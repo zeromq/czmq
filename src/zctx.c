@@ -108,8 +108,9 @@ zctx_set_iothreads (zctx_t *self, int iothreads)
 
 
 //  --------------------------------------------------------------------------
-//  Configure linger timeout. Call this before destroying sockets or context.
-//  Default is no linger, i.e. any pending messages or connects will be lost.
+//  Configure linger timeout in msecs. Call this before destroying sockets or 
+//  context. Default is no linger, i.e. any pending messages or connects will 
+//  be lost.
 
 void 
 zctx_set_linger (zctx_t *self, int linger)
