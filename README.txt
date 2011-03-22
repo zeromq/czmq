@@ -1,7 +1,7 @@
-.set GIT=http://github.com/zeromq/zapi
+.set GIT=https://github.com/zeromq/zapi
 .sub 0MQ=ØMQ
 
-# zapi - 0MQ Function Library
+# zapi - High-level C binding for 0MQ
 
 ## Contents
 

@@ -1,6 +1,6 @@
 
-<A name="toc1-3" title="zapi - ØMQ Function Library" />
-# zapi - ØMQ Function Library
+<A name="toc1-3" title="zapi - High-level C binding for ØMQ" />
+# zapi - High-level C binding for ØMQ
 
 <A name="toc2-6" title="Contents" />
 ## Contents
