@@ -23,13 +23,28 @@
 */
 
 #include "../include/zapi_prelude.h"
+#include "../include/zlist.h"
 #include "../include/zctx.h"
 
 //  Structure of our class
 
 struct _zctx_t {
     void *context;              //  0MQ context object
+    zlist_t *sockets;           //  List of registered sockets
+    int iothreads;              //  Number of io threads for zmq_init
+    int linger;                 //  Linger setting
 };
+
+
+//  ---------------------------------------------------------------------
+//  Signal handling
+//
+
+int zctx_interrupted = 0;
+static void s_signal_handler (int signal_value)
+{
+    zctx_interrupted = 1;
+}
 
 
 //  --------------------------------------------------------------------------
@@ -41,7 +56,17 @@ zctx_new (void)
     zctx_t
         *self;
 
-    self = (zctx_t *) calloc (1, sizeof (zctx_t));
+    self = (zctx_t *) zmalloc (sizeof (zctx_t));
+    self->sockets = zlist_new ();
+
+    //  Install signal handler for SIGINT and SIGTERM
+    struct sigaction action;
+    action.sa_handler = s_signal_handler;
+    action.sa_flags = 0;
+    sigemptyset (&action.sa_mask);
+    sigaction (SIGINT, &action, NULL);
+    sigaction (SIGTERM, &action, NULL);
+    
     return self;
 }
 
@@ -55,6 +80,13 @@ zctx_destroy (zctx_t **self_p)
     assert (self_p);
     if (*self_p) {
         zctx_t *self = *self_p;
+        if (self->context) {
+            //  Close all sockets still registered with context
+            while (zlist_size (self->sockets))
+                zctx_socket_destroy (self, zlist_first (self->sockets));
+            zmq_term (self->context);
+        }
+        zlist_destroy (&self->sockets);
         free (self);
         *self_p = NULL;
     }
@@ -67,9 +99,11 @@ zctx_destroy (zctx_t **self_p)
 //  high volume applications.
 
 void
-zctx_set_iothreads (zctx_t *self, int threads) 
+zctx_set_iothreads (zctx_t *self, int iothreads) 
 {
     assert (self);
+    assert (!self->context);
+    self->iothreads = iothreads;
 }
 
 
@@ -78,19 +112,24 @@ zctx_set_iothreads (zctx_t *self, int threads)
 //  Default is no linger, i.e. any pending messages or connects will be lost.
 
 void 
-zctx_set_linger (zctx_t *self, int msecs)
+zctx_set_linger (zctx_t *self, int linger)
 {
     assert (self);
+    self->linger = linger;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Return 0MQ context for zctx
+//  Return 0MQ context for zctx; if the context has not yet been initialized,
+//  this method will initialize it.
 
 void *
 zctx_context (zctx_t *self)
 {
     assert (self);
+    if (self->context == NULL)
+        self->context = zmq_init (self->iothreads);
+    assert (self->context);
     return self->context;
 }
 
@@ -98,13 +137,20 @@ zctx_context (zctx_t *self)
 //  --------------------------------------------------------------------------
 //  Create new 0MQ socket and register for this context. Use this instead of
 //  the 0MQ core API method if you want automatic management of the socket 
-//  at shutdown.
+//  at shutdown. If the context has not yet been initialized, this method will
+//  initialize it.
 
 void *
 zctx_socket_new (zctx_t *self, int type)
 {
     assert (self);
-    return NULL;
+    if (self->context == NULL)
+        self->context = zmq_init (self->iothreads);
+    assert (self->context);
+    void *socket = zmq_socket (self->context, type);
+    assert (socket);
+    zlist_push (self->sockets, socket);
+    return socket;
 }
 
 
@@ -113,9 +159,13 @@ zctx_socket_new (zctx_t *self, int type)
 //  zctx_socket_new method.
 
 void
-zctx_socket_destroy (zctx_t *self, void **socket)
+zctx_socket_destroy (zctx_t *self, void *socket)
 {
     assert (self);
+    assert (socket);
+    zmq_setsockopt (socket, ZMQ_LINGER, &self->linger, sizeof (int));
+    zmq_close (socket);
+    zlist_remove (self->sockets, socket);
 }
 
 
@@ -125,16 +175,30 @@ zctx_socket_destroy (zctx_t *self, void **socket)
 int
 zctx_test (Bool verbose)
 {
-    zctx_t
-        *ctx;
-
     printf (" * zctx: ");
-    ctx = zctx_new ();
+    
+    //  Create and destroy a context without using it
+    zctx_t *ctx = zctx_new ();
     assert (ctx);
-
     zctx_destroy (&ctx);
     assert (ctx == NULL);
 
+    //  Create a context with many busy sockets, destroy it
+    ctx = zctx_new ();
+    void *s1 = zctx_socket_new (ctx, ZMQ_PAIR);
+    void *s2 = zctx_socket_new (ctx, ZMQ_XREQ);
+    void *s3 = zctx_socket_new (ctx, ZMQ_REQ);
+    void *s4 = zctx_socket_new (ctx, ZMQ_REP);
+    void *s5 = zctx_socket_new (ctx, ZMQ_PUB);
+    void *s6 = zctx_socket_new (ctx, ZMQ_SUB);
+    zmq_connect (s1, "tcp://127.0.0.1:5555");
+    zmq_connect (s2, "tcp://127.0.0.1:5555");
+    zmq_connect (s3, "tcp://127.0.0.1:5555");
+    zmq_connect (s4, "tcp://127.0.0.1:5555");
+    zmq_connect (s5, "tcp://127.0.0.1:5555");
+    zmq_connect (s6, "tcp://127.0.0.1:5555");
+    zctx_destroy (&ctx);
+    
     printf ("OK\n");
     return 0;
 }

@@ -3,6 +3,8 @@ MAN3 =
 MAN7 = zapi.7 \
     zctx.7 \
     zframe.7 \
+    zhash.7 \
+    zlist.7 \
     zloop.7 \
     zmsg.7 \
     zstr.7

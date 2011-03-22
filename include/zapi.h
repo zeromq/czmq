@@ -25,10 +25,6 @@
 #ifndef __ZAPI_H_INCLUDED__
 #define __ZAPI_H_INCLUDED__
 
-//  Always include ZeroMQ header file
-//
-#include <zmq.h>
-
 //  Set up environment for the application
 //
 #include <zfl_prelude.h>
@@ -37,6 +33,8 @@
 
 #include <zctx.h>
 #include <zframe.h>
+#include <zhash.h>
+#include <zlist.h>
 #include <zloop.h>
 #include <zmsg.h>
 #include <zstr.h>

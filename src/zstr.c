@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zstr - working with 0MQ contexts
+    zstr - sending and receiving strings
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
@@ -23,28 +23,48 @@
 */
 
 #include "../include/zapi_prelude.h"
+#include "../include/zctx.h"
 #include "../include/zstr.h"
 
 
 //  --------------------------------------------------------------------------
-//  Receive C string from socket
+//  Receive C string from socket. Caller must free returned string. Returns 
+//  NULL if the context is being terminated or the process was interrupted.
 
 char *
 zstr_recv (void *socket)
 {
     assert (socket);
-    return NULL;
+    zmq_msg_t message;
+    zmq_msg_init (&message);
+    if (zmq_recv (socket, &message, 0))
+        return NULL;
+
+    int size = zmq_msg_size (&message);
+    char *string = malloc (size + 1);
+    memcpy (string, zmq_msg_data (&message), size);
+    zmq_msg_close (&message);
+    string [size] = 0;
+    return string;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Send C string to socket
+//  Send C string to socket. Returns 0 if successful, -1 if there was an 
+//  error.
 
 int
 zstr_send (void *socket, const char *string)
 {
     assert (socket);
-    return 0;
+    assert (string);
+
+    zmq_msg_t message;
+    zmq_msg_init_size (&message, strlen (string));
+    memcpy (zmq_msg_data (&message), string, strlen (string));
+    int rc = zmq_send (socket, &message, 0);
+    zmq_msg_close (&message);
+    return rc;
 }
 
 
@@ -52,11 +72,29 @@ zstr_send (void *socket, const char *string)
 //  Send formatted C string to socket
 
 int
-zstr_sendf (void *socket, const char format, ...)
+zstr_sendf (void *socket, const char *format, ...)
 {
     assert (socket);
-    return 0;
+
+    //  Format string into buffer
+    va_list argptr;
+    va_start (argptr, format);
+    size_t size = 255 + 1;
+    char *string = malloc (size);
+    int required = vsnprintf (string, size, format, argptr);
+    if (required >= size) {
+        size = required + 1;
+        string = realloc (string, size);
+        vsnprintf (string, size, format, argptr);
+    }
+    va_end (argptr);
+    
+    //  Now send formatted string
+    int rc = zstr_send (socket, string);
+    free (string);
+    return rc;
 }
+
 
 //  --------------------------------------------------------------------------
 //  Selftest
@@ -65,6 +103,32 @@ int
 zstr_test (Bool verbose)
 {
     printf (" * zstr: ");
+    zctx_t *ctx = zctx_new ();
+
+    void *output = zctx_socket_new (ctx, ZMQ_PAIR);
+    zmq_bind (output, "inproc://zstr.test");
+    void *input = zctx_socket_new (ctx, ZMQ_PAIR);
+    zmq_connect (input, "inproc://zstr.test");
+
+    //  Send ten strings and then END
+    int string_nbr;
+    for (string_nbr = 0; string_nbr < 10; string_nbr++)
+        zstr_sendf (output, "this is string %d", string_nbr);
+    zstr_send (output, "END");
+    
+    //  Read and count until we receive END
+    string_nbr = 0;
+    for (string_nbr = 0;; string_nbr++) {
+        char *string = zstr_recv (input);
+        if (streq (string, "END")) {
+            free (string);
+            break;
+        }
+        free (string);
+    }
+    assert (string_nbr == 10);
+
+    zctx_destroy (&ctx);
     printf ("OK\n");
     return 0;
 }

@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zframe - working with 0MQ contexts
+    zframe - working with single message frames
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
@@ -34,14 +34,13 @@ typedef struct _zframe_t zframe_t;
 
 #define ZFRAME_MORE     1
 #define ZFRAME_REUSE    2
-#define ZFRAME_NOWAIT   4
 
 zframe_t *
     zframe_new (const void *data, size_t size);
 void
     zframe_destroy (zframe_t **self_p);
 zframe_t *
-    zframe_recv (void *socket, int flags);
+    zframe_recv (void *socket);
 void
     zframe_send (zframe_t **self_p, void *socket, int flags);
 size_t

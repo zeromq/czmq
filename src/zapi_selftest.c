@@ -27,6 +27,8 @@
 #include "../include/zapi_prelude.h"
 #include "../include/zctx.h"
 #include "../include/zframe.h"
+#include "../include/zhash.h"
+#include "../include/zlist.h"
 #include "../include/zloop.h"
 #include "../include/zmsg.h"
 #include "../include/zstr.h"
@@ -43,6 +45,8 @@ int main (int argc, char *argv [])
 
     zctx_test (verbose);
     zframe_test (verbose);
+    zhash_test (verbose);
+    zlist_test (verbose);
     zloop_test (verbose);
     zmsg_test (verbose);
     zstr_test (verbose);

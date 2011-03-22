@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zmsg - working with 0MQ contexts
+    zmsg - working with multipart messages
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
@@ -33,7 +33,7 @@ extern "C" {
 typedef struct _zmsg_t zmsg_t;
 
 zmsg_t *
-    zmsg_new (const void *data, size_t size);
+    zmsg_new (void);
 void
     zmsg_destroy (zmsg_t **self_p);
 zmsg_t *
@@ -43,21 +43,27 @@ void
 size_t
     zmsg_size (zmsg_t *self);
 void
-    zmsg_push (zmsg_t *self, const zframe_t *frame);
+    zmsg_push (zmsg_t *self, zframe_t *frame);
 void
-    zmsg_queue (zmsg_t *self, const zframe_t *frame);
+    zmsg_append (zmsg_t *self, zframe_t *frame);
 void
     zmsg_pushmem (zmsg_t *self, const void *src, size_t size);
 void
-    zmsg_queuemem (zmsg_t *self, const void *src, size_t size);
+    zmsg_appendmem (zmsg_t *self, const void *src, size_t size);
 zframe_t *
     zmsg_pop (zmsg_t *self);
+void
+    zmsg_remove (zmsg_t *self, zframe_t *frame);
 zframe_t *
-    zmsg_remove (zmsg_t *self);
+    zmsg_first (zmsg_t *self);
+zframe_t *
+    zmsg_next (zmsg_t *self);
+zframe_t *
+    zmsg_body (zmsg_t *self);
+void
+    zmsg_save (zmsg_t *self, FILE *file);
 zmsg_t *
     zmsg_load (FILE *file);
-void
-    zmsg_save (zmsg_t **self_p, FILE *file);
 void
     zmsg_dump (zmsg_t *self);
 int

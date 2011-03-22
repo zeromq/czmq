@@ -13,15 +13,15 @@ zctx_t *
 void
     zctx_destroy (zctx_t **self_p);
 void
-    zctx_set_iothreads (zctx_t *self, int threads);
+    zctx_set_iothreads (zctx_t *self, int iothreads);
 void 
-    zctx_set_linger (zctx_t *self, int msecs);
+    zctx_set_linger (zctx_t *self, int linger);
 void *
     zctx_context (zctx_t *self);
 void *
     zctx_socket_new (zctx_t *self, int type);
 void
-    zctx_socket_destroy (zctx_t *self, void **socket);
+    zctx_socket_destroy (zctx_t *self, void *socket);
 int
     zctx_test (int verbose);
 ----
@@ -39,6 +39,27 @@ EXAMPLE
 -------
 .From zctx_test method
 ----
+    //  Create and destroy a context without using it
+    zctx_t *ctx = zctx_new ();
+    assert (ctx);
+    zctx_destroy (&ctx);
+    assert (ctx == NULL);
+
+    //  Create a context with many busy sockets, destroy it
+    ctx = zctx_new ();
+    void *s1 = zctx_socket_new (ctx, ZMQ_PAIR);
+    void *s2 = zctx_socket_new (ctx, ZMQ_XREQ);
+    void *s3 = zctx_socket_new (ctx, ZMQ_REQ);
+    void *s4 = zctx_socket_new (ctx, ZMQ_REP);
+    void *s5 = zctx_socket_new (ctx, ZMQ_PUB);
+    void *s6 = zctx_socket_new (ctx, ZMQ_SUB);
+    zmq_connect (s1, "tcp://127.0.0.1:5555");
+    zmq_connect (s2, "tcp://127.0.0.1:5555");
+    zmq_connect (s3, "tcp://127.0.0.1:5555");
+    zmq_connect (s4, "tcp://127.0.0.1:5555");
+    zmq_connect (s5, "tcp://127.0.0.1:5555");
+    zmq_connect (s6, "tcp://127.0.0.1:5555");
+    zctx_destroy (&ctx);
 ----
 
 

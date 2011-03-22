@@ -37,17 +37,20 @@ zctx_t *
 void
     zctx_destroy (zctx_t **self_p);
 void
-    zctx_set_iothreads (zctx_t *self, int threads);
+    zctx_set_iothreads (zctx_t *self, int iothreads);
 void 
-    zctx_set_linger (zctx_t *self, int msecs);
+    zctx_set_linger (zctx_t *self, int linger);
 void *
     zctx_context (zctx_t *self);
 void *
     zctx_socket_new (zctx_t *self, int type);
 void
-    zctx_socket_destroy (zctx_t *self, void **socket);
+    zctx_socket_destroy (zctx_t *self, void *socket);
 int
     zctx_test (Bool verbose);
+
+//  Global signal indicator
+int zctx_interrupted;
 
 #ifdef __cplusplus
 }

@@ -8,29 +8,23 @@ zloop - event-driven reactor
 SYNOPSIS
 --------
 ----
-typedef int (zloop_fn) (void *socket, int flags, void *argument);
-
-#define ZEVENTS_IN      1
-#define ZEVENTS_OUT     2
-#define ZEVENTS_ALARM   4
+//  Callback function for reactor events
+typedef int (zloop_fn) (zloop_t *loop, void *socket, void *args);
 
 zloop_t *
     zloop_new (void);
 void
     zloop_destroy (zloop_t **self_p);
 int
-    zloop_register (zloop_t *self, void *socket, int flags, 
-                    zloop_fn handler, void *argument);
+    zloop_reader (zloop_t *self, void *socket, zloop_fn handler, void *args);
+void
+    zloop_cancel (zloop_t *self, void *socket);
 int
-    zloop_alarm (zloop_t *self, size_t alarm_msecs,
-                 zloop_fn handler, void *argument);
-int
-    zloop_clock (zloop_t *self, size_t clock_msecs,
-                 zloop_fn handler, void *argument);
+    zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *args);
 int
     zloop_start (zloop_t *self);
 int
-    zloop_test (int verbose);
+    zloop_test (Bool verbose);
 ----
 
 DESCRIPTION
@@ -42,6 +36,38 @@ EXAMPLE
 -------
 .From zloop_test method
 ----
+int s_timer_event (zloop_t *loop, void *socket, void *output)
+{
+    zstr_send (output, "PING");
+    return 0;
+}
+
+int s_socket_event (zloop_t *loop, void *socket, void *args)
+{
+    //  Just end the reactor
+    return -1;
+}
+
+    zctx_t *ctx = zctx_new ();
+    
+    void *output = zctx_socket_new (ctx, ZMQ_PAIR);
+    zmq_bind (output, "inproc://zloop.test");
+    void *input = zctx_socket_new (ctx, ZMQ_PAIR);
+    zmq_connect (input, "inproc://zloop.test");
+
+    zloop_t *loop = zloop_new ();
+    assert (loop);
+    
+    //  After 10 msecs, send a ping message to output
+    zloop_timer (loop, 10, 1,  s_timer_event, output);
+    //  When we get the ping message, end the reactor
+    zloop_reader (loop, input, s_socket_event, NULL);
+    zloop_start (loop);
+    
+    zloop_destroy (&loop);
+    assert (loop == NULL);
+
+    zctx_destroy (&ctx);
 ----
 
 

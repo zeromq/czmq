@@ -25,6 +25,10 @@
 #ifndef __ZAPI_PRELUDE_H_INCLUDED__
 #define __ZAPI_PRELUDE_H_INCLUDED__
 
+//- Always include ZeroMQ header file ---------------------------------------
+//
+#include <zmq.h>
+
 //- Standard ANSI include files ---------------------------------------------
 
 #include <ctype.h>
@@ -88,7 +92,8 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 
 #define streq(s1,s2)    (!strcmp ((s1), (s2)))
 #define strneq(s1,s2)   (strcmp ((s1), (s2)))
-#define randof(num)     (int) (((float) num) * rand () / (RAND_MAX + 1.0))
+//  Provide random number from 0..(num-1)
+#define randof(num)     (int) ((float) (num) * random () / (RAND_MAX + 1.0))
 #if (!defined (TRUE))
 #    define TRUE        1               //  ANSI standard
 #    define FALSE       0
@@ -107,6 +112,52 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
     typedef unsigned int  uint;
     typedef __int64 int64_t;
     typedef unsigned __int64 uint64_t;
+#elif (defined (__APPLE__))
+    typedef unsigned long ulong;
+    typedef unsigned int  uint;
+#endif
+
+//- Error reporting ---------------------------------------------------------
+// If the compiler is GCC or supports C99, include enclosing function
+// in zapi assertions
+#if defined (__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
+#   define ZAPI_ASSERT_SANE_FUNCTION    __func__
+#elif defined (__GNUC__) && (__GNUC__ >= 2)
+#   define ZAPI_ASSERT_SANE_FUNCTION    __FUNCTION__
+#else
+#   define ZAPI_ASSERT_SANE_FUNCTION    "<unknown>"
+#endif
+
+//  Replacement for malloc() which asserts if we run out of heap, and
+//  which zeroes the allocated block.
+static inline void *
+    safe_malloc (
+    size_t size,
+    char *file,
+    unsigned line,
+    const char *func)
+{
+    void
+        *mem;
+
+    mem = calloc (1, size);
+    if (mem == NULL) {
+        fprintf (stderr, "FATAL ERROR at %s:%u, in %s\n", file, line, func);
+        fprintf (stderr, "OUT OF MEMORY (malloc returned NULL)\n");
+        fflush (stderr);
+        abort ();
+    }
+    return mem;
+}
+
+//  Define _ZMALLOC_DEBUG if you need to trace memory leaks using e.g. mtrace,
+//  otherwise all allocations will claim to come from zfl_prelude.h.  For best
+//  results, compile all classes so you see dangling object allocations.
+//
+#ifdef _ZMALLOC_DEBUG
+#   define zmalloc(size) calloc(1,(size))
+#else
+#   define zmalloc(size) safe_malloc((size), __FILE__, __LINE__, ZAPI_ASSERT_SANE_FUNCTION)
 #endif
 
 //- DLL exports -------------------------------------------------------------

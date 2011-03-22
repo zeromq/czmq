@@ -13,7 +13,7 @@ char *
 int
     zstr_send (void *socket, const char *string);
 int
-    zstr_sendf (void *socket, const char format, ...);
+    zstr_sendf (void *socket, const char *format, ...);
 ----
 
 DESCRIPTION
@@ -26,6 +26,32 @@ EXAMPLE
 -------
 .From zstr_test method
 ----
+    zctx_t *ctx = zctx_new ();
+
+    void *output = zctx_socket_new (ctx, ZMQ_PAIR);
+    zmq_bind (output, "inproc://zstr.test");
+    void *input = zctx_socket_new (ctx, ZMQ_PAIR);
+    zmq_connect (input, "inproc://zstr.test");
+
+    //  Send ten strings and then END
+    int string_nbr;
+    for (string_nbr = 0; string_nbr < 10; string_nbr++)
+        zstr_sendf (output, "this is string %d", string_nbr);
+    zstr_send (output, "END");
+    
+    //  Read and count until we receive END
+    string_nbr = 0;
+    for (string_nbr = 0;; string_nbr++) {
+        char *string = zstr_recv (input);
+        if (streq (string, "END")) {
+            free (string);
+            break;
+        }
+        free (string);
+    }
+    assert (string_nbr == 10);
+
+    zctx_destroy (&ctx);
 ----
 
 

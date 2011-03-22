@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zloop - working with 0MQ contexts
+    zloop - event-driven reactor
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
@@ -32,23 +32,19 @@ extern "C" {
 //  Opaque class structure
 typedef struct _zloop_t zloop_t;
 
-//  Callback function for zhash_foreach method
-typedef int (zloop_fn) (void *socket, int flags, void *argument);
-
-#define ZEVENTS_IN      1
-#define ZEVENTS_OUT     2
-#define ZEVENTS_ALARM   4
+//  Callback function for reactor events
+typedef int (zloop_fn) (zloop_t *loop, void *socket, void *args);
 
 zloop_t *
     zloop_new (void);
 void
     zloop_destroy (zloop_t **self_p);
 int
-    zloop_register (zloop_t *self, void *socket, int flags, zloop_fn handler, void *argument);
+    zloop_reader (zloop_t *self, void *socket, zloop_fn handler, void *args);
+void
+    zloop_cancel (zloop_t *self, void *socket);
 int
-    zloop_alarm (zloop_t *self, size_t alarm_msecs, zloop_fn handler, void *argument);
-int
-    zloop_clock (zloop_t *self, size_t clock_msecs, zloop_fn handler, void *argument);
+    zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *args);
 int
     zloop_start (zloop_t *self);
 int

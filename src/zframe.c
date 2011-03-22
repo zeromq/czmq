@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zframe - working with 0MQ contexts
+    zframe - working with single message frames
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
@@ -23,17 +23,20 @@
 */
 
 #include "../include/zapi_prelude.h"
+#include "../include/zctx.h"
 #include "../include/zframe.h"
 
 //  Structure of our class
 
 struct _zframe_t {
-    void *context;              //  0MQ context object
+    zmq_msg_t frame;            //  If so, zmq_msg_t for it
+    int more;                   //  More flag, from last read
 };
 
 
 //  --------------------------------------------------------------------------
-//  Constructor
+//  Constructor; if size is >0, allocates frame with that size, and if data
+//  is not null, copies data into frame.
 
 zframe_t *
 zframe_new (const void *data, size_t size)
@@ -41,7 +44,15 @@ zframe_new (const void *data, size_t size)
     zframe_t
         *self;
 
-    self = (zframe_t *) calloc (1, sizeof (zframe_t));
+    self = (zframe_t *) zmalloc (sizeof (zframe_t));
+    if (size) {
+        zmq_msg_init_size (&self->frame, size);
+        if (data)
+            memcpy (zmq_msg_data (&self->frame), data, size);
+    }
+    else
+        zmq_msg_init (&self->frame);
+    
     return self;
 }
 
@@ -55,6 +66,7 @@ zframe_destroy (zframe_t **self_p)
     assert (self_p);
     if (*self_p) {
         zframe_t *self = *self_p;
+        zmq_msg_close (&self->frame);
         free (self);
         *self_p = NULL;
     }
@@ -62,13 +74,25 @@ zframe_destroy (zframe_t **self_p)
 
 
 //  --------------------------------------------------------------------------
-//  Receive frame from socket
+//  Receive frame from socket, returns zframe_t object or NULL if the recv
+//  was interrupted. Does a blocking recv, if you want to not block then use
+//  the zloop class or zmq_poll to check for socket input before receiving.
 
 zframe_t *
-zframe_recv (void *socket, int flags)
+zframe_recv (void *socket)
 {
     assert (socket);
-    return NULL;
+    zframe_t *self = zframe_new (NULL, 0);
+    if (zmq_recv (socket, &self->frame, 0)) {
+        zframe_destroy (&self);
+        return NULL;            //  Interrupted or terminated
+    }
+    //  Check multipart framing
+    int64_t more;
+    size_t more_size = sizeof (more);
+    zmq_getsockopt (socket, ZMQ_RCVMORE, &more, &more_size);
+    self->more = (int) more;
+    return self;
 }
 
 
@@ -79,6 +103,21 @@ void
 zframe_send (zframe_t **self_p, void *socket, int flags)
 {
     assert (socket);
+    assert (self_p);
+    if (*self_p) {
+        zframe_t *self = *self_p;
+        if (flags & ZFRAME_REUSE) {
+            zmq_msg_t copy;
+            zmq_msg_init (&copy);
+            zmq_msg_copy (&copy, &self->frame);
+            zmq_send (socket, &copy, (flags & ZFRAME_MORE)? ZMQ_SNDMORE: 0);
+            zmq_msg_close (&copy);
+        }
+        else {
+            zmq_send (socket, &self->frame, (flags & ZFRAME_MORE)? ZMQ_SNDMORE: 0);
+            zframe_destroy (self_p);
+        }
+    }
 }
 
 
@@ -89,7 +128,7 @@ size_t
 zframe_size (zframe_t *self)
 {
     assert (self);
-    return 0;
+    return zmq_msg_size (&self->frame);
 }
 
 
@@ -100,7 +139,7 @@ void *
 zframe_data (zframe_t *self)
 {
     assert (self);
-    return NULL;
+    return zmq_msg_data (&self->frame);
 }
 
 
@@ -111,7 +150,7 @@ int
 zframe_more (zframe_t *self)
 {
     assert (self);
-    return 0;
+    return self->more;
 }
 
 
@@ -121,16 +160,48 @@ zframe_more (zframe_t *self)
 int
 zframe_test (Bool verbose)
 {
-    zframe_t
-        *frame;
-
     printf (" * zframe: ");
-    frame = zframe_new ("Hello", 5);
+
+    zctx_t *ctx = zctx_new ();
+
+    void *output = zctx_socket_new (ctx, ZMQ_PAIR);
+    zmq_bind (output, "inproc://zframe.test");
+    void *input = zctx_socket_new (ctx, ZMQ_PAIR);
+    zmq_connect (input, "inproc://zframe.test");
+    
+    //  Send five different frames, test ZFRAME_MORE
+    int frame_nbr;
+    for (frame_nbr = 0; frame_nbr < 5; frame_nbr++) {
+        zframe_t *frame = zframe_new ("Hello", 5);
+        zframe_send (&frame, output, ZFRAME_MORE);
+    }
+    //  Send same frame five times, test ZFRAME_REUSE
+    zframe_t *frame = zframe_new ("Hello", 5);
+    for (frame_nbr = 0; frame_nbr < 5; frame_nbr++) {
+        zframe_send (&frame, output, ZFRAME_MORE + ZFRAME_REUSE);
+    }
     assert (frame);
-
     zframe_destroy (&frame);
-    assert (frame == NULL);
-
+    
+    //  Send END frame
+    frame = zframe_new ("END", 3);
+    zframe_send (&frame, output, 0);
+    
+    //  Read and count until we receive END
+    frame_nbr = 0;
+    for (frame_nbr = 0;; frame_nbr++) {
+        zframe_t *frame = zframe_recv (input);
+        if (zframe_size (frame) == 3
+        &&  memcmp (zframe_data (frame), "END", 3) == 0) {
+            zframe_destroy (&frame);
+            break;
+        }
+        assert (zframe_more (frame));
+        zframe_destroy (&frame);
+    }
+    assert (frame_nbr == 10);
+    
+    zctx_destroy (&ctx);
     printf ("OK\n");
     return 0;
 }

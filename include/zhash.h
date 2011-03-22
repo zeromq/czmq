@@ -1,11 +1,11 @@
 /*  =========================================================================
-    zstr - sending and receiving strings
+    zhash.h - ZFL singly-linked hash class
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
-    This file is part of zapi, the C binding for 0MQ: http://zapi.zeromq.org.
+    This file is part of the ZeroMQ Function Library: http://zfl.zeromq.org
 
     This is free software; you can redistribute it and/or modify it under the
     terms of the GNU Lesser General Public License as published by the Free
@@ -22,21 +22,41 @@
     =========================================================================
 */
 
-#ifndef __ZSTR_H_INCLUDED__
-#define __ZSTR_H_INCLUDED__
+#ifndef __ZFL_HASH_H_INCLUDED__
+#define __ZFL_HASH_H_INCLUDED__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-char *
-    zstr_recv (void *socket);
+//  Callback function for zhash_foreach method
+typedef int (zhash_foreach_fn) (char *key, void *value, void *argument);
+//  Callback function for zhash_freefn method
+typedef void (zhash_free_fn) (void *data);
+
+//  Opaque class structure
+typedef struct _zhash zhash_t;
+
+zhash_t *
+    zhash_new (void);
+void
+    zhash_destroy (zhash_t **self_p);
 int
-    zstr_send (void *socket, const char *string);
+    zhash_insert (zhash_t *self, char *key, void *value);
+void
+    zhash_update (zhash_t *self, char *key, void *value);
+void
+    zhash_delete (zhash_t *self, char *key);
+void *
+    zhash_lookup (zhash_t *self, char *key);
+void *
+    zhash_freefn (zhash_t *self, char *key, zhash_free_fn *free_fn);
+size_t
+    zhash_size (zhash_t *self);
 int
-    zstr_sendf (void *socket, const char *format, ...);
-int
-    zstr_test (Bool verbose);
+    zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument);
+void
+    zhash_test (int verbose);
 
 #ifdef __cplusplus
 }

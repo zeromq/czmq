@@ -8,19 +8,23 @@
 
 **<a href="#toc2-11">Overview</a>**
 &emsp;<a href="#toc3-14">Scope and Goals</a>
-&emsp;<a href="#toc3-23">Ownership and License</a>
-&emsp;<a href="#toc3-30">Contributing</a>
+&emsp;<a href="#toc3-25">Highlights</a>
+&emsp;<a href="#toc3-38">Ownership and License</a>
+&emsp;<a href="#toc3-45">Contributing</a>
 
-**<a href="#toc2-41">Using zapi</a>**
-&emsp;<a href="#toc3-44">API Summary</a>
-&emsp;<a href="#toc4-47">zctx - working with ØMQ contexts</a>
-&emsp;<a href="#toc4-69">zstr - sending and receiving strings</a>
-&emsp;<a href="#toc4-81">zframe - working with single message frames</a>
-&emsp;<a href="#toc4-103">zmsg - working with multipart messages</a>
-&emsp;<a href="#toc4-139">zloop - event-driven reactor</a>
-&emsp;<a href="#toc3-162">Building and Installing</a>
-&emsp;<a href="#toc3-183">Linking with an Application</a>
-&emsp;<a href="#toc3-190">This Document</a>
+**<a href="#toc2-54">Using zapi</a>**
+&emsp;<a href="#toc3-57">Building and Installing</a>
+&emsp;<a href="#toc3-78">Linking with an Application</a>
+&emsp;<a href="#toc3-85">API Summary</a>
+&emsp;<a href="#toc4-88">zctx - working with ØMQ contexts</a>
+&emsp;<a href="#toc4-117">zstr - sending and receiving strings</a>
+&emsp;<a href="#toc4-131">zframe - working with single message frames</a>
+&emsp;<a href="#toc4-155">zmsg - working with multipart messages</a>
+&emsp;<a href="#toc4-199">zloop - event-driven reactor</a>
+&emsp;<a href="#toc4-221">zhash - expandable hash table container</a>
+&emsp;<a href="#toc4-249">zlist - singly-linked list container</a>
+&emsp;<a href="#toc3-280">Development</a>
+&emsp;<a href="#toc3-290">This Document</a>
 
 <A name="toc2-11" title="Overview" />
 ## Overview
@@ -31,149 +35,44 @@
 zapi has these goals:
 
 * To wrap the ØMQ core API in semantics that are natural and lead to shorter, more readable applications.
-* To hide the differences between versions of ØMQ.
+* To hide the differences between versions of ØMQ, particularly 2.0, 2.1, and 3.0.
 * To provide a space for development of more sophisticated API semantics.
 
-<A name="toc3-23" title="Ownership and License" />
+zapi grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.org) and [ZFL](http://zfl.zeromq.org).
+
+<A name="toc3-25" title="Highlights" />
+### Highlights
+
+* Single API hides differences between ØMQ/2.1, and ØMQ/3.0.
+* Broken into easy-to-use classes: zctx, zstr, zframe, zmsg, zloop, zhash, and zlist.
+* Work with messages as strings, individual frames, or multipart messages.
+* Automatic closure of any open sockets at context termination.
+* Automatic LINGER configuration of all sockets for context termination.
+* Includes generic hash and list containers.
+* Simple reactor with one-off and repeated timers, and socket readers.
+* Full selftests on all classes.
+* Portable to Linux, UNIX, OS X, Windows (porting is not yet complete).
+
+<A name="toc3-38" title="Ownership and License" />
 ### Ownership and License
 
 zapi is maintained by Pieter Hintjens and Mikko Koppanen (build system). Its other authors and contributors are listed in the AUTHORS file. It is held by the ZeroMQ organization at github.com.
 
 The authors of zapi grant you use of this software under the terms of the GNU Lesser General Public License (LGPL). For details see the files `COPYING` and `COPYING.LESSER` in this directory.
 
-<A name="toc3-30" title="Contributing" />
+<A name="toc3-45" title="Contributing" />
 ### Contributing
 
 To submit an issue use the [issue tracker](http://github.com/zeromq/zapi/issues). All discussion happens on the [zeromq-dev](zeromq-dev@lists.zeromq.org) list or #zeromq IRC channel at irc.freenode.net.
 
 The proper way to submit patches is to clone this repository, make your changes, and use git to create a patch or a pull request. See http://www.zeromq.org/docs:contributing. All contributors are listed in AUTHORS.
 
-All classes are maintained by a single person, who is the responsible editor for that class and who is named in the header as such. This is usually the originator of the class. When several people collaborate on a class, one single person is always the lead maintainer and the one to blame when it breaks.
-
 The general rule is, if you contribute code to zapi you must be willing to maintain it as long as there are users of it. Code with no active maintainer will in general be deprecated and/or removed.
 
-<A name="toc2-41" title="Using zapi" />
+<A name="toc2-54" title="Using zapi" />
 ## Using zapi
 
-<A name="toc3-44" title="API Summary" />
-### API Summary
-
-<A name="toc4-47" title="zctx - working with ØMQ contexts" />
-#### zctx - working with ØMQ contexts
-
-The zctx class wraps ØMQ contexts. It manages open sockets in the context and automatically closes these before terminating the context. It provides a simple way to set the linger timeout on sockets, and configure contexts for number of I/O threads. Sets-up signal (interrrupt) handling for the process.
-
-    zctx_t *
-        zctx = zctx_new (void);
-    void
-        zctx_destroy (zctx_t **self_p);
-    void
-        zctx_set_iothreads (zctx_t *self, int threads);
-    void 
-        zctx_set_linger (zctx_t *self, int msecs);
-    void *
-        zctx_context (zctx_t *self);
-    void *
-        zctx_socket_new (zctx_t *self, int type);
-    void
-        zctx_socket_destroy (zctx_t *self, void **socket);
-    int
-        zctx_test (int verbose);
-
-<A name="toc4-69" title="zstr - sending and receiving strings" />
-#### zstr - sending and receiving strings
-
-The zstr class provides utility functions for sending and receiving C strings across ØMQ sockets.
-
-    char *
-        zstr_recv (void *socket);
-    int
-        zstr_send (void *socket, const char *string);
-    int
-        zstr_sendf (void *socket, const char format, ...);
-
-<A name="toc4-81" title="zframe - working with single message frames" />
-#### zframe - working with single message frames
-
-The zframe class provides methods to send and receive single message frames across ØMQ sockets.
-
-    zframe_t *
-        zframe_new (const void *data, size_t size);
-    void
-        zframe_destroy (zframe_t **self_p);
-    zframe_t *
-        zframe_recv (void *socket, int flags);
-    void
-        zframe_send (zframe_t **self_p, void *socket, int flags);
-    size_t
-        zframe_size (zframe_t *self);
-    void *
-        zframe_data (zframe_t *self);
-    int
-        zframe_more (zframe_t *self);
-    int
-        zframe_test (int verbose);
-
-<A name="toc4-103" title="zmsg - working with multipart messages" />
-#### zmsg - working with multipart messages
-
-The zmsg class provides methods to send and receive multipart messages across ØMQ sockets.
-
-    zmsg_t *
-        zmsg_new (const void *data, size_t size);
-    void
-        zmsg_destroy (zmsg_t **self_p);
-    zmsg_t *
-        zmsg_recv (void *socket);
-    void
-        zmsg_send (zmsg_t **self, void *socket);
-    size_t
-        zmsg_size (zmsg_t *self);
-    void
-        zmsg_push (zmsg_t *self, const zframe_t *frame);
-    void
-        zmsg_queue (zmsg_t *self, const zframe_t *frame);
-    void
-        zmsg_pushmem (zmsg_t *self, const void *src, size_t size);
-    void
-        zmsg_queuemem (zmsg_t *self, const void *src, size_t size);
-    zframe_t *
-        zmsg_pop (zmsg_t *self);
-    zframe_t *
-        zmsg_remove (zmsg_t *self);
-    zmsg_t *
-        zmsg_load (FILE *file);
-    void
-        zmsg_save (zmsg_t **self_p, FILE *file);
-    void
-        zmsg_dump (zmsg_t *self);
-    int
-        zmsg_test (int verbose);
-
-<A name="toc4-139" title="zloop - event-driven reactor" />
-#### zloop - event-driven reactor
-
-The zloop class provides an event-driven reactor pattern.
-
-    zloop_t *
-        zloop_new (void);
-    void
-        zloop_destroy (zloop_t **self_p);
-    int
-        zloop_register (zloop_t *self, void *socket, int flags, 
-                        zloop_fn handler, void *argument);
-    int
-        zloop_alarm (zloop_t *self, size_t alarm_msecs,
-                    zloop_fn handler, void *argument);
-    int
-        zloop_clock (zloop_t *self, size_t clock_msecs,
-                    zloop_fn handler, void *argument);
-    int
-        zloop_start (zloop_t *self);
-    int
-        zloop_test (int verbose);
-
-<A name="toc3-162" title="Building and Installing" />
+<A name="toc3-57" title="Building and Installing" />
 ### Building and Installing
 
 zapi uses autotools for packaging. To build from git (all example commands are for Linux):
@@ -194,14 +93,219 @@ After building, you can run the zapi selftests:
 
     make check
 
-<A name="toc3-183" title="Linking with an Application" />
+<A name="toc3-78" title="Linking with an Application" />
 ### Linking with an Application
 
 Include `zapi.h` in your application and link with libzapi. Here is a typical gcc link command:
 
     gcc -lzapi -lzmq myapp.c -o myapp
 
-<A name="toc3-190" title="This Document" />
+<A name="toc3-85" title="API Summary" />
+### API Summary
+
+<A name="toc4-88" title="zctx - working with ØMQ contexts" />
+#### zctx - working with ØMQ contexts
+
+The zctx class wraps ØMQ contexts and replaces the core zmq_init(), zmq_term(), and zmq_socket() functions. The main purpose of this class is to automatically close sockets when terminating a context. The zctx class has these main features:
+
+* Tracks all open sockets and automatically closes them before calling zmq_term(). This avoids an infinite wait on open sockets.
+* Automatically configures sockets with a ZMQ_LINGER timeout you can define, and which defaults to zero. The default behavior of zctx is therefore like ØMQ/2.0, immediate termination with loss of any pending messages. You can set any linger timeout you like by calling the zctx_set_linger() method.
+* Moves the iothreads configuration to a separate method, so that default usage is 1 I/O thread. Lets you configure this value.
+* Sets up signal (SIGINT and SIGTERM) handling so that blocking calls such as zmq_recv() and zmq_poll() will return when the user presses Ctrl-C.
+
+This is the class interface:
+
+    zctx_t *
+        zctx = zctx_new (void);
+    void
+        zctx_destroy (zctx_t **self_p);
+    void
+        zctx_set_iothreads (zctx_t *self, int iothreads);
+    void 
+        zctx_set_linger (zctx_t *self, int linger);
+    void *
+        zctx_context (zctx_t *self);
+    void *
+        zctx_socket_new (zctx_t *self, int type);
+    void
+        zctx_socket_destroy (zctx_t *self, void *socket);
+    int
+        zctx_test (int verbose);
+
+<A name="toc4-117" title="zstr - sending and receiving strings" />
+#### zstr - sending and receiving strings
+
+The zstr class provides utility functions for sending and receiving C strings across ØMQ sockets. It sends strings without a terminating null, and appends a null byte on received strings. This class is for simple message sending. 
+
+This is the class interface:
+
+    char *
+        zstr_recv (void *socket);
+    int
+        zstr_send (void *socket, const char *string);
+    int
+        zstr_sendf (void *socket, const char *format, ...);
+
+<A name="toc4-131" title="zframe - working with single message frames" />
+#### zframe - working with single message frames
+
+The zframe class provides methods to send and receive single message frames across ØMQ sockets. A 'frame' corresponds to one zmq_msg_t. When you read a frame from a socket, the zframe_more() method indicates if the frame is part of an unfinished multipart message. The zframe_send method normally destroys the frame, but with the ZFRAME_REUSE flag, you can send the same frame many times. Frames are binary, and this class has no special support for text data.
+
+This is the class interface:
+
+    zframe_t *
+        zframe_new (const void *data, size_t size);
+    void
+        zframe_destroy (zframe_t **self_p);
+    zframe_t *
+        zframe_recv (void *socket);
+    void
+        zframe_send (zframe_t **self_p, void *socket, int flags);
+    size_t
+        zframe_size (zframe_t *self);
+    void *
+        zframe_data (zframe_t *self);
+    int
+        zframe_more (zframe_t *self);
+    int
+        zframe_test (int verbose);
+
+<A name="toc4-155" title="zmsg - working with multipart messages" />
+#### zmsg - working with multipart messages
+
+The zmsg class provides methods to send and receive multipart messages across ØMQ sockets. This class provides a list-like container interface, with methods to work with the overall container. zmsg_t messages are composed of zero or more zframe_t frames.
+
+This is the class interface:
+
+    zmsg_t *
+        zmsg_new (void);
+    void
+        zmsg_destroy (zmsg_t **self_p);
+    zmsg_t *
+        zmsg_recv (void *socket);
+    void
+        zmsg_send (zmsg_t **self, void *socket);
+    size_t
+        zmsg_size (zmsg_t *self);
+    void
+        zmsg_push (zmsg_t *self, zframe_t *frame);
+    void
+        zmsg_append (zmsg_t *self, zframe_t *frame);
+    void
+        zmsg_pushmem (zmsg_t *self, const void *src, size_t size);
+    void
+        zmsg_appendmem (zmsg_t *self, const void *src, size_t size);
+    zframe_t *
+        zmsg_pop (zmsg_t *self);
+    void
+        zmsg_remove (zmsg_t *self, zframe_t *frame);
+    zframe_t *
+        zmsg_first (zmsg_t *self);
+    zframe_t *
+        zmsg_next (zmsg_t *self);
+    zframe_t *
+        zmsg_body (zmsg_t *self);
+    void
+        zmsg_save (zmsg_t *self, FILE *file);
+    zmsg_t *
+        zmsg_load (FILE *file);
+    void
+        zmsg_dump (zmsg_t *self);
+    int
+        zmsg_test (int verbose);
+
+<A name="toc4-199" title="zloop - event-driven reactor" />
+#### zloop - event-driven reactor
+
+The zloop class provides an event-driven reactor pattern. The reactor handles socket readers (not writers in the current implementation), and once-off or repeated timers. Its resolution is 1 msec. It uses a tickless timer to reduce CPU interrupts in inactive processes.
+
+This is the class interface:
+
+    zloop_t *
+        zloop_new (void);
+    void
+        zloop_destroy (zloop_t **self_p);
+    int
+        zloop_reader (zloop_t *self, void *socket, zloop_fn handler, void *args);
+    void
+        zloop_cancel (zloop_t *self, void *socket);
+    int
+        zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *args);
+    int
+        zloop_start (zloop_t *self);
+    int
+        zloop_test (Bool verbose);
+
+<A name="toc4-221" title="zhash - expandable hash table container" />
+#### zhash - expandable hash table container
+
+Provides a generic hash container. Taken from the ZFL project zfl_hash class and provides identical functionality. Note that it's relatively slow (~50k insertions/deletes per second), so don't do inserts/updates on the critical path for message I/O.  It can do ~2.5M lookups per second for 16-char keys.  Timed on a 1.6GHz CPU.
+
+This is the class interface:
+
+    zhash_t *
+        zhash_new (void);
+    void
+        zhash_destroy (zhash_t **self_p);
+    int
+        zhash_insert (zhash_t *self, char *key, void *value);
+    void
+        zhash_update (zhash_t *self, char *key, void *value);
+    void
+        zhash_delete (zhash_t *self, char *key);
+    void *
+        zhash_lookup (zhash_t *self, char *key);
+    void *
+        zhash_freefn (zhash_t *self, char *key, zhash_free_fn *free_fn);
+    size_t
+        zhash_size (zhash_t *self);
+    int
+        zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument);
+    void
+        zhash_test (int verbose);
+
+<A name="toc4-249" title="zlist - singly-linked list container" />
+#### zlist - singly-linked list container
+
+Provides a generic list container. Taken from the ZFL project zlist class and provides identical functionality. You
+can use this to construct multi-dimensional lists, and other structures together with other generic containers like zhash.
+
+This is the class interface:
+
+    zlist_t *
+        zlist_new (void);
+    void
+        zlist_destroy (zlist_t **self_p);
+    void *
+        zlist_first (zlist_t *self);
+    void *
+        zlist_next (zlist_t *self);
+    void
+        zlist_append (zlist_t *self, void *value);
+    void
+        zlist_push (zlist_t *self, void *value);
+    void *
+        zlist_pop (zlist_t *self);
+    void
+        zlist_remove (zlist_t *self, void *value);
+    zlist_t *
+        zlist_copy (zlist_t *self);
+    size_t
+        zlist_size (zlist_t *self);
+    void
+        zlist_test (int verbose);
+
+<A name="toc3-280" title="Development" />
+### Development
+
+zapi is developed through a test-driven process that guarantees no memory violations or leaks in the code:
+
+* Modify a class or method.
+* Update the test method for that class.
+* Run the 'selftest' script, which uses the Valgrind memcheck tool.
+* Repeat until perfect.
+
+<A name="toc3-290" title="This Document" />
 ### This Document
 
 This document is originally at README.txt and is built using [gitdown](http://github.com/imatix/gitdown).

@@ -8,6 +8,8 @@ include_HEADERS = \
     ../include/zapi_prelude.h \
     ../include/zctx.h \
     ../include/zframe.h \
+    ../include/zhash.h \
+    ../include/zlist.h \
     ../include/zloop.h \
     ../include/zmsg.h \
     ../include/zstr.h
@@ -15,11 +17,11 @@ include_HEADERS = \
 libzapi_la_SOURCES = \
     zctx.c \
     zframe.c \
+    zhash.c \
+    zlist.c \
     zloop.c \
     zmsg.c \
     zstr.c 
-
-EXTRA_libzapi_la_SOURCES = import/cJSON/cJSON.c
 
 INCLUDES = -I$(top_srcdir)/include
 bin_PROGRAMS = zapi_selftest
