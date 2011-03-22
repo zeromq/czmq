@@ -1,0 +1,48 @@
+zctx(7)
+=======
+
+NAME
+----
+zctx - working with 0MQ contexts
+
+SYNOPSIS
+--------
+----
+zctx_t *
+    zctx = zctx_new (void);
+void
+    zctx_destroy (zctx_t **self_p);
+void
+    zctx_set_iothreads (zctx_t *self, int threads);
+void 
+    zctx_set_linger (zctx_t *self, int msecs);
+void *
+    zctx_context (zctx_t *self);
+void *
+    zctx_socket_new (zctx_t *self, int type);
+void
+    zctx_socket_destroy (zctx_t *self, void **socket);
+int
+    zctx_test (int verbose);
+----
+
+DESCRIPTION
+-----------
+The zctx class wraps 0MQ contexts. It manages open sockets in the context 
+and automatically closes these before terminating the context. It provides
+a simple way to set the linger timeout on sockets, and configure contexts
+for number of I/O threads. Sets-up signal (interrrupt) handling for the
+process.
+
+
+EXAMPLE
+-------
+.From zctx_test method
+----
+----
+
+
+SEE ALSO
+--------
+linkzapi:zapi[7]
+

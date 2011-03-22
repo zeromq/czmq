@@ -1,0 +1,51 @@
+zloop(7)
+========
+
+NAME
+----
+zloop - event-driven reactor
+
+SYNOPSIS
+--------
+----
+typedef int (zloop_fn) (void *socket, int flags, void *argument);
+
+#define ZEVENTS_IN      1
+#define ZEVENTS_OUT     2
+#define ZEVENTS_ALARM   4
+
+zloop_t *
+    zloop_new (void);
+void
+    zloop_destroy (zloop_t **self_p);
+int
+    zloop_register (zloop_t *self, void *socket, int flags, 
+                    zloop_fn handler, void *argument);
+int
+    zloop_alarm (zloop_t *self, size_t alarm_msecs,
+                 zloop_fn handler, void *argument);
+int
+    zloop_clock (zloop_t *self, size_t clock_msecs,
+                 zloop_fn handler, void *argument);
+int
+    zloop_start (zloop_t *self);
+int
+    zloop_test (int verbose);
+----
+
+DESCRIPTION
+-----------
+The zloop class provides an event-driven reactor pattern.
+
+
+EXAMPLE
+-------
+.From zloop_test method
+----
+----
+
+
+SEE ALSO
+--------
+linkzapi:zapi[7]
+

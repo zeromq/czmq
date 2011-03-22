@@ -1,0 +1,59 @@
+zmsg(7)
+=======
+
+NAME
+----
+zmsg - working with multipart messages
+
+SYNOPSIS
+--------
+----
+zmsg_t *
+    zmsg_new (const void *data, size_t size);
+void
+    zmsg_destroy (zmsg_t **self_p);
+zmsg_t *
+    zmsg_recv (void *socket);
+void
+    zmsg_send (zmsg_t **self, void *socket);
+size_t
+    zmsg_size (zmsg_t *self);
+void
+    zmsg_push (zmsg_t *self, const zframe_t *frame);
+void
+    zmsg_queue (zmsg_t *self, const zframe_t *frame);
+void
+    zmsg_pushmem (zmsg_t *self, const void *src, size_t size);
+void
+    zmsg_queuemem (zmsg_t *self, const void *src, size_t size);
+zframe_t *
+    zmsg_pop (zmsg_t *self);
+zframe_t *
+    zmsg_remove (zmsg_t *self);
+zmsg_t *
+    zmsg_load (FILE *file);
+void
+    zmsg_save (zmsg_t **self_p, FILE *file);
+void
+    zmsg_dump (zmsg_t *self);
+int
+    zmsg_test (int verbose);
+----
+
+DESCRIPTION
+-----------
+The zmsg class provides methods to send and receive multipart messages
+across 0MQ sockets.
+
+
+EXAMPLE
+-------
+.From zmsg_test method
+----
+----
+
+
+SEE ALSO
+--------
+linkzapi:zapi[7]
+

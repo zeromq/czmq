@@ -1,0 +1,109 @@
+zapi(7)
+=======
+
+
+NAME
+----
+zapi - 0MQ C Binding
+
+
+SYNOPSIS
+--------
+*#include <zapi.h>*
+
+*cc* ['flags'] 'files' *-lzmq* *-lzapi* ['libraries']
+
+
+DESCRIPTION
+-----------
+
+Scope and Goals
+~~~~~~~~~~~~~~~
+
+zapi has these goals:
+
+* To wrap the 0MQ core API in semantics that are natural and lead to shorter, more readable applications.
+* To hide the differences between versions of 0MQ.
+* To provide a space for development of more sophisticated API semantics.
+
+Ownership and License
+~~~~~~~~~~~~~~~~~~~~~
+
+zapi is maintained by Pieter Hintjens. Its other authors and contributors are listed in the AUTHORS file. It is held by the ZeroMQ organization at github.com.
+
+The authors of zapi grant you free use of this software under the terms of the GNU Lesser General Public License (LGPL). For details see the files `COPYING` and `COPYING.LESSER` in this directory.
+
+Contributing
+~~~~~~~~~~~~
+
+To submit an issue use the [issue tracker](http://github.com/zeromq/zapi/issues). All discussion happens on the [zeromq-dev](zeromq-dev@lists.zeromq.org) list or #zeromq IRC channel at irc.freenode.net.
+
+The proper way to submit patches is to clone this repository, make your changes, and use git to create a patch or a pull request. See http://www.zeromq.org/docs:contributing. All contributors are listed in AUTHORS.
+
+All classes are maintained by a single person, who is the responsible editor for that class and who is named in the header as such. This is usually the originator of the class. When several people collaborate on a class, one single person is always the lead maintainer and the one to blame when it breaks.
+
+The general rule is, if you contribute code to zapi you must be willing to maintain it as long as there are users of it. Code with no active maintainer will in general be deprecated and/or removed.
+
+USING ZAPI
+----------
+
+Building and Installing
+~~~~~~~~~~~~~~~~~~~~~~~
+
+zapi uses autotools for packaging. To build from git (all example commands are for Linux):
+----
+git clone git://github.com/zeromq/zapi.git
+cd zapi
+sh autogen.sh
+./configure
+make all
+sudo make install
+sudo ldconfig
+----
+You will need the pkg-config, libtool, and autoreconf packages. Set the LD_LIBRARY_PATH to /usr/local/libs unless you install elsewhere.
+
+After building, you can run the zapi selftests:
+----
+cd src
+./zapi_selftest
+----
+
+Linking with an Application
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Include `zapi.h` in your application and link with libzapi. Here is a typical gcc link command:
+----
+gcc -lzapi -lzmq myapp.c -o myapp
+----
+You should read `zapi.h`. This file includes `zmq.h` and the system header files that typical 0MQ applications will need. The provided 'c' shell script lets you write simple portable build scripts:
+----
+c -lzapi -lzmq -l myapp
+----
+
+The Class Model
+~~~~~~~~~~~~~~~
+
+zapi consists of classes, each class consisting of a .h and a .c. Classes may depend on other classes.
+
+`zapi.h` includes all classes header files, all the time. For the user, zapi forms one single package. All classes start by including `zapi.h`. All applications that use zapi start by including `zapi.h`. `zapi.h` also defines a limited number of small, useful macros and typedefs that have proven useful for writing clearer C code.
+
+All classes (with some exceptions) are based on a flat C class system and follow these rules (where 'zclass' is the class name):
+
+* Class typedef: `zclass_t`
+* Constructor: `zclass_new`
+* Destructor: `zclass_destroy`
+* Property methods: `zclass_property_set`, `zclass_property`
+* Class structures are private (defined in the .c source but not the .h)
+* Properties are accessed only via methods named as described above.
+* In the class source code the object is always called `self`.
+* The constructor may take arbitrary arguments, and returns NULL on failure, or a new object.
+* The destructor takes a pointer to an object reference and nullifies it.
+
+Return values for methods are:
+
+* For methods that return an object reference, either the reference, or NULL on failure.
+* For methods that signal success/failure, a return value of 0 means sucess, -1 failure.
+
+Private/static functions in a class are named `s_functionname` and are not exported via the header file.
+
+All classes (with some exceptions) have a test method called `zclass_test`.

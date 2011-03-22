@@ -1,0 +1,49 @@
+zframe(7)
+=========
+
+NAME
+----
+zframe - working with single message frames
+
+SYNOPSIS
+--------
+----
+#define ZFRAME_MORE     1
+#define ZFRAME_REUSE    2
+#define ZFRAME_NOWAIT   4
+
+zframe_t *
+    zframe_new (const void *data, size_t size);
+void
+    zframe_destroy (zframe_t **self_p);
+zframe_t *
+    zframe_recv (void *socket, int flags);
+void
+    zframe_send (zframe_t **self_p, void *socket, int flags);
+size_t
+    zframe_size (zframe_t *self);
+void *
+    zframe_data (zframe_t *self);
+int
+    zframe_more (zframe_t *self);
+int
+    zframe_test (int verbose);
+----
+
+DESCRIPTION
+-----------
+The zframe class provides methods to send and receive single message
+frames across 0MQ sockets.
+
+
+EXAMPLE
+-------
+.From zframe_test method
+----
+----
+
+
+SEE ALSO
+--------
+linkzapi:zapi[7]
+
