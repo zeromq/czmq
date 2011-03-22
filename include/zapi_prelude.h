@@ -89,6 +89,10 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 #define streq(s1,s2)    (!strcmp ((s1), (s2)))
 #define strneq(s1,s2)   (strcmp ((s1), (s2)))
 #define randof(num)     (int) (((float) num) * rand () / (RAND_MAX + 1.0))
+#if (!defined (TRUE))
+#    define TRUE        1               //  ANSI standard
+#    define FALSE       0
+#endif
 
 //- A number of POSIX and C99 keywords and data types -----------------------
 

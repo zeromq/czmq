@@ -51,7 +51,7 @@ void *
 int
     zframe_more (zframe_t *self);
 int
-    zframe_test (int verbose);
+    zframe_test (Bool verbose);
 
 #ifdef __cplusplus
 }

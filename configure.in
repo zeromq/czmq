@@ -210,5 +210,5 @@ AM_CONDITIONAL(BUILD_DOC, test "x$zapi_build_doc" = "xyes")
 AC_TYPE_SIGNAL
 AC_CHECK_FUNCS(perror gettimeofday memset)
 
-AC_OUTPUT(Makefile src/Makefile doc/Makefile src/libzapi.pc examples/Makefile)
+AC_OUTPUT(Makefile src/Makefile doc/Makefile src/libzapi.pc)
 

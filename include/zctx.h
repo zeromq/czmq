@@ -46,6 +46,8 @@ void *
     zctx_socket_new (zctx_t *self, int type);
 void
     zctx_socket_destroy (zctx_t *self, void **socket);
+int
+    zctx_test (Bool verbose);
 
 #ifdef __cplusplus
 }

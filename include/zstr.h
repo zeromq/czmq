@@ -35,6 +35,8 @@ int
     zstr_send (void *socket, const char *string);
 int
     zstr_sendf (void *socket, const char format, ...);
+int
+    zstr_test (Bool verbose);
 
 #ifdef __cplusplus
 }

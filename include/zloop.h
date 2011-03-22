@@ -52,7 +52,7 @@ int
 int
     zloop_start (zloop_t *self);
 int
-    zloop_test (int verbose);
+    zloop_test (Bool verbose);
 
 #ifdef __cplusplus
 }

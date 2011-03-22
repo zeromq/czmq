@@ -61,7 +61,7 @@ void
 void
     zmsg_dump (zmsg_t *self);
 int
-    zmsg_test (int verbose);
+    zmsg_test (Bool verbose);
 
 #ifdef __cplusplus
 }
