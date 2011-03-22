@@ -37,4 +37,6 @@ examples/.libs/
 examples/core
 src/core
 ipr
+*.gz
+*.zip
 
