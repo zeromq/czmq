@@ -1,1 +1,22 @@
-See git log.
+zapi version 1.1.0 (beta), released on 2011/03/23
+=================================================
+
+Changes
+-------
+
+* Added zctx_thread_new method to create child threads with a PAIR pipe
+  to talk to them.
+  
+* Made zapi threadsafe, specifically multiple threads can share the same
+  context and thus talk to each other.
+
+
+zapi version 1.0.0 (beta), released on 2011/03/22
+=================================================
+
+Changes
+-------
+
+* Initial version of library finished, tested, documented, and packaged.
+
+

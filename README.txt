@@ -26,10 +26,11 @@ zapi grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.o
 * Work with messages as strings, individual frames, or multipart messages.
 * Automatic closure of any open sockets at context termination.
 * Automatic LINGER configuration of all sockets for context termination.
-* Includes generic hash and list containers.
+* Portable API for creating child threads and 0MQ pipes to talk to them.
 * Simple reactor with one-off and repeated timers, and socket readers.
-* Full selftests on all classes.
 * Portable to Linux, UNIX, OS X, Windows (porting is not yet complete).
+* Includes generic hash and list containers.
+* Full selftests on all classes.
 
 ### Ownership and License
 
@@ -83,25 +84,71 @@ The zctx class wraps 0MQ contexts and replaces the core zmq_init(), zmq_term(), 
 * Automatically configures sockets with a ZMQ_LINGER timeout you can define, and which defaults to zero. The default behavior of zctx is therefore like 0MQ/2.0, immediate termination with loss of any pending messages. You can set any linger timeout you like by calling the zctx_set_linger() method.
 * Moves the iothreads configuration to a separate method, so that default usage is 1 I/O thread. Lets you configure this value.
 * Sets up signal (SIGINT and SIGTERM) handling so that blocking calls such as zmq_recv() and zmq_poll() will return when the user presses Ctrl-C.
+* Provides API to create child threads with a pipe (PAIR socket) to talk to them.
 
 This is the class interface:
 
+    //  Structure passed to threads created via this class
+    typedef struct {
+        zctx_t *ctx;                //  Context shared with parent thread
+        void *pipe;                 //  Pipe to parent thread (PAIR)
+        void *arg;                  //  Application argument
+    } zthread_t;
+
+    //  Create new context, returns context object, replaces zmq_init
     zctx_t *
-        zctx = zctx_new (void);
+        zctx_new (void);
+    //  Destroy context and all sockets in it, replaces zmq_term
     void
         zctx_destroy (zctx_t **self_p);
+    //  Raise default I/O threads from 1, for crazy heavy applications    
     void
         zctx_set_iothreads (zctx_t *self, int iothreads);
+    //  Set msecs to flush sockets when closing them
     void 
         zctx_set_linger (zctx_t *self, int linger);
-    void *
-        zctx_context (zctx_t *self);
+    //  Create socket within this context, replaces zmq_socket
     void *
         zctx_socket_new (zctx_t *self, int type);
+    //  Destroy socket, replaces zmq_close
     void
         zctx_socket_destroy (zctx_t *self, void *socket);
+    //  Create thread, return PAIR socket to talk to thread. The child thread
+    //  receives a (zthread_t *) object including a zctx, a pipe back to the
+    //  creating thread, and the arg passed in this call.
+    void *
+        zctx_thread_new (zctx_t *self, void *(*thread_fn) (void *), void *arg);
+    //  Self test of this class
     int
-        zctx_test (int verbose);
+        zctx_test (Bool verbose);
+
+    //  Global signal indicator, TRUE when user presses Ctrl-C or the process
+    //  gets a SIGTERM signal.
+    int zctx_interrupted;
+
+This class is an example of how to create a thread-safe object using 0MQ. Actually it's a little more work than it sounded at first. Let's start by agreeing on the problem here. We have a context wrapper, zctx, which does some neat work for us such as managing sockets automatically so we can just shut down without having to manually close each and every damn socket. All good, until we need to build a multithreaded application. Which is about 80% of interesting 0MQ applications. It is not safe to share a single object from multiple threads. They'll try to mess with the data structures concurrently, and it'll break nastily.
+
+OK, the classic solution would be exclusion using semaphores, critical sections, etc. We're 0MQ fanatics so that's not even an option. Instead, we want to eat our own dogfood and do this using 0MQ.
+
+The basic concept, which you'll see in this class, is that the real work is not done by the object we own, but by a separate object, running in its own thread. I call this the "agent". This is a nice pattern, and we see it in a few places, such as the flcliapi example from the Guide.
+
+The slight difficulty here is bootstrapping. We have a separate agent thread, which we talk to over inproc, and which manages our context and sockets. This is problem number one, I'll get to problem two in a sec.
+
+Part of zctx's magic is delaying the zmq_init call until it's really needed. This lets us first configure iothreads if needed. It's the agent that will create the 0MQ context by calling zmq_init. However we need sockets to talk to the agent. Solution: use two contexts, one for the pipes to/from the agent, and one for the application itself. Not many 0MQ applications create multiple contexts, but it's a valid and useful technique.
+
+So we create a private context, two sockets, and then we pass one of those sockets to the agent. We can then talk to the agent by sending simple commands like IOTHREADS=100, SOCKET, CLOSE=0xff33344, and TERMINATE. BTW, do not set IOTHREADS to 100, that is insane. Anything above 1 is actually insane unless you know what you're doing.
+
+Next problem is when our application needs child threads. If we simply use pthreads_create() we're faced with several issues. First, it's not portable to legacy OSes like win32. Second, how can a child thread get access to our zctx object? If we just pass it around, we'll end up sharing the pipe socket (which we use to talk to the agent) between threads, and that will then crash 0MQ. Sockets cannot be used from more than one thread at a time.
+
+So each child thread needs its own pipe to the agent. For the agent, this is fine, it can talk to a million threads. But how do we create those pipes in the child thread? We can't, not without help from the main thread. The solution is to wrap thread creation, like we wrap socket creation. To create a new thread, the app calls zctx_thread_new() and this method creates a dedicated zctx object, with a pipe, and then it passes that object to the newly minted child thread.
+
+The neat thing is we can hide non-portable aspects. Windows is really a mess when it comes to threads. Three different APIs, none of which is really right, so you have to do rubbish like manually cleaning up when a thread finishes. Anyhow, it's hidden in this class so you don't need to worry.
+
+Second neat thing about wrapping thread creation is we can make it a more enriching experience for all involved. One thing I do often is use a PAIR-PAIR pipe to talk from a thread to/from its parent. So this class will automatically create such a pair for each thread you start.
+
+That's it. We have a multithreaded class that is thread safe and also gives you major power for creating multithreaded applications, with a really simple API.
+
+Now that's what I call a language binding.
 
 #### zstr - sending and receiving strings
 
