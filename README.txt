@@ -19,6 +19,34 @@ zapi has these goals:
 
 zapi grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.org) and [ZFL](http://zfl.zeromq.org).
 
+[diagram]
+                              +---------------+
+                              |               |
+                              | C application |
+                              |               |
+                              +-----+---+-----+
+                                    |   |
+                                    |   |
+                       +------------+   |
+                       |                |
+                       v                |
+  Open context    +---------+           |
+  Create sockets  |         |           |    Connect, bind sockets
+  Close sockets   | libzapi |           |    get/set socket options
+  Send/receive    |    cYEL |           |
+  Multithreading  +----+----+           |
+  Reactor pattern      |                |
+  Hash container       +------------+   |
+  List container                    |   |
+  Close context                     v   v
+                                 +---------+
+                                 |         |
+                                 | libzmq  |
+                                 |         |
+                                 +---------+
+
+[/diagram]
+
 ### Highlights
 
 * Single API hides differences between 0MQ/2.1, and 0MQ/3.0.
@@ -153,6 +181,21 @@ Now that's what I call a language binding.
 #### zstr - sending and receiving strings
 
 The zstr class provides utility functions for sending and receiving C strings across 0MQ sockets. It sends strings without a terminating null, and appends a null byte on received strings. This class is for simple message sending. 
+
+[diagram]
+
+           Memory                                 Wire
+           +---+---+---+---+---+---+---+          +---+---+---+---+---+---+---+
+    Send   | S | t | r | i | n | g | 0 |  ---->   | 6 | S | t | r | i | n | g |
+           +---+---+---+---+---+---+---+          +---+---+---+---+---+---+---+
+
+
+           Wire                                   Heap
+           +---+---+---+---+---+---+---+          +---+---+---+---+---+---+---+
+    Recv   | 6 | S | t | r | i | n | g |  ---->   | S | t | r | i | n | g | 0 |
+           +---+---+---+---+---+---+---+          +---+---+---+---+---+---+---+
+
+[/diagram]
 
 This is the class interface:
 

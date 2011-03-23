@@ -8,23 +8,23 @@
 
 **<a href="#toc2-11">Overview</a>**
 &emsp;<a href="#toc3-14">Scope and Goals</a>
-&emsp;<a href="#toc3-25">Highlights</a>
-&emsp;<a href="#toc3-38">Ownership and License</a>
-&emsp;<a href="#toc3-45">Contributing</a>
+&emsp;<a href="#toc3-53">Highlights</a>
+&emsp;<a href="#toc3-67">Ownership and License</a>
+&emsp;<a href="#toc3-74">Contributing</a>
 
-**<a href="#toc2-54">Using zapi</a>**
-&emsp;<a href="#toc3-57">Building and Installing</a>
-&emsp;<a href="#toc3-78">Linking with an Application</a>
-&emsp;<a href="#toc3-85">API Summary</a>
-&emsp;<a href="#toc4-88">zctx - working with ØMQ contexts</a>
-&emsp;<a href="#toc4-117">zstr - sending and receiving strings</a>
-&emsp;<a href="#toc4-131">zframe - working with single message frames</a>
-&emsp;<a href="#toc4-155">zmsg - working with multipart messages</a>
-&emsp;<a href="#toc4-199">zloop - event-driven reactor</a>
-&emsp;<a href="#toc4-221">zhash - expandable hash table container</a>
-&emsp;<a href="#toc4-249">zlist - singly-linked list container</a>
-&emsp;<a href="#toc3-280">Development</a>
-&emsp;<a href="#toc3-290">This Document</a>
+**<a href="#toc2-83">Using zapi</a>**
+&emsp;<a href="#toc3-86">Building and Installing</a>
+&emsp;<a href="#toc3-107">Linking with an Application</a>
+&emsp;<a href="#toc3-114">API Summary</a>
+&emsp;<a href="#toc4-117">zctx - working with ØMQ contexts</a>
+&emsp;<a href="#toc4-192">zstr - sending and receiving strings</a>
+&emsp;<a href="#toc4-221">zframe - working with single message frames</a>
+&emsp;<a href="#toc4-245">zmsg - working with multipart messages</a>
+&emsp;<a href="#toc4-289">zloop - event-driven reactor</a>
+&emsp;<a href="#toc4-311">zhash - expandable hash table container</a>
+&emsp;<a href="#toc4-339">zlist - singly-linked list container</a>
+&emsp;<a href="#toc3-370">Development</a>
+&emsp;<a href="#toc3-380">This Document</a>
 
 <A name="toc2-11" title="Overview" />
 ## Overview
@@ -40,7 +40,11 @@ zapi has these goals:
 
 zapi grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.org) and [ZFL](http://zfl.zeromq.org).
 
-<A name="toc3-25" title="Highlights" />
+<center>
+<img src="https://github.com/zeromq/zapi/raw/master/images/README_1.png" alt="1">
+</center>
+
+<A name="toc3-53" title="Highlights" />
 ### Highlights
 
 * Single API hides differences between ØMQ/2.1, and ØMQ/3.0.
@@ -48,19 +52,20 @@ zapi grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.o
 * Work with messages as strings, individual frames, or multipart messages.
 * Automatic closure of any open sockets at context termination.
 * Automatic LINGER configuration of all sockets for context termination.
-* Includes generic hash and list containers.
+* Portable API for creating child threads and ØMQ pipes to talk to them.
 * Simple reactor with one-off and repeated timers, and socket readers.
-* Full selftests on all classes.
 * Portable to Linux, UNIX, OS X, Windows (porting is not yet complete).
+* Includes generic hash and list containers.
+* Full selftests on all classes.
 
-<A name="toc3-38" title="Ownership and License" />
+<A name="toc3-67" title="Ownership and License" />
 ### Ownership and License
 
 zapi is maintained by Pieter Hintjens and Mikko Koppanen (build system). Its other authors and contributors are listed in the AUTHORS file. It is held by the ZeroMQ organization at github.com.
 
 The authors of zapi grant you use of this software under the terms of the GNU Lesser General Public License (LGPL). For details see the files `COPYING` and `COPYING.LESSER` in this directory.
 
-<A name="toc3-45" title="Contributing" />
+<A name="toc3-74" title="Contributing" />
 ### Contributing
 
 To submit an issue use the [issue tracker](http://github.com/zeromq/zapi/issues). All discussion happens on the [zeromq-dev](zeromq-dev@lists.zeromq.org) list or #zeromq IRC channel at irc.freenode.net.
@@ -69,10 +74,10 @@ The proper way to submit patches is to clone this repository, make your changes,
 
 The general rule is, if you contribute code to zapi you must be willing to maintain it as long as there are users of it. Code with no active maintainer will in general be deprecated and/or removed.
 
-<A name="toc2-54" title="Using zapi" />
+<A name="toc2-83" title="Using zapi" />
 ## Using zapi
 
-<A name="toc3-57" title="Building and Installing" />
+<A name="toc3-86" title="Building and Installing" />
 ### Building and Installing
 
 zapi uses autotools for packaging. To build from git (all example commands are for Linux):
@@ -93,17 +98,17 @@ After building, you can run the zapi selftests:
 
     make check
 
-<A name="toc3-78" title="Linking with an Application" />
+<A name="toc3-107" title="Linking with an Application" />
 ### Linking with an Application
 
 Include `zapi.h` in your application and link with libzapi. Here is a typical gcc link command:
 
     gcc -lzapi -lzmq myapp.c -o myapp
 
-<A name="toc3-85" title="API Summary" />
+<A name="toc3-114" title="API Summary" />
 ### API Summary
 
-<A name="toc4-88" title="zctx - working with ØMQ contexts" />
+<A name="toc4-117" title="zctx - working with ØMQ contexts" />
 #### zctx - working with ØMQ contexts
 
 The zctx class wraps ØMQ contexts and replaces the core zmq_init(), zmq_term(), and zmq_socket() functions. The main purpose of this class is to automatically close sockets when terminating a context. The zctx class has these main features:
@@ -112,30 +117,80 @@ The zctx class wraps ØMQ contexts and replaces the core zmq_init(), zmq_term(),
 * Automatically configures sockets with a ZMQ_LINGER timeout you can define, and which defaults to zero. The default behavior of zctx is therefore like ØMQ/2.0, immediate termination with loss of any pending messages. You can set any linger timeout you like by calling the zctx_set_linger() method.
 * Moves the iothreads configuration to a separate method, so that default usage is 1 I/O thread. Lets you configure this value.
 * Sets up signal (SIGINT and SIGTERM) handling so that blocking calls such as zmq_recv() and zmq_poll() will return when the user presses Ctrl-C.
+* Provides API to create child threads with a pipe (PAIR socket) to talk to them.
 
 This is the class interface:
 
+    //  Structure passed to threads created via this class
+    typedef struct {
+        zctx_t *ctx;                //  Context shared with parent thread
+        void *pipe;                 //  Pipe to parent thread (PAIR)
+        void *arg;                  //  Application argument
+    } zthread_t;
+
+    //  Create new context, returns context object, replaces zmq_init
     zctx_t *
-        zctx = zctx_new (void);
+        zctx_new (void);
+    //  Destroy context and all sockets in it, replaces zmq_term
     void
         zctx_destroy (zctx_t **self_p);
+    //  Raise default I/O threads from 1, for crazy heavy applications    
     void
         zctx_set_iothreads (zctx_t *self, int iothreads);
+    //  Set msecs to flush sockets when closing them
     void 
         zctx_set_linger (zctx_t *self, int linger);
-    void *
-        zctx_context (zctx_t *self);
+    //  Create socket within this context, replaces zmq_socket
     void *
         zctx_socket_new (zctx_t *self, int type);
+    //  Destroy socket, replaces zmq_close
     void
         zctx_socket_destroy (zctx_t *self, void *socket);
+    //  Create thread, return PAIR socket to talk to thread. The child thread
+    //  receives a (zthread_t *) object including a zctx, a pipe back to the
+    //  creating thread, and the arg passed in this call.
+    void *
+        zctx_thread_new (zctx_t *self, void *(*thread_fn) (void *), void *arg);
+    //  Self test of this class
     int
-        zctx_test (int verbose);
+        zctx_test (Bool verbose);
 
-<A name="toc4-117" title="zstr - sending and receiving strings" />
+    //  Global signal indicator, TRUE when user presses Ctrl-C or the process
+    //  gets a SIGTERM signal.
+    int zctx_interrupted;
+
+This class is an example of how to create a thread-safe object using ØMQ. Actually it's a little more work than it sounded at first. Let's start by agreeing on the problem here. We have a context wrapper, zctx, which does some neat work for us such as managing sockets automatically so we can just shut down without having to manually close each and every damn socket. All good, until we need to build a multithreaded application. Which is about 80% of interesting ØMQ applications. It is not safe to share a single object from multiple threads. They'll try to mess with the data structures concurrently, and it'll break nastily.
+
+OK, the classic solution would be exclusion using semaphores, critical sections, etc. We're ØMQ fanatics so that's not even an option. Instead, we want to eat our own dogfood and do this using ØMQ.
+
+The basic concept, which you'll see in this class, is that the real work is not done by the object we own, but by a separate object, running in its own thread. I call this the "agent". This is a nice pattern, and we see it in a few places, such as the flcliapi example from the Guide.
+
+The slight difficulty here is bootstrapping. We have a separate agent thread, which we talk to over inproc, and which manages our context and sockets. This is problem number one, I'll get to problem two in a sec.
+
+Part of zctx's magic is delaying the zmq_init call until it's really needed. This lets us first configure iothreads if needed. It's the agent that will create the ØMQ context by calling zmq_init. However we need sockets to talk to the agent. Solution: use two contexts, one for the pipes to/from the agent, and one for the application itself. Not many ØMQ applications create multiple contexts, but it's a valid and useful technique.
+
+So we create a private context, two sockets, and then we pass one of those sockets to the agent. We can then talk to the agent by sending simple commands like IOTHREADS=100, SOCKET, CLOSE=0xff33344, and TERMINATE. BTW, do not set IOTHREADS to 100, that is insane. Anything above 1 is actually insane unless you know what you're doing.
+
+Next problem is when our application needs child threads. If we simply use pthreads_create() we're faced with several issues. First, it's not portable to legacy OSes like win32. Second, how can a child thread get access to our zctx object? If we just pass it around, we'll end up sharing the pipe socket (which we use to talk to the agent) between threads, and that will then crash ØMQ. Sockets cannot be used from more than one thread at a time.
+
+So each child thread needs its own pipe to the agent. For the agent, this is fine, it can talk to a million threads. But how do we create those pipes in the child thread? We can't, not without help from the main thread. The solution is to wrap thread creation, like we wrap socket creation. To create a new thread, the app calls zctx_thread_new() and this method creates a dedicated zctx object, with a pipe, and then it passes that object to the newly minted child thread.
+
+The neat thing is we can hide non-portable aspects. Windows is really a mess when it comes to threads. Three different APIs, none of which is really right, so you have to do rubbish like manually cleaning up when a thread finishes. Anyhow, it's hidden in this class so you don't need to worry.
+
+Second neat thing about wrapping thread creation is we can make it a more enriching experience for all involved. One thing I do often is use a PAIR-PAIR pipe to talk from a thread to/from its parent. So this class will automatically create such a pair for each thread you start.
+
+That's it. We have a multithreaded class that is thread safe and also gives you major power for creating multithreaded applications, with a really simple API.
+
+Now that's what I call a language binding.
+
+<A name="toc4-192" title="zstr - sending and receiving strings" />
 #### zstr - sending and receiving strings
 
 The zstr class provides utility functions for sending and receiving C strings across ØMQ sockets. It sends strings without a terminating null, and appends a null byte on received strings. This class is for simple message sending. 
+
+<center>
+<img src="https://github.com/zeromq/zapi/raw/master/images/README_2.png" alt="2">
+</center>
 
 This is the class interface:
 
@@ -146,7 +201,7 @@ This is the class interface:
     int
         zstr_sendf (void *socket, const char *format, ...);
 
-<A name="toc4-131" title="zframe - working with single message frames" />
+<A name="toc4-221" title="zframe - working with single message frames" />
 #### zframe - working with single message frames
 
 The zframe class provides methods to send and receive single message frames across ØMQ sockets. A 'frame' corresponds to one zmq_msg_t. When you read a frame from a socket, the zframe_more() method indicates if the frame is part of an unfinished multipart message. The zframe_send method normally destroys the frame, but with the ZFRAME_REUSE flag, you can send the same frame many times. Frames are binary, and this class has no special support for text data.
@@ -170,7 +225,7 @@ This is the class interface:
     int
         zframe_test (int verbose);
 
-<A name="toc4-155" title="zmsg - working with multipart messages" />
+<A name="toc4-245" title="zmsg - working with multipart messages" />
 #### zmsg - working with multipart messages
 
 The zmsg class provides methods to send and receive multipart messages across ØMQ sockets. This class provides a list-like container interface, with methods to work with the overall container. zmsg_t messages are composed of zero or more zframe_t frames.
@@ -214,7 +269,7 @@ This is the class interface:
     int
         zmsg_test (int verbose);
 
-<A name="toc4-199" title="zloop - event-driven reactor" />
+<A name="toc4-289" title="zloop - event-driven reactor" />
 #### zloop - event-driven reactor
 
 The zloop class provides an event-driven reactor pattern. The reactor handles socket readers (not writers in the current implementation), and once-off or repeated timers. Its resolution is 1 msec. It uses a tickless timer to reduce CPU interrupts in inactive processes.
@@ -236,7 +291,7 @@ This is the class interface:
     int
         zloop_test (Bool verbose);
 
-<A name="toc4-221" title="zhash - expandable hash table container" />
+<A name="toc4-311" title="zhash - expandable hash table container" />
 #### zhash - expandable hash table container
 
 Provides a generic hash container. Taken from the ZFL project zfl_hash class and provides identical functionality. Note that it's relatively slow (~50k insertions/deletes per second), so don't do inserts/updates on the critical path for message I/O.  It can do ~2.5M lookups per second for 16-char keys.  Timed on a 1.6GHz CPU.
@@ -264,7 +319,7 @@ This is the class interface:
     void
         zhash_test (int verbose);
 
-<A name="toc4-249" title="zlist - singly-linked list container" />
+<A name="toc4-339" title="zlist - singly-linked list container" />
 #### zlist - singly-linked list container
 
 Provides a generic list container. Taken from the ZFL project zlist class and provides identical functionality. You
@@ -295,7 +350,7 @@ This is the class interface:
     void
         zlist_test (int verbose);
 
-<A name="toc3-280" title="Development" />
+<A name="toc3-370" title="Development" />
 ### Development
 
 zapi is developed through a test-driven process that guarantees no memory violations or leaks in the code:
@@ -305,7 +360,7 @@ zapi is developed through a test-driven process that guarantees no memory violat
 * Run the 'selftest' script, which uses the Valgrind memcheck tool.
 * Repeat until perfect.
 
-<A name="toc3-290" title="This Document" />
+<A name="toc3-380" title="This Document" />
 ### This Document
 
 This document is originally at README.txt and is built using [gitdown](http://github.com/imatix/gitdown).
