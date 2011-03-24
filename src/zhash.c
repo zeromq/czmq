@@ -1,12 +1,6 @@
 /*  =========================================================================
     zhash - hash table
 
-    Expandable hash table container
-
-    Note that it's relatively slow (~50k insertions/deletes per second), so
-    don't do inserts/updates on the critical path for message I/O.  It can
-    do ~2.5M lookups per second for 16-char keys.  Timed on a 1.6GHz CPU.
-
     -------------------------------------------------------------------------
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
@@ -26,6 +20,18 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program. If not, see <http://www.gnu.org/licenses/>.
     =========================================================================
+*/
+
+/*  
+@overview
+
+Expandable hash table container
+
+@discuss
+
+Note that it's relatively slow (~50k insertions/deletes per second), so
+don't do inserts/updates on the critical path for message I/O.  It can
+do ~2.5M lookups per second for 16-char keys.  Timed on a 1.6GHz CPU.
 */
 
 #include "../include/zapi_prelude.h"

@@ -1,10 +1,6 @@
 /*  =========================================================================
     zlist.c - singly-linked list container
 
-    Provides a generic container implementing a fast singly-linked list. You
-    can use this to construct multi-dimensional lists, and other structures
-    together with other generic containers like zfl_hash.
-
     -------------------------------------------------------------------------
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
@@ -24,6 +20,16 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program. If not, see <http://www.gnu.org/licenses/>.
     =========================================================================
+*/
+
+/*  
+@overview
+
+Provides a generic container implementing a fast singly-linked list. You
+can use this to construct multi-dimensional lists, and other structures
+together with other generic containers like zfl_hash.
+
+@discuss
 */
 
 #include "../include/zapi_prelude.h"

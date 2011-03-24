@@ -68,7 +68,7 @@ int
 
 //  Global signal indicator, TRUE when user presses Ctrl-C or the process
 //  gets a SIGTERM signal.
-int zctx_interrupted;
+extern int zctx_interrupted;
 
 #ifdef __cplusplus
 }

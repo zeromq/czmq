@@ -55,6 +55,25 @@ a simple way to set the linger timeout on sockets, and configure contexts
 for number of I/O threads. Sets-up signal (interrrupt) handling for the
 process.
 
+The zctx class has these main features:
+
+* Tracks all open sockets and automatically closes them before calling 
+  zmq_term(). This avoids an infinite wait on open sockets.
+
+* Automatically configures sockets with a ZMQ_LINGER timeout you can define, 
+  and which defaults to zero. The default behavior of zctx is therefore like 
+  0MQ/2.0, immediate termination with loss of any pending messages. You can 
+  set any linger timeout you like by calling the zctx_set_linger() method.
+
+* Moves the iothreads configuration to a separate method, so that default 
+  usage is 1 I/O thread. Lets you configure this value.
+
+* Sets up signal (SIGINT and SIGTERM) handling so that blocking calls such 
+  as zmq_recv() and zmq_poll() will return when the user presses Ctrl-C.
+
+* Provides API to create child threads with a pipe (PAIR socket) to talk to 
+  them.
+
 This class is an example of how to create a thread-safe object using
 0MQ. Actually it's a little more work than it sounded at first. Let's
 start by agreeing on the problem here. We have a context wrapper, zctx,
