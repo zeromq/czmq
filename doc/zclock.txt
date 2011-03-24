@@ -21,6 +21,7 @@ int
 
 DESCRIPTION
 -----------
+
 The zclock class provides essential sleep and system time functions, used 
 to slow down threads for testing, and calculate timers for polling. Wraps 
 the non-portable system calls in a simple portable API.
@@ -39,13 +40,8 @@ EXAMPLE
 -------
 .From zclock_test method
 ----
-    int64_t start = zclock_time ();
-    zclock_sleep (10);
-    assert ((zclock_time () - start) >= 10);
 ----
-
 
 SEE ALSO
 --------
 linkzapi:zapi[7]
-

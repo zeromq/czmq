@@ -1,5 +1,5 @@
 zctx(7)
-=======
+=========
 
 NAME
 ----
@@ -44,11 +44,12 @@ int
 
 //  Global signal indicator, TRUE when user presses Ctrl-C or the process
 //  gets a SIGTERM signal.
-int zctx_interrupted;
+extern int zctx_interrupted;
 ----
 
 DESCRIPTION
 -----------
+
 The zctx class wraps 0MQ contexts. It manages open sockets in the context 
 and automatically closes these before terminating the context. It provides
 a simple way to set the linger timeout on sockets, and configure contexts
@@ -58,21 +59,23 @@ process.
 The zctx class has these main features:
 
 * Tracks all open sockets and automatically closes them before calling 
-  zmq_term(). This avoids an infinite wait on open sockets.
+zmq_term(). This avoids an infinite wait on open sockets.
 
-* Automatically configures sockets with a ZMQ_LINGER timeout you can define, 
-  and which defaults to zero. The default behavior of zctx is therefore like 
-  0MQ/2.0, immediate termination with loss of any pending messages. You can 
-  set any linger timeout you like by calling the zctx_set_linger() method.
+* Automatically configures sockets with a ZMQ_LINGER timeout you can 
+define, and which defaults to zero. The default behavior of zctx is 
+therefore like 0MQ/2.0, immediate termination with loss of any pending 
+messages. You can set any linger timeout you like by calling the 
+zctx_set_linger() method.
 
 * Moves the iothreads configuration to a separate method, so that default 
-  usage is 1 I/O thread. Lets you configure this value.
+usage is 1 I/O thread. Lets you configure this value.
 
-* Sets up signal (SIGINT and SIGTERM) handling so that blocking calls such 
-  as zmq_recv() and zmq_poll() will return when the user presses Ctrl-C.
+* Sets up signal (SIGINT and SIGTERM) handling so that blocking calls 
+such as zmq_recv() and zmq_poll() will return when the user presses 
+Ctrl-C.
 
-* Provides API to create child threads with a pipe (PAIR socket) to talk to 
-  them.
+* Provides API to create child threads with a pipe (PAIR socket) to talk 
+to them.
 
 This class is an example of how to create a thread-safe object using
 0MQ. Actually it's a little more work than it sounded at first. Let's
@@ -163,7 +166,6 @@ s_test_thread (void *args_ptr)
     return NULL;
 }
 
-
     //  Create and destroy a context without using it
     zctx_t *ctx = zctx_new ();
     assert (ctx);
@@ -198,8 +200,6 @@ s_test_thread (void *args_ptr)
     zctx_destroy (&ctx);
 ----
 
-
 SEE ALSO
 --------
 linkzapi:zapi[7]
-

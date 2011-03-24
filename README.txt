@@ -107,340 +107,97 @@ Include `zapi.h` in your application and link with libzapi. Here is a typical gc
 
 #### zctx - working with 0MQ contexts
 
-The zctx class wraps 0MQ contexts. It manages open sockets in the context 
-and automatically closes these before terminating the context. It provides
-a simple way to set the linger timeout on sockets, and configure contexts
-for number of I/O threads. Sets-up signal (interrrupt) handling for the
-process.
-
-The zctx class has these main features:
-
-* Tracks all open sockets and automatically closes them before calling 
-  zmq_term(). This avoids an infinite wait on open sockets.
-
-* Automatically configures sockets with a ZMQ_LINGER timeout you can define, 
-  and which defaults to zero. The default behavior of zctx is therefore like 
-  0MQ/2.0, immediate termination with loss of any pending messages. You can 
-  set any linger timeout you like by calling the zctx_set_linger() method.
-
-* Moves the iothreads configuration to a separate method, so that default 
-  usage is 1 I/O thread. Lets you configure this value.
-
-* Sets up signal (SIGINT and SIGTERM) handling so that blocking calls such 
-  as zmq_recv() and zmq_poll() will return when the user presses Ctrl-C.
-
-* Provides API to create child threads with a pipe (PAIR socket) to talk to 
-  them.
+.pull src/zctx.c@header,left
 
 This is the class interface:
 
-    //  Structure passed to threads created via this class
-    typedef struct {
-        zctx_t *ctx;                //  Context shared with parent thread
-        void *pipe;                 //  Pipe to parent thread (PAIR)
-        void *arg;                  //  Application argument
-    } zthread_t;
+.pull include/zctx.h@interface,code
 
-    //  Create new context, returns context object, replaces zmq_init
-    zctx_t *
-        zctx_new (void);
-    //  Destroy context and all sockets in it, replaces zmq_term
-    void
-        zctx_destroy (zctx_t **self_p);
-    //  Raise default I/O threads from 1, for crazy heavy applications    
-    void
-        zctx_set_iothreads (zctx_t *self, int iothreads);
-    //  Set msecs to flush sockets when closing them
-    void 
-        zctx_set_linger (zctx_t *self, int linger);
-    //  Create socket within this context, replaces zmq_socket
-    void *
-        zctx_socket_new (zctx_t *self, int type);
-    //  Destroy socket, replaces zmq_close
-    void
-        zctx_socket_destroy (zctx_t *self, void *socket);
-    //  Create thread, return PAIR socket to talk to thread. The child thread
-    //  receives a (zthread_t *) object including a zctx, a pipe back to the
-    //  creating thread, and the arg passed in this call.
-    void *
-        zctx_thread_new (zctx_t *self, void *(*thread_fn) (void *), void *arg);
-    //  Self test of this class
-    int
-        zctx_test (Bool verbose);
-
-    //  Global signal indicator, TRUE when user presses Ctrl-C or the process
-    //  gets a SIGTERM signal.
-    int zctx_interrupted;
-
-This class is an example of how to create a thread-safe object using
-0MQ. Actually it's a little more work than it sounded at first. Let's
-start by agreeing on the problem here. We have a context wrapper, zctx,
-which does some neat work for us such as managing sockets automatically
-so we can just shut down without having to manually close each and
-every damn socket. All good, until we need to build a multithreaded
-application. Which is about 80% of interesting 0MQ applications. It is
-not safe to share a single object from multiple threads. They'll try to
-mess with the data structures concurrently, and it'll break nastily.
-
-OK, the classic solution would be exclusion using semaphores, critical
-sections, etc. We're 0MQ fanatics so that's not even an option. Instead,
-we want to eat our own dogfood and do this using 0MQ.
-
-The basic concept, which you'll see in this class, is that the real work
-is not done by the object we own, but by a separate object, running in
-its own thread. I call this the "agent". This is a nice pattern, and we
-see it in a few places, such as the flcliapi example from the Guide.
-
-The slight difficulty here is bootstrapping. We have a separate agent
-thread, which we talk to over inproc, and which manages our context and
-sockets. This is problem number one, I'll get to problem two in a sec.
-
-Part of zctx's magic is delaying the zmq_init call until it's really
-needed. This lets us first configure iothreads if needed. It's the agent
-that will create the 0MQ context by calling zmq_init. However we need
-sockets to talk to the agent. Solution: use two contexts, one for the
-pipes to/from the agent, and one for the application itself. Not many
-0MQ applications create multiple contexts, but it's a valid and useful
-technique.
-
-So we create a private context, two sockets, and then we pass one of
-those sockets to the agent. We can then talk to the agent by sending
-simple commands like IOTHREADS=100, SOCKET, CLOSE=0xff33344, and
-TERMINATE. BTW, do not set IOTHREADS to 100, that is insane. Anything
-above 1 is actually insane unless you know what you're doing.
-
-Next problem is when our application needs child threads. If we simply
-use pthreads_create() we're faced with several issues. First, it's not
-portable to legacy OSes like win32. Second, how can a child thread get
-access to our zctx object? If we just pass it around, we'll end up 
-sharing the pipe socket (which we use to talk to the agent) between 
-threads, and that will then crash 0MQ. Sockets cannot be used from more
-than one thread at a time.
-
-So each child thread needs its own pipe to the agent. For the agent, 
-this is fine, it can talk to a million threads. But how do we create 
-those pipes in the child thread? We can't, not without help from the
-main thread. The solution is to wrap thread creation, like we wrap
-socket creation. To create a new thread, the app calls zctx_thread_new()
-and this method creates a dedicated zctx object, with a pipe, and then
-it passes that object to the newly minted child thread.
-
-The neat thing is we can hide non-portable aspects. Windows is really a
-mess when it comes to threads. Three different APIs, none of which is
-really right, so you have to do rubbish like manually cleaning up when
-a thread finishes. Anyhow, it's hidden in this class so you don't need
-to worry.
-
-Second neat thing about wrapping thread creation is we can make it a 
-more enriching experience for all involved. One thing I do often is use
-a PAIR-PAIR pipe to talk from a thread to/from its parent. So this class
-will automatically create such a pair for each thread you start.
-
-That's it. We have a multithreaded class that is thread safe and also
-gives you major power for creating multithreaded applications, with a 
-really simple API.
-
-Now that's what I call a language binding.
+.pull src/zctx.c@discuss,left
 
 #### zstr - sending and receiving strings
 
-The zstr class provides utility functions for sending and receiving C strings across 0MQ sockets. It sends strings without a terminating null, and appends a null byte on received strings. This class is for simple message sending. 
+.pull src/zstr.c@header,left
 
 [diagram]
 
-           Memory                                 Wire
-           +---+---+---+---+---+---+---+          +---+---+---+---+---+---+---+
-    Send   | S | t | r | i | n | g | 0 |  ---->   | 6 | S | t | r | i | n | g |
-           +---+---+---+---+---+---+---+          +---+---+---+---+---+---+---+
+           Memory                       Wire
+           +-------------+---+          +---+-------------+
+    Send   | S t r i n g | 0 |  ---->   | 6 | S t r i n g |
+           +-------------+---+          +---+-------------+
 
-
-           Wire                                   Heap
-           +---+---+---+---+---+---+---+          +---+---+---+---+---+---+---+
-    Recv   | 6 | S | t | r | i | n | g |  ---->   | S | t | r | i | n | g | 0 |
-           +---+---+---+---+---+---+---+          +---+---+---+---+---+---+---+
+           Wire                         Heap
+           +---+-------------+          +-------------+---+
+    Recv   | 6 | S t r i n g |  ---->   | S t r i n g | 0 |
+           +---+-------------+          +-------------+---+
 
 [/diagram]
 
 This is the class interface:
 
-    char *
-        zstr_recv (void *socket);
-    int
-        zstr_send (void *socket, const char *string);
-    int
-        zstr_sendf (void *socket, const char *format, ...);
+.pull include/zstr.h@interface,code
+
+.pull src/zstr.c@discuss,left
 
 #### zframe - working with single message frames
 
-The zframe class provides methods to send and receive single message frames across 0MQ sockets. A 'frame' corresponds to one zmq_msg_t. When you read a frame from a socket, the zframe_more() method indicates if the frame is part of an unfinished multipart message. The zframe_send method normally destroys the frame, but with the ZFRAME_REUSE flag, you can send the same frame many times. Frames are binary, and this class has no special support for text data.
+.pull src/zframe.c@header,left
 
 This is the class interface:
 
-    zframe_t *
-        zframe_new (const void *data, size_t size);
-    void
-        zframe_destroy (zframe_t **self_p);
-    zframe_t *
-        zframe_recv (void *socket);
-    void
-        zframe_send (zframe_t **self_p, void *socket, int flags);
-    size_t
-        zframe_size (zframe_t *self);
-    void *
-        zframe_data (zframe_t *self);
-    int
-        zframe_more (zframe_t *self);
-    int
-        zframe_test (int verbose);
+.pull include/zframe.h@interface,code
+
+.pull src/zframe.c@discuss,left
 
 #### zmsg - working with multipart messages
 
-The zmsg class provides methods to send and receive multipart messages across 0MQ sockets. This class provides a list-like container interface, with methods to work with the overall container. zmsg_t messages are composed of zero or more zframe_t frames.
+.pull src/zmsg.c@header,left
 
 This is the class interface:
 
-    zmsg_t *
-        zmsg_new (void);
-    void
-        zmsg_destroy (zmsg_t **self_p);
-    zmsg_t *
-        zmsg_recv (void *socket);
-    void
-        zmsg_send (zmsg_t **self, void *socket);
-    size_t
-        zmsg_size (zmsg_t *self);
-    void
-        zmsg_push (zmsg_t *self, zframe_t *frame);
-    void
-        zmsg_append (zmsg_t *self, zframe_t *frame);
-    void
-        zmsg_pushmem (zmsg_t *self, const void *src, size_t size);
-    void
-        zmsg_appendmem (zmsg_t *self, const void *src, size_t size);
-    zframe_t *
-        zmsg_pop (zmsg_t *self);
-    void
-        zmsg_remove (zmsg_t *self, zframe_t *frame);
-    zframe_t *
-        zmsg_first (zmsg_t *self);
-    zframe_t *
-        zmsg_next (zmsg_t *self);
-    zframe_t *
-        zmsg_body (zmsg_t *self);
-    void
-        zmsg_save (zmsg_t *self, FILE *file);
-    zmsg_t *
-        zmsg_load (FILE *file);
-    void
-        zmsg_dump (zmsg_t *self);
-    int
-        zmsg_test (int verbose);
+.pull include/zmsg.h@interface,code
+
+.pull src/zmsg.c@discuss,left
 
 #### zloop - event-driven reactor
 
-The zloop class provides an event-driven reactor pattern. The reactor handles socket readers (not writers in the current implementation), and once-off or repeated timers. Its resolution is 1 msec. It uses a tickless timer to reduce CPU interrupts in inactive processes.
+.pull src/zloop.c@header,left
 
 This is the class interface:
 
-    zloop_t *
-        zloop_new (void);
-    void
-        zloop_destroy (zloop_t **self_p);
-    int
-        zloop_reader (zloop_t *self, void *socket, zloop_fn handler, void *args);
-    void
-        zloop_cancel (zloop_t *self, void *socket);
-    int
-        zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *args);
-    int
-        zloop_start (zloop_t *self);
-    int
-        zloop_test (Bool verbose);
+.pull include/zloop.h@interface,code
+
+.pull src/zloop.c@discuss,left
 
 #### zhash - expandable hash table container
 
-Provides a generic hash container. Taken from the ZFL project zfl_hash class and provides identical functionality. Note that it's relatively slow (~50k insertions/deletes per second), so don't do inserts/updates on the critical path for message I/O.  It can do ~2.5M lookups per second for 16-char keys.  Timed on a 1.6GHz CPU.
+.pull src/zhash.c@header,left
 
 This is the class interface:
 
-    zhash_t *
-        zhash_new (void);
-    void
-        zhash_destroy (zhash_t **self_p);
-    int
-        zhash_insert (zhash_t *self, char *key, void *value);
-    void
-        zhash_update (zhash_t *self, char *key, void *value);
-    void
-        zhash_delete (zhash_t *self, char *key);
-    void *
-        zhash_lookup (zhash_t *self, char *key);
-    void *
-        zhash_freefn (zhash_t *self, char *key, zhash_free_fn *free_fn);
-    size_t
-        zhash_size (zhash_t *self);
-    int
-        zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument);
-    void
-        zhash_test (int verbose);
+.pull include/zhash.h@interface,code
+
+.pull src/zhash.c@discuss,left
 
 #### zlist - singly-linked list container
 
-Provides a generic list container. Taken from the ZFL project zlist class and provides identical functionality. You
-can use this to construct multi-dimensional lists, and other structures together with other generic containers like zhash.
+.pull src/zlist.c@header,left
 
 This is the class interface:
 
-    zlist_t *
-        zlist_new (void);
-    void
-        zlist_destroy (zlist_t **self_p);
-    void *
-        zlist_first (zlist_t *self);
-    void *
-        zlist_next (zlist_t *self);
-    void
-        zlist_append (zlist_t *self, void *value);
-    void
-        zlist_push (zlist_t *self, void *value);
-    void *
-        zlist_pop (zlist_t *self);
-    void
-        zlist_remove (zlist_t *self, void *value);
-    zlist_t *
-        zlist_copy (zlist_t *self);
-    size_t
-        zlist_size (zlist_t *self);
-    void
-        zlist_test (int verbose);
+.pull include/zlist.h@interface,code
+
+.pull src/zlist.c@discuss,left
 
 #### zclock - millisecond clocks and delays
 
-The zclock class provides essential sleep and system time functions, used 
-to slow down threads for testing, and calculate timers for polling. Wraps 
-the non-portable system calls in a simple portable API.
+.pull src/zclock.c@header,left
 
 This is the class interface:
 
-    //  Sleep for a number of milliseconds
-    void 
-        zclock_sleep (int msecs);
-    //  Return current system clock as milliseconds
-    int64_t 
-        zclock_time (void);
-    //  Selftest
-    int 
-        zclock_test (Bool verbose);
+.pull include/zclock.h@interface,code
 
-This class contains some small surprises. Most amazing, win32 did an API
-better than POSIX. The win32 Sleep() call is not only a neat 1-liner, it
-also sleeps for milliseconds, whereas the POSIX call asks us to think in
-terms of nanoseconds, which is insane. I've decided every single man page
-for this library will say "insane" at least once. Anyhow, milliseconds 
-are a concept we can deal with. Seconds are too fat, nanoseconds too 
-tiny, but milliseconds are just right for slices of time we want to work
-with at the 0MQ scale. zclock doesn't give you objects to work with, we
-like the zapi class model but we're not insane. There, got it in again.
+.pull src/zclock.c@discuss,left
 
 ### Development
 

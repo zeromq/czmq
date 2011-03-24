@@ -1,5 +1,5 @@
 zloop(7)
-========
+=========
 
 NAME
 ----
@@ -29,49 +29,19 @@ int
 
 DESCRIPTION
 -----------
-The zloop class provides an event-driven reactor pattern.
+
+The zloop class provides an event-driven reactor pattern. The reactor 
+handles socket readers (not writers in the current implementation), and 
+once-off or repeated timers. Its resolution is 1 msec. It uses a tickless 
+timer to reduce CPU interrupts in inactive processes.
 
 
 EXAMPLE
 -------
 .From zloop_test method
 ----
-int s_timer_event (zloop_t *loop, void *socket, void *output)
-{
-    zstr_send (output, "PING");
-    return 0;
-}
-
-int s_socket_event (zloop_t *loop, void *socket, void *args)
-{
-    //  Just end the reactor
-    return -1;
-}
-
-    zctx_t *ctx = zctx_new ();
-    
-    void *output = zctx_socket_new (ctx, ZMQ_PAIR);
-    zmq_bind (output, "inproc://zloop.test");
-    void *input = zctx_socket_new (ctx, ZMQ_PAIR);
-    zmq_connect (input, "inproc://zloop.test");
-
-    zloop_t *loop = zloop_new ();
-    assert (loop);
-    
-    //  After 10 msecs, send a ping message to output
-    zloop_timer (loop, 10, 1,  s_timer_event, output);
-    //  When we get the ping message, end the reactor
-    zloop_reader (loop, input, s_socket_event, NULL);
-    zloop_start (loop);
-    
-    zloop_destroy (&loop);
-    assert (loop == NULL);
-
-    zctx_destroy (&ctx);
 ----
-
 
 SEE ALSO
 --------
 linkzapi:zapi[7]
-

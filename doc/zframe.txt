@@ -10,7 +10,6 @@ SYNOPSIS
 ----
 #define ZFRAME_MORE     1
 #define ZFRAME_REUSE    2
-#define ZFRAME_NOWAIT   4
 
 zframe_t *
     zframe_new (const void *data, size_t size);
@@ -27,63 +26,27 @@ void *
 int
     zframe_more (zframe_t *self);
 int
-    zframe_test (int verbose);
+    zframe_test (Bool verbose);
 ----
 
 DESCRIPTION
 -----------
-The zframe class provides methods to send and receive single message
-frames across 0MQ sockets.
+
+The zframe class provides methods to send and receive single message 
+frames across 0MQ sockets. A 'frame' corresponds to one zmq_msg_t. When 
+you read a frame from a socket, the zframe_more() method indicates if the 
+frame is part of an unfinished multipart message. The zframe_send method 
+normally destroys the frame, but with the ZFRAME_REUSE flag, you can send 
+the same frame many times. Frames are binary, and this class has no 
+special support for text data.
 
 
 EXAMPLE
 -------
 .From zframe_test method
 ----
-    zctx_t *ctx = zctx_new ();
-
-    void *output = zctx_socket_new (ctx, ZMQ_PAIR);
-    zmq_bind (output, "inproc://zframe.test");
-    void *input = zctx_socket_new (ctx, ZMQ_PAIR);
-    zmq_connect (input, "inproc://zframe.test");
-    
-    //  Send five different frames, test ZFRAME_MORE
-    int frame_nbr;
-    for (frame_nbr = 0; frame_nbr < 5; frame_nbr++) {
-        zframe_t *frame = zframe_new ("Hello", 5);
-        zframe_send (&frame, output, ZFRAME_MORE);
-    }
-    //  Send same frame five times, test ZFRAME_REUSE
-    zframe_t *frame = zframe_new ("Hello", 5);
-    for (frame_nbr = 0; frame_nbr < 5; frame_nbr++) {
-        zframe_send (&frame, output, ZFRAME_MORE + ZFRAME_REUSE);
-    }
-    assert (frame);
-    zframe_destroy (&frame);
-    
-    //  Send END frame
-    frame = zframe_new ("END", 3);
-    zframe_send (&frame, output, 0);
-    
-    //  Read and count until we receive END
-    frame_nbr = 0;
-    for (frame_nbr = 0;; frame_nbr++) {
-        zframe_t *frame = zframe_recv (input);
-        if (zframe_size (frame) == 3
-        &&  memcmp (zframe_data (frame), "END", 3) == 0) {
-            zframe_destroy (&frame);
-            break;
-        }
-        assert (zframe_more (frame));
-        zframe_destroy (&frame);
-    }
-    assert (frame_nbr == 10);
-    
-    zctx_destroy (&ctx);
 ----
-
 
 SEE ALSO
 --------
 linkzapi:zapi[7]
-

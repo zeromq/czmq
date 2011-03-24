@@ -1,22 +1,20 @@
 zhash(7)
-========
-
+=========
 
 NAME
 ----
-zhash - expandable hash table container
-
+zhash - hash table
 
 SYNOPSIS
 --------
-
-Taken from the ZFL project zfl_hash class and provides identical functionality.
-
 ----
 //  Callback function for zhash_foreach method
 typedef int (zhash_foreach_fn) (char *key, void *value, void *argument);
 //  Callback function for zhash_freefn method
 typedef void (zhash_free_fn) (void *data);
+
+//  Opaque class structure
+typedef struct _zhash zhash_t;
 
 zhash_t *
     zhash_new (void);
@@ -40,98 +38,21 @@ void
     zhash_test (int verbose);
 ----
 
-
 DESCRIPTION
 -----------
+
+Expandable hash table container
+
 Note that it's relatively slow (~50k insertions/deletes per second), so
 don't do inserts/updates on the critical path for message I/O.  It can
 do ~2.5M lookups per second for 16-char keys.  Timed on a 1.6GHz CPU.
-
 
 EXAMPLE
 -------
 .From zhash_test method
 ----
-zhash_t *hash = zhash_new ();
-assert (hash);
-assert (zhash_size (hash) == 0);
-
-//  Insert some values
-int rc;
-rc = zhash_insert (hash, "DEADBEEF", (void *) 0xDEADBEEF);
-assert (rc == 0);
-rc = zhash_insert (hash, "ABADCAFE", (void *) 0xABADCAFE);
-assert (rc == 0);
-rc = zhash_insert (hash, "C0DEDBAD", (void *) 0xC0DEDBAD);
-assert (rc == 0);
-rc = zhash_insert (hash, "DEADF00D", (void *) 0xDEADF00D);
-assert (rc == 0);
-assert (zhash_size (hash) == 4);
-
-//  Look for existing values
-void *value;
-value = zhash_lookup (hash, "DEADBEEF");
-assert (value == (void *) 0xDEADBEEF);
-value = zhash_lookup (hash, "ABADCAFE");
-assert (value == (void *) 0xABADCAFE);
-value = zhash_lookup (hash, "C0DEDBAD");
-assert (value == (void *) 0xC0DEDBAD);
-value = zhash_lookup (hash, "DEADF00D");
-assert (value == (void *) 0xDEADF00D);
-
-//  Look for non-existent values
-value = zhash_lookup (hash, "0xF0000000");
-assert (value == NULL);
-
-//  Try to insert duplicate values
-rc = zhash_insert (hash, "DEADBEEF", (void *) 0xF0000000);
-assert (rc == -1);
-value = zhash_lookup (hash, "DEADBEEF");
-assert (value == (void *) 0xDEADBEEF);
-
-//  Delete a value
-zhash_delete (hash, "DEADBEEF");
-value = zhash_lookup (hash, "DEADBEEF");
-assert (value == NULL);
-assert (zhash_size (hash) == 3);
-
-//  Check that the queue is robust against random usage
-struct {
-    char name [100];
-    Bool exists;
-} testset [200];
-memset (testset, 0, sizeof (testset));
-
-int
-    testmax = 200,
-    testnbr,
-    iteration;
-
-srandom ((unsigned) time (NULL));
-for (iteration = 0; iteration < 25000; iteration++) {
-    testnbr = within (testmax);
-    if (testset [testnbr].exists) {
-        value = zhash_lookup (hash, testset [testnbr].name);
-        assert (value);
-        zhash_delete (hash, testset [testnbr].name);
-        testset [testnbr].exists = FALSE;
-    }
-    else {
-        sprintf (testset [testnbr].name, "%x-%x", rand (), rand ());
-        if (zhash_insert (hash, testset [testnbr].name, "") == 0)
-            testset [testnbr].exists = TRUE;
-    }
-}
-//  Test 1M lookups
-for (iteration = 0; iteration < 1000000; iteration++)
-    value = zhash_lookup (hash, "DEADBEEFABADCAFE");
-
-zhash_destroy (&hash);
-assert (hash == NULL);
 ----
-
 
 SEE ALSO
 --------
 linkzapi:zapi[7]
-

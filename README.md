@@ -6,27 +6,6 @@
 ## Contents
 
 
-**<a href="#toc2-11">Overview</a>**
-&emsp;<a href="#toc3-14">Scope and Goals</a>
-&emsp;<a href="#toc3-53">Highlights</a>
-&emsp;<a href="#toc3-68">Ownership and License</a>
-&emsp;<a href="#toc3-75">Contributing</a>
-
-**<a href="#toc2-84">Using zapi</a>**
-&emsp;<a href="#toc3-87">Building and Installing</a>
-&emsp;<a href="#toc3-108">Linking with an Application</a>
-&emsp;<a href="#toc3-115">API Summary</a>
-&emsp;<a href="#toc4-118">zctx - working with ØMQ contexts</a>
-&emsp;<a href="#toc4-129">zstr - sending and receiving strings</a>
-&emsp;<a href="#toc4-154">zframe - working with single message frames</a>
-&emsp;<a href="#toc4-165">zmsg - working with multipart messages</a>
-&emsp;<a href="#toc4-176">zloop - event-driven reactor</a>
-&emsp;<a href="#toc4-187">zhash - expandable hash table container</a>
-&emsp;<a href="#toc4-198">zlist - singly-linked list container</a>
-&emsp;<a href="#toc4-209">zclock - millisecond clocks and delays</a>
-&emsp;<a href="#toc3-220">Development</a>
-&emsp;<a href="#toc3-230">This Document</a>
-
 <A name="toc2-11" title="Overview" />
 ## Overview
 
@@ -44,6 +23,32 @@ zapi grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.o
 <center>
 <img src="https://github.com/zeromq/zapi/raw/master/images/README_1.png" alt="1">
 </center>
+                              +---------------+
+                              |               |
+                              | C application |
+                              |               |
+                              +-----+---+-----+
+                                    |   |
+                                    |   |
+                       +------------+   |
+                       |                |
+                       v                |
+  Open context    +---------+           |
+  Create sockets  |         |           |    Connect, bind sockets
+  Close sockets   | libzapi |           |    get/set socket options
+  Send/receive    |    cYEL |           |
+  Multithreading  +----+----+           |
+  Reactor pattern      |                |
+  Hash container       +------------+   |
+  List container                    |   |
+  System clock                      v   v
+  Close context                  +---------+
+                                 |         |
+                                 | libzmq  |
+                                 |         |
+                                 +---------+
+
+[/diagram]
 
 <A name="toc3-53" title="Highlights" />
 ### Highlights
@@ -152,26 +157,33 @@ This is the class interface:
     //  Create new context, returns context object, replaces zmq_init
     zctx_t *
         zctx_new (void);
+    
     //  Destroy context and all sockets in it, replaces zmq_term
     void
         zctx_destroy (zctx_t **self_p);
+        
     //  Raise default I/O threads from 1, for crazy heavy applications    
     void
         zctx_set_iothreads (zctx_t *self, int iothreads);
+        
     //  Set msecs to flush sockets when closing them
     void 
         zctx_set_linger (zctx_t *self, int linger);
+    
     //  Create socket within this context, replaces zmq_socket
     void *
         zctx_socket_new (zctx_t *self, int type);
+    
     //  Destroy socket, replaces zmq_close
     void
         zctx_socket_destroy (zctx_t *self, void *socket);
+    
     //  Create thread, return PAIR socket to talk to thread. The child thread
     //  receives a (zthread_t *) object including a zctx, a pipe back to the
     //  creating thread, and the arg passed in this call.
     void *
         zctx_thread_new (zctx_t *self, void *(*thread_fn) (void *), void *arg);
+    
     //  Self test of this class
     int
         zctx_test (Bool verbose);
@@ -262,14 +274,33 @@ message sending.
 <img src="https://github.com/zeromq/zapi/raw/master/images/README_2.png" alt="2">
 </center>
 
+           Memory                       Wire
+           +-------------+---+          +---+-------------+
+    Send   | S t r i n g | 0 |  ---->   | 6 | S t r i n g |
+           +-------------+---+          +---+-------------+
+
+           Wire                         Heap
+           +---+-------------+          +-------------+---+
+    Recv   | 6 | S t r i n g |  ---->   | S t r i n g | 0 |
+           +---+-------------+          +-------------+---+
+
+[/diagram]
+
 This is the class interface:
 
+    //  Receive a string off a socket, caller must free it
     char *
         zstr_recv (void *socket);
+    
+    //  Send a string to a socket in ØMQ string format
     int
         zstr_send (void *socket, const char *string);
+    
+    //  Send a formatted string to a socket
     int
         zstr_sendf (void *socket, const char *format, ...);
+    
+    //  Self test of this class
     int
         zstr_test (Bool verbose);
 
@@ -290,20 +321,35 @@ This is the class interface:
     #define ZFRAME_MORE     1
     #define ZFRAME_REUSE    2
     
+    //  Create a new frame with optional size, and optional data
     zframe_t *
         zframe_new (const void *data, size_t size);
+    
+    //  Destroy a frame
     void
         zframe_destroy (zframe_t **self_p);
+    
+    //  Receive a new frame off the socket
     zframe_t *
         zframe_recv (void *socket);
+    
+    //  Send a frame to a socket, destroy frame after sending
     void
         zframe_send (zframe_t **self_p, void *socket, int flags);
+    
+    //  Return number of bytes in frame data
     size_t
         zframe_size (zframe_t *self);
+    
+    //  Return address of frame data
     void *
         zframe_data (zframe_t *self);
+    
+    //  Return frame 'more' property
     int
         zframe_more (zframe_t *self);
+    
+    //  Self test of this class
     int
         zframe_test (Bool verbose);
 
@@ -318,40 +364,75 @@ composed of zero or more zframe_t frames.
 
 This is the class interface:
 
+    //  Create a new empty message object
     zmsg_t *
         zmsg_new (void);
+    
+    //  Destroy a message object and all frames it contains
     void
         zmsg_destroy (zmsg_t **self_p);
+        
+    //  Read 1 or more frames off the socket, into a new message object
     zmsg_t *
         zmsg_recv (void *socket);
+        
+    //  Send a message to the socket, and then destroy it
     void
         zmsg_send (zmsg_t **self_p, void *socket);
+        
+    //  Return number of frames in message
     size_t
         zmsg_size (zmsg_t *self);
+    
+    //  Push frame to front of message, before first frame
     void
         zmsg_push (zmsg_t *self, zframe_t *frame);
+    
+    //  Append frame to end of message, after last frame
     void
         zmsg_append (zmsg_t *self, zframe_t *frame);
+    
+    //  Push block of memory as new frame to front of message
     void
         zmsg_pushmem (zmsg_t *self, const void *src, size_t size);
+    
+    //  Push block of memory as new frame to end of message
     void
         zmsg_appendmem (zmsg_t *self, const void *src, size_t size);
+    
+    //  Pop frame off front of message, caller now owns frame
     zframe_t *
         zmsg_pop (zmsg_t *self);
+    
+    //  Remove frame from message, at any position, caller owns it
     void
         zmsg_remove (zmsg_t *self, zframe_t *frame);
+    
+    //  Return first frame in message, or null
     zframe_t *
         zmsg_first (zmsg_t *self);
+    
+    //  Return next frame in message, or null
     zframe_t *
         zmsg_next (zmsg_t *self);
+    
+    //  Return first body frame, i.e. after first null frame
     zframe_t *
         zmsg_body (zmsg_t *self);
+    
+    //  Save message to an open file
     void
         zmsg_save (zmsg_t *self, FILE *file);
+    
+    //  Load a message from an open file
     zmsg_t *
         zmsg_load (FILE *file);
+    
+    //  Print message to stderr, for debugging
     void
         zmsg_dump (zmsg_t *self);
+    
+    //  Self test of this class
     int
         zmsg_test (Bool verbose);
 
@@ -369,18 +450,33 @@ This is the class interface:
     //  Callback function for reactor events
     typedef int (zloop_fn) (zloop_t *loop, void *socket, void *args);
     
+    //  Create a new zloop reactor
     zloop_t *
         zloop_new (void);
+    
+    //  Destroy a reactor
     void
         zloop_destroy (zloop_t **self_p);
+    
+    //  Register a socket reader, on one socket
     int
         zloop_reader (zloop_t *self, void *socket, zloop_fn handler, void *args);
+    
+    //  Cancel the reader on the specified socket, if any
     void
         zloop_cancel (zloop_t *self, void *socket);
+    
+    //  Register a timer that will go off after 'delay' msecs, and will
+    //  repeat 'times' times, unless 'times' is zero, meaning repeat forever.
     int
         zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *args);
+    
+    //  Start the reactor, ends if a callback function returns -1, or the process
+    //  received SIGINT or SIGTERM.
     int
         zloop_start (zloop_t *self);
+    
+    //  Self test of this class
     int
         zloop_test (Bool verbose);
 
@@ -393,31 +489,47 @@ Expandable hash table container
 This is the class interface:
 
     //  Callback function for zhash_foreach method
-    typedef int (zhash_foreach_fn) (char *key, void *value, void *argument);
+    typedef int (zhash_foreach_fn) (char *key, void *item, void *argument);
     //  Callback function for zhash_freefn method
     typedef void (zhash_free_fn) (void *data);
     
-    //  Opaque class structure
-    typedef struct _zhash zhash_t;
-    
+    //  Create a new, empty hash container
     zhash_t *
         zhash_new (void);
+    
+    //  Destroy a hash container and all items in it
     void
         zhash_destroy (zhash_t **self_p);
+    
+    //  Insert an item into the hash container using the specified key
     int
-        zhash_insert (zhash_t *self, char *key, void *value);
+        zhash_insert (zhash_t *self, char *key, void *item);
+    
+    //  Insert or update the item for the specified key
     void
-        zhash_update (zhash_t *self, char *key, void *value);
+        zhash_update (zhash_t *self, char *key, void *item);
+    
+    //  Destroy the item at the specified key, if any
     void
         zhash_delete (zhash_t *self, char *key);
+    
+    //  Return the item at the specified key, or null
     void *
         zhash_lookup (zhash_t *self, char *key);
+    
+    //  Set a free function for the item at the specified key
     void *
         zhash_freefn (zhash_t *self, char *key, zhash_free_fn *free_fn);
+    
+    //  Return the number of keys/items in the hash table
     size_t
         zhash_size (zhash_t *self);
+    
+    //  Iterate over the hash table and apply the function to each item
     int
         zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument);
+    
+    //  Self test of this class
     void
         zhash_test (int verbose);
 
@@ -434,26 +546,47 @@ together with other generic containers like zhash.
 
 This is the class interface:
 
+    //  Create a new list container
     zlist_t *
         zlist_new (void);
+    
+    //  Destroy a list container
     void
         zlist_destroy (zlist_t **self_p);
+    
+    //  Return first item in the list, or null
     void *
         zlist_first (zlist_t *self);
+    
+    //  Return next item in the list, or null
     void *
         zlist_next (zlist_t *self);
+    
+    //  Append an item to the end of the list
     void
-        zlist_append (zlist_t *self, void *value);
+        zlist_append (zlist_t *self, void *item);
+    
+    //  Push an item to the start of the list
     void
-        zlist_push (zlist_t *self, void *value);
+        zlist_push (zlist_t *self, void *item);
+    
+    //  Pop the item off the start of the list, if any
     void *
         zlist_pop (zlist_t *self);
+    
+    //  Remove the specified item from the list if present
     void
-        zlist_remove (zlist_t *self, void *value);
+        zlist_remove (zlist_t *self, void *item);
+    
+    //  Copy the entire list, return the copy
     zlist_t *
         zlist_copy (zlist_t *self);
+    
+    //  Return number of items in the list
     size_t
         zlist_size (zlist_t *self);
+    
+    //  Self test of this class
     void
         zlist_test (int verbose);
 
@@ -470,10 +603,12 @@ This is the class interface:
     //  Sleep for a number of milliseconds
     void 
         zclock_sleep (int msecs);
+    
     //  Return current system clock as milliseconds
     int64_t 
         zclock_time (void);
-    //  Selftest
+    
+    //  Self test of this class
     int 
         zclock_test (Bool verbose);
 

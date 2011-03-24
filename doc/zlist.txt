@@ -1,17 +1,12 @@
 zlist(7)
-==========
-
+=========
 
 NAME
 ----
-zlist - singly-linked list container
-
+zlist - no title found
 
 SYNOPSIS
 --------
-
-Taken from the ZFL project zlist class and provides identical functionality.
-
 ----
 zlist_t *
     zlist_new (void);
@@ -37,9 +32,9 @@ void
     zlist_test (int verbose);
 ----
 
-
 DESCRIPTION
 -----------
+
 Provides a generic container implementing a fast singly-linked list. You
 can use this to construct multi-dimensional lists, and other structures
 together with other generic containers like zhash.
@@ -49,65 +44,8 @@ EXAMPLE
 -------
 .From zlist_test method
 ----
-zlist_t *list = zlist_new ();
-assert (list);
-assert (zlist_size (list) == 0);
-
-//  Three values we'll use as test data
-//  List values are void *, not particularly strings
-char *cheese = "boursin";
-char *bread = "baguette";
-char *wine = "bordeaux";
-
-zlist_append (list, cheese);
-assert (zlist_size (list) == 1);
-zlist_append (list, bread);
-assert (zlist_size (list) == 2);
-zlist_append (list, wine);
-assert (zlist_size (list) == 3);
-
-assert (zlist_first (list) == cheese);
-assert (zlist_size (list) == 3);
-zlist_remove (list, wine);
-assert (zlist_size (list) == 2);
-
-assert (zlist_first (list) == cheese);
-zlist_remove (list, cheese);
-assert (zlist_size (list) == 1);
-assert (zlist_first (list) == bread);
-
-zlist_remove (list, bread);
-assert (zlist_size (list) == 0);
-
-zlist_push (list, cheese);
-assert (zlist_size (list) == 1);
-assert (zlist_first (list) == cheese);
-
-zlist_push (list, bread);
-assert (zlist_size (list) == 2);
-assert (zlist_first (list) == bread);
-
-zlist_append (list, wine);
-assert (zlist_size (list) == 3);
-assert (zlist_first (list) == bread);
-
-zlist_remove (list, bread);
-assert (zlist_first (list) == cheese);
-
-zlist_remove (list, cheese);
-assert (zlist_first (list) == wine);
-
-zlist_remove (list, wine);
-assert (zlist_size (list) == 0);
-
-zlist_destroy (&list);
-assert (list == NULL);
 ----
-
 
 SEE ALSO
 --------
 linkzapi:zapi[7]
-
-
-
