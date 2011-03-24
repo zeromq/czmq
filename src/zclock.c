@@ -22,14 +22,11 @@
     =========================================================================
 */
 /*  
-@overview
-
+@header
 The zclock class provides essential sleep and system time functions, used 
 to slow down threads for testing, and calculate timers for polling. Wraps 
 the non-portable system calls in a simple portable API.
-
 @discuss
-
 This class contains some small surprises. Most amazing, win32 did an API
 better than POSIX. The win32 Sleep() call is not only a neat 1-liner, it
 also sleeps for milliseconds, whereas the POSIX call asks us to think in
@@ -39,6 +36,7 @@ are a concept we can deal with. Seconds are too fat, nanoseconds too
 tiny, but milliseconds are just right for slices of time we want to work
 with at the 0MQ scale. zclock doesn't give you objects to work with, we
 like the zapi class model but we're not insane. There, got it in again.
+@end
 */
 
 #include "../include/zapi_prelude.h"
@@ -88,10 +86,12 @@ zclock_test (Bool verbose)
 {
     printf (" * zclock: ");
     
+    //  @selftest
     int64_t start = zclock_time ();
     zclock_sleep (10);
     assert ((zclock_time () - start) >= 10);
-
+    //  @end
+    
     printf ("OK\n");
     return 0;
 }

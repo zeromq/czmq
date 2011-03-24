@@ -8,40 +8,75 @@ zmsg - working with multipart messages
 SYNOPSIS
 --------
 ----
+//  Create a new empty message object
 zmsg_t *
     zmsg_new (void);
+
+//  Destroy a message object and all frames it contains
 void
     zmsg_destroy (zmsg_t **self_p);
+    
+//  Read 1 or more frames off the socket, into a new message object
 zmsg_t *
     zmsg_recv (void *socket);
+    
+//  Send a message to the socket, and then destroy it
 void
     zmsg_send (zmsg_t **self_p, void *socket);
+    
+//  Return number of frames in message
 size_t
     zmsg_size (zmsg_t *self);
+
+//  Push frame to front of message, before first frame
 void
     zmsg_push (zmsg_t *self, zframe_t *frame);
+
+//  Append frame to end of message, after last frame
 void
     zmsg_append (zmsg_t *self, zframe_t *frame);
+
+//  Push block of memory as new frame to front of message
 void
     zmsg_pushmem (zmsg_t *self, const void *src, size_t size);
+
+//  Push block of memory as new frame to end of message
 void
     zmsg_appendmem (zmsg_t *self, const void *src, size_t size);
+
+//  Pop frame off front of message, caller now owns frame
 zframe_t *
     zmsg_pop (zmsg_t *self);
+
+//  Remove frame from message, at any position, caller owns it
 void
     zmsg_remove (zmsg_t *self, zframe_t *frame);
+
+//  Return first frame in message, or null
 zframe_t *
     zmsg_first (zmsg_t *self);
+
+//  Return next frame in message, or null
 zframe_t *
     zmsg_next (zmsg_t *self);
+
+//  Return first body frame, i.e. after first null frame
 zframe_t *
     zmsg_body (zmsg_t *self);
+
+//  Save message to an open file
 void
     zmsg_save (zmsg_t *self, FILE *file);
+
+//  Load a message from an open file
 zmsg_t *
     zmsg_load (FILE *file);
+
+//  Print message to stderr, for debugging
 void
     zmsg_dump (zmsg_t *self);
+
+//  Self test of this class
 int
     zmsg_test (Bool verbose);
 ----
@@ -59,6 +94,85 @@ EXAMPLE
 -------
 .From zmsg_test method
 ----
+    zctx_t *ctx = zctx_new ();
+
+    void *output = zctx_socket_new (ctx, ZMQ_PAIR);
+    zmq_bind (output, "inproc://zmsg.test");
+    void *input = zctx_socket_new (ctx, ZMQ_PAIR);
+    zmq_connect (input, "inproc://zmsg.test");
+
+    //  Test send and receive of single-frame message
+    zmsg_t *msg = zmsg_new ();
+    zframe_t *frame = zframe_new ("Hello", 5);
+    zmsg_push (msg, frame);
+    assert (zmsg_size (msg) == 1);
+    zmsg_send (&msg, output);
+    assert (msg == NULL);
+    
+    msg = zmsg_recv (input);
+    assert (msg);
+    assert (zmsg_size (msg) == 1);
+    zmsg_destroy (&msg);
+
+    //  Test send and receive of multi-frame message
+    msg = zmsg_new ();
+    zmsg_appendmem (msg, "Frame0", 6);
+    zmsg_appendmem (msg, "Frame1", 6);
+    zmsg_appendmem (msg, "Frame2", 6);
+    zmsg_appendmem (msg, "Frame3", 6);
+    zmsg_appendmem (msg, "Frame4", 6);
+    zmsg_appendmem (msg, "Frame5", 6);
+    zmsg_appendmem (msg, "Frame6", 6);
+    zmsg_appendmem (msg, "Frame7", 6);
+    zmsg_appendmem (msg, "Frame8", 6);
+    zmsg_appendmem (msg, "Frame9", 6);
+    zmsg_send (&msg, output);
+
+    msg = zmsg_recv (input);
+    assert (msg);
+    assert (zmsg_size (msg) == 10);
+    if (verbose)
+        zmsg_dump (msg);
+    
+    //  Save to a file, read back
+    FILE *file = fopen ("zmsg.test", "w");
+    assert (file);
+    zmsg_save (msg, file);
+    zmsg_destroy (&msg);
+    fclose (file);
+    
+    file = fopen ("zmsg.test", "r");
+    msg = zmsg_load (file);
+    fclose (file);
+    remove ("zmsg.test");
+    assert (zmsg_size (msg) == 10);
+    
+    //  Remove all frames except first and last
+    int frame_nbr;
+    for (frame_nbr = 0; frame_nbr < 8; frame_nbr++) {
+        zmsg_first (msg);
+        frame = zmsg_next (msg);
+        zmsg_remove (msg, frame);
+        zframe_destroy (&frame);
+    }
+    assert (zmsg_size (msg) == 2);
+    zmsg_pushmem (msg, "", 0);
+    zmsg_pushmem (msg, "Address", 7);
+    assert (zmsg_size (msg) == 4);
+    frame = zmsg_body (msg);
+    assert (memcmp (zframe_data (frame), "Frame0", 6) == 0);
+    zmsg_destroy (&msg);
+    
+    //  Now try methods on an empty message
+    msg = zmsg_new ();
+    assert (zmsg_size (msg) == 0);
+    assert (zmsg_body (msg) == NULL);
+    assert (zmsg_first (msg) == NULL);
+    assert (zmsg_next (msg) == NULL);
+    assert (zmsg_pop (msg) == NULL);
+    zmsg_destroy (&msg);
+
+    zctx_destroy (&ctx);
 ----
 
 SEE ALSO

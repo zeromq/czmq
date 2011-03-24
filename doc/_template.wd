@@ -1,0 +1,20 @@
+[!-- live template used for API pages --]
+
+[[module CSS]]
+.foldedtoc #toc #toc-action-bar {
+    display: none
+}
+.foldedtoc #toc .title{
+    display: none;
+    border: 0px solid black;
+}
+.foldedtoc #toc {
+    border: 0px solid black;
+    margin: 0 0 0 -0,9em;
+}
+.foldedtoc .collapsible-block-link {
+    text-decoration:none
+}
+[[/module]]
+[[include include:print-css]]
+%%content%%

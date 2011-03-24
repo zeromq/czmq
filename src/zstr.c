@@ -23,8 +23,13 @@
 */
 
 /*  
-@overview
+@header
+    The zstr class provides utility functions for sending and receiving C 
+    strings across 0MQ sockets. It sends strings without a terminating null, 
+    and appends a null byte on received strings. This class is for simple 
+    message sending. 
 @discuss
+@end
 */
 
 #include "../include/zapi_prelude.h"
@@ -108,6 +113,8 @@ int
 zstr_test (Bool verbose)
 {
     printf (" * zstr: ");
+
+    //  @selftest
     zctx_t *ctx = zctx_new ();
 
     void *output = zctx_socket_new (ctx, ZMQ_PAIR);
@@ -134,6 +141,8 @@ zstr_test (Bool verbose)
     assert (string_nbr == 10);
 
     zctx_destroy (&ctx);
+    //  @end
+    
     printf ("OK\n");
     return 0;
 }

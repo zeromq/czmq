@@ -23,8 +23,16 @@
 */
 
 /*  
-@overview
+@header
+    The zframe class provides methods to send and receive single message 
+    frames across 0MQ sockets. A 'frame' corresponds to one zmq_msg_t. When 
+    you read a frame from a socket, the zframe_more() method indicates if the 
+    frame is part of an unfinished multipart message. The zframe_send method 
+    normally destroys the frame, but with the ZFRAME_REUSE flag, you can send 
+    the same frame many times. Frames are binary, and this class has no 
+    special support for text data.
 @discuss
+@end
 */
 
 #include "../include/zapi_prelude.h"
@@ -167,6 +175,7 @@ zframe_test (Bool verbose)
 {
     printf (" * zframe: ");
 
+    //  @selftest
     zctx_t *ctx = zctx_new ();
 
     void *output = zctx_socket_new (ctx, ZMQ_PAIR);
@@ -205,8 +214,9 @@ zframe_test (Bool verbose)
         zframe_destroy (&frame);
     }
     assert (frame_nbr == 10);
-    
+
     zctx_destroy (&ctx);
+    //  @end
     printf ("OK\n");
     return 0;
 }

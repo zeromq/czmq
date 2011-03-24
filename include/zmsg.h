@@ -32,42 +32,79 @@ extern "C" {
 //  Opaque class structure
 typedef struct _zmsg_t zmsg_t;
 
+//  @interface
+//  Create a new empty message object
 zmsg_t *
     zmsg_new (void);
+
+//  Destroy a message object and all frames it contains
 void
     zmsg_destroy (zmsg_t **self_p);
+    
+//  Read 1 or more frames off the socket, into a new message object
 zmsg_t *
     zmsg_recv (void *socket);
+    
+//  Send a message to the socket, and then destroy it
 void
     zmsg_send (zmsg_t **self_p, void *socket);
+    
+//  Return number of frames in message
 size_t
     zmsg_size (zmsg_t *self);
+
+//  Push frame to front of message, before first frame
 void
     zmsg_push (zmsg_t *self, zframe_t *frame);
+
+//  Append frame to end of message, after last frame
 void
     zmsg_append (zmsg_t *self, zframe_t *frame);
+
+//  Push block of memory as new frame to front of message
 void
     zmsg_pushmem (zmsg_t *self, const void *src, size_t size);
+
+//  Push block of memory as new frame to end of message
 void
     zmsg_appendmem (zmsg_t *self, const void *src, size_t size);
+
+//  Pop frame off front of message, caller now owns frame
 zframe_t *
     zmsg_pop (zmsg_t *self);
+
+//  Remove frame from message, at any position, caller owns it
 void
     zmsg_remove (zmsg_t *self, zframe_t *frame);
+
+//  Return first frame in message, or null
 zframe_t *
     zmsg_first (zmsg_t *self);
+
+//  Return next frame in message, or null
 zframe_t *
     zmsg_next (zmsg_t *self);
+
+//  Return first body frame, i.e. after first null frame
 zframe_t *
     zmsg_body (zmsg_t *self);
+
+//  Save message to an open file
 void
     zmsg_save (zmsg_t *self, FILE *file);
+
+//  Load a message from an open file
 zmsg_t *
     zmsg_load (FILE *file);
+
+//  Print message to stderr, for debugging
 void
     zmsg_dump (zmsg_t *self);
+
+//  Self test of this class
 int
     zmsg_test (Bool verbose);
+//  @end
 
 #ifdef __cplusplus
 }

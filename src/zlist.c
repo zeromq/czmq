@@ -5,7 +5,7 @@
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
-    This file is part of the ZeroMQ Function Library: http://zfl.zeromq.org
+    This file is part of zapi, the C binding for 0MQ: http://zapi.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under the
     terms of the GNU Lesser General Public License as published by the Free
@@ -23,13 +23,12 @@
 */
 
 /*  
-@overview
-
-Provides a generic container implementing a fast singly-linked list. You
-can use this to construct multi-dimensional lists, and other structures
-together with other generic containers like zfl_hash.
-
+@header
+    Provides a generic container implementing a fast singly-linked list. You
+    can use this to construct multi-dimensional lists, and other structures
+    together with other generic containers like zhash.
 @discuss
+@end
 */
 
 #include "../include/zapi_prelude.h"
@@ -41,7 +40,7 @@ struct node_t {
     struct node_t
         *next;
     void
-        *value;
+        *item;
 };
 
 //  Actual list object
@@ -88,7 +87,7 @@ zlist_destroy (zlist_t **self_p)
 
 
 //  --------------------------------------------------------------------------
-//  Return the value at the head of list. If the list is empty, returns NULL.
+//  Return the item at the head of list. If the list is empty, returns NULL.
 //  Leaves cursor pointing at the head item, or NULL if the list is empty.
 
 void *
@@ -97,14 +96,14 @@ zlist_first (zlist_t *self)
     assert (self);
     self->cursor = self->head;
     if (self->cursor)
-        return self->cursor->value;
+        return self->cursor->item;
     else
         return NULL;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Return the next value. If the list is empty, returns NULL. To move to
+//  Return the next item. If the list is empty, returns NULL. To move to
 //  the start of the list call zlist_first(). Advances the cursor.
 
 void *
@@ -116,21 +115,21 @@ zlist_next (zlist_t *self)
     else
         self->cursor = self->head;
     if (self->cursor)
-        return self->cursor->value;
+        return self->cursor->item;
     else
         return NULL;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Add value to the end of the list
+//  Add item to the end of the list
 
 void
-zlist_append (zlist_t *self, void *value)
+zlist_append (zlist_t *self, void *item)
 {
     struct node_t *node;
     node = (struct node_t *) zmalloc (sizeof (struct node_t));
-    node->value = value;
+    node->item = item;
     if (self->tail)
         self->tail->next = node;
     else
@@ -143,14 +142,14 @@ zlist_append (zlist_t *self, void *value)
 
 
 //  --------------------------------------------------------------------------
-//  Insert value at the beginning of the list
+//  Insert item at the beginning of the list
 
 void
-zlist_push (zlist_t *self, void *value)
+zlist_push (zlist_t *self, void *item)
 {
     struct node_t *node;
     node = (struct node_t *) zmalloc (sizeof (struct node_t));
-    node->value = value;
+    node->item = item;
     node->next = self->head;
     self->head = node;
     if (self->tail == NULL)
@@ -161,15 +160,15 @@ zlist_push (zlist_t *self, void *value)
 
 
 //  --------------------------------------------------------------------------
-//  Remove value from the beginning of the list, returns NULL if none
+//  Remove item from the beginning of the list, returns NULL if none
 
 void *
 zlist_pop (zlist_t *self)
 {
     struct node_t *node = self->head;
-    void *value = NULL;
+    void *item = NULL;
     if (node) {
-        value = node->value;
+        item = node->item;
         self->head = node->next;
         if (self->tail == node)
             self->tail = NULL;
@@ -177,22 +176,22 @@ zlist_pop (zlist_t *self)
         self->size--;
     }
     self->cursor = NULL;
-    return value;
+    return item;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Remove the value from the list, if present. Safe to call on values that
+//  Remove the item from the list, if present. Safe to call on items that
 //  are not in the list.
 
 void
-zlist_remove (zlist_t *self, void *value)
+zlist_remove (zlist_t *self, void *item)
 {
     struct node_t *node, *prev = NULL;
 
     //  First off, we need to find the list node.
     for (node = self->head; node != NULL; node = node->next) {
-        if (node->value == value)
+        if (node->item == item)
             break;
         prev = node;
     }
@@ -226,7 +225,7 @@ zlist_copy (zlist_t *self)
 
     struct node_t *node;
     for (node = self->head; node; node = node->next)
-        zlist_append (copy, node->value);
+        zlist_append (copy, node->item);
     return copy;
 }
 
@@ -249,12 +248,13 @@ zlist_test (int verbose)
 {
     printf (" * zlist: ");
 
+    //  @selftest
     zlist_t *list = zlist_new ();
     assert (list);
     assert (zlist_size (list) == 0);
 
-    //  Three values we'll use as test data
-    //  List values are void *, not particularly strings
+    //  Three items we'll use as test data
+    //  List items are void *, not particularly strings
     char *cheese = "boursin";
     char *bread = "baguette";
     char *wine = "bordeaux";
@@ -307,6 +307,7 @@ zlist_test (int verbose)
     zlist_destroy (&list);
     zlist_destroy (&list);
     assert (list == NULL);
+    //  @end
 
     printf ("OK\n");
 }

@@ -32,25 +32,42 @@ extern "C" {
 //  Opaque class structure
 typedef struct _zframe_t zframe_t;
 
+//  @interface
 #define ZFRAME_MORE     1
 #define ZFRAME_REUSE    2
 
+//  Create a new frame with optional size, and optional data
 zframe_t *
     zframe_new (const void *data, size_t size);
+
+//  Destroy a frame
 void
     zframe_destroy (zframe_t **self_p);
+
+//  Receive a new frame off the socket
 zframe_t *
     zframe_recv (void *socket);
+
+//  Send a frame to a socket, destroy frame after sending
 void
     zframe_send (zframe_t **self_p, void *socket, int flags);
+
+//  Return number of bytes in frame data
 size_t
     zframe_size (zframe_t *self);
+
+//  Return address of frame data
 void *
     zframe_data (zframe_t *self);
+
+//  Return frame 'more' property
 int
     zframe_more (zframe_t *self);
+
+//  Self test of this class
 int
     zframe_test (Bool verbose);
+//  @end
 
 #ifdef __cplusplus
 }

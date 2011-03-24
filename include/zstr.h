@@ -29,14 +29,23 @@
 extern "C" {
 #endif
 
+//  @interface
+//  Receive a string off a socket, caller must free it
 char *
     zstr_recv (void *socket);
+
+//  Send a string to a socket in 0MQ string format
 int
     zstr_send (void *socket, const char *string);
+
+//  Send a formatted string to a socket
 int
     zstr_sendf (void *socket, const char *format, ...);
+
+//  Self test of this class
 int
     zstr_test (Bool verbose);
+//  @end
 
 #ifdef __cplusplus
 }

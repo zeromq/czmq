@@ -32,6 +32,7 @@ extern "C" {
 //  Opaque class structure
 typedef struct _zctx_t zctx_t;
 
+//  @interface
 //  Structure passed to threads created via this class
 typedef struct {
     zctx_t *ctx;                //  Context shared with parent thread
@@ -42,26 +43,33 @@ typedef struct {
 //  Create new context, returns context object, replaces zmq_init
 zctx_t *
     zctx_new (void);
+
 //  Destroy context and all sockets in it, replaces zmq_term
 void
     zctx_destroy (zctx_t **self_p);
+    
 //  Raise default I/O threads from 1, for crazy heavy applications    
 void
     zctx_set_iothreads (zctx_t *self, int iothreads);
+    
 //  Set msecs to flush sockets when closing them
 void 
     zctx_set_linger (zctx_t *self, int linger);
+
 //  Create socket within this context, replaces zmq_socket
 void *
     zctx_socket_new (zctx_t *self, int type);
+
 //  Destroy socket, replaces zmq_close
 void
     zctx_socket_destroy (zctx_t *self, void *socket);
+
 //  Create thread, return PAIR socket to talk to thread. The child thread
 //  receives a (zthread_t *) object including a zctx, a pipe back to the
 //  creating thread, and the arg passed in this call.
 void *
     zctx_thread_new (zctx_t *self, void *(*thread_fn) (void *), void *arg);
+
 //  Self test of this class
 int
     zctx_test (Bool verbose);
@@ -69,6 +77,7 @@ int
 //  Global signal indicator, TRUE when user presses Ctrl-C or the process
 //  gets a SIGTERM signal.
 extern int zctx_interrupted;
+//  @end
 
 #ifdef __cplusplus
 }

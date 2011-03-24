@@ -29,6 +29,7 @@ if BUILD_DOC
 SUFFIXES=.txt .xml .1 .3 .7
 
 .txt.xml:
+	./mkman $<
 	asciidoc -d manpage -b docbook -f asciidoc.conf \
 		-azapi_version=@PACKAGE_VERSION@ $<
 .xml.1:

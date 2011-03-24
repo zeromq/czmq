@@ -9,31 +9,47 @@ SYNOPSIS
 --------
 ----
 //  Callback function for zhash_foreach method
-typedef int (zhash_foreach_fn) (char *key, void *value, void *argument);
+typedef int (zhash_foreach_fn) (char *key, void *item, void *argument);
 //  Callback function for zhash_freefn method
 typedef void (zhash_free_fn) (void *data);
 
-//  Opaque class structure
-typedef struct _zhash zhash_t;
-
+//  Create a new, empty hash container
 zhash_t *
     zhash_new (void);
+
+//  Destroy a hash container and all items in it
 void
     zhash_destroy (zhash_t **self_p);
+
+//  Insert an item into the hash container using the specified key
 int
-    zhash_insert (zhash_t *self, char *key, void *value);
+    zhash_insert (zhash_t *self, char *key, void *item);
+
+//  Insert or update the item for the specified key
 void
-    zhash_update (zhash_t *self, char *key, void *value);
+    zhash_update (zhash_t *self, char *key, void *item);
+
+//  Destroy the item at the specified key, if any
 void
     zhash_delete (zhash_t *self, char *key);
+
+//  Return the item at the specified key, or null
 void *
     zhash_lookup (zhash_t *self, char *key);
+
+//  Set a free function for the item at the specified key
 void *
     zhash_freefn (zhash_t *self, char *key, zhash_free_fn *free_fn);
+
+//  Return the number of keys/items in the hash table
 size_t
     zhash_size (zhash_t *self);
+
+//  Iterate over the hash table and apply the function to each item
 int
     zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument);
+
+//  Self test of this class
 void
     zhash_test (int verbose);
 ----
@@ -51,6 +67,84 @@ EXAMPLE
 -------
 .From zhash_test method
 ----
+    zhash_t *hash = zhash_new ();
+    assert (hash);
+    assert (zhash_size (hash) == 0);
+
+    //  Insert some items
+    int rc;
+    rc = zhash_insert (hash, "DEADBEEF", (void *) 0xDEADBEEF);
+    assert (rc == 0);
+    rc = zhash_insert (hash, "ABADCAFE", (void *) 0xABADCAFE);
+    assert (rc == 0);
+    rc = zhash_insert (hash, "C0DEDBAD", (void *) 0xC0DEDBAD);
+    assert (rc == 0);
+    rc = zhash_insert (hash, "DEADF00D", (void *) 0xDEADF00D);
+    assert (rc == 0);
+    assert (zhash_size (hash) == 4);
+
+    //  Look for existing items
+    void *item;
+    item = zhash_lookup (hash, "DEADBEEF");
+    assert (item == (void *) 0xDEADBEEF);
+    item = zhash_lookup (hash, "ABADCAFE");
+    assert (item == (void *) 0xABADCAFE);
+    item = zhash_lookup (hash, "C0DEDBAD");
+    assert (item == (void *) 0xC0DEDBAD);
+    item = zhash_lookup (hash, "DEADF00D");
+    assert (item == (void *) 0xDEADF00D);
+
+    //  Look for non-existent items
+    item = zhash_lookup (hash, "0xF0000000");
+    assert (item == NULL);
+
+    //  Try to insert duplicate items
+    rc = zhash_insert (hash, "DEADBEEF", (void *) 0xF0000000);
+    assert (rc == -1);
+    item = zhash_lookup (hash, "DEADBEEF");
+    assert (item == (void *) 0xDEADBEEF);
+
+    //  Delete a item
+    zhash_delete (hash, "DEADBEEF");
+    item = zhash_lookup (hash, "DEADBEEF");
+    assert (item == NULL);
+    assert (zhash_size (hash) == 3);
+
+    //  Check that the queue is robust against random usage
+    struct {
+        char name [100];
+        Bool exists;
+    } testset [200];
+    memset (testset, 0, sizeof (testset));
+
+    int
+        testmax = 200,
+        testnbr,
+        iteration;
+
+    srandom ((unsigned) time (NULL));
+    for (iteration = 0; iteration < 25000; iteration++) {
+        testnbr = randof (testmax);
+        if (testset [testnbr].exists) {
+            item = zhash_lookup (hash, testset [testnbr].name);
+            assert (item);
+            zhash_delete (hash, testset [testnbr].name);
+            testset [testnbr].exists = FALSE;
+        }
+        else {
+            sprintf (testset [testnbr].name, "%x-%x", rand (), rand ());
+            if (zhash_insert (hash, testset [testnbr].name, "") == 0)
+                testset [testnbr].exists = TRUE;
+        }
+    }
+    //  Test 10K lookups
+    for (iteration = 0; iteration < 10000; iteration++)
+        item = zhash_lookup (hash, "DEADBEEFABADCAFE");
+
+    //  Destructor should be safe to call twice
+    zhash_destroy (&hash);
+    zhash_destroy (&hash);
+    assert (hash == NULL);
 ----
 
 SEE ALSO

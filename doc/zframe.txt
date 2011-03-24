@@ -11,20 +11,35 @@ SYNOPSIS
 #define ZFRAME_MORE     1
 #define ZFRAME_REUSE    2
 
+//  Create a new frame with optional size, and optional data
 zframe_t *
     zframe_new (const void *data, size_t size);
+
+//  Destroy a frame
 void
     zframe_destroy (zframe_t **self_p);
+
+//  Receive a new frame off the socket
 zframe_t *
     zframe_recv (void *socket);
+
+//  Send a frame to a socket, destroy frame after sending
 void
     zframe_send (zframe_t **self_p, void *socket, int flags);
+
+//  Return number of bytes in frame data
 size_t
     zframe_size (zframe_t *self);
+
+//  Return address of frame data
 void *
     zframe_data (zframe_t *self);
+
+//  Return frame 'more' property
 int
     zframe_more (zframe_t *self);
+
+//  Self test of this class
 int
     zframe_test (Bool verbose);
 ----
@@ -45,6 +60,46 @@ EXAMPLE
 -------
 .From zframe_test method
 ----
+    zctx_t *ctx = zctx_new ();
+
+    void *output = zctx_socket_new (ctx, ZMQ_PAIR);
+    zmq_bind (output, "inproc://zframe.test");
+    void *input = zctx_socket_new (ctx, ZMQ_PAIR);
+    zmq_connect (input, "inproc://zframe.test");
+    
+    //  Send five different frames, test ZFRAME_MORE
+    int frame_nbr;
+    for (frame_nbr = 0; frame_nbr < 5; frame_nbr++) {
+        zframe_t *frame = zframe_new ("Hello", 5);
+        zframe_send (&frame, output, ZFRAME_MORE);
+    }
+    //  Send same frame five times, test ZFRAME_REUSE
+    zframe_t *frame = zframe_new ("Hello", 5);
+    for (frame_nbr = 0; frame_nbr < 5; frame_nbr++) {
+        zframe_send (&frame, output, ZFRAME_MORE + ZFRAME_REUSE);
+    }
+    assert (frame);
+    zframe_destroy (&frame);
+    
+    //  Send END frame
+    frame = zframe_new ("END", 3);
+    zframe_send (&frame, output, 0);
+    
+    //  Read and count until we receive END
+    frame_nbr = 0;
+    for (frame_nbr = 0;; frame_nbr++) {
+        zframe_t *frame = zframe_recv (input);
+        if (zframe_size (frame) == 3
+        &&  memcmp (zframe_data (frame), "END", 3) == 0) {
+            zframe_destroy (&frame);
+            break;
+        }
+        assert (zframe_more (frame));
+        zframe_destroy (&frame);
+    }
+    assert (frame_nbr == 10);
+
+    zctx_destroy (&ctx);
 ----
 
 SEE ALSO

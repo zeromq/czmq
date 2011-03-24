@@ -32,23 +32,40 @@ extern "C" {
 //  Opaque class structure
 typedef struct _zloop_t zloop_t;
 
+//  @interface
 //  Callback function for reactor events
 typedef int (zloop_fn) (zloop_t *loop, void *socket, void *args);
 
+//  Create a new zloop reactor
 zloop_t *
     zloop_new (void);
+
+//  Destroy a reactor
 void
     zloop_destroy (zloop_t **self_p);
+
+//  Register a socket reader, on one socket
 int
     zloop_reader (zloop_t *self, void *socket, zloop_fn handler, void *args);
+
+//  Cancel the reader on the specified socket, if any
 void
     zloop_cancel (zloop_t *self, void *socket);
+
+//  Register a timer that will go off after 'delay' msecs, and will
+//  repeat 'times' times, unless 'times' is zero, meaning repeat forever.
 int
     zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *args);
+
+//  Start the reactor, ends if a callback function returns -1, or the process
+//  received SIGINT or SIGTERM.
 int
     zloop_start (zloop_t *self);
+
+//  Self test of this class
 int
     zloop_test (Bool verbose);
+//  @end
 
 #ifdef __cplusplus
 }

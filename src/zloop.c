@@ -23,8 +23,13 @@
 */
 
 /*  
-@overview
+@header
+    The zloop class provides an event-driven reactor pattern. The reactor 
+    handles socket readers (not writers in the current implementation), and 
+    once-off or repeated timers. Its resolution is 1 msec. It uses a tickless 
+    timer to reduce CPU interrupts in inactive processes.
 @discuss
+@end
 */
 
 #include "../include/zapi_prelude.h"
@@ -282,6 +287,8 @@ int
 zloop_test (Bool verbose)
 {
     printf (" * zloop: ");
+    
+    //  @selftest
     zctx_t *ctx = zctx_new ();
     
     void *output = zctx_socket_new (ctx, ZMQ_PAIR);
@@ -302,6 +309,7 @@ zloop_test (Bool verbose)
     assert (loop == NULL);
 
     zctx_destroy (&ctx);
+    //  @end
     printf ("OK\n");
     return 0;
 }

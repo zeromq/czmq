@@ -9,9 +9,11 @@ zapi - 0MQ C Binding
 
 SYNOPSIS
 --------
-*#include <zapi.h>*
+----
+#include <zapi.h>
 
-*cc* ['flags'] 'files' *-lzmq* *-lzapi* ['libraries']
+cc ['flags'] 'files' -lzmq -lzapi ['libraries']
+----
 
 
 DESCRIPTION
@@ -36,7 +38,7 @@ The authors of zapi grant you free use of this software under the terms of the G
 Contributing
 ~~~~~~~~~~~~
 
-To submit an issue use the [issue tracker](http://github.com/zeromq/zapi/issues). All discussion happens on the [zeromq-dev](zeromq-dev@lists.zeromq.org) list or #zeromq IRC channel at irc.freenode.net.
+To submit an issue use the issue tracker at http://github.com/zeromq/zapi/issues. All discussion happens on the  zeromq-dev list or #zeromq IRC channel at irc.freenode.net.
 
 The proper way to submit patches is to clone this repository, make your changes, and use git to create a patch or a pull request. See http://www.zeromq.org/docs:contributing. All contributors are listed in AUTHORS.
 

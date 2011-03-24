@@ -23,8 +23,13 @@
 */
 
 /*  
-@overview
+@header
+    The zmsg class provides methods to send and receive multipart messages 
+    across 0MQ sockets. This class provides a list-like container interface, 
+    with methods to work with the overall container. zmsg_t messages are 
+    composed of zero or more zframe_t frames.
 @discuss
+@end
 */
 
 #include "../include/zapi_prelude.h"
@@ -340,6 +345,7 @@ zmsg_test (Bool verbose)
 {
     printf (" * zmsg: ");
 
+    //  @selftest
     zctx_t *ctx = zctx_new ();
 
     void *output = zctx_socket_new (ctx, ZMQ_PAIR);
@@ -419,6 +425,7 @@ zmsg_test (Bool verbose)
     zmsg_destroy (&msg);
 
     zctx_destroy (&ctx);
+    //  @end
     printf ("OK\n");
     return 0;
 }

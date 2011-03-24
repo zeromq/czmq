@@ -11,10 +11,12 @@ SYNOPSIS
 //  Sleep for a number of milliseconds
 void 
     zclock_sleep (int msecs);
+
 //  Return current system clock as milliseconds
 int64_t 
     zclock_time (void);
-//  Selftest
+
+//  Self test of this class
 int 
     zclock_test (Bool verbose);
 ----
@@ -40,6 +42,9 @@ EXAMPLE
 -------
 .From zclock_test method
 ----
+    int64_t start = zclock_time ();
+    zclock_sleep (10);
+    assert ((zclock_time () - start) >= 10);
 ----
 
 SEE ALSO

@@ -23,6 +23,7 @@ src/mtrace.txt
 src/outbin
 src/zapi_selftest
 doc/*.7
+doc/*.xml
 src/.libs/
 src/libzapi.la
 src/platform.h

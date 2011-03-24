@@ -29,16 +29,20 @@
 extern "C" {
 #endif
 
+//  @interface
 //  Sleep for a number of milliseconds
 void 
     zclock_sleep (int msecs);
+
 //  Return current system clock as milliseconds
 int64_t 
     zclock_time (void);
-//  Selftest
+
+//  Self test of this class
 int 
     zclock_test (Bool verbose);
-
+//  @end
+    
 #ifdef __cplusplus
 }
 #endif
