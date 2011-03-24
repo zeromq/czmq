@@ -22,7 +22,13 @@
     =========================================================================
 */
 
+/*  
+@overview
+@discuss
+*/
+
 #include "../include/zapi_prelude.h"
+#include "../include/zclock.h"
 #include "../include/zctx.h"
 #include "../include/zlist.h"
 #include "../include/zstr.h"
@@ -154,22 +160,6 @@ zloop_cancel (zloop_t *self, void *socket)
 }
 
 
-//  Return current system clock as milliseconds
-static int64_t
-s_clock (void)
-{
-#if (defined (__WINDOWS__))
-    SYSTEMTIME st;
-    GetSystemTime (&st);
-    return (int64_t) st.wSecond * 1000 + st.wMilliseconds;
-#else
-    struct timeval tv;
-    gettimeofday (&tv, NULL);
-    return (int64_t) (tv.tv_sec * 1000 + tv.tv_usec / 1000);
-#endif
-}
-
-
 //  --------------------------------------------------------------------------
 //  Register a timer that expires after some delay and repeats some number of
 //  times. At each expiry, will call the handler, passing the args. To
@@ -215,14 +205,14 @@ zloop_start (zloop_t *self)
     //  Recalculate all timers now
     s_timer_t *timer = (s_timer_t *) zlist_first (self->timers);
     while (timer) {
-        timer->when = s_clock () + timer->delay;
+        timer->when = zclock_time () + timer->delay;
         timer = (s_timer_t *) zlist_next (self->timers);
     }
 
     //  Main reactor loop
     while (!zctx_interrupted) {
         //  Calculate tickless timer, up to 1 hour
-        uint64_t tickless = s_clock () + 1000 * 3600;
+        uint64_t tickless = zclock_time () + 1000 * 3600;
         s_timer_t *timer = (s_timer_t *) zlist_first (self->timers);
         while (timer) {
             //  Find earliest timer
@@ -230,7 +220,7 @@ zloop_start (zloop_t *self)
                 tickless = timer->when;
             timer = (s_timer_t *) zlist_next (self->timers);
         }
-        long timeout = (long) (tickless - s_clock ()) * 1000;
+        long timeout = (long) (tickless - zclock_time ()) * 1000;
         if (timeout < 0)
             timeout = 0;
         rc = zmq_poll (self->pollset, zlist_size (self->readers), timeout);
@@ -241,7 +231,7 @@ zloop_start (zloop_t *self)
         //  Handle any timers that have now expired
         timer = (s_timer_t *) zlist_first (self->timers);
         while (timer) {
-            if (s_clock () > timer->when) {
+            if (zclock_time () > timer->when) {
                 rc = timer->handler (self, NULL, timer->args);
                 if (rc == -1)
                     break;      //  Timer handler signalled break
@@ -250,7 +240,7 @@ zloop_start (zloop_t *self)
                     free (timer);
                 }
                 else
-                    timer->when = timer->delay + s_clock ();
+                    timer->when = timer->delay + zclock_time ();
             }
             timer = (s_timer_t *) zlist_next (self->timers);
         }

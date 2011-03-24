@@ -38,8 +38,8 @@ zapi grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.o
   Reactor pattern      |                |
   Hash container       +------------+   |
   List container                    |   |
-  Close context                     v   v
-                                 +---------+
+  System clock                      v   v
+  Close context                  +---------+
                                  |         |
                                  | libzmq  |
                                  |         |
@@ -56,6 +56,7 @@ zapi grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.o
 * Automatic LINGER configuration of all sockets for context termination.
 * Portable API for creating child threads and 0MQ pipes to talk to them.
 * Simple reactor with one-off and repeated timers, and socket readers.
+* System clock functions for sleeping and calculating timers.
 * Portable to Linux, UNIX, OS X, Windows (porting is not yet complete).
 * Includes generic hash and list containers.
 * Full selftests on all classes.
@@ -106,13 +107,30 @@ Include `zapi.h` in your application and link with libzapi. Here is a typical gc
 
 #### zctx - working with 0MQ contexts
 
-The zctx class wraps 0MQ contexts and replaces the core zmq_init(), zmq_term(), and zmq_socket() functions. The main purpose of this class is to automatically close sockets when terminating a context. The zctx class has these main features:
+The zctx class wraps 0MQ contexts. It manages open sockets in the context 
+and automatically closes these before terminating the context. It provides
+a simple way to set the linger timeout on sockets, and configure contexts
+for number of I/O threads. Sets-up signal (interrrupt) handling for the
+process.
 
-* Tracks all open sockets and automatically closes them before calling zmq_term(). This avoids an infinite wait on open sockets.
-* Automatically configures sockets with a ZMQ_LINGER timeout you can define, and which defaults to zero. The default behavior of zctx is therefore like 0MQ/2.0, immediate termination with loss of any pending messages. You can set any linger timeout you like by calling the zctx_set_linger() method.
-* Moves the iothreads configuration to a separate method, so that default usage is 1 I/O thread. Lets you configure this value.
-* Sets up signal (SIGINT and SIGTERM) handling so that blocking calls such as zmq_recv() and zmq_poll() will return when the user presses Ctrl-C.
-* Provides API to create child threads with a pipe (PAIR socket) to talk to them.
+The zctx class has these main features:
+
+* Tracks all open sockets and automatically closes them before calling 
+  zmq_term(). This avoids an infinite wait on open sockets.
+
+* Automatically configures sockets with a ZMQ_LINGER timeout you can define, 
+  and which defaults to zero. The default behavior of zctx is therefore like 
+  0MQ/2.0, immediate termination with loss of any pending messages. You can 
+  set any linger timeout you like by calling the zctx_set_linger() method.
+
+* Moves the iothreads configuration to a separate method, so that default 
+  usage is 1 I/O thread. Lets you configure this value.
+
+* Sets up signal (SIGINT and SIGTERM) handling so that blocking calls such 
+  as zmq_recv() and zmq_poll() will return when the user presses Ctrl-C.
+
+* Provides API to create child threads with a pipe (PAIR socket) to talk to 
+  them.
 
 This is the class interface:
 
@@ -154,27 +172,73 @@ This is the class interface:
     //  gets a SIGTERM signal.
     int zctx_interrupted;
 
-This class is an example of how to create a thread-safe object using 0MQ. Actually it's a little more work than it sounded at first. Let's start by agreeing on the problem here. We have a context wrapper, zctx, which does some neat work for us such as managing sockets automatically so we can just shut down without having to manually close each and every damn socket. All good, until we need to build a multithreaded application. Which is about 80% of interesting 0MQ applications. It is not safe to share a single object from multiple threads. They'll try to mess with the data structures concurrently, and it'll break nastily.
+This class is an example of how to create a thread-safe object using
+0MQ. Actually it's a little more work than it sounded at first. Let's
+start by agreeing on the problem here. We have a context wrapper, zctx,
+which does some neat work for us such as managing sockets automatically
+so we can just shut down without having to manually close each and
+every damn socket. All good, until we need to build a multithreaded
+application. Which is about 80% of interesting 0MQ applications. It is
+not safe to share a single object from multiple threads. They'll try to
+mess with the data structures concurrently, and it'll break nastily.
 
-OK, the classic solution would be exclusion using semaphores, critical sections, etc. We're 0MQ fanatics so that's not even an option. Instead, we want to eat our own dogfood and do this using 0MQ.
+OK, the classic solution would be exclusion using semaphores, critical
+sections, etc. We're 0MQ fanatics so that's not even an option. Instead,
+we want to eat our own dogfood and do this using 0MQ.
 
-The basic concept, which you'll see in this class, is that the real work is not done by the object we own, but by a separate object, running in its own thread. I call this the "agent". This is a nice pattern, and we see it in a few places, such as the flcliapi example from the Guide.
+The basic concept, which you'll see in this class, is that the real work
+is not done by the object we own, but by a separate object, running in
+its own thread. I call this the "agent". This is a nice pattern, and we
+see it in a few places, such as the flcliapi example from the Guide.
 
-The slight difficulty here is bootstrapping. We have a separate agent thread, which we talk to over inproc, and which manages our context and sockets. This is problem number one, I'll get to problem two in a sec.
+The slight difficulty here is bootstrapping. We have a separate agent
+thread, which we talk to over inproc, and which manages our context and
+sockets. This is problem number one, I'll get to problem two in a sec.
 
-Part of zctx's magic is delaying the zmq_init call until it's really needed. This lets us first configure iothreads if needed. It's the agent that will create the 0MQ context by calling zmq_init. However we need sockets to talk to the agent. Solution: use two contexts, one for the pipes to/from the agent, and one for the application itself. Not many 0MQ applications create multiple contexts, but it's a valid and useful technique.
+Part of zctx's magic is delaying the zmq_init call until it's really
+needed. This lets us first configure iothreads if needed. It's the agent
+that will create the 0MQ context by calling zmq_init. However we need
+sockets to talk to the agent. Solution: use two contexts, one for the
+pipes to/from the agent, and one for the application itself. Not many
+0MQ applications create multiple contexts, but it's a valid and useful
+technique.
 
-So we create a private context, two sockets, and then we pass one of those sockets to the agent. We can then talk to the agent by sending simple commands like IOTHREADS=100, SOCKET, CLOSE=0xff33344, and TERMINATE. BTW, do not set IOTHREADS to 100, that is insane. Anything above 1 is actually insane unless you know what you're doing.
+So we create a private context, two sockets, and then we pass one of
+those sockets to the agent. We can then talk to the agent by sending
+simple commands like IOTHREADS=100, SOCKET, CLOSE=0xff33344, and
+TERMINATE. BTW, do not set IOTHREADS to 100, that is insane. Anything
+above 1 is actually insane unless you know what you're doing.
 
-Next problem is when our application needs child threads. If we simply use pthreads_create() we're faced with several issues. First, it's not portable to legacy OSes like win32. Second, how can a child thread get access to our zctx object? If we just pass it around, we'll end up sharing the pipe socket (which we use to talk to the agent) between threads, and that will then crash 0MQ. Sockets cannot be used from more than one thread at a time.
+Next problem is when our application needs child threads. If we simply
+use pthreads_create() we're faced with several issues. First, it's not
+portable to legacy OSes like win32. Second, how can a child thread get
+access to our zctx object? If we just pass it around, we'll end up 
+sharing the pipe socket (which we use to talk to the agent) between 
+threads, and that will then crash 0MQ. Sockets cannot be used from more
+than one thread at a time.
 
-So each child thread needs its own pipe to the agent. For the agent, this is fine, it can talk to a million threads. But how do we create those pipes in the child thread? We can't, not without help from the main thread. The solution is to wrap thread creation, like we wrap socket creation. To create a new thread, the app calls zctx_thread_new() and this method creates a dedicated zctx object, with a pipe, and then it passes that object to the newly minted child thread.
+So each child thread needs its own pipe to the agent. For the agent, 
+this is fine, it can talk to a million threads. But how do we create 
+those pipes in the child thread? We can't, not without help from the
+main thread. The solution is to wrap thread creation, like we wrap
+socket creation. To create a new thread, the app calls zctx_thread_new()
+and this method creates a dedicated zctx object, with a pipe, and then
+it passes that object to the newly minted child thread.
 
-The neat thing is we can hide non-portable aspects. Windows is really a mess when it comes to threads. Three different APIs, none of which is really right, so you have to do rubbish like manually cleaning up when a thread finishes. Anyhow, it's hidden in this class so you don't need to worry.
+The neat thing is we can hide non-portable aspects. Windows is really a
+mess when it comes to threads. Three different APIs, none of which is
+really right, so you have to do rubbish like manually cleaning up when
+a thread finishes. Anyhow, it's hidden in this class so you don't need
+to worry.
 
-Second neat thing about wrapping thread creation is we can make it a more enriching experience for all involved. One thing I do often is use a PAIR-PAIR pipe to talk from a thread to/from its parent. So this class will automatically create such a pair for each thread you start.
+Second neat thing about wrapping thread creation is we can make it a 
+more enriching experience for all involved. One thing I do often is use
+a PAIR-PAIR pipe to talk from a thread to/from its parent. So this class
+will automatically create such a pair for each thread you start.
 
-That's it. We have a multithreaded class that is thread safe and also gives you major power for creating multithreaded applications, with a really simple API.
+That's it. We have a multithreaded class that is thread safe and also
+gives you major power for creating multithreaded applications, with a 
+really simple API.
 
 Now that's what I call a language binding.
 
@@ -349,6 +413,34 @@ This is the class interface:
         zlist_size (zlist_t *self);
     void
         zlist_test (int verbose);
+
+#### zclock - millisecond clocks and delays
+
+The zclock class provides essential sleep and system time functions, used 
+to slow down threads for testing, and calculate timers for polling. Wraps 
+the non-portable system calls in a simple portable API.
+
+This is the class interface:
+
+    //  Sleep for a number of milliseconds
+    void 
+        zclock_sleep (int msecs);
+    //  Return current system clock as milliseconds
+    int64_t 
+        zclock_time (void);
+    //  Selftest
+    int 
+        zclock_test (Bool verbose);
+
+This class contains some small surprises. Most amazing, win32 did an API
+better than POSIX. The win32 Sleep() call is not only a neat 1-liner, it
+also sleeps for milliseconds, whereas the POSIX call asks us to think in
+terms of nanoseconds, which is insane. I've decided every single man page
+for this library will say "insane" at least once. Anyhow, milliseconds 
+are a concept we can deal with. Seconds are too fat, nanoseconds too 
+tiny, but milliseconds are just right for slices of time we want to work
+with at the 0MQ scale. zclock doesn't give you objects to work with, we
+like the zapi class model but we're not insane. There, got it in again.
 
 ### Development
 

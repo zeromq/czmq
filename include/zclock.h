@@ -1,8 +1,6 @@
 /*  =========================================================================
-    zapi_tests.c - run selftests
-
-    Runs all selftests.
-
+    zclock - millisecond clocks and delays
+    
     -------------------------------------------------------------------------
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
@@ -24,35 +22,25 @@
     =========================================================================
 */
 
-#include "../include/zapi_prelude.h"
-#include "../include/zclock.h"
-#include "../include/zctx.h"
-#include "../include/zframe.h"
-#include "../include/zhash.h"
-#include "../include/zlist.h"
-#include "../include/zloop.h"
-#include "../include/zmsg.h"
-#include "../include/zstr.h"
+#ifndef __ZCLOCK_H_INCLUDED__
+#define __ZCLOCK_H_INCLUDED__
 
-int main (int argc, char *argv [])
-{
-    Bool verbose;
-    if (argc == 2 && streq (argv [1], "-v"))
-        verbose = TRUE;
-    else
-        verbose = FALSE;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-    printf ("Running zapi self tests...\n");
+//  Sleep for a number of milliseconds
+void 
+    zclock_sleep (int msecs);
+//  Return current system clock as milliseconds
+int64_t 
+    zclock_time (void);
+//  Selftest
+int 
+    zclock_test (Bool verbose);
 
-    zclock_test (verbose);
-    zctx_test (verbose);
-    zframe_test (verbose);
-    zhash_test (verbose);
-    zlist_test (verbose);
-    zloop_test (verbose);
-    zmsg_test (verbose);
-    zstr_test (verbose);
-
-    printf ("Tests passed OK\n");
-    return 0;
+#ifdef __cplusplus
 }
+#endif
+
+#endif

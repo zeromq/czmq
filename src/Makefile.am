@@ -6,6 +6,7 @@ pkgconfig_DATA = libzapi.pc
 include_HEADERS = \
     ../include/zapi.h \
     ../include/zapi_prelude.h \
+    ../include/zclock.h \
     ../include/zctx.h \
     ../include/zframe.h \
     ../include/zhash.h \
@@ -15,6 +16,7 @@ include_HEADERS = \
     ../include/zstr.h
 
 libzapi_la_SOURCES = \
+    zclock.c \
     zctx.c \
     zframe.c \
     zhash.c \

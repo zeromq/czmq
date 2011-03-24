@@ -31,6 +31,7 @@
 
 //  Classes listed in alphabetical order
 
+#include <zclock.h>
 #include <zctx.h>
 #include <zframe.h>
 #include <zhash.h>

@@ -1,6 +1,7 @@
 MAN1 =
 MAN3 =
 MAN7 = zapi.7 \
+    zclock.7 \
     zctx.7 \
     zframe.7 \
     zhash.7 \
