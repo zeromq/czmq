@@ -6,6 +6,27 @@
 ## Contents
 
 
+**<a href="#toc2-11">Overview</a>**
+&emsp;<a href="#toc3-14">Scope and Goals</a>
+&emsp;<a href="#toc3-53">Highlights</a>
+&emsp;<a href="#toc3-68">Ownership and License</a>
+&emsp;<a href="#toc3-75">Contributing</a>
+
+**<a href="#toc2-84">Using zapi</a>**
+&emsp;<a href="#toc3-87">Building and Installing</a>
+&emsp;<a href="#toc3-108">Linking with an Application</a>
+&emsp;<a href="#toc3-115">API Summary</a>
+&emsp;<a href="#toc4-118">zctx - working with ØMQ contexts</a>
+&emsp;<a href="#toc4-129">zstr - sending and receiving strings</a>
+&emsp;<a href="#toc4-154">zframe - working with single message frames</a>
+&emsp;<a href="#toc4-165">zmsg - working with multipart messages</a>
+&emsp;<a href="#toc4-176">zloop - event-driven reactor</a>
+&emsp;<a href="#toc4-187">zhash - expandable hash table container</a>
+&emsp;<a href="#toc4-198">zlist - singly-linked list container</a>
+&emsp;<a href="#toc4-209">zclock - millisecond clocks and delays</a>
+&emsp;<a href="#toc3-220">Development</a>
+&emsp;<a href="#toc3-230">This Document</a>
+
 <A name="toc2-11" title="Overview" />
 ## Overview
 
@@ -23,32 +44,6 @@ zapi grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.o
 <center>
 <img src="https://github.com/zeromq/zapi/raw/master/images/README_1.png" alt="1">
 </center>
-                              +---------------+
-                              |               |
-                              | C application |
-                              |               |
-                              +-----+---+-----+
-                                    |   |
-                                    |   |
-                       +------------+   |
-                       |                |
-                       v                |
-  Open context    +---------+           |
-  Create sockets  |         |           |    Connect, bind sockets
-  Close sockets   | libzapi |           |    get/set socket options
-  Send/receive    |    cYEL |           |
-  Multithreading  +----+----+           |
-  Reactor pattern      |                |
-  Hash container       +------------+   |
-  List container                    |   |
-  System clock                      v   v
-  Close context                  +---------+
-                                 |         |
-                                 | libzmq  |
-                                 |         |
-                                 +---------+
-
-[/diagram]
 
 <A name="toc3-53" title="Highlights" />
 ### Highlights
@@ -273,18 +268,6 @@ message sending.
 <center>
 <img src="https://github.com/zeromq/zapi/raw/master/images/README_2.png" alt="2">
 </center>
-
-           Memory                       Wire
-           +-------------+---+          +---+-------------+
-    Send   | S t r i n g | 0 |  ---->   | 6 | S t r i n g |
-           +-------------+---+          +---+-------------+
-
-           Wire                         Heap
-           +---+-------------+          +-------------+---+
-    Recv   | 6 | S t r i n g |  ---->   | S t r i n g | 0 |
-           +---+-------------+          +-------------+---+
-
-[/diagram]
 
 This is the class interface:
 
