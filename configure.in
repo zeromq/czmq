@@ -64,30 +64,30 @@ if test "x${ZAPI_GCOV}" == "xyes"; then
     fi
 fi
 
-# zmq location
-AC_ARG_WITH([zeromq],
-            [AS_HELP_STRING([--with-zeromq],
-                            [Specify ZeroMQ prefix])],
-            [zapi_search_zeromq="yes"],
+# libzmq integration
+AC_ARG_WITH([libzmq],
+            [AS_HELP_STRING([--with-libzmq],
+                            [Specify libzmq prefix])],
+            [zapi_search_libzmq="yes"],
             [])
 
-if test "x$zapi_search_zeromq" = "xyes"; then
-    if test -r "${with_zeromq}/include/zmq.h"; then
-        CFLAGS="-I${with_zeromq}/include ${CFLAGS}"
-        LDFLAGS="-L${with_zeromq}/lib ${LDFLAGS}"
+if test "x$zapi_search_libzmq" = "xyes"; then
+    if test -r "${with_libzmq}/include/zmq.h"; then
+        CFLAGS="-I${with_libzmq}/include ${CFLAGS}"
+        LDFLAGS="-L${with_libzmq}/lib ${LDFLAGS}"
     else
-        AC_MSG_ERROR([${with_zeromq}/include/zmq.h not found. Please check ZeroMQ prefix])
+        AC_MSG_ERROR([${with_libzmq}/include/zmq.h not found. Please check libzmq prefix])
     fi
 fi
 
-AC_CHECK_LIB(zmq, zmq_init, ,[AC_MSG_ERROR([cannot link with -lzmq, install ZeroMQ.])])
+AC_CHECK_LIB(zmq, zmq_init, ,[AC_MSG_ERROR([cannot link with -lzmq, install libzmq.])])
 
-AC_MSG_CHECKING([whether ZeroMQ installation works])
+AC_MSG_CHECKING([whether libzmq installation works])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <zmq.h>],
                                 [zmq_init(1);])
                ],
                [AC_MSG_RESULT([yes])], 
-               [AC_MSG_ERROR([no. Please specify ZeroMQ installation prefix using --with-zeromq])])
+               [AC_MSG_ERROR([no. Please specify libzmq installation prefix using --with-libzmq])])
 
 #Whether we are on mingw or not.
 zapi_on_mingw32="no"
