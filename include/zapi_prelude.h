@@ -223,6 +223,7 @@
 #include <signal.h>
 #include <setjmp.h>
 #include <assert.h>
+#include <inttypes.h>
 
 //- System-specific include files -------------------------------------------
 

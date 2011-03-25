@@ -47,7 +47,7 @@
 typedef struct _item_t item_t;
 struct _item_t {
     void
-        *item;                  //  Opaque item
+        *value;                 //  Opaque item value
     item_t
         *next;                  //  Next item in the hash slot
     qbyte
@@ -118,14 +118,14 @@ s_item_lookup (zhash_t *self, char *key)
 //  If item already existed, returns NULL
 
 static item_t *
-s_item_insert (zhash_t *self, char *key, void *item)
+s_item_insert (zhash_t *self, char *key, void *value)
 {
     //  Check that item does not already exist in hash table
     //  Leaves self->cached_index with calculated hash item
     item_t *item = s_item_lookup (self, key);
     if (item == NULL) {
         item = (item_t *) zmalloc (sizeof (item_t));
-        item->item = item;
+        item->value = value;
         item->key = strdup (key);
         item->index = self->cached_index;
         //  Insert into start of bucket list
@@ -159,7 +159,7 @@ s_item_destroy (zhash_t *self, item_t *item)
     *prev_item = item->next;
     self->size--;
     if (item->free_fn)
-        (item->free_fn) (item->item);
+        (item->free_fn) (item->value);
     free (item->key);
     free (item);
 }
@@ -212,7 +212,7 @@ zhash_destroy (zhash_t **self_p)
 //  Returns 0 on success.
 
 int
-zhash_insert (zhash_t *self, char *key, void *item)
+zhash_insert (zhash_t *self, char *key, void *value)
 {
     assert (self);
     assert (key);
@@ -253,7 +253,7 @@ zhash_insert (zhash_t *self, char *key, void *item)
         self->items = new_items;
         self->limit = new_limit;
     }
-    return s_item_insert (self, key, item)? 0: -1;
+    return s_item_insert (self, key, value)? 0: -1;
 }
 
 
@@ -263,18 +263,18 @@ zhash_insert (zhash_t *self, char *key, void *item)
 //  Use free_fn method to ensure deallocator is properly called on item.
 
 void
-zhash_update (zhash_t *self, char *key, void *item)
+zhash_update (zhash_t *self, char *key, void *value)
 {
     assert (self);
     assert (key);
     item_t *item = s_item_lookup (self, key);
     if (item) {
         if (item->free_fn)
-            (item->free_fn) (item->item);
-        item->item = item;
+            (item->free_fn) (item->value);
+        item->value = value;
     }
     else
-        zhash_insert (self, key, item);
+        zhash_insert (self, key, value);
 }
 
 
@@ -305,7 +305,7 @@ zhash_lookup (zhash_t *self, char *key)
 
     item_t *item = s_item_lookup (self, key);
     if (item)
-        return item->item;
+        return item->value;
     else
         return NULL;
 }
@@ -327,7 +327,7 @@ zhash_freefn (zhash_t *self, char *key, zhash_free_fn *free_fn)
     item_t *item = s_item_lookup (self, key);
     if (item) {
         item->free_fn = free_fn;
-        return item->item;
+        return item->value;
     }
     else
         return NULL;
@@ -365,7 +365,7 @@ zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument)
         item = self->items [index];
         while (item) {
             //  Invoke callback, passing item properties and argument
-            rc = callback (item->key, item->item, argument);
+            rc = callback (item->key, item->value, argument);
             if (rc)
                 break;          //  End if non-zero return code
             item = item->next;
