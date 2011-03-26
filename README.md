@@ -1,6 +1,6 @@
 
-<A name="toc1-3" title="zapi - High-level C binding for ØMQ" />
-# zapi - High-level C binding for ØMQ
+<A name="toc1-3" title="libzapi - High-level C binding for ØMQ" />
+# libzapi - High-level C binding for ØMQ
 
 <A name="toc2-6" title="Contents" />
 ## Contents
@@ -12,7 +12,7 @@
 &emsp;<a href="#toc3-68">Ownership and License</a>
 &emsp;<a href="#toc3-75">Contributing</a>
 
-**<a href="#toc2-84">Using zapi</a>**
+**<a href="#toc2-84">Using libzapi</a>**
 &emsp;<a href="#toc3-87">Building and Installing</a>
 &emsp;<a href="#toc3-108">Linking with an Application</a>
 &emsp;<a href="#toc3-115">API Summary</a>
@@ -33,16 +33,16 @@
 <A name="toc3-14" title="Scope and Goals" />
 ### Scope and Goals
 
-zapi has these goals:
+libzapi has these goals:
 
 * To wrap the ØMQ core API in semantics that are natural and lead to shorter, more readable applications.
 * To hide the differences between versions of ØMQ, particularly 2.0, 2.1, and 3.0.
 * To provide a space for development of more sophisticated API semantics.
 
-zapi grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.org) and [ZFL](http://zfl.zeromq.org).
+libzapi grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.org) and [ZFL](http://zfl.zeromq.org).
 
 <center>
-<img src="https://github.com/zeromq/zapi/raw/master/images/README_1.png" alt="1">
+<img src="https://github.com/zeromq/libzapi/raw/master/images/README_1.png" alt="1">
 </center>
 
 <A name="toc3-53" title="Highlights" />
@@ -63,29 +63,29 @@ zapi grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.o
 <A name="toc3-68" title="Ownership and License" />
 ### Ownership and License
 
-zapi is maintained by Pieter Hintjens and Mikko Koppanen (build system). Its other authors and contributors are listed in the AUTHORS file. It is held by the ZeroMQ organization at github.com.
+libzapi is maintained by Pieter Hintjens and Mikko Koppanen (build system). Its other authors and contributors are listed in the AUTHORS file. It is held by the ZeroMQ organization at github.com.
 
-The authors of zapi grant you use of this software under the terms of the GNU Lesser General Public License (LGPL). For details see the files `COPYING` and `COPYING.LESSER` in this directory.
+The authors of libzapi grant you use of this software under the terms of the GNU Lesser General Public License (LGPL). For details see the files `COPYING` and `COPYING.LESSER` in this directory.
 
 <A name="toc3-75" title="Contributing" />
 ### Contributing
 
-To submit an issue use the [issue tracker](http://github.com/zeromq/zapi/issues). All discussion happens on the [zeromq-dev](zeromq-dev@lists.zeromq.org) list or #zeromq IRC channel at irc.freenode.net.
+To submit an issue use the [issue tracker](http://github.com/zeromq/libzapi/issues). All discussion happens on the [zeromq-dev](zeromq-dev@lists.zeromq.org) list or #zeromq IRC channel at irc.freenode.net.
 
 The proper way to submit patches is to clone this repository, make your changes, and use git to create a patch or a pull request. See http://www.zeromq.org/docs:contributing. All contributors are listed in AUTHORS.
 
-The general rule is, if you contribute code to zapi you must be willing to maintain it as long as there are users of it. Code with no active maintainer will in general be deprecated and/or removed.
+The general rule is, if you contribute code to libzapi you must be willing to maintain it as long as there are users of it. Code with no active maintainer will in general be deprecated and/or removed.
 
-<A name="toc2-84" title="Using zapi" />
-## Using zapi
+<A name="toc2-84" title="Using libzapi" />
+## Using libzapi
 
 <A name="toc3-87" title="Building and Installing" />
 ### Building and Installing
 
-zapi uses autotools for packaging. To build from git (all example commands are for Linux):
+libzapi uses autotools for packaging. To build from git (all example commands are for Linux):
 
-    git clone git://github.com/zeromq/zapi.git
-    cd zapi
+    git clone git://github.com/zeromq/libzapi.git
+    cd libzapi
     sh autogen.sh
     ./configure
     make all
@@ -96,7 +96,7 @@ You will need the libtool and autotools packages. On FreeBSD, you may need to sp
 
     ./configure --with-zeromq=/usr/local
 
-After building, you can run the zapi selftests:
+After building, you can run the libzapi selftests:
 
     make check
 
@@ -266,7 +266,7 @@ and appends a null byte on received strings. This class is for simple
 message sending. 
 
 <center>
-<img src="https://github.com/zeromq/zapi/raw/master/images/README_2.png" alt="2">
+<img src="https://github.com/zeromq/libzapi/raw/master/images/README_2.png" alt="2">
 </center>
 
 This is the class interface:
@@ -608,7 +608,7 @@ like the zapi class model but we're not insane. There, got it in again.
 <A name="toc3-220" title="Development" />
 ### Development
 
-zapi is developed through a test-driven process that guarantees no memory violations or leaks in the code:
+libzapi is developed through a test-driven process that guarantees no memory violations or leaks in the code:
 
 * Modify a class or method.
 * Update the test method for that class.
