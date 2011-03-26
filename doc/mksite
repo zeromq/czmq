@@ -27,7 +27,7 @@ function do_upload {
 echo "Building docs..."
 make --quiet
 rm -f *.xml    #   Makefile does not detect version differences for XML
-for FILE in libzapi.txt z*.txt; do 
+for FILE in z*.txt; do 
     ./mkman $FILE
     make `basename $FILE .txt`.xml
 done
