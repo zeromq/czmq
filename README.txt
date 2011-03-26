@@ -1,7 +1,7 @@
-.set GIT=https://github.com/zeromq/zapi
+.set GIT=https://github.com/zeromq/libzapi
 .sub 0MQ=ØMQ
 
-# zapi - High-level C binding for 0MQ
+# libzapi - High-level C binding for 0MQ
 
 ## Contents
 
@@ -11,13 +11,13 @@
 
 ### Scope and Goals
 
-zapi has these goals:
+libzapi has these goals:
 
 * To wrap the 0MQ core API in semantics that are natural and lead to shorter, more readable applications.
 * To hide the differences between versions of 0MQ, particularly 2.0, 2.1, and 3.0.
 * To provide a space for development of more sophisticated API semantics.
 
-zapi grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.org) and [zapi](http://zfl.zeromq.org).
+libzapi grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.org) and [ZFL](http://zfl.zeromq.org).
 
 [diagram]
                               +---------------+
@@ -63,26 +63,26 @@ zapi grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.o
 
 ### Ownership and License
 
-zapi is maintained by Pieter Hintjens and Mikko Koppanen (build system). Its other authors and contributors are listed in the AUTHORS file. It is held by the ZeroMQ organization at github.com.
+libzapi is maintained by Pieter Hintjens and Mikko Koppanen (build system). Its other authors and contributors are listed in the AUTHORS file. It is held by the ZeroMQ organization at github.com.
 
-The authors of zapi grant you use of this software under the terms of the GNU Lesser General Public License (LGPL). For details see the files `COPYING` and `COPYING.LESSER` in this directory.
+The authors of libzapi grant you use of this software under the terms of the GNU Lesser General Public License (LGPL). For details see the files `COPYING` and `COPYING.LESSER` in this directory.
 
 ### Contributing
 
-To submit an issue use the [issue tracker](http://github.com/zeromq/zapi/issues). All discussion happens on the [zeromq-dev](zeromq-dev@lists.zeromq.org) list or #zeromq IRC channel at irc.freenode.net.
+To submit an issue use the [issue tracker](http://github.com/zeromq/libzapi/issues). All discussion happens on the [zeromq-dev](zeromq-dev@lists.zeromq.org) list or #zeromq IRC channel at irc.freenode.net.
 
 The proper way to submit patches is to clone this repository, make your changes, and use git to create a patch or a pull request. See http://www.zeromq.org/docs:contributing. All contributors are listed in AUTHORS.
 
-The general rule is, if you contribute code to zapi you must be willing to maintain it as long as there are users of it. Code with no active maintainer will in general be deprecated and/or removed.
+The general rule is, if you contribute code to libzapi you must be willing to maintain it as long as there are users of it. Code with no active maintainer will in general be deprecated and/or removed.
 
-## Using zapi
+## Using libzapi
 
 ### Building and Installing
 
-zapi uses autotools for packaging. To build from git (all example commands are for Linux):
+libzapi uses autotools for packaging. To build from git (all example commands are for Linux):
 
-    git clone git://github.com/zeromq/zapi.git
-    cd zapi
+    git clone git://github.com/zeromq/libzapi.git
+    cd libzapi
     sh autogen.sh
     ./configure
     make all
@@ -93,7 +93,7 @@ You will need the libtool and autotools packages. On FreeBSD, you may need to sp
 
     ./configure --with-zeromq=/usr/local
 
-After building, you can run the zapi selftests:
+After building, you can run the libzapi selftests:
 
     make check
 
@@ -344,7 +344,7 @@ Man pages are generated from the class header and source files. Please follow th
 
 ### Development
 
-zapi is developed through a test-driven process that guarantees no memory violations or leaks in the code:
+libzapi is developed through a test-driven process that guarantees no memory violations or leaks in the code:
 
 * Modify a class or method.
 * Update the test method for that class.
