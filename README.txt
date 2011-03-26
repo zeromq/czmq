@@ -213,7 +213,7 @@ The answer to this, as we learned from building enterprise-level C applications 
 
 C has no standard API style. It is one thing to write a useful component, but something else to provide an API that is consistent and obvious across many components. We learned from building [OpenAMQ](http://www.openamq.org), a messaging client and server of 0.5M LoC, that a consistent model for extending C makes life for the application developer much easier.
 
-The general model is that of a class (the source package) that provides objects (in fact C structures). The application creates objects and then works with them. When done, the application destroys the object. In C, we tend to use the same name for the object as the class, when we can, and it looks like this (to take a fictitious zapi class):
+The general model is that of a class (the source package) that provides objects (in fact C structures). The application creates objects and then works with them. When done, the application destroys the object. In C, we tend to use the same name for the object as the class, when we can, and it looks like this (to take a fictitious libzapi class):
 
     zregexp_t *regexp = zregexp_new (regexp_string);
     if (!regexp)
@@ -237,7 +237,7 @@ No model is fully consistent, and classes can define their own rules if it helps
 
 ### Naming Style
 
-zapi aims for short, consistent names, following the theory that names we use most often should be shortest. Classes get one-word names, unless they are part of a family of classes in which case they may be two words, the first being the family name. Methods, similarly, get one-word names and we aim for consistency across classes (so a method that does something semantically similar in two classes will get the same name in both). So the canonical name for any method is:
+libzapi aims for short, consistent names, following the theory that names we use most often should be shortest. Classes get one-word names, unless they are part of a family of classes in which case they may be two words, the first being the family name. Methods, similarly, get one-word names and we aim for consistency across classes (so a method that does something semantically similar in two classes will get the same name in both). So the canonical name for any method is:
 
     zclassname_methodname
 
@@ -258,7 +258,7 @@ We assume that at some point we'll need to switch to a doubly-linked list.
 
 Creating a portable C application can be rewarding in terms of maintaining a single code base across many platforms, and keeping (expensive) system-specific knowledge separate from application developers. In most projects (like 0MQ core), there is no portability layer and application code does conditional compilation for all mixes of platforms. This leads to quite messy code.
 
-zapi is explicitly meant to become a portability layer, similar to but thinner than libraries like the [Apache Portable Runtime](http://apr.apache.org) (APR).
+libzapi is a portability layer, similar to but thinner than libraries like the [Apache Portable Runtime](http://apr.apache.org) (APR).
 
 These are the places a C application is subject to arbitrary system differences:
 
@@ -277,7 +277,7 @@ An example of the last:
         pid = 0;
     #endif
 
-zapi uses the GNU autotools system, so non-portable code can use the macros this defines. It can also use macros defined by the zapi_prelude.h header file.
+libzapi uses the GNU autotools system, so non-portable code can use the macros this defines. It can also use macros defined by the zapi_prelude.h header file.
 
 ### Technical Aspects
 
@@ -286,14 +286,13 @@ zapi uses the GNU autotools system, so non-portable code can use the macros this
 * *Library versioning*: we don't make any attempt to version the library at this stage. Classes are in our experience highly stable once they are built and tested, the only changes typically being added methods.
 * *Performance*: for critical path processing, you may want to avoid creating and destroying classes. However on modern Linux systems the heap allocator is very fast. Individual classes can choose whether or not to nullify their data on allocation.
 * *Self-testing*: every class has a `selftest` method that runs through the methods of the class. In theory, calling all selftest functions of all classes does a full unit test of the library. The `zapi_selftest` application does this.
-* *Portability*: the zapi library is aimed at becoming a portability layer (like Apache APR or the older iMatix SFL) but that depends on it actually being ported. See section on 'Porting zapi' below.
-* *Memory management*: zapi classes do not use any special memory management techiques to detect leaks. We've done this in the past but it makes the code relatively complex. Instead, we do memory leak testing using tools like valgrind.
+* *Memory management*: libzapi classes do not use any special memory management techiques to detect leaks. We've done this in the past but it makes the code relatively complex. Instead, we do memory leak testing using tools like valgrind.
 
 ## Under the Hood
 
 ### Adding a New Class
 
-If you define a new zapi class `myclass` you need to:
+If you define a new libzapi class `myclass` you need to:
 
 * Write the `zmyclass.c` and `zmyclass.h` source files, in `src` and `include` respectively.
 * Add`#include <zmyclass.h>` to `include/zapi.h`.
@@ -317,13 +316,13 @@ So while ANSI C code might say:
     file_buffer = zblob_new ();
     ...
 
-The style in zapi would be:
+The style in libzapi would be:
 
     zblob_t *file_buffer = zblob_new ();
 
 ### Assertions
 
-We use assertions heavily to catch bad argument values. The zapi classes do not attempt to validate arguments and report errors; bad arguments are treated as fatal application programming errors.
+We use assertions heavily to catch bad argument values. The libzapi classes do not attempt to validate arguments and report errors; bad arguments are treated as fatal application programming errors.
 
 We also use assertions heavily on calls to system functions that are never supposed to fail, where failure is to be treated as a fatal non-recoverable error (e.g. running out of memory).
 
@@ -340,7 +339,41 @@ Since assertions may be removed by an optimizing compiler.
 
 ### Documentation
 
-Man pages are generated from the class header and source files. Please follow the zctx example. Create an empty man page (.txt) in doc/ before rebuilding.
+Man pages are generated from the class header and source files via the doc/mkman tool, and similar functionality in the gitdown tool (http://github.com/imatix/gitdown). The header file for a class must wrap its interface as follows (example is from include/zclock.h):
+
+    //  @interface
+    //  Sleep for a number of milliseconds
+    void 
+        zclock_sleep (int msecs);
+
+    //  Return current system clock as milliseconds
+    int64_t 
+        zclock_time (void);
+
+    //  Self test of this class
+    int 
+        zclock_test (Bool verbose);
+    //  @end
+
+The source file for a class must provide documentation as follows:
+
+    /*  
+    @header
+    ...short explanation of class...
+    @discuss
+    ...longer discussion of how it works...
+    @end
+    */
+
+The source file for a class then provides the self test example as follows:
+
+    //  @selftest
+    int64_t start = zclock_time ();
+    zclock_sleep (10);
+    assert ((zclock_time () - start) >= 10);
+    //  @end
+
+The template for man pages is in doc/mkman.
 
 ### Development
 
@@ -351,9 +384,9 @@ libzapi is developed through a test-driven process that guarantees no memory vio
 * Run the 'selftest' script, which uses the Valgrind memcheck tool.
 * Repeat until perfect.
 
-### Porting zapi
+### Porting libzapi
 
-When you try zapi on an OS that it's not been used on (ever, or for a while), you will hit code that does not compile. In some cases the patches are trivial, in other cases (usually when porting to Windows), the work needed to build equivalent functionality may be quite heavy. In any case, the benefit is that once ported, the functionality is available to all applications.
+When you try libzapi on an OS that it's not been used on (ever, or for a while), you will hit code that does not compile. In some cases the patches are trivial, in other cases (usually when porting to Windows), the work needed to build equivalent functionality may be quite heavy. In any case, the benefit is that once ported, the functionality is available to all applications.
 
 Before attempting to patch code for portability, please read the `zapi_prelude.h` header file. There are several typical types of changes you may need to make to get functionality working on a specific operating system:
 
@@ -361,7 +394,7 @@ Before attempting to patch code for portability, please read the `zapi_prelude.h
 * Defining macros that rename exotic library functions to more conventional names: do this in zapi_prelude.h.
 * Reimplementing specific methods to use a non-standard API: this is typically needed on Windows. Do this in the relevant class, using #ifdefs to properly differentiate code for different platforms.
 
-The canonical 'standard operating system' for all zapi code is Linux, gcc, POSIX.
+The canonical 'standard operating system' for all libzapi code is Linux, gcc, POSIX.
 
 ### This Document
 
