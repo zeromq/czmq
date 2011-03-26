@@ -131,6 +131,21 @@ END
         }
         $output = "\n[[code]]\n$_\n[[/code]]\n";
     }
+    elsif (/<screen>/) {
+        $_ = $';
+        chop while /\s$/;
+        $line = $_;
+        while (<>) {
+            chop while /\s$/;
+            $line .= "\n$_";
+            if ($line =~ /(.*)<\/screen>/s) {
+                $_ = $1;
+                last;
+            }
+        }
+        s/\/\//\\\/\\\//g;
+        $output = "\n[[code]]\n$_\n[[/code]]\n";
+    }
 
     if (/<term>/) {
         $term = load_tag ("term");

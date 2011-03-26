@@ -54,21 +54,21 @@ Building and Installing
 
 libzapi uses autotools for packaging. To build from git (all example commands are for Linux):
 ----
-git clone git://github.com/zeromq/libzapi.git
-cd libzapi
-sh autogen.sh
-./configure
-make all
-sudo make install
-sudo ldconfig
+    git clone git://github.com/zeromq/libzapi.git
+    cd libzapi
+    sh autogen.sh
+    ./configure
+    make all
+    sudo make install
+    sudo ldconfig
 ----
 
 You will need the pkg-config, libtool, and autoreconf packages. Set the LD_LIBRARY_PATH to /usr/local/libs unless you install elsewhere.
 
 After building, you can run the libzapi selftests:
 ----
-cd src
-./zapi_selftest
+    cd src
+    ./zapi_selftest
 ----
 
 Linking with an Application
@@ -76,12 +76,12 @@ Linking with an Application
 
 Include `zapi.h` in your application and link with libzapi. Here is a typical gcc link command:
 ----
-gcc -lzapi -lzmq myapp.c -o myapp
+    gcc -lzapi -lzmq myapp.c -o myapp
 ----
 
 You should read `zapi.h`. This file includes `zmq.h` and the system header files that typical ØMQ applications will need. The provided 'c' shell script lets you write simple portable build scripts:
 ----
-c -lzapi -lzmq -l myapp
+    c -lzapi -lzmq -l myapp
 ----
 
 The Class Model
@@ -273,39 +273,39 @@ Documentation
 
 Man pages are generated from the class header and source files via the doc/mkman tool, and similar functionality in the gitdown tool (http://github.com/imatix/gitdown). The header file for a class must wrap its interface as follows (example is from include/zclock.h):
 ----
-//  @interface
-//  Sleep for a number of milliseconds
-void 
-    zclock_sleep (int msecs);
+    //  @interface
+    //  Sleep for a number of milliseconds
+    void 
+        zclock_sleep (int msecs);
 
-//  Return current system clock as milliseconds
-int64_t 
-    zclock_time (void);
+    //  Return current system clock as milliseconds
+    int64_t 
+        zclock_time (void);
 
-//  Self test of this class
-int 
-    zclock_test (Bool verbose);
-//  @end
+    //  Self test of this class
+    int 
+        zclock_test (Bool verbose);
+    //  @end
 ----
 
 The source file for a class must provide documentation as follows:
 ----
-/*  
-@header
-...short explanation of class...
-@discuss
-...longer discussion of how it works...
-@end
-*/
+    /*  
+    @header
+    ...short explanation of class...
+    @discuss
+    ...longer discussion of how it works...
+    @end
+    */
 ----
 
 The source file for a class then provides the self test example as follows:
 ----
-//  @selftest
-int64_t start = zclock_time ();
-zclock_sleep (10);
-assert ((zclock_time () - start) >= 10);
-//  @end
+    //  @selftest
+    int64_t start = zclock_time ();
+    zclock_sleep (10);
+    assert ((zclock_time () - start) >= 10);
+    //  @end
 ----
 
 The template for man pages is in doc/mkman.
