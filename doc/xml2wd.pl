@@ -1,7 +1,7 @@
 #! /bin/perl
 #
 #   xml2wd.pl - Convert docbook XML to Wikidot syntax
-#   Part of the ztools/apisite toolkit. Modified for zapi.
+#   Part of the ztools/apisite toolkit. Modified for libzapi.
 #
 #   Author: Pieter Hintjens <ph@imatix.com>
 #   License: public domain
@@ -43,10 +43,10 @@ $title($volume)
 $manual - $source/$version
 [[/div]]
 END
-        if ($title eq "zapi") {
+        if ($title eq "libzapi") {
             open (TOC, ">_start.wd");
-            print TOC "[[image http://zapi.zeromq.org/local--files/admin:css/logo.gif]]\n\n";
-            print TOC "++ zapi/$version reference\n\n";
+            print TOC "[[image http://libzapi.zeromq.org/local--files/admin:css/logo.gif link=\"page:start\"]]\n\n";
+            print TOC "++ libzapi/$version reference\n\n";
             close (TOC);
         }
     }
@@ -222,7 +222,6 @@ sub title_case {
     if (!/^ZMQ_/) {
         tr/[A-Z]/[a-z]/;
         s/(\w+)/\u\L$1/;
-        s/Zapi_/zapi_/g;
     }
     return $_;
 }

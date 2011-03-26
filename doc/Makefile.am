@@ -1,6 +1,6 @@
 MAN1 =
 MAN3 =
-MAN7 = zapi.7 \
+MAN7 = libzapi.7 \
     zclock.7 \
     zctx.7 \
     zframe.7 \

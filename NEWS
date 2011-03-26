@@ -1,3 +1,14 @@
+libzapi version 1.2.1 (beta), released on 2011/03/xx
+====================================================
+
+Changes
+-------
+
+* Project renamed to 'libzapi' for consistency with 'libzmq'.
+
+* Expanded main documentation page significantly.
+
+
 zapi version 1.2.0 (beta), released on 2011/03/24
 =================================================
 

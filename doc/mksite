@@ -27,14 +27,14 @@ function do_upload {
 echo "Building docs..."
 make --quiet
 rm -f *.xml    #   Makefile does not detect version differences for XML
-for FILE in *.txt; do 
+for FILE in libzapi.txt z*.txt; do 
     ./mkman $FILE
     make `basename $FILE .txt`.xml
 done
 
 echo "Generating XML pages for manual..."
 FILES=
-for FILE in z*.txt; do
+for FILE in libzapi.txt z*.txt; do
     BASE=`basename $FILE .txt`
     make --quiet $BASE.xml;
     FILES="$FILES $BASE"
