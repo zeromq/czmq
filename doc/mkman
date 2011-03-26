@@ -38,11 +38,11 @@ die "Can't create $class.txt: $!"
     unless open (OUTPUT, ">$class.txt");
 
 printf "Generating $class.txt...\n";
-
+$underline = "=" x (length ($class) + 3);
 
 $template = <<"END";
 $class(7)
-=========
+$underline
 
 NAME
 ----
