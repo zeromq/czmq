@@ -29,6 +29,15 @@
 
 #include <zmq.h>
 
+//  If the version doesn't implement the ROUTER/DEALER macros, fix it -------
+
+#ifndef ZMQ_ROUTER
+#   define ZMQ_ROUTER ZMQ_XREP
+#endif
+#ifndef ZMQ_DEALER
+#   define ZMQ_DEALER ZMQ_XREQ
+#endif
+
 //- Establish the compiler and computer system ------------------------------
 /*
  *  Defines zero or more of these symbols, for use in any non-portable
