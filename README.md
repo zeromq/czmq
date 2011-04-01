@@ -128,7 +128,7 @@ Include `zapi.h` in your application and link with libzapi. Here is a typical gc
 <A name="toc4-118" title="zctx - working with ØMQ contexts" />
 #### zctx - working with ØMQ contexts
 
-The zctx class wraps ØMQ contexts. It manages open sockets in the context 
+The zctx class wraps ØMQ contexts. It manages open sockets in the context
 and automatically closes these before terminating the context. It provides
 a simple way to set the linger timeout on sockets, and configure contexts
 for number of I/O threads. Sets-up signal (interrrupt) handling for the
@@ -136,23 +136,23 @@ process.
 
 The zctx class has these main features:
 
-* Tracks all open sockets and automatically closes them before calling 
+* Tracks all open sockets and automatically closes them before calling
 zmq_term(). This avoids an infinite wait on open sockets.
 
-* Automatically configures sockets with a ZMQ_LINGER timeout you can 
-define, and which defaults to zero. The default behavior of zctx is 
-therefore like ØMQ/2.0, immediate termination with loss of any pending 
-messages. You can set any linger timeout you like by calling the 
+* Automatically configures sockets with a ZMQ_LINGER timeout you can
+define, and which defaults to zero. The default behavior of zctx is
+therefore like ØMQ/2.0, immediate termination with loss of any pending
+messages. You can set any linger timeout you like by calling the
 zctx_set_linger() method.
 
-* Moves the iothreads configuration to a separate method, so that default 
+* Moves the iothreads configuration to a separate method, so that default
 usage is 1 I/O thread. Lets you configure this value.
 
-* Sets up signal (SIGINT and SIGTERM) handling so that blocking calls 
-such as zmq_recv() and zmq_poll() will return when the user presses 
+* Sets up signal (SIGINT and SIGTERM) handling so that blocking calls
+such as zmq_recv() and zmq_poll() will return when the user presses
 Ctrl-C.
 
-* Provides API to create child threads with a pipe (PAIR socket) to talk 
+* Provides API to create child threads with a pipe (PAIR socket) to talk
 to them.
 
 This is the class interface:
@@ -202,53 +202,16 @@ This is the class interface:
     //  gets a SIGTERM signal.
     extern int zctx_interrupted;
 
-This class is an example of how to create a thread-safe object using
-ØMQ. Actually it's a little more work than it sounded at first. Let's
-start by agreeing on the problem here. We have a context wrapper, zctx,
-which does some neat work for us such as managing sockets automatically
-so we can just shut down without having to manually close each and
-every damn socket. All good, until we need to build a multithreaded
-application. Which is about 80% of interesting ØMQ applications. It is
-not safe to share a single object from multiple threads. They'll try to
-mess with the data structures concurrently, and it'll break nastily.
-
-OK, the classic solution would be exclusion using semaphores, critical
-sections, etc. We're ØMQ fanatics so that's not even an option. Instead,
-we want to eat our own dogfood and do this using ØMQ.
-
-The basic concept, which you'll see in this class, is that the real work
-is not done by the object we own, but by a separate object, running in
-its own thread. I call this the "agent". This is a nice pattern, and we
-see it in a few places, such as the flcliapi example from the Guide.
-
-The slight difficulty here is bootstrapping. We have a separate agent
-thread, which we talk to over inproc, and which manages our context and
-sockets. This is problem number one, I'll get to problem two in a sec.
-
-Part of zctx's magic is delaying the zmq_init call until it's really
-needed. This lets us first configure iothreads if needed. It's the agent
-that will create the ØMQ context by calling zmq_init. However we need
-sockets to talk to the agent. Solution: use two contexts, one for the
-pipes to/from the agent, and one for the application itself. Not many
-ØMQ applications create multiple contexts, but it's a valid and useful
-technique.
-
-So we create a private context, two sockets, and then we pass one of
-those sockets to the agent. We can then talk to the agent by sending
-simple commands like IOTHREADS=100, SOCKET, CLOSE=0xff33344, and
-TERMINATE. BTW, do not set IOTHREADS to 100, that is insane. Anything
-above 1 is actually insane unless you know what you're doing.
-
-Next problem is when our application needs child threads. If we simply
+One problem is when our application needs child threads. If we simply
 use pthreads_create() we're faced with several issues. First, it's not
 portable to legacy OSes like win32. Second, how can a child thread get
-access to our zctx object? If we just pass it around, we'll end up 
-sharing the pipe socket (which we use to talk to the agent) between 
+access to our zctx object? If we just pass it around, we'll end up
+sharing the pipe socket (which we use to talk to the agent) between
 threads, and that will then crash ØMQ. Sockets cannot be used from more
 than one thread at a time.
 
-So each child thread needs its own pipe to the agent. For the agent, 
-this is fine, it can talk to a million threads. But how do we create 
+So each child thread needs its own pipe to the agent. For the agent,
+this is fine, it can talk to a million threads. But how do we create
 those pipes in the child thread? We can't, not without help from the
 main thread. The solution is to wrap thread creation, like we wrap
 socket creation. To create a new thread, the app calls zctx_thread_new()
@@ -261,16 +224,10 @@ really right, so you have to do rubbish like manually cleaning up when
 a thread finishes. Anyhow, it's hidden in this class so you don't need
 to worry.
 
-Second neat thing about wrapping thread creation is we can make it a 
+Second neat thing about wrapping thread creation is we can make it a
 more enriching experience for all involved. One thing I do often is use
 a PAIR-PAIR pipe to talk from a thread to/from its parent. So this class
 will automatically create such a pair for each thread you start.
-
-That's it. We have a multithreaded class that is thread safe and also
-gives you major power for creating multithreaded applications, with a 
-really simple API.
-
-Now that's what I call a language binding.
 
 <A name="toc4-129" title="zstr - sending and receiving strings" />
 #### zstr - sending and receiving strings
@@ -355,9 +312,9 @@ This is the class interface:
 <A name="toc4-165" title="zmsg - working with multipart messages" />
 #### zmsg - working with multipart messages
 
-The zmsg class provides methods to send and receive multipart messages 
-across ØMQ sockets. This class provides a list-like container interface, 
-with methods to work with the overall container. zmsg_t messages are 
+The zmsg class provides methods to send and receive multipart messages
+across ØMQ sockets. This class provides a list-like container interface,
+with methods to work with the overall container. zmsg_t messages are
 composed of zero or more zframe_t frames.
 
 This is the class interface:
@@ -438,15 +395,15 @@ This is the class interface:
 <A name="toc4-176" title="zloop - event-driven reactor" />
 #### zloop - event-driven reactor
 
-The zloop class provides an event-driven reactor pattern. The reactor 
-handles socket readers (not writers in the current implementation), and 
-once-off or repeated timers. Its resolution is 1 msec. It uses a tickless 
+The zloop class provides an event-driven reactor pattern. The reactor
+handles socket readers (not writers in the current implementation), and
+once-off or repeated timers. Its resolution is 1 msec. It uses a tickless
 timer to reduce CPU interrupts in inactive processes.
 
 This is the class interface:
 
     //  Callback function for reactor events
-    typedef int (zloop_fn) (zloop_t *loop, void *socket, void *args);
+    typedef int (zloop_fn) (zloop_t *loop, void *socket, void *arg);
     
     //  Create a new zloop reactor
     zloop_t *
@@ -458,7 +415,7 @@ This is the class interface:
     
     //  Register a socket reader, on one socket
     int
-        zloop_reader (zloop_t *self, void *socket, zloop_fn handler, void *args);
+        zloop_reader (zloop_t *self, void *socket, zloop_fn handler, void *arg);
     
     //  Cancel the reader on the specified socket, if any
     void
@@ -467,7 +424,7 @@ This is the class interface:
     //  Register a timer that will go off after 'delay' msecs, and will
     //  repeat 'times' times, unless 'times' is zero, meaning repeat forever.
     int
-        zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *args);
+        zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *arg);
     
     //  Start the reactor, ends if a callback function returns -1, or the process
     //  received SIGINT or SIGTERM.
@@ -626,7 +583,7 @@ like the zapi class model but we're not insane. There, got it in again.
 <A name="toc3-223" title="The Problem with C" />
 ### The Problem with C
 
-C has the significant advantage of being a small language that, if we take a little care with formatting and naming, can be easily interchanged between developers. Every C developer will use much the same 90% of the language. Larger languages like C++ provide powerful abstractions like STL containers but at the cost of interchange. Every C++ developer will use a different 20% of the language.
+C has the significant advantage of being a small language that, if we take a little care with formatting and naming, can be easily interchanged between developers. Every C developer will use much the same 90% of the language. Larger languages like C++ provide powerful abstractions like STL containers but at the cost of interchange.
 
 The huge problem with C is that any realistic application needs packages of functionality to bring the language up to the levels we expect for the 21st century. Much can be done by using external libraries but every additional library is a dependency that makes the resulting applications harder to build and port. While C itself is a highly portable language (and can be made more so by careful use of the preprocessor), most C libraries consider themselves part of the operating system, and as such do not attempt to be portable.
 
