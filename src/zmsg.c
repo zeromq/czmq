@@ -22,11 +22,11 @@
     =========================================================================
 */
 
-/*  
+/*
 @header
-    The zmsg class provides methods to send and receive multipart messages 
-    across 0MQ sockets. This class provides a list-like container interface, 
-    with methods to work with the overall container. zmsg_t messages are 
+    The zmsg class provides methods to send and receive multipart messages
+    across 0MQ sockets. This class provides a list-like container interface,
+    with methods to work with the overall container. zmsg_t messages are
     composed of zero or more zframe_t frames.
 @discuss
 @end
@@ -105,24 +105,26 @@ zmsg_recv (void *socket)
 
 
 //  --------------------------------------------------------------------------
-//  Send message to socket, destroy after sending. If the message has no 
-//  frames, sends nothing but destroys the message anyhow.
+//  Send message to socket, destroy after sending. If the message has no
+//  frames, sends nothing but destroys the message anyhow. Safe to call
+//  if zmsg is null.
 
 void
 zmsg_send (zmsg_t **self_p, void *socket)
 {
     assert (self_p);
-    assert (*self_p);
     assert (socket);
     zmsg_t *self = *self_p;
-    
-    zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
-    while (frame) {
-        zframe_send (&frame, socket, 
-            zlist_size (self->frames)? ZFRAME_MORE: 0);
-        frame = (zframe_t *) zlist_pop (self->frames);
+
+    if (self) {
+        zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
+        while (frame) {
+            zframe_send (&frame, socket,
+                zlist_size (self->frames)? ZFRAME_MORE: 0);
+            frame = (zframe_t *) zlist_pop (self->frames);
+        }
+        zmsg_destroy (self_p);
     }
-    zmsg_destroy (self_p);
 }
 
 
@@ -222,7 +224,7 @@ zmsg_first (zmsg_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Return the next value. If there are no more frames, returns NULL. To move 
+//  Return the next value. If there are no more frames, returns NULL. To move
 //  to the first frame call zmsg_first(). Advances the cursor.
 
 zframe_t *
@@ -360,7 +362,7 @@ zmsg_test (Bool verbose)
     assert (zmsg_size (msg) == 1);
     zmsg_send (&msg, output);
     assert (msg == NULL);
-    
+
     msg = zmsg_recv (input);
     assert (msg);
     assert (zmsg_size (msg) == 1);
@@ -385,20 +387,20 @@ zmsg_test (Bool verbose)
     assert (zmsg_size (msg) == 10);
     if (verbose)
         zmsg_dump (msg);
-    
+
     //  Save to a file, read back
     FILE *file = fopen ("zmsg.test", "w");
     assert (file);
     zmsg_save (msg, file);
     zmsg_destroy (&msg);
     fclose (file);
-    
+
     file = fopen ("zmsg.test", "r");
     msg = zmsg_load (file);
     fclose (file);
     remove ("zmsg.test");
     assert (zmsg_size (msg) == 10);
-    
+
     //  Remove all frames except first and last
     int frame_nbr;
     for (frame_nbr = 0; frame_nbr < 8; frame_nbr++) {
@@ -414,7 +416,7 @@ zmsg_test (Bool verbose)
     frame = zmsg_body (msg);
     assert (memcmp (zframe_data (frame), "Frame0", 6) == 0);
     zmsg_destroy (&msg);
-    
+
     //  Now try methods on an empty message
     msg = zmsg_new ();
     assert (zmsg_size (msg) == 0);

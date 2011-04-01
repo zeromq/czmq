@@ -22,11 +22,11 @@
     =========================================================================
 */
 
-/*  
+/*
 @header
-    The zloop class provides an event-driven reactor pattern. The reactor 
-    handles socket readers (not writers in the current implementation), and 
-    once-off or repeated timers. Its resolution is 1 msec. It uses a tickless 
+    The zloop class provides an event-driven reactor pattern. The reactor
+    handles socket readers (not writers in the current implementation), and
+    once-off or repeated timers. Its resolution is 1 msec. It uses a tickless
     timer to reduce CPU interrupts in inactive processes.
 @discuss
 @end
@@ -52,35 +52,35 @@ struct _zloop_t {
 typedef struct {
     void *socket;
     zloop_fn *handler;
-    void *args;
+    void *arg;
 } s_reader_t;
-    
+
 typedef struct {
     size_t delay;
     size_t times;
     zloop_fn *handler;
-    void *args;
+    void *arg;
     uint64_t when;              //  Clock time when alarm goes off
 } s_timer_t;
 
 static s_reader_t *
-s_reader_new (void *socket, zloop_fn handler, void *args)
+s_reader_new (void *socket, zloop_fn handler, void *arg)
 {
     s_reader_t *reader = (s_reader_t *) zmalloc (sizeof (s_reader_t));
     reader->socket = socket;
     reader->handler = handler;
-    reader->args = args;
+    reader->arg= arg;
     return reader;
 }
 
 static s_timer_t *
-s_timer_new (size_t delay, size_t times, zloop_fn handler, void *args) 
+s_timer_new (size_t delay, size_t times, zloop_fn handler, void *arg)
 {
     s_timer_t *timer = (s_timer_t *) zmalloc (sizeof (s_timer_t));
     timer->delay = delay;
     timer->times = times;
     timer->handler = handler;
-    timer->args = args;
+    timer->arg= arg;
     return timer;
 }
 
@@ -115,12 +115,12 @@ zloop_destroy (zloop_t **self_p)
         while (zlist_size (self->readers))
             free (zlist_pop (self->readers));
         zlist_destroy (&self->readers);
-        
+
         //  Destroy list of timers
         while (zlist_size (self->timers))
             free (zlist_pop (self->timers));
         zlist_destroy (&self->timers);
-        
+
         free (self->pollset);
         free (self);
         *self_p = NULL;
@@ -129,23 +129,23 @@ zloop_destroy (zloop_t **self_p)
 
 
 //  --------------------------------------------------------------------------
-//  Register a socket with the reactor. When the socket has input, will call 
-//  the handler, passing the args. Returns 0 if OK, -1 if there was an error.
+//  Register a socket with the reactor. When the socket has input, will call
+//  the handler, passing the arg. Returns 0 if OK, -1 if there was an error.
 //  If you register the socket more than once, each instance will invoke its
 //  corresponding handler.
 
 int
-zloop_reader (zloop_t *self, void *socket, zloop_fn handler, void *args)
+zloop_reader (zloop_t *self, void *socket, zloop_fn handler, void *arg)
 {
     assert (self);
-    zlist_push (self->readers, s_reader_new (socket, handler, args));
+    zlist_push (self->readers, s_reader_new (socket, handler, arg));
     self->dirty = TRUE;         //  Rebuild will be needed
     return 0;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Cancel a socket from the reactor. If the socket was not previously 
+//  Cancel a socket from the reactor. If the socket was not previously
 //  registered, does nothing. If the socket was registered more than once,
 //  cancels only the first instance.
 
@@ -167,15 +167,15 @@ zloop_cancel (zloop_t *self, void *socket)
 
 //  --------------------------------------------------------------------------
 //  Register a timer that expires after some delay and repeats some number of
-//  times. At each expiry, will call the handler, passing the args. To
-//  run a timer forever, use 0 times. Returns 0 if OK, -1 if there was an 
+//  times. At each expiry, will call the handler, passing the arg. To
+//  run a timer forever, use 0 times. Returns 0 if OK, -1 if there was an
 //  error.
 
 int
-zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *args)
+zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *arg)
 {
     assert (self);
-    zlist_push (self->timers, s_timer_new (delay, times, handler, args));
+    zlist_push (self->timers, s_timer_new (delay, times, handler, arg));
     return 0;
 }
 
@@ -237,7 +237,7 @@ zloop_start (zloop_t *self)
         timer = (s_timer_t *) zlist_first (self->timers);
         while (timer) {
             if (zclock_time () > timer->when) {
-                rc = timer->handler (self, NULL, timer->args);
+                rc = timer->handler (self, NULL, timer->arg);
                 if (rc == -1)
                     break;      //  Timer handler signalled break
                 if (timer->times && --timer->times == 0) {
@@ -254,7 +254,7 @@ zloop_start (zloop_t *self)
         uint item_nbr = 0;
         while (reader && rc != -1) {
             if (self->pollset [item_nbr].revents & ZMQ_POLLIN) {
-                rc = reader->handler (self, reader->socket, reader->args);
+                rc = reader->handler (self, reader->socket, reader->arg);
                 if (rc == -1)
                     break;      //  Reader handler signalled break
             }
@@ -277,7 +277,7 @@ int s_timer_event (zloop_t *loop, void *socket, void *output)
     return 0;
 }
 
-int s_socket_event (zloop_t *loop, void *socket, void *args)
+int s_socket_event (zloop_t *loop, void *socket, void *arg)
 {
     //  Just end the reactor
     return -1;
@@ -287,10 +287,10 @@ int
 zloop_test (Bool verbose)
 {
     printf (" * zloop: ");
-    
+
     //  @selftest
     zctx_t *ctx = zctx_new ();
-    
+
     void *output = zctx_socket_new (ctx, ZMQ_PAIR);
     zmq_bind (output, "inproc://zloop.test");
     void *input = zctx_socket_new (ctx, ZMQ_PAIR);
@@ -298,13 +298,13 @@ zloop_test (Bool verbose)
 
     zloop_t *loop = zloop_new ();
     assert (loop);
-    
+
     //  After 10 msecs, send a ping message to output
     zloop_timer (loop, 10, 1,  s_timer_event, output);
     //  When we get the ping message, end the reactor
     zloop_reader (loop, input, s_socket_event, NULL);
     zloop_start (loop);
-    
+
     zloop_destroy (&loop);
     assert (loop == NULL);
 

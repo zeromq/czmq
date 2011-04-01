@@ -24,7 +24,7 @@
 
 /*
 @header
-    The zctx class wraps 0MQ contexts. It manages open sockets in the context 
+    The zctx class wraps 0MQ contexts. It manages open sockets in the context
     and automatically closes these before terminating the context. It provides
     a simple way to set the linger timeout on sockets, and configure contexts
     for number of I/O threads. Sets-up signal (interrrupt) handling for the
@@ -32,23 +32,23 @@
 
     The zctx class has these main features:
 
-    * Tracks all open sockets and automatically closes them before calling 
+    * Tracks all open sockets and automatically closes them before calling
     zmq_term(). This avoids an infinite wait on open sockets.
 
-    * Automatically configures sockets with a ZMQ_LINGER timeout you can 
-    define, and which defaults to zero. The default behavior of zctx is 
-    therefore like 0MQ/2.0, immediate termination with loss of any pending 
-    messages. You can set any linger timeout you like by calling the 
+    * Automatically configures sockets with a ZMQ_LINGER timeout you can
+    define, and which defaults to zero. The default behavior of zctx is
+    therefore like 0MQ/2.0, immediate termination with loss of any pending
+    messages. You can set any linger timeout you like by calling the
     zctx_set_linger() method.
 
-    * Moves the iothreads configuration to a separate method, so that default 
+    * Moves the iothreads configuration to a separate method, so that default
     usage is 1 I/O thread. Lets you configure this value.
 
-    * Sets up signal (SIGINT and SIGTERM) handling so that blocking calls 
-    such as zmq_recv() and zmq_poll() will return when the user presses 
+    * Sets up signal (SIGINT and SIGTERM) handling so that blocking calls
+    such as zmq_recv() and zmq_poll() will return when the user presses
     Ctrl-C.
 
-    * Provides API to create child threads with a pipe (PAIR socket) to talk 
+    * Provides API to create child threads with a pipe (PAIR socket) to talk
     to them.
 @discuss
     This class is an example of how to create a thread-safe object using
@@ -91,13 +91,13 @@
     Next problem is when our application needs child threads. If we simply
     use pthreads_create() we're faced with several issues. First, it's not
     portable to legacy OSes like win32. Second, how can a child thread get
-    access to our zctx object? If we just pass it around, we'll end up 
-    sharing the pipe socket (which we use to talk to the agent) between 
+    access to our zctx object? If we just pass it around, we'll end up
+    sharing the pipe socket (which we use to talk to the agent) between
     threads, and that will then crash 0MQ. Sockets cannot be used from more
     than one thread at a time.
 
-    So each child thread needs its own pipe to the agent. For the agent, 
-    this is fine, it can talk to a million threads. But how do we create 
+    So each child thread needs its own pipe to the agent. For the agent,
+    this is fine, it can talk to a million threads. But how do we create
     those pipes in the child thread? We can't, not without help from the
     main thread. The solution is to wrap thread creation, like we wrap
     socket creation. To create a new thread, the app calls zctx_thread_new()
@@ -110,13 +110,13 @@
     a thread finishes. Anyhow, it's hidden in this class so you don't need
     to worry.
 
-    Second neat thing about wrapping thread creation is we can make it a 
+    Second neat thing about wrapping thread creation is we can make it a
     more enriching experience for all involved. One thing I do often is use
     a PAIR-PAIR pipe to talk from a thread to/from its parent. So this class
     will automatically create such a pair for each thread you start.
 
     That's it. We have a multithreaded class that is thread safe and also
-    gives you major power for creating multithreaded applications, with a 
+    gives you major power for creating multithreaded applications, with a
     really simple API.
 
     Now that's what I call a language binding.
@@ -162,7 +162,7 @@ agent_thread (void *pipe)
     int iothreads = 1;          //  Number of io threads for zmq_init
     int linger = 0;             //  Linger setting
     Bool terminated = FALSE;
-    
+
     //  Initialize agent
     sockets = zlist_new ();
 
@@ -303,7 +303,7 @@ zctx_destroy (zctx_t **self_p)
         zmq_close (self->pipe);
         if (self->agent)
             zmq_term (self->context);
-        
+
         free (self);
         *self_p = NULL;
     }
@@ -311,12 +311,12 @@ zctx_destroy (zctx_t **self_p)
 
 
 //  --------------------------------------------------------------------------
-//  Configure number of I/O threads in context, only has effect if called 
-//  before creating first socket. Default I/O threads is 1, sufficient for 
+//  Configure number of I/O threads in context, only has effect if called
+//  before creating first socket. Default I/O threads is 1, sufficient for
 //  all except very high volume applications.
 
 void
-zctx_set_iothreads (zctx_t *self, int iothreads) 
+zctx_set_iothreads (zctx_t *self, int iothreads)
 {
     assert (self);
     zstr_sendf (self->pipe, "IOTHREADS=%d", iothreads);
@@ -324,11 +324,11 @@ zctx_set_iothreads (zctx_t *self, int iothreads)
 
 
 //  --------------------------------------------------------------------------
-//  Configure linger timeout in msecs. Call this before destroying sockets or 
-//  context. Default is no linger, i.e. any pending messages or connects will 
+//  Configure linger timeout in msecs. Call this before destroying sockets or
+//  context. Default is no linger, i.e. any pending messages or connects will
 //  be lost.
 
-void 
+void
 zctx_set_linger (zctx_t *self, int linger)
 {
     assert (self);
@@ -368,7 +368,7 @@ s_call_thread_fn (void *args)
 //  Thread shim for Windows that wraps a POSIX-style thread handler
 //  and does the _endthreadex for us automatically.
 
-unsigned __stdcall 
+unsigned __stdcall
 s_call_thread_fn (void *args)
 {
     assert (args);
@@ -376,7 +376,7 @@ s_call_thread_fn (void *args)
     shim->thread_fn (shim->args);
     _endthreadex (0);
     CloseHandle (shim->handle);
-    
+
     zthread_t *zthread = (zthread_t *) shim->args;
     zctx_destroy (&zthread->ctx);
     free (zthread);
@@ -398,7 +398,7 @@ zctx_thread_new (zctx_t *self, void *(*thread_fn) (void *), void *arg)
     //  This is what we're going to pass to the child thread
     zthread_t *args = (zthread_t *) zmalloc (sizeof (zthread_t));
     args->arg = arg;
-    
+
     //  Create pipe from our thread to child
     void *pipe = zctx_socket_new (self, ZMQ_PAIR);
     args->pipe = zctx_socket_new (self, ZMQ_PAIR);
@@ -422,12 +422,12 @@ zctx_thread_new (zctx_t *self, void *(*thread_fn) (void *), void *arg)
     shim_t *shim = (shim_t *) zmalloc (sizeof (shim_t));
     shim->thread_fn = thread_fn;
     shim->args = args;
-    
+
 #if defined (__UNIX__)
     pthread_t thread;
     pthread_create (&thread, NULL, s_call_thread_fn, shim);
     pthread_detach (thread);
-    
+
 #elif defined (__WINDOWS__)
     shim->handle = (HANDLE)_beginthreadex(
         NULL,                   //  Handle is private to this process
@@ -444,14 +444,14 @@ zctx_thread_new (zctx_t *self, void *(*thread_fn) (void *), void *arg)
     //  Now start thread
     ResumeThread (shim->handle);
 #endif
-    
+
     return pipe;
 }
 
 
 //  --------------------------------------------------------------------------
 //  Create new 0MQ socket and register for this context. Use this instead of
-//  the 0MQ core API method if you want automatic management of the socket 
+//  the 0MQ core API method if you want automatic management of the socket
 //  at shutdown. If the context has not yet been initialized, this method will
 //  initialize it.
 
@@ -470,7 +470,7 @@ zctx_socket_new (zctx_t *self, int type)
 
 
 //  --------------------------------------------------------------------------
-//  Destroy the socket. You must use this for any socket created via the 
+//  Destroy the socket. You must use this for any socket created via the
 //  zctx_socket_new method.
 
 void
@@ -490,10 +490,10 @@ static void *
 s_test_thread (void *args_ptr)
 {
     zthread_t *args = (zthread_t *) args_ptr;
-    
+
     //  Create a socket to check it'll be properly deleted at exit
     zctx_socket_new (args->ctx, ZMQ_PUSH);
-    
+
     //  Wait for our parent to ping us, and pong back
     char *ping = zstr_recv (args->pipe);
     free (ping);
@@ -503,12 +503,11 @@ s_test_thread (void *args_ptr)
 
 //  @end
 
-
 int
 zctx_test (Bool verbose)
 {
     printf (" * zctx: ");
-    
+
     //  @selftest
     //  Create and destroy a context without using it
     zctx_t *ctx = zctx_new ();

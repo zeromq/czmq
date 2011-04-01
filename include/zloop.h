@@ -34,7 +34,7 @@ typedef struct _zloop_t zloop_t;
 
 //  @interface
 //  Callback function for reactor events
-typedef int (zloop_fn) (zloop_t *loop, void *socket, void *args);
+typedef int (zloop_fn) (zloop_t *loop, void *socket, void *arg);
 
 //  Create a new zloop reactor
 zloop_t *
@@ -46,7 +46,7 @@ void
 
 //  Register a socket reader, on one socket
 int
-    zloop_reader (zloop_t *self, void *socket, zloop_fn handler, void *args);
+    zloop_reader (zloop_t *self, void *socket, zloop_fn handler, void *arg);
 
 //  Cancel the reader on the specified socket, if any
 void
@@ -55,7 +55,7 @@ void
 //  Register a timer that will go off after 'delay' msecs, and will
 //  repeat 'times' times, unless 'times' is zero, meaning repeat forever.
 int
-    zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *args);
+    zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *arg);
 
 //  Start the reactor, ends if a callback function returns -1, or the process
 //  received SIGINT or SIGTERM.
