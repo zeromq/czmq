@@ -1,8 +1,11 @@
-libzapi version 1.2.1 (beta), released on 2011/03/xx
+libzapi version 1.2.1 (beta), released on 2011/04/01
 ====================================================
 
 Changes
 -------
+
+* Rewrote zctx class, which was wrongly working with sockets in two
+  threads. Much simpler, and properly stable now.
 
 * Project renamed to 'libzapi' for consistency with 'libzmq'.
 
@@ -28,7 +31,7 @@ Changes
 
 * Added zctx_thread_new method to create child threads with a PAIR pipe
   to talk to them.
-  
+
 * Made zapi threadsafe, specifically multiple threads can share the same
   context and thus talk to each other.
 

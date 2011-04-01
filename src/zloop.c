@@ -192,30 +192,29 @@ zloop_start (zloop_t *self)
     assert (self);
     int rc = 0;
 
-    //  Rebuild pollitem set if necessary
-    if (self->dirty) {
-        free (self->pollset);
-        self->pollset = zmalloc (
-            zlist_size (self->readers) * sizeof (zmq_pollitem_t));
-
-        s_reader_t *reader = (s_reader_t *) zlist_first (self->readers);
-        uint item_nbr = 0;
-        while (reader) {
-            self->pollset [item_nbr].socket = reader->socket;
-            self->pollset [item_nbr].events = ZMQ_POLLIN;
-            reader = (s_reader_t *) zlist_next (self->readers);
-            item_nbr++;
-        }
-    }
     //  Recalculate all timers now
     s_timer_t *timer = (s_timer_t *) zlist_first (self->timers);
     while (timer) {
         timer->when = zclock_time () + timer->delay;
         timer = (s_timer_t *) zlist_next (self->timers);
     }
-
     //  Main reactor loop
     while (!zctx_interrupted) {
+        //  Rebuild pollitem set if necessary
+        if (self->dirty) {
+            free (self->pollset);
+            self->pollset = zmalloc (
+                zlist_size (self->readers) * sizeof (zmq_pollitem_t));
+
+            s_reader_t *reader = (s_reader_t *) zlist_first (self->readers);
+            uint item_nbr = 0;
+            while (reader) {
+                self->pollset [item_nbr].socket = reader->socket;
+                self->pollset [item_nbr].events = ZMQ_POLLIN;
+                reader = (s_reader_t *) zlist_next (self->readers);
+                item_nbr++;
+            }
+        }
         //  Calculate tickless timer, up to 1 hour
         uint64_t tickless = zclock_time () + 1000 * 3600;
         s_timer_t *timer = (s_timer_t *) zlist_first (self->timers);
@@ -228,8 +227,9 @@ zloop_start (zloop_t *self)
         long timeout = (long) (tickless - zclock_time ()) * 1000;
         if (timeout < 0)
             timeout = 0;
+
         rc = zmq_poll (self->pollset, zlist_size (self->readers), timeout);
-        if (rc == -1 && errno == ETERM) {
+        if (rc == -1) {
             rc = 0;
             break;              //  Context has been shut down
         }

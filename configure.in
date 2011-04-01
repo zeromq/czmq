@@ -55,10 +55,10 @@ AC_CHECK_LIB([pthread], [pthread_create])
 AC_ARG_WITH(gcov, [AS_HELP_STRING([--with-gcov=yes/no],
                   [With GCC Code Coverage reporting.])],
                   [ZAPI_GCOV="$withval"])
-                  
+
 if test "x${ZAPI_GCOV}" == "xyes"; then
     CFLAGS="-O0 -g -fprofile-arcs -ftest-coverage"
-    
+
     if test "x${ZAPI_ORIG_CFLAGS}" != "xnone"; then
         CFLAGS="${CFLAGS} ${ZAPI_ORIG_CFLAGS}"
     fi
@@ -86,7 +86,7 @@ AC_MSG_CHECKING([whether libzmq installation works])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <zmq.h>],
                                 [zmq_init(1);])
                ],
-               [AC_MSG_RESULT([yes])], 
+               [AC_MSG_RESULT([yes])],
                [AC_MSG_ERROR([no. Please specify libzmq installation prefix using --with-libzmq])])
 
 #Whether we are on mingw or not.
