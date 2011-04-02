@@ -22,12 +22,12 @@
     =========================================================================
 */
 
-/*  
+/*
 @header
-    The zstr class provides utility functions for sending and receiving C 
-    strings across 0MQ sockets. It sends strings without a terminating null, 
-    and appends a null byte on received strings. This class is for simple 
-    message sending. 
+    The zstr class provides utility functions for sending and receiving C
+    strings across 0MQ sockets. It sends strings without a terminating null,
+    and appends a null byte on received strings. This class is for simple
+    message sending.
 @discuss
 @end
 */
@@ -38,7 +38,7 @@
 
 
 //  --------------------------------------------------------------------------
-//  Receive C string from socket. Caller must free returned string. Returns 
+//  Receive C string from socket. Caller must free returned string. Returns
 //  NULL if the context is being terminated or the process was interrupted.
 
 char *
@@ -60,7 +60,7 @@ zstr_recv (void *socket)
 
 
 //  --------------------------------------------------------------------------
-//  Send C string to socket. Returns 0 if successful, -1 if there was an 
+//  Send C string to socket. Returns 0 if successful, -1 if there was an
 //  error.
 
 int
@@ -73,6 +73,23 @@ zstr_send (void *socket, const char *string)
     zmq_msg_init_size (&message, strlen (string));
     memcpy (zmq_msg_data (&message), string, strlen (string));
     int rc = zmq_send (socket, &message, 0);
+    zmq_msg_close (&message);
+    return rc;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Send a string to a socket in 0MQ string format, with MORE flag
+int
+zstr_sendm (void *socket, const char *string)
+{
+    assert (socket);
+    assert (string);
+
+    zmq_msg_t message;
+    zmq_msg_init_size (&message, strlen (string));
+    memcpy (zmq_msg_data (&message), string, strlen (string));
+    int rc = zmq_send (socket, &message, ZMQ_SNDMORE);
     zmq_msg_close (&message);
     return rc;
 }
@@ -98,7 +115,7 @@ zstr_sendf (void *socket, const char *format, ...)
         vsnprintf (string, size, format, argptr);
     }
     va_end (argptr);
-    
+
     //  Now send formatted string
     int rc = zstr_send (socket, string);
     free (string);
@@ -127,7 +144,7 @@ zstr_test (Bool verbose)
     for (string_nbr = 0; string_nbr < 10; string_nbr++)
         zstr_sendf (output, "this is string %d", string_nbr);
     zstr_send (output, "END");
-    
+
     //  Read and count until we receive END
     string_nbr = 0;
     for (string_nbr = 0;; string_nbr++) {
@@ -142,7 +159,7 @@ zstr_test (Bool verbose)
 
     zctx_destroy (&ctx);
     //  @end
-    
+
     printf ("OK\n");
     return 0;
 }

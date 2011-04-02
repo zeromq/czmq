@@ -38,6 +38,10 @@ char *
 int
     zstr_send (void *socket, const char *string);
 
+//  Send a string to a socket in 0MQ string format, with MORE flag
+int
+    zstr_sendm (void *socket, const char *string);
+
 //  Send a formatted string to a socket
 int
     zstr_sendf (void *socket, const char *format, ...);
