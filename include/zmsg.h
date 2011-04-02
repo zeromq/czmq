@@ -40,15 +40,15 @@ zmsg_t *
 //  Destroy a message object and all frames it contains
 void
     zmsg_destroy (zmsg_t **self_p);
-    
+
 //  Read 1 or more frames off the socket, into a new message object
 zmsg_t *
     zmsg_recv (void *socket);
-    
+
 //  Send a message to the socket, and then destroy it
 void
     zmsg_send (zmsg_t **self_p, void *socket);
-    
+
 //  Return number of frames in message
 size_t
     zmsg_size (zmsg_t *self);
@@ -84,6 +84,10 @@ zframe_t *
 //  Return next frame in message, or null
 zframe_t *
     zmsg_next (zmsg_t *self);
+
+//  Return last frame in message, or null
+zframe_t *
+    zmsg_last (zmsg_t *self);
 
 //  Return first body frame, i.e. after first null frame
 zframe_t *

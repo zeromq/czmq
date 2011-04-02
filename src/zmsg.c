@@ -224,7 +224,7 @@ zmsg_first (zmsg_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Return the next value. If there are no more frames, returns NULL. To move
+//  Return the next frame. If there are no more frames, returns NULL. To move
 //  to the first frame call zmsg_first(). Advances the cursor.
 
 zframe_t *
@@ -232,6 +232,24 @@ zmsg_next (zmsg_t *self)
 {
     assert (self);
     return (zframe_t *) zlist_next (self->frames);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return the last frame. If there are no frames, returns NULL.
+
+zframe_t *
+zmsg_last (zmsg_t *self)
+{
+    assert (self);
+    zframe_t *frame = (zframe_t *) zlist_first (self->frames);
+    while (frame) {
+        zframe_t *next = (zframe_t *) zlist_next (self->frames);
+        if (!next)
+            break;
+        frame = next;
+    }
+    return frame;
 }
 
 
@@ -245,16 +263,16 @@ zframe_t *
 zmsg_body (zmsg_t *self)
 {
     assert (self);
-    zframe_t *frame = zlist_first (self->frames);
+    zframe_t *frame = (zframe_t *) zlist_first (self->frames);
     while (frame && zframe_size (frame))
-        frame = zlist_next (self->frames);
+        frame = (zframe_t *) zlist_next (self->frames);
 
     //  If we found a delimiter, skip to next frame
     if (frame)
-        return zlist_next (self->frames);
+        return (zframe_t *) zlist_next (self->frames);
     else
         //  Else return first frame, if any at all
-        return zlist_first (self->frames);
+        return (zframe_t *) zlist_first (self->frames);
 }
 
 
