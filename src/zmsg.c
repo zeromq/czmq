@@ -202,6 +202,38 @@ zmsg_pop (zmsg_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  Push frame to front of message, before first frame
+//  Pushes an empty frame in front of frame
+
+void
+zmsg_wrap (zmsg_t *self, zframe_t *frame)
+{
+    assert (self);
+    assert (frame);
+    zmsg_pushmem (self, "", 0);
+    zmsg_push (self, frame);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Pop frame off front of message, caller now owns frame
+//  If next frame is empty, pops and destroys that empty frame.
+
+zframe_t *
+zmsg_unwrap (zmsg_t *self)
+{
+    assert (self);
+    zframe_t *frame = zmsg_pop (self);
+    zframe_t *empty = zmsg_first (self);
+    if (zframe_size (empty) == 0) {
+        empty = zmsg_pop (self);
+        zframe_destroy (&empty);
+    }
+    return frame;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Remove specified frame from list, if present. Does not destroy frame.
 
 void
@@ -412,11 +444,14 @@ zmsg_test (Bool verbose)
         zframe_destroy (&frame);
     }
     assert (zmsg_size (msg) == 2);
-    zmsg_pushmem (msg, "", 0);
-    zmsg_pushmem (msg, "Address", 7);
+    frame = zframe_new ("Address", 7);
+    zmsg_wrap (msg, frame);
     assert (zmsg_size (msg) == 4);
     frame = zmsg_body (msg);
     assert (memcmp (zframe_data (frame), "Frame0", 6) == 0);
+    frame = zmsg_unwrap (msg);
+    zframe_destroy (&frame);
+    assert (zmsg_size (msg) == 2);
     zmsg_destroy (&msg);
 
     //  Now try methods on an empty message

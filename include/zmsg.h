@@ -73,6 +73,16 @@ void
 zframe_t *
     zmsg_pop (zmsg_t *self);
 
+//  Push frame to front of message, before first frame
+//  Pushes an empty frame in front of frame
+void
+    zmsg_wrap (zmsg_t *self, zframe_t *frame);
+
+//  Pop frame off front of message, caller now owns frame
+//  If next frame is empty, pops and destroys that empty frame.
+zframe_t *
+    zmsg_unwrap (zmsg_t *self);
+
 //  Remove frame from message, at any position, caller owns it
 void
     zmsg_remove (zmsg_t *self, zframe_t *frame);
