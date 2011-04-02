@@ -3,7 +3,7 @@ zlist(7)
 
 NAME
 ----
-zlist - no title found
+zlist - singly-linked list container
 
 SYNOPSIS
 --------

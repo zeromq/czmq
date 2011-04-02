@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zlist.h - ZFL singly-linked list class
+    zlist - singly-linked list container
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>

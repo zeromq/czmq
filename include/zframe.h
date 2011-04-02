@@ -64,6 +64,14 @@ void *
 int
     zframe_more (zframe_t *self);
 
+//  Print contents of frame to stderr
+void
+    zframe_print (zframe_t *self, char *prefix);
+
+//  Set new contents for frame
+void
+    zframe_reset (zframe_t *self, const void *data, size_t size);
+
 //  Self test of this class
 int
     zframe_test (Bool verbose);

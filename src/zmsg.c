@@ -317,23 +317,7 @@ zmsg_dump (zmsg_t *self)
     }
     zframe_t *frame = zmsg_first (self);
     while (frame) {
-        byte  *data = zframe_data (frame);
-        size_t size = zframe_size (frame);
-        //  Dump the message as text or binary
-        int is_text = 1;
-        int char_nbr;
-        for (char_nbr = 0; char_nbr < size; char_nbr++)
-            if (data [char_nbr] < 32 || data [char_nbr] > 127)
-                is_text = 0;
-
-        fprintf (stderr, "[%03d] ", (int) size);
-        for (char_nbr = 0; char_nbr < size; char_nbr++) {
-            if (is_text)
-                fprintf (stderr, "%c", data [char_nbr]);
-            else
-                fprintf (stderr, "%02X", (unsigned char) data [char_nbr]);
-        }
-        fprintf (stderr, "\n");
+        zframe_print (frame, "");
         frame = zmsg_next (self);
     }
 }

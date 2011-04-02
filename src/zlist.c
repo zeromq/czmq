@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zlist.c - singly-linked list container
+    zlist - singly-linked list container
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
@@ -22,7 +22,7 @@
     =========================================================================
 */
 
-/*  
+/*
 @header
     Provides a generic container implementing a fast singly-linked list. You
     can use this to construct multi-dimensional lists, and other structures
