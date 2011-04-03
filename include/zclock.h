@@ -40,7 +40,7 @@ int64_t
 
 //  Print formatted string to stdout, prefixed by date/time and
 //  terminated with a newline.
-static void
+void
     zclock_log (const char *format, ...);
 
 //  Self test of this class
