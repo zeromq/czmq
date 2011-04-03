@@ -157,6 +157,30 @@ zframe_data (zframe_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  Return frame data encoded as printable hex string, useful for 0MQ UUIDs.
+//  Caller must free string when finished with it.
+
+char *
+zframe_string (zframe_t *self)
+{
+    static char
+        hex_char [] = "0123456789ABCDEF";
+
+    size_t size = zframe_size (self);
+    byte *data = zframe_data (self);
+    char *hex_str = malloc (size * 2 + 1);
+
+    int byte_nbr;
+    for (byte_nbr = 0; byte_nbr < size; byte_nbr++) {
+        hex_str [byte_nbr * 2 + 0] = hex_char [data [byte_nbr] >> 4];
+        hex_str [byte_nbr * 2 + 1] = hex_char [data [byte_nbr] & 15];
+    }
+    hex_str [size * 2] = 0;
+    return hex_str;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Return frame MORE indicator (1 or 0), set when reading frame from socket
 
 int
@@ -243,6 +267,9 @@ zframe_test (Bool verbose)
     //  Send END frame
     frame = zframe_new ("NOT", 3);
     zframe_reset (frame, "END", 3);
+    char *hex = zframe_string (frame);
+    assert (streq (hex, "454E44"));
+    free (hex);
     zframe_send (&frame, output, 0);
 
     //  Read and count until we receive END

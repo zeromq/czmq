@@ -60,6 +60,10 @@ size_t
 void *
     zframe_data (zframe_t *self);
 
+//  Return frame data encoded as printable hex string
+char *
+    zframe_string (zframe_t *self);
+
 //  Return frame 'more' property
 int
     zframe_more (zframe_t *self);
