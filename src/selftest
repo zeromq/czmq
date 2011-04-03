@@ -3,5 +3,5 @@ echo "Rebuilding zapi..."
 gcc -g -o zapi_selftest z*.c -lzmq
 if [ $? -eq 0 ]; then
     echo "Starting Valgrind memcheck..."
-    valgrind --tool=memcheck --leak-check=full zapi_selftest
+    valgrind --tool=memcheck --leak-check=full --suppressions=valgrind.supp zapi_selftest
 fi
