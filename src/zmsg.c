@@ -355,6 +355,22 @@ zmsg_load (FILE *file)
 
 
 //  --------------------------------------------------------------------------
+//  Create copy of message, as new message object
+zmsg_t *
+zmsg_dup (zmsg_t *self)
+{
+    assert (self);
+    zmsg_t *copy = zmsg_new ();
+    zframe_t *frame = zmsg_first (self);
+    while (frame) {
+        zmsg_appendmem (copy, zframe_data (frame), zframe_size (frame));
+        frame = zmsg_next (self);
+    }
+    return copy;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Dump message to stderr, for debugging and tracing
 
 void
@@ -414,7 +430,14 @@ zmsg_test (Bool verbose)
     zmsg_appendmem (msg, "Frame7", 6);
     zmsg_appendmem (msg, "Frame8", 6);
     zmsg_appendmem (msg, "Frame9", 6);
+    zmsg_t *copy = zmsg_dup (msg);
+    zmsg_send (&copy, output);
     zmsg_send (&msg, output);
+
+    copy = zmsg_recv (input);
+    assert (copy);
+    assert (zmsg_size (copy) == 10);
+    zmsg_destroy (&copy);
 
     msg = zmsg_recv (input);
     assert (msg);

@@ -111,6 +111,10 @@ void
 zmsg_t *
     zmsg_load (FILE *file);
 
+//  Create copy of message, as new message object
+zmsg_t *
+    zmsg_dup (zmsg_t *self);
+
 //  Print message to stderr, for debugging
 void
     zmsg_dump (zmsg_t *self);
