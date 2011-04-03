@@ -181,6 +181,21 @@ zframe_string (zframe_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  Return TRUE if frame body is equal to string, excluding terminator
+
+Bool
+zframe_streq (zframe_t *self, char *string)
+{
+    assert (self);
+    if (zframe_size (self) == strlen (string)
+    &&  memcmp (zframe_data (self), string, strlen (string)) == 0)
+        return TRUE;
+    else
+        return FALSE;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Return frame MORE indicator (1 or 0), set when reading frame from socket
 
 int
@@ -276,8 +291,7 @@ zframe_test (Bool verbose)
     frame_nbr = 0;
     for (frame_nbr = 0;; frame_nbr++) {
         zframe_t *frame = zframe_recv (input);
-        if (zframe_size (frame) == 3
-        &&  memcmp (zframe_data (frame), "END", 3) == 0) {
+        if (zframe_streq (frame, "END")) {
             zframe_destroy (&frame);
             break;
         }

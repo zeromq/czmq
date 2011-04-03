@@ -64,6 +64,10 @@ void *
 char *
     zframe_string (zframe_t *self);
 
+//  Return TRUE if frame body is equal to string, excluding terminator
+Bool
+    zframe_streq (zframe_t *self, char *string);
+
 //  Return frame 'more' property
 int
     zframe_more (zframe_t *self);
