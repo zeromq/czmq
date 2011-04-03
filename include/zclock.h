@@ -1,6 +1,6 @@
 /*  =========================================================================
     zclock - millisecond clocks and delays
-    
+
     -------------------------------------------------------------------------
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
@@ -31,18 +31,23 @@ extern "C" {
 
 //  @interface
 //  Sleep for a number of milliseconds
-void 
+void
     zclock_sleep (int msecs);
 
 //  Return current system clock as milliseconds
-int64_t 
+int64_t
     zclock_time (void);
 
+//  Print formatted string to stdout, prefixed by date/time and
+//  terminated with a newline.
+static void
+    zclock_log (const char *format, ...);
+
 //  Self test of this class
-int 
+int
     zclock_test (Bool verbose);
 //  @end
-    
+
 #ifdef __cplusplus
 }
 #endif

@@ -21,18 +21,18 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
     =========================================================================
 */
-/*  
+/*
 @header
-The zclock class provides essential sleep and system time functions, used 
-to slow down threads for testing, and calculate timers for polling. Wraps 
+The zclock class provides essential sleep and system time functions, used
+to slow down threads for testing, and calculate timers for polling. Wraps
 the non-portable system calls in a simple portable API.
 @discuss
 This class contains some small surprises. Most amazing, win32 did an API
 better than POSIX. The win32 Sleep() call is not only a neat 1-liner, it
 also sleeps for milliseconds, whereas the POSIX call asks us to think in
 terms of nanoseconds, which is insane. I've decided every single man page
-for this library will say "insane" at least once. Anyhow, milliseconds 
-are a concept we can deal with. Seconds are too fat, nanoseconds too 
+for this library will say "insane" at least once. Anyhow, milliseconds
+are a concept we can deal with. Seconds are too fat, nanoseconds too
 tiny, but milliseconds are just right for slices of time we want to work
 with at the 0MQ scale. zclock doesn't give you objects to work with, we
 like the zapi class model but we're not insane. There, got it in again.
@@ -79,19 +79,41 @@ zclock_time (void)
 
 
 //  --------------------------------------------------------------------------
+//  Print formatted string to stdout, prefixed by date/time and
+//  terminated with a newline.
+
+static void
+zclock_log (const char *format, ...)
+{
+    time_t curtime = time (NULL);
+    struct tm *loctime = localtime (&curtime);
+    char *formatted = malloc (20);
+    strftime (formatted, 20, "%y-%m-%d %H:%M:%S ", loctime);
+    printf ("%s", formatted);
+    free (formatted);
+
+    va_list argptr;
+    va_start (argptr, format);
+    vprintf (format, argptr);
+    va_end (argptr);
+    printf ("\n");
+}
+
+
+//  --------------------------------------------------------------------------
 //  Self test of this class
 
 int
 zclock_test (Bool verbose)
 {
     printf (" * zclock: ");
-    
+
     //  @selftest
     int64_t start = zclock_time ();
     zclock_sleep (10);
     assert ((zclock_time () - start) >= 10);
     //  @end
-    
+
     printf ("OK\n");
     return 0;
 }
