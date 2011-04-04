@@ -35,6 +35,22 @@ size_t
 void *
     zframe_data (zframe_t *self);
 
+//  Create a new frame that duplicates an existing frame
+zframe_t *
+    zframe_dup (zframe_t *self);
+
+//  Return frame data encoded as printable hex string
+char *
+    zframe_strhex (zframe_t *self);
+
+//  Return frame data copied into freshly allocated string
+char *
+    zframe_strdup (zframe_t *self);
+
+//  Return TRUE if frame body is equal to string, excluding terminator
+Bool
+    zframe_streq (zframe_t *self, char *string);
+
 //  Return frame 'more' property
 int
     zframe_more (zframe_t *self);
@@ -87,19 +103,27 @@ EXAMPLE
         zframe_send (&frame, output, ZFRAME_MORE + ZFRAME_REUSE);
     }
     assert (frame);
+    zframe_t *copy = zframe_dup (frame);
     zframe_destroy (&frame);
+    assert (zframe_size (copy) == 5);
+    zframe_destroy (&copy);
 
     //  Send END frame
     frame = zframe_new ("NOT", 3);
     zframe_reset (frame, "END", 3);
+    char *string = zframe_strhex (frame);
+    assert (streq (string, "454E44"));
+    free (string);
+    string = zframe_strdup (frame);
+    assert (streq (string, "END"));
+    free (string);
     zframe_send (&frame, output, 0);
 
     //  Read and count until we receive END
     frame_nbr = 0;
     for (frame_nbr = 0;; frame_nbr++) {
         zframe_t *frame = zframe_recv (input);
-        if (zframe_size (frame) == 3
-        &&  memcmp (zframe_data (frame), "END", 3) == 0) {
+        if (zframe_streq (frame, "END")) {
             zframe_destroy (&frame);
             break;
         }
