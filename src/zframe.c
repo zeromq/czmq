@@ -161,7 +161,7 @@ zframe_data (zframe_t *self)
 //  Caller must free string when finished with it.
 
 char *
-zframe_string (zframe_t *self)
+zframe_strhex (zframe_t *self)
 {
     static char
         hex_char [] = "0123456789ABCDEF";
@@ -177,6 +177,21 @@ zframe_string (zframe_t *self)
     }
     hex_str [size * 2] = 0;
     return hex_str;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return frame data copied into freshly allocated string
+//  Caller must free string when finished with it.
+
+char *
+zframe_strdup (zframe_t *self)
+{
+    size_t size = zframe_size (self);
+    char *string = malloc (size + 1);
+    memcpy (string, zframe_data (self), size);
+    string [size] = 0;
+    return string;
 }
 
 
@@ -282,9 +297,12 @@ zframe_test (Bool verbose)
     //  Send END frame
     frame = zframe_new ("NOT", 3);
     zframe_reset (frame, "END", 3);
-    char *hex = zframe_string (frame);
-    assert (streq (hex, "454E44"));
-    free (hex);
+    char *string = zframe_strhex (frame);
+    assert (streq (string, "454E44"));
+    free (string);
+    string = zframe_strdup (frame);
+    assert (streq (string, "END"));
+    free (string);
     zframe_send (&frame, output, 0);
 
     //  Read and count until we receive END

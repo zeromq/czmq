@@ -62,7 +62,11 @@ void *
 
 //  Return frame data encoded as printable hex string
 char *
-    zframe_string (zframe_t *self);
+    zframe_strhex (zframe_t *self);
+
+//  Return frame data copied into freshly allocated string
+char *
+    zframe_strdup (zframe_t *self);
 
 //  Return TRUE if frame body is equal to string, excluding terminator
 Bool
