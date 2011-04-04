@@ -96,7 +96,7 @@ zmsg_recv (void *socket)
             zmsg_destroy (&self);
             break;              //  Interrupted or terminated
         }
-        zmsg_append (self, frame);
+        zmsg_add (self, frame);
         if (!zframe_more (frame))
             break;              //  Last message frame
     }
@@ -141,6 +141,7 @@ zmsg_size (zmsg_t *self)
 
 //  --------------------------------------------------------------------------
 //  Push frame to the front of the message, i.e. before all other frames.
+//  Message takes ownership of frame, will destroy it when message is sent.
 
 void
 zmsg_push (zmsg_t *self, zframe_t *frame)
@@ -152,10 +153,23 @@ zmsg_push (zmsg_t *self, zframe_t *frame)
 
 
 //  --------------------------------------------------------------------------
-//  Append frame to the end of the message, i.e. after all other frames.
+//  Remove first frame from message, if any. Returns frame, or NULL. Caller
+//  now owns frame and must destroy it when finished with it.
+
+zframe_t *
+zmsg_pop (zmsg_t *self)
+{
+    assert (self);
+    return (zframe_t *) zlist_pop (self->frames);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Add frame to the end of the message, i.e. after all other frames.
+//  Message takes ownership of frame, will destroy it when message is sent.
 
 void
-zmsg_append (zmsg_t *self, zframe_t *frame)
+zmsg_add (zmsg_t *self, zframe_t *frame)
 {
     assert (self);
     assert (frame);
@@ -177,10 +191,10 @@ zmsg_pushmem (zmsg_t *self, const void *src, size_t size)
 
 
 //  --------------------------------------------------------------------------
-//  Append block of memory to the end of the message, as a new frame.
+//  Add block of memory to the end of the message, as a new frame.
 
 void
-zmsg_appendmem (zmsg_t *self, const void *src, size_t size)
+zmsg_addmem (zmsg_t *self, const void *src, size_t size)
 {
     assert (self);
     assert (src);
@@ -190,20 +204,46 @@ zmsg_appendmem (zmsg_t *self, const void *src, size_t size)
 
 
 //  --------------------------------------------------------------------------
-//  Remove first frame from message, if any. Returns frame, or NULL. Caller
-//  now owns frame and must destroy it when finished with it.
+//  Push string as new frame to front of message
 
-zframe_t *
-zmsg_pop (zmsg_t *self)
+void
+zmsg_pushstr (zmsg_t *self, const char *string)
 {
     assert (self);
-    return (zframe_t *) zlist_pop (self->frames);
+    assert (string);
+    zlist_push (self->frames, zframe_new (string, strlen (string)));
 }
 
 
 //  --------------------------------------------------------------------------
-//  Push frame to front of message, before first frame
-//  Pushes an empty frame in front of frame
+//  Push string as new frame to end of message
+
+void
+zmsg_addstr (zmsg_t *self, const char *string)
+{
+    assert (self);
+    assert (string);
+    zlist_append (self->frames, zframe_new (string, strlen (string)));
+}
+
+
+//  --------------------------------------------------------------------------
+//  Pop frame off front of message, return as fresh string
+
+char *
+zmsg_popstr (zmsg_t *self)
+{
+    assert (self);
+    zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
+    char *string = zframe_strdup (frame);
+    zframe_destroy (&frame);
+    return string;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Push frame plus empty frame to front of message, before first frame.
+//  Message takes ownership of frame, will destroy it when message is sent.
 
 void
 zmsg_wrap (zmsg_t *self, zframe_t *frame)
@@ -286,29 +326,6 @@ zmsg_last (zmsg_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Return the first body frame, defined as the first frame following a zero
-//  length frame (which ends the address envelope, if any). If there is no
-//  zero length frame, returns the first frame. Sets the cursor, so you can
-//  do a zmsg_next after this.
-
-zframe_t *
-zmsg_body (zmsg_t *self)
-{
-    assert (self);
-    zframe_t *frame = (zframe_t *) zlist_first (self->frames);
-    while (frame && zframe_size (frame))
-        frame = (zframe_t *) zlist_next (self->frames);
-
-    //  If we found a delimiter, skip to next frame
-    if (frame)
-        return (zframe_t *) zlist_next (self->frames);
-    else
-        //  Else return first frame, if any at all
-        return (zframe_t *) zlist_first (self->frames);
-}
-
-
-//  --------------------------------------------------------------------------
 //  Save message to file
 
 void
@@ -345,7 +362,7 @@ zmsg_load (FILE *file)
             rc = fread (zframe_data (frame), frame_size, 1, file);
             if (frame_size > 0 && rc != 1)
                 break;          //  Unable to read properly, quit
-            zmsg_append (self, frame);
+            zmsg_add (self, frame);
         }
         else
             break;              //  Unable to read properly, quit
@@ -363,7 +380,7 @@ zmsg_dup (zmsg_t *self)
     zmsg_t *copy = zmsg_new ();
     zframe_t *frame = zmsg_first (self);
     while (frame) {
-        zmsg_appendmem (copy, zframe_data (frame), zframe_size (frame));
+        zmsg_addmem (copy, zframe_data (frame), zframe_size (frame));
         frame = zmsg_next (self);
     }
     return copy;
@@ -420,16 +437,16 @@ zmsg_test (Bool verbose)
 
     //  Test send and receive of multi-frame message
     msg = zmsg_new ();
-    zmsg_appendmem (msg, "Frame0", 6);
-    zmsg_appendmem (msg, "Frame1", 6);
-    zmsg_appendmem (msg, "Frame2", 6);
-    zmsg_appendmem (msg, "Frame3", 6);
-    zmsg_appendmem (msg, "Frame4", 6);
-    zmsg_appendmem (msg, "Frame5", 6);
-    zmsg_appendmem (msg, "Frame6", 6);
-    zmsg_appendmem (msg, "Frame7", 6);
-    zmsg_appendmem (msg, "Frame8", 6);
-    zmsg_appendmem (msg, "Frame9", 6);
+    zmsg_addmem (msg, "Frame0", 6);
+    zmsg_addmem (msg, "Frame1", 6);
+    zmsg_addmem (msg, "Frame2", 6);
+    zmsg_addmem (msg, "Frame3", 6);
+    zmsg_addmem (msg, "Frame4", 6);
+    zmsg_addmem (msg, "Frame5", 6);
+    zmsg_addmem (msg, "Frame6", 6);
+    zmsg_addmem (msg, "Frame7", 6);
+    zmsg_addmem (msg, "Frame8", 6);
+    zmsg_addmem (msg, "Frame9", 6);
     zmsg_t *copy = zmsg_dup (msg);
     zmsg_send (&copy, output);
     zmsg_send (&msg, output);
@@ -466,21 +483,24 @@ zmsg_test (Bool verbose)
         zmsg_remove (msg, frame);
         zframe_destroy (&frame);
     }
+    //  Test message frame manipulation
     assert (zmsg_size (msg) == 2);
     frame = zframe_new ("Address", 7);
     zmsg_wrap (msg, frame);
     assert (zmsg_size (msg) == 4);
-    frame = zmsg_body (msg);
-    assert (memcmp (zframe_data (frame), "Frame0", 6) == 0);
+    zmsg_addstr (msg, "Body");
+    assert (zmsg_size (msg) == 5);
     frame = zmsg_unwrap (msg);
     zframe_destroy (&frame);
-    assert (zmsg_size (msg) == 2);
+    assert (zmsg_size (msg) == 3);
+    char *body = zmsg_popstr (msg);
+    assert (streq (body, "Frame0"));
+    free (body);
     zmsg_destroy (&msg);
 
     //  Now try methods on an empty message
     msg = zmsg_new ();
     assert (zmsg_size (msg) == 0);
-    assert (zmsg_body (msg) == NULL);
     assert (zmsg_first (msg) == NULL);
     assert (zmsg_next (msg) == NULL);
     assert (zmsg_pop (msg) == NULL);

@@ -57,9 +57,13 @@ size_t
 void
     zmsg_push (zmsg_t *self, zframe_t *frame);
 
-//  Append frame to end of message, after last frame
+//  Pop frame off front of message, caller now owns frame
+zframe_t *
+    zmsg_pop (zmsg_t *self);
+
+//  Add frame to end of message, after last frame
 void
-    zmsg_append (zmsg_t *self, zframe_t *frame);
+    zmsg_add (zmsg_t *self, zframe_t *frame);
 
 //  Push block of memory as new frame to front of message
 void
@@ -67,11 +71,19 @@ void
 
 //  Push block of memory as new frame to end of message
 void
-    zmsg_appendmem (zmsg_t *self, const void *src, size_t size);
+    zmsg_addmem (zmsg_t *self, const void *src, size_t size);
 
-//  Pop frame off front of message, caller now owns frame
-zframe_t *
-    zmsg_pop (zmsg_t *self);
+//  Push string as new frame to front of message
+void
+    zmsg_pushstr (zmsg_t *self, const char *string);
+
+//  Push string as new frame to end of message
+void
+    zmsg_addstr (zmsg_t *self, const char *string);
+
+//  Pop frame off front of message, return as fresh string
+char *
+    zmsg_popstr (zmsg_t *self);
 
 //  Push frame to front of message, before first frame
 //  Pushes an empty frame in front of frame
@@ -98,10 +110,6 @@ zframe_t *
 //  Return last frame in message, or null
 zframe_t *
     zmsg_last (zmsg_t *self);
-
-//  Return first body frame, i.e. after first null frame
-zframe_t *
-    zmsg_body (zmsg_t *self);
 
 //  Save message to an open file
 void
