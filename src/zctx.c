@@ -103,11 +103,12 @@ struct _zctx_t {
 
 //  This is a global variable accessible to zapi application code
 int zctx_interrupted = 0;
+#if defined (__UNIX__)
 static void s_signal_handler (int signal_value)
 {
     zctx_interrupted = 1;
 }
-
+#endif
 
 //  --------------------------------------------------------------------------
 //  Constructor
@@ -123,6 +124,7 @@ zctx_new (void)
     self->iothreads = 1;
     self->main = TRUE;
 
+#if defined (__UNIX__)
     //  Install signal handler for SIGINT and SIGTERM
     struct sigaction action;
     action.sa_handler = s_signal_handler;
@@ -130,6 +132,7 @@ zctx_new (void)
     sigemptyset (&action.sa_mask);
     sigaction (SIGINT, &action, NULL);
     sigaction (SIGTERM, &action, NULL);
+#endif
 
     return self;
 }
