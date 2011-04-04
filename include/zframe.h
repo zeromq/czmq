@@ -60,6 +60,10 @@ size_t
 void *
     zframe_data (zframe_t *self);
 
+//  Create a new frame that duplicates an existing frame
+zframe_t *
+    zframe_dup (zframe_t *self);
+
 //  Return frame data encoded as printable hex string
 char *
     zframe_strhex (zframe_t *self);

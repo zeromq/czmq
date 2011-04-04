@@ -157,6 +157,18 @@ zframe_data (zframe_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  Create a new frame that duplicates an existing frame
+
+zframe_t *
+zframe_dup (zframe_t *self)
+{
+    assert (self);
+    return zframe_new (
+        zframe_data (self), zframe_size (self));
+}
+
+
+//  --------------------------------------------------------------------------
 //  Return frame data encoded as printable hex string, useful for 0MQ UUIDs.
 //  Caller must free string when finished with it.
 
@@ -292,7 +304,10 @@ zframe_test (Bool verbose)
         zframe_send (&frame, output, ZFRAME_MORE + ZFRAME_REUSE);
     }
     assert (frame);
+    zframe_t *copy = zframe_dup (frame);
     zframe_destroy (&frame);
+    assert (zframe_size (copy) == 5);
+    zframe_destroy (&copy);
 
     //  Send END frame
     frame = zframe_new ("NOT", 3);
