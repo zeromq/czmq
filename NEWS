@@ -1,3 +1,29 @@
+libzapi version 1.2.2 (beta), released on 2011/04/xx
+====================================================
+
+Changes
+-------
+
+* In zframe class, added print, reset, strdup, streq, strhex, dup methods.
+
+* In zmsg class, added last, wrap, unwrap, popstr, pushstr, addstr, dup 
+  methods.
+
+* In zclock class, added log method.
+
+* In zstr class, added sendm method.
+
+* Added Valgrind suppression file for libzmq.
+
+Bug Fixes
+---------
+
+* Fixed error in thread pipe handling which sometimes provoked libzmq
+  assertion failure at shutdown. 
+  
+* Fixed build for Windows.
+
+
 libzapi version 1.2.1 (beta), released on 2011/04/01
 ====================================================
 
