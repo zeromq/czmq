@@ -284,21 +284,25 @@ s_call_thread_fn (void *args)
 void *
 zctx_thread_new (zctx_t *self, void *(*thread_fn) (void *), void *arg)
 {
-    //  This is what we're going to pass to the child thread
-    zthread_t *args = (zthread_t *) zmalloc (sizeof (zthread_t));
-    args->arg = arg;
-    args->pipe = zctx_socket_new (self, ZMQ_PAIR);
-    args->ctx = (zctx_t *) zmalloc (sizeof (zctx_t));
-    args->ctx->context = self->context;
-    args->ctx->sockets = zlist_new ();
-
-    //  Create pipe from our thread to child
+    //  Create our end of the pipe
     void *pipe = zctx_socket_new (self, ZMQ_PAIR);
     char endpoint [64];
     int rc = snprintf (endpoint, 64, "inproc://zctx-pipe-%p", pipe);
     assert (rc < 64);
     rc = zmq_bind (pipe, endpoint);
     assert (rc == 0);
+
+    //  Child thread gets a zthread_t arguments block
+    zthread_t *args = (zthread_t *) zmalloc (sizeof (zthread_t));
+    args->arg = arg;            //  Application arguments
+
+    //  Create new zctx_t for child, and new pipe in that
+    args->ctx = (zctx_t *) zmalloc (sizeof (zctx_t));
+    args->ctx->context = self->context;
+    args->ctx->sockets = zlist_new ();
+
+    //  Create child end of pipe, and connect to ours
+    args->pipe = zctx_socket_new (args->ctx, ZMQ_PAIR);
     rc = zmq_connect (args->pipe, endpoint);
     assert (rc == 0);
 
