@@ -29,31 +29,34 @@
 extern "C" {
 #endif
 
+
 //  Opaque class structure
 typedef struct _zctx_t zctx_t;
 
 //  @interface
-//  Structure passed to threads created via this class
-typedef struct {
-    zctx_t *ctx;                //  Context shared with parent thread
-    void *pipe;                 //  Pipe to parent thread (PAIR)
-    void *arg;                  //  Application argument
-} zthread_t;
+//  Detached threads follow POSIX pthreads API
+typedef void *(zthread_detached_fn) (void *args);
+//  Attached threads get context and pipe from parent
+typedef void (zthread_attached_fn) (void *args, zctx_t *ctx, void *pipe);
 
 //  Create new context, returns context object, replaces zmq_init
 zctx_t *
     zctx_new (void);
 
+//  Create new shadow context, returns context object
+zctx_t *
+    zctx_shadow (zctx_t *self);
+
 //  Destroy context and all sockets in it, replaces zmq_term
 void
     zctx_destroy (zctx_t **self_p);
-    
-//  Raise default I/O threads from 1, for crazy heavy applications    
+
+//  Raise default I/O threads from 1, for crazy heavy applications
 void
     zctx_set_iothreads (zctx_t *self, int iothreads);
-    
+
 //  Set msecs to flush sockets when closing them
-void 
+void
     zctx_set_linger (zctx_t *self, int linger);
 
 //  Create socket within this context, replaces zmq_socket
@@ -64,11 +67,20 @@ void *
 void
     zctx_socket_destroy (zctx_t *self, void *socket);
 
-//  Create thread, return PAIR socket to talk to thread. The child thread
-//  receives a (zthread_t *) object including a zctx, a pipe back to the
-//  creating thread, and the arg passed in this call.
+//  --- SHOULD MOVE TO zthread class
+//  Create an attached thread. An attached thread gets a ctx and a PAIR
+//  pipe back to its parent. It must monitor its pipe, and exit if the
+//  pipe becomes unreadable.
 void *
-    zctx_thread_new (zctx_t *self, void *(*thread_fn) (void *), void *arg);
+    zctx_attach_thread (zctx_t *self, zthread_attached_fn *thread_fn,
+                        void *args);
+
+//  Create a detached thread. A detached thread operates autonomously
+//  and is used to simulate a separate process. It gets no ctx, and no
+//  pipe.
+void
+    zctx_detach_thread (zctx_t *self, zthread_detached_fn *thread_fn,
+                        void *args);
 
 //  Self test of this class
 int

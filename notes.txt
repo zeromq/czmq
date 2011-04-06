@@ -1,0 +1,21 @@
+zsocket_
+
+ - subscribe
+ - unsubscribe
+ - hwm / set_
+ - swap / set_
+ - affinity / set_
+ - identity / set_
+ - rate / set_
+ - recovery_ivl / set_
+ - recovery_ivl_msec / set_
+ - mcast_loop / set_
+ - sndbuf / set_
+ - rcvbuf / set_
+ - linger / set_
+ - reconnect_ivl / set_
+ - reconnect_ivl_max / set_
+ - backlog / set_
+ - fd
+ - events
+ - type

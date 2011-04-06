@@ -248,7 +248,7 @@ zframe_print (zframe_t *self, char *prefix)
     int is_text = 1;
     int char_nbr;
     for (char_nbr = 0; char_nbr < size; char_nbr++)
-        if (data [char_nbr] < 32 || data [char_nbr] > 127)
+        if (data [char_nbr] < 9 || data [char_nbr] > 127)
             is_text = 0;
 
     fprintf (stderr, "[%03d] ", (int) size);

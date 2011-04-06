@@ -4,6 +4,8 @@ libzapi version 1.2.2 (beta), released on 2011/04/xx
 Changes
 -------
 
+* Threading API now supports attached and detached threads.
+
 * In zframe class, added print, reset, strdup, streq, strhex, dup methods.
 
 * In zmsg class, added last, wrap, unwrap, popstr, pushstr, addstr, dup 
