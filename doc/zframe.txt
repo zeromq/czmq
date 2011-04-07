@@ -86,9 +86,9 @@ EXAMPLE
 ----
     zctx_t *ctx = zctx_new ();
 
-    void *output = zctx_socket_new (ctx, ZMQ_PAIR);
+    void *output = zsocket_new (ctx, ZMQ_PAIR);
     zmq_bind (output, "inproc://zframe.test");
-    void *input = zctx_socket_new (ctx, ZMQ_PAIR);
+    void *input = zsocket_new (ctx, ZMQ_PAIR);
     zmq_connect (input, "inproc://zframe.test");
 
     //  Send five different frames, test ZFRAME_MORE

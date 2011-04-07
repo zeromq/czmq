@@ -28,13 +28,13 @@ void
 void
     zctx_set_linger (zctx_t *self, int linger);
 
-//  Create socket within this context, replaces zmq_socket
+//  Create socket within this context, for libzapi use only
 void *
-    zctx_socket_new (zctx_t *self, int type);
+    zctx__socket_new (zctx_t *self, int type);
 
-//  Destroy socket, replaces zmq_close
+//  Destroy socket within this context, for libzapi use only
 void
-    zctx_socket_destroy (zctx_t *self, void *socket);
+    zctx__socket_destroy (zctx_t *self, void *socket);
 
 //  Self test of this class
 int
@@ -88,12 +88,12 @@ EXAMPLE
     ctx = zctx_new ();
     zctx_set_iothreads (ctx, 1);
     zctx_set_linger (ctx, 5);       //  5 msecs
-    void *s1 = zctx_socket_new (ctx, ZMQ_PAIR);
-    void *s2 = zctx_socket_new (ctx, ZMQ_XREQ);
-    void *s3 = zctx_socket_new (ctx, ZMQ_REQ);
-    void *s4 = zctx_socket_new (ctx, ZMQ_REP);
-    void *s5 = zctx_socket_new (ctx, ZMQ_PUB);
-    void *s6 = zctx_socket_new (ctx, ZMQ_SUB);
+    void *s1 = zctx__socket_new (ctx, ZMQ_PAIR);
+    void *s2 = zctx__socket_new (ctx, ZMQ_XREQ);
+    void *s3 = zctx__socket_new (ctx, ZMQ_REQ);
+    void *s4 = zctx__socket_new (ctx, ZMQ_REP);
+    void *s5 = zctx__socket_new (ctx, ZMQ_PUB);
+    void *s6 = zctx__socket_new (ctx, ZMQ_SUB);
     zmq_connect (s1, "tcp://127.0.0.1:5555");
     zmq_connect (s2, "tcp://127.0.0.1:5555");
     zmq_connect (s3, "tcp://127.0.0.1:5555");

@@ -17,31 +17,34 @@
 &emsp;<a href="#toc3-108">Linking with an Application</a>
 &emsp;<a href="#toc3-115">API Summary</a>
 &emsp;<a href="#toc4-118">zctx - working with ØMQ contexts</a>
-&emsp;<a href="#toc4-129">zstr - sending and receiving strings</a>
-&emsp;<a href="#toc4-154">zframe - working with single message frames</a>
-&emsp;<a href="#toc4-165">zmsg - working with multipart messages</a>
-&emsp;<a href="#toc4-176">zloop - event-driven reactor</a>
-&emsp;<a href="#toc4-187">zthread - working with system threads</a>
-&emsp;<a href="#toc4-198">zhash - expandable hash table container</a>
-&emsp;<a href="#toc4-209">zlist - singly-linked list container</a>
-&emsp;<a href="#toc4-220">zclock - millisecond clocks and delays</a>
+&emsp;<a href="#toc4-129">zsocket - working with ØMQ sockets</a>
+&emsp;<a href="#toc4-140">zsockopt - working with ØMQ socket options</a>
+&emsp;<a href="#toc4-151">zstr - sending and receiving strings</a>
+&emsp;<a href="#toc4-176">zframe - working with single message frames</a>
+&emsp;<a href="#toc4-187">zmsg - working with multipart messages</a>
+&emsp;<a href="#toc4-198">zloop - event-driven reactor</a>
+&emsp;<a href="#toc4-209">zthread - working with system threads</a>
+&emsp;<a href="#toc4-220">zhash - expandable hash table container</a>
+&emsp;<a href="#toc4-231">zlist - singly-linked list container</a>
+&emsp;<a href="#toc4-242">zclock - millisecond clocks and delays</a>
 
-**<a href="#toc2-231">Design Ideology</a>**
-&emsp;<a href="#toc3-234">The Problem with C</a>
-&emsp;<a href="#toc3-243">A Simple Class Model</a>
-&emsp;<a href="#toc3-270">Naming Style</a>
-&emsp;<a href="#toc3-279">Containers</a>
-&emsp;<a href="#toc3-291">Portability</a>
-&emsp;<a href="#toc3-317">Technical Aspects</a>
+**<a href="#toc2-253">Design Ideology</a>**
+&emsp;<a href="#toc3-256">The Problem with C</a>
+&emsp;<a href="#toc3-265">A Simple Class Model</a>
+&emsp;<a href="#toc3-292">Naming Style</a>
+&emsp;<a href="#toc3-301">Containers</a>
+&emsp;<a href="#toc3-313">Portability</a>
+&emsp;<a href="#toc3-339">Technical Aspects</a>
 
-**<a href="#toc2-327">Under the Hood</a>**
-&emsp;<a href="#toc3-330">Adding a New Class</a>
-&emsp;<a href="#toc3-343">Coding Style</a>
-&emsp;<a href="#toc3-362">Assertions</a>
-&emsp;<a href="#toc3-380">Documentation</a>
-&emsp;<a href="#toc3-419">Development</a>
-&emsp;<a href="#toc3-429">Porting libzapi</a>
-&emsp;<a href="#toc3-442">This Document</a>
+**<a href="#toc2-349">Under the Hood</a>**
+&emsp;<a href="#toc3-352">Adding a New Class</a>
+&emsp;<a href="#toc3-365">Coding Style</a>
+&emsp;<a href="#toc3-384">Assertions</a>
+&emsp;<a href="#toc3-402">Documentation</a>
+&emsp;<a href="#toc3-441">Development</a>
+&emsp;<a href="#toc3-451">Porting libzapi</a>
+&emsp;<a href="#toc3-464">Code Generation</a>
+&emsp;<a href="#toc3-473">This Document</a>
 
 <A name="toc2-11" title="Overview" />
 ## Overview
@@ -65,13 +68,13 @@ libzapi grew out of concepts developed in [ØMQ - The Guide](http://zguide.zerom
 ### Highlights
 
 * Single API hides differences between ØMQ/2.1, and ØMQ/3.0.
-* Broken into easy-to-use classes: zctx, zstr, zframe, zmsg, zloop, zhash, and zlist.
 * Work with messages as strings, individual frames, or multipart messages.
 * Automatic closure of any open sockets at context termination.
 * Automatic LINGER configuration of all sockets for context termination.
 * Portable API for creating child threads and ØMQ pipes to talk to them.
 * Simple reactor with one-off and repeated timers, and socket readers.
 * System clock functions for sleeping and calculating timers.
+* Easy API to get/set all socket options.
 * Portable to Linux, UNIX, OS X, Windows (porting is not yet complete).
 * Includes generic hash and list containers.
 * Full selftests on all classes.
@@ -176,13 +179,13 @@ This is the class interface:
     void
         zctx_set_linger (zctx_t *self, int linger);
     
-    //  Create socket within this context, replaces zmq_socket
+    //  Create socket within this context, for libzapi use only
     void *
-        zctx_socket_new (zctx_t *self, int type);
+        zctx__socket_new (zctx_t *self, int type);
     
-    //  Destroy socket, replaces zmq_close
+    //  Destroy socket within this context, for libzapi use only
     void
-        zctx_socket_destroy (zctx_t *self, void *socket);
+        zctx__socket_destroy (zctx_t *self, void *socket);
     
     //  Self test of this class
     int
@@ -193,7 +196,188 @@ This is the class interface:
     extern int zctx_interrupted;
 
 
-<A name="toc4-129" title="zstr - sending and receiving strings" />
+<A name="toc4-129" title="zsocket - working with ØMQ sockets" />
+#### zsocket - working with ØMQ sockets
+
+The zsocket class provides helper functions for ØMQ sockets. It doesn't
+wrap the ØMQ socket type, to avoid breaking all libzmq socket-related
+calls. Automatically subscribes SUB sockets to "".
+
+This is the class interface:
+
+    //  Create a new socket within our libzapi context, replaces zmq_socket.
+    //  If the socket is a SUB socket, automatically subscribes to everything.
+    //  Use this to get automatic management of the socket at shutdown.
+    void *
+        zsocket_new (zctx_t *self, int type);
+    
+    //  Destroy a socket within our libzapi context, replaces zmq_close.
+    void
+        zsocket_destroy (zctx_t *self, void *socket);
+    
+    //  Bind a socket to a formatted endpoint
+    //  Checks with assertion that the bind was valid
+    void
+        zsocket_bind (void *socket, const char *format, ...);
+    
+    //  Connect a socket to a formatted endpoint
+    //  Checks with assertion that the connect was valid
+    void
+        zsocket_connect (void *socket, const char *format, ...);
+    
+    //  Self test of this class
+    int
+        zsocket_test (Bool verbose);
+
+
+<A name="toc4-140" title="zsockopt - working with ØMQ socket options" />
+#### zsockopt - working with ØMQ socket options
+
+The zsockopt class provides access to the ØMQ getsockopt/setsockopt API.
+
+This is the class interface:
+
+    //  Set socket ZMQ_HWM value
+    void
+        zsockopt_set_hwm (void *socket, int hwm);
+    
+    //  Return socket ZMQ_HWM value
+    int
+        zsockopt_hwm (void *socket);
+    
+    //  Set socket ZMQ_SWAP value
+    void
+        zsockopt_set_swap (void *socket, int swap);
+    
+    //  Return socket ZMQ_SWAP value
+    int
+        zsockopt_swap (void *socket);
+    
+    //  Set socket ZMQ_AFFINITY value
+    void
+        zsockopt_set_affinity (void *socket, int affinity);
+    
+    //  Return socket ZMQ_AFFINITY value
+    int
+        zsockopt_affinity (void *socket);
+    
+    //  Set socket ZMQ_IDENTITY value
+    void
+        zsockopt_set_identity (void *socket, char * identity);
+    
+    //  Set socket ZMQ_RATE value
+    void
+        zsockopt_set_rate (void *socket, int rate);
+    
+    //  Return socket ZMQ_RATE value
+    int
+        zsockopt_rate (void *socket);
+    
+    //  Set socket ZMQ_RECOVERY_IVL value
+    void
+        zsockopt_set_recovery_ivl (void *socket, int recovery_ivl);
+    
+    //  Return socket ZMQ_RECOVERY_IVL value
+    int
+        zsockopt_recovery_ivl (void *socket);
+    
+    //  Set socket ZMQ_RECOVERY_IVL_MSEC value
+    void
+        zsockopt_set_recovery_ivl_msec (void *socket, int recovery_ivl_msec);
+    
+    //  Return socket ZMQ_RECOVERY_IVL_MSEC value
+    int
+        zsockopt_recovery_ivl_msec (void *socket);
+    
+    //  Set socket ZMQ_MCAST_LOOP value
+    void
+        zsockopt_set_mcast_loop (void *socket, int mcast_loop);
+    
+    //  Return socket ZMQ_MCAST_LOOP value
+    int
+        zsockopt_mcast_loop (void *socket);
+    
+    //  Set socket ZMQ_SNDBUF value
+    void
+        zsockopt_set_sndbuf (void *socket, int sndbuf);
+    
+    //  Return socket ZMQ_SNDBUF value
+    int
+        zsockopt_sndbuf (void *socket);
+    
+    //  Set socket ZMQ_RCVBUF value
+    void
+        zsockopt_set_rcvbuf (void *socket, int rcvbuf);
+    
+    //  Return socket ZMQ_RCVBUF value
+    int
+        zsockopt_rcvbuf (void *socket);
+    
+    //  Set socket ZMQ_LINGER value
+    void
+        zsockopt_set_linger (void *socket, int linger);
+    
+    //  Return socket ZMQ_LINGER value
+    int
+        zsockopt_linger (void *socket);
+    
+    //  Set socket ZMQ_RECONNECT_IVL value
+    void
+        zsockopt_set_reconnect_ivl (void *socket, int reconnect_ivl);
+    
+    //  Return socket ZMQ_RECONNECT_IVL value
+    int
+        zsockopt_reconnect_ivl (void *socket);
+    
+    //  Set socket ZMQ_RECONNECT_IVL_MAX value
+    void
+        zsockopt_set_reconnect_ivl_max (void *socket, int reconnect_ivl_max);
+    
+    //  Return socket ZMQ_RECONNECT_IVL_MAX value
+    int
+        zsockopt_reconnect_ivl_max (void *socket);
+    
+    //  Set socket ZMQ_BACKLOG value
+    void
+        zsockopt_set_backlog (void *socket, int backlog);
+    
+    //  Return socket ZMQ_BACKLOG value
+    int
+        zsockopt_backlog (void *socket);
+    
+    //  Set socket ZMQ_SUBSCRIBE value
+    void
+        zsockopt_set_subscribe (void *socket, char * subscribe);
+    
+    //  Set socket ZMQ_UNSUBSCRIBE value
+    void
+        zsockopt_set_unsubscribe (void *socket, char * unsubscribe);
+    
+    //  Return socket ZMQ_TYPE value
+    int
+        zsockopt_type (void *socket);
+    
+    //  Return socket ZMQ_RCVMORE value
+    int
+        zsockopt_rcvmore (void *socket);
+    
+    //  Return socket ZMQ_FD value
+    int
+        zsockopt_fd (void *socket);
+    
+    //  Return socket ZMQ_EVENTS value
+    int
+        zsockopt_events (void *socket);
+    
+    //  Self test of this class
+    int
+        zsockopt_test (Bool verbose);
+
+This class is generated, using the GSL code generator. See the sockopts
+XML file, which provides the metadata, and the sockopts.gsl template,
+which does the work.
+
+<A name="toc4-151" title="zstr - sending and receiving strings" />
 #### zstr - sending and receiving strings
 
 The zstr class provides utility functions for sending and receiving C
@@ -210,6 +394,10 @@ This is the class interface:
     //  Receive a string off a socket, caller must free it
     char *
         zstr_recv (void *socket);
+    
+    //  Receive a string off a socket if socket had input waiting
+    char *
+        zstr_recv_nowait (void *socket);
     
     //  Send a string to a socket in ØMQ string format
     int
@@ -228,7 +416,7 @@ This is the class interface:
         zstr_test (Bool verbose);
 
 
-<A name="toc4-154" title="zframe - working with single message frames" />
+<A name="toc4-176" title="zframe - working with single message frames" />
 #### zframe - working with single message frames
 
 The zframe class provides methods to send and receive single message
@@ -301,7 +489,7 @@ This is the class interface:
         zframe_test (Bool verbose);
 
 
-<A name="toc4-165" title="zmsg - working with multipart messages" />
+<A name="toc4-187" title="zmsg - working with multipart messages" />
 #### zmsg - working with multipart messages
 
 The zmsg class provides methods to send and receive multipart messages
@@ -410,7 +598,7 @@ This is the class interface:
         zmsg_test (Bool verbose);
 
 
-<A name="toc4-176" title="zloop - event-driven reactor" />
+<A name="toc4-198" title="zloop - event-driven reactor" />
 #### zloop - event-driven reactor
 
 The zloop class provides an event-driven reactor pattern. The reactor
@@ -454,7 +642,7 @@ This is the class interface:
         zloop_test (Bool verbose);
 
 
-<A name="toc4-187" title="zthread - working with system threads" />
+<A name="toc4-209" title="zthread - working with system threads" />
 #### zthread - working with system threads
 
 The zthread class wraps OS thread creation. It creates detached threads
@@ -512,7 +700,7 @@ more enriching experience for all involved. One thing I do often is use
 a PAIR-PAIR pipe to talk from a thread to/from its parent. So this class
 will automatically create such a pair for each thread you start.
 
-<A name="toc4-198" title="zhash - expandable hash table container" />
+<A name="toc4-220" title="zhash - expandable hash table container" />
 #### zhash - expandable hash table container
 
 Expandable hash table container
@@ -568,7 +756,7 @@ Note that it's relatively slow (~50k insertions/deletes per second), so
 don't do inserts/updates on the critical path for message I/O.  It can
 do ~2.5M lookups per second for 16-char keys.  Timed on a 1.6GHz CPU.
 
-<A name="toc4-209" title="zlist - singly-linked list container" />
+<A name="toc4-231" title="zlist - singly-linked list container" />
 #### zlist - singly-linked list container
 
 Provides a generic container implementing a fast singly-linked list. You
@@ -622,7 +810,7 @@ This is the class interface:
         zlist_test (int verbose);
 
 
-<A name="toc4-220" title="zclock - millisecond clocks and delays" />
+<A name="toc4-242" title="zclock - millisecond clocks and delays" />
 #### zclock - millisecond clocks and delays
 
 The zclock class provides essential sleep and system time functions, used
@@ -658,10 +846,10 @@ tiny, but milliseconds are just right for slices of time we want to work
 with at the ØMQ scale. zclock doesn't give you objects to work with, we
 like the zapi class model but we're not insane. There, got it in again.
 
-<A name="toc2-231" title="Design Ideology" />
+<A name="toc2-253" title="Design Ideology" />
 ## Design Ideology
 
-<A name="toc3-234" title="The Problem with C" />
+<A name="toc3-256" title="The Problem with C" />
 ### The Problem with C
 
 C has the significant advantage of being a small language that, if we take a little care with formatting and naming, can be easily interchanged between developers. Every C developer will use much the same 90% of the language. Larger languages like C++ provide powerful abstractions like STL containers but at the cost of interchange.
@@ -670,7 +858,7 @@ The huge problem with C is that any realistic application needs packages of func
 
 The answer to this, as we learned from building enterprise-level C applications at iMatix from 1995-2005, is to create our own fully portable, high-quality libraries of pre-packaged functionality, in C. Doing this right solves both the requirements of richness of the language, and of portability of the final applications.
 
-<A name="toc3-243" title="A Simple Class Model" />
+<A name="toc3-265" title="A Simple Class Model" />
 ### A Simple Class Model
 
 C has no standard API style. It is one thing to write a useful component, but something else to provide an API that is consistent and obvious across many components. We learned from building [OpenAMQ](http://www.openamq.org), a messaging client and server of 0.5M LoC, that a consistent model for extending C makes life for the application developer much easier.
@@ -697,7 +885,7 @@ No model is fully consistent, and classes can define their own rules if it helps
 
 * While every class has a destroy method that is the formal destructor, some methods may also act as destructors. For example, a method that sends an object may also destroy the object (so that ownership of any buffers can passed to background threads). Such methods take the same "pointer to a reference" argument as the destroy method.
 
-<A name="toc3-270" title="Naming Style" />
+<A name="toc3-292" title="Naming Style" />
 ### Naming Style
 
 libzapi aims for short, consistent names, following the theory that names we use most often should be shortest. Classes get one-word names, unless they are part of a family of classes in which case they may be two words, the first being the family name. Methods, similarly, get one-word names and we aim for consistency across classes (so a method that does something semantically similar in two classes will get the same name in both). So the canonical name for any method is:
@@ -706,7 +894,7 @@ libzapi aims for short, consistent names, following the theory that names we use
 
 And the reader can easily parse this without needing special syntax to separate the class name from the method name.
 
-<A name="toc3-279" title="Containers" />
+<A name="toc3-301" title="Containers" />
 ### Containers
 
 After a long experiment with containers, we've decided that we need exactly two containers:
@@ -718,7 +906,7 @@ These are zlist and zhash, respectively. Both store void pointers, with no attem
 
 We assume that at some point we'll need to switch to a doubly-linked list.
 
-<A name="toc3-291" title="Portability" />
+<A name="toc3-313" title="Portability" />
 ### Portability
 
 Creating a portable C application can be rewarding in terms of maintaining a single code base across many platforms, and keeping (expensive) system-specific knowledge separate from application developers. In most projects (like ØMQ core), there is no portability layer and application code does conditional compilation for all mixes of platforms. This leads to quite messy code.
@@ -744,7 +932,7 @@ An example of the last:
 
 libzapi uses the GNU autotools system, so non-portable code can use the macros this defines. It can also use macros defined by the zapi_prelude.h header file.
 
-<A name="toc3-317" title="Technical Aspects" />
+<A name="toc3-339" title="Technical Aspects" />
 ### Technical Aspects
 
 * *Thread safety*: the use of opaque structures is thread safe, though ØMQ applications should not share state between threads in any case.
@@ -754,10 +942,10 @@ libzapi uses the GNU autotools system, so non-portable code can use the macros t
 * *Self-testing*: every class has a `selftest` method that runs through the methods of the class. In theory, calling all selftest functions of all classes does a full unit test of the library. The `zapi_selftest` application does this.
 * *Memory management*: libzapi classes do not use any special memory management techiques to detect leaks. We've done this in the past but it makes the code relatively complex. Instead, we do memory leak testing using tools like valgrind.
 
-<A name="toc2-327" title="Under the Hood" />
+<A name="toc2-349" title="Under the Hood" />
 ## Under the Hood
 
-<A name="toc3-330" title="Adding a New Class" />
+<A name="toc3-352" title="Adding a New Class" />
 ### Adding a New Class
 
 If you define a new libzapi class `myclass` you need to:
@@ -770,7 +958,7 @@ If you define a new libzapi class `myclass` you need to:
 
 The `bin/newclass.sh` shell script will automate these steps for you.
 
-<A name="toc3-343" title="Coding Style" />
+<A name="toc3-365" title="Coding Style" />
 ### Coding Style
 
 In general the zctx class defines the style for the whole library. The overriding rules for coding style are consistency, clarity, and ease of maintenance. We use the C99 standard for syntax including principally:
@@ -789,7 +977,7 @@ The style in libzapi would be:
 
     zblob_t *file_buffer = zblob_new ();
 
-<A name="toc3-362" title="Assertions" />
+<A name="toc3-384" title="Assertions" />
 ### Assertions
 
 We use assertions heavily to catch bad argument values. The libzapi classes do not attempt to validate arguments and report errors; bad arguments are treated as fatal application programming errors.
@@ -807,7 +995,7 @@ Rather than the side-effect form:
 
 Since assertions may be removed by an optimizing compiler.
 
-<A name="toc3-380" title="Documentation" />
+<A name="toc3-402" title="Documentation" />
 ### Documentation
 
 Man pages are generated from the class header and source files via the doc/mkman tool, and similar functionality in the gitdown tool (http://github.com/imatix/gitdown). The header file for a class must wrap its interface as follows (example is from include/zclock.h):
@@ -846,7 +1034,7 @@ The source file for a class then provides the self test example as follows:
 
 The template for man pages is in doc/mkman.
 
-<A name="toc3-419" title="Development" />
+<A name="toc3-441" title="Development" />
 ### Development
 
 libzapi is developed through a test-driven process that guarantees no memory violations or leaks in the code:
@@ -856,7 +1044,7 @@ libzapi is developed through a test-driven process that guarantees no memory vio
 * Run the 'selftest' script, which uses the Valgrind memcheck tool.
 * Repeat until perfect.
 
-<A name="toc3-429" title="Porting libzapi" />
+<A name="toc3-451" title="Porting libzapi" />
 ### Porting libzapi
 
 When you try libzapi on an OS that it's not been used on (ever, or for a while), you will hit code that does not compile. In some cases the patches are trivial, in other cases (usually when porting to Windows), the work needed to build equivalent functionality may be quite heavy. In any case, the benefit is that once ported, the functionality is available to all applications.
@@ -869,7 +1057,16 @@ Before attempting to patch code for portability, please read the `zapi_prelude.h
 
 The canonical 'standard operating system' for all libzapi code is Linux, gcc, POSIX.
 
-<A name="toc3-442" title="This Document" />
+<A name="toc3-464" title="Code Generation" />
+### Code Generation
+
+We generate the zsockopt class using the mysterious but powerful GSL code generator. It's actually really cool, since about 30 lines of XML are sufficient to generate 700 lines of code. Better, since many of the option data types changed in ØMQ/3.0, it's possible to completely hide the differences. To regenerate the zsockopt class, build and install GSL from https://github.com/imatix/gsl, and then:
+
+    gsl sockopts
+
+You may also enjoy using this same technique if you're writing bindings in other languages. See the sockopts.gsl file, this can be easily modified to produce code in whatever language interests you.
+
+<A name="toc3-473" title="This Document" />
 ### This Document
 
 This document is originally at README.txt and is built using [gitdown](http://github.com/imatix/gitdown).

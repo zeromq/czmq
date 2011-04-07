@@ -52,18 +52,16 @@ EXAMPLE
     char *domain = "localhost";
     int service = 5555;
 
-    void *publisher = zsocket_new (ctx, ZMQ_PUB);
-    void *subscriber = zsocket_new (ctx, ZMQ_SUB);
-    zsocket_bind (publisher, "tcp://%s:%d", interface, service);
-    zsocket_connect (subscriber, "tcp://%s:%d", domain, service);
-    assert (zsockopt_type (publisher) == ZMQ_PUB);
-    zclock_sleep (100);
-    zstr_send (publisher, "HELLO");
-    char *message = zstr_recv (subscriber);
+    void *writer = zsocket_new (ctx, ZMQ_PUSH);
+    void *reader = zsocket_new (ctx, ZMQ_PULL);
+    zsocket_bind (writer, "tcp://%s:%d", interface, service);
+    zsocket_connect (reader, "tcp://%s:%d", domain, service);
+    zstr_send (writer, "HELLO");
+    char *message = zstr_recv (reader);
     assert (message);
     assert (streq (message, "HELLO"));
     free (message);
-    zsocket_destroy (ctx, publisher);
+    zsocket_destroy (ctx, writer);
 
     zctx_destroy (&ctx);
 ----

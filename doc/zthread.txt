@@ -72,9 +72,9 @@ EXAMPLE
 static void *
 s_test_detached (void *args)
 {
-    zctx_t *ctx = zctx_new ();
     //  Create a socket to check it'll be automatically deleted
-    void *push = zctx_socket_new (ctx, ZMQ_PUSH);
+    zctx_t *ctx = zctx_new ();
+    void *push = zsocket_new (ctx, ZMQ_PUSH);
     zctx_destroy (&ctx);
     return NULL;
 }
@@ -83,8 +83,7 @@ static void
 s_test_attached (void *args, zctx_t *ctx, void *pipe)
 {
     //  Create a socket to check it'll be automatically deleted
-    zctx_socket_new (ctx, ZMQ_PUSH);
-
+    zsocket_new (ctx, ZMQ_PUSH);
     //  Wait for our parent to ping us, and pong back
     free (zstr_recv (pipe));
     zstr_send (pipe, "pong");
@@ -92,14 +91,16 @@ s_test_attached (void *args, zctx_t *ctx, void *pipe)
 
     zctx_t *ctx = zctx_new ();
 
-    //  Create a child thread, check it's safely alive
+    //  Create a detached thread, let it run
+    zthread_new (ctx, s_test_detached, NULL);
+    zclock_sleep (100);
+
+    //  Create an attached thread, check it's safely alive
     void *pipe = zthread_fork (ctx, s_test_attached, NULL);
     zstr_send (pipe, "ping");
     char *pong = zstr_recv (pipe);
     assert (streq (pong, "pong"));
     free (pong);
-
-    zthread_new (ctx, s_test_detached, NULL);
 
     //  Everything should be cleanly closed now
     zctx_destroy (&ctx);

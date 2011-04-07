@@ -12,6 +12,10 @@ SYNOPSIS
 char *
     zstr_recv (void *socket);
 
+//  Receive a string off a socket if socket had input waiting
+char *
+    zstr_recv_nowait (void *socket);
+
 //  Send a string to a socket in 0MQ string format
 int
     zstr_send (void *socket, const char *string);
@@ -44,9 +48,9 @@ EXAMPLE
 ----
     zctx_t *ctx = zctx_new ();
 
-    void *output = zctx_socket_new (ctx, ZMQ_PAIR);
+    void *output = zsocket_new (ctx, ZMQ_PAIR);
     zmq_bind (output, "inproc://zstr.test");
-    void *input = zctx_socket_new (ctx, ZMQ_PAIR);
+    void *input = zsocket_new (ctx, ZMQ_PAIR);
     zmq_connect (input, "inproc://zstr.test");
 
     //  Send ten strings and then END

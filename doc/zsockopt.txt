@@ -160,7 +160,8 @@ EXAMPLE
 ----
     zctx_t *ctx = zctx_new ();
 
-    void *socket = zsocket_new (ctx, ZMQ_PUB);
+    //  All options are valid on SUB sockets
+    void *socket = zsocket_new (ctx, ZMQ_SUB);
 
     zsockopt_set_hwm (socket, 1);
     assert (zsockopt_hwm (socket) == 1);

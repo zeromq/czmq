@@ -39,6 +39,7 @@
 #include <zloop.h>
 #include <zmsg.h>
 #include <zsocket.h>
+#include <zsockopt.h>
 #include <zstr.h>
 #include <zthread.h>
 
