@@ -286,9 +286,9 @@ zframe_test (Bool verbose)
     zctx_t *ctx = zctx_new ();
 
     void *output = zsocket_new (ctx, ZMQ_PAIR);
-    zmq_bind (output, "inproc://zframe.test");
+    zsocket_bind (output, "inproc://zframe.test");
     void *input = zsocket_new (ctx, ZMQ_PAIR);
-    zmq_connect (input, "inproc://zframe.test");
+    zsocket_connect (input, "inproc://zframe.test");
 
     //  Send five different frames, test ZFRAME_MORE
     int frame_nbr;

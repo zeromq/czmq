@@ -419,9 +419,9 @@ zmsg_test (Bool verbose)
     zctx_t *ctx = zctx_new ();
 
     void *output = zsocket_new (ctx, ZMQ_PAIR);
-    zmq_bind (output, "inproc://zmsg.test");
+    zsocket_bind (output, "inproc://zmsg.test");
     void *input = zsocket_new (ctx, ZMQ_PAIR);
-    zmq_connect (input, "inproc://zmsg.test");
+    zsocket_connect (input, "inproc://zmsg.test");
 
     //  Test send and receive of single-frame message
     zmsg_t *msg = zmsg_new ();

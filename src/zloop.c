@@ -293,9 +293,9 @@ zloop_test (Bool verbose)
     zctx_t *ctx = zctx_new ();
 
     void *output = zsocket_new (ctx, ZMQ_PAIR);
-    zmq_bind (output, "inproc://zloop.test");
+    zsocket_bind (output, "inproc://zloop.test");
     void *input = zsocket_new (ctx, ZMQ_PAIR);
-    zmq_connect (input, "inproc://zloop.test");
+    zsocket_connect (input, "inproc://zloop.test");
 
     zloop_t *loop = zloop_new ();
     assert (loop);
