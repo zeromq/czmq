@@ -13,7 +13,8 @@ include_HEADERS = \
     ../include/zlist.h \
     ../include/zloop.h \
     ../include/zmsg.h \
-    ../include/zstr.h
+    ../include/zstr.h \
+    ../include/zthread.h
 
 libzapi_la_SOURCES = \
     zclock.c \
@@ -23,7 +24,8 @@ libzapi_la_SOURCES = \
     zlist.c \
     zloop.c \
     zmsg.c \
-    zstr.c 
+    zstr.c \
+    zthread.c
 
 INCLUDES = -I$(top_srcdir)/include
 bin_PROGRAMS = zapi_selftest

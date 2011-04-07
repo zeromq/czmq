@@ -39,5 +39,6 @@
 #include <zloop.h>
 #include <zmsg.h>
 #include <zstr.h>
+#include <zthread.h>
 
 #endif
