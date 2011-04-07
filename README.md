@@ -21,26 +21,27 @@
 &emsp;<a href="#toc4-154">zframe - working with single message frames</a>
 &emsp;<a href="#toc4-165">zmsg - working with multipart messages</a>
 &emsp;<a href="#toc4-176">zloop - event-driven reactor</a>
-&emsp;<a href="#toc4-187">zhash - expandable hash table container</a>
-&emsp;<a href="#toc4-198">zlist - singly-linked list container</a>
-&emsp;<a href="#toc4-209">zclock - millisecond clocks and delays</a>
+&emsp;<a href="#toc4-187">zthread - working with system threads</a>
+&emsp;<a href="#toc4-198">zhash - expandable hash table container</a>
+&emsp;<a href="#toc4-209">zlist - singly-linked list container</a>
+&emsp;<a href="#toc4-220">zclock - millisecond clocks and delays</a>
 
-**<a href="#toc2-220">Design Ideology</a>**
-&emsp;<a href="#toc3-223">The Problem with C</a>
-&emsp;<a href="#toc3-232">A Simple Class Model</a>
-&emsp;<a href="#toc3-259">Naming Style</a>
-&emsp;<a href="#toc3-268">Containers</a>
-&emsp;<a href="#toc3-280">Portability</a>
-&emsp;<a href="#toc3-306">Technical Aspects</a>
+**<a href="#toc2-231">Design Ideology</a>**
+&emsp;<a href="#toc3-234">The Problem with C</a>
+&emsp;<a href="#toc3-243">A Simple Class Model</a>
+&emsp;<a href="#toc3-270">Naming Style</a>
+&emsp;<a href="#toc3-279">Containers</a>
+&emsp;<a href="#toc3-291">Portability</a>
+&emsp;<a href="#toc3-317">Technical Aspects</a>
 
-**<a href="#toc2-316">Under the Hood</a>**
-&emsp;<a href="#toc3-319">Adding a New Class</a>
-&emsp;<a href="#toc3-332">Coding Style</a>
-&emsp;<a href="#toc3-351">Assertions</a>
-&emsp;<a href="#toc3-369">Documentation</a>
-&emsp;<a href="#toc3-408">Development</a>
-&emsp;<a href="#toc3-418">Porting libzapi</a>
-&emsp;<a href="#toc3-431">This Document</a>
+**<a href="#toc2-327">Under the Hood</a>**
+&emsp;<a href="#toc3-330">Adding a New Class</a>
+&emsp;<a href="#toc3-343">Coding Style</a>
+&emsp;<a href="#toc3-362">Assertions</a>
+&emsp;<a href="#toc3-380">Documentation</a>
+&emsp;<a href="#toc3-419">Development</a>
+&emsp;<a href="#toc3-429">Porting libzapi</a>
+&emsp;<a href="#toc3-442">This Document</a>
 
 <A name="toc2-11" title="Overview" />
 ## Overview
@@ -152,18 +153,9 @@ usage is 1 I/O thread. Lets you configure this value.
 such as zmq_recv() and zmq_poll() will return when the user presses
 Ctrl-C.
 
-* Provides API to create child threads with a pipe (PAIR socket) to talk
-to them.
 
 This is the class interface:
 
-    //  Structure passed to threads created via this class
-    typedef struct {
-        zctx_t *ctx;                //  Context shared with parent thread
-        void *pipe;                 //  Pipe to parent thread (PAIR)
-        void *arg;                  //  Application argument
-    } zthread_t;
-    
     //  Create new context, returns context object, replaces zmq_init
     zctx_t *
         zctx_new (void);
@@ -171,13 +163,17 @@ This is the class interface:
     //  Destroy context and all sockets in it, replaces zmq_term
     void
         zctx_destroy (zctx_t **self_p);
-        
-    //  Raise default I/O threads from 1, for crazy heavy applications    
+    
+    //  Create new shadow context, returns context object
+    zctx_t *
+        zctx_shadow (zctx_t *self);
+    
+    //  Raise default I/O threads from 1, for crazy heavy applications
     void
         zctx_set_iothreads (zctx_t *self, int iothreads);
-        
+    
     //  Set msecs to flush sockets when closing them
-    void 
+    void
         zctx_set_linger (zctx_t *self, int linger);
     
     //  Create socket within this context, replaces zmq_socket
@@ -188,12 +184,6 @@ This is the class interface:
     void
         zctx_socket_destroy (zctx_t *self, void *socket);
     
-    //  Create thread, return PAIR socket to talk to thread. The child thread
-    //  receives a (zthread_t *) object including a zctx, a pipe back to the
-    //  creating thread, and the arg passed in this call.
-    void *
-        zctx_thread_new (zctx_t *self, void *(*thread_fn) (void *), void *arg);
-    
     //  Self test of this class
     int
         zctx_test (Bool verbose);
@@ -202,40 +192,14 @@ This is the class interface:
     //  gets a SIGTERM signal.
     extern int zctx_interrupted;
 
-One problem is when our application needs child threads. If we simply
-use pthreads_create() we're faced with several issues. First, it's not
-portable to legacy OSes like win32. Second, how can a child thread get
-access to our zctx object? If we just pass it around, we'll end up
-sharing the pipe socket (which we use to talk to the agent) between
-threads, and that will then crash ØMQ. Sockets cannot be used from more
-than one thread at a time.
-
-So each child thread needs its own pipe to the agent. For the agent,
-this is fine, it can talk to a million threads. But how do we create
-those pipes in the child thread? We can't, not without help from the
-main thread. The solution is to wrap thread creation, like we wrap
-socket creation. To create a new thread, the app calls zctx_thread_new()
-and this method creates a dedicated zctx object, with a pipe, and then
-it passes that object to the newly minted child thread.
-
-The neat thing is we can hide non-portable aspects. Windows is really a
-mess when it comes to threads. Three different APIs, none of which is
-really right, so you have to do rubbish like manually cleaning up when
-a thread finishes. Anyhow, it's hidden in this class so you don't need
-to worry.
-
-Second neat thing about wrapping thread creation is we can make it a
-more enriching experience for all involved. One thing I do often is use
-a PAIR-PAIR pipe to talk from a thread to/from its parent. So this class
-will automatically create such a pair for each thread you start.
 
 <A name="toc4-129" title="zstr - sending and receiving strings" />
 #### zstr - sending and receiving strings
 
-The zstr class provides utility functions for sending and receiving C 
-strings across ØMQ sockets. It sends strings without a terminating null, 
-and appends a null byte on received strings. This class is for simple 
-message sending. 
+The zstr class provides utility functions for sending and receiving C
+strings across ØMQ sockets. It sends strings without a terminating null,
+and appends a null byte on received strings. This class is for simple
+message sending.
 
 <center>
 <img src="https://github.com/zeromq/libzapi/raw/master/images/README_2.png" alt="2">
@@ -251,6 +215,10 @@ This is the class interface:
     int
         zstr_send (void *socket, const char *string);
     
+    //  Send a string to a socket in ØMQ string format, with MORE flag
+    int
+        zstr_sendm (void *socket, const char *string);
+    
     //  Send a formatted string to a socket
     int
         zstr_sendf (void *socket, const char *format, ...);
@@ -263,12 +231,12 @@ This is the class interface:
 <A name="toc4-154" title="zframe - working with single message frames" />
 #### zframe - working with single message frames
 
-The zframe class provides methods to send and receive single message 
-frames across ØMQ sockets. A 'frame' corresponds to one zmq_msg_t. When 
-you read a frame from a socket, the zframe_more() method indicates if the 
-frame is part of an unfinished multipart message. The zframe_send method 
-normally destroys the frame, but with the ZFRAME_REUSE flag, you can send 
-the same frame many times. Frames are binary, and this class has no 
+The zframe class provides methods to send and receive single message
+frames across ØMQ sockets. A 'frame' corresponds to one zmq_msg_t. When
+you read a frame from a socket, the zframe_more() method indicates if the
+frame is part of an unfinished multipart message. The zframe_send method
+normally destroys the frame, but with the ZFRAME_REUSE flag, you can send
+the same frame many times. Frames are binary, and this class has no
 special support for text data.
 
 This is the class interface:
@@ -300,9 +268,33 @@ This is the class interface:
     void *
         zframe_data (zframe_t *self);
     
+    //  Create a new frame that duplicates an existing frame
+    zframe_t *
+        zframe_dup (zframe_t *self);
+    
+    //  Return frame data encoded as printable hex string
+    char *
+        zframe_strhex (zframe_t *self);
+    
+    //  Return frame data copied into freshly allocated string
+    char *
+        zframe_strdup (zframe_t *self);
+    
+    //  Return TRUE if frame body is equal to string, excluding terminator
+    Bool
+        zframe_streq (zframe_t *self, char *string);
+    
     //  Return frame 'more' property
     int
         zframe_more (zframe_t *self);
+    
+    //  Print contents of frame to stderr
+    void
+        zframe_print (zframe_t *self, char *prefix);
+    
+    //  Set new contents for frame
+    void
+        zframe_reset (zframe_t *self, const void *data, size_t size);
     
     //  Self test of this class
     int
@@ -326,15 +318,15 @@ This is the class interface:
     //  Destroy a message object and all frames it contains
     void
         zmsg_destroy (zmsg_t **self_p);
-        
+    
     //  Read 1 or more frames off the socket, into a new message object
     zmsg_t *
         zmsg_recv (void *socket);
-        
+    
     //  Send a message to the socket, and then destroy it
     void
         zmsg_send (zmsg_t **self_p, void *socket);
-        
+    
     //  Return number of frames in message
     size_t
         zmsg_size (zmsg_t *self);
@@ -343,9 +335,13 @@ This is the class interface:
     void
         zmsg_push (zmsg_t *self, zframe_t *frame);
     
-    //  Append frame to end of message, after last frame
+    //  Pop frame off front of message, caller now owns frame
+    zframe_t *
+        zmsg_pop (zmsg_t *self);
+    
+    //  Add frame to end of message, after last frame
     void
-        zmsg_append (zmsg_t *self, zframe_t *frame);
+        zmsg_add (zmsg_t *self, zframe_t *frame);
     
     //  Push block of memory as new frame to front of message
     void
@@ -353,11 +349,29 @@ This is the class interface:
     
     //  Push block of memory as new frame to end of message
     void
-        zmsg_appendmem (zmsg_t *self, const void *src, size_t size);
+        zmsg_addmem (zmsg_t *self, const void *src, size_t size);
+    
+    //  Push string as new frame to front of message
+    void
+        zmsg_pushstr (zmsg_t *self, const char *string);
+    
+    //  Push string as new frame to end of message
+    void
+        zmsg_addstr (zmsg_t *self, const char *string);
+    
+    //  Pop frame off front of message, return as fresh string
+    char *
+        zmsg_popstr (zmsg_t *self);
+    
+    //  Push frame to front of message, before first frame
+    //  Pushes an empty frame in front of frame
+    void
+        zmsg_wrap (zmsg_t *self, zframe_t *frame);
     
     //  Pop frame off front of message, caller now owns frame
+    //  If next frame is empty, pops and destroys that empty frame.
     zframe_t *
-        zmsg_pop (zmsg_t *self);
+        zmsg_unwrap (zmsg_t *self);
     
     //  Remove frame from message, at any position, caller owns it
     void
@@ -371,9 +385,9 @@ This is the class interface:
     zframe_t *
         zmsg_next (zmsg_t *self);
     
-    //  Return first body frame, i.e. after first null frame
+    //  Return last frame in message, or null
     zframe_t *
-        zmsg_body (zmsg_t *self);
+        zmsg_last (zmsg_t *self);
     
     //  Save message to an open file
     void
@@ -382,6 +396,10 @@ This is the class interface:
     //  Load a message from an open file
     zmsg_t *
         zmsg_load (FILE *file);
+    
+    //  Create copy of message, as new message object
+    zmsg_t *
+        zmsg_dup (zmsg_t *self);
     
     //  Print message to stderr, for debugging
     void
@@ -436,7 +454,65 @@ This is the class interface:
         zloop_test (Bool verbose);
 
 
-<A name="toc4-187" title="zhash - expandable hash table container" />
+<A name="toc4-187" title="zthread - working with system threads" />
+#### zthread - working with system threads
+
+The zthread class wraps OS thread creation. It creates detached threads
+that look like normal OS threads, or attached threads that share the
+caller's ØMQ context, and get a pipe to talk back to the parent thread.
+
+This is the class interface:
+
+    //  Detached threads follow POSIX pthreads API
+    typedef void *(zthread_detached_fn) (void *args);
+    
+    //  Attached threads get context and pipe from parent
+    typedef void (zthread_attached_fn) (void *args, zctx_t *ctx, void *pipe);
+    
+    //  Create a detached thread. A detached thread operates autonomously
+    //  and is used to simulate a separate process. It gets no ctx, and no
+    //  pipe.
+    void
+        zthread_new (zctx_t *self, zthread_detached_fn *thread_fn, void *args);
+    
+    //  Create an attached thread. An attached thread gets a ctx and a PAIR
+    //  pipe back to its parent. It must monitor its pipe, and exit if the
+    //  pipe becomes unreadable.
+    void *
+        zthread_fork (zctx_t *self, zthread_attached_fn *thread_fn, void *args);
+    
+    //  Self test of this class
+    int
+        zthread_test (Bool verbose);
+
+One problem is when our application needs child threads. If we simply
+use pthreads_create() we're faced with several issues. First, it's not
+portable to legacy OSes like win32. Second, how can a child thread get
+access to our zctx object? If we just pass it around, we'll end up
+sharing the pipe socket (which we use to talk to the agent) between
+threads, and that will then crash ØMQ. Sockets cannot be used from more
+than one thread at a time.
+
+So each child thread needs its own pipe to the agent. For the agent,
+this is fine, it can talk to a million threads. But how do we create
+those pipes in the child thread? We can't, not without help from the
+main thread. The solution is to wrap thread creation, like we wrap
+socket creation. To create a new thread, the app calls zctx_thread_new()
+and this method creates a dedicated zctx object, with a pipe, and then
+it passes that object to the newly minted child thread.
+
+The neat thing is we can hide non-portable aspects. Windows is really a
+mess when it comes to threads. Three different APIs, none of which is
+really right, so you have to do rubbish like manually cleaning up when
+a thread finishes. Anyhow, it's hidden in this class so you don't need
+to worry.
+
+Second neat thing about wrapping thread creation is we can make it a
+more enriching experience for all involved. One thing I do often is use
+a PAIR-PAIR pipe to talk from a thread to/from its parent. So this class
+will automatically create such a pair for each thread you start.
+
+<A name="toc4-198" title="zhash - expandable hash table container" />
 #### zhash - expandable hash table container
 
 Expandable hash table container
@@ -492,7 +568,7 @@ Note that it's relatively slow (~50k insertions/deletes per second), so
 don't do inserts/updates on the critical path for message I/O.  It can
 do ~2.5M lookups per second for 16-char keys.  Timed on a 1.6GHz CPU.
 
-<A name="toc4-198" title="zlist - singly-linked list container" />
+<A name="toc4-209" title="zlist - singly-linked list container" />
 #### zlist - singly-linked list container
 
 Provides a generic container implementing a fast singly-linked list. You
@@ -546,41 +622,46 @@ This is the class interface:
         zlist_test (int verbose);
 
 
-<A name="toc4-209" title="zclock - millisecond clocks and delays" />
+<A name="toc4-220" title="zclock - millisecond clocks and delays" />
 #### zclock - millisecond clocks and delays
 
-The zclock class provides essential sleep and system time functions, used 
-to slow down threads for testing, and calculate timers for polling. Wraps 
+The zclock class provides essential sleep and system time functions, used
+to slow down threads for testing, and calculate timers for polling. Wraps
 the non-portable system calls in a simple portable API.
 
 This is the class interface:
 
     //  Sleep for a number of milliseconds
-    void 
+    void
         zclock_sleep (int msecs);
     
     //  Return current system clock as milliseconds
-    int64_t 
+    int64_t
         zclock_time (void);
     
+    //  Print formatted string to stdout, prefixed by date/time and
+    //  terminated with a newline.
+    void
+        zclock_log (const char *format, ...);
+    
     //  Self test of this class
-    int 
+    int
         zclock_test (Bool verbose);
 
 This class contains some small surprises. Most amazing, win32 did an API
 better than POSIX. The win32 Sleep() call is not only a neat 1-liner, it
 also sleeps for milliseconds, whereas the POSIX call asks us to think in
 terms of nanoseconds, which is insane. I've decided every single man page
-for this library will say "insane" at least once. Anyhow, milliseconds 
-are a concept we can deal with. Seconds are too fat, nanoseconds too 
+for this library will say "insane" at least once. Anyhow, milliseconds
+are a concept we can deal with. Seconds are too fat, nanoseconds too
 tiny, but milliseconds are just right for slices of time we want to work
 with at the ØMQ scale. zclock doesn't give you objects to work with, we
 like the zapi class model but we're not insane. There, got it in again.
 
-<A name="toc2-220" title="Design Ideology" />
+<A name="toc2-231" title="Design Ideology" />
 ## Design Ideology
 
-<A name="toc3-223" title="The Problem with C" />
+<A name="toc3-234" title="The Problem with C" />
 ### The Problem with C
 
 C has the significant advantage of being a small language that, if we take a little care with formatting and naming, can be easily interchanged between developers. Every C developer will use much the same 90% of the language. Larger languages like C++ provide powerful abstractions like STL containers but at the cost of interchange.
@@ -589,7 +670,7 @@ The huge problem with C is that any realistic application needs packages of func
 
 The answer to this, as we learned from building enterprise-level C applications at iMatix from 1995-2005, is to create our own fully portable, high-quality libraries of pre-packaged functionality, in C. Doing this right solves both the requirements of richness of the language, and of portability of the final applications.
 
-<A name="toc3-232" title="A Simple Class Model" />
+<A name="toc3-243" title="A Simple Class Model" />
 ### A Simple Class Model
 
 C has no standard API style. It is one thing to write a useful component, but something else to provide an API that is consistent and obvious across many components. We learned from building [OpenAMQ](http://www.openamq.org), a messaging client and server of 0.5M LoC, that a consistent model for extending C makes life for the application developer much easier.
@@ -616,7 +697,7 @@ No model is fully consistent, and classes can define their own rules if it helps
 
 * While every class has a destroy method that is the formal destructor, some methods may also act as destructors. For example, a method that sends an object may also destroy the object (so that ownership of any buffers can passed to background threads). Such methods take the same "pointer to a reference" argument as the destroy method.
 
-<A name="toc3-259" title="Naming Style" />
+<A name="toc3-270" title="Naming Style" />
 ### Naming Style
 
 libzapi aims for short, consistent names, following the theory that names we use most often should be shortest. Classes get one-word names, unless they are part of a family of classes in which case they may be two words, the first being the family name. Methods, similarly, get one-word names and we aim for consistency across classes (so a method that does something semantically similar in two classes will get the same name in both). So the canonical name for any method is:
@@ -625,7 +706,7 @@ libzapi aims for short, consistent names, following the theory that names we use
 
 And the reader can easily parse this without needing special syntax to separate the class name from the method name.
 
-<A name="toc3-268" title="Containers" />
+<A name="toc3-279" title="Containers" />
 ### Containers
 
 After a long experiment with containers, we've decided that we need exactly two containers:
@@ -637,7 +718,7 @@ These are zlist and zhash, respectively. Both store void pointers, with no attem
 
 We assume that at some point we'll need to switch to a doubly-linked list.
 
-<A name="toc3-280" title="Portability" />
+<A name="toc3-291" title="Portability" />
 ### Portability
 
 Creating a portable C application can be rewarding in terms of maintaining a single code base across many platforms, and keeping (expensive) system-specific knowledge separate from application developers. In most projects (like ØMQ core), there is no portability layer and application code does conditional compilation for all mixes of platforms. This leads to quite messy code.
@@ -663,7 +744,7 @@ An example of the last:
 
 libzapi uses the GNU autotools system, so non-portable code can use the macros this defines. It can also use macros defined by the zapi_prelude.h header file.
 
-<A name="toc3-306" title="Technical Aspects" />
+<A name="toc3-317" title="Technical Aspects" />
 ### Technical Aspects
 
 * *Thread safety*: the use of opaque structures is thread safe, though ØMQ applications should not share state between threads in any case.
@@ -673,10 +754,10 @@ libzapi uses the GNU autotools system, so non-portable code can use the macros t
 * *Self-testing*: every class has a `selftest` method that runs through the methods of the class. In theory, calling all selftest functions of all classes does a full unit test of the library. The `zapi_selftest` application does this.
 * *Memory management*: libzapi classes do not use any special memory management techiques to detect leaks. We've done this in the past but it makes the code relatively complex. Instead, we do memory leak testing using tools like valgrind.
 
-<A name="toc2-316" title="Under the Hood" />
+<A name="toc2-327" title="Under the Hood" />
 ## Under the Hood
 
-<A name="toc3-319" title="Adding a New Class" />
+<A name="toc3-330" title="Adding a New Class" />
 ### Adding a New Class
 
 If you define a new libzapi class `myclass` you need to:
@@ -689,7 +770,7 @@ If you define a new libzapi class `myclass` you need to:
 
 The `bin/newclass.sh` shell script will automate these steps for you.
 
-<A name="toc3-332" title="Coding Style" />
+<A name="toc3-343" title="Coding Style" />
 ### Coding Style
 
 In general the zctx class defines the style for the whole library. The overriding rules for coding style are consistency, clarity, and ease of maintenance. We use the C99 standard for syntax including principally:
@@ -708,7 +789,7 @@ The style in libzapi would be:
 
     zblob_t *file_buffer = zblob_new ();
 
-<A name="toc3-351" title="Assertions" />
+<A name="toc3-362" title="Assertions" />
 ### Assertions
 
 We use assertions heavily to catch bad argument values. The libzapi classes do not attempt to validate arguments and report errors; bad arguments are treated as fatal application programming errors.
@@ -726,28 +807,28 @@ Rather than the side-effect form:
 
 Since assertions may be removed by an optimizing compiler.
 
-<A name="toc3-369" title="Documentation" />
+<A name="toc3-380" title="Documentation" />
 ### Documentation
 
 Man pages are generated from the class header and source files via the doc/mkman tool, and similar functionality in the gitdown tool (http://github.com/imatix/gitdown). The header file for a class must wrap its interface as follows (example is from include/zclock.h):
 
     //  @interface
     //  Sleep for a number of milliseconds
-    void 
+    void
         zclock_sleep (int msecs);
 
     //  Return current system clock as milliseconds
-    int64_t 
+    int64_t
         zclock_time (void);
 
     //  Self test of this class
-    int 
+    int
         zclock_test (Bool verbose);
     //  @end
 
 The source file for a class must provide documentation as follows:
 
-    /*  
+    /*
     @header
     ...short explanation of class...
     @discuss
@@ -765,7 +846,7 @@ The source file for a class then provides the self test example as follows:
 
 The template for man pages is in doc/mkman.
 
-<A name="toc3-408" title="Development" />
+<A name="toc3-419" title="Development" />
 ### Development
 
 libzapi is developed through a test-driven process that guarantees no memory violations or leaks in the code:
@@ -775,7 +856,7 @@ libzapi is developed through a test-driven process that guarantees no memory vio
 * Run the 'selftest' script, which uses the Valgrind memcheck tool.
 * Repeat until perfect.
 
-<A name="toc3-418" title="Porting libzapi" />
+<A name="toc3-429" title="Porting libzapi" />
 ### Porting libzapi
 
 When you try libzapi on an OS that it's not been used on (ever, or for a while), you will hit code that does not compile. In some cases the patches are trivial, in other cases (usually when porting to Windows), the work needed to build equivalent functionality may be quite heavy. In any case, the benefit is that once ported, the functionality is available to all applications.
@@ -788,7 +869,7 @@ Before attempting to patch code for portability, please read the `zapi_prelude.h
 
 The canonical 'standard operating system' for all libzapi code is Linux, gcc, POSIX.
 
-<A name="toc3-431" title="This Document" />
+<A name="toc3-442" title="This Document" />
 ### This Document
 
 This document is originally at README.txt and is built using [gitdown](http://github.com/imatix/gitdown).

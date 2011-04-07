@@ -169,6 +169,16 @@ This is the class interface:
 
 .pull src/zloop.c@discuss,left
 
+#### zthread - working with system threads
+
+.pull src/zthread.c@header,left
+
+This is the class interface:
+
+.pull include/zthread.h@interface,code
+
+.pull src/zthread.c@discuss,left
+
 #### zhash - expandable hash table container
 
 .pull src/zhash.c@header,left
@@ -343,21 +353,21 @@ Man pages are generated from the class header and source files via the doc/mkman
 
     //  @interface
     //  Sleep for a number of milliseconds
-    void 
+    void
         zclock_sleep (int msecs);
 
     //  Return current system clock as milliseconds
-    int64_t 
+    int64_t
         zclock_time (void);
 
     //  Self test of this class
-    int 
+    int
         zclock_test (Bool verbose);
     //  @end
 
 The source file for a class must provide documentation as follows:
 
-    /*  
+    /*
     @header
     ...short explanation of class...
     @discuss
