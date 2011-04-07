@@ -36,6 +36,7 @@
 #include "../include/zctx.h"
 #include "../include/zframe.h"
 #include "../include/zlist.h"
+#include "../include/zsocket.h"
 #include "../include/zmsg.h"
 
 //  Structure of our class
@@ -417,9 +418,9 @@ zmsg_test (Bool verbose)
     //  @selftest
     zctx_t *ctx = zctx_new ();
 
-    void *output = zctx_socket_new (ctx, ZMQ_PAIR);
+    void *output = zsocket_new (ctx, ZMQ_PAIR);
     zmq_bind (output, "inproc://zmsg.test");
-    void *input = zctx_socket_new (ctx, ZMQ_PAIR);
+    void *input = zsocket_new (ctx, ZMQ_PAIR);
     zmq_connect (input, "inproc://zmsg.test");
 
     //  Test send and receive of single-frame message

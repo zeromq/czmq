@@ -56,6 +56,7 @@
 #include "../include/zlist.h"
 #include "../include/zstr.h"
 #include "../include/zframe.h"
+#include "../include/zsockopt.h"
 #include "../include/zctx.h"
 
 //  Structure of our class
@@ -121,7 +122,7 @@ zctx_destroy (zctx_t **self_p)
         zctx_t *self = *self_p;
         while (zlist_size (self->sockets)) {
             void *socket = zlist_first (self->sockets);
-            zmq_setsockopt (socket, ZMQ_LINGER, &self->linger, sizeof (int));
+            zsockopt_set_linger (socket, self->linger);
             zmq_close (socket);
             zlist_remove (self->sockets, socket);
         }
@@ -179,13 +180,10 @@ zctx_set_linger (zctx_t *self, int linger)
 
 
 //  --------------------------------------------------------------------------
-//  Create new 0MQ socket and register for this context. Use this instead of
-//  the 0MQ core API method if you want automatic management of the socket
-//  at shutdown. If the context has not yet been initialized, this method will
-//  initialize it.
+//  Create socket within this context, for libzapi use only
 
 void *
-zctx_socket_new (zctx_t *self, int type)
+zctx__socket_new (zctx_t *self, int type)
 {
     assert (self);
     //  Initialize context now if necessary
@@ -201,15 +199,14 @@ zctx_socket_new (zctx_t *self, int type)
 
 
 //  --------------------------------------------------------------------------
-//  Destroy the socket. You must use this for any socket created via the
-//  zctx_socket_new method.
+//  Destroy socket within this context, for libzapi use only
 
 void
-zctx_socket_destroy (zctx_t *self, void *socket)
+zctx__socket_destroy (zctx_t *self, void *socket)
 {
     assert (self);
     assert (socket);
-    zmq_setsockopt (socket, ZMQ_LINGER, &self->linger, sizeof (int));
+    zsockopt_set_linger (socket, self->linger);
     zmq_close (socket);
     zlist_remove (self->sockets, socket);
 }
@@ -234,12 +231,12 @@ zctx_test (Bool verbose)
     ctx = zctx_new ();
     zctx_set_iothreads (ctx, 1);
     zctx_set_linger (ctx, 5);       //  5 msecs
-    void *s1 = zctx_socket_new (ctx, ZMQ_PAIR);
-    void *s2 = zctx_socket_new (ctx, ZMQ_XREQ);
-    void *s3 = zctx_socket_new (ctx, ZMQ_REQ);
-    void *s4 = zctx_socket_new (ctx, ZMQ_REP);
-    void *s5 = zctx_socket_new (ctx, ZMQ_PUB);
-    void *s6 = zctx_socket_new (ctx, ZMQ_SUB);
+    void *s1 = zctx__socket_new (ctx, ZMQ_PAIR);
+    void *s2 = zctx__socket_new (ctx, ZMQ_XREQ);
+    void *s3 = zctx__socket_new (ctx, ZMQ_REQ);
+    void *s4 = zctx__socket_new (ctx, ZMQ_REP);
+    void *s5 = zctx__socket_new (ctx, ZMQ_PUB);
+    void *s6 = zctx__socket_new (ctx, ZMQ_SUB);
     zmq_connect (s1, "tcp://127.0.0.1:5555");
     zmq_connect (s2, "tcp://127.0.0.1:5555");
     zmq_connect (s3, "tcp://127.0.0.1:5555");

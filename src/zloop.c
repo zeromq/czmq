@@ -37,6 +37,7 @@
 #include "../include/zctx.h"
 #include "../include/zlist.h"
 #include "../include/zstr.h"
+#include "../include/zsocket.h"
 #include "../include/zloop.h"
 
 //  Structure of our class
@@ -291,9 +292,9 @@ zloop_test (Bool verbose)
     //  @selftest
     zctx_t *ctx = zctx_new ();
 
-    void *output = zctx_socket_new (ctx, ZMQ_PAIR);
+    void *output = zsocket_new (ctx, ZMQ_PAIR);
     zmq_bind (output, "inproc://zloop.test");
-    void *input = zctx_socket_new (ctx, ZMQ_PAIR);
+    void *input = zsocket_new (ctx, ZMQ_PAIR);
     zmq_connect (input, "inproc://zloop.test");
 
     zloop_t *loop = zloop_new ();

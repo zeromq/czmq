@@ -34,6 +34,7 @@
 
 #include "../include/zapi_prelude.h"
 #include "../include/zctx.h"
+#include "../include/zsocket.h"
 #include "../include/zstr.h"
 
 
@@ -157,9 +158,9 @@ zstr_test (Bool verbose)
     //  @selftest
     zctx_t *ctx = zctx_new ();
 
-    void *output = zctx_socket_new (ctx, ZMQ_PAIR);
+    void *output = zsocket_new (ctx, ZMQ_PAIR);
     zmq_bind (output, "inproc://zstr.test");
-    void *input = zctx_socket_new (ctx, ZMQ_PAIR);
+    void *input = zsocket_new (ctx, ZMQ_PAIR);
     zmq_connect (input, "inproc://zstr.test");
 
     //  Send ten strings and then END

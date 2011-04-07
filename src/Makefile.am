@@ -13,6 +13,8 @@ include_HEADERS = \
     ../include/zlist.h \
     ../include/zloop.h \
     ../include/zmsg.h \
+    ../include/zsocket.h \
+    ../include/zsockopt.h \
     ../include/zstr.h \
     ../include/zthread.h
 
@@ -24,6 +26,8 @@ libzapi_la_SOURCES = \
     zlist.c \
     zloop.c \
     zmsg.c \
+    zsocket.c \
+    zsockopt.c \
     zstr.c \
     zthread.c
 

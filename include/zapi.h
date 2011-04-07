@@ -38,6 +38,7 @@
 #include <zlist.h>
 #include <zloop.h>
 #include <zmsg.h>
+#include <zsocket.h>
 #include <zstr.h>
 #include <zthread.h>
 

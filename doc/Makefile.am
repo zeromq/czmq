@@ -8,6 +8,8 @@ MAN7 = libzapi.7 \
     zlist.7 \
     zloop.7 \
     zmsg.7 \
+    zsocket.7 \
+    zsockopt.7 \
     zstr.7 \
     zthread.7
 MAN_DOC = $(MAN1) $(MAN3) $(MAN7)

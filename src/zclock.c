@@ -87,10 +87,9 @@ zclock_log (const char *format, ...)
 {
     time_t curtime = time (NULL);
     struct tm *loctime = localtime (&curtime);
-    char *formatted = malloc (20);
+    char formatted [20];
     strftime (formatted, 20, "%y-%m-%d %H:%M:%S ", loctime);
     printf ("%s", formatted);
-    free (formatted);
 
     va_list argptr;
     va_start (argptr, format);

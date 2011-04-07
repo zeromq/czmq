@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zctx - working with 0MQ contexts
+    zsocket - working with 0MQ sockets
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
@@ -22,53 +22,37 @@
     =========================================================================
 */
 
-#ifndef __ZCTX_H_INCLUDED__
-#define __ZCTX_H_INCLUDED__
+#ifndef __ZSOCKET_H_INCLUDED__
+#define __ZSOCKET_H_INCLUDED__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
-//  Opaque class structure
-typedef struct _zctx_t zctx_t;
-
 //  @interface
-//  Create new context, returns context object, replaces zmq_init
-zctx_t *
-    zctx_new (void);
-
-//  Destroy context and all sockets in it, replaces zmq_term
-void
-    zctx_destroy (zctx_t **self_p);
-
-//  Create new shadow context, returns context object
-zctx_t *
-    zctx_shadow (zctx_t *self);
-
-//  Raise default I/O threads from 1, for crazy heavy applications
-void
-    zctx_set_iothreads (zctx_t *self, int iothreads);
-
-//  Set msecs to flush sockets when closing them
-void
-    zctx_set_linger (zctx_t *self, int linger);
-
-//  Create socket within this context, for libzapi use only
+//  Create a new socket within our libzapi context, replaces zmq_socket.
+//  If the socket is a SUB socket, automatically subscribes to everything.
+//  Use this to get automatic management of the socket at shutdown.
 void *
-    zctx__socket_new (zctx_t *self, int type);
+    zsocket_new (zctx_t *self, int type);
 
-//  Destroy socket within this context, for libzapi use only
+//  Destroy a socket within our libzapi context, replaces zmq_close.
 void
-    zctx__socket_destroy (zctx_t *self, void *socket);
+    zsocket_destroy (zctx_t *self, void *socket);
+
+//  Bind a socket to a formatted endpoint
+//  Checks with assertion that the bind was valid
+void
+    zsocket_bind (void *socket, const char *format, ...);
+
+//  Connect a socket to a formatted endpoint
+//  Checks with assertion that the connect was valid
+void
+    zsocket_connect (void *socket, const char *format, ...);
 
 //  Self test of this class
 int
-    zctx_test (Bool verbose);
-
-//  Global signal indicator, TRUE when user presses Ctrl-C or the process
-//  gets a SIGTERM signal.
-extern int zctx_interrupted;
+    zsocket_test (Bool verbose);
 //  @end
 
 #ifdef __cplusplus

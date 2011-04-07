@@ -60,6 +60,8 @@
 #include "../include/zapi_prelude.h"
 #include "../include/zclock.h"
 #include "../include/zctx.h"
+#include "../include/zsocket.h"
+#include "../include/zsockopt.h"
 #include "../include/zstr.h"
 #include "../include/zthread.h"
 
@@ -171,14 +173,9 @@ zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args)
 {
     //  Create our end of the pipe
     //  Pipe has HWM of 1 at both sides to block runaway writers
-    uint64_t hwm = 1;
-    void *pipe = zctx_socket_new (ctx, ZMQ_PAIR);
-    zmq_setsockopt (pipe, ZMQ_HWM, &hwm, sizeof (hwm));
-    char endpoint [64];
-    int rc = snprintf (endpoint, 64, "inproc://zctx-pipe-%p", pipe);
-    assert (rc < 64);
-    rc = zmq_bind (pipe, endpoint);
-    assert (rc == 0);
+    void *pipe = zsocket_new (ctx, ZMQ_PAIR);
+    zsockopt_set_hwm (pipe, 1);
+    zsocket_bind (pipe, "inproc://zctx-pipe-%p", pipe);
 
     //  Prepare argument shim for child thread
     shim_t *shim = (shim_t *) zmalloc (sizeof (shim_t));
@@ -187,10 +184,9 @@ zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args)
     shim->ctx = zctx_shadow (ctx);
 
     //  Connect child pipe to our pipe
-    shim->pipe = zctx_socket_new (shim->ctx, ZMQ_PAIR);
-    zmq_setsockopt (shim->pipe, ZMQ_HWM, &hwm, sizeof (hwm));
-    rc = zmq_connect (shim->pipe, endpoint);
-    assert (rc == 0);
+    shim->pipe = zsocket_new (shim->ctx, ZMQ_PAIR);
+    zsockopt_set_hwm (shim->pipe, 1);
+    zsocket_connect (shim->pipe, "inproc://zctx-pipe-%p", pipe);
 
     s_thread_start (shim);
     return pipe;
@@ -206,7 +202,7 @@ s_test_detached (void *args)
 {
     //  Create a socket to check it'll be automatically deleted
     zctx_t *ctx = zctx_new ();
-    void *push = zctx_socket_new (ctx, ZMQ_PUSH);
+    void *push = zsocket_new (ctx, ZMQ_PUSH);
     zctx_destroy (&ctx);
     return NULL;
 }
@@ -215,7 +211,7 @@ static void
 s_test_attached (void *args, zctx_t *ctx, void *pipe)
 {
     //  Create a socket to check it'll be automatically deleted
-    zctx_socket_new (ctx, ZMQ_PUSH);
+    zsocket_new (ctx, ZMQ_PUSH);
     //  Wait for our parent to ping us, and pong back
     free (zstr_recv (pipe));
     zstr_send (pipe, "pong");

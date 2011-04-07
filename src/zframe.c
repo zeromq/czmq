@@ -37,6 +37,8 @@
 
 #include "../include/zapi_prelude.h"
 #include "../include/zctx.h"
+#include "../include/zsocket.h"
+#include "../include/zsockopt.h"
 #include "../include/zframe.h"
 
 //  Structure of our class
@@ -100,11 +102,7 @@ zframe_recv (void *socket)
         zframe_destroy (&self);
         return NULL;            //  Interrupted or terminated
     }
-    //  Check multipart framing
-    int64_t more;
-    size_t more_size = sizeof (more);
-    zmq_getsockopt (socket, ZMQ_RCVMORE, &more, &more_size);
-    self->more = (int) more;
+    self->more = zsockopt_rcvmore (socket);
     return self;
 }
 
@@ -287,9 +285,9 @@ zframe_test (Bool verbose)
     //  @selftest
     zctx_t *ctx = zctx_new ();
 
-    void *output = zctx_socket_new (ctx, ZMQ_PAIR);
+    void *output = zsocket_new (ctx, ZMQ_PAIR);
     zmq_bind (output, "inproc://zframe.test");
-    void *input = zctx_socket_new (ctx, ZMQ_PAIR);
+    void *input = zsocket_new (ctx, ZMQ_PAIR);
     zmq_connect (input, "inproc://zframe.test");
 
     //  Send five different frames, test ZFRAME_MORE

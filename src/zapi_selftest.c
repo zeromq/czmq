@@ -32,6 +32,8 @@
 #include "../include/zlist.h"
 #include "../include/zloop.h"
 #include "../include/zmsg.h"
+#include "../include/zsocket.h"
+#include "../include/zsockopt.h"
 #include "../include/zstr.h"
 #include "../include/zthread.h"
 
@@ -52,6 +54,8 @@ int main (int argc, char *argv [])
     zlist_test (verbose);
     zloop_test (verbose);
     zmsg_test (verbose);
+    zsocket_test (verbose);
+    zsockopt_test (verbose);
     zstr_test (verbose);
     zthread_test (verbose);
 

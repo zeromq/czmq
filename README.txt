@@ -50,13 +50,13 @@ libzapi grew out of concepts developed in [ØMQ - The Guide](http://zguide.zerom
 ### Highlights
 
 * Single API hides differences between 0MQ/2.1, and 0MQ/3.0.
-* Broken into easy-to-use classes: zctx, zstr, zframe, zmsg, zloop, zhash, and zlist.
 * Work with messages as strings, individual frames, or multipart messages.
 * Automatic closure of any open sockets at context termination.
 * Automatic LINGER configuration of all sockets for context termination.
 * Portable API for creating child threads and 0MQ pipes to talk to them.
 * Simple reactor with one-off and repeated timers, and socket readers.
 * System clock functions for sleeping and calculating timers.
+* Easy API to get/set all socket options.
 * Portable to Linux, UNIX, OS X, Windows (porting is not yet complete).
 * Includes generic hash and list containers.
 * Full selftests on all classes.
@@ -114,6 +114,26 @@ This is the class interface:
 .pull include/zctx.h@interface,code
 
 .pull src/zctx.c@discuss,left
+
+#### zsocket - working with 0MQ sockets
+
+.pull src/zsocket.c@header,left
+
+This is the class interface:
+
+.pull include/zsocket.h@interface,code
+
+.pull src/zsocket.c@discuss,left
+
+#### zsockopt - working with 0MQ socket options
+
+.pull src/zsockopt.c@header,left
+
+This is the class interface:
+
+.pull include/zsockopt.h@interface,code
+
+.pull src/zsockopt.c@discuss,left
 
 #### zstr - sending and receiving strings
 
@@ -405,6 +425,14 @@ Before attempting to patch code for portability, please read the `zapi_prelude.h
 * Reimplementing specific methods to use a non-standard API: this is typically needed on Windows. Do this in the relevant class, using #ifdefs to properly differentiate code for different platforms.
 
 The canonical 'standard operating system' for all libzapi code is Linux, gcc, POSIX.
+
+### Code Generation
+
+We generate the zsockopt class using the mysterious but powerful GSL code generator. It's actually really cool, since about 30 lines of XML are sufficient to generate 700 lines of code. Better, since many of the option data types changed in 0MQ/3.0, it's possible to completely hide the differences. To regenerate the zsockopt class, build and install GSL from https://github.com/imatix/gsl, and then:
+
+    gsl sockopts
+
+You may also enjoy using this same technique if you're writing bindings in other languages. See the sockopts.gsl file, this can be easily modified to produce code in whatever language interests you.
 
 ### This Document
 
