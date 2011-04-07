@@ -52,7 +52,7 @@ zstr_recv (void *socket)
         return NULL;
 
     int size = zmq_msg_size (&message);
-    char *string = malloc (size + 1);
+    char *string = (char *) malloc (size + 1);
     memcpy (string, zmq_msg_data (&message), size);
     zmq_msg_close (&message);
     string [size] = 0;
@@ -75,7 +75,7 @@ zstr_recv_nowait (void *socket)
         return NULL;
 
     int size = zmq_msg_size (&message);
-    char *string = malloc (size + 1);
+    char *string = (char *) malloc (size + 1);
     memcpy (string, zmq_msg_data (&message), size);
     zmq_msg_close (&message);
     string [size] = 0;
@@ -130,12 +130,12 @@ zstr_sendf (void *socket, const char *format, ...)
     //  Format string into buffer
     va_list argptr;
     va_start (argptr, format);
-    size_t size = 255 + 1;
-    char *string = malloc (size);
+    int size = 255 + 1;
+    char *string = (char *) malloc (size);
     int required = vsnprintf (string, size, format, argptr);
     if (required >= size) {
         size = required + 1;
-        string = realloc (string, size);
+        string = (char *) realloc (string, size);
         vsnprintf (string, size, format, argptr);
     }
     va_end (argptr);

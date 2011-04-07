@@ -111,11 +111,9 @@ s_thread_shim (void *args)
     else
         shim->detached (shim->args);
 
-    _endthreadex (0);
-    CloseHandle (shim->handle);
-
-    zthread_destroy (&shim->ctx);
+    zctx_destroy (&shim->ctx);  //  Close any dangling sockets
     free (shim);
+    _endthreadex (0);           //  Terminates thread
     return 0;
 }
 #endif
@@ -132,7 +130,7 @@ s_thread_start (shim_t *shim)
     shim->handle = (HANDLE)_beginthreadex(
         NULL,                   //  Handle is private to this process
         0,                      //  Use a default stack size for new thread
-        &s_thread_shim,      //  Start real thread function via this shim
+        &s_thread_shim,         //  Start real thread function via this shim
         shim,                   //  Which gets the current object as argument
         CREATE_SUSPENDED,       //  Set thread priority before starting it
         NULL);                  //  We don't use the thread ID

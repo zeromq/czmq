@@ -57,7 +57,7 @@ size_t
     zframe_size (zframe_t *self);
 
 //  Return address of frame data
-void *
+byte *
     zframe_data (zframe_t *self);
 
 //  Create a new frame that duplicates an existing frame

@@ -295,11 +295,11 @@ zlist_test (int verbose)
     assert (zlist_first (list) == bread);
 
     char *item;
-    item = zlist_pop (list);
+    item = (char *) zlist_pop (list);
     assert (item == bread);
-    item = zlist_pop (list);
+    item = (char *) zlist_pop (list);
     assert (item == cheese);
-    item = zlist_pop (list);
+    item = (char *) zlist_pop (list);
     assert (item == wine);
     assert (zlist_size (list) == 0);
 

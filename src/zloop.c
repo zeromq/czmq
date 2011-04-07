@@ -61,7 +61,7 @@ typedef struct {
     size_t times;
     zloop_fn *handler;
     void *arg;
-    uint64_t when;              //  Clock time when alarm goes off
+    int64_t when;               //  Clock time when alarm goes off
 } s_timer_t;
 
 static s_reader_t *
@@ -204,7 +204,7 @@ zloop_start (zloop_t *self)
         //  Rebuild pollitem set if necessary
         if (self->dirty) {
             free (self->pollset);
-            self->pollset = zmalloc (
+            self->pollset = (zmq_pollitem_t *) zmalloc (
                 zlist_size (self->readers) * sizeof (zmq_pollitem_t));
 
             s_reader_t *reader = (s_reader_t *) zlist_first (self->readers);
@@ -217,7 +217,7 @@ zloop_start (zloop_t *self)
             }
         }
         //  Calculate tickless timer, up to 1 hour
-        uint64_t tickless = zclock_time () + 1000 * 3600;
+        int64_t tickless = zclock_time () + 1000 * 3600;
         s_timer_t *timer = (s_timer_t *) zlist_first (self->timers);
         while (timer) {
             //  Find earliest timer

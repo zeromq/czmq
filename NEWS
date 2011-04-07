@@ -4,6 +4,8 @@ libzapi version 1.3.0 (beta), released on 2011/04/xx
 Changes
 -------
 
+* Ported to win32, all selftests pass successfully.
+
 * New zsockopt class provides API to set/get socket options.
 
 * New zsocket class provides API to connect and bind sockets using
@@ -31,8 +33,6 @@ Bug Fixes
 
 * Fixed error in thread pipe handling which sometimes provoked libzmq
   assertion failure at shutdown.
-
-* Fixed build for Windows.
 
 
 libzapi version 1.2.1 (beta), released on 2011/04/01

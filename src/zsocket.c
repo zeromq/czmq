@@ -111,13 +111,13 @@ zsocket_test (Bool verbose)
     zctx_t *ctx = zctx_new ();
 
     //  Create a detached thread, let it run
-    char *interface = "*";
+    char *interf = "*";
     char *domain = "localhost";
     int service = 5555;
 
     void *writer = zsocket_new (ctx, ZMQ_PUSH);
     void *reader = zsocket_new (ctx, ZMQ_PULL);
-    zsocket_bind (writer, "tcp://%s:%d", interface, service);
+    zsocket_bind (writer, "tcp://%s:%d", interf, service);
     zsocket_connect (reader, "tcp://%s:%d", domain, service);
     zstr_send (writer, "HELLO");
     char *message = zstr_recv (reader);

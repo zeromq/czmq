@@ -27,7 +27,7 @@
 
 //- Always include ZeroMQ header file ---------------------------------------
 
-#include <zmq.h>
+#include "zmq.h"
 
 //  If the version doesn't implement the ROUTER/DEALER macros, fix it -------
 
@@ -232,7 +232,6 @@
 #include <signal.h>
 #include <setjmp.h>
 #include <assert.h>
-#include <inttypes.h>
 
 //- System-specific include files -------------------------------------------
 
@@ -272,6 +271,7 @@
 #   include <grp.h>
 #   include <utime.h>
 #   include <syslog.h>
+#   include <inttypes.h>
 #   include <sys/types.h>
 #   include <sys/param.h>
 #   include <sys/socket.h>
@@ -374,7 +374,11 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 #define streq(s1,s2)    (!strcmp ((s1), (s2)))
 #define strneq(s1,s2)   (strcmp ((s1), (s2)))
 //  Provide random number from 0..(num-1)
-#define randof(num)     (int) ((float) (num) * random () / (RAND_MAX + 1.0))
+#if (defined (__WINDOWS__))
+#   define randof(num)  (int) ((float) (num) * rand () / (RAND_MAX + 1.0))
+#else
+#   define randof(num)  (int) ((float) (num) * random () / (RAND_MAX + 1.0))
+#endif
 #if (!defined (TRUE))
 #    define TRUE        1               //  ANSI standard
 #    define FALSE       0
@@ -391,7 +395,9 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 #   define vsnprintf    _vsnprintf
     typedef unsigned long ulong;
     typedef unsigned int  uint;
+    typedef __int32 int32_t;
     typedef __int64 int64_t;
+    typedef unsigned __int32 uint32_t;
     typedef unsigned __int64 uint64_t;
 #elif (defined (__APPLE__))
     typedef unsigned long ulong;

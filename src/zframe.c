@@ -146,11 +146,11 @@ zframe_size (zframe_t *self)
 //  --------------------------------------------------------------------------
 //  Return pointer to frame data.
 
-void *
+byte *
 zframe_data (zframe_t *self)
 {
     assert (self);
-    return zmq_msg_data (&self->zmsg);
+    return (byte *) zmq_msg_data (&self->zmsg);
 }
 
 
@@ -161,8 +161,7 @@ zframe_t *
 zframe_dup (zframe_t *self)
 {
     assert (self);
-    return zframe_new (
-        zframe_data (self), zframe_size (self));
+    return zframe_new (zframe_data (self), zframe_size (self));
 }
 
 
@@ -178,9 +177,9 @@ zframe_strhex (zframe_t *self)
 
     size_t size = zframe_size (self);
     byte *data = zframe_data (self);
-    char *hex_str = malloc (size * 2 + 1);
+    char *hex_str = (char *) malloc (size * 2 + 1);
 
-    int byte_nbr;
+    uint byte_nbr;
     for (byte_nbr = 0; byte_nbr < size; byte_nbr++) {
         hex_str [byte_nbr * 2 + 0] = hex_char [data [byte_nbr] >> 4];
         hex_str [byte_nbr * 2 + 1] = hex_char [data [byte_nbr] & 15];
@@ -198,7 +197,7 @@ char *
 zframe_strdup (zframe_t *self)
 {
     size_t size = zframe_size (self);
-    char *string = malloc (size + 1);
+    char *string = (char *) malloc (size + 1);
     memcpy (string, zframe_data (self), size);
     string [size] = 0;
     return string;
@@ -240,11 +239,11 @@ zframe_print (zframe_t *self, char *prefix)
     assert (self);
     if (prefix)
         fprintf (stderr, "%s", prefix);
-    byte  *data = zframe_data (self);
+    byte *data = zframe_data (self);
     size_t size = zframe_size (self);
 
     int is_text = 1;
-    int char_nbr;
+    uint char_nbr;
     for (char_nbr = 0; char_nbr < size; char_nbr++)
         if (data [char_nbr] < 9 || data [char_nbr] > 127)
             is_text = 0;

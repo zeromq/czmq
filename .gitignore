@@ -40,4 +40,9 @@ src/core
 ipr
 *.gz
 *.zip
-
+win32/zapi.ncb
+win32/zapi.vcproj.WS200902.user.user
+win32/zapi_selftest.exe.embed.manifest
+win32/zapi_selftest.exe.embed.manifest.res
+win32/zapi_selftest.exe.intermediate.manifest
+win32/zapi_selftest.vcproj.WS200902.user.user
