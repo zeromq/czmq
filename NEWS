@@ -7,6 +7,9 @@ Changes
 * Threading API now supports detached and attached threads via zthread
   class, and zthread_new and zthread_fork methods.
 
+* Pipes to attached threads have HWM of 1 (each side) to block runaway
+  writers.
+
 * In zframe class, added print, reset, strdup, streq, strhex, dup methods.
 
 * In zmsg class, added last, wrap, unwrap, popstr, pushstr, addstr, dup 
