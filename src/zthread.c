@@ -58,6 +58,7 @@
 */
 
 #include "../include/zapi_prelude.h"
+#include "../include/zclock.h"
 #include "../include/zctx.h"
 #include "../include/zstr.h"
 #include "../include/zthread.h"

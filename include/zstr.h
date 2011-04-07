@@ -34,6 +34,10 @@ extern "C" {
 char *
     zstr_recv (void *socket);
 
+//  Receive a string off a socket if socket had input waiting
+char *
+    zstr_recv_nowait (void *socket);
+
 //  Send a string to a socket in 0MQ string format
 int
     zstr_send (void *socket, const char *string);

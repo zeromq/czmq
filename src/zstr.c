@@ -60,6 +60,29 @@ zstr_recv (void *socket)
 
 
 //  --------------------------------------------------------------------------
+//  Receive C string from socket, if socket had input ready. Caller must
+//  free returned string. Returns NULL if the context is being terminated
+//  or the process was interrupted.
+
+char *
+zstr_recv_nowait (void *socket)
+{
+    assert (socket);
+    zmq_msg_t message;
+    zmq_msg_init (&message);
+    if (zmq_recv (socket, &message, ZMQ_NOBLOCK))
+        return NULL;
+
+    int size = zmq_msg_size (&message);
+    char *string = malloc (size + 1);
+    memcpy (string, zmq_msg_data (&message), size);
+    zmq_msg_close (&message);
+    string [size] = 0;
+    return string;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Send C string to socket. Returns 0 if successful, -1 if there was an
 //  error.
 

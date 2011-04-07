@@ -14,7 +14,7 @@ Changes
 
 * In zclock class, added log method.
 
-* In zstr class, added sendm method.
+* In zstr class, added sendm and recv_nowait methods.
 
 * Added Valgrind suppression file for libzmq.
 
