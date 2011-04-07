@@ -16,6 +16,10 @@ char *
 int
     zstr_send (void *socket, const char *string);
 
+//  Send a string to a socket in 0MQ string format, with MORE flag
+int
+    zstr_sendm (void *socket, const char *string);
+
 //  Send a formatted string to a socket
 int
     zstr_sendf (void *socket, const char *format, ...);
@@ -28,10 +32,10 @@ int
 DESCRIPTION
 -----------
 
-The zstr class provides utility functions for sending and receiving C 
-strings across 0MQ sockets. It sends strings without a terminating null, 
-and appends a null byte on received strings. This class is for simple 
-message sending. 
+The zstr class provides utility functions for sending and receiving C
+strings across 0MQ sockets. It sends strings without a terminating null,
+and appends a null byte on received strings. This class is for simple
+message sending.
 
 
 EXAMPLE
@@ -50,7 +54,7 @@ EXAMPLE
     for (string_nbr = 0; string_nbr < 10; string_nbr++)
         zstr_sendf (output, "this is string %d", string_nbr);
     zstr_send (output, "END");
-    
+
     //  Read and count until we receive END
     string_nbr = 0;
     for (string_nbr = 0;; string_nbr++) {
