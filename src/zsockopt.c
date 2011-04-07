@@ -6,20 +6,22 @@
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
-    This file is part of zapi, the C binding for 0MQ: http://zapi.zeromq.org.
+    This file is part of libzapi, the high-level C binding for 0MQ:
+    http://libzapi.zeromq.org.
 
-    This is free software; you can redistribute it and/or modify it under the
-    terms of the GNU Lesser General Public License as published by the Free
-    Software Foundation; either version 3 of the License, or (at your option)
-    any later version.
+    This is free software; you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation; either version 3 of the License, or (at
+    your option) any later version.
 
     This software is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL-
-    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General
-    Public License for more details.
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    Lesser General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public License
-    along with this program. If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU Lesser General Public
+    License along with this program. If not, see
+    <http://www.gnu.org/licenses/>.
     =========================================================================
 */
 
@@ -47,7 +49,7 @@ zsockopt_set_hwm (void *socket, int hwm)
 {
     uint64_t value = hwm;
     int rc = zmq_setsockopt (socket, ZMQ_HWM, &value, sizeof (value));
-    assert (rc == 0);
+    assert (rc == 0 || errno == ETERM);
 }
 
 
@@ -72,7 +74,7 @@ zsockopt_set_swap (void *socket, int swap)
 {
     int64_t value = swap;
     int rc = zmq_setsockopt (socket, ZMQ_SWAP, &value, sizeof (value));
-    assert (rc == 0);
+    assert (rc == 0 || errno == ETERM);
 }
 
 
@@ -97,7 +99,7 @@ zsockopt_set_affinity (void *socket, int affinity)
 {
     uint64_t value = affinity;
     int rc = zmq_setsockopt (socket, ZMQ_AFFINITY, &value, sizeof (value));
-    assert (rc == 0);
+    assert (rc == 0 || errno == ETERM);
 }
 
 
@@ -121,7 +123,7 @@ void
 zsockopt_set_identity (void *socket, char * identity)
 {
     int rc = zmq_setsockopt (socket, ZMQ_IDENTITY, identity, strlen (identity));
-    assert (rc == 0);
+    assert (rc == 0 || errno == ETERM);
 }
 
 
@@ -133,7 +135,7 @@ zsockopt_set_rate (void *socket, int rate)
 {
     int64_t value = rate;
     int rc = zmq_setsockopt (socket, ZMQ_RATE, &value, sizeof (value));
-    assert (rc == 0);
+    assert (rc == 0 || errno == ETERM);
 }
 
 
@@ -158,7 +160,7 @@ zsockopt_set_recovery_ivl (void *socket, int recovery_ivl)
 {
     int64_t value = recovery_ivl;
     int rc = zmq_setsockopt (socket, ZMQ_RECOVERY_IVL, &value, sizeof (value));
-    assert (rc == 0);
+    assert (rc == 0 || errno == ETERM);
 }
 
 
@@ -183,7 +185,7 @@ zsockopt_set_recovery_ivl_msec (void *socket, int recovery_ivl_msec)
 {
     int64_t value = recovery_ivl_msec;
     int rc = zmq_setsockopt (socket, ZMQ_RECOVERY_IVL_MSEC, &value, sizeof (value));
-    assert (rc == 0);
+    assert (rc == 0 || errno == ETERM);
 }
 
 
@@ -208,7 +210,7 @@ zsockopt_set_mcast_loop (void *socket, int mcast_loop)
 {
     int64_t value = mcast_loop;
     int rc = zmq_setsockopt (socket, ZMQ_MCAST_LOOP, &value, sizeof (value));
-    assert (rc == 0);
+    assert (rc == 0 || errno == ETERM);
 }
 
 
@@ -233,7 +235,7 @@ zsockopt_set_sndbuf (void *socket, int sndbuf)
 {
     uint64_t value = sndbuf;
     int rc = zmq_setsockopt (socket, ZMQ_SNDBUF, &value, sizeof (value));
-    assert (rc == 0);
+    assert (rc == 0 || errno == ETERM);
 }
 
 
@@ -258,7 +260,7 @@ zsockopt_set_rcvbuf (void *socket, int rcvbuf)
 {
     uint64_t value = rcvbuf;
     int rc = zmq_setsockopt (socket, ZMQ_RCVBUF, &value, sizeof (value));
-    assert (rc == 0);
+    assert (rc == 0 || errno == ETERM);
 }
 
 
@@ -281,9 +283,8 @@ zsockopt_rcvbuf (void *socket)
 void
 zsockopt_set_linger (void *socket, int linger)
 {
-    int value = linger;
-    int rc = zmq_setsockopt (socket, ZMQ_LINGER, &value, sizeof (value));
-    assert (rc == 0);
+    int rc = zmq_setsockopt (socket, ZMQ_LINGER, &linger, sizeof (linger));
+    assert (rc == 0 || errno == ETERM);
 }
 
 
@@ -306,9 +307,8 @@ zsockopt_linger (void *socket)
 void
 zsockopt_set_reconnect_ivl (void *socket, int reconnect_ivl)
 {
-    int value = reconnect_ivl;
-    int rc = zmq_setsockopt (socket, ZMQ_RECONNECT_IVL, &value, sizeof (value));
-    assert (rc == 0);
+    int rc = zmq_setsockopt (socket, ZMQ_RECONNECT_IVL, &reconnect_ivl, sizeof (reconnect_ivl));
+    assert (rc == 0 || errno == ETERM);
 }
 
 
@@ -331,9 +331,8 @@ zsockopt_reconnect_ivl (void *socket)
 void
 zsockopt_set_reconnect_ivl_max (void *socket, int reconnect_ivl_max)
 {
-    int value = reconnect_ivl_max;
-    int rc = zmq_setsockopt (socket, ZMQ_RECONNECT_IVL_MAX, &value, sizeof (value));
-    assert (rc == 0);
+    int rc = zmq_setsockopt (socket, ZMQ_RECONNECT_IVL_MAX, &reconnect_ivl_max, sizeof (reconnect_ivl_max));
+    assert (rc == 0 || errno == ETERM);
 }
 
 
@@ -356,9 +355,8 @@ zsockopt_reconnect_ivl_max (void *socket)
 void
 zsockopt_set_backlog (void *socket, int backlog)
 {
-    int value = backlog;
-    int rc = zmq_setsockopt (socket, ZMQ_BACKLOG, &value, sizeof (value));
-    assert (rc == 0);
+    int rc = zmq_setsockopt (socket, ZMQ_BACKLOG, &backlog, sizeof (backlog));
+    assert (rc == 0 || errno == ETERM);
 }
 
 
@@ -382,7 +380,7 @@ void
 zsockopt_set_subscribe (void *socket, char * subscribe)
 {
     int rc = zmq_setsockopt (socket, ZMQ_SUBSCRIBE, subscribe, strlen (subscribe));
-    assert (rc == 0);
+    assert (rc == 0 || errno == ETERM);
 }
 
 
@@ -393,7 +391,7 @@ void
 zsockopt_set_unsubscribe (void *socket, char * unsubscribe)
 {
     int rc = zmq_setsockopt (socket, ZMQ_UNSUBSCRIBE, unsubscribe, strlen (unsubscribe));
-    assert (rc == 0);
+    assert (rc == 0 || errno == ETERM);
 }
 
 
