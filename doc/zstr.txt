@@ -49,9 +49,9 @@ EXAMPLE
     zctx_t *ctx = zctx_new ();
 
     void *output = zsocket_new (ctx, ZMQ_PAIR);
-    zmq_bind (output, "inproc://zstr.test");
+    zsocket_bind (output, "inproc://zstr.test");
     void *input = zsocket_new (ctx, ZMQ_PAIR);
-    zmq_connect (input, "inproc://zstr.test");
+    zsocket_connect (input, "inproc://zstr.test");
 
     //  Send ten strings and then END
     int string_nbr;
