@@ -100,7 +100,7 @@ zframe_recv (void *socket)
 {
     assert (socket);
     zframe_t *self = zframe_new (NULL, 0);
-    if (ZMQ_RECV (socket, &self->zmsg, 0)) {
+    if (zmq_recvmsg (socket, &self->zmsg, 0)) {
         zframe_destroy (&self);
         return NULL;            //  Interrupted or terminated
     }
@@ -123,11 +123,11 @@ zframe_send (zframe_t **self_p, void *socket, int flags)
             zmq_msg_t copy;
             zmq_msg_init (&copy);
             zmq_msg_copy (&copy, &self->zmsg);
-            ZMQ_SEND (socket, &copy, (flags & ZFRAME_MORE)? ZMQ_SNDMORE: 0);
+            zmq_sendmsg (socket, &copy, (flags & ZFRAME_MORE)? ZMQ_SNDMORE: 0);
             zmq_msg_close (&copy);
         }
         else {
-            ZMQ_SEND (socket, &self->zmsg, (flags & ZFRAME_MORE)? ZMQ_SNDMORE: 0);
+            zmq_sendmsg (socket, &self->zmsg, (flags & ZFRAME_MORE)? ZMQ_SNDMORE: 0);
             zframe_destroy (self_p);
         }
     }
