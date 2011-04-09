@@ -50,7 +50,7 @@ zstr_recv (void *socket)
     assert (socket);
     zmq_msg_t message;
     zmq_msg_init (&message);
-    if (zmq_recv (socket, &message, 0))
+    if (ZMQ_RECV (socket, &message, 0))
         return NULL;
 
     int size = zmq_msg_size (&message);
@@ -73,7 +73,7 @@ zstr_recv_nowait (void *socket)
     assert (socket);
     zmq_msg_t message;
     zmq_msg_init (&message);
-    if (zmq_recv (socket, &message, ZMQ_NOBLOCK))
+    if (ZMQ_RECV (socket, &message, ZMQ_DONTWAIT))
         return NULL;
 
     int size = zmq_msg_size (&message);
@@ -98,7 +98,7 @@ zstr_send (void *socket, const char *string)
     zmq_msg_t message;
     zmq_msg_init_size (&message, strlen (string));
     memcpy (zmq_msg_data (&message), string, strlen (string));
-    int rc = zmq_send (socket, &message, 0);
+    int rc = ZMQ_SEND (socket, &message, 0);
     zmq_msg_close (&message);
     return rc;
 }
@@ -115,7 +115,7 @@ zstr_sendm (void *socket, const char *string)
     zmq_msg_t message;
     zmq_msg_init_size (&message, strlen (string));
     memcpy (zmq_msg_data (&message), string, strlen (string));
-    int rc = zmq_send (socket, &message, ZMQ_SNDMORE);
+    int rc = ZMQ_SEND (socket, &message, ZMQ_SNDMORE);
     zmq_msg_close (&message);
     return rc;
 }

@@ -41,6 +41,7 @@
 #include "../include/zsockopt.h"
 
 
+#if (ZMQ_VERSION_MAJOR == 2)
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_HWM value
 
@@ -48,7 +49,7 @@ void
 zsockopt_set_hwm (void *socket, int hwm)
 {
     uint64_t value = hwm;
-    int rc = zmq_setsockopt (socket, ZMQ_HWM, &value, sizeof (value));
+    int rc = zmq_setsockopt (socket, ZMQ_HWM, &value, sizeof (uint64_t));
     assert (rc == 0 || errno == ETERM);
 }
 
@@ -60,7 +61,7 @@ int
 zsockopt_hwm (void *socket)
 {
     uint64_t hwm;
-    size_t type_size = sizeof (hwm);
+    size_t type_size = sizeof (uint64_t);
     zmq_getsockopt (socket, ZMQ_HWM, &hwm, &type_size);
     return (int) hwm;
 }
@@ -73,7 +74,7 @@ void
 zsockopt_set_swap (void *socket, int swap)
 {
     int64_t value = swap;
-    int rc = zmq_setsockopt (socket, ZMQ_SWAP, &value, sizeof (value));
+    int rc = zmq_setsockopt (socket, ZMQ_SWAP, &value, sizeof (int64_t));
     assert (rc == 0 || errno == ETERM);
 }
 
@@ -85,7 +86,7 @@ int
 zsockopt_swap (void *socket)
 {
     int64_t swap;
-    size_t type_size = sizeof (swap);
+    size_t type_size = sizeof (int64_t);
     zmq_getsockopt (socket, ZMQ_SWAP, &swap, &type_size);
     return (int) swap;
 }
@@ -98,7 +99,7 @@ void
 zsockopt_set_affinity (void *socket, int affinity)
 {
     uint64_t value = affinity;
-    int rc = zmq_setsockopt (socket, ZMQ_AFFINITY, &value, sizeof (value));
+    int rc = zmq_setsockopt (socket, ZMQ_AFFINITY, &value, sizeof (uint64_t));
     assert (rc == 0 || errno == ETERM);
 }
 
@@ -110,7 +111,7 @@ int
 zsockopt_affinity (void *socket)
 {
     uint64_t affinity;
-    size_t type_size = sizeof (affinity);
+    size_t type_size = sizeof (uint64_t);
     zmq_getsockopt (socket, ZMQ_AFFINITY, &affinity, &type_size);
     return (int) affinity;
 }
@@ -134,7 +135,7 @@ void
 zsockopt_set_rate (void *socket, int rate)
 {
     int64_t value = rate;
-    int rc = zmq_setsockopt (socket, ZMQ_RATE, &value, sizeof (value));
+    int rc = zmq_setsockopt (socket, ZMQ_RATE, &value, sizeof (int64_t));
     assert (rc == 0 || errno == ETERM);
 }
 
@@ -146,7 +147,7 @@ int
 zsockopt_rate (void *socket)
 {
     int64_t rate;
-    size_t type_size = sizeof (rate);
+    size_t type_size = sizeof (int64_t);
     zmq_getsockopt (socket, ZMQ_RATE, &rate, &type_size);
     return (int) rate;
 }
@@ -159,7 +160,7 @@ void
 zsockopt_set_recovery_ivl (void *socket, int recovery_ivl)
 {
     int64_t value = recovery_ivl;
-    int rc = zmq_setsockopt (socket, ZMQ_RECOVERY_IVL, &value, sizeof (value));
+    int rc = zmq_setsockopt (socket, ZMQ_RECOVERY_IVL, &value, sizeof (int64_t));
     assert (rc == 0 || errno == ETERM);
 }
 
@@ -171,7 +172,7 @@ int
 zsockopt_recovery_ivl (void *socket)
 {
     int64_t recovery_ivl;
-    size_t type_size = sizeof (recovery_ivl);
+    size_t type_size = sizeof (int64_t);
     zmq_getsockopt (socket, ZMQ_RECOVERY_IVL, &recovery_ivl, &type_size);
     return (int) recovery_ivl;
 }
@@ -184,7 +185,7 @@ void
 zsockopt_set_recovery_ivl_msec (void *socket, int recovery_ivl_msec)
 {
     int64_t value = recovery_ivl_msec;
-    int rc = zmq_setsockopt (socket, ZMQ_RECOVERY_IVL_MSEC, &value, sizeof (value));
+    int rc = zmq_setsockopt (socket, ZMQ_RECOVERY_IVL_MSEC, &value, sizeof (int64_t));
     assert (rc == 0 || errno == ETERM);
 }
 
@@ -196,7 +197,7 @@ int
 zsockopt_recovery_ivl_msec (void *socket)
 {
     int64_t recovery_ivl_msec;
-    size_t type_size = sizeof (recovery_ivl_msec);
+    size_t type_size = sizeof (int64_t);
     zmq_getsockopt (socket, ZMQ_RECOVERY_IVL_MSEC, &recovery_ivl_msec, &type_size);
     return (int) recovery_ivl_msec;
 }
@@ -209,7 +210,7 @@ void
 zsockopt_set_mcast_loop (void *socket, int mcast_loop)
 {
     int64_t value = mcast_loop;
-    int rc = zmq_setsockopt (socket, ZMQ_MCAST_LOOP, &value, sizeof (value));
+    int rc = zmq_setsockopt (socket, ZMQ_MCAST_LOOP, &value, sizeof (int64_t));
     assert (rc == 0 || errno == ETERM);
 }
 
@@ -221,7 +222,7 @@ int
 zsockopt_mcast_loop (void *socket)
 {
     int64_t mcast_loop;
-    size_t type_size = sizeof (mcast_loop);
+    size_t type_size = sizeof (int64_t);
     zmq_getsockopt (socket, ZMQ_MCAST_LOOP, &mcast_loop, &type_size);
     return (int) mcast_loop;
 }
@@ -234,7 +235,7 @@ void
 zsockopt_set_sndbuf (void *socket, int sndbuf)
 {
     uint64_t value = sndbuf;
-    int rc = zmq_setsockopt (socket, ZMQ_SNDBUF, &value, sizeof (value));
+    int rc = zmq_setsockopt (socket, ZMQ_SNDBUF, &value, sizeof (uint64_t));
     assert (rc == 0 || errno == ETERM);
 }
 
@@ -246,7 +247,7 @@ int
 zsockopt_sndbuf (void *socket)
 {
     uint64_t sndbuf;
-    size_t type_size = sizeof (sndbuf);
+    size_t type_size = sizeof (uint64_t);
     zmq_getsockopt (socket, ZMQ_SNDBUF, &sndbuf, &type_size);
     return (int) sndbuf;
 }
@@ -259,7 +260,7 @@ void
 zsockopt_set_rcvbuf (void *socket, int rcvbuf)
 {
     uint64_t value = rcvbuf;
-    int rc = zmq_setsockopt (socket, ZMQ_RCVBUF, &value, sizeof (value));
+    int rc = zmq_setsockopt (socket, ZMQ_RCVBUF, &value, sizeof (uint64_t));
     assert (rc == 0 || errno == ETERM);
 }
 
@@ -271,7 +272,7 @@ int
 zsockopt_rcvbuf (void *socket)
 {
     uint64_t rcvbuf;
-    size_t type_size = sizeof (rcvbuf);
+    size_t type_size = sizeof (uint64_t);
     zmq_getsockopt (socket, ZMQ_RCVBUF, &rcvbuf, &type_size);
     return (int) rcvbuf;
 }
@@ -283,7 +284,7 @@ zsockopt_rcvbuf (void *socket)
 void
 zsockopt_set_linger (void *socket, int linger)
 {
-    int rc = zmq_setsockopt (socket, ZMQ_LINGER, &linger, sizeof (linger));
+    int rc = zmq_setsockopt (socket, ZMQ_LINGER, &linger, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
 
@@ -295,7 +296,7 @@ int
 zsockopt_linger (void *socket)
 {
     int linger;
-    size_t type_size = sizeof (linger);
+    size_t type_size = sizeof (int);
     zmq_getsockopt (socket, ZMQ_LINGER, &linger, &type_size);
     return linger;
 }
@@ -307,7 +308,7 @@ zsockopt_linger (void *socket)
 void
 zsockopt_set_reconnect_ivl (void *socket, int reconnect_ivl)
 {
-    int rc = zmq_setsockopt (socket, ZMQ_RECONNECT_IVL, &reconnect_ivl, sizeof (reconnect_ivl));
+    int rc = zmq_setsockopt (socket, ZMQ_RECONNECT_IVL, &reconnect_ivl, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
 
@@ -319,7 +320,7 @@ int
 zsockopt_reconnect_ivl (void *socket)
 {
     int reconnect_ivl;
-    size_t type_size = sizeof (reconnect_ivl);
+    size_t type_size = sizeof (int);
     zmq_getsockopt (socket, ZMQ_RECONNECT_IVL, &reconnect_ivl, &type_size);
     return reconnect_ivl;
 }
@@ -331,7 +332,7 @@ zsockopt_reconnect_ivl (void *socket)
 void
 zsockopt_set_reconnect_ivl_max (void *socket, int reconnect_ivl_max)
 {
-    int rc = zmq_setsockopt (socket, ZMQ_RECONNECT_IVL_MAX, &reconnect_ivl_max, sizeof (reconnect_ivl_max));
+    int rc = zmq_setsockopt (socket, ZMQ_RECONNECT_IVL_MAX, &reconnect_ivl_max, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
 
@@ -343,7 +344,7 @@ int
 zsockopt_reconnect_ivl_max (void *socket)
 {
     int reconnect_ivl_max;
-    size_t type_size = sizeof (reconnect_ivl_max);
+    size_t type_size = sizeof (int);
     zmq_getsockopt (socket, ZMQ_RECONNECT_IVL_MAX, &reconnect_ivl_max, &type_size);
     return reconnect_ivl_max;
 }
@@ -355,7 +356,7 @@ zsockopt_reconnect_ivl_max (void *socket)
 void
 zsockopt_set_backlog (void *socket, int backlog)
 {
-    int rc = zmq_setsockopt (socket, ZMQ_BACKLOG, &backlog, sizeof (backlog));
+    int rc = zmq_setsockopt (socket, ZMQ_BACKLOG, &backlog, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
 
@@ -367,7 +368,7 @@ int
 zsockopt_backlog (void *socket)
 {
     int backlog;
-    size_t type_size = sizeof (backlog);
+    size_t type_size = sizeof (int);
     zmq_getsockopt (socket, ZMQ_BACKLOG, &backlog, &type_size);
     return backlog;
 }
@@ -402,7 +403,7 @@ int
 zsockopt_type (void *socket)
 {
     int type;
-    size_t type_size = sizeof (type);
+    size_t type_size = sizeof (int);
     zmq_getsockopt (socket, ZMQ_TYPE, &type, &type_size);
     return type;
 }
@@ -415,7 +416,7 @@ int
 zsockopt_rcvmore (void *socket)
 {
     int64_t rcvmore;
-    size_t type_size = sizeof (rcvmore);
+    size_t type_size = sizeof (int64_t);
     zmq_getsockopt (socket, ZMQ_RCVMORE, &rcvmore, &type_size);
     return (int) rcvmore;
 }
@@ -428,7 +429,7 @@ int
 zsockopt_fd (void *socket)
 {
     int fd;
-    size_t type_size = sizeof (fd);
+    size_t type_size = sizeof (int);
     zmq_getsockopt (socket, ZMQ_FD, &fd, &type_size);
     return fd;
 }
@@ -441,11 +442,389 @@ int
 zsockopt_events (void *socket)
 {
     uint32_t events;
-    size_t type_size = sizeof (events);
+    size_t type_size = sizeof (uint32_t);
     zmq_getsockopt (socket, ZMQ_EVENTS, &events, &type_size);
     return (int) events;
 }
 
+
+#endif
+
+#if (ZMQ_VERSION_MAJOR == 3)
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_SNDHWM value
+
+void
+zsockopt_set_sndhwm (void *socket, int sndhwm)
+{
+    int rc = zmq_setsockopt (socket, ZMQ_SNDHWM, &sndhwm, sizeof (int));
+    assert (rc == 0 || errno == ETERM);
+}
+
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_SNDHWM value
+int
+zsockopt_sndhwm (void *socket)
+{
+    int sndhwm;
+    size_t type_size = sizeof (int);
+    zmq_getsockopt (socket, ZMQ_SNDHWM, &sndhwm, &type_size);
+    return sndhwm;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_RCVHWM value
+
+void
+zsockopt_set_rcvhwm (void *socket, int rcvhwm)
+{
+    int rc = zmq_setsockopt (socket, ZMQ_RCVHWM, &rcvhwm, sizeof (int));
+    assert (rc == 0 || errno == ETERM);
+}
+
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_RCVHWM value
+int
+zsockopt_rcvhwm (void *socket)
+{
+    int rcvhwm;
+    size_t type_size = sizeof (int);
+    zmq_getsockopt (socket, ZMQ_RCVHWM, &rcvhwm, &type_size);
+    return rcvhwm;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_AFFINITY value
+
+void
+zsockopt_set_affinity (void *socket, int affinity)
+{
+    int rc = zmq_setsockopt (socket, ZMQ_AFFINITY, &affinity, sizeof (int));
+    assert (rc == 0 || errno == ETERM);
+}
+
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_AFFINITY value
+int
+zsockopt_affinity (void *socket)
+{
+    int affinity;
+    size_t type_size = sizeof (int);
+    zmq_getsockopt (socket, ZMQ_AFFINITY, &affinity, &type_size);
+    return affinity;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_IDENTITY value
+
+void
+zsockopt_set_identity (void *socket, char * identity)
+{
+    int rc = zmq_setsockopt (socket, ZMQ_IDENTITY, identity, strlen (identity));
+    assert (rc == 0 || errno == ETERM);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_RATE value
+
+void
+zsockopt_set_rate (void *socket, int rate)
+{
+    int rc = zmq_setsockopt (socket, ZMQ_RATE, &rate, sizeof (int));
+    assert (rc == 0 || errno == ETERM);
+}
+
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_RATE value
+int
+zsockopt_rate (void *socket)
+{
+    int rate;
+    size_t type_size = sizeof (int);
+    zmq_getsockopt (socket, ZMQ_RATE, &rate, &type_size);
+    return rate;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_RECOVERY_IVL value
+
+void
+zsockopt_set_recovery_ivl (void *socket, int recovery_ivl)
+{
+    int rc = zmq_setsockopt (socket, ZMQ_RECOVERY_IVL, &recovery_ivl, sizeof (int));
+    assert (rc == 0 || errno == ETERM);
+}
+
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_RECOVERY_IVL value
+int
+zsockopt_recovery_ivl (void *socket)
+{
+    int recovery_ivl;
+    size_t type_size = sizeof (int);
+    zmq_getsockopt (socket, ZMQ_RECOVERY_IVL, &recovery_ivl, &type_size);
+    return recovery_ivl;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_SNDBUF value
+
+void
+zsockopt_set_sndbuf (void *socket, int sndbuf)
+{
+    int rc = zmq_setsockopt (socket, ZMQ_SNDBUF, &sndbuf, sizeof (int));
+    assert (rc == 0 || errno == ETERM);
+}
+
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_SNDBUF value
+int
+zsockopt_sndbuf (void *socket)
+{
+    int sndbuf;
+    size_t type_size = sizeof (int);
+    zmq_getsockopt (socket, ZMQ_SNDBUF, &sndbuf, &type_size);
+    return sndbuf;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_RCVBUF value
+
+void
+zsockopt_set_rcvbuf (void *socket, int rcvbuf)
+{
+    int rc = zmq_setsockopt (socket, ZMQ_RCVBUF, &rcvbuf, sizeof (int));
+    assert (rc == 0 || errno == ETERM);
+}
+
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_RCVBUF value
+int
+zsockopt_rcvbuf (void *socket)
+{
+    int rcvbuf;
+    size_t type_size = sizeof (int);
+    zmq_getsockopt (socket, ZMQ_RCVBUF, &rcvbuf, &type_size);
+    return rcvbuf;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_LINGER value
+
+void
+zsockopt_set_linger (void *socket, int linger)
+{
+    int rc = zmq_setsockopt (socket, ZMQ_LINGER, &linger, sizeof (int));
+    assert (rc == 0 || errno == ETERM);
+}
+
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_LINGER value
+int
+zsockopt_linger (void *socket)
+{
+    int linger;
+    size_t type_size = sizeof (int);
+    zmq_getsockopt (socket, ZMQ_LINGER, &linger, &type_size);
+    return linger;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_RECONNECT_IVL value
+
+void
+zsockopt_set_reconnect_ivl (void *socket, int reconnect_ivl)
+{
+    int rc = zmq_setsockopt (socket, ZMQ_RECONNECT_IVL, &reconnect_ivl, sizeof (int));
+    assert (rc == 0 || errno == ETERM);
+}
+
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_RECONNECT_IVL value
+int
+zsockopt_reconnect_ivl (void *socket)
+{
+    int reconnect_ivl;
+    size_t type_size = sizeof (int);
+    zmq_getsockopt (socket, ZMQ_RECONNECT_IVL, &reconnect_ivl, &type_size);
+    return reconnect_ivl;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_RECONNECT_IVL_MAX value
+
+void
+zsockopt_set_reconnect_ivl_max (void *socket, int reconnect_ivl_max)
+{
+    int rc = zmq_setsockopt (socket, ZMQ_RECONNECT_IVL_MAX, &reconnect_ivl_max, sizeof (int));
+    assert (rc == 0 || errno == ETERM);
+}
+
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_RECONNECT_IVL_MAX value
+int
+zsockopt_reconnect_ivl_max (void *socket)
+{
+    int reconnect_ivl_max;
+    size_t type_size = sizeof (int);
+    zmq_getsockopt (socket, ZMQ_RECONNECT_IVL_MAX, &reconnect_ivl_max, &type_size);
+    return reconnect_ivl_max;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_BACKLOG value
+
+void
+zsockopt_set_backlog (void *socket, int backlog)
+{
+    int rc = zmq_setsockopt (socket, ZMQ_BACKLOG, &backlog, sizeof (int));
+    assert (rc == 0 || errno == ETERM);
+}
+
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_BACKLOG value
+int
+zsockopt_backlog (void *socket)
+{
+    int backlog;
+    size_t type_size = sizeof (int);
+    zmq_getsockopt (socket, ZMQ_BACKLOG, &backlog, &type_size);
+    return backlog;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_MAXMSGSIZE value
+
+void
+zsockopt_set_maxmsgsize (void *socket, int maxmsgsize)
+{
+    int rc = zmq_setsockopt (socket, ZMQ_MAXMSGSIZE, &maxmsgsize, sizeof (int));
+    assert (rc == 0 || errno == ETERM);
+}
+
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_MAXMSGSIZE value
+int
+zsockopt_maxmsgsize (void *socket)
+{
+    int maxmsgsize;
+    size_t type_size = sizeof (int);
+    zmq_getsockopt (socket, ZMQ_MAXMSGSIZE, &maxmsgsize, &type_size);
+    return maxmsgsize;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_SUBSCRIBE value
+
+void
+zsockopt_set_subscribe (void *socket, char * subscribe)
+{
+    int rc = zmq_setsockopt (socket, ZMQ_SUBSCRIBE, subscribe, strlen (subscribe));
+    assert (rc == 0 || errno == ETERM);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_UNSUBSCRIBE value
+
+void
+zsockopt_set_unsubscribe (void *socket, char * unsubscribe)
+{
+    int rc = zmq_setsockopt (socket, ZMQ_UNSUBSCRIBE, unsubscribe, strlen (unsubscribe));
+    assert (rc == 0 || errno == ETERM);
+}
+
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_TYPE value
+int
+zsockopt_type (void *socket)
+{
+    int type;
+    size_t type_size = sizeof (int);
+    zmq_getsockopt (socket, ZMQ_TYPE, &type, &type_size);
+    return type;
+}
+
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_RCVMORE value
+int
+zsockopt_rcvmore (void *socket)
+{
+    int rcvmore;
+    size_t type_size = sizeof (int);
+    zmq_getsockopt (socket, ZMQ_RCVMORE, &rcvmore, &type_size);
+    return rcvmore;
+}
+
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_FD value
+int
+zsockopt_fd (void *socket)
+{
+    int fd;
+    size_t type_size = sizeof (int);
+    zmq_getsockopt (socket, ZMQ_FD, &fd, &type_size);
+    return fd;
+}
+
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_EVENTS value
+int
+zsockopt_events (void *socket)
+{
+    int events;
+    size_t type_size = sizeof (int);
+    zmq_getsockopt (socket, ZMQ_EVENTS, &events, &type_size);
+    return events;
+}
+
+
+#endif
 
 //  --------------------------------------------------------------------------
 //  Selftest
@@ -461,6 +840,7 @@ zsockopt_test (Bool verbose)
     //  All options are valid on SUB sockets
     void *socket = zsocket_new (ctx, ZMQ_SUB);
 
+#if (ZMQ_VERSION_MAJOR == 2)
     zsockopt_set_hwm (socket, 1);
     assert (zsockopt_hwm (socket) == 1);
     zsockopt_hwm (socket);
@@ -507,6 +887,54 @@ zsockopt_test (Bool verbose)
     zsockopt_rcvmore (socket);
     zsockopt_fd (socket);
     zsockopt_events (socket);
+#endif
+
+#if (ZMQ_VERSION_MAJOR == 3)
+    zsockopt_set_sndhwm (socket, 1);
+    assert (zsockopt_sndhwm (socket) == 1);
+    zsockopt_sndhwm (socket);
+    zsockopt_set_rcvhwm (socket, 1);
+    assert (zsockopt_rcvhwm (socket) == 1);
+    zsockopt_rcvhwm (socket);
+    zsockopt_set_affinity (socket, 1);
+    assert (zsockopt_affinity (socket) == 1);
+    zsockopt_affinity (socket);
+    zsockopt_set_identity (socket, "test");
+    zsockopt_set_rate (socket, 1);
+    assert (zsockopt_rate (socket) == 1);
+    zsockopt_rate (socket);
+    zsockopt_set_recovery_ivl (socket, 1);
+    assert (zsockopt_recovery_ivl (socket) == 1);
+    zsockopt_recovery_ivl (socket);
+    zsockopt_set_sndbuf (socket, 1);
+    assert (zsockopt_sndbuf (socket) == 1);
+    zsockopt_sndbuf (socket);
+    zsockopt_set_rcvbuf (socket, 1);
+    assert (zsockopt_rcvbuf (socket) == 1);
+    zsockopt_rcvbuf (socket);
+    zsockopt_set_linger (socket, 1);
+    assert (zsockopt_linger (socket) == 1);
+    zsockopt_linger (socket);
+    zsockopt_set_reconnect_ivl (socket, 1);
+    assert (zsockopt_reconnect_ivl (socket) == 1);
+    zsockopt_reconnect_ivl (socket);
+    zsockopt_set_reconnect_ivl_max (socket, 1);
+    assert (zsockopt_reconnect_ivl_max (socket) == 1);
+    zsockopt_reconnect_ivl_max (socket);
+    zsockopt_set_backlog (socket, 1);
+    assert (zsockopt_backlog (socket) == 1);
+    zsockopt_backlog (socket);
+    zsockopt_set_maxmsgsize (socket, 1);
+    assert (zsockopt_maxmsgsize (socket) == 1);
+    zsockopt_maxmsgsize (socket);
+    zsockopt_set_subscribe (socket, "test");
+    zsockopt_set_unsubscribe (socket, "test");
+    zsockopt_type (socket);
+    zsockopt_rcvmore (socket);
+    zsockopt_fd (socket);
+    zsockopt_events (socket);
+#endif
+
 
     zctx_destroy (&ctx);
     //  @end
