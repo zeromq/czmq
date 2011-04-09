@@ -107,6 +107,9 @@ void zsockopt_set_backlog (void *socket, int backlog);
 void zsockopt_set_maxmsgsize (void *socket, int maxmsgsize);
 void zsockopt_set_subscribe (void *socket, char * subscribe);
 void zsockopt_set_unsubscribe (void *socket, char * unsubscribe);
+
+//  Emulation of widely-used 2.x socket options
+void zsockopt_set_hwm (void *socket, int hwm);
 #endif
 
 //  Self test of this class

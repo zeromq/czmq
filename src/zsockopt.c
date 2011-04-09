@@ -54,7 +54,6 @@ zsockopt_set_hwm (void *socket, int hwm)
 }
 
 
-
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_HWM value
 int
@@ -79,7 +78,6 @@ zsockopt_set_swap (void *socket, int swap)
 }
 
 
-
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_SWAP value
 int
@@ -102,7 +100,6 @@ zsockopt_set_affinity (void *socket, int affinity)
     int rc = zmq_setsockopt (socket, ZMQ_AFFINITY, &value, sizeof (uint64_t));
     assert (rc == 0 || errno == ETERM);
 }
-
 
 
 //  --------------------------------------------------------------------------
@@ -140,7 +137,6 @@ zsockopt_set_rate (void *socket, int rate)
 }
 
 
-
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RATE value
 int
@@ -163,7 +159,6 @@ zsockopt_set_recovery_ivl (void *socket, int recovery_ivl)
     int rc = zmq_setsockopt (socket, ZMQ_RECOVERY_IVL, &value, sizeof (int64_t));
     assert (rc == 0 || errno == ETERM);
 }
-
 
 
 //  --------------------------------------------------------------------------
@@ -190,7 +185,6 @@ zsockopt_set_recovery_ivl_msec (void *socket, int recovery_ivl_msec)
 }
 
 
-
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RECOVERY_IVL_MSEC value
 int
@@ -213,7 +207,6 @@ zsockopt_set_mcast_loop (void *socket, int mcast_loop)
     int rc = zmq_setsockopt (socket, ZMQ_MCAST_LOOP, &value, sizeof (int64_t));
     assert (rc == 0 || errno == ETERM);
 }
-
 
 
 //  --------------------------------------------------------------------------
@@ -240,7 +233,6 @@ zsockopt_set_sndbuf (void *socket, int sndbuf)
 }
 
 
-
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_SNDBUF value
 int
@@ -263,7 +255,6 @@ zsockopt_set_rcvbuf (void *socket, int rcvbuf)
     int rc = zmq_setsockopt (socket, ZMQ_RCVBUF, &value, sizeof (uint64_t));
     assert (rc == 0 || errno == ETERM);
 }
-
 
 
 //  --------------------------------------------------------------------------
@@ -289,7 +280,6 @@ zsockopt_set_linger (void *socket, int linger)
 }
 
 
-
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_LINGER value
 int
@@ -311,7 +301,6 @@ zsockopt_set_reconnect_ivl (void *socket, int reconnect_ivl)
     int rc = zmq_setsockopt (socket, ZMQ_RECONNECT_IVL, &reconnect_ivl, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
-
 
 
 //  --------------------------------------------------------------------------
@@ -337,7 +326,6 @@ zsockopt_set_reconnect_ivl_max (void *socket, int reconnect_ivl_max)
 }
 
 
-
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RECONNECT_IVL_MAX value
 int
@@ -359,7 +347,6 @@ zsockopt_set_backlog (void *socket, int backlog)
     int rc = zmq_setsockopt (socket, ZMQ_BACKLOG, &backlog, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
-
 
 
 //  --------------------------------------------------------------------------
@@ -396,7 +383,6 @@ zsockopt_set_unsubscribe (void *socket, char * unsubscribe)
 }
 
 
-
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_TYPE value
 int
@@ -407,7 +393,6 @@ zsockopt_type (void *socket)
     zmq_getsockopt (socket, ZMQ_TYPE, &type, &type_size);
     return type;
 }
-
 
 
 //  --------------------------------------------------------------------------
@@ -422,7 +407,6 @@ zsockopt_rcvmore (void *socket)
 }
 
 
-
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_FD value
 int
@@ -433,7 +417,6 @@ zsockopt_fd (void *socket)
     zmq_getsockopt (socket, ZMQ_FD, &fd, &type_size);
     return fd;
 }
-
 
 
 //  --------------------------------------------------------------------------
@@ -462,7 +445,6 @@ zsockopt_set_sndhwm (void *socket, int sndhwm)
 }
 
 
-
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_SNDHWM value
 int
@@ -486,7 +468,6 @@ zsockopt_set_rcvhwm (void *socket, int rcvhwm)
 }
 
 
-
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RCVHWM value
 int
@@ -508,7 +489,6 @@ zsockopt_set_affinity (void *socket, int affinity)
     int rc = zmq_setsockopt (socket, ZMQ_AFFINITY, &affinity, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
-
 
 
 //  --------------------------------------------------------------------------
@@ -545,7 +525,6 @@ zsockopt_set_rate (void *socket, int rate)
 }
 
 
-
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RATE value
 int
@@ -567,7 +546,6 @@ zsockopt_set_recovery_ivl (void *socket, int recovery_ivl)
     int rc = zmq_setsockopt (socket, ZMQ_RECOVERY_IVL, &recovery_ivl, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
-
 
 
 //  --------------------------------------------------------------------------
@@ -593,7 +571,6 @@ zsockopt_set_sndbuf (void *socket, int sndbuf)
 }
 
 
-
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_SNDBUF value
 int
@@ -615,7 +592,6 @@ zsockopt_set_rcvbuf (void *socket, int rcvbuf)
     int rc = zmq_setsockopt (socket, ZMQ_RCVBUF, &rcvbuf, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
-
 
 
 //  --------------------------------------------------------------------------
@@ -641,7 +617,6 @@ zsockopt_set_linger (void *socket, int linger)
 }
 
 
-
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_LINGER value
 int
@@ -663,7 +638,6 @@ zsockopt_set_reconnect_ivl (void *socket, int reconnect_ivl)
     int rc = zmq_setsockopt (socket, ZMQ_RECONNECT_IVL, &reconnect_ivl, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
-
 
 
 //  --------------------------------------------------------------------------
@@ -689,7 +663,6 @@ zsockopt_set_reconnect_ivl_max (void *socket, int reconnect_ivl_max)
 }
 
 
-
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RECONNECT_IVL_MAX value
 int
@@ -713,7 +686,6 @@ zsockopt_set_backlog (void *socket, int backlog)
 }
 
 
-
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_BACKLOG value
 int
@@ -735,7 +707,6 @@ zsockopt_set_maxmsgsize (void *socket, int maxmsgsize)
     int rc = zmq_setsockopt (socket, ZMQ_MAXMSGSIZE, &maxmsgsize, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
-
 
 
 //  --------------------------------------------------------------------------
@@ -772,7 +743,6 @@ zsockopt_set_unsubscribe (void *socket, char * unsubscribe)
 }
 
 
-
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_TYPE value
 int
@@ -783,7 +753,6 @@ zsockopt_type (void *socket)
     zmq_getsockopt (socket, ZMQ_TYPE, &type, &type_size);
     return type;
 }
-
 
 
 //  --------------------------------------------------------------------------
@@ -798,7 +767,6 @@ zsockopt_rcvmore (void *socket)
 }
 
 
-
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_FD value
 int
@@ -809,7 +777,6 @@ zsockopt_fd (void *socket)
     zmq_getsockopt (socket, ZMQ_FD, &fd, &type_size);
     return fd;
 }
-
 
 
 //  --------------------------------------------------------------------------
@@ -823,6 +790,16 @@ zsockopt_events (void *socket)
     return events;
 }
 
+
+//  --------------------------------------------------------------------------
+//  Set socket high-water mark, emulating 2.x API
+
+void
+zsockopt_set_hwm (void *socket, int hwm)
+{
+    zsockopt_set_sndhwm (socket, hwm);
+    zsockopt_set_rcvhwm (socket, hwm);
+}
 
 #endif
 
@@ -933,8 +910,8 @@ zsockopt_test (Bool verbose)
     zsockopt_rcvmore (socket);
     zsockopt_fd (socket);
     zsockopt_events (socket);
+    zsockopt_set_hwm (socket, 1);
 #endif
-
 
     zctx_destroy (&ctx);
     //  @end
