@@ -31,13 +31,26 @@
 
 #include "zmq.h"
 
-//  If the version doesn't implement the ROUTER/DEALER macros, fix it -------
+//  Fix up variants of ZMQ constants across different versions
 
 #ifndef ZMQ_ROUTER
 #   define ZMQ_ROUTER ZMQ_XREP
 #endif
 #ifndef ZMQ_DEALER
 #   define ZMQ_DEALER ZMQ_XREQ
+#endif
+#ifndef ZMQ_DONTWAIT
+#   define ZMQ_DONTWAIT ZMQ_NOBLOCK
+#endif
+
+//  Fix differences between 0MQ/2.x and 0MQ/3.x API
+
+#if ZMQ_VERSION_MAJOR == 3
+#   define ZMQ_SEND     zmq_sendmsg
+#   define ZMQ_RECV     zmq_recvmsg
+#else
+#   define ZMQ_SEND     zmq_send
+#   define ZMQ_RECV     zmq_recv
 #endif
 
 //- Establish the compiler and computer system ------------------------------

@@ -1,4 +1,16 @@
 .output "include/zsockopt.h"
+.for version
+.   for option
+.       if type = "uint64" | type = "int64" | type = "uint32" | type = "int"
+.           option.ctype = "int"
+.       elsif type = "blob"
+.           option.ctype = "char *"     #   Enforce C strings
+.           mode = "w"                  #   and read-only
+.       else
+.           echo "E: unknown type: $(type)"
+.       endif
+.   endfor
+.endfor
 /*  =========================================================================
     zsockopt - get/set 0MQ socket options
 
@@ -34,31 +46,27 @@ extern "C" {
 #endif
 
 //  @interface
-.for option
-.   if type = "uint64" | type = "int64" | type = "uint32" | type = "int"
-.       option.ctype = "int"
-.   elsif type = "blob"
-.       option.ctype = "char *"     #   Enforce C strings
-.       mode = "w"                  #   and read-only
-.   else
-.       echo "E: unknown type: $(type)"
-.   endif
-.   if mode = "rw" | mode = "w"
-//  Set socket ZMQ_$(NAME) value
-void
-    zsockopt_set_$(name) (void *socket, $(ctype) $(name));
+.for version
+#if (ZMQ_VERSION_MAJOR == $(major))
+//  Get socket options
+.   for option
+.       if mode = "rw" | mode = "r"
+$(ctype)\
+     zsockopt_$(name) (void *socket);
+.       endif
+.   endfor
 
-.   endif
-.   if mode = "rw" | mode = "r"
-//  Return socket ZMQ_$(NAME) value
-$(ctype)
-    zsockopt_$(name) (void *socket);
+//  Set socket options
+.   for option
+.       if mode = "rw" | mode = "w"
+void zsockopt_set_$(name) (void *socket, $(ctype) $(name));
+.       endif
+.   endfor
+#endif
 
-.   endif
 .endfor
 //  Self test of this class
-int
-    zsockopt_test (Bool verbose);
+int zsockopt_test (Bool verbose);
 //  @end
 
 #ifdef __cplusplus
@@ -110,62 +118,70 @@ int
 #include "../include/zsockopt.h"
 
 
-.for option
-.   if mode = "rw" | mode = "w"
+.for version
+#if (ZMQ_VERSION_MAJOR == $(major))
+.   for option
+.       if mode = "rw" | mode = "w"
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_$(NAME) value
 
 void
 zsockopt_set_$(name) (void *socket, $(ctype) $(name))
 {
-.   if ctype = "int"
-.       if type = "uint64"
+.           if ctype = "int"
+.               if type = "uint64"
     uint64_t value = $(name);
-    int rc = zmq_setsockopt (socket, ZMQ_$(NAME), &value, sizeof (value));
-.       elsif type = "int64"
+    int rc = zmq_setsockopt (socket, ZMQ_$(NAME), &value, sizeof (uint64_t));
+.               elsif type = "int64"
     int64_t value = $(name);
-    int rc = zmq_setsockopt (socket, ZMQ_$(NAME), &value, sizeof (value));
-.       elsif type = "uint32"
+    int rc = zmq_setsockopt (socket, ZMQ_$(NAME), &value, sizeof (int64_t));
+.               elsif type = "uint32"
     uint32_t value = $(name);
-    int rc = zmq_setsockopt (socket, ZMQ_$(NAME), &value, sizeof (value));
-.       else
-    int rc = zmq_setsockopt (socket, ZMQ_$(NAME), &$(name), sizeof ($(name)));
-.       endif
-.   else
+    int rc = zmq_setsockopt (socket, ZMQ_$(NAME), &value, sizeof (uint32_t));
+.               else
+    int rc = zmq_setsockopt (socket, ZMQ_$(NAME), &$(name), sizeof (int));
+.               endif
+.           else
     int rc = zmq_setsockopt (socket, ZMQ_$(NAME), $(name), strlen ($(name)));
-.   endif
+.           endif
     assert (rc == 0 || errno == ETERM);
 }
 
 
-.   endif
-.   if mode = "rw" | mode = "r"
+.           endif
+.           if mode = "rw" | mode = "r"
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_$(NAME) value
 $(ctype)
 zsockopt_$(name) (void *socket)
 {
-.   if type = "uint64"
+.           if type = "uint64"
     uint64_t $(name);
-.   elsif type = "int64"
+    size_t type_size = sizeof (uint64_t);
+.           elsif type = "int64"
     int64_t $(name);
-.   elsif type = "uint32"
+    size_t type_size = sizeof (int64_t);
+.           elsif type = "uint32"
     uint32_t $(name);
-.   elsif type = "int"
+    size_t type_size = sizeof (uint32_t);
+.           elsif type = "int"
     int $(name);
-.   endif
-    size_t type_size = sizeof ($(name));
+    size_t type_size = sizeof (int);
+.           endif
     zmq_getsockopt (socket, ZMQ_$(NAME), &$(name), &type_size);
-.   if type = "int"
+.           if type = "int"
     return $(name);
-.   else
+.           else
     return ($(ctype)) $(name);
-.   endif
+.           endif
 }
 
 
-.   endif
+.       endif
+.   endfor
+#endif
+
 .endfor
 //  --------------------------------------------------------------------------
 //  Selftest
@@ -181,20 +197,25 @@ zsockopt_test (Bool verbose)
     //  All options are valid on SUB sockets
     void *socket = zsocket_new (ctx, ZMQ_SUB);
 
-.for option
-.   if mode = "rw" | mode = "w"
-.       if ctype = "int"
+.for version
+#if (ZMQ_VERSION_MAJOR == $(major))
+.   for option
+.       if mode = "rw" | mode = "w"
+.           if ctype = "int"
     zsockopt_set_$(name) (socket, 1);
-.           if mode = "rw"
+.               if mode = "rw"
     assert (zsockopt_$(name) (socket) == 1);
-.           endif
-.       else
+.               endif
+.           else
     zsockopt_set_$(name) (socket, "test");
+.           endif
 .       endif
-.   endif
-.   if mode = "rw" | mode = "r"
+.       if mode = "rw" | mode = "r"
     zsockopt_$(name) (socket);
-.   endif
+.       endif
+.   endfor
+#endif
+
 .endfor
 
     zctx_destroy (&ctx);
