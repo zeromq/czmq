@@ -486,7 +486,8 @@ zsockopt_rcvhwm (void *socket)
 void
 zsockopt_set_affinity (void *socket, int affinity)
 {
-    int rc = zmq_setsockopt (socket, ZMQ_AFFINITY, &affinity, sizeof (int));
+    uint64_t value = affinity;
+    int rc = zmq_setsockopt (socket, ZMQ_AFFINITY, &value, sizeof (uint64_t));
     assert (rc == 0 || errno == ETERM);
 }
 
@@ -496,10 +497,10 @@ zsockopt_set_affinity (void *socket, int affinity)
 int
 zsockopt_affinity (void *socket)
 {
-    int affinity;
-    size_t type_size = sizeof (int);
+    uint64_t affinity;
+    size_t type_size = sizeof (uint64_t);
     zmq_getsockopt (socket, ZMQ_AFFINITY, &affinity, &type_size);
-    return affinity;
+    return (int) affinity;
 }
 
 
@@ -704,7 +705,8 @@ zsockopt_backlog (void *socket)
 void
 zsockopt_set_maxmsgsize (void *socket, int maxmsgsize)
 {
-    int rc = zmq_setsockopt (socket, ZMQ_MAXMSGSIZE, &maxmsgsize, sizeof (int));
+    int64_t value = maxmsgsize;
+    int rc = zmq_setsockopt (socket, ZMQ_MAXMSGSIZE, &value, sizeof (int64_t));
     assert (rc == 0 || errno == ETERM);
 }
 
@@ -714,10 +716,10 @@ zsockopt_set_maxmsgsize (void *socket, int maxmsgsize)
 int
 zsockopt_maxmsgsize (void *socket)
 {
-    int maxmsgsize;
-    size_t type_size = sizeof (int);
+    int64_t maxmsgsize;
+    size_t type_size = sizeof (int64_t);
     zmq_getsockopt (socket, ZMQ_MAXMSGSIZE, &maxmsgsize, &type_size);
-    return maxmsgsize;
+    return (int) maxmsgsize;
 }
 
 
@@ -910,6 +912,7 @@ zsockopt_test (Bool verbose)
     zsockopt_rcvmore (socket);
     zsockopt_fd (socket);
     zsockopt_events (socket);
+
     zsockopt_set_hwm (socket, 1);
 #endif
 

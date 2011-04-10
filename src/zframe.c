@@ -100,7 +100,7 @@ zframe_recv (void *socket)
 {
     assert (socket);
     zframe_t *self = zframe_new (NULL, 0);
-    if (zmq_recvmsg (socket, &self->zmsg, 0)) {
+    if (zmq_recvmsg (socket, &self->zmsg, 0) < 0) {
         zframe_destroy (&self);
         return NULL;            //  Interrupted or terminated
     }

@@ -227,7 +227,7 @@ zloop_start (zloop_t *self)
                 tickless = timer->when;
             timer = (s_timer_t *) zlist_next (self->timers);
         }
-        long timeout = (long) (tickless - zclock_time ()) * 1000;
+        long timeout = (long) (tickless - zclock_time ()) * ZMQ_POLL_MULT;
         if (timeout < 0)
             timeout = 0;
 
