@@ -44,10 +44,13 @@ zctx_t *
 void
     zctx_destroy (zctx_t **self_p);
 
+//  @end
 //  Create new shadow context, returns context object
+//  For internal use only.
 zctx_t *
     zctx_shadow (zctx_t *self);
 
+//  @interface
 //  Raise default I/O threads from 1, for crazy heavy applications
 void
     zctx_set_iothreads (zctx_t *self, int iothreads);
