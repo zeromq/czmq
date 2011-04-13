@@ -232,7 +232,7 @@ zloop_start (zloop_t *self)
             timeout = 0;
 
         rc = zmq_poll (self->pollset, zlist_size (self->readers), timeout);
-        if (rc == -1) {
+        if (rc == -1 || zctx_interrupted) {
             rc = 0;
             break;              //  Context has been shut down
         }
