@@ -32,6 +32,10 @@ void
 int
     zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *arg);
 
+//  Set verbose tracing of reactor on/off
+void
+    zloop_set_verbose (zloop_t *self, Bool verbose);
+
 //  Start the reactor, ends if a callback function returns -1, or the process
 //  received SIGINT or SIGTERM.
 int
@@ -64,6 +68,7 @@ EXAMPLE
 
     zloop_t *loop = zloop_new ();
     assert (loop);
+    zloop_set_verbose (loop, verbose);
 
     //  After 10 msecs, send a ping message to output
     zloop_timer (loop, 10, 1,  s_timer_event, output);

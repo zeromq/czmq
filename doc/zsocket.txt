@@ -28,6 +28,10 @@ void
 void
     zsocket_connect (void *socket, const char *format, ...);
 
+//  Returns socket type as printable constant string
+char *
+    zsocket_type_str (void *socket);
+
 //  Self test of this class
 int
     zsocket_test (Bool verbose);
@@ -54,6 +58,8 @@ EXAMPLE
 
     void *writer = zsocket_new (ctx, ZMQ_PUSH);
     void *reader = zsocket_new (ctx, ZMQ_PULL);
+    assert (streq (zsocket_type_str (writer), "PUSH"));
+    assert (streq (zsocket_type_str (reader), "PULL"));
     zsocket_bind (writer, "tcp://%s:%d", interf, service);
     zsocket_connect (reader, "tcp://%s:%d", domain, service);
     zstr_send (writer, "HELLO");
