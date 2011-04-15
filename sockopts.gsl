@@ -156,6 +156,7 @@ zsockopt_set_$(name) (void *socket, $(ctype) $(name))
 .           if mode = "rw" | mode = "r"
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_$(NAME) value
+
 $(ctype)
 zsockopt_$(name) (void *socket)
 {
