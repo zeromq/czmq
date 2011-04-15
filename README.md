@@ -167,10 +167,6 @@ This is the class interface:
     void
         zctx_destroy (zctx_t **self_p);
     
-    //  Create new shadow context, returns context object
-    zctx_t *
-        zctx_shadow (zctx_t *self);
-    
     //  Raise default I/O threads from 1, for crazy heavy applications
     void
         zctx_set_iothreads (zctx_t *self, int iothreads);
@@ -224,6 +220,10 @@ This is the class interface:
     //  Checks with assertion that the connect was valid
     void
         zsocket_connect (void *socket, const char *format, ...);
+    
+    //  Returns socket type as printable constant string
+    char *
+        zsocket_type_str (void *socket);
     
     //  Self test of this class
     int
@@ -311,6 +311,9 @@ This is the class interface:
     void zsockopt_set_maxmsgsize (void *socket, int maxmsgsize);
     void zsockopt_set_subscribe (void *socket, char * subscribe);
     void zsockopt_set_unsubscribe (void *socket, char * unsubscribe);
+    
+    //  Emulation of widely-used 2.x socket options
+    void zsockopt_set_hwm (void *socket, int hwm);
     #endif
     
     //  Self test of this class
@@ -574,6 +577,10 @@ This is the class interface:
     //  repeat 'times' times, unless 'times' is zero, meaning repeat forever.
     int
         zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *arg);
+    
+    //  Set verbose tracing of reactor on/off
+    void
+        zloop_set_verbose (zloop_t *self, Bool verbose);
     
     //  Start the reactor, ends if a callback function returns -1, or the process
     //  received SIGINT or SIGTERM.

@@ -1,8 +1,20 @@
-libzapi version 1.3.2 (beta), released on 2011/04/xx
+libzapi version 1.3.2 (beta), released on 2011/04/15
 ====================================================
 
 Changes
 -------
+
+* Added zsocket_type_str method to return printable socket type.
+
+* Added zloop_set_verbose method to enable/disable reactor activity.
+
+* Fixed zloop to call right handlers even if handlers register/cancel
+  other handlers.
+
+* Fixed zloop to not call handlers when interrupted.
+
+* Added zsocket_set_hwm method to emulate 2.x option (sets both send
+  and recv high-water marks).
 
 * Several parts of the 3.0 porting didn't work properly - fixed.
 
