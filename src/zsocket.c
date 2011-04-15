@@ -102,6 +102,25 @@ zsocket_connect (void *socket, const char *format, ...)
 
 
 //  --------------------------------------------------------------------------
+//  Returns socket type as printable constant string
+
+char *
+zsocket_type_str (void *socket)
+{
+    char *type_name [] = {
+        "PAIR", "PUB", "SUB", "REQ", "REP",
+        "DEALER", "ROUTER", "PULL", "PUSH",
+        "XPUB", "XSUB"
+    };
+    int type = zsockopt_type (socket);
+    if (type < 0 || type > ZMQ_XSUB)
+        return "UNKNOWN";
+    else
+        return type_name [type];
+}
+
+
+//  --------------------------------------------------------------------------
 //  Selftest
 
 int
@@ -119,6 +138,8 @@ zsocket_test (Bool verbose)
 
     void *writer = zsocket_new (ctx, ZMQ_PUSH);
     void *reader = zsocket_new (ctx, ZMQ_PULL);
+    assert (streq (zsocket_type_str (writer), "PUSH"));
+    assert (streq (zsocket_type_str (reader), "PULL"));
     zsocket_bind (writer, "tcp://%s:%d", interf, service);
     zsocket_connect (reader, "tcp://%s:%d", domain, service);
     zstr_send (writer, "HELLO");

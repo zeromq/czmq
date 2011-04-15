@@ -52,6 +52,10 @@ void
 void
     zsocket_connect (void *socket, const char *format, ...);
 
+//  Returns socket type as printable constant string
+char *
+    zsocket_type_str (void *socket);
+
 //  Self test of this class
 int
     zsocket_test (Bool verbose);
