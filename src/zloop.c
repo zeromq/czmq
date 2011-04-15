@@ -49,6 +49,7 @@ struct _zloop_t {
     zlist_t *timers;            //  List of timers
     zmq_pollitem_t *pollset;    //  zmq_poll set
     Bool dirty;                 //  True if pollset needs rebuilding
+    Bool verbose;               //  True if verbose tracing wanted
 };
 
 //  Readers and timers are held as small structures of their own
@@ -143,6 +144,10 @@ zloop_reader (zloop_t *self, void *socket, zloop_fn handler, void *arg)
     assert (self);
     zlist_push (self->readers, s_reader_new (socket, handler, arg));
     self->dirty = TRUE;         //  Rebuild will be needed
+    if (self->verbose)
+        zclock_log ("I: zloop: register reader for %s socket %p",
+            zsocket_type_str (socket), socket);
+
     return 0;
 }
 
@@ -165,6 +170,9 @@ zloop_cancel (zloop_t *self, void *socket)
         }
         reader = (s_reader_t *) zlist_next (self->readers);
     }
+    if (self->verbose)
+        zclock_log ("I: zloop: cancel reader for %s socket %p",
+            zsocket_type_str (socket), socket);
 }
 
 
@@ -179,7 +187,18 @@ zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *
 {
     assert (self);
     zlist_push (self->timers, s_timer_new (delay, times, handler, arg));
+    if (self->verbose)
+        zclock_log ("I: zloop: register timer delay=%d times=%d", delay, times);
     return 0;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set verbose tracing of reactor on/off
+void
+zloop_set_verbose (zloop_t *self, Bool verbose)
+{
+    self->verbose = verbose;
 }
 
 
@@ -227,19 +246,26 @@ zloop_start (zloop_t *self)
                 tickless = timer->when;
             timer = (s_timer_t *) zlist_next (self->timers);
         }
-        long timeout = (long) (tickless - zclock_time ()) * ZMQ_POLL_MSEC;
+        long timeout = (long) (tickless - zclock_time ());
         if (timeout < 0)
             timeout = 0;
+        if (self->verbose)
+            zclock_log ("I: zloop: polling for %d msec", timeout);
 
-        rc = zmq_poll (self->pollset, zlist_size (self->readers), timeout);
+        rc = zmq_poll (self->pollset, zlist_size (self->readers),
+                       timeout * ZMQ_POLL_MSEC);
         if (rc == -1 || zctx_interrupted) {
+            if (self->verbose)
+                zclock_log ("I: zloop: interrupted");
             rc = 0;
             break;              //  Context has been shut down
         }
         //  Handle any timers that have now expired
         timer = (s_timer_t *) zlist_first (self->timers);
         while (timer) {
-            if (zclock_time () > timer->when) {
+            if (zclock_time () >= timer->when) {
+                if (self->verbose)
+                    zclock_log ("I: zloop: call timer handler");
                 rc = timer->handler (self, NULL, timer->arg);
                 if (rc == -1)
                     break;      //  Timer handler signalled break
@@ -257,6 +283,9 @@ zloop_start (zloop_t *self)
         uint item_nbr = 0;
         while (reader && rc != -1) {
             if (self->pollset [item_nbr].revents & ZMQ_POLLIN) {
+                if (self->verbose)
+                    zclock_log ("I: zloop: call %s socket handler",
+                        zsocket_type_str (reader->socket));
                 rc = reader->handler (self, reader->socket, reader->arg);
                 if (rc == -1)
                     break;      //  Reader handler signalled break
@@ -301,6 +330,7 @@ zloop_test (Bool verbose)
 
     zloop_t *loop = zloop_new ();
     assert (loop);
+    zloop_set_verbose (loop, verbose);
 
     //  After 10 msecs, send a ping message to output
     zloop_timer (loop, 10, 1,  s_timer_event, output);
