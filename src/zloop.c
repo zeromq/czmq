@@ -42,30 +42,35 @@
 #include "../include/zsocket.h"
 #include "../include/zloop.h"
 
+typedef struct _s_reader_t s_reader_t;
+typedef struct _s_timer_t s_timer_t;
+
 //  Structure of our class
 
 struct _zloop_t {
     zlist_t *readers;           //  List of sockets for reading
     zlist_t *timers;            //  List of timers
+    int poll_size;                 //  Size of poll set
     zmq_pollitem_t *pollset;    //  zmq_poll set
+    s_reader_t *readset;        //  Readers for this poll set
     Bool dirty;                 //  True if pollset needs rebuilding
     Bool verbose;               //  True if verbose tracing wanted
 };
 
 //  Readers and timers are held as small structures of their own
-typedef struct {
+struct _s_reader_t {
     void *socket;
     zloop_fn *handler;
     void *arg;
-} s_reader_t;
+};
 
-typedef struct {
+struct _s_timer_t {
     size_t delay;
     size_t times;
     zloop_fn *handler;
     void *arg;
     int64_t when;               //  Clock time when alarm goes off
-} s_timer_t;
+};
 
 static s_reader_t *
 s_reader_new (void *socket, zloop_fn handler, void *arg)
@@ -126,6 +131,7 @@ zloop_destroy (zloop_t **self_p)
         zlist_destroy (&self->timers);
 
         free (self->pollset);
+        free (self->readset);
         free (self);
         *self_p = NULL;
     }
@@ -145,7 +151,7 @@ zloop_reader (zloop_t *self, void *socket, zloop_fn handler, void *arg)
     zlist_push (self->readers, s_reader_new (socket, handler, arg));
     self->dirty = TRUE;         //  Rebuild will be needed
     if (self->verbose)
-        zclock_log ("I: zloop: register reader for %s socket %p",
+        zclock_log ("I: zloop: register %s socket reader (%p)",
             zsocket_type_str (socket), socket);
 
     return 0;
@@ -171,7 +177,7 @@ zloop_cancel (zloop_t *self, void *socket)
         reader = (s_reader_t *) zlist_next (self->readers);
     }
     if (self->verbose)
-        zclock_log ("I: zloop: cancel reader for %s socket %p",
+        zclock_log ("I: zloop: cancel %s socket reader (%p)",
             zsocket_type_str (socket), socket);
 }
 
@@ -223,16 +229,25 @@ zloop_start (zloop_t *self)
     //  Main reactor loop
     while (!zctx_interrupted) {
         //  Rebuild pollitem set if necessary
+        //  We hold an array of readers that matches the pollset, so
+        //  we can register/cancel readers orthogonally to executing
+        //  the pollset activity on readers.
+        uint item_nbr;
         if (self->dirty) {
             free (self->pollset);
+            free (self->readset);
+            self->poll_size = zlist_size (self->readers);
             self->pollset = (zmq_pollitem_t *) zmalloc (
-                zlist_size (self->readers) * sizeof (zmq_pollitem_t));
+                self->poll_size * sizeof (zmq_pollitem_t));
+            self->readset = (s_reader_t *) zmalloc (
+                self->poll_size * sizeof (s_reader_t));
 
             s_reader_t *reader = (s_reader_t *) zlist_first (self->readers);
-            uint item_nbr = 0;
+            item_nbr = 0;
             while (reader) {
                 self->pollset [item_nbr].socket = reader->socket;
                 self->pollset [item_nbr].events = ZMQ_POLLIN;
+                self->readset [item_nbr] = *reader;
                 reader = (s_reader_t *) zlist_next (self->readers);
                 item_nbr++;
             }
@@ -252,8 +267,7 @@ zloop_start (zloop_t *self)
         if (self->verbose)
             zclock_log ("I: zloop: polling for %d msec", timeout);
 
-        rc = zmq_poll (self->pollset, zlist_size (self->readers),
-                       timeout * ZMQ_POLL_MSEC);
+        rc = zmq_poll (self->pollset, self->poll_size, timeout * ZMQ_POLL_MSEC);
         if (rc == -1 || zctx_interrupted) {
             if (self->verbose)
                 zclock_log ("I: zloop: interrupted");
@@ -279,19 +293,17 @@ zloop_start (zloop_t *self)
             timer = (s_timer_t *) zlist_next (self->timers);
         }
         //  Handle any readers that are ready
-        s_reader_t *reader = (s_reader_t *) zlist_first (self->readers);
-        uint item_nbr = 0;
-        while (reader && rc != -1) {
+        for (item_nbr = 0; item_nbr < self->poll_size; item_nbr++) {
             if (self->pollset [item_nbr].revents & ZMQ_POLLIN) {
+                s_reader_t *reader = &self->readset [item_nbr];
+                assert (self->pollset [item_nbr].socket == reader->socket);
                 if (self->verbose)
-                    zclock_log ("I: zloop: call %s socket handler",
-                        zsocket_type_str (reader->socket));
+                    zclock_log ("I: zloop: call %s socket handler (%p)",
+                        zsocket_type_str (reader->socket), reader->socket);
                 rc = reader->handler (self, reader->socket, reader->arg);
                 if (rc == -1)
                     break;      //  Reader handler signalled break
             }
-            reader = (s_reader_t *) zlist_next (self->readers);
-            item_nbr++;
         }
         if (rc == -1)
             break;
