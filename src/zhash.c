@@ -356,21 +356,17 @@ int
 zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument)
 {
     assert (self);
-    uint
-        index;
-    item_t
-        *item;
-    int
-        rc = 0;
-
+    int rc = 0;
+    uint index;
     for (index = 0; index != self->limit; index++) {
-        item = self->items [index];
+        item_t *item = self->items [index];
         while (item) {
             //  Invoke callback, passing item properties and argument
+            item_t *next = item->next;
             rc = callback (item->key, item->value, argument);
             if (rc)
                 break;          //  End if non-zero return code
-            item = item->next;
+            item = next;
         }
     }
     return rc;
