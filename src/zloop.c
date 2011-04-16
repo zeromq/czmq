@@ -50,7 +50,7 @@ typedef struct _s_timer_t s_timer_t;
 struct _zloop_t {
     zlist_t *readers;           //  List of sockets for reading
     zlist_t *timers;            //  List of timers
-    int poll_size;                 //  Size of poll set
+    int poll_size;              //  Size of poll set
     zmq_pollitem_t *pollset;    //  zmq_poll set
     s_reader_t *readset;        //  Readers for this poll set
     Bool dirty;                 //  True if pollset needs rebuilding
