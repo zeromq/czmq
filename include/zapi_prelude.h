@@ -43,6 +43,9 @@
 #   define ZMQ_DONTWAIT     ZMQ_NOBLOCK
 #endif
 #if ZMQ_VERSION_MAJOR == 2
+#   if ZMQ_VERSION_MINOR == 0
+#       error "libzapi requires at least libzmq/2.1.x stable"
+#   endif
 #   define zmq_sendmsg      zmq_send
 #   define zmq_recvmsg      zmq_recv
 #   define ZMQ_POLL_MSEC    1000        //  zmq_poll is usec
