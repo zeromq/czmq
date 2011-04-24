@@ -134,7 +134,7 @@ zsocket_test (Bool verbose)
     //  Create a detached thread, let it run
     char *interf = "*";
     char *domain = "localhost";
-    int service = 5555;
+    int service = 5560;
 
     void *writer = zsocket_new (ctx, ZMQ_PUSH);
     void *reader = zsocket_new (ctx, ZMQ_PULL);
