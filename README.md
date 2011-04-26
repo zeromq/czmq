@@ -795,7 +795,7 @@ for this library will say "insane" at least once. Anyhow, milliseconds
 are a concept we can deal with. Seconds are too fat, nanoseconds too
 tiny, but milliseconds are just right for slices of time we want to work
 with at the ØMQ scale. zclock doesn't give you objects to work with, we
-like the zapi class model but we're not insane. There, got it in again.
+like the czmq class model but we're not insane. There, got it in again.
 
 <A name="toc2-253" title="Design Ideology" />
 ## Design Ideology
