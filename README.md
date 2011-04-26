@@ -1,6 +1,7 @@
+Z.set GIT=https://github.com/zeromq/czmq
 
-<A name="toc1-3" title="libzapi - High-level C binding for ØMQ" />
-# libzapi - High-level C binding for ØMQ
+<A name="toc1-3" title="czmq - High-level C binding for ØMQ" />
+# czmq - High-level C binding for ØMQ
 
 <A name="toc2-6" title="Contents" />
 ## Contents
@@ -12,7 +13,7 @@
 &emsp;<a href="#toc3-68">Ownership and License</a>
 &emsp;<a href="#toc3-75">Contributing</a>
 
-**<a href="#toc2-84">Using libzapi</a>**
+**<a href="#toc2-84">Using czmq</a>**
 &emsp;<a href="#toc3-87">Building and Installing</a>
 &emsp;<a href="#toc3-108">Linking with an Application</a>
 &emsp;<a href="#toc3-115">API Summary</a>
@@ -42,7 +43,7 @@
 &emsp;<a href="#toc3-384">Assertions</a>
 &emsp;<a href="#toc3-402">Documentation</a>
 &emsp;<a href="#toc3-441">Development</a>
-&emsp;<a href="#toc3-451">Porting libzapi</a>
+&emsp;<a href="#toc3-451">Porting czmq</a>
 &emsp;<a href="#toc3-464">Code Generation</a>
 &emsp;<a href="#toc3-473">This Document</a>
 
@@ -52,16 +53,16 @@
 <A name="toc3-14" title="Scope and Goals" />
 ### Scope and Goals
 
-libzapi has these goals:
+czmq has these goals:
 
 * To wrap the ØMQ core API in semantics that are natural and lead to shorter, more readable applications.
-* To hide the differences between versions of ØMQ, particularly 2.0, 2.1, and 3.0.
+* To hide the differences between versions of ØMQ, particularly 2.1 and 3.0.
 * To provide a space for development of more sophisticated API semantics.
 
-libzapi grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.org) and [ZFL](http://zfl.zeromq.org).
+czmq grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.org) and [ZFL](http://zfl.zeromq.org). Until end-April 2011, czmq was known as //libzapi//.
 
 <center>
-<img src="https://github.com/zeromq/libzapi/raw/master/images/README_1.png" alt="1">
+<img src="README_1.png" alt="1">
 </center>
 
 <A name="toc3-53" title="Highlights" />
@@ -82,29 +83,29 @@ libzapi grew out of concepts developed in [ØMQ - The Guide](http://zguide.zerom
 <A name="toc3-68" title="Ownership and License" />
 ### Ownership and License
 
-libzapi is maintained by Pieter Hintjens and Mikko Koppanen (build system). Its other authors and contributors are listed in the AUTHORS file. It is held by the ZeroMQ organization at github.com.
+czmq is maintained by Pieter Hintjens and Mikko Koppanen (build system). Its other authors and contributors are listed in the AUTHORS file. It is held by the ZeroMQ organization at github.com.
 
-The authors of libzapi grant you use of this software under the terms of the GNU Lesser General Public License (LGPL). For details see the files `COPYING` and `COPYING.LESSER` in this directory.
+The authors of czmq grant you use of this software under the terms of the GNU Lesser General Public License (LGPL). For details see the files `COPYING` and `COPYING.LESSER` in this directory.
 
 <A name="toc3-75" title="Contributing" />
 ### Contributing
 
-To submit an issue use the [issue tracker](http://github.com/zeromq/libzapi/issues). All discussion happens on the [zeromq-dev](zeromq-dev@lists.zeromq.org) list or #zeromq IRC channel at irc.freenode.net.
+To submit an issue use the [issue tracker](http://github.com/zeromq/czmq/issues). All discussion happens on the [zeromq-dev](zeromq-dev@lists.zeromq.org) list or #zeromq IRC channel at irc.freenode.net.
 
 The proper way to submit patches is to clone this repository, make your changes, and use git to create a patch or a pull request. See http://www.zeromq.org/docs:contributing. All contributors are listed in AUTHORS.
 
-The general rule is, if you contribute code to libzapi you must be willing to maintain it as long as there are users of it. Code with no active maintainer will in general be deprecated and/or removed.
+The general rule is, if you contribute code to czmq you must be willing to maintain it as long as there are users of it. Code with no active maintainer will in general be deprecated and/or removed.
 
-<A name="toc2-84" title="Using libzapi" />
-## Using libzapi
+<A name="toc2-84" title="Using czmq" />
+## Using czmq
 
 <A name="toc3-87" title="Building and Installing" />
 ### Building and Installing
 
-libzapi uses autotools for packaging. To build from git (all example commands are for Linux):
+czmq uses autotools for packaging. To build from git (all example commands are for Linux):
 
-    git clone git://github.com/zeromq/libzapi.git
-    cd libzapi
+    git clone git://github.com/zeromq/czmq.git
+    cd czmq
     sh autogen.sh
     ./configure
     make all
@@ -115,16 +116,16 @@ You will need the libtool and autotools packages. On FreeBSD, you may need to sp
 
     ./configure --with-zeromq=/usr/local
 
-After building, you can run the libzapi selftests:
+After building, you can run the czmq selftests:
 
     make check
 
 <A name="toc3-108" title="Linking with an Application" />
 ### Linking with an Application
 
-Include `zapi.h` in your application and link with libzapi. Here is a typical gcc link command:
+Include `czmq.h` in your application and link with czmq. Here is a typical gcc link command:
 
-    gcc -lzapi -lzmq myapp.c -o myapp
+    gcc -lczmq -lzmq myapp.c -o myapp
 
 <A name="toc3-115" title="API Summary" />
 ### API Summary
@@ -175,11 +176,11 @@ This is the class interface:
     void
         zctx_set_linger (zctx_t *self, int linger);
     
-    //  Create socket within this context, for libzapi use only
+    //  Create socket within this context, for czmq use only
     void *
         zctx__socket_new (zctx_t *self, int type);
     
-    //  Destroy socket within this context, for libzapi use only
+    //  Destroy socket within this context, for czmq use only
     void
         zctx__socket_destroy (zctx_t *self, void *socket);
     
@@ -201,13 +202,13 @@ calls. Automatically subscribes SUB sockets to "".
 
 This is the class interface:
 
-    //  Create a new socket within our libzapi context, replaces zmq_socket.
+    //  Create a new socket within our czmq context, replaces zmq_socket.
     //  If the socket is a SUB socket, automatically subscribes to everything.
     //  Use this to get automatic management of the socket at shutdown.
     void *
         zsocket_new (zctx_t *self, int type);
     
-    //  Destroy a socket within our libzapi context, replaces zmq_close.
+    //  Destroy a socket within our czmq context, replaces zmq_close.
     void
         zsocket_destroy (zctx_t *self, void *socket);
     
@@ -332,7 +333,7 @@ and appends a null byte on received strings. This class is for simple
 message sending.
 
 <center>
-<img src="https://github.com/zeromq/libzapi/raw/master/images/README_2.png" alt="2">
+<img src="README_2.png" alt="2">
 </center>
 
 This is the class interface:
@@ -813,7 +814,7 @@ The answer to this, as we learned from building enterprise-level C applications 
 
 C has no standard API style. It is one thing to write a useful component, but something else to provide an API that is consistent and obvious across many components. We learned from building [OpenAMQ](http://www.openamq.org), a messaging client and server of 0.5M LoC, that a consistent model for extending C makes life for the application developer much easier.
 
-The general model is that of a class (the source package) that provides objects (in fact C structures). The application creates objects and then works with them. When done, the application destroys the object. In C, we tend to use the same name for the object as the class, when we can, and it looks like this (to take a fictitious libzapi class):
+The general model is that of a class (the source package) that provides objects (in fact C structures). The application creates objects and then works with them. When done, the application destroys the object. In C, we tend to use the same name for the object as the class, when we can, and it looks like this (to take a fictitious czmq class):
 
     zregexp_t *regexp = zregexp_new (regexp_string);
     if (!regexp)
@@ -838,7 +839,7 @@ No model is fully consistent, and classes can define their own rules if it helps
 <A name="toc3-292" title="Naming Style" />
 ### Naming Style
 
-libzapi aims for short, consistent names, following the theory that names we use most often should be shortest. Classes get one-word names, unless they are part of a family of classes in which case they may be two words, the first being the family name. Methods, similarly, get one-word names and we aim for consistency across classes (so a method that does something semantically similar in two classes will get the same name in both). So the canonical name for any method is:
+czmq aims for short, consistent names, following the theory that names we use most often should be shortest. Classes get one-word names, unless they are part of a family of classes in which case they may be two words, the first being the family name. Methods, similarly, get one-word names and we aim for consistency across classes (so a method that does something semantically similar in two classes will get the same name in both). So the canonical name for any method is:
 
     zclassname_methodname
 
@@ -861,12 +862,12 @@ We assume that at some point we'll need to switch to a doubly-linked list.
 
 Creating a portable C application can be rewarding in terms of maintaining a single code base across many platforms, and keeping (expensive) system-specific knowledge separate from application developers. In most projects (like ØMQ core), there is no portability layer and application code does conditional compilation for all mixes of platforms. This leads to quite messy code.
 
-libzapi is a portability layer, similar to but thinner than libraries like the [Apache Portable Runtime](http://apr.apache.org) (APR).
+czmq is a portability layer, similar to but thinner than libraries like the [Apache Portable Runtime](http://apr.apache.org) (APR).
 
 These are the places a C application is subject to arbitrary system differences:
 
-* Different compilers may offer slightly different variants of the C language, often lacking specific types or using neat non-portable names. Windows is a big culprit here. We solve this by 'patching' the language in zapi_prelude.h, e.g. defining int64_t on Windows.
-* System header files are inconsistent, i.e. you need to include different files depending on the OS type and version. We solve this by pulling in all necessary header files in zapi_prelude.h. This is a proven brute-force approach that increases recompilation times but eliminates a major source of pain.
+* Different compilers may offer slightly different variants of the C language, often lacking specific types or using neat non-portable names. Windows is a big culprit here. We solve this by 'patching' the language in czmq_prelude.h, e.g. defining int64_t on Windows.
+* System header files are inconsistent, i.e. you need to include different files depending on the OS type and version. We solve this by pulling in all necessary header files in czmq_prelude.h. This is a proven brute-force approach that increases recompilation times but eliminates a major source of pain.
 * System libraries are inconsistent, i.e. you need to link with different libraries depending on the OS type and version. We solve this with an external compilation tool, 'C', which detects the OS type and version (at runtime) and builds the necessary link commands.
 * System functions are inconsistent, i.e. you need to call different functions depending, again, on OS type and version. We solve this by building small abstract classes that handle specific areas of functionality, and doing conditional compilation in these.
 
@@ -880,7 +881,7 @@ An example of the last:
         pid = 0;
     #endif
 
-libzapi uses the GNU autotools system, so non-portable code can use the macros this defines. It can also use macros defined by the zapi_prelude.h header file.
+czmq uses the GNU autotools system, so non-portable code can use the macros this defines. It can also use macros defined by the czmq_prelude.h header file.
 
 <A name="toc3-339" title="Technical Aspects" />
 ### Technical Aspects
@@ -889,8 +890,8 @@ libzapi uses the GNU autotools system, so non-portable code can use the macros t
 * *Name spaces*: we prefix class names with `z`, which ensures that all exported functions are globally safe.
 * *Library versioning*: we don't make any attempt to version the library at this stage. Classes are in our experience highly stable once they are built and tested, the only changes typically being added methods.
 * *Performance*: for critical path processing, you may want to avoid creating and destroying classes. However on modern Linux systems the heap allocator is very fast. Individual classes can choose whether or not to nullify their data on allocation.
-* *Self-testing*: every class has a `selftest` method that runs through the methods of the class. In theory, calling all selftest functions of all classes does a full unit test of the library. The `zapi_selftest` application does this.
-* *Memory management*: libzapi classes do not use any special memory management techiques to detect leaks. We've done this in the past but it makes the code relatively complex. Instead, we do memory leak testing using tools like valgrind.
+* *Self-testing*: every class has a `selftest` method that runs through the methods of the class. In theory, calling all selftest functions of all classes does a full unit test of the library. The `czmq_selftest` application does this.
+* *Memory management*: czmq classes do not use any special memory management techiques to detect leaks. We've done this in the past but it makes the code relatively complex. Instead, we do memory leak testing using tools like valgrind.
 
 <A name="toc2-349" title="Under the Hood" />
 ## Under the Hood
@@ -898,11 +899,11 @@ libzapi uses the GNU autotools system, so non-portable code can use the macros t
 <A name="toc3-352" title="Adding a New Class" />
 ### Adding a New Class
 
-If you define a new libzapi class `myclass` you need to:
+If you define a new czmq class `myclass` you need to:
 
 * Write the `zmyclass.c` and `zmyclass.h` source files, in `src` and `include` respectively.
-* Add`#include <zmyclass.h>` to `include/zapi.h`.
-* Add the myclass header and test call to `src/zapi_selftest.c`.
+* Add`#include <zmyclass.h>` to `include/czmq.h`.
+* Add the myclass header and test call to `src/czmq_selftest.c`.
 * Add a reference documentation to 'doc/zmyclass.txt'.
 * Add myclass to 'src/Makefile.am` and `doc/Makefile.am`.
 
@@ -923,14 +924,14 @@ So while ANSI C code might say:
     file_buffer = zblob_new ();
     ...
 
-The style in libzapi would be:
+The style in czmq would be:
 
     zblob_t *file_buffer = zblob_new ();
 
 <A name="toc3-384" title="Assertions" />
 ### Assertions
 
-We use assertions heavily to catch bad argument values. The libzapi classes do not attempt to validate arguments and report errors; bad arguments are treated as fatal application programming errors.
+We use assertions heavily to catch bad argument values. The czmq classes do not attempt to validate arguments and report errors; bad arguments are treated as fatal application programming errors.
 
 We also use assertions heavily on calls to system functions that are never supposed to fail, where failure is to be treated as a fatal non-recoverable error (e.g. running out of memory).
 
@@ -987,25 +988,25 @@ The template for man pages is in doc/mkman.
 <A name="toc3-441" title="Development" />
 ### Development
 
-libzapi is developed through a test-driven process that guarantees no memory violations or leaks in the code:
+czmq is developed through a test-driven process that guarantees no memory violations or leaks in the code:
 
 * Modify a class or method.
 * Update the test method for that class.
 * Run the 'selftest' script, which uses the Valgrind memcheck tool.
 * Repeat until perfect.
 
-<A name="toc3-451" title="Porting libzapi" />
-### Porting libzapi
+<A name="toc3-451" title="Porting czmq" />
+### Porting czmq
 
-When you try libzapi on an OS that it's not been used on (ever, or for a while), you will hit code that does not compile. In some cases the patches are trivial, in other cases (usually when porting to Windows), the work needed to build equivalent functionality may be quite heavy. In any case, the benefit is that once ported, the functionality is available to all applications.
+When you try czmq on an OS that it's not been used on (ever, or for a while), you will hit code that does not compile. In some cases the patches are trivial, in other cases (usually when porting to Windows), the work needed to build equivalent functionality may be non-trivial. In any case, the benefit is that once ported, the functionality is available to all applications.
 
-Before attempting to patch code for portability, please read the `zapi_prelude.h` header file. There are several typical types of changes you may need to make to get functionality working on a specific operating system:
+Before attempting to patch code for portability, please read the `czmq_prelude.h` header file. There are several typical types of changes you may need to make to get functionality working on a specific operating system:
 
-* Defining typedefs which are missing on that specific compiler: do this in zapi_prelude.h.
-* Defining macros that rename exotic library functions to more conventional names: do this in zapi_prelude.h.
+* Defining typedefs which are missing on that specific compiler: do this in czmq_prelude.h.
+* Defining macros that rename exotic library functions to more conventional names: do this in czmq_prelude.h.
 * Reimplementing specific methods to use a non-standard API: this is typically needed on Windows. Do this in the relevant class, using #ifdefs to properly differentiate code for different platforms.
 
-The canonical 'standard operating system' for all libzapi code is Linux, gcc, POSIX.
+The canonical 'standard operating system' for all czmq code is Linux, gcc, POSIX. The canonical 'weird operating system' for czmq is Windows.
 
 <A name="toc3-464" title="Code Generation" />
 ### Code Generation

@@ -149,4 +149,4 @@ EXAMPLE
 
 SEE ALSO
 --------
-linkzapi:zapi[7]
+linkczmq:czmq[7]

@@ -2,9 +2,9 @@
 <VisualStudioProject
     ProjectType="Visual C++"
     Version="9.00"
-    Name="zapi_selftest"
+    Name="czmq_selftest"
     ProjectGUID="{A5497C4B-1CD1-4779-9458-2CF7908E7E26}"
-    RootNamespace="zapi_selftest"
+    RootNamespace="czmq_selftest"
     Keyword="Win32Proj"
     TargetFrameworkVersion="196613"
     >
@@ -41,7 +41,7 @@
             <Tool
                 Name="VCCLCompilerTool"
                 Optimization="0"
-                AdditionalIncludeDirectories="..\..\libzapi\include;..\..\libzmq\include"
+                AdditionalIncludeDirectories="..\..\czmq\include;..\..\libzmq\include"
                 PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
                 MinimalRebuild="true"
                 BasicRuntimeChecks="3"
@@ -61,7 +61,7 @@
             />
             <Tool
                 Name="VCLinkerTool"
-                AdditionalDependencies="zapi.lib ..\..\zeromq2\lib\libzmq.lib"
+                AdditionalDependencies="czmq.lib ..\..\libzmq\lib\libzmq.lib"
                 LinkIncremental="2"
                 GenerateDebugInformation="true"
                 SubSystem="1"
@@ -116,7 +116,7 @@
                 Name="VCCLCompilerTool"
                 Optimization="2"
                 EnableIntrinsicFunctions="true"
-                AdditionalIncludeDirectories="..\..\libzapi\include;..\..\libzmq\include"
+                AdditionalIncludeDirectories="..\..\czmq\include;..\..\libzmq\include"
                 PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
                 RuntimeLibrary="0"
                 EnableFunctionLevelLinking="true"
@@ -135,7 +135,7 @@
             />
             <Tool
                 Name="VCLinkerTool"
-                AdditionalDependencies="zapi.lib ..\..\zeromq2\lib\libzmq.lib"
+                AdditionalDependencies="czmq.lib ..\..\libzmq\lib\libzmq.lib"
                 LinkIncremental="1"
                 GenerateDebugInformation="true"
                 SubSystem="1"
@@ -175,7 +175,7 @@
             UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
             >
             <File
-                RelativePath="..\src\zapi_selftest.c"
+                RelativePath="..\src\czmq_selftest.c"
                 >
                 <FileConfiguration
                     Name="Debug|Win32"

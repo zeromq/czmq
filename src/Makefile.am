@@ -1,11 +1,11 @@
-lib_LTLIBRARIES = libzapi.la
+lib_LTLIBRARIES = libczmq.la
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = libzapi.pc
+pkgconfig_DATA = libczmq.pc
 
 include_HEADERS = \
-    ../include/zapi.h \
-    ../include/zapi_prelude.h \
+    ../include/czmq.h \
+    ../include/czmq_prelude.h \
     ../include/zclock.h \
     ../include/zctx.h \
     ../include/zframe.h \
@@ -18,7 +18,7 @@ include_HEADERS = \
     ../include/zstr.h \
     ../include/zthread.h
 
-libzapi_la_SOURCES = \
+libczmq_la_SOURCES = \
     zclock.c \
     zctx.c \
     zframe.c \
@@ -32,16 +32,16 @@ libzapi_la_SOURCES = \
     zthread.c
 
 INCLUDES = -I$(top_srcdir)/include
-bin_PROGRAMS = zapi_selftest
-zapi_selftest_LDADD = libzapi.la
-zapi_selftest_SOURCES = zapi_selftest.c
+bin_PROGRAMS = czmq_selftest
+czmq_selftest_LDADD = libczmq.la
+czmq_selftest_SOURCES = czmq_selftest.c
 
 if ON_MINGW
-libzapi_la_LDFLAGS = -no-undefined -avoid-version -version-info @LTVER@
+libczmq_la_LDFLAGS = -no-undefined -avoid-version -version-info @LTVER@
 else
-libzapi_la_LDFLAGS = -version-info @LTVER@
+libczmq_la_LDFLAGS = -version-info @LTVER@
 endif
 
-TESTS = zapi_selftest
+TESTS = czmq_selftest
 
 

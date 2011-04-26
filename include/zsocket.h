@@ -5,8 +5,8 @@
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
-    This file is part of libzapi, the high-level C binding for 0MQ:
-    http://libzapi.zeromq.org.
+    This file is part of czmq, the high-level C binding for 0MQ:
+    http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
@@ -32,13 +32,13 @@ extern "C" {
 #endif
 
 //  @interface
-//  Create a new socket within our libzapi context, replaces zmq_socket.
+//  Create a new socket within our czmq context, replaces zmq_socket.
 //  If the socket is a SUB socket, automatically subscribes to everything.
 //  Use this to get automatic management of the socket at shutdown.
 void *
     zsocket_new (zctx_t *self, int type);
 
-//  Destroy a socket within our libzapi context, replaces zmq_close.
+//  Destroy a socket within our czmq context, replaces zmq_close.
 void
     zsocket_destroy (zctx_t *self, void *socket);
 

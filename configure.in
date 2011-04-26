@@ -6,7 +6,7 @@ AC_PREREQ(2.61)
 # The version in git should reflect the *next* version planned.
 # Version must be MAJOR.MINOR.PATCH otherwise things will break.
 #
-AC_INIT([libzapi],[1.3.3],[zeromq-dev@lists.zeromq.org])
+AC_INIT([czmq],[1.0.0],[zeromq-dev@lists.zeromq.org])
 
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(config)
@@ -33,7 +33,7 @@ AC_SUBST(PACKAGE_VERSION)
 # know exactly what you're doing and have read and understand
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
 #
-# libzapi -version-info
+# libczmq -version-info
 LTVER="0:0:0"
 AC_SUBST(LTVER)
 
@@ -107,7 +107,7 @@ if test "x$zapi_have_asciidoc" = "xno" -o "x$zapi_have_xmlto" = "xno"; then
     # Tarballs built with 'make dist' ship with prebuilt documentation.
     if ! test -f doc/zapi.7; then
         zapi_install_man="no"
-        AC_MSG_WARN([You are building an unreleased version of libzapi and asciidoc or xmlto are not installed.])
+        AC_MSG_WARN([You are building an unreleased version of libczmq and asciidoc or xmlto are not installed.])
         AC_MSG_WARN([Documentation will not be built and manual pages will not be installed.])
     fi
 fi
@@ -116,7 +116,7 @@ AC_MSG_RESULT([$zapi_build_doc])
 AC_MSG_CHECKING([whether to install manpages])
 AC_MSG_RESULT([$zapi_install_man])
 
-# Set some default features required by libzapi code.
+# Set some default features required by libczmq code.
 CPPFLAGS="-D_REENTRANT -D_THREAD_SAFE $CPPFLAGS"
 
 # OS-specific tests
@@ -210,5 +210,5 @@ AM_CONDITIONAL(BUILD_DOC, test "x$zapi_build_doc" = "xyes")
 AC_TYPE_SIGNAL
 AC_CHECK_FUNCS(perror gettimeofday memset)
 
-AC_OUTPUT(Makefile src/Makefile doc/Makefile src/libzapi.pc)
+AC_OUTPUT(Makefile src/Makefile doc/Makefile src/libczmq.pc)
 

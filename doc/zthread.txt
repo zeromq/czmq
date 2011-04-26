@@ -108,4 +108,4 @@ s_test_attached (void *args, zctx_t *ctx, void *pipe)
 
 SEE ALSO
 --------
-linkzapi:zapi[7]
+linkczmq:czmq[7]

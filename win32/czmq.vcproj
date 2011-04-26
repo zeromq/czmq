@@ -2,9 +2,9 @@
 <VisualStudioProject
     ProjectType="Visual C++"
     Version="9.00"
-    Name="zapi"
+    Name="czmq"
     ProjectGUID="{0C4A2E28-8C9E-4B27-85D9-BB679AD84AC7}"
-    RootNamespace="libzapi"
+    RootNamespace="czmq"
     TargetFrameworkVersion="0"
     >
     <Platforms>
@@ -44,12 +44,12 @@
                 Name="VCCLCompilerTool"
                 Optimization="2"
                 InlineFunctionExpansion="1"
-                AdditionalIncludeDirectories="..\..\libzapi\include;..\..\libzmq\include"
+                AdditionalIncludeDirectories="..\..\czmq\include;..\..\libzmq\include"
                 PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;BASE_THREADSAFE"
                 StringPooling="true"
                 RuntimeLibrary="0"
                 EnableFunctionLevelLinking="true"
-                PrecompiledHeaderFile="./libzapi.pch"
+                PrecompiledHeaderFile="./czmq.pch"
                 AssemblerListingLocation="./"
                 ObjectFile="./"
                 ProgramDataBaseFileName="./"
@@ -69,7 +69,7 @@
             />
             <Tool
                 Name="VCLibrarianTool"
-                OutputFile=".\libzapi.lib"
+                OutputFile=".\czmq.lib"
                 SuppressStartupBanner="true"
             />
             <Tool
@@ -81,7 +81,7 @@
             <Tool
                 Name="VCBscMakeTool"
                 SuppressStartupBanner="true"
-                OutputFile="./libzapi.bsc"
+                OutputFile="./czmq.bsc"
             />
             <Tool
                 Name="VCFxCopTool"
@@ -118,12 +118,12 @@
             <Tool
                 Name="VCCLCompilerTool"
                 Optimization="0"
-                AdditionalIncludeDirectories="..\..\libzapi\include;..\..\libzmq\include"
+                AdditionalIncludeDirectories="..\..\czmq\include;..\..\libzmq\include"
                 PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;BASE_THREADSAFE"
                 MinimalRebuild="false"
                 BasicRuntimeChecks="3"
                 RuntimeLibrary="1"
-                PrecompiledHeaderFile="./libzapi.pch"
+                PrecompiledHeaderFile="./czmq.pch"
                 AssemblerListingLocation="./"
                 ObjectFile="./"
                 ProgramDataBaseFileName="./"
@@ -144,7 +144,7 @@
             />
             <Tool
                 Name="VCLibrarianTool"
-                OutputFile=".\zapi.lib"
+                OutputFile=".\czmq.lib"
                 SuppressStartupBanner="true"
             />
             <Tool
@@ -156,7 +156,7 @@
             <Tool
                 Name="VCBscMakeTool"
                 SuppressStartupBanner="true"
-                OutputFile="./libzapi.bsc"
+                OutputFile="./czmq.bsc"
             />
             <Tool
                 Name="VCFxCopTool"
@@ -310,11 +310,11 @@
             Name="Header Files"
             >
             <File
-                RelativePath="..\include\zapi.h"
+                RelativePath="..\include\czmq.h"
                 >
             </File>
             <File
-                RelativePath="..\include\zapi_prelude.h"
+                RelativePath="..\include\czmq_prelude.h"
                 >
             </File>
             <File

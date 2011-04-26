@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zapi_tests.c - run selftests
+    czmq_tests.c - run selftests
 
     Runs all selftests.
 
@@ -7,8 +7,8 @@
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
-    This file is part of libzapi, the high-level C binding for 0MQ:
-    http://libzapi.zeromq.org.
+    This file is part of czmq, the high-level C binding for 0MQ:
+    http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
@@ -26,7 +26,7 @@
     =========================================================================
 */
 
-#include "../include/zapi_prelude.h"
+#include "../include/czmq_prelude.h"
 #include "../include/zclock.h"
 #include "../include/zctx.h"
 #include "../include/zframe.h"
@@ -47,7 +47,7 @@ int main (int argc, char *argv [])
     else
         verbose = FALSE;
 
-    printf ("Running zapi self tests...\n");
+    printf ("Running czmq self tests...\n");
 
     zclock_test (verbose);
     zctx_test (verbose);

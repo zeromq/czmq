@@ -1,6 +1,6 @@
 #! /bin/bash
 #
-#   mksite - Upload zapi manual to zapi.zeromq.org/manual:
+#   mksite - Upload czmq manual to czmq.zeromq.org/manual:
 #
 #   Author: Pieter Hintjens <ph@imatix.com>
 #   License: public domain
@@ -11,7 +11,7 @@
 #   Export so child scripts can access these
 export UPLOAD=1            #   If 0, don't actually upload
 export CATEGORY=manual     #   Category to receive man pages
-export WEBSITE=zapi        #   Wikidot website prefix
+export WEBSITE=czmq        #   Wikidot website prefix
 
 # This function uploads a file to wikidot
 # Error in upload will cause the script to exit with non-zero status
@@ -34,7 +34,7 @@ done
 
 echo "Generating XML pages for manual..."
 FILES=
-for FILE in libzapi.txt z*.txt; do
+for FILE in czmq.txt z*.txt; do
     BASE=`basename $FILE .txt`
     make --quiet $BASE.xml;
     FILES="$FILES $BASE"
@@ -49,7 +49,7 @@ if [ $UPLOAD -eq 1 ]; then
     echo "Uploading to $CATEGORY..."
 
     #   Send table of contents as category:_start
-    do_upload "_start" "zapi Documentation"
+    do_upload "_start" "czmq Documentation"
 
     #   Send template as category:_template
     do_upload "_template" "Category template - generated"
