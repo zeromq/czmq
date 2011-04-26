@@ -70,7 +70,7 @@ pull ../src/$class.c\@selftest
 
 SEE ALSO
 --------
-linkzapi:zapi[7]
+linkczmq:czmq[7]
 END
 
 #   Now process template

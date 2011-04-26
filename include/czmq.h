@@ -1,12 +1,12 @@
 /*  =========================================================================
-    zapi.h - zapi wrapper
+    czmq.h - czmq wrapper
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
-    This file is part of libzapi, the high-level C binding for 0MQ:
-    http://libzapi.zeromq.org.
+    This file is part of czmq, the high-level C binding for 0MQ:
+    http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
@@ -24,12 +24,12 @@
     =========================================================================
 */
 
-#ifndef __ZAPI_H_INCLUDED__
-#define __ZAPI_H_INCLUDED__
+#ifndef __CZMQ_H_INCLUDED__
+#define __CZMQ_H_INCLUDED__
 
 //  Set up environment for the application
 //
-#include <zapi_prelude.h>
+#include <czmq_prelude.h>
 
 //  Classes listed in alphabetical order
 

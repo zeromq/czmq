@@ -5,8 +5,8 @@
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
-    This file is part of libzapi, the high-level C binding for 0MQ:
-    http://libzapi.zeromq.org.
+    This file is part of czmq, the high-level C binding for 0MQ:
+    http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
@@ -59,11 +59,11 @@ void
 void
     zctx_set_linger (zctx_t *self, int linger);
 
-//  Create socket within this context, for libzapi use only
+//  Create socket within this context, for czmq use only
 void *
     zctx__socket_new (zctx_t *self, int type);
 
-//  Destroy socket within this context, for libzapi use only
+//  Destroy socket within this context, for czmq use only
 void
     zctx__socket_destroy (zctx_t *self, void *socket);
 

@@ -1,12 +1,12 @@
 /*  =========================================================================
-    zapi_prelude.h - zapi environment
+    czmq_prelude.h - czmq environment
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
-    This file is part of libzapi, the high-level C binding for 0MQ:
-    http://libzapi.zeromq.org.
+    This file is part of czmq, the high-level C binding for 0MQ:
+    http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by
@@ -24,8 +24,8 @@
     =========================================================================
 */
 
-#ifndef __ZAPI_PRELUDE_H_INCLUDED__
-#define __ZAPI_PRELUDE_H_INCLUDED__
+#ifndef __CZMQ_PRELUDE_H_INCLUDED__
+#define __CZMQ_PRELUDE_H_INCLUDED__
 
 //- Always include ZeroMQ header file ---------------------------------------
 
@@ -44,7 +44,7 @@
 #endif
 #if ZMQ_VERSION_MAJOR == 2
 #   if ZMQ_VERSION_MINOR == 0
-#       error "libzapi requires at least libzmq/2.1.x stable"
+#       error "czmq requires at least libzmq/2.1.x stable"
 #   endif
 #   define zmq_sendmsg      zmq_send
 #   define zmq_recvmsg      zmq_recv
@@ -421,13 +421,13 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 
 //- Error reporting ---------------------------------------------------------
 // If the compiler is GCC or supports C99, include enclosing function
-// in zapi assertions
+// in czmq assertions
 #if defined (__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
-#   define ZAPI_ASSERT_SANE_FUNCTION    __func__
+#   define CZMQ_ASSERT_SANE_FUNCTION    __func__
 #elif defined (__GNUC__) && (__GNUC__ >= 2)
-#   define ZAPI_ASSERT_SANE_FUNCTION    __FUNCTION__
+#   define CZMQ_ASSERT_SANE_FUNCTION    __FUNCTION__
 #else
-#   define ZAPI_ASSERT_SANE_FUNCTION    "<unknown>"
+#   define CZMQ_ASSERT_SANE_FUNCTION    "<unknown>"
 #endif
 
 //  Replacement for malloc() which asserts if we run out of heap, and
@@ -459,19 +459,19 @@ static inline void *
 #ifdef _ZMALLOC_DEBUG
 #   define zmalloc(size) calloc(1,(size))
 #else
-#   define zmalloc(size) safe_malloc((size), __FILE__, __LINE__, ZAPI_ASSERT_SANE_FUNCTION)
+#   define zmalloc(size) safe_malloc((size), __FILE__, __LINE__, CZMQ_ASSERT_SANE_FUNCTION)
 #endif
 
 //- DLL exports -------------------------------------------------------------
 
 #if (defined (__WINDOWS__))
 #   if defined DLL_EXPORT
-#       define ZAPI_EXPORT __declspec(dllexport)
+#       define CZMQ_EXPORT __declspec(dllexport)
 #   else
-#       define ZAPI_EXPORT __declspec(dllimport)
+#       define CZMQ_EXPORT __declspec(dllimport)
 #   endif
 #else
-#   define ZAPI_EXPORT
+#   define CZMQ_EXPORT
 #endif
 
 #endif

@@ -1,6 +1,6 @@
 MAN1 =
 MAN3 =
-MAN7 = libzapi.7 \
+MAN7 = czmq.7 \
     zclock.7 \
     zctx.7 \
     zframe.7 \
@@ -34,7 +34,7 @@ SUFFIXES=.txt .xml .1 .3 .7
 .txt.xml:
 	./mkman $<
 	asciidoc -d manpage -b docbook -f asciidoc.conf \
-		-azapi_version=@PACKAGE_VERSION@ $<
+		-aczmq_version=@PACKAGE_VERSION@ $<
 .xml.1:
 	xmlto man $<
 .xml.3:

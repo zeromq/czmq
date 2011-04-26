@@ -5,7 +5,7 @@
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
-    This file is part of zapi, the C binding for 0MQ: http://zapi.zeromq.org.
+    This file is part of czmq, the C binding for 0MQ: http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under the
     terms of the GNU Lesser General Public License as published by the Free
@@ -35,11 +35,11 @@ for this library will say "insane" at least once. Anyhow, milliseconds
 are a concept we can deal with. Seconds are too fat, nanoseconds too
 tiny, but milliseconds are just right for slices of time we want to work
 with at the 0MQ scale. zclock doesn't give you objects to work with, we
-like the zapi class model but we're not insane. There, got it in again.
+like the czmq class model but we're not insane. There, got it in again.
 @end
 */
 
-#include "../include/zapi_prelude.h"
+#include "../include/czmq_prelude.h"
 #include "../include/zclock.h"
 
 

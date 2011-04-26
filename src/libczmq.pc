@@ -1,0 +1,10 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libczmq
+Description: High-level C binding for 0MQ
+Version: 1.3.3
+Libs: -L${libdir} -lczmq
+Cflags: -I${includedir}

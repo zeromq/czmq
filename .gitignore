@@ -13,7 +13,7 @@ libtool
 src/.deps/
 src/Makefile
 src/Makefile.in
-src/libzapi.pc
+src/czmq.pc
 src/platform.hpp
 src/platform.hpp.in
 src/platform.hpp.in~
@@ -25,7 +25,7 @@ src/zapi_selftest
 doc/*.7
 doc/*.xml
 src/.libs/
-src/libzapi.la
+src/czmq.la
 src/platform.h
 src/platform.h.in
 src/platform.h.in~
