@@ -42,6 +42,9 @@
 #ifndef ZMQ_DONTWAIT
 #   define ZMQ_DONTWAIT     ZMQ_NOBLOCK
 #endif
+#ifndef ZMQ_XSUB
+#   error "please upgrade to latest stable libzmq from http://zeromq.org"
+#endif
 #if ZMQ_VERSION_MAJOR == 2
 #   if ZMQ_VERSION_MINOR == 0
 #       error "czmq requires at least libzmq/2.1.x stable"
