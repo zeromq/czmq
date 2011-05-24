@@ -27,7 +27,7 @@
 /*
 @header
     The zloop class provides an event-driven reactor pattern. The reactor
-    handles socket readers (not writers in the current implementation), and
+    handles zmq_pollitem_t items (pollers or writers, sockets or fds), and
     once-off or repeated timers. Its resolution is 1 msec. It uses a tickless
     timer to reduce CPU interrupts in inactive processes.
 @discuss
@@ -42,24 +42,24 @@
 #include "../include/zsocket.h"
 #include "../include/zloop.h"
 
-typedef struct _s_reader_t s_reader_t;
+typedef struct _s_poller_t s_poller_t;
 typedef struct _s_timer_t s_timer_t;
 
 //  Structure of our class
 
 struct _zloop_t {
-    zlist_t *readers;           //  List of sockets for reading
+    zlist_t *pollers;           //  List of poll items
     zlist_t *timers;            //  List of timers
     int poll_size;              //  Size of poll set
     zmq_pollitem_t *pollset;    //  zmq_poll set
-    s_reader_t *readset;        //  Readers for this poll set
+    s_poller_t *pollact;        //  Pollers for this poll set
     Bool dirty;                 //  True if pollset needs rebuilding
     Bool verbose;               //  True if verbose tracing wanted
 };
 
-//  Readers and timers are held as small structures of their own
-struct _s_reader_t {
-    void *socket;
+//  Pollers and timers are held as small structures of their own
+struct _s_poller_t {
+    zmq_pollitem_t item;
     zloop_fn *handler;
     void *arg;
 };
@@ -72,14 +72,14 @@ struct _s_timer_t {
     int64_t when;               //  Clock time when alarm goes off
 };
 
-static s_reader_t *
-s_reader_new (void *socket, zloop_fn handler, void *arg)
+static s_poller_t *
+s_poller_new (zmq_pollitem_t *item, zloop_fn handler, void *arg)
 {
-    s_reader_t *reader = (s_reader_t *) zmalloc (sizeof (s_reader_t));
-    reader->socket = socket;
-    reader->handler = handler;
-    reader->arg= arg;
-    return reader;
+    s_poller_t *poller = (s_poller_t *) zmalloc (sizeof (s_poller_t));
+    memcpy (&poller->item, item, sizeof (zmq_pollitem_t));
+    poller->handler = handler;
+    poller->arg = arg;
+    return poller;
 }
 
 static s_timer_t *
@@ -89,7 +89,7 @@ s_timer_new (size_t delay, size_t times, zloop_fn handler, void *arg)
     timer->delay = delay;
     timer->times = times;
     timer->handler = handler;
-    timer->arg= arg;
+    timer->arg = arg;
     return timer;
 }
 
@@ -104,7 +104,7 @@ zloop_new (void)
         *self;
 
     self = (zloop_t *) zmalloc (sizeof (zloop_t));
-    self->readers = zlist_new ();
+    self->pollers = zlist_new ();
     self->timers = zlist_new ();
     return self;
 }
@@ -120,10 +120,10 @@ zloop_destroy (zloop_t **self_p)
     if (*self_p) {
         zloop_t *self = *self_p;
 
-        //  Destroy list of readers
-        while (zlist_size (self->readers))
-            free (zlist_pop (self->readers));
-        zlist_destroy (&self->readers);
+        //  Destroy list of pollers
+        while (zlist_size (self->pollers))
+            free (zlist_pop (self->pollers));
+        zlist_destroy (&self->pollers);
 
         //  Destroy list of timers
         while (zlist_size (self->timers))
@@ -131,7 +131,7 @@ zloop_destroy (zloop_t **self_p)
         zlist_destroy (&self->timers);
 
         free (self->pollset);
-        free (self->readset);
+        free (self->pollact);
         free (self);
         *self_p = NULL;
     }
@@ -139,46 +139,49 @@ zloop_destroy (zloop_t **self_p)
 
 
 //  --------------------------------------------------------------------------
-//  Register a socket with the reactor. When the socket has input, will call
+//  Register pollitem with the reactor. When the pollitem is ready, will call
 //  the handler, passing the arg. Returns 0 if OK, -1 if there was an error.
-//  If you register the socket more than once, each instance will invoke its
+//  If you register the pollitem more than once, each instance will invoke its
 //  corresponding handler.
 
 int
-zloop_reader (zloop_t *self, void *socket, zloop_fn handler, void *arg)
+zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
 {
     assert (self);
-    zlist_push (self->readers, s_reader_new (socket, handler, arg));
+    zlist_push (self->pollers, s_poller_new (item, handler, arg));
     self->dirty = TRUE;         //  Rebuild will be needed
     if (self->verbose)
-        zclock_log ("I: zloop: register %s socket reader (%p)",
-            zsocket_type_str (socket), socket);
+        zclock_log ("I: zloop: register %s poller (%p, %d)",
+            item->socket? zsocket_type_str (item->socket): "FD",
+            item->socket, item->fd);
 
     return 0;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Cancel a socket from the reactor. If the socket was not previously
-//  registered, does nothing. If the socket was registered more than once,
-//  cancels only the first instance.
+//  Cancel a pollitem from the reactor, specified by socket or FD. If both
+//  are specified, uses only socket. If multiple poll items exist for same
+//  socket/FD, only first is cancelled.
 
 void
-zloop_cancel (zloop_t *self, void *socket)
+zloop_cancel (zloop_t *self, void *socket, int fd)
 {
     assert (self);
-    s_reader_t *reader = (s_reader_t *) zlist_first (self->readers);
-    while (reader) {
-        if (reader->socket == socket) {
-            zlist_remove (self->readers, reader);
+    s_poller_t *poller = (s_poller_t *) zlist_first (self->pollers);
+    while (poller) {
+        if ((socket && poller->item.socket == socket)
+        ||  (fd && poller->item.fd == fd)) {
+            zlist_remove (self->pollers, poller);
             self->dirty = TRUE;     //  Rebuild will be needed
             break;
         }
-        reader = (s_reader_t *) zlist_next (self->readers);
+        poller = (s_poller_t *) zlist_next (self->pollers);
     }
     if (self->verbose)
-        zclock_log ("I: zloop: cancel %s socket reader (%p)",
-            zsocket_type_str (socket), socket);
+        zclock_log ("I: zloop: cancel %s socket poller (%p, %d)",
+            socket? zsocket_type_str (socket): "FD",
+            socket, fd);
 }
 
 
@@ -229,27 +232,26 @@ zloop_start (zloop_t *self)
     //  Main reactor loop
     while (!zctx_interrupted) {
         //  Rebuild pollitem set if necessary
-        //  We hold an array of readers that matches the pollset, so
-        //  we can register/cancel readers orthogonally to executing
-        //  the pollset activity on readers.
+        //  We hold an array of pollers that matches the pollset, so
+        //  we can register/cancel pollers orthogonally to executing
+        //  the pollset activity on pollers.
         uint item_nbr;
         if (self->dirty) {
             free (self->pollset);
-            free (self->readset);
-            self->poll_size = zlist_size (self->readers);
+            free (self->pollact);
+            self->poll_size = zlist_size (self->pollers);
             self->pollset = (zmq_pollitem_t *) zmalloc (
                 self->poll_size * sizeof (zmq_pollitem_t));
-            self->readset = (s_reader_t *) zmalloc (
-                self->poll_size * sizeof (s_reader_t));
+            self->pollact = (s_poller_t *) zmalloc (
+                self->poll_size * sizeof (s_poller_t));
 
-            s_reader_t *reader = (s_reader_t *) zlist_first (self->readers);
+            s_poller_t *poller = (s_poller_t *) zlist_first (self->pollers);
             item_nbr = 0;
-            while (reader) {
-                self->pollset [item_nbr].socket = reader->socket;
-                self->pollset [item_nbr].events = ZMQ_POLLIN;
-                self->readset [item_nbr] = *reader;
-                reader = (s_reader_t *) zlist_next (self->readers);
+            while (poller) {
+                self->pollset [item_nbr] = poller->item;
+                self->pollact [item_nbr] = *poller;
                 item_nbr++;
+                poller = (s_poller_t *) zlist_next (self->pollers);
             }
         }
         //  Calculate tickless timer, up to 1 hour
@@ -292,17 +294,19 @@ zloop_start (zloop_t *self)
             }
             timer = (s_timer_t *) zlist_next (self->timers);
         }
-        //  Handle any readers that are ready
+        //  Handle any pollers that are ready
         for (item_nbr = 0; item_nbr < self->poll_size; item_nbr++) {
             if (self->pollset [item_nbr].revents & ZMQ_POLLIN) {
-                s_reader_t *reader = &self->readset [item_nbr];
-                assert (self->pollset [item_nbr].socket == reader->socket);
+                s_poller_t *poller = &self->pollact [item_nbr];
+                assert (self->pollset [item_nbr].socket == poller->item.socket);
                 if (self->verbose)
-                    zclock_log ("I: zloop: call %s socket handler (%p)",
-                        zsocket_type_str (reader->socket), reader->socket);
-                rc = reader->handler (self, reader->socket, reader->arg);
+                    zclock_log ("I: zloop: call %s socket handler (%p, %d)",
+                        poller->item.socket?
+                            zsocket_type_str (poller->item.socket): "FD",
+                        poller->item.socket, poller->item.fd);
+                rc = poller->handler (self, &poller->item, poller->arg);
                 if (rc == -1)
-                    break;      //  Reader handler signalled break
+                    break;      //  Poller handler signalled break
             }
         }
         if (rc == -1)
@@ -315,13 +319,13 @@ zloop_start (zloop_t *self)
 //  --------------------------------------------------------------------------
 //  Selftest
 
-int s_timer_event (zloop_t *loop, void *socket, void *output)
+int s_timer_event (zloop_t *loop, zmq_pollitem_t *item, void *output)
 {
     zstr_send (output, "PING");
     return 0;
 }
 
-int s_socket_event (zloop_t *loop, void *socket, void *arg)
+int s_socket_event (zloop_t *loop, zmq_pollitem_t *item, void *arg)
 {
     //  Just end the reactor
     return -1;
@@ -347,7 +351,8 @@ zloop_test (Bool verbose)
     //  After 10 msecs, send a ping message to output
     zloop_timer (loop, 10, 1,  s_timer_event, output);
     //  When we get the ping message, end the reactor
-    zloop_reader (loop, input, s_socket_event, NULL);
+    zmq_pollitem_t poll_input = { input, 0, ZMQ_POLLIN, 0 };
+    zloop_poller (loop, &poll_input, s_socket_event, NULL);
     zloop_start (loop);
 
     zloop_destroy (&loop);

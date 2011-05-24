@@ -1,3 +1,15 @@
+zmq_pollitem_t *item
+
+czmq version 1.1.0 (draft), released on 2011/05/xx
+==================================================
+
+Changes
+-------
+
+* zloop works with zmq_pollitem_t * instead of void * sockets; allows
+  use of native FDs in reactor as well as 0MQ sockets.
+
+
 czmq version 1.0.0 (stable), released on 2011/04/26
 ===================================================
 
