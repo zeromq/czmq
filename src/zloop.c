@@ -173,13 +173,14 @@ zloop_cancel (zloop_t *self, void *socket, int fd)
         if ((socket && poller->item.socket == socket)
         ||  (fd && poller->item.fd == fd)) {
             zlist_remove (self->pollers, poller);
+            free (poller);
             self->dirty = TRUE;     //  Rebuild will be needed
             break;
         }
         poller = (s_poller_t *) zlist_next (self->pollers);
     }
     if (self->verbose)
-        zclock_log ("I: zloop: cancel %s socket poller (%p, %d)",
+        zclock_log ("I: zloop: cancel %s poller (%p, %d)",
             socket? zsocket_type_str (socket): "FD",
             socket, fd);
 }
