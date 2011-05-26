@@ -46,6 +46,19 @@ granularity.
 #include "../include/zclock.h"
 
 
+#if defined (__WINDOWS__)
+//  --------------------------------------------------------------------------
+//  Convert FILETIME "Contains a 64-bit value representing the number of
+//  100-nanosecond intervals since January 1, 1601 (UTC)."
+
+static int64_t FileTimeToMilliseconds (const FILETIME& ft)
+{
+    int64_t t;
+    memcpy (&t, &ft, sizeof (ft));
+    return (int64_t) (t / 100);
+}
+#endif
+
 //  --------------------------------------------------------------------------
 //  Sleep for a number of milliseconds
 
@@ -84,9 +97,9 @@ zclock_time (void)
     gettimeofday (&tv, NULL);
     return (int64_t) (tv.tv_sec * 1000 + tv.tv_usec / 1000);
 #elif (defined (__WINDOWS__))
-    SYSTEMTIME st;
-    GetSystemTime (&st);
-    return (int64_t) st.wSecond * 1000 + st.wMilliseconds;
+    FILETIME ft;
+    GetSystemTimeAsFileTime (&ft);
+    return FileTimeToMilliseconds (ft);
 #endif
 }
 
