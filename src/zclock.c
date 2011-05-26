@@ -36,6 +36,9 @@ are a concept we can deal with. Seconds are too fat, nanoseconds too
 tiny, but milliseconds are just right for slices of time we want to work
 with at the 0MQ scale. zclock doesn't give you objects to work with, we
 like the czmq class model but we're not insane. There, got it in again.
+The Win32 Sleep() call defaults to 16ms resolution unless the system timer
+resolution is increased with a call to timeBeginPeriod() permitting 1ms
+granularity.
 @end
 */
 
@@ -55,7 +58,17 @@ zclock_sleep (int msecs)
     t.tv_nsec = (msecs % 1000) * 1000000;
     nanosleep (&t, NULL);
 #elif (defined (__WINDOWS__))
+//  Windows XP/2000:  A value of zero causes the thread to relinquish the
+//  remainder of its time slice to any other thread of equal priority that is
+//  ready to run. If there are no other threads of equal priority ready to run,
+//  the function returns immediately, and the thread continues execution. This
+//  behavior changed starting with Windows Server 2003.
+#if defined (NTDDI_VERSION) && defined (NTDDI_WS03) && (NTDDI_VERSION >= NTDDI_WS03)
     Sleep (msecs);
+#else
+    if (msecs > 0)
+        Sleep (msecs);
+#endif
 #endif
 }
 
