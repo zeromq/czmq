@@ -51,10 +51,11 @@ granularity.
 //  Convert FILETIME "Contains a 64-bit value representing the number of
 //  100-nanosecond intervals since January 1, 1601 (UTC)."
 
-static int64_t FileTimeToMilliseconds (const FILETIME& ft)
+static int64_t
+s_filetime_to_msec (const FILETIME *ft)
 {
     int64_t t;
-    memcpy (&t, &ft, sizeof (ft));
+    memcpy (&t, ft, sizeof (*ft));
     return (int64_t) (t / 100);
 }
 #endif
@@ -99,7 +100,7 @@ zclock_time (void)
 #elif (defined (__WINDOWS__))
     FILETIME ft;
     GetSystemTimeAsFileTime (&ft);
-    return FileTimeToMilliseconds (ft);
+    return s_filetime_to_msec (&ft);
 #endif
 }
 
