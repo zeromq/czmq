@@ -355,9 +355,8 @@ zmsg_last (zmsg_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Save message to file
-
-void
+//  Save message to an open file, return 0 if OK, else -1.
+int
 zmsg_save (zmsg_t *self, FILE *file)
 {
     assert (self);
@@ -366,10 +365,13 @@ zmsg_save (zmsg_t *self, FILE *file)
     zframe_t *frame = zmsg_first (self);
     while (frame) {
         size_t frame_size = zframe_size (frame);
-        fwrite (&frame_size, sizeof (frame_size), 1, file);
-        fwrite (zframe_data (frame), frame_size, 1, file);
+        if (fwrite (&frame_size, sizeof (frame_size), 1, file) != 1)
+            return -1;
+        if (fwrite (zframe_data (frame), frame_size, 1, file) != 1)
+            return -1;
         frame = zmsg_next (self);
     }
+    return 0;
 }
 
 
@@ -498,9 +500,15 @@ zmsg_test (Bool verbose)
     //  Save to a file, read back
     FILE *file = fopen ("zmsg.test", "w");
     assert (file);
-    zmsg_save (msg, file);
-    zmsg_destroy (&msg);
+    int rc = zmsg_save (msg, file);
+    assert (rc == 0);
     fclose (file);
+
+    file = fopen ("zmsg.test", "r");
+    rc = zmsg_save (msg, file);
+    assert (rc == -1);
+    fclose (file);
+    zmsg_destroy (&msg);
 
     file = fopen ("zmsg.test", "r");
     msg = zmsg_load (file);

@@ -11,6 +11,9 @@ Changes
 
 * Added zmsg_content_size method to report full content size of message.
 
+* zmsg_save returns 0/-1 depending on success/failure (previously returned
+  void).
+
 
 czmq version 1.0.0 (stable), released on 2011/04/26
 ===================================================

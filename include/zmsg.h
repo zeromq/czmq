@@ -117,8 +117,8 @@ zframe_t *
 zframe_t *
     zmsg_last (zmsg_t *self);
 
-//  Save message to an open file
-void
+//  Save message to an open file, return 0 if OK, else -1.
+int
     zmsg_save (zmsg_t *self, FILE *file);
 
 //  Load a message from an open file
