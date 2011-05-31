@@ -1,5 +1,5 @@
 /*  =========================================================================
-    czmq.h - czmq wrapper
+    zfile - helper functions for working with files.
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
@@ -24,26 +24,34 @@
     =========================================================================
 */
 
-#ifndef __CZMQ_H_INCLUDED__
-#define __CZMQ_H_INCLUDED__
+#ifndef __ZFILE_H_INCLUDED__
+#define __ZFILE_H_INCLUDED__
 
-//  Set up environment for the application
-//
-#include <czmq_prelude.h>
-
-//  Classes listed in alphabetical order
-
-#include <zclock.h>
-#include <zctx.h>
-#include <zfile.h>
-#include <zframe.h>
-#include <zhash.h>
-#include <zlist.h>
-#include <zloop.h>
-#include <zmsg.h>
-#include <zsocket.h>
-#include <zsockopt.h>
-#include <zstr.h>
-#include <zthread.h>
-
+#ifdef __cplusplus
+extern "C" {
 #endif
+
+//  @interface
+//  Delete file. Does not complain if the file is absent
+int
+    zfile_delete (char *filename);
+
+//  Make directory (maximum one level depending on OS)
+int
+    zfile_mkdir (char *dirname);
+
+//  Return 1 if file exists, else zero
+int
+    zfile_exists (char *filename);
+
+//  Self test of this class
+int
+    zfile_test (Bool verbose);
+//  @end
+
+#ifdef __cplusplus
+}
+#endif
+
+
+#endif  //  __ZFILE_H_INCLUDED__

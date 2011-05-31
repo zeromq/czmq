@@ -3,6 +3,7 @@ MAN3 =
 MAN7 = czmq.7 \
     zclock.7 \
     zctx.7 \
+    zfile.7 \
     zframe.7 \
     zhash.7 \
     zlist.7 \

@@ -22,6 +22,8 @@ Changes
 * Added ability for zsocket_bind to bind to ephemeral port in range 0xc000
   to 0xffff.
 
+* Added zfile class with minimal helper functions.
+
 
 czmq version 1.0.0 (stable), released on 2011/04/26
 ===================================================

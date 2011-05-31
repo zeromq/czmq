@@ -159,6 +159,16 @@ This is the class interface:
 
 .pull src/zstr.c@discuss,left
 
+#### zfile - work with files
+
+.pull src/zfile.c@header,left
+
+This is the class interface:
+
+.pull include/zfile.h@interface,code
+
+.pull src/zfile.c@discuss,left
+
 #### zframe - working with single message frames
 
 .pull src/zframe.c@header,left

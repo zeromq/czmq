@@ -29,6 +29,7 @@
 #include "../include/czmq_prelude.h"
 #include "../include/zclock.h"
 #include "../include/zctx.h"
+#include "../include/zfile.h"
 #include "../include/zframe.h"
 #include "../include/zhash.h"
 #include "../include/zlist.h"
@@ -51,6 +52,7 @@ int main (int argc, char *argv [])
 
     zclock_test (verbose);
     zctx_test (verbose);
+    zfile_test (verbose);
     zframe_test (verbose);
     zhash_test (verbose);
     zlist_test (verbose);
