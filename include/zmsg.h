@@ -55,6 +55,10 @@ void
 size_t
     zmsg_size (zmsg_t *self);
 
+//  Return combined size of all frames in message
+size_t
+    zmsg_content_size (zmsg_t *self);
+
 //  Push frame to front of message, before first frame
 void
     zmsg_push (zmsg_t *self, zframe_t *frame);

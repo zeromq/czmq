@@ -44,7 +44,8 @@
 //  Structure of our class
 
 struct _zmsg_t {
-    zlist_t *frames;             //  List of frames
+    zlist_t *frames;            //  List of frames
+    size_t content_size;        //  Total content size
 };
 
 
@@ -143,6 +144,17 @@ zmsg_size (zmsg_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  Return size of message, i.e. number of frames (0 or more).
+
+size_t
+zmsg_content_size (zmsg_t *self)
+{
+    assert (self);
+    return self->content_size;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Push frame to the front of the message, i.e. before all other frames.
 //  Message takes ownership of frame, will destroy it when message is sent.
 
@@ -151,6 +163,7 @@ zmsg_push (zmsg_t *self, zframe_t *frame)
 {
     assert (self);
     assert (frame);
+    self->content_size += zframe_size (frame);
     zlist_push (self->frames, (void *) frame);
 }
 
@@ -163,7 +176,10 @@ zframe_t *
 zmsg_pop (zmsg_t *self)
 {
     assert (self);
-    return (zframe_t *) zlist_pop (self->frames);
+    zframe_t *frame = zlist_pop (self->frames);
+    if (frame)
+        self->content_size -= zframe_size (frame);
+    return frame;
 }
 
 
@@ -176,6 +192,7 @@ zmsg_add (zmsg_t *self, zframe_t *frame)
 {
     assert (self);
     assert (frame);
+    self->content_size += zframe_size (frame);
     zlist_append (self->frames, frame);
 }
 
@@ -189,6 +206,7 @@ zmsg_pushmem (zmsg_t *self, const void *src, size_t size)
     assert (self);
     assert (src);
     zframe_t *frame = zframe_new (src, size);
+    self->content_size += size;
     zlist_push (self->frames, frame);
 }
 
@@ -202,6 +220,7 @@ zmsg_addmem (zmsg_t *self, const void *src, size_t size)
     assert (self);
     assert (src);
     zframe_t *frame = zframe_new (src, size);
+    self->content_size += size;
     zlist_append (self->frames, frame);
 }
 
@@ -214,6 +233,7 @@ zmsg_pushstr (zmsg_t *self, const char *string)
 {
     assert (self);
     assert (string);
+    self->content_size += strlen (string);
     zlist_push (self->frames, zframe_new (string, strlen (string)));
 }
 
@@ -226,6 +246,7 @@ zmsg_addstr (zmsg_t *self, const char *string)
 {
     assert (self);
     assert (string);
+    self->content_size += strlen (string);
     zlist_append (self->frames, zframe_new (string, strlen (string)));
 }
 
@@ -238,8 +259,12 @@ zmsg_popstr (zmsg_t *self)
 {
     assert (self);
     zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
-    char *string = zframe_strdup (frame);
-    zframe_destroy (&frame);
+    char *string = NULL;
+    if (frame) {
+        self->content_size -= zframe_size (frame);
+        string = zframe_strdup (frame);
+        zframe_destroy (&frame);
+    }
     return string;
 }
 
@@ -283,6 +308,7 @@ void
 zmsg_remove (zmsg_t *self, zframe_t *frame)
 {
     assert (self);
+    self->content_size -= zframe_size (frame);
     zlist_remove (self->frames, frame);
 }
 
@@ -430,12 +456,14 @@ zmsg_test (Bool verbose)
     zframe_t *frame = zframe_new ("Hello", 5);
     zmsg_push (msg, frame);
     assert (zmsg_size (msg) == 1);
+    assert (zmsg_content_size (msg) == 5);
     zmsg_send (&msg, output);
     assert (msg == NULL);
 
     msg = zmsg_recv (input);
     assert (msg);
     assert (zmsg_size (msg) == 1);
+    assert (zmsg_content_size (msg) == 5);
     zmsg_destroy (&msg);
 
     //  Test send and receive of multi-frame message
@@ -457,11 +485,13 @@ zmsg_test (Bool verbose)
     copy = zmsg_recv (input);
     assert (copy);
     assert (zmsg_size (copy) == 10);
+    assert (zmsg_content_size (copy) == 60);
     zmsg_destroy (&copy);
 
     msg = zmsg_recv (input);
     assert (msg);
     assert (zmsg_size (msg) == 10);
+    assert (zmsg_content_size (msg) == 60);
     if (verbose)
         zmsg_dump (msg);
 
@@ -477,6 +507,7 @@ zmsg_test (Bool verbose)
     fclose (file);
     remove ("zmsg.test");
     assert (zmsg_size (msg) == 10);
+    assert (zmsg_content_size (msg) == 60);
 
     //  Remove all frames except first and last
     int frame_nbr;
@@ -488,6 +519,7 @@ zmsg_test (Bool verbose)
     }
     //  Test message frame manipulation
     assert (zmsg_size (msg) == 2);
+    assert (zmsg_content_size (msg) == 12);
     frame = zframe_new ("Address", 7);
     zmsg_wrap (msg, frame);
     assert (zmsg_size (msg) == 4);

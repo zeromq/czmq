@@ -1,7 +1,7 @@
 #  Run selftests and check memory
-echo "Rebuilding zapi..."
-gcc -g -o zapi_selftest z*.c -lzmq
+echo "Rebuilding czmq..."
+gcc -g -o czmq_selftest z*.c -lzmq
 if [ $? -eq 0 ]; then
     echo "Starting Valgrind memcheck..."
-    valgrind --tool=memcheck --leak-check=full --suppressions=valgrind.supp zapi_selftest
+    valgrind --tool=memcheck --leak-check=full --suppressions=valgrind.supp czmq_selftest
 fi
