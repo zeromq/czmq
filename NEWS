@@ -17,6 +17,8 @@ Changes
 * zmsg_dump limited to first 10 frames, to allow mix of large and small
   messages in applications.
 
+* zframe_print truncates output at 70 chars to prevent over-long output.
+
 * Added ability for zsocket_bind to bind to ephemeral port in range 0xc000
   to 0xffff.
 

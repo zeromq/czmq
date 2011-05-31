@@ -244,20 +244,26 @@ zframe_print (zframe_t *self, char *prefix)
     byte *data = zframe_data (self);
     size_t size = zframe_size (self);
 
-    int is_text = 1;
+    int is_bin = 0;
     uint char_nbr;
     for (char_nbr = 0; char_nbr < size; char_nbr++)
         if (data [char_nbr] < 9 || data [char_nbr] > 127)
-            is_text = 0;
+            is_bin = 1;
 
     fprintf (stderr, "[%03d] ", (int) size);
-    for (char_nbr = 0; char_nbr < size; char_nbr++) {
-        if (is_text)
-            fprintf (stderr, "%c", data [char_nbr]);
-        else
-            fprintf (stderr, "%02X", (unsigned char) data [char_nbr]);
+    size_t max_size = is_bin? 35: 70;
+    char *elipsis = "";
+    if (size > max_size) {
+        size = max_size;
+        elipsis = "...";
     }
-    fprintf (stderr, "\n");
+    for (char_nbr = 0; char_nbr < size; char_nbr++) {
+        if (is_bin)
+            fprintf (stderr, "%02X", (unsigned char) data [char_nbr]);
+        else
+            fprintf (stderr, "%c", data [char_nbr]);
+    }
+    fprintf (stderr, "%s\n", elipsis);
 }
 
 
