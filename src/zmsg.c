@@ -420,6 +420,7 @@ zmsg_dup (zmsg_t *self)
 
 //  --------------------------------------------------------------------------
 //  Dump message to stderr, for debugging and tracing
+//  Prints first 10 frames, for larger messages
 
 void
 zmsg_dump (zmsg_t *self)
@@ -430,7 +431,8 @@ zmsg_dump (zmsg_t *self)
         return;
     }
     zframe_t *frame = zmsg_first (self);
-    while (frame) {
+    int frame_nbr = 0;
+    while (frame && frame_nbr++ < 10) {
         zframe_print (frame, "");
         frame = zmsg_next (self);
     }

@@ -14,6 +14,9 @@ Changes
 * zmsg_save returns 0/-1 depending on success/failure (previously returned
   void).
 
+* zmsg_dump limited to first 10 frames, to allow mix of large and small
+  messages in applications.
+
 
 czmq version 1.0.0 (stable), released on 2011/04/26
 ===================================================
