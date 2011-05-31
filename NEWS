@@ -1,6 +1,6 @@
 zmq_pollitem_t *item
 
-czmq version 1.1.0 (draft), released on 2011/05/xx
+czmq version 1.1.0 (draft), released on 2011/06/xx
 ==================================================
 
 Changes
@@ -16,6 +16,9 @@ Changes
 
 * zmsg_dump limited to first 10 frames, to allow mix of large and small
   messages in applications.
+
+* Added ability for zsocket_bind to bind to ephemeral port in range 0xc000
+  to 0xffff.
 
 
 czmq version 1.0.0 (stable), released on 2011/04/26

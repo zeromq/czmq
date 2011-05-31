@@ -32,6 +32,11 @@ extern "C" {
 #endif
 
 //  @interface
+//  This port range is defined by IANA for dynamic or private ports
+//  We use this when choosing a port for dynamic binding.
+#define ZSOCKET_DYNFROM     0xc000
+#define ZSOCKET_DYNTO       0xffff
+
 //  Create a new socket within our czmq context, replaces zmq_socket.
 //  If the socket is a SUB socket, automatically subscribes to everything.
 //  Use this to get automatic management of the socket at shutdown.
@@ -42,9 +47,11 @@ void *
 void
     zsocket_destroy (zctx_t *self, void *socket);
 
-//  Bind a socket to a formatted endpoint
-//  Checks with assertion that the bind was valid
-void
+//  Bind a socket to a formatted endpoint. If the port is specified as
+//  '*', binds to any free port from ZSOCKET_DYNFROM to ZSOCKET_DYNTO
+//  and returns the actual port number used. Otherwise asserts that the
+//  bind succeeded with the specified port number.
+int
     zsocket_bind (void *socket, const char *format, ...);
 
 //  Connect a socket to a formatted endpoint

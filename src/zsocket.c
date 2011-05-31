@@ -68,19 +68,40 @@ zsocket_destroy (zctx_t *ctx, void *socket)
 
 
 //  --------------------------------------------------------------------------
-//  Bind a socket to a formatted endpoint
-//  Checks with assertion that the bind was valid
+//  Bind a socket to a formatted endpoint. If the port is specified as
+//  '*', binds to any free port from ZSOCKET_DYNFROM to ZSOCKET_DYNTO
+//  and returns the actual port number used. Otherwise asserts that the
+//  bind succeeded with the specified port number.
 
-void
+int
 zsocket_bind (void *socket, const char *format, ...)
 {
-    char endpoint [256];
+    //  Ephemeral port needs 4 additional characters
+    char endpoint [256 + 4];
     va_list argptr;
     va_start (argptr, format);
-    vsnprintf (endpoint, 256, format, argptr);
+    int endpoint_size = vsnprintf (endpoint, 256, format, argptr);
     va_end (argptr);
-    int rc = zmq_bind (socket, endpoint);
-    assert (rc == 0);
+
+    //  Port must be at end of endpoint
+    int rc = 0;
+    if (endpoint [endpoint_size - 2] == ':'
+    &&  endpoint [endpoint_size - 1] == '*') {
+        rc = -1;            //  Unless successful
+        int port;
+        for (port = ZSOCKET_DYNFROM; port < ZSOCKET_DYNTO; port++) {
+            sprintf (endpoint + endpoint_size - 1, "%d", port);
+            if (zmq_bind (socket, endpoint) == 0) {
+                rc = port;
+                break;
+            }
+        }
+    }
+    else {
+        rc = zmq_bind (socket, endpoint);
+        assert (rc == 0);
+    }
+    return rc;
 }
 
 
@@ -147,8 +168,11 @@ zsocket_test (Bool verbose)
     assert (message);
     assert (streq (message, "HELLO"));
     free (message);
-    zsocket_destroy (ctx, writer);
 
+    int port = zsocket_bind (writer, "tcp://%s:*", interf);
+    assert (port >= ZSOCKET_DYNFROM && port <= ZSOCKET_DYNTO);
+
+    zsocket_destroy (ctx, writer);
     zctx_destroy (&ctx);
     //  @end
 
