@@ -44,6 +44,10 @@ int
 int
     zfile_exists (char *filename);
 
+//  Return size of file, or -1 if not found
+long
+    zfile_size (char *filename);
+
 //  Self test of this class
 int
     zfile_test (Bool verbose);

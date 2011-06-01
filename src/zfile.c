@@ -104,6 +104,20 @@ zfile_exists (char *filename)
 }
 
 
+//  Return size of file, or -1 if not found
+long
+zfile_size (char *filename)
+{
+    struct stat
+        stat_buf;
+
+    assert (filename);
+    if (stat ((char *) filename, &stat_buf) == 0)
+        return ((long) stat_buf.st_size);
+    else
+        return (-1);
+}
+
 //  --------------------------------------------------------------------------
 //  Selftest
 
@@ -118,6 +132,9 @@ zfile_test (Bool verbose)
 
     rc = zfile_exists ("nosuchfile");
     assert (rc == FALSE);
+
+    rc = (int) zfile_size ("nosuchfile");
+    assert (rc == -1);
 
     //  @end
     printf ("OK\n");

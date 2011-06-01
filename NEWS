@@ -27,6 +27,8 @@ Changes
 
 * Added zfile class with minimal helper functions.
 
+* Added zfile_size method to return file size.
+
 
 czmq version 1.0.0 (stable), released on 2011/04/26
 ===================================================
