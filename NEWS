@@ -29,6 +29,9 @@ Changes
 
 * Added zfile_size method to return file size.
 
+* Added socket multipart flush to zctx_destroy to work around libzmq issue
+  134, which asserts if a fair-queuing socket still has input at close.
+
 
 czmq version 1.0.0 (stable), released on 2011/04/26
 ===================================================
