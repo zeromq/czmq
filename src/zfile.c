@@ -53,7 +53,7 @@ int
 zfile_mkdir (char *dirname)
 {
 #if (defined (__WINDOWS__))
-    return !CreateDirectory (dirname, NULL));
+    return !CreateDirectory (dirname, NULL);
 #else
     return mkdir (dirname, 0755);    //  User RWE Group RE World RE
 #endif
