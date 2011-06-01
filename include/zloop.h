@@ -50,9 +50,9 @@ void
 int
     zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg);
 
-//  Cancel the reader on the specified socket, if any
+//  Cancel the reader on the specified socket or fd, if any
 void
-    zloop_cancel (zloop_t *self, void *socket, int fd);
+    zloop_cancel (zloop_t *self, zmq_pollitem_t *item);
 
 //  Register a timer that will go off after 'delay' msecs, and will
 //  repeat 'times' times, unless 'times' is zero, meaning repeat forever.

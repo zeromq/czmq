@@ -165,13 +165,13 @@ zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
 //  socket/FD, only first is cancelled.
 
 void
-zloop_cancel (zloop_t *self, void *socket, int fd)
+zloop_cancel (zloop_t *self, zmq_pollitem_t *item)
 {
     assert (self);
     s_poller_t *poller = (s_poller_t *) zlist_first (self->pollers);
     while (poller) {
-        if ((socket && poller->item.socket == socket)
-        ||  (fd && poller->item.fd == fd)) {
+        if ((item->socket && item->socket == poller->item.socket)
+        ||  (item->fd     && item->fd     == poller->item.fd)) {
             zlist_remove (self->pollers, poller);
             free (poller);
             self->dirty = TRUE;     //  Rebuild will be needed
@@ -181,8 +181,8 @@ zloop_cancel (zloop_t *self, void *socket, int fd)
     }
     if (self->verbose)
         zclock_log ("I: zloop: cancel %s poller (%p, %d)",
-            socket? zsocket_type_str (socket): "FD",
-            socket, fd);
+            item->socket? zsocket_type_str (item->socket): "FD",
+            item->socket, item->fd);
 }
 
 
