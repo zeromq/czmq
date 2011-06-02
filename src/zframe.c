@@ -233,6 +233,24 @@ zframe_more (zframe_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  Return TRUE if two frames have identical size and data
+
+Bool
+zframe_eq (zframe_t *self, zframe_t *other)
+{
+    if (!self || !other)
+        return FALSE;
+    else
+    if (zframe_size (self) == zframe_size (other)
+    && memcmp (zframe_data (self), zframe_data (other),
+               zframe_size (self)) == 0)
+        return TRUE;
+    else
+        return FALSE;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Print contents of frame to stderr, prefix is ignored if null.
 
 void
@@ -310,9 +328,12 @@ zframe_test (Bool verbose)
     }
     assert (frame);
     zframe_t *copy = zframe_dup (frame);
+    assert (zframe_eq (frame, copy));
     zframe_destroy (&frame);
+    assert (!zframe_eq (frame, copy));
     assert (zframe_size (copy) == 5);
     zframe_destroy (&copy);
+    assert (!zframe_eq (frame, copy));
 
     //  Send END frame
     frame = zframe_new ("NOT", 3);

@@ -32,6 +32,8 @@ Changes
 * Added socket multipart flush to zctx_destroy to work around libzmq issue
   134, which asserts if a fair-queuing socket still has input at close.
 
+* Added zframe_eq method to compare two frames' size and content.
+
 
 czmq version 1.0.0 (stable), released on 2011/04/26
 ===================================================

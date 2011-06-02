@@ -82,6 +82,11 @@ Bool
 int
     zframe_more (zframe_t *self);
 
+//  Return TRUE if two frames have identical size and data
+//  If either frame is NULL, equality is always false.
+Bool
+    zframe_eq (zframe_t *self, zframe_t *other);
+
 //  Print contents of frame to stderr
 void
     zframe_print (zframe_t *self, char *prefix);
