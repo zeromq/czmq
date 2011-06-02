@@ -320,13 +320,15 @@ zloop_start (zloop_t *self)
 //  --------------------------------------------------------------------------
 //  Selftest
 
-int s_timer_event (zloop_t *loop, zmq_pollitem_t *item, void *output)
+static int
+s_timer_event (zloop_t *loop, zmq_pollitem_t *item, void *output)
 {
     zstr_send (output, "PING");
     return 0;
 }
 
-int s_socket_event (zloop_t *loop, zmq_pollitem_t *item, void *arg)
+static int
+s_socket_event (zloop_t *loop, zmq_pollitem_t *item, void *arg)
 {
     //  Just end the reactor
     return -1;

@@ -5,3 +5,10 @@
    fun:send
    ...
 }
+{
+   <socketcall_sendto>
+   Memcheck:Param
+   socketcall.send(msg)
+   fun:send
+   ...
+}
