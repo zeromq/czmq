@@ -29,7 +29,7 @@ Changes
 
 * Added zfile class with minimal helper functions.
 
-* Added zfile_size method to return file size.
+* Added zfile_size method to return file size, as ssize_t.
 
 * Added socket multipart flush to zctx_destroy to work around libzmq issue
   134, which asserts if a fair-queuing socket still has input at close.
