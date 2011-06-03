@@ -71,7 +71,8 @@ zsocket_destroy (zctx_t *ctx, void *socket)
 //  Bind a socket to a formatted endpoint. If the port is specified as
 //  '*', binds to any free port from ZSOCKET_DYNFROM to ZSOCKET_DYNTO
 //  and returns the actual port number used. Otherwise asserts that the
-//  bind succeeded with the specified port number.
+//  bind succeeded with the specified port number. Always returns the
+//  port number if successful.
 
 int
 zsocket_bind (void *socket, const char *format, ...)
@@ -100,6 +101,8 @@ zsocket_bind (void *socket, const char *format, ...)
     else {
         rc = zmq_bind (socket, endpoint);
         assert (rc == 0);
+        //  Return actual port used for binding
+        rc = atoi (strrchr (endpoint, ':') + 1);
     }
     return rc;
 }
@@ -161,7 +164,8 @@ zsocket_test (Bool verbose)
     void *reader = zsocket_new (ctx, ZMQ_PULL);
     assert (streq (zsocket_type_str (writer), "PUSH"));
     assert (streq (zsocket_type_str (reader), "PULL"));
-    zsocket_bind (writer, "tcp://%s:%d", interf, service);
+    int rc = zsocket_bind (writer, "tcp://%s:%d", interf, service);
+    assert (rc == service);
     zsocket_connect (reader, "tcp://%s:%d", domain, service);
     zstr_send (writer, "HELLO");
     char *message = zstr_recv (reader);

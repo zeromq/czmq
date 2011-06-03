@@ -50,7 +50,8 @@ void
 //  Bind a socket to a formatted endpoint. If the port is specified as
 //  '*', binds to any free port from ZSOCKET_DYNFROM to ZSOCKET_DYNTO
 //  and returns the actual port number used. Otherwise asserts that the
-//  bind succeeded with the specified port number.
+//  bind succeeded with the specified port number. Always returns the
+//  port number if successful.
 int
     zsocket_bind (void *socket, const char *format, ...);
 

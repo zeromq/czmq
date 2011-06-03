@@ -25,6 +25,8 @@ Changes
 * Added ability for zsocket_bind to bind to ephemeral port in range 0xc000
   to 0xffff.
 
+* zmq_bind always returns port number bound to, if successful.
+
 * Added zfile class with minimal helper functions.
 
 * Added zfile_size method to return file size.
