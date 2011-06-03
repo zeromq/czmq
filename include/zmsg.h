@@ -121,9 +121,10 @@ zframe_t *
 int
     zmsg_save (zmsg_t *self, FILE *file);
 
-//  Load a message from an open file
+//  Load/append an open file into message, create new message if
+//  null message provided.
 zmsg_t *
-    zmsg_load (FILE *file);
+    zmsg_load (zmsg_t *self, FILE *file);
 
 //  Create copy of message, as new message object
 zmsg_t *

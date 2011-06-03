@@ -376,14 +376,15 @@ zmsg_save (zmsg_t *self, FILE *file)
 
 
 //  --------------------------------------------------------------------------
-//  Load message from file
-//  Creates a new message and returns as many frames as can be read.
+//  Load/append an open file into message, create new message if
+//  null message provided.
 
 zmsg_t *
-zmsg_load (FILE *file)
+zmsg_load (zmsg_t *self, FILE *file)
 {
     assert (file);
-    zmsg_t *self = zmsg_new ();
+    if (!self)
+        self = zmsg_new ();
 
     while (TRUE) {
         size_t frame_size;
@@ -513,7 +514,7 @@ zmsg_test (Bool verbose)
     zmsg_destroy (&msg);
 
     file = fopen ("zmsg.test", "r");
-    msg = zmsg_load (file);
+    msg = zmsg_load (NULL, file);
     fclose (file);
     remove ("zmsg.test");
     assert (zmsg_size (msg) == 10);
