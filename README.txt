@@ -9,6 +9,10 @@
 
 ## Overview
 
+### To report an Issue
+
+[Use the issue tracker.](https://zeromq.jira.com/browse/CZMQ)
+
 ### Scope and Goals
 
 czmq has these goals:
