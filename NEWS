@@ -36,6 +36,10 @@ Changes
 
 * Added zframe_eq method to compare two frames' size and content.
 
+* Fixed zloop to allow timers to be added after reactor was started.
+  Without this fix, the reactor would spin at max speed instead of
+  properly calculating the timer. (Luc Heinrich)
+
 
 czmq version 1.0.0 (stable), released on 2011/04/26
 ===================================================
