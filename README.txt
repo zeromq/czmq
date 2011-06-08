@@ -1,4 +1,4 @@
-Z.set GIT=https://github.com/zeromq/czmq
+.set GIT=https://github.com/zeromq/czmq
 .sub 0MQ=ØMQ
 
 # czmq - High-level C binding for 0MQ
@@ -17,7 +17,7 @@ czmq has these goals:
 * To hide the differences between versions of 0MQ, particularly 2.1 and 3.0.
 * To provide a space for development of more sophisticated API semantics.
 
-czmq grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.org) and [ZFL](http://zfl.zeromq.org). Until end-April 2011, czmq was known as //libzapi//.
+czmq grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.org) and [ZFL](http://zfl.zeromq.org). Until end-April 2011, czmq was known as *libzapi*.
 
 [diagram]
                               +---------------+
