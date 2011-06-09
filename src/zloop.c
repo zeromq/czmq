@@ -169,6 +169,8 @@ void
 zloop_cancel (zloop_t *self, zmq_pollitem_t *item)
 {
     assert (self);
+    assert (item->socket || item->fd);
+
     s_poller_t *poller = (s_poller_t *) zlist_first (self->pollers);
     while (poller) {
         if ((item->socket && item->socket == poller->item.socket)
@@ -357,7 +359,7 @@ zloop_test (Bool verbose)
     //  After 10 msecs, send a ping message to output
     zloop_timer (loop, 10, 1,  s_timer_event, output);
     //  When we get the ping message, end the reactor
-    zmq_pollitem_t poll_input = { input, 0, ZMQ_POLLIN, 0 };
+    zmq_pollitem_t poll_input = { input, 0, ZMQ_POLLIN };
     zloop_poller (loop, &poll_input, s_socket_event, NULL);
     zloop_start (loop);
 

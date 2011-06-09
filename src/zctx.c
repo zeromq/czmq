@@ -123,20 +123,8 @@ zctx_destroy (zctx_t **self_p)
     assert (self_p);
     if (*self_p) {
         zctx_t *self = *self_p;
-        while (zlist_size (self->sockets)) {
-            //  Set LINGER on the socket as specified by the ctx linger
-            void *socket = zlist_first (self->sockets);
-            zsockopt_set_linger (socket, self->linger);
-            //  Handle issue 134 by removing any remaining frames on the
-            //  socket (otherwise we get a crash)
-            while (zsockopt_rcvmore (socket)) {
-                zframe_t *frame = zframe_recv (socket);
-                zframe_destroy (&frame);
-            }
-            //  Now it's safe to close the socket...
-            zmq_close (socket);
-            zlist_remove (self->sockets, socket);
-        }
+        while (zlist_size (self->sockets))
+            zctx__socket_destroy (self, zlist_first (self->sockets));
         zlist_destroy (&self->sockets);
         if (self->main && self->context)
             zmq_term (self->context);
@@ -217,6 +205,15 @@ zctx__socket_destroy (zctx_t *self, void *socket)
 {
     assert (self);
     assert (socket);
+    //  Handle issue 134 by removing any remaining frames on the
+    //  socket (otherwise we get a crash)
+    while (zsockopt_rcvmore (socket)) {
+        zmq_msg_t msg;
+        zmq_msg_init (&msg);
+        if (zmq_recv (&msg, socket, ZMQ_NOBLOCK))
+            break;
+        zmq_msg_close (&msg);
+    }
     zsockopt_set_linger (socket, self->linger);
     zmq_close (socket);
     zlist_remove (self->sockets, socket);
