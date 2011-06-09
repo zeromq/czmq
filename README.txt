@@ -1,7 +1,7 @@
 .set GIT=https://github.com/zeromq/czmq
 .sub 0MQ=ØMQ
 
-# czmq - High-level C binding for 0MQ
+# CZMQ - High-level C binding for 0MQ
 
 ## Contents
 
@@ -15,13 +15,13 @@
 
 ### Scope and Goals
 
-czmq has these goals:
+CZMQ has these goals:
 
 * To wrap the 0MQ core API in semantics that are natural and lead to shorter, more readable applications.
 * To hide the differences between versions of 0MQ, particularly 2.1 and 3.0.
 * To provide a space for development of more sophisticated API semantics.
 
-czmq grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.org) and [ZFL](http://zfl.zeromq.org). Until end-April 2011, czmq was known as *libzapi*.
+CZMQ grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.org) and [ZFL](http://zfl.zeromq.org). Until end-April 2011, CZMQ was known as *libzapi*.
 
 [diagram]
                               +---------------+
@@ -36,7 +36,7 @@ czmq grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.o
                        v                |
   Open context    +---------+           |
   Create sockets  |         |           |    Connect, bind sockets
-  Close sockets   |  czmq   |           |    get/set socket options
+  Close sockets   |  CZMQ   |           |    get/set socket options
   Send/receive    |    cYEL |           |
   Multithreading  +----+----+           |
   Reactor pattern      |                |
@@ -67,23 +67,23 @@ czmq grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.o
 
 ### Ownership and License
 
-czmq is maintained by Pieter Hintjens and Mikko Koppanen (build system). Its other authors and contributors are listed in the AUTHORS file. It is held by the ZeroMQ organization at github.com.
+CZMQ is maintained by Pieter Hintjens and Mikko Koppanen (build system). Its other authors and contributors are listed in the AUTHORS file. It is held by the ZeroMQ organization at github.com.
 
-The authors of czmq grant you use of this software under the terms of the GNU Lesser General Public License (LGPL). For details see the files `COPYING` and `COPYING.LESSER` in this directory.
+The authors of CZMQ grant you use of this software under the terms of the GNU Lesser General Public License (LGPL). For details see the files `COPYING` and `COPYING.LESSER` in this directory.
 
 ### Contributing
 
-To submit an issue use the [issue tracker](http://github.com/zeromq/czmq/issues). All discussion happens on the [zeromq-dev](zeromq-dev@lists.zeromq.org) list or #zeromq IRC channel at irc.freenode.net.
+To submit an issue use the [issue tracker](https://zeromq.jira.com/browse/CZMQ). All discussion happens on the [zeromq-dev](zeromq-dev@lists.zeromq.org) list or #zeromq IRC channel at irc.freenode.net.
 
 The proper way to submit patches is to clone this repository, make your changes, and use git to create a patch or a pull request. See http://www.zeromq.org/docs:contributing. All contributors are listed in AUTHORS.
 
-The general rule is, if you contribute code to czmq you must be willing to maintain it as long as there are users of it. Code with no active maintainer will in general be deprecated and/or removed.
+The general rule is, if you contribute code to CZMQ you must be willing to maintain it as long as there are users of it. Code with no active maintainer will in general be deprecated and/or removed.
 
-## Using czmq
+## Using CZMQ
 
 ### Building and Installing
 
-czmq uses autotools for packaging. To build from git (all example commands are for Linux):
+CZMQ uses autotools for packaging. To build from git (all example commands are for Linux):
 
     git clone git://github.com/zeromq/czmq.git
     cd czmq
@@ -97,13 +97,13 @@ You will need the libtool and autotools packages. On FreeBSD, you may need to sp
 
     ./configure --with-zeromq=/usr/local
 
-After building, you can run the czmq selftests:
+After building, you can run the CZMQ selftests:
 
     make check
 
 ### Linking with an Application
 
-Include `czmq.h` in your application and link with czmq. Here is a typical gcc link command:
+Include `czmq.h` in your application and link with libczmq. Here is a typical gcc link command:
 
     gcc -lczmq -lzmq myapp.c -o myapp
 
@@ -257,7 +257,7 @@ The answer to this, as we learned from building enterprise-level C applications 
 
 C has no standard API style. It is one thing to write a useful component, but something else to provide an API that is consistent and obvious across many components. We learned from building [OpenAMQ](http://www.openamq.org), a messaging client and server of 0.5M LoC, that a consistent model for extending C makes life for the application developer much easier.
 
-The general model is that of a class (the source package) that provides objects (in fact C structures). The application creates objects and then works with them. When done, the application destroys the object. In C, we tend to use the same name for the object as the class, when we can, and it looks like this (to take a fictitious czmq class):
+The general model is that of a class (the source package) that provides objects (in fact C structures). The application creates objects and then works with them. When done, the application destroys the object. In C, we tend to use the same name for the object as the class, when we can, and it looks like this (to take a fictitious CZMQ class):
 
     zregexp_t *regexp = zregexp_new (regexp_string);
     if (!regexp)
@@ -281,7 +281,7 @@ No model is fully consistent, and classes can define their own rules if it helps
 
 ### Naming Style
 
-czmq aims for short, consistent names, following the theory that names we use most often should be shortest. Classes get one-word names, unless they are part of a family of classes in which case they may be two words, the first being the family name. Methods, similarly, get one-word names and we aim for consistency across classes (so a method that does something semantically similar in two classes will get the same name in both). So the canonical name for any method is:
+CZMQ aims for short, consistent names, following the theory that names we use most often should be shortest. Classes get one-word names, unless they are part of a family of classes in which case they may be two words, the first being the family name. Methods, similarly, get one-word names and we aim for consistency across classes (so a method that does something semantically similar in two classes will get the same name in both). So the canonical name for any method is:
 
     zclassname_methodname
 
@@ -302,7 +302,7 @@ We assume that at some point we'll need to switch to a doubly-linked list.
 
 Creating a portable C application can be rewarding in terms of maintaining a single code base across many platforms, and keeping (expensive) system-specific knowledge separate from application developers. In most projects (like 0MQ core), there is no portability layer and application code does conditional compilation for all mixes of platforms. This leads to quite messy code.
 
-czmq is a portability layer, similar to but thinner than libraries like the [Apache Portable Runtime](http://apr.apache.org) (APR).
+CZMQ is a portability layer, similar to but thinner than libraries like the [Apache Portable Runtime](http://apr.apache.org) (APR).
 
 These are the places a C application is subject to arbitrary system differences:
 
@@ -321,7 +321,7 @@ An example of the last:
         pid = 0;
     #endif
 
-czmq uses the GNU autotools system, so non-portable code can use the macros this defines. It can also use macros defined by the czmq_prelude.h header file.
+CZMQ uses the GNU autotools system, so non-portable code can use the macros this defines. It can also use macros defined by the czmq_prelude.h header file.
 
 ### Technical Aspects
 
@@ -330,13 +330,13 @@ czmq uses the GNU autotools system, so non-portable code can use the macros this
 * *Library versioning*: we don't make any attempt to version the library at this stage. Classes are in our experience highly stable once they are built and tested, the only changes typically being added methods.
 * *Performance*: for critical path processing, you may want to avoid creating and destroying classes. However on modern Linux systems the heap allocator is very fast. Individual classes can choose whether or not to nullify their data on allocation.
 * *Self-testing*: every class has a `selftest` method that runs through the methods of the class. In theory, calling all selftest functions of all classes does a full unit test of the library. The `czmq_selftest` application does this.
-* *Memory management*: czmq classes do not use any special memory management techiques to detect leaks. We've done this in the past but it makes the code relatively complex. Instead, we do memory leak testing using tools like valgrind.
+* *Memory management*: CZMQ classes do not use any special memory management techiques to detect leaks. We've done this in the past but it makes the code relatively complex. Instead, we do memory leak testing using tools like valgrind.
 
 ## Under the Hood
 
 ### Adding a New Class
 
-If you define a new czmq class `myclass` you need to:
+If you define a new CZMQ class `myclass` you need to:
 
 * Write the `zmyclass.c` and `zmyclass.h` source files, in `src` and `include` respectively.
 * Add`#include <zmyclass.h>` to `include/czmq.h`.
@@ -360,13 +360,13 @@ So while ANSI C code might say:
     file_buffer = zblob_new ();
     ...
 
-The style in czmq would be:
+The style in CZMQ would be:
 
     zblob_t *file_buffer = zblob_new ();
 
 ### Assertions
 
-We use assertions heavily to catch bad argument values. The czmq classes do not attempt to validate arguments and report errors; bad arguments are treated as fatal application programming errors.
+We use assertions heavily to catch bad argument values. The CZMQ classes do not attempt to validate arguments and report errors; bad arguments are treated as fatal application programming errors.
 
 We also use assertions heavily on calls to system functions that are never supposed to fail, where failure is to be treated as a fatal non-recoverable error (e.g. running out of memory).
 
@@ -421,16 +421,16 @@ The template for man pages is in doc/mkman.
 
 ### Development
 
-czmq is developed through a test-driven process that guarantees no memory violations or leaks in the code:
+CZMQ is developed through a test-driven process that guarantees no memory violations or leaks in the code:
 
 * Modify a class or method.
 * Update the test method for that class.
 * Run the 'selftest' script, which uses the Valgrind memcheck tool.
 * Repeat until perfect.
 
-### Porting czmq
+### Porting CZMQ
 
-When you try czmq on an OS that it's not been used on (ever, or for a while), you will hit code that does not compile. In some cases the patches are trivial, in other cases (usually when porting to Windows), the work needed to build equivalent functionality may be non-trivial. In any case, the benefit is that once ported, the functionality is available to all applications.
+When you try CZMQ on an OS that it's not been used on (ever, or for a while), you will hit code that does not compile. In some cases the patches are trivial, in other cases (usually when porting to Windows), the work needed to build equivalent functionality may be non-trivial. In any case, the benefit is that once ported, the functionality is available to all applications.
 
 Before attempting to patch code for portability, please read the `czmq_prelude.h` header file. There are several typical types of changes you may need to make to get functionality working on a specific operating system:
 
@@ -438,7 +438,7 @@ Before attempting to patch code for portability, please read the `czmq_prelude.h
 * Defining macros that rename exotic library functions to more conventional names: do this in czmq_prelude.h.
 * Reimplementing specific methods to use a non-standard API: this is typically needed on Windows. Do this in the relevant class, using #ifdefs to properly differentiate code for different platforms.
 
-The canonical 'standard operating system' for all czmq code is Linux, gcc, POSIX. The canonical 'weird operating system' for czmq is Windows.
+The canonical 'standard operating system' for all CZMQ code is Linux, gcc, POSIX. The canonical 'weird operating system' for CZMQ is Windows.
 
 ### Code Generation
 

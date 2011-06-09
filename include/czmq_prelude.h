@@ -1,11 +1,11 @@
 /*  =========================================================================
-    czmq_prelude.h - czmq environment
+    czmq_prelude.h - CZMQ environment
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
-    This file is part of czmq, the high-level C binding for 0MQ:
+    This file is part of CZMQ, the high-level C binding for 0MQ:
     http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
@@ -46,8 +46,8 @@
 #   error "please upgrade to latest stable libzmq from http://zeromq.org"
 #endif
 #if ZMQ_VERSION_MAJOR == 2
-#   if ZMQ_VERSION_MINOR == 0
-#       error "czmq requires at least libzmq/2.1.x stable"
+#   if ZMQ_VERSION_MINOR == 0 || ZMQ_VERSION_PATCH < 7
+#       error "CZMQ requires at least libzmq/2.1.7 stable"
 #   endif
 #   define zmq_sendmsg      zmq_send
 #   define zmq_recvmsg      zmq_recv
