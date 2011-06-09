@@ -40,6 +40,9 @@ Changes
   Without this fix, the reactor would spin at max speed instead of
   properly calculating the timer. (Luc Heinrich)
 
+* Modified zmsg_pushstr and zmsg_addstr to accept variable argument list
+  and do vsnprintf formatting of provided string.
+
 
 czmq version 1.0.0 (stable), released on 2011/04/26
 ===================================================

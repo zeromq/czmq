@@ -81,11 +81,11 @@ void
 
 //  Push string as new frame to front of message
 void
-    zmsg_pushstr (zmsg_t *self, const char *string);
+    zmsg_pushstr (zmsg_t *self, const char *format, ...);
 
 //  Push string as new frame to end of message
 void
-    zmsg_addstr (zmsg_t *self, const char *string);
+    zmsg_addstr (zmsg_t *self, const char *format, ...);
 
 //  Pop frame off front of message, return as fresh string
 char *
