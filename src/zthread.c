@@ -94,9 +94,7 @@ s_thread_shim (void *args)
         shim->attached (shim->args, shim->ctx, shim->pipe);
     else
         shim->detached (shim->args);
-puts ("< thread shim destroy ctx");
     zctx_destroy (&shim->ctx);
-puts ("> thread shim destroy ctx");
     free (shim);
     return NULL;
 }
