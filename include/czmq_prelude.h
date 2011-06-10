@@ -46,7 +46,8 @@
 #   error "please upgrade to latest stable libzmq from http://zeromq.org"
 #endif
 #if ZMQ_VERSION_MAJOR == 2
-#   if ZMQ_VERSION_MINOR == 0 || ZMQ_VERSION_PATCH < 7
+#   if  ZMQ_VERSION_MINOR == 0 \
+    || (ZMQ_VERSION_MINOR == 1 && ZMQ_VERSION_PATCH < 7)
 #       error "CZMQ requires at least libzmq/2.1.7 stable"
 #   endif
 #   define zmq_sendmsg      zmq_send
