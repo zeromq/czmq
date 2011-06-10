@@ -5,7 +5,7 @@
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
-    This file is part of czmq, the high-level C binding for 0MQ:
+    This file is part of CZMQ, the high-level C binding for 0MQ:
     http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
@@ -90,6 +90,7 @@ s_timer_new (size_t delay, size_t times, zloop_fn handler, void *arg)
     timer->times = times;
     timer->handler = handler;
     timer->arg = arg;
+    timer->when = -1;
     return timer;
 }
 
@@ -168,6 +169,8 @@ void
 zloop_cancel (zloop_t *self, zmq_pollitem_t *item)
 {
     assert (self);
+    assert (item->socket || item->fd);
+
     s_poller_t *poller = (s_poller_t *) zlist_first (self->pollers);
     while (poller) {
         if ((item->socket && item->socket == poller->item.socket)
@@ -280,6 +283,8 @@ zloop_start (zloop_t *self)
         //  Handle any timers that have now expired
         timer = (s_timer_t *) zlist_first (self->timers);
         while (timer) {
+            if (timer->when == -1)
+                timer->when = timer->delay + zclock_time ();
             if (zclock_time () >= timer->when) {
                 if (self->verbose)
                     zclock_log ("I: zloop: call timer handler");
@@ -354,7 +359,7 @@ zloop_test (Bool verbose)
     //  After 10 msecs, send a ping message to output
     zloop_timer (loop, 10, 1,  s_timer_event, output);
     //  When we get the ping message, end the reactor
-    zmq_pollitem_t poll_input = { input, 0, ZMQ_POLLIN, 0 };
+    zmq_pollitem_t poll_input = { input, 0, ZMQ_POLLIN };
     zloop_poller (loop, &poll_input, s_socket_event, NULL);
     zloop_start (loop);
 

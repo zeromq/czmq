@@ -5,7 +5,7 @@
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
-    This file is part of czmq, the high-level C binding for 0MQ:
+    This file is part of CZMQ, the high-level C binding for 0MQ:
     http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
@@ -81,11 +81,11 @@ void
 
 //  Push string as new frame to front of message
 void
-    zmsg_pushstr (zmsg_t *self, const char *string);
+    zmsg_pushstr (zmsg_t *self, const char *format, ...);
 
 //  Push string as new frame to end of message
 void
-    zmsg_addstr (zmsg_t *self, const char *string);
+    zmsg_addstr (zmsg_t *self, const char *format, ...);
 
 //  Pop frame off front of message, return as fresh string
 char *

@@ -5,7 +5,7 @@
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
-    This file is part of czmq, the high-level C binding for 0MQ:
+    This file is part of CZMQ, the high-level C binding for 0MQ:
     http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
@@ -229,12 +229,26 @@ zmsg_addmem (zmsg_t *self, const void *src, size_t size)
 //  Push string as new frame to front of message
 
 void
-zmsg_pushstr (zmsg_t *self, const char *string)
+zmsg_pushstr (zmsg_t *self, const char *format, ...)
 {
     assert (self);
-    assert (string);
+    assert (format);
+    //  Format string into buffer
+    va_list argptr;
+    va_start (argptr, format);
+    int size = 255 + 1;
+    char *string = (char *) malloc (size);
+    int required = vsnprintf (string, size, format, argptr);
+    if (required >= size) {
+        size = required + 1;
+        string = (char *) realloc (string, size);
+        vsnprintf (string, size, format, argptr);
+    }
+    va_end (argptr);
+
     self->content_size += strlen (string);
     zlist_push (self->frames, zframe_new (string, strlen (string)));
+    free (string);
 }
 
 
@@ -242,12 +256,26 @@ zmsg_pushstr (zmsg_t *self, const char *string)
 //  Push string as new frame to end of message
 
 void
-zmsg_addstr (zmsg_t *self, const char *string)
+zmsg_addstr (zmsg_t *self, const char *format, ...)
 {
     assert (self);
-    assert (string);
+    assert (format);
+    //  Format string into buffer
+    va_list argptr;
+    va_start (argptr, format);
+    int size = 255 + 1;
+    char *string = (char *) malloc (size);
+    int required = vsnprintf (string, size, format, argptr);
+    if (required >= size) {
+        size = required + 1;
+        string = (char *) realloc (string, size);
+        vsnprintf (string, size, format, argptr);
+    }
+    va_end (argptr);
+
     self->content_size += strlen (string);
     zlist_append (self->frames, zframe_new (string, strlen (string)));
+    free (string);
 }
 
 

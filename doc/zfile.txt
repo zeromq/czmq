@@ -19,6 +19,14 @@ int
 //  Return 1 if file exists, else zero
 int
     zfile_exists (char *filename);
+
+//  Return size of file, or -1 if not found
+long
+    zfile_size (char *filename);
+
+//  Self test of this class
+int
+    zfile_test (Bool verbose);
 ----
 
 DESCRIPTION
@@ -31,11 +39,14 @@ EXAMPLE
 -------
 .From zfile_test method
 ----
-    int rc = zfile_delete ("no such file");
-    assert (rc == 0);
+    int rc = zfile_delete ("nosuchfile");
+    assert (rc == -1);
 
-    rc = zfile_exists ("no such file");
+    rc = zfile_exists ("nosuchfile");
     assert (rc == FALSE);
+
+    rc = (int) zfile_size ("nosuchfile");
+    assert (rc == -1);
 
 ----
 

@@ -21,9 +21,9 @@ void
 
 //  Register a socket reader, on one socket
 int
-    zloop_reader (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg);
+    zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg);
 
-//  Cancel the reader on the specified socket, if any
+//  Cancel the reader on the specified socket or fd, if any
 void
     zloop_cancel (zloop_t *self, zmq_pollitem_t *item);
 

@@ -5,7 +5,7 @@
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
-    This file is part of czmq, the high-level C binding for 0MQ:
+    This file is part of CZMQ, the high-level C binding for 0MQ:
     http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
@@ -123,20 +123,8 @@ zctx_destroy (zctx_t **self_p)
     assert (self_p);
     if (*self_p) {
         zctx_t *self = *self_p;
-        while (zlist_size (self->sockets)) {
-            //  Set LINGER on the socket as specified by the ctx linger
-            void *socket = zlist_first (self->sockets);
-            zsockopt_set_linger (socket, self->linger);
-            //  Handle issue 134 by removing any remaining frames on the
-            //  socket (otherwise we get a crash)
-            while (zsockopt_rcvmore (socket)) {
-                zframe_t *frame = zframe_recv (socket);
-                zframe_destroy (&frame);
-            }
-            //  Now it's safe to close the socket...
-            zmq_close (socket);
-            zlist_remove (self->sockets, socket);
-        }
+        while (zlist_size (self->sockets))
+            zctx__socket_destroy (self, zlist_first (self->sockets));
         zlist_destroy (&self->sockets);
         if (self->main && self->context)
             zmq_term (self->context);

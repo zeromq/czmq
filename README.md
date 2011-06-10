@@ -1,4 +1,3 @@
-Z.set GIT=https://github.com/zeromq/czmq
 
 <A name="toc1-3" title="czmq - High-level C binding for ØMQ" />
 # czmq - High-level C binding for ØMQ
@@ -8,49 +7,56 @@ Z.set GIT=https://github.com/zeromq/czmq
 
 
 **<a href="#toc2-11">Overview</a>**
-&emsp;<a href="#toc3-14">Scope and Goals</a>
-&emsp;<a href="#toc3-53">Highlights</a>
-&emsp;<a href="#toc3-68">Ownership and License</a>
-&emsp;<a href="#toc3-75">Contributing</a>
+&emsp;<a href="#toc3-14">To report an Issue</a>
+&emsp;<a href="#toc3-19">Scope and Goals</a>
+&emsp;<a href="#toc3-58">Highlights</a>
+&emsp;<a href="#toc3-73">Ownership and License</a>
+&emsp;<a href="#toc3-80">Contributing</a>
 
-**<a href="#toc2-84">Using czmq</a>**
-&emsp;<a href="#toc3-87">Building and Installing</a>
-&emsp;<a href="#toc3-108">Linking with an Application</a>
-&emsp;<a href="#toc3-115">API Summary</a>
-&emsp;<a href="#toc4-118">zctx - working with ØMQ contexts</a>
-&emsp;<a href="#toc4-129">zsocket - working with ØMQ sockets</a>
-&emsp;<a href="#toc4-140">zsockopt - working with ØMQ socket options</a>
-&emsp;<a href="#toc4-151">zstr - sending and receiving strings</a>
-&emsp;<a href="#toc4-176">zframe - working with single message frames</a>
-&emsp;<a href="#toc4-187">zmsg - working with multipart messages</a>
-&emsp;<a href="#toc4-198">zloop - event-driven reactor</a>
-&emsp;<a href="#toc4-209">zthread - working with system threads</a>
-&emsp;<a href="#toc4-220">zhash - expandable hash table container</a>
-&emsp;<a href="#toc4-231">zlist - singly-linked list container</a>
-&emsp;<a href="#toc4-242">zclock - millisecond clocks and delays</a>
+**<a href="#toc2-89">Using czmq</a>**
+&emsp;<a href="#toc3-92">Building and Installing</a>
+&emsp;<a href="#toc3-113">Linking with an Application</a>
+&emsp;<a href="#toc3-120">API Summary</a>
+&emsp;<a href="#toc4-123">zctx - working with ØMQ contexts</a>
+&emsp;<a href="#toc4-134">zsocket - working with ØMQ sockets</a>
+&emsp;<a href="#toc4-145">zsockopt - working with ØMQ socket options</a>
+&emsp;<a href="#toc4-156">zstr - sending and receiving strings</a>
+&emsp;<a href="#toc4-181">zfile - work with files</a>
+&emsp;<a href="#toc4-192">zframe - working with single message frames</a>
+&emsp;<a href="#toc4-203">zmsg - working with multipart messages</a>
+&emsp;<a href="#toc4-214">zloop - event-driven reactor</a>
+&emsp;<a href="#toc4-225">zthread - working with system threads</a>
+&emsp;<a href="#toc4-236">zhash - expandable hash table container</a>
+&emsp;<a href="#toc4-247">zlist - singly-linked list container</a>
+&emsp;<a href="#toc4-258">zclock - millisecond clocks and delays</a>
 
-**<a href="#toc2-253">Design Ideology</a>**
-&emsp;<a href="#toc3-256">The Problem with C</a>
-&emsp;<a href="#toc3-265">A Simple Class Model</a>
-&emsp;<a href="#toc3-292">Naming Style</a>
-&emsp;<a href="#toc3-301">Containers</a>
-&emsp;<a href="#toc3-313">Portability</a>
-&emsp;<a href="#toc3-339">Technical Aspects</a>
+**<a href="#toc2-269">Design Ideology</a>**
+&emsp;<a href="#toc3-272">The Problem with C</a>
+&emsp;<a href="#toc3-281">A Simple Class Model</a>
+&emsp;<a href="#toc3-308">Naming Style</a>
+&emsp;<a href="#toc3-317">Containers</a>
+&emsp;<a href="#toc3-329">Portability</a>
+&emsp;<a href="#toc3-355">Technical Aspects</a>
 
-**<a href="#toc2-349">Under the Hood</a>**
-&emsp;<a href="#toc3-352">Adding a New Class</a>
-&emsp;<a href="#toc3-365">Coding Style</a>
-&emsp;<a href="#toc3-384">Assertions</a>
-&emsp;<a href="#toc3-402">Documentation</a>
-&emsp;<a href="#toc3-441">Development</a>
-&emsp;<a href="#toc3-451">Porting czmq</a>
-&emsp;<a href="#toc3-464">Code Generation</a>
-&emsp;<a href="#toc3-473">This Document</a>
+**<a href="#toc2-365">Under the Hood</a>**
+&emsp;<a href="#toc3-368">Adding a New Class</a>
+&emsp;<a href="#toc3-381">Coding Style</a>
+&emsp;<a href="#toc3-400">Assertions</a>
+&emsp;<a href="#toc3-418">Documentation</a>
+&emsp;<a href="#toc3-457">Development</a>
+&emsp;<a href="#toc3-467">Porting czmq</a>
+&emsp;<a href="#toc3-480">Code Generation</a>
+&emsp;<a href="#toc3-489">This Document</a>
 
 <A name="toc2-11" title="Overview" />
 ## Overview
 
-<A name="toc3-14" title="Scope and Goals" />
+<A name="toc3-14" title="To report an Issue" />
+### To report an Issue
+
+[Use the issue tracker.](https://zeromq.jira.com/browse/CZMQ)
+
+<A name="toc3-19" title="Scope and Goals" />
 ### Scope and Goals
 
 czmq has these goals:
@@ -59,13 +65,13 @@ czmq has these goals:
 * To hide the differences between versions of ØMQ, particularly 2.1 and 3.0.
 * To provide a space for development of more sophisticated API semantics.
 
-czmq grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.org) and [ZFL](http://zfl.zeromq.org). Until end-April 2011, czmq was known as //libzapi//.
+czmq grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.org) and [ZFL](http://zfl.zeromq.org). Until end-April 2011, czmq was known as *libzapi*.
 
 <center>
-<img src="README_1.png" alt="1">
+<img src="https://github.com/zeromq/czmq/raw/master/images/README_1.png" alt="1">
 </center>
 
-<A name="toc3-53" title="Highlights" />
+<A name="toc3-58" title="Highlights" />
 ### Highlights
 
 * Single API hides differences between ØMQ/2.1, and ØMQ/3.0.
@@ -80,14 +86,14 @@ czmq grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.o
 * Includes generic hash and list containers.
 * Full selftests on all classes.
 
-<A name="toc3-68" title="Ownership and License" />
+<A name="toc3-73" title="Ownership and License" />
 ### Ownership and License
 
 czmq is maintained by Pieter Hintjens and Mikko Koppanen (build system). Its other authors and contributors are listed in the AUTHORS file. It is held by the ZeroMQ organization at github.com.
 
 The authors of czmq grant you use of this software under the terms of the GNU Lesser General Public License (LGPL). For details see the files `COPYING` and `COPYING.LESSER` in this directory.
 
-<A name="toc3-75" title="Contributing" />
+<A name="toc3-80" title="Contributing" />
 ### Contributing
 
 To submit an issue use the [issue tracker](http://github.com/zeromq/czmq/issues). All discussion happens on the [zeromq-dev](zeromq-dev@lists.zeromq.org) list or #zeromq IRC channel at irc.freenode.net.
@@ -96,10 +102,10 @@ The proper way to submit patches is to clone this repository, make your changes,
 
 The general rule is, if you contribute code to czmq you must be willing to maintain it as long as there are users of it. Code with no active maintainer will in general be deprecated and/or removed.
 
-<A name="toc2-84" title="Using czmq" />
+<A name="toc2-89" title="Using czmq" />
 ## Using czmq
 
-<A name="toc3-87" title="Building and Installing" />
+<A name="toc3-92" title="Building and Installing" />
 ### Building and Installing
 
 czmq uses autotools for packaging. To build from git (all example commands are for Linux):
@@ -120,17 +126,17 @@ After building, you can run the czmq selftests:
 
     make check
 
-<A name="toc3-108" title="Linking with an Application" />
+<A name="toc3-113" title="Linking with an Application" />
 ### Linking with an Application
 
 Include `czmq.h` in your application and link with czmq. Here is a typical gcc link command:
 
     gcc -lczmq -lzmq myapp.c -o myapp
 
-<A name="toc3-115" title="API Summary" />
+<A name="toc3-120" title="API Summary" />
 ### API Summary
 
-<A name="toc4-118" title="zctx - working with ØMQ contexts" />
+<A name="toc4-123" title="zctx - working with ØMQ contexts" />
 #### zctx - working with ØMQ contexts
 
 The zctx class wraps ØMQ contexts. It manages open sockets in the context
@@ -193,7 +199,7 @@ This is the class interface:
     extern int zctx_interrupted;
 
 
-<A name="toc4-129" title="zsocket - working with ØMQ sockets" />
+<A name="toc4-134" title="zsocket - working with ØMQ sockets" />
 #### zsocket - working with ØMQ sockets
 
 The zsocket class provides helper functions for ØMQ sockets. It doesn't
@@ -202,6 +208,11 @@ calls. Automatically subscribes SUB sockets to "".
 
 This is the class interface:
 
+    //  This port range is defined by IANA for dynamic or private ports
+    //  We use this when choosing a port for dynamic binding.
+    #define ZSOCKET_DYNFROM     0xc000
+    #define ZSOCKET_DYNTO       0xffff
+    
     //  Create a new socket within our czmq context, replaces zmq_socket.
     //  If the socket is a SUB socket, automatically subscribes to everything.
     //  Use this to get automatic management of the socket at shutdown.
@@ -212,9 +223,12 @@ This is the class interface:
     void
         zsocket_destroy (zctx_t *self, void *socket);
     
-    //  Bind a socket to a formatted endpoint
-    //  Checks with assertion that the bind was valid
-    void
+    //  Bind a socket to a formatted endpoint. If the port is specified as
+    //  '*', binds to any free port from ZSOCKET_DYNFROM to ZSOCKET_DYNTO
+    //  and returns the actual port number used. Otherwise asserts that the
+    //  bind succeeded with the specified port number. Always returns the
+    //  port number if successful.
+    int
         zsocket_bind (void *socket, const char *format, ...);
     
     //  Connect a socket to a formatted endpoint
@@ -231,7 +245,7 @@ This is the class interface:
         zsocket_test (Bool verbose);
 
 
-<A name="toc4-140" title="zsockopt - working with ØMQ socket options" />
+<A name="toc4-145" title="zsockopt - working with ØMQ socket options" />
 #### zsockopt - working with ØMQ socket options
 
 The zsockopt class provides access to the ØMQ getsockopt/setsockopt API.
@@ -324,7 +338,7 @@ This class is generated, using the GSL code generator. See the sockopts
 XML file, which provides the metadata, and the sockopts.gsl template,
 which does the work.
 
-<A name="toc4-151" title="zstr - sending and receiving strings" />
+<A name="toc4-156" title="zstr - sending and receiving strings" />
 #### zstr - sending and receiving strings
 
 The zstr class provides utility functions for sending and receiving C
@@ -333,7 +347,7 @@ and appends a null byte on received strings. This class is for simple
 message sending.
 
 <center>
-<img src="README_2.png" alt="2">
+<img src="https://github.com/zeromq/czmq/raw/master/images/README_2.png" alt="2">
 </center>
 
 This is the class interface:
@@ -363,7 +377,35 @@ This is the class interface:
         zstr_test (Bool verbose);
 
 
-<A name="toc4-176" title="zframe - working with single message frames" />
+<A name="toc4-181" title="zfile - work with files" />
+#### zfile - work with files
+
+The zfile class provides methods to work with files.
+
+This is the class interface:
+
+    //  Delete file. Does not complain if the file is absent
+    int
+        zfile_delete (char *filename);
+    
+    //  Make directory (maximum one level depending on OS)
+    int
+        zfile_mkdir (char *dirname);
+    
+    //  Return 1 if file exists, else zero
+    int
+        zfile_exists (char *filename);
+    
+    //  Return size of file, or -1 if not found
+    long
+        zfile_size (char *filename);
+    
+    //  Self test of this class
+    int
+        zfile_test (Bool verbose);
+
+
+<A name="toc4-192" title="zframe - working with single message frames" />
 #### zframe - working with single message frames
 
 The zframe class provides methods to send and receive single message
@@ -423,6 +465,11 @@ This is the class interface:
     int
         zframe_more (zframe_t *self);
     
+    //  Return TRUE if two frames have identical size and data
+    //  If either frame is NULL, equality is always false.
+    Bool
+        zframe_eq (zframe_t *self, zframe_t *other);
+    
     //  Print contents of frame to stderr
     void
         zframe_print (zframe_t *self, char *prefix);
@@ -436,7 +483,7 @@ This is the class interface:
         zframe_test (Bool verbose);
 
 
-<A name="toc4-187" title="zmsg - working with multipart messages" />
+<A name="toc4-203" title="zmsg - working with multipart messages" />
 #### zmsg - working with multipart messages
 
 The zmsg class provides methods to send and receive multipart messages
@@ -465,6 +512,10 @@ This is the class interface:
     //  Return number of frames in message
     size_t
         zmsg_size (zmsg_t *self);
+    
+    //  Return combined size of all frames in message
+    size_t
+        zmsg_content_size (zmsg_t *self);
     
     //  Push frame to front of message, before first frame
     void
@@ -524,8 +575,8 @@ This is the class interface:
     zframe_t *
         zmsg_last (zmsg_t *self);
     
-    //  Save message to an open file
-    void
+    //  Save message to an open file, return 0 if OK, else -1.
+    int
         zmsg_save (zmsg_t *self, FILE *file);
     
     //  Load a message from an open file
@@ -545,18 +596,18 @@ This is the class interface:
         zmsg_test (Bool verbose);
 
 
-<A name="toc4-198" title="zloop - event-driven reactor" />
+<A name="toc4-214" title="zloop - event-driven reactor" />
 #### zloop - event-driven reactor
 
 The zloop class provides an event-driven reactor pattern. The reactor
-handles socket readers (not writers in the current implementation), and
+handles zmq_pollitem_t items (pollers or writers, sockets or fds), and
 once-off or repeated timers. Its resolution is 1 msec. It uses a tickless
 timer to reduce CPU interrupts in inactive processes.
 
 This is the class interface:
 
     //  Callback function for reactor events
-    typedef int (zloop_fn) (zloop_t *loop, void *socket, void *arg);
+    typedef int (zloop_fn) (zloop_t *loop, zmq_pollitem_t *item, void *arg);
     
     //  Create a new zloop reactor
     zloop_t *
@@ -568,11 +619,11 @@ This is the class interface:
     
     //  Register a socket reader, on one socket
     int
-        zloop_reader (zloop_t *self, void *socket, zloop_fn handler, void *arg);
+        zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg);
     
-    //  Cancel the reader on the specified socket, if any
+    //  Cancel the reader on the specified socket or fd, if any
     void
-        zloop_cancel (zloop_t *self, void *socket);
+        zloop_cancel (zloop_t *self, zmq_pollitem_t *item);
     
     //  Register a timer that will go off after 'delay' msecs, and will
     //  repeat 'times' times, unless 'times' is zero, meaning repeat forever.
@@ -593,7 +644,7 @@ This is the class interface:
         zloop_test (Bool verbose);
 
 
-<A name="toc4-209" title="zthread - working with system threads" />
+<A name="toc4-225" title="zthread - working with system threads" />
 #### zthread - working with system threads
 
 The zthread class wraps OS thread creation. It creates detached threads
@@ -651,7 +702,7 @@ more enriching experience for all involved. One thing I do often is use
 a PAIR-PAIR pipe to talk from a thread to/from its parent. So this class
 will automatically create such a pair for each thread you start.
 
-<A name="toc4-220" title="zhash - expandable hash table container" />
+<A name="toc4-236" title="zhash - expandable hash table container" />
 #### zhash - expandable hash table container
 
 Expandable hash table container
@@ -707,7 +758,7 @@ Note that it's relatively slow (~50k insertions/deletes per second), so
 don't do inserts/updates on the critical path for message I/O.  It can
 do ~2.5M lookups per second for 16-char keys.  Timed on a 1.6GHz CPU.
 
-<A name="toc4-231" title="zlist - singly-linked list container" />
+<A name="toc4-247" title="zlist - singly-linked list container" />
 #### zlist - singly-linked list container
 
 Provides a generic container implementing a fast singly-linked list. You
@@ -761,7 +812,7 @@ This is the class interface:
         zlist_test (int verbose);
 
 
-<A name="toc4-242" title="zclock - millisecond clocks and delays" />
+<A name="toc4-258" title="zclock - millisecond clocks and delays" />
 #### zclock - millisecond clocks and delays
 
 The zclock class provides essential sleep and system time functions, used
@@ -796,11 +847,14 @@ are a concept we can deal with. Seconds are too fat, nanoseconds too
 tiny, but milliseconds are just right for slices of time we want to work
 with at the ØMQ scale. zclock doesn't give you objects to work with, we
 like the czmq class model but we're not insane. There, got it in again.
+The Win32 Sleep() call defaults to 16ms resolution unless the system timer
+resolution is increased with a call to timeBeginPeriod() permitting 1ms
+granularity.
 
-<A name="toc2-253" title="Design Ideology" />
+<A name="toc2-269" title="Design Ideology" />
 ## Design Ideology
 
-<A name="toc3-256" title="The Problem with C" />
+<A name="toc3-272" title="The Problem with C" />
 ### The Problem with C
 
 C has the significant advantage of being a small language that, if we take a little care with formatting and naming, can be easily interchanged between developers. Every C developer will use much the same 90% of the language. Larger languages like C++ provide powerful abstractions like STL containers but at the cost of interchange.
@@ -809,7 +863,7 @@ The huge problem with C is that any realistic application needs packages of func
 
 The answer to this, as we learned from building enterprise-level C applications at iMatix from 1995-2005, is to create our own fully portable, high-quality libraries of pre-packaged functionality, in C. Doing this right solves both the requirements of richness of the language, and of portability of the final applications.
 
-<A name="toc3-265" title="A Simple Class Model" />
+<A name="toc3-281" title="A Simple Class Model" />
 ### A Simple Class Model
 
 C has no standard API style. It is one thing to write a useful component, but something else to provide an API that is consistent and obvious across many components. We learned from building [OpenAMQ](http://www.openamq.org), a messaging client and server of 0.5M LoC, that a consistent model for extending C makes life for the application developer much easier.
@@ -836,7 +890,7 @@ No model is fully consistent, and classes can define their own rules if it helps
 
 * While every class has a destroy method that is the formal destructor, some methods may also act as destructors. For example, a method that sends an object may also destroy the object (so that ownership of any buffers can passed to background threads). Such methods take the same "pointer to a reference" argument as the destroy method.
 
-<A name="toc3-292" title="Naming Style" />
+<A name="toc3-308" title="Naming Style" />
 ### Naming Style
 
 czmq aims for short, consistent names, following the theory that names we use most often should be shortest. Classes get one-word names, unless they are part of a family of classes in which case they may be two words, the first being the family name. Methods, similarly, get one-word names and we aim for consistency across classes (so a method that does something semantically similar in two classes will get the same name in both). So the canonical name for any method is:
@@ -845,7 +899,7 @@ czmq aims for short, consistent names, following the theory that names we use mo
 
 And the reader can easily parse this without needing special syntax to separate the class name from the method name.
 
-<A name="toc3-301" title="Containers" />
+<A name="toc3-317" title="Containers" />
 ### Containers
 
 After a long experiment with containers, we've decided that we need exactly two containers:
@@ -857,7 +911,7 @@ These are zlist and zhash, respectively. Both store void pointers, with no attem
 
 We assume that at some point we'll need to switch to a doubly-linked list.
 
-<A name="toc3-313" title="Portability" />
+<A name="toc3-329" title="Portability" />
 ### Portability
 
 Creating a portable C application can be rewarding in terms of maintaining a single code base across many platforms, and keeping (expensive) system-specific knowledge separate from application developers. In most projects (like ØMQ core), there is no portability layer and application code does conditional compilation for all mixes of platforms. This leads to quite messy code.
@@ -883,7 +937,7 @@ An example of the last:
 
 czmq uses the GNU autotools system, so non-portable code can use the macros this defines. It can also use macros defined by the czmq_prelude.h header file.
 
-<A name="toc3-339" title="Technical Aspects" />
+<A name="toc3-355" title="Technical Aspects" />
 ### Technical Aspects
 
 * *Thread safety*: the use of opaque structures is thread safe, though ØMQ applications should not share state between threads in any case.
@@ -893,10 +947,10 @@ czmq uses the GNU autotools system, so non-portable code can use the macros this
 * *Self-testing*: every class has a `selftest` method that runs through the methods of the class. In theory, calling all selftest functions of all classes does a full unit test of the library. The `czmq_selftest` application does this.
 * *Memory management*: czmq classes do not use any special memory management techiques to detect leaks. We've done this in the past but it makes the code relatively complex. Instead, we do memory leak testing using tools like valgrind.
 
-<A name="toc2-349" title="Under the Hood" />
+<A name="toc2-365" title="Under the Hood" />
 ## Under the Hood
 
-<A name="toc3-352" title="Adding a New Class" />
+<A name="toc3-368" title="Adding a New Class" />
 ### Adding a New Class
 
 If you define a new czmq class `myclass` you need to:
@@ -909,7 +963,7 @@ If you define a new czmq class `myclass` you need to:
 
 The `bin/newclass.sh` shell script will automate these steps for you.
 
-<A name="toc3-365" title="Coding Style" />
+<A name="toc3-381" title="Coding Style" />
 ### Coding Style
 
 In general the zctx class defines the style for the whole library. The overriding rules for coding style are consistency, clarity, and ease of maintenance. We use the C99 standard for syntax including principally:
@@ -928,7 +982,7 @@ The style in czmq would be:
 
     zblob_t *file_buffer = zblob_new ();
 
-<A name="toc3-384" title="Assertions" />
+<A name="toc3-400" title="Assertions" />
 ### Assertions
 
 We use assertions heavily to catch bad argument values. The czmq classes do not attempt to validate arguments and report errors; bad arguments are treated as fatal application programming errors.
@@ -946,7 +1000,7 @@ Rather than the side-effect form:
 
 Since assertions may be removed by an optimizing compiler.
 
-<A name="toc3-402" title="Documentation" />
+<A name="toc3-418" title="Documentation" />
 ### Documentation
 
 Man pages are generated from the class header and source files via the doc/mkman tool, and similar functionality in the gitdown tool (http://github.com/imatix/gitdown). The header file for a class must wrap its interface as follows (example is from include/zclock.h):
@@ -985,7 +1039,7 @@ The source file for a class then provides the self test example as follows:
 
 The template for man pages is in doc/mkman.
 
-<A name="toc3-441" title="Development" />
+<A name="toc3-457" title="Development" />
 ### Development
 
 czmq is developed through a test-driven process that guarantees no memory violations or leaks in the code:
@@ -995,7 +1049,7 @@ czmq is developed through a test-driven process that guarantees no memory violat
 * Run the 'selftest' script, which uses the Valgrind memcheck tool.
 * Repeat until perfect.
 
-<A name="toc3-451" title="Porting czmq" />
+<A name="toc3-467" title="Porting czmq" />
 ### Porting czmq
 
 When you try czmq on an OS that it's not been used on (ever, or for a while), you will hit code that does not compile. In some cases the patches are trivial, in other cases (usually when porting to Windows), the work needed to build equivalent functionality may be non-trivial. In any case, the benefit is that once ported, the functionality is available to all applications.
@@ -1008,7 +1062,7 @@ Before attempting to patch code for portability, please read the `czmq_prelude.h
 
 The canonical 'standard operating system' for all czmq code is Linux, gcc, POSIX. The canonical 'weird operating system' for czmq is Windows.
 
-<A name="toc3-464" title="Code Generation" />
+<A name="toc3-480" title="Code Generation" />
 ### Code Generation
 
 We generate the zsockopt class using the mysterious but powerful GSL code generator. It's actually really cool, since about 30 lines of XML are sufficient to generate 700 lines of code. Better, since many of the option data types changed in ØMQ/3.0, it's possible to completely hide the differences. To regenerate the zsockopt class, build and install GSL from https://github.com/imatix/gsl, and then:
@@ -1017,7 +1071,7 @@ We generate the zsockopt class using the mysterious but powerful GSL code genera
 
 You may also enjoy using this same technique if you're writing bindings in other languages. See the sockopts.gsl file, this can be easily modified to produce code in whatever language interests you.
 
-<A name="toc3-473" title="This Document" />
+<A name="toc3-489" title="This Document" />
 ### This Document
 
 This document is originally at README.txt and is built using [gitdown](http://github.com/imatix/gitdown).
