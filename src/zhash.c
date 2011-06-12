@@ -335,11 +335,15 @@ zhash_rename (zhash_t *self, char *old_key, char *new_key)
             self->size++;
             return 0;
         }
-        else
+        else {
+            puts ("******** new key already exists");
             return -1;
+        }
     }
-    else
+    else {
+        puts ("******** old key does not exist");
         return -1;
+    }
 }
 
 
