@@ -77,7 +77,7 @@ struct _zctx_t {
 //  Signal handling
 //
 
-//  This is a global variable accessible to czmq application code
+//  This is a global variable accessible to CZMQ application code
 int zctx_interrupted = 0;
 #if defined (__UNIX__)
 static void s_signal_handler (int signal_value)
@@ -179,7 +179,7 @@ zctx_set_linger (zctx_t *self, int linger)
 
 
 //  --------------------------------------------------------------------------
-//  Create socket within this context, for czmq use only
+//  Create socket within this context, for CZMQ use only
 
 void *
 zctx__socket_new (zctx_t *self, int type)
@@ -191,14 +191,16 @@ zctx__socket_new (zctx_t *self, int type)
     assert (self->context);
     //  Create and register socket
     void *socket = zmq_socket (self->context, type);
-    assert (socket);
-    zlist_push (self->sockets, socket);
+    if (socket) {
+        assert (socket);
+        zlist_push (self->sockets, socket);
+    }
     return socket;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Destroy socket within this context, for czmq use only
+//  Destroy socket within this context, for CZMQ use only
 
 void
 zctx__socket_destroy (zctx_t *self, void *socket)
