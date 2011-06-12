@@ -271,6 +271,9 @@ zlist_test (int verbose)
     assert (zlist_first (list) == cheese);
     assert (zlist_next (list) == bread);
     assert (zlist_next (list) == wine);
+    assert (zlist_next (list) == NULL);
+    //  After we reach end of list, next wraps around
+    assert (zlist_next (list) == cheese);
     assert (zlist_size (list) == 3);
 
     zlist_remove (list, wine);

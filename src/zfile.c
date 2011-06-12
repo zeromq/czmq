@@ -100,12 +100,12 @@ int
 zfile_exists (char *filename)
 {
     assert (filename);
-    return (s_file_mode (filename) > 0);
+    return s_file_mode (filename) > 0;
 }
 
 
 //  Return size of file, or -1 if not found
-long
+ssize_t
 zfile_size (char *filename)
 {
     struct stat
@@ -113,9 +113,9 @@ zfile_size (char *filename)
 
     assert (filename);
     if (stat ((char *) filename, &stat_buf) == 0)
-        return ((long) stat_buf.st_size);
+        return stat_buf.st_size;
     else
-        return (-1);
+        return -1;
 }
 
 //  --------------------------------------------------------------------------

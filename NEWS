@@ -1,5 +1,3 @@
-zmq_pollitem_t *item
-
 czmq version 1.1.0 (draft), released on 2011/06/xx
 ==================================================
 
@@ -29,12 +27,14 @@ Changes
 
 * Added zfile class with minimal helper functions.
 
-* Added zfile_size method to return file size.
+* Added zfile_size method to return file size, as ssize_t.
 
 * Added socket multipart flush to zctx_destroy to work around libzmq issue
   134, which asserts if a fair-queuing socket still has input at close.
 
 * Added zframe_eq method to compare two frames' size and content.
+
+* Changed zmsg_load to append to an optional existing message.
 
 * Fixed zloop to allow timers to be added after reactor was started.
   Without this fix, the reactor would spin at max speed instead of

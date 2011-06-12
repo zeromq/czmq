@@ -73,7 +73,7 @@ EXAMPLE
     //  After 10 msecs, send a ping message to output
     zloop_timer (loop, 10, 1,  s_timer_event, output);
     //  When we get the ping message, end the reactor
-    zmq_pollitem_t poll_input = { input, 0, ZMQ_POLLIN, 0 };
+    zmq_pollitem_t poll_input = { input, 0, ZMQ_POLLIN };
     zloop_poller (loop, &poll_input, s_socket_event, NULL);
     zloop_start (loop);
 
