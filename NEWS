@@ -45,6 +45,8 @@ Changes
 
 * Added zhash_rename() function to allow soft renaming of item keys.
 
+* Added tblsize and tbllast macros, so very useful when you need them.
+
 
 czmq version 1.0.0 (stable), released on 2011/04/26
 ===================================================
