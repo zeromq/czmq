@@ -146,7 +146,7 @@ s_item_insert (zhash_t *self, char *key, void *value)
 //  Destroy item in hash table, item must exist in table
 
 static void
-s_item_destroy (zhash_t *self, item_t *item)
+s_item_destroy (zhash_t *self, item_t *item, Bool hard)
 {
     //  Find previous item since it's a singly-linked list
     item_t *cur_item = self->items [item->index];
@@ -160,10 +160,12 @@ s_item_destroy (zhash_t *self, item_t *item)
     assert (cur_item);
     *prev_item = item->next;
     self->size--;
-    if (item->free_fn)
-        (item->free_fn) (item->value);
-    free (item->key);
-    free (item);
+    if (hard) {
+        if (item->free_fn)
+            (item->free_fn) (item->value);
+        free (item->key);
+        free (item);
+    }
 }
 
 
@@ -195,7 +197,7 @@ zhash_destroy (zhash_t **self_p)
             item_t *cur_item = self->items [index];
             while (cur_item) {
                 item_t *next_item = cur_item->next;
-                s_item_destroy (self, cur_item);
+                s_item_destroy (self, cur_item, TRUE);
                 cur_item = next_item;
             }
         }
@@ -292,7 +294,7 @@ zhash_delete (zhash_t *self, char *key)
 
     item_t *item = s_item_lookup (self, key);
     if (item)
-        s_item_destroy (self, item);
+        s_item_destroy (self, item, TRUE);
 }
 
 
@@ -310,6 +312,34 @@ zhash_lookup (zhash_t *self, char *key)
         return item->value;
     else
         return NULL;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Reindexes an item from an old key to a new key. If there was no such
+//  item, does nothing. If the new key already exists, deletes old item.
+
+int
+zhash_rename (zhash_t *self, char *old_key, char *new_key)
+{
+    item_t *item = s_item_lookup (self, old_key);
+    if (item) {
+        s_item_destroy (self, item, FALSE);
+        item_t *new_item = s_item_lookup (self, new_key);
+        if (new_item == NULL) {
+            free (item->key);
+            item->key = strdup (new_key);
+            item->index = self->cached_index;
+            item->next = self->items [self->cached_index];
+            self->items [self->cached_index] = item;
+            self->size++;
+            return 0;
+        }
+        else
+            return -1;
+    }
+    else
+        return -1;
 }
 
 
@@ -420,9 +450,15 @@ zhash_test (int verbose)
     item = zhash_lookup (hash, "DEADBEEF");
     assert (item == (void *) 0xDEADBEEF);
 
+    //  Rename an item
+    rc = zhash_rename (hash, "DEADBEEF", "LIVEBEEF");
+    assert (rc == 0);
+    rc = zhash_rename (hash, "WHATBEEF", "LIVEBEEF");
+    assert (rc == -1);
+
     //  Delete a item
-    zhash_delete (hash, "DEADBEEF");
-    item = zhash_lookup (hash, "DEADBEEF");
+    zhash_delete (hash, "LIVEBEEF");
+    item = zhash_lookup (hash, "LIVEBEEF");
     assert (item == NULL);
     assert (zhash_size (hash) == 3);
 
@@ -432,11 +468,7 @@ zhash_test (int verbose)
         Bool exists;
     } testset [200];
     memset (testset, 0, sizeof (testset));
-
-    int
-        testmax = 200,
-        testnbr,
-        iteration;
+    int testmax = 200, testnbr, iteration;
 
     srandom ((unsigned) time (NULL));
     for (iteration = 0; iteration < 25000; iteration++) {

@@ -173,6 +173,7 @@ zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args)
     //  Create our end of the pipe
     //  Pipe has HWM of 1 at both sides to block runaway writers
     void *pipe = zsocket_new (ctx, ZMQ_PAIR);
+    assert (pipe);
     zsockopt_set_hwm (pipe, 1);
     zsocket_bind (pipe, "inproc://zctx-pipe-%p", pipe);
 
@@ -184,6 +185,7 @@ zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args)
 
     //  Connect child pipe to our pipe
     shim->pipe = zsocket_new (shim->ctx, ZMQ_PAIR);
+    assert (shim->pipe);
     zsockopt_set_hwm (shim->pipe, 1);
     zsocket_connect (shim->pipe, "inproc://zctx-pipe-%p", pipe);
 

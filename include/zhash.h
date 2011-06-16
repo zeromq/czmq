@@ -48,15 +48,20 @@ zhash_t *
 void
     zhash_destroy (zhash_t **self_p);
 
-//  Insert an item into the hash container using the specified key
+//  Insert item into hash table with specified key and item.
+//  If key is already present returns -1 and leaves existing item unchanged
+//  Returns 0 on success.
 int
     zhash_insert (zhash_t *self, char *key, void *item);
 
-//  Insert or update the item for the specified key
+//  Update item into hash table with specified key and item.
+//  If key is already present, destroys old item and inserts new one.
+//  Use free_fn method to ensure deallocator is properly called on item.
 void
     zhash_update (zhash_t *self, char *key, void *item);
 
-//  Destroy the item at the specified key, if any
+//  Remove an item specified by key from the hash table. If there was no such
+//  item, this function does nothing.
 void
     zhash_delete (zhash_t *self, char *key);
 
@@ -64,7 +69,16 @@ void
 void *
     zhash_lookup (zhash_t *self, char *key);
 
-//  Set a free function for the item at the specified key
+//  Reindexes an item from an old key to a new key. If there was no such
+//  item, does nothing. Returns 0 if successful, else -1.
+int
+    zhash_rename (zhash_t *self, char *old_key, char *new_key);
+
+//  Set a free function for the specified hash table item. When the item is
+//  destroyed, the free function, if any, is called on that item.
+//  Use this when hash items are dynamically allocated, to ensure that
+//  you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
+//  Returns the item, or NULL if there is no such item.
 void *
     zhash_freefn (zhash_t *self, char *key, zhash_free_fn *free_fn);
 
@@ -72,7 +86,9 @@ void *
 size_t
     zhash_size (zhash_t *self);
 
-//  Iterate over the hash table and apply the function to each item
+//  Apply function to each item in the hash table. Items are iterated in no
+//  defined order.  Stops if callback function returns non-zero and returns
+//  final return code from callback function (zero = success).
 int
     zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument);
 
