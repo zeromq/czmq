@@ -263,6 +263,8 @@ zloop_start (zloop_t *self)
         s_timer_t *timer = (s_timer_t *) zlist_first (self->timers);
         while (timer) {
             //  Find earliest timer
+            if (timer->when == -1)
+                timer->when = timer->delay + zclock_time ();
             if (tickless > timer->when)
                 tickless = timer->when;
             timer = (s_timer_t *) zlist_next (self->timers);
@@ -283,8 +285,6 @@ zloop_start (zloop_t *self)
         //  Handle any timers that have now expired
         timer = (s_timer_t *) zlist_first (self->timers);
         while (timer) {
-            if (timer->when == -1)
-                timer->when = timer->delay + zclock_time ();
             if (zclock_time () >= timer->when) {
                 if (self->verbose)
                     zclock_log ("I: zloop: call timer handler");
