@@ -7,8 +7,12 @@ Changes
 * zloop works with zmq_pollitem_t * instead of void * sockets; allows
   use of native FDs in reactor as well as 0MQ sockets.
 
-* zloop_reader renamed to zloop_poller, and zloop_cancel API also changed
-  to work with zmq_pollitem_t * instead of a single 0MQ socket void *.
+* zloop_reader renamed to zloop_poller.
+
+* zloop_cancel renamed to zloop_poller_end, and API changed to work with
+  zmq_pollitem_t * instead of a single 0MQ socket void *.
+
+* Added zloop_timer_end, taking same argument as for zloop_timer.
 
 * Added zmsg_content_size method to report full content size of message.
 

@@ -55,6 +55,7 @@ struct _zloop_t {
     s_poller_t *pollact;        //  Pollers for this poll set
     Bool dirty;                 //  True if pollset needs rebuilding
     Bool verbose;               //  True if verbose tracing wanted
+    zlist_t *zombies;           //  List of timers to kill
 };
 
 //  Pollers and timers are held as small structures of their own
@@ -107,6 +108,7 @@ zloop_new (void)
     self = (zloop_t *) zmalloc (sizeof (zloop_t));
     self->pollers = zlist_new ();
     self->timers = zlist_new ();
+    self->zombies = zlist_new ();
     return self;
 }
 
@@ -130,6 +132,7 @@ zloop_destroy (zloop_t **self_p)
         while (zlist_size (self->timers))
             free (zlist_pop (self->timers));
         zlist_destroy (&self->timers);
+        zlist_destroy (&self->zombies);
 
         free (self->pollset);
         free (self->pollact);
@@ -166,7 +169,7 @@ zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
 //  socket/FD, only first is cancelled.
 
 void
-zloop_cancel (zloop_t *self, zmq_pollitem_t *item)
+zloop_poller_end (zloop_t *self, zmq_pollitem_t *item)
 {
     assert (self);
     assert (item->socket || item->fd);
@@ -205,6 +208,22 @@ zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *
     return 0;
 }
 
+
+//  --------------------------------------------------------------------------
+//  Cancel all timers for a specific argument (as provided in zloop_timer)
+void
+zloop_timer_end (zloop_t *self, void *arg)
+{
+    assert (self);
+    assert (arg);
+
+    //  We cannot touch self->timers because we may be executing that
+    //  from inside the poll loop. So, we hold the arg on the zombie
+    //  list, and process that list when we're done executing timers.
+    zlist_append (self->zombies, arg);
+    if (self->verbose)
+        zclock_log ("I: zloop: cancel timer");
+}
 
 //  --------------------------------------------------------------------------
 //  Set verbose tracing of reactor on/off
@@ -313,6 +332,19 @@ zloop_start (zloop_t *self)
                 rc = poller->handler (self, &poller->item, poller->arg);
                 if (rc == -1)
                     break;      //  Poller handler signalled break
+            }
+        }
+        //  Now handle any timer zombies
+        //  This is going to be slow if we have many zombies
+        while (zlist_size (self->zombies)) {
+            void *arg = zlist_pop (self->zombies);
+            timer = (s_timer_t *) zlist_first (self->timers);
+            while (timer) {
+                if (timer->arg == arg) {
+                    zlist_remove (self->timers, timer);
+                    free (timer);
+                }
+                timer = (s_timer_t *) zlist_next (self->timers);
             }
         }
         if (rc == -1)
