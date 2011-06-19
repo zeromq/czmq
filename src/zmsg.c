@@ -432,7 +432,112 @@ zmsg_load (zmsg_t *self, FILE *file)
 
 
 //  --------------------------------------------------------------------------
+//  Encode message to a new buffer, return buffer size
+
+//  Frame lengths are encoded as 1, 1+2, or 1+4 bytes
+//  0..253 bytes        octet + data
+//  254..64k-1 bytes    0xFE + 2octet + data
+//  64k..4Gb-1 bytes    0xFF + 4octet + data
+
+#define ZMSG_SHORT_LEN      0xFE
+#define ZMSG_LONG_LEN       0xFF
+
+size_t
+zmsg_encode (zmsg_t *self, byte **buffer)
+{
+    assert (self);
+
+    //  Calculate real size of buffer
+    size_t buffer_size = 0;
+    zframe_t *frame = zmsg_first (self);
+    while (frame) {
+        size_t frame_size = zframe_size (frame);
+        if (frame_size < ZMSG_SHORT_LEN)
+            buffer_size += frame_size + 1;
+        else
+        if (frame_size < 0x10000)
+            buffer_size += frame_size + 3;
+        else
+            buffer_size += frame_size + 5;
+        frame = zmsg_next (self);
+    }
+    *buffer = malloc (buffer_size);
+
+    //  Encode message now
+    byte *dest = *buffer;
+    frame = zmsg_first (self);
+    while (frame) {
+        size_t frame_size = zframe_size (frame);
+        if (frame_size < ZMSG_SHORT_LEN) {
+            *dest++ = (byte) frame_size;
+            memcpy (dest, zframe_data (frame), frame_size);
+            dest += frame_size;
+        }
+        else
+        if (frame_size < 0x10000) {
+            *dest++ = ZMSG_SHORT_LEN;
+            *dest++ = (frame_size >> 8) & 255;
+            *dest++ =  frame_size       & 255;
+            memcpy (dest, zframe_data (frame), frame_size);
+            dest += frame_size;
+        }
+        else {
+            *dest++ = ZMSG_LONG_LEN;
+            *dest++ = (frame_size >> 24) & 255;
+            *dest++ = (frame_size >> 16) & 255;
+            *dest++ = (frame_size >>  8) & 255;
+            *dest++ =  frame_size        & 255;
+            memcpy (dest, zframe_data (frame), frame_size);
+            dest += frame_size;
+        }
+        frame = zmsg_next (self);
+    }
+    assert ((dest - *buffer) == buffer_size);
+    return buffer_size;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Decode a buffer into a new message, returns NULL if buffer is not
+//  properly formatted.
+
+zmsg_t *
+zmsg_decode (byte *buffer, size_t buffer_size)
+{
+    zmsg_t *self = zmsg_new ();
+    byte *source = buffer;
+    byte *limit = buffer + buffer_size;
+    while (source < limit) {
+        size_t frame_size = *source++;
+        if (frame_size == ZMSG_SHORT_LEN) {
+            if (source > limit - 2)
+                return NULL;
+            frame_size = (source [0] << 8) + source [1];
+            source += 2;
+        }
+        else
+        if (frame_size == ZMSG_LONG_LEN) {
+            if (source > limit - 4)
+                return NULL;
+            frame_size = (source [0] << 24)
+                       + (source [1] << 16)
+                       + (source [2] << 8)
+                       +  source [3];
+            source += 4;
+        }
+        if (source > limit - frame_size)
+            return NULL;
+        zframe_t *frame = zframe_new (source, frame_size);
+        zmsg_add (self, frame);
+        source += frame_size;
+    }
+    return self;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Create copy of message, as new message object
+
 zmsg_t *
 zmsg_dup (zmsg_t *self)
 {
@@ -571,6 +676,27 @@ zmsg_test (Bool verbose)
     assert (streq (body, "Frame0"));
     free (body);
     zmsg_destroy (&msg);
+
+    //  Test encoding/decoding
+    msg = zmsg_new ();
+    byte *blank = zmalloc (100000);
+    zmsg_addmem (msg, blank, 0);
+    zmsg_addmem (msg, blank, 1);
+    zmsg_addmem (msg, blank, 253);
+    zmsg_addmem (msg, blank, 254);
+    zmsg_addmem (msg, blank, 255);
+    zmsg_addmem (msg, blank, 256);
+    zmsg_addmem (msg, blank, 65535);
+    zmsg_addmem (msg, blank, 65536);
+    zmsg_addmem (msg, blank, 65537);
+    assert (zmsg_size (msg) == 9);
+
+    byte *buffer;
+    size_t buffer_size = zmsg_encode (msg, &buffer);
+    zmsg_destroy (&msg);
+    msg = zmsg_decode (buffer, buffer_size);
+    assert (msg);
+    free (buffer);
 
     //  Now try methods on an empty message
     msg = zmsg_new ();

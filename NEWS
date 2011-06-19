@@ -51,6 +51,9 @@ Changes
 
 * Added tblsize and tbllast macros, so very useful when you need them.
 
+* Added zmsg_encode and zmsg_decode functions to serialize messages to 
+  and from a byte buffer.
+
 
 czmq version 1.0.0 (stable), released on 2011/04/26
 ===================================================

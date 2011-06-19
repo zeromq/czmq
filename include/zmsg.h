@@ -126,6 +126,15 @@ int
 zmsg_t *
     zmsg_load (zmsg_t *self, FILE *file);
 
+//  Encode message to a new buffer, return buffer size
+size_t
+    zmsg_encode (zmsg_t *self, byte **buffer);
+
+//  Decode a buffer into a new message, returns NULL if buffer is not
+//  properly formatted.
+zmsg_t *
+    zmsg_decode (byte *buffer, size_t buffer_size);
+
 //  Create copy of message, as new message object
 zmsg_t *
     zmsg_dup (zmsg_t *self);
