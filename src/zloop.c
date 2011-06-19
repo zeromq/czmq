@@ -321,15 +321,25 @@ zloop_start (zloop_t *self)
         }
         //  Handle any pollers that are ready
         for (item_nbr = 0; item_nbr < self->poll_size; item_nbr++) {
-            if (self->pollset [item_nbr].revents & ZMQ_POLLIN) {
-                s_poller_t *poller = &self->pollact [item_nbr];
-                assert (self->pollset [item_nbr].socket == poller->item.socket);
+            s_poller_t *poller = &self->pollact [item_nbr];
+            assert (self->pollset [item_nbr].socket == poller->item.socket);
+            if (self->pollset [item_nbr].revents & ZMQ_POLLERR) {
+                if (self->verbose)
+                    zclock_log ("I: zloop: can't poll %s socket (%p, %d): %s",
+                        poller->item.socket?
+                            zsocket_type_str (poller->item.socket): "FD",
+                        poller->item.socket, poller->item.fd,
+                        strerror (errno));
+                zloop_poller_end (self, &poller->item);
+            }
+            else
+            if (self->pollset [item_nbr].revents) {
                 if (self->verbose)
                     zclock_log ("I: zloop: call %s socket handler (%p, %d)",
                         poller->item.socket?
                             zsocket_type_str (poller->item.socket): "FD",
                         poller->item.socket, poller->item.fd);
-                rc = poller->handler (self, &poller->item, poller->arg);
+                rc = poller->handler (self, &self->pollset [item_nbr], poller->arg);
                 if (rc == -1)
                     break;      //  Poller handler signalled break
             }
