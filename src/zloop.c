@@ -77,7 +77,7 @@ static s_poller_t *
 s_poller_new (zmq_pollitem_t *item, zloop_fn handler, void *arg)
 {
     s_poller_t *poller = (s_poller_t *) zmalloc (sizeof (s_poller_t));
-    memcpy (&poller->item, item, sizeof (zmq_pollitem_t));
+    poller->item = *item;
     poller->handler = handler;
     poller->arg = arg;
     return poller;
