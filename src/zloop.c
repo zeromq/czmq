@@ -63,6 +63,7 @@ struct _s_poller_t {
     zmq_pollitem_t item;
     zloop_fn *handler;
     void *arg;
+    int errors;                 //  If too many errors, kill poller
 };
 
 struct _s_timer_t {
@@ -254,6 +255,7 @@ zloop_start (zloop_t *self)
     }
     //  Main reactor loop
     while (!zctx_interrupted) {
+        static int i = 0; if (++i == 10) exit (0);
         //  Rebuild pollitem set if necessary
         //  We hold an array of pollers that matches the pollset, so
         //  we can register/cancel pollers orthogonally to executing
@@ -276,6 +278,7 @@ zloop_start (zloop_t *self)
                 item_nbr++;
                 poller = (s_poller_t *) zlist_next (self->pollers);
             }
+            self->dirty = FALSE;
         }
         //  Calculate tickless timer, up to 1 hour
         int64_t tickless = zclock_time () + 1000 * 3600;
@@ -330,9 +333,16 @@ zloop_start (zloop_t *self)
                             zsocket_type_str (poller->item.socket): "FD",
                         poller->item.socket, poller->item.fd,
                         strerror (errno));
-                zloop_poller_end (self, &poller->item);
+                //  Give handler one chance to handle error, then kill
+                //  poller because it'll disrupt the reactor otherwise.
+                if (poller->errors++) {
+                    zloop_poller_end (self, &poller->item);
+                    self->pollset [item_nbr].revents = 0;
+                }
             }
             else
+                poller->errors = 0;     //  A non-error happened
+
             if (self->pollset [item_nbr].revents) {
                 if (self->verbose)
                     zclock_log ("I: zloop: call %s socket handler (%p, %d)",
