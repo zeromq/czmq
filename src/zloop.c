@@ -91,7 +91,7 @@ s_timer_new (size_t delay, size_t times, zloop_fn handler, void *arg)
     timer->times = times;
     timer->handler = handler;
     timer->arg = arg;
-    timer->when = -1;
+    timer->when = -1;           //  Indicates a new timer
     return timer;
 }
 
@@ -304,7 +304,7 @@ zloop_start (zloop_t *self)
         //  Handle any timers that have now expired
         timer = (s_timer_t *) zlist_first (self->timers);
         while (timer) {
-            if (zclock_time () >= timer->when) {
+            if (zclock_time () >= timer->when && timer->when != -1) {
                 if (self->verbose)
                     zclock_log ("I: zloop: call timer handler");
                 rc = timer->handler (self, NULL, timer->arg);
