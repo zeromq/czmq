@@ -689,14 +689,15 @@ zmsg_test (Bool verbose)
     zmsg_addmem (msg, blank, 65535);
     zmsg_addmem (msg, blank, 65536);
     zmsg_addmem (msg, blank, 65537);
+    free (blank);
     assert (zmsg_size (msg) == 9);
-
     byte *buffer;
     size_t buffer_size = zmsg_encode (msg, &buffer);
     zmsg_destroy (&msg);
     msg = zmsg_decode (buffer, buffer_size);
     assert (msg);
     free (buffer);
+    zmsg_destroy (&msg);
 
     //  Now try methods on an empty message
     msg = zmsg_new ();
