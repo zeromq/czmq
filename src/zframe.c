@@ -93,7 +93,7 @@ zframe_destroy (zframe_t **self_p)
 //  --------------------------------------------------------------------------
 //  Receive frame from socket, returns zframe_t object or NULL if the recv
 //  was interrupted. Does a blocking recv, if you want to not block then use
-//  the zloop class or zmq_poll to check for socket input before receiving.
+//  zframe_recv_nowait().
 
 zframe_t *
 zframe_recv (void *socket)
@@ -101,6 +101,24 @@ zframe_recv (void *socket)
     assert (socket);
     zframe_t *self = zframe_new (NULL, 0);
     if (zmq_recvmsg (socket, &self->zmsg, 0) < 0) {
+        zframe_destroy (&self);
+        return NULL;            //  Interrupted or terminated
+    }
+    self->more = zsockopt_rcvmore (socket);
+    return self;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Receive a new frame off the socket. Returns newly allocated frame, or
+//  NULL if there was no input waiting, or if the read was interrupted.
+
+zframe_t *
+zframe_recv_nowait (void *socket)
+{
+    assert (socket);
+    zframe_t *self = zframe_new (NULL, 0);
+    if (zmq_recvmsg (socket, &self->zmsg, ZMQ_NOBLOCK) < 0) {
         zframe_destroy (&self);
         return NULL;            //  Interrupted or terminated
     }
@@ -358,6 +376,8 @@ zframe_test (Bool verbose)
         zframe_destroy (&frame);
     }
     assert (frame_nbr == 10);
+    frame = zframe_recv_nowait (input);
+    assert (frame == NULL);
 
     zctx_destroy (&ctx);
     //  @end

@@ -49,12 +49,14 @@ Changes
 * Modified zmsg_pushstr and zmsg_addstr to accept variable argument list
   and do vsnprintf formatting of provided string.
 
-* Added zhash_rename() function to allow soft renaming of item keys.
+* Added zhash_rename function to allow soft renaming of item keys.
 
 * Added tblsize and tbllast macros, so very useful when you need them.
 
-* Added zmsg_encode and zmsg_decode functions to serialize messages to 
+* Added zmsg_encode and zmsg_decode functions to serialize messages to
   and from a byte buffer.
+
+* Added zframe_recv_nowait method to read frame without blocking.
 
 
 czmq version 1.0.0 (stable), released on 2011/04/26

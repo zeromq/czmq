@@ -46,9 +46,16 @@ zframe_t *
 void
     zframe_destroy (zframe_t **self_p);
 
-//  Receive a new frame off the socket
+//  Receive frame from socket, returns zframe_t object or NULL if the recv
+//  was interrupted. Does a blocking recv, if you want to not block then use
+//  zframe_recv_nowait().
 zframe_t *
     zframe_recv (void *socket);
+
+//  Receive a new frame off the socket. Returns newly allocated frame, or
+//  NULL if there was no input waiting, or if the read was interrupted.
+zframe_t *
+    zframe_recv_nowait (void *socket);
 
 //  Send a frame to a socket, destroy frame after sending
 void
