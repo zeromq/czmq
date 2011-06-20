@@ -255,7 +255,6 @@ zloop_start (zloop_t *self)
     }
     //  Main reactor loop
     while (!zctx_interrupted) {
-        static int i = 0; if (++i == 10) exit (0);
         //  Rebuild pollitem set if necessary
         //  We hold an array of pollers that matches the pollset, so
         //  we can register/cancel pollers orthogonally to executing
