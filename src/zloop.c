@@ -96,6 +96,54 @@ s_timer_new (size_t delay, size_t times, zloop_fn handler, void *arg)
     return timer;
 }
 
+//  We hold an array of pollers that matches the pollset, so
+//  we can register/cancel pollers orthogonally to executing
+//  the pollset activity on pollers.
+
+static void
+s_rebuild_pollset (zloop_t *self)
+{
+    free (self->pollset);
+    free (self->pollact);
+    self->poll_size = zlist_size (self->pollers);
+    self->pollset = (zmq_pollitem_t *) zmalloc (
+        self->poll_size * sizeof (zmq_pollitem_t));
+    self->pollact = (s_poller_t *) zmalloc (
+        self->poll_size * sizeof (s_poller_t));
+
+    s_poller_t *poller = (s_poller_t *) zlist_first (self->pollers);
+    uint item_nbr = 0;
+    while (poller) {
+        self->pollset [item_nbr] = poller->item;
+        self->pollact [item_nbr] = *poller;
+        item_nbr++;
+        poller = (s_poller_t *) zlist_next (self->pollers);
+    }
+    self->dirty = FALSE;
+}
+
+static long
+s_tickless_timer (zloop_t *self)
+{
+    //  Calculate tickless timer, up to 1 hour
+    int64_t tickless = zclock_time () + 1000 * 3600;
+    s_timer_t *timer = (s_timer_t *) zlist_first (self->timers);
+    while (timer) {
+        //  Find earliest timer
+        if (timer->when == -1)
+            timer->when = timer->delay + zclock_time ();
+        if (tickless > timer->when)
+            tickless = timer->when;
+        timer = (s_timer_t *) zlist_next (self->timers);
+    }
+    long timeout = (long) (tickless - zclock_time ());
+    if (timeout < 0)
+        timeout = 0;
+    if (self->verbose)
+        zclock_log ("I: zloop: polling for %d msec", timeout);
+    return timeout;
+}
+
 
 //  --------------------------------------------------------------------------
 //  Constructor
@@ -154,7 +202,7 @@ zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
 {
     assert (self);
     zlist_push (self->pollers, s_poller_new (item, handler, arg));
-    self->dirty = TRUE;         //  Rebuild will be needed
+    self->dirty = TRUE;
     if (self->verbose)
         zclock_log ("I: zloop: register %s poller (%p, %d)",
             item->socket? zsocket_type_str (item->socket): "FD",
@@ -167,7 +215,7 @@ zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
 //  --------------------------------------------------------------------------
 //  Cancel a pollitem from the reactor, specified by socket or FD. If both
 //  are specified, uses only socket. If multiple poll items exist for same
-//  socket/FD, only first is cancelled.
+//  socket/FD, cancels ALL of them.
 
 void
 zloop_poller_end (zloop_t *self, zmq_pollitem_t *item)
@@ -181,8 +229,7 @@ zloop_poller_end (zloop_t *self, zmq_pollitem_t *item)
         ||  (item->fd     && item->fd     == poller->item.fd)) {
             zlist_remove (self->pollers, poller);
             free (poller);
-            self->dirty = TRUE;     //  Rebuild will be needed
-            break;
+            self->dirty = TRUE;
         }
         poller = (s_poller_t *) zlist_next (self->pollers);
     }
@@ -255,48 +302,10 @@ zloop_start (zloop_t *self)
     }
     //  Main reactor loop
     while (!zctx_interrupted) {
-        //  Rebuild pollitem set if necessary
-        //  We hold an array of pollers that matches the pollset, so
-        //  we can register/cancel pollers orthogonally to executing
-        //  the pollset activity on pollers.
-        uint item_nbr;
-        if (self->dirty) {
-            free (self->pollset);
-            free (self->pollact);
-            self->poll_size = zlist_size (self->pollers);
-            self->pollset = (zmq_pollitem_t *) zmalloc (
-                self->poll_size * sizeof (zmq_pollitem_t));
-            self->pollact = (s_poller_t *) zmalloc (
-                self->poll_size * sizeof (s_poller_t));
-
-            s_poller_t *poller = (s_poller_t *) zlist_first (self->pollers);
-            item_nbr = 0;
-            while (poller) {
-                self->pollset [item_nbr] = poller->item;
-                self->pollact [item_nbr] = *poller;
-                item_nbr++;
-                poller = (s_poller_t *) zlist_next (self->pollers);
-            }
-            self->dirty = FALSE;
-        }
-        //  Calculate tickless timer, up to 1 hour
-        int64_t tickless = zclock_time () + 1000 * 3600;
-        s_timer_t *timer = (s_timer_t *) zlist_first (self->timers);
-        while (timer) {
-            //  Find earliest timer
-            if (timer->when == -1)
-                timer->when = timer->delay + zclock_time ();
-            if (tickless > timer->when)
-                tickless = timer->when;
-            timer = (s_timer_t *) zlist_next (self->timers);
-        }
-        long timeout = (long) (tickless - zclock_time ());
-        if (timeout < 0)
-            timeout = 0;
-        if (self->verbose)
-            zclock_log ("I: zloop: polling for %d msec", timeout);
-
-        rc = zmq_poll (self->pollset, self->poll_size, timeout * ZMQ_POLL_MSEC);
+        if (self->dirty)
+            s_rebuild_pollset (self);
+        rc = zmq_poll (self->pollset, self->poll_size,
+                       s_tickless_timer (self) * ZMQ_POLL_MSEC);
         if (rc == -1 || zctx_interrupted) {
             if (self->verbose)
                 zclock_log ("I: zloop: interrupted");
@@ -322,6 +331,7 @@ zloop_start (zloop_t *self)
             timer = (s_timer_t *) zlist_next (self->timers);
         }
         //  Handle any pollers that are ready
+        uint item_nbr;
         for (item_nbr = 0; item_nbr < self->poll_size; item_nbr++) {
             s_poller_t *poller = &self->pollact [item_nbr];
             assert (self->pollset [item_nbr].socket == poller->item.socket);

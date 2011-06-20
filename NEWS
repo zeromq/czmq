@@ -14,6 +14,8 @@ Changes
 
 * Added zloop_timer_end, taking same argument as for zloop_timer.
 
+* zloop_poller_end cancels ALL handlers for the socket or FD.
+
 * Added zmsg_content_size method to report full content size of message.
 
 * zmsg_save returns 0/-1 depending on success/failure (previously returned
