@@ -204,7 +204,6 @@ void
 zmsg_pushmem (zmsg_t *self, const void *src, size_t size)
 {
     assert (self);
-    assert (src);
     zframe_t *frame = zframe_new (src, size);
     self->content_size += size;
     zlist_push (self->frames, frame);
@@ -218,7 +217,6 @@ void
 zmsg_addmem (zmsg_t *self, const void *src, size_t size)
 {
     assert (self);
-    assert (src);
     zframe_t *frame = zframe_new (src, size);
     self->content_size += size;
     zlist_append (self->frames, frame);
