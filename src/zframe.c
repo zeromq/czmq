@@ -118,7 +118,7 @@ zframe_recv_nowait (void *socket)
 {
     assert (socket);
     zframe_t *self = zframe_new (NULL, 0);
-    if (zmq_recvmsg (socket, &self->zmsg, ZMQ_NOBLOCK) < 0) {
+    if (zmq_recvmsg (socket, &self->zmsg, ZMQ_DONTWAIT) < 0) {
         zframe_destroy (&self);
         return NULL;            //  Interrupted or terminated
     }
