@@ -1,6 +1,6 @@
 
-<A name="toc1-3" title="czmq - High-level C binding for ØMQ" />
-# czmq - High-level C binding for ØMQ
+<A name="toc1-3" title="CZMQ - High-level C binding for ØMQ" />
+# CZMQ - High-level C binding for ØMQ
 
 <A name="toc2-6" title="Contents" />
 ## Contents
@@ -13,7 +13,7 @@
 &emsp;<a href="#toc3-73">Ownership and License</a>
 &emsp;<a href="#toc3-80">Contributing</a>
 
-**<a href="#toc2-89">Using czmq</a>**
+**<a href="#toc2-89">Using CZMQ</a>**
 &emsp;<a href="#toc3-92">Building and Installing</a>
 &emsp;<a href="#toc3-113">Linking with an Application</a>
 &emsp;<a href="#toc3-120">API Summary</a>
@@ -44,7 +44,7 @@
 &emsp;<a href="#toc3-400">Assertions</a>
 &emsp;<a href="#toc3-418">Documentation</a>
 &emsp;<a href="#toc3-457">Development</a>
-&emsp;<a href="#toc3-467">Porting czmq</a>
+&emsp;<a href="#toc3-467">Porting CZMQ</a>
 &emsp;<a href="#toc3-480">Code Generation</a>
 &emsp;<a href="#toc3-489">This Document</a>
 
@@ -59,13 +59,13 @@
 <A name="toc3-19" title="Scope and Goals" />
 ### Scope and Goals
 
-czmq has these goals:
+CZMQ has these goals:
 
 * To wrap the ØMQ core API in semantics that are natural and lead to shorter, more readable applications.
 * To hide the differences between versions of ØMQ, particularly 2.1 and 3.0.
 * To provide a space for development of more sophisticated API semantics.
 
-czmq grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.org) and [ZFL](http://zfl.zeromq.org). Until end-April 2011, czmq was known as *libzapi*.
+CZMQ grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.org) and [ZFL](http://zfl.zeromq.org). Until end-April 2011, CZMQ was known as *libzapi*.
 
 <center>
 <img src="https://github.com/zeromq/czmq/raw/master/images/README_1.png" alt="1">
@@ -89,26 +89,26 @@ czmq grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.o
 <A name="toc3-73" title="Ownership and License" />
 ### Ownership and License
 
-czmq is maintained by Pieter Hintjens and Mikko Koppanen (build system). Its other authors and contributors are listed in the AUTHORS file. It is held by the ZeroMQ organization at github.com.
+CZMQ is maintained by Pieter Hintjens and Mikko Koppanen (build system). Its other authors and contributors are listed in the AUTHORS file. It is held by the ZeroMQ organization at github.com.
 
-The authors of czmq grant you use of this software under the terms of the GNU Lesser General Public License (LGPL). For details see the files `COPYING` and `COPYING.LESSER` in this directory.
+The authors of CZMQ grant you use of this software under the terms of the GNU Lesser General Public License (LGPL). For details see the files `COPYING` and `COPYING.LESSER` in this directory.
 
 <A name="toc3-80" title="Contributing" />
 ### Contributing
 
-To submit an issue use the [issue tracker](http://github.com/zeromq/czmq/issues). All discussion happens on the [zeromq-dev](zeromq-dev@lists.zeromq.org) list or #zeromq IRC channel at irc.freenode.net.
+To submit an issue use the [issue tracker](https://zeromq.jira.com/browse/CZMQ). All discussion happens on the [zeromq-dev](zeromq-dev@lists.zeromq.org) list or #zeromq IRC channel at irc.freenode.net.
 
 The proper way to submit patches is to clone this repository, make your changes, and use git to create a patch or a pull request. See http://www.zeromq.org/docs:contributing. All contributors are listed in AUTHORS.
 
-The general rule is, if you contribute code to czmq you must be willing to maintain it as long as there are users of it. Code with no active maintainer will in general be deprecated and/or removed.
+The general rule is, if you contribute code to CZMQ you must be willing to maintain it as long as there are users of it. Code with no active maintainer will in general be deprecated and/or removed.
 
-<A name="toc2-89" title="Using czmq" />
-## Using czmq
+<A name="toc2-89" title="Using CZMQ" />
+## Using CZMQ
 
 <A name="toc3-92" title="Building and Installing" />
 ### Building and Installing
 
-czmq uses autotools for packaging. To build from git (all example commands are for Linux):
+CZMQ uses autotools for packaging. To build from git (all example commands are for Linux):
 
     git clone git://github.com/zeromq/czmq.git
     cd czmq
@@ -122,14 +122,14 @@ You will need the libtool and autotools packages. On FreeBSD, you may need to sp
 
     ./configure --with-zeromq=/usr/local
 
-After building, you can run the czmq selftests:
+After building, you can run the CZMQ selftests:
 
     make check
 
 <A name="toc3-113" title="Linking with an Application" />
 ### Linking with an Application
 
-Include `czmq.h` in your application and link with czmq. Here is a typical gcc link command:
+Include `czmq.h` in your application and link with libczmq. Here is a typical gcc link command:
 
     gcc -lczmq -lzmq myapp.c -o myapp
 
@@ -397,7 +397,7 @@ This is the class interface:
         zfile_exists (char *filename);
     
     //  Return size of file, or -1 if not found
-    long
+    ssize_t
         zfile_size (char *filename);
     
     //  Self test of this class
@@ -429,9 +429,16 @@ This is the class interface:
     void
         zframe_destroy (zframe_t **self_p);
     
-    //  Receive a new frame off the socket
+    //  Receive frame from socket, returns zframe_t object or NULL if the recv
+    //  was interrupted. Does a blocking recv, if you want to not block then use
+    //  zframe_recv_nowait().
     zframe_t *
         zframe_recv (void *socket);
+    
+    //  Receive a new frame off the socket. Returns newly allocated frame, or
+    //  NULL if there was no input waiting, or if the read was interrupted.
+    zframe_t *
+        zframe_recv_nowait (void *socket);
     
     //  Send a frame to a socket, destroy frame after sending
     void
@@ -539,11 +546,11 @@ This is the class interface:
     
     //  Push string as new frame to front of message
     void
-        zmsg_pushstr (zmsg_t *self, const char *string);
+        zmsg_pushstr (zmsg_t *self, const char *format, ...);
     
     //  Push string as new frame to end of message
     void
-        zmsg_addstr (zmsg_t *self, const char *string);
+        zmsg_addstr (zmsg_t *self, const char *format, ...);
     
     //  Pop frame off front of message, return as fresh string
     char *
@@ -579,9 +586,19 @@ This is the class interface:
     int
         zmsg_save (zmsg_t *self, FILE *file);
     
-    //  Load a message from an open file
+    //  Load/append an open file into message, create new message if
+    //  null message provided.
     zmsg_t *
-        zmsg_load (FILE *file);
+        zmsg_load (zmsg_t *self, FILE *file);
+    
+    //  Encode message to a new buffer, return buffer size
+    size_t
+        zmsg_encode (zmsg_t *self, byte **buffer);
+    
+    //  Decode a buffer into a new message, returns NULL if buffer is not
+    //  properly formatted.
+    zmsg_t *
+        zmsg_decode (byte *buffer, size_t buffer_size);
     
     //  Create copy of message, as new message object
     zmsg_t *
@@ -617,25 +634,38 @@ This is the class interface:
     void
         zloop_destroy (zloop_t **self_p);
     
-    //  Register a socket reader, on one socket
+    //  Register pollitem with the reactor. When the pollitem is ready, will call
+    //  the handler, passing the arg. Returns 0 if OK, -1 if there was an error.
+    //  If you register the pollitem more than once, each instance will invoke its
+    //  corresponding handler.
     int
         zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg);
     
-    //  Cancel the reader on the specified socket or fd, if any
+    //  Cancel a pollitem from the reactor, specified by socket or FD. If both
+    //  are specified, uses only socket. If multiple poll items exist for same
+    //  socket/FD, cancels ALL of them.
     void
-        zloop_cancel (zloop_t *self, zmq_pollitem_t *item);
+        zloop_poller_end (zloop_t *self, zmq_pollitem_t *item);
     
-    //  Register a timer that will go off after 'delay' msecs, and will
-    //  repeat 'times' times, unless 'times' is zero, meaning repeat forever.
+    //  Register a timer that expires after some delay and repeats some number of
+    //  times. At each expiry, will call the handler, passing the arg. To
+    //  run a timer forever, use 0 times. Returns 0 if OK, -1 if there was an
+    //  error.
     int
         zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *arg);
+    
+    //  Cancel all timers for a specific argument (as provided in zloop_timer)
+    void
+        zloop_timer_end (zloop_t *self, void *arg);
     
     //  Set verbose tracing of reactor on/off
     void
         zloop_set_verbose (zloop_t *self, Bool verbose);
     
-    //  Start the reactor, ends if a callback function returns -1, or the process
-    //  received SIGINT or SIGTERM.
+    //  Start the reactor. Takes control of the thread and returns when the ØMQ
+    //  context is terminated or the process is interrupted, or any event handler
+    //  returns -1. Event handlers may register new sockets and timers, and
+    //  cancel sockets. Returns 0 if interrupted, -1 if cancelled by a handler.
     int
         zloop_start (zloop_t *self);
     
@@ -722,15 +752,20 @@ This is the class interface:
     void
         zhash_destroy (zhash_t **self_p);
     
-    //  Insert an item into the hash container using the specified key
+    //  Insert item into hash table with specified key and item.
+    //  If key is already present returns -1 and leaves existing item unchanged
+    //  Returns 0 on success.
     int
         zhash_insert (zhash_t *self, char *key, void *item);
     
-    //  Insert or update the item for the specified key
+    //  Update item into hash table with specified key and item.
+    //  If key is already present, destroys old item and inserts new one.
+    //  Use free_fn method to ensure deallocator is properly called on item.
     void
         zhash_update (zhash_t *self, char *key, void *item);
     
-    //  Destroy the item at the specified key, if any
+    //  Remove an item specified by key from the hash table. If there was no such
+    //  item, this function does nothing.
     void
         zhash_delete (zhash_t *self, char *key);
     
@@ -738,7 +773,16 @@ This is the class interface:
     void *
         zhash_lookup (zhash_t *self, char *key);
     
-    //  Set a free function for the item at the specified key
+    //  Reindexes an item from an old key to a new key. If there was no such
+    //  item, does nothing. Returns 0 if successful, else -1.
+    int
+        zhash_rename (zhash_t *self, char *old_key, char *new_key);
+    
+    //  Set a free function for the specified hash table item. When the item is
+    //  destroyed, the free function, if any, is called on that item.
+    //  Use this when hash items are dynamically allocated, to ensure that
+    //  you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
+    //  Returns the item, or NULL if there is no such item.
     void *
         zhash_freefn (zhash_t *self, char *key, zhash_free_fn *free_fn);
     
@@ -746,7 +790,9 @@ This is the class interface:
     size_t
         zhash_size (zhash_t *self);
     
-    //  Iterate over the hash table and apply the function to each item
+    //  Apply function to each item in the hash table. Items are iterated in no
+    //  defined order.  Stops if callback function returns non-zero and returns
+    //  final return code from callback function (zero = success).
     int
         zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument);
     
@@ -868,7 +914,7 @@ The answer to this, as we learned from building enterprise-level C applications 
 
 C has no standard API style. It is one thing to write a useful component, but something else to provide an API that is consistent and obvious across many components. We learned from building [OpenAMQ](http://www.openamq.org), a messaging client and server of 0.5M LoC, that a consistent model for extending C makes life for the application developer much easier.
 
-The general model is that of a class (the source package) that provides objects (in fact C structures). The application creates objects and then works with them. When done, the application destroys the object. In C, we tend to use the same name for the object as the class, when we can, and it looks like this (to take a fictitious czmq class):
+The general model is that of a class (the source package) that provides objects (in fact C structures). The application creates objects and then works with them. When done, the application destroys the object. In C, we tend to use the same name for the object as the class, when we can, and it looks like this (to take a fictitious CZMQ class):
 
     zregexp_t *regexp = zregexp_new (regexp_string);
     if (!regexp)
@@ -893,7 +939,7 @@ No model is fully consistent, and classes can define their own rules if it helps
 <A name="toc3-308" title="Naming Style" />
 ### Naming Style
 
-czmq aims for short, consistent names, following the theory that names we use most often should be shortest. Classes get one-word names, unless they are part of a family of classes in which case they may be two words, the first being the family name. Methods, similarly, get one-word names and we aim for consistency across classes (so a method that does something semantically similar in two classes will get the same name in both). So the canonical name for any method is:
+CZMQ aims for short, consistent names, following the theory that names we use most often should be shortest. Classes get one-word names, unless they are part of a family of classes in which case they may be two words, the first being the family name. Methods, similarly, get one-word names and we aim for consistency across classes (so a method that does something semantically similar in two classes will get the same name in both). So the canonical name for any method is:
 
     zclassname_methodname
 
@@ -916,7 +962,7 @@ We assume that at some point we'll need to switch to a doubly-linked list.
 
 Creating a portable C application can be rewarding in terms of maintaining a single code base across many platforms, and keeping (expensive) system-specific knowledge separate from application developers. In most projects (like ØMQ core), there is no portability layer and application code does conditional compilation for all mixes of platforms. This leads to quite messy code.
 
-czmq is a portability layer, similar to but thinner than libraries like the [Apache Portable Runtime](http://apr.apache.org) (APR).
+CZMQ is a portability layer, similar to but thinner than libraries like the [Apache Portable Runtime](http://apr.apache.org) (APR).
 
 These are the places a C application is subject to arbitrary system differences:
 
@@ -935,7 +981,7 @@ An example of the last:
         pid = 0;
     #endif
 
-czmq uses the GNU autotools system, so non-portable code can use the macros this defines. It can also use macros defined by the czmq_prelude.h header file.
+CZMQ uses the GNU autotools system, so non-portable code can use the macros this defines. It can also use macros defined by the czmq_prelude.h header file.
 
 <A name="toc3-355" title="Technical Aspects" />
 ### Technical Aspects
@@ -945,7 +991,7 @@ czmq uses the GNU autotools system, so non-portable code can use the macros this
 * *Library versioning*: we don't make any attempt to version the library at this stage. Classes are in our experience highly stable once they are built and tested, the only changes typically being added methods.
 * *Performance*: for critical path processing, you may want to avoid creating and destroying classes. However on modern Linux systems the heap allocator is very fast. Individual classes can choose whether or not to nullify their data on allocation.
 * *Self-testing*: every class has a `selftest` method that runs through the methods of the class. In theory, calling all selftest functions of all classes does a full unit test of the library. The `czmq_selftest` application does this.
-* *Memory management*: czmq classes do not use any special memory management techiques to detect leaks. We've done this in the past but it makes the code relatively complex. Instead, we do memory leak testing using tools like valgrind.
+* *Memory management*: CZMQ classes do not use any special memory management techiques to detect leaks. We've done this in the past but it makes the code relatively complex. Instead, we do memory leak testing using tools like valgrind.
 
 <A name="toc2-365" title="Under the Hood" />
 ## Under the Hood
@@ -953,7 +999,7 @@ czmq uses the GNU autotools system, so non-portable code can use the macros this
 <A name="toc3-368" title="Adding a New Class" />
 ### Adding a New Class
 
-If you define a new czmq class `myclass` you need to:
+If you define a new CZMQ class `myclass` you need to:
 
 * Write the `zmyclass.c` and `zmyclass.h` source files, in `src` and `include` respectively.
 * Add`#include <zmyclass.h>` to `include/czmq.h`.
@@ -978,14 +1024,14 @@ So while ANSI C code might say:
     file_buffer = zblob_new ();
     ...
 
-The style in czmq would be:
+The style in CZMQ would be:
 
     zblob_t *file_buffer = zblob_new ();
 
 <A name="toc3-400" title="Assertions" />
 ### Assertions
 
-We use assertions heavily to catch bad argument values. The czmq classes do not attempt to validate arguments and report errors; bad arguments are treated as fatal application programming errors.
+We use assertions heavily to catch bad argument values. The CZMQ classes do not attempt to validate arguments and report errors; bad arguments are treated as fatal application programming errors.
 
 We also use assertions heavily on calls to system functions that are never supposed to fail, where failure is to be treated as a fatal non-recoverable error (e.g. running out of memory).
 
@@ -1042,17 +1088,17 @@ The template for man pages is in doc/mkman.
 <A name="toc3-457" title="Development" />
 ### Development
 
-czmq is developed through a test-driven process that guarantees no memory violations or leaks in the code:
+CZMQ is developed through a test-driven process that guarantees no memory violations or leaks in the code:
 
 * Modify a class or method.
 * Update the test method for that class.
 * Run the 'selftest' script, which uses the Valgrind memcheck tool.
 * Repeat until perfect.
 
-<A name="toc3-467" title="Porting czmq" />
-### Porting czmq
+<A name="toc3-467" title="Porting CZMQ" />
+### Porting CZMQ
 
-When you try czmq on an OS that it's not been used on (ever, or for a while), you will hit code that does not compile. In some cases the patches are trivial, in other cases (usually when porting to Windows), the work needed to build equivalent functionality may be non-trivial. In any case, the benefit is that once ported, the functionality is available to all applications.
+When you try CZMQ on an OS that it's not been used on (ever, or for a while), you will hit code that does not compile. In some cases the patches are trivial, in other cases (usually when porting to Windows), the work needed to build equivalent functionality may be non-trivial. In any case, the benefit is that once ported, the functionality is available to all applications.
 
 Before attempting to patch code for portability, please read the `czmq_prelude.h` header file. There are several typical types of changes you may need to make to get functionality working on a specific operating system:
 
@@ -1060,7 +1106,7 @@ Before attempting to patch code for portability, please read the `czmq_prelude.h
 * Defining macros that rename exotic library functions to more conventional names: do this in czmq_prelude.h.
 * Reimplementing specific methods to use a non-standard API: this is typically needed on Windows. Do this in the relevant class, using #ifdefs to properly differentiate code for different platforms.
 
-The canonical 'standard operating system' for all czmq code is Linux, gcc, POSIX. The canonical 'weird operating system' for czmq is Windows.
+The canonical 'standard operating system' for all CZMQ code is Linux, gcc, POSIX. The canonical 'weird operating system' for CZMQ is Windows.
 
 <A name="toc3-480" title="Code Generation" />
 ### Code Generation
