@@ -152,7 +152,7 @@ s_thread_start (shim_t *shim)
 //  pipe.
 
 void
-zthread_new (zctx_t *ctx, zthread_detached_fn *thread_fn, void *args)
+zthread_new (zthread_detached_fn *thread_fn, void *args)
 {
     //  Prepare argument shim for child thread
     shim_t *shim = (shim_t *) zmalloc (sizeof (shim_t));
@@ -229,7 +229,7 @@ zthread_test (Bool verbose)
     zctx_t *ctx = zctx_new ();
 
     //  Create a detached thread, let it run
-    zthread_new (ctx, s_test_detached, NULL);
+    zthread_new (s_test_detached, NULL);
     zclock_sleep (100);
 
     //  Create an attached thread, check it's safely alive

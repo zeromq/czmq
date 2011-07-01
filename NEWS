@@ -4,6 +4,8 @@ czmq version 1.1.0 (draft), released on 2011/06/xx
 Changes
 -------
 
+* Removed unused ctx argument from zthread_new() call.
+
 * zloop works with zmq_pollitem_t * instead of void * sockets; allows
   use of native FDs in reactor as well as 0MQ sockets.
 
