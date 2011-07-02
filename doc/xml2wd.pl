@@ -1,7 +1,7 @@
 #! /bin/perl
 #
 #   xml2wd.pl - Convert docbook XML to Wikidot syntax
-#   Part of the ztools/apisite toolkit. Modified for libczmq.
+#   Part of the ztools/apisite toolkit. Modified for CZMQ.
 #
 #   Author: Pieter Hintjens <ph@imatix.com>
 #   License: public domain
@@ -46,7 +46,7 @@ END
         if ($title eq "czmq") {
             open (TOC, ">_start.wd");
             print TOC "[[image http://czmq.zeromq.org/local--files/admin:css/logo.gif link=\"page:start\"]]\n\n";
-            print TOC "++ czmq/$version reference\n\n";
+            print TOC "++ CZMQ/$version reference\n\n";
             close (TOC);
         }
     }

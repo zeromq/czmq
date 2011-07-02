@@ -42,6 +42,9 @@ are a concept we can deal with. Seconds are too fat, nanoseconds too
 tiny, but milliseconds are just right for slices of time we want to work
 with at the 0MQ scale. zclock doesn't give you objects to work with, we
 like the czmq class model but we're not insane. There, got it in again.
+The Win32 Sleep() call defaults to 16ms resolution unless the system timer
+resolution is increased with a call to timeBeginPeriod() permitting 1ms
+granularity.
 
 EXAMPLE
 -------

@@ -8,6 +8,11 @@ zsocket - working with 0MQ sockets
 SYNOPSIS
 --------
 ----
+//  This port range is defined by IANA for dynamic or private ports
+//  We use this when choosing a port for dynamic binding.
+#define ZSOCKET_DYNFROM     0xc000
+#define ZSOCKET_DYNTO       0xffff
+
 //  Create a new socket within our czmq context, replaces zmq_socket.
 //  If the socket is a SUB socket, automatically subscribes to everything.
 //  Use this to get automatic management of the socket at shutdown.
@@ -18,9 +23,12 @@ void *
 void
     zsocket_destroy (zctx_t *self, void *socket);
 
-//  Bind a socket to a formatted endpoint
-//  Checks with assertion that the bind was valid
-void
+//  Bind a socket to a formatted endpoint. If the port is specified as
+//  '*', binds to any free port from ZSOCKET_DYNFROM to ZSOCKET_DYNTO
+//  and returns the actual port number used. Otherwise asserts that the
+//  bind succeeded with the specified port number. Always returns the
+//  port number if successful.
+int
     zsocket_bind (void *socket, const char *format, ...);
 
 //  Connect a socket to a formatted endpoint
@@ -60,15 +68,19 @@ EXAMPLE
     void *reader = zsocket_new (ctx, ZMQ_PULL);
     assert (streq (zsocket_type_str (writer), "PUSH"));
     assert (streq (zsocket_type_str (reader), "PULL"));
-    zsocket_bind (writer, "tcp://%s:%d", interf, service);
+    int rc = zsocket_bind (writer, "tcp://%s:%d", interf, service);
+    assert (rc == service);
     zsocket_connect (reader, "tcp://%s:%d", domain, service);
     zstr_send (writer, "HELLO");
     char *message = zstr_recv (reader);
     assert (message);
     assert (streq (message, "HELLO"));
     free (message);
-    zsocket_destroy (ctx, writer);
 
+    int port = zsocket_bind (writer, "tcp://%s:*", interf);
+    assert (port >= ZSOCKET_DYNFROM && port <= ZSOCKET_DYNTO);
+
+    zsocket_destroy (ctx, writer);
     zctx_destroy (&ctx);
 ----
 

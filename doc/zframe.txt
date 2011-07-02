@@ -19,9 +19,16 @@ zframe_t *
 void
     zframe_destroy (zframe_t **self_p);
 
-//  Receive a new frame off the socket
+//  Receive frame from socket, returns zframe_t object or NULL if the recv
+//  was interrupted. Does a blocking recv, if you want to not block then use
+//  zframe_recv_nowait().
 zframe_t *
     zframe_recv (void *socket);
+
+//  Receive a new frame off the socket. Returns newly allocated frame, or
+//  NULL if there was no input waiting, or if the read was interrupted.
+zframe_t *
+    zframe_recv_nowait (void *socket);
 
 //  Send a frame to a socket, destroy frame after sending
 void
@@ -54,6 +61,11 @@ Bool
 //  Return frame 'more' property
 int
     zframe_more (zframe_t *self);
+
+//  Return TRUE if two frames have identical size and data
+//  If either frame is NULL, equality is always false.
+Bool
+    zframe_eq (zframe_t *self, zframe_t *other);
 
 //  Print contents of frame to stderr
 void
@@ -104,9 +116,12 @@ EXAMPLE
     }
     assert (frame);
     zframe_t *copy = zframe_dup (frame);
+    assert (zframe_eq (frame, copy));
     zframe_destroy (&frame);
+    assert (!zframe_eq (frame, copy));
     assert (zframe_size (copy) == 5);
     zframe_destroy (&copy);
+    assert (!zframe_eq (frame, copy));
 
     //  Send END frame
     frame = zframe_new ("NOT", 3);
@@ -131,6 +146,8 @@ EXAMPLE
         zframe_destroy (&frame);
     }
     assert (frame_nbr == 10);
+    frame = zframe_recv_nowait (input);
+    assert (frame == NULL);
 
     zctx_destroy (&ctx);
 ----

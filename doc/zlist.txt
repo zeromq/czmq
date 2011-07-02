@@ -3,7 +3,7 @@ zlist(7)
 
 NAME
 ----
-zlist - singly-linked list container
+zlist - generic type-free list container
 
 SYNOPSIS
 --------
@@ -85,6 +85,9 @@ EXAMPLE
     assert (zlist_first (list) == cheese);
     assert (zlist_next (list) == bread);
     assert (zlist_next (list) == wine);
+    assert (zlist_next (list) == NULL);
+    //  After we reach end of list, next wraps around
+    assert (zlist_next (list) == cheese);
     assert (zlist_size (list) == 3);
 
     zlist_remove (list, wine);

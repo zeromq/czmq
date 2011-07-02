@@ -19,25 +19,38 @@ zloop_t *
 void
     zloop_destroy (zloop_t **self_p);
 
-//  Register a socket reader, on one socket
+//  Register pollitem with the reactor. When the pollitem is ready, will call
+//  the handler, passing the arg. Returns 0 if OK, -1 if there was an error.
+//  If you register the pollitem more than once, each instance will invoke its
+//  corresponding handler.
 int
     zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg);
 
-//  Cancel the reader on the specified socket or fd, if any
+//  Cancel a pollitem from the reactor, specified by socket or FD. If both
+//  are specified, uses only socket. If multiple poll items exist for same
+//  socket/FD, cancels ALL of them.
 void
-    zloop_cancel (zloop_t *self, zmq_pollitem_t *item);
+    zloop_poller_end (zloop_t *self, zmq_pollitem_t *item);
 
-//  Register a timer that will go off after 'delay' msecs, and will
-//  repeat 'times' times, unless 'times' is zero, meaning repeat forever.
+//  Register a timer that expires after some delay and repeats some number of
+//  times. At each expiry, will call the handler, passing the arg. To
+//  run a timer forever, use 0 times. Returns 0 if OK, -1 if there was an
+//  error.
 int
     zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *arg);
+
+//  Cancel all timers for a specific argument (as provided in zloop_timer)
+void
+    zloop_timer_end (zloop_t *self, void *arg);
 
 //  Set verbose tracing of reactor on/off
 void
     zloop_set_verbose (zloop_t *self, Bool verbose);
 
-//  Start the reactor, ends if a callback function returns -1, or the process
-//  received SIGINT or SIGTERM.
+//  Start the reactor. Takes control of the thread and returns when the 0MQ
+//  context is terminated or the process is interrupted, or any event handler
+//  returns -1. Event handlers may register new sockets and timers, and
+//  cancel sockets. Returns 0 if interrupted, -1 if cancelled by a handler.
 int
     zloop_start (zloop_t *self);
 

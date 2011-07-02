@@ -28,6 +28,10 @@ void
 size_t
     zmsg_size (zmsg_t *self);
 
+//  Return combined size of all frames in message
+size_t
+    zmsg_content_size (zmsg_t *self);
+
 //  Push frame to front of message, before first frame
 void
     zmsg_push (zmsg_t *self, zframe_t *frame);
@@ -50,11 +54,11 @@ void
 
 //  Push string as new frame to front of message
 void
-    zmsg_pushstr (zmsg_t *self, const char *string);
+    zmsg_pushstr (zmsg_t *self, const char *format, ...);
 
 //  Push string as new frame to end of message
 void
-    zmsg_addstr (zmsg_t *self, const char *string);
+    zmsg_addstr (zmsg_t *self, const char *format, ...);
 
 //  Pop frame off front of message, return as fresh string
 char *
@@ -86,13 +90,23 @@ zframe_t *
 zframe_t *
     zmsg_last (zmsg_t *self);
 
-//  Save message to an open file
-void
+//  Save message to an open file, return 0 if OK, else -1.
+int
     zmsg_save (zmsg_t *self, FILE *file);
 
-//  Load a message from an open file
+//  Load/append an open file into message, create new message if
+//  null message provided.
 zmsg_t *
-    zmsg_load (FILE *file);
+    zmsg_load (zmsg_t *self, FILE *file);
+
+//  Encode message to a new buffer, return buffer size
+size_t
+    zmsg_encode (zmsg_t *self, byte **buffer);
+
+//  Decode a buffer into a new message, returns NULL if buffer is not
+//  properly formatted.
+zmsg_t *
+    zmsg_decode (byte *buffer, size_t buffer_size);
 
 //  Create copy of message, as new message object
 zmsg_t *
@@ -132,12 +146,14 @@ EXAMPLE
     zframe_t *frame = zframe_new ("Hello", 5);
     zmsg_push (msg, frame);
     assert (zmsg_size (msg) == 1);
+    assert (zmsg_content_size (msg) == 5);
     zmsg_send (&msg, output);
     assert (msg == NULL);
 
     msg = zmsg_recv (input);
     assert (msg);
     assert (zmsg_size (msg) == 1);
+    assert (zmsg_content_size (msg) == 5);
     zmsg_destroy (&msg);
 
     //  Test send and receive of multi-frame message
@@ -159,26 +175,35 @@ EXAMPLE
     copy = zmsg_recv (input);
     assert (copy);
     assert (zmsg_size (copy) == 10);
+    assert (zmsg_content_size (copy) == 60);
     zmsg_destroy (&copy);
 
     msg = zmsg_recv (input);
     assert (msg);
     assert (zmsg_size (msg) == 10);
+    assert (zmsg_content_size (msg) == 60);
     if (verbose)
         zmsg_dump (msg);
 
     //  Save to a file, read back
     FILE *file = fopen ("zmsg.test", "w");
     assert (file);
-    zmsg_save (msg, file);
-    zmsg_destroy (&msg);
+    int rc = zmsg_save (msg, file);
+    assert (rc == 0);
     fclose (file);
 
     file = fopen ("zmsg.test", "r");
-    msg = zmsg_load (file);
+    rc = zmsg_save (msg, file);
+    assert (rc == -1);
+    fclose (file);
+    zmsg_destroy (&msg);
+
+    file = fopen ("zmsg.test", "r");
+    msg = zmsg_load (NULL, file);
     fclose (file);
     remove ("zmsg.test");
     assert (zmsg_size (msg) == 10);
+    assert (zmsg_content_size (msg) == 60);
 
     //  Remove all frames except first and last
     int frame_nbr;
@@ -190,6 +215,7 @@ EXAMPLE
     }
     //  Test message frame manipulation
     assert (zmsg_size (msg) == 2);
+    assert (zmsg_content_size (msg) == 12);
     frame = zframe_new ("Address", 7);
     zmsg_wrap (msg, frame);
     assert (zmsg_size (msg) == 4);
@@ -201,6 +227,28 @@ EXAMPLE
     char *body = zmsg_popstr (msg);
     assert (streq (body, "Frame0"));
     free (body);
+    zmsg_destroy (&msg);
+
+    //  Test encoding/decoding
+    msg = zmsg_new ();
+    byte *blank = zmalloc (100000);
+    zmsg_addmem (msg, blank, 0);
+    zmsg_addmem (msg, blank, 1);
+    zmsg_addmem (msg, blank, 253);
+    zmsg_addmem (msg, blank, 254);
+    zmsg_addmem (msg, blank, 255);
+    zmsg_addmem (msg, blank, 256);
+    zmsg_addmem (msg, blank, 65535);
+    zmsg_addmem (msg, blank, 65536);
+    zmsg_addmem (msg, blank, 65537);
+    free (blank);
+    assert (zmsg_size (msg) == 9);
+    byte *buffer;
+    size_t buffer_size = zmsg_encode (msg, &buffer);
+    zmsg_destroy (&msg);
+    msg = zmsg_decode (buffer, buffer_size);
+    assert (msg);
+    free (buffer);
     zmsg_destroy (&msg);
 
     //  Now try methods on an empty message

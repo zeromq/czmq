@@ -1,6 +1,6 @@
 #! /bin/bash
 #
-#   mksite - Upload czmq manual to czmq.zeromq.org/manual:
+#   mksite - Upload CZMQ manual to czmq.zeromq.org/manual:
 #
 #   Author: Pieter Hintjens <ph@imatix.com>
 #   License: public domain
@@ -49,7 +49,7 @@ if [ $UPLOAD -eq 1 ]; then
     echo "Uploading to $CATEGORY..."
 
     #   Send table of contents as category:_start
-    do_upload "_start" "czmq Documentation"
+    do_upload "_start" "CZMQ Documentation"
 
     #   Send template as category:_template
     do_upload "_template" "Category template - generated"
