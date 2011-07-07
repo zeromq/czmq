@@ -297,7 +297,7 @@ zloop_start (zloop_t *self)
     //  Recalculate all timers now
     s_timer_t *timer = (s_timer_t *) zlist_first (self->timers);
     while (timer) {
-        timer->when = zclock_time () + timer->delay;
+        timer->when = timer->delay + zclock_time ();
         timer = (s_timer_t *) zlist_next (self->timers);
     }
     //  Main reactor loop
