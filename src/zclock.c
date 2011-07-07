@@ -122,6 +122,7 @@ zclock_log (const char *format, ...)
     vprintf (format, argptr);
     va_end (argptr);
     printf ("\n");
+    fflush (stdout);
 }
 
 
