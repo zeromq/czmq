@@ -59,14 +59,6 @@ void
 void
     zctx_set_linger (zctx_t *self, int linger);
 
-//  Create socket within this context, for czmq use only
-void *
-    zctx__socket_new (zctx_t *self, int type);
-
-//  Destroy socket within this context, for czmq use only
-void
-    zctx__socket_destroy (zctx_t *self, void *socket);
-
 //  Self test of this class
 int
     zctx_test (Bool verbose);
@@ -76,6 +68,13 @@ int
 extern int zctx_interrupted;
 //  @end
 
+//  Create socket within this context, for czmq use only
+void *
+    zctx__socket_new (zctx_t *self, int type);
+
+//  Destroy socket within this context, for czmq use only
+void
+    zctx__socket_destroy (zctx_t *self, void *socket);
 #ifdef __cplusplus
 }
 #endif

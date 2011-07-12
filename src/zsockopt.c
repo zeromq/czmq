@@ -6,7 +6,7 @@
     Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
-    This file is part of czmq, the high-level C binding for 0MQ:
+    This file is part of CZMQ, the high-level C binding for 0MQ:
     http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
@@ -56,6 +56,7 @@ zsockopt_set_hwm (void *socket, int hwm)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_HWM value
+
 int
 zsockopt_hwm (void *socket)
 {
@@ -80,6 +81,7 @@ zsockopt_set_swap (void *socket, int swap)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_SWAP value
+
 int
 zsockopt_swap (void *socket)
 {
@@ -104,6 +106,7 @@ zsockopt_set_affinity (void *socket, int affinity)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_AFFINITY value
+
 int
 zsockopt_affinity (void *socket)
 {
@@ -139,6 +142,7 @@ zsockopt_set_rate (void *socket, int rate)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RATE value
+
 int
 zsockopt_rate (void *socket)
 {
@@ -163,6 +167,7 @@ zsockopt_set_recovery_ivl (void *socket, int recovery_ivl)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RECOVERY_IVL value
+
 int
 zsockopt_recovery_ivl (void *socket)
 {
@@ -187,6 +192,7 @@ zsockopt_set_recovery_ivl_msec (void *socket, int recovery_ivl_msec)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RECOVERY_IVL_MSEC value
+
 int
 zsockopt_recovery_ivl_msec (void *socket)
 {
@@ -211,6 +217,7 @@ zsockopt_set_mcast_loop (void *socket, int mcast_loop)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_MCAST_LOOP value
+
 int
 zsockopt_mcast_loop (void *socket)
 {
@@ -235,6 +242,7 @@ zsockopt_set_sndbuf (void *socket, int sndbuf)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_SNDBUF value
+
 int
 zsockopt_sndbuf (void *socket)
 {
@@ -259,6 +267,7 @@ zsockopt_set_rcvbuf (void *socket, int rcvbuf)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RCVBUF value
+
 int
 zsockopt_rcvbuf (void *socket)
 {
@@ -282,6 +291,7 @@ zsockopt_set_linger (void *socket, int linger)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_LINGER value
+
 int
 zsockopt_linger (void *socket)
 {
@@ -305,6 +315,7 @@ zsockopt_set_reconnect_ivl (void *socket, int reconnect_ivl)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RECONNECT_IVL value
+
 int
 zsockopt_reconnect_ivl (void *socket)
 {
@@ -328,6 +339,7 @@ zsockopt_set_reconnect_ivl_max (void *socket, int reconnect_ivl_max)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RECONNECT_IVL_MAX value
+
 int
 zsockopt_reconnect_ivl_max (void *socket)
 {
@@ -351,6 +363,7 @@ zsockopt_set_backlog (void *socket, int backlog)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_BACKLOG value
+
 int
 zsockopt_backlog (void *socket)
 {
@@ -385,6 +398,7 @@ zsockopt_set_unsubscribe (void *socket, char * unsubscribe)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_TYPE value
+
 int
 zsockopt_type (void *socket)
 {
@@ -397,6 +411,7 @@ zsockopt_type (void *socket)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RCVMORE value
+
 int
 zsockopt_rcvmore (void *socket)
 {
@@ -409,6 +424,7 @@ zsockopt_rcvmore (void *socket)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_FD value
+
 int
 zsockopt_fd (void *socket)
 {
@@ -421,6 +437,7 @@ zsockopt_fd (void *socket)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_EVENTS value
+
 int
 zsockopt_events (void *socket)
 {
@@ -447,6 +464,7 @@ zsockopt_set_sndhwm (void *socket, int sndhwm)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_SNDHWM value
+
 int
 zsockopt_sndhwm (void *socket)
 {
@@ -470,6 +488,7 @@ zsockopt_set_rcvhwm (void *socket, int rcvhwm)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RCVHWM value
+
 int
 zsockopt_rcvhwm (void *socket)
 {
@@ -494,6 +513,7 @@ zsockopt_set_affinity (void *socket, int affinity)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_AFFINITY value
+
 int
 zsockopt_affinity (void *socket)
 {
@@ -528,6 +548,7 @@ zsockopt_set_rate (void *socket, int rate)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RATE value
+
 int
 zsockopt_rate (void *socket)
 {
@@ -551,6 +572,7 @@ zsockopt_set_recovery_ivl (void *socket, int recovery_ivl)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RECOVERY_IVL value
+
 int
 zsockopt_recovery_ivl (void *socket)
 {
@@ -574,6 +596,7 @@ zsockopt_set_sndbuf (void *socket, int sndbuf)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_SNDBUF value
+
 int
 zsockopt_sndbuf (void *socket)
 {
@@ -597,6 +620,7 @@ zsockopt_set_rcvbuf (void *socket, int rcvbuf)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RCVBUF value
+
 int
 zsockopt_rcvbuf (void *socket)
 {
@@ -620,6 +644,7 @@ zsockopt_set_linger (void *socket, int linger)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_LINGER value
+
 int
 zsockopt_linger (void *socket)
 {
@@ -643,6 +668,7 @@ zsockopt_set_reconnect_ivl (void *socket, int reconnect_ivl)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RECONNECT_IVL value
+
 int
 zsockopt_reconnect_ivl (void *socket)
 {
@@ -666,6 +692,7 @@ zsockopt_set_reconnect_ivl_max (void *socket, int reconnect_ivl_max)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RECONNECT_IVL_MAX value
+
 int
 zsockopt_reconnect_ivl_max (void *socket)
 {
@@ -689,6 +716,7 @@ zsockopt_set_backlog (void *socket, int backlog)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_BACKLOG value
+
 int
 zsockopt_backlog (void *socket)
 {
@@ -713,6 +741,7 @@ zsockopt_set_maxmsgsize (void *socket, int maxmsgsize)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_MAXMSGSIZE value
+
 int
 zsockopt_maxmsgsize (void *socket)
 {
@@ -747,6 +776,7 @@ zsockopt_set_unsubscribe (void *socket, char * unsubscribe)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_TYPE value
+
 int
 zsockopt_type (void *socket)
 {
@@ -759,6 +789,7 @@ zsockopt_type (void *socket)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RCVMORE value
+
 int
 zsockopt_rcvmore (void *socket)
 {
@@ -771,6 +802,7 @@ zsockopt_rcvmore (void *socket)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_FD value
+
 int
 zsockopt_fd (void *socket)
 {
@@ -783,6 +815,7 @@ zsockopt_fd (void *socket)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_EVENTS value
+
 int
 zsockopt_events (void *socket)
 {
@@ -815,103 +848,178 @@ zsockopt_test (Bool verbose)
 
     //  @selftest
     zctx_t *ctx = zctx_new ();
-
-    //  All options are valid on SUB sockets
-    void *socket = zsocket_new (ctx, ZMQ_SUB);
-
+    void *socket;
 #if (ZMQ_VERSION_MAJOR == 2)
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_hwm (socket, 1);
     assert (zsockopt_hwm (socket) == 1);
     zsockopt_hwm (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_swap (socket, 1);
     assert (zsockopt_swap (socket) == 1);
     zsockopt_swap (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_affinity (socket, 1);
     assert (zsockopt_affinity (socket) == 1);
     zsockopt_affinity (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_identity (socket, "test");
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_rate (socket, 1);
     assert (zsockopt_rate (socket) == 1);
     zsockopt_rate (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_recovery_ivl (socket, 1);
     assert (zsockopt_recovery_ivl (socket) == 1);
     zsockopt_recovery_ivl (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_recovery_ivl_msec (socket, 1);
     assert (zsockopt_recovery_ivl_msec (socket) == 1);
     zsockopt_recovery_ivl_msec (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_mcast_loop (socket, 1);
     assert (zsockopt_mcast_loop (socket) == 1);
     zsockopt_mcast_loop (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_sndbuf (socket, 1);
     assert (zsockopt_sndbuf (socket) == 1);
     zsockopt_sndbuf (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_rcvbuf (socket, 1);
     assert (zsockopt_rcvbuf (socket) == 1);
     zsockopt_rcvbuf (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_linger (socket, 1);
     assert (zsockopt_linger (socket) == 1);
     zsockopt_linger (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_reconnect_ivl (socket, 1);
     assert (zsockopt_reconnect_ivl (socket) == 1);
     zsockopt_reconnect_ivl (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_reconnect_ivl_max (socket, 1);
     assert (zsockopt_reconnect_ivl_max (socket) == 1);
     zsockopt_reconnect_ivl_max (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_backlog (socket, 1);
     assert (zsockopt_backlog (socket) == 1);
     zsockopt_backlog (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_subscribe (socket, "test");
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_unsubscribe (socket, "test");
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_type (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_rcvmore (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_fd (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_events (socket);
+    zsocket_destroy (ctx, socket);
 #endif
 
 #if (ZMQ_VERSION_MAJOR == 3)
+    socket = zsocket_new (ctx, ZMQ_PUB);
     zsockopt_set_sndhwm (socket, 1);
     assert (zsockopt_sndhwm (socket) == 1);
     zsockopt_sndhwm (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_DEALER);
     zsockopt_set_rcvhwm (socket, 1);
     assert (zsockopt_rcvhwm (socket) == 1);
     zsockopt_rcvhwm (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_affinity (socket, 1);
     assert (zsockopt_affinity (socket) == 1);
     zsockopt_affinity (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_identity (socket, "test");
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_rate (socket, 1);
     assert (zsockopt_rate (socket) == 1);
     zsockopt_rate (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_recovery_ivl (socket, 1);
     assert (zsockopt_recovery_ivl (socket) == 1);
     zsockopt_recovery_ivl (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_PUB);
     zsockopt_set_sndbuf (socket, 1);
     assert (zsockopt_sndbuf (socket) == 1);
     zsockopt_sndbuf (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_rcvbuf (socket, 1);
     assert (zsockopt_rcvbuf (socket) == 1);
     zsockopt_rcvbuf (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_linger (socket, 1);
     assert (zsockopt_linger (socket) == 1);
     zsockopt_linger (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_reconnect_ivl (socket, 1);
     assert (zsockopt_reconnect_ivl (socket) == 1);
     zsockopt_reconnect_ivl (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_reconnect_ivl_max (socket, 1);
     assert (zsockopt_reconnect_ivl_max (socket) == 1);
     zsockopt_reconnect_ivl_max (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_backlog (socket, 1);
     assert (zsockopt_backlog (socket) == 1);
     zsockopt_backlog (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_maxmsgsize (socket, 1);
     assert (zsockopt_maxmsgsize (socket) == 1);
     zsockopt_maxmsgsize (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_subscribe (socket, "test");
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_unsubscribe (socket, "test");
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_type (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_rcvmore (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_fd (socket);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_events (socket);
+    zsocket_destroy (ctx, socket);
 
     zsockopt_set_hwm (socket, 1);
 #endif

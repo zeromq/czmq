@@ -5,48 +5,48 @@
 -->
 <options script = "sockopts">
     <version major = "2">
-        <option name = "hwm"               type = "uint64" mode = "rw" />
-        <option name = "swap"              type = "int64"  mode = "rw" />
-        <option name = "affinity"          type = "uint64" mode = "rw" />
-        <option name = "identity"          type = "blob"   mode = "rw" />
-        <option name = "rate"              type = "int64"  mode = "rw" />
-        <option name = "recovery_ivl"      type = "int64"  mode = "rw" />
-        <option name = "recovery_ivl_msec" type = "int64"  mode = "rw" />
-        <option name = "mcast_loop"        type = "int64"  mode = "rw" />
-        <option name = "sndbuf"            type = "uint64" mode = "rw" />
-        <option name = "rcvbuf"            type = "uint64" mode = "rw" />
-        <option name = "linger"            type = "int"    mode = "rw" />
-        <option name = "reconnect_ivl"     type = "int"    mode = "rw" />
-        <option name = "reconnect_ivl_max" type = "int"    mode = "rw" />
-        <option name = "backlog"           type = "int"    mode = "rw" />
-        <option name = "subscribe"         type = "blob"   mode = "w" />
-        <option name = "unsubscribe"       type = "blob"   mode = "w" />
-        <option name = "type"              type = "int"    mode = "r" />
-        <option name = "rcvmore"           type = "int64"  mode = "r" />
-        <option name = "fd"                type = "int"    mode = "r" />
-        <option name = "events"            type = "uint32" mode = "r" />
+        <option name = "hwm"               type = "uint64" mode = "rw" test = "SUB" />
+        <option name = "swap"              type = "int64"  mode = "rw" test = "SUB" />
+        <option name = "affinity"          type = "uint64" mode = "rw" test = "SUB" />
+        <option name = "identity"          type = "blob"   mode = "rw" test = "SUB" />
+        <option name = "rate"              type = "int64"  mode = "rw" test = "SUB" />
+        <option name = "recovery_ivl"      type = "int64"  mode = "rw" test = "SUB" />
+        <option name = "recovery_ivl_msec" type = "int64"  mode = "rw" test = "SUB" />
+        <option name = "mcast_loop"        type = "int64"  mode = "rw" test = "SUB" />
+        <option name = "sndbuf"            type = "uint64" mode = "rw" test = "SUB" />
+        <option name = "rcvbuf"            type = "uint64" mode = "rw" test = "SUB" />
+        <option name = "linger"            type = "int"    mode = "rw" test = "SUB" />
+        <option name = "reconnect_ivl"     type = "int"    mode = "rw" test = "SUB" />
+        <option name = "reconnect_ivl_max" type = "int"    mode = "rw" test = "SUB" />
+        <option name = "backlog"           type = "int"    mode = "rw" test = "SUB" />
+        <option name = "subscribe"         type = "blob"   mode = "w"  test = "SUB" />
+        <option name = "unsubscribe"       type = "blob"   mode = "w"  test = "SUB" />
+        <option name = "type"              type = "int"    mode = "r"  test = "SUB" />
+        <option name = "rcvmore"           type = "int64"  mode = "r"  test = "SUB" />
+        <option name = "fd"                type = "int"    mode = "r"  test = "SUB" />
+        <option name = "events"            type = "uint32" mode = "r"  test = "SUB" />
     </version>
 
     <version major = "3">
-        <option name = "sndhwm"            type = "int"    mode = "rw" />
-        <option name = "rcvhwm"            type = "int"    mode = "rw" />
-        <option name = "affinity"          type = "uint64" mode = "rw" />
-        <option name = "identity"          type = "blob"   mode = "rw" />
-        <option name = "rate"              type = "int"    mode = "rw" />
-        <option name = "recovery_ivl"      type = "int"    mode = "rw" />
-        <option name = "sndbuf"            type = "int"    mode = "rw" />
-        <option name = "rcvbuf"            type = "int"    mode = "rw" />
-        <option name = "linger"            type = "int"    mode = "rw" />
-        <option name = "reconnect_ivl"     type = "int"    mode = "rw" />
-        <option name = "reconnect_ivl_max" type = "int"    mode = "rw" />
-        <option name = "backlog"           type = "int"    mode = "rw" />
-        <option name = "maxmsgsize"        type = "int64"  mode = "rw" />
-        <option name = "subscribe"         type = "blob"   mode = "w" />
-        <option name = "unsubscribe"       type = "blob"   mode = "w" />
-        <option name = "type"              type = "int"    mode = "r" />
-        <option name = "rcvmore"           type = "int"    mode = "r" />
-        <option name = "fd"                type = "int"    mode = "r" />
-        <option name = "events"            type = "int"    mode = "r" />
+        <option name = "sndhwm"            type = "int"    mode = "rw" test = "PUB" />
+        <option name = "rcvhwm"            type = "int"    mode = "rw" test = "SUB" />
+        <option name = "affinity"          type = "uint64" mode = "rw" test = "SUB" />
+        <option name = "identity"          type = "blob"   mode = "rw" test = "SUB" />
+        <option name = "rate"              type = "int"    mode = "rw" test = "SUB" />
+        <option name = "recovery_ivl"      type = "int"    mode = "rw" test = "SUB" />
+        <option name = "sndbuf"            type = "int"    mode = "rw" test = "PUB" />
+        <option name = "rcvbuf"            type = "int"    mode = "rw" test = "SUB" />
+        <option name = "linger"            type = "int"    mode = "rw" test = "SUB" />
+        <option name = "reconnect_ivl"     type = "int"    mode = "rw" test = "SUB" />
+        <option name = "reconnect_ivl_max" type = "int"    mode = "rw" test = "SUB" />
+        <option name = "backlog"           type = "int"    mode = "rw" test = "SUB" />
+        <option name = "maxmsgsize"        type = "int64"  mode = "rw" test = "SUB" />
+        <option name = "subscribe"         type = "blob"   mode = "w"  test = "SUB" />
+        <option name = "unsubscribe"       type = "blob"   mode = "w"  test = "SUB" />
+        <option name = "type"              type = "int"    mode = "r"  test = "SUB" />
+        <option name = "rcvmore"           type = "int"    mode = "r"  test = "SUB" />
+        <option name = "fd"                type = "int"    mode = "r"  test = "SUB" />
+        <option name = "events"            type = "int"    mode = "r"  test = "SUB" />
         <header>
 //  Emulation of widely-used 2.x socket options
 void zsockopt_set_hwm (void *socket, int hwm);

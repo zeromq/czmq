@@ -201,13 +201,11 @@ zsockopt_test (Bool verbose)
 
     //  @selftest
     zctx_t *ctx = zctx_new ();
-
-    //  All options are valid on SUB sockets
-    void *socket = zsocket_new (ctx, ZMQ_SUB);
-
+    void *socket;
 .for version
 #if (ZMQ_VERSION_MAJOR == $(major))
 .   for option
+    socket = zsocket_new (ctx, ZMQ_$(TEST));
 .       if mode = "rw" | mode = "w"
 .           if ctype = "int"
     zsockopt_set_$(name) (socket, 1);
@@ -221,6 +219,7 @@ zsockopt_test (Bool verbose)
 .       if mode = "rw" | mode = "r"
     zsockopt_$(name) (socket);
 .       endif
+    zsocket_destroy (ctx, socket);
 .   endfor
 .   for selftest
 
