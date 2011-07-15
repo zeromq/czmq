@@ -96,9 +96,9 @@ s_timer_new (size_t delay, size_t times, zloop_fn handler, void *arg)
     return timer;
 }
 
-//  We hold an array of pollers that matches the pollset, so
-//  we can register/cancel pollers orthogonally to executing
-//  the pollset activity on pollers.
+//  We hold an array of pollers that matches the pollset, so we can
+//  register/cancel pollers orthogonally to executing the pollset
+//  activity on pollers.
 
 static void
 s_rebuild_pollset (zloop_t *self)
