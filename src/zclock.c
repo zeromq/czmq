@@ -54,11 +54,10 @@ granularity.
 static int64_t
 s_filetime_to_msec (const FILETIME *ft)
 {
-    int64_t t;
-    memcpy (&t, ft, sizeof (*ft));
-    return (int64_t) (t / 100);
+    return (int64_t) (*((int64_t*) ft) / 10000);
 }
 #endif
+
 
 //  --------------------------------------------------------------------------
 //  Sleep for a number of milliseconds
