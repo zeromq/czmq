@@ -40,7 +40,7 @@ zfile_delete (char *filename)
 {
     assert (filename);
 #if (defined (__WINDOWS__))
-    return !DeleteFile (filename);
+    return DeleteFile (filename) ? 0 : -1;
 #else
     return unlink (filename);
 #endif

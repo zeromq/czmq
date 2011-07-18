@@ -409,18 +409,20 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 //- A number of POSIX and C99 keywords and data types -----------------------
 
 #if (defined (__WINDOWS__))
-#   define inline __inline
-#   define strtoull _strtoui64
-#   define srandom      srand
-#   define TIMEZONE     _timezone
-#   define snprintf     _snprintf
-#   define vsnprintf    _vsnprintf
     typedef unsigned long ulong;
     typedef unsigned int  uint;
-    typedef __int32 int32_t;
-    typedef __int64 int64_t;
-    typedef unsigned __int32 uint32_t;
-    typedef unsigned __int64 uint64_t;
+#   define srandom      srand
+#   if (defined (_MSC_VER))
+#       define inline __inline
+#       define strtoull _strtoui64
+#       define TIMEZONE     _timezone
+#       define snprintf     _snprintf
+#       define vsnprintf    _vsnprintf
+        typedef __int32 int32_t;
+        typedef __int64 int64_t;
+        typedef unsigned __int32 uint32_t;
+        typedef unsigned __int64 uint64_t;
+#    endif
 #elif (defined (__APPLE__))
     typedef unsigned long ulong;
     typedef unsigned int  uint;
