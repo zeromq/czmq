@@ -913,17 +913,6 @@ zsockopt_affinity (void *socket)
 
 
 //  --------------------------------------------------------------------------
-//  Set socket ZMQ_IDENTITY value
-
-void
-zsockopt_set_identity (void *socket, char * identity)
-{
-    int rc = zmq_setsockopt (socket, ZMQ_IDENTITY, identity, strlen (identity));
-    assert (rc == 0 || errno == ETERM);
-}
-
-
-//  --------------------------------------------------------------------------
 //  Set socket ZMQ_RATE value
 
 void
@@ -1427,9 +1416,6 @@ zsockopt_test (Bool verbose)
     zsockopt_set_affinity (socket, 1);
     assert (zsockopt_affinity (socket) == 1);
     zsockopt_affinity (socket);
-    zsocket_destroy (ctx, socket);
-    socket = zsocket_new (ctx, ZMQ_SUB);
-    zsockopt_set_identity (socket, "test");
     zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_SUB);
     zsockopt_set_rate (socket, 1);

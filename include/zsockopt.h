@@ -135,7 +135,6 @@ int  zsockopt_events (void *socket);
 void zsockopt_set_sndhwm (void *socket, int sndhwm);
 void zsockopt_set_rcvhwm (void *socket, int rcvhwm);
 void zsockopt_set_affinity (void *socket, int affinity);
-void zsockopt_set_identity (void *socket, char * identity);
 void zsockopt_set_rate (void *socket, int rate);
 void zsockopt_set_recovery_ivl (void *socket, int recovery_ivl);
 void zsockopt_set_sndbuf (void *socket, int sndbuf);

@@ -72,7 +72,6 @@ zsockopt_set_hwm (void *socket, int hwm)
         <option name = "sndhwm"            type = "int"    mode = "rw" test = "PUB" />
         <option name = "rcvhwm"            type = "int"    mode = "rw" test = "SUB" />
         <option name = "affinity"          type = "uint64" mode = "rw" test = "SUB" />
-        <option name = "identity"          type = "blob"   mode = "rw" test = "SUB" />
         <option name = "rate"              type = "int"    mode = "rw" test = "SUB" />
         <option name = "recovery_ivl"      type = "int"    mode = "rw" test = "SUB" />
         <option name = "sndbuf"            type = "int"    mode = "rw" test = "PUB" />
