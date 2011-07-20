@@ -54,7 +54,7 @@ granularity.
 static int64_t
 s_filetime_to_msec (const FILETIME *ft)
 {
-    return (int64_t) (*((int64_t*) ft) / 10000);
+    return (int64_t) (*((int64_t *) ft) / 10000);
 }
 #endif
 
@@ -76,12 +76,12 @@ zclock_sleep (int msecs)
 //  ready to run. If there are no other threads of equal priority ready to run,
 //  the function returns immediately, and the thread continues execution. This
 //  behavior changed starting with Windows Server 2003.
-#if defined (NTDDI_VERSION) && defined (NTDDI_WS03) && (NTDDI_VERSION >= NTDDI_WS03)
+#   if defined (NTDDI_VERSION) && defined (NTDDI_WS03) && (NTDDI_VERSION >= NTDDI_WS03)
     Sleep (msecs);
-#else
+#   else
     if (msecs > 0)
         Sleep (msecs);
-#endif
+#   endif
 #endif
 }
 
