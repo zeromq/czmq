@@ -80,6 +80,7 @@
  *  __UTYPE_IBMAIX      IBM RS/6000 AIX
  *  __UTYPE_FREEBSD     FreeBSD
  *  __UTYPE_HPUX        HP/UX
+ *  __UTYPE_ANDROID     Android
  *  __UTYPE_LINUX       Linux
  *  __UTYPE_MIPS        MIPS (BSD 4.3/System V mixture)
  *  __UTYPE_NETBSD      NetBSD
@@ -189,6 +190,9 @@
 #elif (defined (APPLE) || defined (__APPLE__))
 #   define __UTYPE_GENERIC
 #   define __UNIX__
+#elif (defined (__ANDROID__))
+#   define __UTYPE_ANDROID
+#   define __UNIX__
 #elif (defined (LINUX) || defined (linux))
 #   define __UTYPE_LINUX
 #   define __UNIX__
@@ -291,7 +295,6 @@
 #   include <utime.h>
 #   include <syslog.h>
 #   include <inttypes.h>
-#   include <ifaddrs.h>
 #   include <sys/types.h>
 #   include <sys/param.h>
 #   include <sys/socket.h>
@@ -301,6 +304,9 @@
 #   include <sys/file.h>
 #   include <sys/wait.h>
 #   include <netinet/in.h>              //  Must come before arpa/inet.h
+#   if (!defined (__UTYPE_ANDROID))
+#       include <ifaddrs.h>
+#   endif
 #   if (!defined (__UTYPE_BEOS))
 #       include <arpa/inet.h>
 #       if (!defined (TCP_NODELAY))
