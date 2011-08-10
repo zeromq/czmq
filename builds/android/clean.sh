@@ -19,8 +19,8 @@ if [ -d $SRC_DIR/libs ]; then
     rm -rf $SRC_DIR/libs
 fi
 
-if [ -h libzmq.so ]; then
-    rm libzmq.so
+if [ -h libczmq.so ]; then
+    rm libczmq.so
 fi
 
 exit 0
