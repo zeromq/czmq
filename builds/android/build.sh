@@ -2,11 +2,10 @@
 #
 #   Does an NDK build by creating the necessary JNI directory
 #   and copying the libzmq source files into a temporary tree.
-#   We build a static uuid library (libuuid isn't provided on
-#   Android) and link that into libzmq.so. After the build is
-#   done, creates a symlink to the resulting libzmq.so.
+#   It then builds libczmq.so and places a symlink in this
+#   directory.
 #
-#   The clean.sh script restores the libzmq environment to its
+#   The clean.sh script restores the libczmq environment to its
 #   former state.
 
 SRC_DIR="../../src/"
@@ -51,8 +50,9 @@ echo "Current Working dir: `pwd`"
 $NDK_BUILD
 popd
 
-if [ -f ../../src/libs/armeabi/libzmq.so ]; then
-	echo TODO LINK
+if [ -f ../../src/libs/armeabi/libczmq.so ]; then
+	echo "Symlinking ../../src/libs/armeabi/libczmq.so --> ./libczmq.so"
+	ln -s ../../src/libs/armeabi/libczmq.so ./libczmq.so
 fi
 
 
