@@ -1,6 +1,8 @@
 BASE_PATH := $(call my-dir)
 APP_PLATFORM = android-10
 
+LOCAL_PATH := $(BASE_PATH)
+
 #Info for libzmq
 include $(CLEAR_VARS)
 LOCAL_MODULE := zmq
@@ -10,7 +12,6 @@ include $(PREBUILT_SHARED_LIBRARY)
 
 # build czmq
 include $(CLEAR_VARS)
-LOCAL_PATH := $(BASE_PATH)
 LOCAL_MODULE := czmq
 LOCAL_C_INCLUDES := ../../include $(LIBZMQ)/include
 LOCAL_SRC_FILES := \

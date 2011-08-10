@@ -11,8 +11,6 @@ if [ -d $JNI_DIR ]; then
     rm -rf $JNI_DIR
 fi
 
-echo 1
-
 if [ -d $SRC_DIR/obj ]; then
     rm -rf $SRC_DIR/obj
 fi

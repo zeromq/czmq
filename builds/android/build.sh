@@ -24,7 +24,7 @@ if [ -z "$LIBZMQ" ]; then
 	exit 2
 fi
 
-if [ -h $LIBZMQ/src/libs/armeabi/libzmq.so ]; then
+if [ ! -e $LIBZMQ/builds/android/libzmq.so ]; then
 	echo "You must build libzmq for android"
 	exit 3
 fi
@@ -42,7 +42,8 @@ done
 
 cp Android.mk $JNI_DIR;
 cp Application.mk $JNI_DIR
-cp $LIBZMQ/src/libs/armeabi/libzmq.so $JNI_DIR/
+
+ln -s $LIBZMQ/builds/android/libzmq.so $JNI_DIR/libzmq.so
 
 pushd .
 cd $JNI_DIR
