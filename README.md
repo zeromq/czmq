@@ -182,14 +182,6 @@ This is the class interface:
     void
         zctx_set_linger (zctx_t *self, int linger);
     
-    //  Create socket within this context, for czmq use only
-    void *
-        zctx__socket_new (zctx_t *self, int type);
-    
-    //  Destroy socket within this context, for czmq use only
-    void
-        zctx__socket_destroy (zctx_t *self, void *socket);
-    
     //  Self test of this class
     int
         zctx_test (Bool verbose);
@@ -315,6 +307,45 @@ This is the class interface:
     void zsockopt_set_rcvhwm (void *socket, int rcvhwm);
     void zsockopt_set_affinity (void *socket, int affinity);
     void zsockopt_set_identity (void *socket, char * identity);
+    void zsockopt_set_rate (void *socket, int rate);
+    void zsockopt_set_recovery_ivl (void *socket, int recovery_ivl);
+    void zsockopt_set_sndbuf (void *socket, int sndbuf);
+    void zsockopt_set_rcvbuf (void *socket, int rcvbuf);
+    void zsockopt_set_linger (void *socket, int linger);
+    void zsockopt_set_reconnect_ivl (void *socket, int reconnect_ivl);
+    void zsockopt_set_reconnect_ivl_max (void *socket, int reconnect_ivl_max);
+    void zsockopt_set_backlog (void *socket, int backlog);
+    void zsockopt_set_maxmsgsize (void *socket, int maxmsgsize);
+    void zsockopt_set_subscribe (void *socket, char * subscribe);
+    void zsockopt_set_unsubscribe (void *socket, char * unsubscribe);
+    
+    //  Emulation of widely-used 2.x socket options
+    void zsockopt_set_hwm (void *socket, int hwm);
+    #endif
+    
+    #if (ZMQ_VERSION_MAJOR == 4)
+    //  Get socket options
+    int  zsockopt_sndhwm (void *socket);
+    int  zsockopt_rcvhwm (void *socket);
+    int  zsockopt_affinity (void *socket);
+    int  zsockopt_rate (void *socket);
+    int  zsockopt_recovery_ivl (void *socket);
+    int  zsockopt_sndbuf (void *socket);
+    int  zsockopt_rcvbuf (void *socket);
+    int  zsockopt_linger (void *socket);
+    int  zsockopt_reconnect_ivl (void *socket);
+    int  zsockopt_reconnect_ivl_max (void *socket);
+    int  zsockopt_backlog (void *socket);
+    int  zsockopt_maxmsgsize (void *socket);
+    int  zsockopt_type (void *socket);
+    int  zsockopt_rcvmore (void *socket);
+    int  zsockopt_fd (void *socket);
+    int  zsockopt_events (void *socket);
+    
+    //  Set socket options
+    void zsockopt_set_sndhwm (void *socket, int sndhwm);
+    void zsockopt_set_rcvhwm (void *socket, int rcvhwm);
+    void zsockopt_set_affinity (void *socket, int affinity);
     void zsockopt_set_rate (void *socket, int rate);
     void zsockopt_set_recovery_ivl (void *socket, int recovery_ivl);
     void zsockopt_set_sndbuf (void *socket, int sndbuf);
@@ -693,13 +724,13 @@ This is the class interface:
     //  and is used to simulate a separate process. It gets no ctx, and no
     //  pipe.
     void
-        zthread_new (zctx_t *self, zthread_detached_fn *thread_fn, void *args);
+        zthread_new (zthread_detached_fn *thread_fn, void *args);
     
     //  Create an attached thread. An attached thread gets a ctx and a PAIR
     //  pipe back to its parent. It must monitor its pipe, and exit if the
     //  pipe becomes unreadable.
     void *
-        zthread_fork (zctx_t *self, zthread_attached_fn *thread_fn, void *args);
+        zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args);
     
     //  Self test of this class
     int
