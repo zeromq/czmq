@@ -23,7 +23,7 @@ if INSTALL_MAN
 dist_man_MANS = $(MAN_DOC)
 endif
 
-EXTRA_DIST = asciidoc.conf $(MAN_TXT)
+EXTRA_DIST = asciidoc.conf mkman $(MAN_TXT)
 
 MAINTAINERCLEANFILES = $(MAN_DOC)
 
