@@ -18,13 +18,13 @@ typedef void (zthread_attached_fn) (void *args, zctx_t *ctx, void *pipe);
 //  and is used to simulate a separate process. It gets no ctx, and no
 //  pipe.
 void
-    zthread_new (zctx_t *self, zthread_detached_fn *thread_fn, void *args);
+    zthread_new (zthread_detached_fn *thread_fn, void *args);
 
 //  Create an attached thread. An attached thread gets a ctx and a PAIR
 //  pipe back to its parent. It must monitor its pipe, and exit if the
 //  pipe becomes unreadable.
 void *
-    zthread_fork (zctx_t *self, zthread_attached_fn *thread_fn, void *args);
+    zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args);
 
 //  Self test of this class
 int
@@ -92,7 +92,7 @@ s_test_attached (void *args, zctx_t *ctx, void *pipe)
     zctx_t *ctx = zctx_new ();
 
     //  Create a detached thread, let it run
-    zthread_new (ctx, s_test_detached, NULL);
+    zthread_new (s_test_detached, NULL);
     zclock_sleep (100);
 
     //  Create an attached thread, check it's safely alive

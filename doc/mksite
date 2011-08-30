@@ -51,9 +51,6 @@ if [ $UPLOAD -eq 1 ]; then
     #   Send table of contents as category:_start
     do_upload "_start" "CZMQ Documentation"
 
-    #   Send template as category:_template
-    do_upload "_template" "Category template - generated"
-
     #   Now send individual man pages
     for FILE in $FILES; do
         TITLE=`egrep --after-context 1 PAGE_TITLE $FILE.wd | egrep $FILE`
