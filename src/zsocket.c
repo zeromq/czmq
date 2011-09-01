@@ -110,9 +110,9 @@ zsocket_bind (void *socket, const char *format, ...)
 
 //  --------------------------------------------------------------------------
 //  Connect a socket to a formatted endpoint
-//  Checks with assertion that the connect was valid
+//  Returns 0 if the endpoint is valid, -1 if the connect failed.
 
-void
+int
 zsocket_connect (void *socket, const char *format, ...)
 {
     char endpoint [256];
@@ -120,8 +120,7 @@ zsocket_connect (void *socket, const char *format, ...)
     va_start (argptr, format);
     vsnprintf (endpoint, 256, format, argptr);
     va_end (argptr);
-    int rc = zmq_connect (socket, endpoint);
-    assert (rc == 0);
+    return zmq_connect (socket, endpoint);
 }
 
 
