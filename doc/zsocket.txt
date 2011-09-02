@@ -32,8 +32,8 @@ int
     zsocket_bind (void *socket, const char *format, ...);
 
 //  Connect a socket to a formatted endpoint
-//  Checks with assertion that the connect was valid
-void
+//  Returns 0 if OK, -1 if the endpoint was invalid.
+int
     zsocket_connect (void *socket, const char *format, ...);
 
 //  Returns socket type as printable constant string
