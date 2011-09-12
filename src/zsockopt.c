@@ -1225,6 +1225,8 @@ zsockopt_test (Bool verbose)
 
     //  @selftest
     zctx_t *ctx = zctx_new ();
+    assert (ctx);
+
     void *socket;
 #if (ZMQ_VERSION_MAJOR == 2)
     socket = zsocket_new (ctx, ZMQ_SUB);

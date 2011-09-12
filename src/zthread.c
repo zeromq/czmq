@@ -182,6 +182,7 @@ zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args)
     shim->attached = thread_fn;
     shim->args = args;
     shim->ctx = zctx_shadow (ctx);
+    assert (shim->ctx);
 
     //  Connect child pipe to our pipe
     shim->pipe = zsocket_new (shim->ctx, ZMQ_PAIR);
@@ -203,6 +204,8 @@ s_test_detached (void *args)
 {
     //  Create a socket to check it'll be automatically deleted
     zctx_t *ctx = zctx_new ();
+    assert (ctx);
+
     void *push = zsocket_new (ctx, ZMQ_PUSH);
     zctx_destroy (&ctx);
     return NULL;
@@ -227,6 +230,7 @@ zthread_test (Bool verbose)
 
     //  @selftest
     zctx_t *ctx = zctx_new ();
+    assert (ctx);
 
     //  Create a detached thread, let it run
     zthread_new (s_test_detached, NULL);

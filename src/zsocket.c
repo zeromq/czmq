@@ -156,6 +156,7 @@ zsocket_test (Bool verbose)
 
     //  @selftest
     zctx_t *ctx = zctx_new ();
+    assert (ctx);
 
     //  Create a detached thread, let it run
     char *interf = "*";
