@@ -57,8 +57,9 @@ zframe_t *
 zframe_t *
     zframe_recv_nowait (void *socket);
 
-//  Send a frame to a socket, destroy frame after sending
-void
+// Send a frame to a socket, destroy frame after sending.  Returns
+// non-zero error code on failure.
+int
     zframe_send (zframe_t **self_p, void *socket, int flags);
 
 //  Return number of bytes in frame data
