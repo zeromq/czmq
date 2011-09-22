@@ -100,6 +100,9 @@ zsocket_bind (void *socket, const char *format, ...)
     }
     else {
         rc = zmq_bind (socket, endpoint);
+        if (rc)
+            fprintf (stderr, "E: zsocket_bind to %s failed\n", endpoint);
+
         assert (rc == 0);
         //  Return actual port used for binding
         rc = atoi (strrchr (endpoint, ':') + 1);
