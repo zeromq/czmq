@@ -450,35 +450,92 @@ zmsg_save (zmsg_t *self, FILE *file)
 
 //  --------------------------------------------------------------------------
 //  Load/append an open file into message, create new message if
-//  null message provided.
-//  FIXME: Not sure what to do with errors in this one...break seems
-//  wrong - silent corrupt messages are possible.
+//  null message provided.  Return 0 if OK, non-zero otherwise.  The 
+//  returned message should be identical to the passed in message on
+//  error.
+//  
 
-zmsg_t *
-zmsg_load (zmsg_t *self, FILE *file)
+int
+zmsg_load (zmsg_t *self, FILE *file, zmsg_t **return_self)
 {
     assert (file);
-    if (!self)
-        self = zmsg_new ();
+    int error = 0;
+    int frame_count = 0;
+    int created_msg = 0;
+    zmsg_t *tmp_msg = NULL;
+
+    // NULL out return_self so the caller knows not to use it on failure
+    *return_self = NULL;
+
+    if (self)
+        tmp_msg = self;
+    else {
+        tmp_msg = zmsg_new ();
+        if (!tmp_msg) {
+            error = ENOMEM;
+            goto end;
+        }
+        created_msg = 1;
+    }
 
     while (TRUE) {
         size_t frame_size;
+        clearerr (file);
         size_t rc = fread (&frame_size, sizeof (frame_size), 1, file);
         if (rc == 1) {
             zframe_t *frame = zframe_new (NULL, frame_size);
             if (frame) {
-                rc = fread (zframe_data (frame), frame_size, 1, file);
-                if (frame_size > 0 && rc != 1)
-                    break;          //  Unable to read properly, quit
-                zmsg_add (self, frame);
+                if (frame_size) {
+                    clearerr (file);
+                    rc = fread (zframe_data (frame), frame_size, 1, file);
+                    if (rc != 1) {
+                        error = ferror (file);
+                        if (!error)
+                            error = 1;
+                        goto end;
+                    }
+                }
+
+                zmsg_add (tmp_msg, frame);
+                frame_count++;
             }
-            else
-                break;
+            else {
+                error = ENOMEM;
+                goto end;          // Unable to allocate frame, quit
+            }
         }
-        else
-            break;              //  Unable to read properly, quit
+        else {
+            if (feof (file))
+                goto end;
+
+            error = ferror (file);
+            if (!error) 
+                error = 1;
+            goto end;              //  Unable to read properly, quit
+        }
     }
-    return self;
+
+end:
+    if (error) {
+        if (tmp_msg) {
+            // need to rewind the frames we added to the message
+            // to return the message to its original state
+            int i = 0;
+            zframe_t *lastframe;
+            for(i = 0; i < frame_count; i++) {
+                lastframe = zmsg_last (tmp_msg);
+                zmsg_remove (tmp_msg, lastframe);
+                zframe_destroy (&lastframe);
+            }
+            // Only destroy the message if we created it in this function
+            if (created_msg)
+                zmsg_destroy (&tmp_msg);
+        }
+    }
+
+    *return_self = tmp_msg;
+
+    return error;
 }
 
 
@@ -737,7 +794,8 @@ zmsg_test (Bool verbose)
     zmsg_destroy (&msg);
 
     file = fopen ("zmsg.test", "r");
-    msg = zmsg_load (NULL, file);
+    rc = zmsg_load (NULL, file, &msg);
+    assert (rc == 0);
     fclose (file);
     remove ("zmsg.test");
     assert (zmsg_size (msg) == 10);

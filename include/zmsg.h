@@ -128,8 +128,8 @@ int
 
 //  Load/append an open file into message, create new message if
 //  null message provided.
-zmsg_t *
-    zmsg_load (zmsg_t *self, FILE *file);
+int
+    zmsg_load (zmsg_t *self, FILE *file, zmsg_t **return_msg);
 
 //  Encode message to a new buffer, return buffer size
 size_t
