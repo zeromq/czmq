@@ -166,31 +166,60 @@ zthread_new (zthread_detached_fn *thread_fn, void *args)
 //  Create an attached thread. An attached thread gets a ctx and a PAIR
 //  pipe back to its parent. It must monitor its pipe, and exit if the
 //  pipe becomes unreadable.
+//  FIXME: Return error code
 
 void *
 zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args)
 {
+    int error = 0;
+    shim_t *shim = NULL;
     //  Create our end of the pipe
     //  Pipe has HWM of 1 at both sides to block runaway writers
     void *pipe = zsocket_new (ctx, ZMQ_PAIR);
-    assert (pipe);
+    if (!pipe) {
+        error = ENOMEM;
+        goto end;
+    }
+
     zsockopt_set_hwm (pipe, 1);
     zsocket_bind (pipe, "inproc://zctx-pipe-%p", pipe);
 
     //  Prepare argument shim for child thread
-    shim_t *shim = (shim_t *) zmalloc (sizeof (shim_t));
+    shim = (shim_t *) zmalloc (sizeof (shim_t));
+    if (!shim) {
+        error = ENOMEM;
+        goto end;
+    }
+
     shim->attached = thread_fn;
     shim->args = args;
     shim->ctx = zctx_shadow (ctx);
-    assert (shim->ctx);
+    if (!shim->ctx) {
+        error = ENOMEM;
+        goto end;
+    }
 
     //  Connect child pipe to our pipe
     shim->pipe = zsocket_new (shim->ctx, ZMQ_PAIR);
-    assert (shim->pipe);
+    if (!shim->pipe) {
+        error = ENOMEM;
+        goto end;
+    }
     zsockopt_set_hwm (shim->pipe, 1);
     zsocket_connect (shim->pipe, "inproc://zctx-pipe-%p", pipe);
 
     s_thread_start (shim);
+
+end:
+    if (error) {
+        if (shim) {
+            zsocket_destroy (shim->ctx, shim->pipe);
+            zctx_destroy (&(shim->ctx));
+            free (shim);
+        }
+        zsocket_destroy (ctx, pipe);
+    }
+
     return pipe;
 }
 
@@ -239,6 +268,7 @@ zthread_test (Bool verbose)
 
     //  Create an attached thread, check it's safely alive
     void *pipe = zthread_fork (ctx, s_test_attached, NULL);
+    assert (pipe);
     zstr_send (pipe, "ping");
     char *pong = zstr_recv (pipe);
     assert (streq (pong, "pong"));
