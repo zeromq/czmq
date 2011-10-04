@@ -59,7 +59,8 @@ zmsg_new (void)
         *self;
 
     self = (zmsg_t *) zmalloc (sizeof (zmsg_t));
-    self->frames = zlist_new ();
+    if (self)
+        self->frames = zlist_new ();
     return self;
 }
 
@@ -94,6 +95,8 @@ zmsg_recv (void *socket)
 {
     assert (socket);
     zmsg_t *self = zmsg_new ();
+    if (!self)
+        goto end;
     while (1) {
         zframe_t *frame = zframe_recv (socket);
         if (!frame) {
@@ -104,6 +107,8 @@ zmsg_recv (void *socket)
         if (!zframe_more (frame))
             break;              //  Last message frame
     }
+
+end:
     return self;
 }
 
@@ -613,6 +618,9 @@ zmsg_t *
 zmsg_decode (byte *buffer, size_t buffer_size)
 {
     zmsg_t *self = zmsg_new ();
+    if (!self)
+        goto end;
+
     byte *source = buffer;
     byte *limit = buffer + buffer_size;
     while (source < limit) {
@@ -651,6 +659,8 @@ zmsg_decode (byte *buffer, size_t buffer_size)
             break;
         }
     }
+
+end:
     return self;
 }
 
@@ -671,6 +681,9 @@ zmsg_dup (zmsg_t *self)
         goto end;
     }
     copy = zmsg_new ();
+    if (!copy)
+        goto end;
+
     while (frame) {
         rc = zmsg_addmem (copy, zframe_data (frame), zframe_size (frame));
         if (rc) {
@@ -681,6 +694,7 @@ zmsg_dup (zmsg_t *self)
     }
 
 end:
+
     return copy;
 }
 
@@ -726,6 +740,7 @@ zmsg_test (Bool verbose)
 
     //  Test send and receive of single-frame message
     zmsg_t *msg = zmsg_new ();
+    assert (msg);
     zframe_t *frame = zframe_new ("Hello", 5);
     assert (frame);
     zmsg_push (msg, frame);
@@ -742,6 +757,7 @@ zmsg_test (Bool verbose)
 
     //  Test send and receive of multi-frame message
     msg = zmsg_new ();
+    assert (msg);
     rc = zmsg_addmem (msg, "Frame0", 6);
     assert(rc == 0);
     rc = zmsg_addmem (msg, "Frame1", 6);
@@ -830,6 +846,7 @@ zmsg_test (Bool verbose)
 
     //  Test encoding/decoding
     msg = zmsg_new ();
+    assert (msg);
     byte *blank = zmalloc (100000);
     rc = zmsg_addmem (msg, blank, 0);
     assert(rc == 0);
@@ -861,6 +878,7 @@ zmsg_test (Bool verbose)
 
     //  Now try methods on an empty message
     msg = zmsg_new ();
+    assert (msg);
     assert (zmsg_size (msg) == 0);
     assert (zmsg_first (msg) == NULL);
     assert (zmsg_next (msg) == NULL);
