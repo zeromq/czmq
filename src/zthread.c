@@ -207,6 +207,7 @@ s_test_detached (void *args)
     assert (ctx);
 
     void *push = zsocket_new (ctx, ZMQ_PUSH);
+    assert (push);
     zctx_destroy (&ctx);
     return NULL;
 }

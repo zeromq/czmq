@@ -410,8 +410,10 @@ zloop_test (Bool verbose)
     assert (ctx);
 
     void *output = zsocket_new (ctx, ZMQ_PAIR);
+    assert (output);
     zsocket_bind (output, "inproc://zloop.test");
     void *input = zsocket_new (ctx, ZMQ_PAIR);
+    assert (input);
     zsocket_connect (input, "inproc://zloop.test");
 
     zloop_t *loop = zloop_new ();

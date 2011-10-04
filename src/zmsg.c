@@ -734,8 +734,10 @@ zmsg_test (Bool verbose)
     assert (ctx);
 
     void *output = zsocket_new (ctx, ZMQ_PAIR);
+    assert (output);
     zsocket_bind (output, "inproc://zmsg.test");
     void *input = zsocket_new (ctx, ZMQ_PAIR);
+    assert (input);
     zsocket_connect (input, "inproc://zmsg.test");
 
     //  Test send and receive of single-frame message
