@@ -850,6 +850,7 @@ zmsg_test (Bool verbose)
     msg = zmsg_new ();
     assert (msg);
     byte *blank = zmalloc (100000);
+    assert (blank);
     rc = zmsg_addmem (msg, blank, 0);
     assert(rc == 0);
     rc = zmsg_addmem (msg, blank, 1);
