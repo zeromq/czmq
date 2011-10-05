@@ -201,14 +201,19 @@ int
 zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
 {
     assert (self);
-    zlist_push (self->pollers, s_poller_new (item, handler, arg));
+    int error = 0;
+    error = zlist_push (self->pollers, s_poller_new (item, handler, arg));
+    if (error) {
+        error = -1;
+        goto end;
+    }
     self->dirty = TRUE;
     if (self->verbose)
         zclock_log ("I: zloop: register %s poller (%p, %d)",
             item->socket? zsocket_type_str (item->socket): "FD",
             item->socket, item->fd);
-
-    return 0;
+end:
+    return error;
 }
 
 
@@ -250,27 +255,37 @@ int
 zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *arg)
 {
     assert (self);
-    zlist_push (self->timers, s_timer_new (delay, times, handler, arg));
+    int error = zlist_push (self->timers,
+        s_timer_new (delay, times, handler, arg));
+    if (error)
+        goto end;
     if (self->verbose)
         zclock_log ("I: zloop: register timer delay=%d times=%d", delay, times);
-    return 0;
+
+end:
+    return error;
 }
 
 
 //  --------------------------------------------------------------------------
 //  Cancel all timers for a specific argument (as provided in zloop_timer)
-void
+//  Returnes 0 on success
+int
 zloop_timer_end (zloop_t *self, void *arg)
 {
     assert (self);
     assert (arg);
-
+    int error = 0;
     //  We cannot touch self->timers because we may be executing that
     //  from inside the poll loop. So, we hold the arg on the zombie
     //  list, and process that list when we're done executing timers.
-    zlist_append (self->zombies, arg);
+    error = zlist_append (self->zombies, arg);
+    if (error)
+        goto end;
     if (self->verbose)
         zclock_log ("I: zloop: cancel timer");
+end:
+    return error;
 }
 
 //  --------------------------------------------------------------------------
@@ -404,7 +419,7 @@ int
 zloop_test (Bool verbose)
 {
     printf (" * zloop: ");
-
+    int rc = 0;
     //  @selftest
     zctx_t *ctx = zctx_new ();
     assert (ctx);
@@ -424,7 +439,8 @@ zloop_test (Bool verbose)
     zloop_timer (loop, 10, 1,  s_timer_event, output);
     //  When we get the ping message, end the reactor
     zmq_pollitem_t poll_input = { input, 0, ZMQ_POLLIN };
-    zloop_poller (loop, &poll_input, s_socket_event, NULL);
+    rc = zloop_poller (loop, &poll_input, s_socket_event, NULL);
+    assert (rc == 0);
     zloop_start (loop);
 
     zloop_destroy (&loop);

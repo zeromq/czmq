@@ -126,11 +126,16 @@ zlist_next (zlist_t *self)
 //  --------------------------------------------------------------------------
 //  Add item to the end of the list
 
-void
+int
 zlist_append (zlist_t *self, void *item)
 {
+    int error = 0;
     struct node_t *node;
     node = (struct node_t *) zmalloc (sizeof (struct node_t));
+    if (!node) {
+        error = ENOMEM;
+        goto end;
+    }
     node->item = item;
     if (self->tail)
         self->tail->next = node;
@@ -140,17 +145,25 @@ zlist_append (zlist_t *self, void *item)
     node->next = NULL;
     self->size++;
     self->cursor = NULL;
+
+end:
+    return error;
 }
 
 
 //  --------------------------------------------------------------------------
 //  Insert item at the beginning of the list
 
-void
+int
 zlist_push (zlist_t *self, void *item)
 {
+    int error = 0;
     struct node_t *node;
     node = (struct node_t *) zmalloc (sizeof (struct node_t));
+    if (!node) {
+        error = ENOMEM;
+        goto end;
+    }
     node->item = item;
     node->next = self->head;
     self->head = node;
@@ -158,6 +171,9 @@ zlist_push (zlist_t *self, void *item)
         self->tail = node;
     self->size++;
     self->cursor = NULL;
+
+end:
+    return error;
 }
 
 
@@ -223,11 +239,17 @@ zlist_copy (zlist_t *self)
         return NULL;
 
     zlist_t *copy = zlist_new ();
-    assert (copy);
+    if (!copy)
+        goto end;
 
     struct node_t *node;
     for (node = self->head; node; node = node->next)
-        zlist_append (copy, node->item);
+        if (!zlist_append (copy, node->item)) {
+            zlist_destroy(&copy);
+            break;
+        }
+
+end:
     return copy;
 }
 

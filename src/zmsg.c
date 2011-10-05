@@ -59,8 +59,17 @@ zmsg_new (void)
         *self;
 
     self = (zmsg_t *) zmalloc (sizeof (zmsg_t));
-    if (self)
-        self->frames = zlist_new ();
+    if (!self)
+	goto end;
+
+    self->frames = zlist_new ();
+    if (!(self->frames)) {
+	free (self);
+	self = NULL;
+	goto end;
+    }
+
+end:
     return self;
 }
 
@@ -103,7 +112,10 @@ zmsg_recv (void *socket)
             zmsg_destroy (&self);
             break;              //  Interrupted or terminated
         }
-        zmsg_add (self, frame);
+        if (zmsg_add (self, frame)) {
+	    zmsg_destroy (&self);
+	    break;
+	}
         if (!zframe_more (frame))
             break;              //  Last message frame
     }
@@ -164,14 +176,17 @@ zmsg_content_size (zmsg_t *self)
 //  --------------------------------------------------------------------------
 //  Push frame to the front of the message, i.e. before all other frames.
 //  Message takes ownership of frame, will destroy it when message is sent.
+//  Returns 0 on success;
 
-void
+int
 zmsg_push (zmsg_t *self, zframe_t *frame)
 {
     assert (self);
     assert (frame);
+    int error = 0;
     self->content_size += zframe_size (frame);
-    zlist_push (self->frames, (void *) frame);
+    error = zlist_push (self->frames, (void *) frame);
+    return error;
 }
 
 
@@ -193,14 +208,17 @@ zmsg_pop (zmsg_t *self)
 //  --------------------------------------------------------------------------
 //  Add frame to the end of the message, i.e. after all other frames.
 //  Message takes ownership of frame, will destroy it when message is sent.
+//  Returns 0 on success
 
-void
+int
 zmsg_add (zmsg_t *self, zframe_t *frame)
 {
     assert (self);
     assert (frame);
+    int error = 0;
     self->content_size += zframe_size (frame);
-    zlist_append (self->frames, frame);
+    error = zlist_append (self->frames, frame);
+    return error;
 }
 
 
@@ -215,7 +233,7 @@ zmsg_pushmem (zmsg_t *self, const void *src, size_t size)
     zframe_t *frame = zframe_new (src, size);
     if (frame) {
         self->content_size += size;
-        zlist_push (self->frames, frame);
+        error = zlist_push (self->frames, frame);
     }
     else
         error = ENOMEM;
@@ -235,7 +253,7 @@ zmsg_addmem (zmsg_t *self, const void *src, size_t size)
     zframe_t *frame = zframe_new (src, size);
     if (frame) {
         self->content_size += size;
-        zlist_append (self->frames, frame);
+        error = zlist_append (self->frames, frame);
     }
     else
         error = ENOMEM;
@@ -248,7 +266,7 @@ zmsg_addmem (zmsg_t *self, const void *src, size_t size)
 // function passed in determines how the frame containing the string
 // enters the list
 
-int zmsg_add_str_to_framelist (void (*list_fxn)(zlist_t *, void *),
+int zmsg_add_str_to_framelist (int (*list_fxn)(zlist_t *, void *),
                                zmsg_t *self, const char *format, va_list argptr)
 {
     assert (list_fxn);
@@ -282,7 +300,7 @@ int zmsg_add_str_to_framelist (void (*list_fxn)(zlist_t *, void *),
         goto end;
     }
 
-    list_fxn (self->frames, frame);
+    error = list_fxn (self->frames, frame);
 
 end:
     free (string);
@@ -354,9 +372,17 @@ zmsg_wrap (zmsg_t *self, zframe_t *frame)
     assert (frame);
     int error = 0;
     error = zmsg_pushmem (self, "", 0);
-    if (!error) {
-        zmsg_push (self, frame);
+    if (error)
+	goto end;
+
+    error = zmsg_push (self, frame);
+    if (error) {
+	// Rewind the empty frame
+	zmsg_pop (self);
+	goto end;
     }
+
+end:
     return error;
 }
 
@@ -501,7 +527,10 @@ zmsg_load (zmsg_t *self, FILE *file, zmsg_t **return_self)
                     }
                 }
 
-                zmsg_add (tmp_msg, frame);
+                error = zmsg_add (tmp_msg, frame);
+		if (error)
+		    goto end;
+
                 frame_count++;
             }
             else {
@@ -651,7 +680,11 @@ zmsg_decode (byte *buffer, size_t buffer_size)
         }
         zframe_t *frame = zframe_new (source, frame_size);
         if (frame) {
-            zmsg_add (self, frame);
+            if (zmsg_add (self, frame)) {
+		zmsg_destroy (&self);
+		break;
+	    }
+
             source += frame_size;
         }
         else {

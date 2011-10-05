@@ -60,7 +60,7 @@ size_t
     zmsg_content_size (zmsg_t *self);
 
 //  Push frame to front of message, before first frame
-void
+int
     zmsg_push (zmsg_t *self, zframe_t *frame);
 
 //  Pop frame off front of message, caller now owns frame
@@ -68,7 +68,7 @@ zframe_t *
     zmsg_pop (zmsg_t *self);
 
 //  Add frame to end of message, after last frame
-void
+int
     zmsg_add (zmsg_t *self, zframe_t *frame);
 
 //  Push block of memory as new frame to front of message.  Returns
