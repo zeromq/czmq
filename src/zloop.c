@@ -78,9 +78,14 @@ static s_poller_t *
 s_poller_new (zmq_pollitem_t *item, zloop_fn handler, void *arg)
 {
     s_poller_t *poller = (s_poller_t *) zmalloc (sizeof (s_poller_t));
+    if (!poller)
+        goto end;
+
     poller->item = *item;
     poller->handler = handler;
     poller->arg = arg;
+
+end:
     return poller;
 }
 
@@ -88,28 +93,47 @@ static s_timer_t *
 s_timer_new (size_t delay, size_t times, zloop_fn handler, void *arg)
 {
     s_timer_t *timer = (s_timer_t *) zmalloc (sizeof (s_timer_t));
+    if (!timer)
+        goto end;
+
     timer->delay = delay;
     timer->times = times;
     timer->handler = handler;
     timer->arg = arg;
     timer->when = -1;           //  Indicates a new timer
+
+end:
     return timer;
 }
 
 //  We hold an array of pollers that matches the pollset, so we can
 //  register/cancel pollers orthogonally to executing the pollset
 //  activity on pollers.
+//  Returns 0 on success, positive values on failure
 
-static void
+static int
 s_rebuild_pollset (zloop_t *self)
 {
     free (self->pollset);
     free (self->pollact);
+    int error = 0;
+    self->pollset = NULL;
+    self->pollact = NULL;
+
     self->poll_size = zlist_size (self->pollers);
     self->pollset = (zmq_pollitem_t *) zmalloc (
         self->poll_size * sizeof (zmq_pollitem_t));
+    if (!(self->pollset)) {
+        error = ENOMEM;
+        goto end;
+    }
+
     self->pollact = (s_poller_t *) zmalloc (
         self->poll_size * sizeof (s_poller_t));
+    if (!(self->pollact)) {
+        error = ENOMEM;
+        goto end;
+    }
 
     s_poller_t *poller = (s_poller_t *) zlist_first (self->pollers);
     uint item_nbr = 0;
@@ -120,6 +144,16 @@ s_rebuild_pollset (zloop_t *self)
         poller = (s_poller_t *) zlist_next (self->pollers);
     }
     self->dirty = FALSE;
+
+end:
+    if (error) {
+        free (self->pollset);
+        free (self->pollact);
+        self->pollset = NULL;
+        self->pollact = NULL;
+    }
+
+    return error;
 }
 
 static long
@@ -153,11 +187,39 @@ zloop_new (void)
 {
     zloop_t
         *self;
+    int error = 0;
 
     self = (zloop_t *) zmalloc (sizeof (zloop_t));
+    if (!self)
+        goto end;
+
     self->pollers = zlist_new ();
+    if (!(self->pollers)) {
+        error = ENOMEM;
+        goto end;
+    }
     self->timers = zlist_new ();
+    if (!(self->timers)) {
+        error = ENOMEM;
+        goto end;
+    }
     self->zombies = zlist_new ();
+    if (!(self->zombies)) {
+        error = ENOMEM;
+        goto end;
+    }
+
+end:
+    if (error) {
+        if (self) {
+            zlist_destroy(&(self->pollers));
+            zlist_destroy(&(self->timers));
+            zlist_destroy(&(self->zombies));
+        }
+        free(self);
+        self = NULL;
+    }
+
     return self;
 }
 
@@ -202,7 +264,12 @@ zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
 {
     assert (self);
     int error = 0;
-    error = zlist_push (self->pollers, s_poller_new (item, handler, arg));
+    s_poller_t *poller = s_poller_new (item, handler, arg);
+    if (!poller) {
+        error = ENOMEM;
+        goto end;
+    }
+    error = zlist_push (self->pollers, poller);
     if (error) {
         error = -1;
         goto end;
@@ -255,8 +322,13 @@ int
 zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *arg)
 {
     assert (self);
-    int error = zlist_push (self->timers,
-        s_timer_new (delay, times, handler, arg));
+    int error = 0;
+    s_timer_t *timer = s_timer_new (delay, times, handler, arg);
+    if (!timer) {
+        error = ENOMEM;
+        goto end;
+    }
+    error = zlist_push (self->timers, timer);
     if (error)
         goto end;
     if (self->verbose)
@@ -301,7 +373,8 @@ zloop_set_verbose (zloop_t *self, Bool verbose)
 //  Start the reactor. Takes control of the thread and returns when the 0MQ
 //  context is terminated or the process is interrupted, or any event handler
 //  returns -1. Event handlers may register new sockets and timers, and
-//  cancel sockets. Returns 0 if interrupted, -1 if cancelled by a handler.
+//  cancel sockets. Returns 0 if interrupted, -1 if cancelled by a
+//  handler, positive on internal error
 
 int
 zloop_start (zloop_t *self)
@@ -317,8 +390,13 @@ zloop_start (zloop_t *self)
     }
     //  Main reactor loop
     while (!zctx_interrupted) {
-        if (self->dirty)
-            s_rebuild_pollset (self);
+        if (self->dirty) {
+            // If s_rebuild_pollset() fails, break out of the loop and
+            // return its error
+            rc = s_rebuild_pollset (self);
+            if (rc)
+                break;
+        }
         rc = zmq_poll (self->pollset, self->poll_size,
                        s_tickless_timer (self) * ZMQ_POLL_MSEC);
         if (rc == -1 || zctx_interrupted) {
