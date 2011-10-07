@@ -151,14 +151,21 @@ s_thread_start (shim_t *shim)
 //  and is used to simulate a separate process. It gets no ctx, and no
 //  pipe.
 
-void
+int
 zthread_new (zthread_detached_fn *thread_fn, void *args)
 {
+    int error = 0;
     //  Prepare argument shim for child thread
     shim_t *shim = (shim_t *) zmalloc (sizeof (shim_t));
+    if (!shim) {
+        error = ENOMEM;
+        goto end;
+    }
     shim->detached = thread_fn;
     shim->args = args;
     s_thread_start (shim);
+end:
+    return error;
 }
 
 
@@ -261,9 +268,11 @@ zthread_test (Bool verbose)
     //  @selftest
     zctx_t *ctx = zctx_new ();
     assert (ctx);
+    int rc = 0;
 
     //  Create a detached thread, let it run
-    zthread_new (s_test_detached, NULL);
+    rc = zthread_new (s_test_detached, NULL);
+    assert (rc == 0);
     zclock_sleep (100);
 
     //  Create an attached thread, check it's safely alive
