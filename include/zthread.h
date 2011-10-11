@@ -41,7 +41,7 @@ typedef void (zthread_attached_fn) (void *args, zctx_t *ctx, void *pipe);
 //  Create a detached thread. A detached thread operates autonomously
 //  and is used to simulate a separate process. It gets no ctx, and no
 //  pipe.
-void
+int
     zthread_new (zthread_detached_fn *thread_fn, void *args);
 
 //  Create an attached thread. An attached thread gets a ctx and a PAIR

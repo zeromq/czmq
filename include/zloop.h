@@ -67,7 +67,7 @@ int
     zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *arg);
 
 //  Cancel all timers for a specific argument (as provided in zloop_timer)
-void
+int
     zloop_timer_end (zloop_t *self, void *arg);
 
 //  Set verbose tracing of reactor on/off

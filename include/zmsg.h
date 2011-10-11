@@ -60,7 +60,7 @@ size_t
     zmsg_content_size (zmsg_t *self);
 
 //  Push frame to front of message, before first frame
-void
+int
     zmsg_push (zmsg_t *self, zframe_t *frame);
 
 //  Pop frame off front of message, caller now owns frame
@@ -68,23 +68,27 @@ zframe_t *
     zmsg_pop (zmsg_t *self);
 
 //  Add frame to end of message, after last frame
-void
+int
     zmsg_add (zmsg_t *self, zframe_t *frame);
 
-//  Push block of memory as new frame to front of message
-void
+//  Push block of memory as new frame to front of message.  Returns
+//  non-zero error code on failure
+int
     zmsg_pushmem (zmsg_t *self, const void *src, size_t size);
 
-//  Push block of memory as new frame to end of message
-void
+//  Push block of memory as new frame to end of message.  Returns
+//  non-zero error code on failure
+int
     zmsg_addmem (zmsg_t *self, const void *src, size_t size);
 
-//  Push string as new frame to front of message
-void
+//  Push string as new frame to front of message.  Returns non-zero
+//  error code on failure
+int
     zmsg_pushstr (zmsg_t *self, const char *format, ...);
 
-//  Push string as new frame to end of message
-void
+//  Push string as new frame to end of message.  Returns non-zero
+//  error code on failure
+int
     zmsg_addstr (zmsg_t *self, const char *format, ...);
 
 //  Pop frame off front of message, return as fresh string
@@ -93,7 +97,8 @@ char *
 
 //  Push frame to front of message, before first frame
 //  Pushes an empty frame in front of frame
-void
+//  Returns non-zero error code on failure
+int
     zmsg_wrap (zmsg_t *self, zframe_t *frame);
 
 //  Pop frame off front of message, caller now owns frame
@@ -123,8 +128,8 @@ int
 
 //  Load/append an open file into message, create new message if
 //  null message provided.
-zmsg_t *
-    zmsg_load (zmsg_t *self, FILE *file);
+int
+    zmsg_load (zmsg_t *self, FILE *file, zmsg_t **return_msg);
 
 //  Encode message to a new buffer, return buffer size
 size_t

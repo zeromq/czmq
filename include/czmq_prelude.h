@@ -468,8 +468,9 @@ static inline void *
 //  Define _ZMALLOC_DEBUG if you need to trace memory leaks using e.g. mtrace,
 //  otherwise all allocations will claim to come from zfl_prelude.h.  For best
 //  results, compile all classes so you see dangling object allocations.
-//
-#ifdef _ZMALLOC_DEBUG
+//  _ZMALLOC_PEDANTIC does the same thing, but its intention is to propagate
+//  out of memory condition back up the call stack.
+#if defined _ZMALLOC_DEBUG || _ZMALLOC_PEDANTIC
 #   define zmalloc(size) calloc(1,(size))
 #else
 #   define zmalloc(size) safe_malloc((size), __FILE__, __LINE__, CZMQ_ASSERT_SANE_FUNCTION)
