@@ -96,7 +96,15 @@ zctx_new (void)
         *self;
 
     self = (zctx_t *) zmalloc (sizeof (zctx_t));
+    if (!self)
+        goto end;
+
     self->sockets = zlist_new ();
+    if (!(self->sockets)) {
+        free(self);
+        self = NULL;
+        goto end;
+    }
     self->iothreads = 1;
     self->main = TRUE;
 
@@ -109,6 +117,8 @@ zctx_new (void)
     sigaction (SIGINT, &action, NULL);
     sigaction (SIGTERM, &action, NULL);
 #endif
+
+end:
 
     return self;
 }
@@ -146,8 +156,18 @@ zctx_shadow (zctx_t *ctx)
     //  Shares same 0MQ context but has its own list of sockets so that
     //  we create, use, and destroy sockets only within a single thread.
     self = (zctx_t *) zmalloc (sizeof (zctx_t));
+    if (!self)
+        goto end;
+
     self->sockets = zlist_new ();
+    if (!(self->sockets)) {
+        free (self);
+        self = NULL;
+        goto end;
+    }
     self->context = ctx->context;
+
+end:
     return self;
 }
 
@@ -185,16 +205,24 @@ void *
 zctx__socket_new (zctx_t *self, int type)
 {
     assert (self);
+    void *socket = NULL;
     //  Initialize context now if necessary
     if (self->context == NULL)
         self->context = zmq_init (self->iothreads);
-    assert (self->context);
+    if (!(self->context))
+        goto end;
+
     //  Create and register socket
-    void *socket = zmq_socket (self->context, type);
-    if (socket) {
-        assert (socket);
-        zlist_push (self->sockets, socket);
+    socket = zmq_socket (self->context, type);
+    if (!socket)
+        goto end;
+
+    if (zlist_push (self->sockets, socket)) {
+        zmq_close (socket);
+        socket = NULL;
     }
+
+end:
     return socket;
 }
 
@@ -230,6 +258,7 @@ zctx_test (Bool verbose)
 
     //  Create a context with many busy sockets, destroy it
     ctx = zctx_new ();
+    assert (ctx);
     zctx_set_iothreads (ctx, 1);
     zctx_set_linger (ctx, 5);       //  5 msecs
     void *s1 = zctx__socket_new (ctx, ZMQ_PAIR);

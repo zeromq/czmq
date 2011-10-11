@@ -50,8 +50,9 @@ void *
 zsocket_new (zctx_t *ctx, int type)
 {
     void *socket = zctx__socket_new (ctx, type);
-    if (type == ZMQ_SUB)
-        zsockopt_set_subscribe (socket, "");
+    if (socket)
+        if (type == ZMQ_SUB)
+            zsockopt_set_subscribe (socket, "");
     return socket;
 }
 
@@ -156,6 +157,7 @@ zsocket_test (Bool verbose)
 
     //  @selftest
     zctx_t *ctx = zctx_new ();
+    assert (ctx);
 
     //  Create a detached thread, let it run
     char *interf = "*";
@@ -163,7 +165,9 @@ zsocket_test (Bool verbose)
     int service = 5560;
 
     void *writer = zsocket_new (ctx, ZMQ_PUSH);
+    assert (writer);
     void *reader = zsocket_new (ctx, ZMQ_PULL);
+    assert (reader);
     assert (streq (zsocket_type_str (writer), "PUSH"));
     assert (streq (zsocket_type_str (reader), "PULL"));
     int rc = zsocket_bind (writer, "tcp://%s:%d", interf, service);

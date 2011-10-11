@@ -52,11 +52,11 @@ void *
     zlist_next (zlist_t *self);
 
 //  Append an item to the end of the list
-void
+int
     zlist_append (zlist_t *self, void *item);
 
 //  Push an item to the start of the list
-void
+int
     zlist_push (zlist_t *self, void *item);
 
 //  Pop the item off the start of the list, if any
