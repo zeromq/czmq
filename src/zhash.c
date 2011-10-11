@@ -288,7 +288,6 @@ end:
         if ((!error) && (!item))
             error = -1;
     }
-
     return error;
 }
 

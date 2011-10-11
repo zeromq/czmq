@@ -60,15 +60,14 @@ zmsg_new (void)
 
     self = (zmsg_t *) zmalloc (sizeof (zmsg_t));
     if (!self)
-	goto end;
+        goto end;
 
     self->frames = zlist_new ();
     if (!(self->frames)) {
-	free (self);
-	self = NULL;
-	goto end;
+        free (self);
+        self = NULL;
+        goto end;
     }
-
 end:
     return self;
 }
@@ -113,13 +112,12 @@ zmsg_recv (void *socket)
             break;              //  Interrupted or terminated
         }
         if (zmsg_add (self, frame)) {
-	    zmsg_destroy (&self);
-	    break;
-	}
+            zmsg_destroy (&self);
+            break;
+        }
         if (!zframe_more (frame))
             break;              //  Last message frame
     }
-
 end:
     return self;
 }
@@ -279,7 +277,6 @@ int zmsg_add_str_to_framelist (int (*list_fxn)(zlist_t *, void *),
         error = ENOMEM;
         goto end;
     }
-
     int required = vsnprintf (string, size, format, argptr);
     if (required >= size) {
         char *tmpstring;
@@ -292,14 +289,12 @@ int zmsg_add_str_to_framelist (int (*list_fxn)(zlist_t *, void *),
         string = tmpstring;
         vsnprintf (string, size, format, argptr);
     }
-
     self->content_size += strlen (string);
     zframe_t *frame = zframe_new (string, strlen (string));
     if (!frame) {
         error = ENOMEM;
         goto end;
     }
-
     error = list_fxn (self->frames, frame);
 
 end:
@@ -373,15 +368,14 @@ zmsg_wrap (zmsg_t *self, zframe_t *frame)
     int error = 0;
     error = zmsg_pushmem (self, "", 0);
     if (error)
-	goto end;
+        goto end;
 
     error = zmsg_push (self, frame);
     if (error) {
-	// Rewind the empty frame
-	zmsg_pop (self);
-	goto end;
+        // Rewind the empty frame
+        zmsg_pop (self);
+        goto end;
     }
-
 end:
     return error;
 }
@@ -481,10 +475,10 @@ zmsg_save (zmsg_t *self, FILE *file)
 
 //  --------------------------------------------------------------------------
 //  Load/append an open file into message, create new message if
-//  null message provided.  Return 0 if OK, non-zero otherwise.  The 
+//  null message provided.  Return 0 if OK, non-zero otherwise.  The
 //  returned message should be identical to the passed in message on
 //  error.
-//  
+//
 
 int
 zmsg_load (zmsg_t *self, FILE *file, zmsg_t **return_self)
@@ -526,11 +520,9 @@ zmsg_load (zmsg_t *self, FILE *file, zmsg_t **return_self)
                         goto end;
                     }
                 }
-
                 error = zmsg_add (tmp_msg, frame);
-		if (error)
-		    goto end;
-
+                if (error)
+                    goto end;
                 frame_count++;
             }
             else {
@@ -541,9 +533,8 @@ zmsg_load (zmsg_t *self, FILE *file, zmsg_t **return_self)
         else {
             if (feof (file))
                 goto end;
-
             error = ferror (file);
-            if (!error) 
+            if (!error)
                 error = 1;
             goto end;              //  Unable to read properly, quit
         }
@@ -566,9 +557,7 @@ end:
                 zmsg_destroy (&tmp_msg);
         }
     }
-
     *return_self = tmp_msg;
-
     return error;
 }
 
@@ -681,10 +670,9 @@ zmsg_decode (byte *buffer, size_t buffer_size)
         zframe_t *frame = zframe_new (source, frame_size);
         if (frame) {
             if (zmsg_add (self, frame)) {
-		zmsg_destroy (&self);
-		break;
-	    }
-
+                zmsg_destroy (&self);
+                break;
+            }
             source += frame_size;
         }
         else {
@@ -727,7 +715,6 @@ zmsg_dup (zmsg_t *self)
     }
 
 end:
-
     return copy;
 }
 

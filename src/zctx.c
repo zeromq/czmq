@@ -119,7 +119,6 @@ zctx_new (void)
 #endif
 
 end:
-
     return self;
 }
 

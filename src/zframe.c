@@ -187,7 +187,6 @@ zframe_send (zframe_t **self_p, void *socket, int flags)
         error = EINVAL;
 
 end:
-
     return error;
 }
 

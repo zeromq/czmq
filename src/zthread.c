@@ -94,6 +94,7 @@ s_thread_shim (void *args)
         shim->attached (shim->args, shim->ctx, shim->pipe);
     else
         shim->detached (shim->args);
+
     zctx_destroy (&shim->ctx);
     free (shim);
     return NULL;
@@ -187,7 +188,6 @@ zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args)
         error = ENOMEM;
         goto end;
     }
-
     zsockopt_set_hwm (pipe, 1);
     zsocket_bind (pipe, "inproc://zctx-pipe-%p", pipe);
 
@@ -197,7 +197,6 @@ zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args)
         error = ENOMEM;
         goto end;
     }
-
     shim->attached = thread_fn;
     shim->args = args;
     shim->ctx = zctx_shadow (ctx);
@@ -205,7 +204,6 @@ zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args)
         error = ENOMEM;
         goto end;
     }
-
     //  Connect child pipe to our pipe
     shim->pipe = zsocket_new (shim->ctx, ZMQ_PAIR);
     if (!shim->pipe) {
@@ -226,7 +224,6 @@ end:
         }
         zsocket_destroy (ctx, pipe);
     }
-
     return pipe;
 }
 
