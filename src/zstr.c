@@ -64,8 +64,9 @@ zstr_recv (void *socket)
 
 //  --------------------------------------------------------------------------
 //  Receive C string from socket, if socket had input ready. Caller must
-//  free returned string. Returns NULL if the context is being terminated
-//  or the process was interrupted.
+//  free returned string. Returns NULL if there was no input waiting, or if
+//  the context was terminated. Use zctx_interrupted to exit any loop that
+//  relies on this method.
 
 char *
 zstr_recv_nowait (void *socket)

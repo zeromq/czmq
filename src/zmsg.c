@@ -259,13 +259,17 @@ zmsg_addmem (zmsg_t *self, const void *src, size_t size)
     return error;
 }
 
-// --------------------------------------------------------------------------
-// Handle the mechanics of pushing the string frame into the list - the list
-// function passed in determines how the frame containing the string
-// enters the list
 
-int zmsg_add_str_to_framelist (int (*list_fxn)(zlist_t *, void *),
-                               zmsg_t *self, const char *format, va_list argptr)
+// --------------------------------------------------------------------------
+//  Handle the mechanics of pushing the string frame into the list - the list
+//  function passed in determines how the frame containing the string
+//  enters the list
+
+static int zmsg_add_str_to_framelist (
+    int (*list_fxn) (zlist_t *, void *),
+    zmsg_t *self,
+    const char *format,
+    va_list argptr)
 {
     assert (list_fxn);
     assert (self);
@@ -307,13 +311,13 @@ end:
 //  --------------------------------------------------------------------------
 //  Push string as new frame to front of message
 
-int zmsg_pushstr(zmsg_t *self, const char *format, ...)
+int zmsg_pushstr (zmsg_t *self, const char *format, ...)
 {
     assert (format);
     va_list argptr;
     va_start (argptr, format);
 
-    int error = zmsg_add_str_to_framelist(&zlist_push, self, format, argptr);
+    int error = zmsg_add_str_to_framelist (&zlist_push, self, format, argptr);
     va_end (argptr);
 
     return error;
@@ -331,7 +335,6 @@ zmsg_addstr (zmsg_t *self, const char *format, ...)
     va_start (argptr, format);
 
     int error = zmsg_add_str_to_framelist (&zlist_append, self, format, argptr);
-
     va_end (argptr);
 
     return error;
