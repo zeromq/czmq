@@ -243,12 +243,12 @@ zlist_copy (zlist_t *self)
         goto end;
 
     struct node_t *node;
-    for (node = self->head; node; node = node->next)
+    for (node = self->head; node; node = node->next) {
         if (!zlist_append (copy, node->item)) {
             zlist_destroy(&copy);
             break;
         }
-
+    }
 end:
     return copy;
 }

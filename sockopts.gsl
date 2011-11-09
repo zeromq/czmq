@@ -201,11 +201,13 @@ zsockopt_test (Bool verbose)
 
     //  @selftest
     zctx_t *ctx = zctx_new ();
+    assert (ctx);
     void *socket;
 .for version
 #if (ZMQ_VERSION_MAJOR == $(major))
 .   for option
     socket = zsocket_new (ctx, ZMQ_$(TEST));
+    assert (socket);
 .       if mode = "rw" | mode = "w"
 .           if ctype = "int"
     zsockopt_set_$(name) (socket, 1);

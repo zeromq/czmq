@@ -95,7 +95,8 @@ zclock_time (void)
 #if defined (__UNIX__)
     struct timeval tv;
     gettimeofday (&tv, NULL);
-    return (int64_t) (tv.tv_sec * 1000 + tv.tv_usec / 1000);
+
+    return (int64_t) ((int64_t) tv.tv_sec * 1000 + (int64_t) tv.tv_usec / 1000);
 #elif (defined (__WINDOWS__))
     FILETIME ft;
     GetSystemTimeAsFileTime (&ft);

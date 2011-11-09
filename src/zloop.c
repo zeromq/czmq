@@ -123,14 +123,14 @@ s_rebuild_pollset (zloop_t *self)
     self->poll_size = zlist_size (self->pollers);
     self->pollset = (zmq_pollitem_t *) zmalloc (
         self->poll_size * sizeof (zmq_pollitem_t));
-    if (!(self->pollset)) {
+    if (!self->pollset) {
         error = ENOMEM;
         goto end;
     }
 
     self->pollact = (s_poller_t *) zmalloc (
         self->poll_size * sizeof (s_poller_t));
-    if (!(self->pollact)) {
+    if (!self->pollact) {
         error = ENOMEM;
         goto end;
     }
@@ -194,17 +194,17 @@ zloop_new (void)
         goto end;
 
     self->pollers = zlist_new ();
-    if (!(self->pollers)) {
+    if (!self->pollers) {
         error = ENOMEM;
         goto end;
     }
     self->timers = zlist_new ();
-    if (!(self->timers)) {
+    if (!self->timers) {
         error = ENOMEM;
         goto end;
     }
     self->zombies = zlist_new ();
-    if (!(self->zombies)) {
+    if (!self->zombies) {
         error = ENOMEM;
         goto end;
     }
