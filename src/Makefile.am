@@ -3,7 +3,8 @@ lib_LTLIBRARIES = libczmq.la
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libczmq.pc
 
-include_HEADERS = \
+libczmq_includedir = $(includedir)/czmq
+libczmq_include_HEADERS = \
     ../include/czmq.h \
     ../include/czmq_prelude.h \
     ../include/zclock.h \
