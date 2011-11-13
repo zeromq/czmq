@@ -105,7 +105,7 @@ After building, you can run the CZMQ selftests:
 
 Include `czmq.h` in your application and link with libczmq. Here is a typical gcc link command:
 
-    gcc -Iczmq -lczmq -lzmq myapp.c -o myapp
+    gcc -I/usr/include/czmq -lczmq -lzmq myapp.c -o myapp
 
 You can also use pkg-config to obtain the compile and link flags:
 
