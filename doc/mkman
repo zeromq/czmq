@@ -21,12 +21,15 @@
 #
 use File::Basename;
 
-$class = $ARGV [0];
+# Script needs top of source tree for VPATH/parallel builds
+$top_srcdir = $ARGV [0];
+
+$class = $ARGV [1];
 $class = $1 if $class =~ /(\w+)\.\w+/;
 
 #   Look for class title in 2nd line of source
 #   If there's no class file, leave hand-written man page alone
-exit unless open (SOURCE, "../src/$class.c");
+exit unless open (SOURCE, "$top_srcdir/src/$class.c");
 $_ = <SOURCE>;
 $_ = <SOURCE>;
 $title = "no title found";
@@ -51,21 +54,21 @@ $class - $title
 SYNOPSIS
 --------
 ----
-pull ../include/$class.h\@interface
+pull $top_srcdir/include/$class.h\@interface
 ----
 
 DESCRIPTION
 -----------
 
-pull ../src/$class.c\@header,left
+pull $top_srcdir/src/$class.c\@header,left
 
-pull ../src/$class.c\@discuss,left
+pull $top_srcdir/src/$class.c\@discuss,left
 
 EXAMPLE
 -------
 .From $class\_test method
 ----
-pull ../src/$class.c\@selftest
+pull $top_srcdir/src/$class.c\@selftest
 ----
 
 SEE ALSO

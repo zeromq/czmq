@@ -29,7 +29,7 @@
 
 //- Always include ZeroMQ header file ---------------------------------------
 
-#include "zmq.h"
+#include <zmq.h>
 
 //  Older libzmq APIs will be missing some aspects of libzmq/3.0
 
