@@ -6,5 +6,6 @@ includedir=@includedir@
 Name: libczmq
 Description: High-level C binding for 0MQ
 Version: @VERSION@
+Requires: libzmq
 Libs: -L${libdir} -lczmq
 Cflags: -I${includedir}
