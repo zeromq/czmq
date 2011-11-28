@@ -778,7 +778,7 @@ zmsg_test (Bool verbose)
 
     file = fopen ("zmsg.test", "r");
     msg = zmsg_load (NULL, file);
-    assert (rc == 0);
+    assert (msg);
     fclose (file);
     remove ("zmsg.test");
     assert (zmsg_size (msg) == 10);
