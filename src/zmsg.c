@@ -141,7 +141,7 @@ zmsg_send (zmsg_t **self_p, void *socket)
             int rc;
             rc = zframe_send (&frame, socket,
                               zlist_size (self->frames)? ZFRAME_MORE: 0);
-            assert(rc == 0);
+            assert (rc == 0);
             frame = (zframe_t *) zlist_pop (self->frames);
         }
         zmsg_destroy (self_p);
@@ -478,90 +478,32 @@ zmsg_save (zmsg_t *self, FILE *file)
 
 //  --------------------------------------------------------------------------
 //  Load/append an open file into message, create new message if
-//  null message provided.  Return 0 if OK, non-zero otherwise.  The
-//  returned message should be identical to the passed in message on
-//  error.
-//
+//  null message provided. Returns NULL if the message could not be
+//  loaded.
 
-int
-zmsg_load (zmsg_t *self, FILE *file, zmsg_t **return_self)
+zmsg_t *
+zmsg_load (zmsg_t *self, FILE *file)
 {
     assert (file);
-    int error = 0;
-    int frame_count = 0;
-    int created_msg = 0;
-    zmsg_t *tmp_msg = NULL;
-
-    // NULL out return_self so the caller knows not to use it on failure
-    *return_self = NULL;
-
-    if (self)
-        tmp_msg = self;
-    else {
-        tmp_msg = zmsg_new ();
-        if (!tmp_msg) {
-            error = ENOMEM;
-            goto end;
-        }
-        created_msg = 1;
-    }
+    if (!self)
+        self = zmsg_new ();
+    if (!self)
+        return NULL;
 
     while (TRUE) {
         size_t frame_size;
-        clearerr (file);
         size_t rc = fread (&frame_size, sizeof (frame_size), 1, file);
         if (rc == 1) {
             zframe_t *frame = zframe_new (NULL, frame_size);
-            if (frame) {
-                if (frame_size) {
-                    clearerr (file);
-                    rc = fread (zframe_data (frame), frame_size, 1, file);
-                    if (rc != 1) {
-                        error = ferror (file);
-                        if (!error)
-                            error = 1;
-                        goto end;
-                    }
-                }
-                error = zmsg_add (tmp_msg, frame);
-                if (error)
-                    goto end;
-                frame_count++;
-            }
-            else {
-                error = ENOMEM;
-                goto end;          // Unable to allocate frame, quit
-            }
+            rc = fread (zframe_data (frame), frame_size, 1, file);
+            if (frame_size > 0 && rc != 1)
+                break;          //  Unable to read properly, quit
+            zmsg_add (self, frame);
         }
-        else {
-            if (feof (file))
-                goto end;
-            error = ferror (file);
-            if (!error)
-                error = 1;
-            goto end;              //  Unable to read properly, quit
-        }
+        else
+            break;              //  Unable to read properly, quit
     }
-
-end:
-    if (error) {
-        if (tmp_msg) {
-            // need to rewind the frames we added to the message
-            // to return the message to its original state
-            int i = 0;
-            zframe_t *lastframe;
-            for(i = 0; i < frame_count; i++) {
-                lastframe = zmsg_last (tmp_msg);
-                zmsg_remove (tmp_msg, lastframe);
-                zframe_destroy (&lastframe);
-            }
-            // Only destroy the message if we created it in this function
-            if (created_msg)
-                zmsg_destroy (&tmp_msg);
-        }
-    }
-    *return_self = tmp_msg;
-    return error;
+    return self;
 }
 
 
@@ -784,25 +726,25 @@ zmsg_test (Bool verbose)
     msg = zmsg_new ();
     assert (msg);
     rc = zmsg_addmem (msg, "Frame0", 6);
-    assert(rc == 0);
+    assert (rc == 0);
     rc = zmsg_addmem (msg, "Frame1", 6);
-    assert(rc == 0);
+    assert (rc == 0);
     rc = zmsg_addmem (msg, "Frame2", 6);
-    assert(rc == 0);
+    assert (rc == 0);
     rc = zmsg_addmem (msg, "Frame3", 6);
-    assert(rc == 0);
+    assert (rc == 0);
     rc = zmsg_addmem (msg, "Frame4", 6);
-    assert(rc == 0);
+    assert (rc == 0);
     rc = zmsg_addmem (msg, "Frame5", 6);
-    assert(rc == 0);
+    assert (rc == 0);
     rc = zmsg_addmem (msg, "Frame6", 6);
-    assert(rc == 0);
+    assert (rc == 0);
     rc = zmsg_addmem (msg, "Frame7", 6);
-    assert(rc == 0);
+    assert (rc == 0);
     rc = zmsg_addmem (msg, "Frame8", 6);
-    assert(rc == 0);
+    assert (rc == 0);
     rc = zmsg_addmem (msg, "Frame9", 6);
-    assert(rc == 0);
+    assert (rc == 0);
     zmsg_t *copy = zmsg_dup (msg);
     assert (copy);
     zmsg_send (&copy, output);
@@ -835,7 +777,7 @@ zmsg_test (Bool verbose)
     zmsg_destroy (&msg);
 
     file = fopen ("zmsg.test", "r");
-    rc = zmsg_load (NULL, file, &msg);
+    msg = zmsg_load (NULL, file);
     assert (rc == 0);
     fclose (file);
     remove ("zmsg.test");
@@ -875,23 +817,23 @@ zmsg_test (Bool verbose)
     byte *blank = zmalloc (100000);
     assert (blank);
     rc = zmsg_addmem (msg, blank, 0);
-    assert(rc == 0);
+    assert (rc == 0);
     rc = zmsg_addmem (msg, blank, 1);
-    assert(rc == 0);
+    assert (rc == 0);
     rc = zmsg_addmem (msg, blank, 253);
-    assert(rc == 0);
+    assert (rc == 0);
     rc = zmsg_addmem (msg, blank, 254);
-    assert(rc == 0);
+    assert (rc == 0);
     rc = zmsg_addmem (msg, blank, 255);
-    assert(rc == 0);
+    assert (rc == 0);
     rc = zmsg_addmem (msg, blank, 256);
-    assert(rc == 0);
+    assert (rc == 0);
     rc = zmsg_addmem (msg, blank, 65535);
-    assert(rc == 0);
+    assert (rc == 0);
     rc = zmsg_addmem (msg, blank, 65536);
-    assert(rc == 0);
+    assert (rc == 0);
     rc = zmsg_addmem (msg, blank, 65537);
-    assert(rc == 0);
+    assert (rc == 0);
     free (blank);
     assert (zmsg_size (msg) == 9);
     byte *buffer;

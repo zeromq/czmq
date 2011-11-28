@@ -9,6 +9,9 @@ Changes
 * Changed zsocket_connect() to return 0 or -1, since zmq_connect() now
   checks endpoints properly (issue LIBZMQ-207).
 
+* All classes handle memory exhaustion correctly by returning an error
+  instead of asserting.
+
 
 CZMQ version 1.1.0 (stable), released on 2011/08/30
 ===================================================

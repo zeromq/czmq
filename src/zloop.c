@@ -514,7 +514,8 @@ zloop_test (Bool verbose)
     zloop_set_verbose (loop, verbose);
 
     //  After 10 msecs, send a ping message to output
-    zloop_timer (loop, 10, 1,  s_timer_event, output);
+    zloop_timer (loop, 10, 1, s_timer_event, output);
+    
     //  When we get the ping message, end the reactor
     zmq_pollitem_t poll_input = { input, 0, ZMQ_POLLIN };
     rc = zloop_poller (loop, &poll_input, s_socket_event, NULL);
