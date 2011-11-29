@@ -116,24 +116,19 @@ s_item_lookup (zhash_t *self, char *key)
 
 //  --------------------------------------------------------------------------
 //  Local helper function
-//  Insert new item into hash table, returns item in itemret argument
-//  Returns 0 on success.
-//  If item already existed, returns 0 and *itemret is NULL
+//  Insert new item into hash table, returns item
+//  If item already existed, returns NULL
 
-static int
-    s_item_insert (zhash_t *self, char *key, void *value, item_t **itemret)
+static item_t *
+s_item_insert (zhash_t *self, char *key, void *value)
 {
-    int error = 0;
-    item_t *item = NULL;
     //  Check that item does not already exist in hash table
     //  Leaves self->cached_index with calculated hash item
-    item = s_item_lookup (self, key);
+    item_t *item = s_item_lookup (self, key);
     if (item == NULL) {
         item = (item_t *) zmalloc (sizeof (item_t));
-        if (!item) {
-            error = ENOMEM;
-            goto end;
-        }
+        if (!item)
+            return NULL;
         item->value = value;
         item->key = strdup (key);
         item->index = self->cached_index;
@@ -144,10 +139,7 @@ static int
     }
     else
         item = NULL;            //  Signal duplicate insertion
-
-end:
-    *itemret = item;
-    return error;
+    return item;
 }
 
 
@@ -186,15 +178,12 @@ zhash_t *
 zhash_new (void)
 {
     zhash_t *self = (zhash_t *) zmalloc (sizeof (zhash_t));
-    if (!self)
-        goto end;
-
-    self->limit = INITIAL_SIZE;
-    self->items = (item_t **) zmalloc (sizeof (item_t *) * self->limit);
-    if (!self->items)
-        zhash_destroy (&self);
-
-end:
+    if (self) {
+        self->limit = INITIAL_SIZE;
+        self->items = (item_t **) zmalloc (sizeof (item_t *) * self->limit);
+        if (!self->items)
+            zhash_destroy (&self);
+    }
     return self;
 }
 
@@ -230,15 +219,13 @@ zhash_destroy (zhash_t **self_p)
 //  --------------------------------------------------------------------------
 //  Insert item into hash table with specified key and item
 //  If key is already present returns -1 and leaves existing item unchanged
-//  Returns 0 on success, returns positive value on error and leaves
-//  existing item unchanged.
+//  Returns 0 on success.
 
 int
 zhash_insert (zhash_t *self, char *key, void *value)
 {
     assert (self);
     assert (key);
-    int error = 0;
 
     //  If we're exceeding the load factor of the hash table,
     //  resize it according to the growth factor
@@ -257,10 +244,8 @@ zhash_insert (zhash_t *self, char *key, void *value)
         //  Create new hash table
         new_limit = self->limit * GROWTH_FACTOR / 100;
         new_items = (item_t **) zmalloc (sizeof (item_t *) * new_limit);
-        if (!new_items) {
-            error = ENOMEM;
-            goto end;
-        }
+        if (!new_items)
+            return ENOMEM;
 
         //  Move all items to the new hash table, rehashing to
         //  take into account new hash table limit
@@ -280,15 +265,7 @@ zhash_insert (zhash_t *self, char *key, void *value)
         self->items = new_items;
         self->limit = new_limit;
     }
-
-end:
-    if (!error) {
-        item_t *item = NULL;
-        error = s_item_insert (self, key, value, &item);
-        if ((!error) && (!item))
-            error = -1;
-    }
-    return error;
+    return s_item_insert (self, key, value)? 0: -1;
 }
 
 
@@ -296,30 +273,21 @@ end:
 //  Update item into hash table with specified key and item.
 //  If key is already present, destroys old item and inserts new one.
 //  Use free_fn method to ensure deallocator is properly called on item.
-//  Returns 0 on success, >0 on error, and -1 when racing.
 
-int
+void
 zhash_update (zhash_t *self, char *key, void *value)
 {
     assert (self);
     assert (key);
-    int error = 0;
+    
     item_t *item = s_item_lookup (self, key);
     if (item) {
         if (item->free_fn)
             (item->free_fn) (item->value);
         item->value = value;
     }
-    else {
-        int rc = zhash_insert (self, key, value);
-        // A return of -1 means the item was already in the list.
-        // Since we already checked for the item above, this means
-        // we're racing with another thread, so consider this an
-        // error.
-        if (rc != 0)
-            error = rc;
-    }
-    return error;
+    else
+        zhash_insert (self, key, value);
 }
 
 

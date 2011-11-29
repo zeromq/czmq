@@ -97,13 +97,12 @@ zctx_new (void)
 
     self = (zctx_t *) zmalloc (sizeof (zctx_t));
     if (!self)
-        goto end;
+        return NULL;
 
     self->sockets = zlist_new ();
-    if (!(self->sockets)) {
-        free(self);
-        self = NULL;
-        goto end;
+    if (!self->sockets) {
+        free (self);
+        return NULL;
     }
     self->iothreads = 1;
     self->main = TRUE;
@@ -117,8 +116,6 @@ zctx_new (void)
     sigaction (SIGINT, &action, NULL);
     sigaction (SIGTERM, &action, NULL);
 #endif
-
-end:
     return self;
 }
 
@@ -144,7 +141,8 @@ zctx_destroy (zctx_t **self_p)
 
 
 //  --------------------------------------------------------------------------
-//  Create new shadow context, returns context object
+//  Create new shadow context, returns context object. Returns NULL if there
+//  wasn't sufficient memory available.
 
 zctx_t *
 zctx_shadow (zctx_t *ctx)
@@ -156,17 +154,14 @@ zctx_shadow (zctx_t *ctx)
     //  we create, use, and destroy sockets only within a single thread.
     self = (zctx_t *) zmalloc (sizeof (zctx_t));
     if (!self)
-        goto end;
+        return NULL;
 
-    self->sockets = zlist_new ();
-    if (!(self->sockets)) {
-        free (self);
-        self = NULL;
-        goto end;
-    }
     self->context = ctx->context;
-
-end:
+    self->sockets = zlist_new ();
+    if (!self->sockets) {
+        free (self);
+        return NULL;
+    }
     return self;
 }
 
@@ -203,25 +198,22 @@ zctx_set_linger (zctx_t *self, int linger)
 void *
 zctx__socket_new (zctx_t *self, int type)
 {
-    assert (self);
-    void *socket = NULL;
     //  Initialize context now if necessary
-    if (self->context == NULL)
+    assert (self);
+    if (!self->context)
         self->context = zmq_init (self->iothreads);
-    if (!(self->context))
-        goto end;
+    if (!self->context)
+        return NULL;
 
     //  Create and register socket
-    socket = zmq_socket (self->context, type);
+    void *socket = zmq_socket (self->context, type);
     if (!socket)
-        goto end;
+        return NULL;
 
     if (zlist_push (self->sockets, socket)) {
         zmq_close (socket);
-        socket = NULL;
+        return NULL;
     }
-
-end:
     return socket;
 }
 

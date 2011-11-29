@@ -129,13 +129,11 @@ zlist_next (zlist_t *self)
 int
 zlist_append (zlist_t *self, void *item)
 {
-    int error = 0;
     struct node_t *node;
     node = (struct node_t *) zmalloc (sizeof (struct node_t));
-    if (!node) {
-        error = ENOMEM;
-        goto end;
-    }
+    if (!node)
+        return -1;
+
     node->item = item;
     if (self->tail)
         self->tail->next = node;
@@ -146,8 +144,7 @@ zlist_append (zlist_t *self, void *item)
     self->size++;
     self->cursor = NULL;
 
-end:
-    return error;
+    return 0;
 }
 
 
@@ -157,13 +154,11 @@ end:
 int
 zlist_push (zlist_t *self, void *item)
 {
-    int error = 0;
     struct node_t *node;
     node = (struct node_t *) zmalloc (sizeof (struct node_t));
-    if (!node) {
-        error = ENOMEM;
-        goto end;
-    }
+    if (!node)
+        return -1;
+
     node->item = item;
     node->next = self->head;
     self->head = node;
@@ -171,9 +166,7 @@ zlist_push (zlist_t *self, void *item)
         self->tail = node;
     self->size++;
     self->cursor = NULL;
-
-end:
-    return error;
+    return 0;
 }
 
 
@@ -239,17 +232,15 @@ zlist_copy (zlist_t *self)
         return NULL;
 
     zlist_t *copy = zlist_new ();
-    if (!copy)
-        goto end;
-
-    struct node_t *node;
-    for (node = self->head; node; node = node->next) {
-        if (!zlist_append (copy, node->item)) {
-            zlist_destroy(&copy);
-            break;
+    if (copy) {
+        struct node_t *node;
+        for (node = self->head; node; node = node->next) {
+            if (!zlist_append (copy, node->item)) {
+                zlist_destroy(&copy);
+                break;
+            }
         }
     }
-end:
     return copy;
 }
 

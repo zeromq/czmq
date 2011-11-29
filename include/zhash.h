@@ -57,8 +57,7 @@ int
 //  Update item into hash table with specified key and item.
 //  If key is already present, destroys old item and inserts new one.
 //  Use free_fn method to ensure deallocator is properly called on item.
-//  Returns 0 on success, >0 on error, and -1 when racing.
-int
+void
     zhash_update (zhash_t *self, char *key, void *item);
 
 //  Remove an item specified by key from the hash table. If there was no such
@@ -88,7 +87,7 @@ size_t
     zhash_size (zhash_t *self);
 
 //  Apply function to each item in the hash table. Items are iterated in no
-//  defined order.  Stops if callback function returns non-zero and returns
+//  defined order. Stops if callback function returns non-zero and returns
 //  final return code from callback function (zero = success).
 int
     zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument);

@@ -150,80 +150,62 @@ s_thread_start (shim_t *shim)
 //  --------------------------------------------------------------------------
 //  Create a detached thread. A detached thread operates autonomously
 //  and is used to simulate a separate process. It gets no ctx, and no
-//  pipe.
+//  pipe. Returns 0 on success, -1 if insufficient memory.
 
 int
 zthread_new (zthread_detached_fn *thread_fn, void *args)
 {
-    int error = 0;
     //  Prepare argument shim for child thread
     shim_t *shim = (shim_t *) zmalloc (sizeof (shim_t));
-    if (!shim) {
-        error = ENOMEM;
-        goto end;
+    if (shim) {
+        shim->detached = thread_fn;
+        shim->args = args;
+        s_thread_start (shim);
+        return 0;
     }
-    shim->detached = thread_fn;
-    shim->args = args;
-    s_thread_start (shim);
-end:
-    return error;
+    return -1;
 }
 
 
 //  --------------------------------------------------------------------------
 //  Create an attached thread. An attached thread gets a ctx and a PAIR
 //  pipe back to its parent. It must monitor its pipe, and exit if the
-//  pipe becomes unreadable.
-//  FIXME: Return error code
+//  pipe becomes unreadable. Returns pipe, or NULL if there was an error.
 
 void *
 zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args)
 {
-    int error = 0;
     shim_t *shim = NULL;
     //  Create our end of the pipe
     //  Pipe has HWM of 1 at both sides to block runaway writers
     void *pipe = zsocket_new (ctx, ZMQ_PAIR);
-    if (!pipe) {
-        error = ENOMEM;
-        goto end;
+    if (pipe) {
+        zsockopt_set_hwm (pipe, 1);
+        zsocket_bind (pipe, "inproc://zctx-pipe-%p", pipe);
     }
-    zsockopt_set_hwm (pipe, 1);
-    zsocket_bind (pipe, "inproc://zctx-pipe-%p", pipe);
-
+    else
+        return NULL;
+    
     //  Prepare argument shim for child thread
     shim = (shim_t *) zmalloc (sizeof (shim_t));
-    if (!shim) {
-        error = ENOMEM;
-        goto end;
+    if (shim) {
+        shim->attached = thread_fn;
+        shim->args = args;
+        shim->ctx = zctx_shadow (ctx);
+        if (!shim->ctx)
+            return NULL;
     }
-    shim->attached = thread_fn;
-    shim->args = args;
-    shim->ctx = zctx_shadow (ctx);
-    if (!shim->ctx) {
-        error = ENOMEM;
-        goto end;
-    }
+    else
+        return NULL;
+    
     //  Connect child pipe to our pipe
     shim->pipe = zsocket_new (shim->ctx, ZMQ_PAIR);
-    if (!shim->pipe) {
-        error = ENOMEM;
-        goto end;
-    }
+    if (!shim->pipe)
+        return NULL;
     zsockopt_set_hwm (shim->pipe, 1);
     zsocket_connect (shim->pipe, "inproc://zctx-pipe-%p", pipe);
-
+    
     s_thread_start (shim);
-
-end:
-    if (error) {
-        if (shim) {
-            zsocket_destroy (shim->ctx, shim->pipe);
-            zctx_destroy (&(shim->ctx));
-            free (shim);
-        }
-        zsocket_destroy (ctx, pipe);
-    }
     return pipe;
 }
 

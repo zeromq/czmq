@@ -71,23 +71,23 @@ zframe_t *
 int
     zmsg_add (zmsg_t *self, zframe_t *frame);
 
-//  Push block of memory as new frame to front of message.  Returns
-//  non-zero error code on failure
+//  Push block of memory as new frame to front of message.
+//  Returns 0 on success, -1 on error.
 int
     zmsg_pushmem (zmsg_t *self, const void *src, size_t size);
 
-//  Push block of memory as new frame to end of message.  Returns
-//  non-zero error code on failure
+//  Push block of memory as new frame to end of message.
+//  Returns 0 on success, -1 on error.
 int
     zmsg_addmem (zmsg_t *self, const void *src, size_t size);
 
-//  Push string as new frame to front of message.  Returns non-zero
-//  error code on failure
+//  Push string as new frame to front of message.
+//  Returns 0 on success, -1 on error.
 int
     zmsg_pushstr (zmsg_t *self, const char *format, ...);
 
-//  Push string as new frame to end of message.  Returns non-zero
-//  error code on failure
+//  Push string as new frame to end of message.
+//  Returns 0 on success, -1 on error.
 int
     zmsg_addstr (zmsg_t *self, const char *format, ...);
 
@@ -97,8 +97,7 @@ char *
 
 //  Push frame to front of message, before first frame
 //  Pushes an empty frame in front of frame
-//  Returns non-zero error code on failure
-int
+void
     zmsg_wrap (zmsg_t *self, zframe_t *frame);
 
 //  Pop frame off front of message, caller now owns frame

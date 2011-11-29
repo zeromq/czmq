@@ -78,14 +78,11 @@ static s_poller_t *
 s_poller_new (zmq_pollitem_t *item, zloop_fn handler, void *arg)
 {
     s_poller_t *poller = (s_poller_t *) zmalloc (sizeof (s_poller_t));
-    if (!poller)
-        goto end;
-
-    poller->item = *item;
-    poller->handler = handler;
-    poller->arg = arg;
-
-end:
+    if (poller) {
+        poller->item = *item;
+        poller->handler = handler;
+        poller->arg = arg;
+    }
     return poller;
 }
 
@@ -93,47 +90,38 @@ static s_timer_t *
 s_timer_new (size_t delay, size_t times, zloop_fn handler, void *arg)
 {
     s_timer_t *timer = (s_timer_t *) zmalloc (sizeof (s_timer_t));
-    if (!timer)
-        goto end;
-
-    timer->delay = delay;
-    timer->times = times;
-    timer->handler = handler;
-    timer->arg = arg;
-    timer->when = -1;           //  Indicates a new timer
-
-end:
+    if (timer) {
+        timer->delay = delay;
+        timer->times = times;
+        timer->handler = handler;
+        timer->arg = arg;
+        timer->when = -1;           //  Indicates a new timer
+    }
     return timer;
 }
 
 //  We hold an array of pollers that matches the pollset, so we can
 //  register/cancel pollers orthogonally to executing the pollset
-//  activity on pollers.
-//  Returns 0 on success, positive values on failure
+//  activity on pollers. Returns 0 on success, -1 on failure.
 
 static int
 s_rebuild_pollset (zloop_t *self)
 {
     free (self->pollset);
     free (self->pollact);
-    int error = 0;
     self->pollset = NULL;
     self->pollact = NULL;
 
     self->poll_size = zlist_size (self->pollers);
     self->pollset = (zmq_pollitem_t *) zmalloc (
         self->poll_size * sizeof (zmq_pollitem_t));
-    if (!self->pollset) {
-        error = ENOMEM;
-        goto end;
-    }
+    if (!self->pollset)
+        return -1;
 
     self->pollact = (s_poller_t *) zmalloc (
         self->poll_size * sizeof (s_poller_t));
-    if (!self->pollact) {
-        error = ENOMEM;
-        goto end;
-    }
+    if (!self->pollact)
+        return -1;
 
     s_poller_t *poller = (s_poller_t *) zlist_first (self->pollers);
     uint item_nbr = 0;
@@ -144,16 +132,7 @@ s_rebuild_pollset (zloop_t *self)
         poller = (s_poller_t *) zlist_next (self->pollers);
     }
     self->dirty = FALSE;
-
-end:
-    if (error) {
-        free (self->pollset);
-        free (self->pollact);
-        self->pollset = NULL;
-        self->pollact = NULL;
-    }
-
-    return error;
+    return 0;
 }
 
 static long
@@ -187,39 +166,22 @@ zloop_new (void)
 {
     zloop_t
         *self;
-    int error = 0;
 
     self = (zloop_t *) zmalloc (sizeof (zloop_t));
-    if (!self)
-        goto end;
-
-    self->pollers = zlist_new ();
-    if (!self->pollers) {
-        error = ENOMEM;
-        goto end;
-    }
-    self->timers = zlist_new ();
-    if (!self->timers) {
-        error = ENOMEM;
-        goto end;
-    }
-    self->zombies = zlist_new ();
-    if (!self->zombies) {
-        error = ENOMEM;
-        goto end;
-    }
-
-end:
-    if (error) {
-        if (self) {
-            zlist_destroy(&(self->pollers));
-            zlist_destroy(&(self->timers));
-            zlist_destroy(&(self->zombies));
+    if (self) {
+        self->pollers = zlist_new ();
+        self->timers  = zlist_new ();
+        self->zombies = zlist_new ();
+        if (!self->pollers
+        ||  !self->timers
+        ||  !self->zombies) {
+            zlist_destroy (&self->pollers);
+            zlist_destroy (&self->timers);
+            zlist_destroy (&self->zombies);
+            free (self);
+            return NULL;
         }
-        free(self);
-        self = NULL;
     }
-
     return self;
 }
 
@@ -263,24 +225,20 @@ int
 zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
 {
     assert (self);
-    int error = 0;
     s_poller_t *poller = s_poller_new (item, handler, arg);
-    if (!poller) {
-        error = ENOMEM;
-        goto end;
+    if (poller) {
+        if (zlist_push (self->pollers, poller))
+            return -1;
+
+        self->dirty = TRUE;
+        if (self->verbose)
+            zclock_log ("I: zloop: register %s poller (%p, %d)",
+                item->socket? zsocket_type_str (item->socket): "FD",
+                item->socket, item->fd);
+        return 0;
     }
-    error = zlist_push (self->pollers, poller);
-    if (error) {
-        error = -1;
-        goto end;
-    }
-    self->dirty = TRUE;
-    if (self->verbose)
-        zclock_log ("I: zloop: register %s poller (%p, %d)",
-            item->socket? zsocket_type_str (item->socket): "FD",
-            item->socket, item->fd);
-end:
-    return error;
+    else
+        return -1;
 }
 
 
@@ -322,42 +280,37 @@ int
 zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *arg)
 {
     assert (self);
-    int error = 0;
     s_timer_t *timer = s_timer_new (delay, times, handler, arg);
-    if (!timer) {
-        error = ENOMEM;
-        goto end;
-    }
-    error = zlist_push (self->timers, timer);
-    if (error)
-        goto end;
+    if (!timer)
+        return -1;
+    if (zlist_push (self->timers, timer))
+        return -1;
     if (self->verbose)
         zclock_log ("I: zloop: register timer delay=%d times=%d", delay, times);
-
-end:
-    return error;
+    
+    return 0;
 }
 
 
 //  --------------------------------------------------------------------------
 //  Cancel all timers for a specific argument (as provided in zloop_timer)
-//  Returnes 0 on success
+//  Returns 0 on success.
+
 int
 zloop_timer_end (zloop_t *self, void *arg)
 {
     assert (self);
     assert (arg);
-    int error = 0;
+    
     //  We cannot touch self->timers because we may be executing that
     //  from inside the poll loop. So, we hold the arg on the zombie
     //  list, and process that list when we're done executing timers.
-    error = zlist_append (self->zombies, arg);
-    if (error)
-        goto end;
+    if (zlist_append (self->zombies, arg))
+        return -1;
     if (self->verbose)
         zclock_log ("I: zloop: cancel timer");
-end:
-    return error;
+    
+    return 0;
 }
 
 //  --------------------------------------------------------------------------
