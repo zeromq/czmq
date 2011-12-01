@@ -101,7 +101,7 @@ zstr_send (void *socket, const char *string)
     memcpy (zmq_msg_data (&message), string, strlen (string));
     int rc = zmq_sendmsg (socket, &message, 0);
     zmq_msg_close (&message);
-    return rc < 0? -1: 0;
+    return rc == -1? -1: 0;
 }
 
 
@@ -118,7 +118,7 @@ zstr_sendm (void *socket, const char *string)
     memcpy (zmq_msg_data (&message), string, strlen (string));
     int rc = zmq_sendmsg (socket, &message, ZMQ_SNDMORE);
     zmq_msg_close (&message);
-    return rc < 0? -1: 0;
+    return rc == -1? -1: 0;
 }
 
 

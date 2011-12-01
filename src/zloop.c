@@ -235,6 +235,7 @@ zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
             zclock_log ("I: zloop: register %s poller (%p, %d)",
                 item->socket? zsocket_type_str (item->socket): "FD",
                 item->socket, item->fd);
+        assert (strneq (zsocket_type_str (item->socket), "UNKNOWN"));
         return 0;
     }
     else
@@ -354,7 +355,7 @@ zloop_start (zloop_t *self)
                        s_tickless_timer (self) * ZMQ_POLL_MSEC);
         if (rc == -1 || zctx_interrupted) {
             if (self->verbose)
-                zclock_log ("I: zloop: interrupted");
+                zclock_log ("I: zloop: interrupted (%d) - %s", rc, strerror (errno));
             rc = 0;
             break;              //  Context has been shut down
         }
