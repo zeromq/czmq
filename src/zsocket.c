@@ -50,9 +50,6 @@ void *
 zsocket_new (zctx_t *ctx, int type)
 {
     void *socket = zctx__socket_new (ctx, type);
-    if (socket)
-        if (type == ZMQ_SUB)
-            zsockopt_set_subscribe (socket, "");
     return socket;
 }
 
@@ -183,6 +180,21 @@ zsocket_test (Bool verbose)
     assert (port >= ZSOCKET_DYNFROM && port <= ZSOCKET_DYNTO);
 
     zsocket_destroy (ctx, writer);
+
+    char *content = "normal zmq message";
+    char *content2 = "private zmq message";
+    void *input = zsocket_new (ctx, ZMQ_PUB);
+    zsocket_bind (input, "inproc://zstr.test");
+    void *output = zsocket_new (ctx, ZMQ_SUB);
+    zsocket_connect (output, "inproc://zstr.test");
+    zsockopt_set_subscribe (output, "private"); 
+    zstr_send (input, content);
+    zstr_send (input, content2);
+    char *recv1 = zstr_recv_nowait (output);
+    char *recv2 = zstr_recv_nowait (output);
+
+    assert(recv2 == NULL);
+
     zctx_destroy (&ctx);
     //  @end
 
