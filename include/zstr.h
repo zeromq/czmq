@@ -44,6 +44,10 @@ char *
 int
     zstr_send (void *socket, const char *string);
 
+//  Send a string to a socket in 0MQ string format, with DONTWAIT flag
+int
+    zstr_send_nowait (void *socket, const char *string);
+
 //  Send a string to a socket in 0MQ string format, with MORE flag
 int
     zstr_sendm (void *socket, const char *string);

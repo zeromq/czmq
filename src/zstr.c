@@ -104,6 +104,21 @@ zstr_send (void *socket, const char *string)
     return rc == -1? -1: 0;
 }
 
+//  --------------------------------------------------------------------------
+//  Send a string to a socket in 0MQ string format, with DONTWAIT flag
+int
+zstr_send_nowait (void *socket, const char *string)
+{
+    assert (socket);
+    assert (string);
+
+    zmq_msg_t message;
+    zmq_msg_init_size (&message, strlen (string));
+    memcpy (zmq_msg_data (&message), string, strlen (string));
+    int rc = zmq_sendmsg (socket, &message, ZMQ_DONTWAIT);
+    zmq_msg_close (&message);
+    return rc == -1? -1: 0;
+}
 
 //  --------------------------------------------------------------------------
 //  Send a string to a socket in 0MQ string format, with MORE flag
@@ -173,7 +188,7 @@ zstr_test (Bool verbose)
     int string_nbr;
     for (string_nbr = 0; string_nbr < 10; string_nbr++)
         zstr_sendf (output, "this is string %d", string_nbr);
-    zstr_send (output, "END");
+    zstr_send_nowait (output, "END");
 
     //  Read and count until we receive END
     string_nbr = 0;
