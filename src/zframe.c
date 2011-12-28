@@ -357,7 +357,7 @@ zframe_reset (zframe_t *self, const void *data, size_t size)
 //  Selftest
 
 void
-free_frame_cb(void *frame)
+free_frame_cb(zframe_t *frame)
 {
     static zframe_t *cb_frame;
     cb_frame = frame;
