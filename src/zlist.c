@@ -103,6 +103,20 @@ zlist_first (zlist_t *self)
         return NULL;
 }
 
+//  --------------------------------------------------------------------------
+//  Return the item at the head of list. If the list is empty, returns NULL.
+//  Does not change the current cursor position.
+
+void *
+zlist_peek (zlist_t *self)
+{
+    assert (self);
+    struct node_t *item = NULL;
+    if (self->head)
+        item = self->head->item;
+    return item;
+}
+
 
 //  --------------------------------------------------------------------------
 //  Return the next item. If the list is empty, returns NULL. To move to
@@ -282,6 +296,7 @@ zlist_test (int verbose)
     assert (zlist_size (list) == 3);
 
     assert (zlist_first (list) == cheese);
+    assert (zlist_peek (list) == cheese);
     assert (zlist_next (list) == bread);
     assert (zlist_next (list) == wine);
     assert (zlist_next (list) == NULL);
@@ -293,12 +308,15 @@ zlist_test (int verbose)
     assert (zlist_size (list) == 2);
 
     assert (zlist_first (list) == cheese);
+    assert (zlist_peek (list) == cheese);
     zlist_remove (list, cheese);
     assert (zlist_size (list) == 1);
     assert (zlist_first (list) == bread);
+    assert (zlist_peek (list) == bread);
 
     zlist_remove (list, bread);
     assert (zlist_size (list) == 0);
+    assert (zlist_peek (list) == NULL);
 
     zlist_push (list, cheese);
     assert (zlist_size (list) == 1);
