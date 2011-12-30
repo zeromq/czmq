@@ -414,14 +414,7 @@ zframe_t *
 zmsg_last (zmsg_t *self)
 {
     assert (self);
-    zframe_t *frame = (zframe_t *) zlist_first (self->frames);
-    while (frame) {
-        zframe_t *next = (zframe_t *) zlist_next (self->frames);
-        if (!next)
-            break;
-        frame = next;
-    }
-    return frame;
+    return (zframe_t *) zlist_last (self->frames);
 }
 
 
