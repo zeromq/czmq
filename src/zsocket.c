@@ -28,7 +28,7 @@
 @header
     The zsocket class provides helper functions for 0MQ sockets. It doesn't
     wrap the 0MQ socket type, to avoid breaking all libzmq socket-related
-    calls. Automatically subscribes SUB sockets to "".
+    calls.
 @discuss
 @end
 */
@@ -50,9 +50,6 @@ void *
 zsocket_new (zctx_t *ctx, int type)
 {
     void *socket = zctx__socket_new (ctx, type);
-    if (socket)
-        if (type == ZMQ_SUB)
-            zsockopt_set_subscribe (socket, "");
     return socket;
 }
 

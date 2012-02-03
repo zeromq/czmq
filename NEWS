@@ -4,6 +4,8 @@ CZMQ version 1.2.0 (stable), released on 2011/10/xx
 Changes
 -------
 
+* SUB sockets are no longer subscribed to everything.
+
 * Fixed issue CZMQ-7, wrong name used for czmq man page.
 
 * Changed zsocket_connect() to return 0 or -1, since zmq_connect() now

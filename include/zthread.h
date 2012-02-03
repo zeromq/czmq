@@ -46,7 +46,8 @@ int
 
 //  Create an attached thread. An attached thread gets a ctx and a PAIR
 //  pipe back to its parent. It must monitor its pipe, and exit if the
-//  pipe becomes unreadable.
+//  pipe becomes unreadable. Do not destroy the ctx, the thread does this
+//  automatically when it ends.
 void *
     zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args);
 
