@@ -196,7 +196,7 @@ This is the class interface:
 
 The zsocket class provides helper functions for ØMQ sockets. It doesn't
 wrap the ØMQ socket type, to avoid breaking all libzmq socket-related
-calls. Automatically subscribes SUB sockets to "".
+calls.
 
 This is the class interface:
 
@@ -205,13 +205,14 @@ This is the class interface:
     #define ZSOCKET_DYNFROM     0xc000
     #define ZSOCKET_DYNTO       0xffff
     
-    //  Create a new socket within our czmq context, replaces zmq_socket.
-    //  If the socket is a SUB socket, automatically subscribes to everything.
+    //  Create a new socket within our CZMQ context, replaces zmq_socket.
     //  Use this to get automatic management of the socket at shutdown.
+    //  Note: SUB sockets do not automatically subscribe to everything; you
+    //  must set filters explicitly.
     void *
         zsocket_new (zctx_t *self, int type);
     
-    //  Destroy a socket within our czmq context, replaces zmq_close.
+    //  Destroy a socket within our CZMQ context, replaces zmq_close.
     void
         zsocket_destroy (zctx_t *self, void *socket);
     
@@ -224,8 +225,8 @@ This is the class interface:
         zsocket_bind (void *socket, const char *format, ...);
     
     //  Connect a socket to a formatted endpoint
-    //  Checks with assertion that the connect was valid
-    void
+    //  Returns 0 if OK, -1 if the endpoint was invalid.
+    int
         zsocket_connect (void *socket, const char *format, ...);
     
     //  Returns socket type as printable constant string
@@ -471,8 +472,9 @@ This is the class interface:
     zframe_t *
         zframe_recv_nowait (void *socket);
     
-    //  Send a frame to a socket, destroy frame after sending
-    void
+    // Send a frame to a socket, destroy frame after sending.  Returns
+    // non-zero error code on failure.
+    int
         zframe_send (zframe_t **self_p, void *socket, int flags);
     
     //  Return number of bytes in frame data
@@ -556,7 +558,7 @@ This is the class interface:
         zmsg_content_size (zmsg_t *self);
     
     //  Push frame to front of message, before first frame
-    void
+    int
         zmsg_push (zmsg_t *self, zframe_t *frame);
     
     //  Pop frame off front of message, caller now owns frame
@@ -564,23 +566,27 @@ This is the class interface:
         zmsg_pop (zmsg_t *self);
     
     //  Add frame to end of message, after last frame
-    void
+    int
         zmsg_add (zmsg_t *self, zframe_t *frame);
     
-    //  Push block of memory as new frame to front of message
-    void
+    //  Push block of memory as new frame to front of message.
+    //  Returns 0 on success, -1 on error.
+    int
         zmsg_pushmem (zmsg_t *self, const void *src, size_t size);
     
-    //  Push block of memory as new frame to end of message
-    void
+    //  Push block of memory as new frame to end of message.
+    //  Returns 0 on success, -1 on error.
+    int
         zmsg_addmem (zmsg_t *self, const void *src, size_t size);
     
-    //  Push string as new frame to front of message
-    void
+    //  Push string as new frame to front of message.
+    //  Returns 0 on success, -1 on error.
+    int
         zmsg_pushstr (zmsg_t *self, const char *format, ...);
     
-    //  Push string as new frame to end of message
-    void
+    //  Push string as new frame to end of message.
+    //  Returns 0 on success, -1 on error.
+    int
         zmsg_addstr (zmsg_t *self, const char *format, ...);
     
     //  Pop frame off front of message, return as fresh string
@@ -686,7 +692,7 @@ This is the class interface:
         zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *arg);
     
     //  Cancel all timers for a specific argument (as provided in zloop_timer)
-    void
+    int
         zloop_timer_end (zloop_t *self, void *arg);
     
     //  Set verbose tracing of reactor on/off
@@ -723,12 +729,13 @@ This is the class interface:
     //  Create a detached thread. A detached thread operates autonomously
     //  and is used to simulate a separate process. It gets no ctx, and no
     //  pipe.
-    void
+    int
         zthread_new (zthread_detached_fn *thread_fn, void *args);
     
     //  Create an attached thread. An attached thread gets a ctx and a PAIR
     //  pipe back to its parent. It must monitor its pipe, and exit if the
-    //  pipe becomes unreadable.
+    //  pipe becomes unreadable. Do not destroy the ctx, the thread does this
+    //  automatically when it ends.
     void *
         zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args);
     
@@ -822,7 +829,7 @@ This is the class interface:
         zhash_size (zhash_t *self);
     
     //  Apply function to each item in the hash table. Items are iterated in no
-    //  defined order.  Stops if callback function returns non-zero and returns
+    //  defined order. Stops if callback function returns non-zero and returns
     //  final return code from callback function (zero = success).
     int
         zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument);
@@ -861,11 +868,11 @@ This is the class interface:
         zlist_next (zlist_t *self);
     
     //  Append an item to the end of the list
-    void
+    int
         zlist_append (zlist_t *self, void *item);
     
     //  Push an item to the start of the list
-    void
+    int
         zlist_push (zlist_t *self, void *item);
     
     //  Pop the item off the start of the list, if any
