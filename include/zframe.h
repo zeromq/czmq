@@ -35,12 +35,19 @@ extern "C" {
 typedef struct _zframe_t zframe_t;
 
 //  @interface
+//  Callback function for zframe_free_fn method
+typedef void (zframe_free_fn) (zframe_t *data);
+
 #define ZFRAME_MORE     1
 #define ZFRAME_REUSE    2
 
 //  Create a new frame with optional size, and optional data
 zframe_t *
     zframe_new (const void *data, size_t size);
+
+//  Sets a free function / callback for when this frame is recycled.
+void
+	zframe_freefn (zframe_t *self, zframe_free_fn *free_fn);
 
 //  Destroy a frame
 void

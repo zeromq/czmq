@@ -47,6 +47,14 @@ void
 void *
     zlist_first (zlist_t *self);
 
+//  Return last item in the list, or null
+void *
+    zlist_last (zlist_t *self);
+
+//  Return first item in the list, or null. Does not change the current cursor position.
+void *
+    zlist_peek (zlist_t *self);
+
 //  Return next item in the list, or null
 void *
     zlist_next (zlist_t *self);

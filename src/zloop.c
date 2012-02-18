@@ -235,7 +235,8 @@ zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
             zclock_log ("I: zloop: register %s poller (%p, %d)",
                 item->socket? zsocket_type_str (item->socket): "FD",
                 item->socket, item->fd);
-        assert (strneq (zsocket_type_str (item->socket), "UNKNOWN"));
+        if (item->socket)
+            assert (strneq (zsocket_type_str (item->socket), "UNKNOWN"));
         return 0;
     }
     else
@@ -441,7 +442,23 @@ s_timer_event (zloop_t *loop, zmq_pollitem_t *item, void *output)
 }
 
 static int
+s_timer_fd_event (zloop_t *loop, zmq_pollitem_t *item, void *arg)
+{
+    int rc;
+    rc = write (1, "PING", 4);
+    assert(rc == 0);
+    return 0;
+}
+
+static int
 s_socket_event (zloop_t *loop, zmq_pollitem_t *item, void *arg)
+{
+    //  Just end the reactor
+    return -1;
+}
+
+static int
+s_fd_event (zloop_t *loop, zmq_pollitem_t *item, void *arg)
 {
     //  Just end the reactor
     return -1;
@@ -474,7 +491,19 @@ zloop_test (Bool verbose)
     zmq_pollitem_t poll_input = { input, 0, ZMQ_POLLIN };
     rc = zloop_poller (loop, &poll_input, s_socket_event, NULL);
     assert (rc == 0);
-    zloop_start (loop);
+    rc = zloop_start (loop);
+    assert(rc == -1);
+
+    zloop_poller_end(loop, &poll_input);
+
+    //  After 10 msecs, write to stdout
+    zloop_timer (loop, 10, 1, s_timer_fd_event, NULL);
+
+    zmq_pollitem_t poll_fd = { NULL, 1, ZMQ_POLLOUT };
+    rc = zloop_poller (loop, &poll_fd, s_fd_event, NULL);
+    assert (rc == 0);
+    rc = zloop_start (loop);
+    assert(rc == -1);
 
     zloop_destroy (&loop);
     assert (loop == NULL);

@@ -47,6 +47,7 @@
 
 struct _zframe_t {
     zmq_msg_t zmsg;             //  zmq_msg_t blob for frame
+    zframe_free_fn *free_fn;    //  Free function / callback if any
     int more;                   //  More flag, from last read
 };
 
@@ -87,9 +88,24 @@ zframe_destroy (zframe_t **self_p)
     if (*self_p) {
         zframe_t *self = *self_p;
         zmq_msg_close (&self->zmsg);
+        if (self->free_fn)
+            (self->free_fn) (self);
         free (self);
         *self_p = NULL;
     }
+}
+
+//  --------------------------------------------------------------------------
+//  Sets a free function / callback invoked when this frame is recycled. This is
+//  useful for bindings that coerce frames to native objects in languages with
+//  automatic memory management where it's difficult / crufty for the GC to track
+//  frames recycled elsewhere by libczmq eg. when using the zmsg_send API.
+
+void
+zframe_freefn (zframe_t *self, zframe_free_fn *free_fn)
+{
+    assert (self);
+    self->free_fn = free_fn;
 }
 
 
@@ -340,11 +356,19 @@ zframe_reset (zframe_t *self, const void *data, size_t size)
 //  --------------------------------------------------------------------------
 //  Selftest
 
+void
+free_frame_cb(zframe_t *frame)
+{
+    static zframe_t *cb_frame;
+    cb_frame = frame;
+}
+
 int
 zframe_test (Bool verbose)
 {
     printf (" * zframe: ");
     int rc;
+    static zframe_t *cb_frame = NULL;
 
     //  @selftest
     zctx_t *ctx = zctx_new ();
@@ -407,6 +431,11 @@ zframe_test (Bool verbose)
     assert (frame_nbr == 10);
     frame = zframe_recv_nowait (input);
     assert (frame == NULL);
+
+    frame = zframe_new ("callback", 8);
+    zframe_freefn (frame, free_frame_cb);
+    zframe_destroy (&frame);
+    assert (frame == cb_frame);
 
     zctx_destroy (&ctx);
     //  @end
