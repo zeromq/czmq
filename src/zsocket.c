@@ -43,8 +43,9 @@
 
 //  --------------------------------------------------------------------------
 //  Create a new socket within our czmq context, replaces zmq_socket.
-//  If the socket is a SUB socket, automatically subscribes to everything.
 //  Use this to get automatic management of the socket at shutdown.
+//  Note: SUB sockets do not automatically subscribe to everything; you
+//  must set filters explicitly.
 
 void *
 zsocket_new (zctx_t *ctx, int type)

@@ -37,12 +37,14 @@ extern "C" {
 #define ZSOCKET_DYNFROM     0xc000
 #define ZSOCKET_DYNTO       0xffff
 
-//  Create a new socket within our czmq context, replaces zmq_socket.
+//  Create a new socket within our CZMQ context, replaces zmq_socket.
 //  Use this to get automatic management of the socket at shutdown.
+//  Note: SUB sockets do not automatically subscribe to everything; you
+//  must set filters explicitly.
 void *
     zsocket_new (zctx_t *self, int type);
 
-//  Destroy a socket within our czmq context, replaces zmq_close.
+//  Destroy a socket within our CZMQ context, replaces zmq_close.
 void
     zsocket_destroy (zctx_t *self, void *socket);
 
