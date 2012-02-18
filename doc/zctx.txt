@@ -74,6 +74,7 @@ EXAMPLE
 
     //  Create a context with many busy sockets, destroy it
     ctx = zctx_new ();
+    assert (ctx);
     zctx_set_iothreads (ctx, 1);
     zctx_set_linger (ctx, 5);       //  5 msecs
     void *s1 = zctx__socket_new (ctx, ZMQ_PAIR);

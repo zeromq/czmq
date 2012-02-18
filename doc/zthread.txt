@@ -17,12 +17,13 @@ typedef void (zthread_attached_fn) (void *args, zctx_t *ctx, void *pipe);
 //  Create a detached thread. A detached thread operates autonomously
 //  and is used to simulate a separate process. It gets no ctx, and no
 //  pipe.
-void
+int
     zthread_new (zthread_detached_fn *thread_fn, void *args);
 
 //  Create an attached thread. An attached thread gets a ctx and a PAIR
 //  pipe back to its parent. It must monitor its pipe, and exit if the
-//  pipe becomes unreadable.
+//  pipe becomes unreadable. Do not destroy the ctx, the thread does this
+//  automatically when it ends.
 void *
     zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args);
 
@@ -74,7 +75,10 @@ s_test_detached (void *args)
 {
     //  Create a socket to check it'll be automatically deleted
     zctx_t *ctx = zctx_new ();
+    assert (ctx);
+
     void *push = zsocket_new (ctx, ZMQ_PUSH);
+    assert (push);
     zctx_destroy (&ctx);
     return NULL;
 }
@@ -90,13 +94,17 @@ s_test_attached (void *args, zctx_t *ctx, void *pipe)
 }
 
     zctx_t *ctx = zctx_new ();
+    assert (ctx);
+    int rc = 0;
 
     //  Create a detached thread, let it run
-    zthread_new (s_test_detached, NULL);
+    rc = zthread_new (s_test_detached, NULL);
+    assert (rc == 0);
     zclock_sleep (100);
 
     //  Create an attached thread, check it's safely alive
     void *pipe = zthread_fork (ctx, s_test_attached, NULL);
+    assert (pipe);
     zstr_send (pipe, "ping");
     char *pong = zstr_recv (pipe);
     assert (streq (pong, "pong"));

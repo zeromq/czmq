@@ -60,7 +60,7 @@ size_t
     zhash_size (zhash_t *self);
 
 //  Apply function to each item in the hash table. Items are iterated in no
-//  defined order.  Stops if callback function returns non-zero and returns
+//  defined order. Stops if callback function returns non-zero and returns
 //  final return code from callback function (zero = success).
 int
     zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument);

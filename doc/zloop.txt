@@ -40,7 +40,7 @@ int
     zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *arg);
 
 //  Cancel all timers for a specific argument (as provided in zloop_timer)
-void
+int
     zloop_timer_end (zloop_t *self, void *arg);
 
 //  Set verbose tracing of reactor on/off
@@ -73,10 +73,13 @@ EXAMPLE
 .From zloop_test method
 ----
     zctx_t *ctx = zctx_new ();
+    assert (ctx);
 
     void *output = zsocket_new (ctx, ZMQ_PAIR);
+    assert (output);
     zsocket_bind (output, "inproc://zloop.test");
     void *input = zsocket_new (ctx, ZMQ_PAIR);
+    assert (input);
     zsocket_connect (input, "inproc://zloop.test");
 
     zloop_t *loop = zloop_new ();
@@ -84,10 +87,12 @@ EXAMPLE
     zloop_set_verbose (loop, verbose);
 
     //  After 10 msecs, send a ping message to output
-    zloop_timer (loop, 10, 1,  s_timer_event, output);
+    zloop_timer (loop, 10, 1, s_timer_event, output);
+    
     //  When we get the ping message, end the reactor
     zmq_pollitem_t poll_input = { input, 0, ZMQ_POLLIN };
-    zloop_poller (loop, &poll_input, s_socket_event, NULL);
+    rc = zloop_poller (loop, &poll_input, s_socket_event, NULL);
+    assert (rc == 0);
     zloop_start (loop);
 
     zloop_destroy (&loop);

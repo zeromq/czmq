@@ -33,7 +33,7 @@ size_t
     zmsg_content_size (zmsg_t *self);
 
 //  Push frame to front of message, before first frame
-void
+int
     zmsg_push (zmsg_t *self, zframe_t *frame);
 
 //  Pop frame off front of message, caller now owns frame
@@ -41,23 +41,27 @@ zframe_t *
     zmsg_pop (zmsg_t *self);
 
 //  Add frame to end of message, after last frame
-void
+int
     zmsg_add (zmsg_t *self, zframe_t *frame);
 
-//  Push block of memory as new frame to front of message
-void
+//  Push block of memory as new frame to front of message.
+//  Returns 0 on success, -1 on error.
+int
     zmsg_pushmem (zmsg_t *self, const void *src, size_t size);
 
-//  Push block of memory as new frame to end of message
-void
+//  Push block of memory as new frame to end of message.
+//  Returns 0 on success, -1 on error.
+int
     zmsg_addmem (zmsg_t *self, const void *src, size_t size);
 
-//  Push string as new frame to front of message
-void
+//  Push string as new frame to front of message.
+//  Returns 0 on success, -1 on error.
+int
     zmsg_pushstr (zmsg_t *self, const char *format, ...);
 
-//  Push string as new frame to end of message
-void
+//  Push string as new frame to end of message.
+//  Returns 0 on success, -1 on error.
+int
     zmsg_addstr (zmsg_t *self, const char *format, ...);
 
 //  Pop frame off front of message, return as fresh string
@@ -135,15 +139,20 @@ EXAMPLE
 .From zmsg_test method
 ----
     zctx_t *ctx = zctx_new ();
+    assert (ctx);
 
     void *output = zsocket_new (ctx, ZMQ_PAIR);
+    assert (output);
     zsocket_bind (output, "inproc://zmsg.test");
     void *input = zsocket_new (ctx, ZMQ_PAIR);
+    assert (input);
     zsocket_connect (input, "inproc://zmsg.test");
 
     //  Test send and receive of single-frame message
     zmsg_t *msg = zmsg_new ();
+    assert (msg);
     zframe_t *frame = zframe_new ("Hello", 5);
+    assert (frame);
     zmsg_push (msg, frame);
     assert (zmsg_size (msg) == 1);
     assert (zmsg_content_size (msg) == 5);
@@ -158,17 +167,29 @@ EXAMPLE
 
     //  Test send and receive of multi-frame message
     msg = zmsg_new ();
-    zmsg_addmem (msg, "Frame0", 6);
-    zmsg_addmem (msg, "Frame1", 6);
-    zmsg_addmem (msg, "Frame2", 6);
-    zmsg_addmem (msg, "Frame3", 6);
-    zmsg_addmem (msg, "Frame4", 6);
-    zmsg_addmem (msg, "Frame5", 6);
-    zmsg_addmem (msg, "Frame6", 6);
-    zmsg_addmem (msg, "Frame7", 6);
-    zmsg_addmem (msg, "Frame8", 6);
-    zmsg_addmem (msg, "Frame9", 6);
+    assert (msg);
+    rc = zmsg_addmem (msg, "Frame0", 6);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, "Frame1", 6);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, "Frame2", 6);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, "Frame3", 6);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, "Frame4", 6);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, "Frame5", 6);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, "Frame6", 6);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, "Frame7", 6);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, "Frame8", 6);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, "Frame9", 6);
+    assert (rc == 0);
     zmsg_t *copy = zmsg_dup (msg);
+    assert (copy);
     zmsg_send (&copy, output);
     zmsg_send (&msg, output);
 
@@ -188,7 +209,7 @@ EXAMPLE
     //  Save to a file, read back
     FILE *file = fopen ("zmsg.test", "w");
     assert (file);
-    int rc = zmsg_save (msg, file);
+    rc = zmsg_save (msg, file);
     assert (rc == 0);
     fclose (file);
 
@@ -200,6 +221,7 @@ EXAMPLE
 
     file = fopen ("zmsg.test", "r");
     msg = zmsg_load (NULL, file);
+    assert (msg);
     fclose (file);
     remove ("zmsg.test");
     assert (zmsg_size (msg) == 10);
@@ -217,9 +239,11 @@ EXAMPLE
     assert (zmsg_size (msg) == 2);
     assert (zmsg_content_size (msg) == 12);
     frame = zframe_new ("Address", 7);
+    assert (frame);
     zmsg_wrap (msg, frame);
     assert (zmsg_size (msg) == 4);
-    zmsg_addstr (msg, "Body");
+    rc = zmsg_addstr (msg, "Body");
+    assert (rc == 0);
     assert (zmsg_size (msg) == 5);
     frame = zmsg_unwrap (msg);
     zframe_destroy (&frame);
@@ -231,16 +255,27 @@ EXAMPLE
 
     //  Test encoding/decoding
     msg = zmsg_new ();
+    assert (msg);
     byte *blank = zmalloc (100000);
-    zmsg_addmem (msg, blank, 0);
-    zmsg_addmem (msg, blank, 1);
-    zmsg_addmem (msg, blank, 253);
-    zmsg_addmem (msg, blank, 254);
-    zmsg_addmem (msg, blank, 255);
-    zmsg_addmem (msg, blank, 256);
-    zmsg_addmem (msg, blank, 65535);
-    zmsg_addmem (msg, blank, 65536);
-    zmsg_addmem (msg, blank, 65537);
+    assert (blank);
+    rc = zmsg_addmem (msg, blank, 0);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, blank, 1);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, blank, 253);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, blank, 254);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, blank, 255);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, blank, 256);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, blank, 65535);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, blank, 65536);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, blank, 65537);
+    assert (rc == 0);
     free (blank);
     assert (zmsg_size (msg) == 9);
     byte *buffer;
@@ -253,6 +288,7 @@ EXAMPLE
 
     //  Now try methods on an empty message
     msg = zmsg_new ();
+    assert (msg);
     assert (zmsg_size (msg) == 0);
     assert (zmsg_first (msg) == NULL);
     assert (zmsg_next (msg) == NULL);

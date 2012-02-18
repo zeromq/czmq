@@ -30,8 +30,9 @@ zframe_t *
 zframe_t *
     zframe_recv_nowait (void *socket);
 
-//  Send a frame to a socket, destroy frame after sending
-void
+// Send a frame to a socket, destroy frame after sending.  Returns
+// non-zero error code on failure.
+int
     zframe_send (zframe_t **self_p, void *socket, int flags);
 
 //  Return number of bytes in frame data
@@ -97,22 +98,28 @@ EXAMPLE
 .From zframe_test method
 ----
     zctx_t *ctx = zctx_new ();
+    assert (ctx);
 
     void *output = zsocket_new (ctx, ZMQ_PAIR);
+    assert (output);
     zsocket_bind (output, "inproc://zframe.test");
     void *input = zsocket_new (ctx, ZMQ_PAIR);
+    assert (input);
     zsocket_connect (input, "inproc://zframe.test");
 
     //  Send five different frames, test ZFRAME_MORE
     int frame_nbr;
     for (frame_nbr = 0; frame_nbr < 5; frame_nbr++) {
         zframe_t *frame = zframe_new ("Hello", 5);
-        zframe_send (&frame, output, ZFRAME_MORE);
+        rc = zframe_send (&frame, output, ZFRAME_MORE);
+        assert (rc == 0);
     }
     //  Send same frame five times, test ZFRAME_REUSE
     zframe_t *frame = zframe_new ("Hello", 5);
+    assert (frame);
     for (frame_nbr = 0; frame_nbr < 5; frame_nbr++) {
-        zframe_send (&frame, output, ZFRAME_MORE + ZFRAME_REUSE);
+        rc = zframe_send (&frame, output, ZFRAME_MORE + ZFRAME_REUSE);
+        assert (rc == 0);
     }
     assert (frame);
     zframe_t *copy = zframe_dup (frame);
@@ -125,6 +132,7 @@ EXAMPLE
 
     //  Send END frame
     frame = zframe_new ("NOT", 3);
+    assert (frame);
     zframe_reset (frame, "END", 3);
     char *string = zframe_strhex (frame);
     assert (streq (string, "454E44"));
@@ -132,7 +140,8 @@ EXAMPLE
     string = zframe_strdup (frame);
     assert (streq (string, "END"));
     free (string);
-    zframe_send (&frame, output, 0);
+    rc = zframe_send (&frame, output, 0);
+    assert (rc == 0);
 
     //  Read and count until we receive END
     frame_nbr = 0;
