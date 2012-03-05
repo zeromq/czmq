@@ -48,6 +48,7 @@
 struct _zframe_t {
     zmq_msg_t zmsg;             //  zmq_msg_t blob for frame
     int more;                   //  More flag, from last read
+    int zero_copy;              //  zero-copy flag
 };
 
 
@@ -69,6 +70,34 @@ zframe_new (const void *data, size_t size)
         zmq_msg_init_size (&self->zmsg, size);
         if (data)
             memcpy (zmq_msg_data (&self->zmsg), data, size);
+    }
+    else
+        zmq_msg_init (&self->zmsg);
+
+    return self;
+}
+
+//  --------------------------------------------------------------------------
+//  Constructor; Allows zero-copy semantics.
+//  Zero-copy frame is initialised if data != NULL, size > 0, free_fn != 0
+//  'arg' is a void pointer that is passed to free_fn as second argument
+zframe_t *
+zframe_new_zero_copy (void *data, size_t size, zframe_free_fn *free_fn, void *arg)
+{
+    zframe_t
+        *self;
+
+    self = (zframe_t *) zmalloc (sizeof (zframe_t));
+    if (!self)
+        return NULL;
+
+    if (size) {
+        if (data && free_fn) {
+            zmq_msg_init_data (&self->zmsg, data, size, free_fn, arg);
+            self->zero_copy = 1;
+        }
+        else
+            zmq_msg_init_size (&self->zmsg, size);
     }
     else
         zmq_msg_init (&self->zmsg);
@@ -269,6 +298,16 @@ zframe_more (zframe_t *self)
     return self->more;
 }
 
+// --------------------------------------------------------------------------
+// Return frame zero copy indicator (1 or 0)
+
+int
+zframe_zero_copy (zframe_t *self)
+{
+    assert (self);
+    return self->zero_copy;
+}
+
 
 //  --------------------------------------------------------------------------
 //  Return TRUE if two frames have identical size and data
@@ -336,9 +375,21 @@ zframe_reset (zframe_t *self, const void *data, size_t size)
     memcpy (zmq_msg_data (&self->zmsg), data, size);
 }
 
-
 //  --------------------------------------------------------------------------
 //  Selftest
+
+static void
+s_test_free_cb (void *data, void *arg)
+{
+    char cmp_buf [1024];
+
+    int i;
+    for (i = 0; i < 1024; i++)
+        cmp_buf [i] = 'A';
+
+    assert (memcmp (data, cmp_buf, 1024) == 0);
+    free (data);
+}
 
 int
 zframe_test (Bool verbose)
@@ -407,6 +458,21 @@ zframe_test (Bool verbose)
     assert (frame_nbr == 10);
     frame = zframe_recv_nowait (input);
     assert (frame == NULL);
+
+    // Test zero copy
+    char *buffer = malloc (1024);
+    int i;
+    for (i = 0; i < 1024; i++)
+        buffer [i] = 'A';
+
+    frame = zframe_new_zero_copy (buffer, 1024, s_test_free_cb, NULL);
+    zframe_t *frame_copy = zframe_dup (frame);
+
+    assert (zframe_zero_copy (frame) == 1);
+    assert (zframe_zero_copy (frame_copy) == 0);
+
+    zframe_destroy (&frame);
+    zframe_destroy (&frame_copy);
 
     zctx_destroy (&ctx);
     //  @end
