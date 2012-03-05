@@ -38,9 +38,17 @@ typedef struct _zframe_t zframe_t;
 #define ZFRAME_MORE     1
 #define ZFRAME_REUSE    2
 
+//  Callback function for zframe_free_fn method
+typedef void (zframe_free_fn) (void *data, void *arg);
+
 //  Create a new frame with optional size, and optional data
 zframe_t *
     zframe_new (const void *data, size_t size);
+
+//  Create a zero-copy frame
+zframe_t *
+    zframe_new_zero_copy (void *data, size_t size,
+                          zframe_free_fn *free_fn, void *arg);
 
 //  Destroy a frame
 void
@@ -85,6 +93,10 @@ char *
 //  Return TRUE if frame body is equal to string, excluding terminator
 Bool
     zframe_streq (zframe_t *self, char *string);
+
+// Return frame zero copy indicator (1 or 0)
+int
+    zframe_zero_copy (zframe_t *self);
 
 //  Return frame 'more' property
 int
