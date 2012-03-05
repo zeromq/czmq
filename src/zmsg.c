@@ -364,7 +364,7 @@ zmsg_unwrap (zmsg_t *self)
     assert (self);
     zframe_t *frame = zmsg_pop (self);
     zframe_t *empty = zmsg_first (self);
-    if (zframe_size (empty) == 0) {
+    if (empty && zframe_size (empty) == 0) {
         empty = zmsg_pop (self);
         zframe_destroy (&empty);
     }
