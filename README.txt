@@ -9,16 +9,12 @@
 
 ## Overview
 
-### To report an Issue
-
-[Use the issue tracker.](https://zeromq.jira.com/browse/CZMQ)
-
 ### Scope and Goals
 
 CZMQ has these goals:
 
 * To wrap the 0MQ core API in semantics that are natural and lead to shorter, more readable applications.
-* To hide the differences between versions of 0MQ, particularly 2.1 and 3.0.
+* To hide the differences between versions of 0MQ, particularly 2.1 and 3.1.
 * To provide a space for development of more sophisticated API semantics.
 
 CZMQ grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.org) and [ZFL](http://zfl.zeromq.org). Until end-April 2011, CZMQ was known as *libzapi*.
@@ -53,7 +49,7 @@ CZMQ grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.o
 
 ### Highlights
 
-* Single API hides differences between 0MQ/2.1, and 0MQ/3.0.
+* Single API hides differences between 0MQ/2.1, and 0MQ/3.1.
 * Work with messages as strings, individual frames, or multipart messages.
 * Automatic closure of any open sockets at context termination.
 * Automatic LINGER configuration of all sockets for context termination.
@@ -73,11 +69,9 @@ The authors of CZMQ grant you use of this software under the terms of the GNU Le
 
 ### Contributing
 
-To submit an issue use the [issue tracker](https://zeromq.jira.com/browse/CZMQ). All discussion happens on the [zeromq-dev](zeromq-dev@lists.zeromq.org) list or #zeromq IRC channel at irc.freenode.net.
+CZMQ uses the [C4 (Collective Code Construction Contract)](http://rfc.zeromq.org/spec:16) process which says, "Everyone, without distinction or discrimination, SHALL have an equal right to become a Contributor under the terms of this contract".
 
-The proper way to submit patches is to clone this repository, make your changes, and use git to create a patch or a pull request. See http://www.zeromq.org/docs:contributing. All contributors are listed in AUTHORS.
-
-The general rule is, if you contribute code to CZMQ you must be willing to maintain it as long as there are users of it. Code with no active maintainer will in general be deprecated and/or removed.
+To report an issue, use the [CZMQ issue tracker](https://github.com/zeromq/czmq/issues) at github.com.
 
 ## Using CZMQ
 
@@ -442,7 +436,7 @@ The canonical 'standard operating system' for all CZMQ code is Linux, gcc, POSIX
 
 ### Code Generation
 
-We generate the zsockopt class using the mysterious but powerful GSL code generator. It's actually really cool, since about 30 lines of XML are sufficient to generate 700 lines of code. Better, since many of the option data types changed in 0MQ/3.0, it's possible to completely hide the differences. To regenerate the zsockopt class, build and install GSL from https://github.com/imatix/gsl, and then:
+We generate the zsockopt class using the mysterious but powerful GSL code generator. It's actually cool, since about 30 lines of XML are sufficient to generate 700 lines of code. Better, since many of the option data types changed in 0MQ/3.1, it's possible to completely hide the differences. To regenerate the zsockopt class, build and install GSL from https://github.com/imatix/gsl, and then:
 
     gsl sockopts
 
