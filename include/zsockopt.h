@@ -32,6 +32,56 @@
 extern "C" {
 #endif
 
+// Uniform zsocket_set_* API
+
+#define zsocket_set_hwm zsockopt_set_hwm
+#define zsocket_set_swap zsockopt_set_swap
+#define zsocket_set_affinity zsockopt_set_affinity
+#define zsocket_set_identity zsockopt_set_identity
+#define zsocket_set_rate zsockopt_set_rate
+#define zsocket_set_recovery_ivl zsockopt_set_recovery_ivl
+#define zsocket_set_recovery_ivl_msec zsockopt_set_recovery_ivl_msec
+#define zsocket_set_mcast_loop zsockopt_set_mcast_loop
+#define zsocket_set_sndbuf zsockopt_set_sndbuf
+#define zsocket_set_rcvbuf zsockopt_set_rcvbuf
+#define zsocket_set_linger zsockopt_set_linger
+#define zsocket_set_reconnect_ivl zsockopt_set_reconnect_ivl
+#define zsocket_set_reconnect_ivl_max zsockopt_set_reconnect_ivl_max
+#define zsocket_set_backlog zsockopt_set_backlog
+#define zsocket_set_subscribe zsockopt_set_subscribe
+#define zsocket_set_unsubscribe zsockopt_set_unsubscribe
+#define zsocket_set_sndhwm zsockopt_set_sndhwm
+#define zsocket_set_rcvhwm zsockopt_set_rcvhwm
+#define zsocket_set_backlog zsockopt_set_backlog
+#define zsocket_set_maxmsgsize zsockopt_set_maxmsgsize
+
+// Uniform zsocket_* API
+
+#define zsocket_hwm zsockopt_hwm
+#define zsocket_swap zsockopt_swap
+#define zsocket_affinity zsockopt_affinity
+#define zsocket_identity zsockopt_identity
+#define zsocket_rate zsockopt_rate
+#define zsocket_recovery_ivl zsockopt_recovery_ivl
+#define zsocket_recovery_ivl_msec zsockopt_recovery_ivl_msec
+#define zsocket_mcast_loop zsockopt_mcast_loop
+#define zsocket_sndbuf zsockopt_sndbuf
+#define zsocket_rcvbuf zsockopt_rcvbuf
+#define zsocket_linger zsockopt_linger
+#define zsocket_reconnect_ivl zsockopt_reconnect_ivl
+#define zsocket_reconnect_ivl_max zsockopt_reconnect_ivl_max
+#define zsocket_backlog zsockopt_backlog
+#define zsocket_subscribe zsockopt_subscribe
+#define zsocket_unsubscribe zsockopt_unsubscribe
+#define zsocket_sndhwm zsockopt_sndhwm
+#define zsocket_rcvhwm zsockopt_rcvhwm
+#define zsocket_backlog zsockopt_backlog
+#define zsocket_maxmsgsize zsockopt_maxmsgsize
+#define zsocket_events zsocketopt_events
+#define zsocket_rcvmore zsocketopt_rcvmore
+#define zsocket_type zsocketopt_type
+#define zsocket_fd zsocketopt_fd
+
 //  @interface
 #if (ZMQ_VERSION_MAJOR == 2)
 //  Get socket options

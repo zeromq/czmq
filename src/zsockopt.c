@@ -40,7 +40,6 @@
 #include "../include/zsocket.h"
 #include "../include/zsockopt.h"
 
-
 #if (ZMQ_VERSION_MAJOR == 2)
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_HWM value
