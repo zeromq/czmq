@@ -59,6 +59,11 @@ void
 void
     zctx_set_linger (zctx_t *self, int linger);
 
+//  Return low-level 0MQ context object, will be NULL before first socket
+//  is created. Use with care.
+void *
+    zctx_underlying (zctx_t *self);
+
 //  Self test of this class
 int
     zctx_test (Bool verbose);
