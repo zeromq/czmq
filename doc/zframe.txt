@@ -11,6 +11,9 @@ SYNOPSIS
 #define ZFRAME_MORE     1
 #define ZFRAME_REUSE    2
 
+//  Callback function for zframe_free_fn method
+typedef void (zframe_free_fn) (void *data, void *arg);
+
 //  Create a new frame with optional size, and optional data
 zframe_t *
     zframe_new (const void *data, size_t size);
@@ -100,36 +103,12 @@ frame is part of an unfinished multipart message. The zframe_send method
 normally destroys the frame, but with the ZFRAME_REUSE flag, you can send
 the same frame many times. Frames are binary, and this class has no
 special support for text data.
-zframe_new_zero_copy() can be used to create zero-copy frames. The caller
-must provide contents, size and free function for the frame to be initialised
-as zero-copy. Caller is responsible for making sure that the frame contents
-are valid until the free_fn is called.
 
 
 EXAMPLE
 -------
 .From zframe_test method
 ----
-static void
-s_test_free_cb (void *data, void *arg)
-{
-    char cmp_buf [1024];
-
-    int i;
-    for (i = 0; i < 1024; i++)
-        cmp_buf [i] = 'A';
-
-    assert (memcmp (data, cmp_buf, 1024) == 0);
-    free (data);
-}
-
-int
-zframe_test (Bool verbose)
-{
-    printf (" * zframe: ");
-    int rc;
-
-    //  @selftest
     zctx_t *ctx = zctx_new ();
     assert (ctx);
 
@@ -207,10 +186,6 @@ zframe_test (Bool verbose)
     zframe_destroy (&frame_copy);
 
     zctx_destroy (&ctx);
-    //  @end
-    printf ("OK\n");
-    return 0;
-}
 ----
 
 SEE ALSO

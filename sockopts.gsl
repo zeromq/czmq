@@ -5,7 +5,6 @@
 .           option.ctype = "int"
 .       elsif type = "blob"
 .           option.ctype = "char *"     #   Enforce C strings
-.           mode = "w"                  #   and read-only
 .       else
 .           echo "E: unknown type: $(type)"
 .       endif
@@ -16,7 +15,7 @@
 
     GENERATED SOURCE CODE, DO NOT EDIT
     -------------------------------------------------------------------------
-    Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
+    Copyright (c) 1991-2012 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -51,15 +50,17 @@ extern "C" {
 //  Get socket options
 .   for option
 .       if mode = "rw" | mode = "r"
-$(ctype)\
-     zsockopt_$(name) (void *socket);
+.           if type = "blob"
+//  Returns freshly allocated string, free when done
+.           endif
+$(ctype) zsocket_$(name) (void *socket);
 .       endif
 .   endfor
 
 //  Set socket options
 .   for option
 .       if mode = "rw" | mode = "w"
-void zsockopt_set_$(name) (void *socket, $(ctype) $(name));
+void zsocket_set_$(name) (void *socket, $(ctype) $(name));
 .       endif
 .   endfor
 .   for header
@@ -73,6 +74,21 @@ $(string.trim(.):)
 int zsockopt_test (Bool verbose);
 //  @end
 
+.for version
+//  Deprecated function names
+#if (ZMQ_VERSION_MAJOR == $(major))
+.   for option
+.       if mode = "rw" | mode = "r"
+#define zsockopt_$(name) zsocket_$(name)
+.       endif
+.       if mode = "rw" | mode = "w"
+#define zsockopt_set_$(name) zsocket_set_$(name)
+.       endif
+.   endfor
+#endif
+
+.endfor
+
 #ifdef __cplusplus
 }
 #endif
@@ -84,7 +100,7 @@ int zsockopt_test (Bool verbose);
 
     GENERATED SOURCE CODE, DO NOT EDIT
     -------------------------------------------------------------------------
-    Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
+    Copyright (c) 1991-2012 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -130,7 +146,7 @@ int zsockopt_test (Bool verbose);
 //  Set socket ZMQ_$(NAME) value
 
 void
-zsockopt_set_$(name) (void *socket, $(ctype) $(name))
+zsocket_set_$(name) (void *socket, $(ctype) $(name))
 {
 .           if ctype = "int"
 .               if type = "uint64"
@@ -158,22 +174,25 @@ zsockopt_set_$(name) (void *socket, $(ctype) $(name))
 //  Return socket ZMQ_$(NAME) value
 
 $(ctype)
-zsockopt_$(name) (void *socket)
+zsocket_$(name) (void *socket)
 {
 .           if type = "uint64"
     uint64_t $(name);
-    size_t type_size = sizeof (uint64_t);
+    size_t option_len = sizeof (uint64_t);
 .           elsif type = "int64"
     int64_t $(name);
-    size_t type_size = sizeof (int64_t);
+    size_t option_len = sizeof (int64_t);
 .           elsif type = "uint32"
     uint32_t $(name);
-    size_t type_size = sizeof (uint32_t);
+    size_t option_len = sizeof (uint32_t);
 .           elsif type = "int"
     int $(name);
-    size_t type_size = sizeof (int);
+    size_t option_len = sizeof (int);
+.           elsif type = "blob"
+    size_t option_len = 255;
+    char *$(name) = zmalloc (option_len);
 .           endif
-    zmq_getsockopt (socket, ZMQ_$(NAME), &$(name), &type_size);
+    zmq_getsockopt (socket, ZMQ_$(NAME), &$(name), &option_len);
 .           if type = "int"
     return $(name);
 .           else
@@ -210,16 +229,16 @@ zsockopt_test (Bool verbose)
     assert (socket);
 .       if mode = "rw" | mode = "w"
 .           if ctype = "int"
-    zsockopt_set_$(name) (socket, 1);
+    zsocket_set_$(name) (socket, 1);
 .               if mode = "rw"
-    assert (zsockopt_$(name) (socket) == 1);
+    assert (zsocket_$(name) (socket) == 1);
 .               endif
 .           else
-    zsockopt_set_$(name) (socket, "test");
+    zsocket_set_$(name) (socket, "test"); //a
 .           endif
 .       endif
 .       if mode = "rw" | mode = "r"
-    zsockopt_$(name) (socket);
+    zsocket_$(name) (socket);
 .       endif
     zsocket_destroy (ctx, socket);
 .   endfor

@@ -4,15 +4,20 @@ CZMQ version 1.2.0 (stable), released on 2011/10/xx
 Changes
 -------
 
+* zsockopt_ functions renamed to zsocket_, for clarity. Old names are
+  still provided for compatibility.
+
 * SUB sockets are no longer subscribed to everything.
 
-* Fixed issue CZMQ-7, wrong name used for czmq man page.
+* Fixed issue CZMQ-7, wrong name used for CZMQ man page.
 
 * Changed zsocket_connect() to return 0 or -1, since zmq_connect() now
   checks endpoints properly (issue LIBZMQ-207).
 
 * All classes handle memory exhaustion correctly by returning an error
   instead of asserting.
+
+* zsocket_identity implemented correctly.
 
 
 CZMQ version 1.1.0 (stable), released on 2011/08/30
