@@ -137,7 +137,7 @@ zframe_recv (void *socket)
             zframe_destroy (&self);
             return NULL;            //  Interrupted or terminated
         }
-        self->more = zsockopt_rcvmore (socket);
+        self->more = zsocket_rcvmore (socket);
     }
     return self;
 }
@@ -157,7 +157,7 @@ zframe_recv_nowait (void *socket)
             zframe_destroy (&self);
             return NULL;            //  Interrupted or terminated
         }
-        self->more = zsockopt_rcvmore (socket);
+        self->more = zsocket_rcvmore (socket);
     }
     return self;
 }
