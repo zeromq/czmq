@@ -37,6 +37,7 @@ typedef struct _zframe_t zframe_t;
 //  @interface
 #define ZFRAME_MORE     1
 #define ZFRAME_REUSE    2
+#define ZFRAME_DONTWAIT 4
 
 //  Callback function for zframe_free_fn method
 typedef void (zframe_free_fn) (void *data, void *arg);

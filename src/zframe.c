@@ -175,6 +175,8 @@ zframe_send (zframe_t **self_p, void *socket, int flags)
 
     if (*self_p) {
         zframe_t *self = *self_p;
+        int snd_flags = (flags & ZFRAME_MORE)? ZMQ_SNDMORE: 0;
+        snd_flags |= (flags & ZFRAME_DONTWAIT)? ZMQ_DONTWAIT: 0;
         if (flags & ZFRAME_REUSE) {
             zmq_msg_t copy;
             zmq_msg_init (&copy);
@@ -182,14 +184,14 @@ zframe_send (zframe_t **self_p, void *socket, int flags)
                 puts ("copy");
                 return -1;
             }
-            if (zmq_sendmsg (socket, &copy, (flags & ZFRAME_MORE)? ZMQ_SNDMORE: 0) == -1) {
+            if (zmq_sendmsg (socket, &copy, snd_flags) == -1) {
                 puts ("sendmsg 1");
                 return -1;
             }
             zmq_msg_close (&copy);
         }
         else {
-            if (zmq_sendmsg (socket, &self->zmsg, (flags & ZFRAME_MORE)? ZMQ_SNDMORE: 0) == -1) {
+            if (zmq_sendmsg (socket, &self->zmsg, snd_flags) == -1) {
                 puts ("sendmsg 2");
                 puts (zmq_strerror (errno));
                 return -1;
