@@ -89,7 +89,7 @@ CZMQ uses autotools for packaging. To build from git (all example commands are f
 
 You will need the libtool and autotools packages. On FreeBSD, you may need to specify the default directories for configure:
 
-    ./configure --with-zeromq=/usr/local
+    ./configure --with-libzmq=/usr/local
 
 After building, you can run the CZMQ selftests:
 
