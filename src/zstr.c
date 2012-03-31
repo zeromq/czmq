@@ -121,18 +121,12 @@ zstr_sendm (void *socket, const char *string)
     return rc == -1? -1: 0;
 }
 
-
-//  --------------------------------------------------------------------------
-//  Send formatted C string to socket
-
-int
-zstr_sendf (void *socket, const char *format, ...)
+static int
+s_zstr_sendf_impl (void *socket, Bool more, const char *format, va_list argptr)
 {
     assert (socket);
 
     //  Format string into buffer
-    va_list argptr;
-    va_start (argptr, format);
     int size = 255 + 1;
     char *string = (char *) malloc (size);
     int required = vsnprintf (string, size, format, argptr);
@@ -141,14 +135,48 @@ zstr_sendf (void *socket, const char *format, ...)
         string = (char *) realloc (string, size);
         vsnprintf (string, size, format, argptr);
     }
-    va_end (argptr);
 
     //  Now send formatted string
-    int rc = zstr_send (socket, string);
+    int rc;
+    if (more)
+        rc = zstr_sendm (socket, string);
+    else
+        rc = zstr_send (socket, string);
     free (string);
     return rc;
 }
 
+//  --------------------------------------------------------------------------
+//  Send formatted C string to socket
+int
+zstr_sendf (void *socket, const char *format, ...)
+{
+    assert (socket);
+
+    va_list argptr;
+    va_start (argptr, format);
+
+    int rc = s_zstr_sendf_impl (socket, FALSE, format, argptr);
+    va_end (argptr);
+
+    return rc;
+}
+
+//  --------------------------------------------------------------------------
+//  Send formatted C string to socket with MORE flag
+int
+zstr_sendfm (void *socket, const char *format, ...)
+{
+    assert (socket);
+
+    va_list argptr;
+    va_start (argptr, format);
+
+    int rc = s_zstr_sendf_impl (socket, TRUE, format, argptr);
+    va_end (argptr);
+
+    return rc;
+}
 
 //  --------------------------------------------------------------------------
 //  Selftest

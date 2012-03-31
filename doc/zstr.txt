@@ -28,6 +28,10 @@ int
 int
     zstr_sendf (void *socket, const char *format, ...);
 
+//  Send formatted C string to socket with MORE flag
+int
+    zstr_sendfm (void *socket, const char *format, ...);
+
 //  Self test of this class
 int
     zstr_test (Bool verbose);
