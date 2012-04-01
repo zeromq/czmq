@@ -976,10 +976,10 @@ zsocket_last_endpoint (void *socket)
 //  Set socket high-water mark, emulating 2.x API
 
 void
-zsockopt_set_hwm (void *socket, int hwm)
+zsocket_set_hwm (void *socket, int hwm)
 {
-    zsockopt_set_sndhwm (socket, hwm);
-    zsockopt_set_rcvhwm (socket, hwm);
+    zsocket_set_sndhwm (socket, hwm);
+    zsocket_set_rcvhwm (socket, hwm);
 }
 
 #endif
@@ -1241,7 +1241,7 @@ zsockopt_test (Bool verbose)
     zsocket_last_endpoint (socket);
     zsocket_destroy (ctx, socket);
 
-    zsockopt_set_hwm (socket, 1);
+    zsocket_set_hwm (socket, 1);
 #endif
 
     zctx_destroy (&ctx);
