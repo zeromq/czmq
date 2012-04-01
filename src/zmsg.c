@@ -414,14 +414,7 @@ zframe_t *
 zmsg_last (zmsg_t *self)
 {
     assert (self);
-    zframe_t *frame = (zframe_t *) zlist_first (self->frames);
-    while (frame) {
-        zframe_t *next = (zframe_t *) zlist_next (self->frames);
-        if (!next)
-            break;
-        frame = next;
-    }
-    return frame;
+    return (zframe_t *) zlist_last (self->frames);
 }
 
 
@@ -755,6 +748,8 @@ zmsg_test (Bool verbose)
     }
     //  Test message frame manipulation
     assert (zmsg_size (msg) == 2);
+    frame = zmsg_last (msg);
+    assert (zframe_streq (frame, "Frame9"));
     assert (zmsg_content_size (msg) == 12);
     frame = zframe_new ("Address", 7);
     assert (frame);
@@ -809,6 +804,7 @@ zmsg_test (Bool verbose)
     assert (msg);
     assert (zmsg_size (msg) == 0);
     assert (zmsg_first (msg) == NULL);
+    assert (zmsg_last (msg) == NULL);
     assert (zmsg_next (msg) == NULL);
     assert (zmsg_pop (msg) == NULL);
     zmsg_destroy (&msg);
