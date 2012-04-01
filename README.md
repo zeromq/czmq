@@ -112,7 +112,7 @@ CZMQ uses autotools for packaging. To build from git (all example commands are f
 
 You will need the libtool and autotools packages. On FreeBSD, you may need to specify the default directories for configure:
 
-    ./configure --with-zeromq=/usr/local
+    ./configure --with-libzmq=/usr/local
 
 After building, you can run the CZMQ selftests:
 
@@ -239,117 +239,93 @@ This is the class interface:
 
     #if (ZMQ_VERSION_MAJOR == 2)
     //  Get socket options
-    int  zsockopt_hwm (void *socket);
-    int  zsockopt_swap (void *socket);
-    int  zsockopt_affinity (void *socket);
-    int  zsockopt_rate (void *socket);
-    int  zsockopt_recovery_ivl (void *socket);
-    int  zsockopt_recovery_ivl_msec (void *socket);
-    int  zsockopt_mcast_loop (void *socket);
-    int  zsockopt_sndbuf (void *socket);
-    int  zsockopt_rcvbuf (void *socket);
-    int  zsockopt_linger (void *socket);
-    int  zsockopt_reconnect_ivl (void *socket);
-    int  zsockopt_reconnect_ivl_max (void *socket);
-    int  zsockopt_backlog (void *socket);
-    int  zsockopt_type (void *socket);
-    int  zsockopt_rcvmore (void *socket);
-    int  zsockopt_fd (void *socket);
-    int  zsockopt_events (void *socket);
+    int  zsocket_hwm (void *socket);
+    int  zsocket_swap (void *socket);
+    int  zsocket_affinity (void *socket);
+    //  Returns freshly allocated string, free when done
+    char *zsocket_identity (void *socket);
+    int  zsocket_rate (void *socket);
+    int  zsocket_recovery_ivl (void *socket);
+    int  zsocket_recovery_ivl_msec (void *socket);
+    int  zsocket_mcast_loop (void *socket);
+    int  zsocket_sndbuf (void *socket);
+    int  zsocket_rcvbuf (void *socket);
+    int  zsocket_linger (void *socket);
+    int  zsocket_reconnect_ivl (void *socket);
+    int  zsocket_reconnect_ivl_max (void *socket);
+    int  zsocket_backlog (void *socket);
+    int  zsocket_type (void *socket);
+    int  zsocket_rcvmore (void *socket);
+    int  zsocket_fd (void *socket);
+    int  zsocket_events (void *socket);
     
     //  Set socket options
-    void zsockopt_set_hwm (void *socket, int hwm);
-    void zsockopt_set_swap (void *socket, int swap);
-    void zsockopt_set_affinity (void *socket, int affinity);
-    void zsockopt_set_identity (void *socket, char * identity);
-    void zsockopt_set_rate (void *socket, int rate);
-    void zsockopt_set_recovery_ivl (void *socket, int recovery_ivl);
-    void zsockopt_set_recovery_ivl_msec (void *socket, int recovery_ivl_msec);
-    void zsockopt_set_mcast_loop (void *socket, int mcast_loop);
-    void zsockopt_set_sndbuf (void *socket, int sndbuf);
-    void zsockopt_set_rcvbuf (void *socket, int rcvbuf);
-    void zsockopt_set_linger (void *socket, int linger);
-    void zsockopt_set_reconnect_ivl (void *socket, int reconnect_ivl);
-    void zsockopt_set_reconnect_ivl_max (void *socket, int reconnect_ivl_max);
-    void zsockopt_set_backlog (void *socket, int backlog);
-    void zsockopt_set_subscribe (void *socket, char * subscribe);
-    void zsockopt_set_unsubscribe (void *socket, char * unsubscribe);
+    void zsocket_set_hwm (void *socket, int hwm);
+    void zsocket_set_swap (void *socket, int swap);
+    void zsocket_set_affinity (void *socket, int affinity);
+    void zsocket_set_identity (void *socket, char * identity);
+    void zsocket_set_rate (void *socket, int rate);
+    void zsocket_set_recovery_ivl (void *socket, int recovery_ivl);
+    void zsocket_set_recovery_ivl_msec (void *socket, int recovery_ivl_msec);
+    void zsocket_set_mcast_loop (void *socket, int mcast_loop);
+    void zsocket_set_sndbuf (void *socket, int sndbuf);
+    void zsocket_set_rcvbuf (void *socket, int rcvbuf);
+    void zsocket_set_linger (void *socket, int linger);
+    void zsocket_set_reconnect_ivl (void *socket, int reconnect_ivl);
+    void zsocket_set_reconnect_ivl_max (void *socket, int reconnect_ivl_max);
+    void zsocket_set_backlog (void *socket, int backlog);
+    void zsocket_set_subscribe (void *socket, char * subscribe);
+    void zsocket_set_unsubscribe (void *socket, char * unsubscribe);
     #endif
     
     #if (ZMQ_VERSION_MAJOR == 3)
     //  Get socket options
-    int  zsockopt_sndhwm (void *socket);
-    int  zsockopt_rcvhwm (void *socket);
-    int  zsockopt_affinity (void *socket);
-    int  zsockopt_rate (void *socket);
-    int  zsockopt_recovery_ivl (void *socket);
-    int  zsockopt_sndbuf (void *socket);
-    int  zsockopt_rcvbuf (void *socket);
-    int  zsockopt_linger (void *socket);
-    int  zsockopt_reconnect_ivl (void *socket);
-    int  zsockopt_reconnect_ivl_max (void *socket);
-    int  zsockopt_backlog (void *socket);
-    int  zsockopt_maxmsgsize (void *socket);
-    int  zsockopt_type (void *socket);
-    int  zsockopt_rcvmore (void *socket);
-    int  zsockopt_fd (void *socket);
-    int  zsockopt_events (void *socket);
+    int  zsocket_type (void *socket);
+    int  zsocket_sndhwm (void *socket);
+    int  zsocket_rcvhwm (void *socket);
+    int  zsocket_affinity (void *socket);
+    //  Returns freshly allocated string, free when done
+    char *zsocket_identity (void *socket);
+    int  zsocket_rate (void *socket);
+    int  zsocket_recovery_ivl (void *socket);
+    int  zsocket_sndbuf (void *socket);
+    int  zsocket_rcvbuf (void *socket);
+    int  zsocket_linger (void *socket);
+    int  zsocket_reconnect_ivl (void *socket);
+    int  zsocket_reconnect_ivl_max (void *socket);
+    int  zsocket_backlog (void *socket);
+    int  zsocket_maxmsgsize (void *socket);
+    int  zsocket_multicast_hops (void *socket);
+    int  zsocket_rcvtimeo (void *socket);
+    int  zsocket_sndtimeo (void *socket);
+    int  zsocket_ipv4only (void *socket);
+    int  zsocket_rcvmore (void *socket);
+    int  zsocket_fd (void *socket);
+    int  zsocket_events (void *socket);
+    //  Returns freshly allocated string, free when done
+    char *zsocket_last_endpoint (void *socket);
     
     //  Set socket options
-    void zsockopt_set_sndhwm (void *socket, int sndhwm);
-    void zsockopt_set_rcvhwm (void *socket, int rcvhwm);
-    void zsockopt_set_affinity (void *socket, int affinity);
-    void zsockopt_set_identity (void *socket, char * identity);
-    void zsockopt_set_rate (void *socket, int rate);
-    void zsockopt_set_recovery_ivl (void *socket, int recovery_ivl);
-    void zsockopt_set_sndbuf (void *socket, int sndbuf);
-    void zsockopt_set_rcvbuf (void *socket, int rcvbuf);
-    void zsockopt_set_linger (void *socket, int linger);
-    void zsockopt_set_reconnect_ivl (void *socket, int reconnect_ivl);
-    void zsockopt_set_reconnect_ivl_max (void *socket, int reconnect_ivl_max);
-    void zsockopt_set_backlog (void *socket, int backlog);
-    void zsockopt_set_maxmsgsize (void *socket, int maxmsgsize);
-    void zsockopt_set_subscribe (void *socket, char * subscribe);
-    void zsockopt_set_unsubscribe (void *socket, char * unsubscribe);
-    
-    //  Emulation of widely-used 2.x socket options
-    void zsockopt_set_hwm (void *socket, int hwm);
-    #endif
-    
-    #if (ZMQ_VERSION_MAJOR == 4)
-    //  Get socket options
-    int  zsockopt_sndhwm (void *socket);
-    int  zsockopt_rcvhwm (void *socket);
-    int  zsockopt_affinity (void *socket);
-    int  zsockopt_rate (void *socket);
-    int  zsockopt_recovery_ivl (void *socket);
-    int  zsockopt_sndbuf (void *socket);
-    int  zsockopt_rcvbuf (void *socket);
-    int  zsockopt_linger (void *socket);
-    int  zsockopt_reconnect_ivl (void *socket);
-    int  zsockopt_reconnect_ivl_max (void *socket);
-    int  zsockopt_backlog (void *socket);
-    int  zsockopt_maxmsgsize (void *socket);
-    int  zsockopt_type (void *socket);
-    int  zsockopt_rcvmore (void *socket);
-    int  zsockopt_fd (void *socket);
-    int  zsockopt_events (void *socket);
-    
-    //  Set socket options
-    void zsockopt_set_sndhwm (void *socket, int sndhwm);
-    void zsockopt_set_rcvhwm (void *socket, int rcvhwm);
-    void zsockopt_set_affinity (void *socket, int affinity);
-    void zsockopt_set_rate (void *socket, int rate);
-    void zsockopt_set_recovery_ivl (void *socket, int recovery_ivl);
-    void zsockopt_set_sndbuf (void *socket, int sndbuf);
-    void zsockopt_set_rcvbuf (void *socket, int rcvbuf);
-    void zsockopt_set_linger (void *socket, int linger);
-    void zsockopt_set_reconnect_ivl (void *socket, int reconnect_ivl);
-    void zsockopt_set_reconnect_ivl_max (void *socket, int reconnect_ivl_max);
-    void zsockopt_set_backlog (void *socket, int backlog);
-    void zsockopt_set_maxmsgsize (void *socket, int maxmsgsize);
-    void zsockopt_set_subscribe (void *socket, char * subscribe);
-    void zsockopt_set_unsubscribe (void *socket, char * unsubscribe);
+    void zsocket_set_sndhwm (void *socket, int sndhwm);
+    void zsocket_set_rcvhwm (void *socket, int rcvhwm);
+    void zsocket_set_affinity (void *socket, int affinity);
+    void zsocket_set_subscribe (void *socket, char * subscribe);
+    void zsocket_set_unsubscribe (void *socket, char * unsubscribe);
+    void zsocket_set_identity (void *socket, char * identity);
+    void zsocket_set_rate (void *socket, int rate);
+    void zsocket_set_recovery_ivl (void *socket, int recovery_ivl);
+    void zsocket_set_sndbuf (void *socket, int sndbuf);
+    void zsocket_set_rcvbuf (void *socket, int rcvbuf);
+    void zsocket_set_linger (void *socket, int linger);
+    void zsocket_set_reconnect_ivl (void *socket, int reconnect_ivl);
+    void zsocket_set_reconnect_ivl_max (void *socket, int reconnect_ivl_max);
+    void zsocket_set_backlog (void *socket, int backlog);
+    void zsocket_set_maxmsgsize (void *socket, int maxmsgsize);
+    void zsocket_set_multicast_hops (void *socket, int multicast_hops);
+    void zsocket_set_rcvtimeo (void *socket, int rcvtimeo);
+    void zsocket_set_sndtimeo (void *socket, int sndtimeo);
+    void zsocket_set_ipv4only (void *socket, int ipv4only);
+    void zsocket_set_fail_unroutable (void *socket, int fail_unroutable);
     
     //  Emulation of widely-used 2.x socket options
     void zsockopt_set_hwm (void *socket, int hwm);
@@ -395,6 +371,10 @@ This is the class interface:
     //  Send a formatted string to a socket
     int
         zstr_sendf (void *socket, const char *format, ...);
+    
+    //  Send formatted C string to socket with MORE flag
+    int
+        zstr_sendfm (void *socket, const char *format, ...);
     
     //  Self test of this class
     int
@@ -444,10 +424,19 @@ This is the class interface:
 
     #define ZFRAME_MORE     1
     #define ZFRAME_REUSE    2
+    #define ZFRAME_DONTWAIT 4
+    
+    //  Callback function for zframe_free_fn method
+    typedef void (zframe_free_fn) (void *data, void *arg);
     
     //  Create a new frame with optional size, and optional data
     zframe_t *
         zframe_new (const void *data, size_t size);
+    
+    //  Create a zero-copy frame
+    zframe_t *
+        zframe_new_zero_copy (void *data, size_t size,
+                              zframe_free_fn *free_fn, void *arg);
     
     //  Destroy a frame
     void
@@ -492,6 +481,10 @@ This is the class interface:
     //  Return TRUE if frame body is equal to string, excluding terminator
     Bool
         zframe_streq (zframe_t *self, char *string);
+    
+    // Return frame zero copy indicator (1 or 0)
+    int
+        zframe_zero_copy (zframe_t *self);
     
     //  Return frame 'more' property
     int
