@@ -19,6 +19,9 @@ Changes
 
 * zsocket_identity implemented correctly.
 
+* Added zctx_underlying() to provide access to low-level 0MQ context
+  object, to allow manipulation for extreme cases and tests.
+
 
 CZMQ version 1.1.0 (stable), released on 2011/08/30
 ===================================================

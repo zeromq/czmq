@@ -193,6 +193,17 @@ zctx_set_linger (zctx_t *self, int linger)
 
 
 //  --------------------------------------------------------------------------
+//  Return low-level 0MQ context object
+
+void *
+zctx_underlying (zctx_t *self)
+{
+    assert (self);
+    return self->context;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Create socket within this context, for CZMQ use only
 
 void *
@@ -264,6 +275,7 @@ zctx_test (Bool verbose)
     zsocket_connect (s4, "tcp://127.0.0.1:5555");
     zsocket_connect (s5, "tcp://127.0.0.1:5555");
     zsocket_connect (s6, "tcp://127.0.0.1:5555");
+    assert (zctx_underlying (ctx));
 
     //  Everything should be cleanly closed now
     zctx_destroy (&ctx);
