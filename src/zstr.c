@@ -197,10 +197,12 @@ zstr_test (Bool verbose)
     assert (input);
     zsocket_connect (input, "inproc://zstr.test");
 
-    //  Send ten strings and then END
+    //  Send ten strings, five strings with MORE flag and then END
     int string_nbr;
     for (string_nbr = 0; string_nbr < 10; string_nbr++)
         zstr_sendf (output, "this is string %d", string_nbr);
+    for (string_nbr = 0; string_nbr < 5; string_nbr++)
+        zstr_sendfm (output, "this is string %d", string_nbr);
     zstr_send (output, "END");
 
     //  Read and count until we receive END
@@ -213,7 +215,7 @@ zstr_test (Bool verbose)
         }
         free (string);
     }
-    assert (string_nbr == 10);
+    assert (string_nbr == 15);
 
     zctx_destroy (&ctx);
     //  @end
