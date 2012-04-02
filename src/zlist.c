@@ -106,6 +106,7 @@ zlist_first (zlist_t *self)
 //  --------------------------------------------------------------------------
 //  Return the item at the tail of list. If the list is empty, returns NULL.
 //  Leaves cursor pointing at the tail item, or NULL if the list is empty.
+
 void *
 zlist_last (zlist_t *self)
 {
@@ -115,6 +116,34 @@ zlist_last (zlist_t *self)
         return self->cursor->item;
     else
         return NULL;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return the item at the head of list. If the list is empty, returns NULL.
+//  Leaves cursor as-is.
+
+void *
+zlist_head (zlist_t *self)
+{
+    assert (self);
+    return self->head
+      ? self->head->item
+      : NULL;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return the item at the tail of list. If the list is empty, returns NULL.
+//  Leaves cursor as-is.
+
+void *
+zlist_tail (zlist_t *self)
+{
+    assert (self);
+    return self->tail
+      ? self->tail->item
+      : NULL;
 }
 
 //  --------------------------------------------------------------------------
@@ -293,6 +322,13 @@ zlist_test (int verbose)
     assert (zlist_size (list) == 2);
     zlist_append (list, wine);
     assert (zlist_size (list) == 3);
+
+    assert (zlist_head (list) == cheese);
+    assert (zlist_next (list) == cheese);
+
+    assert (zlist_first (list) == cheese);
+    assert (zlist_tail (list) == wine);
+    assert (zlist_next (list) == bread);
 
     assert (zlist_first (list) == cheese);
     assert (zlist_next (list) == bread);
