@@ -51,6 +51,14 @@ void *
 void *
     zlist_last (zlist_t *self);
 
+//  Return first item in the list, or null, leaves the cursor
+void *
+    zlist_head (zlist_t *self);
+
+//  Return last item in the list, or null, leaves the cursor
+void *
+    zlist_tail (zlist_t *self);
+
 //  Return next item in the list, or null
 void *
     zlist_next (zlist_t *self);
