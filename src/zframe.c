@@ -181,19 +181,15 @@ zframe_send (zframe_t **self_p, void *socket, int flags)
             zmq_msg_t copy;
             zmq_msg_init (&copy);
             if (zmq_msg_copy (&copy, &self->zmsg)) {
-                puts ("copy");
                 return -1;
             }
             if (zmq_sendmsg (socket, &copy, snd_flags) == -1) {
-                puts ("sendmsg 1");
                 return -1;
             }
             zmq_msg_close (&copy);
         }
         else {
             if (zmq_sendmsg (socket, &self->zmsg, snd_flags) == -1) {
-                puts ("sendmsg 2");
-                puts (zmq_strerror (errno));
                 return -1;
             }
             zframe_destroy (self_p);
