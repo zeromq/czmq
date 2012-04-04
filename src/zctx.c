@@ -70,6 +70,7 @@ struct _zctx_t {
     Bool main;                  //  TRUE if we're the main thread
     int iothreads;              //  Number of IO threads, default 1
     int linger;                 //  Linger timeout, default 0
+    int hwm;                    //  HWM, default 1
 };
 
 
@@ -106,6 +107,7 @@ zctx_new (void)
     }
     self->iothreads = 1;
     self->main = TRUE;
+    self->hwm = 1;
 
 #if defined (__UNIX__)
     //  Install signal handler for SIGINT and SIGTERM
@@ -191,6 +193,26 @@ zctx_set_linger (zctx_t *self, int linger)
     self->linger = linger;
 }
 
+
+//  --------------------------------------------------------------------------
+//  Configure HWM value. This is used in zthread_fork
+
+void
+zctx_set_hwm (zctx_t *self, int hwm)
+{
+    assert (self);
+    self->hwm = hwm;
+}
+
+//  --------------------------------------------------------------------------
+//  Get HWM value. This is used in zthread_fork
+
+int
+zctx_hwm (zctx_t *self)
+{
+    assert (self);
+    return self->hwm;
+}
 
 //  --------------------------------------------------------------------------
 //  Return low-level 0MQ context object
