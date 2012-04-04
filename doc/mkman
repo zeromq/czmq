@@ -21,11 +21,9 @@
 #
 use File::Basename;
 
-# Script needs top of source tree for VPATH/parallel builds
-$top_srcdir = $ARGV [0];
-
-$class = $ARGV [1];
+$class = $ARGV [0];
 $class = $1 if $class =~ /(\w+)\.\w+/;
+$top_srcdir = "..";
 
 #   Look for class title in 2nd line of source
 #   If there's no class file, leave hand-written man page alone
