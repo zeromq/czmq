@@ -180,7 +180,7 @@ zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args)
     //  Pipe has HWM of 1 at both sides to block runaway writers
     void *pipe = zsocket_new (ctx, ZMQ_PAIR);
     if (pipe) {
-        zsocket_set_hwm (pipe, 1);
+        zsocket_set_hwm (pipe, zctx_hwm (ctx));
         zsocket_bind (pipe, "inproc://zctx-pipe-%p", pipe);
     }
     else

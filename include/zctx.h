@@ -59,6 +59,14 @@ void
 void
     zctx_set_linger (zctx_t *self, int linger);
 
+//  Set HWM value. This is used in zthread_fork
+void
+    zctx_set_hwm (zctx_t *self, int hwm);
+
+//  Get HWM value. This is used in zthread_fork
+int
+    zctx_hwm (zctx_t *self);
+
 //  Return low-level 0MQ context object, will be NULL before first socket
 //  is created. Use with care.
 void *
