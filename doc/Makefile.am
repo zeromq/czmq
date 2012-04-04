@@ -33,7 +33,7 @@ if BUILD_DOC
 SUFFIXES=.txt .xml .1 .3 .7
 
 .txt.xml:
-	$(srcdir)/mkman $(top_srcdir) $<
+	$(srcdir)/mkman $<
 	asciidoc -d manpage -b docbook -f  $(srcdir)/asciidoc.conf \
 		-aczmq_version=@PACKAGE_VERSION@ -o$@ $<
 .xml.1:
