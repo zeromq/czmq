@@ -49,18 +49,30 @@ extern "C" {
 #if (ZMQ_VERSION_MAJOR == $(major))
 //  Get socket options
 .   for option
+.       if defined (.minor)
+#   if (ZMQ_VERSION_MINOR == $(minor))
+.       endif
 .       if mode = "rw" | mode = "r"
 .           if type = "blob"
 //  Returns freshly allocated string, free when done
 .           endif
 $(ctype) zsocket_$(name) (void *socket);
 .       endif
+.       if defined (.minor)
+#   endif
+.       endif
 .   endfor
 
 //  Set socket options
 .   for option
+.       if defined (.minor)
+#   if (ZMQ_VERSION_MINOR == $(minor))
+.       endif
 .       if mode = "rw" | mode = "w"
 void zsocket_set_$(name) (void *socket, $(ctype) $(name));
+.       endif
+.       if defined (.minor)
+#   endif
 .       endif
 .   endfor
 .   for header
@@ -78,11 +90,17 @@ int zsockopt_test (Bool verbose);
 //  Deprecated function names
 #if (ZMQ_VERSION_MAJOR == $(major))
 .   for option
+.       if defined (.minor)
+#   if (ZMQ_VERSION_MINOR == $(minor))
+.       endif
 .       if mode = "rw" | mode = "r"
 #define zsockopt_$(name) zsocket_$(name)
 .       endif
 .       if mode = "rw" | mode = "w"
 #define zsockopt_set_$(name) zsocket_set_$(name)
+.       endif
+.       if defined (.minor)
+#   endif
 .       endif
 .   endfor
 #endif
@@ -141,6 +159,9 @@ int zsockopt_test (Bool verbose);
 .for version
 #if (ZMQ_VERSION_MAJOR == $(major))
 .   for option
+.       if defined (.minor)
+#   if (ZMQ_VERSION_MINOR == $(minor))
+.       endif
 .       if mode = "rw" | mode = "w"
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_$(NAME) value
@@ -202,6 +223,9 @@ zsocket_$(name) (void *socket)
 
 
 .       endif
+.       if defined (.minor)
+#   endif
+.       endif
 .   endfor
 .   for source
 $(string.trim(.):)
@@ -225,6 +249,9 @@ zsockopt_test (Bool verbose)
 .for version
 #if (ZMQ_VERSION_MAJOR == $(major))
 .   for option
+.       if defined (.minor)
+#   if (ZMQ_VERSION_MINOR == $(minor))
+.       endif
     socket = zsocket_new (ctx, ZMQ_$(TEST));
     assert (socket);
 .       if mode = "rw" | mode = "w"
@@ -241,6 +268,9 @@ zsockopt_test (Bool verbose)
     zsocket_$(name) (socket);
 .       endif
     zsocket_destroy (ctx, socket);
+.       if defined (.minor)
+#   endif
+.       endif
 .   endfor
 .   for selftest
 

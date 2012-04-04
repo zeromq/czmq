@@ -44,6 +44,12 @@ int zsocket_rate (void *socket);
 int zsocket_recovery_ivl (void *socket);
 int zsocket_recovery_ivl_msec (void *socket);
 int zsocket_mcast_loop (void *socket);
+#   if (ZMQ_VERSION_MINOR == 2)
+int zsocket_rcvtimeo (void *socket);
+#   endif
+#   if (ZMQ_VERSION_MINOR == 2)
+int zsocket_sndtimeo (void *socket);
+#   endif
 int zsocket_sndbuf (void *socket);
 int zsocket_rcvbuf (void *socket);
 int zsocket_linger (void *socket);
@@ -64,6 +70,12 @@ void zsocket_set_rate (void *socket, int rate);
 void zsocket_set_recovery_ivl (void *socket, int recovery_ivl);
 void zsocket_set_recovery_ivl_msec (void *socket, int recovery_ivl_msec);
 void zsocket_set_mcast_loop (void *socket, int mcast_loop);
+#   if (ZMQ_VERSION_MINOR == 2)
+void zsocket_set_rcvtimeo (void *socket, int rcvtimeo);
+#   endif
+#   if (ZMQ_VERSION_MINOR == 2)
+void zsocket_set_sndtimeo (void *socket, int sndtimeo);
+#   endif
 void zsocket_set_sndbuf (void *socket, int sndbuf);
 void zsocket_set_rcvbuf (void *socket, int rcvbuf);
 void zsocket_set_linger (void *socket, int linger);
@@ -149,6 +161,14 @@ int zsockopt_test (Bool verbose);
 #define zsockopt_set_recovery_ivl_msec zsocket_set_recovery_ivl_msec
 #define zsockopt_mcast_loop zsocket_mcast_loop
 #define zsockopt_set_mcast_loop zsocket_set_mcast_loop
+#   if (ZMQ_VERSION_MINOR == 2)
+#define zsockopt_rcvtimeo zsocket_rcvtimeo
+#define zsockopt_set_rcvtimeo zsocket_set_rcvtimeo
+#   endif
+#   if (ZMQ_VERSION_MINOR == 2)
+#define zsockopt_sndtimeo zsocket_sndtimeo
+#define zsockopt_set_sndtimeo zsocket_set_sndtimeo
+#   endif
 #define zsockopt_sndbuf zsocket_sndbuf
 #define zsockopt_set_sndbuf zsocket_set_sndbuf
 #define zsockopt_rcvbuf zsocket_rcvbuf

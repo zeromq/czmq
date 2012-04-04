@@ -24,6 +24,14 @@ void *
 void *
     zlist_last (zlist_t *self);
 
+//  Return first item in the list, or null, leaves the cursor
+void *
+    zlist_head (zlist_t *self);
+
+//  Return last item in the list, or null, leaves the cursor
+void *
+    zlist_tail (zlist_t *self);
+
 //  Return next item in the list, or null
 void *
     zlist_next (zlist_t *self);
@@ -86,6 +94,13 @@ EXAMPLE
     zlist_append (list, wine);
     assert (zlist_size (list) == 3);
 
+    assert (zlist_head (list) == cheese);
+    assert (zlist_next (list) == cheese);
+
+    assert (zlist_first (list) == cheese);
+    assert (zlist_tail (list) == wine);
+    assert (zlist_next (list) == bread);
+
     assert (zlist_first (list) == cheese);
     assert (zlist_next (list) == bread);
     assert (zlist_next (list) == wine);
@@ -104,6 +119,14 @@ EXAMPLE
 
     zlist_remove (list, bread);
     assert (zlist_size (list) == 0);
+
+    zlist_append (list, cheese);
+    zlist_append (list, bread);
+    assert (zlist_last (list) == bread);
+    zlist_remove (list, bread);
+    assert (zlist_last (list) == cheese);
+    zlist_remove (list, cheese);
+    assert (zlist_last (list) == NULL);
 
     zlist_push (list, cheese);
     assert (zlist_size (list) == 1);
