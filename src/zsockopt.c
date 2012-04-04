@@ -241,6 +241,58 @@ zsocket_mcast_loop (void *socket)
 }
 
 
+#   if (ZMQ_VERSION_MINOR == 2)
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_RCVTIMEO value
+
+void
+zsocket_set_rcvtimeo (void *socket, int rcvtimeo)
+{
+    int rc = zmq_setsockopt (socket, ZMQ_RCVTIMEO, &rcvtimeo, sizeof (int));
+    assert (rc == 0 || errno == ETERM);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_RCVTIMEO value
+
+int
+zsocket_rcvtimeo (void *socket)
+{
+    int rcvtimeo;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (socket, ZMQ_RCVTIMEO, &rcvtimeo, &option_len);
+    return rcvtimeo;
+}
+
+
+#   endif
+#   if (ZMQ_VERSION_MINOR == 2)
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_SNDTIMEO value
+
+void
+zsocket_set_sndtimeo (void *socket, int sndtimeo)
+{
+    int rc = zmq_setsockopt (socket, ZMQ_SNDTIMEO, &sndtimeo, sizeof (int));
+    assert (rc == 0 || errno == ETERM);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_SNDTIMEO value
+
+int
+zsocket_sndtimeo (void *socket)
+{
+    int sndtimeo;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (socket, ZMQ_SNDTIMEO, &sndtimeo, &option_len);
+    return sndtimeo;
+}
+
+
+#   endif
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_SNDBUF value
 
@@ -1044,6 +1096,22 @@ zsockopt_test (Bool verbose)
     assert (zsocket_mcast_loop (socket) == 1);
     zsocket_mcast_loop (socket);
     zsocket_destroy (ctx, socket);
+#   if (ZMQ_VERSION_MINOR == 2)
+    socket = zsocket_new (ctx, ZMQ_SUB);
+    assert (socket);
+    zsocket_set_rcvtimeo (socket, 1);
+    assert (zsocket_rcvtimeo (socket) == 1);
+    zsocket_rcvtimeo (socket);
+    zsocket_destroy (ctx, socket);
+#   endif
+#   if (ZMQ_VERSION_MINOR == 2)
+    socket = zsocket_new (ctx, ZMQ_SUB);
+    assert (socket);
+    zsocket_set_sndtimeo (socket, 1);
+    assert (zsocket_sndtimeo (socket) == 1);
+    zsocket_sndtimeo (socket);
+    zsocket_destroy (ctx, socket);
+#   endif
     socket = zsocket_new (ctx, ZMQ_SUB);
     assert (socket);
     zsocket_set_sndbuf (socket, 1);

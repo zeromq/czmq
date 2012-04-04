@@ -13,6 +13,8 @@
         <option name = "recovery_ivl"      type = "int64"  mode = "rw" test = "SUB" />
         <option name = "recovery_ivl_msec" type = "int64"  mode = "rw" test = "SUB" />
         <option name = "mcast_loop"        type = "int64"  mode = "rw" test = "SUB" />
+        <option name = "rcvtimeo"          type = "int"    mode = "rw" test = "SUB" minor = "2" />
+        <option name = "sndtimeo"          type = "int"    mode = "rw" test = "SUB" minor = "2" />
         <option name = "sndbuf"            type = "uint64" mode = "rw" test = "SUB" />
         <option name = "rcvbuf"            type = "uint64" mode = "rw" test = "SUB" />
         <option name = "linger"            type = "int"    mode = "rw" test = "SUB" />
