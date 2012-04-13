@@ -36,7 +36,7 @@
 //  Delete file, return 0 if OK, -1 if not possible.
 
 int
-zfile_delete (char *filename)
+zfile_delete (const char *filename)
 {
     assert (filename);
 #if (defined (__WINDOWS__))
@@ -50,7 +50,7 @@ zfile_delete (char *filename)
 //  Make directory (maximum one level depending on OS)
 
 int
-zfile_mkdir (char *dirname)
+zfile_mkdir (const char *dirname)
 {
 #if (defined (__WINDOWS__))
     return !CreateDirectory (dirname, NULL);
@@ -64,7 +64,7 @@ zfile_mkdir (char *dirname)
 //  returns 0 if the specified file does not exist.
 
 static int
-s_file_mode (char *filename)
+s_file_mode (const char *filename)
 {
     assert (filename);
 
@@ -97,7 +97,7 @@ s_file_mode (char *filename)
 
 //  Return 1 if file exists, else zero
 int
-zfile_exists (char *filename)
+zfile_exists (const char *filename)
 {
     assert (filename);
     return s_file_mode (filename) > 0;
@@ -106,7 +106,7 @@ zfile_exists (char *filename)
 
 //  Return size of file, or -1 if not found
 ssize_t
-zfile_size (char *filename)
+zfile_size (const char *filename)
 {
     struct stat
         stat_buf;
