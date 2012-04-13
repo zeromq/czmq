@@ -124,7 +124,7 @@ zfile_size (const char *filename)
 int
 zfile_test (Bool verbose)
 {
-    printf (" * zmsg: ");
+    printf (" * zfile: ");
 
     //  @selftest
     int rc = zfile_delete ("nosuchfile");
