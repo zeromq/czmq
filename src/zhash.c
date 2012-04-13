@@ -79,7 +79,7 @@ struct _zhash {
 //  Compute hash for key string
 
 static uint
-s_item_hash (char *key, size_t limit)
+s_item_hash (const char *key, size_t limit)
 {
     uint
         key_hash = 0;
@@ -100,7 +100,7 @@ s_item_hash (char *key, size_t limit)
 //  Lookup item in hash table, returns item or NULL
 
 static item_t *
-s_item_lookup (zhash_t *self, char *key)
+s_item_lookup (zhash_t *self, const char *key)
 {
     //  Look in bucket list for item by key
     self->cached_index = s_item_hash (key, self->limit);
@@ -120,7 +120,7 @@ s_item_lookup (zhash_t *self, char *key)
 //  If item already existed, returns NULL
 
 static item_t *
-s_item_insert (zhash_t *self, char *key, void *value)
+s_item_insert (zhash_t *self, const char *key, void *value)
 {
     //  Check that item does not already exist in hash table
     //  Leaves self->cached_index with calculated hash item
@@ -222,7 +222,7 @@ zhash_destroy (zhash_t **self_p)
 //  Returns 0 on success.
 
 int
-zhash_insert (zhash_t *self, char *key, void *value)
+zhash_insert (zhash_t *self, const char *key, void *value)
 {
     assert (self);
     assert (key);
@@ -275,7 +275,7 @@ zhash_insert (zhash_t *self, char *key, void *value)
 //  Use free_fn method to ensure deallocator is properly called on item.
 
 void
-zhash_update (zhash_t *self, char *key, void *value)
+zhash_update (zhash_t *self, const char *key, void *value)
 {
     assert (self);
     assert (key);
@@ -296,7 +296,7 @@ zhash_update (zhash_t *self, char *key, void *value)
 //  item, this function does nothing.
 
 void
-zhash_delete (zhash_t *self, char *key)
+zhash_delete (zhash_t *self, const char *key)
 {
     assert (self);
     assert (key);
@@ -311,7 +311,7 @@ zhash_delete (zhash_t *self, char *key)
 //  Look for item in hash table and return its item, or NULL
 
 void *
-zhash_lookup (zhash_t *self, char *key)
+zhash_lookup (zhash_t *self, const char *key)
 {
     assert (self);
     assert (key);
@@ -329,7 +329,7 @@ zhash_lookup (zhash_t *self, char *key)
 //  item, does nothing. If the new key already exists, deletes old item.
 
 int
-zhash_rename (zhash_t *self, char *old_key, char *new_key)
+zhash_rename (zhash_t *self, const char *old_key, const char *new_key)
 {
     item_t *item = s_item_lookup (self, old_key);
     if (item) {
@@ -360,7 +360,7 @@ zhash_rename (zhash_t *self, char *old_key, char *new_key)
 //  Returns the item, or NULL if there is no such item.
 
 void *
-zhash_freefn (zhash_t *self, char *key, zhash_free_fn *free_fn)
+zhash_freefn (zhash_t *self, const char *key, zhash_free_fn *free_fn)
 {
     assert (self);
     assert (key);
