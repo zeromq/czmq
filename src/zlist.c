@@ -298,7 +298,42 @@ zlist_size (zlist_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  Sort the list
+
+void
+zlist_sort (zlist_t *self, int order, zlist_sort_fn sorter)
+{
+    assert (self);
+    struct node_t *node, *ptr;
+
+    for (node = self->head; node != NULL && node->next != NULL; node = node->next) {
+        for (ptr = node->next; ptr != NULL; ptr = ptr->next) {
+
+            int swap = 0;
+
+            if (order == ZLIST_SORT_ASC)
+                swap = sorter (node->item, ptr->item);
+            else
+                swap = sorter (ptr->item, node->item);
+
+            if (swap) {
+                void *tmp  = node->item;
+                node->item = ptr->item;
+                ptr->item  = tmp;
+            }
+        }
+    }
+    zlist_first (self);
+}
+
+//  --------------------------------------------------------------------------
 //  Runs selftest of class
+
+static
+int s_test_str_sort (void *left, void *right)
+{
+    return (strcmp ((char *) left, (char *) right) > 0);
+}
 
 void
 zlist_test (int verbose)
@@ -377,6 +412,39 @@ zlist_test (int verbose)
     item = (char *) zlist_pop (list);
     assert (item == wine);
     assert (zlist_size (list) == 0);
+
+    // Test sorting
+    char *one   = "aa11";
+    char *two   = "bb22";
+    char *three = "cc33";
+    char *four  = "dd44";
+
+    zlist_append (list, two);
+    zlist_append (list, four);
+    zlist_append (list, one);
+    zlist_append (list, three);
+
+    zlist_sort (list, ZLIST_SORT_ASC, s_test_str_sort);
+
+    assert (zlist_pop (list) == one);
+    assert (zlist_pop (list) == two);
+    assert (zlist_pop (list) == three);
+    assert (zlist_pop (list) == four);
+
+    zlist_append (list, two);
+    zlist_append (list, four);
+    zlist_append (list, one);
+    zlist_append (list, three);
+
+    zlist_sort (list, ZLIST_SORT_DESC, s_test_str_sort);
+
+    assert (zlist_pop (list) == four);
+    assert (zlist_pop (list) == three);
+    assert (zlist_pop (list) == two);
+    assert (zlist_pop (list) == one);
+
+    // sorting empty list should be safe
+    zlist_sort (list, ZLIST_SORT_DESC, s_test_str_sort);
 
     //  Destructor should be safe to call twice
     zlist_destroy (&list);
