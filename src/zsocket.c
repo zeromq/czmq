@@ -69,8 +69,7 @@ zsocket_destroy (zctx_t *ctx, void *socket)
 //  --------------------------------------------------------------------------
 //  Bind a socket to a formatted endpoint. If the port is specified as
 //  '*', binds to any free port from ZSOCKET_DYNFROM to ZSOCKET_DYNTO
-//  and returns the actual port number used. Otherwise asserts that the
-//  bind succeeded with the specified port number. Always returns the
+//  and returns the actual port number used.  Always returns the
 //  port number if successful.
 
 int
@@ -99,12 +98,12 @@ zsocket_bind (void *socket, const char *format, ...)
     }
     else {
         rc = zmq_bind (socket, endpoint);
-        if (rc)
-            fprintf (stderr, "E: zsocket_bind to %s failed\n", endpoint);
 
-        assert (rc == 0);
         //  Return actual port used for binding
-        rc = atoi (strrchr (endpoint, ':') + 1);
+        if (rc == 0)
+            rc = atoi (strrchr (endpoint, ':') + 1);
+        else
+            rc = -1;
     }
     return rc;
 }
