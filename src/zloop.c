@@ -225,6 +225,14 @@ int
 zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
 {
     assert (self);
+
+    if (!item->socket && !item->fd)
+        return -1;
+
+    if (item->socket)
+        if (streq (zsocket_type_str (item->socket), "UNKNOWN"))
+            return -1;
+
     s_poller_t *poller = s_poller_new (item, handler, arg);
     if (poller) {
         if (zlist_push (self->pollers, poller))
@@ -235,7 +243,6 @@ zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
             zclock_log ("I: zloop: register %s poller (%p, %d)",
                 item->socket? zsocket_type_str (item->socket): "FD",
                 item->socket, item->fd);
-        assert (strneq (zsocket_type_str (item->socket), "UNKNOWN"));
         return 0;
     }
     else
