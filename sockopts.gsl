@@ -261,7 +261,7 @@ zsockopt_test (Bool verbose)
     assert (zsocket_$(name) (socket) == 1);
 .               endif
 .           else
-    zsocket_set_$(name) (socket, "test"); //a
+    zsocket_set_$(name) (socket, "test");
 .           endif
 .       endif
 .       if mode = "rw" | mode = "r"

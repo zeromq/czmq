@@ -71,6 +71,7 @@ zsocket_set_hwm (void *socket, int hwm)
 }
         </source>
         <selftest>
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsocket_set_hwm (socket, 1);
         </selftest>
     </version>
