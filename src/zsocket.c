@@ -126,6 +126,19 @@ zsocket_connect (void *socket, const char *format, ...)
 
 
 //  --------------------------------------------------------------------------
+//  Poll for input events on the socket. Returns TRUE if there is input
+//  ready on the socket, else FALSE.
+
+Bool
+zsocket_poll (void *socket, int msecs)
+{
+    zmq_pollitem_t items [] = { { socket, 0, ZMQ_POLLIN, 0 } };
+    int rc = zmq_poll (items, 1, msecs);
+    return (items [0].revents & ZMQ_POLLIN) != 0;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Returns socket type as printable constant string
 
 char *
@@ -179,6 +192,8 @@ zsocket_test (Bool verbose)
     int port = zsocket_bind (writer, "tcp://%s:*", interf);
     assert (port >= ZSOCKET_DYNFROM && port <= ZSOCKET_DYNTO);
 
+    assert (zsocket_poll (writer, 100) == FALSE);
+    
     zsocket_destroy (ctx, writer);
     zctx_destroy (&ctx);
     //  @end

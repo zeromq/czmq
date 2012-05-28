@@ -61,6 +61,12 @@ int
 int
     zsocket_connect (void *socket, const char *format, ...);
 
+//  Poll for input events on the socket. Returns TRUE if there is input
+//  ready on the socket, else FALSE.
+
+Bool
+    zsocket_poll (void *socket, int msecs);
+    
 //  Returns socket type as printable constant string
 char *
     zsocket_type_str (void *socket);
