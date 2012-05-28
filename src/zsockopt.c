@@ -1069,7 +1069,7 @@ zsockopt_test (Bool verbose)
     zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_SUB);
     assert (socket);
-    zsocket_set_identity (socket, "test"); //a
+    zsocket_set_identity (socket, "test");
     zsocket_identity (socket);
     zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_SUB);
@@ -1150,11 +1150,11 @@ zsockopt_test (Bool verbose)
     zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_SUB);
     assert (socket);
-    zsocket_set_subscribe (socket, "test"); //a
+    zsocket_set_subscribe (socket, "test");
     zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_SUB);
     assert (socket);
-    zsocket_set_unsubscribe (socket, "test"); //a
+    zsocket_set_unsubscribe (socket, "test");
     zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_SUB);
     assert (socket);
@@ -1199,15 +1199,15 @@ zsockopt_test (Bool verbose)
     zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_SUB);
     assert (socket);
-    zsocket_set_subscribe (socket, "test"); //a
+    zsocket_set_subscribe (socket, "test");
     zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_SUB);
     assert (socket);
-    zsocket_set_unsubscribe (socket, "test"); //a
+    zsocket_set_unsubscribe (socket, "test");
     zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_SUB);
     assert (socket);
-    zsocket_set_identity (socket, "test"); //a
+    zsocket_set_identity (socket, "test");
     zsocket_identity (socket);
     zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_SUB);
@@ -1309,6 +1309,7 @@ zsockopt_test (Bool verbose)
     zsocket_last_endpoint (socket);
     zsocket_destroy (ctx, socket);
 
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsocket_set_hwm (socket, 1);
 #endif
 
