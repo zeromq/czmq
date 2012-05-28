@@ -220,6 +220,11 @@ This is the class interface:
     //  Returns 0 if OK, -1 if the endpoint was invalid.
     int
         zsocket_connect (void *socket, const char *format, ...);
+
+    //  Poll for input events on the socket. Returns TRUE if there is input
+    //  ready on the socket, else FALSE.
+    Bool
+        zsocket_poll (void *socket, int msecs);
     
     //  Returns socket type as printable constant string
     char *
