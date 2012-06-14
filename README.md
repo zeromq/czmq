@@ -180,7 +180,7 @@ This is the class interface:
     
     //  Global signal indicator, TRUE when user presses Ctrl-C or the process
     //  gets a SIGTERM signal.
-    extern int zctx_interrupted;
+    extern volatile int zctx_interrupted;
 
 
 <A name="toc4-127" title="zsocket - working with ØMQ sockets" />
