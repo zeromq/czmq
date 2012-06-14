@@ -93,7 +93,7 @@ char *
 
 //  Return TRUE if frame body is equal to string, excluding terminator
 Bool
-    zframe_streq (zframe_t *self, char *string);
+    zframe_streq (zframe_t *self, const char *string);
 
 // Return frame zero copy indicator (1 or 0)
 int
@@ -101,7 +101,7 @@ int
 
 //  Return frame 'more' property
 int
-    zframe_more (zframe_t *self);
+    zframe_more (const zframe_t *self);
 
 //  Return TRUE if two frames have identical size and data
 //  If either frame is NULL, equality is always false.
@@ -110,7 +110,7 @@ Bool
 
 //  Print contents of frame to stderr
 void
-    zframe_print (zframe_t *self, char *prefix);
+    zframe_print (zframe_t *self, const char *prefix);
 
 //  Set new contents for frame
 void

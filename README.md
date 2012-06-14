@@ -395,19 +395,19 @@ This is the class interface:
 
     //  Delete file. Does not complain if the file is absent
     int
-        zfile_delete (char *filename);
+        zfile_delete (const char *filename);
     
     //  Make directory (maximum one level depending on OS)
     int
-        zfile_mkdir (char *dirname);
+        zfile_mkdir (const char *dirname);
     
     //  Return 1 if file exists, else zero
     int
-        zfile_exists (char *filename);
+        zfile_exists (const char *filename);
     
     //  Return size of file, or -1 if not found
     ssize_t
-        zfile_size (char *filename);
+        zfile_size (const char *filename);
     
     //  Self test of this class
     int
@@ -485,7 +485,7 @@ This is the class interface:
     
     //  Return TRUE if frame body is equal to string, excluding terminator
     Bool
-        zframe_streq (zframe_t *self, char *string);
+        zframe_streq (zframe_t *self, const char *string);
     
     // Return frame zero copy indicator (1 or 0)
     int
@@ -493,7 +493,7 @@ This is the class interface:
     
     //  Return frame 'more' property
     int
-        zframe_more (zframe_t *self);
+        zframe_more (const zframe_t *self);
     
     //  Return TRUE if two frames have identical size and data
     //  If either frame is NULL, equality is always false.
@@ -502,7 +502,7 @@ This is the class interface:
     
     //  Print contents of frame to stderr
     void
-        zframe_print (zframe_t *self, char *prefix);
+        zframe_print (zframe_t *self, const char *prefix);
     
     //  Set new contents for frame
     void
@@ -768,7 +768,7 @@ Expandable hash table container
 This is the class interface:
 
     //  Callback function for zhash_foreach method
-    typedef int (zhash_foreach_fn) (char *key, void *item, void *argument);
+    typedef int (zhash_foreach_fn) (const char *key, void *item, void *argument);
     //  Callback function for zhash_freefn method
     typedef void (zhash_free_fn) (void *data);
     
@@ -784,27 +784,27 @@ This is the class interface:
     //  If key is already present returns -1 and leaves existing item unchanged
     //  Returns 0 on success.
     int
-        zhash_insert (zhash_t *self, char *key, void *item);
+        zhash_insert (zhash_t *self, const char *key, void *item);
     
     //  Update item into hash table with specified key and item.
     //  If key is already present, destroys old item and inserts new one.
     //  Use free_fn method to ensure deallocator is properly called on item.
     void
-        zhash_update (zhash_t *self, char *key, void *item);
+        zhash_update (zhash_t *self, const char *key, void *item);
     
     //  Remove an item specified by key from the hash table. If there was no such
     //  item, this function does nothing.
     void
-        zhash_delete (zhash_t *self, char *key);
+        zhash_delete (zhash_t *self, const char *key);
     
     //  Return the item at the specified key, or null
     void *
-        zhash_lookup (zhash_t *self, char *key);
+        zhash_lookup (zhash_t *self, const char *key);
     
     //  Reindexes an item from an old key to a new key. If there was no such
     //  item, does nothing. Returns 0 if successful, else -1.
     int
-        zhash_rename (zhash_t *self, char *old_key, char *new_key);
+        zhash_rename (zhash_t *self, const char *old_key, const char *new_key);
     
     //  Set a free function for the specified hash table item. When the item is
     //  destroyed, the free function, if any, is called on that item.
@@ -812,7 +812,7 @@ This is the class interface:
     //  you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
     //  Returns the item, or NULL if there is no such item.
     void *
-        zhash_freefn (zhash_t *self, char *key, zhash_free_fn *free_fn);
+        zhash_freefn (zhash_t *self, const char *key, zhash_free_fn *free_fn);
     
     //  Return the number of keys/items in the hash table
     size_t

@@ -239,7 +239,7 @@ zframe_dup (zframe_t *self)
 char *
 zframe_strhex (zframe_t *self)
 {
-    static char
+    static const char
         hex_char [] = "0123456789ABCDEF";
 
     size_t size = zframe_size (self);
@@ -275,7 +275,7 @@ zframe_strdup (zframe_t *self)
 //  Return TRUE if frame body is equal to string, excluding terminator
 
 Bool
-zframe_streq (zframe_t *self, char *string)
+zframe_streq (zframe_t *self, const char *string)
 {
     assert (self);
     if (zframe_size (self) == strlen (string)
@@ -290,7 +290,7 @@ zframe_streq (zframe_t *self, char *string)
 //  Return frame MORE indicator (1 or 0), set when reading frame from socket
 
 int
-zframe_more (zframe_t *self)
+zframe_more (const zframe_t *self)
 {
     assert (self);
     return self->more;
@@ -329,7 +329,7 @@ zframe_eq (zframe_t *self, zframe_t *other)
 //  Print contents of frame to stderr, prefix is ignored if null.
 
 void
-zframe_print (zframe_t *self, char *prefix)
+zframe_print (zframe_t *self, const char *prefix)
 {
     assert (self);
     if (prefix)
@@ -345,7 +345,7 @@ zframe_print (zframe_t *self, char *prefix)
 
     fprintf (stderr, "[%03d] ", (int) size);
     size_t max_size = is_bin? 35: 70;
-    char *elipsis = "";
+    const char *elipsis = "";
     if (size > max_size) {
         size = max_size;
         elipsis = "...";
