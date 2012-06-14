@@ -79,7 +79,7 @@ struct _zctx_t {
 //
 
 //  This is a global variable accessible to CZMQ application code
-int zctx_interrupted = 0;
+volatile int zctx_interrupted = 0;
 #if defined (__UNIX__)
 static void s_signal_handler (int signal_value)
 {
