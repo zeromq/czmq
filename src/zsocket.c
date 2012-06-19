@@ -124,6 +124,7 @@ zsocket_connect (void *socket, const char *format, ...)
     return zmq_connect (socket, endpoint);
 }
 
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,3,0))
 //  --------------------------------------------------------------------------
 //  Disconnect a socket from a formatted endpoint
 //  Returns 0 if disconnection is complete -1 if the disconnection failed.
@@ -138,6 +139,7 @@ zsocket_disconnect (void *socket, const char *format, ...)
     va_end (argptr);
     return zmq_disconnect (socket, endpoint);
 }
+#endif
 
 //  --------------------------------------------------------------------------
 //  Poll for input events on the socket. Returns TRUE if there is input
