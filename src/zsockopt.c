@@ -962,12 +962,12 @@ zsocket_ipv4only (void *socket)
 
 
 //  --------------------------------------------------------------------------
-//  Set socket ZMQ_FAIL_UNROUTABLE value
+//  Set socket ZMQ_ROUTER_BEHAVIOR value
 
 void
-zsocket_set_fail_unroutable (void *socket, int fail_unroutable)
+zsocket_set_router_behavior (void *socket, int router_behavior)
 {
-    int rc = zmq_setsockopt (socket, ZMQ_FAIL_UNROUTABLE, &fail_unroutable, sizeof (int));
+    int rc = zmq_setsockopt (socket, ZMQ_ROUTER_BEHAVIOR, &router_behavior, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
 
@@ -1290,7 +1290,7 @@ zsockopt_test (Bool verbose)
     zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_ROUTER);
     assert (socket);
-    zsocket_set_fail_unroutable (socket, 1);
+    zsocket_set_router_behavior (socket, 1);
     zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_SUB);
     assert (socket);
