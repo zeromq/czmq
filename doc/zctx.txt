@@ -32,6 +32,11 @@ void
 int
     zctx_hwm (zctx_t *self);
 
+//  Return low-level 0MQ context object, will be NULL before first socket
+//  is created. Use with care.
+void *
+    zctx_underlying (zctx_t *self);
+
 //  Self test of this class
 int
     zctx_test (Bool verbose);
@@ -97,6 +102,7 @@ EXAMPLE
     zsocket_connect (s4, "tcp://127.0.0.1:5555");
     zsocket_connect (s5, "tcp://127.0.0.1:5555");
     zsocket_connect (s6, "tcp://127.0.0.1:5555");
+    assert (zctx_underlying (ctx));
 
     //  Everything should be cleanly closed now
     zctx_destroy (&ctx);

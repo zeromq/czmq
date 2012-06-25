@@ -133,7 +133,7 @@ void zsocket_set_multicast_hops (void *socket, int multicast_hops);
 void zsocket_set_rcvtimeo (void *socket, int rcvtimeo);
 void zsocket_set_sndtimeo (void *socket, int sndtimeo);
 void zsocket_set_ipv4only (void *socket, int ipv4only);
-void zsocket_set_fail_unroutable (void *socket, int fail_unroutable);
+void zsocket_set_router_behavior (void *socket, int router_behavior);
 
 //  Emulation of widely-used 2.x socket options
 void zsocket_set_hwm (void *socket, int hwm);
@@ -228,7 +228,7 @@ int zsockopt_test (Bool verbose);
 #define zsockopt_set_sndtimeo zsocket_set_sndtimeo
 #define zsockopt_ipv4only zsocket_ipv4only
 #define zsockopt_set_ipv4only zsocket_set_ipv4only
-#define zsockopt_set_fail_unroutable zsocket_set_fail_unroutable
+#define zsockopt_set_router_behavior zsocket_set_router_behavior
 #define zsockopt_rcvmore zsocket_rcvmore
 #define zsockopt_fd zsocket_fd
 #define zsockopt_events zsocket_events
