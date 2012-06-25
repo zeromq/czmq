@@ -275,12 +275,14 @@ zmsg_pushstr (zmsg_t *self, const char *format, ...)
             va_end (argptr);
             return -1;
         }
-        vsnprintf (string, size, format, argptr);
+        size = vsnprintf (string, size, format, argptr);
+    } else {
+      size = required;
     }
     va_end (argptr);
 
-    self->content_size += strlen (string);
-    zlist_push (self->frames, zframe_new (string, strlen (string)));
+    self->content_size += size;
+    zlist_push (self->frames, zframe_new (string, size));
     free (string);
     return 0;
 }
@@ -311,12 +313,14 @@ zmsg_addstr (zmsg_t *self, const char *format, ...)
             va_end (argptr);
             return -1;
         }
-        vsnprintf (string, size, format, argptr);
+        size = vsnprintf (string, size, format, argptr);
+    } else {
+      size = required;
     }
     va_end (argptr);
 
-    self->content_size += strlen (string);
-    zlist_append (self->frames, zframe_new (string, strlen (string)));
+    self->content_size += size;
+    zlist_append (self->frames, zframe_new (string, size));
     free (string);
     return 0;
 }
