@@ -108,7 +108,7 @@ void zsocket_set_multicast_hops (void *socket, int multicast_hops);
 void zsocket_set_rcvtimeo (void *socket, int rcvtimeo);
 void zsocket_set_sndtimeo (void *socket, int sndtimeo);
 void zsocket_set_ipv4only (void *socket, int ipv4only);
-void zsocket_set_fail_unroutable (void *socket, int fail_unroutable);
+void zsocket_set_router_behavior (void *socket, int router_behavior);
 
 //  Emulation of widely-used 2.x socket options
 void zsocket_set_hwm (void *socket, int hwm);
@@ -155,7 +155,7 @@ EXAMPLE
     zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_SUB);
     assert (socket);
-    zsocket_set_identity (socket, "test"); //a
+    zsocket_set_identity (socket, "test");
     zsocket_identity (socket);
     zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_SUB);
@@ -236,11 +236,11 @@ EXAMPLE
     zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_SUB);
     assert (socket);
-    zsocket_set_subscribe (socket, "test"); //a
+    zsocket_set_subscribe (socket, "test");
     zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_SUB);
     assert (socket);
-    zsocket_set_unsubscribe (socket, "test"); //a
+    zsocket_set_unsubscribe (socket, "test");
     zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_SUB);
     assert (socket);
@@ -285,15 +285,15 @@ EXAMPLE
     zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_SUB);
     assert (socket);
-    zsocket_set_subscribe (socket, "test"); //a
+    zsocket_set_subscribe (socket, "test");
     zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_SUB);
     assert (socket);
-    zsocket_set_unsubscribe (socket, "test"); //a
+    zsocket_set_unsubscribe (socket, "test");
     zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_SUB);
     assert (socket);
-    zsocket_set_identity (socket, "test"); //a
+    zsocket_set_identity (socket, "test");
     zsocket_identity (socket);
     zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_SUB);
@@ -376,7 +376,7 @@ EXAMPLE
     zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_ROUTER);
     assert (socket);
-    zsocket_set_fail_unroutable (socket, 1);
+    zsocket_set_router_behavior (socket, 1);
     zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_SUB);
     assert (socket);
@@ -395,6 +395,7 @@ EXAMPLE
     zsocket_last_endpoint (socket);
     zsocket_destroy (ctx, socket);
 
+    socket = zsocket_new (ctx, ZMQ_SUB);
     zsocket_set_hwm (socket, 1);
 #endif
 
