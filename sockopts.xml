@@ -50,7 +50,7 @@
         <option name = "rcvtimeo"          type = "int"    mode = "rw" test = "SUB" />
         <option name = "sndtimeo"          type = "int"    mode = "rw" test = "SUB" />
         <option name = "ipv4only"          type = "int"    mode = "rw" test = "SUB" />
-        <option name = "fail_unroutable"   type = "int"    mode = "w"  test = "ROUTER" />
+        <option name = "router_behavior"   type = "int"    mode = "w"  test = "ROUTER" />
         <option name = "rcvmore"           type = "int"    mode = "r"  test = "SUB" />
         <option name = "fd"                type = "int"    mode = "r"  test = "SUB" />
         <option name = "events"            type = "int"    mode = "r"  test = "SUB" />

@@ -237,6 +237,8 @@ EXAMPLE
     }
     //  Test message frame manipulation
     assert (zmsg_size (msg) == 2);
+    frame = zmsg_last (msg);
+    assert (zframe_streq (frame, "Frame9"));
     assert (zmsg_content_size (msg) == 12);
     frame = zframe_new ("Address", 7);
     assert (frame);
@@ -291,6 +293,7 @@ EXAMPLE
     assert (msg);
     assert (zmsg_size (msg) == 0);
     assert (zmsg_first (msg) == NULL);
+    assert (zmsg_last (msg) == NULL);
     assert (zmsg_next (msg) == NULL);
     assert (zmsg_pop (msg) == NULL);
     zmsg_destroy (&msg);
