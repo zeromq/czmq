@@ -138,7 +138,9 @@ zmsg_send (zmsg_t **self_p, void *socket)
             int rc;
             rc = zframe_send (&frame, socket,
                               zlist_size (self->frames)? ZFRAME_MORE: 0);
-            assert (rc == 0 || (errno == ETERM || errno == EINTR));
+            if (rc != 0) {
+                break;
+            }
             frame = (zframe_t *) zlist_pop (self->frames);
         }
         zmsg_destroy (self_p);
