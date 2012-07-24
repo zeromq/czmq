@@ -31,6 +31,12 @@
 extern "C" {
 #endif
 
+#define ZLIST_SORT_ASC 1
+#define ZLIST_SORT_DESC 2
+
+//  Callback function for zhash_sort method
+typedef int (zlist_sort_fn) (void *left, void *right);
+
 //  Opaque class structure
 typedef struct _zlist zlist_t;
 
@@ -86,6 +92,10 @@ zlist_t *
 //  Return number of items in the list
 size_t
     zlist_size (zlist_t *self);
+
+// Sort the list
+void
+    zlist_sort (zlist_t *self, int order, zlist_sort_fn sorter);
 
 //  Self test of this class
 void
