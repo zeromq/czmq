@@ -234,7 +234,7 @@
 #           define FD_SETSIZE 1024      //  Max. filehandles/sockets
 #       endif
 #       include <direct.h>
-#	include <winsock2.h>
+#       include <winsock2.h>
 #       include <windows.h>
 #       include <process.h>
 #   endif
