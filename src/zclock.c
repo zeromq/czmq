@@ -54,7 +54,13 @@ granularity.
 static int64_t
 s_filetime_to_msec (const FILETIME *ft)
 {
-    return (int64_t) (*((int64_t *) ft) / 10000);
+//  As per Windows documentation for FILETIME, copy the resulting FILETIME structure to a
+//  ULARGE_INTEGER structure using memcpy (using memcpy instead of direct assignment can
+//  prevent alignment faults on 64-bit Windows).
+    ULARGE_INTEGER dateTime;
+    memcpy (&dateTime, ft, sizeof (dateTime));
+
+    return (int64_t) (dateTime.QuadPart / 10000);
 }
 #endif
 
