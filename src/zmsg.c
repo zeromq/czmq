@@ -193,7 +193,7 @@ zframe_t *
 zmsg_pop (zmsg_t *self)
 {
     assert (self);
-    zframe_t *frame = zlist_pop (self->frames);
+    zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
     if (frame)
         self->content_size -= zframe_size (frame);
     return frame;
@@ -506,7 +506,7 @@ zmsg_encode (zmsg_t *self, byte **buffer)
             buffer_size += frame_size + 5;
         frame = zmsg_next (self);
     }
-    *buffer = malloc (buffer_size);
+    *buffer = (byte *) malloc (buffer_size);
 
     //  Encode message now
     byte *dest = *buffer;
@@ -775,7 +775,7 @@ zmsg_test (Bool verbose)
     //  Test encoding/decoding
     msg = zmsg_new ();
     assert (msg);
-    byte *blank = zmalloc (100000);
+    byte *blank = (byte *) zmalloc (100000);
     assert (blank);
     rc = zmsg_addmem (msg, blank, 0);
     assert (rc == 0);
