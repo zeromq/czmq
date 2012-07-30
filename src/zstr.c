@@ -53,7 +53,7 @@ zstr_recv (void *socket)
     if (zmq_recvmsg (socket, &message, 0) < 0)
         return NULL;
 
-    int size = zmq_msg_size (&message);
+    size_t size = zmq_msg_size (&message);
     char *string = (char *) malloc (size + 1);
     memcpy (string, zmq_msg_data (&message), size);
     zmq_msg_close (&message);
@@ -77,7 +77,7 @@ zstr_recv_nowait (void *socket)
     if (zmq_recvmsg (socket, &message, ZMQ_DONTWAIT) < 0)
         return NULL;
 
-    int size = zmq_msg_size (&message);
+    size_t size = zmq_msg_size (&message);
     char *string = (char *) malloc (size + 1);
     memcpy (string, zmq_msg_data (&message), size);
     zmq_msg_close (&message);

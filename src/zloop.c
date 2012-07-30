@@ -50,7 +50,7 @@ typedef struct _s_timer_t s_timer_t;
 struct _zloop_t {
     zlist_t *pollers;           //  List of poll items
     zlist_t *timers;            //  List of timers
-    int poll_size;              //  Size of poll set
+    size_t poll_size;           //  Size of poll set
     zmq_pollitem_t *pollset;    //  zmq_poll set
     s_poller_t *pollact;        //  Pollers for this poll set
     Bool dirty;                 //  True if pollset needs rebuilding
@@ -358,7 +358,7 @@ zloop_start (zloop_t *self)
             if (rc)
                 break;
         }
-        rc = zmq_poll (self->pollset, self->poll_size,
+        rc = zmq_poll (self->pollset, (int) self->poll_size,
                        s_tickless_timer (self) * ZMQ_POLL_MSEC);
         if (rc == -1 || zctx_interrupted) {
             if (self->verbose)
@@ -385,7 +385,7 @@ zloop_start (zloop_t *self)
             timer = (s_timer_t *) zlist_next (self->timers);
         }
         //  Handle any pollers that are ready
-        uint item_nbr;
+        size_t item_nbr;
         for (item_nbr = 0; item_nbr < self->poll_size; item_nbr++) {
             s_poller_t *poller = &self->pollact [item_nbr];
             assert (self->pollset [item_nbr].socket == poller->item.socket);

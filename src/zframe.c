@@ -458,7 +458,7 @@ zframe_test (Bool verbose)
     assert (frame == NULL);
 
     // Test zero copy
-    char *buffer = malloc (1024);
+    char *buffer = (char *) malloc (1024);
     int i;
     for (i = 0; i < 1024; i++)
         buffer [i] = 'A';
