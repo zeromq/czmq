@@ -88,6 +88,8 @@ void *
 //  Destroy socket within this context, for czmq use only
 void
     zctx__socket_destroy (zctx_t *self, void *socket);
+//  @end
+    
 #ifdef __cplusplus
 }
 #endif

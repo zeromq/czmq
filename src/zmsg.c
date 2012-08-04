@@ -138,9 +138,8 @@ zmsg_send (zmsg_t **self_p, void *socket)
             int rc;
             rc = zframe_send (&frame, socket,
                               zlist_size (self->frames)? ZFRAME_MORE: 0);
-            if (rc != 0) {
+            if (rc != 0)
                 break;
-            }
             frame = (zframe_t *) zlist_pop (self->frames);
         }
         zmsg_destroy (self_p);
@@ -260,6 +259,7 @@ zmsg_pushstr (zmsg_t *self, const char *format, ...)
 {
     assert (self);
     assert (format);
+
     //  Format string into buffer
     va_list argptr;
     va_start (argptr, format);
@@ -278,9 +278,10 @@ zmsg_pushstr (zmsg_t *self, const char *format, ...)
             return -1;
         }
         size = vsnprintf (string, size, format, argptr);
-    } else {
-      size = required;
-    }
+    } 
+    else 
+        size = required;
+    
     va_end (argptr);
 
     self->content_size += size;
@@ -316,9 +317,10 @@ zmsg_addstr (zmsg_t *self, const char *format, ...)
             return -1;
         }
         size = vsnprintf (string, size, format, argptr);
-    } else {
-      size = required;
     }
+    else
+        size = required;
+    
     va_end (argptr);
 
     self->content_size += size;
