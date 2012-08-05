@@ -125,17 +125,17 @@ zmsg_recv (void *socket)
 //  frames, sends nothing but destroys the message anyhow. Safe to call
 //  if zmsg is null.
 
-void
+int
 zmsg_send (zmsg_t **self_p, void *socket)
 {
     assert (self_p);
     assert (socket);
     zmsg_t *self = *self_p;
 
+    int rc = 0;
     if (self) {
         zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
         while (frame) {
-            int rc;
             rc = zframe_send (&frame, socket,
                               zlist_size (self->frames)? ZFRAME_MORE: 0);
             if (rc != 0)
@@ -144,6 +144,7 @@ zmsg_send (zmsg_t **self_p, void *socket)
         }
         zmsg_destroy (self_p);
     }
+    return rc;
 }
 
 
@@ -628,7 +629,9 @@ zmsg_dup (zmsg_t *self)
 
 //  --------------------------------------------------------------------------
 //  Dump message to stderr, for debugging and tracing
-//  Prints first 10 frames, for larger messages
+//  Truncates to first 10 frames, for readability; this may be unfortunate
+//  when debugging larger and more complex messages. Perhaps a way to hide
+//  repeated lines instead?
 
 void
 zmsg_dump (zmsg_t *self)

@@ -21,7 +21,7 @@ zmsg_t *
     zmsg_recv (void *socket);
 
 //  Send a message to the socket, and then destroy it
-void
+int
     zmsg_send (zmsg_t **self_p, void *socket);
 
 //  Return number of frames in message
