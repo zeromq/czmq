@@ -198,7 +198,8 @@ zsocket_test (Bool verbose)
     assert (streq (zsocket_type_str (reader), "PULL"));
     int rc = zsocket_bind (writer, "tcp://%s:%d", interf, service);
     assert (rc == service);
-    zsocket_connect (reader, "tcp://%s:%d", domain, service);
+    rc = zsocket_connect (reader, "tcp://%s:%d", domain, service);
+    assert (rc == 0);
     zstr_send (writer, "HELLO");
     char *message = zstr_recv (reader);
     assert (message);
@@ -209,7 +210,10 @@ zsocket_test (Bool verbose)
     assert (port >= ZSOCKET_DYNFROM && port <= ZSOCKET_DYNTO);
 
     assert (zsocket_poll (writer, 100) == FALSE);
-    
+
+    rc = zsocket_connect (reader, "txp://%s:%d", domain, service);
+    assert (rc == -1);
+
     zsocket_destroy (ctx, writer);
     zctx_destroy (&ctx);
     //  @end
