@@ -279,10 +279,10 @@ zmsg_pushstr (zmsg_t *self, const char *format, ...)
             return -1;
         }
         size = vsnprintf (string, size, format, argptr);
-    } 
-    else 
+    }
+    else
         size = required;
-    
+
     va_end (argptr);
 
     self->content_size += size;
@@ -321,7 +321,7 @@ zmsg_addstr (zmsg_t *self, const char *format, ...)
     }
     else
         size = required;
-    
+
     va_end (argptr);
 
     self->content_size += size;
@@ -611,7 +611,7 @@ zmsg_dup (zmsg_t *self)
     zframe_t *frame = zmsg_first (self);
     if (!frame)
         return NULL;
-    
+
     zmsg_t *copy = zmsg_new ();
     if (!copy)
         return NULL;
@@ -678,8 +678,9 @@ zmsg_test (Bool verbose)
     zmsg_push (msg, frame);
     assert (zmsg_size (msg) == 1);
     assert (zmsg_content_size (msg) == 5);
-    zmsg_send (&msg, output);
+    rc = zmsg_send (&msg, output);
     assert (msg == NULL);
+    assert (rc == 0);
 
     msg = zmsg_recv (input);
     assert (msg);
@@ -712,8 +713,10 @@ zmsg_test (Bool verbose)
     assert (rc == 0);
     zmsg_t *copy = zmsg_dup (msg);
     assert (copy);
-    zmsg_send (&copy, output);
-    zmsg_send (&msg, output);
+    rc = zmsg_send (&copy, output);
+    assert (rc == 0);
+    rc = zmsg_send (&msg, output);
+    assert (rc == 0);
 
     copy = zmsg_recv (input);
     assert (copy);
