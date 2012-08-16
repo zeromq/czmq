@@ -61,16 +61,14 @@ int
 int
     zsocket_connect (void *socket, const char *format, ...);
 
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0))
 //  Disonnect a socket from a formatted endpoint
-//  Returns 0 if OK, -1 if the endpoint was invalid.
+//  Returns 0 if OK, -1 if the endpoint was invalid or the function
+//  isn't supported.
 int
     zsocket_disconnect (void *socket, const char *format, ...);
-#endif
 
 //  Poll for input events on the socket. Returns TRUE if there is input
 //  ready on the socket, else FALSE.
-
 Bool
     zsocket_poll (void *socket, int msecs);
     
