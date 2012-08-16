@@ -124,7 +124,7 @@ zsocket_connect (void *socket, const char *format, ...)
     return zmq_connect (socket, endpoint);
 }
 
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,3,0))
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0))
 //  --------------------------------------------------------------------------
 //  Disconnect a socket from a formatted endpoint
 //  Returns 0 if disconnection is complete -1 if the disconnection failed.
