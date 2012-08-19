@@ -180,18 +180,15 @@ zframe_send (zframe_t **self_p, void *socket, int flags)
         if (flags & ZFRAME_REUSE) {
             zmq_msg_t copy;
             zmq_msg_init (&copy);
-            if (zmq_msg_copy (&copy, &self->zmsg)) {
+            if (zmq_msg_copy (&copy, &self->zmsg))
                 return -1;
-            }
-            if (zmq_sendmsg (socket, &copy, snd_flags) == -1) {
+            if (zmq_sendmsg (socket, &copy, snd_flags) == -1)
                 return -1;
-            }
             zmq_msg_close (&copy);
         }
         else {
-            if (zmq_sendmsg (socket, &self->zmsg, snd_flags) == -1) {
+            if (zmq_sendmsg (socket, &self->zmsg, snd_flags) == -1)
                 return -1;
-            }
             zframe_destroy (self_p);
         }
     }
