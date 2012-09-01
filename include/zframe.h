@@ -43,77 +43,77 @@ typedef struct _zframe_t zframe_t;
 typedef void (zframe_free_fn) (void *data, void *arg);
 
 //  Create a new frame with optional size, and optional data
-zframe_t *
+CZMQ_EXPORT zframe_t *
     zframe_new (const void *data, size_t size);
 
 //  Create a zero-copy frame
-zframe_t *
+CZMQ_EXPORT zframe_t *
     zframe_new_zero_copy (void *data, size_t size,
                           zframe_free_fn *free_fn, void *arg);
 
 //  Destroy a frame
-void
+CZMQ_EXPORT void
     zframe_destroy (zframe_t **self_p);
 
 //  Receive frame from socket, returns zframe_t object or NULL if the recv
 //  was interrupted. Does a blocking recv, if you want to not block then use
 //  zframe_recv_nowait().
-zframe_t *
+CZMQ_EXPORT zframe_t *
     zframe_recv (void *socket);
 
 //  Receive a new frame off the socket. Returns newly allocated frame, or
 //  NULL if there was no input waiting, or if the read was interrupted.
-zframe_t *
+CZMQ_EXPORT zframe_t *
     zframe_recv_nowait (void *socket);
 
 // Send a frame to a socket, destroy frame after sending.  Returns
 // non-zero error code on failure.
-int
+CZMQ_EXPORT int
     zframe_send (zframe_t **self_p, void *socket, int flags);
 
 //  Return number of bytes in frame data
-size_t
+CZMQ_EXPORT size_t
     zframe_size (zframe_t *self);
 
 //  Return address of frame data
-byte *
+CZMQ_EXPORT byte *
     zframe_data (zframe_t *self);
 
 //  Create a new frame that duplicates an existing frame
-zframe_t *
+CZMQ_EXPORT zframe_t *
     zframe_dup (zframe_t *self);
 
 //  Return frame data encoded as printable hex string
-char *
+CZMQ_EXPORT char *
     zframe_strhex (zframe_t *self);
 
 //  Return frame data copied into freshly allocated string
-char *
+CZMQ_EXPORT char *
     zframe_strdup (zframe_t *self);
 
 //  Return TRUE if frame body is equal to string, excluding terminator
-Bool
+CZMQ_EXPORT Bool
     zframe_streq (zframe_t *self, const char *string);
 
 // Return frame zero copy indicator (1 or 0)
-int
+CZMQ_EXPORT int
     zframe_zero_copy (zframe_t *self);
 
 //  Return frame 'more' property
-int
+CZMQ_EXPORT int
     zframe_more (const zframe_t *self);
 
 //  Return TRUE if two frames have identical size and data
 //  If either frame is NULL, equality is always false.
-Bool
+CZMQ_EXPORT Bool
     zframe_eq (zframe_t *self, zframe_t *other);
 
 //  Print contents of frame to stderr
-void
+CZMQ_EXPORT void
     zframe_print (zframe_t *self, const char *prefix);
 
 //  Set new contents for frame
-void
+CZMQ_EXPORT void
     zframe_reset (zframe_t *self, const void *data, size_t size);
 
 //  Self test of this class

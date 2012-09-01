@@ -33,16 +33,16 @@ extern "C" {
 
 //  @interface
 //  Sleep for a number of milliseconds
-void
+CZMQ_EXPORT void
     zclock_sleep (int msecs);
 
 //  Return current system clock as milliseconds
-int64_t
+CZMQ_EXPORT int64_t
     zclock_time (void);
 
 //  Print formatted string to stdout, prefixed by date/time and
 //  terminated with a newline.
-void
+CZMQ_EXPORT void
     zclock_log (const char *format, ...);
 
 //  Self test of this class
