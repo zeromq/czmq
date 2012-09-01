@@ -37,30 +37,30 @@ typedef struct _zctx_t zctx_t;
 
 //  @interface
 //  Create new context, returns context object, replaces zmq_init
-zctx_t *
+CZMQ_EXPORT zctx_t *
     zctx_new (void);
 
 //  Destroy context and all sockets in it, replaces zmq_term
-void
+CZMQ_EXPORT void
     zctx_destroy (zctx_t **self_p);
 
 //  @end
 //  Create new shadow context, returns context object
 //  For internal use only.
-zctx_t *
+CZMQ_EXPORT zctx_t *
     zctx_shadow (zctx_t *self);
 
 //  @interface
 //  Raise default I/O threads from 1, for crazy heavy applications
-void
+CZMQ_EXPORT void
     zctx_set_iothreads (zctx_t *self, int iothreads);
 
 //  Set msecs to flush sockets when closing them
-void
+CZMQ_EXPORT void
     zctx_set_linger (zctx_t *self, int linger);
 
 //  Set HWM value. This is used in zthread_fork
-void
+CZMQ_EXPORT void
     zctx_set_hwm (zctx_t *self, int hwm);
 
 //  Get HWM value. This is used in zthread_fork
@@ -69,7 +69,7 @@ int
 
 //  Return low-level 0MQ context object, will be NULL before first socket
 //  is created. Use with care.
-void *
+CZMQ_EXPORT void *
     zctx_underlying (zctx_t *self);
 
 //  Self test of this class
@@ -78,15 +78,15 @@ int
 
 //  Global signal indicator, TRUE when user presses Ctrl-C or the process
 //  gets a SIGTERM signal.
-extern volatile int zctx_interrupted;
+CZMQ_EXPORT extern volatile int zctx_interrupted;
 //  @end
 
 //  Create socket within this context, for czmq use only
-void *
+CZMQ_EXPORT void *
     zctx__socket_new (zctx_t *self, int type);
 
 //  Destroy socket within this context, for czmq use only
-void
+CZMQ_EXPORT void
     zctx__socket_destroy (zctx_t *self, void *socket);
 //  @end
     
