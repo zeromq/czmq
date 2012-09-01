@@ -33,19 +33,19 @@ extern "C" {
 
 //  @interface
 //  Delete file. Does not complain if the file is absent
-int
+CZMQ_EXPORT int
     zfile_delete (const char *filename);
 
 //  Make directory (maximum one level depending on OS)
-int
+CZMQ_EXPORT int
     zfile_mkdir (const char *dirname);
 
 //  Return 1 if file exists, else zero
-int
+CZMQ_EXPORT int
     zfile_exists (const char *filename);
 
 //  Return size of file, or -1 if not found
-ssize_t
+CZMQ_EXPORT ssize_t
     zfile_size (const char *filename);
 
 //  Self test of this class

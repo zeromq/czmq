@@ -56,7 +56,7 @@ extern "C" {
 .           if type = "blob"
 //  Returns freshly allocated string, free when done
 .           endif
-$(ctype) zsocket_$(name) (void *socket);
+CZMQ_EXPORT $(ctype) zsocket_$(name) (void *socket);
 .       endif
 .       if defined (.minor)
 #   endif
@@ -69,7 +69,7 @@ $(ctype) zsocket_$(name) (void *socket);
 #   if (ZMQ_VERSION_MINOR == $(minor))
 .       endif
 .       if mode = "rw" | mode = "w"
-void zsocket_set_$(name) (void *socket, $(ctype) $(name));
+CZMQ_EXPORT void zsocket_set_$(name) (void *socket, $(ctype) $(name));
 .       endif
 .       if defined (.minor)
 #   endif
