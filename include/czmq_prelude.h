@@ -181,6 +181,9 @@
 #elif (defined (OpenBSD) || defined (__OpenBSD__))
 #   define __UTYPE_OPENBSD
 #   define __UNIX__
+#elif (defined (__APPLE__))
+#   define __UTYPE_OSX
+#   define __UNIX__
 #elif (defined (NeXT))
 #   define __UTYPE_NEXT
 #   define __UNIX__
@@ -217,6 +220,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <stdbool.h>
 #include <string.h>
 #include <time.h>
 #include <errno.h>
@@ -273,8 +277,9 @@
 #   include <sys/ioctl.h>
 #   include <sys/file.h>
 #   include <sys/wait.h>
-#   include <sys/uio.h>                 //  This is required to make czmq compile with libzmq/3.x
+#   include <sys/uio.h>                 //  This is required to make CZMQ compile with libzmq/3.x
 #   include <netinet/in.h>              //  Must come before arpa/inet.h
+#   include <uuid/uuid.h>
 #   if (!defined (__UTYPE_ANDROID)) && (!defined (__UTYPE_IBMAIX)) && (!defined (__UTYPE_HPUX)) && (!defined (__UTYPE_SUNOS))
 #       include <ifaddrs.h>
 #   endif
@@ -388,10 +393,10 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 #if (defined (__WINDOWS__))
 #   define inline __inline
 #   define strtoull _strtoui64
-#   define srandom      srand
-#   define TIMEZONE     _timezone
-#   define snprintf     _snprintf
-#   define vsnprintf    _vsnprintf
+#   define srandom srand
+#   define TIMEZONE _timezone
+#   define snprintf _snprintf
+#   define vsnprintf _vsnprintf
     typedef unsigned long ulong;
     typedef unsigned int  uint;
     typedef __int32 int32_t;
@@ -400,12 +405,12 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
     typedef unsigned __int64 uint64_t;
 #elif (defined (__APPLE__))
     typedef unsigned long ulong;
-    typedef unsigned int  uint;
+    typedef unsigned int uint;
 #endif
 
 //- Error reporting ---------------------------------------------------------
 // If the compiler is GCC or supports C99, include enclosing function
-// in czmq assertions
+// in CZMQ assertions
 #if defined (__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
 #   define CZMQ_ASSERT_SANE_FUNCTION    __func__
 #elif defined (__GNUC__) && (__GNUC__ >= 2)
