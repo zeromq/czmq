@@ -152,7 +152,7 @@ zsocket_poll (void *socket, int msecs)
 {
     zmq_pollitem_t items [] = { { socket, 0, ZMQ_POLLIN, 0 } };
     int rc = zmq_poll (items, 1, msecs);
-    return (items [0].revents & ZMQ_POLLIN) != 0;
+    return rc != -1 && (items [0].revents & ZMQ_POLLIN) != 0;
 }
 
 
