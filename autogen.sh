@@ -1,7 +1,10 @@
 #!/bin/sh
-#   Copyright (c) 1991-2011 iMatix Corporation and contributors
 #
-#   This file is part of ZFL, the 0MQ Function Library.
+#   Copyright (c) 1991-2012 iMatix Corporation <www.imatix.com>
+#   Copyright other contributors as noted in the AUTHORS file.
+#
+#   This file is part of CZMQ, the high-level C binding for 0MQ:
+#   http://czmq.zeromq.org.
 #
 #   This is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
