@@ -35,6 +35,9 @@ extern "C" {
 typedef struct _zlist zlist_t;
 
 //  @interface
+//  Comparison function for zlist_sort method
+typedef bool (zlist_compare_fn) (void *item1, void *item2);
+
 //  Create a new list container
 zlist_t *
     zlist_new (void);
@@ -86,6 +89,10 @@ zlist_t *
 //  Return number of items in the list
 size_t
     zlist_size (zlist_t *self);
+
+//  Sort list
+void
+    zlist_sort (zlist_t *self, zlist_compare_fn *compare);
 
 //  Self test of this class
 void
