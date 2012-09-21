@@ -2,7 +2,7 @@
     zlist - generic type-free list container
 
     -------------------------------------------------------------------------
-    Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
+    Copyright (c) 1991-2012 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -38,19 +38,19 @@
 
 //  List node, used internally only
 
-struct node_t {
-    struct node_t
+typedef struct _node_t {
+    struct _node_t
         *next;
     void
         *item;
-};
+} node_t;
 
 //  Actual list object
 
 struct _zlist {
-    struct node_t
+    node_t
         *head, *tail;
-    struct node_t
+    node_t
         *cursor;
     size_t
         size;
@@ -77,7 +77,7 @@ zlist_destroy (zlist_t **self_p)
     assert (self_p);
     if (*self_p) {
         zlist_t *self = *self_p;
-        struct node_t *node, *next;
+        node_t *node, *next;
         for (node = (*self_p)->head; node != NULL; node = next) {
             next = node->next;
             free (node);
@@ -171,8 +171,8 @@ zlist_next (zlist_t *self)
 int
 zlist_append (zlist_t *self, void *item)
 {
-    struct node_t *node;
-    node = (struct node_t *) zmalloc (sizeof (struct node_t));
+    node_t *node;
+    node = (node_t *) zmalloc (sizeof (node_t));
     if (!node)
         return -1;
 
@@ -196,8 +196,8 @@ zlist_append (zlist_t *self, void *item)
 int
 zlist_push (zlist_t *self, void *item)
 {
-    struct node_t *node;
-    node = (struct node_t *) zmalloc (sizeof (struct node_t));
+    node_t *node;
+    node = (node_t *) zmalloc (sizeof (node_t));
     if (!node)
         return -1;
 
@@ -218,7 +218,7 @@ zlist_push (zlist_t *self, void *item)
 void *
 zlist_pop (zlist_t *self)
 {
-    struct node_t *node = self->head;
+    node_t *node = self->head;
     void *item = NULL;
     if (node) {
         item = node->item;
@@ -240,7 +240,7 @@ zlist_pop (zlist_t *self)
 void
 zlist_remove (zlist_t *self, void *item)
 {
-    struct node_t *node, *prev = NULL;
+    node_t *node, *prev = NULL;
 
     //  First off, we need to find the list node.
     for (node = self->head; node != NULL; node = node->next) {
@@ -275,7 +275,7 @@ zlist_copy (zlist_t *self)
 
     zlist_t *copy = zlist_new ();
     if (copy) {
-        struct node_t *node;
+        node_t *node;
         for (node = self->head; node; node = node->next) {
             if (!zlist_append (copy, node->item)) {
                 zlist_destroy(&copy);
@@ -298,7 +298,52 @@ zlist_size (zlist_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  Sort list
+//  Uses a comb sort, which is simple and reasonably fast
+//  Algorithm based on Wikipedia C pseudo-code
+
+void
+zlist_sort (zlist_t *self, zlist_compare_fn *compare)
+{
+    size_t gap = self->size;
+    bool swapped = false;
+    while (gap > 1 || swapped) {
+        if (gap > 1)
+            gap = (size_t) ((double) gap / 1.247330950103979);
+        
+        node_t *base = self->head;
+        node_t *test = self->head;
+        int jump = gap;
+        while (jump--)
+            test = test->next;
+        
+        swapped = false;
+        while (base && test) {
+            if ((*compare) (base->item, test->item)) {
+                //  It's trivial to swap items in a generic container
+                void *item = base->item;
+                base->item = test->item;
+                test->item = item;
+                swapped = true;
+            }
+            base = base->next;
+            test = test->next;
+        }
+    }
+}
+
+
+//  --------------------------------------------------------------------------
 //  Runs selftest of class
+
+static bool
+s_compare (void *item1, void *item2)
+{
+    if (strcmp ((char *) item1, (char *) item2) > 0)
+        return true;
+    else
+        return false;
+}
 
 void
 zlist_test (int verbose)
@@ -369,13 +414,14 @@ zlist_test (int verbose)
     assert (zlist_size (list) == 3);
     assert (zlist_first (list) == bread);
 
+    zlist_sort (list, s_compare);
     char *item;
     item = (char *) zlist_pop (list);
     assert (item == bread);
     item = (char *) zlist_pop (list);
-    assert (item == cheese);
-    item = (char *) zlist_pop (list);
     assert (item == wine);
+    item = (char *) zlist_pop (list);
+    assert (item == cheese);
     assert (zlist_size (list) == 0);
 
     //  Destructor should be safe to call twice

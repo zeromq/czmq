@@ -2,7 +2,7 @@
     zlist - generic type-free list container
 
     -------------------------------------------------------------------------
-    Copyright (c) 1991-2011 iMatix Corporation <www.imatix.com>
+    Copyright (c) 1991-2012 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -35,6 +35,9 @@ extern "C" {
 typedef struct _zlist zlist_t;
 
 //  @interface
+//  Comparison function for zlist_sort method
+typedef bool (zlist_compare_fn) (void *item1, void *item2);
+
 //  Create a new list container
 CZMQ_EXPORT zlist_t *
     zlist_new (void);
@@ -86,6 +89,10 @@ CZMQ_EXPORT zlist_t *
 //  Return number of items in the list
 CZMQ_EXPORT size_t
     zlist_size (zlist_t *self);
+
+//  Sort list
+void
+    zlist_sort (zlist_t *self, zlist_compare_fn *compare);
 
 //  Self test of this class
 void
