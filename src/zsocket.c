@@ -57,12 +57,13 @@ zsocket_new (zctx_t *ctx, int type)
 
 //  --------------------------------------------------------------------------
 //  Destroy the socket. You must use this for any socket created via the
-//  zsocket_new method.
+//  zsocket_new method. If socket is null, does nothing.
 
 void
 zsocket_destroy (zctx_t *ctx, void *socket)
 {
-    zctx__socket_destroy (ctx, socket);
+    if (socket)
+        zctx__socket_destroy (ctx, socket);
 }
 
 
