@@ -31,6 +31,7 @@
 extern "C" {
 #endif
 
+
 //  Opaque class structure
 typedef struct _zloop_t zloop_t;
 
@@ -85,6 +86,11 @@ CZMQ_EXPORT int
 int
     zloop_test (Bool verbose);
 //  @end
+
+
+// to suppress disabling the event handler on POLLERR
+// set this in pollitem.events
+#define ZMQ_IGNERR 8
 
 #ifdef __cplusplus
 }

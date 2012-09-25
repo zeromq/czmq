@@ -63,6 +63,7 @@ struct _s_poller_t {
     zmq_pollitem_t item;
     zloop_fn *handler;
     void *arg;
+    Bool ignore_errors;
     int errors;                 //  If too many errors, kill poller
 };
 
@@ -79,6 +80,7 @@ s_poller_new (zmq_pollitem_t *item, zloop_fn handler, void *arg)
 {
     s_poller_t *poller = (s_poller_t *) zmalloc (sizeof (s_poller_t));
     if (poller) {
+	poller->ignore_errors = (item->events & ZMQ_IGNERR);
         poller->item = *item;
         poller->handler = handler;
         poller->arg = arg;
@@ -389,7 +391,8 @@ zloop_start (zloop_t *self)
         for (item_nbr = 0; item_nbr < self->poll_size; item_nbr++) {
             s_poller_t *poller = &self->pollact [item_nbr];
             assert (self->pollset [item_nbr].socket == poller->item.socket);
-            if (self->pollset [item_nbr].revents & ZMQ_POLLERR) {
+            if ((self->pollset [item_nbr].revents & ZMQ_POLLERR) &&
+		!poller->ignore_errors) {
                 if (self->verbose)
                     zclock_log ("I: zloop: can't poll %s socket (%p, %d): %s",
                         poller->item.socket?
