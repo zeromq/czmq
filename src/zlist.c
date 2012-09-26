@@ -243,10 +243,6 @@ zlist_remove (zlist_t *self, void *item)
     node_t *node, *prev = NULL;
 
     //  First off, we need to find the list node
-    //  Cheap optimization for case where we've been looking through list
-    if (self->cursor && self->cursor->item == item)
-        node = self->cursor;
-    else
     for (node = self->head; node != NULL; node = node->next) {
         if (node->item == item)
             break;
