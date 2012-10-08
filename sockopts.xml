@@ -50,7 +50,10 @@
         <option name = "rcvtimeo"          type = "int"    mode = "rw" test = "SUB" />
         <option name = "sndtimeo"          type = "int"    mode = "rw" test = "SUB" />
         <option name = "ipv4only"          type = "int"    mode = "rw" test = "SUB" />
-        <option name = "router_behavior"   type = "int"    mode = "w"  test = "ROUTER" />
+        <option name = "delay_attach_on_connect"
+                                           type = "int"    mode = "w"  test = "PUB" />
+        <option name = "router_mandatory"  type = "int"    mode = "w"  test = "ROUTER" />
+        <option name = "xpub_verbose"      type = "int"    mode = "w"  test = "XPUB" />
         <option name = "rcvmore"           type = "int"    mode = "r"  test = "SUB" />
         <option name = "fd"                type = "int"    mode = "r"  test = "SUB" />
         <option name = "events"            type = "int"    mode = "r"  test = "SUB" />
