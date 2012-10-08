@@ -135,7 +135,7 @@ char *
 zsocket_identity (void *socket)
 {
     size_t option_len = 255;
-    char *identity = (char *) zmalloc (option_len);
+    char *identity = zmalloc (option_len);
     zmq_getsockopt (socket, ZMQ_IDENTITY, &identity, &option_len);
     return (char *) identity;
 }
@@ -962,12 +962,34 @@ zsocket_ipv4only (void *socket)
 
 
 //  --------------------------------------------------------------------------
-//  Set socket ZMQ_ROUTER_BEHAVIOR value
+//  Set socket ZMQ_DELAY_ATTACH_ON_CONNECT value
 
 void
-zsocket_set_router_behavior (void *socket, int router_behavior)
+zsocket_set_delay_attach_on_connect (void *socket, int delay_attach_on_connect)
 {
-    int rc = zmq_setsockopt (socket, ZMQ_ROUTER_BEHAVIOR, &router_behavior, sizeof (int));
+    int rc = zmq_setsockopt (socket, ZMQ_DELAY_ATTACH_ON_CONNECT, &delay_attach_on_connect, sizeof (int));
+    assert (rc == 0 || errno == ETERM);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_ROUTER_MANDATORY value
+
+void
+zsocket_set_router_mandatory (void *socket, int router_mandatory)
+{
+    int rc = zmq_setsockopt (socket, ZMQ_ROUTER_MANDATORY, &router_mandatory, sizeof (int));
+    assert (rc == 0 || errno == ETERM);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_XPUB_VERBOSE value
+
+void
+zsocket_set_xpub_verbose (void *socket, int xpub_verbose)
+{
+    int rc = zmq_setsockopt (socket, ZMQ_XPUB_VERBOSE, &xpub_verbose, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
 
@@ -1288,9 +1310,17 @@ zsockopt_test (Bool verbose)
     assert (zsocket_ipv4only (socket) == 1);
     zsocket_ipv4only (socket);
     zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_PUB);
+    assert (socket);
+    zsocket_set_delay_attach_on_connect (socket, 1);
+    zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_ROUTER);
     assert (socket);
-    zsocket_set_router_behavior (socket, 1);
+    zsocket_set_router_mandatory (socket, 1);
+    zsocket_destroy (ctx, socket);
+    socket = zsocket_new (ctx, ZMQ_XPUB);
+    assert (socket);
+    zsocket_set_xpub_verbose (socket, 1);
     zsocket_destroy (ctx, socket);
     socket = zsocket_new (ctx, ZMQ_SUB);
     assert (socket);
