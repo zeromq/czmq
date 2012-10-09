@@ -48,6 +48,9 @@
 void
 zsocket_set_hwm (void *socket, int hwm)
 {
+#   if !defined (ZMQ_HWM)
+#       define ZMQ_HWM 999          //  Using an out-of-date libzmq
+#   endif
     uint64_t value = hwm;
     int rc = zmq_setsockopt (socket, ZMQ_HWM, &value, sizeof (uint64_t));
     assert (rc == 0 || errno == ETERM);
@@ -73,6 +76,9 @@ zsocket_hwm (void *socket)
 void
 zsocket_set_swap (void *socket, int swap)
 {
+#   if !defined (ZMQ_SWAP)
+#       define ZMQ_SWAP 999         //  Using an out-of-date libzmq
+#   endif
     int64_t value = swap;
     int rc = zmq_setsockopt (socket, ZMQ_SWAP, &value, sizeof (int64_t));
     assert (rc == 0 || errno == ETERM);
@@ -98,6 +104,9 @@ zsocket_swap (void *socket)
 void
 zsocket_set_affinity (void *socket, int affinity)
 {
+#   if !defined (ZMQ_AFFINITY)
+#       define ZMQ_AFFINITY 999     //  Using an out-of-date libzmq
+#   endif
     uint64_t value = affinity;
     int rc = zmq_setsockopt (socket, ZMQ_AFFINITY, &value, sizeof (uint64_t));
     assert (rc == 0 || errno == ETERM);
@@ -123,6 +132,9 @@ zsocket_affinity (void *socket)
 void
 zsocket_set_identity (void *socket, char * identity)
 {
+#   if !defined (ZMQ_IDENTITY)
+#       define ZMQ_IDENTITY 999     //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_IDENTITY, identity, strlen (identity));
     assert (rc == 0 || errno == ETERM);
 }
@@ -147,6 +159,9 @@ zsocket_identity (void *socket)
 void
 zsocket_set_rate (void *socket, int rate)
 {
+#   if !defined (ZMQ_RATE)
+#       define ZMQ_RATE 999         //  Using an out-of-date libzmq
+#   endif
     int64_t value = rate;
     int rc = zmq_setsockopt (socket, ZMQ_RATE, &value, sizeof (int64_t));
     assert (rc == 0 || errno == ETERM);
@@ -172,6 +187,9 @@ zsocket_rate (void *socket)
 void
 zsocket_set_recovery_ivl (void *socket, int recovery_ivl)
 {
+#   if !defined (ZMQ_RECOVERY_IVL)
+#       define ZMQ_RECOVERY_IVL 999  //  Using an out-of-date libzmq
+#   endif
     int64_t value = recovery_ivl;
     int rc = zmq_setsockopt (socket, ZMQ_RECOVERY_IVL, &value, sizeof (int64_t));
     assert (rc == 0 || errno == ETERM);
@@ -197,6 +215,9 @@ zsocket_recovery_ivl (void *socket)
 void
 zsocket_set_recovery_ivl_msec (void *socket, int recovery_ivl_msec)
 {
+#   if !defined (ZMQ_RECOVERY_IVL_MSEC)
+#       define ZMQ_RECOVERY_IVL_MSEC 999  //  Using an out-of-date libzmq
+#   endif
     int64_t value = recovery_ivl_msec;
     int rc = zmq_setsockopt (socket, ZMQ_RECOVERY_IVL_MSEC, &value, sizeof (int64_t));
     assert (rc == 0 || errno == ETERM);
@@ -222,6 +243,9 @@ zsocket_recovery_ivl_msec (void *socket)
 void
 zsocket_set_mcast_loop (void *socket, int mcast_loop)
 {
+#   if !defined (ZMQ_MCAST_LOOP)
+#       define ZMQ_MCAST_LOOP 999   //  Using an out-of-date libzmq
+#   endif
     int64_t value = mcast_loop;
     int rc = zmq_setsockopt (socket, ZMQ_MCAST_LOOP, &value, sizeof (int64_t));
     assert (rc == 0 || errno == ETERM);
@@ -248,6 +272,9 @@ zsocket_mcast_loop (void *socket)
 void
 zsocket_set_rcvtimeo (void *socket, int rcvtimeo)
 {
+#   if !defined (ZMQ_RCVTIMEO)
+#       define ZMQ_RCVTIMEO 999     //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_RCVTIMEO, &rcvtimeo, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
@@ -274,6 +301,9 @@ zsocket_rcvtimeo (void *socket)
 void
 zsocket_set_sndtimeo (void *socket, int sndtimeo)
 {
+#   if !defined (ZMQ_SNDTIMEO)
+#       define ZMQ_SNDTIMEO 999     //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_SNDTIMEO, &sndtimeo, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
@@ -299,6 +329,9 @@ zsocket_sndtimeo (void *socket)
 void
 zsocket_set_sndbuf (void *socket, int sndbuf)
 {
+#   if !defined (ZMQ_SNDBUF)
+#       define ZMQ_SNDBUF 999       //  Using an out-of-date libzmq
+#   endif
     uint64_t value = sndbuf;
     int rc = zmq_setsockopt (socket, ZMQ_SNDBUF, &value, sizeof (uint64_t));
     assert (rc == 0 || errno == ETERM);
@@ -324,6 +357,9 @@ zsocket_sndbuf (void *socket)
 void
 zsocket_set_rcvbuf (void *socket, int rcvbuf)
 {
+#   if !defined (ZMQ_RCVBUF)
+#       define ZMQ_RCVBUF 999       //  Using an out-of-date libzmq
+#   endif
     uint64_t value = rcvbuf;
     int rc = zmq_setsockopt (socket, ZMQ_RCVBUF, &value, sizeof (uint64_t));
     assert (rc == 0 || errno == ETERM);
@@ -349,6 +385,9 @@ zsocket_rcvbuf (void *socket)
 void
 zsocket_set_linger (void *socket, int linger)
 {
+#   if !defined (ZMQ_LINGER)
+#       define ZMQ_LINGER 999       //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_LINGER, &linger, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
@@ -373,6 +412,9 @@ zsocket_linger (void *socket)
 void
 zsocket_set_reconnect_ivl (void *socket, int reconnect_ivl)
 {
+#   if !defined (ZMQ_RECONNECT_IVL)
+#       define ZMQ_RECONNECT_IVL 999  //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_RECONNECT_IVL, &reconnect_ivl, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
@@ -397,6 +439,9 @@ zsocket_reconnect_ivl (void *socket)
 void
 zsocket_set_reconnect_ivl_max (void *socket, int reconnect_ivl_max)
 {
+#   if !defined (ZMQ_RECONNECT_IVL_MAX)
+#       define ZMQ_RECONNECT_IVL_MAX 999  //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_RECONNECT_IVL_MAX, &reconnect_ivl_max, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
@@ -421,6 +466,9 @@ zsocket_reconnect_ivl_max (void *socket)
 void
 zsocket_set_backlog (void *socket, int backlog)
 {
+#   if !defined (ZMQ_BACKLOG)
+#       define ZMQ_BACKLOG 999      //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_BACKLOG, &backlog, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
@@ -445,6 +493,9 @@ zsocket_backlog (void *socket)
 void
 zsocket_set_subscribe (void *socket, char * subscribe)
 {
+#   if !defined (ZMQ_SUBSCRIBE)
+#       define ZMQ_SUBSCRIBE 999    //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_SUBSCRIBE, subscribe, strlen (subscribe));
     assert (rc == 0 || errno == ETERM);
 }
@@ -456,6 +507,9 @@ zsocket_set_subscribe (void *socket, char * subscribe)
 void
 zsocket_set_unsubscribe (void *socket, char * unsubscribe)
 {
+#   if !defined (ZMQ_UNSUBSCRIBE)
+#       define ZMQ_UNSUBSCRIBE 999  //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_UNSUBSCRIBE, unsubscribe, strlen (unsubscribe));
     assert (rc == 0 || errno == ETERM);
 }
@@ -535,6 +589,9 @@ zsocket_type (void *socket)
 void
 zsocket_set_sndhwm (void *socket, int sndhwm)
 {
+#   if !defined (ZMQ_SNDHWM)
+#       define ZMQ_SNDHWM 999       //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_SNDHWM, &sndhwm, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
@@ -559,6 +616,9 @@ zsocket_sndhwm (void *socket)
 void
 zsocket_set_rcvhwm (void *socket, int rcvhwm)
 {
+#   if !defined (ZMQ_RCVHWM)
+#       define ZMQ_RCVHWM 999       //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_RCVHWM, &rcvhwm, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
@@ -583,6 +643,9 @@ zsocket_rcvhwm (void *socket)
 void
 zsocket_set_affinity (void *socket, int affinity)
 {
+#   if !defined (ZMQ_AFFINITY)
+#       define ZMQ_AFFINITY 999     //  Using an out-of-date libzmq
+#   endif
     uint64_t value = affinity;
     int rc = zmq_setsockopt (socket, ZMQ_AFFINITY, &value, sizeof (uint64_t));
     assert (rc == 0 || errno == ETERM);
@@ -608,6 +671,9 @@ zsocket_affinity (void *socket)
 void
 zsocket_set_subscribe (void *socket, char * subscribe)
 {
+#   if !defined (ZMQ_SUBSCRIBE)
+#       define ZMQ_SUBSCRIBE 999    //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_SUBSCRIBE, subscribe, strlen (subscribe));
     assert (rc == 0 || errno == ETERM);
 }
@@ -619,6 +685,9 @@ zsocket_set_subscribe (void *socket, char * subscribe)
 void
 zsocket_set_unsubscribe (void *socket, char * unsubscribe)
 {
+#   if !defined (ZMQ_UNSUBSCRIBE)
+#       define ZMQ_UNSUBSCRIBE 999  //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_UNSUBSCRIBE, unsubscribe, strlen (unsubscribe));
     assert (rc == 0 || errno == ETERM);
 }
@@ -630,6 +699,9 @@ zsocket_set_unsubscribe (void *socket, char * unsubscribe)
 void
 zsocket_set_identity (void *socket, char * identity)
 {
+#   if !defined (ZMQ_IDENTITY)
+#       define ZMQ_IDENTITY 999     //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_IDENTITY, identity, strlen (identity));
     assert (rc == 0 || errno == ETERM);
 }
@@ -654,6 +726,9 @@ zsocket_identity (void *socket)
 void
 zsocket_set_rate (void *socket, int rate)
 {
+#   if !defined (ZMQ_RATE)
+#       define ZMQ_RATE 999         //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_RATE, &rate, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
@@ -678,6 +753,9 @@ zsocket_rate (void *socket)
 void
 zsocket_set_recovery_ivl (void *socket, int recovery_ivl)
 {
+#   if !defined (ZMQ_RECOVERY_IVL)
+#       define ZMQ_RECOVERY_IVL 999  //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_RECOVERY_IVL, &recovery_ivl, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
@@ -702,6 +780,9 @@ zsocket_recovery_ivl (void *socket)
 void
 zsocket_set_sndbuf (void *socket, int sndbuf)
 {
+#   if !defined (ZMQ_SNDBUF)
+#       define ZMQ_SNDBUF 999       //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_SNDBUF, &sndbuf, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
@@ -726,6 +807,9 @@ zsocket_sndbuf (void *socket)
 void
 zsocket_set_rcvbuf (void *socket, int rcvbuf)
 {
+#   if !defined (ZMQ_RCVBUF)
+#       define ZMQ_RCVBUF 999       //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_RCVBUF, &rcvbuf, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
@@ -750,6 +834,9 @@ zsocket_rcvbuf (void *socket)
 void
 zsocket_set_linger (void *socket, int linger)
 {
+#   if !defined (ZMQ_LINGER)
+#       define ZMQ_LINGER 999       //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_LINGER, &linger, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
@@ -774,6 +861,9 @@ zsocket_linger (void *socket)
 void
 zsocket_set_reconnect_ivl (void *socket, int reconnect_ivl)
 {
+#   if !defined (ZMQ_RECONNECT_IVL)
+#       define ZMQ_RECONNECT_IVL 999  //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_RECONNECT_IVL, &reconnect_ivl, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
@@ -798,6 +888,9 @@ zsocket_reconnect_ivl (void *socket)
 void
 zsocket_set_reconnect_ivl_max (void *socket, int reconnect_ivl_max)
 {
+#   if !defined (ZMQ_RECONNECT_IVL_MAX)
+#       define ZMQ_RECONNECT_IVL_MAX 999  //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_RECONNECT_IVL_MAX, &reconnect_ivl_max, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
@@ -822,6 +915,9 @@ zsocket_reconnect_ivl_max (void *socket)
 void
 zsocket_set_backlog (void *socket, int backlog)
 {
+#   if !defined (ZMQ_BACKLOG)
+#       define ZMQ_BACKLOG 999      //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_BACKLOG, &backlog, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
@@ -846,6 +942,9 @@ zsocket_backlog (void *socket)
 void
 zsocket_set_maxmsgsize (void *socket, int maxmsgsize)
 {
+#   if !defined (ZMQ_MAXMSGSIZE)
+#       define ZMQ_MAXMSGSIZE 999   //  Using an out-of-date libzmq
+#   endif
     int64_t value = maxmsgsize;
     int rc = zmq_setsockopt (socket, ZMQ_MAXMSGSIZE, &value, sizeof (int64_t));
     assert (rc == 0 || errno == ETERM);
@@ -871,6 +970,9 @@ zsocket_maxmsgsize (void *socket)
 void
 zsocket_set_multicast_hops (void *socket, int multicast_hops)
 {
+#   if !defined (ZMQ_MULTICAST_HOPS)
+#       define ZMQ_MULTICAST_HOPS 999  //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_MULTICAST_HOPS, &multicast_hops, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
@@ -895,6 +997,9 @@ zsocket_multicast_hops (void *socket)
 void
 zsocket_set_rcvtimeo (void *socket, int rcvtimeo)
 {
+#   if !defined (ZMQ_RCVTIMEO)
+#       define ZMQ_RCVTIMEO 999     //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_RCVTIMEO, &rcvtimeo, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
@@ -919,6 +1024,9 @@ zsocket_rcvtimeo (void *socket)
 void
 zsocket_set_sndtimeo (void *socket, int sndtimeo)
 {
+#   if !defined (ZMQ_SNDTIMEO)
+#       define ZMQ_SNDTIMEO 999     //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_SNDTIMEO, &sndtimeo, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
@@ -943,6 +1051,9 @@ zsocket_sndtimeo (void *socket)
 void
 zsocket_set_ipv4only (void *socket, int ipv4only)
 {
+#   if !defined (ZMQ_IPV4ONLY)
+#       define ZMQ_IPV4ONLY 999     //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_IPV4ONLY, &ipv4only, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
@@ -967,6 +1078,9 @@ zsocket_ipv4only (void *socket)
 void
 zsocket_set_delay_attach_on_connect (void *socket, int delay_attach_on_connect)
 {
+#   if !defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
+#       define ZMQ_DELAY_ATTACH_ON_CONNECT 999  //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_DELAY_ATTACH_ON_CONNECT, &delay_attach_on_connect, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
@@ -978,6 +1092,9 @@ zsocket_set_delay_attach_on_connect (void *socket, int delay_attach_on_connect)
 void
 zsocket_set_router_mandatory (void *socket, int router_mandatory)
 {
+#   if !defined (ZMQ_ROUTER_MANDATORY)
+#       define ZMQ_ROUTER_MANDATORY 999  //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_ROUTER_MANDATORY, &router_mandatory, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }
@@ -989,6 +1106,9 @@ zsocket_set_router_mandatory (void *socket, int router_mandatory)
 void
 zsocket_set_xpub_verbose (void *socket, int xpub_verbose)
 {
+#   if !defined (ZMQ_XPUB_VERBOSE)
+#       define ZMQ_XPUB_VERBOSE 999  //  Using an out-of-date libzmq
+#   endif
     int rc = zmq_setsockopt (socket, ZMQ_XPUB_VERBOSE, &xpub_verbose, sizeof (int));
     assert (rc == 0 || errno == ETERM);
 }

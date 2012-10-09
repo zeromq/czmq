@@ -169,6 +169,9 @@ int zsockopt_test (Bool verbose);
 void
 zsocket_set_$(name) (void *socket, $(ctype) $(name))
 {
+#   if !defined (ZMQ_$(NAME))
+#       define ZMQ_$(NAME) 999      //  Using an out-of-date libzmq
+#   endif
 .           if ctype = "int"
 .               if type = "uint64"
     uint64_t value = $(name);
