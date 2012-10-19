@@ -21,8 +21,12 @@
         <option name = "reconnect_ivl"     type = "int"    mode = "rw" test = "SUB" />
         <option name = "reconnect_ivl_max" type = "int"    mode = "rw" test = "SUB" />
         <option name = "backlog"           type = "int"    mode = "rw" test = "SUB" />
-        <option name = "subscribe"         type = "blob"   mode = "w"  test = "SUB" />
-        <option name = "unsubscribe"       type = "blob"   mode = "w"  test = "SUB" />
+        <option name = "subscribe"         type = "blob"   mode = "w"  test = "SUB">
+            <restrict type = "SUB" />
+        </option>
+        <option name = "unsubscribe"       type = "blob"   mode = "w"  test = "SUB">
+            <restrict type = "SUB" />
+        </option>
         <option name = "type"              type = "int"    mode = "r"  test = "SUB" />
         <option name = "rcvmore"           type = "int64"  mode = "r"  test = "SUB" />
         <option name = "fd"                type = "int"    mode = "r"  test = "SUB" />
@@ -34,9 +38,18 @@
         <option name = "sndhwm"            type = "int"    mode = "rw" test = "PUB" />
         <option name = "rcvhwm"            type = "int"    mode = "rw" test = "SUB" />
         <option name = "affinity"          type = "uint64" mode = "rw" test = "SUB" />
-        <option name = "subscribe"         type = "blob"   mode = "w"  test = "SUB" />
-        <option name = "unsubscribe"       type = "blob"   mode = "w"  test = "SUB" />
-        <option name = "identity"          type = "blob"   mode = "rw" test = "SUB" />
+        <option name = "subscribe"         type = "blob"   mode = "w"  test = "SUB">
+            <restrict type = "SUB" />
+        </option>
+        <option name = "unsubscribe"       type = "blob"   mode = "w"  test = "SUB">
+            <restrict type = "SUB" />
+        </option>
+        <option name = "identity"          type = "blob"   mode = "rw" test = "DEALER">
+            <restrict type = "REQ" />
+            <restrict type = "REP" />
+            <restrict type = "DEALER" />
+            <restrict type = "ROUTER" />
+        </option>
         <option name = "rate"              type = "int"    mode = "rw" test = "SUB" />
         <option name = "recovery_ivl"      type = "int"    mode = "rw" test = "SUB" />
         <option name = "sndbuf"            type = "int"    mode = "rw" test = "PUB" />
@@ -52,30 +65,34 @@
         <option name = "ipv4only"          type = "int"    mode = "rw" test = "SUB" />
         <option name = "delay_attach_on_connect"
                                            type = "int"    mode = "w"  test = "PUB" />
-        <option name = "router_mandatory"  type = "int"    mode = "w"  test = "ROUTER" />
-        <option name = "xpub_verbose"      type = "int"    mode = "w"  test = "XPUB" />
+        <option name = "router_mandatory"  type = "int"    mode = "w"  test = "ROUTER">
+            <restrict type = "ROUTER" />
+        </option>
+        <option name = "xpub_verbose"      type = "int"    mode = "w"  test = "XPUB">
+            <restrict type = "XPUB" />
+        </option>
         <option name = "rcvmore"           type = "int"    mode = "r"  test = "SUB" />
         <option name = "fd"                type = "int"    mode = "r"  test = "SUB" />
         <option name = "events"            type = "int"    mode = "r"  test = "SUB" />
         <option name = "last_endpoint"     type = "blob"   mode = "r"  test = "SUB" />
         <header>
 //  Emulation of widely-used 2.x socket options
-void zsocket_set_hwm (void *socket, int hwm);
+void zsocket_set_hwm (void *zocket, int hwm);
         </header>
         <source>
 //  --------------------------------------------------------------------------
 //  Set socket high-water mark, emulating 2.x API
 
 void
-zsocket_set_hwm (void *socket, int hwm)
+zsocket_set_hwm (void *zocket, int hwm)
 {
-    zsocket_set_sndhwm (socket, hwm);
-    zsocket_set_rcvhwm (socket, hwm);
+    zsocket_set_sndhwm (zocket, hwm);
+    zsocket_set_rcvhwm (zocket, hwm);
 }
         </source>
         <selftest>
-    socket = zsocket_new (ctx, ZMQ_SUB);
-    zsocket_set_hwm (socket, 1);
+    zocket = zsocket_new (ctx, ZMQ_SUB);
+    zsocket_set_hwm (zocket, 1);
         </selftest>
     </version>
 </options>

@@ -35,110 +35,110 @@ extern "C" {
 //  @interface
 #if (ZMQ_VERSION_MAJOR == 2)
 //  Get socket options
-CZMQ_EXPORT int zsocket_hwm (void *socket);
-CZMQ_EXPORT int zsocket_swap (void *socket);
-CZMQ_EXPORT int zsocket_affinity (void *socket);
+CZMQ_EXPORT int zsocket_hwm (void *zocket);
+CZMQ_EXPORT int zsocket_swap (void *zocket);
+CZMQ_EXPORT int zsocket_affinity (void *zocket);
 //  Returns freshly allocated string, free when done
-CZMQ_EXPORT char * zsocket_identity (void *socket);
-CZMQ_EXPORT int zsocket_rate (void *socket);
-CZMQ_EXPORT int zsocket_recovery_ivl (void *socket);
-CZMQ_EXPORT int zsocket_recovery_ivl_msec (void *socket);
-CZMQ_EXPORT int zsocket_mcast_loop (void *socket);
+CZMQ_EXPORT char * zsocket_identity (void *zocket);
+CZMQ_EXPORT int zsocket_rate (void *zocket);
+CZMQ_EXPORT int zsocket_recovery_ivl (void *zocket);
+CZMQ_EXPORT int zsocket_recovery_ivl_msec (void *zocket);
+CZMQ_EXPORT int zsocket_mcast_loop (void *zocket);
 #   if (ZMQ_VERSION_MINOR == 2)
-CZMQ_EXPORT int zsocket_rcvtimeo (void *socket);
+CZMQ_EXPORT int zsocket_rcvtimeo (void *zocket);
 #   endif
 #   if (ZMQ_VERSION_MINOR == 2)
-CZMQ_EXPORT int zsocket_sndtimeo (void *socket);
+CZMQ_EXPORT int zsocket_sndtimeo (void *zocket);
 #   endif
-CZMQ_EXPORT int zsocket_sndbuf (void *socket);
-CZMQ_EXPORT int zsocket_rcvbuf (void *socket);
-CZMQ_EXPORT int zsocket_linger (void *socket);
-CZMQ_EXPORT int zsocket_reconnect_ivl (void *socket);
-CZMQ_EXPORT int zsocket_reconnect_ivl_max (void *socket);
-CZMQ_EXPORT int zsocket_backlog (void *socket);
-CZMQ_EXPORT int zsocket_type (void *socket);
-CZMQ_EXPORT int zsocket_rcvmore (void *socket);
-CZMQ_EXPORT int zsocket_fd (void *socket);
-CZMQ_EXPORT int zsocket_events (void *socket);
+CZMQ_EXPORT int zsocket_sndbuf (void *zocket);
+CZMQ_EXPORT int zsocket_rcvbuf (void *zocket);
+CZMQ_EXPORT int zsocket_linger (void *zocket);
+CZMQ_EXPORT int zsocket_reconnect_ivl (void *zocket);
+CZMQ_EXPORT int zsocket_reconnect_ivl_max (void *zocket);
+CZMQ_EXPORT int zsocket_backlog (void *zocket);
+CZMQ_EXPORT int zsocket_type (void *zocket);
+CZMQ_EXPORT int zsocket_rcvmore (void *zocket);
+CZMQ_EXPORT int zsocket_fd (void *zocket);
+CZMQ_EXPORT int zsocket_events (void *zocket);
 
 //  Set socket options
-CZMQ_EXPORT void zsocket_set_hwm (void *socket, int hwm);
-CZMQ_EXPORT void zsocket_set_swap (void *socket, int swap);
-CZMQ_EXPORT void zsocket_set_affinity (void *socket, int affinity);
-CZMQ_EXPORT void zsocket_set_identity (void *socket, char * identity);
-CZMQ_EXPORT void zsocket_set_rate (void *socket, int rate);
-CZMQ_EXPORT void zsocket_set_recovery_ivl (void *socket, int recovery_ivl);
-CZMQ_EXPORT void zsocket_set_recovery_ivl_msec (void *socket, int recovery_ivl_msec);
-CZMQ_EXPORT void zsocket_set_mcast_loop (void *socket, int mcast_loop);
+CZMQ_EXPORT void zsocket_set_hwm (void *zocket, int hwm);
+CZMQ_EXPORT void zsocket_set_swap (void *zocket, int swap);
+CZMQ_EXPORT void zsocket_set_affinity (void *zocket, int affinity);
+CZMQ_EXPORT void zsocket_set_identity (void *zocket, char * identity);
+CZMQ_EXPORT void zsocket_set_rate (void *zocket, int rate);
+CZMQ_EXPORT void zsocket_set_recovery_ivl (void *zocket, int recovery_ivl);
+CZMQ_EXPORT void zsocket_set_recovery_ivl_msec (void *zocket, int recovery_ivl_msec);
+CZMQ_EXPORT void zsocket_set_mcast_loop (void *zocket, int mcast_loop);
 #   if (ZMQ_VERSION_MINOR == 2)
-CZMQ_EXPORT void zsocket_set_rcvtimeo (void *socket, int rcvtimeo);
+CZMQ_EXPORT void zsocket_set_rcvtimeo (void *zocket, int rcvtimeo);
 #   endif
 #   if (ZMQ_VERSION_MINOR == 2)
-CZMQ_EXPORT void zsocket_set_sndtimeo (void *socket, int sndtimeo);
+CZMQ_EXPORT void zsocket_set_sndtimeo (void *zocket, int sndtimeo);
 #   endif
-CZMQ_EXPORT void zsocket_set_sndbuf (void *socket, int sndbuf);
-CZMQ_EXPORT void zsocket_set_rcvbuf (void *socket, int rcvbuf);
-CZMQ_EXPORT void zsocket_set_linger (void *socket, int linger);
-CZMQ_EXPORT void zsocket_set_reconnect_ivl (void *socket, int reconnect_ivl);
-CZMQ_EXPORT void zsocket_set_reconnect_ivl_max (void *socket, int reconnect_ivl_max);
-CZMQ_EXPORT void zsocket_set_backlog (void *socket, int backlog);
-CZMQ_EXPORT void zsocket_set_subscribe (void *socket, char * subscribe);
-CZMQ_EXPORT void zsocket_set_unsubscribe (void *socket, char * unsubscribe);
+CZMQ_EXPORT void zsocket_set_sndbuf (void *zocket, int sndbuf);
+CZMQ_EXPORT void zsocket_set_rcvbuf (void *zocket, int rcvbuf);
+CZMQ_EXPORT void zsocket_set_linger (void *zocket, int linger);
+CZMQ_EXPORT void zsocket_set_reconnect_ivl (void *zocket, int reconnect_ivl);
+CZMQ_EXPORT void zsocket_set_reconnect_ivl_max (void *zocket, int reconnect_ivl_max);
+CZMQ_EXPORT void zsocket_set_backlog (void *zocket, int backlog);
+CZMQ_EXPORT void zsocket_set_subscribe (void *zocket, char * subscribe);
+CZMQ_EXPORT void zsocket_set_unsubscribe (void *zocket, char * unsubscribe);
 #endif
 
 #if (ZMQ_VERSION_MAJOR == 3)
 //  Get socket options
-CZMQ_EXPORT int zsocket_type (void *socket);
-CZMQ_EXPORT int zsocket_sndhwm (void *socket);
-CZMQ_EXPORT int zsocket_rcvhwm (void *socket);
-CZMQ_EXPORT int zsocket_affinity (void *socket);
+CZMQ_EXPORT int zsocket_type (void *zocket);
+CZMQ_EXPORT int zsocket_sndhwm (void *zocket);
+CZMQ_EXPORT int zsocket_rcvhwm (void *zocket);
+CZMQ_EXPORT int zsocket_affinity (void *zocket);
 //  Returns freshly allocated string, free when done
-CZMQ_EXPORT char * zsocket_identity (void *socket);
-CZMQ_EXPORT int zsocket_rate (void *socket);
-CZMQ_EXPORT int zsocket_recovery_ivl (void *socket);
-CZMQ_EXPORT int zsocket_sndbuf (void *socket);
-CZMQ_EXPORT int zsocket_rcvbuf (void *socket);
-CZMQ_EXPORT int zsocket_linger (void *socket);
-CZMQ_EXPORT int zsocket_reconnect_ivl (void *socket);
-CZMQ_EXPORT int zsocket_reconnect_ivl_max (void *socket);
-CZMQ_EXPORT int zsocket_backlog (void *socket);
-CZMQ_EXPORT int zsocket_maxmsgsize (void *socket);
-CZMQ_EXPORT int zsocket_multicast_hops (void *socket);
-CZMQ_EXPORT int zsocket_rcvtimeo (void *socket);
-CZMQ_EXPORT int zsocket_sndtimeo (void *socket);
-CZMQ_EXPORT int zsocket_ipv4only (void *socket);
-CZMQ_EXPORT int zsocket_rcvmore (void *socket);
-CZMQ_EXPORT int zsocket_fd (void *socket);
-CZMQ_EXPORT int zsocket_events (void *socket);
+CZMQ_EXPORT char * zsocket_identity (void *zocket);
+CZMQ_EXPORT int zsocket_rate (void *zocket);
+CZMQ_EXPORT int zsocket_recovery_ivl (void *zocket);
+CZMQ_EXPORT int zsocket_sndbuf (void *zocket);
+CZMQ_EXPORT int zsocket_rcvbuf (void *zocket);
+CZMQ_EXPORT int zsocket_linger (void *zocket);
+CZMQ_EXPORT int zsocket_reconnect_ivl (void *zocket);
+CZMQ_EXPORT int zsocket_reconnect_ivl_max (void *zocket);
+CZMQ_EXPORT int zsocket_backlog (void *zocket);
+CZMQ_EXPORT int zsocket_maxmsgsize (void *zocket);
+CZMQ_EXPORT int zsocket_multicast_hops (void *zocket);
+CZMQ_EXPORT int zsocket_rcvtimeo (void *zocket);
+CZMQ_EXPORT int zsocket_sndtimeo (void *zocket);
+CZMQ_EXPORT int zsocket_ipv4only (void *zocket);
+CZMQ_EXPORT int zsocket_rcvmore (void *zocket);
+CZMQ_EXPORT int zsocket_fd (void *zocket);
+CZMQ_EXPORT int zsocket_events (void *zocket);
 //  Returns freshly allocated string, free when done
-CZMQ_EXPORT char * zsocket_last_endpoint (void *socket);
+CZMQ_EXPORT char * zsocket_last_endpoint (void *zocket);
 
 //  Set socket options
-CZMQ_EXPORT void zsocket_set_sndhwm (void *socket, int sndhwm);
-CZMQ_EXPORT void zsocket_set_rcvhwm (void *socket, int rcvhwm);
-CZMQ_EXPORT void zsocket_set_affinity (void *socket, int affinity);
-CZMQ_EXPORT void zsocket_set_subscribe (void *socket, char * subscribe);
-CZMQ_EXPORT void zsocket_set_unsubscribe (void *socket, char * unsubscribe);
-CZMQ_EXPORT void zsocket_set_identity (void *socket, char * identity);
-CZMQ_EXPORT void zsocket_set_rate (void *socket, int rate);
-CZMQ_EXPORT void zsocket_set_recovery_ivl (void *socket, int recovery_ivl);
-CZMQ_EXPORT void zsocket_set_sndbuf (void *socket, int sndbuf);
-CZMQ_EXPORT void zsocket_set_rcvbuf (void *socket, int rcvbuf);
-CZMQ_EXPORT void zsocket_set_linger (void *socket, int linger);
-CZMQ_EXPORT void zsocket_set_reconnect_ivl (void *socket, int reconnect_ivl);
-CZMQ_EXPORT void zsocket_set_reconnect_ivl_max (void *socket, int reconnect_ivl_max);
-CZMQ_EXPORT void zsocket_set_backlog (void *socket, int backlog);
-CZMQ_EXPORT void zsocket_set_maxmsgsize (void *socket, int maxmsgsize);
-CZMQ_EXPORT void zsocket_set_multicast_hops (void *socket, int multicast_hops);
-CZMQ_EXPORT void zsocket_set_rcvtimeo (void *socket, int rcvtimeo);
-CZMQ_EXPORT void zsocket_set_sndtimeo (void *socket, int sndtimeo);
-CZMQ_EXPORT void zsocket_set_ipv4only (void *socket, int ipv4only);
-CZMQ_EXPORT void zsocket_set_delay_attach_on_connect (void *socket, int delay_attach_on_connect);
-CZMQ_EXPORT void zsocket_set_router_mandatory (void *socket, int router_mandatory);
-CZMQ_EXPORT void zsocket_set_xpub_verbose (void *socket, int xpub_verbose);
+CZMQ_EXPORT void zsocket_set_sndhwm (void *zocket, int sndhwm);
+CZMQ_EXPORT void zsocket_set_rcvhwm (void *zocket, int rcvhwm);
+CZMQ_EXPORT void zsocket_set_affinity (void *zocket, int affinity);
+CZMQ_EXPORT void zsocket_set_subscribe (void *zocket, char * subscribe);
+CZMQ_EXPORT void zsocket_set_unsubscribe (void *zocket, char * unsubscribe);
+CZMQ_EXPORT void zsocket_set_identity (void *zocket, char * identity);
+CZMQ_EXPORT void zsocket_set_rate (void *zocket, int rate);
+CZMQ_EXPORT void zsocket_set_recovery_ivl (void *zocket, int recovery_ivl);
+CZMQ_EXPORT void zsocket_set_sndbuf (void *zocket, int sndbuf);
+CZMQ_EXPORT void zsocket_set_rcvbuf (void *zocket, int rcvbuf);
+CZMQ_EXPORT void zsocket_set_linger (void *zocket, int linger);
+CZMQ_EXPORT void zsocket_set_reconnect_ivl (void *zocket, int reconnect_ivl);
+CZMQ_EXPORT void zsocket_set_reconnect_ivl_max (void *zocket, int reconnect_ivl_max);
+CZMQ_EXPORT void zsocket_set_backlog (void *zocket, int backlog);
+CZMQ_EXPORT void zsocket_set_maxmsgsize (void *zocket, int maxmsgsize);
+CZMQ_EXPORT void zsocket_set_multicast_hops (void *zocket, int multicast_hops);
+CZMQ_EXPORT void zsocket_set_rcvtimeo (void *zocket, int rcvtimeo);
+CZMQ_EXPORT void zsocket_set_sndtimeo (void *zocket, int sndtimeo);
+CZMQ_EXPORT void zsocket_set_ipv4only (void *zocket, int ipv4only);
+CZMQ_EXPORT void zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect);
+CZMQ_EXPORT void zsocket_set_router_mandatory (void *zocket, int router_mandatory);
+CZMQ_EXPORT void zsocket_set_xpub_verbose (void *zocket, int xpub_verbose);
 
 //  Emulation of widely-used 2.x socket options
-void zsocket_set_hwm (void *socket, int hwm);
+void zsocket_set_hwm (void *zocket, int hwm);
 #endif
 
 //  Self test of this class
