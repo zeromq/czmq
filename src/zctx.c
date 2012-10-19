@@ -239,15 +239,15 @@ zctx__socket_new (zctx_t *self, int type)
         return NULL;
 
     //  Create and register socket
-    void *socket = zmq_socket (self->context, type);
-    if (!socket)
+    void *zocket = zmq_socket (self->context, type);
+    if (!zocket)
         return NULL;
 
-    if (zlist_push (self->sockets, socket)) {
-        zmq_close (socket);
+    if (zlist_push (self->sockets, zocket)) {
+        zmq_close (zocket);
         return NULL;
     }
-    return socket;
+    return zocket;
 }
 
 
@@ -255,13 +255,13 @@ zctx__socket_new (zctx_t *self, int type)
 //  Destroy socket within this context, for CZMQ use only
 
 void
-zctx__socket_destroy (zctx_t *self, void *socket)
+zctx__socket_destroy (zctx_t *self, void *zocket)
 {
     assert (self);
-    assert (socket);
-    zsocket_set_linger (socket, self->linger);
-    zmq_close (socket);
-    zlist_remove (self->sockets, socket);
+    assert (zocket);
+    zsocket_set_linger (zocket, self->linger);
+    zmq_close (zocket);
+    zlist_remove (self->sockets, zocket);
 }
 
 

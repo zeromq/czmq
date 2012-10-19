@@ -96,15 +96,15 @@ zmsg_destroy (zmsg_t **self_p)
 //  the zloop class or zmq_poll to check for socket input before receiving.
 
 zmsg_t *
-zmsg_recv (void *socket)
+zmsg_recv (void *zocket)
 {
-    assert (socket);
+    assert (zocket);
     zmsg_t *self = zmsg_new ();
     if (!self)
         return NULL;
 
     while (1) {
-        zframe_t *frame = zframe_recv (socket);
+        zframe_t *frame = zframe_recv (zocket);
         if (!frame) {
             zmsg_destroy (&self);
             break;              //  Interrupted or terminated
@@ -126,17 +126,17 @@ zmsg_recv (void *socket)
 //  if zmsg is null.
 
 int
-zmsg_send (zmsg_t **self_p, void *socket)
+zmsg_send (zmsg_t **self_p, void *zocket)
 {
     assert (self_p);
-    assert (socket);
+    assert (zocket);
     zmsg_t *self = *self_p;
 
     int rc = 0;
     if (self) {
         zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
         while (frame) {
-            rc = zframe_send (&frame, socket,
+            rc = zframe_send (&frame, zocket,
                               zlist_size (self->frames)? ZFRAME_MORE: 0);
             if (rc != 0)
                 break;
