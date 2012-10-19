@@ -129,16 +129,16 @@ zframe_destroy (zframe_t **self_p)
 //  zframe_recv_nowait().
 
 zframe_t *
-zframe_recv (void *socket)
+zframe_recv (void *zocket)
 {
-    assert (socket);
+    assert (zocket);
     zframe_t *self = zframe_new (NULL, 0);
     if (self) {
-        if (zmq_recvmsg (socket, &self->zmsg, 0) < 0) {
+        if (zmq_recvmsg (zocket, &self->zmsg, 0) < 0) {
             zframe_destroy (&self);
             return NULL;            //  Interrupted or terminated
         }
-        self->more = zsocket_rcvmore (socket);
+        self->more = zsocket_rcvmore (zocket);
     }
     return self;
 }
@@ -149,16 +149,16 @@ zframe_recv (void *socket)
 //  NULL if there was no input waiting, or if the read was interrupted.
 
 zframe_t *
-zframe_recv_nowait (void *socket)
+zframe_recv_nowait (void *zocket)
 {
-    assert (socket);
+    assert (zocket);
     zframe_t *self = zframe_new (NULL, 0);
     if (self) {
-        if (zmq_recvmsg (socket, &self->zmsg, ZMQ_DONTWAIT) < 0) {
+        if (zmq_recvmsg (zocket, &self->zmsg, ZMQ_DONTWAIT) < 0) {
             zframe_destroy (&self);
             return NULL;            //  Interrupted or terminated
         }
-        self->more = zsocket_rcvmore (socket);
+        self->more = zsocket_rcvmore (zocket);
     }
     return self;
 }
@@ -169,9 +169,9 @@ zframe_recv_nowait (void *socket)
 //  set or the attempt to send the message errors out.
 
 int
-zframe_send (zframe_t **self_p, void *socket, int flags)
+zframe_send (zframe_t **self_p, void *zocket, int flags)
 {
-    assert (socket);
+    assert (zocket);
     assert (self_p);
 
     if (*self_p) {
@@ -183,12 +183,12 @@ zframe_send (zframe_t **self_p, void *socket, int flags)
             zmq_msg_init (&copy);
             if (zmq_msg_copy (&copy, &self->zmsg))
                 return -1;
-            if (zmq_sendmsg (socket, &copy, snd_flags) == -1)
+            if (zmq_sendmsg (zocket, &copy, snd_flags) == -1)
                 return -1;
             zmq_msg_close (&copy);
         }
         else {
-            if (zmq_sendmsg (socket, &self->zmsg, snd_flags) == -1)
+            if (zmq_sendmsg (zocket, &self->zmsg, snd_flags) == -1)
                 return -1;
             zframe_destroy (self_p);
         }

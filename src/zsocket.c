@@ -50,8 +50,8 @@
 void *
 zsocket_new (zctx_t *ctx, int type)
 {
-    void *socket = zctx__socket_new (ctx, type);
-    return socket;
+    void *zocket = zctx__socket_new (ctx, type);
+    return zocket;
 }
 
 
@@ -60,10 +60,10 @@ zsocket_new (zctx_t *ctx, int type)
 //  zsocket_new method. If socket is null, does nothing.
 
 void
-zsocket_destroy (zctx_t *ctx, void *socket)
+zsocket_destroy (zctx_t *ctx, void *zocket)
 {
-    if (socket)
-        zctx__socket_destroy (ctx, socket);
+    if (zocket)
+        zctx__socket_destroy (ctx, zocket);
 }
 
 
@@ -74,7 +74,7 @@ zsocket_destroy (zctx_t *ctx, void *socket)
 //  port number if successful.
 
 int
-zsocket_bind (void *socket, const char *format, ...)
+zsocket_bind (void *zocket, const char *format, ...)
 {
     //  Ephemeral port needs 4 additional characters
     char endpoint [256 + 4];
@@ -91,14 +91,14 @@ zsocket_bind (void *socket, const char *format, ...)
         int port;
         for (port = ZSOCKET_DYNFROM; port < ZSOCKET_DYNTO; port++) {
             sprintf (endpoint + endpoint_size - 1, "%d", port);
-            if (zmq_bind (socket, endpoint) == 0) {
+            if (zmq_bind (zocket, endpoint) == 0) {
                 rc = port;
                 break;
             }
         }
     }
     else {
-        rc = zmq_bind (socket, endpoint);
+        rc = zmq_bind (zocket, endpoint);
 
         //  Return actual port used for binding
         if (rc == 0)
@@ -115,14 +115,14 @@ zsocket_bind (void *socket, const char *format, ...)
 //  Returns 0 if the endpoint is valid, -1 if the connect failed.
 
 int
-zsocket_connect (void *socket, const char *format, ...)
+zsocket_connect (void *zocket, const char *format, ...)
 {
     char endpoint [256];
     va_list argptr;
     va_start (argptr, format);
     vsnprintf (endpoint, 256, format, argptr);
     va_end (argptr);
-    return zmq_connect (socket, endpoint);
+    return zmq_connect (zocket, endpoint);
 }
 
 //  --------------------------------------------------------------------------
@@ -130,7 +130,7 @@ zsocket_connect (void *socket, const char *format, ...)
 //  Returns 0 if disconnection is complete -1 if the disconnection failed.
 
 int
-zsocket_disconnect (void *socket, const char *format, ...)
+zsocket_disconnect (void *zocket, const char *format, ...)
 {
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0))
     char endpoint [256];
@@ -138,7 +138,7 @@ zsocket_disconnect (void *socket, const char *format, ...)
     va_start (argptr, format);
     vsnprintf (endpoint, 256, format, argptr);
     va_end (argptr);
-    return zmq_disconnect (socket, endpoint);
+    return zmq_disconnect (zocket, endpoint);
 #else
     return -1;
 #endif
@@ -149,9 +149,9 @@ zsocket_disconnect (void *socket, const char *format, ...)
 //  ready on the socket, else FALSE.
 
 Bool
-zsocket_poll (void *socket, int msecs)
+zsocket_poll (void *zocket, int msecs)
 {
-    zmq_pollitem_t items [] = { { socket, 0, ZMQ_POLLIN, 0 } };
+    zmq_pollitem_t items [] = { { zocket, 0, ZMQ_POLLIN, 0 } };
     int rc = zmq_poll (items, 1, msecs);
     return rc != -1 && (items [0].revents & ZMQ_POLLIN) != 0;
 }
@@ -161,14 +161,14 @@ zsocket_poll (void *socket, int msecs)
 //  Returns socket type as printable constant string
 
 char *
-zsocket_type_str (void *socket)
+zsocket_type_str (void *zocket)
 {
     char *type_name [] = {
         "PAIR", "PUB", "SUB", "REQ", "REP",
         "DEALER", "ROUTER", "PULL", "PUSH",
         "XPUB", "XSUB"
     };
-    int type = zsockopt_type (socket);
+    int type = zsockopt_type (zocket);
     if (type < 0 || type > ZMQ_XSUB)
         return "UNKNOWN";
     else

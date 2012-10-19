@@ -45,12 +45,12 @@
 //  NULL if the context is being terminated or the process was interrupted.
 
 char *
-zstr_recv (void *socket)
+zstr_recv (void *zocket)
 {
-    assert (socket);
+    assert (zocket);
     zmq_msg_t message;
     zmq_msg_init (&message);
-    if (zmq_recvmsg (socket, &message, 0) < 0)
+    if (zmq_recvmsg (zocket, &message, 0) < 0)
         return NULL;
 
     size_t size = zmq_msg_size (&message);
@@ -69,12 +69,12 @@ zstr_recv (void *socket)
 //  relies on this method.
 
 char *
-zstr_recv_nowait (void *socket)
+zstr_recv_nowait (void *zocket)
 {
-    assert (socket);
+    assert (zocket);
     zmq_msg_t message;
     zmq_msg_init (&message);
-    if (zmq_recvmsg (socket, &message, ZMQ_DONTWAIT) < 0)
+    if (zmq_recvmsg (zocket, &message, ZMQ_DONTWAIT) < 0)
         return NULL;
 
     size_t size = zmq_msg_size (&message);
@@ -91,15 +91,15 @@ zstr_recv_nowait (void *socket)
 //  error.
 
 int
-zstr_send (void *socket, const char *string)
+zstr_send (void *zocket, const char *string)
 {
-    assert (socket);
+    assert (zocket);
     assert (string);
 
     zmq_msg_t message;
     zmq_msg_init_size (&message, strlen (string));
     memcpy (zmq_msg_data (&message), string, strlen (string));
-    int rc = zmq_sendmsg (socket, &message, 0);
+    int rc = zmq_sendmsg (zocket, &message, 0);
     zmq_msg_close (&message);
     return rc == -1? -1: 0;
 }
@@ -108,23 +108,23 @@ zstr_send (void *socket, const char *string)
 //  --------------------------------------------------------------------------
 //  Send a string to a socket in 0MQ string format, with MORE flag
 int
-zstr_sendm (void *socket, const char *string)
+zstr_sendm (void *zocket, const char *string)
 {
-    assert (socket);
+    assert (zocket);
     assert (string);
 
     zmq_msg_t message;
     zmq_msg_init_size (&message, strlen (string));
     memcpy (zmq_msg_data (&message), string, strlen (string));
-    int rc = zmq_sendmsg (socket, &message, ZMQ_SNDMORE);
+    int rc = zmq_sendmsg (zocket, &message, ZMQ_SNDMORE);
     zmq_msg_close (&message);
     return rc == -1? -1: 0;
 }
 
 static int
-s_zstr_sendf_impl (void *socket, Bool more, const char *format, va_list argptr)
+s_zstr_sendf_impl (void *zocket, Bool more, const char *format, va_list argptr)
 {
-    assert (socket);
+    assert (zocket);
 
     //  Format string into buffer
     int size = 255 + 1;
@@ -139,9 +139,9 @@ s_zstr_sendf_impl (void *socket, Bool more, const char *format, va_list argptr)
     //  Now send formatted string
     int rc;
     if (more)
-        rc = zstr_sendm (socket, string);
+        rc = zstr_sendm (zocket, string);
     else
-        rc = zstr_send (socket, string);
+        rc = zstr_send (zocket, string);
     free (string);
     return rc;
 }
@@ -149,14 +149,14 @@ s_zstr_sendf_impl (void *socket, Bool more, const char *format, va_list argptr)
 //  --------------------------------------------------------------------------
 //  Send formatted C string to socket
 int
-zstr_sendf (void *socket, const char *format, ...)
+zstr_sendf (void *zocket, const char *format, ...)
 {
-    assert (socket);
+    assert (zocket);
 
     va_list argptr;
     va_start (argptr, format);
 
-    int rc = s_zstr_sendf_impl (socket, FALSE, format, argptr);
+    int rc = s_zstr_sendf_impl (zocket, FALSE, format, argptr);
     va_end (argptr);
 
     return rc;
@@ -165,14 +165,14 @@ zstr_sendf (void *socket, const char *format, ...)
 //  --------------------------------------------------------------------------
 //  Send formatted C string to socket with MORE flag
 int
-zstr_sendfm (void *socket, const char *format, ...)
+zstr_sendfm (void *zocket, const char *format, ...)
 {
-    assert (socket);
+    assert (zocket);
 
     va_list argptr;
     va_start (argptr, format);
 
-    int rc = s_zstr_sendf_impl (socket, TRUE, format, argptr);
+    int rc = s_zstr_sendf_impl (zocket, TRUE, format, argptr);
     va_end (argptr);
 
     return rc;
