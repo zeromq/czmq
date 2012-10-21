@@ -28,34 +28,39 @@
 @header
     The zthread class wraps OS thread creation. It creates detached threads
     that look like normal OS threads, or attached threads that share the
-    caller's 0MQ context, and get a pipe to talk back to the parent thread.
+    caller's 0MQ context, and get an inproc pipe to talk back to the parent
+    thread. Detached threads create their own 0MQ contexts as needed.
 @discuss
-    One problem is when our application needs child threads. If we simply
-    use pthreads_create() we're faced with several issues. First, it's not
-    portable to legacy OSes like win32. Second, how can a child thread get
-    access to our zctx object? If we just pass it around, we'll end up
-    sharing the pipe socket (which we use to talk to the agent) between
-    threads, and that will then crash 0MQ. Sockets cannot be used from more
-    than one thread at a time.
+    We have several use cases for multiple threads. One is to simulate many
+    processes, so we can test 0MQ designs and flows more easily. Another is
+    to create APIs that can send and receive 0MQ messages in the background.
 
-    So each child thread needs its own pipe to the agent. For the agent,
-    this is fine, it can talk to a million threads. But how do we create
-    those pipes in the child thread? We can't, not without help from the
-    main thread. The solution is to wrap thread creation, like we wrap
-    socket creation. To create a new thread, the app calls zctx_thread_new()
-    and this method creates a dedicated zctx object, with a pipe, and then
-    it passes that object to the newly minted child thread.
+    zthread solves these two use cases separately, using the zthread_new
+    and zthead_fork methods respectively. These methods wrap the native
+    system calls needed to start threads, so your code can remain fully
+    portable.
 
-    The neat thing is we can hide non-portable aspects. Windows is really a
-    mess when it comes to threads. Three different APIs, none of which is
-    really right, so you have to do rubbish like manually cleaning up when
-    a thread finishes. Anyhow, it's hidden in this class so you don't need
-    to worry.
+    Detached threads follow the POSIX pthreads API; they accept a void *
+    argument and return a void * result (always NULL in our case).
 
-    Second neat thing about wrapping thread creation is we can make it a
-    more enriching experience for all involved. One thing I do often is use
-    a PAIR-PAIR pipe to talk from a thread to/from its parent. So this class
-    will automatically create such a pair for each thread you start.
+    Attached thread receive a void * argument, a zctx_t context, and a pipe
+    socket. The pipe socket is a PAIR socket that is connected back to the
+    caller. When you call zthread_fork, it returns you a PAIR socket that
+    is the other end of this pipe. Thus attached threads can talk back to
+    their parent threads over the pipe. We use this very heavily when making
+    so-called "asynchronous" APIs, which you can see in the Guide examples
+    like 'clone'.
+
+    To recap some rules about threading: do not share sockets between
+    threads or your code will crash. You can migrate a socket from one
+    thread to a child thread, if you stop using it in the parent thread
+    immediately after creating the child thread. If you want to connect
+    sockets over inproc:// they must share the same 0MQ context, i.e. be
+    attached threads. If you want to communicate over ipc:// or tcp://
+    you can be sharing the same context, or use separate contexts.
+
+    Thus, every detached thread usually starts by creating its own zctx_t
+    instance.
 @end
 */
 
@@ -177,7 +182,6 @@ zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args)
 {
     shim_t *shim = NULL;
     //  Create our end of the pipe
-    //  Pipe has HWM of 1 at both sides to block runaway writers
     void *pipe = zsocket_new (ctx, ZMQ_PAIR);
     if (pipe) {
         zsocket_set_hwm (pipe, zctx_hwm (ctx));
