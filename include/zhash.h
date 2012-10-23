@@ -89,6 +89,10 @@ CZMQ_EXPORT size_t
 //  Make copy of hash table
 CZMQ_EXPORT zhash_t *
     zhash_dup (zhash_t *self);
+
+//  Return keys for items in table
+CZMQ_EXPORT zlist_t *
+    zhash_keys (zhash_t *self);
     
 //  Apply function to each item in the hash table. Items are iterated in no
 //  defined order. Stops if callback function returns non-zero and returns
