@@ -34,12 +34,7 @@
 @end
 */
 
-#include "../include/czmq_prelude.h"
-#include "../include/zctx.h"
-#include "../include/zframe.h"
-#include "../include/zlist.h"
-#include "../include/zsocket.h"
-#include "../include/zmsg.h"
+#include "../include/czmq.h"
 
 //  Structure of our class
 

@@ -375,6 +375,14 @@ Rather than the side-effect form:
 
 Since assertions may be removed by an optimizing compiler.
 
+### Method Styles
+
+We aim for consistent method semantics where possible:
+
+* new returns null if the constructor failed.
+* destroy always voids the supplied reference pointer.
+* dup, if defined, copies the object and returns null if the provided reference was null.
+
 ### Documentation
 
 Man pages are generated from the class header and source files via the doc/mkman tool, and similar functionality in the gitdown tool (http://github.com/imatix/gitdown). The header file for a class must wrap its interface as follows (example is from include/zclock.h):

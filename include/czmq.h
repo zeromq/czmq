@@ -35,7 +35,7 @@
 
 #define CZMQ_VERSION_MAJOR 1
 #define CZMQ_VERSION_MINOR 3
-#define CZMQ_VERSION_PATCH 0
+#define CZMQ_VERSION_PATCH 1
 
 #define CZMQ_MAKE_VERSION(major, minor, patch) \
     ((major) * 10000 + (minor) * 100 + (patch))
@@ -48,8 +48,8 @@
 #include <zctx.h>
 #include <zfile.h>
 #include <zframe.h>
-#include <zhash.h>
 #include <zlist.h>
+#include <zhash.h>
 #include <zloop.h>
 #include <zmsg.h>
 #include <zsocket.h>

@@ -34,8 +34,7 @@
 @end
 */
 
-#include "../include/czmq_prelude.h"
-#include "../include/zhash.h"
+#include "../include/czmq.h"
 
 //  Hash table performance parameters
 
@@ -46,11 +45,10 @@
 
 //  Hash item, used internally only
 
-typedef struct _item_t item_t;
-struct _item_t {
+typedef struct _item_t {
     void
         *value;                 //  Opaque item value
-    item_t
+    struct _item_t
         *next;                  //  Next item in the hash slot
     qbyte
         index;                  //  Index of item in table
@@ -58,9 +56,11 @@ struct _item_t {
         *key;                   //  Item's original key
     zhash_free_fn
         *free_fn;               //  Value free function if any
-};
+} item_t;
 
-//  Hash table structure
+
+//  ---------------------------------------------------------------------
+//  Structure of our class
 
 struct _zhash {
     size_t
@@ -230,30 +230,20 @@ zhash_insert (zhash_t *self, const char *key, void *value)
     //  If we're exceeding the load factor of the hash table,
     //  resize it according to the growth factor
     if (self->size >= self->limit * LOAD_FACTOR / 100) {
-        item_t
-            *cur_item,
-            *next_item;
-        item_t
-            **new_items;
-        size_t
-            new_limit;
-        qbyte
-            index,
-            new_index;
-
         //  Create new hash table
-        new_limit = self->limit * GROWTH_FACTOR / 100;
-        new_items = (item_t **) zmalloc (sizeof (item_t *) * new_limit);
+        size_t new_limit = self->limit * GROWTH_FACTOR / 100;
+        item_t **new_items = (item_t **) zmalloc (sizeof (item_t *) * new_limit);
         if (!new_items)
             return ENOMEM;
 
         //  Move all items to the new hash table, rehashing to
         //  take into account new hash table limit
+        uint index;
         for (index = 0; index != self->limit; index++) {
-            cur_item = self->items [index];
+            item_t *cur_item = self->items [index];
             while (cur_item) {
-                next_item = cur_item->next;
-                new_index = s_item_hash (cur_item->key, new_limit);
+                item_t *next_item = cur_item->next;
+                uint new_index = s_item_hash (cur_item->key, new_limit);
                 cur_item->index = new_index;
                 cur_item->next = new_items [new_index];
                 new_items [new_index] = cur_item;
@@ -387,6 +377,53 @@ zhash_size (zhash_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  Make copy of hash table
+//  Does not copy items themselves. Rebuilds new table so may be slow on 
+//  very large tables.
+
+zhash_t *
+zhash_dup (zhash_t *self)
+{
+    if (!self)
+        return NULL;
+
+    zhash_t *copy = zhash_new ();
+    if (copy) {
+        uint index;
+        for (index = 0; index != self->limit; index++) {
+            item_t *item = self->items [index];
+            while (item) {
+                zhash_insert (copy, item->key, item->value);
+                item = item->next;
+            }
+        }
+    }
+    return copy;
+}
+
+//  --------------------------------------------------------------------------
+//  Return keys for items in table
+
+zlist_t *
+zhash_keys (zhash_t *self)
+{
+    assert (self);
+    zlist_t *keys = zlist_new ();
+    zlist_autofree (keys);
+
+    uint index;
+    for (index = 0; index != self->limit; index++) {
+        item_t *item = self->items [index];
+        while (item) {
+            zlist_append (keys, strdup (item->key));
+            item = item->next;
+        }
+    }
+    return keys;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Apply function to each item in the hash table. Items are iterated in no
 //  defined order.  Stops if callback function returns non-zero and returns
 //  final return code from callback function (zero = success).
@@ -464,6 +501,16 @@ zhash_test (int verbose)
     assert (rc == 0);
     rc = zhash_rename (hash, "WHATBEEF", "LIVEBEEF");
     assert (rc == -1);
+
+    //  Test keys method
+    zlist_t *keys = zhash_keys (hash);
+    assert (zlist_size (keys) == 4);
+    zlist_destroy (&keys);
+
+    //  Test dup method
+    zhash_t *copy = zhash_dup (hash);
+    assert (zhash_size (copy) == 4);
+    zhash_destroy (&copy);
 
     //  Delete a item
     zhash_delete (hash, "LIVEBEEF");

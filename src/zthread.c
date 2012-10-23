@@ -64,14 +64,7 @@
 @end
 */
 
-#include "../include/czmq_prelude.h"
-#include "../include/zclock.h"
-#include "../include/zctx.h"
-#include "../include/zsocket.h"
-#include "../include/zsockopt.h"
-#include "../include/zstr.h"
-#include "../include/zthread.h"
-
+#include "../include/czmq.h"
 
 //  --------------------------------------------------------------------------
 //  Thread creation code, wrapping POSIX and Win32 thread APIs
