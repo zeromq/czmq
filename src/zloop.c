@@ -34,13 +34,7 @@
 @end
 */
 
-#include "../include/czmq_prelude.h"
-#include "../include/zclock.h"
-#include "../include/zctx.h"
-#include "../include/zlist.h"
-#include "../include/zstr.h"
-#include "../include/zsocket.h"
-#include "../include/zloop.h"
+#include "../include/czmq.h"
 
 typedef struct _s_poller_t s_poller_t;
 typedef struct _s_timer_t s_timer_t;

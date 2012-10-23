@@ -31,7 +31,7 @@
 @end
 */
 
-#include "../include/czmq_prelude.h"
+#include "../include/czmq.h"
 
 //  Delete file, return 0 if OK, -1 if not possible.
 

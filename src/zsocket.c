@@ -33,13 +33,7 @@
 @end
 */
 
-#include "../include/czmq_prelude.h"
-#include "../include/zctx.h"
-#include "../include/zclock.h"
-#include "../include/zstr.h"
-#include "../include/zsockopt.h"
-#include "../include/zsocket.h"
-
+#include "../include/czmq.h"
 
 //  --------------------------------------------------------------------------
 //  Create a new socket within our czmq context, replaces zmq_socket.

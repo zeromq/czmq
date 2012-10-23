@@ -35,11 +35,7 @@
 @end
 */
 
-#include "../include/czmq_prelude.h"
-#include "../include/zctx.h"
-#include "../include/zsocket.h"
-#include "../include/zsockopt.h"
-
+#include "../include/czmq.h"
 
 #if (ZMQ_VERSION_MAJOR == 2)
 //  --------------------------------------------------------------------------

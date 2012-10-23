@@ -42,9 +42,7 @@ granularity.
 @end
 */
 
-#include "../include/czmq_prelude.h"
-#include "../include/zclock.h"
-
+#include "../include/czmq.h"
 
 #if defined (__WINDOWS__)
 //  --------------------------------------------------------------------------

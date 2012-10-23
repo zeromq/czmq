@@ -225,8 +225,10 @@ zframe_data (zframe_t *self)
 zframe_t *
 zframe_dup (zframe_t *self)
 {
-    assert (self);
-    return zframe_new (zframe_data (self), zframe_size (self));
+    if (self)
+        return zframe_new (zframe_data (self), zframe_size (self));
+    else
+        return NULL;
 }
 
 
