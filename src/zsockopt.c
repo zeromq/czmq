@@ -1101,7 +1101,7 @@ zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect)
 #       define ZMQ_DELAY_ATTACH_ON_CONNECT 999  //  Using an out-of-date libzmq
 #   endif
     int rc = zmq_setsockopt (zocket, ZMQ_DELAY_ATTACH_ON_CONNECT, &delay_attach_on_connect, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || errno == ETERM || (ZMQ_DELAY_ATTACH_ON_CONNECT == 999 && errno == EINVAL));
 }
 
 
@@ -1119,7 +1119,7 @@ zsocket_set_router_mandatory (void *zocket, int router_mandatory)
         assert (false);
     }
     int rc = zmq_setsockopt (zocket, ZMQ_ROUTER_MANDATORY, &router_mandatory, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || errno == ETERM || (ZMQ_ROUTER_MANDATORY == 999 || errno == EINVAL));
 }
 
 
@@ -1137,7 +1137,7 @@ zsocket_set_xpub_verbose (void *zocket, int xpub_verbose)
         assert (false);
     }
     int rc = zmq_setsockopt (zocket, ZMQ_XPUB_VERBOSE, &xpub_verbose, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || errno == ETERM || (ZMQ_XPUB_VERBOSE == 999 || errno == EINVAL));
 }
 
 
