@@ -41,11 +41,12 @@
 &emsp;<a href="#toc3-361">Adding a New Class</a>
 &emsp;<a href="#toc3-374">Coding Style</a>
 &emsp;<a href="#toc3-393">Assertions</a>
-&emsp;<a href="#toc3-411">Documentation</a>
-&emsp;<a href="#toc3-450">Development</a>
-&emsp;<a href="#toc3-460">Porting CZMQ</a>
-&emsp;<a href="#toc3-473">Code Generation</a>
-&emsp;<a href="#toc3-482">This Document</a>
+&emsp;<a href="#toc3-411">Method Styles</a>
+&emsp;<a href="#toc3-420">Documentation</a>
+&emsp;<a href="#toc3-459">Development</a>
+&emsp;<a href="#toc3-469">Porting CZMQ</a>
+&emsp;<a href="#toc3-482">Code Generation</a>
+&emsp;<a href="#toc3-491">This Document</a>
 
 <A name="toc2-11" title="Overview" />
 ## Overview
@@ -856,6 +857,10 @@ This is the class interface:
     CZMQ_EXPORT size_t
         zhash_size (zhash_t *self);
     
+    //  Make copy of hash table
+    CZMQ_EXPORT zhash_t *
+        zhash_dup (zhash_t *self);
+        
     //  Apply function to each item in the hash table. Items are iterated in no
     //  defined order. Stops if callback function returns non-zero and returns
     //  final return code from callback function (zero = success).
@@ -928,6 +933,10 @@ This is the class interface:
     
     //  Copy the entire list, return the copy
     CZMQ_EXPORT zlist_t *
+        zlist_dup (zlist_t *self);
+    
+    //  Copy the entire list, return the copy (deprecated)
+    CZMQ_EXPORT zlist_t *
         zlist_copy (zlist_t *self);
     
     //  Return number of items in the list
@@ -935,8 +944,12 @@ This is the class interface:
         zlist_size (zlist_t *self);
     
     //  Sort list
-    void
+    CZMQ_EXPORT void
         zlist_sort (zlist_t *self, zlist_compare_fn *compare);
+    
+    //  Set list for automatic item destruction
+    CZMQ_EXPORT void
+        zlist_autofree (zlist_t *self);
     
     //  Self test of this class
     void
@@ -1131,7 +1144,16 @@ Rather than the side-effect form:
 
 Since assertions may be removed by an optimizing compiler.
 
-<A name="toc3-411" title="Documentation" />
+<A name="toc3-411" title="Method Styles" />
+### Method Styles
+
+We aim for consistent method semantics where possible:
+
+* new returns null if the constructor failed.
+* destroy always voids the supplied reference pointer.
+* dup, if defined, copies the object and returns null if the provided reference was null.
+
+<A name="toc3-420" title="Documentation" />
 ### Documentation
 
 Man pages are generated from the class header and source files via the doc/mkman tool, and similar functionality in the gitdown tool (http://github.com/imatix/gitdown). The header file for a class must wrap its interface as follows (example is from include/zclock.h):
@@ -1170,7 +1192,7 @@ The source file for a class then provides the self test example as follows:
 
 The template for man pages is in doc/mkman.
 
-<A name="toc3-450" title="Development" />
+<A name="toc3-459" title="Development" />
 ### Development
 
 CZMQ is developed through a test-driven process that guarantees no memory violations or leaks in the code:
@@ -1180,7 +1202,7 @@ CZMQ is developed through a test-driven process that guarantees no memory violat
 * Run the 'selftest' script, which uses the Valgrind memcheck tool.
 * Repeat until perfect.
 
-<A name="toc3-460" title="Porting CZMQ" />
+<A name="toc3-469" title="Porting CZMQ" />
 ### Porting CZMQ
 
 When you try CZMQ on an OS that it's not been used on (ever, or for a while), you will hit code that does not compile. In some cases the patches are trivial, in other cases (usually when porting to Windows), the work needed to build equivalent functionality may be non-trivial. In any case, the benefit is that once ported, the functionality is available to all applications.
@@ -1193,7 +1215,7 @@ Before attempting to patch code for portability, please read the `czmq_prelude.h
 
 The canonical 'standard operating system' for all CZMQ code is Linux, gcc, POSIX. The canonical 'weird operating system' for CZMQ is Windows.
 
-<A name="toc3-473" title="Code Generation" />
+<A name="toc3-482" title="Code Generation" />
 ### Code Generation
 
 We generate the zsockopt class using the mysterious but powerful GSL code generator. It's actually cool, since about 30 lines of XML are sufficient to generate 700 lines of code. Better, since many of the option data types changed in ØMQ/3.1, it's possible to completely hide the differences. To regenerate the zsockopt class, build and install GSL from https://github.com/imatix/gsl, and then:
@@ -1202,7 +1224,7 @@ We generate the zsockopt class using the mysterious but powerful GSL code genera
 
 You may also enjoy using this same technique if you're writing bindings in other languages. See the sockopts.gsl file, this can be easily modified to produce code in whatever language interests you.
 
-<A name="toc3-482" title="This Document" />
+<A name="toc3-491" title="This Document" />
 ### This Document
 
 This document is originally at README.txt and is built using [gitdown](http://github.com/imatix/gitdown).
