@@ -26,19 +26,7 @@
     =========================================================================
 */
 
-#include "../include/czmq_prelude.h"
-#include "../include/zclock.h"
-#include "../include/zctx.h"
-#include "../include/zfile.h"
-#include "../include/zframe.h"
-#include "../include/zhash.h"
-#include "../include/zlist.h"
-#include "../include/zloop.h"
-#include "../include/zmsg.h"
-#include "../include/zsocket.h"
-#include "../include/zsockopt.h"
-#include "../include/zstr.h"
-#include "../include/zthread.h"
+#include "../include/czmq.h"
 
 int main (int argc, char *argv [])
 {

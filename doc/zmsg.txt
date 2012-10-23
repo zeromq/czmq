@@ -9,115 +9,115 @@ SYNOPSIS
 --------
 ----
 //  Create a new empty message object
-zmsg_t *
+CZMQ_EXPORT zmsg_t *
     zmsg_new (void);
 
 //  Destroy a message object and all frames it contains
-void
+CZMQ_EXPORT void
     zmsg_destroy (zmsg_t **self_p);
 
 //  Read 1 or more frames off the socket, into a new message object
-zmsg_t *
+CZMQ_EXPORT zmsg_t *
     zmsg_recv (void *socket);
 
 //  Send a message to the socket, and then destroy it
-int
+CZMQ_EXPORT int
     zmsg_send (zmsg_t **self_p, void *socket);
 
 //  Return number of frames in message
-size_t
+CZMQ_EXPORT size_t
     zmsg_size (zmsg_t *self);
 
 //  Return combined size of all frames in message
-size_t
+CZMQ_EXPORT size_t
     zmsg_content_size (zmsg_t *self);
 
 //  Push frame to front of message, before first frame
-int
+CZMQ_EXPORT int
     zmsg_push (zmsg_t *self, zframe_t *frame);
 
 //  Pop frame off front of message, caller now owns frame
-zframe_t *
+CZMQ_EXPORT zframe_t *
     zmsg_pop (zmsg_t *self);
 
 //  Add frame to end of message, after last frame
-int
+CZMQ_EXPORT int
     zmsg_add (zmsg_t *self, zframe_t *frame);
 
 //  Push block of memory as new frame to front of message.
 //  Returns 0 on success, -1 on error.
-int
+CZMQ_EXPORT int
     zmsg_pushmem (zmsg_t *self, const void *src, size_t size);
 
 //  Push block of memory as new frame to end of message.
 //  Returns 0 on success, -1 on error.
-int
+CZMQ_EXPORT int
     zmsg_addmem (zmsg_t *self, const void *src, size_t size);
 
 //  Push string as new frame to front of message.
 //  Returns 0 on success, -1 on error.
-int
+CZMQ_EXPORT int
     zmsg_pushstr (zmsg_t *self, const char *format, ...);
 
 //  Push string as new frame to end of message.
 //  Returns 0 on success, -1 on error.
-int
+CZMQ_EXPORT int
     zmsg_addstr (zmsg_t *self, const char *format, ...);
 
 //  Pop frame off front of message, return as fresh string
-char *
+CZMQ_EXPORT char *
     zmsg_popstr (zmsg_t *self);
 
 //  Push frame to front of message, before first frame
 //  Pushes an empty frame in front of frame
-void
+CZMQ_EXPORT void
     zmsg_wrap (zmsg_t *self, zframe_t *frame);
 
 //  Pop frame off front of message, caller now owns frame
 //  If next frame is empty, pops and destroys that empty frame.
-zframe_t *
+CZMQ_EXPORT zframe_t *
     zmsg_unwrap (zmsg_t *self);
 
 //  Remove frame from message, at any position, caller owns it
-void
+CZMQ_EXPORT void
     zmsg_remove (zmsg_t *self, zframe_t *frame);
 
 //  Return first frame in message, or null
-zframe_t *
+CZMQ_EXPORT zframe_t *
     zmsg_first (zmsg_t *self);
 
 //  Return next frame in message, or null
-zframe_t *
+CZMQ_EXPORT zframe_t *
     zmsg_next (zmsg_t *self);
 
 //  Return last frame in message, or null
-zframe_t *
+CZMQ_EXPORT zframe_t *
     zmsg_last (zmsg_t *self);
 
 //  Save message to an open file, return 0 if OK, else -1.
-int
+CZMQ_EXPORT int
     zmsg_save (zmsg_t *self, FILE *file);
 
 //  Load/append an open file into message, create new message if
 //  null message provided.
-zmsg_t *
+CZMQ_EXPORT zmsg_t *
     zmsg_load (zmsg_t *self, FILE *file);
 
 //  Encode message to a new buffer, return buffer size
-size_t
+CZMQ_EXPORT size_t
     zmsg_encode (zmsg_t *self, byte **buffer);
 
 //  Decode a buffer into a new message, returns NULL if buffer is not
 //  properly formatted.
-zmsg_t *
+CZMQ_EXPORT zmsg_t *
     zmsg_decode (byte *buffer, size_t buffer_size);
 
 //  Create copy of message, as new message object
-zmsg_t *
+CZMQ_EXPORT zmsg_t *
     zmsg_dup (zmsg_t *self);
 
 //  Print message to stderr, for debugging
-void
+CZMQ_EXPORT void
     zmsg_dump (zmsg_t *self);
 
 //  Self test of this class
@@ -156,8 +156,9 @@ EXAMPLE
     zmsg_push (msg, frame);
     assert (zmsg_size (msg) == 1);
     assert (zmsg_content_size (msg) == 5);
-    zmsg_send (&msg, output);
+    rc = zmsg_send (&msg, output);
     assert (msg == NULL);
+    assert (rc == 0);
 
     msg = zmsg_recv (input);
     assert (msg);
@@ -190,8 +191,10 @@ EXAMPLE
     assert (rc == 0);
     zmsg_t *copy = zmsg_dup (msg);
     assert (copy);
-    zmsg_send (&copy, output);
-    zmsg_send (&msg, output);
+    rc = zmsg_send (&copy, output);
+    assert (rc == 0);
+    rc = zmsg_send (&msg, output);
+    assert (rc == 0);
 
     copy = zmsg_recv (input);
     assert (copy);
@@ -258,7 +261,7 @@ EXAMPLE
     //  Test encoding/decoding
     msg = zmsg_new ();
     assert (msg);
-    byte *blank = zmalloc (100000);
+    byte *blank = (byte *) zmalloc (100000);
     assert (blank);
     rc = zmsg_addmem (msg, blank, 0);
     assert (rc == 0);

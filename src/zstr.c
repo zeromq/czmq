@@ -34,11 +34,7 @@
 @end
 */
 
-#include "../include/czmq_prelude.h"
-#include "../include/zctx.h"
-#include "../include/zsocket.h"
-#include "../include/zstr.h"
-
+#include "../include/czmq.h"
 
 //  --------------------------------------------------------------------------
 //  Receive C string from socket. Caller must free returned string. Returns
