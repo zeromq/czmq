@@ -57,6 +57,10 @@ CZMQ_EXPORT void
 
 //  Copy the entire list, return the copy
 CZMQ_EXPORT zlist_t *
+    zlist_dup (zlist_t *self);
+
+//  Copy the entire list, return the copy (deprecated)
+CZMQ_EXPORT zlist_t *
     zlist_copy (zlist_t *self);
 
 //  Return number of items in the list
@@ -64,8 +68,12 @@ CZMQ_EXPORT size_t
     zlist_size (zlist_t *self);
 
 //  Sort list
-void
+CZMQ_EXPORT void
     zlist_sort (zlist_t *self, zlist_compare_fn *compare);
+
+//  Set list for automatic item destruction
+CZMQ_EXPORT void
+    zlist_autofree (zlist_t *self);
 
 //  Self test of this class
 void

@@ -59,6 +59,10 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT size_t
     zhash_size (zhash_t *self);
 
+//  Make copy of hash table
+CZMQ_EXPORT zhash_t *
+    zhash_dup (zhash_t *self);
+    
 //  Apply function to each item in the hash table. Items are iterated in no
 //  defined order. Stops if callback function returns non-zero and returns
 //  final return code from callback function (zero = success).
@@ -125,6 +129,16 @@ EXAMPLE
     assert (rc == 0);
     rc = zhash_rename (hash, "WHATBEEF", "LIVEBEEF");
     assert (rc == -1);
+
+    //  Test keys method
+    zlist_t *keys = zhash_keys (hash);
+    assert (zlist_size (keys) == 4);
+    zlist_destroy (&keys);
+
+    //  Test dup method
+    zhash_t *copy = zhash_dup (hash);
+    assert (zhash_size (copy) == 4);
+    zhash_destroy (&copy);
 
     //  Delete a item
     zhash_delete (hash, "LIVEBEEF");
