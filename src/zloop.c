@@ -67,6 +67,9 @@ struct _s_timer_t {
     zloop_fn *handler;
     void *arg;
     int64_t when;               //  Clock time when alarm goes off
+    Bool absolute;              // Whether to use absolute times (minimize drift)
+    Bool dropEventsIfOverloaded; // Drop events that can't be executed in time
+//    Bool isOverloaded;          // Indicates if we are missing events due to load
 };
 
 static s_poller_t *
@@ -83,7 +86,19 @@ s_poller_new (zmq_pollitem_t *item, zloop_fn handler, void *arg)
 }
 
 static s_timer_t *
+s_absolute_timer_new (size_t delay, size_t times, zloop_fn handler, void *arg, Bool dropEventsIfOverloaded)
+{
+    return s_timer_construct(delay, times, handler, arg, true, dropEventsIfOverloaded);
+}
+
+static s_timer_t *
 s_timer_new (size_t delay, size_t times, zloop_fn handler, void *arg)
+{
+    return s_timer_construct(delay, times, handler, arg, false, false);
+}
+
+static s_timer_t *
+s_timer_construct (size_t delay, size_t times, zloop_fn handler, void *arg, bool absolute, bool dropEventsIfOverloaded)
 {
     s_timer_t *timer = (s_timer_t *) zmalloc (sizeof (s_timer_t));
     if (timer) {
@@ -91,7 +106,18 @@ s_timer_new (size_t delay, size_t times, zloop_fn handler, void *arg)
         timer->times = times;
         timer->handler = handler;
         timer->arg = arg;
-        timer->when = -1;           //  Indicates a new timer
+        timer->absolute = absolute;
+        timer->dropEventsIfOverloaded = dropEventsIfOverloaded;
+        //timer->isOverloaded = false; // OK until demonstrated otherwise
+
+        if (absolute)
+        {
+            timer->when = delay + zclock_time (); // Encode first expiry immediately
+        }
+        else
+        {
+            timer->when = -1;                     //  Indicates a new timer
+        }
     }
     return timer;
 }
@@ -290,11 +316,31 @@ zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *
     if (zlist_push (self->timers, timer))
         return -1;
     if (self->verbose)
-        zclock_log ("I: zloop: register timer delay=%d times=%d", delay, times);
+        zclock_log ("I: zloop: register relative timer delay=%d times=%d", delay, times);
     
     return 0;
 }
 
+//  --------------------------------------------------------------------------
+//  Register a non-drifting timer that expires after some delay and repeats some
+//  number of times, optionally dropping events if they don't fire in time due to
+//  load. At each expiry, will call the handler, passing the arg. To run a timer
+//  forever, use 0 times. Returns 0 if OK, -1 if there was an error.
+
+int
+zloop_absolute_timer(zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *arg, bool dropEventsIfOverloaded)
+{
+    assert (self);
+    s_timer_t *timer = s_absolute_timer_new (delay, times, handler, arg, dropEventsIfOverloaded);
+    if (!timer)
+        return -1;
+    if (zlist_push (self->timers, timer))
+        return -1;
+    if (self->verbose)
+        zclock_log ("I: zloop: register absolute timer delay=%d times=%d", delay, times);
+
+    return 0;
+}
 
 //  --------------------------------------------------------------------------
 //  Cancel all timers for a specific argument (as provided in zloop_timer)
@@ -376,7 +422,32 @@ zloop_start (zloop_t *self)
                     free (timer);
                 }
                 else
-                    timer->when = timer->delay + zclock_time ();
+                {
+                    if (timer->absolute)
+                    {
+                        const int64_t timeNow = zclock_time ();
+
+                        // TODO useful or just log - time now is already past next fire time (!)
+                        //timer->isOverloaded = timeNow > (timer->when + timer->delay);
+                        // if (timeNow > timer->when + timer->delay)
+                        // {
+                        //     zclock_log ("I: zloop: timer not executing in time! when=%d delay=%d timeNow=%d", timer->when, timer->delay, timeNow);
+                        // }
+
+                        do
+                        {
+                            // Hard constraint on next execution time unless we prevent overloading, in
+                            // which case we drop timer events if we aren't executing in time
+                            timer->when += timer->delay;
+                        }
+                        while (timeNow > timer->when && !timer->dropEventsIfOverloaded)
+                    }
+                    else
+                    {
+                        // Allow drift based on whenever we are executing this
+                        timer->when = timer->delay + zclock_time ();
+                    }
+                }
             }
             timer = (s_timer_t *) zlist_next (self->timers);
         }
@@ -470,7 +541,7 @@ zloop_test (Bool verbose)
     zloop_t *loop = zloop_new ();
     assert (loop);
     zloop_set_verbose (loop, verbose);
-
+    
     //  After 10 msecs, send a ping message to output
     zloop_timer (loop, 10, 1, s_timer_event, output);
     
