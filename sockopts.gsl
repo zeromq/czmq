@@ -165,9 +165,7 @@ int zsockopt_test (Bool verbose);
 void
 zsocket_set_$(name) (void *zocket, $(ctype) $(name))
 {
-#   if !defined (ZMQ_$(NAME))
-#       define ZMQ_$(NAME) 999      //  Using an out-of-date libzmq
-#   endif
+#   if defined (ZMQ_$(NAME))
 .           if count (restrict)
 .               for restrict
 .                   if first()
@@ -203,6 +201,7 @@ zsocket_set_$(name) (void *zocket, $(ctype) $(name))
     int rc = zmq_setsockopt (zocket, ZMQ_$(NAME), $(name), strlen ($(name)));
 .           endif
     assert (rc == 0 || errno == ETERM);
+#   endif
 }
 
 
@@ -214,6 +213,7 @@ zsocket_set_$(name) (void *zocket, $(ctype) $(name))
 $(ctype)
 zsocket_$(name) (void *zocket)
 {
+#   if defined (ZMQ_$(NAME))
 .           if type = "uint64"
     uint64_t $(name);
     size_t option_len = sizeof (uint64_t);
@@ -240,6 +240,7 @@ zsocket_$(name) (void *zocket)
 .           else
     return ($(ctype)) $(name);
 .           endif
+#   endif
 }
 
 
@@ -273,6 +274,7 @@ zsockopt_test (Bool verbose)
 .       if defined (.minor)
 #   if (ZMQ_VERSION_MINOR == $(minor))
 .       endif
+#       if defined (ZMQ_$(NAME))
     zocket = zsocket_new (ctx, ZMQ_$(TEST));
     assert (zocket);
 .       if mode = "rw" | mode = "w"
@@ -295,6 +297,7 @@ zsockopt_test (Bool verbose)
 .           endif
 .       endif
     zsocket_destroy (ctx, zocket);
+#       endif
 .       if defined (.minor)
 #   endif
 .       endif
