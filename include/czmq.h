@@ -29,13 +29,13 @@
 
 //  Set up environment for the application
 //
-#include <czmq_prelude.h>
+#include "czmq_prelude.h"
 
 //  CZMQ version macros for compile-time API detection
 
 #define CZMQ_VERSION_MAJOR 1
 #define CZMQ_VERSION_MINOR 3
-#define CZMQ_VERSION_PATCH 1
+#define CZMQ_VERSION_PATCH 2
 
 #define CZMQ_MAKE_VERSION(major, minor, patch) \
     ((major) * 10000 + (minor) * 100 + (patch))
@@ -44,17 +44,18 @@
 
 //  Classes listed in alphabetical order
 
-#include <zclock.h>
-#include <zctx.h>
-#include <zfile.h>
-#include <zframe.h>
-#include <zlist.h>
-#include <zhash.h>
-#include <zloop.h>
-#include <zmsg.h>
-#include <zsocket.h>
-#include <zsockopt.h>
-#include <zstr.h>
-#include <zthread.h>
+#include "zclock.h"
+#include "zctx.h"
+#include "zfile.h"
+#include "zframe.h"
+#include "zlist.h"
+#include "zhash.h"
+#include "zloop.h"
+#include "zmsg.h"
+#include "zmutex.h"
+#include "zsocket.h"
+#include "zsockopt.h"
+#include "zstr.h"
+#include "zthread.h"
 
 #endif

@@ -237,7 +237,7 @@ s_test_attached (void *args, zctx_t *ctx, void *pipe)
 //  @end
 
 int
-zthread_test (Bool verbose)
+zthread_test (bool verbose)
 {
     printf (" * zthread: ");
 

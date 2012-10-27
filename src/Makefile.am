@@ -14,6 +14,7 @@ include_HEADERS = \
     ../include/zlist.h \
     ../include/zloop.h \
     ../include/zmsg.h \
+    ../include/zmutex.h \
     ../include/zsocket.h \
     ../include/zsockopt.h \
     ../include/zstr.h \
@@ -28,6 +29,7 @@ libczmq_la_SOURCES = \
     zlist.c \
     zloop.c \
     zmsg.c \
+    zmutex.c \
     zsocket.c \
     zsockopt.c \
     zstr.c \

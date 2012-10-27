@@ -92,7 +92,7 @@ CZMQ_EXPORT char *
     zframe_strdup (zframe_t *self);
 
 //  Return TRUE if frame body is equal to string, excluding terminator
-CZMQ_EXPORT Bool
+CZMQ_EXPORT bool
     zframe_streq (zframe_t *self, const char *string);
 
 // Return frame zero copy indicator (1 or 0)
@@ -105,7 +105,7 @@ CZMQ_EXPORT int
 
 //  Return TRUE if two frames have identical size and data
 //  If either frame is NULL, equality is always false.
-CZMQ_EXPORT Bool
+CZMQ_EXPORT bool
     zframe_eq (zframe_t *self, zframe_t *other);
 
 //  Print contents of frame to stderr
@@ -118,7 +118,7 @@ CZMQ_EXPORT void
 
 //  Self test of this class
 int
-    zframe_test (Bool verbose);
+    zframe_test (bool verbose);
 //  @end
 
 #ifdef __cplusplus

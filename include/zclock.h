@@ -47,7 +47,7 @@ CZMQ_EXPORT void
 
 //  Self test of this class
 int
-    zclock_test (Bool verbose);
+    zclock_test (bool verbose);
 //  @end
 
 #ifdef __cplusplus

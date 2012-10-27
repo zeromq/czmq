@@ -274,7 +274,7 @@ zframe_strdup (zframe_t *self)
 //  --------------------------------------------------------------------------
 //  Return TRUE if frame body is equal to string, excluding terminator
 
-Bool
+bool
 zframe_streq (zframe_t *self, const char *string)
 {
     assert (self);
@@ -310,7 +310,7 @@ zframe_zero_copy (zframe_t *self)
 //  --------------------------------------------------------------------------
 //  Return TRUE if two frames have identical size and data
 
-Bool
+bool
 zframe_eq (zframe_t *self, zframe_t *other)
 {
     if (!self || !other)
@@ -390,7 +390,7 @@ s_test_free_cb (void *data, void *arg)
 }
 
 int
-zframe_test (Bool verbose)
+zframe_test (bool verbose)
 {
     printf (" * zframe: ");
     int rc;

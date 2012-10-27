@@ -30,7 +30,7 @@
 
 int main (int argc, char *argv [])
 {
-    Bool verbose;
+    bool verbose;
     if (argc == 2 && streq (argv [1], "-v"))
         verbose = TRUE;
     else
@@ -46,6 +46,7 @@ int main (int argc, char *argv [])
     zlist_test (verbose);
     zloop_test (verbose);
     zmsg_test (verbose);
+    zmutex_test (verbose);
     zsocket_test (verbose);
     zsockopt_test (verbose);
     zstr_test (verbose);

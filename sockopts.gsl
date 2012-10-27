@@ -83,7 +83,7 @@ $(string.trim(.):)
 
 .endfor
 //  Self test of this class
-int zsockopt_test (Bool verbose);
+int zsockopt_test (bool verbose);
 //  @end
 
 .for version
@@ -260,7 +260,7 @@ $(string.trim(.):)
 //  Selftest
 
 int
-zsockopt_test (Bool verbose)
+zsockopt_test (bool verbose)
 {
     printf (" * zsockopt: ");
 

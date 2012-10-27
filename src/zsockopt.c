@@ -1253,7 +1253,7 @@ zsocket_set_hwm (void *zocket, int hwm)
 //  Selftest
 
 int
-zsockopt_test (Bool verbose)
+zsockopt_test (bool verbose)
 {
     printf (" * zsockopt: ");
 
