@@ -5,7 +5,7 @@
     Copyright (c) 1991-2012 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
-    This file is part of czmq, the high-level C binding for 0MQ:
+    This file is part of CZMQ, the high-level C binding for 0MQ:
     http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
@@ -44,8 +44,8 @@
 void *
 zsocket_new (zctx_t *ctx, int type)
 {
-    void *zocket = zctx__socket_new (ctx, type);
-    return zocket;
+    void *self = zctx__socket_new (ctx, type);
+    return self;
 }
 
 
@@ -54,10 +54,10 @@ zsocket_new (zctx_t *ctx, int type)
 //  zsocket_new method. If socket is null, does nothing.
 
 void
-zsocket_destroy (zctx_t *ctx, void *zocket)
+zsocket_destroy (zctx_t *ctx, void *self)
 {
-    if (zocket)
-        zctx__socket_destroy (ctx, zocket);
+    if (self)
+        zctx__socket_destroy (ctx, self);
 }
 
 
@@ -68,7 +68,7 @@ zsocket_destroy (zctx_t *ctx, void *zocket)
 //  port number if successful.
 
 int
-zsocket_bind (void *zocket, const char *format, ...)
+zsocket_bind (void *self, const char *format, ...)
 {
     //  Ephemeral port needs 4 additional characters
     char endpoint [256 + 4];
@@ -85,16 +85,15 @@ zsocket_bind (void *zocket, const char *format, ...)
         int port;
         for (port = ZSOCKET_DYNFROM; port < ZSOCKET_DYNTO; port++) {
             sprintf (endpoint + endpoint_size - 1, "%d", port);
-            if (zmq_bind (zocket, endpoint) == 0) {
+            if (zmq_bind (self, endpoint) == 0) {
                 rc = port;
                 break;
             }
         }
     }
     else {
-        rc = zmq_bind (zocket, endpoint);
-
         //  Return actual port used for binding
+        rc = zmq_bind (self, endpoint);
         if (rc == 0)
             rc = atoi (strrchr (endpoint, ':') + 1);
         else
@@ -109,14 +108,14 @@ zsocket_bind (void *zocket, const char *format, ...)
 //  Returns 0 if the endpoint is valid, -1 if the connect failed.
 
 int
-zsocket_connect (void *zocket, const char *format, ...)
+zsocket_connect (void *self, const char *format, ...)
 {
     char endpoint [256];
     va_list argptr;
     va_start (argptr, format);
     vsnprintf (endpoint, 256, format, argptr);
     va_end (argptr);
-    return zmq_connect (zocket, endpoint);
+    return zmq_connect (self, endpoint);
 }
 
 //  --------------------------------------------------------------------------
@@ -124,7 +123,7 @@ zsocket_connect (void *zocket, const char *format, ...)
 //  Returns 0 if disconnection is complete -1 if the disconnection failed.
 
 int
-zsocket_disconnect (void *zocket, const char *format, ...)
+zsocket_disconnect (void *self, const char *format, ...)
 {
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0))
     char endpoint [256];
@@ -132,7 +131,7 @@ zsocket_disconnect (void *zocket, const char *format, ...)
     va_start (argptr, format);
     vsnprintf (endpoint, 256, format, argptr);
     va_end (argptr);
-    return zmq_disconnect (zocket, endpoint);
+    return zmq_disconnect (self, endpoint);
 #else
     return -1;
 #endif
@@ -142,10 +141,10 @@ zsocket_disconnect (void *zocket, const char *format, ...)
 //  Poll for input events on the socket. Returns TRUE if there is input
 //  ready on the socket, else FALSE.
 
-Bool
-zsocket_poll (void *zocket, int msecs)
+bool
+zsocket_poll (void *self, int msecs)
 {
-    zmq_pollitem_t items [] = { { zocket, 0, ZMQ_POLLIN, 0 } };
+    zmq_pollitem_t items [] = { { self, 0, ZMQ_POLLIN, 0 } };
     int rc = zmq_poll (items, 1, msecs);
     return rc != -1 && (items [0].revents & ZMQ_POLLIN) != 0;
 }
@@ -155,14 +154,14 @@ zsocket_poll (void *zocket, int msecs)
 //  Returns socket type as printable constant string
 
 char *
-zsocket_type_str (void *zocket)
+zsocket_type_str (void *self)
 {
     char *type_name [] = {
         "PAIR", "PUB", "SUB", "REQ", "REP",
         "DEALER", "ROUTER", "PULL", "PUSH",
         "XPUB", "XSUB"
     };
-    int type = zsockopt_type (zocket);
+    int type = zsockopt_type (self);
     if (type < 0 || type > ZMQ_XSUB)
         return "UNKNOWN";
     else
@@ -174,7 +173,7 @@ zsocket_type_str (void *zocket)
 //  Selftest
 
 int
-zsocket_test (Bool verbose)
+zsocket_test (bool verbose)
 {
     printf (" * zsocket: ");
 

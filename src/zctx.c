@@ -61,7 +61,7 @@
 struct _zctx_t {
     void *context;              //  Our 0MQ context
     zlist_t *sockets;           //  Sockets held by this thread
-    Bool main;                  //  TRUE if we're the main thread
+    bool main;                  //  TRUE if we're the main thread
     int iothreads;              //  Number of IO threads, default 1
     int linger;                 //  Linger timeout, default 0
     int hwm;                    //  HWM, default 1
@@ -263,7 +263,7 @@ zctx__socket_destroy (zctx_t *self, void *zocket)
 //  Selftest
 
 int
-zctx_test (Bool verbose)
+zctx_test (bool verbose)
 {
     printf (" * zctx: ");
 

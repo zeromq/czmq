@@ -148,7 +148,7 @@ s_item_insert (zhash_t *self, const char *key, void *value)
 //  Destroy item in hash table, item must exist in table
 
 static void
-s_item_destroy (zhash_t *self, item_t *item, Bool hard)
+s_item_destroy (zhash_t *self, item_t *item, bool hard)
 {
     //  Find previous item since it's a singly-linked list
     item_t *cur_item = self->items [item->index];
@@ -521,7 +521,7 @@ zhash_test (int verbose)
     //  Check that the queue is robust against random usage
     struct {
         char name [100];
-        Bool exists;
+        bool exists;
     } testset [200];
     memset (testset, 0, sizeof (testset));
     int testmax = 200, testnbr, iteration;

@@ -73,7 +73,7 @@ CZMQ_EXPORT int
 
 //  Set verbose tracing of reactor on/off
 CZMQ_EXPORT void
-    zloop_set_verbose (zloop_t *self, Bool verbose);
+    zloop_set_verbose (zloop_t *self, bool verbose);
 
 //  Start the reactor. Takes control of the thread and returns when the 0MQ
 //  context is terminated or the process is interrupted, or any event handler
@@ -84,7 +84,7 @@ CZMQ_EXPORT int
 
 //  Self test of this class
 int
-    zloop_test (Bool verbose);
+    zloop_test (bool verbose);
 //  @end
 
 

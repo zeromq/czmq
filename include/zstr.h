@@ -58,7 +58,7 @@ CZMQ_EXPORT int
 
 //  Self test of this class
 int
-    zstr_test (Bool verbose);
+    zstr_test (bool verbose);
 //  @end
 
 #ifdef __cplusplus

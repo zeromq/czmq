@@ -649,7 +649,7 @@ zmsg_dump (zmsg_t *self)
 //  Selftest
 
 int
-zmsg_test (Bool verbose)
+zmsg_test (bool verbose)
 {
     printf (" * zmsg: ");
 

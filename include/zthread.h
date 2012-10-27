@@ -53,7 +53,7 @@ CZMQ_EXPORT void *
 
 //  Self test of this class
 int
-    zthread_test (Bool verbose);
+    zthread_test (bool verbose);
 //  @end
 
 #ifdef __cplusplus

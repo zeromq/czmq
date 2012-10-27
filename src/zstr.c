@@ -118,7 +118,7 @@ zstr_sendm (void *zocket, const char *string)
 }
 
 static int
-s_zstr_sendf_impl (void *zocket, Bool more, const char *format, va_list argptr)
+s_zstr_sendf_impl (void *zocket, bool more, const char *format, va_list argptr)
 {
     assert (zocket);
 
@@ -178,7 +178,7 @@ zstr_sendfm (void *zocket, const char *format, ...)
 //  Selftest
 
 int
-zstr_test (Bool verbose)
+zstr_test (bool verbose)
 {
     printf (" * zstr: ");
 

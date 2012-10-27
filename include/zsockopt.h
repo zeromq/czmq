@@ -142,7 +142,7 @@ void zsocket_set_hwm (void *zocket, int hwm);
 #endif
 
 //  Self test of this class
-int zsockopt_test (Bool verbose);
+int zsockopt_test (bool verbose);
 //  @end
 
 //  Deprecated function names

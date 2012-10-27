@@ -5,7 +5,7 @@
     Copyright (c) 1991-2012 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
-    This file is part of czmq, the C binding for 0MQ: http://czmq.zeromq.org.
+    This file is part of CZMQ, the C binding for 0MQ: http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under the
     terms of the GNU Lesser General Public License as published by the Free
@@ -135,7 +135,7 @@ zclock_log (const char *format, ...)
 //  Self test of this class
 
 int
-zclock_test (Bool verbose)
+zclock_test (bool verbose)
 {
     printf (" * zclock: ");
 
