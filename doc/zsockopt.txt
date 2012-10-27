@@ -117,7 +117,7 @@ void zsocket_set_hwm (void *zocket, int hwm);
 #endif
 
 //  Self test of this class
-int zsockopt_test (Bool verbose);
+int zsockopt_test (bool verbose);
 ----
 
 DESCRIPTION
@@ -137,24 +137,31 @@ EXAMPLE
     assert (ctx);
     void *zocket;
 #if (ZMQ_VERSION_MAJOR == 2)
+#       if defined (ZMQ_HWM)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_hwm (zocket, 1);
     assert (zsocket_hwm (zocket) == 1);
     zsocket_hwm (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_SWAP)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_swap (zocket, 1);
     assert (zsocket_swap (zocket) == 1);
     zsocket_swap (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_AFFINITY)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_affinity (zocket, 1);
     assert (zsocket_affinity (zocket) == 1);
     zsocket_affinity (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_IDENTITY)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_identity (zocket, "test");
@@ -162,139 +169,189 @@ EXAMPLE
     assert (identity);
     free (identity);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_RATE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_rate (zocket, 1);
     assert (zsocket_rate (zocket) == 1);
     zsocket_rate (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_RECOVERY_IVL)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_recovery_ivl (zocket, 1);
     assert (zsocket_recovery_ivl (zocket) == 1);
     zsocket_recovery_ivl (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_RECOVERY_IVL_MSEC)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_recovery_ivl_msec (zocket, 1);
     assert (zsocket_recovery_ivl_msec (zocket) == 1);
     zsocket_recovery_ivl_msec (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_MCAST_LOOP)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_mcast_loop (zocket, 1);
     assert (zsocket_mcast_loop (zocket) == 1);
     zsocket_mcast_loop (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
 #   if (ZMQ_VERSION_MINOR == 2)
+#       if defined (ZMQ_RCVTIMEO)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_rcvtimeo (zocket, 1);
     assert (zsocket_rcvtimeo (zocket) == 1);
     zsocket_rcvtimeo (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
 #   endif
 #   if (ZMQ_VERSION_MINOR == 2)
+#       if defined (ZMQ_SNDTIMEO)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_sndtimeo (zocket, 1);
     assert (zsocket_sndtimeo (zocket) == 1);
     zsocket_sndtimeo (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
 #   endif
+#       if defined (ZMQ_SNDBUF)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_sndbuf (zocket, 1);
     assert (zsocket_sndbuf (zocket) == 1);
     zsocket_sndbuf (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_RCVBUF)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_rcvbuf (zocket, 1);
     assert (zsocket_rcvbuf (zocket) == 1);
     zsocket_rcvbuf (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_LINGER)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_linger (zocket, 1);
     assert (zsocket_linger (zocket) == 1);
     zsocket_linger (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_RECONNECT_IVL)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_reconnect_ivl (zocket, 1);
     assert (zsocket_reconnect_ivl (zocket) == 1);
     zsocket_reconnect_ivl (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_RECONNECT_IVL_MAX)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_reconnect_ivl_max (zocket, 1);
     assert (zsocket_reconnect_ivl_max (zocket) == 1);
     zsocket_reconnect_ivl_max (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_BACKLOG)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_backlog (zocket, 1);
     assert (zsocket_backlog (zocket) == 1);
     zsocket_backlog (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_SUBSCRIBE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_subscribe (zocket, "test");
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_UNSUBSCRIBE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_unsubscribe (zocket, "test");
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_TYPE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_type (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_RCVMORE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_rcvmore (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_FD)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_fd (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_EVENTS)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_events (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
 #endif
 
 #if (ZMQ_VERSION_MAJOR == 3)
+#       if defined (ZMQ_TYPE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_type (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_SNDHWM)
     zocket = zsocket_new (ctx, ZMQ_PUB);
     assert (zocket);
     zsocket_set_sndhwm (zocket, 1);
     assert (zsocket_sndhwm (zocket) == 1);
     zsocket_sndhwm (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_RCVHWM)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_rcvhwm (zocket, 1);
     assert (zsocket_rcvhwm (zocket) == 1);
     zsocket_rcvhwm (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_AFFINITY)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_affinity (zocket, 1);
     assert (zsocket_affinity (zocket) == 1);
     zsocket_affinity (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_SUBSCRIBE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_subscribe (zocket, "test");
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_UNSUBSCRIBE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_unsubscribe (zocket, "test");
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_IDENTITY)
     zocket = zsocket_new (ctx, ZMQ_DEALER);
     assert (zocket);
     zsocket_set_identity (zocket, "test");
@@ -302,114 +359,155 @@ EXAMPLE
     assert (identity);
     free (identity);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_RATE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_rate (zocket, 1);
     assert (zsocket_rate (zocket) == 1);
     zsocket_rate (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_RECOVERY_IVL)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_recovery_ivl (zocket, 1);
     assert (zsocket_recovery_ivl (zocket) == 1);
     zsocket_recovery_ivl (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_SNDBUF)
     zocket = zsocket_new (ctx, ZMQ_PUB);
     assert (zocket);
     zsocket_set_sndbuf (zocket, 1);
     assert (zsocket_sndbuf (zocket) == 1);
     zsocket_sndbuf (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_RCVBUF)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_rcvbuf (zocket, 1);
     assert (zsocket_rcvbuf (zocket) == 1);
     zsocket_rcvbuf (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_LINGER)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_linger (zocket, 1);
     assert (zsocket_linger (zocket) == 1);
     zsocket_linger (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_RECONNECT_IVL)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_reconnect_ivl (zocket, 1);
     assert (zsocket_reconnect_ivl (zocket) == 1);
     zsocket_reconnect_ivl (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_RECONNECT_IVL_MAX)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_reconnect_ivl_max (zocket, 1);
     assert (zsocket_reconnect_ivl_max (zocket) == 1);
     zsocket_reconnect_ivl_max (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_BACKLOG)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_backlog (zocket, 1);
     assert (zsocket_backlog (zocket) == 1);
     zsocket_backlog (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_MAXMSGSIZE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_maxmsgsize (zocket, 1);
     assert (zsocket_maxmsgsize (zocket) == 1);
     zsocket_maxmsgsize (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_MULTICAST_HOPS)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_multicast_hops (zocket, 1);
     assert (zsocket_multicast_hops (zocket) == 1);
     zsocket_multicast_hops (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_RCVTIMEO)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_rcvtimeo (zocket, 1);
     assert (zsocket_rcvtimeo (zocket) == 1);
     zsocket_rcvtimeo (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_SNDTIMEO)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_sndtimeo (zocket, 1);
     assert (zsocket_sndtimeo (zocket) == 1);
     zsocket_sndtimeo (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_IPV4ONLY)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_ipv4only (zocket, 1);
     assert (zsocket_ipv4only (zocket) == 1);
     zsocket_ipv4only (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
     zocket = zsocket_new (ctx, ZMQ_PUB);
     assert (zocket);
     zsocket_set_delay_attach_on_connect (zocket, 1);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_ROUTER_MANDATORY)
     zocket = zsocket_new (ctx, ZMQ_ROUTER);
     assert (zocket);
     zsocket_set_router_mandatory (zocket, 1);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_XPUB_VERBOSE)
     zocket = zsocket_new (ctx, ZMQ_XPUB);
     assert (zocket);
     zsocket_set_xpub_verbose (zocket, 1);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_RCVMORE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_rcvmore (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_FD)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_fd (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_EVENTS)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_events (zocket);
     zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_LAST_ENDPOINT)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     char *last_endpoint = zsocket_last_endpoint (zocket);
     assert (last_endpoint);
     free (last_endpoint);
     zsocket_destroy (ctx, zocket);
+#       endif
 
     zocket = zsocket_new (ctx, ZMQ_SUB);
     zsocket_set_hwm (zocket, 1);

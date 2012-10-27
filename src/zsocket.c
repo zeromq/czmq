@@ -61,6 +61,13 @@ zsocket_destroy (zctx_t *ctx, void *self)
 }
 
 
+//  Static mutex used only in the following code
+static zmutex_t *s_mutex = NULL;
+static void s_mutex_free (void)
+{
+    zmutex_destroy (&s_mutex);
+}
+
 //  --------------------------------------------------------------------------
 //  Bind a socket to a formatted endpoint. If the port is specified as
 //  '*', binds to any free port from ZSOCKET_DYNFROM to ZSOCKET_DYNTO
@@ -70,6 +77,19 @@ zsocket_destroy (zctx_t *ctx, void *self)
 int
 zsocket_bind (void *self, const char *format, ...)
 {
+    //  We avoid reusing ephemeral ports so that peers which have
+    //  received an ephemeral port to connect to won't connect to
+    //  old peers and in fact connect to new ones which have bound
+    //  to that old port by misfortune. For the rare case that
+    //  you do lots of binds/unbinds in one process, we use a mutex
+    //  to protect against collisions.
+    //  
+    static int dynport = ZSOCKET_DYNFROM;
+    if (!s_mutex) {
+        s_mutex = zmutex_new ();
+        atexit (s_mutex_free);
+    }
+
     //  Ephemeral port needs 4 additional characters
     char endpoint [256 + 4];
     va_list argptr;
@@ -82,13 +102,21 @@ zsocket_bind (void *self, const char *format, ...)
     if (endpoint [endpoint_size - 2] == ':'
     &&  endpoint [endpoint_size - 1] == '*') {
         rc = -1;            //  Unless successful
-        int port;
-        for (port = ZSOCKET_DYNFROM; port < ZSOCKET_DYNTO; port++) {
+        int port = dynport;
+        while (true) {
+            //  Try to bind on the next plausible port
             sprintf (endpoint + endpoint_size - 1, "%d", port);
             if (zmq_bind (self, endpoint) == 0) {
                 rc = port;
                 break;
             }
+            //  Failed, so increment port and try again
+            zmutex_lock (s_mutex);
+            dynport++;
+            if (dynport >= ZSOCKET_DYNTO)
+                dynport = ZSOCKET_DYNFROM;
+            port = dynport;
+            zmutex_unlock (s_mutex);
         }
     }
     else {
