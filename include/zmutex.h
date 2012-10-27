@@ -1,5 +1,5 @@
 /*  =========================================================================
-    czmq.h - CZMQ wrapper
+    zmutex - working with mutexes
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2012 iMatix Corporation <www.imatix.com>
@@ -24,38 +24,40 @@
     =========================================================================
 */
 
-#ifndef __CZMQ_H_INCLUDED__
-#define __CZMQ_H_INCLUDED__
+#ifndef __ZFL_MUTEX_H_INCLUDED__
+#define __ZFL_MUTEX_H_INCLUDED__
 
-//  Set up environment for the application
-//
-#include "czmq_prelude.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-//  CZMQ version macros for compile-time API detection
+//  Opaque class structure
+typedef struct _zmutex_t zmutex_t;
 
-#define CZMQ_VERSION_MAJOR 1
-#define CZMQ_VERSION_MINOR 3
-#define CZMQ_VERSION_PATCH 1
+//  @interface
+//  Create a new mutex container
+CZMQ_EXPORT zmutex_t *
+    zmutex_new (void);
 
-#define CZMQ_MAKE_VERSION(major, minor, patch) \
-    ((major) * 10000 + (minor) * 100 + (patch))
-#define CZMQ_VERSION \
-    CZMQ_MAKE_VERSION(CZMQ_VERSION_MAJOR, CZMQ_VERSION_MINOR, CZMQ_VERSION_PATCH)
+//  Destroy a mutex container
+CZMQ_EXPORT void
+    zmutex_destroy (zmutex_t **self_p);
 
-//  Classes listed in alphabetical order
+//  Lock mutex
+CZMQ_EXPORT void
+    zmutex_lock (zmutex_t *self);
 
-#include "zclock.h"
-#include "zctx.h"
-#include "zfile.h"
-#include "zframe.h"
-#include "zlist.h"
-#include "zhash.h"
-#include "zloop.h"
-#include "zmsg.h"
-#include "zmutex.h"
-#include "zsocket.h"
-#include "zsockopt.h"
-#include "zstr.h"
-#include "zthread.h"
+//  Unlock mutex
+CZMQ_EXPORT void
+    zmutex_unlock (zmutex_t *self);
+
+//  Self test of this class
+int
+    zmutex_test (bool verbose);
+//  @end
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
