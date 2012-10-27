@@ -9,6 +9,7 @@ MAN7 = czmq.7 \
     zlist.7 \
     zloop.7 \
     zmsg.7 \
+    zmutex.7 \
     zsocket.7 \
     zsockopt.7 \
     zstr.7 \

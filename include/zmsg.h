@@ -149,7 +149,7 @@ CZMQ_EXPORT void
 
 //  Self test of this class
 int
-    zmsg_test (Bool verbose);
+    zmsg_test (bool verbose);
 //  @end
 
 #ifdef __cplusplus

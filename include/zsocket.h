@@ -69,7 +69,7 @@ CZMQ_EXPORT int
 
 //  Poll for input events on the socket. Returns TRUE if there is input
 //  ready on the socket, else FALSE.
-CZMQ_EXPORT Bool
+CZMQ_EXPORT bool
     zsocket_poll (void *socket, int msecs);
     
 //  Returns socket type as printable constant string
@@ -78,7 +78,7 @@ CZMQ_EXPORT char *
 
 //  Self test of this class
 int
-    zsocket_test (Bool verbose);
+    zsocket_test (bool verbose);
 //  @end
 
 #ifdef __cplusplus

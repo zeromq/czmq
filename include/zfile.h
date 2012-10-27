@@ -50,7 +50,7 @@ CZMQ_EXPORT ssize_t
 
 //  Self test of this class
 int
-    zfile_test (Bool verbose);
+    zfile_test (bool verbose);
 //  @end
 
 #ifdef __cplusplus

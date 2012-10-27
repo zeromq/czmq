@@ -237,6 +237,16 @@ This is the class interface:
 
 .pull src/zclock.c@discuss,left
 
+#### zmutex - wrap lightweight mutexes
+
+.pull src/zmutex.c@header,left
+
+This is the class interface:
+
+.pull include/zmutex.h@interface,code
+
+.pull src/zmutex.c@discuss,left
+
 ## Design Ideology
 
 ### The Problem with C

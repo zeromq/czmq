@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zthread - working with system threads
+    zmutex - working with mutexes
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2012 iMatix Corporation <www.imatix.com>
@@ -24,36 +24,36 @@
     =========================================================================
 */
 
-#ifndef __ZTHREAD_H_INCLUDED__
-#define __ZTHREAD_H_INCLUDED__
+#ifndef __ZFL_MUTEX_H_INCLUDED__
+#define __ZFL_MUTEX_H_INCLUDED__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+//  Opaque class structure
+typedef struct _zmutex_t zmutex_t;
+
 //  @interface
-//  Detached threads follow POSIX pthreads API
-typedef void *(zthread_detached_fn) (void *args);
+//  Create a new mutex container
+CZMQ_EXPORT zmutex_t *
+    zmutex_new (void);
 
-//  Attached threads get context and pipe from parent
-typedef void (zthread_attached_fn) (void *args, zctx_t *ctx, void *pipe);
+//  Destroy a mutex container
+CZMQ_EXPORT void
+    zmutex_destroy (zmutex_t **self_p);
 
-//  Create a detached thread. A detached thread operates autonomously
-//  and is used to simulate a separate process. It gets no ctx, and no
-//  pipe.
-CZMQ_EXPORT int
-    zthread_new (zthread_detached_fn *thread_fn, void *args);
+//  Lock mutex
+CZMQ_EXPORT void
+    zmutex_lock (zmutex_t *self);
 
-//  Create an attached thread. An attached thread gets a ctx and a PAIR
-//  pipe back to its parent. It must monitor its pipe, and exit if the
-//  pipe becomes unreadable. Do not destroy the ctx, the thread does this
-//  automatically when it ends.
-CZMQ_EXPORT void *
-    zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args);
+//  Unlock mutex
+CZMQ_EXPORT void
+    zmutex_unlock (zmutex_t *self);
 
 //  Self test of this class
 int
-    zthread_test (bool verbose);
+    zmutex_test (bool verbose);
 //  @end
 
 #ifdef __cplusplus

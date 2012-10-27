@@ -74,7 +74,7 @@ CZMQ_EXPORT void *
 
 //  Self test of this class
 int
-    zctx_test (Bool verbose);
+    zctx_test (bool verbose);
 
 //  Global signal indicator, TRUE when user presses Ctrl-C or the process
 //  gets a SIGTERM signal.
