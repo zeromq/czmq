@@ -106,17 +106,21 @@ zsocket_bind (void *self, const char *format, ...)
         while (true) {
             //  Try to bind on the next plausible port
             sprintf (endpoint + endpoint_size - 1, "%d", port);
-            if (zmq_bind (self, endpoint) == 0) {
-                rc = port;
-                break;
-            }
-            //  Failed, so increment port and try again
+            rc = port;      //  Assume it works
+            
+            //  Increment port number in any case
             zmutex_lock (s_mutex);
             dynport++;
             if (dynport >= ZSOCKET_DYNTO)
                 dynport = ZSOCKET_DYNFROM;
             port = dynport;
             zmutex_unlock (s_mutex);
+
+            //  Now try to bind and return port number
+            //  Will fail due to lack of file handles before
+            //  running out of ephemeral port space.
+            if (zmq_bind (self, endpoint) == 0)
+                break;
         }
     }
     else {
