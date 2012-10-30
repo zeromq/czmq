@@ -29,7 +29,7 @@
     The zctx class wraps 0MQ contexts. It manages open sockets in the context
     and automatically closes these before terminating the context. It provides
     a simple way to set the linger timeout on sockets, and configure contexts
-    for number of I/O threads. Sets-up signal (interrrupt) handling for the
+    for number of I/O threads. Sets-up signal (interrupt) handling for the
     process.
 
     The zctx class has these main features:

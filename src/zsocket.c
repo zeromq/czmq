@@ -61,35 +61,17 @@ zsocket_destroy (zctx_t *ctx, void *self)
 }
 
 
-//  Static mutex used only in the following code
-static zmutex_t *s_mutex = NULL;
-static void s_mutex_free (void)
-{
-    zmutex_destroy (&s_mutex);
-}
-
 //  --------------------------------------------------------------------------
 //  Bind a socket to a formatted endpoint. If the port is specified as
 //  '*', binds to any free port from ZSOCKET_DYNFROM to ZSOCKET_DYNTO
 //  and returns the actual port number used.  Always returns the
-//  port number if successful.
+//  port number if successful. Note that if a previous process or thread
+//  used the same port, peers may connect to the caller thinking it was 
+//  the previous process/thread.
 
 int
 zsocket_bind (void *self, const char *format, ...)
 {
-    //  We avoid reusing ephemeral ports so that peers which have
-    //  received an ephemeral port to connect to won't connect to
-    //  old peers and in fact connect to new ones which have bound
-    //  to that old port by misfortune. For the rare case that
-    //  you do lots of binds/unbinds in one process, we use a mutex
-    //  to protect against collisions.
-    //  
-    static int dynport = ZSOCKET_DYNFROM;
-    if (!s_mutex) {
-        s_mutex = zmutex_new ();
-        atexit (s_mutex_free);
-    }
-
     //  Ephemeral port needs 4 additional characters
     char endpoint [256 + 4];
     va_list argptr;
@@ -98,40 +80,26 @@ zsocket_bind (void *self, const char *format, ...)
     va_end (argptr);
 
     //  Port must be at end of endpoint
-    int rc = 0;
     if (endpoint [endpoint_size - 2] == ':'
     &&  endpoint [endpoint_size - 1] == '*') {
-        rc = -1;            //  Unless successful
-        int port = dynport;
+        int port = ZSOCKET_DYNFROM;
         while (true) {
             //  Try to bind on the next plausible port
             sprintf (endpoint + endpoint_size - 1, "%d", port);
-            rc = port;      //  Assume it works
-            
-            //  Increment port number in any case
-            zmutex_lock (s_mutex);
-            dynport++;
-            if (dynport >= ZSOCKET_DYNTO)
-                dynport = ZSOCKET_DYNFROM;
-            port = dynport;
-            zmutex_unlock (s_mutex);
-
-            //  Now try to bind and return port number
-            //  Will fail due to lack of file handles before
-            //  running out of ephemeral port space.
             if (zmq_bind (self, endpoint) == 0)
-                break;
+                return port;
+            port++;
         }
     }
     else {
         //  Return actual port used for binding
-        rc = zmq_bind (self, endpoint);
+        int rc = zmq_bind (self, endpoint);
         if (rc == 0)
             rc = atoi (strrchr (endpoint, ':') + 1);
         else
             rc = -1;
+        return rc;
     }
-    return rc;
 }
 
 
