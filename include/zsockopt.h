@@ -135,6 +135,7 @@ CZMQ_EXPORT void zsocket_set_sndtimeo (void *zocket, int sndtimeo);
 CZMQ_EXPORT void zsocket_set_ipv4only (void *zocket, int ipv4only);
 CZMQ_EXPORT void zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect);
 CZMQ_EXPORT void zsocket_set_router_mandatory (void *zocket, int router_mandatory);
+CZMQ_EXPORT void zsocket_set_router_raw (void *zocket, int router_raw);
 CZMQ_EXPORT void zsocket_set_xpub_verbose (void *zocket, int xpub_verbose);
 
 //  Emulation of widely-used 2.x socket options
@@ -232,6 +233,7 @@ int zsockopt_test (bool verbose);
 #define zsockopt_set_ipv4only zsocket_set_ipv4only
 #define zsockopt_set_delay_attach_on_connect zsocket_set_delay_attach_on_connect
 #define zsockopt_set_router_mandatory zsocket_set_router_mandatory
+#define zsockopt_set_router_raw zsocket_set_router_raw
 #define zsockopt_set_xpub_verbose zsocket_set_xpub_verbose
 #define zsockopt_rcvmore zsocket_rcvmore
 #define zsockopt_fd zsocket_fd
