@@ -1161,6 +1161,23 @@ zsocket_set_router_mandatory (void *zocket, int router_mandatory)
 
 
 //  --------------------------------------------------------------------------
+//  Set socket ZMQ_ROUTER_RAW value
+
+void
+zsocket_set_router_raw (void *zocket, int router_raw)
+{
+#   if defined (ZMQ_ROUTER_RAW)
+    if (zsockopt_type (zocket) != ZMQ_ROUTER) {
+        printf ("ZMQ_ROUTER_RAW is not valid on %s sockets\n", zsocket_type_str (zocket));
+        assert (false);
+    }
+    int rc = zmq_setsockopt (zocket, ZMQ_ROUTER_RAW, &router_raw, sizeof (int));
+    assert (rc == 0 || errno == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
 //  Set socket ZMQ_XPUB_VERBOSE value
 
 void
@@ -1599,6 +1616,12 @@ zsockopt_test (bool verbose)
     zocket = zsocket_new (ctx, ZMQ_ROUTER);
     assert (zocket);
     zsocket_set_router_mandatory (zocket, 1);
+    zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_ROUTER_RAW)
+    zocket = zsocket_new (ctx, ZMQ_ROUTER);
+    assert (zocket);
+    zsocket_set_router_raw (zocket, 1);
     zsocket_destroy (ctx, zocket);
 #       endif
 #       if defined (ZMQ_XPUB_VERBOSE)

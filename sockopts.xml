@@ -68,6 +68,9 @@
         <option name = "router_mandatory"  type = "int"    mode = "w"  test = "ROUTER">
             <restrict type = "ROUTER" />
         </option>
+        <option name = "router_raw"        type = "int"    mode = "w"  test = "ROUTER">
+            <restrict type = "ROUTER" />
+        </option>
         <option name = "xpub_verbose"      type = "int"    mode = "w"  test = "XPUB">
             <restrict type = "XPUB" />
         </option>
