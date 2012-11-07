@@ -83,13 +83,14 @@ zsocket_bind (void *self, const char *format, ...)
     if (endpoint [endpoint_size - 2] == ':'
     &&  endpoint [endpoint_size - 1] == '*') {
         int port = ZSOCKET_DYNFROM;
-        while (true) {
+        while (port <= ZSOCKET_DYNTO) {
             //  Try to bind on the next plausible port
             sprintf (endpoint + endpoint_size - 1, "%d", port);
             if (zmq_bind (self, endpoint) == 0)
                 return port;
             port++;
         }
+        return -1;
     }
     else {
         //  Return actual port used for binding
