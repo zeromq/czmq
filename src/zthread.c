@@ -199,7 +199,6 @@ zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args)
     shim->pipe = zsocket_new (shim->ctx, ZMQ_PAIR);
     if (!shim->pipe)
         return NULL;
-    zsocket_set_hwm (shim->pipe, 1);
     zsocket_connect (shim->pipe, "inproc://zctx-pipe-%p", pipe);
     
     s_thread_start (shim);
