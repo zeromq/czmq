@@ -379,7 +379,8 @@ zhash_size (zhash_t *self)
 //  --------------------------------------------------------------------------
 //  Make copy of hash table
 //  Does not copy items themselves. Rebuilds new table so may be slow on 
-//  very large tables.
+//  very large tables. NOTE: only works with item values that are strings
+//  since there's no other way to know how to duplicate the item value.
 
 zhash_t *
 zhash_dup (zhash_t *self)
@@ -393,7 +394,8 @@ zhash_dup (zhash_t *self)
         for (index = 0; index != self->limit; index++) {
             item_t *item = self->items [index];
             while (item) {
-                zhash_insert (copy, item->key, item->value);
+                zhash_insert (copy, item->key, strdup (item->value));
+                zhash_freefn (copy, item->key, free);
                 item = item->next;
             }
         }
