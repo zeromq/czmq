@@ -84,12 +84,9 @@ s_item_hash (const char *key, size_t limit)
     uint
         key_hash = 0;
 
-    //  Torek hashing function
-    while (*key) {
-        key_hash *= 33;
-        key_hash += *key;
-        key++;
-    }
+    //  Modified Bernstein hashing function
+    while (*key)
+        key_hash = 33 * key_hash ^ *key++;
     key_hash %= limit;
     return key_hash;
 }
@@ -467,36 +464,36 @@ zhash_test (int verbose)
 
     //  Insert some items
     int rc;
-    rc = zhash_insert (hash, "DEADBEEF", (void *) 0xDEADBEEF);
+    rc = zhash_insert (hash, "DEADBEEF", "dead beef");
     assert (rc == 0);
-    rc = zhash_insert (hash, "ABADCAFE", (void *) 0xABADCAFE);
+    rc = zhash_insert (hash, "ABADCAFE", "a bad cafe");
     assert (rc == 0);
-    rc = zhash_insert (hash, "C0DEDBAD", (void *) 0xC0DEDBAD);
+    rc = zhash_insert (hash, "C0DEDBAD", "coded bad");
     assert (rc == 0);
-    rc = zhash_insert (hash, "DEADF00D", (void *) 0xDEADF00D);
+    rc = zhash_insert (hash, "DEADF00D", "dead food");
     assert (rc == 0);
     assert (zhash_size (hash) == 4);
 
     //  Look for existing items
-    void *item;
+    char *item;
     item = zhash_lookup (hash, "DEADBEEF");
-    assert (item == (void *) 0xDEADBEEF);
+    assert (streq (item, "dead beef"));
     item = zhash_lookup (hash, "ABADCAFE");
-    assert (item == (void *) 0xABADCAFE);
+    assert (streq (item, "a bad cafe"));
     item = zhash_lookup (hash, "C0DEDBAD");
-    assert (item == (void *) 0xC0DEDBAD);
+    assert (streq (item, "coded bad"));
     item = zhash_lookup (hash, "DEADF00D");
-    assert (item == (void *) 0xDEADF00D);
+    assert (streq (item, "dead food"));
 
     //  Look for non-existent items
-    item = zhash_lookup (hash, "0xF0000000");
+    item = zhash_lookup (hash, "foo");
     assert (item == NULL);
 
     //  Try to insert duplicate items
-    rc = zhash_insert (hash, "DEADBEEF", (void *) 0xF0000000);
+    rc = zhash_insert (hash, "DEADBEEF", "foo");
     assert (rc == -1);
     item = zhash_lookup (hash, "DEADBEEF");
-    assert (item == (void *) 0xDEADBEEF);
+    assert (streq (item, "dead beef"));
 
     //  Rename an item
     rc = zhash_rename (hash, "DEADBEEF", "LIVEBEEF");
