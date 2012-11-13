@@ -100,6 +100,22 @@ CZMQ_EXPORT zlist_t *
 CZMQ_EXPORT int
     zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument);
 
+//  Save hash table to a text file in name=value format. Hash values must be
+//  printable strings; keys may not contain '=' character. Returns 0 if OK,
+//  else -1 if a file error occurred.
+CZMQ_EXPORT int
+    zhash_save (zhash_t *self, char *filename);
+
+//  Load hash table from a text file in name=value format; hash table must
+//  already exist. Hash values must printable strings; keys may not contain
+//  '=' character. Returns 0 if OK, else -1 if a file was not readable.
+CZMQ_EXPORT int
+    zhash_load (zhash_t *self, char *filename);
+
+//  Set hash for automatic value destruction
+CZMQ_EXPORT void
+    zhash_autofree (zhash_t *self);
+    
 //  Self test of this class
 void
     zhash_test (int verbose);
