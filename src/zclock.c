@@ -27,15 +27,6 @@ The zclock class provides essential sleep and system time functions, used
 to slow down threads for testing, and calculate timers for polling. Wraps
 the non-portable system calls in a simple portable API.
 @discuss
-This class contains some small surprises. Most amazing, win32 did an API
-better than POSIX. The win32 Sleep() call is not only a neat 1-liner, it
-also sleeps for milliseconds, whereas the POSIX call asks us to think in
-terms of nanoseconds, which is insane. I've decided every single man page
-for this library will say "insane" at least once. Anyhow, milliseconds
-are a concept we can deal with. Seconds are too fat, nanoseconds too
-tiny, but milliseconds are just right for slices of time we want to work
-with at the 0MQ scale. zclock doesn't give you objects to work with, we
-like the czmq class model but we're not insane. There, got it in again.
 The Win32 Sleep() call defaults to 16ms resolution unless the system timer
 resolution is increased with a call to timeBeginPeriod() permitting 1ms
 granularity.
@@ -52,9 +43,10 @@ granularity.
 static int64_t
 s_filetime_to_msec (const FILETIME *ft)
 {
-//  As per Windows documentation for FILETIME, copy the resulting FILETIME structure to a
-//  ULARGE_INTEGER structure using memcpy (using memcpy instead of direct assignment can
-//  prevent alignment faults on 64-bit Windows).
+    //  As per Windows documentation for FILETIME, copy the resulting FILETIME
+    //  structure to a ULARGE_INTEGER structure using memcpy (using memcpy
+    //  instead of direct assignment can prevent alignment faults on 64-bit
+    //  Windows).
     ULARGE_INTEGER dateTime;
     memcpy (&dateTime, ft, sizeof (dateTime));
 
@@ -75,11 +67,12 @@ zclock_sleep (int msecs)
     t.tv_nsec = (msecs % 1000) * 1000000;
     nanosleep (&t, NULL);
 #elif (defined (__WINDOWS__))
-//  Windows XP/2000:  A value of zero causes the thread to relinquish the
-//  remainder of its time slice to any other thread of equal priority that is
-//  ready to run. If there are no other threads of equal priority ready to run,
-//  the function returns immediately, and the thread continues execution. This
-//  behavior changed starting with Windows Server 2003.
+    //  Windows XP/2000:  A value of zero causes the thread to relinquish the
+    //  remainder of its time slice to any other thread of equal priority that
+    //  is ready to run. If there are no other threads of equal priority ready
+    //  to run, the function returns immediately, and the thread continues
+    //  execution. This behavior changed starting with Windows Server 2003.
+    
 #   if defined (NTDDI_VERSION) && defined (NTDDI_WS03) && (NTDDI_VERSION >= NTDDI_WS03)
     Sleep (msecs);
 #   else

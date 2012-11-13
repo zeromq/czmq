@@ -350,6 +350,7 @@ s_compare (void *item1, void *item2)
         return false;
 }
 
+
 //  --------------------------------------------------------------------------
 //  Set list for automatic item destruction
 
@@ -359,6 +360,7 @@ zlist_autofree (zlist_t *self)
     assert (self);
     self->autofree = true;
 }
+
 
 //  --------------------------------------------------------------------------
 //  Runs selftest of class
