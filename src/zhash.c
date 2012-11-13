@@ -46,16 +46,11 @@
 //  Hash item, used internally only
 
 typedef struct _item_t {
-    void
-        *value;                 //  Opaque item value
-    struct _item_t
-        *next;                  //  Next item in the hash slot
-    qbyte
-        index;                  //  Index of item in table
-    char
-        *key;                   //  Item's original key
-    zhash_free_fn
-        *free_fn;               //  Value free function if any
+    void *value;                //  Opaque item value
+    struct _item_t *next;       //  Next item in the hash slot
+    qbyte index;                //  Index of item in table
+    char *key;                  //  Item's original key
+    zhash_free_fn *free_fn;     //  Value free function if any
 } item_t;
 
 
@@ -63,14 +58,11 @@ typedef struct _item_t {
 //  Structure of our class
 
 struct _zhash {
-    size_t
-        size;                   //  Current size of hash table
-    size_t
-        limit;                  //  Current hash table limit
-    item_t
-        **items;                //  Array of items
-    uint
-        cached_index;           //  Avoids duplicate hash calculations
+    size_t size;                //  Current size of hash table
+    size_t limit;               //  Current hash table limit
+    item_t **items;             //  Array of items
+    uint cached_index;          //  Avoids duplicate hash calculations
+    bool autofree;              //  If true, free values in destructor
 };
 
 
@@ -81,10 +73,8 @@ struct _zhash {
 static uint
 s_item_hash (const char *key, size_t limit)
 {
-    uint
-        key_hash = 0;
-
     //  Modified Bernstein hashing function
+    uint key_hash = 0;
     while (*key)
         key_hash = 33 * key_hash ^ *key++;
     key_hash %= limit;
@@ -162,6 +152,10 @@ s_item_destroy (zhash_t *self, item_t *item, bool hard)
     if (hard) {
         if (item->free_fn)
             (item->free_fn) (item->value);
+        else
+        if (self->autofree)
+            free (item->value);
+        
         free (item->key);
         free (item);
     }
@@ -271,6 +265,9 @@ zhash_update (zhash_t *self, const char *key, void *value)
     if (item) {
         if (item->free_fn)
             (item->free_fn) (item->value);
+        else
+        if (self->autofree)
+            free (item->value);
         item->value = value;
     }
     else
@@ -386,19 +383,20 @@ zhash_dup (zhash_t *self)
         return NULL;
 
     zhash_t *copy = zhash_new ();
+    zhash_autofree (copy);
     if (copy) {
         uint index;
         for (index = 0; index != self->limit; index++) {
             item_t *item = self->items [index];
             while (item) {
                 zhash_insert (copy, item->key, strdup (item->value));
-                zhash_freefn (copy, item->key, free);
                 item = item->next;
             }
         }
     }
     return copy;
 }
+
 
 //  --------------------------------------------------------------------------
 //  Return keys for items in table
@@ -445,6 +443,76 @@ zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument)
         }
     }
     return rc;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Save hash table to a text file in name=value format
+//  Hash values must be printable strings; keys may not contain '=' character
+//  Returns 0 if OK, else -1 if a file error occurred
+
+int
+zhash_save (zhash_t *self, char *filename)
+{
+    assert (self);
+
+    FILE *handle = fopen (filename, "w");
+    if (!handle)
+        return -1;              //  Failed to create file
+    
+    uint index;
+    for (index = 0; index != self->limit; index++) {
+        item_t *item = self->items [index];
+        while (item) {
+            fprintf (handle, "%s=%s\n", item->key, (char *) item->value);
+            item = item->next;
+        }
+    }
+    fclose (handle);
+    return 0;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Load hash table from a text file in name=value format; hash table must
+//  already exist. Hash values must printable strings; keys may not contain
+//  '=' character. Returns 0 if OK, else -1 if a file was not readable.
+
+int
+zhash_load (zhash_t *self, char *filename)
+{
+    assert (self);
+    zhash_autofree (self);
+    
+    FILE *handle = fopen (filename, "r");
+    if (!handle)
+        return -1;              //  Failed to create file
+
+    char buffer [1024];
+    while (fgets (buffer, 1024, handle)) {
+        //  Buffer may end in newline, which we don't want
+        if (buffer [strlen (buffer) - 1] == '\n')
+            buffer [strlen (buffer) - 1] = 0;
+        //  Split at equals, if any
+        char *equals = strchr (buffer, '=');
+        if (!equals)
+            break;              //  Some error, stop parsing it
+        *equals++ = 0;
+        zhash_update (self, buffer, strdup (equals));
+    }
+    fclose (handle);
+    return 0;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set hash for automatic value destruction
+
+void
+zhash_autofree (zhash_t *self)
+{
+    assert (self);
+    self->autofree = true;
 }
 
 
@@ -509,8 +577,25 @@ zhash_test (int verbose)
     //  Test dup method
     zhash_t *copy = zhash_dup (hash);
     assert (zhash_size (copy) == 4);
+    item = zhash_lookup (copy, "LIVEBEEF");
+    assert (item);
+    assert (streq (item, "dead beef"));
     zhash_destroy (&copy);
 
+    //  Test save and load
+    zhash_save (hash, ".cache");
+    copy = zhash_new ();
+    zhash_load (copy, ".cache");
+    item = zhash_lookup (copy, "LIVEBEEF");
+    assert (item);
+    assert (streq (item, "dead beef"));
+    zhash_destroy (&copy);
+#if (defined (WIN32))
+    DeleteFile (".cache");
+#else
+    unlink (".cache");
+#endif
+        
     //  Delete a item
     zhash_delete (hash, "LIVEBEEF");
     item = zhash_lookup (hash, "LIVEBEEF");
