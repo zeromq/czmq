@@ -279,7 +279,6 @@
 #   include <sys/wait.h>
 #   include <sys/uio.h>                 //  This is required to make CZMQ compile with libzmq/3.x
 #   include <netinet/in.h>              //  Must come before arpa/inet.h
-#   include <uuid/uuid.h>
 #   if (!defined (__UTYPE_ANDROID)) && (!defined (__UTYPE_IBMAIX)) && (!defined (__UTYPE_HPUX)) && (!defined (__UTYPE_SUNOS))
 #       include <ifaddrs.h>
 #   endif
