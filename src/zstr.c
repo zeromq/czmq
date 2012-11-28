@@ -152,7 +152,7 @@ zstr_sendf (void *zocket, const char *format, ...)
     va_list argptr;
     va_start (argptr, format);
 
-    int rc = s_zstr_sendf_impl (zocket, FALSE, format, argptr);
+    int rc = s_zstr_sendf_impl (zocket, false, format, argptr);
     va_end (argptr);
 
     return rc;
@@ -168,7 +168,7 @@ zstr_sendfm (void *zocket, const char *format, ...)
     va_list argptr;
     va_start (argptr, format);
 
-    int rc = s_zstr_sendf_impl (zocket, TRUE, format, argptr);
+    int rc = s_zstr_sendf_impl (zocket, true, format, argptr);
     va_end (argptr);
 
     return rc;

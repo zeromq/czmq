@@ -61,7 +61,7 @@
 struct _zctx_t {
     void *context;              //  Our 0MQ context
     zlist_t *sockets;           //  Sockets held by this thread
-    bool main;                  //  TRUE if we're the main thread
+    bool main;                  //  True if we're the main thread
     int iothreads;              //  Number of IO threads, default 1
     int linger;                 //  Linger timeout, default 0
 };
@@ -99,7 +99,7 @@ zctx_new (void)
         return NULL;
     }
     self->iothreads = 1;
-    self->main = TRUE;
+    self->main = true;
 
 #if defined (__UNIX__)
     //  Install signal handler for SIGINT and SIGTERM

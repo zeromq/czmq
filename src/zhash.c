@@ -194,7 +194,7 @@ zhash_destroy (zhash_t **self_p)
             item_t *cur_item = self->items [index];
             while (cur_item) {
                 item_t *next_item = cur_item->next;
-                s_item_destroy (self, cur_item, TRUE);
+                s_item_destroy (self, cur_item, true);
                 cur_item = next_item;
             }
         }
@@ -287,7 +287,7 @@ zhash_delete (zhash_t *self, const char *key)
 
     item_t *item = s_item_lookup (self, key);
     if (item)
-        s_item_destroy (self, item, TRUE);
+        s_item_destroy (self, item, true);
 }
 
 
@@ -317,7 +317,7 @@ zhash_rename (zhash_t *self, const char *old_key, const char *new_key)
 {
     item_t *item = s_item_lookup (self, old_key);
     if (item) {
-        s_item_destroy (self, item, FALSE);
+        s_item_destroy (self, item, false);
         item_t *new_item = s_item_lookup (self, new_key);
         if (new_item == NULL) {
             free (item->key);
@@ -617,12 +617,12 @@ zhash_test (int verbose)
             item = zhash_lookup (hash, testset [testnbr].name);
             assert (item);
             zhash_delete (hash, testset [testnbr].name);
-            testset [testnbr].exists = FALSE;
+            testset [testnbr].exists = false;
         }
         else {
             sprintf (testset [testnbr].name, "%x-%x", rand (), rand ());
             if (zhash_insert (hash, testset [testnbr].name, "") == 0)
-                testset [testnbr].exists = TRUE;
+                testset [testnbr].exists = true;
         }
     }
     //  Test 10K lookups
