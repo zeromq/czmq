@@ -43,10 +43,11 @@ node_new (uint64_t key)
 }
 
 void
-node_destroy (zsklnode_t * node)
+node_destroy (zsklnode_t ** node)
 {
-    free (node->next);
-    free (node);
+    free ((*node)->next);
+    free (*node);
+    node = NULL;
 }
 
 
@@ -69,13 +70,26 @@ zsklist_new (void)
     return zsklist;
 }
 
+void
+zsklist_destroy (zsklist_t ** zsklist)
+{
 
-inline int
+    while ((*zsklist)->head->next[0]) {
+        zsklist_delete (*zsklist, (*zsklist)->head->next[0]->key);
+    }
+    free ((*zsklist)->head->next);
+    free ((*zsklist)->head);
+    free (*zsklist);
+    zsklist = NULL;
+
+}
+
+
+int
 zsklist_add_ (zsklist_t * zsklist, int height, uint64_t key)
 {
     assert (key > 0);
     zsklnode_t *node = node_new (key);
-
 
     zsklnode_t *prev_list[height];
 
@@ -126,26 +140,26 @@ zsklist_add (zsklist_t * zsklist, uint64_t key)
     return zsklist_add_ (zsklist, zsklist->head->height, key);
 }
 
-inline int
+int
 zsklist_delete_ (zsklist_t * zsklist, int height, uint64_t key)
 {
 
     assert (key > 0);
-    zsklnode_t *node = node_new (key);
-
+    zsklnode_t node;
+    node.key = key;
 
     zsklnode_t *prev_list[height];
 
     int iter = height;
     zsklnode_t *ptr = zsklist->head;
-    int comp;
+    int comp = 1;
     while (iter) {
         if (!(ptr->next[iter - 1])) {
             prev_list[iter] = ptr;
             iter--;
         }
         else {
-            comp = comp_node_t (node, ptr->next[iter - 1]);
+            comp = comp_node_t (&node, ptr->next[iter - 1]);
             if (comp == 1) {
                 ptr = ptr->next[iter - 1];
             }
@@ -163,7 +177,7 @@ zsklist_delete_ (zsklist_t * zsklist, int height, uint64_t key)
         for (iter = 1; iter <= height; iter++) {
             prev_list[iter]->next[iter - 1] = ptr->next[iter - 1];
         }
-        node_destroy (ptr);
+        node_destroy (&ptr);
 
 
         return 1;
@@ -199,7 +213,7 @@ zsklist_search (zsklist_t * zsklist, uint64_t key)
 
 zsklnode_t *
 zsklist_lsearch (zsklist_t * t, uint64_t key,
-                zsklnode_t * rlimit, zsklnode_t * llimit)
+                 zsklnode_t * rlimit, zsklnode_t * llimit)
 {
     zsklnode_t node;
     node.key = key;
@@ -212,13 +226,13 @@ zsklist_lsearch (zsklist_t * t, uint64_t key,
     }
     zsklnode_t *ptr = rlimit;
     while (iter) {
-        if (!(ptr->next[iter-1])) {
+        if (!(ptr->next[iter - 1])) {
             iter--;
         }
         else {
-            int comp = comp_node_t (&node, ptr->next[iter-1]);
+            int comp = comp_node_t (&node, ptr->next[iter - 1]);
             if (comp == 1) {
-                ptr = ptr->next[iter-1];
+                ptr = ptr->next[iter - 1];
             }
             else {
                 if (comp == -1) {
@@ -262,10 +276,13 @@ zsklist_test (int verbose)
     assert (key[66] == zsklist_search (list, key[66]));
     assert (key[22] == zsklist_search (list, key[22]));
 
-    assert(zsklist_delete(list,key[77]));
-    assert (0== zsklist_search (list, key[77]));
+    assert (zsklist_delete (list, key[77]));
+    assert (0 == zsklist_search (list, key[77]));
 
-    assert(zsklist_delete(list,key[33]));
-    assert (0== zsklist_search (list, key[33]));
+    assert (zsklist_delete (list, key[33]));
+    assert (0 == zsklist_search (list, key[33]));
 
+    zsklist_destroy (&list);
+
+    printf ("OK\n");
 }

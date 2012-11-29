@@ -51,6 +51,7 @@ int main (int argc, char *argv [])
     zsockopt_test (verbose);
     zstr_test (verbose);
     zthread_test (verbose);
+    zsklist_test (verbose);
     printf ("Tests passed OK\n");
     return 0;
 }

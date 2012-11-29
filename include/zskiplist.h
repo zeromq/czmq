@@ -9,20 +9,21 @@ extern "C"
 
     typedef struct _zsklnode_t zsklnode_t;
 
-
-
     typedef struct _zsklist_t zsklist_t;
 
-    zsklist_t *zsklist_new (void);
+    CZMQ_EXPORT zsklist_t *zsklist_new (void);
 
-    int zsklist_add (zsklist_t * zsklist, uint64_t key);
+    CZMQ_EXPORT void zsklist_destroy (zsklist_t ** zsklist);
 
-    int zsklist_delete (zsklist_t * zsklist, uint64_t key);
+    CZMQ_EXPORT int zsklist_add (zsklist_t * zsklist, uint64_t key);
 
-    uint64_t zsklist_search (zsklist_t * zsklist, uint64_t key);
+    CZMQ_EXPORT int zsklist_delete (zsklist_t * zsklist, uint64_t key);
 
-    zsklnode_t *zsklist_lsearch (zsklist_t * t, uint64_t key,
-                                zsklnode_t * rlimit, zsklnode_t * llimit);
+    CZMQ_EXPORT uint64_t zsklist_search (zsklist_t * zsklist, uint64_t key);
+
+    CZMQ_EXPORT zsklnode_t *zsklist_lsearch (zsklist_t * t, uint64_t key,
+                                             zsklnode_t * rlimit,
+                                             zsklnode_t * llimit);
 
 
 
