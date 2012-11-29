@@ -18,7 +18,8 @@ include_HEADERS = \
     ../include/zsocket.h \
     ../include/zsockopt.h \
     ../include/zstr.h \
-    ../include/zthread.h
+    ../include/zthread.h \
+    ../include/zskiplist.h
 
 libczmq_la_SOURCES = \
     zclock.c \
@@ -33,7 +34,8 @@ libczmq_la_SOURCES = \
     zsocket.c \
     zsockopt.c \
     zstr.c \
-    zthread.c
+    zthread.c \
+    zskiplist.c
 
 INCLUDES = -I$(top_srcdir)/include
 bin_PROGRAMS = czmq_selftest
