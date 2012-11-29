@@ -36,7 +36,7 @@ comp_node_t (zsklnode_t * first, zsklnode_t * second)
 zsklnode_t *
 node_new (uint64_t key)
 {
-    zsklnode_t *node = malloc (sizeof (zsklnode_t));
+    zsklnode_t *node = zmalloc (sizeof (zsklnode_t));
     node->key = key;
 
     return node;
@@ -45,7 +45,9 @@ node_new (uint64_t key)
 void
 node_destroy (zsklnode_t ** node)
 {
-    free ((*node)->next);
+    if ((*node)->next) {
+        free ((*node)->next);
+    }
     free (*node);
     node = NULL;
 }
@@ -66,7 +68,7 @@ zsklist_new (void)
     zsklist_t *zsklist = malloc (sizeof (zsklist_t));
     zsklist->head = node_new (0);
     zsklist->head->height = 1;
-    zsklist->head->next = calloc (1, sizeof (zsklnode_t *));
+    zsklist->head->next = zmalloc (sizeof (zsklnode_t *));
     return zsklist;
 }
 
@@ -111,6 +113,7 @@ zsklist_add_ (zsklist_t * zsklist, int height, uint64_t key)
                     iter--;
                 }
                 else {
+                    node_destroy (&node);
                     return 0;
                 }
             }
@@ -122,7 +125,7 @@ zsklist_add_ (zsklist_t * zsklist, int height, uint64_t key)
         node->height++;
     }
 
-    node->next = calloc (node->height, sizeof (zsklnode_t *));
+    node->next = zmalloc (node->height * sizeof (zsklnode_t *));
 
     for (iter = 1; iter <= height; iter++) {
         node->next[iter - 1] = prev_list[iter]->next[iter - 1];
