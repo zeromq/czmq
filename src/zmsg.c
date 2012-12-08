@@ -457,7 +457,7 @@ zmsg_load (zmsg_t *self, FILE *file)
     if (!self)
         return NULL;
 
-    while (TRUE) {
+    while (true) {
         size_t frame_size;
         size_t rc = fread (&frame_size, sizeof (frame_size), 1, file);
         if (rc == 1) {

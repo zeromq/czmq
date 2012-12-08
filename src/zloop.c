@@ -127,7 +127,7 @@ s_rebuild_pollset (zloop_t *self)
         item_nbr++;
         poller = (s_poller_t *) zlist_next (self->pollers);
     }
-    self->dirty = FALSE;
+    self->dirty = false;
     return 0;
 }
 
@@ -234,7 +234,7 @@ zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
         if (zlist_push (self->pollers, poller))
             return -1;
 
-        self->dirty = TRUE;
+        self->dirty = true;
         if (self->verbose)
             zclock_log ("I: zloop: register %s poller (%p, %d)",
                 item->socket? zsocket_type_str (item->socket): "FD",
@@ -263,7 +263,7 @@ zloop_poller_end (zloop_t *self, zmq_pollitem_t *item)
         ||  (item->fd     && item->fd     == poller->item.fd)) {
             zlist_remove (self->pollers, poller);
             free (poller);
-            self->dirty = TRUE;
+            self->dirty = true;
         }
         poller = (s_poller_t *) zlist_next (self->pollers);
     }
