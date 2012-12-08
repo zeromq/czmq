@@ -177,6 +177,10 @@ zlist_append (zlist_t *self, void *item)
     if (!node)
         return -1;
 
+    //  If necessary, take duplicate of (string) item
+    if (self->autofree)
+        item = strdup ((char *) item);
+    
     node->item = item;
     if (self->tail)
         self->tail->next = node;
@@ -201,6 +205,10 @@ zlist_push (zlist_t *self, void *item)
     node = (node_t *) zmalloc (sizeof (node_t));
     if (!node)
         return -1;
+
+    //  If necessary, take duplicate of (string) item
+    if (self->autofree)
+        item = strdup ((char *) item);
 
     node->item = item;
     node->next = self->head;

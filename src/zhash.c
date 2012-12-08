@@ -246,6 +246,10 @@ zhash_insert (zhash_t *self, const char *key, void *value)
         self->items = new_items;
         self->limit = new_limit;
     }
+    //  If necessary, take duplicate of item (string) value
+    if (self->autofree)
+        value = strdup ((char *) value);
+    
     return s_item_insert (self, key, value)? 0: -1;
 }
 
@@ -268,6 +272,10 @@ zhash_update (zhash_t *self, const char *key, void *value)
         else
         if (self->autofree)
             free (item->value);
+        
+        //  If necessary, take duplicate of item (string) value
+        if (self->autofree)
+            value = strdup ((char *) value);
         item->value = value;
     }
     else
@@ -389,7 +397,7 @@ zhash_dup (zhash_t *self)
         for (index = 0; index != self->limit; index++) {
             item_t *item = self->items [index];
             while (item) {
-                zhash_insert (copy, item->key, strdup (item->value));
+                zhash_insert (copy, item->key, item->value);
                 item = item->next;
             }
         }
@@ -412,7 +420,7 @@ zhash_keys (zhash_t *self)
     for (index = 0; index != self->limit; index++) {
         item_t *item = self->items [index];
         while (item) {
-            zlist_append (keys, strdup (item->key));
+            zlist_append (keys, item->key);
             item = item->next;
         }
     }
@@ -498,7 +506,7 @@ zhash_load (zhash_t *self, char *filename)
         if (!equals)
             break;              //  Some error, stop parsing it
         *equals++ = 0;
-        zhash_update (self, buffer, strdup (equals));
+        zhash_update (self, buffer, equals);
     }
     fclose (handle);
     return 0;
