@@ -131,7 +131,7 @@ zfile_test (bool verbose)
     assert (rc == -1);
 
     rc = zfile_exists ("nosuchfile");
-    assert (rc == FALSE);
+    assert (rc != true);
 
     rc = (int) zfile_size ("nosuchfile");
     assert (rc == -1);

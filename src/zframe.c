@@ -272,7 +272,7 @@ zframe_strdup (zframe_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Return TRUE if frame body is equal to string, excluding terminator
+//  Return true if frame body is equal to string, excluding terminator
 
 bool
 zframe_streq (zframe_t *self, const char *string)
@@ -280,9 +280,9 @@ zframe_streq (zframe_t *self, const char *string)
     assert (self);
     if (zframe_size (self) == strlen (string)
     &&  memcmp (zframe_data (self), string, strlen (string)) == 0)
-        return TRUE;
+        return true;
     else
-        return FALSE;
+        return false;
 }
 
 
@@ -308,20 +308,20 @@ zframe_zero_copy (zframe_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Return TRUE if two frames have identical size and data
+//  Return true if two frames have identical size and data
 
 bool
 zframe_eq (zframe_t *self, zframe_t *other)
 {
     if (!self || !other)
-        return FALSE;
+        return false;
     else
     if (zframe_size (self) == zframe_size (other)
     && memcmp (zframe_data (self), zframe_data (other),
                zframe_size (self)) == 0)
-        return TRUE;
+        return true;
     else
-        return FALSE;
+        return false;
 }
 
 

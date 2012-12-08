@@ -139,8 +139,8 @@ zsocket_disconnect (void *self, const char *format, ...)
 }
 
 //  --------------------------------------------------------------------------
-//  Poll for input events on the socket. Returns TRUE if there is input
-//  ready on the socket, else FALSE.
+//  Poll for input events on the socket. Returns true if there is input
+//  ready on the socket, else false.
 
 bool
 zsocket_poll (void *self, int msecs)
@@ -206,7 +206,7 @@ zsocket_test (bool verbose)
     int port = zsocket_bind (writer, "tcp://%s:*", interf);
     assert (port >= ZSOCKET_DYNFROM && port <= ZSOCKET_DYNTO);
 
-    assert (zsocket_poll (writer, 100) == FALSE);
+    assert (zsocket_poll (writer, 100) == false);
 
     rc = zsocket_connect (reader, "txp://%s:%d", domain, service);
     assert (rc == -1);

@@ -32,9 +32,9 @@ int main (int argc, char *argv [])
 {
     bool verbose;
     if (argc == 2 && streq (argv [1], "-v"))
-        verbose = TRUE;
+        verbose = true;
     else
-        verbose = FALSE;
+        verbose = false;
 
     printf ("Running czmq self tests...\n");
 

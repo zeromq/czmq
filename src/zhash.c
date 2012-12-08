@@ -194,7 +194,7 @@ zhash_destroy (zhash_t **self_p)
             item_t *cur_item = self->items [index];
             while (cur_item) {
                 item_t *next_item = cur_item->next;
-                s_item_destroy (self, cur_item, TRUE);
+                s_item_destroy (self, cur_item, true);
                 cur_item = next_item;
             }
         }
@@ -246,6 +246,10 @@ zhash_insert (zhash_t *self, const char *key, void *value)
         self->items = new_items;
         self->limit = new_limit;
     }
+    //  If necessary, take duplicate of item (string) value
+    if (self->autofree)
+        value = strdup ((char *) value);
+    
     return s_item_insert (self, key, value)? 0: -1;
 }
 
@@ -268,6 +272,10 @@ zhash_update (zhash_t *self, const char *key, void *value)
         else
         if (self->autofree)
             free (item->value);
+        
+        //  If necessary, take duplicate of item (string) value
+        if (self->autofree)
+            value = strdup ((char *) value);
         item->value = value;
     }
     else
@@ -287,7 +295,7 @@ zhash_delete (zhash_t *self, const char *key)
 
     item_t *item = s_item_lookup (self, key);
     if (item)
-        s_item_destroy (self, item, TRUE);
+        s_item_destroy (self, item, true);
 }
 
 
@@ -317,7 +325,7 @@ zhash_rename (zhash_t *self, const char *old_key, const char *new_key)
 {
     item_t *item = s_item_lookup (self, old_key);
     if (item) {
-        s_item_destroy (self, item, FALSE);
+        s_item_destroy (self, item, false);
         item_t *new_item = s_item_lookup (self, new_key);
         if (new_item == NULL) {
             free (item->key);
@@ -389,7 +397,7 @@ zhash_dup (zhash_t *self)
         for (index = 0; index != self->limit; index++) {
             item_t *item = self->items [index];
             while (item) {
-                zhash_insert (copy, item->key, strdup (item->value));
+                zhash_insert (copy, item->key, item->value);
                 item = item->next;
             }
         }
@@ -412,7 +420,7 @@ zhash_keys (zhash_t *self)
     for (index = 0; index != self->limit; index++) {
         item_t *item = self->items [index];
         while (item) {
-            zlist_append (keys, strdup (item->key));
+            zlist_append (keys, item->key);
             item = item->next;
         }
     }
@@ -498,7 +506,7 @@ zhash_load (zhash_t *self, char *filename)
         if (!equals)
             break;              //  Some error, stop parsing it
         *equals++ = 0;
-        zhash_update (self, buffer, strdup (equals));
+        zhash_update (self, buffer, equals);
     }
     fclose (handle);
     return 0;
@@ -617,12 +625,12 @@ zhash_test (int verbose)
             item = zhash_lookup (hash, testset [testnbr].name);
             assert (item);
             zhash_delete (hash, testset [testnbr].name);
-            testset [testnbr].exists = FALSE;
+            testset [testnbr].exists = false;
         }
         else {
             sprintf (testset [testnbr].name, "%x-%x", rand (), rand ());
             if (zhash_insert (hash, testset [testnbr].name, "") == 0)
-                testset [testnbr].exists = TRUE;
+                testset [testnbr].exists = true;
         }
     }
     //  Test 10K lookups
