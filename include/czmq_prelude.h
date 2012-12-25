@@ -394,8 +394,10 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 #   define strtoull _strtoui64
 #   define srandom srand
 #   define TIMEZONE _timezone
-#   define snprintf _snprintf
-#   define vsnprintf _vsnprintf
+#   if (!defined (__MINGW32__))
+#       define snprintf _snprintf
+#       define vsnprintf _vsnprintf
+#   endif
     typedef unsigned long ulong;
     typedef unsigned int  uint;
 #   if (!defined (__MINGW32__)) 

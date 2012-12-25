@@ -141,6 +141,9 @@ s_thread_start (shim_t *shim)
     SetThreadPriority (shim->handle, priority);
     //  Now start thread
     ResumeThread (shim->handle);
+
+    CloseHandle (shim->handle);
+    shim->handle = 0;
 #endif
 }
 
