@@ -1,13 +1,11 @@
 /*  =========================================================================
-    czmq_tests.c - run selftests
-
-    Runs all selftests.
+    zsys - system wrapper
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2012 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
-    This file is part of czmq, the high-level C binding for 0MQ:
+    This file is part of CZMQ, the high-level C binding for 0MQ:
     http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
@@ -26,32 +24,41 @@
     =========================================================================
 */
 
-#include "../include/czmq.h"
+#ifndef __ZFL_SYS_H_INCLUDED__
+#define __ZFL_SYS_H_INCLUDED__
 
-int main (int argc, char *argv [])
-{
-    bool verbose;
-    if (argc == 2 && streq (argv [1], "-v"))
-        verbose = true;
-    else
-        verbose = false;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-    printf ("Running czmq self tests...\n");
+//  @interface
+//  Return file mode
+CZMQ_EXPORT mode_t
+    zsys_mode (const char *filename);
 
-    zclock_test (verbose);
-    zctx_test (verbose);
-    zfile_test (verbose);
-    zframe_test (verbose);
-    zhash_test (verbose);
-    zlist_test (verbose);
-    zloop_test (verbose);
-    zmsg_test (verbose);
-    zmutex_test (verbose);
-    zsocket_test (verbose);
-    zsockopt_test (verbose);
-    zstr_test (verbose);
-    zsys_test (verbose);
-    zthread_test (verbose);
-    printf ("Tests passed OK\n");
-    return 0;
+//  Create a file path if it doesn't exit
+CZMQ_EXPORT void
+    zsys_mkdir (const char *pathname);
+
+//  Remove a file path if empty
+CZMQ_EXPORT void
+    zsys_rmdir (const char *pathname);
+
+//  Delete a file
+CZMQ_EXPORT void
+    zsys_unlink (const char *filename);
+
+//  Check if file is 'stable'
+CZMQ_EXPORT bool
+    zsys_stable (const char *filename);
+
+//  Self test of this class
+int
+    zsys_test (bool verbose);
+//  @end
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif

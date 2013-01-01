@@ -56,11 +56,13 @@
     thread to a child thread, if you stop using it in the parent thread
     immediately after creating the child thread. If you want to connect
     sockets over inproc:// they must share the same 0MQ context, i.e. be
-    attached threads. If you want to communicate over ipc:// or tcp://
-    you can be sharing the same context, or use separate contexts.
+    attached threads. You should always use zthread_fork to create an
+    attached thread; it is not sufficient to pass a zctx_t structure to
+    a detached thread (this will crash).
 
-    Thus, every detached thread usually starts by creating its own zctx_t
-    instance.
+    If you want to communicate over ipc:// or tcp:// you may be sharing
+    the same context, or use separate contexts. Thus, every detached thread
+    usually starts by creating its own zctx_t instance.    
 @end
 */
 
