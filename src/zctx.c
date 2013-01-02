@@ -102,13 +102,15 @@ zctx_new (void)
     self->main = true;
 
 #if defined (__UNIX__)
-    //  Install signal handler for SIGINT and SIGTERM
-    struct sigaction action;
-    action.sa_handler = s_signal_handler;
-    action.sa_flags = 0;
-    sigemptyset (&action.sa_mask);
-    sigaction (SIGINT, &action, NULL);
-    sigaction (SIGTERM, &action, NULL);
+    if (zctx_interrupted == 0) {
+        //  Install signal handler for SIGINT and SIGTERM
+        struct sigaction action;
+        action.sa_handler = s_signal_handler;
+        action.sa_flags = 0;
+        sigemptyset (&action.sa_mask);
+        sigaction (SIGINT, &action, NULL);
+        sigaction (SIGTERM, &action, NULL);
+    }
 #endif
     return self;
 }
