@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zstr - sending and receiving strings
+    zsys - system wrapper
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2012 iMatix Corporation <www.imatix.com>
@@ -24,44 +24,38 @@
     =========================================================================
 */
 
-#ifndef __ZSTR_H_INCLUDED__
-#define __ZSTR_H_INCLUDED__
+#ifndef __ZFL_SYS_H_INCLUDED__
+#define __ZFL_SYS_H_INCLUDED__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 //  @interface
-//  Receive a string off a socket, caller must free it
-CZMQ_EXPORT char *
-    zstr_recv (void *socket);
+//  Return file mode
+CZMQ_EXPORT mode_t
+    zsys_mode (const char *filename);
 
-//  Receive a string off a socket if socket had input waiting
-CZMQ_EXPORT char *
-    zstr_recv_nowait (void *socket);
+//  Create a file path if it doesn't exit
+CZMQ_EXPORT void
+    zsys_mkdir (const char *pathname);
 
-//  Send a formatted string to a socket
-CZMQ_EXPORT int
-    zstr_send (void *socket, const char *format, ...);
+//  Remove a file path if empty
+CZMQ_EXPORT void
+    zsys_rmdir (const char *pathname);
 
-//  Send a formatted string to a socket, with MORE flag
-CZMQ_EXPORT int
-    zstr_sendm (void *socket, const char *format, ...);
+//  Delete a file
+CZMQ_EXPORT void
+    zsys_unlink (const char *filename);
+
+//  Check if file is 'stable'
+CZMQ_EXPORT bool
+    zsys_stable (const char *filename);
 
 //  Self test of this class
 int
-    zstr_test (bool verbose);
+    zsys_test (bool verbose);
 //  @end
-
-//  Deprecated methods
-//  -----------------------------------------------------------
-//  Send a formatted string to a socket
-CZMQ_EXPORT int
-    zstr_sendf (void *socket, const char *format, ...);
-
-//  Send formatted C string to socket with MORE flag
-CZMQ_EXPORT int
-    zstr_sendfm (void *socket, const char *format, ...);
 
 #ifdef __cplusplus
 }

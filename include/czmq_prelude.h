@@ -468,8 +468,6 @@ static inline void *
 #   define CZMQ_EXPORT
 #endif
 
-#endif
-
 //- Always include ZeroMQ header file ---------------------------------------
 
 #include "zmq.h"
@@ -498,4 +496,6 @@ static inline void *
 #   define ZMQ_POLL_MSEC    1000        //  zmq_poll is usec
 #elif ZMQ_VERSION_MAJOR == 3 || ZMQ_VERSION_MAJOR == 4
 #   define ZMQ_POLL_MSEC    1           //  zmq_poll is msec
+#endif
+
 #endif

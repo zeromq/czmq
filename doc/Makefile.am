@@ -13,6 +13,7 @@ MAN7 = czmq.7 \
     zsocket.7 \
     zsockopt.7 \
     zstr.7 \
+    zsys.7 \
     zthread.7
 MAN_DOC = $(MAN1) $(MAN3) $(MAN7)
 
