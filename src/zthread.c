@@ -141,9 +141,9 @@ s_thread_start (shim_t *shim)
     //  Set child thread priority to same as current
     int priority = GetThreadPriority (GetCurrentThread ());
     SetThreadPriority (shim->handle, priority);
-    //  Now start thread
+    //  Start thread
     ResumeThread (shim->handle);
-
+    //  Release resources
     CloseHandle (shim->handle);
     shim->handle = 0;
 #endif
