@@ -18,6 +18,7 @@ include_HEADERS = \
     ../include/zsocket.h \
     ../include/zsockopt.h \
     ../include/zstr.h \
+    ../include/zsys.h \
     ../include/zthread.h
 
 libczmq_la_SOURCES = \
@@ -33,6 +34,7 @@ libczmq_la_SOURCES = \
     zsocket.c \
     zsockopt.c \
     zstr.c \
+    zsys.c \
     zthread.c
 
 INCLUDES = -I$(top_srcdir)/include

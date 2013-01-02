@@ -50,6 +50,7 @@ int main (int argc, char *argv [])
     zsocket_test (verbose);
     zsockopt_test (verbose);
     zstr_test (verbose);
+    zsys_test (verbose);
     zthread_test (verbose);
     printf ("Tests passed OK\n");
     return 0;

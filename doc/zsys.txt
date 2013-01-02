@@ -1,0 +1,41 @@
+zsys(7)
+=======
+
+NAME
+----
+zsys - system wrapper
+
+SYNOPSIS
+--------
+----
+//  Create a file path if it doesn't exit
+CZMQ_EXPORT void
+    zsys_mkdir (zsys_t *self, char *pathname);
+
+//  Remove a file path with multiple levels
+CZMQ_EXPORT void
+    zsys_rmdir (zsys_t *self, char *pathname, bool force);
+
+//  Self test of this class
+int
+    zsys_test (bool verbose);
+----
+
+DESCRIPTION
+-----------
+
+The zsys class provides a portable wrapper for miscellaneous functions
+that we want to wrap but which don't fit into any of the existing
+classes. Eventually all non-portable functionality might be moved here
+but for now it covers only file systems.
+
+
+EXAMPLE
+-------
+.From zsys_test method
+----
+----
+
+SEE ALSO
+--------
+linkczmq:czmq[7]
