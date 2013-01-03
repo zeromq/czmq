@@ -36,6 +36,57 @@
 
 #include "../include/czmq.h"
 
+#if defined (__UNIX__)
+static bool s_first_time = true;
+static struct sigaction sigint_default;
+static struct sigaction sigterm_default;
+#endif
+
+//  --------------------------------------------------------------------------
+//  Set interrupt handler (NULL means external handler)
+//  Idempotent; safe to call multiple times
+
+CZMQ_EXPORT void
+zsys_handler_set (zsys_handler_fn *handler_fn)
+{
+#if defined (__UNIX__)
+    //  Install signal handler for SIGINT and SIGTERM if not NULL
+    //  and if this is the first time we've been called
+    if (s_first_time) {
+        s_first_time = false;
+        if (handler_fn) {
+            struct sigaction action;
+            action.sa_handler = handler_fn;
+            action.sa_flags = 0;
+            sigemptyset (&action.sa_mask);
+            sigaction (SIGINT, &action, NULL);
+            sigaction (SIGTERM, &action, NULL);
+        }
+        //  Save default handlers if not already done
+        sigaction (SIGINT, NULL, &sigint_default);
+        sigaction (SIGTERM, NULL, &sigterm_default);
+    }
+#endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Reset interrupt handler, call this at exit if needed
+//  Idempotent; safe to call multiple times
+
+CZMQ_EXPORT void
+zsys_handler_reset (void)
+{
+    //  Restore default handlers if not already done
+    if (sigint_default.sa_handler) {
+        sigaction (SIGINT, &sigint_default, NULL);
+        sigaction (SIGTERM, &sigterm_default, NULL);
+        sigint_default.sa_handler = NULL;
+        sigterm_default.sa_handler = NULL;
+        s_first_time = true;
+    }
+}
+
 
 //  --------------------------------------------------------------------------
 //  Return file mode
@@ -164,7 +215,12 @@ int
 zsys_test (bool verbose)
 {
     printf (" * zsys: ");
-
+    zsys_handler_reset ();
+    zsys_handler_set (NULL);
+    zsys_handler_set (NULL);
+    zsys_handler_reset ();
+    zsys_handler_reset ();
     printf ("OK\n");
     return 0;
 }
+
