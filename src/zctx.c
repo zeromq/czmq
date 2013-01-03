@@ -64,22 +64,21 @@ struct _zctx_t {
     bool main;                  //  True if we're the main thread
     int iothreads;              //  Number of IO threads, default 1
     int linger;                 //  Linger timeout, default 0
-    struct sigaction oacts[2];  //  Current sigaction values
 };
 
 
 //  ---------------------------------------------------------------------
 //  Signal handling
-//
-
 //  This is a global variable accessible to CZMQ application code
+
 volatile int zctx_interrupted = 0;
-#if defined (__UNIX__)
-static void s_signal_handler (int signal_value)
+
+static void
+s_signal_handler (int signal_value)
 {
     zctx_interrupted = 1;
 }
-#endif
+
 
 //  --------------------------------------------------------------------------
 //  Constructor
@@ -101,18 +100,7 @@ zctx_new (void)
     }
     self->iothreads = 1;
     self->main = true;
-
-#if defined (__UNIX__)
-    if (zctx_interrupted == 0) {
-        //  Install signal handler for SIGINT and SIGTERM
-        struct sigaction action;
-        action.sa_handler = s_signal_handler;
-        action.sa_flags = 0;
-        sigemptyset (&action.sa_mask);
-        sigaction (SIGINT, &action, &self->oacts[0]);
-        sigaction (SIGTERM, &action, &self->oacts[1]);
-    }
-#endif
+    zsys_handler_set (s_signal_handler);
     return self;
 }
 
@@ -131,10 +119,6 @@ zctx_destroy (zctx_t **self_p)
         zlist_destroy (&self->sockets);
         if (self->main && self->context)
             zmq_term (self->context);
-#if defined (__UNIX__)
-        sigaction (SIGINT, &self->oacts[0], NULL);
-        sigaction (SIGTERM, &self->oacts[1], NULL);
-#endif
         free (self);
         *self_p = NULL;
     }
@@ -296,33 +280,6 @@ zctx_test (bool verbose)
     zsocket_connect (s5, "tcp://127.0.0.1:5555");
     zsocket_connect (s6, "tcp://127.0.0.1:5555");
     assert (zctx_underlying (ctx));
-
-#if defined (__UNIX__)
-    struct sigaction action;
-    sigaction (SIGINT, NULL, &action);
-    assert (action.sa_handler == s_signal_handler);
-
-    sigaction (SIGTERM, NULL, &action);
-    assert (action.sa_handler == s_signal_handler);
-    //  Everything should be cleanly closed now
-    zctx_destroy (&ctx);
-
-    sigaction (SIGINT, NULL, &action);
-    sigaction (SIGTERM, NULL, &action);
-    assert (action.sa_handler != s_signal_handler);
-    assert (action.sa_handler != s_signal_handler);
-
-    // Check if no signal handler is installed if zctx_interrupted
-    zctx_interrupted = 1;
-    bzero(&action, sizeof(struct sigaction));
-    ctx = zctx_new ();
-
-    sigaction (SIGINT, NULL, &action);
-    assert (action.sa_handler != s_signal_handler);
-
-    sigaction (SIGTERM, NULL, &action);
-    assert (action.sa_handler != s_signal_handler);
-#endif
     zctx_destroy (&ctx);
     //  @end
 

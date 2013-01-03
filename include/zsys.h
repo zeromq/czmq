@@ -32,6 +32,17 @@ extern "C" {
 #endif
 
 //  @interface
+//  Callback for interrupt signal handler
+typedef void (zsys_handler_fn) (int signal_value);
+
+//  Set interrupt handler (NULL means external handler)
+CZMQ_EXPORT void
+    zsys_handler_set (zsys_handler_fn *handler_fn);
+
+//  Reset interrupt handler, call this at exit if needed
+CZMQ_EXPORT void
+    zsys_handler_reset (void);
+
 //  Return file mode
 CZMQ_EXPORT mode_t
     zsys_mode (const char *filename);
