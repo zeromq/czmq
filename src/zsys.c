@@ -79,6 +79,7 @@ zsys_handler_set (zsys_handler_fn *handler_fn)
 CZMQ_EXPORT void
 zsys_handler_reset (void)
 {
+#if defined (__UNIX__)
     //  Restore default handlers if not already done
     if (sigint_default.sa_handler) {
         sigaction (SIGINT, &sigint_default, NULL);
@@ -87,6 +88,7 @@ zsys_handler_reset (void)
         sigterm_default.sa_handler = NULL;
         s_first_time = true;
     }
+#endif
 }
 
 
