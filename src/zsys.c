@@ -59,12 +59,14 @@ zsys_handler_set (zsys_handler_fn *handler_fn)
             action.sa_handler = handler_fn;
             action.sa_flags = 0;
             sigemptyset (&action.sa_mask);
-            sigaction (SIGINT, &action, NULL);
-            sigaction (SIGTERM, &action, NULL);
+            sigaction (SIGINT, &action, &sigint_default);
+            sigaction (SIGTERM, &action, &sigterm_default);
         }
-        //  Save default handlers if not already done
-        sigaction (SIGINT, NULL, &sigint_default);
-        sigaction (SIGTERM, NULL, &sigterm_default);
+        else {
+            //  Save default handlers if not already done
+            sigaction (SIGINT, NULL, &sigint_default);
+            sigaction (SIGTERM, NULL, &sigterm_default);
+        }
     }
 #endif
 }
