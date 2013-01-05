@@ -134,7 +134,7 @@ zframe_recv (void *zocket)
     assert (zocket);
     zframe_t *self = zframe_new (NULL, 0);
     if (self) {
-        if (zmq_recvmsg (zocket, &self->zmsg, 0) < 0) {
+        if (zmq_msg_recv (&self->zmsg, zocket, 0) < 0) {
             zframe_destroy (&self);
             return NULL;            //  Interrupted or terminated
         }
@@ -154,7 +154,7 @@ zframe_recv_nowait (void *zocket)
     assert (zocket);
     zframe_t *self = zframe_new (NULL, 0);
     if (self) {
-        if (zmq_recvmsg (zocket, &self->zmsg, ZMQ_DONTWAIT) < 0) {
+        if (zmq_msg_recv (&self->zmsg, zocket, ZMQ_DONTWAIT) < 0) {
             zframe_destroy (&self);
             return NULL;            //  Interrupted or terminated
         }
@@ -183,12 +183,12 @@ zframe_send (zframe_t **self_p, void *zocket, int flags)
             zmq_msg_init (&copy);
             if (zmq_msg_copy (&copy, &self->zmsg))
                 return -1;
-            if (zmq_sendmsg (zocket, &copy, snd_flags) == -1)
+            if (zmq_msg_send (&copy, zocket, snd_flags) == -1)
                 return -1;
             zmq_msg_close (&copy);
         }
         else {
-            if (zmq_sendmsg (zocket, &self->zmsg, snd_flags) == -1)
+            if (zmq_msg_send (&self->zmsg, zocket, snd_flags) == -1)
                 return -1;
             zframe_destroy (self_p);
         }
