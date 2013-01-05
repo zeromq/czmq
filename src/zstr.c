@@ -54,7 +54,7 @@ s_send_string (void *zocket, bool more, const char *format, va_list argptr)
     zmq_msg_t message;
     zmq_msg_init_size (&message, strlen (string));
     memcpy (zmq_msg_data (&message), string, strlen (string));
-    int rc = zmq_sendmsg (zocket, &message, more? ZMQ_SNDMORE: 0);
+    int rc = zmq_msg_send (&message, zocket, more? ZMQ_SNDMORE: 0);
     zmq_msg_close (&message);
 
     free (string);
@@ -72,7 +72,7 @@ zstr_recv (void *zocket)
     assert (zocket);
     zmq_msg_t message;
     zmq_msg_init (&message);
-    if (zmq_recvmsg (zocket, &message, 0) < 0)
+    if (zmq_msg_recv (&message, zocket, 0) < 0)
         return NULL;
 
     size_t size = zmq_msg_size (&message);
@@ -96,7 +96,7 @@ zstr_recv_nowait (void *zocket)
     assert (zocket);
     zmq_msg_t message;
     zmq_msg_init (&message);
-    if (zmq_recvmsg (zocket, &message, ZMQ_DONTWAIT) < 0)
+    if (zmq_msg_recv (&message, zocket, ZMQ_DONTWAIT) < 0)
         return NULL;
 
     size_t size = zmq_msg_size (&message);
