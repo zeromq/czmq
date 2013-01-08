@@ -26,85 +26,28 @@
 
 /*
 @header
-    The zfile class provides methods to work with files.
+    The zfile class provides methods to work with files and directories.
 @discuss
 @end
 */
 
 #include "../include/czmq.h"
 
-//  Delete file, return 0 if OK, -1 if not possible.
 
-int
-zfile_delete (const char *filename)
-{
-    assert (filename);
-#if (defined (__WINDOWS__))
-    return DeleteFile (filename) ? 0 : -1;
-#else
-    return unlink (filename);
-#endif
-}
+//  --------------------------------------------------------------------------
+//  Return true if file exists, else zero
 
-
-//  Make directory (maximum one level depending on OS)
-
-int
-zfile_mkdir (const char *dirname)
-{
-#if (defined (__WINDOWS__))
-    return !CreateDirectory (dirname, NULL);
-#else
-    return mkdir (dirname, 0755);    //  User RWE Group RE World RE
-#endif
-}
-
-
-//  Returns the file mode for the specified file or directory name;
-//  returns 0 if the specified file does not exist.
-
-static int
-s_file_mode (const char *filename)
-{
-    assert (filename);
-
-#if (defined (__WINDOWS__))
-    DWORD dwfa = GetFileAttributes (filename);
-    if (dwfa == 0xffffffff)
-        return 0;
-
-    int mode = 0;
-    if (dwfa & FILE_ATTRIBUTE_DIRECTORY)
-        mode |= S_IFDIR;
-    else
-        mode |= S_IFREG;
-
-    if (!(dwfa & FILE_ATTRIBUTE_HIDDEN))
-        mode |= S_IREAD;
-
-    if (!(dwfa & FILE_ATTRIBUTE_READONLY))
-        mode |= S_IWRITE;
-
-    return mode;
-#else
-    struct stat stat_buf;
-    if (stat ((char *) filename, &stat_buf) == 0)
-        return stat_buf.st_mode;
-    else
-        return 0;
-#endif
-}
-
-//  Return 1 if file exists, else zero
-int
+bool
 zfile_exists (const char *filename)
 {
     assert (filename);
-    return s_file_mode (filename) > 0;
+    return (int) zfile_mode (filename) > 0;
 }
 
 
+//  --------------------------------------------------------------------------
 //  Return size of file, or -1 if not found
+
 ssize_t
 zfile_size (const char *filename)
 {
@@ -117,6 +60,129 @@ zfile_size (const char *filename)
     else
         return -1;
 }
+
+
+//  --------------------------------------------------------------------------
+//  Return file mode
+
+mode_t
+zfile_mode (const char *filename)
+{
+#if (defined (__WINDOWS__))
+    DWORD dwfa = GetFileAttributes (filename);
+    if (dwfa == 0xffffffff)
+        return -1;
+
+    dbyte mode = 0;
+    if (dwfa & FILE_ATTRIBUTE_DIRECTORY)
+        mode |= S_IFDIR;
+    else
+        mode |= S_IFREG;
+    if (!(dwfa & FILE_ATTRIBUTE_HIDDEN))
+        mode |= S_IREAD;
+    if (!(dwfa & FILE_ATTRIBUTE_READONLY))
+        mode |= S_IWRITE;
+
+    return mode;
+#else
+    struct stat stat_buf;
+    if (stat ((char *) filename, &stat_buf) == 0)
+        return stat_buf.st_mode;
+    else
+        return -1;
+#endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Delete file, return 0 if OK, -1 if not possible.
+
+int
+zfile_delete (const char *filename)
+{
+    assert (filename);
+#if (defined (__WINDOWS__))
+    return DeleteFile (filename) ? 0: -1;
+#else
+    return unlink (filename);
+#endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Check if file is 'stable'
+
+bool
+zfile_stable (const char *filename)
+{
+    struct stat stat_buf;
+    if (stat (filename, &stat_buf) == 0) {
+        //  File is 'stable' if more than 1 second old
+#if (defined (WIN32))
+#   define EPOCH_DIFFERENCE 11644473600LL
+        long age = (long) (zclock_time () - EPOCH_DIFFERENCE * 1000 - (stat_buf.st_mtime * 1000));
+#else
+        long age = (long) (zclock_time () - (stat_buf.st_mtime * 1000));
+#endif
+        return (age > 1000);
+    }
+    else
+        return false;           //  File doesn't exist, so not stable
+}
+
+
+//  --------------------------------------------------------------------------
+//  Create a file path if it doesn't exist
+
+int
+zfile_mkdir (const char *pathname)
+{
+    //  Take copy of string as we're going to mess with it
+    char *my_pathname = strdup (pathname);
+
+    //  Create parent directory levels if needed
+    char *slash = strchr (my_pathname + 1, '/');
+    do {
+        if (slash)
+            *slash = 0;         //  Cut at slash
+        mode_t mode = zfile_mode (my_pathname);
+        if (mode == (mode_t)-1) {
+            //  Does not exist, try to create it
+#if (defined (__WINDOWS__))
+            if (!CreateDirectory (my_pathname, NULL))
+#else
+            if (mkdir (my_pathname, 0775))
+#endif
+                return -1;      //  Failed
+        }
+        else
+        if ((mode & S_IFDIR) == 0) {
+            //  Not a directory, abort
+        }
+        if (!slash)             //  End if last segment
+            break;
+       *slash = '/';
+        slash = strchr (slash + 1, '/');
+    } while (slash);
+
+    free (my_pathname);
+    return 0;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Remove a file path if empty
+
+int
+zfile_rmdir (const char *pathname)
+{
+#if (defined (__WINDOWS__))
+    return RemoveDirectory (pathname)? 0: -1;
+#else
+    return rmdir (pathname);
+#endif
+}
+
 
 //  --------------------------------------------------------------------------
 //  Selftest

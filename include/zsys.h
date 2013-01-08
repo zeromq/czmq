@@ -43,26 +43,6 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zsys_handler_reset (void);
 
-//  Return file mode
-CZMQ_EXPORT mode_t
-    zsys_mode (const char *filename);
-
-//  Create a file path if it doesn't exit
-CZMQ_EXPORT void
-    zsys_mkdir (const char *pathname);
-
-//  Remove a file path if empty
-CZMQ_EXPORT void
-    zsys_rmdir (const char *pathname);
-
-//  Delete a file
-CZMQ_EXPORT void
-    zsys_unlink (const char *filename);
-
-//  Check if file is 'stable'
-CZMQ_EXPORT bool
-    zsys_stable (const char *filename);
-
 //  Self test of this class
 int
     zsys_test (bool verbose);

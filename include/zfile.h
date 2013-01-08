@@ -32,21 +32,33 @@ extern "C" {
 #endif
 
 //  @interface
-//  Delete file. Does not complain if the file is absent
-CZMQ_EXPORT int
-    zfile_delete (const char *filename);
-
-//  Make directory (maximum one level depending on OS)
-CZMQ_EXPORT int
-    zfile_mkdir (const char *dirname);
-
 //  Return 1 if file exists, else zero
-CZMQ_EXPORT int
+CZMQ_EXPORT bool
     zfile_exists (const char *filename);
 
 //  Return size of file, or -1 if not found
 CZMQ_EXPORT ssize_t
     zfile_size (const char *filename);
+
+//  Return file mode
+CZMQ_EXPORT mode_t
+    zfile_mode (const char *filename);
+
+//  Delete file. Does not complain if the file is absent
+CZMQ_EXPORT int
+    zfile_delete (const char *filename);
+
+//  Check if file is 'stable'
+CZMQ_EXPORT bool
+    zfile_stable (const char *filename);
+
+//  Create a file path if it doesn't exit
+CZMQ_EXPORT int
+    zfile_mkdir (const char *pathname);
+
+//  Remove a file path if empty
+CZMQ_EXPORT int
+    zfile_rmdir (const char *pathname);
 
 //  Self test of this class
 int
