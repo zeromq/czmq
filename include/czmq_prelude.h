@@ -374,8 +374,6 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 
 #define streq(s1,s2)    (!strcmp ((s1), (s2)))
 #define strneq(s1,s2)   (strcmp ((s1), (s2)))
-#define tblsize(x)      (sizeof (x) / sizeof ((x) [0]))
-#define tbllast(x)      (x [tblsize (x) - 1])
 //  Provide random number from 0..(num-1)
 #if (defined (__WINDOWS__)) || (defined (__UTYPE_IBMAIX)) || (defined (__UTYPE_HPUX)) || (defined (__UTYPE_SUNOS))
 #   define randof(num)  (int) ((float) (num) * rand () / (RAND_MAX + 1.0))
