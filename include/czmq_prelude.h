@@ -220,7 +220,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
-#include <stdbool.h>
 #include <string.h>
 #include <time.h>
 #include <errno.h>
@@ -365,7 +364,7 @@
 
 //- Data types --------------------------------------------------------------
 
-typedef          bool   Bool;           //  Boolean TRUE/FALSE value
+typedef          int    Bool;           //  Boolean TRUE/FALSE value
 typedef unsigned char   byte;           //  Single unsigned byte = 8 bits
 typedef unsigned short  dbyte;          //  Double byte = 16 bits
 typedef unsigned int    qbyte;          //  Quad byte = 32 bits
@@ -380,8 +379,15 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 #else
 #   define randof(num)  (int) ((float) (num) * random () / (RAND_MAX + 1.0))
 #endif
+//  I'd rather use stdbool.h but that is not available on current MSVC
+#if (!defined (true))
+#    define true        1
+#    define false       0
+     typedef char bool;
+#endif
+//  Deprecated, remove at some stage
 #if (!defined (TRUE))
-#    define TRUE        1               //  ANSI standard
+#    define TRUE        1
 #    define FALSE       0
 #endif
 
