@@ -2,7 +2,7 @@
     czmq_prelude.h - CZMQ environment
 
     -------------------------------------------------------------------------
-    Copyright (c) 1991-2012 iMatix Corporation <www.imatix.com>
+    Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -220,7 +220,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
-#include <stdbool.h>
 #include <string.h>
 #include <time.h>
 #include <errno.h>
@@ -365,7 +364,7 @@
 
 //- Data types --------------------------------------------------------------
 
-typedef          bool   Bool;           //  Boolean TRUE/FALSE value
+typedef          int    Bool;           //  Boolean TRUE/FALSE value
 typedef unsigned char   byte;           //  Single unsigned byte = 8 bits
 typedef unsigned short  dbyte;          //  Double byte = 16 bits
 typedef unsigned int    qbyte;          //  Quad byte = 32 bits
@@ -374,16 +373,21 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 
 #define streq(s1,s2)    (!strcmp ((s1), (s2)))
 #define strneq(s1,s2)   (strcmp ((s1), (s2)))
-#define tblsize(x)      (sizeof (x) / sizeof ((x) [0]))
-#define tbllast(x)      (x [tblsize (x) - 1])
 //  Provide random number from 0..(num-1)
 #if (defined (__WINDOWS__)) || (defined (__UTYPE_IBMAIX)) || (defined (__UTYPE_HPUX)) || (defined (__UTYPE_SUNOS))
 #   define randof(num)  (int) ((float) (num) * rand () / (RAND_MAX + 1.0))
 #else
 #   define randof(num)  (int) ((float) (num) * random () / (RAND_MAX + 1.0))
 #endif
+//  I'd rather use stdbool.h but that is not available on current MSVC
+#if (!defined (true))
+#    define true        1
+#    define false       0
+     typedef char bool;
+#endif
+//  Deprecated, remove at some stage
 #if (!defined (TRUE))
-#    define TRUE        1               //  ANSI standard
+#    define TRUE        1
 #    define FALSE       0
 #endif
 
