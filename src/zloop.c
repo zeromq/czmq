@@ -2,7 +2,7 @@
     zloop - event-driven reactor
 
     -------------------------------------------------------------------------
-    Copyright (c) 1991-2012 iMatix Corporation <www.imatix.com>
+    Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -370,7 +370,7 @@ zloop_start (zloop_t *self)
                     zclock_log ("I: zloop: call timer handler");
                 rc = timer->handler (self, NULL, timer->arg);
                 if (rc == -1)
-                    break;      //  Timer handler signalled break
+                    break;      //  Timer handler signaled break
                 if (timer->times && --timer->times == 0) {
                     zlist_remove (self->timers, timer);
                     free (timer);
@@ -382,7 +382,7 @@ zloop_start (zloop_t *self)
         }
         //  Handle any pollers that are ready
         size_t item_nbr;
-        for (item_nbr = 0; item_nbr < self->poll_size; item_nbr++) {
+        for (item_nbr = 0; item_nbr < self->poll_size && rc == 0; item_nbr++) {
             s_poller_t *poller = &self->pollact [item_nbr];
             assert (self->pollset [item_nbr].socket == poller->item.socket);
             
@@ -412,7 +412,7 @@ zloop_start (zloop_t *self)
                         poller->item.socket, poller->item.fd);
                 rc = poller->handler (self, &self->pollset [item_nbr], poller->arg);
                 if (rc == -1)
-                    break;      //  Poller handler signalled break
+                    break;      //  Poller handler signaled break
             }
         }
         //  Now handle any timer zombies

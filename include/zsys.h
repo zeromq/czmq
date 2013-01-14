@@ -2,7 +2,7 @@
     zsys - system wrapper
 
     -------------------------------------------------------------------------
-    Copyright (c) 1991-2012 iMatix Corporation <www.imatix.com>
+    Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -42,26 +42,6 @@ CZMQ_EXPORT void
 //  Reset interrupt handler, call this at exit if needed
 CZMQ_EXPORT void
     zsys_handler_reset (void);
-
-//  Return file mode
-CZMQ_EXPORT mode_t
-    zsys_mode (const char *filename);
-
-//  Create a file path if it doesn't exit
-CZMQ_EXPORT void
-    zsys_mkdir (const char *pathname);
-
-//  Remove a file path if empty
-CZMQ_EXPORT void
-    zsys_rmdir (const char *pathname);
-
-//  Delete a file
-CZMQ_EXPORT void
-    zsys_unlink (const char *filename);
-
-//  Check if file is 'stable'
-CZMQ_EXPORT bool
-    zsys_stable (const char *filename);
 
 //  Self test of this class
 int
