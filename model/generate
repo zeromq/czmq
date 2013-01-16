@@ -1,0 +1,2 @@
+export PATH=../scripts:$PATH
+gsl -q -script:sockopts.gsl sockopts.xml

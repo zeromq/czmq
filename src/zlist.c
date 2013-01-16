@@ -128,9 +128,7 @@ void *
 zlist_head (zlist_t *self)
 {
     assert (self);
-    return self->head
-      ? self->head->item
-      : NULL;
+    return self->head? self->head->item: NULL;
 }
 
 
@@ -142,14 +140,12 @@ void *
 zlist_tail (zlist_t *self)
 {
     assert (self);
-    return self->tail
-      ? self->tail->item
-      : NULL;
+    return self->tail? self->tail->item: NULL;
 }
 
 //  --------------------------------------------------------------------------
 //  Return the next item. If the list is empty, returns NULL. To move to
-//  the start of the list call zlist_first(). Advances the cursor.
+//  the start of the list call zlist_first (). Advances the cursor.
 
 void *
 zlist_next (zlist_t *self)

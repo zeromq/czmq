@@ -1,4 +1,4 @@
-.output "include/zsockopt.h"
+.output "../include/zsockopt.h"
 .for version
 .   for option
 .       if type = "uint64" | type = "int64" | type = "uint32" | type = "int"
@@ -112,7 +112,7 @@ int zsockopt_test (bool verbose);
 #endif
 
 #endif
-.output "src/zsockopt.c"
+.output "../src/zsockopt.c"
 /*  =========================================================================
     zsockopt - get/set 0MQ socket options
 

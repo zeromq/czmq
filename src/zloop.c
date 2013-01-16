@@ -453,7 +453,7 @@ s_socket_event (zloop_t *loop, zmq_pollitem_t *item, void *arg)
     return -1;
 }
 
-int
+void
 zloop_test (bool verbose)
 {
     printf (" * zloop: ");
