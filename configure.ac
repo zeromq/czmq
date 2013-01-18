@@ -11,7 +11,7 @@ AC_INIT([czmq],[1.3.3],[zeromq-dev@lists.zeromq.org])
 
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(config)
-AM_CONFIG_HEADER(src/platform.h)
+AC_CONFIG_HEADERS([src/platform.h])
 AM_INIT_AUTOMAKE(tar-ustar)
 
 # This defines PACKAGE_VERSION_... in src/platform.h
