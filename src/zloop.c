@@ -488,5 +488,4 @@ zloop_test (bool verbose)
     zctx_destroy (&ctx);
     //  @end
     printf ("OK\n");
-    return 0;
 }
