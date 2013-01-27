@@ -382,7 +382,7 @@ zloop_start (zloop_t *self)
         }
         //  Handle any pollers that are ready
         size_t item_nbr;
-        for (item_nbr = 0; item_nbr < self->poll_size && rc == 0; item_nbr++) {
+        for (item_nbr = 0; item_nbr < self->poll_size && rc >= 0; item_nbr++) {
             s_poller_t *poller = &self->pollact [item_nbr];
             assert (self->pollset [item_nbr].socket == poller->item.socket);
             
