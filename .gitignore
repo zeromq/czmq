@@ -41,9 +41,56 @@ ipr
 *.gz
 *.zip
 *.la
-win32/czmq.ncb
-win32/czmq.vcproj.WS200902.user.user
 win32/czmq_selftest.exe.embed.manifest
 win32/czmq_selftest.exe.embed.manifest.res
 win32/czmq_selftest.exe.intermediate.manifest
-win32/czmq_selftest.vcproj.WS200902.user.user
+
+# Visual Studio Ignored Files
+*_i.c
+*_p.c
+*.ilk
+*.meta
+*.obj
+*.pch
+*.pdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.log
+*.scc
+
+# User-specific files
+*.suo
+*.user
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+build/
+[Bb]in/
+[Oo]bj/
+
+# MSTest test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# Visual C++ cache files
+ipch/
+*.aps
+*.ncb
+*.opensdf
+*.sdf
+*.cachefile
