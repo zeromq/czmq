@@ -552,23 +552,23 @@ zhash_test (int verbose)
 
     //  Look for existing items
     char *item;
-    item = zhash_lookup (hash, "DEADBEEF");
+    item = (char*)zhash_lookup (hash, "DEADBEEF");
     assert (streq (item, "dead beef"));
-    item = zhash_lookup (hash, "ABADCAFE");
+    item = (char*)zhash_lookup (hash, "ABADCAFE");
     assert (streq (item, "a bad cafe"));
-    item = zhash_lookup (hash, "C0DEDBAD");
+    item = (char*)zhash_lookup (hash, "C0DEDBAD");
     assert (streq (item, "coded bad"));
-    item = zhash_lookup (hash, "DEADF00D");
+    item = (char*)zhash_lookup (hash, "DEADF00D");
     assert (streq (item, "dead food"));
 
     //  Look for non-existent items
-    item = zhash_lookup (hash, "foo");
+    item = (char*)zhash_lookup (hash, "foo");
     assert (item == NULL);
 
     //  Try to insert duplicate items
     rc = zhash_insert (hash, "DEADBEEF", "foo");
     assert (rc == -1);
-    item = zhash_lookup (hash, "DEADBEEF");
+    item = (char*)zhash_lookup (hash, "DEADBEEF");
     assert (streq (item, "dead beef"));
 
     //  Rename an item
@@ -585,7 +585,7 @@ zhash_test (int verbose)
     //  Test dup method
     zhash_t *copy = zhash_dup (hash);
     assert (zhash_size (copy) == 4);
-    item = zhash_lookup (copy, "LIVEBEEF");
+    item = (char*)zhash_lookup (copy, "LIVEBEEF");
     assert (item);
     assert (streq (item, "dead beef"));
     zhash_destroy (&copy);
@@ -594,7 +594,7 @@ zhash_test (int verbose)
     zhash_save (hash, ".cache");
     copy = zhash_new ();
     zhash_load (copy, ".cache");
-    item = zhash_lookup (copy, "LIVEBEEF");
+    item = (char*)zhash_lookup (copy, "LIVEBEEF");
     assert (item);
     assert (streq (item, "dead beef"));
     zhash_destroy (&copy);
@@ -606,7 +606,7 @@ zhash_test (int verbose)
         
     //  Delete a item
     zhash_delete (hash, "LIVEBEEF");
-    item = zhash_lookup (hash, "LIVEBEEF");
+    item = (char*)zhash_lookup (hash, "LIVEBEEF");
     assert (item == NULL);
     assert (zhash_size (hash) == 3);
 
@@ -622,7 +622,7 @@ zhash_test (int verbose)
     for (iteration = 0; iteration < 25000; iteration++) {
         testnbr = randof (testmax);
         if (testset [testnbr].exists) {
-            item = zhash_lookup (hash, testset [testnbr].name);
+            item = (char*)zhash_lookup (hash, testset [testnbr].name);
             assert (item);
             zhash_delete (hash, testset [testnbr].name);
             testset [testnbr].exists = false;
@@ -635,7 +635,7 @@ zhash_test (int verbose)
     }
     //  Test 10K lookups
     for (iteration = 0; iteration < 10000; iteration++)
-        item = zhash_lookup (hash, "DEADBEEFABADCAFE");
+        item = (char*)zhash_lookup (hash, "DEADBEEFABADCAFE");
 
     //  Destructor should be safe to call twice
     zhash_destroy (&hash);

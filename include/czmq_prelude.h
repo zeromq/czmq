@@ -363,7 +363,6 @@
 #endif
 
 //- Data types --------------------------------------------------------------
-
 typedef          int    Bool;           //  Boolean TRUE/FALSE value
 typedef unsigned char   byte;           //  Single unsigned byte = 8 bits
 typedef unsigned short  dbyte;          //  Double byte = 16 bits
@@ -383,12 +382,11 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 #if (!defined (true))
 #    define true        1
 #    define false       0
-     typedef char bool;
-#endif
-//  Deprecated, remove at some stage
-#if (!defined (TRUE))
-#    define TRUE        1
-#    define FALSE       0
+#   if (defined (__WINDOWS__) && !defined (bool))
+#       define bool char
+#   else
+        typedef char bool;
+#   endif
 #endif
 
 //- A number of POSIX and C99 keywords and data types -----------------------

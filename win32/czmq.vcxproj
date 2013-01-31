@@ -94,6 +94,7 @@
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
+      <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -115,6 +116,7 @@
     <ClCompile Include="..\src\zctx.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
     </ClCompile>
+    <ClCompile Include="..\src\zfile.c" />
     <ClCompile Include="..\src\zframe.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
     </ClCompile>
@@ -148,6 +150,7 @@
     <ClInclude Include="..\include\czmq_prelude.h" />
     <ClInclude Include="..\include\zclock.h" />
     <ClInclude Include="..\include\zctx.h" />
+    <ClInclude Include="..\include\zfile.h" />
     <ClInclude Include="..\include\zframe.h" />
     <ClInclude Include="..\include\zhash.h" />
     <ClInclude Include="..\include\zlist.h" />

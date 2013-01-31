@@ -69,11 +69,12 @@ mode_t
 zfile_mode (const char *filename)
 {
 #if (defined (__WINDOWS__))
+	dbyte mode;
     DWORD dwfa = GetFileAttributes (filename);
     if (dwfa == 0xffffffff)
         return -1;
 
-    dbyte mode = 0;
+    mode = 0;
     if (dwfa & FILE_ATTRIBUTE_DIRECTORY)
         mode |= S_IFDIR;
     else
@@ -137,15 +138,16 @@ zfile_stable (const char *filename)
 int
 zfile_mkdir (const char *pathname)
 {
-    //  Take copy of string as we're going to mess with it
-    char *my_pathname = strdup (pathname);
+    mode_t mode;
+	//  Take copy of string as we're going to mess with it
+    char *my_pathname = _strdup (pathname);
 
     //  Create parent directory levels if needed
     char *slash = strchr (my_pathname + 1, '/');
     do {
         if (slash)
             *slash = 0;         //  Cut at slash
-        mode_t mode = zfile_mode (my_pathname);
+        mode = zfile_mode (my_pathname);
         if (mode == (mode_t)-1) {
             //  Does not exist, try to create it
 #if (defined (__WINDOWS__))
@@ -190,10 +192,11 @@ zfile_rmdir (const char *pathname)
 int
 zfile_test (bool verbose)
 {
-    printf (" * zfile: ");
+    int rc;
+	printf (" * zfile: ");
 
     //  @selftest
-    int rc = zfile_delete ("nosuchfile");
+    rc = zfile_delete ("nosuchfile");
     assert (rc == -1);
 
     rc = zfile_exists ("nosuchfile");
