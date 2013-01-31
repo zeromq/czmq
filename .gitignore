@@ -85,6 +85,7 @@ build/
 *.unsuccessfulbuild
 *.lastbuildstate
 *.tlog
+[Bb]ackup/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
