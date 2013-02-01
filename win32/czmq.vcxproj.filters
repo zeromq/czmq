@@ -46,6 +46,12 @@
     <ClCompile Include="..\src\zfile.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\zmutex.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\zsys.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\czmq.h">
