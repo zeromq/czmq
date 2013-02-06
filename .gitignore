@@ -102,3 +102,4 @@ ipch/
 *.cache
 
 *.db
+*.dll
