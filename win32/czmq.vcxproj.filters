@@ -96,5 +96,8 @@
     <ClInclude Include="..\include\zfile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\zsys.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
