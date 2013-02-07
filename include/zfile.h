@@ -41,6 +41,9 @@ CZMQ_EXPORT ssize_t
     zfile_size (const char *filename);
 
 //  Return file mode
+#if (defined (__WINDOWS__) && !defined (mode_t))
+typedef int mode_t;
+#endif
 CZMQ_EXPORT mode_t
     zfile_mode (const char *filename);
 

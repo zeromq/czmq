@@ -389,11 +389,12 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 #      else
            typedef char bool;
 #      endif
+#   endif
+#endif
 //  Deprecated, remove at some stage
 #if (!defined (TRUE))
 #    define TRUE        1
 #    define FALSE       0
-#   endif
 #endif
 
 //- A number of POSIX and C99 keywords and data types -----------------------
