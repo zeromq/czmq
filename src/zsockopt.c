@@ -758,7 +758,7 @@ zsocket_identity (void *zocket)
 {
 #   if defined (ZMQ_IDENTITY)
     size_t option_len = 255;
-    char *identity = (char*)zmalloc (option_len);
+    char *identity = zmalloc (option_len);
     zmq_getsockopt (zocket, ZMQ_IDENTITY, identity, &option_len);
     return (char *) identity;
 #   endif
@@ -1247,7 +1247,7 @@ zsocket_last_endpoint (void *zocket)
 {
 #   if defined (ZMQ_LAST_ENDPOINT)
     size_t option_len = 255;
-    char *last_endpoint = (char*)zmalloc (option_len);
+    char *last_endpoint = zmalloc (option_len);
     zmq_getsockopt (zocket, ZMQ_LAST_ENDPOINT, last_endpoint, &option_len);
     return (char *) last_endpoint;
 #   endif

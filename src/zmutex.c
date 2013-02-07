@@ -122,11 +122,10 @@ zmutex_unlock (zmutex_t *self)
 int
 zmutex_test (bool verbose)
 {
-    zmutex_t *mutex;
-	printf (" * zmutex: ");
+    printf (" * zmutex: ");
 
     //  @selftest
-    mutex = zmutex_new ();
+    zmutex_t *mutex = zmutex_new ();
     zmutex_lock (mutex);
     zmutex_unlock (mutex);
     zmutex_destroy (&mutex);

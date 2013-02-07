@@ -126,7 +126,6 @@
     <ClCompile Include="..\src\zctx.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="..\src\zfile.c" />
     <ClCompile Include="..\src\zframe.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
     </ClCompile>
@@ -142,7 +141,6 @@
     <ClCompile Include="..\src\zmsg.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="..\src\zmutex.c" />
     <ClCompile Include="..\src\zsocket.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
     </ClCompile>
@@ -152,7 +150,6 @@
     <ClCompile Include="..\src\zstr.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="..\src\zsys.c" />
     <ClCompile Include="..\src\zthread.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
     </ClCompile>
@@ -162,7 +159,6 @@
     <ClInclude Include="..\include\czmq_prelude.h" />
     <ClInclude Include="..\include\zclock.h" />
     <ClInclude Include="..\include\zctx.h" />
-    <ClInclude Include="..\include\zfile.h" />
     <ClInclude Include="..\include\zframe.h" />
     <ClInclude Include="..\include\zhash.h" />
     <ClInclude Include="..\include\zlist.h" />

@@ -85,7 +85,6 @@ build/
 *.unsuccessfulbuild
 *.lastbuildstate
 *.tlog
-*.exp
 [Bb]ackup/
 
 # MSTest test Results
@@ -99,7 +98,9 @@ ipch/
 *.opensdf
 *.sdf
 *.cachefile
-*.cache
 
 *.db
 *.dll
+*.orig
+*.exp
+*.cache

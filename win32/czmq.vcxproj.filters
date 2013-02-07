@@ -46,12 +46,6 @@
     <ClCompile Include="..\src\zfile.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\zmutex.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\zsys.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\czmq.h">
@@ -93,11 +87,8 @@
     <ClInclude Include="..\include\zthread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\zfile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\zsys.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

@@ -213,8 +213,7 @@ zctx_underlying (zctx_t *self)
 void *
 zctx__socket_new (zctx_t *self, int type)
 {
-    void *zocket;
-	//  Initialize context now if necessary
+    //  Initialize context now if necessary
     assert (self);
     if (!self->context)
         self->context = zmq_init (self->iothreads);
@@ -222,7 +221,7 @@ zctx__socket_new (zctx_t *self, int type)
         return NULL;
 
     //  Create and register socket
-    zocket = zmq_socket (self->context, type);
+    void *zocket = zmq_socket (self->context, type);
     if (!zocket)
         return NULL;
 
@@ -254,18 +253,11 @@ zctx__socket_destroy (zctx_t *self, void *zocket)
 int
 zctx_test (bool verbose)
 {
-    zctx_t *ctx;
-	void *s1;
-	void *s2;
-	void *s3;
-	void *s4;
-	void *s5;
-	void *s6;
-	printf (" * zctx: ");
+    printf (" * zctx: ");
 
     //  @selftest
     //  Create and destroy a context without using it
-    ctx = zctx_new ();
+    zctx_t *ctx = zctx_new ();
     assert (ctx);
     zctx_destroy (&ctx);
     assert (ctx == NULL);
@@ -275,12 +267,12 @@ zctx_test (bool verbose)
     assert (ctx);
     zctx_set_iothreads (ctx, 1);
     zctx_set_linger (ctx, 5);       //  5 msecs
-    s1 = zctx__socket_new (ctx, ZMQ_PAIR);
-    s2 = zctx__socket_new (ctx, ZMQ_XREQ);
-    s3 = zctx__socket_new (ctx, ZMQ_REQ);
-    s4 = zctx__socket_new (ctx, ZMQ_REP);
-    s5 = zctx__socket_new (ctx, ZMQ_PUB);
-    s6 = zctx__socket_new (ctx, ZMQ_SUB);
+    void *s1 = zctx__socket_new (ctx, ZMQ_PAIR);
+    void *s2 = zctx__socket_new (ctx, ZMQ_XREQ);
+    void *s3 = zctx__socket_new (ctx, ZMQ_REQ);
+    void *s4 = zctx__socket_new (ctx, ZMQ_REP);
+    void *s5 = zctx__socket_new (ctx, ZMQ_PUB);
+    void *s6 = zctx__socket_new (ctx, ZMQ_SUB);
     zsocket_connect (s1, "tcp://127.0.0.1:5555");
     zsocket_connect (s2, "tcp://127.0.0.1:5555");
     zsocket_connect (s3, "tcp://127.0.0.1:5555");

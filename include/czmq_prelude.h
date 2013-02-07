@@ -363,6 +363,7 @@
 #endif
 
 //- Data types --------------------------------------------------------------
+
 typedef          int    Bool;           //  Boolean TRUE/FALSE value
 typedef unsigned char   byte;           //  Single unsigned byte = 8 bits
 typedef unsigned short  dbyte;          //  Double byte = 16 bits
@@ -388,6 +389,10 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 #      else
            typedef char bool;
 #      endif
+//  Deprecated, remove at some stage
+#if (!defined (TRUE))
+#    define TRUE        1
+#    define FALSE       0
 #   endif
 #endif
 
