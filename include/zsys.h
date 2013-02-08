@@ -44,7 +44,7 @@ CZMQ_EXPORT void
     zsys_handler_reset (void);
 
 //  Self test of this class
-int
+CZMQ_EXPORT int
     zsys_test (bool verbose);
 //  @end
 
