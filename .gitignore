@@ -104,3 +104,5 @@ ipch/
 *.orig
 *.exp
 *.cache
+*.dll.txt
+*.lib.txt
