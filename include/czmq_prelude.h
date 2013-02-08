@@ -471,7 +471,7 @@ static inline void *
 //- DLL exports -------------------------------------------------------------
 
 #if (defined (__WINDOWS__))
-#   if defined DLL_EXPORT
+#   if defined CZMQ_DLL_EXPORT
 #       define CZMQ_EXPORT __declspec(dllexport)
 #   else
 #       define CZMQ_EXPORT __declspec(dllimport)
