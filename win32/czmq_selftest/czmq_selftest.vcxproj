@@ -93,12 +93,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="czmq.vcxproj">
-      <Project>{0c4a2e28-8c9e-4b27-85d9-bb679ad84ac7}</Project>
-    </ProjectReference>
+    <ClCompile Include="..\..\src\czmq_selftest.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\czmq_selftest.c" />
+    <ProjectReference Include="..\czmq.vcxproj">
+      <Project>{0c4a2e28-8c9e-4b27-85d9-bb679ad84ac7}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

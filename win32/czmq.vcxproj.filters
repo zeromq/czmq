@@ -93,6 +93,7 @@
     <ClInclude Include="..\include\zmutex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
@@ -101,5 +102,8 @@
     <Filter Include="Header Files">
       <UniqueIdentifier>{8eaf34db-b6e4-493a-bdea-8f9f9353ec36}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
 </Project>

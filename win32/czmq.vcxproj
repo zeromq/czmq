@@ -175,6 +175,10 @@
     <ClInclude Include="..\include\zstr.h" />
     <ClInclude Include="..\include\zsys.h" />
     <ClInclude Include="..\include\zthread.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
