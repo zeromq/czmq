@@ -71,11 +71,11 @@ struct _zctx_t {
 //  Signal handling
 //  This is a global variable accessible to CZMQ application code
 static volatile int zctx_interrupted_private = 0;
-volatile int zctx_interrupted()
+volatile int zctx_is_interrupted()
 {
 	return zctx_interrupted_private;
 }
-void zctx_interrupted_set(volatile int interrupted)
+void zctx_interrupt(volatile int interrupted)
 {
 	zctx_interrupted_private = interrupted;
 }
@@ -83,7 +83,7 @@ void zctx_interrupted_set(volatile int interrupted)
 static void
 s_signal_handler (int signal_value)
 {
-    zctx_interrupted_set(1);
+    zctx_interrupt(1);
 }
 
 

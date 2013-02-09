@@ -346,7 +346,7 @@ zloop_start (zloop_t *self)
         timer = (s_timer_t *) zlist_next (self->timers);
     }
     //  Main reactor loop
-    while (!zctx_interrupted()) {
+    while (!zctx_is_interrupted()) {
         if (self->dirty) {
             // If s_rebuild_pollset() fails, break out of the loop and
             // return its error
@@ -356,7 +356,7 @@ zloop_start (zloop_t *self)
         }
         rc = zmq_poll (self->pollset, (int) self->poll_size,
                        s_tickless_timer (self) * ZMQ_POLL_MSEC);
-        if (rc == -1 || zctx_interrupted()) {
+        if (rc == -1 || zctx_is_interrupted()) {
             if (self->verbose)
                 zclock_log ("I: zloop: interrupted (%d) - %s", rc, strerror (errno));
             rc = 0;
