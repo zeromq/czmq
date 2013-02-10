@@ -46,7 +46,7 @@ CZMQ_EXPORT void
     zclock_log (const char *format, ...);
 
 //  Self test of this class
-int
+CZMQ_EXPORT int
     zclock_test (bool verbose);
 //  @end
 

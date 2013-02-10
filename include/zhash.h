@@ -117,7 +117,7 @@ CZMQ_EXPORT void
     zhash_autofree (zhash_t *self);
     
 //  Self test of this class
-void
+CZMQ_EXPORT void
     zhash_test (int verbose);
 //  @end
 

@@ -77,7 +77,7 @@ CZMQ_EXPORT char *
     zsocket_type_str (void *socket);
 
 //  Self test of this class
-int
+CZMQ_EXPORT int
     zsocket_test (bool verbose);
 //  @end
 

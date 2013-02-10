@@ -380,10 +380,16 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 #   define randof(num)  (int) ((float) (num) * random () / (RAND_MAX + 1.0))
 #endif
 //  I'd rather use stdbool.h but that is not available on current MSVC
-#if (!defined (true))
-#    define true        1
-#    define false       0
-     typedef char bool;
+#if (!defined (__cplusplus))	// It is illegal to redefine keywords in C++
+#   if (!defined (true))
+#       define true        1
+#       define false       0
+#      if (defined (__WINDOWS__) && !defined (bool))
+#          define bool char
+#      else
+           typedef char bool;
+#      endif
+#   endif
 #endif
 //  Deprecated, remove at some stage
 #if (!defined (TRUE))
@@ -394,7 +400,9 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 //- A number of POSIX and C99 keywords and data types -----------------------
 
 #if (defined (__WINDOWS__))
-#   define inline __inline
+#   if (!defined (__cplusplus))
+#      define inline __inline
+#   endif
 #   define strtoull _strtoui64
 #   define srandom srand
 #   define TIMEZONE _timezone
@@ -463,7 +471,7 @@ static inline void *
 //- DLL exports -------------------------------------------------------------
 
 #if (defined (__WINDOWS__))
-#   if defined DLL_EXPORT
+#   if defined CZMQ_DLL_EXPORT
 #       define CZMQ_EXPORT __declspec(dllexport)
 #   else
 #       define CZMQ_EXPORT __declspec(dllimport)
