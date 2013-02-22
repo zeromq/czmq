@@ -16,21 +16,13 @@ CZMQ_EXPORT char *
 CZMQ_EXPORT char *
     zstr_recv_nowait (void *socket);
 
-//  Send a string to a socket in 0MQ string format
-CZMQ_EXPORT int
-    zstr_send (void *socket, const char *string);
-
-//  Send a string to a socket in 0MQ string format, with MORE flag
-CZMQ_EXPORT int
-    zstr_sendm (void *socket, const char *string);
-
 //  Send a formatted string to a socket
 CZMQ_EXPORT int
-    zstr_sendf (void *socket, const char *format, ...);
+    zstr_send (void *socket, const char *format, ...);
 
-//  Send formatted C string to socket with MORE flag
+//  Send a formatted string to a socket, with MORE flag
 CZMQ_EXPORT int
-    zstr_sendfm (void *socket, const char *format, ...);
+    zstr_sendm (void *socket, const char *format, ...);
 
 //  Self test of this class
 int
@@ -63,9 +55,9 @@ EXAMPLE
     //  Send ten strings, five strings with MORE flag and then END
     int string_nbr;
     for (string_nbr = 0; string_nbr < 10; string_nbr++)
-        zstr_sendf (output, "this is string %d", string_nbr);
+        zstr_send (output, "this is string %d", string_nbr);
     for (string_nbr = 0; string_nbr < 5; string_nbr++)
-        zstr_sendfm (output, "this is string %d", string_nbr);
+        zstr_sendm (output, "this is string %d", string_nbr);
     zstr_send (output, "END");
 
     //  Read and count until we receive END

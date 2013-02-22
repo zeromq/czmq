@@ -90,8 +90,9 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <zmq.h>],
                [AC_MSG_RESULT([yes])],
                [AC_MSG_ERROR([no. Please specify libzmq installation prefix using --with-libzmq])])
 
-#Whether we are on mingw or not.
+# Platform specific checks
 czmq_on_mingw32="no"
+czmq_on_android="no"
 
 # Host speciffic checks
 AC_CANONICAL_HOST
@@ -126,6 +127,13 @@ case "${host_os}" in
         # Define on Linux to enable all library features
         CPPFLAGS="-D_GNU_SOURCE -DLINUX $CPPFLAGS"
         AC_DEFINE(CZMQ_HAVE_LINUX, 1, [Have Linux OS])
+        
+        case "${host_os}" in
+            *android*)
+                AC_DEFINE(CZMQ_HAVE_ANDROID, 1, [Have Android OS])
+                czmq_on_android="yes"
+            ;;
+        esac
         ;;
     *solaris*)
         # Define on Solaris to enable all library features
@@ -184,6 +192,12 @@ esac
 AC_HEADER_STDC
 AC_CHECK_HEADERS(errno.h arpa/inet.h netinet/tcp.h netinet/in.h stddef.h \
 stdlib.h string.h sys/socket.h sys/time.h unistd.h limits.h)
+AC_CHECK_HEADERS([net/if.h net/if_media.h linux/wireless.h], [], [],
+[
+#ifdef HAVE_SYS_SOCKET_H
+# include <sys/socket.h>
+#endif
+])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
@@ -204,12 +218,13 @@ if test "x$GCC" = "xyes"; then
 fi
 
 AM_CONDITIONAL(ON_MINGW, test "x$czmq_on_mingw32" = "xyes")
+AM_CONDITIONAL(ON_ANDROID, test "x$czmq_on_android" = "xyes")
 AM_CONDITIONAL(INSTALL_MAN, test "x$czmq_install_man" = "xyes")
 AM_CONDITIONAL(BUILD_DOC, test "x$czmq_build_doc" = "xyes")
 
 # Checks for library functions.
 AC_TYPE_SIGNAL
-AC_CHECK_FUNCS(perror gettimeofday memset)
+AC_CHECK_FUNCS(perror gettimeofday memset getifaddrs freeifaddrs)
 
 AC_OUTPUT(Makefile src/Makefile doc/Makefile src/libczmq.pc)
 

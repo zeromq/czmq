@@ -6,6 +6,7 @@ pkgconfig_DATA = libczmq.pc
 include_HEADERS = \
     ../include/czmq.h \
     ../include/czmq_prelude.h \
+    ../include/zbeacon.h \
     ../include/zclock.h \
     ../include/zctx.h \
     ../include/zfile.h \
@@ -22,6 +23,7 @@ include_HEADERS = \
     ../include/zthread.h
 
 libczmq_la_SOURCES = \
+    zbeacon.c \
     zclock.c \
     zctx.c \
     zfile.c \

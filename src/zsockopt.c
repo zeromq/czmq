@@ -998,6 +998,8 @@ zsocket_set_maxmsgsize (void *zocket, int maxmsgsize)
 #   if defined (ZMQ_MAXMSGSIZE)
     int64_t value = maxmsgsize;
     int rc = zmq_setsockopt (zocket, ZMQ_MAXMSGSIZE, &value, sizeof (int64_t));
+if (rc != 0)
+puts (strerror (errno));
     assert (rc == 0 || errno == ETERM);
 #   endif
 }
