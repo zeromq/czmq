@@ -1,6 +1,7 @@
 MAN1 =
 MAN3 =
 MAN7 = czmq.7 \
+    zbeacon.7 \
     zclock.7 \
     zctx.7 \
     zfile.7 \

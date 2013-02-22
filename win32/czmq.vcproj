@@ -173,193 +173,104 @@
             Name="Source Files"
             Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
             >
-            <File
-                RelativePath="..\src\zclock.c"
-                >
-                <FileConfiguration
-                    Name="Debug|Win32"
-                    >
-                    <Tool
-                        Name="VCCLCompilerTool"
-                        CompileAs="2"
-                    />
+            <File RelativePath="..\src\zbeacon.c" >
+                <FileConfiguration Name="Debug|Win32" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File
-                RelativePath="..\src\zctx.c"
-                >
-                <FileConfiguration
-                    Name="Debug|Win32"
-                    >
-                    <Tool
-                        Name="VCCLCompilerTool"
-                        CompileAs="2"
-                    />
+            <File RelativePath="..\src\zclock.c" >
+                <FileConfiguration Name="Debug|Win32" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File
-                RelativePath="..\src\zframe.c"
-                >
-                <FileConfiguration
-                    Name="Debug|Win32"
-                    >
-                    <Tool
-                        Name="VCCLCompilerTool"
-                        CompileAs="2"
-                    />
+            <File RelativePath="..\src\zctx.c" > 
+                <FileConfiguration Name="Debug|Win32" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File
-                RelativePath="..\src\zhash.c"
-                >
-                <FileConfiguration
-                    Name="Debug|Win32"
-                    >
-                    <Tool
-                        Name="VCCLCompilerTool"
-                        CompileAs="2"
-                    />
+            <File RelativePath="..\src\zframe.c" >
+                <FileConfiguration Name="Debug|Win32" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File
-                RelativePath="..\src\zlist.c"
-                >
-                <FileConfiguration
-                    Name="Debug|Win32"
-                    >
-                    <Tool
-                        Name="VCCLCompilerTool"
-                        CompileAs="2"
-                    />
+            <File RelativePath="..\src\zhash.c" >
+                <FileConfiguration Name="Debug|Win32" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File
-                RelativePath="..\src\zloop.c"
-                >
-                <FileConfiguration
-                    Name="Debug|Win32"
-                    >
-                    <Tool
-                        Name="VCCLCompilerTool"
-                        CompileAs="2"
-                    />
+            <File RelativePath="..\src\zlist.c" >
+                <FileConfiguration Name="Debug|Win32" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File
-                RelativePath="..\src\zmsg.c"
-                >
-                <FileConfiguration
-                    Name="Debug|Win32"
-                    >
-                    <Tool
-                        Name="VCCLCompilerTool"
-                        CompileAs="2"
-                    />
+            <File RelativePath="..\src\zloop.c" >
+                <FileConfiguration Name="Debug|Win32" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File
-                RelativePath="..\src\zsocket.c"
-                >
-                <FileConfiguration
-                    Name="Debug|Win32"
-                    >
-                    <Tool
-                        Name="VCCLCompilerTool"
-                        CompileAs="2"
-                    />
+            <File RelativePath="..\src\zmsg.c" >
+                <FileConfiguration Name="Debug|Win32" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File
-                RelativePath="..\src\zsockopt.c"
-                >
-                <FileConfiguration
-                    Name="Debug|Win32"
-                    >
-                    <Tool
-                        Name="VCCLCompilerTool"
-                        CompileAs="2"
-                    />
+            <File RelativePath="..\src\zmutex.c" >
+                <FileConfiguration Name="Debug|Win32" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File
-                RelativePath="..\src\zstr.c"
-                >
-                <FileConfiguration
-                    Name="Debug|Win32"
-                    >
-                    <Tool
-                        Name="VCCLCompilerTool"
-                        CompileAs="2"
-                    />
+            <File RelativePath="..\src\zsocket.c" >
+                <FileConfiguration Name="Debug|Win32" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File
-                RelativePath="..\src\zthread.c"
-                >
-                <FileConfiguration
-                    Name="Debug|Win32"
-                    >
-                    <Tool
-                        Name="VCCLCompilerTool"
-                        CompileAs="2"
-                    />
+            <File RelativePath="..\src\zsockopt.c" >
+                <FileConfiguration Name="Debug|Win32" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
+                </FileConfiguration>
+            </File>
+            <File RelativePath="..\src\zstr.c" >
+                <FileConfiguration Name="Debug|Win32" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
+                </FileConfiguration>
+            </File>
+            <File RelativePath="..\src\zthread.c" >
+                <FileConfiguration Name="Debug|Win32" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
         </Filter>
         <Filter
             Name="Header Files"
             >
-            <File
-                RelativePath="..\include\czmq.h"
-                >
+            <File RelativePath="..\include\czmq.h" >
             </File>
-            <File
-                RelativePath="..\include\czmq_prelude.h"
-                >
+            <File RelativePath="..\include\czmq_prelude.h" >
             </File>
-            <File
-                RelativePath="..\include\zclock.h"
-                >
+            <File RelativePath="..\include\zbeacon.h" >
             </File>
-            <File
-                RelativePath="..\include\zctx.h"
-                >
+            <File RelativePath="..\include\zclock.h" >
             </File>
-            <File
-                RelativePath="..\include\zframe.h"
-                >
+            <File RelativePath="..\include\zctx.h" >
             </File>
-            <File
-                RelativePath="..\include\zhash.h"
-                >
+            <File RelativePath="..\include\zframe.h" >
             </File>
-            <File
-                RelativePath="..\include\zlist.h"
-                >
+            <File RelativePath="..\include\zhash.h" >
             </File>
-            <File
-                RelativePath="..\include\zloop.h"
-                >
+            <File RelativePath="..\include\zlist.h" >
             </File>
-            <File
-                RelativePath="..\include\zmsg.h"
-                >
+            <File RelativePath="..\include\zloop.h" >
             </File>
-            <File
-                RelativePath="..\include\zsocket.h"
-                >
+            <File RelativePath="..\include\zmsg.h" >
             </File>
-            <File
-                RelativePath="..\include\zsockopt.h"
-                >
+            <File RelativePath="..\include\zmutex.h" >
             </File>
-            <File
-                RelativePath="..\include\zstr.h"
-                >
+            <File RelativePath="..\include\zsocket.h" >
             </File>
-            <File
-                RelativePath="..\include\zthread.h"
-                >
+            <File RelativePath="..\include\zsockopt.h" >
+            </File>
+            <File RelativePath="..\include\zstr.h" >
+            </File>
+            <File RelativePath="..\include\zthread.h" >
             </File>
         </Filter>
     </Files>

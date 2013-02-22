@@ -96,7 +96,7 @@ EXAMPLE
     int port = zsocket_bind (writer, "tcp://%s:*", interf);
     assert (port >= ZSOCKET_DYNFROM && port <= ZSOCKET_DYNTO);
 
-    assert (zsocket_poll (writer, 100) == FALSE);
+    assert (zsocket_poll (writer, 100) == false);
 
     rc = zsocket_connect (reader, "txp://%s:%d", domain, service);
     assert (rc == -1);

@@ -231,7 +231,7 @@ zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
 
     s_poller_t *poller = s_poller_new (item, handler, arg);
     if (poller) {
-        if (zlist_push (self->pollers, poller))
+        if (zlist_append (self->pollers, poller))
             return -1;
 
         self->dirty = true;
@@ -287,7 +287,7 @@ zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *
     s_timer_t *timer = s_timer_new (delay, times, handler, arg);
     if (!timer)
         return -1;
-    if (zlist_push (self->timers, timer))
+    if (zlist_append (self->timers, timer))
         return -1;
     if (self->verbose)
         zclock_log ("I: zloop: register timer delay=%d times=%d", delay, times);
@@ -330,7 +330,7 @@ zloop_set_verbose (zloop_t *self, bool verbose)
 //  Start the reactor. Takes control of the thread and returns when the 0MQ
 //  context is terminated or the process is interrupted, or any event handler
 //  returns -1. Event handlers may register new sockets and timers, and
-//  cancel sockets. Returns 0 if interrupted, -1 if cancelled by a
+//  cancel sockets. Returns 0 if interrupted, -1 if canceled by a
 //  handler, positive on internal error
 
 int
@@ -424,6 +424,7 @@ zloop_start (zloop_t *self)
                 if (timer->arg == arg) {
                     zlist_remove (self->timers, timer);
                     free (timer);
+                    break;
                 }
                 timer = (s_timer_t *) zlist_next (self->timers);
             }
@@ -452,7 +453,7 @@ s_socket_event (zloop_t *loop, zmq_pollitem_t *item, void *arg)
     return -1;
 }
 
-int
+void
 zloop_test (bool verbose)
 {
     printf (" * zloop: ");
@@ -487,5 +488,4 @@ zloop_test (bool verbose)
     zctx_destroy (&ctx);
     //  @end
     printf ("OK\n");
-    return 0;
 }
