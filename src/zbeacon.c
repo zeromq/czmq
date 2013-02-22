@@ -488,19 +488,19 @@ s_handle_io_error (char *reason)
     ||  errno == EHOSTUNREACH
     ||  errno == ENETUNREACH
     ||  errno == EINTR
+    ||  errno == EPIPE
+    ||  errno == ECONNRESET
 #if !defined (__WINDOWS__)
     ||  errno == EPROTO
     ||  errno == ENOPROTOOPT
     ||  errno == EHOSTDOWN
-    ||  errno == ENONET
     ||  errno == EOPNOTSUPP
     ||  errno == EWOULDBLOCK
 #endif
+#if defined (ENONET)
+    ||  errno == ENONET
+#endif
     )
-        return;             //  Ignore error and try again
-    else
-    if (errno == EPIPE
-    ||  errno == ECONNRESET)
         return;             //  Ignore error and try again
     else {
         zclock_log ("E: (UDP) error '%s' on %s", strerror (errno), reason);
