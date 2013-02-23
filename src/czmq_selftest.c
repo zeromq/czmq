@@ -52,6 +52,7 @@ int main (int argc, char *argv [])
     zstr_test (verbose);
     zsys_test (verbose);
     zthread_test (verbose);
+    zbeacon_test (verbose);
     printf ("Tests passed OK\n");
     return 0;
 }

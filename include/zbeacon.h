@@ -1,6 +1,6 @@
 /*  =========================================================================
-    zmutex - working with mutexes
-
+    zbeacon - LAN service announcement and discovery
+    
     -------------------------------------------------------------------------
     Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
@@ -24,36 +24,60 @@
     =========================================================================
 */
 
-#ifndef __ZMUTEX_H_INCLUDED__
-#define __ZMUTEX_H_INCLUDED__
+#ifndef __ZBEACON_H_INCLUDED__
+#define __ZBEACON_H_INCLUDED__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 //  Opaque class structure
-typedef struct _zmutex_t zmutex_t;
+typedef struct _zbeacon_t zbeacon_t;
 
 //  @interface
-//  Create a new mutex container
-CZMQ_EXPORT zmutex_t *
-    zmutex_new (void);
-
-//  Destroy a mutex container
+//  Create a new beacon
+CZMQ_EXPORT zbeacon_t *
+    zbeacon_new (int port_nbr);
+    
+//  Destroy a beacon
 CZMQ_EXPORT void
-    zmutex_destroy (zmutex_t **self_p);
+    zbeacon_destroy (zbeacon_t **self_p);
 
-//  Lock mutex
+//  Set broadcast interval in milliseconds (default is 1000 msec)
 CZMQ_EXPORT void
-    zmutex_lock (zmutex_t *self);
+    zbeacon_set_interval (zbeacon_t *self, int interval);
 
-//  Unlock mutex
+//  Filter out any beacon that looks exactly like ours
 CZMQ_EXPORT void
-    zmutex_unlock (zmutex_t *self);
+    zbeacon_noecho (zbeacon_t *self);
 
+//  Start broadcasting beacon to peers at the specified interval
+CZMQ_EXPORT void
+    zbeacon_publish (zbeacon_t *self, byte *transmit, size_t size);
+    
+//  Stop broadcasting beacons
+CZMQ_EXPORT void
+    zbeacon_silence (zbeacon_t *self);
+
+//  Start listening to other peers; zero-sized filter means get everything
+CZMQ_EXPORT void
+    zbeacon_subscribe (zbeacon_t *self, byte *filter, size_t size);
+
+//  Stop listening to other peers
+CZMQ_EXPORT void
+    zbeacon_unsubscribe (zbeacon_t *self);
+
+//  Get beacon pipe, for polling or receiving messages off
+CZMQ_EXPORT void *
+    zbeacon_pipe (zbeacon_t *self);
+    
+//  Return our own IP address as printable string
+CZMQ_EXPORT char *
+    zbeacon_hostname (zbeacon_t *self);
+    
 //  Self test of this class
-int
-    zmutex_test (bool verbose);
+void
+    zbeacon_test (bool verbose);
 //  @end
 
 #ifdef __cplusplus

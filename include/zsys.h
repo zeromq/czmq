@@ -24,8 +24,8 @@
     =========================================================================
 */
 
-#ifndef __ZFL_SYS_H_INCLUDED__
-#define __ZFL_SYS_H_INCLUDED__
+#ifndef __ZSYS_H_INCLUDED__
+#define __ZSYS_H_INCLUDED__
 
 #ifdef __cplusplus
 extern "C" {
