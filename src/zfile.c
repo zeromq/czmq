@@ -41,7 +41,7 @@ bool
 zfile_exists (const char *filename)
 {
     assert (filename);
-    return (int) zfile_mode (filename) > 0;
+    return zfile_mode (filename) != (mode_t)-1;
 }
 
 
