@@ -61,6 +61,14 @@
 #   include <iphlpapi.h>            //  For GetAdaptersAddresses ()
 #endif
 
+//  Basic WinSock compatibility
+#if !defined(__WINDOWS__)
+typedef SOCKET int
+#define closesocket close
+#define INVALID_SOCKET -1
+#define SOCKET_ERROR -1
+#endif
+
 //  Constants
 #define BEACON_MAX      255         //  Max size of beacon data
 #define INTERVAL_DFLT  1000         //  Default interval = 1 second
@@ -327,7 +335,7 @@ zbeacon_test (bool verbose)
     
 typedef struct {
     void *pipe;                 //  Socket to talk back to application
-    int udpsock;                //  UDP socket for send/recv
+    SOCKET udpsock;             //  UDP socket for send/recv
     int port_nbr;               //  UDP port number we work on
     int interval;               //  Beacon broadcast interval
     bool enabled;               //  Are we broadcasting?
@@ -419,25 +427,25 @@ s_agent_new (void *pipe, int port_nbr)
 
     //  Create our UDP socket
     self->udpsock = socket (AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (self->udpsock == -1)
+    if (self->udpsock == INVALID_SOCKET)
         s_handle_io_error ("socket");
 
     //  Ask operating system to let us do broadcasts from socket
     int on = 1;
     if (setsockopt (self->udpsock, SOL_SOCKET, SO_BROADCAST,
-                   (char *) &on, sizeof (on)) == -1)
+                   (char *) &on, sizeof (on)) == SOCKET_ERROR)
         s_handle_io_error ("setsockopt (SO_BROADCAST)");
 
     //  Allow multiple owners to bind to socket; incoming
     //  messages will replicate to each owner
     if (setsockopt (self->udpsock, SOL_SOCKET, SO_REUSEADDR,
-                   (char *) &on, sizeof (on)) == -1)
+                   (char *) &on, sizeof (on)) == SOCKET_ERROR)
         s_handle_io_error ("setsockopt (SO_REUSEADDR)");
 
 #if defined (SO_REUSEPORT)
     //  On some platforms we have to ask to reuse the port
     if (setsockopt (self->udpsock, SOL_SOCKET, SO_REUSEPORT,
-                    (char *) &on, sizeof (on)) == -1)
+                    (char *) &on, sizeof (on)) == SOCKET_ERROR)
         s_handle_io_error ("setsockopt (SO_REUSEPORT)");
 #endif
     //  PROBLEM: this design will not survive the network interface
@@ -448,7 +456,7 @@ s_agent_new (void *pipe, int port_nbr)
     sockaddr.sin_family = AF_INET;
     sockaddr.sin_port = htons (self->port_nbr);
     sockaddr.sin_addr.s_addr = htonl (INADDR_ANY);
-    if (bind (self->udpsock, (struct sockaddr *) &sockaddr, sizeof (sockaddr)) == -1)
+    if (bind (self->udpsock, (struct sockaddr *) &sockaddr, sizeof (sockaddr)) == SOCKET_ERROR)
         s_handle_io_error ("bind");
 
     //  Get the network interface
@@ -604,8 +612,8 @@ s_get_interface (agent_t *self)
 static bool
 s_wireless_nic (const char *name)
 {
-    int sock = socket (AF_INET, SOCK_DGRAM, 0);
-    if (sock == -1)
+    SOCKET sock = socket (AF_INET, SOCK_DGRAM, 0);
+    if (sock == INVALID_SOCKET)
         s_handle_io_error ("socket");
 
     bool is_nic = FALSE;
@@ -625,7 +633,7 @@ s_wireless_nic (const char *name)
     if (res != -1)
         is_nic = TRUE;
 #endif
-    close (sock);
+    closesocket (sock);
     return is_nic;
 }
 
@@ -685,10 +693,10 @@ s_beacon_recv (agent_t *self)
     byte buffer [BEACON_MAX];
     ssize_t size = recvfrom (
         self->udpsock,
-        buffer, BEACON_MAX,
+        (void *) buffer, BEACON_MAX,
         0,      //  Flags
         (struct sockaddr *) &sender, &si_len);
-    if (size == -1)
+    if (size == SOCKET_ERROR)
         s_handle_io_error ("recvfrom");
     
     //  Get sender address as printable string
@@ -731,10 +739,10 @@ s_beacon_send (agent_t *self)
     assert (self->transmit);
     ssize_t size = sendto (
         self->udpsock,
-        zframe_data (self->transmit), zframe_size (self->transmit),
+        (void *) zframe_data (self->transmit), zframe_size (self->transmit),
         0,      //  Flags
         (struct sockaddr *) &self->broadcast, sizeof (inaddr_t));
-    if (size == -1)
+    if (size == SOCKET_ERROR)
         s_handle_io_error ("sendto");
 }
 
@@ -746,7 +754,7 @@ s_agent_destroy (agent_t **self_p)
     assert (self_p);
     if (*self_p) {
         agent_t *self = *self_p;
-        close (self->udpsock);
+        closesocket (self->udpsock);
         zframe_destroy (&self->transmit);
         zframe_destroy (&self->filter);
         free (self);
