@@ -63,7 +63,7 @@
 
 //  Basic WinSock compatibility
 #if !defined(__WINDOWS__)
-typedef SOCKET int
+typedef SOCKET int;
 #define closesocket close
 #define INVALID_SOCKET -1
 #define SOCKET_ERROR -1
