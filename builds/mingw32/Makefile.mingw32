@@ -1,0 +1,26 @@
+CC=gcc
+# replace the following with wherever you have installed libzmq
+INCDIR=-I/code/include -I.
+LIBDIR=-L/code/lib
+CFLAGS=-Wall -Os -g -DDLL_EXPORT $(INCDIR)
+
+OBJS = zctx.o zsocket.o zsockopt.o zframe.o zmsg.o zstr.o zloop.o \
+	zhash.o zlist.o zmutex.o zclock.o zthread.o \
+	zsys.o zfile.o zbeacon.o
+
+%.o: ../../src/%.c
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+all: libczmq.dll czmq_selftest.exe
+
+libczmq.dll: $(OBJS)
+	gcc -shared -o $@ $(OBJS) -Wl,--out-implib,$@.a $(LIBDIR) -lzmq -lws2_32 -liphlpapi
+
+# the test functions are not exported into the DLL
+czmq_selftest.exe: czmq_selftest.o $(OBJS)
+	gcc -o $@ $^ $(LIBDIR) -lzmq -lws2_32 -liphlpapi
+	
+clean:
+	del *.o *.a *.dll *.exe
+
+	
