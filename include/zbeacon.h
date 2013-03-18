@@ -35,13 +35,17 @@ extern "C" {
 typedef struct _zbeacon_t zbeacon_t;
 
 //  @interface
-//  Create a new beacon
+//  Create a new beacon on a certain UDP port
 CZMQ_EXPORT zbeacon_t *
     zbeacon_new (int port_nbr);
     
 //  Destroy a beacon
 CZMQ_EXPORT void
     zbeacon_destroy (zbeacon_t **self_p);
+
+//  Return our own IP address as printable string
+CZMQ_EXPORT char *
+    zbeacon_hostname (zbeacon_t *self);
 
 //  Set broadcast interval in milliseconds (default is 1000 msec)
 CZMQ_EXPORT void
@@ -67,14 +71,10 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zbeacon_unsubscribe (zbeacon_t *self);
 
-//  Get beacon pipe, for polling or receiving messages off
+//  Get beacon pipe, for polling or receiving messages
 CZMQ_EXPORT void *
     zbeacon_pipe (zbeacon_t *self);
-    
-//  Return our own IP address as printable string
-CZMQ_EXPORT char *
-    zbeacon_hostname (zbeacon_t *self);
-    
+
 //  Self test of this class
 void
     zbeacon_test (bool verbose);
