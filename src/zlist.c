@@ -358,7 +358,7 @@ s_compare (void *item1, void *item2)
 
 
 //  --------------------------------------------------------------------------
-//  Set list for automatic item destruction
+//  Set list for automatic item destruction; item values MUST be strings.
 
 void
 zlist_autofree (zlist_t *self)
