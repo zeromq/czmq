@@ -79,7 +79,7 @@ CZMQ's contributors are listed in the AUTHORS file. It is held by the ZeroMQ org
 <A name="toc3-73" title="Contributing" />
 ### Contributing
 
-CZMQ uses the [C4 (Collective Code Construction Contract)](http://rfc.zeromq.org/spec:16) process for contributions.
+CZMQ uses the [C4.1 (Collective Code Construction Contract)](http://rfc.zeromq.org/spec:22) process for contributions.
 
 CZMQ uses the [CLASS (C Language Style for Scalabilty)](http://rfc.zeromq.org/spec:21) guide for code style.
 
