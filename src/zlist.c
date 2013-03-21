@@ -262,9 +262,11 @@ zlist_remove (zlist_t *self, void *item)
         if (node->next == NULL)
             self->tail = prev;
 
+        if (self->cursor == node)
+            self->cursor = prev;
+
         free (node);
         self->size--;
-        self->cursor = NULL;
     }
 }
 
