@@ -227,5 +227,5 @@ AC_TYPE_SIGNAL
 AC_CHECK_FUNCS(perror gettimeofday memset getifaddrs freeifaddrs)
 
 # Specify output files
-AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile win32/Makefile src/libczmq.pc])
+AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile builds/msvc/Makefile src/libczmq.pc])
 AC_OUTPUT
