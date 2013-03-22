@@ -226,5 +226,6 @@ AM_CONDITIONAL(BUILD_DOC, test "x$czmq_build_doc" = "xyes")
 AC_TYPE_SIGNAL
 AC_CHECK_FUNCS(perror gettimeofday memset getifaddrs freeifaddrs)
 
-AC_OUTPUT(Makefile src/Makefile doc/Makefile src/libczmq.pc)
-
+# Specify output files
+AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile win32/Makefile src/libczmq.pc])
+AC_OUTPUT
