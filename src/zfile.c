@@ -196,8 +196,8 @@ zfile_test (bool verbose)
     int rc = zfile_delete ("nosuchfile");
     assert (rc == -1);
 
-    rc = zfile_exists ("nosuchfile");
-    assert (rc != true);
+    bool rc_bool = zfile_exists ("nosuchfile");
+    assert (rc_bool != true);
 
     rc = (int) zfile_size ("nosuchfile");
     assert (rc == -1);

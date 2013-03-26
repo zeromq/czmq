@@ -380,18 +380,15 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 #   define randof(num)  (int) ((float) (num) * random () / (RAND_MAX + 1.0))
 #endif
 
-//  I'd rather use stdbool.h but that is not available on current MSVC
-#if (!defined (true))
-#    define true        1
-#    define false       0
-     typedef char bool;
-#endif
-     
-//  Deprecated, remove at some stage
-typedef          int    Bool;           //  Boolean TRUE/FALSE value
-#if (!defined (TRUE))
-#    define TRUE        1
-#    define FALSE       0
+// Windows MSVS doesn't have stdbool
+#if (defined (__WINDOWS__))
+#    if (!defined(__cplusplus) && (!defined (true)))
+#        define true 1
+#        define false 0
+         typedef char bool;
+#    endif
+#else
+#   include <stdbool.h>
 #endif
 
 //- A number of POSIX and C99 keywords and data types -----------------------
@@ -407,6 +404,7 @@ typedef          int    Bool;           //  Boolean TRUE/FALSE value
 #   endif
     typedef unsigned long ulong;
     typedef unsigned int  uint;
+	typedef int mode_t;
 #   if (!defined (__MINGW32__)) 
     typedef __int32 int32_t;
     typedef __int64 int64_t;
