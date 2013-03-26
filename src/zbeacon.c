@@ -41,7 +41,9 @@
 */
 
 #include "../include/czmq.h"
-#include "platform.h"
+#if !defined(__WINDOWS__)
+#   include "platform.h"
+#endif
 #if defined (HAVE_LINUX_WIRELESS_H)
 #   include <linux/wireless.h>
 #else
@@ -290,7 +292,7 @@ zbeacon_test (bool verbose)
         { zbeacon_pipe (node2), 0, ZMQ_POLLIN, 0 },
         { zbeacon_pipe (node3), 0, ZMQ_POLLIN, 0 }
     };
-    long stop_at = zclock_time () + 1000;
+    uint64_t stop_at = zclock_time () + 1000;
     while (zclock_time () < stop_at) {
         long timeout = (long) (stop_at - zclock_time ());
         if (timeout < 0)
@@ -580,7 +582,7 @@ s_get_interface (agent_t *self)
         GAA_FLAG_INCLUDE_PREFIX, NULL, NULL, &addr_size);
     assert (rc == ERROR_BUFFER_OVERFLOW);
 
-    PIP_ADAPTER_ADDRESSES pip_addresses = malloc (addr_size);
+    PIP_ADAPTER_ADDRESSES pip_addresses = (PIP_ADAPTER_ADDRESSES) malloc (addr_size);
     rc = GetAdaptersAddresses (AF_INET,
         GAA_FLAG_INCLUDE_PREFIX, NULL, pip_addresses, &addr_size);
     assert (rc == NO_ERROR);
@@ -693,7 +695,7 @@ s_beacon_recv (agent_t *self)
     byte buffer [BEACON_MAX];
     ssize_t size = recvfrom (
         self->udpsock,
-        (void *) buffer, BEACON_MAX,
+        (char *) buffer, BEACON_MAX,
         0,      //  Flags
         (struct sockaddr *) &sender, &si_len);
     if (size == SOCKET_ERROR)
@@ -739,7 +741,7 @@ s_beacon_send (agent_t *self)
     assert (self->transmit);
     ssize_t size = sendto (
         self->udpsock,
-        (void *) zframe_data (self->transmit), zframe_size (self->transmit),
+        (char *) zframe_data (self->transmit), zframe_size (self->transmit),
         0,      //  Flags
         (struct sockaddr *) &self->broadcast, sizeof (inaddr_t));
     if (size == SOCKET_ERROR)
