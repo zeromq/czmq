@@ -618,7 +618,7 @@ s_wireless_nic (const char *name)
     if (sock == INVALID_SOCKET)
         s_handle_io_error ("socket");
 
-    bool is_nic = FALSE;
+    bool is_nic = false;
 #if defined (SIOCGIFMEDIA)
     struct ifmediareq ifmr;
     memset (&ifmr, 0, sizeof (struct ifmediareq));
@@ -633,7 +633,7 @@ s_wireless_nic (const char *name)
     strncpy (wrq.ifr_name, name, sizeof (wrq.ifr_name));
     int res = ioctl (sock, SIOCGIWNAME, (caddr_t) &wrq);
     if (res != -1)
-        is_nic = TRUE;
+        is_nic = true;
 #endif
     closesocket (sock);
     return is_nic;
