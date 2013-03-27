@@ -41,9 +41,11 @@
 */
 
 #include "../include/czmq.h"
+
 #if !defined(__WINDOWS__)
 #   include "platform.h"
 #endif
+
 #if defined (HAVE_LINUX_WIRELESS_H)
 #   include <linux/wireless.h>
 #else
@@ -54,6 +56,11 @@
 #       include <net/if_media.h>
 #   endif
 #endif
+
+#if defined(__UTYPE_SUNSOLARIS) || defined(__UTYPE_SUNOS)
+#   include<sys/sockio.h>
+#endif
+
 #if defined (__WINDOWS__)
 #   if (_WIN32_WINNT < 0x0501)
 #       undef _WIN32_WINNT
