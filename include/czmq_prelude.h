@@ -404,8 +404,8 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 #   endif
     typedef unsigned long ulong;
     typedef unsigned int  uint;
-	typedef int mode_t;
 #   if (!defined (__MINGW32__)) 
+    typedef int mode_t;
     typedef __int32 int32_t;
     typedef __int64 int64_t;
     typedef unsigned __int32 uint32_t;
