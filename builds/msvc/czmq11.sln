@@ -24,9 +24,11 @@ Global
 		{A5497C4B-1CD1-4779-9458-2CF7908E7E26}.Debug|Win32.ActiveCfg = Debug|Win32
 		{A5497C4B-1CD1-4779-9458-2CF7908E7E26}.Debug|Win32.Build.0 = Debug|Win32
 		{A5497C4B-1CD1-4779-9458-2CF7908E7E26}.DebugDLL|Win32.ActiveCfg = DebugDLL|Win32
+		{A5497C4B-1CD1-4779-9458-2CF7908E7E26}.DebugDLL|Win32.Build.0 = DebugDLL|Win32
 		{A5497C4B-1CD1-4779-9458-2CF7908E7E26}.Release|Win32.ActiveCfg = Release|Win32
 		{A5497C4B-1CD1-4779-9458-2CF7908E7E26}.Release|Win32.Build.0 = Release|Win32
 		{A5497C4B-1CD1-4779-9458-2CF7908E7E26}.ReleaseDLL|Win32.ActiveCfg = ReleaseDLL|Win32
+		{A5497C4B-1CD1-4779-9458-2CF7908E7E26}.ReleaseDLL|Win32.Build.0 = ReleaseDLL|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
