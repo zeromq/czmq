@@ -74,7 +74,7 @@ s_poller_new (zmq_pollitem_t *item, zloop_fn handler, void *arg)
 {
     s_poller_t *poller = (s_poller_t *) zmalloc (sizeof (s_poller_t));
     if (poller) {
-        poller->ignore_errors = (item->events & ZMQ_IGNERR);
+        poller->ignore_errors = (item->events & ZMQ_IGNERR) != 0;
         poller->item = *item;
         poller->handler = handler;
         poller->arg = arg;
