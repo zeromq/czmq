@@ -76,7 +76,7 @@ CZMQ_EXPORT void *
     zbeacon_pipe (zbeacon_t *self);
 
 //  Self test of this class
-void
+CZMQ_EXPORT void
     zbeacon_test (bool verbose);
 //  @end
 

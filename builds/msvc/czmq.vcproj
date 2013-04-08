@@ -194,10 +194,10 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\include;..\..\..\libzmq\include"
-				PreprocessorDefinitions="DLL_EXPORT;WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;BASE_THREADSAFE"
+				PreprocessorDefinitions="LIBCZMQ_EXPORTS;_WIN32;WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;BASE_THREADSAFE"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
+				RuntimeLibrary="3"
 				PrecompiledHeaderFile="./czmq.pch"
 				AssemblerListingLocation="./"
 				ObjectFile="./"
@@ -219,7 +219,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\..\..\libzmq\lib\libzmq.lib Ws2_32.lib Iphlpapi.lib"
+				AdditionalDependencies="libzmq.lib Ws2_32.lib Iphlpapi.lib"
+				AdditionalLibraryDirectories="..\..\..\libzmq\lib\"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -277,7 +278,7 @@
 				AdditionalIncludeDirectories="..\..\include;..\..\..\libzmq\include"
 				PreprocessorDefinitions="DLL_EXPORT;WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;BASE_THREADSAFE"
 				StringPooling="true"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				PrecompiledHeaderFile="./czmq.pch"
 				AssemblerListingLocation="./"
@@ -299,7 +300,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\..\..\libzmq\lib\libzmq.lib Ws2_32.lib Iphlpapi.lib"
+				AdditionalDependencies="libzmq.lib Ws2_32.lib Iphlpapi.lib"
+				AdditionalLibraryDirectories="..\..\..\libzmq\lib\"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -867,10 +869,6 @@
 			</File>
 			<File
 				RelativePath="..\..\include\czmq_prelude.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\stdbool_for_windows.h"
 				>
 			</File>
 			<File

@@ -117,7 +117,7 @@ CZMQ_EXPORT void
     zframe_reset (zframe_t *self, const void *data, size_t size);
 
 //  Self test of this class
-int
+CZMQ_EXPORT int
     zframe_test (bool verbose);
 //  @end
 

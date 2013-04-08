@@ -83,7 +83,7 @@ CZMQ_EXPORT int
     zloop_start (zloop_t *self);
 
 //  Self test of this class
-void
+CZMQ_EXPORT void
     zloop_test (bool verbose);
 //  @end
 
