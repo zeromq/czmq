@@ -49,7 +49,7 @@ CZMQ_EXPORT int
     zstr_sendm (void *socket, const char *format, ...);
 
 //  Self test of this class
-int
+CZMQ_EXPORT int
     zstr_test (bool verbose);
 //  @end
 

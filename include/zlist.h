@@ -103,7 +103,7 @@ CZMQ_EXPORT void
     zlist_autofree (zlist_t *self);
 
 //  Self test of this class
-void
+CZMQ_EXPORT void
     zlist_test (int verbose);
 //  @end
 
