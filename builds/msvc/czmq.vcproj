@@ -872,10 +872,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\stdbool_for_windows.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\include\zbeacon.h"
 				>
 				<FileConfiguration
