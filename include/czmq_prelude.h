@@ -467,7 +467,7 @@ static inline void *
 #   if defined DLL_EXPORT
 #       define CZMQ_EXPORT __declspec(dllexport)
 #   else
-#       define CZMQ_EXPORT __declspec(dllimport)
+#       define CZMQ_EXPORT
 #   endif
 #else
 #   define CZMQ_EXPORT
