@@ -61,7 +61,7 @@ CZMQ_EXPORT int
     zfile_rmdir (const char *pathname);
 
 //  Self test of this class
-int
+CZMQ_EXPORT int
     zfile_test (bool verbose);
 //  @end
 
