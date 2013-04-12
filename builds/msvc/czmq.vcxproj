@@ -152,7 +152,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\include;..\..\..\libzmq\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>DLL_EXPORT;WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;BASE_THREADSAFE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LIBCZMQ_EXPORTS;WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;BASE_THREADSAFE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -182,7 +182,7 @@
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>..\..\include;..\..\..\libzmq\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>DLL_EXPORT;WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;BASE_THREADSAFE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LIBCZMQ_EXPORTS;WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;BASE_THREADSAFE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
