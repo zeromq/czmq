@@ -539,7 +539,8 @@ s_get_interface (agent_t *self)
         struct ifaddrs *interface = interfaces;
         while (interface) {
             //  Hopefully the last interface will be WiFi or Ethernet
-            if (interface->ifa_addr->sa_family == AF_INET) {
+            if (interface->ifa_addr &&
+                (interface->ifa_addr->sa_family == AF_INET)) {
                 self->address = *(inaddr_t *) interface->ifa_addr;
                 self->broadcast = *(inaddr_t *) interface->ifa_broadaddr;
                 self->broadcast.sin_port = htons (self->port_nbr);
