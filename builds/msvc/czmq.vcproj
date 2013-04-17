@@ -538,7 +538,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="libzmq.lib Ws2_32.lib Iphlpapi.lib"
-				AdditionalLibraryDirectories="..\..\..\libzmq\lib\x64"
+				AdditionalLibraryDirectories="..\..\..\libzmq\lib\x64;..\..\..\libzmq\lib"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -621,7 +621,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="libzmq.lib Ws2_32.lib Iphlpapi.lib"
-				AdditionalLibraryDirectories="..\..\..\libzmq\lib\"
+				AdditionalLibraryDirectories="..\..\..\libzmq\lib\x64;..\..\..\libzmq\lib"
 				TargetMachine="17"
 			/>
 			<Tool
