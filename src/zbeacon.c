@@ -164,8 +164,10 @@ zbeacon_publish (zbeacon_t *self, byte *transmit, size_t size)
     assert (self);
     assert (transmit);
     assert (size > 0 && size <= BEACON_MAX);
-    zstr_sendm (self->pipe, "PUBLISH");
-    zmq_send (self->pipe, transmit, size, 0);
+    zmsg_t *msg = zmsg_new ();
+    zmsg_addstr (msg, "PUBLISH");
+    zmsg_addmem (msg, transmit, size);
+    zmsg_send (&msg, self->pipe);
 }
 
 
@@ -188,8 +190,10 @@ zbeacon_subscribe (zbeacon_t *self, byte *filter, size_t size)
 {
     assert (self);
     assert (size <= BEACON_MAX);
-    zstr_sendm (self->pipe, "SUBSCRIBE");
-    zmq_send (self->pipe, filter, size, 0);
+    zmsg_t *msg = zmsg_new ();
+    zmsg_addstr (msg, "SUBSCRIBE");
+    zmsg_addmem (msg, filter, size);
+    zmsg_send (&msg, self->pipe);
 }
 
 
@@ -725,8 +729,10 @@ s_beacon_recv (agent_t *self)
     }
     //  If still a valid beacon, send on to the API
     if (is_valid) {
-        zstr_sendm (self->pipe, peername);
-        zmq_send (self->pipe, buffer, size, 0);
+        zmsg_t *msg = zmsg_new ();
+        zmsg_addstr (msg, peername);
+        zmsg_addmem (msg, buffer, size);
+        zmsg_send (&msg, self->pipe);
     }
 }
 
