@@ -37,7 +37,7 @@ CZMQ_EXPORT int
     zfile_rmdir (const char *pathname);
 
 //  Self test of this class
-int
+CZMQ_EXPORT int
     zfile_test (bool verbose);
 ----
 
@@ -54,8 +54,8 @@ EXAMPLE
     int rc = zfile_delete ("nosuchfile");
     assert (rc == -1);
 
-    rc = zfile_exists ("nosuchfile");
-    assert (rc != true);
+    bool rc_bool = zfile_exists ("nosuchfile");
+    assert (rc_bool != true);
 
     rc = (int) zfile_size ("nosuchfile");
     assert (rc == -1);
