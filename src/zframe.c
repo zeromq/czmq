@@ -49,6 +49,8 @@ struct _zframe_t {
     zmq_msg_t zmsg;             //  zmq_msg_t blob for frame
     int more;                   //  More flag, from last read
     int zero_copy;              //  zero-copy flag
+    zframe_free_fn *free_fn;    //  destructor callback
+    void *free_arg;             //  destructor callback arg
 };
 
 
@@ -116,6 +118,8 @@ zframe_destroy (zframe_t **self_p)
     assert (self_p);
     if (*self_p) {
         zframe_t *self = *self_p;
+        if (self->free_fn)
+          (self->free_fn) (self, self->free_arg);
         zmq_msg_close (&self->zmsg);
         free (self);
         *self_p = NULL;
@@ -373,6 +377,16 @@ zframe_reset (zframe_t *self, const void *data, size_t size)
     memcpy (zmq_msg_data (&self->zmsg), data, size);
 }
 
+void
+zframe_freefn (zframe_t *self, zframe_free_fn *free_fn, void *arg)
+{
+    assert (self);
+    assert (free_fn);
+
+    self->free_fn = free_fn;
+    self->free_arg = arg;
+}
+
 //  --------------------------------------------------------------------------
 //  Selftest
 
@@ -387,6 +401,12 @@ s_test_free_cb (void *data, void *arg)
 
     assert (memcmp (data, cmp_buf, 1024) == 0);
     free (data);
+}
+
+static void
+s_test_free_frame_cb(void *frame, void *arg)
+{
+    assert (frame);
 }
 
 int
@@ -471,6 +491,10 @@ zframe_test (bool verbose)
 
     zframe_destroy (&frame);
     zframe_destroy (&frame_copy);
+
+    frame = zframe_new ("callback", 8);
+    zframe_freefn (frame, s_test_free_frame_cb, NULL);
+    zframe_destroy (&frame);
 
     zctx_destroy (&ctx);
     //  @end
