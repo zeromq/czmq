@@ -189,7 +189,6 @@ zframe_send (zframe_t **self_p, void *zocket, int flags)
                 return -1;
             if (zmq_sendmsg (zocket, &copy, snd_flags) == -1)
                 return -1;
-            zmq_msg_close (&copy);
         }
         else {
             if (zmq_sendmsg (zocket, &self->zmsg, snd_flags) == -1)
