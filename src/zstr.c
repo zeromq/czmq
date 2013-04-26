@@ -55,7 +55,6 @@ s_send_string (void *zocket, bool more, const char *format, va_list argptr)
     zmq_msg_init_size (&message, strlen (string));
     memcpy (zmq_msg_data (&message), string, strlen (string));
     int rc = zmq_sendmsg (zocket, &message, more? ZMQ_SNDMORE: 0);
-    zmq_msg_close (&message);
 
     free (string);
     return rc == -1? -1: 0;
