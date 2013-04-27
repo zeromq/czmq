@@ -89,8 +89,12 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zframe_reset (zframe_t *self, const void *data, size_t size);
 
+//  Set the free callback for frame
+CZMQ_EXPORT void
+    zframe_freefn(zframe_t *self, zframe_free_fn *free_fn, void *arg);
+
 //  Self test of this class
-int
+CZMQ_EXPORT int
     zframe_test (bool verbose);
 ----
 
@@ -185,6 +189,10 @@ EXAMPLE
 
     zframe_destroy (&frame);
     zframe_destroy (&frame_copy);
+
+    frame = zframe_new ("callback", 8);
+    zframe_freefn (frame, s_test_free_frame_cb, NULL);
+    zframe_destroy (&frame);
 
     zctx_destroy (&ctx);
 ----
