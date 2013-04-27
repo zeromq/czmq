@@ -41,7 +41,7 @@ AC_SUBST(LTVER)
 # Capture c flags
 CZMQ_ORIG_CFLAGS="${CFLAGS:-none}"
 
-# Checks for programs.
+# Checks for programs
 AC_PROG_CC
 AC_PROG_CC_C99
 AM_PROG_CC_C_O
@@ -50,8 +50,9 @@ AC_PROG_LIBTOOL
 AC_PROG_SED
 AC_PROG_AWK
 
-# Checks for libraries.
+# Checks for libraries
 AC_CHECK_LIB([pthread], [pthread_create])
+AC_CHECK_LIB([sodium], [sodium_version_major])
 
 AC_ARG_WITH(gcov, [AS_HELP_STRING([--with-gcov=yes/no],
                   [With GCC Code Coverage reporting.])],
