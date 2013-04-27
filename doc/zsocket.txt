@@ -1,4 +1,4 @@
-zsocket(7)
+zsocket(3)
 ==========
 
 NAME
