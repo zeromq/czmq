@@ -1,4 +1,4 @@
-zclock(7)
+zclock(3)
 =========
 
 NAME

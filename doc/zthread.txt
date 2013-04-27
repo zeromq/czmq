@@ -1,4 +1,4 @@
-zthread(7)
+zthread(3)
 ==========
 
 NAME

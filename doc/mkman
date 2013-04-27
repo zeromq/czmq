@@ -42,7 +42,7 @@ printf "Generating $class.txt...\n";
 $underline = "=" x (length ($class) + 3);
 
 $template = <<"END";
-$class(7)
+$class(3)
 $underline
 
 NAME

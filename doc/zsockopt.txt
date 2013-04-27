@@ -1,4 +1,4 @@
-zsockopt(7)
+zsockopt(3)
 ===========
 
 NAME
