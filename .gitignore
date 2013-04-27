@@ -22,6 +22,7 @@ src/*.o
 src/mtrace.txt
 src/outbin
 src/czmq_selftest
+doc/*.3
 doc/*.7
 doc/*.xml
 src/.libs/

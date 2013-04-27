@@ -1,4 +1,4 @@
-zbeacon(7)
+zbeacon(3)
 ==========
 
 NAME

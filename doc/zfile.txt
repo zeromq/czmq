@@ -1,4 +1,4 @@
-zfile(7)
+zfile(3)
 ========
 
 NAME

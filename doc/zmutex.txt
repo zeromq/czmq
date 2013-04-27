@@ -1,4 +1,4 @@
-zmutex(7)
+zmutex(3)
 =========
 
 NAME

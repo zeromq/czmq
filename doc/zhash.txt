@@ -1,4 +1,4 @@
-zhash(7)
+zhash(3)
 ========
 
 NAME
