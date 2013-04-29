@@ -446,7 +446,7 @@ zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument)
             item_t *next = item->next;
             rc = callback (item->key, item->value, argument);
             if (rc)
-                break;          //  End if non-zero return code
+                return rc;      //  End if non-zero return code
             item = next;
         }
     }
