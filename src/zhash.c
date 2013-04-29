@@ -57,7 +57,7 @@ typedef struct _item_t {
 //  ---------------------------------------------------------------------
 //  Structure of our class
 
-struct _zhash {
+struct _zhash_t {
     size_t size;                //  Current size of hash table
     size_t limit;               //  Current hash table limit
     item_t **items;             //  Array of items
