@@ -535,8 +535,8 @@ test_foreach (const char *key, void *item, void *arg)
     assert (NULL != zhash_lookup ((zhash_t*) arg, key));
     return 0;
 }
-int
 
+int
 test_foreach_error (const char *key, void *item, void *arg)
 {
     return -1;
