@@ -229,7 +229,6 @@ zmsg_pushmem (zmsg_t *self, const void *src, size_t size)
         return -1;
 }
 
-
 //  --------------------------------------------------------------------------
 //  Add block of memory to the end of the message, as a new frame.
 
@@ -246,6 +245,22 @@ zmsg_addmem (zmsg_t *self, const void *src, size_t size)
         return -1;
 }
 
+//  --------------------------------------------------------------------------
+//  Add block of memory to the end of the message, as a new frame.
+//  The new frame is zero-copy-constructed (see zframe_new_zero_copy(...) for detailed description)
+
+int
+zmsg_addmem_zero_copy (zmsg_t *self, void *src, size_t size, zframe_free_fn *free_fn, void *arg)
+{
+    assert (self);
+    zframe_t *frame = zframe_new_zero_copy (src, size, free_fn, arg);
+    if (frame) {
+        self->content_size += size;
+        return zlist_append (self->frames, frame);
+    }
+    else
+        return -1;
+}
 
 //  --------------------------------------------------------------------------
 //  Push string as new frame to front of message
