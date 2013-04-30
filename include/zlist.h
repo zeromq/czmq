@@ -32,7 +32,7 @@ extern "C" {
 #endif
 
 //  Opaque class structure
-typedef struct _zlist zlist_t;
+typedef struct _zlist_t zlist_t;
 
 //  @interface
 //  Comparison function for zlist_sort method
