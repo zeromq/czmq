@@ -527,6 +527,20 @@ zhash_autofree (zhash_t *self)
 //  --------------------------------------------------------------------------
 //  Runs selftest of class
 //  TODO: add unit test for free_fn, foreach
+//
+
+int
+test_foreach (const char *key, void *item, void *arg)
+{
+    assert (NULL != zhash_lookup ((zhash_t*) arg, key));
+    return 0;
+}
+
+int
+test_foreach_error (const char *key, void *item, void *arg)
+{
+    return -1;
+}
 
 void
 zhash_test (int verbose)
@@ -589,6 +603,10 @@ zhash_test (int verbose)
     assert (item);
     assert (streq (item, "dead beef"));
     zhash_destroy (&copy);
+
+    // Test foreach
+    assert (0 == zhash_foreach (hash, test_foreach, hash));
+    assert (-1 == zhash_foreach (hash, test_foreach_error, hash));
 
     //  Test save and load
     zhash_save (hash, ".cache");
