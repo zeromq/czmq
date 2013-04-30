@@ -52,8 +52,9 @@ AC_PROG_AWK
 
 # Checks for libraries
 AC_CHECK_LIB([pthread], [pthread_create])
-AC_CHECK_LIB([sodium], [sodium_version_major])
+AC_CHECK_LIB([sodium], [sodium_init])
 
+# Code coverage
 AC_ARG_WITH(gcov, [AS_HELP_STRING([--with-gcov=yes/no],
                   [With GCC Code Coverage reporting.])],
                   [CZMQ_GCOV="$withval"])
@@ -209,9 +210,6 @@ AC_TYPE_SSIZE_T
 AC_HEADER_TIME
 AC_TYPE_UINT32_T
 AC_C_VOLATILE
-
-# Math libraries
-AC_CHECK_LIB([m], [pow])
 
 # These options are GNU compiler specific.
 if test "x$GCC" = "xyes"; then
