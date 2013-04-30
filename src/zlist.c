@@ -46,7 +46,7 @@ typedef struct _node_t {
 //  ---------------------------------------------------------------------
 //  Structure of our class
 
-struct _zlist {
+struct _zlist_t {
     node_t *head;               //  First item in list, if any
     node_t *tail;               //  Last item in list, if any
     node_t *cursor;             //  Current cursors for iteration

@@ -32,7 +32,7 @@ extern "C" {
 #endif
 
 //  Opaque class structure
-typedef struct _zhash zhash_t;
+typedef struct _zhash_t zhash_t;
 
 //  @interface
 //  Callback function for zhash_foreach method

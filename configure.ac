@@ -41,7 +41,7 @@ AC_SUBST(LTVER)
 # Capture c flags
 CZMQ_ORIG_CFLAGS="${CFLAGS:-none}"
 
-# Checks for programs.
+# Checks for programs
 AC_PROG_CC
 AC_PROG_CC_C99
 AM_PROG_CC_C_O
@@ -50,9 +50,11 @@ AC_PROG_LIBTOOL
 AC_PROG_SED
 AC_PROG_AWK
 
-# Checks for libraries.
+# Checks for libraries
 AC_CHECK_LIB([pthread], [pthread_create])
+AC_CHECK_LIB([sodium], [sodium_init])
 
+# Code coverage
 AC_ARG_WITH(gcov, [AS_HELP_STRING([--with-gcov=yes/no],
                   [With GCC Code Coverage reporting.])],
                   [CZMQ_GCOV="$withval"])
@@ -208,9 +210,6 @@ AC_TYPE_SSIZE_T
 AC_HEADER_TIME
 AC_TYPE_UINT32_T
 AC_C_VOLATILE
-
-# Math libraries
-AC_CHECK_LIB([m], [pow])
 
 # These options are GNU compiler specific.
 if test "x$GCC" = "xyes"; then
