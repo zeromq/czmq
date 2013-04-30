@@ -163,6 +163,10 @@ EXAMPLE
     assert (streq (item, "dead beef"));
     zhash_destroy (&copy);
 
+    // Test foreach
+    assert (0 == zhash_foreach (hash, test_foreach, hash));
+    assert (-1 == zhash_foreach (hash, test_foreach_error, hash));
+
     //  Test save and load
     zhash_save (hash, ".cache");
     copy = zhash_new ();
