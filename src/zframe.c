@@ -80,6 +80,22 @@ zframe_new (const void *data, size_t size)
 }
 
 //  --------------------------------------------------------------------------
+//  Constructor; Allocates a new empty (zero-sized) frame
+
+zframe_t *
+zframe_new_empty ()
+{
+    zframe_t *self;
+
+    self = (zframe_t *) zmalloc (sizeof (zframe_t));
+    if (!self) return NULL;
+    
+    zmq_msg_init (&self->zmsg);
+
+    return self;
+}
+
+//  --------------------------------------------------------------------------
 //  Constructor; Allows zero-copy semantics.
 //  Zero-copy frame is initialised if data != NULL, size > 0, free_fn != 0
 //  'arg' is a void pointer that is passed to free_fn as second argument
@@ -442,7 +458,7 @@ zframe_test (bool verbose)
     //  @selftest
     zctx_t *ctx = zctx_new ();
     assert (ctx);
-
+    
     void *output = zsocket_new (ctx, ZMQ_PAIR);
     assert (output);
     zsocket_bind (output, "inproc://zframe.test");
@@ -481,6 +497,12 @@ zframe_test (bool verbose)
 	assert (streq (zeroCopyTestStr, "TWO"));
     free (zeroCopyTestStr);
 	zframe_destroy(&frame);
+    
+    //Test zframe_new_empty
+    frame = zframe_new_empty();
+    assert(frame);
+    assert(zframe_size(frame) == 0);
+    zframe_destroy(&frame);
 
     //  Send END frame
     frame = zframe_new ("NOT", 3);
