@@ -376,6 +376,31 @@ zframe_reset (zframe_t *self, const void *data, size_t size)
     memcpy (zmq_msg_data (&self->zmsg), data, size);
 }
 
+//  --------------------------------------------------------------------------
+//  Set new contents for frame, using zero-copy.
+//  See zframe_new_zero_copy (...) for a detailed description.
+
+
+void
+zframe_reset_zero_copy (zframe_t *self, void *data, size_t size, zframe_free_fn *free_fn, void *arg)
+{
+    assert (self);
+    assert (data);
+    zmq_msg_close (&self->zmsg);
+	if (size) {
+        if (data && free_fn) {
+            zmq_msg_init_data (&self->zmsg, data, size, free_fn, arg);
+            self->zero_copy = 1;
+        } else {
+			zmq_msg_init_size (&self->zmsg, size);
+		}
+    } else { //Initialize zero-size messages
+        zmq_msg_init (&self->zmsg);
+	}
+    zmq_msg_init_size (&self->zmsg, size);
+    memcpy (zmq_msg_data (&self->zmsg), data, size);
+}
+
 void
 zframe_freefn (zframe_t *self, zframe_free_fn *free_fn, void *arg)
 {
@@ -447,6 +472,15 @@ zframe_test (bool verbose)
     assert (zframe_size (copy) == 5);
     zframe_destroy (&copy);
     assert (!zframe_eq (frame, copy));
+	
+	//Test zframe_reset_zero_copy
+    frame = zframe_new ("ONE", 3);
+    assert (frame);
+	zframe_reset_zero_copy (frame, strdup("TWO"), 3, s_test_free_cb, NULL);
+    char* zeroCopyTestStr = zframe_strdup (frame);
+	assert (streq (zeroCopyTestStr, "TWO"));
+    free (zeroCopyTestStr);
+	zframe_destroy(&frame);
 
     //  Send END frame
     frame = zframe_new ("NOT", 3);
