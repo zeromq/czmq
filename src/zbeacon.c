@@ -758,8 +758,11 @@ s_beacon_send (agent_t *self)
         (char *) zframe_data (self->transmit), zframe_size (self->transmit),
         0,      //  Flags
         (struct sockaddr *) &self->broadcast, sizeof (inaddr_t));
-    if (size == SOCKET_ERROR)
-        s_handle_io_error ("sendto");
+    //  Sending can fail if the OS is blocking multicast. In such cases we
+    //  don't try to report the error. We might log this or send to an error
+    //  console at some point.
+        if (size == SOCKET_ERROR)
+            /* s_handle_io_error ("sendto") */ ;
 }
 
 //  Destroy agent instance
