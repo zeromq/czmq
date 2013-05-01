@@ -380,7 +380,7 @@ zframe_reset (zframe_t *self, const void *data, size_t size)
 //  Set new contents for frame, using zero-copy
 
 void
-zframe_reset_zero_copy (zframe_t *self, const void *data, size_t size, zframe_free_fn *free_fn, void *arg)
+zframe_reset_zero_copy (zframe_t *self, void *data, size_t size, zframe_free_fn *free_fn, void *arg)
 {
     assert (self);
     assert (data);
@@ -470,6 +470,15 @@ zframe_test (bool verbose)
     assert (zframe_size (copy) == 5);
     zframe_destroy (&copy);
     assert (!zframe_eq (frame, copy));
+	
+	//Test zframe_reset_zero_copy
+    frame = zframe_new ("ONE", 3);
+    assert (frame);
+	zframe_reset_zero_copy (frame, strdup("TWO"), 3, s_test_free_cb, NULL);
+    char* zeroCopyTestStr = zframe_strdup (frame);
+	assert (streq (zeroCopyTestStr, "TWO"));
+    free (zeroCopyTestStr);
+	zframe_destroy(&frame);
 
     //  Send END frame
     frame = zframe_new ("NOT", 3);
