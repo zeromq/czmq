@@ -7,7 +7,7 @@ AC_PREREQ(2.61)
 # Version must be MAJOR.MINOR.PATCH otherwise things will break.
 # Make sure you also updated include/czmq.h to match.
 #
-AC_INIT([czmq],[1.4.1],[zeromq-dev@lists.zeromq.org])
+AC_INIT([czmq],[1.4.2],[zeromq-dev@lists.zeromq.org])
 
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(config)
