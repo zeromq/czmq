@@ -377,7 +377,9 @@ zframe_reset (zframe_t *self, const void *data, size_t size)
 }
 
 //  --------------------------------------------------------------------------
-//  Set new contents for frame, using zero-copy
+//  Set new contents for frame, using zero-copy.
+//  See zframe_new_zero_copy (...) for a detailed description.
+
 
 void
 zframe_reset_zero_copy (zframe_t *self, void *data, size_t size, zframe_free_fn *free_fn, void *arg)
