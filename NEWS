@@ -1,3 +1,14 @@
+CZMQ version 1.4.1 (stable), released on 2013/05/01
+===================================================
+
+Changes
+-------
+
+* Fixed assertion in zbeacon on sendto error.
+* Fixed packaging of platform scripts in /builds.
+* See git log for rest.
+
+
 CZMQ version 1.4.0 (stable), released on 2013/04/30
 ===================================================
 
