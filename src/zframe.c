@@ -376,6 +376,29 @@ zframe_reset (zframe_t *self, const void *data, size_t size)
     memcpy (zmq_msg_data (&self->zmsg), data, size);
 }
 
+//  --------------------------------------------------------------------------
+//  Set new contents for frame, using zero-copy
+
+void
+zframe_reset_zero_copy (zframe_t *self, const void *data, size_t size, zframe_free_fn *free_fn, void *arg)
+{
+    assert (self);
+    assert (data);
+    zmq_msg_close (&self->zmsg);
+	if (size) {
+        if (data && free_fn) {
+            zmq_msg_init_data (&self->zmsg, data, size, free_fn, arg);
+            self->zero_copy = 1;
+        } else {
+			zmq_msg_init_size (&self->zmsg, size);
+		}
+    } else { //Initialize zero-size messages
+        zmq_msg_init (&self->zmsg);
+	}
+    zmq_msg_init_size (&self->zmsg, size);
+    memcpy (zmq_msg_data (&self->zmsg), data, size);
+}
+
 void
 zframe_freefn (zframe_t *self, zframe_free_fn *free_fn, void *arg)
 {
