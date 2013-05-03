@@ -80,6 +80,12 @@ CZMQ_EXPORT int
 //  Returns 0 on success, -1 on error.
 CZMQ_EXPORT int
     zmsg_addmem (zmsg_t *self, const void *src, size_t size);
+    
+//  Push block of memory as new frame to end of message.
+//  The frame is constructed using zero-copy.
+//  Returns 0 on success, -1 on error.
+CZMQ_EXPORT int
+    zmsg_addmem_zero_copy (zmsg_t *self, void *src, size_t size, zframe_free_fn *free_fn, void *arg);
 
 //  Push string as new frame to front of message.
 //  Returns 0 on success, -1 on error.
