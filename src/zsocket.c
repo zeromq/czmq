@@ -174,7 +174,7 @@ zsocket_type_str (void *self)
 //  Valid flags: ZFRAME_MORE | ZFRAME_DONTWAIT
 
 int
-zsocket_sendmem (const void* data, size_t size, void *zocket, int flags)
+zsocket_sendmem (void *zocket, const void* data, size_t size, int flags)
 {
     assert (zocket);
     assert (size == 0 || data);
@@ -196,9 +196,9 @@ zsocket_sendmem (const void* data, size_t size, void *zocket, int flags)
 //  Valid flags: ZFRAME_MORE | ZFRAME_DONTWAIT
 
 int
-zsocket_sendmem_zero_copy (void *data, size_t size,
+zsocket_sendmem_zero_copy (void *zocket, void *data, size_t size,
                             zsocket_free_fn *free_fn,
-                            void *hint, void *zocket, int flags)
+                            void *hint, int flags)
 {
     assert (zocket);
     assert (size == 0 || data);
@@ -255,9 +255,9 @@ zsocket_test (bool verbose)
     free (message);
     
     //Test zframe_sendmem
-    rc = zsocket_sendmem("ABC", 3, writer, ZFRAME_MORE);
+    rc = zsocket_sendmem(writer,"ABC", 3, ZFRAME_MORE);
     assert(rc == 0);
-    rc = zsocket_sendmem("DEFG", 4, writer, 0);
+    rc = zsocket_sendmem(writer, "DEFG", 4, 0);
     assert(rc == 0);
     zframe_t* frame = zframe_recv(reader);
     assert(frame);
@@ -269,9 +269,9 @@ zsocket_test (bool verbose)
     assert(!zframe_more(frame));
     
     //Test zframe_sendmem_zero_copy
-    rc = zsocket_sendmem_zero_copy(strdup("ABC"), 3, s_test_free_str_cb, NULL, writer, ZFRAME_MORE);
+    rc = zsocket_sendmem_zero_copy(writer, strdup("ABC"), 3, s_test_free_str_cb, NULL, ZFRAME_MORE);
     assert(rc == 0);
-    rc = zsocket_sendmem_zero_copy(strdup("DEFG"), 4, s_test_free_str_cb, NULL, writer, 0);
+    rc = zsocket_sendmem_zero_copy(writer, strdup("DEFG"), 4, s_test_free_str_cb, NULL, 0);
     assert(rc == 0);
     frame = zframe_recv(reader);
     assert(frame);
