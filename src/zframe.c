@@ -216,52 +216,6 @@ zframe_send (zframe_t **self_p, void *zocket, int flags)
 }
 
 //  --------------------------------------------------------------------------
-//  Send data over a socket as if you would call zframe_new(...) followed by
-//  zframe_send(...).
-//  ZFRAME_REUSE flag is ignored in this function.
-
-int
-zframe_sendmem (const void* data, size_t size, void *zocket, int flags)
-{
-    assert (zocket);
-    assert (data);
-    
-    int snd_flags = (flags & ZFRAME_MORE)? ZMQ_SNDMORE : 0;
-    snd_flags |= (flags & ZFRAME_DONTWAIT)? ZMQ_DONTWAIT : 0;
-    zmq_msg_t msg;
-    zmq_msg_init_size(&msg, size);
-    memcpy (zmq_msg_data(&msg), data, size);
-    int rc = zmq_sendmsg (zocket, &msg, snd_flags);
-    if(rc == -1) {
-        return -1;
-    }
-    return 0;
-}
-
-//  --------------------------------------------------------------------------
-//  Send data over a socket as if you would call zframe_new_zero_copy(...) followed by
-//  zframe_send(...).
-//  ZFRAME_REUSE flag is ignored in this function.
-
-int
-zframe_sendmem_zero_copy (void *data, size_t size, zframe_free_fn *free_fn, void *hint, void *zocket, int flags)
-{
-    assert (zocket);
-    assert (data);
-    
-    int snd_flags = (flags & ZFRAME_MORE)? ZMQ_SNDMORE : 0;
-    snd_flags |= (flags & ZFRAME_DONTWAIT)? ZMQ_DONTWAIT : 0;
-    zmq_msg_t msg;
-    zmq_msg_init_data(&msg, data, size, free_fn, hint);
-    int rc = zmq_sendmsg (zocket, &msg, snd_flags);
-    if(rc == -1) {
-        return -1;
-    }
-    return 0;
-}
-
-
-//  --------------------------------------------------------------------------
 //  Return size of frame.
 
 size_t
@@ -511,34 +465,6 @@ zframe_test (bool verbose)
     void *input = zsocket_new (ctx, ZMQ_PAIR);
     assert (input);
     zsocket_connect (input, "inproc://zframe.test");
-    
-    //Test zframe_sendmem
-    rc = zframe_sendmem("ABC", 3, output, ZFRAME_MORE);
-    assert(rc == 0);
-    rc = zframe_sendmem("DEFG", 4, output, 0);
-    assert(rc == 0);
-    frame = zframe_recv(input);
-    assert(frame);
-    assert(zframe_streq(frame, "ABC"));
-    assert(zframe_more(frame));
-    frame = zframe_recv(input);
-    assert(frame);
-    assert(zframe_streq(frame, "DEFG"));
-    assert(!zframe_more(frame));
-    
-    //Test zframe_sendmem_zero_copy
-    rc = zframe_sendmem_zero_copy(strdup("ABC"), 3, s_test_free_cb, NULL, output, ZFRAME_MORE);
-    assert(rc == 0);
-    rc = zframe_sendmem_zero_copy(strdup("DEFG"), 4, s_test_free_cb, NULL, output, 0);
-    assert(rc == 0);
-    frame = zframe_recv(input);
-    assert(frame);
-    assert(zframe_streq(frame, "ABC"));
-    assert(zframe_more(frame));
-    frame = zframe_recv(input);
-    assert(frame);
-    assert(zframe_streq(frame, "DEFG"));
-    assert(!zframe_more(frame));
 
     //  Send five different frames, test ZFRAME_MORE
     int frame_nbr;
