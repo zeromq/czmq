@@ -169,6 +169,57 @@ zsocket_type_str (void *self)
         return type_name [type];
 }
 
+//  --------------------------------------------------------------------------
+//  Send data over a socket as a single message frame
+//  ZFRAME_REUSE flag is ignored in this function.
+
+int
+zsocket_sendmem (const void* data, size_t size, void *zocket, int flags)
+{
+    assert (zocket);
+    assert (size == 0 || data);
+    
+    int snd_flags = (flags & ZFRAME_MORE)? ZMQ_SNDMORE : 0;
+    snd_flags |= (flags & ZFRAME_DONTWAIT)? ZMQ_DONTWAIT : 0;
+    zmq_msg_t msg;
+    zmq_msg_init_size(&msg, size);
+    memcpy (zmq_msg_data(&msg), data, size);
+    int rc = zmq_sendmsg (zocket, &msg, snd_flags);
+    if(rc == -1) {
+        return -1;
+    }
+    return 0;
+}
+
+//  --------------------------------------------------------------------------
+//  Send data over a socket as a single message frame
+//  ZFRAME_REUSE flag is ignored in this function.
+
+int
+zsocket_sendmem_zero_copy (void *data, size_t size,
+                            zsocket_free_fn *free_fn,
+                            void *hint, void *zocket, int flags)
+{
+    assert (zocket);
+    assert (size == 0 || data);
+    
+    int snd_flags = (flags & ZFRAME_MORE)? ZMQ_SNDMORE : 0;
+    snd_flags |= (flags & ZFRAME_DONTWAIT)? ZMQ_DONTWAIT : 0;
+    zmq_msg_t msg;
+    zmq_msg_init_data(&msg, data, size, free_fn, hint);
+    int rc = zmq_sendmsg (zocket, &msg, snd_flags);
+    if(rc == -1) {
+        return -1;
+    }
+    return 0;
+}
+
+static void
+s_test_free_str_cb(void *str, void *arg)
+{
+    assert(str);
+    free(str);
+}
 
 //  --------------------------------------------------------------------------
 //  Selftest
@@ -202,6 +253,34 @@ zsocket_test (bool verbose)
     assert (message);
     assert (streq (message, "HELLO"));
     free (message);
+    
+    //Test zframe_sendmem
+    rc = zsocket_sendmem("ABC", 3, writer, ZFRAME_MORE);
+    assert(rc == 0);
+    rc = zsocket_sendmem("DEFG", 4, writer, 0);
+    assert(rc == 0);
+    zframe_t* frame = zframe_recv(reader);
+    assert(frame);
+    assert(zframe_streq(frame, "ABC"));
+    assert(zframe_more(frame));
+    frame = zframe_recv(reader);
+    assert(frame);
+    assert(zframe_streq(frame, "DEFG"));
+    assert(!zframe_more(frame));
+    
+    //Test zframe_sendmem_zero_copy
+    rc = zsocket_sendmem_zero_copy(strdup("ABC"), 3, s_test_free_str_cb, NULL, writer, ZFRAME_MORE);
+    assert(rc == 0);
+    rc = zsocket_sendmem_zero_copy(strdup("DEFG"), 4, s_test_free_str_cb, NULL, writer, 0);
+    assert(rc == 0);
+    frame = zframe_recv(reader);
+    assert(frame);
+    assert(zframe_streq(frame, "ABC"));
+    assert(zframe_more(frame));
+    frame = zframe_recv(reader);
+    assert(frame);
+    assert(zframe_streq(frame, "DEFG"));
+    assert(!zframe_more(frame));
 
     int port = zsocket_bind (writer, "tcp://%s:*", interf);
     assert (port >= ZSOCKET_DYNFROM && port <= ZSOCKET_DYNTO);

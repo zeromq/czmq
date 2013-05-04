@@ -36,6 +36,9 @@ extern "C" {
 //  We use this when choosing a port for dynamic binding.
 #define ZSOCKET_DYNFROM     0xc000
 #define ZSOCKET_DYNTO       0xffff
+        
+//  Callback function for zero-copy methods
+typedef void (zsocket_free_fn) (void *data, void *arg);
 
 //  Create a new socket within our CZMQ context, replaces zmq_socket.
 //  Use this to get automatic management of the socket at shutdown.
@@ -76,6 +79,19 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT char *
     zsocket_type_str (void *socket);
 
+// Send data over a socket as a single frame
+// Returns -1 on error, 0 on success
+CZMQ_EXPORT int
+    zsocket_sendmem (const void* data, size_t size, void *socket, int flags);
+
+// Send data over a socket as a single frame
+// Returns -1 on error, 0 on success
+CZMQ_EXPORT int
+    zsocket_sendmem_zero_copy (void *data, size_t size, 
+                                zsocket_free_fn *free_fn,
+                                void *hint, void *socket, int flags);
+
+    
 //  Self test of this class
 CZMQ_EXPORT int
     zsocket_test (bool verbose);
