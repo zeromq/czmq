@@ -2,6 +2,7 @@ MAN1 =
 MAN3 = zbeacon.3 \
     zclock.3 \
     zctx.3 \
+    zcurve.3 \
     zfile.3 \
     zframe.3 \
     zhash.3 \

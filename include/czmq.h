@@ -59,5 +59,6 @@
 #include "zsys.h"
 #include "zthread.h"
 #include "zbeacon.h"
+#include "zcurve.h"
 
 #endif
