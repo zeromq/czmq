@@ -281,6 +281,13 @@ zmsg_pushstr (zmsg_t *self, const char *format, ...)
     va_start (argptr, format);
     int required = vsnprintf (string, size, format, argptr);
     va_end (argptr);
+#ifdef _MSC_VER
+    if (required < 0 || required >= size) {
+        va_start (argptr, format);
+        required = _vscprintf (format, argptr);
+        va_end (argptr);
+    }
+#endif
     if (required >= size) {
         size = required + 1;
         string = (char *) realloc (string, size);
@@ -319,6 +326,13 @@ zmsg_addstr (zmsg_t *self, const char *format, ...)
     va_start (argptr, format);
     int required = vsnprintf (string, size, format, argptr);
     va_end (argptr);
+#ifdef _MSC_VER
+    if (required < 0 || required >= size) {
+        va_start (argptr, format);
+        required = _vscprintf (format, argptr);
+        va_end (argptr);
+    }
+#endif    
     if (required >= size) {
         size = required + 1;
         string = (char *) realloc (string, size);
