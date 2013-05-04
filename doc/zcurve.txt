@@ -1,0 +1,108 @@
+zcurve(3)
+=========
+
+NAME
+----
+zcurve - CurveZMQ security engine (rfc.zeromq.org/spec:26)
+
+SYNOPSIS
+--------
+----
+//  Constructor. Always generates a new public/secret key pair which 
+//  you can override if you need to.
+CZMQ_EXPORT zcurve_t *
+    zcurve_new (void);
+
+//  Destructor
+CZMQ_EXPORT void
+    zcurve_destroy (zcurve_t **self_p);
+
+//  Return value of public key
+CZMQ_EXPORT byte *
+    zcurve_public_key (zcurve_t *self);
+
+//  Return value of secret key
+CZMQ_EXPORT byte *
+    zcurve_secret_key (zcurve_t *self);
+
+//  Start zcurve instance as client (if you provide a server key) or as
+//  server. May return a zmq_msg_t to send to the peer, or NULL if there
+//  is nothing to send.
+CZMQ_EXPORT zmq_msg_t *
+    zcurve_start (zcurve_t *self, byte *server_key);
+
+//  Accept command from peer. If the command is invalid, it is discarded
+//  silently (in this prototype, that causes an assertion failure). May
+//  return a zmq_msg_t to send to the peer, or NULL if there is nothing
+//  to send.
+CZMQ_EXPORT zmq_msg_t *
+    zcurve_accept (zcurve_t *self, zmq_msg_t *message);
+    
+//  Encode message from peer. Returns a zmq_msg_t ready to send on the wire.
+CZMQ_EXPORT zmq_msg_t *
+    zcurve_encode (zcurve_t *self, byte *data, size_t size);
+
+//  Self test of this class
+void
+    zcurve_test (bool verbose);
+----
+
+DESCRIPTION
+-----------
+
+CurveZMQ security engine, for use in ZeroMQ applications.
+
+This is a reference implementation of CurveZMQ, and can be used at the
+application level to secure a request-reply dialog (usually, DEALER to
+ROUTER). For an example of use, see the selftest function.
+
+EXAMPLE
+-------
+.From zcurve_test method
+----
+#if defined (HAVE_LIBSODIUM)
+    zmq_msg_t *msg;
+
+    //  Start server peer
+    zcurve_t *server = zcurve_new ();
+    msg = zcurve_start (server, NULL);
+    assert (msg == NULL);
+    
+    //  Start client peer and ping/pong through the handshake
+    zcurve_t *client = zcurve_new ();
+    msg = zcurve_start (client, zcurve_public_key (server));
+    while (msg) {
+        msg = zcurve_accept (server, msg);
+        if (msg)
+            msg = zcurve_accept (client, msg);
+    }
+    msg = zcurve_encode (client, (byte *) "Hello", 5);
+    assert (msg);
+    
+    //  Send encoded message over the wire
+    //  ...
+    //  Receive encoded message from the wire
+    
+    msg = zcurve_accept (server, msg);
+    assert (msg);
+    assert (memcmp (zmq_msg_data (msg), "Hello", 5) == 0);
+
+    msg = zcurve_encode (server, (byte *) "World", 5);
+    assert (msg);
+    
+    //  Send encoded message over the wire
+    //  ...
+    //  Receive encoded message from the wire
+    
+    msg = zcurve_accept (client, msg);
+    assert (msg);
+    assert (memcmp (zmq_msg_data (msg), "World", 5) == 0);
+
+    zcurve_destroy (&server);
+    zcurve_destroy (&client);
+#endif
+----
+
+SEE ALSO
+--------
+linkczmq:czmq[7]

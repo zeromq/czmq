@@ -83,15 +83,15 @@ zframe_new (const void *data, size_t size)
 //  Constructor; Allocates a new empty (zero-sized) frame
 
 zframe_t *
-zframe_new_empty ()
+zframe_new_empty (void)
 {
     zframe_t *self;
 
     self = (zframe_t *) zmalloc (sizeof (zframe_t));
-    if (!self) return NULL;
+    if (!self)
+        return NULL;
     
     zmq_msg_init (&self->zmsg);
-
     return self;
 }
 
