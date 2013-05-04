@@ -30,7 +30,11 @@
 @discuss
     This is a reference implementation of CurveZMQ, and can be used at the
     application level to secure a request-reply dialog (usually, DEALER to
-    ROUTER). For an example of use, see the selftest function.
+    ROUTER). For an example of use, see the selftest function. To compile
+    with security enabled, first build and install libsodium from GitHub at
+    https://github.com/jedisct1/libsodium. Run ./configure after installing
+    libsodium. If configure does not find libsodium, this module will work
+    in clear text.
 @end
 */
 
@@ -39,8 +43,6 @@
 #if !defined(_MSC_VER)
 #include "platform.h"
 #endif
-
-#undef HAVE_LIBSODIUM
 
 #if defined (HAVE_LIBSODIUM)
 #   include <sodium.h>
@@ -59,6 +61,7 @@ typedef enum {
     expect_ready,               //  C: accepts READY from server
     connected                   //  C/S: accepts MESSAGE from server
 } state_t;
+
 
 //  Structure of our class
 struct _zcurve_t {
@@ -83,9 +86,11 @@ struct _zcurve_t {
     byte cn_public [32];        //  Connection public key
     byte cn_secret [32];        //  Connection secret key
     byte cn_precom [32];        //  Connection precomputed key
-    zmq_msg_t msg;              //  ZMQ message to send to peer
-};
 
+    //  Metadata properties
+    zlist_t *metadata;          //  List of property items
+    size_t metadata_size;       //  Total metadata value size
+};
 
 //  Command structures
 
@@ -108,19 +113,19 @@ typedef struct {
     byte id [8];                //  "INITIATE"
     byte cookie [96];           //  Server-provided cookie
     byte nonce [8];             //  Short nonce, prefixed by "CurveZMQINITIATE"
-    byte box [112];                //  Box [C + vouch + metadata](C'->S')
+    byte box [112];             //  Box [C + vouch + metadata](C'->S')
 } initiate_t;
 
 typedef struct {
     byte id [8];                //  "READY   "
     byte nonce [8];             //  Short nonce, prefixed by "CurveZMQREADY---"
-    byte box [116];                //  Box [metadata](S'->C')
+    byte box [116];              //  Box [metadata](S'->C')
 } ready_t;
 
 typedef struct {
     byte id [8];                //  "MESSAGE "
     byte nonce [8];             //  Short nonce, prefixed by "CurveZMQMESSAGE-"
-    byte box [116];                //  Box [payload](S'->C') or (C'->S')
+    byte box [116];              //  Box [payload](S'->C') or (C'->S')
 } message_t;
 
 
@@ -131,10 +136,9 @@ typedef struct {
 zcurve_t *
 zcurve_new (byte *server_key)
 {
-    zcurve_t
-        *self;
-
-    self = (zcurve_t *) zmalloc (sizeof (zcurve_t));
+    zcurve_t *self = (zcurve_t *) zmalloc (sizeof (zcurve_t));
+    assert (self);
+    self->metadata = zlist_new ();
     if (server_key) {
         memcpy (self->server_key, server_key, 32);
         self->is_server = false;
@@ -157,7 +161,10 @@ zcurve_destroy (zcurve_t **self_p)
     assert (self_p);
     if (*self_p) {
         zcurve_t *self = *self_p;
-        zmq_msg_close (&self->msg);
+        while (zlist_size (self->metadata)) {
+            zblob_t *blob = zlist_pop (self->metadata);
+            zblob_destroy (&blob);
+        }
         free (self);
         *self_p = NULL;
     }
@@ -177,7 +184,7 @@ s_dump (byte *buffer, int size, char *prefix)
 //  --------------------------------------------------------------------------
 //  Generate a new long-term key pair
 
-CZMQ_EXPORT void
+void
 zcurve_keypair_new (zcurve_t *self)
 {
     assert (self);
@@ -191,7 +198,7 @@ zcurve_keypair_new (zcurve_t *self)
 //  --------------------------------------------------------------------------
 //  Save long-term key pair to disk; not confidential
 
-CZMQ_EXPORT int
+int
 zcurve_keypair_save (zcurve_t *self)
 {
 #   define PUBKEY_FILE "public.key"
@@ -243,7 +250,7 @@ zcurve_keypair_save (zcurve_t *self)
 //  --------------------------------------------------------------------------
 //  Load long-term key pair from disk; returns 0 if OK, -1 if error
 
-CZMQ_EXPORT int
+int
 zcurve_keypair_load (zcurve_t *self)
 {
     assert (self);
@@ -270,7 +277,7 @@ zcurve_keypair_load (zcurve_t *self)
 //  --------------------------------------------------------------------------
 //  Return public part of key pair
 
-CZMQ_EXPORT byte *
+byte *
 zcurve_keypair_public (zcurve_t *self)
 {
     assert (self);
@@ -278,12 +285,34 @@ zcurve_keypair_public (zcurve_t *self)
 }
 
 
-static zmq_msg_t *
+//  --------------------------------------------------------------------------
+//  Set a metadata property; these are sent to the peer after the
+//  security handshake. Property values are size-specified blobs.
+//  Takes ownership of the blob, destroying it automatically when
+//  finished with it.
+
+void
+zcurve_metadata_set (zcurve_t *self, char *name, zblob_t **value_p)
+{
+    assert (self);
+    assert (value_p);
+    assert (*value_p);
+    //  Append blob to list
+    zlist_append (self->metadata, *value_p);
+    self->metadata_size += zblob_size (*value_p);
+    //  Take ownership of the blob
+    *value_p = NULL;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Internal functions for working with CurveZMQ commands
+    
+static zframe_t *
 s_produce_hello (zcurve_t *self)
 {
-    zmq_msg_close (&self->msg);
-    zmq_msg_init_size (&self->msg, sizeof (hello_t));
-    hello_t *hello = (hello_t *) zmq_msg_data (&self->msg);
+    zframe_t *command = zframe_new (NULL, sizeof (hello_t));
+    hello_t *hello = (hello_t *) zframe_data (command);
     memcpy (hello->id, "HELLO   ", 8);
     
 #if defined (HAVE_LIBSODIUM)
@@ -313,13 +342,14 @@ s_produce_hello (zcurve_t *self)
     memcpy (hello->box, box + crypto_box_BOXZEROBYTES, sizeof (hello->box));
     self->cn_nonce++;
 #endif
-    return &self->msg;
+    return command;
 }
 
 static void
-s_process_hello (zcurve_t *self, hello_t *hello)
+s_process_hello (zcurve_t *self, zframe_t *input)
 {
     printf ("C:HELLO: ");
+    hello_t *hello = (hello_t *) zframe_data (input);
 
 #if defined (HAVE_LIBSODIUM)
     //  Working variables for crypto calls
@@ -342,12 +372,11 @@ s_process_hello (zcurve_t *self, hello_t *hello)
 #endif
 }
 
-static zmq_msg_t *
+static zframe_t *
 s_produce_welcome (zcurve_t *self)
 {
-    zmq_msg_close (&self->msg);
-    zmq_msg_init_size (&self->msg, sizeof (welcome_t));
-    welcome_t *welcome = (welcome_t *) zmq_msg_data (&self->msg);
+    zframe_t *command = zframe_new (NULL, sizeof (welcome_t));
+    welcome_t *welcome = (welcome_t *) zframe_data (command);
     memcpy (welcome->id, "WELCOME ", 8);
 
 #if defined (HAVE_LIBSODIUM)
@@ -400,12 +429,13 @@ s_produce_welcome (zcurve_t *self)
     memcpy (welcome->box,
             box + crypto_box_BOXZEROBYTES, sizeof (welcome->box));
 #endif
-    return &self->msg;
+    return command;
 }
 
 static void
-s_process_welcome (zcurve_t *self, welcome_t *welcome)
+s_process_welcome (zcurve_t *self, zframe_t *input)
 {
+    welcome_t *welcome = (welcome_t *) zframe_data (input);
     printf ("S:WELCOME: ");
 
 #if defined (HAVE_LIBSODIUM)
@@ -437,12 +467,11 @@ s_process_welcome (zcurve_t *self, welcome_t *welcome)
 #endif
 }
 
-static zmq_msg_t *
+static zframe_t *
 s_produce_initiate (zcurve_t *self)
 {
-    zmq_msg_close (&self->msg);
-    zmq_msg_init_size (&self->msg, sizeof (initiate_t));
-    initiate_t *initiate = (initiate_t *) zmq_msg_data (&self->msg);
+    zframe_t *command = zframe_new (NULL, sizeof (initiate_t));
+    initiate_t *initiate = (initiate_t *) zframe_data (command);
     memcpy (initiate->id, "INITIATE", 8);
 
 #if defined (HAVE_LIBSODIUM)
@@ -484,12 +513,13 @@ s_produce_initiate (zcurve_t *self)
     memcpy (initiate->box, box + crypto_box_BOXZEROBYTES, sizeof (initiate->box));
     self->cn_nonce++;
 #endif
-    return &self->msg;
+    return command;
 }
 
 static void
-s_process_initiate (zcurve_t *self, initiate_t *initiate)
+s_process_initiate (zcurve_t *self, zframe_t *input)
 {
+    initiate_t *initiate = (initiate_t *) zframe_data (input);
     printf ("C:INITIATE: ");
 
 #if defined (HAVE_LIBSODIUM)
@@ -554,12 +584,11 @@ s_process_initiate (zcurve_t *self, initiate_t *initiate)
 #endif
 }
 
-static zmq_msg_t *
+static zframe_t *
 s_produce_ready (zcurve_t *self)
 {
-    zmq_msg_close (&self->msg);
-    zmq_msg_init_size (&self->msg, sizeof (ready_t));
-    ready_t *ready = (ready_t *) zmq_msg_data (&self->msg);
+    zframe_t *command = zframe_new (NULL, sizeof (ready_t));
+    ready_t *ready = (ready_t *) zframe_data (command);
     memcpy (ready->id, "READY   ", 8);
     
 #if defined (HAVE_LIBSODIUM)
@@ -567,25 +596,24 @@ s_produce_ready (zcurve_t *self)
 //     memcpy (ready->box, box + crypto_box_BOXZEROBYTES, sizeof (ready->box));
     self->cn_nonce++;
 #endif
-    return &self->msg;
+    return command;
 }
 
 static void
-s_process_ready (zcurve_t *self, ready_t *ready)
+s_process_ready (zcurve_t *self, zframe_t *input)
 {
+//     ready_t *ready = (ready_t *) zframe_data (input);
     printf ("S:READY: ");
     
 #if defined (HAVE_LIBSODIUM)
 #endif
 }
 
-static zmq_msg_t *
-s_process_message (zcurve_t *self, message_t *message)
+static zframe_t *
+s_process_message (zcurve_t *self, zframe_t *input)
 {
+    message_t *message = (message_t *) zframe_data (input);
     printf ("%c:MESSAGE: ", self->is_server? 'C': 'S');
-    
-    zmq_msg_close (&self->msg);
-    zmq_msg_init_size (&self->msg, 100);
 
 #if defined (HAVE_LIBSODIUM)
     //  Working variables for crypto calls
@@ -608,93 +636,92 @@ s_process_message (zcurve_t *self, message_t *message)
         nonce, self->cn_precom);
     assert (rc == 0);
 
-    memcpy (zmq_msg_data (&self->msg), plain + crypto_box_ZEROBYTES, 100);
+    return zframe_new (plain + crypto_box_ZEROBYTES, 100);
 #else
-    memcpy (zmq_msg_data (&self->msg), message->box, 100);
+    return zframe_new (message->box, 100);
 #endif
-    return &self->msg;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Accept command from peer. If the command is invalid, it is discarded
-//  silently (in this prototype, that causes an assertion failure). May
-//  return a zmq_msg_t to send to the peer, or NULL if there is nothing
-//  to send.
+//  Accept input command from peer. If the command is invalid, it is
+//  discarded silently. May return a blob to send to the peer, or NULL
+//  if there is nothing to send.
 
-zmq_msg_t *
-zcurve_execute (zcurve_t *self, zmq_msg_t *incoming)
+zframe_t *
+zcurve_execute (zcurve_t *self, zframe_t *input)
 {
     assert (self);
-
-    zmq_msg_t *outgoing = NULL;
-    size_t size = incoming? zmq_msg_size (incoming): 0;
-    byte *data = (byte *) (incoming? zmq_msg_data (incoming): NULL);
-
-    //  Now process command according to current state
+    
+    //  Pending state - ignore input
     if (self->state == pending) {
-        outgoing = s_produce_hello (self);
         self->state = expect_welcome;
+        puts ("OK");
+        return s_produce_hello (self);
     }
-    else
-    if (size == sizeof (hello_t)
-    &&  memcmp (data, "HELLO   ", 8) == 0
-    &&  self->state == expect_hello) {
-        s_process_hello (self, (hello_t *) data);
-        outgoing = s_produce_welcome (self);
+    //  All other states require input
+    assert (input);
+    size_t size = zframe_size (input);
+    byte *data = zframe_data (input);
+    zframe_t *output = NULL;
+
+    if (self->state == expect_hello
+    &&  size == sizeof (hello_t)
+    &&  memcmp (data, "HELLO   ", 8) == 0) {
+        s_process_hello (self, input);
+        output = s_produce_welcome (self);
         self->state = expect_initiate;
     }
     else
-    if (size == sizeof (welcome_t)
-    &&  memcmp (data, "WELCOME ", 8) == 0
-    &&  self->state == expect_welcome) {
-        s_process_welcome (self, (welcome_t *) data);
-        outgoing = s_produce_initiate (self);
+    if (self->state == expect_welcome
+    &&  size == sizeof (welcome_t)
+    &&  memcmp (data, "WELCOME ", 8) == 0) {
+        s_process_welcome (self, input);
+        output = s_produce_initiate (self);
         self->state = expect_ready;
     }
     else
-    if (size == sizeof (initiate_t)
-    &&  memcmp (data, "INITIATE ", 8) == 0
-    &&  self->state == expect_initiate) {
-        s_process_initiate (self, (initiate_t *) data);
-        outgoing = s_produce_ready (self);
+    if (self->state == expect_initiate
+    &&  size == sizeof (initiate_t)
+    &&  memcmp (data, "INITIATE ", 8) == 0) {
+        s_process_initiate (self, input);
+        output = s_produce_ready (self);
         self->state = connected;
     }
     else
-    if (size == sizeof (ready_t)
-    &&  memcmp (data, "READY   ", 8) == 0
-    &&  self->state == expect_ready) {
-        s_process_ready (self, (ready_t *) data);
+    if (self->state == expect_ready
+    &&  size == sizeof (ready_t)
+    &&  memcmp (data, "READY   ", 8) == 0) {
+        s_process_ready (self, input);
         self->state = connected;
     }
     else
-    if (size == sizeof (message_t)
-    &&  memcmp (data, "MESSAGE ", 8) == 0
-    &&  self->state == connected) {
-        outgoing = s_process_message (self, (message_t *) data);
-    }
+    if (self->state == connected
+    &&  size == sizeof (message_t)
+    &&  memcmp (data, "MESSAGE ", 8) == 0)
+        output = s_process_message (self, input);
     else {
         puts ("E: invalid command");
         assert (false);
     }
     puts ("OK");
-    return outgoing;
+    return output;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Encode message from peer. Returns a zmq_msg_t ready to send on the wire.
+//  Encode clear-text message to peer. Returns a blob ready to send
+//  on the wire.
 
-zmq_msg_t *
-zcurve_encode (zcurve_t *self, byte *data, size_t size)
+zframe_t *
+zcurve_encode (zcurve_t *self, zframe_t *clear)
 {
     assert (self);
-    assert (data);
     assert (self->state == connected);
-    
-    zmq_msg_close (&self->msg);
-    zmq_msg_init_size (&self->msg, sizeof (message_t));
-    message_t *message = (message_t *) zmq_msg_data (&self->msg);
+    assert (clear);
+
+    zframe_t *command = zframe_new (NULL, sizeof (message_t));
+    message_t *message = (message_t *) zframe_data (command);
     memcpy (message->id, "MESSAGE ", 8);
 
 #if defined (HAVE_LIBSODIUM)
@@ -705,7 +732,7 @@ zcurve_encode (zcurve_t *self, byte *data, size_t size)
 
     //  Create message Box [M](C'->S'), max M is 100
     memset (plain, 0, crypto_box_ZEROBYTES + 100);
-    memcpy (plain + crypto_box_ZEROBYTES, data, size);
+    memcpy (plain + crypto_box_ZEROBYTES, zframe_data (clear), zframe_size (clear));
 
     //  Prepare the full nonce and encrypt
     char *prefix = self->is_server? "CurveZMQMESSAGES": "CurveZMQMESSAGEC";
@@ -723,9 +750,9 @@ zcurve_encode (zcurve_t *self, byte *data, size_t size)
     self->cn_nonce++;
 #else
     memset (message->box, 0, sizeof (message->box));
-    memcpy (message->box, data, size);
+    memcpy (message->box, zframe_data (clear), zframe_size (clear));
 #endif
-    return &self->msg;
+    return command;
 }
 
 
@@ -750,70 +777,56 @@ server_task (void *args)
     assert (rc == 0);
 
     //  Hard code the progression for now...
-    
-    zmq_msg_t identity;
-    zmq_msg_t incoming;
+    zframe_t *sender;
+    zframe_t *input;
+    zframe_t *output;
     
     //  Get HELLO command
-    zmq_msg_init (&identity);
-    rc = zmq_msg_recv (&identity, router, 0);
-    assert (rc >= 0);
-    assert (zmq_msg_more (&identity));
-    zmq_msg_init (&incoming);
-    rc = zmq_msg_recv (&incoming, router, 0);
-    assert (rc >= 0);
+    sender = zframe_recv (router);
+    input = zframe_recv (router);
+    assert (input);
 
     //  Start server side of handshake
-    zmq_msg_t *message = zcurve_execute (server, &incoming);
-    zmq_msg_close (&incoming);
+    output = zcurve_execute (server, input);
+    zframe_destroy (&input);
 
     //  We have WELCOME, send back to client
-    assert (message);
-    rc = zmq_msg_send (&identity, router, ZMQ_SNDMORE);
-    assert (rc >= 0);
-    rc = zmq_msg_send (message, router, 0);
-    assert (rc >= 0);
+    assert (output);
+    zframe_send (&sender, router, ZFRAME_MORE);
+    zframe_send (&output, router, 0);
 
     //  Get INITIATE command
-    zmq_msg_init (&identity);
-    rc = zmq_msg_recv (&identity, router, 0);
-    assert (rc >= 0);
-    assert (zmq_msg_more (&identity));
-    zmq_msg_init (&incoming);
-    rc = zmq_msg_recv (&incoming, router, 0);
-    assert (rc >= 0);
+    sender = zframe_recv (router);
+    input = zframe_recv (router);
+    assert (input);
     
-    message = zcurve_execute (server, &incoming);
-    zmq_msg_close (&incoming);
+    output = zcurve_execute (server, input);
+    zframe_destroy (&input);
     
     //  We have READY, send back to client
-    assert (message);
-    rc = zmq_msg_send (&identity, router, ZMQ_SNDMORE);
-    assert (rc >= 0);
-    rc = zmq_msg_send (message, router, 0);
-    assert (rc >= 0);
+    assert (output);
+    zframe_send (&sender, router, ZFRAME_MORE);
+    zframe_send (&output, router, 0);
 
     //  Get MESSAGE command
-    zmq_msg_init (&identity);
-    rc = zmq_msg_recv (&identity, router, 0);
-    assert (rc >= 0);
-    assert (zmq_msg_more (&identity));
-    zmq_msg_init (&incoming);
-    rc = zmq_msg_recv (&incoming, router, 0);
-    assert (rc >= 0);
-    message = zcurve_execute (server, &incoming);
-    zmq_msg_close (&incoming);
+    sender = zframe_recv (router);
+    input = zframe_recv (router);
+    assert (input);
+    
+    output = zcurve_execute (server, input);
+    zframe_destroy (&input);
 
     //  Do Hello, World
-    assert (message);
-    assert (memcmp (zmq_msg_data (message), "Hello", 5) == 0);
-    message = zcurve_encode (server, (byte *) "World", 5);
-    assert (message);
+    assert (output);
+    assert (memcmp (zframe_data (output), "Hello", 5) == 0);
+    zframe_destroy (&output);
 
-    rc = zmq_msg_send (&identity, router, ZMQ_SNDMORE);
-    assert (rc >= 0);
-    rc = zmq_msg_send (message, router, 0);
-    assert (rc >= 0);
+    zframe_t *response = zframe_new ((byte *) "World", 5);
+    output = zcurve_encode (server, response);
+    zframe_destroy (&response);
+    assert (output);
+    zframe_send (&sender, router, ZFRAME_MORE);
+    zframe_send (&output, router, 0);
     
     zcurve_destroy (&server);
     zctx_destroy (&ctx);
@@ -854,30 +867,40 @@ zcurve_test (bool verbose)
     zcurve_t *client = zcurve_new (server_key);
     zcurve_keypair_new (client);
 
+    //  Set some metadata properties
+    zblob_t *property;
+    property = zblob_new ((byte *) "CZMQ/zcurve", 11);
+    zcurve_metadata_set (client, "Client", &property);
+    property = zblob_new ((byte *) (byte *) "E475DA11", 8);
+    zcurve_metadata_set (client, "Identity", &property);
+
     //  Execute null event on client to kick off handshake
-    zmq_msg_t *message = zcurve_execute (client, NULL);
-    while (message) {
+    zframe_t *output = zcurve_execute (client, NULL);
+    while (output) {
         //  Send message to server
-        rc = zmq_msg_send (message, dealer, 0);
-        if (rc == -1) puts (strerror (errno));
+        rc = zframe_send (&output, dealer, 0);
         assert (rc >= 0);
         //  Get reply from server (could be FSMified)
-        rc = zmq_msg_recv (message, dealer, 0);
-        assert (rc >= 0);
+        zframe_t *input = zframe_recv (dealer);
+        assert (input);
         //  Execute reply on client to continue handshake
-        message = zcurve_execute (client, message);
+        output = zcurve_execute (client, input);
     }
     //  Handshake is done, now try Hello, World
-    message = zcurve_encode (client, (byte *) "Hello", 5);
-    assert (message);
-    rc = zmq_msg_send (message, dealer, 0);
-    assert (rc >= 0);
+    zframe_t *request = zframe_new ((byte *) "Hello", 5);
+    output = zcurve_encode (client, request);
+    zframe_destroy (&request);
+    assert (output);
+    zframe_send (&output, dealer, 0);
 
-    rc = zmq_msg_recv (message, dealer, 0);
-    assert (rc >= 0);
-    message = zcurve_execute (client, message);
-    assert (message);
-    assert (memcmp (zmq_msg_data (message), "World", 5) == 0);
+    zframe_t *input = zframe_recv (dealer);
+    assert (input);
+    
+    output = zcurve_execute (client, input);
+    assert (output);
+    assert (memcmp (zframe_data (output), "World", 5) == 0);
+    zframe_destroy (&input);
+    zframe_destroy (&output);
 
     //  Done, clean-up
     zcurve_destroy (&client);

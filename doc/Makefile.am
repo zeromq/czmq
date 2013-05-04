@@ -1,5 +1,6 @@
 MAN1 =
 MAN3 = zbeacon.3 \
+    zblob.3 \
     zclock.3 \
     zctx.3 \
     zcurve.3 \

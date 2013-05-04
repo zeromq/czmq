@@ -1,5 +1,5 @@
 /*  =========================================================================
-    czmq.h - CZMQ wrapper
+    zblob - work with binary long objects (blobs)
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
@@ -24,42 +24,41 @@
     =========================================================================
 */
 
-#ifndef __CZMQ_H_INCLUDED__
-#define __CZMQ_H_INCLUDED__
+#ifndef __ZBLOB_H_INCLUDED__
+#define __ZBLOB_H_INCLUDED__
 
-//  Set up environment for the application
-//
-#include "czmq_prelude.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-//  CZMQ version macros for compile-time API detection
+//  Opaque class structure
+typedef struct _zblob_t zblob_t;
 
-#define CZMQ_VERSION_MAJOR 1
-#define CZMQ_VERSION_MINOR 4
-#define CZMQ_VERSION_PATCH 0
+//  @interface
+//  Constructor. If data is not null, must be at least size bytes, and is
+//  taken as value for blob.
+CZMQ_EXPORT zblob_t *
+    zblob_new (byte *data, size_t size);
+    
+//  Destructor
+CZMQ_EXPORT void
+    zblob_destroy (zblob_t **self_p);
+    
+//  Return blob size
+CZMQ_EXPORT size_t
+    zblob_size (zblob_t *self);
+    
+//  Return blob data; you can write to this memory block.
+CZMQ_EXPORT byte *
+    zblob_data (zblob_t *self);
+    
+//  Self test of this class
+void
+    zblob_test (bool verbose);
+//  @end
 
-#define CZMQ_MAKE_VERSION(major, minor, patch) \
-    ((major) * 10000 + (minor) * 100 + (patch))
-#define CZMQ_VERSION \
-    CZMQ_MAKE_VERSION(CZMQ_VERSION_MAJOR, CZMQ_VERSION_MINOR, CZMQ_VERSION_PATCH)
-
-//  Classes in the API
-
-#include "zblob.h"
-#include "zclock.h"
-#include "zctx.h"
-#include "zfile.h"
-#include "zframe.h"
-#include "zlist.h"
-#include "zhash.h"
-#include "zloop.h"
-#include "zmsg.h"
-#include "zmutex.h"
-#include "zsocket.h"
-#include "zsockopt.h"
-#include "zstr.h"
-#include "zsys.h"
-#include "zthread.h"
-#include "zbeacon.h"
-#include "zcurve.h"
+#ifdef __cplusplus
+}
+#endif
 
 #endif
