@@ -53,7 +53,7 @@ CZMQ_EXPORT zframe_t *
 
 //  Create an empty (zero-sized) frame
 CZMQ_EXPORT zframe_t *
-    zframe_new_empty ();
+    zframe_new_empty (void);
 
 //  Destroy a frame
 CZMQ_EXPORT void
@@ -120,14 +120,14 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zframe_reset (zframe_t *self, const void *data, size_t size);
     
-//  Set new contents for frame, using zero copy.
+//  Set new contents for frame, using zero copy
 CZMQ_EXPORT void
     zframe_reset_zero_copy (zframe_t *self, void *data, size_t size,
-                                zframe_free_fn *free_fn, void *arg);
+                            zframe_free_fn *free_fn, void *arg);
 
 //  Set the free callback for frame
 CZMQ_EXPORT void
-    zframe_freefn(zframe_t *self, zframe_free_fn *free_fn, void *arg);
+    zframe_freefn (zframe_t *self, zframe_free_fn *free_fn, void *arg);
 
 //  Self test of this class
 CZMQ_EXPORT int
