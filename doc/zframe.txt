@@ -26,7 +26,7 @@ CZMQ_EXPORT zframe_t *
 
 //  Create an empty (zero-sized) frame
 CZMQ_EXPORT zframe_t *
-    zframe_new_empty ();
+    zframe_new_empty (void);
 
 //  Destroy a frame
 CZMQ_EXPORT void
@@ -43,8 +43,8 @@ CZMQ_EXPORT zframe_t *
 CZMQ_EXPORT zframe_t *
     zframe_recv_nowait (void *socket);
 
-// Send a frame to a socket, destroy frame after sending.  Returns
-// non-zero error code on failure.
+// Send a frame to a socket, destroy frame after sending.
+// Return -1 on error, 0 on success.
 CZMQ_EXPORT int
     zframe_send (zframe_t **self_p, void *socket, int flags);
 
@@ -93,14 +93,14 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zframe_reset (zframe_t *self, const void *data, size_t size);
     
-//  Set new contents for frame, using zero copy.
+//  Set new contents for frame, using zero copy
 CZMQ_EXPORT void
     zframe_reset_zero_copy (zframe_t *self, void *data, size_t size,
-                                zframe_free_fn *free_fn, void *arg);
+                            zframe_free_fn *free_fn, void *arg);
 
 //  Set the free callback for frame
 CZMQ_EXPORT void
-    zframe_freefn(zframe_t *self, zframe_free_fn *free_fn, void *arg);
+    zframe_freefn (zframe_t *self, zframe_free_fn *free_fn, void *arg);
 
 //  Self test of this class
 CZMQ_EXPORT int
@@ -125,7 +125,7 @@ EXAMPLE
 ----
     zctx_t *ctx = zctx_new ();
     assert (ctx);
-
+    
     void *output = zsocket_new (ctx, ZMQ_PAIR);
     assert (output);
     zsocket_bind (output, "inproc://zframe.test");
@@ -136,12 +136,12 @@ EXAMPLE
     //  Send five different frames, test ZFRAME_MORE
     int frame_nbr;
     for (frame_nbr = 0; frame_nbr < 5; frame_nbr++) {
-        zframe_t *frame = zframe_new ("Hello", 5);
+        frame = zframe_new ("Hello", 5);
         rc = zframe_send (&frame, output, ZFRAME_MORE);
         assert (rc == 0);
     }
     //  Send same frame five times, test ZFRAME_REUSE
-    zframe_t *frame = zframe_new ("Hello", 5);
+    frame = zframe_new ("Hello", 5);
     assert (frame);
     for (frame_nbr = 0; frame_nbr < 5; frame_nbr++) {
         rc = zframe_send (&frame, output, ZFRAME_MORE + ZFRAME_REUSE);
@@ -155,6 +155,21 @@ EXAMPLE
     assert (zframe_size (copy) == 5);
     zframe_destroy (&copy);
     assert (!zframe_eq (frame, copy));
+	
+	//Test zframe_reset_zero_copy
+    frame = zframe_new ("ONE", 3);
+    assert (frame);
+	zframe_reset_zero_copy (frame, strdup("TWO"), 3, s_test_free_cb, NULL);
+    char* zeroCopyTestStr = zframe_strdup (frame);
+	assert (streq (zeroCopyTestStr, "TWO"));
+    free (zeroCopyTestStr);
+	zframe_destroy(&frame);
+    
+    //Test zframe_new_empty
+    frame = zframe_new_empty();
+    assert(frame);
+    assert(zframe_size(frame) == 0);
+    zframe_destroy(&frame);
 
     //  Send END frame
     frame = zframe_new ("NOT", 3);

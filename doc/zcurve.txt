@@ -8,36 +8,38 @@ zcurve - CurveZMQ security engine (rfc.zeromq.org/spec:26)
 SYNOPSIS
 --------
 ----
-//  Constructor. Always generates a new public/secret key pair which 
-//  you can override if you need to.
+//  Constructor; to create a client instance, pass the server public
+//  key. If you pass null, you create a server instance.
 CZMQ_EXPORT zcurve_t *
-    zcurve_new (void);
-
+    zcurve_new (byte *server_key);
+    
 //  Destructor
 CZMQ_EXPORT void
     zcurve_destroy (zcurve_t **self_p);
 
-//  Return value of public key
+//  Long-term key management for servers; generate a new key pair
+CZMQ_EXPORT void
+    zcurve_keypair_new (zcurve_t *self);
+
+//  Save long-term key pair to disk; not confidential
+CZMQ_EXPORT int
+    zcurve_keypair_save (zcurve_t *self);
+
+//  Load long-term key pair from disk
+CZMQ_EXPORT int
+    zcurve_keypair_load (zcurve_t *self);
+
+//  Return public part of key pair
 CZMQ_EXPORT byte *
-    zcurve_public_key (zcurve_t *self);
-
-//  Return value of secret key
-CZMQ_EXPORT byte *
-    zcurve_secret_key (zcurve_t *self);
-
-//  Start zcurve instance as client (if you provide a server key) or as
-//  server. May return a zmq_msg_t to send to the peer, or NULL if there
-//  is nothing to send.
-CZMQ_EXPORT zmq_msg_t *
-    zcurve_start (zcurve_t *self, byte *server_key);
-
+    zcurve_keypair_public (zcurve_t *self);
+    
 //  Accept command from peer. If the command is invalid, it is discarded
 //  silently (in this prototype, that causes an assertion failure). May
 //  return a zmq_msg_t to send to the peer, or NULL if there is nothing
 //  to send.
 CZMQ_EXPORT zmq_msg_t *
-    zcurve_accept (zcurve_t *self, zmq_msg_t *message);
-    
+    zcurve_execute (zcurve_t *self, zmq_msg_t *message);
+
 //  Encode message from peer. Returns a zmq_msg_t ready to send on the wire.
 CZMQ_EXPORT zmq_msg_t *
     zcurve_encode (zcurve_t *self, byte *data, size_t size);
@@ -60,47 +62,148 @@ EXAMPLE
 -------
 .From zcurve_test method
 ----
-#if defined (HAVE_LIBSODIUM)
-    zmq_msg_t *msg;
+void *
+server_task (void *args)
+{
+    //  We'll use a router socket to be more realistic
+    zctx_t *ctx = zctx_new ();
+    assert (ctx);
+    void *router = zsocket_new (ctx, ZMQ_ROUTER);
+    int rc = zsocket_bind (router, "tcp://*:9000");
+    assert (rc != -1);
 
-    //  Start server peer
-    zcurve_t *server = zcurve_new ();
-    msg = zcurve_start (server, NULL);
-    assert (msg == NULL);
-    
-    //  Start client peer and ping/pong through the handshake
-    zcurve_t *client = zcurve_new ();
-    msg = zcurve_start (client, zcurve_public_key (server));
-    while (msg) {
-        msg = zcurve_accept (server, msg);
-        if (msg)
-            msg = zcurve_accept (client, msg);
-    }
-    msg = zcurve_encode (client, (byte *) "Hello", 5);
-    assert (msg);
-    
-    //  Send encoded message over the wire
-    //  ...
-    //  Receive encoded message from the wire
-    
-    msg = zcurve_accept (server, msg);
-    assert (msg);
-    assert (memcmp (zmq_msg_data (msg), "Hello", 5) == 0);
+    //  Create a new server instance and load its keys from
+    //  the previously generated keypair file
+    zcurve_t *server = zcurve_new (NULL);
+    rc = zcurve_keypair_load (server);
+    assert (rc == 0);
 
-    msg = zcurve_encode (server, (byte *) "World", 5);
-    assert (msg);
+    //  Hard code the progression for now...
     
-    //  Send encoded message over the wire
-    //  ...
-    //  Receive encoded message from the wire
+    zmq_msg_t identity;
+    zmq_msg_t incoming;
     
-    msg = zcurve_accept (client, msg);
-    assert (msg);
-    assert (memcmp (zmq_msg_data (msg), "World", 5) == 0);
+    //  Get HELLO command
+    zmq_msg_init (&identity);
+    rc = zmq_msg_recv (&identity, router, 0);
+    assert (rc >= 0);
+    assert (zmq_msg_more (&identity));
+    zmq_msg_init (&incoming);
+    rc = zmq_msg_recv (&incoming, router, 0);
+    assert (rc >= 0);
 
+    //  Start server side of handshake
+    zmq_msg_t *message = zcurve_execute (server, &incoming);
+    zmq_msg_close (&incoming);
+
+    //  We have WELCOME, send back to client
+    assert (message);
+    rc = zmq_msg_send (&identity, router, ZMQ_SNDMORE);
+    assert (rc >= 0);
+    rc = zmq_msg_send (message, router, 0);
+    assert (rc >= 0);
+
+    //  Get INITIATE command
+    zmq_msg_init (&identity);
+    rc = zmq_msg_recv (&identity, router, 0);
+    assert (rc >= 0);
+    assert (zmq_msg_more (&identity));
+    zmq_msg_init (&incoming);
+    rc = zmq_msg_recv (&incoming, router, 0);
+    assert (rc >= 0);
+    
+    message = zcurve_execute (server, &incoming);
+    zmq_msg_close (&incoming);
+    
+    //  We have READY, send back to client
+    assert (message);
+    rc = zmq_msg_send (&identity, router, ZMQ_SNDMORE);
+    assert (rc >= 0);
+    rc = zmq_msg_send (message, router, 0);
+    assert (rc >= 0);
+
+    //  Get MESSAGE command
+    zmq_msg_init (&identity);
+    rc = zmq_msg_recv (&identity, router, 0);
+    assert (rc >= 0);
+    assert (zmq_msg_more (&identity));
+    zmq_msg_init (&incoming);
+    rc = zmq_msg_recv (&incoming, router, 0);
+    assert (rc >= 0);
+    message = zcurve_execute (server, &incoming);
+    zmq_msg_close (&incoming);
+
+    //  Do Hello, World
+    assert (message);
+    assert (memcmp (zmq_msg_data (message), "Hello", 5) == 0);
+    message = zcurve_encode (server, (byte *) "World", 5);
+    assert (message);
+
+    rc = zmq_msg_send (&identity, router, ZMQ_SNDMORE);
+    assert (rc >= 0);
+    rc = zmq_msg_send (message, router, 0);
+    assert (rc >= 0);
+    
     zcurve_destroy (&server);
+    zctx_destroy (&ctx);
+    return NULL;
+}
+    //  Generate new long-term key pair for our test server
+    //  The key pair will be stored in "secret.key"
+    zcurve_t *keygen = zcurve_new (NULL);
+    zcurve_keypair_new (keygen);
+    int rc = zcurve_keypair_save (keygen);
+    assert (rc == 0);
+    assert (zfile_exists ("secret.key"));
+    assert (zfile_size ("secret.key") == 196);
+    //  This is how we "share" the server key in our test
+    byte server_key [32];
+    memcpy (server_key, zcurve_keypair_public (keygen), 32);
+    zcurve_destroy (&keygen);
+    
+    //  We'll run the server as a background task, and the
+    //  client in this foreground thread.
+    zthread_new (server_task, NULL);
+
+    zctx_t *ctx = zctx_new ();
+    assert (ctx);
+    void *dealer = zsocket_new (ctx, ZMQ_DEALER);
+    rc = zsocket_connect (dealer, "tcp://127.0.0.1:9000");
+    assert (rc != -1);
+    
+    //  Create a new client instance using shared server key
+    zcurve_t *client = zcurve_new (server_key);
+    zcurve_keypair_new (client);
+
+    //  Execute null event on client to kick off handshake
+    zmq_msg_t *message = zcurve_execute (client, NULL);
+    while (message) {
+        //  Send message to server
+        rc = zmq_msg_send (message, dealer, 0);
+        if (rc == -1) puts (strerror (errno));
+        assert (rc >= 0);
+        //  Get reply from server (could be FSMified)
+        rc = zmq_msg_recv (message, dealer, 0);
+        assert (rc >= 0);
+        //  Execute reply on client to continue handshake
+        message = zcurve_execute (client, message);
+    }
+    //  Handshake is done, now try Hello, World
+    message = zcurve_encode (client, (byte *) "Hello", 5);
+    assert (message);
+    rc = zmq_msg_send (message, dealer, 0);
+    assert (rc >= 0);
+
+    rc = zmq_msg_recv (message, dealer, 0);
+    assert (rc >= 0);
+    message = zcurve_execute (client, message);
+    assert (message);
+    assert (memcmp (zmq_msg_data (message), "World", 5) == 0);
+
+    //  Done, clean-up
     zcurve_destroy (&client);
-#endif
+    zfile_delete ("public.key");
+    zfile_delete ("secret.key");
 ----
 
 SEE ALSO
