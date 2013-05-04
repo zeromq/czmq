@@ -700,7 +700,7 @@ zsocket_affinity (void *zocket)
 //  Set socket ZMQ_SUBSCRIBE value
 
 void
-zsocket_set_subscribe (void *zocket, char * subscribe)
+zsocket_set_subscribe (void *zocket, const char * subscribe)
 {
 #   if defined (ZMQ_SUBSCRIBE)
     if (zsockopt_type (zocket) != ZMQ_SUB) {
@@ -717,7 +717,7 @@ zsocket_set_subscribe (void *zocket, char * subscribe)
 //  Set socket ZMQ_UNSUBSCRIBE value
 
 void
-zsocket_set_unsubscribe (void *zocket, char * unsubscribe)
+zsocket_set_unsubscribe (void *zocket, const char * unsubscribe)
 {
 #   if defined (ZMQ_UNSUBSCRIBE)
     if (zsockopt_type (zocket) != ZMQ_SUB) {
@@ -734,7 +734,7 @@ zsocket_set_unsubscribe (void *zocket, char * unsubscribe)
 //  Set socket ZMQ_IDENTITY value
 
 void
-zsocket_set_identity (void *zocket, char * identity)
+zsocket_set_identity (void *zocket, const char * identity)
 {
 #   if defined (ZMQ_IDENTITY)
     if (zsockopt_type (zocket) != ZMQ_REQ

@@ -65,7 +65,7 @@ CZMQ_EXPORT int zsocket_events (void *zocket);
 CZMQ_EXPORT void zsocket_set_hwm (void *zocket, int hwm);
 CZMQ_EXPORT void zsocket_set_swap (void *zocket, int swap);
 CZMQ_EXPORT void zsocket_set_affinity (void *zocket, int affinity);
-CZMQ_EXPORT void zsocket_set_identity (void *zocket, char * identity);
+CZMQ_EXPORT void zsocket_set_identity (void *zocket, const char * identity);
 CZMQ_EXPORT void zsocket_set_rate (void *zocket, int rate);
 CZMQ_EXPORT void zsocket_set_recovery_ivl (void *zocket, int recovery_ivl);
 CZMQ_EXPORT void zsocket_set_recovery_ivl_msec (void *zocket, int recovery_ivl_msec);
@@ -82,8 +82,8 @@ CZMQ_EXPORT void zsocket_set_linger (void *zocket, int linger);
 CZMQ_EXPORT void zsocket_set_reconnect_ivl (void *zocket, int reconnect_ivl);
 CZMQ_EXPORT void zsocket_set_reconnect_ivl_max (void *zocket, int reconnect_ivl_max);
 CZMQ_EXPORT void zsocket_set_backlog (void *zocket, int backlog);
-CZMQ_EXPORT void zsocket_set_subscribe (void *zocket, char * subscribe);
-CZMQ_EXPORT void zsocket_set_unsubscribe (void *zocket, char * unsubscribe);
+CZMQ_EXPORT void zsocket_set_subscribe (void *zocket, const char * subscribe);
+CZMQ_EXPORT void zsocket_set_unsubscribe (void *zocket, const char * unsubscribe);
 #endif
 
 #if (ZMQ_VERSION_MAJOR == 3)
@@ -117,9 +117,9 @@ CZMQ_EXPORT char * zsocket_last_endpoint (void *zocket);
 CZMQ_EXPORT void zsocket_set_sndhwm (void *zocket, int sndhwm);
 CZMQ_EXPORT void zsocket_set_rcvhwm (void *zocket, int rcvhwm);
 CZMQ_EXPORT void zsocket_set_affinity (void *zocket, int affinity);
-CZMQ_EXPORT void zsocket_set_subscribe (void *zocket, char * subscribe);
-CZMQ_EXPORT void zsocket_set_unsubscribe (void *zocket, char * unsubscribe);
-CZMQ_EXPORT void zsocket_set_identity (void *zocket, char * identity);
+CZMQ_EXPORT void zsocket_set_subscribe (void *zocket, const char * subscribe);
+CZMQ_EXPORT void zsocket_set_unsubscribe (void *zocket, const char * unsubscribe);
+CZMQ_EXPORT void zsocket_set_identity (void *zocket, const char * identity);
 CZMQ_EXPORT void zsocket_set_rate (void *zocket, int rate);
 CZMQ_EXPORT void zsocket_set_recovery_ivl (void *zocket, int recovery_ivl);
 CZMQ_EXPORT void zsocket_set_sndbuf (void *zocket, int sndbuf);
