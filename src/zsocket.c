@@ -171,7 +171,7 @@ zsocket_type_str (void *self)
 
 //  --------------------------------------------------------------------------
 //  Send data over a socket as a single message frame
-//  ZFRAME_REUSE flag is ignored in this function.
+//  Valid flags: ZFRAME_MORE | ZFRAME_DONTWAIT
 
 int
 zsocket_sendmem (const void* data, size_t size, void *zocket, int flags)
@@ -193,7 +193,7 @@ zsocket_sendmem (const void* data, size_t size, void *zocket, int flags)
 
 //  --------------------------------------------------------------------------
 //  Send data over a socket as a single message frame
-//  ZFRAME_REUSE flag is ignored in this function.
+//  Valid flags: ZFRAME_MORE | ZFRAME_DONTWAIT
 
 int
 zsocket_sendmem_zero_copy (void *data, size_t size,
