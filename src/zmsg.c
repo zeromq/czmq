@@ -272,28 +272,34 @@ zmsg_pushstr (zmsg_t *self, const char *format, ...)
     assert (format);
 
     //  Format string into buffer
-    va_list argptr;
-    va_start (argptr, format);
     int size = 255 + 1;
     char *string = (char *) malloc (size);
     if (!string) {
-        va_end (argptr);
         return -1;
     }
+    va_list argptr;
+    va_start (argptr, format);
     int required = vsnprintf (string, size, format, argptr);
+    va_end (argptr);
+#ifdef _MSC_VER
+    if (required < 0 || required >= size) {
+        va_start (argptr, format);
+        required = _vscprintf (format, argptr);
+        va_end (argptr);
+    }
+#endif
     if (required >= size) {
         size = required + 1;
         string = (char *) realloc (string, size);
         if (!string) {
-            va_end (argptr);
             return -1;
         }
+        va_start (argptr, format);
         size = vsnprintf (string, size, format, argptr);
+        va_end (argptr);
     }
     else
         size = required;
-
-    va_end (argptr);
 
     self->content_size += size;
     zlist_push (self->frames, zframe_new (string, size));
@@ -311,28 +317,35 @@ zmsg_addstr (zmsg_t *self, const char *format, ...)
     assert (self);
     assert (format);
     //  Format string into buffer
-    va_list argptr;
-    va_start (argptr, format);
     int size = 255 + 1;
     char *string = (char *) malloc (size);
     if (!string) {
-        va_end (argptr);
         return -1;
     }
+    va_list argptr;
+    va_start (argptr, format);
     int required = vsnprintf (string, size, format, argptr);
+    va_end (argptr);
+#ifdef _MSC_VER
+    if (required < 0 || required >= size) {
+        va_start (argptr, format);
+        required = _vscprintf (format, argptr);
+        va_end (argptr);
+    }
+#endif    
     if (required >= size) {
         size = required + 1;
         string = (char *) realloc (string, size);
         if (!string) {
-            va_end (argptr);
             return -1;
         }
+        va_start (argptr, format);
         size = vsnprintf (string, size, format, argptr);
+        va_end (argptr);
     }
     else
         size = required;
 
-    va_end (argptr);
 
     self->content_size += size;
     zlist_append (self->frames, zframe_new (string, size));
