@@ -37,26 +37,16 @@
 #include "../include/czmq.h"
 
 static int
-s_send_string (void *zocket, bool more, const char *format, va_list argptr)
+s_send_string (void *zocket, bool more, char *string)
 {
     assert (zocket);
 
-    //  Format string into buffer
-    int size = 255 + 1;
-    char *string = (char *) malloc (size);
-    int required = vsnprintf (string, size, format, argptr);
-    if (required >= size) {
-        size = required + 1;
-        string = (char *) realloc (string, size);
-        vsnprintf (string, size, format, argptr);
-    }
-    //  Now send formatted string
+    int len = strlen (string);
     zmq_msg_t message;
-    zmq_msg_init_size (&message, strlen (string));
-    memcpy (zmq_msg_data (&message), string, strlen (string));
+    zmq_msg_init_size (&message, len);
+    memcpy (zmq_msg_data (&message), string, len);
     int rc = zmq_sendmsg (zocket, &message, more? ZMQ_SNDMORE: 0);
 
-    free (string);
     return rc == -1? -1: 0;
 }
 
@@ -116,10 +106,30 @@ zstr_send (void *zocket, const char *format, ...)
 {
     assert (zocket);
     assert (format);
+    //  Format string into buffer
+    int size = 255 + 1;
+    char *string = (char *) malloc (size);
     va_list argptr;
     va_start (argptr, format);
-    int rc = s_send_string (zocket, false, format, argptr);
+    int required = vsnprintf (string, size, format, argptr);
     va_end (argptr);
+#ifdef _MSC_VER
+    if (required < 0 || required >= size) {
+        va_start (argptr, format);
+        required = _vscprintf (format, argptr);
+        va_end (argptr);
+    }
+#endif
+    if (required >= size) {
+        size = required + 1;
+        string = (char *) realloc (string, size);
+        va_start (argptr, format);
+        vsnprintf (string, size, format, argptr);
+        va_end (argptr);
+    }
+
+    int rc = s_send_string (zocket, false, string);
+    free (string);
     return rc;
 }
 
@@ -129,10 +139,30 @@ zstr_sendf (void *zocket, const char *format, ...)
 {
     assert (zocket);
     assert (format);
+    //  Format string into buffer
+    int size = 255 + 1;
+    char *string = (char *) malloc (size);
     va_list argptr;
     va_start (argptr, format);
-    int rc = s_send_string (zocket, false, format, argptr);
+    int required = vsnprintf (string, size, format, argptr);
     va_end (argptr);
+#ifdef _MSC_VER
+    if (required < 0 || required >= size) {
+        va_start (argptr, format);
+        required = _vscprintf (format, argptr);
+        va_end (argptr);
+    }
+#endif
+    if (required >= size) {
+        size = required + 1;
+        string = (char *) realloc (string, size);
+        va_start (argptr, format);
+        vsnprintf (string, size, format, argptr);
+        va_end (argptr);
+    }
+
+    int rc = s_send_string (zocket, false, string);
+    free (string);
     return rc;
 }
 
@@ -145,10 +175,30 @@ zstr_sendm (void *zocket, const char *format, ...)
 {
     assert (zocket);
     assert (format);
+    //  Format string into buffer
+    int size = 255 + 1;
+    char *string = (char *) malloc (size);
     va_list argptr;
     va_start (argptr, format);
-    int rc = s_send_string (zocket, true, format, argptr);
+    int required = vsnprintf (string, size, format, argptr);
     va_end (argptr);
+#ifdef _MSC_VER
+    if (required < 0 || required >= size) {
+        va_start (argptr, format);
+        required = _vscprintf (format, argptr);
+        va_end (argptr);
+    }
+#endif
+    if (required >= size) {
+        size = required + 1;
+        string = (char *) realloc (string, size);
+        va_start (argptr, format);
+        vsnprintf (string, size, format, argptr);
+        va_end (argptr);
+    }
+
+    int rc = s_send_string (zocket, true, string);
+    free (string);
     return rc;
 }
 
@@ -158,10 +208,30 @@ zstr_sendfm (void *zocket, const char *format, ...)
 {
     assert (zocket);
     assert (format);
+    //  Format string into buffer
+    int size = 255 + 1;
+    char *string = (char *) malloc (size);
     va_list argptr;
     va_start (argptr, format);
-    int rc = s_send_string (zocket, true, format, argptr);
+    int required = vsnprintf (string, size, format, argptr);
     va_end (argptr);
+#ifdef _MSC_VER
+    if (required < 0 || required >= size) {
+        va_start (argptr, format);
+        required = _vscprintf (format, argptr);
+        va_end (argptr);
+    }
+#endif
+    if (required >= size) {
+        size = required + 1;
+        string = (char *) realloc (string, size);
+        va_start (argptr, format);
+        vsnprintf (string, size, format, argptr);
+        va_end (argptr);
+    }
+
+    int rc = s_send_string (zocket, true, string);
+    free (string);
     return rc;
 }
 
