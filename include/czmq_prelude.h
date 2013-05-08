@@ -266,7 +266,6 @@
 #   include <pwd.h>
 #   include <grp.h>
 #   include <utime.h>
-#   include <syslog.h>
 #   include <inttypes.h>
 #   include <sys/types.h>
 #   include <sys/param.h>
