@@ -88,8 +88,8 @@ struct _zcurve_t {
     byte cn_precom [32];        //  Connection precomputed key
 
     //  Metadata properties
-    zlist_t *metadata;          //  List of property items
-    size_t metadata_size;       //  Total metadata value size
+    byte metadata [1000];       //  Encoded for the wire
+    size_t metadata_size;       //  Actual size so far
 };
 
 //  Command structures
@@ -119,13 +119,13 @@ typedef struct {
 typedef struct {
     byte id [8];                //  "READY   "
     byte nonce [8];             //  Short nonce, prefixed by "CurveZMQREADY---"
-    byte box [116];              //  Box [metadata](S'->C')
+    byte box [16];              //  Box [metadata](S'->C')
 } ready_t;
 
 typedef struct {
     byte id [8];                //  "MESSAGE "
     byte nonce [8];             //  Short nonce, prefixed by "CurveZMQMESSAGE-"
-    byte box [116];              //  Box [payload](S'->C') or (C'->S')
+    byte box [16];              //  Box [payload](S'->C') or (C'->S')
 } message_t;
 
 
@@ -138,7 +138,6 @@ zcurve_new (byte *server_key)
 {
     zcurve_t *self = (zcurve_t *) zmalloc (sizeof (zcurve_t));
     assert (self);
-    self->metadata = zlist_new ();
     if (server_key) {
         memcpy (self->server_key, server_key, 32);
         self->is_server = false;
@@ -161,10 +160,6 @@ zcurve_destroy (zcurve_t **self_p)
     assert (self_p);
     if (*self_p) {
         zcurve_t *self = *self_p;
-        while (zlist_size (self->metadata)) {
-            zblob_t *blob = zlist_pop (self->metadata);
-            zblob_destroy (&blob);
-        }
         free (self);
         *self_p = NULL;
     }
@@ -287,21 +282,32 @@ zcurve_keypair_public (zcurve_t *self)
 
 //  --------------------------------------------------------------------------
 //  Set a metadata property; these are sent to the peer after the
-//  security handshake. Property values are size-specified blobs.
-//  Takes ownership of the blob, destroying it automatically when
-//  finished with it.
-
+//  security handshake. Property values are strings.
 void
-zcurve_metadata_set (zcurve_t *self, char *name, zblob_t **value_p)
+zcurve_metadata_set (zcurve_t *self, char *name, char *value)
 {
     assert (self);
-    assert (value_p);
-    assert (*value_p);
-    //  Append blob to list
-    zlist_append (self->metadata, *value_p);
-    self->metadata_size += zblob_size (*value_p);
-    //  Take ownership of the blob
-    *value_p = NULL;
+    assert (name && value);
+    size_t name_len = strlen (name);
+    size_t value_len = strlen (value);
+    assert (name_len > 0 && name_len < 256);
+    byte *needle = self->metadata + self->metadata_size;
+
+    //  Encode name
+    *needle++ = (byte) name_len;
+    memcpy (needle, name, name_len);
+    needle += name_len;
+
+    //  Encode value
+    *needle++ = (byte) ((value_len >> 24) && 255);
+    *needle++ = (byte) ((value_len >> 16) && 255);
+    *needle++ = (byte) ((value_len >> 8)  && 255);
+    *needle++ = (byte) ((value_len)       && 255);
+    memcpy (needle, value, value_len);
+    needle += value_len;
+
+    //  Update size of metadata so far
+    self->metadata_size = needle - self->metadata;
 }
 
 
@@ -318,8 +324,9 @@ s_produce_hello (zcurve_t *self)
 #if defined (HAVE_LIBSODIUM)
     //  Working variables for crypto calls
     byte nonce [24];
-    byte box [256];
-    byte plain [256];
+    size_t box_size = crypto_box_ZEROBYTES + 64;
+    byte *plain = malloc (box_size);
+    byte *box = malloc (box_size);
 
     //  Generate connection key pair
     int rc = crypto_box_keypair (self->cn_public, self->cn_secret);
@@ -327,20 +334,21 @@ s_produce_hello (zcurve_t *self)
     
     //  Create Box [64 * %x0](C'->S)
     assert (crypto_box_ZEROBYTES == 32);
-    memset (plain, 0, crypto_box_ZEROBYTES + 64);
+    memset (plain, 0, box_size);
 
     //  Prepare the full nonce and encrypt
     assert (crypto_box_NONCEBYTES == 24);
     memcpy (nonce, (byte *) "CurveZMQHELLO---", 16);
     memcpy (nonce + 16, &self->cn_nonce, 8);
-    rc = crypto_box (box, plain, crypto_box_ZEROBYTES + 64,
-        nonce, self->server_key, self->cn_secret);
+    rc = crypto_box (box, plain, box_size, nonce, self->server_key, self->cn_secret);
     assert (rc == 0);
 
     memcpy (hello->client, self->cn_public, 32);
     memcpy (hello->nonce, &self->cn_nonce, 8);
-    memcpy (hello->box, box + crypto_box_BOXZEROBYTES, sizeof (hello->box));
+    memcpy (hello->box, box + crypto_box_BOXZEROBYTES, box_size - crypto_box_BOXZEROBYTES);
     self->cn_nonce++;
+    free (plain);
+    free (box);
 #endif
     return command;
 }
@@ -354,21 +362,22 @@ s_process_hello (zcurve_t *self, zframe_t *input)
 #if defined (HAVE_LIBSODIUM)
     //  Working variables for crypto calls
     byte nonce [24];
-    byte box [256];
-    byte plain [256];
+    size_t box_size = crypto_box_ZEROBYTES + 64;
+    byte *plain = malloc (box_size);
+    byte *box = malloc (box_size);
 
     //  Open Box [64 * %x0](C'->S)
     memset (box, 0, crypto_box_BOXZEROBYTES);
-    memcpy (box + crypto_box_BOXZEROBYTES, hello->box, sizeof (hello->box));
+    memcpy (box + crypto_box_BOXZEROBYTES, hello->box, box_size - crypto_box_BOXZEROBYTES);
 
     //  Prepare the full nonce and decrypt
     memcpy (nonce, (byte *) "CurveZMQHELLO---", 16);
     memcpy (nonce + 16, hello->nonce, 8);
-    int rc = crypto_box_open (plain, box,
-                              crypto_box_BOXZEROBYTES + sizeof (hello->box),
-                              nonce, hello->client, self->secret_key);
+    int rc = crypto_box_open (plain, box, box_size, nonce, hello->client, self->secret_key);
     assert (rc == 0);       //  In practice, if box doesn't open, discard it
     memcpy (self->cn_client, hello->client, 32);
+    free (plain);
+    free (box);
 #endif
 }
 
@@ -470,15 +479,16 @@ s_process_welcome (zcurve_t *self, zframe_t *input)
 static zframe_t *
 s_produce_initiate (zcurve_t *self)
 {
-    zframe_t *command = zframe_new (NULL, sizeof (initiate_t));
+    zframe_t *command = zframe_new (NULL, sizeof (initiate_t) + self->metadata_size);
     initiate_t *initiate = (initiate_t *) zframe_data (command);
     memcpy (initiate->id, "INITIATE", 8);
 
 #if defined (HAVE_LIBSODIUM)
     //  Working variables for crypto calls
     byte nonce [24];
-    byte box [256];
-    byte plain [256];
+    size_t box_size = crypto_box_ZEROBYTES + 96 + self->metadata_size;
+    byte *plain = malloc (box_size);
+    byte *box = malloc (box_size);
 
     //  Create vouch = Box [C'](C->S)
     memset (plain, 0, crypto_box_ZEROBYTES);
@@ -490,28 +500,31 @@ s_produce_initiate (zcurve_t *self)
     memcpy (nonce, (byte *) "VOUCH---", 8);
     memcpy (nonce + 8, vouch_nonce, 16);
     int rc = crypto_box (box, plain, crypto_box_ZEROBYTES + 32,
-                     nonce, self->server_key, self->secret_key);
+                         nonce, self->server_key, self->secret_key);
     assert (rc == 0);
     //  Vouch is in box after initial null padding
     byte *vouch_box = box + crypto_box_BOXZEROBYTES;
 
-    //  Create Box [C + nonce + vouch](C'->S')
+    //  Create Box [C + nonce + vouch + metadata](C'->S')
     memset (plain, 0, crypto_box_ZEROBYTES);
     memcpy (plain + crypto_box_ZEROBYTES, self->public_key, 32);
     memcpy (plain + crypto_box_ZEROBYTES + 32, vouch_nonce, 16);
     memcpy (plain + crypto_box_ZEROBYTES + 48, vouch_box, 48);
+    memcpy (plain + crypto_box_ZEROBYTES + 96, self->metadata, self->metadata_size);
 
     //  Prepare the full nonce and encrypt
     memcpy (nonce, (byte *) "CurveZMQINITIATE", 16);
     memcpy (nonce + 16, &self->cn_nonce, 8);
-    rc = crypto_box (box, plain, crypto_box_ZEROBYTES + 96,
-                     nonce, self->cn_server, self->cn_secret);
+    rc = crypto_box (box, plain, box_size, nonce, self->cn_server, self->cn_secret);
     assert (rc == 0);
 
     memcpy (initiate->cookie, self->cn_cookie, sizeof (initiate->cookie));
     memcpy (initiate->nonce, &self->cn_nonce, 8);
-    memcpy (initiate->box, box + crypto_box_BOXZEROBYTES, sizeof (initiate->box));
+    memcpy (initiate->box, box + crypto_box_BOXZEROBYTES, box_size - crypto_box_BOXZEROBYTES);
+    
     self->cn_nonce++;
+    free (plain);
+    free (box);
 #endif
     return command;
 }
@@ -521,12 +534,15 @@ s_process_initiate (zcurve_t *self, zframe_t *input)
 {
     initiate_t *initiate = (initiate_t *) zframe_data (input);
     printf ("C:INITIATE: ");
+    size_t metadata_size = zframe_size (input) - sizeof (initiate_t);
 
 #if defined (HAVE_LIBSODIUM)
     //  Working variables for crypto calls
     byte nonce [24];
-    byte box [256];
-    byte plain [256];
+    
+    size_t box_size = crypto_box_ZEROBYTES + 96 + metadata_size;
+    byte *plain = malloc (box_size);
+    byte *box = malloc (box_size);
 
     //  Check cookie is valid
     //  We could but don't expire cookie key after 60 seconds
@@ -548,20 +564,20 @@ s_process_initiate (zcurve_t *self, zframe_t *input)
     assert (memcmp (plain + crypto_box_ZEROBYTES, self->cn_client, 32) == 0);
     assert (memcmp (plain + crypto_box_ZEROBYTES + 32, self->cn_secret, 32) == 0);
 
-    //  Open Box [C + nonce + vouch](C'->S')
+    //  Open Box [C + nonce + vouch + metadata](C'->S')
     memset (box, 0, crypto_box_BOXZEROBYTES);
-    memcpy (box + crypto_box_BOXZEROBYTES, initiate->box, sizeof (initiate->box));
+    memcpy (box + crypto_box_BOXZEROBYTES, initiate->box, box_size - crypto_box_BOXZEROBYTES);
 
     //  Prepare the full nonce and decrypt
     memcpy (nonce, (byte *) "CurveZMQINITIATE", 16);
     memcpy (nonce + 16, initiate->nonce, 8);
-    rc = crypto_box_open (plain, box,
-                          crypto_box_BOXZEROBYTES + sizeof (initiate->box),
-                          nonce, self->cn_client, self->cn_secret);
+    rc = crypto_box_open (plain, box, box_size, nonce, self->cn_client, self->cn_secret);
     assert (rc == 0);
 
     //  This is where we'd check the decrypted client public key
     memcpy (self->client_key, plain + crypto_box_ZEROBYTES, 32);
+    printf ("(received %zd bytes metadata) ", metadata_size);
+    //  Metadata is at plain + crypto_box_ZEROBYTES + 96
 
     //  Open vouch Box [C'](C->S) and check contents
     memset (box, 0, crypto_box_BOXZEROBYTES);
@@ -578,23 +594,44 @@ s_process_initiate (zcurve_t *self, zframe_t *input)
     assert (memcmp (plain + crypto_box_ZEROBYTES, self->cn_client, 32) == 0);
 
     //  Precompute connection secret from client key
-    rc = crypto_box_beforenm (self->cn_precom,
-                              self->cn_client, self->cn_secret);
+    rc = crypto_box_beforenm (self->cn_precom, self->cn_client, self->cn_secret);
     assert (rc == 0);
+    
+    free (plain);
+    free (box);
 #endif
 }
 
 static zframe_t *
 s_produce_ready (zcurve_t *self)
 {
-    zframe_t *command = zframe_new (NULL, sizeof (ready_t));
+    zframe_t *command = zframe_new (NULL, sizeof (ready_t) + self->metadata_size);
     ready_t *ready = (ready_t *) zframe_data (command);
     memcpy (ready->id, "READY   ", 8);
-    
+
 #if defined (HAVE_LIBSODIUM)
+    //  Working variables for crypto calls
+    byte nonce [24];
+    size_t box_size = crypto_box_ZEROBYTES + self->metadata_size;
+    byte *plain = malloc (box_size);
+    byte *box = malloc (box_size);
+
+    //  Create Box [metadata](S'->C')
+    memset (plain, 0, crypto_box_ZEROBYTES);
+    memcpy (plain + crypto_box_ZEROBYTES, self->metadata, self->metadata_size);
+
+    //  Prepare the full nonce and encrypt
+    memcpy (nonce, (byte *) "CurveZMQREADY---", 16);
+    memcpy (nonce + 16, &self->cn_nonce, 8);
+    int rc = crypto_box_afternm (box, plain, box_size, nonce, self->cn_precom);
+    assert (rc == 0);
+
     memcpy (ready->nonce, &self->cn_nonce, 8);
-//     memcpy (ready->box, box + crypto_box_BOXZEROBYTES, sizeof (ready->box));
+    memcpy (ready->box, box + crypto_box_BOXZEROBYTES, box_size - crypto_box_BOXZEROBYTES);
+
     self->cn_nonce++;
+    free (plain);
+    free (box);
 #endif
     return command;
 }
@@ -602,50 +639,112 @@ s_produce_ready (zcurve_t *self)
 static void
 s_process_ready (zcurve_t *self, zframe_t *input)
 {
-//     ready_t *ready = (ready_t *) zframe_data (input);
-    printf ("S:READY: ");
-    
+    ready_t *ready = (ready_t *) zframe_data (input);
+    printf ("C:READY: ");
+
 #if defined (HAVE_LIBSODIUM)
+    //  Working variables for crypto calls
+    byte nonce [24];
+    size_t metadata_size = zframe_size (input) - sizeof (ready_t);
+    size_t box_size = crypto_box_ZEROBYTES + metadata_size;
+    byte *plain = malloc (box_size);
+    byte *box = malloc (box_size);
+
+    //  Open Box [metadata](S'->C')
+    memset (box, 0, crypto_box_BOXZEROBYTES);
+    memcpy (box + crypto_box_BOXZEROBYTES, ready->box, box_size - crypto_box_BOXZEROBYTES);
+
+    //  Prepare the full nonce and decrypt
+    memcpy (nonce, (byte *) "CurveZMQREADY---", 16);
+    memcpy (nonce + 16, ready->nonce, 8);
+    int rc = crypto_box_open_afternm (plain, box, box_size, nonce, self->cn_precom);
+    assert (rc == 0);
+
+    //  Metadata is at plain + crypto_box_ZEROBYTES
+    printf ("(received %zd bytes metadata) ", metadata_size);
+
+    free (plain);
+    free (box);
 #endif
+}
+
+static zframe_t *
+s_produce_message (zcurve_t *self, zframe_t *clear)
+{
+    zframe_t *command = zframe_new (NULL, sizeof (message_t) + zframe_size (clear));
+    message_t *message = (message_t *) zframe_data (command);
+    memcpy (message->id, "MESSAGE ", 8);
+
+#if defined (HAVE_LIBSODIUM)
+    //  Working variables for crypto calls
+    byte nonce [24];
+    size_t box_size = crypto_box_ZEROBYTES + zframe_size (clear);
+    byte *plain = malloc (box_size);
+    byte *box = malloc (box_size);
+
+    //  Create Box [M](S'->C')/(C'->S')
+    memset (plain, 0, crypto_box_ZEROBYTES);
+    memcpy (plain + crypto_box_ZEROBYTES, zframe_data (clear), zframe_size (clear));
+
+    //  Prepare the full nonce and encrypt
+    char *prefix = self->is_server? "CurveZMQMESSAGES": "CurveZMQMESSAGEC";
+    memcpy (nonce, (byte *) prefix, 16);
+    memcpy (nonce + 16, &self->cn_nonce, 8);
+    int rc = crypto_box_afternm (box, plain, box_size, nonce, self->cn_precom);
+    assert (rc == 0);
+
+    memcpy (message->nonce, &self->cn_nonce, 8);
+    memcpy (message->box, box + crypto_box_BOXZEROBYTES, box_size - crypto_box_BOXZEROBYTES);
+
+    self->cn_nonce++;
+    free (plain);
+    free (box);
+#else
+    memcpy (message->box, zframe_data (clear), zframe_size (clear));
+#endif
+    return command;
 }
 
 static zframe_t *
 s_process_message (zcurve_t *self, zframe_t *input)
 {
     message_t *message = (message_t *) zframe_data (input);
+    size_t data_size = zframe_size (input) - sizeof (message_t);
     printf ("%c:MESSAGE: ", self->is_server? 'C': 'S');
+    printf ("(received %zd bytes data) ", data_size);
 
 #if defined (HAVE_LIBSODIUM)
     //  Working variables for crypto calls
     byte nonce [24];
-    byte box [256];
-    byte plain [256];
+    size_t box_size = crypto_box_ZEROBYTES + data_size;
+    byte *plain = malloc (box_size);
+    byte *box = malloc (box_size);
 
     //  Open Box [M](S'->C') or Box [M](C'->S')
     memset (box, 0, crypto_box_BOXZEROBYTES);
-    memcpy (box + crypto_box_BOXZEROBYTES, message->box, 100 + crypto_box_BOXZEROBYTES);
+    memcpy (box + crypto_box_BOXZEROBYTES, message->box, box_size - crypto_box_BOXZEROBYTES);
 
     //  Prepare the full nonce and decrypt
     char *prefix = self->is_server? "CurveZMQMESSAGEC": "CurveZMQMESSAGES";
     memcpy (nonce, (byte *) prefix, 16);
     memcpy (nonce + 16, message->nonce, 8);
 
-    int rc = crypto_box_open_afternm (
-        plain, box,
-        crypto_box_BOXZEROBYTES + sizeof (message->box),
-        nonce, self->cn_precom);
+    int rc = crypto_box_open_afternm (plain, box, box_size, nonce, self->cn_precom);
     assert (rc == 0);
 
-    return zframe_new (plain + crypto_box_ZEROBYTES, 100);
+    zframe_t *output = zframe_new (plain + crypto_box_ZEROBYTES, data_size);
+    free (plain);
+    free (box);
 #else
-    return zframe_new (message->box, 100);
+    zframe_t *output = zframe_new (message->box, data_size);
 #endif
+    return output;
 }
 
 
 //  --------------------------------------------------------------------------
 //  Accept input command from peer. If the command is invalid, it is
-//  discarded silently. May return a blob to send to the peer, or NULL
+//  discarded silently. May return a frame to send to the peer, or NULL
 //  if there is nothing to send.
 
 zframe_t *
@@ -682,7 +781,7 @@ zcurve_execute (zcurve_t *self, zframe_t *input)
     }
     else
     if (self->state == expect_initiate
-    &&  size == sizeof (initiate_t)
+    &&  size >= sizeof (initiate_t)
     &&  memcmp (data, "INITIATE ", 8) == 0) {
         s_process_initiate (self, input);
         output = s_produce_ready (self);
@@ -690,14 +789,14 @@ zcurve_execute (zcurve_t *self, zframe_t *input)
     }
     else
     if (self->state == expect_ready
-    &&  size == sizeof (ready_t)
+    &&  size >= sizeof (ready_t)
     &&  memcmp (data, "READY   ", 8) == 0) {
         s_process_ready (self, input);
         self->state = connected;
     }
     else
     if (self->state == connected
-    &&  size == sizeof (message_t)
+    &&  size >= sizeof (message_t)
     &&  memcmp (data, "MESSAGE ", 8) == 0)
         output = s_process_message (self, input);
     else {
@@ -710,7 +809,7 @@ zcurve_execute (zcurve_t *self, zframe_t *input)
 
 
 //  --------------------------------------------------------------------------
-//  Encode clear-text message to peer. Returns a blob ready to send
+//  Encode clear-text message to peer. Returns a frame ready to send
 //  on the wire.
 
 zframe_t *
@@ -719,40 +818,7 @@ zcurve_encode (zcurve_t *self, zframe_t *clear)
     assert (self);
     assert (self->state == connected);
     assert (clear);
-
-    zframe_t *command = zframe_new (NULL, sizeof (message_t));
-    message_t *message = (message_t *) zframe_data (command);
-    memcpy (message->id, "MESSAGE ", 8);
-
-#if defined (HAVE_LIBSODIUM)
-    //  Working variables for crypto calls
-    byte nonce [24];
-    byte box [256];
-    byte plain [256];
-
-    //  Create message Box [M](C'->S'), max M is 100
-    memset (plain, 0, crypto_box_ZEROBYTES + 100);
-    memcpy (plain + crypto_box_ZEROBYTES, zframe_data (clear), zframe_size (clear));
-
-    //  Prepare the full nonce and encrypt
-    char *prefix = self->is_server? "CurveZMQMESSAGES": "CurveZMQMESSAGEC";
-    memcpy (nonce, (byte *) prefix, 16);
-    memcpy (nonce + 16, &self->cn_nonce, 8);
-
-    int rc = crypto_box_afternm (
-        box, plain,
-        crypto_box_ZEROBYTES + 100,
-        nonce, self->cn_precom);
-    assert (rc == 0);
-
-    memcpy (message->nonce, &self->cn_nonce, 8);
-    memcpy (message->box, box + crypto_box_BOXZEROBYTES, sizeof (message->box));
-    self->cn_nonce++;
-#else
-    memset (message->box, 0, sizeof (message->box));
-    memcpy (message->box, zframe_data (clear), zframe_size (clear));
-#endif
-    return command;
+    return s_produce_message (self, clear);
 }
 
 
@@ -775,6 +841,9 @@ server_task (void *args)
     zcurve_t *server = zcurve_new (NULL);
     rc = zcurve_keypair_load (server);
     assert (rc == 0);
+
+    //  Set some metadata properties
+    zcurve_metadata_set (server, "Server", "CZMQ/zcurve");
 
     //  Hard code the progression for now...
     zframe_t *sender;
@@ -868,12 +937,9 @@ zcurve_test (bool verbose)
     zcurve_keypair_new (client);
 
     //  Set some metadata properties
-    zblob_t *property;
-    property = zblob_new ((byte *) "CZMQ/zcurve", 11);
-    zcurve_metadata_set (client, "Client", &property);
-    property = zblob_new ((byte *) (byte *) "E475DA11", 8);
-    zcurve_metadata_set (client, "Identity", &property);
-
+    zcurve_metadata_set (client, "Client", "CZMQ/zcurve");
+    zcurve_metadata_set (client, "Identity", "E475DA11");
+    
     //  Execute null event on client to kick off handshake
     zframe_t *output = zcurve_execute (client, NULL);
     while (output) {
@@ -885,6 +951,7 @@ zcurve_test (bool verbose)
         assert (input);
         //  Execute reply on client to continue handshake
         output = zcurve_execute (client, input);
+        zframe_destroy (&input);
     }
     //  Handshake is done, now try Hello, World
     zframe_t *request = zframe_new ((byte *) "Hello", 5);
@@ -903,9 +970,10 @@ zcurve_test (bool verbose)
     zframe_destroy (&output);
 
     //  Done, clean-up
-    zcurve_destroy (&client);
     zfile_delete ("public.key");
     zfile_delete ("secret.key");
+    zcurve_destroy (&client);
+    zctx_destroy (&ctx);
     //  @end
     
     printf ("OK\n");

@@ -61,11 +61,9 @@ CZMQ_EXPORT byte *
     zcurve_keypair_public (zcurve_t *self);
     
 //  Set a metadata property; these are sent to the peer after the
-//  security handshake. Property values are size-specified blobs.
-//  Takes ownership of the blob, destroying it automatically when
-//  finished with it.
+//  security handshake. Property values are strings.
 CZMQ_EXPORT void
-    zcurve_metadata_set (zcurve_t *self, char *name, zblob_t **value_p);
+    zcurve_metadata_set (zcurve_t *self, char *name, char *value);
 
 //  Accept input command from peer. If the command is invalid, it is
 //  discarded silently. May return a blob to send to the peer, or NULL

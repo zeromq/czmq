@@ -44,7 +44,6 @@
 
 //  Classes in the API
 
-#include "zblob.h"
 #include "zclock.h"
 #include "zctx.h"
 #include "zfile.h"
