@@ -391,37 +391,6 @@ zframe_reset (zframe_t *self, const void *data, size_t size)
     memcpy (zmq_msg_data (&self->zmsg), data, size);
 }
 
-//  --------------------------------------------------------------------------
-//  Set new contents for frame, using zero-copy.
-//  See zframe_new_zero_copy (...) for a detailed description.
-//  TODO: review this method and remove if possible (PH, 2013/05/09)
-//      - Explanation of method is not satisfactory
-//      - Method is complex, and leaks memory during selftests
-//      - Code style was not correct (fixed)
-//      - Can we use existing methods for same effect?
-
-void
-zframe_reset_zero_copy (zframe_t *self, void *data, size_t size, zframe_free_fn *free_fn, void *arg)
-{
-    assert (self);
-    assert (data);
-    zmq_msg_close (&self->zmsg);
-	if (size) {
-        if (data && free_fn) {
-            zmq_msg_init_data (&self->zmsg, data, size, free_fn, arg);
-            self->zero_copy = 1;
-        } 
-        else
-			zmq_msg_init_size (&self->zmsg, size);
-    } 
-    else 
-        //  Initialize zero-size messages
-        zmq_msg_init (&self->zmsg);
-
-    zmq_msg_init_size (&self->zmsg, size);
-    memcpy (zmq_msg_data (&self->zmsg), data, size);
-}
-
 
 //  --------------------------------------------------------------------------
 //  Set the free callback for frame
@@ -495,13 +464,6 @@ zframe_test (bool verbose)
     zframe_destroy (&copy);
     assert (!zframe_eq (frame, copy));
 	
-	//  Test zframe_reset_zero_copy
-    frame = zframe_new ("ONE", 3);
-    assert (frame);
-	zframe_reset_zero_copy (frame, strdup ("TWO"), 3, s_test_free_cb, NULL);
-    assert (zframe_streq (frame, "TWO"));
-	zframe_destroy (&frame);
-    
     //  Test zframe_new_empty
     frame = zframe_new_empty ();
     assert (frame);
