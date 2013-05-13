@@ -764,6 +764,17 @@ zcurve_encode (zcurve_t *self, zframe_t *clear)
 
 
 //  --------------------------------------------------------------------------
+//  Indicate whether handshake is still in progress
+
+bool
+zcurve_connected (zcurve_t *self)
+{
+    assert (self);
+    return (self->state == connected);
+}
+
+
+//  --------------------------------------------------------------------------
 //  Selftest
 
 //  @selftest
@@ -786,44 +797,23 @@ server_task (void *args)
     //  Set some metadata properties
     zcurve_metadata_set (server, "Server", "CZMQ/zcurve");
 
-    //  Hard code the progression for now...
-    zframe_t *sender;
-    zframe_t *input;
-    zframe_t *output;
-    
-    //  Get HELLO command
-    sender = zframe_recv (router);
-    input = zframe_recv (router);
-    assert (input);
-
-    //  Start server side of handshake
-    output = zcurve_execute (server, input);
-    zframe_destroy (&input);
-
-    //  We have WELCOME, send back to client
-    assert (output);
-    zframe_send (&sender, router, ZFRAME_MORE);
-    zframe_send (&output, router, 0);
-
-    //  Get INITIATE command
-    sender = zframe_recv (router);
-    input = zframe_recv (router);
-    assert (input);
-    
-    output = zcurve_execute (server, input);
-    zframe_destroy (&input);
-    
-    //  We have READY, send back to client
-    assert (output);
-    zframe_send (&sender, router, ZFRAME_MORE);
-    zframe_send (&output, router, 0);
-
+    //  Execute incoming frames until ready or exception
+    //  In practice we'd want a server instance per unique client
+    while (!zcurve_connected (server)) {
+        zframe_t *sender = zframe_recv (router);
+        zframe_t *input = zframe_recv (router);
+        assert (input);
+        zframe_t *output = zcurve_execute (server, input);
+        zframe_destroy (&input);
+        zframe_send (&sender, router, ZFRAME_MORE);
+        zframe_send (&output, router, 0);
+    }
     //  Get MESSAGE command
-    sender = zframe_recv (router);
-    input = zframe_recv (router);
+    zframe_t *sender = zframe_recv (router);
+    zframe_t *input = zframe_recv (router);
     assert (input);
     
-    output = zcurve_execute (server, input);
+    zframe_t *output = zcurve_execute (server, input);
     zframe_destroy (&input);
 
     //  Do Hello, World
@@ -883,14 +873,11 @@ zcurve_test (bool verbose)
     
     //  Execute null event on client to kick off handshake
     zframe_t *output = zcurve_execute (client, NULL);
-    while (output) {
-        //  Send message to server
+    while (!zcurve_connected (client)) {
         rc = zframe_send (&output, dealer, 0);
         assert (rc >= 0);
-        //  Get reply from server (could be FSMified)
         zframe_t *input = zframe_recv (dealer);
         assert (input);
-        //  Execute reply on client to continue handshake
         output = zcurve_execute (client, input);
         zframe_destroy (&input);
     }

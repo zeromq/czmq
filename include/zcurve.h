@@ -76,6 +76,10 @@ CZMQ_EXPORT zframe_t *
 CZMQ_EXPORT zframe_t *
     zcurve_encode (zcurve_t *self, zframe_t *clear);
 
+//  Indicate whether handshake is still in progress
+CZMQ_EXPORT bool
+    zcurve_connected (zcurve_t *self);
+
 //  Self test of this class
 void
     zcurve_test (bool verbose);
