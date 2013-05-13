@@ -1076,6 +1076,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\..\src\zcurve.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\zfile.c"
 				>
 				<FileConfiguration
@@ -2101,6 +2105,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\zctx.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\zcurve.h"
 				>
 			</File>
 			<File
