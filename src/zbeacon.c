@@ -42,7 +42,8 @@
 
 #include "../include/czmq.h"
 
-#if !defined(__WINDOWS__)
+// Don't include if building in Visual Studio
+#if !defined(_MSC_VER)
 #   include "platform.h"
 #endif
 
