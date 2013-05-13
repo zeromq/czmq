@@ -35,7 +35,10 @@
 */
 
 #include "../include/czmq.h"
+// Only include platform.h if we're not building using visual studio
+#if !defined(_MSC_VER)
 #include "platform.h"
+#endif
 
 #undef HAVE_LIBSODIUM
 
@@ -200,12 +203,16 @@ zcurve_keypair_save (zcurve_t *self)
 
     assert (self);
     //  Set process file create mask to owner access only
-    mode_t old_mask = umask (S_IWGRP | S_IWOTH | S_IRGRP | S_IROTH);
-    
-    //  The public key file contains just the public keys
+#   if !defined(__WINDOWS__)
+	mode_t old_mask = umask (S_IWGRP | S_IWOTH | S_IRGRP | S_IROTH);
+#   endif
+	//  The public key file contains just the public keys
     FILE *file = fopen (PUBKEY_FILE, "w");
     //  Reset process file create mask
-    umask (old_mask);
+#   if !defined(__WINDOWS__)
+	umask (old_mask);
+#   endif
+
     if (!file)
         return -1;
     
@@ -622,7 +629,7 @@ zcurve_execute (zcurve_t *self, zmq_msg_t *incoming)
 
     zmq_msg_t *outgoing = NULL;
     size_t size = incoming? zmq_msg_size (incoming): 0;
-    byte *data = incoming? zmq_msg_data (incoming): NULL;
+    byte *data = (byte *) (incoming? zmq_msg_data (incoming): NULL);
 
     //  Now process command according to current state
     if (self->state == pending) {
