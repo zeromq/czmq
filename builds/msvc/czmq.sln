@@ -18,6 +18,8 @@ Global
 		Release|x64 = Release|x64
 		ReleaseDLL|Win32 = ReleaseDLL|Win32
 		ReleaseDLL|x64 = ReleaseDLL|x64
+		RelWithDebInfo|Win32 = RelWithDebInfo|Win32
+		RelWithDebInfo|x64 = RelWithDebInfo|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{0C4A2E28-8C9E-4B27-85D9-BB679AD84AC7}.Debug|Win32.ActiveCfg = Debug|Win32
@@ -36,6 +38,10 @@ Global
 		{0C4A2E28-8C9E-4B27-85D9-BB679AD84AC7}.ReleaseDLL|Win32.Build.0 = ReleaseDLL|Win32
 		{0C4A2E28-8C9E-4B27-85D9-BB679AD84AC7}.ReleaseDLL|x64.ActiveCfg = ReleaseDLL|x64
 		{0C4A2E28-8C9E-4B27-85D9-BB679AD84AC7}.ReleaseDLL|x64.Build.0 = ReleaseDLL|x64
+		{0C4A2E28-8C9E-4B27-85D9-BB679AD84AC7}.RelWithDebInfo|Win32.ActiveCfg = RelWithDebInfo|Win32
+		{0C4A2E28-8C9E-4B27-85D9-BB679AD84AC7}.RelWithDebInfo|Win32.Build.0 = RelWithDebInfo|Win32
+		{0C4A2E28-8C9E-4B27-85D9-BB679AD84AC7}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
+		{0C4A2E28-8C9E-4B27-85D9-BB679AD84AC7}.RelWithDebInfo|x64.Build.0 = RelWithDebInfo|x64
 		{A5497C4B-1CD1-4779-9458-2CF7908E7E26}.Debug|Win32.ActiveCfg = Debug|Win32
 		{A5497C4B-1CD1-4779-9458-2CF7908E7E26}.Debug|Win32.Build.0 = Debug|Win32
 		{A5497C4B-1CD1-4779-9458-2CF7908E7E26}.Debug|x64.ActiveCfg = Debug|x64
@@ -52,6 +58,10 @@ Global
 		{A5497C4B-1CD1-4779-9458-2CF7908E7E26}.ReleaseDLL|Win32.Build.0 = ReleaseDLL|Win32
 		{A5497C4B-1CD1-4779-9458-2CF7908E7E26}.ReleaseDLL|x64.ActiveCfg = ReleaseDLL|x64
 		{A5497C4B-1CD1-4779-9458-2CF7908E7E26}.ReleaseDLL|x64.Build.0 = ReleaseDLL|x64
+		{A5497C4B-1CD1-4779-9458-2CF7908E7E26}.RelWithDebInfo|Win32.ActiveCfg = RelWithDebInfo|Win32
+		{A5497C4B-1CD1-4779-9458-2CF7908E7E26}.RelWithDebInfo|Win32.Build.0 = RelWithDebInfo|Win32
+		{A5497C4B-1CD1-4779-9458-2CF7908E7E26}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
+		{A5497C4B-1CD1-4779-9458-2CF7908E7E26}.RelWithDebInfo|x64.Build.0 = RelWithDebInfo|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
