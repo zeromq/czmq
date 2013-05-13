@@ -252,7 +252,6 @@ int
 zcurve_keypair_load (zcurve_t *self)
 {
     assert (self);
-    
     FILE *file = fopen (SECKEY_FILE, "r");
     if (!file)
         return -1;
@@ -323,10 +322,10 @@ zcurve_metadata_set (zcurve_t *self, char *name, char *value)
 static void
 s_encrypt (
     zcurve_t *self,         //  zcurve instance sending the data
-    byte *target,           //  target must be 8-byte nonce + box
+    byte *target,           //  target must be nonce + box
     byte *data,             //  Clear text data to encrypt
     size_t size,            //  Size of clear text data
-    char *prefix,           //  Nonce prefix to use, 16 chars
+    char *prefix,           //  Nonce prefix to use, 8 or 16 chars
     byte *key_to,           //  Key to encrypt to, may be null
     byte *key_from)         //  Key to encrypt from, may be null
 {
@@ -340,13 +339,23 @@ s_encrypt (
     memcpy (plain + crypto_box_ZEROBYTES, data, size);
 
     //  Prepare full nonce and store nonce into target
+    //  Handle both short and long nonces
     byte nonce [24];
-    assert (strlen (prefix) == 16);
-    memcpy (nonce, (byte *) prefix, 16);
-    memcpy (nonce + 16, &self->cn_nonce, 8);
-    memcpy (target, &self->cn_nonce, 8);
-    self->cn_nonce++;
-
+    if (strlen (prefix) == 16) {
+        //  Long nonce is sequential integer
+        memcpy (nonce, (byte *) prefix, 16);
+        memcpy (nonce + 16, &self->cn_nonce, 8);
+        memcpy (target, &self->cn_nonce, 8);
+        self->cn_nonce++;
+        target += 8;            //  Encrypted data comes after 8 byte nonce
+    }
+    else {
+        //  Short nonce is random sequence
+        randombytes (target, 16);
+        memcpy (nonce, (byte *) prefix, 8);
+        memcpy (nonce + 8, target, 16);
+        target += 16;           //  Encrypted data comes after 16 byte nonce
+    }
     //  Create box using either key pair, or precomputed key
     int rc;
     if (key_to)
@@ -354,13 +363,13 @@ s_encrypt (
     else
         rc = crypto_box_afternm (box, plain, box_size, nonce, self->cn_precom);
     assert (rc == 0);
-    memcpy (target + 8, box + crypto_box_BOXZEROBYTES, size + crypto_box_BOXZEROBYTES);
     
+    memcpy (target, box + crypto_box_BOXZEROBYTES, size + crypto_box_BOXZEROBYTES);
     free (plain);
     free (box);
 #else
     //  If not built with crypto, store clear text
-    memcpy (target + 8, data, size);
+    memcpy (target, data, size);
 #endif
 }
 
@@ -371,10 +380,10 @@ s_encrypt (
 static void
 s_decrypt (
     zcurve_t *self,         //  zcurve instance sending the data
-    byte *source,           //  source must be 8-byte nonce + box
+    byte *source,           //  source must be nonce + box
     byte *data,             //  Where to store decrypted clear text
     size_t size,            //  Size of clear text data
-    char *prefix,           //  Nonce prefix to use, 16 chars
+    char *prefix,           //  Nonce prefix to use, 8 or 16 chars
     byte *key_to,           //  Key to decrypt to, may be null
     byte *key_from)         //  Key to decrypt from, may be null
 {
@@ -383,15 +392,22 @@ s_decrypt (
     byte *plain = malloc (box_size);
     byte *box = malloc (box_size);
 
+    //  Prepare the full nonce from prefix and source
+    //  Handle both short and long nonces
+    byte nonce [24];
+    if (strlen (prefix) == 16) {
+        memcpy (nonce, (byte *) prefix, 16);
+        memcpy (nonce + 16, source, 8);
+        source += 8;
+    }
+    else {
+        memcpy (nonce, (byte *) prefix, 8);
+        memcpy (nonce + 8, source, 16);
+        source += 16;
+    }
     //  Get encrypted box from source
     memset (box, 0, crypto_box_BOXZEROBYTES);
-    memcpy (box + crypto_box_BOXZEROBYTES, source + 8, size + crypto_box_BOXZEROBYTES);
-
-    //  Prepare the full nonce from prefix and source
-    byte nonce [24];
-    assert (strlen (prefix) == 16);
-    memcpy (nonce, (byte *) prefix, 16);
-    memcpy (nonce + 16, source, 8);
+    memcpy (box + crypto_box_BOXZEROBYTES, source, size + crypto_box_BOXZEROBYTES);
     
     //  Open box using either key pair, or precomputed key
     int rc;
@@ -399,14 +415,15 @@ s_decrypt (
         rc = crypto_box_open (plain, box, box_size, nonce, key_to, key_from);
     else
         rc = crypto_box_open_afternm (plain, box, box_size, nonce, self->cn_precom);
+    //  TODO: don't assert, but raise error on connection
     assert (rc == 0);
-    memcpy (data, plain + crypto_box_ZEROBYTES, size);
     
+    memcpy (data, plain + crypto_box_ZEROBYTES, size);
     free (plain);
     free (box);
 #else
     //  If not built with crypto, use clear text
-    memcpy (data, source + 8, size);
+    memcpy (data, source, size);
 #endif
 }
 
@@ -455,7 +472,6 @@ s_produce_welcome (zcurve_t *self)
 #if defined (HAVE_LIBSODIUM)
     //  Working variables for crypto calls
     byte nonce [24];
-    byte box [256];
     byte plain [256];
 
     //  Generate connection key pair
@@ -475,32 +491,19 @@ s_produce_welcome (zcurve_t *self)
     memcpy (nonce, (byte *) "COOKIE--", 8);
     memcpy (nonce + 8, cookie_nonce, 16);
 
-    //  Encrypt using symmetric cookie key
-    byte cookie_box [96];
-    //  Generate fresh cookie key
+    //  Encrypt using one-time symmetric cookie key
     randombytes (self->cookie_key, 32);
+    byte cookie_box [96];
     rc = crypto_secretbox (cookie_box, plain, 96, nonce, self->cookie_key);
     assert (rc == 0);
 
-    //  Now create 144-byte Box [S' + cookie] (S->C')
-    memset (plain, 0, crypto_box_ZEROBYTES);
-    memcpy (plain + crypto_box_ZEROBYTES, self->cn_public, 32);
-    memcpy (plain + crypto_box_ZEROBYTES + 32, cookie_nonce, 16);
-    memcpy (plain + crypto_box_ZEROBYTES + 48,
-            cookie_box + crypto_box_BOXZEROBYTES, 80);
-
-    //  Prepare the full nonce and encrypt
-    //  8-byte prefix plus 16-byte random nonce
-    randombytes (cookie_nonce, 16);
-    memcpy (nonce, (byte *) "WELCOME-", 8);
-    memcpy (nonce + 8, cookie_nonce, 16);
-    rc = crypto_box (box, plain, crypto_box_ZEROBYTES + 128,
-                     nonce, self->cn_client, self->secret_key);
-    assert (rc == 0);
-
-    memcpy (welcome->nonce, cookie_nonce, 16);
-    memcpy (welcome->box,
-            box + crypto_box_BOXZEROBYTES, sizeof (welcome->box));
+    //  Create Box [S' + cookie](S->C')
+    memcpy (plain, self->cn_public, 32);
+    memcpy (plain + 32, cookie_nonce, 16);
+    memcpy (plain + 48, cookie_box + crypto_box_BOXZEROBYTES, 80);
+    s_encrypt (self, welcome->nonce, 
+               plain, 128, "WELCOME-", 
+               self->cn_client, self->secret_key);
 #endif
     return command;
 }
@@ -512,30 +515,16 @@ s_process_welcome (zcurve_t *self, zframe_t *input)
     printf ("S:WELCOME: ");
 
 #if defined (HAVE_LIBSODIUM)
-    //  Working variables for crypto calls
-    byte nonce [24];
-    byte box [256];
-    byte plain [256];
-
     //  Open Box [S' + cookie](C'->S)
-    memset (box, 0, crypto_box_BOXZEROBYTES);
-    memcpy (box + crypto_box_BOXZEROBYTES,
-            welcome->box, sizeof (welcome->box));
-
-    //  Prepare the full nonce and decrypt
-    memcpy (nonce, (byte *) "WELCOME-", 8);
-    memcpy (nonce + 8, welcome->nonce, 16);
-    int rc = crypto_box_open (plain, box,
-                              crypto_box_BOXZEROBYTES + sizeof (welcome->box),
-                              nonce, self->server_key, self->cn_secret);
-    assert (rc == 0);
-
-    //  Get server cookie and short-term key
-    memcpy (self->cn_server, plain + crypto_box_ZEROBYTES, 32);
-    memcpy (self->cn_cookie, plain + crypto_box_ZEROBYTES + 32, 96);
+    byte plain [128];
+    s_decrypt (self, welcome->nonce, 
+               plain, 128, "WELCOME-", 
+               self->server_key, self->cn_secret);
+    memcpy (self->cn_server, plain, 32);
+    memcpy (self->cn_cookie, plain + 32, 96);
     
     //  Pre-compute connection secret from server key
-    rc = crypto_box_beforenm (self->cn_precom, self->cn_server, self->cn_secret);
+    int rc = crypto_box_beforenm (self->cn_precom, self->cn_server, self->cn_secret);
     assert (rc == 0);
 #endif
 }
@@ -549,38 +538,25 @@ s_produce_initiate (zcurve_t *self)
     memcpy (initiate->cookie, self->cn_cookie, sizeof (initiate->cookie));
 
 #if defined (HAVE_LIBSODIUM)
+    //  Create vouch = Box [C'](C->S)
+    byte vouch [64];
+    s_encrypt (self, vouch, 
+               self->cn_public, 32, "VOUCH---", 
+               self->server_key, self->secret_key);
+    
     //  Working variables for crypto calls
-    byte nonce [24];
     size_t box_size = 96 + self->metadata_size;
     byte *plain = malloc (box_size);
     byte *box = malloc (box_size);
 
-    //  Create vouch = Box [C'](C->S)
-    memset (plain, 0, crypto_box_ZEROBYTES);
-    memcpy (plain + crypto_box_ZEROBYTES, self->cn_public, 32);
-    
-    //  Prepare the full nonce and encrypt
-    byte vouch_nonce [16];
-    randombytes (vouch_nonce, 16);
-    memcpy (nonce, (byte *) "VOUCH---", 8);
-    memcpy (nonce + 8, vouch_nonce, 16);
-    int rc = crypto_box (box, plain, crypto_box_ZEROBYTES + 32,
-                         nonce, self->server_key, self->secret_key);
-    assert (rc == 0);
-    //  Vouch is in box after initial null padding
-    byte *vouch_box = box + crypto_box_BOXZEROBYTES;
-
-    //  Create Box [C + nonce + vouch + metadata](C'->S')
+    //  Create Box [C + vouch + metadata](C'->S')
     memcpy (plain, self->public_key, 32);
-    memcpy (plain + 32, vouch_nonce, 16);
-    memcpy (plain + 48, vouch_box, 48);
+    memcpy (plain + 32, vouch, 64);
     memcpy (plain + 96, self->metadata, self->metadata_size);
-    
     s_encrypt (self, initiate->nonce, 
                plain, 96 + self->metadata_size,
                "CurveZMQINITIATE", 
                self->cn_server, self->cn_secret);
-
     free (plain);
     free (box);
 #endif
@@ -613,16 +589,15 @@ s_process_initiate (zcurve_t *self, zframe_t *input)
     int rc = crypto_secretbox_open (plain, box,
                                     crypto_box_BOXZEROBYTES + 80,
                                     nonce, self->cookie_key);
-    //  Destroy cookie key
+    //  Throw away cookie key
     memset (self->cookie_key, 0, 32);
-    assert (rc == 0);
 
     //  Check cookie plain text is as expected [C' + s']
-    //  In practice we'd reject mismatched cookies, not assert
+    //  TODO: don't assert, but raise error on connection
     assert (memcmp (plain + crypto_box_ZEROBYTES, self->cn_client, 32) == 0);
     assert (memcmp (plain + crypto_box_ZEROBYTES + 32, self->cn_secret, 32) == 0);
 
-    //  Open Box [C + nonce + vouch + metadata](C'->S')
+    //  Open Box [C + vouch + metadata](C'->S')
     s_decrypt (self, initiate->nonce, 
                plain, 96 + metadata_size, 
                "CurveZMQINITIATE", 
@@ -630,24 +605,18 @@ s_process_initiate (zcurve_t *self, zframe_t *input)
     
     //  This is where we'd check the decrypted client public key
     memcpy (self->client_key, plain, 32);
-    byte *vouch_nonce = plain + 32;
-    byte *vouch_box = plain + 48;
     //  Metadata is at plain + 96
     printf ("(received %zd bytes metadata) ", metadata_size);
-
-    //  Open vouch Box [C'](C->S) and check contents
-    memset (box, 0, crypto_box_BOXZEROBYTES);
-    memcpy (box + crypto_box_BOXZEROBYTES, vouch_box, 48);
-
-    //  Prepare the full nonce and decrypt
-    memcpy (nonce, (byte *) "VOUCH---", 8);
-    memcpy (nonce + 8, vouch_nonce, 16);
-    rc = crypto_box_open (plain, box, crypto_box_BOXZEROBYTES + 48,
-                          nonce, self->client_key, self->secret_key);
-    assert (rc == 0);
-
+    //  Vouch nonce + box is 64 bytes at plain + 32
+    byte vouch [64];
+    memcpy (vouch, plain + 32, 64);
+    s_decrypt (self, vouch, 
+               plain, 32, "VOUCH---",
+               self->client_key, self->secret_key);
+    
     //  What we decrypted must be the short term client public key
-    assert (memcmp (plain + crypto_box_ZEROBYTES, self->cn_client, 32) == 0);
+    //  TODO: don't assert, but raise error on connection
+    assert (memcmp (plain, self->cn_client, 32) == 0);
 
     //  Precompute connection secret from client key
     rc = crypto_box_beforenm (self->cn_precom, self->cn_client, self->cn_secret);
