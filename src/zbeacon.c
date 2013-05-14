@@ -41,9 +41,7 @@
 */
 
 #include "../include/czmq.h"
-
-// Don't include if building in Visual Studio
-#if !defined(_MSC_VER)
+#if !defined (__WINDOWS__)
 #   include "platform.h"
 #endif
 
@@ -58,8 +56,8 @@
 #   endif
 #endif
 
-#if defined(__UTYPE_SUNSOLARIS) || defined(__UTYPE_SUNOS)
-#   include<sys/sockio.h>
+#if defined (__UTYPE_SUNSOLARIS) || defined (__UTYPE_SUNOS)
+#   include <sys/sockio.h>
 #endif
 
 #if defined (__WINDOWS__)
@@ -71,12 +69,12 @@
 #   include <iphlpapi.h>            //  For GetAdaptersAddresses ()
 #endif
 
-//  Basic WinSock compatibility
-#if !defined(__WINDOWS__)
+//  Windows uses 
+#if !defined (__WINDOWS__)
 typedef int SOCKET;
-#define closesocket close
-#define INVALID_SOCKET -1
-#define SOCKET_ERROR -1
+#   define closesocket close
+#   define INVALID_SOCKET -1
+#   define SOCKET_ERROR -1
 #endif
 
 //  Constants
@@ -627,8 +625,8 @@ s_get_interface (agent_t *self)
 static bool
 s_wireless_nic (const char *name)
 {
-    SOCKET sock = socket (AF_INET, SOCK_DGRAM, 0);
-    if (sock == INVALID_SOCKET)
+    SOCKET udpsock = socket (AF_INET, SOCK_DGRAM, 0);
+    if (udpsock == INVALID_SOCKET)
         s_handle_io_error ("socket");
 
     bool is_nic = false;
@@ -636,7 +634,7 @@ s_wireless_nic (const char *name)
     struct ifmediareq ifmr;
     memset (&ifmr, 0, sizeof (struct ifmediareq));
     strncpy(ifmr.ifm_name, name, sizeof (ifmr.ifm_name));
-    int res = ioctl (sock, SIOCGIFMEDIA, (caddr_t) &ifmr);
+    int res = ioctl (udpsock, SIOCGIFMEDIA, (caddr_t) &ifmr);
     if (res != -1)
         is_nic = (IFM_TYPE (ifmr.ifm_current) == IFM_IEEE80211);
 
@@ -644,11 +642,11 @@ s_wireless_nic (const char *name)
     struct iwreq wrq;
     memset (&wrq, 0, sizeof (struct iwreq));
     strncpy (wrq.ifr_name, name, sizeof (wrq.ifr_name));
-    int res = ioctl (sock, SIOCGIWNAME, (caddr_t) &wrq);
+    int res = ioctl (udpsock, SIOCGIWNAME, (caddr_t) &wrq);
     if (res != -1)
         is_nic = true;
 #endif
-    closesocket (sock);
+    closesocket (udpsock);
     return is_nic;
 }
 
@@ -762,8 +760,8 @@ s_beacon_send (agent_t *self)
     //  Sending can fail if the OS is blocking multicast. In such cases we
     //  don't try to report the error. We might log this or send to an error
     //  console at some point.
-        if (size == SOCKET_ERROR)
-            /* s_handle_io_error ("sendto") */ ;
+    if (size == SOCKET_ERROR)
+        ;   //  s_handle_io_error ("sendto");
 }
 
 //  Destroy agent instance

@@ -39,9 +39,8 @@
 */
 
 #include "../include/czmq.h"
-// Only include platform.h if we're not building using visual studio
-#if !defined(_MSC_VER)
-#include "platform.h"
+#if !defined (__WINDOWS__)
+#   include "platform.h"
 #endif
 
 #if defined (HAVE_LIBSODIUM)
