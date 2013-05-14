@@ -83,6 +83,14 @@ CZMQ_EXPORT char *
 //  Returns -1 on error, 0 on success
 CZMQ_EXPORT int
     zsocket_sendmem (void *socket, const void* data, size_t size, int flags);
+
+//  Send data over a socket as a single frame
+//  Returns -1 on error, 0 on success
+CZMQ_EXPORT int
+    zsocket_sendmem_zero_copy (void *socket, void *data, size_t size, 
+                               zsocket_free_fn *free_fn,
+                               void *hint, int flags);
+
     
 //  Self test of this class
 CZMQ_EXPORT int
