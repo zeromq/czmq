@@ -734,11 +734,6 @@ zcurve_execute (zcurve_t *self, zframe_t *input)
         s_process_ready (self, input);
         self->state = connected;
     }
-    else
-    if (self->state == connected
-    &&  size >= sizeof (message_t)
-    &&  memcmp (data, "MESSAGE ", 8) == 0)
-        output = s_process_message (self, input);
     else {
         puts ("E: invalid command");
         assert (false);
@@ -759,6 +754,26 @@ zcurve_encode (zcurve_t *self, zframe_t *clear)
     assert (self->state == connected);
     assert (clear);
     return s_produce_message (self, clear);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Decode blob into message from peer.
+
+zframe_t *
+zcurve_decode (zcurve_t *self, zframe_t *input)
+{
+    assert (self);
+    assert (self->state == connected);
+    assert (input);
+    
+    if (zframe_size (input) >= sizeof (message_t)
+    &&  memcmp (zframe_data (input), "MESSAGE ", 8) == 0)
+        return s_process_message (self, input);
+    else {
+        puts ("E: invalid command");
+        return NULL;
+    }
 }
 
 
@@ -812,7 +827,7 @@ server_task (void *args)
     zframe_t *input = zframe_recv (router);
     assert (input);
     
-    zframe_t *output = zcurve_execute (server, input);
+    zframe_t *output = zcurve_decode (server, input);
     zframe_destroy (&input);
 
     //  Do Hello, World
@@ -890,11 +905,21 @@ zcurve_test (bool verbose)
     zframe_t *input = zframe_recv (dealer);
     assert (input);
     
-    output = zcurve_execute (client, input);
+    output = zcurve_decode (client, input);
     assert (output);
     assert (memcmp (zframe_data (output), "World", 5) == 0);
     zframe_destroy (&input);
     zframe_destroy (&output);
+    
+    //  Now send messages of increasing size, check they work
+    int count;
+    size_t size = 0;
+    for (count = 0; count < 12; count++) {
+        
+        
+
+        size = size * 2 + 1;
+    }
 
     //  Done, clean-up
     zfile_delete ("public.key");

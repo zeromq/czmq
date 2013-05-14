@@ -76,6 +76,10 @@ CZMQ_EXPORT zframe_t *
 CZMQ_EXPORT zframe_t *
     zcurve_encode (zcurve_t *self, zframe_t *clear);
 
+//  Decode blob into message from peer.
+CZMQ_EXPORT zframe_t *
+    zcurve_decode (zcurve_t *self, zframe_t *input);
+
 //  Indicate whether handshake is still in progress
 CZMQ_EXPORT bool
     zcurve_connected (zcurve_t *self);
