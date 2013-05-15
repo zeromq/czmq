@@ -33,16 +33,29 @@ CZMQ_EXPORT int
 CZMQ_EXPORT byte *
     zcurve_keypair_public (zcurve_t *self);
     
-//  Accept command from peer. If the command is invalid, it is discarded
-//  silently (in this prototype, that causes an assertion failure). May
-//  return a zmq_msg_t to send to the peer, or NULL if there is nothing
-//  to send.
-CZMQ_EXPORT zmq_msg_t *
-    zcurve_execute (zcurve_t *self, zmq_msg_t *message);
+//  Set a metadata property; these are sent to the peer after the
+//  security handshake. Property values are strings.
+CZMQ_EXPORT void
+    zcurve_metadata_set (zcurve_t *self, char *name, char *value);
 
-//  Encode message from peer. Returns a zmq_msg_t ready to send on the wire.
-CZMQ_EXPORT zmq_msg_t *
-    zcurve_encode (zcurve_t *self, byte *data, size_t size);
+//  Accept input command from peer. If the command is invalid, it is
+//  discarded silently. May return a blob to send to the peer, or NULL
+//  if there is nothing to send.
+CZMQ_EXPORT zframe_t *
+    zcurve_execute (zcurve_t *self, zframe_t *input);
+
+//  Encode clear-text message to peer. Returns a blob ready to send
+//  on the wire.
+CZMQ_EXPORT zframe_t *
+    zcurve_encode (zcurve_t *self, zframe_t *clear);
+
+//  Decode blob into message from peer.
+CZMQ_EXPORT zframe_t *
+    zcurve_decode (zcurve_t *self, zframe_t *input);
+
+//  Indicate whether handshake is still in progress
+CZMQ_EXPORT bool
+    zcurve_connected (zcurve_t *self);
 
 //  Self test of this class
 void
@@ -56,7 +69,11 @@ CurveZMQ security engine, for use in ZeroMQ applications.
 
 This is a reference implementation of CurveZMQ, and can be used at the
 application level to secure a request-reply dialog (usually, DEALER to
-ROUTER). For an example of use, see the selftest function.
+ROUTER). For an example of use, see the selftest function. To compile
+with security enabled, first build and install libsodium from GitHub at
+https://github.com/jedisct1/libsodium. Run ./configure after installing
+libsodium. If configure does not find libsodium, this module will work
+in clear text.
 
 EXAMPLE
 -------
@@ -78,71 +95,39 @@ server_task (void *args)
     rc = zcurve_keypair_load (server);
     assert (rc == 0);
 
-    //  Hard code the progression for now...
-    
-    zmq_msg_t identity;
-    zmq_msg_t incoming;
-    
-    //  Get HELLO command
-    zmq_msg_init (&identity);
-    rc = zmq_msg_recv (&identity, router, 0);
-    assert (rc >= 0);
-    assert (zmq_msg_more (&identity));
-    zmq_msg_init (&incoming);
-    rc = zmq_msg_recv (&incoming, router, 0);
-    assert (rc >= 0);
+    //  Set some metadata properties
+    zcurve_metadata_set (server, "Server", "CZMQ/zcurve");
 
-    //  Start server side of handshake
-    zmq_msg_t *message = zcurve_execute (server, &incoming);
-    zmq_msg_close (&incoming);
-
-    //  We have WELCOME, send back to client
-    assert (message);
-    rc = zmq_msg_send (&identity, router, ZMQ_SNDMORE);
-    assert (rc >= 0);
-    rc = zmq_msg_send (message, router, 0);
-    assert (rc >= 0);
-
-    //  Get INITIATE command
-    zmq_msg_init (&identity);
-    rc = zmq_msg_recv (&identity, router, 0);
-    assert (rc >= 0);
-    assert (zmq_msg_more (&identity));
-    zmq_msg_init (&incoming);
-    rc = zmq_msg_recv (&incoming, router, 0);
-    assert (rc >= 0);
-    
-    message = zcurve_execute (server, &incoming);
-    zmq_msg_close (&incoming);
-    
-    //  We have READY, send back to client
-    assert (message);
-    rc = zmq_msg_send (&identity, router, ZMQ_SNDMORE);
-    assert (rc >= 0);
-    rc = zmq_msg_send (message, router, 0);
-    assert (rc >= 0);
-
+    //  Execute incoming frames until ready or exception
+    //  In practice we'd want a server instance per unique client
+    while (!zcurve_connected (server)) {
+        zframe_t *sender = zframe_recv (router);
+        zframe_t *input = zframe_recv (router);
+        assert (input);
+        zframe_t *output = zcurve_execute (server, input);
+        zframe_destroy (&input);
+        zframe_send (&sender, router, ZFRAME_MORE);
+        zframe_send (&output, router, 0);
+    }
     //  Get MESSAGE command
-    zmq_msg_init (&identity);
-    rc = zmq_msg_recv (&identity, router, 0);
-    assert (rc >= 0);
-    assert (zmq_msg_more (&identity));
-    zmq_msg_init (&incoming);
-    rc = zmq_msg_recv (&incoming, router, 0);
-    assert (rc >= 0);
-    message = zcurve_execute (server, &incoming);
-    zmq_msg_close (&incoming);
+    zframe_t *sender = zframe_recv (router);
+    zframe_t *input = zframe_recv (router);
+    assert (input);
+    
+    zframe_t *output = zcurve_decode (server, input);
+    zframe_destroy (&input);
 
     //  Do Hello, World
-    assert (message);
-    assert (memcmp (zmq_msg_data (message), "Hello", 5) == 0);
-    message = zcurve_encode (server, (byte *) "World", 5);
-    assert (message);
+    assert (output);
+    assert (memcmp (zframe_data (output), "Hello", 5) == 0);
+    zframe_destroy (&output);
 
-    rc = zmq_msg_send (&identity, router, ZMQ_SNDMORE);
-    assert (rc >= 0);
-    rc = zmq_msg_send (message, router, 0);
-    assert (rc >= 0);
+    zframe_t *response = zframe_new ((byte *) "World", 5);
+    output = zcurve_encode (server, response);
+    zframe_destroy (&response);
+    assert (output);
+    zframe_send (&sender, router, ZFRAME_MORE);
+    zframe_send (&output, router, 0);
     
     zcurve_destroy (&server);
     zctx_destroy (&ctx);
@@ -175,35 +160,51 @@ server_task (void *args)
     zcurve_t *client = zcurve_new (server_key);
     zcurve_keypair_new (client);
 
+    //  Set some metadata properties
+    zcurve_metadata_set (client, "Client", "CZMQ/zcurve");
+    zcurve_metadata_set (client, "Identity", "E475DA11");
+    
     //  Execute null event on client to kick off handshake
-    zmq_msg_t *message = zcurve_execute (client, NULL);
-    while (message) {
-        //  Send message to server
-        rc = zmq_msg_send (message, dealer, 0);
-        if (rc == -1) puts (strerror (errno));
+    zframe_t *output = zcurve_execute (client, NULL);
+    while (!zcurve_connected (client)) {
+        rc = zframe_send (&output, dealer, 0);
         assert (rc >= 0);
-        //  Get reply from server (could be FSMified)
-        rc = zmq_msg_recv (message, dealer, 0);
-        assert (rc >= 0);
-        //  Execute reply on client to continue handshake
-        message = zcurve_execute (client, message);
+        zframe_t *input = zframe_recv (dealer);
+        assert (input);
+        output = zcurve_execute (client, input);
+        zframe_destroy (&input);
     }
     //  Handshake is done, now try Hello, World
-    message = zcurve_encode (client, (byte *) "Hello", 5);
-    assert (message);
-    rc = zmq_msg_send (message, dealer, 0);
-    assert (rc >= 0);
+    zframe_t *request = zframe_new ((byte *) "Hello", 5);
+    output = zcurve_encode (client, request);
+    zframe_destroy (&request);
+    assert (output);
+    zframe_send (&output, dealer, 0);
 
-    rc = zmq_msg_recv (message, dealer, 0);
-    assert (rc >= 0);
-    message = zcurve_execute (client, message);
-    assert (message);
-    assert (memcmp (zmq_msg_data (message), "World", 5) == 0);
+    zframe_t *input = zframe_recv (dealer);
+    assert (input);
+    
+    output = zcurve_decode (client, input);
+    assert (output);
+    assert (memcmp (zframe_data (output), "World", 5) == 0);
+    zframe_destroy (&input);
+    zframe_destroy (&output);
+    
+    //  Now send messages of increasing size, check they work
+    int count;
+    size_t size = 0;
+    for (count = 0; count < 12; count++) {
+        
+        
+
+        size = size * 2 + 1;
+    }
 
     //  Done, clean-up
-    zcurve_destroy (&client);
     zfile_delete ("public.key");
     zfile_delete ("secret.key");
+    zcurve_destroy (&client);
+    zctx_destroy (&ctx);
 ----
 
 SEE ALSO

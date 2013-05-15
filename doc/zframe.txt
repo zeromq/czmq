@@ -92,11 +92,6 @@ CZMQ_EXPORT void
 //  Set new contents for frame
 CZMQ_EXPORT void
     zframe_reset (zframe_t *self, const void *data, size_t size);
-    
-//  Set new contents for frame, using zero copy
-CZMQ_EXPORT void
-    zframe_reset_zero_copy (zframe_t *self, void *data, size_t size,
-                            zframe_free_fn *free_fn, void *arg);
 
 //  Set the free callback for frame
 CZMQ_EXPORT void
@@ -156,20 +151,18 @@ EXAMPLE
     zframe_destroy (&copy);
     assert (!zframe_eq (frame, copy));
 	
-	//Test zframe_reset_zero_copy
+	//  Test zframe_reset_zero_copy
     frame = zframe_new ("ONE", 3);
     assert (frame);
-	zframe_reset_zero_copy (frame, strdup("TWO"), 3, s_test_free_cb, NULL);
-    char* zeroCopyTestStr = zframe_strdup (frame);
-	assert (streq (zeroCopyTestStr, "TWO"));
-    free (zeroCopyTestStr);
-	zframe_destroy(&frame);
+	zframe_reset_zero_copy (frame, strdup ("TWO"), 3, s_test_free_cb, NULL);
+    assert (zframe_streq (frame, "TWO"));
+	zframe_destroy (&frame);
     
-    //Test zframe_new_empty
-    frame = zframe_new_empty();
-    assert(frame);
-    assert(zframe_size(frame) == 0);
-    zframe_destroy(&frame);
+    //  Test zframe_new_empty
+    frame = zframe_new_empty ();
+    assert (frame);
+    assert (zframe_size (frame) == 0);
+    zframe_destroy (&frame);
 
     //  Send END frame
     frame = zframe_new ("NOT", 3);
@@ -199,11 +192,9 @@ EXAMPLE
     frame = zframe_recv_nowait (input);
     assert (frame == NULL);
 
-    // Test zero copy
+    //  Test zero copy
     char *buffer = (char *) malloc (1024);
-    int i;
-    for (i = 0; i < 1024; i++)
-        buffer [i] = 'A';
+    memset (buffer, 'A', 1024);
 
     frame = zframe_new_zero_copy (buffer, 1024, s_test_free_cb, NULL);
     zframe_t *frame_copy = zframe_dup (frame);
