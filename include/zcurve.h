@@ -60,16 +60,29 @@ CZMQ_EXPORT int
 CZMQ_EXPORT byte *
     zcurve_keypair_public (zcurve_t *self);
     
-//  Accept command from peer. If the command is invalid, it is discarded
-//  silently (in this prototype, that causes an assertion failure). May
-//  return a zmq_msg_t to send to the peer, or NULL if there is nothing
-//  to send.
-CZMQ_EXPORT zmq_msg_t *
-    zcurve_execute (zcurve_t *self, zmq_msg_t *message);
+//  Set a metadata property; these are sent to the peer after the
+//  security handshake. Property values are strings.
+CZMQ_EXPORT void
+    zcurve_metadata_set (zcurve_t *self, char *name, char *value);
 
-//  Encode message from peer. Returns a zmq_msg_t ready to send on the wire.
-CZMQ_EXPORT zmq_msg_t *
-    zcurve_encode (zcurve_t *self, byte *data, size_t size);
+//  Accept input command from peer. If the command is invalid, it is
+//  discarded silently. May return a blob to send to the peer, or NULL
+//  if there is nothing to send.
+CZMQ_EXPORT zframe_t *
+    zcurve_execute (zcurve_t *self, zframe_t *input);
+
+//  Encode clear-text message to peer. Returns a blob ready to send
+//  on the wire.
+CZMQ_EXPORT zframe_t *
+    zcurve_encode (zcurve_t *self, zframe_t *clear);
+
+//  Decode blob into message from peer.
+CZMQ_EXPORT zframe_t *
+    zcurve_decode (zcurve_t *self, zframe_t *input);
+
+//  Indicate whether handshake is still in progress
+CZMQ_EXPORT bool
+    zcurve_connected (zcurve_t *self);
 
 //  Self test of this class
 void

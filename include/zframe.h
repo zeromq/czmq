@@ -119,11 +119,6 @@ CZMQ_EXPORT void
 //  Set new contents for frame
 CZMQ_EXPORT void
     zframe_reset (zframe_t *self, const void *data, size_t size);
-    
-//  Set new contents for frame, using zero copy
-CZMQ_EXPORT void
-    zframe_reset_zero_copy (zframe_t *self, void *data, size_t size,
-                            zframe_free_fn *free_fn, void *arg);
 
 //  Set the free callback for frame
 CZMQ_EXPORT void

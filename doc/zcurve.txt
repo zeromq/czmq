@@ -8,39 +8,54 @@ zcurve - CurveZMQ security engine (rfc.zeromq.org/spec:26)
 SYNOPSIS
 --------
 ----
-//  Constructor. Always generates a new public/secret key pair which 
-//  you can override if you need to.
+//  Constructor; to create a client instance, pass the server public
+//  key. If you pass null, you create a server instance.
 CZMQ_EXPORT zcurve_t *
-    zcurve_new (void);
-
+    zcurve_new (byte *server_key);
+    
 //  Destructor
 CZMQ_EXPORT void
     zcurve_destroy (zcurve_t **self_p);
 
-//  Return value of public key
+//  Long-term key management for servers; generate a new key pair
+CZMQ_EXPORT void
+    zcurve_keypair_new (zcurve_t *self);
+
+//  Save long-term key pair to disk; not confidential
+CZMQ_EXPORT int
+    zcurve_keypair_save (zcurve_t *self);
+
+//  Load long-term key pair from disk
+CZMQ_EXPORT int
+    zcurve_keypair_load (zcurve_t *self);
+
+//  Return public part of key pair
 CZMQ_EXPORT byte *
-    zcurve_public_key (zcurve_t *self);
-
-//  Return value of secret key
-CZMQ_EXPORT byte *
-    zcurve_secret_key (zcurve_t *self);
-
-//  Start zcurve instance as client (if you provide a server key) or as
-//  server. May return a zmq_msg_t to send to the peer, or NULL if there
-//  is nothing to send.
-CZMQ_EXPORT zmq_msg_t *
-    zcurve_start (zcurve_t *self, byte *server_key);
-
-//  Accept command from peer. If the command is invalid, it is discarded
-//  silently (in this prototype, that causes an assertion failure). May
-//  return a zmq_msg_t to send to the peer, or NULL if there is nothing
-//  to send.
-CZMQ_EXPORT zmq_msg_t *
-    zcurve_accept (zcurve_t *self, zmq_msg_t *message);
+    zcurve_keypair_public (zcurve_t *self);
     
-//  Encode message from peer. Returns a zmq_msg_t ready to send on the wire.
-CZMQ_EXPORT zmq_msg_t *
-    zcurve_encode (zcurve_t *self, byte *data, size_t size);
+//  Set a metadata property; these are sent to the peer after the
+//  security handshake. Property values are strings.
+CZMQ_EXPORT void
+    zcurve_metadata_set (zcurve_t *self, char *name, char *value);
+
+//  Accept input command from peer. If the command is invalid, it is
+//  discarded silently. May return a blob to send to the peer, or NULL
+//  if there is nothing to send.
+CZMQ_EXPORT zframe_t *
+    zcurve_execute (zcurve_t *self, zframe_t *input);
+
+//  Encode clear-text message to peer. Returns a blob ready to send
+//  on the wire.
+CZMQ_EXPORT zframe_t *
+    zcurve_encode (zcurve_t *self, zframe_t *clear);
+
+//  Decode blob into message from peer.
+CZMQ_EXPORT zframe_t *
+    zcurve_decode (zcurve_t *self, zframe_t *input);
+
+//  Indicate whether handshake is still in progress
+CZMQ_EXPORT bool
+    zcurve_connected (zcurve_t *self);
 
 //  Self test of this class
 void
@@ -54,53 +69,142 @@ CurveZMQ security engine, for use in ZeroMQ applications.
 
 This is a reference implementation of CurveZMQ, and can be used at the
 application level to secure a request-reply dialog (usually, DEALER to
-ROUTER). For an example of use, see the selftest function.
+ROUTER). For an example of use, see the selftest function. To compile
+with security enabled, first build and install libsodium from GitHub at
+https://github.com/jedisct1/libsodium. Run ./configure after installing
+libsodium. If configure does not find libsodium, this module will work
+in clear text.
 
 EXAMPLE
 -------
 .From zcurve_test method
 ----
-#if defined (HAVE_LIBSODIUM)
-    zmq_msg_t *msg;
+void *
+server_task (void *args)
+{
+    //  We'll use a router socket to be more realistic
+    zctx_t *ctx = zctx_new ();
+    assert (ctx);
+    void *router = zsocket_new (ctx, ZMQ_ROUTER);
+    int rc = zsocket_bind (router, "tcp://*:9000");
+    assert (rc != -1);
 
-    //  Start server peer
-    zcurve_t *server = zcurve_new ();
-    msg = zcurve_start (server, NULL);
-    assert (msg == NULL);
-    
-    //  Start client peer and ping/pong through the handshake
-    zcurve_t *client = zcurve_new ();
-    msg = zcurve_start (client, zcurve_public_key (server));
-    while (msg) {
-        msg = zcurve_accept (server, msg);
-        if (msg)
-            msg = zcurve_accept (client, msg);
+    //  Create a new server instance and load its keys from
+    //  the previously generated keypair file
+    zcurve_t *server = zcurve_new (NULL);
+    rc = zcurve_keypair_load (server);
+    assert (rc == 0);
+
+    //  Set some metadata properties
+    zcurve_metadata_set (server, "Server", "CZMQ/zcurve");
+
+    //  Execute incoming frames until ready or exception
+    //  In practice we'd want a server instance per unique client
+    while (!zcurve_connected (server)) {
+        zframe_t *sender = zframe_recv (router);
+        zframe_t *input = zframe_recv (router);
+        assert (input);
+        zframe_t *output = zcurve_execute (server, input);
+        zframe_destroy (&input);
+        zframe_send (&sender, router, ZFRAME_MORE);
+        zframe_send (&output, router, 0);
     }
-    msg = zcurve_encode (client, (byte *) "Hello", 5);
-    assert (msg);
+    //  Get MESSAGE command
+    zframe_t *sender = zframe_recv (router);
+    zframe_t *input = zframe_recv (router);
+    assert (input);
     
-    //  Send encoded message over the wire
-    //  ...
-    //  Receive encoded message from the wire
-    
-    msg = zcurve_accept (server, msg);
-    assert (msg);
-    assert (memcmp (zmq_msg_data (msg), "Hello", 5) == 0);
+    zframe_t *output = zcurve_decode (server, input);
+    zframe_destroy (&input);
 
-    msg = zcurve_encode (server, (byte *) "World", 5);
-    assert (msg);
-    
-    //  Send encoded message over the wire
-    //  ...
-    //  Receive encoded message from the wire
-    
-    msg = zcurve_accept (client, msg);
-    assert (msg);
-    assert (memcmp (zmq_msg_data (msg), "World", 5) == 0);
+    //  Do Hello, World
+    assert (output);
+    assert (memcmp (zframe_data (output), "Hello", 5) == 0);
+    zframe_destroy (&output);
 
+    zframe_t *response = zframe_new ((byte *) "World", 5);
+    output = zcurve_encode (server, response);
+    zframe_destroy (&response);
+    assert (output);
+    zframe_send (&sender, router, ZFRAME_MORE);
+    zframe_send (&output, router, 0);
+    
     zcurve_destroy (&server);
+    zctx_destroy (&ctx);
+    return NULL;
+}
+    //  Generate new long-term key pair for our test server
+    //  The key pair will be stored in "secret.key"
+    zcurve_t *keygen = zcurve_new (NULL);
+    zcurve_keypair_new (keygen);
+    int rc = zcurve_keypair_save (keygen);
+    assert (rc == 0);
+    assert (zfile_exists ("secret.key"));
+    assert (zfile_size ("secret.key") == 196);
+    //  This is how we "share" the server key in our test
+    byte server_key [32];
+    memcpy (server_key, zcurve_keypair_public (keygen), 32);
+    zcurve_destroy (&keygen);
+    
+    //  We'll run the server as a background task, and the
+    //  client in this foreground thread.
+    zthread_new (server_task, NULL);
+
+    zctx_t *ctx = zctx_new ();
+    assert (ctx);
+    void *dealer = zsocket_new (ctx, ZMQ_DEALER);
+    rc = zsocket_connect (dealer, "tcp://127.0.0.1:9000");
+    assert (rc != -1);
+    
+    //  Create a new client instance using shared server key
+    zcurve_t *client = zcurve_new (server_key);
+    zcurve_keypair_new (client);
+
+    //  Set some metadata properties
+    zcurve_metadata_set (client, "Client", "CZMQ/zcurve");
+    zcurve_metadata_set (client, "Identity", "E475DA11");
+    
+    //  Execute null event on client to kick off handshake
+    zframe_t *output = zcurve_execute (client, NULL);
+    while (!zcurve_connected (client)) {
+        rc = zframe_send (&output, dealer, 0);
+        assert (rc >= 0);
+        zframe_t *input = zframe_recv (dealer);
+        assert (input);
+        output = zcurve_execute (client, input);
+        zframe_destroy (&input);
+    }
+    //  Handshake is done, now try Hello, World
+    zframe_t *request = zframe_new ((byte *) "Hello", 5);
+    output = zcurve_encode (client, request);
+    zframe_destroy (&request);
+    assert (output);
+    zframe_send (&output, dealer, 0);
+
+    zframe_t *input = zframe_recv (dealer);
+    assert (input);
+    
+    output = zcurve_decode (client, input);
+    assert (output);
+    assert (memcmp (zframe_data (output), "World", 5) == 0);
+    zframe_destroy (&input);
+    zframe_destroy (&output);
+    
+    //  Now send messages of increasing size, check they work
+    int count;
+    size_t size = 0;
+    for (count = 0; count < 12; count++) {
+        
+        
+
+        size = size * 2 + 1;
+    }
+
+    //  Done, clean-up
+    zfile_delete ("public.key");
+    zfile_delete ("secret.key");
     zcurve_destroy (&client);
-#endif
+    zctx_destroy (&ctx);
 ----
 
 SEE ALSO

@@ -266,30 +266,38 @@ zsocket_test (bool verbose)
     assert (rc == 0);
     rc = zsocket_sendmem (writer, "DEFG", 4, 0);
     assert (rc == 0);
-    zframe_t* frame = zframe_recv (reader);
+    
+    zframe_t *frame = zframe_recv (reader);
     assert (frame);
     assert (zframe_streq (frame, "ABC"));
     assert (zframe_more (frame));
+    zframe_destroy (&frame);
+    
     frame = zframe_recv (reader);
     assert (frame);
     assert (zframe_streq (frame, "DEFG"));
     assert (!zframe_more (frame));
+    zframe_destroy (&frame);
 
-    //Test zframe_sendmem_zero_copy
+    //  Test zframe_sendmem_zero_copy
     rc = zsocket_sendmem_zero_copy (writer, strdup ("ABC"), 3,
                                     s_test_free_str_cb, NULL, ZFRAME_MORE);
     assert (rc == 0);
     rc = zsocket_sendmem_zero_copy (writer, strdup ("DEFG"), 4,
                                     s_test_free_str_cb, NULL, 0);
     assert (rc == 0);
+    
     frame = zframe_recv (reader);
     assert (frame);
     assert (zframe_streq (frame, "ABC"));
     assert (zframe_more (frame));
+    zframe_destroy (&frame);
+    
     frame = zframe_recv (reader);
     assert (frame);
     assert (zframe_streq (frame, "DEFG"));
     assert (!zframe_more (frame));
+    zframe_destroy (&frame);
 
     zsocket_destroy (ctx, writer);
     zctx_destroy (&ctx);
