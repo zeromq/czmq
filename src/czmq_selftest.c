@@ -40,6 +40,7 @@ int main (int argc, char *argv [])
 
     zclock_test (verbose);
     zctx_test (verbose);
+    zcurve_test (verbose);
     zfile_test (verbose);
     zframe_test (verbose);
     zhash_test (verbose);
