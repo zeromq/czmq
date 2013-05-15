@@ -273,10 +273,8 @@ zmsg_pushstr (zmsg_t *self, const char *format, ...)
 
     //  Format string into buffer
     int size = 255 + 1;
-    char *string = (char *) malloc (size);
-    if (!string) {
-        return -1;
-    }
+    char stackbuffer[255+1];
+    char *string = stackbuffer;
     va_list argptr;
     va_start (argptr, format);
     int required = vsnprintf (string, size, format, argptr);
@@ -290,7 +288,7 @@ zmsg_pushstr (zmsg_t *self, const char *format, ...)
 #endif
     if (required >= size) {
         size = required + 1;
-        string = (char *) realloc (string, size);
+        string = (char *) malloc (size);
         if (!string) {
             return -1;
         }
@@ -303,7 +301,8 @@ zmsg_pushstr (zmsg_t *self, const char *format, ...)
 
     self->content_size += size;
     zlist_push (self->frames, zframe_new (string, size));
-    free (string);
+    if (string!=stackbuffer)
+        free (string);
     return 0;
 }
 
@@ -318,10 +317,8 @@ zmsg_addstr (zmsg_t *self, const char *format, ...)
     assert (format);
     //  Format string into buffer
     int size = 255 + 1;
-    char *string = (char *) malloc (size);
-    if (!string) {
-        return -1;
-    }
+    char stackbuffer[255+1];
+    char *string = stackbuffer;
     va_list argptr;
     va_start (argptr, format);
     int required = vsnprintf (string, size, format, argptr);
@@ -335,7 +332,7 @@ zmsg_addstr (zmsg_t *self, const char *format, ...)
 #endif    
     if (required >= size) {
         size = required + 1;
-        string = (char *) realloc (string, size);
+        string = (char *) malloc (size);
         if (!string) {
             return -1;
         }
@@ -349,7 +346,8 @@ zmsg_addstr (zmsg_t *self, const char *format, ...)
 
     self->content_size += size;
     zlist_append (self->frames, zframe_new (string, size));
-    free (string);
+    if (string!=stackbuffer)
+        free (string);
     return 0;
 }
 

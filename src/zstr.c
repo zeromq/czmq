@@ -108,7 +108,8 @@ zstr_send (void *zocket, const char *format, ...)
     assert (format);
     //  Format string into buffer
     int size = 255 + 1;
-    char *string = (char *) malloc (size);
+    char stackbuffer[255+1];
+    char *string = stackbuffer;
     va_list argptr;
     va_start (argptr, format);
     int required = vsnprintf (string, size, format, argptr);
@@ -122,14 +123,17 @@ zstr_send (void *zocket, const char *format, ...)
 #endif
     if (required >= size) {
         size = required + 1;
-        string = (char *) realloc (string, size);
+        string = (char *) malloc (size);
+        if (!string)
+            return -1;
         va_start (argptr, format);
         vsnprintf (string, size, format, argptr);
         va_end (argptr);
     }
 
     int rc = s_send_string (zocket, false, string);
-    free (string);
+    if (string!=stackbuffer)
+        free (string);
     return rc;
 }
 
@@ -141,7 +145,8 @@ zstr_sendf (void *zocket, const char *format, ...)
     assert (format);
     //  Format string into buffer
     int size = 255 + 1;
-    char *string = (char *) malloc (size);
+    char stackbuffer[255+1];
+    char *string = stackbuffer;
     va_list argptr;
     va_start (argptr, format);
     int required = vsnprintf (string, size, format, argptr);
@@ -155,14 +160,17 @@ zstr_sendf (void *zocket, const char *format, ...)
 #endif
     if (required >= size) {
         size = required + 1;
-        string = (char *) realloc (string, size);
+        string = (char *) malloc (size);
+        if (!string)
+            return -1;
         va_start (argptr, format);
         vsnprintf (string, size, format, argptr);
         va_end (argptr);
     }
 
     int rc = s_send_string (zocket, false, string);
-    free (string);
+    if (string!=stackbuffer)
+        free (string);
     return rc;
 }
 
@@ -177,7 +185,8 @@ zstr_sendm (void *zocket, const char *format, ...)
     assert (format);
     //  Format string into buffer
     int size = 255 + 1;
-    char *string = (char *) malloc (size);
+    char stackbuffer[255+1];
+    char *string = stackbuffer;
     va_list argptr;
     va_start (argptr, format);
     int required = vsnprintf (string, size, format, argptr);
@@ -191,14 +200,17 @@ zstr_sendm (void *zocket, const char *format, ...)
 #endif
     if (required >= size) {
         size = required + 1;
-        string = (char *) realloc (string, size);
+        string = (char *) malloc (size);
+        if (!string)
+            return -1;
         va_start (argptr, format);
         vsnprintf (string, size, format, argptr);
         va_end (argptr);
     }
 
     int rc = s_send_string (zocket, true, string);
-    free (string);
+    if (string!=stackbuffer)
+        free (string);
     return rc;
 }
 
@@ -210,7 +222,8 @@ zstr_sendfm (void *zocket, const char *format, ...)
     assert (format);
     //  Format string into buffer
     int size = 255 + 1;
-    char *string = (char *) malloc (size);
+    char stackbuffer[255+1];
+    char *string = stackbuffer;
     va_list argptr;
     va_start (argptr, format);
     int required = vsnprintf (string, size, format, argptr);
@@ -224,14 +237,17 @@ zstr_sendfm (void *zocket, const char *format, ...)
 #endif
     if (required >= size) {
         size = required + 1;
-        string = (char *) realloc (string, size);
+        string = (char *) malloc (size);
+        if (!string)
+            return -1;
         va_start (argptr, format);
         vsnprintf (string, size, format, argptr);
         va_end (argptr);
     }
 
     int rc = s_send_string (zocket, true, string);
-    free (string);
+    if (string!=stackbuffer)
+        free (string);
     return rc;
 }
 
