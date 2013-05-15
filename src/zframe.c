@@ -203,9 +203,10 @@ zframe_send (zframe_t **self_p, void *zocket, int flags)
                 return -1;
         }
         else {
-            if (zmq_sendmsg (zocket, &self->zmsg, snd_flags) == -1)
-                return -1;
+            int rc = zmq_sendmsg (zocket, &self->zmsg, snd_flags);
             zframe_destroy (self_p);
+            if (rc == -1)
+                return -1;
         }
     }
     return 0;

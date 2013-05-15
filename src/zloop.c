@@ -424,7 +424,6 @@ zloop_start (zloop_t *self)
                 if (timer->arg == arg) {
                     zlist_remove (self->timers, timer);
                     free (timer);
-                    break;
                 }
                 timer = (s_timer_t *) zlist_next (self->timers);
             }
