@@ -413,6 +413,13 @@ zloop_start (zloop_t *self)
                 rc = poller->handler (self, &self->pollset [item_nbr], poller->arg);
                 if (rc == -1)
                     break;      //  Poller handler signaled break
+                // If the poller handler calls zloop_poller_end on poller other than itself
+                // we need to force rebuild in order to avoid reading from freed memory in the handler
+                if (self->dirty) {
+                    if (self->verbose)
+                        zclock_log ("I: zloop: pollers canceled, forcing rebuild");
+                    break;
+                }
             }
         }
         //  Now handle any timer zombies
