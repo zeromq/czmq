@@ -95,6 +95,12 @@ zframe_new_empty (void)
 //  Constructor; Allows zero-copy semantics.
 //  Zero-copy frame is initialised if data != NULL, size > 0, free_fn != 0
 //  'arg' is a void pointer that is passed to free_fn as second argument
+//  NOTE: this method is DEPRECATED and is slated for removal. These are the
+//  problems with the method:
+//  - premature optimization: do we really need this? It makes the API more
+//    complex; high-performance applications would not use zmsg in any case,
+//    they would work directly with zmq_msg objects.
+//  (PH, 2013/05/18)
 
 zframe_t *
 zframe_new_zero_copy (void *data, size_t size, zframe_free_fn *free_fn, void *arg)
@@ -311,7 +317,10 @@ zframe_more (const zframe_t *self)
 }
 
 // --------------------------------------------------------------------------
-// Return frame zero copy indicator (1 or 0)
+//  Return frame zero copy indicator (1 or 0)
+//  NOTE: this method is DEPRECATED and is slated for removal.
+//  Attached to zframe_new_zero_copy
+//  (PH, 2013/05/18)
 
 int
 zframe_zero_copy (zframe_t *self)
@@ -389,6 +398,13 @@ zframe_reset (zframe_t *self, const void *data, size_t size)
 
 //  --------------------------------------------------------------------------
 //  Set the free callback for frame
+//  NOTE: this method is DEPRECATED and is slated for removal. These are the
+//  problems with the method:
+//  - name is not accurate, should be "set_free_fn"
+//  - use case is unclear - why do we need this method?
+//  - fuzzy overlap with existing semantics - reuses zero-copy free_fn but 
+//    is not actually zero-copy.
+//  (PH, 2013/05/18)
 
 void
 zframe_freefn (zframe_t *self, zframe_free_fn *free_fn, void *arg)
