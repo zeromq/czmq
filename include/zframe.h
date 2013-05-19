@@ -39,17 +39,9 @@ typedef struct _zframe_t zframe_t;
 #define ZFRAME_REUSE    2
 #define ZFRAME_DONTWAIT 4
 
-//  Callback function for zframe_free_fn method
-typedef void (zframe_free_fn) (void *data, void *arg);
-
 //  Create a new frame with optional size, and optional data
 CZMQ_EXPORT zframe_t *
     zframe_new (const void *data, size_t size);
-
-//  Create a zero-copy frame
-CZMQ_EXPORT zframe_t *
-    zframe_new_zero_copy (void *data, size_t size,
-                          zframe_free_fn *free_fn, void *arg);
 
 //  Create an empty (zero-sized) frame
 CZMQ_EXPORT zframe_t *
@@ -99,10 +91,6 @@ CZMQ_EXPORT char *
 CZMQ_EXPORT bool
     zframe_streq (zframe_t *self, const char *string);
 
-// Return frame zero copy indicator (1 or 0)
-CZMQ_EXPORT int
-    zframe_zero_copy (zframe_t *self);
-
 //  Return frame 'more' property
 CZMQ_EXPORT int
     zframe_more (const zframe_t *self);
@@ -120,7 +108,23 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zframe_reset (zframe_t *self, const void *data, size_t size);
 
+//  Callback function for zframe_free_fn method
+//  DEPRECATED - will be removed for next stable release
+typedef void (zframe_free_fn) (void *data, void *arg);
+
+//  Create a zero-copy frame
+//  DEPRECATED - will be removed for next stable release
+CZMQ_EXPORT zframe_t *
+    zframe_new_zero_copy (void *data, size_t size,
+                          zframe_free_fn *free_fn, void *arg);
+
+// Return frame zero copy indicator (1 or 0)
+//  DEPRECATED - will be removed for next stable release
+CZMQ_EXPORT int
+    zframe_zero_copy (zframe_t *self);
+
 //  Set the free callback for frame
+//  DEPRECATED - will be removed at next stable release
 CZMQ_EXPORT void
     zframe_freefn (zframe_t *self, zframe_free_fn *free_fn, void *arg);
 
