@@ -39,6 +39,7 @@ int main (int argc, char *argv [])
     printf ("Running czmq self tests...\n");
 
     zclock_test (verbose);
+    zconfig_test (verbose);
     zctx_test (verbose);
     zcurve_test (verbose);
     zfile_test (verbose);

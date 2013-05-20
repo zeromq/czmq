@@ -8,6 +8,7 @@ include_HEADERS = \
     ../include/czmq_prelude.h \
     ../include/zbeacon.h \
     ../include/zclock.h \
+    ../include/zconfig.h \
     ../include/zcurve.h \
     ../include/zctx.h \
     ../include/zfile.h \
@@ -26,6 +27,7 @@ include_HEADERS = \
 libczmq_la_SOURCES = \
     zbeacon.c \
     zclock.c \
+    zconfig.c \
     zctx.c \
     zcurve.c \
     zfile.c \
