@@ -247,7 +247,14 @@ zmsg_addmem (zmsg_t *self, const void *src, size_t size)
 
 //  --------------------------------------------------------------------------
 //  Add block of memory to the end of the message, as a new frame.
-//  The new frame is zero-copy-constructed (see zframe_new_zero_copy(...) for detailed description)
+//  The new frame is zero-copy-constructed (see zframe_new_zero_copy(...) 
+//  for detailed description)
+//  NOTE: this method is DEPRECATED and is slated for removal. These are the
+//  problems with the method:
+//  - premature optimization: do we really need this? It makes the API more
+//    complex; high-performance applications would not use zmsg in any case,
+//    they would work directly with zmq_msg objects.
+//  (PH, 2013/05/18)
 
 int
 zmsg_addmem_zero_copy (zmsg_t *self, void *src, size_t size, zframe_free_fn *free_fn, void *arg)

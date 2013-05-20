@@ -194,6 +194,13 @@ zsocket_sendmem (void *zocket, const void* data, size_t size, int flags)
 //  --------------------------------------------------------------------------
 //  Send data over a socket as a single message frame
 //  Accepts these flags: ZFRAME_MORE and ZFRAME_DONTWAIT.
+//  NOTE: this method is DEPRECATED and is slated for removal. These are the
+//  problems with the method:
+//  - premature optimization: do we really need this? It makes the API more
+//    complex; high-performance applications would not use this in any case,
+//    they would work directly with zmq_msg objects.
+//  - selftest method leaks memory
+//  (PH, 2013/05/18)
 
 int
 zsocket_sendmem_zero_copy (void *zocket, void *data, size_t size,
@@ -206,8 +213,7 @@ zsocket_sendmem_zero_copy (void *zocket, void *data, size_t size,
     snd_flags |= (flags & ZFRAME_DONTWAIT)? ZMQ_DONTWAIT : 0;
     
     zmq_msg_t msg;
-    zmq_msg_init_data(&msg, data, size, free_fn, hint);
-    
+    zmq_msg_init_data (&msg, data, size, free_fn, hint);
     int rc = zmq_sendmsg (zocket, &msg, snd_flags);
     return rc == -1? -1: 0;
 }
