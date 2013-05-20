@@ -184,6 +184,36 @@ zfile_rmdir (const char *pathname)
 
 
 //  --------------------------------------------------------------------------
+//  Set private file creation mode; all files created from here will be
+//  readable/writable by the owner only.
+
+static mode_t s_old_mask = 0;
+
+void
+zfile_mode_private (void)
+{
+#   if !defined(__WINDOWS__)
+    s_old_mask = umask (S_IWGRP | S_IWOTH | S_IRGRP | S_IROTH);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Reset default file creation mode; all files created from here will use
+//  process file mode defaults.
+
+void
+zfile_mode_default (void)
+{
+    //  Reset process file create mask
+#   if !defined(__WINDOWS__)
+    if (s_old_mask)
+        umask (s_old_mask);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
 //  Selftest
 
 int

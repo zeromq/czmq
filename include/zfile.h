@@ -59,6 +59,16 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zfile_rmdir (const char *pathname);
 
+//  Set private file creation mode; all files created from here will be
+//  readable/writable by the owner only.
+CZMQ_EXPORT void
+    zfile_mode_private (void);
+    
+//  Reset default file creation mode; all files created from here will use
+//  process file mode defaults.
+CZMQ_EXPORT void
+    zfile_mode_default (void);
+
 //  Self test of this class
 CZMQ_EXPORT int
     zfile_test (bool verbose);
