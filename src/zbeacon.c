@@ -25,7 +25,7 @@
 
 /*
 @header
-    The zbeacon module implements a peer-to-peer discovery service for local
+    The zbeacon class implements a peer-to-peer discovery service for local
     networks. A beacon can broadcast and/or capture service announcements
     using UDP messages on the local area network. This implementation uses
     IPv4 UDP broadcasts. You can define the format of your outgoing beacons,
