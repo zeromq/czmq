@@ -10,18 +10,17 @@
     http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation; either version 3 of the License, or (at
-    your option) any later version.
+    the terms of the GNU Lesser General Public License as published by the 
+    Free Software Foundation; either version 3 of the License, or (at your 
+    option) any later version.
 
     This software is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-    Lesser General Public License for more details.
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL-
+    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General 
+    Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this program. If not, see
-    <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU Lesser General Public License 
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
     =========================================================================
 */
 
@@ -65,7 +64,7 @@ CZMQ_EXPORT int zsocket_events (void *zocket);
 CZMQ_EXPORT void zsocket_set_hwm (void *zocket, int hwm);
 CZMQ_EXPORT void zsocket_set_swap (void *zocket, int swap);
 CZMQ_EXPORT void zsocket_set_affinity (void *zocket, int affinity);
-CZMQ_EXPORT void zsocket_set_identity (void *zocket, const char * identity);
+CZMQ_EXPORT void zsocket_set_identity (void *zocket, char * identity);
 CZMQ_EXPORT void zsocket_set_rate (void *zocket, int rate);
 CZMQ_EXPORT void zsocket_set_recovery_ivl (void *zocket, int recovery_ivl);
 CZMQ_EXPORT void zsocket_set_recovery_ivl_msec (void *zocket, int recovery_ivl_msec);
@@ -82,8 +81,8 @@ CZMQ_EXPORT void zsocket_set_linger (void *zocket, int linger);
 CZMQ_EXPORT void zsocket_set_reconnect_ivl (void *zocket, int reconnect_ivl);
 CZMQ_EXPORT void zsocket_set_reconnect_ivl_max (void *zocket, int reconnect_ivl_max);
 CZMQ_EXPORT void zsocket_set_backlog (void *zocket, int backlog);
-CZMQ_EXPORT void zsocket_set_subscribe (void *zocket, const char * subscribe);
-CZMQ_EXPORT void zsocket_set_unsubscribe (void *zocket, const char * unsubscribe);
+CZMQ_EXPORT void zsocket_set_subscribe (void *zocket, char * subscribe);
+CZMQ_EXPORT void zsocket_set_unsubscribe (void *zocket, char * unsubscribe);
 #endif
 
 #if (ZMQ_VERSION_MAJOR == 3)
@@ -117,9 +116,9 @@ CZMQ_EXPORT char * zsocket_last_endpoint (void *zocket);
 CZMQ_EXPORT void zsocket_set_sndhwm (void *zocket, int sndhwm);
 CZMQ_EXPORT void zsocket_set_rcvhwm (void *zocket, int rcvhwm);
 CZMQ_EXPORT void zsocket_set_affinity (void *zocket, int affinity);
-CZMQ_EXPORT void zsocket_set_subscribe (void *zocket, const char * subscribe);
-CZMQ_EXPORT void zsocket_set_unsubscribe (void *zocket, const char * unsubscribe);
-CZMQ_EXPORT void zsocket_set_identity (void *zocket, const char * identity);
+CZMQ_EXPORT void zsocket_set_subscribe (void *zocket, char * subscribe);
+CZMQ_EXPORT void zsocket_set_unsubscribe (void *zocket, char * unsubscribe);
+CZMQ_EXPORT void zsocket_set_identity (void *zocket, char * identity);
 CZMQ_EXPORT void zsocket_set_rate (void *zocket, int rate);
 CZMQ_EXPORT void zsocket_set_recovery_ivl (void *zocket, int recovery_ivl);
 CZMQ_EXPORT void zsocket_set_sndbuf (void *zocket, int sndbuf);
@@ -143,7 +142,7 @@ void zsocket_set_hwm (void *zocket, int hwm);
 #endif
 
 //  Self test of this class
-CZMQ_EXPORT int zsockopt_test (bool verbose);
+int zsockopt_test (bool verbose);
 //  @end
 
 //  Deprecated function names

@@ -9,18 +9,17 @@
     http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation; either version 3 of the License, or (at
-    your option) any later version.
+    the terms of the GNU Lesser General Public License as published by the 
+    Free Software Foundation; either version 3 of the License, or (at your 
+    option) any later version.
 
     This software is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-    Lesser General Public License for more details.
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL-
+    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General 
+    Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this program. If not, see
-    <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU Lesser General Public License 
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
     =========================================================================
 */
 
@@ -210,16 +209,11 @@ zcurve_keypair_save (zcurve_t *self)
 #   if !defined(__WINDOWS__)
 	mode_t old_mask = umask (S_IWGRP | S_IWOTH | S_IRGRP | S_IROTH);
 #   endif
+    
 	//  The public key file contains just the public keys
     FILE *file = fopen (PUBKEY_FILE, "w");
-    //  Reset process file create mask
-#   if !defined(__WINDOWS__)
-	umask (old_mask);
-#   endif
-
     if (!file)
         return -1;
-    
     fprintf (file, PUBKEY_OPEN);
     int byte_nbr;
     for (byte_nbr = 0; byte_nbr < 32; byte_nbr++) 
@@ -228,18 +222,24 @@ zcurve_keypair_save (zcurve_t *self)
     fprintf (file, PUBKEY_CLOSE);
     fclose (file);
 
-    //  The secret key file contains both public and secret keys
+    //  The secret key file contains both secret and public keys
     file = fopen (SECKEY_FILE, "w");
+    if (!file)
+        return -1;
     fprintf (file, SECKEY_OPEN);
     for (byte_nbr = 0; byte_nbr < 32; byte_nbr++)
-        fprintf (file, "%02X", self->public_key [byte_nbr]);
+        fprintf (file, "%02X", self->secret_key [byte_nbr]);
     fprintf (file, "\n");
     for (byte_nbr = 0; byte_nbr < 32; byte_nbr++)
-        fprintf (file, "%02X", self->secret_key [byte_nbr]);
+        fprintf (file, "%02X", self->public_key [byte_nbr]);
     fprintf (file, "\n");
     fprintf (file, SECKEY_CLOSE);
     fclose (file);
 
+    //  Reset process file create mask
+#   if !defined(__WINDOWS__)
+    umask (old_mask);
+#   endif
     return 0;
 }
 
@@ -261,9 +261,9 @@ zcurve_keypair_load (zcurve_t *self)
     &&  streq (buffer, SECKEY_OPEN)) {
         int byte_nbr;
         for (byte_nbr = 0; byte_nbr < 32; byte_nbr++)
-            matches += fscanf (file, "%02hhX ", &self->public_key [byte_nbr]);
-        for (byte_nbr = 0; byte_nbr < 32; byte_nbr++)
             matches += fscanf (file, "%02hhX ", &self->secret_key [byte_nbr]);
+        for (byte_nbr = 0; byte_nbr < 32; byte_nbr++)
+            matches += fscanf (file, "%02hhX ", &self->public_key [byte_nbr]);
     }
     fclose (file);
     return matches == 64? 0: -1;
@@ -915,9 +915,6 @@ zcurve_test (bool verbose)
     int count;
     size_t size = 0;
     for (count = 0; count < 12; count++) {
-        
-        
-
         size = size * 2 + 1;
     }
 

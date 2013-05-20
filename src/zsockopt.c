@@ -10,18 +10,17 @@
     http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation; either version 3 of the License, or (at
-    your option) any later version.
+    the terms of the GNU Lesser General Public License as published by the 
+    Free Software Foundation; either version 3 of the License, or (at your 
+    option) any later version.
 
     This software is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-    Lesser General Public License for more details.
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL-
+    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General 
+    Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this program. If not, see
-    <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU Lesser General Public License 
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
     =========================================================================
 */
 
@@ -700,7 +699,7 @@ zsocket_affinity (void *zocket)
 //  Set socket ZMQ_SUBSCRIBE value
 
 void
-zsocket_set_subscribe (void *zocket, const char * subscribe)
+zsocket_set_subscribe (void *zocket, char * subscribe)
 {
 #   if defined (ZMQ_SUBSCRIBE)
     if (zsockopt_type (zocket) != ZMQ_SUB) {
@@ -717,7 +716,7 @@ zsocket_set_subscribe (void *zocket, const char * subscribe)
 //  Set socket ZMQ_UNSUBSCRIBE value
 
 void
-zsocket_set_unsubscribe (void *zocket, const char * unsubscribe)
+zsocket_set_unsubscribe (void *zocket, char * unsubscribe)
 {
 #   if defined (ZMQ_UNSUBSCRIBE)
     if (zsockopt_type (zocket) != ZMQ_SUB) {
@@ -734,7 +733,7 @@ zsocket_set_unsubscribe (void *zocket, const char * unsubscribe)
 //  Set socket ZMQ_IDENTITY value
 
 void
-zsocket_set_identity (void *zocket, const char * identity)
+zsocket_set_identity (void *zocket, char * identity)
 {
 #   if defined (ZMQ_IDENTITY)
     if (zsockopt_type (zocket) != ZMQ_REQ
@@ -758,7 +757,7 @@ zsocket_identity (void *zocket)
 {
 #   if defined (ZMQ_IDENTITY)
     size_t option_len = 255;
-    char *identity = (char *) zmalloc (option_len);
+    char *identity = zmalloc (option_len);
     zmq_getsockopt (zocket, ZMQ_IDENTITY, identity, &option_len);
     return (char *) identity;
 #   endif
@@ -998,8 +997,6 @@ zsocket_set_maxmsgsize (void *zocket, int maxmsgsize)
 #   if defined (ZMQ_MAXMSGSIZE)
     int64_t value = maxmsgsize;
     int rc = zmq_setsockopt (zocket, ZMQ_MAXMSGSIZE, &value, sizeof (int64_t));
-if (rc != 0)
-puts (strerror (errno));
     assert (rc == 0 || errno == ETERM);
 #   endif
 }
@@ -1249,7 +1246,7 @@ zsocket_last_endpoint (void *zocket)
 {
 #   if defined (ZMQ_LAST_ENDPOINT)
     size_t option_len = 255;
-    char *last_endpoint = (char *) zmalloc (option_len);
+    char *last_endpoint = zmalloc (option_len);
     zmq_getsockopt (zocket, ZMQ_LAST_ENDPOINT, last_endpoint, &option_len);
     return (char *) last_endpoint;
 #   endif
