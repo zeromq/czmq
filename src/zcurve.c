@@ -246,9 +246,6 @@ int
 zcurve_keypair_load (zcurve_t *self)
 {
     assert (self);
-<<<<<<< HEAD
-    //  XXXX
-=======
     zconfig_t *root = zconfig_load ("secret.key");
     assert (root);
     char *secret_key = zconfig_resolve (root, "secret-key", "???");
@@ -256,7 +253,6 @@ zcurve_keypair_load (zcurve_t *self)
     char *public_key = zconfig_resolve (root, "public-key", "???");
     puts (public_key);
     
->>>>>>> Disabled selftest on zcurve to patch broken master
     return -1;
 }
 
