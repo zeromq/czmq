@@ -3,8 +3,10 @@
 .   for option
 .       if type = "uint64" | type = "int64" | type = "uint32" | type = "int"
 .           option.ctype = "int"
+.           option.ctype_const = "int"
 .       elsif type = "blob"
-.           option.ctype = "char *"     #   Enforce C strings
+.           option.ctype = "char *"   #   Enforce C strings
+.           option.ctype_const = "const char *"
 .       else
 .           echo "E: unknown type: $(type)"
 .       endif
@@ -52,9 +54,6 @@ extern "C" {
 #   if (ZMQ_VERSION_MINOR == $(minor))
 .       endif
 .       if mode = "rw" | mode = "r"
-.           if type = "blob"
-//  Returns freshly allocated string, free when done
-.           endif
 CZMQ_EXPORT $(ctype) zsocket_$(name) (void *zocket);
 .       endif
 .       if defined (.minor)
@@ -68,7 +67,7 @@ CZMQ_EXPORT $(ctype) zsocket_$(name) (void *zocket);
 #   if (ZMQ_VERSION_MINOR == $(minor))
 .       endif
 .       if mode = "rw" | mode = "w"
-CZMQ_EXPORT void zsocket_set_$(name) (void *zocket, $(ctype) $(name));
+CZMQ_EXPORT void zsocket_set_$(name) (void *zocket, $(ctype_const) $(name));
 .       endif
 .       if defined (.minor)
 #   endif
@@ -161,7 +160,7 @@ int zsockopt_test (bool verbose);
 //  Set socket ZMQ_$(NAME) value
 
 void
-zsocket_set_$(name) (void *zocket, $(ctype) $(name))
+zsocket_set_$(name) (void *zocket, $(ctype_const) $(name))
 {
 #   if defined (ZMQ_$(NAME))
 .           if count (restrict)
@@ -208,7 +207,7 @@ zsocket_set_$(name) (void *zocket, $(ctype) $(name))
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_$(NAME) value
 
-$(ctype)
+$(ctype) 
 zsocket_$(name) (void *zocket)
 {
 #   if defined (ZMQ_$(NAME))
@@ -287,7 +286,7 @@ zsockopt_test (bool verbose)
 .       endif
 .       if mode = "rw" | mode = "r"
 .           if type = "blob"
-    $(ctype)$(name) = zsocket_$(name) (zocket);
+    char *$(name) = zsocket_$(name) (zocket);
     assert ($(name));
     free ($(name));
 .           else

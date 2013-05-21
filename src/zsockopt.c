@@ -54,7 +54,7 @@ zsocket_set_hwm (void *zocket, int hwm)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_HWM value
 
-int
+int 
 zsocket_hwm (void *zocket)
 {
 #   if defined (ZMQ_HWM)
@@ -83,7 +83,7 @@ zsocket_set_swap (void *zocket, int swap)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_SWAP value
 
-int
+int 
 zsocket_swap (void *zocket)
 {
 #   if defined (ZMQ_SWAP)
@@ -112,7 +112,7 @@ zsocket_set_affinity (void *zocket, int affinity)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_AFFINITY value
 
-int
+int 
 zsocket_affinity (void *zocket)
 {
 #   if defined (ZMQ_AFFINITY)
@@ -128,7 +128,7 @@ zsocket_affinity (void *zocket)
 //  Set socket ZMQ_IDENTITY value
 
 void
-zsocket_set_identity (void *zocket, char * identity)
+zsocket_set_identity (void *zocket, const char * identity)
 {
 #   if defined (ZMQ_IDENTITY)
     int rc = zmq_setsockopt (zocket, ZMQ_IDENTITY, identity, strlen (identity));
@@ -140,7 +140,7 @@ zsocket_set_identity (void *zocket, char * identity)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_IDENTITY value
 
-char *
+char * 
 zsocket_identity (void *zocket)
 {
 #   if defined (ZMQ_IDENTITY)
@@ -169,7 +169,7 @@ zsocket_set_rate (void *zocket, int rate)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RATE value
 
-int
+int 
 zsocket_rate (void *zocket)
 {
 #   if defined (ZMQ_RATE)
@@ -198,7 +198,7 @@ zsocket_set_recovery_ivl (void *zocket, int recovery_ivl)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RECOVERY_IVL value
 
-int
+int 
 zsocket_recovery_ivl (void *zocket)
 {
 #   if defined (ZMQ_RECOVERY_IVL)
@@ -227,7 +227,7 @@ zsocket_set_recovery_ivl_msec (void *zocket, int recovery_ivl_msec)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RECOVERY_IVL_MSEC value
 
-int
+int 
 zsocket_recovery_ivl_msec (void *zocket)
 {
 #   if defined (ZMQ_RECOVERY_IVL_MSEC)
@@ -256,7 +256,7 @@ zsocket_set_mcast_loop (void *zocket, int mcast_loop)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_MCAST_LOOP value
 
-int
+int 
 zsocket_mcast_loop (void *zocket)
 {
 #   if defined (ZMQ_MCAST_LOOP)
@@ -285,7 +285,7 @@ zsocket_set_rcvtimeo (void *zocket, int rcvtimeo)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RCVTIMEO value
 
-int
+int 
 zsocket_rcvtimeo (void *zocket)
 {
 #   if defined (ZMQ_RCVTIMEO)
@@ -315,7 +315,7 @@ zsocket_set_sndtimeo (void *zocket, int sndtimeo)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_SNDTIMEO value
 
-int
+int 
 zsocket_sndtimeo (void *zocket)
 {
 #   if defined (ZMQ_SNDTIMEO)
@@ -345,7 +345,7 @@ zsocket_set_sndbuf (void *zocket, int sndbuf)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_SNDBUF value
 
-int
+int 
 zsocket_sndbuf (void *zocket)
 {
 #   if defined (ZMQ_SNDBUF)
@@ -374,7 +374,7 @@ zsocket_set_rcvbuf (void *zocket, int rcvbuf)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RCVBUF value
 
-int
+int 
 zsocket_rcvbuf (void *zocket)
 {
 #   if defined (ZMQ_RCVBUF)
@@ -402,7 +402,7 @@ zsocket_set_linger (void *zocket, int linger)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_LINGER value
 
-int
+int 
 zsocket_linger (void *zocket)
 {
 #   if defined (ZMQ_LINGER)
@@ -430,7 +430,7 @@ zsocket_set_reconnect_ivl (void *zocket, int reconnect_ivl)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RECONNECT_IVL value
 
-int
+int 
 zsocket_reconnect_ivl (void *zocket)
 {
 #   if defined (ZMQ_RECONNECT_IVL)
@@ -458,7 +458,7 @@ zsocket_set_reconnect_ivl_max (void *zocket, int reconnect_ivl_max)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RECONNECT_IVL_MAX value
 
-int
+int 
 zsocket_reconnect_ivl_max (void *zocket)
 {
 #   if defined (ZMQ_RECONNECT_IVL_MAX)
@@ -486,7 +486,7 @@ zsocket_set_backlog (void *zocket, int backlog)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_BACKLOG value
 
-int
+int 
 zsocket_backlog (void *zocket)
 {
 #   if defined (ZMQ_BACKLOG)
@@ -502,7 +502,7 @@ zsocket_backlog (void *zocket)
 //  Set socket ZMQ_SUBSCRIBE value
 
 void
-zsocket_set_subscribe (void *zocket, char * subscribe)
+zsocket_set_subscribe (void *zocket, const char * subscribe)
 {
 #   if defined (ZMQ_SUBSCRIBE)
     if (zsockopt_type (zocket) != ZMQ_SUB) {
@@ -519,7 +519,7 @@ zsocket_set_subscribe (void *zocket, char * subscribe)
 //  Set socket ZMQ_UNSUBSCRIBE value
 
 void
-zsocket_set_unsubscribe (void *zocket, char * unsubscribe)
+zsocket_set_unsubscribe (void *zocket, const char * unsubscribe)
 {
 #   if defined (ZMQ_UNSUBSCRIBE)
     if (zsockopt_type (zocket) != ZMQ_SUB) {
@@ -535,7 +535,7 @@ zsocket_set_unsubscribe (void *zocket, char * unsubscribe)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_TYPE value
 
-int
+int 
 zsocket_type (void *zocket)
 {
 #   if defined (ZMQ_TYPE)
@@ -550,7 +550,7 @@ zsocket_type (void *zocket)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RCVMORE value
 
-int
+int 
 zsocket_rcvmore (void *zocket)
 {
 #   if defined (ZMQ_RCVMORE)
@@ -565,7 +565,7 @@ zsocket_rcvmore (void *zocket)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_FD value
 
-int
+int 
 zsocket_fd (void *zocket)
 {
 #   if defined (ZMQ_FD)
@@ -580,7 +580,7 @@ zsocket_fd (void *zocket)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_EVENTS value
 
-int
+int 
 zsocket_events (void *zocket)
 {
 #   if defined (ZMQ_EVENTS)
@@ -598,7 +598,7 @@ zsocket_events (void *zocket)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_TYPE value
 
-int
+int 
 zsocket_type (void *zocket)
 {
 #   if defined (ZMQ_TYPE)
@@ -626,7 +626,7 @@ zsocket_set_sndhwm (void *zocket, int sndhwm)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_SNDHWM value
 
-int
+int 
 zsocket_sndhwm (void *zocket)
 {
 #   if defined (ZMQ_SNDHWM)
@@ -654,7 +654,7 @@ zsocket_set_rcvhwm (void *zocket, int rcvhwm)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RCVHWM value
 
-int
+int 
 zsocket_rcvhwm (void *zocket)
 {
 #   if defined (ZMQ_RCVHWM)
@@ -683,7 +683,7 @@ zsocket_set_affinity (void *zocket, int affinity)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_AFFINITY value
 
-int
+int 
 zsocket_affinity (void *zocket)
 {
 #   if defined (ZMQ_AFFINITY)
@@ -699,7 +699,7 @@ zsocket_affinity (void *zocket)
 //  Set socket ZMQ_SUBSCRIBE value
 
 void
-zsocket_set_subscribe (void *zocket, char * subscribe)
+zsocket_set_subscribe (void *zocket, const char * subscribe)
 {
 #   if defined (ZMQ_SUBSCRIBE)
     if (zsockopt_type (zocket) != ZMQ_SUB) {
@@ -716,7 +716,7 @@ zsocket_set_subscribe (void *zocket, char * subscribe)
 //  Set socket ZMQ_UNSUBSCRIBE value
 
 void
-zsocket_set_unsubscribe (void *zocket, char * unsubscribe)
+zsocket_set_unsubscribe (void *zocket, const char * unsubscribe)
 {
 #   if defined (ZMQ_UNSUBSCRIBE)
     if (zsockopt_type (zocket) != ZMQ_SUB) {
@@ -733,7 +733,7 @@ zsocket_set_unsubscribe (void *zocket, char * unsubscribe)
 //  Set socket ZMQ_IDENTITY value
 
 void
-zsocket_set_identity (void *zocket, char * identity)
+zsocket_set_identity (void *zocket, const char * identity)
 {
 #   if defined (ZMQ_IDENTITY)
     if (zsockopt_type (zocket) != ZMQ_REQ
@@ -752,7 +752,7 @@ zsocket_set_identity (void *zocket, char * identity)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_IDENTITY value
 
-char *
+char * 
 zsocket_identity (void *zocket)
 {
 #   if defined (ZMQ_IDENTITY)
@@ -780,7 +780,7 @@ zsocket_set_rate (void *zocket, int rate)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RATE value
 
-int
+int 
 zsocket_rate (void *zocket)
 {
 #   if defined (ZMQ_RATE)
@@ -808,7 +808,7 @@ zsocket_set_recovery_ivl (void *zocket, int recovery_ivl)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RECOVERY_IVL value
 
-int
+int 
 zsocket_recovery_ivl (void *zocket)
 {
 #   if defined (ZMQ_RECOVERY_IVL)
@@ -836,7 +836,7 @@ zsocket_set_sndbuf (void *zocket, int sndbuf)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_SNDBUF value
 
-int
+int 
 zsocket_sndbuf (void *zocket)
 {
 #   if defined (ZMQ_SNDBUF)
@@ -864,7 +864,7 @@ zsocket_set_rcvbuf (void *zocket, int rcvbuf)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RCVBUF value
 
-int
+int 
 zsocket_rcvbuf (void *zocket)
 {
 #   if defined (ZMQ_RCVBUF)
@@ -892,7 +892,7 @@ zsocket_set_linger (void *zocket, int linger)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_LINGER value
 
-int
+int 
 zsocket_linger (void *zocket)
 {
 #   if defined (ZMQ_LINGER)
@@ -920,7 +920,7 @@ zsocket_set_reconnect_ivl (void *zocket, int reconnect_ivl)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RECONNECT_IVL value
 
-int
+int 
 zsocket_reconnect_ivl (void *zocket)
 {
 #   if defined (ZMQ_RECONNECT_IVL)
@@ -948,7 +948,7 @@ zsocket_set_reconnect_ivl_max (void *zocket, int reconnect_ivl_max)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RECONNECT_IVL_MAX value
 
-int
+int 
 zsocket_reconnect_ivl_max (void *zocket)
 {
 #   if defined (ZMQ_RECONNECT_IVL_MAX)
@@ -976,7 +976,7 @@ zsocket_set_backlog (void *zocket, int backlog)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_BACKLOG value
 
-int
+int 
 zsocket_backlog (void *zocket)
 {
 #   if defined (ZMQ_BACKLOG)
@@ -1005,7 +1005,7 @@ zsocket_set_maxmsgsize (void *zocket, int maxmsgsize)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_MAXMSGSIZE value
 
-int
+int 
 zsocket_maxmsgsize (void *zocket)
 {
 #   if defined (ZMQ_MAXMSGSIZE)
@@ -1033,7 +1033,7 @@ zsocket_set_multicast_hops (void *zocket, int multicast_hops)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_MULTICAST_HOPS value
 
-int
+int 
 zsocket_multicast_hops (void *zocket)
 {
 #   if defined (ZMQ_MULTICAST_HOPS)
@@ -1061,7 +1061,7 @@ zsocket_set_rcvtimeo (void *zocket, int rcvtimeo)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RCVTIMEO value
 
-int
+int 
 zsocket_rcvtimeo (void *zocket)
 {
 #   if defined (ZMQ_RCVTIMEO)
@@ -1089,7 +1089,7 @@ zsocket_set_sndtimeo (void *zocket, int sndtimeo)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_SNDTIMEO value
 
-int
+int 
 zsocket_sndtimeo (void *zocket)
 {
 #   if defined (ZMQ_SNDTIMEO)
@@ -1117,7 +1117,7 @@ zsocket_set_ipv4only (void *zocket, int ipv4only)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_IPV4ONLY value
 
-int
+int 
 zsocket_ipv4only (void *zocket)
 {
 #   if defined (ZMQ_IPV4ONLY)
@@ -1196,7 +1196,7 @@ zsocket_set_xpub_verbose (void *zocket, int xpub_verbose)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RCVMORE value
 
-int
+int 
 zsocket_rcvmore (void *zocket)
 {
 #   if defined (ZMQ_RCVMORE)
@@ -1211,7 +1211,7 @@ zsocket_rcvmore (void *zocket)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_FD value
 
-int
+int 
 zsocket_fd (void *zocket)
 {
 #   if defined (ZMQ_FD)
@@ -1226,7 +1226,7 @@ zsocket_fd (void *zocket)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_EVENTS value
 
-int
+int 
 zsocket_events (void *zocket)
 {
 #   if defined (ZMQ_EVENTS)
@@ -1241,7 +1241,7 @@ zsocket_events (void *zocket)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_LAST_ENDPOINT value
 
-char *
+char * 
 zsocket_last_endpoint (void *zocket)
 {
 #   if defined (ZMQ_LAST_ENDPOINT)
