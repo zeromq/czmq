@@ -510,12 +510,12 @@ s_produce_welcome (zcurve_t *self)
 static void
 s_process_welcome (zcurve_t *self, zframe_t *input)
 {
-    welcome_t *welcome = (welcome_t *) zframe_data (input);
     printf ("S:WELCOME: ");
 
 #if defined (HAVE_LIBSODIUM)
     //  Open Box [S' + cookie](C'->S)
     byte plain [128];
+    welcome_t *welcome = (welcome_t *) zframe_data (input);
     s_decrypt (self, welcome->nonce, 
                plain, 128, "WELCOME-", 
                self->server_key, self->cn_secret);
@@ -565,14 +565,14 @@ s_produce_initiate (zcurve_t *self)
 static void
 s_process_initiate (zcurve_t *self, zframe_t *input)
 {
-    initiate_t *initiate = (initiate_t *) zframe_data (input);
     printf ("C:INITIATE: ");
-    size_t metadata_size = zframe_size (input) - sizeof (initiate_t);
 
 #if defined (HAVE_LIBSODIUM)
     //  Working variables for crypto calls
     byte nonce [24];
     
+    initiate_t *initiate = (initiate_t *) zframe_data (input);
+    size_t metadata_size = zframe_size (input) - sizeof (initiate_t);
     size_t box_size = crypto_box_ZEROBYTES + 96 + metadata_size;
     byte *plain = malloc (box_size);
     byte *box = malloc (box_size);
