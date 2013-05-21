@@ -9,18 +9,17 @@
     http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation; either version 3 of the License, or (at
-    your option) any later version.
+    the terms of the GNU Lesser General Public License as published by the 
+    Free Software Foundation; either version 3 of the License, or (at your 
+    option) any later version.
 
     This software is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-    Lesser General Public License for more details.
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL-
+    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General 
+    Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this program. If not, see
-    <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU Lesser General Public License 
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
     =========================================================================
 */
 
@@ -181,6 +180,36 @@ zfile_rmdir (const char *pathname)
 #else
     return rmdir (pathname);
 #endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set private file creation mode; all files created from here will be
+//  readable/writable by the owner only.
+
+static mode_t s_old_mask = 0;
+
+void
+zfile_mode_private (void)
+{
+#   if !defined(__WINDOWS__)
+    s_old_mask = umask (S_IWGRP | S_IWOTH | S_IRGRP | S_IROTH);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Reset default file creation mode; all files created from here will use
+//  process file mode defaults.
+
+void
+zfile_mode_default (void)
+{
+    //  Reset process file create mask
+#   if !defined(__WINDOWS__)
+    if (s_old_mask)
+        umask (s_old_mask);
+#   endif
 }
 
 

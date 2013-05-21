@@ -9,18 +9,17 @@
     http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation; either version 3 of the License, or (at
-    your option) any later version.
+    the terms of the GNU Lesser General Public License as published by the 
+    Free Software Foundation; either version 3 of the License, or (at your 
+    option) any later version.
 
     This software is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-    Lesser General Public License for more details.
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL-
+    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General 
+    Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this program. If not, see
-    <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU Lesser General Public License 
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
     =========================================================================
 */
 
@@ -46,7 +45,7 @@ static struct sigaction sigterm_default;
 //  Set interrupt handler (NULL means external handler)
 //  Idempotent; safe to call multiple times
 
-CZMQ_EXPORT void
+void
 zsys_handler_set (zsys_handler_fn *handler_fn)
 {
 #if defined (__UNIX__)
@@ -76,7 +75,7 @@ zsys_handler_set (zsys_handler_fn *handler_fn)
 //  Reset interrupt handler, call this at exit if needed
 //  Idempotent; safe to call multiple times
 
-CZMQ_EXPORT void
+void
 zsys_handler_reset (void)
 {
 #if defined (__UNIX__)
@@ -107,4 +106,3 @@ zsys_test (bool verbose)
     printf ("OK\n");
     return 0;
 }
-

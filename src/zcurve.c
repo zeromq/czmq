@@ -9,18 +9,17 @@
     http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation; either version 3 of the License, or (at
-    your option) any later version.
+    the terms of the GNU Lesser General Public License as published by the 
+    Free Software Foundation; either version 3 of the License, or (at your 
+    option) any later version.
 
     This software is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-    Lesser General Public License for more details.
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL-
+    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General 
+    Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this program. If not, see
-    <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU Lesser General Public License 
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
     =========================================================================
 */
 
@@ -33,7 +32,7 @@
     ROUTER). For an example of use, see the selftest function. To compile
     with security enabled, first build and install libsodium from GitHub at
     https://github.com/jedisct1/libsodium. Run ./configure after installing
-    libsodium. If configure does not find libsodium, this module will work
+    libsodium. If configure does not find libsodium, this class will work
     in clear text.
 @end
 */
@@ -192,54 +191,50 @@ zcurve_keypair_new (zcurve_t *self)
 }
 
 
+//  Return allocated string containing key in printable hex format
+
+char *s_key_to_hex (byte *key)
+{
+    char *hex = zmalloc (65);
+    int byte_nbr;
+    for (byte_nbr = 0; byte_nbr < 32; byte_nbr++) 
+        sprintf (hex + (byte_nbr * 2), "%02X", key [byte_nbr]);
+    return hex;
+}
+
+
 //  --------------------------------------------------------------------------
 //  Save long-term key pair to disk; not confidential
 
 int
 zcurve_keypair_save (zcurve_t *self)
 {
-#   define PUBKEY_FILE "public.key"
-#   define PUBKEY_OPEN  "-----BEGIN ZCURVE PUBLIC KEY-----\n"
-#   define PUBKEY_CLOSE "-----END ZCURVE PUBLIC KEY-----\n"
-#   define SECKEY_FILE "secret.key"
-#   define SECKEY_OPEN  "-----BEGIN ZCURVE SECRET KEY-----\n"
-#   define SECKEY_CLOSE "-----END ZCURVE SECRET KEY-----\n"
-
     assert (self);
-    //  Set process file create mask to owner access only
-#   if !defined(__WINDOWS__)
-	mode_t old_mask = umask (S_IWGRP | S_IWOTH | S_IRGRP | S_IROTH);
-#   endif
-	//  The public key file contains just the public keys
-    FILE *file = fopen (PUBKEY_FILE, "w");
-    //  Reset process file create mask
-#   if !defined(__WINDOWS__)
-	umask (old_mask);
-#   endif
 
-    if (!file)
-        return -1;
+    //  Get printable key strings
+    char *public_key = s_key_to_hex (self->public_key);
+    char *secret_key = s_key_to_hex (self->secret_key);
     
-    fprintf (file, PUBKEY_OPEN);
-    int byte_nbr;
-    for (byte_nbr = 0; byte_nbr < 32; byte_nbr++) 
-        fprintf (file, "%02X", self->public_key [byte_nbr]);
-    fprintf (file, "\n");
-    fprintf (file, PUBKEY_CLOSE);
-    fclose (file);
-
-    //  The secret key file contains both public and secret keys
-    file = fopen (SECKEY_FILE, "w");
-    fprintf (file, SECKEY_OPEN);
-    for (byte_nbr = 0; byte_nbr < 32; byte_nbr++)
-        fprintf (file, "%02X", self->public_key [byte_nbr]);
-    fprintf (file, "\n");
-    for (byte_nbr = 0; byte_nbr < 32; byte_nbr++)
-        fprintf (file, "%02X", self->secret_key [byte_nbr]);
-    fprintf (file, "\n");
-    fprintf (file, SECKEY_CLOSE);
-    fclose (file);
-
+    //  Set process file create mask to owner access only
+    zfile_mode_private ();
+    
+    //  The public key file contains just the public key
+    zconfig_t *config = zconfig_new ("root", NULL);
+    zconfig_t *key = zconfig_new ("public-key", config);
+    zconfig_value_set (key, public_key);
+    zconfig_save (config, "public.key");
+    
+    //  The secret key file contains both secret and public keys
+    key = zconfig_new ("secret-key", config);
+    zconfig_value_set (key, secret_key);
+    zconfig_save (config, "secret.key");
+    zconfig_destroy (&config);
+    
+    //  Reset process file create mask
+    zfile_mode_default ();
+    
+    free (public_key);
+    free (secret_key);
     return 0;
 }
 
@@ -251,22 +246,8 @@ int
 zcurve_keypair_load (zcurve_t *self)
 {
     assert (self);
-    FILE *file = fopen (SECKEY_FILE, "r");
-    if (!file)
-        return -1;
-
-    char buffer [256];
-    int matches = 0;
-    if (fgets (buffer, 256, file)
-    &&  streq (buffer, SECKEY_OPEN)) {
-        int byte_nbr;
-        for (byte_nbr = 0; byte_nbr < 32; byte_nbr++)
-            matches += fscanf (file, "%02hhX ", &self->public_key [byte_nbr]);
-        for (byte_nbr = 0; byte_nbr < 32; byte_nbr++)
-            matches += fscanf (file, "%02hhX ", &self->secret_key [byte_nbr]);
-    }
-    fclose (file);
-    return matches == 64? 0: -1;
+    //  XXXX
+    return -1;
 }
 
 
@@ -915,9 +896,6 @@ zcurve_test (bool verbose)
     int count;
     size_t size = 0;
     for (count = 0; count < 12; count++) {
-        
-        
-
         size = size * 2 + 1;
     }
 
