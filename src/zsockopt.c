@@ -1,7 +1,11 @@
 /*  =========================================================================
     zsockopt - get/set 0MQ socket options
 
-    GENERATED SOURCE CODE, DO NOT EDIT
+            ****************************************************
+            *   GENERATED SOURCE CODE, DO NOT EDIT!!           *
+            *   TO CHANGE THIS, EDIT scripts/sockopts.gsl      *
+            *   AND RUN ./generate in models/.                 *
+            ****************************************************
     -------------------------------------------------------------------------
     Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
@@ -10,18 +14,17 @@
     http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation; either version 3 of the License, or (at
-    your option) any later version.
+    the terms of the GNU Lesser General Public License as published by the 
+    Free Software Foundation; either version 3 of the License, or (at your 
+    option) any later version.
 
     This software is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-    Lesser General Public License for more details.
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL-
+    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General 
+    Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this program. If not, see
-    <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU Lesser General Public License 
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
     =========================================================================
 */
 
@@ -40,6 +43,7 @@
 #if (ZMQ_VERSION_MAJOR == 2)
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_HWM value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_hwm (void *zocket, int hwm)
@@ -54,8 +58,9 @@ zsocket_set_hwm (void *zocket, int hwm)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_HWM value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_hwm (void *zocket)
 {
 #   if defined (ZMQ_HWM)
@@ -69,6 +74,7 @@ zsocket_hwm (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_SWAP value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_swap (void *zocket, int swap)
@@ -83,8 +89,9 @@ zsocket_set_swap (void *zocket, int swap)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_SWAP value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_swap (void *zocket)
 {
 #   if defined (ZMQ_SWAP)
@@ -98,6 +105,7 @@ zsocket_swap (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_AFFINITY value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_affinity (void *zocket, int affinity)
@@ -112,8 +120,9 @@ zsocket_set_affinity (void *zocket, int affinity)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_AFFINITY value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_affinity (void *zocket)
 {
 #   if defined (ZMQ_AFFINITY)
@@ -127,6 +136,7 @@ zsocket_affinity (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_IDENTITY value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_identity (void *zocket, const char * identity)
@@ -140,13 +150,14 @@ zsocket_set_identity (void *zocket, const char * identity)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_IDENTITY value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-char *
+char * 
 zsocket_identity (void *zocket)
 {
 #   if defined (ZMQ_IDENTITY)
     size_t option_len = 255;
-    char *identity = zmalloc (option_len);
+    char *identity = (char *) zmalloc (option_len);
     zmq_getsockopt (zocket, ZMQ_IDENTITY, identity, &option_len);
     return (char *) identity;
 #   endif
@@ -155,6 +166,7 @@ zsocket_identity (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_RATE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_rate (void *zocket, int rate)
@@ -169,8 +181,9 @@ zsocket_set_rate (void *zocket, int rate)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RATE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_rate (void *zocket)
 {
 #   if defined (ZMQ_RATE)
@@ -184,6 +197,7 @@ zsocket_rate (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_RECOVERY_IVL value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_recovery_ivl (void *zocket, int recovery_ivl)
@@ -198,8 +212,9 @@ zsocket_set_recovery_ivl (void *zocket, int recovery_ivl)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RECOVERY_IVL value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_recovery_ivl (void *zocket)
 {
 #   if defined (ZMQ_RECOVERY_IVL)
@@ -213,6 +228,7 @@ zsocket_recovery_ivl (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_RECOVERY_IVL_MSEC value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_recovery_ivl_msec (void *zocket, int recovery_ivl_msec)
@@ -227,8 +243,9 @@ zsocket_set_recovery_ivl_msec (void *zocket, int recovery_ivl_msec)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RECOVERY_IVL_MSEC value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_recovery_ivl_msec (void *zocket)
 {
 #   if defined (ZMQ_RECOVERY_IVL_MSEC)
@@ -242,6 +259,7 @@ zsocket_recovery_ivl_msec (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_MCAST_LOOP value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_mcast_loop (void *zocket, int mcast_loop)
@@ -256,8 +274,9 @@ zsocket_set_mcast_loop (void *zocket, int mcast_loop)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_MCAST_LOOP value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_mcast_loop (void *zocket)
 {
 #   if defined (ZMQ_MCAST_LOOP)
@@ -272,6 +291,7 @@ zsocket_mcast_loop (void *zocket)
 #   if (ZMQ_VERSION_MINOR == 2)
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_RCVTIMEO value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_rcvtimeo (void *zocket, int rcvtimeo)
@@ -285,8 +305,9 @@ zsocket_set_rcvtimeo (void *zocket, int rcvtimeo)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RCVTIMEO value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_rcvtimeo (void *zocket)
 {
 #   if defined (ZMQ_RCVTIMEO)
@@ -302,6 +323,7 @@ zsocket_rcvtimeo (void *zocket)
 #   if (ZMQ_VERSION_MINOR == 2)
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_SNDTIMEO value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_sndtimeo (void *zocket, int sndtimeo)
@@ -315,8 +337,9 @@ zsocket_set_sndtimeo (void *zocket, int sndtimeo)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_SNDTIMEO value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_sndtimeo (void *zocket)
 {
 #   if defined (ZMQ_SNDTIMEO)
@@ -331,6 +354,7 @@ zsocket_sndtimeo (void *zocket)
 #   endif
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_SNDBUF value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_sndbuf (void *zocket, int sndbuf)
@@ -345,8 +369,9 @@ zsocket_set_sndbuf (void *zocket, int sndbuf)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_SNDBUF value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_sndbuf (void *zocket)
 {
 #   if defined (ZMQ_SNDBUF)
@@ -360,6 +385,7 @@ zsocket_sndbuf (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_RCVBUF value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_rcvbuf (void *zocket, int rcvbuf)
@@ -374,8 +400,9 @@ zsocket_set_rcvbuf (void *zocket, int rcvbuf)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RCVBUF value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_rcvbuf (void *zocket)
 {
 #   if defined (ZMQ_RCVBUF)
@@ -389,6 +416,7 @@ zsocket_rcvbuf (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_LINGER value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_linger (void *zocket, int linger)
@@ -402,8 +430,9 @@ zsocket_set_linger (void *zocket, int linger)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_LINGER value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_linger (void *zocket)
 {
 #   if defined (ZMQ_LINGER)
@@ -417,6 +446,7 @@ zsocket_linger (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_RECONNECT_IVL value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_reconnect_ivl (void *zocket, int reconnect_ivl)
@@ -430,8 +460,9 @@ zsocket_set_reconnect_ivl (void *zocket, int reconnect_ivl)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RECONNECT_IVL value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_reconnect_ivl (void *zocket)
 {
 #   if defined (ZMQ_RECONNECT_IVL)
@@ -445,6 +476,7 @@ zsocket_reconnect_ivl (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_RECONNECT_IVL_MAX value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_reconnect_ivl_max (void *zocket, int reconnect_ivl_max)
@@ -458,8 +490,9 @@ zsocket_set_reconnect_ivl_max (void *zocket, int reconnect_ivl_max)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RECONNECT_IVL_MAX value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_reconnect_ivl_max (void *zocket)
 {
 #   if defined (ZMQ_RECONNECT_IVL_MAX)
@@ -473,6 +506,7 @@ zsocket_reconnect_ivl_max (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_BACKLOG value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_backlog (void *zocket, int backlog)
@@ -486,8 +520,9 @@ zsocket_set_backlog (void *zocket, int backlog)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_BACKLOG value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_backlog (void *zocket)
 {
 #   if defined (ZMQ_BACKLOG)
@@ -501,6 +536,7 @@ zsocket_backlog (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_SUBSCRIBE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_subscribe (void *zocket, const char * subscribe)
@@ -518,6 +554,7 @@ zsocket_set_subscribe (void *zocket, const char * subscribe)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_UNSUBSCRIBE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_unsubscribe (void *zocket, const char * unsubscribe)
@@ -535,8 +572,9 @@ zsocket_set_unsubscribe (void *zocket, const char * unsubscribe)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_TYPE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_type (void *zocket)
 {
 #   if defined (ZMQ_TYPE)
@@ -550,8 +588,9 @@ zsocket_type (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RCVMORE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_rcvmore (void *zocket)
 {
 #   if defined (ZMQ_RCVMORE)
@@ -565,8 +604,9 @@ zsocket_rcvmore (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_FD value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_fd (void *zocket)
 {
 #   if defined (ZMQ_FD)
@@ -580,8 +620,9 @@ zsocket_fd (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_EVENTS value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_events (void *zocket)
 {
 #   if defined (ZMQ_EVENTS)
@@ -598,8 +639,9 @@ zsocket_events (void *zocket)
 #if (ZMQ_VERSION_MAJOR == 3)
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_TYPE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_type (void *zocket)
 {
 #   if defined (ZMQ_TYPE)
@@ -613,6 +655,7 @@ zsocket_type (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_SNDHWM value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_sndhwm (void *zocket, int sndhwm)
@@ -626,8 +669,9 @@ zsocket_set_sndhwm (void *zocket, int sndhwm)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_SNDHWM value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_sndhwm (void *zocket)
 {
 #   if defined (ZMQ_SNDHWM)
@@ -641,6 +685,7 @@ zsocket_sndhwm (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_RCVHWM value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_rcvhwm (void *zocket, int rcvhwm)
@@ -654,8 +699,9 @@ zsocket_set_rcvhwm (void *zocket, int rcvhwm)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RCVHWM value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_rcvhwm (void *zocket)
 {
 #   if defined (ZMQ_RCVHWM)
@@ -669,6 +715,7 @@ zsocket_rcvhwm (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_AFFINITY value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_affinity (void *zocket, int affinity)
@@ -683,8 +730,9 @@ zsocket_set_affinity (void *zocket, int affinity)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_AFFINITY value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_affinity (void *zocket)
 {
 #   if defined (ZMQ_AFFINITY)
@@ -698,6 +746,7 @@ zsocket_affinity (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_SUBSCRIBE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_subscribe (void *zocket, const char * subscribe)
@@ -715,6 +764,7 @@ zsocket_set_subscribe (void *zocket, const char * subscribe)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_UNSUBSCRIBE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_unsubscribe (void *zocket, const char * unsubscribe)
@@ -732,6 +782,7 @@ zsocket_set_unsubscribe (void *zocket, const char * unsubscribe)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_IDENTITY value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_identity (void *zocket, const char * identity)
@@ -752,8 +803,9 @@ zsocket_set_identity (void *zocket, const char * identity)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_IDENTITY value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-char *
+char * 
 zsocket_identity (void *zocket)
 {
 #   if defined (ZMQ_IDENTITY)
@@ -767,6 +819,7 @@ zsocket_identity (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_RATE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_rate (void *zocket, int rate)
@@ -780,8 +833,9 @@ zsocket_set_rate (void *zocket, int rate)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RATE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_rate (void *zocket)
 {
 #   if defined (ZMQ_RATE)
@@ -795,6 +849,7 @@ zsocket_rate (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_RECOVERY_IVL value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_recovery_ivl (void *zocket, int recovery_ivl)
@@ -808,8 +863,9 @@ zsocket_set_recovery_ivl (void *zocket, int recovery_ivl)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RECOVERY_IVL value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_recovery_ivl (void *zocket)
 {
 #   if defined (ZMQ_RECOVERY_IVL)
@@ -823,6 +879,7 @@ zsocket_recovery_ivl (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_SNDBUF value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_sndbuf (void *zocket, int sndbuf)
@@ -836,8 +893,9 @@ zsocket_set_sndbuf (void *zocket, int sndbuf)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_SNDBUF value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_sndbuf (void *zocket)
 {
 #   if defined (ZMQ_SNDBUF)
@@ -851,6 +909,7 @@ zsocket_sndbuf (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_RCVBUF value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_rcvbuf (void *zocket, int rcvbuf)
@@ -864,8 +923,9 @@ zsocket_set_rcvbuf (void *zocket, int rcvbuf)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RCVBUF value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_rcvbuf (void *zocket)
 {
 #   if defined (ZMQ_RCVBUF)
@@ -879,21 +939,23 @@ zsocket_rcvbuf (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_LINGER value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_linger (void *zocket, int linger)
 {
 #   if defined (ZMQ_LINGER)
     int rc = zmq_setsockopt (zocket, ZMQ_LINGER, &linger, sizeof (int));
-    assert ((rc == 0 || errno == ETERM) && "Are you passing a void** instead of a void*?");
+    assert (rc == 0 || errno == ETERM);
 #   endif
 }
 
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_LINGER value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_linger (void *zocket)
 {
 #   if defined (ZMQ_LINGER)
@@ -907,6 +969,7 @@ zsocket_linger (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_RECONNECT_IVL value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_reconnect_ivl (void *zocket, int reconnect_ivl)
@@ -920,8 +983,9 @@ zsocket_set_reconnect_ivl (void *zocket, int reconnect_ivl)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RECONNECT_IVL value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_reconnect_ivl (void *zocket)
 {
 #   if defined (ZMQ_RECONNECT_IVL)
@@ -935,6 +999,7 @@ zsocket_reconnect_ivl (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_RECONNECT_IVL_MAX value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_reconnect_ivl_max (void *zocket, int reconnect_ivl_max)
@@ -948,8 +1013,9 @@ zsocket_set_reconnect_ivl_max (void *zocket, int reconnect_ivl_max)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RECONNECT_IVL_MAX value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_reconnect_ivl_max (void *zocket)
 {
 #   if defined (ZMQ_RECONNECT_IVL_MAX)
@@ -963,6 +1029,7 @@ zsocket_reconnect_ivl_max (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_BACKLOG value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_backlog (void *zocket, int backlog)
@@ -976,8 +1043,9 @@ zsocket_set_backlog (void *zocket, int backlog)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_BACKLOG value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_backlog (void *zocket)
 {
 #   if defined (ZMQ_BACKLOG)
@@ -991,6 +1059,7 @@ zsocket_backlog (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_MAXMSGSIZE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_maxmsgsize (void *zocket, int maxmsgsize)
@@ -998,8 +1067,6 @@ zsocket_set_maxmsgsize (void *zocket, int maxmsgsize)
 #   if defined (ZMQ_MAXMSGSIZE)
     int64_t value = maxmsgsize;
     int rc = zmq_setsockopt (zocket, ZMQ_MAXMSGSIZE, &value, sizeof (int64_t));
-if (rc != 0)
-puts (strerror (errno));
     assert (rc == 0 || errno == ETERM);
 #   endif
 }
@@ -1007,8 +1074,9 @@ puts (strerror (errno));
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_MAXMSGSIZE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_maxmsgsize (void *zocket)
 {
 #   if defined (ZMQ_MAXMSGSIZE)
@@ -1022,6 +1090,7 @@ zsocket_maxmsgsize (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_MULTICAST_HOPS value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_multicast_hops (void *zocket, int multicast_hops)
@@ -1035,8 +1104,9 @@ zsocket_set_multicast_hops (void *zocket, int multicast_hops)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_MULTICAST_HOPS value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_multicast_hops (void *zocket)
 {
 #   if defined (ZMQ_MULTICAST_HOPS)
@@ -1050,6 +1120,7 @@ zsocket_multicast_hops (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_RCVTIMEO value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_rcvtimeo (void *zocket, int rcvtimeo)
@@ -1063,8 +1134,9 @@ zsocket_set_rcvtimeo (void *zocket, int rcvtimeo)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RCVTIMEO value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_rcvtimeo (void *zocket)
 {
 #   if defined (ZMQ_RCVTIMEO)
@@ -1078,6 +1150,7 @@ zsocket_rcvtimeo (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_SNDTIMEO value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_sndtimeo (void *zocket, int sndtimeo)
@@ -1091,8 +1164,9 @@ zsocket_set_sndtimeo (void *zocket, int sndtimeo)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_SNDTIMEO value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_sndtimeo (void *zocket)
 {
 #   if defined (ZMQ_SNDTIMEO)
@@ -1106,6 +1180,7 @@ zsocket_sndtimeo (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_IPV4ONLY value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_ipv4only (void *zocket, int ipv4only)
@@ -1119,8 +1194,9 @@ zsocket_set_ipv4only (void *zocket, int ipv4only)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_IPV4ONLY value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_ipv4only (void *zocket)
 {
 #   if defined (ZMQ_IPV4ONLY)
@@ -1134,6 +1210,7 @@ zsocket_ipv4only (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_DELAY_ATTACH_ON_CONNECT value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect)
@@ -1147,6 +1224,7 @@ zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_ROUTER_MANDATORY value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_router_mandatory (void *zocket, int router_mandatory)
@@ -1164,6 +1242,7 @@ zsocket_set_router_mandatory (void *zocket, int router_mandatory)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_ROUTER_RAW value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_router_raw (void *zocket, int router_raw)
@@ -1181,6 +1260,7 @@ zsocket_set_router_raw (void *zocket, int router_raw)
 
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_XPUB_VERBOSE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_xpub_verbose (void *zocket, int xpub_verbose)
@@ -1198,8 +1278,9 @@ zsocket_set_xpub_verbose (void *zocket, int xpub_verbose)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_RCVMORE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_rcvmore (void *zocket)
 {
 #   if defined (ZMQ_RCVMORE)
@@ -1213,8 +1294,9 @@ zsocket_rcvmore (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_FD value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_fd (void *zocket)
 {
 #   if defined (ZMQ_FD)
@@ -1228,8 +1310,9 @@ zsocket_fd (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_EVENTS value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+int 
 zsocket_events (void *zocket)
 {
 #   if defined (ZMQ_EVENTS)
@@ -1243,8 +1326,9 @@ zsocket_events (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_LAST_ENDPOINT value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-char *
+char * 
 zsocket_last_endpoint (void *zocket)
 {
 #   if defined (ZMQ_LAST_ENDPOINT)
@@ -1270,6 +1354,7 @@ zsocket_set_hwm (void *zocket, int hwm)
 
 //  --------------------------------------------------------------------------
 //  Selftest
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 int
 zsockopt_test (bool verbose)
