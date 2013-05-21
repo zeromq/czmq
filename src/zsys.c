@@ -45,7 +45,7 @@ static struct sigaction sigterm_default;
 //  Set interrupt handler (NULL means external handler)
 //  Idempotent; safe to call multiple times
 
-CZMQ_EXPORT void
+void
 zsys_handler_set (zsys_handler_fn *handler_fn)
 {
 #if defined (__UNIX__)
@@ -75,7 +75,7 @@ zsys_handler_set (zsys_handler_fn *handler_fn)
 //  Reset interrupt handler, call this at exit if needed
 //  Idempotent; safe to call multiple times
 
-CZMQ_EXPORT void
+void
 zsys_handler_reset (void)
 {
 #if defined (__UNIX__)
@@ -106,4 +106,3 @@ zsys_test (bool verbose)
     printf ("OK\n");
     return 0;
 }
-

@@ -26,11 +26,11 @@
 /*
 @header
     Lets applications load, work with, and save configuration files.
-@discuss
     This implements rfc.zeromq.org/spec:4/ZPL, which is a simple structured
     text format for configuration files. Note that comments are stripped out
     of configuration files when loading them, so loading and saving a config
     file will remove any comments it contains.
+@discuss
 @end
 */
 

@@ -32,7 +32,7 @@
     ROUTER). For an example of use, see the selftest function. To compile
     with security enabled, first build and install libsodium from GitHub at
     https://github.com/jedisct1/libsodium. Run ./configure after installing
-    libsodium. If configure does not find libsodium, this module will work
+    libsodium. If configure does not find libsodium, this class will work
     in clear text.
 @end
 */
@@ -191,55 +191,50 @@ zcurve_keypair_new (zcurve_t *self)
 }
 
 
+//  Return allocated string containing key in printable hex format
+
+char *s_key_to_hex (byte *key)
+{
+    char *hex = zmalloc (65);
+    int byte_nbr;
+    for (byte_nbr = 0; byte_nbr < 32; byte_nbr++) 
+        sprintf (hex + (byte_nbr * 2), "%02X", key [byte_nbr]);
+    return hex;
+}
+
+
 //  --------------------------------------------------------------------------
 //  Save long-term key pair to disk; not confidential
 
 int
 zcurve_keypair_save (zcurve_t *self)
 {
-#   define PUBKEY_FILE "public.key"
-#   define PUBKEY_OPEN  "-----BEGIN ZCURVE PUBLIC KEY-----\n"
-#   define PUBKEY_CLOSE "-----END ZCURVE PUBLIC KEY-----\n"
-#   define SECKEY_FILE "secret.key"
-#   define SECKEY_OPEN  "-----BEGIN ZCURVE SECRET KEY-----\n"
-#   define SECKEY_CLOSE "-----END ZCURVE SECRET KEY-----\n"
-
     assert (self);
-    //  Set process file create mask to owner access only
-#   if !defined(__WINDOWS__)
-	mode_t old_mask = umask (S_IWGRP | S_IWOTH | S_IRGRP | S_IROTH);
-#   endif
+
+    //  Get printable key strings
+    char *public_key = s_key_to_hex (self->public_key);
+    char *secret_key = s_key_to_hex (self->secret_key);
     
-	//  The public key file contains just the public keys
-    FILE *file = fopen (PUBKEY_FILE, "w");
-    if (!file)
-        return -1;
-    fprintf (file, PUBKEY_OPEN);
-    int byte_nbr;
-    for (byte_nbr = 0; byte_nbr < 32; byte_nbr++) 
-        fprintf (file, "%02X", self->public_key [byte_nbr]);
-    fprintf (file, "\n");
-    fprintf (file, PUBKEY_CLOSE);
-    fclose (file);
-
+    //  Set process file create mask to owner access only
+    zfile_mode_private ();
+    
+    //  The public key file contains just the public key
+    zconfig_t *config = zconfig_new ("root", NULL);
+    zconfig_t *key = zconfig_new ("public-key", config);
+    zconfig_value_set (key, public_key);
+    zconfig_save (config, "public.key");
+    
     //  The secret key file contains both secret and public keys
-    file = fopen (SECKEY_FILE, "w");
-    if (!file)
-        return -1;
-    fprintf (file, SECKEY_OPEN);
-    for (byte_nbr = 0; byte_nbr < 32; byte_nbr++)
-        fprintf (file, "%02X", self->secret_key [byte_nbr]);
-    fprintf (file, "\n");
-    for (byte_nbr = 0; byte_nbr < 32; byte_nbr++)
-        fprintf (file, "%02X", self->public_key [byte_nbr]);
-    fprintf (file, "\n");
-    fprintf (file, SECKEY_CLOSE);
-    fclose (file);
-
+    key = zconfig_new ("secret-key", config);
+    zconfig_value_set (key, secret_key);
+    zconfig_save (config, "secret.key");
+    zconfig_destroy (&config);
+    
     //  Reset process file create mask
-#   if !defined(__WINDOWS__)
-    umask (old_mask);
-#   endif
+    zfile_mode_default ();
+    
+    free (public_key);
+    free (secret_key);
     return 0;
 }
 
@@ -251,22 +246,8 @@ int
 zcurve_keypair_load (zcurve_t *self)
 {
     assert (self);
-    FILE *file = fopen (SECKEY_FILE, "r");
-    if (!file)
-        return -1;
-
-    char buffer [256];
-    int matches = 0;
-    if (fgets (buffer, 256, file)
-    &&  streq (buffer, SECKEY_OPEN)) {
-        int byte_nbr;
-        for (byte_nbr = 0; byte_nbr < 32; byte_nbr++)
-            matches += fscanf (file, "%02hhX ", &self->secret_key [byte_nbr]);
-        for (byte_nbr = 0; byte_nbr < 32; byte_nbr++)
-            matches += fscanf (file, "%02hhX ", &self->public_key [byte_nbr]);
-    }
-    fclose (file);
-    return matches == 64? 0: -1;
+    //  XXXX
+    return -1;
 }
 
 

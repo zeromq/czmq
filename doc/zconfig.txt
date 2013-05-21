@@ -14,11 +14,11 @@ DESCRIPTION
 -----------
 
 Lets applications load, work with, and save configuration files.
-
 This implements rfc.zeromq.org/spec:4/ZPL, which is a simple structured
 text format for configuration files. Note that comments are stripped out
 of configuration files when loading them, so loading and saving a config
 file will remove any comments it contains.
+
 
 EXAMPLE
 -------
@@ -78,7 +78,7 @@ EXAMPLE
     assert (root == NULL);
 
     //  Test loading from a ZPL file
-    zconfig_t *config = zconfig_load ("anonymous.cfg");
+    zconfig_t *config = zconfig_load ("selftest.cfg");
     assert (config);
 
     //  Destructor should be safe to call twice
