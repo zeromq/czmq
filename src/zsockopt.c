@@ -128,7 +128,7 @@ zsocket_affinity (void *zocket)
 //  Set socket ZMQ_IDENTITY value
 
 void
-zsocket_set_identity (void *zocket, const char * identity)
+zsocket_set_identity (void *zocket, char * identity)
 {
 #   if defined (ZMQ_IDENTITY)
     int rc = zmq_setsockopt (zocket, ZMQ_IDENTITY, identity, strlen (identity));
@@ -502,7 +502,7 @@ zsocket_backlog (void *zocket)
 //  Set socket ZMQ_SUBSCRIBE value
 
 void
-zsocket_set_subscribe (void *zocket, const char * subscribe)
+zsocket_set_subscribe (void *zocket, char * subscribe)
 {
 #   if defined (ZMQ_SUBSCRIBE)
     if (zsockopt_type (zocket) != ZMQ_SUB) {
@@ -519,7 +519,7 @@ zsocket_set_subscribe (void *zocket, const char * subscribe)
 //  Set socket ZMQ_UNSUBSCRIBE value
 
 void
-zsocket_set_unsubscribe (void *zocket, const char * unsubscribe)
+zsocket_set_unsubscribe (void *zocket, char * unsubscribe)
 {
 #   if defined (ZMQ_UNSUBSCRIBE)
     if (zsockopt_type (zocket) != ZMQ_SUB) {
@@ -884,7 +884,7 @@ zsocket_set_linger (void *zocket, int linger)
 {
 #   if defined (ZMQ_LINGER)
     int rc = zmq_setsockopt (zocket, ZMQ_LINGER, &linger, sizeof (int));
-    assert ((rc == 0 || errno == ETERM) && "Are you passing a void** instead of a void*?");
+    assert (rc == 0 || errno == ETERM);
 #   endif
 }
 
