@@ -15,7 +15,11 @@
 /*  =========================================================================
     zsockopt - get/set 0MQ socket options
 
-    GENERATED SOURCE CODE, DO NOT EDIT
+            ****************************************************
+            *   GENERATED SOURCE CODE, DO NOT EDIT!!           *
+            *   TO CHANGE THIS, EDIT scripts/sockopts.gsl      *
+            *   AND RUN ./generate in models/.                 *
+            ****************************************************
     -------------------------------------------------------------------------
     Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
@@ -114,7 +118,11 @@ int zsockopt_test (bool verbose);
 /*  =========================================================================
     zsockopt - get/set 0MQ socket options
 
-    GENERATED SOURCE CODE, DO NOT EDIT
+            ****************************************************
+            *   GENERATED SOURCE CODE, DO NOT EDIT!!           *
+            *   TO CHANGE THIS, EDIT scripts/sockopts.gsl      *
+            *   AND RUN ./generate in models/.                 *
+            ****************************************************
     -------------------------------------------------------------------------
     Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
@@ -158,6 +166,7 @@ int zsockopt_test (bool verbose);
 .       if mode = "rw" | mode = "w"
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_$(NAME) value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
 zsocket_set_$(name) (void *zocket, $(ctype_const) $(name))
@@ -206,6 +215,7 @@ zsocket_set_$(name) (void *zocket, $(ctype_const) $(name))
 .           if mode = "rw" | mode = "r"
 //  --------------------------------------------------------------------------
 //  Return socket ZMQ_$(NAME) value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 $(ctype) 
 zsocket_$(name) (void *zocket)
@@ -229,7 +239,7 @@ zsocket_$(name) (void *zocket)
     zmq_getsockopt (zocket, ZMQ_$(NAME), &$(name), &option_len);
 .           elsif type = "blob"
     size_t option_len = 255;
-    char *$(name) = zmalloc (option_len);
+    char *$(name) = (char *) zmalloc (option_len);
     zmq_getsockopt (zocket, ZMQ_$(NAME), $(name), &option_len);
 .           endif
 .           if type = "int"
@@ -255,6 +265,7 @@ $(string.trim(.):)
 .endfor
 //  --------------------------------------------------------------------------
 //  Selftest
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 int
 zsockopt_test (bool verbose)

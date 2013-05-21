@@ -1,7 +1,11 @@
 /*  =========================================================================
     zsockopt - get/set 0MQ socket options
 
-    GENERATED SOURCE CODE, DO NOT EDIT
+            ****************************************************
+            *   GENERATED SOURCE CODE, DO NOT EDIT!!           *
+            *   TO CHANGE THIS, EDIT scripts/sockopts.gsl      *
+            *   AND RUN ./generate in models/.                 *
+            ****************************************************
     -------------------------------------------------------------------------
     Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
