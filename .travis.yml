@@ -1,2 +1,4 @@
 script: ./autogen.sh && ./configure && make && make check
+before_install:
+- sudo apt-get install libzmq3-dev
 language: c
