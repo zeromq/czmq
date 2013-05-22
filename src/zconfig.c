@@ -379,10 +379,8 @@ zconfig_load (const char *filename)
     if (!file)
         return NULL;            //  File not found, or unreadable
 
-    //  Prepare new zconfig_t structure
-    zconfig_t *self = zconfig_new ("root", NULL);
-    
     //  Parse the file line by line
+    zconfig_t *self = zconfig_new ("root", NULL);
     char cur_line [1024];
     bool valid = true;
     int lineno = 0;
@@ -459,11 +457,25 @@ s_collect_level (char **start, int lineno)
 
 //  Collect property name
 
+static bool
+s_is_namechar (char thischar) 
+{
+    return (isalnum (thischar) 
+         || thischar == '$'
+         || thischar == '-'
+         || thischar == '_'
+         || thischar == '@'
+         || thischar == '.'
+         || thischar == '&'
+         || thischar == '+'
+         || thischar == '/');
+}
+
 static char *
 s_collect_name (char **start, int lineno)
 {
     char *readptr = *start;
-    while (isalnum ((byte) **start) || (byte) **start == '/')
+    while (s_is_namechar ((char) **start))
         (*start)++;
 
     size_t length = *start - readptr;
@@ -575,6 +587,7 @@ zconfig_save (zconfig_t *self, char *filename)
             rc = zconfig_execute (self, s_config_save, file);
         else
             rc = -1;          //  File not writeable
+        fclose (file);
     }
     return rc;
 }
