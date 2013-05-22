@@ -2,6 +2,8 @@
 <A name="toc1-3" title="CZMQ - High-level C binding for ØMQ" />
 # CZMQ - High-level C binding for ØMQ
 
+[![Build Status](https://travis-ci.org/zeromq/czmq.png?branch=master)](https://travis-ci.org/zeromq/czmq)
+
 <A name="toc2-6" title="Contents" />
 ## Contents
 
