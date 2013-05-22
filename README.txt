@@ -3,6 +3,8 @@
 
 # CZMQ - High-level C binding for 0MQ
 
+[![Build Status](https://travis-ci.org/zeromq/czmq.png?branch=master)](https://travis-ci.org/zeromq/czmq)
+
 ## Contents
 
 .toc
