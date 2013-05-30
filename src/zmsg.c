@@ -204,10 +204,8 @@ zmsg_add (zmsg_t *self, zframe_t *frame)
 {
     assert (self);
     assert (frame);
-    int error = 0;
     self->content_size += zframe_size (frame);
-    error = zlist_append (self->frames, frame);
-    return error;
+    return zlist_append (self->frames, frame);
 }
 
 
@@ -348,7 +346,6 @@ zmsg_addstr (zmsg_t *self, const char *format, ...)
     }
     else
         size = required;
-
 
     self->content_size += size;
     zlist_append (self->frames, zframe_new (string, size));
