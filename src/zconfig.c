@@ -70,7 +70,7 @@ zconfig_t *
 zconfig_new (const char *name, zconfig_t *parent)
 {
     zconfig_t *self = (zconfig_t *) zmalloc (sizeof (zconfig_t));
-    zconfig_name_set (self, name);
+    zconfig_set_name (self, name);
     if (parent) {
         if (parent->child) {
             //  Attach as last child of parent
@@ -124,18 +124,6 @@ zconfig_name (zconfig_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Set config item name, name may be NULL
-
-void
-zconfig_name_set (zconfig_t *self, const char *name)
-{
-    assert (self);
-    free (self->name);
-    self->name = strdup (name);
-}
-
-
-//  --------------------------------------------------------------------------
 //  Return value of config item
 
 char *
@@ -147,33 +135,82 @@ zconfig_value (zconfig_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Set value of config item
+//  Insert or update configuration key with value
 
 void
-zconfig_value_set (zconfig_t *self, const char *value)
+zconfig_put (zconfig_t *self, const char *path, const char *value)
+{
+    //  Check length of next path segment
+    char *slash = strchr (path, '/');
+    int length = strlen (path);
+    if (slash)
+        length = slash - path;
+
+    //  Find or create items starting at first child of root
+    zconfig_t *child = self->child;
+    while (child) {
+        if (strlen (child->name) == length
+        &&  memcmp (child->name, path, length) == 0) {
+            //  This segment exists
+            if (slash)          //  Recurse to next level
+                zconfig_put (child, slash + 1, value);
+            else
+                zconfig_set_value (child, value);
+            return;
+        }
+        child = child->next;
+    }
+    //  This segment doesn't exist, create it
+    child = zconfig_new (path, self);
+    child->name [length] = 0;
+    if (slash)                  //  Recurse down further
+        zconfig_put (child, slash + 1, value);
+    else
+        zconfig_set_value (child, value);
+}
+
+    
+//  --------------------------------------------------------------------------
+//  Set new name for config item. The new name may be a string, a printf
+//  format, or NULL.
+
+void
+zconfig_set_name (zconfig_t *self, const char *format, ...)
 {
     assert (self);
-    free (self->value);
-    self->value = strdup (value);
+    free (self->name);
+    if (format) {
+        char formatted [255];
+        va_list args;
+        va_start (args, format);
+        vsnprintf (formatted, 255, format, args);
+        va_end (args);
+        self->name = strdup (formatted);
+    }
+    else
+        self->name = NULL;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Set value of config item via printf format
+//  Set new value for config item. The new value may be a string, a printf
+//  format, or NULL.
 
-char *
-zconfig_value_format (zconfig_t *self, const char *format, ...)
+void
+zconfig_set_value (zconfig_t *self, const char *format, ...)
 {
-    char *value = malloc (255 + 1);
-    va_list args;
     assert (self);
-    va_start (args, format);
-    vsnprintf (value, 255, format, args);
-    va_end (args);
-    
     free (self->value);
-    self->value = value;
-    return 0;
+    if (format) {
+        char formatted [255];
+        va_list args;
+        va_start (args, format);
+        vsnprintf (formatted, 255, format, args);
+        va_end (args);
+        self->value = strdup (formatted);
+    }
+    else
+        self->value = NULL;
 }
 
 
@@ -241,42 +278,6 @@ zconfig_resolve (zconfig_t *self, const char *path, const char *default_value)
 }
 
 
-//  --------------------------------------------------------------------------
-//  Set config item name, name may be NULL
-
-void
-zconfig_path_set (zconfig_t *self, const char *path, const char *value)
-{
-    //  Check length of next path segment
-    char *slash = strchr (path, '/');
-    int length = strlen (path);
-    if (slash)
-        length = slash - path;
-
-    //  Find or create items starting at first child of root
-    zconfig_t *child = self->child;
-    while (child) {
-        if (strlen (child->name) == length
-        &&  memcmp (child->name, path, length) == 0) {
-            //  This segment exists
-            if (slash)          //  Recurse to next level
-                zconfig_path_set (child, slash + 1, value);
-            else
-                zconfig_value_set (child, value);
-            return;
-        }
-        child = child->next;
-    }
-    //  This segment doesn't exist, create it
-    child = zconfig_new (path, self);
-    child->name [length] = 0;
-    if (slash)                  //  Recurse down further
-        zconfig_path_set (child, slash + 1, value);
-    else
-        zconfig_value_set (child, value);
-}
-
-    
 //  --------------------------------------------------------------------------
 //  Finds the latest node at the specified depth, where 0 is the root. If no
 //  such node exists, returns NULL.
@@ -379,10 +380,8 @@ zconfig_load (const char *filename)
     if (!file)
         return NULL;            //  File not found, or unreadable
 
-    //  Prepare new zconfig_t structure
-    zconfig_t *self = zconfig_new ("root", NULL);
-    
     //  Parse the file line by line
+    zconfig_t *self = zconfig_new ("root", NULL);
     char cur_line [1024];
     bool valid = true;
     int lineno = 0;
@@ -459,11 +458,25 @@ s_collect_level (char **start, int lineno)
 
 //  Collect property name
 
+static bool
+s_is_namechar (char thischar) 
+{
+    return (isalnum (thischar) 
+         || thischar == '$'
+         || thischar == '-'
+         || thischar == '_'
+         || thischar == '@'
+         || thischar == '.'
+         || thischar == '&'
+         || thischar == '+'
+         || thischar == '/');
+}
+
 static char *
 s_collect_name (char **start, int lineno)
 {
     char *readptr = *start;
-    while (isalnum ((byte) **start) || (byte) **start == '/')
+    while (s_is_namechar ((char) **start))
         (*start)++;
 
     size_t length = *start - readptr;
@@ -575,6 +588,7 @@ zconfig_save (zconfig_t *self, char *filename)
             rc = zconfig_execute (self, s_config_save, file);
         else
             rc = -1;          //  File not writeable
+        fclose (file);
     }
     return rc;
 }
@@ -636,27 +650,27 @@ zconfig_test (bool verbose)
     //  Left is first child, next is next sibling
     root     = zconfig_new ("root", NULL);
     type     = zconfig_new ("type", root);
-    zconfig_value_set (type, "zqueue");
+    zconfig_set_value (type, "zqueue");
     frontend = zconfig_new ("frontend", root);
     option   = zconfig_new ("option", frontend);
     swap     = zconfig_new ("swap", option);
-    zconfig_value_set (swap, "25000000");
+    zconfig_set_value (swap, "25000000");
     subscribe = zconfig_new ("subscribe", option);
-    zconfig_value_format (subscribe, "#%d", 2);
+    zconfig_set_value (subscribe, "#%d", 2);
     hwm      = zconfig_new ("hwm", option);
-    zconfig_value_set (hwm, "1000");
+    zconfig_set_value (hwm, "1000");
     bind     = zconfig_new ("bind", frontend);
-    zconfig_value_set (bind, "tcp://*:5555");
+    zconfig_set_value (bind, "tcp://*:5555");
     backend  = zconfig_new ("backend", root);
     bind     = zconfig_new ("bind", backend);
-    zconfig_value_set (bind, "tcp://*:5556");
+    zconfig_set_value (bind, "tcp://*:5556");
 
     assert (atoi (zconfig_resolve (root, "frontend/option/hwm", "0")) == 1000);
     assert (streq (zconfig_resolve (root, "backend/bind", ""), "tcp://*:5556"));
 
-    zconfig_path_set (root, "frontend/option/hwm", "500");
+    zconfig_put (root, "frontend/option/hwm", "500");
     assert (atoi (zconfig_resolve (root, "frontend/option/hwm", "0")) == 500);
-    zconfig_path_set (root, "frontend/option/lwm", "200");
+    zconfig_put (root, "frontend/option/lwm", "200");
     assert (atoi (zconfig_resolve (root, "frontend/option/lwm", "0")) == 200);
     
     zconfig_destroy (&root);
