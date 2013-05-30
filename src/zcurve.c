@@ -26,7 +26,6 @@
 /*
 @header
     CurveZMQ security engine, for use in ZeroMQ applications.
-@discuss
     This is a reference implementation of CurveZMQ, and can be used at the
     application level to secure a request-reply dialog (usually, DEALER to
     ROUTER). For an example of use, see the selftest function. To compile
@@ -34,6 +33,11 @@
     https://github.com/jedisct1/libsodium. Run ./configure after installing
     libsodium. If configure does not find libsodium, this class will work
     in clear text.
+@discuss
+    This class does no I/O; all socket input/output is done by the caller
+    which passes frames to and from this class. It still lacks support for
+    multipart messages, for client authentication (will be done using the
+    rfc.zeromq.org/spec:27/ZAP protocol), and proper error handling.
 @end
 */
 
@@ -213,12 +217,12 @@ zcurve_keypair_save (zcurve_t *self)
     //  The public key file contains just the public key
     zconfig_t *root = zconfig_new ("root", NULL);
     zconfig_t *key = zconfig_new ("public-key", root);
-    zconfig_value_set (key, public_key);
+    zconfig_set_value (key, public_key);
     zconfig_save (root, "public.key");
     
     //  The secret key file contains both secret and public keys
     key = zconfig_new ("secret-key", root);
-    zconfig_value_set (key, secret_key);
+    zconfig_set_value (key, secret_key);
     zconfig_save (root, "secret.key");
     zconfig_destroy (&root);
     
