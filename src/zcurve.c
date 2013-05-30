@@ -82,6 +82,7 @@ struct _zcurve_t {
 
     //  Symmetric connection properties
     bool is_server;             //  True or false
+    bool verbose;               //  Trace activity to stdout
     state_t state;              //  Connection state
     int64_t cn_nonce;           //  Connection nonce
     byte cn_public [32];        //  Connection public key
@@ -131,8 +132,9 @@ typedef struct {
 
 
 //  --------------------------------------------------------------------------
-//  Constructor. Always generates a new public/secret key pair which
-//  you can override if you need to.
+//  Create a new zcurve instance; if you provide a server-key, is a client
+//  that can talk to that specific server. Otherwise is a server that will
+//  talk to one specific client.
 
 zcurve_t *
 zcurve_new (byte *server_key)
@@ -166,16 +168,6 @@ zcurve_destroy (zcurve_t **self_p)
     }
 }
 
-
-void
-s_dump (byte *buffer, int size, char *prefix)
-{
-    printf ("\n%s: ", prefix);
-    int byte_nbr;
-    for (byte_nbr = 0; byte_nbr < size; byte_nbr++)
-        printf ("%02X ", buffer [byte_nbr]);
-    printf ("\n");
-}
 
 //  --------------------------------------------------------------------------
 //  Generate a new long-term key pair
@@ -248,12 +240,23 @@ zcurve_keypair_load (zcurve_t *self)
     assert (self);
     zconfig_t *root = zconfig_load ("secret.key");
     assert (root);
-    char *secret_key = zconfig_resolve (root, "secret-key", "???");
-    puts (secret_key);
-    char *public_key = zconfig_resolve (root, "public-key", "???");
-    puts (public_key);
-    
-    return -1;
+    int rc = 0;
+    char *secret_key = zconfig_resolve (root, "secret-key", NULL);
+    char *public_key = zconfig_resolve (root, "public-key", NULL);
+    if (secret_key && public_key) {
+        int byte_nbr, matches = 0;
+        for (byte_nbr = 0; byte_nbr < 32; byte_nbr++) {
+            matches += sscanf (secret_key + byte_nbr * 2, "%02hhX ", &self->secret_key [byte_nbr]);
+            matches += sscanf (public_key + byte_nbr * 2, "%02hhX ", &self->public_key [byte_nbr]);
+        }
+        //  TODO: don't assert, but raise error exception
+        assert (matches == 64);
+    }
+    else
+        rc = -1;
+
+    zconfig_destroy (&root);
+    return rc;
 }
 
 
@@ -269,10 +272,11 @@ zcurve_keypair_public (zcurve_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Set a metadata property; these are sent to the peer after the
-//  security handshake. Property values are strings.
+//  Set a metadata property; these are sent to the peer after the security 
+//  handshake. Property values are strings.
+
 void
-zcurve_metadata_set (zcurve_t *self, char *name, char *value)
+zcurve_set_metadata (zcurve_t *self, char *name, char *value)
 {
     assert (self);
     assert (name && value);
@@ -296,6 +300,17 @@ zcurve_metadata_set (zcurve_t *self, char *name, char *value)
 
     //  Update size of metadata so far
     self->metadata_size = needle - self->metadata;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set tracing on zcurve instance. Will report activity to stdout.
+
+void
+zcurve_set_verbose (zcurve_t *self, bool verbose)
+{
+    assert (self);
+    self->verbose = verbose;
 }
 
 
@@ -437,7 +452,8 @@ s_produce_hello (zcurve_t *self)
 static void
 s_process_hello (zcurve_t *self, zframe_t *input)
 {
-    printf ("C:HELLO: ");
+    if (self->verbose)
+        printf ("\nC:HELLO: ");
     hello_t *hello = (hello_t *) zframe_data (input);
 
     memcpy (self->cn_client, hello->client, 32);
@@ -446,6 +462,8 @@ s_process_hello (zcurve_t *self, zframe_t *input)
                signature, 64, 
                "CurveZMQHELLO---", 
                hello->client, self->secret_key);
+    if (self->verbose)
+        puts ("OK");
 }
 
 static zframe_t *
@@ -497,7 +515,8 @@ s_produce_welcome (zcurve_t *self)
 static void
 s_process_welcome (zcurve_t *self, zframe_t *input)
 {
-    printf ("S:WELCOME: ");
+    if (self->verbose)
+        printf ("S:WELCOME: ");
 
 #if defined (HAVE_LIBSODIUM)
     //  Open Box [S' + cookie](C'->S)
@@ -513,6 +532,8 @@ s_process_welcome (zcurve_t *self, zframe_t *input)
     int rc = crypto_box_beforenm (self->cn_precom, self->cn_server, self->cn_secret);
     assert (rc == 0);
 #endif
+    if (self->verbose)
+        puts ("OK");
 }
 
 static zframe_t *
@@ -552,7 +573,8 @@ s_produce_initiate (zcurve_t *self)
 static void
 s_process_initiate (zcurve_t *self, zframe_t *input)
 {
-    printf ("C:INITIATE: ");
+    if (self->verbose)
+        printf ("C:INITIATE: ");
 
 #if defined (HAVE_LIBSODIUM)
     //  Working variables for crypto calls
@@ -592,7 +614,8 @@ s_process_initiate (zcurve_t *self, zframe_t *input)
     //  This is where we'd check the decrypted client public key
     memcpy (self->client_key, plain, 32);
     //  Metadata is at plain + 96
-    printf ("(received %zd bytes metadata) ", metadata_size);
+    if (self->verbose)
+        printf ("(received %zd bytes metadata) ", metadata_size);
     //  Vouch nonce + box is 64 bytes at plain + 32
     byte vouch [64];
     memcpy (vouch, plain + 32, 64);
@@ -611,6 +634,8 @@ s_process_initiate (zcurve_t *self, zframe_t *input)
     free (plain);
     free (box);
 #endif
+    if (self->verbose)
+        puts ("OK");
 }
 
 static zframe_t *
@@ -630,13 +655,15 @@ static void
 s_process_ready (zcurve_t *self, zframe_t *input)
 {
     ready_t *ready = (ready_t *) zframe_data (input);
-    printf ("C:READY: ");
+    if (self->verbose)
+        printf ("C:READY: ");
     self->metadata_size = zframe_size (input) - sizeof (ready_t);
     s_decrypt (self, ready->nonce, 
                self->metadata, self->metadata_size, 
                "CurveZMQREADY---", 
                NULL, NULL);
-    printf ("(received %zd bytes metadata) ", self->metadata_size);
+    if (self->verbose)
+        printf ("(received %zd bytes metadata) OK\n", self->metadata_size);
 }
 
 static zframe_t *
@@ -656,7 +683,8 @@ static zframe_t *
 s_process_message (zcurve_t *self, zframe_t *input)
 {
     message_t *message = (message_t *) zframe_data (input);
-    printf ("%c:MESSAGE: ", self->is_server? 'C': 'S');
+    if (self->verbose)
+        printf ("%c:MESSAGE: ", self->is_server? 'C': 'S');
     
     size_t size = zframe_size (input) - sizeof (message_t);
     zframe_t *output = zframe_new (NULL, size);
@@ -664,7 +692,8 @@ s_process_message (zcurve_t *self, zframe_t *input)
                zframe_data (output), size, 
                self->is_server? "CurveZMQMESSAGEC": "CurveZMQMESSAGES", 
                NULL, NULL);
-    printf ("(received %zd bytes data) ", size);
+    if (self->verbose)
+        printf ("(received %zd bytes data) OK\n", size);
     return output;
 }
 
@@ -682,7 +711,6 @@ zcurve_execute (zcurve_t *self, zframe_t *input)
     //  Pending state - ignore input
     if (self->state == pending) {
         self->state = expect_welcome;
-        puts ("OK");
         return s_produce_hello (self);
     }
     //  All other states require input
@@ -722,45 +750,53 @@ zcurve_execute (zcurve_t *self, zframe_t *input)
         self->state = connected;
     }
     else {
-        puts ("E: invalid command");
+        if (self->verbose)
+            puts ("E: invalid command");
         assert (false);
     }
-    puts ("OK");
     return output;
 }
 
 
 //  --------------------------------------------------------------------------
 //  Encode clear-text message to peer. Returns a frame ready to send
-//  on the wire.
+//  on the wire. Takes ownership of clear-text frame.
 
 zframe_t *
-zcurve_encode (zcurve_t *self, zframe_t *clear)
+zcurve_encode (zcurve_t *self, zframe_t **cleartext_p)
 {
     assert (self);
     assert (self->state == connected);
-    assert (clear);
-    return s_produce_message (self, clear);
+    assert (cleartext_p);
+    assert (*cleartext_p);
+    
+    zframe_t *encrypted = s_produce_message (self, *cleartext_p);
+    zframe_destroy (cleartext_p);
+    return encrypted;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Decode blob into message from peer.
+//  Decode blob into message from peer. Takes ownership of encrypted frame.
 
 zframe_t *
-zcurve_decode (zcurve_t *self, zframe_t *input)
+zcurve_decode (zcurve_t *self, zframe_t **encrypted_p)
 {
     assert (self);
     assert (self->state == connected);
-    assert (input);
+    assert (encrypted_p);
+    assert (*encrypted_p);
     
-    if (zframe_size (input) >= sizeof (message_t)
-    &&  memcmp (zframe_data (input), "MESSAGE ", 8) == 0)
-        return s_process_message (self, input);
-    else {
+    zframe_t *cleartext = NULL;
+    if (zframe_size (*encrypted_p) >= sizeof (message_t)
+    &&  memcmp (zframe_data (*encrypted_p), "MESSAGE ", 8) == 0)
+        cleartext = s_process_message (self, *encrypted_p);
+    else
+    if (self->verbose)
         puts ("E: invalid command");
-        return NULL;
-    }
+    
+    zframe_destroy (encrypted_p);
+    return cleartext;
 }
 
 
@@ -782,21 +818,24 @@ zcurve_connected (zcurve_t *self)
 void *
 server_task (void *args)
 {
-    //  We'll use a router socket to be more realistic
     zctx_t *ctx = zctx_new ();
     assert (ctx);
     void *router = zsocket_new (ctx, ZMQ_ROUTER);
     int rc = zsocket_bind (router, "tcp://*:9000");
     assert (rc != -1);
 
-    //  Create a new server instance and load its keys from
-    //  the previously generated keypair file
+    //  Create a new server instance and load its keys from the previously 
+    //  generated keypair file
     zcurve_t *server = zcurve_new (NULL);
     rc = zcurve_keypair_load (server);
     assert (rc == 0);
 
     //  Set some metadata properties
-    zcurve_metadata_set (server, "Server", "CZMQ/zcurve");
+    zcurve_set_metadata (server, "Server", "CZMQ/zcurve");
+    
+    //  A hack to get the thread to timeout and exit so we can test
+    //  under Valgrind. Do NOT do this on real servers!
+    zsocket_set_rcvtimeo (router, 1000);
 
     //  Execute incoming frames until ready or exception
     //  In practice we'd want a server instance per unique client
@@ -809,26 +848,22 @@ server_task (void *args)
         zframe_send (&sender, router, ZFRAME_MORE);
         zframe_send (&output, router, 0);
     }
-    //  Get MESSAGE command
-    zframe_t *sender = zframe_recv (router);
-    zframe_t *input = zframe_recv (router);
-    assert (input);
-    
-    zframe_t *output = zcurve_decode (server, input);
-    zframe_destroy (&input);
-
-    //  Do Hello, World
-    assert (output);
-    assert (memcmp (zframe_data (output), "Hello", 5) == 0);
-    zframe_destroy (&output);
-
-    zframe_t *response = zframe_new ((byte *) "World", 5);
-    output = zcurve_encode (server, response);
-    zframe_destroy (&response);
-    assert (output);
-    zframe_send (&sender, router, ZFRAME_MORE);
-    zframe_send (&output, router, 0);
-    
+    while (true) {
+        //  Now act as echo service doing a full decode and encode
+        //  Finish when we get an END message
+        zframe_t *sender = zframe_recv (router);
+        if (!sender)
+            break;          //  Timed-out, finished
+        zframe_t *encrypted = zframe_recv (router);
+        assert (encrypted);
+        zframe_t *cleartext = zcurve_decode (server, &encrypted);
+        assert (cleartext);
+        
+        encrypted = zcurve_encode (server, &cleartext);
+        assert (encrypted);
+        zframe_send (&sender, router, ZFRAME_MORE);
+        zframe_send (&encrypted, router, 0);
+    }
     zcurve_destroy (&server);
     zctx_destroy (&ctx);
     return NULL;
@@ -844,75 +879,96 @@ zcurve_test (bool verbose)
     //  Generate new long-term key pair for our test server
     //  The key pair will be stored in "secret.key"
     
-    //  Selftest disabled while I fix the key load/save code...
-    //  PH 2013/05/21
+    zcurve_t *keygen = zcurve_new (NULL);
+    zcurve_keypair_new (keygen);
+    int rc = zcurve_keypair_save (keygen);
+    assert (rc == 0);
+    assert (zfile_exists ("secret.key"));
     
-//     zcurve_t *keygen = zcurve_new (NULL);
-//     zcurve_keypair_new (keygen);
-//     int rc = zcurve_keypair_save (keygen);
-//     assert (rc == 0);
-//     assert (zfile_exists ("secret.key"));
-//     //  This is how we "share" the server key in our test
-//     byte server_key [32];
-//     memcpy (server_key, zcurve_keypair_public (keygen), 32);
-//     zcurve_destroy (&keygen);
-//     
-//     //  We'll run the server as a background task, and the
-//     //  client in this foreground thread.
-//     zthread_new (server_task, NULL);
-// 
-//     zctx_t *ctx = zctx_new ();
-//     assert (ctx);
-//     void *dealer = zsocket_new (ctx, ZMQ_DEALER);
-//     rc = zsocket_connect (dealer, "tcp://127.0.0.1:9000");
-//     assert (rc != -1);
-//     
-//     //  Create a new client instance using shared server key
-//     zcurve_t *client = zcurve_new (server_key);
-//     zcurve_keypair_new (client);
-// 
-//     //  Set some metadata properties
-//     zcurve_metadata_set (client, "Client", "CZMQ/zcurve");
-//     zcurve_metadata_set (client, "Identity", "E475DA11");
-//     
-//     //  Execute null event on client to kick off handshake
-//     zframe_t *output = zcurve_execute (client, NULL);
-//     while (!zcurve_connected (client)) {
-//         rc = zframe_send (&output, dealer, 0);
-//         assert (rc >= 0);
-//         zframe_t *input = zframe_recv (dealer);
-//         assert (input);
-//         output = zcurve_execute (client, input);
-//         zframe_destroy (&input);
-//     }
-//     //  Handshake is done, now try Hello, World
-//     zframe_t *request = zframe_new ((byte *) "Hello", 5);
-//     output = zcurve_encode (client, request);
-//     zframe_destroy (&request);
-//     assert (output);
-//     zframe_send (&output, dealer, 0);
-// 
-//     zframe_t *input = zframe_recv (dealer);
-//     assert (input);
-//     
-//     output = zcurve_decode (client, input);
-//     assert (output);
-//     assert (memcmp (zframe_data (output), "World", 5) == 0);
-//     zframe_destroy (&input);
-//     zframe_destroy (&output);
-//     
-//     //  Now send messages of increasing size, check they work
-//     int count;
-//     size_t size = 0;
-//     for (count = 0; count < 12; count++) {
-//         size = size * 2 + 1;
-//     }
-// 
-//     //  Done, clean-up
-//     zfile_delete ("public.key");
-//     zfile_delete ("secret.key");
-//     zcurve_destroy (&client);
-//     zctx_destroy (&ctx);
+    //  This is how we "share" the server key in our test
+    byte server_key [32];
+    memcpy (server_key, zcurve_keypair_public (keygen), 32);
+    zcurve_destroy (&keygen);
+    
+    //  We'll run the server as a background task, and the
+    //  client in this foreground thread.
+    zthread_new (server_task, NULL);
+
+    zctx_t *ctx = zctx_new ();
+    assert (ctx);
+    void *dealer = zsocket_new (ctx, ZMQ_DEALER);
+    rc = zsocket_connect (dealer, "tcp://127.0.0.1:9000");
+    assert (rc != -1);
+    
+    //  Create a new client instance using shared server key
+    zcurve_t *client = zcurve_new (server_key);
+    zcurve_set_verbose (client, verbose);
+    zcurve_keypair_new (client);
+
+    //  Set some metadata properties
+    zcurve_set_metadata (client, "Client", "CZMQ/zcurve");
+    zcurve_set_metadata (client, "Identity", "E475DA11");
+    
+    //  Execute null event on client to kick off handshake
+    zframe_t *output = zcurve_execute (client, NULL);
+    while (!zcurve_connected (client)) {
+        rc = zframe_send (&output, dealer, 0);
+        assert (rc >= 0);
+        zframe_t *input = zframe_recv (dealer);
+        assert (input);
+        output = zcurve_execute (client, input);
+        zframe_destroy (&input);
+    }
+    //  Handshake is done, now try Hello, World
+    zframe_t *cleartext = zframe_new ((byte *) "Hello, World", 12);
+    zframe_t *encrypted = zcurve_encode (client, &cleartext);
+    assert (encrypted);
+    zframe_send (&encrypted, dealer, 0);
+
+    encrypted = zframe_recv (dealer);
+    assert (encrypted);
+    
+    cleartext = zcurve_decode (client, &encrypted);
+    assert (cleartext);
+    assert (zframe_size (cleartext) == 12);
+    assert (memcmp (zframe_data (cleartext), "Hello, World", 12) == 0);
+    zframe_destroy (&cleartext);
+    
+    //  Now send messages of increasing size, check they work
+    int count;
+    int size = 0;
+    for (count = 0; count < 18; count++) {
+        if (verbose)
+            printf ("Testing message of size=%d...\n", size);
+        cleartext = zframe_new (NULL, size);
+        int byte_nbr;
+        //  Set data to sequence 0...255 repeated
+        for (byte_nbr = 0; byte_nbr < size; byte_nbr++) 
+            zframe_data (cleartext)[byte_nbr] = (byte) byte_nbr;
+
+        encrypted = zcurve_encode (client, &cleartext);
+        assert (encrypted);
+        zframe_send (&encrypted, dealer, 0);
+        
+        encrypted = zframe_recv (dealer);
+        assert (encrypted);
+        cleartext = zcurve_decode (client, &encrypted);
+        assert (cleartext);
+        assert (zframe_size (cleartext) == size);
+        for (byte_nbr = 0; byte_nbr < size; byte_nbr++) {
+            assert (zframe_data (cleartext)[byte_nbr] == (byte) byte_nbr);
+        }
+        zframe_destroy (&cleartext);
+        size = size * 2 + 1;
+    }
+    //  Give server thread a chance to time-out and exit
+    zclock_sleep (1000);
+
+    //  Done, clean-up
+    zfile_delete ("public.key");
+    zfile_delete ("secret.key");
+    zcurve_destroy (&client);
+    zctx_destroy (&ctx);
     //  @end
     
     printf ("OK\n");
