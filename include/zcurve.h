@@ -62,7 +62,11 @@ CZMQ_EXPORT byte *
 //  Set a metadata property; these are sent to the peer after the
 //  security handshake. Property values are strings.
 CZMQ_EXPORT void
-    zcurve_metadata_set (zcurve_t *self, char *name, char *value);
+    zcurve_set_metadata (zcurve_t *self, char *name, char *value);
+
+//  Set tracing on zcurve instance. Will report activity to stdout.
+CZMQ_EXPORT void
+    zcurve_set_verbose (zcurve_t *self, bool verbose);
 
 //  Accept input command from peer. If the command is invalid, it is
 //  discarded silently. May return a blob to send to the peer, or NULL
@@ -73,11 +77,12 @@ CZMQ_EXPORT zframe_t *
 //  Encode clear-text message to peer. Returns a blob ready to send
 //  on the wire.
 CZMQ_EXPORT zframe_t *
-    zcurve_encode (zcurve_t *self, zframe_t *clear);
+    zcurve_encode (zcurve_t *self, zframe_t **cleartext_p);
 
-//  Decode blob into message from peer.
+//  Decode blob into message from peer. Takes ownership of encrypted frame.
+
 CZMQ_EXPORT zframe_t *
-    zcurve_decode (zcurve_t *self, zframe_t *input);
+    zcurve_decode (zcurve_t *self, zframe_t **encrypted_p);
 
 //  Indicate whether handshake is still in progress
 CZMQ_EXPORT bool

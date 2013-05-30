@@ -48,26 +48,23 @@ CZMQ_EXPORT void
 CZMQ_EXPORT char *
     zconfig_name (zconfig_t *self);
 
-//  Set config item name, name may be NULL
-CZMQ_EXPORT void
-    zconfig_name_set (zconfig_t *self, const char *name);
-
 //  Return value of config item
 CZMQ_EXPORT char *
     zconfig_value (zconfig_t *self);
     
-//  Set value of config item
-CZMQ_EXPORT void
-    zconfig_value_set (zconfig_t *self, const char *value);
-    
-//  Set value of config item via printf format
-CZMQ_EXPORT char *
-    zconfig_value_format (zconfig_t *self, const char *format, ...);
-
 //  Insert or update configuration key with value
 CZMQ_EXPORT void
-    zconfig_path_set (zconfig_t *self, const char *path, const char *value);
+    zconfig_put (zconfig_t *self, const char *path, const char *value);
 
+//  Set config item name, name may be NULL
+CZMQ_EXPORT void
+    zconfig_set_name (zconfig_t *self, const char *format, ...);
+
+//  Set new value for config item. The new value may be a string, a printf
+//  format, or NULL.
+CZMQ_EXPORT void
+    zconfig_set_value (zconfig_t *self, const char *format, ...);
+    
 //  Find our first child, if any
 CZMQ_EXPORT zconfig_t *
     zconfig_child (zconfig_t *self);
@@ -86,7 +83,7 @@ CZMQ_EXPORT char *
 
 //  Set config item name, name may be NULL
 CZMQ_EXPORT void
-    zconfig_path_set (zconfig_t *self, const char *path, const char *value);
+    zconfig_set_path (zconfig_t *self, const char *path, const char *value);
 
 //  Locate the last config item at a specified depth
 CZMQ_EXPORT zconfig_t *
