@@ -215,7 +215,18 @@ zbeacon_unsubscribe (zbeacon_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Get beacon socket handle, for polling
+//  Get beacon ZeroMQ socket, for polling or receiving messages
+
+void *
+zbeacon_socket (zbeacon_t *self)
+{
+    assert (self);
+    return self->pipe;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Get beacon socket handle, for polling - DEPRECATED
 
 void *
 zbeacon_pipe (zbeacon_t *self)
@@ -262,11 +273,11 @@ zbeacon_test (bool verbose)
     zbeacon_subscribe (client_beacon, NULL, 0);
 
     //  Wait for at most 1/2 second if there's no broadcast networking
-    zsocket_set_rcvtimeo (zbeacon_pipe (client_beacon), 500);
+    zsocket_set_rcvtimeo (zbeacon_socket (client_beacon), 500);
 
-    char *ipaddress = zstr_recv (zbeacon_pipe (client_beacon));
+    char *ipaddress = zstr_recv (zbeacon_socket (client_beacon));
     if (ipaddress) {
-        zframe_t *content = zframe_recv (zbeacon_pipe (client_beacon));
+        zframe_t *content = zframe_recv (zbeacon_socket (client_beacon));
         int received_port = (zframe_data (content) [0] << 8)
                         +  zframe_data (content) [1];
         assert (received_port == port_nbr);
@@ -297,9 +308,9 @@ zbeacon_test (bool verbose)
 
     //  Poll on API pipe and on UDP socket
     zmq_pollitem_t pollitems [] = {
-        { zbeacon_pipe (node1), 0, ZMQ_POLLIN, 0 },
-        { zbeacon_pipe (node2), 0, ZMQ_POLLIN, 0 },
-        { zbeacon_pipe (node3), 0, ZMQ_POLLIN, 0 }
+        { zbeacon_socket (node1), 0, ZMQ_POLLIN, 0 },
+        { zbeacon_socket (node2), 0, ZMQ_POLLIN, 0 },
+        { zbeacon_socket (node3), 0, ZMQ_POLLIN, 0 }
     };
     uint64_t stop_at = zclock_time () + 1000;
     while (zclock_time () < stop_at) {
@@ -315,8 +326,8 @@ zbeacon_test (bool verbose)
 
         //  If we get a message on node 1, it must be NODE/2
         if (pollitems [0].revents & ZMQ_POLLIN) {
-            char *ipaddress = zstr_recv (zbeacon_pipe (node1));
-            char *beacon = zstr_recv (zbeacon_pipe (node1));
+            char *ipaddress = zstr_recv (zbeacon_socket (node1));
+            char *beacon = zstr_recv (zbeacon_socket (node1));
             assert (streq (beacon, "NODE/2"));
             free (ipaddress);
             free (beacon);
