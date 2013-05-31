@@ -4,9 +4,23 @@ INCDIR=-I/code/include -I.
 LIBDIR=-L/code/lib
 CFLAGS=-Wall -Os -g -DDLL_EXPORT $(INCDIR)
 
-OBJS = zctx.o zsocket.o zsockopt.o zframe.o zmsg.o zstr.o zloop.o \
-	zhash.o zlist.o zmutex.o zclock.o zthread.o \
-	zsys.o zfile.o zbeacon.o
+OBJS = \
+	zbeacon.o \
+	zclock.o \
+	zconfig.o \
+	zctx.o \
+	zfile.o \
+	zframe.o \
+	zhash.o \
+	zlist.o \
+	zloop.o \
+	zmsg.o \
+	zmutex.o \
+	zsocket.o \
+	zsockopt.o \
+	zstr.o \
+	zsys.o \
+	zthread.o
 
 %.o: ../../src/%.c
 	$(CC) -c -o $@ $< $(CFLAGS)
@@ -22,5 +36,3 @@ czmq_selftest.exe: czmq_selftest.o $(OBJS)
 	
 clean:
 	del *.o *.a *.dll *.exe
-
-	
