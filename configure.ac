@@ -2,12 +2,11 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.61)
 #
-# Change the version number below after doing a public release.
+# The version number is extracted from include/czmq.h using
+# the version.sh script. Hence, it should be updated there.
 # The version in git should reflect the *next* version planned.
-# Version must be MAJOR.MINOR.PATCH otherwise things will break.
-# Make sure you also updated include/czmq.h to match.
 #
-AC_INIT([czmq],[1.4.2],[zeromq-dev@lists.zeromq.org])
+AC_INIT([czmq],[m4_esyscmd([./version.sh czmq])],[zeromq-dev@lists.zeromq.org])
 
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(config)
