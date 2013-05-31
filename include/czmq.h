@@ -34,7 +34,7 @@
 
 #define CZMQ_VERSION_MAJOR 1
 #define CZMQ_VERSION_MINOR 4
-#define CZMQ_VERSION_PATCH 0
+#define CZMQ_VERSION_PATCH 2
 
 #define CZMQ_MAKE_VERSION(major, minor, patch) \
     ((major) * 10000 + (minor) * 100 + (patch))
