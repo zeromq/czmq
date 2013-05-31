@@ -255,6 +255,7 @@ zbeacon_test (bool verbose)
 {
     printf (" * zbeacon: ");
 
+    //  @selftest
     //  Basic test: create a service and announce it
     zctx_t *ctx = zctx_new ();
 
@@ -288,7 +289,6 @@ zbeacon_test (bool verbose)
     zbeacon_destroy (&service_beacon);
     zctx_destroy (&ctx);
     
-    //  @selftest
     zbeacon_t *node1 = zbeacon_new (5670);
     zbeacon_t *node2 = zbeacon_new (5670);
     zbeacon_t *node3 = zbeacon_new (5670);
