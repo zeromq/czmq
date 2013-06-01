@@ -92,6 +92,34 @@ zsys_handler_reset (void)
 
 
 //  --------------------------------------------------------------------------
+//  Set network interface name to use for broadcasts
+//  Use this to force the interface for beacons
+//  This is experimental; may be merged into zbeacon class.
+
+//  NOT thread safe, not a good design; this is to test the feasibility
+//  of forcing a network interface name instead of writing code to find it.
+static char *s_interface = NULL;
+
+void
+zsys_set_interface (char *interface)
+{
+    free (s_interface);
+    s_interface = strdup (interface);
+}
+
+
+//  Return network interface name to use for broadcasts.
+//  Returns "" if no interface was set.
+//  This is experimental; may be merged into zbeacon class.
+
+char *
+zsys_interface (void)
+{
+    return (s_interface? s_interface: "");
+}
+
+
+//  --------------------------------------------------------------------------
 //  Selftest
 
 int

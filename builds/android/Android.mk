@@ -15,7 +15,21 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := czmq
 LOCAL_C_INCLUDES := ../../include $(LIBZMQ)/include
 LOCAL_SRC_FILES := \
-		zclock.c zctx.c zlist.c zsockopt.c zsocket.c zmsg.c \
-		zloop.c zthread.c zstr.c zframe.c zhash.c
+		zbeacon.c \
+		zclock.c \
+		zconfig.c \
+		zctx.c \
+		zfile.c \
+		zframe.c \
+		zhash.c \
+		zlist.c \
+		zloop.c \
+		zmsg.c \
+		zmutex.c \
+		zsocket.c \
+		zsockopt.c \
+		zstr.c \
+		zsys.c \
+		zthread.c
 LOCAL_SHARED_LIBRARIES := zmq
 include $(BUILD_SHARED_LIBRARY)

@@ -215,7 +215,18 @@ zbeacon_unsubscribe (zbeacon_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Get beacon socket handle, for polling
+//  Get beacon ZeroMQ socket, for polling or receiving messages
+
+void *
+zbeacon_socket (zbeacon_t *self)
+{
+    assert (self);
+    return self->pipe;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Get beacon socket handle, for polling - DEPRECATED
 
 void *
 zbeacon_pipe (zbeacon_t *self)
@@ -244,6 +255,7 @@ zbeacon_test (bool verbose)
 {
     printf (" * zbeacon: ");
 
+    //  @selftest
     //  Basic test: create a service and announce it
     zctx_t *ctx = zctx_new ();
 
@@ -262,11 +274,11 @@ zbeacon_test (bool verbose)
     zbeacon_subscribe (client_beacon, NULL, 0);
 
     //  Wait for at most 1/2 second if there's no broadcast networking
-    zsocket_set_rcvtimeo (zbeacon_pipe (client_beacon), 500);
+    zsocket_set_rcvtimeo (zbeacon_socket (client_beacon), 500);
 
-    char *ipaddress = zstr_recv (zbeacon_pipe (client_beacon));
+    char *ipaddress = zstr_recv (zbeacon_socket (client_beacon));
     if (ipaddress) {
-        zframe_t *content = zframe_recv (zbeacon_pipe (client_beacon));
+        zframe_t *content = zframe_recv (zbeacon_socket (client_beacon));
         int received_port = (zframe_data (content) [0] << 8)
                         +  zframe_data (content) [1];
         assert (received_port == port_nbr);
@@ -277,7 +289,6 @@ zbeacon_test (bool verbose)
     zbeacon_destroy (&service_beacon);
     zctx_destroy (&ctx);
     
-    //  @selftest
     zbeacon_t *node1 = zbeacon_new (5670);
     zbeacon_t *node2 = zbeacon_new (5670);
     zbeacon_t *node3 = zbeacon_new (5670);
@@ -297,9 +308,9 @@ zbeacon_test (bool verbose)
 
     //  Poll on API pipe and on UDP socket
     zmq_pollitem_t pollitems [] = {
-        { zbeacon_pipe (node1), 0, ZMQ_POLLIN, 0 },
-        { zbeacon_pipe (node2), 0, ZMQ_POLLIN, 0 },
-        { zbeacon_pipe (node3), 0, ZMQ_POLLIN, 0 }
+        { zbeacon_socket (node1), 0, ZMQ_POLLIN, 0 },
+        { zbeacon_socket (node2), 0, ZMQ_POLLIN, 0 },
+        { zbeacon_socket (node3), 0, ZMQ_POLLIN, 0 }
     };
     uint64_t stop_at = zclock_time () + 1000;
     while (zclock_time () < stop_at) {
@@ -315,8 +326,8 @@ zbeacon_test (bool verbose)
 
         //  If we get a message on node 1, it must be NODE/2
         if (pollitems [0].revents & ZMQ_POLLIN) {
-            char *ipaddress = zstr_recv (zbeacon_pipe (node1));
-            char *beacon = zstr_recv (zbeacon_pipe (node1));
+            char *ipaddress = zstr_recv (zbeacon_socket (node1));
+            char *beacon = zstr_recv (zbeacon_socket (node1));
             assert (streq (beacon, "NODE/2"));
             free (ipaddress);
             free (beacon);
@@ -546,7 +557,8 @@ s_get_interface (agent_t *self)
                 self->address = *(inaddr_t *) interface->ifa_addr;
                 self->broadcast = *(inaddr_t *) interface->ifa_broadaddr;
                 self->broadcast.sin_port = htons (self->port_nbr);
-                if (s_wireless_nic (interface->ifa_name))
+                if (streq (interface->ifa_name, zsys_interface ())
+                ||  s_wireless_nic (interface->ifa_name))
                     break;
             }
             interface = interface->ifa_next;
@@ -557,19 +569,13 @@ s_get_interface (agent_t *self)
     struct ifreq ifr;
     memset (&ifr, 0, sizeof (ifr));
 
-#   if !defined (CZMQ_HAVE_ANDROID)
-    //  TODO: Using hardcoded wlan0 is ugly
-    if (!s_wireless_nic ("wlan0"))
-        s_handle_io_error ("wlan0 not exist");
-#   endif
-
     int sock = 0;
     if ((sock = socket (AF_INET, SOCK_DGRAM, 0)) < 0)
         s_handle_io_error ("socket");
 
     //  Get interface address
     ifr.ifr_addr.sa_family = AF_INET;
-    strncpy (ifr.ifr_name, "wlan0", sizeof (ifr.ifr_name));
+    strncpy (ifr.ifr_name, zsys_interface (), sizeof (ifr.ifr_name));
     int rc = ioctl (sock, SIOCGIFADDR, (caddr_t) &ifr, sizeof (struct ifreq));
     if (rc == -1)
         s_handle_io_error ("siocgifaddr");
@@ -586,7 +592,6 @@ s_get_interface (agent_t *self)
 #   endif
 
 #   elif defined (__WINDOWS__)
-    //  Currently does not filter for wireless NIC
     ULONG addr_size = 0;
     DWORD rc = GetAdaptersAddresses (AF_INET,
         GAA_FLAG_INCLUDE_PREFIX, NULL, NULL, &addr_size);

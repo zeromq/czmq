@@ -219,6 +219,12 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
     </ClCompile>
+    <ClCompile Include="..\..\src\zconfig.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='DebugDLL|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\..\src\zctx.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='DebugDLL|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
@@ -302,6 +308,7 @@
     <ClInclude Include="..\..\include\stdbool_for_windows.h" />
     <CustomBuild Include="..\..\include\zbeacon.h" />
     <ClInclude Include="..\..\include\zclock.h" />
+    <ClInclude Include="..\..\include\zconfig.h" />
     <ClInclude Include="..\..\include\zctx.h" />
     <ClInclude Include="..\..\include\zfile.h" />
     <ClInclude Include="..\..\include\zframe.h" />

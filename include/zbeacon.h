@@ -70,7 +70,12 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zbeacon_unsubscribe (zbeacon_t *self);
 
+//  Get beacon ZeroMQ socket, for polling or receiving messages
+CZMQ_EXPORT void *
+    zbeacon_socket (zbeacon_t *self);
+
 //  Get beacon pipe, for polling or receiving messages
+//  DEPRECATED
 CZMQ_EXPORT void *
     zbeacon_pipe (zbeacon_t *self);
 
