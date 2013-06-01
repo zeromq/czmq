@@ -557,7 +557,8 @@ s_get_interface (agent_t *self)
                 self->address = *(inaddr_t *) interface->ifa_addr;
                 self->broadcast = *(inaddr_t *) interface->ifa_broadaddr;
                 self->broadcast.sin_port = htons (self->port_nbr);
-                if (s_wireless_nic (interface->ifa_name))
+                if (streq (interface->ifa_name, zsys_interface ())
+                ||  s_wireless_nic (interface->ifa_name))
                     break;
             }
             interface = interface->ifa_next;
@@ -568,19 +569,13 @@ s_get_interface (agent_t *self)
     struct ifreq ifr;
     memset (&ifr, 0, sizeof (ifr));
 
-#   if !defined (CZMQ_HAVE_ANDROID)
-    //  TODO: Using hardcoded wlan0 is ugly
-    if (!s_wireless_nic ("wlan0"))
-        s_handle_io_error ("wlan0 not exist");
-#   endif
-
     int sock = 0;
     if ((sock = socket (AF_INET, SOCK_DGRAM, 0)) < 0)
         s_handle_io_error ("socket");
 
     //  Get interface address
     ifr.ifr_addr.sa_family = AF_INET;
-    strncpy (ifr.ifr_name, "wlan0", sizeof (ifr.ifr_name));
+    strncpy (ifr.ifr_name, zsys_interface (), sizeof (ifr.ifr_name));
     int rc = ioctl (sock, SIOCGIFADDR, (caddr_t) &ifr, sizeof (struct ifreq));
     if (rc == -1)
         s_handle_io_error ("siocgifaddr");
@@ -597,7 +592,6 @@ s_get_interface (agent_t *self)
 #   endif
 
 #   elif defined (__WINDOWS__)
-    //  Currently does not filter for wireless NIC
     ULONG addr_size = 0;
     DWORD rc = GetAdaptersAddresses (AF_INET,
         GAA_FLAG_INCLUDE_PREFIX, NULL, NULL, &addr_size);
