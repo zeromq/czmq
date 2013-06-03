@@ -44,6 +44,7 @@ int main (int argc, char *argv [])
     zfile_test (verbose);
     zframe_test (verbose);
     zhash_test (verbose);
+    ztree_test (verbose);
     zlist_test (verbose);
     zloop_test (verbose);
     zmsg_test (verbose);
