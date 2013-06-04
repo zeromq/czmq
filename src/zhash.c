@@ -528,14 +528,14 @@ zhash_autofree (zhash_t *self)
 //  TODO: add unit test for free_fn, foreach
 //
 
-int
+static int
 test_foreach (const char *key, void *item, void *arg)
 {
     assert (NULL != zhash_lookup ((zhash_t*) arg, key));
     return 0;
 }
 
-int
+static int
 test_foreach_error (const char *key, void *item, void *arg)
 {
     return -1;
