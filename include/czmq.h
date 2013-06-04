@@ -50,6 +50,7 @@
 #include "zframe.h"
 #include "zlist.h"
 #include "zhash.h"
+#include "ztree.h"
 #include "zloop.h"
 #include "zmsg.h"
 #include "zmutex.h"
