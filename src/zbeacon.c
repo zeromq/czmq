@@ -407,7 +407,7 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
         //  Poll on API pipe and on UDP socket
         zmq_pollitem_t pollitems [] = {
             { self->pipe, 0, ZMQ_POLLIN, 0 },
-            { 0, self->udpsock, ZMQ_POLLIN, 0 }
+            { NULL, self->udpsock, ZMQ_POLLIN, 0 }
         };
         long timeout = -1;
         if (self->transmit) {
