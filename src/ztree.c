@@ -643,8 +643,10 @@ ztree_dup (ztree_t *self)
         return NULL;
 
     ztree_t *copy = ztree_new (self->compare);
-    if (copy)
+    if (copy) {
+	ztree_autofree (copy);
         ztree_walk (self, s_dupkey, copy);
+    }
 
     return copy;
 }
