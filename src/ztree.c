@@ -22,11 +22,10 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
     =========================================================================
 
-    Derived from Redblack balanced tree algorithm
-    Copyright (C) Damian Ivereigh 2000
-    Licensed GNUL Lesser General Public License (version 2.1 or later).
-*/
+    Derived from Emin Martianan's Red Black which is licensed for free use.
 
+    http://web.mit.edu/~emin/www.old/source_code/red_black_tree/index.html
+*/
 
 /*
 @header
@@ -37,46 +36,27 @@
 
 #include "../include/czmq.h"
 
-/*
-   OK here we go, the balanced tree stuff. The algorithm is the
-   fairly standard red/black taken from "Introduction to Algorithms"
-   by Cormen, Leiserson & Rivest. Maybe one of these days I will
-   fully understand all this stuff.
-  
-   Basically a red/black balanced tree has the following properties:-
-   1) Every node is either red or black (colour is RED or BLACK)
-   2) A leaf (NULL pointer) is considered black
-   3) If a node is red then its children are black
-   4) Every path from a node to a leaf contains the same no
-      of black nodes
-  
-   3) & 4) above guarantee that the longest path (alternating
-   red and black nodes) is only twice as long as the shortest
-   path (all black nodes). Thus the tree remains fairly balanced.
-*/
-
 // Tree node, used internally
 
 typedef struct _node_t {
-    struct _node_t *left, *right, *up;
-    enum nodecolour { black, red } colour;
     char *key;                  //  User's key
     void *value;                //      and datum
+    bool  red;			// if !red then node is black
+    struct _node_t *left, *right, *parent;
     zhash_free_fn *free_fn;     //  Value free function if any
 } node_t;
 
 struct _ztree_t {
-    node_t *root;               //  Red-black tree root
     ztree_compare_fn *compare;  //  Comparison function
-    bool autofree;              //  If true, free values in destructor
+    // A sentinel is used for root and nil.
+    // nil points to anode which should always be black but has
+    // aribtrary children and parent and no key or value.
+    // The point of using these sentinels is so that the root
+    // and nil nodes do not require special cases in the code
+    node_t root;                //  Red-black tree root
+    node_t nil;			//  See above
+    bool autofree;              //  If true, free value in destructor
 };
-
-// Dummy (sentinel) node, so that we can make X->left->up = X
-// We then use this instead of NULL to mean the top or bottom
-// end of the rb tree. It is a black node.
-
-static node_t s_null = { .colour = black };
-#define ZTNULL (&s_null)
 
 //  --------------------------------------------------------------------------
 //  Tree constructor
@@ -85,12 +65,21 @@ ztree_t *
 ztree_new (ztree_compare_fn *compare)
 {
     assert (compare);
-    
-    ztree_t *self = (ztree_t *) zmalloc (sizeof (ztree_t));
-    if (self) {
-        self->compare = compare;
-        self->root = ZTNULL;
-    }
+
+    ztree_t *self = zmalloc (sizeof (ztree_t));
+    if (!self)
+	return NULL;
+
+    self->compare = compare;
+
+    node_t *nil = &self->nil;
+    nil->parent = nil->left = nil->right = nil;
+    nil->red = false;
+
+    node_t *root = &self->root;
+    root->parent = root->left = root->right = nil;
+    root->red = false;
+
     return self;
 }
 
@@ -109,7 +98,7 @@ s_free_value (ztree_t *self, node_t *x)
 static void
 s_destroy (ztree_t *self, node_t *x)
 {
-    if (x == ZTNULL)
+    if (x == &self->nil)
         return;
 
     s_destroy (self, x->left);
@@ -129,219 +118,181 @@ ztree_destroy (ztree_t **self_p)
     assert (self_p);
     if (*self_p) {
         ztree_t *self = *self_p;
-        s_destroy (self, self->root);
+        s_destroy (self, self->root.left);
         free (self);
         *self_p = NULL;
     }
 }
 
-/*  Local helper function
-  
-   Rotate our tree thus:-
-  
-               X        rb_left_rotate (X)--->            Y
-             /   \                                     /   \
-            A     Y     <---rb_right_rotate (Y)        X     C
-                /   \                               /   \
-               B     C                             A     B
-  
-   N.B. This does not change the ordering.
-  
-   We assume that neither X or Y is NULL
-*/
+// Rotates as described in _Introduction_To_Algorithms by
+// Cormen, Leiserson, Rivest (Chapter 14).  Basically this
+// makes the parent of x be to the left of x, x the parent of
+// its parent before the rotation and fixes other pointers accordingly.
 
 static void
 s_left_rotate (ztree_t *tree, node_t *x)
 {
     node_t *y;
+    node_t *nil = &tree->nil;
 
-    assert (x != ZTNULL);
-    assert (x->right != ZTNULL);
+    //  I originally wrote this function to use the sentinel for
+    //  nil to avoid checking for nil.  However this introduces a
+    //  very subtle bug because sometimes this function modifies
+    //  the parent pointer of nil.  This can be a problem if a
+    //  function which calls LeftRotate also uses the nil sentinel
+    //  and expects the nil sentinel's parent pointer to be unchanged
+    //  after calling this function.  For example, when RBDeleteFixUP
+    //  calls LeftRotate it expects the parent pointer of nil to be
+    //  unchanged.
 
-    y = x->right; // set Y 
-
-    // Turn Y's left subtree into X's right subtree (move B)
+    y = x->right;
     x->right = y->left;
 
-    // If B is not null, set it's parent to be X 
-    if (y->left != ZTNULL)
-        y->left->up = x;
+    if (y->left != nil)
+	y->left->parent=x;
 
-    // Set Y's parent to be what X's parent was 
-    y->up = x->up;
+    y->parent = x->parent;
 
-    // if X was the root 
-    if (x->up == ZTNULL)
-        tree->root = y;
-    else {
-        // Set X's parent's left or right pointer to be Y 
-        if (x == x->up->left)
-            x->up->left = y;
-        else
-            x->up->right = y;
-    }
+    // instead of checking if x->parent is the root as in the book, we
+    // count on the root sentinel to implicitly take care of this case
+    if( x == x->parent->left)
+	x->parent->left = y;
+    else
+	x->parent->right = y;
 
-    // Put X on Y's left 
     y->left = x;
+    x->parent = y;
 
-    // Set X's parent to be Y 
-    x->up = y;
+    assert(!tree->nil.red);
 }
 
 static void
 s_right_rotate (ztree_t *tree, node_t *y)
 {
     node_t *x;
+    node_t *nil = &tree->nil;
 
-    assert (y != ZTNULL);
-    assert (y->left != ZTNULL);
-
-    x = y->left; // set X 
-
-    // Turn X's right subtree into Y's left subtree (move B) 
+    x = y->left;
     y->left = x->right;
 
-    // If B is not null, set it's parent to be Y 
-    if (x->right != ZTNULL)
-        x->right->up = y;
+    if (nil != x->right)
+	x->right->parent = y;
 
-    // Set X's parent to be what Y's parent was 
-    x->up = y->up;
+    // instead of checking if x->parent is the root as in the book,
+    // we count on the root sentinel to implicitly take care of this case
+    x->parent = y->parent;
+    if (y == y->parent->left)
+	y->parent->left = x;
+    else
+	y->parent->right = x;
 
-    // if Y was the root 
-    if (y->up == ZTNULL)
-        tree->root = x;
-    else {
-        // Set Y's parent's left or right pointer to be X 
-        if (y == y->up->left)
-            y->up->left = x;
-        else
-            y->up->right = x;
-    }
-    // Put Y on X's right 
     x->right = y;
+    y->parent = x;
 
-    // Set Y's parent to be X 
-    y->up = x;
+  assert(!tree->nil.red);
 }
 
+// Inserts z into the tree as if it were a regular binary tree
+// using the algorithm described in _Introduction_To_Algorithms_
+// by Cormen et al.
+// Returns existing node if key is a duplicate
 
-//  Having added a red node, we must now walk back up the tree balancing
-//  it, by a series of rotations and changing of colours
-
-static void s_insert_color (ztree_t *tree, node_t *x)
+static node_t *s_insert_node (ztree_t *tree, node_t *z)
 {
-    //  While we are not at the top and our parent node is red
-    //  N.B. Since the root node is guaranteed black, then we
-    //  are also going to stop if we are the child of the root
-    
-    while (x != tree->root && x->up->colour == red) {
-        // if our parent is on the left side of our grandparent 
-        if (x->up == x->up->up->left) {
-            // get the right side of our grandparent (uncle?) 
-            node_t *y = x->up->up->right;       // uncle 
-            if (y->colour == red) {
-                x->up->colour = black;          // make our parent black 
-                y->colour = black;              // make our uncle black 
-                x->up->up->colour = red;        // make our grandparent red 
-                x = x->up->up;                  // now consider grandparent 
-                continue;
-            }
-            // if we are on the right side of our parent 
-            if (x == x->up->right) {
-                // Move up to our parent 
-                x = x->up;
-                s_left_rotate (tree, x);
-            }
+    node_t *root = &tree->root;
+    node_t *nil = &tree->nil;
 
-            x->up->colour = black;         // make our parent black 
-            x->up->up->colour = red;        // make our grandparent red 
-            // right rotate our grandparent 
-            s_right_rotate (tree, x->up->up);
-        } 
-        else {
-            // everything here is the same as above, but
-            // exchanging left for right
-            node_t *y = x->up->up->left;
-            if (y->colour == red) {
-                x->up->colour = black;
-                y->colour = black;
-                x->up->up->colour = red;
-                x = x->up->up;
-                continue;
-            }
-            if (x == x->up->left) {
-                x = x->up;
-                s_right_rotate (tree, x);
-            }
-            x->up->colour = black;
-            x->up->up->colour = red;
-            s_left_rotate (tree, x->up->up);
-        }
+    z->left = z->right = nil;
+
+    node_t *y = root;
+    node_t *x = root->left;
+    while (x != nil) {
+	y = x;
+	int cmp = tree->compare (x->key, z->key);
+
+	// do not allow duplicate keys
+	if (cmp == 0)
+	    return x;
+
+	if (cmp > 0) // x.key > z.key
+	    x = x->left;
+	else // x,key <= z.key
+	    x = x->right;
     }
-    tree->root->colour = black; // Set the root node black 
+
+    z->parent = y;
+    if ( y == root ||
+	 tree->compare (y->key, z->key) > 0) // y.key > z.key
+	y->left = z;
+    else
+	y->right = z;
+
+    assert(!tree->nil.red);
+    return NULL;
 }
 
-// Local function to traverse tree and optionally insert new node
-enum insert_action { none, insert, replace };
+// Recolor the binary tree after insertion of node x
+
+static void s_insert_recolor (ztree_t *tree, node_t *x)
+{
+    while (x->parent->red) { // use sentinel instead of checking for root
+	if (x->parent == x->parent->parent->left) {
+	    node_t *y = x->parent->parent->right;
+	    if (y->red) {
+		x->parent->red = false;
+		y->red = false;
+		x->parent->parent->red = true;
+		x = x->parent->parent;
+	    } else {
+		if (x == x->parent->right) {
+		    x = x->parent;
+		    s_left_rotate (tree, x);
+		}
+
+		x->parent->red = false;
+		x->parent->parent->red = true;
+		s_right_rotate (tree, x->parent->parent);
+	    }
+	} else { //case for x->parent == x->parent->parent->right
+	    node_t *y = x->parent->parent->left;
+	    if (y->red) {
+		x->parent->red = false;
+		y->red = false;
+		x->parent->parent->red = true;
+		x = x->parent->parent;
+	    } else {
+		if (x == x->parent->left) {
+		    x = x->parent;
+		    s_right_rotate (tree,x);
+		}
+		x->parent->red = false;
+		x->parent->parent->red = true;
+		s_left_rotate (tree,x->parent->parent);
+	    }
+	}
+    }
+    tree->root.left->red = false;
+
+    assert(!tree->nil.red);
+    assert(!tree->root.red);
+}
+
+// returns the a node with key equal to q.
 
 static node_t *
-s_traverse (ztree_t *tree, const char *key, void *value,
-            enum insert_action action)
+s_lookup (ztree_t *tree, const char *q)
 {
-    ztree_compare_fn *compare = tree->compare;
-    node_t *x, *y;
+    node_t *nil = &tree->nil;
+    node_t *x = tree->root.left;
 
-    x = tree->root;
-    y = ZTNULL;
-    while (x != ZTNULL) {
-        y = x;
-
-        int cmp = compare (key, x->key);
-        if (cmp < 0)
-            x = x->left;
-        else 
-        if (cmp > 0)
-            x = x->right;
-        else {
-            switch (action) {
-                case none:
-                    return x;
-                case insert:
-                    return NULL;
-                case replace:
-                    s_free_value (tree, x);
-                    x->value = value;
-                    return x;
-            }
-        }
+    while (x != nil) {
+	    int cmp = tree->compare (x->key, q);
+	    if (cmp == 0)
+		    break;
+	    x = cmp > 0 ? x->left : x->right;
     }
-    if (action == none)
-        return NULL;        // not found
 
-    node_t *z = zmalloc (sizeof (node_t));
-    if (!z)
-        return NULL; // no memory
-
-    if (tree->autofree)
-        value = strdup ((char *) value);
-
-    z->key = strdup (key);
-    z->value = value;
-    z->left = z->right = ZTNULL;
-    z->up = y;
-    z->colour = red;
-
-    if (y == ZTNULL)
-        tree->root = z;
-    else {
-        if (compare (z->key, y->key) < 0)
-            y->left = z;
-        else
-            y->right = z;
-    }
-    s_insert_color (tree, z);
-    return z;
+    return x;
 }
 
 //  --------------------------------------------------------------------------
@@ -355,7 +306,29 @@ ztree_insert (ztree_t *self, const char *key, void *value)
     assert (self);
     assert (key);
 
-    return s_traverse (self, key, value, insert) ? 0 : -1;
+    node_t *x = zmalloc (sizeof (node_t));
+    if (!x)
+        return -1;
+
+    //  If necessary, take duplicate of item (string) value
+    if (self->autofree)
+        value = strdup ((char *) value);
+
+    x->key = strdup (key);
+    x->value = value;
+    x->red = true;
+
+    // unwind if duplicate node
+    if (s_insert_node (self, x)) {
+	free (x->key);
+	if (self->autofree)
+	    free (value);
+	free (x);
+	return -1;
+    }
+
+    s_insert_recolor (self, x);
+    return 0;
 }
 
 //  --------------------------------------------------------------------------
@@ -369,137 +342,173 @@ ztree_update (ztree_t *self, const char *key, void *value)
     assert (self);
     assert (key);
 
-    s_traverse (self, key, value, replace);
+    node_t *x = zmalloc (sizeof (node_t));
+    if (!x)
+        return;
+
+    //  If necessary, take duplicate of item (string) value
+    if (self->autofree)
+            value = strdup ((char *) value);
+
+    x->key = strdup (key);
+    x->value = value;
+    x->red = true;
+
+    node_t *y = s_insert_node (self, x);
+    if (y) {
+	s_free_value (self, y);
+	y->value = value;
+	free (x->key);
+	free (x);
+    } else {
+	s_insert_recolor (self, x);
+    }
 }
 
-// Helper to restore the reb-black properties after a delete
-static void
-s_remove_color (ztree_t *self, node_t *x)
+// Performs rotations and changes colors to restore red-black
+// properties after a node is deleted
+
+static void s_delete_fix (ztree_t *tree, node_t *x)
 {
+    node_t *root = tree->root.left;
 
-    while (x != self->root && x->colour == black) {
-        if (x == x->up->left) {
-            node_t *w = x->up->right;
-            if (w->colour == red) {
-                w->colour = black;
-                x->up->colour = red;
-                s_left_rotate (self, x->up);
-                w = x->up->right;
-            }
-
-            if (w->left->colour == black && w->right->colour == black) {
-                w->colour = red;
-                x = x->up;
-            } 
-            else {
-                if (w->right->colour == black) {
-                    w->left->colour = black;
-                    w->colour = red;
-                    s_right_rotate (self, w);
-                    w = x->up->right;
-                }
-                w->colour = x->up->colour;
-                x->up->colour = black;
-                w->right->colour = black;
-                s_left_rotate (self, x->up);
-                x = self->root;
-            }
-        } 
-        else {
-            node_t *w = x->up->left;
-            if (w->colour == red) {
-                w->colour = black;
-                x->up->colour = red;
-                s_right_rotate (self, x->up);
-                w = x->up->left;
-            }
-            if (w->left->colour == black && w->right->colour == black) {
-                w->colour = red;
-                x = x->up;
-            } 
-            else {
-                if (w->left->colour == black) {
-                    w->right->colour = black;
-                    w->colour = red;
-                    s_left_rotate (self, w);
-                    w = x->up->left;
-                }
-                w->colour = x->up->colour;
-                x->up->colour = black;
-                w->left->colour = black;
-                s_right_rotate (self, x->up);
-                x = self->root;
-            }
-        }
+    while( (!x->red) && (root != x)) {
+	if (x == x->parent->left) {
+	    node_t *w = x->parent->right;
+	    if (w->red) {
+		w->red = false;
+		x->parent->red = true;
+		s_left_rotate (tree,x->parent);
+		w = x->parent->right;
+	    }
+	    if ( (!w->right->red) && (!w->left->red) ) {
+		w->red = true;
+		x = x->parent;
+	    } else {
+		if (!w->right->red) {
+		    w->left->red = false;
+		    w->red = true;
+		    s_right_rotate (tree,w);
+		    w = x->parent->right;
+		}
+		w->red = x->parent->red;
+		x->parent->red = false;
+		w->right->red = false;
+		s_left_rotate (tree,x->parent);
+		x = root; // this is to exit while loop
+	    }
+	} else { // the code below is has left and right switched from above
+	    node_t *w = x->parent->left;
+	    if (w->red) {
+		w->red = false;
+		x->parent->red = true;
+		s_right_rotate (tree,x->parent);
+		w = x->parent->left;
+	    }
+	    if ( (!w->right->red) && (!w->left->red) ) {
+		w->red = true;
+		x = x->parent;
+	    } else {
+		if (!w->left->red) {
+		    w->right->red = false;
+		    w->red = true;
+		    s_left_rotate (tree,w);
+		    w = x->parent->left;
+		}
+		w->red=x->parent->red;
+		x->parent->red = false;
+		w->left->red = false;
+		s_right_rotate (tree,x->parent);
+		x = root; // this is to exit while loop
+	    }
+	}
     }
-    x->colour = black;
+    x->red = false;
+
+    assert(!tree->nil.red);
 }
 
 // Helper function return a pointer to the smallest key greater than x
 
 static node_t *
-s_successor (const node_t *x)
+s_successor (ztree_t *tree, const node_t *x)
 {
     node_t *y;
+    node_t *nil = &tree->nil;
+    node_t *root = &tree->root;
 
-    if (x->right != ZTNULL) {
-        // If right is not NULL then go right one and then keep going left
-        // until we find a node with no left pointer.
-        for (y = x->right; y->left != ZTNULL; y = y->left)
-            ;
-    } 
-    else {
-        // Go up the tree until we get to a node that is on the
-        // left of its parent (or the root) and then return the  parent.
-        y = x->up;
-        while (y != ZTNULL && x == y->right) {
-            x = y;
-            y = y->up;
-        }
+    if (nil != (y = x->right)) { // assignment to y is intentional
+	while (y->left != nil) { // returns the minium of the right subtree of x
+	    y = y->left;
+	}
+    } else {
+	y = x->parent;
+	while (x == y->right) { // sentinel used instead of checking for nil
+	    x = y;
+	    y = y->parent;
+	}
+
+	if (y == root)
+	    return nil;
     }
+
     return y;
 }
 
 // Helper function to delete node from tree
+//    The algorithm from this function is from _Introduction_To_Algorithms_
 static void
-s_delete (ztree_t *self, node_t *z)
+s_delete (ztree_t *tree, node_t *z)
 {
     node_t *x, *y;
+    node_t *nil = &tree->nil;
+    node_t *root = &tree->root;
 
-    if (z->left == ZTNULL || z->right == ZTNULL)
-        y = z;
+    if (z->left == nil || z->right == nil)
+	y = z;
     else
-        y = s_successor (z);
+	y = s_successor (tree, z);
 
-    if (y->left != ZTNULL)
-        x = y->left;
-    else
-        x = y->right;
+    x = (y->left == nil) ? y->right : y->left;
 
-    x->up = y->up;
-    if (y->up == ZTNULL)
-        self->root = x;
-    else {
-        if (y == y->up->left)
-            y->up->left = x;
-        else
-            y->up->right = x;
+    if (root == (x->parent = y->parent)) { // assignment of y->p to x->p is intentional
+	root->left = x;
+    } else {
+	if (y == y->parent->left)
+	    y->parent->left = x;
+	else
+	    y->parent->right = x;
     }
+
     if (y != z) {
-        free (z->key);
-        s_free_value (self, z);
+	assert(y != &tree->nil);
 
-        z->key = y->key;
-        z->value = y->value;
-    } 
-    else {
-        free (y->key);
-        s_free_value (self, y);
+	// y is the node to splice out and x is its child
+	if (!y->red)
+	    s_delete_fix (tree, x);
+
+	free (z->key);
+	s_free_value (tree, z);
+
+	y->left = z->left;
+	y->right = z->right;
+	y->parent = z->parent;
+	y->red = z->red;
+	z->left->parent = z->right->parent=y;
+	if (z == z->parent->left)
+	    z->parent->left = y;
+	else
+	    z->parent->right = y;
+	free(z);
+    } else {
+	free (y->key);
+	s_free_value (tree, y);
+	if (!y->red)
+	    s_delete_fix (tree, x);
+	free(y);
     }
-    if (y->colour == black)
-        s_remove_color (self, x);
 
-    free (y);
+    assert(!tree->nil.red);
 }
 
 
@@ -513,8 +522,8 @@ ztree_delete (ztree_t *self, const char *key)
     assert (self);
     assert (key);
 
-    node_t *x = s_traverse (self, key, NULL, none);
-    if (x)
+    node_t *x = s_lookup (self, key);
+    if (x != &self->nil)
         s_delete (self, x);
 }
 
@@ -528,8 +537,8 @@ ztree_lookup (ztree_t *self, const char *key)
     assert (self);
     assert (key);
 
-    node_t *n = s_traverse (self, key, NULL, none);
-    return n ? n->value : NULL;
+    node_t *n = s_lookup (self, key);
+    return (n == &self->nil) ? NULL : n->value;
 }
 
 //  --------------------------------------------------------------------------
@@ -549,7 +558,7 @@ ztree_freefn (ztree_t *self, const char *key, ztree_free_fn *free_fn)
     if (x) {
         x->free_fn = free_fn;
         return x->value;
-    } 
+    }
     else
         return NULL;
 }
@@ -557,16 +566,17 @@ ztree_freefn (ztree_t *self, const char *key, ztree_free_fn *free_fn)
 // Local helper function
 // Recursively walk tree, stopping if callback returns non-zero
 
-static int s_walk ( node_t *x, ztree_walk_fn *callback, void *argument)
+static int s_walk (ztree_t *tree, node_t *x,
+		   ztree_walk_fn *callback, void *argument)
 {
-    if (x == ZTNULL)
+    if (x == &tree->nil)
         return 0;        // empty
 
-    int ret = s_walk (x->left, callback, argument);
+    int ret = s_walk (tree, x->left, callback, argument);
     if (ret == 0)
         ret = (*callback) (x->key, x->value, argument);
     if (ret == 0)
-        ret = s_walk (x->right, callback, argument);
+        ret = s_walk (tree, x->right, callback, argument);
     return ret;
 }
 
@@ -580,7 +590,7 @@ int
 ztree_walk (ztree_t *self, ztree_walk_fn *callback, void *argument)
 {
     assert (self);
-    return s_walk (self->root, callback, argument);
+    return s_walk (self, self->root.left, callback, argument);
 }
 
 // Local helper to count nodes
@@ -596,7 +606,7 @@ ztree_size (ztree_t *self)
 {
     assert (self);
     size_t nodes = 0;
-    s_walk (self->root, s_count, &nodes);
+    s_walk (self, self->root.left, s_count, &nodes);
     return nodes;
 }
 
@@ -617,7 +627,7 @@ ztree_keys (ztree_t *self)
     assert (self);
     zlist_t *keys = zlist_new ();
     zlist_autofree (keys);
-    s_walk (self->root, s_addkey, keys);
+    s_walk (self, self->root.left, s_addkey, keys);
     return keys;
 }
 
@@ -673,7 +683,7 @@ ztree_save (ztree_t *self, const char *filename)
     if (!handle)
         return -1;              //  Failed to create file
 
-    s_walk (self->root, s_print, handle);
+    s_walk (self, self->root.left, s_print, handle);
     fclose (handle);
     return 0;
 }
