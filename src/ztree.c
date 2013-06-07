@@ -828,6 +828,18 @@ ztree_test (int verbose)
     assert (value == NULL);
     assert (ztree_size (tree) == 2);
 
+    // Change value of an existing node
+    ztree_update (tree, "ABADCAFE", "A Bad Cafe");
+    value = (char *) ztree_lookup (tree, "ABADCAFE");
+    assert (value != NULL);
+    assert (streq(value, "A Bad Cafe"));
+
+    // Update with non-existant node
+    ztree_update (tree, "C0DEDEBAD", "Coded Bad");
+    value = (char *) ztree_lookup (tree, "C0DEDEBAD");
+    assert (value);
+    assert (streq(value, "Coded Bad"));
+
     //  Check that the queue is robust against random usage
     struct {
         char name [100];
