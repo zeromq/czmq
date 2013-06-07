@@ -662,7 +662,7 @@ static int s_print (const char *key, void *value, void *arg)
 
 //  --------------------------------------------------------------------------
 //  Save tree to a text file in name=value format
-//  Hash values must be printable strings; keys may not contain '=' character
+//  Values must be printable strings; keys may not contain '=' character
 //  Returns 0 if OK, else -1 if a file error occurred
 
 int
@@ -679,8 +679,8 @@ ztree_save (ztree_t *self, const char *filename)
 }
 
 //  --------------------------------------------------------------------------
-//  Load hash table from a text file in name=value format; hash table must
-//  already exist. Hash values must printable strings; keys may not contain
+//  Load tree from a text file in name=value format; tree must
+//  already exist. Values must printable strings; keys may not contain
 //  '=' character. Returns 0 if OK, else -1 if a file was not readable.
 
 int
