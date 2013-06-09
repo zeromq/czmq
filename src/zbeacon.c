@@ -56,6 +56,7 @@
 #endif
 
 #if defined (__UTYPE_SUNSOLARIS) || defined (__UTYPE_SUNOS)
+#   include <ifaddrs.h>
 #   include <sys/sockio.h>
 #endif
 
