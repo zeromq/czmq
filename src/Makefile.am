@@ -42,7 +42,7 @@ libczmq_la_SOURCES = \
     zthread.c \
     ztree.c
 
-CFLAGS = -g
+AM_CFLAGS = -g
 
 INCLUDES = -I$(top_srcdir)/include
 bin_PROGRAMS = czmq_selftest

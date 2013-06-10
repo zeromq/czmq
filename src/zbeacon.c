@@ -56,6 +56,7 @@
 #endif
 
 #if defined (__UTYPE_SUNSOLARIS) || defined (__UTYPE_SUNOS)
+#   include <ifaddrs.h>
 #   include <sys/sockio.h>
 #endif
 
@@ -552,7 +553,8 @@ s_get_interface (agent_t *self)
         struct ifaddrs *interface = interfaces;
         while (interface) {
             //  Hopefully the last interface will be WiFi or Ethernet
-            if (interface->ifa_addr &&
+            if (interface->ifa_addr && 
+                interface->ifa_broadaddr && // on Solaris, loopback interfaces have a NULL in ifa_broadaddr
                 (interface->ifa_addr->sa_family == AF_INET)) {
                 self->address = *(inaddr_t *) interface->ifa_addr;
                 self->broadcast = *(inaddr_t *) interface->ifa_broadaddr;
