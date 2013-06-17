@@ -21,7 +21,8 @@ include_HEADERS = \
     ../include/zsockopt.h \
     ../include/zstr.h \
     ../include/zsys.h \
-    ../include/zthread.h
+    ../include/zthread.h \
+    ../include/ztree.h
 
 libczmq_la_SOURCES = \
     zbeacon.c \
