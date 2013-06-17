@@ -44,7 +44,12 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zbeacon_unsubscribe (zbeacon_t *self);
 
+//  Get beacon ZeroMQ socket, for polling or receiving messages
+CZMQ_EXPORT void *
+    zbeacon_socket (zbeacon_t *self);
+
 //  Get beacon pipe, for polling or receiving messages
+//  DEPRECATED
 CZMQ_EXPORT void *
     zbeacon_pipe (zbeacon_t *self);
 
@@ -56,7 +61,7 @@ CZMQ_EXPORT void
 DESCRIPTION
 -----------
 
-The zbeacon module implements a peer-to-peer discovery service for local
+The zbeacon class implements a peer-to-peer discovery service for local
 networks. A beacon can broadcast and/or capture service announcements
 using UDP messages on the local area network. This implementation uses
 IPv4 UDP broadcasts. You can define the format of your outgoing beacons,
@@ -72,6 +77,39 @@ EXAMPLE
 -------
 .From zbeacon_test method
 ----
+    //  Basic test: create a service and announce it
+    zctx_t *ctx = zctx_new ();
+
+    //  Create a service socket and bind to an ephemeral port
+    void *service = zsocket_new (ctx, ZMQ_PUB);
+    int port_nbr = zsocket_bind (service, "tcp://*:*");
+    
+    //  Create beacon to broadcast our service
+    byte announcement [2] = { (port_nbr >> 8) & 0xFF, port_nbr & 0xFF };
+    zbeacon_t *service_beacon = zbeacon_new (9999);
+    zbeacon_set_interval (service_beacon, 100);
+    zbeacon_publish (service_beacon, announcement, 2);
+
+    //  Create beacon to lookup service
+    zbeacon_t *client_beacon = zbeacon_new (9999);
+    zbeacon_subscribe (client_beacon, NULL, 0);
+
+    //  Wait for at most 1/2 second if there's no broadcast networking
+    zsocket_set_rcvtimeo (zbeacon_socket (client_beacon), 500);
+
+    char *ipaddress = zstr_recv (zbeacon_socket (client_beacon));
+    if (ipaddress) {
+        zframe_t *content = zframe_recv (zbeacon_socket (client_beacon));
+        int received_port = (zframe_data (content) [0] << 8)
+                        +  zframe_data (content) [1];
+        assert (received_port == port_nbr);
+        zframe_destroy (&content);
+        free (ipaddress);
+    }
+    zbeacon_destroy (&client_beacon);
+    zbeacon_destroy (&service_beacon);
+    zctx_destroy (&ctx);
+    
     zbeacon_t *node1 = zbeacon_new (5670);
     zbeacon_t *node2 = zbeacon_new (5670);
     zbeacon_t *node3 = zbeacon_new (5670);
@@ -91,9 +129,9 @@ EXAMPLE
 
     //  Poll on API pipe and on UDP socket
     zmq_pollitem_t pollitems [] = {
-        { zbeacon_pipe (node1), 0, ZMQ_POLLIN, 0 },
-        { zbeacon_pipe (node2), 0, ZMQ_POLLIN, 0 },
-        { zbeacon_pipe (node3), 0, ZMQ_POLLIN, 0 }
+        { zbeacon_socket (node1), 0, ZMQ_POLLIN, 0 },
+        { zbeacon_socket (node2), 0, ZMQ_POLLIN, 0 },
+        { zbeacon_socket (node3), 0, ZMQ_POLLIN, 0 }
     };
     uint64_t stop_at = zclock_time () + 1000;
     while (zclock_time () < stop_at) {
@@ -109,8 +147,8 @@ EXAMPLE
 
         //  If we get a message on node 1, it must be NODE/2
         if (pollitems [0].revents & ZMQ_POLLIN) {
-            char *ipaddress = zstr_recv (zbeacon_pipe (node1));
-            char *beacon = zstr_recv (zbeacon_pipe (node1));
+            char *ipaddress = zstr_recv (zbeacon_socket (node1));
+            char *beacon = zstr_recv (zbeacon_socket (node1));
             assert (streq (beacon, "NODE/2"));
             free (ipaddress);
             free (beacon);
