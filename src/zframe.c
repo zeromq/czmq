@@ -308,13 +308,29 @@ zframe_streq (zframe_t *self, const char *string)
 
 //  --------------------------------------------------------------------------
 //  Return frame MORE indicator (1 or 0), set when reading frame from socket
+//  or by the zframe_set_more() method.
 
 int
-zframe_more (const zframe_t *self)
+zframe_more (zframe_t *self)
 {
     assert (self);
     return self->more;
 }
+
+//  --------------------------------------------------------------------------
+//  Set frame MORE indicator (1 or 0). Note this is NOT used when sending 
+//  frame to socket, you have to specify flag explicitly.
+
+void
+zframe_set_more (zframe_t *self, int more)
+{
+    assert (self);
+    assert (more == 0 || more == 1);
+    self->more = more;
+}
+
+
+
 
 // --------------------------------------------------------------------------
 //  Return frame zero copy indicator (1 or 0)
@@ -503,6 +519,8 @@ zframe_test (bool verbose)
             break;
         }
         assert (zframe_more (frame));
+        zframe_set_more (frame, 0);
+        assert (zframe_more (frame) == 0);
         zframe_destroy (&frame);
     }
     assert (frame_nbr == 10);
