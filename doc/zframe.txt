@@ -64,10 +64,16 @@ CZMQ_EXPORT char *
 CZMQ_EXPORT bool
     zframe_streq (zframe_t *self, const char *string);
 
-//  Return frame 'more' property
+//  Return frame MORE indicator (1 or 0), set when reading frame from socket
+//  or by the zframe_set_more() method
 CZMQ_EXPORT int
-    zframe_more (const zframe_t *self);
+    zframe_more (zframe_t *self);
 
+//  Set frame MORE indicator (1 or 0). Note this is NOT used when sending 
+//  frame to socket, you have to specify flag explicitly.
+CZMQ_EXPORT void
+    zframe_set_more (zframe_t *self, int more);
+    
 //  Return TRUE if two frames have identical size and data
 //  If either frame is NULL, equality is always false.
 CZMQ_EXPORT bool
@@ -183,6 +189,8 @@ EXAMPLE
             break;
         }
         assert (zframe_more (frame));
+        zframe_set_more (frame, 0);
+        assert (zframe_more (frame) == 0);
         zframe_destroy (&frame);
     }
     assert (frame_nbr == 10);
