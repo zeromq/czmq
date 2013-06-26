@@ -365,14 +365,14 @@ zframe_eq (zframe_t *self, zframe_t *other)
 
 
 //  --------------------------------------------------------------------------
-//  Print contents of frame to stderr, prefix is ignored if null.
+//  Print contents of frame to FILE stream, prefix is ignored if null.
 
 void
-zframe_print (zframe_t *self, const char *prefix)
+zframe_print_to_stream (zframe_t *self, const char *prefix, FILE *file)
 {
     assert (self);
     if (prefix)
-        fprintf (stderr, "%s", prefix);
+        fprintf (file, "%s", prefix);
     byte *data = zframe_data (self);
     size_t size = zframe_size (self);
 
@@ -382,7 +382,7 @@ zframe_print (zframe_t *self, const char *prefix)
         if (data [char_nbr] < 9 || data [char_nbr] > 127)
             is_bin = 1;
 
-    fprintf (stderr, "[%03d] ", (int) size);
+    fprintf (file, "[%03d] ", (int) size);
     size_t max_size = is_bin? 35: 70;
     const char *ellipsis = "";
     if (size > max_size) {
@@ -391,13 +391,22 @@ zframe_print (zframe_t *self, const char *prefix)
     }
     for (char_nbr = 0; char_nbr < size; char_nbr++) {
         if (is_bin)
-            fprintf (stderr, "%02X", (unsigned char) data [char_nbr]);
+            fprintf (file, "%02X", (unsigned char) data [char_nbr]);
         else
-            fprintf (stderr, "%c", data [char_nbr]);
+            fprintf (file, "%c", data [char_nbr]);
     }
-    fprintf (stderr, "%s\n", ellipsis);
+    fprintf (file, "%s\n", ellipsis);
 }
 
+
+//  --------------------------------------------------------------------------
+//  Print contents of frame to stderr, prefix is ignored if null.
+
+void
+zframe_print (zframe_t *self, const char *prefix)
+{
+    zframe_print_to_stream (self, prefix, stderr);
+}
 
 //  --------------------------------------------------------------------------
 //  Set new contents for frame
