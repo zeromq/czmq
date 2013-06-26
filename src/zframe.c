@@ -365,10 +365,10 @@ zframe_eq (zframe_t *self, zframe_t *other)
 
 
 //  --------------------------------------------------------------------------
-//  Print contents of frame to stderr, prefix is ignored if null.
+//  Print contents of frame to FILE stream, prefix is ignored if null.
 
 void
-zframe_print_to_file (zframe_t *self, const char *prefix, FILE *file)
+zframe_print_to_stream (zframe_t *self, const char *prefix, FILE *file)
 {
     assert (self);
     if (prefix)
@@ -405,7 +405,7 @@ zframe_print_to_file (zframe_t *self, const char *prefix, FILE *file)
 void
 zframe_print (zframe_t *self, const char *prefix)
 {
-    zframe_print_to_file (self, prefix, stderr);
+    zframe_print_to_stream (self, prefix, stderr);
 }
 
 //  --------------------------------------------------------------------------
