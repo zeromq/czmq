@@ -651,6 +651,31 @@ zmsg_dup (zmsg_t *self)
 }
 
 
+
+
+//  --------------------------------------------------------------------------
+//  Dump message to File, for debugging and tracing
+//  Truncates to first 10 frames, for readability; this may be unfortunate
+//  when debugging larger and more complex messages. Perhaps a way to hide
+//  repeated lines instead?
+
+void
+zmsg_dump_to_file (zmsg_t *self, FILE *file)
+{
+    fprintf (file, "--------------------------------------\n");
+    if (!self) {
+        fprintf (file, "NULL");
+        return;
+    }
+    zframe_t *frame = zmsg_first (self);
+    int frame_nbr = 0;
+    while (frame && frame_nbr++ < 10) {
+        zframe_print_to_file(frame, "", file);
+        frame = zmsg_next (self);
+    }
+}
+
+
 //  --------------------------------------------------------------------------
 //  Dump message to stderr, for debugging and tracing
 //  Truncates to first 10 frames, for readability; this may be unfortunate
@@ -660,17 +685,7 @@ zmsg_dup (zmsg_t *self)
 void
 zmsg_dump (zmsg_t *self)
 {
-    fprintf (stderr, "--------------------------------------\n");
-    if (!self) {
-        fprintf (stderr, "NULL");
-        return;
-    }
-    zframe_t *frame = zmsg_first (self);
-    int frame_nbr = 0;
-    while (frame && frame_nbr++ < 10) {
-        zframe_print (frame, "");
-        frame = zmsg_next (self);
-    }
+   zmsg_dump_to_file (self, stderr);
 }
 
 
