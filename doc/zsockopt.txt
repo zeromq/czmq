@@ -13,7 +13,6 @@ SYNOPSIS
 CZMQ_EXPORT int zsocket_hwm (void *zocket);
 CZMQ_EXPORT int zsocket_swap (void *zocket);
 CZMQ_EXPORT int zsocket_affinity (void *zocket);
-//  Returns freshly allocated string, free when done
 CZMQ_EXPORT char * zsocket_identity (void *zocket);
 CZMQ_EXPORT int zsocket_rate (void *zocket);
 CZMQ_EXPORT int zsocket_recovery_ivl (void *zocket);
@@ -67,7 +66,6 @@ CZMQ_EXPORT int zsocket_type (void *zocket);
 CZMQ_EXPORT int zsocket_sndhwm (void *zocket);
 CZMQ_EXPORT int zsocket_rcvhwm (void *zocket);
 CZMQ_EXPORT int zsocket_affinity (void *zocket);
-//  Returns freshly allocated string, free when done
 CZMQ_EXPORT char * zsocket_identity (void *zocket);
 CZMQ_EXPORT int zsocket_rate (void *zocket);
 CZMQ_EXPORT int zsocket_recovery_ivl (void *zocket);
@@ -85,7 +83,6 @@ CZMQ_EXPORT int zsocket_ipv4only (void *zocket);
 CZMQ_EXPORT int zsocket_rcvmore (void *zocket);
 CZMQ_EXPORT int zsocket_fd (void *zocket);
 CZMQ_EXPORT int zsocket_events (void *zocket);
-//  Returns freshly allocated string, free when done
 CZMQ_EXPORT char * zsocket_last_endpoint (void *zocket);
 
 //  Set socket options
@@ -118,7 +115,7 @@ void zsocket_set_hwm (void *zocket, int hwm);
 #endif
 
 //  Self test of this class
-CZMQ_EXPORT int zsockopt_test (bool verbose);
+int zsockopt_test (bool verbose);
 ----
 
 DESCRIPTION
