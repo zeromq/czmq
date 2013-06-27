@@ -142,6 +142,10 @@ CZMQ_EXPORT zmsg_t *
 CZMQ_EXPORT zmsg_t *
     zmsg_dup (zmsg_t *self);
 
+//  Print message to FILE stream, for debugging
+CZMQ_EXPORT void
+    zmsg_dump_to_stream (zmsg_t *self, FILE *file);
+
 //  Print message to stderr, for debugging
 CZMQ_EXPORT void
     zmsg_dump (zmsg_t *self);

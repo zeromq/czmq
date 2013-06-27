@@ -12,6 +12,9 @@ SYNOPSIS
 //  We use this when choosing a port for dynamic binding.
 #define ZSOCKET_DYNFROM     0xc000
 #define ZSOCKET_DYNTO       0xffff
+        
+//  Callback function for zero-copy methods
+typedef void (zsocket_free_fn) (void *data, void *arg);
 
 //  Create a new socket within our CZMQ context, replaces zmq_socket.
 //  Use this to get automatic management of the socket at shutdown.
@@ -52,6 +55,20 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT char *
     zsocket_type_str (void *socket);
 
+//  Send data over a socket as a single frame
+//  Returns -1 on error, 0 on success
+CZMQ_EXPORT int
+    zsocket_sendmem (void *socket, const void* data, size_t size, int flags);
+
+//  Send data over a socket as a single frame
+//  Returns -1 on error, 0 on success
+//  DEPRECATED - will be removed for next stable release
+CZMQ_EXPORT int
+    zsocket_sendmem_zero_copy (void *socket, void *data, size_t size, 
+                               zsocket_free_fn *free_fn,
+                               void *hint, int flags);
+
+    
 //  Self test of this class
 CZMQ_EXPORT int
     zsocket_test (bool verbose);
@@ -92,7 +109,8 @@ EXAMPLE
     assert (message);
     assert (streq (message, "HELLO"));
     free (message);
-
+    
+    //  Test binding to ports
     int port = zsocket_bind (writer, "tcp://%s:*", interf);
     assert (port >= ZSOCKET_DYNFROM && port <= ZSOCKET_DYNTO);
 
@@ -100,6 +118,44 @@ EXAMPLE
 
     rc = zsocket_connect (reader, "txp://%s:%d", domain, service);
     assert (rc == -1);
+
+    //  Test sending frames to socket
+    rc = zsocket_sendmem (writer,"ABC", 3, ZFRAME_MORE);
+    assert (rc == 0);
+    rc = zsocket_sendmem (writer, "DEFG", 4, 0);
+    assert (rc == 0);
+    
+    zframe_t *frame = zframe_recv (reader);
+    assert (frame);
+    assert (zframe_streq (frame, "ABC"));
+    assert (zframe_more (frame));
+    zframe_destroy (&frame);
+    
+    frame = zframe_recv (reader);
+    assert (frame);
+    assert (zframe_streq (frame, "DEFG"));
+    assert (!zframe_more (frame));
+    zframe_destroy (&frame);
+
+    //  Test zframe_sendmem_zero_copy
+    rc = zsocket_sendmem_zero_copy (writer, strdup ("ABC"), 3,
+                                    s_test_free_str_cb, NULL, ZFRAME_MORE);
+    assert (rc == 0);
+    rc = zsocket_sendmem_zero_copy (writer, strdup ("DEFG"), 4,
+                                    s_test_free_str_cb, NULL, 0);
+    assert (rc == 0);
+    
+    frame = zframe_recv (reader);
+    assert (frame);
+    assert (zframe_streq (frame, "ABC"));
+    assert (zframe_more (frame));
+    zframe_destroy (&frame);
+    
+    frame = zframe_recv (reader);
+    assert (frame);
+    assert (zframe_streq (frame, "DEFG"));
+    assert (!zframe_more (frame));
+    zframe_destroy (&frame);
 
     zsocket_destroy (ctx, writer);
     zctx_destroy (&ctx);
