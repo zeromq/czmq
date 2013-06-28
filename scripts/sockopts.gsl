@@ -206,6 +206,8 @@ zsocket_set_$(name) (void *zocket, $(ctype_const) $(name))
 .           else
     int rc = zmq_setsockopt (zocket, ZMQ_$(NAME), $(name), strlen ($(name)));
 .           endif
+    if (rc)
+        puts (strerror (errno));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -282,6 +284,9 @@ zsockopt_test (bool verbose)
 .       if defined (.minor)
 #   if (ZMQ_VERSION_MINOR == $(minor))
 .       endif
+.       if defined (.ifdef)
+#     if defined ($(ifdef:))
+.       endif
 #       if defined (ZMQ_$(NAME))
     zocket = zsocket_new (ctx, ZMQ_$(TEST));
     assert (zocket);
@@ -292,7 +297,7 @@ zsockopt_test (bool verbose)
     assert (zsocket_$(name) (zocket) == 1);
 .               endif
 .           else
-    zsocket_set_$(name) (zocket, "test");
+    zsocket_set_$(name) (zocket, "$(test_value?'test':)");
 .           endif
 .       endif
 .       if mode = "rw" | mode = "r"
@@ -306,6 +311,9 @@ zsockopt_test (bool verbose)
 .       endif
     zsocket_destroy (ctx, zocket);
 #       endif
+.       if defined (.ifdef)
+#     endif
+.       endif
 .       if defined (.minor)
 #   endif
 .       endif
