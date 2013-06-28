@@ -51,7 +51,7 @@ zsocket_set_hwm (void *zocket, int hwm)
 #   if defined (ZMQ_HWM)
     uint64_t value = hwm;
     int rc = zmq_setsockopt (zocket, ZMQ_HWM, &value, sizeof (uint64_t));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -82,7 +82,7 @@ zsocket_set_swap (void *zocket, int swap)
 #   if defined (ZMQ_SWAP)
     int64_t value = swap;
     int rc = zmq_setsockopt (zocket, ZMQ_SWAP, &value, sizeof (int64_t));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -113,7 +113,7 @@ zsocket_set_affinity (void *zocket, int affinity)
 #   if defined (ZMQ_AFFINITY)
     uint64_t value = affinity;
     int rc = zmq_setsockopt (zocket, ZMQ_AFFINITY, &value, sizeof (uint64_t));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -143,7 +143,7 @@ zsocket_set_identity (void *zocket, const char * identity)
 {
 #   if defined (ZMQ_IDENTITY)
     int rc = zmq_setsockopt (zocket, ZMQ_IDENTITY, identity, strlen (identity));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -174,7 +174,7 @@ zsocket_set_rate (void *zocket, int rate)
 #   if defined (ZMQ_RATE)
     int64_t value = rate;
     int rc = zmq_setsockopt (zocket, ZMQ_RATE, &value, sizeof (int64_t));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -205,7 +205,7 @@ zsocket_set_recovery_ivl (void *zocket, int recovery_ivl)
 #   if defined (ZMQ_RECOVERY_IVL)
     int64_t value = recovery_ivl;
     int rc = zmq_setsockopt (zocket, ZMQ_RECOVERY_IVL, &value, sizeof (int64_t));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -236,7 +236,7 @@ zsocket_set_recovery_ivl_msec (void *zocket, int recovery_ivl_msec)
 #   if defined (ZMQ_RECOVERY_IVL_MSEC)
     int64_t value = recovery_ivl_msec;
     int rc = zmq_setsockopt (zocket, ZMQ_RECOVERY_IVL_MSEC, &value, sizeof (int64_t));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -267,7 +267,7 @@ zsocket_set_mcast_loop (void *zocket, int mcast_loop)
 #   if defined (ZMQ_MCAST_LOOP)
     int64_t value = mcast_loop;
     int rc = zmq_setsockopt (zocket, ZMQ_MCAST_LOOP, &value, sizeof (int64_t));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -298,7 +298,7 @@ zsocket_set_rcvtimeo (void *zocket, int rcvtimeo)
 {
 #   if defined (ZMQ_RCVTIMEO)
     int rc = zmq_setsockopt (zocket, ZMQ_RCVTIMEO, &rcvtimeo, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -330,7 +330,7 @@ zsocket_set_sndtimeo (void *zocket, int sndtimeo)
 {
 #   if defined (ZMQ_SNDTIMEO)
     int rc = zmq_setsockopt (zocket, ZMQ_SNDTIMEO, &sndtimeo, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -362,7 +362,7 @@ zsocket_set_sndbuf (void *zocket, int sndbuf)
 #   if defined (ZMQ_SNDBUF)
     uint64_t value = sndbuf;
     int rc = zmq_setsockopt (zocket, ZMQ_SNDBUF, &value, sizeof (uint64_t));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -393,7 +393,7 @@ zsocket_set_rcvbuf (void *zocket, int rcvbuf)
 #   if defined (ZMQ_RCVBUF)
     uint64_t value = rcvbuf;
     int rc = zmq_setsockopt (zocket, ZMQ_RCVBUF, &value, sizeof (uint64_t));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -423,7 +423,7 @@ zsocket_set_linger (void *zocket, int linger)
 {
 #   if defined (ZMQ_LINGER)
     int rc = zmq_setsockopt (zocket, ZMQ_LINGER, &linger, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -453,7 +453,7 @@ zsocket_set_reconnect_ivl (void *zocket, int reconnect_ivl)
 {
 #   if defined (ZMQ_RECONNECT_IVL)
     int rc = zmq_setsockopt (zocket, ZMQ_RECONNECT_IVL, &reconnect_ivl, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -483,7 +483,7 @@ zsocket_set_reconnect_ivl_max (void *zocket, int reconnect_ivl_max)
 {
 #   if defined (ZMQ_RECONNECT_IVL_MAX)
     int rc = zmq_setsockopt (zocket, ZMQ_RECONNECT_IVL_MAX, &reconnect_ivl_max, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -513,7 +513,7 @@ zsocket_set_backlog (void *zocket, int backlog)
 {
 #   if defined (ZMQ_BACKLOG)
     int rc = zmq_setsockopt (zocket, ZMQ_BACKLOG, &backlog, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -547,7 +547,7 @@ zsocket_set_subscribe (void *zocket, const char * subscribe)
         assert (false);
     }
     int rc = zmq_setsockopt (zocket, ZMQ_SUBSCRIBE, subscribe, strlen (subscribe));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -565,7 +565,7 @@ zsocket_set_unsubscribe (void *zocket, const char * unsubscribe)
         assert (false);
     }
     int rc = zmq_setsockopt (zocket, ZMQ_UNSUBSCRIBE, unsubscribe, strlen (unsubscribe));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -662,7 +662,7 @@ zsocket_set_sndhwm (void *zocket, int sndhwm)
 {
 #   if defined (ZMQ_SNDHWM)
     int rc = zmq_setsockopt (zocket, ZMQ_SNDHWM, &sndhwm, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -692,7 +692,7 @@ zsocket_set_rcvhwm (void *zocket, int rcvhwm)
 {
 #   if defined (ZMQ_RCVHWM)
     int rc = zmq_setsockopt (zocket, ZMQ_RCVHWM, &rcvhwm, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -723,7 +723,7 @@ zsocket_set_affinity (void *zocket, int affinity)
 #   if defined (ZMQ_AFFINITY)
     uint64_t value = affinity;
     int rc = zmq_setsockopt (zocket, ZMQ_AFFINITY, &value, sizeof (uint64_t));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -757,7 +757,7 @@ zsocket_set_subscribe (void *zocket, const char * subscribe)
         assert (false);
     }
     int rc = zmq_setsockopt (zocket, ZMQ_SUBSCRIBE, subscribe, strlen (subscribe));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -775,7 +775,7 @@ zsocket_set_unsubscribe (void *zocket, const char * unsubscribe)
         assert (false);
     }
     int rc = zmq_setsockopt (zocket, ZMQ_UNSUBSCRIBE, unsubscribe, strlen (unsubscribe));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -796,7 +796,7 @@ zsocket_set_identity (void *zocket, const char * identity)
         assert (false);
     }
     int rc = zmq_setsockopt (zocket, ZMQ_IDENTITY, identity, strlen (identity));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -826,7 +826,7 @@ zsocket_set_rate (void *zocket, int rate)
 {
 #   if defined (ZMQ_RATE)
     int rc = zmq_setsockopt (zocket, ZMQ_RATE, &rate, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -856,7 +856,7 @@ zsocket_set_recovery_ivl (void *zocket, int recovery_ivl)
 {
 #   if defined (ZMQ_RECOVERY_IVL)
     int rc = zmq_setsockopt (zocket, ZMQ_RECOVERY_IVL, &recovery_ivl, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -886,7 +886,7 @@ zsocket_set_sndbuf (void *zocket, int sndbuf)
 {
 #   if defined (ZMQ_SNDBUF)
     int rc = zmq_setsockopt (zocket, ZMQ_SNDBUF, &sndbuf, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -916,7 +916,7 @@ zsocket_set_rcvbuf (void *zocket, int rcvbuf)
 {
 #   if defined (ZMQ_RCVBUF)
     int rc = zmq_setsockopt (zocket, ZMQ_RCVBUF, &rcvbuf, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -946,7 +946,7 @@ zsocket_set_linger (void *zocket, int linger)
 {
 #   if defined (ZMQ_LINGER)
     int rc = zmq_setsockopt (zocket, ZMQ_LINGER, &linger, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -976,7 +976,7 @@ zsocket_set_reconnect_ivl (void *zocket, int reconnect_ivl)
 {
 #   if defined (ZMQ_RECONNECT_IVL)
     int rc = zmq_setsockopt (zocket, ZMQ_RECONNECT_IVL, &reconnect_ivl, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -1006,7 +1006,7 @@ zsocket_set_reconnect_ivl_max (void *zocket, int reconnect_ivl_max)
 {
 #   if defined (ZMQ_RECONNECT_IVL_MAX)
     int rc = zmq_setsockopt (zocket, ZMQ_RECONNECT_IVL_MAX, &reconnect_ivl_max, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -1036,7 +1036,7 @@ zsocket_set_backlog (void *zocket, int backlog)
 {
 #   if defined (ZMQ_BACKLOG)
     int rc = zmq_setsockopt (zocket, ZMQ_BACKLOG, &backlog, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -1067,7 +1067,7 @@ zsocket_set_maxmsgsize (void *zocket, int maxmsgsize)
 #   if defined (ZMQ_MAXMSGSIZE)
     int64_t value = maxmsgsize;
     int rc = zmq_setsockopt (zocket, ZMQ_MAXMSGSIZE, &value, sizeof (int64_t));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -1097,7 +1097,7 @@ zsocket_set_multicast_hops (void *zocket, int multicast_hops)
 {
 #   if defined (ZMQ_MULTICAST_HOPS)
     int rc = zmq_setsockopt (zocket, ZMQ_MULTICAST_HOPS, &multicast_hops, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -1127,7 +1127,7 @@ zsocket_set_rcvtimeo (void *zocket, int rcvtimeo)
 {
 #   if defined (ZMQ_RCVTIMEO)
     int rc = zmq_setsockopt (zocket, ZMQ_RCVTIMEO, &rcvtimeo, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -1157,7 +1157,7 @@ zsocket_set_sndtimeo (void *zocket, int sndtimeo)
 {
 #   if defined (ZMQ_SNDTIMEO)
     int rc = zmq_setsockopt (zocket, ZMQ_SNDTIMEO, &sndtimeo, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -1187,7 +1187,7 @@ zsocket_set_ipv4only (void *zocket, int ipv4only)
 {
 #   if defined (ZMQ_IPV4ONLY)
     int rc = zmq_setsockopt (zocket, ZMQ_IPV4ONLY, &ipv4only, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -1217,7 +1217,7 @@ zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect)
 {
 #   if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
     int rc = zmq_setsockopt (zocket, ZMQ_DELAY_ATTACH_ON_CONNECT, &delay_attach_on_connect, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -1235,7 +1235,7 @@ zsocket_set_router_mandatory (void *zocket, int router_mandatory)
         assert (false);
     }
     int rc = zmq_setsockopt (zocket, ZMQ_ROUTER_MANDATORY, &router_mandatory, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -1253,7 +1253,7 @@ zsocket_set_router_raw (void *zocket, int router_raw)
         assert (false);
     }
     int rc = zmq_setsockopt (zocket, ZMQ_ROUTER_RAW, &router_raw, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -1271,7 +1271,7 @@ zsocket_set_xpub_verbose (void *zocket, int xpub_verbose)
         assert (false);
     }
     int rc = zmq_setsockopt (zocket, ZMQ_XPUB_VERBOSE, &xpub_verbose, sizeof (int));
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
