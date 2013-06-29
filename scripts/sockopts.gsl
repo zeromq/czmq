@@ -206,7 +206,7 @@ zsocket_set_$(name) (void *zocket, $(ctype_const) $(name))
 .           else
     int rc = zmq_setsockopt (zocket, ZMQ_$(NAME), $(name), strlen ($(name)));
 .           endif
-    assert (rc == 0 || errno == ETERM);
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 

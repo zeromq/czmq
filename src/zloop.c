@@ -357,7 +357,8 @@ zloop_start (zloop_t *self)
                        s_tickless_timer (self) * ZMQ_POLL_MSEC);
         if (rc == -1 || zctx_interrupted) {
             if (self->verbose)
-                zclock_log ("I: zloop: interrupted (%d) - %s", rc, strerror (errno));
+                zclock_log ("I: zloop: interrupted (%d) - %s", rc, 
+                            strerror (zmq_errno ()));
             rc = 0;
             break;              //  Context has been shut down
         }
@@ -392,7 +393,7 @@ zloop_start (zloop_t *self)
                         poller->item.socket?
                             zsocket_type_str (poller->item.socket): "FD",
                         poller->item.socket, poller->item.fd,
-                        strerror (errno));
+                        strerror (zmq_errno ()));
                 //  Give handler one chance to handle error, then kill
                 //  poller because it'll disrupt the reactor otherwise.
                 if (poller->errors++) {
