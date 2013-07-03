@@ -159,10 +159,10 @@ zsocket_type_str (void *self)
     char *type_name [] = {
         "PAIR", "PUB", "SUB", "REQ", "REP",
         "DEALER", "ROUTER", "PULL", "PUSH",
-        "XPUB", "XSUB"
+        "XPUB", "XSUB", "STREAM"
     };
     int type = zsockopt_type (self);
-    if (type < 0 || type > ZMQ_XSUB)
+    if (type < 0 || type > ZMQ_STREAM)
         return "UNKNOWN";
     else
         return type_name [type];
