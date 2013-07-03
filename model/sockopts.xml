@@ -65,13 +65,13 @@
                 ifdef = "HAVE_LIBSODIUM" />
         <option name = "curve_publickey"   type = "blob"   mode = "rw" test = "PUB" 
                 ifdef = "HAVE_LIBSODIUM" 
-                test_value = "00000000000000000000000000000000" />
+                test_value = "Yne@$w-vo<fVvi]a<NY6T1ed:M$fCG*[IaLV{hID" />
         <option name = "curve_secretkey"   type = "blob"   mode = "rw" test = "PUB" 
                 ifdef = "HAVE_LIBSODIUM" 
-                test_value = "00000000000000000000000000000000" />
+                test_value = "D:)Q[IlAW!ahhC2ac:9*A}h:p?([4%wOTJ%JR%cs" />
         <option name = "curve_serverkey"   type = "blob"   mode = "rw" test = "SUB" 
                 ifdef = "HAVE_LIBSODIUM" 
-                test_value = "00000000000000000000000000000000" />
+                test_value = "rq:rM>}U?@Lns47E1%kR.o@n%FcmmsL/@{H8]yf7" />
         <option name = "rcvmore"           type = "int"    mode = "r"  test = "SUB" />
         <option name = "fd"                type = "int"    mode = "r"  test = "SUB" />
         <option name = "events"            type = "int"    mode = "r"  test = "SUB" />
