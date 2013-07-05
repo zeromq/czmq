@@ -23,7 +23,7 @@ CZMQ_EXPORT void
 //  Use this to force the interface for beacons
 //  This is experimental; may be merged into zbeacon class.
 CZMQ_EXPORT void
-    zsys_set_interface (char *interface);
+    zsys_set_interface (char *iinterface);
 
 //  Return network interface name to use for broadcasts.
 //  Returns "" if no interface was set.

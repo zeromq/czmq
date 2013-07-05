@@ -4,6 +4,109 @@
      use 'gsl sockopts'
 -->
 <options script = "sockopts">
+    <version major = "3">
+        <option name = "type"              type = "int"    mode = "r"  test = "SUB" />
+        <option name = "sndhwm"            type = "int"    mode = "rw" test = "PUB" />
+        <option name = "rcvhwm"            type = "int"    mode = "rw" test = "SUB" />
+        <option name = "affinity"          type = "uint64" mode = "rw" test = "SUB" />
+        <option name = "subscribe"         type = "blob"   mode = "w"  test = "SUB">
+            <restrict type = "SUB" />
+        </option>
+        <option name = "unsubscribe"       type = "blob"   mode = "w"  test = "SUB">
+            <restrict type = "SUB" />
+        </option>
+        <option name = "identity"          type = "blob"   mode = "rw" test = "DEALER">
+            <restrict type = "REQ" />
+            <restrict type = "REP" />
+            <restrict type = "DEALER" />
+            <restrict type = "ROUTER" />
+            <restrict type = "STREAM" />
+        </option>
+        <option name = "rate"              type = "int"    mode = "rw" test = "SUB" />
+        <option name = "recovery_ivl"      type = "int"    mode = "rw" test = "SUB" />
+        <option name = "sndbuf"            type = "int"    mode = "rw" test = "PUB" />
+        <option name = "rcvbuf"            type = "int"    mode = "rw" test = "SUB" />
+        <option name = "linger"            type = "int"    mode = "rw" test = "SUB" />
+        <option name = "reconnect_ivl"     type = "int"    mode = "rw" test = "SUB" />
+        <option name = "reconnect_ivl_max" type = "int"    mode = "rw" test = "SUB" />
+        <option name = "backlog"           type = "int"    mode = "rw" test = "SUB" />
+        <option name = "maxmsgsize"        type = "int64"  mode = "rw" test = "SUB" />
+        <option name = "multicast_hops"    type = "int"    mode = "rw" test = "SUB" />
+        <option name = "rcvtimeo"          type = "int"    mode = "rw" test = "SUB" />
+        <option name = "sndtimeo"          type = "int"    mode = "rw" test = "SUB" />
+        <option name = "ipv6"              type = "int"    mode = "rw" test = "SUB" />
+        <option name = "immediate"         type = "int"    mode = "w"  test = "DEALER" />
+        <option name = "router_mandatory"  type = "int"    mode = "w"  test = "ROUTER">
+            <restrict type = "ROUTER" />
+        </option>
+        <option name = "probe_router"      type = "int"    mode = "r"  test = "DEALER">
+            <restrict type = "ROUTER" />
+            <restrict type = "DEALER" />
+            <restrict type = "REQ" />
+        </option>
+        <option name = "xpub_verbose"      type = "int"    mode = "w"  test = "XPUB">
+            <restrict type = "XPUB" />
+        </option>
+        <option name = "tcp_keepalive"     type = "int"    mode = "rw" test = "SUB" />
+        <option name = "tcp_keepalive_idle"
+                                           type = "int"    mode = "rw" test = "SUB" />
+        <option name = "tcp_keepalive_cnt" type = "int"    mode = "rw" test = "SUB" />
+        <option name = "tcp_keepalive_intvl"
+                                           type = "int"    mode = "rw" test = "SUB" />
+        <option name = "tcp_accept_filter" type = "blob"   mode = "rw" test = "SUB" 
+                test_value = "127.0.0.1" />
+        <option name = "plain_server"      type = "int"    mode = "rw" test = "PUB" />
+        <option name = "plain_username"    type = "blob"   mode = "rw" test = "SUB" />
+        <option name = "plain_password"    type = "blob"   mode = "rw" test = "SUB" />
+        <option name = "curve_server"      type = "int"    mode = "rw" test = "PUB" 
+                ifdef = "HAVE_LIBSODIUM" />
+        <option name = "curve_publickey"   type = "blob"   mode = "rw" test = "PUB" 
+                ifdef = "HAVE_LIBSODIUM" 
+                test_value = "Yne@$w-vo<fVvi]a<NY6T1ed:M$fCG*[IaLV{hID" />
+        <option name = "curve_secretkey"   type = "blob"   mode = "rw" test = "PUB" 
+                ifdef = "HAVE_LIBSODIUM" 
+                test_value = "D:)Q[IlAW!ahhC2ac:9*A}h:p?([4%wOTJ%JR%cs" />
+        <option name = "curve_serverkey"   type = "blob"   mode = "rw" test = "SUB" 
+                ifdef = "HAVE_LIBSODIUM" 
+                test_value = "rq:rM>}U?@Lns47E1%kR.o@n%FcmmsL/@{H8]yf7" />
+        <option name = "rcvmore"           type = "int"    mode = "r"  test = "SUB" />
+        <option name = "fd"                type = "int"    mode = "r"  test = "SUB" />
+        <option name = "events"            type = "int"    mode = "r"  test = "SUB" />
+        <option name = "last_endpoint"     type = "blob"   mode = "r"  test = "SUB" />
+        
+        <!-- Deprecated options -->
+        <option name = "router_raw"        type = "int"    mode = "w"  test = "ROUTER">
+            <restrict type = "ROUTER" />
+        </option>
+        <option name = "ipv4only"          type = "int"    mode = "rw" test = "SUB" />
+        <option name = "delay_attach_on_connect"
+                                           type = "int"    mode = "w"  test = "PUB" />
+        <header>
+//  Emulation of widely-used 2.x socket options
+void zsocket_set_hwm (void *zocket, int hwm);
+//  Patch in case we're on older libzmq
+#ifndef ZMQ_STREAM
+#define ZMQ_STREAM 11
+#endif
+        </header>
+        <source>
+//  --------------------------------------------------------------------------
+//  Set socket high-water mark, emulating 2.x API
+
+void
+zsocket_set_hwm (void *zocket, int hwm)
+{
+    zsocket_set_sndhwm (zocket, hwm);
+    zsocket_set_rcvhwm (zocket, hwm);
+}
+        </source>
+        <selftest>
+    zocket = zsocket_new (ctx, ZMQ_SUB);
+    zsocket_set_hwm (zocket, 1);
+        </selftest>
+    </version>
+    
+    <!-- Legacy version 2 -->
     <version major = "2">
         <option name = "hwm"               type = "uint64" mode = "rw" test = "SUB" />
         <option name = "swap"              type = "int64"  mode = "rw" test = "SUB" />
@@ -31,71 +134,5 @@
         <option name = "rcvmore"           type = "int64"  mode = "r"  test = "SUB" />
         <option name = "fd"                type = "int"    mode = "r"  test = "SUB" />
         <option name = "events"            type = "uint32" mode = "r"  test = "SUB" />
-    </version>
-
-    <version major = "3">
-        <option name = "type"              type = "int"    mode = "r"  test = "SUB" />
-        <option name = "sndhwm"            type = "int"    mode = "rw" test = "PUB" />
-        <option name = "rcvhwm"            type = "int"    mode = "rw" test = "SUB" />
-        <option name = "affinity"          type = "uint64" mode = "rw" test = "SUB" />
-        <option name = "subscribe"         type = "blob"   mode = "w"  test = "SUB">
-            <restrict type = "SUB" />
-        </option>
-        <option name = "unsubscribe"       type = "blob"   mode = "w"  test = "SUB">
-            <restrict type = "SUB" />
-        </option>
-        <option name = "identity"          type = "blob"   mode = "rw" test = "DEALER">
-            <restrict type = "REQ" />
-            <restrict type = "REP" />
-            <restrict type = "DEALER" />
-            <restrict type = "ROUTER" />
-        </option>
-        <option name = "rate"              type = "int"    mode = "rw" test = "SUB" />
-        <option name = "recovery_ivl"      type = "int"    mode = "rw" test = "SUB" />
-        <option name = "sndbuf"            type = "int"    mode = "rw" test = "PUB" />
-        <option name = "rcvbuf"            type = "int"    mode = "rw" test = "SUB" />
-        <option name = "linger"            type = "int"    mode = "rw" test = "SUB" />
-        <option name = "reconnect_ivl"     type = "int"    mode = "rw" test = "SUB" />
-        <option name = "reconnect_ivl_max" type = "int"    mode = "rw" test = "SUB" />
-        <option name = "backlog"           type = "int"    mode = "rw" test = "SUB" />
-        <option name = "maxmsgsize"        type = "int64"  mode = "rw" test = "SUB" />
-        <option name = "multicast_hops"    type = "int"    mode = "rw" test = "SUB" />
-        <option name = "rcvtimeo"          type = "int"    mode = "rw" test = "SUB" />
-        <option name = "sndtimeo"          type = "int"    mode = "rw" test = "SUB" />
-        <option name = "ipv4only"          type = "int"    mode = "rw" test = "SUB" />
-        <option name = "delay_attach_on_connect"
-                                           type = "int"    mode = "w"  test = "PUB" />
-        <option name = "router_mandatory"  type = "int"    mode = "w"  test = "ROUTER">
-            <restrict type = "ROUTER" />
-        </option>
-        <option name = "router_raw"        type = "int"    mode = "w"  test = "ROUTER">
-            <restrict type = "ROUTER" />
-        </option>
-        <option name = "xpub_verbose"      type = "int"    mode = "w"  test = "XPUB">
-            <restrict type = "XPUB" />
-        </option>
-        <option name = "rcvmore"           type = "int"    mode = "r"  test = "SUB" />
-        <option name = "fd"                type = "int"    mode = "r"  test = "SUB" />
-        <option name = "events"            type = "int"    mode = "r"  test = "SUB" />
-        <option name = "last_endpoint"     type = "blob"   mode = "r"  test = "SUB" />
-        <header>
-//  Emulation of widely-used 2.x socket options
-void zsocket_set_hwm (void *zocket, int hwm);
-        </header>
-        <source>
-//  --------------------------------------------------------------------------
-//  Set socket high-water mark, emulating 2.x API
-
-void
-zsocket_set_hwm (void *zocket, int hwm)
-{
-    zsocket_set_sndhwm (zocket, hwm);
-    zsocket_set_rcvhwm (zocket, hwm);
-}
-        </source>
-        <selftest>
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    zsocket_set_hwm (zocket, 1);
-        </selftest>
     </version>
 </options>

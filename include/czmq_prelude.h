@@ -475,8 +475,12 @@ static inline void *
 
 #include "zmq.h"
 
-//  Older libzmq APIs will be missing some aspects of libzmq/3.0
+//  Work with pre-ZMQ_STREAM versions of libzmq
+#ifndef ZMQ_STREAM
+#   define ZMQ_STREAM       11
+#endif
 
+//  Older libzmq APIs will be missing some aspects of libzmq/3.0
 #ifndef ZMQ_ROUTER
 #   define ZMQ_ROUTER       ZMQ_XREP
 #endif
