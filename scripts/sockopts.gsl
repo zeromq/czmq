@@ -249,6 +249,12 @@ zsocket_$(name) (void *zocket)
 .           else
     return ($(ctype)) $(name);
 .           endif
+#   else
+.           if type = "blob"
+    return NULL;
+.           else
+    return 0;
+.           endif
 #   endif
 }
 

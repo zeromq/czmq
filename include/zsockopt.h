@@ -97,7 +97,6 @@ CZMQ_EXPORT void zsocket_set_sndtimeo (void *zocket, int sndtimeo);
 CZMQ_EXPORT void zsocket_set_ipv6 (void *zocket, int ipv6);
 CZMQ_EXPORT void zsocket_set_immediate (void *zocket, int immediate);
 CZMQ_EXPORT void zsocket_set_router_mandatory (void *zocket, int router_mandatory);
-CZMQ_EXPORT void zsocket_set_router_raw (void *zocket, int router_raw);
 CZMQ_EXPORT void zsocket_set_xpub_verbose (void *zocket, int xpub_verbose);
 CZMQ_EXPORT void zsocket_set_tcp_keepalive (void *zocket, int tcp_keepalive);
 CZMQ_EXPORT void zsocket_set_tcp_keepalive_idle (void *zocket, int tcp_keepalive_idle);
@@ -111,6 +110,7 @@ CZMQ_EXPORT void zsocket_set_curve_server (void *zocket, int curve_server);
 CZMQ_EXPORT void zsocket_set_curve_publickey (void *zocket, const char * curve_publickey);
 CZMQ_EXPORT void zsocket_set_curve_secretkey (void *zocket, const char * curve_secretkey);
 CZMQ_EXPORT void zsocket_set_curve_serverkey (void *zocket, const char * curve_serverkey);
+CZMQ_EXPORT void zsocket_set_router_raw (void *zocket, int router_raw);
 CZMQ_EXPORT void zsocket_set_ipv4only (void *zocket, int ipv4only);
 CZMQ_EXPORT void zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect);
 
@@ -219,7 +219,6 @@ int zsockopt_test (bool verbose);
 #define zsockopt_set_ipv6 zsocket_set_ipv6
 #define zsockopt_set_immediate zsocket_set_immediate
 #define zsockopt_set_router_mandatory zsocket_set_router_mandatory
-#define zsockopt_set_router_raw zsocket_set_router_raw
 #define zsockopt_probe_router zsocket_probe_router
 #define zsockopt_set_xpub_verbose zsocket_set_xpub_verbose
 #define zsockopt_tcp_keepalive zsocket_tcp_keepalive
@@ -250,6 +249,7 @@ int zsockopt_test (bool verbose);
 #define zsockopt_fd zsocket_fd
 #define zsockopt_events zsocket_events
 #define zsockopt_last_endpoint zsocket_last_endpoint
+#define zsockopt_set_router_raw zsocket_set_router_raw
 #define zsockopt_ipv4only zsocket_ipv4only
 #define zsockopt_set_ipv4only zsocket_set_ipv4only
 #define zsockopt_set_delay_attach_on_connect zsocket_set_delay_attach_on_connect

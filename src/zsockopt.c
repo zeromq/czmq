@@ -53,6 +53,8 @@ zsocket_type (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_TYPE, &type, &option_len);
     return type;
+#   else
+    return 0;
 #   endif
 }
 
@@ -85,6 +87,8 @@ zsocket_sndhwm (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_SNDHWM, &sndhwm, &option_len);
     return sndhwm;
+#   else
+    return 0;
 #   endif
 }
 
@@ -117,6 +121,8 @@ zsocket_rcvhwm (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_RCVHWM, &rcvhwm, &option_len);
     return rcvhwm;
+#   else
+    return 0;
 #   endif
 }
 
@@ -150,6 +156,8 @@ zsocket_affinity (void *zocket)
     size_t option_len = sizeof (uint64_t);
     zmq_getsockopt (zocket, ZMQ_AFFINITY, &affinity, &option_len);
     return (int) affinity;
+#   else
+    return 0;
 #   endif
 }
 
@@ -230,6 +238,8 @@ zsocket_identity (void *zocket)
     char *identity = (char *) zmalloc (option_len);
     zmq_getsockopt (zocket, ZMQ_IDENTITY, identity, &option_len);
     return (char *) identity;
+#   else
+    return NULL;
 #   endif
 }
 
@@ -262,6 +272,8 @@ zsocket_rate (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_RATE, &rate, &option_len);
     return rate;
+#   else
+    return 0;
 #   endif
 }
 
@@ -294,6 +306,8 @@ zsocket_recovery_ivl (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_RECOVERY_IVL, &recovery_ivl, &option_len);
     return recovery_ivl;
+#   else
+    return 0;
 #   endif
 }
 
@@ -326,6 +340,8 @@ zsocket_sndbuf (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_SNDBUF, &sndbuf, &option_len);
     return sndbuf;
+#   else
+    return 0;
 #   endif
 }
 
@@ -358,6 +374,8 @@ zsocket_rcvbuf (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_RCVBUF, &rcvbuf, &option_len);
     return rcvbuf;
+#   else
+    return 0;
 #   endif
 }
 
@@ -390,6 +408,8 @@ zsocket_linger (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_LINGER, &linger, &option_len);
     return linger;
+#   else
+    return 0;
 #   endif
 }
 
@@ -422,6 +442,8 @@ zsocket_reconnect_ivl (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_RECONNECT_IVL, &reconnect_ivl, &option_len);
     return reconnect_ivl;
+#   else
+    return 0;
 #   endif
 }
 
@@ -454,6 +476,8 @@ zsocket_reconnect_ivl_max (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_RECONNECT_IVL_MAX, &reconnect_ivl_max, &option_len);
     return reconnect_ivl_max;
+#   else
+    return 0;
 #   endif
 }
 
@@ -486,6 +510,8 @@ zsocket_backlog (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_BACKLOG, &backlog, &option_len);
     return backlog;
+#   else
+    return 0;
 #   endif
 }
 
@@ -519,6 +545,8 @@ zsocket_maxmsgsize (void *zocket)
     size_t option_len = sizeof (int64_t);
     zmq_getsockopt (zocket, ZMQ_MAXMSGSIZE, &maxmsgsize, &option_len);
     return (int) maxmsgsize;
+#   else
+    return 0;
 #   endif
 }
 
@@ -551,6 +579,8 @@ zsocket_multicast_hops (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_MULTICAST_HOPS, &multicast_hops, &option_len);
     return multicast_hops;
+#   else
+    return 0;
 #   endif
 }
 
@@ -583,6 +613,8 @@ zsocket_rcvtimeo (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_RCVTIMEO, &rcvtimeo, &option_len);
     return rcvtimeo;
+#   else
+    return 0;
 #   endif
 }
 
@@ -615,6 +647,8 @@ zsocket_sndtimeo (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_SNDTIMEO, &sndtimeo, &option_len);
     return sndtimeo;
+#   else
+    return 0;
 #   endif
 }
 
@@ -647,6 +681,8 @@ zsocket_ipv6 (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_IPV6, &ipv6, &option_len);
     return ipv6;
+#   else
+    return 0;
 #   endif
 }
 
@@ -688,26 +724,6 @@ zsocket_set_router_mandatory (void *zocket, int router_mandatory)
 
 
 //  --------------------------------------------------------------------------
-//  Set socket ZMQ_ROUTER_RAW value
-//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
-
-void
-zsocket_set_router_raw (void *zocket, int router_raw)
-{
-#   if defined (ZMQ_ROUTER_RAW)
-    if (zsockopt_type (zocket) != ZMQ_ROUTER) {
-        printf ("ZMQ_ROUTER_RAW is not valid on %s sockets\n", zsocket_type_str (zocket));
-        assert (false);
-    }
-    int rc = zmq_setsockopt (zocket, ZMQ_ROUTER_RAW, &router_raw, sizeof (int));
-    if (rc)
-        puts (strerror (errno));
-    assert (rc == 0 || zmq_errno () == ETERM);
-#   endif
-}
-
-
-//  --------------------------------------------------------------------------
 //  Return socket ZMQ_PROBE_ROUTER value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
@@ -719,6 +735,8 @@ zsocket_probe_router (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_PROBE_ROUTER, &probe_router, &option_len);
     return probe_router;
+#   else
+    return 0;
 #   endif
 }
 
@@ -771,6 +789,8 @@ zsocket_tcp_keepalive (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_TCP_KEEPALIVE, &tcp_keepalive, &option_len);
     return tcp_keepalive;
+#   else
+    return 0;
 #   endif
 }
 
@@ -803,6 +823,8 @@ zsocket_tcp_keepalive_idle (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_TCP_KEEPALIVE_IDLE, &tcp_keepalive_idle, &option_len);
     return tcp_keepalive_idle;
+#   else
+    return 0;
 #   endif
 }
 
@@ -835,6 +857,8 @@ zsocket_tcp_keepalive_cnt (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_TCP_KEEPALIVE_CNT, &tcp_keepalive_cnt, &option_len);
     return tcp_keepalive_cnt;
+#   else
+    return 0;
 #   endif
 }
 
@@ -867,6 +891,8 @@ zsocket_tcp_keepalive_intvl (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_TCP_KEEPALIVE_INTVL, &tcp_keepalive_intvl, &option_len);
     return tcp_keepalive_intvl;
+#   else
+    return 0;
 #   endif
 }
 
@@ -899,6 +925,8 @@ zsocket_tcp_accept_filter (void *zocket)
     char *tcp_accept_filter = (char *) zmalloc (option_len);
     zmq_getsockopt (zocket, ZMQ_TCP_ACCEPT_FILTER, tcp_accept_filter, &option_len);
     return (char *) tcp_accept_filter;
+#   else
+    return NULL;
 #   endif
 }
 
@@ -931,6 +959,8 @@ zsocket_plain_server (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_PLAIN_SERVER, &plain_server, &option_len);
     return plain_server;
+#   else
+    return 0;
 #   endif
 }
 
@@ -963,6 +993,8 @@ zsocket_plain_username (void *zocket)
     char *plain_username = (char *) zmalloc (option_len);
     zmq_getsockopt (zocket, ZMQ_PLAIN_USERNAME, plain_username, &option_len);
     return (char *) plain_username;
+#   else
+    return NULL;
 #   endif
 }
 
@@ -995,6 +1027,8 @@ zsocket_plain_password (void *zocket)
     char *plain_password = (char *) zmalloc (option_len);
     zmq_getsockopt (zocket, ZMQ_PLAIN_PASSWORD, plain_password, &option_len);
     return (char *) plain_password;
+#   else
+    return NULL;
 #   endif
 }
 
@@ -1027,6 +1061,8 @@ zsocket_curve_server (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_CURVE_SERVER, &curve_server, &option_len);
     return curve_server;
+#   else
+    return 0;
 #   endif
 }
 
@@ -1059,6 +1095,8 @@ zsocket_curve_publickey (void *zocket)
     char *curve_publickey = (char *) zmalloc (option_len);
     zmq_getsockopt (zocket, ZMQ_CURVE_PUBLICKEY, curve_publickey, &option_len);
     return (char *) curve_publickey;
+#   else
+    return NULL;
 #   endif
 }
 
@@ -1091,6 +1129,8 @@ zsocket_curve_secretkey (void *zocket)
     char *curve_secretkey = (char *) zmalloc (option_len);
     zmq_getsockopt (zocket, ZMQ_CURVE_SECRETKEY, curve_secretkey, &option_len);
     return (char *) curve_secretkey;
+#   else
+    return NULL;
 #   endif
 }
 
@@ -1123,6 +1163,8 @@ zsocket_curve_serverkey (void *zocket)
     char *curve_serverkey = (char *) zmalloc (option_len);
     zmq_getsockopt (zocket, ZMQ_CURVE_SERVERKEY, curve_serverkey, &option_len);
     return (char *) curve_serverkey;
+#   else
+    return NULL;
 #   endif
 }
 
@@ -1139,6 +1181,8 @@ zsocket_rcvmore (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_RCVMORE, &rcvmore, &option_len);
     return rcvmore;
+#   else
+    return 0;
 #   endif
 }
 
@@ -1155,6 +1199,8 @@ zsocket_fd (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_FD, &fd, &option_len);
     return fd;
+#   else
+    return 0;
 #   endif
 }
 
@@ -1171,6 +1217,8 @@ zsocket_events (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_EVENTS, &events, &option_len);
     return events;
+#   else
+    return 0;
 #   endif
 }
 
@@ -1187,6 +1235,28 @@ zsocket_last_endpoint (void *zocket)
     char *last_endpoint = (char *) zmalloc (option_len);
     zmq_getsockopt (zocket, ZMQ_LAST_ENDPOINT, last_endpoint, &option_len);
     return (char *) last_endpoint;
+#   else
+    return NULL;
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_ROUTER_RAW value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsocket_set_router_raw (void *zocket, int router_raw)
+{
+#   if defined (ZMQ_ROUTER_RAW)
+    if (zsockopt_type (zocket) != ZMQ_ROUTER) {
+        printf ("ZMQ_ROUTER_RAW is not valid on %s sockets\n", zsocket_type_str (zocket));
+        assert (false);
+    }
+    int rc = zmq_setsockopt (zocket, ZMQ_ROUTER_RAW, &router_raw, sizeof (int));
+    if (rc)
+        puts (strerror (errno));
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -1219,6 +1289,8 @@ zsocket_ipv4only (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_IPV4ONLY, &ipv4only, &option_len);
     return ipv4only;
+#   else
+    return 0;
 #   endif
 }
 
@@ -1281,6 +1353,8 @@ zsocket_hwm (void *zocket)
     size_t option_len = sizeof (uint64_t);
     zmq_getsockopt (zocket, ZMQ_HWM, &hwm, &option_len);
     return (int) hwm;
+#   else
+    return 0;
 #   endif
 }
 
@@ -1314,6 +1388,8 @@ zsocket_swap (void *zocket)
     size_t option_len = sizeof (int64_t);
     zmq_getsockopt (zocket, ZMQ_SWAP, &swap, &option_len);
     return (int) swap;
+#   else
+    return 0;
 #   endif
 }
 
@@ -1347,6 +1423,8 @@ zsocket_affinity (void *zocket)
     size_t option_len = sizeof (uint64_t);
     zmq_getsockopt (zocket, ZMQ_AFFINITY, &affinity, &option_len);
     return (int) affinity;
+#   else
+    return 0;
 #   endif
 }
 
@@ -1379,6 +1457,8 @@ zsocket_identity (void *zocket)
     char *identity = (char *) zmalloc (option_len);
     zmq_getsockopt (zocket, ZMQ_IDENTITY, identity, &option_len);
     return (char *) identity;
+#   else
+    return NULL;
 #   endif
 }
 
@@ -1412,6 +1492,8 @@ zsocket_rate (void *zocket)
     size_t option_len = sizeof (int64_t);
     zmq_getsockopt (zocket, ZMQ_RATE, &rate, &option_len);
     return (int) rate;
+#   else
+    return 0;
 #   endif
 }
 
@@ -1445,6 +1527,8 @@ zsocket_recovery_ivl (void *zocket)
     size_t option_len = sizeof (int64_t);
     zmq_getsockopt (zocket, ZMQ_RECOVERY_IVL, &recovery_ivl, &option_len);
     return (int) recovery_ivl;
+#   else
+    return 0;
 #   endif
 }
 
@@ -1478,6 +1562,8 @@ zsocket_recovery_ivl_msec (void *zocket)
     size_t option_len = sizeof (int64_t);
     zmq_getsockopt (zocket, ZMQ_RECOVERY_IVL_MSEC, &recovery_ivl_msec, &option_len);
     return (int) recovery_ivl_msec;
+#   else
+    return 0;
 #   endif
 }
 
@@ -1511,6 +1597,8 @@ zsocket_mcast_loop (void *zocket)
     size_t option_len = sizeof (int64_t);
     zmq_getsockopt (zocket, ZMQ_MCAST_LOOP, &mcast_loop, &option_len);
     return (int) mcast_loop;
+#   else
+    return 0;
 #   endif
 }
 
@@ -1544,6 +1632,8 @@ zsocket_rcvtimeo (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_RCVTIMEO, &rcvtimeo, &option_len);
     return rcvtimeo;
+#   else
+    return 0;
 #   endif
 }
 
@@ -1578,6 +1668,8 @@ zsocket_sndtimeo (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_SNDTIMEO, &sndtimeo, &option_len);
     return sndtimeo;
+#   else
+    return 0;
 #   endif
 }
 
@@ -1612,6 +1704,8 @@ zsocket_sndbuf (void *zocket)
     size_t option_len = sizeof (uint64_t);
     zmq_getsockopt (zocket, ZMQ_SNDBUF, &sndbuf, &option_len);
     return (int) sndbuf;
+#   else
+    return 0;
 #   endif
 }
 
@@ -1645,6 +1739,8 @@ zsocket_rcvbuf (void *zocket)
     size_t option_len = sizeof (uint64_t);
     zmq_getsockopt (zocket, ZMQ_RCVBUF, &rcvbuf, &option_len);
     return (int) rcvbuf;
+#   else
+    return 0;
 #   endif
 }
 
@@ -1677,6 +1773,8 @@ zsocket_linger (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_LINGER, &linger, &option_len);
     return linger;
+#   else
+    return 0;
 #   endif
 }
 
@@ -1709,6 +1807,8 @@ zsocket_reconnect_ivl (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_RECONNECT_IVL, &reconnect_ivl, &option_len);
     return reconnect_ivl;
+#   else
+    return 0;
 #   endif
 }
 
@@ -1741,6 +1841,8 @@ zsocket_reconnect_ivl_max (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_RECONNECT_IVL_MAX, &reconnect_ivl_max, &option_len);
     return reconnect_ivl_max;
+#   else
+    return 0;
 #   endif
 }
 
@@ -1773,6 +1875,8 @@ zsocket_backlog (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_BACKLOG, &backlog, &option_len);
     return backlog;
+#   else
+    return 0;
 #   endif
 }
 
@@ -1829,6 +1933,8 @@ zsocket_type (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_TYPE, &type, &option_len);
     return type;
+#   else
+    return 0;
 #   endif
 }
 
@@ -1845,6 +1951,8 @@ zsocket_rcvmore (void *zocket)
     size_t option_len = sizeof (int64_t);
     zmq_getsockopt (zocket, ZMQ_RCVMORE, &rcvmore, &option_len);
     return (int) rcvmore;
+#   else
+    return 0;
 #   endif
 }
 
@@ -1861,6 +1969,8 @@ zsocket_fd (void *zocket)
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_FD, &fd, &option_len);
     return fd;
+#   else
+    return 0;
 #   endif
 }
 
@@ -1877,6 +1987,8 @@ zsocket_events (void *zocket)
     size_t option_len = sizeof (uint32_t);
     zmq_getsockopt (zocket, ZMQ_EVENTS, &events, &option_len);
     return (int) events;
+#   else
+    return 0;
 #   endif
 }
 
@@ -2064,12 +2176,6 @@ zsockopt_test (bool verbose)
     zsocket_set_router_mandatory (zocket, 1);
     zsocket_destroy (ctx, zocket);
 #       endif
-#       if defined (ZMQ_ROUTER_RAW)
-    zocket = zsocket_new (ctx, ZMQ_ROUTER);
-    assert (zocket);
-    zsocket_set_router_raw (zocket, 1);
-    zsocket_destroy (ctx, zocket);
-#       endif
 #       if defined (ZMQ_PROBE_ROUTER)
     zocket = zsocket_new (ctx, ZMQ_DEALER);
     assert (zocket);
@@ -2163,7 +2269,7 @@ zsockopt_test (bool verbose)
 #       if defined (ZMQ_CURVE_PUBLICKEY)
     zocket = zsocket_new (ctx, ZMQ_PUB);
     assert (zocket);
-    zsocket_set_curve_publickey (zocket, "00000000000000000000000000000000");
+    zsocket_set_curve_publickey (zocket, "Yne@$w-vo<fVvi]a<NY6T1ed:M$fCG*[IaLV{hID");
     char *curve_publickey = zsocket_curve_publickey (zocket);
     assert (curve_publickey);
     free (curve_publickey);
@@ -2174,7 +2280,7 @@ zsockopt_test (bool verbose)
 #       if defined (ZMQ_CURVE_SECRETKEY)
     zocket = zsocket_new (ctx, ZMQ_PUB);
     assert (zocket);
-    zsocket_set_curve_secretkey (zocket, "00000000000000000000000000000000");
+    zsocket_set_curve_secretkey (zocket, "D:)Q[IlAW!ahhC2ac:9*A}h:p?([4%wOTJ%JR%cs");
     char *curve_secretkey = zsocket_curve_secretkey (zocket);
     assert (curve_secretkey);
     free (curve_secretkey);
@@ -2185,7 +2291,7 @@ zsockopt_test (bool verbose)
 #       if defined (ZMQ_CURVE_SERVERKEY)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
-    zsocket_set_curve_serverkey (zocket, "00000000000000000000000000000000");
+    zsocket_set_curve_serverkey (zocket, "rq:rM>}U?@Lns47E1%kR.o@n%FcmmsL/@{H8]yf7");
     char *curve_serverkey = zsocket_curve_serverkey (zocket);
     assert (curve_serverkey);
     free (curve_serverkey);
@@ -2216,6 +2322,12 @@ zsockopt_test (bool verbose)
     char *last_endpoint = zsocket_last_endpoint (zocket);
     assert (last_endpoint);
     free (last_endpoint);
+    zsocket_destroy (ctx, zocket);
+#       endif
+#       if defined (ZMQ_ROUTER_RAW)
+    zocket = zsocket_new (ctx, ZMQ_ROUTER);
+    assert (zocket);
+    zsocket_set_router_raw (zocket, 1);
     zsocket_destroy (ctx, zocket);
 #       endif
 #       if defined (ZMQ_IPV4ONLY)

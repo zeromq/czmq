@@ -39,9 +39,6 @@
         <option name = "router_mandatory"  type = "int"    mode = "w"  test = "ROUTER">
             <restrict type = "ROUTER" />
         </option>
-        <option name = "router_raw"        type = "int"    mode = "w"  test = "ROUTER">
-            <restrict type = "ROUTER" />
-        </option>
         <option name = "probe_router"      type = "int"    mode = "r"  test = "DEALER">
             <restrict type = "ROUTER" />
             <restrict type = "DEALER" />
@@ -78,6 +75,9 @@
         <option name = "last_endpoint"     type = "blob"   mode = "r"  test = "SUB" />
         
         <!-- Deprecated options -->
+        <option name = "router_raw"        type = "int"    mode = "w"  test = "ROUTER">
+            <restrict type = "ROUTER" />
+        </option>
         <option name = "ipv4only"          type = "int"    mode = "rw" test = "SUB" />
         <option name = "delay_attach_on_connect"
                                            type = "int"    mode = "w"  test = "PUB" />
