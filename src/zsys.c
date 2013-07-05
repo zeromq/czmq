@@ -101,10 +101,10 @@ zsys_handler_reset (void)
 static char *s_interface = NULL;
 
 void
-zsys_set_interface (char *_interface)
+zsys_set_interface (char *interface_name)
 {
     free (s_interface);
-    s_interface = strdup (_interface);
+    s_interface = strdup (interface_name);
 }
 
 
