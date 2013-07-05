@@ -51,6 +51,7 @@ AC_PROG_AWK
 
 # Checks for libraries
 AC_CHECK_LIB([pthread], [pthread_create])
+AC_CHECK_LIB([sodium], [sodium_init],,AC_MSG_WARN(libsodium is needed for CURVE security))
 
 # Code coverage
 AC_ARG_WITH(gcov, [AS_HELP_STRING([--with-gcov=yes/no],
