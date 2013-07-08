@@ -127,11 +127,14 @@ zmsg_send (zmsg_t **self_p, void *zocket)
     zmsg_t *self = *self_p;
 
     int rc = 0;
+    if (zlist_size (self->frames) == 0)
+        return -1;
+    else
     if (self) {
         zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
         while (frame) {
             rc = zframe_send (&frame, zocket,
-                              zlist_size (self->frames)? ZFRAME_MORE: 0);
+                zlist_size (self->frames)? ZFRAME_MORE: 0);
             if (rc != 0)
                 break;
             frame = (zframe_t *) zlist_pop (self->frames);
@@ -858,6 +861,8 @@ zmsg_test (bool verbose)
     assert (zmsg_last (msg) == NULL);
     assert (zmsg_next (msg) == NULL);
     assert (zmsg_pop (msg) == NULL);
+    assert (zmsg_send (&msg, output) == -1);
+    assert (msg != NULL);
     zmsg_destroy (&msg);
 
     zctx_destroy (&ctx);
