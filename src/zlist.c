@@ -29,6 +29,8 @@
     can use this to construct multi-dimensional lists, and other structures
     together with other generic containers like zhash.
 @discuss
+    To iterate through a list, use zlist_first to get the first item, then
+    loop while not null, and do zlist_next at the end of each iteration.
 @end
 */
 
