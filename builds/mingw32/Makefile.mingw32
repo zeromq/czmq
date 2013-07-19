@@ -20,7 +20,8 @@ OBJS = \
 	zsockopt.o \
 	zstr.o \
 	zsys.o \
-	zthread.o
+	zthread.o \
+	ztree.o
 
 %.o: ../../src/%.c
 	$(CC) -c -o $@ $< $(CFLAGS)
