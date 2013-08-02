@@ -392,6 +392,7 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 //- A number of POSIX and C99 keywords and data types -----------------------
 
 #if (defined (__WINDOWS__))
+#   define inline __inline
 #   define strtoull _strtoui64
 #   define srandom srand
 #   define TIMEZONE _timezone
