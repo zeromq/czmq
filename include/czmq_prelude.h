@@ -427,7 +427,7 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 
 //  Replacement for malloc() which asserts if we run out of heap, and
 //  which zeroes the allocated block.
-static void *
+static inline void *
     safe_malloc (
     size_t size,
     char *file,
