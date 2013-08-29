@@ -125,7 +125,8 @@ CZMQ_EXPORT int
     zmsg_save (zmsg_t *self, FILE *file);
 
 //  Load/append an open file into message, create new message if
-//  null message provided.
+//  null message provided. Returns NULL if the message could not 
+//  be loaded.
 CZMQ_EXPORT zmsg_t *
     zmsg_load (zmsg_t *self, FILE *file);
 

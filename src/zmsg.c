@@ -496,12 +496,22 @@ zmsg_load (zmsg_t *self, FILE *file)
             zframe_t *frame = zframe_new (NULL, frame_size);
             rc = fread (zframe_data (frame), frame_size, 1, file);
             if (frame_size > 0 && rc != 1)
+            {
+                zframe_destroy (&frame);
                 break;          //  Unable to read properly, quit
+            }
             zmsg_add (self, frame);
         }
         else
             break;              //  Unable to read properly, quit
     }
+
+    if (zmsg_size(self) == 0)
+    {
+        zmsg_destroy(&self);
+        self = NULL;
+    }
+
     return self;
 }
 
@@ -771,8 +781,19 @@ zmsg_test (bool verbose)
     if (verbose)
         zmsg_dump (msg);
 
-    //  Save to a file, read back
+    // create empty file for null test
     FILE *file = fopen ("zmsg.test", "w");
+    assert (file);
+    fclose (file);
+
+    file = fopen ("zmsg.test", "r");
+    zmsg_t *null_msg = zmsg_load (NULL, file);
+    assert (null_msg == NULL);
+    fclose (file);
+    remove ("zmsg.test");
+
+    //  Save to a file, read back
+    file = fopen ("zmsg.test", "w");
     assert (file);
     rc = zmsg_save (msg, file);
     assert (rc == 0);
