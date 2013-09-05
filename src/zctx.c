@@ -63,6 +63,7 @@ struct _zctx_t {
     bool main;                  //  True if we're the main thread
     int iothreads;              //  Number of IO threads, default 1
     int linger;                 //  Linger timeout, default 0
+    int hwm;                    //  Send/Receive HWM for the pair sockets in zthread_fork
 };
 
 
@@ -98,6 +99,7 @@ zctx_new (void)
         return NULL;
     }
     self->iothreads = 1;
+    self->hwm = 0; // unlimited
     self->main = true;
     zsys_handler_set (s_signal_handler);
     return self;
@@ -141,6 +143,8 @@ zctx_shadow (zctx_t *ctx)
         return NULL;
 
     self->context = ctx->context;
+    self->hwm = ctx->hwm; 
+    self->linger = ctx->linger; 
     self->sockets = zlist_new ();
     if (!self->sockets) {
         free (self);
@@ -177,22 +181,23 @@ zctx_set_linger (zctx_t *self, int linger)
 
 
 //  --------------------------------------------------------------------------
-//  Deprecated method, does nothing - to be removed after 2013/05/14
+//  Set the HWM (send and receive) that will be used for zthread_fork pipes
 
 void
 zctx_set_hwm (zctx_t *self, int hwm)
 {
     assert (self);
+    self->hwm = hwm;
 }
 
 //  --------------------------------------------------------------------------
-//  Deprecated method, does nothing - to be removed after 2013/05/14
+//  Get what the HWM will be for any future zthread_forks
 
 int
 zctx_hwm (zctx_t *self)
 {
     assert (self);
-    return 0;
+    return self->hwm;
 }
 
 //  --------------------------------------------------------------------------
@@ -223,6 +228,17 @@ zctx__socket_new (zctx_t *self, int type)
     void *zocket = zmq_socket (self->context, type);
     if (!zocket)
         return NULL;
+     int rc = zmq_setsockopt(zocket, ZMQ_RCVHWM, &(self->hwm),sizeof(self->hwm));
+     if (rc != 0 )  {
+         zmq_close(zocket);
+         return NULL;
+     }
+     rc = zmq_setsockopt(zocket, ZMQ_SNDHWM, &(self->hwm),sizeof(self->hwm));
+     if (rc != 0 )  {
+         zmq_close(zocket);
+         return NULL;
+     }
+
 
     if (zlist_push (self->sockets, zocket)) {
         zmq_close (zocket);
