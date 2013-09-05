@@ -228,18 +228,7 @@ zctx__socket_new (zctx_t *self, int type)
     void *zocket = zmq_socket (self->context, type);
     if (!zocket)
         return NULL;
-     int rc = zmq_setsockopt(zocket, ZMQ_RCVHWM, &(self->hwm),sizeof(self->hwm));
-     if (rc != 0 )  {
-         zmq_close(zocket);
-         return NULL;
-     }
-     rc = zmq_setsockopt(zocket, ZMQ_SNDHWM, &(self->hwm),sizeof(self->hwm));
-     if (rc != 0 )  {
-         zmq_close(zocket);
-         return NULL;
-     }
-
-
+    zsocket_set_hwm (zocket, self->hwm);
     if (zlist_push (self->sockets, zocket)) {
         zmq_close (zocket);
         return NULL;
