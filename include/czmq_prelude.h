@@ -380,11 +380,11 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 
 // Windows MSVS doesn't have stdbool
 #if (defined (__WINDOWS__))
-#    if (!defined(__cplusplus) && (!defined (true)))
-#        define true 1
-#        define false 0
-         typedef char bool;
-#    endif
+#   if (!defined (__cplusplus) && (!defined (true)))
+#       define true 1
+#       define false 0
+        typedef char bool;
+#   endif
 #else
 #   include <stdbool.h>
 #endif
@@ -392,6 +392,9 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 //- A number of POSIX and C99 keywords and data types -----------------------
 
 #if (defined (__WINDOWS__))
+#   if (!defined (__cplusplus) && (!defined (inline)))
+#       define inline __inline
+#   endif
 #   define strtoull _strtoui64
 #   define srandom srand
 #   define TIMEZONE _timezone

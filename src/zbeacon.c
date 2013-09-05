@@ -736,7 +736,7 @@ s_beacon_recv (agent_t *self)
             is_valid = true;
     }
     //  If valid, check for echoed beacons (i.e. our own broadcast)
-    if (is_valid && self->noecho) {
+    if (is_valid && self->noecho && self->transmit) {
         byte  *transmit_data = zframe_data (self->transmit);
         size_t transmit_size = zframe_size (self->transmit);
         if (size == transmit_size && memcmp (buffer, transmit_data, transmit_size) == 0)
@@ -763,6 +763,7 @@ s_beacon_send (agent_t *self)
         (char *) zframe_data (self->transmit), zframe_size (self->transmit),
         0,      //  Flags
         (struct sockaddr *) &self->broadcast, sizeof (inaddr_t));
+    
     //  Sending can fail if the OS is blocking multicast. In such cases we
     //  don't try to report the error. We might log this or send to an error
     //  console at some point.
