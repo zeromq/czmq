@@ -580,11 +580,31 @@ zhash_test (int verbose)
     item = (char *) zhash_lookup (hash, "DEADBEEF");
     assert (streq (item, "dead beef"));
 
-    //  Rename an item
+    //  Some rename tests
+    
+    //  Valid rename, key is now LIVEBEEF
     rc = zhash_rename (hash, "DEADBEEF", "LIVEBEEF");
     assert (rc == 0);
+    item = (char *) zhash_lookup (hash, "LIVEBEEF");
+    assert (streq (item, "dead beef"));
+    
+    //  Trying to rename an unknown item to a non-existent key
+    rc = zhash_rename (hash, "WHATBEEF", "NONESUCH");
+    assert (rc == -1);
+    
+    //  Trying to rename an unknown item to an existing key
     rc = zhash_rename (hash, "WHATBEEF", "LIVEBEEF");
     assert (rc == -1);
+    item = (char *) zhash_lookup (hash, "LIVEBEEF");
+    assert (streq (item, "dead beef"));
+    
+    //  Trying to rename an existing item to another existing item
+    rc = zhash_rename (hash, "LIVEBEEF", "ABADCAFE");
+    assert (rc == -1);
+    item = (char *) zhash_lookup (hash, "LIVEBEEF");
+    assert (streq (item, "dead beef"));
+    item = (char *) zhash_lookup (hash, "ABADCAFE");
+    assert (streq (item, "a bad cafe"));
 
     //  Test keys method
     zlist_t *keys = zhash_keys (hash);
