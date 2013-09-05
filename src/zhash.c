@@ -322,21 +322,17 @@ zhash_lookup (zhash_t *self, const char *key)
 int
 zhash_rename (zhash_t *self, const char *old_key, const char *new_key)
 {
-    item_t *item = s_item_lookup (self, old_key);
-    if (item) {
-        s_item_destroy (self, item, false);
-        item_t *new_item = s_item_lookup (self, new_key);
-        if (new_item == NULL) {
-            free (item->key);
-            item->key = strdup (new_key);
-            item->index = self->cached_index;
-            item->next = self->items [self->cached_index];
-            self->items [self->cached_index] = item;
-            self->size++;
-            return 0;
-        }
-        else
-            return -1;
+    item_t *old_item = s_item_lookup (self, old_key);
+    item_t *new_item = s_item_lookup (self, new_key);
+    if (old_item && !new_item) {
+        s_item_destroy (self, old_item, false);
+        free (old_item->key);
+        old_item->key = strdup (new_key);
+        old_item->index = self->cached_index;
+        old_item->next = self->items [self->cached_index];
+        self->items [self->cached_index] = old_item;
+        self->size++;
+        return 0;
     }
     else
         return -1;
@@ -584,11 +580,31 @@ zhash_test (int verbose)
     item = (char *) zhash_lookup (hash, "DEADBEEF");
     assert (streq (item, "dead beef"));
 
-    //  Rename an item
+    //  Some rename tests
+    
+    //  Valid rename, key is now LIVEBEEF
     rc = zhash_rename (hash, "DEADBEEF", "LIVEBEEF");
     assert (rc == 0);
+    item = (char *) zhash_lookup (hash, "LIVEBEEF");
+    assert (streq (item, "dead beef"));
+    
+    //  Trying to rename an unknown item to a non-existent key
+    rc = zhash_rename (hash, "WHATBEEF", "NONESUCH");
+    assert (rc == -1);
+    
+    //  Trying to rename an unknown item to an existing key
     rc = zhash_rename (hash, "WHATBEEF", "LIVEBEEF");
     assert (rc == -1);
+    item = (char *) zhash_lookup (hash, "LIVEBEEF");
+    assert (streq (item, "dead beef"));
+    
+    //  Trying to rename an existing item to another existing item
+    rc = zhash_rename (hash, "LIVEBEEF", "ABADCAFE");
+    assert (rc == -1);
+    item = (char *) zhash_lookup (hash, "LIVEBEEF");
+    assert (streq (item, "dead beef"));
+    item = (char *) zhash_lookup (hash, "ABADCAFE");
+    assert (streq (item, "a bad cafe"));
 
     //  Test keys method
     zlist_t *keys = zhash_keys (hash);
