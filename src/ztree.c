@@ -22,14 +22,13 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
     =========================================================================
 
-    Derived from Emin Martianan's Red Black which is licensed for free use.
-
-    http://web.mit.edu/~emin/www.old/source_code/red_black_tree/index.html
 */
 
 /*
 @header
     Red black tree container
+    Derived from Emin Martianan's Red Black which is licensed for free use.
+    http://web.mit.edu/~emin/www.old/source_code/red_black_tree/index.html
 @discuss
 @end
 */
@@ -820,11 +819,7 @@ ztree_test (int verbose)
     assert (value);
     assert (streq (value, "dead beef"));
     ztree_destroy (&copy);
-#if (defined (WIN32))
-    DeleteFile (".cache");
-#else
-    unlink (".cache");
-#endif
+    zfile_delete (".cache");
 
     //  Delete some nodes
     assert (ztree_size (tree) == 4);

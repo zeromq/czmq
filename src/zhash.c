@@ -451,7 +451,7 @@ zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument)
 
 //  --------------------------------------------------------------------------
 //  Save hash table to a text file in name=value format
-//  Hash values must be printable strings; keys may not contain '=' character
+//  Hash values must be printable strings.
 //  Returns 0 if OK, else -1 if a file error occurred
 
 int
@@ -478,8 +478,8 @@ zhash_save (zhash_t *self, char *filename)
 
 //  --------------------------------------------------------------------------
 //  Load hash table from a text file in name=value format; hash table must
-//  already exist. Hash values must printable strings; keys may not contain
-//  '=' character. Returns 0 if OK, else -1 if a file was not readable.
+//  already exist. Hash values must printable strings.
+//  Returns 0 if OK, else -1 if a file was not readable.
 
 int
 zhash_load (zhash_t *self, char *filename)
@@ -631,11 +631,7 @@ zhash_test (int verbose)
     assert (item);
     assert (streq (item, "dead beef"));
     zhash_destroy (&copy);
-#if (defined (WIN32))
-    DeleteFile (".cache");
-#else
-    unlink (".cache");
-#endif
+    zfile_delete (".cache");
         
     //  Delete a item
     zhash_delete (hash, "LIVEBEEF");

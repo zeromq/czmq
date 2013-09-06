@@ -604,7 +604,7 @@ s_config_save (zconfig_t *self, void *arg, int level)
     FILE *file = (FILE *) arg;
     if (level > 0) {
         if (self->value)
-            fprintf (file, "%*s%s = %s\n", (level - 1) * 4, "",
+            fprintf (file, "%*s%s = \"%s\"\n", (level - 1) * 4, "",
                 self->name? self->name: "(Unnamed)", self->value);
         else
             fprintf (file, "%*s%s\n", (level - 1) * 4, "",
