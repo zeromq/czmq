@@ -9,16 +9,16 @@
     http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the 
-    Free Software Foundation; either version 3 of the License, or (at your 
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
     This software is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL-
-    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General 
+    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General
     Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public License 
+    You should have received a copy of the GNU Lesser General Public License
     along with this program. If not, see <http://www.gnu.org/licenses/>.
     =========================================================================
 */
@@ -154,7 +154,7 @@ s_item_destroy (zhash_t *self, item_t *item, bool hard)
         else
         if (self->autofree)
             free (item->value);
-        
+
         free (item->key);
         free (item);
     }
@@ -248,7 +248,7 @@ zhash_insert (zhash_t *self, const char *key, void *value)
     //  If necessary, take duplicate of item (string) value
     if (self->autofree)
         value = strdup ((char *) value);
-    
+
     return s_item_insert (self, key, value)? 0: -1;
 }
 
@@ -263,7 +263,7 @@ zhash_update (zhash_t *self, const char *key, void *value)
 {
     assert (self);
     assert (key);
-    
+
     item_t *item = s_item_lookup (self, key);
     if (item) {
         if (item->free_fn)
@@ -271,7 +271,7 @@ zhash_update (zhash_t *self, const char *key, void *value)
         else
         if (self->autofree)
             free (item->value);
-        
+
         //  If necessary, take duplicate of item (string) value
         if (self->autofree)
             value = strdup ((char *) value);
@@ -375,7 +375,7 @@ zhash_size (zhash_t *self)
 
 //  --------------------------------------------------------------------------
 //  Make copy of hash table
-//  Does not copy items themselves. Rebuilds new table so may be slow on 
+//  Does not copy items themselves. Rebuilds new table so may be slow on
 //  very large tables. NOTE: only works with item values that are strings
 //  since there's no other way to know how to duplicate the item value.
 
@@ -462,7 +462,7 @@ zhash_save (zhash_t *self, char *filename)
     FILE *handle = fopen (filename, "w");
     if (!handle)
         return -1;              //  Failed to create file
-    
+
     uint index;
     for (index = 0; index != self->limit; index++) {
         item_t *item = self->items [index];
@@ -486,13 +486,16 @@ zhash_load (zhash_t *self, char *filename)
 {
     assert (self);
     zhash_autofree (self);
-    
+
     FILE *handle = fopen (filename, "r");
     if (!handle)
         return -1;              //  Failed to create file
 
     char buffer [1024];
     while (fgets (buffer, 1024, handle)) {
+        //  Skip lines starting with "#"
+        if (buffer [0] == '#')
+            continue;
         //  Buffer may end in newline, which we don't want
         if (buffer [strlen (buffer) - 1] == '\n')
             buffer [strlen (buffer) - 1] = 0;
@@ -581,23 +584,23 @@ zhash_test (int verbose)
     assert (streq (item, "dead beef"));
 
     //  Some rename tests
-    
+
     //  Valid rename, key is now LIVEBEEF
     rc = zhash_rename (hash, "DEADBEEF", "LIVEBEEF");
     assert (rc == 0);
     item = (char *) zhash_lookup (hash, "LIVEBEEF");
     assert (streq (item, "dead beef"));
-    
+
     //  Trying to rename an unknown item to a non-existent key
     rc = zhash_rename (hash, "WHATBEEF", "NONESUCH");
     assert (rc == -1);
-    
+
     //  Trying to rename an unknown item to an existing key
     rc = zhash_rename (hash, "WHATBEEF", "LIVEBEEF");
     assert (rc == -1);
     item = (char *) zhash_lookup (hash, "LIVEBEEF");
     assert (streq (item, "dead beef"));
-    
+
     //  Trying to rename an existing item to another existing item
     rc = zhash_rename (hash, "LIVEBEEF", "ABADCAFE");
     assert (rc == -1);
@@ -632,7 +635,7 @@ zhash_test (int verbose)
     assert (streq (item, "dead beef"));
     zhash_destroy (&copy);
     zfile_delete (".cache");
-        
+
     //  Delete a item
     zhash_delete (hash, "LIVEBEEF");
     item = (char *) zhash_lookup (hash, "LIVEBEEF");

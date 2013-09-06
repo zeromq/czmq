@@ -9,16 +9,16 @@
     http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the 
-    Free Software Foundation; either version 3 of the License, or (at your 
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
     This software is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL-
-    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General 
+    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General
     Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public License 
+    You should have received a copy of the GNU Lesser General Public License
     along with this program. If not, see <http://www.gnu.org/licenses/>.
     =========================================================================
 */
@@ -85,7 +85,7 @@ zframe_new_empty (void)
     self = (zframe_t *) zmalloc (sizeof (zframe_t));
     if (!self)
         return NULL;
-    
+
     zmq_msg_init (&self->zmsg);
     return self;
 }
@@ -197,18 +197,18 @@ zframe_send (zframe_t **self_p, void *zocket, int flags)
 
     if (*self_p) {
         zframe_t *self = *self_p;
-        int snd_flags = (flags & ZFRAME_MORE)? ZMQ_SNDMORE: 0;
-        snd_flags |= (flags & ZFRAME_DONTWAIT)? ZMQ_DONTWAIT: 0;
+        int send_flags = (flags & ZFRAME_MORE)? ZMQ_SNDMORE: 0;
+        send_flags |= (flags & ZFRAME_DONTWAIT)? ZMQ_DONTWAIT: 0;
         if (flags & ZFRAME_REUSE) {
             zmq_msg_t copy;
             zmq_msg_init (&copy);
             if (zmq_msg_copy (&copy, &self->zmsg))
                 return -1;
-            if (zmq_sendmsg (zocket, &copy, snd_flags) == -1)
+            if (zmq_sendmsg (zocket, &copy, send_flags) == -1)
                 return -1;
         }
         else {
-            int rc = zmq_sendmsg (zocket, &self->zmsg, snd_flags);
+            int rc = zmq_sendmsg (zocket, &self->zmsg, send_flags);
             zframe_destroy (self_p);
             if (rc == -1)
                 return -1;
@@ -318,7 +318,7 @@ zframe_more (zframe_t *self)
 }
 
 //  --------------------------------------------------------------------------
-//  Set frame MORE indicator (1 or 0). Note this is NOT used when sending 
+//  Set frame MORE indicator (1 or 0). Note this is NOT used when sending
 //  frame to socket, you have to specify flag explicitly.
 
 void
@@ -427,7 +427,7 @@ zframe_reset (zframe_t *self, const void *data, size_t size)
 //  problems with the method:
 //  - name is not accurate, should be "set_free_fn"
 //  - use case is unclear - why do we need this method?
-//  - fuzzy overlap with existing semantics - reuses zero-copy free_fn but 
+//  - fuzzy overlap with existing semantics - reuses zero-copy free_fn but
 //    is not actually zero-copy.
 //  (PH, 2013/05/18)
 
@@ -469,7 +469,7 @@ zframe_test (bool verbose)
     //  @selftest
     zctx_t *ctx = zctx_new ();
     assert (ctx);
-    
+
     void *output = zsocket_new (ctx, ZMQ_PAIR);
     assert (output);
     zsocket_bind (output, "inproc://zframe.test");
@@ -499,7 +499,7 @@ zframe_test (bool verbose)
     assert (zframe_size (copy) == 5);
     zframe_destroy (&copy);
     assert (!zframe_eq (frame, copy));
-	
+
     //  Test zframe_new_empty
     frame = zframe_new_empty ();
     assert (frame);

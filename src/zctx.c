@@ -9,16 +9,16 @@
     http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the 
-    Free Software Foundation; either version 3 of the License, or (at your 
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
     This software is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL-
-    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General 
+    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General
     Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public License 
+    You should have received a copy of the GNU Lesser General Public License
     along with this program. If not, see <http://www.gnu.org/licenses/>.
     =========================================================================
 */
@@ -63,7 +63,7 @@ struct _zctx_t {
     bool main;                  //  True if we're the main thread
     int iothreads;              //  Number of IO threads, default 1
     int linger;                 //  Linger timeout, default 0
-    int hwm;                    //  Send/Receive HWM for the pair sockets in zthread_fork
+    int hwm;                    //  Send/receive HWM for pipes
 };
 
 
@@ -99,7 +99,7 @@ zctx_new (void)
         return NULL;
     }
     self->iothreads = 1;
-    self->hwm = 0; // unlimited
+    self->hwm = 1000;           //  Match ZeroMQ default
     self->main = true;
     zsys_handler_set (s_signal_handler);
     return self;
@@ -143,8 +143,8 @@ zctx_shadow (zctx_t *ctx)
         return NULL;
 
     self->context = ctx->context;
-    self->hwm = ctx->hwm; 
-    self->linger = ctx->linger; 
+    self->hwm = ctx->hwm;
+    self->linger = ctx->linger;
     self->sockets = zlist_new ();
     if (!self->sockets) {
         free (self);
