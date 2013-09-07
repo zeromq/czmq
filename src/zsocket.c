@@ -270,6 +270,16 @@ zsocket_test (bool verbose)
     assert (streq (zsocket_type_str (reader), "PULL"));
     int rc = zsocket_bind (writer, "tcp://%s:%d", interf, service);
     assert (rc == service);
+
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0))
+    // Check unbind
+    assert (0 == zsocket_unbind (writer, "tcp://%s:%d", interf, service));
+
+    // Bind again
+    rc = zsocket_bind (writer, "tcp://%s:%d", interf, service);
+    assert (rc == service);
+#endif
+
     rc = zsocket_connect (reader, "tcp://%s:%d", domain, service);
     assert (rc == 0);
     zstr_send (writer, "HELLO");
