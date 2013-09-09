@@ -524,7 +524,6 @@ zhash_autofree (zhash_t *self)
 
 //  --------------------------------------------------------------------------
 //  Runs selftest of class
-//  TODO: add unit test for free_fn, foreach
 //
 
 static int
@@ -673,6 +672,20 @@ zhash_test (int verbose)
     zhash_destroy (&hash);
     zhash_destroy (&hash);
     assert (hash == NULL);
+
+    // Test autofree; automatically copies and frees string values
+    hash = zhash_new ();
+    zhash_autofree (hash);
+    char value [255];
+    strcpy (value, "This is a string");
+    rc = zhash_insert (hash, "key1", value);
+    assert (rc == 0);
+    strcpy (value, "Ring a ding ding");
+    rc = zhash_insert (hash, "key2", value);
+    assert (rc == 0);
+    assert (streq (zhash_lookup (hash, "key1"), "This is a string"));
+    assert (streq (zhash_lookup (hash, "key2"), "Ring a ding ding"));
+    zhash_destroy (&hash);
     //  @end
 
     printf ("OK\n");
