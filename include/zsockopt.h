@@ -69,6 +69,7 @@ CZMQ_EXPORT int zsocket_curve_server (void *zocket);
 CZMQ_EXPORT char * zsocket_curve_publickey (void *zocket);
 CZMQ_EXPORT char * zsocket_curve_secretkey (void *zocket);
 CZMQ_EXPORT char * zsocket_curve_serverkey (void *zocket);
+CZMQ_EXPORT char * zsocket_zap_domain (void *zocket);
 CZMQ_EXPORT int zsocket_rcvmore (void *zocket);
 CZMQ_EXPORT int zsocket_fd (void *zocket);
 CZMQ_EXPORT int zsocket_events (void *zocket);
@@ -110,6 +111,7 @@ CZMQ_EXPORT void zsocket_set_curve_server (void *zocket, int curve_server);
 CZMQ_EXPORT void zsocket_set_curve_publickey (void *zocket, const char * curve_publickey);
 CZMQ_EXPORT void zsocket_set_curve_secretkey (void *zocket, const char * curve_secretkey);
 CZMQ_EXPORT void zsocket_set_curve_serverkey (void *zocket, const char * curve_serverkey);
+CZMQ_EXPORT void zsocket_set_zap_domain (void *zocket, const char * zap_domain);
 CZMQ_EXPORT void zsocket_set_router_raw (void *zocket, int router_raw);
 CZMQ_EXPORT void zsocket_set_ipv4only (void *zocket, int ipv4only);
 CZMQ_EXPORT void zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect);
@@ -245,6 +247,8 @@ int zsockopt_test (bool verbose);
 #define zsockopt_set_curve_secretkey zsocket_set_curve_secretkey
 #define zsockopt_curve_serverkey zsocket_curve_serverkey
 #define zsockopt_set_curve_serverkey zsocket_set_curve_serverkey
+#define zsockopt_zap_domain zsocket_zap_domain
+#define zsockopt_set_zap_domain zsocket_set_zap_domain
 #define zsockopt_rcvmore zsocket_rcvmore
 #define zsockopt_fd zsocket_fd
 #define zsockopt_events zsocket_events
