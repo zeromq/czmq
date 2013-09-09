@@ -1170,6 +1170,40 @@ zsocket_curve_serverkey (void *zocket)
 
 
 //  --------------------------------------------------------------------------
+//  Set socket ZMQ_ZAP_DOMAIN value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsocket_set_zap_domain (void *zocket, const char * zap_domain)
+{
+#   if defined (ZMQ_ZAP_DOMAIN)
+    int rc = zmq_setsockopt (zocket, ZMQ_ZAP_DOMAIN, zap_domain, strlen (zap_domain));
+    if (rc)
+        puts (zmq_strerror (errno));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_ZAP_DOMAIN value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+char * 
+zsocket_zap_domain (void *zocket)
+{
+#   if defined (ZMQ_ZAP_DOMAIN)
+    size_t option_len = 255;
+    char *zap_domain = (char *) zmalloc (option_len);
+    zmq_getsockopt (zocket, ZMQ_ZAP_DOMAIN, zap_domain, &option_len);
+    return (char *) zap_domain;
+#   else
+    return NULL;
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
 //  Return socket ZMQ_RCVMORE value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
@@ -2298,6 +2332,15 @@ zsockopt_test (bool verbose)
     zsocket_destroy (ctx, zocket);
 #       endif
 #     endif
+#       if defined (ZMQ_ZAP_DOMAIN)
+    zocket = zsocket_new (ctx, ZMQ_SUB);
+    assert (zocket);
+    zsocket_set_zap_domain (zocket, "test");
+    char *zap_domain = zsocket_zap_domain (zocket);
+    assert (zap_domain);
+    free (zap_domain);
+    zsocket_destroy (ctx, zocket);
+#       endif
 #       if defined (ZMQ_RCVMORE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
