@@ -77,10 +77,26 @@ if test "x$czmq_search_libzmq" = "xyes"; then
     if test -r "${with_libzmq}/include/zmq.h"; then
         CFLAGS="-I${with_libzmq}/include ${CFLAGS}"
         LDFLAGS="-L${with_libzmq}/lib ${LDFLAGS}"
-    else
-        AC_MSG_ERROR([${with_libzmq}/include/zmq.h not found. Please check libzmq prefix])
     fi
 fi
+
+AC_ARG_WITH([libzmq-include-dir],
+            [AS_HELP_STRING([--with-libzmq-include-dir],
+                            [Specify libzmq include prefix])],
+            [czmq_search_libzmq_include="yes"],
+            [])
+
+if test "x$czmq_search_libzmq_include" = "xyes"; then
+    if test -r "${with_libzmq_include_dir}/include/zmq.h"; then
+        CFLAGS="-I${with_libzmq_include_dir}/include ${CFLAGS}"
+    fi
+fi
+
+AC_ARG_WITH([libzmq_lib_dir],
+            [AS_HELP_STRING([--with-libzmq-lib-dir],
+                            [Specify libzmq library prefix])],
+            [czmq_search_libzmq_lib="yes"],
+            [])
 
 AC_CHECK_LIB(zmq, zmq_init, ,[AC_MSG_ERROR([cannot link with -lzmq, install libzmq.])])
 
