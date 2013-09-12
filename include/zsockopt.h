@@ -109,8 +109,11 @@ CZMQ_EXPORT void zsocket_set_plain_username (void *zocket, const char * plain_us
 CZMQ_EXPORT void zsocket_set_plain_password (void *zocket, const char * plain_password);
 CZMQ_EXPORT void zsocket_set_curve_server (void *zocket, int curve_server);
 CZMQ_EXPORT void zsocket_set_curve_publickey (void *zocket, const char * curve_publickey);
+CZMQ_EXPORT void zsocket_set_curve_publickey_bin (void *zocket, const byte *curve_publickey);
 CZMQ_EXPORT void zsocket_set_curve_secretkey (void *zocket, const char * curve_secretkey);
+CZMQ_EXPORT void zsocket_set_curve_secretkey_bin (void *zocket, const byte *curve_secretkey);
 CZMQ_EXPORT void zsocket_set_curve_serverkey (void *zocket, const char * curve_serverkey);
+CZMQ_EXPORT void zsocket_set_curve_serverkey_bin (void *zocket, const byte *curve_serverkey);
 CZMQ_EXPORT void zsocket_set_zap_domain (void *zocket, const char * zap_domain);
 CZMQ_EXPORT void zsocket_set_router_raw (void *zocket, int router_raw);
 CZMQ_EXPORT void zsocket_set_ipv4only (void *zocket, int ipv4only);

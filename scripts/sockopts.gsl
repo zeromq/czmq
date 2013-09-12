@@ -72,6 +72,9 @@ CZMQ_EXPORT $(ctype) zsocket_$(name) (void *zocket);
 .       endif
 .       if mode = "rw" | mode = "w"
 CZMQ_EXPORT void zsocket_set_$(name) (void *zocket, $(ctype_const) $(name));
+.           if type = "key"
+CZMQ_EXPORT void zsocket_set_$(name)_bin (void *zocket, const byte *$(name));
+.           endif
 .       endif
 .       if defined (.minor)
 #   endif
