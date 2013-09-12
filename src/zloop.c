@@ -318,6 +318,7 @@ zloop_timer_end (zloop_t *self, void *arg)
 
 //  --------------------------------------------------------------------------
 //  Set verbose tracing of reactor on/off
+
 void
 zloop_set_verbose (zloop_t *self, bool verbose)
 {
@@ -329,8 +330,8 @@ zloop_set_verbose (zloop_t *self, bool verbose)
 //  Start the reactor. Takes control of the thread and returns when the 0MQ
 //  context is terminated or the process is interrupted, or any event handler
 //  returns -1. Event handlers may register new sockets and timers, and
-//  cancel sockets. Returns 0 if interrupted, -1 if canceled by a
-//  handler, positive on internal error
+//  cancel sockets. Returns 0 if interrupted, -1 if canceled by a handler,
+//  positive on internal error
 
 int
 zloop_start (zloop_t *self)
