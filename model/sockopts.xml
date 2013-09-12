@@ -9,13 +9,13 @@
         <option name = "sndhwm"            type = "int"    mode = "rw" test = "PUB" />
         <option name = "rcvhwm"            type = "int"    mode = "rw" test = "SUB" />
         <option name = "affinity"          type = "uint64" mode = "rw" test = "SUB" />
-        <option name = "subscribe"         type = "blob"   mode = "w"  test = "SUB">
+        <option name = "subscribe"         type = "string" mode = "w"  test = "SUB">
             <restrict type = "SUB" />
         </option>
-        <option name = "unsubscribe"       type = "blob"   mode = "w"  test = "SUB">
+        <option name = "unsubscribe"       type = "string" mode = "w"  test = "SUB">
             <restrict type = "SUB" />
         </option>
-        <option name = "identity"          type = "blob"   mode = "rw" test = "DEALER">
+        <option name = "identity"          type = "string" mode = "rw" test = "DEALER">
             <restrict type = "REQ" />
             <restrict type = "REP" />
             <restrict type = "DEALER" />
@@ -53,27 +53,27 @@
         <option name = "tcp_keepalive_cnt" type = "int"    mode = "rw" test = "SUB" />
         <option name = "tcp_keepalive_intvl"
                                            type = "int"    mode = "rw" test = "SUB" />
-        <option name = "tcp_accept_filter" type = "blob"   mode = "rw" test = "SUB"
+        <option name = "tcp_accept_filter" type = "string" mode = "rw" test = "SUB"
                 test_value = "127.0.0.1" />
         <option name = "plain_server"      type = "int"    mode = "rw" test = "PUB" />
-        <option name = "plain_username"    type = "blob"   mode = "rw" test = "SUB" />
-        <option name = "plain_password"    type = "blob"   mode = "rw" test = "SUB" />
+        <option name = "plain_username"    type = "string" mode = "rw" test = "SUB" />
+        <option name = "plain_password"    type = "string" mode = "rw" test = "SUB" />
         <option name = "curve_server"      type = "int"    mode = "rw" test = "PUB"
                 ifdef = "HAVE_LIBSODIUM" />
-        <option name = "curve_publickey"   type = "blob"   mode = "rw" test = "PUB"
+        <option name = "curve_publickey"   type = "key"    mode = "rw" test = "PUB"
                 ifdef = "HAVE_LIBSODIUM"
                 test_value = "Yne@$w-vo<fVvi]a<NY6T1ed:M$fCG*[IaLV{hID" />
-        <option name = "curve_secretkey"   type = "blob"   mode = "rw" test = "PUB"
+        <option name = "curve_secretkey"   type = "key"    mode = "rw" test = "PUB"
                 ifdef = "HAVE_LIBSODIUM"
                 test_value = "D:)Q[IlAW!ahhC2ac:9*A}h:p?([4%wOTJ%JR%cs" />
-        <option name = "curve_serverkey"   type = "blob"   mode = "rw" test = "SUB"
+        <option name = "curve_serverkey"   type = "key"    mode = "rw" test = "SUB"
                 ifdef = "HAVE_LIBSODIUM"
                 test_value = "rq:rM>}U?@Lns47E1%kR.o@n%FcmmsL/@{H8]yf7" />
-        <option name = "zap_domain"        type = "blob"   mode = "rw" test = "SUB" />
+        <option name = "zap_domain"        type = "string" mode = "rw" test = "SUB" />
         <option name = "rcvmore"           type = "int"    mode = "r"  test = "SUB" />
         <option name = "fd"                type = "int"    mode = "r"  test = "SUB" />
         <option name = "events"            type = "int"    mode = "r"  test = "SUB" />
-        <option name = "last_endpoint"     type = "blob"   mode = "r"  test = "SUB" />
+        <option name = "last_endpoint"     type = "string" mode = "r"  test = "SUB" />
 
         <!-- Deprecated options -->
         <option name = "router_raw"        type = "int"    mode = "w"  test = "ROUTER">
@@ -112,7 +112,7 @@ zsocket_set_hwm (void *zocket, int hwm)
         <option name = "hwm"               type = "uint64" mode = "rw" test = "SUB" />
         <option name = "swap"              type = "int64"  mode = "rw" test = "SUB" />
         <option name = "affinity"          type = "uint64" mode = "rw" test = "SUB" />
-        <option name = "identity"          type = "blob"   mode = "rw" test = "SUB" />
+        <option name = "identity"          type = "string" mode = "rw" test = "SUB" />
         <option name = "rate"              type = "int64"  mode = "rw" test = "SUB" />
         <option name = "recovery_ivl"      type = "int64"  mode = "rw" test = "SUB" />
         <option name = "recovery_ivl_msec" type = "int64"  mode = "rw" test = "SUB" />
@@ -125,10 +125,10 @@ zsocket_set_hwm (void *zocket, int hwm)
         <option name = "reconnect_ivl"     type = "int"    mode = "rw" test = "SUB" />
         <option name = "reconnect_ivl_max" type = "int"    mode = "rw" test = "SUB" />
         <option name = "backlog"           type = "int"    mode = "rw" test = "SUB" />
-        <option name = "subscribe"         type = "blob"   mode = "w"  test = "SUB">
+        <option name = "subscribe"         type = "string" mode = "w"  test = "SUB">
             <restrict type = "SUB" />
         </option>
-        <option name = "unsubscribe"       type = "blob"   mode = "w"  test = "SUB">
+        <option name = "unsubscribe"       type = "string" mode = "w"  test = "SUB">
             <restrict type = "SUB" />
         </option>
         <option name = "type"              type = "int"    mode = "r"  test = "SUB" />
