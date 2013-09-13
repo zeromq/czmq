@@ -1020,6 +1020,20 @@ zsocket_set_curve_publickey (void *zocket, const char * curve_publickey)
 
 
 //  --------------------------------------------------------------------------
+//  Set socket ZMQ_CURVE_PUBLICKEY value from 32-octet binary
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsocket_set_curve_publickey_bin (void *zocket, const byte *curve_publickey)
+{
+#   if defined (ZMQ_CURVE_PUBLICKEY)
+    int rc = zmq_setsockopt (zocket, ZMQ_CURVE_PUBLICKEY, curve_publickey, 32);
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
 //  Return socket ZMQ_CURVE_PUBLICKEY value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
@@ -1052,6 +1066,20 @@ zsocket_set_curve_secretkey (void *zocket, const char * curve_secretkey)
 
 
 //  --------------------------------------------------------------------------
+//  Set socket ZMQ_CURVE_SECRETKEY value from 32-octet binary
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsocket_set_curve_secretkey_bin (void *zocket, const byte *curve_secretkey)
+{
+#   if defined (ZMQ_CURVE_SECRETKEY)
+    int rc = zmq_setsockopt (zocket, ZMQ_CURVE_SECRETKEY, curve_secretkey, 32);
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
 //  Return socket ZMQ_CURVE_SECRETKEY value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
@@ -1078,6 +1106,20 @@ zsocket_set_curve_serverkey (void *zocket, const char * curve_serverkey)
 {
 #   if defined (ZMQ_CURVE_SERVERKEY)
     int rc = zmq_setsockopt (zocket, ZMQ_CURVE_SERVERKEY, curve_serverkey, strlen (curve_serverkey));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_CURVE_SERVERKEY value from 32-octet binary
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsocket_set_curve_serverkey_bin (void *zocket, const byte *curve_serverkey)
+{
+#   if defined (ZMQ_CURVE_SERVERKEY)
+    int rc = zmq_setsockopt (zocket, ZMQ_CURVE_SERVERKEY, curve_serverkey, 32);
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
