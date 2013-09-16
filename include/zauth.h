@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zclock - millisecond clocks and delays
+    zauth - authentication for ZeroMQ security mechanisms
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
@@ -9,48 +9,46 @@
     http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the 
-    Free Software Foundation; either version 3 of the License, or (at your 
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
     This software is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL-
-    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General 
+    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General
     Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public License 
+    You should have received a copy of the GNU Lesser General Public License
     along with this program. If not, see <http://www.gnu.org/licenses/>.
     =========================================================================
 */
 
-#ifndef __ZCLOCK_H_INCLUDED__
-#define __ZCLOCK_H_INCLUDED__
+#ifndef __ZAUTH_H_INCLUDED__
+#define __ZAUTH_H_INCLUDED__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+//  Opaque class structure
+typedef struct _zauth_t zauth_t;
+
 //  @interface
-//  Sleep for a number of milliseconds
+//  Create a new authenticator
+CZMQ_EXPORT zauth_t *
+    zauth_new (zctx_t *ctx);
+
+//  Destroy a auth container
 CZMQ_EXPORT void
-    zclock_sleep (int msecs);
+    zauth_destroy (zauth_t **self_p);
 
-//  Return current system clock as milliseconds
-CZMQ_EXPORT int64_t
-    zclock_time (void);
-
-//  Print formatted string to stdout, prefixed by date/time and
-//  terminated with a newline.
+//  Enable verbose tracing of commands and activity
 CZMQ_EXPORT void
-    zclock_log (const char *format, ...);
-
-//  Return formatted date/time as fresh string.
-CZMQ_EXPORT char *
-    zclock_timestr (void);
+    zauth_set_verbose (zauth_t *self, bool verbose);
 
 //  Self test of this class
 CZMQ_EXPORT int
-    zclock_test (bool verbose);
+    zauth_test (bool verbose);
 //  @end
 
 #ifdef __cplusplus

@@ -1,0 +1,100 @@
+zcert(3)
+========
+
+NAME
+----
+zcert - work with CURVE security certificates
+
+SYNOPSIS
+--------
+----
+
+//  Create and initialize a new certificate in memory
+CZMQ_EXPORT zcert_t *
+    zcert_new (void);
+
+//  Constructor, accepts public/secret key pair from caller
+CZMQ_EXPORT zcert_t *
+    zcert_new_from (byte *public_key, byte *secret_key);
+
+//  Destroy a certificate in memory
+CZMQ_EXPORT void
+    zcert_destroy (zcert_t **self_p);
+
+//  Return public part of key pair as 32-byte binary string
+CZMQ_EXPORT byte *
+    zcert_public_key (zcert_t *self);
+
+//  Return secret part of key pair as 32-byte binary string
+CZMQ_EXPORT byte *
+    zcert_secret_key (zcert_t *self);
+
+//  Return public part of key pair as Z85 armored string
+CZMQ_EXPORT char *
+    zcert_public_txt (zcert_t *self);
+
+//  Return secret part of key pair as Z85 armored string
+CZMQ_EXPORT char *
+    zcert_secret_txt (zcert_t *self);
+
+//  Set certificate header (metadata) from formatted string.
+CZMQ_EXPORT void
+    zcert_set_header (zcert_t *self, const char *name, const char *format, ...);
+
+//  Get header value from certificate; if the header doesn't exist, returns
+//  NULL.
+CZMQ_EXPORT char *
+    zcert_header (zcert_t *self, const char *name);
+
+//  Save certificate to file for persistent storage
+CZMQ_EXPORT int
+    zcert_save (zcert_t *self, char *filename);
+
+//  Load certificate from file (constructor)
+CZMQ_EXPORT zcert_t *
+    zcert_load (char *filename);
+
+//  Return copy of certificate
+CZMQ_EXPORT zcert_t *
+    zcert_dup (zcert_t *self);
+
+//  Return true if two certificates have the same keys
+CZMQ_EXPORT bool
+    zcert_eq (zcert_t *self, zcert_t *compare);
+
+//  Dump certificate contents to stderr for debugging
+CZMQ_EXPORT void
+    zcert_dump (zcert_t *self);
+
+//  Self test of this class
+CZMQ_EXPORT int
+    zcert_test (bool verbose);
+----
+
+DESCRIPTION
+-----------
+
+The zcert class provides a way to create and work with security
+certificates for the ZMQ CURVE mechanism. A certificate contains a
+public + secret key pair, plus metadata. It can be used as a
+temporary object in memory, or persisted to disk. On disk, a
+certificate is stored as two files. One is public and contains only
+the public key. The second is secret and contains both keys. The
+two have the same filename, with the secret file adding "_secret".
+To exchange certificates, send the public file via some secure
+route. Certificates are not signed but are text files that can
+be verified by eye.
+
+Certificates are stored in the ZPL (ZMQ RFC 4) format.
+
+EXAMPLE
+-------
+.From zcert_test method
+----
+    //  Create a simple certificate with metadata
+    zcert_t *cert = zcert_new ();
+----
+
+SEE ALSO
+--------
+linkczmq:czmq[7]

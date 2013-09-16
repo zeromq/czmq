@@ -27,9 +27,7 @@
 @header
     Lets applications load, work with, and save configuration files.
     This implements rfc.zeromq.org/spec:4/ZPL, which is a simple structured
-    text format for configuration files. Note that comments are stripped out
-    of configuration files when loading them, so loading and saving a config
-    file will remove any comments it contains.
+    text format for configuration files.
 @discuss
 @end
 */
@@ -45,6 +43,7 @@ struct _zconfig_t {
         *child,                 //  First child if any
         *next,                  //  Next sibling if any
         *parent;                //  Parent if any
+    zlist_t *comments;          //  Comments if any
 };
 
 //  Local functions for parsing and saving ZPL tokens
@@ -103,7 +102,7 @@ zconfig_destroy (zconfig_t **self_p)
             zconfig_destroy (&self->child);
         if (self->next)
             zconfig_destroy (&self->next);
-
+        zlist_destroy (&self->comments);
         free (self->name);
         free (self->value);
         free (self);
@@ -180,12 +179,10 @@ zconfig_set_name (zconfig_t *self, const char *format, ...)
     assert (self);
     free (self->name);
     if (format) {
-        char formatted [255];
-        va_list args;
-        va_start (args, format);
-        vsnprintf (formatted, 255, format, args);
-        va_end (args);
-        self->name = strdup (formatted);
+        va_list argptr;
+        va_start (argptr, format);
+        self->name = zsys_vprintf (format, argptr);
+        va_end (argptr);
     }
     else
         self->name = NULL;
@@ -194,7 +191,9 @@ zconfig_set_name (zconfig_t *self, const char *format, ...)
 
 //  --------------------------------------------------------------------------
 //  Set new value for config item. The new value may be a string, a printf
-//  format, or NULL.
+//  format, or NULL. Note that if string may possibly contain '%', or if it
+//  comes from an insecure source, you must use '%s' as the format, followed
+//  by the string.
 
 void
 zconfig_set_value (zconfig_t *self, const char *format, ...)
@@ -202,12 +201,10 @@ zconfig_set_value (zconfig_t *self, const char *format, ...)
     assert (self);
     free (self->value);
     if (format) {
-        char formatted [255];
-        va_list args;
-        va_start (args, format);
-        vsnprintf (formatted, 255, format, args);
-        va_end (args);
-        self->value = strdup (formatted);
+        va_list argptr;
+        va_start (argptr, format);
+        self->value = zsys_vprintf (format, argptr);
+        va_end (argptr);
     }
     else
         self->value = NULL;
@@ -237,12 +234,14 @@ zconfig_next (zconfig_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Find a config item along a path
+//  Find a config item along a path; leading slash is optional and ignored.
 
 zconfig_t *
 zconfig_locate (zconfig_t *self, const char *path)
 {
     //  Check length of next path segment
+    if (*path == '/')
+        path++;
     const char *slash = strchr (path, '/');
     int length = strlen (path);
     if (slash)
@@ -254,7 +253,7 @@ zconfig_locate (zconfig_t *self, const char *path)
         if (strlen (child->name) == length
         &&  memcmp (child->name, path, length) == 0) {
             if (slash)          //  Look deeper
-                return zconfig_locate (child, slash + 1);
+                return zconfig_locate (child, slash);
             else
                 return child;
         }
@@ -329,10 +328,12 @@ zconfig_execute (zconfig_t *self, zconfig_fct handler, void *arg)
 
 
 //  --------------------------------------------------------------------------
-//  Dump the config file to stdout for tracing
+//  Dump the config file to stderr for tracing
+
 void
 zconfig_dump (zconfig_t *self)
 {
+    zconfig_execute (self, s_config_save, stderr);
 }
 
 
@@ -389,11 +390,19 @@ zconfig_load (const char *filename)
     while (fgets (cur_line, 1024, file)) {
         //  Trim line
         int length = strlen (cur_line);
-        while (isspace ((byte) cur_line [length - 1]))
+        while (length && isspace ((byte) cur_line [length - 1]))
             cur_line [--length] = 0;
 
         //  Collect indentation level and name, if any
         lineno++;
+        //  Handle whole-line comment if present
+        if (cur_line [0] == '#') {
+            if (!self->comments) {
+                self->comments = zlist_new ();
+                zlist_autofree (self->comments);
+            }
+            zlist_append (self->comments, cur_line + 1);
+        }
         char *scanner = cur_line;
         int level = s_collect_level (&scanner, lineno);
         if (level == -1) {
@@ -427,6 +436,7 @@ zconfig_load (const char *filename)
         else
         if (s_verify_eoln (scanner, lineno))
             valid = false;
+            
         free (name);
         if (!valid)
             break;
@@ -568,6 +578,32 @@ s_collect_value (char **start, int lineno)
 
 
 //  --------------------------------------------------------------------------
+//  Add comment to config item before saving to disk. You can add as many
+//  comment lines as you like. If you use a null format, all comments are 
+//  deleted.
+
+void
+zconfig_comment (zconfig_t *self, char *format, ...)
+{
+    if (format) {
+        if (!self->comments) {
+            self->comments = zlist_new ();
+            zlist_autofree (self->comments);
+        }
+        va_list argptr;
+        va_start (argptr, format);
+        char *string = zsys_vprintf (format, argptr);
+        va_end (argptr);
+        
+        zlist_append (self->comments, string);
+        free (string);
+    }
+    else
+        zlist_destroy (&self->comments);
+}
+
+
+//  --------------------------------------------------------------------------
 //  Save a config item tree to a specified ZPL text file, where a filename
 //  "-" means dump to standard output.
 
@@ -602,6 +638,16 @@ s_config_save (zconfig_t *self, void *arg, int level)
     assert (arg);
 
     FILE *file = (FILE *) arg;
+    //  Save any comments on the item
+    if (self->comments) {
+        char *comment = (char *) zlist_first (self->comments);
+        while (comment) {
+            fprintf (file, "#%s\n", comment);
+            comment = (char *) zlist_next (self->comments);
+        }
+        //  Blank line after comments is nice
+        fprintf (file, "\n");
+    }
     if (level > 0) {
         if (self->value)
             fprintf (file, "%*s%s = \"%s\"\n", (level - 1) * 4, "",
@@ -621,69 +667,37 @@ void
 zconfig_test (bool verbose)
 {
     printf (" * zconfig: ");
-
     //  @selftest
-    //  We create a config of this structure:
-    //
-    //  root
-    //      type = zqueue
-    //      frontend
-    //          option
-    //              swap = 25000000     #  25MB
-    //              subscribe = #2
-    //              hwm = 1000
-    //          bind = tcp://*:5555
-    //      backend
-    //          bind = tcp://*:5556
-    //
-    zconfig_t
-        *root,
-        *type,
-        *frontend,
-        *option,
-        *hwm,
-        *swap,
-        *subscribe,
-        *bind,
-        *backend;
-
-    //  Left is first child, next is next sibling
-    root     = zconfig_new ("root", NULL);
-    type     = zconfig_new ("type", root);
-    zconfig_set_value (type, "zqueue");
-    frontend = zconfig_new ("frontend", root);
-    option   = zconfig_new ("option", frontend);
-    swap     = zconfig_new ("swap", option);
-    zconfig_set_value (swap, "25000000");
-    subscribe = zconfig_new ("subscribe", option);
-    zconfig_set_value (subscribe, "#%d", 2);
-    hwm      = zconfig_new ("hwm", option);
-    zconfig_set_value (hwm, "1000");
-    bind     = zconfig_new ("bind", frontend);
-    zconfig_set_value (bind, "tcp://*:5555");
-    backend  = zconfig_new ("backend", root);
-    bind     = zconfig_new ("bind", backend);
-    zconfig_set_value (bind, "tcp://*:5556");
-
-    assert (atoi (zconfig_resolve (root, "frontend/option/hwm", "0")) == 1000);
-    assert (streq (zconfig_resolve (root, "backend/bind", ""), "tcp://*:5556"));
-
-    zconfig_put (root, "frontend/option/hwm", "500");
-    assert (atoi (zconfig_resolve (root, "frontend/option/hwm", "0")) == 500);
-    zconfig_put (root, "frontend/option/lwm", "200");
-    assert (atoi (zconfig_resolve (root, "frontend/option/lwm", "0")) == 200);
+    zconfig_t *root = zconfig_new ("root", NULL);
+    zconfig_t *section, *item;
     
+    section = zconfig_new ("headers", root);
+    item = zconfig_new ("email", section);
+    zconfig_set_value (item, "some@random.com");
+    item = zconfig_new ("name", section);
+    zconfig_set_value (item, "Justin Kayce");
+
+    section = zconfig_new ("curve", root);
+    item = zconfig_new ("public-key", section);
+    zconfig_set_value (item, "blachagsgsnasasda");
+    item = zconfig_new ("secret-key", section);
+    zconfig_set_value (item, "jahsd ahahasd ashdasdasd");
+    
+    zconfig_comment (root, "   CURVE certificate");
+    zconfig_comment (root, "   -----------------");
+    zconfig_save (root, "test.cfg");
     zconfig_destroy (&root);
-    assert (root == NULL);
+    root = zconfig_load ("test.cfg");
+    if (verbose)
+        zconfig_save (root, "-");
+        
+    char *email = zconfig_resolve (root, "/headers/email", NULL);
+    assert (email);
+    assert (streq (email, "some@random.com"));
 
-    //  Test loading from a ZPL file
-    zconfig_t *config = zconfig_load ("selftest.cfg");
-    assert (config);
-
-    //  Destructor should be safe to call twice
-    zconfig_destroy (&config);
-    zconfig_destroy (&config);
-    assert (config == NULL);
+    zconfig_save (root, "test.cfg");
+    zconfig_destroy (&root);
+    zsys_file_delete ("test.cfg");
     //  @end
 
     printf ("OK\n");

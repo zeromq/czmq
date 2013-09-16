@@ -55,16 +55,16 @@ struct _zloop_t {
 struct _s_poller_t {
     zmq_pollitem_t item;
     zloop_fn *handler;
-    void *arg;
-    bool ignore_errors;
+    void *arg;                  //  Application argument to poll item
     int errors;                 //  If too many errors, kill poller
+    bool tolerant;              //  Unless configured as tolerant
 };
 
 struct _s_timer_t {
     size_t delay;
     size_t times;
     zloop_fn *handler;
-    void *arg;
+    void *arg;                  //  Application argument to timer
     int64_t when;               //  Clock time when alarm goes off
 };
 
@@ -73,10 +73,10 @@ s_poller_new (zmq_pollitem_t *item, zloop_fn handler, void *arg)
 {
     s_poller_t *poller = (s_poller_t *) zmalloc (sizeof (s_poller_t));
     if (poller) {
-        poller->ignore_errors = (item->events & ZMQ_IGNERR) != 0;
         poller->item = *item;
         poller->handler = handler;
         poller->arg = arg;
+        poller->tolerant = false;   //  By default, errors are bad
     }
     return poller;
 }
@@ -274,6 +274,28 @@ zloop_poller_end (zloop_t *self, zmq_pollitem_t *item)
 
 
 //  --------------------------------------------------------------------------
+//  Configure a registered pollitem to ignore errors. If you do not set this, 
+//  then pollitems that have errors are removed from the reactor silently.
+
+void
+zloop_set_tolerant (zloop_t *self, zmq_pollitem_t *item)
+{
+    assert (self);
+    assert (item->socket || item->fd);
+
+    //  Find matching poller(s) and mark as tolerant
+    s_poller_t *poller = (s_poller_t *) zlist_first (self->pollers);
+    while (poller) {
+        if ((item->socket && item->socket == poller->item.socket)
+        ||  (item->fd     && item->fd     == poller->item.fd))
+            poller->tolerant = true;
+            
+        poller = (s_poller_t *) zlist_next (self->pollers);
+    }
+}
+
+
+//  --------------------------------------------------------------------------
 //  Register a timer that expires after some delay and repeats some number of
 //  times. At each expiry, will call the handler, passing the arg. To
 //  run a timer forever, use 0 times. Returns 0 if OK, -1 if there was an
@@ -388,9 +410,9 @@ zloop_start (zloop_t *self)
             assert (self->pollset [item_nbr].socket == poller->item.socket);
             
             if ((self->pollset [item_nbr].revents & ZMQ_POLLERR)
-            && !poller->ignore_errors) {
+            && !poller->tolerant) {
                 if (self->verbose)
-                    zclock_log ("I: zloop: can't poll %s socket (%p, %d): %s",
+                    zclock_log ("W: zloop: can't poll %s socket (%p, %d): %s",
                         poller->item.socket?
                             zsocket_type_str (poller->item.socket): "FD",
                         poller->item.socket, poller->item.fd,
@@ -414,8 +436,10 @@ zloop_start (zloop_t *self)
                 rc = poller->handler (self, &self->pollset [item_nbr], poller->arg);
                 if (rc == -1)
                     break;      //  Poller handler signaled break
-                // If the poller handler calls zloop_poller_end on poller other than itself
-                // we need to force rebuild in order to avoid reading from freed memory in the handler
+                    
+                //  If the poller handler calls zloop_poller_end on a poller 
+                //  other than itself, we need to force rebuild in order to 
+                //  avoid reading from freed memory in the handler.
                 if (self->dirty) {
                     if (self->verbose)
                         zclock_log ("I: zloop: pollers canceled, forcing rebuild");
@@ -485,8 +509,9 @@ zloop_test (bool verbose)
     
     //  When we get the ping message, end the reactor
     zmq_pollitem_t poll_input = { input, 0, ZMQ_POLLIN };
-    rc = zloop_poller (loop, &poll_input, s_socket_event, NULL);
+    rc = zloop_poller (loop, &poll_input, s_socket_event, NULL);    
     assert (rc == 0);
+    zloop_set_tolerant (loop, &poll_input);
     zloop_start (loop);
 
     zloop_destroy (&loop);

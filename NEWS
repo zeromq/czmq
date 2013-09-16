@@ -1,3 +1,116 @@
+CZMQ version 2.0.0 (rc1), released on 2013/09/xx
+================================================
+
+* Updated provisional version number to 2.0.0 since this is a major
+  expansion of the CZMQ API. The changes are mainly tools to support 
+  encryption via the libzmq CURVE mechanism, but also some new API
+  constructs to make it simpler to do common messaging work.
+
+Bug fixes and cleanups of codebase:
+
+* zconfig_load () failed if the ZPL file contained a blank line.
+
+* zconfig_locate () allows and ignores initial '/' on pathname.
+
+* Added zsys_vprintf () to centralize all variable string formatting;
+  this code was duplicated many times across the project.
+
+* Updated zmsg interface documentation to be more detailed.
+
+* Removed deprecated zstr_sendfm () method.
+
+* Removed deprecated zstr_sendf () method.
+
+* Removed definition of ZMQ_IGNERR and added zloop_set_tolerant ()
+  to configure a specific poller as error-tolerant.
+  
+* Removed deprecated zframe and zmsg zero-copy methods; this API was
+  too complex and split over several classes, and IMO if we want this 
+  optimization it should be in a new zero-copy class with a clean API.
+
+* Removed deprecated zsocket zero-copy methods, for above reason.
+
+* Removed deprecated zlist_copy method.
+
+* Renamed zframe_print_to_stream to zframe_fprint and kept old name
+  as deprecated macro.
+
+* Removed (not deprecated) zctx_set_hwm () as its semantics were not
+  consistent, and confusing to people.
+  
+* Removed (not deprecated) zctx_hwm (). We now have separate HWMs for
+  normal socket SND and RCV, and for inter-thread pipes. There is no
+  need to provide accessor methods for these.
+
+New API methods to simplify common messaging tasks:
+
+* Added zpoller class to provide new minimalist interface to zmq_poll.
+  This class makes it very simple to read off a set of sockets, which
+  is an 80% usecase.
+
+* Added zstr_sendx () to send multiple strings in one call. Inspired
+  by PyZMQ's multipart send method.
+
+* Added zstr_recvx () to receive multiple strings in one call. We do
+  a lot of multipart string reads; this makes it simpler for simple
+  cases.
+
+* Added zclock_timestr () to provide date/time as printable string.
+
+* Added zmsg_append () that nullifies caller's frame reference; this
+  is more consistent with the API style than zmsg_add (), which is
+  deprecated.
+  
+New classes used for security infrastructure:
+
+* Added zchunk class (from FileMQ), for managing memory blocks. 
+  This is a simpler model than zframes, which are optimized for 
+  message data. 
+  
+* Added zhash_comment () to add comments to a serialized zhash file.
+
+* Added zhash_refresh () to reload a backing file if modified on disk.
+
+* Added zconfig_comment () to add comments to saved config file, and
+  added code to save such comments from file when loading it.
+
+* Moved zfile (char *filename) methods to zsys, to make place for 
+  a new zfile class based on the CLASS object model. The old methods 
+  are still provided but are deprecated.
+  
+* Added zfile class (from FileMQ), for managing files. This provides
+  a rich file class with metadata and operations. This is a component
+  for directory management (zdir).
+  
+* Added zdir class (from FileMQ), for managing directories. This lets
+  us work with filesystem directories. I wanted this to be able to 
+  load certificates for security authentication. 
+  
+* The zdir and zfile classes are slightly stripped down from their 
+  FileMQ originals; no symbolic links, no directory difference tools.
+
+* Unfortunately to keep the old zfile_size and zfile_time methods, I
+  had to use zfile_cursize and zfile_modified in the new class. This
+  is a little clumsy.
+
+* Added zsys_file_modified () to return timestamp for a filename.
+  
+* Added zcert class to work with Curve certificates. A certificate is 
+  a public + secret key pair, plus metadata like name, email, etc. and
+  is saved as two files, a public text file and a secret text file.
+  Certificates are stored in ZPL (ZMQ RFC 4) configuration file format.
+  
+* Added zauth class to automate ZAP authenticators. This class does a
+  simple plug and play authentication of clients against certificates
+  stored in the $HOME/.curve directory. This can be extended over time
+  with other designs.
+  
+* Extended zsockopt generation to allow use of binary keys in CURVE
+  key options (e.g. zsocket_set_curve_secretkey_bin ()).
+  
+* Added addons/makecert.c tool to generate CURVE certificates.
+
+
 CZMQ version 1.4.1 (stable), released on 2013/05/01
 ===================================================
 
