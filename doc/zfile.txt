@@ -3,73 +3,168 @@ zfile(3)
 
 NAME
 ----
-zfile - helper functions for working with files.
+zfile - provides methods to work with files in a portable fashion.
 
 SYNOPSIS
 --------
 ----
-//  Return 1 if file exists, else zero
-CZMQ_EXPORT bool
-    zfile_exists (const char *filename);
+//  Create new file item
+CZMQ_EXPORT zfile_t *
+    zfile_new (const char *path, const char *name);
 
-//  Return size of file, or -1 if not found
-CZMQ_EXPORT ssize_t
-    zfile_size (const char *filename);
-
-//  Return file mode
-CZMQ_EXPORT mode_t
-    zfile_mode (const char *filename);
-
-//  Delete file. Does not complain if the file is absent
-CZMQ_EXPORT int
-    zfile_delete (const char *filename);
-
-//  Check if file is 'stable'
-CZMQ_EXPORT bool
-    zfile_stable (const char *filename);
-
-//  Create a file path if it doesn't exit
-CZMQ_EXPORT int
-    zfile_mkdir (const char *pathname);
-
-//  Remove a file path if empty
-CZMQ_EXPORT int
-    zfile_rmdir (const char *pathname);
-
-//  Set private file creation mode; all files created from here will be
-//  readable/writable by the owner only.
+//  Destroy a file item
 CZMQ_EXPORT void
-    zfile_mode_private (void);
-    
-//  Reset default file creation mode; all files created from here will use
-//  process file mode defaults.
+    zfile_destroy (zfile_t **self_p);
+
+//  Duplicate a file item, returns a newly constructed item
+CZMQ_EXPORT zfile_t *
+    zfile_dup (zfile_t *self);
+
+//  Return file name, remove path if provided
+CZMQ_EXPORT char *
+    zfile_filename (zfile_t *self, char *path);
+
+//  Return when the file was last modified.
+//  Updates the file statistics from disk at every call.
+CZMQ_EXPORT time_t
+    zfile_modified (zfile_t *self);
+
+//  Return the last-known size of the file.
+//  Updates the file statistics from disk at every call.
+CZMQ_EXPORT off_t
+    zfile_cursize (zfile_t *self);
+
+//  Return true if the file is a directory.
+//  Updates the file statistics from disk at every call.
+CZMQ_EXPORT bool
+    zfile_is_directory (zfile_t *self);
+
+//  Return true if the file is a regular file.
+//  Updates the file statistics from disk at every call.
+CZMQ_EXPORT bool
+    zfile_is_regular (zfile_t *self);
+
+//  Return true if the file is readable by this process
+//  Updates the file statistics from disk at every call.
+CZMQ_EXPORT bool
+    zfile_is_readable (zfile_t *self);
+
+//  Return true if the file is writeable by this process
+//  Updates the file statistics from disk at every call.
+CZMQ_EXPORT bool
+    zfile_is_writeable (zfile_t *self);
+
+//  Check if file has stopped changing and can be safely processed.
+//  Updates the file statistics from disk at every call.
+CZMQ_EXPORT bool
+    zfile_is_stable (zfile_t *self);
+
+//  Remove the file from disk
 CZMQ_EXPORT void
-    zfile_mode_default (void);
+    zfile_remove (zfile_t *self);
+
+//  Open file for reading, returns 0 if OK, else -1.
+CZMQ_EXPORT int
+    zfile_input (zfile_t *self);
+
+//  Open file for writing, creating full directory path if needed
+CZMQ_EXPORT int
+    zfile_output (zfile_t *self);
+
+//  Read chunk from file at specified position
+CZMQ_EXPORT zchunk_t *
+    zfile_read (zfile_t *self, size_t bytes, off_t offset);
+
+//  Write chunk to file at specified position
+CZMQ_EXPORT int
+    zfile_write (zfile_t *self, zchunk_t *chunk, off_t offset);
+
+//  Close file, if open
+CZMQ_EXPORT void
+    zfile_close (zfile_t *self);
+
+//  Return file handle, if opened
+CZMQ_EXPORT FILE *
+    zfile_handle (zfile_t *self);
 
 //  Self test of this class
 CZMQ_EXPORT int
     zfile_test (bool verbose);
+//  These methods are deprecated, and now moved to zsys class.
+CZMQ_EXPORT bool
+    zfile_exists (const char *filename);
+CZMQ_EXPORT ssize_t
+    zfile_size   (const char *filename);
+CZMQ_EXPORT mode_t
+    zfile_mode   (const char *filename);
+CZMQ_EXPORT int
+    zfile_delete (const char *filename);
+CZMQ_EXPORT bool
+    zfile_stable (const char *filename);
+CZMQ_EXPORT int
+    zfile_mkdir  (const char *pathname);
+CZMQ_EXPORT int
+    zfile_rmdir  (const char *pathname);
+CZMQ_EXPORT void
+    zfile_mode_private (void);
+CZMQ_EXPORT void
+    zfile_mode_default (void);
 ----
 
 DESCRIPTION
 -----------
 
-The zfile class provides methods to work with files and directories.
+The zfile class provides methods to work with files. This class is a new
+API, deprecating the old zfile class (which still exists but is implemented
+in zsys now).
 
 
 EXAMPLE
 -------
 .From zfile_test method
 ----
-    int rc = zfile_delete ("nosuchfile");
+    zfile_t *file = zfile_new (".", "bilbo");
+    assert (streq (zfile_filename (file, "."), "bilbo"));
+    assert (zfile_is_readable (file) == false);
+    zfile_destroy (&file);
+
+    //  Create a test file in some random subdirectory
+    file = zfile_new ("./this/is/a/test", "bilbo");
+    int rc = zfile_output (file);
+    assert (rc == 0);
+    zchunk_t *chunk = zchunk_new (NULL, 100);
+    zchunk_fill (chunk, 0, 100);
+    //  Write 100 bytes at position 1,000,000 in the file
+    rc = zfile_write (file, chunk, 1000000);
+    assert (rc == 0);
+    zfile_close (file);
+    assert (zfile_is_readable (file));
+    assert (zfile_cursize (file) == 1000100);
+    assert (!zfile_is_stable (file));
+    zchunk_destroy (&chunk);
+    zclock_sleep (1001);
+    assert (zfile_is_stable (file));
+
+    //  Check we can read from file
+    rc = zfile_input (file);
+    assert (rc == 0);
+    chunk = zfile_read (file, 1000100, 0);
+    assert (chunk);
+    assert (zchunk_size (chunk) == 1000100);
+    zchunk_destroy (&chunk);
+
+    //  Remove file and directory
+    zdir_t *dir = zdir_new ("./this", NULL);
+    assert (zdir_cursize (dir) == 1000100);
+    zdir_remove (dir, true);
+    assert (zdir_cursize (dir) == 0);
+    zdir_destroy (&dir);
+
+    //  Check we can no longer read from file
+    assert (!zfile_is_readable (file));
+    rc = zfile_input (file);
     assert (rc == -1);
-
-    bool rc_bool = zfile_exists ("nosuchfile");
-    assert (rc_bool != true);
-
-    rc = (int) zfile_size ("nosuchfile");
-    assert (rc == -1);
-
+    zfile_destroy (&file);
 ----
 
 SEE ALSO

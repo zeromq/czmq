@@ -179,7 +179,7 @@ zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args)
 {
     shim_t *shim = NULL;
     //  Create our end of the pipe
-    void *pipe = zsocket_new (ctx, ZMQ_PAIR);
+    void *pipe = zctx__socket_pipe (ctx);
     if (pipe)
         zsocket_bind (pipe, "inproc://zctx-pipe-%p", pipe);
     else
@@ -198,7 +198,7 @@ zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args)
         return NULL;
     
     //  Connect child pipe to our pipe
-    shim->pipe = zsocket_new (shim->ctx, ZMQ_PAIR);
+    shim->pipe = zctx__socket_pipe (shim->ctx);
     if (!shim->pipe)
         return NULL;
     zsocket_connect (shim->pipe, "inproc://zctx-pipe-%p", pipe);

@@ -12,7 +12,7 @@ SYNOPSIS
 //  We use this when choosing a port for dynamic binding.
 #define ZSOCKET_DYNFROM     0xc000
 #define ZSOCKET_DYNTO       0xffff
-        
+
 //  Callback function for zero-copy methods
 typedef void (zsocket_free_fn) (void *data, void *arg);
 
@@ -35,6 +35,12 @@ CZMQ_EXPORT void
 CZMQ_EXPORT int
     zsocket_bind (void *socket, const char *format, ...);
 
+//  Unbind a socket from a formatted endpoint.
+//  Returns 0 if OK, -1 if the endpoint was invalid or the function
+//  isn't supported.
+CZMQ_EXPORT int
+    zsocket_unbind (void *socket, const char *format, ...);
+
 //  Connect a socket to a formatted endpoint
 //  Returns 0 if OK, -1 if the endpoint was invalid.
 CZMQ_EXPORT int
@@ -50,7 +56,7 @@ CZMQ_EXPORT int
 //  ready on the socket, else FALSE.
 CZMQ_EXPORT bool
     zsocket_poll (void *socket, int msecs);
-    
+
 //  Returns socket type as printable constant string
 CZMQ_EXPORT char *
     zsocket_type_str (void *socket);
@@ -64,11 +70,11 @@ CZMQ_EXPORT int
 //  Returns -1 on error, 0 on success
 //  DEPRECATED - will be removed for next stable release
 CZMQ_EXPORT int
-    zsocket_sendmem_zero_copy (void *socket, void *data, size_t size, 
+    zsocket_sendmem_zero_copy (void *socket, void *data, size_t size,
                                zsocket_free_fn *free_fn,
                                void *hint, int flags);
 
-    
+
 //  Self test of this class
 CZMQ_EXPORT int
     zsocket_test (bool verbose);
@@ -109,7 +115,7 @@ EXAMPLE
     assert (message);
     assert (streq (message, "HELLO"));
     free (message);
-    
+
     //  Test binding to ports
     int port = zsocket_bind (writer, "tcp://%s:*", interf);
     assert (port >= ZSOCKET_DYNFROM && port <= ZSOCKET_DYNTO);
@@ -124,13 +130,13 @@ EXAMPLE
     assert (rc == 0);
     rc = zsocket_sendmem (writer, "DEFG", 4, 0);
     assert (rc == 0);
-    
+
     zframe_t *frame = zframe_recv (reader);
     assert (frame);
     assert (zframe_streq (frame, "ABC"));
     assert (zframe_more (frame));
     zframe_destroy (&frame);
-    
+
     frame = zframe_recv (reader);
     assert (frame);
     assert (zframe_streq (frame, "DEFG"));
@@ -144,13 +150,13 @@ EXAMPLE
     rc = zsocket_sendmem_zero_copy (writer, strdup ("DEFG"), 4,
                                     s_test_free_str_cb, NULL, 0);
     assert (rc == 0);
-    
+
     frame = zframe_recv (reader);
     assert (frame);
     assert (zframe_streq (frame, "ABC"));
     assert (zframe_more (frame));
     zframe_destroy (&frame);
-    
+
     frame = zframe_recv (reader);
     assert (frame);
     assert (zframe_streq (frame, "DEFG"));

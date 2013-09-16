@@ -63,7 +63,9 @@ struct _zctx_t {
     bool main;                  //  True if we're the main thread
     int iothreads;              //  Number of IO threads, default 1
     int linger;                 //  Linger timeout, default 0
-    int hwm;                    //  Send/receive HWM for pipes
+    int pipehwm;                //  Send/receive HWM for pipes
+    int sndhwm;                 //  ZMQ_SNDHWM for normal sockets
+    int rcvhwm;                 //  ZMQ_RCVHWM for normal sockets
 };
 
 
@@ -99,7 +101,9 @@ zctx_new (void)
         return NULL;
     }
     self->iothreads = 1;
-    self->hwm = 1000;           //  Match ZeroMQ default
+    self->pipehwm = 1000;   
+    self->sndhwm = 1000;
+    self->rcvhwm = 1000;
     self->main = true;
     zsys_handler_set (s_signal_handler);
     return self;
@@ -143,7 +147,7 @@ zctx_shadow (zctx_t *ctx)
         return NULL;
 
     self->context = ctx->context;
-    self->hwm = ctx->hwm;
+    self->pipehwm = ctx->pipehwm;
     self->linger = ctx->linger;
     self->sockets = zlist_new ();
     if (!self->sockets) {
@@ -181,24 +185,46 @@ zctx_set_linger (zctx_t *self, int linger)
 
 
 //  --------------------------------------------------------------------------
-//  Set the HWM (send and receive) that will be used for zthread_fork pipes
+//  Set initial high-water mark for inter-thread pipe sockets. Note that
+//  this setting is separate from the default for normal sockets. You 
+//  should change the default for pipe sockets *with care*. Too low values
+//  will cause blocked threads, and an infinite setting can cause memory
+//  exhaustion. The default, no matter the underlying ZeroMQ version, is
+//  1,000.
 
 void
-zctx_set_hwm (zctx_t *self, int hwm)
+zctx_set_pipehwm (zctx_t *self, int pipehwm)
 {
     assert (self);
-    self->hwm = hwm;
+    self->pipehwm = pipehwm;
 }
 
+    
 //  --------------------------------------------------------------------------
-//  Get what the HWM will be for any future zthread_forks
+//  Set initial send HWM for all new normal sockets created in context.
+//  You can set this per-socket after the socket is created.
+//  The default, no matter the underlying ZeroMQ version, is 1,000.
 
-int
-zctx_hwm (zctx_t *self)
+void
+zctx_set_sndhwm (zctx_t *self, int sndhwm)
 {
     assert (self);
-    return self->hwm;
+    self->sndhwm = sndhwm;
 }
+
+    
+//  --------------------------------------------------------------------------
+//  Set initial receive HWM for all new normal sockets created in context.
+//  You can set this per-socket after the socket is created.
+//  The default, no matter the underlying ZeroMQ version, is 1,000.
+
+void
+zctx_set_rcvhwm (zctx_t *self, int rcvhwm)
+{
+    assert (self);
+    self->rcvhwm = rcvhwm;
+}
+
 
 //  --------------------------------------------------------------------------
 //  Return low-level 0MQ context object
@@ -228,12 +254,34 @@ zctx__socket_new (zctx_t *self, int type)
     void *zocket = zmq_socket (self->context, type);
     if (!zocket)
         return NULL;
-    zsocket_set_hwm (zocket, self->hwm);
+    
+#if (ZMQ_VERSION_MAJOR == 2)
+    //  For ZeroMQ/2.x we use sndhwm for both send and receive
+    zsocket_set_hwm (zocket, self->sndhwm);
+#else
+    //  For later versions we use separate SNDHWM and RCVHWM
+    zsocket_set_sndhwm (zocket, self->sndhwm);
+    zsocket_set_rcvhwm (zocket, self->rcvhwm);
+#endif
     if (zlist_push (self->sockets, zocket)) {
         zmq_close (zocket);
         return NULL;
     }
     return zocket;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Create pipe socket within this context, for CZMQ use only
+
+void *
+zctx__socket_pipe (zctx_t *self)
+{
+    assert (self);
+    void *pipe = zctx__socket_new (self, ZMQ_PAIR);
+    if (pipe)
+        zsocket_set_hwm (pipe, self->pipehwm);
+    return pipe;
 }
 
 

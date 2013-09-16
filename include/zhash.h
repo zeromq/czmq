@@ -99,6 +99,12 @@ CZMQ_EXPORT zlist_t *
 CZMQ_EXPORT int
     zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument);
 
+//  Add comment to hash table before saving to disk. You can add as many
+//  comment lines as you like. These comment lines are discarded when loading
+//  the file. If you use a null format, all comments are deleted.
+CZMQ_EXPORT void
+    zhash_comment (zhash_t *self, char *format, ...);
+
 //  Save hash table to a text file in name=value format. Hash values must be
 //  printable strings; keys may not contain '=' character. Returns 0 if OK,
 //  else -1 if a file error occurred.
@@ -110,6 +116,13 @@ CZMQ_EXPORT int
 //  '=' character. Returns 0 if OK, else -1 if a file was not readable.
 CZMQ_EXPORT int
     zhash_load (zhash_t *self, char *filename);
+
+//  When a hash table was loaded from a file by zhash_load, this method will
+//  reload the file if it has been modified since, and is "stable", i.e. not
+//  still changing. Returns 0 if OK, -1 if there was an error reloading the 
+//  file.
+CZMQ_EXPORT int
+    zhash_refresh (zhash_t *self);
 
 //  Set hash for automatic value destruction
 CZMQ_EXPORT void

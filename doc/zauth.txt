@@ -1,0 +1,110 @@
+zauth(3)
+========
+
+NAME
+----
+zauth - authentication for ZeroMQ security mechanisms
+
+SYNOPSIS
+--------
+----
+//  Create a new authenticator
+CZMQ_EXPORT zauth_t *
+    zauth_new (zctx_t *ctx);
+
+//  Destroy a auth container
+CZMQ_EXPORT void
+    zauth_destroy (zauth_t **self_p);
+
+//  Enable verbose tracing of commands and activity
+CZMQ_EXPORT void
+    zauth_set_verbose (zauth_t *self, bool verbose);
+
+//  Self test of this class
+CZMQ_EXPORT int
+    zauth_test (bool verbose);
+----
+
+DESCRIPTION
+-----------
+
+A zauth object takes over authentication for all incoming connections in 
+its context. Note that libzmq provides four levels of security: default 
+NULL (which zauth does not see), and authenticated NULL, PLAIN, and CURVE,
+which zauth can see.
+
+
+
+EXAMPLE
+-------
+.From zauth_test method
+----
+    
+    //  Install the authenticator
+    zctx_t *ctx = zctx_new ();
+    zauth_t *auth = zauth_new (ctx);
+    assert (auth);
+    zauth_set_verbose (auth, verbose);
+    
+    //  A default NULL connection should always success, and not go through
+    //  our authentication infrastructure at all.
+    void *server = zsocket_new (ctx, ZMQ_PUSH);
+    void *client = zsocket_new (ctx, ZMQ_PULL);
+    bool success = s_can_connect (server, client);
+    assert (success);
+    
+    //  When we set a domain on the server, we switch on authentication 
+    //  for NULL sockets, but with no policies, the client connection will 
+    //  be allowed.
+    //
+    //  TODO: libzmq should accept new security options after unbind/bind
+    //  but for now we have to create a new server socket each time.
+    server = zsocket_new (ctx, ZMQ_PUSH);
+    zsocket_set_zap_domain (server, "global");
+    success = s_can_connect (server, client);
+    assert (success);
+        
+    //  Let's try blacklisting on NULL connections; our address is 127.0.0.1
+    //  Connection should now fail
+    FILE *blacklist = fopen ("banned-addresses", "w");
+    assert (blacklist);
+    fprintf (blacklist, "127.0.0.1\n");
+    fclose (blacklist);
+    zauth_set_blacklist (auth, "banned-addresses");
+    success = s_can_connect (server, client);
+    assert (!success);
+    
+    //  Add a whitelist, which takes precedence
+    //  Connection should now succeed again
+    FILE *whitelist = fopen ("allowed-addresses", "w");
+    assert (whitelist);
+    fprintf (whitelist, "127.0.0.1\n");
+    fclose (whitelist);
+    zauth_set_whitelist (auth, "allowed-addresses");
+    success = s_can_connect (server, client);
+    assert (success);
+
+    //  Try PLAIN authentication
+    FILE *password = fopen ("password-file", "w");
+    assert (password);
+    fprintf (password, "admin=Password\n");
+    fclose (password);
+    zauth_configure_plain (auth, "*", "password-file");
+    
+    zsocket_set_plain_server (server, 1);
+    zsocket_set_plain_username (client, "admin");
+    zsocket_set_plain_password (client, "1234");
+    success = s_can_connect (server, client);
+    assert (!success);
+
+    zsocket_set_plain_password (client, "Password");
+    success = s_can_connect (server, client);
+    assert (success);
+
+    //  Try CURVE authentication
+    zsocket_set_curve_server (server, 1);
+----
+
+SEE ALSO
+--------
+linkczmq:czmq[7]
