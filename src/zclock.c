@@ -125,6 +125,20 @@ zclock_log (const char *format, ...)
 
 
 //  --------------------------------------------------------------------------
+//  Return formatted date/time as fresh string.
+
+char *
+zclock_timestr (void)
+{
+    time_t curtime = time (NULL);
+    struct tm *loctime = localtime (&curtime);
+    char formatted [20];
+    strftime (formatted, 20, "%Y-%m-%d %H:%M:%S", loctime);
+    return strdup (formatted);
+}
+
+
+//  --------------------------------------------------------------------------
 //  Self test of this class
 
 int
@@ -136,6 +150,10 @@ zclock_test (bool verbose)
     int64_t start = zclock_time ();
     zclock_sleep (10);
     assert ((zclock_time () - start) >= 10);
+    char *timestr = zclock_timestr ();
+    if (verbose)
+        puts (timestr);
+    free (timestr);
     //  @end
 
     printf ("OK\n");

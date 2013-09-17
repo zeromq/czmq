@@ -61,7 +61,9 @@ CZMQ_EXPORT void
     zconfig_set_name (zconfig_t *self, const char *format, ...);
 
 //  Set new value for config item. The new value may be a string, a printf
-//  format, or NULL.
+//  format, or NULL. Note that if string may possibly contain '%', or if it
+//  comes from an insecure source, you must use '%s' as the format, followed
+//  by the string.
 CZMQ_EXPORT void
     zconfig_set_value (zconfig_t *self, const char *format, ...);
     
@@ -73,13 +75,14 @@ CZMQ_EXPORT zconfig_t *
 CZMQ_EXPORT zconfig_t *
     zconfig_next (zconfig_t *self);
 
-//  Find a config item along a path
+//  Find a config item along a path; leading slash is optional and ignored.
 CZMQ_EXPORT zconfig_t *
     zconfig_locate (zconfig_t *self, const char *path);
 
-//  Resolve a config path into a string value
+//  Resolve a config path into a string value; leading slash is optional 
+//  and ignored.
 CZMQ_EXPORT char *
-    zconfig_resolve (zconfig_t *self, const char *path, const char *default_value);
+    zconfig_resolve (zconfig_t *self, const char *path, const char *deflt);
 
 //  Set config item name, name may be NULL
 CZMQ_EXPORT void
@@ -93,6 +96,12 @@ CZMQ_EXPORT zconfig_t *
 CZMQ_EXPORT int
     zconfig_execute (zconfig_t *self, zconfig_fct handler, void *arg);
 
+//  Add comment to config item before saving to disk. You can add as many
+//  comment lines as you like. If you use a null format, all comments are 
+//  deleted.
+CZMQ_EXPORT void
+    zconfig_comment (zconfig_t *self, char *format, ...);
+
 //  Load a config item tree from a specified ZPL text file
 CZMQ_EXPORT zconfig_t *
     zconfig_load (const char *filename);
@@ -102,7 +111,7 @@ CZMQ_EXPORT zconfig_t *
 CZMQ_EXPORT int
     zconfig_save (zconfig_t *self, char *filename);
 
-//  Dump the config file to stdout for tracing
+//  Dump the config file to stderr for tracing
 CZMQ_EXPORT void
     zconfig_dump (zconfig_t *self);
 

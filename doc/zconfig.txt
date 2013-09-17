@@ -15,76 +15,18 @@ DESCRIPTION
 
 Lets applications load, work with, and save configuration files.
 This implements rfc.zeromq.org/spec:4/ZPL, which is a simple structured
-text format for configuration files. Note that comments are stripped out
-of configuration files when loading them, so loading and saving a config
-file will remove any comments it contains.
+text format for configuration files.
 
 
 EXAMPLE
 -------
 .From zconfig_test method
 ----
-    //  We create a config of this structure:
-    //
-    //  root
-    //      type = zqueue
-    //      frontend
-    //          option
-    //              swap = 25000000     #  25MB
-    //              subscribe = #2
-    //              hwm = 1000
-    //          bind = tcp://*:5555
-    //      backend
-    //          bind = tcp://*:5556
-    //
-    zconfig_t
-        *root,
-        *type,
-        *frontend,
-        *option,
-        *hwm,
-        *swap,
-        *subscribe,
-        *bind,
-        *backend;
-
-    //  Left is first child, next is next sibling
-    root     = zconfig_new ("root", NULL);
-    type     = zconfig_new ("type", root);
-    zconfig_set_value (type, "zqueue");
-    frontend = zconfig_new ("frontend", root);
-    option   = zconfig_new ("option", frontend);
-    swap     = zconfig_new ("swap", option);
-    zconfig_set_value (swap, "25000000");
-    subscribe = zconfig_new ("subscribe", option);
-    zconfig_set_value (subscribe, "#%d", 2);
-    hwm      = zconfig_new ("hwm", option);
-    zconfig_set_value (hwm, "1000");
-    bind     = zconfig_new ("bind", frontend);
-    zconfig_set_value (bind, "tcp://*:5555");
-    backend  = zconfig_new ("backend", root);
-    bind     = zconfig_new ("bind", backend);
-    zconfig_set_value (bind, "tcp://*:5556");
-
-    assert (atoi (zconfig_resolve (root, "frontend/option/hwm", "0")) == 1000);
-    assert (streq (zconfig_resolve (root, "backend/bind", ""), "tcp://*:5556"));
-
-    zconfig_put (root, "frontend/option/hwm", "500");
-    assert (atoi (zconfig_resolve (root, "frontend/option/hwm", "0")) == 500);
-    zconfig_put (root, "frontend/option/lwm", "200");
-    assert (atoi (zconfig_resolve (root, "frontend/option/lwm", "0")) == 200);
+    zconfig_t *root = zconfig_new ("root", NULL);
+    zconfig_t *section, *item;
     
-    zconfig_destroy (&root);
-    assert (root == NULL);
-
-    //  Test loading from a ZPL file
-    zconfig_t *config = zconfig_load ("selftest.cfg");
-    assert (config);
-
-    //  Destructor should be safe to call twice
-    zconfig_destroy (&config);
-    zconfig_destroy (&config);
-    assert (config == NULL);
+    section = zconfig_new ("headers", root);
+    item = zconfig_new ("email", section);
 ----
 
 SEE ALSO

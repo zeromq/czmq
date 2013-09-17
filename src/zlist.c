@@ -294,14 +294,6 @@ zlist_dup (zlist_t *self)
     return copy;
 }
 
-//  Deprecated interface
-
-zlist_t *
-zlist_copy (zlist_t *self)
-{
-    return zlist_dup (self);
-}
-
 
 //  --------------------------------------------------------------------------
 //  Return the number of items in the list

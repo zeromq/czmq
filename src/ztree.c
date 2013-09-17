@@ -823,7 +823,7 @@ ztree_test (int verbose)
     assert (value);
     assert (streq (value, "dead beef"));
     ztree_destroy (&copy);
-    zfile_delete (".cache");
+    zsys_file_delete (".cache");
 
     //  Delete some nodes
     assert (ztree_size (tree) == 4);

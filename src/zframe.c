@@ -43,9 +43,6 @@
 struct _zframe_t {
     zmq_msg_t zmsg;             //  zmq_msg_t blob for frame
     int more;                   //  More flag, from last read
-    int zero_copy;              //  zero-copy flag
-    zframe_free_fn *free_fn;    //  destructor callback
-    void *free_arg;             //  destructor callback arg
 };
 
 
@@ -91,42 +88,6 @@ zframe_new_empty (void)
 }
 
 //  --------------------------------------------------------------------------
-//  Constructor; Allows zero-copy semantics.
-//  Zero-copy frame is initialised if data != NULL, size > 0, free_fn != 0
-//  'arg' is a void pointer that is passed to free_fn as second argument
-//  NOTE: this method is DEPRECATED and is slated for removal. These are the
-//  problems with the method:
-//  - premature optimization: do we really need this? It makes the API more
-//    complex; high-performance applications would not use zmsg in any case,
-//    they would work directly with zmq_msg objects.
-//  (PH, 2013/05/18)
-
-zframe_t *
-zframe_new_zero_copy (void *data, size_t size, zframe_free_fn *free_fn, void *arg)
-{
-    zframe_t
-        *self;
-
-    self = (zframe_t *) zmalloc (sizeof (zframe_t));
-    if (!self)
-        return NULL;
-
-    if (size) {
-        if (data && free_fn) {
-            zmq_msg_init_data (&self->zmsg, data, size, free_fn, arg);
-            self->zero_copy = 1;
-        }
-        else
-            zmq_msg_init_size (&self->zmsg, size);
-    }
-    else
-        zmq_msg_init (&self->zmsg);
-
-    return self;
-}
-
-
-//  --------------------------------------------------------------------------
 //  Destructor
 
 void
@@ -135,8 +96,6 @@ zframe_destroy (zframe_t **self_p)
     assert (self_p);
     if (*self_p) {
         zframe_t *self = *self_p;
-        if (self->free_fn)
-          (self->free_fn) (self, self->free_arg);
         zmq_msg_close (&self->zmsg);
         free (self);
         *self_p = NULL;
@@ -330,22 +289,6 @@ zframe_set_more (zframe_t *self, int more)
 }
 
 
-
-
-// --------------------------------------------------------------------------
-//  Return frame zero copy indicator (1 or 0)
-//  NOTE: this method is DEPRECATED and is slated for removal.
-//  Attached to zframe_new_zero_copy
-//  (PH, 2013/05/18)
-
-int
-zframe_zero_copy (zframe_t *self)
-{
-    assert (self);
-    return self->zero_copy;
-}
-
-
 //  --------------------------------------------------------------------------
 //  Return true if two frames have identical size and data
 
@@ -368,7 +311,7 @@ zframe_eq (zframe_t *self, zframe_t *other)
 //  Print contents of frame to FILE stream, prefix is ignored if null.
 
 void
-zframe_print_to_stream (zframe_t *self, const char *prefix, FILE *file)
+zframe_fprint (zframe_t *self, const char *prefix, FILE *file)
 {
     assert (self);
     if (prefix)
@@ -405,7 +348,7 @@ zframe_print_to_stream (zframe_t *self, const char *prefix, FILE *file)
 void
 zframe_print (zframe_t *self, const char *prefix)
 {
-    zframe_print_to_stream (self, prefix, stderr);
+    zframe_fprint (self, prefix, stderr);
 }
 
 //  --------------------------------------------------------------------------
@@ -421,43 +364,9 @@ zframe_reset (zframe_t *self, const void *data, size_t size)
     memcpy (zmq_msg_data (&self->zmsg), data, size);
 }
 
-//  --------------------------------------------------------------------------
-//  Set the free callback for frame
-//  NOTE: this method is DEPRECATED and is slated for removal. These are the
-//  problems with the method:
-//  - name is not accurate, should be "set_free_fn"
-//  - use case is unclear - why do we need this method?
-//  - fuzzy overlap with existing semantics - reuses zero-copy free_fn but
-//    is not actually zero-copy.
-//  (PH, 2013/05/18)
-
-void
-zframe_freefn (zframe_t *self, zframe_free_fn *free_fn, void *arg)
-{
-    assert (self);
-    assert (free_fn);
-
-    self->free_fn = free_fn;
-    self->free_arg = arg;
-}
-
 
 //  --------------------------------------------------------------------------
 //  Selftest
-
-static void
-s_test_free_cb (void *data, void *arg)
-{
-    assert (((byte *) data) [0] == 'A');
-    assert (((byte *) data) [1023] == 'A');
-    free (data);
-}
-
-static void
-s_test_free_frame_cb (void *data, void *arg)
-{
-    assert (data);
-}
 
 int
 zframe_test (bool verbose)
@@ -535,23 +444,6 @@ zframe_test (bool verbose)
     assert (frame_nbr == 10);
     frame = zframe_recv_nowait (input);
     assert (frame == NULL);
-
-    //  Test zero copy
-    char *buffer = (char *) malloc (1024);
-    memset (buffer, 'A', 1024);
-
-    frame = zframe_new_zero_copy (buffer, 1024, s_test_free_cb, NULL);
-    zframe_t *frame_copy = zframe_dup (frame);
-
-    assert (zframe_zero_copy (frame) == 1);
-    assert (zframe_zero_copy (frame_copy) == 0);
-
-    zframe_destroy (&frame);
-    zframe_destroy (&frame_copy);
-
-    frame = zframe_new ("callback", 8);
-    zframe_freefn (frame, s_test_free_frame_cb, NULL);
-    zframe_destroy (&frame);
 
     zctx_destroy (&ctx);
     //  @end

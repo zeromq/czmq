@@ -73,6 +73,12 @@ CZMQ_EXPORT zlist_t *
 CZMQ_EXPORT int
     zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument);
 
+//  Add comment to hash table before saving to disk. You can add as many
+//  comment lines as you like. These comment lines are discarded when loading
+//  the file. If you use a null format, all comments are deleted.
+CZMQ_EXPORT void
+    zhash_comment (zhash_t *self, char *format, ...);
+
 //  Save hash table to a text file in name=value format. Hash values must be
 //  printable strings; keys may not contain '=' character. Returns 0 if OK,
 //  else -1 if a file error occurred.
@@ -84,6 +90,13 @@ CZMQ_EXPORT int
 //  '=' character. Returns 0 if OK, else -1 if a file was not readable.
 CZMQ_EXPORT int
     zhash_load (zhash_t *self, char *filename);
+
+//  When a hash table was loaded from a file by zhash_load, this method will
+//  reload the file if it has been modified since, and is "stable", i.e. not
+//  still changing. Returns 0 if OK, -1 if there was an error reloading the 
+//  file.
+CZMQ_EXPORT int
+    zhash_refresh (zhash_t *self);
 
 //  Set hash for automatic value destruction
 CZMQ_EXPORT void
@@ -99,9 +112,9 @@ DESCRIPTION
 
 Expandable hash table container
 
-Note that it's relatively slow (~50k insertions/deletes per second), so
-don't do inserts/updates on the critical path for message I/O.  It can
-do ~2.5M lookups per second for 16-char keys.  Timed on a 1.6GHz CPU.
+Note that it's relatively slow (~50K insertions/deletes per second), so
+don't do inserts/updates on the critical path for message I/O. It can
+do ~2.5M lookups per second for 16-char keys. Timed on a 1.6GHz CPU.
 
 EXAMPLE
 -------
@@ -144,11 +157,31 @@ EXAMPLE
     item = (char *) zhash_lookup (hash, "DEADBEEF");
     assert (streq (item, "dead beef"));
 
-    //  Rename an item
+    //  Some rename tests
+
+    //  Valid rename, key is now LIVEBEEF
     rc = zhash_rename (hash, "DEADBEEF", "LIVEBEEF");
     assert (rc == 0);
+    item = (char *) zhash_lookup (hash, "LIVEBEEF");
+    assert (streq (item, "dead beef"));
+
+    //  Trying to rename an unknown item to a non-existent key
+    rc = zhash_rename (hash, "WHATBEEF", "NONESUCH");
+    assert (rc == -1);
+
+    //  Trying to rename an unknown item to an existing key
     rc = zhash_rename (hash, "WHATBEEF", "LIVEBEEF");
     assert (rc == -1);
+    item = (char *) zhash_lookup (hash, "LIVEBEEF");
+    assert (streq (item, "dead beef"));
+
+    //  Trying to rename an existing item to another existing item
+    rc = zhash_rename (hash, "LIVEBEEF", "ABADCAFE");
+    assert (rc == -1);
+    item = (char *) zhash_lookup (hash, "LIVEBEEF");
+    assert (streq (item, "dead beef"));
+    item = (char *) zhash_lookup (hash, "ABADCAFE");
+    assert (streq (item, "a bad cafe"));
 
     //  Test keys method
     zlist_t *keys = zhash_keys (hash);
@@ -168,6 +201,8 @@ EXAMPLE
     assert (-1 == zhash_foreach (hash, test_foreach_error, hash));
 
     //  Test save and load
+    zhash_comment (hash, "This is a test file");
+    zhash_comment (hash, "Created by %s", "czmq_selftest");
     zhash_save (hash, ".cache");
     copy = zhash_new ();
     zhash_load (copy, ".cache");
@@ -175,12 +210,8 @@ EXAMPLE
     assert (item);
     assert (streq (item, "dead beef"));
     zhash_destroy (&copy);
-#if (defined (WIN32))
-    DeleteFile (".cache");
-#else
-    unlink (".cache");
-#endif
-        
+    zsys_file_delete (".cache");
+
     //  Delete a item
     zhash_delete (hash, "LIVEBEEF");
     item = (char *) zhash_lookup (hash, "LIVEBEEF");
@@ -218,6 +249,20 @@ EXAMPLE
     zhash_destroy (&hash);
     zhash_destroy (&hash);
     assert (hash == NULL);
+
+    // Test autofree; automatically copies and frees string values
+    hash = zhash_new ();
+    zhash_autofree (hash);
+    char value [255];
+    strcpy (value, "This is a string");
+    rc = zhash_insert (hash, "key1", value);
+    assert (rc == 0);
+    strcpy (value, "Ring a ding ding");
+    rc = zhash_insert (hash, "key2", value);
+    assert (rc == 0);
+    assert (streq (zhash_lookup (hash, "key1"), "This is a string"));
+    assert (streq (zhash_lookup (hash, "key2"), "Ring a ding ding"));
+    zhash_destroy (&hash);
 ----
 
 SEE ALSO

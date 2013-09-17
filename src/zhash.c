@@ -27,9 +27,9 @@
 @header
     Expandable hash table container
 @discuss
-    Note that it's relatively slow (~50k insertions/deletes per second), so
-    don't do inserts/updates on the critical path for message I/O.  It can
-    do ~2.5M lookups per second for 16-char keys.  Timed on a 1.6GHz CPU.
+    Note that it's relatively slow (~50K insertions/deletes per second), so
+    don't do inserts/updates on the critical path for message I/O. It can
+    do ~2.5M lookups per second for 16-char keys. Timed on a 1.6GHz CPU.
 @end
 */
 
@@ -62,103 +62,17 @@ struct _zhash_t {
     item_t **items;             //  Array of items
     uint cached_index;          //  Avoids duplicate hash calculations
     bool autofree;              //  If true, free values in destructor
+    zlist_t *comments;          //  File comments, if any
+    time_t modified;            //  Set during zhash_load
+    char *filename;             //  Set during zhash_load
 };
 
+//  Local helper functions
+static uint s_item_hash (const char *key, size_t limit);
+static item_t *s_item_lookup (zhash_t *self, const char *key);
+static item_t *s_item_insert (zhash_t *self, const char *key, void *value);
+static void s_item_destroy (zhash_t *self, item_t *item, bool hard);
 
-//  --------------------------------------------------------------------------
-//  Local helper function
-//  Compute hash for key string
-
-static uint
-s_item_hash (const char *key, size_t limit)
-{
-    //  Modified Bernstein hashing function
-    uint key_hash = 0;
-    while (*key)
-        key_hash = 33 * key_hash ^ *key++;
-    key_hash %= limit;
-    return key_hash;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Local helper function
-//  Lookup item in hash table, returns item or NULL
-
-static item_t *
-s_item_lookup (zhash_t *self, const char *key)
-{
-    //  Look in bucket list for item by key
-    self->cached_index = s_item_hash (key, self->limit);
-    item_t *item = self->items [self->cached_index];
-    while (item) {
-        if (streq (item->key, key))
-            break;
-        item = item->next;
-    }
-    return item;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Local helper function
-//  Insert new item into hash table, returns item
-//  If item already existed, returns NULL
-
-static item_t *
-s_item_insert (zhash_t *self, const char *key, void *value)
-{
-    //  Check that item does not already exist in hash table
-    //  Leaves self->cached_index with calculated hash item
-    item_t *item = s_item_lookup (self, key);
-    if (item == NULL) {
-        item = (item_t *) zmalloc (sizeof (item_t));
-        if (!item)
-            return NULL;
-        item->value = value;
-        item->key = strdup (key);
-        item->index = self->cached_index;
-        //  Insert into start of bucket list
-        item->next = self->items [self->cached_index];
-        self->items [self->cached_index] = item;
-        self->size++;
-    }
-    else
-        item = NULL;            //  Signal duplicate insertion
-    return item;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Local helper function
-//  Destroy item in hash table, item must exist in table
-
-static void
-s_item_destroy (zhash_t *self, item_t *item, bool hard)
-{
-    //  Find previous item since it's a singly-linked list
-    item_t *cur_item = self->items [item->index];
-    item_t **prev_item = &(self->items [item->index]);
-    while (cur_item) {
-        if (cur_item == item)
-            break;
-        prev_item = &(cur_item->next);
-        cur_item = cur_item->next;
-    }
-    assert (cur_item);
-    *prev_item = item->next;
-    self->size--;
-    if (hard) {
-        if (item->free_fn)
-            (item->free_fn) (item->value);
-        else
-        if (self->autofree)
-            free (item->value);
-
-        free (item->key);
-        free (item);
-    }
-}
 
 
 //  --------------------------------------------------------------------------
@@ -200,8 +114,41 @@ zhash_destroy (zhash_t **self_p)
         if (self->items)
             free (self->items);
 
+        zlist_destroy (&self->comments);
+        free (self->filename);
         free (self);
         *self_p = NULL;
+    }
+}
+
+//  --------------------------------------------------------------------------
+//  Local helper function
+//  Destroy item in hash table, item must exist in table
+
+static void
+s_item_destroy (zhash_t *self, item_t *item, bool hard)
+{
+    //  Find previous item since it's a singly-linked list
+    item_t *cur_item = self->items [item->index];
+    item_t **prev_item = &(self->items [item->index]);
+    while (cur_item) {
+        if (cur_item == item)
+            break;
+        prev_item = &(cur_item->next);
+        cur_item = cur_item->next;
+    }
+    assert (cur_item);
+    *prev_item = item->next;
+    self->size--;
+    if (hard) {
+        if (item->free_fn)
+            (item->free_fn) (item->value);
+        else
+        if (self->autofree)
+            free (item->value);
+
+        free (item->key);
+        free (item);
     }
 }
 
@@ -250,6 +197,70 @@ zhash_insert (zhash_t *self, const char *key, void *value)
         value = strdup ((char *) value);
 
     return s_item_insert (self, key, value)? 0: -1;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Local helper function
+//  Compute hash for key string
+
+static uint
+s_item_hash (const char *key, size_t limit)
+{
+    //  Modified Bernstein hashing function
+    uint key_hash = 0;
+    while (*key)
+        key_hash = 33 * key_hash ^ *key++;
+    key_hash %= limit;
+    return key_hash;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Local helper function
+//  Insert new item into hash table, returns item
+//  If item already existed, returns NULL
+
+static item_t *
+s_item_insert (zhash_t *self, const char *key, void *value)
+{
+    //  Check that item does not already exist in hash table
+    //  Leaves self->cached_index with calculated hash item
+    item_t *item = s_item_lookup (self, key);
+    if (item == NULL) {
+        item = (item_t *) zmalloc (sizeof (item_t));
+        if (!item)
+            return NULL;
+        item->value = value;
+        item->key = strdup (key);
+        item->index = self->cached_index;
+        //  Insert into start of bucket list
+        item->next = self->items [self->cached_index];
+        self->items [self->cached_index] = item;
+        self->size++;
+    }
+    else
+        item = NULL;            //  Signal duplicate insertion
+    return item;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Local helper function
+//  Lookup item in hash table, returns item or NULL
+
+static item_t *
+s_item_lookup (zhash_t *self, const char *key)
+{
+    //  Look in bucket list for item by key
+    self->cached_index = s_item_hash (key, self->limit);
+    item_t *item = self->items [self->cached_index];
+    while (item) {
+        if (streq (item->key, key))
+            break;
+        item = item->next;
+    }
+    return item;
 }
 
 
@@ -450,6 +461,31 @@ zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument)
 
 
 //  --------------------------------------------------------------------------
+//  Add comment to hash table before saving to disk. You can add as many
+//  comment lines as you like. These comment lines are discarded when loading
+//  the file. If you use a null format, all comments are deleted.
+
+void
+zhash_comment (zhash_t *self, char *format, ...)
+{
+    if (format) {
+        if (!self->comments) {
+            self->comments = zlist_new ();
+            zlist_autofree (self->comments);
+        }
+        va_list argptr;
+        va_start (argptr, format);
+        char *string = zsys_vprintf (format, argptr);
+        va_end (argptr);
+        zlist_append (self->comments, string);
+        free (string);
+    }
+    else
+        zlist_destroy (&self->comments);
+}
+
+
+//  --------------------------------------------------------------------------
 //  Save hash table to a text file in name=value format
 //  Hash values must be printable strings.
 //  Returns 0 if OK, else -1 if a file error occurred
@@ -463,6 +499,14 @@ zhash_save (zhash_t *self, char *filename)
     if (!handle)
         return -1;              //  Failed to create file
 
+    if (self->comments) {
+        char *comment = (char *) zlist_first (self->comments);
+        while (comment) {
+            fprintf (handle, "#   %s\n", comment);
+            comment = (char *) zlist_next (self->comments);
+        }
+        fprintf (handle, "\n");
+    }
     uint index;
     for (index = 0; index != self->limit; index++) {
         item_t *item = self->items [index];
@@ -487,26 +531,66 @@ zhash_load (zhash_t *self, char *filename)
     assert (self);
     zhash_autofree (self);
 
+    //  Whether or not file exists, we'll track the filename and last
+    //  modification date (0 for unknown files), so that zhash_refresh ()
+    //  will always work after zhash_load (), to load a newly-created
+    //  file.
+    free (self->filename);
+    self->filename = strdup (filename);
+    self->modified = zsys_file_modified (filename);
+    
     FILE *handle = fopen (filename, "r");
     if (!handle)
-        return -1;              //  Failed to create file
+        return -1;              //  Failed to open file for reading
 
-    char buffer [1024];
+    char *buffer = zmalloc (1024);
     while (fgets (buffer, 1024, handle)) {
-        //  Skip lines starting with "#"
-        if (buffer [0] == '#')
+        //  Skip lines starting with "#" or that do not look like
+        //  name=value data.
+        char *equals = strchr (buffer, '=');
+        if (buffer [0] == '#' || equals == buffer || !equals)
             continue;
+
         //  Buffer may end in newline, which we don't want
         if (buffer [strlen (buffer) - 1] == '\n')
             buffer [strlen (buffer) - 1] = 0;
-        //  Split at equals, if any
-        char *equals = strchr (buffer, '=');
-        if (!equals)
-            break;              //  Some error, stop parsing it
         *equals++ = 0;
         zhash_update (self, buffer, equals);
     }
+    free (buffer);
     fclose (handle);
+    return 0;
+}
+
+
+//  --------------------------------------------------------------------------
+//  When a hash table was loaded from a file by zhash_load, this method will
+//  reload the file if it has been modified since, and is "stable", i.e. not
+//  still changing. Returns 0 if OK, -1 if there was an error reloading the 
+//  file.
+
+int
+zhash_refresh (zhash_t *self)
+{
+    assert (self);
+    
+    if (self->modified && self->filename) {
+        if (zsys_file_modified (self->filename) > self->modified
+        &&  zsys_file_stable (self->filename)) {
+            //  Empty the hash table; code is copied from zhash_destroy
+            uint index;
+            for (index = 0; index < self->limit; index++) {
+                //  Destroy all items in this hash bucket
+                item_t *cur_item = self->items [index];
+                while (cur_item) {
+                    item_t *next_item = cur_item->next;
+                    s_item_destroy (self, cur_item, true);
+                    cur_item = next_item;
+                }
+            }
+            zhash_load (self, self->filename);
+        }
+    }
     return 0;
 }
 
@@ -626,6 +710,8 @@ zhash_test (int verbose)
     assert (-1 == zhash_foreach (hash, test_foreach_error, hash));
 
     //  Test save and load
+    zhash_comment (hash, "This is a test file");
+    zhash_comment (hash, "Created by %s", "czmq_selftest");
     zhash_save (hash, ".cache");
     copy = zhash_new ();
     zhash_load (copy, ".cache");
@@ -633,7 +719,7 @@ zhash_test (int verbose)
     assert (item);
     assert (streq (item, "dead beef"));
     zhash_destroy (&copy);
-    zfile_delete (".cache");
+    zsys_file_delete (".cache");
 
     //  Delete a item
     zhash_delete (hash, "LIVEBEEF");

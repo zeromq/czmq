@@ -105,71 +105,14 @@ zstr_send (void *zocket, const char *format, ...)
 {
     assert (zocket);
     assert (format);
-    //  Format string into buffer
-    int size = 255 + 1;
-    char stackbuffer[255+1];
-    char *string = stackbuffer;
+    
     va_list argptr;
     va_start (argptr, format);
-    int required = vsnprintf (string, size, format, argptr);
+    char *string = zsys_vprintf (format, argptr);
     va_end (argptr);
-#ifdef _MSC_VER
-    if (required < 0 || required >= size) {
-        va_start (argptr, format);
-        required = _vscprintf (format, argptr);
-        va_end (argptr);
-    }
-#endif
-    if (required >= size) {
-        size = required + 1;
-        string = (char *) malloc (size);
-        if (!string)
-            return -1;
-        va_start (argptr, format);
-        vsnprintf (string, size, format, argptr);
-        va_end (argptr);
-    }
-
+    
     int rc = s_send_string (zocket, false, string);
-    if (string!=stackbuffer)
-        free (string);
-    return rc;
-}
-
-//  Deprecated, does exactly the same
-int
-zstr_sendf (void *zocket, const char *format, ...)
-{
-    assert (zocket);
-    assert (format);
-    //  Format string into buffer
-    int size = 255 + 1;
-    char stackbuffer[255+1];
-    char *string = stackbuffer;
-    va_list argptr;
-    va_start (argptr, format);
-    int required = vsnprintf (string, size, format, argptr);
-    va_end (argptr);
-#ifdef _MSC_VER
-    if (required < 0 || required >= size) {
-        va_start (argptr, format);
-        required = _vscprintf (format, argptr);
-        va_end (argptr);
-    }
-#endif
-    if (required >= size) {
-        size = required + 1;
-        string = (char *) malloc (size);
-        if (!string)
-            return -1;
-        va_start (argptr, format);
-        vsnprintf (string, size, format, argptr);
-        va_end (argptr);
-    }
-
-    int rc = s_send_string (zocket, false, string);
-    if (string!=stackbuffer)
-        free (string);
+    free (string);
     return rc;
 }
 
@@ -182,73 +125,61 @@ zstr_sendm (void *zocket, const char *format, ...)
 {
     assert (zocket);
     assert (format);
-    //  Format string into buffer
-    int size = 255 + 1;
-    char stackbuffer[255+1];
-    char *string = stackbuffer;
+    
     va_list argptr;
     va_start (argptr, format);
-    int required = vsnprintf (string, size, format, argptr);
+    char *string = zsys_vprintf (format, argptr);
     va_end (argptr);
-#ifdef _MSC_VER
-    if (required < 0 || required >= size) {
-        va_start (argptr, format);
-        required = _vscprintf (format, argptr);
-        va_end (argptr);
-    }
-#endif
-    if (required >= size) {
-        size = required + 1;
-        string = (char *) malloc (size);
-        if (!string)
-            return -1;
-        va_start (argptr, format);
-        vsnprintf (string, size, format, argptr);
-        va_end (argptr);
-    }
-
+    
     int rc = s_send_string (zocket, true, string);
-    if (string!=stackbuffer)
-        free (string);
+    free (string);
     return rc;
 }
 
-//  Deprecated, does exactly the same
+
+//  --------------------------------------------------------------------------
+//  Send a series of strings (until NULL) as multipart data
+//  Returns 0 if the strings could be sent OK, or -1 on error.
+
 int
-zstr_sendfm (void *zocket, const char *format, ...)
+zstr_sendx (void *socket, const char *string, ...)
 {
-    assert (zocket);
-    assert (format);
-    //  Format string into buffer
-    int size = 255 + 1;
-    char stackbuffer[255+1];
-    char *string = stackbuffer;
-    va_list argptr;
-    va_start (argptr, format);
-    int required = vsnprintf (string, size, format, argptr);
-    va_end (argptr);
-#ifdef _MSC_VER
-    if (required < 0 || required >= size) {
-        va_start (argptr, format);
-        required = _vscprintf (format, argptr);
-        va_end (argptr);
+    zmsg_t *msg = zmsg_new ();
+    va_list args;
+    va_start (args, string);
+    while (string) {
+        zmsg_addstr (msg, string);
+        string = va_arg (args, char *);
     }
-#endif
-    if (required >= size) {
-        size = required + 1;
-        string = (char *) malloc (size);
-        if (!string)
-            return -1;
-        va_start (argptr, format);
-        vsnprintf (string, size, format, argptr);
-        va_end (argptr);
-    }
-
-    int rc = s_send_string (zocket, true, string);
-    if (string!=stackbuffer)
-        free (string);
-    return rc;
+    va_end (args);
+    return zmsg_send (&msg, socket);
 }
+
+
+//  --------------------------------------------------------------------------
+//  Receive a series of strings (until NULL) from multipart data
+//  Each string is allocated and filled with string data; if there
+//  are not enough frames, unallocated strings are set to NULL.
+//  Returns -1 if the message could not be read, else returns the
+//  number of strings filled, zero or more.
+
+int
+zstr_recvx (void *socket, char **string_p, ...)
+{
+    zmsg_t *msg = zmsg_recv (socket);
+    if (!msg)
+        return -1;
+        
+    va_list args;
+    va_start (args, string_p);
+    while (string_p) {
+        *string_p = zmsg_popstr (msg);
+        string_p = va_arg (args, char **);
+    }
+    va_end (args);
+    return 0;
+}
+
 
 //  --------------------------------------------------------------------------
 //  Selftest
@@ -273,9 +204,7 @@ zstr_test (bool verbose)
     int string_nbr;
     for (string_nbr = 0; string_nbr < 10; string_nbr++)
         zstr_send (output, "this is string %d", string_nbr);
-    for (string_nbr = 0; string_nbr < 5; string_nbr++)
-        zstr_sendm (output, "this is string %d", string_nbr);
-    zstr_send (output, "END");
+    zstr_sendx (output, "This", "is", "almost", "the", "very", "END", NULL);
 
     //  Read and count until we receive END
     string_nbr = 0;

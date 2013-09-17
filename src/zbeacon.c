@@ -227,17 +227,6 @@ zbeacon_socket (zbeacon_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Get beacon socket handle, for polling - DEPRECATED
-
-void *
-zbeacon_pipe (zbeacon_t *self)
-{
-    assert (self);
-    return self->pipe;
-}
-
-
-//  --------------------------------------------------------------------------
 //  Return our own IP address as printable string
 
 char *
@@ -307,33 +296,29 @@ zbeacon_test (bool verbose)
     zbeacon_publish (node3, (byte *) "GARBAGE", 7);
     zbeacon_subscribe (node1, (byte *) "NODE", 4);
 
-    //  Poll on API pipe and on UDP socket
-    zmq_pollitem_t pollitems [] = {
-        { zbeacon_socket (node1), 0, ZMQ_POLLIN, 0 },
-        { zbeacon_socket (node2), 0, ZMQ_POLLIN, 0 },
-        { zbeacon_socket (node3), 0, ZMQ_POLLIN, 0 }
-    };
+    //  Poll on three API sockets at once
+    zpoller_t *poller = zpoller_new (
+        zbeacon_socket (node1), 
+        zbeacon_socket (node2), 
+        zbeacon_socket (node3), NULL);
+        
     uint64_t stop_at = zclock_time () + 1000;
     while (zclock_time () < stop_at) {
         long timeout = (long) (stop_at - zclock_time ());
         if (timeout < 0)
             timeout = 0;
-        if (zmq_poll (pollitems, 3, timeout * ZMQ_POLL_MSEC) == -1)
-            break;              //  Interrupted
-
-        //  We cannot get messages on nodes 2 and 3
-        assert ((pollitems [1].revents & ZMQ_POLLIN) == 0);
-        assert ((pollitems [2].revents & ZMQ_POLLIN) == 0);
-
-        //  If we get a message on node 1, it must be NODE/2
-        if (pollitems [0].revents & ZMQ_POLLIN) {
-            char *ipaddress = zstr_recv (zbeacon_socket (node1));
-            char *beacon = zstr_recv (zbeacon_socket (node1));
+        void *which = zpoller_wait (poller, timeout * ZMQ_POLL_MSEC);
+        if (which) {
+            assert (which == zbeacon_socket (node1));
+            char *ipaddress, *beacon;
+            zstr_recvx (zbeacon_socket (node1), &ipaddress, &beacon, NULL);
             assert (streq (beacon, "NODE/2"));
             free (ipaddress);
             free (beacon);
         }
     }
+    zpoller_destroy (&poller);
+    
     //  Stop listening
     zbeacon_unsubscribe (node1);
     
