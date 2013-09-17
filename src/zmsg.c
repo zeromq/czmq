@@ -97,17 +97,17 @@ zmsg_recv (void *zocket)
     if (!self)
         return NULL;
 
-    while (1) {
+    while (true) {
         zframe_t *frame = zframe_recv (zocket);
         if (!frame) {
             zmsg_destroy (&self);
             break;              //  Interrupted or terminated
         }
-        if (zmsg_add (self, frame)) {
+        if (zmsg_append (self, &frame)) {
             zmsg_destroy (&self);
             break;
         }
-        if (!zframe_more (frame))
+        if (!zsocket_rcvmore (zocket))
             break;              //  Last message frame
     }
     return self;
@@ -157,7 +157,7 @@ zmsg_size (zmsg_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Return size of message, i.e. number of frames (0 or more).
+//  Return total size of all frames in message.
 
 size_t
 zmsg_content_size (zmsg_t *self)
@@ -200,7 +200,24 @@ zmsg_pop (zmsg_t *self)
 //  --------------------------------------------------------------------------
 //  Add frame to the end of the message, i.e. after all other frames.
 //  Message takes ownership of frame, will destroy it when message is sent.
-//  Returns 0 on success
+//  Returns 0 on success. Nullifies caller's reference to frame.
+
+int
+zmsg_append (zmsg_t *self, zframe_t **frame_p)
+{
+    assert (self);
+    assert (frame_p);
+    zframe_t *frame = *frame_p;
+    *frame_p = NULL;            //  We now own frame
+    self->content_size += zframe_size (frame);
+    return zlist_append (self->frames, frame);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Add frame to the end of the message, i.e. after all other frames.
+//  Message takes ownership of frame, will destroy it when message is sent.
+//  Returns 0 on success. Deprecated by zmsg_append ().
 
 int
 zmsg_add (zmsg_t *self, zframe_t *frame)
@@ -231,6 +248,7 @@ zmsg_pushmem (zmsg_t *self, const void *src, size_t size)
 
 //  --------------------------------------------------------------------------
 //  Add block of memory to the end of the message, as a new frame.
+//  Returns 0 on success, -1 on error.
 
 int
 zmsg_addmem (zmsg_t *self, const void *src, size_t size)
@@ -245,32 +263,10 @@ zmsg_addmem (zmsg_t *self, const void *src, size_t size)
         return -1;
 }
 
-//  --------------------------------------------------------------------------
-//  Add block of memory to the end of the message, as a new frame.
-//  The new frame is zero-copy-constructed (see zframe_new_zero_copy(...) 
-//  for detailed description)
-//  NOTE: this method is DEPRECATED and is slated for removal. These are the
-//  problems with the method:
-//  - premature optimization: do we really need this? It makes the API more
-//    complex; high-performance applications would not use zmsg in any case,
-//    they would work directly with zmq_msg objects.
-//  (PH, 2013/05/18)
-
-int
-zmsg_addmem_zero_copy (zmsg_t *self, void *src, size_t size, zframe_free_fn *free_fn, void *arg)
-{
-    assert (self);
-    zframe_t *frame = zframe_new_zero_copy (src, size, free_fn, arg);
-    if (frame) {
-        self->content_size += size;
-        return zlist_append (self->frames, frame);
-    }
-    else
-        return -1;
-}
 
 //  --------------------------------------------------------------------------
-//  Push string as new frame to front of message
+//  Push string as new frame to front of message, returns 0 if OK, -1 on
+//  error. The string is formatted using sprintf. 
 
 int
 zmsg_pushstr (zmsg_t *self, const char *format, ...)
@@ -278,38 +274,14 @@ zmsg_pushstr (zmsg_t *self, const char *format, ...)
     assert (self);
     assert (format);
 
-    //  Format string into buffer
-    int size = 255 + 1;
-    char stackbuffer[255+1];
-    char *string = stackbuffer;
     va_list argptr;
     va_start (argptr, format);
-    int required = vsnprintf (string, size, format, argptr);
+    char *string = zsys_vprintf (format, argptr);
     va_end (argptr);
-#ifdef _MSC_VER
-    if (required < 0 || required >= size) {
-        va_start (argptr, format);
-        required = _vscprintf (format, argptr);
-        va_end (argptr);
-    }
-#endif
-    if (required >= size) {
-        size = required + 1;
-        string = (char *) malloc (size);
-        if (!string) {
-            return -1;
-        }
-        va_start (argptr, format);
-        size = vsnprintf (string, size, format, argptr);
-        va_end (argptr);
-    }
-    else
-        size = required;
-
-    self->content_size += size;
-    zlist_push (self->frames, zframe_new (string, size));
-    if (string!=stackbuffer)
-        free (string);
+    
+    self->content_size += strlen (string);
+    zlist_push (self->frames, zframe_new (string, strlen (string)));
+    free (string);
     return 0;
 }
 
@@ -322,44 +294,21 @@ zmsg_addstr (zmsg_t *self, const char *format, ...)
 {
     assert (self);
     assert (format);
-    //  Format string into buffer
-    int size = 255 + 1;
-    char stackbuffer[255+1];
-    char *string = stackbuffer;
+
     va_list argptr;
     va_start (argptr, format);
-    int required = vsnprintf (string, size, format, argptr);
+    char *string = zsys_vprintf (format, argptr);
     va_end (argptr);
-#ifdef _MSC_VER
-    if (required < 0 || required >= size) {
-        va_start (argptr, format);
-        required = _vscprintf (format, argptr);
-        va_end (argptr);
-    }
-#endif    
-    if (required >= size) {
-        size = required + 1;
-        string = (char *) malloc (size);
-        if (!string) {
-            return -1;
-        }
-        va_start (argptr, format);
-        size = vsnprintf (string, size, format, argptr);
-        va_end (argptr);
-    }
-    else
-        size = required;
-
-    self->content_size += size;
-    zlist_append (self->frames, zframe_new (string, size));
-    if (string!=stackbuffer)
-        free (string);
+    
+    self->content_size += strlen (string);
+    zlist_append (self->frames, zframe_new (string, strlen (string)));
+    free (string);
     return 0;
 }
 
-
 //  --------------------------------------------------------------------------
-//  Pop frame off front of message, return as fresh string
+//  Pop frame off front of message, return as fresh string. If there were
+//  no more frames in the message, returns NULL.
 
 char *
 zmsg_popstr (zmsg_t *self)
@@ -421,7 +370,8 @@ zmsg_remove (zmsg_t *self, zframe_t *frame)
 
 
 //  --------------------------------------------------------------------------
-//  Set cursor to first frame in message. Returns frame, or NULL.
+//  Set cursor to first frame in message. Returns frame, or NULL, if the 
+//  message is empty. Use this to navigate the frames as a list.
 
 zframe_t *
 zmsg_first (zmsg_t *self)
@@ -455,7 +405,12 @@ zmsg_last (zmsg_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Save message to an open file, return 0 if OK, else -1.
+//  Save message to an open file, return 0 if OK, else -1. The message is 
+//  saved as a series of frames, each with length and data. Note that the
+//  file is NOT guaranteed to be portable between operating systems, not
+//  versions of CZMQ. The file format is at present undocumented and liable
+//  to arbitrary change.
+
 int
 zmsg_save (zmsg_t *self, FILE *file)
 {
@@ -495,27 +450,33 @@ zmsg_load (zmsg_t *self, FILE *file)
         if (rc == 1) {
             zframe_t *frame = zframe_new (NULL, frame_size);
             rc = fread (zframe_data (frame), frame_size, 1, file);
-            if (frame_size > 0 && rc != 1)
+            if (frame_size > 0 && rc != 1) {
+                zframe_destroy (&frame);
                 break;          //  Unable to read properly, quit
-            zmsg_add (self, frame);
+            }
+            zmsg_append (self, &frame);
         }
         else
             break;              //  Unable to read properly, quit
+    }
+    if (!zmsg_size (self)) {
+        zmsg_destroy (&self);
+        self = NULL;
     }
     return self;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Encode message to a new buffer, return buffer size
+//  Serialize multipart message to a single buffer. Use this method to send
+//  structured messages across transports that do not support multipart data.
+//  Allocates and returns a new buffer containing the serialized message.
+//  To decode a serialized message buffer, use zmsg_decode ().
 
-//  Frame lengths are encoded as 1, 1+2, or 1+4 bytes
-//  0..253 bytes        octet + data
-//  254..64k-1 bytes    0xFE + 2octet + data
-//  64k..4Gb-1 bytes    0xFF + 4octet + data
 
-#define ZMSG_SHORT_LEN      0xFE
-#define ZMSG_LONG_LEN       0xFF
+//  Frame lengths are encoded as 1 or 1+4 bytes
+//  0..254 bytes        octet + data
+//  255..4Gb-1 bytes    0xFF + 4octet + data
 
 size_t
 zmsg_encode (zmsg_t *self, byte **buffer)
@@ -527,13 +488,10 @@ zmsg_encode (zmsg_t *self, byte **buffer)
     zframe_t *frame = zmsg_first (self);
     while (frame) {
         size_t frame_size = zframe_size (frame);
-        if (frame_size < ZMSG_SHORT_LEN)
+        if (frame_size < 255)
             buffer_size += frame_size + 1;
         else
-        if (frame_size < 0x10000)
-            buffer_size += frame_size + 3;
-        else
-            buffer_size += frame_size + 5;
+            buffer_size += frame_size + 1 + 4;
         frame = zmsg_next (self);
     }
     *buffer = (byte *) malloc (buffer_size);
@@ -543,21 +501,13 @@ zmsg_encode (zmsg_t *self, byte **buffer)
     frame = zmsg_first (self);
     while (frame) {
         size_t frame_size = zframe_size (frame);
-        if (frame_size < ZMSG_SHORT_LEN) {
+        if (frame_size < 255) {
             *dest++ = (byte) frame_size;
             memcpy (dest, zframe_data (frame), frame_size);
             dest += frame_size;
         }
-        else
-        if (frame_size < 0x10000) {
-            *dest++ = ZMSG_SHORT_LEN;
-            *dest++ = (frame_size >> 8) & 255;
-            *dest++ =  frame_size       & 255;
-            memcpy (dest, zframe_data (frame), frame_size);
-            dest += frame_size;
-        }
         else {
-            *dest++ = ZMSG_LONG_LEN;
+            *dest++ = 0xFF;
             *dest++ = (frame_size >> 24) & 255;
             *dest++ = (frame_size >> 16) & 255;
             *dest++ = (frame_size >>  8) & 255;
@@ -573,8 +523,9 @@ zmsg_encode (zmsg_t *self, byte **buffer)
 
 
 //  --------------------------------------------------------------------------
-//  Decode a buffer into a new message, returns NULL if buffer is not
-//  properly formatted or there is insufficient free memory.
+//  Decodes a serialized message buffer created by zmsg_encode () and returns
+//  a new zmsg_t object. Returns NULL if the buffer was badly formatted or 
+//  there was insufficient memory to work.
 
 zmsg_t *
 zmsg_decode (byte *buffer, size_t buffer_size)
@@ -587,16 +538,7 @@ zmsg_decode (byte *buffer, size_t buffer_size)
     byte *limit = buffer + buffer_size;
     while (source < limit) {
         size_t frame_size = *source++;
-        if (frame_size == ZMSG_SHORT_LEN) {
-            if (source > limit - 2) {
-                zmsg_destroy (&self);
-                break;
-            }
-            frame_size = (source [0] << 8) + source [1];
-            source += 2;
-        }
-        else
-        if (frame_size == ZMSG_LONG_LEN) {
+        if (frame_size == 255) {
             if (source > limit - 4) {
                 zmsg_destroy (&self);
                 break;
@@ -613,7 +555,7 @@ zmsg_decode (byte *buffer, size_t buffer_size)
         }
         zframe_t *frame = zframe_new (source, frame_size);
         if (frame) {
-            if (zmsg_add (self, frame)) {
+            if (zmsg_append (self, &frame)) {
                 zmsg_destroy (&self);
                 break;
             }
@@ -629,7 +571,8 @@ zmsg_decode (byte *buffer, size_t buffer_size)
 
 
 //  --------------------------------------------------------------------------
-//  Create copy of message, as new message object
+//  Create copy of message, as new message object. Returns a fresh zmsg_t
+//  object, or NULL if there was not enough heap memory.
 
 zmsg_t *
 zmsg_dup (zmsg_t *self)
@@ -654,13 +597,21 @@ zmsg_dup (zmsg_t *self)
 }
 
 
+//  --------------------------------------------------------------------------
+//  Dump message to stderr, for debugging and tracing.
+//  See zmsg_dump_to_stream() for details
+
+void
+zmsg_dump (zmsg_t *self)
+{
+   zmsg_dump_to_stream (self, stderr);
+}
 
 
 //  --------------------------------------------------------------------------
-//  Dump message to FILE stream, for debugging and tracing
+//  Dump message to FILE stream, for debugging and tracing. 
 //  Truncates to first 10 frames, for readability; this may be unfortunate
-//  when debugging larger and more complex messages. Perhaps a way to hide
-//  repeated lines instead?
+//  when debugging larger and more complex messages.
 
 void
 zmsg_dump_to_stream (zmsg_t *self, FILE *file)
@@ -676,17 +627,6 @@ zmsg_dump_to_stream (zmsg_t *self, FILE *file)
         zframe_print_to_stream(frame, NULL, file);
         frame = zmsg_next (self);
     }
-}
-
-
-//  --------------------------------------------------------------------------
-//  Dump message to stderr, for debugging and tracing
-//  See zmsg_dump_to_stream() for details
-
-void
-zmsg_dump (zmsg_t *self)
-{
-   zmsg_dump_to_stream (self, stderr);
 }
 
 
@@ -771,8 +711,19 @@ zmsg_test (bool verbose)
     if (verbose)
         zmsg_dump (msg);
 
-    //  Save to a file, read back
+    // create empty file for null test
     FILE *file = fopen ("zmsg.test", "w");
+    assert (file);
+    fclose (file);
+
+    file = fopen ("zmsg.test", "r");
+    zmsg_t *null_msg = zmsg_load (NULL, file);
+    assert (null_msg == NULL);
+    fclose (file);
+    remove ("zmsg.test");
+
+    //  Save to a file, read back
+    file = fopen ("zmsg.test", "w");
     assert (file);
     rc = zmsg_save (msg, file);
     assert (rc == 0);

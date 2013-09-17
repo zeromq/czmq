@@ -4,7 +4,7 @@
 .       if type = "uint64" | type = "int64" | type = "uint32" | type = "int"
 .           option.ctype = "int"
 .           option.ctype_const = "int"
-.       elsif type = "blob"
+.       elsif type = "string" | type = "key"
 .           option.ctype = "char *"   #   Enforce C strings
 .           option.ctype_const = "const char *"
 .       else
@@ -72,6 +72,9 @@ CZMQ_EXPORT $(ctype) zsocket_$(name) (void *zocket);
 .       endif
 .       if mode = "rw" | mode = "w"
 CZMQ_EXPORT void zsocket_set_$(name) (void *zocket, $(ctype_const) $(name));
+.           if type = "key"
+CZMQ_EXPORT void zsocket_set_$(name)_bin (void *zocket, const byte *$(name));
+.           endif
 .       endif
 .       if defined (.minor)
 #   endif
@@ -206,13 +209,28 @@ zsocket_set_$(name) (void *zocket, $(ctype_const) $(name))
 .           else
     int rc = zmq_setsockopt (zocket, ZMQ_$(NAME), $(name), strlen ($(name)));
 .           endif
-    if (rc)
-        puts (strerror (errno));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
 
+.# Generate additional set_xxx_bin method
+.if type = "key"
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_$(NAME) value from 32-octet binary
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsocket_set_$(name)_bin (void *zocket, const byte *$(name))
+{
+#   if defined (ZMQ_$(NAME))
+    int rc = zmq_setsockopt (zocket, ZMQ_$(NAME), $(name), 32);
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+.endif
 .           endif
 .           if mode = "rw" | mode = "r"
 //  --------------------------------------------------------------------------
@@ -239,7 +257,7 @@ zsocket_$(name) (void *zocket)
     int $(name);
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_$(NAME), &$(name), &option_len);
-.           elsif type = "blob"
+.           elsif type = "string" | type = "key"
     size_t option_len = 255;
     char *$(name) = (char *) zmalloc (option_len);
     zmq_getsockopt (zocket, ZMQ_$(NAME), $(name), &option_len);
@@ -250,7 +268,7 @@ zsocket_$(name) (void *zocket)
     return ($(ctype)) $(name);
 .           endif
 #   else
-.           if type = "blob"
+.           if type = "string" | type = "key"
     return NULL;
 .           else
     return 0;
@@ -307,7 +325,7 @@ zsockopt_test (bool verbose)
 .           endif
 .       endif
 .       if mode = "rw" | mode = "r"
-.           if type = "blob"
+.           if type = "string" | type = "key"
     char *$(name) = zsocket_$(name) (zocket);
     assert ($(name));
     free ($(name));

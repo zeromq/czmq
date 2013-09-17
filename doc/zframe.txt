@@ -134,7 +134,7 @@ EXAMPLE
 ----
     zctx_t *ctx = zctx_new ();
     assert (ctx);
-    
+
     void *output = zsocket_new (ctx, ZMQ_PAIR);
     assert (output);
     zsocket_bind (output, "inproc://zframe.test");
@@ -164,7 +164,7 @@ EXAMPLE
     assert (zframe_size (copy) == 5);
     zframe_destroy (&copy);
     assert (!zframe_eq (frame, copy));
-	
+
     //  Test zframe_new_empty
     frame = zframe_new_empty ();
     assert (frame);

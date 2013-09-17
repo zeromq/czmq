@@ -1,7 +1,7 @@
 #  Run selftests and check memory
 echo "Rebuilding czmq..."
-gcc -g -o czmq_selftest czmq_selftest.c z*.c ${CFLAGS} ${LDFLAGS} -lzmq -lpthread
+gcc -g -o czmq_selftest czmq_selftest.c z*.c ${CFLAGS} ${LDFLAGS} -lzmq -lpthread -lsodium
 if [ $? -eq 0 ]; then
     echo "Starting Valgrind memcheck..."
-    valgrind --tool=memcheck --leak-check=full --suppressions=valgrind.supp ./czmq_selftest
+    valgrind --tool=memcheck --leak-check=full --suppressions=valgrind.supp ./czmq_selftest -v
 fi

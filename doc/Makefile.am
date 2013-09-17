@@ -1,8 +1,13 @@
 MAN1 =
-MAN3 = zbeacon.3 \
+MAN3 = \
+    zauth.3 \
+    zbeacon.3 \
+    zcert.3 \
+    zchunk.3 \
     zclock.3 \
     zconfig.3 \
     zctx.3 \
+    zdir.3 \
     zfile.3 \
     zframe.3 \
     zhash.3 \
@@ -10,6 +15,7 @@ MAN3 = zbeacon.3 \
     zloop.3 \
     zmsg.3 \
     zmutex.3 \
+    zpoller.3 \
     zsocket.3 \
     zsockopt.3 \
     zstr.3 \

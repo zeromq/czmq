@@ -47,20 +47,23 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zstr_sendm (void *socket, const char *format, ...);
 
+//  Send a series of strings (until NULL) as multipart data
+//  Returns 0 if the strings could be sent OK, or -1 on error.
+CZMQ_EXPORT int
+    zstr_sendx (void *socket, const char *string, ...);
+
+//  Receive a series of strings (until NULL) from multipart data
+//  Each string is allocated and filled with string data; if there
+//  are not enough frames, unallocated strings are set to NULL.
+//  Returns -1 if the message could not be read, else returns the
+//  number of strings filled, zero or more.
+CZMQ_EXPORT int
+    zstr_recvx (void *socket, char **string_p, ...);
+
 //  Self test of this class
 CZMQ_EXPORT int
     zstr_test (bool verbose);
 //  @end
-
-//  Deprecated methods
-//  -----------------------------------------------------------
-//  Send a formatted string to a socket
-CZMQ_EXPORT int
-    zstr_sendf (void *socket, const char *format, ...);
-
-//  Send formatted C string to socket with MORE flag
-CZMQ_EXPORT int
-    zstr_sendfm (void *socket, const char *format, ...);
 
 #ifdef __cplusplus
 }

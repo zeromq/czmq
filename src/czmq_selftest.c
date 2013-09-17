@@ -38,8 +38,12 @@ int main (int argc, char *argv [])
 
     printf ("Running czmq self tests...\n");
 
-    zclock_test (verbose);
+    zauth_test (verbose);
+    zbeacon_test (verbose);
     zconfig_test (verbose);
+    zchunk_test (verbose);
+    zcert_test (verbose);
+    zclock_test (verbose);
     zctx_test (verbose);
     zfile_test (verbose);
     zframe_test (verbose);
@@ -49,12 +53,12 @@ int main (int argc, char *argv [])
     zloop_test (verbose);
     zmsg_test (verbose);
     zmutex_test (verbose);
+    zpoller_test (verbose);
     zsocket_test (verbose);
     zsockopt_test (verbose);
     zstr_test (verbose);
     zsys_test (verbose);
     zthread_test (verbose);
-    zbeacon_test (verbose);
     printf ("Tests passed OK\n");
     return 0;
 }

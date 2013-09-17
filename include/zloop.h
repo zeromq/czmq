@@ -59,6 +59,11 @@ CZMQ_EXPORT int
 CZMQ_EXPORT void
     zloop_poller_end (zloop_t *self, zmq_pollitem_t *item);
 
+//  Configure a registered pollitem to ignore errors. If you do not set this, 
+//  then pollitems that have errors are removed from the reactor silently.
+CZMQ_EXPORT void
+    zloop_set_tolerant (zloop_t *self, zmq_pollitem_t *item);
+
 //  Register a timer that expires after some delay and repeats some number of
 //  times. At each expiry, will call the handler, passing the arg. To
 //  run a timer forever, use 0 times. Returns 0 if OK, -1 if there was an
@@ -85,11 +90,6 @@ CZMQ_EXPORT int
 CZMQ_EXPORT void
     zloop_test (bool verbose);
 //  @end
-
-
-// to suppress disabling the event handler on POLLERR
-// set this in pollitem.events
-#define ZMQ_IGNERR 8
 
 #ifdef __cplusplus
 }

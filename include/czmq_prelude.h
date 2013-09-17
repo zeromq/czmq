@@ -274,9 +274,10 @@
 #   include <sys/ioctl.h>
 #   include <sys/file.h>
 #   include <sys/wait.h>
-#   include <sys/uio.h>                 //  This is required to make CZMQ compile with libzmq/3.x
-#   include <netinet/in.h>              //  Must come before arpa/inet.h
-#   if (!defined (__UTYPE_ANDROID)) && (!defined (__UTYPE_IBMAIX)) && (!defined (__UTYPE_HPUX)) && (!defined (__UTYPE_SUNOS))
+#   include <sys/uio.h>             //  Let CZMQ build with libzmq/3.x
+#   include <netinet/in.h>          //  Must come before arpa/inet.h
+#   if (!defined (__UTYPE_ANDROID)) && (!defined (__UTYPE_IBMAIX)) \
+    && (!defined (__UTYPE_HPUX)) && (!defined (__UTYPE_SUNOS))
 #       include <ifaddrs.h>
 #   endif
 #   if (!defined (__UTYPE_BEOS))
@@ -291,12 +292,12 @@
 #   if (defined (__UTYPE_BEOS))
 #       include <NetKit.h>
 #   endif
-#   if ((defined (_XOPEN_REALTIME) && (_XOPEN_REALTIME >= 1)) || \
-        (defined (_POSIX_VERSION)  && (_POSIX_VERSION  >= 199309L)))
+#   if ((defined (_XOPEN_REALTIME) && (_XOPEN_REALTIME >= 1)) \
+     || (defined (_POSIX_VERSION)  && (_POSIX_VERSION  >= 199309L)))
 #       include <sched.h>
 #   endif
 #   if (defined (__UTYPE_OSX))
-#       include <crt_externs.h>         /* For _NSGetEnviron()               */
+#       include <crt_externs.h>         //  For _NSGetEnviron()
 #   endif
 #endif
 
@@ -372,7 +373,8 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 #define strneq(s1,s2)   (strcmp ((s1), (s2)))
 
 //  Provide random number from 0..(num-1)
-#if (defined (__WINDOWS__)) || (defined (__UTYPE_IBMAIX)) || (defined (__UTYPE_HPUX)) || (defined (__UTYPE_SUNOS))
+#if (defined (__WINDOWS__)) || (defined (__UTYPE_IBMAIX)) \
+ || (defined (__UTYPE_HPUX)) || (defined (__UTYPE_SUNOS))
 #   define randof(num)  (int) ((float) (num) * rand () / (RAND_MAX + 1.0))
 #else
 #   define randof(num)  (int) ((float) (num) * random () / (RAND_MAX + 1.0))
@@ -380,11 +382,11 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 
 // Windows MSVS doesn't have stdbool
 #if (defined (__WINDOWS__))
-#    if (!defined(__cplusplus) && (!defined (true)))
-#        define true 1
-#        define false 0
-         typedef char bool;
-#    endif
+#   if (!defined (__cplusplus) && (!defined (true)))
+#       define true 1
+#       define false 0
+        typedef char bool;
+#   endif
 #else
 #   include <stdbool.h>
 #endif
@@ -392,7 +394,9 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 //- A number of POSIX and C99 keywords and data types -----------------------
 
 #if (defined (__WINDOWS__))
-#   define inline __inline
+#   if (!defined (__cplusplus) && (!defined (inline)))
+#       define inline __inline
+#   endif
 #   define strtoull _strtoui64
 #   define srandom srand
 #   define TIMEZONE _timezone

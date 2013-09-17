@@ -44,6 +44,10 @@ CZMQ_EXPORT int64_t
 CZMQ_EXPORT void
     zclock_log (const char *format, ...);
 
+//  Return formatted date/time as fresh string.
+CZMQ_EXPORT char *
+    zclock_timestr (void);
+
 //  Self test of this class
 CZMQ_EXPORT int
     zclock_test (bool verbose);
