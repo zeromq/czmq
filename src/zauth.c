@@ -77,40 +77,29 @@ zauth_new (zctx_t *ctx)
 
 
 //  --------------------------------------------------------------------------
-//  Set the global whitelist. The whitelist is a list of IP addresses that are
-//  always allowed, and is a text file containing one IP address per line, in
-//  IPv4 or IPv6 text format. The filename is treated as a printf format. You 
-//  may create or modify the file at any time; it is reloaded for each connect
-//  request.
+//  Allow (whitelist) a single IP address. For NULL, all clients from this
+//  address will be accepted. For PLAIN and CURVE, they will be allowed to
+//  continue with authentication. You can call this method multiple times 
+//  to whitelist multiple IP addresses. If you whitelist a single address,
+//  any non-whitelisted addresses are treated as blacklisted.
 
 void
-zauth_set_whitelist (zauth_t *self, char *filename, ...)
+zauth_allow (zauth_t *self, char *address)
 {
-    va_list argptr;
-    va_start (argptr, filename);
-    char *formatted = zsys_vprintf (filename, argptr);
-    va_end (argptr);
-    zstr_sendx (self->pipe, "WHITELIST", formatted, NULL);
-    free (formatted);
+    zstr_sendx (self->pipe, "ALLOW", address, NULL);
 }
 
 
 //  --------------------------------------------------------------------------
-//  Set the global blacklist. The blacklist is a list of IP addresses that are
-//  never allowed, and is a text file containing one IP address per line, in
-//  IPv4 or IPv6 text format. The filename is treated as a printf format. You 
-//  may create or modify the file at any time; it is reloaded for each connect
-//  request.
+//  Deny (blacklist) a single IP address. For all security mechanisms, this
+//  rejects the connection without any further authentication. Use either a
+//  whitelist, or a blacklist, not not both. If you define both a whitelist 
+//  and a blacklist, only the whitelist takes effect.
 
 void
-zauth_set_blacklist (zauth_t *self, char *filename, ...)
+zauth_deny (zauth_t *self, char *address)
 {
-    va_list argptr;
-    va_start (argptr, filename);
-    char *formatted = zsys_vprintf (filename, argptr);
-    va_end (argptr);
-    zstr_sendx (self->pipe, "BLACKLIST", formatted, NULL);
-    free (formatted);
+    zstr_sendx (self->pipe, "DENY", address, NULL);
 }
 
 
@@ -297,8 +286,8 @@ typedef struct {
     void *pipe;                 //  Pipe back to application API
     void *handler;              //  ZAP handler socket
     bool verbose;               //  Trace activity to stdout
-    char *whitelist;            //  Default whitelist
-    char *blacklist;            //  Default blacklist
+    zhash_t *whitelist;         //  Whitelisted addresses
+    zhash_t *blacklist;         //  Blacklisted addresses
     zhash_t *passwords;         //  PLAIN passwords, if loaded
     zcertstore_t *certstore;    //  CURVE certificate store, if loaded
     bool terminated;            //  Did API ask us to quit?
@@ -310,6 +299,8 @@ s_agent_new (zctx_t *ctx, void *pipe)
     agent_t *self = (agent_t *) zmalloc (sizeof (agent_t));
     self->ctx = ctx;
     self->pipe = pipe;
+    self->whitelist = zhash_new ();
+    self->blacklist = zhash_new ();
 
     //  Create ZAP handler and get ready for requests
     self->handler = zsocket_new (self->ctx, ZMQ_REP);
@@ -327,9 +318,9 @@ s_agent_destroy (agent_t **self_p)
     assert (self_p);
     if (*self_p) {
         agent_t *self = *self_p;
-        free (self->blacklist);
-        free (self->whitelist);
         zhash_destroy (&self->passwords);
+        zhash_destroy (&self->whitelist);
+        zhash_destroy (&self->blacklist);
         zcertstore_destroy (&self->certstore);
         free (self);
         *self_p = NULL;
@@ -347,14 +338,16 @@ s_agent_handle_pipe (agent_t *self)
     if (!command)
         return -1;                  //  Interrupted
 
-    if (streq (command, "WHITELIST")) {
-        free (self->whitelist);
-        self->whitelist = zmsg_popstr (request);
+    if (streq (command, "ALLOW")) {
+        char *address = zmsg_popstr (request);
+        zhash_insert (self->whitelist, address, "OK");
+        free (address);
     }
     else
-    if (streq (command, "BLACKLIST")) {
-        free (self->blacklist);
-        self->blacklist = zmsg_popstr (request);
+    if (streq (command, "DENY")) {
+        char *address = zmsg_popstr (request);
+        zhash_insert (self->blacklist, address, "OK");
+        free (address);
     }
     else
     if (streq (command, "PLAIN")) {
@@ -412,56 +405,25 @@ s_agent_authenticate (agent_t *self)
 {
     zap_request_t *request = zap_request_new (self->handler);
     if (request) {
-        bool allowed = false;       //  Not allowed yet
-        bool denied = false;        //  Not denied yet
+        //  Is address explicitly whitelisted or blacklisted?
+        bool allowed = zhash_lookup (self->whitelist, request->address) != NULL;
+        bool denied = allowed? false: zhash_lookup (self->blacklist, request->address) != NULL;
         
-        //  Check whitelist, and then blacklist
-        if (self->whitelist) {
-            FILE *whitelist = fopen (self->whitelist, "r");
-            if (whitelist) {
-                char line [256];
-                while (fgets (line, 256, whitelist)) {
-                    if (line [strlen (line) - 1] == '\n')
-                        line [strlen (line) - 1] = 0;
-                    if (streq (line, request->address)) {
-                        allowed = true;
-                        if (self->verbose) 
-                            printf ("I: ALLOWED (whitelist) address=%s\n", request->address);
-                        break;
-                    }
-                }
-                fclose (whitelist);
-            }
-        }
-        if (!allowed && self->blacklist) {
-            FILE *blacklist = fopen (self->blacklist, "r");
-            if (blacklist) {
-                char line [256];
-                while (fgets (line, 256, blacklist)) {
-                    if (line [strlen (line) - 1] == '\n')
-                        line [strlen (line) - 1] = 0;
-                    if (streq (line, request->address)) {
-                        denied = true;
-                        if (self->verbose) 
-                            printf ("I: DENIED (blacklist) address=%s\n", request->address);
-                        break;
-                    }
-                }
-                fclose (blacklist);
-            }
-        }
         //  Mechanism-specific checks
         if (!denied) {
-            if (streq (request->mechanism, "NULL")) {
+            if (streq (request->mechanism, "NULL") && !allowed) {
+                //  For NULL, we allow if the address wasn't blacklisted
                 if (self->verbose) 
                     printf ("I: ALLOWED (NULL default)\n");
                 allowed = true;
             }
             else
             if (streq (request->mechanism, "PLAIN"))
+                //  For PLAIN, even a whitelisted address must authenticate
                 allowed = s_authenticate_plain (self, request);
             else
             if (streq (request->mechanism, "CURVE"))
+                //  For CURVE, even a whitelisted address must authenticate
                 allowed = s_authenticate_curve (self, request);
         }
         if (allowed)
@@ -574,6 +536,9 @@ s_can_connect (void *server, void *client)
 }
 
 
+//  --------------------------------------------------------------------------
+//  Selftest
+
 int
 zauth_test (bool verbose)
 {
@@ -608,23 +573,13 @@ zauth_test (bool verbose)
     success = s_can_connect (server, client);
     assert (success);
         
-    //  Let's try blacklisting on NULL connections; our address is 127.0.0.1
-    //  Connection should now fail
-    FILE *blacklist = fopen (TESTDIR "/banned-addresses", "w");
-    assert (blacklist);
-    fprintf (blacklist, "127.0.0.1\n");
-    fclose (blacklist);
-    zauth_set_blacklist (auth, TESTDIR "/banned-addresses");
+    //  Blacklist 127.0.0.1, connection should fail
+    zauth_deny (auth, "127.0.0.1");
     success = s_can_connect (server, client);
     assert (!success);
     
-    //  Add a whitelist, which takes precedence
-    //  Connection should now succeed again
-    FILE *whitelist = fopen (TESTDIR "/allowed-addresses", "w");
-    assert (whitelist);
-    fprintf (whitelist, "127.0.0.1\n");
-    fclose (whitelist);
-    zauth_set_whitelist (auth, TESTDIR "/allowed-addresses");
+    //  Whitelist our address, which overrides the blacklist
+    zauth_allow (auth, "127.0.0.1");
     success = s_can_connect (server, client);
     assert (success);
 
