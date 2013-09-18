@@ -18,6 +18,8 @@ CZMQ has these goals:
 * To wrap the 0MQ core API in semantics that are natural and lead to shorter, more readable applications.
 * To hide the differences between versions of 0MQ, particularly 2.x and 3.x.
 * To provide a space for development of more sophisticated API semantics.
+* To wrap the 0MQ security features with high-level tools and APIs.
+* To become the basis for other language bindings built on top of CZMQ.
 
 CZMQ grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.org).
 
@@ -49,23 +51,13 @@ CZMQ grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.o
 
 [/diagram]
 
-### Highlights
-
-* Single API hides differences between 0MQ/2.x, and 0MQ/3.x.
-* Work with messages as strings, individual frames, or multipart messages.
-* Automatic closure of any open sockets at context termination.
-* Automatic LINGER configuration of all sockets for context termination.
-* Portable API for creating child threads and 0MQ pipes to talk to them.
-* Simple reactor with one-off and repeated timers, and socket readers.
-* System clock functions for sleeping and calculating timers.
-* Easy API to get/set all socket options.
-* Portable to Linux, UNIX, OS X, Windows (porting is not yet complete).
-* Includes generic hash and list containers.
-* Full self tests on all classes.
-
 ### Ownership and License
 
 CZMQ's contributors are listed in the AUTHORS file. It is held by the ZeroMQ organization at github.com. The authors of CZMQ grant you use of this software under the terms of the GNU Lesser General Public License (LGPL). For details see the files `COPYING` and `COPYING.LESSER` in this directory.
+
+### Commercial Support
+
+CZMQ is actively developed and maintained by iMatix Corporation, who provide support to commercial users that need it. Contact Pieter Hintjens vai ph@imatix.com for more information. Note that CZMQ is licensed exclusively under the same LGPLv3 + static link exception as libzmq. This lets you use CZMQ freely in any application, with the requirement that you publish patches to the code.
 
 ### Contributing
 
@@ -105,6 +97,76 @@ Include `czmq.h` in your application and link with libczmq. Here is a typical gc
 
 ### API Summary
 
+#### zauth - authentication for ZeroMQ security mechanisms
+
+.pull src/zauth.c@header,left
+
+This is the class interface:
+
+.pull include/zauth.h@interface,code
+
+.pull src/zauth.c@discuss,left
+
+#### zbeacon - LAN service announcement and discovery
+
+.pull src/zbeacon.c@header,left
+
+This is the class interface:
+
+.pull include/zbeacon.h@interface,code
+
+.pull src/zbeacon.c@discuss,left
+
+#### zcert - work with CURVE security certificates
+
+.pull src/zcert.c@header,left
+
+This is the class interface:
+
+.pull include/zcert.h@interface,code
+
+.pull src/zcert.c@discuss,left
+
+#### zcertstore - work with CURVE security certificate stores
+
+.pull src/zcertstore.c@header,left
+
+This is the class interface:
+
+.pull include/zcertstore.h@interface,code
+
+.pull src/zcertstore.c@discuss,left
+
+#### zchunk - work with memory chunks
+
+.pull src/zchunk.c@header,left
+
+This is the class interface:
+
+.pull include/zchunk.h@interface,code
+
+.pull src/zchunk.c@discuss,left
+
+#### zclock - millisecond clocks and delays
+
+.pull src/zclock.c@header,left
+
+This is the class interface:
+
+.pull include/zclock.h@interface,code
+
+.pull src/zclock.c@discuss,left
+
+#### zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.
+
+.pull src/zconfig.c@header,left
+
+This is the class interface:
+
+.pull include/zconfig.h@interface,code
+
+.pull src/zconfig.c@discuss,left
+
 #### zctx - working with 0MQ contexts
 
 .pull src/zctx.c@header,left
@@ -114,6 +176,96 @@ This is the class interface:
 .pull include/zctx.h@interface,code
 
 .pull src/zctx.c@discuss,left
+
+#### zdir - work with file-system directories
+
+.pull src/zdir.c@header,left
+
+This is the class interface:
+
+.pull include/zdir.h@interface,code
+
+.pull src/zdir.c@discuss,left
+
+#### zfile - work with files
+
+.pull src/zfile.c@header,left
+
+This is the class interface:
+
+.pull include/zfile.h@interface,code
+
+.pull src/zfile.c@discuss,left
+
+#### zframe - working with single message frames
+
+.pull src/zframe.c@header,left
+
+This is the class interface:
+
+.pull include/zframe.h@interface,code
+
+.pull src/zframe.c@discuss,left
+
+#### zhash - generic hash table container
+
+.pull src/zhash.c@header,left
+
+This is the class interface:
+
+.pull include/zhash.h@interface,code
+
+.pull src/zhash.c@discuss,left
+
+#### zlist - generic list container
+
+.pull src/zlist.c@header,left
+
+This is the class interface:
+
+.pull include/zlist.h@interface,code
+
+.pull src/zlist.c@discuss,left
+
+#### zloop - event-driven reactor
+
+.pull src/zloop.c@header,left
+
+This is the class interface:
+
+.pull include/zloop.h@interface,code
+
+.pull src/zloop.c@discuss,left
+
+#### zmsg - working with multipart messages
+
+.pull src/zmsg.c@header,left
+
+This is the class interface:
+
+.pull include/zmsg.h@interface,code
+
+.pull src/zmsg.c@discuss,left
+
+#### zmutex - wrap lightweight mutexes
+
+.pull src/zmutex.c@header,left
+
+This is the class interface:
+
+.pull include/zmutex.h@interface,code
+
+.pull src/zmutex.c@discuss,left
+
+#### zpoller - trivial socket poller class
+
+.pull src/zpoller.c@header,left
+
+This is the class interface:
+
+.pull include/zpoller.h@interface,code
+
+.pull src/zpoller.c@discuss,left
 
 #### zsocket - working with 0MQ sockets
 
@@ -159,45 +311,15 @@ This is the class interface:
 
 .pull src/zstr.c@discuss,left
 
-#### zfile - work with files
+#### zsys - system-level methods
 
-.pull src/zfile.c@header,left
-
-This is the class interface:
-
-.pull include/zfile.h@interface,code
-
-.pull src/zfile.c@discuss,left
-
-#### zframe - working with single message frames
-
-.pull src/zframe.c@header,left
+.pull src/zsys.c@header,left
 
 This is the class interface:
 
-.pull include/zframe.h@interface,code
+.pull include/zsys.h@interface,code
 
-.pull src/zframe.c@discuss,left
-
-#### zmsg - working with multipart messages
-
-.pull src/zmsg.c@header,left
-
-This is the class interface:
-
-.pull include/zmsg.h@interface,code
-
-.pull src/zmsg.c@discuss,left
-
-#### zloop - event-driven reactor
-
-.pull src/zloop.c@header,left
-
-This is the class interface:
-
-.pull include/zloop.h@interface,code
-
-.pull src/zloop.c@discuss,left
+.pull src/zsys.c@discuss,left
 
 #### zthread - working with system threads
 
@@ -209,45 +331,15 @@ This is the class interface:
 
 .pull src/zthread.c@discuss,left
 
-#### zhash - expandable hash table container
+#### ztree - generic red-black tree container
 
-.pull src/zhash.c@header,left
-
-This is the class interface:
-
-.pull include/zhash.h@interface,code
-
-.pull src/zhash.c@discuss,left
-
-#### zlist - singly-linked list container
-
-.pull src/zlist.c@header,left
+.pull src/ztree.c@header,left
 
 This is the class interface:
 
-.pull include/zlist.h@interface,code
+.pull include/ztree.h@interface,code
 
-.pull src/zlist.c@discuss,left
-
-#### zclock - millisecond clocks and delays
-
-.pull src/zclock.c@header,left
-
-This is the class interface:
-
-.pull include/zclock.h@interface,code
-
-.pull src/zclock.c@discuss,left
-
-#### zmutex - wrap lightweight mutexes
-
-.pull src/zmutex.c@header,left
-
-This is the class interface:
-
-.pull include/zmutex.h@interface,code
-
-.pull src/zmutex.c@discuss,left
+.pull src/ztree.c@discuss,left
 
 ## Under the Hood
 
@@ -260,6 +352,7 @@ If you define a new CZMQ class `myclass` you need to:
 * Add the myclass header and test call to `src/czmq_selftest.c`.
 * Add a reference documentation to 'doc/zmyclass.txt'.
 * Add myclass to 'src/Makefile.am` and `doc/Makefile.am`.
+* Add a section to README.txt.
 
 ### Documentation
 

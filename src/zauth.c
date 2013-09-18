@@ -241,6 +241,7 @@ zap_request_new (void *handler)
         assert (zframe_size (frame) == 32);
         self->client_key = zmalloc (41);
         zmq_z85_encode (self->client_key, zframe_data (frame), 32);
+        zframe_destroy (&frame);
     }
     zmsg_destroy (&request);
     return self;
@@ -298,11 +299,8 @@ typedef struct {
     bool verbose;               //  Trace activity to stdout
     char *whitelist;            //  Default whitelist
     char *blacklist;            //  Default blacklist
-    zhash_t *plain_passwd;      //  PLAIN passwords, if loaded
-    char *curve_directory;      //  CURVE certificate directory
-    zlist_t *curve_cert_list;   //  List of loaded certificates
-    zhash_t *curve_certs;       //  Hash of loaded certificates
-    time_t curve_modified;      //  Date/time directory changed
+    zhash_t *passwords;         //  PLAIN passwords, if loaded
+    zcertstore_t *certstore;    //  CURVE certificate store, if loaded
     bool terminated;            //  Did API ask us to quit?
 } agent_t;
 
@@ -312,7 +310,6 @@ s_agent_new (zctx_t *ctx, void *pipe)
     agent_t *self = (agent_t *) zmalloc (sizeof (agent_t));
     self->ctx = ctx;
     self->pipe = pipe;
-    self->curve_cert_list = zlist_new ();
 
     //  Create ZAP handler and get ready for requests
     self->handler = zsocket_new (self->ctx, ZMQ_REP);
@@ -332,24 +329,14 @@ s_agent_destroy (agent_t **self_p)
         agent_t *self = *self_p;
         free (self->blacklist);
         free (self->whitelist);
-        zhash_destroy (&self->plain_passwd);
-        
-        zcert_t *cert = (zcert_t *) zlist_pop (self->curve_cert_list);
-        while (cert) {
-            zcert_destroy (&cert);
-            cert = (zcert_t *) zlist_pop (self->curve_cert_list);
-        }
-        zlist_destroy (&self->curve_cert_list);
-        zhash_destroy (&self->curve_certs);
-        free (self->curve_directory);
-        
+        zhash_destroy (&self->passwords);
+        zcertstore_destroy (&self->certstore);
         free (self);
         *self_p = NULL;
     }
 }
 
 //  Handle a message from front-end API
-static void s_load_curve_certificates (agent_t *self);
 
 static int
 s_agent_handle_pipe (agent_t *self)
@@ -377,9 +364,9 @@ s_agent_handle_pipe (agent_t *self)
         //  Get password file and load into zhash table
         //  If the file doesn't exist we'll get an empty table
         char *filename = zmsg_popstr (request);
-        zhash_destroy (&self->plain_passwd);
-        self->plain_passwd = zhash_new ();
-        zhash_load (self->plain_passwd, filename);
+        zhash_destroy (&self->passwords);
+        self->passwords = zhash_new ();
+        zhash_load (self->passwords, filename);
         free (filename);
     }
     else
@@ -387,10 +374,12 @@ s_agent_handle_pipe (agent_t *self)
         //  For now we don't do anything with domains
         char *domain = zmsg_popstr (request);
         free (domain);
-        //  Get the directory name and load all certificates
-        free (self->curve_directory);
-        self->curve_directory = zmsg_popstr (request);
-        s_load_curve_certificates (self);
+        //  Get certificate directory, and load into new certstore
+        //  If the directory doesn't exist we'll get an empty store.
+        char *directory = zmsg_popstr (request);
+        zcertstore_destroy (&self->certstore);
+        self->certstore = zcertstore_new (directory);
+        free (directory);
     }
     else
     if (streq (command, "VERBOSE")) {
@@ -412,43 +401,6 @@ s_agent_handle_pipe (agent_t *self)
     return 0;
 }
 
-static void
-s_load_curve_certificates (agent_t *self)
-{
-    //  Want a zkeystore class to cover this
-    
-    zcert_t *cert = (zcert_t *) zlist_pop (self->curve_cert_list);
-    while (cert) {
-        zcert_destroy (&cert);
-        cert = (zcert_t *) zlist_pop (self->curve_cert_list);
-    }
-    zlist_destroy (&self->curve_cert_list);
-    zhash_destroy (&self->curve_certs);
-
-    self->curve_cert_list = zlist_new ();
-    self->curve_certs = zhash_new ();
-    self->curve_modified = zsys_file_modified (self->curve_directory);
-    
-    zdir_t *dir = zdir_new (self->curve_directory, NULL);
-    if (dir) {
-        zfile_t **files = zdir_flatten (dir);
-        uint index;
-        for (index = 0;; index++) {
-            zfile_t *file = files [index];
-            if (!file)
-                break;      //  End of list
-            if (zfile_is_regular (file)) {
-                zcert_t *cert = zcert_load (zfile_filename (file, NULL));
-                if (cert) {
-                    zlist_push (self->curve_cert_list, cert);
-                    zhash_insert (self->curve_certs, zcert_public_txt (cert), cert);
-                }
-            }
-        }
-        free (files);
-    }
-}
-
 
 //  Handle an authentication request from libzmq core
 
@@ -460,9 +412,6 @@ s_agent_authenticate (agent_t *self)
 {
     zap_request_t *request = zap_request_new (self->handler);
     if (request) {
-        if (self->verbose)
-            zap_request_dump (request);
-        
         bool allowed = false;       //  Not allowed yet
         bool denied = false;        //  Not denied yet
         
@@ -524,8 +473,8 @@ s_agent_authenticate (agent_t *self)
 static bool 
 s_authenticate_plain (agent_t *self, zap_request_t *request)
 {
-    zhash_refresh (self->plain_passwd);
-    char *password = (char *) zhash_lookup (self->plain_passwd, request->username);
+    zhash_refresh (self->passwords);
+    char *password = (char *) zhash_lookup (self->passwords, request->username);
     if (password && streq (password, request->password))
         return true;
     else
@@ -536,13 +485,12 @@ s_authenticate_plain (agent_t *self, zap_request_t *request)
 static bool 
 s_authenticate_curve (agent_t *self, zap_request_t *request)
 {
-    //s_load_curve_certificates (self);
-    if (self->curve_certs) {
-        zcert_t *cert = (zcert_t *) zhash_lookup (self->curve_certs, request->client_key);
-        if (cert)
-            return true;
-    }
-    return false;
+    //  TODO: load metadata from certificate and return via ZAP response
+    if (self->certstore
+    &&  zcertstore_lookup (self->certstore, request->client_key))
+        return true;
+    else
+        return false;
 }
 
 
@@ -604,12 +552,16 @@ s_can_connect (void *server, void *client)
     return success;
 }
 
+
 int
 zauth_test (bool verbose)
 {
     printf (" * zauth: ");
 
     //  @selftest
+    //  Create temporary directory for test files
+#   define TESTDIR ".test_zauth"
+    zsys_dir_create (TESTDIR);
     
     //  Install the authenticator
     zctx_t *ctx = zctx_new ();
@@ -637,30 +589,30 @@ zauth_test (bool verbose)
         
     //  Let's try blacklisting on NULL connections; our address is 127.0.0.1
     //  Connection should now fail
-    FILE *blacklist = fopen ("banned-addresses", "w");
+    FILE *blacklist = fopen (TESTDIR "/banned-addresses", "w");
     assert (blacklist);
     fprintf (blacklist, "127.0.0.1\n");
     fclose (blacklist);
-    zauth_set_blacklist (auth, "banned-addresses");
+    zauth_set_blacklist (auth, TESTDIR "/banned-addresses");
     success = s_can_connect (server, client);
     assert (!success);
     
     //  Add a whitelist, which takes precedence
     //  Connection should now succeed again
-    FILE *whitelist = fopen ("allowed-addresses", "w");
+    FILE *whitelist = fopen (TESTDIR "/allowed-addresses", "w");
     assert (whitelist);
     fprintf (whitelist, "127.0.0.1\n");
     fclose (whitelist);
-    zauth_set_whitelist (auth, "allowed-addresses");
+    zauth_set_whitelist (auth, TESTDIR "/allowed-addresses");
     success = s_can_connect (server, client);
     assert (success);
 
     //  Try PLAIN authentication
-    FILE *password = fopen ("password-file", "w");
+    FILE *password = fopen (TESTDIR "/password-file", "w");
     assert (password);
     fprintf (password, "admin=Password\n");
     fclose (password);
-    zauth_configure_plain (auth, "*", "password-file");
+    zauth_configure_plain (auth, "*", TESTDIR "/password-file");
     
     zsocket_set_plain_server (server, 1);
     zsocket_set_plain_username (client, "admin");
@@ -673,26 +625,29 @@ zauth_test (bool verbose)
     assert (success);
 
     //  Try CURVE authentication
+    //  We'll create two new certificates and save the client public 
+    //  certificate on disk; in a real case we'd transfer this securely
+    //  from the client machine to the server machine.
+    zcert_t *server_cert = zcert_new ();
+    zcert_apply (server_cert, server);
     zsocket_set_curve_server (server, 1);
-    zsocket_set_curve_publickey (server, "rq:rM>}U?@Lns47E1%kR.o@n%FcmmsL/@{H8]yf7");
-    zsocket_set_curve_secretkey (server, "JTKVSB%%)wK0E.X)V>+}o?pNmC{O&4W4b!Ni{Lh6");
 
-    zsocket_set_curve_serverkey (client, "rq:rM>}U?@Lns47E1%kR.o@n%FcmmsL/@{H8]yf7");
-    zsocket_set_curve_publickey (client, "Yne@$w-vo<fVvi]a<NY6T1ed:M$fCG*[IaLV{hID");
-    zsocket_set_curve_secretkey (client, "D:)Q[IlAW!ahhC2ac:9*A}h:p?([4%wOTJ%JR%cs");
+    zcert_t *client_cert = zcert_new ();
+    zcert_apply (client_cert, client);
+    char *server_key = zcert_public_txt (server_cert);
+    zsocket_set_curve_serverkey (client, server_key);
 
+    //  We've not set-up any authentication, connection will fail
     success = s_can_connect (server, client);
     assert (!success);
 
-    zsys_dir_create ("certificates");
-    FILE *certificate = fopen ("certificates/mycert.txt", "w");
-    assert (certificate);
-    fprintf (certificate, "curve\n");
-    fprintf (certificate, "    public-key = \"Yne@$w-vo<fVvi]a<NY6T1ed:M$fCG*[IaLV{hID\"\n");
-    fclose (certificate);
-    zauth_configure_curve (auth, "*", "certificates");
+    //  Authenticate against client certificates in TESTDIR
+    zcert_save_public (client_cert, TESTDIR "/mycert.txt");
+    zauth_configure_curve (auth, "*", TESTDIR);
     success = s_can_connect (server, client);
     assert (success);
+    zcert_destroy (&server_cert);
+    zcert_destroy (&client_cert);
     
     //  Remove the authenticator and check a normal connection works
     zauth_destroy (&auth);
@@ -702,13 +657,11 @@ zauth_test (bool verbose)
     zctx_destroy (&ctx);
     
     //  Delete all test files
-    zsys_file_delete ("allowed-addresses");
-    zsys_file_delete ("banned-addresses");
-    zsys_file_delete ("password-file");
-    zsys_file_delete ("certificates/mycert.txt");
-    zsys_dir_delete ("certificates");
-    
+    zdir_t *dir = zdir_new (TESTDIR, NULL);
+    zdir_remove (dir, true);
+    zdir_destroy (&dir);
     //  @end
+    
     printf ("OK\n");
     return 0;
 }

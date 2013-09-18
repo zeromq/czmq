@@ -9,6 +9,7 @@ include_HEADERS = \
     ../include/zauth.h \
     ../include/zbeacon.h \
     ../include/zcert.h \
+    ../include/zcertstore.h \
     ../include/zchunk.h \
     ../include/zclock.h \
     ../include/zconfig.h \
@@ -33,6 +34,7 @@ libczmq_la_SOURCES = \
     zauth.c \
     zbeacon.c \
     zcert.c \
+    zcertstore.c \
     zchunk.c \
     zclock.c \
     zconfig.c \

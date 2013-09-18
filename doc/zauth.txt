@@ -39,6 +39,9 @@ EXAMPLE
 -------
 .From zauth_test method
 ----
+    //  Create temporary directory for test files
+#   define TESTDIR ".test_zauth"
+    zsys_dir_create (TESTDIR);
     
     //  Install the authenticator
     zctx_t *ctx = zctx_new ();
@@ -66,30 +69,30 @@ EXAMPLE
         
     //  Let's try blacklisting on NULL connections; our address is 127.0.0.1
     //  Connection should now fail
-    FILE *blacklist = fopen ("banned-addresses", "w");
+    FILE *blacklist = fopen (TESTDIR "/banned-addresses", "w");
     assert (blacklist);
     fprintf (blacklist, "127.0.0.1\n");
     fclose (blacklist);
-    zauth_set_blacklist (auth, "banned-addresses");
+    zauth_set_blacklist (auth, TESTDIR "/banned-addresses");
     success = s_can_connect (server, client);
     assert (!success);
     
     //  Add a whitelist, which takes precedence
     //  Connection should now succeed again
-    FILE *whitelist = fopen ("allowed-addresses", "w");
+    FILE *whitelist = fopen (TESTDIR "/allowed-addresses", "w");
     assert (whitelist);
     fprintf (whitelist, "127.0.0.1\n");
     fclose (whitelist);
-    zauth_set_whitelist (auth, "allowed-addresses");
+    zauth_set_whitelist (auth, TESTDIR "/allowed-addresses");
     success = s_can_connect (server, client);
     assert (success);
 
     //  Try PLAIN authentication
-    FILE *password = fopen ("password-file", "w");
+    FILE *password = fopen (TESTDIR "/password-file", "w");
     assert (password);
     fprintf (password, "admin=Password\n");
     fclose (password);
-    zauth_configure_plain (auth, "*", "password-file");
+    zauth_configure_plain (auth, "*", TESTDIR "/password-file");
     
     zsocket_set_plain_server (server, 1);
     zsocket_set_plain_username (client, "admin");
@@ -102,7 +105,41 @@ EXAMPLE
     assert (success);
 
     //  Try CURVE authentication
+    //  We'll create two new certificates and save the client public 
+    //  certificate on disk; in a real case we'd transfer this securely
+    //  from the client machine to the server machine.
+    zcert_t *server_cert = zcert_new ();
+    zcert_apply (server_cert, server);
     zsocket_set_curve_server (server, 1);
+
+    zcert_t *client_cert = zcert_new ();
+    zcert_apply (client_cert, client);
+    char *server_key = zcert_public_txt (server_cert);
+    zsocket_set_curve_serverkey (client, server_key);
+
+    //  We've not set-up any authentication, connection will fail
+    success = s_can_connect (server, client);
+    assert (!success);
+
+    //  Authenticate against client certificates in TESTDIR
+    zcert_save_public (client_cert, TESTDIR "/mycert.txt");
+    zauth_configure_curve (auth, "*", TESTDIR);
+    success = s_can_connect (server, client);
+    assert (success);
+    zcert_destroy (&server_cert);
+    zcert_destroy (&client_cert);
+    
+    //  Remove the authenticator and check a normal connection works
+    zauth_destroy (&auth);
+    success = s_can_connect (server, client);
+    assert (success);
+    
+    zctx_destroy (&ctx);
+    
+    //  Delete all test files
+    zdir_t *dir = zdir_new (TESTDIR, NULL);
+    zdir_remove (dir, true);
+    zdir_destroy (&dir);
 ----
 
 SEE ALSO

@@ -3,6 +3,7 @@ MAN3 = \
     zauth.3 \
     zbeacon.3 \
     zcert.3 \
+    zcertstore.3 \
     zchunk.3 \
     zclock.3 \
     zconfig.3 \

@@ -708,8 +708,6 @@ zmsg_test (bool verbose)
     assert (msg);
     assert (zmsg_size (msg) == 10);
     assert (zmsg_content_size (msg) == 60);
-    if (verbose)
-        zmsg_dump (msg);
 
     // create empty file for null test
     FILE *file = fopen ("zmsg.test", "w");

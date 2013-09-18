@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zsys - system wrapper
+    zsys - system-level methods
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>

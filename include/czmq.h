@@ -43,7 +43,6 @@
 
 //  Classes in the API
 
-#include "zcert.h"
 #include "zchunk.h"
 #include "zclock.h"
 #include "zconfig.h"
@@ -53,7 +52,6 @@
 #include "zframe.h"
 #include "zlist.h"
 #include "zhash.h"
-#include "ztree.h"
 #include "zloop.h"
 #include "zmsg.h"
 #include "zmutex.h"
@@ -63,7 +61,10 @@
 #include "zstr.h"
 #include "zsys.h"
 #include "zthread.h"
+#include "ztree.h"
 #include "zbeacon.h"
 #include "zauth.h"
+#include "zcert.h"
+#include "zcertstore.h"
 
 #endif
