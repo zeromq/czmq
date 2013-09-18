@@ -425,6 +425,8 @@ s_agent_authenticate (agent_t *self)
                         line [strlen (line) - 1] = 0;
                     if (streq (line, request->address)) {
                         allowed = true;
+                        if (self->verbose) 
+                            printf ("I: ALLOWED (whitelist) address=%s\n", request->address);
                         break;
                     }
                 }
@@ -440,6 +442,8 @@ s_agent_authenticate (agent_t *self)
                         line [strlen (line) - 1] = 0;
                     if (streq (line, request->address)) {
                         denied = true;
+                        if (self->verbose) 
+                            printf ("I: DENIED (blacklist) address=%s\n", request->address);
                         break;
                     }
                 }
@@ -448,8 +452,11 @@ s_agent_authenticate (agent_t *self)
         }
         //  Mechanism-specific checks
         if (!denied) {
-            if (streq (request->mechanism, "NULL"))
+            if (streq (request->mechanism, "NULL")) {
+                if (self->verbose) 
+                    printf ("I: ALLOWED (NULL default)\n");
                 allowed = true;
+            }
             else
             if (streq (request->mechanism, "PLAIN"))
                 allowed = s_authenticate_plain (self, request);
@@ -475,10 +482,18 @@ s_authenticate_plain (agent_t *self, zap_request_t *request)
 {
     zhash_refresh (self->passwords);
     char *password = (char *) zhash_lookup (self->passwords, request->username);
-    if (password && streq (password, request->password))
+    if (password && streq (password, request->password)) {
+        if (self->verbose) 
+            printf ("I: ALLOWED (PLAIN) username=%s password=%s\n",
+                request->username, request->password);
         return true;
-    else
+    }
+    else {
+        if (self->verbose) 
+            printf ("I: DENIED (PLAIN) username=%s password=%s\n",
+                request->username, request->password);
         return false;
+    }
 }
 
 
@@ -487,10 +502,16 @@ s_authenticate_curve (agent_t *self, zap_request_t *request)
 {
     //  TODO: load metadata from certificate and return via ZAP response
     if (self->certstore
-    &&  zcertstore_lookup (self->certstore, request->client_key))
+    &&  zcertstore_lookup (self->certstore, request->client_key)) {
+        if (self->verbose) 
+            printf ("I: ALLOWED (CURVE) client_key=%s\n", request->client_key);
         return true;
-    else
+    }
+    else {
+        if (self->verbose) 
+            printf ("I: DENIED (CURVE) client_key=%s\n", request->client_key);
         return false;
+    }
 }
 
 
