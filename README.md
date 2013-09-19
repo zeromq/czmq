@@ -133,19 +133,58 @@ which zauth can see.
 
 This is the class interface:
 
-    //  Create a new authenticator
+    #define CURVE_ALLOW_ANY "*"
+    
+    //  Constructor
+    //  Install authentication for the specified context. Returns a new zauth
+    //  object that you can use to configure authentication. Note that until you
+    //  add policies, all incoming NULL connections are allowed (classic ZeroMQ
+    //  behaviour), and all PLAIN and CURVE connections are denied. If there was
+    //  an error during initialization, returns NULL.
     CZMQ_EXPORT zauth_t *
         zauth_new (zctx_t *ctx);
-    
-    //  Destroy a auth container
+        
+    //  Allow (whitelist) a single IP address. For NULL, all clients from this
+    //  address will be accepted. For PLAIN and CURVE, they will be allowed to
+    //  continue with authentication. You can call this method multiple times 
+    //  to whitelist multiple IP addresses. If you whitelist a single address,
+    //  any non-whitelisted addresses are treated as blacklisted.
     CZMQ_EXPORT void
-        zauth_destroy (zauth_t **self_p);
+        zauth_allow (zauth_t *self, char *address);
     
+    //  Deny (blacklist) a single IP address. For all security mechanisms, this
+    //  rejects the connection without any further authentication. Use either a
+    //  whitelist, or a blacklist, not not both. If you define both a whitelist 
+    //  and a blacklist, only the whitelist takes effect.
+    CZMQ_EXPORT void
+        zauth_deny (zauth_t *self, char *address);
+    
+    //  Configure PLAIN authentication for a given domain. PLAIN authentication
+    //  uses a plain-text password file. The filename is treated as a printf 
+    //  format. To cover all domains, use "*". You can modify the password file
+    //  at any time; it is reloaded automatically.
+    CZMQ_EXPORT void
+        zauth_configure_plain (zauth_t *self, char *domain, char *filename, ...);
+        
+    //  Configure CURVE authentication for a given domain. CURVE authentication
+    //  uses a directory that holds all public client certificates, i.e. their
+    //  public keys. The certificates must be in zcert_save () format. The 
+    //  location is treated as a printf format. To cover all domains, use "*". 
+    //  You can add and remove certificates in that directory at any time. 
+    //  To allow all client keys without checking, specify CURVE_ALLOW_ANY
+    //  for the location.
+    CZMQ_EXPORT void
+        zauth_configure_curve (zauth_t *self, char *domain, char *location, ...);
+        
     //  Enable verbose tracing of commands and activity
     CZMQ_EXPORT void
         zauth_set_verbose (zauth_t *self, bool verbose);
+        
+    //  Destructor
+    CZMQ_EXPORT void
+        zauth_destroy (zauth_t **self_p);
     
-    //  Self test of this class
+    //  Selftest
     CZMQ_EXPORT int
         zauth_test (bool verbose);
 
@@ -222,9 +261,9 @@ temporary object in memory, or persisted to disk. On disk, a
 certificate is stored as two files. One is public and contains only
 the public key. The second is secret and contains both keys. The
 two have the same filename, with the secret file adding "_secret".
-To exchange certificates, send the public file via some secure
-route. Certificates are not signed but are text files that can
-be verified by eye.
+To exchange certificates, send the public file via some secure route. 
+Certificates are not signed but are text files that can be verified by 
+eye.
 
 This is the class interface:
 
@@ -257,22 +296,36 @@ This is the class interface:
     CZMQ_EXPORT char *
         zcert_secret_txt (zcert_t *self);
     
-    //  Set certificate header (metadata) from formatted string.
+    //  Set certificate metadata from formatted string.
     CZMQ_EXPORT void
-        zcert_set_header (zcert_t *self, const char *name, const char *format, ...);
+        zcert_set_meta (zcert_t *self, char *name, char *format, ...);
     
-    //  Get header value from certificate; if the header doesn't exist, returns
-    //  NULL.
+    //  Get metadata value from certificate; if the metadata value doesn't 
+    //  exist, returns NULL.
     CZMQ_EXPORT char *
-        zcert_header (zcert_t *self, const char *name);
-    
-    //  Save certificate to file for persistent storage
-    CZMQ_EXPORT int
-        zcert_save (zcert_t *self, char *filename);
+        zcert_meta (zcert_t *self, char *name);
     
     //  Load certificate from file (constructor)
+    //  The filename is treated as a printf format specifier.
     CZMQ_EXPORT zcert_t *
-        zcert_load (char *filename);
+        zcert_load (char *filename, ...);
+    
+    //  Save full certificate (public + secret) to file for persistent storage
+    //  This creates one public file and one secret file (filename + "_secret").
+    //  The filename is treated as a printf format specifier.
+    CZMQ_EXPORT int
+        zcert_save (zcert_t *self, char *filename, ...);
+    
+    //  Save public certificate only to file for persistent storage
+    //  The filename is treated as a printf format specifier.
+    CZMQ_EXPORT int
+        zcert_save_public (zcert_t *self, char *filename, ...);
+    
+    //  Apply certificate to socket, i.e. use for CURVE security on socket.
+    //  If certificate was loaded from public file, the secret key will be
+    //  undefined, and this certificate will not work successfully.
+    CZMQ_EXPORT void
+        zcert_apply (zcert_t *self, void *zocket);
     
     //  Return copy of certificate
     CZMQ_EXPORT zcert_t *
@@ -290,23 +343,36 @@ This is the class interface:
     CZMQ_EXPORT int
         zcert_test (bool verbose);
 
-Certificates are stored in the ZPL (ZMQ RFC 4) format.
+Certificates are stored in the ZPL (ZMQ RFC 4) format. They have two
+sections, "metadata" and "curve". The first contains a list of 'name =
+value' pairs, one per line. Values may be enclosed in quotes. The curve
+section has a 'public-key = keyvalue' and, for secret certificates, a
+'secret-key = keyvalue' line. The keyvalue is a Z85-encoded CURVE key.
 
 <A name="toc4-143" title="zcertstore - work with CURVE security certificate stores" />
 #### zcertstore - work with CURVE security certificate stores
 
+To authenticate new clients using the ZeroMQ CURVE security mechanism,
+we have to check that the client's public key matches a key we know and
+accept. There are numerous ways to store accepted client public keys. 
+The mechanism CZMQ implements is "certificates" (plain text files) held 
+in a "certificate store" (a disk directory). This class works with such
+certificate stores, and lets you easily load them from disk, and check
+if a given client public key is known or not. The zcert class does the
+work of managing a single certificate.
 
 This is the class interface:
 
     
     //  Create a new certificate store from a disk directory, loading and 
-    //  indexing all certificates in that directory. The directory itself may be
+    //  indexing all certificates in that location. The directory itself may be
     //  absent, and created later, or modified at any time. The certificate store 
     //  is automatically refreshed on any zcertstore_lookup() call. If the 
-    //  directory is specified as NULL, creates a pure-memory store, which you 
-    //  can work with by inserting certificates at runtime.
+    //  location is specified as NULL, creates a pure-memory store, which you 
+    //  can work with by inserting certificates at runtime. The location is
+    //  treated as a printf format.
     CZMQ_EXPORT zcertstore_t *
-        zcertstore_new (const char *directory);
+        zcertstore_new (char *location, ...);
     
     //  Destroy a certificate store object in memory. Does not affect anything
     //  stored on disk.
@@ -320,14 +386,29 @@ This is the class interface:
     
     //  Insert certificate into certificate store in memory. Note that this 
     //  does not save the certificate to disk. To do that, use zcert_save()
-    //  directly on the certificate.
+    //  directly on the certificate. Takes ownership of zcert_t object.
     CZMQ_EXPORT void
-        zcertstore_insert (zcertstore_t *self, zcert_t *cert);
+        zcertstore_insert (zcertstore_t *self, zcert_t **cert_p);
+    
+    //  Print out list of certificates in store to stdout, for debugging
+    //  purposes.
+    CZMQ_EXPORT void
+        zcertstore_dump (zcertstore_t *self);
     
     //  Self test of this class
     CZMQ_EXPORT int
         zcertstore_test (bool verbose);
 
+The certificate store can be memory-only, in which case you can load it
+yourself by inserting certificate objects one by one, or it can be loaded
+from disk, in which case you can add, modify, or remove certificates on
+disk at any time, and the store will detect such changes and refresh 
+itself automatically. In most applications you won't use this class
+directly but through the zauth class, which provides a high-level API for
+authentication (and manages certificate stores for you). To actually
+create certificates on disk, use the zcert class in code, or the 
+tools/makecert.c command line tool, or any text editor. The format of a
+certificate file is defined in the zcert man page.
 
 <A name="toc4-154" title="zchunk - work with memory chunks" />
 #### zchunk - work with memory chunks
@@ -1436,7 +1517,8 @@ This is the class interface:
     CZMQ_EXPORT void zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect);
     
     //  Emulation of widely-used 2.x socket options
-    void zsocket_set_hwm (void *zocket, int hwm);
+    CZMQ_EXPORT void zsocket_set_hwm (void *zocket, int hwm);
+    
     //  Patch in case we're on older libzmq
     #ifndef ZMQ_STREAM
     #define ZMQ_STREAM 11
@@ -1607,13 +1689,14 @@ This is the class interface:
     CZMQ_EXPORT bool
         zsys_file_stable (const char *filename);
     
-    //  Create a file path if it doesn't exit
+    //  Create a file path if it doesn't exist. The file path is treated as a 
+    //  printf format.
     CZMQ_EXPORT int
-        zsys_dir_create (const char *pathname);
+        zsys_dir_create (const char *pathname, ...);
     
-    //  Remove a file path if empty
+    //  Remove a file path if empty; the pathname is treated as printf format.
     CZMQ_EXPORT int
-        zsys_dir_delete (const char *pathname);
+        zsys_dir_delete (const char *pathname, ...);
     
     //  Set private file creation mode; all files created from here will be
     //  readable/writable by the owner only.
