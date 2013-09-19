@@ -34,6 +34,8 @@ extern "C" {
 typedef struct _zauth_t zauth_t;
 
 //  @interface
+#define CURVE_ALLOW_ANY "*"
+
 //  Constructor
 //  Install authentication for the specified context. Returns a new zauth
 //  object that you can use to configure authentication. Note that until you
@@ -68,10 +70,12 @@ CZMQ_EXPORT void
 //  Configure CURVE authentication for a given domain. CURVE authentication
 //  uses a directory that holds all public client certificates, i.e. their
 //  public keys. The certificates must be in zcert_save () format. The 
-//  directory is treated as a printf format. To cover all domains, use "*". 
+//  location is treated as a printf format. To cover all domains, use "*". 
 //  You can add and remove certificates in that directory at any time. 
+//  To allow all client keys without checking, specify CURVE_ALLOW_ANY
+//  for the location.
 CZMQ_EXPORT void
-    zauth_configure_curve (zauth_t *self, char *domain, char *directory, ...);
+    zauth_configure_curve (zauth_t *self, char *domain, char *location, ...);
     
 //  Enable verbose tracing of commands and activity
 CZMQ_EXPORT void

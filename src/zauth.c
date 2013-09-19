@@ -127,17 +127,20 @@ zauth_configure_plain (zauth_t *self, char *domain, char *filename, ...)
 //  Configure CURVE authentication for a given domain. CURVE authentication
 //  uses a directory that holds all public client certificates, i.e. their
 //  public keys. The certificates must be in zcert_save () format. The 
-//  directory is treated as a printf format. To cover all domains, use "*". 
+//  location is treated as a printf format. To cover all domains, use "*". 
 //  You can add and remove certificates in that directory at any time. 
+//  To allow all client keys without checking, specify CURVE_ALLOW_ANY for
+//  the location.
 
 void
-zauth_configure_curve (zauth_t *self, char *domain, char *directory, ...)
+zauth_configure_curve (zauth_t *self, char *domain, char *location, ...)
 {
     assert (self);
     assert (domain);
+    assert (location);
     va_list argptr;
-    va_start (argptr, directory);
-    char *formatted = zsys_vprintf (directory, argptr);
+    va_start (argptr, location);
+    char *formatted = zsys_vprintf (location, argptr);
     va_end (argptr);
     zstr_sendx (self->pipe, "CURVE", domain, formatted, NULL);
     free (formatted);
@@ -290,6 +293,7 @@ typedef struct {
     zhash_t *blacklist;         //  Blacklisted addresses
     zhash_t *passwords;         //  PLAIN passwords, if loaded
     zcertstore_t *certstore;    //  CURVE certificate store, if loaded
+    bool allow_any;             //  CURVE allows arbitrary clients
     bool terminated;            //  Did API ask us to quit?
 } agent_t;
 
@@ -367,12 +371,17 @@ s_agent_handle_pipe (agent_t *self)
         //  For now we don't do anything with domains
         char *domain = zmsg_popstr (request);
         free (domain);
-        //  Get certificate directory, and load into new certstore
-        //  If the directory doesn't exist we'll get an empty store.
-        char *directory = zmsg_popstr (request);
-        zcertstore_destroy (&self->certstore);
-        self->certstore = zcertstore_new (directory);
-        free (directory);
+        //  If location is CURVE_ALLOW_ANY, allow all clients. Otherwise 
+        //  treat location as a directory that holds the certificates.
+        char *location = zmsg_popstr (request);
+        if (streq (location, CURVE_ALLOW_ANY))
+            self->allow_any = true;
+        else {
+            zcertstore_destroy (&self->certstore);
+            self->certstore = zcertstore_new (location);
+            self->allow_any = false;
+        }
+        free (location);
     }
     else
     if (streq (command, "VERBOSE")) {
@@ -406,15 +415,40 @@ s_agent_authenticate (agent_t *self)
     zap_request_t *request = zap_request_new (self->handler);
     if (request) {
         //  Is address explicitly whitelisted or blacklisted?
-        bool allowed = zhash_lookup (self->whitelist, request->address) != NULL;
-        bool denied = allowed? false: zhash_lookup (self->blacklist, request->address) != NULL;
-        
+        bool allowed = false;
+        bool denied = false;
+
+        if (zhash_size (self->whitelist)) {
+            if (zhash_lookup (self->whitelist, request->address)) {
+                allowed = true;
+                if (self->verbose) 
+                    printf ("I: PASSED (whitelist) address=%s\n", request->address);
+            }
+            else {
+                denied = true;
+                if (self->verbose) 
+                    printf ("I: DENIED (not in whitelist) address=%s\n", request->address);
+            }
+        }
+        else
+        if (zhash_size (self->blacklist)) {
+            if (zhash_lookup (self->blacklist, request->address)) {
+                denied = true;
+                if (self->verbose) 
+                    printf ("I: DENIED (blacklist) address=%s\n", request->address);
+            }
+            else {
+                allowed = true;
+                if (self->verbose) 
+                    printf ("I: PASSED (not in blacklist) address=%s\n", request->address);
+            }
+        }
         //  Mechanism-specific checks
         if (!denied) {
             if (streq (request->mechanism, "NULL") && !allowed) {
                 //  For NULL, we allow if the address wasn't blacklisted
                 if (self->verbose) 
-                    printf ("I: ALLOWED (NULL default)\n");
+                    printf ("I: ALLOWED (NULL)\n");
                 allowed = true;
             }
             else
@@ -442,18 +476,25 @@ s_agent_authenticate (agent_t *self)
 static bool 
 s_authenticate_plain (agent_t *self, zap_request_t *request)
 {
-    zhash_refresh (self->passwords);
-    char *password = (char *) zhash_lookup (self->passwords, request->username);
-    if (password && streq (password, request->password)) {
-        if (self->verbose) 
-            printf ("I: ALLOWED (PLAIN) username=%s password=%s\n",
-                request->username, request->password);
-        return true;
+    if (self->passwords) {
+        zhash_refresh (self->passwords);
+        char *password = (char *) zhash_lookup (self->passwords, request->username);
+        if (password && streq (password, request->password)) {
+            if (self->verbose) 
+                printf ("I: ALLOWED (PLAIN) username=%s password=%s\n",
+                    request->username, request->password);
+            return true;
+        }
+        else {
+            if (self->verbose) 
+                printf ("I: DENIED (PLAIN) username=%s password=%s\n",
+                    request->username, request->password);
+            return false;
+        }
     }
     else {
         if (self->verbose) 
-            printf ("I: DENIED (PLAIN) username=%s password=%s\n",
-                request->username, request->password);
+            printf ("I: DENIED (PLAIN) no password file defined\n");
         return false;
     }
 }
@@ -463,6 +504,12 @@ static bool
 s_authenticate_curve (agent_t *self, zap_request_t *request)
 {
     //  TODO: load metadata from certificate and return via ZAP response
+    if (self->allow_any) {
+        if (self->verbose) 
+            printf ("I: ALLOWED (CURVE allow any client)\n");
+        return true;
+    }
+    else
     if (self->certstore
     &&  zcertstore_lookup (self->certstore, request->client_key)) {
         if (self->verbose) 
@@ -588,17 +635,20 @@ zauth_test (bool verbose)
     assert (password);
     fprintf (password, "admin=Password\n");
     fclose (password);
-    zauth_configure_plain (auth, "*", TESTDIR "/password-file");
     
     zsocket_set_plain_server (server, 1);
     zsocket_set_plain_username (client, "admin");
-    zsocket_set_plain_password (client, "1234");
+    zsocket_set_plain_password (client, "Password");
     success = s_can_connect (server, client);
     assert (!success);
 
-    zsocket_set_plain_password (client, "Password");
+    zauth_configure_plain (auth, "*", TESTDIR "/password-file");
     success = s_can_connect (server, client);
     assert (success);
+
+    zsocket_set_plain_password (client, "Bogus");
+    success = s_can_connect (server, client);
+    assert (!success);
 
     //  Try CURVE authentication
     //  We'll create two new certificates and save the client public 
@@ -617,7 +667,19 @@ zauth_test (bool verbose)
     success = s_can_connect (server, client);
     assert (!success);
 
-    //  Authenticate against client certificates in TESTDIR
+    //  PH: 2013/09/18
+    //  There's an issue with libzmq where it sometimes fails to 
+    //  connect even if the ZAP handler allows it. It's timing
+    //  dependent, so this is a voodoo hack. To be removed, I've
+    //  no idea this even applies to all boxes.
+    sleep (1);
+
+    //  Test CURVE_ALLOW_ANY
+    zauth_configure_curve (auth, "*", CURVE_ALLOW_ANY);
+    success = s_can_connect (server, client);
+    assert (success);
+    
+    //  Test full client authentication using certificates
     zcert_save_public (client_cert, TESTDIR "/mycert.txt");
     zauth_configure_curve (auth, "*", TESTDIR);
     success = s_can_connect (server, client);
