@@ -40,10 +40,11 @@ typedef struct _zcertstore_t zcertstore_t;
 //  absent, and created later, or modified at any time. The certificate store 
 //  is automatically refreshed on any zcertstore_lookup() call. If the 
 //  location is specified as NULL, creates a pure-memory store, which you 
-//  can work with by inserting certificates at runtime.
+//  can work with by inserting certificates at runtime. The location is
+//  treated as a printf format.
 
 CZMQ_EXPORT zcertstore_t *
-    zcertstore_new (char *location);
+    zcertstore_new (char *location, ...);
 
 //  Destroy a certificate store object in memory. Does not affect anything
 //  stored on disk.

@@ -73,17 +73,20 @@ CZMQ_EXPORT char *
     zcert_meta (zcert_t *self, char *name);
 
 //  Load certificate from file (constructor)
+//  The filename is treated as a printf format specifier.
 CZMQ_EXPORT zcert_t *
-    zcert_load (char *filename);
+    zcert_load (char *filename, ...);
 
 //  Save full certificate (public + secret) to file for persistent storage
 //  This creates one public file and one secret file (filename + "_secret").
+//  The filename is treated as a printf format specifier.
 CZMQ_EXPORT int
-    zcert_save (zcert_t *self, char *filename);
+    zcert_save (zcert_t *self, char *filename, ...);
 
 //  Save public certificate only to file for persistent storage
+//  The filename is treated as a printf format specifier.
 CZMQ_EXPORT int
-    zcert_save_public (zcert_t *self, char *filename);
+    zcert_save_public (zcert_t *self, char *filename, ...);
 
 //  Apply certificate to socket, i.e. use for CURVE security on socket.
 //  If certificate was loaded from public file, the secret key will be
