@@ -57,7 +57,6 @@ libczmq_la_SOURCES = \
 
 AM_CFLAGS = -g
 
-EXTRA_DIST = z85_codec.h
 INCLUDES = -I$(top_srcdir)/include
 bin_PROGRAMS = czmq_selftest
 czmq_selftest_LDADD = libczmq.la
