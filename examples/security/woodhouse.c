@@ -10,7 +10,6 @@ int main (void)
     //  Create context and start authentication engine
     zctx_t *ctx = zctx_new ();
     zauth_t *auth = zauth_new (ctx);
-    assert (auth);
     zauth_set_verbose (auth, true);
     zauth_allow (auth, "127.0.0.1");
     

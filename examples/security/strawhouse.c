@@ -15,7 +15,6 @@ int main (void)
     //  allows or denies incoming connections (talking to the libzmq
     //  core over a protocol called ZAP).
     zauth_t *auth = zauth_new (ctx);
-    assert (auth);
     
     //  Get some indication of what the authenticator is deciding
     zauth_set_verbose (auth, true);

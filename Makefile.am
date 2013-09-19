@@ -25,7 +25,7 @@ EXTRA_DIST = \
 	examples/security/woodhouse.c \
 	examples/security/stonehouse.c \
 	examples/security/ironhouse.c \
+	examples/security/ironhouse2.c \
 	examples/security/README.txt \
 	examples/security/LICENSE
 	
-

@@ -11,7 +11,6 @@ int main (void)
     //  Create context and start authentication engine
     zctx_t *ctx = zctx_new ();
     zauth_t *auth = zauth_new (ctx);
-    assert (auth);
     zauth_set_verbose (auth, true);
     zauth_allow (auth, "127.0.0.1");
     
@@ -44,6 +43,8 @@ int main (void)
     free (message);
     puts ("Stonehouse test OK");
 
+    zcert_destroy (&client_cert);
+    zcert_destroy (&server_cert);
     zauth_destroy (&auth);
     zctx_destroy (&ctx);
     return 0;

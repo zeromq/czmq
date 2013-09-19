@@ -11,7 +11,6 @@ int main (void)
     
     //  Create and bind server socket
     void *server = zsocket_new (ctx, ZMQ_PUSH);
-    zsocket_set_zap_domain (server, "global");
     zsocket_bind (server, "tcp://*:9000");
 
     //  Create and connect client socket
