@@ -42,7 +42,6 @@ typedef struct _zcertstore_t zcertstore_t;
 //  location is specified as NULL, creates a pure-memory store, which you 
 //  can work with by inserting certificates at runtime. The location is
 //  treated as a printf format.
-
 CZMQ_EXPORT zcertstore_t *
     zcertstore_new (char *location, ...);
 

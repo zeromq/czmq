@@ -1,8 +1,7 @@
 //  The Ironhouse Pattern
 //
-//  Security doesn't get any stronger than this. Any attacker is going
-//  to look for other weaknesses, like breaking into your machines, to
-//  read what you type, over your shoulder.
+//  Security doesn't get any stronger than this. An attacker is going to
+//  have to break into your systems to see data before/after encryption.
 
 #include <czmq.h>
 
@@ -11,20 +10,24 @@ int main (void)
     //  Create context and start authentication engine
     zctx_t *ctx = zctx_new ();
     zauth_t *auth = zauth_new (ctx);
-    assert (auth);
     zauth_set_verbose (auth, true);
     zauth_allow (auth, "127.0.0.1");
     
-    //  Tell the authenticator how to handle CURVE requests
-    zauth_configure_curve (auth, "*", CURVE_ALLOW_ANY);
-
-    //  We need two certificates, one for the client and one for
-    //  the server. The client must know the server's public key
-    //  to make a CURVE connection.
+    //  Tell authenticator to use the certificate store in .curve
+    zauth_configure_curve (auth, "*", ".curve");
+    
+    //  We'll generate a new client certificate and save the public part
+    //  in the certificate store (in practice this would be done by hand
+    //  or some out-of-band process).
     zcert_t *client_cert = zcert_new ();
+    zsys_dir_create (".curve");
+    zcert_set_meta (client_cert, "name", "Client test certificate");
+    zcert_save_public (client_cert, ".curve/testcert.pub");
+    
+    //  Prepare the server certificate as we did in Stonehouse
     zcert_t *server_cert = zcert_new ();
     char *server_key = zcert_public_txt (server_cert);
-        
+    
     //  Create and bind server socket
     void *server = zsocket_new (ctx, ZMQ_PUSH);
     zcert_apply (server_cert, server);
@@ -44,6 +47,8 @@ int main (void)
     free (message);
     puts ("Ironhouse test OK");
 
+    zcert_destroy (&client_cert);
+    zcert_destroy (&server_cert);
     zauth_destroy (&auth);
     zctx_destroy (&ctx);
     return 0;
