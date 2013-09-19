@@ -40,9 +40,9 @@ int main (void)
     //  Send a single message from server to client
     zstr_send (server, "Hello");
     char *message = zstr_recv (client);
-    if (streq (message, "Hello"))
-        puts ("I: CURVE-allow-any OK");
+    assert (streq (message, "Hello"));
     free (message);
+    puts ("Ironhouse test OK");
 
     zauth_destroy (&auth);
     zctx_destroy (&ctx);

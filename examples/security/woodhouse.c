@@ -31,9 +31,9 @@ int main (void)
     //  Send a single message from server to client
     zstr_send (server, "Hello");
     char *message = zstr_recv (client);
-    if (streq (message, "Hello"))
-        puts ("I: PLAIN-filtered OK");
+    assert (streq (message, "Hello"));
     free (message);
+    puts ("Woodhouse test OK");
 
     zauth_destroy (&auth);
     zctx_destroy (&ctx);

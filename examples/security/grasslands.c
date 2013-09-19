@@ -21,9 +21,9 @@ int main (void)
     //  Send a single message from server to client
     zstr_send (server, "Hello");
     char *message = zstr_recv (client);
-    if (streq (message, "Hello"))
-        puts ("NULL-default OK");
+    assert (streq (message, "Hello"));
     free (message);
+    puts ("Grasslands test OK");
     
     zctx_destroy (&ctx);
     return 0;
