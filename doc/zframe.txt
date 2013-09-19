@@ -81,7 +81,7 @@ CZMQ_EXPORT bool
 
 //   Print contents of the frame to FILE stream.
 CZMQ_EXPORT void
-    zframe_print_to_stream (zframe_t *self, const char *prefix, FILE *file);
+    zframe_fprint (zframe_t *self, const char *prefix, FILE *file);
 
 //  Print contents of frame to stderr
 CZMQ_EXPORT void
@@ -90,26 +90,6 @@ CZMQ_EXPORT void
 //  Set new contents for frame
 CZMQ_EXPORT void
     zframe_reset (zframe_t *self, const void *data, size_t size);
-
-//  Callback function for zframe_free_fn method
-//  DEPRECATED - will be removed for next stable release
-typedef void (zframe_free_fn) (void *data, void *arg);
-
-//  Create a zero-copy frame
-//  DEPRECATED - will be removed for next stable release
-CZMQ_EXPORT zframe_t *
-    zframe_new_zero_copy (void *data, size_t size,
-                          zframe_free_fn *free_fn, void *arg);
-
-// Return frame zero copy indicator (1 or 0)
-//  DEPRECATED - will be removed for next stable release
-CZMQ_EXPORT int
-    zframe_zero_copy (zframe_t *self);
-
-//  Set the free callback for frame
-//  DEPRECATED - will be removed at next stable release
-CZMQ_EXPORT void
-    zframe_freefn (zframe_t *self, zframe_free_fn *free_fn, void *arg);
 
 //  Self test of this class
 CZMQ_EXPORT int
@@ -200,23 +180,6 @@ EXAMPLE
     assert (frame_nbr == 10);
     frame = zframe_recv_nowait (input);
     assert (frame == NULL);
-
-    //  Test zero copy
-    char *buffer = (char *) malloc (1024);
-    memset (buffer, 'A', 1024);
-
-    frame = zframe_new_zero_copy (buffer, 1024, s_test_free_cb, NULL);
-    zframe_t *frame_copy = zframe_dup (frame);
-
-    assert (zframe_zero_copy (frame) == 1);
-    assert (zframe_zero_copy (frame_copy) == 0);
-
-    zframe_destroy (&frame);
-    zframe_destroy (&frame_copy);
-
-    frame = zframe_new ("callback", 8);
-    zframe_freefn (frame, s_test_free_frame_cb, NULL);
-    zframe_destroy (&frame);
 
     zctx_destroy (&ctx);
 ----

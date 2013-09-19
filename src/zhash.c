@@ -535,11 +535,13 @@ zhash_load (zhash_t *self, char *filename)
     //  modification date (0 for unknown files), so that zhash_refresh ()
     //  will always work after zhash_load (), to load a newly-created
     //  file.
-    free (self->filename);
-    self->filename = strdup (filename);
-    self->modified = zsys_file_modified (filename);
     
-    FILE *handle = fopen (filename, "r");
+    //  Take copy of filename in case self->filename is same string.
+    filename = strdup (filename);
+    free (self->filename);
+    self->filename = filename;
+    self->modified = zsys_file_modified (self->filename);
+    FILE *handle = fopen (self->filename, "r");
     if (!handle)
         return -1;              //  Failed to open file for reading
 
@@ -574,7 +576,7 @@ zhash_refresh (zhash_t *self)
 {
     assert (self);
     
-    if (self->modified && self->filename) {
+    if (self->filename) {
         if (zsys_file_modified (self->filename) > self->modified
         &&  zsys_file_stable (self->filename)) {
             //  Empty the hash table; code is copied from zhash_destroy

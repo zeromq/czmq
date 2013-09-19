@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zsys - system wrapper
+    zsys - system-level methods
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
@@ -358,6 +358,7 @@ zsys_test (bool verbose)
 {
     printf (" * zsys: ");
 
+    //  @selftest
     zsys_handler_reset ();
     zsys_handler_set (NULL);
     zsys_handler_set (NULL);
@@ -379,6 +380,7 @@ zsys_test (bool verbose)
     char *string = s_vprintf ("%s %02x", "Hello", 16);
     assert (streq (string, "Hello 10"));
     free (string);
+    //  @end
     
     printf ("OK\n");
     return 0;

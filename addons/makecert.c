@@ -35,7 +35,7 @@
 //  Get and store one header in certificate
 
 static int
-s_get_header (zcert_t *cert, char *prompt, char *name)
+s_get_meta (zcert_t *cert, char *prompt, char *name)
 {
     printf ("%s ", prompt);
     char value [256];
@@ -45,7 +45,7 @@ s_get_header (zcert_t *cert, char *prompt, char *name)
     if (strlen (value) && value [strlen (value) - 1] == '\n')
         value [strlen (value) - 1] = 0;
     if (*value)
-        zcert_set_header (cert, name, value);
+        zcert_set_meta (cert, name, value);
     return 0;
 }
 
@@ -54,14 +54,14 @@ int main (void)
     puts ("Creating new CURVE certificate");
 
     zcert_t *cert = zcert_new ();
-    if (s_get_header (cert, "Enter your full name:", "name")
-    ||  s_get_header (cert, "Enter your email address:", "email")
-    ||  s_get_header (cert, "Enter your organization:", "organization"))
+    if (s_get_meta (cert, "Enter your full name:", "name")
+    ||  s_get_meta (cert, "Enter your email address:", "email")
+    ||  s_get_meta (cert, "Enter your organization:", "organization"))
         return -1;
         
     char *timestr = zclock_timestr ();
-    zcert_set_header (cert, "created-by", "CZMQ makecert");
-    zcert_set_header (cert, "date-created", timestr);
+    zcert_set_meta (cert, "created-by", "CZMQ makecert");
+    zcert_set_meta (cert, "date-created", timestr);
     free (timestr);
     zcert_dump (cert);
     zcert_save (cert, "mycert.txt");

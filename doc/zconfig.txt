@@ -22,6 +22,10 @@ EXAMPLE
 -------
 .From zconfig_test method
 ----
+    //  Create temporary directory for test files
+#   define TESTDIR ".test_zconfig"
+    zsys_dir_create (TESTDIR);
+    
     zconfig_t *root = zconfig_new ("root", NULL);
     zconfig_t *section, *item;
     

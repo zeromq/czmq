@@ -38,7 +38,7 @@ typedef int (zconfig_fct) (zconfig_t *self, void *arg, int level);
 
 //  Create new config item
 CZMQ_EXPORT zconfig_t *
-    zconfig_new (const char *name, zconfig_t *parent);
+    zconfig_new (char *name, zconfig_t *parent);
 
 //  Destroy a config item and all its children
 CZMQ_EXPORT void
@@ -54,18 +54,18 @@ CZMQ_EXPORT char *
     
 //  Insert or update configuration key with value
 CZMQ_EXPORT void
-    zconfig_put (zconfig_t *self, const char *path, const char *value);
+    zconfig_put (zconfig_t *self, char *path, char *value);
 
 //  Set config item name, name may be NULL
 CZMQ_EXPORT void
-    zconfig_set_name (zconfig_t *self, const char *format, ...);
+    zconfig_set_name (zconfig_t *self, char *name);
 
 //  Set new value for config item. The new value may be a string, a printf
 //  format, or NULL. Note that if string may possibly contain '%', or if it
 //  comes from an insecure source, you must use '%s' as the format, followed
 //  by the string.
 CZMQ_EXPORT void
-    zconfig_set_value (zconfig_t *self, const char *format, ...);
+    zconfig_set_value (zconfig_t *self, char *format, ...);
     
 //  Find our first child, if any
 CZMQ_EXPORT zconfig_t *
@@ -77,16 +77,16 @@ CZMQ_EXPORT zconfig_t *
 
 //  Find a config item along a path; leading slash is optional and ignored.
 CZMQ_EXPORT zconfig_t *
-    zconfig_locate (zconfig_t *self, const char *path);
+    zconfig_locate (zconfig_t *self, char *path);
 
 //  Resolve a config path into a string value; leading slash is optional 
 //  and ignored.
 CZMQ_EXPORT char *
-    zconfig_resolve (zconfig_t *self, const char *path, const char *deflt);
+    zconfig_resolve (zconfig_t *self, char *path, char *default_value);
 
 //  Set config item name, name may be NULL
 CZMQ_EXPORT void
-    zconfig_set_path (zconfig_t *self, const char *path, const char *value);
+    zconfig_set_path (zconfig_t *self, char *path, char *value);
 
 //  Locate the last config item at a specified depth
 CZMQ_EXPORT zconfig_t *
@@ -104,7 +104,7 @@ CZMQ_EXPORT void
 
 //  Load a config item tree from a specified ZPL text file
 CZMQ_EXPORT zconfig_t *
-    zconfig_load (const char *filename);
+    zconfig_load (char *filename);
 
 //  Save a config item tree to a specified ZPL text file, where a filename
 //  "-" means dump to standard output.

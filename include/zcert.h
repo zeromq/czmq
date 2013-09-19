@@ -63,22 +63,33 @@ CZMQ_EXPORT char *
 CZMQ_EXPORT char *
     zcert_secret_txt (zcert_t *self);
 
-//  Set certificate header (metadata) from formatted string.
+//  Set certificate metadata from formatted string.
 CZMQ_EXPORT void
-    zcert_set_header (zcert_t *self, const char *name, const char *format, ...);
+    zcert_set_meta (zcert_t *self, char *name, char *format, ...);
 
-//  Get header value from certificate; if the header doesn't exist, returns
-//  NULL.
+//  Get metadata value from certificate; if the metadata value doesn't 
+//  exist, returns NULL.
 CZMQ_EXPORT char *
-    zcert_header (zcert_t *self, const char *name);
-
-//  Save certificate to file for persistent storage
-CZMQ_EXPORT int
-    zcert_save (zcert_t *self, char *filename);
+    zcert_meta (zcert_t *self, char *name);
 
 //  Load certificate from file (constructor)
 CZMQ_EXPORT zcert_t *
     zcert_load (char *filename);
+
+//  Save full certificate (public + secret) to file for persistent storage
+//  This creates one public file and one secret file (filename + "_secret").
+CZMQ_EXPORT int
+    zcert_save (zcert_t *self, char *filename);
+
+//  Save public certificate only to file for persistent storage
+CZMQ_EXPORT int
+    zcert_save_public (zcert_t *self, char *filename);
+
+//  Apply certificate to socket, i.e. use for CURVE security on socket.
+//  If certificate was loaded from public file, the secret key will be
+//  undefined, and this certificate will not work successfully.
+CZMQ_EXPORT void
+    zcert_apply (zcert_t *self, void *zocket);
 
 //  Return copy of certificate
 CZMQ_EXPORT zcert_t *
