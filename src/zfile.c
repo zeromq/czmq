@@ -281,15 +281,25 @@ int
 zfile_output (zfile_t *self)
 {
     assert (self);
+    
     //  Create file path if it doesn't exist
-    zsys_dir_create (self->fullname);
+    char *file_path = strdup (self->fullname);
+    char *last_slash = strrchr (file_path, '/');
+    if (last_slash)
+        *last_slash = 0;
+    if (zsys_dir_create (file_path))
+        return -1;
+    free (file_path);
 
     //  Create file if it doesn't exist
     if (self->handle)
         zfile_close (self);
-    self->handle = fopen (self->fullname, "r+b");
-    if (!self->handle)
+    self->handle = fopen (self->fullname, "r+b"); 
+    if (!self->handle) {
         self->handle = fopen (self->fullname, "w+b");
+        if (!self->handle)
+            self->handle = fopen (self->fullname, "w+b");
+    }
     return self->handle? 0: -1;
 }
 
@@ -404,7 +414,7 @@ void zfile_mode_default (void) {
 int
 zfile_test (bool verbose)
 {
-    printf (" * file: ");
+    printf (" * zfile: ");
 
     //  @selftest
     zfile_t *file = zfile_new (".", "bilbo");
