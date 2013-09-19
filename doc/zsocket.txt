@@ -66,15 +66,6 @@ CZMQ_EXPORT char *
 CZMQ_EXPORT int
     zsocket_sendmem (void *socket, const void* data, size_t size, int flags);
 
-//  Send data over a socket as a single frame
-//  Returns -1 on error, 0 on success
-//  DEPRECATED - will be removed for next stable release
-CZMQ_EXPORT int
-    zsocket_sendmem_zero_copy (void *socket, void *data, size_t size,
-                               zsocket_free_fn *free_fn,
-                               void *hint, int flags);
-
-
 //  Self test of this class
 CZMQ_EXPORT int
     zsocket_test (bool verbose);
@@ -108,6 +99,22 @@ EXAMPLE
     assert (streq (zsocket_type_str (reader), "PULL"));
     int rc = zsocket_bind (writer, "tcp://%s:%d", interf, service);
     assert (rc == service);
+
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
+    //  Check unbind
+    rc = zsocket_unbind (writer, "tcp://%s:%d", interf, service);
+    assert (rc == 0);
+
+    //  In some cases and especially when running under Valgrind, doing
+    //  a bind immediately after an unbind causes an EADDRINUSE error.
+    //  Even a short sleep allows the OS to release the port for reuse.
+    zclock_sleep (100);
+    
+    //  Bind again
+    rc = zsocket_bind (writer, "tcp://%s:%d", interf, service);
+    assert (rc == service);
+#endif
+
     rc = zsocket_connect (reader, "tcp://%s:%d", domain, service);
     assert (rc == 0);
     zstr_send (writer, "HELLO");
@@ -132,26 +139,6 @@ EXAMPLE
     assert (rc == 0);
 
     zframe_t *frame = zframe_recv (reader);
-    assert (frame);
-    assert (zframe_streq (frame, "ABC"));
-    assert (zframe_more (frame));
-    zframe_destroy (&frame);
-
-    frame = zframe_recv (reader);
-    assert (frame);
-    assert (zframe_streq (frame, "DEFG"));
-    assert (!zframe_more (frame));
-    zframe_destroy (&frame);
-
-    //  Test zframe_sendmem_zero_copy
-    rc = zsocket_sendmem_zero_copy (writer, strdup ("ABC"), 3,
-                                    s_test_free_str_cb, NULL, ZFRAME_MORE);
-    assert (rc == 0);
-    rc = zsocket_sendmem_zero_copy (writer, strdup ("DEFG"), 4,
-                                    s_test_free_str_cb, NULL, 0);
-    assert (rc == 0);
-
-    frame = zframe_recv (reader);
     assert (frame);
     assert (zframe_streq (frame, "ABC"));
     assert (zframe_more (frame));

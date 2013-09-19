@@ -237,11 +237,17 @@ zsocket_test (bool verbose)
     int rc = zsocket_bind (writer, "tcp://%s:%d", interf, service);
     assert (rc == service);
 
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0))
-    // Check unbind
-    assert (0 == zsocket_unbind (writer, "tcp://%s:%d", interf, service));
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
+    //  Check unbind
+    rc = zsocket_unbind (writer, "tcp://%s:%d", interf, service);
+    assert (rc == 0);
 
-    // Bind again
+    //  In some cases and especially when running under Valgrind, doing
+    //  a bind immediately after an unbind causes an EADDRINUSE error.
+    //  Even a short sleep allows the OS to release the port for reuse.
+    zclock_sleep (100);
+    
+    //  Bind again
     rc = zsocket_bind (writer, "tcp://%s:%d", interf, service);
     assert (rc == service);
 #endif

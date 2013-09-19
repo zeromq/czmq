@@ -120,7 +120,8 @@ CZMQ_EXPORT void zsocket_set_ipv4only (void *zocket, int ipv4only);
 CZMQ_EXPORT void zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect);
 
 //  Emulation of widely-used 2.x socket options
-void zsocket_set_hwm (void *zocket, int hwm);
+CZMQ_EXPORT void zsocket_set_hwm (void *zocket, int hwm);
+
 //  Patch in case we're on older libzmq
 #ifndef ZMQ_STREAM
 #define ZMQ_STREAM 11

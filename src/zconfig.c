@@ -66,7 +66,7 @@ static int
 //  Optionally attach new config to parent config, as first or next child.
 
 zconfig_t *
-zconfig_new (const char *name, zconfig_t *parent)
+zconfig_new (char *name, zconfig_t *parent)
 {
     zconfig_t *self = (zconfig_t *) zmalloc (sizeof (zconfig_t));
     zconfig_set_name (self, name);
@@ -134,13 +134,17 @@ zconfig_value (zconfig_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Insert or update configuration key with value
+//  Insert or update configuration key with value; leading slash is optional 
+//  and ignored.
 
 void
-zconfig_put (zconfig_t *self, const char *path, const char *value)
+zconfig_put (zconfig_t *self, char *path, char *value)
 {
+    if (*path == '/')
+        path++;
+        
     //  Check length of next path segment
-    const char *slash = strchr (path, '/');
+    char *slash = strchr (path, '/');
     int length = strlen (path);
     if (slash)
         length = slash - path;
@@ -154,7 +158,7 @@ zconfig_put (zconfig_t *self, const char *path, const char *value)
             if (slash)          //  Recurse to next level
                 zconfig_put (child, slash + 1, value);
             else
-                zconfig_set_value (child, value);
+                zconfig_set_value (child, "%s", value);
             return;
         }
         child = child->next;
@@ -163,29 +167,21 @@ zconfig_put (zconfig_t *self, const char *path, const char *value)
     child = zconfig_new (path, self);
     child->name [length] = 0;
     if (slash)                  //  Recurse down further
-        zconfig_put (child, slash + 1, value);
+        zconfig_put (child, slash, value);
     else
-        zconfig_set_value (child, value);
+        zconfig_set_value (child, "%s", value);
 }
 
     
 //  --------------------------------------------------------------------------
-//  Set new name for config item. The new name may be a string, a printf
-//  format, or NULL.
+//  Set new name for config item; this may be null.
 
 void
-zconfig_set_name (zconfig_t *self, const char *format, ...)
+zconfig_set_name (zconfig_t *self, char *name)
 {
     assert (self);
     free (self->name);
-    if (format) {
-        va_list argptr;
-        va_start (argptr, format);
-        self->name = zsys_vprintf (format, argptr);
-        va_end (argptr);
-    }
-    else
-        self->name = NULL;
+    self->name = name? strdup (name): NULL;
 }
 
 
@@ -196,7 +192,7 @@ zconfig_set_name (zconfig_t *self, const char *format, ...)
 //  by the string.
 
 void
-zconfig_set_value (zconfig_t *self, const char *format, ...)
+zconfig_set_value (zconfig_t *self, char *format, ...)
 {
     assert (self);
     free (self->value);
@@ -237,12 +233,12 @@ zconfig_next (zconfig_t *self)
 //  Find a config item along a path; leading slash is optional and ignored.
 
 zconfig_t *
-zconfig_locate (zconfig_t *self, const char *path)
+zconfig_locate (zconfig_t *self, char *path)
 {
     //  Check length of next path segment
     if (*path == '/')
         path++;
-    const char *slash = strchr (path, '/');
+    char *slash = strchr (path, '/');
     int length = strlen (path);
     if (slash)
         length = slash - path;
@@ -267,7 +263,7 @@ zconfig_locate (zconfig_t *self, const char *path)
 //  Resolve a config path into a string value
 
 char *
-zconfig_resolve (zconfig_t *self, const char *path, const char *default_value)
+zconfig_resolve (zconfig_t *self, char *path, char *default_value)
 {
     zconfig_t *item = zconfig_locate (self, path);
     if (item)
@@ -375,7 +371,7 @@ zconfig_dump (zconfig_t *self)
 //  iothreads=1-->verbose=false
 
 zconfig_t *
-zconfig_load (const char *filename)
+zconfig_load (char *filename)
 {
     FILE *file = fopen (filename, "r");
     if (!file)
@@ -667,7 +663,12 @@ void
 zconfig_test (bool verbose)
 {
     printf (" * zconfig: ");
+    
     //  @selftest
+    //  Create temporary directory for test files
+#   define TESTDIR ".test_zconfig"
+    zsys_dir_create (TESTDIR);
+    
     zconfig_t *root = zconfig_new ("root", NULL);
     zconfig_t *section, *item;
     
@@ -676,28 +677,29 @@ zconfig_test (bool verbose)
     zconfig_set_value (item, "some@random.com");
     item = zconfig_new ("name", section);
     zconfig_set_value (item, "Justin Kayce");
-
-    section = zconfig_new ("curve", root);
-    item = zconfig_new ("public-key", section);
-    zconfig_set_value (item, "blachagsgsnasasda");
-    item = zconfig_new ("secret-key", section);
-    zconfig_set_value (item, "jahsd ahahasd ashdasdasd");
-    
+    zconfig_put (root, "/curve/secret-key", "Top Secret");
     zconfig_comment (root, "   CURVE certificate");
     zconfig_comment (root, "   -----------------");
-    zconfig_save (root, "test.cfg");
+    zconfig_save (root, TESTDIR "/test.cfg");
     zconfig_destroy (&root);
-    root = zconfig_load ("test.cfg");
+    root = zconfig_load (TESTDIR "/test.cfg");
     if (verbose)
         zconfig_save (root, "-");
         
     char *email = zconfig_resolve (root, "/headers/email", NULL);
     assert (email);
     assert (streq (email, "some@random.com"));
+    char *passwd = zconfig_resolve (root, "/curve/secret-key", NULL);
+    assert (passwd);
+    assert (streq (passwd, "Top Secret"));
 
-    zconfig_save (root, "test.cfg");
+    zconfig_save (root, TESTDIR "/test.cfg");
     zconfig_destroy (&root);
-    zsys_file_delete ("test.cfg");
+    
+    //  Delete all test files
+    zdir_t *dir = zdir_new (TESTDIR, NULL);
+    zdir_remove (dir, true);
+    zdir_destroy (&dir);
     //  @end
 
     printf ("OK\n");

@@ -34,19 +34,58 @@ extern "C" {
 typedef struct _zauth_t zauth_t;
 
 //  @interface
-//  Create a new authenticator
+#define CURVE_ALLOW_ANY "*"
+
+//  Constructor
+//  Install authentication for the specified context. Returns a new zauth
+//  object that you can use to configure authentication. Note that until you
+//  add policies, all incoming NULL connections are allowed (classic ZeroMQ
+//  behaviour), and all PLAIN and CURVE connections are denied. If there was
+//  an error during initialization, returns NULL.
 CZMQ_EXPORT zauth_t *
     zauth_new (zctx_t *ctx);
-
-//  Destroy a auth container
+    
+//  Allow (whitelist) a single IP address. For NULL, all clients from this
+//  address will be accepted. For PLAIN and CURVE, they will be allowed to
+//  continue with authentication. You can call this method multiple times 
+//  to whitelist multiple IP addresses. If you whitelist a single address,
+//  any non-whitelisted addresses are treated as blacklisted.
 CZMQ_EXPORT void
-    zauth_destroy (zauth_t **self_p);
+    zauth_allow (zauth_t *self, char *address);
 
+//  Deny (blacklist) a single IP address. For all security mechanisms, this
+//  rejects the connection without any further authentication. Use either a
+//  whitelist, or a blacklist, not not both. If you define both a whitelist 
+//  and a blacklist, only the whitelist takes effect.
+CZMQ_EXPORT void
+    zauth_deny (zauth_t *self, char *address);
+
+//  Configure PLAIN authentication for a given domain. PLAIN authentication
+//  uses a plain-text password file. The filename is treated as a printf 
+//  format. To cover all domains, use "*". You can modify the password file
+//  at any time; it is reloaded automatically.
+CZMQ_EXPORT void
+    zauth_configure_plain (zauth_t *self, char *domain, char *filename, ...);
+    
+//  Configure CURVE authentication for a given domain. CURVE authentication
+//  uses a directory that holds all public client certificates, i.e. their
+//  public keys. The certificates must be in zcert_save () format. The 
+//  location is treated as a printf format. To cover all domains, use "*". 
+//  You can add and remove certificates in that directory at any time. 
+//  To allow all client keys without checking, specify CURVE_ALLOW_ANY
+//  for the location.
+CZMQ_EXPORT void
+    zauth_configure_curve (zauth_t *self, char *domain, char *location, ...);
+    
 //  Enable verbose tracing of commands and activity
 CZMQ_EXPORT void
     zauth_set_verbose (zauth_t *self, bool verbose);
+    
+//  Destructor
+CZMQ_EXPORT void
+    zauth_destroy (zauth_t **self_p);
 
-//  Self test of this class
+//  Selftest
 CZMQ_EXPORT int
     zauth_test (bool verbose);
 //  @end

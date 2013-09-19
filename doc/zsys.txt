@@ -3,7 +3,7 @@ zsys(3)
 
 NAME
 ----
-zsys - system wrapper
+zsys - system-level methods
 
 SYNOPSIS
 --------
@@ -96,6 +96,27 @@ EXAMPLE
 -------
 .From zsys_test method
 ----
+    zsys_handler_reset ();
+    zsys_handler_set (NULL);
+    zsys_handler_set (NULL);
+    zsys_handler_reset ();
+    zsys_handler_reset ();
+
+    int rc = zsys_file_delete ("nosuchfile");
+    assert (rc == -1);
+
+    bool rc_bool = zsys_file_exists ("nosuchfile");
+    assert (rc_bool != true);
+
+    rc = (int) zsys_file_size ("nosuchfile");
+    assert (rc == -1);
+
+    time_t when = zsys_file_modified (".");
+    assert (when > 0);
+
+    char *string = s_vprintf ("%s %02x", "Hello", 16);
+    assert (streq (string, "Hello 10"));
+    free (string);
 ----
 
 SEE ALSO

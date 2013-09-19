@@ -36,13 +36,14 @@ int main (int argc, char *argv [])
     else
         verbose = false;
 
-    printf ("Running czmq self tests...\n");
+    printf ("Running CZMQ selftests...\n");
 
     zauth_test (verbose);
     zbeacon_test (verbose);
     zconfig_test (verbose);
     zchunk_test (verbose);
     zcert_test (verbose);
+    zcertstore_test (verbose);
     zclock_test (verbose);
     zctx_test (verbose);
     zfile_test (verbose);

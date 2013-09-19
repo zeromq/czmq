@@ -24,6 +24,19 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zstr_sendm (void *socket, const char *format, ...);
 
+//  Send a series of strings (until NULL) as multipart data
+//  Returns 0 if the strings could be sent OK, or -1 on error.
+CZMQ_EXPORT int
+    zstr_sendx (void *socket, const char *string, ...);
+
+//  Receive a series of strings (until NULL) from multipart data
+//  Each string is allocated and filled with string data; if there
+//  are not enough frames, unallocated strings are set to NULL.
+//  Returns -1 if the message could not be read, else returns the
+//  number of strings filled, zero or more.
+CZMQ_EXPORT int
+    zstr_recvx (void *socket, char **string_p, ...);
+
 //  Self test of this class
 CZMQ_EXPORT int
     zstr_test (bool verbose);
@@ -56,9 +69,7 @@ EXAMPLE
     int string_nbr;
     for (string_nbr = 0; string_nbr < 10; string_nbr++)
         zstr_send (output, "this is string %d", string_nbr);
-    for (string_nbr = 0; string_nbr < 5; string_nbr++)
-        zstr_sendm (output, "this is string %d", string_nbr);
-    zstr_send (output, "END");
+    zstr_sendx (output, "This", "is", "almost", "the", "very", "END", NULL);
 
     //  Read and count until we receive END
     string_nbr = 0;

@@ -177,6 +177,7 @@ zstr_recvx (void *socket, char **string_p, ...)
         string_p = va_arg (args, char **);
     }
     va_end (args);
+    zmsg_destroy (&msg);
     return 0;
 }
 
