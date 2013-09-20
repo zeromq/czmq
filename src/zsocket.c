@@ -182,7 +182,7 @@ zsocket_type_str (void *self)
         "DEALER", "ROUTER", "PULL", "PUSH",
         "XPUB", "XSUB", "STREAM"
     };
-    int type = zsockopt_type (self);
+    int type = zsocket_type (self);
     if (type < 0 || type > ZMQ_STREAM)
         return "UNKNOWN";
     else
