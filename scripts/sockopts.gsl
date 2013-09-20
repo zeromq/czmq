@@ -1,17 +1,32 @@
-.output "../include/zsockopt.h"
-.for version
-.   for option
-.       if type = "uint64" | type = "int64" | type = "uint32" | type = "int"
-.           option.ctype = "int"
-.           option.ctype_const = "int"
-.       elsif type = "string" | type = "key"
-.           option.ctype = "char *"   #   Enforce C strings
-.           option.ctype_const = "const char *"
-.       else
-.           echo "E: unknown type: $(type)"
-.       endif
-.   endfor
-.endfor
+.#  This is a code generator built using the iMatix GSL code generation
+.#  language. See https://github.com/imatix/gsl for details. This script 
+.#  is licensed under MIT/X11.
+.#
+.template 0
+    output "../include/zsockopt.h"
+    for version
+        #  Expand any macros
+        for include
+            for options.macro where name = include.name
+                for . as child
+                    copy child to version
+                endfor
+            endfor
+        endfor
+        #   Preprocess options
+        for option
+            if type = "uint64" | type = "int64" | type = "uint32" | type = "int"
+                option.ctype = "int"
+                option.ctype_const = "int"
+            elsif type = "string" | type = "key"
+                option.ctype = "char *"   #   Enforce C strings
+                option.ctype_const = "const char *"
+            else
+                echo "E: unknown type: $(type)"
+            endif
+        endfor
+    endfor
+.endtemplate
 /*  =========================================================================
     zsockopt - get/set 0MQ socket options
 
@@ -91,27 +106,6 @@ $(string.trim(.):)
 int zsockopt_test (bool verbose);
 //  @end
 
-.for version
-//  Deprecated function names
-#if (ZMQ_VERSION_MAJOR == $(major))
-.   for option
-.       if defined (.minor)
-#   if (ZMQ_VERSION_MINOR == $(minor))
-.       endif
-.       if mode = "rw" | mode = "r"
-#define zsockopt_$(name) zsocket_$(name)
-.       endif
-.       if mode = "rw" | mode = "w"
-#define zsockopt_set_$(name) zsocket_set_$(name)
-.       endif
-.       if defined (.minor)
-#   endif
-.       endif
-.   endfor
-#endif
-
-.endfor
-
 #ifdef __cplusplus
 }
 #endif
@@ -187,7 +181,7 @@ zsocket_set_$(name) (void *zocket, $(ctype_const) $(name))
 .                   else
 .                       .close = ""
 .                   endif
-    $(open)zsockopt_type (zocket) != ZMQ_$(TYPE)$(close)
+    $(open)zsocket_type (zocket) != ZMQ_$(TYPE)$(close)
 .               endfor
         printf ("ZMQ_$(NAME) is not valid on %s sockets\\n", zsocket_type_str (zocket));
         assert (false);
