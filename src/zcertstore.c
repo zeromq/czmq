@@ -217,6 +217,7 @@ int
 zcertstore_test (bool verbose)
 {
     printf (" * zcertstore: ");
+#if (ZMQ_VERSION_MAJOR == 4)
     //  @selftest
     //  Create temporary directory for test files
 #   define TESTDIR ".test_zcertstore"
