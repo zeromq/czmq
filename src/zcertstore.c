@@ -247,7 +247,7 @@ zcertstore_test (bool verbose)
     zdir_remove (dir, true);
     zdir_destroy (&dir);
     //  @end
-    
+#endif    
     printf ("OK\n");
     return 0;
 }

@@ -204,6 +204,7 @@ typedef struct {
 static zap_request_t *
 zap_request_new (void *handler)
 {
+#if (ZMQ_VERSION_MAJOR == 4)
     zap_request_t *self = (zap_request_t *) zmalloc (sizeof (zap_request_t));
     assert (self);
     
@@ -237,6 +238,9 @@ zap_request_new (void *handler)
     }
     zmsg_destroy (&request);
     return self;
+#else
+    return NULL;
+#endif
 }
 
 
@@ -553,6 +557,7 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
 //  --------------------------------------------------------------------------
 //  Selftest
 
+#if (ZMQ_VERSION_MAJOR == 4)
 //  Checks whether client can connect to server, and if so, returns
 //  true; else returns false after a short timeout.
 
@@ -581,7 +586,7 @@ s_can_connect (void *server, void *client)
     port_nbr++;
     return success;
 }
-
+#endif
 
 //  --------------------------------------------------------------------------
 //  Selftest
@@ -590,6 +595,7 @@ int
 zauth_test (bool verbose)
 {
     printf (" * zauth: ");
+#if (ZMQ_VERSION_MAJOR == 4)
 
     //  @selftest
     //  Create temporary directory for test files
@@ -699,7 +705,8 @@ zauth_test (bool verbose)
     zdir_remove (dir, true);
     zdir_destroy (&dir);
     //  @end
-    
+#endif    
+
     printf ("OK\n");
     return 0;
 }
