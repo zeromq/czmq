@@ -1,3 +1,16 @@
+CZMQ version 2.0.1 (rc2), released on 2013/09/21
+================================================
+
+Updated to support ZeroMQ v4.x. If you are using an older version of CZMQ
+it will not build correctly with ZeroMQ v4.x. Sorry about that.
+
+Added support for the new socket options:
+ 
+ * zsocket_set_req_relaxed ()
+ * zsocket_set_req_correlate ()
+ * zsocket_set_conflate ()
+
+
 CZMQ version 2.0.0 (rc1), released on 2013/09/19
 ================================================
 
