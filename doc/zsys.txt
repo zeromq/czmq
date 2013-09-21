@@ -55,13 +55,14 @@ CZMQ_EXPORT int
 CZMQ_EXPORT bool
     zsys_file_stable (const char *filename);
 
-//  Create a file path if it doesn't exit
+//  Create a file path if it doesn't exist. The file path is treated as a 
+//  printf format.
 CZMQ_EXPORT int
-    zsys_dir_create (const char *pathname);
+    zsys_dir_create (const char *pathname, ...);
 
-//  Remove a file path if empty
+//  Remove a file path if empty; the pathname is treated as printf format.
 CZMQ_EXPORT int
-    zsys_dir_delete (const char *pathname);
+    zsys_dir_delete (const char *pathname, ...);
 
 //  Set private file creation mode; all files created from here will be
 //  readable/writable by the owner only.
@@ -113,6 +114,13 @@ EXAMPLE
 
     time_t when = zsys_file_modified (".");
     assert (when > 0);
+
+    rc = zsys_dir_create ("%s/%s", ".", ".testsys/subdir");
+    assert (rc == 0);
+    when = zsys_file_modified ("./.testsys/subdir");
+    assert (when > 0);
+    rc = zsys_dir_delete ("%s/%s", ".", ".testsys/subdir");
+    assert (rc == 0);
 
     char *string = s_vprintf ("%s %02x", "Hello", 16);
     assert (streq (string, "Hello 10"));
