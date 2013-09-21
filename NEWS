@@ -1,10 +1,22 @@
-CZMQ version 2.0.0 (rc1), released on 2013/09/xx
+CZMQ version 2.0.1 (rc2), released on 2013/09/21
 ================================================
 
-* Updated provisional version number to 2.0.0 since this is a major
-  expansion of the CZMQ API. The changes are mainly tools to support 
-  encryption via the libzmq CURVE mechanism, but also some new API
-  constructs to make it simpler to do common messaging work.
+Updated to support ZeroMQ v4.x. If you are using an older version of CZMQ
+it will not build correctly with ZeroMQ v4.x. Sorry about that.
+
+Added support for the new socket options:
+ 
+ * zsocket_set_req_relaxed ()
+ * zsocket_set_req_correlate ()
+ * zsocket_set_conflate ()
+
+
+CZMQ version 2.0.0 (rc1), released on 2013/09/19
+================================================
+
+The changes are mainly tools to support encryption via the libzmq CURVE 
+mechanism, but also some new API constructs to make it simpler to do 
+common messaging work.
 
 Bug fixes and cleanups of codebase:
 
@@ -41,7 +53,7 @@ Bug fixes and cleanups of codebase:
 * Removed (not deprecated) zctx_hwm (). We now have separate HWMs for
   normal socket SND and RCV, and for inter-thread pipes. There is no
   need to provide accessor methods for these.
-
+  
 New API methods to simplify common messaging tasks:
 
 * Added zpoller class to provide new minimalist interface to zmq_poll.
@@ -105,10 +117,17 @@ New classes used for security infrastructure:
   stored in the $HOME/.curve directory. This can be extended over time
   with other designs.
   
+* Added zcertstore class to work with Curve certificate stores. This is
+  a directory or in-memory store holding a set of certificates.
+
 * Extended zsockopt generation to allow use of binary keys in CURVE
   key options (e.g. zsocket_set_curve_secretkey_bin ()).
   
 * Added addons/makecert.c tool to generate CURVE certificates.
+
+* Added examples/security directory with several examples.
+
+For full details, see git log.
 
 
 CZMQ version 1.4.1 (stable), released on 2013/05/01

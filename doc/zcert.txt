@@ -37,22 +37,36 @@ CZMQ_EXPORT char *
 CZMQ_EXPORT char *
     zcert_secret_txt (zcert_t *self);
 
-//  Set certificate header (metadata) from formatted string.
+//  Set certificate metadata from formatted string.
 CZMQ_EXPORT void
-    zcert_set_header (zcert_t *self, const char *name, const char *format, ...);
+    zcert_set_meta (zcert_t *self, char *name, char *format, ...);
 
-//  Get header value from certificate; if the header doesn't exist, returns
-//  NULL.
+//  Get metadata value from certificate; if the metadata value doesn't 
+//  exist, returns NULL.
 CZMQ_EXPORT char *
-    zcert_header (zcert_t *self, const char *name);
-
-//  Save certificate to file for persistent storage
-CZMQ_EXPORT int
-    zcert_save (zcert_t *self, char *filename);
+    zcert_meta (zcert_t *self, char *name);
 
 //  Load certificate from file (constructor)
+//  The filename is treated as a printf format specifier.
 CZMQ_EXPORT zcert_t *
-    zcert_load (char *filename);
+    zcert_load (char *filename, ...);
+
+//  Save full certificate (public + secret) to file for persistent storage
+//  This creates one public file and one secret file (filename + "_secret").
+//  The filename is treated as a printf format specifier.
+CZMQ_EXPORT int
+    zcert_save (zcert_t *self, char *filename, ...);
+
+//  Save public certificate only to file for persistent storage
+//  The filename is treated as a printf format specifier.
+CZMQ_EXPORT int
+    zcert_save_public (zcert_t *self, char *filename, ...);
+
+//  Apply certificate to socket, i.e. use for CURVE security on socket.
+//  If certificate was loaded from public file, the secret key will be
+//  undefined, and this certificate will not work successfully.
+CZMQ_EXPORT void
+    zcert_apply (zcert_t *self, void *zocket);
 
 //  Return copy of certificate
 CZMQ_EXPORT zcert_t *
@@ -81,16 +95,24 @@ temporary object in memory, or persisted to disk. On disk, a
 certificate is stored as two files. One is public and contains only
 the public key. The second is secret and contains both keys. The
 two have the same filename, with the secret file adding "_secret".
-To exchange certificates, send the public file via some secure
-route. Certificates are not signed but are text files that can
-be verified by eye.
+To exchange certificates, send the public file via some secure route. 
+Certificates are not signed but are text files that can be verified by 
+eye.
 
-Certificates are stored in the ZPL (ZMQ RFC 4) format.
+Certificates are stored in the ZPL (ZMQ RFC 4) format. They have two
+sections, "metadata" and "curve". The first contains a list of 'name =
+value' pairs, one per line. Values may be enclosed in quotes. The curve
+section has a 'public-key = keyvalue' and, for secret certificates, a
+'secret-key = keyvalue' line. The keyvalue is a Z85-encoded CURVE key.
 
 EXAMPLE
 -------
 .From zcert_test method
 ----
+    //  Create temporary directory for test files
+#   define TESTDIR ".test_zcert"
+    zsys_dir_create (TESTDIR);
+    
     //  Create a simple certificate with metadata
     zcert_t *cert = zcert_new ();
 ----

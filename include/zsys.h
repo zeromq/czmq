@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zsys - system wrapper
+    zsys - system-level methods
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
@@ -78,13 +78,14 @@ CZMQ_EXPORT int
 CZMQ_EXPORT bool
     zsys_file_stable (const char *filename);
 
-//  Create a file path if it doesn't exit
+//  Create a file path if it doesn't exist. The file path is treated as a 
+//  printf format.
 CZMQ_EXPORT int
-    zsys_dir_create (const char *pathname);
+    zsys_dir_create (const char *pathname, ...);
 
-//  Remove a file path if empty
+//  Remove a file path if empty; the pathname is treated as printf format.
 CZMQ_EXPORT int
-    zsys_dir_delete (const char *pathname);
+    zsys_dir_delete (const char *pathname, ...);
 
 //  Set private file creation mode; all files created from here will be
 //  readable/writable by the owner only.

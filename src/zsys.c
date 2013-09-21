@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zsys - system wrapper
+    zsys - system-level methods
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
@@ -231,26 +231,29 @@ zsys_file_stable (const char *filename)
 
 
 //  --------------------------------------------------------------------------
-//  Create a file path if it doesn't exist
+//  Create a file path if it doesn't exist. The file path is treated as a 
+//  printf format.
 
 int
-zsys_dir_create (const char *pathname)
+zsys_dir_create (const char *pathname, ...)
 {
-    //  Take copy of string as we're going to mess with it
-    char *my_pathname = strdup (pathname);
+    va_list argptr;
+    va_start (argptr, pathname);
+    char *formatted = zsys_vprintf (pathname, argptr);
+    va_end (argptr);
 
     //  Create parent directory levels if needed
-    char *slash = strchr (my_pathname + 1, '/');
-    do {
+    char *slash = strchr (formatted + 1, '/');
+    while (true) {
         if (slash)
             *slash = 0;         //  Cut at slash
-        mode_t mode = zsys_file_mode (my_pathname);
+        mode_t mode = zsys_file_mode (formatted);
         if (mode == (mode_t)-1) {
             //  Does not exist, try to create it
 #if (defined (__WINDOWS__))
-            if (!CreateDirectory (my_pathname, NULL))
+            if (!CreateDirectory (formatted, NULL))
 #else
-            if (mkdir (my_pathname, 0775))
+            if (mkdir (formatted, 0775))
 #endif
                 return -1;      //  Failed
         }
@@ -260,26 +263,32 @@ zsys_dir_create (const char *pathname)
         }
         if (!slash)             //  End if last segment
             break;
-       *slash = '/';
+        *slash = '/';
         slash = strchr (slash + 1, '/');
-    } while (slash);
-
-    free (my_pathname);
+    }
+    free (formatted);
     return 0;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Remove a file path if empty
+//  Remove a file path if empty; the pathname is treated as printf format.
 
 int
-zsys_dir_delete (const char *pathname)
+zsys_dir_delete (const char *pathname, ...)
 {
+    va_list argptr;
+    va_start (argptr, pathname);
+    char *formatted = zsys_vprintf (pathname, argptr);
+    va_end (argptr);
+    
 #if (defined (__WINDOWS__))
-    return RemoveDirectory (pathname)? 0: -1;
+    int rc = RemoveDirectory (formatted)? 0: -1;
 #else
-    return rmdir (pathname);
+    int rc = rmdir (formatted);
 #endif
+    free (formatted);
+    return rc;
 }
 
 
@@ -358,6 +367,7 @@ zsys_test (bool verbose)
 {
     printf (" * zsys: ");
 
+    //  @selftest
     zsys_handler_reset ();
     zsys_handler_set (NULL);
     zsys_handler_set (NULL);
@@ -376,9 +386,17 @@ zsys_test (bool verbose)
     time_t when = zsys_file_modified (".");
     assert (when > 0);
 
+    rc = zsys_dir_create ("%s/%s", ".", ".testsys/subdir");
+    assert (rc == 0);
+    when = zsys_file_modified ("./.testsys/subdir");
+    assert (when > 0);
+    rc = zsys_dir_delete ("%s/%s", ".", ".testsys/subdir");
+    assert (rc == 0);
+
     char *string = s_vprintf ("%s %02x", "Hello", 16);
     assert (streq (string, "Hello 10"));
     free (string);
+    //  @end
     
     printf ("OK\n");
     return 0;

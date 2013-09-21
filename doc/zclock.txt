@@ -21,6 +21,10 @@ CZMQ_EXPORT int64_t
 CZMQ_EXPORT void
     zclock_log (const char *format, ...);
 
+//  Return formatted date/time as fresh string.
+CZMQ_EXPORT char *
+    zclock_timestr (void);
+
 //  Self test of this class
 CZMQ_EXPORT int
     zclock_test (bool verbose);
@@ -44,6 +48,10 @@ EXAMPLE
     int64_t start = zclock_time ();
     zclock_sleep (10);
     assert ((zclock_time () - start) >= 10);
+    char *timestr = zclock_timestr ();
+    if (verbose)
+        puts (timestr);
+    free (timestr);
 ----
 
 SEE ALSO

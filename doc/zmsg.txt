@@ -49,7 +49,15 @@ CZMQ_EXPORT zframe_t *
 
 //  Add frame to the end of the message, i.e. after all other frames.
 //  Message takes ownership of frame, will destroy it when message is sent.
-//  Returns 0 on success
+//  Returns 0 on success. Deprecates zmsg_add, which did not nullify the
+//  caller's frame reference.
+CZMQ_EXPORT int
+    zmsg_append (zmsg_t *self, zframe_t **frame_p);
+
+//  Add frame to the end of the message, i.e. after all other frames.
+//  Message takes ownership of frame, will destroy it when message is sent.
+//  Returns 0 on success.
+//  DEPRECATED - will be removed for next stable release
 CZMQ_EXPORT int
     zmsg_add (zmsg_t *self, zframe_t *frame);
 
@@ -149,13 +157,6 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zmsg_dump_to_stream (zmsg_t *self, FILE *file);
 
-//  Push block of memory as new frame to end of message.
-//  The frame is constructed using zero-copy.
-//  Returns 0 on success, -1 on error.
-//  DEPRECATED - will be removed for next stable release
-CZMQ_EXPORT int
-    zmsg_addmem_zero_copy (zmsg_t *self, void *src, size_t size, zframe_free_fn *free_fn, void *arg);
-
 //  Self test of this class
 CZMQ_EXPORT int
     zmsg_test (bool verbose);
@@ -242,8 +243,6 @@ EXAMPLE
     assert (msg);
     assert (zmsg_size (msg) == 10);
     assert (zmsg_content_size (msg) == 60);
-    if (verbose)
-        zmsg_dump (msg);
 
     // create empty file for null test
     FILE *file = fopen ("zmsg.test", "w");

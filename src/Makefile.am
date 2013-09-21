@@ -9,6 +9,7 @@ include_HEADERS = \
     ../include/zauth.h \
     ../include/zbeacon.h \
     ../include/zcert.h \
+    ../include/zcertstore.h \
     ../include/zchunk.h \
     ../include/zclock.h \
     ../include/zconfig.h \
@@ -33,6 +34,7 @@ libczmq_la_SOURCES = \
     zauth.c \
     zbeacon.c \
     zcert.c \
+    zcertstore.c \
     zchunk.c \
     zclock.c \
     zconfig.c \
@@ -55,7 +57,6 @@ libczmq_la_SOURCES = \
 
 AM_CFLAGS = -g
 
-EXTRA_DIST = z85_codec.h
 INCLUDES = -I$(top_srcdir)/include
 bin_PROGRAMS = czmq_selftest
 czmq_selftest_LDADD = libczmq.la

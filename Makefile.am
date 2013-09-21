@@ -19,4 +19,13 @@ EXTRA_DIST = \
 	builds/msvc/czmq.vcproj \
 	builds/msvc/czmq.vcxproj \
 	builds/msvc/czmq.vcxproj.filters \
-	builds/msvc/README.txt
+	builds/msvc/README.txt \
+	examples/security/grasslands.c \ 
+	examples/security/strawhouse.c \
+	examples/security/woodhouse.c \
+	examples/security/stonehouse.c \
+	examples/security/ironhouse.c \
+	examples/security/ironhouse2.c \
+	examples/security/README.txt \
+	examples/security/LICENSE
+	
