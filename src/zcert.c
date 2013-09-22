@@ -91,6 +91,7 @@ zcert_new (void)
 zcert_t *
 zcert_new_from (byte *public_key, byte *secret_key)
 {
+#if (ZMQ_VERSION_MAJOR == 4)
     zcert_t *self =
         (zcert_t *) zmalloc (sizeof (zcert_t));
     assert (self);
@@ -107,6 +108,9 @@ zcert_new_from (byte *public_key, byte *secret_key)
     zhash_autofree (self->metadata);
 
     return self;
+#else
+    return NULL;
+#endif
 }
 
 
@@ -205,6 +209,7 @@ zcert_meta (zcert_t *self, char *name)
 zcert_t *
 zcert_load (char *format, ...)
 {
+#if (ZMQ_VERSION_MAJOR == 4)
     assert (format);
     va_list argptr;
     va_start (argptr, format);
@@ -243,6 +248,9 @@ zcert_load (char *format, ...)
     zconfig_destroy (&root);
     free (filename);
     return self;
+#else   
+    return NULL;
+#endif
 }
 
 
@@ -340,8 +348,10 @@ void
 zcert_apply (zcert_t *self, void *zocket)
 {
     assert (self);
+#if (ZMQ_VERSION_MAJOR == 4)
     zsocket_set_curve_secretkey_bin (zocket, self->secret_key);
     zsocket_set_curve_publickey_bin (zocket, self->public_key);
+#endif
 }
 
 
@@ -401,6 +411,7 @@ int
 zcert_test (bool verbose)
 {
     printf (" * zcert: ");
+#if (ZMQ_VERSION_MAJOR == 4)
     //  @selftest
     //  Create temporary directory for test files
 #   define TESTDIR ".test_zcert"
@@ -445,7 +456,7 @@ zcert_test (bool verbose)
     zdir_remove (dir, true);
     zdir_destroy (&dir);
     //  @end
-    
+#endif
     printf ("OK\n");
     return 0;
 }
