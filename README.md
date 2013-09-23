@@ -16,39 +16,39 @@
 
 **<a href="#toc2-76">Using CZMQ</a>**
 &emsp;<a href="#toc3-79">Building and Installing</a>
-&emsp;<a href="#toc3-100">Linking with an Application</a>
-&emsp;<a href="#toc3-107">API Summary</a>
-&emsp;<a href="#toc4-110">zauth - authentication for ZeroMQ security mechanisms</a>
-&emsp;<a href="#toc4-121">zbeacon - LAN service announcement and discovery</a>
-&emsp;<a href="#toc4-132">zcert - work with CURVE security certificates</a>
-&emsp;<a href="#toc4-143">zcertstore - work with CURVE security certificate stores</a>
-&emsp;<a href="#toc4-154">zchunk - work with memory chunks</a>
-&emsp;<a href="#toc4-165">zclock - millisecond clocks and delays</a>
-&emsp;<a href="#toc4-176">zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.</a>
-&emsp;<a href="#toc4-187">zctx - working with ØMQ contexts</a>
-&emsp;<a href="#toc4-198">zdir - work with file-system directories</a>
-&emsp;<a href="#toc4-209">zfile - work with files</a>
-&emsp;<a href="#toc4-220">zframe - working with single message frames</a>
-&emsp;<a href="#toc4-231">zhash - generic hash table container</a>
-&emsp;<a href="#toc4-242">zlist - generic list container</a>
-&emsp;<a href="#toc4-253">zloop - event-driven reactor</a>
-&emsp;<a href="#toc4-264">zmsg - working with multipart messages</a>
-&emsp;<a href="#toc4-275">zmutex - wrap lightweight mutexes</a>
-&emsp;<a href="#toc4-286">zpoller - trivial socket poller class</a>
-&emsp;<a href="#toc4-297">zsocket - working with ØMQ sockets</a>
-&emsp;<a href="#toc4-308">zsockopt - working with ØMQ socket options</a>
-&emsp;<a href="#toc4-319">zstr - sending and receiving strings</a>
-&emsp;<a href="#toc4-344">zsys - system-level methods</a>
-&emsp;<a href="#toc4-355">zthread - working with system threads</a>
-&emsp;<a href="#toc4-366">ztree - generic red-black tree container</a>
+&emsp;<a href="#toc3-123">Linking with an Application</a>
+&emsp;<a href="#toc3-130">API Summary</a>
+&emsp;<a href="#toc4-133">zauth - authentication for ZeroMQ security mechanisms</a>
+&emsp;<a href="#toc4-144">zbeacon - LAN service announcement and discovery</a>
+&emsp;<a href="#toc4-155">zcert - work with CURVE security certificates</a>
+&emsp;<a href="#toc4-166">zcertstore - work with CURVE security certificate stores</a>
+&emsp;<a href="#toc4-177">zchunk - work with memory chunks</a>
+&emsp;<a href="#toc4-188">zclock - millisecond clocks and delays</a>
+&emsp;<a href="#toc4-199">zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.</a>
+&emsp;<a href="#toc4-210">zctx - working with ØMQ contexts</a>
+&emsp;<a href="#toc4-221">zdir - work with file-system directories</a>
+&emsp;<a href="#toc4-232">zfile - work with files</a>
+&emsp;<a href="#toc4-243">zframe - working with single message frames</a>
+&emsp;<a href="#toc4-254">zhash - generic hash table container</a>
+&emsp;<a href="#toc4-265">zlist - generic list container</a>
+&emsp;<a href="#toc4-276">zloop - event-driven reactor</a>
+&emsp;<a href="#toc4-287">zmsg - working with multipart messages</a>
+&emsp;<a href="#toc4-298">zmutex - wrap lightweight mutexes</a>
+&emsp;<a href="#toc4-309">zpoller - trivial socket poller class</a>
+&emsp;<a href="#toc4-320">zsocket - working with ØMQ sockets</a>
+&emsp;<a href="#toc4-331">zsockopt - working with ØMQ socket options</a>
+&emsp;<a href="#toc4-342">zstr - sending and receiving strings</a>
+&emsp;<a href="#toc4-367">zsys - system-level methods</a>
+&emsp;<a href="#toc4-378">zthread - working with system threads</a>
+&emsp;<a href="#toc4-389">ztree - generic red-black tree container</a>
 
-**<a href="#toc2-377">Under the Hood</a>**
-&emsp;<a href="#toc3-380">Adding a New Class</a>
-&emsp;<a href="#toc3-392">Documentation</a>
-&emsp;<a href="#toc3-431">Development</a>
-&emsp;<a href="#toc3-441">Porting CZMQ</a>
-&emsp;<a href="#toc3-452">Code Generation</a>
-&emsp;<a href="#toc3-457">This Document</a>
+**<a href="#toc2-400">Under the Hood</a>**
+&emsp;<a href="#toc3-403">Adding a New Class</a>
+&emsp;<a href="#toc3-415">Documentation</a>
+&emsp;<a href="#toc3-454">Development</a>
+&emsp;<a href="#toc3-464">Porting CZMQ</a>
+&emsp;<a href="#toc3-475">Code Generation</a>
+&emsp;<a href="#toc3-480">This Document</a>
 
 <A name="toc2-13" title="Overview" />
 ## Overview
@@ -95,35 +95,58 @@ To report an issue, use the [CZMQ issue tracker](https://github.com/zeromq/czmq/
 <A name="toc3-79" title="Building and Installing" />
 ### Building and Installing
 
-CZMQ uses autotools for packaging. To build from git (all example commands are for Linux):
+Here's how to build CZMQ from GitHub (building from packages is very similar, you don't clone a repo but unpack a tarball), including the libsodium (for security) and libzmq (ZeroMQ core) libraries:
+
+    git clone git://github.com/jedisct1/libsodium.git
+    cd libsodium
+    ./autogen.sh
+    ./configure && make check
+    sudo make install
+    sudo ldconfig
+    cd ..
+
+    git clone git://github.com/zeromq/libzmq.git
+    cd libzmq
+    ./autogen.sh
+    ./configure && make check
+    sudo make install
+    sudo ldconfig
+    cd ..
 
     git clone git://github.com/zeromq/czmq.git
     cd czmq
-    sh autogen.sh
-    ./configure
-    make all
+    ./autogen.sh
+    ./configure && make check
     sudo make install
     sudo ldconfig
+    cd ..
 
-You will need the libtool and autotools packages. On FreeBSD, you may need to specify the default directories for configure:
+In general CZMQ works best with the latest libzmq master. If you already have an older version of libzmq installed on your system, e.g. in /usr/, then you can install libzmq master to your home directory ($HOME/local):
 
-    ./configure --with-libzmq=/usr/local
+    #   Building libzmq in our home directory
+    ./configure --prefix=$HOME/local
 
-After building, you can run the CZMQ selftests:
+And then to build CZMQ against this installation of libzmq:
+
+    export CFLAGS=-I$HOME/local/include 
+    export LDFLAGS=-L$HOME/local/lib64 
+    ./configure
+    
+You will need the libtool and autotools packages. After building, run the CZMQ selftests:
 
     make check
 
-<A name="toc3-100" title="Linking with an Application" />
+<A name="toc3-123" title="Linking with an Application" />
 ### Linking with an Application
 
 Include `czmq.h` in your application and link with libczmq. Here is a typical gcc link command:
 
     gcc -lczmq -lzmq myapp.c -o myapp
 
-<A name="toc3-107" title="API Summary" />
+<A name="toc3-130" title="API Summary" />
 ### API Summary
 
-<A name="toc4-110" title="zauth - authentication for ZeroMQ security mechanisms" />
+<A name="toc4-133" title="zauth - authentication for ZeroMQ security mechanisms" />
 #### zauth - authentication for ZeroMQ security mechanisms
 
 A zauth object takes over authentication for all incoming connections in 
@@ -190,7 +213,7 @@ This is the class interface:
 
 
 
-<A name="toc4-121" title="zbeacon - LAN service announcement and discovery" />
+<A name="toc4-144" title="zbeacon - LAN service announcement and discovery" />
 #### zbeacon - LAN service announcement and discovery
 
 The zbeacon class implements a peer-to-peer discovery service for local
@@ -251,7 +274,7 @@ This is the class interface:
         zbeacon_test (bool verbose);
 
 
-<A name="toc4-132" title="zcert - work with CURVE security certificates" />
+<A name="toc4-155" title="zcert - work with CURVE security certificates" />
 #### zcert - work with CURVE security certificates
 
 The zcert class provides a way to create and work with security
@@ -349,7 +372,7 @@ value' pairs, one per line. Values may be enclosed in quotes. The curve
 section has a 'public-key = keyvalue' and, for secret certificates, a
 'secret-key = keyvalue' line. The keyvalue is a Z85-encoded CURVE key.
 
-<A name="toc4-143" title="zcertstore - work with CURVE security certificate stores" />
+<A name="toc4-166" title="zcertstore - work with CURVE security certificate stores" />
 #### zcertstore - work with CURVE security certificate stores
 
 To authenticate new clients using the ZeroMQ CURVE security mechanism,
@@ -410,7 +433,7 @@ create certificates on disk, use the zcert class in code, or the
 tools/makecert.c command line tool, or any text editor. The format of a
 certificate file is defined in the zcert man page.
 
-<A name="toc4-154" title="zchunk - work with memory chunks" />
+<A name="toc4-177" title="zchunk - work with memory chunks" />
 #### zchunk - work with memory chunks
 
 The zchunk class works with variable sized blobs. Not as efficient as
@@ -464,7 +487,7 @@ This is the class interface:
         zchunk_test (bool verbose);
 
 
-<A name="toc4-165" title="zclock - millisecond clocks and delays" />
+<A name="toc4-188" title="zclock - millisecond clocks and delays" />
 #### zclock - millisecond clocks and delays
 
 The zclock class provides essential sleep and system time functions, used
@@ -498,7 +521,7 @@ The Win32 Sleep() call defaults to 16ms resolution unless the system timer
 resolution is increased with a call to timeBeginPeriod() permitting 1ms
 granularity.
 
-<A name="toc4-176" title="zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL." />
+<A name="toc4-199" title="zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL." />
 #### zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.
 
 Lets applications load, work with, and save configuration files.
@@ -509,7 +532,7 @@ This is the class interface:
 
 
 
-<A name="toc4-187" title="zctx - working with ØMQ contexts" />
+<A name="toc4-210" title="zctx - working with ØMQ contexts" />
 #### zctx - working with ØMQ contexts
 
 The zctx class wraps ØMQ contexts. It manages open sockets in the context
@@ -596,7 +619,7 @@ This is the class interface:
     CZMQ_EXPORT extern volatile int zctx_interrupted;
 
 
-<A name="toc4-198" title="zdir - work with file-system directories" />
+<A name="toc4-221" title="zdir - work with file-system directories" />
 #### zdir - work with file-system directories
 
 The zdir class gives access to the file system index. It will load
@@ -651,7 +674,7 @@ This is the class interface:
         zdir_test (bool verbose);
 
 
-<A name="toc4-209" title="zfile - work with files" />
+<A name="toc4-232" title="zfile - work with files" />
 #### zfile - work with files
 
 The zfile class provides methods to work with files. This class is a new
@@ -763,7 +786,7 @@ This is the class interface:
         zfile_mode_default (void);
 
 
-<A name="toc4-220" title="zframe - working with single message frames" />
+<A name="toc4-243" title="zframe - working with single message frames" />
 #### zframe - working with single message frames
 
 The zframe class provides methods to send and receive single message
@@ -864,7 +887,7 @@ This is the class interface:
         zframe_test (bool verbose);
 
 
-<A name="toc4-231" title="zhash - generic hash table container" />
+<A name="toc4-254" title="zhash - generic hash table container" />
 #### zhash - generic hash table container
 
 Expandable hash table container
@@ -973,7 +996,7 @@ Note that it's relatively slow (~50K insertions/deletes per second), so
 don't do inserts/updates on the critical path for message I/O. It can
 do ~2.5M lookups per second for 16-char keys. Timed on a 1.6GHz CPU.
 
-<A name="toc4-242" title="zlist - generic list container" />
+<A name="toc4-265" title="zlist - generic list container" />
 #### zlist - generic list container
 
 Provides a generic container implementing a fast singly-linked list. You
@@ -1052,7 +1075,7 @@ This is the class interface:
 To iterate through a list, use zlist_first to get the first item, then
 loop while not null, and do zlist_next at the end of each iteration.
 
-<A name="toc4-253" title="zloop - event-driven reactor" />
+<A name="toc4-276" title="zloop - event-driven reactor" />
 #### zloop - event-driven reactor
 
 The zloop class provides an event-driven reactor pattern. The reactor
@@ -1118,7 +1141,7 @@ This is the class interface:
         zloop_test (bool verbose);
 
 
-<A name="toc4-264" title="zmsg - working with multipart messages" />
+<A name="toc4-287" title="zmsg - working with multipart messages" />
 #### zmsg - working with multipart messages
 
 The zmsg class provides methods to send and receive multipart messages
@@ -1282,7 +1305,7 @@ This is the class interface:
         zmsg_test (bool verbose);
 
 
-<A name="toc4-275" title="zmutex - wrap lightweight mutexes" />
+<A name="toc4-298" title="zmutex - wrap lightweight mutexes" />
 #### zmutex - wrap lightweight mutexes
 
 The zmutex class provides a portable wrapper for mutexes. Please do not
@@ -1314,7 +1337,7 @@ This is the class interface:
         zmutex_test (bool verbose);
 
 
-<A name="toc4-286" title="zpoller - trivial socket poller class" />
+<A name="toc4-309" title="zpoller - trivial socket poller class" />
 #### zpoller - trivial socket poller class
 
 The zpoller class provides a minimalist interface to ZeroMQ's zmq_poll 
@@ -1354,7 +1377,7 @@ This is the class interface:
         zpoller_test (bool verbose);
 
 
-<A name="toc4-297" title="zsocket - working with ØMQ sockets" />
+<A name="toc4-320" title="zsocket - working with ØMQ sockets" />
 #### zsocket - working with ØMQ sockets
 
 The zsocket class provides helper functions for ØMQ sockets. It doesn't
@@ -1426,15 +1449,26 @@ This is the class interface:
         zsocket_test (bool verbose);
 
 
-<A name="toc4-308" title="zsockopt - working with ØMQ socket options" />
+<A name="toc4-331" title="zsockopt - working with ØMQ socket options" />
 #### zsockopt - working with ØMQ socket options
 
 The zsockopt class provides access to the ØMQ getsockopt/setsockopt API.
 
 This is the class interface:
 
-    #if (ZMQ_VERSION_MAJOR == 3)
+    #if (ZMQ_VERSION_MAJOR == 4)
     //  Get socket options
+    CZMQ_EXPORT int zsocket_ipv6 (void *zocket);
+    CZMQ_EXPORT int zsocket_ipv4only (void *zocket);
+    CZMQ_EXPORT int zsocket_probe_router (void *zocket);
+    CZMQ_EXPORT int zsocket_plain_server (void *zocket);
+    CZMQ_EXPORT char * zsocket_plain_username (void *zocket);
+    CZMQ_EXPORT char * zsocket_plain_password (void *zocket);
+    CZMQ_EXPORT int zsocket_curve_server (void *zocket);
+    CZMQ_EXPORT char * zsocket_curve_publickey (void *zocket);
+    CZMQ_EXPORT char * zsocket_curve_secretkey (void *zocket);
+    CZMQ_EXPORT char * zsocket_curve_serverkey (void *zocket);
+    CZMQ_EXPORT char * zsocket_zap_domain (void *zocket);
     CZMQ_EXPORT int zsocket_type (void *zocket);
     CZMQ_EXPORT int zsocket_sndhwm (void *zocket);
     CZMQ_EXPORT int zsocket_rcvhwm (void *zocket);
@@ -1452,28 +1486,37 @@ This is the class interface:
     CZMQ_EXPORT int zsocket_multicast_hops (void *zocket);
     CZMQ_EXPORT int zsocket_rcvtimeo (void *zocket);
     CZMQ_EXPORT int zsocket_sndtimeo (void *zocket);
-    CZMQ_EXPORT int zsocket_ipv6 (void *zocket);
-    CZMQ_EXPORT int zsocket_probe_router (void *zocket);
     CZMQ_EXPORT int zsocket_tcp_keepalive (void *zocket);
     CZMQ_EXPORT int zsocket_tcp_keepalive_idle (void *zocket);
     CZMQ_EXPORT int zsocket_tcp_keepalive_cnt (void *zocket);
     CZMQ_EXPORT int zsocket_tcp_keepalive_intvl (void *zocket);
     CZMQ_EXPORT char * zsocket_tcp_accept_filter (void *zocket);
-    CZMQ_EXPORT int zsocket_plain_server (void *zocket);
-    CZMQ_EXPORT char * zsocket_plain_username (void *zocket);
-    CZMQ_EXPORT char * zsocket_plain_password (void *zocket);
-    CZMQ_EXPORT int zsocket_curve_server (void *zocket);
-    CZMQ_EXPORT char * zsocket_curve_publickey (void *zocket);
-    CZMQ_EXPORT char * zsocket_curve_secretkey (void *zocket);
-    CZMQ_EXPORT char * zsocket_curve_serverkey (void *zocket);
-    CZMQ_EXPORT char * zsocket_zap_domain (void *zocket);
     CZMQ_EXPORT int zsocket_rcvmore (void *zocket);
     CZMQ_EXPORT int zsocket_fd (void *zocket);
     CZMQ_EXPORT int zsocket_events (void *zocket);
     CZMQ_EXPORT char * zsocket_last_endpoint (void *zocket);
-    CZMQ_EXPORT int zsocket_ipv4only (void *zocket);
     
     //  Set socket options
+    CZMQ_EXPORT void zsocket_set_ipv6 (void *zocket, int ipv6);
+    CZMQ_EXPORT void zsocket_set_immediate (void *zocket, int immediate);
+    CZMQ_EXPORT void zsocket_set_router_raw (void *zocket, int router_raw);
+    CZMQ_EXPORT void zsocket_set_ipv4only (void *zocket, int ipv4only);
+    CZMQ_EXPORT void zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect);
+    CZMQ_EXPORT void zsocket_set_router_mandatory (void *zocket, int router_mandatory);
+    CZMQ_EXPORT void zsocket_set_req_relaxed (void *zocket, int req_relaxed);
+    CZMQ_EXPORT void zsocket_set_req_correlate (void *zocket, int req_correlate);
+    CZMQ_EXPORT void zsocket_set_conflate (void *zocket, int conflate);
+    CZMQ_EXPORT void zsocket_set_plain_server (void *zocket, int plain_server);
+    CZMQ_EXPORT void zsocket_set_plain_username (void *zocket, const char * plain_username);
+    CZMQ_EXPORT void zsocket_set_plain_password (void *zocket, const char * plain_password);
+    CZMQ_EXPORT void zsocket_set_curve_server (void *zocket, int curve_server);
+    CZMQ_EXPORT void zsocket_set_curve_publickey (void *zocket, const char * curve_publickey);
+    CZMQ_EXPORT void zsocket_set_curve_publickey_bin (void *zocket, const byte *curve_publickey);
+    CZMQ_EXPORT void zsocket_set_curve_secretkey (void *zocket, const char * curve_secretkey);
+    CZMQ_EXPORT void zsocket_set_curve_secretkey_bin (void *zocket, const byte *curve_secretkey);
+    CZMQ_EXPORT void zsocket_set_curve_serverkey (void *zocket, const char * curve_serverkey);
+    CZMQ_EXPORT void zsocket_set_curve_serverkey_bin (void *zocket, const byte *curve_serverkey);
+    CZMQ_EXPORT void zsocket_set_zap_domain (void *zocket, const char * zap_domain);
     CZMQ_EXPORT void zsocket_set_sndhwm (void *zocket, int sndhwm);
     CZMQ_EXPORT void zsocket_set_rcvhwm (void *zocket, int rcvhwm);
     CZMQ_EXPORT void zsocket_set_affinity (void *zocket, int affinity);
@@ -1492,29 +1535,80 @@ This is the class interface:
     CZMQ_EXPORT void zsocket_set_multicast_hops (void *zocket, int multicast_hops);
     CZMQ_EXPORT void zsocket_set_rcvtimeo (void *zocket, int rcvtimeo);
     CZMQ_EXPORT void zsocket_set_sndtimeo (void *zocket, int sndtimeo);
-    CZMQ_EXPORT void zsocket_set_ipv6 (void *zocket, int ipv6);
-    CZMQ_EXPORT void zsocket_set_immediate (void *zocket, int immediate);
-    CZMQ_EXPORT void zsocket_set_router_mandatory (void *zocket, int router_mandatory);
     CZMQ_EXPORT void zsocket_set_xpub_verbose (void *zocket, int xpub_verbose);
     CZMQ_EXPORT void zsocket_set_tcp_keepalive (void *zocket, int tcp_keepalive);
     CZMQ_EXPORT void zsocket_set_tcp_keepalive_idle (void *zocket, int tcp_keepalive_idle);
     CZMQ_EXPORT void zsocket_set_tcp_keepalive_cnt (void *zocket, int tcp_keepalive_cnt);
     CZMQ_EXPORT void zsocket_set_tcp_keepalive_intvl (void *zocket, int tcp_keepalive_intvl);
     CZMQ_EXPORT void zsocket_set_tcp_accept_filter (void *zocket, const char * tcp_accept_filter);
-    CZMQ_EXPORT void zsocket_set_plain_server (void *zocket, int plain_server);
-    CZMQ_EXPORT void zsocket_set_plain_username (void *zocket, const char * plain_username);
-    CZMQ_EXPORT void zsocket_set_plain_password (void *zocket, const char * plain_password);
-    CZMQ_EXPORT void zsocket_set_curve_server (void *zocket, int curve_server);
-    CZMQ_EXPORT void zsocket_set_curve_publickey (void *zocket, const char * curve_publickey);
-    CZMQ_EXPORT void zsocket_set_curve_publickey_bin (void *zocket, const byte *curve_publickey);
-    CZMQ_EXPORT void zsocket_set_curve_secretkey (void *zocket, const char * curve_secretkey);
-    CZMQ_EXPORT void zsocket_set_curve_secretkey_bin (void *zocket, const byte *curve_secretkey);
-    CZMQ_EXPORT void zsocket_set_curve_serverkey (void *zocket, const char * curve_serverkey);
-    CZMQ_EXPORT void zsocket_set_curve_serverkey_bin (void *zocket, const byte *curve_serverkey);
-    CZMQ_EXPORT void zsocket_set_zap_domain (void *zocket, const char * zap_domain);
+    
+    //  Emulation of widely-used 2.x socket options
+    CZMQ_EXPORT void zsocket_set_hwm (void *zocket, int hwm);
+    
+    //  Patch in case we're on older libzmq
+    #ifndef ZMQ_STREAM
+    #define ZMQ_STREAM 11
+    #endif
+    #endif
+    
+    #if (ZMQ_VERSION_MAJOR == 3)
+    //  Get socket options
+    CZMQ_EXPORT int zsocket_ipv4only (void *zocket);
+    CZMQ_EXPORT int zsocket_type (void *zocket);
+    CZMQ_EXPORT int zsocket_sndhwm (void *zocket);
+    CZMQ_EXPORT int zsocket_rcvhwm (void *zocket);
+    CZMQ_EXPORT int zsocket_affinity (void *zocket);
+    CZMQ_EXPORT char * zsocket_identity (void *zocket);
+    CZMQ_EXPORT int zsocket_rate (void *zocket);
+    CZMQ_EXPORT int zsocket_recovery_ivl (void *zocket);
+    CZMQ_EXPORT int zsocket_sndbuf (void *zocket);
+    CZMQ_EXPORT int zsocket_rcvbuf (void *zocket);
+    CZMQ_EXPORT int zsocket_linger (void *zocket);
+    CZMQ_EXPORT int zsocket_reconnect_ivl (void *zocket);
+    CZMQ_EXPORT int zsocket_reconnect_ivl_max (void *zocket);
+    CZMQ_EXPORT int zsocket_backlog (void *zocket);
+    CZMQ_EXPORT int zsocket_maxmsgsize (void *zocket);
+    CZMQ_EXPORT int zsocket_multicast_hops (void *zocket);
+    CZMQ_EXPORT int zsocket_rcvtimeo (void *zocket);
+    CZMQ_EXPORT int zsocket_sndtimeo (void *zocket);
+    CZMQ_EXPORT int zsocket_tcp_keepalive (void *zocket);
+    CZMQ_EXPORT int zsocket_tcp_keepalive_idle (void *zocket);
+    CZMQ_EXPORT int zsocket_tcp_keepalive_cnt (void *zocket);
+    CZMQ_EXPORT int zsocket_tcp_keepalive_intvl (void *zocket);
+    CZMQ_EXPORT char * zsocket_tcp_accept_filter (void *zocket);
+    CZMQ_EXPORT int zsocket_rcvmore (void *zocket);
+    CZMQ_EXPORT int zsocket_fd (void *zocket);
+    CZMQ_EXPORT int zsocket_events (void *zocket);
+    CZMQ_EXPORT char * zsocket_last_endpoint (void *zocket);
+    
+    //  Set socket options
     CZMQ_EXPORT void zsocket_set_router_raw (void *zocket, int router_raw);
     CZMQ_EXPORT void zsocket_set_ipv4only (void *zocket, int ipv4only);
     CZMQ_EXPORT void zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect);
+    CZMQ_EXPORT void zsocket_set_sndhwm (void *zocket, int sndhwm);
+    CZMQ_EXPORT void zsocket_set_rcvhwm (void *zocket, int rcvhwm);
+    CZMQ_EXPORT void zsocket_set_affinity (void *zocket, int affinity);
+    CZMQ_EXPORT void zsocket_set_subscribe (void *zocket, const char * subscribe);
+    CZMQ_EXPORT void zsocket_set_unsubscribe (void *zocket, const char * unsubscribe);
+    CZMQ_EXPORT void zsocket_set_identity (void *zocket, const char * identity);
+    CZMQ_EXPORT void zsocket_set_rate (void *zocket, int rate);
+    CZMQ_EXPORT void zsocket_set_recovery_ivl (void *zocket, int recovery_ivl);
+    CZMQ_EXPORT void zsocket_set_sndbuf (void *zocket, int sndbuf);
+    CZMQ_EXPORT void zsocket_set_rcvbuf (void *zocket, int rcvbuf);
+    CZMQ_EXPORT void zsocket_set_linger (void *zocket, int linger);
+    CZMQ_EXPORT void zsocket_set_reconnect_ivl (void *zocket, int reconnect_ivl);
+    CZMQ_EXPORT void zsocket_set_reconnect_ivl_max (void *zocket, int reconnect_ivl_max);
+    CZMQ_EXPORT void zsocket_set_backlog (void *zocket, int backlog);
+    CZMQ_EXPORT void zsocket_set_maxmsgsize (void *zocket, int maxmsgsize);
+    CZMQ_EXPORT void zsocket_set_multicast_hops (void *zocket, int multicast_hops);
+    CZMQ_EXPORT void zsocket_set_rcvtimeo (void *zocket, int rcvtimeo);
+    CZMQ_EXPORT void zsocket_set_sndtimeo (void *zocket, int sndtimeo);
+    CZMQ_EXPORT void zsocket_set_xpub_verbose (void *zocket, int xpub_verbose);
+    CZMQ_EXPORT void zsocket_set_tcp_keepalive (void *zocket, int tcp_keepalive);
+    CZMQ_EXPORT void zsocket_set_tcp_keepalive_idle (void *zocket, int tcp_keepalive_idle);
+    CZMQ_EXPORT void zsocket_set_tcp_keepalive_cnt (void *zocket, int tcp_keepalive_cnt);
+    CZMQ_EXPORT void zsocket_set_tcp_keepalive_intvl (void *zocket, int tcp_keepalive_intvl);
+    CZMQ_EXPORT void zsocket_set_tcp_accept_filter (void *zocket, const char * tcp_accept_filter);
     
     //  Emulation of widely-used 2.x socket options
     CZMQ_EXPORT void zsocket_set_hwm (void *zocket, int hwm);
@@ -1584,7 +1678,7 @@ This class is generated, using the GSL code generator. See the sockopts
 XML file, which provides the metadata, and the sockopts.gsl template,
 which does the work.
 
-<A name="toc4-319" title="zstr - sending and receiving strings" />
+<A name="toc4-342" title="zstr - sending and receiving strings" />
 #### zstr - sending and receiving strings
 
 The zstr class provides utility functions for sending and receiving C
@@ -1632,7 +1726,7 @@ This is the class interface:
         zstr_test (bool verbose);
 
 
-<A name="toc4-344" title="zsys - system-level methods" />
+<A name="toc4-367" title="zsys - system-level methods" />
 #### zsys - system-level methods
 
 The zsys class provides a portable wrapper for miscellaneous functions
@@ -1718,7 +1812,7 @@ This is the class interface:
         zsys_test (bool verbose);
 
 
-<A name="toc4-355" title="zthread - working with system threads" />
+<A name="toc4-378" title="zthread - working with system threads" />
 #### zthread - working with system threads
 
 The zthread class wraps OS thread creation. It creates detached threads
@@ -1784,7 +1878,7 @@ If you want to communicate over ipc:// or tcp:// you may be sharing
 the same context, or use separate contexts. Thus, every detached thread
 usually starts by creating its own zctx_t instance.    
 
-<A name="toc4-366" title="ztree - generic red-black tree container" />
+<A name="toc4-389" title="ztree - generic red-black tree container" />
 #### ztree - generic red-black tree container
 
 Red black tree container
@@ -1880,10 +1974,10 @@ This is the class interface:
         ztree_test (int verbose);
 
 
-<A name="toc2-377" title="Under the Hood" />
+<A name="toc2-400" title="Under the Hood" />
 ## Under the Hood
 
-<A name="toc3-380" title="Adding a New Class" />
+<A name="toc3-403" title="Adding a New Class" />
 ### Adding a New Class
 
 If you define a new CZMQ class `myclass` you need to:
@@ -1895,7 +1989,7 @@ If you define a new CZMQ class `myclass` you need to:
 * Add myclass to 'src/Makefile.am` and `doc/Makefile.am`.
 * Add a section to README.txt.
 
-<A name="toc3-392" title="Documentation" />
+<A name="toc3-415" title="Documentation" />
 ### Documentation
 
 Man pages are generated from the class header and source files via the doc/mkman tool, and similar functionality in the gitdown tool (http://github.com/imatix/gitdown). The header file for a class must wrap its interface as follows (example is from include/zclock.h):
@@ -1934,7 +2028,7 @@ The source file for a class then provides the self test example as follows:
 
 The template for man pages is in doc/mkman.
 
-<A name="toc3-431" title="Development" />
+<A name="toc3-454" title="Development" />
 ### Development
 
 CZMQ is developed through a test-driven process that guarantees no memory violations or leaks in the code:
@@ -1944,7 +2038,7 @@ CZMQ is developed through a test-driven process that guarantees no memory violat
 * Run the 'selftest' script, which uses the Valgrind memcheck tool.
 * Repeat until perfect.
 
-<A name="toc3-441" title="Porting CZMQ" />
+<A name="toc3-464" title="Porting CZMQ" />
 ### Porting CZMQ
 
 When you try CZMQ on an OS that it's not been used on (ever, or for a while), you will hit code that does not compile. In some cases the patches are trivial, in other cases (usually when porting to Windows), the work needed to build equivalent functionality may be non-trivial. In any case, the benefit is that once ported, the functionality is available to all applications.
@@ -1955,12 +2049,12 @@ Before attempting to patch code for portability, please read the `czmq_prelude.h
 * Defining macros that rename exotic library functions to more conventional names: do this in czmq_prelude.h.
 * Reimplementing specific methods to use a non-standard API: this is typically needed on Windows. Do this in the relevant class, using #ifdefs to properly differentiate code for different platforms.
 
-<A name="toc3-452" title="Code Generation" />
+<A name="toc3-475" title="Code Generation" />
 ### Code Generation
 
-We generate the zsockopt class using [https://github.com/imatix/gsl GSL].
+We generate the zsockopt class using [https://github.com/imatix/gsl GSL], using a code generator script in scripts/sockopts.gsl.
 
-<A name="toc3-457" title="This Document" />
+<A name="toc3-480" title="This Document" />
 ### This Document
 
 This document is originally at README.txt and is built using [gitdown](http://github.com/imatix/gitdown).

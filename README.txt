@@ -71,21 +71,44 @@ To report an issue, use the [CZMQ issue tracker](https://github.com/zeromq/czmq/
 
 ### Building and Installing
 
-CZMQ uses autotools for packaging. To build from git (all example commands are for Linux):
+Here's how to build CZMQ from GitHub (building from packages is very similar, you don't clone a repo but unpack a tarball), including the libsodium (for security) and libzmq (ZeroMQ core) libraries:
+
+    git clone git://github.com/jedisct1/libsodium.git
+    cd libsodium
+    ./autogen.sh
+    ./configure && make check
+    sudo make install
+    sudo ldconfig
+    cd ..
+
+    git clone git://github.com/zeromq/libzmq.git
+    cd libzmq
+    ./autogen.sh
+    ./configure && make check
+    sudo make install
+    sudo ldconfig
+    cd ..
 
     git clone git://github.com/zeromq/czmq.git
     cd czmq
-    sh autogen.sh
-    ./configure
-    make all
+    ./autogen.sh
+    ./configure && make check
     sudo make install
     sudo ldconfig
+    cd ..
 
-You will need the libtool and autotools packages. On FreeBSD, you may need to specify the default directories for configure:
+In general CZMQ works best with the latest libzmq master. If you already have an older version of libzmq installed on your system, e.g. in /usr/, then you can install libzmq master to your home directory ($HOME/local):
 
-    ./configure --with-libzmq=/usr/local
+    #   Building libzmq in our home directory
+    ./configure --prefix=$HOME/local
 
-After building, you can run the CZMQ selftests:
+And then to build CZMQ against this installation of libzmq:
+
+    export CFLAGS=-I$HOME/local/include 
+    export LDFLAGS=-L$HOME/local/lib64 
+    ./configure
+    
+You will need the libtool and autotools packages. After building, run the CZMQ selftests:
 
     make check
 
@@ -413,7 +436,7 @@ Before attempting to patch code for portability, please read the `czmq_prelude.h
 
 ### Code Generation
 
-We generate the zsockopt class using [https://github.com/imatix/gsl GSL].
+We generate the zsockopt class using [https://github.com/imatix/gsl GSL], using a code generator script in scripts/sockopts.gsl.
 
 ### This Document
 
