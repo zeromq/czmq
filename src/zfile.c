@@ -63,7 +63,7 @@ zfile_new (const char *path, const char *name)
     zfile_t *self = (zfile_t *) zmalloc (sizeof (zfile_t));
 
     //  Format full path to file
-    self->fullname = malloc (strlen (path) + strlen (name) + 2);
+    self->fullname = (char*)malloc (strlen (path) + strlen (name) + 2);
     sprintf (self->fullname, "%s/%s", path, name);
     s_restat (self);
     return self;
