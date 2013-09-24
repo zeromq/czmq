@@ -404,6 +404,7 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 #       define snprintf _snprintf
 #       define vsnprintf _vsnprintf
 #   endif
+#	define sleep Sleep
     typedef unsigned long ulong;
     typedef unsigned int  uint;
 #   if (!defined (__MINGW32__)) 
