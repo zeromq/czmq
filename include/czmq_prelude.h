@@ -404,6 +404,10 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 #       define snprintf _snprintf
 #       define vsnprintf _vsnprintf
 #   endif
+#	if (!defined (S_IRUSR))
+#	define S_IRUSR	_S_IREAD
+#	define S_IWUSR  _S_IWRITE
+#	endif
 #	define sleep Sleep
     typedef unsigned long ulong;
     typedef unsigned int  uint;
