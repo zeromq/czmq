@@ -135,7 +135,7 @@ zcert_destroy (zcert_t **self_p)
 //  Return public part of key pair as 32-byte binary string
 
 byte *
-zcert_public (zcert_t *self)
+zcert_public_key (zcert_t *self)
 {
     assert (self);
     return self->public_key;
@@ -146,7 +146,7 @@ zcert_public (zcert_t *self)
 //  Return secret part of key pair as 32-byte binary string
 
 byte *
-zcert_secret (zcert_t *self)
+zcert_secret_key (zcert_t *self)
 {
     assert (self);
     return self->secret_key;
