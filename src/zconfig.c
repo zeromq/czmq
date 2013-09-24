@@ -620,6 +620,7 @@ zconfig_save (zconfig_t *self, char *filename)
             rc = zconfig_execute (self, s_config_save, file);
         else
             rc = -1;          //  File not writeable
+        fflush (file);
         fclose (file);
     }
     return rc;
