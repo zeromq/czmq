@@ -51,7 +51,45 @@ AC_PROG_AWK
 
 # Checks for libraries
 AC_CHECK_LIB([pthread], [pthread_create])
-AC_CHECK_LIB([sodium], [sodium_init],,AC_MSG_WARN(libsodium is needed for CURVE security))
+
+# Allow libsodium to be installed in a custom path:
+
+AC_ARG_WITH([libsodium],
+            [AS_HELP_STRING([--with-libsodium],
+                            [Specify libsodium prefix])],
+            [zmq_search_libsodium="yes"],
+            [])
+
+if test "x$zmq_search_libsodium" = "xyes"; then
+    if test -r "${with_libsodium}/include/sodium.h"; then
+        CXXFLAGS="-I${with_libsodium}/include ${CXXFLAGS}"
+        LDFLAGS="-L${with_libsodium}/lib ${LDFLAGS}"
+    fi
+fi
+
+AC_ARG_WITH([libsodium-include-dir],
+            [AS_HELP_STRING([--with-libsodium-include-dir],
+                            [Specify libsodium include prefix])],
+            [zmq_search_libsodium_include="yes"],
+            [])
+
+if test "x$zmq_search_libsodium_include" = "xyes"; then
+    if test -r "${with_libsodium_include_dir}/sodium.h"; then
+        CXXFLAGS="-I${with_libsodium_include_dir}/include ${CXXFLAGS}"
+    fi
+fi
+
+AC_ARG_WITH([libsodium_lib_dir],
+            [AS_HELP_STRING([--with-libsodium-lib-dir],
+                            [Specify libsodium library prefix])],
+            [zmq_search_libsodium_lib="yes"],
+            [])
+
+if test "x$zmq_search_libsodium_lib" = "xyes"; then
+    if test -r "${with_libsodium_lib_dir}/libsodium.{a|so|dylib}"; then
+        LDFLAGS="-L${with_libsodium}/lib ${LDFLAGS}"
+    fi
+fi
 
 # Code coverage
 AC_ARG_WITH(gcov, [AS_HELP_STRING([--with-gcov=yes/no],
@@ -156,7 +194,7 @@ case "${host_os}" in
         # Define on Solaris to enable all library features
         CPPFLAGS="-D_PTHREADS $CPPFLAGS"
         AC_DEFINE(CZMQ_HAVE_SOLARIS, 1, [Have Solaris OS])
-        CFLAGS="${CFLAGS} -lsocket"
+        CFLAGS="${CFLAGS} -lsocket -lssp"
         ;;
     *freebsd*)
         # Define on FreeBSD to enable all library features
@@ -205,6 +243,9 @@ case "${host_os}" in
         AC_MSG_ERROR([unsupported system: ${host_os}.])
         ;;
 esac
+
+# Check for libsodium
+AC_CHECK_LIB([sodium], [sodium_init],,AC_MSG_WARN(libsodium is needed for CURVE security))
 
 # Checks for header files.
 AC_HEADER_STDC
