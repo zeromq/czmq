@@ -66,6 +66,7 @@ struct _zctx_t {
     int pipehwm;                //  Send/receive HWM for pipes
     int sndhwm;                 //  ZMQ_SNDHWM for normal sockets
     int rcvhwm;                 //  ZMQ_RCVHWM for normal sockets
+    zmutex_t* socketsMutex;     //  Synchronizes access to socket zlist
 };
 
 
@@ -105,6 +106,11 @@ zctx_new (void)
     self->sndhwm = 1000;
     self->rcvhwm = 1000;
     self->main = true;
+    self->socketsMutex = zmutex_new ();
+    if (!self->socketsMutex) {
+        free(self);
+        return NULL;
+    }
     zsys_handler_set (s_signal_handler);
     return self;
 }
@@ -119,9 +125,12 @@ zctx_destroy (zctx_t **self_p)
     assert (self_p);
     if (*self_p) {
         zctx_t *self = *self_p;
+        // Destroy all sockets
         while (zlist_size (self->sockets))
             zctx__socket_destroy (self, zlist_first (self->sockets));
         zlist_destroy (&self->sockets);
+        zmutex_destroy (&self->socketsMutex);
+        // Destroy the socket itsef
         if (self->main && self->context)
             zmq_term (self->context);
         free (self);
@@ -152,6 +161,11 @@ zctx_shadow (zctx_t *ctx)
     self->sockets = zlist_new ();
     if (!self->sockets) {
         free (self);
+        return NULL;
+    }
+    self->socketsMutex = zmutex_new ();
+    if (!self->socketsMutex) {
+        free(self);
         return NULL;
     }
     return self;
@@ -263,10 +277,13 @@ zctx__socket_new (zctx_t *self, int type)
     zsocket_set_sndhwm (zocket, self->sndhwm);
     zsocket_set_rcvhwm (zocket, self->rcvhwm);
 #endif
+    zmutex_lock (self->socketsMutex);
     if (zlist_push (self->sockets, zocket)) {
+        zmutex_unlock (self->socketsMutex);
         zmq_close (zocket);
         return NULL;
     }
+    zmutex_unlock (self->socketsMutex);
     return zocket;
 }
 
@@ -296,7 +313,9 @@ zctx__socket_destroy (zctx_t *self, void *zocket)
         zsocket_set_linger (zocket, self->linger);
         zmq_close (zocket);
     }
+    zmutex_lock (self->socketsMutex);
     zlist_remove (self->sockets, zocket);
+    zmutex_unlock (self->socketsMutex);
 }
 
 
