@@ -279,8 +279,8 @@ zctx__socket_new (zctx_t *self, int type)
 #endif
     zmutex_lock (self->socketsMutex);
     if (zlist_push (self->sockets, zocket)) {
-        zmq_close (zocket);
         zmutex_unlock (self->socketsMutex);
+        zmq_close (zocket);
         return NULL;
     }
     zmutex_unlock (self->socketsMutex);
