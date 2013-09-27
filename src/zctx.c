@@ -107,6 +107,10 @@ zctx_new (void)
     self->rcvhwm = 1000;
     self->main = true;
     self->socketsMutex = zmutex_new ();
+    if (!self->socketsMutex) {
+        free(self);
+        return NULL;
+    }
     zsys_handler_set (s_signal_handler);
     return self;
 }
@@ -121,14 +125,14 @@ zctx_destroy (zctx_t **self_p)
     assert (self_p);
     if (*self_p) {
         zctx_t *self = *self_p;
-        zmutex_lock (self->socketsMutex);
+        // Destroy all sockets
         while (zlist_size (self->sockets))
             zctx__socket_destroy (self, zlist_first (self->sockets));
         zlist_destroy (&self->sockets);
-        zmutex_unlock (self->socketsMutex);
+        zmutex_destroy (&self->socketsMutex);
+        // Destroy the socket itsef
         if (self->main && self->context)
             zmq_term (self->context);
-        zmutex_destroy (&self->socketsMutex);
         free (self);
         *self_p = NULL;
     }
@@ -157,6 +161,11 @@ zctx_shadow (zctx_t *ctx)
     self->sockets = zlist_new ();
     if (!self->sockets) {
         free (self);
+        return NULL;
+    }
+    self->socketsMutex = zmutex_new ();
+    if (!self->socketsMutex) {
+        free(self);
         return NULL;
     }
     return self;

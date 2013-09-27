@@ -57,9 +57,11 @@ zmutex_new (void)
         *self;
 
     self = (zmutex_t *) zmalloc (sizeof (zmutex_t));
-    assert (self);
 #if defined (__UNIX__)
-    pthread_mutex_init (&self->mutex, NULL);
+    if (pthread_mutex_init (&self->mutex, NULL) != 0) {
+        free (self);
+        return NULL;
+    }
 #elif defined (__WINDOWS__)
     InitializeCriticalSection (&self->mutex);
 #endif
