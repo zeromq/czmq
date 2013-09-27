@@ -169,6 +169,9 @@ void
 zsocket_set_$(name) (void *zocket, $(ctype_const) $(name))
 {
 #   if defined (ZMQ_$(NAME))
+.       if defined (.ifdef)
+#     if defined ($(ifdef:))
+.       endif
 .           if count (restrict)
 .               for restrict
 .                   if first()
@@ -204,6 +207,9 @@ zsocket_set_$(name) (void *zocket, $(ctype_const) $(name))
     int rc = zmq_setsockopt (zocket, ZMQ_$(NAME), $(name), strlen ($(name)));
 .           endif
     assert (rc == 0 || zmq_errno () == ETERM);
+.       if defined (.ifdef)
+#     endif
+.       endif
 #   endif
 }
 
@@ -218,8 +224,14 @@ void
 zsocket_set_$(name)_bin (void *zocket, const byte *$(name))
 {
 #   if defined (ZMQ_$(NAME))
+.       if defined (.ifdef)
+#     if defined ($(ifdef:))
+.       endif
     int rc = zmq_setsockopt (zocket, ZMQ_$(NAME), $(name), 32);
     assert (rc == 0 || zmq_errno () == ETERM);
+.       if defined (.ifdef)
+#     endif
+.       endif
 #   endif
 }
 
