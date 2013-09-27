@@ -292,9 +292,10 @@ void
 zctx__socket_destroy (zctx_t *self, void *zocket)
 {
     assert (self);
-    assert (zocket);
-    zsocket_set_linger (zocket, self->linger);
-    zmq_close (zocket);
+    if(zocket != NULL) {
+        zsocket_set_linger (zocket, self->linger);
+        zmq_close (zocket);
+    }
     zlist_remove (self->sockets, zocket);
 }
 
