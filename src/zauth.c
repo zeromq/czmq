@@ -656,6 +656,7 @@ zauth_test (bool verbose)
     success = s_can_connect (server, client);
     assert (!success);
 
+#   if defined (HAVE_LIBSODIUM)
     //  Try CURVE authentication
     //  We'll create two new certificates and save the client public 
     //  certificate on disk; in a real case we'd transfer this securely
@@ -692,12 +693,13 @@ zauth_test (bool verbose)
     assert (success);
     zcert_destroy (&server_cert);
     zcert_destroy (&client_cert);
-    
+#   endif
+
     //  Remove the authenticator and check a normal connection works
     zauth_destroy (&auth);
     success = s_can_connect (server, client);
     assert (success);
-    
+
     zctx_destroy (&ctx);
     
     //  Delete all test files
