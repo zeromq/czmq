@@ -51,7 +51,6 @@ AC_PROG_AWK
 
 # Checks for libraries
 AC_CHECK_LIB([pthread], [pthread_create])
-AC_CHECK_LIB([sodium], [sodium_init],,AC_MSG_WARN(libsodium is needed for CURVE security))
 
 # Allow libsodium to be installed in a custom path:
 
@@ -195,7 +194,7 @@ case "${host_os}" in
         # Define on Solaris to enable all library features
         CPPFLAGS="-D_PTHREADS $CPPFLAGS"
         AC_DEFINE(CZMQ_HAVE_SOLARIS, 1, [Have Solaris OS])
-        CFLAGS="${CFLAGS} -lsocket"
+        CFLAGS="${CFLAGS} -lsocket -lssp"
         ;;
     *freebsd*)
         # Define on FreeBSD to enable all library features
@@ -244,6 +243,9 @@ case "${host_os}" in
         AC_MSG_ERROR([unsupported system: ${host_os}.])
         ;;
 esac
+
+# Check for libsodium
+AC_CHECK_LIB([sodium], [sodium_init],,AC_MSG_WARN(libsodium is needed for CURVE security))
 
 # Checks for header files.
 AC_HEADER_STDC
