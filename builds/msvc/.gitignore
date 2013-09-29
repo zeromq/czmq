@@ -16,3 +16,6 @@ mt.dep
 *.pdb
 *.idb
 *.lib
+*.opensdf
+*.suo
+*.sdf
