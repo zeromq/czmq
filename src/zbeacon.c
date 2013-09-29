@@ -302,7 +302,7 @@ zbeacon_test (bool verbose)
         zbeacon_socket (node2), 
         zbeacon_socket (node3), NULL);
         
-    uint64_t stop_at = zclock_time () + 1000;
+    int64_t stop_at = zclock_time () + 1000;
     while (zclock_time () < stop_at) {
         long timeout = (long) (stop_at - zclock_time ());
         if (timeout < 0)
@@ -349,7 +349,7 @@ typedef struct {
     bool enabled;               //  Are we broadcasting?
     bool noecho;                //  Ignore own (unique) beacons?
     bool terminated;            //  API shut us down
-    uint64_t ping_at;           //  Next broadcast time
+    int64_t ping_at;            //  Next broadcast time
     zframe_t *transmit;         //  Beacon transmit data
     zframe_t *filter;           //  Beacon filter data
     inaddr_t address;           //  Our own address
@@ -717,7 +717,8 @@ s_beacon_recv (agent_t *self)
     if (self->filter) {
         byte  *filter_data = zframe_data (self->filter);
         size_t filter_size = zframe_size (self->filter);
-        if (size >= filter_size && memcmp (buffer, filter_data, filter_size) == 0)
+        if ((size_t) size >= filter_size
+        &&  memcmp (buffer, filter_data, filter_size) == 0)
             is_valid = true;
     }
     //  If valid, check for echoed beacons (i.e. our own broadcast)
@@ -743,17 +744,22 @@ s_beacon_send (agent_t *self)
 {
     //  Send UDP broadcast packet now
     assert (self->transmit);
-    ssize_t size = sendto (
+    sendto (
         self->udpsock,
         (char *) zframe_data (self->transmit), zframe_size (self->transmit),
         0,      //  Flags
         (struct sockaddr *) &self->broadcast, sizeof (inaddr_t));
-    
+
     //  Sending can fail if the OS is blocking multicast. In such cases we
     //  don't try to report the error. We might log this or send to an error
     //  console at some point.
-    if (size == SOCKET_ERROR)
-        ;   //  s_handle_io_error ("sendto");
+    //  ssize_t size = sendto (
+    //      self->udpsock,
+    //      (char *) zframe_data (self->transmit), zframe_size (self->transmit),
+    //      0,      //  Flags
+    //      (struct sockaddr *) &self->broadcast, sizeof (inaddr_t));
+    //  if (size == SOCKET_ERROR)
+    //      s_handle_io_error ("sendto");
 }
 
 //  Destroy agent instance
