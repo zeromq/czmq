@@ -108,6 +108,7 @@ zctx_new (void)
     self->main = true;
     self->socketsMutex = zmutex_new ();
     if (!self->socketsMutex) {
+        zlist_destroy (&self->sockets);
         free(self);
         return NULL;
     }
@@ -157,6 +158,8 @@ zctx_shadow (zctx_t *ctx)
 
     self->context = ctx->context;
     self->pipehwm = ctx->pipehwm;
+    self->sndhwm = ctx->sndhwm;
+    self->rcvhwm = ctx->rcvhwm;
     self->linger = ctx->linger;
     self->sockets = zlist_new ();
     if (!self->sockets) {
@@ -165,6 +168,7 @@ zctx_shadow (zctx_t *ctx)
     }
     self->socketsMutex = zmutex_new ();
     if (!self->socketsMutex) {
+        zlist_destroy (&self->sockets);
         free(self);
         return NULL;
     }
