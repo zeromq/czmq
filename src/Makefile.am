@@ -31,6 +31,7 @@ include_HEADERS = \
     ../include/ztree.h
 
 libczmq_la_SOURCES = \
+    platform.h \
     zauth.c \
     zbeacon.c \
     zcert.c \

@@ -38,8 +38,8 @@
 struct _zchunk_t {
     size_t size;                //  Current size of data part
     size_t max_size;            //  Maximum allocated size
-    byte  *data;                //  Data part follows here
-} __attribute__ ((aligned (8)));
+    byte *data;                 //  Data part follows here
+};
 
 
 //  --------------------------------------------------------------------------
@@ -92,7 +92,7 @@ zchunk_resize (zchunk_t *self, size_t size)
     if (self->data != (byte *) self + sizeof (zchunk_t))
         free (self->data);
 
-    self->data = zmalloc (size);
+    self->data = (byte *) zmalloc (size);
     self->max_size = size;
     self->size = 0;
 }
