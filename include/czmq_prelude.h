@@ -88,10 +88,9 @@
 #   define __WINDOWS__
 #   undef __MSDOS__
 #   define __MSDOS__
-#   if _MSC_VER == 1500
-#       ifndef _CRT_SECURE_NO_DEPRECATE
-#           define _CRT_SECURE_NO_DEPRECATE   1
-#       endif
+//  Stop cheeky warnings about "deprecated" functions like fopen
+#   if _MSC_VER >= 1500
+#       define _CRT_SECURE_NO_DEPRECATE
 #       pragma warning(disable: 4996)
 #   endif
 #endif
@@ -248,12 +247,6 @@
 #   include <sys/stat.h>
 #   include <sys/utime.h>
 #   include <share.h>
-#   if _MSC_VER == 1500
-#       ifndef _CRT_SECURE_NO_DEPRECATE
-#           define _CRT_SECURE_NO_DEPRECATE   1
-#       endif
-#       pragma warning(disable: 4996)
-#   endif
 #endif
 
 #if (defined (__UNIX__))

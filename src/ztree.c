@@ -797,7 +797,7 @@ ztree_test (int verbose)
     pred = zlist_first (keys);
     assert (pred);
     while ((key = zlist_next (keys))) {
-        assert (strcmp ((char *) key, pred) > 0);
+        assert (strcmp ((char *) key, (char *) pred) > 0);
         pred = key;
     }
     zlist_destroy (&keys);
