@@ -38,7 +38,7 @@
 struct _zchunk_t {
     size_t size;                //  Current size of data part
     size_t max_size;            //  Maximum allocated size
-    byte  *data;                //  Data part follows here
+    byte *data;                 //  Data part follows here
 };
 
 

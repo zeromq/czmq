@@ -303,6 +303,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\builds\msvc\platform.h" />
     <ClInclude Include="..\..\include\czmq.h" />
     <ClInclude Include="..\..\include\czmq_prelude.h" />
     <ClInclude Include="..\..\include\stdbool_for_windows.h" />

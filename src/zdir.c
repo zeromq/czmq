@@ -106,7 +106,7 @@ zdir_new (const char *path, const char *parent)
 {
     zdir_t *self = (zdir_t *) zmalloc (sizeof (zdir_t));
     if (parent) {
-        self->path = malloc (strlen (path) + strlen (parent) + 2);
+        self->path = (char *) malloc (strlen (path) + strlen (parent) + 2);
         sprintf (self->path, "%s/%s", parent, path);
     }
     else
@@ -127,7 +127,7 @@ zdir_new (const char *path, const char *parent)
         self->path [strlen (self->path) - 1] = 0;
 
     //  Win32 wants a wildcard at the end of the path
-    char *wildcard = malloc (strlen (self->path) + 3);
+    char *wildcard = (char *) malloc (strlen (self->path) + 3);
     sprintf (wildcard, "%s/*", self->path);
     WIN32_FIND_DATA entry;
     HANDLE handle = FindFirstFile (wildcard, &entry);
