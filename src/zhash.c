@@ -545,7 +545,7 @@ zhash_load (zhash_t *self, char *filename)
     if (!handle)
         return -1;              //  Failed to open file for reading
 
-    char *buffer = (char*)zmalloc (1024);
+    char *buffer = (char *) zmalloc (1024);
     while (fgets (buffer, 1024, handle)) {
         //  Skip lines starting with "#" or that do not look like
         //  name=value data.
@@ -771,8 +771,8 @@ zhash_test (int verbose)
     strcpy (value, "Ring a ding ding");
     rc = zhash_insert (hash, "key2", value);
     assert (rc == 0);
-    assert (streq ((const char *)zhash_lookup (hash, "key1"), "This is a string"));
-    assert (streq ((const char *)zhash_lookup (hash, "key2"), "Ring a ding ding"));
+    assert (streq ((char *) zhash_lookup (hash, "key1"), "This is a string"));
+    assert (streq ((char *) zhash_lookup (hash, "key2"), "Ring a ding ding"));
     zhash_destroy (&hash);
     //  @end
 

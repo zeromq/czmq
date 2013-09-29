@@ -198,7 +198,7 @@ char *
 zcert_meta (zcert_t *self, char *name)
 {
     assert (self);
-    return (char *)zhash_lookup (self->metadata, name);
+    return zhash_lookup (self->metadata, name);
 }
 
 

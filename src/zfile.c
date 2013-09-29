@@ -63,7 +63,7 @@ zfile_new (const char *path, const char *name)
     zfile_t *self = (zfile_t *) zmalloc (sizeof (zfile_t));
 
     //  Format full path to file
-    self->fullname = (char*)malloc (strlen (path) + strlen (name) + 2);
+    self->fullname = (char *) zmalloc (strlen (path) + strlen (name) + 2);
     sprintf (self->fullname, "%s/%s", path, name);
     s_restat (self);
     return self;
@@ -207,7 +207,7 @@ zfile_is_readable (zfile_t *self)
 {
     assert (self);
     s_restat (self);
-    return (self->mode & S_IRUSR) != 0;
+    return (self->mode & S_IREAD) != 0;
 }
 
 
@@ -220,7 +220,7 @@ zfile_is_writeable (zfile_t *self)
 {
     assert (self);
     s_restat (self);
-    return (self->mode & S_IWUSR) != 0;
+    return (self->mode & S_IWRITE) != 0;
 }
 
 
@@ -318,8 +318,8 @@ zfile_read (zfile_t *self, size_t bytes, off_t offset)
     if (offset > self->cursize)
         bytes = 0;
     else
-    if (bytes > self->cursize - offset)
-        bytes = self->cursize - offset;
+    if (bytes > (size_t) (self->cursize - offset))
+        bytes = (size_t) (self->cursize - offset);
 
     int rc = fseek (self->handle, (long) offset, SEEK_SET);
     if (rc == -1)

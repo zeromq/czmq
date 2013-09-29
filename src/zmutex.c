@@ -58,7 +58,10 @@ zmutex_new (void)
 
     self = (zmutex_t *) zmalloc (sizeof (zmutex_t));
 #if defined (__UNIX__)
-    pthread_mutex_init (&self->mutex, NULL);
+    if (pthread_mutex_init (&self->mutex, NULL) != 0) {
+        free (self);
+        return NULL;
+    }
 #elif defined (__WINDOWS__)
     InitializeCriticalSection (&self->mutex);
 #endif
@@ -93,6 +96,7 @@ zmutex_destroy (zmutex_t **self_p)
 void
 zmutex_lock (zmutex_t *self)
 {
+    assert (self);
 #if defined (__UNIX__)
     pthread_mutex_lock (&self->mutex);
 #elif defined (__WINDOWS__)
@@ -107,6 +111,7 @@ zmutex_lock (zmutex_t *self)
 void
 zmutex_unlock (zmutex_t *self)
 {
+    assert (self);
 #if defined (__UNIX__)
     pthread_mutex_unlock (&self->mutex);
 #elif defined (__WINDOWS__)
@@ -114,6 +119,27 @@ zmutex_unlock (zmutex_t *self)
 #endif
 }
 
+//  --------------------------------------------------------------------------
+//  Try to lock mutex.
+//  Returns:
+//    0 if the mutex is already locked
+//    1 if the mutex lock has successfully been acquired
+//    -1 on error
+
+int
+zmutex_try_lock (zmutex_t *self)
+{
+    assert (self);
+#if defined (__UNIX__)
+    // rc is either EBUSY or 0
+    int rc = pthread_mutex_trylock (&self->mutex);
+    return rc == EBUSY ? 0 : 1;
+#elif defined (__WINDOWS__)
+    // rc is nonzero if the mutex lock has been acquired
+    int rc = TryEnterCriticalSection (&self->mutex);
+    return rc != 0 ? 1 : 0;
+#endif
+}
 
 //  --------------------------------------------------------------------------
 //  Selftest
@@ -125,8 +151,17 @@ zmutex_test (bool verbose)
 
     //  @selftest
     zmutex_t *mutex = zmutex_new ();
-    zmutex_lock (mutex);
+    // Try to lock while unlocked
+    assert (zmutex_try_lock (mutex));
     zmutex_unlock (mutex);
+    // Try to lock while locked
+    zmutex_lock (mutex);
+    assert (zmutex_try_lock (mutex) == 0);
+    zmutex_unlock (mutex);
+    // Try to lock while unlocked, again
+    assert (zmutex_try_lock (mutex));
+    zmutex_unlock (mutex);
+    
     zmutex_destroy (&mutex);
     //  @end
     printf ("OK\n");
