@@ -232,7 +232,7 @@ zap_request_new (void *handler)
     if (streq (self->mechanism, "CURVE")) {
         zframe_t *frame = zmsg_pop (request);
         assert (zframe_size (frame) == 32);
-        self->client_key = zmalloc (41);
+        self->client_key = (char *) zmalloc (41);
         zmq_z85_encode (self->client_key, zframe_data (frame), 32);
         zframe_destroy (&frame);
     }

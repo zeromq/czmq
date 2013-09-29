@@ -2140,6 +2140,10 @@
 			Name="Header Files"
 			>
 			<File
+				RelativePath="..\..\builds\msvc\platform.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\czmq.h"
 				>
 			</File>

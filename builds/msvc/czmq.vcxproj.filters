@@ -57,6 +57,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\builds\msvc\platform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\include\czmq.h">
       <Filter>Header Files</Filter>
     </ClInclude>
