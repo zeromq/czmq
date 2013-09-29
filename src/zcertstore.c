@@ -53,7 +53,11 @@
 
 struct _zcertstore_t {
     char *location;             //  Directory location
+    //  This isn't sufficient; we should check the hash of all files
+    //  or else use a trigger like inotify on Linux.
     time_t modified;            //  Modified time of directory
+    size_t count;               //  Number of certificates
+    size_t cursize;             //  Total size of certificates
     zlist_t *cert_list;         //  List of loaded certificates
     zhash_t *cert_hash;         //  Hash of loaded certificates
 };
@@ -131,6 +135,9 @@ s_load_certs_from_disk (zcertstore_t *self)
         }
         free (filelist);
         self->modified = zdir_modified (dir);
+        self->count = zdir_count (dir);
+        self->cursize = zdir_cursize (dir);
+
         zdir_destroy (&dir);
     }
 }
@@ -168,8 +175,12 @@ zcertstore_lookup (zcertstore_t *self, char *public_key)
     //  If directory has changed, reload all certificates
     if (self->location) {
         zdir_t *dir = zdir_new (self->location, NULL);
-        if (dir && zdir_modified (dir) > self->modified)
+        if (dir
+        && (self->modified != zdir_modified (dir)
+        ||  self->count    != zdir_count (dir)
+        ||  self->cursize  != zdir_cursize (dir))) {
             s_load_certs_from_disk (self);
+        }
         zdir_destroy (&dir);
     }
     return (zcert_t *) zhash_lookup (self->cert_hash, public_key);

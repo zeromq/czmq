@@ -349,8 +349,10 @@ void
 zsocket_set_curve_server (void *zocket, int curve_server)
 {
 #   if defined (ZMQ_CURVE_SERVER)
+#     if defined (HAVE_LIBSODIUM)
     int rc = zmq_setsockopt (zocket, ZMQ_CURVE_SERVER, &curve_server, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
+#     endif
 #   endif
 }
 
@@ -381,8 +383,10 @@ void
 zsocket_set_curve_publickey (void *zocket, const char * curve_publickey)
 {
 #   if defined (ZMQ_CURVE_PUBLICKEY)
+#     if defined (HAVE_LIBSODIUM)
     int rc = zmq_setsockopt (zocket, ZMQ_CURVE_PUBLICKEY, curve_publickey, strlen (curve_publickey));
     assert (rc == 0 || zmq_errno () == ETERM);
+#     endif
 #   endif
 }
 
@@ -395,8 +399,10 @@ void
 zsocket_set_curve_publickey_bin (void *zocket, const byte *curve_publickey)
 {
 #   if defined (ZMQ_CURVE_PUBLICKEY)
+#     if defined (HAVE_LIBSODIUM)
     int rc = zmq_setsockopt (zocket, ZMQ_CURVE_PUBLICKEY, curve_publickey, 32);
     assert (rc == 0 || zmq_errno () == ETERM);
+#     endif
 #   endif
 }
 
@@ -427,8 +433,10 @@ void
 zsocket_set_curve_secretkey (void *zocket, const char * curve_secretkey)
 {
 #   if defined (ZMQ_CURVE_SECRETKEY)
+#     if defined (HAVE_LIBSODIUM)
     int rc = zmq_setsockopt (zocket, ZMQ_CURVE_SECRETKEY, curve_secretkey, strlen (curve_secretkey));
     assert (rc == 0 || zmq_errno () == ETERM);
+#     endif
 #   endif
 }
 
@@ -441,8 +449,10 @@ void
 zsocket_set_curve_secretkey_bin (void *zocket, const byte *curve_secretkey)
 {
 #   if defined (ZMQ_CURVE_SECRETKEY)
+#     if defined (HAVE_LIBSODIUM)
     int rc = zmq_setsockopt (zocket, ZMQ_CURVE_SECRETKEY, curve_secretkey, 32);
     assert (rc == 0 || zmq_errno () == ETERM);
+#     endif
 #   endif
 }
 
@@ -473,8 +483,10 @@ void
 zsocket_set_curve_serverkey (void *zocket, const char * curve_serverkey)
 {
 #   if defined (ZMQ_CURVE_SERVERKEY)
+#     if defined (HAVE_LIBSODIUM)
     int rc = zmq_setsockopt (zocket, ZMQ_CURVE_SERVERKEY, curve_serverkey, strlen (curve_serverkey));
     assert (rc == 0 || zmq_errno () == ETERM);
+#     endif
 #   endif
 }
 
@@ -487,8 +499,10 @@ void
 zsocket_set_curve_serverkey_bin (void *zocket, const byte *curve_serverkey)
 {
 #   if defined (ZMQ_CURVE_SERVERKEY)
+#     if defined (HAVE_LIBSODIUM)
     int rc = zmq_setsockopt (zocket, ZMQ_CURVE_SERVERKEY, curve_serverkey, 32);
     assert (rc == 0 || zmq_errno () == ETERM);
+#     endif
 #   endif
 }
 
