@@ -48,7 +48,6 @@
     * Sets up signal (SIGINT and SIGTERM) handling so that blocking calls
     such as zmq_recv() and zmq_poll() will return when the user presses
     Ctrl-C.
-
 @discuss
 @end
 */
@@ -60,13 +59,13 @@
 struct _zctx_t {
     void *context;              //  Our 0MQ context
     zlist_t *sockets;           //  Sockets held by this thread
-    bool main;                  //  True if we're the main thread
+    zmutex_t* mutex;            //  Make zctx threadsafe
+    bool shadow;                //  True if this is a shadow context
     int iothreads;              //  Number of IO threads, default 1
     int linger;                 //  Linger timeout, default 0
     int pipehwm;                //  Send/receive HWM for pipes
     int sndhwm;                 //  ZMQ_SNDHWM for normal sockets
     int rcvhwm;                 //  ZMQ_RCVHWM for normal sockets
-    zmutex_t* socketsMutex;     //  Synchronizes access to socket zlist
 };
 
 
@@ -97,7 +96,10 @@ zctx_new (void)
         return NULL;
 
     self->sockets = zlist_new ();
-    if (!self->sockets) {
+    self->mutex = zmutex_new ();
+    if (!self->sockets || !self->mutex) {
+        zlist_destroy (&self->sockets);
+        zmutex_destroy (&self->mutex);
         free (self);
         return NULL;
     }
@@ -105,13 +107,6 @@ zctx_new (void)
     self->pipehwm = 1000;   
     self->sndhwm = 1000;
     self->rcvhwm = 1000;
-    self->main = true;
-    self->socketsMutex = zmutex_new ();
-    if (!self->socketsMutex) {
-        zlist_destroy (&self->sockets);
-        free(self);
-        return NULL;
-    }
     zsys_handler_set (s_signal_handler);
     return self;
 }
@@ -126,14 +121,17 @@ zctx_destroy (zctx_t **self_p)
     assert (self_p);
     if (*self_p) {
         zctx_t *self = *self_p;
-        // Destroy all sockets
+
+        //  Destroy all sockets
         while (zlist_size (self->sockets))
             zctx__socket_destroy (self, zlist_first (self->sockets));
         zlist_destroy (&self->sockets);
-        zmutex_destroy (&self->socketsMutex);
-        // Destroy the socket itsef
-        if (self->main && self->context)
+        zmutex_destroy (&self->mutex);
+
+        //  ZMQ context may not yet be instantiated
+        if (self->context && !self->shadow)
             zmq_term (self->context);
+
         free (self);
         *self_p = NULL;
     }
@@ -156,22 +154,20 @@ zctx_shadow (zctx_t *ctx)
     if (!self)
         return NULL;
 
+    self->sockets = zlist_new ();
+    self->mutex = zmutex_new ();
+    if (!self->sockets || !self->mutex) {
+        zlist_destroy (&self->sockets);
+        zmutex_destroy (&self->mutex);
+        free (self);
+        return NULL;
+    }
     self->context = ctx->context;
     self->pipehwm = ctx->pipehwm;
     self->sndhwm = ctx->sndhwm;
     self->rcvhwm = ctx->rcvhwm;
     self->linger = ctx->linger;
-    self->sockets = zlist_new ();
-    if (!self->sockets) {
-        free (self);
-        return NULL;
-    }
-    self->socketsMutex = zmutex_new ();
-    if (!self->socketsMutex) {
-        zlist_destroy (&self->sockets);
-        free(self);
-        return NULL;
-    }
+    self->shadow = true;             //  This is a shadow context
     return self;
 }
 
@@ -185,7 +181,9 @@ void
 zctx_set_iothreads (zctx_t *self, int iothreads)
 {
     assert (self);
+    zmutex_lock (self->mutex);
     self->iothreads = iothreads;
+    zmutex_unlock (self->mutex);
 }
 
 
@@ -198,7 +196,9 @@ void
 zctx_set_linger (zctx_t *self, int linger)
 {
     assert (self);
+    zmutex_lock (self->mutex);
     self->linger = linger;
+    zmutex_unlock (self->mutex);
 }
 
 
@@ -214,7 +214,9 @@ void
 zctx_set_pipehwm (zctx_t *self, int pipehwm)
 {
     assert (self);
+    zmutex_lock (self->mutex);
     self->pipehwm = pipehwm;
+    zmutex_unlock (self->mutex);
 }
 
     
@@ -227,7 +229,9 @@ void
 zctx_set_sndhwm (zctx_t *self, int sndhwm)
 {
     assert (self);
+    zmutex_lock (self->mutex);
     self->sndhwm = sndhwm;
+    zmutex_unlock (self->mutex);
 }
 
     
@@ -240,7 +244,9 @@ void
 zctx_set_rcvhwm (zctx_t *self, int rcvhwm)
 {
     assert (self);
+    zmutex_lock (self->mutex);
     self->rcvhwm = rcvhwm;
+    zmutex_unlock (self->mutex);
 }
 
 
@@ -263,8 +269,10 @@ zctx__socket_new (zctx_t *self, int type)
 {
     //  Initialize context now if necessary
     assert (self);
+    zmutex_lock (self->mutex);
     if (!self->context)
         self->context = zmq_init (self->iothreads);
+    zmutex_unlock (self->mutex);
     if (!self->context)
         return NULL;
 
@@ -281,13 +289,13 @@ zctx__socket_new (zctx_t *self, int type)
     zsocket_set_sndhwm (zocket, self->sndhwm);
     zsocket_set_rcvhwm (zocket, self->rcvhwm);
 #endif
-    zmutex_lock (self->socketsMutex);
+    zmutex_lock (self->mutex);
     if (zlist_push (self->sockets, zocket)) {
-        zmutex_unlock (self->socketsMutex);
+        zmutex_unlock (self->mutex);
         zmq_close (zocket);
         return NULL;
     }
-    zmutex_unlock (self->socketsMutex);
+    zmutex_unlock (self->mutex);
     return zocket;
 }
 
@@ -313,13 +321,13 @@ void
 zctx__socket_destroy (zctx_t *self, void *zocket)
 {
     assert (self);
-    if(zocket != NULL) {
-        zsocket_set_linger (zocket, self->linger);
-        zmq_close (zocket);
-    }
-    zmutex_lock (self->socketsMutex);
+    assert (zocket);
+    zsocket_set_linger (zocket, self->linger);
+    zmq_close (zocket);
+
+    zmutex_lock (self->mutex);
     zlist_remove (self->sockets, zocket);
-    zmutex_unlock (self->socketsMutex);
+    zmutex_unlock (self->mutex);
 }
 
 
