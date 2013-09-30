@@ -50,33 +50,41 @@ CZMQ_EXPORT zfile_t *
 CZMQ_EXPORT char *
     zfile_filename (zfile_t *self, char *path);
 
-//  Return when the file was last modified.
-//  Updates the file statistics from disk at every call.
+//  Refresh file properties from disk; this is not done automatically
+//  on access methods, otherwise it is not possible to compare directory
+//  snapshots.
+CZMQ_EXPORT void
+    zfile_restat (zfile_t *self);
+
+//  Return when the file was last modified. If you want this to reflect the
+//  current situation, call zfile_restat before checking this property.
 CZMQ_EXPORT time_t
     zfile_modified (zfile_t *self);
 
-//  Return the last-known size of the file.
-//  Updates the file statistics from disk at every call.
+//  Return the last-known size of the file. If you want this to reflect the
+//  current situation, call zfile_restat before checking this property.
 CZMQ_EXPORT off_t
     zfile_cursize (zfile_t *self);
 
-//  Return true if the file is a directory.
-//  Updates the file statistics from disk at every call.
+//  Return true if the file is a directory. If you want this to reflect
+//  any external changes, call zfile_restat before checking this property.
 CZMQ_EXPORT bool
     zfile_is_directory (zfile_t *self);
 
-//  Return true if the file is a regular file.
-//  Updates the file statistics from disk at every call.
+//  Return true if the file is a regular file. If you want this to reflect
+//  any external changes, call zfile_restat before checking this property.
 CZMQ_EXPORT bool
     zfile_is_regular (zfile_t *self);
 
-//  Return true if the file is readable by this process
-//  Updates the file statistics from disk at every call.
+//  Return true if the file is readable by this process. If you want this to
+//  reflect any external changes, call zfile_restat before checking this
+//  property.
 CZMQ_EXPORT bool
     zfile_is_readable (zfile_t *self);
 
-//  Return true if the file is writeable by this process
-//  Updates the file statistics from disk at every call.
+//  Return true if the file is writeable by this process. If you want this
+//  to reflect any external changes, call zfile_restat before checking this
+//  property.
 CZMQ_EXPORT bool
     zfile_is_writeable (zfile_t *self);
 

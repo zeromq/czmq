@@ -53,15 +53,13 @@ struct _zfile_t {
     bool stable;            //  true if file is stable
     bool eof;               //  true if at end of file
     FILE *handle;           //  Read/write handle
+
     //  Properties from files that exist on file system
     time_t modified;        //  Modification time
     off_t  cursize;         //  Size of the file
     mode_t mode;            //  POSIX permission bits
 };
 
-
-//  Prototypes of local functions
-static void s_restat (zfile_t *self);
 
 //  --------------------------------------------------------------------------
 //  Constructor
@@ -96,32 +94,9 @@ zfile_new (const char *path, const char *name)
             fclose (handle);
         }
     }
-    s_restat (self);
+    zfile_restat (self);
     return self;
 }
-
-//  Refreshes file properties from file system
-
-static void
-s_restat (zfile_t *self)
-{
-    assert (self);
-    struct stat stat_buf;
-    char *real_name = self->link? self->link: self->fullname;
-    if (stat (real_name, &stat_buf) == 0) {
-        self->cursize = stat_buf.st_size;
-        self->modified = stat_buf.st_mtime;
-        self->mode = zsys_file_mode (real_name);
-        self->stable = zsys_file_stable (real_name);
-    }
-    else {
-        self->cursize = 0;
-        self->modified = 0;
-        self->mode = 0;
-        self->stable = false;
-    }
-}
-
 
 //  --------------------------------------------------------------------------
 //  Destroy a file item
@@ -181,92 +156,114 @@ zfile_filename (zfile_t *self, char *path)
 
 
 //  --------------------------------------------------------------------------
-//  Return when the file was last modified.
-//  Updates the file statistics from disk at every call.
+//  Refresh file properties from disk; this is not done automatically
+//  on access methods, otherwise it is not possible to compare directory
+//  snapshots.
+
+void
+zfile_restat (zfile_t *self)
+{
+    assert (self);
+    struct stat stat_buf;
+    char *real_name = self->link? self->link: self->fullname;
+    if (stat (real_name, &stat_buf) == 0) {
+        self->cursize = stat_buf.st_size;
+        self->modified = stat_buf.st_mtime;
+        self->mode = zsys_file_mode (real_name);
+        self->stable = zsys_file_stable (real_name);
+    }
+    else {
+        self->cursize = 0;
+        self->modified = 0;
+        self->mode = 0;
+        self->stable = false;
+    }
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return when the file was last modified. If you want this to reflect the
+//  current situation, call zfile_restat before checking this property.
 
 time_t
 zfile_modified (zfile_t *self)
 {
     assert (self);
-    s_restat (self);
     return self->modified;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Return the last-known size of the file.
-//  Updates the file statistics from disk at every call.
+//  Return the last-known size of the file. If you want this to reflect the
+//  current situation, call zfile_restat before checking this property.
 
 off_t
 zfile_cursize (zfile_t *self)
 {
     assert (self);
-    s_restat (self);
     return self->cursize;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Return true if the file is a directory.
-//  Updates the file statistics from disk at every call.
+//  Return true if the file is a directory. If you want this to reflect
+//  any external changes, call zfile_restat before checking this property.
 
 bool
 zfile_is_directory (zfile_t *self)
 {
     assert (self);
-    s_restat (self);
     return (self->mode & S_IFDIR) != 0;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Return true if the file is a regular file.
-//  Updates the file statistics from disk at every call.
+//  Return true if the file is a regular file. If you want this to reflect
+//  any external changes, call zfile_restat before checking this property.
 
 bool
 zfile_is_regular (zfile_t *self)
 {
     assert (self);
-    s_restat (self);
     return (self->mode & S_IFREG) != 0;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Return true if the file is readable by this process
-//  Updates the file statistics from disk at every call.
+//  Return true if the file is readable by this process. If you want this to
+//  reflect any external changes, call zfile_restat before checking this
+//  property.
 
 bool
 zfile_is_readable (zfile_t *self)
 {
     assert (self);
-    s_restat (self);
     return (self->mode & S_IREAD) != 0;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Return true if the file is writeable by this process
-//  Updates the file statistics from disk at every call.
+//  Return true if the file is writeable by this process. If you want this
+//  to reflect any external changes, call zfile_restat before checking this
+//  property.
 
 bool
 zfile_is_writeable (zfile_t *self)
 {
     assert (self);
-    s_restat (self);
     return (self->mode & S_IWRITE) != 0;
 }
 
 
 //  --------------------------------------------------------------------------
 //  Check if file has stopped changing and can be safely processed.
-//  Updates the file statistics from disk at every call.
+//  If you want this to reflect the current situation, call zfile_restat
+//  before checking this property.
 
 bool
 zfile_is_stable (zfile_t *self)
 {
     assert (self);
-    s_restat (self);
     return self->stable;
 }
 
@@ -400,7 +397,7 @@ zfile_close (zfile_t *self)
     assert (self);
     if (self->handle) {
         fclose (self->handle);
-        s_restat (self);
+        zfile_restat (self);
     }
     self->handle = 0;
 }
@@ -473,12 +470,15 @@ zfile_test (bool verbose)
     //  Write 100 bytes at position 1,000,000 in the file
     rc = zfile_write (file, chunk, 1000000);
     assert (rc == 0);
+    zchunk_destroy (&chunk);
     zfile_close (file);
     assert (zfile_is_readable (file));
     assert (zfile_cursize (file) == 1000100);
+    zfile_restat (file);
     assert (!zfile_is_stable (file));
-    zchunk_destroy (&chunk);
     zclock_sleep (1001);
+    assert (!zfile_is_stable (file));
+    zfile_restat (file);
     assert (zfile_is_stable (file));
 
     //  Check we can read from file
@@ -514,6 +514,8 @@ zfile_test (bool verbose)
     zdir_destroy (&dir);
 
     //  Check we can no longer read from file
+    assert (zfile_is_readable (file));
+    zfile_restat (file);
     assert (!zfile_is_readable (file));
     rc = zfile_input (file);
     assert (rc == -1);
