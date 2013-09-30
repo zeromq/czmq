@@ -446,6 +446,7 @@ zfile_test (bool verbose)
     assert (chunk);
     assert (zchunk_size (chunk) == 1000100);
     zchunk_destroy (&chunk);
+    zfile_close (file);
 
     //  Remove file and directory
     zdir_t *dir = zdir_new ("./this", NULL);
