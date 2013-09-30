@@ -89,19 +89,24 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT void
     zfile_remove (zfile_t *self);
 
-//  Open file for reading, returns 0 if OK, else -1.
+//  Open file for reading
+//  Returns 0 if OK, -1 if not found or not accessible
 CZMQ_EXPORT int
     zfile_input (zfile_t *self);
 
-//  Open file for writing, creating full directory path if needed
+//  Open file for writing, creating directory if needed
+//  File is created if necessary; chunks can be written to file at any
+//  location. Returns 0 if OK, -1 if error.
 CZMQ_EXPORT int
     zfile_output (zfile_t *self);
 
-//  Read chunk from file at specified position
+//  Read chunk from file at specified position. If this was the last chunk,
+//  sets self->eof. Returns a null chunk in case of error.
 CZMQ_EXPORT zchunk_t *
     zfile_read (zfile_t *self, size_t bytes, off_t offset);
 
 //  Write chunk to file at specified position
+//  Return 0 if OK, else -1
 CZMQ_EXPORT int
     zfile_write (zfile_t *self, zchunk_t *chunk, off_t offset);
 

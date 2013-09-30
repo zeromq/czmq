@@ -25,10 +25,19 @@
 
 /*
 @header
-    The zfile class provides methods to work with files. This class is a new
-    API, deprecating the old zfile class (which still exists but is implemented
-    in zsys now).
+    The zfile class provides methods to work with disk files. A file object
+    provides the modified date, current size, and type of the file. You can
+    create a file object for a filename that does not yet exist. To read or
+    write data from the file, use the input and output methods, and then
+    read and write chunks. The output method lets you both read and write
+    chunks, at any offset. Finally, this class provides portable symbolic
+    links. If a filename ends in ".ln", the first line of text in the file
+    is read, and used as the underlying file for read/write operations.
+    This lets you manipulate (e.g.) copy symbolic links without copying
+    the perhaps very large files they point to.
 @discuss
+    This class is a new API, deprecating the old zfile class (which still
+    exists but is implemented in zsys now).
 @end
 */
 
@@ -39,6 +48,7 @@
 struct _zfile_t {
     //  Properties for all file objects
     char *fullname;         //  File name with path
+    char *link;             //  Optional linked file
     bool exists;            //  true if file exists
     bool stable;            //  true if file is stable
     bool eof;               //  true if at end of file
@@ -55,7 +65,10 @@ static void s_restat (zfile_t *self);
 
 //  --------------------------------------------------------------------------
 //  Constructor
-//  If file exists, populates properties
+//  If file exists, populates properties. CZMQ supports portable symbolic
+//  links, which are files with the extension ".ln". A symbolic link is a
+//  text file containing one line, the filename of a target file. Reading
+//  data from the symbolic link actually reads from the target file.
 
 zfile_t *
 zfile_new (const char *path, const char *name)
@@ -65,6 +78,24 @@ zfile_new (const char *path, const char *name)
     //  Format full path to file
     self->fullname = (char *) zmalloc (strlen (path) + strlen (name) + 2);
     sprintf (self->fullname, "%s/%s", path, name);
+
+    //  Resolve symbolic link if possible
+    if (strlen (self->fullname) > 3
+    &&  streq (self->fullname + strlen (self->fullname) - 3, ".ln")) {
+        FILE *handle = fopen (self->fullname, "r");
+        if (handle) {
+            char buffer [256];
+            if (fgets (buffer, 256, handle)) {
+                //  We have the contents of the symbolic link
+                if (buffer [strlen (buffer) - 1] == '\n')
+                    buffer [strlen (buffer) - 1] = 0;
+                self->link = strdup (buffer);
+                //  Chop ".ln" off name for external use
+                self->fullname [strlen (self->fullname) - 3] = 0;
+            }
+            fclose (handle);
+        }
+    }
     s_restat (self);
     return self;
 }
@@ -76,11 +107,12 @@ s_restat (zfile_t *self)
 {
     assert (self);
     struct stat stat_buf;
-    if (stat (self->fullname, &stat_buf) == 0) {
+    char *real_name = self->link? self->link: self->fullname;
+    if (stat (real_name, &stat_buf) == 0) {
         self->cursize = stat_buf.st_size;
         self->modified = stat_buf.st_mtime;
-        self->mode = zsys_file_mode (self->fullname);
-        self->stable = zsys_file_stable (self->fullname);
+        self->mode = zsys_file_mode (real_name);
+        self->stable = zsys_file_stable (real_name);
     }
     else {
         self->cursize = 0;
@@ -103,6 +135,7 @@ zfile_destroy (zfile_t **self_p)
         if (self->handle)
             fclose (self->handle);
         free (self->fullname);
+        free (self->link);
         free (self);
         *self_p = NULL;
     }
@@ -122,6 +155,7 @@ zfile_dup (zfile_t *self)
     copy->fullname = strdup (self->fullname);
     copy->modified = self->modified;
     copy->cursize = self->cursize;
+    copy->link = self->link? strdup (self->link): NULL;
     copy->mode = self->mode;
     return copy;
 }
@@ -244,6 +278,9 @@ void
 zfile_remove (zfile_t *self)
 {
     assert (self);
+    //  Restore ".ln" in file name if this was a symbolic link
+    if (self->link)
+        self->fullname [strlen (self->fullname)] = '.';
     zfile_close (self);
     zsys_file_delete (self->fullname);
 }
@@ -260,10 +297,11 @@ zfile_input (zfile_t *self)
     if (self->handle)
         zfile_close (self);
 
-    self->handle = fopen (self->fullname, "rb");
+    char *real_name = self->link? self->link: self->fullname;
+    self->handle = fopen (real_name, "rb");
     if (self->handle) {
         struct stat stat_buf;
-        if (stat (self->fullname, &stat_buf) == 0)
+        if (stat (real_name, &stat_buf) == 0)
             self->cursize = stat_buf.st_size;
         else
             self->cursize = 0;
@@ -282,6 +320,11 @@ zfile_output (zfile_t *self)
 {
     assert (self);
     
+    //  Wipe symbolic link if that's what the file was
+    if (self->link) {
+        free (self->link);
+        self->link = NULL;
+    }
     //  Create file path if it doesn't exist
     char *file_path = strdup (self->fullname);
     char *last_slash = strrchr (file_path, '/');
@@ -305,9 +348,8 @@ zfile_output (zfile_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Read chunk from file at specified position
-//  If this was the last chunk, sets self->eof
-//  Null chunk means there was another error
+//  Read chunk from file at specified position. If this was the last chunk,
+//  sets self->eof. Returns a null chunk in case of error.
 
 zchunk_t *
 zfile_read (zfile_t *self, size_t bytes, off_t offset)
@@ -448,9 +490,25 @@ zfile_test (bool verbose)
     zchunk_destroy (&chunk);
     zfile_close (file);
 
+    //  Try some fun with symbolic links
+    zfile_t *link = zfile_new ("./this/is/a/test", "bilbo.ln");
+    rc = zfile_output (link);
+    assert (rc == 0);
+    fprintf (zfile_handle (link), "./this/is/a/test/bilbo\n");
+    zfile_destroy (&link);
+
+    link = zfile_new ("./this/is/a/test", "bilbo.ln");
+    rc = zfile_input (link);
+    assert (rc == 0);
+    chunk = zfile_read (link, 1000100, 0);
+    assert (chunk);
+    assert (zchunk_size (chunk) == 1000100);
+    zchunk_destroy (&chunk);
+    zfile_destroy (&link);
+
     //  Remove file and directory
     zdir_t *dir = zdir_new ("./this", NULL);
-    assert (zdir_cursize (dir) == 1000100);
+    assert (zdir_cursize (dir) == 2000200);
     zdir_remove (dir, true);
     assert (zdir_cursize (dir) == 0);
     zdir_destroy (&dir);
