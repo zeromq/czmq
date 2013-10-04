@@ -151,17 +151,8 @@ zmutex_test (bool verbose)
 
     //  @selftest
     zmutex_t *mutex = zmutex_new ();
-    // Try to lock while unlocked
-    assert (zmutex_try_lock (mutex));
-    zmutex_unlock (mutex);
-    // Try to lock while locked
     zmutex_lock (mutex);
-    assert (zmutex_try_lock (mutex) == 0);
     zmutex_unlock (mutex);
-    // Try to lock while unlocked, again
-    assert (zmutex_try_lock (mutex));
-    zmutex_unlock (mutex);
-    
     zmutex_destroy (&mutex);
     //  @end
     printf ("OK\n");
