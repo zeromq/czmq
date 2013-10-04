@@ -472,34 +472,33 @@ static inline void *
 
 #include "zmq.h"
 
-//  Work with pre-ZMQ_STREAM versions of libzmq
-#ifndef ZMQ_STREAM
-#   define ZMQ_STREAM       11
-#endif
+#if ZMQ_VERSION_MAJOR == 4
+#   define ZMQ_POLL_MSEC    1           //  zmq_poll is msec
 
-//  Older libzmq APIs will be missing some aspects of libzmq/3.0
-#ifndef ZMQ_ROUTER
-#   define ZMQ_ROUTER       ZMQ_XREP
-#endif
-#ifndef ZMQ_DEALER
-#   define ZMQ_DEALER       ZMQ_XREQ
-#endif
-#ifndef ZMQ_DONTWAIT
-#   define ZMQ_DONTWAIT     ZMQ_NOBLOCK
-#endif
-#ifndef ZMQ_XSUB
-#   error "please upgrade to latest stable libzmq from http://zeromq.org"
-#endif
-#if ZMQ_VERSION_MAJOR == 2
+#elif ZMQ_VERSION_MAJOR == 3
+#   define ZMQ_POLL_MSEC    1           //  zmq_poll is msec
+
+#elif ZMQ_VERSION_MAJOR == 2
+#   define ZMQ_POLL_MSEC    1000        //  zmq_poll is usec
+#   define zmq_sendmsg      zmq_send    //  Smooth out 2.x changes
+#   define zmq_recvmsg      zmq_recv
+    //  Older libzmq APIs may be missing some aspects of libzmq v3.0
+#   ifndef ZMQ_ROUTER
+#       define ZMQ_ROUTER       ZMQ_XREP
+#   endif
+#   ifndef ZMQ_DEALER
+#       define ZMQ_DEALER       ZMQ_XREQ
+#   endif
+#   ifndef ZMQ_DONTWAIT
+#       define ZMQ_DONTWAIT     ZMQ_NOBLOCK
+#   endif
+#   ifndef ZMQ_XSUB
+#       error "please upgrade your libzmq from http://zeromq.org"
+#   endif
 #   if  ZMQ_VERSION_MINOR == 0 \
     || (ZMQ_VERSION_MINOR == 1 && ZMQ_VERSION_PATCH < 7)
 #       error "CZMQ requires at least libzmq/2.1.7 stable"
 #   endif
-#   define zmq_sendmsg      zmq_send
-#   define zmq_recvmsg      zmq_recv
-#   define ZMQ_POLL_MSEC    1000        //  zmq_poll is usec
-#elif ZMQ_VERSION_MAJOR == 3 || ZMQ_VERSION_MAJOR == 4
-#   define ZMQ_POLL_MSEC    1           //  zmq_poll is msec
 #endif
 
 #endif

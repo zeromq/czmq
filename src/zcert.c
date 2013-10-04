@@ -47,7 +47,7 @@
 #include "../include/czmq.h"
 #include "platform.h"
 
-#ifdef HAVE_LIBSODIUM
+#if defined (HAVE_LIBSODIUM)
 #   include <sodium.h>
 #   if crypto_box_PUBLICKEYBYTES != 32 \
     || crypto_box_SECRETKEYBYTES != 32 \
@@ -77,7 +77,7 @@ zcert_new (void)
 {
     byte public_key [32] = { 0 };
     byte secret_key [32] = { 0 };
-#ifdef HAVE_LIBSODIUM
+#if defined (HAVE_LIBSODIUM)
     int rc = crypto_box_keypair (public_key, secret_key);
     assert (rc == 0);
 #endif
