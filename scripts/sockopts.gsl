@@ -168,7 +168,9 @@ int zsockopt_test (bool verbose);
 void
 zsocket_set_$(name) (void *zocket, $(ctype_const) $(name))
 {
+.       if style = "macro"
 #   if defined (ZMQ_$(NAME))
+.       endif
 .       if defined (.ifdef)
 #     if defined ($(ifdef:))
 .       endif
@@ -210,7 +212,9 @@ zsocket_set_$(name) (void *zocket, $(ctype_const) $(name))
 .       if defined (.ifdef)
 #     endif
 .       endif
+.       if style = "macro"
 #   endif
+.       endif
 }
 
 
@@ -223,7 +227,9 @@ zsocket_set_$(name) (void *zocket, $(ctype_const) $(name))
 void
 zsocket_set_$(name)_bin (void *zocket, const byte *$(name))
 {
+.       if style = "macro"
 #   if defined (ZMQ_$(NAME))
+.       endif
 .       if defined (.ifdef)
 #     if defined ($(ifdef:))
 .       endif
@@ -232,7 +238,9 @@ zsocket_set_$(name)_bin (void *zocket, const byte *$(name))
 .       if defined (.ifdef)
 #     endif
 .       endif
+.       if style = "macro"
 #   endif
+.       endif
 }
 
 
@@ -246,7 +254,9 @@ zsocket_set_$(name)_bin (void *zocket, const byte *$(name))
 $(ctype) 
 zsocket_$(name) (void *zocket)
 {
+.           if style = "macro"
 #   if defined (ZMQ_$(NAME))
+.           endif
 .           if type = "uint64"
     uint64_t $(name);
     size_t option_len = sizeof (uint64_t);
@@ -273,13 +283,15 @@ zsocket_$(name) (void *zocket)
 .           else
     return ($(ctype)) $(name);
 .           endif
+.           if style = "macro"
 #   else
-.           if type = "string" | type = "key"
+.               if type = "string" | type = "key"
     return NULL;
-.           else
+.               else
     return 0;
-.           endif
+.               endif
 #   endif
+.           endif
 }
 
 
@@ -314,10 +326,12 @@ zsockopt_test (bool verbose)
 .       if defined (.minor)
 #   if (ZMQ_VERSION_MINOR == $(minor))
 .       endif
-.       if defined (.ifdef)
-#     if defined ($(ifdef:))
+.       if style = "macro"
+#     if defined (ZMQ_$(NAME))
 .       endif
-#       if defined (ZMQ_$(NAME))
+.       if defined (.ifdef)
+#       if defined ($(ifdef:))
+.       endif
     zocket = zsocket_new (ctx, ZMQ_$(TEST));
     assert (zocket);
 .       if mode = "rw" | mode = "w"
@@ -340,8 +354,10 @@ zsockopt_test (bool verbose)
 .           endif
 .       endif
     zsocket_destroy (ctx, zocket);
-#       endif
 .       if defined (.ifdef)
+#       endif
+.       endif
+.       if style = "macro"
 #     endif
 .       endif
 .       if defined (.minor)

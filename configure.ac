@@ -256,6 +256,7 @@ AC_CHECK_HEADERS([net/if.h net/if_media.h linux/wireless.h], [], [],
 #ifdef HAVE_SYS_SOCKET_H
 # include <sys/socket.h>
 #endif
+#include <stdint.h>
 ])
 
 # Checks for typedefs, structures, and compiler characteristics.
