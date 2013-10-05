@@ -4,7 +4,7 @@
      use 'gsl sockopts'
 -->
 <options script = "sockopts">
-    <version major = "4">
+    <version major = "4" style = "enum">
         <!-- New names for deprecated 3.x options -->
         <option name = "ipv6"              type = "int"    mode = "rw" test = "SUB" />
         <option name = "immediate"         type = "int"    mode = "w"  test = "DEALER" />
@@ -64,7 +64,7 @@
         <include name = "set_hwm" />
     </version>
     
-    <version major = "3">
+    <version major = "3" style = "macro">
         <!-- Options that are carried forward to 4.0 -->
         <include name = "3-x options" />
         
@@ -81,7 +81,7 @@
     </version>
 
     <!-- Legacy version 2 -->
-    <version major = "2">
+    <version major = "2" style = "macro">
         <option name = "hwm"               type = "uint64" mode = "rw" test = "SUB" />
         <option name = "swap"              type = "int64"  mode = "rw" test = "SUB" />
         <option name = "affinity"          type = "uint64" mode = "rw" test = "SUB" />
@@ -161,11 +161,6 @@
         <header>
 //  Emulation of widely-used 2.x socket options
 CZMQ_EXPORT void zsocket_set_hwm (void *zocket, int hwm);
-
-//  Patch in case we're on older libzmq
-#ifndef ZMQ_STREAM
-#define ZMQ_STREAM 11
-#endif
         </header>
         <source>
 //  --------------------------------------------------------------------------

@@ -124,11 +124,6 @@ CZMQ_EXPORT void zsocket_set_tcp_accept_filter (void *zocket, const char * tcp_a
 
 //  Emulation of widely-used 2.x socket options
 CZMQ_EXPORT void zsocket_set_hwm (void *zocket, int hwm);
-
-//  Patch in case we're on older libzmq
-#ifndef ZMQ_STREAM
-#define ZMQ_STREAM 11
-#endif
 #endif
 
 #if (ZMQ_VERSION_MAJOR == 3)
@@ -192,11 +187,6 @@ CZMQ_EXPORT void zsocket_set_tcp_accept_filter (void *zocket, const char * tcp_a
 
 //  Emulation of widely-used 2.x socket options
 CZMQ_EXPORT void zsocket_set_hwm (void *zocket, int hwm);
-
-//  Patch in case we're on older libzmq
-#ifndef ZMQ_STREAM
-#define ZMQ_STREAM 11
-#endif
 #endif
 
 #if (ZMQ_VERSION_MAJOR == 2)
