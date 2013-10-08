@@ -4,7 +4,7 @@
      use 'gsl sockopts'
 -->
 <options script = "sockopts">
-    <version major = "4" style = "enum">
+    <version major = "4" style = "macro">
         <!-- New names for deprecated 3.x options -->
         <option name = "ipv6"              type = "int"    mode = "rw" test = "SUB" />
         <option name = "immediate"         type = "int"    mode = "w"  test = "DEALER" />
