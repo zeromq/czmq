@@ -459,16 +459,13 @@ s_agent_new (void *pipe, int port_nbr)
     //  PROBLEM: this design will not survive the network interface
     //  being killed and restarted while the program is running
 
-    //  Bind to the port on all interfaces
-    inaddr_t sockaddr = { 0 };
-    sockaddr.sin_family = AF_INET;
-    sockaddr.sin_port = htons (self->port_nbr);
-    sockaddr.sin_addr.s_addr = htonl (INADDR_ANY);
-    if (bind (self->udpsock, (struct sockaddr *) &sockaddr, sizeof (sockaddr)) == SOCKET_ERROR)
-        s_handle_io_error ("bind");
-
     //  Get the network interface
     s_get_interface (self);
+
+    //  Bind to the port on all interfaces
+    inaddr_t sockaddr = self->broadcast;
+    if (bind (self->udpsock, (struct sockaddr *) &sockaddr, sizeof (sockaddr)) == SOCKET_ERROR)
+        s_handle_io_error ("bind");
 
     //  Send our hostname back to API
     char hostname [INET_ADDRSTRLEN];
@@ -531,6 +528,13 @@ s_handle_io_error (char *reason)
 static void
 s_get_interface (agent_t *self)
 {
+    if(!zsys_interface()) {
+        //  Set broadcast address and port
+        self->broadcast.sin_family = AF_INET;
+        self->broadcast.sin_addr.s_addr = INADDR_BROADCAST;
+        self->broadcast.sin_port = htons (self->port_nbr);
+        return;
+    }
 #if defined (__UNIX__)
 #   if defined (HAVE_GETIFADDRS) && defined (HAVE_FREEIFADDRS)
     struct ifaddrs *interfaces;
@@ -605,10 +609,6 @@ s_get_interface (agent_t *self)
 #   else
 #       error "Interface detection TBD on this operating system"
 #   endif
-
-    //  Set broadcast address and port
-    self->broadcast.sin_addr.s_addr = INADDR_BROADCAST;
-    self->broadcast.sin_port = htons (self->port_nbr);
 }
 
 //  Check if a given NIC name is wireless
