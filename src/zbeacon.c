@@ -302,6 +302,7 @@ zbeacon_test (bool verbose)
         zbeacon_socket (node2), 
         zbeacon_socket (node3), NULL);
         
+    int num_beacons_recvd = 0;
     int64_t stop_at = zclock_time () + 1000;
     while (zclock_time () < stop_at) {
         long timeout = (long) (stop_at - zclock_time ());
@@ -313,10 +314,12 @@ zbeacon_test (bool verbose)
             char *ipaddress, *beacon;
             zstr_recvx (zbeacon_socket (node1), &ipaddress, &beacon, NULL);
             assert (streq (beacon, "NODE/2"));
+            num_beacons_recvd++;
             free (ipaddress);
             free (beacon);
         }
     }
+    assert(num_beacons_recvd > 0);
     zpoller_destroy (&poller);
     
     //  Stop listening
@@ -541,18 +544,29 @@ s_get_interface (agent_t *self)
     if (getifaddrs (&interfaces) == 0) {
         struct ifaddrs *interface = interfaces;
         while (interface) {
-            //  Hopefully the last interface will be WiFi or Ethernet
             if (interface->ifa_addr && 
                 interface->ifa_broadaddr && // on Solaris, loopback interfaces have a NULL in ifa_broadaddr
                 (interface->ifa_addr->sa_family == AF_INET)) {
                 self->address = *(inaddr_t *) interface->ifa_addr;
                 self->broadcast = *(inaddr_t *) interface->ifa_broadaddr;
                 self->broadcast.sin_port = htons (self->port_nbr);
-                if (streq (interface->ifa_name, zsys_interface ())
-                ||  s_wireless_nic (interface->ifa_name))
+
+                //  If an interface was specified and this is it OR if no interface was
+                //  specified and this is a wireless interface then desired interface found.
+                if (strlen (zsys_interface ()) != 0) {
+                    if (streq (interface->ifa_name, zsys_interface ()))
+                        break;
+                }
+                else
+                if (s_wireless_nic (interface->ifa_name))
                     break;
             }
             interface = interface->ifa_next;
+        }
+        //  If the returned broadcast address is the same as source address build
+        //  the broadcast address from the source address and netmask.
+        if (self->address.sin_addr.s_addr == self->broadcast.sin_addr.s_addr) {
+            self->broadcast.sin_addr.s_addr &= ((inaddr_t *) interface->ifa_netmask)->sin_addr.s_addr;
         }
     }
     freeifaddrs (interfaces);
