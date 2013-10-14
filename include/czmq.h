@@ -62,6 +62,7 @@
 #include "zsys.h"
 #include "zthread.h"
 #include "ztree.h"
+#include "zrex.h"
 #include "zbeacon.h"
 #include "zauth.h"
 #include "zcert.h"

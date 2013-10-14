@@ -39,16 +39,18 @@
 &emsp;<a href="#toc4-331">zsockopt - working with ØMQ socket options</a>
 &emsp;<a href="#toc4-342">zstr - sending and receiving strings</a>
 &emsp;<a href="#toc4-367">zsys - system-level methods</a>
-&emsp;<a href="#toc4-378">zthread - working with system threads</a>
+&emsp;<a href="#toc4-378">zrex - working with regular expressions</a>
 &emsp;<a href="#toc4-389">ztree - generic red-black tree container</a>
+&emsp;<a href="#toc4-393">zthread - working with system threads</a>
+&emsp;<a href="#toc4-404">ztree - generic red-black tree container</a>
 
-**<a href="#toc2-400">Under the Hood</a>**
-&emsp;<a href="#toc3-403">Adding a New Class</a>
-&emsp;<a href="#toc3-415">Documentation</a>
-&emsp;<a href="#toc3-454">Development</a>
-&emsp;<a href="#toc3-464">Porting CZMQ</a>
-&emsp;<a href="#toc3-475">Code Generation</a>
-&emsp;<a href="#toc3-480">This Document</a>
+**<a href="#toc2-415">Under the Hood</a>**
+&emsp;<a href="#toc3-418">Adding a New Class</a>
+&emsp;<a href="#toc3-430">Documentation</a>
+&emsp;<a href="#toc3-469">Development</a>
+&emsp;<a href="#toc3-479">Porting CZMQ</a>
+&emsp;<a href="#toc3-490">Code Generation</a>
+&emsp;<a href="#toc3-495">This Document</a>
 
 <A name="toc2-13" title="Overview" />
 ## Overview
@@ -559,7 +561,6 @@ usage is 1 I/O thread. Lets you configure this value.
 such as zmq_recv() and zmq_poll() will return when the user presses
 Ctrl-C.
 
-
 This is the class interface:
 
     //  Create new context, returns context object, replaces zmq_init
@@ -651,6 +652,10 @@ This is the class interface:
     CZMQ_EXPORT off_t
         zdir_cursize (zdir_t *self);
     
+    //  Return directory count
+    CZMQ_EXPORT size_t
+        zdir_count (zdir_t *self);
+        
     //  Returns a sorted array of zfile objects; returns a single block of memory,
     //  that you destroy by calling free(). Each entry in the array is a pointer
     //  to a zfile_t item already allocated in the zdir tree. The array ends with
@@ -677,9 +682,16 @@ This is the class interface:
 <A name="toc4-232" title="zfile - work with files" />
 #### zfile - work with files
 
-The zfile class provides methods to work with files. This class is a new
-API, deprecating the old zfile class (which still exists but is implemented
-in zsys now).
+The zfile class provides methods to work with disk files. A file object
+provides the modified date, current size, and type of the file. You can
+create a file object for a filename that does not yet exist. To read or
+write data from the file, use the input and output methods, and then
+read and write chunks. The output method lets you both read and write
+chunks, at any offset. Finally, this class provides portable symbolic
+links. If a filename ends in ".ln", the first line of text in the file
+is read, and used as the underlying file for read/write operations.
+This lets you manipulate (e.g.) copy symbolic links without copying
+the perhaps very large files they point to.
 
 This is the class interface:
 
@@ -699,33 +711,41 @@ This is the class interface:
     CZMQ_EXPORT char *
         zfile_filename (zfile_t *self, char *path);
     
-    //  Return when the file was last modified.
-    //  Updates the file statistics from disk at every call.
+    //  Refresh file properties from disk; this is not done automatically
+    //  on access methods, otherwise it is not possible to compare directory
+    //  snapshots.
+    CZMQ_EXPORT void
+        zfile_restat (zfile_t *self);
+    
+    //  Return when the file was last modified. If you want this to reflect the
+    //  current situation, call zfile_restat before checking this property.
     CZMQ_EXPORT time_t
         zfile_modified (zfile_t *self);
     
-    //  Return the last-known size of the file.
-    //  Updates the file statistics from disk at every call.
+    //  Return the last-known size of the file. If you want this to reflect the
+    //  current situation, call zfile_restat before checking this property.
     CZMQ_EXPORT off_t
         zfile_cursize (zfile_t *self);
     
-    //  Return true if the file is a directory.
-    //  Updates the file statistics from disk at every call.
+    //  Return true if the file is a directory. If you want this to reflect
+    //  any external changes, call zfile_restat before checking this property.
     CZMQ_EXPORT bool
         zfile_is_directory (zfile_t *self);
     
-    //  Return true if the file is a regular file.
-    //  Updates the file statistics from disk at every call.
+    //  Return true if the file is a regular file. If you want this to reflect
+    //  any external changes, call zfile_restat before checking this property.
     CZMQ_EXPORT bool
         zfile_is_regular (zfile_t *self);
     
-    //  Return true if the file is readable by this process
-    //  Updates the file statistics from disk at every call.
+    //  Return true if the file is readable by this process. If you want this to
+    //  reflect any external changes, call zfile_restat before checking this
+    //  property.
     CZMQ_EXPORT bool
         zfile_is_readable (zfile_t *self);
     
-    //  Return true if the file is writeable by this process
-    //  Updates the file statistics from disk at every call.
+    //  Return true if the file is writeable by this process. If you want this
+    //  to reflect any external changes, call zfile_restat before checking this
+    //  property.
     CZMQ_EXPORT bool
         zfile_is_writeable (zfile_t *self);
     
@@ -738,19 +758,24 @@ This is the class interface:
     CZMQ_EXPORT void
         zfile_remove (zfile_t *self);
     
-    //  Open file for reading, returns 0 if OK, else -1.
+    //  Open file for reading
+    //  Returns 0 if OK, -1 if not found or not accessible
     CZMQ_EXPORT int
         zfile_input (zfile_t *self);
     
-    //  Open file for writing, creating full directory path if needed
+    //  Open file for writing, creating directory if needed
+    //  File is created if necessary; chunks can be written to file at any
+    //  location. Returns 0 if OK, -1 if error.
     CZMQ_EXPORT int
         zfile_output (zfile_t *self);
     
-    //  Read chunk from file at specified position
+    //  Read chunk from file at specified position. If this was the last chunk,
+    //  sets self->eof. Returns a null chunk in case of error.
     CZMQ_EXPORT zchunk_t *
         zfile_read (zfile_t *self, size_t bytes, off_t offset);
     
     //  Write chunk to file at specified position
+    //  Return 0 if OK, else -1
     CZMQ_EXPORT int
         zfile_write (zfile_t *self, zchunk_t *chunk, off_t offset);
     
@@ -785,6 +810,8 @@ This is the class interface:
     CZMQ_EXPORT void
         zfile_mode_default (void);
 
+This class is a new API, deprecating the old zfile class (which still
+exists but is implemented in zsys now).
 
 <A name="toc4-243" title="zframe - working with single message frames" />
 #### zframe - working with single message frames
@@ -1332,6 +1359,11 @@ This is the class interface:
     CZMQ_EXPORT void
         zmutex_unlock (zmutex_t *self);
     
+    //  Try to lock mutex
+    CZMQ_EXPORT int
+        zmutex_try_lock (zmutex_t *self);
+    
+    
     //  Self test of this class
     CZMQ_EXPORT int
         zmutex_test (bool verbose);
@@ -1544,11 +1576,6 @@ This is the class interface:
     
     //  Emulation of widely-used 2.x socket options
     CZMQ_EXPORT void zsocket_set_hwm (void *zocket, int hwm);
-    
-    //  Patch in case we're on older libzmq
-    #ifndef ZMQ_STREAM
-    #define ZMQ_STREAM 11
-    #endif
     #endif
     
     #if (ZMQ_VERSION_MAJOR == 3)
@@ -1612,11 +1639,6 @@ This is the class interface:
     
     //  Emulation of widely-used 2.x socket options
     CZMQ_EXPORT void zsocket_set_hwm (void *zocket, int hwm);
-    
-    //  Patch in case we're on older libzmq
-    #ifndef ZMQ_STREAM
-    #define ZMQ_STREAM 11
-    #endif
     #endif
     
     #if (ZMQ_VERSION_MAJOR == 2)
@@ -1812,7 +1834,103 @@ This is the class interface:
         zsys_test (bool verbose);
 
 
-<A name="toc4-378" title="zthread - working with system threads" />
+<A name="toc4-378" title="zrex - working with regular expressions" />
+#### zrex - working with regular expressions
+
+The zrex class provides a simple API for regular expressions, wrapping
+Alberto Demichelis's T-Rex library from http://tiny-rex.sourceforge.net/.
+
+This is the class interface:
+
+    //  Constructor; compile a new regular expression. If the expression is not
+    //  valid, will still return a zrex_t object but all methods on this will
+    //  fail, except zrex_strerror () and zrex_valid ().
+    CZMQ_EXPORT zrex_t *
+        zrex_new (const char *expression);
+    
+    //  Destructor
+    CZMQ_EXPORT void
+        zrex_destroy (zrex_t **self_p);
+    
+    //  Return true if the expression was valid and compiled without errors.
+    CZMQ_EXPORT bool
+        zrex_valid (zrex_t *self);
+    
+    //  Return the error message generated during compilation of the expression.
+    CZMQ_EXPORT const char *
+        zrex_strerror (zrex_t *self);
+    
+    //  Return true if the expression matches a provided string. If true, you
+    //  can access the matched sequences using zrex_sequence ().
+    CZMQ_EXPORT bool
+        zrex_matches (zrex_t *self, const char *text);
+    
+    //  Returns a string holding the sequence at the specified index. If there
+    //  was no sequence at the specified index, returns NULL. Sequence 0 is the
+    //  whole matching sequence; sequence 1 is the first subsequence.
+    CZMQ_EXPORT const char *
+        zrex_sequence (zrex_t *self, uint index);
+    
+    //  Return number of matched sequences, which is 1 or more if the string
+    //  matched, and zero otherwise.
+    CZMQ_EXPORT int
+        zrex_count (zrex_t *self);
+    
+    //  Self test of this class
+    CZMQ_EXPORT int
+        zrex_test (bool verbose);
+
+The underlying TRex class implements the following expressions:
+
+\   Quote the next metacharacter
+^   Match the beginning of the string
+.   Match any character
+$   Match the end of the string
+|   Alternation
+()  Grouping (creates a subsequence)
+[]  Character class
+
+==GREEDY CLOSURES==
+*      Match 0 or more times
++      Match 1 or more times
+?      Match 1 or 0 times
+{n}    Match exactly n times
+{n,}   Match at least n times
+{n,m}  Match at least n but not more than m times
+
+==ESCAPE CHARACTERS==
+\t      tab                   (HT, TAB)
+\n      newline               (LF, NL)
+\r      return                (CR)
+\f      form feed             (FF)
+
+==PREDEFINED CLASSES==
+\l      lowercase next char
+\u      uppercase next char
+\a      letters
+\w      alphanumeric [0-9a-zA-Z]
+\s      space
+\d      decimal digits
+\x      hexadecimal digits
+\c      control characters
+\p      punctuation
+\b      word boundary
+\A      non letters
+\W      non alphanumeric
+\S      non space
+\D      non decimal digits
+\X      non hexadecimal digits
+\C      non control characters
+\P      non punctuation
+\B      non word boundary
+
+<A name="toc4-389" title="ztree - generic red-black tree container" />
+#### ztree - generic red-black tree container
+
+Red black tree container
+Derived from Emin Martianan's Red Black which is licensed for free use.
+http://web.mit.edu/~emin/www.old/source_code/red_black_tree/index.html
+<A name="toc4-393" title="zthread - working with system threads" />
 #### zthread - working with system threads
 
 The zthread class wraps OS thread creation. It creates detached threads
@@ -1878,7 +1996,7 @@ If you want to communicate over ipc:// or tcp:// you may be sharing
 the same context, or use separate contexts. Thus, every detached thread
 usually starts by creating its own zctx_t instance.    
 
-<A name="toc4-389" title="ztree - generic red-black tree container" />
+<A name="toc4-404" title="ztree - generic red-black tree container" />
 #### ztree - generic red-black tree container
 
 Red black tree container
@@ -1974,10 +2092,10 @@ This is the class interface:
         ztree_test (int verbose);
 
 
-<A name="toc2-400" title="Under the Hood" />
+<A name="toc2-415" title="Under the Hood" />
 ## Under the Hood
 
-<A name="toc3-403" title="Adding a New Class" />
+<A name="toc3-418" title="Adding a New Class" />
 ### Adding a New Class
 
 If you define a new CZMQ class `myclass` you need to:
@@ -1989,7 +2107,7 @@ If you define a new CZMQ class `myclass` you need to:
 * Add myclass to 'src/Makefile.am` and `doc/Makefile.am`.
 * Add a section to README.txt.
 
-<A name="toc3-415" title="Documentation" />
+<A name="toc3-430" title="Documentation" />
 ### Documentation
 
 Man pages are generated from the class header and source files via the doc/mkman tool, and similar functionality in the gitdown tool (http://github.com/imatix/gitdown). The header file for a class must wrap its interface as follows (example is from include/zclock.h):
@@ -2028,7 +2146,7 @@ The source file for a class then provides the self test example as follows:
 
 The template for man pages is in doc/mkman.
 
-<A name="toc3-454" title="Development" />
+<A name="toc3-469" title="Development" />
 ### Development
 
 CZMQ is developed through a test-driven process that guarantees no memory violations or leaks in the code:
@@ -2038,7 +2156,7 @@ CZMQ is developed through a test-driven process that guarantees no memory violat
 * Run the 'selftest' script, which uses the Valgrind memcheck tool.
 * Repeat until perfect.
 
-<A name="toc3-464" title="Porting CZMQ" />
+<A name="toc3-479" title="Porting CZMQ" />
 ### Porting CZMQ
 
 When you try CZMQ on an OS that it's not been used on (ever, or for a while), you will hit code that does not compile. In some cases the patches are trivial, in other cases (usually when porting to Windows), the work needed to build equivalent functionality may be non-trivial. In any case, the benefit is that once ported, the functionality is available to all applications.
@@ -2049,12 +2167,12 @@ Before attempting to patch code for portability, please read the `czmq_prelude.h
 * Defining macros that rename exotic library functions to more conventional names: do this in czmq_prelude.h.
 * Reimplementing specific methods to use a non-standard API: this is typically needed on Windows. Do this in the relevant class, using #ifdefs to properly differentiate code for different platforms.
 
-<A name="toc3-475" title="Code Generation" />
+<A name="toc3-490" title="Code Generation" />
 ### Code Generation
 
 We generate the zsockopt class using [https://github.com/imatix/gsl GSL], using a code generator script in scripts/sockopts.gsl.
 
-<A name="toc3-480" title="This Document" />
+<A name="toc3-495" title="This Document" />
 ### This Document
 
 This document is originally at README.txt and is built using [gitdown](http://github.com/imatix/gitdown).
