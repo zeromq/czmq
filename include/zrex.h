@@ -52,6 +52,22 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT const char *
     zrex_strerror (zrex_t *self);
 
+//  Return true if the expression matches a provided string. If true, you
+//  can access the matched sequences using zrex_sequence ().
+CZMQ_EXPORT bool
+    zrex_matches (zrex_t *self, const char *text);
+
+//  Returns a string holding the sequence at the specified index. If there
+//  was no sequence at the specified index, returns NULL. Sequence 0 is the
+//  whole matching sequence; sequence 1 is the first subsequence.
+CZMQ_EXPORT const char *
+    zrex_sequence (zrex_t *self, uint index);
+
+//  Return number of matched sequences, which is 1 or more if the string
+//  matched, and zero otherwise.
+CZMQ_EXPORT int
+    zrex_count (zrex_t *self);
+
 //  Self test of this class
 CZMQ_EXPORT int
     zrex_test (bool verbose);

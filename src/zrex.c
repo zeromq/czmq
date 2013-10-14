@@ -35,7 +35,7 @@
     .   Match any character
     $   Match the end of the string
     |   Alternation
-    ()  Grouping (creates a capture)
+    ()  Grouping (creates a subsequence)
     []  Character class
 
     ==GREEDY CLOSURES==
@@ -74,18 +74,22 @@
 @end
 */
 
-#include "../include/czmq.h"
-
 #undef _UNICODE
 #define TREX_API    //  Empty, trex not exported to API
 #include "../foreign/trex/trex.h"
 #include "../foreign/trex/trex.c"
+#include "../include/czmq.h"
+
+#define MAX_SEQ 100             //  Should be enough for anyone :)
 
 //  Structure of our class
 
 struct _zrex_t {
     TRex *trex;                 //  Compiled regular expression
     const char *strerror;       //  Error message if any
+    bool matches;               //  True if last match succeeded
+    uint count;                 //  Number of sequences
+    char *sequence [MAX_SEQ];   //  Captured sequences
 };
 
 
@@ -120,6 +124,9 @@ zrex_destroy (zrex_t **self_p)
     if (*self_p) {
         zrex_t *self = *self_p;
         trex_free (self->trex);
+        int index;
+        for (index = 0; index < self->count; index++)
+            free (self->sequence [index]);
         free (self);
         *self_p = NULL;
     }
@@ -149,6 +156,60 @@ zrex_strerror (zrex_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  Return true if the expression matches a provided string. If true, you
+//  can access the matched sequences using zrex_sequence ().
+
+bool
+zrex_matches (zrex_t *self, const char *text)
+{
+    int index;
+    for (index = 0; index < self->count; index++)
+        free (self->sequence [index]);
+
+    self->matches = trex_match (self->trex, text);
+    if (self->matches) {
+        self->count = trex_getsubexpcount (self->trex);
+        for (index = 0; index < self->count; index++) {
+            TRexMatch match;
+            trex_getsubexp (self->trex, index, &match);
+            self->sequence [index] = strndup (match.begin, match.len);
+        }
+    }
+    else
+        self->count = 0;
+    return self->matches;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Returns a string holding the sequence at the specified index. If there
+//  was no sequence at the specified index, returns NULL. Sequence 0 is the
+//  whole matching sequence; sequence 1 is the first subsequence.
+
+const char *
+zrex_sequence (zrex_t *self, uint index)
+{
+    assert (self);
+    if (!self->matches || index > MAX_SEQ)
+        return NULL;
+    else
+        return self->sequence [index];
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return number of matched sequences, which is 1 or more if the string
+//  matched, and zero otherwise.
+
+int
+zrex_count (zrex_t *self)
+{
+    assert (self);
+    return self->count;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Selftest
 
 int
@@ -161,6 +222,29 @@ zrex_test (bool verbose)
     assert (!zrex_valid (rex));
     if (verbose)
         puts (zrex_strerror (rex));
+    zrex_destroy (&rex);
+
+    rex = zrex_new ("([0-9]+)\\-([0-9]+)\\-([0-9]+)");
+    assert (rex);
+    assert (zrex_valid (rex));
+    bool matches = zrex_matches (rex, "123-456-ABC");
+    assert (!matches);
+    matches = zrex_matches (rex, "123-456-789");
+    assert (matches);
+    assert (zrex_count (rex) == 4);
+    assert (streq (zrex_sequence (rex, 0), "123-456-789"));
+    assert (streq (zrex_sequence (rex, 1), "123"));
+    assert (streq (zrex_sequence (rex, 2), "456"));
+    assert (streq (zrex_sequence (rex, 3), "789"));
+    zrex_destroy (&rex);
+
+    rex = zrex_new ("[0-9]+\\-[0-9]+\\-[0-9]+");
+    assert (rex);
+    matches = zrex_matches (rex, "123-456-789");
+    assert (matches);
+    assert (zrex_count (rex) == 1);
+    assert (streq (zrex_sequence (rex, 0), "123-456-789"));
+    assert (zrex_sequence (rex, 1) == NULL);
     zrex_destroy (&rex);
 
     printf ("OK\n");
