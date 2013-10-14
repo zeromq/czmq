@@ -39,6 +39,10 @@ typedef struct _zctx_t zctx_t;
 CZMQ_EXPORT zctx_t *
     zctx_new (void);
 
+//  Create a new context by shadowing a plain zmq context
+zctx_t *
+zctx_new_from_zmq_ctx (void *zmqctx);
+
 //  Destroy context and all sockets in it, replaces zmq_term
 CZMQ_EXPORT void
     zctx_destroy (zctx_t **self_p);

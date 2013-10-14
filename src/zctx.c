@@ -113,6 +113,39 @@ zctx_new (void)
 
 
 //  --------------------------------------------------------------------------
+//  Create new context that shadows the given ZMQ context
+
+zctx_t *
+zctx_new_from_zmq_ctx (void *zmqctx)
+{
+    assert(zmqctx);
+    zctx_t
+        *self;
+
+    //  Shares same 0MQ context but has its own list of sockets so that
+    //  we create, use, and destroy sockets only within a single thread.
+    self = (zctx_t *) zmalloc (sizeof (zctx_t));
+    if (!self)
+        return NULL;
+
+    self->sockets = zlist_new ();
+    self->mutex = zmutex_new ();
+    if (!self->sockets || !self->mutex) {
+        zlist_destroy (&self->sockets);
+        zmutex_destroy (&self->mutex);
+        free (self);
+        return NULL;
+    }
+    self->context = zmqctx;
+    self->pipehwm = 1000;   
+    self->sndhwm = 1000;
+    self->rcvhwm = 1000;
+    self->shadow = true;             //  This is a shadow context
+    return self;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Destructor
 
 void
@@ -145,6 +178,7 @@ zctx_destroy (zctx_t **self_p)
 zctx_t *
 zctx_shadow (zctx_t *ctx)
 {
+    assert(ctx);
     zctx_t
         *self;
 
