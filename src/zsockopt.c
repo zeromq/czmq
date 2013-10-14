@@ -39,6 +39,7 @@
 */
 
 #include "../include/czmq.h"
+#include "platform.h"
 
 #if (ZMQ_VERSION_MAJOR == 4)
 //  --------------------------------------------------------------------------
