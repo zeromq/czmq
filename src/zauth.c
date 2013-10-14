@@ -35,6 +35,7 @@
 */
 
 #include "../include/czmq.h"
+#include "platform.h"
 
 //  Structure of our class
 //  All work is done by a background thread, the "agent", which we talk
