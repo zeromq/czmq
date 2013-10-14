@@ -23,12 +23,13 @@ include_HEADERS = \
     ../include/zmsg.h \
     ../include/zmutex.h \
     ../include/zpoller.h \
+    ../include/zrex.h \
     ../include/zsocket.h \
     ../include/zsockopt.h \
     ../include/zstr.h \
     ../include/zsys.h \
     ../include/zthread.h \
-    ../include/ztree.h
+    ../include/ztree.h 
 
 libczmq_la_SOURCES = \
     platform.h \
@@ -49,6 +50,7 @@ libczmq_la_SOURCES = \
     zmsg.c \
     zmutex.c \
     zpoller.c \
+    zrex.c \
     zsocket.c \
     zsockopt.c \
     zstr.c \
@@ -70,5 +72,4 @@ libczmq_la_LDFLAGS = -version-info @LTVER@
 endif
 
 TESTS = czmq_selftest
-
 

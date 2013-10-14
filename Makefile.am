@@ -28,5 +28,13 @@ EXTRA_DIST = \
 	examples/security/ironhouse.c \
 	examples/security/ironhouse2.c \
 	examples/security/README.txt \
-	examples/security/LICENSE
-	
+	examples/security/LICENSE \
+	foreign/trex/history.txt \
+	foreign/trex/LICENSE \
+	foreign/trex/README \
+	foreign/trex/readme.txt \
+	foreign/trex/test2.c \
+	foreign/trex/test.c \
+	foreign/trex/trex.c \
+	foreign/trex/trex.h \
+	foreign/trex/TRexpp.h
