@@ -39,10 +39,6 @@ typedef struct _zctx_t zctx_t;
 CZMQ_EXPORT zctx_t *
     zctx_new (void);
 
-//  Create a new context by shadowing a plain zmq context
-zctx_t *
-zctx_new_from_zmq_ctx (void *zmqctx);
-
 //  Destroy context and all sockets in it, replaces zmq_term
 CZMQ_EXPORT void
     zctx_destroy (zctx_t **self_p);
@@ -52,6 +48,10 @@ CZMQ_EXPORT void
 //  For internal use only.
 CZMQ_EXPORT zctx_t *
     zctx_shadow (zctx_t *self);
+
+//  Create a new context by shadowing a plain zmq context
+zctx_t *
+zctx_shadow_zmq_ctx (void *zmqctx);
 
 //  @interface
 //  Raise default I/O threads from 1, for crazy heavy applications
