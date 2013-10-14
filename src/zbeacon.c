@@ -551,6 +551,11 @@ s_get_interface (agent_t *self)
                 self->broadcast = *(inaddr_t *) interface->ifa_broadaddr;
                 self->broadcast.sin_port = htons (self->port_nbr);
 
+                //  If the returned broadcast address is the same as source address build
+                //  the broadcast address from the source address and netmask.
+                if (self->address.sin_addr.s_addr == self->broadcast.sin_addr.s_addr)
+                   self->broadcast.sin_addr.s_addr |= ~(((inaddr_t *) interface->ifa_netmask)->sin_addr.s_addr);
+
                 //  If an interface was specified and this is it OR if no interface was
                 //  specified and this is a wireless interface then desired interface found.
                 if (strlen (zsys_interface ()) != 0) {
@@ -562,11 +567,6 @@ s_get_interface (agent_t *self)
                     break;
             }
             interface = interface->ifa_next;
-        }
-        //  If the returned broadcast address is the same as source address build
-        //  the broadcast address from the source address and netmask.
-        if (self->address.sin_addr.s_addr == self->broadcast.sin_addr.s_addr) {
-            self->broadcast.sin_addr.s_addr &= ((inaddr_t *) interface->ifa_netmask)->sin_addr.s_addr;
         }
     }
     freeifaddrs (interfaces);
