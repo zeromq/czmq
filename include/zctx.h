@@ -49,6 +49,10 @@ CZMQ_EXPORT void
 CZMQ_EXPORT zctx_t *
     zctx_shadow (zctx_t *self);
 
+//  Create a new context by shadowing a plain zmq context
+CZMQ_EXPORT zctx_t *
+zctx_shadow_zmq_ctx (void *zmqctx);
+
 //  @interface
 //  Raise default I/O threads from 1, for crazy heavy applications
 //  The rule of thumb is one I/O thread per gigabyte of traffic in
