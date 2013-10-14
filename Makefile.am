@@ -21,7 +21,7 @@ EXTRA_DIST = \
 	builds/msvc/czmq.vcxproj.filters \
 	builds/msvc/README.txt \
         builds/msvc/platform.h \
-	examples/security/grasslands.c \ 
+	examples/security/grasslands.c \
 	examples/security/strawhouse.c \
 	examples/security/woodhouse.c \
 	examples/security/stonehouse.c \
