@@ -54,4 +54,11 @@ addons/makecert
 addons/makecert.o
 addons/.libs
 addons/.deps
-
+foreign/trex/test.o
+foreign/trex/test
+foreign/trex/test2.o
+foreign/trex/test2
+*.kate-swp
+src/czmq_selftest.log
+src/czmq_selftest.trs
+src/test-suite.log

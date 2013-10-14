@@ -1,0 +1,108 @@
+zrex(3)
+=======
+
+NAME
+----
+zrex - work with regular expressions
+
+SYNOPSIS
+--------
+----
+//  Constructor; compile a new regular expression. If the expression is not
+//  valid, will still return a zrex_t object but all methods on this will
+//  fail, except zrex_strerror () and zrex_valid ().
+CZMQ_EXPORT zrex_t *
+    zrex_new (const char *expression);
+
+//  Destructor
+CZMQ_EXPORT void
+    zrex_destroy (zrex_t **self_p);
+
+//  Return true if the expression was valid and compiled without errors.
+CZMQ_EXPORT bool
+    zrex_valid (zrex_t *self);
+
+//  Return the error message generated during compilation of the expression.
+CZMQ_EXPORT const char *
+    zrex_strerror (zrex_t *self);
+
+//  Return true if the expression matches a provided string. If true, you
+//  can access the matched sequences using zrex_sequence ().
+CZMQ_EXPORT bool
+    zrex_matches (zrex_t *self, const char *text);
+
+//  Returns a string holding the sequence at the specified index. If there
+//  was no sequence at the specified index, returns NULL. Sequence 0 is the
+//  whole matching sequence; sequence 1 is the first subsequence.
+CZMQ_EXPORT const char *
+    zrex_sequence (zrex_t *self, uint index);
+
+//  Return number of matched sequences, which is 1 or more if the string
+//  matched, and zero otherwise.
+CZMQ_EXPORT int
+    zrex_count (zrex_t *self);
+
+//  Self test of this class
+CZMQ_EXPORT int
+    zrex_test (bool verbose);
+----
+
+DESCRIPTION
+-----------
+
+The zrex class provides a simple API for regular expressions, wrapping
+Alberto Demichelis's T-Rex library from http://tiny-rex.sourceforge.net/.
+
+The underlying TRex class implements the following expressions:
+
+\   Quote the next metacharacter
+^   Match the beginning of the string
+.   Match any character
+$   Match the end of the string
+|   Alternation
+()  Grouping (creates a subsequence)
+[]  Character class
+
+==GREEDY CLOSURES==
+*      Match 0 or more times
++      Match 1 or more times
+?      Match 1 or 0 times
+{n}    Match exactly n times
+{n,}   Match at least n times
+{n,m}  Match at least n but not more than m times
+
+==ESCAPE CHARACTERS==
+\t      tab                   (HT, TAB)
+\n      newline               (LF, NL)
+\r      return                (CR)
+\f      form feed             (FF)
+
+==PREDEFINED CLASSES==
+\l      lowercase next char
+\u      uppercase next char
+\a      letters
+\w      alphanumeric [0-9a-zA-Z]
+\s      space
+\d      decimal digits
+\x      hexadecimal digits
+\c      control characters
+\p      punctuation
+\b      word boundary
+\A      non letters
+\W      non alphanumeric
+\S      non space
+\D      non decimal digits
+\X      non hexadecimal digits
+\C      non control characters
+\P      non punctuation
+\B      non word boundary
+
+EXAMPLE
+-------
+.From zrex_test method
+----
+----
+
+SEE ALSO
+--------
+linkczmq:czmq[7]

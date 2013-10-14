@@ -1,2 +1,5 @@
-export PATH=../scripts:$PATH
+#  Rebuild socket options class from model
+#  Requires iMatix GSL4, from http://github.com/imatix/gsl
+#  Only needed when socket options change
+
 gsl -q -script:sockopts.gsl sockopts.xml

@@ -17,6 +17,7 @@ MAN3 = \
     zmsg.3 \
     zmutex.3 \
     zpoller.3 \
+    zrex.3 \
     zsocket.3 \
     zsockopt.3 \
     zstr.3 \

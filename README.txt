@@ -344,6 +344,19 @@ This is the class interface:
 
 .pull src/zsys.c@discuss,left
 
+#### zrex - working with regular expressions
+
+.pull src/zrex.c@header,left
+
+This is the class interface:
+
+.pull include/zrex.h@interface,code
+
+.pull src/zrex.c@discuss,left
+
+#### ztree - generic red-black tree container
+
+.pull src/ztree.c@header,left
 #### zthread - working with system threads
 
 .pull src/zthread.c@header,left
