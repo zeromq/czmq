@@ -170,7 +170,7 @@ zrex_matches (zrex_t *self, const char *text)
     if (self->matches) {
         self->count = trex_getsubexpcount (self->trex);
         for (index = 0; index < self->count; index++) {
-            TRexMatch match;
+            TRexMatch match = { 0 };
             trex_getsubexp (self->trex, index, &match);
             self->sequence [index] = strndup (match.begin, match.len);
         }
