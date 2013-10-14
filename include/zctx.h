@@ -50,7 +50,7 @@ CZMQ_EXPORT zctx_t *
     zctx_shadow (zctx_t *self);
 
 //  Create a new context by shadowing a plain zmq context
-zctx_t *
+CZMQ_EXPORT zctx_t *
 zctx_shadow_zmq_ctx (void *zmqctx);
 
 //  @interface
