@@ -12,6 +12,7 @@ AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(config)
 AC_CONFIG_HEADERS([src/platform.h])
 AM_INIT_AUTOMAKE(tar-ustar)
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # This defines PACKAGE_VERSION_... in src/platform.h
 PV_MAJOR=`echo $PACKAGE_VERSION | cut -d . -f 1`
@@ -29,7 +30,7 @@ AC_SUBST(PACKAGE_VERSION)
 #
 # Libtool -version-info (ABI version)
 #
-# Currently 1.0.0 ("stable"). Don't change this unless you
+# Currently 2.0.1 ("stable"). Don't change this unless you
 # know exactly what you're doing and have read and understand
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
 #
