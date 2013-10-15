@@ -1,0 +1,314 @@
+.#  Generate VC++ project file for project
+.#
+.#  This is a code generator built using the iMatix GSL code generation
+.#  language. See https://github.com/imatix/gsl for details. This script
+.#  is licensed under MIT/X11.
+.#
+.echo "Generating builds/msvc/$(project.name).vcxproj..."
+.output "../builds/msvc/$(project.name).vcxproj"
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+#################################################################
+#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
+#   Please read the README.txt file in the model directory.     #
+#################################################################
+-->
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugDLL|Win32">
+      <Configuration>DebugDLL</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseDLL|Win32">
+      <Configuration>ReleaseDLL</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{0C4A2E28-8C9E-4B27-85D9-BB679AD84AC7}</ProjectGuid>
+    <RootNamespace>$(project.name)</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$\(VCTargetsPath)\\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='ReleaseDLL|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='DebugDLL|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$\(VCTargetsPath)\\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='ReleaseDLL|Win32'" Label="PropertySheets">
+    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$\(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='DebugDLL|Win32'" Label="PropertySheets">
+    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$\(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$\(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$\(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='Release|Win32'">
+    <OutDir>$\(Configuration)\\</OutDir>
+    <IntDir>$\(Configuration)\\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='Debug|Win32'">
+    <OutDir>$\(Configuration)\\</OutDir>
+    <IntDir>$\(Configuration)\\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='DebugDLL|Win32'">
+    <OutDir>$\(Configuration)\\</OutDir>
+    <IntDir>$\(Configuration)\\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='ReleaseDLL|Win32'">
+    <OutDir>$\(Configuration)\\</OutDir>
+    <IntDir>$\(Configuration)\\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$\(Configuration)|$\(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>..\\..\\include;..\\..\\..\\libzmq\\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DLL_EXPORT;WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;BASE_THREADSAFE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeaderOutputFile>./$\(project.name).pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>./</AssemblerListingLocation>
+      <ObjectFileName>./</ObjectFileName>
+      <ProgramDataBaseFileName>./</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x080c</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$\(Configuration)\\$(project.name).lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>./$(project.name).bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$\(Configuration)|$\(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\\..\\include;..\\..\\..\\libzmq\\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DLL_EXPORT;WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;BASE_THREADSAFE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeaderOutputFile>./$(project.name).pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>./</AssemblerListingLocation>
+      <ObjectFileName>./</ObjectFileName>
+      <ProgramDataBaseFileName>./</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x080c</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$\(Configuration)\\$(project.name).lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+    </Lib>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>./$(project.name).bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$\(Configuration)|$\(Platform)'=='DebugDLL|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\\..\\include;..\\..\\..\\libzmq\\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>LIBCZMQ_EXPORTS;WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;BASE_THREADSAFE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeaderOutputFile>./$(project.name).pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>./</AssemblerListingLocation>
+      <ObjectFileName>./</ObjectFileName>
+      <ProgramDataBaseFileName>./</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x080c</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>libzmq_d.lib;Ws2_32.lib;Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\\..\\..\\libzmq\\lib\\win32</AdditionalLibraryDirectories>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>./$(project.name).bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$\(Configuration)|$\(Platform)'=='ReleaseDLL|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>..\\..\\include;..\\..\\..\\libzmq\\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>LIBCZMQ_EXPORTS;WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;BASE_THREADSAFE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeaderOutputFile>./$(project.name).pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>./</AssemblerListingLocation>
+      <ObjectFileName>./</ObjectFileName>
+      <ProgramDataBaseFileName>./</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x080c</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>libzmq.lib;Ws2_32.lib;Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\\..\\..\\libzmq\\lib\\win32</AdditionalLibraryDirectories>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>./$(project.name).bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+.for class
+    <ClCompile Include="..\\..\\src\\$(name).c">
+      <CompileAs Condition="'$\(Configuration)|$\(Platform)'=='DebugDLL|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$\(Configuration)|$\(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$\(Configuration)|$\(Platform)'=='ReleaseDLL|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$\(Configuration)|$\(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+    </ClCompile>
+.endfor
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\\..\\builds\\msvc\\platform.h" />
+.for header
+    <ClInclude Include="..\\..\\include\\$(name).h" />
+.endfor
+.for class
+    <ClInclude Include="..\\..\\include\\$(name).h" />
+.endfor
+  </ItemGroup>
+  <Import Project="$\(VCTargetsPath)\\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+<!--
+#################################################################
+#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
+#   Please read the README.txt file in the model directory.     #
+#################################################################
+-->
+</Project>
+.echo "Generating builds/msvc/$(project.name).vcxproj.filters..."
+.output "../builds/msvc/$(project.name).vcxproj.filters"
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+#################################################################
+#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
+#   Please read the README.txt file in the model directory.     #
+#################################################################
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{d074b448-3c0f-43b6-aef9-604ddf0c34a8}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{546164a9-1001-4d84-970a-e40d977e56f2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+.for class
+    <ClCompile Include="..\\..\\src\\$(name).c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+.endfor
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\\..\\builds\\msvc\\platform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <!-- What is this and where does it come from?
+         it should perhaps be in builds\\msvc\\?
+    <ClInclude Include="..\\..\\include\\stdbool_for_windows.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    -->
+.for header
+    <ClInclude Include="..\\..\\include\\$(name).h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+.endfor
+.for class
+    <ClInclude Include="..\\..\\include\\$(name).h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+.endfor
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\\..\\include\\zbeacon.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+<!--
+#################################################################
+#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
+#   Please read the README.txt file in the model directory.     #
+#################################################################
+-->
+</Project>

@@ -1,3 +1,7 @@
+#################################################################
+#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
+#   Please read the README.txt file in the model directory.     #
+#################################################################
 MAN1 =
 MAN3 = \
     zauth.3 \
@@ -46,7 +50,7 @@ SUFFIXES=.txt .xml .1 .3 .7
 
 .txt.xml:
 	$(srcdir)/mkman $<
-	asciidoc -d manpage -b docbook -f  $(srcdir)/asciidoc.conf \
+	asciidoc -d manpage -b docbook -f $(srcdir)/asciidoc.conf \
 		-aczmq_version=@PACKAGE_VERSION@ -o$@ $<
 .xml.1:
 	xmlto man $<
@@ -55,3 +59,9 @@ SUFFIXES=.txt .xml .1 .3 .7
 .xml.7:
 	xmlto man $<
 endif
+#################################################################
+#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
+#   Please read the README.txt file in the model directory.     #
+#################################################################
+
+
