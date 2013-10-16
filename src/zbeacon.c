@@ -366,8 +366,8 @@ static void
     s_handle_io_error (char *reason);
 static void
     s_get_interface (agent_t *self);
-static bool
-    s_wireless_nic (const char* name);
+//static bool
+//    s_wireless_nic (const char* name);
 static void
     s_api_command (agent_t *self);
 static void
@@ -528,17 +528,10 @@ s_handle_io_error (char *reason)
 static void
 s_get_interface (agent_t *self)
 {
-    if(!zsys_interface()) {
-        //  Set broadcast address and port
-        self->broadcast.sin_family = AF_INET;
-        self->broadcast.sin_addr.s_addr = INADDR_BROADCAST;
-        self->broadcast.sin_port = htons (self->port_nbr);
-        return;
-    }
-#if defined (__UNIX__)
-#   if defined (HAVE_GETIFADDRS) && defined (HAVE_FREEIFADDRS)
+#if defined (__UNIX__) && defined (HAVE_GETIFADDRS) && defined (HAVE_FREEIFADDRS)
     struct ifaddrs *interfaces;
     if (getifaddrs (&interfaces) == 0) {
+        int num_interfaces = 0;
         struct ifaddrs *interface = interfaces;
         while (interface) {
             if (interface->ifa_addr && 
@@ -551,47 +544,73 @@ s_get_interface (agent_t *self)
                 //  If the returned broadcast address is the same as source address build
                 //  the broadcast address from the source address and netmask.
                 if (self->address.sin_addr.s_addr == self->broadcast.sin_addr.s_addr)
-                   self->broadcast.sin_addr.s_addr |= ~(((inaddr_t *) interface->ifa_netmask)->sin_addr.s_addr);
+                    self->broadcast.sin_addr.s_addr |= ~(((inaddr_t *) interface->ifa_netmask)->sin_addr.s_addr);
 
-                //  If an interface was specified and this is it OR if no interface was
-                //  specified and this is a wireless interface then desired interface found.
-                if (strlen (zsys_interface ()) != 0) {
-                    if (streq (interface->ifa_name, zsys_interface ()))
-                        break;
-                }
-                else
-                if (s_wireless_nic (interface->ifa_name))
+                //  Keep track of the number of interfaces on this host
+                if (self->address.sin_addr.s_addr != ntohl(INADDR_LOOPBACK))
+                    num_interfaces++;
+
+                //  If this is the specified interface then move on
+                if (streq (interface->ifa_name, zsys_interface ()))
                     break;
             }
             interface = interface->ifa_next;
         }
+
+        if (strlen (zsys_interface ()) == 0) {
+            //  Subnet broadcast addresses don't work on some platforms but is
+            //  assumed to work if the interface is specified.
+            self->broadcast.sin_family = AF_INET;
+            self->broadcast.sin_addr.s_addr = INADDR_BROADCAST;
+            self->broadcast.sin_port = htons (self->port_nbr);
+            if (num_interfaces > 1) {
+                //  Our source address is unknown in this case so set it to
+                //  INADDR_ANY so self->hostname isn't set to an incorrect IP.
+                self->address = self->broadcast;
+                self->address.sin_addr.s_addr = INADDR_ANY;
+            }
+        }
+
     }
     freeifaddrs (interfaces);
-#   else
-    struct ifreq ifr;
-    memset (&ifr, 0, sizeof (ifr));
 
-    int sock = 0;
-    if ((sock = socket (AF_INET, SOCK_DGRAM, 0)) < 0)
-        s_handle_io_error ("socket");
+#else
 
-    //  Get interface address
-    ifr.ifr_addr.sa_family = AF_INET;
-    strncpy (ifr.ifr_name, zsys_interface (), sizeof (ifr.ifr_name));
-    int rc = ioctl (sock, SIOCGIFADDR, (caddr_t) &ifr, sizeof (struct ifreq));
-    if (rc == -1)
-        s_handle_io_error ("siocgifaddr");
+    if (strlen (zsys_interface ()) == 0) {
+        self->broadcast.sin_family = AF_INET;
+        self->broadcast.sin_addr.s_addr = INADDR_BROADCAST;
+        self->broadcast.sin_port = htons (self->port_nbr);
 
-    //  Get interface broadcast address
-    memcpy (&self->address, ((inaddr_t *) &ifr.ifr_addr),
-        sizeof (inaddr_t));
-    rc = ioctl (sock, SIOCGIFBRDADDR, (caddr_t) &ifr, sizeof (struct ifreq));
-    if (rc == -1)
-        s_handle_io_error ("siocgifbrdaddr");
+        //  Our source address is unknown in this case so set it to
+        //  INADDR_ANY so self->hostname isn't set to an incorrect IP.
+        self->address = self->broadcast;
+        self->address.sin_addr.s_addr = INADDR_ANY;
+    }
+    else {
+#   if defined (__UNIX__)
+        struct ifreq ifr;
+        memset (&ifr, 0, sizeof (ifr));
 
-    memcpy (&self->broadcast, ((inaddr_t *) &ifr.ifr_broadaddr), sizeof (inaddr_t));
-    close (sock);
-#   endif
+        int sock = 0;
+        if ((sock = socket (AF_INET, SOCK_DGRAM, 0)) < 0)
+            s_handle_io_error ("socket");
+
+        //  Get interface address
+        ifr.ifr_addr.sa_family = AF_INET;
+        strncpy (ifr.ifr_name, zsys_interface (), sizeof (ifr.ifr_name));
+        int rc = ioctl (sock, SIOCGIFADDR, (caddr_t) &ifr, sizeof (struct ifreq));
+        if (rc == -1)
+            s_handle_io_error ("siocgifaddr");
+
+        //  Get interface broadcast address
+        memcpy (&self->address, ((inaddr_t *) &ifr.ifr_addr),
+                sizeof (inaddr_t));
+        rc = ioctl (sock, SIOCGIFBRDADDR, (caddr_t) &ifr, sizeof (struct ifreq));
+        if (rc == -1)
+            s_handle_io_error ("siocgifbrdaddr");
+
+        memcpy (&self->broadcast, ((inaddr_t *) &ifr.ifr_broadaddr), sizeof (inaddr_t));
+        close (sock);
 
 #   elif defined (__WINDOWS__)
     ULONG addr_size = 0;
@@ -620,37 +639,39 @@ s_get_interface (agent_t *self)
 #   else
 #       error "Interface detection TBD on this operating system"
 #   endif
+    }
+#endif
 }
 
 //  Check if a given NIC name is wireless
 
-static bool
-s_wireless_nic (const char *name)
-{
-    SOCKET udpsock = socket (AF_INET, SOCK_DGRAM, 0);
-    if (udpsock == INVALID_SOCKET)
-        s_handle_io_error ("socket");
+//static bool
+//s_wireless_nic (const char *name)
+//{
+//    SOCKET udpsock = socket (AF_INET, SOCK_DGRAM, 0);
+//    if (udpsock == INVALID_SOCKET)
+//        s_handle_io_error ("socket");
 
-    bool is_nic = false;
-#if defined (SIOCGIFMEDIA)
-    struct ifmediareq ifmr;
-    memset (&ifmr, 0, sizeof (struct ifmediareq));
-    strncpy(ifmr.ifm_name, name, sizeof (ifmr.ifm_name));
-    int res = ioctl (udpsock, SIOCGIFMEDIA, (caddr_t) &ifmr);
-    if (res != -1)
-        is_nic = (IFM_TYPE (ifmr.ifm_current) == IFM_IEEE80211);
+//    bool is_nic = false;
+//#if defined (SIOCGIFMEDIA)
+//    struct ifmediareq ifmr;
+//    memset (&ifmr, 0, sizeof (struct ifmediareq));
+//    strncpy(ifmr.ifm_name, name, sizeof (ifmr.ifm_name));
+//    int res = ioctl (udpsock, SIOCGIFMEDIA, (caddr_t) &ifmr);
+//    if (res != -1)
+//        is_nic = (IFM_TYPE (ifmr.ifm_current) == IFM_IEEE80211);
 
-#elif defined (SIOCGIWNAME)
-    struct iwreq wrq;
-    memset (&wrq, 0, sizeof (struct iwreq));
-    strncpy (wrq.ifr_name, name, sizeof (wrq.ifr_name));
-    int res = ioctl (udpsock, SIOCGIWNAME, (caddr_t) &wrq);
-    if (res != -1)
-        is_nic = true;
-#endif
-    closesocket (udpsock);
-    return is_nic;
-}
+//#elif defined (SIOCGIWNAME)
+//    struct iwreq wrq;
+//    memset (&wrq, 0, sizeof (struct iwreq));
+//    strncpy (wrq.ifr_name, name, sizeof (wrq.ifr_name));
+//    int res = ioctl (udpsock, SIOCGIWNAME, (caddr_t) &wrq);
+//    if (res != -1)
+//        is_nic = true;
+//#endif
+//    closesocket (udpsock);
+//    return is_nic;
+//}
 
 //  Handle command from API
 
