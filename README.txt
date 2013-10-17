@@ -387,7 +387,7 @@ If you define a new CZMQ class `myclass` you need to:
 * Add`#include <zmyclass.h>` to `include/czmq.h`.
 * Add the myclass header and test call to `src/czmq_selftest.c`.
 * Add a reference documentation to 'doc/zmyclass.txt'.
-* Add myclass to 'src/Makefile.am` and `doc/Makefile.am`.
+* Add myclass to 'model/projects.xml` and read model/README.txt.
 * Add a section to README.txt.
 
 ### Documentation

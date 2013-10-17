@@ -1842,9 +1842,10 @@ Alberto Demichelis's T-Rex library from http://tiny-rex.sourceforge.net/.
 
 This is the class interface:
 
-    //  Constructor; compile a new regular expression. If the expression is not
-    //  valid, will still return a zrex_t object but all methods on this will
-    //  fail, except zrex_strerror () and zrex_valid ().
+    //  Constructor. Optionally, sets an expression against which we can match
+    //  text and capture hits. If there is an error in the expression, reports
+    //  zrex_valid() as false and provides the error in zrex_strerror(). If you
+    //  set a pattern, you can call zrex_hits() to test it against text.
     CZMQ_EXPORT zrex_t *
         zrex_new (const char *expression);
     
@@ -1860,21 +1861,30 @@ This is the class interface:
     CZMQ_EXPORT const char *
         zrex_strerror (zrex_t *self);
     
-    //  Return true if the expression matches a provided string. If true, you
-    //  can access the matched sequences using zrex_sequence ().
-    CZMQ_EXPORT bool
-        zrex_matches (zrex_t *self, const char *text);
-    
-    //  Returns a string holding the sequence at the specified index. If there
-    //  was no sequence at the specified index, returns NULL. Sequence 0 is the
-    //  whole matching sequence; sequence 1 is the first subsequence.
-    CZMQ_EXPORT const char *
-        zrex_sequence (zrex_t *self, uint index);
-    
-    //  Return number of matched sequences, which is 1 or more if the string
-    //  matched, and zero otherwise.
+    //  Matches the text against a previously set expression, and reports the
+    //  number of hits (aka "capture groups" in e.g. Perl). If the text does
+    //  not match, returns 0. If it matches, returns 1 or greater, depending on
+    //  how many "(...)" groups the expression has. An expression with one group
+    //  will produce 2 hits, one for the whole expression and one for the group.
+    //  To retrieve the individual hits, call zrex_hit ().
     CZMQ_EXPORT int
-        zrex_count (zrex_t *self);
+        zrex_hits (zrex_t *self, const char *text);
+    
+    //  Matches the text against a new expression, and reports the number of
+    //  hits. If the text does not match, returns 0. If it matches, returns 1 or
+    //  greater, depending on how many "(...)" groups the expression has. An
+    //  expression with one group will produce 2 hits, one for the whole
+    //  expression and one for the group. To retrieve the individual hits, call
+    //  zrex_hit ().
+    CZMQ_EXPORT int
+        zrex_eq (zrex_t *self, const char *text, const char *expression);
+    
+    //  Returns the Nth sequence captured from the last expression match, where
+    //  N is 0 to the value returned by zrex_hits() or zrex_eq(). Sequence 0
+    //  is always the whole matching string. Sequence 1 is the first capture
+    //  group, if any, and so on.
+    CZMQ_EXPORT const char *
+        zrex_hit (zrex_t *self, uint index);
     
     //  Self test of this class
     CZMQ_EXPORT int
@@ -1887,7 +1897,7 @@ The underlying TRex class implements the following expressions:
 .   Match any character
 $   Match the end of the string
 |   Alternation
-()  Grouping (creates a subsequence)
+()  Grouping (captures a 'hit')
 []  Character class
 
 ==GREEDY CLOSURES==
@@ -1907,9 +1917,9 @@ $   Match the end of the string
 ==PREDEFINED CLASSES==
 \l      lowercase next char
 \u      uppercase next char
-\a      letters
+\a      alpha [a-zA-Z]
 \w      alphanumeric [0-9a-zA-Z]
-\s      space
+\s      space characters
 \d      decimal digits
 \x      hexadecimal digits
 \c      control characters
@@ -2104,7 +2114,7 @@ If you define a new CZMQ class `myclass` you need to:
 * Add`#include <zmyclass.h>` to `include/czmq.h`.
 * Add the myclass header and test call to `src/czmq_selftest.c`.
 * Add a reference documentation to 'doc/zmyclass.txt'.
-* Add myclass to 'src/Makefile.am` and `doc/Makefile.am`.
+* Add myclass to 'model/projects.xml` and read model/README.txt.
 * Add a section to README.txt.
 
 <A name="toc3-430" title="Documentation" />

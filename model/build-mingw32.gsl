@@ -1,3 +1,11 @@
+.#  Generate Mingw32 makefile for project
+.#
+.#  This is a code generator built using the iMatix GSL code generation
+.#  language. See https://github.com/imatix/gsl for details. This script
+.#  is licensed under MIT/X11.
+.#
+.echo "Generating builds/mingw32/Makefile.mingw32..."
+.output "../builds/mingw32/Makefile.mingw32"
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
 #   Please read the README.txt file in the model directory.     #
@@ -6,23 +14,27 @@
 CC=gcc
 # replace the following with wherever you have installed libzmq
 PREFIX=c:/mingw/msys/1.0/local
-INCDIR=-I$(PREFIX)/include -I.
-LIBDIR=-L$(PREFIX)/lib
-CFLAGS=-Wall -Os -g -DDLL_EXPORT $(INCDIR)
+INCDIR=-I$\(PREFIX)/include -I.
+LIBDIR=-L$\(PREFIX)/lib
+CFLAGS=-Wall -Os -g -DDLL_EXPORT $\(INCDIR)
 
-OBJS = zauth.o zbeacon.o zcert.o zcertstore.o zchunk.o zclock.o zconfig.o zctx.o zdir.o zfile.o zframe.o zhash.o zlist.o zloop.o zmsg.o zmutex.o zpoller.o zrex.o zsocket.o zsockopt.o zstr.o zsys.o zthread.o ztree.o
+OBJS =\
+.for class
+ $(name).o\
+.endfor
+
 
 %.o: ../../src/%.c
-    $(CC) -c -o $@ $< $(CFLAGS)
+    $\(CC) -c -o $@ $< $\(CFLAGS)
 
 all: libczmq.dll czmq_selftest.exe
 
-libczmq.dll: $(OBJS)
-    gcc -shared -o $@ $(OBJS) -Wl,--out-implib,$@.a $(LIBDIR) -lzmq -lws2_32 -liphlpapi
+libczmq.dll: $\(OBJS)
+    gcc -shared -o $@ $\(OBJS) -Wl,--out-implib,$@.a $\(LIBDIR) -lzmq -lws2_32 -liphlpapi
 
 # the test functions are not exported into the DLL
-czmq_selftest.exe: czmq_selftest.o $(OBJS)
-    gcc -o $@ $^ $(LIBDIR) -lzmq -lws2_32 -liphlpapi
+czmq_selftest.exe: czmq_selftest.o $\(OBJS)
+    gcc -o $@ $^ $\(LIBDIR) -lzmq -lws2_32 -liphlpapi
 
 clean:
     del *.o *.a *.dll *.exe

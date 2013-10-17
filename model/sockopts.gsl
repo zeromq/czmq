@@ -4,6 +4,7 @@
 .#
 .template 0
     output "../include/zsockopt.h"
+    echo "Generating include/zsockopt.h..."
     for version
         #  Expand any macros
         for include
@@ -111,6 +112,7 @@ int zsockopt_test (bool verbose);
 #endif
 
 #endif
+.echo "Generating src/zsockopt.c..."
 .output "../src/zsockopt.c"
 /*  =========================================================================
     zsockopt - get/set 0MQ socket options
@@ -153,6 +155,7 @@ int zsockopt_test (bool verbose);
 */
 
 #include "../include/czmq.h"
+#include "platform.h"
 
 .for version
 #if (ZMQ_VERSION_MAJOR == $(major))

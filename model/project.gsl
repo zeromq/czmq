@@ -1,0 +1,12 @@
+.#  This is a code generator built using the iMatix GSL code generation
+.#  language. See https://github.com/imatix/gsl for details. This script
+.#  is licensed under MIT/X11.
+.#
+.include "build-cmake.gsl"
+.include "build-android.gsl"
+.include "build-mingw32.gsl"
+.include "build-vcproj.gsl"
+.include "build-vcxproj.gsl"
+.include "build-autoconf.gsl"
+
+

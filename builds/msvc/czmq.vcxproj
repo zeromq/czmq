@@ -1,4 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+#################################################################
+#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
+#   Please read the README.txt file in the model directory.     #
+#################################################################
+-->
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="DebugDLL|Win32">
@@ -95,7 +101,7 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <PrecompiledHeaderOutputFile>./czmq.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderOutputFile>./$(project.name).pch</PrecompiledHeaderOutputFile>
       <AssemblerListingLocation>./</AssemblerListingLocation>
       <ObjectFileName>./</ObjectFileName>
       <ProgramDataBaseFileName>./</ProgramDataBaseFileName>
@@ -211,7 +217,31 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\zauth.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='DebugDLL|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\..\src\zbeacon.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='DebugDLL|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\src\zcert.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='DebugDLL|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\src\zcertstore.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='DebugDLL|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\src\zchunk.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='DebugDLL|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|Win32'">CompileAsCpp</CompileAs>
@@ -230,6 +260,12 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="..\..\src\zctx.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='DebugDLL|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\src\zdir.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='DebugDLL|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|Win32'">CompileAsCpp</CompileAs>
@@ -277,6 +313,18 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
     </ClCompile>
+    <ClCompile Include="..\..\src\zpoller.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='DebugDLL|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\src\zrex.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='DebugDLL|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\..\src\zsocket.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='DebugDLL|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
@@ -296,10 +344,18 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="..\..\src\zsys.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='DebugDLL|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="..\..\src\zthread.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='DebugDLL|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ztree.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='DebugDLL|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|Win32'">CompileAsCpp</CompileAs>
@@ -310,11 +366,15 @@
     <ClInclude Include="..\..\builds\msvc\platform.h" />
     <ClInclude Include="..\..\include\czmq.h" />
     <ClInclude Include="..\..\include\czmq_prelude.h" />
-    <ClInclude Include="..\..\include\stdbool_for_windows.h" />
-    <CustomBuild Include="..\..\include\zbeacon.h" />
+    <ClInclude Include="..\..\include\zauth.h" />
+    <ClInclude Include="..\..\include\zbeacon.h" />
+    <ClInclude Include="..\..\include\zcert.h" />
+    <ClInclude Include="..\..\include\zcertstore.h" />
+    <ClInclude Include="..\..\include\zchunk.h" />
     <ClInclude Include="..\..\include\zclock.h" />
     <ClInclude Include="..\..\include\zconfig.h" />
     <ClInclude Include="..\..\include\zctx.h" />
+    <ClInclude Include="..\..\include\zdir.h" />
     <ClInclude Include="..\..\include\zfile.h" />
     <ClInclude Include="..\..\include\zframe.h" />
     <ClInclude Include="..\..\include\zhash.h" />
@@ -322,13 +382,22 @@
     <ClInclude Include="..\..\include\zloop.h" />
     <ClInclude Include="..\..\include\zmsg.h" />
     <ClInclude Include="..\..\include\zmutex.h" />
+    <ClInclude Include="..\..\include\zpoller.h" />
+    <ClInclude Include="..\..\include\zrex.h" />
     <ClInclude Include="..\..\include\zsocket.h" />
     <ClInclude Include="..\..\include\zsockopt.h" />
     <ClInclude Include="..\..\include\zstr.h" />
     <ClInclude Include="..\..\include\zsys.h" />
     <ClInclude Include="..\..\include\zthread.h" />
+    <ClInclude Include="..\..\include\ztree.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+<!--
+#################################################################
+#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
+#   Please read the README.txt file in the model directory.     #
+#################################################################
+-->
 </Project>

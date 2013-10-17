@@ -1,0 +1,78 @@
+.#  Generate CMake project file for project
+.#
+.#  This is a code generator built using the iMatix GSL code generation
+.#  language. See https://github.com/imatix/gsl for details. This script
+.#  is licensed under MIT/X11.
+.#
+.echo "Generating CMakeLists.txt..."
+.output "../CMakeLists.txt"
+#################################################################
+#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
+#   Please read the README.txt file in the model directory.     #
+#################################################################
+
+cmake_minimum_required (VERSION 2.8)
+
+project ($(project.name))
+
+set (SOURCES_files_Source_Files
+.for class
+    src/$(name).c
+.endfor
+)
+source_group ("Source Files" FILES ${SOURCES_files_Source_Files})
+
+set (SOURCES_Source_Files
+  ${SOURCES_files_Source_Files}
+)
+
+set (SOURCES_files_Header_Files
+.for header
+    include/$(name).h
+.endfor
+.for class
+    include/$(name).h
+.endfor
+)
+source_group ("Header Files" FILES ${SOURCES_files_Header_Files})
+
+set (SOURCES_Header_Files
+  ${SOURCES_files_Header_Files}
+)
+
+set (SOURCES_
+  ${SOURCES_Source_Files}
+  ${SOURCES_Header_Files}
+)
+
+set (WITH_LIBZMQ .)
+
+include_directories (
+  ../libzmq/include
+  include
+  ${CMAKE_INSTALL_PREFIX}/include
+  ${WITH_LIBZMQ}
+)
+
+set_source_files_properties (
+    ${SOURCES_files_Source_Files} PROPERTIES LANGUAGE CXX
+)
+
+add_library (
+    $(project.name)
+    ${SOURCES_}
+)
+
+install (
+    TARGETS $(project.name)
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+)
+install (
+    FILES ${SOURCES_files_Header_Files} DESTINATION include
+)
+
+#################################################################
+#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
+#   Please read the README.txt file in the model directory.     #
+#################################################################

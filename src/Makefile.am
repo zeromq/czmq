@@ -1,3 +1,7 @@
+#################################################################
+#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
+#   Please read the README.txt file in the model directory.     #
+#################################################################
 lib_LTLIBRARIES = libczmq.la
 
 pkgconfigdir = $(libdir)/pkgconfig
@@ -29,7 +33,7 @@ include_HEADERS = \
     ../include/zstr.h \
     ../include/zsys.h \
     ../include/zthread.h \
-    ../include/ztree.h 
+    ../include/ztree.h
 
 libczmq_la_SOURCES = \
     platform.h \
@@ -59,8 +63,7 @@ libczmq_la_SOURCES = \
     ztree.c
 
 AM_CFLAGS = -g
-
-INCLUDES = -I$(top_srcdir)/include
+AM_CPPFLAGS = -I$(top_srcdir)/include
 bin_PROGRAMS = czmq_selftest
 czmq_selftest_LDADD = libczmq.la
 czmq_selftest_SOURCES = czmq_selftest.c
@@ -73,3 +76,7 @@ endif
 
 TESTS = czmq_selftest
 
+#################################################################
+#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
+#   Please read the README.txt file in the model directory.     #
+#################################################################

@@ -1,5 +1,8 @@
-#  Rebuild socket options class from model
-#  Requires iMatix GSL4, from http://github.com/imatix/gsl
-#  Only needed when socket options change
+#   Run all code generation scripts
+#   Requires iMatix GSL4, from http://github.com/imatix/gsl
+#   Use this when:
+#       - you add a socket option (sockopts.xml)
+#       - add a new project class (project.xml)
 
 gsl -q -script:sockopts.gsl sockopts.xml
+gsl -q -script:project.gsl project.xml
