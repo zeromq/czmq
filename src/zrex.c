@@ -35,7 +35,7 @@
     .   Match any character
     $   Match the end of the string
     |   Alternation
-    ()  Grouping (creates a subsequence)
+    ()  Grouping (captures a 'hit')
     []  Character class
 
     ==GREEDY CLOSURES==
@@ -55,9 +55,9 @@
     ==PREDEFINED CLASSES==
     \l      lowercase next char
     \u      uppercase next char
-    \a      letters
+    \a      alpha [a-zA-Z]
     \w      alphanumeric [0-9a-zA-Z]
-    \s      space
+    \s      space characters
     \d      decimal digits
     \x      hexadecimal digits
     \c      control characters
@@ -80,23 +80,23 @@
 #include "../foreign/trex/trex.c"
 #include "../include/czmq.h"
 
-#define MAX_SEQ 100             //  Should be enough for anyone :)
+#define MAX_HITS 100            //  Should be enough for anyone :)
 
 //  Structure of our class
 
 struct _zrex_t {
     TRex *trex;                 //  Compiled regular expression
     const char *strerror;       //  Error message if any
-    bool matches;               //  True if last match succeeded
-    uint count;                 //  Number of sequences
-    char *sequence [MAX_SEQ];   //  Captured sequences
+    uint hits;                  //  Number of hits matched
+    char *hit [MAX_HITS];       //  Captured hits
 };
 
 
 //  --------------------------------------------------------------------------
-//  Constructor; compile a new regular expression. If the expression is not
-//  valid, will still return a zrex_t object but all methods on this will
-//  fail, except zrex_strerror () and zrex_valid ().
+//  Constructor. Optionally, sets an expression against which we can match
+//  text and capture hits. If there is an error in the expression, reports
+//  zrex_valid() as false and provides the error in zrex_strerror(). If you
+//  set a pattern, you can call zrex_hits() to test it against text.
 
 zrex_t *
 zrex_new (const char *expression)
@@ -106,10 +106,12 @@ zrex_new (const char *expression)
     self->strerror = "No error";
     //  Trex cannot handle an empty pattern, which doesn't inspire huge
     //  confidence but apart from this, seems to be working...
-    if (*expression)
-        self->trex = trex_compile (expression, &self->strerror);
-    else
-        self->strerror = "Missing pattern";
+    if (expression) {
+        if (*expression)
+            self->trex = trex_compile (expression, &self->strerror);
+        else
+            self->strerror = "Missing pattern";
+    }
     return self;
 }
 
@@ -125,8 +127,8 @@ zrex_destroy (zrex_t **self_p)
         zrex_t *self = *self_p;
         trex_free (self->trex);
         int index;
-        for (index = 0; index < self->count; index++)
-            free (self->sequence [index]);
+        for (index = 0; index < self->hits; index++)
+            free (self->hit [index]);
         free (self);
         *self_p = NULL;
     }
@@ -154,74 +156,100 @@ zrex_strerror (zrex_t *self)
     return self->strerror;
 }
 
-// Work-around for Windows MS libc not having strndup():
-char* my_strndup(const char* src, size_t length) {
-#if defined(__WINDOWS__)
-    if (!src)
-        return "";
-    length = strlen(src) > length ? length: strlen(src);
-    char* result = (char*) malloc((length + 1) * sizeof(char));
-    if (!result)
-        return NULL;
-    strncpy(result, src, length);
-    result[length] = '\0';
-    return result;
-#else //defined(__WINDOWS__)
-    return strndup(src, length);
-#endif //defined(__WINDOWS__)
-}
 
 //  --------------------------------------------------------------------------
-//  Return true if the expression matches a provided string. If true, you
-//  can access the matched sequences using zrex_sequence ().
-
-bool
-zrex_matches (zrex_t *self, const char *text)
-{
-    int index;
-    for (index = 0; index < self->count; index++)
-        free (self->sequence [index]);
-
-    self->matches = trex_match (self->trex, text);
-    if (self->matches) {
-        self->count = trex_getsubexpcount (self->trex);
-        for (index = 0; index < self->count; index++) {
-            TRexMatch match = { 0 };
-            trex_getsubexp (self->trex, index, &match);
-            self->sequence [index] = my_strndup (match.begin, match.len);
-        }
-    }
-    else
-        self->count = 0;
-    return self->matches;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Returns a string holding the sequence at the specified index. If there
-//  was no sequence at the specified index, returns NULL. Sequence 0 is the
-//  whole matching sequence; sequence 1 is the first subsequence.
-
-const char *
-zrex_sequence (zrex_t *self, uint index)
-{
-    assert (self);
-    if (!self->matches || index > MAX_SEQ)
-        return NULL;
-    else
-        return self->sequence [index];
-}
-
-
-//  --------------------------------------------------------------------------
-//  Return number of matched sequences, which is 1 or more if the string
-//  matched, and zero otherwise.
+//  Matches the text against a previously set expression, and reports the
+//  number of hits (aka "capture groups" in e.g. Perl). If the text does
+//  not match, returns 0. If it matches, returns 1 or greater, depending on
+//  how many "(...)" groups the expression has. An expression with one group
+//  will produce 2 hits, one for the whole expression and one for the group.
+//  To retrieve the individual hits, call zrex_hit ().
 
 int
-zrex_count (zrex_t *self)
+zrex_hits (zrex_t *self, const char *text)
 {
     assert (self);
-    return self->count;
+    assert (text);
+    assert (self->trex);
+
+    int index;
+    for (index = 0; index < self->hits; index++) {
+        free (self->hit [index]);
+        self->hit [index] = NULL;
+    }
+    bool matched = trex_match (self->trex, text);
+    if (matched) {
+        //  Get number of hits, setting a sane limit
+        self->hits = trex_getsubexpcount (self->trex);
+        if (self->hits > MAX_HITS)
+            self->hits = MAX_HITS;
+    }
+    else
+        self->hits = 0;
+
+    return self->hits;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Matches the text against a new expression, and reports the number of
+//  hits. If the text does not match, returns 0. If it matches, returns 1 or
+//  greater, depending on how many "(...)" groups the expression has. An
+//  expression with one group will produce 2 hits, one for the whole
+//  expression and one for the group. To retrieve the individual hits, call
+//  zrex_hit ().
+
+int
+zrex_eq (zrex_t *self, const char *text, const char *expression)
+{
+    assert (self);
+    assert (text);
+    assert (expression);
+
+    //  If we had any previous expression, destroy it
+    if (self->trex) {
+        trex_free (self->trex);
+        self->trex = NULL;
+    }
+    //  Compile the new expression
+    if (*expression)
+        self->trex = trex_compile (expression, &self->strerror);
+    else
+        self->strerror = "Missing pattern";
+
+    //  zrex_hits takes care of the rest for us
+    return zrex_hits (self, text);
+
+}
+
+
+//  --------------------------------------------------------------------------
+//  Returns the Nth hit captured from the last expression match, where N is
+//  0 up to the value returned by zrex_hits() or zrex_eq(). Hit 0 is always
+//  the whole matching string. Hit 1 is the first capture group, if any, and
+//  so on.
+
+const char *
+zrex_hit (zrex_t *self, uint index)
+{
+    assert (self);
+    assert (self->trex);
+
+    if (index < self->hits) {
+        //  We collect hits opportunistically to minimize use of the heap for
+        //  complex expressions where the caller wants only a few hits.
+        if (self->hit [index] == NULL) {
+            //  We haven't fetched this hit yet, so grab it now
+            TRexMatch match = { 0 };
+            trex_getsubexp (self->trex, index, &match);
+            self->hit [index] = malloc (match.len + 1);
+            memcpy (self->hit [index], match.begin, match.len);
+            self->hit [index][match.len] = 0;
+        }
+        return self->hit [index];
+    }
+    else
+        return NULL;
 }
 
 
@@ -240,29 +268,40 @@ zrex_test (bool verbose)
         puts (zrex_strerror (rex));
     zrex_destroy (&rex);
 
+    //  This shows the pattern of matching many lines to a single pattern
+    rex = zrex_new ("[0-9]+\\-[0-9]+\\-[0-9]+");
+    assert (rex);
+    int hits = zrex_hits (rex, "123-456-789");
+    assert (hits == 1);
+    assert (streq (zrex_hit (rex, 0), "123-456-789"));
+    assert (zrex_hit (rex, 1) == NULL);
+    zrex_destroy (&rex);
+
+    //  Here we pick out hits using capture groups
     rex = zrex_new ("([0-9]+)\\-([0-9]+)\\-([0-9]+)");
     assert (rex);
     assert (zrex_valid (rex));
-    bool matches = zrex_matches (rex, "123-456-ABC");
-    assert (!matches);
-    matches = zrex_matches (rex, "123-456-789");
-    assert (matches);
-    assert (zrex_count (rex) == 4);
-    assert (streq (zrex_sequence (rex, 0), "123-456-789"));
-    assert (streq (zrex_sequence (rex, 1), "123"));
-    assert (streq (zrex_sequence (rex, 2), "456"));
-    assert (streq (zrex_sequence (rex, 3), "789"));
+    hits = zrex_hits (rex, "123-456-ABC");
+    assert (hits == 0);
+    hits = zrex_hits (rex, "123-456-789");
+    assert (hits == 4);
+    assert (streq (zrex_hit (rex, 0), "123-456-789"));
+    assert (streq (zrex_hit (rex, 1), "123"));
+    assert (streq (zrex_hit (rex, 2), "456"));
+    assert (streq (zrex_hit (rex, 3), "789"));
     zrex_destroy (&rex);
 
-    rex = zrex_new ("[0-9]+\\-[0-9]+\\-[0-9]+");
-    assert (rex);
-    matches = zrex_matches (rex, "123-456-789");
-    assert (matches);
-    assert (zrex_count (rex) == 1);
-    assert (streq (zrex_sequence (rex, 0), "123-456-789"));
-    assert (zrex_sequence (rex, 1) == NULL);
-    zrex_destroy (&rex);
+    //  This shows the pattern of matching one line against many
+    //  patterns and then handling the case when it hits
+    rex = zrex_new (NULL);      //  No initial pattern
+    char *input = "Mechanism: CURVE";
+    if (zrex_eq (rex, input, "Version: (.+)"))
+        assert (false);
+    else
+    if (zrex_eq (rex, input, "Mechanism: (.+)"))
+        assert (streq (zrex_hit (rex, 1), "CURVE"));
 
+    zrex_destroy (&rex);
     printf ("OK\n");
     return 0;
 }
