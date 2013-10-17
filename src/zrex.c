@@ -154,6 +154,22 @@ zrex_strerror (zrex_t *self)
     return self->strerror;
 }
 
+// Work-around for Windows MS libc not having strndup():
+char* my_strndup(const char* src, size_t length) {
+#if defined(__WINDOWS__)
+    if (!src)
+        return "";
+    length = strlen(src) > length ? length: strlen(src);
+    char* result = (char*) malloc((length + 1) * sizeof(char));
+    if (!result)
+        return NULL;
+    strncpy(result, src, length);
+    result[length] = '\0';
+    return result;
+#else //defined(__WINDOWS__)
+    return strndup(src, length);
+#endif //defined(__WINDOWS__)
+}
 
 //  --------------------------------------------------------------------------
 //  Return true if the expression matches a provided string. If true, you
@@ -172,7 +188,7 @@ zrex_matches (zrex_t *self, const char *text)
         for (index = 0; index < self->count; index++) {
             TRexMatch match = { 0 };
             trex_getsubexp (self->trex, index, &match);
-            self->sequence [index] = strndup (match.begin, match.len);
+            self->sequence [index] = my_strndup (match.begin, match.len);
         }
     }
     else
