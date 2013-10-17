@@ -156,22 +156,6 @@ zrex_strerror (zrex_t *self)
     return self->strerror;
 }
 
-// Work-around for Windows MS libc not having strndup():
-char* my_strndup(const char* src, size_t length) {
-#if defined(__WINDOWS__)
-    if (!src)
-        return "";
-    length = strlen(src) > length ? length: strlen(src);
-    char* result = (char*) malloc((length + 1) * sizeof(char));
-    if (!result)
-        return NULL;
-    strncpy(result, src, length);
-    result[length] = '\0';
-    return result;
-#else //defined(__WINDOWS__)
-    return strndup(src, length);
-#endif //defined(__WINDOWS__)
-}
 
 //  --------------------------------------------------------------------------
 //  Matches the text against a previously set expression, and reports the
@@ -258,7 +242,9 @@ zrex_hit (zrex_t *self, uint index)
             //  We haven't fetched this hit yet, so grab it now
             TRexMatch match = { 0 };
             trex_getsubexp (self->trex, index, &match);
-            self->hit [index] = strndup (match.begin, match.len);
+            self->hit [index] = malloc (match.len + 1);
+            memcpy (self->hit [index], match.begin, match.len);
+            self->hit [index][match.len] = 0;
         }
         return self->hit [index];
     }
