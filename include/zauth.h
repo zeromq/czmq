@@ -63,6 +63,12 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zauth_configure_curve (zauth_t *self, const char *domain, const char *location);
     
+//  Configure GSSAPI authentication for a given domain. GSSAPI authentication
+//  uses an underlying mechanism (usually Kerberos) to establish a secure
+//  context and perform mutual authentication.  To cover all domains, use "*". 
+CZMQ_EXPORT void
+    zauth_configure_gssapi (zauth_t *self, char *domain, ...);
+
 //  Enable verbose tracing of commands and activity
 CZMQ_EXPORT void
     zauth_set_verbose (zauth_t *self, bool verbose);
