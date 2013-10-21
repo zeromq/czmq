@@ -354,9 +354,6 @@ This is the class interface:
 
 .pull src/zrex.c@discuss,left
 
-#### ztree - generic red-black tree container
-
-.pull src/ztree.c@header,left
 #### zthread - working with system threads
 
 .pull src/zthread.c@header,left

@@ -40,17 +40,16 @@
 &emsp;<a href="#toc4-342">zstr - sending and receiving strings</a>
 &emsp;<a href="#toc4-367">zsys - system-level methods</a>
 &emsp;<a href="#toc4-378">zrex - working with regular expressions</a>
-&emsp;<a href="#toc4-389">ztree - generic red-black tree container</a>
-&emsp;<a href="#toc4-393">zthread - working with system threads</a>
-&emsp;<a href="#toc4-404">ztree - generic red-black tree container</a>
+&emsp;<a href="#toc4-389">zthread - working with system threads</a>
+&emsp;<a href="#toc4-400">ztree - generic red-black tree container</a>
 
-**<a href="#toc2-415">Under the Hood</a>**
-&emsp;<a href="#toc3-418">Adding a New Class</a>
-&emsp;<a href="#toc3-430">Documentation</a>
-&emsp;<a href="#toc3-469">Development</a>
-&emsp;<a href="#toc3-479">Porting CZMQ</a>
-&emsp;<a href="#toc3-490">Code Generation</a>
-&emsp;<a href="#toc3-495">This Document</a>
+**<a href="#toc2-411">Under the Hood</a>**
+&emsp;<a href="#toc3-414">Adding a New Class</a>
+&emsp;<a href="#toc3-426">Documentation</a>
+&emsp;<a href="#toc3-465">Development</a>
+&emsp;<a href="#toc3-475">Porting CZMQ</a>
+&emsp;<a href="#toc3-486">Code Generation</a>
+&emsp;<a href="#toc3-491">This Document</a>
 
 <A name="toc2-13" title="Overview" />
 ## Overview
@@ -1934,13 +1933,7 @@ $   Match the end of the string
 \P      non punctuation
 \B      non word boundary
 
-<A name="toc4-389" title="ztree - generic red-black tree container" />
-#### ztree - generic red-black tree container
-
-Red black tree container
-Derived from Emin Martianan's Red Black which is licensed for free use.
-http://web.mit.edu/~emin/www.old/source_code/red_black_tree/index.html
-<A name="toc4-393" title="zthread - working with system threads" />
+<A name="toc4-389" title="zthread - working with system threads" />
 #### zthread - working with system threads
 
 The zthread class wraps OS thread creation. It creates detached threads
@@ -2006,7 +1999,7 @@ If you want to communicate over ipc:// or tcp:// you may be sharing
 the same context, or use separate contexts. Thus, every detached thread
 usually starts by creating its own zctx_t instance.    
 
-<A name="toc4-404" title="ztree - generic red-black tree container" />
+<A name="toc4-400" title="ztree - generic red-black tree container" />
 #### ztree - generic red-black tree container
 
 Red black tree container
@@ -2102,10 +2095,10 @@ This is the class interface:
         ztree_test (int verbose);
 
 
-<A name="toc2-415" title="Under the Hood" />
+<A name="toc2-411" title="Under the Hood" />
 ## Under the Hood
 
-<A name="toc3-418" title="Adding a New Class" />
+<A name="toc3-414" title="Adding a New Class" />
 ### Adding a New Class
 
 If you define a new CZMQ class `myclass` you need to:
@@ -2117,7 +2110,7 @@ If you define a new CZMQ class `myclass` you need to:
 * Add myclass to 'model/projects.xml` and read model/README.txt.
 * Add a section to README.txt.
 
-<A name="toc3-430" title="Documentation" />
+<A name="toc3-426" title="Documentation" />
 ### Documentation
 
 Man pages are generated from the class header and source files via the doc/mkman tool, and similar functionality in the gitdown tool (http://github.com/imatix/gitdown). The header file for a class must wrap its interface as follows (example is from include/zclock.h):
@@ -2156,7 +2149,7 @@ The source file for a class then provides the self test example as follows:
 
 The template for man pages is in doc/mkman.
 
-<A name="toc3-469" title="Development" />
+<A name="toc3-465" title="Development" />
 ### Development
 
 CZMQ is developed through a test-driven process that guarantees no memory violations or leaks in the code:
@@ -2166,7 +2159,7 @@ CZMQ is developed through a test-driven process that guarantees no memory violat
 * Run the 'selftest' script, which uses the Valgrind memcheck tool.
 * Repeat until perfect.
 
-<A name="toc3-479" title="Porting CZMQ" />
+<A name="toc3-475" title="Porting CZMQ" />
 ### Porting CZMQ
 
 When you try CZMQ on an OS that it's not been used on (ever, or for a while), you will hit code that does not compile. In some cases the patches are trivial, in other cases (usually when porting to Windows), the work needed to build equivalent functionality may be non-trivial. In any case, the benefit is that once ported, the functionality is available to all applications.
@@ -2177,12 +2170,12 @@ Before attempting to patch code for portability, please read the `czmq_prelude.h
 * Defining macros that rename exotic library functions to more conventional names: do this in czmq_prelude.h.
 * Reimplementing specific methods to use a non-standard API: this is typically needed on Windows. Do this in the relevant class, using #ifdefs to properly differentiate code for different platforms.
 
-<A name="toc3-490" title="Code Generation" />
+<A name="toc3-486" title="Code Generation" />
 ### Code Generation
 
 We generate the zsockopt class using [https://github.com/imatix/gsl GSL], using a code generator script in scripts/sockopts.gsl.
 
-<A name="toc3-495" title="This Document" />
+<A name="toc3-491" title="This Document" />
 ### This Document
 
 This document is originally at README.txt and is built using [gitdown](http://github.com/imatix/gitdown).
