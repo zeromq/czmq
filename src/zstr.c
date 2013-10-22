@@ -51,8 +51,9 @@ s_send_string (void *zocket, bool more, char *string)
 
 
 //  --------------------------------------------------------------------------
-//  Receive C string from socket. Caller must free returned string. Returns
-//  NULL if the context is being terminated or the process was interrupted.
+//  Receive C string from socket. Caller must free returned string using
+//  zstr_free(). Returns NULL if the context is being terminated or the
+//  process was interrupted.
 
 char *
 zstr_recv (void *zocket)
@@ -74,9 +75,9 @@ zstr_recv (void *zocket)
 
 //  --------------------------------------------------------------------------
 //  Receive C string from socket, if socket had input ready. Caller must
-//  free returned string. Returns NULL if there was no input waiting, or if
-//  the context was terminated. Use zctx_interrupted to exit any loop that
-//  relies on this method.
+//  free returned string using zstr_free. Returns NULL if there was no input
+//  waiting, or if the context was terminated. Use zctx_interrupted to exit
+//  any loop that relies on this method.
 
 char *
 zstr_recv_nowait (void *zocket)
@@ -157,11 +158,12 @@ zstr_sendx (void *socket, const char *string, ...)
 
 
 //  --------------------------------------------------------------------------
-//  Receive a series of strings (until NULL) from multipart data
+//  Receive a series of strings (until NULL) from multipart data.
 //  Each string is allocated and filled with string data; if there
 //  are not enough frames, unallocated strings are set to NULL.
 //  Returns -1 if the message could not be read, else returns the
-//  number of strings filled, zero or more.
+//  number of strings filled, zero or more. Free each returned string
+//  using zstr_free().
 
 int
 zstr_recvx (void *socket, char **string_p, ...)
@@ -179,6 +181,19 @@ zstr_recvx (void *socket, char **string_p, ...)
     va_end (args);
     zmsg_destroy (&msg);
     return 0;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Free a provided string, and nullify the parent pointer. Safe to call on
+//  a null pointer.
+
+void
+zstr_free (char **string_p)
+{
+    assert (string_p);
+    free (*string_p);
+    *string_p = NULL;
 }
 
 
@@ -212,10 +227,10 @@ zstr_test (bool verbose)
     for (string_nbr = 0;; string_nbr++) {
         char *string = zstr_recv (input);
         if (streq (string, "END")) {
-            free (string);
+            zstr_free (&string);
             break;
         }
-        free (string);
+        zstr_free (&string);
     }
     assert (string_nbr == 15);
 

@@ -259,10 +259,10 @@ zdir_count (zdir_t *self)
 
 //  --------------------------------------------------------------------------
 //  Returns a sorted array of zfile objects; returns a single block of memory,
-//  that you destroy by calling free(). Each entry in the array is a pointer
-//  to a zfile_t item already allocated in the zdir tree. The array ends with
-//  a null pointer. Do not destroy the original zdir tree until you are done
-//  with this array.
+//  that you destroy by calling zdir_flatten_free(). Each entry in the array
+//  is a pointer to a zfile_t item already allocated in the zdir tree. The
+//  array ends with a null pointer. Do not destroy the original zdir tree
+//  until you are done with this array.
 
 static int  s_dir_flatten (zdir_t *self, zfile_t **files, int index);
 static bool s_dir_compare (void *item1, void *item2);
@@ -333,6 +333,19 @@ s_file_compare (void *item1, void *item2)
 
 
 //  --------------------------------------------------------------------------
+//  Free a provided string, and nullify the parent pointer. Safe to call on
+//  a null pointer.
+
+void
+zdir_flatten_free (zfile_t ***files_p)
+{
+    assert (files_p);
+    free (*files_p);
+    *files_p = NULL;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Print contents of directory
 
 void
@@ -348,7 +361,7 @@ zdir_dump (zdir_t *self, int indent)
             break;
         puts (zfile_filename (file, NULL));
     }
-    free (files);
+    zdir_flatten_free (&files);
 }
 
 
