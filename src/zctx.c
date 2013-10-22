@@ -149,6 +149,14 @@ zctx_shadow (zctx_t *ctx)
     zctx_t
         *self;
 
+    // Initialize the original context now if necessary
+    if (!ctx->context) {
+        zctx__initialize_underlying(ctx);
+        if (!ctx->context) {
+            return NULL;
+        }
+    }
+
     //  Shares same 0MQ context but has its own list of sockets so that
     //  we create, use, and destroy sockets only within a single thread.
     self = (zctx_t *) zmalloc (sizeof (zctx_t));
@@ -207,8 +215,8 @@ zctx_shadow_zmq_ctx (void *zmqctx)
 
 //  --------------------------------------------------------------------------
 //  Configure number of I/O threads in context, only has effect if called
-//  before creating first socket. Default I/O threads is 1, sufficient for
-//  all except very high volume applications.
+//  before creating first socket, or calling zctx_shadow. Default I/O 
+//  threads is 1, sufficient for all except very high volume applications.
 
 void
 zctx_set_iothreads (zctx_t *self, int iothreads)
@@ -295,6 +303,19 @@ zctx_underlying (zctx_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  Initialize the low-level 0MQ context object
+
+void
+zctx__initialize_underlying(zctx_t *self)
+{
+	assert (self);
+	zmutex_lock (self->mutex);
+    if (!self->context)
+        self->context = zmq_init (self->iothreads);
+    zmutex_unlock (self->mutex);
+}
+
+//  --------------------------------------------------------------------------
 //  Create socket within this context, for CZMQ use only
 
 void *
@@ -302,12 +323,12 @@ zctx__socket_new (zctx_t *self, int type)
 {
     //  Initialize context now if necessary
     assert (self);
-    zmutex_lock (self->mutex);
-    if (!self->context)
-        self->context = zmq_init (self->iothreads);
-    zmutex_unlock (self->mutex);
-    if (!self->context)
-        return NULL;
+    if (!self->context) {
+        zctx__initialize_underlying(self);
+        if (!self->context) {
+            return NULL;
+        }
+    }
 
     //  Create and register socket
     void *zocket = zmq_socket (self->context, type);

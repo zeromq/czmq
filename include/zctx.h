@@ -43,12 +43,11 @@ CZMQ_EXPORT zctx_t *
 CZMQ_EXPORT void
     zctx_destroy (zctx_t **self_p);
 
-//  @end
 //  Create new shadow context, returns context object
-//  For internal use only.
 CZMQ_EXPORT zctx_t *
     zctx_shadow (zctx_t *self);
-
+//  @end
+	
 //  Create a new context by shadowing a plain zmq context
 CZMQ_EXPORT zctx_t *
 zctx_shadow_zmq_ctx (void *zmqctx);
@@ -56,8 +55,8 @@ zctx_shadow_zmq_ctx (void *zmqctx);
 //  @interface
 //  Raise default I/O threads from 1, for crazy heavy applications
 //  The rule of thumb is one I/O thread per gigabyte of traffic in
-//  or out. Call this method before creating any sockets on the context
-//  or the setting will have no effect.
+//  or out. Call this method before creating any sockets on the context,
+//  or calling zctx_shadow, or the setting will have no effect.
 CZMQ_EXPORT void
     zctx_set_iothreads (zctx_t *self, int iothreads);
 
@@ -114,6 +113,10 @@ void *
 //  Destroy socket within this context, for CZMQ use only
 void
     zctx__socket_destroy (zctx_t *self, void *socket);
+	
+//  Initialize the low-level 0MQ context object, for CZMQ use only
+void
+	zctx__initialize_underlying(zctx_t *self);
 //  @end
     
 #ifdef __cplusplus
