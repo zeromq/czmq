@@ -206,7 +206,7 @@ zpoller_test (bool verbose)
     assert (zpoller_terminated (poller) == false);
     char *message = zstr_recv (which);
     assert (streq (message, "Hello, World"));
-    free (message);
+    zstr_free (&message);
     
     //  Destroy poller and context
     zpoller_destroy (&poller);

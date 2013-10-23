@@ -125,7 +125,7 @@ zclock_log (const char *format, ...)
 
 
 //  --------------------------------------------------------------------------
-//  Return formatted date/time as fresh string.
+//  Return formatted date/time as fresh string. Free using zstr_free().
 
 char *
 zclock_timestr (void)

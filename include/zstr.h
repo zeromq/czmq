@@ -31,11 +31,16 @@ extern "C" {
 #endif
 
 //  @interface
-//  Receive a string off a socket, caller must free it
+//  Receive C string from socket. Caller must free returned string using
+//  zstr_free(). Returns NULL if the context is being terminated or the
+//  process was interrupted.
 CZMQ_EXPORT char *
     zstr_recv (void *socket);
 
-//  Receive a string off a socket if socket had input waiting
+//  Receive C string from socket, if socket had input ready. Caller must
+//  free returned string using zstr_free. Returns NULL if there was no input
+//  waiting, or if the context was terminated. Use zctx_interrupted to exit
+//  any loop that relies on this method.
 CZMQ_EXPORT char *
     zstr_recv_nowait (void *socket);
 
@@ -52,13 +57,19 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zstr_sendx (void *socket, const char *string, ...);
 
-//  Receive a series of strings (until NULL) from multipart data
+//  Receive a series of strings (until NULL) from multipart data.
 //  Each string is allocated and filled with string data; if there
 //  are not enough frames, unallocated strings are set to NULL.
 //  Returns -1 if the message could not be read, else returns the
-//  number of strings filled, zero or more.
+//  number of strings filled, zero or more. Free each returned string
+//  using zstr_free().
 CZMQ_EXPORT int
     zstr_recvx (void *socket, char **string_p, ...);
+
+//  Free a provided string, and nullify the parent pointer. Safe to call on
+//  a null pointer.
+CZMQ_EXPORT void
+    zstr_free (char **string_p);
 
 //  Self test of this class
 CZMQ_EXPORT int

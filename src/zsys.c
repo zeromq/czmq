@@ -324,7 +324,8 @@ zsys_file_mode_default (void)
 
 //  --------------------------------------------------------------------------
 //  Format a string with variable arguments, returning a freshly allocated
-//  buffer. If there was insufficient memory, returns NULL.
+//  buffer. If there was insufficient memory, returns NULL. Free the returned
+//  string using zstr_free().
  
 char *
 zsys_vprintf (const char *format, va_list argptr)
@@ -395,7 +396,7 @@ zsys_test (bool verbose)
 
     char *string = s_vprintf ("%s %02x", "Hello", 16);
     assert (streq (string, "Hello 10"));
-    free (string);
+    zstr_free (&string);
     //  @end
     
     printf ("OK\n");

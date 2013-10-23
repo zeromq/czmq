@@ -98,7 +98,8 @@ CZMQ_EXPORT void
     zsys_file_mode_default (void);
 
 //  Format a string with variable arguments, returning a freshly allocated
-//  buffer. If there was insufficient memory, returns NULL.
+//  buffer. If there was insufficient memory, returns NULL. Free the returned
+//  string using zstr_free().
 CZMQ_EXPORT char *
     zsys_vprintf (const char *format, va_list argptr);
 

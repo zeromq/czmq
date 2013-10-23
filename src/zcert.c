@@ -186,7 +186,7 @@ zcert_set_meta (zcert_t *self, char *name, char *format, ...)
     char *value = zsys_vprintf (format, argptr);
     va_end (argptr);
     zhash_insert (self->metadata, name, value);
-    free (value);
+    zstr_free (&value);
 }
 
 
@@ -246,7 +246,7 @@ zcert_load (char *format, ...)
         }
     }
     zconfig_destroy (&root);
-    free (filename);
+    zstr_free (&filename);
     return self;
 #else   
     return NULL;
@@ -277,7 +277,7 @@ s_save_metadata_all (zcert_t *self)
     
     char *timestr = zclock_timestr ();
     zconfig_comment (self->config, "   ****  Generated on %s by CZMQ  ****", timestr);
-    free (timestr);
+    zstr_free (&timestr);
 }
 
 
@@ -307,7 +307,7 @@ zcert_save (zcert_t *self, char *format, ...)
     int rc = zconfig_save (self->config, filename_secret);
     zsys_file_mode_default ();
     
-    free (filename);
+    zstr_free (&filename);
     return rc;
 }
 
@@ -334,7 +334,7 @@ zcert_save_public (zcert_t *self, char *format, ...)
     
     zconfig_put (self->config, "/curve/public-key", self->public_txt);
     int rc = zconfig_save (self->config, filename);
-    free (filename);
+    zstr_free (&filename);
     return rc;
 }
 

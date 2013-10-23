@@ -131,7 +131,8 @@ zbeacon_destroy (zbeacon_t **self_p)
     if (*self_p) {
         zbeacon_t *self = *self_p;
         zstr_send (self->pipe, "TERMINATE");
-        free (zstr_recv (self->pipe));
+        char *reply = zstr_recv (self->pipe);
+        zstr_free (&reply);
         zctx_destroy (&self->ctx);
         free (self->hostname);
         free (self);
@@ -273,7 +274,7 @@ zbeacon_test (bool verbose)
                         +  zframe_data (content) [1];
         assert (received_port == port_nbr);
         zframe_destroy (&content);
-        free (ipaddress);
+        zstr_free (&ipaddress);
     }
     zbeacon_destroy (&client_beacon);
     zbeacon_destroy (&service_beacon);
@@ -313,8 +314,8 @@ zbeacon_test (bool verbose)
             char *ipaddress, *beacon;
             zstr_recvx (zbeacon_socket (node1), &ipaddress, &beacon, NULL);
             assert (streq (beacon, "NODE/2"));
-            free (ipaddress);
-            free (beacon);
+            zstr_free (&ipaddress);
+            zstr_free (&beacon);
         }
     }
     zpoller_destroy (&poller);
@@ -387,7 +388,7 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
 
     //  Create agent instance
     agent_t *self = s_agent_new (pipe, atoi (port_str));
-    free (port_str);
+    zstr_free (&port_str);
 
     while (!zctx_interrupted) {
         //  Poll on API pipe and on UDP socket
@@ -682,7 +683,7 @@ s_api_command (agent_t *self)
     if (streq (command, "INTERVAL")) {
         char *interval = zstr_recv (self->pipe);
         self->interval = atoi (interval);
-        free (interval);
+        zstr_free (&interval);
     }
     else
     if (streq (command, "NOECHO"))
@@ -714,7 +715,7 @@ s_api_command (agent_t *self)
     else
         printf ("E: unexpected API command '%s'\n", command);
     
-    free (command);
+    zstr_free (&command);
 }
 
 //  Receive and filter the waiting beacon

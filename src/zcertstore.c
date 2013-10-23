@@ -133,7 +133,7 @@ s_load_certs_from_disk (zcertstore_t *self)
                     zcertstore_insert (self, &cert);
             }
         }
-        free (filelist);
+        zdir_flatten_free (&filelist);
         self->modified = zdir_modified (dir);
         self->count = zdir_count (dir);
         self->cursize = zdir_cursize (dir);

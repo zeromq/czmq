@@ -72,7 +72,7 @@ zauth_new (zctx_t *ctx)
     char *status = zstr_recv (self->pipe);
     if (strneq (status, "OK"))
         zauth_destroy (&self);
-    free (status);
+    zstr_free (&status);
     return self;
 }
 
@@ -120,7 +120,7 @@ zauth_configure_plain (zauth_t *self, char *domain, char *filename, ...)
     char *formatted = zsys_vprintf (filename, argptr);
     va_end (argptr);
     zstr_sendx (self->pipe, "PLAIN", domain, formatted, NULL);
-    free (formatted);
+    zstr_free (&formatted);
 }
 
 
@@ -144,7 +144,7 @@ zauth_configure_curve (zauth_t *self, char *domain, char *location, ...)
     char *formatted = zsys_vprintf (location, argptr);
     va_end (argptr);
     zstr_sendx (self->pipe, "CURVE", domain, formatted, NULL);
-    free (formatted);
+    zstr_free (&formatted);
 }
 
 
@@ -170,7 +170,8 @@ zauth_destroy (zauth_t **self_p)
     if (*self_p) {
         zauth_t *self = *self_p;
         zstr_send (self->pipe, "TERMINATE");
-        free (zstr_recv (self->pipe));
+        char *reply = zstr_recv (self->pipe);
+        zstr_free (&reply);
         free (self);
         *self_p = NULL;
     }
@@ -350,32 +351,32 @@ s_agent_handle_pipe (agent_t *self)
     if (streq (command, "ALLOW")) {
         char *address = zmsg_popstr (request);
         zhash_insert (self->whitelist, address, "OK");
-        free (address);
+        zstr_free (&address);
     }
     else
     if (streq (command, "DENY")) {
         char *address = zmsg_popstr (request);
         zhash_insert (self->blacklist, address, "OK");
-        free (address);
+        zstr_free (&address);
     }
     else
     if (streq (command, "PLAIN")) {
         //  For now we don't do anything with domains
         char *domain = zmsg_popstr (request);
-        free (domain);
+        zstr_free (&domain);
         //  Get password file and load into zhash table
         //  If the file doesn't exist we'll get an empty table
         char *filename = zmsg_popstr (request);
         zhash_destroy (&self->passwords);
         self->passwords = zhash_new ();
         zhash_load (self->passwords, filename);
-        free (filename);
+        zstr_free (&filename);
     }
     else
     if (streq (command, "CURVE")) {
         //  For now we don't do anything with domains
         char *domain = zmsg_popstr (request);
-        free (domain);
+        zstr_free (&domain);
         //  If location is CURVE_ALLOW_ANY, allow all clients. Otherwise 
         //  treat location as a directory that holds the certificates.
         char *location = zmsg_popstr (request);
@@ -386,13 +387,13 @@ s_agent_handle_pipe (agent_t *self)
             self->certstore = zcertstore_new (location);
             self->allow_any = false;
         }
-        free (location);
+        zstr_free (&location);
     }
     else
     if (streq (command, "VERBOSE")) {
         char *verbose = zmsg_popstr (request);
         self->verbose = *verbose == '1';
-        free (verbose);
+        zstr_free (&verbose);
     }
     else
     if (streq (command, "TERMINATE")) {
@@ -403,7 +404,7 @@ s_agent_handle_pipe (agent_t *self)
         printf ("E: invalid command from API: %s\n", command);
         assert (false);
     }
-    free (command);
+    zstr_free (&command);
     zmsg_destroy (&request);
     return 0;
 }
@@ -577,8 +578,10 @@ s_can_connect (void *server, void *client)
     zstr_send (server, "Hello, World");
     //  Need up to half a second if running under Valgrind
     bool success = zpoller_wait (poller, 500) == client;
-    if (success)
-        free (zstr_recv (client));
+    if (success) {
+        char *response = zstr_recv (client);
+        zstr_free (&response);
+    }
     zpoller_destroy (&poller);
     rc = zsocket_unbind (server, "tcp://*:%d", port_nbr);
     assert (rc != -1);
