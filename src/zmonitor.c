@@ -27,14 +27,14 @@
 @header
     The zmonitor class provides an API for obtaining socket events such as
     connected, listen, disconnected, etc. Socket events are only available
-    for ipc and tcp socket types.
+    for sockets connecting or bound to ipc:// and tcp:// endpoints.
 @discuss
+    This class wraps the ZMQ socket monitor API, see zmq_socket_monitor for
+    details.
 @end
 */
 
-
 #include "../include/czmq.h"
-
 
 //  Structure of our class
 struct _zmonitor_t {
@@ -47,6 +47,7 @@ struct _zmonitor_t {
 static void
     s_agent_task (void *args, zctx_t *ctx, void *pipe);
 
+
 //  --------------------------------------------------------------------------
 //  Create a new socket monitor
 
@@ -54,8 +55,9 @@ zmonitor_t *
 zmonitor_new (zctx_t *ctx, void *socket, int events)
 {
     zmonitor_t *self = (zmonitor_t *) zmalloc (sizeof (zmonitor_t));
+    assert (self);
 
-    // register a monitor endpoint on the socket
+    //  Register a monitor endpoint on the socket
     char *monitor_endpoint = (char *) zmalloc (100);
     sprintf (monitor_endpoint, "inproc://zmonitor-%p", socket);
     int rc = zmq_socket_monitor (socket, monitor_endpoint, events);
@@ -76,7 +78,7 @@ zmonitor_new (zctx_t *ctx, void *socket, int events)
 }
 
 //  --------------------------------------------------------------------------
-//  Destructor
+//  Destroy a socket monitor
 
 void
 zmonitor_destroy (zmonitor_t **self_p)
@@ -106,6 +108,7 @@ zmonitor_socket (zmonitor_t *self)
 
 //  --------------------------------------------------------------------------
 //  Enable verbose tracing of commands and activity
+
 void
 zmonitor_set_verbose (zmonitor_t *self, bool verbose)
 {
@@ -138,12 +141,12 @@ void
 zmonitor_test (bool verbose)
 {
     printf (" * zmonitor: ");
-
     if (verbose)
-        printf("\n");
-    bool result;
+        printf ("\n");
+
     //  @selftest
     zctx_t *ctx = zctx_new ();
+    bool result;
 
     void *sink = zsocket_new (ctx, ZMQ_PULL);
     zmonitor_t *sinkmon = zmonitor_new (ctx,
@@ -151,7 +154,7 @@ zmonitor_test (bool verbose)
     zmonitor_set_verbose (sinkmon, verbose);
     void *sinkmon_sock = zmonitor_socket (sinkmon);
 
-    // check sink is now listening
+    //  Check sink is now listening
     zsocket_bind (sink, "tcp://*:5555");
     result = s_check_event (sinkmon_sock, ZMQ_EVENT_LISTENING);
     assert (result);
@@ -163,15 +166,15 @@ zmonitor_test (bool verbose)
     void *sourcemon_sock = zmonitor_socket (sourcemon);
     zsocket_connect (source, "tcp://localhost:5555");
 
-    // check source connected to sink
+    //  Check source connected to sink
     result = s_check_event (sourcemon_sock, ZMQ_EVENT_CONNECTED);
     assert (result);
 
-    // check sink accepted connection
+    //  Check sink accepted connection
     result = s_check_event (sinkmon_sock, ZMQ_EVENT_ACCEPTED);
     assert (result);
 
-    // destroy sink to trigger a disconnect event on the source
+    //  Destroy sink to trigger a disconnect event on the source
     zsocket_destroy (ctx, sink);
     result = s_check_event (sourcemon_sock, ZMQ_EVENT_DISCONNECTED);
     assert (result);
@@ -191,12 +194,11 @@ zmonitor_test (bool verbose)
 
 typedef struct {
     zctx_t *ctx;
-    void *pipe;           // Socket back to application
-    void *mon;            // monitor socket
-    char *endpoint;       // monitor endpoint
-    bool verbose;         // Trace activity to stdout
+    void *pipe;             //  Socket back to application
+    void *socket;           //  Monitored socket
+    char *endpoint;         //  Monitored endpoint
+    bool verbose;           //  Trace activity to stdout
     bool terminated;
-
 } agent_t;
 
 //  Prototypes for local functions we use in the agent
@@ -206,7 +208,7 @@ static agent_t *
 static void
     s_api_command (agent_t *self);
 static void
-    s_event_recv (agent_t *self);
+    s_socket_event (agent_t *self);
 static void
     s_agent_destroy (agent_t **self_p);
 
@@ -216,27 +218,23 @@ static void
 static void
 s_agent_task (void *args, zctx_t *ctx, void *pipe)
 {
-
     char *endpoint = zstr_recv (pipe);
     assert (endpoint);
 
-    //  Create agent instance
     agent_t *self = s_agent_new (ctx, pipe, endpoint);
 
-    zpoller_t *poller = zpoller_new (self->pipe, self->mon, NULL);
-
+    zpoller_t *poller = zpoller_new (self->pipe, self->socket, NULL);
     while (!zctx_interrupted) {
-
         //  Poll on API pipe and on monitor socket
         void *result = zpoller_wait (poller, -1);
-
         if (result == NULL)
             break; // Interrupted
-
+        else
         if (result == self->pipe)
             s_api_command (self);
-        if (result == self->mon)
-            s_event_recv (self);
+        else
+        if (result == self->socket)
+            s_socket_event (self);
 
         if (self->terminated)
             break;
@@ -262,10 +260,10 @@ s_agent_new (zctx_t *ctx, void *pipe, char *endpoint)
     self->terminated = false;
 
     // connect to the socket monitor inproc endpoint
-    self->mon = zsocket_new (self->ctx, ZMQ_PAIR);
-    assert (self->mon);
+    self->socket = zsocket_new (self->ctx, ZMQ_PAIR);
+    assert (self->socket);
 
-    if (zsocket_connect (self->mon, self->endpoint) == 0)
+    if (zsocket_connect (self->socket, self->endpoint) == 0)
         zstr_send (self->pipe, "OK");
     else
         zstr_send (self->pipe, "ERROR");
@@ -281,7 +279,6 @@ static void
 s_api_command (agent_t *self)
 {
     char *command = zstr_recv (self->pipe);
-
     if (streq (command, "TERMINATE")) {
         self->terminated = true;
         zstr_send (self->pipe, "OK");
@@ -303,30 +300,28 @@ s_api_command (agent_t *self)
 // Handle event from socket monitor
 
 static void
-s_event_recv (agent_t *self)
+s_socket_event (agent_t *self)
 {
-
     zframe_t *frame;
     zmq_event_t event;
     char *description = "Unknown";
-    char addr[1025];
+    char address [1025];
 
-    // copy event data into event struct
-    frame = zframe_recv (self->mon);
-    // extract id of the event as bitfield
-    memcpy(&(event.event),
-           zframe_data (frame),
-           sizeof (event.event));
-    // extract value which is either error code, fd or reconnect interval
-    memcpy(&(event.value),
-           zframe_data (frame) + sizeof (event.event),
+    //  Copy event data into event struct
+    frame = zframe_recv (self->socket);
+
+    //  Extract id of the event as bitfield
+    memcpy (&(event.event), zframe_data (frame), sizeof (event.event));
+
+    //  Extract value which is either error code, fd, or reconnect interval
+    memcpy (&(event.value), zframe_data (frame) + sizeof (event.event),
            sizeof (event.value));
     zframe_destroy (&frame);
 
-    // copy address part
-    frame = zframe_recv (self->mon);
-    memcpy(addr, zframe_data (frame), zframe_size (frame));
-    *(addr + zframe_size (frame)) = '\0'; // add null terminator to address string
+    //  Copy address part
+    frame = zframe_recv (self->socket);
+    memcpy (address, zframe_data (frame), zframe_size (frame));
+    address [zframe_size (frame)] = 0;  // Terminate address string
     zframe_destroy (&frame);
 
     switch (event.event) {
@@ -368,18 +363,17 @@ s_event_recv (agent_t *self)
                 printf ("Unknown socket monitor event: %d", event.event);
             break;
     }
-
     if (self->verbose)
-        printf ("I: zmonitor: %s - %s\n", description, addr);
+        printf ("I: zmonitor: %s - %s\n", description, address);
 
     zmsg_t *msg = zmsg_new();
     zmsg_addstr (msg, "%d", (int) event.event );
     zmsg_addstr (msg, "%d", (int) event.value );
-    zmsg_addstr (msg, "%s", addr);
+    zmsg_addstr (msg, "%s", address);
     zmsg_addstr (msg, "%s", description);
-    zmsg_send (&msg, self->pipe);
-
+    zmsg_send  (&msg, self->pipe);
 }
+
 
 //  --------------------------------------------------------------------------
 //  Destroy agent instance

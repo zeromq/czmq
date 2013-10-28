@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zloop - event-driven reactor
+    zmonitor - socket event monitor
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
@@ -38,14 +38,16 @@ typedef struct _zmonitor_t zmonitor_t;
 CZMQ_EXPORT zmonitor_t *
     zmonitor_new (zctx_t *ctx, void *socket, int events);
 
-//  Destroy a beacon
+//  Destroy a socket monitor
 CZMQ_EXPORT void
     zmonitor_destroy (zmonitor_t **self_p);
 
-// Get zmonitor pipe socket, for polling or receiving messages
+//  Get the ZeroMQ socket, for polling or receiving socket
+//  event messages from the backend agent on.
 CZMQ_EXPORT void *
-zmonitor_socket (zmonitor_t *self);
+    zmonitor_socket (zmonitor_t *self);
 
+//  Enable verbose tracing of commands and activity
 CZMQ_EXPORT void
     zmonitor_set_verbose (zmonitor_t *self, bool verbose);
 
