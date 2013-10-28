@@ -104,10 +104,10 @@ In general CZMQ works best with the latest libzmq master. If you already have an
 
 And then to build CZMQ against this installation of libzmq:
 
-    export CFLAGS=-I$HOME/local/include 
-    export LDFLAGS=-L$HOME/local/lib64 
+    export CFLAGS=-I$HOME/local/include
+    export LDFLAGS=-L$HOME/local/lib64
     ./configure
-    
+
 You will need the libtool and autotools packages. After building, run the CZMQ selftests:
 
     make check
@@ -259,6 +259,16 @@ This is the class interface:
 .pull include/zloop.h@interface,code
 
 .pull src/zloop.c@discuss,left
+
+#### zmonitor - socket event monitor
+
+.pull src/zmonitor.c@header,left
+
+This is the class interface:
+
+.pull include/zmonitor.h@interface,code
+
+.pull src/zmonitor.c@discuss,left
 
 #### zmsg - working with multipart messages
 
