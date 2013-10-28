@@ -32,24 +32,25 @@
 &emsp;<a href="#toc4-254">zhash - generic hash table container</a>
 &emsp;<a href="#toc4-265">zlist - generic list container</a>
 &emsp;<a href="#toc4-276">zloop - event-driven reactor</a>
-&emsp;<a href="#toc4-287">zmsg - working with multipart messages</a>
-&emsp;<a href="#toc4-298">zmutex - wrap lightweight mutexes</a>
-&emsp;<a href="#toc4-309">zpoller - trivial socket poller class</a>
-&emsp;<a href="#toc4-320">zsocket - working with ØMQ sockets</a>
-&emsp;<a href="#toc4-331">zsockopt - working with ØMQ socket options</a>
-&emsp;<a href="#toc4-342">zstr - sending and receiving strings</a>
-&emsp;<a href="#toc4-367">zsys - system-level methods</a>
-&emsp;<a href="#toc4-378">zrex - working with regular expressions</a>
-&emsp;<a href="#toc4-389">zthread - working with system threads</a>
-&emsp;<a href="#toc4-400">ztree - generic red-black tree container</a>
+&emsp;<a href="#toc4-287">zmonitor - socket event monitor</a>
+&emsp;<a href="#toc4-298">zmsg - working with multipart messages</a>
+&emsp;<a href="#toc4-309">zmutex - wrap lightweight mutexes</a>
+&emsp;<a href="#toc4-320">zpoller - trivial socket poller class</a>
+&emsp;<a href="#toc4-331">zsocket - working with ØMQ sockets</a>
+&emsp;<a href="#toc4-342">zsockopt - working with ØMQ socket options</a>
+&emsp;<a href="#toc4-353">zstr - sending and receiving strings</a>
+&emsp;<a href="#toc4-378">zsys - system-level methods</a>
+&emsp;<a href="#toc4-389">zrex - working with regular expressions</a>
+&emsp;<a href="#toc4-400">zthread - working with system threads</a>
+&emsp;<a href="#toc4-411">ztree - generic red-black tree container</a>
 
-**<a href="#toc2-411">Under the Hood</a>**
-&emsp;<a href="#toc3-414">Adding a New Class</a>
-&emsp;<a href="#toc3-426">Documentation</a>
-&emsp;<a href="#toc3-465">Development</a>
-&emsp;<a href="#toc3-475">Porting CZMQ</a>
-&emsp;<a href="#toc3-486">Code Generation</a>
-&emsp;<a href="#toc3-491">This Document</a>
+**<a href="#toc2-422">Under the Hood</a>**
+&emsp;<a href="#toc3-425">Adding a New Class</a>
+&emsp;<a href="#toc3-437">Documentation</a>
+&emsp;<a href="#toc3-476">Development</a>
+&emsp;<a href="#toc3-486">Porting CZMQ</a>
+&emsp;<a href="#toc3-497">Code Generation</a>
+&emsp;<a href="#toc3-502">This Document</a>
 
 <A name="toc2-13" title="Overview" />
 ## Overview
@@ -129,10 +130,10 @@ In general CZMQ works best with the latest libzmq master. If you already have an
 
 And then to build CZMQ against this installation of libzmq:
 
-    export CFLAGS=-I$HOME/local/include 
-    export LDFLAGS=-L$HOME/local/lib64 
+    export CFLAGS=-I$HOME/local/include
+    export LDFLAGS=-L$HOME/local/lib64
     ./configure
-    
+
 You will need the libtool and autotools packages. After building, run the CZMQ selftests:
 
     make check
@@ -510,7 +511,7 @@ This is the class interface:
     CZMQ_EXPORT void
         zclock_log (const char *format, ...);
     
-    //  Return formatted date/time as fresh string.
+    //  Return formatted date/time as fresh string. Free using zstr_free().
     CZMQ_EXPORT char *
         zclock_timestr (void);
     
@@ -570,10 +571,13 @@ This is the class interface:
     CZMQ_EXPORT void
         zctx_destroy (zctx_t **self_p);
     
+    //  Create new shadow context, returns context object
+    CZMQ_EXPORT zctx_t *
+        zctx_shadow (zctx_t *self);
     //  Raise default I/O threads from 1, for crazy heavy applications
     //  The rule of thumb is one I/O thread per gigabyte of traffic in
-    //  or out. Call this method before creating any sockets on the context
-    //  or the setting will have no effect.
+    //  or out. Call this method before creating any sockets on the context,
+    //  or calling zctx_shadow, or the setting will have no effect.
     CZMQ_EXPORT void
         zctx_set_iothreads (zctx_t *self, int iothreads);
     
@@ -656,12 +660,17 @@ This is the class interface:
         zdir_count (zdir_t *self);
         
     //  Returns a sorted array of zfile objects; returns a single block of memory,
-    //  that you destroy by calling free(). Each entry in the array is a pointer
+    //  that you destroy by calling zstr_free(). Each entry in the array is a pointer
     //  to a zfile_t item already allocated in the zdir tree. The array ends with
     //  a null pointer. Do not destroy the original zdir tree until you are done
     //  with this array.
     CZMQ_EXPORT zfile_t **
         zdir_flatten (zdir_t *self);
+    
+    //  Free a provided string, and nullify the parent pointer. Safe to call on
+    //  a null pointer.
+    CZMQ_EXPORT void
+        zdir_flatten_free (zfile_t ***files_p);
     
     //  Print contents of directory to stderr
     CZMQ_EXPORT void
@@ -1167,7 +1176,37 @@ This is the class interface:
         zloop_test (bool verbose);
 
 
-<A name="toc4-287" title="zmsg - working with multipart messages" />
+<A name="toc4-287" title="zmonitor - socket event monitor" />
+#### zmonitor - socket event monitor
+
+The zmonitor class provides an API for obtaining socket events such as
+connected, listen, disconnected, etc. Socket events are only available
+for ipc and tcp socket types.
+
+This is the class interface:
+
+    //  Create a new socket monitor
+    CZMQ_EXPORT zmonitor_t *
+        zmonitor_new (zctx_t *ctx, void *socket, int events);
+    
+    //  Destroy a beacon
+    CZMQ_EXPORT void
+        zmonitor_destroy (zmonitor_t **self_p);
+    
+    // Get zmonitor pipe socket, for polling or receiving messages
+    CZMQ_EXPORT void *
+    zmonitor_socket (zmonitor_t *self);
+    
+    CZMQ_EXPORT void
+        zmonitor_set_verbose (zmonitor_t *self, bool verbose);
+    
+    // Self test of this class
+    CZMQ_EXPORT void
+        zmonitor_test (bool verbose);
+    
+
+
+<A name="toc4-298" title="zmsg - working with multipart messages" />
 #### zmsg - working with multipart messages
 
 The zmsg class provides methods to send and receive multipart messages
@@ -1331,7 +1370,7 @@ This is the class interface:
         zmsg_test (bool verbose);
 
 
-<A name="toc4-298" title="zmutex - wrap lightweight mutexes" />
+<A name="toc4-309" title="zmutex - wrap lightweight mutexes" />
 #### zmutex - wrap lightweight mutexes
 
 The zmutex class provides a portable wrapper for mutexes. Please do not
@@ -1368,7 +1407,7 @@ This is the class interface:
         zmutex_test (bool verbose);
 
 
-<A name="toc4-309" title="zpoller - trivial socket poller class" />
+<A name="toc4-320" title="zpoller - trivial socket poller class" />
 #### zpoller - trivial socket poller class
 
 The zpoller class provides a minimalist interface to ZeroMQ's zmq_poll 
@@ -1408,7 +1447,7 @@ This is the class interface:
         zpoller_test (bool verbose);
 
 
-<A name="toc4-320" title="zsocket - working with ØMQ sockets" />
+<A name="toc4-331" title="zsocket - working with ØMQ sockets" />
 #### zsocket - working with ØMQ sockets
 
 The zsocket class provides helper functions for ØMQ sockets. It doesn't
@@ -1480,7 +1519,7 @@ This is the class interface:
         zsocket_test (bool verbose);
 
 
-<A name="toc4-331" title="zsockopt - working with ØMQ socket options" />
+<A name="toc4-342" title="zsockopt - working with ØMQ socket options" />
 #### zsockopt - working with ØMQ socket options
 
 The zsockopt class provides access to the ØMQ getsockopt/setsockopt API.
@@ -1699,7 +1738,7 @@ This class is generated, using the GSL code generator. See the sockopts
 XML file, which provides the metadata, and the sockopts.gsl template,
 which does the work.
 
-<A name="toc4-342" title="zstr - sending and receiving strings" />
+<A name="toc4-353" title="zstr - sending and receiving strings" />
 #### zstr - sending and receiving strings
 
 The zstr class provides utility functions for sending and receiving C
@@ -1713,11 +1752,16 @@ message sending.
 
 This is the class interface:
 
-    //  Receive a string off a socket, caller must free it
+    //  Receive C string from socket. Caller must free returned string using
+    //  zstr_free(). Returns NULL if the context is being terminated or the
+    //  process was interrupted.
     CZMQ_EXPORT char *
         zstr_recv (void *socket);
     
-    //  Receive a string off a socket if socket had input waiting
+    //  Receive C string from socket, if socket had input ready. Caller must
+    //  free returned string using zstr_free. Returns NULL if there was no input
+    //  waiting, or if the context was terminated. Use zctx_interrupted to exit
+    //  any loop that relies on this method.
     CZMQ_EXPORT char *
         zstr_recv_nowait (void *socket);
     
@@ -1734,20 +1778,26 @@ This is the class interface:
     CZMQ_EXPORT int
         zstr_sendx (void *socket, const char *string, ...);
     
-    //  Receive a series of strings (until NULL) from multipart data
+    //  Receive a series of strings (until NULL) from multipart data.
     //  Each string is allocated and filled with string data; if there
     //  are not enough frames, unallocated strings are set to NULL.
     //  Returns -1 if the message could not be read, else returns the
-    //  number of strings filled, zero or more.
+    //  number of strings filled, zero or more. Free each returned string
+    //  using zstr_free().
     CZMQ_EXPORT int
         zstr_recvx (void *socket, char **string_p, ...);
+    
+    //  Free a provided string, and nullify the parent pointer. Safe to call on
+    //  a null pointer.
+    CZMQ_EXPORT void
+        zstr_free (char **string_p);
     
     //  Self test of this class
     CZMQ_EXPORT int
         zstr_test (bool verbose);
 
 
-<A name="toc4-367" title="zsys - system-level methods" />
+<A name="toc4-378" title="zsys - system-level methods" />
 #### zsys - system-level methods
 
 The zsys class provides a portable wrapper for miscellaneous functions
@@ -1824,7 +1874,8 @@ This is the class interface:
         zsys_file_mode_default (void);
     
     //  Format a string with variable arguments, returning a freshly allocated
-    //  buffer. If there was insufficient memory, returns NULL.
+    //  buffer. If there was insufficient memory, returns NULL. Free the returned
+    //  string using zstr_free().
     CZMQ_EXPORT char *
         zsys_vprintf (const char *format, va_list argptr);
     
@@ -1833,7 +1884,7 @@ This is the class interface:
         zsys_test (bool verbose);
 
 
-<A name="toc4-378" title="zrex - working with regular expressions" />
+<A name="toc4-389" title="zrex - working with regular expressions" />
 #### zrex - working with regular expressions
 
 The zrex class provides a simple API for regular expressions, wrapping
@@ -1933,7 +1984,7 @@ $   Match the end of the string
 \P      non punctuation
 \B      non word boundary
 
-<A name="toc4-389" title="zthread - working with system threads" />
+<A name="toc4-400" title="zthread - working with system threads" />
 #### zthread - working with system threads
 
 The zthread class wraps OS thread creation. It creates detached threads
@@ -1999,7 +2050,7 @@ If you want to communicate over ipc:// or tcp:// you may be sharing
 the same context, or use separate contexts. Thus, every detached thread
 usually starts by creating its own zctx_t instance.    
 
-<A name="toc4-400" title="ztree - generic red-black tree container" />
+<A name="toc4-411" title="ztree - generic red-black tree container" />
 #### ztree - generic red-black tree container
 
 Red black tree container
@@ -2095,10 +2146,10 @@ This is the class interface:
         ztree_test (int verbose);
 
 
-<A name="toc2-411" title="Under the Hood" />
+<A name="toc2-422" title="Under the Hood" />
 ## Under the Hood
 
-<A name="toc3-414" title="Adding a New Class" />
+<A name="toc3-425" title="Adding a New Class" />
 ### Adding a New Class
 
 If you define a new CZMQ class `myclass` you need to:
@@ -2110,7 +2161,7 @@ If you define a new CZMQ class `myclass` you need to:
 * Add myclass to 'model/projects.xml` and read model/README.txt.
 * Add a section to README.txt.
 
-<A name="toc3-426" title="Documentation" />
+<A name="toc3-437" title="Documentation" />
 ### Documentation
 
 Man pages are generated from the class header and source files via the doc/mkman tool, and similar functionality in the gitdown tool (http://github.com/imatix/gitdown). The header file for a class must wrap its interface as follows (example is from include/zclock.h):
@@ -2149,7 +2200,7 @@ The source file for a class then provides the self test example as follows:
 
 The template for man pages is in doc/mkman.
 
-<A name="toc3-465" title="Development" />
+<A name="toc3-476" title="Development" />
 ### Development
 
 CZMQ is developed through a test-driven process that guarantees no memory violations or leaks in the code:
@@ -2159,7 +2210,7 @@ CZMQ is developed through a test-driven process that guarantees no memory violat
 * Run the 'selftest' script, which uses the Valgrind memcheck tool.
 * Repeat until perfect.
 
-<A name="toc3-475" title="Porting CZMQ" />
+<A name="toc3-486" title="Porting CZMQ" />
 ### Porting CZMQ
 
 When you try CZMQ on an OS that it's not been used on (ever, or for a while), you will hit code that does not compile. In some cases the patches are trivial, in other cases (usually when porting to Windows), the work needed to build equivalent functionality may be non-trivial. In any case, the benefit is that once ported, the functionality is available to all applications.
@@ -2170,12 +2221,12 @@ Before attempting to patch code for portability, please read the `czmq_prelude.h
 * Defining macros that rename exotic library functions to more conventional names: do this in czmq_prelude.h.
 * Reimplementing specific methods to use a non-standard API: this is typically needed on Windows. Do this in the relevant class, using #ifdefs to properly differentiate code for different platforms.
 
-<A name="toc3-486" title="Code Generation" />
+<A name="toc3-497" title="Code Generation" />
 ### Code Generation
 
 We generate the zsockopt class using [https://github.com/imatix/gsl GSL], using a code generator script in scripts/sockopts.gsl.
 
-<A name="toc3-491" title="This Document" />
+<A name="toc3-502" title="This Document" />
 ### This Document
 
 This document is originally at README.txt and is built using [gitdown](http://github.com/imatix/gitdown).

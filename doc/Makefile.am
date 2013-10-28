@@ -18,6 +18,7 @@ MAN3 = \
     zhash.3 \
     zlist.3 \
     zloop.3 \
+    zmonitor.3 \
     zmsg.3 \
     zmutex.3 \
     zpoller.3 \
