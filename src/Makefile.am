@@ -27,6 +27,7 @@ include_HEADERS = \
     ../include/zmsg.h \
     ../include/zmutex.h \
     ../include/zpoller.h \
+    ../include/zproxy.h \
     ../include/zrex.h \
     ../include/zsocket.h \
     ../include/zsockopt.h \
@@ -54,6 +55,7 @@ libczmq_la_SOURCES = \
     zmsg.c \
     zmutex.c \
     zpoller.c \
+    zproxy.c \
     zrex.c \
     zsocket.c \
     zsockopt.c \

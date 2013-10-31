@@ -25,6 +25,7 @@ set (SOURCES_files_Source_Files
     src/zmsg.c
     src/zmutex.c
     src/zpoller.c
+    src/zproxy.c
     src/zrex.c
     src/zsocket.c
     src/zsockopt.c
@@ -59,6 +60,7 @@ set (SOURCES_files_Header_Files
     include/zmsg.h
     include/zmutex.h
     include/zpoller.h
+    include/zproxy.h
     include/zrex.h
     include/zsocket.h
     include/zsockopt.h
