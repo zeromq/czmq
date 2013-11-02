@@ -35,15 +35,15 @@
 //  Structure of our class
 
 struct _zproxy_t {
-    void *pipe;
+    void *pipe;                     //
     int type;
-    char frontend_addr[256];
+    char frontend_addr [256];
     int frontend_type;
     void *frontend;
-    char backend_addr[256];
+    char backend_addr [256];
     int backend_type;
     void *backend;
-    char capture_addr[256];
+    char capture_addr [256];
     int capture_type;
     void *capture;
     int queue_size;
@@ -51,6 +51,7 @@ struct _zproxy_t {
 
 //  --------------------------------------------------------------------------
 //  zproxy attached thread
+
 static void
 s_zproxy_attached (void *args, zctx_t *ctx, void *pipe)
 {   zproxy_t *self = (zproxy_t*) args;
@@ -113,6 +114,10 @@ zproxy_new (zctx_t *ctx, int zproxy_type, const char *frontend_addr,
     return self;
 }
 
+
+//  --------------------------------------------------------------------------
+//  Start a zproxy object
+
 int
 zproxy_start (zproxy_t *self)
 {
@@ -138,6 +143,7 @@ zproxy_destroy (zproxy_t **self_p)
     }
 }
 
+
 //  --------------------------------------------------------------------------
 //  Get the proxy type 
 
@@ -146,6 +152,7 @@ zproxy_type (zproxy_t *self)
 {
     return self->type;
 }
+
 
 //  --------------------------------------------------------------------------
 //  Get the proxy frontend address
@@ -156,13 +163,16 @@ zproxy_frontend_addr (zproxy_t *self)
     return self->frontend_addr;
 }
 
+
 //  --------------------------------------------------------------------------
 //  Get the proxy frontend type
+
 int
 zproxy_frontend_type (zproxy_t *self)
 {
     return self->frontend_type;
 }
+
 
 //  --------------------------------------------------------------------------
 //  Get the proxy backend address
@@ -173,13 +183,16 @@ zproxy_backend_addr (zproxy_t *self)
     return self->backend_addr;
 }
 
+
 //  --------------------------------------------------------------------------
 //  Get the proxy backend type
+
 int
 zproxy_backend_type (zproxy_t *self)
 {
     return self->backend_type;
 }
+
 
 //  --------------------------------------------------------------------------
 //  Get the proxy capture address
@@ -192,6 +205,7 @@ zproxy_capture_addr (zproxy_t *self)
 
 //  --------------------------------------------------------------------------
 //  Get the proxy capture type
+
 int
 zproxy_capture_type (zproxy_t *self)
 {
