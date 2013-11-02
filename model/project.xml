@@ -19,6 +19,7 @@
     <class name = "zmsg" />
     <class name = "zmutex" />
     <class name = "zpoller" />
+    <class name = "zproxy" />
     <class name = "zrex" />
     <class name = "zsocket" />
     <class name = "zsockopt" />

@@ -325,6 +325,12 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
     </ClCompile>
+    <ClCompile Include="..\..\src\zproxy.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='DebugDLL|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\..\src\zrex.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='DebugDLL|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
@@ -390,6 +396,7 @@
     <ClInclude Include="..\..\include\zmsg.h" />
     <ClInclude Include="..\..\include\zmutex.h" />
     <ClInclude Include="..\..\include\zpoller.h" />
+    <ClInclude Include="..\..\include\zproxy.h" />
     <ClInclude Include="..\..\include\zrex.h" />
     <ClInclude Include="..\..\include\zsocket.h" />
     <ClInclude Include="..\..\include\zsockopt.h" />

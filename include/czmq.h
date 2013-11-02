@@ -68,5 +68,6 @@
 #include "zauth.h"
 #include "zcert.h"
 #include "zcertstore.h"
+#include "zproxy.h"
 
 #endif

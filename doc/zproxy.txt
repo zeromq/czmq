@@ -1,0 +1,106 @@
+zproxy(3)
+=========
+
+NAME
+----
+zproxy - convenient zmq_proxy api
+
+SYNOPSIS
+--------
+----
+//  Create a new zproxy object
+CZMQ_EXPORT zproxy_t* 
+    zproxy_new (zctx_t *ctx, int zproxy_type, const char *frontend_addr,
+            const char *backend_addr, const char *capture_addr);
+
+//  Destroy a zproxy object
+CZMQ_EXPORT void
+    zproxy_destroy (zproxy_t **self_p);
+
+// Start a zproxy object
+CZMQ_EXPORT int
+    zproxy_start (zproxy_t *self);
+
+// Get zproxy type
+CZMQ_EXPORT int
+    zproxy_type (zproxy_t *self);
+
+// Get zproxy frontend address
+CZMQ_EXPORT char *
+    zproxy_frontend_addr (zproxy_t *self);
+
+// Get zproxy frontend type
+CZMQ_EXPORT int
+    zproxy_frontend_type (zproxy_t *self);
+
+// Get zproxy backend address
+CZMQ_EXPORT char *
+    zproxy_backend_addr (zproxy_t *self);
+
+// Get zproxy backend type
+CZMQ_EXPORT int
+    zproxy_backend_type (zproxy_t *self);
+
+// Get zproxy capture address
+CZMQ_EXPORT char *
+    zproxy_capture_addr (zproxy_t *self);
+
+// Get zproxy capture type
+CZMQ_EXPORT int
+    zproxy_capture_type (zproxy_t *self);
+
+//  Self test of this class
+CZMQ_EXPORT int
+    zproxy_test (bool verbose);
+----
+
+DESCRIPTION
+-----------
+
+The zproxy class simplifies working with the zmq_proxy api.
+
+
+EXAMPLE
+-------
+.From zproxy_test method
+----
+    const char *front_addr = "inproc://proxy_front";
+    const char *back_addr = "inproc://proxy_back";
+    const char *capture_addr = "inproc://proxy_capture";
+
+    zctx_t *ctx = zctx_new ();
+    zproxy_t *proxy = zproxy_new (ctx, ZPROXY_QUEUE, front_addr, back_addr, capture_addr);
+
+    assert (zproxy_type (proxy) == ZPROXY_QUEUE);
+    assert (streq (zproxy_frontend_addr (proxy), front_addr));
+    assert (streq (zproxy_backend_addr (proxy), back_addr));
+    assert (streq (zproxy_capture_addr (proxy), capture_addr));
+    assert (zproxy_frontend_type (proxy) == ZMQ_ROUTER);
+    assert (zproxy_backend_type (proxy) == ZMQ_DEALER);
+    assert (zproxy_capture_type (proxy) == ZMQ_PUB);
+
+    int rc = zproxy_start (proxy);
+    assert (rc);
+
+    void *front_s = zsocket_new (ctx, ZMQ_DEALER);
+    assert (front_s);
+    zsocket_connect (front_s, zproxy_frontend_addr (proxy));
+
+    void *back_s = zsocket_new (ctx, ZMQ_DEALER);
+    assert (back_s);
+    zsocket_connect (back_s, zproxy_backend_addr (proxy));
+
+    void *capture_s = zsocket_new (ctx, ZMQ_SUB);
+    zsocket_set_subscribe (capture_s, "");
+    assert (back_s);
+    zsocket_connect (capture_s, zproxy_capture_addr (proxy));
+
+    zstr_send (front_s, "TEST");
+    char *back_resp = zstr_recv (back_s);
+    assert (back_resp);
+    zproxy_destroy (&proxy);
+----
+
+SEE ALSO
+--------
+linkczmq:czmq[7]
