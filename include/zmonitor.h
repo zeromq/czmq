@@ -1,5 +1,5 @@
 /*  =========================================================================
-    czmq.h - CZMQ wrapper
+    zmonitor - socket event monitor
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
@@ -23,51 +23,42 @@
     =========================================================================
 */
 
-#ifndef __CZMQ_H_INCLUDED__
-#define __CZMQ_H_INCLUDED__
+#ifndef __ZMONITOR_H_INCLUDED__
+#define __ZMONITOR_H_INCLUDED__
 
-//  Set up environment for the application
-//
-#include "czmq_prelude.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-//  CZMQ version macros for compile-time API detection
+//  Opaque class structure
+typedef struct _zmonitor_t zmonitor_t;
 
-#define CZMQ_VERSION_MAJOR 2
-#define CZMQ_VERSION_MINOR 0
-#define CZMQ_VERSION_PATCH 3
+//  @interface
+//  Create a new socket monitor
+CZMQ_EXPORT zmonitor_t *
+    zmonitor_new (zctx_t *ctx, void *socket, int events);
 
-#define CZMQ_MAKE_VERSION(major, minor, patch) \
-    ((major) * 10000 + (minor) * 100 + (patch))
-#define CZMQ_VERSION \
-    CZMQ_MAKE_VERSION(CZMQ_VERSION_MAJOR, CZMQ_VERSION_MINOR, CZMQ_VERSION_PATCH)
+//  Destroy a socket monitor
+CZMQ_EXPORT void
+    zmonitor_destroy (zmonitor_t **self_p);
 
-//  Classes in the API
+//  Get the ZeroMQ socket, for polling or receiving socket
+//  event messages from the backend agent on.
+CZMQ_EXPORT void *
+    zmonitor_socket (zmonitor_t *self);
 
-#include "zchunk.h"
-#include "zclock.h"
-#include "zconfig.h"
-#include "zctx.h"
-#include "zfile.h"
-#include "zdir.h"
-#include "zframe.h"
-#include "zlist.h"
-#include "zhash.h"
-#include "zloop.h"
-#include "zmonitor.h"
-#include "zmsg.h"
-#include "zmutex.h"
-#include "zpoller.h"
-#include "zsocket.h"
-#include "zsockopt.h"
-#include "zstr.h"
-#include "zsys.h"
-#include "zthread.h"
-#include "ztree.h"
-#include "zrex.h"
-#include "zbeacon.h"
-#include "zauth.h"
-#include "zcert.h"
-#include "zcertstore.h"
-#include "zproxy.h"
+//  Enable verbose tracing of commands and activity
+CZMQ_EXPORT void
+    zmonitor_set_verbose (zmonitor_t *self, bool verbose);
+
+// Self test of this class
+CZMQ_EXPORT void
+    zmonitor_test (bool verbose);
+
+// @end
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -22,6 +22,7 @@ set (SOURCES_files_Source_Files
     src/zhash.c
     src/zlist.c
     src/zloop.c
+    src/zmonitor.c
     src/zmsg.c
     src/zmutex.c
     src/zpoller.c
@@ -57,6 +58,7 @@ set (SOURCES_files_Header_Files
     include/zhash.h
     include/zlist.h
     include/zloop.h
+    include/zmonitor.h
     include/zmsg.h
     include/zmutex.h
     include/zpoller.h

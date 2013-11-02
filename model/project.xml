@@ -15,6 +15,7 @@
     <class name = "zhash" />
     <class name = "zlist" />
     <class name = "zloop" />
+    <class name = "zmonitor" />
     <class name = "zmsg" />
     <class name = "zmutex" />
     <class name = "zpoller" />
