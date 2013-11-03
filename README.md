@@ -36,21 +36,22 @@
 &emsp;<a href="#toc4-298">zmsg - working with multipart messages</a>
 &emsp;<a href="#toc4-309">zmutex - wrap lightweight mutexes</a>
 &emsp;<a href="#toc4-320">zpoller - trivial socket poller class</a>
-&emsp;<a href="#toc4-331">zsocket - working with ØMQ sockets</a>
-&emsp;<a href="#toc4-342">zsockopt - working with ØMQ socket options</a>
-&emsp;<a href="#toc4-353">zstr - sending and receiving strings</a>
-&emsp;<a href="#toc4-378">zsys - system-level methods</a>
-&emsp;<a href="#toc4-389">zrex - working with regular expressions</a>
-&emsp;<a href="#toc4-400">zthread - working with system threads</a>
-&emsp;<a href="#toc4-411">ztree - generic red-black tree container</a>
+&emsp;<a href="#toc4-331">zproxy - convenient zmq_proxy API</a>
+&emsp;<a href="#toc4-342">zsocket - working with ØMQ sockets</a>
+&emsp;<a href="#toc4-353">zsockopt - working with ØMQ socket options</a>
+&emsp;<a href="#toc4-364">zstr - sending and receiving strings</a>
+&emsp;<a href="#toc4-389">zsys - system-level methods</a>
+&emsp;<a href="#toc4-400">zrex - working with regular expressions</a>
+&emsp;<a href="#toc4-411">zthread - working with system threads</a>
+&emsp;<a href="#toc4-422">ztree - generic red-black tree container</a>
 
-**<a href="#toc2-422">Under the Hood</a>**
-&emsp;<a href="#toc3-425">Adding a New Class</a>
-&emsp;<a href="#toc3-437">Documentation</a>
-&emsp;<a href="#toc3-476">Development</a>
-&emsp;<a href="#toc3-486">Porting CZMQ</a>
-&emsp;<a href="#toc3-497">Code Generation</a>
-&emsp;<a href="#toc3-502">This Document</a>
+**<a href="#toc2-433">Under the Hood</a>**
+&emsp;<a href="#toc3-436">Adding a New Class</a>
+&emsp;<a href="#toc3-448">Documentation</a>
+&emsp;<a href="#toc3-487">Development</a>
+&emsp;<a href="#toc3-497">Porting CZMQ</a>
+&emsp;<a href="#toc3-508">Code Generation</a>
+&emsp;<a href="#toc3-513">This Document</a>
 
 <A name="toc2-13" title="Overview" />
 ## Overview
@@ -1181,7 +1182,7 @@ This is the class interface:
 
 The zmonitor class provides an API for obtaining socket events such as
 connected, listen, disconnected, etc. Socket events are only available
-for ipc and tcp socket types.
+for sockets connecting or bound to ipc:// and tcp:// endpoints.
 
 This is the class interface:
 
@@ -1189,14 +1190,16 @@ This is the class interface:
     CZMQ_EXPORT zmonitor_t *
         zmonitor_new (zctx_t *ctx, void *socket, int events);
     
-    //  Destroy a beacon
+    //  Destroy a socket monitor
     CZMQ_EXPORT void
         zmonitor_destroy (zmonitor_t **self_p);
     
-    // Get zmonitor pipe socket, for polling or receiving messages
+    //  Get the ZeroMQ socket, for polling or receiving socket
+    //  event messages from the backend agent on.
     CZMQ_EXPORT void *
-    zmonitor_socket (zmonitor_t *self);
+        zmonitor_socket (zmonitor_t *self);
     
+    //  Enable verbose tracing of commands and activity
     CZMQ_EXPORT void
         zmonitor_set_verbose (zmonitor_t *self, bool verbose);
     
@@ -1205,6 +1208,8 @@ This is the class interface:
         zmonitor_test (bool verbose);
     
 
+This class wraps the ZMQ socket monitor API, see zmq_socket_monitor for
+details.
 
 <A name="toc4-298" title="zmsg - working with multipart messages" />
 #### zmsg - working with multipart messages
@@ -1447,7 +1452,60 @@ This is the class interface:
         zpoller_test (bool verbose);
 
 
-<A name="toc4-331" title="zsocket - working with ØMQ sockets" />
+<A name="toc4-331" title="zproxy - convenient zmq_proxy API" />
+#### zproxy - convenient zmq_proxy API
+
+The zproxy class simplifies working with the zmq_proxy api.
+
+This is the class interface:
+
+    //  Create a new zproxy object
+    CZMQ_EXPORT zproxy_t* 
+        zproxy_new (zctx_t *ctx, int zproxy_type, const char *frontend_addr,
+                const char *backend_addr, const char *capture_addr);
+    
+    //  Destroy a zproxy object
+    CZMQ_EXPORT void
+        zproxy_destroy (zproxy_t **self_p);
+    
+    // Start a zproxy object
+    CZMQ_EXPORT int
+        zproxy_start (zproxy_t *self);
+    
+    // Get zproxy type
+    CZMQ_EXPORT int
+        zproxy_type (zproxy_t *self);
+    
+    // Get zproxy frontend address
+    CZMQ_EXPORT char *
+        zproxy_frontend_addr (zproxy_t *self);
+    
+    // Get zproxy frontend type
+    CZMQ_EXPORT int
+        zproxy_frontend_type (zproxy_t *self);
+    
+    // Get zproxy backend address
+    CZMQ_EXPORT char *
+        zproxy_backend_addr (zproxy_t *self);
+    
+    // Get zproxy backend type
+    CZMQ_EXPORT int
+        zproxy_backend_type (zproxy_t *self);
+    
+    // Get zproxy capture address
+    CZMQ_EXPORT char *
+        zproxy_capture_addr (zproxy_t *self);
+    
+    // Get zproxy capture type
+    CZMQ_EXPORT int
+        zproxy_capture_type (zproxy_t *self);
+    
+    //  Self test of this class
+    CZMQ_EXPORT int
+        zproxy_test (bool verbose);
+
+
+<A name="toc4-342" title="zsocket - working with ØMQ sockets" />
 #### zsocket - working with ØMQ sockets
 
 The zsocket class provides helper functions for ØMQ sockets. It doesn't
@@ -1519,7 +1577,7 @@ This is the class interface:
         zsocket_test (bool verbose);
 
 
-<A name="toc4-342" title="zsockopt - working with ØMQ socket options" />
+<A name="toc4-353" title="zsockopt - working with ØMQ socket options" />
 #### zsockopt - working with ØMQ socket options
 
 The zsockopt class provides access to the ØMQ getsockopt/setsockopt API.
@@ -1738,7 +1796,7 @@ This class is generated, using the GSL code generator. See the sockopts
 XML file, which provides the metadata, and the sockopts.gsl template,
 which does the work.
 
-<A name="toc4-353" title="zstr - sending and receiving strings" />
+<A name="toc4-364" title="zstr - sending and receiving strings" />
 #### zstr - sending and receiving strings
 
 The zstr class provides utility functions for sending and receiving C
@@ -1797,7 +1855,7 @@ This is the class interface:
         zstr_test (bool verbose);
 
 
-<A name="toc4-378" title="zsys - system-level methods" />
+<A name="toc4-389" title="zsys - system-level methods" />
 #### zsys - system-level methods
 
 The zsys class provides a portable wrapper for miscellaneous functions
@@ -1884,7 +1942,7 @@ This is the class interface:
         zsys_test (bool verbose);
 
 
-<A name="toc4-389" title="zrex - working with regular expressions" />
+<A name="toc4-400" title="zrex - working with regular expressions" />
 #### zrex - working with regular expressions
 
 The zrex class provides a simple API for regular expressions, wrapping
@@ -1984,7 +2042,7 @@ $   Match the end of the string
 \P      non punctuation
 \B      non word boundary
 
-<A name="toc4-400" title="zthread - working with system threads" />
+<A name="toc4-411" title="zthread - working with system threads" />
 #### zthread - working with system threads
 
 The zthread class wraps OS thread creation. It creates detached threads
@@ -2050,7 +2108,7 @@ If you want to communicate over ipc:// or tcp:// you may be sharing
 the same context, or use separate contexts. Thus, every detached thread
 usually starts by creating its own zctx_t instance.    
 
-<A name="toc4-411" title="ztree - generic red-black tree container" />
+<A name="toc4-422" title="ztree - generic red-black tree container" />
 #### ztree - generic red-black tree container
 
 Red black tree container
@@ -2146,10 +2204,10 @@ This is the class interface:
         ztree_test (int verbose);
 
 
-<A name="toc2-422" title="Under the Hood" />
+<A name="toc2-433" title="Under the Hood" />
 ## Under the Hood
 
-<A name="toc3-425" title="Adding a New Class" />
+<A name="toc3-436" title="Adding a New Class" />
 ### Adding a New Class
 
 If you define a new CZMQ class `myclass` you need to:
@@ -2161,7 +2219,7 @@ If you define a new CZMQ class `myclass` you need to:
 * Add myclass to 'model/projects.xml` and read model/README.txt.
 * Add a section to README.txt.
 
-<A name="toc3-437" title="Documentation" />
+<A name="toc3-448" title="Documentation" />
 ### Documentation
 
 Man pages are generated from the class header and source files via the doc/mkman tool, and similar functionality in the gitdown tool (http://github.com/imatix/gitdown). The header file for a class must wrap its interface as follows (example is from include/zclock.h):
@@ -2200,7 +2258,7 @@ The source file for a class then provides the self test example as follows:
 
 The template for man pages is in doc/mkman.
 
-<A name="toc3-476" title="Development" />
+<A name="toc3-487" title="Development" />
 ### Development
 
 CZMQ is developed through a test-driven process that guarantees no memory violations or leaks in the code:
@@ -2210,7 +2268,7 @@ CZMQ is developed through a test-driven process that guarantees no memory violat
 * Run the 'selftest' script, which uses the Valgrind memcheck tool.
 * Repeat until perfect.
 
-<A name="toc3-486" title="Porting CZMQ" />
+<A name="toc3-497" title="Porting CZMQ" />
 ### Porting CZMQ
 
 When you try CZMQ on an OS that it's not been used on (ever, or for a while), you will hit code that does not compile. In some cases the patches are trivial, in other cases (usually when porting to Windows), the work needed to build equivalent functionality may be non-trivial. In any case, the benefit is that once ported, the functionality is available to all applications.
@@ -2221,12 +2279,12 @@ Before attempting to patch code for portability, please read the `czmq_prelude.h
 * Defining macros that rename exotic library functions to more conventional names: do this in czmq_prelude.h.
 * Reimplementing specific methods to use a non-standard API: this is typically needed on Windows. Do this in the relevant class, using #ifdefs to properly differentiate code for different platforms.
 
-<A name="toc3-497" title="Code Generation" />
+<A name="toc3-508" title="Code Generation" />
 ### Code Generation
 
 We generate the zsockopt class using [https://github.com/imatix/gsl GSL], using a code generator script in scripts/sockopts.gsl.
 
-<A name="toc3-502" title="This Document" />
+<A name="toc3-513" title="This Document" />
 ### This Document
 
 This document is originally at README.txt and is built using [gitdown](http://github.com/imatix/gitdown).
