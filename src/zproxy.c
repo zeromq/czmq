@@ -35,6 +35,7 @@
 //  Structure of our class
 
 struct _zproxy_t {
+    zctx_t *ctx;
     void *pipe;
     int type;
     char frontend_addr[256];
@@ -46,14 +47,15 @@ struct _zproxy_t {
     char capture_addr[256];
     int capture_type;
     void *capture;
-    int queue_size;
 };
 
 //  --------------------------------------------------------------------------
 //  zproxy attached thread
+
 static void
 s_zproxy_attached (void *args, zctx_t *ctx, void *pipe)
-{   zproxy_t *self = (zproxy_t*) args;
+{   
+    zproxy_t *self = (zproxy_t*) args;
     self->frontend = zsocket_new (ctx, zproxy_frontend_type (self));
     assert (self->frontend);
     zsocket_bind (self->frontend, zproxy_frontend_addr (self));
@@ -72,24 +74,17 @@ s_zproxy_attached (void *args, zctx_t *ctx, void *pipe)
     zmq_proxy (self->frontend, self->backend, self->capture);
 }
 
-
 //  --------------------------------------------------------------------------
 //  Constructor
 
 zproxy_t *
-zproxy_new (zctx_t *ctx, int zproxy_type, const char *frontend_addr,
-        const char *backend_addr, const char *capture_addr)
+zproxy_new (zctx_t *ctx, int zproxy_type)
 {
     assert (zproxy_type > 0 && zproxy_type < 4);
     
     zproxy_t *self;
     self = (zproxy_t *) zmalloc (sizeof (zproxy_t));
-   
-    self->queue_size = -1; //if left as -1 will use default hwm values
-    strncpy (self->frontend_addr, frontend_addr, 256);
-    strncpy (self->backend_addr, backend_addr, 256);
-    strncpy (self->capture_addr, capture_addr, 256);
-   
+    self->ctx = ctx;
     self->type = zproxy_type;
     self->capture_type = ZMQ_PUB;
     
@@ -109,13 +104,27 @@ zproxy_new (zctx_t *ctx, int zproxy_type, const char *frontend_addr,
         default:
             break;
     }
-    self->pipe = zthread_fork (ctx, s_zproxy_attached, self);
     return self;
 }
 
+//  --------------------------------------------------------------------------
+//  Constructor
+
 int
-zproxy_start (zproxy_t *self)
+zproxy_bind (zproxy_t *self, const char *frontend_addr,
+        const char *backend_addr, const char *capture_addr)
 {
+    strncpy (self->frontend_addr, frontend_addr, 255);
+    self->frontend_addr[255] = '\0';
+
+    strncpy (self->backend_addr, backend_addr, 255);
+    self->frontend_addr[255] = '\0';
+
+    strncpy (self->capture_addr, capture_addr, 255);
+    self->frontend_addr[255] = '\0';
+
+    self->pipe = zthread_fork (self->ctx, s_zproxy_attached, self);
+    
     int rc = 0;
     zstr_send (self->pipe, "START");
     char *response = zstr_recv (self->pipe);
@@ -212,25 +221,31 @@ zproxy_test (bool verbose)
     const char *back_addr = "inproc://proxy_back";
     const char *capture_addr = "inproc://proxy_capture";
 
+    // Create and start the proxy
     zctx_t *ctx = zctx_new ();
-    zproxy_t *proxy = zproxy_new (ctx, ZPROXY_QUEUE, front_addr, back_addr, capture_addr);
-
-    assert (zproxy_type (proxy) == ZPROXY_QUEUE);
-    assert (streq (zproxy_frontend_addr (proxy), front_addr));
-    assert (streq (zproxy_backend_addr (proxy), back_addr));
-    assert (streq (zproxy_capture_addr (proxy), capture_addr));
-    assert (zproxy_frontend_type (proxy) == ZMQ_ROUTER);
-    assert (zproxy_backend_type (proxy) == ZMQ_DEALER);
-    assert (zproxy_capture_type (proxy) == ZMQ_PUB);
-
-    int rc = zproxy_start (proxy);
+    zproxy_t *proxy = zproxy_new (ctx, ZPROXY_STREAMER);
+    int rc = zproxy_bind (proxy, front_addr, back_addr, capture_addr);
     assert (rc);
 
-    void *front_s = zsocket_new (ctx, ZMQ_DEALER);
+    // Test the accessor methods
+    assert (zproxy_type (proxy) == ZPROXY_STREAMER);
+    assert (zproxy_frontend_type (proxy) == ZMQ_PULL);
+    assert (zproxy_backend_type (proxy) == ZMQ_PUSH);
+    assert (zproxy_capture_type (proxy) == ZMQ_PUB);
+
+    char *front_check = zproxy_frontend_addr (proxy);
+    assert (streq (front_check, front_addr));
+    char *back_check = zproxy_backend_addr (proxy);
+    assert (streq (back_check, back_addr));
+    char *capture_check = zproxy_capture_addr (proxy);
+    assert (streq (capture_check, capture_addr));
+
+    // Connect to the proxy front, back, and capture ports
+    void *front_s = zsocket_new (ctx, ZMQ_PUSH);
     assert (front_s);
     zsocket_connect (front_s, zproxy_frontend_addr (proxy));
 
-    void *back_s = zsocket_new (ctx, ZMQ_DEALER);
+    void *back_s = zsocket_new (ctx, ZMQ_PULL);
     assert (back_s);
     zsocket_connect (back_s, zproxy_backend_addr (proxy));
 
@@ -239,10 +254,22 @@ zproxy_test (bool verbose)
     assert (back_s);
     zsocket_connect (capture_s, zproxy_capture_addr (proxy));
 
-    zstr_send (front_s, "TEST");
+    // Send a message through the proxy and receive it
+    zstr_send (front_s, "STREAMER_TEST");
+    
     char *back_resp = zstr_recv (back_s);
     assert (back_resp);
+    assert (streq ("STREAMER_TEST", back_resp));
+    
+    char *capture_resp = zstr_recv (capture_s);
+    assert (capture_resp);
+    assert (capture_resp);
+    assert (streq ("STREAMER_TEST", capture_resp));
+   
+    // Destroying the context will stop the proxy
+    zctx_destroy (&ctx);
     zproxy_destroy (&proxy);
+    
     //  @end
     printf ("OK\n");
     return 0;
