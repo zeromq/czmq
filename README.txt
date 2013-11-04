@@ -300,6 +300,16 @@ This is the class interface:
 
 .pull src/zpoller.c@discuss,left
 
+#### zproxy - convenient zmq_proxy API
+
+.pull src/zproxy.c@header,left
+
+This is the class interface:
+
+.pull include/zproxy.h@interface,code
+
+.pull src/zproxy.c@discuss,left
+
 #### zsocket - working with 0MQ sockets
 
 .pull src/zsocket.c@header,left
