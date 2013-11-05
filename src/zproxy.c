@@ -38,13 +38,13 @@ struct _zproxy_t {
     zctx_t *ctx;
     void *pipe;
     int type;
-    char frontend_addr[256];
+    char frontend_addr [256];
     int frontend_type;
     void *frontend;
-    char backend_addr[256];
+    char backend_addr [256];
     int backend_type;
     void *backend;
-    char capture_addr[256];
+    char capture_addr [256];
     int capture_type;
     void *capture;
 };
@@ -108,7 +108,7 @@ zproxy_new (zctx_t *ctx, int zproxy_type)
 }
 
 //  --------------------------------------------------------------------------
-//  Constructor
+//  Start a zproxy object
 
 int
 zproxy_bind (zproxy_t *self, const char *frontend_addr,
@@ -147,6 +147,7 @@ zproxy_destroy (zproxy_t **self_p)
     }
 }
 
+
 //  --------------------------------------------------------------------------
 //  Get the proxy type 
 
@@ -155,6 +156,7 @@ zproxy_type (zproxy_t *self)
 {
     return self->type;
 }
+
 
 //  --------------------------------------------------------------------------
 //  Get the proxy frontend address
@@ -165,13 +167,16 @@ zproxy_frontend_addr (zproxy_t *self)
     return self->frontend_addr;
 }
 
+
 //  --------------------------------------------------------------------------
 //  Get the proxy frontend type
+
 int
 zproxy_frontend_type (zproxy_t *self)
 {
     return self->frontend_type;
 }
+
 
 //  --------------------------------------------------------------------------
 //  Get the proxy backend address
@@ -182,13 +187,16 @@ zproxy_backend_addr (zproxy_t *self)
     return self->backend_addr;
 }
 
+
 //  --------------------------------------------------------------------------
 //  Get the proxy backend type
+
 int
 zproxy_backend_type (zproxy_t *self)
 {
     return self->backend_type;
 }
+
 
 //  --------------------------------------------------------------------------
 //  Get the proxy capture address
@@ -201,6 +209,7 @@ zproxy_capture_addr (zproxy_t *self)
 
 //  --------------------------------------------------------------------------
 //  Get the proxy capture type
+
 int
 zproxy_capture_type (zproxy_t *self)
 {
