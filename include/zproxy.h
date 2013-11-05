@@ -41,16 +41,16 @@ typedef struct _zproxy_t zproxy_t;
 //  @interface
 //  Create a new zproxy object
 CZMQ_EXPORT zproxy_t* 
-    zproxy_new (zctx_t *ctx, int zproxy_type, const char *frontend_addr,
-            const char *backend_addr, const char *capture_addr);
+    zproxy_new (zctx_t *ctx, int zproxy_type);
 
 //  Destroy a zproxy object
 CZMQ_EXPORT void
     zproxy_destroy (zproxy_t **self_p);
 
-// Start a zproxy object
+// Start and zmq_proxy in an attached thread, binding to endpoints.
 CZMQ_EXPORT int
-    zproxy_start (zproxy_t *self);
+    zproxy_bind (zproxy_t *self, const char *frontend_addr,
+            const char *backend_addr, const char *capture_addr);
 
 // Get zproxy type
 CZMQ_EXPORT int

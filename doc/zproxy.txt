@@ -10,16 +10,16 @@ SYNOPSIS
 ----
 //  Create a new zproxy object
 CZMQ_EXPORT zproxy_t* 
-    zproxy_new (zctx_t *ctx, int zproxy_type, const char *frontend_addr,
-            const char *backend_addr, const char *capture_addr);
+    zproxy_new (zctx_t *ctx, int zproxy_type);
 
 //  Destroy a zproxy object
 CZMQ_EXPORT void
     zproxy_destroy (zproxy_t **self_p);
 
-// Start a zproxy object
+// Start and zmq_proxy in an attached thread, binding to endpoints.
 CZMQ_EXPORT int
-    zproxy_start (zproxy_t *self);
+    zproxy_bind (zproxy_t *self, const char *frontend_addr,
+            const char *backend_addr, const char *capture_addr);
 
 // Get zproxy type
 CZMQ_EXPORT int
@@ -68,25 +68,31 @@ EXAMPLE
     const char *back_addr = "inproc://proxy_back";
     const char *capture_addr = "inproc://proxy_capture";
 
+    // Create and start the proxy
     zctx_t *ctx = zctx_new ();
-    zproxy_t *proxy = zproxy_new (ctx, ZPROXY_QUEUE, front_addr, back_addr, capture_addr);
-
-    assert (zproxy_type (proxy) == ZPROXY_QUEUE);
-    assert (streq (zproxy_frontend_addr (proxy), front_addr));
-    assert (streq (zproxy_backend_addr (proxy), back_addr));
-    assert (streq (zproxy_capture_addr (proxy), capture_addr));
-    assert (zproxy_frontend_type (proxy) == ZMQ_ROUTER);
-    assert (zproxy_backend_type (proxy) == ZMQ_DEALER);
-    assert (zproxy_capture_type (proxy) == ZMQ_PUB);
-
-    int rc = zproxy_start (proxy);
+    zproxy_t *proxy = zproxy_new (ctx, ZPROXY_STREAMER);
+    int rc = zproxy_bind (proxy, front_addr, back_addr, capture_addr);
     assert (rc);
 
-    void *front_s = zsocket_new (ctx, ZMQ_DEALER);
+    // Test the accessor methods
+    assert (zproxy_type (proxy) == ZPROXY_STREAMER);
+    assert (zproxy_frontend_type (proxy) == ZMQ_PULL);
+    assert (zproxy_backend_type (proxy) == ZMQ_PUSH);
+    assert (zproxy_capture_type (proxy) == ZMQ_PUB);
+
+    char *front_check = zproxy_frontend_addr (proxy);
+    assert (streq (front_check, front_addr));
+    char *back_check = zproxy_backend_addr (proxy);
+    assert (streq (back_check, back_addr));
+    char *capture_check = zproxy_capture_addr (proxy);
+    assert (streq (capture_check, capture_addr));
+
+    // Connect to the proxy front, back, and capture ports
+    void *front_s = zsocket_new (ctx, ZMQ_PUSH);
     assert (front_s);
     zsocket_connect (front_s, zproxy_frontend_addr (proxy));
 
-    void *back_s = zsocket_new (ctx, ZMQ_DEALER);
+    void *back_s = zsocket_new (ctx, ZMQ_PULL);
     assert (back_s);
     zsocket_connect (back_s, zproxy_backend_addr (proxy));
 
@@ -95,10 +101,22 @@ EXAMPLE
     assert (back_s);
     zsocket_connect (capture_s, zproxy_capture_addr (proxy));
 
-    zstr_send (front_s, "TEST");
+    // Send a message through the proxy and receive it
+    zstr_send (front_s, "STREAMER_TEST");
+    
     char *back_resp = zstr_recv (back_s);
     assert (back_resp);
+    assert (streq ("STREAMER_TEST", back_resp));
+    
+    char *capture_resp = zstr_recv (capture_s);
+    assert (capture_resp);
+    assert (capture_resp);
+    assert (streq ("STREAMER_TEST", capture_resp));
+   
+    // Destroying the context will stop the proxy
+    zctx_destroy (&ctx);
     zproxy_destroy (&proxy);
+    
 ----
 
 SEE ALSO
