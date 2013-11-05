@@ -50,6 +50,7 @@ int main (int argc, char *argv [])
     zhash_test (verbose);
     ztree_test (verbose);
     zlist_test (verbose);
+    zuuid_test (verbose);
     zctx_test (verbose);
     zsockopt_test (verbose);
     zsocket_test (verbose);

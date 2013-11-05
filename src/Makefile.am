@@ -35,7 +35,8 @@ include_HEADERS = \
     ../include/zstr.h \
     ../include/zsys.h \
     ../include/zthread.h \
-    ../include/ztree.h
+    ../include/ztree.h \
+    ../include/zuuid.h
 
 libczmq_la_SOURCES = \
     platform.h \
@@ -64,7 +65,8 @@ libczmq_la_SOURCES = \
     zstr.c \
     zsys.c \
     zthread.c \
-    ztree.c
+    ztree.c \
+    zuuid.c
 
 AM_CFLAGS = -g
 AM_CPPFLAGS = -I$(top_srcdir)/include

@@ -34,6 +34,7 @@ set (SOURCES_files_Source_Files
     src/zsys.c
     src/zthread.c
     src/ztree.c
+    src/zuuid.c
 )
 source_group ("Source Files" FILES ${SOURCES_files_Source_Files})
 
@@ -70,6 +71,7 @@ set (SOURCES_files_Header_Files
     include/zsys.h
     include/zthread.h
     include/ztree.h
+    include/zuuid.h
 )
 source_group ("Header Files" FILES ${SOURCES_files_Header_Files})
 
