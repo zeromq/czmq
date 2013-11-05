@@ -1,0 +1,35 @@
+zuuid(3)
+========
+
+NAME
+----
+zuuid - UUID support class
+
+SYNOPSIS
+--------
+----
+----
+
+DESCRIPTION
+-----------
+
+The zuuid class generates UUIDs and provides methods for working with
+them. If you build CZMQ with libuuid, on Unix/Linux, it will use that
+library. On Windows it will use UuidCreate(). Otherwise it will use a
+random number generator to produce convincing imitations of uuids.
+
+
+EXAMPLE
+-------
+.From zuuid_test method
+----
+    //  Simple create/destroy test
+    zuuid_t *self = zuuid_new ();
+    assert (self);
+    assert (strlen (zuuid_str (self)) == 32);
+    zuuid_destroy (&self);
+----
+
+SEE ALSO
+--------
+linkczmq:czmq[7]

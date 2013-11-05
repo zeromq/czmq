@@ -27,4 +27,5 @@
     <class name = "zsys" />
     <class name = "zthread" />
     <class name = "ztree" />
+    <class name = "zuuid" />
 </project>

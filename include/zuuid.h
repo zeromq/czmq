@@ -1,5 +1,5 @@
 /*  =========================================================================
-    czmq.h - CZMQ wrapper
+    zuuid - UUID support class
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
@@ -23,52 +23,51 @@
     =========================================================================
 */
 
-#ifndef __CZMQ_H_INCLUDED__
-#define __CZMQ_H_INCLUDED__
+#ifndef __ZUUID_H_INCLUDED__
+#define __ZUUID_H_INCLUDED__
 
-//  Set up environment for the application
-//
-#include "czmq_prelude.h"
+#define ZUUID_LEN    16
 
-//  CZMQ version macros for compile-time API detection
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#define CZMQ_VERSION_MAJOR 2
-#define CZMQ_VERSION_MINOR 0
-#define CZMQ_VERSION_PATCH 3
+typedef struct _zuuid_t zuuid_t;
 
-#define CZMQ_MAKE_VERSION(major, minor, patch) \
-    ((major) * 10000 + (minor) * 100 + (patch))
-#define CZMQ_VERSION \
-    CZMQ_MAKE_VERSION(CZMQ_VERSION_MAJOR, CZMQ_VERSION_MINOR, CZMQ_VERSION_PATCH)
+//  Constructor
+CZMQ_EXPORT zuuid_t *
+    zuuid_new (void);
 
-//  Classes in the API
+//  Destructor
+CZMQ_EXPORT void
+    zuuid_destroy (zuuid_t **self_p);
 
-#include "zchunk.h"
-#include "zclock.h"
-#include "zconfig.h"
-#include "zctx.h"
-#include "zfile.h"
-#include "zdir.h"
-#include "zframe.h"
-#include "zlist.h"
-#include "zhash.h"
-#include "zloop.h"
-#include "zmonitor.h"
-#include "zmsg.h"
-#include "zmutex.h"
-#include "zpoller.h"
-#include "zsocket.h"
-#include "zsockopt.h"
-#include "zstr.h"
-#include "zsys.h"
-#include "zthread.h"
-#include "ztree.h"
-#include "zrex.h"
-#include "zbeacon.h"
-#include "zauth.h"
-#include "zcert.h"
-#include "zcertstore.h"
-#include "zproxy.h"
-#include "zuuid.h"
+//  Returns UUID as string
+CZMQ_EXPORT char *
+    zuuid_str (zuuid_t *self);
+
+//  Set UUID to new supplied value 
+CZMQ_EXPORT void
+    zuuid_set (zuuid_t *self, byte *source);
+    
+//  Store UUID blob in target array
+CZMQ_EXPORT void
+    zuuid_cpy (zuuid_t *self, byte *target);
+
+//  Check if UUID is same as supplied value
+CZMQ_EXPORT bool
+    zuuid_eq (zuuid_t *self, byte *compare);
+
+//  Check if UUID is different from supplied value
+CZMQ_EXPORT bool
+    zuuid_neq (zuuid_t *self, byte *compare);
+
+//  Self test of this class
+CZMQ_EXPORT int
+    zuuid_test (bool verbose);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
