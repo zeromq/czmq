@@ -16,10 +16,13 @@ CZMQ_EXPORT zctx_t *
 CZMQ_EXPORT void
     zctx_destroy (zctx_t **self_p);
 
+//  Create new shadow context, returns context object
+CZMQ_EXPORT zctx_t *
+    zctx_shadow (zctx_t *self);
 //  Raise default I/O threads from 1, for crazy heavy applications
 //  The rule of thumb is one I/O thread per gigabyte of traffic in
-//  or out. Call this method before creating any sockets on the context
-//  or the setting will have no effect.
+//  or out. Call this method before creating any sockets on the context,
+//  or calling zctx_shadow, or the setting will have no effect.
 CZMQ_EXPORT void
     zctx_set_iothreads (zctx_t *self, int iothreads);
 
@@ -91,7 +94,6 @@ usage is 1 I/O thread. Lets you configure this value.
 * Sets up signal (SIGINT and SIGTERM) handling so that blocking calls
 such as zmq_recv() and zmq_poll() will return when the user presses
 Ctrl-C.
-
 
 
 EXAMPLE

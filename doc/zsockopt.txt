@@ -8,8 +8,19 @@ zsockopt - get/set 0MQ socket options
 SYNOPSIS
 --------
 ----
-#if (ZMQ_VERSION_MAJOR == 3)
+#if (ZMQ_VERSION_MAJOR == 4)
 //  Get socket options
+CZMQ_EXPORT int zsocket_ipv6 (void *zocket);
+CZMQ_EXPORT int zsocket_ipv4only (void *zocket);
+CZMQ_EXPORT int zsocket_probe_router (void *zocket);
+CZMQ_EXPORT int zsocket_plain_server (void *zocket);
+CZMQ_EXPORT char * zsocket_plain_username (void *zocket);
+CZMQ_EXPORT char * zsocket_plain_password (void *zocket);
+CZMQ_EXPORT int zsocket_curve_server (void *zocket);
+CZMQ_EXPORT char * zsocket_curve_publickey (void *zocket);
+CZMQ_EXPORT char * zsocket_curve_secretkey (void *zocket);
+CZMQ_EXPORT char * zsocket_curve_serverkey (void *zocket);
+CZMQ_EXPORT char * zsocket_zap_domain (void *zocket);
 CZMQ_EXPORT int zsocket_type (void *zocket);
 CZMQ_EXPORT int zsocket_sndhwm (void *zocket);
 CZMQ_EXPORT int zsocket_rcvhwm (void *zocket);
@@ -27,28 +38,37 @@ CZMQ_EXPORT int zsocket_maxmsgsize (void *zocket);
 CZMQ_EXPORT int zsocket_multicast_hops (void *zocket);
 CZMQ_EXPORT int zsocket_rcvtimeo (void *zocket);
 CZMQ_EXPORT int zsocket_sndtimeo (void *zocket);
-CZMQ_EXPORT int zsocket_ipv6 (void *zocket);
-CZMQ_EXPORT int zsocket_probe_router (void *zocket);
 CZMQ_EXPORT int zsocket_tcp_keepalive (void *zocket);
 CZMQ_EXPORT int zsocket_tcp_keepalive_idle (void *zocket);
 CZMQ_EXPORT int zsocket_tcp_keepalive_cnt (void *zocket);
 CZMQ_EXPORT int zsocket_tcp_keepalive_intvl (void *zocket);
 CZMQ_EXPORT char * zsocket_tcp_accept_filter (void *zocket);
-CZMQ_EXPORT int zsocket_plain_server (void *zocket);
-CZMQ_EXPORT char * zsocket_plain_username (void *zocket);
-CZMQ_EXPORT char * zsocket_plain_password (void *zocket);
-CZMQ_EXPORT int zsocket_curve_server (void *zocket);
-CZMQ_EXPORT char * zsocket_curve_publickey (void *zocket);
-CZMQ_EXPORT char * zsocket_curve_secretkey (void *zocket);
-CZMQ_EXPORT char * zsocket_curve_serverkey (void *zocket);
-CZMQ_EXPORT char * zsocket_zap_domain (void *zocket);
 CZMQ_EXPORT int zsocket_rcvmore (void *zocket);
 CZMQ_EXPORT int zsocket_fd (void *zocket);
 CZMQ_EXPORT int zsocket_events (void *zocket);
 CZMQ_EXPORT char * zsocket_last_endpoint (void *zocket);
-CZMQ_EXPORT int zsocket_ipv4only (void *zocket);
 
 //  Set socket options
+CZMQ_EXPORT void zsocket_set_ipv6 (void *zocket, int ipv6);
+CZMQ_EXPORT void zsocket_set_immediate (void *zocket, int immediate);
+CZMQ_EXPORT void zsocket_set_router_raw (void *zocket, int router_raw);
+CZMQ_EXPORT void zsocket_set_ipv4only (void *zocket, int ipv4only);
+CZMQ_EXPORT void zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect);
+CZMQ_EXPORT void zsocket_set_router_mandatory (void *zocket, int router_mandatory);
+CZMQ_EXPORT void zsocket_set_req_relaxed (void *zocket, int req_relaxed);
+CZMQ_EXPORT void zsocket_set_req_correlate (void *zocket, int req_correlate);
+CZMQ_EXPORT void zsocket_set_conflate (void *zocket, int conflate);
+CZMQ_EXPORT void zsocket_set_plain_server (void *zocket, int plain_server);
+CZMQ_EXPORT void zsocket_set_plain_username (void *zocket, const char * plain_username);
+CZMQ_EXPORT void zsocket_set_plain_password (void *zocket, const char * plain_password);
+CZMQ_EXPORT void zsocket_set_curve_server (void *zocket, int curve_server);
+CZMQ_EXPORT void zsocket_set_curve_publickey (void *zocket, const char * curve_publickey);
+CZMQ_EXPORT void zsocket_set_curve_publickey_bin (void *zocket, const byte *curve_publickey);
+CZMQ_EXPORT void zsocket_set_curve_secretkey (void *zocket, const char * curve_secretkey);
+CZMQ_EXPORT void zsocket_set_curve_secretkey_bin (void *zocket, const byte *curve_secretkey);
+CZMQ_EXPORT void zsocket_set_curve_serverkey (void *zocket, const char * curve_serverkey);
+CZMQ_EXPORT void zsocket_set_curve_serverkey_bin (void *zocket, const byte *curve_serverkey);
+CZMQ_EXPORT void zsocket_set_zap_domain (void *zocket, const char * zap_domain);
 CZMQ_EXPORT void zsocket_set_sndhwm (void *zocket, int sndhwm);
 CZMQ_EXPORT void zsocket_set_rcvhwm (void *zocket, int rcvhwm);
 CZMQ_EXPORT void zsocket_set_affinity (void *zocket, int affinity);
@@ -67,37 +87,78 @@ CZMQ_EXPORT void zsocket_set_maxmsgsize (void *zocket, int maxmsgsize);
 CZMQ_EXPORT void zsocket_set_multicast_hops (void *zocket, int multicast_hops);
 CZMQ_EXPORT void zsocket_set_rcvtimeo (void *zocket, int rcvtimeo);
 CZMQ_EXPORT void zsocket_set_sndtimeo (void *zocket, int sndtimeo);
-CZMQ_EXPORT void zsocket_set_ipv6 (void *zocket, int ipv6);
-CZMQ_EXPORT void zsocket_set_immediate (void *zocket, int immediate);
-CZMQ_EXPORT void zsocket_set_router_mandatory (void *zocket, int router_mandatory);
 CZMQ_EXPORT void zsocket_set_xpub_verbose (void *zocket, int xpub_verbose);
 CZMQ_EXPORT void zsocket_set_tcp_keepalive (void *zocket, int tcp_keepalive);
 CZMQ_EXPORT void zsocket_set_tcp_keepalive_idle (void *zocket, int tcp_keepalive_idle);
 CZMQ_EXPORT void zsocket_set_tcp_keepalive_cnt (void *zocket, int tcp_keepalive_cnt);
 CZMQ_EXPORT void zsocket_set_tcp_keepalive_intvl (void *zocket, int tcp_keepalive_intvl);
 CZMQ_EXPORT void zsocket_set_tcp_accept_filter (void *zocket, const char * tcp_accept_filter);
-CZMQ_EXPORT void zsocket_set_plain_server (void *zocket, int plain_server);
-CZMQ_EXPORT void zsocket_set_plain_username (void *zocket, const char * plain_username);
-CZMQ_EXPORT void zsocket_set_plain_password (void *zocket, const char * plain_password);
-CZMQ_EXPORT void zsocket_set_curve_server (void *zocket, int curve_server);
-CZMQ_EXPORT void zsocket_set_curve_publickey (void *zocket, const char * curve_publickey);
-CZMQ_EXPORT void zsocket_set_curve_publickey_bin (void *zocket, const byte *curve_publickey);
-CZMQ_EXPORT void zsocket_set_curve_secretkey (void *zocket, const char * curve_secretkey);
-CZMQ_EXPORT void zsocket_set_curve_secretkey_bin (void *zocket, const byte *curve_secretkey);
-CZMQ_EXPORT void zsocket_set_curve_serverkey (void *zocket, const char * curve_serverkey);
-CZMQ_EXPORT void zsocket_set_curve_serverkey_bin (void *zocket, const byte *curve_serverkey);
-CZMQ_EXPORT void zsocket_set_zap_domain (void *zocket, const char * zap_domain);
-CZMQ_EXPORT void zsocket_set_router_raw (void *zocket, int router_raw);
-CZMQ_EXPORT void zsocket_set_ipv4only (void *zocket, int ipv4only);
-CZMQ_EXPORT void zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect);
 
 //  Emulation of widely-used 2.x socket options
 CZMQ_EXPORT void zsocket_set_hwm (void *zocket, int hwm);
-
-//  Patch in case we're on older libzmq
-#ifndef ZMQ_STREAM
-#define ZMQ_STREAM 11
 #endif
+
+#if (ZMQ_VERSION_MAJOR == 3)
+//  Get socket options
+CZMQ_EXPORT int zsocket_ipv4only (void *zocket);
+CZMQ_EXPORT int zsocket_type (void *zocket);
+CZMQ_EXPORT int zsocket_sndhwm (void *zocket);
+CZMQ_EXPORT int zsocket_rcvhwm (void *zocket);
+CZMQ_EXPORT int zsocket_affinity (void *zocket);
+CZMQ_EXPORT char * zsocket_identity (void *zocket);
+CZMQ_EXPORT int zsocket_rate (void *zocket);
+CZMQ_EXPORT int zsocket_recovery_ivl (void *zocket);
+CZMQ_EXPORT int zsocket_sndbuf (void *zocket);
+CZMQ_EXPORT int zsocket_rcvbuf (void *zocket);
+CZMQ_EXPORT int zsocket_linger (void *zocket);
+CZMQ_EXPORT int zsocket_reconnect_ivl (void *zocket);
+CZMQ_EXPORT int zsocket_reconnect_ivl_max (void *zocket);
+CZMQ_EXPORT int zsocket_backlog (void *zocket);
+CZMQ_EXPORT int zsocket_maxmsgsize (void *zocket);
+CZMQ_EXPORT int zsocket_multicast_hops (void *zocket);
+CZMQ_EXPORT int zsocket_rcvtimeo (void *zocket);
+CZMQ_EXPORT int zsocket_sndtimeo (void *zocket);
+CZMQ_EXPORT int zsocket_tcp_keepalive (void *zocket);
+CZMQ_EXPORT int zsocket_tcp_keepalive_idle (void *zocket);
+CZMQ_EXPORT int zsocket_tcp_keepalive_cnt (void *zocket);
+CZMQ_EXPORT int zsocket_tcp_keepalive_intvl (void *zocket);
+CZMQ_EXPORT char * zsocket_tcp_accept_filter (void *zocket);
+CZMQ_EXPORT int zsocket_rcvmore (void *zocket);
+CZMQ_EXPORT int zsocket_fd (void *zocket);
+CZMQ_EXPORT int zsocket_events (void *zocket);
+CZMQ_EXPORT char * zsocket_last_endpoint (void *zocket);
+
+//  Set socket options
+CZMQ_EXPORT void zsocket_set_router_raw (void *zocket, int router_raw);
+CZMQ_EXPORT void zsocket_set_ipv4only (void *zocket, int ipv4only);
+CZMQ_EXPORT void zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect);
+CZMQ_EXPORT void zsocket_set_sndhwm (void *zocket, int sndhwm);
+CZMQ_EXPORT void zsocket_set_rcvhwm (void *zocket, int rcvhwm);
+CZMQ_EXPORT void zsocket_set_affinity (void *zocket, int affinity);
+CZMQ_EXPORT void zsocket_set_subscribe (void *zocket, const char * subscribe);
+CZMQ_EXPORT void zsocket_set_unsubscribe (void *zocket, const char * unsubscribe);
+CZMQ_EXPORT void zsocket_set_identity (void *zocket, const char * identity);
+CZMQ_EXPORT void zsocket_set_rate (void *zocket, int rate);
+CZMQ_EXPORT void zsocket_set_recovery_ivl (void *zocket, int recovery_ivl);
+CZMQ_EXPORT void zsocket_set_sndbuf (void *zocket, int sndbuf);
+CZMQ_EXPORT void zsocket_set_rcvbuf (void *zocket, int rcvbuf);
+CZMQ_EXPORT void zsocket_set_linger (void *zocket, int linger);
+CZMQ_EXPORT void zsocket_set_reconnect_ivl (void *zocket, int reconnect_ivl);
+CZMQ_EXPORT void zsocket_set_reconnect_ivl_max (void *zocket, int reconnect_ivl_max);
+CZMQ_EXPORT void zsocket_set_backlog (void *zocket, int backlog);
+CZMQ_EXPORT void zsocket_set_maxmsgsize (void *zocket, int maxmsgsize);
+CZMQ_EXPORT void zsocket_set_multicast_hops (void *zocket, int multicast_hops);
+CZMQ_EXPORT void zsocket_set_rcvtimeo (void *zocket, int rcvtimeo);
+CZMQ_EXPORT void zsocket_set_sndtimeo (void *zocket, int sndtimeo);
+CZMQ_EXPORT void zsocket_set_xpub_verbose (void *zocket, int xpub_verbose);
+CZMQ_EXPORT void zsocket_set_tcp_keepalive (void *zocket, int tcp_keepalive);
+CZMQ_EXPORT void zsocket_set_tcp_keepalive_idle (void *zocket, int tcp_keepalive_idle);
+CZMQ_EXPORT void zsocket_set_tcp_keepalive_cnt (void *zocket, int tcp_keepalive_cnt);
+CZMQ_EXPORT void zsocket_set_tcp_keepalive_intvl (void *zocket, int tcp_keepalive_intvl);
+CZMQ_EXPORT void zsocket_set_tcp_accept_filter (void *zocket, const char * tcp_accept_filter);
+
+//  Emulation of widely-used 2.x socket options
+CZMQ_EXPORT void zsocket_set_hwm (void *zocket, int hwm);
 #endif
 
 #if (ZMQ_VERSION_MAJOR == 2)
@@ -172,236 +233,80 @@ EXAMPLE
     zctx_t *ctx = zctx_new ();
     assert (ctx);
     void *zocket;
-#if (ZMQ_VERSION_MAJOR == 3)
-#       if defined (ZMQ_TYPE)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    assert (zocket);
-    zsocket_type (zocket);
-    zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_SNDHWM)
-    zocket = zsocket_new (ctx, ZMQ_PUB);
-    assert (zocket);
-    zsocket_set_sndhwm (zocket, 1);
-    assert (zsocket_sndhwm (zocket) == 1);
-    zsocket_sndhwm (zocket);
-    zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_RCVHWM)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    assert (zocket);
-    zsocket_set_rcvhwm (zocket, 1);
-    assert (zsocket_rcvhwm (zocket) == 1);
-    zsocket_rcvhwm (zocket);
-    zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_AFFINITY)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    assert (zocket);
-    zsocket_set_affinity (zocket, 1);
-    assert (zsocket_affinity (zocket) == 1);
-    zsocket_affinity (zocket);
-    zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_SUBSCRIBE)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    assert (zocket);
-    zsocket_set_subscribe (zocket, "test");
-    zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_UNSUBSCRIBE)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    assert (zocket);
-    zsocket_set_unsubscribe (zocket, "test");
-    zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_IDENTITY)
-    zocket = zsocket_new (ctx, ZMQ_DEALER);
-    assert (zocket);
-    zsocket_set_identity (zocket, "test");
-    char *identity = zsocket_identity (zocket);
-    assert (identity);
-    free (identity);
-    zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_RATE)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    assert (zocket);
-    zsocket_set_rate (zocket, 1);
-    assert (zsocket_rate (zocket) == 1);
-    zsocket_rate (zocket);
-    zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_RECOVERY_IVL)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    assert (zocket);
-    zsocket_set_recovery_ivl (zocket, 1);
-    assert (zsocket_recovery_ivl (zocket) == 1);
-    zsocket_recovery_ivl (zocket);
-    zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_SNDBUF)
-    zocket = zsocket_new (ctx, ZMQ_PUB);
-    assert (zocket);
-    zsocket_set_sndbuf (zocket, 1);
-    assert (zsocket_sndbuf (zocket) == 1);
-    zsocket_sndbuf (zocket);
-    zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_RCVBUF)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    assert (zocket);
-    zsocket_set_rcvbuf (zocket, 1);
-    assert (zsocket_rcvbuf (zocket) == 1);
-    zsocket_rcvbuf (zocket);
-    zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_LINGER)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    assert (zocket);
-    zsocket_set_linger (zocket, 1);
-    assert (zsocket_linger (zocket) == 1);
-    zsocket_linger (zocket);
-    zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_RECONNECT_IVL)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    assert (zocket);
-    zsocket_set_reconnect_ivl (zocket, 1);
-    assert (zsocket_reconnect_ivl (zocket) == 1);
-    zsocket_reconnect_ivl (zocket);
-    zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_RECONNECT_IVL_MAX)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    assert (zocket);
-    zsocket_set_reconnect_ivl_max (zocket, 1);
-    assert (zsocket_reconnect_ivl_max (zocket) == 1);
-    zsocket_reconnect_ivl_max (zocket);
-    zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_BACKLOG)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    assert (zocket);
-    zsocket_set_backlog (zocket, 1);
-    assert (zsocket_backlog (zocket) == 1);
-    zsocket_backlog (zocket);
-    zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_MAXMSGSIZE)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    assert (zocket);
-    zsocket_set_maxmsgsize (zocket, 1);
-    assert (zsocket_maxmsgsize (zocket) == 1);
-    zsocket_maxmsgsize (zocket);
-    zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_MULTICAST_HOPS)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    assert (zocket);
-    zsocket_set_multicast_hops (zocket, 1);
-    assert (zsocket_multicast_hops (zocket) == 1);
-    zsocket_multicast_hops (zocket);
-    zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_RCVTIMEO)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    assert (zocket);
-    zsocket_set_rcvtimeo (zocket, 1);
-    assert (zsocket_rcvtimeo (zocket) == 1);
-    zsocket_rcvtimeo (zocket);
-    zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_SNDTIMEO)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    assert (zocket);
-    zsocket_set_sndtimeo (zocket, 1);
-    assert (zsocket_sndtimeo (zocket) == 1);
-    zsocket_sndtimeo (zocket);
-    zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_IPV6)
+#if (ZMQ_VERSION_MAJOR == 4)
+#     if defined (ZMQ_IPV6)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_ipv6 (zocket, 1);
     assert (zsocket_ipv6 (zocket) == 1);
     zsocket_ipv6 (zocket);
     zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_IMMEDIATE)
+#     endif
+#     if defined (ZMQ_IMMEDIATE)
     zocket = zsocket_new (ctx, ZMQ_DEALER);
     assert (zocket);
     zsocket_set_immediate (zocket, 1);
     zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_ROUTER_MANDATORY)
+#     endif
+#     if defined (ZMQ_ROUTER_RAW)
+    zocket = zsocket_new (ctx, ZMQ_ROUTER);
+    assert (zocket);
+    zsocket_set_router_raw (zocket, 1);
+    zsocket_destroy (ctx, zocket);
+#     endif
+#     if defined (ZMQ_IPV4ONLY)
+    zocket = zsocket_new (ctx, ZMQ_SUB);
+    assert (zocket);
+    zsocket_set_ipv4only (zocket, 1);
+    assert (zsocket_ipv4only (zocket) == 1);
+    zsocket_ipv4only (zocket);
+    zsocket_destroy (ctx, zocket);
+#     endif
+#     if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
+    zocket = zsocket_new (ctx, ZMQ_PUB);
+    assert (zocket);
+    zsocket_set_delay_attach_on_connect (zocket, 1);
+    zsocket_destroy (ctx, zocket);
+#     endif
+#     if defined (ZMQ_ROUTER_MANDATORY)
     zocket = zsocket_new (ctx, ZMQ_ROUTER);
     assert (zocket);
     zsocket_set_router_mandatory (zocket, 1);
     zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_PROBE_ROUTER)
+#     endif
+#     if defined (ZMQ_PROBE_ROUTER)
     zocket = zsocket_new (ctx, ZMQ_DEALER);
     assert (zocket);
     zsocket_probe_router (zocket);
     zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_XPUB_VERBOSE)
-    zocket = zsocket_new (ctx, ZMQ_XPUB);
+#     endif
+#     if defined (ZMQ_REQ_RELAXED)
+    zocket = zsocket_new (ctx, ZMQ_REQ);
     assert (zocket);
-    zsocket_set_xpub_verbose (zocket, 1);
+    zsocket_set_req_relaxed (zocket, 1);
     zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_TCP_KEEPALIVE)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
+#     endif
+#     if defined (ZMQ_REQ_CORRELATE)
+    zocket = zsocket_new (ctx, ZMQ_REQ);
     assert (zocket);
-    zsocket_set_tcp_keepalive (zocket, 1);
-    assert (zsocket_tcp_keepalive (zocket) == 1);
-    zsocket_tcp_keepalive (zocket);
+    zsocket_set_req_correlate (zocket, 1);
     zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_TCP_KEEPALIVE_IDLE)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
+#     endif
+#     if defined (ZMQ_CONFLATE)
+    zocket = zsocket_new (ctx, ZMQ_PUSH);
     assert (zocket);
-    zsocket_set_tcp_keepalive_idle (zocket, 1);
-    assert (zsocket_tcp_keepalive_idle (zocket) == 1);
-    zsocket_tcp_keepalive_idle (zocket);
+    zsocket_set_conflate (zocket, 1);
     zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_TCP_KEEPALIVE_CNT)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    assert (zocket);
-    zsocket_set_tcp_keepalive_cnt (zocket, 1);
-    assert (zsocket_tcp_keepalive_cnt (zocket) == 1);
-    zsocket_tcp_keepalive_cnt (zocket);
-    zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_TCP_KEEPALIVE_INTVL)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    assert (zocket);
-    zsocket_set_tcp_keepalive_intvl (zocket, 1);
-    assert (zsocket_tcp_keepalive_intvl (zocket) == 1);
-    zsocket_tcp_keepalive_intvl (zocket);
-    zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_TCP_ACCEPT_FILTER)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    assert (zocket);
-    zsocket_set_tcp_accept_filter (zocket, "127.0.0.1");
-    char *tcp_accept_filter = zsocket_tcp_accept_filter (zocket);
-    assert (tcp_accept_filter);
-    free (tcp_accept_filter);
-    zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_PLAIN_SERVER)
+#     endif
+#     if defined (ZMQ_PLAIN_SERVER)
     zocket = zsocket_new (ctx, ZMQ_PUB);
     assert (zocket);
     zsocket_set_plain_server (zocket, 1);
     assert (zsocket_plain_server (zocket) == 1);
     zsocket_plain_server (zocket);
     zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_PLAIN_USERNAME)
+#     endif
+#     if defined (ZMQ_PLAIN_USERNAME)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_plain_username (zocket, "test");
@@ -409,8 +314,8 @@ EXAMPLE
     assert (plain_username);
     free (plain_username);
     zsocket_destroy (ctx, zocket);
-#       endif
-#       if defined (ZMQ_PLAIN_PASSWORD)
+#     endif
+#     if defined (ZMQ_PLAIN_PASSWORD)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_plain_password (zocket, "test");
@@ -418,9 +323,9 @@ EXAMPLE
     assert (plain_password);
     free (plain_password);
     zsocket_destroy (ctx, zocket);
-#       endif
-#     if defined (HAVE_LIBSODIUM)
-#       if defined (ZMQ_CURVE_SERVER)
+#     endif
+#     if defined (ZMQ_CURVE_SERVER)
+#       if defined (HAVE_LIBSODIUM)
     zocket = zsocket_new (ctx, ZMQ_PUB);
     assert (zocket);
     zsocket_set_curve_server (zocket, 1);
@@ -429,8 +334,8 @@ EXAMPLE
     zsocket_destroy (ctx, zocket);
 #       endif
 #     endif
-#     if defined (HAVE_LIBSODIUM)
-#       if defined (ZMQ_CURVE_PUBLICKEY)
+#     if defined (ZMQ_CURVE_PUBLICKEY)
+#       if defined (HAVE_LIBSODIUM)
     zocket = zsocket_new (ctx, ZMQ_PUB);
     assert (zocket);
     zsocket_set_curve_publickey (zocket, "Yne@$w-vo<fVvi]a<NY6T1ed:M$fCG*[IaLV{hID");
@@ -440,8 +345,8 @@ EXAMPLE
     zsocket_destroy (ctx, zocket);
 #       endif
 #     endif
-#     if defined (HAVE_LIBSODIUM)
-#       if defined (ZMQ_CURVE_SECRETKEY)
+#     if defined (ZMQ_CURVE_SECRETKEY)
+#       if defined (HAVE_LIBSODIUM)
     zocket = zsocket_new (ctx, ZMQ_PUB);
     assert (zocket);
     zsocket_set_curve_secretkey (zocket, "D:)Q[IlAW!ahhC2ac:9*A}h:p?([4%wOTJ%JR%cs");
@@ -451,8 +356,8 @@ EXAMPLE
     zsocket_destroy (ctx, zocket);
 #       endif
 #     endif
-#     if defined (HAVE_LIBSODIUM)
-#       if defined (ZMQ_CURVE_SERVERKEY)
+#     if defined (ZMQ_CURVE_SERVERKEY)
+#       if defined (HAVE_LIBSODIUM)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
 ----

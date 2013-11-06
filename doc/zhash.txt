@@ -260,8 +260,8 @@ EXAMPLE
     strcpy (value, "Ring a ding ding");
     rc = zhash_insert (hash, "key2", value);
     assert (rc == 0);
-    assert (streq (zhash_lookup (hash, "key1"), "This is a string"));
-    assert (streq (zhash_lookup (hash, "key2"), "Ring a ding ding"));
+    assert (streq ((char *) zhash_lookup (hash, "key1"), "This is a string"));
+    assert (streq ((char *) zhash_lookup (hash, "key2"), "Ring a ding ding"));
     zhash_destroy (&hash);
 ----
 

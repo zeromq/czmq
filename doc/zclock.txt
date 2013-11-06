@@ -21,7 +21,7 @@ CZMQ_EXPORT int64_t
 CZMQ_EXPORT void
     zclock_log (const char *format, ...);
 
-//  Return formatted date/time as fresh string.
+//  Return formatted date/time as fresh string. Free using zstr_free().
 CZMQ_EXPORT char *
     zclock_timestr (void);
 

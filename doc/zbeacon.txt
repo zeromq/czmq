@@ -10,7 +10,7 @@ SYNOPSIS
 ----
 //  Create a new beacon on a certain UDP port
 CZMQ_EXPORT zbeacon_t *
-    zbeacon_new (int port_nbr);
+    zbeacon_new (zctx_t *ctx, int port_nbr);
     
 //  Destroy a beacon
 CZMQ_EXPORT void
@@ -81,12 +81,12 @@ EXAMPLE
     
     //  Create beacon to broadcast our service
     byte announcement [2] = { (port_nbr >> 8) & 0xFF, port_nbr & 0xFF };
-    zbeacon_t *service_beacon = zbeacon_new (9999);
+    zbeacon_t *service_beacon = zbeacon_new (ctx, 9999);
     zbeacon_set_interval (service_beacon, 100);
     zbeacon_publish (service_beacon, announcement, 2);
 
     //  Create beacon to lookup service
-    zbeacon_t *client_beacon = zbeacon_new (9999);
+    zbeacon_t *client_beacon = zbeacon_new (ctx, 9999);
     zbeacon_subscribe (client_beacon, NULL, 0);
 
     //  Wait for at most 1/2 second if there's no broadcast networking
@@ -99,15 +99,14 @@ EXAMPLE
                         +  zframe_data (content) [1];
         assert (received_port == port_nbr);
         zframe_destroy (&content);
-        free (ipaddress);
+        zstr_free (&ipaddress);
     }
     zbeacon_destroy (&client_beacon);
     zbeacon_destroy (&service_beacon);
-    zctx_destroy (&ctx);
     
-    zbeacon_t *node1 = zbeacon_new (5670);
-    zbeacon_t *node2 = zbeacon_new (5670);
-    zbeacon_t *node3 = zbeacon_new (5670);
+    zbeacon_t *node1 = zbeacon_new (ctx, 5670);
+    zbeacon_t *node2 = zbeacon_new (ctx, 5670);
+    zbeacon_t *node3 = zbeacon_new (ctx, 5670);
 
     assert (*zbeacon_hostname (node1));
     assert (*zbeacon_hostname (node2));
@@ -128,7 +127,7 @@ EXAMPLE
         zbeacon_socket (node2), 
         zbeacon_socket (node3), NULL);
         
-    uint64_t stop_at = zclock_time () + 1000;
+    int64_t stop_at = zclock_time () + 1000;
     while (zclock_time () < stop_at) {
         long timeout = (long) (stop_at - zclock_time ());
         if (timeout < 0)
@@ -139,8 +138,8 @@ EXAMPLE
             char *ipaddress, *beacon;
             zstr_recvx (zbeacon_socket (node1), &ipaddress, &beacon, NULL);
             assert (streq (beacon, "NODE/2"));
-            free (ipaddress);
-            free (beacon);
+            zstr_free (&ipaddress);
+            zstr_free (&beacon);
         }
     }
     zpoller_destroy (&poller);
@@ -157,6 +156,8 @@ EXAMPLE
     zbeacon_destroy (&node1);
     zbeacon_destroy (&node2);
     zbeacon_destroy (&node3);
+    
+    zctx_destroy (&ctx);
 ----
 
 SEE ALSO
