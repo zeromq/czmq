@@ -58,7 +58,7 @@ static void
 //  Install authentication for the specified context. Returns a new zauth
 //  object that you can use to configure authentication. Note that until you
 //  add policies, all incoming NULL connections are allowed (classic ZeroMQ
-//  behaviour), and all PLAIN and CURVE connections are denied. If there was
+//  behavior), and all PLAIN and CURVE connections are denied. If there was
 //  an error during initialization, returns NULL.
 
 zauth_t *
@@ -66,8 +66,9 @@ zauth_new (zctx_t *ctx)
 {    
     zauth_t *self = (zauth_t *) zmalloc (sizeof (zauth_t));
     assert (self);
-    
+
     //  Start background agent and wait for it to initialize
+    assert (ctx);
     self->pipe = zthread_fork (ctx, s_agent_task, NULL);
     char *status = zstr_recv (self->pipe);
     if (strneq (status, "OK"))
