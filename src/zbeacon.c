@@ -86,7 +86,6 @@ typedef struct sockaddr_in inaddr_t;
 
 //  Structure of our class
 struct _zbeacon_t {
-    zctx_t *ctx;                //  Private 0MQ context
     void *pipe;                 //  Pipe through to backend agent
     char *hostname;             //  Our own address as string
 };
@@ -101,22 +100,13 @@ static void
 //  Create a new beacon
 
 zbeacon_t *
-zbeacon_new (int port_nbr)
+zbeacon_new (zctx_t *ctx, int port_nbr)
 {
     zbeacon_t *self = (zbeacon_t *) zmalloc (sizeof (zbeacon_t));
-
-    //  For now, we use a context per beacon instance
-    self->ctx = zctx_new ();
-
-    //  Start beacon background agent
-    self->pipe = zthread_fork (self->ctx, s_agent_task, NULL);
-    
-    //  Configure agent with arguments
+    assert (ctx);
+    self->pipe = zthread_fork (ctx, s_agent_task, NULL);
     zstr_send (self->pipe, "%d", port_nbr);
-
-    //  Agent replies with our host name
     self->hostname = zstr_recv (self->pipe);
-
     return self;
 }
 
@@ -133,7 +123,6 @@ zbeacon_destroy (zbeacon_t **self_p)
         zstr_send (self->pipe, "TERMINATE");
         char *reply = zstr_recv (self->pipe);
         zstr_free (&reply);
-        zctx_destroy (&self->ctx);
         free (self->hostname);
         free (self);
         *self_p = NULL;
@@ -256,12 +245,12 @@ zbeacon_test (bool verbose)
     
     //  Create beacon to broadcast our service
     byte announcement [2] = { (port_nbr >> 8) & 0xFF, port_nbr & 0xFF };
-    zbeacon_t *service_beacon = zbeacon_new (9999);
+    zbeacon_t *service_beacon = zbeacon_new (ctx, 9999);
     zbeacon_set_interval (service_beacon, 100);
     zbeacon_publish (service_beacon, announcement, 2);
 
     //  Create beacon to lookup service
-    zbeacon_t *client_beacon = zbeacon_new (9999);
+    zbeacon_t *client_beacon = zbeacon_new (ctx, 9999);
     zbeacon_subscribe (client_beacon, NULL, 0);
 
     //  Wait for at most 1/2 second if there's no broadcast networking
@@ -278,11 +267,10 @@ zbeacon_test (bool verbose)
     }
     zbeacon_destroy (&client_beacon);
     zbeacon_destroy (&service_beacon);
-    zctx_destroy (&ctx);
     
-    zbeacon_t *node1 = zbeacon_new (5670);
-    zbeacon_t *node2 = zbeacon_new (5670);
-    zbeacon_t *node3 = zbeacon_new (5670);
+    zbeacon_t *node1 = zbeacon_new (ctx, 5670);
+    zbeacon_t *node2 = zbeacon_new (ctx, 5670);
+    zbeacon_t *node3 = zbeacon_new (ctx, 5670);
 
     assert (*zbeacon_hostname (node1));
     assert (*zbeacon_hostname (node2));
@@ -332,6 +320,8 @@ zbeacon_test (bool verbose)
     zbeacon_destroy (&node1);
     zbeacon_destroy (&node2);
     zbeacon_destroy (&node3);
+    
+    zctx_destroy (&ctx);
     //  @end
     printf ("OK\n");
 }
@@ -367,8 +357,6 @@ static void
     s_handle_io_error (char *reason);
 static void
     s_get_interface (agent_t *self);
-//static bool
-//    s_wireless_nic (const char* name);
 static void
     s_api_command (agent_t *self);
 static void
@@ -535,15 +523,17 @@ s_get_interface (agent_t *self)
         int num_interfaces = 0;
         struct ifaddrs *interface = interfaces;
         while (interface) {
-            if (interface->ifa_addr && 
-                interface->ifa_broadaddr && // on Solaris, loopback interfaces have a NULL in ifa_broadaddr
-                (interface->ifa_addr->sa_family == AF_INET)) {
+            //  On Solaris, loopback interfaces have a NULL in ifa_broadaddr
+            if (interface->ifa_broadaddr
+            &&  interface->ifa_addr
+            && (interface->ifa_addr->sa_family == AF_INET)) {
                 self->address = *(inaddr_t *) interface->ifa_addr;
                 self->broadcast = *(inaddr_t *) interface->ifa_broadaddr;
                 self->broadcast.sin_port = htons (self->port_nbr);
 
-                //  If the returned broadcast address is the same as source address build
-                //  the broadcast address from the source address and netmask.
+                //  If the returned broadcast address is the same as source
+                //  address, build the broadcast address from the source
+                //  address and netmask.
                 if (self->address.sin_addr.s_addr == self->broadcast.sin_addr.s_addr)
                     self->broadcast.sin_addr.s_addr |= ~(((inaddr_t *) interface->ifa_netmask)->sin_addr.s_addr);
 
@@ -557,10 +547,9 @@ s_get_interface (agent_t *self)
             }
             interface = interface->ifa_next;
         }
-
         if (strlen (zsys_interface ()) == 0) {
-            //  Subnet broadcast addresses don't work on some platforms but is
-            //  assumed to work if the interface is specified.
+            //  Subnet broadcast addresses don't work on some platforms but 
+            //  is assumed to work if the interface is specified.
             self->broadcast.sin_family = AF_INET;
             self->broadcast.sin_addr.s_addr = INADDR_BROADCAST;
             self->broadcast.sin_port = htons (self->port_nbr);
@@ -571,12 +560,10 @@ s_get_interface (agent_t *self)
                 self->address.sin_addr.s_addr = INADDR_ANY;
             }
         }
-
     }
     freeifaddrs (interfaces);
 
 #else
-
     if (strlen (zsys_interface ()) == 0) {
         self->broadcast.sin_family = AF_INET;
         self->broadcast.sin_addr.s_addr = INADDR_BROADCAST;
@@ -643,36 +630,6 @@ s_get_interface (agent_t *self)
     }
 #endif
 }
-
-//  Check if a given NIC name is wireless
-
-//static bool
-//s_wireless_nic (const char *name)
-//{
-//    SOCKET udpsock = socket (AF_INET, SOCK_DGRAM, 0);
-//    if (udpsock == INVALID_SOCKET)
-//        s_handle_io_error ("socket");
-
-//    bool is_nic = false;
-//#if defined (SIOCGIFMEDIA)
-//    struct ifmediareq ifmr;
-//    memset (&ifmr, 0, sizeof (struct ifmediareq));
-//    strncpy(ifmr.ifm_name, name, sizeof (ifmr.ifm_name));
-//    int res = ioctl (udpsock, SIOCGIFMEDIA, (caddr_t) &ifmr);
-//    if (res != -1)
-//        is_nic = (IFM_TYPE (ifmr.ifm_current) == IFM_IEEE80211);
-
-//#elif defined (SIOCGIWNAME)
-//    struct iwreq wrq;
-//    memset (&wrq, 0, sizeof (struct iwreq));
-//    strncpy (wrq.ifr_name, name, sizeof (wrq.ifr_name));
-//    int res = ioctl (udpsock, SIOCGIWNAME, (caddr_t) &wrq);
-//    if (res != -1)
-//        is_nic = true;
-//#endif
-//    closesocket (udpsock);
-//    return is_nic;
-//}
 
 //  Handle command from API
 

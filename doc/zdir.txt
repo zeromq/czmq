@@ -30,13 +30,22 @@ CZMQ_EXPORT time_t
 CZMQ_EXPORT off_t
     zdir_cursize (zdir_t *self);
 
+//  Return directory count
+CZMQ_EXPORT size_t
+    zdir_count (zdir_t *self);
+    
 //  Returns a sorted array of zfile objects; returns a single block of memory,
-//  that you destroy by calling free(). Each entry in the array is a pointer
+//  that you destroy by calling zstr_free(). Each entry in the array is a pointer
 //  to a zfile_t item already allocated in the zdir tree. The array ends with
 //  a null pointer. Do not destroy the original zdir tree until you are done
 //  with this array.
 CZMQ_EXPORT zfile_t **
     zdir_flatten (zdir_t *self);
+
+//  Free a provided string, and nullify the parent pointer. Safe to call on
+//  a null pointer.
+CZMQ_EXPORT void
+    zdir_flatten_free (zfile_t ***files_p);
 
 //  Print contents of directory to stderr
 CZMQ_EXPORT void

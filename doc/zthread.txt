@@ -96,7 +96,8 @@ s_test_attached (void *args, zctx_t *ctx, void *pipe)
     //  Create a socket to check it'll be automatically deleted
     zsocket_new (ctx, ZMQ_PUSH);
     //  Wait for our parent to ping us, and pong back
-    free (zstr_recv (pipe));
+    char *ping = zstr_recv (pipe);
+    zstr_free (&ping);
     zstr_send (pipe, "pong");
 }
 
@@ -115,7 +116,7 @@ s_test_attached (void *args, zctx_t *ctx, void *pipe)
     zstr_send (pipe, "ping");
     char *pong = zstr_recv (pipe);
     assert (streq (pong, "pong"));
-    free (pong);
+    zstr_free (&pong);
 
     //  Everything should be cleanly closed now
     zctx_destroy (&ctx);

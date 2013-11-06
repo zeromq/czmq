@@ -36,7 +36,7 @@ typedef struct _zbeacon_t zbeacon_t;
 //  @interface
 //  Create a new beacon on a certain UDP port
 CZMQ_EXPORT zbeacon_t *
-    zbeacon_new (int port_nbr);
+    zbeacon_new (zctx_t *ctx, int port_nbr);
     
 //  Destroy a beacon
 CZMQ_EXPORT void

@@ -704,6 +704,8 @@ zauth_test (bool verbose)
     success = s_can_connect (server, client);
     assert (success);
 
+    zsocket_destroy (ctx, client);
+    zsocket_destroy (ctx, server);
     zctx_destroy (&ctx);
     
     //  Delete all test files
