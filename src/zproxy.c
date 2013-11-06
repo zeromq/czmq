@@ -27,6 +27,10 @@
 @header
     The zproxy class simplifies working with the zmq_proxy api.
 @discuss
+    If we used a steerable proxy we could do termination better, and
+    allow creation/termination of proxies without destroying contexts.
+    Then, zproxy_destroy would send the proxy task a KILL message and
+    wait for an OK response, then return to the caller.
 @end
 */
 
@@ -49,11 +53,12 @@ struct _zproxy_t {
     void *capture;
 };
 
+
 //  --------------------------------------------------------------------------
-//  zproxy attached thread
+//  zproxy background task
 
 static void
-s_zproxy_attached (void *args, zctx_t *ctx, void *pipe)
+s_proxy_task (void *args, zctx_t *ctx, void *pipe)
 {   
     zproxy_t *self = (zproxy_t*) args;
     self->frontend = zsocket_new (ctx, zproxy_frontend_type (self));
@@ -74,12 +79,14 @@ s_zproxy_attached (void *args, zctx_t *ctx, void *pipe)
     zmq_proxy (self->frontend, self->backend, self->capture);
 }
 
+
 //  --------------------------------------------------------------------------
 //  Constructor
 
 zproxy_t *
 zproxy_new (zctx_t *ctx, int zproxy_type)
 {
+    assert (ctx);
     assert (zproxy_type > 0 && zproxy_type < 4);
     
     zproxy_t *self;
@@ -107,34 +114,10 @@ zproxy_new (zctx_t *ctx, int zproxy_type)
     return self;
 }
 
-//  --------------------------------------------------------------------------
-//  Start a zproxy object
-
-int
-zproxy_bind (zproxy_t *self, const char *frontend_addr,
-        const char *backend_addr, const char *capture_addr)
-{
-    strncpy (self->frontend_addr, frontend_addr, 255);
-    self->frontend_addr[255] = '\0';
-
-    strncpy (self->backend_addr, backend_addr, 255);
-    self->frontend_addr[255] = '\0';
-
-    strncpy (self->capture_addr, capture_addr, 255);
-    self->frontend_addr[255] = '\0';
-
-    self->pipe = zthread_fork (self->ctx, s_zproxy_attached, self);
-    
-    int rc = 0;
-    zstr_send (self->pipe, "START");
-    char *response = zstr_recv (self->pipe);
-    if (streq (response, "OK") == 1)
-        rc = 1;
-    return rc;
-}
 
 //  --------------------------------------------------------------------------
-//  Destructor
+//  Destructor; call this after destroying the parent context. Since the
+//  pipe to the proxy task will be dead, we cannot synchronize 
 
 void
 zproxy_destroy (zproxy_t **self_p)
@@ -145,6 +128,34 @@ zproxy_destroy (zproxy_t **self_p)
         free (self);
         *self_p = NULL;
     }
+}
+
+
+//  --------------------------------------------------------------------------
+//  Start a zproxy object
+
+int
+zproxy_bind (zproxy_t *self,
+    const char *frontend_addr,
+    const char *backend_addr,
+    const char *capture_addr)
+{
+    strncpy (self->frontend_addr, frontend_addr, 255);
+    self->frontend_addr [255] = '\0';
+
+    strncpy (self->backend_addr, backend_addr, 255);
+    self->frontend_addr [255] = '\0';
+
+    strncpy (self->capture_addr, capture_addr, 255);
+    self->frontend_addr [255] = '\0';
+
+    self->pipe = zthread_fork (self->ctx, s_proxy_task, self);
+    
+    zstr_send (self->pipe, "START");
+    char *response = zstr_recv (self->pipe);
+    int rc = streq (response, "OK")? 1: 0;
+    free (response);
+    return rc;
 }
 
 
@@ -207,6 +218,7 @@ zproxy_capture_addr (zproxy_t *self)
     return self->capture_addr;
 }
 
+
 //  --------------------------------------------------------------------------
 //  Get the proxy capture type
 
@@ -217,7 +229,7 @@ zproxy_capture_type (zproxy_t *self)
 }
 
 
-//  --------------------------------------------------------------------------
+// --------------------------------------------------------------------------
 //  Selftest
 
 int
@@ -230,13 +242,13 @@ zproxy_test (bool verbose)
     const char *back_addr = "inproc://proxy_back";
     const char *capture_addr = "inproc://proxy_capture";
 
-    // Create and start the proxy
+    //  Create and start the proxy
     zctx_t *ctx = zctx_new ();
     zproxy_t *proxy = zproxy_new (ctx, ZPROXY_STREAMER);
     int rc = zproxy_bind (proxy, front_addr, back_addr, capture_addr);
     assert (rc);
 
-    // Test the accessor methods
+    //  Test the accessor methods
     assert (zproxy_type (proxy) == ZPROXY_STREAMER);
     assert (zproxy_frontend_type (proxy) == ZMQ_PULL);
     assert (zproxy_backend_type (proxy) == ZMQ_PUSH);
@@ -249,7 +261,7 @@ zproxy_test (bool verbose)
     char *capture_check = zproxy_capture_addr (proxy);
     assert (streq (capture_check, capture_addr));
 
-    // Connect to the proxy front, back, and capture ports
+    //  Connect to the proxy front, back, and capture ports
     void *front_s = zsocket_new (ctx, ZMQ_PUSH);
     assert (front_s);
     zsocket_connect (front_s, zproxy_frontend_addr (proxy));
@@ -263,21 +275,27 @@ zproxy_test (bool verbose)
     assert (back_s);
     zsocket_connect (capture_s, zproxy_capture_addr (proxy));
 
-    // Send a message through the proxy and receive it
+    //  Send a message through the proxy and receive it
     zstr_send (front_s, "STREAMER_TEST");
     
     char *back_resp = zstr_recv (back_s);
     assert (back_resp);
     assert (streq ("STREAMER_TEST", back_resp));
+    free (back_resp);
     
     char *capture_resp = zstr_recv (capture_s);
     assert (capture_resp);
     assert (capture_resp);
     assert (streq ("STREAMER_TEST", capture_resp));
+    free (capture_resp);
    
-    // Destroying the context will stop the proxy
+    //  Destroying the context will stop the proxy, see note at
+    //  start of source about using zmq_proxy_steerable instead.
+    //  The sleep here is to ensure memory is freed so valgrind
+    //  will be happy.
     zctx_destroy (&ctx);
     zproxy_destroy (&proxy);
+    zclock_sleep (100);
     
     //  @end
     printf ("OK\n");
