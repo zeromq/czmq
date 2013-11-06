@@ -53,31 +53,9 @@ struct _zproxy_t {
     void *capture;
 };
 
-
-//  --------------------------------------------------------------------------
-//  zproxy background task
-
+// Background task that runs the proxy
 static void
-s_proxy_task (void *args, zctx_t *ctx, void *pipe)
-{   
-    zproxy_t *self = (zproxy_t*) args;
-    self->frontend = zsocket_new (ctx, zproxy_frontend_type (self));
-    assert (self->frontend);
-    zsocket_bind (self->frontend, zproxy_frontend_addr (self));
-
-    self->backend = zsocket_new (ctx, zproxy_backend_type (self));
-    assert (self->backend);
-    zsocket_bind (self->backend, zproxy_backend_addr (self));
-
-    self->capture = zsocket_new (ctx, zproxy_capture_type (self));
-    assert (self->capture);
-    zsocket_bind (self->capture, zproxy_capture_addr (self));
-
-    free (zstr_recv (pipe));
-    zstr_send (pipe, "OK");
-
-    zmq_proxy (self->frontend, self->backend, self->capture);
-}
+    s_agent_task (void *args, zctx_t *ctx, void *pipe);
 
 
 //  --------------------------------------------------------------------------
@@ -149,7 +127,7 @@ zproxy_bind (zproxy_t *self,
     strncpy (self->capture_addr, capture_addr, 255);
     self->frontend_addr [255] = '\0';
 
-    self->pipe = zthread_fork (self->ctx, s_proxy_task, self);
+    self->pipe = zthread_fork (self->ctx, s_agent_task, self);
     
     zstr_send (self->pipe, "START");
     char *response = zstr_recv (self->pipe);
@@ -300,4 +278,30 @@ zproxy_test (bool verbose)
     //  @end
     printf ("OK\n");
     return 0;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Backend agent implementation
+
+static void
+s_agent_task (void *args, zctx_t *ctx, void *pipe)
+{   
+    zproxy_t *self = (zproxy_t*) args;
+    self->frontend = zsocket_new (ctx, zproxy_frontend_type (self));
+    assert (self->frontend);
+    zsocket_bind (self->frontend, zproxy_frontend_addr (self));
+
+    self->backend = zsocket_new (ctx, zproxy_backend_type (self));
+    assert (self->backend);
+    zsocket_bind (self->backend, zproxy_backend_addr (self));
+
+    self->capture = zsocket_new (ctx, zproxy_capture_type (self));
+    assert (self->capture);
+    zsocket_bind (self->capture, zproxy_capture_addr (self));
+
+    free (zstr_recv (pipe));
+    zstr_send (pipe, "OK");
+
+    zmq_proxy (self->frontend, self->backend, self->capture);
 }
