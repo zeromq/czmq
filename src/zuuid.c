@@ -71,9 +71,11 @@ zuuid_new (void)
     //  No UUID system calls, so generate a random string
     byte uuid [ZUUID_LEN];
     int fd = open ("/dev/urandom", O_RDONLY);
-    ssize_t bytes_read = read (fd, uuid, ZUUID_LEN);
-    assert (bytes_read == ZUUID_LEN);
-    close (fd);
+    if (fd != -1) {
+        ssize_t bytes_read = read (fd, uuid, ZUUID_LEN);
+        assert (bytes_read == ZUUID_LEN);
+        close (fd);
+    }
     zuuid_set (self, uuid);
 #endif
     return self;
