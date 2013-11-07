@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zproxy - convenient zmq_proxy api
+    zproxy - convenient zmq_proxy API
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
@@ -111,7 +111,8 @@ zproxy_destroy (zproxy_t **self_p)
 
 
 //  --------------------------------------------------------------------------
-//  Start a zproxy object
+//  Start and zmq_proxy in an attached thread, binding to endpoints
+//  Returns 0 if OK, -1 if there was an error
 
 int
 zproxy_bind (zproxy_t *self,
@@ -129,11 +130,15 @@ zproxy_bind (zproxy_t *self,
     self->frontend_addr [255] = '\0';
 
     self->pipe = zthread_fork (self->ctx, s_agent_task, self);
-    
-    zstr_send (self->pipe, "START");
-    char *response = zstr_recv (self->pipe);
-    int rc = streq (response, "OK")? 1: 0;
-    free (response);
+    int rc;
+    if (self->pipe) {
+        zstr_send (self->pipe, "START");
+        char *response = zstr_recv (self->pipe);
+        rc = streq (response, "OK")? 0: -1;
+        free (response);
+    }
+    else
+        rc = -1;
     return rc;
 }
 
@@ -225,7 +230,7 @@ zproxy_test (bool verbose)
     zctx_t *ctx = zctx_new ();
     zproxy_t *proxy = zproxy_new (ctx, ZPROXY_STREAMER);
     int rc = zproxy_bind (proxy, front_addr, back_addr, capture_addr);
-    assert (rc);
+    assert (rc == 0);
 
     //  Test the accessor methods
     assert (zproxy_type (proxy) == ZPROXY_STREAMER);
@@ -290,16 +295,22 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
 {   
     zproxy_t *self = (zproxy_t*) args;
     self->frontend = zsocket_new (ctx, zproxy_frontend_type (self));
-    assert (self->frontend);
-    zsocket_bind (self->frontend, zproxy_frontend_addr (self));
+    if (self->frontend)
+        zsocket_bind (self->frontend, zproxy_frontend_addr (self));
+    else
+        return;
 
     self->backend = zsocket_new (ctx, zproxy_backend_type (self));
-    assert (self->backend);
-    zsocket_bind (self->backend, zproxy_backend_addr (self));
+    if (self->backend)
+        zsocket_bind (self->backend, zproxy_backend_addr (self));
+    else
+        return;
 
     self->capture = zsocket_new (ctx, zproxy_capture_type (self));
-    assert (self->capture);
-    zsocket_bind (self->capture, zproxy_capture_addr (self));
+    if (self->capture)
+        zsocket_bind (self->capture, zproxy_capture_addr (self));
+    else
+        return;
 
     free (zstr_recv (pipe));
     zstr_send (pipe, "OK");

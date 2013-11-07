@@ -40,43 +40,44 @@ typedef struct _zproxy_t zproxy_t;
 
 //  @interface
 //  Create a new zproxy object
-CZMQ_EXPORT zproxy_t* 
+CZMQ_EXPORT zproxy_t *
     zproxy_new (zctx_t *ctx, int zproxy_type);
 
 //  Destroy a zproxy object
 CZMQ_EXPORT void
     zproxy_destroy (zproxy_t **self_p);
 
-// Start and zmq_proxy in an attached thread, binding to endpoints.
+//  Start and zmq_proxy in an attached thread, binding to endpoints
+//  Returns 0 if OK, -1 if there was an error
 CZMQ_EXPORT int
     zproxy_bind (zproxy_t *self, const char *frontend_addr,
             const char *backend_addr, const char *capture_addr);
 
-// Get zproxy type
+//  Get zproxy type
 CZMQ_EXPORT int
     zproxy_type (zproxy_t *self);
 
-// Get zproxy frontend address
+//  Get zproxy frontend address
 CZMQ_EXPORT char *
     zproxy_frontend_addr (zproxy_t *self);
 
-// Get zproxy frontend type
+//  Get zproxy frontend type
 CZMQ_EXPORT int
     zproxy_frontend_type (zproxy_t *self);
 
-// Get zproxy backend address
+//  Get zproxy backend address
 CZMQ_EXPORT char *
     zproxy_backend_addr (zproxy_t *self);
 
-// Get zproxy backend type
+//  Get zproxy backend type
 CZMQ_EXPORT int
     zproxy_backend_type (zproxy_t *self);
 
-// Get zproxy capture address
+//  Get zproxy capture address
 CZMQ_EXPORT char *
     zproxy_capture_addr (zproxy_t *self);
 
-// Get zproxy capture type
+//  Get zproxy capture type
 CZMQ_EXPORT int
     zproxy_capture_type (zproxy_t *self);
 
