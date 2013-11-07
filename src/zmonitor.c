@@ -57,23 +57,28 @@ zmonitor_new (zctx_t *ctx, void *socket, int events)
     zmonitor_t *self = (zmonitor_t *) zmalloc (sizeof (zmonitor_t));
     assert (self);
 
-    //  Register a monitor endpoint on the socket
-    char *monitor_endpoint = (char *) zmalloc (100);
-    sprintf (monitor_endpoint, "inproc://zmonitor-%p", socket);
-    int rc = zmq_socket_monitor (socket, monitor_endpoint, events);
-    assert (rc == 0);
-
     //  Start background agent to connect to the inproc monitor socket
+    assert (ctx);
     self->pipe = zthread_fork (ctx, s_agent_task, NULL);
+    if (self->pipe) {
+        //  Register a monitor endpoint on the socket
+        char *monitor_endpoint = (char *) zmalloc (100);
+        sprintf (monitor_endpoint, "inproc://zmonitor-%p", socket);
+        int rc = zmq_socket_monitor (socket, monitor_endpoint, events);
+        assert (rc == 0);
+        //  Configure backend agent with monitor endpoint
+        zstr_send (self->pipe, "%s", monitor_endpoint);
+        free (monitor_endpoint);
 
-    // Configure backend agent with monitor endpoint
-    zstr_send (self->pipe, "%s", monitor_endpoint);
-    free (monitor_endpoint);
-
-    char *status = zstr_recv (self->pipe);
-    if (strneq (status, "OK"))
-        zmonitor_destroy (&self);
-    free (status);
+        char *status = zstr_recv (self->pipe);
+        if (strneq (status, "OK"))
+            zmonitor_destroy (&self);
+        free (status);
+    }
+    else {
+        free (self);
+        self = NULL;
+    }
     return self;
 }
 

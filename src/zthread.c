@@ -191,16 +191,20 @@ zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args)
         shim->attached = thread_fn;
         shim->args = args;
         shim->ctx = zctx_shadow (ctx);
-        if (!shim->ctx)
+        if (!shim->ctx) {
+            zctx__socket_destroy (ctx, pipe);
             return NULL;
+        }
     }
     else
         return NULL;
     
     //  Connect child pipe to our pipe
     shim->pipe = zctx__socket_pipe (shim->ctx);
-    if (!shim->pipe)
+    if (!shim->pipe) {
+        zctx__socket_destroy (ctx, pipe);
         return NULL;
+    }
     zsocket_connect (shim->pipe, "inproc://zctx-pipe-%p", pipe);
     
     s_thread_start (shim);

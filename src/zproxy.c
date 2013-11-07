@@ -25,7 +25,7 @@
 
 /*
 @header
-    The zproxy class simplifies working with the zmq_proxy api.
+    The zproxy class simplifies working with the zmq_proxy API.
 @discuss
     If we used a steerable proxy we could do termination better, and
     allow creation/termination of proxies without destroying contexts.
@@ -69,6 +69,7 @@ zproxy_new (zctx_t *ctx, int zproxy_type)
     
     zproxy_t *self;
     self = (zproxy_t *) zmalloc (sizeof (zproxy_t));
+    assert (self);
     self->ctx = ctx;
     self->type = zproxy_type;
     self->capture_type = ZMQ_PUB;
