@@ -19,6 +19,51 @@ cc ['flags'] 'files' -lzmq -lczmq ['libraries']
 DESCRIPTION
 -----------
 
+Classes
+~~~~~~~
+
+These classes wrap the low-level ZeroMQ API:
+
+* linkczmq:zctx[3] - working with 0MQ contexts
+* linkczmq:zframe[3] - working with single message frames
+* linkczmq:zloop[3] - event-driven reactor
+* linkczmq:zmonitor[3] - socket event monitor
+* linkczmq:zmsg[3] - working with multipart messages
+* linkczmq:zpoller[3] - trivial socket poller class
+* linkczmq:zproxy[3] - convenient zmq_proxy api
+* linkczmq:zsocket[3] - working with 0MQ sockets
+* linkczmq:zsockopt[3] - get/set 0MQ socket options
+* linkczmq:zstr[3] - sending and receiving strings
+
+These classes provide additional support for authentication and encryption:
+
+* linkczmq:zauth[3] - authentication for ZeroMQ security mechanisms
+* linkczmq:zcert[3] - work with CURVE security certificates
+* linkczmq:zcertstore[3] - work with CURVE security certificate stores
+
+These classes provide generic containers:
+
+* linkczmq:zhash[3] - generic type-free hash container
+* linkczmq:zlist[3] - generic type-free list container
+* linkczmq:ztree[3] - generic type-free red-black tree container
+
+These classes abstract non-portable functionality:
+
+* linkczmq:zbeacon[3] - LAN service announcement and discovery
+* linkczmq:zclock[3] - millisecond clocks and delays
+* linkczmq:zdir[3] - work with file-system directories
+* linkczmq:zfile[3] - provides methods to work with files in a portable fashion.
+* linkczmq:zmutex[3] - working with mutexes
+* linkczmq:zsys[3] - system-level methods
+* linkczmq:zthread[3] - working with system threads
+* linkczmq:zuuid[3] - UUID support class
+
+And these utility classes add value:
+
+* linkczmq:zchunk[3] - work with memory chunks
+* linkczmq:zconfig[3] - work with textual config files
+* linkczmq:zrex[3] - work with regular expressions
+
 Scope and Goals
 ~~~~~~~~~~~~~~~
 
@@ -31,7 +76,7 @@ CZMQ has these goals:
 Ownership and License
 ~~~~~~~~~~~~~~~~~~~~~
 
-CZMQ is maintained by Pieter Hintjens. Its other authors and contributors are listed in the AUTHORS file. It is held by the ZeroMQ organization at github.com.
+CZMQ is maintained by the ZeroMQ community at github.com/zeromq. Its other authors and contributors are listed in the AUTHORS file.
 
 The authors of CZMQ grant you free use of this software under the terms of the GNU Lesser General Public License (LGPL). For details see the files `COPYING` and `COPYING.LESSER` in this directory.
 

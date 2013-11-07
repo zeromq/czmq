@@ -59,6 +59,10 @@ DESCRIPTION
 
 The zproxy class simplifies working with the zmq_proxy api.
 
+If we used a steerable proxy we could do termination better, and
+allow creation/termination of proxies without destroying contexts.
+Then, zproxy_destroy would send the proxy task a KILL message and
+wait for an OK response, then return to the caller.
 
 EXAMPLE
 -------
@@ -68,13 +72,13 @@ EXAMPLE
     const char *back_addr = "inproc://proxy_back";
     const char *capture_addr = "inproc://proxy_capture";
 
-    // Create and start the proxy
+    //  Create and start the proxy
     zctx_t *ctx = zctx_new ();
     zproxy_t *proxy = zproxy_new (ctx, ZPROXY_STREAMER);
     int rc = zproxy_bind (proxy, front_addr, back_addr, capture_addr);
     assert (rc);
 
-    // Test the accessor methods
+    //  Test the accessor methods
     assert (zproxy_type (proxy) == ZPROXY_STREAMER);
     assert (zproxy_frontend_type (proxy) == ZMQ_PULL);
     assert (zproxy_backend_type (proxy) == ZMQ_PUSH);
@@ -87,7 +91,7 @@ EXAMPLE
     char *capture_check = zproxy_capture_addr (proxy);
     assert (streq (capture_check, capture_addr));
 
-    // Connect to the proxy front, back, and capture ports
+    //  Connect to the proxy front, back, and capture ports
     void *front_s = zsocket_new (ctx, ZMQ_PUSH);
     assert (front_s);
     zsocket_connect (front_s, zproxy_frontend_addr (proxy));
@@ -101,21 +105,27 @@ EXAMPLE
     assert (back_s);
     zsocket_connect (capture_s, zproxy_capture_addr (proxy));
 
-    // Send a message through the proxy and receive it
+    //  Send a message through the proxy and receive it
     zstr_send (front_s, "STREAMER_TEST");
     
     char *back_resp = zstr_recv (back_s);
     assert (back_resp);
     assert (streq ("STREAMER_TEST", back_resp));
+    free (back_resp);
     
     char *capture_resp = zstr_recv (capture_s);
     assert (capture_resp);
     assert (capture_resp);
     assert (streq ("STREAMER_TEST", capture_resp));
+    free (capture_resp);
    
-    // Destroying the context will stop the proxy
+    //  Destroying the context will stop the proxy, see note at
+    //  start of source about using zmq_proxy_steerable instead.
+    //  The sleep here is to ensure memory is freed so valgrind
+    //  will be happy.
     zctx_destroy (&ctx);
     zproxy_destroy (&proxy);
+    zclock_sleep (100);
     
 ----
 
