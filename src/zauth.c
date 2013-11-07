@@ -70,11 +70,35 @@ zauth_new (zctx_t *ctx)
     //  Start background agent and wait for it to initialize
     assert (ctx);
     self->pipe = zthread_fork (ctx, s_agent_task, NULL);
-    char *status = zstr_recv (self->pipe);
-    if (strneq (status, "OK"))
-        zauth_destroy (&self);
-    zstr_free (&status);
+    if (self->pipe) {
+        char *status = zstr_recv (self->pipe);
+        if (strneq (status, "OK"))
+            zauth_destroy (&self);
+        zstr_free (&status);
+    }
+    else {
+        free (self);
+        self = NULL;
+    }
     return self;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Destructor
+
+void
+zauth_destroy (zauth_t **self_p)
+{
+    assert (self_p);
+    if (*self_p) {
+        zauth_t *self = *self_p;
+        zstr_send (self->pipe, "TERMINATE");
+        char *reply = zstr_recv (self->pipe);
+        zstr_free (&reply);
+        free (self);
+        *self_p = NULL;
+    }
 }
 
 
@@ -158,24 +182,6 @@ zauth_set_verbose (zauth_t *self, bool verbose)
     assert (self);
     zstr_sendm (self->pipe, "VERBOSE");
     zstr_send  (self->pipe, "%d", verbose);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Destructor
-
-void
-zauth_destroy (zauth_t **self_p)
-{
-    assert (self_p);
-    if (*self_p) {
-        zauth_t *self = *self_p;
-        zstr_send (self->pipe, "TERMINATE");
-        char *reply = zstr_recv (self->pipe);
-        zstr_free (&reply);
-        free (self);
-        *self_p = NULL;
-    }
 }
 
 
@@ -315,7 +321,8 @@ s_agent_new (zctx_t *ctx, void *pipe)
 
     //  Create ZAP handler and get ready for requests
     self->handler = zsocket_new (self->ctx, ZMQ_REP);
-    if (zsocket_bind (self->handler, "inproc://zeromq.zap.01") == 0)
+    if (self->handler
+    &&  zsocket_bind (self->handler, "inproc://zeromq.zap.01") == 0)
         zstr_send (self->pipe, "OK");
     else
         zstr_send (self->pipe, "ERROR");

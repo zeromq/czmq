@@ -103,10 +103,19 @@ zbeacon_t *
 zbeacon_new (zctx_t *ctx, int port_nbr)
 {
     zbeacon_t *self = (zbeacon_t *) zmalloc (sizeof (zbeacon_t));
+    assert (self);
+
+    //  Start background agent and wait for it to initialize
     assert (ctx);
     self->pipe = zthread_fork (ctx, s_agent_task, NULL);
-    zstr_send (self->pipe, "%d", port_nbr);
-    self->hostname = zstr_recv (self->pipe);
+    if (self->pipe) {
+        zstr_send (self->pipe, "%d", port_nbr);
+        self->hostname = zstr_recv (self->pipe);
+    }
+    else {
+        free (self);
+        self = NULL;
+    }
     return self;
 }
 
@@ -377,6 +386,8 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
     //  Create agent instance
     agent_t *self = s_agent_new (pipe, atoi (port_str));
     zstr_free (&port_str);
+    if (!self)
+        return;                 //  Give up if we couldn't initialize
 
     while (!zctx_interrupted) {
         //  Poll on API pipe and on UDP socket
@@ -424,8 +435,10 @@ s_agent_new (void *pipe, int port_nbr)
 
     //  Create our UDP socket
     self->udpsock = socket (AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (self->udpsock == INVALID_SOCKET)
-        s_handle_io_error ("socket");
+    if (self->udpsock == INVALID_SOCKET) {
+        free (self);        //  No more file handles - forget it
+        return NULL;
+    }
 
     //  Ask operating system to let us do broadcasts from socket
     int on = 1;
@@ -564,24 +577,25 @@ s_get_interface (agent_t *self)
     freeifaddrs (interfaces);
 
 #else
-    if (strlen (zsys_interface ()) == 0) {
-        self->broadcast.sin_family = AF_INET;
-        self->broadcast.sin_addr.s_addr = INADDR_BROADCAST;
-        self->broadcast.sin_port = htons (self->port_nbr);
+    //  Our default if we fail to find an interface
+    self->broadcast.sin_family = AF_INET;
+    self->broadcast.sin_addr.s_addr = INADDR_BROADCAST;
+    self->broadcast.sin_port = htons (self->port_nbr);
 
-        //  Our source address is unknown in this case so set it to
-        //  INADDR_ANY so self->hostname isn't set to an incorrect IP.
-        self->address = self->broadcast;
-        self->address.sin_addr.s_addr = INADDR_ANY;
-    }
+    //  Our source address is unknown in this case so set it to
+    //  INADDR_ANY so self->hostname isn't set to an incorrect IP.
+    self->address = self->broadcast;
+    self->address.sin_addr.s_addr = INADDR_ANY;
+    if (strlen (zsys_interface ()) == 0)
+        return;         //  Use defaults
     else {
 #   if defined (__UNIX__)
         struct ifreq ifr;
         memset (&ifr, 0, sizeof (ifr));
 
         int sock = 0;
-        if ((sock = socket (AF_INET, SOCK_DGRAM, 0)) < 0)
-            s_handle_io_error ("socket");
+        if ((sock = socket (AF_INET, SOCK_DGRAM, 0)) == -1)
+            return;         //  Use defaults
 
         //  Get interface address
         ifr.ifr_addr.sa_family = AF_INET;
@@ -591,8 +605,7 @@ s_get_interface (agent_t *self)
             s_handle_io_error ("siocgifaddr");
 
         //  Get interface broadcast address
-        memcpy (&self->address, ((inaddr_t *) &ifr.ifr_addr),
-                sizeof (inaddr_t));
+        memcpy (&self->address, ((inaddr_t *) &ifr.ifr_addr), sizeof (inaddr_t));
         rc = ioctl (sock, SIOCGIFBRDADDR, (caddr_t) &ifr, sizeof (struct ifreq));
         if (rc == -1)
             s_handle_io_error ("siocgifbrdaddr");
