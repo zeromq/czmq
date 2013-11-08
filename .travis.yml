@@ -2,14 +2,28 @@
 
 language: c
 
-#   Build required projects first
-before_script:
+script:
+- ./autogen.sh
 
+#   Perform regression test build against ZeroMQ v3.x
+- git clone git://github.com/zeromq/zeromq3-x.git
+- cd libzmq
+- ./autogen.sh
+- ./configure && make check
+- sudo make install
+- sudo ldconfig
+- cd ..
+
+#   Build & test CZMQ
+- ./configure && make check
+
+#   Perform regression test build against ZeroMQ v4.x
 #   libsodium
 - git clone git://github.com/jedisct1/libsodium.git
 - cd libsodium
 - ./autogen.sh
-- ./configure && make check
+- ./configure
+- make check
 - sudo make install
 - sudo ldconfig
 - cd ..
@@ -23,5 +37,5 @@ before_script:
 - sudo ldconfig
 - cd ..
 
-#   Build and check libczmq
-script: ./autogen.sh && ./configure && make && make check
+#   Build & test CZMQ
+- ./configure && make check
