@@ -585,7 +585,7 @@ s_can_connect (void *server, void *client)
     zpoller_t *poller = zpoller_new (client, NULL);
     zstr_send (server, "Hello, World");
     //  Need up to half a second if running under Valgrind
-    bool success = zpoller_wait (poller, 500) == client;
+    bool success = zpoller_wait (poller, 1000) == client;
     if (success) {
         char *response = zstr_recv (client);
         zstr_free (&response);

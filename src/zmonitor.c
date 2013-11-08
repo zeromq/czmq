@@ -318,9 +318,12 @@ s_socket_event (agent_t *self)
     //  Extract id of the event as bitfield
     memcpy (&(event.event), zframe_data (frame), sizeof (event.event));
 
+    //  This code needs backporting to work with ZMQ v3.2
+#if (ZMQ_VERSION_MAJOR == 4)
     //  Extract value which is either error code, fd, or reconnect interval
     memcpy (&(event.value), zframe_data (frame) + sizeof (event.event),
            sizeof (event.value));
+#endif
     zframe_destroy (&frame);
 
     //  Copy address part
@@ -360,9 +363,11 @@ s_socket_event (agent_t *self)
         case ZMQ_EVENT_LISTENING:
             description = "Listening";
             break;
+#if (ZMQ_VERSION_MAJOR == 4)
         case ZMQ_EVENT_MONITOR_STOPPED:
             description = "Monitor stopped";
             break;
+#endif
         default:
             if (self->verbose)
                 printf ("Unknown socket monitor event: %d", event.event);
@@ -372,8 +377,10 @@ s_socket_event (agent_t *self)
         printf ("I: zmonitor: %s - %s\n", description, address);
 
     zmsg_t *msg = zmsg_new();
-    zmsg_addstr (msg, "%d", (int) event.event );
-    zmsg_addstr (msg, "%d", (int) event.value );
+    zmsg_addstr (msg, "%d", (int) event.event);
+#if (ZMQ_VERSION_MAJOR == 4)
+    zmsg_addstr (msg, "%d", (int) event.value);
+#endif
     zmsg_addstr (msg, "%s", address);
     zmsg_addstr (msg, "%s", description);
     zmsg_send  (&msg, self->pipe);

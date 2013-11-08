@@ -126,7 +126,6 @@
             <restrict type = "REP" />
             <restrict type = "DEALER" />
             <restrict type = "ROUTER" />
-            <restrict type = "STREAM" />
         </option>
         <option name = "rate"              type = "int"    mode = "rw" test = "SUB" />
         <option name = "recovery_ivl"      type = "int"    mode = "rw" test = "SUB" />

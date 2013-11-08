@@ -720,8 +720,7 @@ zsocket_set_identity (void *zocket, const char * identity)
     if (zsocket_type (zocket) != ZMQ_REQ
     &&  zsocket_type (zocket) != ZMQ_REP
     &&  zsocket_type (zocket) != ZMQ_DEALER
-    &&  zsocket_type (zocket) != ZMQ_ROUTER
-    &&  zsocket_type (zocket) != ZMQ_STREAM) {
+    &&  zsocket_type (zocket) != ZMQ_ROUTER) {
         printf ("ZMQ_IDENTITY is not valid on %s sockets\n", zsocket_type_str (zocket));
         assert (false);
     }
@@ -1623,8 +1622,7 @@ zsocket_set_identity (void *zocket, const char * identity)
     if (zsocket_type (zocket) != ZMQ_REQ
     &&  zsocket_type (zocket) != ZMQ_REP
     &&  zsocket_type (zocket) != ZMQ_DEALER
-    &&  zsocket_type (zocket) != ZMQ_ROUTER
-    &&  zsocket_type (zocket) != ZMQ_STREAM) {
+    &&  zsocket_type (zocket) != ZMQ_ROUTER) {
         printf ("ZMQ_IDENTITY is not valid on %s sockets\n", zsocket_type_str (zocket));
         assert (false);
     }
