@@ -203,6 +203,18 @@ zcert_meta (zcert_t *self, char *name)
 
 
 //  --------------------------------------------------------------------------
+//  Get list of metadata fields from certificate. Caller is responsible for
+//  destroying list. Caller should not modify the values of list items.
+
+zlist_t *
+zcert_meta_keys (zcert_t *self)
+{
+    assert (self);
+    return zhash_keys (self->metadata);
+}
+
+
+//  --------------------------------------------------------------------------
 //  Load certificate from file (constructor)
 //  The filename is treated as a printf format specifier.
 
@@ -424,6 +436,9 @@ zcert_test (bool verbose)
     zcert_set_meta (cert, "organization", "iMatix Corporation");
     zcert_set_meta (cert, "version", "%d", 1);
     assert (streq (zcert_meta (cert, "email"), "ph@imatix.com"));
+    zlist_t *keys = zcert_meta_keys (cert);
+    assert (zlist_size (keys) == 4);
+    zlist_destroy (&keys);
 
     //  Check the dup and eq methods
     zcert_t *shadow = zcert_dup (cert);
@@ -442,13 +457,13 @@ zcert_test (bool verbose)
     zcert_destroy (&shadow);
 
     //  Delete secret certificate, load public one
-    //int rc = zsys_file_delete (TESTDIR "/mycert.txt_secret");
-    //assert (rc == 0);
-    //shadow = zcert_load (TESTDIR "/mycert.txt");
+    int rc = zsys_file_delete (TESTDIR "/mycert.txt_secret");
+    assert (rc == 0);
+    shadow = zcert_load (TESTDIR "/mycert.txt");
     //  32-byte null key encodes as 40 '0' characters
-    //assert (streq (zcert_secret_txt (shadow),
-        //"0000000000000000000000000000000000000000"));
-    //zcert_destroy (&shadow);
+    assert (streq (zcert_secret_txt (shadow),
+        "0000000000000000000000000000000000000000"));
+    zcert_destroy (&shadow);
     zcert_destroy (&cert);
     
     //  Delete all test files
