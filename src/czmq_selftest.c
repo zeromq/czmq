@@ -60,11 +60,13 @@ int main (int argc, char *argv [])
     zstr_test (verbose);
     zmsg_test (verbose);
     zloop_test (verbose);
-    zmonitor_test (verbose);
     zbeacon_test (verbose);
     zcert_test (verbose);
     zcertstore_test (verbose);
     zauth_test (verbose);
+#if (ZMQ_VERSION_MAJOR == 4)
+    zmonitor_test (verbose);
+#endif
     printf ("Tests passed OK\n");
     return 0;
 }
