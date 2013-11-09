@@ -7,7 +7,7 @@ script:
 
 #   Perform regression test build against ZeroMQ v3.x
 - git clone git://github.com/zeromq/zeromq3-x.git
-- cd libzmq
+- cd zeromq3-x
 - ./autogen.sh
 - ./configure && make check
 - sudo make install
