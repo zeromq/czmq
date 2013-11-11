@@ -24,7 +24,7 @@
 
 /*
 @header
-    The zpoller class provides a minimalist interface to ZeroMQ's zmq_poll 
+    The zpoller class provides a minimalist interface to ZeroMQ's zmq_poll
     API, for the very common case of reading from a number of sockets.
     It does not provide polling for output, nor polling on file handles.
     If you need either of these, use the zmq_poll API directly.
@@ -59,7 +59,7 @@ zpoller_new (void *reader, ...)
     assert (self);
     self->readers = zlist_new ();
     self->dirty = true;
-    
+
     va_list args;
     va_start (args, reader);
     while (reader) {
@@ -89,12 +89,33 @@ zpoller_destroy (zpoller_t **self_p)
 
 
 //  --------------------------------------------------------------------------
+//  Add a reader to be polled.
+
+int
+zpoller_add (zpoller_t *self, void *reader)
+{
+    int rc = 0;
+
+    assert(self);
+    assert(reader);
+
+    rc = zlist_append (self->readers, reader);
+
+    if (rc != -1) {
+        self->dirty = true;
+    }
+
+    return rc;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Poll the registered readers for I/O, return first socket that has input.
 //  This means the order that sockets are defined in the poll list affects
 //  their priority. If you need a balanced poll, use the low level zmq_poll
 //  method directly. If the poll call was interrupted (SIGINT), or the ZMQ
 //  context was destroyed, or the timeout expired, returns NULL. You can
-//  test the actual exit condition by calling zpoller_expired () and 
+//  test the actual exit condition by calling zpoller_expired () and
 //  zpoller_terminated ().
 
 void *
@@ -104,7 +125,7 @@ zpoller_wait (zpoller_t *self, int timeout)
     self->terminated = false;
     if (self->dirty)
         s_rebuild_poll_set (self);
-        
+
     int rc = zmq_poll (self->poll_set, (int) self->poll_size, timeout);
     if (rc > 0) {
         uint reader = 0;
@@ -118,7 +139,7 @@ zpoller_wait (zpoller_t *self, int timeout)
     else
     if (rc == -1 || zctx_interrupted)
         self->terminated = true;
-        
+
     return NULL;
 }
 
@@ -130,7 +151,7 @@ s_rebuild_poll_set (zpoller_t *self)
     self->poll_set = NULL;
 
     self->poll_size = zlist_size (self->readers);
-    self->poll_set = (zmq_pollitem_t *) 
+    self->poll_set = (zmq_pollitem_t *)
         zmalloc (self->poll_size * sizeof (zmq_pollitem_t));
     if (!self->poll_set)
         return -1;
@@ -182,7 +203,7 @@ zpoller_test (bool verbose)
 
     //  @selftest
     zctx_t *ctx = zctx_new ();
-    
+
     //  Create a few sockets
     void *vent = zsocket_new (ctx, ZMQ_PUSH);
     int rc = zsocket_bind (vent, "tcp://*:9000");
@@ -192,13 +213,17 @@ zpoller_test (bool verbose)
     assert (rc != -1);
     void *bowl = zsocket_new (ctx, ZMQ_PULL);
     void *dish = zsocket_new (ctx, ZMQ_PULL);
-    
+
     //  Set-up poller
-    zpoller_t *poller = zpoller_new (bowl, sink, dish, NULL);
+    zpoller_t *poller = zpoller_new (bowl, dish, NULL);
     assert (poller);
 
+    // Add a reader the existing poller
+    rc = zpoller_add (poller, sink);
+    assert (rc != -1);
+
     zstr_send (vent, "Hello, World");
-    
+
     //  We expect a message only on the sink
     void *which = zpoller_wait (poller, -1);
     assert (which == sink);
@@ -207,7 +232,7 @@ zpoller_test (bool verbose)
     char *message = zstr_recv (which);
     assert (streq (message, "Hello, World"));
     zstr_free (&message);
-    
+
     //  Destroy poller and context
     zpoller_destroy (&poller);
     zctx_destroy (&ctx);
