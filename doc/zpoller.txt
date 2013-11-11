@@ -16,6 +16,10 @@ CZMQ_EXPORT zpoller_t *
 CZMQ_EXPORT void
     zpoller_destroy (zpoller_t **self_p);
 
+// Add a reader to be polled.
+CZMQ_EXPORT int
+    zpoller_add (zpoller_t *self, void *reader);
+
 //  Poll the registered readers for I/O, return first socket that has input.
 //  This means the order that sockets are defined in the poll list affects
 //  their priority. If you need a balanced poll, use the low level zmq_poll
@@ -41,7 +45,7 @@ CZMQ_EXPORT int
 DESCRIPTION
 -----------
 
-The zpoller class provides a minimalist interface to ZeroMQ's zmq_poll 
+The zpoller class provides a minimalist interface to ZeroMQ's zmq_poll
 API, for the very common case of reading from a number of sockets.
 It does not provide polling for output, nor polling on file handles.
 If you need either of these, use the zmq_poll API directly.
@@ -52,7 +56,7 @@ EXAMPLE
 .From zpoller_test method
 ----
     zctx_t *ctx = zctx_new ();
-    
+
     //  Create a few sockets
     void *vent = zsocket_new (ctx, ZMQ_PUSH);
     int rc = zsocket_bind (vent, "tcp://*:9000");
@@ -62,13 +66,13 @@ EXAMPLE
     assert (rc != -1);
     void *bowl = zsocket_new (ctx, ZMQ_PULL);
     void *dish = zsocket_new (ctx, ZMQ_PULL);
-    
+
     //  Set-up poller
     zpoller_t *poller = zpoller_new (bowl, sink, dish, NULL);
     assert (poller);
 
     zstr_send (vent, "Hello, World");
-    
+
     //  We expect a message only on the sink
     void *which = zpoller_wait (poller, -1);
     assert (which == sink);
@@ -77,7 +81,7 @@ EXAMPLE
     char *message = zstr_recv (which);
     assert (streq (message, "Hello, World"));
     zstr_free (&message);
-    
+
     //  Destroy poller and context
     zpoller_destroy (&poller);
     zctx_destroy (&ctx);

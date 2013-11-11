@@ -42,6 +42,10 @@ CZMQ_EXPORT zpoller_t *
 CZMQ_EXPORT void
     zpoller_destroy (zpoller_t **self_p);
 
+// Add a reader to be polled.
+CZMQ_EXPORT int
+    zpoller_add (zpoller_t *self, void *reader);
+
 //  Poll the registered readers for I/O, return first socket that has input.
 //  This means the order that sockets are defined in the poll list affects
 //  their priority. If you need a balanced poll, use the low level zmq_poll
