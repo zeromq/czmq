@@ -94,17 +94,11 @@ zpoller_destroy (zpoller_t **self_p)
 int
 zpoller_add (zpoller_t *self, void *reader)
 {
-    int rc = 0;
-
-    assert(self);
-    assert(reader);
-
-    rc = zlist_append (self->readers, reader);
-
-    if (rc != -1) {
+    assert (self);
+    assert (reader);
+    int rc = zlist_append (self->readers, reader);
+    if (rc != -1)
         self->dirty = true;
-    }
-
     return rc;
 }
 
