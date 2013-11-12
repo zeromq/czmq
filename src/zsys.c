@@ -296,7 +296,9 @@ zsys_dir_delete (const char *pathname, ...)
 //  Set private file creation mode; all files created from here will be
 //  readable/writable by the owner only.
 
+#if !defined(__WINDOWS__)
 static mode_t s_old_mask = 0;
+#endif
 
 void
 zsys_file_mode_private (void)

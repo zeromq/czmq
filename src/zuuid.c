@@ -37,7 +37,6 @@
 #include "../include/czmq.h"
 #if defined (__WINDOWS__)
 #   include "platform.h"
-#   include <uuid/uuid.h>
 #endif
 
 //  Structure of our class
