@@ -691,7 +691,7 @@ zauth_test (bool verbose)
     //  connect even if the ZAP handler allows it. It's timing
     //  dependent, so this is a voodoo hack. To be removed, I've
     //  no idea this even applies to all boxes.
-    sleep (1);
+    zclock_sleep (1000);
 
     //  Test CURVE_ALLOW_ANY
     zauth_configure_curve (auth, "*", CURVE_ALLOW_ANY);

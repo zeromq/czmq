@@ -39,6 +39,19 @@
 static bool s_first_time = true;
 static struct sigaction sigint_default;
 static struct sigaction sigterm_default;
+#elif defined (__WINDOWS__)
+static bool s_shim_installed = false;
+static zsys_handler_fn *installed_handler_fn;
+static BOOL WINAPI s_handler_fn_shim (DWORD ctrltype)
+{
+   // return TRUE for events that we handle
+   if (ctrltype == CTRL_C_EVENT && installed_handler_fn != NULL) {
+       installed_handler_fn (ctrltype);
+       return TRUE;
+   }
+   else
+       return FALSE;
+}
 #endif
 
 //  --------------------------------------------------------------------------
@@ -67,6 +80,12 @@ zsys_handler_set (zsys_handler_fn *handler_fn)
             sigaction (SIGTERM, NULL, &sigterm_default);
         }
     }
+#elif defined (__WINDOWS__)
+    installed_handler_fn = handler_fn;
+    if (!s_shim_installed) {
+        s_shim_installed = true;
+        SetConsoleCtrlHandler (s_handler_fn_shim, TRUE);
+    }
 #endif
 }
 
@@ -87,6 +106,12 @@ zsys_handler_reset (void)
         sigterm_default.sa_handler = NULL;
         s_first_time = true;
     }
+#elif defined (__WIN32__)
+    if (s_shim_installed) {
+        SetConsoleCtrlHandler (s_handler_fn_shim, FALSE);
+        s_shim_installed = false;
+    }
+    installed_handler_fn = NULL;
 #endif
 }
 
@@ -296,7 +321,9 @@ zsys_dir_delete (const char *pathname, ...)
 //  Set private file creation mode; all files created from here will be
 //  readable/writable by the owner only.
 
+#if !defined(__WINDOWS__)
 static mode_t s_old_mask = 0;
+#endif
 
 void
 zsys_file_mode_private (void)
