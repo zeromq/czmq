@@ -56,8 +56,8 @@ CZMQ_EXPORT int
 DESCRIPTION
 -----------
 
-The zdir_patch class works with one patch, which really just says "create
-this file" or "delete this file" (referring to a zfile item each time).
+The zdir_patch class works with one patch, which says "create this
+file" or "delete this file" (referring to a zfile item each time).
 
 
 EXAMPLE

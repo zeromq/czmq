@@ -42,6 +42,7 @@
 */
 
 #include "../include/czmq.h"
+#include "platform.h"
 
 //  Structure of our class
 
@@ -514,8 +515,10 @@ zfile_test (bool verbose)
     assert (!zfile_is_stable (file));
     zfile_restat (file);
     assert (zfile_is_stable (file));
+#if defined (HAVE_LIBCRYPTO)
     assert (streq (zfile_digest (file), "F6CA2B0E6609C2B556F651F46A5A14C86153D0BF"));
-
+#endif
+    
     //  Check we can read from file
     rc = zfile_input (file);
     assert (rc == 0);

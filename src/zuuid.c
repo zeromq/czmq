@@ -36,7 +36,12 @@
 
 #include "../include/czmq.h"
 #include "platform.h"
-#if defined (__UNIX__)
+
+#if defined (__UTYPE_FREEBSD) || defined (__UTYPE_NETBSD)
+#   include <uuid.h>
+#elif defined __UTYPE_HPUX
+#   include <dce/uuid.h>
+#elif defined (__UNIX__)
 #   include <uuid/uuid.h>
 #endif
 

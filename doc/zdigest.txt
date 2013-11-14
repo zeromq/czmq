@@ -60,16 +60,15 @@ EXAMPLE
     memset (buffer, 0xAA, 1024);
     
     zdigest_t *digest = zdigest_new ();
-#if HAVE_LIBCRYPTO
+#if defined (HAVE_LIBCRYPTO)
     zdigest_update (digest, buffer, 1024);
     byte *data = zdigest_data (digest);
-    size_t size = zdigest_size (digest);
     assert (data [0] == 0xDE);
     assert (data [1] == 0xB2);
     assert (data [2] == 0x38);
     assert (data [3] == 0x07);
-    puts (zdigest_string (digest));
-    puts (zdigest_string (digest));
+    assert (streq (zdigest_string (digest),
+        "DEB23807D4FE025E900FE9A9C7D8410C3DDE9671"));
 #else
     assert (zdigest_size (digest) == 0);
     assert (zdigest_data (digest) == NULL);

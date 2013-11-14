@@ -102,9 +102,8 @@ zdigest_update (zdigest_t *self, byte *buffer, size_t length)
 {
     //  Calling this after zdigest_data() is illegal use of the API
     assert (self);
-    assert (!self->final);
-    
 #if defined (HAVE_LIBCRYPTO)
+    assert (!self->final);
     //  Buffer has to be on 64-bit boundary
     assert (((long) buffer & 7L) == 0);
     SHA1_Update (&self->context, buffer, length);
