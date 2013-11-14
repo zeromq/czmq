@@ -41,7 +41,7 @@ struct _zdir_patch_t {
     char *path;                 //  Directory path
     char *vpath;                //  Virtual file path
     zfile_t *file;              //  File we refer to
-    zdir_patch_op_t op;          //  Operation
+    zdir_patch_op_t op;         //  Operation
     char *digest;               //  File SHA-1 digest
 };
 
@@ -159,7 +159,7 @@ zdir_patch_digest_set (zdir_patch_t *self)
 {
     if (self->op == patch_create
     &&  self->digest == NULL)
-        self->digest = zfile_digest (self->file);
+        self->digest = strdup (zfile_digest (self->file));
 }
 
 
