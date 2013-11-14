@@ -30,11 +30,15 @@
     for sockets connecting or bound to ipc:// and tcp:// endpoints.
 @discuss
     This class wraps the ZMQ socket monitor API, see zmq_socket_monitor for
-    details.
+    details. Currently this class requires libzmq v4.0 or later and is empty
+    on older versions of libzmq.
 @end
 */
 
 #include "../include/czmq.h"
+
+//  This code needs backporting to work with ZMQ v3.2
+#if (ZMQ_VERSION_MAJOR == 4)
 
 //  Structure of our class
 struct _zmonitor_t {
@@ -372,8 +376,8 @@ s_socket_event (agent_t *self)
         printf ("I: zmonitor: %s - %s\n", description, address);
 
     zmsg_t *msg = zmsg_new();
-    zmsg_addstr (msg, "%d", (int) event.event );
-    zmsg_addstr (msg, "%d", (int) event.value );
+    zmsg_addstr (msg, "%d", (int) event.event);
+    zmsg_addstr (msg, "%d", (int) event.value);
     zmsg_addstr (msg, "%s", address);
     zmsg_addstr (msg, "%s", description);
     zmsg_send  (&msg, self->pipe);
@@ -394,3 +398,5 @@ s_agent_destroy (agent_t **self_p)
         *self_p = NULL;
     }
 }
+
+#endif          //  ZeroMQ 4.0 or later

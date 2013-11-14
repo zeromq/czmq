@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zmonitor - socket event monitor
+    zdir_patch - work with directory patches
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
@@ -23,47 +23,69 @@
     =========================================================================
 */
 
-#ifndef __ZMONITOR_H_INCLUDED__
-#define __ZMONITOR_H_INCLUDED__
+#ifndef __ZDIR_PATCH_H_INCLUDED__
+#define __ZDIR_PATCH_H_INCLUDED__
 
-//  This code needs backporting to work with ZMQ v3.2
-#if (ZMQ_VERSION_MAJOR == 4)
+typedef enum {
+    patch_create = 1,
+    patch_delete = 2
+} zdir_patch_op_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 //  Opaque class structure
-typedef struct _zmonitor_t zmonitor_t;
+typedef struct _zdir_patch_t zdir_patch_t;
 
 //  @interface
-//  Create a new socket monitor
-CZMQ_EXPORT zmonitor_t *
-    zmonitor_new (zctx_t *ctx, void *socket, int events);
+//  Create new patch
+CZMQ_EXPORT zdir_patch_t *
+    zdir_patch_new (char *path, zfile_t *file, zdir_patch_op_t op, char *alias);
 
-//  Destroy a socket monitor
+//  Destroy a patch
 CZMQ_EXPORT void
-    zmonitor_destroy (zmonitor_t **self_p);
+    zdir_patch_destroy (zdir_patch_t **self_p);
 
-//  Get the ZeroMQ socket, for polling or receiving socket
-//  event messages from the backend agent on.
-CZMQ_EXPORT void *
-    zmonitor_socket (zmonitor_t *self);
+//  Create copy of a patch
+CZMQ_EXPORT zdir_patch_t *
+    zdir_patch_dup (zdir_patch_t *self);
 
-//  Enable verbose tracing of commands and activity
+//  Return patch file directory path
+CZMQ_EXPORT char *
+    zdir_patch_path (zdir_patch_t *self);
+
+//  Return patch file item
+CZMQ_EXPORT zfile_t *
+    zdir_patch_file (zdir_patch_t *self);
+
+//  Return operation
+CZMQ_EXPORT zdir_patch_op_t
+    zdir_patch_op (zdir_patch_t *self);
+    
+//  Return patch virtual file path
+CZMQ_EXPORT char *
+    zdir_patch_vpath (zdir_patch_t *self);
+
+//  Set patch virtual file path
 CZMQ_EXPORT void
-    zmonitor_set_verbose (zmonitor_t *self, bool verbose);
+    zdir_patch_vpath_set (zdir_patch_t *self, char *vpath);
 
-// Self test of this class
+//  Calculate hash digest for file (create only)
 CZMQ_EXPORT void
-    zmonitor_test (bool verbose);
+    zdir_patch_digest_set (zdir_patch_t *self);
 
-// @end
+//  Return hash digest for patch file 
+CZMQ_EXPORT char *
+    zdir_patch_digest (zdir_patch_t *self);
+    
+//  Self test of this class
+CZMQ_EXPORT int
+    zdir_patch_test (bool verbose);
+//  @end
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif          //  ZeroMQ 4.0 or later
 
 #endif

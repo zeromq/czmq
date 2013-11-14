@@ -609,6 +609,85 @@ zhash_autofree (zhash_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  Serialize hash table to a binary frame that can be sent in a message.
+//  The packed format is compatible with the 'dictionary' type defined in
+//  rfc.zeromq.org/spec:19/FILEMQ. Comments are not included in the packed
+//  data. Item values MUST be strings.
+
+zframe_t *
+zhash_pack (zhash_t *self)
+{
+    assert (self);
+
+    //  First, calculate packed data size
+    size_t frame_size = 1;      //  Dictionary size, items
+    uint index;
+    for (index = 0; index != self->limit; index++) {
+        item_t *item = self->items [index];
+        while (item) {
+            //  [Length]key=value
+            frame_size += 2 + strlen (item->key) + strlen (item->value);
+            item = item->next;
+        }
+    }
+    //  Now serialize items into the frame
+    zframe_t *frame = zframe_new (NULL, frame_size);
+    byte *needle = zframe_data (frame);
+    *needle++ = (byte) self->size;
+    for (index = 0; index != self->limit; index++) {
+        item_t *item = self->items [index];
+        while (item) {
+            char string [256];
+            snprintf (string, 256, "%s=%s", item->key, (char *) item->value);
+            *needle++ = (byte) strlen (string);
+            memcpy (needle, string, strlen (string));
+            needle += strlen (string);
+            item = item->next;
+        }
+    }
+    return frame;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Unpack binary frame into a new hash table. Packed data must follow format
+//  defined by zhash_pack. Hash table is set to autofree. An empty frame
+//  unpacks to an empty hash table.
+
+zhash_t *
+zhash_unpack (zframe_t *frame)
+{
+    zhash_t *self = zhash_new ();
+    assert (self);
+    zhash_autofree (self);
+
+    assert (frame);
+    if (zframe_size (frame) < 1)
+        return self;            //  Arguable...
+
+    byte *needle = zframe_data (frame);
+    byte *ceiling = needle + zframe_size (frame);
+    size_t nbr_items = *needle++;
+    while (nbr_items && needle < ceiling) {
+        size_t string_size = *needle++;
+        if (needle + string_size <= ceiling) {
+            char string [256];
+            memcpy (string, needle, string_size);
+            string [string_size] = 0;
+            needle += string_size;
+            char *value = strchr (string, '=');
+            if (value) {
+                *value++ = 0;
+                //  Takes copy of value automatically
+                zhash_insert (self, string, value);
+            }
+        }
+    }
+    return self;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Runs selftest of class
 //
 
@@ -701,6 +780,16 @@ zhash_test (int verbose)
 
     //  Test dup method
     zhash_t *copy = zhash_dup (hash);
+    assert (zhash_size (copy) == 4);
+    item = (char *) zhash_lookup (copy, "LIVEBEEF");
+    assert (item);
+    assert (streq (item, "dead beef"));
+    zhash_destroy (&copy);
+
+    //  Test pack/unpack methods
+    zframe_t *frame = zhash_pack (hash);
+    copy = zhash_unpack (frame);
+    zframe_destroy (&frame);
     assert (zhash_size (copy) == 4);
     item = (char *) zhash_lookup (copy, "LIVEBEEF");
     assert (item);

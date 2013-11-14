@@ -94,17 +94,11 @@ zpoller_destroy (zpoller_t **self_p)
 int
 zpoller_add (zpoller_t *self, void *reader)
 {
-    int rc = 0;
-
-    assert(self);
-    assert(reader);
-
-    rc = zlist_append (self->readers, reader);
-
-    if (rc != -1) {
+    assert (self);
+    assert (reader);
+    int rc = zlist_append (self->readers, reader);
+    if (rc != -1)
         self->dirty = true;
-    }
-
     return rc;
 }
 
@@ -115,8 +109,8 @@ zpoller_add (zpoller_t *self, void *reader)
 //  their priority. If you need a balanced poll, use the low level zmq_poll
 //  method directly. If the poll call was interrupted (SIGINT), or the ZMQ
 //  context was destroyed, or the timeout expired, returns NULL. You can
-//  test the actual exit condition by calling zpoller_expired () and
-//  zpoller_terminated ().
+//  test the actual exit condition by calling zpoller_expired () and 
+//  zpoller_terminated (). Timeout is in msec.
 
 void *
 zpoller_wait (zpoller_t *self, int timeout)
@@ -125,8 +119,9 @@ zpoller_wait (zpoller_t *self, int timeout)
     self->terminated = false;
     if (self->dirty)
         s_rebuild_poll_set (self);
-
-    int rc = zmq_poll (self->poll_set, (int) self->poll_size, timeout);
+        
+    int rc = zmq_poll (self->poll_set, (int) self->poll_size,
+                       timeout * ZMQ_POLL_MSEC);
     if (rc > 0) {
         uint reader = 0;
         for (reader = 0; reader < self->poll_size; reader++)

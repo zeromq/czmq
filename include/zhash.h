@@ -128,6 +128,9 @@ CZMQ_EXPORT int
 CZMQ_EXPORT void
     zhash_autofree (zhash_t *self);
     
+CZMQ_EXPORT zframe_t *
+    zhash_pack (zhash_t *self);
+
 //  Self test of this class
 CZMQ_EXPORT void
     zhash_test (int verbose);

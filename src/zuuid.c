@@ -35,8 +35,16 @@
 */
 
 #include "../include/czmq.h"
-#if defined (__WINDOWS__)
-#   include "platform.h"
+#include "platform.h"
+
+#if defined (HAVE_LIBUUID)
+#if defined (__UTYPE_FREEBSD) || defined (__UTYPE_NETBSD)
+#   include <uuid.h>
+#elif defined __UTYPE_HPUX
+#   include <dce/uuid.h>
+#elif defined (__UNIX__)
+#   include <uuid/uuid.h>
+#endif
 #endif
 
 //  Structure of our class

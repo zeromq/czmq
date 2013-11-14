@@ -17,6 +17,8 @@ set (SOURCES_files_Source_Files
     src/zconfig.c
     src/zctx.c
     src/zdir.c
+    src/zdir_patch.c
+    src/zdigest.c
     src/zfile.c
     src/zframe.c
     src/zhash.c
@@ -54,6 +56,8 @@ set (SOURCES_files_Header_Files
     include/zconfig.h
     include/zctx.h
     include/zdir.h
+    include/zdir_patch.h
+    include/zdigest.h
     include/zfile.h
     include/zframe.h
     include/zhash.h

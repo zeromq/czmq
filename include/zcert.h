@@ -72,6 +72,11 @@ CZMQ_EXPORT void
 CZMQ_EXPORT char *
     zcert_meta (zcert_t *self, char *name);
 
+//  Get list of metadata fields from certificate. Caller is responsible for
+//  destroying list. Caller should not modify the values of list items.
+CZMQ_EXPORT zlist_t *
+    zcert_meta_keys (zcert_t *self);
+
 //  Load certificate from file (constructor)
 //  The filename is treated as a printf format specifier.
 CZMQ_EXPORT zcert_t *

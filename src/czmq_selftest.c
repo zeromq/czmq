@@ -46,6 +46,9 @@ int main (int argc, char *argv [])
     zmutex_test (verbose);
     zclock_test (verbose);
     zchunk_test (verbose);
+    zdir_patch_test (verbose);
+    zdir_test (verbose);
+    zdigest_test (verbose);
     zfile_test (verbose);
     zhash_test (verbose);
     ztree_test (verbose);
@@ -60,11 +63,13 @@ int main (int argc, char *argv [])
     zstr_test (verbose);
     zmsg_test (verbose);
     zloop_test (verbose);
-    zmonitor_test (verbose);
     zbeacon_test (verbose);
     zcert_test (verbose);
     zcertstore_test (verbose);
     zauth_test (verbose);
+#if (ZMQ_VERSION_MAJOR == 4)
+    zmonitor_test (verbose);
+#endif
     printf ("Tests passed OK\n");
     return 0;
 }

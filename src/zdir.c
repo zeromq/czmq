@@ -398,7 +398,134 @@ zdir_remove (zdir_t *self, bool force)
 
 
 //  --------------------------------------------------------------------------
+//  Calculate differences between two versions of a directory tree.
+//  Returns a list of zdir_patch_t patches. Either older or newer may
+//  be null, indicating the directory is empty/absent. If alias is set,
+//  generates virtual filename (minus path, plus alias).
+
+zlist_t *
+zdir_diff (zdir_t *older, zdir_t *newer, char *alias)
+{
+    zlist_t *patches = zlist_new ();
+    zfile_t **old_files = zdir_flatten (older);
+    zfile_t **new_files = zdir_flatten (newer);
+
+    int old_index = 0;
+    int new_index = 0;
+
+    //  Note that both lists are sorted, so detecting differences
+    //  is rather trivial
+    while (old_files [old_index] || new_files [new_index]) {
+        zfile_t *old_file = old_files [old_index];
+        zfile_t *new_file = new_files [new_index];
+
+        int cmp;
+        if (!old_file)
+            cmp = 1;        //  Old file was deleted at end of list
+        else
+        if (!new_file)
+            cmp = -1;       //  New file was added at end of list
+        else
+            cmp = strcmp (zfile_filename (old_file, NULL), zfile_filename (new_file, NULL));
+
+        if (cmp > 0) {
+            //  New file was created
+            if (zfile_is_stable (new_file))
+                zlist_append (patches, zdir_patch_new (newer->path, new_file, patch_create, alias));
+            old_index--;
+        }
+        else
+        if (cmp < 0) {
+            //  Old file was deleted
+            if (zfile_is_stable (old_file))
+                zlist_append (patches, zdir_patch_new (older->path, old_file, patch_delete, alias));
+            new_index--;
+        }
+        else
+        if (cmp == 0 && zfile_is_stable (new_file)) {
+            if (zfile_is_stable (old_file)) {
+                //  Old file was modified or replaced
+                //  Since we don't check file contents, treat as created
+                //  Could better do SHA check on file here
+                if (zfile_modified (new_file) != zfile_modified (old_file)
+                ||  zfile_cursize (new_file) != zfile_cursize (old_file))
+                    zlist_append (patches, zdir_patch_new (newer->path, new_file, patch_create, alias));
+            }
+            else
+                //  File was created over some period of time
+                zlist_append (patches, zdir_patch_new (newer->path, new_file, patch_create, alias));
+        }
+        old_index++;
+        new_index++;
+    }
+    free (old_files);
+    free (new_files);
+
+    return patches;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return full contents of directory as a patch list. If alias is set,
+//  generates virtual filename (minus path, plus alias).
+
+zlist_t *
+zdir_resync (zdir_t *self, char *alias)
+{
+    zlist_t *patches = zlist_new ();
+    zfile_t **files = zdir_flatten (self);
+    uint index;
+    for (index = 0;; index++) {
+        zfile_t *file = files [index];
+        if (!file)
+            break;
+        zlist_append (patches, zdir_patch_new (self->path, file, patch_create, alias));
+    }
+    free (files);
+    return patches;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Load directory cache; returns a hash table containing the SHA-1 digests
+//  of every file in the tree. The cache is saved between runs in .cache.
+//  The caller must destroy the hash table when done with it.
+
+zhash_t *
+zdir_cache (zdir_t *self)
+{
+    assert (self);
+
+    //  Load any previous cache from disk
+    zhash_t *cache = zhash_new ();
+    zhash_autofree (cache);
+    char *cache_file = (char *) zmalloc (strlen (self->path) + strlen ("/.cache") + 1);
+    sprintf (cache_file, "%s/.cache", self->path);
+    zhash_load (cache, cache_file);
+
+    //  Recalculate digest for any new files
+    zfile_t **files = zdir_flatten (self);
+    uint index;
+    for (index = 0;; index++) {
+        zfile_t *file = files [index];
+        if (!file)
+            break;
+        char *filename = zfile_filename (file, self->path);
+        if (zhash_lookup (cache, zfile_filename (file, self->path)) == NULL)
+            zhash_insert (cache, filename, zfile_digest (file));
+    }
+    free (files);
+
+    //  Save cache to disk for future reference
+    zhash_save (cache, cache_file);
+    free (cache_file);
+    return cache;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Self test of this class
+
 int
 zdir_test (bool verbose)
 {
@@ -411,7 +538,16 @@ zdir_test (bool verbose)
         printf ("\n");
         zdir_dump (older, 0);
     }
+    zdir_t *newer = zdir_new ("..", NULL);
+    zlist_t *patches = zdir_diff (older, newer, "/");
+    assert (patches);
+    while (zlist_size (patches)) {
+        zdir_patch_t *patch = (zdir_patch_t *) zlist_pop (patches);
+        zdir_patch_destroy (&patch);
+    }
+    zlist_destroy (&patches);
     zdir_destroy (&older);
+    zdir_destroy (&newer);
 
     zdir_t *nosuch = zdir_new ("does-not-exist", NULL);
     assert (nosuch == NULL);

@@ -13,6 +13,8 @@ MAN3 = \
     zconfig.3 \
     zctx.3 \
     zdir.3 \
+    zdir_patch.3 \
+    zdigest.3 \
     zfile.3 \
     zframe.3 \
     zhash.3 \

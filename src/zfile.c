@@ -42,6 +42,7 @@
 */
 
 #include "../include/czmq.h"
+#include "platform.h"
 
 //  Structure of our class
 
@@ -53,6 +54,7 @@ struct _zfile_t {
     bool stable;            //  true if file is stable
     bool eof;               //  true if at end of file
     FILE *handle;           //  Read/write handle
+    zdigest_t *digest;      //  File digest, if known
 
     //  Properties from files that exist on file system
     time_t modified;        //  Modification time
@@ -107,6 +109,7 @@ zfile_destroy (zfile_t **self_p)
     assert (self_p);
     if (*self_p) {
         zfile_t *self = *self_p;
+        zdigest_destroy (&self->digest);
         if (self->handle)
             fclose (self->handle);
         free (self->fullname);
@@ -413,13 +416,45 @@ zfile_handle (zfile_t *self)
     return self->handle;
 }
 
+
+//  --------------------------------------------------------------------------
+//  Calculate SHA1 digest for file, using zdigest class. Caller should not
+//  modify digest.
+
+char *
+zfile_digest (zfile_t *self)
+{
+    if (!self->digest) {
+        if (zfile_input (self) == -1)
+            return NULL;            //  Problem reading file
+
+        //  Now calculate hash for file data, chunk by chunk
+        size_t blocksz = 65535;
+        off_t offset = 0;
+
+        self->digest = zdigest_new ();
+        zchunk_t *chunk = zfile_read (self, blocksz, offset);
+        while (zchunk_size (chunk)) {
+            zdigest_update (self->digest,
+                zchunk_data (chunk), zchunk_size (chunk));
+            zchunk_destroy (&chunk);
+            offset += blocksz;
+            chunk = zfile_read (self, blocksz, offset);
+        }
+        zchunk_destroy (&chunk);
+        zfile_close (self);
+    }
+    return zdigest_string (self->digest);
+}
+
+
 //  Deprecated API, moved to zsys class. The zfile class works with
 //  an object instance, which is more consistent with the CLASS style
 //  and lets us do more interesting things. These functions were
 //  essentially about portability, so now sit in zsys.
 
 bool zfile_exists (const char *filename) {
- return zsys_file_exists (filename);
+    return zsys_file_exists (filename);
 }
 ssize_t zfile_size (const char *filename) {
     return zsys_file_size (filename);
@@ -480,7 +515,10 @@ zfile_test (bool verbose)
     assert (!zfile_is_stable (file));
     zfile_restat (file);
     assert (zfile_is_stable (file));
-
+#if defined (HAVE_LIBCRYPTO)
+    assert (streq (zfile_digest (file), "F6CA2B0E6609C2B556F651F46A5A14C86153D0BF"));
+#endif
+    
     //  Check we can read from file
     rc = zfile_input (file);
     assert (rc == 0);
@@ -525,4 +563,3 @@ zfile_test (bool verbose)
     printf ("OK\n");
     return 0;
 }
-
