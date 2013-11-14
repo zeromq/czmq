@@ -284,7 +284,6 @@ zdir_flatten (zdir_t *self)
     return files;
 }
 
-
 //  Flatten one directory, calls itself recursively
 
 static int
@@ -308,6 +307,7 @@ s_dir_flatten (zdir_t *self, zfile_t **files, int index)
 }
 
 //  Compare two subdirs, true if they need swapping
+
 static bool
 s_dir_compare (void *item1, void *item2)
 {
@@ -318,8 +318,7 @@ s_dir_compare (void *item1, void *item2)
         return false;
 }
 
-//  Compare two files, true if they need swapping
-//  We sort by ascending name
+//  Compare two files, true if they need swapping. We sort by ascending name.
 
 static bool
 s_file_compare (void *item1, void *item2)
