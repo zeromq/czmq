@@ -1693,6 +1693,70 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
+            <File RelativePath="....src$(name).c" >
+                <FileConfiguration Name="Release|Win32" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
+                </FileConfiguration>
+                <FileConfiguration Name="Release|x64" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
+                </FileConfiguration>
+                <FileConfiguration Name="Debug|Win32" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
+                </FileConfiguration>
+                <FileConfiguration Name="Debug|x64" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
+                </FileConfiguration>
+                <FileConfiguration Name="DebugDLL|Win32" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
+                </FileConfiguration>
+                <FileConfiguration Name="DebugDLL|x64" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
+                </FileConfiguration>
+                <FileConfiguration Name="ReleaseDLL|Win32" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
+                </FileConfiguration>
+                <FileConfiguration Name="ReleaseDLL|x64" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
+                </FileConfiguration>
+                <FileConfiguration Name="RelWithDebInfo|Win32" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
+                </FileConfiguration>
+                <FileConfiguration Name="RelWithDebInfo|x64" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
+                </FileConfiguration>
+            </File>
+            <File RelativePath="....src$(name).c" >
+                <FileConfiguration Name="Release|Win32" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
+                </FileConfiguration>
+                <FileConfiguration Name="Release|x64" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
+                </FileConfiguration>
+                <FileConfiguration Name="Debug|Win32" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
+                </FileConfiguration>
+                <FileConfiguration Name="Debug|x64" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
+                </FileConfiguration>
+                <FileConfiguration Name="DebugDLL|Win32" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
+                </FileConfiguration>
+                <FileConfiguration Name="DebugDLL|x64" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
+                </FileConfiguration>
+                <FileConfiguration Name="ReleaseDLL|Win32" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
+                </FileConfiguration>
+                <FileConfiguration Name="ReleaseDLL|x64" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
+                </FileConfiguration>
+                <FileConfiguration Name="RelWithDebInfo|Win32" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
+                </FileConfiguration>
+                <FileConfiguration Name="RelWithDebInfo|x64" >
+                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
+                </FileConfiguration>
+            </File>
         </Filter>
         <Filter
             Name="Header Files"
@@ -1700,6 +1764,8 @@
             <File RelativePath="....buildsmsvcplatform.h" />
             <File RelativePath="....include$(project.name).h" />
             <File RelativePath="....include$(project.name)_prelude.h" />
+            <File RelativePath="....include$(name).h" />
+            <File RelativePath="....include$(name).h" />
             <File RelativePath="....include$(name).h" />
             <File RelativePath="....include$(name).h" />
             <File RelativePath="....include$(name).h" />

@@ -46,6 +46,9 @@ int main (int argc, char *argv [])
     zmutex_test (verbose);
     zclock_test (verbose);
     zchunk_test (verbose);
+    zdir_patch_test (verbose);
+    zdir_test (verbose);
+    zdigest_test (verbose);
     zfile_test (verbose);
     zhash_test (verbose);
     ztree_test (verbose);

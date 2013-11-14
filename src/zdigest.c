@@ -1,5 +1,5 @@
 /*  =========================================================================
-    fmq_hash - provides hashing functions (SHA-1 at present)
+    zdigest - provides hashing functions (SHA-1 at present)
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2012 iMatix Corporation -- http://www.imatix.com
@@ -24,52 +24,70 @@
 
 /*
 @header
-    The fmq_hash class allows to hash blobs.
+    The zdigest class generates a hash from zchunks of data. The current
+    algorithm is SHA-1, chosen for speed. We are aiming to generate a
+    unique digest for a file, and there are no security issues in this
+    use case.
 @discuss
+    The current code depends on OpenSSL, which might be replaced by hard
+    coded SHA-1 implementation to reduce build dependencies.
 @end
 */
 
-#include <czmq.h>
-#if defined(__APPLE__)
-#  define COMMON_DIGEST_FOR_OPENSSL
-#  include <CommonCrypto/CommonDigest.h>
-#  define SHA1 CC_SHA1
-#else
-#  include <openssl/sha.h>
+#include "../include/czmq.h"
+#include "platform.h"
+
+#if defined (HAVE_LIBCRYPTO)
+#   if defined(__APPLE__)
+#       define COMMON_DIGEST_FOR_OPENSSL
+#       include <CommonCrypto/CommonDigest.h>
+#       define SHA1 CC_SHA1
+#   else
+#       include <openssl/sha.h>
+#   endif
 #endif
-#include "../include/fmq.h"
 
 
 //  Structure of our class
 
-struct _fmq_hash_t {
-    SHA_CTX context;
+struct _zdigest_t {
+#if defined (HAVE_LIBCRYPTO)
+    SHA_CTX context;            //  Digest context
+    //  Binary hash
     byte hash [SHA_DIGEST_LENGTH];
-    bool final;
+    //  ASCII representation (hex)
+    char string [SHA_DIGEST_LENGTH * 2 + 1];
+#endif
+    bool final;                 //  Finished calculating
 };
 
 
 //  --------------------------------------------------------------------------
-//  Constructor
-//  Create new SHA object
+//  Constructor - creates new digest object, which you use to build up a
+//  digest by repeatedly calling zdigest_update() on chunks of data.
 
-fmq_hash_t *
-fmq_hash_new (void)
+zdigest_t *
+zdigest_new (void)
 {
-    fmq_hash_t *self = (fmq_hash_t *) zmalloc (sizeof (fmq_hash_t));
+    zdigest_t *self = (zdigest_t *) zmalloc (sizeof (zdigest_t));
+#if defined (HAVE_LIBCRYPTO)
     SHA1_Init (&self->context);
+#else
+    self->final = true;
+#endif
     return self;
 }
 
+
 //  --------------------------------------------------------------------------
-//  Destroy a SHA object
+//  Destroy a digest object
 
 void
-fmq_hash_destroy (fmq_hash_t **self_p)
+zdigest_destroy (zdigest_t **self_p)
 {
     assert (self_p);
     if (*self_p) {
-        fmq_hash_t *self = *self_p;
+        zdigest_t *self = *self_p;
         free (self);
         *self_p = NULL;
     }
@@ -77,38 +95,80 @@ fmq_hash_destroy (fmq_hash_t **self_p)
 
 
 //  --------------------------------------------------------------------------
-//  Add buffer into SHA calculation
+//  Add buffer into digest calculation
 
 void
-fmq_hash_update (fmq_hash_t *self, byte *buffer, size_t length)
+zdigest_update (zdigest_t *self, byte *buffer, size_t length)
 {
+    //  Calling this after zdigest_data() is illegal use of the API
+    assert (self);
+    assert (!self->final);
+    
+#if defined (HAVE_LIBCRYPTO)
     //  Buffer has to be on 64-bit boundary
     assert (((long) buffer & 7L) == 0);
     SHA1_Update (&self->context, buffer, length);
+#endif
 }
 
 
 //  --------------------------------------------------------------------------
-//  Return final SHA hash data
+//  Return final digest hash data. If built without crypto support, returns
+//  NULL.
 
 byte *
-fmq_hash_data (fmq_hash_t *self)
+zdigest_data (zdigest_t *self)
 {
+    assert (self);
+#if defined (HAVE_LIBCRYPTO)
     if (!self->final) {
         SHA1_Final (self->hash, &self->context);
         self->final = true;
     }
     return self->hash;
+#else
+    return NULL;
+#endif
 }
 
 
 //  --------------------------------------------------------------------------
-//  Return final SHA hash size
+//  Return final digest hash size
 
 size_t
-fmq_hash_size (fmq_hash_t *self)
+zdigest_size (zdigest_t *self)
 {
+    assert (self);
+#if defined (HAVE_LIBCRYPTO)
     return SHA_DIGEST_LENGTH;
+#else
+    return 0;
+#endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return digest as printable hex string; caller should not modify nor
+//  free this string. After calling this, you may not use zdigest_update()
+//  on the same digest. If built without crypto support, returns NULL.
+
+char *
+zdigest_string (zdigest_t *self)
+{
+    assert (self);
+#if defined (HAVE_LIBCRYPTO)
+    byte *data = zdigest_data (self);
+    char hex_char [] = "0123456789ABCDEF";
+    int byte_nbr;
+    for (byte_nbr = 0; byte_nbr < SHA_DIGEST_LENGTH; byte_nbr++) {
+        self->string [byte_nbr * 2 + 0] = hex_char [data [byte_nbr] >> 4];
+        self->string [byte_nbr * 2 + 1] = hex_char [data [byte_nbr] & 15];
+    }
+    self->string [SHA_DIGEST_LENGTH * 2] = 0;
+    return self->string;
+#else
+    return NULL;
+#endif
 }
 
 
@@ -116,23 +176,30 @@ fmq_hash_size (fmq_hash_t *self)
 //  Self test of this class
 
 int
-fmq_hash_test (bool verbose)
+zdigest_test (bool verbose)
 {
-    printf (" * fmq_hash: ");
+    printf (" * zdigest: ");
 
     //  @selftest
     byte *buffer = (byte *) zmalloc (1024);
     memset (buffer, 0xAA, 1024);
     
-    fmq_hash_t *hash = fmq_hash_new ();
-    fmq_hash_update (hash, buffer, 1024);
-    byte *data = fmq_hash_data (hash);
-    size_t size = fmq_hash_size (hash);
+    zdigest_t *digest = zdigest_new ();
+#if defined (HAVE_LIBCRYPTO)
+    zdigest_update (digest, buffer, 1024);
+    byte *data = zdigest_data (digest);
     assert (data [0] == 0xDE);
     assert (data [1] == 0xB2);
     assert (data [2] == 0x38);
     assert (data [3] == 0x07);
-    fmq_hash_destroy (&hash);
+    assert (streq (zdigest_string (digest),
+        "DEB23807D4FE025E900FE9A9C7D8410C3DDE9671"));
+#else
+    assert (zdigest_size (digest) == 0);
+    assert (zdigest_data (digest) == NULL);
+    assert (zdigest_string (digest) == NULL);
+#endif
+    zdigest_destroy (&digest);
     free (buffer);
     //  @end
 

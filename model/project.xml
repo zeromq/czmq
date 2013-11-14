@@ -10,6 +10,8 @@
     <class name = "zconfig" />
     <class name = "zctx" />
     <class name = "zdir" />
+    <class name = "zdir_patch" />
+    <class name = "zdigest" />
     <class name = "zfile" />
     <class name = "zframe" />
     <class name = "zhash" />

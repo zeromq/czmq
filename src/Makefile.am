@@ -19,6 +19,8 @@ include_HEADERS = \
     ../include/zconfig.h \
     ../include/zctx.h \
     ../include/zdir.h \
+    ../include/zdir_patch.h \
+    ../include/zdigest.h \
     ../include/zfile.h \
     ../include/zframe.h \
     ../include/zhash.h \
@@ -49,6 +51,8 @@ libczmq_la_SOURCES = \
     zconfig.c \
     zctx.c \
     zdir.c \
+    zdir_patch.c \
+    zdigest.c \
     zfile.c \
     zframe.c \
     zhash.c \

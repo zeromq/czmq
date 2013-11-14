@@ -83,6 +83,23 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zdir_remove (zdir_t *self, bool force);
 
+//  Calculate differences between two versions of a directory tree.
+//  Returns a list of zdir_patch_t patches. Either older or newer may
+//  be null, indicating the directory is empty/absent. If alias is set,
+//  generates virtual filename (minus path, plus alias).
+CZMQ_EXPORT zlist_t *
+    zdir_diff (zdir_t *older, zdir_t *newer, char *alias);
+
+//  Return full contents of directory as a zdir_patch list.
+CZMQ_EXPORT zlist_t *
+    zdir_resync (zdir_t *self, char *alias);
+
+//  Load directory cache; returns a hash table containing the SHA-1 digests
+//  of every file in the tree. The cache is saved between runs in .cache.
+//  The caller must destroy the hash table when done with it.
+CZMQ_EXPORT zhash_t *
+    zdir_cache (zdir_t *self);
+
 //  Self test of this class
 CZMQ_EXPORT int
     zdir_test (bool verbose);

@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zdigest - provides hashing functions (SHA-1 at present)
+    zdir_patch - work with directory patches
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
@@ -23,48 +23,65 @@
     =========================================================================
 */
 
-#ifndef __ZDIGEST_H_INCLUDED__
-#define __ZDIGEST_H_INCLUDED__
+#ifndef __ZDIR_PATCH_H_INCLUDED__
+#define __ZDIR_PATCH_H_INCLUDED__
+
+typedef enum {
+    patch_create = 1,
+    patch_delete = 2
+} zdir_patch_op_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 //  Opaque class structure
-typedef struct _zdigest_t zdigest_t;
+typedef struct _zdir_patch_t zdir_patch_t;
 
 //  @interface
-//  Constructor - creates new digest object, which you use to build up a
-//  digest by repeatedly calling zdigest_update() on chunks of data.
-CZMQ_EXPORT zdigest_t *
-    zdigest_new (void);
-    
-//  Destroy a digest object
+//  Create new patch
+CZMQ_EXPORT zdir_patch_t *
+    zdir_patch_new (char *path, zfile_t *file, zdir_patch_op_t op, char *alias);
+
+//  Destroy a patch
 CZMQ_EXPORT void
-    zdigest_destroy (zdigest_t **self_p);
-    
-//  Add buffer into digest calculation
-CZMQ_EXPORT void
-    zdigest_update (zdigest_t *self, byte *buffer, size_t length);
-    
-//  Return final digest hash data. If built without crypto support, returns
-//  NULL.
-CZMQ_EXPORT byte *
-    zdigest_data (zdigest_t *self);
-    
-//  Return final digest hash size
-CZMQ_EXPORT size_t
-    zdigest_size (zdigest_t *self);
-    
-//  Return digest as printable hex string; caller should not modify nor
-//  free this string. After calling this, you may not use zdigest_update()
-//  on the same digest. If built without crypto support, returns NULL.
+    zdir_patch_destroy (zdir_patch_t **self_p);
+
+//  Create copy of a patch
+CZMQ_EXPORT zdir_patch_t *
+    zdir_patch_dup (zdir_patch_t *self);
+
+//  Return patch file directory path
 CZMQ_EXPORT char *
-    zdigest_string (zdigest_t *self);
+    zdir_patch_path (zdir_patch_t *self);
+
+//  Return patch file item
+CZMQ_EXPORT zfile_t *
+    zdir_patch_file (zdir_patch_t *self);
+
+//  Return operation
+CZMQ_EXPORT zdir_patch_op_t
+    zdir_patch_op (zdir_patch_t *self);
+    
+//  Return patch virtual file path
+CZMQ_EXPORT char *
+    zdir_patch_vpath (zdir_patch_t *self);
+
+//  Set patch virtual file path
+CZMQ_EXPORT void
+    zdir_patch_vpath_set (zdir_patch_t *self, char *vpath);
+
+//  Calculate hash digest for file (create only)
+CZMQ_EXPORT void
+    zdir_patch_digest_set (zdir_patch_t *self);
+
+//  Return hash digest for patch file 
+CZMQ_EXPORT char *
+    zdir_patch_digest (zdir_patch_t *self);
     
 //  Self test of this class
 CZMQ_EXPORT int
-    zdigest_test (bool verbose);
+    zdir_patch_test (bool verbose);
 //  @end
 
 #ifdef __cplusplus

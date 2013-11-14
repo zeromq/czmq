@@ -1,0 +1,79 @@
+zdir_patch(3)
+=============
+
+NAME
+----
+zdir_patch - work with directory patches
+
+SYNOPSIS
+--------
+----
+//  Create new patch
+CZMQ_EXPORT zdir_patch_t *
+    zdir_patch_new (char *path, zfile_t *file, zdir_patch_op_t op, char *alias);
+
+//  Destroy a patch
+CZMQ_EXPORT void
+    zdir_patch_destroy (zdir_patch_t **self_p);
+
+//  Create copy of a patch
+CZMQ_EXPORT zdir_patch_t *
+    zdir_patch_dup (zdir_patch_t *self);
+
+//  Return patch file directory path
+CZMQ_EXPORT char *
+    zdir_patch_path (zdir_patch_t *self);
+
+//  Return patch file item
+CZMQ_EXPORT zfile_t *
+    zdir_patch_file (zdir_patch_t *self);
+
+//  Return operation
+CZMQ_EXPORT zdir_patch_op_t
+    zdir_patch_op (zdir_patch_t *self);
+    
+//  Return patch virtual file path
+CZMQ_EXPORT char *
+    zdir_patch_vpath (zdir_patch_t *self);
+
+//  Set patch virtual file path
+CZMQ_EXPORT void
+    zdir_patch_vpath_set (zdir_patch_t *self, char *vpath);
+
+//  Calculate hash digest for file (create only)
+CZMQ_EXPORT void
+    zdir_patch_digest_set (zdir_patch_t *self);
+
+//  Return hash digest for patch file 
+CZMQ_EXPORT char *
+    zdir_patch_digest (zdir_patch_t *self);
+    
+//  Self test of this class
+CZMQ_EXPORT int
+    zdir_patch_test (bool verbose);
+----
+
+DESCRIPTION
+-----------
+
+The zdir_patch class works with one patch, which really just says "create
+this file" or "delete this file" (referring to a zfile item each time).
+
+
+EXAMPLE
+-------
+.From zdir_patch_test method
+----
+    zfile_t *file = zfile_new (".", "bilbo");
+    zdir_patch_t *patch = zdir_patch_new (".", file, patch_create, "/");
+    zfile_destroy (&file);
+    
+    file = zdir_patch_file (patch);
+    assert (streq (zfile_filename (file, "."), "bilbo"));
+    assert (streq (zdir_patch_vpath (patch), "/bilbo"));
+    zdir_patch_destroy (&patch);
+----
+
+SEE ALSO
+--------
+linkczmq:czmq[7]

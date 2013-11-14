@@ -71,8 +71,12 @@ EXAMPLE
     void *dish = zsocket_new (ctx, ZMQ_PULL);
 
     //  Set-up poller
-    zpoller_t *poller = zpoller_new (bowl, sink, dish, NULL);
+    zpoller_t *poller = zpoller_new (bowl, dish, NULL);
     assert (poller);
+
+    // Add a reader the existing poller
+    rc = zpoller_add (poller, sink);
+    assert (rc != -1);
 
     zstr_send (vent, "Hello, World");
 

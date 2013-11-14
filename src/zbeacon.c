@@ -40,9 +40,7 @@
 */
 
 #include "../include/czmq.h"
-#if !defined (__WINDOWS__)
-#   include "platform.h"
-#endif
+#include "platform.h"
 
 #if defined (HAVE_LINUX_WIRELESS_H)
 #   include <linux/wireless.h>

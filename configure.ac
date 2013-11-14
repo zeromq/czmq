@@ -53,6 +53,8 @@ AC_PROG_AWK
 # Checks for libraries
 AC_CHECK_LIB([pthread], [pthread_create])
 AC_CHECK_LIB([uuid], [uuid_generate])
+AC_CHECK_LIB([crypto], [SHA1_Init])
+
 
 # Allow libsodium to be installed in a custom path:
 
