@@ -135,10 +135,10 @@ zuuid_str (zuuid_t *self)
 
 
 //  -----------------------------------------------------------------
-//  Store UUID blob in target array
+//  Store UUID blob into a target array
 
 void
-zuuid_cpy (zuuid_t *self, byte *target)
+zuuid_export (zuuid_t *self, byte *target)
 {
     assert (self);
     memcpy (target, self->uuid, ZUUID_LEN);

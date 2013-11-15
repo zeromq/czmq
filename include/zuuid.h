@@ -52,7 +52,7 @@ CZMQ_EXPORT void
     
 //  Store UUID blob in target array
 CZMQ_EXPORT void
-    zuuid_cpy (zuuid_t *self, byte *target);
+    zuuid_export (zuuid_t *self, byte *target);
 
 //  Check if UUID is same as supplied value
 CZMQ_EXPORT bool
