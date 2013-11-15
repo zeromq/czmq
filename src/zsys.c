@@ -106,7 +106,7 @@ zsys_handler_reset (void)
         sigterm_default.sa_handler = NULL;
         s_first_time = true;
     }
-#elif defined (__WIN32__)
+#elif defined (__WINDOWS__)
     if (s_shim_installed) {
         SetConsoleCtrlHandler (s_handler_fn_shim, FALSE);
         s_shim_installed = false;
