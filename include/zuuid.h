@@ -42,6 +42,14 @@ CZMQ_EXPORT zuuid_t *
 CZMQ_EXPORT void
     zuuid_destroy (zuuid_t **self_p);
 
+//  Return UUID binary data
+CZMQ_EXPORT byte *
+    zuuid_data (zuuid_t *self);
+
+//  Return UUID binary size
+CZMQ_EXPORT size_t
+    zuuid_size (zuuid_t *self);
+
 //  Returns UUID as string
 CZMQ_EXPORT char *
     zuuid_str (zuuid_t *self);

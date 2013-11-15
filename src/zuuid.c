@@ -124,6 +124,28 @@ zuuid_set (zuuid_t *self, byte *source)
 
 
 //  -----------------------------------------------------------------
+//  Return UUID binary data
+
+byte *
+zuuid_data (zuuid_t *self)
+{
+    assert (self);
+    return self->uuid;
+}
+
+
+//  -----------------------------------------------------------------
+//  Return UUID binary size
+
+size_t
+zuuid_size (zuuid_t *self)
+{
+    assert (self);
+    return ZUUID_LEN;
+}
+
+
+//  -----------------------------------------------------------------
 //  Returns UUID as string
 
 char *
@@ -177,10 +199,11 @@ zuuid_test (bool verbose)
 
     //  @selftest
     //  Simple create/destroy test
-    zuuid_t *self = zuuid_new ();
-    assert (self);
-    assert (strlen (zuuid_str (self)) == 32);
-    zuuid_destroy (&self);
+    zuuid_t *uuid = zuuid_new ();
+    assert (uuid);
+    assert (zuuid_size (uuid) == 16);
+    assert (strlen (zuuid_str (uuid)) == 32);
+    zuuid_destroy (&uuid);
     //  @end
 
     printf ("OK\n");
