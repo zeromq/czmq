@@ -309,14 +309,13 @@ zlist_size (zlist_t *self)
 
 //  --------------------------------------------------------------------------
 //  Sort the list by ascending key value using a straight ASCII comparison.
-//  Uses a comb sort, which is simple and reasonably fast. The algorithm is
-//  based on Wikipedia's C pseudo-code for comb-sort. Note that a comb sort
-//  is not stable; so duplicate values may change order in the list after
-//  sorting.
+//  The sort is not stable, so may reorder items with the same keys.
 
 void
 zlist_sort (zlist_t *self, zlist_compare_fn *compare)
 {
+    //  Uses a comb sort, which is simple and reasonably fast. The
+    //  algorithm is based on Wikipedia's C pseudo-code for comb sort.
     size_t gap = self->size;
     bool swapped = false;
     while (gap > 1 || swapped) {
