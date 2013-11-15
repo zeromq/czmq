@@ -102,6 +102,9 @@ CZMQ_EXPORT int
 CZMQ_EXPORT void
     zhash_autofree (zhash_t *self);
     
+CZMQ_EXPORT zframe_t *
+    zhash_pack (zhash_t *self);
+
 //  Self test of this class
 CZMQ_EXPORT void
     zhash_test (int verbose);
@@ -190,6 +193,16 @@ EXAMPLE
 
     //  Test dup method
     zhash_t *copy = zhash_dup (hash);
+    assert (zhash_size (copy) == 4);
+    item = (char *) zhash_lookup (copy, "LIVEBEEF");
+    assert (item);
+    assert (streq (item, "dead beef"));
+    zhash_destroy (&copy);
+
+    //  Test pack/unpack methods
+    zframe_t *frame = zhash_pack (hash);
+    copy = zhash_unpack (frame);
+    zframe_destroy (&frame);
     assert (zhash_size (copy) == 4);
     item = (char *) zhash_lookup (copy, "LIVEBEEF");
     assert (item);
