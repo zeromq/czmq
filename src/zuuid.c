@@ -190,6 +190,22 @@ zuuid_neq (zuuid_t *self, byte *compare)
 
 
 //  --------------------------------------------------------------------------
+//  Make copy of UUID object
+
+zuuid_t *
+zuuid_dup (zuuid_t *self)
+{
+    if (!self)
+        return NULL;
+
+    zuuid_t *copy = zuuid_new ();
+    if (copy)
+        zuuid_set (copy, zuuid_data (self));
+    return copy;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Selftest
 
 int
@@ -203,7 +219,10 @@ zuuid_test (bool verbose)
     assert (uuid);
     assert (zuuid_size (uuid) == 16);
     assert (strlen (zuuid_str (uuid)) == 32);
+    zuuid_t *copy = zuuid_dup (uuid);
+    assert (streq (zuuid_str (uuid), zuuid_str (copy)));
     zuuid_destroy (&uuid);
+    zuuid_destroy (&copy);
     //  @end
 
     printf ("OK\n");
