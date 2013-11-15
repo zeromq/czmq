@@ -128,8 +128,18 @@ CZMQ_EXPORT int
 CZMQ_EXPORT void
     zhash_autofree (zhash_t *self);
     
+//  Serialize hash table to a binary frame that can be sent in a message.
+//  The packed format is compatible with the 'dictionary' type defined in
+//  rfc.zeromq.org/spec:19/FILEMQ. Comments are not included in the packed
+//  data. Item values MUST be strings.
 CZMQ_EXPORT zframe_t *
     zhash_pack (zhash_t *self);
+    
+//  Unpack binary frame into a new hash table. Packed data must follow format
+//  defined by zhash_pack. Hash table is set to autofree. An empty frame
+//  unpacks to an empty hash table.
+zhash_t *
+    zhash_unpack (zframe_t *frame);
 
 //  Self test of this class
 CZMQ_EXPORT void
