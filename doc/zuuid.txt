@@ -24,10 +24,11 @@ EXAMPLE
 .From zuuid_test method
 ----
     //  Simple create/destroy test
-    zuuid_t *self = zuuid_new ();
-    assert (self);
-    assert (strlen (zuuid_str (self)) == 32);
-    zuuid_destroy (&self);
+    zuuid_t *uuid = zuuid_new ();
+    assert (uuid);
+    assert (zuuid_size (uuid) == 16);
+    assert (strlen (zuuid_str (uuid)) == 32);
+    zuuid_destroy (&uuid);
 ----
 
 SEE ALSO

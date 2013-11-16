@@ -55,7 +55,9 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void
     zlist_remove (zlist_t *self, void *item);
 
-//  Copy the entire list, return the copy
+//  Make a copy of list. If the list has autofree set, the copied list will
+//  duplicate all items, which must be strings. Otherwise, the list will hold
+//  pointers back to the items in the original list.
 CZMQ_EXPORT zlist_t *
     zlist_dup (zlist_t *self);
 
@@ -63,11 +65,19 @@ CZMQ_EXPORT zlist_t *
 CZMQ_EXPORT size_t
     zlist_size (zlist_t *self);
 
-//  Sort list
+//  Sort the list by ascending key value using a straight ASCII comparison.
+//  The sort is not stable, so may reorder items with the same keys.
 CZMQ_EXPORT void
     zlist_sort (zlist_t *self, zlist_compare_fn *compare);
 
-//  Set list for automatic item destruction
+//  Set list for automatic item destruction; item values MUST be strings.
+//  By default a list item refers to a value held elsewhere. When you set
+//  this, each time you append or push a list item, zlist will take a copy
+//  of the string value. Then, when you destroy the list, it will free all
+//  item values automatically. If you use any other technique to allocate
+//  list values, you must free them explicitly before destroying the list.
+//  The usual technique is to pop list items and destroy them, until the
+//  list is empty.
 CZMQ_EXPORT void
     zlist_autofree (zlist_t *self);
 

@@ -42,6 +42,14 @@ CZMQ_EXPORT zuuid_t *
 CZMQ_EXPORT void
     zuuid_destroy (zuuid_t **self_p);
 
+//  Return UUID binary data
+CZMQ_EXPORT byte *
+    zuuid_data (zuuid_t *self);
+
+//  Return UUID binary size
+CZMQ_EXPORT size_t
+    zuuid_size (zuuid_t *self);
+
 //  Returns UUID as string
 CZMQ_EXPORT char *
     zuuid_str (zuuid_t *self);
@@ -52,7 +60,7 @@ CZMQ_EXPORT void
     
 //  Store UUID blob in target array
 CZMQ_EXPORT void
-    zuuid_cpy (zuuid_t *self, byte *target);
+    zuuid_export (zuuid_t *self, byte *target);
 
 //  Check if UUID is same as supplied value
 CZMQ_EXPORT bool
@@ -61,6 +69,10 @@ CZMQ_EXPORT bool
 //  Check if UUID is different from supplied value
 CZMQ_EXPORT bool
     zuuid_neq (zuuid_t *self, byte *compare);
+
+//  Make copy of UUID object
+CZMQ_EXPORT zuuid_t *
+    zuuid_dup (zuuid_t *self);
 
 //  Self test of this class
 CZMQ_EXPORT int

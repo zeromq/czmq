@@ -124,6 +124,28 @@ zuuid_set (zuuid_t *self, byte *source)
 
 
 //  -----------------------------------------------------------------
+//  Return UUID binary data
+
+byte *
+zuuid_data (zuuid_t *self)
+{
+    assert (self);
+    return self->uuid;
+}
+
+
+//  -----------------------------------------------------------------
+//  Return UUID binary size
+
+size_t
+zuuid_size (zuuid_t *self)
+{
+    assert (self);
+    return ZUUID_LEN;
+}
+
+
+//  -----------------------------------------------------------------
 //  Returns UUID as string
 
 char *
@@ -135,10 +157,10 @@ zuuid_str (zuuid_t *self)
 
 
 //  -----------------------------------------------------------------
-//  Store UUID blob in target array
+//  Store UUID blob into a target array
 
 void
-zuuid_cpy (zuuid_t *self, byte *target)
+zuuid_export (zuuid_t *self, byte *target)
 {
     assert (self);
     memcpy (target, self->uuid, ZUUID_LEN);
@@ -168,6 +190,22 @@ zuuid_neq (zuuid_t *self, byte *compare)
 
 
 //  --------------------------------------------------------------------------
+//  Make copy of UUID object
+
+zuuid_t *
+zuuid_dup (zuuid_t *self)
+{
+    if (!self)
+        return NULL;
+
+    zuuid_t *copy = zuuid_new ();
+    if (copy)
+        zuuid_set (copy, zuuid_data (self));
+    return copy;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Selftest
 
 int
@@ -177,10 +215,14 @@ zuuid_test (bool verbose)
 
     //  @selftest
     //  Simple create/destroy test
-    zuuid_t *self = zuuid_new ();
-    assert (self);
-    assert (strlen (zuuid_str (self)) == 32);
-    zuuid_destroy (&self);
+    zuuid_t *uuid = zuuid_new ();
+    assert (uuid);
+    assert (zuuid_size (uuid) == 16);
+    assert (strlen (zuuid_str (uuid)) == 32);
+    zuuid_t *copy = zuuid_dup (uuid);
+    assert (streq (zuuid_str (uuid), zuuid_str (copy)));
+    zuuid_destroy (&uuid);
+    zuuid_destroy (&copy);
     //  @end
 
     printf ("OK\n");

@@ -262,10 +262,8 @@ zlist_remove (zlist_t *self, void *item)
 
         if (node->next == NULL)
             self->tail = prev;
-
         if (self->cursor == node)
             self->cursor = prev;
-
         free (node);
         self->size--;
     }
@@ -273,7 +271,9 @@ zlist_remove (zlist_t *self, void *item)
 
 
 //  --------------------------------------------------------------------------
-//  Make copy of itself
+//  Make a copy of list. If the list has autofree set, the copied list will
+//  duplicate all items, which must be strings. Otherwise, the list will hold
+//  pointers back to the items in the original list.
 
 zlist_t *
 zlist_dup (zlist_t *self)
@@ -282,11 +282,13 @@ zlist_dup (zlist_t *self)
         return NULL;
 
     zlist_t *copy = zlist_new ();
+    copy->autofree = self->autofree;
+
     if (copy) {
         node_t *node;
         for (node = self->head; node; node = node->next) {
             if (!zlist_append (copy, node->item)) {
-                zlist_destroy(&copy);
+                zlist_destroy (&copy);
                 break;
             }
         }
@@ -306,13 +308,14 @@ zlist_size (zlist_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Sort list
-//  Uses a comb sort, which is simple and reasonably fast
-//  Algorithm based on Wikipedia C pseudo-code
+//  Sort the list by ascending key value using a straight ASCII comparison.
+//  The sort is not stable, so may reorder items with the same keys.
 
 void
 zlist_sort (zlist_t *self, zlist_compare_fn *compare)
 {
+    //  Uses a comb sort, which is simple and reasonably fast. The
+    //  algorithm is based on Wikipedia's C pseudo-code for comb sort.
     size_t gap = self->size;
     bool swapped = false;
     while (gap > 1 || swapped) {
@@ -352,6 +355,13 @@ s_compare (void *item1, void *item2)
 
 //  --------------------------------------------------------------------------
 //  Set list for automatic item destruction; item values MUST be strings.
+//  By default a list item refers to a value held elsewhere. When you set
+//  this, each time you append or push a list item, zlist will take a copy
+//  of the string value. Then, when you destroy the list, it will free all
+//  item values automatically. If you use any other technique to allocate
+//  list values, you must free them explicitly before destroying the list.
+//  The usual technique is to pop list items and destroy them, until the
+//  list is empty.
 
 void
 zlist_autofree (zlist_t *self)
