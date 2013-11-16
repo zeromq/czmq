@@ -407,6 +407,10 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
     typedef unsigned __int64 uint64_t;
     typedef long ssize_t;
 #   endif 
+#   if (!defined (va_copy))
+    //  MSVC does not support C99's va_copy so we use a regular assignment
+#       define va_copy(dest,src) (dest) = (src)
+#   endif
 #elif (defined (__APPLE__))
     typedef unsigned long ulong;
     typedef unsigned int uint;

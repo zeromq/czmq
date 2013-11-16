@@ -359,24 +359,30 @@ zsys_vprintf (const char *format, va_list argptr)
 {
     int size = 256;
     char *string = (char *) malloc (size);
-    //  Using a va_list modifies it, on some systems, so set-up a copy
-    //  to use in the second vsnprintf attempt
-    va_list argptr_copy;
-    va_copy (argptr_copy, argptr);
-    int required = vsnprintf (string, size, format, argptr);
-#if defined (__WINDOWS__)
-    if (required < 0 || required >= size)
+    //  Using argptr is destructive, so we take a copy each time we need it
+    //  We define va_copy for Windows in czmq_prelude.h
+    va_list my_argptr;
+    va_copy (my_argptr, argptr);
+    int required = vsnprintf (string, size, format, my_argptr);
+    va_end (my_argptr);
+#ifdef _MSC_VER
+    if (required < 0 || required >= size) {
+        va_copy (my_argptr, argptr);
         required = _vscprintf (format, argptr);
+        va_end (my_argptr);
+    }
 #endif
     //  If formatted string cannot fit into small string, reallocate a
     //  larger buffer for it.
     if (required >= size) {
         size = required + 1;
         string = (char *) realloc (string, size);
-        if (string)
-            vsnprintf (string, size, format, argptr_copy);
+        if (string) {
+            va_copy (my_argptr, argptr);
+            vsnprintf (string, size, format, my_argptr);
+            va_end (my_argptr);
+        }
     }
-    va_end (argptr_copy);
     return string;
 }
 
