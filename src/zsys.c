@@ -424,6 +424,12 @@ zsys_test (bool verbose)
     char *string = s_vprintf ("%s %02x", "Hello", 16);
     assert (streq (string, "Hello 10"));
     zstr_free (&string);
+
+    char *str64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890,.";
+    int num10 = 1234567890;
+    string = s_vprintf ("%s%s%s%s%d", str64, str64, str64, str64, num10);
+    assert (strlen (string) == (4*64+10));
+    zstr_free (&string);
     //  @end
     
     printf ("OK\n");
