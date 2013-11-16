@@ -8,5 +8,3 @@
 .include "build-vcproj.gsl"
 .include "build-vcxproj.gsl"
 .include "build-autoconf.gsl"
-
-
