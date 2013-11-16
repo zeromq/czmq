@@ -359,6 +359,10 @@ zsys_vprintf (const char *format, va_list argptr)
 {
     int size = 256;
     char *string = (char *) malloc (size);
+    //  Using a va_list modifies it, on some systems, so set-up a copy
+    //  to use in the second vsnprintf attempt
+    va_list argptr_copy;
+    va_copy (argptr_copy, argptr);
     int required = vsnprintf (string, size, format, argptr);
 #if defined (__WINDOWS__)
     if (required < 0 || required >= size)
@@ -369,10 +373,10 @@ zsys_vprintf (const char *format, va_list argptr)
     if (required >= size) {
         size = required + 1;
         string = (char *) realloc (string, size);
-        if (!string)
-            return NULL;
-        vsnprintf (string, size, format, argptr);
+        if (string)
+            vsnprintf (string, size, format, argptr_copy);
     }
+    va_end (argptr_copy);
     return string;
 }
 
@@ -428,7 +432,7 @@ zsys_test (bool verbose)
     char *str64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890,.";
     int num10 = 1234567890;
     string = s_vprintf ("%s%s%s%s%d", str64, str64, str64, str64, num10);
-    assert (strlen (string) == (4*64+10));
+    assert (strlen (string) == (4 * 64 + 10));
     zstr_free (&string);
     //  @end
     
