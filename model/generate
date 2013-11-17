@@ -5,4 +5,5 @@
 #       - add a new project class (project.xml)
 
 gsl -q -script:sockopts.gsl sockopts.xml
+mkdir -p ../builds/android ../builds/mingw32 ../builds/msvc
 gsl -q -script:project.gsl project.xml
