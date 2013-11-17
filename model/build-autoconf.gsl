@@ -20,10 +20,15 @@ include_HEADERS = \\
     ../include/$(name).h \\
 .endfor
 .for class
-.   if last ()
-    ../include/$(name).h
+.   if class.private ?= 1
+.       class.classdir = ""
 .   else
-    ../include/$(name).h \\
+.       class.classdir = "../include/"
+.   endif
+.   if last ()
+    $(classdir)$(name).h
+.   else
+    $(classdir)$(name).h \\
 .   endif
 .endfor
 
