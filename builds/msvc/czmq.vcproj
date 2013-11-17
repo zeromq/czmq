@@ -26,10 +26,10 @@
     <Configurations>
         <Configuration
             Name="Release|Win32"
-            OutputDirectory="$(PlatformName)$(ConfigurationName)"
-            IntermediateDirectory="$(PlatformName)$(ConfigurationName)"
+            OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+            IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
             ConfigurationType="4"
-            InheritedPropertySheets="$(VCInstallDir)VCProjectDefaultsUpgradeFromVC60.vsprops"
+            InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
             UseOfMFC="0"
             ATLMinimizesCRunTimeLibraryUsage="false"
             CharacterSet="2"
@@ -53,7 +53,7 @@
                 Name="VCCLCompilerTool"
                 Optimization="2"
                 InlineFunctionExpansion="1"
-                AdditionalIncludeDirectories="....include;......libzmqinclude"
+                AdditionalIncludeDirectories="..\..\include;..\..\..\libzmq\include"
                 PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;BASE_THREADSAFE"
                 StringPooling="true"
                 RuntimeLibrary="0"
@@ -78,7 +78,7 @@
             />
             <Tool
                 Name="VCLibrarianTool"
-                OutputFile=".$(project.name).lib"
+                OutputFile=".\czmq.lib"
                 SuppressStartupBanner="true"
             />
             <Tool
@@ -101,10 +101,10 @@
         </Configuration>
         <Configuration
             Name="Release|x64"
-            OutputDirectory="$(PlatformName)$(ConfigurationName)"
-            IntermediateDirectory="$(PlatformName)$(ConfigurationName)"
+            OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+            IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
             ConfigurationType="4"
-            InheritedPropertySheets="$(VCInstallDir)VCProjectDefaultsUpgradeFromVC60.vsprops"
+            InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
             UseOfMFC="0"
             ATLMinimizesCRunTimeLibraryUsage="false"
             CharacterSet="2"
@@ -129,7 +129,7 @@
                 Name="VCCLCompilerTool"
                 Optimization="2"
                 InlineFunctionExpansion="1"
-                AdditionalIncludeDirectories="....include;......libzmqinclude"
+                AdditionalIncludeDirectories="..\..\include;..\..\..\libzmq\include"
                 PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;BASE_THREADSAFE"
                 StringPooling="true"
                 RuntimeLibrary="0"
@@ -154,7 +154,7 @@
             />
             <Tool
                 Name="VCLibrarianTool"
-                OutputFile=".$(project.name).lib"
+                OutputFile=".\czmq.lib"
                 SuppressStartupBanner="true"
             />
             <Tool
@@ -177,10 +177,10 @@
         </Configuration>
         <Configuration
             Name="Debug|Win32"
-            OutputDirectory="$(PlatformName)$(ConfigurationName)"
-            IntermediateDirectory="$(PlatformName)$(ConfigurationName)"
+            OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+            IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
             ConfigurationType="4"
-            InheritedPropertySheets="$(VCInstallDir)VCProjectDefaultsUpgradeFromVC60.vsprops"
+            InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
             UseOfMFC="0"
             ATLMinimizesCRunTimeLibraryUsage="false"
             CharacterSet="2"
@@ -203,7 +203,7 @@
             <Tool
                 Name="VCCLCompilerTool"
                 Optimization="0"
-                AdditionalIncludeDirectories="....include;......libzmqinclude"
+                AdditionalIncludeDirectories="..\..\include;..\..\..\libzmq\include"
                 PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;BASE_THREADSAFE"
                 MinimalRebuild="false"
                 BasicRuntimeChecks="3"
@@ -229,7 +229,7 @@
             />
             <Tool
                 Name="VCLibrarianTool"
-                OutputFile=".$(project.name).lib"
+                OutputFile=".\czmq.lib"
                 SuppressStartupBanner="true"
             />
             <Tool
@@ -252,10 +252,10 @@
         </Configuration>
         <Configuration
             Name="Debug|x64"
-            OutputDirectory="$(PlatformName)$(ConfigurationName)"
-            IntermediateDirectory="$(PlatformName)$(ConfigurationName)"
+            OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+            IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
             ConfigurationType="4"
-            InheritedPropertySheets="$(VCInstallDir)VCProjectDefaultsUpgradeFromVC60.vsprops"
+            InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
             UseOfMFC="0"
             ATLMinimizesCRunTimeLibraryUsage="false"
             CharacterSet="2"
@@ -279,7 +279,7 @@
             <Tool
                 Name="VCCLCompilerTool"
                 Optimization="0"
-                AdditionalIncludeDirectories="....include;......libzmqinclude"
+                AdditionalIncludeDirectories="..\..\include;..\..\..\libzmq\include"
                 PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;BASE_THREADSAFE"
                 MinimalRebuild="false"
                 BasicRuntimeChecks="3"
@@ -305,7 +305,7 @@
             />
             <Tool
                 Name="VCLibrarianTool"
-                OutputFile=".$(project.name).lib"
+                OutputFile=".\czmq.lib"
                 SuppressStartupBanner="true"
             />
             <Tool
@@ -328,10 +328,10 @@
         </Configuration>
         <Configuration
             Name="DebugDLL|Win32"
-            OutputDirectory="$(PlatformName)$(ConfigurationName)"
-            IntermediateDirectory="$(PlatformName)$(ConfigurationName)"
+            OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+            IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
             ConfigurationType="2"
-            InheritedPropertySheets="$(VCInstallDir)VCProjectDefaultsUpgradeFromVC60.vsprops"
+            InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
             UseOfMFC="0"
             ATLMinimizesCRunTimeLibraryUsage="false"
             CharacterSet="2"
@@ -354,7 +354,7 @@
             <Tool
                 Name="VCCLCompilerTool"
                 Optimization="0"
-                AdditionalIncludeDirectories="....include;......libzmqinclude"
+                AdditionalIncludeDirectories="..\..\include;..\..\..\libzmq\include"
                 PreprocessorDefinitions="LIBCZMQ_EXPORTS;_WIN32;WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;BASE_THREADSAFE"
                 MinimalRebuild="false"
                 BasicRuntimeChecks="3"
@@ -381,7 +381,7 @@
             <Tool
                 Name="VCLinkerTool"
                 AdditionalDependencies="libzmq.lib Ws2_32.lib Iphlpapi.lib"
-                AdditionalLibraryDirectories="......libzmqlib"
+                AdditionalLibraryDirectories="..\..\..\libzmq\lib\"
             />
             <Tool
                 Name="VCALinkTool"
@@ -409,10 +409,10 @@
         </Configuration>
         <Configuration
             Name="DebugDLL|x64"
-            OutputDirectory="$(PlatformName)$(ConfigurationName)"
-            IntermediateDirectory="$(PlatformName)$(ConfigurationName)"
+            OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+            IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
             ConfigurationType="2"
-            InheritedPropertySheets="$(VCInstallDir)VCProjectDefaultsUpgradeFromVC60.vsprops"
+            InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
             UseOfMFC="0"
             ATLMinimizesCRunTimeLibraryUsage="false"
             CharacterSet="2"
@@ -436,7 +436,7 @@
             <Tool
                 Name="VCCLCompilerTool"
                 Optimization="0"
-                AdditionalIncludeDirectories="....include;......libzmqinclude"
+                AdditionalIncludeDirectories="..\..\include;..\..\..\libzmq\include"
                 PreprocessorDefinitions="LIBCZMQ_EXPORTS;_WIN32;WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;BASE_THREADSAFE"
                 MinimalRebuild="false"
                 BasicRuntimeChecks="3"
@@ -463,7 +463,7 @@
             <Tool
                 Name="VCLinkerTool"
                 AdditionalDependencies="libzmq.lib Ws2_32.lib Iphlpapi.lib"
-                AdditionalLibraryDirectories="......libzmqlibx64;......libzmqlib"
+                AdditionalLibraryDirectories="..\..\..\libzmq\lib\x64;..\..\..\libzmq\lib"
                 TargetMachine="17"
             />
             <Tool
@@ -492,10 +492,10 @@
         </Configuration>
         <Configuration
             Name="ReleaseDLL|Win32"
-            OutputDirectory="$(PlatformName)$(ConfigurationName)"
-            IntermediateDirectory="$(PlatformName)$(ConfigurationName)"
+            OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+            IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
             ConfigurationType="2"
-            InheritedPropertySheets="$(VCInstallDir)VCProjectDefaultsUpgradeFromVC60.vsprops"
+            InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
             UseOfMFC="0"
             ATLMinimizesCRunTimeLibraryUsage="false"
             CharacterSet="2"
@@ -519,7 +519,7 @@
                 Name="VCCLCompilerTool"
                 Optimization="2"
                 InlineFunctionExpansion="1"
-                AdditionalIncludeDirectories="....include;......libzmqinclude"
+                AdditionalIncludeDirectories="..\..\include;..\..\..\libzmq\include"
                 PreprocessorDefinitions="LIBCZMQ_EXPORTS;WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;BASE_THREADSAFE"
                 StringPooling="true"
                 RuntimeLibrary="2"
@@ -545,7 +545,7 @@
             <Tool
                 Name="VCLinkerTool"
                 AdditionalDependencies="libzmq.lib Ws2_32.lib Iphlpapi.lib"
-                AdditionalLibraryDirectories="......libzmqlib"
+                AdditionalLibraryDirectories="..\..\..\libzmq\lib\"
             />
             <Tool
                 Name="VCALinkTool"
@@ -573,10 +573,10 @@
         </Configuration>
         <Configuration
             Name="ReleaseDLL|x64"
-            OutputDirectory="$(PlatformName)$(ConfigurationName)"
-            IntermediateDirectory="$(PlatformName)$(ConfigurationName)"
+            OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+            IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
             ConfigurationType="2"
-            InheritedPropertySheets="$(VCInstallDir)VCProjectDefaultsUpgradeFromVC60.vsprops"
+            InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
             UseOfMFC="0"
             ATLMinimizesCRunTimeLibraryUsage="false"
             CharacterSet="2"
@@ -601,7 +601,7 @@
                 Name="VCCLCompilerTool"
                 Optimization="2"
                 InlineFunctionExpansion="1"
-                AdditionalIncludeDirectories="....include;......libzmqinclude"
+                AdditionalIncludeDirectories="..\..\include;..\..\..\libzmq\include"
                 PreprocessorDefinitions="LIBCZMQ_EXPORTS;WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;BASE_THREADSAFE"
                 StringPooling="true"
                 RuntimeLibrary="2"
@@ -627,7 +627,7 @@
             <Tool
                 Name="VCLinkerTool"
                 AdditionalDependencies="libzmq.lib Ws2_32.lib Iphlpapi.lib"
-                AdditionalLibraryDirectories="......libzmqlibx64;......libzmqlib"
+                AdditionalLibraryDirectories="..\..\..\libzmq\lib\x64;..\..\..\libzmq\lib"
                 GenerateDebugInformation="false"
                 TargetMachine="17"
             />
@@ -657,10 +657,10 @@
         </Configuration>
         <Configuration
             Name="RelWithDebInfo|Win32"
-            OutputDirectory="$(ConfigurationName)$(ConfigurationName)"
-            IntermediateDirectory="$(ConfigurationName)$(ConfigurationName)"
+            OutputDirectory="$(ConfigurationName)\$(ConfigurationName)"
+            IntermediateDirectory="$(ConfigurationName)\$(ConfigurationName)"
             ConfigurationType="2"
-            InheritedPropertySheets="$(VCInstallDir)VCProjectDefaultsUpgradeFromVC60.vsprops"
+            InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
             UseOfMFC="0"
             ATLMinimizesCRunTimeLibraryUsage="false"
             CharacterSet="2"
@@ -684,7 +684,7 @@
                 Name="VCCLCompilerTool"
                 Optimization="2"
                 InlineFunctionExpansion="1"
-                AdditionalIncludeDirectories="....include;......libzmqinclude"
+                AdditionalIncludeDirectories="..\..\include;..\..\..\libzmq\include"
                 PreprocessorDefinitions="LIBCZMQ_EXPORTS;WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;BASE_THREADSAFE"
                 StringPooling="true"
                 RuntimeLibrary="2"
@@ -710,7 +710,7 @@
             <Tool
                 Name="VCLinkerTool"
                 AdditionalDependencies="libzmq.lib Ws2_32.lib Iphlpapi.lib"
-                AdditionalLibraryDirectories="......libzmqlib"
+                AdditionalLibraryDirectories="..\..\..\libzmq\lib\"
                 GenerateDebugInformation="true"
             />
             <Tool
@@ -739,10 +739,10 @@
         </Configuration>
         <Configuration
             Name="RelWithDebInfo|x64"
-            OutputDirectory="$(PlatformName)$(ConfigurationName)"
-            IntermediateDirectory="$(PlatformName)$(ConfigurationName)"
+            OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+            IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
             ConfigurationType="2"
-            InheritedPropertySheets="$(VCInstallDir)VCProjectDefaultsUpgradeFromVC60.vsprops"
+            InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
             UseOfMFC="0"
             ATLMinimizesCRunTimeLibraryUsage="false"
             CharacterSet="2"
@@ -767,7 +767,7 @@
                 Name="VCCLCompilerTool"
                 Optimization="2"
                 InlineFunctionExpansion="1"
-                AdditionalIncludeDirectories="....include;......libzmqinclude"
+                AdditionalIncludeDirectories="..\..\include;..\..\..\libzmq\include"
                 PreprocessorDefinitions="LIBCZMQ_EXPORTS;WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;BASE_THREADSAFE"
                 StringPooling="true"
                 RuntimeLibrary="2"
@@ -793,7 +793,7 @@
             <Tool
                 Name="VCLinkerTool"
                 AdditionalDependencies="libzmq.lib Ws2_32.lib Iphlpapi.lib"
-                AdditionalLibraryDirectories="......libzmqlibx64;......libzmqlib"
+                AdditionalLibraryDirectories="..\..\..\libzmq\lib\x64;..\..\..\libzmq\lib"
                 GenerateDebugInformation="true"
                 TargetMachine="17"
             />
@@ -829,7 +829,7 @@
             Name="Source Files"
             Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
             >
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zauth.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -861,7 +861,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zbeacon.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -893,7 +893,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zcert.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -925,7 +925,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zcertstore.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -957,7 +957,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zchunk.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -989,7 +989,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zclock.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -1021,7 +1021,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zconfig.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -1053,7 +1053,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zctx.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -1085,7 +1085,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zdir.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -1117,7 +1117,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zdir_patch.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -1149,7 +1149,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zdigest.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -1181,7 +1181,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zfile.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -1213,7 +1213,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zframe.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -1245,7 +1245,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zhash.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -1277,7 +1277,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zlist.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -1309,7 +1309,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zloop.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -1341,7 +1341,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zmonitor.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -1373,7 +1373,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zmsg.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -1405,7 +1405,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zmutex.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -1437,7 +1437,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zpoller.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -1469,7 +1469,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zproxy.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -1501,7 +1501,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zrex.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -1533,7 +1533,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zsocket.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -1565,7 +1565,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zsockopt.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -1597,7 +1597,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zstr.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -1629,7 +1629,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zsys.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -1661,7 +1661,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zthread.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -1693,7 +1693,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\ztree.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -1725,7 +1725,7 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="....src$(name).c" >
+            <File RelativePath="..\..\src\zuuid.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
@@ -1761,38 +1761,38 @@
         <Filter
             Name="Header Files"
             >
-            <File RelativePath="....buildsmsvcplatform.h" />
-            <File RelativePath="....include$(project.name).h" />
-            <File RelativePath="....include$(project.name)_prelude.h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
-            <File RelativePath="....include$(name).h" />
+            <File RelativePath="..\..\builds\msvc\platform.h" />
+            <File RelativePath="..\..\include\czmq.h" />
+            <File RelativePath="..\..\include\czmq_prelude.h" />
+            <File RelativePath="..\..\include\zauth.h" />
+            <File RelativePath="..\..\include\zbeacon.h" />
+            <File RelativePath="..\..\include\zcert.h" />
+            <File RelativePath="..\..\include\zcertstore.h" />
+            <File RelativePath="..\..\include\zchunk.h" />
+            <File RelativePath="..\..\include\zclock.h" />
+            <File RelativePath="..\..\include\zconfig.h" />
+            <File RelativePath="..\..\include\zctx.h" />
+            <File RelativePath="..\..\include\zdir.h" />
+            <File RelativePath="..\..\include\zdir_patch.h" />
+            <File RelativePath="..\..\include\zdigest.h" />
+            <File RelativePath="..\..\include\zfile.h" />
+            <File RelativePath="..\..\include\zframe.h" />
+            <File RelativePath="..\..\include\zhash.h" />
+            <File RelativePath="..\..\include\zlist.h" />
+            <File RelativePath="..\..\include\zloop.h" />
+            <File RelativePath="..\..\include\zmonitor.h" />
+            <File RelativePath="..\..\include\zmsg.h" />
+            <File RelativePath="..\..\include\zmutex.h" />
+            <File RelativePath="..\..\include\zpoller.h" />
+            <File RelativePath="..\..\include\zproxy.h" />
+            <File RelativePath="..\..\include\zrex.h" />
+            <File RelativePath="..\..\include\zsocket.h" />
+            <File RelativePath="..\..\include\zsockopt.h" />
+            <File RelativePath="..\..\include\zstr.h" />
+            <File RelativePath="..\..\include\zsys.h" />
+            <File RelativePath="..\..\include\zthread.h" />
+            <File RelativePath="..\..\include\ztree.h" />
+            <File RelativePath="..\..\include\zuuid.h" />
         </Filter>
     </Files>
     <Globals>
