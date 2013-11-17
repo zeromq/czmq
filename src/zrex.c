@@ -126,7 +126,7 @@ zrex_destroy (zrex_t **self_p)
     if (*self_p) {
         zrex_t *self = *self_p;
         trex_free (self->trex);
-        int index;
+        unsigned int index;
         for (index = 0; index < self->hits; index++)
             free (self->hit [index]);
         free (self);
@@ -172,12 +172,12 @@ zrex_hits (zrex_t *self, const char *text)
     assert (text);
     assert (self->trex);
 
-    int index;
+    unsigned int index;
     for (index = 0; index < self->hits; index++) {
         free (self->hit [index]);
         self->hit [index] = NULL;
     }
-    bool matched = trex_match (self->trex, text);
+    bool matched = !!trex_match (self->trex, text);
     if (matched) {
         //  Get number of hits, setting a sane limit
         self->hits = trex_getsubexpcount (self->trex);
@@ -242,7 +242,7 @@ zrex_hit (zrex_t *self, uint index)
             //  We haven't fetched this hit yet, so grab it now
             TRexMatch match = { 0 };
             trex_getsubexp (self->trex, index, &match);
-            self->hit [index] = malloc (match.len + 1);
+            self->hit [index] = (char *) malloc (match.len + 1);
             memcpy (self->hit [index], match.begin, match.len);
             self->hit [index][match.len] = 0;
         }

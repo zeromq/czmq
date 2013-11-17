@@ -535,7 +535,7 @@ zhash_load (zhash_t *self, char *filename)
     //  modification date (0 for unknown files), so that zhash_refresh ()
     //  will always work after zhash_load (), to load a newly-created
     //  file.
-    
+
     //  Take copy of filename in case self->filename is same string.
     filename = strdup (filename);
     free (self->filename);
@@ -568,14 +568,14 @@ zhash_load (zhash_t *self, char *filename)
 //  --------------------------------------------------------------------------
 //  When a hash table was loaded from a file by zhash_load, this method will
 //  reload the file if it has been modified since, and is "stable", i.e. not
-//  still changing. Returns 0 if OK, -1 if there was an error reloading the 
+//  still changing. Returns 0 if OK, -1 if there was an error reloading the
 //  file.
 
 int
 zhash_refresh (zhash_t *self)
 {
     assert (self);
-    
+
     if (self->filename) {
         if (zsys_file_modified (self->filename) > self->modified
         &&  zsys_file_stable (self->filename)) {
@@ -626,7 +626,7 @@ zhash_pack (zhash_t *self)
         item_t *item = self->items [index];
         while (item) {
             //  [Length]key=value
-            frame_size += 2 + strlen (item->key) + strlen (item->value);
+            frame_size += 2 + strlen (item->key) + strlen ((char *) item->value);
             item = item->next;
         }
     }
