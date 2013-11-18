@@ -68,7 +68,7 @@ TESTS = $(project.name)_selftest
 #################################################################
 MAN1 =
 MAN3 = \\
-.for class
+.for class where private?0 = 0
 .   if last ()
     $(name).3
 .   else
