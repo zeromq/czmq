@@ -88,12 +88,19 @@ set (SOURCES_
   ${SOURCES_Header_Files}
 )
 
+if (WIN32)
+    set (SOURCES_Platform_Files
+        builds/msvc/
+    )
+endif()
+
 set (WITH_LIBZMQ .)
 
 include_directories (
   ../libzmq/include
   include
   ${CMAKE_INSTALL_PREFIX}/include
+  ${SOURCES_Platform_Files}
   ${WITH_LIBZMQ}
 )
 
