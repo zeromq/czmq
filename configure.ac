@@ -108,12 +108,32 @@ if test "x${CZMQ_GCOV}" == "xyes"; then
     fi
 fi
 
-# libzmq integration
-AC_ARG_WITH([libzmq],
-            [AS_HELP_STRING([--with-libzmq],
-                            [Specify libzmq prefix])],
-            [czmq_search_libzmq="yes"],
-            [])
+# Check for libzmq library
+libzmq_prefix=detect
+AC_ARG_WITH([libzmq], 
+    [AS_HELP_STRING([--with-libzmq=PREFIX], 
+        [build with ZeroMQ library installed in PREFIX [default=autodetect]])],
+    [case "x$withval" in
+        xno)
+            AC_MSG_ERROR([jzmq requires the ZeroMQ library])
+            ;;
+        xyes|x)
+            ;;
+        *)
+            CPPFLAGS="$CPPFLAGS -I${withval}/include"
+            LDFLAGS="$LDFLAGS -L${withval}/lib"
+            zeromq_prefix=${withval}
+            ;;
+    esac ]
+)
+if test "x$libzmq_prefix" = "xdetect"; then
+    PKG_CHECK_MODULES(
+        [ZeroMQ], [libzmq], [libzmq_prefix=pkgconfig], [libzmq_prefix=])
+        if test "x$libzmq_prefix" = "xpkgconfig"; then
+            CPPFLAGS="$CPPFLAGS ${ZeroMQ_CFLAGS}"
+            LDFLAGS="$LDFLAGS ${ZeroMQ_LIBS}"
+        fi
+fi
 
 if test "x$czmq_search_libzmq" = "xyes"; then
     if test -r "${with_libzmq}/include/zmq.h"; then
@@ -139,6 +159,8 @@ AC_ARG_WITH([libzmq_lib_dir],
                             [Specify libzmq library prefix])],
             [czmq_search_libzmq_lib="yes"],
             [])
+
+AC_CHECK_HEADER([zmq.h], [], [AC_MSG_ERROR([cannot find zmq.h])])
 
 AC_CHECK_LIB(zmq, zmq_init, ,[AC_MSG_ERROR([cannot link with -lzmq, install libzmq.])])
 

@@ -66,16 +66,17 @@ TESTS = $(project.name)_selftest
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
 #   Please read the README.txt file in the model directory.     #
 #################################################################
-MAN1 =
-MAN3 = \\
+.project.manpage = "$(project.name).7"
+.manpages = ""
 .for class where private?0 = 0
-.   if last ()
-    $(name).3
-.   else
-    $(name).3 \\
+.   manpages += " $(name).3"
+.   if class.name = project.name
+.       project.manpage = ""
 .   endif
 .endfor
-MAN7 = $(project.name).7
+MAN1 =
+MAN3 =$(manpages)
+MAN7 = $(project.manpage)
 MAN_DOC = $\(MAN1) $\(MAN3) $\(MAN7)
 
 MAN_TXT = $\(MAN1:%.1=%.txt)
