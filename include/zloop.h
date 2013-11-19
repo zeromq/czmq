@@ -38,6 +38,9 @@ typedef struct _zloop_t zloop_t;
 //  Callback function for reactor events
 typedef int (zloop_fn) (zloop_t *loop, zmq_pollitem_t *item, void *arg);
 
+// Callback for reactor timer events
+typedef int (zloop_timer_fn) (zloop_t *loop, int timer_id, void *arg);
+
 //  Create a new zloop reactor
 CZMQ_EXPORT zloop_t *
     zloop_new (void);
@@ -66,14 +69,15 @@ CZMQ_EXPORT void
 
 //  Register a timer that expires after some delay and repeats some number of
 //  times. At each expiry, will call the handler, passing the arg. To
-//  run a timer forever, use 0 times. Returns 0 if OK, -1 if there was an
-//  error.
+//  run a timer forever, use 0 times. Returns a timer_id that is used to cancel
+//  the timer in the future. Returns -1 if there was an error.
 CZMQ_EXPORT int
-    zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *arg);
+    zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_timer_fn handler, void *arg);
 
-//  Cancel all timers for a specific argument (as provided in zloop_timer)
+//  Cancel a specific timer identified by a specific timer_id (as returned by
+//  zloop_timer).
 CZMQ_EXPORT int
-    zloop_timer_end (zloop_t *self, void *arg);
+    zloop_timer_end (zloop_t *self, int timer_id);
 
 //  Set verbose tracing of reactor on/off
 CZMQ_EXPORT void
