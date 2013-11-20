@@ -43,6 +43,7 @@ typedef struct _s_timer_t s_timer_t;
 struct _zloop_t {
     zlist_t *pollers;           //  List of poll items
     zlist_t *timers;            //  List of timers
+    int last_timer_id;          //  Most recent timer id 
     size_t poll_size;           //  Size of poll set
     zmq_pollitem_t *pollset;    //  zmq_poll set
     s_poller_t *pollact;        //  Pollers for this poll set
@@ -61,12 +62,19 @@ struct _s_poller_t {
 };
 
 struct _s_timer_t {
-    size_t delay;
-    size_t times;
-    zloop_fn *handler;
+    int timer_id;               //  Unique timer id, used to cancel timer
+    size_t delay;               //  Delay (ms) between executing
+    size_t times;               //  Number of times to repeat, 0 for forever
+    zloop_timer_fn *handler;    //  Function to execute
     void *arg;                  //  Application argument to timer
     int64_t when;               //  Clock time when alarm goes off
 };
+
+static int
+s_next_timer_id (zloop_t *self)
+{
+    return ++self->last_timer_id;
+}
 
 static s_poller_t *
 s_poller_new (zmq_pollitem_t *item, zloop_fn handler, void *arg)
@@ -82,10 +90,11 @@ s_poller_new (zmq_pollitem_t *item, zloop_fn handler, void *arg)
 }
 
 static s_timer_t *
-s_timer_new (size_t delay, size_t times, zloop_fn handler, void *arg)
+s_timer_new (int timer_id, size_t delay, size_t times, zloop_timer_fn handler, void *arg)
 {
     s_timer_t *timer = (s_timer_t *) zmalloc (sizeof (s_timer_t));
     if (timer) {
+        timer->timer_id = timer_id;
         timer->delay = delay;
         timer->times = times;
         timer->handler = handler;
@@ -167,6 +176,7 @@ zloop_new (void)
         self->pollers = zlist_new ();
         self->timers  = zlist_new ();
         self->zombies = zlist_new ();
+        self->last_timer_id = 0;
         if (!self->pollers
         ||  !self->timers
         ||  !self->zombies) {
@@ -302,18 +312,20 @@ zloop_set_tolerant (zloop_t *self, zmq_pollitem_t *item)
 //  error.
 
 int
-zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *arg)
+zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_timer_fn handler, void *arg)
 {
     assert (self);
-    s_timer_t *timer = s_timer_new (delay, times, handler, arg);
+    int timer_id = s_next_timer_id (self);
+    s_timer_t *timer = s_timer_new (timer_id, delay, times, handler, arg);
     if (!timer)
         return -1;
     if (zlist_append (self->timers, timer))
         return -1;
     if (self->verbose)
-        zclock_log ("I: zloop: register timer delay=%d times=%d", delay, times);
+        zclock_log ("I: zloop: register timer id=%d delay=%d times=%d", 
+                    timer_id, delay, times);
     
-    return 0;
+    return timer_id;
 }
 
 
@@ -322,18 +334,20 @@ zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *
 //  Returns 0 on success.
 
 int
-zloop_timer_end (zloop_t *self, void *arg)
+zloop_timer_end (zloop_t *self, int timer_id)
 {
     assert (self);
-    assert (arg);
     
+    int *cancelled_timer_id = malloc(sizeof(int));
+    *cancelled_timer_id = timer_id;
+
     //  We cannot touch self->timers because we may be executing that
     //  from inside the poll loop. So, we hold the arg on the zombie
     //  list, and process that list when we're done executing timers.
-    if (zlist_append (self->zombies, arg))
+    if (zlist_append (self->zombies, cancelled_timer_id))
         return -1;
     if (self->verbose)
-        zclock_log ("I: zloop: cancel timer");
+        zclock_log ("I: zloop: cancel timer id=%d", timer_id);
     
     return 0;
 }
@@ -344,6 +358,7 @@ zloop_timer_end (zloop_t *self, void *arg)
 void
 zloop_set_verbose (zloop_t *self, bool verbose)
 {
+    assert (self);
     self->verbose = verbose;
 }
 
@@ -390,8 +405,8 @@ zloop_start (zloop_t *self)
         while (timer) {
             if (zclock_time () >= timer->when && timer->when != -1) {
                 if (self->verbose)
-                    zclock_log ("I: zloop: call timer handler");
-                rc = timer->handler (self, NULL, timer->arg);
+                    zclock_log ("I: zloop: call timer id=%d handler", timer->timer_id);
+                rc = timer->handler (self, timer->timer_id, timer->arg);
                 if (rc == -1)
                     break;      //  Timer handler signaled break
                 if (timer->times && --timer->times == 0) {
@@ -450,15 +465,16 @@ zloop_start (zloop_t *self)
         //  Now handle any timer zombies
         //  This is going to be slow if we have many zombies
         while (zlist_size (self->zombies)) {
-            void *arg = zlist_pop (self->zombies);
+            int *timer_id = (int*) zlist_pop (self->zombies);
             timer = (s_timer_t *) zlist_first (self->timers);
             while (timer) {
-                if (timer->arg == arg) {
+                if (timer->timer_id == *timer_id) {
                     zlist_remove (self->timers, timer);
                     free (timer);
                 }
                 timer = (s_timer_t *) zlist_next (self->timers);
             }
+            free (timer_id);
         }
         if (rc == -1)
             break;
@@ -471,7 +487,14 @@ zloop_start (zloop_t *self)
 //  Selftest
 
 static int
-s_timer_event (zloop_t *loop, zmq_pollitem_t *item, void *output)
+s_cancel_timer_event (zloop_t *loop, int timer_id, void *arg)
+{
+    int *cancel_timer_id = (int*) arg;
+    return zloop_timer_end (loop, *cancel_timer_id);
+}
+
+static int
+s_timer_event (zloop_t *loop, int timer_id, void *output)
 {
     zstr_send (output, "PING");
     return 0;
@@ -504,8 +527,12 @@ zloop_test (bool verbose)
     assert (loop);
     zloop_set_verbose (loop, verbose);
 
-    //  After 10 msecs, send a ping message to output
-    zloop_timer (loop, 10, 1, s_timer_event, output);
+    // Create a timer that will be cancelled
+    int cancel_timer_id = zloop_timer (loop, 1000, 1, s_timer_event, NULL);
+    zloop_timer (loop, 5, 1, s_cancel_timer_event, &cancel_timer_id);
+    
+    //  After 20 msecs, send a ping message to output
+    zloop_timer (loop, 20, 1, s_timer_event, output);
     
     //  When we get the ping message, end the reactor
     zmq_pollitem_t poll_input = { input, 0, ZMQ_POLLIN };

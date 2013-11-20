@@ -234,7 +234,7 @@ This is the class interface:
 
     //  Create a new beacon on a certain UDP port
     CZMQ_EXPORT zbeacon_t *
-        zbeacon_new (int port_nbr);
+        zbeacon_new (zctx_t *ctx, int port_nbr);
         
     //  Destroy a beacon
     CZMQ_EXPORT void
@@ -330,6 +330,11 @@ This is the class interface:
     //  exist, returns NULL.
     CZMQ_EXPORT char *
         zcert_meta (zcert_t *self, char *name);
+    
+    //  Get list of metadata fields from certificate. Caller is responsible for
+    //  destroying list. Caller should not modify the values of list items.
+    CZMQ_EXPORT zlist_t *
+        zcert_meta_keys (zcert_t *self);
     
     //  Load certificate from file (constructor)
     //  The filename is treated as a printf format specifier.
@@ -683,6 +688,23 @@ This is the class interface:
     CZMQ_EXPORT void
         zdir_remove (zdir_t *self, bool force);
     
+    //  Calculate differences between two versions of a directory tree.
+    //  Returns a list of zdir_patch_t patches. Either older or newer may
+    //  be null, indicating the directory is empty/absent. If alias is set,
+    //  generates virtual filename (minus path, plus alias).
+    CZMQ_EXPORT zlist_t *
+        zdir_diff (zdir_t *older, zdir_t *newer, char *alias);
+    
+    //  Return full contents of directory as a zdir_patch list.
+    CZMQ_EXPORT zlist_t *
+        zdir_resync (zdir_t *self, char *alias);
+    
+    //  Load directory cache; returns a hash table containing the SHA-1 digests
+    //  of every file in the tree. The cache is saved between runs in .cache.
+    //  The caller must destroy the hash table when done with it.
+    CZMQ_EXPORT zhash_t *
+        zdir_cache (zdir_t *self);
+    
     //  Self test of this class
     CZMQ_EXPORT int
         zdir_test (bool verbose);
@@ -795,6 +817,11 @@ This is the class interface:
     //  Return file handle, if opened
     CZMQ_EXPORT FILE *
         zfile_handle (zfile_t *self);
+    
+    //  Calculate SHA1 digest for file, using zdigest class. Caller should not
+    //  modify digest.
+    CZMQ_EXPORT char *
+        zfile_digest (zfile_t *self);
     
     //  Self test of this class
     CZMQ_EXPORT int
@@ -1024,6 +1051,19 @@ This is the class interface:
     CZMQ_EXPORT void
         zhash_autofree (zhash_t *self);
         
+    //  Serialize hash table to a binary frame that can be sent in a message.
+    //  The packed format is compatible with the 'dictionary' type defined in
+    //  rfc.zeromq.org/spec:19/FILEMQ. Comments are not included in the packed
+    //  data. Item values MUST be strings.
+    CZMQ_EXPORT zframe_t *
+        zhash_pack (zhash_t *self);
+        
+    //  Unpack binary frame into a new hash table. Packed data must follow format
+    //  defined by zhash_pack. Hash table is set to autofree. An empty frame
+    //  unpacks to an empty hash table.
+    zhash_t *
+        zhash_unpack (zframe_t *frame);
+    
     //  Self test of this class
     CZMQ_EXPORT void
         zhash_test (int verbose);
@@ -1088,7 +1128,9 @@ This is the class interface:
     CZMQ_EXPORT void
         zlist_remove (zlist_t *self, void *item);
     
-    //  Copy the entire list, return the copy
+    //  Make a copy of list. If the list has autofree set, the copied list will
+    //  duplicate all items, which must be strings. Otherwise, the list will hold
+    //  pointers back to the items in the original list.
     CZMQ_EXPORT zlist_t *
         zlist_dup (zlist_t *self);
     
@@ -1096,11 +1138,19 @@ This is the class interface:
     CZMQ_EXPORT size_t
         zlist_size (zlist_t *self);
     
-    //  Sort list
+    //  Sort the list by ascending key value using a straight ASCII comparison.
+    //  The sort is not stable, so may reorder items with the same keys.
     CZMQ_EXPORT void
         zlist_sort (zlist_t *self, zlist_compare_fn *compare);
     
-    //  Set list for automatic item destruction
+    //  Set list for automatic item destruction; item values MUST be strings.
+    //  By default a list item refers to a value held elsewhere. When you set
+    //  this, each time you append or push a list item, zlist will take a copy
+    //  of the string value. Then, when you destroy the list, it will free all
+    //  item values automatically. If you use any other technique to allocate
+    //  list values, you must free them explicitly before destroying the list.
+    //  The usual technique is to pop list items and destroy them, until the
+    //  list is empty.
     CZMQ_EXPORT void
         zlist_autofree (zlist_t *self);
     
@@ -1123,6 +1173,9 @@ This is the class interface:
 
     //  Callback function for reactor events
     typedef int (zloop_fn) (zloop_t *loop, zmq_pollitem_t *item, void *arg);
+    
+    // Callback for reactor timer events
+    typedef int (zloop_timer_fn) (zloop_t *loop, int timer_id, void *arg);
     
     //  Create a new zloop reactor
     CZMQ_EXPORT zloop_t *
@@ -1152,14 +1205,15 @@ This is the class interface:
     
     //  Register a timer that expires after some delay and repeats some number of
     //  times. At each expiry, will call the handler, passing the arg. To
-    //  run a timer forever, use 0 times. Returns 0 if OK, -1 if there was an
-    //  error.
+    //  run a timer forever, use 0 times. Returns a timer_id that is used to cancel
+    //  the timer in the future. Returns -1 if there was an error.
     CZMQ_EXPORT int
-        zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *arg);
+        zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_timer_fn handler, void *arg);
     
-    //  Cancel all timers for a specific argument (as provided in zloop_timer)
+    //  Cancel a specific timer identified by a specific timer_id (as returned by
+    //  zloop_timer).
     CZMQ_EXPORT int
-        zloop_timer_end (zloop_t *self, void *arg);
+        zloop_timer_end (zloop_t *self, int timer_id);
     
     //  Set verbose tracing of reactor on/off
     CZMQ_EXPORT void
@@ -1209,7 +1263,8 @@ This is the class interface:
     
 
 This class wraps the ZMQ socket monitor API, see zmq_socket_monitor for
-details.
+details. Currently this class requires libzmq v4.0 or later and is empty
+on older versions of libzmq.
 
 <A name="toc4-298" title="zmsg - working with multipart messages" />
 #### zmsg - working with multipart messages
@@ -1415,7 +1470,7 @@ This is the class interface:
 <A name="toc4-320" title="zpoller - trivial socket poller class" />
 #### zpoller - trivial socket poller class
 
-The zpoller class provides a minimalist interface to ZeroMQ's zmq_poll 
+The zpoller class provides a minimalist interface to ZeroMQ's zmq_poll
 API, for the very common case of reading from a number of sockets.
 It does not provide polling for output, nor polling on file handles.
 If you need either of these, use the zmq_poll API directly.
@@ -1430,10 +1485,17 @@ This is the class interface:
     CZMQ_EXPORT void
         zpoller_destroy (zpoller_t **self_p);
     
+    // Add a reader to be polled.
+    CZMQ_EXPORT int
+        zpoller_add (zpoller_t *self, void *reader);
+    
     //  Poll the registered readers for I/O, return first socket that has input.
     //  This means the order that sockets are defined in the poll list affects
     //  their priority. If you need a balanced poll, use the low level zmq_poll
-    //  method directly.
+    //  method directly. If the poll call was interrupted (SIGINT), or the ZMQ
+    //  context was destroyed, or the timeout expired, returns NULL. You can
+    //  test the actual exit condition by calling zpoller_expired () and
+    //  zpoller_terminated (). Timeout is in msec.
     CZMQ_EXPORT void *
         zpoller_wait (zpoller_t *self, int timeout);
     
@@ -1455,48 +1517,49 @@ This is the class interface:
 <A name="toc4-331" title="zproxy - convenient zmq_proxy API" />
 #### zproxy - convenient zmq_proxy API
 
-The zproxy class simplifies working with the zmq_proxy api.
+The zproxy class simplifies working with the zmq_proxy API.
 
 This is the class interface:
 
     //  Create a new zproxy object
-    CZMQ_EXPORT zproxy_t* 
-        zproxy_new (zctx_t *ctx, int zproxy_type, const char *frontend_addr,
-                const char *backend_addr, const char *capture_addr);
+    CZMQ_EXPORT zproxy_t *
+        zproxy_new (zctx_t *ctx, int zproxy_type);
     
     //  Destroy a zproxy object
     CZMQ_EXPORT void
         zproxy_destroy (zproxy_t **self_p);
     
-    // Start a zproxy object
+    //  Start and zmq_proxy in an attached thread, binding to endpoints
+    //  Returns 0 if OK, -1 if there was an error
     CZMQ_EXPORT int
-        zproxy_start (zproxy_t *self);
+        zproxy_bind (zproxy_t *self, const char *frontend_addr,
+                const char *backend_addr, const char *capture_addr);
     
-    // Get zproxy type
+    //  Get zproxy type
     CZMQ_EXPORT int
         zproxy_type (zproxy_t *self);
     
-    // Get zproxy frontend address
+    //  Get zproxy frontend address
     CZMQ_EXPORT char *
         zproxy_frontend_addr (zproxy_t *self);
     
-    // Get zproxy frontend type
+    //  Get zproxy frontend type
     CZMQ_EXPORT int
         zproxy_frontend_type (zproxy_t *self);
     
-    // Get zproxy backend address
+    //  Get zproxy backend address
     CZMQ_EXPORT char *
         zproxy_backend_addr (zproxy_t *self);
     
-    // Get zproxy backend type
+    //  Get zproxy backend type
     CZMQ_EXPORT int
         zproxy_backend_type (zproxy_t *self);
     
-    // Get zproxy capture address
+    //  Get zproxy capture address
     CZMQ_EXPORT char *
         zproxy_capture_addr (zproxy_t *self);
     
-    // Get zproxy capture type
+    //  Get zproxy capture type
     CZMQ_EXPORT int
         zproxy_capture_type (zproxy_t *self);
     
@@ -1504,6 +1567,10 @@ This is the class interface:
     CZMQ_EXPORT int
         zproxy_test (bool verbose);
 
+If we used a steerable proxy we could do termination better, and
+allow creation/termination of proxies without destroying contexts.
+Then, zproxy_destroy would send the proxy task a KILL message and
+wait for an OK response, then return to the caller.
 
 <A name="toc4-342" title="zsocket - working with ØMQ sockets" />
 #### zsocket - working with ØMQ sockets
