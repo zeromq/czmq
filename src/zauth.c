@@ -250,8 +250,6 @@ zap_request_new (void *handler)
     else
     if (streq (self->mechanism, "GSSAPI")) {
         self->principle = zmsg_popstr (request);
-
-    printf ("principle=%s\n", self->principle);
     }
     zmsg_destroy (&request);
     return self;
