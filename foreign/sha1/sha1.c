@@ -34,7 +34,6 @@
  */
 
 #include "../../include/czmq.h"
-#include <sys/param.h>
 #include "sha1.h"
 
 /* constant table */
