@@ -315,5 +315,10 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
     free (zstr_recv (pipe));
     zstr_send (pipe, "OK");
 
+#if (ZMQ_VERSION_MAJOR >= 30201)
+    //  zmq_proxy was introduced in libzmq 3.2.1
     zmq_proxy (self->frontend, self->backend, self->capture);
+#else
+    zmq_device (ZMQ_QUEUE, self->frontend, self->backend);
+#endif
 }
