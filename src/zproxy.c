@@ -267,12 +267,14 @@ zproxy_test (bool verbose)
     assert (streq ("STREAMER_TEST", back_resp));
     free (back_resp);
     
+#if (ZMQ_VERSION >= 30201)
     char *capture_resp = zstr_recv (capture_s);
     assert (capture_resp);
     assert (capture_resp);
     assert (streq ("STREAMER_TEST", capture_resp));
     free (capture_resp);
-   
+#endif
+
     //  Destroying the context will stop the proxy, see note at
     //  start of source about using zmq_proxy_steerable instead.
     //  The sleep here is to ensure memory is freed so valgrind
@@ -315,5 +317,10 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
     free (zstr_recv (pipe));
     zstr_send (pipe, "OK");
 
+#if (ZMQ_VERSION >= 30201)
+    //  zmq_proxy was introduced in libzmq 3.2.1
     zmq_proxy (self->frontend, self->backend, self->capture);
+#else
+    zmq_device (ZMQ_QUEUE, self->frontend, self->backend);
+#endif
 }

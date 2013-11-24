@@ -75,13 +75,15 @@ struct _zcert_t {
 zcert_t *
 zcert_new (void)
 {
+#if defined (HAVE_LIBSODIUM)
     byte public_key [32] = { 0 };
     byte secret_key [32] = { 0 };
-#if defined (HAVE_LIBSODIUM)
     int rc = crypto_box_keypair (public_key, secret_key);
     assert (rc == 0);
-#endif
     return zcert_new_from (public_key, secret_key);
+#else
+    return NULL;
+#endif
 }
 
 
@@ -431,6 +433,7 @@ zcert_test (bool verbose)
     
     //  Create a simple certificate with metadata
     zcert_t *cert = zcert_new ();
+#   if defined (HAVE_LIBSODIUM)
     zcert_set_meta (cert, "email", "ph@imatix.com");
     zcert_set_meta (cert, "name", "Pieter Hintjens");
     zcert_set_meta (cert, "organization", "iMatix Corporation");
@@ -465,6 +468,10 @@ zcert_test (bool verbose)
         "0000000000000000000000000000000000000000"));
     zcert_destroy (&shadow);
     zcert_destroy (&cert);
+#   else
+    //  Libsodium isn't installed; should have returned NULL
+    assert (cert == NULL);
+#   endif
     
     //  Delete all test files
     zdir_t *dir = zdir_new (TESTDIR, NULL);

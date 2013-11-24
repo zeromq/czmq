@@ -35,29 +35,18 @@
 */
 
 #include "../include/czmq.h"
-#include "platform.h"
-
-#if defined (HAVE_LIBCRYPTO)
-#   if defined(__APPLE__)
-#       define COMMON_DIGEST_FOR_OPENSSL
-#       include <CommonCrypto/CommonDigest.h>
-#       define SHA1 CC_SHA1
-#   else
-#       include <openssl/sha.h>
-#   endif
-#endif
+// #include "../foreign/sha1/sha1.h"
+#include "../foreign/sha1/sha1.c"
 
 
 //  Structure of our class
 
 struct _zdigest_t {
-#if defined (HAVE_LIBCRYPTO)
     SHA_CTX context;            //  Digest context
     //  Binary hash
     byte hash [SHA_DIGEST_LENGTH];
     //  ASCII representation (hex)
     char string [SHA_DIGEST_LENGTH * 2 + 1];
-#endif
     bool final;                 //  Finished calculating
 };
 
@@ -70,11 +59,7 @@ zdigest_t *
 zdigest_new (void)
 {
     zdigest_t *self = (zdigest_t *) zmalloc (sizeof (zdigest_t));
-#if defined (HAVE_LIBCRYPTO)
     SHA1_Init (&self->context);
-#else
-    self->final = true;
-#endif
     return self;
 }
 
@@ -102,12 +87,10 @@ zdigest_update (zdigest_t *self, byte *buffer, size_t length)
 {
     //  Calling this after zdigest_data() is illegal use of the API
     assert (self);
-#if defined (HAVE_LIBCRYPTO)
     assert (!self->final);
     //  Buffer has to be on 64-bit boundary
     assert (((long) buffer & 7L) == 0);
     SHA1_Update (&self->context, buffer, length);
-#endif
 }
 
 
@@ -119,15 +102,11 @@ byte *
 zdigest_data (zdigest_t *self)
 {
     assert (self);
-#if defined (HAVE_LIBCRYPTO)
     if (!self->final) {
         SHA1_Final (self->hash, &self->context);
         self->final = true;
     }
     return self->hash;
-#else
-    return NULL;
-#endif
 }
 
 
@@ -138,11 +117,7 @@ size_t
 zdigest_size (zdigest_t *self)
 {
     assert (self);
-#if defined (HAVE_LIBCRYPTO)
     return SHA_DIGEST_LENGTH;
-#else
-    return 0;
-#endif
 }
 
 
@@ -155,7 +130,6 @@ char *
 zdigest_string (zdigest_t *self)
 {
     assert (self);
-#if defined (HAVE_LIBCRYPTO)
     byte *data = zdigest_data (self);
     char hex_char [] = "0123456789ABCDEF";
     int byte_nbr;
@@ -165,9 +139,6 @@ zdigest_string (zdigest_t *self)
     }
     self->string [SHA_DIGEST_LENGTH * 2] = 0;
     return self->string;
-#else
-    return NULL;
-#endif
 }
 
 
@@ -184,7 +155,6 @@ zdigest_test (bool verbose)
     memset (buffer, 0xAA, 1024);
     
     zdigest_t *digest = zdigest_new ();
-#if defined (HAVE_LIBCRYPTO)
     zdigest_update (digest, buffer, 1024);
     byte *data = zdigest_data (digest);
     assert (data [0] == 0xDE);
@@ -193,11 +163,6 @@ zdigest_test (bool verbose)
     assert (data [3] == 0x07);
     assert (streq (zdigest_string (digest),
         "DEB23807D4FE025E900FE9A9C7D8410C3DDE9671"));
-#else
-    assert (zdigest_size (digest) == 0);
-    assert (zdigest_data (digest) == NULL);
-    assert (zdigest_string (digest) == NULL);
-#endif
     zdigest_destroy (&digest);
     free (buffer);
     //  @end

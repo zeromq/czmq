@@ -37,4 +37,7 @@ EXTRA_DIST = \
 	foreign/trex/test.c \
 	foreign/trex/trex.c \
 	foreign/trex/trex.h \
-	foreign/trex/TRexpp.h
+	foreign/trex/TRexpp.h \
+	foreign/sha1/sha1.c \
+	foreign/sha1/sha1.h
+

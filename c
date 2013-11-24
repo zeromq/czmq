@@ -170,7 +170,7 @@ if [ "$CCNAME" = "gcc" ]; then
     #
     if [ "$UTYPE" = "Linux" ]; then
         #  Use -start-group / -end-group for linking
-        STDLIBS="$STDLIBS -lrt -lcrypt"
+        STDLIBS="$STDLIBS -lrt -lcrypt -luuid"
         LINKTYPE="gnu"
     #
     #  Darwin-specific subsection
