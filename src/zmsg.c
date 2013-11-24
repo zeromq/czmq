@@ -612,7 +612,7 @@ zmsg_fprint (zmsg_t *self, FILE *file)
     zframe_t *frame = zmsg_first (self);
     int frame_nbr = 0;
     while (frame && frame_nbr++ < 10) {
-        zframe_print_to_stream(frame, NULL, file);
+        zframe_fprint (frame, NULL, file);
         frame = zmsg_next (self);
     }
 }
