@@ -16,7 +16,8 @@
         <option name = "ipv4only"          type = "int"    mode = "rw" test = "SUB" />
         <option name = "delay_attach_on_connect"
                                            type = "int"    mode = "w"  test = "PUB" />
-        
+        <option name = "tos"               type = "int"    mode = "rw" test = "DEALER" />
+
         <!-- Options that are new in 4.0 -->
         <option name = "router_mandatory"  type = "int"    mode = "w"  test = "ROUTER">
             <restrict type = "ROUTER" />
