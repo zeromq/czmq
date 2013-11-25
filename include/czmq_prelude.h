@@ -9,16 +9,16 @@
     http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the 
-    Free Software Foundation; either version 3 of the License, or (at your 
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
     This software is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL-
-    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General 
+    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General
     Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public License 
+    You should have received a copy of the GNU Lesser General Public License
     along with this program. If not, see <http://www.gnu.org/licenses/>.
     =========================================================================
 */
@@ -342,6 +342,15 @@
 #   endif
 #endif
 
+// Add missing defines for Android.
+#if (!defined (S_IREAD))
+#   define S_IREAD S_IRUSR
+#endif
+
+#if (!defined (S_IWRITE))
+#   define S_IWRITE S_IWUSR
+#endif
+
 //- Check compiler data type sizes ------------------------------------------
 
 #if (UCHAR_MAX != 0xFF)
@@ -399,14 +408,14 @@ typedef unsigned int    qbyte;          //  Quad byte = 32 bits
 #   endif
     typedef unsigned long ulong;
     typedef unsigned int  uint;
-#   if (!defined (__MINGW32__)) 
+#   if (!defined (__MINGW32__))
     typedef int mode_t;
     typedef __int32 int32_t;
     typedef __int64 int64_t;
     typedef unsigned __int32 uint32_t;
     typedef unsigned __int64 uint64_t;
     typedef long ssize_t;
-#   endif 
+#   endif
 #   if (!defined (va_copy))
     //  MSVC does not support C99's va_copy so we use a regular assignment
 #       define va_copy(dest,src) (dest) = (src)
