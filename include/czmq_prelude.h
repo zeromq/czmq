@@ -343,13 +343,15 @@
 #endif
 
 // Add missing defines for Android.
-#if (!defined (S_IREAD))
-#   define S_IREAD S_IRUSR
+#if (defined (__UTYPE_ANDROID))
+#   if (!defined (S_IREAD))
+#      define S_IREAD S_IRUSR
+#   endif
+#   if (!defined (S_IWRITE))
+#      define S_IWRITE S_IWUSR
+#   endif
 #endif
 
-#if (!defined (S_IWRITE))
-#   define S_IWRITE S_IWUSR
-#endif
 
 //- Check compiler data type sizes ------------------------------------------
 
