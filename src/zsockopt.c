@@ -153,6 +153,38 @@ zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect)
 
 
 //  --------------------------------------------------------------------------
+//  Set socket ZMQ_TOS value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsocket_set_tos (void *zocket, int tos)
+{
+#   if defined (ZMQ_TOS)
+    int rc = zmq_setsockopt (zocket, ZMQ_TOS, &tos, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_TOS value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int 
+zsocket_tos (void *zocket)
+{
+#   if defined (ZMQ_TOS)
+    int tos;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zocket, ZMQ_TOS, &tos, &option_len);
+    return tos;
+#   else
+    return 0;
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
 //  Set socket ZMQ_ROUTER_MANDATORY value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
@@ -2979,6 +3011,14 @@ zsockopt_test (bool verbose)
     zocket = zsocket_new (ctx, ZMQ_PUB);
     assert (zocket);
     zsocket_set_delay_attach_on_connect (zocket, 1);
+    zsocket_destroy (ctx, zocket);
+#     endif
+#     if defined (ZMQ_TOS)
+    zocket = zsocket_new (ctx, ZMQ_DEALER);
+    assert (zocket);
+    zsocket_set_tos (zocket, 1);
+    assert (zsocket_tos (zocket) == 1);
+    zsocket_tos (zocket);
     zsocket_destroy (ctx, zocket);
 #     endif
 #     if defined (ZMQ_ROUTER_MANDATORY)

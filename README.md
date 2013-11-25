@@ -1655,6 +1655,7 @@ This is the class interface:
     //  Get socket options
     CZMQ_EXPORT int zsocket_ipv6 (void *zocket);
     CZMQ_EXPORT int zsocket_ipv4only (void *zocket);
+    CZMQ_EXPORT int zsocket_tos (void *zocket);
     CZMQ_EXPORT int zsocket_probe_router (void *zocket);
     CZMQ_EXPORT int zsocket_plain_server (void *zocket);
     CZMQ_EXPORT char * zsocket_plain_username (void *zocket);
@@ -1697,6 +1698,7 @@ This is the class interface:
     CZMQ_EXPORT void zsocket_set_router_raw (void *zocket, int router_raw);
     CZMQ_EXPORT void zsocket_set_ipv4only (void *zocket, int ipv4only);
     CZMQ_EXPORT void zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect);
+    CZMQ_EXPORT void zsocket_set_tos (void *zocket, int tos);
     CZMQ_EXPORT void zsocket_set_router_mandatory (void *zocket, int router_mandatory);
     CZMQ_EXPORT void zsocket_set_req_relaxed (void *zocket, int req_relaxed);
     CZMQ_EXPORT void zsocket_set_req_correlate (void *zocket, int req_correlate);
