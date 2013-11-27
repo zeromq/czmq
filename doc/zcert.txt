@@ -120,6 +120,7 @@ EXAMPLE
     
     //  Create a simple certificate with metadata
     zcert_t *cert = zcert_new ();
+#   if defined (HAVE_LIBSODIUM)
 ----
 
 SEE ALSO

@@ -57,6 +57,7 @@ CZMQ_EXPORT void zsocket_set_ipv4only (void *zocket, int ipv4only);
 CZMQ_EXPORT void zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect);
 CZMQ_EXPORT void zsocket_set_tos (void *zocket, int tos);
 CZMQ_EXPORT void zsocket_set_router_mandatory (void *zocket, int router_mandatory);
+CZMQ_EXPORT void zsocket_set_probe_router (void *zocket, int probe_router);
 CZMQ_EXPORT void zsocket_set_req_relaxed (void *zocket, int req_relaxed);
 CZMQ_EXPORT void zsocket_set_req_correlate (void *zocket, int req_correlate);
 CZMQ_EXPORT void zsocket_set_conflate (void *zocket, int conflate);
@@ -287,6 +288,8 @@ EXAMPLE
 #     if defined (ZMQ_PROBE_ROUTER)
     zocket = zsocket_new (ctx, ZMQ_DEALER);
     assert (zocket);
+    zsocket_set_probe_router (zocket, 1);
+    assert (zsocket_probe_router (zocket) == 1);
     zsocket_probe_router (zocket);
     zsocket_destroy (ctx, zocket);
 #     endif

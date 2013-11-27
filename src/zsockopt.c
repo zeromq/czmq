@@ -203,19 +203,21 @@ zsocket_set_router_mandatory (void *zocket, int router_mandatory)
 
 
 //  --------------------------------------------------------------------------
-//  Return socket ZMQ_PROBE_ROUTER value
+//  Set socket ZMQ_PROBE_ROUTER value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
-zsocket_probe_router (void *zocket)
+void
+zsocket_set_probe_router (void *zocket, int probe_router)
 {
 #   if defined (ZMQ_PROBE_ROUTER)
-    int probe_router;
-    size_t option_len = sizeof (int);
-    zmq_getsockopt (zocket, ZMQ_PROBE_ROUTER, &probe_router, &option_len);
-    return probe_router;
-#   else
-    return 0;
+    if (zsocket_type (zocket) != ZMQ_ROUTER
+    &&  zsocket_type (zocket) != ZMQ_DEALER
+    &&  zsocket_type (zocket) != ZMQ_REQ) {
+        printf ("ZMQ_PROBE_ROUTER is not valid on %s sockets\n", zsocket_type_str (zocket));
+        assert (false);
+    }
+    int rc = zmq_setsockopt (zocket, ZMQ_PROBE_ROUTER, &probe_router, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -3030,7 +3032,7 @@ zsockopt_test (bool verbose)
 #     if defined (ZMQ_PROBE_ROUTER)
     zocket = zsocket_new (ctx, ZMQ_DEALER);
     assert (zocket);
-    zsocket_probe_router (zocket);
+    zsocket_set_probe_router (zocket, 1);
     zsocket_destroy (ctx, zocket);
 #     endif
 #     if defined (ZMQ_REQ_RELAXED)
