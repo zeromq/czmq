@@ -41,7 +41,6 @@ extern "C" {
 CZMQ_EXPORT int zsocket_ipv6 (void *zocket);
 CZMQ_EXPORT int zsocket_ipv4only (void *zocket);
 CZMQ_EXPORT int zsocket_tos (void *zocket);
-CZMQ_EXPORT int zsocket_probe_router (void *zocket);
 CZMQ_EXPORT int zsocket_plain_server (void *zocket);
 CZMQ_EXPORT char * zsocket_plain_username (void *zocket);
 CZMQ_EXPORT char * zsocket_plain_password (void *zocket);

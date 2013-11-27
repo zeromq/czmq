@@ -22,7 +22,7 @@
         <option name = "router_mandatory"  type = "int"    mode = "w"  test = "ROUTER">
             <restrict type = "ROUTER" />
         </option>
-        <option name = "probe_router"      type = "int"    mode = "rw" test = "DEALER">
+        <option name = "probe_router"      type = "int"    mode = "w"  test = "DEALER">
             <restrict type = "ROUTER" />
             <restrict type = "DEALER" />
             <restrict type = "REQ" />

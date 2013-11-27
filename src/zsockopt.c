@@ -223,24 +223,6 @@ zsocket_set_probe_router (void *zocket, int probe_router)
 
 
 //  --------------------------------------------------------------------------
-//  Return socket ZMQ_PROBE_ROUTER value
-//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
-
-int 
-zsocket_probe_router (void *zocket)
-{
-#   if defined (ZMQ_PROBE_ROUTER)
-    int probe_router;
-    size_t option_len = sizeof (int);
-    zmq_getsockopt (zocket, ZMQ_PROBE_ROUTER, &probe_router, &option_len);
-    return probe_router;
-#   else
-    return 0;
-#   endif
-}
-
-
-//  --------------------------------------------------------------------------
 //  Set socket ZMQ_REQ_RELAXED value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
@@ -3051,8 +3033,6 @@ zsockopt_test (bool verbose)
     zocket = zsocket_new (ctx, ZMQ_DEALER);
     assert (zocket);
     zsocket_set_probe_router (zocket, 1);
-    assert (zsocket_probe_router (zocket) == 1);
-    zsocket_probe_router (zocket);
     zsocket_destroy (ctx, zocket);
 #     endif
 #     if defined (ZMQ_REQ_RELAXED)
