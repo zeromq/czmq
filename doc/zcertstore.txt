@@ -79,6 +79,7 @@ EXAMPLE
     //  Load certificate store from disk; it will be empty
     zcertstore_t *certstore = zcertstore_new ("%s", TESTDIR);
     
+#   if defined (HAVE_LIBSODIUM)
     //  Create a single new certificate and save to disk
     zcert_t *cert = zcert_new ();
     char *client_key = strdup (zcert_public_txt (cert));
@@ -91,11 +92,11 @@ EXAMPLE
     assert (cert);
     assert (streq (zcert_meta (cert, "name"), "John Doe"));
     free (client_key);
+#   endif
     if (verbose)
         zcertstore_dump (certstore);
-        
     zcertstore_destroy (&certstore);
-    
+
     //  Delete all test files
     zdir_t *dir = zdir_new (TESTDIR, NULL);
     zdir_remove (dir, true);
