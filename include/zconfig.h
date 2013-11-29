@@ -111,9 +111,13 @@ CZMQ_EXPORT zconfig_t *
 CZMQ_EXPORT int
     zconfig_save (zconfig_t *self, char *filename);
 
-//  Dump the config file to stderr for tracing
+//  Print the config file to open stream
 CZMQ_EXPORT void
-    zconfig_dump (zconfig_t *self);
+    zconfig_fprint (zconfig_t *self, FILE *file);
+
+//  Print the config file to stdout
+CZMQ_EXPORT void
+    zconfig_print (zconfig_t *self);
 
 //  Self test of this class
 void
@@ -122,5 +126,8 @@ void
 #ifdef __cplusplus
 }
 #endif
+
+//  Deprecated method aliases
+#define zconfig_dump(s) zconfig_print(s)
 
 #endif

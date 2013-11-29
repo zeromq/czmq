@@ -396,25 +396,34 @@ zcert_eq (zcert_t *self, zcert_t *compare)
 }
 
 
-//  --------------------------------------------------------------------------
-//  Dump certificate contents to stderr for debugging
-
 static int
-s_dump_metadata (const char *name, void *value, void *args)
+s_print_metadata (const char *name, void *value, void *args)
 {
-    fprintf (stderr, "    %s = \"%s\"\n", name, (char *) value);
+    fprintf ((FILE *) args, "    %s = \"%s\"\n", name, (char *) value);
     return 0;
 }
 
+//  --------------------------------------------------------------------------
+//  Print certificate contents to open stream
+
 void
-zcert_dump (zcert_t *self)
+zcert_fprint (zcert_t *self, FILE *file)
 {
     assert (self);
-    fprintf (stderr, "metadata\n");
-    zhash_foreach (self->metadata, s_dump_metadata, NULL);
-    fprintf (stderr, "curve\n");
-    fprintf (stderr, "    public-key = \"%s\"\n", self->public_txt);
-    fprintf (stderr, "    secret-key = \"%s\"\n", self->secret_txt);
+    fprintf (file, "metadata\n");
+    zhash_foreach (self->metadata, s_print_metadata, file);
+    fprintf (file, "curve\n");
+    fprintf (file, "    public-key = \"%s\"\n", self->public_txt);
+    fprintf (file, "    secret-key = \"%s\"\n", self->secret_txt);
+}
+
+//  --------------------------------------------------------------------------
+//  Print certificate contents to stdout
+
+void
+zcert_print (zcert_t *self)
+{
+    zcert_fprint (self, stdout);
 }
 
 

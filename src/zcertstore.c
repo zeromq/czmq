@@ -202,22 +202,31 @@ zcertstore_insert (zcertstore_t *self, zcert_t **cert_p)
 
 
 //  --------------------------------------------------------------------------
-//  Print out list of certificates in store to stdout, for debugging
-//  purposes.
+//  Print list of certificates in store to open stream
 
 void
-zcertstore_dump (zcertstore_t *self)
+zcertstore_fprint (zcertstore_t *self, FILE *file)
 {
     if (self->location)
-        printf ("Certificate store at %s:\n", self->location);
+        fprintf (file, "Certificate store at %s:\n", self->location);
     else
-        printf ("Certificate store\n");
-        
+        fprintf (file, "Certificate store\n");
+
     zcert_t *cert = (zcert_t *) zlist_first (self->cert_list);
     while (cert) {
-        zcert_dump (cert);
+        zcert_fprint (cert, file);
         cert = (zcert_t *) (zcert_t *) zlist_next (self->cert_list);
     }
+}
+
+
+//  --------------------------------------------------------------------------
+//  Print list of certificates in store to stdout
+
+void
+zcertstore_print (zcertstore_t *self)
+{
+    zcertstore_fprint (self, stdout);
 }
 
 
@@ -252,7 +261,7 @@ zcertstore_test (bool verbose)
     free (client_key);
 #   endif
     if (verbose)
-        zcertstore_dump (certstore);
+        zcertstore_print (certstore);
     zcertstore_destroy (&certstore);
 
     //  Delete all test files

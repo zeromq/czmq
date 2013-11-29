@@ -61,10 +61,13 @@ CZMQ_EXPORT zcert_t *
 CZMQ_EXPORT void
     zcertstore_insert (zcertstore_t *self, zcert_t **cert_p);
 
-//  Print out list of certificates in store to stdout, for debugging
-//  purposes.
+//  Print list of certificates in store to open stream
 CZMQ_EXPORT void
-    zcertstore_dump (zcertstore_t *self);
+    zcertstore_fprint (zcertstore_t *self, FILE *file);
+
+//  Print list of certificates in store to stdout
+CZMQ_EXPORT void
+    zcertstore_print (zcertstore_t *self);
 
 //  Self test of this class
 CZMQ_EXPORT int
@@ -74,5 +77,8 @@ CZMQ_EXPORT int
 #ifdef __cplusplus
 }
 #endif
+
+//  Deprecated method aliases
+#define zcertstore_dump(s) zcertstore_print(s)
 
 #endif
