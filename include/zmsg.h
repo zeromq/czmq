@@ -172,16 +172,14 @@ CZMQ_EXPORT zmsg_t *
 CZMQ_EXPORT zmsg_t *
     zmsg_dup (zmsg_t *self);
 
-//  Dump message to stderr, for debugging and tracing.
-//  See zmsg_dump_to_stream() for details
+//  Print message to open stream
+//  Truncates to first 10 frames, for readability.
 CZMQ_EXPORT void
-    zmsg_dump (zmsg_t *self);
+    zmsg_fprint (zmsg_t *self, FILE *file);
 
-//  Dump message to FILE stream, for debugging and tracing. 
-//  Truncates to first 10 frames, for readability; this may be unfortunate
-//  when debugging larger and more complex messages.
+//  Print message to stdout
 CZMQ_EXPORT void
-    zmsg_dump_to_stream (zmsg_t *self, FILE *file);
+    zmsg_print (zmsg_t *self);
 
 //  Self test of this class
 CZMQ_EXPORT int
@@ -191,5 +189,9 @@ CZMQ_EXPORT int
 #ifdef __cplusplus
 }
 #endif
+
+//  Deprecated method aliases
+#define zmsg_dump(s) zmsg_print(s)
+#define zmsg_dump_to_stream(s,F) zmsg_fprint(s,F)
 
 #endif

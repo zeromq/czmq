@@ -107,9 +107,13 @@ CZMQ_EXPORT zcert_t *
 CZMQ_EXPORT bool
     zcert_eq (zcert_t *self, zcert_t *compare);
 
-//  Dump certificate contents to stderr for debugging
+//  Print certificate contents to open stream
 CZMQ_EXPORT void
-    zcert_dump (zcert_t *self);
+    zcert_fprint (zcert_t *self, FILE *file);
+
+//  Print certificate contents to stdout
+CZMQ_EXPORT void
+    zcert_print (zcert_t *self);
 
 //  Self test of this class
 CZMQ_EXPORT int
@@ -119,5 +123,8 @@ CZMQ_EXPORT int
 #ifdef __cplusplus
 }
 #endif
+
+//  Deprecated method aliases
+#define zcert_dump(s) zcert_print(s)
 
 #endif

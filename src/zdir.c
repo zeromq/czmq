@@ -345,26 +345,6 @@ zdir_flatten_free (zfile_t ***files_p)
 
 
 //  --------------------------------------------------------------------------
-//  Print contents of directory
-
-void
-zdir_dump (zdir_t *self, int indent)
-{
-    assert (self);
-
-    zfile_t **files = zdir_flatten (self);
-    uint index;
-    for (index = 0;; index++) {
-        zfile_t *file = files [index];
-        if (!file)
-            break;
-        puts (zfile_filename (file, NULL));
-    }
-    zdir_flatten_free (&files);
-}
-
-
-//  --------------------------------------------------------------------------
 //  Remove directory, optionally including all files that it contains, at
 //  all levels. If force is false, will only remove the directory if empty.
 //  If force is true, will remove all files and all subdirectories.
@@ -519,6 +499,36 @@ zdir_cache (zdir_t *self)
     zhash_save (cache, cache_file);
     free (cache_file);
     return cache;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Print contents of directory to open stream
+
+void
+zdir_fprint (zdir_t *self, FILE *stream, int indent)
+{
+    assert (self);
+
+    zfile_t **files = zdir_flatten (self);
+    uint index;
+    for (index = 0;; index++) {
+        zfile_t *file = files [index];
+        if (!file)
+            break;
+        fprintf (stream, "%s\n", zfile_filename (file, NULL));
+    }
+    zdir_flatten_free (&files);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Print contents of directory to stdout
+
+void
+zdir_print (zdir_t *self, int indent)
+{
+    zdir_fprint (self, stdout, indent);
 }
 
 

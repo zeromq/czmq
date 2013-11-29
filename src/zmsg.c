@@ -598,23 +598,11 @@ zmsg_dup (zmsg_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Dump message to stderr, for debugging and tracing.
-//  See zmsg_dump_to_stream() for details
+//  Dump message to FILE stream, for debugging and tracing.
+//  Truncates to first 10 frames, for readability.
 
 void
-zmsg_dump (zmsg_t *self)
-{
-   zmsg_dump_to_stream (self, stderr);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Dump message to FILE stream, for debugging and tracing. 
-//  Truncates to first 10 frames, for readability; this may be unfortunate
-//  when debugging larger and more complex messages.
-
-void
-zmsg_dump_to_stream (zmsg_t *self, FILE *file)
+zmsg_fprint (zmsg_t *self, FILE *file)
 {
     fprintf (file, "--------------------------------------\n");
     if (!self) {
@@ -627,6 +615,17 @@ zmsg_dump_to_stream (zmsg_t *self, FILE *file)
         zframe_print_to_stream(frame, NULL, file);
         frame = zmsg_next (self);
     }
+}
+
+
+//  --------------------------------------------------------------------------
+//  Dump message to stderr, for debugging and tracing.
+//  See zmsg_fprint for details
+
+void
+zmsg_print (zmsg_t *self)
+{
+   zmsg_fprint (self, stderr);
 }
 
 

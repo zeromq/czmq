@@ -324,16 +324,6 @@ zconfig_execute (zconfig_t *self, zconfig_fct handler, void *arg)
 
 
 //  --------------------------------------------------------------------------
-//  Dump the config file to stderr for tracing
-
-void
-zconfig_dump (zconfig_t *self)
-{
-    zconfig_execute (self, s_config_save, stderr);
-}
-
-
-//  --------------------------------------------------------------------------
 //  Load a config item tree from a specified ZPL text file
 //
 //  Here is an example ZPL stream and corresponding config structure:
@@ -654,6 +644,26 @@ s_config_save (zconfig_t *self, void *arg, int level)
                 self->name? self->name: "(Unnamed)");
     }
     return 0;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Print the config file to open stream
+
+void
+zconfig_fprint (zconfig_t *self, FILE *file)
+{
+    zconfig_execute (self, s_config_save, file);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Print the config file to stdout
+
+void
+zconfig_print (zconfig_t *self)
+{
+    zconfig_fprint (self, stdout);
 }
 
 
