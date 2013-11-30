@@ -47,10 +47,6 @@ CZMQ_EXPORT zfile_t **
 CZMQ_EXPORT void
     zdir_flatten_free (zfile_t ***files_p);
 
-//  Print contents of directory to stderr
-CZMQ_EXPORT void
-    zdir_dump (zdir_t *self, int indent);
-
 //  Remove directory, optionally including all files that it contains, at
 //  all levels. If force is false, will only remove the directory if empty.
 //  If force is true, will remove all files and all subdirectories.
@@ -73,6 +69,14 @@ CZMQ_EXPORT zlist_t *
 //  The caller must destroy the hash table when done with it.
 CZMQ_EXPORT zhash_t *
     zdir_cache (zdir_t *self);
+
+//  Print contents of directory to open stream
+CZMQ_EXPORT void
+    zdir_fprint (zdir_t *self, FILE *file, int indent);
+
+//  Print contents of directory to stdout
+CZMQ_EXPORT void
+    zdir_print (zdir_t *self, int indent);
 
 //  Self test of this class
 CZMQ_EXPORT int
