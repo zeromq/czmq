@@ -366,9 +366,13 @@ This is the class interface:
     CZMQ_EXPORT bool
         zcert_eq (zcert_t *self, zcert_t *compare);
     
-    //  Dump certificate contents to stderr for debugging
+    //  Print certificate contents to open stream
     CZMQ_EXPORT void
-        zcert_dump (zcert_t *self);
+        zcert_fprint (zcert_t *self, FILE *file);
+    
+    //  Print certificate contents to stdout
+    CZMQ_EXPORT void
+        zcert_print (zcert_t *self);
     
     //  Self test of this class
     CZMQ_EXPORT int
@@ -421,10 +425,13 @@ This is the class interface:
     CZMQ_EXPORT void
         zcertstore_insert (zcertstore_t *self, zcert_t **cert_p);
     
-    //  Print out list of certificates in store to stdout, for debugging
-    //  purposes.
+    //  Print list of certificates in store to open stream
     CZMQ_EXPORT void
-        zcertstore_dump (zcertstore_t *self);
+        zcertstore_fprint (zcertstore_t *self, FILE *file);
+    
+    //  Print list of certificates in store to stdout
+    CZMQ_EXPORT void
+        zcertstore_print (zcertstore_t *self);
     
     //  Self test of this class
     CZMQ_EXPORT int
@@ -678,10 +685,6 @@ This is the class interface:
     CZMQ_EXPORT void
         zdir_flatten_free (zfile_t ***files_p);
     
-    //  Print contents of directory to stderr
-    CZMQ_EXPORT void
-        zdir_dump (zdir_t *self, int indent);
-    
     //  Remove directory, optionally including all files that it contains, at
     //  all levels. If force is false, will only remove the directory if empty.
     //  If force is true, will remove all files and all subdirectories.
@@ -704,6 +707,14 @@ This is the class interface:
     //  The caller must destroy the hash table when done with it.
     CZMQ_EXPORT zhash_t *
         zdir_cache (zdir_t *self);
+    
+    //  Print contents of directory to open stream
+    CZMQ_EXPORT void
+        zdir_fprint (zdir_t *self, FILE *file, int indent);
+    
+    //  Print contents of directory to stdout
+    CZMQ_EXPORT void
+        zdir_print (zdir_t *self, int indent);
     
     //  Self test of this class
     CZMQ_EXPORT int
@@ -1414,16 +1425,14 @@ This is the class interface:
     CZMQ_EXPORT zmsg_t *
         zmsg_dup (zmsg_t *self);
     
-    //  Dump message to stderr, for debugging and tracing.
-    //  See zmsg_dump_to_stream() for details
+    //  Print message to open stream
+    //  Truncates to first 10 frames, for readability.
     CZMQ_EXPORT void
-        zmsg_dump (zmsg_t *self);
+        zmsg_fprint (zmsg_t *self, FILE *file);
     
-    //  Dump message to FILE stream, for debugging and tracing. 
-    //  Truncates to first 10 frames, for readability; this may be unfortunate
-    //  when debugging larger and more complex messages.
+    //  Print message to stdout
     CZMQ_EXPORT void
-        zmsg_dump_to_stream (zmsg_t *self, FILE *file);
+        zmsg_print (zmsg_t *self);
     
     //  Self test of this class
     CZMQ_EXPORT int
@@ -1656,7 +1665,6 @@ This is the class interface:
     CZMQ_EXPORT int zsocket_ipv6 (void *zocket);
     CZMQ_EXPORT int zsocket_ipv4only (void *zocket);
     CZMQ_EXPORT int zsocket_tos (void *zocket);
-    CZMQ_EXPORT int zsocket_probe_router (void *zocket);
     CZMQ_EXPORT int zsocket_plain_server (void *zocket);
     CZMQ_EXPORT char * zsocket_plain_username (void *zocket);
     CZMQ_EXPORT char * zsocket_plain_password (void *zocket);
@@ -1700,6 +1708,7 @@ This is the class interface:
     CZMQ_EXPORT void zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect);
     CZMQ_EXPORT void zsocket_set_tos (void *zocket, int tos);
     CZMQ_EXPORT void zsocket_set_router_mandatory (void *zocket, int router_mandatory);
+    CZMQ_EXPORT void zsocket_set_probe_router (void *zocket, int probe_router);
     CZMQ_EXPORT void zsocket_set_req_relaxed (void *zocket, int req_relaxed);
     CZMQ_EXPORT void zsocket_set_req_correlate (void *zocket, int req_correlate);
     CZMQ_EXPORT void zsocket_set_conflate (void *zocket, int conflate);
