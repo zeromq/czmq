@@ -148,8 +148,9 @@ zproxy_terminate (zproxy_t *self)
 #if (ZMQ_VERSION >= ZPROXY_HAS_STEERABLE)
     zstr_send (self->control, "TERMINATE");
     char *resp = zstr_recv (self->pipe);
-    if (resp && streq ("TERMINATED", resp))
+    if (streq ("TERMINATED", resp))
         rc = 0;
+    free (resp);
 #endif
     return rc;
 }
