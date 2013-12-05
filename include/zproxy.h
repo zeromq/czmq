@@ -34,6 +34,8 @@ extern "C" {
 #define ZPROXY_QUEUE 1
 #define ZPROXY_FORWARDER 2
 #define ZPROXY_STREAMER 3
+#define ZPROXY_HAS_PROXY 30201
+#define ZPROXY_HAS_STEERABLE 40100
 
 //  Opaque class structure
 typedef struct _zproxy_t zproxy_t;
@@ -43,6 +45,18 @@ typedef struct _zproxy_t zproxy_t;
 CZMQ_EXPORT zproxy_t *
     zproxy_new (zctx_t *ctx, int zproxy_type);
 
+// Pause a zproxy object
+CZMQ_EXPORT int
+    zproxy_pause (zproxy_t *self);
+
+// Resume a zproxy object
+CZMQ_EXPORT int
+    zproxy_resume (zproxy_t *self);
+
+// Terminate a zproxy object
+CZMQ_EXPORT int
+    zproxy_terminate (zproxy_t *self);
+
 //  Destroy a zproxy object
 CZMQ_EXPORT void
     zproxy_destroy (zproxy_t **self_p);
@@ -51,13 +65,14 @@ CZMQ_EXPORT void
 //  Returns 0 if OK, -1 if there was an error
 CZMQ_EXPORT int
     zproxy_bind (zproxy_t *self, const char *frontend_addr,
-            const char *backend_addr, const char *capture_addr);
+            const char *backend_addr, const char *capture_addr,
+            const char *control_addr);
 
 //  Get zproxy type
 CZMQ_EXPORT int
     zproxy_type (zproxy_t *self);
 
-//  Get zproxy frontend address
+// Get zproxy frontend address
 CZMQ_EXPORT char *
     zproxy_frontend_addr (zproxy_t *self);
 
