@@ -48,7 +48,7 @@ CZMQ_EXPORT void
     zproxy_resume (zproxy_t *self);
 
 // Terminate a zproxy object
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zproxy_terminate (zproxy_t *self);
 
 // Underlying libzmq supports zmq_proxy but not zmq_proxy_steerable
@@ -163,7 +163,7 @@ EXAMPLE
     s_zproxy_test_run (proxy, frontend_addr, backend_addr,
             capture_addr, control_addr);
 
-    // terminate the proxy
+    // Destroy the proxy
     zctx_destroy (&ctx);
     zproxy_destroy (&proxy);
 
@@ -183,7 +183,7 @@ EXAMPLE
     s_zproxy_test_run (proxy, frontend_addr, backend_addr,
             capture_addr, control_addr);
 
-    // terminate the proxy
+    // Destroy the proxy
     zctx_destroy (&ctx);
     zproxy_destroy (&proxy);
 
@@ -202,7 +202,7 @@ EXAMPLE
     s_zproxy_test_run (proxy, frontend_addr, backend_addr,
             capture_addr, control_addr);
 
-    // terminate the proxy
+    // Destroy the proxy
     zctx_destroy (&ctx);
     zproxy_destroy (&proxy);
 
@@ -221,12 +221,10 @@ EXAMPLE
     s_zproxy_test_run (proxy, frontend_addr, backend_addr,
             capture_addr, control_addr);
 
-    // terminate the proxy
+    // Destroy the proxy
     zctx_destroy (&ctx);
     zproxy_destroy (&proxy);
 
-    // keep valgrind happy
-    zclock_sleep (100);
 #endif
 #if (ZMQ_VERSION >= ZPROXY_HAS_PROXY && ZMQ_VERSION < ZPROXY_HAS_STEERABLE)
 
@@ -249,7 +247,7 @@ EXAMPLE
     s_zproxy_test_run (proxy, frontend_addr, backend_addr,
             capture_addr, NULL);
 
-    // terminate the proxy
+    // Destroy the proxy
     zctx_destroy (&ctx);
     zproxy_destroy (&proxy);
 #endif
@@ -269,10 +267,13 @@ EXAMPLE
     s_zproxy_test_run (proxy, frontend_addr, backend_addr,
             NULL, NULL);
 
-    // terminate the proxy
+    // Destroy the proxy
     zctx_destroy (&ctx);
     zproxy_destroy (&proxy);
 #endif
+
+    // Keep valgrind happy
+    zclock_sleep (100);
 
 ----
 
