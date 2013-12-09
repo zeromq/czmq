@@ -86,7 +86,7 @@ The zproxy class simplifies working with the zmq_proxy API.
 
 I've modified zproxy to "do the right thing" depending
 on both the underlying version of libzmq and arguments passed 
-to zproxy_bind as follows.  While this introduces quite a 
+to zproxy_bind.  While this introduces quite a 
 bit of complexity in this czmq class, the hope is that it
 reduces a lot of complexity on behalf of the actual czmq user.
 
@@ -95,48 +95,46 @@ based on version of libzmq compiled against, swapping out the
 underlying libzmq for an older version than compiled against
 will cause code to fail.  This is intended behavior.
 
+I have tested swapping out the underlying libzmq for newer
+versions than compiled against, and this works.
+
 The behavior for various cases is as follows:
 
-// ------------------------------------------
-libzmq has zmq_proxy_steerable and zproxy:
+------------------------------------------
+ZMQ_VERSION >= ZPROXY_HAS_STEERABLE 
 
-CZMQ_EXPORT int
+int
 zproxy_bind (zproxy_t *self, char *frontend_addr,
         char *backend_addr, char *capture_addr,
         char *control_addr);
 
-// ------------------------------------------
-// capture? | control?  | should call
-// YES      | YES       | zmq_proxy_steerable
-// NO       | YES       | zmq_proxy_steerable
-// YES      | NO        | zmq_proxy
-// NO       | NO        | zmq_proxy
-// ------------------------------------------
+capture? | control?  | should call
+YES      | YES       | zmq_proxy_steerable
+NO       | YES       | zmq_proxy_steerable
+YES      | NO        | zmq_proxy
+NO       | NO        | zmq_proxy
+   
+------------------------------------------
+ZMQ_VERSION >= ZPROXY_HAS_PROXY &&
+ZMQ_VERSION < ZPROXY_HAS_STEERABLE
 
-// ------------------------------------------
-libzmq has zmq_proxy but doesn't have zmq_proxy_steerable
-
-CZMQ_EXPORT int
+int
 zproxy_bind (zproxy_t *self, char *frontend_addr,
         char *backend_addr, char *capture_addr);
 
-// ------------------------------------------
-// capture? | should call
-// YES      | zmq_proxy
-// NO       | zmq_proxy
-// ------------------------------------------
+capture? | should call
+YES      | zmq_proxy
+NO       | zmq_proxy
 
-// ------------------------------------------
-libzmq only has zmq_device
+------------------------------------------
+ZMQ_VERSION < ZPROXY_HAS_PROXY
 
-CZMQ_EXPORT int
+int
 zproxy_bind (zproxy_t *self, char *frontend_addr,
         char *backend_addr);
 
-// ------------------------------------------
-// should call
-// zmq_proxy
-// ------------------------------------------
+should call
+zmq_proxy
 
 EXAMPLE
 -------
@@ -155,10 +153,10 @@ EXAMPLE
     // using the capture port.
     zctx_t *ctx = zctx_new ();
     zproxy_t *proxy = zproxy_new (ctx, ZPROXY_STREAMER);
-    
+
     int rc = zproxy_bind (proxy, frontend_addr, backend_addr, 
             capture_addr, control_addr);
-    
+
     assert (rc == 0);
 
     // Run the actual test
@@ -176,7 +174,7 @@ EXAMPLE
     ctx = zctx_new ();
     proxy = zproxy_new (ctx, ZPROXY_STREAMER);
 
-    rc = zproxy_bind (proxy, frontend_addr, backend_addr, 
+    rc = zproxy_bind (proxy, frontend_addr, backend_addr,
             NULL, control_addr);
     
     assert (rc == 0);
@@ -216,7 +214,7 @@ EXAMPLE
 
     rc = zproxy_bind (proxy, frontend_addr, backend_addr, 
             NULL, NULL);
-    
+
     assert (rc == 0);
 
     // Run the actual test
@@ -244,7 +242,7 @@ EXAMPLE
 
     int rc = zproxy_bind (proxy, frontend_addr, backend_addr, 
             capture_addr);
-    
+
     assert (rc == 0);
 
     // Run the actual test
@@ -264,7 +262,7 @@ EXAMPLE
     zproxy_t *proxy = zproxy_new (ctx, ZPROXY_STREAMER);
 
     int rc = zproxy_bind (proxy, frontend_addr, backend_addr);
-    
+
     assert (rc == 0);
 
     // Run the actual test

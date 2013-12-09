@@ -81,7 +81,7 @@ CZMQ_EXPORT void
     zproxy_resume (zproxy_t *self);
 
 // Terminate a zproxy object
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zproxy_terminate (zproxy_t *self);
 
 // Underlying libzmq supports zmq_proxy but not zmq_proxy_steerable
