@@ -45,48 +45,12 @@ typedef struct _zproxy_t zproxy_t;
 CZMQ_EXPORT zproxy_t *
     zproxy_new (zctx_t *ctx, int zproxy_type);
 
-// Pause a zproxy object
-CZMQ_EXPORT int
-    zproxy_pause (zproxy_t *self);
-
-// Resume a zproxy object
-CZMQ_EXPORT int
-    zproxy_resume (zproxy_t *self);
-
-// Terminate a zproxy object
-CZMQ_EXPORT int
-    zproxy_terminate (zproxy_t *self);
-
 //  Destroy a zproxy object
 CZMQ_EXPORT void
     zproxy_destroy (zproxy_t **self_p);
 
-//  Start and zmq_proxy in an attached thread, binding to endpoints
-//  Returns 0 if OK, -1 if there was an error
-CZMQ_EXPORT int
-    zproxy_bind (zproxy_t *self, const char *frontend_addr,
-            const char *backend_addr, const char *capture_addr,
-            const char *control_addr);
-
-//  Get zproxy type
-CZMQ_EXPORT int
-    zproxy_type (zproxy_t *self);
-
-// Get zproxy frontend address
-CZMQ_EXPORT char *
-    zproxy_frontend_addr (zproxy_t *self);
-
-//  Get zproxy frontend type
-CZMQ_EXPORT int
-    zproxy_frontend_type (zproxy_t *self);
-
-//  Get zproxy backend address
-CZMQ_EXPORT char *
-    zproxy_backend_addr (zproxy_t *self);
-
-//  Get zproxy backend type
-CZMQ_EXPORT int
-    zproxy_backend_type (zproxy_t *self);
+// Underlying libzmq supports zmq_proxy
+#if (ZMQ_VERSION >= ZPROXY_HAS_PROXY)
 
 //  Get zproxy capture address
 CZMQ_EXPORT char *
@@ -96,7 +60,54 @@ CZMQ_EXPORT char *
 CZMQ_EXPORT int
     zproxy_capture_type (zproxy_t *self);
 
-//  Self test of this class
+// Underlying libzmq also supports zmq_proxy_steerable
+#if (ZMQ_VERSION >= ZPROXY_HAS_STEERABLE)
+
+//  Start a zproxy in an attached thread, binding to endpoints.
+//  If capture_addr is not null, will create a capture socket.
+//  If control_addr is not null, will use zmq_proxy_steerable
+//  Returns 0 if OK, -1 if there was an error
+CZMQ_EXPORT int
+    zproxy_bind (zproxy_t *self, char *frontend_addr,
+            char *backend_addr, char *capture_addr,
+            char *control_addr);
+
+// Pause a zproxy object
+CZMQ_EXPORT void
+    zproxy_pause (zproxy_t *self);
+
+// Resume a zproxy object
+CZMQ_EXPORT void
+    zproxy_resume (zproxy_t *self);
+
+// Terminate a zproxy object
+CZMQ_EXPORT void
+    zproxy_terminate (zproxy_t *self);
+
+// Underlying libzmq supports zmq_proxy but not zmq_proxy_steerable
+#else
+
+//  Start and zmq_proxy in an attached thread, binding to endpoints.
+//  If capture_addr is not null, will create a capture socket.
+//  Returns 0 if OK, -1 if there was an error
+CZMQ_EXPORT int
+    zproxy_bind (zproxy_t *self, char *frontend_addr,
+            char *backend_addr, char *capture_addr);
+#endif
+
+// Underlying libzmq supports zmq_device and does not support
+// zmq_proxy nor zmq_proxy_steerable
+#else
+
+//  Start a zproxy in an attached thread, binding to endpoints.
+//  Returns 0 if OK, -1 if there was an error
+CZMQ_EXPORT int
+    zproxy_bind (zproxy_t *self, char *frontend_addr,
+            char *backend_addr);
+
+#endif 
+
+// Self test of this class
 CZMQ_EXPORT int
     zproxy_test (bool verbose);
 //  @end
