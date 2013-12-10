@@ -176,16 +176,16 @@ zproxy_resume (zproxy_t *self)
 
 //  --------------------------------------------------------------------------
 //  Command; Sends a terminate command to the proxy
-//  Returns 0 = ok
-//  Returns -1 = command not implemented for current libzmq version
-//      or proxy did not respond
 
 void
 zproxy_terminate (zproxy_t *self)
 {
     assert (self);
+    zpoller_t *poller = zpoller_new (self->pipe, NULL);
+    assert (poller);
     zstr_send (self->control, "TERMINATE");
-    char *resp = zstr_recv (self->pipe);
+    void *pipe_sock = zpoller_wait (poller, 1000);
+    char *resp = zstr_recv_nowait (pipe_sock);
     assert (streq (resp, "TERMINATED"));
     free (resp);
 }
@@ -599,17 +599,18 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
         return;
 #if (ZMQ_VERSION < ZPROXY_HAS_PROXY)
 
-    if (zproxy_type (self) == ZPROXY_STREAMER) {
-        zmq_device (ZMQ_STREAMER, self->frontend, self->backend);
-    }
-    else if (zproxy_type (self) == ZPROXY_QUEUE) {
-        zmq_device (ZMQ_QUEUE, self->frontend, self->backend);
-    }
-    else if (zproxy_type (self)== ZPROXY_FORWARDER) {
-        zmq_device (ZMQ_FORWARDER, self->frontend, self->backend);
-    }
-    else {
-        assert (1==0);
+    switch (zproxy_type (self)) {
+        case (ZPROXY_STREAMER):
+            zmq_device (ZMQ_STREAMER, self->frontend, self->backend);
+            break;
+        case (ZPROXY_QUEUE):
+            zmq_device (ZMQ_QUEUE, self->frontend, self->backend);
+            break;
+        case (ZPROXY_FORWARDER):
+            zmq_device (ZMQ_FORWARDER, self->frontend, self->backend);
+            break;
+        default:
+            assert (1==0);
     }
 #else
 
