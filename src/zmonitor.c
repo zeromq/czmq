@@ -43,6 +43,7 @@
 //  Structure of our class
 struct _zmonitor_t {
     zctx_t *ctx;                //  Private 0MQ context
+    void *socket;               //  Socket being monitored
     void *pipe;                 //  Pipe through to backend agent
 };
 
@@ -65,10 +66,11 @@ zmonitor_new (zctx_t *ctx, void *socket, int events)
     assert (ctx);
     self->pipe = zthread_fork (ctx, s_agent_task, NULL);
     if (self->pipe) {
+        self->socket = socket;
         //  Register a monitor endpoint on the socket
         char *monitor_endpoint = (char *) zmalloc (100);
-        sprintf (monitor_endpoint, "inproc://zmonitor-%p", socket);
-        int rc = zmq_socket_monitor (socket, monitor_endpoint, events);
+        sprintf (monitor_endpoint, "inproc://zmonitor-%p", self->socket);
+        int rc = zmq_socket_monitor (self->socket, monitor_endpoint, events);
         assert (rc == 0);
         //  Configure backend agent with monitor endpoint
         zstr_send (self->pipe, "%s", monitor_endpoint);
@@ -95,6 +97,8 @@ zmonitor_destroy (zmonitor_t **self_p)
     assert (self_p);
     if (*self_p) {
         zmonitor_t *self = *self_p;
+        // deregister monitor endpoint
+        zmq_socket_monitor (self->socket, NULL, 0);
         zstr_send (self->pipe, "TERMINATE");
         free (zstr_recv (self->pipe));
         free (self);
