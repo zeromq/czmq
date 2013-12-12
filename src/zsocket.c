@@ -291,6 +291,7 @@ zsocket_test (bool verbose)
     assert (!zframe_more (frame));
     zframe_destroy (&frame);
 
+    zsocket_destroy (ctx, reader);
     zsocket_destroy (ctx, writer);
     zctx_destroy (&ctx);
     //  @end
