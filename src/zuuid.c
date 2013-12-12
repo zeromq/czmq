@@ -37,6 +37,10 @@
 #include "../include/czmq.h"
 #include "platform.h"
 
+#if defined (__WINDOWS__) && !defined (HAVE_LIBUUID)
+#define HAVE_LIBUUID 1
+#endif
+
 #if defined (HAVE_LIBUUID)
 #if defined (__UTYPE_FREEBSD) || defined (__UTYPE_NETBSD)
 #   include <uuid.h>
