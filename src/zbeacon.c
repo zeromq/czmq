@@ -233,6 +233,38 @@ zbeacon_hostname (zbeacon_t *self)
     return self->hostname;
 }
 
+//  --------------------------------------------------------------------------
+//  Start/stop listening on unicast packets
+
+void zbeacon_unicast (zbeacon_t *self,  int flag)
+{
+    assert (self);
+
+    zmsg_t *msg = zmsg_new ();
+    zmsg_addstr (msg, "UNICAST");
+    zmsg_addstr (msg, "%d", flag);
+    zmsg_send (&msg, self->pipe);
+    // wait until socket setup to unicast/broadcast complete
+    char *reply =  zstr_recv (self->pipe);
+    zstr_free (&reply);
+}
+
+//  --------------------------------------------------------------------------
+//  Send a frame directed to a particular IP unicast address once
+
+void zbeacon_send (zbeacon_t *self,  char *ipaddress, byte *transmit, size_t size)
+{
+    assert (self);
+    assert (ipaddress);
+    assert (transmit);
+    assert (size > 0 && size <= BEACON_MAX);
+
+    zmsg_t *msg = zmsg_new ();
+    zmsg_addstr (msg, "SEND");
+    zmsg_addstr (msg, ipaddress);
+    zmsg_addmem (msg, transmit, size);
+    zmsg_send (&msg, self->pipe);
+}
 
 //  --------------------------------------------------------------------------
 //  Self test of this class
@@ -270,7 +302,30 @@ zbeacon_test (bool verbose)
                         +  zframe_data (content) [1];
         assert (received_port == port_nbr);
         zframe_destroy (&content);
+	zbeacon_silence (service_beacon);
+
+	// turn on UDP unicast reception
+	zbeacon_unicast (client_beacon, 1);
+
+	zsocket_set_rcvtimeo (zbeacon_socket (client_beacon), 500);
+
+	// send unicast UDP message to ourselves
+	zbeacon_send (service_beacon, ipaddress, (byte *) "SELF", 4);
+
+        char *addr = zstr_recv (zbeacon_socket (client_beacon));
+	assert(addr != NULL);
+
+	// assert we got it, src IP and contents add up
+	assert(strcmp(addr,ipaddress) == 0);
+
+        content = zframe_recv (zbeacon_socket (client_beacon));
+	assert(content != NULL);
+
+	assert(memcmp((void *) "SELF", zframe_data (content),  zframe_size (content)) == 0);
         zstr_free (&ipaddress);
+
+	// turn off UDP unicast reception
+	zbeacon_unicast (client_beacon, 0);
     }
     zbeacon_destroy (&client_beacon);
     zbeacon_destroy (&service_beacon);
@@ -404,9 +459,9 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
 
         if (pollitems [0].revents & ZMQ_POLLIN)
             s_api_command (self);
-        if (pollitems [1].revents & ZMQ_POLLIN)
+	if (pollitems [1].revents & ZMQ_POLLIN)
             s_beacon_recv (self);
-        
+
         if (self->transmit
         &&  zclock_time () >= self->ping_at) {
             s_beacon_send (self);
@@ -681,6 +736,86 @@ s_api_command (agent_t *self)
         zstr_send (self->pipe, "OK");
     }
     else
+    if (streq (command, "UNICAST")) {
+	char *flag =  zstr_recv (self->pipe);
+	assert(flag);
+	assert(strlen(flag));
+
+	// shutdown and reopen, listening either on  INADDR_BROADCAST
+	// or INADDR_ANY if unicast desired
+	shutdown(self->udpsock, SHUT_RDWR);
+
+	self->udpsock = socket (AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if (self->udpsock == INVALID_SOCKET) {
+	    free (self);        //  No more file handles - forget it
+	    s_handle_io_error ("socket");
+	    zstr_send (self->pipe, "-1");
+	    return;
+	}
+	//  Allow multiple owners to bind to socket; incoming
+	//  messages will replicate to each owner
+	int on = 1;
+	if (setsockopt (self->udpsock, SOL_SOCKET, SO_REUSEADDR,
+			(char *) &on, sizeof (on)) == SOCKET_ERROR)
+	    s_handle_io_error ("setsockopt (SO_REUSEADDR)");
+
+#if defined (SO_REUSEPORT)
+	//  On some platforms we have to ask to reuse the port
+	if (setsockopt (self->udpsock, SOL_SOCKET, SO_REUSEPORT,
+			(char *) &on, sizeof (on)) == SOCKET_ERROR)
+	    s_handle_io_error ("setsockopt (SO_REUSEPORT)");
+#endif
+
+	if (setsockopt (self->udpsock, SOL_SOCKET, SO_BROADCAST,
+                   (char *) &on, sizeof (on)) == SOCKET_ERROR)
+        s_handle_io_error ("setsockopt (SO_BROADCAST)");
+
+	inaddr_t sockaddr;
+	if (atoi(flag)) {
+	    sockaddr.sin_family  = AF_INET;
+	    sockaddr.sin_port = htons (self->port_nbr);
+	    sockaddr.sin_addr.s_addr =  INADDR_ANY; 
+	} else {
+	   sockaddr = self->broadcast;
+	}
+
+	if (bind (self->udpsock, (struct sockaddr *) &sockaddr, 
+		  sizeof (sockaddr)) == SOCKET_ERROR) {
+	    s_handle_io_error ("bind");
+	    zstr_send (self->pipe, "-1");
+	} else {
+	    zstr_send (self->pipe, "0");
+	}
+    }
+    else
+    if (streq (command, "SEND")) {
+	char *ipaddress = zstr_recv (self->pipe);
+        assert (ipaddress);
+	zframe_t *content =  zframe_recv (self->pipe);
+        assert (content);
+
+	in_addr_t addr = inet_addr (ipaddress);
+	if (addr == 0) {
+	    zframe_destroy (&content);
+	    zstr_free (&ipaddress);
+	    return;
+	}
+	struct sockaddr_in to_addr;
+	to_addr.sin_family  = AF_INET;
+	to_addr.sin_port = htons (self->port_nbr);
+	to_addr.sin_addr.s_addr = addr; 
+
+	// Send as UDP unicast packet
+	if (sendto (self->udpsock,
+		    (char *) zframe_data (content), zframe_size (content),
+		    0,      //  Flags
+		    (struct sockaddr *) &to_addr, sizeof (to_addr)) < 0) {
+	    perror("sendto");
+	}
+        zframe_destroy (&content);
+        zstr_free (&ipaddress);
+    }
+    else
         printf ("E: unexpected API command '%s'\n", command);
     
     zstr_free (&command);
@@ -712,7 +847,7 @@ s_beacon_recv (agent_t *self)
 #else
     inet_ntop (AF_INET, &sender.sin_addr, peername, si_len);
 #endif
-    
+
     //  If filter is set, check that beacon matches it
     bool is_valid = false;
     if (self->filter) {
@@ -737,6 +872,7 @@ s_beacon_recv (agent_t *self)
         zmsg_send (&msg, self->pipe);
     }
 }
+
 
 //  Send beacon to any listening peers
 
