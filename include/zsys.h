@@ -97,6 +97,10 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zsys_file_mode_default (void);
 
+//  Return the czmq version for run-time API detection
+CZMQ_EXPORT void
+    zsys_version (int *major, int *minor, int *patch);
+
 //  Format a string with variable arguments, returning a freshly allocated
 //  buffer. If there was insufficient memory, returns NULL. Free the returned
 //  string using zstr_free().
