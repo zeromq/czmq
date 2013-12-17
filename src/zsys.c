@@ -350,6 +350,17 @@ zsys_file_mode_default (void)
 
 
 //  --------------------------------------------------------------------------
+//  Return the czmq version for run-time API detection
+
+void zsys_version (int *major, int *minor, int *patch)
+{
+    *major = CZMQ_VERSION_MAJOR;
+    *minor = CZMQ_VERSION_MINOR;
+    *patch = CZMQ_VERSION_PATCH;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Format a string with variable arguments, returning a freshly allocated
 //  buffer. If there was insufficient memory, returns NULL. Free the returned
 //  string using zstr_free().
@@ -431,6 +442,12 @@ zsys_test (bool verbose)
     rc = zsys_dir_delete ("%s/%s", ".", ".testsys/subdir");
     assert (rc == 0);
 
+    int major, minor, patch;
+    zsys_version (&major, &minor, &patch);
+    assert (major == CZMQ_VERSION_MAJOR);
+    assert (minor == CZMQ_VERSION_MINOR);
+    assert (patch == CZMQ_VERSION_PATCH);
+    
     char *string = s_vprintf ("%s %02x", "Hello", 16);
     assert (streq (string, "Hello 10"));
     zstr_free (&string);

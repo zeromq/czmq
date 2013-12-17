@@ -252,6 +252,14 @@ This is the class interface:
     CZMQ_EXPORT void
         zbeacon_noecho (zbeacon_t *self);
     
+    //  Start/stop listening on unicast packets
+    CZMQ_EXPORT void
+        zbeacon_unicast (zbeacon_t *self, int flag);
+    
+    //  Send a frame directed to a particular unicast IP address once
+    CZMQ_EXPORT void
+        zbeacon_send (zbeacon_t *self,  char *ipaddress, byte *transmit, size_t size);
+    
     //  Start broadcasting beacon to peers at the specified interval
     CZMQ_EXPORT void
         zbeacon_publish (zbeacon_t *self, byte *transmit, size_t size);
@@ -1538,31 +1546,8 @@ This is the class interface:
     CZMQ_EXPORT void
         zproxy_destroy (zproxy_t **self_p);
     
-    //  Start and zmq_proxy in an attached thread, binding to endpoints
-    //  Returns 0 if OK, -1 if there was an error
-    CZMQ_EXPORT int
-        zproxy_bind (zproxy_t *self, const char *frontend_addr,
-                const char *backend_addr, const char *capture_addr);
-    
-    //  Get zproxy type
-    CZMQ_EXPORT int
-        zproxy_type (zproxy_t *self);
-    
-    //  Get zproxy frontend address
-    CZMQ_EXPORT char *
-        zproxy_frontend_addr (zproxy_t *self);
-    
-    //  Get zproxy frontend type
-    CZMQ_EXPORT int
-        zproxy_frontend_type (zproxy_t *self);
-    
-    //  Get zproxy backend address
-    CZMQ_EXPORT char *
-        zproxy_backend_addr (zproxy_t *self);
-    
-    //  Get zproxy backend type
-    CZMQ_EXPORT int
-        zproxy_backend_type (zproxy_t *self);
+    // Underlying libzmq supports zmq_proxy
+    #if (ZMQ_VERSION >= ZPROXY_HAS_PROXY)
     
     //  Get zproxy capture address
     CZMQ_EXPORT char *
@@ -1572,14 +1557,108 @@ This is the class interface:
     CZMQ_EXPORT int
         zproxy_capture_type (zproxy_t *self);
     
-    //  Self test of this class
+    // Underlying libzmq also supports zmq_proxy_steerable
+    #if (ZMQ_VERSION >= ZPROXY_HAS_STEERABLE)
+    
+    //  Start a zproxy in an attached thread, binding to endpoints.
+    //  If capture_addr is not null, will create a capture socket.
+    //  If control_addr is not null, will use zmq_proxy_steerable
+    //  Returns 0 if OK, -1 if there was an error
+    CZMQ_EXPORT int
+        zproxy_bind (zproxy_t *self, char *frontend_addr,
+                char *backend_addr, char *capture_addr,
+                char *control_addr);
+    
+    // Pause a zproxy object
+    CZMQ_EXPORT void
+        zproxy_pause (zproxy_t *self);
+    
+    // Resume a zproxy object
+    CZMQ_EXPORT void
+        zproxy_resume (zproxy_t *self);
+    
+    // Terminate a zproxy object
+    CZMQ_EXPORT void
+        zproxy_terminate (zproxy_t *self);
+    
+    // Underlying libzmq supports zmq_proxy but not zmq_proxy_steerable
+    #else
+    
+    //  Start and zmq_proxy in an attached thread, binding to endpoints.
+    //  If capture_addr is not null, will create a capture socket.
+    //  Returns 0 if OK, -1 if there was an error
+    CZMQ_EXPORT int
+        zproxy_bind (zproxy_t *self, char *frontend_addr,
+                char *backend_addr, char *capture_addr);
+    #endif
+    
+    // Underlying libzmq supports zmq_device and does not support
+    // zmq_proxy nor zmq_proxy_steerable
+    #else
+    
+    //  Start a zproxy in an attached thread, binding to endpoints.
+    //  Returns 0 if OK, -1 if there was an error
+    CZMQ_EXPORT int
+        zproxy_bind (zproxy_t *self, char *frontend_addr,
+                char *backend_addr);
+    
+    #endif 
+    
+    // Self test of this class
     CZMQ_EXPORT int
         zproxy_test (bool verbose);
 
-If we used a steerable proxy we could do termination better, and
-allow creation/termination of proxies without destroying contexts.
-Then, zproxy_destroy would send the proxy task a KILL message and
-wait for an OK response, then return to the caller.
+I've modified zproxy to "do the right thing" depending
+on both the underlying version of libzmq and arguments passed 
+to zproxy_bind.  While this introduces quite a 
+bit of complexity in this czmq class, the hope is that it
+reduces a lot of complexity on behalf of the actual czmq user.
+
+Note that because the zproxy_bind function signature changes
+based on version of libzmq compiled against, swapping out the
+underlying libzmq for an older version than compiled against
+will cause code to fail.  This is intended behavior.
+
+I have tested swapping out the underlying libzmq for newer
+versions than compiled against, and this works.
+
+The behavior for various cases is as follows:
+
+------------------------------------------
+ZMQ_VERSION >= ZPROXY_HAS_STEERABLE 
+
+int
+zproxy_bind (zproxy_t *self, char *frontend_addr,
+        char *backend_addr, char *capture_addr,
+        char *control_addr);
+
+capture? | control?  | should call
+YES      | YES       | zmq_proxy_steerable
+NO       | YES       | zmq_proxy_steerable
+YES      | NO        | zmq_proxy
+NO       | NO        | zmq_proxy
+   
+------------------------------------------
+ZMQ_VERSION >= ZPROXY_HAS_PROXY &&
+ZMQ_VERSION < ZPROXY_HAS_STEERABLE
+
+int
+zproxy_bind (zproxy_t *self, char *frontend_addr,
+        char *backend_addr, char *capture_addr);
+
+capture? | should call
+YES      | zmq_proxy
+NO       | zmq_proxy
+
+------------------------------------------
+ZMQ_VERSION < ZPROXY_HAS_PROXY
+
+int
+zproxy_bind (zproxy_t *self, char *frontend_addr,
+        char *backend_addr);
+
+should call
+zmq_proxy
 
 <A name="toc4-342" title="zsocket - working with ØMQ sockets" />
 #### zsocket - working with ØMQ sockets
@@ -2008,6 +2087,10 @@ This is the class interface:
     //  process file mode defaults.
     CZMQ_EXPORT void
         zsys_file_mode_default (void);
+    
+    //  Return the czmq version for run-time API detection
+    CZMQ_EXPORT void
+        zsys_version (int *major, int *minor, int *patch);
     
     //  Format a string with variable arguments, returning a freshly allocated
     //  buffer. If there was insufficient memory, returns NULL. Free the returned
