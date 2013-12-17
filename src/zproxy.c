@@ -89,9 +89,11 @@ struct _zproxy_t {
     zctx_t *ctx;
     void *pipe;
     int type;
+    char *frontend_identity;
     char *frontend_addr;
     int frontend_type;
     void *frontend;
+    char *backend_identity;
     char *backend_addr;
     int backend_type;
     void *backend;
@@ -247,6 +249,18 @@ zproxy_bind (zproxy_t *self,
     else
         rc = -1;
     return rc;
+}
+
+void
+zproxy_set_frontend_identity (zproxy_t *self, char *frontend_identity)
+{
+    self->frontend_identity = frontend_identity? strdup(frontend_identity): NULL;
+}
+
+void
+zproxy_set_backend_identity (zproxy_t *self, char *backend_identity)
+{
+    self->backend_identity = backend_identity? strdup(backend_identity): NULL;
 }
 
 //  --------------------------------------------------------------------------
@@ -587,16 +601,26 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
     zstr_send (pipe, "OK");
 
     self->frontend = zsocket_new (ctx, zproxy_frontend_type (self));
-    if (self->frontend)
+    if (self->frontend) {
+        if (self->frontend_identity)
+            zsocket_set_identity (self->frontend, self->frontend_identity);
+
         zsocket_bind (self->frontend, zproxy_frontend_addr (self));
-    else
+    }
+    else {
         return;
+    }
 
     self->backend = zsocket_new (ctx, zproxy_backend_type (self));
-    if (self->backend)
+    if (self->backend) {
+        if (self->backend_identity)
+            zsocket_set_identity (self->backend, self->backend_identity);
+
         zsocket_bind (self->backend, zproxy_backend_addr (self));
-    else
+    }
+    else {
         return;
+    }
 #if (ZMQ_VERSION < ZPROXY_HAS_PROXY)
 
     switch (zproxy_type (self)) {
