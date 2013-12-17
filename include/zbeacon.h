@@ -54,6 +54,14 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zbeacon_noecho (zbeacon_t *self);
 
+//  Start/stop listening on unicast packets
+CZMQ_EXPORT void
+    zbeacon_unicast (zbeacon_t *self, int flag);
+
+//  Send a frame directed to a particular unicast IP address once
+CZMQ_EXPORT void
+    zbeacon_send (zbeacon_t *self,  char *ipaddress, byte *transmit, size_t size);
+
 //  Start broadcasting beacon to peers at the specified interval
 CZMQ_EXPORT void
     zbeacon_publish (zbeacon_t *self, byte *transmit, size_t size);
