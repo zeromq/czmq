@@ -54,10 +54,18 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zproxy_set_frontend_identity (zproxy_t *self, char *frontend_identity);
 
+// Get frontend socket identity
+CZMQ_EXPORT char *
+    zproxy_frontend_identity (zproxy_t *self);
+
 // Set the identity for the back end socket manually.
 // Must be done before call to zproxy_bind!
 CZMQ_EXPORT void
     zproxy_set_backend_identity (zproxy_t *self, char *backend_identity);
+
+// Get backend socket identity
+CZMQ_EXPORT char *
+    zproxy_backend_identity (zproxy_t *self);
 
 // Underlying libzmq supports zmq_proxy
 #if (ZMQ_VERSION >= ZPROXY_HAS_PROXY)

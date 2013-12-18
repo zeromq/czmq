@@ -251,16 +251,40 @@ zproxy_bind (zproxy_t *self,
     return rc;
 }
 
+//  --------------------------------------------------------------------------
+//  Set the identity of the frontend socket (before calling zproxy_bind)
+
 void
 zproxy_set_frontend_identity (zproxy_t *self, char *frontend_identity)
 {
     self->frontend_identity = frontend_identity? strdup(frontend_identity): NULL;
 }
 
+//  --------------------------------------------------------------------------
+//  Get the identity of the frontend socket
+
+char *
+zproxy_frontend_identity (zproxy_t *self)
+{
+    return self->frontend_identity;
+}
+
+//  --------------------------------------------------------------------------
+//  Set the identity of the backend socket (before calling zproxy_bind)
+
 void
 zproxy_set_backend_identity (zproxy_t *self, char *backend_identity)
 {
     self->backend_identity = backend_identity? strdup(backend_identity): NULL;
+}
+
+//  --------------------------------------------------------------------------
+//  Get the identity of the backend socket
+
+char *
+zproxy_backend_identity (zproxy_t *self)
+{
+    return self->backend_identity;
 }
 
 //  --------------------------------------------------------------------------
@@ -370,7 +394,7 @@ zproxy_test (bool verbose)
     char *backend_addr = "inproc://proxy_back";
     char *capture_addr = "inproc://proxy_capture";
     char *control_addr = "inproc://proxy_control";
-
+    
     // Defining both a capture address and a control address
     // should create a zmq_proxy_steerable proxy that we
     // can control with a control port and capture data from
@@ -378,6 +402,15 @@ zproxy_test (bool verbose)
     zctx_t *ctx = zctx_new ();
     zproxy_t *proxy = zproxy_new (ctx, ZPROXY_STREAMER);
 
+    // You can set the identity of the front and back sockets
+    // before you call zproxy_bind
+    
+    zproxy_set_frontend_identity (proxy, "front_id");
+    assert (streq (zproxy_frontend_identity (proxy, "front_id"));
+
+    zproxy_set_backend_identity (proxy, "back_id");
+    assert (streq (zproxy_frontend_identity (proxy, "back_id"));
+    
     int rc = zproxy_bind (proxy, frontend_addr, backend_addr, 
             capture_addr, control_addr);
 
