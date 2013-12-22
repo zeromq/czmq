@@ -406,10 +406,12 @@ zproxy_test (bool verbose)
     // before you call zproxy_bind
     
     zproxy_set_frontend_identity (proxy, "front_id");
-    assert (streq (zproxy_frontend_identity (proxy, "front_id"));
+    char *test_identity = zproxy_frontend_identity (proxy);
+    assert (streq (test_identity, "front_id"));
 
     zproxy_set_backend_identity (proxy, "back_id");
-    assert (streq (zproxy_frontend_identity (proxy, "back_id"));
+    test_identity = zproxy_backend_identity (proxy);
+    assert (streq (test_identity, "back_id"));
     
     int rc = zproxy_bind (proxy, frontend_addr, backend_addr, 
             capture_addr, control_addr);
