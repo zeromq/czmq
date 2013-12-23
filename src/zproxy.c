@@ -165,13 +165,12 @@ zproxy_resume (zproxy_t *self)
 static void
 s_proxy_task (void *args, zctx_t *ctx, void *pipe)
 {
-    zproxy_t *self = (zproxy_t *) args;
-
     //  Confirm to API that we've initialized
     zstr_send (pipe, "INITIALIZED");
 
-    //  Start proxy
 #if HAVE_ZMQ_PROXY_STEERABLE
+    //  Start proxy
+    zproxy_t *self = (zproxy_t *) args;
     zmq_proxy_steerable (self->frontend, self->backend, self->capture, pipe);
 #endif
     //  Proxy has ended; we now confirm to the API that we've terminated
@@ -240,4 +239,7 @@ zproxy_test (bool verbose)
     assert (proxy == NULL);
 #endif
     zctx_destroy (&ctx);
+    
+    //  @end
+    printf ("OK\n");
 }
