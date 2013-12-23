@@ -31,6 +31,8 @@ extern "C" {
 #endif
 
 //  @interface
+#define UDP_FRAME_MAX   255         //  Max size of UDP frame
+
 //  Callback for interrupt signal handler
 typedef void (zsys_handler_fn) (int signal_value);
 
@@ -107,6 +109,26 @@ CZMQ_EXPORT void
 CZMQ_EXPORT char *
     zsys_vprintf (const char *format, va_list argptr);
 
+//  Create UDP beacon socket; if the routable option is true, uses
+//  multicast (not yet implemented), else uses broadcast. This method
+//  and related ones might _eventually_ be moved to a zudp class.
+CZMQ_EXPORT SOCKET
+    zsys_udp_new (bool routable);
+
+//  Send zframe to UDP socket
+CZMQ_EXPORT void
+    zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address);
+
+//  Receive zframe from UDP socket, and set address of peer that sent it
+//  The peername must be a char [INET_ADDRSTRLEN] array.
+CZMQ_EXPORT zframe_t *
+    zsys_udp_recv (SOCKET udpsock, char *peername);
+
+//  Handle an I/O error on some socket operation; will report and die on
+//  fatal errors, and continue silently on "try again" errors.
+CZMQ_EXPORT void
+    zsys_socket_error (char *reason);
+    
 //  Self test of this class
 CZMQ_EXPORT int
     zsys_test (bool verbose);

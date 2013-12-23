@@ -42,45 +42,8 @@
 #include "../include/czmq.h"
 #include "platform.h"
 
-#if defined (HAVE_LINUX_WIRELESS_H)
-#   include <linux/wireless.h>
-#else
-#   if defined (HAVE_NET_IF_H)
-#       include <net/if.h>
-#   endif
-#   if defined (HAVE_NET_IF_MEDIA_H)
-#       include <net/if_media.h>
-#   endif
-#endif
-
-#if defined (__UTYPE_SUNSOLARIS) || defined (__UTYPE_SUNOS)
-#   include <ifaddrs.h>
-#   include <sys/sockio.h>
-#endif
-
-#if defined (__WINDOWS__)
-#   if (_WIN32_WINNT < 0x0501)
-#       undef _WIN32_WINNT
-#       define _WIN32_WINNT 0x0501
-#   endif
-#   include <ws2tcpip.h>            //  For getnameinfo ()
-#   include <iphlpapi.h>            //  For GetAdaptersAddresses ()
-#endif
-
-//  Windows uses 
-#if !defined (__WINDOWS__)
-typedef int SOCKET;
-#   define closesocket close
-#   define INVALID_SOCKET -1
-#   define SOCKET_ERROR -1
-#endif
-
 //  Constants
-#define BEACON_MAX      255         //  Max size of beacon data
 #define INTERVAL_DFLT  1000         //  Default interval = 1 second
-
-//  Internet socket address structure
-typedef struct sockaddr_in inaddr_t;
 
 //  Structure of our class
 struct _zbeacon_t {
@@ -168,7 +131,7 @@ zbeacon_publish (zbeacon_t *self, byte *transmit, size_t size)
 {
     assert (self);
     assert (transmit);
-    assert (size > 0 && size <= BEACON_MAX);
+    assert (size > 0 && size <= UDP_FRAME_MAX);
     zmsg_t *msg = zmsg_new ();
     zmsg_addstr (msg, "PUBLISH");
     zmsg_addmem (msg, transmit, size);
@@ -194,7 +157,7 @@ void
 zbeacon_subscribe (zbeacon_t *self, byte *filter, size_t size)
 {
     assert (self);
-    assert (size <= BEACON_MAX);
+    assert (size <= UDP_FRAME_MAX);
     zmsg_t *msg = zmsg_new ();
     zmsg_addstr (msg, "SUBSCRIBE");
     zmsg_addmem (msg, filter, size);
@@ -233,38 +196,6 @@ zbeacon_hostname (zbeacon_t *self)
     return self->hostname;
 }
 
-//  --------------------------------------------------------------------------
-//  Start/stop listening on unicast packets
-
-void zbeacon_unicast (zbeacon_t *self,  int flag)
-{
-    assert (self);
-
-    zmsg_t *msg = zmsg_new ();
-    zmsg_addstr (msg, "UNICAST");
-    zmsg_addstr (msg, "%d", flag);
-    zmsg_send (&msg, self->pipe);
-    // wait until socket setup to unicast/broadcast complete
-    char *reply =  zstr_recv (self->pipe);
-    zstr_free (&reply);
-}
-
-//  --------------------------------------------------------------------------
-//  Send a frame directed to a particular IP unicast address once
-
-void zbeacon_send (zbeacon_t *self,  char *ipaddress, byte *transmit, size_t size)
-{
-    assert (self);
-    assert (ipaddress);
-    assert (transmit);
-    assert (size > 0 && size <= BEACON_MAX);
-
-    zmsg_t *msg = zmsg_new ();
-    zmsg_addstr (msg, "SEND");
-    zmsg_addstr (msg, ipaddress);
-    zmsg_addmem (msg, transmit, size);
-    zmsg_send (&msg, self->pipe);
-}
 
 //  --------------------------------------------------------------------------
 //  Self test of this class
@@ -302,30 +233,7 @@ zbeacon_test (bool verbose)
                         +  zframe_data (content) [1];
         assert (received_port == port_nbr);
         zframe_destroy (&content);
-	zbeacon_silence (service_beacon);
-
-	// turn on UDP unicast reception
-	zbeacon_unicast (client_beacon, 1);
-
-	zsocket_set_rcvtimeo (zbeacon_socket (client_beacon), 500);
-
-	// send unicast UDP message to ourselves
-	zbeacon_send (service_beacon, ipaddress, (byte *) "SELF", 4);
-
-        char *addr = zstr_recv (zbeacon_socket (client_beacon));
-	assert(addr != NULL);
-
-	// assert we got it, src IP and contents add up
-	assert(strcmp(addr,ipaddress) == 0);
-
-        content = zframe_recv (zbeacon_socket (client_beacon));
-	assert(content != NULL);
-
-	assert(memcmp((void *) "SELF", zframe_data (content),  zframe_size (content)) == 0);
-        zstr_free (&ipaddress);
-
-	// turn off UDP unicast reception
-	zbeacon_unicast (client_beacon, 0);
+        zbeacon_silence (service_beacon);
     }
     zbeacon_destroy (&client_beacon);
     zbeacon_destroy (&service_beacon);
@@ -416,13 +324,9 @@ static agent_t *
 static void
     s_agent_destroy (agent_t **self_p);
 static void
-    s_handle_io_error (char *reason);
-static void
     s_get_interface (agent_t *self);
 static void
     s_api_command (agent_t *self);
-static void
-    s_beacon_send (agent_t *self);
 static void
     s_beacon_recv (agent_t *self);
 
@@ -459,12 +363,13 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
 
         if (pollitems [0].revents & ZMQ_POLLIN)
             s_api_command (self);
-	if (pollitems [1].revents & ZMQ_POLLIN)
+        if (pollitems [1].revents & ZMQ_POLLIN)
             s_beacon_recv (self);
 
         if (self->transmit
         &&  zclock_time () >= self->ping_at) {
-            s_beacon_send (self);
+            //  Send beacon to any listening peers
+            zsys_udp_send (self->udpsock, self->transmit, &self->broadcast);
             self->ping_at = zclock_time () + self->interval;
         }
         if (self->terminated)
@@ -487,40 +392,21 @@ s_agent_new (void *pipe, int port_nbr)
     self->interval = INTERVAL_DFLT;
 
     //  Create our UDP socket
-    self->udpsock = socket (AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    self->udpsock = zsys_udp_new (false);
     if (self->udpsock == INVALID_SOCKET) {
         free (self);        //  No more file handles - forget it
         return NULL;
     }
 
-    //  Ask operating system to let us do broadcasts from socket
-    int on = 1;
-    if (setsockopt (self->udpsock, SOL_SOCKET, SO_BROADCAST,
-                   (char *) &on, sizeof (on)) == SOCKET_ERROR)
-        s_handle_io_error ("setsockopt (SO_BROADCAST)");
-
-    //  Allow multiple owners to bind to socket; incoming
-    //  messages will replicate to each owner
-    if (setsockopt (self->udpsock, SOL_SOCKET, SO_REUSEADDR,
-                   (char *) &on, sizeof (on)) == SOCKET_ERROR)
-        s_handle_io_error ("setsockopt (SO_REUSEADDR)");
-
-#if defined (SO_REUSEPORT)
-    //  On some platforms we have to ask to reuse the port
-    if (setsockopt (self->udpsock, SOL_SOCKET, SO_REUSEPORT,
-                    (char *) &on, sizeof (on)) == SOCKET_ERROR)
-        s_handle_io_error ("setsockopt (SO_REUSEPORT)");
-#endif
     //  PROBLEM: this design will not survive the network interface
     //  being killed and restarted while the program is running
-
     //  Get the network interface
     s_get_interface (self);
 
     //  Bind to the port on all interfaces
     inaddr_t sockaddr = self->broadcast;
     if (bind (self->udpsock, (struct sockaddr *) &sockaddr, sizeof (sockaddr)) == SOCKET_ERROR)
-        s_handle_io_error ("bind");
+        zsys_socket_error ("bind");
 
     //  Send our hostname back to API
     char hostname [INET_ADDRSTRLEN];
@@ -532,52 +418,7 @@ s_agent_new (void *pipe, int port_nbr)
 }
 
 
-//  Handle error from I/O operation
-
-static void
-s_handle_io_error (char *reason)
-{
-#if defined (__WINDOWS__)
-    switch (WSAGetLastError ()) {
-        case WSAEINTR:        errno = EINTR;      break;
-        case WSAEBADF:        errno = EBADF;      break;
-        case WSAEWOULDBLOCK:  errno = EAGAIN;     break;
-        case WSAEINPROGRESS:  errno = EAGAIN;     break;
-        case WSAENETDOWN:     errno = ENETDOWN;   break;
-        case WSAECONNRESET:   errno = ECONNRESET; break;
-        case WSAECONNABORTED: errno = EPIPE;      break;
-        case WSAESHUTDOWN:    errno = ECONNRESET; break;
-        case WSAEINVAL:       errno = EPIPE;      break;
-        default:              errno = GetLastError ();
-    }
-#endif
-    if (errno == EAGAIN
-    ||  errno == ENETDOWN
-    ||  errno == EHOSTUNREACH
-    ||  errno == ENETUNREACH
-    ||  errno == EINTR
-    ||  errno == EPIPE
-    ||  errno == ECONNRESET
-#if !defined (__WINDOWS__)
-    ||  errno == EPROTO
-    ||  errno == ENOPROTOOPT
-    ||  errno == EHOSTDOWN
-    ||  errno == EOPNOTSUPP
-    ||  errno == EWOULDBLOCK
-#endif
-#if defined (ENONET)
-    ||  errno == ENONET
-#endif
-    )
-        return;             //  Ignore error and try again
-    else {
-        zclock_log ("E: (UDP) error '%s' on %s", strerror (errno), reason);
-        assert (false);
-    }
-}
-
-
-//  Get the actual network interface we're working on
+//  Get the actual network interface we're working on.
 //  Currently implemented for POSIX and for Windows
 
 static void
@@ -601,7 +442,8 @@ s_get_interface (agent_t *self)
                 //  address, build the broadcast address from the source
                 //  address and netmask.
                 if (self->address.sin_addr.s_addr == self->broadcast.sin_addr.s_addr)
-                    self->broadcast.sin_addr.s_addr |= ~(((inaddr_t *) interface->ifa_netmask)->sin_addr.s_addr);
+                    self->broadcast.sin_addr.s_addr
+                        |= ~(((inaddr_t *) interface->ifa_netmask)->sin_addr.s_addr);
 
                 //  Keep track of the number of interfaces on this host
                 if (self->address.sin_addr.s_addr != ntohl(INADDR_LOOPBACK))
@@ -655,13 +497,13 @@ s_get_interface (agent_t *self)
         strncpy (ifr.ifr_name, zsys_interface (), sizeof (ifr.ifr_name));
         int rc = ioctl (sock, SIOCGIFADDR, (caddr_t) &ifr, sizeof (struct ifreq));
         if (rc == -1)
-            s_handle_io_error ("siocgifaddr");
+            zsys_socket_error ("siocgifaddr");
 
         //  Get interface broadcast address
         memcpy (&self->address, ((inaddr_t *) &ifr.ifr_addr), sizeof (inaddr_t));
         rc = ioctl (sock, SIOCGIFBRDADDR, (caddr_t) &ifr, sizeof (struct ifreq));
         if (rc == -1)
-            s_handle_io_error ("siocgifbrdaddr");
+            zsys_socket_error ("siocgifbrdaddr");
 
         memcpy (&self->broadcast, ((inaddr_t *) &ifr.ifr_broadaddr), sizeof (inaddr_t));
         close (sock);
@@ -685,7 +527,8 @@ s_get_interface (agent_t *self)
         if (pUnicast && pPrefix) {
             self->address = *(inaddr_t *)(pUnicast->Address.lpSockaddr);
             self->broadcast = *(inaddr_t *)(pPrefix->Address.lpSockaddr);
-            self->broadcast.sin_addr.s_addr |= htonl ((1 << (32 - pPrefix->PrefixLength)) - 1);
+            self->broadcast.sin_addr.s_addr
+                |= htonl ((1 << (32 - pPrefix->PrefixLength)) - 1);
         }
         cur_address = cur_address->Next;
     }
@@ -736,86 +579,6 @@ s_api_command (agent_t *self)
         zstr_send (self->pipe, "OK");
     }
     else
-    if (streq (command, "UNICAST")) {
-	char *flag =  zstr_recv (self->pipe);
-	assert(flag);
-	assert(strlen(flag));
-
-	// shutdown and reopen, listening either on  INADDR_BROADCAST
-	// or INADDR_ANY if unicast desired
-	shutdown(self->udpsock, SHUT_RDWR);
-
-	self->udpsock = socket (AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	if (self->udpsock == INVALID_SOCKET) {
-	    free (self);        //  No more file handles - forget it
-	    s_handle_io_error ("socket");
-	    zstr_send (self->pipe, "-1");
-	    return;
-	}
-	//  Allow multiple owners to bind to socket; incoming
-	//  messages will replicate to each owner
-	int on = 1;
-	if (setsockopt (self->udpsock, SOL_SOCKET, SO_REUSEADDR,
-			(char *) &on, sizeof (on)) == SOCKET_ERROR)
-	    s_handle_io_error ("setsockopt (SO_REUSEADDR)");
-
-#if defined (SO_REUSEPORT)
-	//  On some platforms we have to ask to reuse the port
-	if (setsockopt (self->udpsock, SOL_SOCKET, SO_REUSEPORT,
-			(char *) &on, sizeof (on)) == SOCKET_ERROR)
-	    s_handle_io_error ("setsockopt (SO_REUSEPORT)");
-#endif
-
-	if (setsockopt (self->udpsock, SOL_SOCKET, SO_BROADCAST,
-                   (char *) &on, sizeof (on)) == SOCKET_ERROR)
-        s_handle_io_error ("setsockopt (SO_BROADCAST)");
-
-	inaddr_t sockaddr;
-	if (atoi(flag)) {
-	    sockaddr.sin_family  = AF_INET;
-	    sockaddr.sin_port = htons (self->port_nbr);
-	    sockaddr.sin_addr.s_addr =  INADDR_ANY; 
-	} else {
-	   sockaddr = self->broadcast;
-	}
-
-	if (bind (self->udpsock, (struct sockaddr *) &sockaddr, 
-		  sizeof (sockaddr)) == SOCKET_ERROR) {
-	    s_handle_io_error ("bind");
-	    zstr_send (self->pipe, "-1");
-	} else {
-	    zstr_send (self->pipe, "0");
-	}
-    }
-    else
-    if (streq (command, "SEND")) {
-	char *ipaddress = zstr_recv (self->pipe);
-        assert (ipaddress);
-	zframe_t *content =  zframe_recv (self->pipe);
-        assert (content);
-
-	in_addr_t addr = inet_addr (ipaddress);
-	if (addr == 0) {
-	    zframe_destroy (&content);
-	    zstr_free (&ipaddress);
-	    return;
-	}
-	struct sockaddr_in to_addr;
-	to_addr.sin_family  = AF_INET;
-	to_addr.sin_port = htons (self->port_nbr);
-	to_addr.sin_addr.s_addr = addr; 
-
-	// Send as UDP unicast packet
-	if (sendto (self->udpsock,
-		    (char *) zframe_data (content), zframe_size (content),
-		    0,      //  Flags
-		    (struct sockaddr *) &to_addr, sizeof (to_addr)) < 0) {
-	    perror("sendto");
-	}
-        zframe_destroy (&content);
-        zstr_free (&ipaddress);
-    }
-    else
         printf ("E: unexpected API command '%s'\n", command);
     
     zstr_free (&command);
@@ -828,76 +591,35 @@ s_beacon_recv (agent_t *self)
 {
     assert (self);
 
-    socklen_t si_len = sizeof (inaddr_t);
-    inaddr_t sender;
-    byte buffer [BEACON_MAX];
-    ssize_t size = recvfrom (
-        self->udpsock,
-        (char *) buffer, BEACON_MAX,
-        0,      //  Flags
-        (struct sockaddr *) &sender, &si_len);
-    if (size == SOCKET_ERROR)
-        s_handle_io_error ("recvfrom");
-    
-    //  Get sender address as printable string
     char peername [INET_ADDRSTRLEN];
-#if (defined (__WINDOWS__))
-    getnameinfo ((struct sockaddr *) &sender, si_len,
-                peername, INET_ADDRSTRLEN, NULL, 0, NI_NUMERICHOST);
-#else
-    inet_ntop (AF_INET, &sender.sin_addr, peername, si_len);
-#endif
-
+    zframe_t *frame = zsys_udp_recv (self->udpsock, peername);
+    
     //  If filter is set, check that beacon matches it
     bool is_valid = false;
     if (self->filter) {
         byte  *filter_data = zframe_data (self->filter);
         size_t filter_size = zframe_size (self->filter);
-        if ((size_t) size >= filter_size
-        &&  memcmp (buffer, filter_data, filter_size) == 0)
+        if (zframe_size (frame) >= filter_size
+        && memcmp (zframe_data (frame), filter_data, filter_size) == 0)
             is_valid = true;
     }
     //  If valid, check for echoed beacons (i.e. our own broadcast)
     if (is_valid && self->noecho && self->transmit) {
         byte  *transmit_data = zframe_data (self->transmit);
         size_t transmit_size = zframe_size (self->transmit);
-        if (size == transmit_size && memcmp (buffer, transmit_data, transmit_size) == 0)
+        if (zframe_size (frame) == transmit_size
+        && memcmp (zframe_data (frame), transmit_data, transmit_size) == 0)
             is_valid = false;
     }
     //  If still a valid beacon, send on to the API
     if (is_valid) {
         zmsg_t *msg = zmsg_new ();
         zmsg_addstr (msg, peername);
-        zmsg_addmem (msg, buffer, size);
+        zmsg_add (msg, frame);
         zmsg_send (&msg, self->pipe);
     }
 }
 
-
-//  Send beacon to any listening peers
-
-static void
-s_beacon_send (agent_t *self)
-{
-    //  Send UDP broadcast packet now
-    assert (self->transmit);
-    sendto (
-        self->udpsock,
-        (char *) zframe_data (self->transmit), zframe_size (self->transmit),
-        0,      //  Flags
-        (struct sockaddr *) &self->broadcast, sizeof (inaddr_t));
-
-    //  Sending can fail if the OS is blocking multicast. In such cases we
-    //  don't try to report the error. We might log this or send to an error
-    //  console at some point.
-    //  ssize_t size = sendto (
-    //      self->udpsock,
-    //      (char *) zframe_data (self->transmit), zframe_size (self->transmit),
-    //      0,      //  Flags
-    //      (struct sockaddr *) &self->broadcast, sizeof (inaddr_t));
-    //  if (size == SOCKET_ERROR)
-    //      s_handle_io_error ("sendto");
-}
 
 //  Destroy agent instance
 
