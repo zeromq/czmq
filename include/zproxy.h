@@ -1,6 +1,6 @@
 /*
     =========================================================================
-    zproxy - convenient zmq_proxy api
+    zproxy - work with zmq_proxy_steerable instances
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
@@ -31,102 +31,43 @@
 extern "C" {
 #endif
 
-#define ZPROXY_QUEUE 1
-#define ZPROXY_FORWARDER 2
-#define ZPROXY_STREAMER 3
-#define ZPROXY_HAS_PROXY 30201
-#define ZPROXY_HAS_STEERABLE 40100
-
 //  Opaque class structure
 typedef struct _zproxy_t zproxy_t;
 
 //  @interface
-//  Create a new zproxy object
-CZMQ_EXPORT zproxy_t *
-    zproxy_new (zctx_t *ctx, int zproxy_type);
 
-//  Destroy a zproxy object
+//  Constructor
+//  Create a new zproxy object. You must create the frontend and backend
+//  sockets, configure them, and connect or bind them, before you pass them
+//  to the constructor. Do NOT use the sockets again, after passing them to
+//  this method.
+CZMQ_EXPORT zproxy_t *
+    zproxy_new (zctx_t *ctx, void *frontend, void *backend);
+
+//  Destructor
+//  Destroy a zproxy object; note this first stops the proxy.
 CZMQ_EXPORT void
     zproxy_destroy (zproxy_t **self_p);
 
-// Set the identity for the front end socket manually.
-// Must be done before call to zproxy_bind!
+//  Copy all proxied messages to specified endpoint; if this is NULL, any
+//  in-progress capturing will be stopped. You must already have bound the
+//  endpoint to a PULL socket.
 CZMQ_EXPORT void
-    zproxy_set_frontend_identity (zproxy_t *self, char *frontend_identity);
+    zproxy_capture (zproxy_t *self, char *endpoint);
 
-// Get frontend socket identity
-CZMQ_EXPORT char *
-    zproxy_frontend_identity (zproxy_t *self);
-
-// Set the identity for the back end socket manually.
-// Must be done before call to zproxy_bind!
-CZMQ_EXPORT void
-    zproxy_set_backend_identity (zproxy_t *self, char *backend_identity);
-
-// Get backend socket identity
-CZMQ_EXPORT char *
-    zproxy_backend_identity (zproxy_t *self);
-
-// Underlying libzmq supports zmq_proxy
-#if (ZMQ_VERSION >= ZPROXY_HAS_PROXY)
-
-//  Get zproxy capture address
-CZMQ_EXPORT char *
-    zproxy_capture_addr (zproxy_t *self);
-
-//  Get zproxy capture type
-CZMQ_EXPORT int
-    zproxy_capture_type (zproxy_t *self);
-
-// Underlying libzmq also supports zmq_proxy_steerable
-#if (ZMQ_VERSION >= ZPROXY_HAS_STEERABLE)
-
-//  Start a zproxy in an attached thread, binding to endpoints.
-//  If capture_addr is not null, will create a capture socket.
-//  If control_addr is not null, will use zmq_proxy_steerable
-//  Returns 0 if OK, -1 if there was an error
-CZMQ_EXPORT int
-    zproxy_bind (zproxy_t *self, char *frontend_addr,
-            char *backend_addr, char *capture_addr,
-            char *control_addr);
-
-// Pause a zproxy object
+//  Pauses a zproxy object; a paused proxy will cease processing messages,
+//  causing them to be queued up and potentially hit the high-water mark on
+//  the frontend socket, causing messages to be dropped, or writing
+//  applications to block.
 CZMQ_EXPORT void
     zproxy_pause (zproxy_t *self);
 
-// Resume a zproxy object
+//  Resume a zproxy object
 CZMQ_EXPORT void
     zproxy_resume (zproxy_t *self);
 
-// Terminate a zproxy object
-CZMQ_EXPORT void
-    zproxy_terminate (zproxy_t *self);
-
-// Underlying libzmq supports zmq_proxy but not zmq_proxy_steerable
-#else
-
-//  Start and zmq_proxy in an attached thread, binding to endpoints.
-//  If capture_addr is not null, will create a capture socket.
-//  Returns 0 if OK, -1 if there was an error
-CZMQ_EXPORT int
-    zproxy_bind (zproxy_t *self, char *frontend_addr,
-            char *backend_addr, char *capture_addr);
-#endif
-
-// Underlying libzmq supports zmq_device and does not support
-// zmq_proxy nor zmq_proxy_steerable
-#else
-
-//  Start a zproxy in an attached thread, binding to endpoints.
-//  Returns 0 if OK, -1 if there was an error
-CZMQ_EXPORT int
-    zproxy_bind (zproxy_t *self, char *frontend_addr,
-            char *backend_addr);
-
-#endif 
-
 // Self test of this class
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zproxy_test (bool verbose);
 //  @end
 

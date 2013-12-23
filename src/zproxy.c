@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zproxy - convenient zmq_proxy API
+    zproxy - work with zmq_proxy_steerable instances
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
@@ -25,177 +25,70 @@
 
 /*
 @header
-    The zproxy class simplifies working with the zmq_proxy API.
+    The zproxy class simplifies working with the zmq_proxy_steerable API.
 @discuss
-    I've modified zproxy to "do the right thing" depending
-    on both the underlying version of libzmq and arguments passed 
-    to zproxy_bind.  While this introduces quite a 
-    bit of complexity in this czmq class, the hope is that it
-    reduces a lot of complexity on behalf of the actual czmq user.
-
-    Note that because the zproxy_bind function signature changes
-    based on version of libzmq compiled against, swapping out the
-    underlying libzmq for an older version than compiled against
-    will cause code to fail.  This is intended behavior.
-
-    I have tested swapping out the underlying libzmq for newer
-    versions than compiled against, and this works.
-
-    The behavior for various cases is as follows:
-
-    ------------------------------------------
-    ZMQ_VERSION >= ZPROXY_HAS_STEERABLE 
-    
-    int
-    zproxy_bind (zproxy_t *self, char *frontend_addr,
-            char *backend_addr, char *capture_addr,
-            char *control_addr);
-
-    capture? | control?  | should call
-    YES      | YES       | zmq_proxy_steerable
-    NO       | YES       | zmq_proxy_steerable
-    YES      | NO        | zmq_proxy
-    NO       | NO        | zmq_proxy
-   
-    ------------------------------------------
-    ZMQ_VERSION >= ZPROXY_HAS_PROXY &&
-    ZMQ_VERSION < ZPROXY_HAS_STEERABLE
-
-    int
-    zproxy_bind (zproxy_t *self, char *frontend_addr,
-            char *backend_addr, char *capture_addr);
-
-    capture? | should call
-    YES      | zmq_proxy
-    NO       | zmq_proxy
-
-    ------------------------------------------
-    ZMQ_VERSION < ZPROXY_HAS_PROXY
-
-    int
-    zproxy_bind (zproxy_t *self, char *frontend_addr,
-            char *backend_addr);
-
-    should call
-    zmq_proxy
+    There's no fallback to the older zmq_proxy, since that does not allow
+    dynamic control. If you need zmq_proxy (if you are using an older
+    version of libzmq), use that directly in your code.
 @end
 */
-
+#if HAVE_ZMQ_PROXY_STREERABLE
+#endif
 #include "../include/czmq.h"
+#include "platform.h"
 
 //  Structure of our class
 
 struct _zproxy_t {
     zctx_t *ctx;
-    void *pipe;
-    int type;
-    char *frontend_identity;
-    char *frontend_addr;
-    int frontend_type;
     void *frontend;
-    char *backend_identity;
-    char *backend_addr;
-    int backend_type;
     void *backend;
-#if (ZMQ_VERSION >= ZPROXY_HAS_PROXY)
-    char *capture_addr;
-    int capture_type;
     void *capture;
-#endif
-#if (ZMQ_VERSION >= ZPROXY_HAS_STEERABLE)
-    char *control_addr;
-    int control_type;
-    void *control;
-#endif
+    void *pipe;
 };
 
-// Background task that runs the proxy
-static void
-    s_agent_task (void *args, zctx_t *ctx, void *pipe);
 
+//  The proxy runs in a background thread
+static void
+    s_proxy_task (void *args, zctx_t *ctx, void *pipe);
 
 //  --------------------------------------------------------------------------
 //  Constructor
+//  Create a new zproxy object. You must create the frontend and backend
+//  sockets, configure them, and connect or bind them, before you pass them
+//  to the constructor. Do NOT use the sockets again, after passing them to
+//  this method.
 
 zproxy_t *
-zproxy_new (zctx_t *ctx, int zproxy_type)
+zproxy_new (zctx_t *ctx, void *frontend, void *backend)
 {
     assert (ctx);
-    assert (zproxy_type > 0 && zproxy_type < 4);
-
+#if HAVE_ZMQ_PROXY_STEERABLE
     zproxy_t *self;
     self = (zproxy_t *) zmalloc (sizeof (zproxy_t));
-    assert (self);
-    self->ctx = ctx;
-    self->type = zproxy_type;
-#if (ZMQ_VERSION >= ZPROXY_HAS_PROXY)
-    self->capture_type = ZMQ_PUB;
-#endif
-#if (ZMQ_VERSION >= ZPROXY_HAS_STEERABLE)
-    self->control_type = ZMQ_SUB;
-#endif
-
-    switch (self->type) {
-        case (ZPROXY_QUEUE):
-            self->frontend_type = ZMQ_ROUTER;
-            self->backend_type = ZMQ_DEALER;
-            break;
-        case (ZPROXY_FORWARDER):
-            self->frontend_type = ZMQ_XSUB;
-            self->backend_type = ZMQ_XPUB;
-            break;
-        case (ZPROXY_STREAMER):
-            self->frontend_type = ZMQ_PULL;
-            self->backend_type = ZMQ_PUSH;
-            break;
-        default:
-            break;
+    if (self) {
+        self->ctx = ctx;
+        self->frontend = frontend;
+        self->backend = backend;
+        self->pipe = zthread_fork (ctx, s_proxy_task, self);
+        if (self->pipe) {
+            char *reply = zstr_recv (self->pipe);
+            zstr_free (&reply);
+        }
+        else {
+            free (self);
+            self = NULL;
+        }
     }
     return self;
-}
-#if (ZMQ_VERSION >= ZPROXY_HAS_STEERABLE)
-
-//  --------------------------------------------------------------------------
-//  Command; Sends a pause command to the proxy
-
-void
-zproxy_pause (zproxy_t *self)
-{
-    assert (self);
-    zstr_send (self->control, "PAUSE");
-
+#else
+    return NULL;
+#endif
 }
 
-//  --------------------------------------------------------------------------
-//  Command; Sends a resume command to the proxy
-
-void
-zproxy_resume (zproxy_t *self)
-{
-    assert (self);
-    zstr_send (self->control, "RESUME");
-}
 
 //  --------------------------------------------------------------------------
-//  Command; Sends a terminate command to the proxy
-
-void
-zproxy_terminate (zproxy_t *self)
-{
-    assert (self);
-    zpoller_t *poller = zpoller_new (self->pipe, NULL);
-    assert (poller);
-    zstr_send (self->control, "TERMINATE");
-    void *pipe_sock = zpoller_wait (poller, 1000);
-    char *resp = zstr_recv_nowait (pipe_sock);
-    assert (streq (resp, "TERMINATED"));
-    free (resp);
-}
-#endif 
-
-//  --------------------------------------------------------------------------
-//  Destructor; call this after destroying the parent context. Since the
-//  pipe to the proxy task will be dead, we cannot synchronize 
+//  Destroy a zproxy object; note this first stops the proxy.
 
 void
 zproxy_destroy (zproxy_t **self_p)
@@ -203,499 +96,148 @@ zproxy_destroy (zproxy_t **self_p)
     assert (self_p);
     if (*self_p) {
         zproxy_t *self = *self_p;
+        zstr_send (self->pipe, "TERMINATE");
+        char *reply = zstr_recv (self->pipe);
+        zstr_free (&reply);
         free (self);
         *self_p = NULL;
     }
 }
 
-//  --------------------------------------------------------------------------
-//  Start and zmq_proxy in an attached thread, binding to endpoints
-//  Returns 0 if OK, -1 if there was an error
-
-int
-zproxy_bind (zproxy_t *self,
-    char *frontend_addr,
-    char *backend_addr
-#if (ZMQ_VERSION >= ZPROXY_HAS_PROXY)
-    ,char *capture_addr
-#if (ZMQ_VERSION >= ZPROXY_HAS_STEERABLE)
-    ,char *control_addr
-#endif
-#endif
-)
-{
-    self->frontend_addr = frontend_addr? strdup(frontend_addr): NULL;
-    self->backend_addr = backend_addr? strdup(backend_addr): NULL;
-#if (ZMQ_VERSION >= ZPROXY_HAS_PROXY)
-    self->capture_addr = capture_addr? strdup(capture_addr): NULL;
-#endif
-#if (ZMQ_VERSION >= ZPROXY_HAS_STEERABLE)
-    self->control_addr = control_addr? strdup(control_addr): NULL;
-    if (self->control_addr) {
-        self->control = zsocket_new (self->ctx, ZMQ_PUB);
-        zsocket_bind (self->control, self->control_addr);
-    }
-#endif
-
-    self->pipe = zthread_fork (self->ctx, s_agent_task, self);
-
-    int rc;
-    if (self->pipe) {
-        zstr_send (self->pipe, "START");
-        char *response = zstr_recv (self->pipe);
-        rc = streq (response, "OK")? 0: -1;
-        free (response);
-    }
-    else
-        rc = -1;
-    return rc;
-}
 
 //  --------------------------------------------------------------------------
-//  Set the identity of the frontend socket (before calling zproxy_bind)
+//  Copy all proxied messages to specified endpoint; if this is NULL, any
+//  in-progress capturing will be stopped. You must already have bound the
+//  endpoint to a PULL socket.
 
 void
-zproxy_set_frontend_identity (zproxy_t *self, char *frontend_identity)
+zproxy_capture (zproxy_t *self, char *endpoint)
 {
-    self->frontend_identity = frontend_identity? strdup(frontend_identity): NULL;
+    assert (self);
+
+    //  Stop running proxy, and reconfigure new proxy with capture
+    zstr_send (self->pipe, "TERMINATE");
+    char *reply = zstr_recv (self->pipe);
+    zstr_free (&reply);
+
+    //  Capture flow is always PUSH-to-PULL
+    self->capture = zsocket_new (self->ctx, ZMQ_PUSH);
+    assert (self->capture);
+    int rc = zsocket_connect (self->capture, endpoint);
+    assert (rc == 0);
+
+    //  Restart proxy with new configuration
+    self->pipe = zthread_fork (self->ctx, s_proxy_task, self);
+    assert (self->pipe);
+    reply = zstr_recv (self->pipe);
+    zstr_free (&reply);
 }
 
-//  --------------------------------------------------------------------------
-//  Get the identity of the frontend socket
-
-char *
-zproxy_frontend_identity (zproxy_t *self)
-{
-    return self->frontend_identity;
-}
 
 //  --------------------------------------------------------------------------
-//  Set the identity of the backend socket (before calling zproxy_bind)
+//  Pauses a zproxy object; a paused proxy will cease processing messages,
+//  causing them to be queued up and potentially hit the high-water mark on
+//  the frontend socket, causing messages to be dropped, or writing
+//  applications to block.
 
 void
-zproxy_set_backend_identity (zproxy_t *self, char *backend_identity)
+zproxy_pause (zproxy_t *self)
 {
-    self->backend_identity = backend_identity? strdup(backend_identity): NULL;
+    assert (self);
+    zstr_send (self->pipe, "PAUSE");
 }
+
 
 //  --------------------------------------------------------------------------
-//  Get the identity of the backend socket
+//  Resume a zproxy object
 
-char *
-zproxy_backend_identity (zproxy_t *self)
+void
+zproxy_resume (zproxy_t *self)
 {
-    return self->backend_identity;
+    assert (self);
+    zstr_send (self->pipe, "RESUME");
 }
+
 
 //  --------------------------------------------------------------------------
-//  Get the proxy type 
+//  Backend proxy task
 
-int
-zproxy_type (zproxy_t *self)
+static void
+s_proxy_task (void *args, zctx_t *ctx, void *pipe)
 {
-    return self->type;
-}
+    zproxy_t *self = (zproxy_t *) args;
 
-//  --------------------------------------------------------------------------
-//  Get the proxy frontend address
+    //  Confirm to API that we've initialized
+    zstr_send (pipe, "INITIALIZED");
 
-char *
-zproxy_frontend_addr (zproxy_t *self)
-{
-    return self->frontend_addr;
-}
-
-//  --------------------------------------------------------------------------
-//  Get the proxy frontend type
-
-int
-zproxy_frontend_type (zproxy_t *self)
-{
-    return self->frontend_type;
-}
-
-//  --------------------------------------------------------------------------
-//  Get the proxy backend address
-
-char *
-zproxy_backend_addr (zproxy_t *self)
-{
-    return self->backend_addr;
-}
-
-//  --------------------------------------------------------------------------
-//  Get the proxy backend type
-
-int
-zproxy_backend_type (zproxy_t *self)
-{
-    return self->backend_type;
-}
-#if (ZMQ_VERSION >= ZPROXY_HAS_PROXY)
-
-//  --------------------------------------------------------------------------
-//  Get the proxy capture address
-
-char *
-zproxy_capture_addr (zproxy_t *self)
-{
-    return self->capture_addr;
-}
-
-//  --------------------------------------------------------------------------
-//  Get the proxy capture type
-
-int
-zproxy_capture_type (zproxy_t *self)
-{
-    return self->capture_type;
-}
+    //  Start proxy
+#if HAVE_ZMQ_PROXY_STEERABLE
+    zmq_proxy_steerable (self->frontend, self->backend, self->capture, pipe);
 #endif
-#if (ZMQ_VERSION >= ZPROXY_HAS_STEERABLE)
-
-//  --------------------------------------------------------------------------
-//  Get the proxy control address
-
-char *
-zproxy_control_addr (zproxy_t *self)
-{
-    return self->control_addr;
+    //  Proxy has ended; we now confirm to the API that we've terminated
+    zstr_send (pipe, "TERMINATED");
 }
 
-//  --------------------------------------------------------------------------
-//  Get the proxy control type
-
-int
-zproxy_control_type (zproxy_t *self)
-{
-    return self->control_type;
-}
-#endif
 
 // --------------------------------------------------------------------------
 //  Selftest
 
-// Forward declaration of test runner.  This lets us test zproxy with a 
-// matrix of different input combinations without repeating a lot
-// of code.   
-static void
-s_zproxy_test_run (zproxy_t *proxy, char *frontend_addr,
-        char *backend_addr, char *capture_addr, char *control_addr);
-
-int
+void
 zproxy_test (bool verbose)
 {
     printf (" * zproxy: ");
-    
+
     //  @selftest
-#if (ZMQ_VERSION >= ZPROXY_HAS_STEERABLE)
-
-    char *frontend_addr = "inproc://proxy_front";
-    char *backend_addr = "inproc://proxy_back";
-    char *capture_addr = "inproc://proxy_capture";
-    char *control_addr = "inproc://proxy_control";
-    
-    // Defining both a capture address and a control address
-    // should create a zmq_proxy_steerable proxy that we
-    // can control with a control port and capture data from
-    // using the capture port.
     zctx_t *ctx = zctx_new ();
-    zproxy_t *proxy = zproxy_new (ctx, ZPROXY_STREAMER);
+    void *frontend = zsocket_new (ctx, ZMQ_PULL);
+    int rc = zsocket_bind (frontend, "inproc://frontend");
+    assert (rc == 0);
+    void *backend = zsocket_new (ctx, ZMQ_PUSH);
+    rc = zsocket_bind (backend, "inproc://backend");
+    assert (rc == 0);
+    zproxy_t *proxy = zproxy_new (ctx, frontend, backend);
 
-    // You can set the identity of the front and back sockets
-    // before you call zproxy_bind
+#if HAVE_ZMQ_PROXY_STEERABLE
+    //  Connect application sockets to proxy
+    void *faucet = zsocket_new (ctx, ZMQ_PUSH);
+    rc = zsocket_connect (faucet, "inproc://frontend");
+    assert (rc == 0);
+    void *sink = zsocket_new (ctx, ZMQ_PULL);
+    rc = zsocket_connect (sink, "inproc://backend");
+    assert (rc == 0);
+
+    //  Create capture socket, must be a PULL socket
+    void *capture = zsocket_new (ctx, ZMQ_PULL);
+    rc = zsocket_bind (capture, "inproc://capture");
+    assert (rc == 0);
+
+    //  Send some messages and check they arrived
+    zstr_send (faucet, "Hello");
+    char *string = zstr_recv (sink);
+    assert (streq (string, "Hello"));
+    zstr_free (&string);
     
-    zproxy_set_frontend_identity (proxy, "front_id");
-    char *test_identity = zproxy_frontend_identity (proxy);
-    assert (streq (test_identity, "front_id"));
-
-    zproxy_set_backend_identity (proxy, "back_id");
-    test_identity = zproxy_backend_identity (proxy);
-    assert (streq (test_identity, "back_id"));
+    zproxy_pause (proxy);
+    zstr_send (faucet, "World");
+    zproxy_resume (proxy);
+    string = zstr_recv (sink);
+    assert (streq (string, "World"));
+    zstr_free (&string);
     
-    int rc = zproxy_bind (proxy, frontend_addr, backend_addr, 
-            capture_addr, control_addr);
-
-    assert (rc == 0);
-
-    // Run the actual test
-    s_zproxy_test_run (proxy, frontend_addr, backend_addr,
-            capture_addr, control_addr);
-
-    // Destroy the proxy
-    zctx_destroy (&ctx);
-    zproxy_destroy (&proxy);
-
-    // Defining a control address and no capture address
-    // should create a zmq_proxy_steerable proxy that we
-    // can control with a control port with no capture
-    // port.
-    ctx = zctx_new ();
-    proxy = zproxy_new (ctx, ZPROXY_STREAMER);
-
-    rc = zproxy_bind (proxy, frontend_addr, backend_addr,
-            NULL, control_addr);
+    //  Switch on capturing, check that it works
+    zproxy_capture (proxy, "inproc://capture");
+    zstr_send (faucet, "Hello");
     
-    assert (rc == 0);
-
-    // Run the actual test
-    s_zproxy_test_run (proxy, frontend_addr, backend_addr,
-            capture_addr, control_addr);
-
-    // Destroy the proxy
-    zctx_destroy (&ctx);
-    zproxy_destroy (&proxy);
-
-    // Defining a capture address and no control address
-    // should create a zmq_proxy proxy that we
-    // can capture data from
-    ctx = zctx_new ();
-    proxy = zproxy_new (ctx, ZPROXY_STREAMER);
-
-    rc = zproxy_bind (proxy, frontend_addr, backend_addr, 
-            capture_addr, NULL);
+    string = zstr_recv (sink);
+    assert (streq (string, "Hello"));
+    zstr_free (&string);
     
-    assert (rc == 0);
-
-    // Run the actual test
-    s_zproxy_test_run (proxy, frontend_addr, backend_addr,
-            capture_addr, control_addr);
-
-    // Destroy the proxy
-    zctx_destroy (&ctx);
+    string = zstr_recv (capture);
+    assert (streq (string, "Hello"));
+    zstr_free (&string);
     zproxy_destroy (&proxy);
-
-    // Leaving both capture and control undefined
-    // should create a zmq_proxy proxy that is
-    // not steerable and has no capture port.
-    ctx = zctx_new ();
-    proxy = zproxy_new (ctx, ZPROXY_STREAMER);
-
-    rc = zproxy_bind (proxy, frontend_addr, backend_addr, 
-            NULL, NULL);
-
-    assert (rc == 0);
-
-    // Run the actual test
-    s_zproxy_test_run (proxy, frontend_addr, backend_addr,
-            capture_addr, control_addr);
-
-    // Destroy the proxy
-    zctx_destroy (&ctx);
-    zproxy_destroy (&proxy);
-
-#endif
-#if (ZMQ_VERSION >= ZPROXY_HAS_PROXY && ZMQ_VERSION < ZPROXY_HAS_STEERABLE)
-
-    char *frontend_addr = "inproc://proxy_front";
-    char *backend_addr = "inproc://proxy_back";
-    char *capture_addr = "inproc://proxy_capture";
-
-    // Defining a capture address and no control address
-    // should create a zmq_proxy proxy that we
-    // can capture data from
-    zctx_t *ctx = zctx_new ();
-    zproxy_t *proxy = zproxy_new (ctx, ZPROXY_STREAMER);
-
-    int rc = zproxy_bind (proxy, frontend_addr, backend_addr, 
-            capture_addr);
-
-    assert (rc == 0);
-
-    // Run the actual test
-    s_zproxy_test_run (proxy, frontend_addr, backend_addr,
-            capture_addr, NULL);
-
-    // Destroy the proxy
-    zctx_destroy (&ctx);
-    zproxy_destroy (&proxy);
-#endif
-#if (ZMQ_VERSION < ZPROXY_HAS_PROXY)
-
-    char *frontend_addr = "inproc://proxy_front";
-    char *backend_addr = "inproc://proxy_back";
-
-    zctx_t *ctx = zctx_new ();
-    zproxy_t *proxy = zproxy_new (ctx, ZPROXY_STREAMER);
-
-    int rc = zproxy_bind (proxy, frontend_addr, backend_addr);
-
-    assert (rc == 0);
-
-    // Run the actual test
-    s_zproxy_test_run (proxy, frontend_addr, backend_addr,
-            NULL, NULL);
-
-    // Destroy the proxy
-    zctx_destroy (&ctx);
-    zproxy_destroy (&proxy);
-#endif
-
-    // Keep valgrind happy
-    zclock_sleep (100);
-
-    //  @end
-    printf ("OK\n");
-    return 0;
-}
-
-static void
-s_zproxy_test_run (zproxy_t *proxy, char *frontend_addr,
-        char *backend_addr, char *capture_addr, char *control_addr)
-{
-    // Pause for 10ms 
-    zclock_sleep (10);
-
-    // Check proxy type
-    assert (zproxy_type (proxy) == ZPROXY_STREAMER);
-
-    // Check frontend type and address
-    assert (zproxy_frontend_type (proxy) == ZMQ_PULL);
-    assert (streq (zproxy_frontend_addr (proxy), frontend_addr));
-
-    // Check backend type and address 
-    assert (zproxy_backend_type (proxy) == ZMQ_PUSH);
-    assert (streq (zproxy_backend_addr (proxy), backend_addr));
-#if (ZMQ_VERSION >= ZPROXY_HAS_PROXY)
-
-    // Check capture type and address    
-    if (zproxy_capture_addr (proxy)) {
-        assert (zproxy_capture_type (proxy) == ZMQ_PUB);
-        assert (streq (zproxy_capture_addr (proxy), capture_addr));
-    }
-#endif
-#if (ZMQ_VERSION >= ZPROXY_HAS_STEERABLE) 
-    // Check control type and address 
-    if (zproxy_control_addr (proxy)) {
-        assert (zproxy_control_type (proxy) == ZMQ_SUB);
-        assert (streq (zproxy_control_addr (proxy), control_addr));
-    }
-#endif 
-
-    // Connect to front of proxy
-    void *front_s = zsocket_new (proxy->ctx, ZMQ_PUSH);
-    assert (front_s);
-    zsocket_connect (front_s, zproxy_frontend_addr (proxy));
-
-    // Connect to back of proxy
-    void *back_s = zsocket_new (proxy->ctx, ZMQ_PULL);
-    assert (back_s);
-    zsocket_connect (back_s, zproxy_backend_addr (proxy));
-#if (ZMQ_VERSION >= ZPROXY_HAS_PROXY) 
-
-    // Create a capture socket in case we need it
-    void *capture_s = zsocket_new (proxy->ctx, ZMQ_SUB);
-    assert (capture_s);
-    zsocket_set_subscribe (capture_s, "");
-
-    // if proxy has a capture port connect to it
-    if (zproxy_capture_addr (proxy))
-        zsocket_connect (capture_s, zproxy_capture_addr (proxy));
-#endif
-
-    // Send a message through the proxy and receive it
-    zstr_send (front_s, "STREAMER_TEST");
-    char *back_resp = zstr_recv (back_s);
-    assert (back_resp);
-    assert (streq ("STREAMER_TEST", back_resp));
-    free (back_resp);
-#if (ZMQ_VERSION >= ZPROXY_HAS_PROXY) 
-
-    // If the proxy has a capture address, make sure the
-    // data sent through the proxy comes through the
-    // capture socket.
-    if (zproxy_capture_addr (proxy)) {
-        char *capture_resp = zstr_recv (capture_s);
-        assert (capture_resp);
-        assert (streq ("STREAMER_TEST", capture_resp));
-        free (capture_resp);
-    }
-#endif
-#if (ZMQ_VERSION >= ZPROXY_HAS_STEERABLE) 
-
-    // If the proxy has a control address, call
-    // pause, resume, and destroy
-    if (zproxy_control_addr (proxy)) {
-        zproxy_pause (proxy);
-        zproxy_resume (proxy);
-        zproxy_terminate (proxy);
-    }
-#endif
-}
-
-
-//  --------------------------------------------------------------------------
-//  Backend agent implementation
-
-static void
-s_agent_task (void *args, zctx_t *ctx, void *pipe)
-{   
-    zproxy_t *self = (zproxy_t*) args;
-
-    free (zstr_recv (pipe));
-    zstr_send (pipe, "OK");
-
-    self->frontend = zsocket_new (ctx, zproxy_frontend_type (self));
-    if (self->frontend) {
-        if (self->frontend_identity)
-            zsocket_set_identity (self->frontend, self->frontend_identity);
-
-        zsocket_bind (self->frontend, zproxy_frontend_addr (self));
-    }
-    else {
-        return;
-    }
-
-    self->backend = zsocket_new (ctx, zproxy_backend_type (self));
-    if (self->backend) {
-        if (self->backend_identity)
-            zsocket_set_identity (self->backend, self->backend_identity);
-
-        zsocket_bind (self->backend, zproxy_backend_addr (self));
-    }
-    else {
-        return;
-    }
-#if (ZMQ_VERSION < ZPROXY_HAS_PROXY)
-
-    switch (zproxy_type (self)) {
-        case (ZPROXY_STREAMER):
-            zmq_device (ZMQ_STREAMER, self->frontend, self->backend);
-            break;
-        case (ZPROXY_QUEUE):
-            zmq_device (ZMQ_QUEUE, self->frontend, self->backend);
-            break;
-        case (ZPROXY_FORWARDER):
-            zmq_device (ZMQ_FORWARDER, self->frontend, self->backend);
-            break;
-        default:
-            assert (1==0);
-    }
 #else
-
-    if (zproxy_capture_addr (self)) {
-        self->capture = zsocket_new (ctx, zproxy_capture_type (self));
-        if (self->capture)
-            zsocket_bind (self->capture, zproxy_capture_addr (self));
-        else
-            return;
-    }
-#if (ZMQ_VERSION >= ZPROXY_HAS_STEERABLE)
-    if (zproxy_control_addr (self)) {
-        void *control = zsocket_new (ctx, zproxy_control_type (self));
-        if (control) {
-            zsocket_set_subscribe (control, "");
-            zsocket_connect (control, zproxy_control_addr (self));
-        }
-        else 
-            return;
-        zmq_proxy_steerable (self->frontend, self->backend, self->capture, control);
-        zstr_send (pipe, "TERMINATED");
-    }
-    else
-        zmq_proxy (self->frontend, self->backend, self->capture);
-#else
-    zmq_proxy (self->frontend, self->backend, self->capture);
+    assert (proxy == NULL);
 #endif
-#endif
+    zctx_destroy (&ctx);
 }
