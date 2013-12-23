@@ -28,14 +28,6 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zbeacon_noecho (zbeacon_t *self);
 
-//  Start/stop listening on unicast packets
-CZMQ_EXPORT void
-    zbeacon_unicast (zbeacon_t *self, int flag);
-
-//  Send a frame directed to a particular unicast IP address once
-CZMQ_EXPORT void
-    zbeacon_send (zbeacon_t *self,  char *ipaddress, byte *transmit, size_t size);
-
 //  Start broadcasting beacon to peers at the specified interval
 CZMQ_EXPORT void
     zbeacon_publish (zbeacon_t *self, byte *transmit, size_t size);
@@ -102,36 +94,12 @@ EXAMPLE
 
     char *ipaddress = zstr_recv (zbeacon_socket (client_beacon));
     if (ipaddress) {
-
         zframe_t *content = zframe_recv (zbeacon_socket (client_beacon));
         int received_port = (zframe_data (content) [0] << 8)
                         +  zframe_data (content) [1];
         assert (received_port == port_nbr);
         zframe_destroy (&content);
-	zbeacon_silence (service_beacon);
-
-	// turn on UDP unicast reception
-	zbeacon_unicast (client_beacon, 1);
-
-	zsocket_set_rcvtimeo (zbeacon_socket (client_beacon), 500);
-
-	// send unicast UDP message to ourselves
-	zbeacon_send (service_beacon, ipaddress, (byte *) "SELF", 4);
-
-        char *addr = zstr_recv (zbeacon_socket (client_beacon));
-	assert(addr != NULL);
-
-	// assert we got it, src IP and contents add up
-	assert(strcmp(addr,ipaddress) == 0);
-
-        content = zframe_recv (zbeacon_socket (client_beacon));
-	assert(content != NULL);
-
-	assert(memcmp((void *) "SELF", zframe_data (content),  zframe_size (content)) == 0);
-        zstr_free (&ipaddress);
-
-	// turn off UDP unicast reception
-	zbeacon_unicast (client_beacon, 0);
+        zbeacon_silence (service_beacon);
     }
     zbeacon_destroy (&client_beacon);
     zbeacon_destroy (&service_beacon);

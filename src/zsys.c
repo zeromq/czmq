@@ -399,6 +399,140 @@ zsys_vprintf (const char *format, va_list argptr)
 
 
 //  --------------------------------------------------------------------------
+//  Create UDP beacon socket; if the routable option is true, uses
+//  multicast (not yet implemented), else uses broadcast. This method
+//  and related ones might _eventually_ be moved to a zudp class.
+
+SOCKET
+zsys_udp_new (bool routable)
+{
+    //  We haven't implemented multicast yet
+    assert (!routable);
+    int udpsock = socket (AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (udpsock == INVALID_SOCKET) {
+        zsys_socket_error ("socket");
+        return INVALID_SOCKET;
+    }
+
+    //  Ask operating system for broadcast permissions on socket
+    int on = 1;
+    if (setsockopt (udpsock, SOL_SOCKET, SO_BROADCAST,
+                   (char *) &on, sizeof (on)) == SOCKET_ERROR)
+        zsys_socket_error ("setsockopt (SO_BROADCAST)");
+
+    //  Allow multiple owners to bind to socket; incoming
+    //  messages will replicate to each owner
+    if (setsockopt (udpsock, SOL_SOCKET, SO_REUSEADDR,
+                   (char *) &on, sizeof (on)) == SOCKET_ERROR)
+        zsys_socket_error ("setsockopt (SO_REUSEADDR)");
+
+#if defined (SO_REUSEPORT)
+    //  On some platforms we have to ask to reuse the port
+    if (setsockopt (udpsock, SOL_SOCKET, SO_REUSEPORT,
+                   (char *) &on, sizeof (on)) == SOCKET_ERROR)
+        zsys_socket_error ("setsockopt (SO_REUSEPORT)");
+#endif
+    return udpsock;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Send zframe to UDP socket
+
+void
+zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address)
+{
+    assert (frame);
+    assert (address);
+    
+    //  Sending can fail if the OS is blocking multicast. In such cases we
+    //  don't try to report the error. We might log this or send to an error
+    //  console at some point.
+    sendto (udpsock,
+            (char *) zframe_data (frame), zframe_size (frame),
+            0,      //  Flags
+            (struct sockaddr *) address, sizeof (inaddr_t));
+}
+
+
+//  --------------------------------------------------------------------------
+//  Receive zframe from UDP socket, and set address of peer that sent it
+//  The peername must be a char [INET_ADDRSTRLEN] array.
+
+zframe_t *
+zsys_udp_recv (SOCKET udpsock, char *peername)
+{
+    char buffer [UDP_FRAME_MAX];
+    inaddr_t address;
+    socklen_t address_len = sizeof (inaddr_t);
+    ssize_t size = recvfrom (
+        udpsock,
+        buffer, UDP_FRAME_MAX,
+        0,      //  Flags
+        (struct sockaddr *) &address, &address_len);
+    if (size == SOCKET_ERROR)
+        zsys_socket_error ("recvfrom");
+    
+    //  Get sender address as printable string
+#if (defined (__WINDOWS__))
+    getnameinfo ((struct sockaddr *) &address, address_len,
+                peername, INET_ADDRSTRLEN, NULL, 0, NI_NUMERICHOST);
+#else
+    inet_ntop (AF_INET, &address.sin_addr, peername, address_len);
+#endif
+    return zframe_new (buffer, size);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Handle an I/O error on some socket operation; will report and die on
+//  fatal errors, and continue silently on "try again" errors.
+
+void
+zsys_socket_error (char *reason)
+{
+#if defined (__WINDOWS__)
+    switch (WSAGetLastError ()) {
+        case WSAEINTR:        errno = EINTR;      break;
+        case WSAEBADF:        errno = EBADF;      break;
+        case WSAEWOULDBLOCK:  errno = EAGAIN;     break;
+        case WSAEINPROGRESS:  errno = EAGAIN;     break;
+        case WSAENETDOWN:     errno = ENETDOWN;   break;
+        case WSAECONNRESET:   errno = ECONNRESET; break;
+        case WSAECONNABORTED: errno = EPIPE;      break;
+        case WSAESHUTDOWN:    errno = ECONNRESET; break;
+        case WSAEINVAL:       errno = EPIPE;      break;
+        default:              errno = GetLastError ();
+    }
+#endif
+    if (errno == EAGAIN
+    ||  errno == ENETDOWN
+    ||  errno == EHOSTUNREACH
+    ||  errno == ENETUNREACH
+    ||  errno == EINTR
+    ||  errno == EPIPE
+    ||  errno == ECONNRESET
+#if !defined (__WINDOWS__)
+    ||  errno == EPROTO
+    ||  errno == ENOPROTOOPT
+    ||  errno == EHOSTDOWN
+    ||  errno == EOPNOTSUPP
+    ||  errno == EWOULDBLOCK
+#endif
+#if defined (ENONET)
+    ||  errno == ENONET
+#endif
+    )
+        return;             //  Ignore error and try again
+    else {
+        zclock_log ("E: (UDP) error '%s' on %s", strerror (errno), reason);
+        assert (false);
+    }
+}
+
+
+
+//  --------------------------------------------------------------------------
 //  Selftest
 
 static char *

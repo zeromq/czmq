@@ -231,6 +231,10 @@
 
 #if (defined (__MSDOS__))
 #   if (defined (__WINDOWS__))
+#       if (_WIN32_WINNT < 0x0501)
+#           undef _WIN32_WINNT
+#           define _WIN32_WINNT 0x0501
+#       endif
 #       if (!defined (FD_SETSIZE))
 #           define FD_SETSIZE 1024      //  Max. filehandles/sockets
 #       endif
@@ -238,6 +242,8 @@
 #       include <winsock2.h>
 #       include <windows.h>
 #       include <process.h>
+#       include <ws2tcpip.h>            //  For getnameinfo ()
+#       include <iphlpapi.h>            //  For GetAdaptersAddresses ()
 #   endif
 #   include <malloc.h>
 #   include <dos.h>
@@ -270,8 +276,11 @@
 #   include <sys/uio.h>             //  Let CZMQ build with libzmq/3.x
 #   include <netinet/in.h>          //  Must come before arpa/inet.h
 #   if (!defined (__UTYPE_ANDROID)) && (!defined (__UTYPE_IBMAIX)) \
-    && (!defined (__UTYPE_HPUX)) && (!defined (__UTYPE_SUNOS))
+    && (!defined (__UTYPE_HPUX))
 #       include <ifaddrs.h>
+#   endif
+#   if defined (__UTYPE_SUNSOLARIS) || defined (__UTYPE_SUNOS)
+#       include <sys/sockio.h>
 #   endif
 #   if (!defined (__UTYPE_BEOS))
 #       include <arpa/inet.h>
@@ -370,6 +379,7 @@
 typedef unsigned char   byte;           //  Single unsigned byte = 8 bits
 typedef unsigned short  dbyte;          //  Double byte = 16 bits
 typedef unsigned int    qbyte;          //  Quad byte = 32 bits
+typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
 
 //- Inevitable macros -------------------------------------------------------
 
@@ -469,6 +479,26 @@ static inline void *
 #   define zmalloc(size) calloc(1,(size))
 #else
 #   define zmalloc(size) safe_malloc((size), __FILE__, __LINE__, CZMQ_ASSERT_SANE_FUNCTION)
+#endif
+
+//- Socket header files -----------------------------------------------------
+
+#if defined (HAVE_LINUX_WIRELESS_H)
+#   include <linux/wireless.h>
+#else
+#   if defined (HAVE_NET_IF_H)
+#       include <net/if.h>
+#   endif
+#   if defined (HAVE_NET_IF_MEDIA_H)
+#       include <net/if_media.h>
+#   endif
+#endif
+//  Lets us write code that compiles both on Windows and normal platforms
+#if !defined (__WINDOWS__)
+typedef int SOCKET;
+#   define closesocket close
+#   define INVALID_SOCKET -1
+#   define SOCKET_ERROR -1
 #endif
 
 //- DLL exports -------------------------------------------------------------
