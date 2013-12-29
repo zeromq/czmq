@@ -270,6 +270,8 @@ zsocket_test (bool verbose)
 
     assert (zsocket_poll (writer, 100) == false);
 
+    //  Test error state when connecting to an invalid socket type
+    //  ('txp://' instead of 'tcp://', typo intentional)
     rc = zsocket_connect (reader, "txp://%s:%d", domain, service);
     assert (rc == -1);
 
