@@ -39,7 +39,6 @@ int main (int argc, char *argv [])
     printf ("Running CZMQ selftests...\n");
 
     //  These are ordered from most basic to most complex
-    //    zproxy_test (verbose);
     zrex_test (verbose);
     zsys_test (verbose);
     zconfig_test (verbose);
@@ -63,6 +62,7 @@ int main (int argc, char *argv [])
     zstr_test (verbose);
     zmsg_test (verbose);
     zloop_test (verbose);
+    zproxy_test (verbose);
     zbeacon_test (verbose);
     zcert_test (verbose);
     zcertstore_test (verbose);

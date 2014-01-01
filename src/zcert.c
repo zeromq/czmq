@@ -50,9 +50,7 @@
 #if defined (HAVE_LIBSODIUM)
 #   include <sodium.h>
 #   if crypto_box_PUBLICKEYBYTES != 32 \
-    || crypto_box_SECRETKEYBYTES != 32 \
-    || crypto_sign_PUBLICKEYBYTES != 32 \
-    || crypto_sign_PUBLICKEYBYTES != 32
+    || crypto_box_SECRETKEYBYTES != 32
 #       error "libsodium not built correctly"
 #   endif
 #endif
