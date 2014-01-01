@@ -45,8 +45,12 @@ CZMQ_EXPORT zmonitor_t *
 CZMQ_EXPORT void
     zmonitor_destroy (zmonitor_t **self_p);
 
-//  Get the ZeroMQ socket, for polling or receiving socket
-//  event messages from the backend agent on.
+//  Receive a status message from the monitor; if no message arrives within
+//  500 msec, or the call was interrupted, returns NULL.
+CZMQ_EXPORT zmsg_t *
+    zmonitor_recv (zmonitor_t *self);
+
+//  Get the ZeroMQ socket, for polling 
 CZMQ_EXPORT void *
     zmonitor_socket (zmonitor_t *self);
 

@@ -66,6 +66,7 @@ EXAMPLE
     assert (rc == 0);
     zproxy_t *proxy = zproxy_new (ctx, frontend, backend);
 
+#if HAVE_ZMQ_PROXY_STEERABLE
     //  Connect application sockets to proxy
     void *faucet = zsocket_new (ctx, ZMQ_PUSH);
     rc = zsocket_connect (faucet, "inproc://frontend");
@@ -103,13 +104,12 @@ EXAMPLE
     string = zstr_recv (capture);
     assert (streq (string, "Hello"));
     zstr_free (&string);
-    
-    //  Destroy the proxy
     zproxy_destroy (&proxy);
+#else
+    assert (proxy == NULL);
+#endif
     zctx_destroy (&ctx);
-
-}
-
+    
 ----
 
 SEE ALSO
