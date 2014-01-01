@@ -5,19 +5,12 @@
 -->
 <options script = "sockopts">
     <version major = "4" style = "macro">
-        <!-- New names for deprecated 3.x options -->
-        <option name = "ipv6"              type = "int"    mode = "rw" test = "SUB" />
-        <option name = "immediate"         type = "int"    mode = "w"  test = "DEALER" />
-        
-        <!-- Deprecated 3.x options -->
-        <option name = "router_raw"        type = "int"    mode = "w"  test = "ROUTER">
+        <!-- Options that are new in 4.1 -->
+        <option name = "tos"               type = "int"    mode = "rw" test = "DEALER" />
+        <option name = "router_handover"   type = "int"    mode = "w"  test = "ROUTER">
             <restrict type = "ROUTER" />
         </option>
-        <option name = "ipv4only"          type = "int"    mode = "rw" test = "SUB" />
-        <option name = "delay_attach_on_connect"
-                                           type = "int"    mode = "w"  test = "PUB" />
-        <option name = "tos"               type = "int"    mode = "rw" test = "DEALER" />
-
+        
         <!-- Options that are new in 4.0 -->
         <option name = "router_mandatory"  type = "int"    mode = "w"  test = "ROUTER">
             <restrict type = "ROUTER" />
@@ -57,6 +50,19 @@
                 ifdef = "HAVE_LIBSODIUM"
                 test_value = "rq:rM>}U?@Lns47E1%kR.o@n%FcmmsL/@{H8]yf7" />
         <option name = "zap_domain"        type = "string" mode = "rw" test = "SUB" />
+        <option name = "mechanism"         type = "int"    mode = "r"  test = "SUB" />
+
+        <!-- New names for deprecated 3.x options -->
+        <option name = "ipv6"              type = "int"    mode = "rw" test = "SUB" />
+        <option name = "immediate"         type = "int"    mode = "rw" test = "DEALER" />
+
+        <!-- Deprecated 3.x options -->
+        <option name = "router_raw"        type = "int"    mode = "w"  test = "ROUTER">
+            <restrict type = "ROUTER" />
+        </option>
+        <option name = "ipv4only"          type = "int"    mode = "rw" test = "SUB" />
+        <option name = "delay_attach_on_connect"
+                                           type = "int"    mode = "w"  test = "PUB" />
 
         <!-- Options that are the same in 3.x -->
         <include name = "3-x options" />

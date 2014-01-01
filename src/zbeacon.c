@@ -409,6 +409,8 @@ s_agent_new (void *pipe, int port_nbr)
         zsys_socket_error ("bind");
 
     //  Send our hostname back to API
+    //  PROBLEM: this hostname will not be accurate when the node
+    //  has more than one active interface.
     char hostname [INET_ADDRSTRLEN];
     getnameinfo ((struct sockaddr *) &self->address, sizeof (self->address),
                  hostname, INET_ADDRSTRLEN, NULL, 0, NI_NUMERICHOST);
@@ -446,7 +448,7 @@ s_get_interface (agent_t *self)
                         |= ~(((inaddr_t *) interface->ifa_netmask)->sin_addr.s_addr);
 
                 //  Keep track of the number of interfaces on this host
-                if (self->address.sin_addr.s_addr != ntohl(INADDR_LOOPBACK))
+                if (self->address.sin_addr.s_addr != ntohl (INADDR_LOOPBACK))
                     num_interfaces++;
 
                 //  If this is the specified interface then move on
