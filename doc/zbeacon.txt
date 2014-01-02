@@ -3,7 +3,7 @@ zbeacon(3)
 
 NAME
 ----
-zbeacon - LAN service announcement and discovery
+zbeacon - LAN discovery and presence
 
 SYNOPSIS
 --------

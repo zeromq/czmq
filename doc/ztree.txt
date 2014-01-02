@@ -102,6 +102,10 @@ Red black tree container
 Derived from Emin Martianan's Red Black which is licensed for free use.
 http://web.mit.edu/~emin/www.old/source_code/red_black_tree/index.html
 
+TODO: code style needs cleanup to match CLASS guideliness
+    - poor variable names like 'x'
+    - indentation and if/else layouts
+    - possibly removal of all tree code to foreign/
 
 EXAMPLE
 -------

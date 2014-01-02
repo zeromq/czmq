@@ -2,7 +2,7 @@
     zlist - generic type-free list container
 
     -------------------------------------------------------------------------
-    Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
+    Copyright (c) 1991-2014 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
     This file is part of CZMQ, the high-level C binding for 0MQ:
