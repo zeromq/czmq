@@ -100,7 +100,11 @@ CZMQ_EXPORT int
 //  comment lines as you like. If you use a null format, all comments are 
 //  deleted.
 CZMQ_EXPORT void
-    zconfig_comment (zconfig_t *self, char *format, ...);
+    zconfig_set_comment (zconfig_t *self, char *format, ...);
+
+//  Return comments of config item, as zlist.
+CZMQ_EXPORT zlist_t *
+    zconfig_comments (zconfig_t *self);
 
 //  Load a config item tree from a specified ZPL text file
 CZMQ_EXPORT zconfig_t *

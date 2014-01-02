@@ -288,7 +288,8 @@ s_save_metadata_all (zcert_t *self)
     zhash_foreach (self->metadata, s_save_metadata, section);
     
     char *timestr = zclock_timestr ();
-    zconfig_comment (self->config, "   ****  Generated on %s by CZMQ  ****", timestr);
+    zconfig_set_comment (self->config,
+        "   ****  Generated on %s by CZMQ  ****", timestr);
     zstr_free (&timestr);
 }
 
@@ -308,8 +309,10 @@ zcert_save (zcert_t *self, char *format, ...)
 
     //  Now save secret certificate using filename with "_secret" suffix
     s_save_metadata_all (self);
-    zconfig_comment (self->config, "   ZeroMQ CURVE **Secret** Certificate");
-    zconfig_comment (self->config, "   DO NOT PROVIDE THIS FILE TO OTHER USERS nor change its permissions.");
+    zconfig_set_comment (self->config,
+        "   ZeroMQ CURVE **Secret** Certificate");
+    zconfig_set_comment (self->config,
+        "   DO NOT PROVIDE THIS FILE TO OTHER USERS nor change its permissions.");
     zconfig_put (self->config, "/curve/public-key", self->public_txt);
     zconfig_put (self->config, "/curve/secret-key", self->secret_txt);
     
@@ -339,10 +342,14 @@ zcert_save_public (zcert_t *self, char *format, ...)
     va_end (argptr);
 
     s_save_metadata_all (self);
-    zconfig_comment (self->config, "   ZeroMQ CURVE Public Certificate");
-    zconfig_comment (self->config, "   Exchange securely, or use a secure mechanism to verify the contents");
-    zconfig_comment (self->config, "   of this file after exchange. Store public certificates in your home");
-    zconfig_comment (self->config, "   directory, in the .curve subdirectory.");
+    zconfig_set_comment (self->config,
+        "   ZeroMQ CURVE Public Certificate");
+    zconfig_set_comment (self->config,
+        "   Exchange securely, or use a secure mechanism to verify the contents");
+    zconfig_set_comment (self->config,
+        "   of this file after exchange. Store public certificates in your home");
+    zconfig_set_comment (self->config,
+        "   directory, in the .curve subdirectory.");
     
     zconfig_put (self->config, "/curve/public-key", self->public_txt);
     int rc = zconfig_save (self->config, filename);
