@@ -1,12 +1,8 @@
 /*  =========================================================================
     ztree - generic type-free red-black tree container
 
-    TODO: code style needs cleanup to match CLASS guideliness
-        - poor variable names like 'x'
-        - indentation and if/else layouts
-
     -------------------------------------------------------------------------
-    Copyright (c) 2013 Stephen Hemminger <stephen@networkplumber.org>
+    Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -34,6 +30,10 @@
     Derived from Emin Martianan's Red Black which is licensed for free use.
     http://web.mit.edu/~emin/www.old/source_code/red_black_tree/index.html
 @discuss
+    TODO: code style needs cleanup to match CLASS guideliness
+        - poor variable names like 'x'
+        - indentation and if/else layouts
+        - possibly removal of all tree code to foreign/
 @end
 */
 

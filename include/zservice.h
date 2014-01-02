@@ -1,5 +1,5 @@
 /*  =========================================================================
-    czmq.h - CZMQ wrapper
+    zservice - network service registry and lookup
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
@@ -23,55 +23,45 @@
     =========================================================================
 */
 
-#ifndef __CZMQ_H_INCLUDED__
-#define __CZMQ_H_INCLUDED__
+#ifndef __ZSERVICE_H_INCLUDED__
+#define __ZSERVICE_H_INCLUDED__
 
-//  Set up environment for the application
-//
-#include "czmq_prelude.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-//  CZMQ version macros for compile-time API detection
+//  Opaque class structure
+typedef struct _zservice_t zservice_t;
 
-#define CZMQ_VERSION_MAJOR 2
-#define CZMQ_VERSION_MINOR 1
-#define CZMQ_VERSION_PATCH 0
+//  @interface
+//  Create a new service instance
+CZMQ_EXPORT zservice_t *
+    zservice_new (zctx_t *ctx);
 
-#define CZMQ_MAKE_VERSION(major, minor, patch) \
-    ((major) * 10000 + (minor) * 100 + (patch))
-#define CZMQ_VERSION \
-    CZMQ_MAKE_VERSION(CZMQ_VERSION_MAJOR, CZMQ_VERSION_MINOR, CZMQ_VERSION_PATCH)
+//  Destroy a service instance
+CZMQ_EXPORT void
+    zservice_destroy (zservice_t **self_p);
 
-//  Classes in the API
+//  Enable verbose tracing of commands and activity
+CZMQ_EXPORT void
+    zservice_set_verbose (zservice_t *self, bool verbose);
 
-#include "zchunk.h"
-#include "zclock.h"
-#include "zframe.h"
-#include "zlist.h"
-#include "zhash.h"
-#include "zconfig.h"
-#include "zctx.h"
-#include "zfile.h"
-#include "zdir.h"
-#include "zdir_patch.h"
-#include "zdigest.h"
-#include "zloop.h"
-#include "zmsg.h"
-#include "zmonitor.h"
-#include "zmutex.h"
-#include "zpoller.h"
-#include "zsocket.h"
-#include "zsockopt.h"
-#include "zstr.h"
-#include "zsys.h"
-#include "zthread.h"
-#include "ztree.h"
-#include "zrex.h"
-#include "zbeacon.h"
-#include "zauth.h"
-#include "zcert.h"
-#include "zcertstore.h"
-#include "zproxy.h"
-#include "zservice.h"
-#include "zuuid.h"
+//  Register a new network service
+CZMQ_EXPORT void
+    zservice_register (zservice_t *self, char *name, char *endpoint);
+
+//  Lookup a network service, return endpoint or NULL if not known
+CZMQ_EXPORT char *
+    zservice_lookup (zservice_t *self, char *name);
+
+// Self test of this class
+CZMQ_EXPORT void
+    zservice_test (bool verbose);
+
+// @end
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

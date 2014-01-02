@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zbeacon - LAN service announcement and discovery
+    zbeacon - LAN discovery and presence
     
     -------------------------------------------------------------------------
     Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>

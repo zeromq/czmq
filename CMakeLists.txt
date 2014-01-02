@@ -30,6 +30,7 @@ set (SOURCES_files_Source_Files
     src/zpoller.c
     src/zproxy.c
     src/zrex.c
+    src/zservice.c
     src/zsocket.c
     src/zsockopt.c
     src/zstr.c
@@ -69,6 +70,7 @@ set (SOURCES_files_Header_Files
     include/zpoller.h
     include/zproxy.h
     include/zrex.h
+    include/zservice.h
     include/zsocket.h
     include/zsockopt.h
     include/zstr.h

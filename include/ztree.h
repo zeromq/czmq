@@ -2,7 +2,7 @@
     ztree - generic red-black tree container
 
     -------------------------------------------------------------------------
-    Copyright (c) 2013 Stephen Hemminger <stephen@networkplumber.org>
+    Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -20,12 +20,11 @@
 
     You should have received a copy of the GNU Lesser General Public License
     along with this program. If not, see <http://www.gnu.org/licenses/>.
+    =========================================================================
 
     This code is derived from Redblack balanced tree algorithm
     Copyright (C) Damian Ivereigh 2000
     Which was licensed under GPL version 2 (or later) license.
-
-    =========================================================================
 */
 
 #ifndef __ZTREE_H_INCLUDED__
