@@ -4,7 +4,7 @@
     Runs all selftests.
 
     -------------------------------------------------------------------------
-    Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
+    Copyright (c) 1991-2014 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
     This file is part of czmq, the high-level C binding for 0MQ:
@@ -67,6 +67,7 @@ int main (int argc, char *argv [])
     zcert_test (verbose);
     zcertstore_test (verbose);
     zauth_test (verbose);
+    zservice_test (verbose);
 #if (ZMQ_VERSION_MAJOR == 4)
     zmonitor_test (verbose);
 #endif

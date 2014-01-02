@@ -6,7 +6,7 @@
     * mycert.txt - public certificate
     * mycert.txt_secret - secret certificate
     
-    Copyright (C) 2013 iMatix Corporation 
+    Copyright (C) 2013-2014 iMatix Corporation 
 
     Licensed under MIT/X11.
     

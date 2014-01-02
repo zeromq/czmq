@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zdigest - provides hashing functions (SHA-1 at present)
+    zservice - network service registry and lookup
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2014 iMatix Corporation <www.imatix.com>
@@ -23,49 +23,42 @@
     =========================================================================
 */
 
-#ifndef __ZDIGEST_H_INCLUDED__
-#define __ZDIGEST_H_INCLUDED__
+#ifndef __ZSERVICE_H_INCLUDED__
+#define __ZSERVICE_H_INCLUDED__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 //  Opaque class structure
-typedef struct _zdigest_t zdigest_t;
+typedef struct _zservice_t zservice_t;
 
 //  @interface
-//  Constructor - creates new digest object, which you use to build up a
-//  digest by repeatedly calling zdigest_update() on chunks of data.
-CZMQ_EXPORT zdigest_t *
-    zdigest_new (void);
-    
-//  Destroy a digest object
+//  Create a new service instance
+CZMQ_EXPORT zservice_t *
+    zservice_new (zctx_t *ctx);
+
+//  Destroy a service instance
 CZMQ_EXPORT void
-    zdigest_destroy (zdigest_t **self_p);
-    
-//  Add buffer into digest calculation
+    zservice_destroy (zservice_t **self_p);
+
+//  Enable verbose tracing of commands and activity
 CZMQ_EXPORT void
-    zdigest_update (zdigest_t *self, byte *buffer, size_t length);
-    
-//  Return final digest hash data. If built without crypto support, returns
-//  NULL.
-CZMQ_EXPORT byte *
-    zdigest_data (zdigest_t *self);
-    
-//  Return final digest hash size
-CZMQ_EXPORT size_t
-    zdigest_size (zdigest_t *self);
-    
-//  Return digest as printable hex string; caller should not modify nor
-//  free this string. After calling this, you may not use zdigest_update()
-//  on the same digest. If built without crypto support, returns NULL.
+    zservice_set_verbose (zservice_t *self, bool verbose);
+
+//  Register a new network service
+CZMQ_EXPORT void
+    zservice_register (zservice_t *self, char *name, char *endpoint);
+
+//  Lookup a network service, return endpoint or NULL if not known
 CZMQ_EXPORT char *
-    zdigest_string (zdigest_t *self);
-    
-//  Self test of this class
-CZMQ_EXPORT int
-    zdigest_test (bool verbose);
-//  @end
+    zservice_lookup (zservice_t *self, char *name);
+
+// Self test of this class
+CZMQ_EXPORT void
+    zservice_test (bool verbose);
+
+// @end
 
 #ifdef __cplusplus
 }

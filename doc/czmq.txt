@@ -49,7 +49,8 @@ These classes provide generic containers:
 
 These classes abstract non-portable functionality:
 
-* linkczmq:zbeacon[3] - LAN service announcement and discovery
+* linkczmq:zbeacon[3] - LAN discovery and presence
+* linkczmq:zservice[3] - network service registry and lookup
 * linkczmq:zclock[3] - millisecond clocks and delays
 * linkczmq:zdir[3] - work with file-system directories
 * linkczmq:zfile[3] - provides methods to work with files in a portable fashion.

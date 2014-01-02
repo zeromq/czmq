@@ -7,7 +7,7 @@
             *   AND RUN ./generate in models/.                 *
             ****************************************************
     -------------------------------------------------------------------------
-    Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
+    Copyright (c) 1991-2014 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -38,8 +38,6 @@ extern "C" {
 //  @interface
 #if (ZMQ_VERSION_MAJOR == 4)
 //  Get socket options
-CZMQ_EXPORT int zsocket_ipv6 (void *zocket);
-CZMQ_EXPORT int zsocket_ipv4only (void *zocket);
 CZMQ_EXPORT int zsocket_tos (void *zocket);
 CZMQ_EXPORT int zsocket_plain_server (void *zocket);
 CZMQ_EXPORT char * zsocket_plain_username (void *zocket);
@@ -49,6 +47,10 @@ CZMQ_EXPORT char * zsocket_curve_publickey (void *zocket);
 CZMQ_EXPORT char * zsocket_curve_secretkey (void *zocket);
 CZMQ_EXPORT char * zsocket_curve_serverkey (void *zocket);
 CZMQ_EXPORT char * zsocket_zap_domain (void *zocket);
+CZMQ_EXPORT int zsocket_mechanism (void *zocket);
+CZMQ_EXPORT int zsocket_ipv6 (void *zocket);
+CZMQ_EXPORT int zsocket_immediate (void *zocket);
+CZMQ_EXPORT int zsocket_ipv4only (void *zocket);
 CZMQ_EXPORT int zsocket_type (void *zocket);
 CZMQ_EXPORT int zsocket_sndhwm (void *zocket);
 CZMQ_EXPORT int zsocket_rcvhwm (void *zocket);
@@ -77,12 +79,8 @@ CZMQ_EXPORT int zsocket_events (void *zocket);
 CZMQ_EXPORT char * zsocket_last_endpoint (void *zocket);
 
 //  Set socket options
-CZMQ_EXPORT void zsocket_set_ipv6 (void *zocket, int ipv6);
-CZMQ_EXPORT void zsocket_set_immediate (void *zocket, int immediate);
-CZMQ_EXPORT void zsocket_set_router_raw (void *zocket, int router_raw);
-CZMQ_EXPORT void zsocket_set_ipv4only (void *zocket, int ipv4only);
-CZMQ_EXPORT void zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect);
 CZMQ_EXPORT void zsocket_set_tos (void *zocket, int tos);
+CZMQ_EXPORT void zsocket_set_router_handover (void *zocket, int router_handover);
 CZMQ_EXPORT void zsocket_set_router_mandatory (void *zocket, int router_mandatory);
 CZMQ_EXPORT void zsocket_set_probe_router (void *zocket, int probe_router);
 CZMQ_EXPORT void zsocket_set_req_relaxed (void *zocket, int req_relaxed);
@@ -99,6 +97,11 @@ CZMQ_EXPORT void zsocket_set_curve_secretkey_bin (void *zocket, const byte *curv
 CZMQ_EXPORT void zsocket_set_curve_serverkey (void *zocket, const char * curve_serverkey);
 CZMQ_EXPORT void zsocket_set_curve_serverkey_bin (void *zocket, const byte *curve_serverkey);
 CZMQ_EXPORT void zsocket_set_zap_domain (void *zocket, const char * zap_domain);
+CZMQ_EXPORT void zsocket_set_ipv6 (void *zocket, int ipv6);
+CZMQ_EXPORT void zsocket_set_immediate (void *zocket, int immediate);
+CZMQ_EXPORT void zsocket_set_router_raw (void *zocket, int router_raw);
+CZMQ_EXPORT void zsocket_set_ipv4only (void *zocket, int ipv4only);
+CZMQ_EXPORT void zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect);
 CZMQ_EXPORT void zsocket_set_sndhwm (void *zocket, int sndhwm);
 CZMQ_EXPORT void zsocket_set_rcvhwm (void *zocket, int rcvhwm);
 CZMQ_EXPORT void zsocket_set_affinity (void *zocket, int affinity);

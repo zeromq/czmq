@@ -7,7 +7,7 @@
             *   AND RUN ./generate in models/.                 *
             ****************************************************
     -------------------------------------------------------------------------
-    Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
+    Copyright (c) 1991-2014 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -43,116 +43,6 @@
 
 #if (ZMQ_VERSION_MAJOR == 4)
 //  --------------------------------------------------------------------------
-//  Set socket ZMQ_IPV6 value
-//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
-
-void
-zsocket_set_ipv6 (void *zocket, int ipv6)
-{
-#   if defined (ZMQ_IPV6)
-    int rc = zmq_setsockopt (zocket, ZMQ_IPV6, &ipv6, sizeof (int));
-    assert (rc == 0 || zmq_errno () == ETERM);
-#   endif
-}
-
-
-//  --------------------------------------------------------------------------
-//  Return socket ZMQ_IPV6 value
-//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
-
-int 
-zsocket_ipv6 (void *zocket)
-{
-#   if defined (ZMQ_IPV6)
-    int ipv6;
-    size_t option_len = sizeof (int);
-    zmq_getsockopt (zocket, ZMQ_IPV6, &ipv6, &option_len);
-    return ipv6;
-#   else
-    return 0;
-#   endif
-}
-
-
-//  --------------------------------------------------------------------------
-//  Set socket ZMQ_IMMEDIATE value
-//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
-
-void
-zsocket_set_immediate (void *zocket, int immediate)
-{
-#   if defined (ZMQ_IMMEDIATE)
-    int rc = zmq_setsockopt (zocket, ZMQ_IMMEDIATE, &immediate, sizeof (int));
-    assert (rc == 0 || zmq_errno () == ETERM);
-#   endif
-}
-
-
-//  --------------------------------------------------------------------------
-//  Set socket ZMQ_ROUTER_RAW value
-//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
-
-void
-zsocket_set_router_raw (void *zocket, int router_raw)
-{
-#   if defined (ZMQ_ROUTER_RAW)
-    if (zsocket_type (zocket) != ZMQ_ROUTER) {
-        printf ("ZMQ_ROUTER_RAW is not valid on %s sockets\n", zsocket_type_str (zocket));
-        assert (false);
-    }
-    int rc = zmq_setsockopt (zocket, ZMQ_ROUTER_RAW, &router_raw, sizeof (int));
-    assert (rc == 0 || zmq_errno () == ETERM);
-#   endif
-}
-
-
-//  --------------------------------------------------------------------------
-//  Set socket ZMQ_IPV4ONLY value
-//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
-
-void
-zsocket_set_ipv4only (void *zocket, int ipv4only)
-{
-#   if defined (ZMQ_IPV4ONLY)
-    int rc = zmq_setsockopt (zocket, ZMQ_IPV4ONLY, &ipv4only, sizeof (int));
-    assert (rc == 0 || zmq_errno () == ETERM);
-#   endif
-}
-
-
-//  --------------------------------------------------------------------------
-//  Return socket ZMQ_IPV4ONLY value
-//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
-
-int 
-zsocket_ipv4only (void *zocket)
-{
-#   if defined (ZMQ_IPV4ONLY)
-    int ipv4only;
-    size_t option_len = sizeof (int);
-    zmq_getsockopt (zocket, ZMQ_IPV4ONLY, &ipv4only, &option_len);
-    return ipv4only;
-#   else
-    return 0;
-#   endif
-}
-
-
-//  --------------------------------------------------------------------------
-//  Set socket ZMQ_DELAY_ATTACH_ON_CONNECT value
-//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
-
-void
-zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect)
-{
-#   if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
-    int rc = zmq_setsockopt (zocket, ZMQ_DELAY_ATTACH_ON_CONNECT, &delay_attach_on_connect, sizeof (int));
-    assert (rc == 0 || zmq_errno () == ETERM);
-#   endif
-}
-
-
-//  --------------------------------------------------------------------------
 //  Set socket ZMQ_TOS value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
@@ -180,6 +70,24 @@ zsocket_tos (void *zocket)
     return tos;
 #   else
     return 0;
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_ROUTER_HANDOVER value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsocket_set_router_handover (void *zocket, int router_handover)
+{
+#   if defined (ZMQ_ROUTER_HANDOVER)
+    if (zsocket_type (zocket) != ZMQ_ROUTER) {
+        printf ("ZMQ_ROUTER_HANDOVER is not valid on %s sockets\n", zsocket_type_str (zocket));
+        assert (false);
+    }
+    int rc = zmq_setsockopt (zocket, ZMQ_ROUTER_HANDOVER, &router_handover, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -588,6 +496,152 @@ zsocket_zap_domain (void *zocket)
     return (char *) zap_domain;
 #   else
     return NULL;
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_MECHANISM value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int 
+zsocket_mechanism (void *zocket)
+{
+#   if defined (ZMQ_MECHANISM)
+    int mechanism;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zocket, ZMQ_MECHANISM, &mechanism, &option_len);
+    return mechanism;
+#   else
+    return 0;
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_IPV6 value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsocket_set_ipv6 (void *zocket, int ipv6)
+{
+#   if defined (ZMQ_IPV6)
+    int rc = zmq_setsockopt (zocket, ZMQ_IPV6, &ipv6, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_IPV6 value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int 
+zsocket_ipv6 (void *zocket)
+{
+#   if defined (ZMQ_IPV6)
+    int ipv6;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zocket, ZMQ_IPV6, &ipv6, &option_len);
+    return ipv6;
+#   else
+    return 0;
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_IMMEDIATE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsocket_set_immediate (void *zocket, int immediate)
+{
+#   if defined (ZMQ_IMMEDIATE)
+    int rc = zmq_setsockopt (zocket, ZMQ_IMMEDIATE, &immediate, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_IMMEDIATE value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int 
+zsocket_immediate (void *zocket)
+{
+#   if defined (ZMQ_IMMEDIATE)
+    int immediate;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zocket, ZMQ_IMMEDIATE, &immediate, &option_len);
+    return immediate;
+#   else
+    return 0;
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_ROUTER_RAW value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsocket_set_router_raw (void *zocket, int router_raw)
+{
+#   if defined (ZMQ_ROUTER_RAW)
+    if (zsocket_type (zocket) != ZMQ_ROUTER) {
+        printf ("ZMQ_ROUTER_RAW is not valid on %s sockets\n", zsocket_type_str (zocket));
+        assert (false);
+    }
+    int rc = zmq_setsockopt (zocket, ZMQ_ROUTER_RAW, &router_raw, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_IPV4ONLY value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsocket_set_ipv4only (void *zocket, int ipv4only)
+{
+#   if defined (ZMQ_IPV4ONLY)
+    int rc = zmq_setsockopt (zocket, ZMQ_IPV4ONLY, &ipv4only, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_IPV4ONLY value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int 
+zsocket_ipv4only (void *zocket)
+{
+#   if defined (ZMQ_IPV4ONLY)
+    int ipv4only;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zocket, ZMQ_IPV4ONLY, &ipv4only, &option_len);
+    return ipv4only;
+#   else
+    return 0;
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_DELAY_ATTACH_ON_CONNECT value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect)
+{
+#   if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
+    int rc = zmq_setsockopt (zocket, ZMQ_DELAY_ATTACH_ON_CONNECT, &delay_attach_on_connect, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
 
@@ -2981,46 +3035,18 @@ zsockopt_test (bool verbose)
     assert (ctx);
     void *zocket;
 #if (ZMQ_VERSION_MAJOR == 4)
-#     if defined (ZMQ_IPV6)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    assert (zocket);
-    zsocket_set_ipv6 (zocket, 1);
-    assert (zsocket_ipv6 (zocket) == 1);
-    zsocket_ipv6 (zocket);
-    zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_IMMEDIATE)
-    zocket = zsocket_new (ctx, ZMQ_DEALER);
-    assert (zocket);
-    zsocket_set_immediate (zocket, 1);
-    zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_ROUTER_RAW)
-    zocket = zsocket_new (ctx, ZMQ_ROUTER);
-    assert (zocket);
-    zsocket_set_router_raw (zocket, 1);
-    zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_IPV4ONLY)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    assert (zocket);
-    zsocket_set_ipv4only (zocket, 1);
-    assert (zsocket_ipv4only (zocket) == 1);
-    zsocket_ipv4only (zocket);
-    zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
-    zocket = zsocket_new (ctx, ZMQ_PUB);
-    assert (zocket);
-    zsocket_set_delay_attach_on_connect (zocket, 1);
-    zsocket_destroy (ctx, zocket);
-#     endif
 #     if defined (ZMQ_TOS)
     zocket = zsocket_new (ctx, ZMQ_DEALER);
     assert (zocket);
     zsocket_set_tos (zocket, 1);
     assert (zsocket_tos (zocket) == 1);
     zsocket_tos (zocket);
+    zsocket_destroy (ctx, zocket);
+#     endif
+#     if defined (ZMQ_ROUTER_HANDOVER)
+    zocket = zsocket_new (ctx, ZMQ_ROUTER);
+    assert (zocket);
+    zsocket_set_router_handover (zocket, 1);
     zsocket_destroy (ctx, zocket);
 #     endif
 #     if defined (ZMQ_ROUTER_MANDATORY)
@@ -3129,6 +3155,48 @@ zsockopt_test (bool verbose)
     char *zap_domain = zsocket_zap_domain (zocket);
     assert (zap_domain);
     free (zap_domain);
+    zsocket_destroy (ctx, zocket);
+#     endif
+#     if defined (ZMQ_MECHANISM)
+    zocket = zsocket_new (ctx, ZMQ_SUB);
+    assert (zocket);
+    zsocket_mechanism (zocket);
+    zsocket_destroy (ctx, zocket);
+#     endif
+#     if defined (ZMQ_IPV6)
+    zocket = zsocket_new (ctx, ZMQ_SUB);
+    assert (zocket);
+    zsocket_set_ipv6 (zocket, 1);
+    assert (zsocket_ipv6 (zocket) == 1);
+    zsocket_ipv6 (zocket);
+    zsocket_destroy (ctx, zocket);
+#     endif
+#     if defined (ZMQ_IMMEDIATE)
+    zocket = zsocket_new (ctx, ZMQ_DEALER);
+    assert (zocket);
+    zsocket_set_immediate (zocket, 1);
+    assert (zsocket_immediate (zocket) == 1);
+    zsocket_immediate (zocket);
+    zsocket_destroy (ctx, zocket);
+#     endif
+#     if defined (ZMQ_ROUTER_RAW)
+    zocket = zsocket_new (ctx, ZMQ_ROUTER);
+    assert (zocket);
+    zsocket_set_router_raw (zocket, 1);
+    zsocket_destroy (ctx, zocket);
+#     endif
+#     if defined (ZMQ_IPV4ONLY)
+    zocket = zsocket_new (ctx, ZMQ_SUB);
+    assert (zocket);
+    zsocket_set_ipv4only (zocket, 1);
+    assert (zsocket_ipv4only (zocket) == 1);
+    zsocket_ipv4only (zocket);
+    zsocket_destroy (ctx, zocket);
+#     endif
+#     if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
+    zocket = zsocket_new (ctx, ZMQ_PUB);
+    assert (zocket);
+    zsocket_set_delay_attach_on_connect (zocket, 1);
     zsocket_destroy (ctx, zocket);
 #     endif
 #     if defined (ZMQ_TYPE)

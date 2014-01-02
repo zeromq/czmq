@@ -2,7 +2,7 @@
     zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.
 
     -------------------------------------------------------------------------
-    Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
+    Copyright (c) 1991-2014 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -569,7 +569,7 @@ s_collect_value (char **start, int lineno)
 //  deleted.
 
 void
-zconfig_comment (zconfig_t *self, char *format, ...)
+zconfig_set_comment (zconfig_t *self, char *format, ...)
 {
     if (format) {
         if (!self->comments) {
@@ -586,6 +586,17 @@ zconfig_comment (zconfig_t *self, char *format, ...)
     }
     else
         zlist_destroy (&self->comments);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return comments of config item, as zlist.
+
+zlist_t *
+zconfig_comments (zconfig_t *self)
+{
+    assert (self);
+    return self->comments;
 }
 
 
@@ -689,8 +700,9 @@ zconfig_test (bool verbose)
     item = zconfig_new ("name", section);
     zconfig_set_value (item, "Justin Kayce");
     zconfig_put (root, "/curve/secret-key", "Top Secret");
-    zconfig_comment (root, "   CURVE certificate");
-    zconfig_comment (root, "   -----------------");
+    zconfig_set_comment (root, "   CURVE certificate");
+    zconfig_set_comment (root, "   -----------------");
+    assert (zconfig_comments (root));
     zconfig_save (root, TESTDIR "/test.cfg");
     zconfig_destroy (&root);
     root = zconfig_load (TESTDIR "/test.cfg");

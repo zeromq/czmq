@@ -2,7 +2,7 @@
     czmq.h - CZMQ wrapper
 
     -------------------------------------------------------------------------
-    Copyright (c) 1991-2013 iMatix Corporation <www.imatix.com>
+    Copyright (c) 1991-2014 iMatix Corporation <www.imatix.com>
     Copyright other contributors as noted in the AUTHORS file.
 
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -45,10 +45,10 @@
 
 #include "zchunk.h"
 #include "zclock.h"
-#include "zconfig.h"
 #include "zframe.h"
 #include "zlist.h"
 #include "zhash.h"
+#include "zconfig.h"
 #include "zctx.h"
 #include "zfile.h"
 #include "zdir.h"
@@ -71,6 +71,7 @@
 #include "zcert.h"
 #include "zcertstore.h"
 #include "zproxy.h"
+#include "zservice.h"
 #include "zuuid.h"
 
 #endif
