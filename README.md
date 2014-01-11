@@ -252,14 +252,6 @@ This is the class interface:
     CZMQ_EXPORT void
         zbeacon_noecho (zbeacon_t *self);
     
-    //  Start/stop listening on unicast packets
-    CZMQ_EXPORT void
-        zbeacon_unicast (zbeacon_t *self, int flag);
-    
-    //  Send a frame directed to a particular unicast IP address once
-    CZMQ_EXPORT void
-        zbeacon_send (zbeacon_t *self,  char *ipaddress, byte *transmit, size_t size);
-    
     //  Start broadcasting beacon to peers at the specified interval
     CZMQ_EXPORT void
         zbeacon_publish (zbeacon_t *self, byte *transmit, size_t size);
@@ -1267,8 +1259,12 @@ This is the class interface:
     CZMQ_EXPORT void
         zmonitor_destroy (zmonitor_t **self_p);
     
-    //  Get the ZeroMQ socket, for polling or receiving socket
-    //  event messages from the backend agent on.
+    //  Receive a status message from the monitor; if no message arrives within
+    //  500 msec, or the call was interrupted, returns NULL.
+    CZMQ_EXPORT zmsg_t *
+        zmonitor_recv (zmonitor_t *self);
+    
+    //  Get the ZeroMQ socket, for polling 
     CZMQ_EXPORT void *
         zmonitor_socket (zmonitor_t *self);
     
@@ -1534,131 +1530,48 @@ This is the class interface:
 <A name="toc4-331" title="zproxy - convenient zmq_proxy API" />
 #### zproxy - convenient zmq_proxy API
 
-The zproxy class simplifies working with the zmq_proxy API.
+The zproxy class simplifies working with the zmq_proxy_steerable API.
 
 This is the class interface:
 
-    //  Create a new zproxy object
-    CZMQ_EXPORT zproxy_t *
-        zproxy_new (zctx_t *ctx, int zproxy_type);
     
-    //  Destroy a zproxy object
+    //  Constructor
+    //  Create a new zproxy object. You must create the frontend and backend
+    //  sockets, configure them, and connect or bind them, before you pass them
+    //  to the constructor. Do NOT use the sockets again, after passing them to
+    //  this method.
+    CZMQ_EXPORT zproxy_t *
+        zproxy_new (zctx_t *ctx, void *frontend, void *backend);
+    
+    //  Destructor
+    //  Destroy a zproxy object; note this first stops the proxy.
     CZMQ_EXPORT void
         zproxy_destroy (zproxy_t **self_p);
     
-    // Underlying libzmq supports zmq_proxy
-    #if (ZMQ_VERSION >= ZPROXY_HAS_PROXY)
+    //  Copy all proxied messages to specified endpoint; if this is NULL, any
+    //  in-progress capturing will be stopped. You must already have bound the
+    //  endpoint to a PULL socket.
+    CZMQ_EXPORT void
+        zproxy_capture (zproxy_t *self, char *endpoint);
     
-    //  Get zproxy capture address
-    CZMQ_EXPORT char *
-        zproxy_capture_addr (zproxy_t *self);
-    
-    //  Get zproxy capture type
-    CZMQ_EXPORT int
-        zproxy_capture_type (zproxy_t *self);
-    
-    // Underlying libzmq also supports zmq_proxy_steerable
-    #if (ZMQ_VERSION >= ZPROXY_HAS_STEERABLE)
-    
-    //  Start a zproxy in an attached thread, binding to endpoints.
-    //  If capture_addr is not null, will create a capture socket.
-    //  If control_addr is not null, will use zmq_proxy_steerable
-    //  Returns 0 if OK, -1 if there was an error
-    CZMQ_EXPORT int
-        zproxy_bind (zproxy_t *self, char *frontend_addr,
-                char *backend_addr, char *capture_addr,
-                char *control_addr);
-    
-    // Pause a zproxy object
+    //  Pauses a zproxy object; a paused proxy will cease processing messages,
+    //  causing them to be queued up and potentially hit the high-water mark on
+    //  the frontend socket, causing messages to be dropped, or writing
+    //  applications to block.
     CZMQ_EXPORT void
         zproxy_pause (zproxy_t *self);
     
-    // Resume a zproxy object
+    //  Resume a zproxy object
     CZMQ_EXPORT void
         zproxy_resume (zproxy_t *self);
     
-    // Terminate a zproxy object
-    CZMQ_EXPORT void
-        zproxy_terminate (zproxy_t *self);
-    
-    // Underlying libzmq supports zmq_proxy but not zmq_proxy_steerable
-    #else
-    
-    //  Start and zmq_proxy in an attached thread, binding to endpoints.
-    //  If capture_addr is not null, will create a capture socket.
-    //  Returns 0 if OK, -1 if there was an error
-    CZMQ_EXPORT int
-        zproxy_bind (zproxy_t *self, char *frontend_addr,
-                char *backend_addr, char *capture_addr);
-    #endif
-    
-    // Underlying libzmq supports zmq_device and does not support
-    // zmq_proxy nor zmq_proxy_steerable
-    #else
-    
-    //  Start a zproxy in an attached thread, binding to endpoints.
-    //  Returns 0 if OK, -1 if there was an error
-    CZMQ_EXPORT int
-        zproxy_bind (zproxy_t *self, char *frontend_addr,
-                char *backend_addr);
-    
-    #endif 
-    
     // Self test of this class
-    CZMQ_EXPORT int
+    CZMQ_EXPORT void
         zproxy_test (bool verbose);
 
-I've modified zproxy to "do the right thing" depending
-on both the underlying version of libzmq and arguments passed 
-to zproxy_bind.  While this introduces quite a 
-bit of complexity in this czmq class, the hope is that it
-reduces a lot of complexity on behalf of the actual czmq user.
-
-Note that because the zproxy_bind function signature changes
-based on version of libzmq compiled against, swapping out the
-underlying libzmq for an older version than compiled against
-will cause code to fail.  This is intended behavior.
-
-I have tested swapping out the underlying libzmq for newer
-versions than compiled against, and this works.
-
-The behavior for various cases is as follows:
-
-------------------------------------------
-ZMQ_VERSION >= ZPROXY_HAS_STEERABLE 
-
-int
-zproxy_bind (zproxy_t *self, char *frontend_addr,
-        char *backend_addr, char *capture_addr,
-        char *control_addr);
-
-capture? | control?  | should call
-YES      | YES       | zmq_proxy_steerable
-NO       | YES       | zmq_proxy_steerable
-YES      | NO        | zmq_proxy
-NO       | NO        | zmq_proxy
-   
-------------------------------------------
-ZMQ_VERSION >= ZPROXY_HAS_PROXY &&
-ZMQ_VERSION < ZPROXY_HAS_STEERABLE
-
-int
-zproxy_bind (zproxy_t *self, char *frontend_addr,
-        char *backend_addr, char *capture_addr);
-
-capture? | should call
-YES      | zmq_proxy
-NO       | zmq_proxy
-
-------------------------------------------
-ZMQ_VERSION < ZPROXY_HAS_PROXY
-
-int
-zproxy_bind (zproxy_t *self, char *frontend_addr,
-        char *backend_addr);
-
-should call
-zmq_proxy
+There's no fallback to the older zmq_proxy, since that does not allow
+dynamic control. If you need zmq_proxy (if you are using an older
+version of libzmq), use that directly in your code.
 
 <A name="toc4-342" title="zsocket - working with ØMQ sockets" />
 #### zsocket - working with ØMQ sockets
@@ -1741,8 +1654,6 @@ This is the class interface:
 
     #if (ZMQ_VERSION_MAJOR == 4)
     //  Get socket options
-    CZMQ_EXPORT int zsocket_ipv6 (void *zocket);
-    CZMQ_EXPORT int zsocket_ipv4only (void *zocket);
     CZMQ_EXPORT int zsocket_tos (void *zocket);
     CZMQ_EXPORT int zsocket_plain_server (void *zocket);
     CZMQ_EXPORT char * zsocket_plain_username (void *zocket);
@@ -1752,6 +1663,10 @@ This is the class interface:
     CZMQ_EXPORT char * zsocket_curve_secretkey (void *zocket);
     CZMQ_EXPORT char * zsocket_curve_serverkey (void *zocket);
     CZMQ_EXPORT char * zsocket_zap_domain (void *zocket);
+    CZMQ_EXPORT int zsocket_mechanism (void *zocket);
+    CZMQ_EXPORT int zsocket_ipv6 (void *zocket);
+    CZMQ_EXPORT int zsocket_immediate (void *zocket);
+    CZMQ_EXPORT int zsocket_ipv4only (void *zocket);
     CZMQ_EXPORT int zsocket_type (void *zocket);
     CZMQ_EXPORT int zsocket_sndhwm (void *zocket);
     CZMQ_EXPORT int zsocket_rcvhwm (void *zocket);
@@ -1780,12 +1695,8 @@ This is the class interface:
     CZMQ_EXPORT char * zsocket_last_endpoint (void *zocket);
     
     //  Set socket options
-    CZMQ_EXPORT void zsocket_set_ipv6 (void *zocket, int ipv6);
-    CZMQ_EXPORT void zsocket_set_immediate (void *zocket, int immediate);
-    CZMQ_EXPORT void zsocket_set_router_raw (void *zocket, int router_raw);
-    CZMQ_EXPORT void zsocket_set_ipv4only (void *zocket, int ipv4only);
-    CZMQ_EXPORT void zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect);
     CZMQ_EXPORT void zsocket_set_tos (void *zocket, int tos);
+    CZMQ_EXPORT void zsocket_set_router_handover (void *zocket, int router_handover);
     CZMQ_EXPORT void zsocket_set_router_mandatory (void *zocket, int router_mandatory);
     CZMQ_EXPORT void zsocket_set_probe_router (void *zocket, int probe_router);
     CZMQ_EXPORT void zsocket_set_req_relaxed (void *zocket, int req_relaxed);
@@ -1802,6 +1713,11 @@ This is the class interface:
     CZMQ_EXPORT void zsocket_set_curve_serverkey (void *zocket, const char * curve_serverkey);
     CZMQ_EXPORT void zsocket_set_curve_serverkey_bin (void *zocket, const byte *curve_serverkey);
     CZMQ_EXPORT void zsocket_set_zap_domain (void *zocket, const char * zap_domain);
+    CZMQ_EXPORT void zsocket_set_ipv6 (void *zocket, int ipv6);
+    CZMQ_EXPORT void zsocket_set_immediate (void *zocket, int immediate);
+    CZMQ_EXPORT void zsocket_set_router_raw (void *zocket, int router_raw);
+    CZMQ_EXPORT void zsocket_set_ipv4only (void *zocket, int ipv4only);
+    CZMQ_EXPORT void zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect);
     CZMQ_EXPORT void zsocket_set_sndhwm (void *zocket, int sndhwm);
     CZMQ_EXPORT void zsocket_set_rcvhwm (void *zocket, int rcvhwm);
     CZMQ_EXPORT void zsocket_set_affinity (void *zocket, int affinity);
@@ -2022,6 +1938,8 @@ but for now it covers only file systems.
 
 This is the class interface:
 
+    #define UDP_FRAME_MAX   255         //  Max size of UDP frame
+    
     //  Callback for interrupt signal handler
     typedef void (zsys_handler_fn) (int signal_value);
     
@@ -2098,6 +2016,26 @@ This is the class interface:
     CZMQ_EXPORT char *
         zsys_vprintf (const char *format, va_list argptr);
     
+    //  Create UDP beacon socket; if the routable option is true, uses
+    //  multicast (not yet implemented), else uses broadcast. This method
+    //  and related ones might _eventually_ be moved to a zudp class.
+    CZMQ_EXPORT SOCKET
+        zsys_udp_new (bool routable);
+    
+    //  Send zframe to UDP socket
+    CZMQ_EXPORT void
+        zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address);
+    
+    //  Receive zframe from UDP socket, and set address of peer that sent it
+    //  The peername must be a char [INET_ADDRSTRLEN] array.
+    CZMQ_EXPORT zframe_t *
+        zsys_udp_recv (SOCKET udpsock, char *peername);
+    
+    //  Handle an I/O error on some socket operation; will report and die on
+    //  fatal errors, and continue silently on "try again" errors.
+    CZMQ_EXPORT void
+        zsys_socket_error (char *reason);
+        
     //  Self test of this class
     CZMQ_EXPORT int
         zsys_test (bool verbose);
@@ -2364,6 +2302,10 @@ This is the class interface:
     CZMQ_EXPORT void
         ztree_test (int verbose);
 
+TODO: code style needs cleanup to match CLASS guideliness
+    - poor variable names like 'x'
+    - indentation and if/else layouts
+    - possibly removal of all tree code to foreign/
 
 <A name="toc2-433" title="Under the Hood" />
 ## Under the Hood
