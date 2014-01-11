@@ -9,16 +9,16 @@
     http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the 
-    Free Software Foundation; either version 3 of the License, or (at your 
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
     This software is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL-
-    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General 
+    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General
     Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public License 
+    You should have received a copy of the GNU Lesser General Public License
     along with this program. If not, see <http://www.gnu.org/licenses/>.
     =========================================================================
 */
@@ -33,6 +33,7 @@ extern "C" {
 //  Opaque class structure
 typedef struct _zconfig_t zconfig_t;
 
+//  @interface
 //  Function that executes config
 typedef int (zconfig_fct) (zconfig_t *self, void *arg, int level);
 
@@ -51,7 +52,7 @@ CZMQ_EXPORT char *
 //  Return value of config item
 CZMQ_EXPORT char *
     zconfig_value (zconfig_t *self);
-    
+
 //  Insert or update configuration key with value
 CZMQ_EXPORT void
     zconfig_put (zconfig_t *self, char *path, char *value);
@@ -66,7 +67,7 @@ CZMQ_EXPORT void
 //  by the string.
 CZMQ_EXPORT void
     zconfig_set_value (zconfig_t *self, char *format, ...);
-    
+
 //  Find our first child, if any
 CZMQ_EXPORT zconfig_t *
     zconfig_child (zconfig_t *self);
@@ -79,7 +80,7 @@ CZMQ_EXPORT zconfig_t *
 CZMQ_EXPORT zconfig_t *
     zconfig_locate (zconfig_t *self, char *path);
 
-//  Resolve a config path into a string value; leading slash is optional 
+//  Resolve a config path into a string value; leading slash is optional
 //  and ignored.
 CZMQ_EXPORT char *
     zconfig_resolve (zconfig_t *self, char *path, char *default_value);
@@ -97,7 +98,7 @@ CZMQ_EXPORT int
     zconfig_execute (zconfig_t *self, zconfig_fct handler, void *arg);
 
 //  Add comment to config item before saving to disk. You can add as many
-//  comment lines as you like. If you use a null format, all comments are 
+//  comment lines as you like. If you use a null format, all comments are
 //  deleted.
 CZMQ_EXPORT void
     zconfig_set_comment (zconfig_t *self, char *format, ...);
@@ -122,6 +123,7 @@ CZMQ_EXPORT void
 //  Print the config file to stdout
 CZMQ_EXPORT void
     zconfig_print (zconfig_t *self);
+//  @end
 
 //  Self test of this class
 void
