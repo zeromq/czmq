@@ -41,6 +41,9 @@
 
 #include "../include/czmq.h"
 #include "platform.h"
+#if defined (__UNIX__) && defined (HAVE_GETIFADDRS) && defined (HAVE_FREEIFADDRS)
+#include <net/if.h>
+#endif
 
 //  Constants
 #define INTERVAL_DFLT  1000         //  Default interval = 1 second
@@ -438,6 +441,9 @@ s_get_interface (agent_t *self)
         while (interface) {
             //  On Solaris, loopback interfaces have a NULL in ifa_broadaddr
             if (interface->ifa_broadaddr
+            && !(interface->ifa_flags & IFF_LOOPBACK) // ignore loopback interface
+            && (interface->ifa_flags & IFF_BROADCAST) // only use interfaces that have BROADCAST
+            && !(interface->ifa_flags & IFF_POINTOPOINT) // ignore point to point interfaces.
             &&  interface->ifa_addr
             && (interface->ifa_addr->sa_family == AF_INET)) {
                 self->address = *(inaddr_t *) interface->ifa_addr;
