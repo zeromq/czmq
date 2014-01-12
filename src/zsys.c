@@ -140,7 +140,16 @@ zsys_set_interface (char *interface_name)
 char *
 zsys_interface (void)
 {
-    return (s_interface? s_interface: "");
+    if (s_interface) return s_interface;
+
+    // if the environment variable ZSYS_INTERFACE is set, use that as the
+    // default interface name. This lets the environment variable be configured
+    // for test environments where required. For example, on Mac OS X, zbeacon
+    // cannot bind to 255.255.255.255 which is the default when there is no
+    // specified interface.
+    char* env = getenv ("ZSYS_INTERFACE");
+    if (env) return env;
+    return "";
 }
 
 

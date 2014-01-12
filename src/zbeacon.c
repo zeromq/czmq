@@ -199,6 +199,10 @@ zbeacon_hostname (zbeacon_t *self)
 
 //  --------------------------------------------------------------------------
 //  Self test of this class
+//
+// If this test fails with an unable to bind error, try specifying the default
+// interface to be used for zbeacon with the ZSYS_INTERFACE environment
+// variable.
 
 void
 zbeacon_test (bool verbose)
