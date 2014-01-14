@@ -330,7 +330,7 @@ zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_timer_fn handler, 
 
 
 //  --------------------------------------------------------------------------
-//  Cancel all timers for a specific argument (as provided in zloop_timer)
+//  Cancel a timer by timer id (as returned by zloop_timer()).
 //  Returns 0 on success.
 
 int
