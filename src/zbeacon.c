@@ -630,6 +630,9 @@ s_beacon_recv (agent_t *self)
         zmsg_add (msg, frame);
         zmsg_send (&msg, self->pipe);
     }
+    else {
+        zframe_destroy(&frame);
+    }
 }
 
 
