@@ -44,9 +44,14 @@ CZMQ_EXPORT void
 
 //  Receive message from socket, returns zmsg_t object or NULL if the recv
 //  was interrupted. Does a blocking recv, if you want to not block then use
-//  the zloop class or zmq_poll to check for socket input before receiving.
+//  the zloop class or zmsg_recv_nowait() or zmq_poll to check for socket input before receiving.
 CZMQ_EXPORT zmsg_t *
     zmsg_recv (void *socket);
+
+//  Receive message from socket, returns zmsg_t object, or NULL either if there was
+//  no input waiting, or the recv was interrupted.
+CZMQ_EXPORT zmsg_t *
+    zmsg_recv_nowait (void *socket);
 
 //  Send message to socket, destroy after sending. If the message has no
 //  frames, sends nothing but destroys the message anyhow. Safe to call

@@ -87,7 +87,7 @@ zmsg_destroy (zmsg_t **self_p)
 //  --------------------------------------------------------------------------
 //  Receive message from socket, returns zmsg_t object or NULL if the recv
 //  was interrupted. Does a blocking recv, if you want to not block then use
-//  the zloop class or zmq_poll to check for socket input before receiving.
+//  the zloop class or zmsg_recv_nowait() or zmq_poll to check for socket input before receiving.
 
 zmsg_t *
 zmsg_recv (void *zocket)
@@ -113,6 +113,35 @@ zmsg_recv (void *zocket)
     return self;
 }
 
+//  --------------------------------------------------------------------------
+//  Receive message from socket, returns zmsg_t object, or NULL either if there was
+//  no input waiting, or the recv was interrupted.
+
+zmsg_t *
+zmsg_recv_nowait (void *zocket)
+{
+    assert (zocket);
+    int frames = 0;
+    zmsg_t *self = zmsg_new ();
+    if (!self)
+        return NULL;
+    
+    while (true) {
+        zframe_t *frame = zframe_recv_nowait (zocket);
+        if (!frame) {
+            zmsg_destroy (&self);
+            break;              //  Interrupted or terminated
+        }
+        if (zmsg_append (self, &frame)) {
+            zmsg_destroy (&self);
+            break;
+        }
+        if (!zsocket_rcvmore (zocket))
+            break;              //  Last message frame
+        frames++;
+    }
+    return frames > 0 ? self : NULL;
+}
 
 //  --------------------------------------------------------------------------
 //  Send message to socket, destroy after sending. If the message has no
