@@ -584,6 +584,8 @@ zsys_test (bool verbose)
     assert (when > 0);
     rc = zsys_dir_delete ("%s/%s", ".", ".testsys/subdir");
     assert (rc == 0);
+    rc = zsys_dir_delete ("%s/%s", ".", ".testsys");
+    assert (rc == 0);
 
     int major, minor, patch;
     zsys_version (&major, &minor, &patch);
