@@ -411,7 +411,11 @@ s_agent_new (void *pipe, int port_nbr)
     s_get_interface (self);
 
     //  Bind to the port on all interfaces
+#if (defined (__WINDOWS__))
+    inaddr_t sockaddr = self->address;
+#else
     inaddr_t sockaddr = self->broadcast;
+#endif
     if (bind (self->udpsock, (struct sockaddr *) &sockaddr, sizeof (sockaddr)) == SOCKET_ERROR)
         zsys_socket_error ("bind");
 
