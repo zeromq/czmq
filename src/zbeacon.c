@@ -422,10 +422,13 @@ s_agent_new (void *pipe, int port_nbr)
     //  Send our hostname back to API
     //  PROBLEM: this hostname will not be accurate when the node
     //  has more than one active interface.
-    char hostname [INET_ADDRSTRLEN];
-    getnameinfo ((struct sockaddr *) &self->address, sizeof (self->address),
-                 hostname, INET_ADDRSTRLEN, NULL, 0, NI_NUMERICHOST);
-    printf ("***X*** GET NAME INFO: %s\n", hostname);
+    char hostname [255];
+    int rc = getnameinfo ((struct sockaddr *) &self->address, sizeof (self->address),
+                           hostname, 255, NULL, 0, NI_NUMERICHOST);
+    if (rc) {
+        puts (gai_strerror (rc));
+        strcpy (hostname, "127.0.0.1");
+    }
     zstr_send (pipe, hostname);
     
     return self;
