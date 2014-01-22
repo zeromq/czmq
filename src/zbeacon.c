@@ -425,6 +425,7 @@ s_agent_new (void *pipe, int port_nbr)
     char hostname [INET_ADDRSTRLEN];
     getnameinfo ((struct sockaddr *) &self->address, sizeof (self->address),
                  hostname, INET_ADDRSTRLEN, NULL, 0, NI_NUMERICHOST);
+    printf ("***X*** GET NAME INFO: %s\n", hostname);
     zstr_send (pipe, hostname);
     
     return self;
