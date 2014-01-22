@@ -22,8 +22,8 @@ CZMQ_EXPORT void
 CZMQ_EXPORT zmsg_t *
     zmsg_recv (void *socket);
 
-//  Receive message from socket, returns zmsg_t object or NULL if the recv
-//  was interrupted. Does a none blocking recv.
+//  Receive message from socket, returns zmsg_t object, or NULL either if there was
+//  no input waiting, or the recv was interrupted.
 CZMQ_EXPORT zmsg_t *
     zmsg_recv_nowait (void *socket);
 
