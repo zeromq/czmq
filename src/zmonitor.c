@@ -388,10 +388,10 @@ s_socket_event (agent_t *self)
         printf ("I: zmonitor: %s - %s\n", description, address);
 
     zmsg_t *msg = zmsg_new();
-    zmsg_addstr (msg, "%d", (int) event.event);
-    zmsg_addstr (msg, "%d", (int) event.value);
-    zmsg_addstr (msg, "%s", address);
-    zmsg_addstr (msg, "%s", description);
+    zmsg_addstrf (msg, "%d", (int) event.event);
+    zmsg_addstrf (msg, "%d", (int) event.value);
+    zmsg_addstrf (msg, "%s", address);
+    zmsg_addstrf (msg, "%s", description);
     zmsg_send (&msg, self->pipe);
 }
 
