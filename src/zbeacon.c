@@ -73,7 +73,7 @@ zbeacon_new (zctx_t *ctx, int port_nbr)
     assert (ctx);
     self->pipe = zthread_fork (ctx, s_agent_task, NULL);
     if (self->pipe) {
-        zstr_send (self->pipe, "%d", port_nbr);
+        zstr_sendf (self->pipe, "%d", port_nbr);
         self->hostname = zstr_recv (self->pipe);
     }
     else {
@@ -111,7 +111,7 @@ zbeacon_set_interval (zbeacon_t *self, int interval)
 {
     assert (self);
     zstr_sendm (self->pipe, "INTERVAL");
-    zstr_send (self->pipe, "%d", interval);
+    zstr_sendf (self->pipe, "%d", interval);
 }
 
 

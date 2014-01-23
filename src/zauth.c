@@ -189,7 +189,7 @@ zauth_set_verbose (zauth_t *self, bool verbose)
 {
     assert (self);
     zstr_sendm (self->pipe, "VERBOSE");
-    zstr_send  (self->pipe, "%d", verbose);
+    zstr_sendf (self->pipe, "%d", verbose);
     //  Wait for completion
     free (zstr_recv (self->pipe));
 }

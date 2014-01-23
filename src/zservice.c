@@ -102,7 +102,7 @@ zservice_set_verbose (zservice_t *self, bool verbose)
 {
     assert (self);
     zstr_sendm (self->pipe, "VERBOSE");
-    zstr_send (self->pipe, "%d", verbose);
+    zstr_sendf (self->pipe, "%d", verbose);
 }
 
 
