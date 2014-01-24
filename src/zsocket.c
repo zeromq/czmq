@@ -193,14 +193,15 @@ zsocket_type_str (void *self)
         return type_name [type];
 }
 
+
 //  --------------------------------------------------------------------------
 //  Send data over a socket as a single message frame.
 //  Accepts these flags: ZFRAME_MORE and ZFRAME_DONTWAIT.
 
 int
-zsocket_sendmem (void *zocket, const void* data, size_t size, int flags)
+zsocket_sendmem (void *socket, const void *data, size_t size, int flags)
 {
-    assert (zocket);
+    assert (socket);
     assert (size == 0 || data);
 
     int snd_flags = (flags & ZFRAME_MORE)? ZMQ_SNDMORE : 0;
@@ -210,7 +211,37 @@ zsocket_sendmem (void *zocket, const void* data, size_t size, int flags)
     zmq_msg_init_size (&msg, size);
     memcpy (zmq_msg_data (&msg), data, size);
 
-    int rc = zmq_sendmsg (zocket, &msg, snd_flags);
+    int rc = zmq_sendmsg (socket, &msg, snd_flags);
+    return rc == -1? -1: 0;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Send a signal over a socket. A signal is a zero-byte message.
+//  Signals are used primarily between threads, over pipe sockets.
+//  Returns -1 if there was an error sending the signal.
+
+int
+zsocket_signal (void *zocket)
+{
+    zmq_msg_t msg;
+    zmq_msg_init_size (&msg, 0);
+    int rc = zmq_sendmsg (zocket, &msg, 0);
+    return rc == -1? -1: 0;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Wait on a signal. Use this to coordinate between threads, over
+//  pipe pairs. Blocks until the signal is received. Returns -1 on error,
+//  0 on success.
+
+int
+zsocket_wait (void *zocket)
+{
+    zmq_msg_t msg;
+    zmq_msg_init (&msg);
+    int rc = zmq_recvmsg (zocket, &msg, 0);
     return rc == -1? -1: 0;
 }
 
@@ -292,6 +323,11 @@ zsocket_test (bool verbose)
     assert (zframe_streq (frame, "DEFG"));
     assert (!zframe_more (frame));
     zframe_destroy (&frame);
+
+    rc = zsocket_signal (writer);
+    assert (rc == 0);
+    rc = zsocket_wait (reader);
+    assert (rc == 0);
 
     zsocket_destroy (ctx, reader);
     zsocket_destroy (ctx, writer);
