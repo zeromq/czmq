@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zproxy - work with zmq_proxy_steerable instances
+    zproxy - run a steerable proxy in the background
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2014 iMatix Corporation <www.imatix.com>
@@ -25,32 +25,28 @@
 
 /*
 @header
-    The zproxy class simplifies working with the zmq_proxy_steerable API.
+    The zproxy class provides an equivalent to the ZMQ steerable proxy, on
+    all versions of ZeroMQ.
 @discuss
-    There's no fallback to the older zmq_proxy, since that does not allow
-    dynamic control. If you need zmq_proxy (if you are using an older
-    version of libzmq), use that directly in your code.
 @end
 */
-#if HAVE_ZMQ_PROXY_STREERABLE
-#endif
 #include "../include/czmq.h"
 #include "platform.h"
-
-//  Structure of our class
-
-struct _zproxy_t {
-    zctx_t *ctx;
-    void *frontend;
-    void *backend;
-    void *capture;
-    void *pipe;
-};
-
 
 //  The proxy runs in a background thread
 static void
     s_proxy_task (void *args, zctx_t *ctx, void *pipe);
+
+//  Structure of our class; note that this structure is shared between
+//  the API thread and the proxy task.
+
+struct _zproxy_t {
+    zctx_t *ctx;                //  Context, allows inproc capture
+    void *pipe;                 //  Pipe used by API thread
+    void *frontend;             //  Frontend socket for proxy switching
+    void *backend;              //  Backend socket for proxy switching
+};
+
 
 //  --------------------------------------------------------------------------
 //  Constructor
@@ -63,7 +59,6 @@ zproxy_t *
 zproxy_new (zctx_t *ctx, void *frontend, void *backend)
 {
     assert (ctx);
-#if HAVE_ZMQ_PROXY_STEERABLE
     zproxy_t *self;
     self = (zproxy_t *) zmalloc (sizeof (zproxy_t));
     if (self) {
@@ -71,19 +66,15 @@ zproxy_new (zctx_t *ctx, void *frontend, void *backend)
         self->frontend = frontend;
         self->backend = backend;
         self->pipe = zthread_fork (ctx, s_proxy_task, self);
-        if (self->pipe) {
-            char *reply = zstr_recv (self->pipe);
-            zstr_free (&reply);
-        }
+        if (self->pipe)
+            zsocket_wait (self->pipe);
         else {
+            //  If we ran out of sockets, signal failure to caller
             free (self);
             self = NULL;
         }
     }
     return self;
-#else
-    return NULL;
-#endif
 }
 
 
@@ -96,9 +87,8 @@ zproxy_destroy (zproxy_t **self_p)
     assert (self_p);
     if (*self_p) {
         zproxy_t *self = *self_p;
-        zstr_send (self->pipe, "TERMINATE");
-        char *reply = zstr_recv (self->pipe);
-        zstr_free (&reply);
+        zstr_send (self->pipe, "STOP");
+        zsocket_wait (self->pipe);
         free (self);
         *self_p = NULL;
     }
@@ -114,23 +104,9 @@ void
 zproxy_capture (zproxy_t *self, char *endpoint)
 {
     assert (self);
-
-    //  Stop running proxy, and reconfigure new proxy with capture
-    zstr_send (self->pipe, "TERMINATE");
-    char *reply = zstr_recv (self->pipe);
-    zstr_free (&reply);
-
-    //  Capture flow is always PUSH-to-PULL
-    self->capture = zsocket_new (self->ctx, ZMQ_PUSH);
-    assert (self->capture);
-    int rc = zsocket_connect (self->capture, endpoint);
-    assert (rc == 0);
-
-    //  Restart proxy with new configuration
-    self->pipe = zthread_fork (self->ctx, s_proxy_task, self);
-    assert (self->pipe);
-    reply = zstr_recv (self->pipe);
-    zstr_free (&reply);
+    zstr_sendm (self->pipe, "CAPTURE");
+    zstr_send (self->pipe, endpoint);
+    zsocket_wait (self->pipe);
 }
 
 
@@ -145,6 +121,7 @@ zproxy_pause (zproxy_t *self)
 {
     assert (self);
     zstr_send (self->pipe, "PAUSE");
+    zsocket_wait (self->pipe);
 }
 
 
@@ -156,6 +133,7 @@ zproxy_resume (zproxy_t *self)
 {
     assert (self);
     zstr_send (self->pipe, "RESUME");
+    zsocket_wait (self->pipe);
 }
 
 
@@ -163,18 +141,90 @@ zproxy_resume (zproxy_t *self)
 //  Backend proxy task
 
 static void
-s_proxy_task (void *args, zctx_t *ctx, void *pipe)
+s_proxy_task (void *args, zctx_t *ctx, void *command_pipe)
 {
-    //  Confirm to API that we've initialized
-    zstr_send (pipe, "INITIALIZED");
-
-#if HAVE_ZMQ_PROXY_STEERABLE
-    //  Start proxy
+    //  Confirm to API that we've started up
+    zsocket_signal (command_pipe);
     zproxy_t *self = (zproxy_t *) args;
-    zmq_proxy_steerable (self->frontend, self->backend, self->capture, pipe);
-#endif
-    //  Proxy has ended; we now confirm to the API that we've terminated
-    zstr_send (pipe, "TERMINATED");
+    //  Capture socket, if not NULL, receives all data
+    void *capture = NULL;
+
+    //  Create poller to work on all three sockets
+    zpoller_t *poller = zpoller_new (self->frontend, self->backend, command_pipe, NULL);
+
+    bool stopped = false;
+    while (!stopped) {
+        //  Wait for activity on any polled socket, and read incoming message
+        void *which = zpoller_wait (poller, -1);
+        zmq_msg_t msg;
+        zmq_msg_init (&msg);
+        int send_flags;         //  Flags for outgoing message
+
+        if (which && zmq_recvmsg (which, &msg, 0) != -1) {
+            send_flags = zsocket_rcvmore (which)? ZMQ_SNDMORE: 0;
+
+            if (which == self->frontend || which == self->backend) {
+                void *output = which == self->frontend?
+                    self->backend: self->frontend;
+
+                //  Loop on all waiting messages, since polling adds a
+                //  non-trivial cost per message, especially on OS/X
+                while (true) {
+                    if (capture) {
+                        zmq_msg_t dup;
+                        zmq_msg_init (&dup);
+                        zmq_msg_copy (&dup, &msg);
+                        zmq_sendmsg (capture, &dup, send_flags);
+                    }
+                    int rc = zmq_sendmsg (output, &msg, send_flags);
+                    assert (rc != -1);
+                    if (zmq_recvmsg (which, &msg, ZMQ_DONTWAIT) == -1)
+                        break;      //  Presumably EAGAIN
+                }
+            }
+            else
+            if (which == command_pipe) {
+                char command [10] = { 0 };
+                assert (zmq_msg_size (&msg) < 10);
+                memcpy (command, zmq_msg_data (&msg), zmq_msg_size (&msg));
+
+                //  Execute API command
+                if (streq (command, "PAUSE")) {
+                    zpoller_destroy (&poller);
+                    poller = zpoller_new (command_pipe, NULL);
+                }
+                else
+                if (streq (command, "RESUME")) {
+                    zpoller_destroy (&poller);
+                    poller = zpoller_new (self->frontend, self->backend, command_pipe, NULL);
+                }
+                else
+                if (streq (command, "CAPTURE")) {
+                    //  Capture flow is always PUSH-to-PULL
+                    capture = zsocket_new (self->ctx, ZMQ_PUSH);
+                    char *endpoint = zstr_recv (command_pipe);
+                    if (capture) {
+                        int rc = zsocket_connect (capture, endpoint);
+                        assert (rc == 0);
+                    }
+                    zstr_free (&endpoint);
+                }
+                else
+                if (streq (command, "STOP"))
+                    stopped = true;
+                else
+                    assert (0); //  Cannot happen, so die
+
+                //  Signal to caller that we processed the command
+                zsocket_signal (command_pipe);
+            }
+            else
+                assert (0);     //  Cannot happen, so die
+        }
+        else
+            break;              //  Interrupted
+    }
+    zpoller_destroy (&poller);
 }
 
 
@@ -196,7 +246,6 @@ zproxy_test (bool verbose)
     assert (rc == 0);
     zproxy_t *proxy = zproxy_new (ctx, frontend, backend);
 
-#if HAVE_ZMQ_PROXY_STEERABLE
     //  Connect application sockets to proxy
     void *faucet = zsocket_new (ctx, ZMQ_PUSH);
     rc = zsocket_connect (faucet, "inproc://frontend");
@@ -205,24 +254,26 @@ zproxy_test (bool verbose)
     rc = zsocket_connect (sink, "inproc://backend");
     assert (rc == 0);
 
-    //  Create capture socket, must be a PULL socket
-    void *capture = zsocket_new (ctx, ZMQ_PULL);
-    rc = zsocket_bind (capture, "inproc://capture");
-    assert (rc == 0);
-
     //  Send some messages and check they arrived
     zstr_send (faucet, "Hello");
     char *string = zstr_recv (sink);
     assert (streq (string, "Hello"));
     zstr_free (&string);
     
+    //  Check pause/resume functionality
     zproxy_pause (proxy);
     zstr_send (faucet, "World");
+
     zproxy_resume (proxy);
     string = zstr_recv (sink);
     assert (streq (string, "World"));
     zstr_free (&string);
     
+    //  Create capture socket, must be a PULL socket
+    void *capture = zsocket_new (ctx, ZMQ_PULL);
+    rc = zsocket_bind (capture, "inproc://capture");
+    assert (rc == 0);
+
     //  Switch on capturing, check that it works
     zproxy_capture (proxy, "inproc://capture");
     zstr_send (faucet, "Hello");
@@ -235,11 +286,8 @@ zproxy_test (bool verbose)
     assert (streq (string, "Hello"));
     zstr_free (&string);
     zproxy_destroy (&proxy);
-#else
-    assert (proxy == NULL);
-#endif
     zctx_destroy (&ctx);
-    
+
     //  @end
     printf ("OK\n");
 }

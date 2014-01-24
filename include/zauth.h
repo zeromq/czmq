@@ -61,21 +61,19 @@ CZMQ_EXPORT void
     zauth_deny (zauth_t *self, char *address);
 
 //  Configure PLAIN authentication for a given domain. PLAIN authentication
-//  uses a plain-text password file. The filename is treated as a printf 
-//  format. To cover all domains, use "*". You can modify the password file
-//  at any time; it is reloaded automatically.
+//  uses a plain-text password file. To cover all domains, use "*". You can
+//  modify the password file at any time; it is reloaded automatically.
 CZMQ_EXPORT void
-    zauth_configure_plain (zauth_t *self, char *domain, char *filename, ...);
+    zauth_configure_plain (zauth_t *self, char *domain, char *filename);
     
 //  Configure CURVE authentication for a given domain. CURVE authentication
 //  uses a directory that holds all public client certificates, i.e. their
-//  public keys. The certificates must be in zcert_save () format. The 
-//  location is treated as a printf format. To cover all domains, use "*". 
-//  You can add and remove certificates in that directory at any time. 
-//  To allow all client keys without checking, specify CURVE_ALLOW_ANY
-//  for the location.
+//  public keys. The certificates must be in zcert_save () format. To cover
+//  all domains, use "*". You can add and remove certificates in that
+//  directory at any time. To allow all client keys without checking, specify
+//  CURVE_ALLOW_ANY for the location.
 CZMQ_EXPORT void
-    zauth_configure_curve (zauth_t *self, char *domain, char *location, ...);
+    zauth_configure_curve (zauth_t *self, char *domain, char *location);
     
 //  Enable verbose tracing of commands and activity
 CZMQ_EXPORT void

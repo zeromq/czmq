@@ -73,7 +73,7 @@ zbeacon_new (zctx_t *ctx, int port_nbr)
     assert (ctx);
     self->pipe = zthread_fork (ctx, s_agent_task, NULL);
     if (self->pipe) {
-        zstr_send (self->pipe, "%d", port_nbr);
+        zstr_sendf (self->pipe, "%d", port_nbr);
         self->hostname = zstr_recv (self->pipe);
     }
     else {
@@ -111,7 +111,7 @@ zbeacon_set_interval (zbeacon_t *self, int interval)
 {
     assert (self);
     zstr_sendm (self->pipe, "INTERVAL");
-    zstr_send (self->pipe, "%d", interval);
+    zstr_sendf (self->pipe, "%d", interval);
 }
 
 
@@ -411,16 +411,24 @@ s_agent_new (void *pipe, int port_nbr)
     s_get_interface (self);
 
     //  Bind to the port on all interfaces
+#if (defined (__WINDOWS__))
+    inaddr_t sockaddr = self->address;
+#else
     inaddr_t sockaddr = self->broadcast;
+#endif
     if (bind (self->udpsock, (struct sockaddr *) &sockaddr, sizeof (sockaddr)) == SOCKET_ERROR)
         zsys_socket_error ("bind");
 
     //  Send our hostname back to API
     //  PROBLEM: this hostname will not be accurate when the node
     //  has more than one active interface.
-    char hostname [INET_ADDRSTRLEN];
-    getnameinfo ((struct sockaddr *) &self->address, sizeof (self->address),
-                 hostname, INET_ADDRSTRLEN, NULL, 0, NI_NUMERICHOST);
+    char hostname [255];
+    int rc = getnameinfo ((struct sockaddr *) &self->address, sizeof (self->address),
+                           hostname, 255, NULL, 0, NI_NUMERICHOST);
+    if (rc) {
+        puts (gai_strerror (rc));
+        strcpy (hostname, "127.0.0.1");
+    }
     zstr_send (pipe, hostname);
     
     return self;

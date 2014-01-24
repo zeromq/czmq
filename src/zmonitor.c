@@ -74,7 +74,7 @@ zmonitor_new (zctx_t *ctx, void *socket, int events)
         assert (rc == 0);
         
         //  Configure backend agent with monitor endpoint
-        zstr_send (self->pipe, "%s", monitor_endpoint);
+        zstr_sendf (self->pipe, "%s", monitor_endpoint);
         free (monitor_endpoint);
 
         char *status = zstr_recv (self->pipe);
@@ -141,7 +141,7 @@ zmonitor_set_verbose (zmonitor_t *self, bool verbose)
 {
     assert (self);
     zstr_sendm (self->pipe, "VERBOSE");
-    zstr_send (self->pipe, "%d", verbose);
+    zstr_sendf (self->pipe, "%d", verbose);
 }
 
 
@@ -388,10 +388,10 @@ s_socket_event (agent_t *self)
         printf ("I: zmonitor: %s - %s\n", description, address);
 
     zmsg_t *msg = zmsg_new();
-    zmsg_addstr (msg, "%d", (int) event.event);
-    zmsg_addstr (msg, "%d", (int) event.value);
-    zmsg_addstr (msg, "%s", address);
-    zmsg_addstr (msg, "%s", description);
+    zmsg_addstrf (msg, "%d", (int) event.event);
+    zmsg_addstrf (msg, "%d", (int) event.value);
+    zmsg_addstrf (msg, "%s", address);
+    zmsg_addstrf (msg, "%s", description);
     zmsg_send (&msg, self->pipe);
 }
 

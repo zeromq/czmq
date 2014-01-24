@@ -71,13 +71,12 @@ struct _zcertstore_t {
 //  absent, and created later, or modified at any time. The certificate store 
 //  is automatically refreshed on any zcertstore_lookup() call. If the 
 //  location is specified as NULL, creates a pure-memory store, which you 
-//  can work with by inserting certificates at runtime. The location is
-//  treated as a printf format.
+//  can work with by inserting certificates at runtime.
 
 static void s_load_certs_from_disk (zcertstore_t *self);
 
 zcertstore_t *
-zcertstore_new (char *location, ...)
+zcertstore_new (char *location)
 {
     zcertstore_t *self = (zcertstore_t *) zmalloc (sizeof (zcertstore_t));
     assert (self);
@@ -85,10 +84,7 @@ zcertstore_new (char *location, ...)
     self->cert_list = zlist_new ();
     self->cert_hash = zhash_new ();
     if (location) {
-        va_list argptr;
-        va_start (argptr, location);
-        self->location = zsys_vprintf (location, argptr);
-        va_end (argptr);
+        self->location = strdup (location);
         s_load_certs_from_disk (self);
     }
     return self;
@@ -244,7 +240,7 @@ zcertstore_test (bool verbose)
     zsys_dir_create (TESTDIR);
     
     //  Load certificate store from disk; it will be empty
-    zcertstore_t *certstore = zcertstore_new ("%s", TESTDIR);
+    zcertstore_t *certstore = zcertstore_new (TESTDIR);
     
 #   if defined (HAVE_LIBSODIUM)
     //  Create a single new certificate and save to disk

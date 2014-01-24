@@ -216,17 +216,12 @@ zcert_meta_keys (zcert_t *self)
 
 //  --------------------------------------------------------------------------
 //  Load certificate from file (constructor)
-//  The filename is treated as a printf format specifier.
 
 zcert_t *
-zcert_load (char *format, ...)
+zcert_load (char *filename)
 {
 #if (ZMQ_VERSION_MAJOR == 4)
-    assert (format);
-    va_list argptr;
-    va_start (argptr, format);
-    char *filename = zsys_vprintf (format, argptr);
-    va_end (argptr);
+    assert (filename);
 
     //  Try first to load secret certificate, which has both keys
     //  Then fallback to loading public certificate
@@ -258,7 +253,6 @@ zcert_load (char *format, ...)
         }
     }
     zconfig_destroy (&root);
-    zstr_free (&filename);
     return self;
 #else   
     return NULL;
@@ -269,7 +263,6 @@ zcert_load (char *format, ...)
 //  --------------------------------------------------------------------------
 //  Save full certificate (public + secret) to file for persistent storage
 //  This creates one public file and one secret file (filename + "_secret").
-//  The filename is treated as a printf format specifier.
 
 static int
 s_save_metadata (const char *name, void *value, void *args)
@@ -295,14 +288,10 @@ s_save_metadata_all (zcert_t *self)
 
 
 int
-zcert_save (zcert_t *self, char *format, ...)
+zcert_save (zcert_t *self, char *filename)
 {
     assert (self);
-    assert (format);
-    va_list argptr;
-    va_start (argptr, format);
-    char *filename = zsys_vprintf (format, argptr);
-    va_end (argptr);
+    assert (filename);
 
     //  Save public certificate using specified filename
     zcert_save_public (self, filename);
@@ -321,25 +310,18 @@ zcert_save (zcert_t *self, char *format, ...)
     zsys_file_mode_private ();
     int rc = zconfig_save (self->config, filename_secret);
     zsys_file_mode_default ();
-    
-    zstr_free (&filename);
     return rc;
 }
 
 
 //  --------------------------------------------------------------------------
 //  Save public certificate only to file for persistent storage.
-//  The filename is treated as a printf format specifier.
 
 int
-zcert_save_public (zcert_t *self, char *format, ...)
+zcert_save_public (zcert_t *self, char *filename)
 {
     assert (self);
-    assert (format);
-    va_list argptr;
-    va_start (argptr, format);
-    char *filename = zsys_vprintf (format, argptr);
-    va_end (argptr);
+    assert (filename);
 
     s_save_metadata_all (self);
     zconfig_set_comment (self->config,
@@ -353,7 +335,6 @@ zcert_save_public (zcert_t *self, char *format, ...)
     
     zconfig_put (self->config, "/curve/public-key", self->public_txt);
     int rc = zconfig_save (self->config, filename);
-    zstr_free (&filename);
     return rc;
 }
 

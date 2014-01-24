@@ -1,6 +1,5 @@
-/*
-    =========================================================================
-    zproxy - work with zmq_proxy_steerable instances
+/*  =========================================================================
+    zproxy - run a steerable proxy in the background
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2014 iMatix Corporation <www.imatix.com>
