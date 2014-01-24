@@ -117,6 +117,53 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zframe_reset (zframe_t *self, const void *data, size_t size);
 
+//  Put one byte to frame payload. Returns 0 if successful else 1.
+CZMQ_EXPORT int
+    zframe_put_8_bit (zframe_t *self, uint8_t data);
+
+//  Put two bytes to frame payload. Returns 0 if successful else 1.
+CZMQ_EXPORT int
+    zframe_put_16_bit(zframe_t *self, uint16_t data);
+
+//  Put four bytes to frame payload. Returns 0 if successful else 1.
+CZMQ_EXPORT int
+    zframe_put_32_bit(zframe_t *self, uint32_t data);
+
+//  Put eight bytes to frame payload. Returns 0 if successful else 1.
+CZMQ_EXPORT int
+    zframe_put_64_bit (zframe_t *self, uint64_t data);
+
+//  Put a string to frame payload. Returns 0 if successful else 1.
+//  The string length limited to 2^16 - 1 for '\0' => 65535 characters.
+//  For allocation purpose calculate: (string length + 2) bytes
+CZMQ_EXPORT int
+    zframe_put_string (zframe_t *self, char *data);
+
+//  Get one byte from frame payload. Returns pointer to byte or NULL if 
+//  next byte isn't allocated by frame payload.
+CZMQ_EXPORT uint8_t
+    zframe_get_8_bit (zframe_t *self);
+
+//  Get two bytes from frame payload. Returns pointer to byte or NULL if 
+//  next byte isn't allocated by frame payload.
+CZMQ_EXPORT uint16_t 
+    zframe_get_16_bit (zframe_t *self);
+
+//  Get four bytes from frame payload. Returns pointer to byte or NULL if 
+//  next byte isn't allocated by frame payload.
+CZMQ_EXPORT uint32_t 
+    zframe_get_32_bit (zframe_t *self);
+
+//  Get eight bytes from frame payload. Returns pointer to byte or NULL if 
+//  next byte isn't allocated by frame payload.
+CZMQ_EXPORT uint64_t 
+    zframe_get_64_bit (zframe_t *self);
+
+//  Get a newly allocated string from frame payload. Returns char pointer to 
+//  a string. The max string size can be 2^16 and is 0 terminated.
+CZMQ_EXPORT char *
+    zframe_get_string (zframe_t *self);
+
 //  Self test of this class
 CZMQ_EXPORT int
     zframe_test (bool verbose);
