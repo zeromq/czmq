@@ -135,21 +135,16 @@ zauth_deny (zauth_t *self, char *address)
 
 //  --------------------------------------------------------------------------
 //  Configure PLAIN authentication for a given domain. PLAIN authentication
-//  uses a plain-text password file. The filename is treated as a printf 
-//  format. To cover all domains, use "*". You can modify the password file
-//  at any time; it is reloaded automatically.
+//  uses a plain-text password file. To cover all domains, use "*". You can
+//  modify the password file at any time; it is reloaded automatically.
 
 void
-zauth_configure_plain (zauth_t *self, char *domain, char *filename, ...)
+zauth_configure_plain (zauth_t *self, char *domain, char *filename)
 {
     assert (self);
     assert (domain);
-    va_list argptr;
-    va_start (argptr, filename);
-    char *formatted = zsys_vprintf (filename, argptr);
-    va_end (argptr);
-    zstr_sendx (self->pipe, "PLAIN", domain, formatted, NULL);
-    zstr_free (&formatted);
+    assert (filename);
+    zstr_sendx (self->pipe, "PLAIN", domain, filename, NULL);
     //  Wait for completion
     free (zstr_recv (self->pipe));
 }
@@ -158,24 +153,18 @@ zauth_configure_plain (zauth_t *self, char *domain, char *filename, ...)
 //  --------------------------------------------------------------------------
 //  Configure CURVE authentication for a given domain. CURVE authentication
 //  uses a directory that holds all public client certificates, i.e. their
-//  public keys. The certificates must be in zcert_save () format. The 
-//  location is treated as a printf format. To cover all domains, use "*". 
-//  You can add and remove certificates in that directory at any time. 
-//  To allow all client keys without checking, specify CURVE_ALLOW_ANY for
-//  the location.
+//  public keys. The certificates must be in zcert_save () format. To cover
+//  all domains, use "*". You can add and remove certificates in that
+//  directory at any time. To allow all client keys without checking, specify
+//  CURVE_ALLOW_ANY for the location.
 
 void
-zauth_configure_curve (zauth_t *self, char *domain, char *location, ...)
+zauth_configure_curve (zauth_t *self, char *domain, char *location)
 {
     assert (self);
     assert (domain);
     assert (location);
-    va_list argptr;
-    va_start (argptr, location);
-    char *formatted = zsys_vprintf (location, argptr);
-    va_end (argptr);
-    zstr_sendx (self->pipe, "CURVE", domain, formatted, NULL);
-    zstr_free (&formatted);
+    zstr_sendx (self->pipe, "CURVE", domain, location, NULL);
     //  Wait for completion
     free (zstr_recv (self->pipe));
 }
@@ -189,7 +178,7 @@ zauth_set_verbose (zauth_t *self, bool verbose)
 {
     assert (self);
     zstr_sendm (self->pipe, "VERBOSE");
-    zstr_send  (self->pipe, "%d", verbose);
+    zstr_sendf (self->pipe, "%d", verbose);
     //  Wait for completion
     free (zstr_recv (self->pipe));
 }

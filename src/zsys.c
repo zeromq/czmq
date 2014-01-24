@@ -44,7 +44,7 @@ static bool s_shim_installed = false;
 static zsys_handler_fn *installed_handler_fn;
 static BOOL WINAPI s_handler_fn_shim (DWORD ctrltype)
 {
-   // return TRUE for events that we handle
+   //  Return TRUE for events that we handle
    if (ctrltype == CTRL_C_EVENT && installed_handler_fn != NULL) {
        installed_handler_fn (ctrltype);
        return TRUE;

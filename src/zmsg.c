@@ -294,11 +294,41 @@ zmsg_addmem (zmsg_t *self, const void *src, size_t size)
 
 
 //  --------------------------------------------------------------------------
-//  Push string as new frame to front of message, returns 0 if OK, -1 on
-//  error. The string is formatted using sprintf. 
+//  Push string as new frame to front of message.
+//  Returns 0 on success, -1 on error.
 
 int
-zmsg_pushstr (zmsg_t *self, const char *format, ...)
+zmsg_pushstr (zmsg_t *self, const char *string)
+{
+    assert (self);
+    assert (string);
+    self->content_size += strlen (string);
+    zlist_push (self->frames, zframe_new (string, strlen (string)));
+    return 0;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Push string as new frame to end of message.
+//  Returns 0 on success, -1 on error.
+
+int
+zmsg_addstr (zmsg_t *self, const char *string)
+{
+    assert (self);
+    assert (string);
+    self->content_size += strlen (string);
+    zlist_append (self->frames, zframe_new (string, strlen (string)));
+    return 0;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Push formatted string as new frame to front of message.
+//  Returns 0 on success, -1 on error.
+
+int
+zmsg_pushstrf (zmsg_t *self, const char *format, ...)
 {
     assert (self);
     assert (format);
@@ -307,7 +337,7 @@ zmsg_pushstr (zmsg_t *self, const char *format, ...)
     va_start (argptr, format);
     char *string = zsys_vprintf (format, argptr);
     va_end (argptr);
-    
+
     self->content_size += strlen (string);
     zlist_push (self->frames, zframe_new (string, strlen (string)));
     free (string);
@@ -316,10 +346,11 @@ zmsg_pushstr (zmsg_t *self, const char *format, ...)
 
 
 //  --------------------------------------------------------------------------
-//  Push string as new frame to end of message
+//  Push formatted string as new frame to end of message.
+//  Returns 0 on success, -1 on error.
 
 int
-zmsg_addstr (zmsg_t *self, const char *format, ...)
+zmsg_addstrf (zmsg_t *self, const char *format, ...)
 {
     assert (self);
     assert (format);
@@ -328,12 +359,13 @@ zmsg_addstr (zmsg_t *self, const char *format, ...)
     va_start (argptr, format);
     char *string = zsys_vprintf (format, argptr);
     va_end (argptr);
-    
+
     self->content_size += strlen (string);
     zlist_append (self->frames, zframe_new (string, strlen (string)));
     free (string);
     return 0;
 }
+
 
 //  --------------------------------------------------------------------------
 //  Pop frame off front of message, return as fresh string. If there were

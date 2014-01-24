@@ -44,13 +44,28 @@ CZMQ_EXPORT char *
 CZMQ_EXPORT char *
     zstr_recv_nowait (void *socket);
 
-//  Send a formatted string to a socket
+//  Send a C string to a socket, as a frame. The string is sent without
+//  trailing null byte; to read this you can use zstr_recv, or a similar
+//  method that adds a null terminator on the received string.
 CZMQ_EXPORT int
-    zstr_send (void *socket, const char *format, ...);
+    zstr_send (void *socket, const char *string);
 
-//  Send a formatted string to a socket, with MORE flag
+//  Send a C string to a socket, as zstr_send(), with a MORE flag, so that
+//  you can send further strings in the same multi-part message.
 CZMQ_EXPORT int
-    zstr_sendm (void *socket, const char *format, ...);
+    zstr_sendm (void *socket, const char *string);
+
+//  Send a formatted string to a socket. Note that you should NOT use
+//  user-supplied strings in the format (they may contain '%' which
+//  will create security holes).
+CZMQ_EXPORT int
+    zstr_sendf (void *socket, const char *format, ...);
+
+//  Send a formatted string to a socket, as for zstr_sendf(), with a
+//  MORE flag, so that you can send further strings in the same multi-part
+//  message.
+CZMQ_EXPORT int
+    zstr_sendfm (void *socket, const char *format, ...);
 
 //  Send a series of strings (until NULL) as multipart data
 //  Returns 0 if the strings could be sent OK, or -1 on error.
