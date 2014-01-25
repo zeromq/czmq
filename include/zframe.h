@@ -123,19 +123,19 @@ CZMQ_EXPORT void
 CZMQ_EXPORT int
     zframe_put_string (zframe_t *self, char *data);
 
-//  Put one byte to frame payload. Returns 0 if successful else -1.
+//  Put 1-byte to frame payload. Returns 0 if successful else -1.
 CZMQ_EXPORT int
     zframe_put_uint8 (zframe_t *self, uint8_t data);
 
-//  Put two bytes to frame payload. Returns 0 if successful else -1.
+//  Put 2-byte to frame payload. Returns 0 if successful else -1.
 CZMQ_EXPORT int
     zframe_put_uint16 (zframe_t *self, uint16_t data);
 
-//  Put four bytes to frame payload. Returns 0 if successful else -1.
+//  Put 4-byte to frame payload. Returns 0 if successful else -1.
 CZMQ_EXPORT int
     zframe_put_uint32 (zframe_t *self, uint32_t data);
 
-//  Put eight bytes to frame payload. Returns 0 if successful else -1.
+//  Put 8-byte to frame payload. Returns 0 if successful else -1.
 CZMQ_EXPORT int
     zframe_put_uint64 (zframe_t *self, uint64_t data);
 
