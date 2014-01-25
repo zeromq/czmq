@@ -117,6 +117,10 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zframe_reset (zframe_t *self, const void *data, size_t size);
 
+//  Put a block of data to the frame payload.
+CZMQ_EXPORT int
+    zframe_put_block (zframe_t *self, byte *data, size_t size);
+
 //  Put a string to frame payload. Returns 0 if successful else -1.
 //  The string length limited to 2^16 - 1 for '\0' => 65535 characters.
 //  For allocation purpose calculate: (string length + 2) bytes
@@ -138,6 +142,10 @@ CZMQ_EXPORT int
 //  Put 8-byte to frame payload. Returns 0 if successful else -1.
 CZMQ_EXPORT int
     zframe_put_uint64 (zframe_t *self, uint64_t data);
+
+//  Get a block of data from the frame payload.
+CZMQ_EXPORT int
+    zframe_get_block (zframe_t *self, byte *data, size_t size);
 
 //  Get a newly allocated string from frame payload. Returns char pointer to
 //  a string. The max string size can be 2^16 and is 0 terminated.

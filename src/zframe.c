@@ -386,6 +386,21 @@ s_sufficient_data (zframe_t *self, size_t bytes)
     return (self->needle + bytes) <= self->ceiling;
 }
 
+//  --------------------------------------------------------------------------
+//  Put a block of data to the frame payload. Returns 0 if successful else -1
+
+int
+zframe_put_block (zframe_t *self, byte *data, size_t size)
+{
+    assert (self);
+    if (s_sufficient_data (self, size)) {
+        memcpy (self->needle, data, size);
+        self->needle += size;
+        return 0;
+    }
+    else
+        return -1;
+}
 
 //  --------------------------------------------------------------------------
 //  Put one byte to frame payload. Returns 0 if successful else -1
@@ -480,6 +495,23 @@ zframe_put_string (zframe_t *self, char *data)
         return 0;
     }
     else
+        return -1;
+}
+
+//  --------------------------------------------------------------------------
+//  Get a block of data from the frame payload by copying it to the 'data'
+//  location. If there was insufficient data in the frame, returns -1
+
+int
+zframe_get_block (zframe_t *self, byte *data, size_t size)
+{
+    assert (self);  
+    if (s_sufficient_data (self, size)) {
+        memcpy (data, self->needle, size);
+        self->needle += size;
+        return 0;
+    }
+    else 
         return -1;
 }
 
@@ -670,12 +702,13 @@ zframe_test (bool verbose)
     assert (frame == NULL);
 
     // Write custom frame
-    frame = zframe_new (NULL, 29);
+    frame = zframe_new (NULL, 45);
     size_t test_8bit  = 0xFF;
     size_t test_16bit = 0xFFFF;
     size_t test_32bit = 0xFFFFFFFF;
     size_t test_64bit = 0xFFFFFFFFFFFFFFFF;
     char *test_string = "Hello World!";
+    zuuid_t *test_uuid = zuuid_new ();
     rc = zframe_put_uint8 (frame, test_64bit);
     assert (rc == 0);
     rc = zframe_put_uint16 (frame, test_64bit);
@@ -685,6 +718,8 @@ zframe_test (bool verbose)
     rc = zframe_put_uint64 (frame, test_64bit);
     assert (rc == 0);
     rc = zframe_put_string (frame, test_string);
+    assert (rc == 0);
+    rc = zframe_put_block (frame, zuuid_data (test_uuid), 16);
     assert (rc == 0);
     // one byte more than allocated, expect 1
     rc = zframe_put_uint8 (frame, test_64bit);
@@ -704,6 +739,9 @@ zframe_test (bool verbose)
     assert (bit64 == test_64bit);
     char *hello = zframe_get_string (frame);
     assert (streq (hello, test_string));
+    zuuid_t *uuid = zuuid_new ();
+    zframe_get_block (frame, zuuid_data (uuid), 16);
+    assert (zuuid_eq (uuid, zuuid_data (test_uuid)));
     zframe_destroy (&frame);
     assert (frame == NULL);
 
