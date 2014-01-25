@@ -1049,6 +1049,60 @@ This is the class interface:
     CZMQ_EXPORT int
         zframe_test (bool verbose);
 
+    //  Put a block of data to the frame payload.
+    CZMQ_EXPORT int
+        zframe_put_block (zframe_t *self, byte *data, size_t size);
+    
+    //  Put a string to frame payload. Returns 0 if successful else -1.
+    //  The string length limited to 2^16 - 1 for '\0' => 65535 characters.
+    //  For allocation purpose calculate: (string length + 2) bytes
+    CZMQ_EXPORT int
+        zframe_put_string (zframe_t *self, char *data);
+
+    //  Put 1-byte to frame payload. Returns 0 if successful else -1.
+    CZMQ_EXPORT int
+        zframe_put_uint8 (zframe_t *self, uint8_t data);
+
+    //  Put 2-byte to frame payload. Returns 0 if successful else -1.
+    CZMQ_EXPORT int
+        zframe_put_uint16 (zframe_t *self, uint16_t data);
+
+    //  Put 4-byte to frame payload. Returns 0 if successful else -1.
+    CZMQ_EXPORT int
+        zframe_put_uint32 (zframe_t *self, uint32_t data);
+
+    //  Put 8-byte to frame payload. Returns 0 if successful else -1.
+    CZMQ_EXPORT int
+        zframe_put_uint64 (zframe_t *self, uint64_t data);
+
+    //  Get a block of data from the frame payload.
+    CZMQ_EXPORT int
+        zframe_get_block (zframe_t *self, byte *data, size_t size);
+    
+    //  Get a newly allocated string from frame payload. Returns char pointer to
+    //  a string. The max string size can be 2^16 and is 0 terminated.
+    CZMQ_EXPORT char *
+        zframe_get_string (zframe_t *self);
+
+    //  Get a 1-byte integer from the frame payload. If there was insufficient
+    //  data in the frame, returns zero.
+    CZMQ_EXPORT uint8_t
+        zframe_get_uint8 (zframe_t *self);
+
+    //  Get a 2-byte integer from the frame payload. If there was insufficient
+    //  data in the frame, returns zero.
+    CZMQ_EXPORT uint16_t
+        zframe_get_uint16 (zframe_t *self);
+
+    //  Get a 4-byte integer from the frame payload. If there was insufficient
+    //  data in the frame, returns zero.
+    CZMQ_EXPORT uint32_t
+        zframe_get_uint32 (zframe_t *self);
+
+    //  Get a 8-byte integer from the frame payload. If there was insufficient
+    //  data in the frame, returns zero.
+    CZMQ_EXPORT uint64_t
+        zframe_get_uint64 (zframe_t *self);
 
 <A name="toc4-254" title="zhash - generic hash table container" />
 #### zhash - generic hash table container
