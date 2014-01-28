@@ -518,8 +518,8 @@ zframe_get_block (zframe_t *self, byte *data, size_t size)
 }
 
 //  --------------------------------------------------------------------------
-//  Get a 1-byte integer from the frame payload. If there was insufficient
-//  data in the frame, returns zero.
+//  Get a 1-byte integer from the frame payload by copying it to the 'data'
+//  location. If there was insufficient data in the frame, returns -1.
 
 int
 zframe_get_uint8 (zframe_t *self, uint8_t *data)
@@ -536,8 +536,8 @@ zframe_get_uint8 (zframe_t *self, uint8_t *data)
 
 
 //  --------------------------------------------------------------------------
-//  Get a 2-byte integer from the frame payload. If there was insufficient
-//  data in the frame, returns zero.
+//  Get a 2-byte integer from the frame payload by copying it to the 'data'
+//  location. If there was insufficient data in the frame, returns -1.
 
 int 
 zframe_get_uint16 (zframe_t *self, uint16_t *data)
@@ -555,8 +555,8 @@ zframe_get_uint16 (zframe_t *self, uint16_t *data)
 
 
 //  --------------------------------------------------------------------------
-//  Get a 4-byte integer from the frame payload. If there was insufficient
-//  data in the frame, returns zero.
+//  Get a 4-byte integer from the frame payload by copying it to the 'data'
+//  location. If there was insufficient data in the frame, returns -1.
 
 int 
 zframe_get_uint32 (zframe_t *self, uint32_t *data)
@@ -576,8 +576,8 @@ zframe_get_uint32 (zframe_t *self, uint32_t *data)
 
 
 //  --------------------------------------------------------------------------
-//  Get a 8-byte integer from the frame payload. If there was insufficient
-//  data in the frame, returns zero.
+//  Get a 8-byte integer from the frame payload by copying it to the 'data'
+//  location. If there was insufficient data in the frame, returns -1.
 
 int
 zframe_get_uint64 (zframe_t *self, uint64_t *data)
