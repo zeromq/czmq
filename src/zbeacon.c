@@ -353,7 +353,7 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
     if (!self)
         return;                 //  Give up if we couldn't initialize
 
-    while (!zctx_interrupted) {
+    while (!self->terminated) {
         //  Poll on API pipe and on UDP socket
         zmq_pollitem_t pollitems [] = {
             { self->pipe, 0, ZMQ_POLLIN, 0 },
@@ -379,8 +379,6 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
             zsys_udp_send (self->udpsock, self->transmit, &self->broadcast);
             self->ping_at = zclock_time () + self->interval;
         }
-        if (self->terminated)
-            break;
     }
     s_agent_destroy (&self);
 }
@@ -448,12 +446,12 @@ s_get_interface (agent_t *self)
         struct ifaddrs *interface = interfaces;
         while (interface) {
             //  On Solaris, loopback interfaces have a NULL in ifa_broadaddr
-            if (interface->ifa_broadaddr
-            && !(interface->ifa_flags & IFF_LOOPBACK) // ignore loopback interface
-            && (interface->ifa_flags & IFF_BROADCAST) // only use interfaces that have BROADCAST
-            && !(interface->ifa_flags & IFF_POINTOPOINT) // ignore point to point interfaces.
-            &&  interface->ifa_addr
-            && (interface->ifa_addr->sa_family == AF_INET)) {
+            if  (interface->ifa_broadaddr
+            && !(interface->ifa_flags & IFF_LOOPBACK)       //  Ignore loopback interface
+            &&  (interface->ifa_flags & IFF_BROADCAST)      //  Only use interfaces that have BROADCAST
+            && !(interface->ifa_flags & IFF_POINTOPOINT)    //  Ignore point to point interfaces.
+            &&   interface->ifa_addr
+            &&  (interface->ifa_addr->sa_family == AF_INET)) {
                 self->address = *(inaddr_t *) interface->ifa_addr;
                 self->broadcast = *(inaddr_t *) interface->ifa_broadaddr;
                 self->broadcast.sin_port = htons (self->port_nbr);
@@ -503,30 +501,30 @@ s_get_interface (agent_t *self)
     self->address.sin_addr.s_addr = INADDR_ANY;
     if (strlen (zsys_interface ()) == 0)
         return;         //  Use defaults
-    else {
+
 #   if defined (__UNIX__)
-        struct ifreq ifr;
-        memset (&ifr, 0, sizeof (ifr));
+    struct ifreq ifr;
+    memset (&ifr, 0, sizeof (ifr));
 
-        int sock = 0;
-        if ((sock = socket (AF_INET, SOCK_DGRAM, 0)) == -1)
-            return;         //  Use defaults
+    int sock = 0;
+    if ((sock = socket (AF_INET, SOCK_DGRAM, 0)) == -1)
+        return;         //  Use defaults
 
-        //  Get interface address
-        ifr.ifr_addr.sa_family = AF_INET;
-        strncpy (ifr.ifr_name, zsys_interface (), sizeof (ifr.ifr_name));
-        int rc = ioctl (sock, SIOCGIFADDR, (caddr_t) &ifr, sizeof (struct ifreq));
-        if (rc == -1)
-            zsys_socket_error ("siocgifaddr");
+    //  Get interface address
+    ifr.ifr_addr.sa_family = AF_INET;
+    strncpy (ifr.ifr_name, zsys_interface (), sizeof (ifr.ifr_name));
+    int rc = ioctl (sock, SIOCGIFADDR, (caddr_t) &ifr, sizeof (struct ifreq));
+    if (rc == -1)
+        zsys_socket_error ("siocgifaddr");
 
-        //  Get interface broadcast address
-        memcpy (&self->address, ((inaddr_t *) &ifr.ifr_addr), sizeof (inaddr_t));
-        rc = ioctl (sock, SIOCGIFBRDADDR, (caddr_t) &ifr, sizeof (struct ifreq));
-        if (rc == -1)
-            zsys_socket_error ("siocgifbrdaddr");
+    //  Get interface broadcast address
+    memcpy (&self->address, ((inaddr_t *) &ifr.ifr_addr), sizeof (inaddr_t));
+    rc = ioctl (sock, SIOCGIFBRDADDR, (caddr_t) &ifr, sizeof (struct ifreq));
+    if (rc == -1)
+        zsys_socket_error ("siocgifbrdaddr");
 
-        memcpy (&self->broadcast, ((inaddr_t *) &ifr.ifr_broadaddr), sizeof (inaddr_t));
-        close (sock);
+    memcpy (&self->broadcast, ((inaddr_t *) &ifr.ifr_broadaddr), sizeof (inaddr_t));
+    close (sock);
 
 #   elif defined (__WINDOWS__)
     ULONG addr_size = 0;
@@ -556,7 +554,6 @@ s_get_interface (agent_t *self)
 #   else
 #       error "Interface detection TBD on this operating system"
 #   endif
-    }
 #endif
 }
 
@@ -604,6 +601,7 @@ s_api_command (agent_t *self)
     zstr_free (&command);
 }
 
+
 //  Receive and filter the waiting beacon
 
 static void
@@ -638,9 +636,8 @@ s_beacon_recv (agent_t *self)
         zmsg_add (msg, frame);
         zmsg_send (&msg, self->pipe);
     }
-    else {
-        zframe_destroy(&frame);
-    }
+    else
+        zframe_destroy (&frame);
 }
 
 
