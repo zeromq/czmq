@@ -162,7 +162,6 @@ s_proxy_task (void *args, zctx_t *ctx, void *command_pipe)
 
         if (which && zmq_recvmsg (which, &msg, 0) != -1) {
             send_flags = zsocket_rcvmore (which)? ZMQ_SNDMORE: 0;
-
             if (which == self->frontend || which == self->backend) {
                 void *output = which == self->frontend?
                     self->backend: self->frontend;
@@ -180,6 +179,7 @@ s_proxy_task (void *args, zctx_t *ctx, void *command_pipe)
                     assert (rc != -1);
                     if (zmq_recvmsg (which, &msg, ZMQ_DONTWAIT) == -1)
                         break;      //  Presumably EAGAIN
+                    send_flags = zsocket_rcvmore (which)? ZMQ_SNDMORE: 0;
                 }
             }
             else
