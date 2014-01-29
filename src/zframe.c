@@ -56,10 +56,7 @@ struct _zframe_t {
 zframe_t *
 zframe_new (const void *data, size_t size)
 {
-    zframe_t
-        *self;
-
-    self = (zframe_t *) zmalloc (sizeof (zframe_t));
+    zframe_t *self = (zframe_t *) zmalloc (sizeof (zframe_t));
     if (!self)
         return NULL;
 
@@ -87,9 +84,7 @@ zframe_new (const void *data, size_t size)
 zframe_t *
 zframe_new_empty (void)
 {
-    zframe_t *self;
-
-    self = (zframe_t *) zmalloc (sizeof (zframe_t));
+    zframe_t *self = (zframe_t *) zmalloc (sizeof (zframe_t));
     if (!self)
         return NULL;
 
@@ -614,7 +609,7 @@ zframe_get_string (zframe_t *self)
     int rc = zframe_get_uint16 (self, &size);
     assert (rc == 0);
     if (s_sufficient_data (self, size)) {
-        char *data = malloc (size + 1);
+        char *data = (char *) malloc (size + 1);
         memcpy (data, self->needle, size);
         data [size] = 0;
         self->needle += size;

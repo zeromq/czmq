@@ -210,6 +210,10 @@ zloop_destroy (zloop_t **self_p)
         while (zlist_size (self->timers))
             free (zlist_pop (self->timers));
         zlist_destroy (&self->timers);
+
+        //  Destroy zombie timer list
+        //  Which must always be empty here
+        assert (zlist_size (self->zombies) == 0);
         zlist_destroy (&self->zombies);
 
         free (self->pollset);
@@ -338,19 +342,20 @@ zloop_timer_end (zloop_t *self, int timer_id)
 {
     assert (self);
     
-    int *cancelled_timer_id = malloc(sizeof(int));
-    *cancelled_timer_id = timer_id;
-
     //  We cannot touch self->timers because we may be executing that
     //  from inside the poll loop. So, we hold the arg on the zombie
     //  list, and process that list when we're done executing timers.
-    if (zlist_append (self->zombies, cancelled_timer_id))
+
+    //  This hack lets us store an integer timer ID as a pointer
+    if (zlist_append (self->zombies, (byte *) NULL + timer_id))
         return -1;
+
     if (self->verbose)
         zclock_log ("I: zloop: cancel timer id=%d", timer_id);
     
     return 0;
 }
+
 
 //  --------------------------------------------------------------------------
 //  Set verbose tracing of reactor on/off
@@ -463,18 +468,19 @@ zloop_start (zloop_t *self)
             }
         }
         //  Now handle any timer zombies
-        //  This is going to be slow if we have many zombies
+        //  This is going to be slow if we have many timers; we might use
+        //  a faster lookup on the timer list.
         while (zlist_size (self->zombies)) {
-            int *timer_id = (int*) zlist_pop (self->zombies);
+            //  This hack lets us convert our pointer back into an integer timer_id
+            int timer_id = (byte *) zlist_pop (self->zombies) - (byte *) NULL;
             timer = (s_timer_t *) zlist_first (self->timers);
             while (timer) {
-                if (timer->timer_id == *timer_id) {
+                if (timer->timer_id == timer_id) {
                     zlist_remove (self->timers, timer);
                     free (timer);
                 }
                 timer = (s_timer_t *) zlist_next (self->timers);
             }
-            free (timer_id);
         }
         if (rc == -1)
             break;
@@ -489,8 +495,9 @@ zloop_start (zloop_t *self)
 static int
 s_cancel_timer_event (zloop_t *loop, int timer_id, void *arg)
 {
-    int *cancel_timer_id = (int*) arg;
-    return zloop_timer_end (loop, *cancel_timer_id);
+    //  We are handling timer 2, and will cancel timer 1
+    int cancel_timer_id = *((int *) arg);
+    return zloop_timer_end (loop, cancel_timer_id);
 }
 
 static int
@@ -527,9 +534,9 @@ zloop_test (bool verbose)
     assert (loop);
     zloop_set_verbose (loop, verbose);
 
-    // Create a timer that will be cancelled
-    int cancel_timer_id = zloop_timer (loop, 1000, 1, s_timer_event, NULL);
-    zloop_timer (loop, 5, 1, s_cancel_timer_event, &cancel_timer_id);
+    //  Create a timer that will be canceled
+    int timer_id = zloop_timer (loop, 1000, 1, s_timer_event, NULL);
+    zloop_timer (loop, 5, 1, s_cancel_timer_event, &timer_id);
     
     //  After 20 msecs, send a ping message to output
     zloop_timer (loop, 20, 1, s_timer_event, output);
