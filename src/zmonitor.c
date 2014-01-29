@@ -245,22 +245,19 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
     assert (endpoint);
 
     agent_t *self = s_agent_new (ctx, pipe, endpoint);
-
     zpoller_t *poller = zpoller_new (self->pipe, self->socket, NULL);
-    while (!zctx_interrupted) {
+
+    while (!self->terminated) {
         //  Poll on API pipe and on monitor socket
         void *result = zpoller_wait (poller, -1);
         if (result == NULL)
-            break; // Interrupted
+            break;              // Interrupted
         else
         if (result == self->pipe)
             s_api_command (self);
         else
         if (result == self->socket)
             s_socket_event (self);
-
-        if (self->terminated)
-            break;
     }
     zpoller_destroy (&poller);
     s_agent_destroy (&self);
