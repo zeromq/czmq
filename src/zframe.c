@@ -702,17 +702,17 @@ zframe_test (bool verbose)
 
     // Write custom frame
     frame = zframe_new (NULL, 45);
-    size_t test_8bit  = 0xFF;
-    size_t test_16bit = 0xFFFF;
-    size_t test_32bit = 0xFFFFFFFF;
-    uint64_t test_64bit = 0xFFFFFFFFFFFFFFFFUL;
+    uint8_t  test_8bit  = 0xFF;
+    uint16_t test_16bit = 0xFFFF;
+    uint32_t test_32bit = 0xFFFFFFFF;
+    uint64_t test_64bit = 0xFFFFFFFFFFFFFFFF;
     char *test_string = "Hello World!";
     zuuid_t *test_uuid = zuuid_new ();
-    rc = zframe_put_uint8 (frame, test_64bit);
+    rc = zframe_put_uint8 (frame, test_8bit);
     assert (rc == 0);
-    rc = zframe_put_uint16 (frame, test_64bit);
+    rc = zframe_put_uint16 (frame, test_16bit);
     assert (rc == 0);
-    rc = zframe_put_uint32 (frame, test_64bit);
+    rc = zframe_put_uint32 (frame, test_32bit);
     assert (rc == 0);
     rc = zframe_put_uint64 (frame, test_64bit);
     assert (rc == 0);
@@ -721,7 +721,7 @@ zframe_test (bool verbose)
     rc = zframe_put_block (frame, zuuid_data (test_uuid), 16);
     assert (rc == 0);
     // one byte more than allocated, expect 1
-    rc = zframe_put_uint8 (frame, test_64bit);
+    rc = zframe_put_uint8 (frame, test_8bit);
     assert (rc == -1);
     rc = zframe_send (&frame, output, 0);
     assert (rc == 0);

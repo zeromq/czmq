@@ -79,12 +79,22 @@ CZMQ_EXPORT int
 //  Push string as new frame to front of message.
 //  Returns 0 on success, -1 on error.
 CZMQ_EXPORT int
-    zmsg_pushstr (zmsg_t *self, const char *format, ...);
+    zmsg_pushstr (zmsg_t *self, const char *string);
 
 //  Push string as new frame to end of message.
 //  Returns 0 on success, -1 on error.
 CZMQ_EXPORT int
-    zmsg_addstr (zmsg_t *self, const char *format, ...);
+    zmsg_addstr (zmsg_t *self, const char *string);
+
+//  Push formatted string as new frame to front of message.
+//  Returns 0 on success, -1 on error.
+CZMQ_EXPORT int
+    zmsg_pushstrf (zmsg_t *self, const char *format, ...);
+
+//  Push formatted string as new frame to end of message.
+//  Returns 0 on success, -1 on error.
+CZMQ_EXPORT int
+    zmsg_addstrf (zmsg_t *self, const char *format, ...);
 
 //  Pop frame off front of message, return as fresh string. If there were
 //  no more frames in the message, returns NULL.
