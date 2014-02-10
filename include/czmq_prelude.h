@@ -453,7 +453,7 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
 static inline void *
     safe_malloc (
     size_t size,
-    char *file,
+    const char *file,
     unsigned line,
     const char *func)
 {
