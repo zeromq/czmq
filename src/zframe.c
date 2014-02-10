@@ -705,7 +705,7 @@ zframe_test (bool verbose)
     size_t test_8bit  = 0xFF;
     size_t test_16bit = 0xFFFF;
     size_t test_32bit = 0xFFFFFFFF;
-    size_t test_64bit = 0xFFFFFFFFFFFFFFFF;
+    uint64_t test_64bit = 0xFFFFFFFFFFFFFFFFUL;
     char *test_string = "Hello World!";
     zuuid_t *test_uuid = zuuid_new ();
     rc = zframe_put_uint8 (frame, test_64bit);
