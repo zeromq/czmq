@@ -70,7 +70,7 @@
  *  __VMS_XOPEN         Supports XOPEN functions
  */
 
-#if (defined (__64BIT__) || defined (__x86_64__))
+#if (defined (__64BIT__) || defined (__x86_64__) )
 #    define __IS_64BIT__                //  May have 64-bit OS/compiler
 #else
 #    define __IS_32BIT__                //  Else assume 32-bit OS/compiler
@@ -253,9 +253,11 @@
 #   include <sys/stat.h>
 #   include <sys/utime.h>
 #   include <share.h>
+#   include <stdint.h>
 #endif
 
 #if (defined (__UNIX__))
+#error "this thinks it is unix"
 #   include <fcntl.h>
 #   include <netdb.h>
 #   include <unistd.h>
