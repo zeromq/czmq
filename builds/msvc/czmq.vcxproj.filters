@@ -1,18 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-#################################################################
-#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
-#   Please read the README.txt file in the model directory.     #
-#################################################################
--->
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{d074b448-3c0f-43b6-aef9-604ddf0c34a8}</UniqueIdentifier>
+      <UniqueIdentifier>{9957e2fc-794f-4016-baa5-6d00cefa53f3}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{546164a9-1001-4d84-970a-e40d977e56f2}</UniqueIdentifier>
+      <UniqueIdentifier>{bf4a25bf-7dc6-4126-88f6-a1ef6f9fa2ff}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -108,15 +102,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\builds\msvc\platform.h">
+    <ClInclude Include="platform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <!-- What is this and where does it come from?
-         it should perhaps be in builds\msvc\?
-    <ClInclude Include="..\..\include\stdbool_for_windows.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    -->
     <ClInclude Include="..\..\include\czmq.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -214,15 +202,4 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="..\..\include\zbeacon.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-  </ItemGroup>
-<!--
-#################################################################
-#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
-#   Please read the README.txt file in the model directory.     #
-#################################################################
--->
 </Project>
