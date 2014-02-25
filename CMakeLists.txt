@@ -45,6 +45,15 @@ file(WRITE ${CZMQ_BINARY_DIR}/platform.h.in "
 
 configure_file(${CZMQ_BINARY_DIR}/platform.h.in ${CZMQ_BINARY_DIR}/platform.h)
 
+#The MSVC C compiler is too out of date,
+#so the sources have to be compiled as c++
+if (MSVC)
+    enable_language(CXX)
+    file(GLOB sources ${CZMQ_SOURCE_DIR}/src/*.c)
+    set_source_files_properties(${sources} PROPERTIES LANGUAGE CXX)
+    set(MORE_LIBRARIES ws2_32 Rpcrt4 Iphlpapi)
+endif()
+
 ########################################################################
 # zeromq depedency
 ########################################################################
@@ -65,7 +74,8 @@ include_directories(${CZMQ_SOURCE_DIR}/include)
 include_directories(${ZEROMQ_INCLUDE_DIRS})
 file(GLOB czmq_sources ${CZMQ_SOURCE_DIR}/src/z*.c)
 add_library(czmq SHARED ${czmq_sources})
-target_link_libraries(czmq ${ZEROMQ_LIBRARIES})
+set_target_properties(czmq PROPERTIES DEFINE_SYMBOL "LIBCZMQ_EXPORTS")
+target_link_libraries(czmq ${ZEROMQ_LIBRARIES} ${MORE_LIBRARIES})
 
 install(TARGETS czmq
     LIBRARY DESTINATION lib${LIB_SUFFIX} # .so file
