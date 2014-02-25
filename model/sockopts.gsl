@@ -104,7 +104,7 @@ $(string.trim(.):)
 
 .endfor
 //  Self test of this class
-int zsockopt_test (bool verbose);
+CZMQ_EXPORT int zsockopt_test (bool verbose);
 //  @end
 
 #ifdef __cplusplus
