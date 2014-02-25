@@ -11,22 +11,72 @@
 #   Please read the README.txt file in the model directory.     #
 #################################################################
 
-cmake_minimum_required (VERSION 2.8)
+########################################################################
+# Project setup
+########################################################################
+cmake_minimum_required(VERSION 2.8)
+project($(project.name))
+enable_language(C)
+enable_testing()
 
-project ($(project.name))
+set(CZMQ_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(CZMQ_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
-set (SOURCES_files_Source_Files
-.for class
-    src/$(name).c
-.endfor
-)
-source_group ("Source Files" FILES ${SOURCES_files_Source_Files})
+########################################################################
+# determine version
+########################################################################
+foreach(which MAJOR MINOR PATCH)
+    file(STRINGS "${CZMQ_SOURCE_DIR}/include/czmq.h" CZMQ_VERSION_STRING REGEX "#define CZMQ_VERSION_${which}")
+    string(REGEX MATCH "#define CZMQ_VERSION_${which} ([0-9_]+)" CZMQ_REGEX_MATCH "${CZMQ_VERSION_STRING}")
+    if (NOT CZMQ_REGEX_MATCH)
+        message(FATAL_ERROR "failed to parse CZMQ_VERSION_${which} from czmq.h")
+    endif()
+    set(CZMQ_${which}_VERSION ${CMAKE_MATCH_1})
+endforeach(which)
 
-set (SOURCES_Source_Files
-  ${SOURCES_files_Source_Files}
-)
+set(CZMQ_VERSION ${CZMQ_MAJOR_VERSION}.${CZMQ_MINOR_VERSION}.${CZMQ_PATCH_VERSION})
 
-set (SOURCES_files_Header_Files
+########################################################################
+# platform.h
+########################################################################
+include(CheckIncludeFile)
+CHECK_INCLUDE_FILE("linux/wireless.h" HAVE_LINUX_WIRELESS_H)
+CHECK_INCLUDE_FILE("net/if.h" HAVE_NET_IF_H)
+CHECK_INCLUDE_FILE("net/if_media.h" HAVE_NET_IF_MEDIA_H)
+
+include(CheckFunctionExists)
+CHECK_FUNCTION_EXISTS("getifaddrs" HAVE_GETIFADDRS)
+CHECK_FUNCTION_EXISTS("freeifaddrs" HAVE_FREEIFADDRS)
+
+file(WRITE ${CZMQ_BINARY_DIR}/platform.h.in "
+#cmakedefine HAVE_LINUX_WIRELESS_H
+#cmakedefine HAVE_NET_IF_H
+#cmakedefine HAVE_NET_IF_MEDIA_H
+#cmakedefine HAVE_GETIFADDRS
+#cmakedefine HAVE_FREEIFADDRS
+")
+
+configure_file(${CZMQ_BINARY_DIR}/platform.h.in ${CZMQ_BINARY_DIR}/platform.h)
+
+#The MSVC C compiler is too out of date,
+#so the sources have to be compiled as c++
+if (MSVC)
+    enable_language(CXX)
+    file(GLOB sources ${CZMQ_SOURCE_DIR}/src/*.c)
+    set_source_files_properties(${sources} PROPERTIES LANGUAGE CXX)
+    set(MORE_LIBRARIES ws2_32 Rpcrt4 Iphlpapi)
+endif()
+
+########################################################################
+# zeromq depedency
+########################################################################
+list(APPEND CMAKE_MODULE_PATH ${CZMQ_SOURCE_DIR})
+find_package(ZeroMQ REQUIRED)
+
+########################################################################
+# includes
+########################################################################
+set (czmq_headers
 .for header
     include/$(name).h
 .endfor
@@ -34,50 +84,61 @@ set (SOURCES_files_Header_Files
     include/$(name).h
 .endfor
 )
-source_group ("Header Files" FILES ${SOURCES_files_Header_Files})
+source_group ("Header Files" FILES ${czmq_headers})
+install(FILES ${czmq_headers} DESTINATION include)
 
-set (SOURCES_Header_Files
-  ${SOURCES_files_Header_Files}
+########################################################################
+# library
+########################################################################
+include_directories(${CZMQ_BINARY_DIR})
+include_directories(${CZMQ_SOURCE_DIR}/include)
+include_directories(${ZEROMQ_INCLUDE_DIRS})
+set (czmq_sources
+.for class
+    src/$(name).c
+.endfor
+)
+source_group ("Source Files" FILES ${czmq_sources})
+add_library($(project.name) SHARED ${czmq_sources})
+set_target_properties($(project.name) PROPERTIES DEFINE_SYMBOL "LIBCZMQ_EXPORTS")
+target_link_libraries($(project.name) ${ZEROMQ_LIBRARIES} ${MORE_LIBRARIES})
+
+install(TARGETS $(project.name)
+    LIBRARY DESTINATION lib${LIB_SUFFIX} # .so file
+    ARCHIVE DESTINATION lib${LIB_SUFFIX} # .lib file
+    RUNTIME DESTINATION bin              # .dll file
 )
 
-set (SOURCES_
-  ${SOURCES_Source_Files}
-  ${SOURCES_Header_Files}
+########################################################################
+# pkgconfig
+########################################################################
+set(VERSION "${CZMQ_VERSION}")
+set(prefix "${CMAKE_INSTALL_PREFIX}")
+set(exec_prefix "\\${prefix}")
+set(libdir "\\${prefix}/lib${LIB_SUFFIX}")
+set(includedir "\\${prefix}/include")
+configure_file(
+    ${CZMQ_SOURCE_DIR}/src/libczmq.pc.in
+    ${CZMQ_BINARY_DIR}/libczmq.pc
+@ONLY)
+
+install(
+    FILES ${CZMQ_BINARY_DIR}/libczmq.pc
+    DESTINATION lib${LIB_SUFFIX}/pkgconfig
 )
 
-if (WIN32)
-    set (SOURCES_Platform_Files
-        builds/msvc/
-    )
-endif()
+########################################################################
+# tests
+########################################################################
+add_executable(czmq_selftest ${CZMQ_SOURCE_DIR}/src/czmq_selftest.c)
+target_link_libraries(czmq_selftest czmq ${ZEROMQ_LIBRARIES})
+add_test(czmq_selftest czmq_selftest)
 
-set (WITH_LIBZMQ .)
-
-include_directories (
-  ../libzmq/include
-  include
-  ${CMAKE_INSTALL_PREFIX}/include
-  ${SOURCES_Platform_Files}
-  ${WITH_LIBZMQ}
-)
-
-set_source_files_properties (
-    ${SOURCES_files_Source_Files} PROPERTIES LANGUAGE CXX
-)
-
-add_library (
-    $(project.name)
-    ${SOURCES_}
-)
-
-install (
-    TARGETS $(project.name)
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-)
-install (
-    FILES ${SOURCES_files_Header_Files} DESTINATION include
-)
+########################################################################
+# summary
+########################################################################
+message(STATUS "version: ${CZMQ_VERSION}")
+message(STATUS "install: ${CMAKE_INSTALL_PREFIX}")
 
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #

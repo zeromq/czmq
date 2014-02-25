@@ -1,3 +1,8 @@
+#################################################################
+#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
+#   Please read the README.txt file in the model directory.     #
+#################################################################
+
 ########################################################################
 # Project setup
 ########################################################################
@@ -63,7 +68,41 @@ find_package(ZeroMQ REQUIRED)
 ########################################################################
 # includes
 ########################################################################
-file(GLOB czmq_headers ${CZMQ_SOURCE_DIR}/include/*.h)
+set (czmq_headers
+    include/czmq.h
+    include/czmq_prelude.h
+    include/zauth.h
+    include/zbeacon.h
+    include/zcert.h
+    include/zcertstore.h
+    include/zchunk.h
+    include/zclock.h
+    include/zconfig.h
+    include/zctx.h
+    include/zdir.h
+    include/zdir_patch.h
+    include/zdigest.h
+    include/zfile.h
+    include/zframe.h
+    include/zhash.h
+    include/zlist.h
+    include/zloop.h
+    include/zmonitor.h
+    include/zmsg.h
+    include/zmutex.h
+    include/zpoller.h
+    include/zproxy.h
+    include/zrex.h
+    include/zservice.h
+    include/zsocket.h
+    include/zsockopt.h
+    include/zstr.h
+    include/zsys.h
+    include/zthread.h
+    include/ztree.h
+    include/zuuid.h
+)
+source_group ("Header Files" FILES ${czmq_headers})
 install(FILES ${czmq_headers} DESTINATION include)
 
 ########################################################################
@@ -72,7 +111,39 @@ install(FILES ${czmq_headers} DESTINATION include)
 include_directories(${CZMQ_BINARY_DIR})
 include_directories(${CZMQ_SOURCE_DIR}/include)
 include_directories(${ZEROMQ_INCLUDE_DIRS})
-file(GLOB czmq_sources ${CZMQ_SOURCE_DIR}/src/z*.c)
+set (czmq_sources
+    src/zauth.c
+    src/zbeacon.c
+    src/zcert.c
+    src/zcertstore.c
+    src/zchunk.c
+    src/zclock.c
+    src/zconfig.c
+    src/zctx.c
+    src/zdir.c
+    src/zdir_patch.c
+    src/zdigest.c
+    src/zfile.c
+    src/zframe.c
+    src/zhash.c
+    src/zlist.c
+    src/zloop.c
+    src/zmonitor.c
+    src/zmsg.c
+    src/zmutex.c
+    src/zpoller.c
+    src/zproxy.c
+    src/zrex.c
+    src/zservice.c
+    src/zsocket.c
+    src/zsockopt.c
+    src/zstr.c
+    src/zsys.c
+    src/zthread.c
+    src/ztree.c
+    src/zuuid.c
+)
+source_group ("Source Files" FILES ${czmq_sources})
 add_library(czmq SHARED ${czmq_sources})
 set_target_properties(czmq PROPERTIES DEFINE_SYMBOL "LIBCZMQ_EXPORTS")
 target_link_libraries(czmq ${ZEROMQ_LIBRARIES} ${MORE_LIBRARIES})
@@ -113,3 +184,8 @@ add_test(czmq_selftest czmq_selftest)
 ########################################################################
 message(STATUS "version: ${CZMQ_VERSION}")
 message(STATUS "install: ${CMAKE_INSTALL_PREFIX}")
+
+#################################################################
+#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
+#   Please read the README.txt file in the model directory.     #
+#################################################################
