@@ -1,130 +1,105 @@
-#################################################################
-#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
-#   Please read the README.txt file in the model directory.     #
-#################################################################
+########################################################################
+# Project setup
+########################################################################
+cmake_minimum_required(VERSION 2.8)
+project(czmq)
+enable_language(C)
+enable_testing()
 
-cmake_minimum_required (VERSION 2.8)
+set(CZMQ_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(CZMQ_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
-project (czmq)
+########################################################################
+# determine version
+########################################################################
+foreach(which MAJOR MINOR PATCH)
+    file(STRINGS "${CZMQ_SOURCE_DIR}/include/czmq.h" CZMQ_VERSION_STRING REGEX "#define CZMQ_VERSION_${which}")
+    string(REGEX MATCH "#define CZMQ_VERSION_${which} ([0-9_]+)" CZMQ_REGEX_MATCH "${CZMQ_VERSION_STRING}")
+    if (NOT CZMQ_REGEX_MATCH)
+        message(FATAL_ERROR "failed to parse CZMQ_VERSION_${which} from czmq.h")
+    endif()
+    set(CZMQ_${which}_VERSION ${CMAKE_MATCH_1})
+endforeach(which)
 
-set (SOURCES_files_Source_Files
-    src/zauth.c
-    src/zbeacon.c
-    src/zcert.c
-    src/zcertstore.c
-    src/zchunk.c
-    src/zclock.c
-    src/zconfig.c
-    src/zctx.c
-    src/zdir.c
-    src/zdir_patch.c
-    src/zdigest.c
-    src/zfile.c
-    src/zframe.c
-    src/zhash.c
-    src/zlist.c
-    src/zloop.c
-    src/zmonitor.c
-    src/zmsg.c
-    src/zmutex.c
-    src/zpoller.c
-    src/zproxy.c
-    src/zrex.c
-    src/zservice.c
-    src/zsocket.c
-    src/zsockopt.c
-    src/zstr.c
-    src/zsys.c
-    src/zthread.c
-    src/ztree.c
-    src/zuuid.c
-)
-source_group ("Source Files" FILES ${SOURCES_files_Source_Files})
+set(CZMQ_VERSION ${CZMQ_MAJOR_VERSION}.${CZMQ_MINOR_VERSION}.${CZMQ_PATCH_VERSION})
 
-set (SOURCES_Source_Files
-  ${SOURCES_files_Source_Files}
-)
+########################################################################
+# platform.h
+########################################################################
+include(CheckIncludeFile)
+CHECK_INCLUDE_FILE("linux/wireless.h" HAVE_LINUX_WIRELESS_H)
+CHECK_INCLUDE_FILE("net/if.h" HAVE_NET_IF_H)
+CHECK_INCLUDE_FILE("net/if_media.h" HAVE_NET_IF_MEDIA_H)
 
-set (SOURCES_files_Header_Files
-    include/czmq.h
-    include/czmq_prelude.h
-    include/zauth.h
-    include/zbeacon.h
-    include/zcert.h
-    include/zcertstore.h
-    include/zchunk.h
-    include/zclock.h
-    include/zconfig.h
-    include/zctx.h
-    include/zdir.h
-    include/zdir_patch.h
-    include/zdigest.h
-    include/zfile.h
-    include/zframe.h
-    include/zhash.h
-    include/zlist.h
-    include/zloop.h
-    include/zmonitor.h
-    include/zmsg.h
-    include/zmutex.h
-    include/zpoller.h
-    include/zproxy.h
-    include/zrex.h
-    include/zservice.h
-    include/zsocket.h
-    include/zsockopt.h
-    include/zstr.h
-    include/zsys.h
-    include/zthread.h
-    include/ztree.h
-    include/zuuid.h
-)
-source_group ("Header Files" FILES ${SOURCES_files_Header_Files})
+include(CheckFunctionExists)
+CHECK_FUNCTION_EXISTS("getifaddrs" HAVE_GETIFADDRS)
+CHECK_FUNCTION_EXISTS("freeifaddrs" HAVE_FREEIFADDRS)
 
-set (SOURCES_Header_Files
-  ${SOURCES_files_Header_Files}
+file(WRITE ${CZMQ_BINARY_DIR}/platform.h.in "
+#cmakedefine HAVE_LINUX_WIRELESS_H
+#cmakedefine HAVE_NET_IF_H
+#cmakedefine HAVE_NET_IF_MEDIA_H
+#cmakedefine HAVE_GETIFADDRS
+#cmakedefine HAVE_FREEIFADDRS
+")
+
+configure_file(${CZMQ_BINARY_DIR}/platform.h.in ${CZMQ_BINARY_DIR}/platform.h)
+
+########################################################################
+# zeromq depedency
+########################################################################
+list(APPEND CMAKE_MODULE_PATH ${CZMQ_SOURCE_DIR})
+find_package(ZeroMQ REQUIRED)
+
+########################################################################
+# includes
+########################################################################
+file(GLOB czmq_headers ${CZMQ_SOURCE_DIR}/include/*.h)
+install(FILES ${czmq_headers} DESTINATION include)
+
+########################################################################
+# library
+########################################################################
+include_directories(${CZMQ_BINARY_DIR})
+include_directories(${CZMQ_SOURCE_DIR}/include)
+include_directories(${ZEROMQ_INCLUDE_DIRS})
+file(GLOB czmq_sources ${CZMQ_SOURCE_DIR}/src/z*.c)
+add_library(czmq SHARED ${czmq_sources})
+target_link_libraries(czmq ${ZEROMQ_LIBRARIES})
+
+install(TARGETS czmq
+    LIBRARY DESTINATION lib${LIB_SUFFIX} # .so file
+    ARCHIVE DESTINATION lib${LIB_SUFFIX} # .lib file
+    RUNTIME DESTINATION bin              # .dll file
 )
 
-set (SOURCES_
-  ${SOURCES_Source_Files}
-  ${SOURCES_Header_Files}
+########################################################################
+# pkgconfig
+########################################################################
+set(VERSION "${CZMQ_VERSION}")
+set(prefix "${CMAKE_INSTALL_PREFIX}")
+set(exec_prefix "\${prefix}")
+set(libdir "\${prefix}/lib${LIB_SUFFIX}")
+set(includedir "\${prefix}/include")
+configure_file(
+    ${CZMQ_SOURCE_DIR}/src/libczmq.pc.in
+    ${CZMQ_BINARY_DIR}/libczmq.pc
+@ONLY)
+
+install(
+    FILES ${CZMQ_BINARY_DIR}/libczmq.pc
+    DESTINATION lib${LIB_SUFFIX}/pkgconfig
 )
 
-if (WIN32)
-    set (SOURCES_Platform_Files
-        builds/msvc/
-    )
-endif()
+########################################################################
+# tests
+########################################################################
+add_executable(czmq_selftest ${CZMQ_SOURCE_DIR}/src/czmq_selftest.c)
+target_link_libraries(czmq_selftest czmq ${ZEROMQ_LIBRARIES})
+add_test(czmq_selftest czmq_selftest)
 
-set (WITH_LIBZMQ .)
-
-include_directories (
-  ../libzmq/include
-  include
-  ${CMAKE_INSTALL_PREFIX}/include
-  ${SOURCES_Platform_Files}
-  ${WITH_LIBZMQ}
-)
-
-set_source_files_properties (
-    ${SOURCES_files_Source_Files} PROPERTIES LANGUAGE CXX
-)
-
-add_library (
-    czmq
-    ${SOURCES_}
-)
-
-install (
-    TARGETS czmq
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-)
-install (
-    FILES ${SOURCES_files_Header_Files} DESTINATION include
-)
-
-#################################################################
-#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
-#   Please read the README.txt file in the model directory.     #
-#################################################################
+########################################################################
+# summary
+########################################################################
+message(STATUS "version: ${CZMQ_VERSION}")
+message(STATUS "install: ${CMAKE_INSTALL_PREFIX}")
