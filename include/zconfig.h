@@ -126,7 +126,7 @@ CZMQ_EXPORT void
 //  @end
 
 //  Self test of this class
-void
+CZMQ_EXPORT void
     zconfig_test (bool verbose);
 
 #ifdef __cplusplus

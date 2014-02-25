@@ -247,7 +247,7 @@ CZMQ_EXPORT void zsocket_set_unsubscribe (void *zocket, const char * unsubscribe
 #endif
 
 //  Self test of this class
-int zsockopt_test (bool verbose);
+CZMQ_EXPORT int zsockopt_test (bool verbose);
 //  @end
 
 #ifdef __cplusplus
