@@ -287,7 +287,7 @@ zlist_dup (zlist_t *self)
     if (copy) {
         node_t *node;
         for (node = self->head; node; node = node->next) {
-            if (!zlist_append (copy, node->item)) {
+            if (zlist_append (copy, node->item) == -1) {
                 zlist_destroy (&copy);
                 break;
             }
@@ -443,6 +443,10 @@ zlist_test (int verbose)
     assert (zlist_size (list) == 3);
     assert (zlist_first (list) == bread);
 
+    zlist_t *sub_list = zlist_dup (list);
+    assert (sub_list);
+    assert (zlist_size (sub_list) == 3);
+
     zlist_sort (list, s_compare);
     char *item;
     item = (char *) zlist_pop (list);
@@ -456,6 +460,7 @@ zlist_test (int verbose)
     //  Destructor should be safe to call twice
     zlist_destroy (&list);
     zlist_destroy (&list);
+    zlist_destroy (&sub_list);
     assert (list == NULL);
     //  @end
 
