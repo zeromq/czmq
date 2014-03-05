@@ -746,12 +746,15 @@ zframe_test (bool verbose)
     assert (bit64 == test_64bit);
     char *hello = zframe_get_string (frame);
     assert (streq (hello, test_string));
+    free (hello);
     zuuid_t *uuid = zuuid_new ();
     zframe_get_block (frame, zuuid_data (uuid), 16);
     assert (zuuid_eq (uuid, zuuid_data (test_uuid)));
+    zuuid_destroy (&uuid);
     zframe_destroy (&frame);
     assert (frame == NULL);
 
+    zuuid_destroy (&test_uuid);
     zctx_destroy (&ctx);
     //  @end
     printf ("OK\n");
