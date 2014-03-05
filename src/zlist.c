@@ -41,6 +41,7 @@
 typedef struct _node_t {
     struct _node_t *next;
     void *item;
+    zlist_free_fn *free_fn;
 } node_t;
 
 
@@ -79,6 +80,9 @@ zlist_destroy (zlist_t **self_p)
         node_t *node = (*self_p)->head;
         while (node) {
             node_t *next = node->next;
+            if (node->free_fn)
+                (node->free_fn) (node->item);
+            else
             if (self->autofree)
                 free (node->item);
             free (node);
@@ -269,6 +273,35 @@ zlist_remove (zlist_t *self, void *item)
     }
 }
 
+//  --------------------------------------------------------------------------
+//  Set a free function for the specified list item. When the item is
+//  destroyed, the free function, if any, is called on that item.
+//  Use this when list items are dynamically allocated, to ensure that
+//  you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
+//  Returns the item, or NULL if there is no such item.
+
+void *
+zlist_freefn (zlist_t *self, void *item, zlist_free_fn *fn, bool at_tail)
+{
+    node_t *node = self->head;
+    if (at_tail)
+        node = self->tail;
+    while (node) {
+        if (node->item == item) {
+            node->free_fn = fn;
+            return item;
+        }
+        node = node->next;
+    }
+    return NULL;
+}
+
+static void
+s_zlist_free (void *data)
+{
+    zlist_t *self = (zlist_t *)data;
+    zlist_destroy (&self);
+}
 
 //  --------------------------------------------------------------------------
 //  Make a copy of list. If the list has autofree set, the copied list will
@@ -457,10 +490,16 @@ zlist_test (int verbose)
     assert (item == cheese);
     assert (zlist_size (list) == 0);
 
+    assert (zlist_size (sub_list) == 3);
+    zlist_push (list, sub_list);
+    zlist_t *sub_list_2 = zlist_dup (sub_list);
+    zlist_append (list, sub_list_2);
+    assert (zlist_freefn (list, sub_list, &s_zlist_free, false) == sub_list);
+    assert (zlist_freefn (list, sub_list_2, &s_zlist_free, true) == sub_list_2);
+
     //  Destructor should be safe to call twice
     zlist_destroy (&list);
     zlist_destroy (&list);
-    zlist_destroy (&sub_list);
     assert (list == NULL);
     //  @end
 
