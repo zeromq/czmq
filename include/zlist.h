@@ -37,6 +37,9 @@ typedef struct _zlist_t zlist_t;
 //  Comparison function for zlist_sort method
 typedef bool (zlist_compare_fn) (void *item1, void *item2);
 
+// Callback function for zlist_freefn method
+typedef void (zlist_free_fn) (void *data);
+
 //  Create a new list container
 CZMQ_EXPORT zlist_t *
     zlist_new (void);
@@ -80,6 +83,11 @@ CZMQ_EXPORT void *
 //  Remove the specified item from the list if present
 CZMQ_EXPORT void
     zlist_remove (zlist_t *self, void *item);
+
+// Add an explicit free function to the item including a hint as to
+// whether it can be found at the tail
+CZMQ_EXPORT void *
+    zlist_freefn (zlist_t *self, void *item, zlist_free_fn *fn, bool at_tail);
 
 //  Make a copy of list. If the list has autofree set, the copied list will
 //  duplicate all items, which must be strings. Otherwise, the list will hold
