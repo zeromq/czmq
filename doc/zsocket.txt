@@ -61,10 +61,21 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT char *
     zsocket_type_str (void *socket);
 
-//  Send data over a socket as a single frame
-//  Returns -1 on error, 0 on success
+//  Send data over a socket as a single message frame.
+//  Accepts these flags: ZFRAME_MORE and ZFRAME_DONTWAIT.
 CZMQ_EXPORT int
-    zsocket_sendmem (void *socket, const void* data, size_t size, int flags);
+    zsocket_sendmem (void *socket, const void *data, size_t size, int flags);
+    
+//  Send a signal over a socket. A signal is a zero-byte message.
+//  Signals are used primarily between threads, over pipe sockets.
+//  Returns -1 if there was an error sending the signal.
+CZMQ_EXPORT int
+    zsocket_signal (void *socket);
+
+//  Wait on a signal. Use this to coordinate between threads, over
+//  pipe pairs. Returns -1 on error, 0 on success.
+CZMQ_EXPORT int
+    zsocket_wait (void *socket);
 
 //  Self test of this class
 CZMQ_EXPORT int
@@ -151,6 +162,11 @@ EXAMPLE
     assert (zframe_streq (frame, "DEFG"));
     assert (!zframe_more (frame));
     zframe_destroy (&frame);
+
+    rc = zsocket_signal (writer);
+    assert (rc == 0);
+    rc = zsocket_wait (reader);
+    assert (rc == 0);
 
     zsocket_destroy (ctx, reader);
     zsocket_destroy (ctx, writer);

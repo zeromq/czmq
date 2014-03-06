@@ -3,7 +3,7 @@ zproxy(3)
 
 NAME
 ----
-zproxy - work with zmq_proxy_steerable instances
+zproxy - run a steerable proxy in the background
 
 SYNOPSIS
 --------
@@ -47,11 +47,9 @@ CZMQ_EXPORT void
 DESCRIPTION
 -----------
 
-The zproxy class simplifies working with the zmq_proxy_steerable API.
+The zproxy class provides an equivalent to the ZMQ steerable proxy, on
+all versions of ZeroMQ.
 
-There's no fallback to the older zmq_proxy, since that does not allow
-dynamic control. If you need zmq_proxy (if you are using an older
-version of libzmq), use that directly in your code.
 
 EXAMPLE
 -------
@@ -66,7 +64,6 @@ EXAMPLE
     assert (rc == 0);
     zproxy_t *proxy = zproxy_new (ctx, frontend, backend);
 
-#if HAVE_ZMQ_PROXY_STEERABLE
     //  Connect application sockets to proxy
     void *faucet = zsocket_new (ctx, ZMQ_PUSH);
     rc = zsocket_connect (faucet, "inproc://frontend");
@@ -75,24 +72,26 @@ EXAMPLE
     rc = zsocket_connect (sink, "inproc://backend");
     assert (rc == 0);
 
-    //  Create capture socket, must be a PULL socket
-    void *capture = zsocket_new (ctx, ZMQ_PULL);
-    rc = zsocket_bind (capture, "inproc://capture");
-    assert (rc == 0);
-
     //  Send some messages and check they arrived
     zstr_send (faucet, "Hello");
     char *string = zstr_recv (sink);
     assert (streq (string, "Hello"));
     zstr_free (&string);
     
+    //  Check pause/resume functionality
     zproxy_pause (proxy);
     zstr_send (faucet, "World");
+
     zproxy_resume (proxy);
     string = zstr_recv (sink);
     assert (streq (string, "World"));
     zstr_free (&string);
     
+    //  Create capture socket, must be a PULL socket
+    void *capture = zsocket_new (ctx, ZMQ_PULL);
+    rc = zsocket_bind (capture, "inproc://capture");
+    assert (rc == 0);
+
     //  Switch on capturing, check that it works
     zproxy_capture (proxy, "inproc://capture");
     zstr_send (faucet, "Hello");
@@ -105,11 +104,8 @@ EXAMPLE
     assert (streq (string, "Hello"));
     zstr_free (&string);
     zproxy_destroy (&proxy);
-#else
-    assert (proxy == NULL);
-#endif
     zctx_destroy (&ctx);
-    
+
 ----
 
 SEE ALSO
