@@ -40,11 +40,8 @@ client_task (void *args)
 static void *
 server_task (void *args)
 {
-    //  Create a ZeroMQ context and configure it so our test message
-    //  has time to be delivered. 100 msec is more than enough.
     zctx_t *ctx = zctx_new ();
     assert (ctx);
-    zctx_set_linger (ctx, 100);
     
     //  Start the authenticator and tell it do authenticate clients
     //  via the certificates stored in the .curve directory.
@@ -64,6 +61,7 @@ server_task (void *args)
 
     //  Send our test message, just once
     zstr_send (server, "Hello");
+    zclock_sleep (200);
     
     //  Free all memory we used
     zauth_destroy (&auth);
