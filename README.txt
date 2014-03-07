@@ -59,6 +59,18 @@ CZMQ's contributors are listed in the AUTHORS file. It is held by the ZeroMQ org
 
 CZMQ is actively developed and maintained by iMatix Corporation, who provide support to commercial users that need it. Contact Pieter Hintjens vai ph@imatix.com for more information. Note that CZMQ is licensed exclusively under the same LGPLv3 + static link exception as libzmq. This lets you use CZMQ freely in any application, with the requirement that you publish patches to the code.
 
+### Use from Other Languages
+
+This is a list of known higher-level wrappers around CZMQ:
+
+* https://github.com/1100110/CZMQ - D bindings
+* https://github.com/methodmissing/rbczmq - Ruby
+* https://github.com/zeromq/pyczmq - Python
+* https://github.com/lhope/cl-czmq - Common Lisp
+* https://github.com/fmp88/ocaml-czmq - Ocaml
+* https://github.com/gar1t/erlang-czmq - Erlang
+* https://github.com/mtortonesi/ruby-czmq-ffi - Ruby FFI
+
 ### Contributing
 
 CZMQ uses the [C4.1 (Collective Code Construction Contract)](http://rfc.zeromq.org/spec:22) process for contributions.
