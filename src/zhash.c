@@ -27,7 +27,7 @@
 @header
     Expandable hash table container
 @discuss
-    Note that it's relatively slow (~50K insertions/deletes per second), so
+    Note that it's relatively slow (~50k insertions/deletes per second), so
     don't do inserts/updates on the critical path for message I/O. It can
     do ~2.5M lookups per second for 16-char keys. Timed on a 1.6GHz CPU.
 @end
