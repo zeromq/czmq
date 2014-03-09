@@ -143,7 +143,7 @@ zfile_dup (zfile_t *self)
 //  Return file name, remove path if provided
 
 char *
-zfile_filename (zfile_t *self, char *path)
+zfile_filename (zfile_t *self, const char *path)
 {
     assert (self);
     char *name = self->fullname;

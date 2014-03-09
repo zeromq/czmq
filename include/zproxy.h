@@ -52,7 +52,7 @@ CZMQ_EXPORT void
 //  in-progress capturing will be stopped. You must already have bound the
 //  endpoint to a PULL socket.
 CZMQ_EXPORT void
-    zproxy_capture (zproxy_t *self, char *endpoint);
+    zproxy_capture (zproxy_t *self, const char *endpoint);
 
 //  Pauses a zproxy object; a paused proxy will cease processing messages,
 //  causing them to be queued up and potentially hit the high-water mark on

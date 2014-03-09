@@ -48,11 +48,11 @@ CZMQ_EXPORT void
 
 //  Register a new network service
 CZMQ_EXPORT void
-    zservice_register (zservice_t *self, char *name, char *endpoint);
+    zservice_register (zservice_t *self, const char *name, const char *endpoint);
 
 //  Lookup a network service, return endpoint or NULL if not known
 CZMQ_EXPORT char *
-    zservice_lookup (zservice_t *self, char *name);
+    zservice_lookup (zservice_t *self, const char *name);
 
 // Self test of this class
 CZMQ_EXPORT void

@@ -101,7 +101,7 @@ zproxy_destroy (zproxy_t **self_p)
 //  endpoint to a PULL socket.
 
 void
-zproxy_capture (zproxy_t *self, char *endpoint)
+zproxy_capture (zproxy_t *self, const char *endpoint)
 {
     assert (self);
     zstr_sendm (self->pipe, "CAPTURE");

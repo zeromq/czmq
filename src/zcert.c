@@ -179,7 +179,7 @@ zcert_secret_txt (zcert_t *self)
 //  Set certificate metadata from formatted string.
 
 void
-zcert_set_meta (zcert_t *self, char *name, char *format, ...)
+zcert_set_meta (zcert_t *self, const char *name, const char *format, ...)
 {
     va_list argptr;
     va_start (argptr, format);
@@ -195,7 +195,7 @@ zcert_set_meta (zcert_t *self, char *name, char *format, ...)
 //  exist, returns NULL.
 
 char *
-zcert_meta (zcert_t *self, char *name)
+zcert_meta (zcert_t *self, const char *name)
 {
     assert (self);
     return (char *) zhash_lookup (self->metadata, name);
@@ -218,7 +218,7 @@ zcert_meta_keys (zcert_t *self)
 //  Load certificate from file (constructor)
 
 zcert_t *
-zcert_load (char *filename)
+zcert_load (const char *filename)
 {
 #if (ZMQ_VERSION_MAJOR == 4)
     assert (filename);
@@ -288,7 +288,7 @@ s_save_metadata_all (zcert_t *self)
 
 
 int
-zcert_save (zcert_t *self, char *filename)
+zcert_save (zcert_t *self, const char *filename)
 {
     assert (self);
     assert (filename);
@@ -318,7 +318,7 @@ zcert_save (zcert_t *self, char *filename)
 //  Save public certificate only to file for persistent storage.
 
 int
-zcert_save_public (zcert_t *self, char *filename)
+zcert_save_public (zcert_t *self, const char *filename)
 {
     assert (self);
     assert (filename);

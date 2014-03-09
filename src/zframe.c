@@ -481,7 +481,7 @@ zframe_put_uint64 (zframe_t *self, uint64_t data)
 //  For allocation purpose calculate: (string length + 2) bytes
 
 int
-zframe_put_string (zframe_t *self, char *data)
+zframe_put_string (zframe_t *self, const char *data)
 {
     assert (self);
     uint16_t size = strlen (data);

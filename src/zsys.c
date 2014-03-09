@@ -126,7 +126,7 @@ zsys_handler_reset (void)
 static char *s_interface = NULL;
 
 void
-zsys_set_interface (char *interface_name)
+zsys_set_interface (const char *interface_name)
 {
     free (s_interface);
     s_interface = strdup (interface_name);
@@ -498,7 +498,7 @@ zsys_udp_recv (SOCKET udpsock, char *peername)
 //  fatal errors, and continue silently on "try again" errors.
 
 void
-zsys_socket_error (char *reason)
+zsys_socket_error (const char *reason)
 {
 #if defined (__WINDOWS__)
     switch (WSAGetLastError ()) {

@@ -383,7 +383,7 @@ zdir_remove (zdir_t *self, bool force)
 //  generates virtual filename (minus path, plus alias).
 
 zlist_t *
-zdir_diff (zdir_t *older, zdir_t *newer, char *alias)
+zdir_diff (zdir_t *older, zdir_t *newer, const char *alias)
 {
     zlist_t *patches = zlist_new ();
     zfile_t **old_files = zdir_flatten (older);
@@ -449,7 +449,7 @@ zdir_diff (zdir_t *older, zdir_t *newer, char *alias)
 //  generates virtual filename (minus path, plus alias).
 
 zlist_t *
-zdir_resync (zdir_t *self, char *alias)
+zdir_resync (zdir_t *self, const char *alias)
 {
     zlist_t *patches = zlist_new ();
     zfile_t **files = zdir_flatten (self);

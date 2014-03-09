@@ -76,7 +76,7 @@ struct _zcertstore_t {
 static void s_load_certs_from_disk (zcertstore_t *self);
 
 zcertstore_t *
-zcertstore_new (char *location)
+zcertstore_new (const char *location)
 {
     zcertstore_t *self = (zcertstore_t *) zmalloc (sizeof (zcertstore_t));
     assert (self);
@@ -166,7 +166,7 @@ zcertstore_destroy (zcertstore_t **self_p)
 //  else returns NULL. The public key is provided in Z85 text format.
 
 zcert_t *
-zcertstore_lookup (zcertstore_t *self, char *public_key)
+zcertstore_lookup (zcertstore_t *self, const char *public_key)
 {
     //  If directory has changed, reload all certificates
     if (self->location) {

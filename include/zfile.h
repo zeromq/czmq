@@ -48,7 +48,7 @@ CZMQ_EXPORT zfile_t *
 
 //  Return file name, remove path if provided
 CZMQ_EXPORT char *
-    zfile_filename (zfile_t *self, char *path);
+    zfile_filename (zfile_t *self, const char *path);
 
 //  Refresh file properties from disk; this is not done automatically
 //  on access methods, otherwise it is not possible to compare directory

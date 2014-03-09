@@ -42,7 +42,7 @@ typedef struct _zcertstore_t zcertstore_t;
 //  location is specified as NULL, creates a pure-memory store, which you 
 //  can work with by inserting certificates at runtime.
 CZMQ_EXPORT zcertstore_t *
-    zcertstore_new (char *location);
+    zcertstore_new (const char *location);
 
 //  Destroy a certificate store object in memory. Does not affect anything
 //  stored on disk.
@@ -52,7 +52,7 @@ CZMQ_EXPORT void
 //  Look up certificate by public key, returns zcert_t object if found, 
 //  else returns NULL. The public key is provided in Z85 text format.
 CZMQ_EXPORT zcert_t *
-    zcertstore_lookup (zcertstore_t *self, char *public_key);
+    zcertstore_lookup (zcertstore_t *self, const char *public_key);
 
 //  Insert certificate into certificate store in memory. Note that this 
 //  does not save the certificate to disk. To do that, use zcert_save()

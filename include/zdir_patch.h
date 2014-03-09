@@ -41,7 +41,8 @@ typedef struct _zdir_patch_t zdir_patch_t;
 //  @interface
 //  Create new patch
 CZMQ_EXPORT zdir_patch_t *
-    zdir_patch_new (char *path, zfile_t *file, zdir_patch_op_t op, char *alias);
+    zdir_patch_new (const char *path, zfile_t *file,
+                    zdir_patch_op_t op, const char *alias);
 
 //  Destroy a patch
 CZMQ_EXPORT void
@@ -66,10 +67,6 @@ CZMQ_EXPORT zdir_patch_op_t
 //  Return patch virtual file path
 CZMQ_EXPORT char *
     zdir_patch_vpath (zdir_patch_t *self);
-
-//  Set patch virtual file path
-CZMQ_EXPORT void
-    zdir_patch_vpath_set (zdir_patch_t *self, char *vpath);
 
 //  Calculate hash digest for file (create only)
 CZMQ_EXPORT void

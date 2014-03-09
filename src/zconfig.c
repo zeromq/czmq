@@ -66,7 +66,7 @@ static int
 //  Optionally attach new config to parent config, as first or next child.
 
 zconfig_t *
-zconfig_new (char *name, zconfig_t *parent)
+zconfig_new (const char *name, zconfig_t *parent)
 {
     zconfig_t *self = (zconfig_t *) zmalloc (sizeof (zconfig_t));
     zconfig_set_name (self, name);
@@ -138,7 +138,7 @@ zconfig_value (zconfig_t *self)
 //  and ignored.
 
 void
-zconfig_put (zconfig_t *self, char *path, char *value)
+zconfig_put (zconfig_t *self, const char *path, const char *value)
 {
     if (*path == '/')
         path++;
@@ -177,7 +177,7 @@ zconfig_put (zconfig_t *self, char *path, char *value)
 //  Set new name for config item; this may be null.
 
 void
-zconfig_set_name (zconfig_t *self, char *name)
+zconfig_set_name (zconfig_t *self, const char *name)
 {
     assert (self);
     free (self->name);
@@ -192,7 +192,7 @@ zconfig_set_name (zconfig_t *self, char *name)
 //  by the string.
 
 void
-zconfig_set_value (zconfig_t *self, char *format, ...)
+zconfig_set_value (zconfig_t *self, const char *format, ...)
 {
     assert (self);
     free (self->value);
@@ -233,7 +233,7 @@ zconfig_next (zconfig_t *self)
 //  Find a config item along a path; leading slash is optional and ignored.
 
 zconfig_t *
-zconfig_locate (zconfig_t *self, char *path)
+zconfig_locate (zconfig_t *self, const char *path)
 {
     //  Check length of next path segment
     if (*path == '/')
@@ -263,7 +263,7 @@ zconfig_locate (zconfig_t *self, char *path)
 //  Resolve a config path into a string value
 
 char *
-zconfig_resolve (zconfig_t *self, char *path, char *default_value)
+zconfig_resolve (zconfig_t *self, const char *path, const char *default_value)
 {
     zconfig_t *item = zconfig_locate (self, path);
     if (item)
@@ -361,7 +361,7 @@ zconfig_execute (zconfig_t *self, zconfig_fct handler, void *arg)
 //  iothreads=1-->verbose=false
 
 zconfig_t *
-zconfig_load (char *filename)
+zconfig_load (const char *filename)
 {
     FILE *file = fopen (filename, "r");
     if (!file)
@@ -569,7 +569,7 @@ s_collect_value (char **start, int lineno)
 //  deleted.
 
 void
-zconfig_set_comment (zconfig_t *self, char *format, ...)
+zconfig_set_comment (zconfig_t *self, const char *format, ...)
 {
     if (format) {
         if (!self->comments) {
@@ -605,7 +605,7 @@ zconfig_comments (zconfig_t *self)
 //  "-" means dump to standard output.
 
 int
-zconfig_save (zconfig_t *self, char *filename)
+zconfig_save (zconfig_t *self, const char *filename)
 {
     assert (self);
 
