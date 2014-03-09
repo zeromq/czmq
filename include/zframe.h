@@ -125,7 +125,7 @@ CZMQ_EXPORT int
 //  The string length limited to 2^16 - 1 for '\0' => 65535 characters.
 //  For allocation purpose calculate: (string length + 2) bytes
 CZMQ_EXPORT int
-    zframe_put_string (zframe_t *self, char *data);
+    zframe_put_string (zframe_t *self, const char *data);
 
 //  Put 1-byte to frame payload. Returns 0 if successful else -1.
 CZMQ_EXPORT int

@@ -51,20 +51,20 @@ CZMQ_EXPORT zauth_t *
 //  to whitelist multiple IP addresses. If you whitelist a single address,
 //  any non-whitelisted addresses are treated as blacklisted.
 CZMQ_EXPORT void
-    zauth_allow (zauth_t *self, char *address);
+    zauth_allow (zauth_t *self, const char *address);
 
 //  Deny (blacklist) a single IP address. For all security mechanisms, this
 //  rejects the connection without any further authentication. Use either a
 //  whitelist, or a blacklist, not not both. If you define both a whitelist 
 //  and a blacklist, only the whitelist takes effect.
 CZMQ_EXPORT void
-    zauth_deny (zauth_t *self, char *address);
+    zauth_deny (zauth_t *self, const char *address);
 
 //  Configure PLAIN authentication for a given domain. PLAIN authentication
 //  uses a plain-text password file. To cover all domains, use "*". You can
 //  modify the password file at any time; it is reloaded automatically.
 CZMQ_EXPORT void
-    zauth_configure_plain (zauth_t *self, char *domain, char *filename);
+    zauth_configure_plain (zauth_t *self, const char *domain, const char *filename);
     
 //  Configure CURVE authentication for a given domain. CURVE authentication
 //  uses a directory that holds all public client certificates, i.e. their
@@ -73,7 +73,7 @@ CZMQ_EXPORT void
 //  directory at any time. To allow all client keys without checking, specify
 //  CURVE_ALLOW_ANY for the location.
 CZMQ_EXPORT void
-    zauth_configure_curve (zauth_t *self, char *domain, char *location);
+    zauth_configure_curve (zauth_t *self, const char *domain, const char *location);
     
 //  Enable verbose tracing of commands and activity
 CZMQ_EXPORT void

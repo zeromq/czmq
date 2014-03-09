@@ -103,19 +103,19 @@ CZMQ_EXPORT int
 //  comment lines as you like. These comment lines are discarded when loading
 //  the file. If you use a null format, all comments are deleted.
 CZMQ_EXPORT void
-    zhash_comment (zhash_t *self, char *format, ...);
+    zhash_comment (zhash_t *self, const char *format, ...);
 
 //  Save hash table to a text file in name=value format. Hash values must be
 //  printable strings; keys may not contain '=' character. Returns 0 if OK,
 //  else -1 if a file error occurred.
 CZMQ_EXPORT int
-    zhash_save (zhash_t *self, char *filename);
+    zhash_save (zhash_t *self, const char *filename);
 
 //  Load hash table from a text file in name=value format; hash table must
 //  already exist. Hash values must printable strings; keys may not contain
 //  '=' character. Returns 0 if OK, else -1 if a file was not readable.
 CZMQ_EXPORT int
-    zhash_load (zhash_t *self, char *filename);
+    zhash_load (zhash_t *self, const char *filename);
 
 //  When a hash table was loaded from a file by zhash_load, this method will
 //  reload the file if it has been modified since, and is "stable", i.e. not

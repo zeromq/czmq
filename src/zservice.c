@@ -110,7 +110,7 @@ zservice_set_verbose (zservice_t *self, bool verbose)
 //  Register a new network service
 
 void
-zservice_register (zservice_t *self, char *name, char *endpoint)
+zservice_register (zservice_t *self, const char *name, const char *endpoint)
 {
 }
 
@@ -119,7 +119,7 @@ zservice_register (zservice_t *self, char *name, char *endpoint)
 //  Lookup a network service, return endpoint or NULL if not known
 
 char *
-zservice_lookup (zservice_t *self, char *name)
+zservice_lookup (zservice_t *self, const char *name)
 {
     return NULL;
 }

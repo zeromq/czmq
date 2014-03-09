@@ -65,12 +65,12 @@ CZMQ_EXPORT char *
 
 //  Set certificate metadata from formatted string.
 CZMQ_EXPORT void
-    zcert_set_meta (zcert_t *self, char *name, char *format, ...);
+    zcert_set_meta (zcert_t *self, const char *name, const char *format, ...);
 
 //  Get metadata value from certificate; if the metadata value doesn't 
 //  exist, returns NULL.
 CZMQ_EXPORT char *
-    zcert_meta (zcert_t *self, char *name);
+    zcert_meta (zcert_t *self, const char *name);
 
 //  Get list of metadata fields from certificate. Caller is responsible for
 //  destroying list. Caller should not modify the values of list items.
@@ -79,16 +79,16 @@ CZMQ_EXPORT zlist_t *
 
 //  Load certificate from file (constructor)
 CZMQ_EXPORT zcert_t *
-    zcert_load (char *filename);
+    zcert_load (const char *filename);
 
 //  Save full certificate (public + secret) to file for persistent storage
 //  This creates one public file and one secret file (filename + "_secret").
 CZMQ_EXPORT int
-    zcert_save (zcert_t *self, char *filename);
+    zcert_save (zcert_t *self, const char *filename);
 
 //  Save public certificate only to file for persistent storage
 CZMQ_EXPORT int
-    zcert_save_public (zcert_t *self, char *filename);
+    zcert_save_public (zcert_t *self, const char *filename);
 
 //  Apply certificate to socket, i.e. use for CURVE security on socket.
 //  If certificate was loaded from public file, the secret key will be

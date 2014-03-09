@@ -84,11 +84,11 @@ CZMQ_EXPORT void
 //  be null, indicating the directory is empty/absent. If alias is set,
 //  generates virtual filename (minus path, plus alias).
 CZMQ_EXPORT zlist_t *
-    zdir_diff (zdir_t *older, zdir_t *newer, char *alias);
+    zdir_diff (zdir_t *older, zdir_t *newer, const char *alias);
 
 //  Return full contents of directory as a zdir_patch list.
 CZMQ_EXPORT zlist_t *
-    zdir_resync (zdir_t *self, char *alias);
+    zdir_resync (zdir_t *self, const char *alias);
 
 //  Load directory cache; returns a hash table containing the SHA-1 digests
 //  of every file in the tree. The cache is saved between runs in .cache.

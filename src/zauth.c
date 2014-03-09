@@ -110,7 +110,7 @@ zauth_destroy (zauth_t **self_p)
 //  any non-whitelisted addresses are treated as blacklisted.
 
 void
-zauth_allow (zauth_t *self, char *address)
+zauth_allow (zauth_t *self, const char *address)
 {
     zstr_sendx (self->pipe, "ALLOW", address, NULL);
     //  Wait for completion
@@ -125,7 +125,7 @@ zauth_allow (zauth_t *self, char *address)
 //  and a blacklist, only the whitelist takes effect.
 
 void
-zauth_deny (zauth_t *self, char *address)
+zauth_deny (zauth_t *self, const char *address)
 {
     zstr_sendx (self->pipe, "DENY", address, NULL);
     //  Wait for completion
@@ -139,7 +139,7 @@ zauth_deny (zauth_t *self, char *address)
 //  modify the password file at any time; it is reloaded automatically.
 
 void
-zauth_configure_plain (zauth_t *self, char *domain, char *filename)
+zauth_configure_plain (zauth_t *self, const char *domain, const char *filename)
 {
     assert (self);
     assert (domain);
@@ -159,7 +159,7 @@ zauth_configure_plain (zauth_t *self, char *domain, char *filename)
 //  CURVE_ALLOW_ANY for the location.
 
 void
-zauth_configure_curve (zauth_t *self, char *domain, char *location)
+zauth_configure_curve (zauth_t *self, const char *domain, const char *location)
 {
     assert (self);
     assert (domain);
