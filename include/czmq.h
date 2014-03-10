@@ -71,6 +71,7 @@
 #include "zcert.h"
 #include "zcertstore.h"
 #include "zproxy.h"
+#include "zprotocol.h"
 #include "zservice.h"
 #include "zuuid.h"
 
