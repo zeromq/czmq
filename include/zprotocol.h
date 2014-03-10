@@ -58,6 +58,7 @@ CZMQ_EXPORT int
 
 //  Receives a message from the provided zeromq socket and unpacks the
 //  content of the message payload to some kind of structure.
+//  The message is automatically destroyed by this method.
 //  Returns the structure that has been unpacked from payload, otherwise NULL.
 
 CZMQ_EXPORT void *
@@ -66,6 +67,7 @@ CZMQ_EXPORT void *
 //  Receives a message from the provided zeromq socket and unpacks the
 //  content of the message payload to some kind of structure. Doesn't go into
 //  blocking mode, it returns immediatly if there are no messages queued.
+//  The message is automatically destroyed by this method.
 //  Returns the structure that has been unpacked from payload, otherwise NULL.
 
 CZMQ_EXPORT void *

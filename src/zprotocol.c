@@ -25,8 +25,7 @@
 
 /*
 @header
-    The zprotocol simplifies the implementation of a protocol where the 
-    payload of a message is reoccurring.
+    The zprotocol simplifies message payload implementations for protocols.
 @discuss
 @end
 */
@@ -37,7 +36,7 @@
 
 struct _zprotocol_t {
     int (*pack_message)(void *args);
-    zprotocol_packmessage_fn *pack_fn;;
+    zprotocol_packmessage_fn *pack_fn;
     zprotocol_unpackmessage_fn *unpack_fn;
 };
 
@@ -98,6 +97,7 @@ zprotocol_send (zprotocol_t *self, void *zocket, void *args)
 //  --------------------------------------------------------------------------
 //  Receives a message from the provided zeromq socket and unpacks the
 //  content of the message payload to some kind of structure.
+//  The message is automatically destroyed by this method.
 //  Returns the structure that has been unpacked from payload, otherwise NULL.
 
 void *
@@ -107,8 +107,10 @@ zprotocol_recv (zprotocol_t *self, void *zocket)
     assert (zocket);
 
     zmsg_t *msg = zmsg_recv (zocket);    
-    if (msg) {   
-        return (self->unpack_fn) (msg);
+    if (msg) {
+        void *data = (self->unpack_fn) (msg);
+        zmsg_destroy (&msg);
+        return data;
     }
     return NULL;
 }
@@ -118,6 +120,7 @@ zprotocol_recv (zprotocol_t *self, void *zocket)
 //  Receives a message from the provided zeromq socket and unpacks the
 //  content of the message payload to some kind of structure. Doesn't go into
 //  blocking mode, it returns immediatly if there are no messages queued.
+//  The message is automatically destroyed by this method.
 //  Returns the structure that has been unpacked from payload, otherwise NULL.
 
 void *
@@ -128,43 +131,94 @@ zprotocol_recv_nowait (zprotocol_t *self, void *zocket)
 
     zmsg_t *msg = zmsg_recv_nowait (zocket);
     if (msg) {   
-        return (self->unpack_fn) (msg);
+        void *data = (self->unpack_fn) (msg);
+        zmsg_destroy (&msg);
+        return data;
     }
     return NULL;
 }
 
+
+//  --------------------------------------------------------------------------
+//  Test structs/methods
+
+typedef struct {
+    char *sender;
+    int command;
+    uint64_t some_value1;
+    uint32_t some_value2;
+} zprotocol_test_t;
+
 zmsg_t *
 s_test_packmessage_fn (void *args)
 {
-    return NULL;
+    assert (args);
+    zprotocol_test_t *test = (zprotocol_test_t *) args;
+ 
+    int size = 2 + strlen (test->sender) + 8 + 8 + 4;
+
+    zmsg_t *msg = zmsg_new ();
+    zframe_t *frame = zframe_new (NULL, size);
+    zframe_put_string (frame, test->sender);
+    zframe_put_uint64 (frame, test->command);
+    zframe_put_uint64 (frame, test->some_value1);
+    zframe_put_uint32 (frame, test->some_value2);
+    zmsg_append (msg, &frame);
+
+    return msg;
 }
 
 void *
 s_test_unpackmessage_fn (zmsg_t *msg)
 {
-    return NULL;
-}
+    assert (msg);
+    zprotocol_test_t *test = malloc (sizeof (zprotocol_test_t));
+    zframe_t *frame = zmsg_pop (msg);
+    
+    test->sender = zframe_get_string (frame);
+    uint64_t command;
+    zframe_get_uint64 (frame, &command);
+    test->command = command;
+    zframe_get_uint64 (frame, &test->some_value1);
+    zframe_get_uint32 (frame, &test->some_value2);
 
-typedef struct {
-    char *a;
-    int b;
-    uint8_t c;
-    uint32_t d;
-} zprotocol_test_t;
+    return test;
+}
 
 void
 zprotocol_test (bool verbose)
 {
-    zctx_t *ctx = zctx_new ();
+    //  Setup
+    void *ctx = zmq_ctx_new ();
+    void *pipe1 = zmq_socket (ctx, ZMQ_PAIR);
+    zmq_bind (pipe1, "inproc://zprotocol");
+    void *pipe2 = zmq_socket (ctx, ZMQ_PAIR);
+    zmq_connect (pipe2, "inproc://zprotocol");
 
+    //  New Protocol Class
     zprotocol_t *protocol = zprotocol_new (s_test_packmessage_fn, s_test_unpackmessage_fn);
-    
-    zprotocol_test_t *test1 = malloc (sizeof (zprotocol_test_t));
-    test1->a = "Hello World!";
-    test1->b = 42;
-    test1->c = 0xFA;
-    test1->d = 0xFAFAFAFA;
+   
+    //  Fill struct 
+    zprotocol_test_t *test = malloc (sizeof (zprotocol_test_t));
+    test->sender = "Paul";
+    test->command = 0x5;
+    test->some_value1 = 2046;
+    test->some_value2 = 256;
 
-    int rc = zprotocol_send (protocol, NULL, test1);
+    //  Pack/Send struct
+    int rc = zprotocol_send (protocol, pipe1, test);
+    assert (rc == 0);
+
+    //  Assert actual
+    zprotocol_test_t *actual = zprotocol_recv (protocol, pipe2);
+    assert (streq (test->sender, actual->sender));
+    assert (test->command == actual->command);
+    assert (test->some_value1 == actual->some_value1);
+    assert (test->some_value2 == actual->some_value2);
+
+    //  Cleanup
+    zmq_close (pipe1);
+    zmq_close (pipe2);
+    zmq_ctx_destroy (&ctx);
 }
 
