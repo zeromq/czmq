@@ -68,7 +68,8 @@ struct _zfile_t {
 //  If file exists, populates properties. CZMQ supports portable symbolic
 //  links, which are files with the extension ".ln". A symbolic link is a
 //  text file containing one line, the filename of a target file. Reading
-//  data from the symbolic link actually reads from the target file.
+//  data from the symbolic link actually reads from the target file. Path
+//  may be NULL, in which case it is not used.
 
 zfile_t *
 zfile_new (const char *path, const char *name)
@@ -76,8 +77,12 @@ zfile_new (const char *path, const char *name)
     zfile_t *self = (zfile_t *) zmalloc (sizeof (zfile_t));
 
     //  Format full path to file
-    self->fullname = (char *) zmalloc (strlen (path) + strlen (name) + 2);
-    sprintf (self->fullname, "%s/%s", path, name);
+    if (path) {
+        self->fullname = (char *) zmalloc (strlen (path) + strlen (name) + 2);
+        sprintf (self->fullname, "%s/%s", path, name);
+    }
+    else
+        self->fullname = strdup (name);
 
     //  Resolve symbolic link if possible
     if (strlen (self->fullname) > 3
@@ -491,7 +496,7 @@ zfile_test (bool verbose)
     printf (" * zfile: ");
 
     //  @selftest
-    zfile_t *file = zfile_new (".", "bilbo");
+    zfile_t *file = zfile_new (NULL, "bilbo");
     assert (streq (zfile_filename (file, "."), "bilbo"));
     assert (zfile_is_readable (file) == false);
     zfile_destroy (&file);

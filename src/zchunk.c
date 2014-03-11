@@ -99,38 +99,6 @@ zchunk_resize (zchunk_t *self, size_t size)
 
 
 //  --------------------------------------------------------------------------
-//  Set chunk data from user-supplied data; truncate if too large
-//  Returns actual size of chunk
-
-size_t
-zchunk_set (zchunk_t *self, const void *data, size_t size)
-{
-    assert (self);
-    if (size > self->max_size)
-        size = self->max_size;
-    memcpy (self->data, data, size);
-    self->size = size;
-    return size;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Fill chunk data from user-supplied octet
-//  Returns actual size of chunk
-
-size_t
-zchunk_fill (zchunk_t *self, byte filler, size_t size)
-{
-    assert (self);
-    if (size > self->max_size)
-        size = self->max_size;
-    memset (self->data, filler, size);
-    self->size = size;
-    return size;
-}
-
-
-//  --------------------------------------------------------------------------
 //  Return chunk cur size
 
 size_t
@@ -164,11 +132,59 @@ zchunk_data (zchunk_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  Set chunk data from user-supplied data; truncate if too large
+//  Returns actual size of chunk
+
+size_t
+zchunk_set (zchunk_t *self, const void *data, size_t size)
+{
+    assert (self);
+    if (size > self->max_size)
+        size = self->max_size;
+    memcpy (self->data, data, size);
+    self->size = size;
+    return size;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Fill chunk data from user-supplied octet
+//  Returns actual size of chunk
+
+size_t
+zchunk_fill (zchunk_t *self, byte filler, size_t size)
+{
+    assert (self);
+    if (size > self->max_size)
+        size = self->max_size;
+    memset (self->data, filler, size);
+    self->size = size;
+    return size;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Append user-supplied data to chunk, return resulting chunk size
+
+size_t
+zchunk_append (zchunk_t *self, const void *data, size_t size)
+{
+    assert (self);
+    if (self->size + size > self->max_size)
+        size = self->max_size - self->size;
+    memcpy (self->data + self->size, data, size);
+    self->size += size;
+    return self->size;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Read chunk from an open file descriptor
 
 zchunk_t *
 zchunk_read (FILE *handle, size_t bytes)
 {
+    assert (handle);
     zchunk_t *self = zchunk_new (NULL, bytes);
     self->size = fread (self->data, 1, bytes, handle);
     return self;
@@ -199,6 +215,14 @@ zchunk_test (bool verbose)
     assert (chunk);
     assert (zchunk_size (chunk) == 10);
     assert (memcmp (zchunk_data (chunk), "1234567890", 10) == 0);
+    zchunk_destroy (&chunk);
+
+    chunk = zchunk_new (NULL, 10);
+    zchunk_append (chunk, "12345678", 8);
+    zchunk_append (chunk, "90ABCDEF", 8);
+    zchunk_append (chunk, "GHIJKLMN", 8);
+    assert (memcmp (zchunk_data (chunk), "1234567890", 10) == 0);
+    assert (zchunk_size (chunk) == 10);
     zchunk_destroy (&chunk);
     //  @end
 

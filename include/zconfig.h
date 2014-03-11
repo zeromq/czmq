@@ -107,11 +107,11 @@ CZMQ_EXPORT void
 CZMQ_EXPORT zlist_t *
     zconfig_comments (zconfig_t *self);
 
-//  Load a config item tree from a specified ZPL text file
+//  Load a config tree from a specified ZPL text file
 CZMQ_EXPORT zconfig_t *
     zconfig_load (const char *filename);
 
-//  Save a config item tree to a specified ZPL text file, where a filename
+//  Save a config tree to a specified ZPL text file, where a filename
 //  "-" means dump to standard output.
 CZMQ_EXPORT int
     zconfig_save (zconfig_t *self, const char *filename);
@@ -123,6 +123,15 @@ CZMQ_EXPORT void
 //  Print the config file to stdout
 CZMQ_EXPORT void
     zconfig_print (zconfig_t *self);
+    
+//  Load a config tree from a memory chunk
+CZMQ_EXPORT zconfig_t *
+    zconfig_chunk_load (zchunk_t *chunk);
+
+//  Save a config tree to a new memory chunk
+CZMQ_EXPORT zchunk_t *
+    zconfig_chunk_save (zconfig_t *self);
+
 //  @end
 
 //  Self test of this class
