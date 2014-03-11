@@ -95,9 +95,9 @@ EXAMPLE
     assert (loop);
     zloop_set_verbose (loop, verbose);
 
-    // Create a timer that will be cancelled
-    int cancel_timer_id = zloop_timer (loop, 1000, 1, s_timer_event, NULL);
-    zloop_timer (loop, 5, 1, s_cancel_timer_event, &cancel_timer_id);
+    //  Create a timer that will be canceled
+    int timer_id = zloop_timer (loop, 1000, 1, s_timer_event, NULL);
+    zloop_timer (loop, 5, 1, s_cancel_timer_event, &timer_id);
     
     //  After 20 msecs, send a ping message to output
     zloop_timer (loop, 20, 1, s_timer_event, output);
