@@ -100,6 +100,7 @@ EXAMPLE
         assert (received_port == port_nbr);
         zframe_destroy (&content);
         zbeacon_silence (service_beacon);
+        zstr_free (&ipaddress);
     }
     zbeacon_destroy (&client_beacon);
     zbeacon_destroy (&service_beacon);

@@ -34,7 +34,11 @@ extern "C" {
 typedef struct _zfile_t zfile_t;
 
 //  @interface
-//  Create new file item
+//  If file exists, populates properties. CZMQ supports portable symbolic
+//  links, which are files with the extension ".ln". A symbolic link is a
+//  text file containing one line, the filename of a target file. Reading
+//  data from the symbolic link actually reads from the target file. Path
+//  may be NULL, in which case it is not used.
 CZMQ_EXPORT zfile_t *
     zfile_new (const char *path, const char *name);
 

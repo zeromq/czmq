@@ -8,7 +8,11 @@ zfile - provides methods to work with files in a portable fashion.
 SYNOPSIS
 --------
 ----
-//  Create new file item
+//  If file exists, populates properties. CZMQ supports portable symbolic
+//  links, which are files with the extension ".ln". A symbolic link is a
+//  text file containing one line, the filename of a target file. Reading
+//  data from the symbolic link actually reads from the target file. Path
+//  may be NULL, in which case it is not used.
 CZMQ_EXPORT zfile_t *
     zfile_new (const char *path, const char *name);
 
@@ -22,7 +26,7 @@ CZMQ_EXPORT zfile_t *
 
 //  Return file name, remove path if provided
 CZMQ_EXPORT char *
-    zfile_filename (zfile_t *self, char *path);
+    zfile_filename (zfile_t *self, const char *path);
 
 //  Refresh file properties from disk; this is not done automatically
 //  on access methods, otherwise it is not possible to compare directory
@@ -150,7 +154,7 @@ EXAMPLE
 -------
 .From zfile_test method
 ----
-    zfile_t *file = zfile_new (".", "bilbo");
+    zfile_t *file = zfile_new (NULL, "bilbo");
     assert (streq (zfile_filename (file, "."), "bilbo"));
     assert (zfile_is_readable (file) == false);
     zfile_destroy (&file);
