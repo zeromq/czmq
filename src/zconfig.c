@@ -29,6 +29,39 @@
     This implements rfc.zeromq.org/spec:4/ZPL, which is a simple structured
     text format for configuration files.
 @discuss
+    Here is an example ZPL stream and corresponding config structure:
+
+    context
+        iothreads = 1
+        verbose = 1      #   Ask for a trace
+    main
+        type = zqueue    #  ZMQ_DEVICE type
+        frontend
+            option
+                hwm = 1000
+                swap = 25000000     #  25MB
+            bind = 'inproc://addr1'
+            bind = 'ipc://addr2'
+        backend
+            bind = inproc://addr3
+
+    root                    Down = child
+      |                     Across = next
+      v
+    context-->main
+      |         |
+      |         v
+      |       type=queue-->frontend-->backend
+      |                      |          |
+      |                      |          v
+      |                      |        bind=inproc://addr3
+      |                      v
+      |                    option-->bind=inproc://addr1-->bind=ipc://addr2
+      |                      |
+      |                      v
+      |                    hwm=1000-->swap=25000000
+      v
+    iothreads=1-->verbose=false
 @end
 */
 
@@ -58,6 +91,8 @@ static char *
     s_collect_value (char **start, int lineno);
 static int
     s_config_save (zconfig_t *self, void *arg, int level);
+static int
+    s_config_save_chunk (zconfig_t *self, void *arg, int level);
 
 
 //  --------------------------------------------------------------------------
@@ -324,56 +359,114 @@ zconfig_execute (zconfig_t *self, zconfig_fct handler, void *arg)
 
 
 //  --------------------------------------------------------------------------
-//  Load a config item tree from a specified ZPL text file
-//
-//  Here is an example ZPL stream and corresponding config structure:
-//
-//  context
-//      iothreads = 1
-//      verbose = 1      #   Ask for a trace
-//  main
-//      type = zqueue    #  ZMQ_DEVICE type
-//      frontend
-//          option
-//              hwm = 1000
-//              swap = 25000000     #  25MB
-//          bind = 'inproc://addr1'
-//          bind = 'ipc://addr2'
-//      backend
-//          bind = inproc://addr3
-//
-//  root                    Down = child
-//    |                     Across = next
-//    v
-//  context-->main
-//    |         |
-//    |         v
-//    |       type=queue-->frontend-->backend
-//    |                      |          |
-//    |                      |          v
-//    |                      |        bind=inproc://addr3
-//    |                      v
-//    |                    option-->bind=inproc://addr1-->bind=ipc://addr2
-//    |                      |
-//    |                      v
-//    |                    hwm=1000-->swap=25000000
-//    v
-//  iothreads=1-->verbose=false
+//  Load a config tree from a specified ZPL text file
 
 zconfig_t *
 zconfig_load (const char *filename)
 {
-    FILE *file = fopen (filename, "r");
-    if (!file)
-        return NULL;            //  File not found, or unreadable
+    //  Load entire file into memory as a chunk, then process it
+    zconfig_t *self = NULL;
+    zfile_t *file = zfile_new (NULL, filename);
+    if (zfile_input (file) == 0) {
+        zchunk_t *chunk = zfile_read (file, zfile_cursize (file), 0);
+        if (chunk)
+            self = zconfig_chunk_load (chunk);
+        zchunk_destroy (&chunk);
+    }
+    zfile_destroy (&file);
+    return self;
+}
 
-    //  Parse the file line by line
+
+//  --------------------------------------------------------------------------
+//  Save a config tree to a specified ZPL text file, where a filename
+//  "-" means dump to standard output.
+
+int
+zconfig_save (zconfig_t *self, const char *filename)
+{
+    assert (self);
+
+    int rc = 0;
+    if (streq (filename, "-")) {
+        //  "-" means write to stdout
+        rc = zconfig_execute (self, s_config_save, stdout);
+    }
+    else {
+        FILE *file;
+        file = fopen (filename, "w");
+        if (file)
+            rc = zconfig_execute (self, s_config_save, file);
+        else
+            rc = -1;          //  File not writeable
+        fflush (file);
+        fclose (file);
+    }
+    return rc;
+}
+
+//  Save an item
+
+static int
+s_config_save (zconfig_t *self, void *arg, int level)
+{
+    assert (self);
+    assert (arg);
+
+    FILE *file = (FILE *) arg;
+    //  Save any comments on the item
+    if (self->comments) {
+        char *comment = (char *) zlist_first (self->comments);
+        while (comment) {
+            fprintf (file, "#%s\n", comment);
+            comment = (char *) zlist_next (self->comments);
+        }
+        //  Blank line after comments is nice
+        fprintf (file, "\n");
+    }
+    if (level > 0) {
+        if (self->value)
+            fprintf (file, "%*s%s = \"%s\"\n", (level - 1) * 4, "",
+                self->name? self->name: "(Unnamed)", self->value);
+        else
+            fprintf (file, "%*s%s\n", (level - 1) * 4, "",
+                self->name? self->name: "(Unnamed)");
+    }
+    return 0;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Load a config tree from a memory chunk
+
+zconfig_t *
+zconfig_chunk_load (zchunk_t *chunk)
+{
+    //  Parse the chunk line by line
     zconfig_t *self = zconfig_new ("root", NULL);
-    char cur_line [1024];
     bool valid = true;
     int lineno = 0;
+    char *data_ptr = (char *) zchunk_data (chunk);
+    size_t remaining = zchunk_size (chunk);
     
-    while (fgets (cur_line, 1024, file)) {
+    while (remaining) {
+        //  Copy stuff into cur_line; not fastest but safest option
+        //  since chunk may not be null terminated, etc.
+        char cur_line [1024 + 1];
+        char *eoln = strchr (data_ptr, '\n');
+        size_t cur_size;
+        if (eoln)
+            cur_size = eoln - data_ptr;
+        else
+            cur_size = remaining;
+        
+        remaining -= cur_size;
+        if (cur_size > 1024)
+            cur_size = 1024;
+        memcpy (cur_line, data_ptr, cur_size);
+        cur_line [cur_size] = '\0';
+        data_ptr = eoln? eoln + 1: NULL;
+        
         //  Trim line
         int length = strlen (cur_line);
         while (length && isspace ((byte) cur_line [length - 1]))
@@ -413,7 +506,7 @@ zconfig_load (const char *filename)
                     item->value = value;
                 }
                 else {
-                    fprintf (stderr, "E: (%d) indentation error\n", lineno);
+                    fprintf (stderr, "zconfig E: (%d) indentation error\n", lineno);
                     free (value);
                     valid = false;
                 }
@@ -422,15 +515,14 @@ zconfig_load (const char *filename)
         else
         if (s_verify_eoln (scanner, lineno))
             valid = false;
-            
+
         free (name);
         if (!valid)
             break;
     }
-    //  Either the whole ZPL file is valid or none of it is
+    //  Either the whole ZPL stream is valid or none of it is
     if (!valid)
         zconfig_destroy (&self);
-    fclose (file);
     return self;
 }
 
@@ -445,7 +537,7 @@ s_collect_level (char **start, int lineno)
         readptr++;
     int level = (readptr - *start) / 4;
     if (level * 4 != readptr - *start) {
-        fprintf (stderr, "E: (%d) indent 4 spaces at once\n", lineno);
+        fprintf (stderr, "zconfig E: (%d) indent 4 spaces at once\n", lineno);
         level = -1;
     }
     *start = readptr;
@@ -455,9 +547,9 @@ s_collect_level (char **start, int lineno)
 //  Collect property name
 
 static bool
-s_is_namechar (char thischar) 
+s_is_namechar (char thischar)
 {
-    return (isalnum (thischar) 
+    return (isalnum (thischar)
          || thischar == '$'
          || thischar == '-'
          || thischar == '_'
@@ -479,10 +571,10 @@ s_collect_name (char **start, int lineno)
     char *name = (char *) zmalloc (length + 1);
     memcpy (name, readptr, length);
     name [length] = 0;
-    
+
     if (length > 0
     && (name [0] == '/' || name [length - 1] == '/')) {
-        fprintf (stderr, "E: (%d) '/' not valid at name start or end\n", lineno);
+        fprintf (stderr, "zconfig E: (%d) '/' not valid at name start or end\n", lineno);
         free (name);
     }
     return name;
@@ -537,7 +629,7 @@ s_collect_value (char **start, int lineno)
                 rc = s_verify_eoln (endquote + 1, lineno);
             }
             else {
-                fprintf (stderr, "E: (%d) missing %c\n", lineno, *readptr);
+                fprintf (stderr, "zconfig E: (%d) missing %c\n", lineno, *readptr);
                 rc = -1;
             }
         }
@@ -560,6 +652,68 @@ s_collect_value (char **start, int lineno)
     if (rc)
         free (value);
     return value;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Save a config tree to a new memory chunk
+
+zchunk_t *
+zconfig_chunk_save (zconfig_t *self)
+{
+    assert (self);
+    size_t out_count = (size_t) zconfig_execute (self, s_config_save_chunk, NULL);
+    printf ("OUT COUNT: %zd\n", out_count);
+    zchunk_t *chunk = zchunk_new (NULL, out_count);
+    zconfig_execute (self, s_config_save_chunk, zchunk_data (chunk));
+    return chunk;
+}
+
+
+//  Save an item to memory; stores the item and value with indent
+//  and newline, at the indicated location, if not null. Always
+//  returns the number of bytes (that would be) written.
+
+static int
+s_config_save_chunk (zconfig_t *self, void *arg, int level)
+{
+    assert (self);
+    assert (arg);
+
+    int out_count = 0;
+    zchunk_t *chunk = (zchunk_t *) arg;
+
+    //  Store any comments on the item
+    if (self->comments) {
+        char *comment = (char *) zlist_first (self->comments);
+        while (comment) {
+            char curline [1024];
+            snprintf (curline, 1024, "#%s\n", comment);
+            out_count += strlen (curline);
+            if (chunk)
+                zchunk_append (chunk, curline, strlen (curline));
+            comment = (char *) zlist_next (self->comments);
+        }
+        //  Blank line after comments is nice
+        out_count++;
+        if (chunk)
+            zchunk_append (chunk, "\n", 1);
+    }
+    if (level > 0) {
+        char curline [1024];
+        if (self->value)
+            snprintf (curline, 1024, "%*s%s = \"%s\"\n",
+                     (level - 1) * 4, "",
+                      self->name? self->name: "(Unnamed)", self->value);
+        else
+            snprintf (curline, 1024, "%*s%s\n",
+                     (level - 1) * 4, "",
+                      self->name? self->name: "(Unnamed)");
+        out_count += strlen (curline);
+        if (chunk)
+            zchunk_append (chunk, curline, strlen (curline));
+    }
+    return out_count;
 }
 
 
@@ -597,64 +751,6 @@ zconfig_comments (zconfig_t *self)
 {
     assert (self);
     return self->comments;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Save a config item tree to a specified ZPL text file, where a filename
-//  "-" means dump to standard output.
-
-int
-zconfig_save (zconfig_t *self, const char *filename)
-{
-    assert (self);
-
-    int rc = 0;
-    if (streq (filename, "-")) {
-        //  "-" means write to stdout
-        rc = zconfig_execute (self, s_config_save, stdout);
-    }
-    else {
-        FILE *file;
-        file = fopen (filename, "w");
-        if (file)
-            rc = zconfig_execute (self, s_config_save, file);
-        else
-            rc = -1;          //  File not writeable
-        fflush (file);
-        fclose (file);
-    }
-    return rc;
-}
-
-//  Save an item
-
-static int
-s_config_save (zconfig_t *self, void *arg, int level)
-{
-    assert (self);
-    assert (arg);
-
-    FILE *file = (FILE *) arg;
-    //  Save any comments on the item
-    if (self->comments) {
-        char *comment = (char *) zlist_first (self->comments);
-        while (comment) {
-            fprintf (file, "#%s\n", comment);
-            comment = (char *) zlist_next (self->comments);
-        }
-        //  Blank line after comments is nice
-        fprintf (file, "\n");
-    }
-    if (level > 0) {
-        if (self->value)
-            fprintf (file, "%*s%s = \"%s\"\n", (level - 1) * 4, "",
-                self->name? self->name: "(Unnamed)", self->value);
-        else
-            fprintf (file, "%*s%s\n", (level - 1) * 4, "",
-                self->name? self->name: "(Unnamed)");
-    }
-    return 0;
 }
 
 
