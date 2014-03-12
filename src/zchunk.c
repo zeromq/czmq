@@ -204,6 +204,71 @@ zchunk_write (zchunk_t *self, FILE *handle)
 
 
 //  --------------------------------------------------------------------------
+//  Create copy of chunk, as new chunk object. Returns a fresh zchunk_t
+//  object, or NULL if there was not enough heap memory.
+
+zchunk_t *
+zchunk_dup (zchunk_t *self)
+{
+    assert (self);
+    zchunk_t *copy = zchunk_new (self->data, self->max_size);
+    if (!copy)
+        return NULL;
+
+    return copy;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Dump chunk to FILE stream, for debugging and tracing.
+
+void
+zchunk_fprint (zchunk_t *self, FILE *file)
+{
+    fprintf (file, "--------------------------------------\n");
+    if (!self) {
+        fprintf (file, "NULL");
+        return;
+    }
+    
+    byte *data = self->data;
+    size_t size = self->size;
+
+    int is_bin = 0;
+    uint char_nbr;
+    for (char_nbr = 0; char_nbr < size; char_nbr++)
+        if (data [char_nbr] < 9 || data [char_nbr] > 127)
+            is_bin = 1;
+
+    fprintf (file, "[%03d] ", (int) size);
+    size_t max_size = is_bin? 35: 70;
+    const char *ellipsis = "";
+    if (size > max_size) {
+        size = max_size;
+        ellipsis = "...";
+    }
+    for (char_nbr = 0; char_nbr < size; char_nbr++) {
+        if (is_bin)
+            fprintf (file, "%02X", (unsigned char) data [char_nbr]);
+        else
+            fprintf (file, "%c", data [char_nbr]);
+    }
+    fprintf (file, "%s\n", ellipsis);
+}
+
+
+
+//  --------------------------------------------------------------------------
+//  Dump message to stderr, for debugging and tracing.
+//  See zchunk_fprint for details
+
+void
+zchunk_print (zchunk_t *self)
+{
+    zchunk_fprint (self, stderr);
+}
+
+//  --------------------------------------------------------------------------
 //  Self test of this class
 int
 zchunk_test (bool verbose)

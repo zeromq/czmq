@@ -78,6 +78,20 @@ CZMQ_EXPORT zchunk_t *
 CZMQ_EXPORT int
     zchunk_write (zchunk_t *self, FILE *handle);
 
+//  Create copy of chunk, as new chunk object. Returns a fresh zchunk_t
+//  object, or NULL if there was not enough heap memory.
+CZMQ_EXPORT zchunk_t *
+    zchunk_dup (zchunk_t *self);
+
+//  Dump chunk to FILE stream, for debugging and tracing.
+CZMQ_EXPORT void
+    zchunk_fprint (zchunk_t *self, FILE *file);
+
+//  Dump message to stderr, for debugging and tracing.
+//  See zchunk_fprint for details
+CZMQ_EXPORT void
+    zchunk_print (zchunk_t *self);
+
 //  Self test of this class
 CZMQ_EXPORT int
     zchunk_test (bool verbose);
