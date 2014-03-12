@@ -164,18 +164,6 @@ zchunk_fill (zchunk_t *self, byte filler, size_t size)
 
 
 //  --------------------------------------------------------------------------
-//  Return a full copy of a chunk
-
-zchunk_t *
-zchunk_dup (zchunk_t *self)
-{
-    assert (self);
-    zchunk_t *copy = zchunk_new (self->data, self->size);
-    return copy;
-}
-
-
-//  --------------------------------------------------------------------------
 //  Append user-supplied data to chunk, return resulting chunk size
 
 size_t
@@ -223,11 +211,7 @@ zchunk_t *
 zchunk_dup (zchunk_t *self)
 {
     assert (self);
-    zchunk_t *copy = zchunk_new (self->data, self->max_size);
-    if (!copy)
-        return NULL;
-
-    return copy;
+    return zchunk_new (self->data, self->max_size);
 }
 
 
