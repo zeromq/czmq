@@ -639,14 +639,11 @@ zmsg_t *
 zmsg_dup (zmsg_t *self)
 {
     assert (self);
-    zframe_t *frame = zmsg_first (self);
-    if (!frame)
-        return NULL;
-
     zmsg_t *copy = zmsg_new ();
     if (!copy)
         return NULL;
 
+    zframe_t *frame = zmsg_first (self);
     while (frame) {
         if (zmsg_addmem (copy, zframe_data (frame), zframe_size (frame))) {
             zmsg_destroy (&copy);
