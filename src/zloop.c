@@ -229,14 +229,12 @@ zloop_destroy (zloop_t **self_p)
 //  the handler, passing the arg. Returns 0 if OK, -1 if there was an error.
 //  If you register the pollitem more than once, each instance will invoke its
 //  corresponding handler.
+//  A pollitem with socket=NULL and fd=0 will be interpreted as 'poll on fd zero'.
 
 int
 zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
 {
     assert (self);
-
-    if (!item->socket && !item->fd)
-        return -1;
 
     if (item->socket)
         if (streq (zsocket_type_str (item->socket), "UNKNOWN"))
