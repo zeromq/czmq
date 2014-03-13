@@ -83,7 +83,7 @@ zchunk_destroy (zchunk_t **self_p)
 
 
 //  --------------------------------------------------------------------------
-//  Resizes chunk max_size as requested; chunk_cur size is set to zero
+//  Resizes chunk max_size as requested; chunk size is set to zero
 
 void
 zchunk_resize (zchunk_t *self, size_t size)
@@ -99,7 +99,7 @@ zchunk_resize (zchunk_t *self, size_t size)
 
 
 //  --------------------------------------------------------------------------
-//  Return chunk cur size
+//  Return chunk current size
 
 size_t
 zchunk_size (zchunk_t *self)
@@ -211,11 +211,7 @@ zchunk_t *
 zchunk_dup (zchunk_t *self)
 {
     assert (self);
-    zchunk_t *copy = zchunk_new (self->data, self->max_size);
-    if (!copy)
-        return NULL;
-
-    return copy;
+    return zchunk_new (self->data, self->max_size);
 }
 
 
@@ -230,30 +226,31 @@ zchunk_fprint (zchunk_t *self, FILE *file)
         fprintf (file, "NULL");
         return;
     }
-    
-    byte *data = self->data;
-    size_t size = self->size;
-
+    assert (self);
     int is_bin = 0;
     uint char_nbr;
-    for (char_nbr = 0; char_nbr < size; char_nbr++)
-        if (data [char_nbr] < 9 || data [char_nbr] > 127)
+    for (char_nbr = 0; char_nbr < self->size; char_nbr++)
+        if (self->data [char_nbr] < 9 || self->data [char_nbr] > 127)
             is_bin = 1;
 
-    fprintf (file, "[%03d] ", (int) size);
-    size_t max_size = is_bin? 35: 70;
-    const char *ellipsis = "";
-    if (size > max_size) {
-        size = max_size;
-        ellipsis = "...";
+    fprintf (file, "[%03d] ", (int) self->size);
+    for (char_nbr = 0; char_nbr < self->size; char_nbr++) {
+        if (is_bin) {
+            fprintf (file, "%02X", (unsigned char) self->data [char_nbr]);
+            if (char_nbr > 35) {
+                fprintf (file, "...");
+                break;
+            }
+        }
+        else {
+            fprintf (file, "%c", self->data [char_nbr]);
+            if (char_nbr > 70) {
+                fprintf (file, "...");
+                break;
+            }
+        }
     }
-    for (char_nbr = 0; char_nbr < size; char_nbr++) {
-        if (is_bin)
-            fprintf (file, "%02X", (unsigned char) data [char_nbr]);
-        else
-            fprintf (file, "%c", data [char_nbr]);
-    }
-    fprintf (file, "%s\n", ellipsis);
+    fprintf (file, "\n");
 }
 
 
@@ -267,6 +264,7 @@ zchunk_print (zchunk_t *self)
 {
     zchunk_fprint (self, stderr);
 }
+
 
 //  --------------------------------------------------------------------------
 //  Self test of this class
@@ -288,6 +286,12 @@ zchunk_test (bool verbose)
     zchunk_append (chunk, "GHIJKLMN", 8);
     assert (memcmp (zchunk_data (chunk), "1234567890", 10) == 0);
     assert (zchunk_size (chunk) == 10);
+    
+    zchunk_t *copy = zchunk_dup (chunk);
+    assert (memcmp (zchunk_data (copy), "1234567890", 10) == 0);
+    assert (zchunk_size (copy) == 10);
+    zchunk_destroy (&copy);
+    
     zchunk_destroy (&chunk);
     //  @end
 
