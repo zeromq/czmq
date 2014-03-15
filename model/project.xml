@@ -23,7 +23,6 @@
     <class name = "zpoller" />
     <class name = "zproxy" />
     <class name = "zrex" />
-    <class name = "zservice" />
     <class name = "zsocket" />
     <class name = "zsockopt" />
     <class name = "zstr" />

@@ -10,7 +10,7 @@ INCDIR=-I$(PREFIX)/include -I.
 LIBDIR=-L$(PREFIX)/lib
 CFLAGS=-Wall -Os -g -DDLL_EXPORT $(INCDIR)
 
-OBJS = zauth.o zbeacon.o zcert.o zcertstore.o zchunk.o zclock.o zconfig.o zctx.o zdir.o zdir_patch.o zdigest.o zfile.o zframe.o zhash.o zlist.o zloop.o zmonitor.o zmsg.o zmutex.o zpoller.o zproxy.o zrex.o zservice.o zsocket.o zsockopt.o zstr.o zsys.o zthread.o ztree.o zuuid.o
+OBJS = zauth.o zbeacon.o zcert.o zcertstore.o zchunk.o zclock.o zconfig.o zctx.o zdir.o zdir_patch.o zdigest.o zfile.o zframe.o zhash.o zlist.o zloop.o zmonitor.o zmsg.o zmutex.o zpoller.o zproxy.o zrex.o zsocket.o zsockopt.o zstr.o zsys.o zthread.o ztree.o zuuid.o
 
 %.o: ../../src/%.c
     $(CC) -c -o $@ $< $(CFLAGS)

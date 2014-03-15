@@ -20,7 +20,7 @@ include $(PREBUILT_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 LOCAL_MODULE := czmq
 LOCAL_C_INCLUDES := ../../include $(LIBZMQ)/include
-LOCAL_SRC_FILES := zauth.c zbeacon.c zcert.c zcertstore.c zchunk.c zclock.c zconfig.c zctx.c zdir.c zdir_patch.c zdigest.c zfile.c zframe.c zhash.c zlist.c zloop.c zmonitor.c zmsg.c zmutex.c zpoller.c zproxy.c zrex.c zservice.c zsocket.c zsockopt.c zstr.c zsys.c zthread.c ztree.c zuuid.c
+LOCAL_SRC_FILES := zauth.c zbeacon.c zcert.c zcertstore.c zchunk.c zclock.c zconfig.c zctx.c zdir.c zdir_patch.c zdigest.c zfile.c zframe.c zhash.c zlist.c zloop.c zmonitor.c zmsg.c zmutex.c zpoller.c zproxy.c zrex.c zsocket.c zsockopt.c zstr.c zsys.c zthread.c ztree.c zuuid.c
 LOCAL_SHARED_LIBRARIES := zmq
 include $(BUILD_SHARED_LIBRARY)
 

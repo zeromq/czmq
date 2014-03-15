@@ -1533,38 +1533,6 @@
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
                 </FileConfiguration>
             </File>
-            <File RelativePath="..\..\src\zservice.c" >
-                <FileConfiguration Name="Release|Win32" >
-                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
-                </FileConfiguration>
-                <FileConfiguration Name="Release|x64" >
-                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
-                </FileConfiguration>
-                <FileConfiguration Name="Debug|Win32" >
-                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
-                </FileConfiguration>
-                <FileConfiguration Name="Debug|x64" >
-                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
-                </FileConfiguration>
-                <FileConfiguration Name="DebugDLL|Win32" >
-                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
-                </FileConfiguration>
-                <FileConfiguration Name="DebugDLL|x64" >
-                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
-                </FileConfiguration>
-                <FileConfiguration Name="ReleaseDLL|Win32" >
-                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
-                </FileConfiguration>
-                <FileConfiguration Name="ReleaseDLL|x64" >
-                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
-                </FileConfiguration>
-                <FileConfiguration Name="RelWithDebInfo|Win32" >
-                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
-                </FileConfiguration>
-                <FileConfiguration Name="RelWithDebInfo|x64" >
-                    <Tool Name="VCCLCompilerTool" CompileAs="2" />
-                </FileConfiguration>
-            </File>
             <File RelativePath="..\..\src\zsocket.c" >
                 <FileConfiguration Name="Release|Win32" >
                     <Tool Name="VCCLCompilerTool" CompileAs="2" />
@@ -1818,7 +1786,6 @@
             <File RelativePath="..\..\include\zpoller.h" />
             <File RelativePath="..\..\include\zproxy.h" />
             <File RelativePath="..\..\include\zrex.h" />
-            <File RelativePath="..\..\include\zservice.h" />
             <File RelativePath="..\..\include\zsocket.h" />
             <File RelativePath="..\..\include\zsockopt.h" />
             <File RelativePath="..\..\include\zstr.h" />
