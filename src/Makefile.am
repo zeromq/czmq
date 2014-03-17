@@ -32,7 +32,6 @@ include_HEADERS = \
     ../include/zpoller.h \
     ../include/zproxy.h \
     ../include/zrex.h \
-    ../include/zservice.h \
     ../include/zsocket.h \
     ../include/zsockopt.h \
     ../include/zstr.h \
@@ -65,7 +64,6 @@ libczmq_la_SOURCES = \
     zpoller.c \
     zproxy.c \
     zrex.c \
-    zservice.c \
     zsocket.c \
     zsockopt.c \
     zstr.c \

@@ -3,7 +3,7 @@
 #   Please read the README.txt file in the model directory.     #
 #################################################################
 MAN1 =
-MAN3 = zauth.3 zbeacon.3 zcert.3 zcertstore.3 zchunk.3 zclock.3 zconfig.3 zctx.3 zdir.3 zdir_patch.3 zdigest.3 zfile.3 zframe.3 zhash.3 zlist.3 zloop.3 zmonitor.3 zmsg.3 zmutex.3 zpoller.3 zproxy.3 zrex.3 zservice.3 zsocket.3 zsockopt.3 zstr.3 zsys.3 zthread.3 ztree.3 zuuid.3
+MAN3 = zauth.3 zbeacon.3 zcert.3 zcertstore.3 zchunk.3 zclock.3 zconfig.3 zctx.3 zdir.3 zdir_patch.3 zdigest.3 zfile.3 zframe.3 zhash.3 zlist.3 zloop.3 zmonitor.3 zmsg.3 zmutex.3 zpoller.3 zproxy.3 zrex.3 zsocket.3 zsockopt.3 zstr.3 zsys.3 zthread.3 ztree.3 zuuid.3
 MAN7 = czmq.7
 MAN_DOC = $(MAN1) $(MAN3) $(MAN7)
 
