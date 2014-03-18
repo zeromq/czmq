@@ -199,30 +199,18 @@ zmsg_content_size (zmsg_t *self)
 //  --------------------------------------------------------------------------
 //  Push frame to the front of the message, i.e. before all other frames.
 //  Message takes ownership of frame, will destroy it when message is sent.
-//  Returns 0 on success, -1 on error.
+//  Returns 0 on success, -1 on error. Deprecates zmsg_push, which did not
+//  nullify the caller's frame reference.
 
 int
-zmsg_push (zmsg_t *self, zframe_t *frame)
+zmsg_prepend (zmsg_t *self, zframe_t **frame_p)
 {
     assert (self);
-    assert (frame);
+    assert (frame_p);
+    zframe_t *frame = *frame_p;
+    *frame_p = NULL;            //  We now own frame
     self->content_size += zframe_size (frame);
-    return zlist_push (self->frames, (void *) frame);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Remove first frame from message, if any. Returns frame, or NULL. Caller
-//  now owns frame and must destroy it when finished with it.
-
-zframe_t *
-zmsg_pop (zmsg_t *self)
-{
-    assert (self);
-    zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
-    if (frame)
-        self->content_size -= zframe_size (frame);
-    return frame;
+    return zlist_push (self->frames, frame);
 }
 
 
@@ -244,17 +232,17 @@ zmsg_append (zmsg_t *self, zframe_t **frame_p)
 
 
 //  --------------------------------------------------------------------------
-//  Add frame to the end of the message, i.e. after all other frames.
-//  Message takes ownership of frame, will destroy it when message is sent.
-//  Returns 0 on success. Deprecated by zmsg_append ().
+//  Remove first frame from message, if any. Returns frame, or NULL. Caller
+//  now owns frame and must destroy it when finished with it.
 
-int
-zmsg_add (zmsg_t *self, zframe_t *frame)
+zframe_t *
+zmsg_pop (zmsg_t *self)
 {
     assert (self);
-    assert (frame);
-    self->content_size += zframe_size (frame);
-    return zlist_append (self->frames, frame);
+    zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
+    if (frame)
+        self->content_size -= zframe_size (frame);
+    return frame;
 }
 
 
@@ -383,20 +371,6 @@ zmsg_popstr (zmsg_t *self)
         zframe_destroy (&frame);
     }
     return string;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Push frame plus empty frame to front of message, before first frame.
-//  Message takes ownership of frame, will destroy it when message is sent.
-
-void
-zmsg_wrap (zmsg_t *self, zframe_t *frame)
-{
-    assert (self);
-    assert (frame);
-    if (zmsg_pushmem (self, "", 0) == 0)
-        zmsg_push (self, frame);
 }
 
 
@@ -688,6 +662,53 @@ zmsg_print (zmsg_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  Push frame plus empty frame to front of message, before first frame.
+//  Message takes ownership of frame, will destroy it when message is sent.
+//  DEPRECATED as unsafe -- does not nullify frame reference.
+
+void
+zmsg_wrap (zmsg_t *self, zframe_t *frame)
+{
+    assert (self);
+    assert (frame);
+    if (zmsg_pushmem (self, "", 0) == 0)
+        zmsg_push (self, frame);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Push frame to the front of the message, i.e. before all other frames.
+//  Message takes ownership of frame, will destroy it when message is sent.
+//  Returns 0 on success, -1 on error.
+//  DEPRECATED by zmsg_prepend ().
+
+int
+zmsg_push (zmsg_t *self, zframe_t *frame)
+{
+    assert (self);
+    assert (frame);
+    self->content_size += zframe_size (frame);
+    return zlist_push (self->frames, frame);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Add frame to the end of the message, i.e. after all other frames.
+//  Message takes ownership of frame, will destroy it when message is sent.
+//  Returns 0 on success.
+//  DEPRECATED by zmsg_append ().
+
+int
+zmsg_add (zmsg_t *self, zframe_t *frame)
+{
+    assert (self);
+    assert (frame);
+    self->content_size += zframe_size (frame);
+    return zlist_append (self->frames, frame);
+}
+
+
+//  --------------------------------------------------------------------------
 //  Selftest
 
 int
@@ -712,7 +733,7 @@ zmsg_test (bool verbose)
     assert (msg);
     zframe_t *frame = zframe_new ("Hello", 5);
     assert (frame);
-    zmsg_push (msg, frame);
+    zmsg_prepend (msg, &frame);
     assert (zmsg_size (msg) == 1);
     assert (zmsg_content_size (msg) == 5);
     rc = zmsg_send (&msg, output);
