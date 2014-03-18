@@ -297,22 +297,11 @@ zcert_save (zcert_t *self, const char *filename)
     zcert_save_public (self, filename);
 
     //  Now save secret certificate using filename with "_secret" suffix
-    s_save_metadata_all (self);
-    zconfig_set_comment (self->config,
-        "   ZeroMQ CURVE **Secret** Certificate");
-    zconfig_set_comment (self->config,
-        "   DO NOT PROVIDE THIS FILE TO OTHER USERS nor change its permissions.");
-    zconfig_put (self->config, "/curve/public-key", self->public_txt);
-    zconfig_put (self->config, "/curve/secret-key", self->secret_txt);
-    
     char filename_secret [256];
     snprintf (filename_secret, 256, "%s_secret", filename);
-    zsys_file_mode_private ();
-    int rc = zconfig_save (self->config, filename_secret);
-    zsys_file_mode_default ();
+    int rc = zcert_save_secret (self, filename_secret);
     return rc;
 }
-
 
 //  --------------------------------------------------------------------------
 //  Save public certificate only to file for persistent storage.
@@ -335,6 +324,29 @@ zcert_save_public (zcert_t *self, const char *filename)
     
     zconfig_put (self->config, "/curve/public-key", self->public_txt);
     int rc = zconfig_save (self->config, filename);
+    return rc;
+}
+
+//  --------------------------------------------------------------------------
+//  Save public certificate only to file for persistent storage.
+
+int
+zcert_save_secret (zcert_t *self, const char *filename)
+{
+    assert (self);
+    assert (filename);
+
+    s_save_metadata_all (self);
+    zconfig_set_comment (self->config,
+        "   ZeroMQ CURVE **Secret** Certificate");
+    zconfig_set_comment (self->config,
+        "   DO NOT PROVIDE THIS FILE TO OTHER USERS nor change its permissions.");
+    zconfig_put (self->config, "/curve/public-key", self->public_txt);
+    zconfig_put (self->config, "/curve/secret-key", self->secret_txt);
+    
+    zsys_file_mode_private ();
+    int rc = zconfig_save (self->config, filename);
+    zsys_file_mode_default ();
     return rc;
 }
 
