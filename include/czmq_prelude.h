@@ -511,6 +511,8 @@ typedef int SOCKET;
 #   else
 #       define CZMQ_EXPORT __declspec(dllimport)
 #   endif
+#else
+#   define CZMQ_EXPORT
 #endif
 
 //- Always include ZeroMQ header file ---------------------------------------
