@@ -168,7 +168,8 @@ zlist_next (zlist_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Add item to the end of the list
+//  Append an item to the end of the list, return 0 if OK
+//  or -1 if this failed for some reason (out of memory).
 
 int
 zlist_append (zlist_t *self, void *item)
@@ -187,17 +188,19 @@ zlist_append (zlist_t *self, void *item)
         self->tail->next = node;
     else
         self->head = node;
+    
     self->tail = node;
     node->next = NULL;
+    
     self->size++;
     self->cursor = NULL;
-
     return 0;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Insert item at the beginning of the list
+//  Push an item to the start of the list, return 0 if OK
+//  or -1 if this failed for some reason (out of memory).
 
 int
 zlist_push (zlist_t *self, void *item)
@@ -216,6 +219,7 @@ zlist_push (zlist_t *self, void *item)
     self->head = node;
     if (self->tail == NULL)
         self->tail = node;
+    
     self->size++;
     self->cursor = NULL;
     return 0;
