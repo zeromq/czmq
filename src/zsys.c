@@ -521,12 +521,20 @@ zsys_socket_error (const char *reason)
     ||  errno == EINTR
     ||  errno == EPIPE
     ||  errno == ECONNRESET
-#if !defined (__WINDOWS__)
-    ||  errno == EPROTO
+#if defined (ENOPROTOOPT)
     ||  errno == ENOPROTOOPT
+#endif
+#if defined (EHOSTDOWN)
     ||  errno == EHOSTDOWN
+#endif
+#if defined (EOPNOTSUPP)
     ||  errno == EOPNOTSUPP
+#endif
+#if defined (EWOULDBLOCK)
     ||  errno == EWOULDBLOCK
+#endif
+#if defined (EPROTO)
+    ||  errno == EPROTO
 #endif
 #if defined (ENONET)
     ||  errno == ENONET

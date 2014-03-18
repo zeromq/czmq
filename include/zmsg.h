@@ -69,14 +69,10 @@ CZMQ_EXPORT size_t
 
 //  Push frame to the front of the message, i.e. before all other frames.
 //  Message takes ownership of frame, will destroy it when message is sent.
-//  Returns 0 on success, -1 on error.
+//  Returns 0 on success, -1 on error. Deprecates zmsg_push, which did not
+//  nullify the caller's frame reference.
 CZMQ_EXPORT int
-    zmsg_push (zmsg_t *self, zframe_t *frame);
-
-//  Remove first frame from message, if any. Returns frame, or NULL. Caller
-//  now owns frame and must destroy it when finished with it.
-CZMQ_EXPORT zframe_t *
-    zmsg_pop (zmsg_t *self);
+    zmsg_prepend (zmsg_t *self, zframe_t **frame_p);
 
 //  Add frame to the end of the message, i.e. after all other frames.
 //  Message takes ownership of frame, will destroy it when message is sent.
@@ -85,12 +81,10 @@ CZMQ_EXPORT zframe_t *
 CZMQ_EXPORT int
     zmsg_append (zmsg_t *self, zframe_t **frame_p);
 
-//  Add frame to the end of the message, i.e. after all other frames.
-//  Message takes ownership of frame, will destroy it when message is sent.
-//  Returns 0 on success.
-//  DEPRECATED - will be removed for next stable release
-CZMQ_EXPORT int
-    zmsg_add (zmsg_t *self, zframe_t *frame);
+//  Remove first frame from message, if any. Returns frame, or NULL. Caller
+//  now owns frame and must destroy it when finished with it.
+CZMQ_EXPORT zframe_t *
+    zmsg_pop (zmsg_t *self);
 
 //  Push block of memory to front of message, as a new frame.
 //  Returns 0 on success, -1 on error.
@@ -126,11 +120,6 @@ CZMQ_EXPORT int
 //  no more frames in the message, returns NULL.
 CZMQ_EXPORT char *
     zmsg_popstr (zmsg_t *self);
-
-//  Push frame plus empty frame to front of message, before first frame.
-//  Message takes ownership of frame, will destroy it when message is sent.
-CZMQ_EXPORT void
-    zmsg_wrap (zmsg_t *self, zframe_t *frame);
 
 //  Pop frame off front of message, caller now owns frame
 //  If next frame is empty, pops and destroys that empty frame.
@@ -200,6 +189,23 @@ CZMQ_EXPORT void
 CZMQ_EXPORT int
     zmsg_test (bool verbose);
 //  @end
+
+//  Push frame plus empty frame to front of message, before first frame.
+//  Message takes ownership of frame, will destroy it when message is sent.
+//  DEPRECATED as unsafe -- does not nullify frame reference.
+CZMQ_EXPORT void
+    zmsg_wrap (zmsg_t *self, zframe_t *frame);
+
+//  DEPRECATED - will be removed for next + 1 stable release
+//  Add frame to the front of the message, i.e. before all other frames.
+//  Message takes ownership of frame, will destroy it when message is sent.
+//  Returns 0 on success, -1 on error.
+CZMQ_EXPORT int
+    zmsg_push (zmsg_t *self, zframe_t *frame);
+
+//  DEPRECATED - will be removed for next stable release
+CZMQ_EXPORT int
+    zmsg_add (zmsg_t *self, zframe_t *frame);
 
 #ifdef __cplusplus
 }
