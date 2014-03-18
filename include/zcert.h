@@ -90,6 +90,10 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zcert_save_public (zcert_t *self, const char *filename);
 
+//  Save secret certificate only to file for persistent storage
+CZMQ_EXPORT int
+    zcert_save_secret (zcert_t *self, const char *filename);
+
 //  Apply certificate to socket, i.e. use for CURVE security on socket.
 //  If certificate was loaded from public file, the secret key will be
 //  undefined, and this certificate will not work successfully.
