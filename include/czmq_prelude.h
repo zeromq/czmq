@@ -503,7 +503,7 @@ typedef int SOCKET;
 
 //- DLL exports -------------------------------------------------------------
 
-#if defined (_WIN32)
+#if defined (__WINDOWS__)
 #   if defined LIBCZMQ_STATIC
 #       define CZMQ_EXPORT
 #   elif defined LIBCZMQ_EXPORTS
