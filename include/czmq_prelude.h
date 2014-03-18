@@ -503,14 +503,14 @@ typedef int SOCKET;
 
 //- DLL exports -------------------------------------------------------------
 
-#if defined (_WINDLL)
-#   if defined LIBCZMQ_EXPORTS
+#if defined (_WIN32)
+#   if defined LIBCZMQ_STATIC
+#       define CZMQ_EXPORT
+#   elif defined LIBCZMQ_EXPORTS
 #       define CZMQ_EXPORT __declspec(dllexport)
 #   else
 #       define CZMQ_EXPORT __declspec(dllimport)
 #   endif
-#else
-#   define CZMQ_EXPORT
 #endif
 
 //- Always include ZeroMQ header file ---------------------------------------
