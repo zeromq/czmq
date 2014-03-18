@@ -452,20 +452,20 @@ zconfig_chunk_load (zchunk_t *chunk)
     while (remaining) {
         //  Copy stuff into cur_line; not fastest but safest option
         //  since chunk may not be null terminated, etc.
-        char cur_line [1024 + 1];
-        char *eoln = strchr (data_ptr, '\n');
+        char *eoln = (char *) memchr (data_ptr, '\n', remaining);
         size_t cur_size;
         if (eoln)
             cur_size = eoln - data_ptr;
         else
             cur_size = remaining;
         
-        remaining -= cur_size;
         if (cur_size > 1024)
             cur_size = 1024;
+        char cur_line [1024 + 1];
         memcpy (cur_line, data_ptr, cur_size);
         cur_line [cur_size] = '\0';
         data_ptr = eoln? eoln + 1: NULL;
+        remaining -= cur_size + 1;
         
         //  Trim line
         int length = strlen (cur_line);
