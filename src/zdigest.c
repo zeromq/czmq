@@ -35,7 +35,6 @@
 */
 
 #include "../include/czmq.h"
-// #include "../foreign/sha1/sha1.h"
 #include "../foreign/sha1/sha1.c"
 
 

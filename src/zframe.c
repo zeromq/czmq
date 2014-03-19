@@ -38,17 +38,10 @@
 
 #include "../include/czmq.h"
 
-// See <stdlib.h> for preceding exported definition.
-#ifndef _CRT_ERRNO_DEFINED
-extern int errno;
-#endif  /* _CRT_ERRNO_DEFINED */
-
 //  Structure of our class
 
 struct _zframe_t {
     zmq_msg_t zmsg;             //  zmq_msg_t blob for frame
-    byte *needle;               //  Read/write pointer for serialization
-    byte *ceiling;              //  Valid upper limit for read pointer
     int more;                   //  More flag, from last read
 };
 
@@ -65,21 +58,15 @@ zframe_new (const void *data, size_t size)
 
     if (size) {
         zmq_msg_init_size (&self->zmsg, size);
-        if (data) {
+        if (data)
             memcpy (zmq_msg_data (&self->zmsg), data, size);
-            self->needle = zframe_data (self) + zframe_size (self);
-            self->ceiling = self->needle + zframe_size (self);
-        }
-        else {
-            self->needle = zframe_data (self);
-            self->ceiling = self->needle + zframe_size (self);
-        }
     }
     else
         zmq_msg_init (&self->zmsg);
 
     return self;
 }
+
 
 //  --------------------------------------------------------------------------
 //  Constructor; Allocates a new empty (zero-sized) frame
@@ -94,6 +81,7 @@ zframe_new_empty (void)
     zmq_msg_init (&self->zmsg);
     return self;
 }
+
 
 //  --------------------------------------------------------------------------
 //  Destructor
@@ -127,8 +115,6 @@ zframe_recv (void *zocket)
             return NULL;            //  Interrupted or terminated
         }
         self->more = zsocket_rcvmore (zocket);
-        self->needle = zframe_data (self);
-        self->ceiling = self->needle + zframe_size (self);
     }
     return self;
 }
@@ -378,252 +364,6 @@ zframe_reset (zframe_t *self, const void *data, size_t size)
 
 
 //  --------------------------------------------------------------------------
-// Helper method which tests if there's 'bytes' space left on the frame
-
-static bool
-s_sufficient_data (zframe_t *self, size_t bytes)
-{
-    return (self->needle + bytes) <= self->ceiling;
-}
-
-//  --------------------------------------------------------------------------
-//  Put a block of data to the frame payload. Returns 0 if successful else -1
-
-int
-zframe_put_block (zframe_t *self, byte *data, size_t size)
-{
-    assert (self);
-    if (s_sufficient_data (self, size)) {
-        memcpy (self->needle, data, size);
-        self->needle += size;
-        return 0;
-    }
-    else
-        return -1;
-}
-
-//  --------------------------------------------------------------------------
-//  Put one byte to frame payload. Returns 0 if successful else -1
-
-int
-zframe_put_uint8 (zframe_t *self, uint8_t data)
-{
-    assert (self);
-    if (s_sufficient_data (self, 1)) {
-        self->needle [0] = data;
-        self->needle++;
-        return 0;
-    }
-    else
-        return -1;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Put two bytes to frame payload. Returns 0 if successful else -1
-
-int
-zframe_put_uint16 (zframe_t *self, uint16_t data)
-{
-    assert (self);
-    if (s_sufficient_data (self, 2)) {
-        self->needle [0] = (byte) (data >> 8) & 255;
-        self->needle [1] = (byte) (data & 255);
-        self->needle += 2;
-        return 0;
-    }
-    else
-        return -1;
-}
-
-//  --------------------------------------------------------------------------
-//  Put four bytes to frame payload. Returns 0 if successful else -1
-
-int
-zframe_put_uint32 (zframe_t *self, uint32_t data)
-{
-    assert (self);
-    if (s_sufficient_data (self, 4)) {
-        self->needle [0] = (byte) (data >> 24) & 255;
-        self->needle [1] = (byte) (data >> 16) & 255;
-        self->needle [2] = (byte) (data >>  8) & 255;
-        self->needle [3] = (byte) (data & 255);
-        self->needle += 4;
-        return 0;
-    }
-    else
-        return -1;
-}
-
-//  --------------------------------------------------------------------------
-//  Put eight bytes to frame payload. Returns 0 if successful else -1
-
-int
-zframe_put_uint64 (zframe_t *self, uint64_t data)
-{
-    assert (self);
-    if (s_sufficient_data (self, 8)) {
-        self->needle [0] = (byte) (data >> 56) & 255;
-        self->needle [1] = (byte) (data >> 48) & 255;
-        self->needle [2] = (byte) (data >> 40) & 255;
-        self->needle [3] = (byte) (data >> 32) & 255;
-        self->needle [4] = (byte) (data >> 24) & 255;
-        self->needle [5] = (byte) (data >> 16) & 255;
-        self->needle [6] = (byte) (data >>  8) & 255;
-        self->needle [7] = (byte) (data & 255);
-        self->needle += 8;
-        return 0;
-    }
-    else
-        return -1;
-}
-
-//  --------------------------------------------------------------------------
-//  Put a string to frame payload. Returns 0 if successful else -1
-//  The string length limited to 2^16 - 1 for '\0' => 65535 characters.
-//  For allocation purpose calculate: (string length + 2) bytes
-
-int
-zframe_put_string (zframe_t *self, const char *data)
-{
-    assert (self);
-    uint16_t size = strlen (data);
-    if (s_sufficient_data (self, 2 + size)) {
-        zframe_put_uint16 (self, size);
-        memcpy (self->needle, data, size);
-        self->needle += size;
-        return 0;
-    }
-    else
-        return -1;
-}
-
-//  --------------------------------------------------------------------------
-//  Get a block of data from the frame payload by copying it to the 'data'
-//  location. If there was insufficient data in the frame, returns -1
-
-int
-zframe_get_block (zframe_t *self, byte *data, size_t size)
-{
-    assert (self);  
-    if (s_sufficient_data (self, size)) {
-        memcpy (data, self->needle, size);
-        self->needle += size;
-        return 0;
-    }
-    else 
-        return -1;
-}
-
-//  --------------------------------------------------------------------------
-//  Get a 1-byte integer from the frame payload by copying it to the 'data'
-//  location. If there was insufficient data in the frame, returns -1.
-
-int
-zframe_get_uint8 (zframe_t *self, uint8_t *data)
-{
-    assert (self);
-    if (s_sufficient_data (self, 1)) {
-        *data = *(byte *) self->needle;
-        self->needle++;
-        return 0;
-    }
-    else
-        return -1;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Get a 2-byte integer from the frame payload by copying it to the 'data'
-//  location. If there was insufficient data in the frame, returns -1.
-
-int 
-zframe_get_uint16 (zframe_t *self, uint16_t *data)
-{
-    assert (self);
-    if (s_sufficient_data (self, 2)) {
-        *data = ((uint16_t) (self->needle [0]) << 8)
-              +  (uint16_t) (self->needle [1]);
-        self->needle += 2;
-        return 0;
-    }
-    else
-        return -1;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Get a 4-byte integer from the frame payload by copying it to the 'data'
-//  location. If there was insufficient data in the frame, returns -1.
-
-int 
-zframe_get_uint32 (zframe_t *self, uint32_t *data)
-{
-    assert (self);
-    if (s_sufficient_data (self, 4)) {
-        *data = ((uint32_t) (self->needle [0]) << 24)
-              + ((uint32_t) (self->needle [1]) << 16)
-              + ((uint32_t) (self->needle [2]) << 8)
-              +  (uint32_t) (self->needle [3]);
-        self->needle += 4;
-        return 0;
-    }
-    else
-        return -1;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Get a 8-byte integer from the frame payload by copying it to the 'data'
-//  location. If there was insufficient data in the frame, returns -1.
-
-int
-zframe_get_uint64 (zframe_t *self, uint64_t *data)
-{
-    assert (self);
-    if (s_sufficient_data (self, 8)) {
-        *data = ((uint64_t) (self->needle [0]) << 56)
-              + ((uint64_t) (self->needle [1]) << 48)
-              + ((uint64_t) (self->needle [2]) << 40)
-              + ((uint64_t) (self->needle [3]) << 32)
-              + ((uint64_t) (self->needle [4]) << 24)
-              + ((uint64_t) (self->needle [5]) << 16)
-              + ((uint64_t) (self->needle [6]) << 8)
-              +  (uint64_t) (self->needle [7]);
-        self->needle += 8;
-        return 0;
-    }
-    else
-        return -1;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Get a newly allocated string from frame payload. Returns char pointer to 
-//  a string. The max string size can be 2^16 and is 0 terminated. If there
-//  was insufficient data in the frame, or the frame was badly formatted,
-//  returns NULL.
-
-char *
-zframe_get_string (zframe_t *self)
-{
-    assert (self);
-    uint16_t size;
-    int rc = zframe_get_uint16 (self, &size);
-    assert (rc == 0);
-    if (s_sufficient_data (self, size)) {
-        char *data = (char *) malloc (size + 1);
-        memcpy (data, self->needle, size);
-        data [size] = 0;
-        self->needle += size;
-        return data;
-    }
-    else
-        return NULL;
-}
-
-
-//  --------------------------------------------------------------------------
 //  Selftest
 
 int
@@ -703,61 +443,6 @@ zframe_test (bool verbose)
     frame = zframe_recv_nowait (input);
     assert (frame == NULL);
 
-    // Write custom frame
-    frame = zframe_new (NULL, 45);
-    uint8_t  test_8bit  = 0xFF;
-    uint16_t test_16bit = 0xFFFF;
-    uint32_t test_32bit = 0xFFFFFFFF;
-    uint64_t test_64bit = 0xFFFFFFFFFFFFFFFF;
-    char *test_string = "Hello World!";
-    zuuid_t *test_uuid = zuuid_new ();
-    rc = zframe_put_uint8 (frame, test_8bit);
-    assert (rc == 0);
-    rc = zframe_put_uint16 (frame, test_16bit);
-    assert (rc == 0);
-    rc = zframe_put_uint32 (frame, test_32bit);
-    assert (rc == 0);
-    rc = zframe_put_uint64 (frame, test_64bit);
-    assert (rc == 0);
-    rc = zframe_put_string (frame, test_string);
-    assert (rc == 0);
-    rc = zframe_put_block (frame, zuuid_data (test_uuid), 16);
-    assert (rc == 0);
-    // one byte more than allocated, expect 1
-    rc = zframe_put_uint8 (frame, test_8bit);
-    assert (rc == -1);
-    rc = zframe_send (&frame, output, 0);
-    assert (rc == 0);
-
-    // Read custom frame
-    frame = zframe_recv (input);
-    uint8_t bit8;
-    rc = zframe_get_uint8 (frame, &bit8);
-    assert (rc == 0);
-    assert (bit8 == test_8bit);
-    uint16_t bit16;
-    rc = zframe_get_uint16 (frame, &bit16);
-    assert (rc == 0);
-    assert (bit16 == test_16bit);
-    uint32_t bit32;
-    rc = zframe_get_uint32 (frame, &bit32);
-    assert (rc == 0);
-    assert (bit32 == test_32bit);
-    uint64_t bit64;
-    rc = zframe_get_uint64 (frame, &bit64);
-    assert (rc == 0);
-    assert (bit64 == test_64bit);
-    char *hello = zframe_get_string (frame);
-    assert (streq (hello, test_string));
-    free (hello);
-    zuuid_t *uuid = zuuid_new ();
-    zframe_get_block (frame, zuuid_data (uuid), 16);
-    assert (zuuid_eq (uuid, zuuid_data (test_uuid)));
-    zuuid_destroy (&uuid);
-    zframe_destroy (&frame);
-    assert (frame == NULL);
-
-    zuuid_destroy (&test_uuid);
     zctx_destroy (&ctx);
     //  @end
     printf ("OK\n");

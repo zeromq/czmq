@@ -834,12 +834,12 @@ zmsg_test (bool verbose)
     assert (zmsg_content_size (msg) == 12);
     frame = zframe_new ("Address", 7);
     assert (frame);
-    zmsg_wrap (msg, frame);
-    assert (zmsg_size (msg) == 4);
+    zmsg_prepend (msg, &frame);
+    assert (zmsg_size (msg) == 3);
     rc = zmsg_addstr (msg, "Body");
     assert (rc == 0);
-    assert (zmsg_size (msg) == 5);
-    frame = zmsg_unwrap (msg);
+    assert (zmsg_size (msg) == 4);
+    frame = zmsg_pop (msg);
     zframe_destroy (&frame);
     assert (zmsg_size (msg) == 3);
     char *body = zmsg_popstr (msg);
