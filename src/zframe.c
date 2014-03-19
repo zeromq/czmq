@@ -38,7 +38,10 @@
 
 #include "../include/czmq.h"
 
+// See <stdlib.h> for preceding exported definition.
+#ifndef _CRT_ERRNO_DEFINED
 extern int errno;
+#endif  /* _CRT_ERRNO_DEFINED */
 
 //  Structure of our class
 

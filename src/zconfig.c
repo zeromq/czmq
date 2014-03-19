@@ -179,7 +179,7 @@ zconfig_put (zconfig_t *self, const char *path, const char *value)
         path++;
         
     //  Check length of next path segment
-    char *slash = strchr (path, '/');
+    const char *slash = strchr (path, '/');
     int length = strlen (path);
     if (slash)
         length = slash - path;
@@ -273,7 +273,7 @@ zconfig_locate (zconfig_t *self, const char *path)
     //  Check length of next path segment
     if (*path == '/')
         path++;
-    char *slash = strchr (path, '/');
+    const char *slash = strchr (path, '/');
     int length = strlen (path);
     if (slash)
         length = slash - path;
