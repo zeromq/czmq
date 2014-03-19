@@ -62,3 +62,6 @@ foreign/trex/test2
 src/czmq_selftest.log
 src/czmq_selftest.trs
 src/test-suite.log
+/bin/
+/obj/
+/lib/

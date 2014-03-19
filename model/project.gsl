@@ -7,4 +7,5 @@
 .include "build-mingw32.gsl"
 .include "build-vcproj.gsl"
 .include "build-vcxproj.gsl"
+.include "build-vcxproj12.gsl"
 .include "build-autoconf.gsl"

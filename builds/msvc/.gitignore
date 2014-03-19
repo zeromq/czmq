@@ -19,3 +19,4 @@ mt.dep
 *.opensdf
 *.suo
 *.sdf
+*.vcxproj.user
