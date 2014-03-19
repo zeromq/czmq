@@ -1,4 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+#################################################################
+#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
+#   Please read the README.txt file in the model directory.     #
+#################################################################
+-->
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A5497C4B-1CD1-4779-9458-2CF7908E7E26}</ProjectGuid>
@@ -119,11 +125,16 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\src\czmq_selftest.c" />
   </ItemGroup>
-  <!--<ItemGroup>
-    <ProjectReference Include="..\czmq\czmq.vcxproj">
+    <ItemGroup>
+    <ProjectReference Include="..\czmq\czmq12.vcxproj">
       <Project>{0C4A2E28-8C9E-4B27-85D9-BB679AD84AC7}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-  </ItemGroup>-->
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+<!--
+#################################################################
+#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
+#   Please read the README.txt file in the model directory.     #
+#################################################################
+-->
 </Project>

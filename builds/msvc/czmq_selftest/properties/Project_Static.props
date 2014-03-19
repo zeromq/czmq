@@ -10,5 +10,11 @@
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
     <_PropertySheetDisplayName>Curve ZMQ Static Settings</_PropertySheetDisplayName>
   </PropertyGroup>
-  
+
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>ZMQ_STATIC;LIBCZMQ_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
 </Project>

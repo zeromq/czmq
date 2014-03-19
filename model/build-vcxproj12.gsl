@@ -1,0 +1,302 @@
+.#  Generate VC++ project file for project
+.#
+.#  This is a code generator built using the iMatix GSL code generation
+.#  language. See https://github.com/imatix/gsl for details. This script
+.#  is licensed under MIT/X11.
+.#
+.echo "Generating builds/msvc/$(project.name)/$(project.name).vcxproj..."
+.output "../builds/msvc/$(project.name)/$(project.name)12.vcxproj"
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+#################################################################
+#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
+#   Please read the README.txt file in the model directory.     #
+#################################################################
+-->
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{0C4A2E28-8C9E-4B27-85D9-BB679AD84AC7}</ProjectGuid>
+    <ProjectName>$(project.name)12</ProjectName>
+    <RootNamespace>$(project.name)</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="StaticDebug|Win32">
+      <Configuration>StaticDebug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="StaticDebug|x64">
+      <Configuration>StaticDebug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="StaticRelease|Win32">
+      <Configuration>StaticRelease</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="StaticRelease|x64">
+      <Configuration>StaticRelease</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Configuration">
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='StaticDebug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='StaticRelease|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='StaticDebug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='StaticRelease|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$\(VCTargetsPath)\\Microsoft.Cpp.Default.props" />
+  <Import Project="$\(VCTargetsPath)\\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets" Condition="'$\(Configuration)|$\(Platform)'=='Debug|Win32'">
+    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$\(ProjectDir)properties\\Project_Dynamic.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\Win32.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\Debug.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$\(Configuration)|$\(Platform)'=='Release|Win32'">
+    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$\(ProjectDir)properties\\Project_Dynamic.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\Win32.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\Release.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$\(ProjectDir)properties\\Project_Dynamic.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\x64.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\Debug.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$\(ProjectDir)properties\\Project_Dynamic.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\x64.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\Release.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='StaticDebug|Win32'" Label="PropertySheets">
+    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$\(ProjectDir)properties\\Project_Static.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\Win32.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\Debug.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='StaticRelease|Win32'" Label="PropertySheets">
+    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$\(ProjectDir)properties\\Project_Static.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\Win32.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\Release.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='StaticDebug|x64'" Label="PropertySheets">
+    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$\(ProjectDir)properties\\Project_Static.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\x64.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\Debug.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='StaticRelease|x64'" Label="PropertySheets">
+    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$\(ProjectDir)properties\\Project_Static.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\x64.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\Release.props" />
+  </ImportGroup>
+
+  <ItemGroup>
+    <ClInclude Include="..\\..\\..\\builds\\msvc\\platform.h" />
+  </ItemGroup>
+
+  <ItemGroup>
+.for header
+    <ClInclude Include="..\\..\\..\\include\\$(name).h" />
+.endfor
+  </ItemGroup>
+
+  <ItemGroup>
+.for class
+    <ClCompile Include="..\\..\\..\\src\\$(name).c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+.endfor
+  </ItemGroup>
+
+  <Import Project="$\(VCTargetsPath)\\Microsoft.Cpp.targets" />
+
+  <!--
+  #################################################################
+  #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
+  #   Please read the README.txt file in the model directory.     #
+  #################################################################
+  -->
+</Project>
+.echo "Generating builds/msvc/$(project.name)_selftest/$(project.name)_selftest12.vcxproj..."
+.output "../builds/msvc/$(project.name)_selftest/$(project.name)_selftest12.vcxproj"
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+#################################################################
+#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
+#   Please read the README.txt file in the model directory.     #
+#################################################################
+-->
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{A5497C4B-1CD1-4779-9458-2CF7908E7E26}</ProjectGuid>
+    <ProjectName>$(project.name)_selftest12</ProjectName>
+    <RootNamespace>$(project.name)_selftest</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="StaticDebug|Win32">
+      <Configuration>StaticDebug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="StaticDebug|x64">
+      <Configuration>StaticDebug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="StaticRelease|Win32">
+      <Configuration>StaticRelease</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="StaticRelease|x64">
+      <Configuration>StaticRelease</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Configuration">
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='StaticDebug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='StaticRelease|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='StaticDebug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='StaticRelease|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$\(VCTargetsPath)\\Microsoft.Cpp.Default.props" />
+  <Import Project="$\(VCTargetsPath)\\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets" Condition="'$\(Configuration)|$\(Platform)'=='Debug|Win32'">
+    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$\(ProjectDir)properties\\Project_Dynamic.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\Win32.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\Debug.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$\(Configuration)|$\(Platform)'=='Release|Win32'">
+    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$\(ProjectDir)properties\\Project_Dynamic.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\Win32.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\Release.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$\(ProjectDir)properties\\Project_Dynamic.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\x64.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\Debug.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$\(ProjectDir)properties\\Project_Dynamic.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\x64.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\Release.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='StaticDebug|Win32'" Label="PropertySheets">
+    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$\(ProjectDir)properties\\Project_Static.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\Win32.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\Debug.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='StaticRelease|Win32'" Label="PropertySheets">
+    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$\(ProjectDir)properties\\Project_Static.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\Win32.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\Release.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='StaticDebug|x64'" Label="PropertySheets">
+    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$\(ProjectDir)properties\\Project_Static.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\x64.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\Debug.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='StaticRelease|x64'" Label="PropertySheets">
+    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$\(ProjectDir)properties\\Project_Static.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\x64.props" />
+    <Import Project="$\(ProjectDir)..\\properties\\Release.props" />
+  </ImportGroup>
+  <ItemGroup>
+    <ClCompile Include="..\\..\\..\\src\\$(project.name)_selftest.c" />
+  </ItemGroup>
+    <ItemGroup>
+    <ProjectReference Include="..\\$(project.name)\\$(project.name)12.vcxproj">
+      <Project>{0C4A2E28-8C9E-4B27-85D9-BB679AD84AC7}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$\(VCTargetsPath)\\Microsoft.Cpp.targets" />
+<!--
+#################################################################
+#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
+#   Please read the README.txt file in the model directory.     #
+#################################################################
+-->
+</Project>

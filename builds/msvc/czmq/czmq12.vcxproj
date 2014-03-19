@@ -1,4 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+#################################################################
+#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
+#   Please read the README.txt file in the model directory.     #
+#################################################################
+-->
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0C4A2E28-8C9E-4B27-85D9-BB679AD84AC7}</ProjectGuid>
@@ -116,43 +122,16 @@
     <Import Project="$(ProjectDir)..\properties\x64.props" />
     <Import Project="$(ProjectDir)..\properties\Release.props" />
   </ImportGroup>
+
   <ItemGroup>
     <ClInclude Include="..\..\..\builds\msvc\platform.h" />
   </ItemGroup>
+
   <ItemGroup>
     <ClInclude Include="..\..\..\include\czmq.h" />
     <ClInclude Include="..\..\..\include\czmq_prelude.h" />
-    <ClInclude Include="..\..\..\include\zauth.h" />
-    <ClInclude Include="..\..\..\include\zbeacon.h" />
-    <ClInclude Include="..\..\..\include\zcert.h" />
-    <ClInclude Include="..\..\..\include\zcertstore.h" />
-    <ClInclude Include="..\..\..\include\zchunk.h" />
-    <ClInclude Include="..\..\..\include\zclock.h" />
-    <ClInclude Include="..\..\..\include\zconfig.h" />
-    <ClInclude Include="..\..\..\include\zctx.h" />
-    <ClInclude Include="..\..\..\include\zdir.h" />
-    <ClInclude Include="..\..\..\include\zdir_patch.h" />
-    <ClInclude Include="..\..\..\include\zdigest.h" />
-    <ClInclude Include="..\..\..\include\zfile.h" />
-    <ClInclude Include="..\..\..\include\zframe.h" />
-    <ClInclude Include="..\..\..\include\zhash.h" />
-    <ClInclude Include="..\..\..\include\zlist.h" />
-    <ClInclude Include="..\..\..\include\zloop.h" />
-    <ClInclude Include="..\..\..\include\zmonitor.h" />
-    <ClInclude Include="..\..\..\include\zmsg.h" />
-    <ClInclude Include="..\..\..\include\zmutex.h" />
-    <ClInclude Include="..\..\..\include\zpoller.h" />
-    <ClInclude Include="..\..\..\include\zproxy.h" />
-    <ClInclude Include="..\..\..\include\zrex.h" />
-    <ClInclude Include="..\..\..\include\zservice.h" />
-    <ClInclude Include="..\..\..\include\zsocket.h" />
-    <ClInclude Include="..\..\..\include\zsockopt.h" />
-    <ClInclude Include="..\..\..\include\zstr.h" />
-    <ClInclude Include="..\..\..\include\zsys.h" />
-    <ClInclude Include="..\..\..\include\zthread.h" />
-    <ClInclude Include="..\..\..\include\ztree.h" />
-    <ClInclude Include="..\..\..\include\zuuid.h" />
   </ItemGroup>
+
   <ItemGroup>
     <ClCompile Include="..\..\..\src\zauth.c">
       <CompileAs>CompileAsCpp</CompileAs>
@@ -163,16 +142,30 @@
     <ClCompile Include="..\..\..\src\zcert.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\zcertstore.c" />
-    <ClCompile Include="..\..\..\src\zchunk.c" />
-    <ClCompile Include="..\..\..\src\zclock.c" />
+    <ClCompile Include="..\..\..\src\zcertstore.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\zchunk.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\zclock.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\zconfig.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\zctx.c" />
-    <ClCompile Include="..\..\..\src\zdir.c" />
-    <ClCompile Include="..\..\..\src\zdir_patch.c" />
-    <ClCompile Include="..\..\..\src\zdigest.c" />
+    <ClCompile Include="..\..\..\src\zctx.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\zdir.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\zdir_patch.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\zdigest.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\zfile.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
@@ -194,24 +187,36 @@
     <ClCompile Include="..\..\..\src\zmsg.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\zmutex.c" />
+    <ClCompile Include="..\..\..\src\zmutex.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\zpoller.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\zproxy.c" />
-    <ClCompile Include="..\..\..\src\zrex.c" />
+    <ClCompile Include="..\..\..\src\zproxy.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\zrex.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\zservice.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\zsocket.c" />
-    <ClCompile Include="..\..\..\src\zsockopt.c" />
+    <ClCompile Include="..\..\..\src\zsocket.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\zsockopt.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\zstr.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="..\..\..\src\zsys.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\zthread.c" />
+    <ClCompile Include="..\..\..\src\zthread.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\ztree.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
@@ -219,5 +224,13 @@
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
   </ItemGroup>
+
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+
+  <!--
+  #################################################################
+  #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
+  #   Please read the README.txt file in the model directory.     #
+  #################################################################
+  -->
 </Project>
