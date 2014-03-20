@@ -95,57 +95,6 @@ CZMQ_EXPORT void
 CZMQ_EXPORT int
     zframe_put_block (zframe_t *self, byte *data, size_t size);
 
-//  Put a string to frame payload. Returns 0 if successful else -1.
-//  The string length limited to 2^16 - 1 for '\0' => 65535 characters.
-//  For allocation purpose calculate: (string length + 2) bytes
-CZMQ_EXPORT int
-    zframe_put_string (zframe_t *self, const char *data);
-
-//  Put 1-byte to frame payload. Returns 0 if successful else -1.
-CZMQ_EXPORT int
-    zframe_put_uint8 (zframe_t *self, uint8_t data);
-
-//  Put 2-byte to frame payload. Returns 0 if successful else -1.
-CZMQ_EXPORT int
-    zframe_put_uint16 (zframe_t *self, uint16_t data);
-
-//  Put 4-byte to frame payload. Returns 0 if successful else -1.
-CZMQ_EXPORT int
-    zframe_put_uint32 (zframe_t *self, uint32_t data);
-
-//  Put 8-byte to frame payload. Returns 0 if successful else -1.
-CZMQ_EXPORT int
-    zframe_put_uint64 (zframe_t *self, uint64_t data);
-
-//  Get a block of data from the frame payload.
-CZMQ_EXPORT int
-    zframe_get_block (zframe_t *self, byte *data, size_t size);
-
-//  Get a newly allocated string from frame payload. Returns char pointer to
-//  a string. The max string size can be 2^16 and is 0 terminated.
-CZMQ_EXPORT char *
-    zframe_get_string (zframe_t *self);
-
-//  Get a 1-byte integer from the frame payload by copying it to the 'data'
-//  location. If there was insufficient data in the frame, returns -1.
-CZMQ_EXPORT int
-    zframe_get_uint8 (zframe_t *self, uint8_t *data);
-
-//  Get a 2-byte integer from the frame payload by copying it to the 'data'
-//  location. If there was insufficient data in the frame, returns -1.
-CZMQ_EXPORT int
-    zframe_get_uint16 (zframe_t *self, uint16_t *data);
-
-//  Get a 4-byte integer from the frame payload by copying it to the 'data'
-//  location. If there was insufficient data in the frame, returns -1.
-CZMQ_EXPORT int
-    zframe_get_uint32 (zframe_t *self, uint32_t *data);
-
-//  Get a 8-byte integer from the frame payload by copying it to the 'data'
-//  location. If there was insufficient data in the frame, returns -1.
-CZMQ_EXPORT int
-    zframe_get_uint64 (zframe_t *self, uint64_t *data);
-
 //  Self test of this class
 CZMQ_EXPORT int
     zframe_test (bool verbose);
@@ -236,61 +185,6 @@ EXAMPLE
     frame = zframe_recv_nowait (input);
     assert (frame == NULL);
 
-    // Write custom frame
-    frame = zframe_new (NULL, 45);
-    uint8_t  test_8bit  = 0xFF;
-    uint16_t test_16bit = 0xFFFF;
-    uint32_t test_32bit = 0xFFFFFFFF;
-    uint64_t test_64bit = 0xFFFFFFFFFFFFFFFF;
-    char *test_string = "Hello World!";
-    zuuid_t *test_uuid = zuuid_new ();
-    rc = zframe_put_uint8 (frame, test_8bit);
-    assert (rc == 0);
-    rc = zframe_put_uint16 (frame, test_16bit);
-    assert (rc == 0);
-    rc = zframe_put_uint32 (frame, test_32bit);
-    assert (rc == 0);
-    rc = zframe_put_uint64 (frame, test_64bit);
-    assert (rc == 0);
-    rc = zframe_put_string (frame, test_string);
-    assert (rc == 0);
-    rc = zframe_put_block (frame, zuuid_data (test_uuid), 16);
-    assert (rc == 0);
-    // one byte more than allocated, expect 1
-    rc = zframe_put_uint8 (frame, test_8bit);
-    assert (rc == -1);
-    rc = zframe_send (&frame, output, 0);
-    assert (rc == 0);
-
-    // Read custom frame
-    frame = zframe_recv (input);
-    uint8_t bit8;
-    rc = zframe_get_uint8 (frame, &bit8);
-    assert (rc == 0);
-    assert (bit8 == test_8bit);
-    uint16_t bit16;
-    rc = zframe_get_uint16 (frame, &bit16);
-    assert (rc == 0);
-    assert (bit16 == test_16bit);
-    uint32_t bit32;
-    rc = zframe_get_uint32 (frame, &bit32);
-    assert (rc == 0);
-    assert (bit32 == test_32bit);
-    uint64_t bit64;
-    rc = zframe_get_uint64 (frame, &bit64);
-    assert (rc == 0);
-    assert (bit64 == test_64bit);
-    char *hello = zframe_get_string (frame);
-    assert (streq (hello, test_string));
-    free (hello);
-    zuuid_t *uuid = zuuid_new ();
-    zframe_get_block (frame, zuuid_data (uuid), 16);
-    assert (zuuid_eq (uuid, zuuid_data (test_uuid)));
-    zuuid_destroy (&uuid);
-    zframe_destroy (&frame);
-    assert (frame == NULL);
-
-    zuuid_destroy (&test_uuid);
     zctx_destroy (&ctx);
 ----
 
