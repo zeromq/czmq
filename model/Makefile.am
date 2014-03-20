@@ -1,4 +1,4 @@
-bin_SCRIPTS = \
+dist_bin_SCRIPTS = \
 	project.gsl \
 	build-android.gsl \
 	build-autoconf.gsl \
