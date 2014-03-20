@@ -33,7 +33,7 @@
 //  CZMQ version macros for compile-time API detection
 
 #define CZMQ_VERSION_MAJOR 2
-#define CZMQ_VERSION_MINOR 1
+#define CZMQ_VERSION_MINOR 2
 #define CZMQ_VERSION_PATCH 0
 
 #define CZMQ_MAKE_VERSION(major, minor, patch) \
