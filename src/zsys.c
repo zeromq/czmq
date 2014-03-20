@@ -123,7 +123,8 @@ zsys_handler_reset (void)
 
 //  NOT thread safe, not a good design; this is to test the feasibility
 //  of forcing a network interface name instead of writing code to find it.
-static char *s_interface = NULL;
+static char *
+    s_interface = NULL;
 
 void
 zsys_set_interface (const char *interface_name)
@@ -135,20 +136,21 @@ zsys_set_interface (const char *interface_name)
 
 //  Return network interface name to use for broadcasts.
 //  Returns "" if no interface was set.
-//  This is experimental; may be merged into zbeacon class.
 
 char *
 zsys_interface (void)
 {
-    if (s_interface) return s_interface;
+    if (s_interface)
+        return s_interface;
 
-    // if the environment variable ZSYS_INTERFACE is set, use that as the
-    // default interface name. This lets the environment variable be configured
-    // for test environments where required. For example, on Mac OS X, zbeacon
-    // cannot bind to 255.255.255.255 which is the default when there is no
-    // specified interface.
-    char* env = getenv ("ZSYS_INTERFACE");
-    if (env) return env;
+    //  If the environment variable ZSYS_INTERFACE is set, use that as
+    //  the default interface name. This lets the environment variable
+    //  be configured for test environments where required. For example,
+    //  on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is the
+    //  default when there is no specified interface.
+    char *env = getenv ("ZSYS_INTERFACE");
+    if (env)
+        return env;
     return "";
 }
 
