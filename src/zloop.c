@@ -157,7 +157,7 @@ s_tickless_timer (zloop_t *self)
     if (timeout < 0)
         timeout = 0;
     if (self->verbose)
-        zclock_log ("I: zloop: polling for %d msec", timeout);
+	zclock_log ("I: zloop: polling for %d msec", (int)timeout);
     return timeout;
 }
 
@@ -324,7 +324,7 @@ zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_timer_fn handler, 
     if (zlist_append (self->timers, timer))
         return -1;
     if (self->verbose)
-        zclock_log ("I: zloop: register timer id=%d delay=%d times=%d", 
+        zclock_log ("I: zloop: register timer id=%d delay=%zd times=%zd", 
                     timer_id, delay, times);
     
     return timer_id;

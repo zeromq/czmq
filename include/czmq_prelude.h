@@ -437,6 +437,15 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
     typedef unsigned int uint;
 #endif
 
+//- Printf format error checking --------------------------------------------
+// GCC supports validating format strings for functions that act like printf
+#if defined (__GNUC__) && (__GNUC__ >= 2)
+#   define CZMQ_PRINTF_FUNC(a, b)	__attribute__((format(printf, a, b)))
+#else
+#   define CZMQ_PRINTF_FUNC(a, b)
+#endif
+
+
 //- Error reporting ---------------------------------------------------------
 // If the compiler is GCC or supports C99, include enclosing function
 // in CZMQ assertions
