@@ -204,7 +204,7 @@ s_proxy_task (void *args, zctx_t *ctx, void *command_pipe)
                     capture = zsocket_new (self->ctx, ZMQ_PUSH);
                     char *endpoint = zstr_recv (command_pipe);
                     if (capture) {
-                        int rc = zsocket_connect (capture, endpoint);
+                        int rc = zsocket_connect (capture, "%s", endpoint);
                         assert (rc == 0);
                     }
                     zstr_free (&endpoint);
