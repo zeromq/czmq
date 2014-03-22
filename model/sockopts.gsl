@@ -104,7 +104,7 @@ $(string.trim(.):)
 
 .endfor
 //  Self test of this class
-CZMQ_EXPORT int zsockopt_test (bool verbose);
+CZMQ_EXPORT void zsockopt_test (bool verbose);
 //  @end
 
 #ifdef __cplusplus
@@ -314,7 +314,7 @@ $(string.trim(.):)
 //  Selftest
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+void
 zsockopt_test (bool verbose)
 {
     printf (" * zsockopt: ");
@@ -378,5 +378,4 @@ $(string.trim(.):)
     //  @end
 
     printf ("OK\\n");
-    return 0;
 }
