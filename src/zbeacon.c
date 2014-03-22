@@ -480,6 +480,14 @@ s_get_interface (agent_t *self)
             self->broadcast.sin_family = AF_INET;
             self->broadcast.sin_addr.s_addr = INADDR_BROADCAST;
             self->broadcast.sin_port = htons (self->port_nbr);
+            if (num_interfaces == 0) {
+                //  Subnet broadcast addresses don't work on some platforms 
+                //  but is assumed to work if the interface is specified.
+                self->broadcast.sin_family = AF_INET;
+                self->broadcast.sin_addr.s_addr = INADDR_BROADCAST;
+                self->broadcast.sin_port = htons (self->port_nbr);
+            }
+            else
             if (num_interfaces > 1) {
                 //  Our source address is unknown in this case so set it to
                 //  INADDR_ANY so self->hostname isn't set to an incorrect IP.
