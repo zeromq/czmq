@@ -475,11 +475,6 @@ s_get_interface (agent_t *self)
             interface = interface->ifa_next;
         }
         if (strlen (zsys_interface ()) == 0) {
-            //  Subnet broadcast addresses don't work on some platforms but 
-            //  is assumed to work if the interface is specified.
-            self->broadcast.sin_family = AF_INET;
-            self->broadcast.sin_addr.s_addr = INADDR_BROADCAST;
-            self->broadcast.sin_port = htons (self->port_nbr);
             if (num_interfaces == 0) {
                 //  Subnet broadcast addresses don't work on some platforms 
                 //  but is assumed to work if the interface is specified.
