@@ -1,10 +1,10 @@
 nuget{
   nuspec{
     id = czmq;
-    version : 2.1.0;
+    version : 2.1.0-alpha;
     title: CZMQ - High Level C Wrapper for ZeroMQ;
-    authors: {phreed};
-    owners: {phreed};
+    authors: { zeromq };
+    owners: { phreed, jgoz };
     licenseUrl: "https://www.gnu.org/licenses/lgpl.html";
     projectUrl: "http://czmq.zeromq.org/";
     iconUrl: "http://czmq.zeromq.org/local--files/admin:css/logo.gif";
@@ -13,7 +13,7 @@ nuget{
     description: @" 
 - Free software with full commercial support.";
     releaseNotes: "Made a NuGet package.";
-    copyright: Copyright 2014;
+    copyright: Copyright 2012 iMatix Corporation and Contributors;
     tags: {0mq, zeromq, nuget, native; }
   }
 
