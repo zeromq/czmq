@@ -174,7 +174,7 @@ zsocket_poll (void *self, int msecs)
 //  --------------------------------------------------------------------------
 //  Returns socket type as printable constant string
 
-char *
+const char *
 zsocket_type_str (void *self)
 {
     char *type_name [] = {
@@ -281,7 +281,7 @@ zsocket_test (bool verbose)
     //  a bind immediately after an unbind causes an EADDRINUSE error.
     //  Even a short sleep allows the OS to release the port for reuse.
     zclock_sleep (100);
-    
+
     //  Bind again
     rc = zsocket_bind (writer, "tcp://%s:%d", interf, service);
     assert (rc == service);
