@@ -145,9 +145,9 @@ zconfig_put (zconfig_t *self, char *path, char *value)
         
     //  Check length of next path segment
     char *slash = strchr (path, '/');
-    int length = strlen (path);
+    int length = static_cast<int>(strlen (path));
     if (slash)
-        length = slash - path;
+        length = static_cast<int>(slash - path);
 
     //  Find or create items starting at first child of root
     zconfig_t *child = self->child;
@@ -239,9 +239,9 @@ zconfig_locate (zconfig_t *self, char *path)
     if (*path == '/')
         path++;
     char *slash = strchr (path, '/');
-    int length = strlen (path);
+    int length = static_cast<int>(strlen (path));
     if (slash)
-        length = slash - path;
+        length = static_cast<int>(slash - path);
 
     //  Find matching name starting at first child of root
     zconfig_t *child = self->child;
@@ -375,7 +375,7 @@ zconfig_load (char *filename)
     
     while (fgets (cur_line, 1024, file)) {
         //  Trim line
-        int length = strlen (cur_line);
+        int length = static_cast<int>(strlen (cur_line));
         while (length && isspace ((byte) cur_line [length - 1]))
             cur_line [--length] = 0;
 
@@ -443,7 +443,7 @@ s_collect_level (char **start, int lineno)
     char *readptr = *start;
     while (*readptr == ' ')
         readptr++;
-    int level = (readptr - *start) / 4;
+    int level = static_cast<int>((readptr - *start) / 4);
     if (level * 4 != readptr - *start) {
         fprintf (stderr, "E: (%d) indent 4 spaces at once\n", lineno);
         level = -1;

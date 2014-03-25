@@ -619,6 +619,25 @@ zframe_get_string (zframe_t *self)
         return NULL;
 }
 
+char *
+zframe_as_cstr (zframe_t *self, bool is_wide)
+{
+    assert (self);
+    byte *data = zframe_data (self);
+    size_t size = zframe_size (self);
+
+	const size_t usize = is_wide ? size/2 : size;
+	const size_t char_size = is_wide ? 2 : 1;
+
+    char *result = (char *) malloc (usize + 1);
+	for( int ix=0; ix < usize; ++ix) {
+       result[ix] = data[ix*char_size];
+	}
+    result [usize] = 0;
+    self->needle += size;
+    return result;
+}
+
 
 //  --------------------------------------------------------------------------
 //  Selftest

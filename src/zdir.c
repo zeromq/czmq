@@ -273,7 +273,7 @@ zdir_flatten (zdir_t *self)
 {
     int flat_size;
     if (self)
-        flat_size = self->count + 1;
+        flat_size = static_cast<int>(self->count + 1);
     else
         flat_size = 1;      //  Just null terminator
 

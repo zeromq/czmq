@@ -152,6 +152,11 @@ CZMQ_EXPORT int
 CZMQ_EXPORT char *
     zframe_get_string (zframe_t *self);
 
+//  Get a newly allocated string from frame payload. Returns char pointer to
+//  a string. The max string size can be 2^15 and is 0 terminated.
+CZMQ_EXPORT char *
+    zframe_as_cstr (zframe_t *self, bool is_wide = false);
+
 //  Get a 1-byte integer from the frame payload by copying it to the 'data'
 //  location. If there was insufficient data in the frame, returns -1.
 CZMQ_EXPORT int

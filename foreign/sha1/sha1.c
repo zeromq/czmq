@@ -243,7 +243,7 @@ sha1_pad(struct sha1_ctxt * ctxt)
 	if (padlen < 8)
 	{
 		memset(&ctxt->m.b8[padstart], 0, padlen);
-		COUNT += padlen;
+		COUNT += static_cast<uint8_t>(padlen);
 		COUNT %= 64;
 		sha1_step(ctxt);
 		padstart = COUNT % 64;	/* should be 0 */
