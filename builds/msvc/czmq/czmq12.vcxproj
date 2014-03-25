@@ -199,9 +199,6 @@
     <ClCompile Include="..\..\..\src\zrex.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\zservice.c">
-      <CompileAs>CompileAsCpp</CompileAs>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\zsocket.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>

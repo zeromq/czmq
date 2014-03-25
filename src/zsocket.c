@@ -93,12 +93,12 @@ zsocket_bind (void *self, const char *format, ...)
     }
     else {
         //  Return actual port used for binding
-        int rc = zmq_bind (self, endpoint);
-        if (rc == 0)
-            rc = atoi (strrchr (endpoint, ':') + 1);
+        int port = zmq_bind (self, endpoint);
+        if (port == 0)
+            port = atoi (strrchr (endpoint, ':') + 1);
         else
-            rc = -1;
-        return rc;
+            port = -1;
+        return port;
     }
 }
 

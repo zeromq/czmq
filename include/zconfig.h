@@ -134,7 +134,6 @@ CZMQ_EXPORT zchunk_t *
     zconfig_chunk_save (zconfig_t *self);
 
 //  @end
-
 //  Self test of this class
 CZMQ_EXPORT void
     zconfig_test (bool verbose);

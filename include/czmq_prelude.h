@@ -273,6 +273,7 @@
 #   include <sys/ioctl.h>
 #   include <sys/file.h>
 #   include <sys/wait.h>
+#   include <sys/un.h>
 #   include <sys/uio.h>             //  Let CZMQ build with libzmq/3.x
 #   include <netinet/in.h>          //  Must come before arpa/inet.h
 #   if (!defined (__UTYPE_ANDROID)) && (!defined (__UTYPE_IBMAIX)) \
@@ -351,13 +352,13 @@
 #   endif
 #endif
 
-// Add missing defines for Android.
-#if (defined (__UTYPE_ANDROID))
-#   if (!defined (S_IREAD))
-#      define S_IREAD S_IRUSR
+//  Add missing defines for Android
+#ifdef __UTYPE_ANDROID
+#   ifndef S_IREAD
+#       define S_IREAD S_IRUSR
 #   endif
-#   if (!defined (S_IWRITE))
-#      define S_IWRITE S_IWUSR
+#   ifndef S_IWRITE
+#       define S_IWRITE S_IWUSR
 #   endif
 #endif
 
@@ -422,11 +423,11 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
     typedef unsigned int  uint;
 #   if (!defined (__MINGW32__))
     typedef int mode_t;
+    typedef long ssize_t;
     typedef __int32 int32_t;
     typedef __int64 int64_t;
     typedef unsigned __int32 uint32_t;
     typedef unsigned __int64 uint64_t;
-    typedef long ssize_t;
 #   endif
 #   if (!defined (va_copy))
     //  MSVC does not support C99's va_copy so we use a regular assignment

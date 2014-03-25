@@ -42,7 +42,7 @@ CZMQ_EXPORT zpoller_t *
 CZMQ_EXPORT void
     zpoller_destroy (zpoller_t **self_p);
 
-// Add a reader to be polled.
+//  Add a reader to be polled
 CZMQ_EXPORT int
     zpoller_add (zpoller_t *self, void *reader);
 
