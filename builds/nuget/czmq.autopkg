@@ -1,24 +1,16 @@
 nuget{
   nuspec{
-    id = libzmq;
+    id = czmq;
     version : 2.1.0;
-    title: ZMQ - Code Connected;
+    title: CZMQ - High Level C Wrapper for ZeroMQ;
     authors: {phreed};
     owners: {phreed};
     licenseUrl: "https://www.gnu.org/licenses/lgpl.html";
-    projectUrl: "http://www.zeromq.org/";
-    iconUrl: "http://www.zeromq.org/local--files/admin:css/logo.gif";
+    projectUrl: "http://czmq.zeromq.org/";
+    iconUrl: "http://czmq.zeromq.org/local--files/admin:css/logo.gif";
     requireLicenseAcceptance: false;
     summary: High-level C binding for ZeroMQ and all-round Slice of Heaven for C developers.;
     description: @" 
-ZeroMQ \zeromq\:
-- Connect your code in any language, on any platform.
-- Carries messages across inproc, IPC, TCP, TPIC, multicast.
-- Smart patterns like pub-sub, push-pull, and router-dealer.
-- High-speed asynchronous I/O engines, in a tiny library.
-- Backed by a large and active open source community.
-- Supports every modern language and platform.
-- Build any architecture: centralized, distributed, small, or large.
 - Free software with full commercial support.";
     releaseNotes: "Made a NuGet package.";
     copyright: Copyright 2014;
@@ -33,17 +25,25 @@ ZeroMQ \zeromq\:
     include: { "${SDK_ROOT}include\*" };
     docs: { "${SDK_ROOT}doc\*.txt" };
 
-    [x64,v100,debug] {
-       lib: ${SDK_2010}Debug\libzmq.lib;     
-       symbols: ${SDK_2010}Debug\libzmq.pdb;     
-    }    
+
+
+//    [x64,v100,debug] {
+//       lib: ${SDK_2010}x64\Debug\czmq.lib;     
+//       symbols: ${SDK_2010}x64\Debug\vc100.pdb;     
+//    }    
 
     [x64,v100,release] {
-       lib: ${SDK_2010}Release\libzmq.lib;     
+       lib: ${SDK_2010}x64\Release\czmq.lib;     
     }    
 
     targets{
-       Defines += HAS_CPP_ZMQ_SDK;
+       Defines += HAS_CPP_CZMQ_SDK;
+    }
+
+    dependencies{
+       packages: {
+           libzmq/4.1.0
+       };
     }
   }
 }

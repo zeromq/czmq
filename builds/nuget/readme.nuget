@@ -12,7 +12,7 @@ http://coapp.org/pages/tutorials.html
 
 The basic procedure is to first build all 
 the artifacts and then run ...
- Write-NuGetPackage .\libzmq.autopkg 
+ Write-NuGetPackage .\czmq.autopkg 
 
 The *.nuget files thus produced can then be installed
 in a local repository or uploaded to one of the nuget servers.
