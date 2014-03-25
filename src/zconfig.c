@@ -465,8 +465,8 @@ zconfig_chunk_load (zchunk_t *chunk)
         memcpy (cur_line, data_ptr, cur_size);
         cur_line [cur_size] = '\0';
         data_ptr = eoln? eoln + 1: NULL;
-        remaining -= cur_size + 1;
-        
+        remaining -= cur_size + (eoln? 1 :0);
+
         //  Trim line
         int length = strlen (cur_line);
         while (length && isspace ((byte) cur_line [length - 1]))
@@ -814,6 +814,18 @@ zconfig_test (bool verbose)
 
     zconfig_save (root, TESTDIR "/test.cfg");
     zconfig_destroy (&root);
+
+    // Test improperly terminated config files
+    char *chunk_data = "section\n    value = somevalue";
+    zchunk_t *chunk = zchunk_new (chunk_data, strlen (chunk_data));
+    assert (chunk);
+    root = zconfig_chunk_load (chunk);
+    assert(root);
+    char *value = zconfig_resolve (root, "/section/value", NULL);
+    assert (value);
+    assert (streq (value, "somevalue"));
+    zconfig_destroy (&root);
+    zchunk_destroy (&chunk);
     
     //  Delete all test files
     zdir_t *dir = zdir_new (TESTDIR, NULL);
