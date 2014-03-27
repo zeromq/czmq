@@ -155,9 +155,6 @@
 #elif (defined (BSD) || defined (bsd))
 #   define __UTYPE_BSDOS
 #   define __UNIX__
-#elif (defined (APPLE) || defined (__APPLE__))
-#   define __UTYPE_GENERIC
-#   define __UNIX__
 #elif (defined (__ANDROID__))
 #   define __UTYPE_ANDROID
 #   define __UNIX__
@@ -179,7 +176,7 @@
 #elif (defined (OpenBSD) || defined (__OpenBSD__))
 #   define __UTYPE_OPENBSD
 #   define __UNIX__
-#elif (defined (__APPLE__))
+#elif (defined (APPLE) || defined (__APPLE__))
 #   define __UTYPE_OSX
 #   define __UNIX__
 #elif (defined (NeXT))
@@ -407,6 +404,9 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
 #endif
 
 //- A number of POSIX and C99 keywords and data types -----------------------
+//  CZMQ uses uint for array indices; equivalent to unsigned int, but more
+//  convenient in code. We define it in czmq_prelude.h on systems that do
+//  not define it by default.
 
 #if (defined (__WINDOWS__))
 #   if (!defined (__cplusplus) && (!defined (inline)))
@@ -433,7 +433,7 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
     //  MSVC does not support C99's va_copy so we use a regular assignment
 #       define va_copy(dest,src) (dest) = (src)
 #   endif
-#elif (defined (__APPLE__))
+#elif (defined (__UTYPE_OSX))
     typedef unsigned long ulong;
     typedef unsigned int uint;
 #endif
