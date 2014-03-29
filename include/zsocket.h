@@ -56,8 +56,7 @@ CZMQ_EXPORT void
 //  bind succeeded with the specified port number. Always returns the
 //  port number if successful.
 CZMQ_EXPORT int
-    zsocket_bind (void *socket, const char *format, ...)
-	CZMQ_PRINTF_FUNC(2,3);
+    zsocket_bind (void *socket, const char *format, ...);
 
 //  Unbind a socket from a formatted endpoint.
 //  Returns 0 if OK, -1 if the endpoint was invalid or the function
@@ -68,15 +67,13 @@ CZMQ_EXPORT int
 //  Connect a socket to a formatted endpoint
 //  Returns 0 if OK, -1 if the endpoint was invalid.
 CZMQ_EXPORT int
-    zsocket_connect (void *socket, const char *format, ...)
-	CZMQ_PRINTF_FUNC(2,3);
+    zsocket_connect (void *socket, const char *format, ...);
 
-//  Disonnect a socket from a formatted endpoint
+//  Disconnect a socket from a formatted endpoint
 //  Returns 0 if OK, -1 if the endpoint was invalid or the function
 //  isn't supported.
 CZMQ_EXPORT int
-    zsocket_disconnect (void *socket, const char *format, ...)
-	CZMQ_PRINTF_FUNC(2,3);
+    zsocket_disconnect (void *socket, const char *format, ...);
 
 //  Poll for input events on the socket. Returns TRUE if there is input
 //  ready on the socket, else FALSE.
@@ -112,6 +109,12 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zsocket_test (bool verbose);
 //  @end
+
+//  Compiler hints
+CZMQ_EXPORT int zsocket_bind (void *socket, const char *format, ...) CHECK_PRINTF (2);
+CZMQ_EXPORT int zsocket_unbind (void *socket, const char *format, ...) CHECK_PRINTF (2);
+CZMQ_EXPORT int zsocket_connect (void *socket, const char *format, ...) CHECK_PRINTF (2);
+CZMQ_EXPORT int zsocket_disconnect (void *socket, const char *format, ...) CHECK_PRINTF (2);
 
 #ifdef __cplusplus
 }
