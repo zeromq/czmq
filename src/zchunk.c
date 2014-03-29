@@ -38,6 +38,7 @@
 struct _zchunk_t {
     size_t size;                //  Current size of data part
     size_t max_size;            //  Maximum allocated size
+    size_t consumed;            //  Amount already consumed
     byte *data;                 //  Data part follows here
 };
 
@@ -56,8 +57,6 @@ zchunk_new (const void *data, size_t size)
             self->size = size;
             memcpy (self->data, data, size);
         }
-        else
-            self->size = 0;
     }
     return self;
 }
@@ -75,7 +74,6 @@ zchunk_destroy (zchunk_t **self_p)
         //  If data was reallocated independently, free it independently
         if (self->data != (byte *) self + sizeof (zchunk_t))
             free (self->data);
-
         free (self);
         *self_p = NULL;
     }
@@ -132,8 +130,8 @@ zchunk_data (zchunk_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Set chunk data from user-supplied data; truncate if too large
-//  Returns actual size of chunk
+//  Set chunk data from user-supplied data; truncate if too large. Data may
+//  be null. Returns actual size of chunk
 
 size_t
 zchunk_set (zchunk_t *self, const void *data, size_t size)
@@ -141,7 +139,8 @@ zchunk_set (zchunk_t *self, const void *data, size_t size)
     assert (self);
     if (size > self->max_size)
         size = self->max_size;
-    memcpy (self->data, data, size);
+    if (data)
+        memcpy (self->data, data, size);
     self->size = size;
     return size;
 }
@@ -175,6 +174,45 @@ zchunk_append (zchunk_t *self, const void *data, size_t size)
     memcpy (self->data + self->size, data, size);
     self->size += size;
     return self->size;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Copy as much data from 'source' into the chunk as possible; returns the
+//  new size of chunk. If all data from 'source' is used, returns exhausted
+//  on the source chunk. Source can be consumed as many times as needed until
+//  it is exhausted. If source was already exhausted, does not change chunk.
+
+size_t
+zchunk_consume (zchunk_t *self, zchunk_t *source)
+{
+    assert (self);
+    assert (source);
+
+    //  We can take at most this many bytes from source
+    size_t size = source->size - source->consumed;
+
+    //  And we can store at most this many bytes in chunk
+    if (self->size + size > self->max_size)
+        size = self->max_size - self->size;
+
+    memcpy (self->data + self->size, source->data + source->consumed, size);
+    source->consumed += size;
+    self->size += size;
+    return self->size;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Returns true if the chunk was exhausted by consume methods, or if the
+//  chunk has a size of zero.
+
+bool
+zchunk_exhausted (zchunk_t *self)
+{
+    assert (self);
+    assert (self->consumed <= self->size);
+    return self->consumed == self->size;
 }
 
 
@@ -291,7 +329,20 @@ zchunk_test (bool verbose)
     assert (memcmp (zchunk_data (copy), "1234567890", 10) == 0);
     assert (zchunk_size (copy) == 10);
     zchunk_destroy (&copy);
-    
+    zchunk_destroy (&chunk);
+
+    copy = zchunk_new ("1234567890abcdefghij", 20);
+    chunk = zchunk_new (NULL, 8);
+    zchunk_consume (chunk, copy);
+    assert (memcmp (zchunk_data (chunk), "12345678", 8) == 0);
+    zchunk_set (chunk, NULL, 0);
+    zchunk_consume (chunk, copy);
+    assert (memcmp (zchunk_data (chunk), "90abcdef", 8) == 0);
+    zchunk_set (chunk, NULL, 0);
+    zchunk_consume (chunk, copy);
+    assert (zchunk_size (chunk) == 4);
+    assert (memcmp (zchunk_data (chunk), "ghij", 4) == 0);
+    zchunk_destroy (&copy);
     zchunk_destroy (&chunk);
     //  @end
 
