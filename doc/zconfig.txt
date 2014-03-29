@@ -41,7 +41,7 @@ CZMQ_EXPORT void
 //  by the string.
 CZMQ_EXPORT void
     zconfig_set_value (zconfig_t *self, const char *format, ...);
-
+    
 //  Find our first child, if any
 CZMQ_EXPORT zconfig_t *
     zconfig_child (zconfig_t *self);
