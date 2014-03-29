@@ -3025,7 +3025,7 @@ zsocket_events (void *zocket)
 //  Selftest
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int
+void
 zsockopt_test (bool verbose)
 {
     printf (" * zsockopt: ");
@@ -3846,5 +3846,4 @@ zsockopt_test (bool verbose)
     //  @end
 
     printf ("OK\n");
-    return 0;
 }
