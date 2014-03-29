@@ -63,7 +63,7 @@ AC_ARG_WITH([libsodium],
 
 if test "x$zmq_search_libsodium" = "xyes"; then
     if test -r "${with_libsodium}/include/sodium.h"; then
-        CXXFLAGS="-I${with_libsodium}/include ${CXXFLAGS}"
+        CPPFLAGS="-I${with_libsodium}/include ${CPPFLAGS}"
         LDFLAGS="-L${with_libsodium}/lib ${LDFLAGS}"
     fi
 fi
@@ -76,7 +76,7 @@ AC_ARG_WITH([libsodium-include-dir],
 
 if test "x$zmq_search_libsodium_include" = "xyes"; then
     if test -r "${with_libsodium_include_dir}/sodium.h"; then
-        CXXFLAGS="-I${with_libsodium_include_dir}/include ${CXXFLAGS}"
+        CPPFLAGS="-I${with_libsodium_include_dir}/include ${CPPFLAGS}"
     fi
 fi
 
@@ -112,7 +112,7 @@ AC_ARG_WITH([libzmq],
         [build with ZeroMQ library installed in PREFIX [default=autodetect]])],
     [case "x$withval" in
         xno)
-            AC_MSG_ERROR([jzmq requires the ZeroMQ library])
+            AC_MSG_ERROR([czmq requires the ZeroMQ library])
             ;;
         xyes|x)
             ;;
