@@ -620,28 +620,37 @@ zhash_pack (zhash_t *self)
     assert (self);
 
     //  First, calculate packed data size
-    size_t frame_size = 1;      //  Dictionary size, items
+    size_t frame_size = 4;      //  Dictionary size, number-4
     uint index;
     for (index = 0; index != self->limit; index++) {
         item_t *item = self->items [index];
         while (item) {
-            //  [Length]key=value
-            frame_size += 2 + strlen (item->key) + strlen ((char *) item->value);
+            //  We store key as short string
+            frame_size += 1 + strlen (item->key);
+            //  We store value as long string
+            frame_size += 4 + strlen ((char *) item->value);
             item = item->next;
         }
     }
     //  Now serialize items into the frame
     zframe_t *frame = zframe_new (NULL, frame_size);
     byte *needle = zframe_data (frame);
-    *needle++ = (byte) self->size;
+    //  Store size as number-4
+    *(uint32_t *) needle = htonl (self->size);
+    needle += 4;
     for (index = 0; index != self->limit; index++) {
         item_t *item = self->items [index];
         while (item) {
-            char string [256];
-            snprintf (string, 256, "%s=%s", item->key, (char *) item->value);
-            *needle++ = (byte) strlen (string);
-            memcpy (needle, string, strlen (string));
-            needle += strlen (string);
+            //  Store key as string
+            *needle++ = (byte) strlen (item->key);
+            memcpy (needle, item->key, strlen (item->key));
+            needle += strlen (item->key);
+
+            //  Store value as longstr
+            *(uint32_t *) needle = htonl (strlen ((char *) item->value));
+            needle += 4;
+            memcpy (needle, (char *) item->value, strlen ((char *) item->value));
+            needle += strlen ((char *) item->value);
             item = item->next;
         }
     }
@@ -659,34 +668,45 @@ zhash_unpack (zframe_t *frame)
 {
     zhash_t *self = zhash_new ();
     assert (self);
-    zhash_autofree (self);
-
     assert (frame);
-    if (zframe_size (frame) < 1)
+    if (zframe_size (frame) < 4)
         return self;            //  Arguable...
 
     byte *needle = zframe_data (frame);
     byte *ceiling = needle + zframe_size (frame);
-    size_t nbr_items = *needle++;
+    size_t nbr_items = ntohl (*(uint32_t *) needle);
+    needle += 4;
     while (nbr_items && needle < ceiling) {
-        size_t string_size = *needle++;
-        if (needle + string_size <= ceiling) {
-            char string [256];
-            memcpy (string, needle, string_size);
-            string [string_size] = 0;
-            needle += string_size;
-            char *value = strchr (string, '=');
-            if (value) {
-                *value++ = 0;
-                //  Takes copy of value automatically
-                zhash_insert (self, string, value);
+        //  Get key as string
+        size_t key_size = *needle++;
+        if (needle + key_size <= ceiling) {
+            char key [256];
+            memcpy (key, needle, key_size);
+            key [key_size] = 0;
+            needle += key_size;
+
+            //  Get value as longstr
+            if (needle + 4 <= ceiling) {
+                size_t value_size = ntohl (*(uint32_t *) needle);
+                needle += 4;
+                //  Be wary of malformed frames
+                if (needle + value_size <= ceiling) {
+                    char *value = (char *) malloc (value_size + 1);
+                    memcpy (value, needle, value_size);
+                    value [value_size] = 0;
+                    needle += value_size;
+                    //  Hash takes ownership of value
+                    zhash_insert (self, key, value);
+                }
             }
         }
     }
+    //  Hash will free values in destructor
+    zhash_autofree (self);
     return self;
 }
 
-
+            
 //  --------------------------------------------------------------------------
 //  Runs selftest of class
 //
