@@ -129,6 +129,14 @@ CZMQ_EXPORT zframe_t *
 CZMQ_EXPORT void
     zsys_socket_error (const char *reason);
     
+//  Move the current process into the background. The precise effect depends
+//  on the operating system. On POSIX boxes, moves to a specified working
+//  directory (if specified), closes all file handles, reopens stdin, stdout,
+//  and stderr to the null device, and sets the process to ignore SIGHUP. On
+//  Windows, does nothing. Returns 0 if OK, -1 if there was an error.
+CZMQ_EXPORT int
+    zsys_daemonize (const char *workdir);
+
 //  Self test of this class
 CZMQ_EXPORT int
     zsys_test (bool verbose);
