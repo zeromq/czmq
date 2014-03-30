@@ -281,7 +281,7 @@ s_agent_new (zctx_t *ctx, void *pipe, char *endpoint)
     self->socket = zsocket_new (self->ctx, ZMQ_PAIR);
     assert (self->socket);
 
-    if (zsocket_connect (self->socket, self->endpoint) == 0)
+    if (zsocket_connect (self->socket, "%s", self->endpoint) == 0)
         zstr_send (self->pipe, "OK");
     else
         zstr_send (self->pipe, "ERROR");

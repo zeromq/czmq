@@ -93,12 +93,12 @@ zsocket_bind (void *self, const char *format, ...)
     }
     else {
         //  Return actual port used for binding
-        int rc = zmq_bind (self, endpoint);
-        if (rc == 0)
-            rc = atoi (strrchr (endpoint, ':') + 1);
+        int port = zmq_bind (self, endpoint);
+        if (port == 0)
+            port = atoi (strrchr (endpoint, ':') + 1);
         else
-            rc = -1;
-        return rc;
+            port = -1;
+        return port;
     }
 }
 
@@ -174,7 +174,7 @@ zsocket_poll (void *self, int msecs)
 //  --------------------------------------------------------------------------
 //  Returns socket type as printable constant string
 
-char *
+const char *
 zsocket_type_str (void *self)
 {
     char *type_name [] = {
@@ -281,7 +281,7 @@ zsocket_test (bool verbose)
     //  a bind immediately after an unbind causes an EADDRINUSE error.
     //  Even a short sleep allows the OS to release the port for reuse.
     zclock_sleep (100);
-    
+
     //  Bind again
     rc = zsocket_bind (writer, "tcp://%s:%d", interf, service);
     assert (rc == service);
