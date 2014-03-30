@@ -169,13 +169,13 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <!-- TODO: determine if we want to keep the nuget association as a default. -->
   <ImportGroup Label="ExtensionSettings">
-    <Import Project="..\..\..\..\..\nuget\libzmq.4.1.0.0\build\native\package.targets" Condition="Exists('..\..\..\..\..\nuget\libzmq.4.1.0.0\build\native\package.targets')" />
+    <Import Project="..\..\..\..\..\nuget\libzmq_v120.4.1.0.0\build\native\package.targets" Condition="Exists('..\..\..\..\..\nuget\libzmq_v120.4.1.0.0\build\native\package.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\..\..\..\nuget\libzmq.4.1.0.0\build\native\package.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\..\nuget\libzmq.4.1.0.0\build\native\package.targets'))" />
+    <Error Condition="!Exists('..\..\..\..\..\nuget\libzmq_v120.4.1.0.0\build\native\package.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\..\nuget\libzmq_v120.4.1.0.0\build\native\package.targets'))" />
   </Target>
 <!--
 #################################################################
