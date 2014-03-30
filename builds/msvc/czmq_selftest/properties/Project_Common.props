@@ -16,7 +16,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Ws2_32.lib;Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Rpcrt4.lib;Ws2_32.lib;Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <!--<AdditionalLibraryDirectories>$(ProjectDir)..\..\..\..\libzmq\bin\$(PlatformName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>-->
     </Link>
   </ItemDefinitionGroup>
