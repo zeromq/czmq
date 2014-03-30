@@ -56,7 +56,8 @@ CZMQ_EXPORT void
 //  bind succeeded with the specified port number. Always returns the
 //  port number if successful.
 CZMQ_EXPORT int
-    zsocket_bind (void *socket, const char *format, ...);
+    zsocket_bind (void *socket, const char *format, ...)
+	CZMQ_PRINTF_FUNC(2,3);
 
 //  Unbind a socket from a formatted endpoint.
 //  Returns 0 if OK, -1 if the endpoint was invalid or the function
@@ -67,13 +68,15 @@ CZMQ_EXPORT int
 //  Connect a socket to a formatted endpoint
 //  Returns 0 if OK, -1 if the endpoint was invalid.
 CZMQ_EXPORT int
-    zsocket_connect (void *socket, const char *format, ...);
+    zsocket_connect (void *socket, const char *format, ...)
+	CZMQ_PRINTF_FUNC(2,3);
 
 //  Disonnect a socket from a formatted endpoint
 //  Returns 0 if OK, -1 if the endpoint was invalid or the function
 //  isn't supported.
 CZMQ_EXPORT int
-    zsocket_disconnect (void *socket, const char *format, ...);
+    zsocket_disconnect (void *socket, const char *format, ...)
+	CZMQ_PRINTF_FUNC(2,3);
 
 //  Poll for input events on the socket. Returns TRUE if there is input
 //  ready on the socket, else FALSE.
@@ -81,14 +84,14 @@ CZMQ_EXPORT bool
     zsocket_poll (void *socket, int msecs);
 
 //  Returns socket type as printable constant string
-CZMQ_EXPORT char *
+CZMQ_EXPORT const char *
     zsocket_type_str (void *socket);
 
 //  Send data over a socket as a single message frame.
 //  Accepts these flags: ZFRAME_MORE and ZFRAME_DONTWAIT.
 CZMQ_EXPORT int
     zsocket_sendmem (void *socket, const void *data, size_t size, int flags);
-    
+
 //  Send a signal over a socket. A signal is a zero-byte message.
 //  Signals are used primarily between threads, over pipe sockets.
 //  Returns -1 if there was an error sending the signal.

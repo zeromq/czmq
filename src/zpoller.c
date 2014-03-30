@@ -40,7 +40,7 @@ struct _zpoller_t {
     zlist_t *readers;           //  List of sockets to read from
     zmq_pollitem_t *poll_set;   //  Current zmq_poll set
     size_t poll_size;           //  Size of poll set
-    bool dirty;                 //  Does pollset needs rebuilding?
+    bool need_rebuild;          //  Does pollset needs rebuilding?
     bool expired;               //  Did poll timer expire?
     bool terminated;            //  Did poll call end with EINTR?
 };
@@ -58,7 +58,7 @@ zpoller_new (void *reader, ...)
     zpoller_t *self = (zpoller_t *) zmalloc (sizeof (zpoller_t));
     assert (self);
     self->readers = zlist_new ();
-    self->dirty = true;
+    self->need_rebuild = true;
 
     va_list args;
     va_start (args, reader);
@@ -89,7 +89,7 @@ zpoller_destroy (zpoller_t **self_p)
 
 
 //  --------------------------------------------------------------------------
-//  Add a reader to be polled.
+//  Add a reader to be polled
 
 int
 zpoller_add (zpoller_t *self, void *reader)
@@ -98,7 +98,7 @@ zpoller_add (zpoller_t *self, void *reader)
     assert (reader);
     int rc = zlist_append (self->readers, reader);
     if (rc != -1)
-        self->dirty = true;
+        self->need_rebuild = true;
     return rc;
 }
 
@@ -117,7 +117,7 @@ zpoller_wait (zpoller_t *self, int timeout)
 {
     self->expired = false;
     self->terminated = false;
-    if (self->dirty)
+    if (self->need_rebuild)
         s_rebuild_poll_set (self);
         
     int rc = zmq_poll (self->poll_set, (int) self->poll_size,
@@ -159,7 +159,7 @@ s_rebuild_poll_set (zpoller_t *self)
         reader_nbr++;
         reader = zlist_next (self->readers);
     }
-    self->dirty = false;
+    self->need_rebuild = false;
     return 0;
 }
 
