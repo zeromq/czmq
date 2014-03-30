@@ -58,7 +58,8 @@ CZMQ_EXPORT size_t
 CZMQ_EXPORT byte *
     zchunk_data (zchunk_t *self);
 
-//  Set chunk data from user-supplied data; truncate if too large
+//  Set chunk data from user-supplied data; truncate if too large. Data may
+//  be null. Returns actual size of chunk
 CZMQ_EXPORT size_t
     zchunk_set (zchunk_t *self, const void *data, size_t size);
 
@@ -69,6 +70,18 @@ CZMQ_EXPORT size_t
 //  Append user-supplied data to chunk, return resulting chunk size
 CZMQ_EXPORT size_t
     zchunk_append (zchunk_t *self, const void *data, size_t size);
+
+//  Copy as much data from 'source' into the chunk as possible; returns the
+//  new size of chunk. If all data from 'source' is used, returns exhausted
+//  on the source chunk. Source can be consumed as many times as needed until
+//  it is exhausted. If source was already exhausted, does not change chunk.
+CZMQ_EXPORT size_t
+    zchunk_consume (zchunk_t *self, zchunk_t *source);
+
+//  Returns true if the chunk was exhausted by consume methods, or if the
+//  chunk has a size of zero.
+CZMQ_EXPORT bool
+    zchunk_exhausted (zchunk_t *self);
 
 //  Read chunk from an open file descriptor
 CZMQ_EXPORT zchunk_t *

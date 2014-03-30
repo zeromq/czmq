@@ -42,8 +42,7 @@ CZMQ_EXPORT int64_t
 //  Print formatted string to stdout, prefixed by date/time and
 //  terminated with a newline.
 CZMQ_EXPORT void
-    zclock_log (const char *format, ...)
-	CZMQ_PRINTF_FUNC(1,2);
+    zclock_log (const char *format, ...);
 
 //  Return formatted date/time as fresh string. Free using zstr_free().
 CZMQ_EXPORT char *
@@ -53,6 +52,9 @@ CZMQ_EXPORT char *
 CZMQ_EXPORT int
     zclock_test (bool verbose);
 //  @end
+
+//  Compiler hints
+CZMQ_EXPORT void zclock_log (const char *format, ...) CHECK_PRINTF (1);
 
 #ifdef __cplusplus
 }
