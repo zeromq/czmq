@@ -13,7 +13,8 @@
 
   <ItemDefinitionGroup>
     <ClCompile>
-      <PreprocessorDefinitions>ZMQ_STATIC;LIBCZMQ_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <!--<PreprocessorDefinitions>ZMQ_STATIC;LIBCZMQ_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>-->
+      <PreprocessorDefinitions>LIBCZMQ_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>

@@ -6,7 +6,6 @@
     <_PropertySheetDisplayName>Release Configuration</_PropertySheetDisplayName>
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(RootNamespace)</TargetName>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   
   <ItemDefinitionGroup>
@@ -25,7 +24,6 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
-      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration> 
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
