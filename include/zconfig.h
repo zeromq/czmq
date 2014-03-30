@@ -66,8 +66,7 @@ CZMQ_EXPORT void
 //  comes from an insecure source, you must use '%s' as the format, followed
 //  by the string.
 CZMQ_EXPORT void
-    zconfig_set_value (zconfig_t *self, const char *format, ...)
-	CZMQ_PRINTF_FUNC(2,3);
+    zconfig_set_value (zconfig_t *self, const char *format, ...);
     
 //  Find our first child, if any
 CZMQ_EXPORT zconfig_t *
@@ -137,6 +136,9 @@ CZMQ_EXPORT zchunk_t *
 //  Self test of this class
 CZMQ_EXPORT void
     zconfig_test (bool verbose);
+
+//  Compiler hints
+CZMQ_EXPORT void zconfig_set_value (zconfig_t *self, const char *format, ...) CHECK_PRINTF (2);
 
 #ifdef __cplusplus
 }

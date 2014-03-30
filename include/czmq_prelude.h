@@ -438,25 +438,7 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
     typedef unsigned int uint;
 #endif
 
-//- Printf format error checking --------------------------------------------
-// GCC supports validating format strings for functions that act like printf
-#if defined (__GNUC__) && (__GNUC__ >= 2)
-#   define CZMQ_PRINTF_FUNC(a, b)	__attribute__((format(printf, a, b)))
-#else
-#   define CZMQ_PRINTF_FUNC(a, b)
-#endif
-
-
 //- Error reporting ---------------------------------------------------------
-// If the compiler is GCC or supports C99, include enclosing function
-// in CZMQ assertions
-#if defined (__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
-#   define CZMQ_ASSERT_SANE_FUNCTION    __func__
-#elif defined (__GNUC__) && (__GNUC__ >= 2)
-#   define CZMQ_ASSERT_SANE_FUNCTION    __FUNCTION__
-#else
-#   define CZMQ_ASSERT_SANE_FUNCTION    "<unknown>"
-#endif
 
 //  Replacement for malloc() which asserts if we run out of heap, and
 //  which zeroes the allocated block.
@@ -464,15 +446,14 @@ static inline void *
     safe_malloc (
     size_t size,
     const char *file,
-    unsigned line,
-    const char *func)
+    unsigned line)
 {
     void
         *mem;
 
     mem = calloc (1, size);
     if (mem == NULL) {
-        fprintf (stderr, "FATAL ERROR at %s:%u, in %s\n", file, line, func);
+        fprintf (stderr, "FATAL ERROR at %s:%u\n", file, line);
         fprintf (stderr, "OUT OF MEMORY (malloc returned NULL)\n");
         fflush (stderr);
         abort ();
@@ -488,7 +469,14 @@ static inline void *
 #if defined _ZMALLOC_DEBUG || _ZMALLOC_PEDANTIC
 #   define zmalloc(size) calloc(1,(size))
 #else
-#   define zmalloc(size) safe_malloc((size), __FILE__, __LINE__, CZMQ_ASSERT_SANE_FUNCTION)
+#   define zmalloc(size) safe_malloc((size), __FILE__, __LINE__)
+#endif
+
+//  GCC supports validating format strings for functions that act like printf
+#if defined (__GNUC__) && (__GNUC__ >= 2)
+#   define CHECK_PRINTF(a)   __attribute__((format (printf, a, a + 1)))
+#else
+#   define CHECK_PRINTF(a)
 #endif
 
 //- Socket header files -----------------------------------------------------
