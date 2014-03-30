@@ -21,11 +21,11 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Ws2_32.lib;Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\..\libzmq\bin\$(PlatformName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <!--<AdditionalLibraryDirectories>$(ProjectDir)..\..\..\..\libzmq\bin\$(PlatformName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>-->
     </Link>
   </ItemDefinitionGroup>
 
-  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release' Or '$(Configuration)'=='StaticRelease'">
+  <!--<ItemDefinitionGroup Condition="'$(Configuration)'=='Release' Or '$(Configuration)'=='StaticRelease'">
     <Link>
       <AdditionalDependencies>libzmq.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -34,6 +34,6 @@
     <Link>
       <AdditionalDependencies>libzmq_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-  </ItemDefinitionGroup>
+  </ItemDefinitionGroup>-->
 
 </Project>

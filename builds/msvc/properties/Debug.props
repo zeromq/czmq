@@ -6,7 +6,6 @@
     <_PropertySheetDisplayName>Debug Configuration</_PropertySheetDisplayName>
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(RootNamespace)_d</TargetName>
-    <WholeProgramOptimization>false</WholeProgramOptimization>
   </PropertyGroup>
   
   <ItemDefinitionGroup>
