@@ -10,11 +10,5 @@
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
     <_PropertySheetDisplayName>Curve ZMQ Dynamic Settings</_PropertySheetDisplayName>
   </PropertyGroup>
-  
-  <ItemDefinitionGroup>
-    <Link>
-      <AdditionalDependencies>Rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
-  
+    
 </Project>

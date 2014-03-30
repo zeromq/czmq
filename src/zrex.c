@@ -177,7 +177,7 @@ zrex_hits (zrex_t *self, const char *text)
         free (self->hit [index]);
         self->hit [index] = NULL;
     }
-    bool matched = trex_match (self->trex, text);
+    bool matched = trex_match (self->trex, text) == TRex_True;
     if (matched) {
         //  Get number of hits, setting a sane limit
         self->hits = trex_getsubexpcount (self->trex);
