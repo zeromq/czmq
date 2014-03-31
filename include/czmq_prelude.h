@@ -164,7 +164,9 @@
 #   ifndef __NO_CTYPE
 #   define __NO_CTYPE                   //  Suppress warnings on tolower()
 #   endif
+#   ifndef _BSD_SOURCE
 #   define _BSD_SOURCE                  //  Include stuff from 4.3 BSD Unix
+#   endif
 #elif (defined (Mips))
 #   define __UTYPE_MIPS
 #   define __UNIX__
