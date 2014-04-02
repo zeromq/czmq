@@ -32,6 +32,7 @@ extern "C" {
 
 typedef struct _zlog_t zlog_t;
 
+//  @interface
 //  Constructor; the sender name is prepended to every message, and may
 //  not be null.
 CZMQ_EXPORT zlog_t *
@@ -41,13 +42,37 @@ CZMQ_EXPORT zlog_t *
 CZMQ_EXPORT void
     zlog_destroy (zlog_t **self_p);
 
-//  Print informational message
+//  Log error condition - highest priority
+CZMQ_EXPORT void
+    zlog_error (zlog_t *self, const char *format, ...);
+
+//  Log warning condition - high priority
+CZMQ_EXPORT void
+    zlog_warning (zlog_t *self, const char *format, ...);
+
+//  Log normal, but significant, condition - normal priority
+CZMQ_EXPORT void
+    zlog_notice (zlog_t *self, const char *format, ...);
+
+//  Log informational message - low priority
 CZMQ_EXPORT void
     zlog_info (zlog_t *self, const char *format, ...);
+
+//  Log debug-level message - lowest priority
+CZMQ_EXPORT void
+    zlog_debug (zlog_t *self, const char *format, ...);
 
 //  Self test of this class
 CZMQ_EXPORT int
     zlog_test (bool verbose);
+//  @end
+
+//  Compiler hints
+CZMQ_EXPORT void zlog_error (zlog_t *self, const char *format, ...) CHECK_PRINTF (2);
+CZMQ_EXPORT void zlog_warning (zlog_t *self, const char *format, ...) CHECK_PRINTF (2);
+CZMQ_EXPORT void zlog_notice (zlog_t *self, const char *format, ...) CHECK_PRINTF (2);
+CZMQ_EXPORT void zlog_info (zlog_t *self, const char *format, ...) CHECK_PRINTF (2);
+CZMQ_EXPORT void zlog_debug (zlog_t *self, const char *format, ...) CHECK_PRINTF (2);
 
 #ifdef __cplusplus
 }
