@@ -1,5 +1,5 @@
 /*  =========================================================================
-    czmq.h - CZMQ wrapper
+    zlog - Syslog support class
 
     -------------------------------------------------------------------------
     Copyright (c) 1991-2014 iMatix Corporation <www.imatix.com>
@@ -23,55 +23,34 @@
     =========================================================================
 */
 
-#ifndef __CZMQ_H_INCLUDED__
-#define __CZMQ_H_INCLUDED__
+#ifndef __ZLOG_H_INCLUDED__
+#define __ZLOG_H_INCLUDED__
 
-//  Set up environment for the application
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#include "czmq_prelude.h"
+typedef struct _zlog_t zlog_t;
 
-//  CZMQ version macros for compile-time API detection
+//  Constructor; the sender name is prepended to every message, and may
+//  not be null.
+CZMQ_EXPORT zlog_t *
+    zlog_new (const char *sender);
 
-#define CZMQ_VERSION_MAJOR 2
-#define CZMQ_VERSION_MINOR 2
-#define CZMQ_VERSION_PATCH 0
+//  Destructor
+CZMQ_EXPORT void
+    zlog_destroy (zlog_t **self_p);
 
-#define CZMQ_MAKE_VERSION(major, minor, patch) \
-    ((major) * 10000 + (minor) * 100 + (patch))
-#define CZMQ_VERSION \
-    CZMQ_MAKE_VERSION(CZMQ_VERSION_MAJOR, CZMQ_VERSION_MINOR, CZMQ_VERSION_PATCH)
+//  Print informational message
+CZMQ_EXPORT void
+    zlog_info (zlog_t *self, const char *format, ...);
 
-//  Public API classes
+//  Self test of this class
+CZMQ_EXPORT int
+    zlog_test (bool verbose);
 
-#include "zchunk.h"
-#include "zclock.h"
-#include "zframe.h"
-#include "zlist.h"
-#include "zhash.h"
-#include "zconfig.h"
-#include "zctx.h"
-#include "zfile.h"
-#include "zdir.h"
-#include "zdir_patch.h"
-#include "zdigest.h"
-#include "zlog.h"
-#include "zloop.h"
-#include "zmsg.h"
-#include "zmonitor.h"
-#include "zmutex.h"
-#include "zpoller.h"
-#include "zsocket.h"
-#include "zsockopt.h"
-#include "zstr.h"
-#include "zsys.h"
-#include "zthread.h"
-#include "ztree.h"
-#include "zrex.h"
-#include "zbeacon.h"
-#include "zauth.h"
-#include "zcert.h"
-#include "zcertstore.h"
-#include "zproxy.h"
-#include "zuuid.h"
+#ifdef __cplusplus
+}
+#endif
 
 #endif

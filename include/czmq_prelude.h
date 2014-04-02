@@ -265,6 +265,7 @@
 #   include <grp.h>
 #   include <utime.h>
 #   include <inttypes.h>
+#   include <syslog.h>
 #   include <sys/types.h>
 #   include <sys/param.h>
 #   include <sys/socket.h>
