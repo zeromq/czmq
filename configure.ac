@@ -273,7 +273,8 @@ AC_CHECK_LIB([sodium], [sodium_init],,AC_MSG_WARN(libsodium is needed for CURVE 
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS(errno.h arpa/inet.h netinet/tcp.h netinet/in.h stddef.h \
-stdlib.h string.h sys/socket.h sys/time.h unistd.h limits.h ifaddrs.h)
+                 stdlib.h string.h sys/socket.h sys/time.h unistd.h \
+                 limits.h ifaddrs.h)
 AC_CHECK_HEADERS([net/if.h net/if_media.h linux/wireless.h], [], [],
 [
 #ifdef HAVE_SYS_SOCKET_H

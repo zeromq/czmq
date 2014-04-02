@@ -16,6 +16,7 @@
     <class name = "zframe" />
     <class name = "zhash" />
     <class name = "zlist" />
+    <class name = "zlog" />
     <class name = "zloop" />
     <class name = "zmonitor" />
     <class name = "zmsg" />
