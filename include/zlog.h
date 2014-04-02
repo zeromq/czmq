@@ -42,6 +42,12 @@ CZMQ_EXPORT zlog_t *
 CZMQ_EXPORT void
     zlog_destroy (zlog_t **self_p);
 
+//  Set foreground logging on/off. By default, this is off on systems that
+//  can do background logging using syslog, and on for systems without syslog
+//  support.
+CZMQ_EXPORT void
+    zlog_set_foreground (zlog_t *self, bool foreground);
+    
 //  Log error condition - highest priority
 CZMQ_EXPORT void
     zlog_error (zlog_t *self, const char *format, ...);
