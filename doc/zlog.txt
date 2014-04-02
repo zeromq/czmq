@@ -1,0 +1,32 @@
+zlog(3)
+=======
+
+NAME
+----
+zlog - logging class
+
+SYNOPSIS
+--------
+----
+----
+
+DESCRIPTION
+-----------
+
+Wraps the syslog API in a portable framework. On platforms without
+syslog, sends output to the console. 
+
+
+EXAMPLE
+-------
+.From zlog_test method
+----
+    zlog_t *log = zlog_new ("zlog_test");
+    assert (log);
+    zlog_info (log, "%s, %s", "Hello", "World");
+    zlog_destroy (&log);
+----
+
+SEE ALSO
+--------
+linkczmq:czmq[7]

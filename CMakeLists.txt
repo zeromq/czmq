@@ -86,6 +86,7 @@ set (czmq_headers
     include/zframe.h
     include/zhash.h
     include/zlist.h
+    include/zlog.h
     include/zloop.h
     include/zmonitor.h
     include/zmsg.h
@@ -126,6 +127,7 @@ set (czmq_sources
     src/zframe.c
     src/zhash.c
     src/zlist.c
+    src/zlog.c
     src/zloop.c
     src/zmonitor.c
     src/zmsg.c
