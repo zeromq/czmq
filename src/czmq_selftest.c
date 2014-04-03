@@ -51,7 +51,6 @@ int main (int argc, char *argv [])
     zdigest_test (verbose);
     zfile_test (verbose);
     zhash_test (verbose);
-    ztree_test (verbose);
     zlist_test (verbose);
     zuuid_test (verbose);
     zctx_test (verbose);
