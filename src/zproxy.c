@@ -173,10 +173,13 @@ s_proxy_task (void *args, zctx_t *ctx, void *command_pipe)
                         zmq_msg_t dup;
                         zmq_msg_init (&dup);
                         zmq_msg_copy (&dup, &msg);
-                        zmq_sendmsg (capture, &dup, send_flags);
+                        if (zmq_sendmsg (capture, &dup, send_flags))
+                            zmq_msg_close (&dup);
                     }
-                    int rc = zmq_sendmsg (output, &msg, send_flags);
-                    assert (rc != -1);
+                    if (zmq_sendmsg (output, &msg, send_flags) == -1) {
+                        zmq_msg_close (&msg);
+                        break;
+                    }
                     if (zmq_recvmsg (which, &msg, ZMQ_DONTWAIT) == -1)
                         break;      //  Presumably EAGAIN
                     send_flags = zsocket_rcvmore (which)? ZMQ_SNDMORE: 0;

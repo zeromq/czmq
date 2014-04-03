@@ -44,9 +44,12 @@ s_send_string (void *socket, bool more, char *string)
     zmq_msg_t message;
     zmq_msg_init_size (&message, len);
     memcpy (zmq_msg_data (&message), string, len);
-    int rc = zmq_sendmsg (socket, &message, more? ZMQ_SNDMORE: 0);
-
-    return rc == -1? -1: 0;
+    if (zmq_sendmsg (socket, &message, more? ZMQ_SNDMORE: 0)) {
+        zmq_msg_close (&message);
+        return -1;
+    }
+    else
+        return 0;
 }
 
 
