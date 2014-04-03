@@ -199,9 +199,9 @@ zsocket_type_str (void *self)
 //  Accepts these flags: ZFRAME_MORE and ZFRAME_DONTWAIT.
 
 int
-zsocket_sendmem (void *socket, const void *data, size_t size, int flags)
+zsocket_sendmem (void *zocket, const void *data, size_t size, int flags)
 {
-    assert (socket);
+    assert (zocket);
     assert (size == 0 || data);
 
     int snd_flags = (flags & ZFRAME_MORE)? ZMQ_SNDMORE : 0;
@@ -211,8 +211,12 @@ zsocket_sendmem (void *socket, const void *data, size_t size, int flags)
     zmq_msg_init_size (&msg, size);
     memcpy (zmq_msg_data (&msg), data, size);
 
-    int rc = zmq_sendmsg (socket, &msg, snd_flags);
-    return rc == -1? -1: 0;
+    if (zmq_sendmsg (zocket, &msg, snd_flags) == -1) {
+        zmq_msg_close (&msg);
+        return -1;
+    }
+    else
+        return 0;
 }
 
 
@@ -226,8 +230,12 @@ zsocket_signal (void *zocket)
 {
     zmq_msg_t msg;
     zmq_msg_init_size (&msg, 0);
-    int rc = zmq_sendmsg (zocket, &msg, 0);
-    return rc == -1? -1: 0;
+    if (zmq_sendmsg (zocket, &msg, 0) == -1) {
+        zmq_msg_close (&msg);
+        return -1;
+    }
+    else
+        return 0;
 }
 
 
@@ -241,8 +249,10 @@ zsocket_wait (void *zocket)
 {
     zmq_msg_t msg;
     zmq_msg_init (&msg);
-    int rc = zmq_recvmsg (zocket, &msg, 0);
-    return rc == -1? -1: 0;
+    if (zmq_recvmsg (zocket, &msg, 0) == -1)
+        return -1;
+    else
+        return 0;
 }
 
 
