@@ -38,7 +38,6 @@ include_HEADERS = \
     ../include/zstr.h \
     ../include/zsys.h \
     ../include/zthread.h \
-    ../include/ztree.h \
     ../include/zuuid.h
 
 libczmq_la_SOURCES = \
@@ -71,7 +70,6 @@ libczmq_la_SOURCES = \
     zstr.c \
     zsys.c \
     zthread.c \
-    ztree.c \
     zuuid.c
 
 AM_CFLAGS = -g

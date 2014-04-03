@@ -53,25 +53,7 @@ CZMQ grew out of concepts developed in [ØMQ - The Guide](http://zguide.zeromq.o
 
 ### Ownership and License
 
-CZMQ's contributors are listed in the AUTHORS file. It is held by the ZeroMQ organization at github.com. The authors of CZMQ grant you use of this software under the terms of the GNU Lesser General Public License (LGPL). For details see the files `COPYING` and `COPYING.LESSER` in this directory.
-
-### Commercial Support
-
-CZMQ is actively developed and maintained by iMatix Corporation, who provide support to commercial users that need it. Contact Pieter Hintjens vai ph@imatix.com for more information. Note that CZMQ is licensed exclusively under the same LGPLv3 + static link exception as libzmq. This lets you use CZMQ freely in any application, with the requirement that you publish patches to the code.
-
-### Use from Other Languages
-
-This is a list of known higher-level wrappers around CZMQ:
-
-* https://github.com/1100110/CZMQ - D bindings
-* https://github.com/methodmissing/rbczmq - Ruby
-* https://github.com/zeromq/pyczmq - Python
-* https://github.com/lhope/cl-czmq - Common Lisp
-* https://github.com/fmp88/ocaml-czmq - Ocaml
-* https://github.com/gar1t/erlang-czmq - Erlang
-* https://github.com/mtortonesi/ruby-czmq-ffi - Ruby FFI
-
-### Contributing
+The contributors are listed in AUTHORS. This project uses the MPL v2 license, see LICENSE.
 
 CZMQ uses the [C4.1 (Collective Code Construction Contract)](http://rfc.zeromq.org/spec:22) process for contributions.
 
@@ -129,6 +111,18 @@ You will need the libtool and autotools packages. After building, run the CZMQ s
 Include `czmq.h` in your application and link with libczmq. Here is a typical gcc link command:
 
     gcc -lczmq -lzmq myapp.c -o myapp
+
+### Use from Other Languages
+
+This is a list of known higher-level wrappers around CZMQ:
+
+* https://github.com/1100110/CZMQ - D bindings
+* https://github.com/methodmissing/rbczmq - Ruby
+* https://github.com/zeromq/pyczmq - Python
+* https://github.com/lhope/cl-czmq - Common Lisp
+* https://github.com/fmp88/ocaml-czmq - Ocaml
+* https://github.com/gar1t/erlang-czmq - Erlang
+* https://github.com/mtortonesi/ruby-czmq-ffi - Ruby FFI
 
 ### API Summary
 

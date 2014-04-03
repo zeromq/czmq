@@ -1,25 +1,13 @@
 /*  =========================================================================
     zsocket - working with 0MQ sockets
 
-    -------------------------------------------------------------------------
-    Copyright (c) 1991-2014 iMatix Corporation <www.imatix.com>
-    Copyright other contributors as noted in the AUTHORS file.
-
+    Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
     http://czmq.zeromq.org.
 
-    This is free software; you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the
-    Free Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
-
-    This software is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL-
-    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General
-    Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with this program. If not, see <http://www.gnu.org/licenses/>.
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
     =========================================================================
 */
 
@@ -199,9 +187,9 @@ zsocket_type_str (void *self)
 //  Accepts these flags: ZFRAME_MORE and ZFRAME_DONTWAIT.
 
 int
-zsocket_sendmem (void *socket, const void *data, size_t size, int flags)
+zsocket_sendmem (void *zocket, const void *data, size_t size, int flags)
 {
-    assert (socket);
+    assert (zocket);
     assert (size == 0 || data);
 
     int snd_flags = (flags & ZFRAME_MORE)? ZMQ_SNDMORE : 0;
@@ -211,8 +199,12 @@ zsocket_sendmem (void *socket, const void *data, size_t size, int flags)
     zmq_msg_init_size (&msg, size);
     memcpy (zmq_msg_data (&msg), data, size);
 
-    int rc = zmq_sendmsg (socket, &msg, snd_flags);
-    return rc == -1? -1: 0;
+    if (zmq_sendmsg (zocket, &msg, snd_flags) == -1) {
+        zmq_msg_close (&msg);
+        return -1;
+    }
+    else
+        return 0;
 }
 
 
@@ -226,8 +218,12 @@ zsocket_signal (void *zocket)
 {
     zmq_msg_t msg;
     zmq_msg_init_size (&msg, 0);
-    int rc = zmq_sendmsg (zocket, &msg, 0);
-    return rc == -1? -1: 0;
+    if (zmq_sendmsg (zocket, &msg, 0) == -1) {
+        zmq_msg_close (&msg);
+        return -1;
+    }
+    else
+        return 0;
 }
 
 
@@ -241,8 +237,10 @@ zsocket_wait (void *zocket)
 {
     zmq_msg_t msg;
     zmq_msg_init (&msg);
-    int rc = zmq_recvmsg (zocket, &msg, 0);
-    return rc == -1? -1: 0;
+    if (zmq_recvmsg (zocket, &msg, 0) == -1)
+        return -1;
+    else
+        return 0;
 }
 
 
