@@ -298,9 +298,9 @@ zloop_set_tolerant (zloop_t *self, zmq_pollitem_t *item)
 
 //  --------------------------------------------------------------------------
 //  Register a timer that expires after some delay and repeats some number of
-//  times. At each expiry, will call the handler, passing the arg. To
-//  run a timer forever, use 0 times. Returns a non-negative timer id if OK, 
-//  or -1 if there was an error.
+//  times. At each expiry, will call the handler, passing the arg. To run a
+//  timer forever, use 0 times. Returns a timer_id that is used to cancel the
+//  timer in the future. Returns -1 if there was an error.
 
 int
 zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_timer_fn handler, void *arg)
