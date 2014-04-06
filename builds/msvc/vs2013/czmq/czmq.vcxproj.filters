@@ -82,10 +82,10 @@
     <ClCompile Include="..\..\..\..\src\zthread.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\ztree.c">
+    <ClCompile Include="..\..\..\..\src\zuuid.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zuuid.c">
+    <ClCompile Include="..\..\..\..\src\zlog.c">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -99,6 +99,18 @@
     <ClInclude Include="..\..\..\..\include\czmq.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\builds\msvc\platform.h">
+      <Filter>src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\zdir.h">
+      <Filter>src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\zdir_patch.h">
+      <Filter>src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\zfile.h">
+      <Filter>src\include</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\..\include\zframe.h">
       <Filter>src\include</Filter>
     </ClInclude>
@@ -106,6 +118,9 @@
       <Filter>src\include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\include\zlist.h">
+      <Filter>src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\zlog.h">
       <Filter>src\include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\include\zloop.h">
@@ -144,9 +159,6 @@
     <ClInclude Include="..\..\..\..\include\zthread.h">
       <Filter>src\include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\include\ztree.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\include\zuuid.h">
       <Filter>src\include</Filter>
     </ClInclude>
@@ -177,18 +189,6 @@
     <ClInclude Include="..\..\..\..\include\zdigest.h">
       <Filter>src\include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zdir.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zdir_patch.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zfile.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\builds\msvc\platform.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -213,9 +213,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\packaging\nuget\package.gsl">
-      <Filter>packaging</Filter>
-    </None>
     <None Include="..\..\..\..\packaging\nuget\package.nuspec">
       <Filter>packaging</Filter>
     </None>
@@ -226,6 +223,9 @@
       <Filter>packaging</Filter>
     </None>
     <None Include="..\..\..\..\packaging\nuget\package.config">
+      <Filter>packaging</Filter>
+    </None>
+    <None Include="..\..\..\..\packaging\nuget\package.gsl">
       <Filter>packaging</Filter>
     </None>
   </ItemGroup>
