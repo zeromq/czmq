@@ -1,25 +1,13 @@
 /*  =========================================================================
     zproxy - run a steerable proxy in the background
 
-    -------------------------------------------------------------------------
-    Copyright (c) 1991-2014 iMatix Corporation <www.imatix.com>
-    Copyright other contributors as noted in the AUTHORS file.
-
+    Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
     http://czmq.zeromq.org.
 
-    This is free software; you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the 
-    Free Software Foundation; either version 3 of the License, or (at your 
-    option) any later version.
-
-    This software is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL-
-    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General 
-    Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License 
-    along with this program. If not, see <http://www.gnu.org/licenses/>.
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
     =========================================================================
 */
 
@@ -173,10 +161,13 @@ s_proxy_task (void *args, zctx_t *ctx, void *command_pipe)
                         zmq_msg_t dup;
                         zmq_msg_init (&dup);
                         zmq_msg_copy (&dup, &msg);
-                        zmq_sendmsg (capture, &dup, send_flags);
+                        if (zmq_sendmsg (capture, &dup, send_flags))
+                            zmq_msg_close (&dup);
                     }
-                    int rc = zmq_sendmsg (output, &msg, send_flags);
-                    assert (rc != -1);
+                    if (zmq_sendmsg (output, &msg, send_flags) == -1) {
+                        zmq_msg_close (&msg);
+                        break;
+                    }
                     if (zmq_recvmsg (which, &msg, ZMQ_DONTWAIT) == -1)
                         break;      //  Presumably EAGAIN
                     send_flags = zsocket_rcvmore (which)? ZMQ_SNDMORE: 0;

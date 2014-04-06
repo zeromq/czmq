@@ -86,6 +86,7 @@ set (czmq_headers
     include/zframe.h
     include/zhash.h
     include/zlist.h
+    include/zlog.h
     include/zloop.h
     include/zmonitor.h
     include/zmsg.h
@@ -98,7 +99,6 @@ set (czmq_headers
     include/zstr.h
     include/zsys.h
     include/zthread.h
-    include/ztree.h
     include/zuuid.h
 )
 source_group ("Header Files" FILES ${czmq_headers})
@@ -126,6 +126,7 @@ set (czmq_sources
     src/zframe.c
     src/zhash.c
     src/zlist.c
+    src/zlog.c
     src/zloop.c
     src/zmonitor.c
     src/zmsg.c
@@ -138,7 +139,6 @@ set (czmq_sources
     src/zstr.c
     src/zsys.c
     src/zthread.c
-    src/ztree.c
     src/zuuid.c
 )
 source_group ("Source Files" FILES ${czmq_sources})

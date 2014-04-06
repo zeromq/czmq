@@ -1,25 +1,13 @@
 /*  =========================================================================
     zstr - sending and receiving strings
 
-    -------------------------------------------------------------------------
-    Copyright (c) 1991-2014 iMatix Corporation <www.imatix.com>
-    Copyright other contributors as noted in the AUTHORS file.
-
+    Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
     http://czmq.zeromq.org.
 
-    This is free software; you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the 
-    Free Software Foundation; either version 3 of the License, or (at your 
-    option) any later version.
-
-    This software is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL-
-    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General 
-    Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License 
-    along with this program. If not, see <http://www.gnu.org/licenses/>.
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
     =========================================================================
 */
 
@@ -44,9 +32,12 @@ s_send_string (void *socket, bool more, char *string)
     zmq_msg_t message;
     zmq_msg_init_size (&message, len);
     memcpy (zmq_msg_data (&message), string, len);
-    int rc = zmq_sendmsg (socket, &message, more? ZMQ_SNDMORE: 0);
-
-    return rc == -1? -1: 0;
+    if (zmq_sendmsg (socket, &message, more? ZMQ_SNDMORE: 0)) {
+        zmq_msg_close (&message);
+        return -1;
+    }
+    else
+        return 0;
 }
 
 

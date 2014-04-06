@@ -1,25 +1,13 @@
 /*  =========================================================================
     zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.
 
-    -------------------------------------------------------------------------
-    Copyright (c) 1991-2014 iMatix Corporation <www.imatix.com>
-    Copyright other contributors as noted in the AUTHORS file.
-
+    Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
     http://czmq.zeromq.org.
 
-    This is free software; you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the
-    Free Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
-
-    This software is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL-
-    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General
-    Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with this program. If not, see <http://www.gnu.org/licenses/>.
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
     =========================================================================
 */
 
@@ -66,8 +54,7 @@ CZMQ_EXPORT void
 //  comes from an insecure source, you must use '%s' as the format, followed
 //  by the string.
 CZMQ_EXPORT void
-    zconfig_set_value (zconfig_t *self, const char *format, ...)
-	CZMQ_PRINTF_FUNC(2,3);
+    zconfig_set_value (zconfig_t *self, const char *format, ...);
     
 //  Find our first child, if any
 CZMQ_EXPORT zconfig_t *
@@ -137,6 +124,9 @@ CZMQ_EXPORT zchunk_t *
 //  Self test of this class
 CZMQ_EXPORT void
     zconfig_test (bool verbose);
+
+//  Compiler hints
+CZMQ_EXPORT void zconfig_set_value (zconfig_t *self, const char *format, ...) CHECK_PRINTF (2);
 
 #ifdef __cplusplus
 }
