@@ -425,7 +425,7 @@ s_agent_new (void *pipe, int port_nbr)
     int rc = getnameinfo ((struct sockaddr *) &self->address, sizeof (self->address),
                            hostname, 255, NULL, 0, NI_NUMERICHOST);
     if (rc) {
-        puts (gai_strerror (rc));
+        puts (gai_strerrorA (rc));
         strcpy (hostname, "127.0.0.1");
     }
     zstr_send (pipe, hostname);
