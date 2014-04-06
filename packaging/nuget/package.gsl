@@ -16,7 +16,7 @@
     <metadata minClientVersion="2.5">
         <id>$(package.id)</id>
         <version>$(package.version)</version>
-        <title>czmq_v120</title>
+        <title>$(package.id)</title>
         <authors>czmq contributors</authors>
         <owners>Eric Voskuil</owners>
         <licenseUrl>https://raw.github.com/zeromq/czmq/master/LICENSE</licenseUrl>
@@ -30,7 +30,7 @@
         <copyright>MPL v2</copyright>
         <tags>native, czmq, libzmq, zmq, 0MQ, messaging, sockets, C++</tags>
         <dependencies>
-            <dependency id="libzmq_v120" version="4.1.0.1" />
+            <dependency id="libzmq_vc120" version="4.1.0.2" />
         </dependencies>
     </metadata>
     <files>
