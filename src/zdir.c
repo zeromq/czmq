@@ -47,7 +47,7 @@ struct _zdir_t {
 
 #if (defined (WIN32))
 static void
-s_win32_populate_entry (zdir_t *self, WIN32_FIND_DATA *entry)
+s_win32_populate_entry (zdir_t *self, WIN32_FIND_DATAA *entry)
 {
     if (entry->cFileName [0] == '.')
         ; //  Skip hidden files
@@ -129,14 +129,14 @@ zdir_new (const char *path, const char *parent)
     //  Win32 wants a wildcard at the end of the path
     char *wildcard = (char *) malloc (strlen (self->path) + 3);
     sprintf (wildcard, "%s/*", self->path);
-    WIN32_FIND_DATA entry;
-    HANDLE handle = FindFirstFile (wildcard, &entry);
+    WIN32_FIND_DATAA entry;
+    HANDLE handle = FindFirstFileA (wildcard, &entry);
     free (wildcard);
 
     if (handle != INVALID_HANDLE_VALUE) {
         //  We have read an entry, so return those values
         s_win32_populate_entry (self, &entry);
-        while (FindNextFile (handle, &entry))
+        while (FindNextFileA (handle, &entry))
             s_win32_populate_entry (self, &entry);
         FindClose (handle);
     }
