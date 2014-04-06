@@ -1,25 +1,13 @@
 /*  =========================================================================
     zmsg - working with multipart messages
 
-    -------------------------------------------------------------------------
-    Copyright (c) 1991-2014 iMatix Corporation <www.imatix.com>
-    Copyright other contributors as noted in the AUTHORS file.
-
+    Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
     http://czmq.zeromq.org.
 
-    This is free software; you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the 
-    Free Software Foundation; either version 3 of the License, or (at your 
-    option) any later version.
-
-    This software is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL-
-    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General 
-    Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License 
-    along with this program. If not, see <http://www.gnu.org/licenses/>.
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
     =========================================================================
 */
 
@@ -109,14 +97,12 @@ CZMQ_EXPORT int
 //  Push formatted string as new frame to front of message.
 //  Returns 0 on success, -1 on error.
 CZMQ_EXPORT int
-    zmsg_pushstrf (zmsg_t *self, const char *format, ...)
-	CZMQ_PRINTF_FUNC(2,3);
+    zmsg_pushstrf (zmsg_t *self, const char *format, ...);
 
 //  Push formatted string as new frame to end of message.
 //  Returns 0 on success, -1 on error.
 CZMQ_EXPORT int
-    zmsg_addstrf (zmsg_t *self, const char *format, ...)
-	CZMQ_PRINTF_FUNC(2,3);
+    zmsg_addstrf (zmsg_t *self, const char *format, ...);
 
 //  Pop frame off front of message, return as fresh string. If there were
 //  no more frames in the message, returns NULL.
@@ -208,6 +194,10 @@ CZMQ_EXPORT int
 //  DEPRECATED - will be removed for next stable release
 CZMQ_EXPORT int
     zmsg_add (zmsg_t *self, zframe_t *frame);
+
+//  Compiler hints
+CZMQ_EXPORT int zmsg_addstrf (zmsg_t *self, const char *format, ...) CHECK_PRINTF (2);
+CZMQ_EXPORT int zmsg_pushstrf (zmsg_t *self, const char *format, ...) CHECK_PRINTF (2);
 
 #ifdef __cplusplus
 }

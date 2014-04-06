@@ -1,25 +1,13 @@
 /*  =========================================================================
     zsys - system-level methods
 
-    -------------------------------------------------------------------------
-    Copyright (c) 1991-2014 iMatix Corporation <www.imatix.com>
-    Copyright other contributors as noted in the AUTHORS file.
-
+    Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
     http://czmq.zeromq.org.
 
-    This is free software; you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the 
-    Free Software Foundation; either version 3 of the License, or (at your 
-    option) any later version.
-
-    This software is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL-
-    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General 
-    Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License 
-    along with this program. If not, see <http://www.gnu.org/licenses/>.
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
     =========================================================================
 */
 
@@ -129,6 +117,14 @@ CZMQ_EXPORT zframe_t *
 CZMQ_EXPORT void
     zsys_socket_error (const char *reason);
     
+//  Move the current process into the background. The precise effect depends
+//  on the operating system. On POSIX boxes, moves to a specified working
+//  directory (if specified), closes all file handles, reopens stdin, stdout,
+//  and stderr to the null device, and sets the process to ignore SIGHUP. On
+//  Windows, does nothing. Returns 0 if OK, -1 if there was an error.
+CZMQ_EXPORT int
+    zsys_daemonize (const char *workdir);
+
 //  Self test of this class
 CZMQ_EXPORT int
     zsys_test (bool verbose);

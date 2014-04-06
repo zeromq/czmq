@@ -1,25 +1,13 @@
 /*  =========================================================================
     czmq_prelude.h - CZMQ environment
 
-    -------------------------------------------------------------------------
-    Copyright (c) 1991-2014 iMatix Corporation <www.imatix.com>
-    Copyright other contributors as noted in the AUTHORS file.
-
+    Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
     http://czmq.zeromq.org.
 
-    This is free software; you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the
-    Free Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
-
-    This software is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL-
-    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General
-    Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with this program. If not, see <http://www.gnu.org/licenses/>.
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
     =========================================================================
 */
 
@@ -164,6 +152,9 @@
 #   ifndef __NO_CTYPE
 #   define __NO_CTYPE                   //  Suppress warnings on tolower()
 #   endif
+#   ifndef _BSD_SOURCE
+#   define _BSD_SOURCE                  //  Include stuff from 4.3 BSD Unix
+#   endif
 #elif (defined (Mips))
 #   define __UTYPE_MIPS
 #   define __UNIX__
@@ -262,6 +253,7 @@
 #   include <grp.h>
 #   include <utime.h>
 #   include <inttypes.h>
+#   include <syslog.h>
 #   include <sys/types.h>
 #   include <sys/param.h>
 #   include <sys/socket.h>
@@ -438,25 +430,7 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
     typedef unsigned int uint;
 #endif
 
-//- Printf format error checking --------------------------------------------
-// GCC supports validating format strings for functions that act like printf
-#if defined (__GNUC__) && (__GNUC__ >= 2)
-#   define CZMQ_PRINTF_FUNC(a, b)	__attribute__((format(printf, a, b)))
-#else
-#   define CZMQ_PRINTF_FUNC(a, b)
-#endif
-
-
 //- Error reporting ---------------------------------------------------------
-// If the compiler is GCC or supports C99, include enclosing function
-// in CZMQ assertions
-#if defined (__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
-#   define CZMQ_ASSERT_SANE_FUNCTION    __func__
-#elif defined (__GNUC__) && (__GNUC__ >= 2)
-#   define CZMQ_ASSERT_SANE_FUNCTION    __FUNCTION__
-#else
-#   define CZMQ_ASSERT_SANE_FUNCTION    "<unknown>"
-#endif
 
 //  Replacement for malloc() which asserts if we run out of heap, and
 //  which zeroes the allocated block.
@@ -464,15 +438,14 @@ static inline void *
     safe_malloc (
     size_t size,
     const char *file,
-    unsigned line,
-    const char *func)
+    unsigned line)
 {
     void
         *mem;
 
     mem = calloc (1, size);
     if (mem == NULL) {
-        fprintf (stderr, "FATAL ERROR at %s:%u, in %s\n", file, line, func);
+        fprintf (stderr, "FATAL ERROR at %s:%u\n", file, line);
         fprintf (stderr, "OUT OF MEMORY (malloc returned NULL)\n");
         fflush (stderr);
         abort ();
@@ -488,7 +461,14 @@ static inline void *
 #if defined _ZMALLOC_DEBUG || _ZMALLOC_PEDANTIC
 #   define zmalloc(size) calloc(1,(size))
 #else
-#   define zmalloc(size) safe_malloc((size), __FILE__, __LINE__, CZMQ_ASSERT_SANE_FUNCTION)
+#   define zmalloc(size) safe_malloc((size), __FILE__, __LINE__)
+#endif
+
+//  GCC supports validating format strings for functions that act like printf
+#if defined (__GNUC__) && (__GNUC__ >= 2)
+#   define CHECK_PRINTF(a)   __attribute__((format (printf, a, a + 1)))
+#else
+#   define CHECK_PRINTF(a)
 #endif
 
 //- Socket header files -----------------------------------------------------

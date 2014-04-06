@@ -1,44 +1,34 @@
 /*  =========================================================================
     zsys - system-level methods
 
-    -------------------------------------------------------------------------
-    Copyright (c) 1991-2014 iMatix Corporation <www.imatix.com>
-    Copyright other contributors as noted in the AUTHORS file.
-
+    Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
     http://czmq.zeromq.org.
 
-    This is free software; you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the 
-    Free Software Foundation; either version 3 of the License, or (at your 
-    option) any later version.
-
-    This software is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL-
-    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General 
-    Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License 
-    along with this program. If not, see <http://www.gnu.org/licenses/>.
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
     =========================================================================
 */
 
 /*
 @header
-    The zsys class provides a portable wrapper for miscellaneous functions
-    that we want to wrap but which don't fit into any of the existing
-    classes. Eventually all non-portable functionality might be moved here
-    but for now it covers only file systems.
+    The zsys class provides a portable wrapper for system calls. We collect
+    them here to reduce the number of weird #ifdefs in other classes. As far
+    as possible, the bulk of CZMQ classes are fully portable.
 @discuss
 @end
 */
 
 #include "../include/czmq.h"
 
+//  We use these variables for signal handling
+
 #if defined (__UNIX__)
 static bool s_first_time = true;
 static struct sigaction sigint_default;
 static struct sigaction sigterm_default;
+
 #elif defined (__WINDOWS__)
 static bool s_shim_installed = false;
 static zsys_handler_fn *installed_handler_fn;
@@ -53,6 +43,7 @@ static BOOL WINAPI s_handler_fn_shim (DWORD ctrltype)
        return FALSE;
 }
 #endif
+
 
 //  --------------------------------------------------------------------------
 //  Set interrupt handler (NULL means external handler)
@@ -267,7 +258,7 @@ zsys_file_stable (const char *filename)
 
 
 //  --------------------------------------------------------------------------
-//  Create a file path if it doesn't exist. The file path is treated as a 
+//  Create a file path if it doesn't exist. The file path is treated as a
 //  printf format.
 
 int
@@ -317,7 +308,7 @@ zsys_dir_delete (const char *pathname, ...)
     va_start (argptr, pathname);
     char *formatted = zsys_vprintf (pathname, argptr);
     va_end (argptr);
-    
+
 #if (defined (__WINDOWS__))
     int rc = RemoveDirectoryA (formatted)? 0: -1;
 #else
@@ -375,7 +366,7 @@ void zsys_version (int *major, int *minor, int *patch)
 //  Format a string with variable arguments, returning a freshly allocated
 //  buffer. If there was insufficient memory, returns NULL. Free the returned
 //  string using zstr_free().
- 
+
 char *
 zsys_vprintf (const char *format, va_list argptr)
 {
@@ -410,7 +401,7 @@ zsys_vprintf (const char *format, va_list argptr)
 
 
 //  --------------------------------------------------------------------------
-//  Create UDP beacon socket; if the routable option is true, uses
+//  Create a UDP beacon socket; if the routable option is true, uses
 //  multicast (not yet implemented), else uses broadcast. This method
 //  and related ones might _eventually_ be moved to a zudp class.
 
@@ -455,7 +446,7 @@ zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address)
 {
     assert (frame);
     assert (address);
-    
+
     //  Sending can fail if the OS is blocking multicast. In such cases we
     //  don't try to report the error. We might log this or send to an error
     //  console at some point.
@@ -483,7 +474,7 @@ zsys_udp_recv (SOCKET udpsock, char *peername)
         (struct sockaddr *) &address, &address_len);
     if (size == SOCKET_ERROR)
         zsys_socket_error ("recvfrom");
-    
+
     //  Get sender address as printable string
 #if (defined (__WINDOWS__))
     getnameinfo ((struct sockaddr *) &address, address_len,
@@ -550,12 +541,63 @@ zsys_socket_error (const char *reason)
 }
 
 
+//  --------------------------------------------------------------------------
+//  Move the current process into the background. The precise effect depends
+//  on the operating system. On POSIX boxes, moves to a specified working
+//  directory (if specified), closes all file handles, reopens stdin, stdout,
+//  and stderr to the null device, and sets the process to ignore SIGHUP. On
+//  Windows, does nothing. Returns 0 if OK, -1 if there was an error.
+
+int
+zsys_daemonize (const char *workdir)
+{
+#if (defined (__UNIX__))
+    //  Defines umask for new files this process will create
+    mode_t file_mask = 027;     //  Complement of 0750
+
+    //  Recreate our process as a child of init
+    int fork_result = fork ();
+    if (fork_result < 0)        //  < 0 is an error
+        return -1;              //  Could not fork
+    else
+    if (fork_result > 0)        //  > 0 is the parent process
+        exit (0);               //  End parent process
+
+    //  Move to a safe and known directory, which is supplied as an
+    //  argument to this function (or not, if workdir is NULL or empty).
+    if (workdir && chdir (workdir)) {
+        fprintf (stderr, "E: cannot chdir to '%s'\n", workdir);
+        return -1;
+    }
+    //  Close all open file descriptors inherited from the parent
+    //  process, to reduce the resources we use
+    int file_handle = sysconf (_SC_OPEN_MAX);
+    while (file_handle)
+    close (file_handle--);      //  Ignore any errors
+
+    //  Set the umask for new files we might create
+    umask (file_mask);
+
+    //  Set standard input and output to the null device so that any
+    //  code that assumes that these files are open will work
+    file_handle = open ("/dev/null", O_RDWR);
+    int fh_stdout = dup (file_handle);
+    int fh_stderr = dup (file_handle);
+    assert (fh_stdout);
+    assert (fh_stderr);
+
+    //  Ignore any hangup signal from the controlling console
+    signal (SIGHUP, SIG_IGN);
+#endif
+    return 0;
+}
+
 
 //  --------------------------------------------------------------------------
 //  Selftest
 
 static char *
-s_vprintf (const char *format, ...) 
+s_vprintf (const char *format, ...)
 {
     va_list argptr;
     va_start (argptr, format);
@@ -563,7 +605,7 @@ s_vprintf (const char *format, ...)
     va_end (argptr);
     return (string);
 }
-    
+
 int
 zsys_test (bool verbose)
 {
@@ -602,7 +644,7 @@ zsys_test (bool verbose)
     assert (major == CZMQ_VERSION_MAJOR);
     assert (minor == CZMQ_VERSION_MINOR);
     assert (patch == CZMQ_VERSION_PATCH);
-    
+
     char *string = s_vprintf ("%s %02x", "Hello", 16);
     assert (streq (string, "Hello 10"));
     zstr_free (&string);
@@ -613,7 +655,7 @@ zsys_test (bool verbose)
     assert (strlen (string) == (4 * 64 + 10));
     zstr_free (&string);
     //  @end
-    
+
     printf ("OK\n");
     return 0;
 }

@@ -41,6 +41,7 @@ int main (int argc, char *argv [])
     //  These are ordered from most basic to most complex
     zrex_test (verbose);
     zsys_test (verbose);
+    zlog_test (verbose);
     zchunk_test (verbose);
     zconfig_test (verbose);
     zmutex_test (verbose);
@@ -50,7 +51,6 @@ int main (int argc, char *argv [])
     zdigest_test (verbose);
     zfile_test (verbose);
     zhash_test (verbose);
-    ztree_test (verbose);
     zlist_test (verbose);
     zuuid_test (verbose);
     zctx_test (verbose);

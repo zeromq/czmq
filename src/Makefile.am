@@ -25,6 +25,7 @@ include_HEADERS = \
     ../include/zframe.h \
     ../include/zhash.h \
     ../include/zlist.h \
+    ../include/zlog.h \
     ../include/zloop.h \
     ../include/zmonitor.h \
     ../include/zmsg.h \
@@ -37,7 +38,6 @@ include_HEADERS = \
     ../include/zstr.h \
     ../include/zsys.h \
     ../include/zthread.h \
-    ../include/ztree.h \
     ../include/zuuid.h
 
 libczmq_la_SOURCES = \
@@ -57,6 +57,7 @@ libczmq_la_SOURCES = \
     zframe.c \
     zhash.c \
     zlist.c \
+    zlog.c \
     zloop.c \
     zmonitor.c \
     zmsg.c \
@@ -69,7 +70,6 @@ libczmq_la_SOURCES = \
     zstr.c \
     zsys.c \
     zthread.c \
-    ztree.c \
     zuuid.c
 
 AM_CFLAGS = -g
