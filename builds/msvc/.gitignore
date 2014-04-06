@@ -20,3 +20,4 @@ mt.dep
 *.suo
 *.sdf
 *.vcxproj.user
+*.aps
