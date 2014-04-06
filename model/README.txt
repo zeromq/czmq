@@ -54,13 +54,24 @@ fix the project files for any given system. However, you can cheat...
 
 Currently we generate these project-related files:
 
-    CMakeLists.txt...
-    builds/android/Android.mk...
-    builds/mingw32/Makefile.mingw32...
-    builds/msvc/czmq.vcproj...
-    builds/msvc/czmq.vcxproj...
-    builds/msvc/czmq.vcxproj.filters...
-    src/Makefile.am...
-    doc/Makefile.am...
+    CMakeLists.txt
+
+    builds/android/Android.mk
+
+    builds/mingw32/Makefile.mingw32
+
+    builds/msvc/vs2008/czmq/czmq.vcproj
+
+    builds/msvc/vs2010/czmq/czmq.vcxproj
+    builds/msvc/vs2010/czmq/czmq.vcxproj.filters
+
+    builds/msvc/vs2012/czmq/czmq.vcxproj
+    builds/msvc/vs2012/czmq/czmq.vcxproj.filters
+
+    builds/msvc/vs2013/czmq/czmq.vcxproj
+    builds/msvc/vs2013/czmq_selftest/czmq_selftest.vcxproj
+
+    src/Makefile.am
+    doc/Makefile.am
 
 And also the socket options class zsockopts using the same approach.
