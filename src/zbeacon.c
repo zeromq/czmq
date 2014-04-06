@@ -401,6 +401,9 @@ s_agent_new (void *pipe, int port_nbr)
 #if (defined (__WINDOWS__))
     inaddr_t sockaddr = self->address;
 #else
+#ifndef gai_strerrorA
+    #define gai_strerrorA gai_strerror
+#endif
     inaddr_t sockaddr = self->broadcast;
 #endif
     if (bind (self->udpsock, (struct sockaddr *) &sockaddr, sizeof (sockaddr)) == SOCKET_ERROR)
