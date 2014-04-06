@@ -195,7 +195,7 @@ mode_t
 zsys_file_mode (const char *filename)
 {
 #if (defined (__WINDOWS__))
-    DWORD dwfa = GetFileAttributes (filename);
+    DWORD dwfa = GetFileAttributesA (filename);
     if (dwfa == 0xffffffff)
         return -1;
 
@@ -228,7 +228,7 @@ zsys_file_delete (const char *filename)
 {
     assert (filename);
 #if (defined (__WINDOWS__))
-    return DeleteFile (filename) ? 0: -1;
+    return DeleteFileA (filename) ? 0: -1;
 #else
     return unlink (filename);
 #endif
@@ -278,7 +278,7 @@ zsys_dir_create (const char *pathname, ...)
         if (mode == (mode_t)-1) {
             //  Does not exist, try to create it
 #if (defined (__WINDOWS__))
-            if (!CreateDirectory (formatted, NULL))
+            if (!CreateDirectoryA (formatted, NULL))
 #else
             if (mkdir (formatted, 0775))
 #endif
@@ -310,7 +310,7 @@ zsys_dir_delete (const char *pathname, ...)
     va_end (argptr);
 
 #if (defined (__WINDOWS__))
-    int rc = RemoveDirectory (formatted)? 0: -1;
+    int rc = RemoveDirectoryA (formatted)? 0: -1;
 #else
     int rc = rmdir (formatted);
 #endif
