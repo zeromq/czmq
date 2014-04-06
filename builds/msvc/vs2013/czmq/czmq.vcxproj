@@ -206,6 +206,7 @@
     <ClInclude Include="..\..\..\..\include\zframe.h" />
     <ClInclude Include="..\..\..\..\include\zhash.h" />
     <ClInclude Include="..\..\..\..\include\zlist.h" />
+    <ClInclude Include="..\..\..\..\include\zlog.h" />
     <ClInclude Include="..\..\..\..\include\zloop.h" />
     <ClInclude Include="..\..\..\..\include\zmonitor.h" />
     <ClInclude Include="..\..\..\..\include\zmsg.h" />
@@ -218,7 +219,6 @@
     <ClInclude Include="..\..\..\..\include\zstr.h" />
     <ClInclude Include="..\..\..\..\include\zsys.h" />
     <ClInclude Include="..\..\..\..\include\zthread.h" />
-    <ClInclude Include="..\..\..\..\include\ztree.h" />
     <ClInclude Include="..\..\..\..\include\zuuid.h" />
     <ClInclude Include="..\..\resource.h" />
   </ItemGroup>
@@ -272,6 +272,9 @@
     <ClCompile Include="..\..\..\..\src\zlist.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\zlog.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zloop.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
@@ -306,9 +309,6 @@
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\zthread.c">
-      <CompileAs>CompileAsCpp</CompileAs>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\ztree.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\zuuid.c">
