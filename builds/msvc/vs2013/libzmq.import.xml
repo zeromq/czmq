@@ -6,7 +6,7 @@
     <Rule.DataSource>
       <DataSource Persistence="ProjectFile" ItemType="" />
     </Rule.DataSource>
-    <EnumProperty Name="libzmq-linkage-local" DisplayName="Linkage" Description="How $(package.target) will be linked into the output of this project" Category="libzmq">
+    <EnumProperty Name="libzmq-linkage-local" DisplayName="Linkage" Description="How libzmq will be linked into the output of this project" Category="libzmq">
       <EnumValue Name="" DisplayName="Not linked to another project output" />
       <EnumValue Name="dynamic" DisplayName="Dynamic (DLL)" />
       <EnumValue Name="static" DisplayName="Static (LIB)" />
