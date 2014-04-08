@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup Label="Globals">
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <_PropertySheetDisplayName>CZMQ Import Settings</_PropertySheetDisplayName>
+  </PropertyGroup>
+  
+  <!-- User Interface -->
+
+  <ItemGroup Label="BuildOptionsExtension">
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)czmq.import.xml" />
+  </ItemGroup>
+
+  <!-- Configuration -->
+
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\..\czmq\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
+  <ItemDefinitionGroup Condition="'$(Linkage-czmq)' == 'static' Or '$(Linkage-czmq)' == 'ltcg'">
+    <ClCompile>
+      <PreprocessorDefinitions>LIBCZMQ_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
+    <ItemDefinitionGroup Condition="'$(Linkage-czmq)' == 'dynamic'">
+    <Link Condition="$(Configuration.IndexOf('Debug')) != -1">
+      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Debug\czmq11\czmq.imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Link Condition="$(Configuration.IndexOf('Release')) != -1">
+      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Release\czmq11\czmq.imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <ItemDefinitionGroup Condition="'$(Linkage-czmq)' == 'static'">
+    <Link Condition="$(Configuration.IndexOf('Debug')) != -1">
+      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Debug\czmq11\czmq.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Link Condition="$(Configuration.IndexOf('Release')) != -1">
+      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Release\czmq11\czmq.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <ItemDefinitionGroup Condition="'$(Linkage-czmq)' == 'ltcg'">
+    <Link Condition="$(Configuration.IndexOf('Debug')) != -1">
+      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Debug\czmq11\czmq.ltcg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Link Condition="$(Configuration.IndexOf('Release')) != -1">
+      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Release\czmq11\czmq.ltcg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <!-- Copy -->
+
+  <Target Name="Linkage-czmq-dynamic" AfterTargets="AfterBuild" Condition="'$(Linkage-czmq)' == 'dynamic'">
+    <Copy Condition="$(Configuration.IndexOf('Debug')) != -1"
+          SourceFiles="$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Debug\czmq11\czmq.dll"
+          DestinationFiles="$(TargetDir)czmq.dll"
+          SkipUnchangedFiles="true" />
+    <Copy Condition="$(Configuration.IndexOf('Debug')) != -1"
+          SourceFiles="$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Debug\czmq11\czmq.pdb"
+          DestinationFiles="$(TargetDir)czmq.pdb"
+          SkipUnchangedFiles="true" />
+    <Copy Condition="$(Configuration.IndexOf('Release')) != -1"
+          SourceFiles="$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Release\czmq11\czmq.dll"
+          DestinationFiles="$(TargetDir)czmq.dll"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+  <!-- Messages -->
+
+  <Target Name="czmq-info" BeforeTargets="AfterBuild" Condition="'$(Linkage-czmq)' == 'dynamic'">
+    <Message Text="Copying czmq.dll -&gt; $(TargetDir)czmq.dll" Importance="high"/>
+    <Message Text="Copying czmq.pdb -&gt; $(TargetDir)czmq.pdb" Importance="high" Condition="$(Configuration.IndexOf('Debug')) != -1" />
+  </Target>
+
+</Project>
