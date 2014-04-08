@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
@@ -174,52 +174,8 @@
     <Import Project="$(ProjectDir)..\properties\StaticRelease.props" />
     <Import Project="$(ProjectDir)..\properties\x64.props" />
   </ImportGroup>
-  <ItemGroup Label="BuildOptionsExtension">
-    <PropertyPageSchema Include="..\libzmq.import.xml" />
-  </ItemGroup>
-  <ImportGroup Label="PropertySheets">
-    <Import Project="..\libzmq.import.props" />
-  </ImportGroup>
-  <PropertyGroup Condition="$(Configuration.IndexOf('DLL')) != -1">
-    <libzmq-linkage-local>dynamic</libzmq-linkage-local>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(Configuration.IndexOf('LTCG')) != -1">
-    <libzmq-linkage-local>ltcg</libzmq-linkage-local>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(Configuration.IndexOf('LIB')) != -1">
-    <libzmq-linkage-local>static</libzmq-linkage-local>
-  </PropertyGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\builds\msvc\platform.h" />
-    <ClInclude Include="..\..\..\..\include\zauth.h" />
-    <ClInclude Include="..\..\..\..\include\zbeacon.h" />
-    <ClInclude Include="..\..\..\..\include\zcert.h" />
-    <ClInclude Include="..\..\..\..\include\zcertstore.h" />
-    <ClInclude Include="..\..\..\..\include\zchunk.h" />
-    <ClInclude Include="..\..\..\..\include\zclock.h" />
-    <ClInclude Include="..\..\..\..\include\zconfig.h" />
-    <ClInclude Include="..\..\..\..\include\zctx.h" />
-    <ClInclude Include="..\..\..\..\include\zdigest.h" />
-    <ClInclude Include="..\..\..\..\include\zdir.h" />
-    <ClInclude Include="..\..\..\..\include\zdir_patch.h" />
-    <ClInclude Include="..\..\..\..\include\zfile.h" />
-    <ClInclude Include="..\..\..\..\include\zframe.h" />
-    <ClInclude Include="..\..\..\..\include\zhash.h" />
-    <ClInclude Include="..\..\..\..\include\zlist.h" />
-    <ClInclude Include="..\..\..\..\include\zlog.h" />
-    <ClInclude Include="..\..\..\..\include\zloop.h" />
-    <ClInclude Include="..\..\..\..\include\zmonitor.h" />
-    <ClInclude Include="..\..\..\..\include\zmsg.h" />
-    <ClInclude Include="..\..\..\..\include\zmutex.h" />
-    <ClInclude Include="..\..\..\..\include\zpoller.h" />
-    <ClInclude Include="..\..\..\..\include\zproxy.h" />
-    <ClInclude Include="..\..\..\..\include\zrex.h" />
-    <ClInclude Include="..\..\..\..\include\zsocket.h" />
-    <ClInclude Include="..\..\..\..\include\zsockopt.h" />
-    <ClInclude Include="..\..\..\..\include\zstr.h" />
-    <ClInclude Include="..\..\..\..\include\zsys.h" />
-    <ClInclude Include="..\..\..\..\include\zthread.h" />
-    <ClInclude Include="..\..\..\..\include\zuuid.h" />
     <ClInclude Include="..\..\resource.h" />
   </ItemGroup>
   <ItemGroup>

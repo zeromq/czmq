@@ -30,7 +30,7 @@
         <copyright>MPL v2</copyright>
         <tags>native, czmq, libzmq, zmq, 0MQ, messaging, sockets, C++</tags>
         <dependencies>
-            <dependency id="libzmq_vc120" version="4.1.0.3" />
+            <dependency id="libzmq_vc120" version="4.1.0.4" />
         </dependencies>
     </metadata>
     <files>

@@ -8,6 +8,8 @@
     <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
 
+  <!-- Configuration -->
+  
   <ItemDefinitionGroup>
     <ClCompile>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
@@ -19,34 +21,36 @@
     </Link>
   </ItemDefinitionGroup>
 
-  <ItemDefinitionGroup Condition="$(Configuration.IndexOf('LEXE')) != -1 Or $(Configuration.IndexOf('SEXE')) != -1">
-    <ClCompile>
-      <PreprocessorDefinitions>LIBCZMQ_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-  </ItemDefinitionGroup>
+  <!-- Extensions -->
 
-  <!-- Copy dynamic libraries to target -->
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(SolutionDir)czmq.import.props" />
+    <Import Project="$(SolutionDir)libzmq.import.props" />
+    <Import Project="$(SolutionDir)libsodium.import.props" />
+  </ImportGroup>
 
-  <Target Name="czmq-linkage-local-dynamic" AfterTargets="AfterBuild" Condition="$(Configuration.IndexOf('DEXE')) != -1">
-    <Copy Condition="$(Configuration.IndexOf('Debug')) != -1"
-          SourceFiles="$(ProjectDir)..\..\..\..\bin\$(PlatformName)\Debug\czmq10\czmq.dll"
-          DestinationFiles="$(TargetDir)czmq.dll"
-          SkipUnchangedFiles="true" />
-    <Copy Condition="$(Configuration.IndexOf('Debug')) != -1"
-          SourceFiles="$(ProjectDir)..\..\..\..\bin\$(PlatformName)\Debug\czmq10\czmq.pdb"
-          DestinationFiles="$(TargetDir)czmq.pdb"
-          SkipUnchangedFiles="true" />
-    <Copy Condition="$(Configuration.IndexOf('Release')) != -1"
-          SourceFiles="$(ProjectDir)..\..\..\..\bin\$(PlatformName)\Release\czmq10\czmq.dll"
-          DestinationFiles="$(TargetDir)czmq.dll"
-          SkipUnchangedFiles="true" />
-  </Target>
+  <PropertyGroup Condition="$(Configuration.IndexOf('DEXE')) != -1">
+    <Linkage-czmq>dynamic</Linkage-czmq>
+    <Linkage-libzmq>dynamic</Linkage-libzmq>
+    <Linkage-libsodium>dynamic</Linkage-libsodium>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(Configuration.IndexOf('LEXE')) != -1">
+    <Linkage-czmq>ltcg</Linkage-czmq>
+    <Linkage-libzmq>ltcg</Linkage-libzmq>
+    <Linkage-libsodium>ltcg</Linkage-libsodium>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(Configuration.IndexOf('SEXE')) != -1">
+    <Linkage-czmq>static</Linkage-czmq>
+    <Linkage-libzmq>static</Linkage-libzmq>
+    <Linkage-libsodium>static</Linkage-libsodium>
+  </PropertyGroup>
 
   <!-- Messages -->
 
-  <Target Name="czmq-info" BeforeTargets="AfterBuild" Condition="$(Configuration.IndexOf('DEXE')) != -1">
-    <Message Text="Copying czmq.dll -&gt; $(TargetDir)czmq.dll" Importance="high"/>
-    <Message Text="Copying czmq.pdb -&gt; $(TargetDir)czmq.pdb" Importance="high" Condition="$(Configuration.IndexOf('Debug')) != -1" />
+  <Target Name="LinkageInfo" BeforeTargets="PrepareForBuild">
+    <Message Text="Linkage-czmq      : $(Linkage-czmq)" Importance="high"/>
+    <Message Text="Linkage-libzmq    : $(Linkage-libzmq)" Importance="high"/>
+    <Message Text="Linkage-libsodium : $(Linkage-libsodium)" Importance="high"/>
   </Target>
 
 </Project>
