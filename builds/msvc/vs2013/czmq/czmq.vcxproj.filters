@@ -102,93 +102,6 @@
     <ClInclude Include="..\..\..\..\builds\msvc\platform.h">
       <Filter>src\include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zdir.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zdir_patch.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zfile.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zframe.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zhash.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zlist.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zlog.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zloop.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zmonitor.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zmsg.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zmutex.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zpoller.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zproxy.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zrex.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zsocket.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zsockopt.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zstr.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zsys.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zthread.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zuuid.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zauth.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zbeacon.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zcert.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zcertstore.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zchunk.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zclock.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zconfig.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zctx.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\zdigest.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -213,6 +126,9 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\..\packaging\nuget\package.gsl">
+      <Filter>packaging</Filter>
+    </None>
     <None Include="..\..\..\..\packaging\nuget\package.nuspec">
       <Filter>packaging</Filter>
     </None>
@@ -223,9 +139,6 @@
       <Filter>packaging</Filter>
     </None>
     <None Include="..\..\..\..\packaging\nuget\package.config">
-      <Filter>packaging</Filter>
-    </None>
-    <None Include="..\..\..\..\packaging\nuget\package.gsl">
       <Filter>packaging</Filter>
     </None>
   </ItemGroup>

@@ -182,21 +182,6 @@
     <Import Project="$\(ProjectDir)..\\properties\\StaticRelease.props" />
     <Import Project="$\(ProjectDir)..\\properties\\x64.props" />
   </ImportGroup>
-  <ItemGroup Label="BuildOptionsExtension">
-    <PropertyPageSchema Include="..\\libzmq.import.xml" />
-  </ItemGroup>
-  <ImportGroup Label="PropertySheets">
-    <Import Project="..\\libzmq.import.props" />
-  </ImportGroup>
-  <PropertyGroup Condition="$\(Configuration.IndexOf('DLL')) != -1">
-    <libzmq-linkage-local>dynamic</libzmq-linkage-local>
-  </PropertyGroup>
-  <PropertyGroup Condition="$\(Configuration.IndexOf('LTCG')) != -1">
-    <libzmq-linkage-local>ltcg</libzmq-linkage-local>
-  </PropertyGroup>
-  <PropertyGroup Condition="$\(Configuration.IndexOf('LIB')) != -1">
-    <libzmq-linkage-local>static</libzmq-linkage-local>
-  </PropertyGroup>
   <ItemGroup>
     <ClInclude Include="..\\..\\..\\..\\builds\\msvc\\platform.h" />
     <ClInclude Include="..\\..\\resource.h" />
@@ -367,21 +352,6 @@
     <Import Project="$\(ProjectDir)..\\properties\\ConsoleReleaseStatic.props" />
     <Import Project="$\(ProjectDir)..\\properties\\x64.props" />
   </ImportGroup>
-  <ItemGroup Label="BuildOptionsExtension">
-    <PropertyPageSchema Include="..\\libzmq.import.xml" />
-  </ItemGroup>
-  <ImportGroup Label="PropertySheets">
-    <Import Project="..\\libzmq.import.props" />
-  </ImportGroup>
-  <PropertyGroup Condition="$\(Configuration.IndexOf('DEXE')) != -1">
-    <libzmq-linkage-local>dynamic</libzmq-linkage-local>
-  </PropertyGroup>
-  <PropertyGroup Condition="$\(Configuration.IndexOf('LEXE')) != -1">
-    <libzmq-linkage-local>ltcg</libzmq-linkage-local>
-  </PropertyGroup>
-  <PropertyGroup Condition="$\(Configuration.IndexOf('SEXE')) != -1">
-    <libzmq-linkage-local>static</libzmq-linkage-local>
-  </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="..\\..\\..\\..\\src\\$(project.name)_selftest.c" />
   </ItemGroup>

@@ -4,13 +4,17 @@
   <PropertyGroup Label="Globals">
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
     <_PropertySheetDisplayName>ZMQ Import Settings</_PropertySheetDisplayName>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
+  
+  <!-- User Interface -->
 
-  <!-- Dependency linkage -->
+  <ItemGroup Label="BuildOptionsExtension">
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)libzmq.import.xml" />
+  </ItemGroup>
 
-  <ItemDefinitionGroup Condition="'$(Linkage-libzmq)' != ''">
+  <!-- Configuration -->
+
+  <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\..\libzmq\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -49,7 +53,7 @@
     </Link>
   </ItemDefinitionGroup>
 
-  <!-- Copy dynamic libraries to target -->
+  <!-- Copy -->
 
   <Target Name="Linkage-libzmq-dynamic" AfterTargets="AfterBuild" Condition="'$(Linkage-libzmq)' == 'dynamic'">
     <Copy Condition="$(Configuration.IndexOf('Debug')) != -1"

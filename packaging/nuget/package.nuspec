@@ -7,7 +7,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/01/nuspec.xsd">
     <metadata minClientVersion="2.5">
         <id>czmq_vc120</id>
-        <version>2.2.0.6</version>
+        <version>2.2.0.7</version>
         <title>czmq_vc120</title>
         <authors>czmq contributors</authors>
         <owners>Eric Voskuil</owners>
@@ -22,7 +22,7 @@
         <copyright>MPL v2</copyright>
         <tags>native, czmq, libzmq, zmq, 0MQ, messaging, sockets, C++</tags>
         <dependencies>
-            <dependency id="libzmq_vc120" version="4.1.0.3" />
+            <dependency id="libzmq_vc120" version="4.1.0.4" />
         </dependencies>
     </metadata>
     <files>
@@ -74,52 +74,52 @@
         <!-- libraries -->
 
         <!-- x86 Dynamic libraries (.dll) -->
-        <file src="..\..\bin\Win32\Release\czmq12\czmq.dll" target="build\native\bin\czmq-x86-v120-mt-2_2_0_6.dll" />
-        <file src="..\..\bin\Win32\Debug\czmq12\czmq.dll" target="build\native\bin\czmq-x86-v120-mt-gd-2_2_0_6.dll" />
+        <file src="..\..\bin\Win32\Release\czmq12\czmq.dll" target="build\native\bin\czmq-x86-v120-mt-2_2_0_7.dll" />
+        <file src="..\..\bin\Win32\Debug\czmq12\czmq.dll" target="build\native\bin\czmq-x86-v120-mt-gd-2_2_0_7.dll" />
 
         <!-- x86 Debugging symbols (.pdb) -->
-        <!--<file src="..\..\bin\Win32\Release\czmq12\czmq.pdb" target="build\native\bin\czmq-x86-v120-mt-2_2_0_6.pdb" />-->
-        <file src="..\..\bin\Win32\Debug\czmq12\czmq.pdb" target="build\native\bin\czmq-x86-v120-mt-gd-2_2_0_6.pdb" />
+        <!--<file src="..\..\bin\Win32\Release\czmq12\czmq.pdb" target="build\native\bin\czmq-x86-v120-mt-2_2_0_7.pdb" />-->
+        <file src="..\..\bin\Win32\Debug\czmq12\czmq.pdb" target="build\native\bin\czmq-x86-v120-mt-gd-2_2_0_7.pdb" />
 
         <!-- x86 Static libraries (.lib) -->
-        <file src="..\..\bin\Win32\Release\czmq12\czmq.lib" target="build\native\bin\czmq-x86-v120-mt-s-2_2_0_6.lib" />
-        <file src="..\..\bin\Win32\Debug\czmq12\czmq.lib" target="build\native\bin\czmq-x86-v120-mt-sgd-2_2_0_6.lib" />
+        <file src="..\..\bin\Win32\Release\czmq12\czmq.lib" target="build\native\bin\czmq-x86-v120-mt-s-2_2_0_7.lib" />
+        <file src="..\..\bin\Win32\Debug\czmq12\czmq.lib" target="build\native\bin\czmq-x86-v120-mt-sgd-2_2_0_7.lib" />
 
         <!-- x86 Static link time code generation libraries (.ltcg.lib) -->
-        <file src="..\..\bin\Win32\Release\czmq12\czmq.ltcg.lib" target="build\native\bin\czmq-x86-v120-mt-s-2_2_0_6.ltcg.lib" />
-        <file src="..\..\bin\Win32\Debug\czmq12\czmq.ltcg.lib" target="build\native\bin\czmq-x86-v120-mt-sgd-2_2_0_6.ltcg.lib" />
+        <file src="..\..\bin\Win32\Release\czmq12\czmq.ltcg.lib" target="build\native\bin\czmq-x86-v120-mt-s-2_2_0_7.ltcg.lib" />
+        <file src="..\..\bin\Win32\Debug\czmq12\czmq.ltcg.lib" target="build\native\bin\czmq-x86-v120-mt-sgd-2_2_0_7.ltcg.lib" />
 
         <!-- x86 Import libraries (.imp.lib) -->
-        <file src="..\..\bin\Win32\Release\czmq12\czmq.imp.lib" target="build\native\bin\czmq-x86-v120-mt-2_2_0_6.imp.lib" />
-        <file src="..\..\bin\Win32\Debug\czmq12\czmq.imp.lib" target="build\native\bin\czmq-x86-v120-mt-gd-2_2_0_6.imp.lib" />
+        <file src="..\..\bin\Win32\Release\czmq12\czmq.imp.lib" target="build\native\bin\czmq-x86-v120-mt-2_2_0_7.imp.lib" />
+        <file src="..\..\bin\Win32\Debug\czmq12\czmq.imp.lib" target="build\native\bin\czmq-x86-v120-mt-gd-2_2_0_7.imp.lib" />
 
         <!-- x86 Export libraries (.exp) -->
-        <file src="..\..\bin\Win32\Release\czmq12\czmq.imp.exp" target="build\native\bin\czmq-x86-v120-mt-2_2_0_6.exp" />
-        <file src="..\..\bin\Win32\Debug\czmq12\czmq.imp.exp" target="build\native\bin\czmq-x86-v120-mt-gd-2_2_0_6.exp" />
+        <file src="..\..\bin\Win32\Release\czmq12\czmq.imp.exp" target="build\native\bin\czmq-x86-v120-mt-2_2_0_7.exp" />
+        <file src="..\..\bin\Win32\Debug\czmq12\czmq.imp.exp" target="build\native\bin\czmq-x86-v120-mt-gd-2_2_0_7.exp" />
 
         <!-- x64 Dynamic libraries (.dll) -->
-        <file src="..\..\bin\x64\Release\czmq12\czmq.dll" target="build\native\bin\czmq-x64-v120-mt-2_2_0_6.dll" />
-        <file src="..\..\bin\x64\Debug\czmq12\czmq.dll" target="build\native\bin\czmq-x64-v120-mt-gd-2_2_0_6.dll" />
+        <file src="..\..\bin\x64\Release\czmq12\czmq.dll" target="build\native\bin\czmq-x64-v120-mt-2_2_0_7.dll" />
+        <file src="..\..\bin\x64\Debug\czmq12\czmq.dll" target="build\native\bin\czmq-x64-v120-mt-gd-2_2_0_7.dll" />
 
         <!-- x64 Debugging symbols (.pdb) -->
-        <!--<file src="..\..\bin\x64\Release\czmq12\czmq.pdb" target="build\native\bin\czmq-x64-v120-mt-2_2_0_6.pdb" />-->
-        <file src="..\..\bin\x64\Debug\czmq12\czmq.pdb" target="build\native\bin\czmq-x64-v120-mt-gd-2_2_0_6.pdb" />
+        <!--<file src="..\..\bin\x64\Release\czmq12\czmq.pdb" target="build\native\bin\czmq-x64-v120-mt-2_2_0_7.pdb" />-->
+        <file src="..\..\bin\x64\Debug\czmq12\czmq.pdb" target="build\native\bin\czmq-x64-v120-mt-gd-2_2_0_7.pdb" />
 
         <!-- x64 Static libraries (.lib) -->
-        <file src="..\..\bin\x64\Release\czmq12\czmq.lib" target="build\native\bin\czmq-x64-v120-mt-s-2_2_0_6.lib" />
-        <file src="..\..\bin\x64\Debug\czmq12\czmq.lib" target="build\native\bin\czmq-x64-v120-mt-sgd-2_2_0_6.lib" />
+        <file src="..\..\bin\x64\Release\czmq12\czmq.lib" target="build\native\bin\czmq-x64-v120-mt-s-2_2_0_7.lib" />
+        <file src="..\..\bin\x64\Debug\czmq12\czmq.lib" target="build\native\bin\czmq-x64-v120-mt-sgd-2_2_0_7.lib" />
 
         <!-- x64 Static link time code generation libraries (.ltcg.lib) -->
-        <file src="..\..\bin\Win32\Release\czmq12\czmq.ltcg.lib" target="build\native\bin\czmq-x64-v120-mt-s-2_2_0_6.ltcg.lib" />
-        <file src="..\..\bin\Win32\Debug\czmq12\czmq.ltcg.lib" target="build\native\bin\czmq-x64-v120-mt-sgd-2_2_0_6.ltcg.lib" />
+        <file src="..\..\bin\Win32\Release\czmq12\czmq.ltcg.lib" target="build\native\bin\czmq-x64-v120-mt-s-2_2_0_7.ltcg.lib" />
+        <file src="..\..\bin\Win32\Debug\czmq12\czmq.ltcg.lib" target="build\native\bin\czmq-x64-v120-mt-sgd-2_2_0_7.ltcg.lib" />
 
         <!-- x64 Import libraries (.imp.lib) -->
-        <file src="..\..\bin\x64\Release\czmq12\czmq.imp.lib" target="build\native\bin\czmq-x64-v120-mt-2_2_0_6.imp.lib" />
-        <file src="..\..\bin\x64\Debug\czmq12\czmq.imp.lib" target="build\native\bin\czmq-x64-v120-mt-gd-2_2_0_6.imp.lib" />
+        <file src="..\..\bin\x64\Release\czmq12\czmq.imp.lib" target="build\native\bin\czmq-x64-v120-mt-2_2_0_7.imp.lib" />
+        <file src="..\..\bin\x64\Debug\czmq12\czmq.imp.lib" target="build\native\bin\czmq-x64-v120-mt-gd-2_2_0_7.imp.lib" />
 
         <!-- x64 Export libraries (.exp) -->
-        <file src="..\..\bin\x64\Release\czmq12\czmq.imp.exp" target="build\native\bin\czmq-x64-v120-mt-2_2_0_6.exp" />
-        <file src="..\..\bin\x64\Debug\czmq12\czmq.imp.exp" target="build\native\bin\czmq-x64-v120-mt-gd-2_2_0_6.exp" />
+        <file src="..\..\bin\x64\Release\czmq12\czmq.imp.exp" target="build\native\bin\czmq-x64-v120-mt-2_2_0_7.exp" />
+        <file src="..\..\bin\x64\Debug\czmq12\czmq.imp.exp" target="build\native\bin\czmq-x64-v120-mt-gd-2_2_0_7.exp" />
     </files>
 <!--
 #################################################################
