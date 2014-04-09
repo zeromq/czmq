@@ -23,7 +23,7 @@
         <projectUrl>https://github.com/zeromq/czmq</projectUrl>
         <iconUrl>https://avatars1.githubusercontent.com/u/109777?s=32</iconUrl>
         <requireLicenseAcceptance>true</requireLicenseAcceptance>
-        <developmentDependency>true</developmentDependency>
+        <developmentDependency>false</developmentDependency>
         <description>The 0MQ lightweight messaging kernel is a library which extends the standard socket interfaces with features traditionally provided by specialised messaging middleware products. 0MQ sockets provide an abstraction of asynchronous message queues, multiple messaging patterns, message filtering (subscriptions), seamless access to multiple transport protocols and more.</description>
         <summary>High-level C binding for 0MQ, packaged for Visual Studio 2013 (v120) and CTP_Nov2013 compilers.</summary>
         <releaseNotes>https://raw.github.com/zeromq/czmq/master/NEWS</releaseNotes>
