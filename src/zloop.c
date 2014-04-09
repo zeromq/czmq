@@ -37,6 +37,7 @@ struct _zloop_t {
     s_poller_t *pollact;        //  Pollers for this poll set
     bool need_rebuild;          //  True if pollset needs rebuilding
     bool verbose;               //  True if verbose tracing wanted
+    bool terminated;            //  True when stopped running
     zlist_t *zombies;           //  List of timers to kill
 };
 
@@ -91,6 +92,23 @@ s_timer_new (int timer_id, size_t delay, size_t times, zloop_timer_fn handler, v
     }
     return timer;
 }
+
+//  Remove timer with specified id, if it exists
+
+static void
+s_timer_remove (zloop_t *self, int timer_id)
+{
+    s_timer_t *timer = (s_timer_t *) zlist_first (self->timers);
+    while (timer) {
+        if (timer->timer_id == timer_id) {
+            zlist_remove (self->timers, timer);
+            free (timer);
+            break;
+        }
+        timer = (s_timer_t *) zlist_next (self->timers);
+    }
+}
+
 
 //  We hold an array of pollers that matches the pollset, so we can
 //  register/cancel pollers orthogonally to executing the pollset
@@ -329,10 +347,12 @@ zloop_timer_end (zloop_t *self, int timer_id)
 {
     assert (self);
     
+    if (self->terminated)
+        s_timer_remove (self, timer_id);
+    else
     //  We cannot touch self->timers because we may be executing that
     //  from inside the poll loop. So, we hold the arg on the zombie
     //  list, and process that list when we're done executing timers.
-
     //  This hack lets us store an integer timer ID as a pointer
     if (zlist_append (self->zombies, (byte *) NULL + timer_id))
         return -1;
@@ -377,8 +397,8 @@ zloop_start (zloop_t *self)
     //  Main reactor loop
     while (!zctx_interrupted) {
         if (self->need_rebuild) {
-            // If s_rebuild_pollset() fails, break out of the loop and
-            // return its error
+            //  If s_rebuild_pollset() fails, break out of the loop and
+            //  return its error
             rc = s_rebuild_pollset (self);
             if (rc)
                 break;
@@ -449,20 +469,14 @@ zloop_start (zloop_t *self)
         //  This is going to be slow if we have many timers; we might use
         //  a faster lookup on the timer list.
         while (zlist_size (self->zombies)) {
-            //  This hack lets us convert our pointer back into an integer timer_id
+            //  Get timer_id back from pointer
             int timer_id = (byte *) zlist_pop (self->zombies) - (byte *) NULL;
-            timer = (s_timer_t *) zlist_first (self->timers);
-            while (timer) {
-                if (timer->timer_id == timer_id) {
-                    zlist_remove (self->timers, timer);
-                    free (timer);
-                }
-                timer = (s_timer_t *) zlist_next (self->timers);
-            }
+            s_timer_remove (self, timer_id);
         }
         if (rc == -1)
             break;
     }
+    self->terminated = true;
     return rc;
 }
 
