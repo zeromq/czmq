@@ -17,16 +17,13 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\..\czmq\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Linkage-czmq)' == 'static' Or '$(Linkage-czmq)' == 'ltcg'">LIBCZMQ_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
 
-  <ItemDefinitionGroup Condition="'$(Linkage-czmq)' == 'static' Or '$(Linkage-czmq)' == 'ltcg'">
-    <ClCompile>
-      <PreprocessorDefinitions>LIBCZMQ_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-  </ItemDefinitionGroup>
-
-    <ItemDefinitionGroup Condition="'$(Linkage-czmq)' == 'dynamic'">
+  <!-- Linkage -->
+  
+  <ItemDefinitionGroup Condition="'$(Linkage-czmq)' == 'dynamic'">
     <Link Condition="$(Configuration.IndexOf('Debug')) != -1">
       <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Debug\czmq12\czmq.imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
