@@ -126,7 +126,7 @@ CZMQ_EXPORT zframe_t *
 //  Unpack binary frame into a new hash table. Packed data must follow format
 //  defined by zhash_pack. Hash table is set to autofree. An empty frame
 //  unpacks to an empty hash table.
-zhash_t *
+CZMQ_EXPORT zhash_t *
     zhash_unpack (zframe_t *frame);
 
 //  Self test of this class
