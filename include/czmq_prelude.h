@@ -508,6 +508,7 @@ typedef int SOCKET;
 //- Always include ZeroMQ header file ---------------------------------------
 
 #include "zmq.h"
+#include "zmq_utils.h"
 
 #if ZMQ_VERSION_MAJOR == 4
 #   define ZMQ_POLL_MSEC    1           //  zmq_poll is msec
