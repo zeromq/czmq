@@ -118,8 +118,24 @@ CZMQ_EXPORT void
     
 //  Serialize hash table to a binary frame that can be sent in a message.
 //  The packed format is compatible with the 'dictionary' type defined in
-//  rfc.zeromq.org/spec:19/FILEMQ. Comments are not included in the packed
-//  data. Item values MUST be strings.
+//  http://rfc.zeromq.org/spec:35/FILEMQ, and implemented by zproto:
+//
+//     ; A list of name/value pairs
+//     dictionary      = dict-count *( dict-name dict-value )
+//     dict-count      = number-4
+//     dict-value      = longstr
+//     dict-name       = string
+//
+//     ; Strings are always length + text contents
+//     longstr         = number-4 *VCHAR
+//     string          = number-1 *VCHAR
+//
+//     ; Numbers are unsigned integers in network byte order
+//     number-1        = 1OCTET
+//     number-4        = 4OCTET
+//
+//  Comments are not included in the packed data. Item values MUST be
+//  strings.
 CZMQ_EXPORT zframe_t *
     zhash_pack (zhash_t *self);
     
