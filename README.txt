@@ -390,15 +390,15 @@ This is the class interface:
 
 .pull src/zthread.c@discuss,left
 
-#### ztree - generic red-black tree container
+#### zuuid - UUID management
 
-.pull src/ztree.c@header,left
+.pull src/zuuid.c@header,left
 
 This is the class interface:
 
-.pull include/ztree.h@interface,code
+.pull include/zuuid.h@interface,code
 
-.pull src/ztree.c@discuss,left
+.pull src/zuuid.c@discuss,left
 
 ## Under the Hood
 

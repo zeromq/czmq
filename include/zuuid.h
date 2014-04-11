@@ -22,6 +22,7 @@ extern "C" {
 
 typedef struct _zuuid_t zuuid_t;
 
+//  @interface
 //  Constructor
 CZMQ_EXPORT zuuid_t *
     zuuid_new (void);
@@ -65,6 +66,7 @@ CZMQ_EXPORT zuuid_t *
 //  Self test of this class
 CZMQ_EXPORT int
     zuuid_test (bool verbose);
+//  @end
 
 #ifdef __cplusplus
 }
