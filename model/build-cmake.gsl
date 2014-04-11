@@ -67,6 +67,11 @@ if (MSVC)
     set(MORE_LIBRARIES ws2_32 Rpcrt4 Iphlpapi)
 endif()
 
+# required libraries for mingw
+if (MINGW)
+    set(MORE_LIBRARIES -lws2_32 -lrpcrt4 -liphlpapi)
+endif()
+
 ########################################################################
 # zeromq depedency
 ########################################################################
