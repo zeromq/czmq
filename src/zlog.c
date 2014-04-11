@@ -96,7 +96,7 @@ zlog_error (zlog_t *self, const char *format, ...)
     syslog (LOG_ERR, "%s", string);
 #endif
     if (self->foreground)
-        zclock_log ("E: %s\n", string);
+        zclock_log ("E: %s", string);
     free (string);
 }
 
@@ -116,7 +116,7 @@ zlog_warning (zlog_t *self, const char *format, ...)
     syslog (LOG_WARNING, "%s", string);
 #endif
     if (self->foreground)
-        zclock_log ("W: %s\n", string);
+        zclock_log ("W: %s", string);
     free (string);
 }
 
@@ -136,7 +136,7 @@ zlog_notice (zlog_t *self, const char *format, ...)
     syslog (LOG_NOTICE, "%s", string);
 #endif
     if (self->foreground)
-        zclock_log ("N: %s\n", string);
+        zclock_log ("N: %s", string);
     free (string);
 }
 
@@ -156,7 +156,7 @@ zlog_info (zlog_t *self, const char *format, ...)
     syslog (LOG_INFO, "%s", string);
 #endif
     if (self->foreground)
-        zclock_log ("I: %s\n", string);
+        zclock_log ("I: %s", string);
     free (string);
 }
 
@@ -176,7 +176,7 @@ zlog_debug (zlog_t *self, const char *format, ...)
     syslog (LOG_DEBUG, "%s", string);
 #endif
     if (self->foreground)
-        zclock_log ("D: %s\n", string);
+        zclock_log ("D: %s", string);
     free (string);
 }
 
