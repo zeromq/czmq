@@ -28,6 +28,10 @@
 #define HAVE_LIBUUID 1
 #endif
 
+#if defined (__UTYPE_OSX) && !defined (HAVE_LIBUUID)
+#define HAVE_LIBUUID 1
+#endif
+
 #if defined (HAVE_LIBUUID)
 #if defined (__UTYPE_FREEBSD) || defined (__UTYPE_NETBSD)
 #   include <uuid.h>
