@@ -274,6 +274,14 @@
   <ItemGroup>
     <ResourceCompile Include="..\..\czmq.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\packaging\nuget\package.bat" />
+    <None Include="..\..\..\..\packaging\nuget\package.config" />
+    <None Include="..\..\..\..\packaging\nuget\package.gsl" />
+    <None Include="..\..\..\..\packaging\nuget\package.nuspec" />
+    <None Include="..\..\..\..\packaging\nuget\package.targets" />
+    <None Include="..\..\..\..\packaging\nuget\package.xml" />
+  </ItemGroup>  
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <!--
   #################################################################
