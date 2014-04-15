@@ -1,4 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+#################################################################
+#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
+#   Please read the README.txt file in the model directory.     #
+#################################################################
+-->
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\zauth.c">
@@ -25,13 +31,13 @@
     <ClCompile Include="..\..\..\..\src\zctx.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zdigest.c">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zdir.c">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\zdir_patch.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\zdigest.c">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\zfile.c">
@@ -44,6 +50,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\zlist.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\zlog.c">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\zloop.c">
@@ -85,23 +94,29 @@
     <ClCompile Include="..\..\..\..\src\zuuid.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zlog.c">
-      <Filter>src</Filter>
-    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\include\czmq.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\czmq_prelude.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\builds\msvc\platform.h">
+      <Filter>src\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\resource.h">
       <Filter>resource</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\include\czmq_prelude.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\czmq.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\builds\msvc\platform.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
+  </ItemGroup>  
+  <ItemGroup>
+    <ResourceCompile Include="..\..\czmq.rc">
+      <Filter>resource</Filter>
+    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -113,19 +128,20 @@
     <Filter Include="src\include">
       <UniqueIdentifier>{d0c837b5-cb58-4b82-b9bf-38727c7b25bd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="packaging">
-      <UniqueIdentifier>{25c4c9ff-ad06-43a8-bba7-c117f3af598b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="resource">
       <UniqueIdentifier>{48e93f8c-156c-4379-a901-4b5ad39a4eac}</UniqueIdentifier>
     </Filter>
+    <Filter Include="packaging">
+      <UniqueIdentifier>{04a473ca-1d88-4e12-9190-8d9cc20efd74}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\..\czmq.rc">
-      <Filter>resource</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
+    <None Include="..\..\..\..\packaging\nuget\package.bat">
+      <Filter>packaging</Filter>
+    </None>
+    <None Include="..\..\..\..\packaging\nuget\package.config">
+      <Filter>packaging</Filter>
+    </None>
     <None Include="..\..\..\..\packaging\nuget\package.gsl">
       <Filter>packaging</Filter>
     </None>
@@ -135,16 +151,14 @@
     <None Include="..\..\..\..\packaging\nuget\package.targets">
       <Filter>packaging</Filter>
     </None>
-    <None Include="..\..\..\..\packaging\nuget\package.bat">
+    <None Include="..\..\..\..\packaging\nuget\package.xml">
       <Filter>packaging</Filter>
-    </None>
-    <None Include="..\..\..\..\packaging\nuget\package.config">
-      <Filter>packaging</Filter>
-    </None>
+    </None>    
   </ItemGroup>
-  <ItemGroup>
-    <Xml Include="..\..\..\..\packaging\nuget\package.xml">
-      <Filter>packaging</Filter>
-    </Xml>
-  </ItemGroup>
+<!--
+#################################################################
+#   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
+#   Please read the README.txt file in the model directory.     #
+#################################################################
+-->  
 </Project>
