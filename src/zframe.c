@@ -155,7 +155,7 @@ zframe_send (zframe_t **self_p, void *zocket, int flags)
         else {
             int rc = zmq_sendmsg (zocket, &self->zmsg, send_flags);
             zframe_destroy (self_p);
-            if (rc < 0)
+            if (rc == -1)
                 return rc;
         }
     }

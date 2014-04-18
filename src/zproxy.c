@@ -161,7 +161,7 @@ s_proxy_task (void *args, zctx_t *ctx, void *command_pipe)
                         zmq_msg_t dup;
                         zmq_msg_init (&dup);
                         zmq_msg_copy (&dup, &msg);
-                        if (zmq_sendmsg (capture, &dup, send_flags))
+                        if (zmq_sendmsg (capture, &dup, send_flags) == -1)
                             zmq_msg_close (&dup);
                     }
                     if (zmq_sendmsg (output, &msg, send_flags) == -1) {
