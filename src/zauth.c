@@ -205,7 +205,7 @@ typedef struct {
     char *username;             //  PLAIN user name
     char *password;             //  PLAIN password, in clear text
     char *client_key;           //  CURVE client public key in ASCII
-    char *principle;            //  GSSAPI client principle
+    char *principal;            //  GSSAPI client principal
 } zap_request_t;
 
 
@@ -249,7 +249,7 @@ zap_request_new (void *handler)
     }
     else
     if (streq (self->mechanism, "GSSAPI")) {
-        self->principle = zmsg_popstr (request);
+        self->principal = zmsg_popstr (request);
     }
     zmsg_destroy (&request);
     return self;
@@ -274,7 +274,7 @@ zap_request_destroy (zap_request_t **self_p)
         free (self->username);
         free (self->password);
         free (self->client_key);
-        free (self->principle);
+        free (self->principal);
         free (self);
         *self_p = NULL;
     }
@@ -566,7 +566,7 @@ static bool
 s_authenticate_gssapi (agent_t *self, zap_request_t *request)
 {
     if (self->verbose) 
-        printf ("I: ALLOWED (GSSAPI) principle=%s identity=%s\n", request->principle, request->identity);
+        printf ("I: ALLOWED (GSSAPI) principal=%s identity=%s\n", request->principal, request->identity);
     return true;
 }
 
