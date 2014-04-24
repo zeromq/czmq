@@ -159,6 +159,20 @@ zauth_configure_curve (zauth_t *self, const char *domain, const char *location)
 
 
 //  --------------------------------------------------------------------------
+//  Configure GSSAPI authentication for a given domain. GSSAPI authentication
+//  uses an underlying mechanism (usually Kerberos) to establish a secure
+//  context and perform mutual authentication.  To cover all domains, use "*". 
+
+void
+zauth_configure_gssapi (zauth_t *self, char *domain, ...)
+{
+    assert (self);
+    assert (domain);
+    zstr_sendx (self->pipe, "GSSAPI", domain, NULL);
+}
+
+
+//  --------------------------------------------------------------------------
 //  Enable verbose tracing of commands and activity
 
 void
@@ -191,6 +205,7 @@ typedef struct {
     char *username;             //  PLAIN user name
     char *password;             //  PLAIN password, in clear text
     char *client_key;           //  CURVE client public key in ASCII
+    char *principal;            //  GSSAPI client principal
 } zap_request_t;
 
 
@@ -232,6 +247,10 @@ zap_request_new (void *handler)
         zmq_z85_encode (self->client_key, zframe_data (frame), 32);
         zframe_destroy (&frame);
     }
+    else
+    if (streq (self->mechanism, "GSSAPI")) {
+        self->principal = zmsg_popstr (request);
+    }
     zmsg_destroy (&request);
     return self;
 #else
@@ -255,6 +274,7 @@ zap_request_destroy (zap_request_t **self_p)
         free (self->username);
         free (self->password);
         free (self->client_key);
+        free (self->principal);
         free (self);
         *self_p = NULL;
     }
@@ -389,6 +409,12 @@ s_agent_handle_pipe (agent_t *self)
         zstr_send (self->pipe, "OK");
     }
     else
+    if (streq (command, "GSSAPI")) {
+        //  For now we don't do anything with domains
+        char *domain = zmsg_popstr (request);
+        free (domain);
+    }
+    else
     if (streq (command, "VERBOSE")) {
         char *verbose = zmsg_popstr (request);
         self->verbose = *verbose == '1';
@@ -414,6 +440,7 @@ s_agent_handle_pipe (agent_t *self)
 
 static bool s_authenticate_plain (agent_t *self, zap_request_t *request);
 static bool s_authenticate_curve (agent_t *self, zap_request_t *request);
+static bool s_authenticate_gssapi (agent_t *self, zap_request_t *request);
 
 static int
 s_agent_authenticate (agent_t *self)
@@ -465,6 +492,12 @@ s_agent_authenticate (agent_t *self)
             if (streq (request->mechanism, "CURVE"))
                 //  For CURVE, even a whitelisted address must authenticate
                 allowed = s_authenticate_curve (self, request);
+            else
+            if (streq (request->mechanism, "GSSAPI"))
+                //  For GSSAPI, even a whitelisted address must authenticate
+                allowed = s_authenticate_gssapi (self, request);
+            else
+                printf("Skipping unknown mechanism: %s\n", request->mechanism);
         }
         if (allowed)
             zap_request_reply (request, "200", "OK");
@@ -529,6 +562,13 @@ s_authenticate_curve (agent_t *self, zap_request_t *request)
     }
 }
 
+static bool 
+s_authenticate_gssapi (agent_t *self, zap_request_t *request)
+{
+    if (self->verbose) 
+        printf ("I: ALLOWED (GSSAPI) principal=%s identity=%s\n", request->principal, request->identity);
+    return true;
+}
 
 //  Handle a message from front-end API
 
