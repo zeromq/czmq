@@ -27,7 +27,6 @@
     <class name = "zsocket" />
     <class name = "zsockopt" />
     <class name = "zsock" />
-    <class name = "zsock_option" />
     <class name = "zstr" />
     <class name = "zsys" />
     <class name = "zthread" />

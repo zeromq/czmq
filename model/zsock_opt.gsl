@@ -168,9 +168,9 @@ zsock_set_$(name) (zsock_t *self, $(ctype_const) $(name))
 .                   else
 .                       .close = ""
 .                   endif
-    $(open)zsock_type (self->socket) != ZMQ_$(TYPE)$(close)
+    $(open)zsock_type (self) != ZMQ_$(TYPE)$(close)
 .               endfor
-        printf ("ZMQ_$(NAME) is not valid on %s sockets\\n", zsock_type_str (self->socket));
+        printf ("ZMQ_$(NAME) is not valid on %s sockets\\n", zsock_type_str (self));
         assert (false);
     }
 .           endif
@@ -315,28 +315,28 @@ zsock_option_test (bool verbose)
 .       if defined (.ifdef)
 #       if defined ($(ifdef:))
 .       endif
-    self->socket = zsock_new (ctx, ZMQ_$(TEST));
-    assert (self->socket);
+    self = zsock_new (ctx, ZMQ_$(TEST));
+    assert (self);
 .       if mode = "rw" | mode = "w"
 .           if ctype = "int"
-    zsock_set_$(name) (self->socket, 1);
+    zsock_set_$(name) (self, 1);
 .               if mode = "rw"
-    assert (zsock_$(name) (self->socket) == 1);
+    assert (zsock_$(name) (self) == 1);
 .               endif
 .           else
-    zsock_set_$(name) (self->socket, "$(test_value?'test':)");
+    zsock_set_$(name) (self, "$(test_value?'test':)");
 .           endif
 .       endif
 .       if mode = "rw" | mode = "r"
 .           if type = "string" | type = "key"
-    char *$(name) = zsock_$(name) (self->socket);
+    char *$(name) = zsock_$(name) (self);
     assert ($(name));
     free ($(name));
 .           else
-    zsock_$(name) (self->socket);
+    zsock_$(name) (self);
 .           endif
 .       endif
-    zsock_destroy (ctx, self->socket);
+    zsock_destroy (&self);
 .       if defined (.ifdef)
 #       endif
 .       endif

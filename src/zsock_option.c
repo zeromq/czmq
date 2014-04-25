@@ -74,8 +74,8 @@ zsock_set_router_handover (zsock_t *self, int router_handover)
 {
     assert(self);
 #   if defined (ZMQ_ROUTER_HANDOVER)
-    if (zsock_type (self->socket) != ZMQ_ROUTER) {
-        printf ("ZMQ_ROUTER_HANDOVER is not valid on %s sockets\n", zsock_type_str (self->socket));
+    if (zsock_type (self) != ZMQ_ROUTER) {
+        printf ("ZMQ_ROUTER_HANDOVER is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
     int rc = zmq_setsockopt (self->socket, ZMQ_ROUTER_HANDOVER, &router_handover, sizeof (int));
@@ -93,8 +93,8 @@ zsock_set_router_mandatory (zsock_t *self, int router_mandatory)
 {
     assert(self);
 #   if defined (ZMQ_ROUTER_MANDATORY)
-    if (zsock_type (self->socket) != ZMQ_ROUTER) {
-        printf ("ZMQ_ROUTER_MANDATORY is not valid on %s sockets\n", zsock_type_str (self->socket));
+    if (zsock_type (self) != ZMQ_ROUTER) {
+        printf ("ZMQ_ROUTER_MANDATORY is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
     int rc = zmq_setsockopt (self->socket, ZMQ_ROUTER_MANDATORY, &router_mandatory, sizeof (int));
@@ -112,10 +112,10 @@ zsock_set_probe_router (zsock_t *self, int probe_router)
 {
     assert(self);
 #   if defined (ZMQ_PROBE_ROUTER)
-    if (zsock_type (self->socket) != ZMQ_ROUTER
-    &&  zsock_type (self->socket) != ZMQ_DEALER
-    &&  zsock_type (self->socket) != ZMQ_REQ) {
-        printf ("ZMQ_PROBE_ROUTER is not valid on %s sockets\n", zsock_type_str (self->socket));
+    if (zsock_type (self) != ZMQ_ROUTER
+    &&  zsock_type (self) != ZMQ_DEALER
+    &&  zsock_type (self) != ZMQ_REQ) {
+        printf ("ZMQ_PROBE_ROUTER is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
     int rc = zmq_setsockopt (self->socket, ZMQ_PROBE_ROUTER, &probe_router, sizeof (int));
@@ -133,8 +133,8 @@ zsock_set_req_relaxed (zsock_t *self, int req_relaxed)
 {
     assert(self);
 #   if defined (ZMQ_REQ_RELAXED)
-    if (zsock_type (self->socket) != ZMQ_REQ) {
-        printf ("ZMQ_REQ_RELAXED is not valid on %s sockets\n", zsock_type_str (self->socket));
+    if (zsock_type (self) != ZMQ_REQ) {
+        printf ("ZMQ_REQ_RELAXED is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
     int rc = zmq_setsockopt (self->socket, ZMQ_REQ_RELAXED, &req_relaxed, sizeof (int));
@@ -152,8 +152,8 @@ zsock_set_req_correlate (zsock_t *self, int req_correlate)
 {
     assert(self);
 #   if defined (ZMQ_REQ_CORRELATE)
-    if (zsock_type (self->socket) != ZMQ_REQ) {
-        printf ("ZMQ_REQ_CORRELATE is not valid on %s sockets\n", zsock_type_str (self->socket));
+    if (zsock_type (self) != ZMQ_REQ) {
+        printf ("ZMQ_REQ_CORRELATE is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
     int rc = zmq_setsockopt (self->socket, ZMQ_REQ_CORRELATE, &req_correlate, sizeof (int));
@@ -171,12 +171,12 @@ zsock_set_conflate (zsock_t *self, int conflate)
 {
     assert(self);
 #   if defined (ZMQ_CONFLATE)
-    if (zsock_type (self->socket) != ZMQ_PUSH
-    &&  zsock_type (self->socket) != ZMQ_PULL
-    &&  zsock_type (self->socket) != ZMQ_PUB
-    &&  zsock_type (self->socket) != ZMQ_SUB
-    &&  zsock_type (self->socket) != ZMQ_DEALER) {
-        printf ("ZMQ_CONFLATE is not valid on %s sockets\n", zsock_type_str (self->socket));
+    if (zsock_type (self) != ZMQ_PUSH
+    &&  zsock_type (self) != ZMQ_PULL
+    &&  zsock_type (self) != ZMQ_PUB
+    &&  zsock_type (self) != ZMQ_SUB
+    &&  zsock_type (self) != ZMQ_DEALER) {
+        printf ("ZMQ_CONFLATE is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
     int rc = zmq_setsockopt (self->socket, ZMQ_CONFLATE, &conflate, sizeof (int));
@@ -609,8 +609,8 @@ zsock_set_router_raw (zsock_t *self, int router_raw)
 {
     assert(self);
 #   if defined (ZMQ_ROUTER_RAW)
-    if (zsock_type (self->socket) != ZMQ_ROUTER) {
-        printf ("ZMQ_ROUTER_RAW is not valid on %s sockets\n", zsock_type_str (self->socket));
+    if (zsock_type (self) != ZMQ_ROUTER) {
+        printf ("ZMQ_ROUTER_RAW is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
     int rc = zmq_setsockopt (self->socket, ZMQ_ROUTER_RAW, &router_raw, sizeof (int));
@@ -799,8 +799,8 @@ zsock_set_subscribe (zsock_t *self, const char * subscribe)
 {
     assert(self);
 #   if defined (ZMQ_SUBSCRIBE)
-    if (zsock_type (self->socket) != ZMQ_SUB) {
-        printf ("ZMQ_SUBSCRIBE is not valid on %s sockets\n", zsock_type_str (self->socket));
+    if (zsock_type (self) != ZMQ_SUB) {
+        printf ("ZMQ_SUBSCRIBE is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
     int rc = zmq_setsockopt (self->socket, ZMQ_SUBSCRIBE, subscribe, strlen (subscribe));
@@ -818,8 +818,8 @@ zsock_set_unsubscribe (zsock_t *self, const char * unsubscribe)
 {
     assert(self);
 #   if defined (ZMQ_UNSUBSCRIBE)
-    if (zsock_type (self->socket) != ZMQ_SUB) {
-        printf ("ZMQ_UNSUBSCRIBE is not valid on %s sockets\n", zsock_type_str (self->socket));
+    if (zsock_type (self) != ZMQ_SUB) {
+        printf ("ZMQ_UNSUBSCRIBE is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
     int rc = zmq_setsockopt (self->socket, ZMQ_UNSUBSCRIBE, unsubscribe, strlen (unsubscribe));
@@ -837,11 +837,11 @@ zsock_set_identity (zsock_t *self, const char * identity)
 {
     assert(self);
 #   if defined (ZMQ_IDENTITY)
-    if (zsock_type (self->socket) != ZMQ_REQ
-    &&  zsock_type (self->socket) != ZMQ_REP
-    &&  zsock_type (self->socket) != ZMQ_DEALER
-    &&  zsock_type (self->socket) != ZMQ_ROUTER) {
-        printf ("ZMQ_IDENTITY is not valid on %s sockets\n", zsock_type_str (self->socket));
+    if (zsock_type (self) != ZMQ_REQ
+    &&  zsock_type (self) != ZMQ_REP
+    &&  zsock_type (self) != ZMQ_DEALER
+    &&  zsock_type (self) != ZMQ_ROUTER) {
+        printf ("ZMQ_IDENTITY is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
     int rc = zmq_setsockopt (self->socket, ZMQ_IDENTITY, identity, strlen (identity));
@@ -1287,8 +1287,8 @@ zsock_set_xpub_verbose (zsock_t *self, int xpub_verbose)
 {
     assert(self);
 #   if defined (ZMQ_XPUB_VERBOSE)
-    if (zsock_type (self->socket) != ZMQ_XPUB) {
-        printf ("ZMQ_XPUB_VERBOSE is not valid on %s sockets\n", zsock_type_str (self->socket));
+    if (zsock_type (self) != ZMQ_XPUB) {
+        printf ("ZMQ_XPUB_VERBOSE is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
     int rc = zmq_setsockopt (self->socket, ZMQ_XPUB_VERBOSE, &xpub_verbose, sizeof (int));
@@ -1555,8 +1555,8 @@ zsock_set_router_raw (zsock_t *self, int router_raw)
 {
     assert(self);
 #   if defined (ZMQ_ROUTER_RAW)
-    if (zsock_type (self->socket) != ZMQ_ROUTER) {
-        printf ("ZMQ_ROUTER_RAW is not valid on %s sockets\n", zsock_type_str (self->socket));
+    if (zsock_type (self) != ZMQ_ROUTER) {
+        printf ("ZMQ_ROUTER_RAW is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
     int rc = zmq_setsockopt (self->socket, ZMQ_ROUTER_RAW, &router_raw, sizeof (int));
@@ -1745,8 +1745,8 @@ zsock_set_subscribe (zsock_t *self, const char * subscribe)
 {
     assert(self);
 #   if defined (ZMQ_SUBSCRIBE)
-    if (zsock_type (self->socket) != ZMQ_SUB) {
-        printf ("ZMQ_SUBSCRIBE is not valid on %s sockets\n", zsock_type_str (self->socket));
+    if (zsock_type (self) != ZMQ_SUB) {
+        printf ("ZMQ_SUBSCRIBE is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
     int rc = zmq_setsockopt (self->socket, ZMQ_SUBSCRIBE, subscribe, strlen (subscribe));
@@ -1764,8 +1764,8 @@ zsock_set_unsubscribe (zsock_t *self, const char * unsubscribe)
 {
     assert(self);
 #   if defined (ZMQ_UNSUBSCRIBE)
-    if (zsock_type (self->socket) != ZMQ_SUB) {
-        printf ("ZMQ_UNSUBSCRIBE is not valid on %s sockets\n", zsock_type_str (self->socket));
+    if (zsock_type (self) != ZMQ_SUB) {
+        printf ("ZMQ_UNSUBSCRIBE is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
     int rc = zmq_setsockopt (self->socket, ZMQ_UNSUBSCRIBE, unsubscribe, strlen (unsubscribe));
@@ -1783,11 +1783,11 @@ zsock_set_identity (zsock_t *self, const char * identity)
 {
     assert(self);
 #   if defined (ZMQ_IDENTITY)
-    if (zsock_type (self->socket) != ZMQ_REQ
-    &&  zsock_type (self->socket) != ZMQ_REP
-    &&  zsock_type (self->socket) != ZMQ_DEALER
-    &&  zsock_type (self->socket) != ZMQ_ROUTER) {
-        printf ("ZMQ_IDENTITY is not valid on %s sockets\n", zsock_type_str (self->socket));
+    if (zsock_type (self) != ZMQ_REQ
+    &&  zsock_type (self) != ZMQ_REP
+    &&  zsock_type (self) != ZMQ_DEALER
+    &&  zsock_type (self) != ZMQ_ROUTER) {
+        printf ("ZMQ_IDENTITY is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
     int rc = zmq_setsockopt (self->socket, ZMQ_IDENTITY, identity, strlen (identity));
@@ -2233,8 +2233,8 @@ zsock_set_xpub_verbose (zsock_t *self, int xpub_verbose)
 {
     assert(self);
 #   if defined (ZMQ_XPUB_VERBOSE)
-    if (zsock_type (self->socket) != ZMQ_XPUB) {
-        printf ("ZMQ_XPUB_VERBOSE is not valid on %s sockets\n", zsock_type_str (self->socket));
+    if (zsock_type (self) != ZMQ_XPUB) {
+        printf ("ZMQ_XPUB_VERBOSE is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
     int rc = zmq_setsockopt (self->socket, ZMQ_XPUB_VERBOSE, &xpub_verbose, sizeof (int));
@@ -3058,8 +3058,8 @@ zsock_set_subscribe (zsock_t *self, const char * subscribe)
 {
     assert(self);
 #   if defined (ZMQ_SUBSCRIBE)
-    if (zsock_type (self->socket) != ZMQ_SUB) {
-        printf ("ZMQ_SUBSCRIBE is not valid on %s sockets\n", zsock_type_str (self->socket));
+    if (zsock_type (self) != ZMQ_SUB) {
+        printf ("ZMQ_SUBSCRIBE is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
     int rc = zmq_setsockopt (self->socket, ZMQ_SUBSCRIBE, subscribe, strlen (subscribe));
@@ -3077,8 +3077,8 @@ zsock_set_unsubscribe (zsock_t *self, const char * unsubscribe)
 {
     assert(self);
 #   if defined (ZMQ_UNSUBSCRIBE)
-    if (zsock_type (self->socket) != ZMQ_SUB) {
-        printf ("ZMQ_UNSUBSCRIBE is not valid on %s sockets\n", zsock_type_str (self->socket));
+    if (zsock_type (self) != ZMQ_SUB) {
+        printf ("ZMQ_UNSUBSCRIBE is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
     int rc = zmq_setsockopt (self->socket, ZMQ_UNSUBSCRIBE, unsubscribe, strlen (unsubscribe));
@@ -3180,803 +3180,803 @@ zsock_option_test (bool verbose)
     zsock_t *self;
 #if (ZMQ_VERSION_MAJOR == 4)
 #     if defined (ZMQ_TOS)
-    self->socket = zsock_new (ctx, ZMQ_DEALER);
-    assert (self->socket);
-    zsock_set_tos (self->socket, 1);
-    assert (zsock_tos (self->socket) == 1);
-    zsock_tos (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_DEALER);
+    assert (self);
+    zsock_set_tos (self, 1);
+    assert (zsock_tos (self) == 1);
+    zsock_tos (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_ROUTER_HANDOVER)
-    self->socket = zsock_new (ctx, ZMQ_ROUTER);
-    assert (self->socket);
-    zsock_set_router_handover (self->socket, 1);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_ROUTER);
+    assert (self);
+    zsock_set_router_handover (self, 1);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_ROUTER_MANDATORY)
-    self->socket = zsock_new (ctx, ZMQ_ROUTER);
-    assert (self->socket);
-    zsock_set_router_mandatory (self->socket, 1);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_ROUTER);
+    assert (self);
+    zsock_set_router_mandatory (self, 1);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_PROBE_ROUTER)
-    self->socket = zsock_new (ctx, ZMQ_DEALER);
-    assert (self->socket);
-    zsock_set_probe_router (self->socket, 1);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_DEALER);
+    assert (self);
+    zsock_set_probe_router (self, 1);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_REQ_RELAXED)
-    self->socket = zsock_new (ctx, ZMQ_REQ);
-    assert (self->socket);
-    zsock_set_req_relaxed (self->socket, 1);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_REQ);
+    assert (self);
+    zsock_set_req_relaxed (self, 1);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_REQ_CORRELATE)
-    self->socket = zsock_new (ctx, ZMQ_REQ);
-    assert (self->socket);
-    zsock_set_req_correlate (self->socket, 1);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_REQ);
+    assert (self);
+    zsock_set_req_correlate (self, 1);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_CONFLATE)
-    self->socket = zsock_new (ctx, ZMQ_PUSH);
-    assert (self->socket);
-    zsock_set_conflate (self->socket, 1);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_PUSH);
+    assert (self);
+    zsock_set_conflate (self, 1);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_PLAIN_SERVER)
-    self->socket = zsock_new (ctx, ZMQ_PUB);
-    assert (self->socket);
-    zsock_set_plain_server (self->socket, 1);
-    assert (zsock_plain_server (self->socket) == 1);
-    zsock_plain_server (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_PUB);
+    assert (self);
+    zsock_set_plain_server (self, 1);
+    assert (zsock_plain_server (self) == 1);
+    zsock_plain_server (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_PLAIN_USERNAME)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_plain_username (self->socket, "test");
-    char *plain_username = zsock_plain_username (self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_plain_username (self, "test");
+    char *plain_username = zsock_plain_username (self);
     assert (plain_username);
     free (plain_username);
-    zsock_destroy (ctx, self->socket);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_PLAIN_PASSWORD)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_plain_password (self->socket, "test");
-    char *plain_password = zsock_plain_password (self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_plain_password (self, "test");
+    char *plain_password = zsock_plain_password (self);
     assert (plain_password);
     free (plain_password);
-    zsock_destroy (ctx, self->socket);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_CURVE_SERVER)
 #       if defined (HAVE_LIBSODIUM)
-    self->socket = zsock_new (ctx, ZMQ_PUB);
-    assert (self->socket);
-    zsock_set_curve_server (self->socket, 1);
-    assert (zsock_curve_server (self->socket) == 1);
-    zsock_curve_server (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_PUB);
+    assert (self);
+    zsock_set_curve_server (self, 1);
+    assert (zsock_curve_server (self) == 1);
+    zsock_curve_server (self);
+    zsock_destroy (&self);
 #       endif
 #     endif
 #     if defined (ZMQ_CURVE_PUBLICKEY)
 #       if defined (HAVE_LIBSODIUM)
-    self->socket = zsock_new (ctx, ZMQ_PUB);
-    assert (self->socket);
-    zsock_set_curve_publickey (self->socket, "Yne@$w-vo<fVvi]a<NY6T1ed:M$fCG*[IaLV{hID");
-    char *curve_publickey = zsock_curve_publickey (self->socket);
+    self = zsock_new (ctx, ZMQ_PUB);
+    assert (self);
+    zsock_set_curve_publickey (self, "Yne@$w-vo<fVvi]a<NY6T1ed:M$fCG*[IaLV{hID");
+    char *curve_publickey = zsock_curve_publickey (self);
     assert (curve_publickey);
     free (curve_publickey);
-    zsock_destroy (ctx, self->socket);
+    zsock_destroy (&self);
 #       endif
 #     endif
 #     if defined (ZMQ_CURVE_SECRETKEY)
 #       if defined (HAVE_LIBSODIUM)
-    self->socket = zsock_new (ctx, ZMQ_PUB);
-    assert (self->socket);
-    zsock_set_curve_secretkey (self->socket, "D:)Q[IlAW!ahhC2ac:9*A}h:p?([4%wOTJ%JR%cs");
-    char *curve_secretkey = zsock_curve_secretkey (self->socket);
+    self = zsock_new (ctx, ZMQ_PUB);
+    assert (self);
+    zsock_set_curve_secretkey (self, "D:)Q[IlAW!ahhC2ac:9*A}h:p?([4%wOTJ%JR%cs");
+    char *curve_secretkey = zsock_curve_secretkey (self);
     assert (curve_secretkey);
     free (curve_secretkey);
-    zsock_destroy (ctx, self->socket);
+    zsock_destroy (&self);
 #       endif
 #     endif
 #     if defined (ZMQ_CURVE_SERVERKEY)
 #       if defined (HAVE_LIBSODIUM)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_curve_serverkey (self->socket, "rq:rM>}U?@Lns47E1%kR.o@n%FcmmsL/@{H8]yf7");
-    char *curve_serverkey = zsock_curve_serverkey (self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_curve_serverkey (self, "rq:rM>}U?@Lns47E1%kR.o@n%FcmmsL/@{H8]yf7");
+    char *curve_serverkey = zsock_curve_serverkey (self);
     assert (curve_serverkey);
     free (curve_serverkey);
-    zsock_destroy (ctx, self->socket);
+    zsock_destroy (&self);
 #       endif
 #     endif
 #     if defined (ZMQ_ZAP_DOMAIN)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_zap_domain (self->socket, "test");
-    char *zap_domain = zsock_zap_domain (self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_zap_domain (self, "test");
+    char *zap_domain = zsock_zap_domain (self);
     assert (zap_domain);
     free (zap_domain);
-    zsock_destroy (ctx, self->socket);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_MECHANISM)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_mechanism (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_mechanism (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_IPV6)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_ipv6 (self->socket, 1);
-    assert (zsock_ipv6 (self->socket) == 1);
-    zsock_ipv6 (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_ipv6 (self, 1);
+    assert (zsock_ipv6 (self) == 1);
+    zsock_ipv6 (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_IMMEDIATE)
-    self->socket = zsock_new (ctx, ZMQ_DEALER);
-    assert (self->socket);
-    zsock_set_immediate (self->socket, 1);
-    assert (zsock_immediate (self->socket) == 1);
-    zsock_immediate (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_DEALER);
+    assert (self);
+    zsock_set_immediate (self, 1);
+    assert (zsock_immediate (self) == 1);
+    zsock_immediate (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_ROUTER_RAW)
-    self->socket = zsock_new (ctx, ZMQ_ROUTER);
-    assert (self->socket);
-    zsock_set_router_raw (self->socket, 1);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_ROUTER);
+    assert (self);
+    zsock_set_router_raw (self, 1);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_IPV4ONLY)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_ipv4only (self->socket, 1);
-    assert (zsock_ipv4only (self->socket) == 1);
-    zsock_ipv4only (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_ipv4only (self, 1);
+    assert (zsock_ipv4only (self) == 1);
+    zsock_ipv4only (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
-    self->socket = zsock_new (ctx, ZMQ_PUB);
-    assert (self->socket);
-    zsock_set_delay_attach_on_connect (self->socket, 1);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_PUB);
+    assert (self);
+    zsock_set_delay_attach_on_connect (self, 1);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TYPE)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_type (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_type (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_SNDHWM)
-    self->socket = zsock_new (ctx, ZMQ_PUB);
-    assert (self->socket);
-    zsock_set_sndhwm (self->socket, 1);
-    assert (zsock_sndhwm (self->socket) == 1);
-    zsock_sndhwm (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_PUB);
+    assert (self);
+    zsock_set_sndhwm (self, 1);
+    assert (zsock_sndhwm (self) == 1);
+    zsock_sndhwm (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RCVHWM)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_rcvhwm (self->socket, 1);
-    assert (zsock_rcvhwm (self->socket) == 1);
-    zsock_rcvhwm (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_rcvhwm (self, 1);
+    assert (zsock_rcvhwm (self) == 1);
+    zsock_rcvhwm (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_AFFINITY)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_affinity (self->socket, 1);
-    assert (zsock_affinity (self->socket) == 1);
-    zsock_affinity (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_affinity (self, 1);
+    assert (zsock_affinity (self) == 1);
+    zsock_affinity (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_SUBSCRIBE)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_subscribe (self->socket, "test");
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_subscribe (self, "test");
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_UNSUBSCRIBE)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_unsubscribe (self->socket, "test");
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_unsubscribe (self, "test");
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_IDENTITY)
-    self->socket = zsock_new (ctx, ZMQ_DEALER);
-    assert (self->socket);
-    zsock_set_identity (self->socket, "test");
-    char *identity = zsock_identity (self->socket);
+    self = zsock_new (ctx, ZMQ_DEALER);
+    assert (self);
+    zsock_set_identity (self, "test");
+    char *identity = zsock_identity (self);
     assert (identity);
     free (identity);
-    zsock_destroy (ctx, self->socket);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RATE)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_rate (self->socket, 1);
-    assert (zsock_rate (self->socket) == 1);
-    zsock_rate (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_rate (self, 1);
+    assert (zsock_rate (self) == 1);
+    zsock_rate (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RECOVERY_IVL)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_recovery_ivl (self->socket, 1);
-    assert (zsock_recovery_ivl (self->socket) == 1);
-    zsock_recovery_ivl (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_recovery_ivl (self, 1);
+    assert (zsock_recovery_ivl (self) == 1);
+    zsock_recovery_ivl (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_SNDBUF)
-    self->socket = zsock_new (ctx, ZMQ_PUB);
-    assert (self->socket);
-    zsock_set_sndbuf (self->socket, 1);
-    assert (zsock_sndbuf (self->socket) == 1);
-    zsock_sndbuf (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_PUB);
+    assert (self);
+    zsock_set_sndbuf (self, 1);
+    assert (zsock_sndbuf (self) == 1);
+    zsock_sndbuf (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RCVBUF)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_rcvbuf (self->socket, 1);
-    assert (zsock_rcvbuf (self->socket) == 1);
-    zsock_rcvbuf (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_rcvbuf (self, 1);
+    assert (zsock_rcvbuf (self) == 1);
+    zsock_rcvbuf (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_LINGER)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_linger (self->socket, 1);
-    assert (zsock_linger (self->socket) == 1);
-    zsock_linger (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_linger (self, 1);
+    assert (zsock_linger (self) == 1);
+    zsock_linger (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RECONNECT_IVL)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_reconnect_ivl (self->socket, 1);
-    assert (zsock_reconnect_ivl (self->socket) == 1);
-    zsock_reconnect_ivl (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_reconnect_ivl (self, 1);
+    assert (zsock_reconnect_ivl (self) == 1);
+    zsock_reconnect_ivl (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RECONNECT_IVL_MAX)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_reconnect_ivl_max (self->socket, 1);
-    assert (zsock_reconnect_ivl_max (self->socket) == 1);
-    zsock_reconnect_ivl_max (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_reconnect_ivl_max (self, 1);
+    assert (zsock_reconnect_ivl_max (self) == 1);
+    zsock_reconnect_ivl_max (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_BACKLOG)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_backlog (self->socket, 1);
-    assert (zsock_backlog (self->socket) == 1);
-    zsock_backlog (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_backlog (self, 1);
+    assert (zsock_backlog (self) == 1);
+    zsock_backlog (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_MAXMSGSIZE)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_maxmsgsize (self->socket, 1);
-    assert (zsock_maxmsgsize (self->socket) == 1);
-    zsock_maxmsgsize (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_maxmsgsize (self, 1);
+    assert (zsock_maxmsgsize (self) == 1);
+    zsock_maxmsgsize (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_MULTICAST_HOPS)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_multicast_hops (self->socket, 1);
-    assert (zsock_multicast_hops (self->socket) == 1);
-    zsock_multicast_hops (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_multicast_hops (self, 1);
+    assert (zsock_multicast_hops (self) == 1);
+    zsock_multicast_hops (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RCVTIMEO)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_rcvtimeo (self->socket, 1);
-    assert (zsock_rcvtimeo (self->socket) == 1);
-    zsock_rcvtimeo (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_rcvtimeo (self, 1);
+    assert (zsock_rcvtimeo (self) == 1);
+    zsock_rcvtimeo (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_SNDTIMEO)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_sndtimeo (self->socket, 1);
-    assert (zsock_sndtimeo (self->socket) == 1);
-    zsock_sndtimeo (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_sndtimeo (self, 1);
+    assert (zsock_sndtimeo (self) == 1);
+    zsock_sndtimeo (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_XPUB_VERBOSE)
-    self->socket = zsock_new (ctx, ZMQ_XPUB);
-    assert (self->socket);
-    zsock_set_xpub_verbose (self->socket, 1);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_XPUB);
+    assert (self);
+    zsock_set_xpub_verbose (self, 1);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TCP_KEEPALIVE)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_tcp_keepalive (self->socket, 1);
-    assert (zsock_tcp_keepalive (self->socket) == 1);
-    zsock_tcp_keepalive (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_tcp_keepalive (self, 1);
+    assert (zsock_tcp_keepalive (self) == 1);
+    zsock_tcp_keepalive (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TCP_KEEPALIVE_IDLE)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_tcp_keepalive_idle (self->socket, 1);
-    assert (zsock_tcp_keepalive_idle (self->socket) == 1);
-    zsock_tcp_keepalive_idle (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_tcp_keepalive_idle (self, 1);
+    assert (zsock_tcp_keepalive_idle (self) == 1);
+    zsock_tcp_keepalive_idle (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TCP_KEEPALIVE_CNT)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_tcp_keepalive_cnt (self->socket, 1);
-    assert (zsock_tcp_keepalive_cnt (self->socket) == 1);
-    zsock_tcp_keepalive_cnt (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_tcp_keepalive_cnt (self, 1);
+    assert (zsock_tcp_keepalive_cnt (self) == 1);
+    zsock_tcp_keepalive_cnt (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TCP_KEEPALIVE_INTVL)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_tcp_keepalive_intvl (self->socket, 1);
-    assert (zsock_tcp_keepalive_intvl (self->socket) == 1);
-    zsock_tcp_keepalive_intvl (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_tcp_keepalive_intvl (self, 1);
+    assert (zsock_tcp_keepalive_intvl (self) == 1);
+    zsock_tcp_keepalive_intvl (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TCP_ACCEPT_FILTER)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_tcp_accept_filter (self->socket, "127.0.0.1");
-    char *tcp_accept_filter = zsock_tcp_accept_filter (self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_tcp_accept_filter (self, "127.0.0.1");
+    char *tcp_accept_filter = zsock_tcp_accept_filter (self);
     assert (tcp_accept_filter);
     free (tcp_accept_filter);
-    zsock_destroy (ctx, self->socket);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RCVMORE)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_rcvmore (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_rcvmore (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_FD)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_fd (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_fd (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_EVENTS)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_events (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_events (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_LAST_ENDPOINT)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    char *last_endpoint = zsock_last_endpoint (self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    char *last_endpoint = zsock_last_endpoint (self);
     assert (last_endpoint);
     free (last_endpoint);
-    zsock_destroy (ctx, self->socket);
+    zsock_destroy (&self);
 #     endif
 #endif
 
 #if (ZMQ_VERSION_MAJOR == 3)
 #     if defined (ZMQ_ROUTER_RAW)
-    self->socket = zsock_new (ctx, ZMQ_ROUTER);
-    assert (self->socket);
-    zsock_set_router_raw (self->socket, 1);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_ROUTER);
+    assert (self);
+    zsock_set_router_raw (self, 1);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_IPV4ONLY)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_ipv4only (self->socket, 1);
-    assert (zsock_ipv4only (self->socket) == 1);
-    zsock_ipv4only (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_ipv4only (self, 1);
+    assert (zsock_ipv4only (self) == 1);
+    zsock_ipv4only (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
-    self->socket = zsock_new (ctx, ZMQ_PUB);
-    assert (self->socket);
-    zsock_set_delay_attach_on_connect (self->socket, 1);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_PUB);
+    assert (self);
+    zsock_set_delay_attach_on_connect (self, 1);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TYPE)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_type (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_type (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_SNDHWM)
-    self->socket = zsock_new (ctx, ZMQ_PUB);
-    assert (self->socket);
-    zsock_set_sndhwm (self->socket, 1);
-    assert (zsock_sndhwm (self->socket) == 1);
-    zsock_sndhwm (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_PUB);
+    assert (self);
+    zsock_set_sndhwm (self, 1);
+    assert (zsock_sndhwm (self) == 1);
+    zsock_sndhwm (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RCVHWM)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_rcvhwm (self->socket, 1);
-    assert (zsock_rcvhwm (self->socket) == 1);
-    zsock_rcvhwm (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_rcvhwm (self, 1);
+    assert (zsock_rcvhwm (self) == 1);
+    zsock_rcvhwm (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_AFFINITY)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_affinity (self->socket, 1);
-    assert (zsock_affinity (self->socket) == 1);
-    zsock_affinity (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_affinity (self, 1);
+    assert (zsock_affinity (self) == 1);
+    zsock_affinity (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_SUBSCRIBE)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_subscribe (self->socket, "test");
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_subscribe (self, "test");
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_UNSUBSCRIBE)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_unsubscribe (self->socket, "test");
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_unsubscribe (self, "test");
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_IDENTITY)
-    self->socket = zsock_new (ctx, ZMQ_DEALER);
-    assert (self->socket);
-    zsock_set_identity (self->socket, "test");
-    char *identity = zsock_identity (self->socket);
+    self = zsock_new (ctx, ZMQ_DEALER);
+    assert (self);
+    zsock_set_identity (self, "test");
+    char *identity = zsock_identity (self);
     assert (identity);
     free (identity);
-    zsock_destroy (ctx, self->socket);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RATE)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_rate (self->socket, 1);
-    assert (zsock_rate (self->socket) == 1);
-    zsock_rate (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_rate (self, 1);
+    assert (zsock_rate (self) == 1);
+    zsock_rate (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RECOVERY_IVL)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_recovery_ivl (self->socket, 1);
-    assert (zsock_recovery_ivl (self->socket) == 1);
-    zsock_recovery_ivl (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_recovery_ivl (self, 1);
+    assert (zsock_recovery_ivl (self) == 1);
+    zsock_recovery_ivl (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_SNDBUF)
-    self->socket = zsock_new (ctx, ZMQ_PUB);
-    assert (self->socket);
-    zsock_set_sndbuf (self->socket, 1);
-    assert (zsock_sndbuf (self->socket) == 1);
-    zsock_sndbuf (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_PUB);
+    assert (self);
+    zsock_set_sndbuf (self, 1);
+    assert (zsock_sndbuf (self) == 1);
+    zsock_sndbuf (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RCVBUF)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_rcvbuf (self->socket, 1);
-    assert (zsock_rcvbuf (self->socket) == 1);
-    zsock_rcvbuf (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_rcvbuf (self, 1);
+    assert (zsock_rcvbuf (self) == 1);
+    zsock_rcvbuf (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_LINGER)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_linger (self->socket, 1);
-    assert (zsock_linger (self->socket) == 1);
-    zsock_linger (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_linger (self, 1);
+    assert (zsock_linger (self) == 1);
+    zsock_linger (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RECONNECT_IVL)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_reconnect_ivl (self->socket, 1);
-    assert (zsock_reconnect_ivl (self->socket) == 1);
-    zsock_reconnect_ivl (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_reconnect_ivl (self, 1);
+    assert (zsock_reconnect_ivl (self) == 1);
+    zsock_reconnect_ivl (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RECONNECT_IVL_MAX)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_reconnect_ivl_max (self->socket, 1);
-    assert (zsock_reconnect_ivl_max (self->socket) == 1);
-    zsock_reconnect_ivl_max (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_reconnect_ivl_max (self, 1);
+    assert (zsock_reconnect_ivl_max (self) == 1);
+    zsock_reconnect_ivl_max (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_BACKLOG)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_backlog (self->socket, 1);
-    assert (zsock_backlog (self->socket) == 1);
-    zsock_backlog (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_backlog (self, 1);
+    assert (zsock_backlog (self) == 1);
+    zsock_backlog (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_MAXMSGSIZE)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_maxmsgsize (self->socket, 1);
-    assert (zsock_maxmsgsize (self->socket) == 1);
-    zsock_maxmsgsize (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_maxmsgsize (self, 1);
+    assert (zsock_maxmsgsize (self) == 1);
+    zsock_maxmsgsize (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_MULTICAST_HOPS)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_multicast_hops (self->socket, 1);
-    assert (zsock_multicast_hops (self->socket) == 1);
-    zsock_multicast_hops (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_multicast_hops (self, 1);
+    assert (zsock_multicast_hops (self) == 1);
+    zsock_multicast_hops (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RCVTIMEO)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_rcvtimeo (self->socket, 1);
-    assert (zsock_rcvtimeo (self->socket) == 1);
-    zsock_rcvtimeo (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_rcvtimeo (self, 1);
+    assert (zsock_rcvtimeo (self) == 1);
+    zsock_rcvtimeo (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_SNDTIMEO)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_sndtimeo (self->socket, 1);
-    assert (zsock_sndtimeo (self->socket) == 1);
-    zsock_sndtimeo (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_sndtimeo (self, 1);
+    assert (zsock_sndtimeo (self) == 1);
+    zsock_sndtimeo (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_XPUB_VERBOSE)
-    self->socket = zsock_new (ctx, ZMQ_XPUB);
-    assert (self->socket);
-    zsock_set_xpub_verbose (self->socket, 1);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_XPUB);
+    assert (self);
+    zsock_set_xpub_verbose (self, 1);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TCP_KEEPALIVE)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_tcp_keepalive (self->socket, 1);
-    assert (zsock_tcp_keepalive (self->socket) == 1);
-    zsock_tcp_keepalive (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_tcp_keepalive (self, 1);
+    assert (zsock_tcp_keepalive (self) == 1);
+    zsock_tcp_keepalive (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TCP_KEEPALIVE_IDLE)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_tcp_keepalive_idle (self->socket, 1);
-    assert (zsock_tcp_keepalive_idle (self->socket) == 1);
-    zsock_tcp_keepalive_idle (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_tcp_keepalive_idle (self, 1);
+    assert (zsock_tcp_keepalive_idle (self) == 1);
+    zsock_tcp_keepalive_idle (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TCP_KEEPALIVE_CNT)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_tcp_keepalive_cnt (self->socket, 1);
-    assert (zsock_tcp_keepalive_cnt (self->socket) == 1);
-    zsock_tcp_keepalive_cnt (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_tcp_keepalive_cnt (self, 1);
+    assert (zsock_tcp_keepalive_cnt (self) == 1);
+    zsock_tcp_keepalive_cnt (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TCP_KEEPALIVE_INTVL)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_tcp_keepalive_intvl (self->socket, 1);
-    assert (zsock_tcp_keepalive_intvl (self->socket) == 1);
-    zsock_tcp_keepalive_intvl (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_tcp_keepalive_intvl (self, 1);
+    assert (zsock_tcp_keepalive_intvl (self) == 1);
+    zsock_tcp_keepalive_intvl (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TCP_ACCEPT_FILTER)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_tcp_accept_filter (self->socket, "127.0.0.1");
-    char *tcp_accept_filter = zsock_tcp_accept_filter (self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_tcp_accept_filter (self, "127.0.0.1");
+    char *tcp_accept_filter = zsock_tcp_accept_filter (self);
     assert (tcp_accept_filter);
     free (tcp_accept_filter);
-    zsock_destroy (ctx, self->socket);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RCVMORE)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_rcvmore (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_rcvmore (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_FD)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_fd (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_fd (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_EVENTS)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_events (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_events (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_LAST_ENDPOINT)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    char *last_endpoint = zsock_last_endpoint (self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    char *last_endpoint = zsock_last_endpoint (self);
     assert (last_endpoint);
     free (last_endpoint);
-    zsock_destroy (ctx, self->socket);
+    zsock_destroy (&self);
 #     endif
 #endif
 
 #if (ZMQ_VERSION_MAJOR == 2)
 #     if defined (ZMQ_HWM)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_hwm (self->socket, 1);
-    assert (zsock_hwm (self->socket) == 1);
-    zsock_hwm (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_hwm (self, 1);
+    assert (zsock_hwm (self) == 1);
+    zsock_hwm (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_SWAP)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_swap (self->socket, 1);
-    assert (zsock_swap (self->socket) == 1);
-    zsock_swap (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_swap (self, 1);
+    assert (zsock_swap (self) == 1);
+    zsock_swap (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_AFFINITY)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_affinity (self->socket, 1);
-    assert (zsock_affinity (self->socket) == 1);
-    zsock_affinity (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_affinity (self, 1);
+    assert (zsock_affinity (self) == 1);
+    zsock_affinity (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_IDENTITY)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_identity (self->socket, "test");
-    char *identity = zsock_identity (self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_identity (self, "test");
+    char *identity = zsock_identity (self);
     assert (identity);
     free (identity);
-    zsock_destroy (ctx, self->socket);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RATE)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_rate (self->socket, 1);
-    assert (zsock_rate (self->socket) == 1);
-    zsock_rate (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_rate (self, 1);
+    assert (zsock_rate (self) == 1);
+    zsock_rate (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RECOVERY_IVL)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_recovery_ivl (self->socket, 1);
-    assert (zsock_recovery_ivl (self->socket) == 1);
-    zsock_recovery_ivl (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_recovery_ivl (self, 1);
+    assert (zsock_recovery_ivl (self) == 1);
+    zsock_recovery_ivl (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RECOVERY_IVL_MSEC)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_recovery_ivl_msec (self->socket, 1);
-    assert (zsock_recovery_ivl_msec (self->socket) == 1);
-    zsock_recovery_ivl_msec (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_recovery_ivl_msec (self, 1);
+    assert (zsock_recovery_ivl_msec (self) == 1);
+    zsock_recovery_ivl_msec (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_MCAST_LOOP)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_mcast_loop (self->socket, 1);
-    assert (zsock_mcast_loop (self->socket) == 1);
-    zsock_mcast_loop (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_mcast_loop (self, 1);
+    assert (zsock_mcast_loop (self) == 1);
+    zsock_mcast_loop (self);
+    zsock_destroy (&self);
 #     endif
 #   if (ZMQ_VERSION_MINOR == 2)
 #     if defined (ZMQ_RCVTIMEO)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_rcvtimeo (self->socket, 1);
-    assert (zsock_rcvtimeo (self->socket) == 1);
-    zsock_rcvtimeo (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_rcvtimeo (self, 1);
+    assert (zsock_rcvtimeo (self) == 1);
+    zsock_rcvtimeo (self);
+    zsock_destroy (&self);
 #     endif
 #   endif
 #   if (ZMQ_VERSION_MINOR == 2)
 #     if defined (ZMQ_SNDTIMEO)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_sndtimeo (self->socket, 1);
-    assert (zsock_sndtimeo (self->socket) == 1);
-    zsock_sndtimeo (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_sndtimeo (self, 1);
+    assert (zsock_sndtimeo (self) == 1);
+    zsock_sndtimeo (self);
+    zsock_destroy (&self);
 #     endif
 #   endif
 #     if defined (ZMQ_SNDBUF)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_sndbuf (self->socket, 1);
-    assert (zsock_sndbuf (self->socket) == 1);
-    zsock_sndbuf (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_sndbuf (self, 1);
+    assert (zsock_sndbuf (self) == 1);
+    zsock_sndbuf (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RCVBUF)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_rcvbuf (self->socket, 1);
-    assert (zsock_rcvbuf (self->socket) == 1);
-    zsock_rcvbuf (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_rcvbuf (self, 1);
+    assert (zsock_rcvbuf (self) == 1);
+    zsock_rcvbuf (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_LINGER)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_linger (self->socket, 1);
-    assert (zsock_linger (self->socket) == 1);
-    zsock_linger (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_linger (self, 1);
+    assert (zsock_linger (self) == 1);
+    zsock_linger (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RECONNECT_IVL)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_reconnect_ivl (self->socket, 1);
-    assert (zsock_reconnect_ivl (self->socket) == 1);
-    zsock_reconnect_ivl (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_reconnect_ivl (self, 1);
+    assert (zsock_reconnect_ivl (self) == 1);
+    zsock_reconnect_ivl (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RECONNECT_IVL_MAX)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_reconnect_ivl_max (self->socket, 1);
-    assert (zsock_reconnect_ivl_max (self->socket) == 1);
-    zsock_reconnect_ivl_max (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_reconnect_ivl_max (self, 1);
+    assert (zsock_reconnect_ivl_max (self) == 1);
+    zsock_reconnect_ivl_max (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_BACKLOG)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_backlog (self->socket, 1);
-    assert (zsock_backlog (self->socket) == 1);
-    zsock_backlog (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_backlog (self, 1);
+    assert (zsock_backlog (self) == 1);
+    zsock_backlog (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_SUBSCRIBE)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_subscribe (self->socket, "test");
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_subscribe (self, "test");
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_UNSUBSCRIBE)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_set_unsubscribe (self->socket, "test");
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_set_unsubscribe (self, "test");
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TYPE)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_type (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_type (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RCVMORE)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_rcvmore (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_rcvmore (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_FD)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_fd (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_fd (self);
+    zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_EVENTS)
-    self->socket = zsock_new (ctx, ZMQ_SUB);
-    assert (self->socket);
-    zsock_events (self->socket);
-    zsock_destroy (ctx, self->socket);
+    self = zsock_new (ctx, ZMQ_SUB);
+    assert (self);
+    zsock_events (self);
+    zsock_destroy (&self);
 #     endif
 #endif
 
