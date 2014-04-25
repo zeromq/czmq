@@ -36,7 +36,6 @@ include_HEADERS = \
     ../include/zsocket.h \
     ../include/zsockopt.h \
     ../include/zsock.h \
-    ../include/zsock_option.h \
     ../include/zstr.h \
     ../include/zsys.h \
     ../include/zthread.h \
@@ -70,7 +69,6 @@ libczmq_la_SOURCES = \
     zsocket.c \
     zsockopt.c \
     zsock.c \
-    zsock_option.c \
     zstr.c \
     zsys.c \
     zthread.c \

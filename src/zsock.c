@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zsocket - working with 0MQ sockets
+    zsock - working with 0MQ sockets
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -13,7 +13,7 @@
 
 /*
 @header
-    The zsocket class provides helper functions for 0MQ sockets. It doesn't
+    The zsock class provides helper functions for 0MQ sockets. It doesn't
     wrap the 0MQ socket type, to avoid breaking all libzmq socket-related
     calls.
 @discuss
@@ -36,9 +36,10 @@ struct _zsock_t {
 //  Note: SUB sockets do not automatically subscribe to everything; you
 //  must set filters explicitly.
 
-void *
-zsocket_new (zctx_t *ctx, int type)
+zsock_t *
+zsock_new (zctx_t *ctx, int type)
 {
+    assert(ctx);
     zsock_t *self = (zsock_t *) zmalloc (sizeof (zsock_t));
     if (!self)
         return NULL;
@@ -57,7 +58,7 @@ zsocket_new (zctx_t *ctx, int type)
 
 //  --------------------------------------------------------------------------
 //  Destroy the socket. You must use this for any socket created via the
-//  zsocket_new method. If socket is null, does nothing.
+//  zsock_new method. If socket is null, does nothing.
 
 void
 zsock_destroy (zsock_t **self_p)
@@ -66,7 +67,7 @@ zsock_destroy (zsock_t **self_p)
     if (*self_p) {
         zsock_t *self = *self_p;
 
-        zctx__socket_destroy (ctx, self->socket);
+        zctx__socket_destroy (self->context, self->socket);
 
         free (self);
         *self_p = NULL;
@@ -82,8 +83,9 @@ zsock_destroy (zsock_t **self_p)
 //  the previous process/thread.
 
 int
-zsocket_bind (zsock_t *self, const char *format, ...)
+zsock_bind (zsock_t *self, const char *format, ...)
 {
+    assert(self);
     //  Ephemeral port needs 4 additional characters
     char endpoint [256 + 4];
     va_list argptr;
@@ -98,7 +100,7 @@ zsocket_bind (zsock_t *self, const char *format, ...)
         while (port <= ZSOCKET_DYNTO) {
             //  Try to bind on the next plausible port
             sprintf (endpoint + endpoint_size - 1, "%d", port);
-            if (zmq_bind (self, endpoint) == 0)
+            if (zmq_bind (self->socket, endpoint) == 0)
                 return port;
             port++;
         }
@@ -106,7 +108,7 @@ zsocket_bind (zsock_t *self, const char *format, ...)
     }
     else {
         //  Return actual port used for binding
-        int port = zmq_bind (self, endpoint);
+        int port = zmq_bind (self->socket, endpoint);
         if (port == 0)
             port = atoi (strrchr (endpoint, ':') + 1);
         else
@@ -122,15 +124,16 @@ zsocket_bind (zsock_t *self, const char *format, ...)
 //  isn't supported.
 
 int
-zsocket_unbind (zsock_t *self, const char *format, ...)
+zsock_unbind (zsock_t *self, const char *format, ...)
 {
+    assert(self);
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0))
     char endpoint [256];
     va_list argptr;
     va_start (argptr, format);
     vsnprintf (endpoint, 256, format, argptr);
     va_end (argptr);
-    return zmq_unbind (self, endpoint);
+    return zmq_unbind (self->socket, endpoint);
 #else
     return -1;
 #endif
@@ -142,14 +145,15 @@ zsocket_unbind (zsock_t *self, const char *format, ...)
 //  Returns 0 if the endpoint is valid, -1 if the connect failed.
 
 int
-zsocket_connect (zsock_t *self, const char *format, ...)
+zsock_connect (zsock_t *self, const char *format, ...)
 {
+    assert(self);
     char endpoint [256];
     va_list argptr;
     va_start (argptr, format);
     vsnprintf (endpoint, 256, format, argptr);
     va_end (argptr);
-    return zmq_connect (self, endpoint);
+    return zmq_connect (self->socket, endpoint);
 }
 
 //  --------------------------------------------------------------------------
@@ -157,15 +161,16 @@ zsocket_connect (zsock_t *self, const char *format, ...)
 //  Returns 0 if disconnection is complete -1 if the disconnection failed.
 
 int
-zsocket_disconnect (zsock_t *self, const char *format, ...)
+zsock_disconnect (zsock_t *self, const char *format, ...)
 {
+    assert(self);
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0))
     char endpoint [256];
     va_list argptr;
     va_start (argptr, format);
     vsnprintf (endpoint, 256, format, argptr);
     va_end (argptr);
-    return zmq_disconnect (self, endpoint);
+    return zmq_disconnect (self->socket, endpoint);
 #else
     return -1;
 #endif
@@ -176,9 +181,10 @@ zsocket_disconnect (zsock_t *self, const char *format, ...)
 //  ready on the socket, else false.
 
 bool
-zsocket_poll (zsock_t *self, int msecs)
+zsock_poll (zsock_t *self, int msecs)
 {
-    zmq_pollitem_t items [] = { { self, 0, ZMQ_POLLIN, 0 } };
+    assert(self);
+    zmq_pollitem_t items [] = { { self->socket, 0, ZMQ_POLLIN, 0 } };
     int rc = zmq_poll (items, 1, msecs);
     return rc != -1 && (items [0].revents & ZMQ_POLLIN) != 0;
 }
@@ -188,14 +194,15 @@ zsocket_poll (zsock_t *self, int msecs)
 //  Returns socket type as printable constant string
 
 const char *
-zsocket_type_str (zsock_t *self)
+zsock_type_str (zsock_t *self)
 {
+    assert(self);
     char *type_name [] = {
         "PAIR", "PUB", "SUB", "REQ", "REP",
         "DEALER", "ROUTER", "PULL", "PUSH",
         "XPUB", "XSUB", "STREAM"
     };
-    int type = zsocket_type (self);
+    int type = zsock_type (self);
 #if ZMQ_VERSION_MAJOR == 4
     if (type < 0 || type > ZMQ_STREAM)
 #else
@@ -212,9 +219,9 @@ zsocket_type_str (zsock_t *self)
 //  Accepts these flags: ZFRAME_MORE and ZFRAME_DONTWAIT.
 
 int
-zsocket_sendmem (void *zocket, const void *data, size_t size, int flags)
+zsock_sendmem (zsock_t *self, const void *data, size_t size, int flags)
 {
-    assert (zocket);
+    assert (self);
     assert (size == 0 || data);
 
     int snd_flags = (flags & ZFRAME_MORE)? ZMQ_SNDMORE : 0;
@@ -224,7 +231,7 @@ zsocket_sendmem (void *zocket, const void *data, size_t size, int flags)
     zmq_msg_init_size (&msg, size);
     memcpy (zmq_msg_data (&msg), data, size);
 
-    if (zmq_sendmsg (zocket, &msg, snd_flags) == -1) {
+    if (zmq_sendmsg (self->socket, &msg, snd_flags) == -1) {
         zmq_msg_close (&msg);
         return -1;
     }
@@ -239,11 +246,12 @@ zsocket_sendmem (void *zocket, const void *data, size_t size, int flags)
 //  Returns -1 if there was an error sending the signal.
 
 int
-zsocket_signal (void *zocket)
+zsock_signal (zsock_t *self)
 {
+    assert(self);
     zmq_msg_t msg;
     zmq_msg_init_size (&msg, 0);
-    if (zmq_sendmsg (zocket, &msg, 0) == -1) {
+    if (zmq_sendmsg (self->socket, &msg, 0) == -1) {
         zmq_msg_close (&msg);
         return -1;
     }
@@ -258,11 +266,12 @@ zsocket_signal (void *zocket)
 //  0 on success.
 
 int
-zsocket_wait (void *zocket)
+zsock_wait (zsock_t *self)
 {
+    assert(self);
     zmq_msg_t msg;
     zmq_msg_init (&msg);
-    if (zmq_recvmsg (zocket, &msg, 0) == -1)
+    if (zmq_recvmsg (self->socket, &msg, 0) == -1)
         return -1;
     else
         return 0;
@@ -270,12 +279,99 @@ zsocket_wait (void *zocket)
 
 
 //  --------------------------------------------------------------------------
+//  Return the encapsulated 0MQ socket.
+
+void *
+zsock_socket (zsock_t *self)
+{
+    assert(self);
+	return self->socket;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Send frame to socket, destroy after sending unless ZFRAME_REUSE is
+//  set or the attempt to send the message errors out.
+//  Return -1 on error, 0 on success.
+int
+zsock_send_frame(zsock_t *self, zframe_t **frame_p, int flags)
+{
+    assert(self);
+    return zframe_send(frame_p, self->socket, flags);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Receive frame from socket, returns zframe_t object or NULL if the recv
+//  was interrupted. Does a blocking recv, if you want to not block then use
+//  zsock_recv_frame_nowait().
+zframe_t *
+zsock_recv_frame (zsock_t *self)
+{
+    assert(self);
+    return zframe_recv(self->socket);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Receive a new frame off the socket. Returns newly allocated frame, or
+//  NULL if there was no input waiting, or if the read was interrupted.
+zframe_t *
+zsock_recv_frame_nowait (zsock_t *self)
+{
+    assert(self);
+    return zframe_recv_nowait(self->socket);
+}
+
+//  --------------------------------------------------------------------------
+//  Send message to socket, destroy after sending. If the message has no
+//  frames, sends nothing but destroys the message anyhow. Safe to call
+//  if zmsg is null.
+int
+zsock_send_msg (zsock_t *self, zmsg_t **msg_p)
+{
+    assert(self);
+    return zmsg_send(msg_p, self->socket);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Receive message from socket, returns zmsg_t object or NULL if the recv
+//  was interrupted. Does a blocking recv, if you want to not block then use
+//  the zloop class or zsock_msg_recv_nowait() or zmq_poll to check for socket 
+//  input before receiving.
+zmsg_t *
+zsock_recv_msg (zsock_t *self)
+{
+    assert(self);
+    return zmsg_recv(self->socket);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Receive message from socket, returns zmsg_t object, or NULL either if there was
+//  no input waiting, or the recv was interrupted.
+zmsg_t *
+zsock_recv_msg_nowait (zsock_t *self)
+{
+    assert(self);
+    return zmsg_recv_nowait(self->socket);
+}
+
+
+//  --------------------------------------------------------------------------
+//  include generated code
+
+#include "zsock_option.c"
+
+
+//  --------------------------------------------------------------------------
 //  Selftest
 
 int
-zsocket_test (bool verbose)
+zsock_test (bool verbose)
 {
-    printf (" * zsocket: ");
+    printf (" * zsock: ");
 
     //  @selftest
     zctx_t *ctx = zctx_new ();
@@ -286,18 +382,18 @@ zsocket_test (bool verbose)
     char *domain = "localhost";
     int service = 5560;
 
-    void *writer = zsocket_new (ctx, ZMQ_PUSH);
+    zsock_t *writer = zsock_new (ctx, ZMQ_PUSH);
     assert (writer);
-    void *reader = zsocket_new (ctx, ZMQ_PULL);
+    zsock_t *reader = zsock_new (ctx, ZMQ_PULL);
     assert (reader);
-    assert (streq (zsocket_type_str (writer), "PUSH"));
-    assert (streq (zsocket_type_str (reader), "PULL"));
-    int rc = zsocket_bind (writer, "tcp://%s:%d", interf, service);
+    assert (streq (zsock_type_str (writer), "PUSH"));
+    assert (streq (zsock_type_str (reader), "PULL"));
+    int rc = zsock_bind (writer, "tcp://%s:%d", interf, service);
     assert (rc == service);
 
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
     //  Check unbind
-    rc = zsocket_unbind (writer, "tcp://%s:%d", interf, service);
+    rc = zsock_unbind (writer, "tcp://%s:%d", interf, service);
     assert (rc == 0);
 
     //  In some cases and especially when running under Valgrind, doing
@@ -306,54 +402,54 @@ zsocket_test (bool verbose)
     zclock_sleep (100);
 
     //  Bind again
-    rc = zsocket_bind (writer, "tcp://%s:%d", interf, service);
+    rc = zsock_bind (writer, "tcp://%s:%d", interf, service);
     assert (rc == service);
 #endif
 
-    rc = zsocket_connect (reader, "tcp://%s:%d", domain, service);
+    rc = zsock_connect (reader, "tcp://%s:%d", domain, service);
     assert (rc == 0);
-    zstr_send (writer, "HELLO");
-    char *message = zstr_recv (reader);
+    zstr_send (writer->socket, "HELLO");
+    char *message = zstr_recv (reader->socket);
     assert (message);
     assert (streq (message, "HELLO"));
     free (message);
 
     //  Test binding to ports
-    int port = zsocket_bind (writer, "tcp://%s:*", interf);
+    int port = zsock_bind (writer, "tcp://%s:*", interf);
     assert (port >= ZSOCKET_DYNFROM && port <= ZSOCKET_DYNTO);
 
-    assert (zsocket_poll (writer, 100) == false);
+    assert (zsock_poll (writer, 100) == false);
 
     //  Test error state when connecting to an invalid socket type
     //  ('txp://' instead of 'tcp://', typo intentional)
-    rc = zsocket_connect (reader, "txp://%s:%d", domain, service);
+    rc = zsock_connect (reader, "txp://%s:%d", domain, service);
     assert (rc == -1);
 
     //  Test sending frames to socket
-    rc = zsocket_sendmem (writer,"ABC", 3, ZFRAME_MORE);
+    rc = zsock_sendmem (writer, "ABC", 3, ZFRAME_MORE);
     assert (rc == 0);
-    rc = zsocket_sendmem (writer, "DEFG", 4, 0);
+    rc = zsock_sendmem (writer, "DEFG", 4, 0);
     assert (rc == 0);
 
-    zframe_t *frame = zframe_recv (reader);
+    zframe_t *frame = zsock_recv_frame (reader);
     assert (frame);
     assert (zframe_streq (frame, "ABC"));
     assert (zframe_more (frame));
     zframe_destroy (&frame);
 
-    frame = zframe_recv (reader);
+    frame = zsock_recv_frame (reader);
     assert (frame);
     assert (zframe_streq (frame, "DEFG"));
     assert (!zframe_more (frame));
     zframe_destroy (&frame);
 
-    rc = zsocket_signal (writer);
+    rc = zsock_signal (writer);
     assert (rc == 0);
-    rc = zsocket_wait (reader);
+    rc = zsock_wait (reader);
     assert (rc == 0);
 
-    zsocket_destroy (ctx, reader);
-    zsocket_destroy (ctx, writer);
+    zsock_destroy (&reader);
+    zsock_destroy (&writer);
     zctx_destroy (&ctx);
     //  @end
 
