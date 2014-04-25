@@ -101,6 +101,7 @@ set (czmq_headers
     include/zrex.h
     include/zsocket.h
     include/zsockopt.h
+    include/zsock.h
     include/zstr.h
     include/zsys.h
     include/zthread.h
@@ -141,6 +142,7 @@ set (czmq_sources
     src/zrex.c
     src/zsocket.c
     src/zsockopt.c
+    src/zsock.c
     src/zstr.c
     src/zsys.c
     src/zthread.c

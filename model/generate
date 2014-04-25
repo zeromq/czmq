@@ -16,4 +16,5 @@ mkdir -p ../builds/msvc/vs2013/czmq
 mkdir -p ../builds/msvc/vs2013/czmq_selftest
 
 gsl -q -script:sockopts.gsl sockopts.xml
+gsl -q -script:zsock_opt.gsl sockopts.xml
 gsl -q -script:project.gsl project.xml

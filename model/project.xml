@@ -26,6 +26,7 @@
     <class name = "zrex" />
     <class name = "zsocket" />
     <class name = "zsockopt" />
+    <class name = "zsock" />
     <class name = "zstr" />
     <class name = "zsys" />
     <class name = "zthread" />
