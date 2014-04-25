@@ -50,6 +50,7 @@
 #include "zpoller.h"
 #include "zsocket.h"
 #include "zsockopt.h"
+#include "zsock.h"
 #include "zstr.h"
 #include "zsys.h"
 #include "zthread.h"
