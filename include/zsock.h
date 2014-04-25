@@ -103,9 +103,8 @@ CZMQ_EXPORT int
 //  -------------------------------------------------------------------------
 //  Extensions
 
-//  Opaque class structures
-typedef struct _zframe_t zframe_t;
-typedef struct _zmsg_t zmsg_t;
+#include "zframe.h"
+#include "zmsg.h"
 
 //  Return a pointer to the 0MQ socket.
 CZMQ_EXPORT void *
