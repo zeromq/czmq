@@ -36,6 +36,7 @@ include_HEADERS = \
     ../include/zsocket.h \
     ../include/zsockopt.h \
     ../include/zsock.h \
+    ../include/zsock_option.h \
     ../include/zstr.h \
     ../include/zsys.h \
     ../include/zthread.h \
