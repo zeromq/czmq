@@ -19,7 +19,7 @@
 @discuss
     This class wraps the ZMQ socket monitor API, see zmq_socket_monitor for
     details. Currently this class requires libzmq v4.0 or later and is empty
-    on older versions of libzmq.
+    on older versions of libzmq. Deprecated in favor of zsock_monitor.
 @end
 */
 
@@ -165,7 +165,7 @@ zmonitor_test (bool verbose)
     zmonitor_set_verbose (sinkmon, verbose);
 
     //  Check sink is now listening
-    zsocket_bind (sink, "tcp://*:5555");
+    zsocket_bind (sink, "tcp://127.0.0.1:9999");
     result = s_check_event (sinkmon, ZMQ_EVENT_LISTENING);
     assert (result);
 
@@ -173,7 +173,7 @@ zmonitor_test (bool verbose)
     zmonitor_t *sourcemon = zmonitor_new (ctx,
         source, ZMQ_EVENT_CONNECTED | ZMQ_EVENT_DISCONNECTED);
     zmonitor_set_verbose (sourcemon, verbose);
-    zsocket_connect (source, "tcp://localhost:5555");
+    zsocket_connect (source, "tcp://127.0.0.1:5555");
 
     //  Check source connected to sink
     result = s_check_event (sourcemon, ZMQ_EVENT_CONNECTED);
@@ -258,7 +258,7 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
 static agent_t *
 s_agent_new (zctx_t *ctx, void *pipe, char *endpoint)
 {
-    agent_t *self = (agent_t *) malloc (sizeof (agent_t));
+    agent_t *self = (agent_t *) zmalloc (sizeof (agent_t));
     assert (self);
 
     self->ctx = ctx;

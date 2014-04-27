@@ -22,17 +22,15 @@ DESCRIPTION
 Classes
 ~~~~~~~
 
-These classes wrap the low-level ZeroMQ API:
+These classes provide the main socket and message API:
 
-* linkczmq:zctx[3] - working with 0MQ contexts
 * linkczmq:zframe[3] - working with single message frames
 * linkczmq:zloop[3] - event-driven reactor
-* linkczmq:zmonitor[3] - socket event monitor
 * linkczmq:zmsg[3] - working with multipart messages
 * linkczmq:zpoller[3] - trivial socket poller class
 * linkczmq:zproxy[3] - convenient zmq_proxy api
-* linkczmq:zsocket[3] - working with 0MQ sockets
-* linkczmq:zsockopt[3] - get/set 0MQ socket options
+* linkczmq:zsock[3] - working with 0MQ sockets (high-level)
+* linkczmq:zsock_monitor[3] - monitor events on 0MQ sockets
 * linkczmq:zstr[3] - sending and receiving strings
 
 These classes provide additional support for authentication and encryption:
@@ -45,15 +43,16 @@ These classes provide generic containers:
 
 * linkczmq:zhash[3] - generic type-free hash container
 * linkczmq:zlist[3] - generic type-free list container
-* linkczmq:ztree[3] - generic type-free red-black tree container
 
-These classes abstract non-portable functionality:
+These classes wrap-up non-portable functionality:
 
 * linkczmq:zbeacon[3] - LAN discovery and presence
 * linkczmq:zservice[3] - network service registry and lookup
 * linkczmq:zclock[3] - millisecond clocks and delays
 * linkczmq:zdir[3] - work with file-system directories
-* linkczmq:zfile[3] - provides methods to work with files in a portable fashion.
+* linkczmq:zdir_patch[3] - work with directory differences
+* linkczmq:zfile[3] - work with file-system files
+* linkczmq:zlog[3] - work with the system logger
 * linkczmq:zmutex[3] - working with mutexes
 * linkczmq:zsys[3] - system-level methods
 * linkczmq:zthread[3] - working with system threads
@@ -64,6 +63,13 @@ And these utility classes add value:
 * linkczmq:zchunk[3] - work with memory chunks
 * linkczmq:zconfig[3] - work with textual config files
 * linkczmq:zrex[3] - work with regular expressions
+
+These classes work with low-level libzmq socket handles, and are deprecated:
+
+* linkczmq:zctx[3] - working with 0MQ contexts
+* linkczmq:zmonitor[3] - socket event monitor
+* linkczmq:zsocket[3] - working with 0MQ sockets (low-level)
+* linkczmq:zsockopt[3] - get/set 0MQ socket options
 
 Scope and Goals
 ~~~~~~~~~~~~~~~
@@ -79,7 +85,7 @@ Ownership and License
 
 CZMQ is maintained by the ZeroMQ community at github.com/zeromq. Its other authors and contributors are listed in the AUTHORS file.
 
-The authors of CZMQ grant you free use of this software under the terms of the GNU Lesser General Public License (LGPL). For details see the files `COPYING` and `COPYING.LESSER` in this directory.
+The contributors are listed in AUTHORS. This project uses the MPL v2 license, see LICENSE.
 
 Contributing
 ~~~~~~~~~~~~

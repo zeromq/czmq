@@ -91,7 +91,13 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zsys_version (int *major, int *minor, int *patch);
 
-//  Format a string with variable arguments, returning a freshly allocated
+//  Format a string using printf formatting, returning a freshly allocated
+//  buffer. If there was insufficient memory, returns NULL. Free the returned
+//  string using zstr_free().
+CZMQ_EXPORT char *
+    zsys_sprintf (const char *format, ...);
+
+//  Format a string with a va_list argument, returning a freshly allocated
 //  buffer. If there was insufficient memory, returns NULL. Free the returned
 //  string using zstr_free().
 CZMQ_EXPORT char *

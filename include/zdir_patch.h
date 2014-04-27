@@ -23,9 +23,6 @@ typedef enum {
 extern "C" {
 #endif
 
-//  Opaque class structure
-typedef struct _zdir_patch_t zdir_patch_t;
-
 //  @interface
 //  Create new patch
 CZMQ_EXPORT zdir_patch_t *

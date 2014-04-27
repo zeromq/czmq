@@ -18,9 +18,6 @@
 extern "C" {
 #endif
 
-//  Opaque class structure
-typedef struct _zpoller_t zpoller_t;
-
 //  @interface
 //  Create new poller
 CZMQ_EXPORT zpoller_t *

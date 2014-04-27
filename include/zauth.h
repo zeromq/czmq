@@ -18,9 +18,6 @@
 extern "C" {
 #endif
 
-//  Opaque class structure
-typedef struct _zauth_t zauth_t;
-
 //  @interface
 #define CURVE_ALLOW_ANY "*"
 
@@ -65,7 +62,7 @@ CZMQ_EXPORT void
     
 //  Configure GSSAPI authentication for a given domain. GSSAPI authentication
 //  uses an underlying mechanism (usually Kerberos) to establish a secure
-//  context and perform mutual authentication.  To cover all domains, use "*". 
+//  context and perform mutual authentication. To cover all domains, use "*".
 CZMQ_EXPORT void
     zauth_configure_gssapi (zauth_t *self, char *domain, ...);
 

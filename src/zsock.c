@@ -352,27 +352,6 @@ zsock_test (bool verbose)
     rc = zsock_wait (reader);
     assert (rc == 0);
 
-
-
-
-//     //  Test sending frames to socket
-//     rc = zsock_sendmem (writer, "ABC", 3, ZFRAME_MORE);
-//     assert (rc == 0);
-//     rc = zsock_sendmem (writer, "DEFG", 4, 0);
-//     assert (rc == 0);
-
-//     zframe_t *frame = zsock_recv_frame (reader);
-//     assert (frame);
-//     assert (zframe_streq (frame, "ABC"));
-//     assert (zframe_more (frame));
-//     zframe_destroy (&frame);
-
-//     frame = zsock_recv_frame (reader);
-//     assert (frame);
-//     assert (zframe_streq (frame, "DEFG"));
-//     assert (!zframe_more (frame));
-//     zframe_destroy (&frame);
-
     zsock_destroy (&reader);
     zsock_destroy (&writer);
     //  @end

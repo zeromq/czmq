@@ -18,9 +18,6 @@
 extern "C" {
 #endif
 
-//  Opaque class structure
-typedef struct _zconfig_t zconfig_t;
-
 //  @interface
 //  Function that executes config
 typedef int (zconfig_fct) (zconfig_t *self, void *arg, int level);

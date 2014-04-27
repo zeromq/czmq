@@ -18,9 +18,6 @@
 extern "C" {
 #endif
 
-//  Opaque class structure
-typedef struct _zmsg_t zmsg_t;
-
 //  @interface
 //  Create a new empty message object
 CZMQ_EXPORT zmsg_t *

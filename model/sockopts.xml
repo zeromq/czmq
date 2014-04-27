@@ -66,7 +66,7 @@
 
         <!-- Options that are the same in 3.x -->
         <include name = "3-x options" />
-        
+
         <!-- Emulation of 2.x ZMQ_HWM option -->
         <include name = "set_hwm" />
     </version>
@@ -82,7 +82,7 @@
         <option name = "ipv4only"          type = "int"    mode = "rw" test = "SUB" />
         <option name = "delay_attach_on_connect"
                                            type = "int"    mode = "w"  test = "PUB" />
-                                           
+
         <!-- Emulation of 2.x ZMQ_HWM option -->
         <include name = "set_hwm" />
     </version>
@@ -161,27 +161,5 @@
         <option name = "fd"                type = "int"    mode = "r"  test = "SUB" />
         <option name = "events"            type = "int"    mode = "r"  test = "SUB" />
         <option name = "last_endpoint"     type = "string" mode = "r"  test = "SUB" />
-    </macro>
-    
-    <macro name = "set_hwm">
-        <header>
-//  Emulation of widely-used 2.x socket options
-CZMQ_EXPORT void zsocket_set_hwm (void *zocket, int hwm);
-        </header>
-        <source>
-//  --------------------------------------------------------------------------
-//  Set socket high-water mark, emulating 2.x API
-
-void
-zsocket_set_hwm (void *zocket, int hwm)
-{
-    zsocket_set_sndhwm (zocket, hwm);
-    zsocket_set_rcvhwm (zocket, hwm);
-}
-        </source>
-        <selftest>
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    zsocket_set_hwm (zocket, 1);
-        </selftest>
     </macro>
 </options>

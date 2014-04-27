@@ -83,7 +83,6 @@ set (czmq_headers
     include/zchunk.h
     include/zclock.h
     include/zconfig.h
-    include/zctx.h
     include/zdir.h
     include/zdir_patch.h
     include/zdigest.h
@@ -99,13 +98,16 @@ set (czmq_headers
     include/zpoller.h
     include/zproxy.h
     include/zrex.h
-    include/zsocket.h
-    include/zsockopt.h
     include/zsock.h
+    include/zsock_option.h
+    include/zsock_monitor.h
     include/zstr.h
     include/zsys.h
-    include/zthread.h
     include/zuuid.h
+    include/zthread.h
+    include/zctx.h
+    include/zsocket.h
+    include/zsockopt.h
 )
 source_group ("Header Files" FILES ${czmq_headers})
 install(FILES ${czmq_headers} DESTINATION include)
@@ -124,7 +126,6 @@ set (czmq_sources
     src/zchunk.c
     src/zclock.c
     src/zconfig.c
-    src/zctx.c
     src/zdir.c
     src/zdir_patch.c
     src/zdigest.c
@@ -140,13 +141,16 @@ set (czmq_sources
     src/zpoller.c
     src/zproxy.c
     src/zrex.c
-    src/zsocket.c
-    src/zsockopt.c
     src/zsock.c
+    src/zsock_option.c
+    src/zsock_monitor.c
     src/zstr.c
     src/zsys.c
-    src/zthread.c
     src/zuuid.c
+    src/zthread.c
+    src/zctx.c
+    src/zsocket.c
+    src/zsockopt.c
 )
 source_group ("Source Files" FILES ${czmq_sources})
 add_library(czmq SHARED ${czmq_sources})
