@@ -5,6 +5,7 @@ SUBDIRS = src model doc addons
 DIST_SUBDIRS = src model doc addons
 
 EXTRA_DIST = \
+	version.sh \
 	builds/android/Android.mk \
 	builds/android/Application.mk \
 	builds/android/build.sh \
