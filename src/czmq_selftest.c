@@ -56,7 +56,7 @@ int main (int argc, char *argv [])
     zctx_test (verbose);
     zsockopt_test (verbose);
     zsocket_test (verbose);
-    zsock_option_test (verbose);
+//     zsock_option_test (verbose);
     zsock_test (verbose);
     zpoller_test (verbose);
     zthread_test (verbose);

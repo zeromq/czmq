@@ -31,21 +31,18 @@ CZMQ_EXPORT void
     zmsg_destroy (zmsg_t **self_p);
 
 //  Receive message from socket, returns zmsg_t object or NULL if the recv
-//  was interrupted. Does a blocking recv, if you want to not block then use
-//  the zloop class or zmsg_recv_nowait() or zmq_poll to check for socket input before receiving.
+//  was interrupted. Does a blocking recv. If you want to not block then use
+//  the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
+//  before receiving.
 CZMQ_EXPORT zmsg_t *
-    zmsg_recv (void *socket);
+    zmsg_recv (zsock_t *source);
 
-//  Receive message from socket, returns zmsg_t object, or NULL either if there was
-//  no input waiting, or the recv was interrupted.
-CZMQ_EXPORT zmsg_t *
-    zmsg_recv_nowait (void *socket);
-
-//  Send message to socket, destroy after sending. If the message has no
-//  frames, sends nothing but destroys the message anyhow. Safe to call
-//  if zmsg is null.
+//  Send message to destination socket, and destroy the message after sending
+//  it successfully. If the message has no frames, sends nothing but destroys
+//  the message anyhow. Nullifies the caller's reference to the message (as
+//  it is a destructor).
 CZMQ_EXPORT int
-    zmsg_send (zmsg_t **self_p, void *socket);
+    zmsg_send (zmsg_t **self_p, zsock_t *dest);
 
 //  Return size of message, i.e. number of frames (0 or more).
 CZMQ_EXPORT size_t
@@ -108,11 +105,6 @@ CZMQ_EXPORT int
 //  no more frames in the message, returns NULL.
 CZMQ_EXPORT char *
     zmsg_popstr (zmsg_t *self);
-
-//  Pop frame off front of message, caller now owns frame
-//  If next frame is empty, pops and destroys that empty frame.
-CZMQ_EXPORT zframe_t *
-    zmsg_unwrap (zmsg_t *self);
 
 //  Remove specified frame from list, if present. Does not destroy frame.
 CZMQ_EXPORT void
@@ -178,9 +170,21 @@ CZMQ_EXPORT int
     zmsg_test (bool verbose);
 //  @end
 
+//  DEPRECATED as over-engineered, poor style
+//  Pop frame off front of message, caller now owns frame
+//  If next frame is empty, pops and destroys that empty frame.
+CZMQ_EXPORT zframe_t *
+    zmsg_unwrap (zmsg_t *self);
+
+//  DEPRECATED as poor style -- callers should use zloop or zpoller
+//  Receive message from socket, returns zmsg_t object, or NULL either if
+//  there was no input waiting, or the recv was interrupted.
+CZMQ_EXPORT zmsg_t *
+    zmsg_recv_nowait (void *source);
+
+//  DEPRECATED as unsafe -- does not nullify frame reference.
 //  Push frame plus empty frame to front of message, before first frame.
 //  Message takes ownership of frame, will destroy it when message is sent.
-//  DEPRECATED as unsafe -- does not nullify frame reference.
 CZMQ_EXPORT void
     zmsg_wrap (zmsg_t *self, zframe_t *frame);
 

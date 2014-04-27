@@ -25,8 +25,9 @@
 //  Structure of our class
 
 struct _zpoller_t {
-    zlist_t *readers;           //  List of sockets to read from
+    zlist_t *reader_list;       //  List of sockets to read from
     zmq_pollitem_t *poll_set;   //  Current zmq_poll set
+    zsock_t **poll_readers;     //  Matching table of socket readers
     size_t poll_size;           //  Size of poll set
     bool need_rebuild;          //  Does pollset needs rebuilding?
     bool expired;               //  Did poll timer expire?
@@ -38,21 +39,21 @@ static int s_rebuild_poll_set (zpoller_t *self);
 
 //  --------------------------------------------------------------------------
 //  Constructor
-//  Create new poller from a list of readers (end in NULL)
+//  Create new poller from a list of zsock_t readers (end in NULL)
 
 zpoller_t *
-zpoller_new (void *reader, ...)
+zpoller_new (zsock_t *reader, ...)
 {
     zpoller_t *self = (zpoller_t *) zmalloc (sizeof (zpoller_t));
     assert (self);
-    self->readers = zlist_new ();
+    self->reader_list = zlist_new ();
     self->need_rebuild = true;
 
     va_list args;
     va_start (args, reader);
     while (reader) {
-        zlist_append (self->readers, reader);
-        reader = va_arg (args, void *);
+        zlist_append (self->reader_list, reader);
+        reader = va_arg (args, zsock_t *);
     }
     va_end (args);
     return self;
@@ -68,7 +69,8 @@ zpoller_destroy (zpoller_t **self_p)
     assert (self_p);
     if (*self_p) {
         zpoller_t *self = *self_p;
-        zlist_destroy (&self->readers);
+        zlist_destroy (&self->reader_list);
+        free (self->poll_readers);
         free (self->poll_set);
         free (self);
         *self_p = NULL;
@@ -80,11 +82,11 @@ zpoller_destroy (zpoller_t **self_p)
 //  Add a reader to be polled
 
 int
-zpoller_add (zpoller_t *self, void *reader)
+zpoller_add (zpoller_t *self, zsock_t *reader)
 {
     assert (self);
     assert (reader);
-    int rc = zlist_append (self->readers, reader);
+    int rc = zlist_append (self->reader_list, reader);
     if (rc != -1)
         self->need_rebuild = true;
     return rc;
@@ -100,7 +102,7 @@ zpoller_add (zpoller_t *self, void *reader)
 //  test the actual exit condition by calling zpoller_expired () and 
 //  zpoller_terminated (). Timeout is in msec.
 
-void *
+zsock_t *
 zpoller_wait (zpoller_t *self, int timeout)
 {
     self->expired = false;
@@ -114,7 +116,7 @@ zpoller_wait (zpoller_t *self, int timeout)
         uint reader = 0;
         for (reader = 0; reader < self->poll_size; reader++)
             if (self->poll_set [reader].revents & ZMQ_POLLIN)
-                return self->poll_set [reader].socket;
+                return self->poll_readers [reader];
     }
     else
     if (rc == 0)
@@ -132,20 +134,24 @@ s_rebuild_poll_set (zpoller_t *self)
 {
     free (self->poll_set);
     self->poll_set = NULL;
+    free (self->poll_readers);
+    self->poll_readers = NULL;
 
-    self->poll_size = zlist_size (self->readers);
+    self->poll_size = zlist_size (self->reader_list);
     self->poll_set = (zmq_pollitem_t *)
         zmalloc (self->poll_size * sizeof (zmq_pollitem_t));
-    if (!self->poll_set)
+    self->poll_readers = (zsock_t **) zmalloc (self->poll_size * sizeof (zsock_t *));
+    if (!self->poll_set || !self->poll_readers)
         return -1;
 
     uint reader_nbr = 0;
-    void *reader = zlist_first (self->readers);
+    zsock_t *reader = zlist_first (self->reader_list);
     while (reader) {
-        self->poll_set [reader_nbr].socket = reader;
+        self->poll_readers [reader_nbr] = reader;
+        self->poll_set [reader_nbr].socket = zsock_resolve (reader);
         self->poll_set [reader_nbr].events = ZMQ_POLLIN;
         reader_nbr++;
-        reader = zlist_next (self->readers);
+        reader = zlist_next (self->reader_list);
     }
     self->need_rebuild = false;
     return 0;
@@ -185,17 +191,15 @@ zpoller_test (bool verbose)
     printf (" * zpoller: ");
 
     //  @selftest
-    zctx_t *ctx = zctx_new ();
-
     //  Create a few sockets
-    void *vent = zsocket_new (ctx, ZMQ_PUSH);
-    int rc = zsocket_bind (vent, "tcp://*:9000");
+    zsock_t *vent = zsock_new (ZMQ_PUSH);
+    int rc = zsock_bind (vent, "tcp://*:9000");
     assert (rc != -1);
-    void *sink = zsocket_new (ctx, ZMQ_PULL);
-    rc = zsocket_connect (sink, "tcp://localhost:9000");
+    zsock_t *sink = zsock_new (ZMQ_PULL);
+    rc = zsock_connect (sink, "tcp://localhost:9000");
     assert (rc != -1);
-    void *bowl = zsocket_new (ctx, ZMQ_PULL);
-    void *dish = zsocket_new (ctx, ZMQ_PULL);
+    zsock_t *bowl = zsock_new (ZMQ_PULL);
+    zsock_t *dish = zsock_new (ZMQ_PULL);
 
     //  Set-up poller
     zpoller_t *poller = zpoller_new (bowl, dish, NULL);
@@ -208,7 +212,7 @@ zpoller_test (bool verbose)
     zstr_send (vent, "Hello, World");
 
     //  We expect a message only on the sink
-    void *which = zpoller_wait (poller, -1);
+    zsock_t *which = zpoller_wait (poller, -1);
     assert (which == sink);
     assert (zpoller_expired (poller) == false);
     assert (zpoller_terminated (poller) == false);
@@ -216,9 +220,13 @@ zpoller_test (bool verbose)
     assert (streq (message, "Hello, World"));
     zstr_free (&message);
 
-    //  Destroy poller and context
+    //  Destroy poller and sockets
     zpoller_destroy (&poller);
-    zctx_destroy (&ctx);
+
+    zsock_destroy (&vent);
+    zsock_destroy (&sink);
+    zsock_destroy (&bowl);
+    zsock_destroy (&dish);
     //  @end
 
     printf ("OK\n");

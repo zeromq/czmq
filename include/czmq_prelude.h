@@ -491,7 +491,7 @@ typedef int SOCKET;
 #   define SOCKET_ERROR -1
 #endif
 
-//- DLL exports -------------------------------------------------------------
+//- Non-portable declaration specifiers -------------------------------------
 
 #if defined (__WINDOWS__)
 #   if defined LIBCZMQ_STATIC
@@ -503,6 +503,13 @@ typedef int SOCKET;
 #   endif
 #else
 #   define CZMQ_EXPORT
+#endif
+
+//  For thread-local storage
+#if defined (__WINDOWS__)
+#   define CZMQ_THREADLS __declspec(thread)
+#else
+#   define CZMQ_THREADLS _thread
 #endif
 
 //- Always include ZeroMQ header file ---------------------------------------
