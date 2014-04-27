@@ -18,9 +18,6 @@
 extern "C" {
 #endif
 
-//  Opaque class structure
-typedef struct _zdigest_t zdigest_t;
-
 //  @interface
 //  Constructor - creates new digest object, which you use to build up a
 //  digest by repeatedly calling zdigest_update() on chunks of data.

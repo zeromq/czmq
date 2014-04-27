@@ -20,9 +20,6 @@ extern "C" {
 
 //  @interface
 
-//  Opaque class structure
-typedef struct _zsock_t zsock_t;
-
 //  Create a new socket.
 CZMQ_EXPORT zsock_t *
     zsock_new (int type);
@@ -82,7 +79,6 @@ CZMQ_EXPORT void *
 //  Self test of this class
 CZMQ_EXPORT int
     zsock_test (bool verbose);
-
 
 //  @end
 

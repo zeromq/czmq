@@ -115,9 +115,6 @@ CZMQ_EXPORT void zsocket_set_tcp_keepalive_idle (void *zocket, int tcp_keepalive
 CZMQ_EXPORT void zsocket_set_tcp_keepalive_cnt (void *zocket, int tcp_keepalive_cnt);
 CZMQ_EXPORT void zsocket_set_tcp_keepalive_intvl (void *zocket, int tcp_keepalive_intvl);
 CZMQ_EXPORT void zsocket_set_tcp_accept_filter (void *zocket, const char * tcp_accept_filter);
-
-//  Emulation of widely-used 2.x socket options
-CZMQ_EXPORT void zsocket_set_hwm (void *zocket, int hwm);
 #endif
 
 #if (ZMQ_VERSION_MAJOR == 3)
@@ -178,9 +175,6 @@ CZMQ_EXPORT void zsocket_set_tcp_keepalive_idle (void *zocket, int tcp_keepalive
 CZMQ_EXPORT void zsocket_set_tcp_keepalive_cnt (void *zocket, int tcp_keepalive_cnt);
 CZMQ_EXPORT void zsocket_set_tcp_keepalive_intvl (void *zocket, int tcp_keepalive_intvl);
 CZMQ_EXPORT void zsocket_set_tcp_accept_filter (void *zocket, const char * tcp_accept_filter);
-
-//  Emulation of widely-used 2.x socket options
-CZMQ_EXPORT void zsocket_set_hwm (void *zocket, int hwm);
 #endif
 
 #if (ZMQ_VERSION_MAJOR == 2)

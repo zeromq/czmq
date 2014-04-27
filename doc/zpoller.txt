@@ -10,7 +10,7 @@ SYNOPSIS
 ----
 //  Create new poller
 CZMQ_EXPORT zpoller_t *
-    zpoller_new (void *reader, ...);
+    zpoller_new (zsock_t *reader, ...);
 
 //  Destroy a poller
 CZMQ_EXPORT void
@@ -18,7 +18,7 @@ CZMQ_EXPORT void
 
 //  Add a reader to be polled
 CZMQ_EXPORT int
-    zpoller_add (zpoller_t *self, void *reader);
+    zpoller_add (zpoller_t *self, zsock_t *reader);
 
 //  Poll the registered readers for I/O, return first socket that has input.
 //  This means the order that sockets are defined in the poll list affects
@@ -27,7 +27,7 @@ CZMQ_EXPORT int
 //  context was destroyed, or the timeout expired, returns NULL. You can
 //  test the actual exit condition by calling zpoller_expired () and
 //  zpoller_terminated (). Timeout is in msec.
-CZMQ_EXPORT void *
+CZMQ_EXPORT zsock_t *
     zpoller_wait (zpoller_t *self, int timeout);
 
 //  Return true if the last zpoller_wait () call ended because the timeout
@@ -58,17 +58,15 @@ EXAMPLE
 -------
 .From zpoller_test method
 ----
-    zctx_t *ctx = zctx_new ();
-
     //  Create a few sockets
-    void *vent = zsocket_new (ctx, ZMQ_PUSH);
-    int rc = zsocket_bind (vent, "tcp://*:9000");
+    zsock_t *vent = zsock_new (ZMQ_PUSH);
+    int rc = zsock_bind (vent, "tcp://*:9000");
     assert (rc != -1);
-    void *sink = zsocket_new (ctx, ZMQ_PULL);
-    rc = zsocket_connect (sink, "tcp://localhost:9000");
+    zsock_t *sink = zsock_new (ZMQ_PULL);
+    rc = zsock_connect (sink, "tcp://localhost:9000");
     assert (rc != -1);
-    void *bowl = zsocket_new (ctx, ZMQ_PULL);
-    void *dish = zsocket_new (ctx, ZMQ_PULL);
+    zsock_t *bowl = zsock_new (ZMQ_PULL);
+    zsock_t *dish = zsock_new (ZMQ_PULL);
 
     //  Set-up poller
     zpoller_t *poller = zpoller_new (bowl, dish, NULL);
@@ -81,7 +79,7 @@ EXAMPLE
     zstr_send (vent, "Hello, World");
 
     //  We expect a message only on the sink
-    void *which = zpoller_wait (poller, -1);
+    zsock_t *which = zpoller_wait (poller, -1);
     assert (which == sink);
     assert (zpoller_expired (poller) == false);
     assert (zpoller_terminated (poller) == false);
@@ -89,9 +87,13 @@ EXAMPLE
     assert (streq (message, "Hello, World"));
     zstr_free (&message);
 
-    //  Destroy poller and context
+    //  Destroy poller and sockets
     zpoller_destroy (&poller);
-    zctx_destroy (&ctx);
+
+    zsock_destroy (&vent);
+    zsock_destroy (&sink);
+    zsock_destroy (&bowl);
+    zsock_destroy (&dish);
 ----
 
 SEE ALSO

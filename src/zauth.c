@@ -101,8 +101,7 @@ void
 zauth_allow (zauth_t *self, const char *address)
 {
     zstr_sendx (self->pipe, "ALLOW", address, NULL);
-    //  Wait for completion
-    free (zstr_recv (self->pipe));
+    zsocket_wait (self->pipe);
 }
 
 
@@ -116,8 +115,7 @@ void
 zauth_deny (zauth_t *self, const char *address)
 {
     zstr_sendx (self->pipe, "DENY", address, NULL);
-    //  Wait for completion
-    free (zstr_recv (self->pipe));
+    zsocket_wait (self->pipe);
 }
 
 
@@ -133,8 +131,7 @@ zauth_configure_plain (zauth_t *self, const char *domain, const char *filename)
     assert (domain);
     assert (filename);
     zstr_sendx (self->pipe, "PLAIN", domain, filename, NULL);
-    //  Wait for completion
-    free (zstr_recv (self->pipe));
+    zsocket_wait (self->pipe);
 }
 
 
@@ -153,8 +150,7 @@ zauth_configure_curve (zauth_t *self, const char *domain, const char *location)
     assert (domain);
     assert (location);
     zstr_sendx (self->pipe, "CURVE", domain, location, NULL);
-    //  Wait for completion
-    free (zstr_recv (self->pipe));
+    zsocket_wait (self->pipe);
 }
 
 
@@ -169,6 +165,7 @@ zauth_configure_gssapi (zauth_t *self, char *domain, ...)
     assert (self);
     assert (domain);
     zstr_sendx (self->pipe, "GSSAPI", domain, NULL);
+    zsocket_wait (self->pipe);
 }
 
 
@@ -181,8 +178,7 @@ zauth_set_verbose (zauth_t *self, bool verbose)
     assert (self);
     zstr_sendm (self->pipe, "VERBOSE");
     zstr_sendf (self->pipe, "%d", verbose);
-    //  Wait for completion
-    free (zstr_recv (self->pipe));
+    zsocket_wait (self->pipe);
 }
 
 
@@ -248,9 +244,9 @@ zap_request_new (void *handler)
         zframe_destroy (&frame);
     }
     else
-    if (streq (self->mechanism, "GSSAPI")) {
+    if (streq (self->mechanism, "GSSAPI"))
         self->principal = zmsg_popstr (request);
-    }
+
     zmsg_destroy (&request);
     return self;
 #else
@@ -367,14 +363,14 @@ s_agent_handle_pipe (agent_t *self)
         char *address = zmsg_popstr (request);
         zhash_insert (self->whitelist, address, "OK");
         zstr_free (&address);
-        zstr_send (self->pipe, "OK");
+        zsocket_signal (self->pipe);
     }
     else
     if (streq (command, "DENY")) {
         char *address = zmsg_popstr (request);
         zhash_insert (self->blacklist, address, "OK");
         zstr_free (&address);
-        zstr_send (self->pipe, "OK");
+        zsocket_signal (self->pipe);
     }
     else
     if (streq (command, "PLAIN")) {
@@ -388,12 +384,12 @@ s_agent_handle_pipe (agent_t *self)
         self->passwords = zhash_new ();
         zhash_load (self->passwords, filename);
         zstr_free (&filename);
-        zstr_send (self->pipe, "OK");
+        zsocket_signal (self->pipe);
     }
     else
     if (streq (command, "CURVE")) {
-        //  For now we don't do anything with domains
         char *domain = zmsg_popstr (request);
+        //  For now we don't do anything with domains
         zstr_free (&domain);
         //  If location is CURVE_ALLOW_ANY, allow all clients. Otherwise 
         //  treat location as a directory that holds the certificates.
@@ -406,25 +402,26 @@ s_agent_handle_pipe (agent_t *self)
             self->allow_any = false;
         }
         zstr_free (&location);
-        zstr_send (self->pipe, "OK");
+        zsocket_signal (self->pipe);
     }
     else
     if (streq (command, "GSSAPI")) {
-        //  For now we don't do anything with domains
         char *domain = zmsg_popstr (request);
-        free (domain);
+        //  For now we don't do anything with domains
+        zstr_free (&domain);
+        zsocket_signal (self->pipe);
     }
     else
     if (streq (command, "VERBOSE")) {
         char *verbose = zmsg_popstr (request);
         self->verbose = *verbose == '1';
         zstr_free (&verbose);
-        zstr_send (self->pipe, "OK");
+        zsocket_signal (self->pipe);
     }
     else
     if (streq (command, "TERMINATE")) {
         self->terminated = true;
-        zstr_send (self->pipe, "OK");
+        zsocket_signal (self->pipe);
     }
     else {
         printf ("E: invalid command from API: %s\n", command);

@@ -363,6 +363,22 @@ void zsys_version (int *major, int *minor, int *patch)
 
 
 //  --------------------------------------------------------------------------
+//  Format a string using printf formatting, returning a freshly allocated
+//  buffer. If there was insufficient memory, returns NULL. Free the returned
+//  string using zstr_free().
+
+char *
+zsys_sprintf (const char *format, ...)
+{
+    va_list argptr;
+    va_start (argptr, format);
+    char *string = zsys_vprintf (format, argptr);
+    va_end (argptr);
+    return (string);
+}
+
+
+//  --------------------------------------------------------------------------
 //  Format a string with variable arguments, returning a freshly allocated
 //  buffer. If there was insufficient memory, returns NULL. Free the returned
 //  string using zstr_free().
@@ -596,16 +612,6 @@ zsys_daemonize (const char *workdir)
 //  --------------------------------------------------------------------------
 //  Selftest
 
-static char *
-s_vprintf (const char *format, ...)
-{
-    va_list argptr;
-    va_start (argptr, format);
-    char *string = zsys_vprintf (format, argptr);
-    va_end (argptr);
-    return (string);
-}
-
 int
 zsys_test (bool verbose)
 {
@@ -645,13 +651,13 @@ zsys_test (bool verbose)
     assert (minor == CZMQ_VERSION_MINOR);
     assert (patch == CZMQ_VERSION_PATCH);
 
-    char *string = s_vprintf ("%s %02x", "Hello", 16);
+    char *string = zsys_sprintf ("%s %02x", "Hello", 16);
     assert (streq (string, "Hello 10"));
     zstr_free (&string);
 
     char *str64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890,.";
     int num10 = 1234567890;
-    string = s_vprintf ("%s%s%s%s%d", str64, str64, str64, str64, num10);
+    string = zsys_sprintf ("%s%s%s%s%d", str64, str64, str64, str64, num10);
     assert (strlen (string) == (4 * 64 + 10));
     zstr_free (&string);
     //  @end

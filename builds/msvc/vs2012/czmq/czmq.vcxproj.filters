@@ -28,9 +28,6 @@
     <ClCompile Include="..\..\..\..\src\zconfig.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zctx.c">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zdir.c">
       <Filter>src</Filter>
     </ClCompile>
@@ -76,10 +73,13 @@
     <ClCompile Include="..\..\..\..\src\zrex.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zsocket.c">
+    <ClCompile Include="..\..\..\..\src\zsock.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zsockopt.c">
+    <ClCompile Include="..\..\..\..\src\zsock_option.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\zsock_monitor.c">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\zstr.c">
@@ -88,10 +88,19 @@
     <ClCompile Include="..\..\..\..\src\zsys.c">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\zuuid.c">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zthread.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zuuid.c">
+    <ClCompile Include="..\..\..\..\src\zctx.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\zsocket.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\zsockopt.c">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

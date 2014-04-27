@@ -18,9 +18,6 @@
 extern "C" {
 #endif
 
-//  Opaque class structure
-typedef struct _zcert_t zcert_t;
-
 //  @interface
 
 //  Create and initialize a new certificate in memory

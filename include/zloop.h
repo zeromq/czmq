@@ -18,10 +18,6 @@
 extern "C" {
 #endif
 
-
-//  Opaque class structure
-typedef struct _zloop_t zloop_t;
-
 //  @interface
 //  Callback function for reactor socket activity
 typedef int (zloop_reader_fn) (zloop_t *loop, zsock_t *reader, void *arg);

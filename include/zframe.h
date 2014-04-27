@@ -18,9 +18,6 @@
 extern "C" {
 #endif
 
-//  Opaque class structure
-typedef struct _zframe_t zframe_t;
-
 //  @interface
 #define ZFRAME_MORE     1
 #define ZFRAME_REUSE    2

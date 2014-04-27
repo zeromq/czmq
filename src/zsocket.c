@@ -245,6 +245,17 @@ zsocket_wait (void *zocket)
 
 
 //  --------------------------------------------------------------------------
+//  Set socket high-water mark, emulating 2.x API
+
+void
+zsocket_set_hwm (void *zocket, int hwm)
+{
+    zsocket_set_sndhwm (zocket, hwm);
+    zsocket_set_rcvhwm (zocket, hwm);
+}
+
+
+//  --------------------------------------------------------------------------
 //  Selftest
 
 int

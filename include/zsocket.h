@@ -104,6 +104,9 @@ CZMQ_EXPORT int zsocket_unbind (void *socket, const char *format, ...) CHECK_PRI
 CZMQ_EXPORT int zsocket_connect (void *socket, const char *format, ...) CHECK_PRINTF (2);
 CZMQ_EXPORT int zsocket_disconnect (void *socket, const char *format, ...) CHECK_PRINTF (2);
 
+//  Emulation of widely-used 2.x socket options
+CZMQ_EXPORT void zsocket_set_hwm (void *zocket, int hwm);
+
 #ifdef __cplusplus
 }
 #endif
