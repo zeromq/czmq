@@ -85,20 +85,22 @@ zmsg_destroy (zmsg_t **self_p)
 
 
 //  --------------------------------------------------------------------------
-//  Receive message from socket, returns zmsg_t object or NULL if the recv
-//  was interrupted. Does a blocking recv, if you want to not block then use
-//  the zloop class or zmsg_recv_nowait() or zmq_poll to check for socket input before receiving.
+//  Receive a message from a socket. The socket may be a libzmq socket, or a
+//  zsock_t object. Returns a new zmsg_t object if successful, or NULL if the
+//  receive was interrupted. The recv call blocks: if you want a non-blocking
+//  call, use the zloop or zpoller class to receive only from ready sockets.
 
 zmsg_t *
-zmsg_recv (void *zocket)
+zmsg_recv (zsock_t *source)
 {
-    assert (zocket);
+    assert (source);
     zmsg_t *self = zmsg_new ();
     if (!self)
         return NULL;
 
+    void *handle = zsock_resolve (source);
     while (true) {
-        zframe_t *frame = zframe_recv (zocket);
+        zframe_t *frame = zframe_recv (handle);
         if (!frame) {
             zmsg_destroy (&self);
             break;              //  Interrupted or terminated
@@ -107,41 +109,12 @@ zmsg_recv (void *zocket)
             zmsg_destroy (&self);
             break;
         }
-        if (!zsocket_rcvmore (zocket))
+        if (!zsocket_rcvmore (handle))
             break;              //  Last message frame
     }
     return self;
 }
 
-//  --------------------------------------------------------------------------
-//  Receive message from socket, returns zmsg_t object, or NULL either if there was
-//  no input waiting, or the recv was interrupted.
-
-zmsg_t *
-zmsg_recv_nowait (void *zocket)
-{
-    assert (zocket);
-    int frames = 0;
-    zmsg_t *self = zmsg_new ();
-    if (!self)
-        return NULL;
-    
-    while (true) {
-        zframe_t *frame = zframe_recv_nowait (zocket);
-        if (!frame) {
-            zmsg_destroy (&self);
-            break;              //  Interrupted or terminated
-        }
-        if (zmsg_append (self, &frame)) {
-            zmsg_destroy (&self);
-            break;
-        }
-        if (!zsocket_rcvmore (zocket))
-            break;              //  Last message frame
-        frames++;
-    }
-    return frames > 0 ? self : NULL;
-}
 
 //  --------------------------------------------------------------------------
 //  Send message to socket, destroy after sending. If the message has no
@@ -149,20 +122,21 @@ zmsg_recv_nowait (void *zocket)
 //  if zmsg is null.
 
 int
-zmsg_send (zmsg_t **self_p, void *zocket)
+zmsg_send (zmsg_t **self_p, zsock_t *dest)
 {
     assert (self_p);
-    assert (zocket);
+    assert (dest);
     zmsg_t *self = *self_p;
 
     int rc = 0;
+    void *handle = zsock_resolve (dest);
     if (zlist_size (self->frames) == 0)
         return -1;
     else
     if (self) {
         zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
         while (frame) {
-            rc = zframe_send (&frame, zocket,
+            rc = zframe_send (&frame, handle,
                 zlist_size (self->frames)? ZFRAME_MORE: 0);
             if (rc != 0)
                 break;
@@ -375,24 +349,6 @@ zmsg_popstr (zmsg_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Pop frame off front of message, caller now owns frame
-//  If next frame is empty, pops and destroys that empty frame.
-
-zframe_t *
-zmsg_unwrap (zmsg_t *self)
-{
-    assert (self);
-    zframe_t *frame = zmsg_pop (self);
-    zframe_t *empty = zmsg_first (self);
-    if (empty && zframe_size (empty) == 0) {
-        empty = zmsg_pop (self);
-        zframe_destroy (&empty);
-    }
-    return frame;
-}
-
-
-//  --------------------------------------------------------------------------
 //  Remove specified frame from list, if present. Does not destroy frame.
 
 void
@@ -507,7 +463,6 @@ zmsg_load (zmsg_t *self, FILE *file)
 //  structured messages across transports that do not support multipart data.
 //  Allocates and returns a new buffer containing the serialized message.
 //  To decode a serialized message buffer, use zmsg_decode ().
-
 
 //  Frame lengths are encoded as 1 or 1+4 bytes
 //  0..254 bytes        octet + data
@@ -662,9 +617,59 @@ zmsg_print (zmsg_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  DEPRECATED as over-engineered, poor style
+//  Pop frame off front of message, caller now owns frame
+//  If next frame is empty, pops and destroys that empty frame.
+
+zframe_t *
+zmsg_unwrap (zmsg_t *self)
+{
+    assert (self);
+    zframe_t *frame = zmsg_pop (self);
+    zframe_t *empty = zmsg_first (self);
+    if (empty && zframe_size (empty) == 0) {
+        empty = zmsg_pop (self);
+        zframe_destroy (&empty);
+    }
+    return frame;
+}
+
+
+//  --------------------------------------------------------------------------
+//  DEPRECATED as poor style -- callers should use zloop or zpoller
+//  Receive message from socket, returns zmsg_t object, or NULL either if
+//  there was no input waiting, or the recv was interrupted.
+
+zmsg_t *
+zmsg_recv_nowait (void *source)
+{
+    assert (source);
+    zmsg_t *self = zmsg_new ();
+    if (!self)
+        return NULL;
+
+    void *handle = zsock_resolve (source);
+    while (true) {
+        zframe_t *frame = zframe_recv_nowait (handle);
+        if (!frame) {
+            zmsg_destroy (&self);
+            break;              //  Interrupted or terminated
+        }
+        if (zmsg_append (self, &frame)) {
+            zmsg_destroy (&self);
+            break;
+        }
+        if (!zsocket_rcvmore (source))
+            break;              //  Last message frame
+    }
+    return self;
+}
+
+
+//  --------------------------------------------------------------------------
+//  DEPRECATED as unsafe -- does not nullify frame reference.
 //  Push frame plus empty frame to front of message, before first frame.
 //  Message takes ownership of frame, will destroy it when message is sent.
-//  DEPRECATED as unsafe -- does not nullify frame reference.
 
 void
 zmsg_wrap (zmsg_t *self, zframe_t *frame)
@@ -677,10 +682,10 @@ zmsg_wrap (zmsg_t *self, zframe_t *frame)
 
 
 //  --------------------------------------------------------------------------
+//  DEPRECATED by zmsg_prepend ().
 //  Push frame to the front of the message, i.e. before all other frames.
 //  Message takes ownership of frame, will destroy it when message is sent.
 //  Returns 0 on success, -1 on error.
-//  DEPRECATED by zmsg_prepend ().
 
 int
 zmsg_push (zmsg_t *self, zframe_t *frame)
@@ -693,10 +698,10 @@ zmsg_push (zmsg_t *self, zframe_t *frame)
 
 
 //  --------------------------------------------------------------------------
+//  DEPRECATED by zmsg_append ().
 //  Add frame to the end of the message, i.e. after all other frames.
 //  Message takes ownership of frame, will destroy it when message is sent.
 //  Returns 0 on success.
-//  DEPRECATED by zmsg_append ().
 
 int
 zmsg_add (zmsg_t *self, zframe_t *frame)
@@ -718,15 +723,14 @@ zmsg_test (bool verbose)
 
     int rc = 0;
     //  @selftest
-    zctx_t *ctx = zctx_new ();
-    assert (ctx);
-
-    void *output = zsocket_new (ctx, ZMQ_PAIR);
+    //  Create two PAIR sockets and connect over inproc
+    zsock_t *output = zsock_new (ZMQ_PAIR);
     assert (output);
-    zsocket_bind (output, "inproc://zmsg.test");
-    void *input = zsocket_new (ctx, ZMQ_PAIR);
+    zsock_bind (output, "inproc://zmsg.test");
+
+    zsock_t *input = zsock_new (ZMQ_PAIR);
     assert (input);
-    zsocket_connect (input, "inproc://zmsg.test");
+    zsock_connect (input, "inproc://zmsg.test");
 
     //  Test send and receive of single-frame message
     zmsg_t *msg = zmsg_new ();
@@ -893,7 +897,9 @@ zmsg_test (bool verbose)
     assert (msg != NULL);
     zmsg_destroy (&msg);
 
-    zctx_destroy (&ctx);
+    zsock_destroy (&input);
+    zsock_destroy (&output);
+
     //  @end
     printf ("OK\n");
     return 0;

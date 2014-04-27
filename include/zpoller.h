@@ -24,7 +24,7 @@ typedef struct _zpoller_t zpoller_t;
 //  @interface
 //  Create new poller
 CZMQ_EXPORT zpoller_t *
-    zpoller_new (void *reader, ...);
+    zpoller_new (zsock_t *reader, ...);
 
 //  Destroy a poller
 CZMQ_EXPORT void
@@ -32,7 +32,7 @@ CZMQ_EXPORT void
 
 //  Add a reader to be polled
 CZMQ_EXPORT int
-    zpoller_add (zpoller_t *self, void *reader);
+    zpoller_add (zpoller_t *self, zsock_t *reader);
 
 //  Poll the registered readers for I/O, return first socket that has input.
 //  This means the order that sockets are defined in the poll list affects
@@ -41,7 +41,7 @@ CZMQ_EXPORT int
 //  context was destroyed, or the timeout expired, returns NULL. You can
 //  test the actual exit condition by calling zpoller_expired () and
 //  zpoller_terminated (). Timeout is in msec.
-CZMQ_EXPORT void *
+CZMQ_EXPORT zsock_t *
     zpoller_wait (zpoller_t *self, int timeout);
 
 //  Return true if the last zpoller_wait () call ended because the timeout

@@ -23,7 +23,10 @@ extern "C" {
 typedef struct _zloop_t zloop_t;
 
 //  @interface
-//  Callback function for reactor events
+//  Callback function for reactor socket activity
+typedef int (zloop_reader_fn) (zloop_t *loop, zsock_t *reader, void *arg);
+
+//  Callback function for reactor events (low-level)
 typedef int (zloop_fn) (zloop_t *loop, zmq_pollitem_t *item, void *arg);
 
 // Callback for reactor timer events
@@ -37,10 +40,28 @@ CZMQ_EXPORT zloop_t *
 CZMQ_EXPORT void
     zloop_destroy (zloop_t **self_p);
 
-//  Register pollitem with the reactor. When the pollitem is ready, will call
-//  the handler, passing the arg. Returns 0 if OK, -1 if there was an error.
-//  If you register the pollitem more than once, each instance will invoke its
-//  corresponding handler.
+//  Register socket reader with the reactor. When the reader has messages,
+//  the reactor will call the handler, passing the arg. Returns 0 if OK, -1
+//  if there was an error. If you register the same socket more than once,
+//  each instance will invoke its corresponding handler.
+CZMQ_EXPORT int
+    zloop_reader (zloop_t *self, zsock_t *sock, zloop_reader_fn handler, void *arg);
+
+//  Cancel a socket reader from the reactor. If multiple readers exist for
+//  same socket, cancels ALL of them.
+CZMQ_EXPORT void
+    zloop_reader_end (zloop_t *self, zsock_t *sock);
+
+//  Configure a registered reader to ignore errors. If you do not set this,
+//  then readers that have errors are removed from the reactor silently.
+CZMQ_EXPORT void
+    zloop_reader_set_tolerant (zloop_t *self, zsock_t *sock);
+
+//  Register low-level libzmq pollitem with the reactor. When the pollitem
+//  is ready, will call the handler, passing the arg. Returns 0 if OK, -1
+//  if there was an error. If you register the pollitem more than once, each
+//  instance will invoke its corresponding handler. A pollitem with
+//  socket=NULL and fd=0 means 'poll on FD zero'.
 CZMQ_EXPORT int
     zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg);
 
@@ -50,10 +71,10 @@ CZMQ_EXPORT int
 CZMQ_EXPORT void
     zloop_poller_end (zloop_t *self, zmq_pollitem_t *item);
 
-//  Configure a registered pollitem to ignore errors. If you do not set this, 
-//  then pollitems that have errors are removed from the reactor silently.
+//  Configure a registered poller to ignore errors. If you do not set this,
+//  then poller that have errors are removed from the reactor silently.
 CZMQ_EXPORT void
-    zloop_set_tolerant (zloop_t *self, zmq_pollitem_t *item);
+    zloop_poller_set_tolerant (zloop_t *self, zmq_pollitem_t *item);
 
 //  Register a timer that expires after some delay and repeats some number of
 //  times. At each expiry, will call the handler, passing the arg. To run a
@@ -82,6 +103,9 @@ CZMQ_EXPORT int
 CZMQ_EXPORT void
     zloop_test (bool verbose);
 //  @end
+
+//  Deprecated method aliases
+#define zloop_set_tolerant(s,i) zloop_poller_set_tolerant(s,i)
 
 #ifdef __cplusplus
 }

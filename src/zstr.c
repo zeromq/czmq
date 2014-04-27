@@ -24,15 +24,16 @@
 #include "../include/czmq.h"
 
 static int
-s_send_string (void *socket, bool more, char *string)
+s_send_string (zsock_t *dest, bool more, char *string)
 {
-    assert (socket);
+    assert (dest);
+    void *handle = zsock_resolve (dest);
 
     int len = strlen (string);
     zmq_msg_t message;
     zmq_msg_init_size (&message, len);
     memcpy (zmq_msg_data (&message), string, len);
-    if (zmq_sendmsg (socket, &message, more? ZMQ_SNDMORE: 0) == -1) {
+    if (zmq_sendmsg (handle, &message, more? ZMQ_SNDMORE: 0) == -1) {
         zmq_msg_close (&message);
         return -1;
     }
@@ -47,36 +48,14 @@ s_send_string (void *socket, bool more, char *string)
 //  process was interrupted.
 
 char *
-zstr_recv (void *socket)
+zstr_recv (zsock_t *source)
 {
-    assert (socket);
+    assert (source);
+    void *handle = zsock_resolve (source);
+
     zmq_msg_t message;
     zmq_msg_init (&message);
-    if (zmq_recvmsg (socket, &message, 0) < 0)
-        return NULL;
-
-    size_t size = zmq_msg_size (&message);
-    char *string = (char *) malloc (size + 1);
-    memcpy (string, zmq_msg_data (&message), size);
-    zmq_msg_close (&message);
-    string [size] = 0;
-    return string;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Receive C string from socket, if socket had input ready. Caller must
-//  free returned string using zstr_free. Returns NULL if there was no input
-//  waiting, or if the context was terminated. Use zctx_interrupted to exit
-//  any loop that relies on this method.
-
-char *
-zstr_recv_nowait (void *socket)
-{
-    assert (socket);
-    zmq_msg_t message;
-    zmq_msg_init (&message);
-    if (zmq_recvmsg (socket, &message, ZMQ_DONTWAIT) < 0)
+    if (zmq_recvmsg (handle, &message, 0) < 0)
         return NULL;
 
     size_t size = zmq_msg_size (&message);
@@ -94,11 +73,11 @@ zstr_recv_nowait (void *socket)
 //  method that adds a null terminator on the received string.
 
 int
-zstr_send (void *socket, const char *string)
+zstr_send (zsock_t *dest, const char *string)
 {
-    assert (socket);
+    assert (dest);
     assert (string);
-    return s_send_string (socket, false, (char *) string);
+    return s_send_string (dest, false, (char *) string);
 }
 
 
@@ -107,11 +86,11 @@ zstr_send (void *socket, const char *string)
 //  you can send further strings in the same multi-part message.
 
 int
-zstr_sendm (void *socket, const char *string)
+zstr_sendm (zsock_t *dest, const char *string)
 {
-    assert (socket);
+    assert (dest);
     assert (string);
-    return s_send_string (socket, true, (char *) string);
+    return s_send_string (dest, true, (char *) string);
 }
 
 
@@ -121,9 +100,9 @@ zstr_sendm (void *socket, const char *string)
 //  will create security holes).
 
 int
-zstr_sendf (void *socket, const char *format, ...)
+zstr_sendf (zsock_t *dest, const char *format, ...)
 {
-    assert (socket);
+    assert (dest);
     assert (format);
 
     va_list argptr;
@@ -131,7 +110,7 @@ zstr_sendf (void *socket, const char *format, ...)
     char *string = zsys_vprintf (format, argptr);
     va_end (argptr);
 
-    int rc = s_send_string (socket, false, string);
+    int rc = s_send_string (dest, false, string);
     free (string);
     return rc;
 }
@@ -143,9 +122,9 @@ zstr_sendf (void *socket, const char *format, ...)
 //  message.
 
 int
-zstr_sendfm (void *socket, const char *format, ...)
+zstr_sendfm (zsock_t *dest, const char *format, ...)
 {
-    assert (socket);
+    assert (dest);
     assert (format);
 
     va_list argptr;
@@ -153,7 +132,7 @@ zstr_sendfm (void *socket, const char *format, ...)
     char *string = zsys_vprintf (format, argptr);
     va_end (argptr);
 
-    int rc = s_send_string (socket, true, string);
+    int rc = s_send_string (dest, true, string);
     free (string);
     return rc;
 }
@@ -164,7 +143,7 @@ zstr_sendfm (void *socket, const char *format, ...)
 //  Returns 0 if the strings could be sent OK, or -1 on error.
 
 int
-zstr_sendx (void *socket, const char *string, ...)
+zstr_sendx (zsock_t *dest, const char *string, ...)
 {
     zmsg_t *msg = zmsg_new ();
     va_list args;
@@ -174,7 +153,7 @@ zstr_sendx (void *socket, const char *string, ...)
         string = va_arg (args, char *);
     }
     va_end (args);
-    return zmsg_send (&msg, socket);
+    return zmsg_send (&msg, dest);
 }
 
 
@@ -187,9 +166,11 @@ zstr_sendx (void *socket, const char *string, ...)
 //  using zstr_free().
 
 int
-zstr_recvx (void *socket, char **string_p, ...)
+zstr_recvx (zsock_t *source, char **string_p, ...)
 {
-    zmsg_t *msg = zmsg_recv (socket);
+    assert (source);
+    void *handle = zsock_resolve (source);
+    zmsg_t *msg = zmsg_recv (handle);
     if (!msg)
         return -1;
         
@@ -219,6 +200,33 @@ zstr_free (char **string_p)
 
 
 //  --------------------------------------------------------------------------
+//  DEPRECATED as poor style -- callers should use zloop or zpoller
+//  Receive C string from socket, if socket had input ready. Caller must
+//  free returned string using zstr_free. Returns NULL if there was no input
+//  waiting, or if the context was terminated. Use zctx_interrupted to exit
+//  any loop that relies on this method.
+
+char *
+zstr_recv_nowait (zsock_t *dest)
+{
+    assert (dest);
+    void *handle = zsock_resolve (dest);
+
+    zmq_msg_t message;
+    zmq_msg_init (&message);
+    if (zmq_recvmsg (handle, &message, ZMQ_DONTWAIT) < 0)
+        return NULL;
+
+    size_t size = zmq_msg_size (&message);
+    char *string = (char *) malloc (size + 1);
+    memcpy (string, zmq_msg_data (&message), size);
+    zmq_msg_close (&message);
+    string [size] = 0;
+    return string;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Selftest
 
 int
@@ -227,15 +235,13 @@ zstr_test (bool verbose)
     printf (" * zstr: ");
 
     //  @selftest
-    zctx_t *ctx = zctx_new ();
-    assert (ctx);
-
-    void *output = zsocket_new (ctx, ZMQ_PAIR);
+    //  Create two PAIR sockets and connect over inproc
+    zsock_t *output = zsock_new (ZMQ_PAIR);
     assert (output);
-    zsocket_bind (output, "inproc://zstr.test");
-    void *input = zsocket_new (ctx, ZMQ_PAIR);
+    zsock_bind (output, "inproc://zstr.test");
+    zsock_t *input = zsock_new (ZMQ_PAIR);
     assert (input);
-    zsocket_connect (input, "inproc://zstr.test");
+    zsock_connect (input, "inproc://zstr.test");
 
     //  Send ten strings, five strings with MORE flag and then END
     int string_nbr;
@@ -255,7 +261,8 @@ zstr_test (bool verbose)
     }
     assert (string_nbr == 15);
 
-    zctx_destroy (&ctx);
+    zsock_destroy (&input);
+    zsock_destroy (&output);
     //  @end
 
     printf ("OK\n");

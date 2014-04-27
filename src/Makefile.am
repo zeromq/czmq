@@ -36,11 +36,11 @@ include_HEADERS = \
     ../include/zsocket.h \
     ../include/zsockopt.h \
     ../include/zsock.h \
-    ../include/zsock_option.h \
     ../include/zstr.h \
     ../include/zsys.h \
     ../include/zthread.h \
     ../include/zuuid.h
+#    ../include/zsock_option.h 
 
 libczmq_la_SOURCES = \
     platform.h \
