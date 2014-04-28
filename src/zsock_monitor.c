@@ -25,9 +25,6 @@
 
 #include "../include/czmq.h"
 
-//  This code needs backporting to work with ZMQ v3.2
-#if (ZMQ_VERSION_MAJOR == 4)
-
 //  Structure of our class
 struct _zsock_monitor_t {
     zsock_t *sock;              //  Socket being monitored
@@ -244,21 +241,32 @@ s_api_command (agent_t *self)
 static void
 s_monitor_event (agent_t *self)
 {
-    //  Copy event data into event struct
+#if (ZMQ_VERSION_MAJOR == 4)
+    //  First frame is event number and value
     zframe_t *frame = zframe_recv (self->sink);
-
-    //  Extract id of the event as bitfield
-    zmq_event_t event;
-    memcpy (&(event.event), zframe_data (frame), sizeof (event.event));
-
-    //  Extract value which is either error code, fd, or reconnect interval
-    memcpy (&(event.value), zframe_data (frame) + sizeof (event.event),
-           sizeof (event.value));
+    int event = *(uint16_t *) (zframe_data (frame));
+    int value = *(uint32_t *) (zframe_data (frame) + 2);
+    //  Address is in second message frame
+    char *address = zstr_recv (self->sink);
     zframe_destroy (&frame);
 
+#elif (ZMQ_VERSION_MAJOR == 3 && ZMQ_VERSION_MINOR == 2)
+    //  zmq_event_t is passed as-is in the frame
+    zframe_t *frame = zframe_recv (self->sink);
+    zmq_event_t *eptr = (zmq_event_t *) zframe_data (frame);
+    int event = eptr->event;
+    int value = eptr->data.listening.fd;
+    char *address = strdup (eptr->data.listening.addr);
+    zframe_destroy (&frame);
+
+#else
+    //  We can't plausibly be here with other versions of libzmq
+    assert (false);
+#endif
+    
+    //  Now map event to something we can send over the pipe
     char *description = "Unknown";
-    char *address = zstr_recv (self->sink);
-    switch (event.event) {
+    switch (event) {
         case ZMQ_EVENT_ACCEPTED:
             description = "Accepted";
             break;
@@ -289,19 +297,20 @@ s_monitor_event (agent_t *self)
         case ZMQ_EVENT_LISTENING:
             description = "Listening";
             break;
+#if (ZMQ_VERSION_MAJOR == 4)
         case ZMQ_EVENT_MONITOR_STOPPED:
             description = "Monitor stopped";
             break;
+#endif
         default:
-            if (self->verbose)
-                printf ("Unknown socket monitor event: %d", event.event);
+            printf ("E: illegal socket monitor event: %d", event);
             break;
     }
     if (self->verbose)
         printf ("I: zsock_monitor: %s - %s\n", description, address);
 
-    zstr_sendfm (self->pipe, "%d", (int) event.event);
-    zstr_sendfm (self->pipe, "%d", (int) event.value);
+    zstr_sendfm (self->pipe, "%d", event);
+    zstr_sendfm (self->pipe, "%d", value);
     zstr_sendm  (self->pipe, address);
     zstr_send   (self->pipe, description);
     free (address);
@@ -389,6 +398,3 @@ zsock_monitor_test (bool verbose)
     //  @end
     printf ("OK\n");
 }
-
-
-#endif          //  ZeroMQ 4.0 or later

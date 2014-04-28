@@ -308,29 +308,16 @@ s_api_command (agent_t *self)
 static void
 s_socket_event (agent_t *self)
 {
-    zframe_t *frame;
-    zmq_event_t event;
+    //  First frame is event number and value
+    zframe_t *frame = zframe_recv (self->socket);
+    int event = *(uint16_t *) (zframe_data (frame));
+    int value = *(uint32_t *) (zframe_data (frame) + 2);
+    zframe_destroy (&frame);
+    
+    //  Second frame is address
+    char *address = zstr_recv (self->socket);
     char *description = "Unknown";
-    char address [1025];
-
-    //  Copy event data into event struct
-    frame = zframe_recv (self->socket);
-
-    //  Extract id of the event as bitfield
-    memcpy (&(event.event), zframe_data (frame), sizeof (event.event));
-
-    //  Extract value which is either error code, fd, or reconnect interval
-    memcpy (&(event.value), zframe_data (frame) + sizeof (event.event),
-           sizeof (event.value));
-    zframe_destroy (&frame);
-
-    //  Copy address part
-    frame = zframe_recv (self->socket);
-    memcpy (address, zframe_data (frame), zframe_size (frame));
-    address [zframe_size (frame)] = 0;  // Terminate address string
-    zframe_destroy (&frame);
-
-    switch (event.event) {
+    switch (event) {
         case ZMQ_EVENT_ACCEPTED:
             description = "Accepted";
             break;
@@ -365,19 +352,17 @@ s_socket_event (agent_t *self)
             description = "Monitor stopped";
             break;
         default:
-            if (self->verbose)
-                printf ("Unknown socket monitor event: %d", event.event);
+            printf ("E: illegal socket monitor event: %d", event);
             break;
     }
     if (self->verbose)
         printf ("I: zmonitor: %s - %s\n", description, address);
 
-    zmsg_t *msg = zmsg_new();
-    zmsg_addstrf (msg, "%d", (int) event.event);
-    zmsg_addstrf (msg, "%d", (int) event.value);
-    zmsg_addstrf (msg, "%s", address);
-    zmsg_addstrf (msg, "%s", description);
-    zmsg_send (&msg, self->pipe);
+    zstr_sendfm (self->pipe, "%d", event);
+    zstr_sendfm (self->pipe, "%d", value);
+    zstr_sendm  (self->pipe, address);
+    zstr_send   (self->pipe, description);
+    free (address);
 }
 
 

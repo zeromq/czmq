@@ -64,6 +64,7 @@ typedef struct _zuuid_t zuuid_t;
 #include "zchunk.h"
 #include "zclock.h"
 #include "zconfig.h"
+#include "zctx.h"
 #include "zdigest.h"
 #include "zdir.h"
 #include "zdir_patch.h"
@@ -81,15 +82,14 @@ typedef struct _zuuid_t zuuid_t;
 #include "zsock.h"
 #include "zsock_monitor.h"
 #include "zsock_option.h"
+#include "zsocket.h"
+#include "zsockopt.h"
 #include "zstr.h"
 #include "zsys.h"
+#include "zthread.h"
 #include "zuuid.h"
 
 //  These are deprecated and will be removed in 3.0
-#include "zctx.h"
 #include "zmonitor.h"
-#include "zsocket.h"
-#include "zsockopt.h"
-#include "zthread.h"
 
 #endif
