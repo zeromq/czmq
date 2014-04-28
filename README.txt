@@ -256,6 +256,16 @@ This is the class interface:
 
 .pull src/zlist.c@discuss,left
 
+#### zlog - system-provided logging service
+
+.pull src/zlog.c@header,left
+
+This is the class interface:
+
+.pull include/zlog.h@interface,code
+
+.pull src/zlog.c@discuss,left
+
 #### zloop - event-driven reactor
 
 .pull src/zloop.c@header,left
@@ -470,9 +480,17 @@ Before attempting to patch code for portability, please read the `czmq_prelude.h
 * Defining macros that rename exotic library functions to more conventional names: do this in czmq_prelude.h.
 * Reimplementing specific methods to use a non-standard API: this is typically needed on Windows. Do this in the relevant class, using #ifdefs to properly differentiate code for different platforms.
 
+### Hints to Contributors
+
+CZMQ is a nice, neat library, and you may not immediately appreciate why. Read the CLASS style guide please, and write your code to make it indistinguishable from the rest of the code in the library. That is the only real criteria for good style: it's invisible.
+
+Don't include system headers in source files. The right place for these is czmq_prelude.h. If you need to check against configured libraries and/or headers, include platform.h in the source before including czmq.h.
+
+Do read your code after you write it and ask, "Can I make this simpler?" We do use a nice minimalist and yet readable style. Learn it, adopt it, use it.
+
 ### Code Generation
 
-We generate the zsockopt class using [https://github.com/imatix/gsl GSL], using a code generator script in scripts/sockopts.gsl.
+We generate the zsockopt class using [https://github.com/imatix/gsl GSL], using a code generator script in scripts/sockopts.gsl. We also generate the project files.
 
 ### This Document
 
