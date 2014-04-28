@@ -493,8 +493,6 @@ s_agent_authenticate (agent_t *self)
             if (streq (request->mechanism, "GSSAPI"))
                 //  For GSSAPI, even a whitelisted address must authenticate
                 allowed = s_authenticate_gssapi (self, request);
-            else
-                printf("Skipping unknown mechanism: %s\n", request->mechanism);
         }
         if (allowed)
             zap_request_reply (request, "200", "OK");
