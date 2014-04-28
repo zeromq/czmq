@@ -36,6 +36,7 @@ typedef struct _zcert_t zcert_t;
 typedef struct _zcertstore_t zcertstore_t;
 typedef struct _zchunk_t zchunk_t;
 typedef struct _zconfig_t zconfig_t;
+typedef struct _zctx_t zctx_t;
 typedef struct _zdigest_t zdigest_t;
 typedef struct _zdir_t zdir_t;
 typedef struct _zdir_patch_t zdir_patch_t;
@@ -45,18 +46,15 @@ typedef struct _zhash_t zhash_t;
 typedef struct _zlist_t zlist_t;
 typedef struct _zlog_t zlog_t;
 typedef struct _zloop_t zloop_t;
+typedef struct _zmonitor_t zmonitor_t;
 typedef struct _zmsg_t zmsg_t;
+typedef struct _zmutex_t zmutex_t;
 typedef struct _zpoller_t zpoller_t;
 typedef struct _zproxy_t zproxy_t;
 typedef struct _zrex_t zrex_t;
 typedef struct _zsock_t zsock_t;
 typedef struct _zsock_monitor_t zsock_monitor_t;
 typedef struct _zuuid_t zuuid_t;
-
-//  These are deprecated and will be removed in 3.0
-typedef struct _zctx_t zctx_t;
-typedef struct _zmonitor_t zmonitor_t;
-typedef struct _zmutex_t zmutex_t;
 
 //  Public API classes
 #include "zauth.h"

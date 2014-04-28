@@ -22,16 +22,22 @@ DESCRIPTION
 Classes
 ~~~~~~~
 
+These classes work with low-level libzmq socket handles:
+
+* linkczmq:zctx[3] - working with 0MQ contexts
+* linkczmq:zsocket[3] - working with 0MQ sockets (low-level)
+* linkczmq:zsockopt[3] - get/set 0MQ socket options
+
 These classes provide the main socket and message API:
 
-* linkczmq:zframe[3] - working with single message frames
-* linkczmq:zloop[3] - event-driven reactor
-* linkczmq:zmsg[3] - working with multipart messages
-* linkczmq:zpoller[3] - trivial socket poller class
-* linkczmq:zproxy[3] - convenient zmq_proxy api
 * linkczmq:zsock[3] - working with 0MQ sockets (high-level)
 * linkczmq:zsock_monitor[3] - monitor events on 0MQ sockets
 * linkczmq:zstr[3] - sending and receiving strings
+* linkczmq:zmsg[3] - working with multipart messages
+* linkczmq:zframe[3] - working with single message frames
+* linkczmq:zloop[3] - event-driven reactor
+* linkczmq:zpoller[3] - trivial socket poller class
+* linkczmq:zproxy[3] - convenient zmq_proxy api
 
 These classes provide additional support for authentication and encryption:
 
@@ -47,13 +53,11 @@ These classes provide generic containers:
 These classes wrap-up non-portable functionality:
 
 * linkczmq:zbeacon[3] - LAN discovery and presence
-* linkczmq:zservice[3] - network service registry and lookup
 * linkczmq:zclock[3] - millisecond clocks and delays
 * linkczmq:zdir[3] - work with file-system directories
 * linkczmq:zdir_patch[3] - work with directory differences
 * linkczmq:zfile[3] - work with file-system files
 * linkczmq:zlog[3] - work with the system logger
-* linkczmq:zmutex[3] - working with mutexes
 * linkczmq:zsys[3] - system-level methods
 * linkczmq:zthread[3] - working with system threads
 * linkczmq:zuuid[3] - UUID support class
@@ -64,12 +68,10 @@ And these utility classes add value:
 * linkczmq:zconfig[3] - work with textual config files
 * linkczmq:zrex[3] - work with regular expressions
 
-These classes work with low-level libzmq socket handles, and are deprecated:
+These classes are deprecated:
 
-* linkczmq:zctx[3] - working with 0MQ contexts
-* linkczmq:zmonitor[3] - socket event monitor
-* linkczmq:zsocket[3] - working with 0MQ sockets (low-level)
-* linkczmq:zsockopt[3] - get/set 0MQ socket options
+* linkczmq:zmonitor[3] - socket event monitor (deprecated)
+* linkczmq:zmutex[3] - working with mutexes
 
 Scope and Goals
 ~~~~~~~~~~~~~~~
