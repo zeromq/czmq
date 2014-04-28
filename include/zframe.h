@@ -18,9 +18,6 @@
 extern "C" {
 #endif
 
-//  Opaque class structure
-typedef struct _zframe_t zframe_t;
-
 //  @interface
 #define ZFRAME_MORE     1
 #define ZFRAME_REUSE    2
@@ -42,17 +39,12 @@ CZMQ_EXPORT void
 //  was interrupted. Does a blocking recv, if you want to not block then use
 //  zframe_recv_nowait().
 CZMQ_EXPORT zframe_t *
-    zframe_recv (void *socket);
-
-//  Receive a new frame off the socket. Returns newly allocated frame, or
-//  NULL if there was no input waiting, or if the read was interrupted.
-CZMQ_EXPORT zframe_t *
-    zframe_recv_nowait (void *socket);
+    zframe_recv (zsock_t *source);
 
 // Send a frame to a socket, destroy frame after sending.
 // Return -1 on error, 0 on success.
 CZMQ_EXPORT int
-    zframe_send (zframe_t **self_p, void *socket, int flags);
+    zframe_send (zframe_t **self_p, zsock_t *dest, int flags);
 
 //  Return number of bytes in frame data
 CZMQ_EXPORT size_t
@@ -113,6 +105,12 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zframe_test (bool verbose);
 //  @end
+
+//  DEPRECATED as poor style -- callers should use zloop or zpoller
+//  Receive a new frame off the socket. Returns newly allocated frame, or
+//  NULL if there was no input waiting, or if the read was interrupted.
+CZMQ_EXPORT zframe_t *
+    zframe_recv_nowait (zsock_t *source);
 
 //  Deprecated method aliases
 #define zframe_print_to_stream(s,p,F) zframe_fprint(s,p,F)

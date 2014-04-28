@@ -17,7 +17,6 @@ include_HEADERS = \
     ../include/zchunk.h \
     ../include/zclock.h \
     ../include/zconfig.h \
-    ../include/zctx.h \
     ../include/zdir.h \
     ../include/zdir_patch.h \
     ../include/zdigest.h \
@@ -33,14 +32,16 @@ include_HEADERS = \
     ../include/zpoller.h \
     ../include/zproxy.h \
     ../include/zrex.h \
-    ../include/zsocket.h \
-    ../include/zsockopt.h \
     ../include/zsock.h \
     ../include/zsock_option.h \
+    ../include/zsock_monitor.h \
     ../include/zstr.h \
     ../include/zsys.h \
+    ../include/zuuid.h \
     ../include/zthread.h \
-    ../include/zuuid.h
+    ../include/zctx.h \
+    ../include/zsocket.h \
+    ../include/zsockopt.h
 
 libczmq_la_SOURCES = \
     platform.h \
@@ -51,7 +52,6 @@ libczmq_la_SOURCES = \
     zchunk.c \
     zclock.c \
     zconfig.c \
-    zctx.c \
     zdir.c \
     zdir_patch.c \
     zdigest.c \
@@ -67,13 +67,16 @@ libczmq_la_SOURCES = \
     zpoller.c \
     zproxy.c \
     zrex.c \
-    zsocket.c \
-    zsockopt.c \
     zsock.c \
+    zsock_option.c \
+    zsock_monitor.c \
     zstr.c \
     zsys.c \
+    zuuid.c \
     zthread.c \
-    zuuid.c
+    zctx.c \
+    zsocket.c \
+    zsockopt.c
 
 AM_CFLAGS = -g
 AM_CPPFLAGS = -I$(top_srcdir)/include

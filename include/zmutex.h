@@ -18,9 +18,6 @@
 extern "C" {
 #endif
 
-//  Opaque class structure
-typedef struct _zmutex_t zmutex_t;
-
 //  @interface
 //  Create a new mutex container
 CZMQ_EXPORT zmutex_t *

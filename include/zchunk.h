@@ -18,9 +18,6 @@
 extern "C" {
 #endif
 
-//  Opaque class structure
-typedef struct _zchunk_t zchunk_t;
-
 //  @interface
 //  Create new chunk
 CZMQ_EXPORT zchunk_t *

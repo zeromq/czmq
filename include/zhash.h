@@ -18,9 +18,6 @@
 extern "C" {
 #endif
 
-//  Opaque class structure
-typedef struct _zhash_t zhash_t;
-
 //  @interface
 //  Callback function for zhash_foreach method
 typedef int (zhash_foreach_fn) (const char *key, void *item, void *argument);

@@ -19,9 +19,6 @@ extern "C" {
 #endif
 
 
-//  Opaque class structure
-typedef struct _zctx_t zctx_t;
-
 //  @interface
 //  Create new context, returns context object, replaces zmq_init
 CZMQ_EXPORT zctx_t *

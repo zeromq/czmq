@@ -32,16 +32,8 @@
 @end
 */
 
-#include "../include/czmq.h"
 #include "platform.h"
-
-#if defined (HAVE_LIBSODIUM)
-#   include <sodium.h>
-#   if crypto_box_PUBLICKEYBYTES != 32 \
-    || crypto_box_SECRETKEYBYTES != 32
-#       error "libsodium not built correctly"
-#   endif
-#endif
+#include "../include/czmq.h"
 
 //  Structure of our class
 

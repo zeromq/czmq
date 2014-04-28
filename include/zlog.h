@@ -18,8 +18,6 @@
 extern "C" {
 #endif
 
-typedef struct _zlog_t zlog_t;
-
 //  @interface
 //  Constructor; the sender name is prepended to every message, and may
 //  not be null.

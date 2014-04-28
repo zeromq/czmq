@@ -305,7 +305,7 @@ AM_CONDITIONAL(BUILD_DOC, test "x$czmq_build_doc" = "xyes")
 
 # Checks for library functions.
 AC_TYPE_SIGNAL
-AC_CHECK_FUNCS(perror gettimeofday memset getifaddrs freeifaddrs)
+AC_CHECK_FUNCS(perror gettimeofday memset getifaddrs)
 
 # Specify output files
 AC_CONFIG_FILES([Makefile \

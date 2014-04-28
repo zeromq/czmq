@@ -18,8 +18,9 @@
 @discuss
 @end
 */
-#include "../include/czmq.h"
+
 #include "platform.h"
+#include "../include/czmq.h"
 
 //  The proxy runs in a background thread
 static void

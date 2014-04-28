@@ -422,38 +422,6 @@
           <Tool Name="VCCLCompilerTool" CompileAs="2" />
         </FileConfiguration>
       </File>
-      <File RelativePath="..\..\..\..\src\zctx.c">
-        <FileConfiguration Name="Release|Win32">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="Release|x64">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="Debug|Win32">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="Debug|x64">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="DebugDLL|Win32">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="DebugDLL|x64">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="ReleaseDLL|Win32">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="ReleaseDLL|x64">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="RelWithDebInfo|Win32">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="RelWithDebInfo|x64">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-      </File>
       <File RelativePath="..\..\..\..\src\zdir.c">
         <FileConfiguration Name="Release|Win32">
           <Tool Name="VCCLCompilerTool" CompileAs="2" />
@@ -934,71 +902,71 @@
           <Tool Name="VCCLCompilerTool" CompileAs="2" />
         </FileConfiguration>
       </File>
-      <File RelativePath="..\..\..\..\src\zsocket.c">
-        <FileConfiguration Name="Release|Win32">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="Release|x64">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="Debug|Win32">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="Debug|x64">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="DebugDLL|Win32">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="DebugDLL|x64">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="ReleaseDLL|Win32">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="ReleaseDLL|x64">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="RelWithDebInfo|Win32">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="RelWithDebInfo|x64">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-      </File>
-      <File RelativePath="..\..\..\..\src\zsockopt.c">
-        <FileConfiguration Name="Release|Win32">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="Release|x64">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="Debug|Win32">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="Debug|x64">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="DebugDLL|Win32">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="DebugDLL|x64">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="ReleaseDLL|Win32">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="ReleaseDLL|x64">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="RelWithDebInfo|Win32">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="RelWithDebInfo|x64">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-      </File>
       <File RelativePath="..\..\..\..\src\zsock.c">
+        <FileConfiguration Name="Release|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="Release|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="Debug|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="Debug|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="DebugDLL|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="DebugDLL|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="ReleaseDLL|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="ReleaseDLL|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="RelWithDebInfo|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="RelWithDebInfo|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+      </File>
+      <File RelativePath="..\..\..\..\src\zsock_option.c">
+        <FileConfiguration Name="Release|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="Release|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="Debug|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="Debug|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="DebugDLL|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="DebugDLL|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="ReleaseDLL|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="ReleaseDLL|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="RelWithDebInfo|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="RelWithDebInfo|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+      </File>
+      <File RelativePath="..\..\..\..\src\zsock_monitor.c">
         <FileConfiguration Name="Release|Win32">
           <Tool Name="VCCLCompilerTool" CompileAs="2" />
         </FileConfiguration>
@@ -1094,6 +1062,38 @@
           <Tool Name="VCCLCompilerTool" CompileAs="2" />
         </FileConfiguration>
       </File>
+      <File RelativePath="..\..\..\..\src\zuuid.c">
+        <FileConfiguration Name="Release|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="Release|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="Debug|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="Debug|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="DebugDLL|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="DebugDLL|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="ReleaseDLL|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="ReleaseDLL|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="RelWithDebInfo|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="RelWithDebInfo|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+      </File>
       <File RelativePath="..\..\..\..\src\zthread.c">
         <FileConfiguration Name="Release|Win32">
           <Tool Name="VCCLCompilerTool" CompileAs="2" />
@@ -1126,7 +1126,71 @@
           <Tool Name="VCCLCompilerTool" CompileAs="2" />
         </FileConfiguration>
       </File>
-      <File RelativePath="..\..\..\..\src\zuuid.c">
+      <File RelativePath="..\..\..\..\src\zctx.c">
+        <FileConfiguration Name="Release|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="Release|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="Debug|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="Debug|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="DebugDLL|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="DebugDLL|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="ReleaseDLL|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="ReleaseDLL|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="RelWithDebInfo|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="RelWithDebInfo|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+      </File>
+      <File RelativePath="..\..\..\..\src\zsocket.c">
+        <FileConfiguration Name="Release|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="Release|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="Debug|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="Debug|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="DebugDLL|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="DebugDLL|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="ReleaseDLL|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="ReleaseDLL|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="RelWithDebInfo|Win32">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+        <FileConfiguration Name="RelWithDebInfo|x64">
+          <Tool Name="VCCLCompilerTool" CompileAs="2" />
+        </FileConfiguration>
+      </File>
+      <File RelativePath="..\..\..\..\src\zsockopt.c">
         <FileConfiguration Name="Release|Win32">
           <Tool Name="VCCLCompilerTool" CompileAs="2" />
         </FileConfiguration>
@@ -1170,7 +1234,6 @@
       <File RelativePath="..\..\..\..\include\zchunk.h" />
       <File RelativePath="..\..\..\..\include\zclock.h" />
       <File RelativePath="..\..\..\..\include\zconfig.h" />
-      <File RelativePath="..\..\..\..\include\zctx.h" />
       <File RelativePath="..\..\..\..\include\zdir.h" />
       <File RelativePath="..\..\..\..\include\zdir_patch.h" />
       <File RelativePath="..\..\..\..\include\zdigest.h" />
@@ -1186,13 +1249,16 @@
       <File RelativePath="..\..\..\..\include\zpoller.h" />
       <File RelativePath="..\..\..\..\include\zproxy.h" />
       <File RelativePath="..\..\..\..\include\zrex.h" />
-      <File RelativePath="..\..\..\..\include\zsocket.h" />
-      <File RelativePath="..\..\..\..\include\zsockopt.h" />
       <File RelativePath="..\..\..\..\include\zsock.h" />
+      <File RelativePath="..\..\..\..\include\zsock_option.h" />
+      <File RelativePath="..\..\..\..\include\zsock_monitor.h" />
       <File RelativePath="..\..\..\..\include\zstr.h" />
       <File RelativePath="..\..\..\..\include\zsys.h" />
-      <File RelativePath="..\..\..\..\include\zthread.h" />
       <File RelativePath="..\..\..\..\include\zuuid.h" />
+      <File RelativePath="..\..\..\..\include\zthread.h" />
+      <File RelativePath="..\..\..\..\include\zctx.h" />
+      <File RelativePath="..\..\..\..\include\zsocket.h" />
+      <File RelativePath="..\..\..\..\include\zsockopt.h" />
     </Filter>
   </Files>
   <Globals />

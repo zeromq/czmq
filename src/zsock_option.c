@@ -22,7 +22,7 @@
     The zsock_option class provides access to the 0MQ getsockopt/setsockopt API.
 @discuss
     This class is generated, using the GSL code generator. See the sockopts
-    XML file, which provides the metadata, and the sockopts.gsl template,
+    XML file, which provides the metadata, and the sock_option.gsl template,
     which does the work.
 @end
 */
@@ -40,7 +40,7 @@ zsock_set_tos (zsock_t *self, int tos)
 {
     assert(self);
 #   if defined (ZMQ_TOS)
-    int rc = zmq_setsockopt (self->socket, ZMQ_TOS, &tos, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_TOS, &tos, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -57,7 +57,7 @@ zsock_tos (zsock_t *self)
 #   if defined (ZMQ_TOS)
     int tos;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_TOS, &tos, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_TOS, &tos, &option_len);
     return tos;
 #   else
     return 0;
@@ -78,7 +78,7 @@ zsock_set_router_handover (zsock_t *self, int router_handover)
         printf ("ZMQ_ROUTER_HANDOVER is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
-    int rc = zmq_setsockopt (self->socket, ZMQ_ROUTER_HANDOVER, &router_handover, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_ROUTER_HANDOVER, &router_handover, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -97,7 +97,7 @@ zsock_set_router_mandatory (zsock_t *self, int router_mandatory)
         printf ("ZMQ_ROUTER_MANDATORY is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
-    int rc = zmq_setsockopt (self->socket, ZMQ_ROUTER_MANDATORY, &router_mandatory, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_ROUTER_MANDATORY, &router_mandatory, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -118,7 +118,7 @@ zsock_set_probe_router (zsock_t *self, int probe_router)
         printf ("ZMQ_PROBE_ROUTER is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
-    int rc = zmq_setsockopt (self->socket, ZMQ_PROBE_ROUTER, &probe_router, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_PROBE_ROUTER, &probe_router, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -137,7 +137,7 @@ zsock_set_req_relaxed (zsock_t *self, int req_relaxed)
         printf ("ZMQ_REQ_RELAXED is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
-    int rc = zmq_setsockopt (self->socket, ZMQ_REQ_RELAXED, &req_relaxed, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_REQ_RELAXED, &req_relaxed, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -156,7 +156,7 @@ zsock_set_req_correlate (zsock_t *self, int req_correlate)
         printf ("ZMQ_REQ_CORRELATE is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
-    int rc = zmq_setsockopt (self->socket, ZMQ_REQ_CORRELATE, &req_correlate, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_REQ_CORRELATE, &req_correlate, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -179,7 +179,7 @@ zsock_set_conflate (zsock_t *self, int conflate)
         printf ("ZMQ_CONFLATE is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
-    int rc = zmq_setsockopt (self->socket, ZMQ_CONFLATE, &conflate, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_CONFLATE, &conflate, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -194,7 +194,7 @@ zsock_set_plain_server (zsock_t *self, int plain_server)
 {
     assert(self);
 #   if defined (ZMQ_PLAIN_SERVER)
-    int rc = zmq_setsockopt (self->socket, ZMQ_PLAIN_SERVER, &plain_server, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_PLAIN_SERVER, &plain_server, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -211,7 +211,7 @@ zsock_plain_server (zsock_t *self)
 #   if defined (ZMQ_PLAIN_SERVER)
     int plain_server;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_PLAIN_SERVER, &plain_server, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_PLAIN_SERVER, &plain_server, &option_len);
     return plain_server;
 #   else
     return 0;
@@ -228,7 +228,7 @@ zsock_set_plain_username (zsock_t *self, const char * plain_username)
 {
     assert(self);
 #   if defined (ZMQ_PLAIN_USERNAME)
-    int rc = zmq_setsockopt (self->socket, ZMQ_PLAIN_USERNAME, plain_username, strlen (plain_username));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_PLAIN_USERNAME, plain_username, strlen (plain_username));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -245,7 +245,7 @@ zsock_plain_username (zsock_t *self)
 #   if defined (ZMQ_PLAIN_USERNAME)
     size_t option_len = 255;
     char *plain_username = (char *) zmalloc (option_len);
-    zmq_getsockopt (self->socket, ZMQ_PLAIN_USERNAME, plain_username, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_PLAIN_USERNAME, plain_username, &option_len);
     return (char *) plain_username;
 #   else
     return NULL;
@@ -262,7 +262,7 @@ zsock_set_plain_password (zsock_t *self, const char * plain_password)
 {
     assert(self);
 #   if defined (ZMQ_PLAIN_PASSWORD)
-    int rc = zmq_setsockopt (self->socket, ZMQ_PLAIN_PASSWORD, plain_password, strlen (plain_password));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_PLAIN_PASSWORD, plain_password, strlen (plain_password));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -279,7 +279,7 @@ zsock_plain_password (zsock_t *self)
 #   if defined (ZMQ_PLAIN_PASSWORD)
     size_t option_len = 255;
     char *plain_password = (char *) zmalloc (option_len);
-    zmq_getsockopt (self->socket, ZMQ_PLAIN_PASSWORD, plain_password, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_PLAIN_PASSWORD, plain_password, &option_len);
     return (char *) plain_password;
 #   else
     return NULL;
@@ -297,7 +297,7 @@ zsock_set_curve_server (zsock_t *self, int curve_server)
     assert(self);
 #   if defined (ZMQ_CURVE_SERVER)
 #     if defined (HAVE_LIBSODIUM)
-    int rc = zmq_setsockopt (self->socket, ZMQ_CURVE_SERVER, &curve_server, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_CURVE_SERVER, &curve_server, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #     endif
 #   endif
@@ -315,7 +315,7 @@ zsock_curve_server (zsock_t *self)
 #   if defined (ZMQ_CURVE_SERVER)
     int curve_server;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_CURVE_SERVER, &curve_server, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_CURVE_SERVER, &curve_server, &option_len);
     return curve_server;
 #   else
     return 0;
@@ -333,7 +333,7 @@ zsock_set_curve_publickey (zsock_t *self, const char * curve_publickey)
     assert(self);
 #   if defined (ZMQ_CURVE_PUBLICKEY)
 #     if defined (HAVE_LIBSODIUM)
-    int rc = zmq_setsockopt (self->socket, ZMQ_CURVE_PUBLICKEY, curve_publickey, strlen (curve_publickey));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_CURVE_PUBLICKEY, curve_publickey, strlen (curve_publickey));
     assert (rc == 0 || zmq_errno () == ETERM);
 #     endif
 #   endif
@@ -349,7 +349,7 @@ zsock_set_curve_publickey_bin (zsock_t *self, const byte *curve_publickey)
 {
 #   if defined (ZMQ_CURVE_PUBLICKEY)
 #     if defined (HAVE_LIBSODIUM)
-    int rc = zmq_setsockopt (self->socket, ZMQ_CURVE_PUBLICKEY, curve_publickey, 32);
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_CURVE_PUBLICKEY, curve_publickey, 32);
     assert (rc == 0 || zmq_errno () == ETERM);
 #     endif
 #   endif
@@ -367,7 +367,7 @@ zsock_curve_publickey (zsock_t *self)
 #   if defined (ZMQ_CURVE_PUBLICKEY)
     size_t option_len = 255;
     char *curve_publickey = (char *) zmalloc (option_len);
-    zmq_getsockopt (self->socket, ZMQ_CURVE_PUBLICKEY, curve_publickey, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_CURVE_PUBLICKEY, curve_publickey, &option_len);
     return (char *) curve_publickey;
 #   else
     return NULL;
@@ -385,7 +385,7 @@ zsock_set_curve_secretkey (zsock_t *self, const char * curve_secretkey)
     assert(self);
 #   if defined (ZMQ_CURVE_SECRETKEY)
 #     if defined (HAVE_LIBSODIUM)
-    int rc = zmq_setsockopt (self->socket, ZMQ_CURVE_SECRETKEY, curve_secretkey, strlen (curve_secretkey));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_CURVE_SECRETKEY, curve_secretkey, strlen (curve_secretkey));
     assert (rc == 0 || zmq_errno () == ETERM);
 #     endif
 #   endif
@@ -401,7 +401,7 @@ zsock_set_curve_secretkey_bin (zsock_t *self, const byte *curve_secretkey)
 {
 #   if defined (ZMQ_CURVE_SECRETKEY)
 #     if defined (HAVE_LIBSODIUM)
-    int rc = zmq_setsockopt (self->socket, ZMQ_CURVE_SECRETKEY, curve_secretkey, 32);
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_CURVE_SECRETKEY, curve_secretkey, 32);
     assert (rc == 0 || zmq_errno () == ETERM);
 #     endif
 #   endif
@@ -419,7 +419,7 @@ zsock_curve_secretkey (zsock_t *self)
 #   if defined (ZMQ_CURVE_SECRETKEY)
     size_t option_len = 255;
     char *curve_secretkey = (char *) zmalloc (option_len);
-    zmq_getsockopt (self->socket, ZMQ_CURVE_SECRETKEY, curve_secretkey, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_CURVE_SECRETKEY, curve_secretkey, &option_len);
     return (char *) curve_secretkey;
 #   else
     return NULL;
@@ -437,7 +437,7 @@ zsock_set_curve_serverkey (zsock_t *self, const char * curve_serverkey)
     assert(self);
 #   if defined (ZMQ_CURVE_SERVERKEY)
 #     if defined (HAVE_LIBSODIUM)
-    int rc = zmq_setsockopt (self->socket, ZMQ_CURVE_SERVERKEY, curve_serverkey, strlen (curve_serverkey));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_CURVE_SERVERKEY, curve_serverkey, strlen (curve_serverkey));
     assert (rc == 0 || zmq_errno () == ETERM);
 #     endif
 #   endif
@@ -453,7 +453,7 @@ zsock_set_curve_serverkey_bin (zsock_t *self, const byte *curve_serverkey)
 {
 #   if defined (ZMQ_CURVE_SERVERKEY)
 #     if defined (HAVE_LIBSODIUM)
-    int rc = zmq_setsockopt (self->socket, ZMQ_CURVE_SERVERKEY, curve_serverkey, 32);
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_CURVE_SERVERKEY, curve_serverkey, 32);
     assert (rc == 0 || zmq_errno () == ETERM);
 #     endif
 #   endif
@@ -471,7 +471,7 @@ zsock_curve_serverkey (zsock_t *self)
 #   if defined (ZMQ_CURVE_SERVERKEY)
     size_t option_len = 255;
     char *curve_serverkey = (char *) zmalloc (option_len);
-    zmq_getsockopt (self->socket, ZMQ_CURVE_SERVERKEY, curve_serverkey, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_CURVE_SERVERKEY, curve_serverkey, &option_len);
     return (char *) curve_serverkey;
 #   else
     return NULL;
@@ -488,7 +488,7 @@ zsock_set_zap_domain (zsock_t *self, const char * zap_domain)
 {
     assert(self);
 #   if defined (ZMQ_ZAP_DOMAIN)
-    int rc = zmq_setsockopt (self->socket, ZMQ_ZAP_DOMAIN, zap_domain, strlen (zap_domain));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_ZAP_DOMAIN, zap_domain, strlen (zap_domain));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -505,7 +505,7 @@ zsock_zap_domain (zsock_t *self)
 #   if defined (ZMQ_ZAP_DOMAIN)
     size_t option_len = 255;
     char *zap_domain = (char *) zmalloc (option_len);
-    zmq_getsockopt (self->socket, ZMQ_ZAP_DOMAIN, zap_domain, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_ZAP_DOMAIN, zap_domain, &option_len);
     return (char *) zap_domain;
 #   else
     return NULL;
@@ -524,7 +524,7 @@ zsock_mechanism (zsock_t *self)
 #   if defined (ZMQ_MECHANISM)
     int mechanism;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_MECHANISM, &mechanism, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_MECHANISM, &mechanism, &option_len);
     return mechanism;
 #   else
     return 0;
@@ -541,7 +541,7 @@ zsock_set_ipv6 (zsock_t *self, int ipv6)
 {
     assert(self);
 #   if defined (ZMQ_IPV6)
-    int rc = zmq_setsockopt (self->socket, ZMQ_IPV6, &ipv6, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_IPV6, &ipv6, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -558,7 +558,7 @@ zsock_ipv6 (zsock_t *self)
 #   if defined (ZMQ_IPV6)
     int ipv6;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_IPV6, &ipv6, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_IPV6, &ipv6, &option_len);
     return ipv6;
 #   else
     return 0;
@@ -575,7 +575,7 @@ zsock_set_immediate (zsock_t *self, int immediate)
 {
     assert(self);
 #   if defined (ZMQ_IMMEDIATE)
-    int rc = zmq_setsockopt (self->socket, ZMQ_IMMEDIATE, &immediate, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_IMMEDIATE, &immediate, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -592,7 +592,7 @@ zsock_immediate (zsock_t *self)
 #   if defined (ZMQ_IMMEDIATE)
     int immediate;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_IMMEDIATE, &immediate, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_IMMEDIATE, &immediate, &option_len);
     return immediate;
 #   else
     return 0;
@@ -613,7 +613,7 @@ zsock_set_router_raw (zsock_t *self, int router_raw)
         printf ("ZMQ_ROUTER_RAW is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
-    int rc = zmq_setsockopt (self->socket, ZMQ_ROUTER_RAW, &router_raw, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_ROUTER_RAW, &router_raw, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -628,7 +628,7 @@ zsock_set_ipv4only (zsock_t *self, int ipv4only)
 {
     assert(self);
 #   if defined (ZMQ_IPV4ONLY)
-    int rc = zmq_setsockopt (self->socket, ZMQ_IPV4ONLY, &ipv4only, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_IPV4ONLY, &ipv4only, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -645,7 +645,7 @@ zsock_ipv4only (zsock_t *self)
 #   if defined (ZMQ_IPV4ONLY)
     int ipv4only;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_IPV4ONLY, &ipv4only, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_IPV4ONLY, &ipv4only, &option_len);
     return ipv4only;
 #   else
     return 0;
@@ -662,7 +662,7 @@ zsock_set_delay_attach_on_connect (zsock_t *self, int delay_attach_on_connect)
 {
     assert(self);
 #   if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
-    int rc = zmq_setsockopt (self->socket, ZMQ_DELAY_ATTACH_ON_CONNECT, &delay_attach_on_connect, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_DELAY_ATTACH_ON_CONNECT, &delay_attach_on_connect, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -679,7 +679,7 @@ zsock_type (zsock_t *self)
 #   if defined (ZMQ_TYPE)
     int type;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_TYPE, &type, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_TYPE, &type, &option_len);
     return type;
 #   else
     return 0;
@@ -696,7 +696,7 @@ zsock_set_sndhwm (zsock_t *self, int sndhwm)
 {
     assert(self);
 #   if defined (ZMQ_SNDHWM)
-    int rc = zmq_setsockopt (self->socket, ZMQ_SNDHWM, &sndhwm, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_SNDHWM, &sndhwm, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -713,7 +713,7 @@ zsock_sndhwm (zsock_t *self)
 #   if defined (ZMQ_SNDHWM)
     int sndhwm;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_SNDHWM, &sndhwm, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_SNDHWM, &sndhwm, &option_len);
     return sndhwm;
 #   else
     return 0;
@@ -730,7 +730,7 @@ zsock_set_rcvhwm (zsock_t *self, int rcvhwm)
 {
     assert(self);
 #   if defined (ZMQ_RCVHWM)
-    int rc = zmq_setsockopt (self->socket, ZMQ_RCVHWM, &rcvhwm, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_RCVHWM, &rcvhwm, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -747,7 +747,7 @@ zsock_rcvhwm (zsock_t *self)
 #   if defined (ZMQ_RCVHWM)
     int rcvhwm;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_RCVHWM, &rcvhwm, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RCVHWM, &rcvhwm, &option_len);
     return rcvhwm;
 #   else
     return 0;
@@ -765,7 +765,7 @@ zsock_set_affinity (zsock_t *self, int affinity)
     assert(self);
 #   if defined (ZMQ_AFFINITY)
     uint64_t value = affinity;
-    int rc = zmq_setsockopt (self->socket, ZMQ_AFFINITY, &value, sizeof (uint64_t));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_AFFINITY, &value, sizeof (uint64_t));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -782,7 +782,7 @@ zsock_affinity (zsock_t *self)
 #   if defined (ZMQ_AFFINITY)
     uint64_t affinity;
     size_t option_len = sizeof (uint64_t);
-    zmq_getsockopt (self->socket, ZMQ_AFFINITY, &affinity, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_AFFINITY, &affinity, &option_len);
     return (int) affinity;
 #   else
     return 0;
@@ -803,7 +803,7 @@ zsock_set_subscribe (zsock_t *self, const char * subscribe)
         printf ("ZMQ_SUBSCRIBE is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
-    int rc = zmq_setsockopt (self->socket, ZMQ_SUBSCRIBE, subscribe, strlen (subscribe));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_SUBSCRIBE, subscribe, strlen (subscribe));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -822,7 +822,7 @@ zsock_set_unsubscribe (zsock_t *self, const char * unsubscribe)
         printf ("ZMQ_UNSUBSCRIBE is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
-    int rc = zmq_setsockopt (self->socket, ZMQ_UNSUBSCRIBE, unsubscribe, strlen (unsubscribe));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_UNSUBSCRIBE, unsubscribe, strlen (unsubscribe));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -844,7 +844,7 @@ zsock_set_identity (zsock_t *self, const char * identity)
         printf ("ZMQ_IDENTITY is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
-    int rc = zmq_setsockopt (self->socket, ZMQ_IDENTITY, identity, strlen (identity));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_IDENTITY, identity, strlen (identity));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -861,7 +861,7 @@ zsock_identity (zsock_t *self)
 #   if defined (ZMQ_IDENTITY)
     size_t option_len = 255;
     char *identity = (char *) zmalloc (option_len);
-    zmq_getsockopt (self->socket, ZMQ_IDENTITY, identity, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_IDENTITY, identity, &option_len);
     return (char *) identity;
 #   else
     return NULL;
@@ -878,7 +878,7 @@ zsock_set_rate (zsock_t *self, int rate)
 {
     assert(self);
 #   if defined (ZMQ_RATE)
-    int rc = zmq_setsockopt (self->socket, ZMQ_RATE, &rate, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_RATE, &rate, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -895,7 +895,7 @@ zsock_rate (zsock_t *self)
 #   if defined (ZMQ_RATE)
     int rate;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_RATE, &rate, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RATE, &rate, &option_len);
     return rate;
 #   else
     return 0;
@@ -912,7 +912,7 @@ zsock_set_recovery_ivl (zsock_t *self, int recovery_ivl)
 {
     assert(self);
 #   if defined (ZMQ_RECOVERY_IVL)
-    int rc = zmq_setsockopt (self->socket, ZMQ_RECOVERY_IVL, &recovery_ivl, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_RECOVERY_IVL, &recovery_ivl, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -929,7 +929,7 @@ zsock_recovery_ivl (zsock_t *self)
 #   if defined (ZMQ_RECOVERY_IVL)
     int recovery_ivl;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_RECOVERY_IVL, &recovery_ivl, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RECOVERY_IVL, &recovery_ivl, &option_len);
     return recovery_ivl;
 #   else
     return 0;
@@ -946,7 +946,7 @@ zsock_set_sndbuf (zsock_t *self, int sndbuf)
 {
     assert(self);
 #   if defined (ZMQ_SNDBUF)
-    int rc = zmq_setsockopt (self->socket, ZMQ_SNDBUF, &sndbuf, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_SNDBUF, &sndbuf, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -963,7 +963,7 @@ zsock_sndbuf (zsock_t *self)
 #   if defined (ZMQ_SNDBUF)
     int sndbuf;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_SNDBUF, &sndbuf, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_SNDBUF, &sndbuf, &option_len);
     return sndbuf;
 #   else
     return 0;
@@ -980,7 +980,7 @@ zsock_set_rcvbuf (zsock_t *self, int rcvbuf)
 {
     assert(self);
 #   if defined (ZMQ_RCVBUF)
-    int rc = zmq_setsockopt (self->socket, ZMQ_RCVBUF, &rcvbuf, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_RCVBUF, &rcvbuf, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -997,7 +997,7 @@ zsock_rcvbuf (zsock_t *self)
 #   if defined (ZMQ_RCVBUF)
     int rcvbuf;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_RCVBUF, &rcvbuf, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RCVBUF, &rcvbuf, &option_len);
     return rcvbuf;
 #   else
     return 0;
@@ -1014,7 +1014,7 @@ zsock_set_linger (zsock_t *self, int linger)
 {
     assert(self);
 #   if defined (ZMQ_LINGER)
-    int rc = zmq_setsockopt (self->socket, ZMQ_LINGER, &linger, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_LINGER, &linger, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1031,7 +1031,7 @@ zsock_linger (zsock_t *self)
 #   if defined (ZMQ_LINGER)
     int linger;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_LINGER, &linger, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_LINGER, &linger, &option_len);
     return linger;
 #   else
     return 0;
@@ -1048,7 +1048,7 @@ zsock_set_reconnect_ivl (zsock_t *self, int reconnect_ivl)
 {
     assert(self);
 #   if defined (ZMQ_RECONNECT_IVL)
-    int rc = zmq_setsockopt (self->socket, ZMQ_RECONNECT_IVL, &reconnect_ivl, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_RECONNECT_IVL, &reconnect_ivl, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1065,7 +1065,7 @@ zsock_reconnect_ivl (zsock_t *self)
 #   if defined (ZMQ_RECONNECT_IVL)
     int reconnect_ivl;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_RECONNECT_IVL, &reconnect_ivl, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RECONNECT_IVL, &reconnect_ivl, &option_len);
     return reconnect_ivl;
 #   else
     return 0;
@@ -1082,7 +1082,7 @@ zsock_set_reconnect_ivl_max (zsock_t *self, int reconnect_ivl_max)
 {
     assert(self);
 #   if defined (ZMQ_RECONNECT_IVL_MAX)
-    int rc = zmq_setsockopt (self->socket, ZMQ_RECONNECT_IVL_MAX, &reconnect_ivl_max, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_RECONNECT_IVL_MAX, &reconnect_ivl_max, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1099,7 +1099,7 @@ zsock_reconnect_ivl_max (zsock_t *self)
 #   if defined (ZMQ_RECONNECT_IVL_MAX)
     int reconnect_ivl_max;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_RECONNECT_IVL_MAX, &reconnect_ivl_max, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RECONNECT_IVL_MAX, &reconnect_ivl_max, &option_len);
     return reconnect_ivl_max;
 #   else
     return 0;
@@ -1116,7 +1116,7 @@ zsock_set_backlog (zsock_t *self, int backlog)
 {
     assert(self);
 #   if defined (ZMQ_BACKLOG)
-    int rc = zmq_setsockopt (self->socket, ZMQ_BACKLOG, &backlog, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_BACKLOG, &backlog, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1133,7 +1133,7 @@ zsock_backlog (zsock_t *self)
 #   if defined (ZMQ_BACKLOG)
     int backlog;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_BACKLOG, &backlog, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_BACKLOG, &backlog, &option_len);
     return backlog;
 #   else
     return 0;
@@ -1151,7 +1151,7 @@ zsock_set_maxmsgsize (zsock_t *self, int maxmsgsize)
     assert(self);
 #   if defined (ZMQ_MAXMSGSIZE)
     int64_t value = maxmsgsize;
-    int rc = zmq_setsockopt (self->socket, ZMQ_MAXMSGSIZE, &value, sizeof (int64_t));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_MAXMSGSIZE, &value, sizeof (int64_t));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1168,7 +1168,7 @@ zsock_maxmsgsize (zsock_t *self)
 #   if defined (ZMQ_MAXMSGSIZE)
     int64_t maxmsgsize;
     size_t option_len = sizeof (int64_t);
-    zmq_getsockopt (self->socket, ZMQ_MAXMSGSIZE, &maxmsgsize, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_MAXMSGSIZE, &maxmsgsize, &option_len);
     return (int) maxmsgsize;
 #   else
     return 0;
@@ -1185,7 +1185,7 @@ zsock_set_multicast_hops (zsock_t *self, int multicast_hops)
 {
     assert(self);
 #   if defined (ZMQ_MULTICAST_HOPS)
-    int rc = zmq_setsockopt (self->socket, ZMQ_MULTICAST_HOPS, &multicast_hops, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_MULTICAST_HOPS, &multicast_hops, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1202,7 +1202,7 @@ zsock_multicast_hops (zsock_t *self)
 #   if defined (ZMQ_MULTICAST_HOPS)
     int multicast_hops;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_MULTICAST_HOPS, &multicast_hops, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_MULTICAST_HOPS, &multicast_hops, &option_len);
     return multicast_hops;
 #   else
     return 0;
@@ -1219,7 +1219,7 @@ zsock_set_rcvtimeo (zsock_t *self, int rcvtimeo)
 {
     assert(self);
 #   if defined (ZMQ_RCVTIMEO)
-    int rc = zmq_setsockopt (self->socket, ZMQ_RCVTIMEO, &rcvtimeo, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_RCVTIMEO, &rcvtimeo, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1236,7 +1236,7 @@ zsock_rcvtimeo (zsock_t *self)
 #   if defined (ZMQ_RCVTIMEO)
     int rcvtimeo;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_RCVTIMEO, &rcvtimeo, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RCVTIMEO, &rcvtimeo, &option_len);
     return rcvtimeo;
 #   else
     return 0;
@@ -1253,7 +1253,7 @@ zsock_set_sndtimeo (zsock_t *self, int sndtimeo)
 {
     assert(self);
 #   if defined (ZMQ_SNDTIMEO)
-    int rc = zmq_setsockopt (self->socket, ZMQ_SNDTIMEO, &sndtimeo, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_SNDTIMEO, &sndtimeo, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1270,7 +1270,7 @@ zsock_sndtimeo (zsock_t *self)
 #   if defined (ZMQ_SNDTIMEO)
     int sndtimeo;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_SNDTIMEO, &sndtimeo, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_SNDTIMEO, &sndtimeo, &option_len);
     return sndtimeo;
 #   else
     return 0;
@@ -1291,7 +1291,7 @@ zsock_set_xpub_verbose (zsock_t *self, int xpub_verbose)
         printf ("ZMQ_XPUB_VERBOSE is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
-    int rc = zmq_setsockopt (self->socket, ZMQ_XPUB_VERBOSE, &xpub_verbose, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_XPUB_VERBOSE, &xpub_verbose, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1306,7 +1306,7 @@ zsock_set_tcp_keepalive (zsock_t *self, int tcp_keepalive)
 {
     assert(self);
 #   if defined (ZMQ_TCP_KEEPALIVE)
-    int rc = zmq_setsockopt (self->socket, ZMQ_TCP_KEEPALIVE, &tcp_keepalive, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_TCP_KEEPALIVE, &tcp_keepalive, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1323,7 +1323,7 @@ zsock_tcp_keepalive (zsock_t *self)
 #   if defined (ZMQ_TCP_KEEPALIVE)
     int tcp_keepalive;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_TCP_KEEPALIVE, &tcp_keepalive, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_TCP_KEEPALIVE, &tcp_keepalive, &option_len);
     return tcp_keepalive;
 #   else
     return 0;
@@ -1340,7 +1340,7 @@ zsock_set_tcp_keepalive_idle (zsock_t *self, int tcp_keepalive_idle)
 {
     assert(self);
 #   if defined (ZMQ_TCP_KEEPALIVE_IDLE)
-    int rc = zmq_setsockopt (self->socket, ZMQ_TCP_KEEPALIVE_IDLE, &tcp_keepalive_idle, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_TCP_KEEPALIVE_IDLE, &tcp_keepalive_idle, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1357,7 +1357,7 @@ zsock_tcp_keepalive_idle (zsock_t *self)
 #   if defined (ZMQ_TCP_KEEPALIVE_IDLE)
     int tcp_keepalive_idle;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_TCP_KEEPALIVE_IDLE, &tcp_keepalive_idle, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_TCP_KEEPALIVE_IDLE, &tcp_keepalive_idle, &option_len);
     return tcp_keepalive_idle;
 #   else
     return 0;
@@ -1374,7 +1374,7 @@ zsock_set_tcp_keepalive_cnt (zsock_t *self, int tcp_keepalive_cnt)
 {
     assert(self);
 #   if defined (ZMQ_TCP_KEEPALIVE_CNT)
-    int rc = zmq_setsockopt (self->socket, ZMQ_TCP_KEEPALIVE_CNT, &tcp_keepalive_cnt, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_TCP_KEEPALIVE_CNT, &tcp_keepalive_cnt, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1391,7 +1391,7 @@ zsock_tcp_keepalive_cnt (zsock_t *self)
 #   if defined (ZMQ_TCP_KEEPALIVE_CNT)
     int tcp_keepalive_cnt;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_TCP_KEEPALIVE_CNT, &tcp_keepalive_cnt, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_TCP_KEEPALIVE_CNT, &tcp_keepalive_cnt, &option_len);
     return tcp_keepalive_cnt;
 #   else
     return 0;
@@ -1408,7 +1408,7 @@ zsock_set_tcp_keepalive_intvl (zsock_t *self, int tcp_keepalive_intvl)
 {
     assert(self);
 #   if defined (ZMQ_TCP_KEEPALIVE_INTVL)
-    int rc = zmq_setsockopt (self->socket, ZMQ_TCP_KEEPALIVE_INTVL, &tcp_keepalive_intvl, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_TCP_KEEPALIVE_INTVL, &tcp_keepalive_intvl, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1425,7 +1425,7 @@ zsock_tcp_keepalive_intvl (zsock_t *self)
 #   if defined (ZMQ_TCP_KEEPALIVE_INTVL)
     int tcp_keepalive_intvl;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_TCP_KEEPALIVE_INTVL, &tcp_keepalive_intvl, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_TCP_KEEPALIVE_INTVL, &tcp_keepalive_intvl, &option_len);
     return tcp_keepalive_intvl;
 #   else
     return 0;
@@ -1442,7 +1442,7 @@ zsock_set_tcp_accept_filter (zsock_t *self, const char * tcp_accept_filter)
 {
     assert(self);
 #   if defined (ZMQ_TCP_ACCEPT_FILTER)
-    int rc = zmq_setsockopt (self->socket, ZMQ_TCP_ACCEPT_FILTER, tcp_accept_filter, strlen (tcp_accept_filter));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_TCP_ACCEPT_FILTER, tcp_accept_filter, strlen (tcp_accept_filter));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1459,7 +1459,7 @@ zsock_tcp_accept_filter (zsock_t *self)
 #   if defined (ZMQ_TCP_ACCEPT_FILTER)
     size_t option_len = 255;
     char *tcp_accept_filter = (char *) zmalloc (option_len);
-    zmq_getsockopt (self->socket, ZMQ_TCP_ACCEPT_FILTER, tcp_accept_filter, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_TCP_ACCEPT_FILTER, tcp_accept_filter, &option_len);
     return (char *) tcp_accept_filter;
 #   else
     return NULL;
@@ -1478,7 +1478,7 @@ zsock_rcvmore (zsock_t *self)
 #   if defined (ZMQ_RCVMORE)
     int rcvmore;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_RCVMORE, &rcvmore, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RCVMORE, &rcvmore, &option_len);
     return rcvmore;
 #   else
     return 0;
@@ -1497,7 +1497,7 @@ zsock_fd (zsock_t *self)
 #   if defined (ZMQ_FD)
     int fd;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_FD, &fd, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_FD, &fd, &option_len);
     return fd;
 #   else
     return 0;
@@ -1516,7 +1516,7 @@ zsock_events (zsock_t *self)
 #   if defined (ZMQ_EVENTS)
     int events;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_EVENTS, &events, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_EVENTS, &events, &option_len);
     return events;
 #   else
     return 0;
@@ -1535,7 +1535,7 @@ zsock_last_endpoint (zsock_t *self)
 #   if defined (ZMQ_LAST_ENDPOINT)
     size_t option_len = 255;
     char *last_endpoint = (char *) zmalloc (option_len);
-    zmq_getsockopt (self->socket, ZMQ_LAST_ENDPOINT, last_endpoint, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_LAST_ENDPOINT, last_endpoint, &option_len);
     return (char *) last_endpoint;
 #   else
     return NULL;
@@ -1559,7 +1559,7 @@ zsock_set_router_raw (zsock_t *self, int router_raw)
         printf ("ZMQ_ROUTER_RAW is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
-    int rc = zmq_setsockopt (self->socket, ZMQ_ROUTER_RAW, &router_raw, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_ROUTER_RAW, &router_raw, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1574,7 +1574,7 @@ zsock_set_ipv4only (zsock_t *self, int ipv4only)
 {
     assert(self);
 #   if defined (ZMQ_IPV4ONLY)
-    int rc = zmq_setsockopt (self->socket, ZMQ_IPV4ONLY, &ipv4only, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_IPV4ONLY, &ipv4only, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1591,7 +1591,7 @@ zsock_ipv4only (zsock_t *self)
 #   if defined (ZMQ_IPV4ONLY)
     int ipv4only;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_IPV4ONLY, &ipv4only, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_IPV4ONLY, &ipv4only, &option_len);
     return ipv4only;
 #   else
     return 0;
@@ -1608,7 +1608,7 @@ zsock_set_delay_attach_on_connect (zsock_t *self, int delay_attach_on_connect)
 {
     assert(self);
 #   if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
-    int rc = zmq_setsockopt (self->socket, ZMQ_DELAY_ATTACH_ON_CONNECT, &delay_attach_on_connect, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_DELAY_ATTACH_ON_CONNECT, &delay_attach_on_connect, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1625,7 +1625,7 @@ zsock_type (zsock_t *self)
 #   if defined (ZMQ_TYPE)
     int type;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_TYPE, &type, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_TYPE, &type, &option_len);
     return type;
 #   else
     return 0;
@@ -1642,7 +1642,7 @@ zsock_set_sndhwm (zsock_t *self, int sndhwm)
 {
     assert(self);
 #   if defined (ZMQ_SNDHWM)
-    int rc = zmq_setsockopt (self->socket, ZMQ_SNDHWM, &sndhwm, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_SNDHWM, &sndhwm, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1659,7 +1659,7 @@ zsock_sndhwm (zsock_t *self)
 #   if defined (ZMQ_SNDHWM)
     int sndhwm;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_SNDHWM, &sndhwm, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_SNDHWM, &sndhwm, &option_len);
     return sndhwm;
 #   else
     return 0;
@@ -1676,7 +1676,7 @@ zsock_set_rcvhwm (zsock_t *self, int rcvhwm)
 {
     assert(self);
 #   if defined (ZMQ_RCVHWM)
-    int rc = zmq_setsockopt (self->socket, ZMQ_RCVHWM, &rcvhwm, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_RCVHWM, &rcvhwm, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1693,7 +1693,7 @@ zsock_rcvhwm (zsock_t *self)
 #   if defined (ZMQ_RCVHWM)
     int rcvhwm;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_RCVHWM, &rcvhwm, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RCVHWM, &rcvhwm, &option_len);
     return rcvhwm;
 #   else
     return 0;
@@ -1711,7 +1711,7 @@ zsock_set_affinity (zsock_t *self, int affinity)
     assert(self);
 #   if defined (ZMQ_AFFINITY)
     uint64_t value = affinity;
-    int rc = zmq_setsockopt (self->socket, ZMQ_AFFINITY, &value, sizeof (uint64_t));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_AFFINITY, &value, sizeof (uint64_t));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1728,7 +1728,7 @@ zsock_affinity (zsock_t *self)
 #   if defined (ZMQ_AFFINITY)
     uint64_t affinity;
     size_t option_len = sizeof (uint64_t);
-    zmq_getsockopt (self->socket, ZMQ_AFFINITY, &affinity, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_AFFINITY, &affinity, &option_len);
     return (int) affinity;
 #   else
     return 0;
@@ -1749,7 +1749,7 @@ zsock_set_subscribe (zsock_t *self, const char * subscribe)
         printf ("ZMQ_SUBSCRIBE is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
-    int rc = zmq_setsockopt (self->socket, ZMQ_SUBSCRIBE, subscribe, strlen (subscribe));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_SUBSCRIBE, subscribe, strlen (subscribe));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1768,7 +1768,7 @@ zsock_set_unsubscribe (zsock_t *self, const char * unsubscribe)
         printf ("ZMQ_UNSUBSCRIBE is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
-    int rc = zmq_setsockopt (self->socket, ZMQ_UNSUBSCRIBE, unsubscribe, strlen (unsubscribe));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_UNSUBSCRIBE, unsubscribe, strlen (unsubscribe));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1790,7 +1790,7 @@ zsock_set_identity (zsock_t *self, const char * identity)
         printf ("ZMQ_IDENTITY is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
-    int rc = zmq_setsockopt (self->socket, ZMQ_IDENTITY, identity, strlen (identity));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_IDENTITY, identity, strlen (identity));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1807,7 +1807,7 @@ zsock_identity (zsock_t *self)
 #   if defined (ZMQ_IDENTITY)
     size_t option_len = 255;
     char *identity = (char *) zmalloc (option_len);
-    zmq_getsockopt (self->socket, ZMQ_IDENTITY, identity, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_IDENTITY, identity, &option_len);
     return (char *) identity;
 #   else
     return NULL;
@@ -1824,7 +1824,7 @@ zsock_set_rate (zsock_t *self, int rate)
 {
     assert(self);
 #   if defined (ZMQ_RATE)
-    int rc = zmq_setsockopt (self->socket, ZMQ_RATE, &rate, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_RATE, &rate, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1841,7 +1841,7 @@ zsock_rate (zsock_t *self)
 #   if defined (ZMQ_RATE)
     int rate;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_RATE, &rate, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RATE, &rate, &option_len);
     return rate;
 #   else
     return 0;
@@ -1858,7 +1858,7 @@ zsock_set_recovery_ivl (zsock_t *self, int recovery_ivl)
 {
     assert(self);
 #   if defined (ZMQ_RECOVERY_IVL)
-    int rc = zmq_setsockopt (self->socket, ZMQ_RECOVERY_IVL, &recovery_ivl, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_RECOVERY_IVL, &recovery_ivl, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1875,7 +1875,7 @@ zsock_recovery_ivl (zsock_t *self)
 #   if defined (ZMQ_RECOVERY_IVL)
     int recovery_ivl;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_RECOVERY_IVL, &recovery_ivl, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RECOVERY_IVL, &recovery_ivl, &option_len);
     return recovery_ivl;
 #   else
     return 0;
@@ -1892,7 +1892,7 @@ zsock_set_sndbuf (zsock_t *self, int sndbuf)
 {
     assert(self);
 #   if defined (ZMQ_SNDBUF)
-    int rc = zmq_setsockopt (self->socket, ZMQ_SNDBUF, &sndbuf, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_SNDBUF, &sndbuf, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1909,7 +1909,7 @@ zsock_sndbuf (zsock_t *self)
 #   if defined (ZMQ_SNDBUF)
     int sndbuf;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_SNDBUF, &sndbuf, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_SNDBUF, &sndbuf, &option_len);
     return sndbuf;
 #   else
     return 0;
@@ -1926,7 +1926,7 @@ zsock_set_rcvbuf (zsock_t *self, int rcvbuf)
 {
     assert(self);
 #   if defined (ZMQ_RCVBUF)
-    int rc = zmq_setsockopt (self->socket, ZMQ_RCVBUF, &rcvbuf, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_RCVBUF, &rcvbuf, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1943,7 +1943,7 @@ zsock_rcvbuf (zsock_t *self)
 #   if defined (ZMQ_RCVBUF)
     int rcvbuf;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_RCVBUF, &rcvbuf, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RCVBUF, &rcvbuf, &option_len);
     return rcvbuf;
 #   else
     return 0;
@@ -1960,7 +1960,7 @@ zsock_set_linger (zsock_t *self, int linger)
 {
     assert(self);
 #   if defined (ZMQ_LINGER)
-    int rc = zmq_setsockopt (self->socket, ZMQ_LINGER, &linger, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_LINGER, &linger, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1977,7 +1977,7 @@ zsock_linger (zsock_t *self)
 #   if defined (ZMQ_LINGER)
     int linger;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_LINGER, &linger, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_LINGER, &linger, &option_len);
     return linger;
 #   else
     return 0;
@@ -1994,7 +1994,7 @@ zsock_set_reconnect_ivl (zsock_t *self, int reconnect_ivl)
 {
     assert(self);
 #   if defined (ZMQ_RECONNECT_IVL)
-    int rc = zmq_setsockopt (self->socket, ZMQ_RECONNECT_IVL, &reconnect_ivl, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_RECONNECT_IVL, &reconnect_ivl, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2011,7 +2011,7 @@ zsock_reconnect_ivl (zsock_t *self)
 #   if defined (ZMQ_RECONNECT_IVL)
     int reconnect_ivl;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_RECONNECT_IVL, &reconnect_ivl, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RECONNECT_IVL, &reconnect_ivl, &option_len);
     return reconnect_ivl;
 #   else
     return 0;
@@ -2028,7 +2028,7 @@ zsock_set_reconnect_ivl_max (zsock_t *self, int reconnect_ivl_max)
 {
     assert(self);
 #   if defined (ZMQ_RECONNECT_IVL_MAX)
-    int rc = zmq_setsockopt (self->socket, ZMQ_RECONNECT_IVL_MAX, &reconnect_ivl_max, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_RECONNECT_IVL_MAX, &reconnect_ivl_max, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2045,7 +2045,7 @@ zsock_reconnect_ivl_max (zsock_t *self)
 #   if defined (ZMQ_RECONNECT_IVL_MAX)
     int reconnect_ivl_max;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_RECONNECT_IVL_MAX, &reconnect_ivl_max, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RECONNECT_IVL_MAX, &reconnect_ivl_max, &option_len);
     return reconnect_ivl_max;
 #   else
     return 0;
@@ -2062,7 +2062,7 @@ zsock_set_backlog (zsock_t *self, int backlog)
 {
     assert(self);
 #   if defined (ZMQ_BACKLOG)
-    int rc = zmq_setsockopt (self->socket, ZMQ_BACKLOG, &backlog, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_BACKLOG, &backlog, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2079,7 +2079,7 @@ zsock_backlog (zsock_t *self)
 #   if defined (ZMQ_BACKLOG)
     int backlog;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_BACKLOG, &backlog, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_BACKLOG, &backlog, &option_len);
     return backlog;
 #   else
     return 0;
@@ -2097,7 +2097,7 @@ zsock_set_maxmsgsize (zsock_t *self, int maxmsgsize)
     assert(self);
 #   if defined (ZMQ_MAXMSGSIZE)
     int64_t value = maxmsgsize;
-    int rc = zmq_setsockopt (self->socket, ZMQ_MAXMSGSIZE, &value, sizeof (int64_t));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_MAXMSGSIZE, &value, sizeof (int64_t));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2114,7 +2114,7 @@ zsock_maxmsgsize (zsock_t *self)
 #   if defined (ZMQ_MAXMSGSIZE)
     int64_t maxmsgsize;
     size_t option_len = sizeof (int64_t);
-    zmq_getsockopt (self->socket, ZMQ_MAXMSGSIZE, &maxmsgsize, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_MAXMSGSIZE, &maxmsgsize, &option_len);
     return (int) maxmsgsize;
 #   else
     return 0;
@@ -2131,7 +2131,7 @@ zsock_set_multicast_hops (zsock_t *self, int multicast_hops)
 {
     assert(self);
 #   if defined (ZMQ_MULTICAST_HOPS)
-    int rc = zmq_setsockopt (self->socket, ZMQ_MULTICAST_HOPS, &multicast_hops, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_MULTICAST_HOPS, &multicast_hops, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2148,7 +2148,7 @@ zsock_multicast_hops (zsock_t *self)
 #   if defined (ZMQ_MULTICAST_HOPS)
     int multicast_hops;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_MULTICAST_HOPS, &multicast_hops, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_MULTICAST_HOPS, &multicast_hops, &option_len);
     return multicast_hops;
 #   else
     return 0;
@@ -2165,7 +2165,7 @@ zsock_set_rcvtimeo (zsock_t *self, int rcvtimeo)
 {
     assert(self);
 #   if defined (ZMQ_RCVTIMEO)
-    int rc = zmq_setsockopt (self->socket, ZMQ_RCVTIMEO, &rcvtimeo, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_RCVTIMEO, &rcvtimeo, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2182,7 +2182,7 @@ zsock_rcvtimeo (zsock_t *self)
 #   if defined (ZMQ_RCVTIMEO)
     int rcvtimeo;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_RCVTIMEO, &rcvtimeo, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RCVTIMEO, &rcvtimeo, &option_len);
     return rcvtimeo;
 #   else
     return 0;
@@ -2199,7 +2199,7 @@ zsock_set_sndtimeo (zsock_t *self, int sndtimeo)
 {
     assert(self);
 #   if defined (ZMQ_SNDTIMEO)
-    int rc = zmq_setsockopt (self->socket, ZMQ_SNDTIMEO, &sndtimeo, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_SNDTIMEO, &sndtimeo, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2216,7 +2216,7 @@ zsock_sndtimeo (zsock_t *self)
 #   if defined (ZMQ_SNDTIMEO)
     int sndtimeo;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_SNDTIMEO, &sndtimeo, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_SNDTIMEO, &sndtimeo, &option_len);
     return sndtimeo;
 #   else
     return 0;
@@ -2237,7 +2237,7 @@ zsock_set_xpub_verbose (zsock_t *self, int xpub_verbose)
         printf ("ZMQ_XPUB_VERBOSE is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
-    int rc = zmq_setsockopt (self->socket, ZMQ_XPUB_VERBOSE, &xpub_verbose, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_XPUB_VERBOSE, &xpub_verbose, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2252,7 +2252,7 @@ zsock_set_tcp_keepalive (zsock_t *self, int tcp_keepalive)
 {
     assert(self);
 #   if defined (ZMQ_TCP_KEEPALIVE)
-    int rc = zmq_setsockopt (self->socket, ZMQ_TCP_KEEPALIVE, &tcp_keepalive, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_TCP_KEEPALIVE, &tcp_keepalive, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2269,7 +2269,7 @@ zsock_tcp_keepalive (zsock_t *self)
 #   if defined (ZMQ_TCP_KEEPALIVE)
     int tcp_keepalive;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_TCP_KEEPALIVE, &tcp_keepalive, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_TCP_KEEPALIVE, &tcp_keepalive, &option_len);
     return tcp_keepalive;
 #   else
     return 0;
@@ -2286,7 +2286,7 @@ zsock_set_tcp_keepalive_idle (zsock_t *self, int tcp_keepalive_idle)
 {
     assert(self);
 #   if defined (ZMQ_TCP_KEEPALIVE_IDLE)
-    int rc = zmq_setsockopt (self->socket, ZMQ_TCP_KEEPALIVE_IDLE, &tcp_keepalive_idle, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_TCP_KEEPALIVE_IDLE, &tcp_keepalive_idle, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2303,7 +2303,7 @@ zsock_tcp_keepalive_idle (zsock_t *self)
 #   if defined (ZMQ_TCP_KEEPALIVE_IDLE)
     int tcp_keepalive_idle;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_TCP_KEEPALIVE_IDLE, &tcp_keepalive_idle, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_TCP_KEEPALIVE_IDLE, &tcp_keepalive_idle, &option_len);
     return tcp_keepalive_idle;
 #   else
     return 0;
@@ -2320,7 +2320,7 @@ zsock_set_tcp_keepalive_cnt (zsock_t *self, int tcp_keepalive_cnt)
 {
     assert(self);
 #   if defined (ZMQ_TCP_KEEPALIVE_CNT)
-    int rc = zmq_setsockopt (self->socket, ZMQ_TCP_KEEPALIVE_CNT, &tcp_keepalive_cnt, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_TCP_KEEPALIVE_CNT, &tcp_keepalive_cnt, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2337,7 +2337,7 @@ zsock_tcp_keepalive_cnt (zsock_t *self)
 #   if defined (ZMQ_TCP_KEEPALIVE_CNT)
     int tcp_keepalive_cnt;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_TCP_KEEPALIVE_CNT, &tcp_keepalive_cnt, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_TCP_KEEPALIVE_CNT, &tcp_keepalive_cnt, &option_len);
     return tcp_keepalive_cnt;
 #   else
     return 0;
@@ -2354,7 +2354,7 @@ zsock_set_tcp_keepalive_intvl (zsock_t *self, int tcp_keepalive_intvl)
 {
     assert(self);
 #   if defined (ZMQ_TCP_KEEPALIVE_INTVL)
-    int rc = zmq_setsockopt (self->socket, ZMQ_TCP_KEEPALIVE_INTVL, &tcp_keepalive_intvl, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_TCP_KEEPALIVE_INTVL, &tcp_keepalive_intvl, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2371,7 +2371,7 @@ zsock_tcp_keepalive_intvl (zsock_t *self)
 #   if defined (ZMQ_TCP_KEEPALIVE_INTVL)
     int tcp_keepalive_intvl;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_TCP_KEEPALIVE_INTVL, &tcp_keepalive_intvl, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_TCP_KEEPALIVE_INTVL, &tcp_keepalive_intvl, &option_len);
     return tcp_keepalive_intvl;
 #   else
     return 0;
@@ -2388,7 +2388,7 @@ zsock_set_tcp_accept_filter (zsock_t *self, const char * tcp_accept_filter)
 {
     assert(self);
 #   if defined (ZMQ_TCP_ACCEPT_FILTER)
-    int rc = zmq_setsockopt (self->socket, ZMQ_TCP_ACCEPT_FILTER, tcp_accept_filter, strlen (tcp_accept_filter));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_TCP_ACCEPT_FILTER, tcp_accept_filter, strlen (tcp_accept_filter));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2405,7 +2405,7 @@ zsock_tcp_accept_filter (zsock_t *self)
 #   if defined (ZMQ_TCP_ACCEPT_FILTER)
     size_t option_len = 255;
     char *tcp_accept_filter = (char *) zmalloc (option_len);
-    zmq_getsockopt (self->socket, ZMQ_TCP_ACCEPT_FILTER, tcp_accept_filter, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_TCP_ACCEPT_FILTER, tcp_accept_filter, &option_len);
     return (char *) tcp_accept_filter;
 #   else
     return NULL;
@@ -2424,7 +2424,7 @@ zsock_rcvmore (zsock_t *self)
 #   if defined (ZMQ_RCVMORE)
     int rcvmore;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_RCVMORE, &rcvmore, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RCVMORE, &rcvmore, &option_len);
     return rcvmore;
 #   else
     return 0;
@@ -2443,7 +2443,7 @@ zsock_fd (zsock_t *self)
 #   if defined (ZMQ_FD)
     int fd;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_FD, &fd, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_FD, &fd, &option_len);
     return fd;
 #   else
     return 0;
@@ -2462,7 +2462,7 @@ zsock_events (zsock_t *self)
 #   if defined (ZMQ_EVENTS)
     int events;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_EVENTS, &events, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_EVENTS, &events, &option_len);
     return events;
 #   else
     return 0;
@@ -2481,7 +2481,7 @@ zsock_last_endpoint (zsock_t *self)
 #   if defined (ZMQ_LAST_ENDPOINT)
     size_t option_len = 255;
     char *last_endpoint = (char *) zmalloc (option_len);
-    zmq_getsockopt (self->socket, ZMQ_LAST_ENDPOINT, last_endpoint, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_LAST_ENDPOINT, last_endpoint, &option_len);
     return (char *) last_endpoint;
 #   else
     return NULL;
@@ -2502,7 +2502,7 @@ zsock_set_hwm (zsock_t *self, int hwm)
     assert(self);
 #   if defined (ZMQ_HWM)
     uint64_t value = hwm;
-    int rc = zmq_setsockopt (self->socket, ZMQ_HWM, &value, sizeof (uint64_t));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_HWM, &value, sizeof (uint64_t));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2519,7 +2519,7 @@ zsock_hwm (zsock_t *self)
 #   if defined (ZMQ_HWM)
     uint64_t hwm;
     size_t option_len = sizeof (uint64_t);
-    zmq_getsockopt (self->socket, ZMQ_HWM, &hwm, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_HWM, &hwm, &option_len);
     return (int) hwm;
 #   else
     return 0;
@@ -2537,7 +2537,7 @@ zsock_set_swap (zsock_t *self, int swap)
     assert(self);
 #   if defined (ZMQ_SWAP)
     int64_t value = swap;
-    int rc = zmq_setsockopt (self->socket, ZMQ_SWAP, &value, sizeof (int64_t));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_SWAP, &value, sizeof (int64_t));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2554,7 +2554,7 @@ zsock_swap (zsock_t *self)
 #   if defined (ZMQ_SWAP)
     int64_t swap;
     size_t option_len = sizeof (int64_t);
-    zmq_getsockopt (self->socket, ZMQ_SWAP, &swap, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_SWAP, &swap, &option_len);
     return (int) swap;
 #   else
     return 0;
@@ -2572,7 +2572,7 @@ zsock_set_affinity (zsock_t *self, int affinity)
     assert(self);
 #   if defined (ZMQ_AFFINITY)
     uint64_t value = affinity;
-    int rc = zmq_setsockopt (self->socket, ZMQ_AFFINITY, &value, sizeof (uint64_t));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_AFFINITY, &value, sizeof (uint64_t));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2589,7 +2589,7 @@ zsock_affinity (zsock_t *self)
 #   if defined (ZMQ_AFFINITY)
     uint64_t affinity;
     size_t option_len = sizeof (uint64_t);
-    zmq_getsockopt (self->socket, ZMQ_AFFINITY, &affinity, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_AFFINITY, &affinity, &option_len);
     return (int) affinity;
 #   else
     return 0;
@@ -2606,7 +2606,7 @@ zsock_set_identity (zsock_t *self, const char * identity)
 {
     assert(self);
 #   if defined (ZMQ_IDENTITY)
-    int rc = zmq_setsockopt (self->socket, ZMQ_IDENTITY, identity, strlen (identity));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_IDENTITY, identity, strlen (identity));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2623,7 +2623,7 @@ zsock_identity (zsock_t *self)
 #   if defined (ZMQ_IDENTITY)
     size_t option_len = 255;
     char *identity = (char *) zmalloc (option_len);
-    zmq_getsockopt (self->socket, ZMQ_IDENTITY, identity, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_IDENTITY, identity, &option_len);
     return (char *) identity;
 #   else
     return NULL;
@@ -2641,7 +2641,7 @@ zsock_set_rate (zsock_t *self, int rate)
     assert(self);
 #   if defined (ZMQ_RATE)
     int64_t value = rate;
-    int rc = zmq_setsockopt (self->socket, ZMQ_RATE, &value, sizeof (int64_t));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_RATE, &value, sizeof (int64_t));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2658,7 +2658,7 @@ zsock_rate (zsock_t *self)
 #   if defined (ZMQ_RATE)
     int64_t rate;
     size_t option_len = sizeof (int64_t);
-    zmq_getsockopt (self->socket, ZMQ_RATE, &rate, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RATE, &rate, &option_len);
     return (int) rate;
 #   else
     return 0;
@@ -2676,7 +2676,7 @@ zsock_set_recovery_ivl (zsock_t *self, int recovery_ivl)
     assert(self);
 #   if defined (ZMQ_RECOVERY_IVL)
     int64_t value = recovery_ivl;
-    int rc = zmq_setsockopt (self->socket, ZMQ_RECOVERY_IVL, &value, sizeof (int64_t));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_RECOVERY_IVL, &value, sizeof (int64_t));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2693,7 +2693,7 @@ zsock_recovery_ivl (zsock_t *self)
 #   if defined (ZMQ_RECOVERY_IVL)
     int64_t recovery_ivl;
     size_t option_len = sizeof (int64_t);
-    zmq_getsockopt (self->socket, ZMQ_RECOVERY_IVL, &recovery_ivl, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RECOVERY_IVL, &recovery_ivl, &option_len);
     return (int) recovery_ivl;
 #   else
     return 0;
@@ -2711,7 +2711,7 @@ zsock_set_recovery_ivl_msec (zsock_t *self, int recovery_ivl_msec)
     assert(self);
 #   if defined (ZMQ_RECOVERY_IVL_MSEC)
     int64_t value = recovery_ivl_msec;
-    int rc = zmq_setsockopt (self->socket, ZMQ_RECOVERY_IVL_MSEC, &value, sizeof (int64_t));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_RECOVERY_IVL_MSEC, &value, sizeof (int64_t));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2728,7 +2728,7 @@ zsock_recovery_ivl_msec (zsock_t *self)
 #   if defined (ZMQ_RECOVERY_IVL_MSEC)
     int64_t recovery_ivl_msec;
     size_t option_len = sizeof (int64_t);
-    zmq_getsockopt (self->socket, ZMQ_RECOVERY_IVL_MSEC, &recovery_ivl_msec, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RECOVERY_IVL_MSEC, &recovery_ivl_msec, &option_len);
     return (int) recovery_ivl_msec;
 #   else
     return 0;
@@ -2746,7 +2746,7 @@ zsock_set_mcast_loop (zsock_t *self, int mcast_loop)
     assert(self);
 #   if defined (ZMQ_MCAST_LOOP)
     int64_t value = mcast_loop;
-    int rc = zmq_setsockopt (self->socket, ZMQ_MCAST_LOOP, &value, sizeof (int64_t));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_MCAST_LOOP, &value, sizeof (int64_t));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2763,7 +2763,7 @@ zsock_mcast_loop (zsock_t *self)
 #   if defined (ZMQ_MCAST_LOOP)
     int64_t mcast_loop;
     size_t option_len = sizeof (int64_t);
-    zmq_getsockopt (self->socket, ZMQ_MCAST_LOOP, &mcast_loop, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_MCAST_LOOP, &mcast_loop, &option_len);
     return (int) mcast_loop;
 #   else
     return 0;
@@ -2781,7 +2781,7 @@ zsock_set_rcvtimeo (zsock_t *self, int rcvtimeo)
 {
     assert(self);
 #   if defined (ZMQ_RCVTIMEO)
-    int rc = zmq_setsockopt (self->socket, ZMQ_RCVTIMEO, &rcvtimeo, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_RCVTIMEO, &rcvtimeo, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2798,7 +2798,7 @@ zsock_rcvtimeo (zsock_t *self)
 #   if defined (ZMQ_RCVTIMEO)
     int rcvtimeo;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_RCVTIMEO, &rcvtimeo, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RCVTIMEO, &rcvtimeo, &option_len);
     return rcvtimeo;
 #   else
     return 0;
@@ -2817,7 +2817,7 @@ zsock_set_sndtimeo (zsock_t *self, int sndtimeo)
 {
     assert(self);
 #   if defined (ZMQ_SNDTIMEO)
-    int rc = zmq_setsockopt (self->socket, ZMQ_SNDTIMEO, &sndtimeo, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_SNDTIMEO, &sndtimeo, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2834,7 +2834,7 @@ zsock_sndtimeo (zsock_t *self)
 #   if defined (ZMQ_SNDTIMEO)
     int sndtimeo;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_SNDTIMEO, &sndtimeo, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_SNDTIMEO, &sndtimeo, &option_len);
     return sndtimeo;
 #   else
     return 0;
@@ -2853,7 +2853,7 @@ zsock_set_sndbuf (zsock_t *self, int sndbuf)
     assert(self);
 #   if defined (ZMQ_SNDBUF)
     uint64_t value = sndbuf;
-    int rc = zmq_setsockopt (self->socket, ZMQ_SNDBUF, &value, sizeof (uint64_t));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_SNDBUF, &value, sizeof (uint64_t));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2870,7 +2870,7 @@ zsock_sndbuf (zsock_t *self)
 #   if defined (ZMQ_SNDBUF)
     uint64_t sndbuf;
     size_t option_len = sizeof (uint64_t);
-    zmq_getsockopt (self->socket, ZMQ_SNDBUF, &sndbuf, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_SNDBUF, &sndbuf, &option_len);
     return (int) sndbuf;
 #   else
     return 0;
@@ -2888,7 +2888,7 @@ zsock_set_rcvbuf (zsock_t *self, int rcvbuf)
     assert(self);
 #   if defined (ZMQ_RCVBUF)
     uint64_t value = rcvbuf;
-    int rc = zmq_setsockopt (self->socket, ZMQ_RCVBUF, &value, sizeof (uint64_t));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_RCVBUF, &value, sizeof (uint64_t));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2905,7 +2905,7 @@ zsock_rcvbuf (zsock_t *self)
 #   if defined (ZMQ_RCVBUF)
     uint64_t rcvbuf;
     size_t option_len = sizeof (uint64_t);
-    zmq_getsockopt (self->socket, ZMQ_RCVBUF, &rcvbuf, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RCVBUF, &rcvbuf, &option_len);
     return (int) rcvbuf;
 #   else
     return 0;
@@ -2922,7 +2922,7 @@ zsock_set_linger (zsock_t *self, int linger)
 {
     assert(self);
 #   if defined (ZMQ_LINGER)
-    int rc = zmq_setsockopt (self->socket, ZMQ_LINGER, &linger, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_LINGER, &linger, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2939,7 +2939,7 @@ zsock_linger (zsock_t *self)
 #   if defined (ZMQ_LINGER)
     int linger;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_LINGER, &linger, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_LINGER, &linger, &option_len);
     return linger;
 #   else
     return 0;
@@ -2956,7 +2956,7 @@ zsock_set_reconnect_ivl (zsock_t *self, int reconnect_ivl)
 {
     assert(self);
 #   if defined (ZMQ_RECONNECT_IVL)
-    int rc = zmq_setsockopt (self->socket, ZMQ_RECONNECT_IVL, &reconnect_ivl, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_RECONNECT_IVL, &reconnect_ivl, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2973,7 +2973,7 @@ zsock_reconnect_ivl (zsock_t *self)
 #   if defined (ZMQ_RECONNECT_IVL)
     int reconnect_ivl;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_RECONNECT_IVL, &reconnect_ivl, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RECONNECT_IVL, &reconnect_ivl, &option_len);
     return reconnect_ivl;
 #   else
     return 0;
@@ -2990,7 +2990,7 @@ zsock_set_reconnect_ivl_max (zsock_t *self, int reconnect_ivl_max)
 {
     assert(self);
 #   if defined (ZMQ_RECONNECT_IVL_MAX)
-    int rc = zmq_setsockopt (self->socket, ZMQ_RECONNECT_IVL_MAX, &reconnect_ivl_max, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_RECONNECT_IVL_MAX, &reconnect_ivl_max, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -3007,7 +3007,7 @@ zsock_reconnect_ivl_max (zsock_t *self)
 #   if defined (ZMQ_RECONNECT_IVL_MAX)
     int reconnect_ivl_max;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_RECONNECT_IVL_MAX, &reconnect_ivl_max, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RECONNECT_IVL_MAX, &reconnect_ivl_max, &option_len);
     return reconnect_ivl_max;
 #   else
     return 0;
@@ -3024,7 +3024,7 @@ zsock_set_backlog (zsock_t *self, int backlog)
 {
     assert(self);
 #   if defined (ZMQ_BACKLOG)
-    int rc = zmq_setsockopt (self->socket, ZMQ_BACKLOG, &backlog, sizeof (int));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_BACKLOG, &backlog, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -3041,7 +3041,7 @@ zsock_backlog (zsock_t *self)
 #   if defined (ZMQ_BACKLOG)
     int backlog;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_BACKLOG, &backlog, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_BACKLOG, &backlog, &option_len);
     return backlog;
 #   else
     return 0;
@@ -3062,7 +3062,7 @@ zsock_set_subscribe (zsock_t *self, const char * subscribe)
         printf ("ZMQ_SUBSCRIBE is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
-    int rc = zmq_setsockopt (self->socket, ZMQ_SUBSCRIBE, subscribe, strlen (subscribe));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_SUBSCRIBE, subscribe, strlen (subscribe));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -3081,7 +3081,7 @@ zsock_set_unsubscribe (zsock_t *self, const char * unsubscribe)
         printf ("ZMQ_UNSUBSCRIBE is not valid on %s sockets\n", zsock_type_str (self));
         assert (false);
     }
-    int rc = zmq_setsockopt (self->socket, ZMQ_UNSUBSCRIBE, unsubscribe, strlen (unsubscribe));
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_UNSUBSCRIBE, unsubscribe, strlen (unsubscribe));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -3098,7 +3098,7 @@ zsock_type (zsock_t *self)
 #   if defined (ZMQ_TYPE)
     int type;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_TYPE, &type, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_TYPE, &type, &option_len);
     return type;
 #   else
     return 0;
@@ -3117,7 +3117,7 @@ zsock_rcvmore (zsock_t *self)
 #   if defined (ZMQ_RCVMORE)
     int64_t rcvmore;
     size_t option_len = sizeof (int64_t);
-    zmq_getsockopt (self->socket, ZMQ_RCVMORE, &rcvmore, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_RCVMORE, &rcvmore, &option_len);
     return (int) rcvmore;
 #   else
     return 0;
@@ -3136,7 +3136,7 @@ zsock_fd (zsock_t *self)
 #   if defined (ZMQ_FD)
     int fd;
     size_t option_len = sizeof (int);
-    zmq_getsockopt (self->socket, ZMQ_FD, &fd, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_FD, &fd, &option_len);
     return fd;
 #   else
     return 0;
@@ -3155,7 +3155,7 @@ zsock_events (zsock_t *self)
 #   if defined (ZMQ_EVENTS)
     uint32_t events;
     size_t option_len = sizeof (uint32_t);
-    zmq_getsockopt (self->socket, ZMQ_EVENTS, &events, &option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_EVENTS, &events, &option_len);
     return (int) events;
 #   else
     return 0;
@@ -3175,12 +3175,10 @@ zsock_option_test (bool verbose)
     printf (" * zsock_option: ");
 
     //  @selftest
-    zctx_t *ctx = zctx_new ();
-    assert (ctx);
     zsock_t *self;
 #if (ZMQ_VERSION_MAJOR == 4)
 #     if defined (ZMQ_TOS)
-    self = zsock_new (ctx, ZMQ_DEALER);
+    self = zsock_new (ZMQ_DEALER);
     assert (self);
     zsock_set_tos (self, 1);
     assert (zsock_tos (self) == 1);
@@ -3188,43 +3186,43 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_ROUTER_HANDOVER)
-    self = zsock_new (ctx, ZMQ_ROUTER);
+    self = zsock_new (ZMQ_ROUTER);
     assert (self);
     zsock_set_router_handover (self, 1);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_ROUTER_MANDATORY)
-    self = zsock_new (ctx, ZMQ_ROUTER);
+    self = zsock_new (ZMQ_ROUTER);
     assert (self);
     zsock_set_router_mandatory (self, 1);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_PROBE_ROUTER)
-    self = zsock_new (ctx, ZMQ_DEALER);
+    self = zsock_new (ZMQ_DEALER);
     assert (self);
     zsock_set_probe_router (self, 1);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_REQ_RELAXED)
-    self = zsock_new (ctx, ZMQ_REQ);
+    self = zsock_new (ZMQ_REQ);
     assert (self);
     zsock_set_req_relaxed (self, 1);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_REQ_CORRELATE)
-    self = zsock_new (ctx, ZMQ_REQ);
+    self = zsock_new (ZMQ_REQ);
     assert (self);
     zsock_set_req_correlate (self, 1);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_CONFLATE)
-    self = zsock_new (ctx, ZMQ_PUSH);
+    self = zsock_new (ZMQ_PUSH);
     assert (self);
     zsock_set_conflate (self, 1);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_PLAIN_SERVER)
-    self = zsock_new (ctx, ZMQ_PUB);
+    self = zsock_new (ZMQ_PUB);
     assert (self);
     zsock_set_plain_server (self, 1);
     assert (zsock_plain_server (self) == 1);
@@ -3232,7 +3230,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_PLAIN_USERNAME)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_plain_username (self, "test");
     char *plain_username = zsock_plain_username (self);
@@ -3241,7 +3239,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_PLAIN_PASSWORD)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_plain_password (self, "test");
     char *plain_password = zsock_plain_password (self);
@@ -3251,7 +3249,7 @@ zsock_option_test (bool verbose)
 #     endif
 #     if defined (ZMQ_CURVE_SERVER)
 #       if defined (HAVE_LIBSODIUM)
-    self = zsock_new (ctx, ZMQ_PUB);
+    self = zsock_new (ZMQ_PUB);
     assert (self);
     zsock_set_curve_server (self, 1);
     assert (zsock_curve_server (self) == 1);
@@ -3261,7 +3259,7 @@ zsock_option_test (bool verbose)
 #     endif
 #     if defined (ZMQ_CURVE_PUBLICKEY)
 #       if defined (HAVE_LIBSODIUM)
-    self = zsock_new (ctx, ZMQ_PUB);
+    self = zsock_new (ZMQ_PUB);
     assert (self);
     zsock_set_curve_publickey (self, "Yne@$w-vo<fVvi]a<NY6T1ed:M$fCG*[IaLV{hID");
     char *curve_publickey = zsock_curve_publickey (self);
@@ -3272,7 +3270,7 @@ zsock_option_test (bool verbose)
 #     endif
 #     if defined (ZMQ_CURVE_SECRETKEY)
 #       if defined (HAVE_LIBSODIUM)
-    self = zsock_new (ctx, ZMQ_PUB);
+    self = zsock_new (ZMQ_PUB);
     assert (self);
     zsock_set_curve_secretkey (self, "D:)Q[IlAW!ahhC2ac:9*A}h:p?([4%wOTJ%JR%cs");
     char *curve_secretkey = zsock_curve_secretkey (self);
@@ -3283,7 +3281,7 @@ zsock_option_test (bool verbose)
 #     endif
 #     if defined (ZMQ_CURVE_SERVERKEY)
 #       if defined (HAVE_LIBSODIUM)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_curve_serverkey (self, "rq:rM>}U?@Lns47E1%kR.o@n%FcmmsL/@{H8]yf7");
     char *curve_serverkey = zsock_curve_serverkey (self);
@@ -3293,7 +3291,7 @@ zsock_option_test (bool verbose)
 #       endif
 #     endif
 #     if defined (ZMQ_ZAP_DOMAIN)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_zap_domain (self, "test");
     char *zap_domain = zsock_zap_domain (self);
@@ -3302,13 +3300,13 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_MECHANISM)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_mechanism (self);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_IPV6)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_ipv6 (self, 1);
     assert (zsock_ipv6 (self) == 1);
@@ -3316,7 +3314,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_IMMEDIATE)
-    self = zsock_new (ctx, ZMQ_DEALER);
+    self = zsock_new (ZMQ_DEALER);
     assert (self);
     zsock_set_immediate (self, 1);
     assert (zsock_immediate (self) == 1);
@@ -3324,13 +3322,13 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_ROUTER_RAW)
-    self = zsock_new (ctx, ZMQ_ROUTER);
+    self = zsock_new (ZMQ_ROUTER);
     assert (self);
     zsock_set_router_raw (self, 1);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_IPV4ONLY)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_ipv4only (self, 1);
     assert (zsock_ipv4only (self) == 1);
@@ -3338,19 +3336,19 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
-    self = zsock_new (ctx, ZMQ_PUB);
+    self = zsock_new (ZMQ_PUB);
     assert (self);
     zsock_set_delay_attach_on_connect (self, 1);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TYPE)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_type (self);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_SNDHWM)
-    self = zsock_new (ctx, ZMQ_PUB);
+    self = zsock_new (ZMQ_PUB);
     assert (self);
     zsock_set_sndhwm (self, 1);
     assert (zsock_sndhwm (self) == 1);
@@ -3358,7 +3356,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RCVHWM)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_rcvhwm (self, 1);
     assert (zsock_rcvhwm (self) == 1);
@@ -3366,7 +3364,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_AFFINITY)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_affinity (self, 1);
     assert (zsock_affinity (self) == 1);
@@ -3374,19 +3372,19 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_SUBSCRIBE)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_subscribe (self, "test");
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_UNSUBSCRIBE)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_unsubscribe (self, "test");
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_IDENTITY)
-    self = zsock_new (ctx, ZMQ_DEALER);
+    self = zsock_new (ZMQ_DEALER);
     assert (self);
     zsock_set_identity (self, "test");
     char *identity = zsock_identity (self);
@@ -3395,7 +3393,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RATE)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_rate (self, 1);
     assert (zsock_rate (self) == 1);
@@ -3403,7 +3401,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RECOVERY_IVL)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_recovery_ivl (self, 1);
     assert (zsock_recovery_ivl (self) == 1);
@@ -3411,7 +3409,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_SNDBUF)
-    self = zsock_new (ctx, ZMQ_PUB);
+    self = zsock_new (ZMQ_PUB);
     assert (self);
     zsock_set_sndbuf (self, 1);
     assert (zsock_sndbuf (self) == 1);
@@ -3419,7 +3417,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RCVBUF)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_rcvbuf (self, 1);
     assert (zsock_rcvbuf (self) == 1);
@@ -3427,7 +3425,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_LINGER)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_linger (self, 1);
     assert (zsock_linger (self) == 1);
@@ -3435,7 +3433,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RECONNECT_IVL)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_reconnect_ivl (self, 1);
     assert (zsock_reconnect_ivl (self) == 1);
@@ -3443,7 +3441,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RECONNECT_IVL_MAX)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_reconnect_ivl_max (self, 1);
     assert (zsock_reconnect_ivl_max (self) == 1);
@@ -3451,7 +3449,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_BACKLOG)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_backlog (self, 1);
     assert (zsock_backlog (self) == 1);
@@ -3459,7 +3457,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_MAXMSGSIZE)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_maxmsgsize (self, 1);
     assert (zsock_maxmsgsize (self) == 1);
@@ -3467,7 +3465,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_MULTICAST_HOPS)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_multicast_hops (self, 1);
     assert (zsock_multicast_hops (self) == 1);
@@ -3475,7 +3473,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RCVTIMEO)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_rcvtimeo (self, 1);
     assert (zsock_rcvtimeo (self) == 1);
@@ -3483,7 +3481,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_SNDTIMEO)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_sndtimeo (self, 1);
     assert (zsock_sndtimeo (self) == 1);
@@ -3491,13 +3489,13 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_XPUB_VERBOSE)
-    self = zsock_new (ctx, ZMQ_XPUB);
+    self = zsock_new (ZMQ_XPUB);
     assert (self);
     zsock_set_xpub_verbose (self, 1);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TCP_KEEPALIVE)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_tcp_keepalive (self, 1);
     assert (zsock_tcp_keepalive (self) == 1);
@@ -3505,7 +3503,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TCP_KEEPALIVE_IDLE)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_tcp_keepalive_idle (self, 1);
     assert (zsock_tcp_keepalive_idle (self) == 1);
@@ -3513,7 +3511,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TCP_KEEPALIVE_CNT)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_tcp_keepalive_cnt (self, 1);
     assert (zsock_tcp_keepalive_cnt (self) == 1);
@@ -3521,7 +3519,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TCP_KEEPALIVE_INTVL)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_tcp_keepalive_intvl (self, 1);
     assert (zsock_tcp_keepalive_intvl (self) == 1);
@@ -3529,7 +3527,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TCP_ACCEPT_FILTER)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_tcp_accept_filter (self, "127.0.0.1");
     char *tcp_accept_filter = zsock_tcp_accept_filter (self);
@@ -3538,25 +3536,25 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RCVMORE)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_rcvmore (self);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_FD)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_fd (self);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_EVENTS)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_events (self);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_LAST_ENDPOINT)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     char *last_endpoint = zsock_last_endpoint (self);
     assert (last_endpoint);
@@ -3567,13 +3565,13 @@ zsock_option_test (bool verbose)
 
 #if (ZMQ_VERSION_MAJOR == 3)
 #     if defined (ZMQ_ROUTER_RAW)
-    self = zsock_new (ctx, ZMQ_ROUTER);
+    self = zsock_new (ZMQ_ROUTER);
     assert (self);
     zsock_set_router_raw (self, 1);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_IPV4ONLY)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_ipv4only (self, 1);
     assert (zsock_ipv4only (self) == 1);
@@ -3581,19 +3579,19 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
-    self = zsock_new (ctx, ZMQ_PUB);
+    self = zsock_new (ZMQ_PUB);
     assert (self);
     zsock_set_delay_attach_on_connect (self, 1);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TYPE)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_type (self);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_SNDHWM)
-    self = zsock_new (ctx, ZMQ_PUB);
+    self = zsock_new (ZMQ_PUB);
     assert (self);
     zsock_set_sndhwm (self, 1);
     assert (zsock_sndhwm (self) == 1);
@@ -3601,7 +3599,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RCVHWM)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_rcvhwm (self, 1);
     assert (zsock_rcvhwm (self) == 1);
@@ -3609,7 +3607,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_AFFINITY)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_affinity (self, 1);
     assert (zsock_affinity (self) == 1);
@@ -3617,19 +3615,19 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_SUBSCRIBE)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_subscribe (self, "test");
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_UNSUBSCRIBE)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_unsubscribe (self, "test");
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_IDENTITY)
-    self = zsock_new (ctx, ZMQ_DEALER);
+    self = zsock_new (ZMQ_DEALER);
     assert (self);
     zsock_set_identity (self, "test");
     char *identity = zsock_identity (self);
@@ -3638,7 +3636,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RATE)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_rate (self, 1);
     assert (zsock_rate (self) == 1);
@@ -3646,7 +3644,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RECOVERY_IVL)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_recovery_ivl (self, 1);
     assert (zsock_recovery_ivl (self) == 1);
@@ -3654,7 +3652,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_SNDBUF)
-    self = zsock_new (ctx, ZMQ_PUB);
+    self = zsock_new (ZMQ_PUB);
     assert (self);
     zsock_set_sndbuf (self, 1);
     assert (zsock_sndbuf (self) == 1);
@@ -3662,7 +3660,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RCVBUF)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_rcvbuf (self, 1);
     assert (zsock_rcvbuf (self) == 1);
@@ -3670,7 +3668,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_LINGER)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_linger (self, 1);
     assert (zsock_linger (self) == 1);
@@ -3678,7 +3676,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RECONNECT_IVL)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_reconnect_ivl (self, 1);
     assert (zsock_reconnect_ivl (self) == 1);
@@ -3686,7 +3684,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RECONNECT_IVL_MAX)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_reconnect_ivl_max (self, 1);
     assert (zsock_reconnect_ivl_max (self) == 1);
@@ -3694,7 +3692,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_BACKLOG)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_backlog (self, 1);
     assert (zsock_backlog (self) == 1);
@@ -3702,7 +3700,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_MAXMSGSIZE)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_maxmsgsize (self, 1);
     assert (zsock_maxmsgsize (self) == 1);
@@ -3710,7 +3708,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_MULTICAST_HOPS)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_multicast_hops (self, 1);
     assert (zsock_multicast_hops (self) == 1);
@@ -3718,7 +3716,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RCVTIMEO)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_rcvtimeo (self, 1);
     assert (zsock_rcvtimeo (self) == 1);
@@ -3726,7 +3724,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_SNDTIMEO)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_sndtimeo (self, 1);
     assert (zsock_sndtimeo (self) == 1);
@@ -3734,13 +3732,13 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_XPUB_VERBOSE)
-    self = zsock_new (ctx, ZMQ_XPUB);
+    self = zsock_new (ZMQ_XPUB);
     assert (self);
     zsock_set_xpub_verbose (self, 1);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TCP_KEEPALIVE)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_tcp_keepalive (self, 1);
     assert (zsock_tcp_keepalive (self) == 1);
@@ -3748,7 +3746,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TCP_KEEPALIVE_IDLE)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_tcp_keepalive_idle (self, 1);
     assert (zsock_tcp_keepalive_idle (self) == 1);
@@ -3756,7 +3754,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TCP_KEEPALIVE_CNT)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_tcp_keepalive_cnt (self, 1);
     assert (zsock_tcp_keepalive_cnt (self) == 1);
@@ -3764,7 +3762,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TCP_KEEPALIVE_INTVL)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_tcp_keepalive_intvl (self, 1);
     assert (zsock_tcp_keepalive_intvl (self) == 1);
@@ -3772,7 +3770,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TCP_ACCEPT_FILTER)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_tcp_accept_filter (self, "127.0.0.1");
     char *tcp_accept_filter = zsock_tcp_accept_filter (self);
@@ -3781,25 +3779,25 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RCVMORE)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_rcvmore (self);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_FD)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_fd (self);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_EVENTS)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_events (self);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_LAST_ENDPOINT)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     char *last_endpoint = zsock_last_endpoint (self);
     assert (last_endpoint);
@@ -3810,7 +3808,7 @@ zsock_option_test (bool verbose)
 
 #if (ZMQ_VERSION_MAJOR == 2)
 #     if defined (ZMQ_HWM)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_hwm (self, 1);
     assert (zsock_hwm (self) == 1);
@@ -3818,7 +3816,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_SWAP)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_swap (self, 1);
     assert (zsock_swap (self) == 1);
@@ -3826,7 +3824,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_AFFINITY)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_affinity (self, 1);
     assert (zsock_affinity (self) == 1);
@@ -3834,7 +3832,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_IDENTITY)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_identity (self, "test");
     char *identity = zsock_identity (self);
@@ -3843,7 +3841,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RATE)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_rate (self, 1);
     assert (zsock_rate (self) == 1);
@@ -3851,7 +3849,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RECOVERY_IVL)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_recovery_ivl (self, 1);
     assert (zsock_recovery_ivl (self) == 1);
@@ -3859,7 +3857,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RECOVERY_IVL_MSEC)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_recovery_ivl_msec (self, 1);
     assert (zsock_recovery_ivl_msec (self) == 1);
@@ -3867,7 +3865,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_MCAST_LOOP)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_mcast_loop (self, 1);
     assert (zsock_mcast_loop (self) == 1);
@@ -3876,7 +3874,7 @@ zsock_option_test (bool verbose)
 #     endif
 #   if (ZMQ_VERSION_MINOR == 2)
 #     if defined (ZMQ_RCVTIMEO)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_rcvtimeo (self, 1);
     assert (zsock_rcvtimeo (self) == 1);
@@ -3886,7 +3884,7 @@ zsock_option_test (bool verbose)
 #   endif
 #   if (ZMQ_VERSION_MINOR == 2)
 #     if defined (ZMQ_SNDTIMEO)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_sndtimeo (self, 1);
     assert (zsock_sndtimeo (self) == 1);
@@ -3895,7 +3893,7 @@ zsock_option_test (bool verbose)
 #     endif
 #   endif
 #     if defined (ZMQ_SNDBUF)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_sndbuf (self, 1);
     assert (zsock_sndbuf (self) == 1);
@@ -3903,7 +3901,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RCVBUF)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_rcvbuf (self, 1);
     assert (zsock_rcvbuf (self) == 1);
@@ -3911,7 +3909,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_LINGER)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_linger (self, 1);
     assert (zsock_linger (self) == 1);
@@ -3919,7 +3917,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RECONNECT_IVL)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_reconnect_ivl (self, 1);
     assert (zsock_reconnect_ivl (self) == 1);
@@ -3927,7 +3925,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RECONNECT_IVL_MAX)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_reconnect_ivl_max (self, 1);
     assert (zsock_reconnect_ivl_max (self) == 1);
@@ -3935,7 +3933,7 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_BACKLOG)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_backlog (self, 1);
     assert (zsock_backlog (self) == 1);
@@ -3943,44 +3941,43 @@ zsock_option_test (bool verbose)
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_SUBSCRIBE)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_subscribe (self, "test");
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_UNSUBSCRIBE)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_unsubscribe (self, "test");
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_TYPE)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_type (self);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_RCVMORE)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_rcvmore (self);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_FD)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_fd (self);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_EVENTS)
-    self = zsock_new (ctx, ZMQ_SUB);
+    self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_events (self);
     zsock_destroy (&self);
 #     endif
 #endif
 
-    zctx_destroy (&ctx);
     //  @end
 
     printf ("OK\n");
