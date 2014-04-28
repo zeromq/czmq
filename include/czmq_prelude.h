@@ -471,7 +471,15 @@ static inline void *
 #   define CHECK_PRINTF(a)
 #endif
 
-//- Socket header files -----------------------------------------------------
+//  Lets us write code that compiles both on Windows and normal platforms
+#if !defined (__WINDOWS__)
+typedef int SOCKET;
+#   define closesocket close
+#   define INVALID_SOCKET -1
+#   define SOCKET_ERROR -1
+#endif
+
+//- Include non-portable header files based on platform.h -------------------
 
 #if defined (HAVE_LINUX_WIRELESS_H)
 #   include <linux/wireless.h>
@@ -483,12 +491,29 @@ static inline void *
 #       include <net/if_media.h>
 #   endif
 #endif
-//  Lets us write code that compiles both on Windows and normal platforms
-#if !defined (__WINDOWS__)
-typedef int SOCKET;
-#   define closesocket close
-#   define INVALID_SOCKET -1
-#   define SOCKET_ERROR -1
+
+#if defined (HAVE_LIBSODIUM)
+#   include <sodium.h>
+#   if crypto_box_PUBLICKEYBYTES != 32 \
+    || crypto_box_SECRETKEYBYTES != 32
+#       error "libsodium not built correctly"
+#   endif
+#endif
+
+#if defined (__WINDOWS__) && !defined (HAVE_LIBUUID)
+#   define HAVE_LIBUUID 1
+#endif
+#if defined (__UTYPE_OSX) && !defined (HAVE_LIBUUID)
+#   define HAVE_LIBUUID 1
+#endif
+#if defined (HAVE_LIBUUID)
+#   if defined (__UTYPE_FREEBSD) || defined (__UTYPE_NETBSD)
+#       include <uuid.h>
+#   elif defined __UTYPE_HPUX
+#       include <dce/uuid.h>
+#   elif defined (__UNIX__)
+#       include <uuid/uuid.h>
+#   endif
 #endif
 
 //- Non-portable declaration specifiers -------------------------------------
