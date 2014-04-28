@@ -14,9 +14,6 @@
 #ifndef __ZSOCK_MONITOR_H_INCLUDED__
 #define __ZSOCK_MONITOR_H_INCLUDED__
 
-//  This code needs backporting to work with ZMQ v3.2
-#if (ZMQ_VERSION_MAJOR == 4)
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -61,7 +58,5 @@ CZMQ_EXPORT void
 #ifdef __cplusplus
 }
 #endif
-
-#endif          //  ZeroMQ 4.0 or later
 
 #endif

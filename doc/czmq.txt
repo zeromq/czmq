@@ -58,6 +58,7 @@ These classes wrap-up non-portable functionality:
 * linkczmq:zdir_patch[3] - work with directory differences
 * linkczmq:zfile[3] - work with file-system files
 * linkczmq:zlog[3] - work with the system logger
+* linkczmq:zmutex[3] - working with mutexes
 * linkczmq:zsys[3] - system-level methods
 * linkczmq:zthread[3] - working with system threads
 * linkczmq:zuuid[3] - UUID support class
@@ -71,7 +72,6 @@ And these utility classes add value:
 These classes are deprecated:
 
 * linkczmq:zmonitor[3] - socket event monitor (deprecated)
-* linkczmq:zmutex[3] - working with mutexes
 
 Scope and Goals
 ~~~~~~~~~~~~~~~
