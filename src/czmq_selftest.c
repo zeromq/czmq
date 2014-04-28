@@ -61,13 +61,9 @@ int main (int argc, char *argv [])
     zsockopt_test (verbose);
     zsock_test (verbose);
     zsock_option_test (verbose);
+//     zsock_monitor_test (verbose);
     zpoller_test (verbose);
     zthread_test (verbose);
-#if (ZMQ_VERSION_MAJOR == 4)
-//  TODO: failing this test, no events coming from monitor
-//     zsock_monitor_test (verbose);
-//     zmonitor_test (verbose);
-#endif
     zloop_test (verbose);
     zproxy_test (verbose);
     zbeacon_test (verbose);
