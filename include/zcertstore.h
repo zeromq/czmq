@@ -18,9 +18,6 @@
 extern "C" {
 #endif
 
-//  Opaque class structure
-typedef struct _zcertstore_t zcertstore_t;
-
 //  @interface
 
 //  Create a new certificate store from a disk directory, loading and 

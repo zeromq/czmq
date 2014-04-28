@@ -18,9 +18,6 @@
 extern "C" {
 #endif
 
-//  Opaque class structure
-typedef struct _zlist_t zlist_t;
-
 //  @interface
 //  Comparison function for zlist_sort method
 typedef bool (zlist_compare_fn) (void *item1, void *item2);

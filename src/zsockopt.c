@@ -22,7 +22,7 @@
     The zsockopt class provides access to the 0MQ getsockopt/setsockopt API.
 @discuss
     This class is generated, using the GSL code generator. See the sockopts
-    XML file, which provides the metadata, and the sockopts.gsl template,
+    XML file, which provides the metadata, and the zsockopt.gsl template,
     which does the work.
 @end
 */
@@ -1460,16 +1460,6 @@ zsocket_last_endpoint (void *zocket)
 }
 
 
-//  --------------------------------------------------------------------------
-//  Set socket high-water mark, emulating 2.x API
-
-void
-zsocket_set_hwm (void *zocket, int hwm)
-{
-    zsocket_set_sndhwm (zocket, hwm);
-    zsocket_set_rcvhwm (zocket, hwm);
-}
-
 #endif
 
 #if (ZMQ_VERSION_MAJOR == 3)
@@ -2361,16 +2351,6 @@ zsocket_last_endpoint (void *zocket)
 #   endif
 }
 
-
-//  --------------------------------------------------------------------------
-//  Set socket high-water mark, emulating 2.x API
-
-void
-zsocket_set_hwm (void *zocket, int hwm)
-{
-    zsocket_set_sndhwm (zocket, hwm);
-    zsocket_set_rcvhwm (zocket, hwm);
-}
 
 #endif
 
@@ -3408,9 +3388,6 @@ zsockopt_test (bool verbose)
     free (last_endpoint);
     zsocket_destroy (ctx, zocket);
 #     endif
-
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    zsocket_set_hwm (zocket, 1);
 #endif
 
 #if (ZMQ_VERSION_MAJOR == 3)
@@ -3654,9 +3631,6 @@ zsockopt_test (bool verbose)
     free (last_endpoint);
     zsocket_destroy (ctx, zocket);
 #     endif
-
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    zsocket_set_hwm (zocket, 1);
 #endif
 
 #if (ZMQ_VERSION_MAJOR == 2)

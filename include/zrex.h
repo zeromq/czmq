@@ -18,9 +18,6 @@
 extern "C" {
 #endif
 
-//  Opaque class structure
-typedef struct _zrex_t zrex_t;
-
 //  @interface
 //  Constructor. Optionally, sets an expression against which we can match
 //  text and capture hits. If there is an error in the expression, reports

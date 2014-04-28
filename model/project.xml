@@ -1,6 +1,10 @@
-<project name = "czmq">
+<project
+    name = "czmq"
+    script = "project.gsl"
+    >
     <header name = "czmq" />
     <header name = "czmq_prelude" />
+
     <class name = "zauth" />
     <class name = "zbeacon" />
     <class name = "zcert" />
@@ -8,7 +12,6 @@
     <class name = "zchunk" />
     <class name = "zclock" />
     <class name = "zconfig" />
-    <class name = "zctx" />
     <class name = "zdir" />
     <class name = "zdir_patch" />
     <class name = "zdigest" />
@@ -24,11 +27,16 @@
     <class name = "zpoller" />
     <class name = "zproxy" />
     <class name = "zrex" />
-    <class name = "zsocket" />
-    <class name = "zsockopt" />
     <class name = "zsock" />
+    <class name = "zsock_option" />
+    <class name = "zsock_monitor" />
     <class name = "zstr" />
     <class name = "zsys" />
-    <class name = "zthread" />
     <class name = "zuuid" />
+
+    <!-- Deprecated, remove after 3.0 -->
+    <class name = "zthread" />
+    <class name = "zctx" />
+    <class name = "zsocket" />
+    <class name = "zsockopt" />
 </project>

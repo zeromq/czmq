@@ -18,9 +18,6 @@
 extern "C" {
 #endif
 
-//  Opaque class structure
-typedef struct _zproxy_t zproxy_t;
-
 //  @interface
 
 //  Constructor

@@ -90,39 +90,20 @@ zframe_destroy (zframe_t **self_p)
 //  --------------------------------------------------------------------------
 //  Receive frame from socket, returns zframe_t object or NULL if the recv
 //  was interrupted. Does a blocking recv, if you want to not block then use
-//  zframe_recv_nowait().
+//  zpoller or zloop.
 
 zframe_t *
-zframe_recv (void *zocket)
+zframe_recv (zsock_t *source)
 {
-    assert (zocket);
+    assert (source);
+    void *handle = zsock_resolve (source);
     zframe_t *self = zframe_new (NULL, 0);
     if (self) {
-        if (zmq_recvmsg (zocket, &self->zmsg, 0) < 0) {
+        if (zmq_recvmsg (handle, &self->zmsg, 0) < 0) {
             zframe_destroy (&self);
             return NULL;            //  Interrupted or terminated
         }
-        self->more = zsocket_rcvmore (zocket);
-    }
-    return self;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Receive a new frame off the socket. Returns newly allocated frame, or
-//  NULL if there was no input waiting, or if the read was interrupted.
-
-zframe_t *
-zframe_recv_nowait (void *zocket)
-{
-    assert (zocket);
-    zframe_t *self = zframe_new (NULL, 0);
-    if (self) {
-        if (zmq_recvmsg (zocket, &self->zmsg, ZMQ_DONTWAIT) < 0) {
-            zframe_destroy (&self);
-            return NULL;            //  Interrupted or terminated
-        }
-        self->more = zsocket_rcvmore (zocket);
+        self->more = zsocket_rcvmore (handle);
     }
     return self;
 }
@@ -133,11 +114,12 @@ zframe_recv_nowait (void *zocket)
 //  set or the attempt to send the message errors out.
 
 int
-zframe_send (zframe_t **self_p, void *zocket, int flags)
+zframe_send (zframe_t **self_p, zsock_t *dest, int flags)
 {
-    assert (zocket);
+    assert (dest);
     assert (self_p);
 
+    void *handle = zsock_resolve (dest);
     if (*self_p) {
         zframe_t *self = *self_p;
         int send_flags = (flags & ZFRAME_MORE)? ZMQ_SNDMORE: 0;
@@ -147,13 +129,13 @@ zframe_send (zframe_t **self_p, void *zocket, int flags)
             zmq_msg_init (&copy);
             if (zmq_msg_copy (&copy, &self->zmsg))
                 return -1;
-            if (zmq_sendmsg (zocket, &copy, send_flags) == -1) {
+            if (zmq_sendmsg (handle, &copy, send_flags) == -1) {
                 zmq_msg_close (&copy);
                 return -1;
             }
         }
         else {
-            int rc = zmq_sendmsg (zocket, &self->zmsg, send_flags);
+            int rc = zmq_sendmsg (handle, &self->zmsg, send_flags);
             zframe_destroy (self_p);
             if (rc == -1)
                 return rc;
@@ -354,6 +336,28 @@ zframe_reset (zframe_t *self, const void *data, size_t size)
 
 
 //  --------------------------------------------------------------------------
+//  DEPRECATED as poor style -- callers should use zloop or zpoller
+//  Receive a new frame off the socket. Returns newly allocated frame, or
+//  NULL if there was no input waiting, or if the read was interrupted.
+
+zframe_t *
+zframe_recv_nowait (zsock_t *source)
+{
+    assert (source);
+    void *handle = zsock_resolve (source);
+    zframe_t *self = zframe_new (NULL, 0);
+    if (self) {
+        if (zmq_recvmsg (handle, &self->zmsg, ZMQ_DONTWAIT) < 0) {
+            zframe_destroy (&self);
+            return NULL;            //  Interrupted or terminated
+        }
+        self->more = zsocket_rcvmore (handle);
+    }
+    return self;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Selftest
 
 int
@@ -364,15 +368,13 @@ zframe_test (bool verbose)
     zframe_t* frame;
 
     //  @selftest
-    zctx_t *ctx = zctx_new ();
-    assert (ctx);
-
-    void *output = zsocket_new (ctx, ZMQ_PAIR);
+    //  Create two PAIR sockets and connect over inproc
+    zsock_t *output = zsock_new (ZMQ_PAIR);
     assert (output);
-    zsocket_bind (output, "inproc://zframe.test");
-    void *input = zsocket_new (ctx, ZMQ_PAIR);
+    zsock_bind (output, "inproc://zframe.test");
+    zsock_t *input = zsock_new (ZMQ_PAIR);
     assert (input);
-    zsocket_connect (input, "inproc://zframe.test");
+    zsock_connect (input, "inproc://zframe.test");
 
     //  Send five different frames, test ZFRAME_MORE
     int frame_nbr;
@@ -430,10 +432,10 @@ zframe_test (bool verbose)
         zframe_destroy (&frame);
     }
     assert (frame_nbr == 10);
-    frame = zframe_recv_nowait (input);
-    assert (frame == NULL);
 
-    zctx_destroy (&ctx);
+    zsock_destroy (&input);
+    zsock_destroy (&output);
+
     //  @end
     printf ("OK\n");
     return 0;

@@ -20,8 +20,6 @@
 extern "C" {
 #endif
 
-typedef struct _zuuid_t zuuid_t;
-
 //  @interface
 //  Constructor
 CZMQ_EXPORT zuuid_t *

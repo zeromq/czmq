@@ -27,11 +27,8 @@
 @end
 */
 
-#include "../include/czmq.h"
 #include "platform.h"
-#if defined (__UNIX__) && defined (HAVE_GETIFADDRS) && defined (HAVE_FREEIFADDRS)
-#include <net/if.h>
-#endif
+#include "../include/czmq.h"
 
 //  Constants
 #define INTERVAL_DFLT  1000         //  Default interval = 1 second
@@ -391,7 +388,6 @@ s_agent_new (void *pipe, int port_nbr)
         free (self);        //  No more file handles - forget it
         return NULL;
     }
-
     //  PROBLEM: this design will not survive the network interface
     //  being killed and restarted while the program is running
     //  Get the network interface
@@ -401,9 +397,9 @@ s_agent_new (void *pipe, int port_nbr)
 #if (defined (__WINDOWS__))
     inaddr_t sockaddr = self->address;
 #else
-#ifndef gai_strerrorA
-    #define gai_strerrorA gai_strerror
-#endif
+#   ifndef gai_strerrorA
+#       define gai_strerrorA gai_strerror
+#   endif
     inaddr_t sockaddr = self->broadcast;
 #endif
     if (bind (self->udpsock, (struct sockaddr *) &sockaddr, sizeof (sockaddr)) == SOCKET_ERROR)
@@ -431,7 +427,7 @@ s_agent_new (void *pipe, int port_nbr)
 static void
 s_get_interface (agent_t *self)
 {
-#if defined (__UNIX__) && defined (HAVE_GETIFADDRS) && defined (HAVE_FREEIFADDRS)
+#if defined (HAVE_GETIFADDRS)
     struct ifaddrs *interfaces;
     if (getifaddrs (&interfaces) == 0) {
         int num_interfaces = 0;
