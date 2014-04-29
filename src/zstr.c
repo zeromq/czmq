@@ -163,7 +163,8 @@ zstr_sendx (void *dest, const char *string, ...)
 //  are not enough frames, unallocated strings are set to NULL.
 //  Returns -1 if the message could not be read, else returns the
 //  number of strings filled, zero or more. Free each returned string
-//  using zstr_free().
+//  using zstr_free(). If not enough strings are provided, remaining
+//  multipart frames in the message are dropped.
 
 int
 zstr_recvx (void *source, char **string_p, ...)

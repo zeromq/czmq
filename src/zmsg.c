@@ -606,13 +606,12 @@ zmsg_fprint (zmsg_t *self, FILE *file)
 
 
 //  --------------------------------------------------------------------------
-//  Dump message to stderr, for debugging and tracing.
-//  See zmsg_fprint for details
+//  Dump message to stdout, for debugging. See zmsg_fprint for details
 
 void
 zmsg_print (zmsg_t *self)
 {
-   zmsg_fprint (self, stderr);
+   zmsg_fprint (self, stdout);
 }
 
 

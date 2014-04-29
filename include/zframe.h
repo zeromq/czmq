@@ -89,7 +89,7 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT void
     zframe_fprint (zframe_t *self, const char *prefix, FILE *file);
 
-//  Print contents of frame to stderr
+//  Print contents of frame to stdout
 CZMQ_EXPORT void
     zframe_print (zframe_t *self, const char *prefix);
 

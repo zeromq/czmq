@@ -312,12 +312,12 @@ zframe_fprint (zframe_t *self, const char *prefix, FILE *file)
 
 
 //  --------------------------------------------------------------------------
-//  Print contents of frame to stderr, prefix is ignored if null.
+//  Print contents of frame to stdout, prefix is ignored if null.
 
 void
 zframe_print (zframe_t *self, const char *prefix)
 {
-    zframe_fprint (self, prefix, stderr);
+    zframe_fprint (self, prefix, stdout);
 }
 
 

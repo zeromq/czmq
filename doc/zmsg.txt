@@ -147,7 +147,7 @@ CZMQ_EXPORT zmsg_t *
 CZMQ_EXPORT void
     zmsg_fprint (zmsg_t *self, FILE *file);
 
-//  Print message to stdout
+//  Dump message to stdout, for debugging. See zmsg_fprint for details
 CZMQ_EXPORT void
     zmsg_print (zmsg_t *self);
 
