@@ -200,7 +200,7 @@ s_tickless_timer (zloop_t *self)
     if (timeout < 0)
         timeout = 0;
     if (self->verbose)
-	zclock_log ("I: zloop: polling for %d msec", (int)timeout);
+	zclock_log ("I: zloop: polling for %d msec", (int) timeout);
     return timeout;
 }
 
@@ -550,7 +550,7 @@ zloop_start (zloop_t *self)
         size_t item_nbr;
         for (item_nbr = 0; item_nbr < self->poll_size && rc >= 0; item_nbr++) {
             s_reader_t *reader = &self->readact [item_nbr];
-            if (reader) {
+            if (reader->handler) {
                 if ((self->pollset [item_nbr].revents & ZMQ_POLLERR)
                 && !reader->tolerant) {
                     if (self->verbose)
