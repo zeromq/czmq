@@ -74,6 +74,10 @@ CZMQ_EXPORT void
 CZMQ_EXPORT bool
     zframe_eq (zframe_t *self, zframe_t *other);
 
+//  Set new contents for frame
+CZMQ_EXPORT void
+    zframe_reset (zframe_t *self, const void *data, size_t size);
+
 //   Print contents of the frame to FILE stream.
 CZMQ_EXPORT void
     zframe_fprint (zframe_t *self, const char *prefix, FILE *file);
@@ -82,13 +86,9 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zframe_print (zframe_t *self, const char *prefix);
 
-//  Set new contents for frame
-CZMQ_EXPORT void
-    zframe_reset (zframe_t *self, const void *data, size_t size);
-
-//  Put a block of data to the frame payload.
-CZMQ_EXPORT int
-    zframe_put_block (zframe_t *self, byte *data, size_t size);
+//  Probe the supplied object, and report if it looks like a zframe_t.
+CZMQ_EXPORT bool
+    zframe_is (void *self);
 
 //  Self test of this class
 CZMQ_EXPORT int

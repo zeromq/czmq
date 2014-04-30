@@ -151,6 +151,10 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zmsg_print (zmsg_t *self);
 
+//  Probe the supplied object, and report if it looks like a zmsg_t.
+CZMQ_EXPORT bool
+    zmsg_is (void *self);
+
 //  Self test of this class
 CZMQ_EXPORT int
     zmsg_test (bool verbose);

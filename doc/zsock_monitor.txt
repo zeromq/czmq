@@ -73,13 +73,17 @@ EXAMPLE
     zsock_monitor_listen (sourcemon, ZMQ_EVENT_DISCONNECTED);
     zsock_monitor_start (sourcemon);
 
+    //  Allow a brief time for the message to get there...
+    zmq_poll (NULL, 0, 200);
+
     //  Check sink is now listening
-    zsock_bind (sink, "tcp://127.0.0.1:9999");
+    int port_nbr = zsock_bind (sink, "tcp://127.0.0.1:*");
+    assert (port_nbr != -1);
     bool result = s_check_event (sinkmon, ZMQ_EVENT_LISTENING);
     assert (result);
 
     //  Check source connected to sink
-    zsock_connect (source, "tcp://127.0.0.1:9999");
+    zsock_connect (source, "tcp://127.0.0.1:%d", port_nbr);
     result = s_check_event (sourcemon, ZMQ_EVENT_CONNECTED);
     assert (result);
 

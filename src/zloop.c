@@ -645,7 +645,7 @@ s_timer_event (zloop_t *loop, int timer_id, void *output)
 }
 
 static int
-s_socket_event (zloop_t *loop, void *handle, void *arg)
+s_socket_event (zloop_t *loop, zsock_t *handle, void *arg)
 {
     //  Just end the reactor
     return -1;
