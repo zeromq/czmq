@@ -165,7 +165,8 @@ zmonitor_test (bool verbose)
     zmonitor_set_verbose (sinkmon, verbose);
 
     //  Check sink is now listening
-    zsocket_bind (sink, "tcp://127.0.0.1:9999");
+    int port_nbr = zsocket_bind (sink, "tcp://127.0.0.1:*");
+    assert (port_nbr != -1);
     result = s_check_event (sinkmon, ZMQ_EVENT_LISTENING);
     assert (result);
 
@@ -173,7 +174,7 @@ zmonitor_test (bool verbose)
     zmonitor_t *sourcemon = zmonitor_new (ctx,
         source, ZMQ_EVENT_CONNECTED | ZMQ_EVENT_DISCONNECTED);
     zmonitor_set_verbose (sourcemon, verbose);
-    zsocket_connect (source, "tcp://127.0.0.1:5555");
+    zsocket_connect (source, "tcp://127.0.0.1:%d", port_nbr);
 
     //  Check source connected to sink
     result = s_check_event (sourcemon, ZMQ_EVENT_CONNECTED);

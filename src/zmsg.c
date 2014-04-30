@@ -35,9 +35,14 @@
 
 #include "../include/czmq.h"
 
+//  zmsg_t instances always have this tag as the first 4 octets of
+//  their data, which lets us do runtime object typing & validation.
+#define ZMSG_TAG            0x0003cafe
+
 //  Structure of our class
 
 struct _zmsg_t {
+    uint32_t tag;               //  Object tag for runtime detection
     zlist_t *frames;            //  List of frames
     size_t content_size;        //  Total content size
 };
@@ -54,6 +59,7 @@ zmsg_new (void)
 
     self = (zmsg_t *) zmalloc (sizeof (zmsg_t));
     if (self) {
+        self->tag = ZMSG_TAG;
         self->frames = zlist_new ();
         if (!self->frames) {
             free (self);
@@ -73,11 +79,13 @@ zmsg_destroy (zmsg_t **self_p)
     assert (self_p);
     if (*self_p) {
         zmsg_t *self = *self_p;
+        assert (zmsg_is (self));
         while (zlist_size (self->frames) > 0) {
             zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
             zframe_destroy (&frame);
         }
         zlist_destroy (&self->frames);
+        self->tag = 0xDeadBeef;
         free (self);
         *self_p = NULL;
     }
@@ -91,14 +99,14 @@ zmsg_destroy (zmsg_t **self_p)
 //  call, use the zloop or zpoller class to receive only from ready sockets.
 
 zmsg_t *
-zmsg_recv (zsock_t *source)
+zmsg_recv (void *source)
 {
     assert (source);
     zmsg_t *self = zmsg_new ();
     if (!self)
         return NULL;
 
-    void *handle = zsock_resolve (source);
+    void *handle = zsock_resolve ((zsock_t *) source);
     while (true) {
         zframe_t *frame = zframe_recv (handle);
         if (!frame) {
@@ -122,18 +130,19 @@ zmsg_recv (zsock_t *source)
 //  if zmsg is null.
 
 int
-zmsg_send (zmsg_t **self_p, zsock_t *dest)
+zmsg_send (zmsg_t **self_p, void *dest)
 {
     assert (self_p);
     assert (dest);
     zmsg_t *self = *self_p;
 
     int rc = 0;
-    void *handle = zsock_resolve (dest);
+    void *handle = zsock_resolve ((zsock_t *) dest);
     if (zlist_size (self->frames) == 0)
         return -1;
     else
     if (self) {
+        assert (zmsg_is (self));
         zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
         while (frame) {
             rc = zframe_send (&frame, handle,
@@ -155,6 +164,8 @@ size_t
 zmsg_size (zmsg_t *self)
 {
     assert (self);
+    assert (zmsg_is (self));
+
     return zlist_size (self->frames);
 }
 
@@ -166,6 +177,8 @@ size_t
 zmsg_content_size (zmsg_t *self)
 {
     assert (self);
+    assert (zmsg_is (self));
+
     return self->content_size;
 }
 
@@ -180,7 +193,9 @@ int
 zmsg_prepend (zmsg_t *self, zframe_t **frame_p)
 {
     assert (self);
+    assert (zmsg_is (self));
     assert (frame_p);
+
     zframe_t *frame = *frame_p;
     *frame_p = NULL;            //  We now own frame
     self->content_size += zframe_size (frame);
@@ -197,7 +212,9 @@ int
 zmsg_append (zmsg_t *self, zframe_t **frame_p)
 {
     assert (self);
+    assert (zmsg_is (self));
     assert (frame_p);
+
     zframe_t *frame = *frame_p;
     *frame_p = NULL;            //  We now own frame
     self->content_size += zframe_size (frame);
@@ -213,9 +230,12 @@ zframe_t *
 zmsg_pop (zmsg_t *self)
 {
     assert (self);
+    assert (zmsg_is (self));
+
     zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
     if (frame)
         self->content_size -= zframe_size (frame);
+
     return frame;
 }
 
@@ -228,6 +248,8 @@ int
 zmsg_pushmem (zmsg_t *self, const void *src, size_t size)
 {
     assert (self);
+    assert (zmsg_is (self));
+
     zframe_t *frame = zframe_new (src, size);
     if (frame) {
         self->content_size += size;
@@ -245,6 +267,8 @@ int
 zmsg_addmem (zmsg_t *self, const void *src, size_t size)
 {
     assert (self);
+    assert (zmsg_is (self));
+
     zframe_t *frame = zframe_new (src, size);
     if (frame) {
         self->content_size += size;
@@ -263,7 +287,9 @@ int
 zmsg_pushstr (zmsg_t *self, const char *string)
 {
     assert (self);
+    assert (zmsg_is (self));
     assert (string);
+
     self->content_size += strlen (string);
     zlist_push (self->frames, zframe_new (string, strlen (string)));
     return 0;
@@ -278,7 +304,9 @@ int
 zmsg_addstr (zmsg_t *self, const char *string)
 {
     assert (self);
+    assert (zmsg_is (self));
     assert (string);
+
     self->content_size += strlen (string);
     zlist_append (self->frames, zframe_new (string, strlen (string)));
     return 0;
@@ -293,6 +321,7 @@ int
 zmsg_pushstrf (zmsg_t *self, const char *format, ...)
 {
     assert (self);
+    assert (zmsg_is (self));
     assert (format);
 
     va_list argptr;
@@ -303,6 +332,7 @@ zmsg_pushstrf (zmsg_t *self, const char *format, ...)
     self->content_size += strlen (string);
     zlist_push (self->frames, zframe_new (string, strlen (string)));
     free (string);
+
     return 0;
 }
 
@@ -315,6 +345,7 @@ int
 zmsg_addstrf (zmsg_t *self, const char *format, ...)
 {
     assert (self);
+    assert (zmsg_is (self));
     assert (format);
 
     va_list argptr;
@@ -325,6 +356,7 @@ zmsg_addstrf (zmsg_t *self, const char *format, ...)
     self->content_size += strlen (string);
     zlist_append (self->frames, zframe_new (string, strlen (string)));
     free (string);
+
     return 0;
 }
 
@@ -337,6 +369,8 @@ char *
 zmsg_popstr (zmsg_t *self)
 {
     assert (self);
+    assert (zmsg_is (self));
+
     zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
     char *string = NULL;
     if (frame) {
@@ -355,6 +389,8 @@ void
 zmsg_remove (zmsg_t *self, zframe_t *frame)
 {
     assert (self);
+    assert (zmsg_is (self));
+
     self->content_size -= zframe_size (frame);
     zlist_remove (self->frames, frame);
 }
@@ -368,6 +404,8 @@ zframe_t *
 zmsg_first (zmsg_t *self)
 {
     assert (self);
+    assert (zmsg_is (self));
+
     return (zframe_t *) zlist_first (self->frames);
 }
 
@@ -380,6 +418,8 @@ zframe_t *
 zmsg_next (zmsg_t *self)
 {
     assert (self);
+    assert (zmsg_is (self));
+
     return (zframe_t *) zlist_next (self->frames);
 }
 
@@ -391,6 +431,8 @@ zframe_t *
 zmsg_last (zmsg_t *self)
 {
     assert (self);
+    assert (zmsg_is (self));
+
     return (zframe_t *) zlist_last (self->frames);
 }
 
@@ -406,6 +448,7 @@ int
 zmsg_save (zmsg_t *self, FILE *file)
 {
     assert (self);
+    assert (zmsg_is (self));
     assert (file);
 
     zframe_t *frame = zmsg_first (self);
@@ -472,6 +515,7 @@ size_t
 zmsg_encode (zmsg_t *self, byte **buffer)
 {
     assert (self);
+    assert (zmsg_is (self));
 
     //  Calculate real size of buffer
     size_t buffer_size = 0;
@@ -568,6 +612,8 @@ zmsg_t *
 zmsg_dup (zmsg_t *self)
 {
     assert (self);
+    assert (zmsg_is (self));
+
     zmsg_t *copy = zmsg_new ();
     if (!copy)
         return NULL;
@@ -591,6 +637,9 @@ zmsg_dup (zmsg_t *self)
 void
 zmsg_fprint (zmsg_t *self, FILE *file)
 {
+    assert (self);
+    assert (zmsg_is (self));
+
     fprintf (file, "--------------------------------------\n");
     if (!self) {
         fprintf (file, "NULL");
@@ -606,13 +655,26 @@ zmsg_fprint (zmsg_t *self, FILE *file)
 
 
 //  --------------------------------------------------------------------------
-//  Dump message to stderr, for debugging and tracing.
-//  See zmsg_fprint for details
+//  Dump message to stdout, for debugging. See zmsg_fprint for details
 
 void
 zmsg_print (zmsg_t *self)
 {
-   zmsg_fprint (self, stderr);
+    assert (self);
+    assert (zmsg_is (self));
+    
+    zmsg_fprint (self, stdout);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Probe the supplied object, and report if it looks like a zmsg_t.
+
+bool
+zmsg_is (void *self)
+{
+    assert (self);
+    return ((zmsg_t *) self)->tag == ZMSG_TAG;
 }
 
 

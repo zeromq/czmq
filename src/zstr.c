@@ -24,10 +24,10 @@
 #include "../include/czmq.h"
 
 static int
-s_send_string (zsock_t *dest, bool more, char *string)
+s_send_string (void *dest, bool more, char *string)
 {
     assert (dest);
-    void *handle = zsock_resolve (dest);
+    void *handle = zsock_resolve ((zsock_t *) dest);
 
     int len = strlen (string);
     zmq_msg_t message;
@@ -48,10 +48,10 @@ s_send_string (zsock_t *dest, bool more, char *string)
 //  process was interrupted.
 
 char *
-zstr_recv (zsock_t *source)
+zstr_recv (void *source)
 {
     assert (source);
-    void *handle = zsock_resolve (source);
+    void *handle = zsock_resolve ((zsock_t *) source);
 
     zmq_msg_t message;
     zmq_msg_init (&message);
@@ -73,7 +73,7 @@ zstr_recv (zsock_t *source)
 //  method that adds a null terminator on the received string.
 
 int
-zstr_send (zsock_t *dest, const char *string)
+zstr_send (void *dest, const char *string)
 {
     assert (dest);
     assert (string);
@@ -86,7 +86,7 @@ zstr_send (zsock_t *dest, const char *string)
 //  you can send further strings in the same multi-part message.
 
 int
-zstr_sendm (zsock_t *dest, const char *string)
+zstr_sendm (void *dest, const char *string)
 {
     assert (dest);
     assert (string);
@@ -100,7 +100,7 @@ zstr_sendm (zsock_t *dest, const char *string)
 //  will create security holes).
 
 int
-zstr_sendf (zsock_t *dest, const char *format, ...)
+zstr_sendf (void *dest, const char *format, ...)
 {
     assert (dest);
     assert (format);
@@ -122,7 +122,7 @@ zstr_sendf (zsock_t *dest, const char *format, ...)
 //  message.
 
 int
-zstr_sendfm (zsock_t *dest, const char *format, ...)
+zstr_sendfm (void *dest, const char *format, ...)
 {
     assert (dest);
     assert (format);
@@ -143,7 +143,7 @@ zstr_sendfm (zsock_t *dest, const char *format, ...)
 //  Returns 0 if the strings could be sent OK, or -1 on error.
 
 int
-zstr_sendx (zsock_t *dest, const char *string, ...)
+zstr_sendx (void *dest, const char *string, ...)
 {
     zmsg_t *msg = zmsg_new ();
     va_list args;
@@ -163,13 +163,15 @@ zstr_sendx (zsock_t *dest, const char *string, ...)
 //  are not enough frames, unallocated strings are set to NULL.
 //  Returns -1 if the message could not be read, else returns the
 //  number of strings filled, zero or more. Free each returned string
-//  using zstr_free().
+//  using zstr_free(). If not enough strings are provided, remaining
+//  multipart frames in the message are dropped.
 
 int
-zstr_recvx (zsock_t *source, char **string_p, ...)
+zstr_recvx (void *source, char **string_p, ...)
 {
     assert (source);
-    void *handle = zsock_resolve (source);
+    void *handle = zsock_resolve ((zsock_t *) source);
+    
     zmsg_t *msg = zmsg_recv (handle);
     if (!msg)
         return -1;
@@ -207,10 +209,10 @@ zstr_free (char **string_p)
 //  any loop that relies on this method.
 
 char *
-zstr_recv_nowait (zsock_t *dest)
+zstr_recv_nowait (void *dest)
 {
     assert (dest);
-    void *handle = zsock_resolve (dest);
+    void *handle = zsock_resolve ((zsock_t *) dest);
 
     zmq_msg_t message;
     zmq_msg_init (&message);
@@ -239,6 +241,7 @@ zstr_test (bool verbose)
     zsock_t *output = zsock_new (ZMQ_PAIR);
     assert (output);
     zsock_bind (output, "inproc://zstr.test");
+    
     zsock_t *input = zsock_new (ZMQ_PAIR);
     assert (input);
     zsock_connect (input, "inproc://zstr.test");

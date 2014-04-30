@@ -645,7 +645,7 @@ s_timer_event (zloop_t *loop, int timer_id, void *output)
 }
 
 static int
-s_socket_event (zloop_t *loop, zsock_t *sock, void *arg)
+s_socket_event (zloop_t *loop, void *handle, void *arg)
 {
     //  Just end the reactor
     return -1;
@@ -661,6 +661,7 @@ zloop_test (bool verbose)
     zsock_t *output = zsock_new (ZMQ_PAIR);
     assert (output);
     zsock_bind (output, "inproc://zloop.test");
+    
     zsock_t *input = zsock_new (ZMQ_PAIR);
     assert (input);
     zsock_connect (input, "inproc://zloop.test");

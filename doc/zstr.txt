@@ -12,44 +12,45 @@ SYNOPSIS
 //  zstr_free(). Returns NULL if the context is being terminated or the
 //  process was interrupted.
 CZMQ_EXPORT char *
-    zstr_recv (zsock_t *source);
+    zstr_recv (void *source);
 
 //  Send a C string to a socket, as a frame. The string is sent without
 //  trailing null byte; to read this you can use zstr_recv, or a similar
 //  method that adds a null terminator on the received string.
 CZMQ_EXPORT int
-    zstr_send (zsock_t *dest, const char *string);
+    zstr_send (void *dest, const char *string);
 
 //  Send a C string to a socket, as zstr_send(), with a MORE flag, so that
 //  you can send further strings in the same multi-part message.
 CZMQ_EXPORT int
-    zstr_sendm (zsock_t *dest, const char *string);
+    zstr_sendm (void *dest, const char *string);
 
 //  Send a formatted string to a socket. Note that you should NOT use
 //  user-supplied strings in the format (they may contain '%' which
 //  will create security holes).
 CZMQ_EXPORT int
-    zstr_sendf (zsock_t *dest, const char *format, ...);
+    zstr_sendf (void *dest, const char *format, ...);
 
 //  Send a formatted string to a socket, as for zstr_sendf(), with a
 //  MORE flag, so that you can send further strings in the same multi-part
 //  message.
 CZMQ_EXPORT int
-    zstr_sendfm (zsock_t *dest, const char *format, ...);
+    zstr_sendfm (void *dest, const char *format, ...);
 
 //  Send a series of strings (until NULL) as multipart data
 //  Returns 0 if the strings could be sent OK, or -1 on error.
 CZMQ_EXPORT int
-    zstr_sendx (zsock_t *dest, const char *string, ...);
+    zstr_sendx (void *dest, const char *string, ...);
 
 //  Receive a series of strings (until NULL) from multipart data.
 //  Each string is allocated and filled with string data; if there
 //  are not enough frames, unallocated strings are set to NULL.
 //  Returns -1 if the message could not be read, else returns the
 //  number of strings filled, zero or more. Free each returned string
-//  using zstr_free().
+//  using zstr_free(). If not enough strings are provided, remaining
+//  multipart frames in the message are dropped.
 CZMQ_EXPORT int
-    zstr_recvx (zsock_t *source, char **string_p, ...);
+    zstr_recvx (void *source, char **string_p, ...);
 
 //  Free a provided string, and nullify the parent pointer. Safe to call on
 //  a null pointer.
@@ -78,6 +79,7 @@ EXAMPLE
     zsock_t *output = zsock_new (ZMQ_PAIR);
     assert (output);
     zsock_bind (output, "inproc://zstr.test");
+    
     zsock_t *input = zsock_new (ZMQ_PAIR);
     assert (input);
     zsock_connect (input, "inproc://zstr.test");

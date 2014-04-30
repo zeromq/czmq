@@ -21,9 +21,14 @@
 
 #include "../include/czmq.h"
 
+//  zchunk_t instances always have this tag as the first 4 octets of
+//  their data, which lets us do runtime object typing & validation.
+#define ZCHUNK_TAG              0x0001cafe
+
 //  Structure of our class
 
 struct _zchunk_t {
+    uint32_t tag;               //  Object tag for runtime detection
     size_t size;                //  Current size of data part
     size_t max_size;            //  Maximum allocated size
     size_t consumed;            //  Amount already consumed
@@ -39,6 +44,7 @@ zchunk_new (const void *data, size_t size)
 {
     zchunk_t *self = (zchunk_t *) zmalloc (sizeof (zchunk_t) + size);
     if (self) {
+        self->tag = ZCHUNK_TAG;
         self->max_size = size;
         self->data = (byte *) self + sizeof (zchunk_t);
         if (data) {
@@ -59,9 +65,11 @@ zchunk_destroy (zchunk_t **self_p)
     assert (self_p);
     if (*self_p) {
         zchunk_t *self = *self_p;
+        assert (zchunk_is (self));
         //  If data was reallocated independently, free it independently
         if (self->data != (byte *) self + sizeof (zchunk_t))
             free (self->data);
+        self->tag = 0xDeadBeef;
         free (self);
         *self_p = NULL;
     }
@@ -74,6 +82,9 @@ zchunk_destroy (zchunk_t **self_p)
 void
 zchunk_resize (zchunk_t *self, size_t size)
 {
+    assert (self);
+    assert (zchunk_is (self));
+
     //  If data was reallocated independently, free it independently
     if (self->data != (byte *) self + sizeof (zchunk_t))
         free (self->data);
@@ -91,6 +102,7 @@ size_t
 zchunk_size (zchunk_t *self)
 {
     assert (self);
+    assert (zchunk_is (self));
     return self->size;
 }
 
@@ -102,6 +114,7 @@ size_t
 zchunk_max_size (zchunk_t *self)
 {
     assert (self);
+    assert (zchunk_is (self));
     return self->max_size;
 }
 
@@ -113,6 +126,7 @@ byte *
 zchunk_data (zchunk_t *self)
 {
     assert (self);
+    assert (zchunk_is (self));
     return self->data;
 }
 
@@ -125,10 +139,13 @@ size_t
 zchunk_set (zchunk_t *self, const void *data, size_t size)
 {
     assert (self);
+    assert (zchunk_is (self));
+
     if (size > self->max_size)
         size = self->max_size;
     if (data)
         memcpy (self->data, data, size);
+
     self->size = size;
     return size;
 }
@@ -142,8 +159,11 @@ size_t
 zchunk_fill (zchunk_t *self, byte filler, size_t size)
 {
     assert (self);
+    assert (zchunk_is (self));
+
     if (size > self->max_size)
         size = self->max_size;
+
     memset (self->data, filler, size);
     self->size = size;
     return size;
@@ -157,8 +177,11 @@ size_t
 zchunk_append (zchunk_t *self, const void *data, size_t size)
 {
     assert (self);
+    assert (zchunk_is (self));
+
     if (self->size + size > self->max_size)
         size = self->max_size - self->size;
+
     memcpy (self->data + self->size, data, size);
     self->size += size;
     return self->size;
@@ -175,7 +198,9 @@ size_t
 zchunk_consume (zchunk_t *self, zchunk_t *source)
 {
     assert (self);
+    assert (zchunk_is (self));
     assert (source);
+    assert (zchunk_is (source));
 
     //  We can take at most this many bytes from source
     size_t size = source->size - source->consumed;
@@ -199,6 +224,8 @@ bool
 zchunk_exhausted (zchunk_t *self)
 {
     assert (self);
+    assert (zchunk_is (self));
+
     assert (self->consumed <= self->size);
     return self->consumed == self->size;
 }
@@ -211,6 +238,7 @@ zchunk_t *
 zchunk_read (FILE *handle, size_t bytes)
 {
     assert (handle);
+
     zchunk_t *self = zchunk_new (NULL, bytes);
     self->size = fread (self->data, 1, bytes, handle);
     return self;
@@ -223,6 +251,9 @@ zchunk_read (FILE *handle, size_t bytes)
 int
 zchunk_write (zchunk_t *self, FILE *handle)
 {
+    assert (self);
+    assert (zchunk_is (self));
+
     size_t items = fwrite (self->data, 1, self->size, handle);
     int rc = (items < self->size)? -1: 0;
     return rc;
@@ -237,6 +268,8 @@ zchunk_t *
 zchunk_dup (zchunk_t *self)
 {
     assert (self);
+    assert (zchunk_is (self));
+
     return zchunk_new (self->data, self->max_size);
 }
 
@@ -247,6 +280,9 @@ zchunk_dup (zchunk_t *self)
 void
 zchunk_fprint (zchunk_t *self, FILE *file)
 {
+    assert (self);
+    assert (zchunk_is (self));
+
     fprintf (file, "--------------------------------------\n");
     if (!self) {
         fprintf (file, "NULL");
@@ -288,7 +324,21 @@ zchunk_fprint (zchunk_t *self, FILE *file)
 void
 zchunk_print (zchunk_t *self)
 {
+    assert (self);
+    assert (zchunk_is (self));
+
     zchunk_fprint (self, stderr);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Probe the supplied object, and report if it looks like a zchunk_t.
+
+bool
+zchunk_is (void *self)
+{
+    assert (self);
+    return ((zchunk_t *) self)->tag == ZCHUNK_TAG;
 }
 
 
