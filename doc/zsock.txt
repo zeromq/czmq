@@ -59,6 +59,10 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zsock_wait (zsock_t *self);
 
+//  Probe the supplied object, and report if it looks like a zsock_t.
+CZMQ_EXPORT bool
+    zsock_is (void *self);
+
 //  Probe the supplied reference. If it looks like a zsock_t instance,
 //  return the underlying libzmq socket handle; else if it looks like
 //  a libzmq socket handle, return the supplied value.
@@ -122,7 +126,7 @@ EXAMPLE
 
     //  Test binding to ports
     int port = zsock_bind (writer, "tcp://%s:*", "127.0.0.1");
-    assert (port >= ZSOCK_DYNFROM && port <= ZSOCK_DYNTO);
+    assert (port >= DYNAMIC_FIRST && port <= DYNAMIC_LAST);
 
     //  Test error state when connecting to an invalid socket type
     //  ('txp://' instead of 'tcp://', typo intentional)
