@@ -93,10 +93,10 @@ zframe_destroy (zframe_t **self_p)
 //  zpoller or zloop.
 
 zframe_t *
-zframe_recv (zsock_t *source)
+zframe_recv (void *source)
 {
     assert (source);
-    void *handle = zsock_resolve (source);
+    void *handle = zsock_resolve ((zsock_t *) source);
     zframe_t *self = zframe_new (NULL, 0);
     if (self) {
         if (zmq_recvmsg (handle, &self->zmsg, 0) < 0) {
@@ -114,12 +114,12 @@ zframe_recv (zsock_t *source)
 //  set or the attempt to send the message errors out.
 
 int
-zframe_send (zframe_t **self_p, zsock_t *dest, int flags)
+zframe_send (zframe_t **self_p, void *dest, int flags)
 {
     assert (dest);
     assert (self_p);
 
-    void *handle = zsock_resolve (dest);
+    void *handle = zsock_resolve ((zsock_t *) dest);
     if (*self_p) {
         zframe_t *self = *self_p;
         int send_flags = (flags & ZFRAME_MORE)? ZMQ_SNDMORE: 0;
@@ -341,10 +341,11 @@ zframe_reset (zframe_t *self, const void *data, size_t size)
 //  NULL if there was no input waiting, or if the read was interrupted.
 
 zframe_t *
-zframe_recv_nowait (zsock_t *source)
+zframe_recv_nowait (void *source)
 {
     assert (source);
-    void *handle = zsock_resolve (source);
+    void *handle = zsock_resolve ((zsock_t *) source);
+    
     zframe_t *self = zframe_new (NULL, 0);
     if (self) {
         if (zmq_recvmsg (handle, &self->zmsg, ZMQ_DONTWAIT) < 0) {

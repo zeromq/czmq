@@ -91,14 +91,14 @@ zmsg_destroy (zmsg_t **self_p)
 //  call, use the zloop or zpoller class to receive only from ready sockets.
 
 zmsg_t *
-zmsg_recv (zsock_t *source)
+zmsg_recv (void *source)
 {
     assert (source);
     zmsg_t *self = zmsg_new ();
     if (!self)
         return NULL;
 
-    void *handle = zsock_resolve (source);
+    void *handle = zsock_resolve ((zsock_t *) source);
     while (true) {
         zframe_t *frame = zframe_recv (handle);
         if (!frame) {
@@ -122,14 +122,14 @@ zmsg_recv (zsock_t *source)
 //  if zmsg is null.
 
 int
-zmsg_send (zmsg_t **self_p, zsock_t *dest)
+zmsg_send (zmsg_t **self_p, void *dest)
 {
     assert (self_p);
     assert (dest);
     zmsg_t *self = *self_p;
 
     int rc = 0;
-    void *handle = zsock_resolve (dest);
+    void *handle = zsock_resolve ((zsock_t *) dest);
     if (zlist_size (self->frames) == 0)
         return -1;
     else

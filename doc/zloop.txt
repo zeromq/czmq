@@ -9,7 +9,7 @@ SYNOPSIS
 --------
 ----
 //  Callback function for reactor socket activity
-typedef int (zloop_reader_fn) (zloop_t *loop, zsock_t *reader, void *arg);
+typedef int (zloop_reader_fn) (zloop_t *loop, void *reader, void *arg);
 
 //  Callback function for reactor events (low-level)
 typedef int (zloop_fn) (zloop_t *loop, zmq_pollitem_t *item, void *arg);
@@ -106,6 +106,7 @@ EXAMPLE
     zsock_t *output = zsock_new (ZMQ_PAIR);
     assert (output);
     zsock_bind (output, "inproc://zloop.test");
+    
     zsock_t *input = zsock_new (ZMQ_PAIR);
     assert (input);
     zsock_connect (input, "inproc://zloop.test");

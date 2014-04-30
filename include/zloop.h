@@ -20,7 +20,7 @@ extern "C" {
 
 //  @interface
 //  Callback function for reactor socket activity
-typedef int (zloop_reader_fn) (zloop_t *loop, zsock_t *reader, void *arg);
+typedef int (zloop_reader_fn) (zloop_t *loop, void *reader, void *arg);
 
 //  Callback function for reactor events (low-level)
 typedef int (zloop_fn) (zloop_t *loop, zmq_pollitem_t *item, void *arg);
