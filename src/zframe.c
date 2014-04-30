@@ -26,9 +26,14 @@
 
 #include "../include/czmq.h"
 
+//  zframe_t instances always have this tag as the first 4 octets of
+//  their data, which lets us do runtime object typing & validation.
+#define ZFRAME_TAG              0x0002cafe
+
 //  Structure of our class
 
 struct _zframe_t {
+    uint32_t tag;               //  Object tag for runtime detection
     zmq_msg_t zmsg;             //  zmq_msg_t blob for frame
     int more;                   //  More flag, from last read
 };
@@ -41,17 +46,16 @@ zframe_t *
 zframe_new (const void *data, size_t size)
 {
     zframe_t *self = (zframe_t *) zmalloc (sizeof (zframe_t));
-    if (!self)
-        return NULL;
-
-    if (size) {
-        zmq_msg_init_size (&self->zmsg, size);
-        if (data)
-            memcpy (zmq_msg_data (&self->zmsg), data, size);
+    if (self) {
+        self->tag = ZFRAME_TAG;
+        if (size) {
+            zmq_msg_init_size (&self->zmsg, size);
+            if (data)
+                memcpy (zmq_msg_data (&self->zmsg), data, size);
+        }
+        else
+            zmq_msg_init (&self->zmsg);
     }
-    else
-        zmq_msg_init (&self->zmsg);
-
     return self;
 }
 
@@ -63,10 +67,10 @@ zframe_t *
 zframe_new_empty (void)
 {
     zframe_t *self = (zframe_t *) zmalloc (sizeof (zframe_t));
-    if (!self)
-        return NULL;
-
-    zmq_msg_init (&self->zmsg);
+    if (self) {
+        self->tag = ZFRAME_TAG;
+        zmq_msg_init (&self->zmsg);
+    }
     return self;
 }
 
@@ -80,7 +84,9 @@ zframe_destroy (zframe_t **self_p)
     assert (self_p);
     if (*self_p) {
         zframe_t *self = *self_p;
+        assert (zframe_is (self));
         zmq_msg_close (&self->zmsg);
+        self->tag = 0xDeadBeef;
         free (self);
         *self_p = NULL;
     }
@@ -93,10 +99,10 @@ zframe_destroy (zframe_t **self_p)
 //  zpoller or zloop.
 
 zframe_t *
-zframe_recv (zsock_t *source)
+zframe_recv (void *source)
 {
     assert (source);
-    void *handle = zsock_resolve (source);
+    void *handle = zsock_resolve ((zsock_t *) source);
     zframe_t *self = zframe_new (NULL, 0);
     if (self) {
         if (zmq_recvmsg (handle, &self->zmsg, 0) < 0) {
@@ -114,14 +120,16 @@ zframe_recv (zsock_t *source)
 //  set or the attempt to send the message errors out.
 
 int
-zframe_send (zframe_t **self_p, zsock_t *dest, int flags)
+zframe_send (zframe_t **self_p, void *dest, int flags)
 {
     assert (dest);
     assert (self_p);
 
-    void *handle = zsock_resolve (dest);
+    void *handle = zsock_resolve ((zsock_t *) dest);
     if (*self_p) {
         zframe_t *self = *self_p;
+        assert (zframe_is (self));
+
         int send_flags = (flags & ZFRAME_MORE)? ZMQ_SNDMORE: 0;
         send_flags |= (flags & ZFRAME_DONTWAIT)? ZMQ_DONTWAIT: 0;
         if (flags & ZFRAME_REUSE) {
@@ -151,6 +159,8 @@ size_t
 zframe_size (zframe_t *self)
 {
     assert (self);
+    assert (zframe_is (self));
+
     return zmq_msg_size (&self->zmsg);
 }
 
@@ -162,6 +172,8 @@ byte *
 zframe_data (zframe_t *self)
 {
     assert (self);
+    assert (zframe_is (self));
+
     return (byte *) zmq_msg_data (&self->zmsg);
 }
 
@@ -172,8 +184,10 @@ zframe_data (zframe_t *self)
 zframe_t *
 zframe_dup (zframe_t *self)
 {
-    if (self)
+    if (self) {
+        assert (zframe_is (self));
         return zframe_new (zframe_data (self), zframe_size (self));
+    }
     else
         return NULL;
 }
@@ -186,6 +200,9 @@ zframe_dup (zframe_t *self)
 char *
 zframe_strhex (zframe_t *self)
 {
+    assert (self);
+    assert (zframe_is (self));
+
     static const char
         hex_char [] = "0123456789ABCDEF";
 
@@ -210,6 +227,9 @@ zframe_strhex (zframe_t *self)
 char *
 zframe_strdup (zframe_t *self)
 {
+    assert (self);
+    assert (zframe_is (self));
+
     size_t size = zframe_size (self);
     char *string = (char *) malloc (size + 1);
     memcpy (string, zframe_data (self), size);
@@ -225,6 +245,8 @@ bool
 zframe_streq (zframe_t *self, const char *string)
 {
     assert (self);
+    assert (zframe_is (self));
+
     if (zframe_size (self) == strlen (string)
     &&  memcmp (zframe_data (self), string, strlen (string)) == 0)
         return true;
@@ -241,6 +263,8 @@ int
 zframe_more (zframe_t *self)
 {
     assert (self);
+    assert (zframe_is (self));
+
     return self->more;
 }
 
@@ -253,7 +277,9 @@ void
 zframe_set_more (zframe_t *self, int more)
 {
     assert (self);
+    assert (zframe_is (self));
     assert (more == 0 || more == 1);
+
     self->more = more;
 }
 
@@ -265,14 +291,35 @@ bool
 zframe_eq (zframe_t *self, zframe_t *other)
 {
     if (!self || !other)
-        return false;
-    else
-    if (zframe_size (self) == zframe_size (other)
-    && memcmp (zframe_data (self), zframe_data (other),
-               zframe_size (self)) == 0)
-        return true;
-    else
-        return false;
+        return false;           //  Tolerate null references here
+    else {
+        assert (zframe_is (self));
+        assert (zframe_is (other));
+
+        if (zframe_size (self) == zframe_size (other)
+        && memcmp (zframe_data (self),
+                   zframe_data (other),
+                   zframe_size (self)) == 0)
+            return true;
+        else
+            return false;
+    }
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set new contents for frame
+
+void
+zframe_reset (zframe_t *self, const void *data, size_t size)
+{
+    assert (self);
+    assert (zframe_is (self));
+    assert (data);
+
+    zmq_msg_close (&self->zmsg);
+    zmq_msg_init_size (&self->zmsg, size);
+    memcpy (zmq_msg_data (&self->zmsg), data, size);
 }
 
 
@@ -283,6 +330,8 @@ void
 zframe_fprint (zframe_t *self, const char *prefix, FILE *file)
 {
     assert (self);
+    assert (zframe_is (self));
+
     if (prefix)
         fprintf (file, "%s", prefix);
     byte *data = zframe_data (self);
@@ -312,26 +361,26 @@ zframe_fprint (zframe_t *self, const char *prefix, FILE *file)
 
 
 //  --------------------------------------------------------------------------
-//  Print contents of frame to stderr, prefix is ignored if null.
+//  Print contents of frame to stdout, prefix is ignored if null.
 
 void
 zframe_print (zframe_t *self, const char *prefix)
 {
-    zframe_fprint (self, prefix, stderr);
+    assert (self);
+    assert (zframe_is (self));
+
+    zframe_fprint (self, prefix, stdout);
 }
 
 
 //  --------------------------------------------------------------------------
-//  Set new contents for frame
+//  Probe the supplied object, and report if it looks like a zframe_t.
 
-void
-zframe_reset (zframe_t *self, const void *data, size_t size)
+bool
+zframe_is (void *self)
 {
     assert (self);
-    assert (data);
-    zmq_msg_close (&self->zmsg);
-    zmq_msg_init_size (&self->zmsg, size);
-    memcpy (zmq_msg_data (&self->zmsg), data, size);
+    return ((zframe_t *) self)->tag == ZFRAME_TAG;
 }
 
 
@@ -341,10 +390,11 @@ zframe_reset (zframe_t *self, const void *data, size_t size)
 //  NULL if there was no input waiting, or if the read was interrupted.
 
 zframe_t *
-zframe_recv_nowait (zsock_t *source)
+zframe_recv_nowait (void *source)
 {
     assert (source);
-    void *handle = zsock_resolve (source);
+    void *handle = zsock_resolve ((zsock_t *) source);
+    
     zframe_t *self = zframe_new (NULL, 0);
     if (self) {
         if (zmq_recvmsg (handle, &self->zmsg, ZMQ_DONTWAIT) < 0) {

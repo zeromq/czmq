@@ -39,12 +39,12 @@ CZMQ_EXPORT void
 //  was interrupted. Does a blocking recv, if you want to not block then use
 //  zframe_recv_nowait().
 CZMQ_EXPORT zframe_t *
-    zframe_recv (zsock_t *source);
+    zframe_recv (void *source);
 
 // Send a frame to a socket, destroy frame after sending.
 // Return -1 on error, 0 on success.
 CZMQ_EXPORT int
-    zframe_send (zframe_t **self_p, zsock_t *dest, int flags);
+    zframe_send (zframe_t **self_p, void *dest, int flags);
 
 //  Return number of bytes in frame data
 CZMQ_EXPORT size_t
@@ -85,21 +85,21 @@ CZMQ_EXPORT void
 CZMQ_EXPORT bool
     zframe_eq (zframe_t *self, zframe_t *other);
 
-//   Print contents of the frame to FILE stream.
-CZMQ_EXPORT void
-    zframe_fprint (zframe_t *self, const char *prefix, FILE *file);
-
-//  Print contents of frame to stderr
-CZMQ_EXPORT void
-    zframe_print (zframe_t *self, const char *prefix);
-
 //  Set new contents for frame
 CZMQ_EXPORT void
     zframe_reset (zframe_t *self, const void *data, size_t size);
 
-//  Put a block of data to the frame payload.
-CZMQ_EXPORT int
-    zframe_put_block (zframe_t *self, byte *data, size_t size);
+//   Print contents of the frame to FILE stream.
+CZMQ_EXPORT void
+    zframe_fprint (zframe_t *self, const char *prefix, FILE *file);
+
+//  Print contents of frame to stdout
+CZMQ_EXPORT void
+    zframe_print (zframe_t *self, const char *prefix);
+
+//  Probe the supplied object, and report if it looks like a zframe_t.
+CZMQ_EXPORT bool
+    zframe_is (void *self);
 
 //  Self test of this class
 CZMQ_EXPORT int
@@ -110,7 +110,7 @@ CZMQ_EXPORT int
 //  Receive a new frame off the socket. Returns newly allocated frame, or
 //  NULL if there was no input waiting, or if the read was interrupted.
 CZMQ_EXPORT zframe_t *
-    zframe_recv_nowait (zsock_t *source);
+    zframe_recv_nowait (void *source);
 
 //  Deprecated method aliases
 #define zframe_print_to_stream(s,p,F) zframe_fprint(s,p,F)

@@ -23,13 +23,14 @@
 
 #include "../include/czmq.h"
 
-//  Tag to probe for, for runtime identification of zsock instances
-#define ZSOCK_TAG           0x0000cafe
+//  zsock_t instances always have this tag as the first 4 octets of
+//  their data, which lets us do runtime object typing & validation.
+#define ZSOCK_TAG           0x0004cafe
 
 //  This port range is defined by IANA for dynamic or private ports
 //  We use this when choosing a port for dynamic binding.
-#define ZSOCK_DYNFROM       0xc000
-#define ZSOCK_DYNTO         0xffff
+#define DYNAMIC_FIRST       0xc000
+#define DYNAMIC_LAST        0xffff
 
 //  Global context
 zctx_t *global_context = NULL;
@@ -53,8 +54,7 @@ s_destroy_global_context (void)
 
 //  --------------------------------------------------------------------------
 //  Create a new socket.
-
-//  TODO: threading class should set-up thread-local context correctly.
+//  TODO: set-up global context safely using a mutex.
 
 zsock_t *
 zsock_new (int type)
@@ -88,7 +88,8 @@ zsock_destroy (zsock_t **self_p)
     assert (self_p);
     if (*self_p) {
         zsock_t *self = *self_p;
-        assert (self->tag == ZSOCK_TAG);
+        assert (zsock_is (self));
+        self->tag = 0xDeadBeef;
         zctx__socket_destroy (global_context, self->handle);
         free (self);
         *self_p = NULL;
@@ -108,7 +109,7 @@ int
 zsock_bind (zsock_t *self, const char *format, ...)
 {
     assert (self);
-    assert (self->tag == ZSOCK_TAG);
+    assert (zsock_is (self));
 
     //  Ephemeral port endpoint needs 4 additional characters
     char endpoint [256 + 4];
@@ -125,11 +126,11 @@ zsock_bind (zsock_t *self, const char *format, ...)
     if (tcp_endpoint
     &&  endpoint [endpoint_size - 2] == ':'
     &&  endpoint [endpoint_size - 1] == '*') {
-        //  Always start at ZSOCK_DYNFROM; this makes reuse collisions
+        //  Always start at DYNAMIC_FORST; this makes reuse collisions
         //  more likely, and forces protocol designers to think about
         //  this upfront.
-        int port = ZSOCK_DYNFROM;
-        while (port <= ZSOCK_DYNTO) {
+        int port = DYNAMIC_FIRST;
+        while (port <= DYNAMIC_LAST) {
             //  Try to bind on the next plausible port
             sprintf (endpoint + endpoint_size - 1, "%d", port);
             if (zmq_bind (self->handle, endpoint) == 0)
@@ -160,7 +161,7 @@ int
 zsock_unbind (zsock_t *self, const char *format, ...)
 {
     assert (self);
-    assert (self->tag == ZSOCK_TAG);
+    assert (zsock_is (self));
 
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0))
     char endpoint [256];
@@ -183,7 +184,7 @@ int
 zsock_connect (zsock_t *self, const char *format, ...)
 {
     assert (self);
-    assert (self->tag == ZSOCK_TAG);
+    assert (zsock_is (self));
 
     char endpoint [256];
     va_list argptr;
@@ -202,7 +203,7 @@ int
 zsock_disconnect (zsock_t *self, const char *format, ...)
 {
     assert (self);
-    assert (self->tag == ZSOCK_TAG);
+    assert (zsock_is (self));
 
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0))
     char endpoint [256];
@@ -224,7 +225,7 @@ const char *
 zsock_type_str (zsock_t *self)
 {
     assert (self);
-    assert (self->tag == ZSOCK_TAG);
+    assert (zsock_is (self));
 
     char *type_name [] = {
         "PAIR", "PUB", "SUB", "REQ", "REP",
@@ -244,7 +245,7 @@ int
 zsock_signal (zsock_t *self)
 {
     assert (self);
-    assert (self->tag == ZSOCK_TAG);
+    assert (zsock_is (self));
 
     zmq_msg_t msg;
     zmq_msg_init_size (&msg, 0);
@@ -266,7 +267,7 @@ int
 zsock_wait (zsock_t *self)
 {
     assert (self);
-    assert (self->tag == ZSOCK_TAG);
+    assert (zsock_is (self));
 
     zmq_msg_t msg;
     zmq_msg_init (&msg);
@@ -274,6 +275,17 @@ zsock_wait (zsock_t *self)
         return -1;
     else
         return 0;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Probe the supplied object, and report if it looks like a zsock_t.
+
+bool
+zsock_is (void *self)
+{
+    assert (self);
+    return ((zsock_t *) self)->tag == ZSOCK_TAG;
 }
 
 
@@ -286,7 +298,7 @@ void *
 zsock_resolve (void *self)
 {
     assert (self);
-    if (((zsock_t *) self)->tag == ZSOCK_TAG)
+    if (zsock_is (self))
         return ((zsock_t *) self)->handle;
     else
         return self;
@@ -340,7 +352,7 @@ zsock_test (bool verbose)
 
     //  Test binding to ports
     int port = zsock_bind (writer, "tcp://%s:*", "127.0.0.1");
-    assert (port >= ZSOCK_DYNFROM && port <= ZSOCK_DYNTO);
+    assert (port >= DYNAMIC_FIRST && port <= DYNAMIC_LAST);
 
     //  Test error state when connecting to an invalid socket type
     //  ('txp://' instead of 'tcp://', typo intentional)

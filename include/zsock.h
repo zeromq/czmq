@@ -70,6 +70,10 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zsock_wait (zsock_t *self);
 
+//  Probe the supplied object, and report if it looks like a zsock_t.
+CZMQ_EXPORT bool
+    zsock_is (void *self);
+
 //  Probe the supplied reference. If it looks like a zsock_t instance,
 //  return the underlying libzmq socket handle; else if it looks like
 //  a libzmq socket handle, return the supplied value.
