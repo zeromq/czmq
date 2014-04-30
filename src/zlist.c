@@ -260,6 +260,11 @@ zlist_remove (zlist_t *self, void *item)
             self->tail = prev;
         if (self->cursor == node)
             self->cursor = prev;
+        if (node->free_fn)
+            (node->free_fn) (node->item);
+        else
+        if (self->autofree)
+            free (node->item);
         free (node);
         self->size--;
     }
