@@ -28,12 +28,12 @@ CZMQ_EXPORT void
 //  was interrupted. Does a blocking recv, if you want to not block then use
 //  zframe_recv_nowait().
 CZMQ_EXPORT zframe_t *
-    zframe_recv (zsock_t *source);
+    zframe_recv (void *source);
 
 // Send a frame to a socket, destroy frame after sending.
 // Return -1 on error, 0 on success.
 CZMQ_EXPORT int
-    zframe_send (zframe_t **self_p, zsock_t *dest, int flags);
+    zframe_send (zframe_t **self_p, void *dest, int flags);
 
 //  Return number of bytes in frame data
 CZMQ_EXPORT size_t
