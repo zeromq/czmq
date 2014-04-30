@@ -79,6 +79,10 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zchunk_print (zchunk_t *self);
 
+//  Probe the supplied object, and report if it looks like a zchunk_t.
+CZMQ_EXPORT bool
+    zchunk_is (void *self);
+
 //  Self test of this class
 CZMQ_EXPORT int
     zchunk_test (bool verbose);

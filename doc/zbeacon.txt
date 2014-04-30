@@ -77,7 +77,7 @@ EXAMPLE
 
     //  Create a service socket and bind to an ephemeral port
     void *service = zsocket_new (ctx, ZMQ_PUB);
-    int port_nbr = zsocket_bind (service, "tcp://*:*");
+    int port_nbr = zsocket_bind (service, "tcp://127.0.0.1:*");
     
     //  Create beacon to broadcast our service
     byte announcement [2] = { (port_nbr >> 8) & 0xFF, port_nbr & 0xFF };
