@@ -20,9 +20,9 @@
 
 //  CZMQ version macros for compile-time API detection
 
-#define CZMQ_VERSION_MAJOR 2
-#define CZMQ_VERSION_MINOR 2
-#define CZMQ_VERSION_PATCH 1
+#define CZMQ_VERSION_MAJOR 3
+#define CZMQ_VERSION_MINOR 0
+#define CZMQ_VERSION_PATCH 0
 
 #define CZMQ_MAKE_VERSION(major, minor, patch) \
     ((major) * 10000 + (minor) * 100 + (patch))
@@ -30,6 +30,7 @@
     CZMQ_MAKE_VERSION(CZMQ_VERSION_MAJOR, CZMQ_VERSION_MINOR, CZMQ_VERSION_PATCH)
 
 //  Opaque class structures to allow forward references
+typedef struct _zactor_t zactor_t;
 typedef struct _zauth_t zauth_t;
 typedef struct _zbeacon_t zbeacon_t;
 typedef struct _zcert_t zcert_t;
@@ -57,6 +58,7 @@ typedef struct _zsock_monitor_t zsock_monitor_t;
 typedef struct _zuuid_t zuuid_t;
 
 //  Public API classes
+#include "zactor.h"
 #include "zauth.h"
 #include "zbeacon.h"
 #include "zcert.h"
