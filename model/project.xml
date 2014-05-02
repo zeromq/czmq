@@ -5,6 +5,7 @@
     <header name = "czmq" />
     <header name = "czmq_prelude" />
 
+    <class name = "zactor" />
     <class name = "zauth" />
     <class name = "zbeacon" />
     <class name = "zcert" />
@@ -21,9 +22,7 @@
     <class name = "zlist" />
     <class name = "zlog" />
     <class name = "zloop" />
-    <class name = "zmonitor" />
     <class name = "zmsg" />
-    <class name = "zmutex" />
     <class name = "zpoller" />
     <class name = "zproxy" />
     <class name = "zrex" />
@@ -34,9 +33,11 @@
     <class name = "zsys" />
     <class name = "zuuid" />
 
-    <!-- Deprecated, remove after 3.0 -->
-    <class name = "zthread" />
+    <!-- Experimentally deprecated, remove some time after 3.0 -->
     <class name = "zctx" />
+    <class name = "zmonitor" />
+    <class name = "zmutex" />
     <class name = "zsocket" />
     <class name = "zsockopt" />
+    <class name = "zthread" />
 </project>
