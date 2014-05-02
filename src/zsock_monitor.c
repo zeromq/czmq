@@ -27,12 +27,10 @@
 
 //  Structure of our class
 struct _zsock_monitor_t {
+    zctx_t *ctx;                //  Need this until we can use zactor
     zsock_t *sock;              //  Socket being monitored
     void *pipe;                 //  Pipe through to backend agent
 };
-
-//  Global context
-extern zctx_t *global_context;
 
 
 //  Background task does the real I/O
@@ -50,7 +48,8 @@ zsock_monitor_new (zsock_t *sock)
     assert (self);
 
     //  Start background agent to connect to the inproc monitor socket
-    self->pipe = zthread_fork (global_context, s_agent_task, sock);
+    self->ctx = zctx_new ();
+    self->pipe = zthread_fork (self->ctx, s_agent_task, sock);
     if (self->pipe) {
         char *status = zstr_recv (self->pipe);
         if (strneq (status, "OK"))
@@ -76,6 +75,7 @@ zsock_monitor_destroy (zsock_monitor_t **self_p)
         zsock_monitor_t *self = *self_p;
         zstr_send (self->pipe, "TERMINATE");
         zsocket_wait (self->pipe);
+        zctx_destroy (&self->ctx);
         free (self);
         *self_p = NULL;
     }
@@ -153,7 +153,7 @@ typedef struct {
     void *pipe;             //  Socket back to application
     zpoller_t *poller;      //  Activity poller
     void *monitored;        //  Monitored socket
-    void *sink;             //  Sink for monitor events
+    zsock_t *sink;          //  Sink for monitor events
     int events;             //  Monitored event mask
     bool verbose;           //  Trace activity to stdout
     bool terminated;
@@ -180,6 +180,7 @@ s_agent_destroy (agent_t **self_p)
         agent_t *self = *self_p;
         zmq_socket_monitor (self->monitored, NULL, 0);
         zpoller_destroy (&self->poller);
+        zsock_destroy (&self->sink);
         free (self);
         *self_p = NULL;
     }
@@ -192,10 +193,9 @@ s_agent_start (agent_t *self)
     char *endpoint = zsys_sprintf ("inproc://zsock_monitor-%p", self->monitored);
     int rc = zmq_socket_monitor (self->monitored, endpoint, self->events);
     assert (rc == 0);
-    //  TODO: replace with zsock_t instance
-    self->sink = zsocket_new (global_context, ZMQ_PAIR);
+    self->sink = zsock_new (ZMQ_PAIR);
     assert (self->sink);
-    rc = zsocket_connect (self->sink, "%s", endpoint);
+    rc = zsock_connect (self->sink, "%s", endpoint);
     assert (rc == 0);
     zpoller_add (self->poller, self->sink);
     free (endpoint);
