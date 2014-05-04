@@ -8,12 +8,14 @@ zactor - simple actor framework
 SYNOPSIS
 --------
 ----
+//  Actors get arguments from caller
+typedef void (zactor_fn) (void *args);
 
-//  Create a new actor.
+//  Create a new actor passing arbitrary arguments reference.
 CZMQ_EXPORT zactor_t *
-    zactor_new (void);
+    zactor_new (zactor_fn *task, void *args);
 
-//  Destroy the actor.
+//  Destroy an actor.
 CZMQ_EXPORT void
     zactor_destroy (zactor_t **p_self);
 
@@ -42,7 +44,7 @@ EXAMPLE
 -------
 .From zactor_test method
 ----
-    zactor_t *actor = zactor_new ();
+    zactor_t *actor = zactor_new (NULL, NULL);
     assert (actor);
     zactor_destroy (&actor);
 ----
