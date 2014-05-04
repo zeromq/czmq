@@ -803,7 +803,7 @@ zconfig_test (bool verbose)
     zconfig_save (root, TESTDIR "/test.cfg");
     zconfig_destroy (&root);
 
-    // Test improperly terminated config files
+    //  Test improperly terminated config files
     char *chunk_data = "section\n    value = somevalue";
     zchunk_t *chunk = zchunk_new (chunk_data, strlen (chunk_data));
     assert (chunk);
