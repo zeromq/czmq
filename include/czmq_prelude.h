@@ -552,6 +552,8 @@ typedef int SOCKET;
 #   define ZMQ_POLL_MSEC    1000        //  zmq_poll is usec
 #   define zmq_sendmsg      zmq_send    //  Smooth out 2.x changes
 #   define zmq_recvmsg      zmq_recv
+#   define zmq_ctx_new      zmq_init
+#   define zmq_ctx_term     zmq_term
     //  Older libzmq APIs may be missing some aspects of libzmq v3.0
 #   ifndef ZMQ_ROUTER
 #       define ZMQ_ROUTER       ZMQ_XREP
