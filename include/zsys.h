@@ -24,6 +24,12 @@ extern "C" {
 //  Callback for interrupt signal handler
 typedef void (zsys_handler_fn) (int signal_value);
 
+//  Get a new ZMQ socket, automagically creating a ZMQ context
+//  if this is the first time. Caller is responsible for destroying
+//  the ZMQ socket before process exits, to avoid a ZMQ deadlock.
+CZMQ_EXPORT void *
+    zsys_socket (int type);
+
 //  Set interrupt handler (NULL means external handler)
 CZMQ_EXPORT void
     zsys_handler_set (zsys_handler_fn *handler_fn);

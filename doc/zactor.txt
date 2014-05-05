@@ -1,0 +1,54 @@
+zactor(3)
+=========
+
+NAME
+----
+zactor - simple actor framework
+
+SYNOPSIS
+--------
+----
+//  Actors get arguments from caller
+typedef void (zactor_fn) (void *args);
+
+//  Create a new actor passing arbitrary arguments reference.
+CZMQ_EXPORT zactor_t *
+    zactor_new (zactor_fn *task, void *args);
+
+//  Destroy an actor.
+CZMQ_EXPORT void
+    zactor_destroy (zactor_t **p_self);
+
+//  Probe the supplied object, and report if it looks like a zactor_t.
+CZMQ_EXPORT bool
+    zactor_is (void *self);
+
+//  Probe the supplied reference. If it looks like a zactor_t instance,
+//  return the underlying libzmq actor handle; else if it looks like
+//  a libzmq actor handle, return the supplied value.
+CZMQ_EXPORT void *
+    zactor_resolve (void *self);
+
+//  Self test of this class
+CZMQ_EXPORT int
+    zactor_test (bool verbose);
+----
+
+DESCRIPTION
+-----------
+
+The zactor class provides a simple actor framework.
+
+
+EXAMPLE
+-------
+.From zactor_test method
+----
+    zactor_t *actor = zactor_new (NULL, NULL);
+    assert (actor);
+    zactor_destroy (&actor);
+----
+
+SEE ALSO
+--------
+linkczmq:czmq[7]

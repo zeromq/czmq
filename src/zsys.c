@@ -44,6 +44,30 @@ static BOOL WINAPI s_handler_fn_shim (DWORD ctrltype)
 }
 #endif
 
+//  Global ZeroMQ context for this process
+void *process_ctx = NULL;
+
+static void
+s_destroy_process_ctx (void)
+{
+    zmq_ctx_term (process_ctx);
+}
+
+//  --------------------------------------------------------------------------
+//  Get a new ZMQ socket, automagically creating a ZMQ context
+//  if this is the first time. Caller is responsible for destroying
+//  the ZMQ socket before process exits, to avoid a ZMQ deadlock.
+
+void *
+zsys_socket (int type)
+{
+    if (!process_ctx) {
+        process_ctx = zmq_ctx_new ();
+        atexit (s_destroy_process_ctx);
+    }
+    return zmq_socket (process_ctx, type);
+}
+
 
 //  --------------------------------------------------------------------------
 //  Set interrupt handler (NULL means external handler)
