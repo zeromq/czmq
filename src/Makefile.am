@@ -82,7 +82,7 @@ libczmq_la_SOURCES = \
 
 AM_CFLAGS = -g
 AM_CPPFLAGS = -I$(top_srcdir)/include
-bin_PROGRAMS = czmq_selftest
+noinst_PROGRAMS = czmq_selftest
 czmq_selftest_LDADD = libczmq.la
 czmq_selftest_SOURCES = czmq_selftest.c
 
