@@ -76,6 +76,7 @@ find_package(ZeroMQ REQUIRED)
 set (czmq_headers
     include/czmq.h
     include/czmq_prelude.h
+    include/zactor.h
     include/zauth.h
     include/zbeacon.h
     include/zcert.h
@@ -92,9 +93,7 @@ set (czmq_headers
     include/zlist.h
     include/zlog.h
     include/zloop.h
-    include/zmonitor.h
     include/zmsg.h
-    include/zmutex.h
     include/zpoller.h
     include/zproxy.h
     include/zrex.h
@@ -104,10 +103,12 @@ set (czmq_headers
     include/zstr.h
     include/zsys.h
     include/zuuid.h
-    include/zthread.h
     include/zctx.h
+    include/zmonitor.h
+    include/zmutex.h
     include/zsocket.h
     include/zsockopt.h
+    include/zthread.h
 )
 source_group ("Header Files" FILES ${czmq_headers})
 install(FILES ${czmq_headers} DESTINATION include)
@@ -119,6 +120,7 @@ include_directories(${CZMQ_BINARY_DIR})
 include_directories(${CZMQ_SOURCE_DIR}/include)
 include_directories(${ZEROMQ_INCLUDE_DIRS})
 set (czmq_sources
+    src/zactor.c
     src/zauth.c
     src/zbeacon.c
     src/zcert.c
@@ -135,9 +137,7 @@ set (czmq_sources
     src/zlist.c
     src/zlog.c
     src/zloop.c
-    src/zmonitor.c
     src/zmsg.c
-    src/zmutex.c
     src/zpoller.c
     src/zproxy.c
     src/zrex.c
@@ -147,10 +147,12 @@ set (czmq_sources
     src/zstr.c
     src/zsys.c
     src/zuuid.c
-    src/zthread.c
     src/zctx.c
+    src/zmonitor.c
+    src/zmutex.c
     src/zsocket.c
     src/zsockopt.c
+    src/zthread.c
 )
 source_group ("Source Files" FILES ${czmq_sources})
 add_library(czmq SHARED ${czmq_sources})

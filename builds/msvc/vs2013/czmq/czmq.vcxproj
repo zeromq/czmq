@@ -183,6 +183,9 @@
     <ClInclude Include="..\..\..\..\include\czmq_prelude.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\src\zactor.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zauth.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
@@ -231,13 +234,7 @@
     <ClCompile Include="..\..\..\..\src\zloop.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zmonitor.c">
-      <CompileAs>CompileAsCpp</CompileAs>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zmsg.c">
-      <CompileAs>CompileAsCpp</CompileAs>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zmutex.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\zpoller.c">
@@ -267,16 +264,22 @@
     <ClCompile Include="..\..\..\..\src\zuuid.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zthread.c">
+    <ClCompile Include="..\..\..\..\src\zctx.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zctx.c">
+    <ClCompile Include="..\..\..\..\src\zmonitor.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\zmutex.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\zsocket.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\zsockopt.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\zthread.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
   </ItemGroup>

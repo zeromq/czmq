@@ -32,24 +32,13 @@
 #define DYNAMIC_FIRST       0xc000
 #define DYNAMIC_LAST        0xffff
 
-//  Global context
-zctx_t *global_context = NULL;
-
 //  Structure of our class
 
 struct _zsock_t {
     uint32_t tag;               //  Object tag for runtime detection
-    zctx_t *context;            //  The CZMQ context for the socket
     void *handle;               //  The libzmq socket handle
     int type;                   //  The socket type
 };
-
-
-static void
-s_destroy_global_context (void)
-{
-    zctx_destroy (&global_context);
-}
 
 
 //  --------------------------------------------------------------------------
@@ -59,16 +48,12 @@ s_destroy_global_context (void)
 zsock_t *
 zsock_new (int type)
 {
-    if (!global_context) {
-        global_context = zctx_new ();
-        atexit (s_destroy_global_context);
-    }
     zsock_t *self = (zsock_t *) zmalloc (sizeof (zsock_t));
     if (!self)
         return NULL;
 
     self->tag = ZSOCK_TAG;
-    self->handle = zctx__socket_new (global_context, type);
+    self->handle = zsys_socket (type);
     self->type = type;
     if (!self->handle) {
         free (self);
@@ -90,7 +75,8 @@ zsock_destroy (zsock_t **self_p)
         zsock_t *self = *self_p;
         assert (zsock_is (self));
         self->tag = 0xDeadBeef;
-        zctx__socket_destroy (global_context, self->handle);
+        zsocket_set_linger (self->handle, 0);
+        zmq_close (self->handle);
         free (self);
         *self_p = NULL;
     }
