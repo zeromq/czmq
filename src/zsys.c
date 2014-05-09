@@ -634,6 +634,84 @@ zsys_daemonize (const char *workdir)
 
 
 //  --------------------------------------------------------------------------
+//  Drop the process ID into the lockfile, with exclusive lock, and switch
+//  the process to the specified group and/or user. Any of the arguments
+//  may be null, indicating a no-op. Returns 0 on success, -1 on failure.
+//  Note if you combine this with zsys_daemonize, run after, not before
+//  that method, or the lockfile will hold the wrong process ID.
+int
+zsys_run_as (const char *lockfile, const char *group, const char *user)
+{
+    //  Switch to effective user ID (who owns executable); for
+    //  system services this should be root, so that we can write
+    //  the PID file into e.g. /var/run/
+    if (seteuid (geteuid ())) {
+        zclock_log ("E: cannot set effective user id: %s\n",
+                    strerror (errno));
+        return -1;
+    }
+    if (lockfile) {
+        //  We enforce a lock on the lockfile, if specified, so that
+        //  only one copy of the process can run at once.
+        int handle = open (lockfile, O_RDWR | O_CREAT, 0640);
+        if (handle < 0) {
+            zclock_log ("E: cannot open lockfile '%s': %s\n",
+                        lockfile, strerror (errno));
+            return -1;
+        }
+        else {
+            struct flock filelock;
+            filelock.l_type   = F_WRLCK;    //  F_RDLCK, F_WRLCK, F_UNLCK
+            filelock.l_whence = SEEK_SET;   //  SEEK_SET, SEEK_CUR, SEEK_END
+            filelock.l_start  = 0;          //  Offset from l_whence
+            filelock.l_len    = 0;          //  length, 0 = to EOF
+            filelock.l_pid    = getpid ();
+            if (fcntl (handle, F_SETLK, &filelock)) {
+                zclock_log ("E: cannot get lock: %s\n", strerror (errno));
+                return -1;
+            }
+        }
+        //   We record the broker's process id in the lock file
+        char pid_buffer [10];
+        snprintf (pid_buffer, sizeof (pid_buffer), "%6d\n", getpid ());
+        if (write (handle, pid_buffer, strlen (pid_buffer)) != strlen (pid_buffer)) {
+            zclock_log ("E: cannot write to lockfile: %s\n",
+                        strerror (errno));
+            return -1;
+        }
+        close (handle);
+    }
+    if (group) {
+        zclock_log ("I: broker running under group '%s'", group);
+        struct group *grpbuf = NULL;
+        grpbuf = getgrnam (group);
+        if (grpbuf == NULL || setgid (grpbuf->gr_gid)) {
+            zclock_log ("E: could not switch group: %s", strerror (errno));
+            return -1;
+        }
+    }
+    if (user) {
+        zclock_log ("I: broker running under user '%s'", user);
+        struct passwd *pwdbuf = NULL;
+        pwdbuf = getpwnam (user);
+        if (pwdbuf == NULL || setuid (pwdbuf->pw_uid)) {
+            zclock_log ("E: could not switch user: %s", strerror (errno));
+            return -1;
+        }
+    }
+    else {
+        //  Switch back to real user ID (who started process)
+        if (setuid (getuid ())) {
+            zclock_log ("E: cannot set real user id: %s\n",
+                        strerror (errno));
+            return -1;
+        }
+    }
+    return 0;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Selftest
 
 int

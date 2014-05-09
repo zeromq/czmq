@@ -137,6 +137,14 @@ CZMQ_EXPORT void
 CZMQ_EXPORT int
     zsys_daemonize (const char *workdir);
 
+//  Drop the process ID into the lockfile, with exclusive lock, and switch
+//  the process to the specified group and/or user. Any of the arguments
+//  may be null, indicating a no-op. Returns 0 on success, -1 on failure.
+//  Note if you combine this with zsys_daemonize, run after, not before
+//  that method, or the lockfile will hold the wrong process ID.
+CZMQ_EXPORT int
+    zsys_run_as (const char *lockfile, const char *group, const char *user);
+
 //  Self test of this class
 CZMQ_EXPORT int
     zsys_test (bool verbose);
