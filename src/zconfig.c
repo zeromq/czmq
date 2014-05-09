@@ -383,12 +383,13 @@ zconfig_save (zconfig_t *self, const char *filename)
     else {
         FILE *file;
         file = fopen (filename, "w");
-        if (file)
+        if (file) {
             rc = zconfig_execute (self, s_config_save, file);
+            fflush (file);
+            fclose (file);
+        }
         else
             rc = -1;          //  File not writeable
-        fflush (file);
-        fclose (file);
     }
     return rc;
 }
@@ -812,6 +813,12 @@ zconfig_test (bool verbose)
     char *value = zconfig_resolve (root, "/section/value", NULL);
     assert (value);
     assert (streq (value, "somevalue"));
+
+    //  Test config can't be saved to a file in a path that doesn't
+    //  exist or isn't writable
+    int result = zconfig_save (root, TESTDIR "/path/that/doesnt/exist/test.cfg");
+    assert (result == -1);
+
     zconfig_destroy (&root);
     zchunk_destroy (&chunk);
     
