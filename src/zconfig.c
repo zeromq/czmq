@@ -82,6 +82,12 @@ static int
 static int
     s_config_save_chunk (zconfig_t *self, void *arg, int level);
 
+// Helper structure for saving config tree to chunck.
+typedef struct chunk_save_helper_s {
+  zchunk_t	*chunk;
+  size_t	size;
+} chunk_save_helper_t;
+
 
 //  --------------------------------------------------------------------------
 //  Constructor
@@ -328,7 +334,7 @@ s_config_execute (zconfig_t *self, zconfig_fct handler, void *arg, int level)
 
     //  Process all children in one go, as a list
     zconfig_t *child = self->child;
-    while (child && !rc) {
+    while (child) {
         rc = s_config_execute (child, handler, arg, level + 1);
         if (rc == -1)
             break;              //  -1 from callback means end execution
@@ -650,10 +656,17 @@ zchunk_t *
 zconfig_chunk_save (zconfig_t *self)
 {
     assert (self);
-    size_t out_count = (size_t) zconfig_execute (self, s_config_save_chunk, NULL);
-    printf ("OUT COUNT: %zd\n", out_count);
-    zchunk_t *chunk = zchunk_new (NULL, out_count);
-    zconfig_execute (self, s_config_save_chunk, zchunk_data (chunk));
+
+    chunk_save_helper_t param;
+    param.size = 0;
+    param.chunk = NULL;
+
+    zconfig_execute (self, s_config_save_chunk, &param);
+    zchunk_t *chunk = zchunk_new (NULL, param.size);
+    if (!chunk)
+      return NULL;
+    param.chunk = chunk;
+    zconfig_execute (self, s_config_save_chunk, &param);
     return chunk;
 }
 
@@ -669,7 +682,8 @@ s_config_save_chunk (zconfig_t *self, void *arg, int level)
     assert (arg);
 
     int out_count = 0;
-    zchunk_t *chunk = (zchunk_t *) arg;
+    chunk_save_helper_t *param = (chunk_save_helper_t *)arg;
+      zchunk_t *chunk = param->chunk;
 
     //  Store any comments on the item
     if (self->comments) {
@@ -701,6 +715,7 @@ s_config_save_chunk (zconfig_t *self, void *arg, int level)
         if (chunk)
             zchunk_append (chunk, curline, strlen (curline));
     }
+    param->size += out_count;
     return out_count;
 }
 
