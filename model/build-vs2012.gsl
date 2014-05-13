@@ -17,7 +17,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0C4A2E28-8C9E-4B27-85D9-BB679AD84AC7}</ProjectGuid>
     <ProjectName>$(project.name)</ProjectName>
-    <RootNamespace>$(project.name)11</RootNamespace>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="DebugDLL|Win32">
@@ -70,117 +70,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Configuration">
-    <PlatformToolset>v110</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='DebugDLL|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='ReleaseDLL|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='DebugDLL|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='ReleaseDLL|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='DebugLTCG|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='ReleaseLTCG|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='DebugLTCG|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='ReleaseLTCG|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='DebugLIB|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='ReleaseLIB|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='DebugLIB|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$\(Configuration)|$\(Platform)'=='ReleaseLIB|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-  </PropertyGroup>
+    <ConfigurationType Condition="$\(Configuration.IndexOf('DLL')) == -1">StaticLibrary</ConfigurationType>
+    <ConfigurationType Condition="$\(Configuration.IndexOf('DLL')) != -1">DynamicLibrary</ConfigurationType>
+  </PropertyGroup> 
   <Import Project="$\(VCTargetsPath)\\Microsoft.Cpp.Default.props" />
   <Import Project="$\(VCTargetsPath)\\Microsoft.Cpp.props" />
-  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='DebugDLL|Win32'" Label="PropertySheets">
-    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$\(ProjectDir)..\\..\\properties\\$\(Configuration).props" />
+    <Import Project="$\(ProjectDir)..\\..\\properties\\Output.props" />
     <Import Project="$\(ProjectDir)$\(ProjectName).props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\DynamicDebug.props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\Win32.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='ReleaseDLL|Win32'" Label="PropertySheets">
-    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$\(ProjectDir)$\(ProjectName).props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\DynamicRelease.props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\Win32.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='DebugDLL|x64'" Label="PropertySheets">
-    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$\(ProjectDir)$\(ProjectName).props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\DynamicDebug.props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\x64.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='ReleaseDLL|x64'" Label="PropertySheets">
-    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$\(ProjectDir)$\(ProjectName).props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\DynamicRelease.props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\x64.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='DebugLTCG|Win32'" Label="PropertySheets">
-    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$\(ProjectDir)$\(ProjectName).props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\StaticDebugLinkTimeCodeGeneration.props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\Win32.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='ReleaseLTCG|Win32'" Label="PropertySheets">
-    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$\(ProjectDir)$\(ProjectName).props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\StaticReleaseLinkTimeCodeGeneration.props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\Win32.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='DebugLTCG|x64'" Label="PropertySheets">
-    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$\(ProjectDir)$\(ProjectName).props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\StaticDebugLinkTimeCodeGeneration.props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\x64.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='ReleaseLTCG|x64'" Label="PropertySheets">
-    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$\(ProjectDir)$\(ProjectName).props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\StaticReleaseLinkTimeCodeGeneration.props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\x64.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='DebugLIB|Win32'" Label="PropertySheets">
-    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$\(ProjectDir)$\(ProjectName).props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\StaticDebug.props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\Win32.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='ReleaseLIB|Win32'" Label="PropertySheets">
-    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$\(ProjectDir)$\(ProjectName).props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\StaticRelease.props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\Win32.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='DebugLIB|x64'" Label="PropertySheets">
-    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$\(ProjectDir)$\(ProjectName).props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\StaticDebug.props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\x64.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='ReleaseLIB|x64'" Label="PropertySheets">
-    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$\(ProjectDir)$\(ProjectName).props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\StaticRelease.props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\x64.props" />
   </ImportGroup>
   <ItemGroup>
     <ClInclude Include="..\\..\\..\\..\\builds\\msvc\\platform.h" />
@@ -313,7 +211,8 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A5497C4B-1CD1-4779-9458-2CF7908E7E26}</ProjectGuid>
     <ProjectName>$(project.name)_selftest</ProjectName>
-    <RootNamespace>$(project.name)_selftest11</RootNamespace>
+    <PlatformToolset>v110</PlatformToolset>
+    <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="DebugDEXE|Win32">
@@ -365,83 +264,12 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <PropertyGroup Label="Configuration">
-    <PlatformToolset>v110</PlatformToolset>
-    <ConfigurationType>Application</ConfigurationType>
-  </PropertyGroup>
   <Import Project="$\(VCTargetsPath)\\Microsoft.Cpp.Default.props" />
   <Import Project="$\(VCTargetsPath)\\Microsoft.Cpp.props" />
-  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='DebugDEXE|Win32'" Label="PropertySheets">
-    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$\(ProjectDir)..\\..\\properties\\$\(Configuration).props" />
+    <Import Project="$\(ProjectDir)..\\..\\properties\\Output.props" />
     <Import Project="$\(ProjectDir)$\(ProjectName).props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\ConsoleDebugDynamic.props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\Win32.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='ReleaseDEXE|Win32'" Label="PropertySheets">
-    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$\(ProjectDir)$\(ProjectName).props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\ConsoleReleaseDynamic.props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\Win32.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='DebugDEXE|x64'" Label="PropertySheets">
-    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$\(ProjectDir)$\(ProjectName).props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\ConsoleDebugDynamic.props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\x64.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='ReleaseDEXE|x64'" Label="PropertySheets">
-    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$\(ProjectDir)$\(ProjectName).props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\ConsoleReleaseDynamic.props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\x64.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='DebugLEXE|Win32'" Label="PropertySheets">
-    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$\(ProjectDir)$\(ProjectName).props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\ConsoleDebugLinkTimeCodeGeneration.props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\Win32.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='ReleaseLEXE|Win32'" Label="PropertySheets">
-    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$\(ProjectDir)$\(ProjectName).props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\ConsoleReleaseLinkTimeCodeGeneration.props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\Win32.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='DebugLEXE|x64'" Label="PropertySheets">
-    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$\(ProjectDir)$\(ProjectName).props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\ConsoleDebugLinkTimeCodeGeneration.props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\x64.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='ReleaseLEXE|x64'" Label="PropertySheets">
-    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$\(ProjectDir)$\(ProjectName).props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\ConsoleReleaseLinkTimeCodeGeneration.props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\x64.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='DebugSEXE|Win32'" Label="PropertySheets">
-    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$\(ProjectDir)$\(ProjectName).props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\ConsoleDebugStatic.props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\Win32.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='ReleaseSEXE|Win32'" Label="PropertySheets">
-    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$\(ProjectDir)$\(ProjectName).props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\ConsoleReleaseStatic.props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\Win32.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='DebugSEXE|x64'" Label="PropertySheets">
-    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$\(ProjectDir)$\(ProjectName).props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\ConsoleDebugStatic.props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\x64.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$\(Configuration)|$\(Platform)'=='ReleaseSEXE|x64'" Label="PropertySheets">
-    <Import Project="$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props" Condition="exists('$\(UserRootDir)\\Microsoft.Cpp.$\(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$\(ProjectDir)$\(ProjectName).props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\ConsoleReleaseStatic.props" />
-    <Import Project="$\(ProjectDir)..\\..\\properties\\x64.props" />
   </ImportGroup>
   <ItemGroup>
     <ClCompile Include="..\\..\\..\\..\\src\\$(project.name)_selftest.c" />
