@@ -778,7 +778,7 @@ zmsg_add (zmsg_t *self, zframe_t *frame)
 //  --------------------------------------------------------------------------
 //  Selftest
 
-int
+void
 zmsg_test (bool verbose)
 {
     printf (" * zmsg: ");
@@ -964,5 +964,4 @@ zmsg_test (bool verbose)
 
     //  @end
     printf ("OK\n");
-    return 0;
 }

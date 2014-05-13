@@ -75,7 +75,7 @@ CZMQ_EXPORT void
     zauth_destroy (zauth_t **self_p);
 
 //  Selftest
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zauth_test (bool verbose);
 //  @end
 

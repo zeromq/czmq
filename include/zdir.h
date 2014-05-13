@@ -90,7 +90,7 @@ CZMQ_EXPORT void
     zdir_print (zdir_t *self, int indent);
 
 //  Self test of this class
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zdir_test (bool verbose);
 //  @end
 

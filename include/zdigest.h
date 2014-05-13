@@ -48,7 +48,7 @@ CZMQ_EXPORT char *
     zdigest_string (zdigest_t *self);
     
 //  Self test of this class
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zdigest_test (bool verbose);
 //  @end
 

@@ -39,9 +39,8 @@ CZMQ_EXPORT void
 CZMQ_EXPORT int
     zmutex_try_lock (zmutex_t *self);
 
-
 //  Self test of this class
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zmutex_test (bool verbose);
 //  @end
 

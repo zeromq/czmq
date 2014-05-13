@@ -55,7 +55,7 @@ CZMQ_EXPORT void
     zlog_debug (zlog_t *self, const char *format, ...);
 
 //  Self test of this class
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zlog_test (bool verbose);
 //  @end
 

@@ -478,7 +478,7 @@ void zfile_mode_default (void) {
 //  --------------------------------------------------------------------------
 //  Self test of this class
 
-int
+void
 zfile_test (bool verbose)
 {
     printf (" * zfile: ");
@@ -552,5 +552,4 @@ zfile_test (bool verbose)
     //  @end
 
     printf ("OK\n");
-    return 0;
 }

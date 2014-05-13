@@ -54,7 +54,7 @@ CZMQ_EXPORT void
     zcertstore_print (zcertstore_t *self);
 
 //  Self test of this class
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zcertstore_test (bool verbose);
 //  @end
 

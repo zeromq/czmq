@@ -41,7 +41,7 @@ CZMQ_EXPORT void *
     zactor_resolve (void *self);
 
 //  Self test of this class
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zactor_test (bool verbose);
 //  @end
 
