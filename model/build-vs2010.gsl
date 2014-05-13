@@ -106,7 +106,7 @@
     <None Include="..\\..\\..\\..\\packaging\\nuget\\package.nuspec" />
     <None Include="..\\..\\..\\..\\packaging\\nuget\\package.targets" />
     <None Include="..\\..\\..\\..\\packaging\\nuget\\package.xml" />
-  </ItemGroup>  
+  </ItemGroup>
   <Import Project="$\(VCTargetsPath)\\Microsoft.Cpp.targets" />
   <!--
   #################################################################
