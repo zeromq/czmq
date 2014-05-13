@@ -683,8 +683,8 @@ s_config_save_chunk (zconfig_t *self, void *arg, int level)
     assert (arg);
 
     int out_count = 0;
-    chunk_save_helper_t *param = (chunk_save_helper_t *)arg;
-      zchunk_t *chunk = param->chunk;
+    chunk_save_helper_t *param = (chunk_save_helper_t *) arg;
+    zchunk_t *chunk = param->chunk;
 
     //  Store any comments on the item
     if (self->comments) {
