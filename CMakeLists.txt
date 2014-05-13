@@ -84,9 +84,9 @@ set (czmq_headers
     include/zchunk.h
     include/zclock.h
     include/zconfig.h
+    include/zdigest.h
     include/zdir.h
     include/zdir_patch.h
-    include/zdigest.h
     include/zfile.h
     include/zframe.h
     include/zhash.h
@@ -98,8 +98,8 @@ set (czmq_headers
     include/zproxy.h
     include/zrex.h
     include/zsock.h
-    include/zsock_option.h
     include/zsock_monitor.h
+    include/zsock_option.h
     include/zstr.h
     include/zsys.h
     include/zuuid.h
@@ -128,9 +128,9 @@ set (czmq_sources
     src/zchunk.c
     src/zclock.c
     src/zconfig.c
+    src/zdigest.c
     src/zdir.c
     src/zdir_patch.c
-    src/zdigest.c
     src/zfile.c
     src/zframe.c
     src/zhash.c
@@ -142,8 +142,8 @@ set (czmq_sources
     src/zproxy.c
     src/zrex.c
     src/zsock.c
-    src/zsock_option.c
     src/zsock_monitor.c
+    src/zsock_option.c
     src/zstr.c
     src/zsys.c
     src/zuuid.c
