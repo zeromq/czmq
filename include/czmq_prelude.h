@@ -534,7 +534,7 @@ typedef int SOCKET;
 #if defined (__WINDOWS__)
 #   define CZMQ_THREADLS __declspec(thread)
 #else
-#   define CZMQ_THREADLS _thread
+#   define CZMQ_THREADLS __thread
 #endif
 
 //- Always include ZeroMQ header file ---------------------------------------
