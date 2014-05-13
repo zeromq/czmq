@@ -31,13 +31,13 @@
     <ClCompile Include="..\..\..\..\src\zconfig.c">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\zdigest.c">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zdir.c">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\zdir_patch.c">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zdigest.c">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\zfile.c">
@@ -73,10 +73,10 @@
     <ClCompile Include="..\..\..\..\src\zsock.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zsock_option.c">
+    <ClCompile Include="..\..\..\..\src\zsock_monitor.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zsock_monitor.c">
+    <ClCompile Include="..\..\..\..\src\zsock_option.c">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\zstr.c">

@@ -18,9 +18,9 @@ include_HEADERS = \
     ../include/zchunk.h \
     ../include/zclock.h \
     ../include/zconfig.h \
+    ../include/zdigest.h \
     ../include/zdir.h \
     ../include/zdir_patch.h \
-    ../include/zdigest.h \
     ../include/zfile.h \
     ../include/zframe.h \
     ../include/zhash.h \
@@ -32,8 +32,8 @@ include_HEADERS = \
     ../include/zproxy.h \
     ../include/zrex.h \
     ../include/zsock.h \
-    ../include/zsock_option.h \
     ../include/zsock_monitor.h \
+    ../include/zsock_option.h \
     ../include/zstr.h \
     ../include/zsys.h \
     ../include/zuuid.h \
@@ -54,9 +54,9 @@ libczmq_la_SOURCES = \
     zchunk.c \
     zclock.c \
     zconfig.c \
+    zdigest.c \
     zdir.c \
     zdir_patch.c \
-    zdigest.c \
     zfile.c \
     zframe.c \
     zhash.c \
@@ -68,8 +68,8 @@ libczmq_la_SOURCES = \
     zproxy.c \
     zrex.c \
     zsock.c \
-    zsock_option.c \
     zsock_monitor.c \
+    zsock_option.c \
     zstr.c \
     zsys.c \
     zuuid.c \
@@ -82,7 +82,7 @@ libczmq_la_SOURCES = \
 
 AM_CFLAGS = -g
 AM_CPPFLAGS = -I$(top_srcdir)/include
-noinst_PROGRAMS = czmq_selftest
+bin_PROGRAMS = czmq_selftest
 czmq_selftest_LDADD = libczmq.la
 czmq_selftest_SOURCES = czmq_selftest.c
 

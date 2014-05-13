@@ -127,7 +127,7 @@ zsock_t *
 zsock_monitor_handle (zsock_monitor_t *self)
 {
     assert (self);
-    return self->pipe;
+    return (zsock_t *) self->pipe;
 }
 
 
