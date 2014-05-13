@@ -11,57 +11,33 @@
     <PropertyPageSchema Include="$(MSBuildThisFileDirectory)czmq.import.xml" />
   </ItemGroup>
 
-  <!-- Configuration -->
-
+  <!-- Linkage -->
+  
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\..\czmq\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Linkage-czmq)' == 'static' Or '$(Linkage-czmq)' == 'ltcg'">LIBCZMQ_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-  </ItemDefinitionGroup>
-
-  <!-- Linkage -->
-  
-  <ItemDefinitionGroup Condition="'$(Linkage-czmq)' == 'dynamic'">
-    <Link Condition="$(Configuration.IndexOf('Debug')) != -1">
-      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Debug\czmq12\czmq.imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    <Link>
+      <AdditionalDependencies>czmq.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories Condition="$(Configuration.IndexOf('Debug')) != -1">$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Debug\$(PlatformToolset)\$(Linkage-czmq)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="$(Configuration.IndexOf('Release')) != -1">$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Release\$(PlatformToolset)\$(Linkage-czmq)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
-    <Link Condition="$(Configuration.IndexOf('Release')) != -1">
-      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Release\czmq12\czmq.imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
-
-  <ItemDefinitionGroup Condition="'$(Linkage-czmq)' == 'static'">
-    <Link Condition="$(Configuration.IndexOf('Debug')) != -1">
-      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Debug\czmq12\czmq.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-    <Link Condition="$(Configuration.IndexOf('Release')) != -1">
-      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Release\czmq12\czmq.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
-
-  <ItemDefinitionGroup Condition="'$(Linkage-czmq)' == 'ltcg'">
-    <Link Condition="$(Configuration.IndexOf('Debug')) != -1">
-      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Debug\czmq12\czmq.ltcg.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-    <Link Condition="$(Configuration.IndexOf('Release')) != -1">
-      <AdditionalDependencies>$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Release\czmq12\czmq.ltcg.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
+  </ItemDefinitionGroup>  
 
   <!-- Copy -->
 
   <Target Name="Linkage-czmq-dynamic" AfterTargets="AfterBuild" Condition="'$(Linkage-czmq)' == 'dynamic'">
     <Copy Condition="$(Configuration.IndexOf('Debug')) != -1"
-          SourceFiles="$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Debug\czmq12\czmq.dll"
+          SourceFiles="$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Debug\$(PlatformToolset)\dynamic\czmq.dll"
           DestinationFiles="$(TargetDir)czmq.dll"
           SkipUnchangedFiles="true" />
     <Copy Condition="$(Configuration.IndexOf('Debug')) != -1"
-          SourceFiles="$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Debug\czmq12\czmq.pdb"
+          SourceFiles="$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Debug\$(PlatformToolset)\dynamic\czmq.pdb"
           DestinationFiles="$(TargetDir)czmq.pdb"
           SkipUnchangedFiles="true" />
     <Copy Condition="$(Configuration.IndexOf('Release')) != -1"
-          SourceFiles="$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Release\czmq12\czmq.dll"
+          SourceFiles="$(ProjectDir)..\..\..\..\..\czmq\bin\$(PlatformName)\Release\$(PlatformToolset)\dynamic\czmq.dll"
           DestinationFiles="$(TargetDir)czmq.dll"
           SkipUnchangedFiles="true" />
   </Target>
