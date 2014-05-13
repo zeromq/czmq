@@ -62,7 +62,7 @@ CZMQ_EXPORT char *
     zdir_patch_digest (zdir_patch_t *self);
     
 //  Self test of this class
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zdir_patch_test (bool verbose);
 //  @end
 

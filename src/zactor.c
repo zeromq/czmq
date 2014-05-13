@@ -95,7 +95,7 @@ zactor_resolve (void *self)
 //  --------------------------------------------------------------------------
 //  Selftest
 
-int
+void
 zactor_test (bool verbose)
 {
     printf (" * zactor: ");
@@ -107,5 +107,4 @@ zactor_test (bool verbose)
     //  @end
 
     printf ("OK\n");
-    return 0;
 }

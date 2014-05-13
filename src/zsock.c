@@ -294,7 +294,7 @@ zsock_resolve (void *self)
 //  --------------------------------------------------------------------------
 //  Selftest
 
-int
+void
 zsock_test (bool verbose)
 {
     printf (" * zsock: ");
@@ -355,5 +355,4 @@ zsock_test (bool verbose)
     //  @end
 
     printf ("OK\n");
-    return 0;
 }

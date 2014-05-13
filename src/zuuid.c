@@ -185,7 +185,7 @@ zuuid_dup (zuuid_t *self)
 //  --------------------------------------------------------------------------
 //  Selftest
 
-int
+void
 zuuid_test (bool verbose)
 {
     printf (" * zuuid: ");
@@ -203,5 +203,4 @@ zuuid_test (bool verbose)
     //  @end
 
     printf ("OK\n");
-    return 0;
 }

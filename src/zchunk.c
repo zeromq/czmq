@@ -344,7 +344,8 @@ zchunk_is (void *self)
 
 //  --------------------------------------------------------------------------
 //  Self test of this class
-int
+
+void
 zchunk_test (bool verbose)
 {
     printf (" * zchunk: ");
@@ -388,5 +389,4 @@ zchunk_test (bool verbose)
     //  @end
 
     printf ("OK\n");
-    return 0;
 }

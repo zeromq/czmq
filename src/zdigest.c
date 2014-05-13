@@ -131,7 +131,7 @@ zdigest_string (zdigest_t *self)
 //  --------------------------------------------------------------------------
 //  Self test of this class
 
-int
+void
 zdigest_test (bool verbose)
 {
     printf (" * zdigest: ");
@@ -154,5 +154,4 @@ zdigest_test (bool verbose)
     //  @end
 
     printf ("OK\n");
-    return 0;
 }

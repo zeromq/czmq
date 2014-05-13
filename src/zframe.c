@@ -410,7 +410,7 @@ zframe_recv_nowait (void *source)
 //  --------------------------------------------------------------------------
 //  Selftest
 
-int
+void
 zframe_test (bool verbose)
 {
     printf (" * zframe: ");
@@ -488,5 +488,4 @@ zframe_test (bool verbose)
 
     //  @end
     printf ("OK\n");
-    return 0;
 }

@@ -121,7 +121,7 @@ CZMQ_EXPORT char *
     zfile_digest (zfile_t *self);
 
 //  Self test of this class
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zfile_test (bool verbose);
 //  @end
 

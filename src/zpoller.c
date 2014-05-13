@@ -185,7 +185,7 @@ zpoller_terminated (zpoller_t *self)
 //  --------------------------------------------------------------------------
 //  Self test of this class
 
-int
+void
 zpoller_test (bool verbose)
 {
     printf (" * zpoller: ");
@@ -230,5 +230,4 @@ zpoller_test (bool verbose)
     //  @end
 
     printf ("OK\n");
-    return 0;
 }

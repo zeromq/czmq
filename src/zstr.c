@@ -231,7 +231,7 @@ zstr_recv_nowait (void *dest)
 //  --------------------------------------------------------------------------
 //  Selftest
 
-int
+void
 zstr_test (bool verbose)
 {
     printf (" * zstr: ");
@@ -269,5 +269,4 @@ zstr_test (bool verbose)
     //  @end
 
     printf ("OK\n");
-    return 0;
 }

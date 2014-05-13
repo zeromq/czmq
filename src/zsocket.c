@@ -258,7 +258,7 @@ zsocket_set_hwm (void *zocket, int hwm)
 //  --------------------------------------------------------------------------
 //  Selftest
 
-int
+void
 zsocket_test (bool verbose)
 {
     printf (" * zsocket: ");
@@ -344,5 +344,4 @@ zsocket_test (bool verbose)
     //  @end
 
     printf ("OK\n");
-    return 0;
 }
