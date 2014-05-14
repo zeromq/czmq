@@ -90,14 +90,12 @@ CZMQ_EXPORT zconfig_t *
 CZMQ_EXPORT int
     zconfig_save (zconfig_t *self, const char *filename);
 
-//  Print the config file to open stream
-CZMQ_EXPORT void
-    zconfig_fprint (zconfig_t *self, FILE *file);
+//  Reload config tree from same file that it was previously loaded from.
+//  Returns 0 if OK, -1 if there was an error (and then does not change
+//  existing data).
+CZMQ_EXPORT int
+    zconfig_reload (zconfig_t **self_p);
 
-//  Print the config file to stdout
-CZMQ_EXPORT void
-    zconfig_print (zconfig_t *self);
-    
 //  Load a config tree from a memory chunk
 CZMQ_EXPORT zconfig_t *
     zconfig_chunk_load (zchunk_t *chunk);
@@ -105,6 +103,19 @@ CZMQ_EXPORT zconfig_t *
 //  Save a config tree to a new memory chunk
 CZMQ_EXPORT zchunk_t *
     zconfig_chunk_save (zconfig_t *self);
+
+//  Return true if a configuration tree was loaded from a file and that 
+//  file has changed in since the tree was loaded.
+CZMQ_EXPORT bool
+    zconfig_has_changed (zconfig_t *self);
+
+//  Print the config file to open stream
+CZMQ_EXPORT void
+    zconfig_fprint (zconfig_t *self, FILE *file);
+
+//  Print the config file to stdout
+CZMQ_EXPORT void
+    zconfig_print (zconfig_t *self);
 
 ----
 
