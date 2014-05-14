@@ -82,6 +82,11 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT bool
     zfile_is_stable (zfile_t *self);
 
+//  Return true if the file was changed on disk since the zfile_t object
+//  was created, or the last zfile_restat() call made on it.
+CZMQ_EXPORT bool
+    zfile_has_changed (zfile_t *self);
+
 //  Remove the file from disk
 CZMQ_EXPORT void
     zfile_remove (zfile_t *self);
