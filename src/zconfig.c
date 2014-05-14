@@ -65,6 +65,7 @@ struct _zconfig_t {
         *next,                  //  Next sibling if any
         *parent;                //  Parent if any
     zlist_t *comments;          //  Comments if any
+    zfile_t *file;              //  Config file handle
 };
 
 //  Local functions for parsing and saving ZPL tokens
@@ -131,7 +132,10 @@ zconfig_destroy (zconfig_t **self_p)
             zconfig_destroy (&self->child);
         if (self->next)
             zconfig_destroy (&self->next);
+
+        //  Destroy other properties and then self
         zlist_destroy (&self->comments);
+        zfile_destroy (&self->file);
         free (self->name);
         free (self->value);
         free (self);
@@ -363,9 +367,13 @@ zconfig_load (const char *filename)
     zfile_t *file = zfile_new (NULL, filename);
     if (zfile_input (file) == 0) {
         zchunk_t *chunk = zfile_read (file, zfile_cursize (file), 0);
-        if (chunk)
+        if (chunk) {
             self = zconfig_chunk_load (chunk);
-        zchunk_destroy (&chunk);
+            zchunk_destroy (&chunk);
+            self->file = file;
+            zfile_close (file);
+            file = NULL;        //  Config tree now owns file handle
+        }
     }
     zfile_destroy (&file);
     return self;
@@ -428,6 +436,30 @@ s_config_save (zconfig_t *self, void *arg, int level)
                 self->name? self->name: "(Unnamed)");
     }
     return 0;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Reload config tree from same file that it was previously loaded from.
+//  Returns 0 if OK, -1 if there was an error (and then does not change
+//  existing data).
+
+int
+zconfig_reload (zconfig_t **self_p)
+{
+    assert (self_p);
+    zconfig_t *self = *self_p;
+
+    if (self->file) {
+        zconfig_t *copy = zconfig_load (zfile_filename (self->file, NULL));
+        if (copy) {
+            //  Destroy old tree and install new one
+            zconfig_destroy (self_p);
+            *self_p = copy;
+            return 0;
+        }
+    }
+    return -1;              //  Not successful
 }
 
 
@@ -722,6 +754,21 @@ s_config_save_chunk (zconfig_t *self, void *arg, int level)
 
 
 //  --------------------------------------------------------------------------
+//  Return true if a configuration tree was loaded from a file and that
+//  file has changed in since the tree was loaded.
+
+bool
+zconfig_has_changed (zconfig_t *self)
+{
+    assert (self);
+    if (self->file && zfile_has_changed (self->file))
+        return true;
+    else
+        return false;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Add comment to config item before saving to disk. You can add as many
 //  comment lines as you like. If you use a null format, all comments are 
 //  deleted.
@@ -817,6 +864,10 @@ zconfig_test (bool verbose)
     assert (streq (passwd, "Top Secret"));
 
     zconfig_save (root, TESTDIR "/test.cfg");
+    assert (zconfig_has_changed (root));
+    int rc = zconfig_reload (&root);
+    assert (rc == 0);
+    assert (!zconfig_has_changed (root));
     zconfig_destroy (&root);
 
     //  Test improperly terminated config files
@@ -824,15 +875,15 @@ zconfig_test (bool verbose)
     zchunk_t *chunk = zchunk_new (chunk_data, strlen (chunk_data));
     assert (chunk);
     root = zconfig_chunk_load (chunk);
-    assert(root);
+    assert (root);
     char *value = zconfig_resolve (root, "/section/value", NULL);
     assert (value);
     assert (streq (value, "somevalue"));
 
     //  Test config can't be saved to a file in a path that doesn't
     //  exist or isn't writable
-    int result = zconfig_save (root, TESTDIR "/path/that/doesnt/exist/test.cfg");
-    assert (result == -1);
+    rc = zconfig_save (root, TESTDIR "/path/that/doesnt/exist/test.cfg");
+    assert (rc == -1);
 
     zconfig_destroy (&root);
     zchunk_destroy (&chunk);
