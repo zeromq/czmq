@@ -83,7 +83,7 @@ CZMQ_EXPORT int
     zsocket_sendmem (void *socket, const void *data, size_t size, int flags);
 
 //  Self test of this class
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zsocket_test (bool verbose);
 ----
 
