@@ -440,6 +440,19 @@ s_config_save (zconfig_t *self, void *arg, int level)
 
 
 //  --------------------------------------------------------------------------
+//  Report filename used during zconfig_load, or NULL if none
+
+char *
+zconfig_filename (zconfig_t *self)
+{
+    if (self->file)
+        return (zfile_filename (self->file, NULL));
+    else
+        return NULL;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Reload config tree from same file that it was previously loaded from.
 //  Returns 0 if OK, -1 if there was an error (and then does not change
 //  existing data).
@@ -855,6 +868,7 @@ zconfig_test (bool verbose)
     root = zconfig_load (TESTDIR "/test.cfg");
     if (verbose)
         zconfig_save (root, "-");
+    assert (streq (zconfig_filename (root), TESTDIR "/test.cfg"));
         
     char *email = zconfig_resolve (root, "/headers/email", NULL);
     assert (email);
