@@ -20,6 +20,10 @@
     caller can be sure all resources are created, and destroyed, when these
     calls complete. (This solves a major problem with zthread, that a caller
     could not be sure when a child thread had finished.)
+
+    A zactor_t instance acts like a zsock_t and you can pass it to any CZMQ
+    method that would take a zsock_t argument, including methods in zframe,
+    zmsg, zstr, zpoller, and zloop.
 @discuss
 @end
 */
