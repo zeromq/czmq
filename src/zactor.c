@@ -15,7 +15,7 @@
 @header
     The zactor class provides a simple actor framework. It replaces the 
     CZMQ zthread class, which had a complex API that did not fit the CLASS
-    standard. A CZMQ actors is implemented as a thread and a PAIR-PAIR 
+    standard. A CZMQ actor is implemented as a thread plus a PAIR-PAIR
     pipe. The constructor and destructor are always synchronized, so the
     caller can be sure all resources are created, and destroyed, when these
     calls complete. (This solves a major problem with zthread, that a caller
@@ -104,12 +104,16 @@ zactor_new (zactor_fn *actor, void *args)
     //  Create front-to-back pipe pair
     self->pipe = zsock_new (ZMQ_PAIR);
     assert (self->pipe);
-    int rc = zsock_bind (self->pipe, "inproc://zactor-pipe-%p", (void *) self);
-    assert (rc != -1);
-
+    char endpoint [32];
+    while (true) {
+        sprintf (endpoint, "inproc://zactor-%x", randof (0x100000000));
+        puts (endpoint);
+        if (zsock_bind (self->pipe, "%s", endpoint) == 0)
+            break;
+    }
     shim->pipe = zsock_new (ZMQ_PAIR);
     assert (shim->pipe);
-    rc = zsock_connect (shim->pipe, "inproc://zactor-pipe-%p", (void *) self);
+    int rc = zsock_connect (shim->pipe, "%s", endpoint);
     assert (rc != -1);
 
     shim->handler = actor;
