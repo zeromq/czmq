@@ -617,7 +617,7 @@ s_can_connect (zctx_t *ctx, void **server, void **client)
 //  --------------------------------------------------------------------------
 //  Selftest
 
-int
+void
 zauth_test (bool verbose)
 {
     printf (" * zauth: ");
@@ -739,5 +739,4 @@ zauth_test (bool verbose)
 #endif    
 
     printf ("OK\n");
-    return 0;
 }

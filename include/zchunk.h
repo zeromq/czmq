@@ -95,7 +95,7 @@ CZMQ_EXPORT bool
     zchunk_is (void *self);
 
 //  Self test of this class
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zchunk_test (bool verbose);
 //  @end
 

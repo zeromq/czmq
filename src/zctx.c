@@ -365,7 +365,7 @@ zctx__socket_destroy (zctx_t *self, void *zocket)
 //  --------------------------------------------------------------------------
 //  Selftest
 
-int
+void
 zctx_test (bool verbose)
 {
     printf (" * zctx: ");
@@ -399,5 +399,4 @@ zctx_test (bool verbose)
     //  @end
 
     printf ("OK\n");
-    return 0;
 }

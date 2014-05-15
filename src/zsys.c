@@ -719,7 +719,7 @@ zsys_run_as (const char *lockfile, const char *group, const char *user)
 //  --------------------------------------------------------------------------
 //  Selftest
 
-int
+void
 zsys_test (bool verbose)
 {
     printf (" * zsys: ");
@@ -770,5 +770,4 @@ zsys_test (bool verbose)
     //  @end
 
     printf ("OK\n");
-    return 0;
 }

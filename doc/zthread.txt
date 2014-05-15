@@ -28,7 +28,7 @@ CZMQ_EXPORT void *
     zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args);
 
 //  Self test of this class
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zthread_test (bool verbose);
 ----
 

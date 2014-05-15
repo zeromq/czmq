@@ -132,7 +132,7 @@ zmutex_try_lock (zmutex_t *self)
 //  --------------------------------------------------------------------------
 //  Selftest
 
-int
+void
 zmutex_test (bool verbose)
 {
     printf (" * zmutex: ");
@@ -144,5 +144,4 @@ zmutex_test (bool verbose)
     zmutex_destroy (&mutex);
     //  @end
     printf ("OK\n");
-    return 0;
 }

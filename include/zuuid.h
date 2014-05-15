@@ -62,7 +62,7 @@ CZMQ_EXPORT zuuid_t *
     zuuid_dup (zuuid_t *self);
 
 //  Self test of this class
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zuuid_test (bool verbose);
 //  @end
 

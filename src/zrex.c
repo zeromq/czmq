@@ -244,7 +244,7 @@ zrex_hit (zrex_t *self, uint index)
 //  --------------------------------------------------------------------------
 //  Selftest
 
-int
+void
 zrex_test (bool verbose)
 {
     printf (" * zrex: ");
@@ -291,5 +291,4 @@ zrex_test (bool verbose)
 
     zrex_destroy (&rex);
     printf ("OK\n");
-    return 0;
 }

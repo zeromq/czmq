@@ -37,7 +37,7 @@ CZMQ_EXPORT char *
     zclock_timestr (void);
 
 //  Self test of this class
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zclock_test (bool verbose);
 //  @end
 

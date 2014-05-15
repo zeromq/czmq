@@ -167,7 +167,7 @@ CZMQ_EXPORT bool
     zmsg_is (void *self);
 
 //  Self test of this class
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zmsg_test (bool verbose);
 //  @end
 
