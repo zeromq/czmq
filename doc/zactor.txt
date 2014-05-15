@@ -50,7 +50,7 @@ DESCRIPTION
 
 The zactor class provides a simple actor framework. It replaces the 
 CZMQ zthread class, which had a complex API that did not fit the CLASS
-standard. A CZMQ actors is implemented as a thread and a PAIR-PAIR 
+standard. A CZMQ actor is implemented as a thread plus a PAIR-PAIR
 pipe. The constructor and destructor are always synchronized, so the
 caller can be sure all resources are created, and destroyed, when these
 calls complete. (This solves a major problem with zthread, that a caller
