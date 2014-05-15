@@ -571,6 +571,7 @@ s_collect_name (char **start, int lineno)
     && (name [0] == '/' || name [length - 1] == '/')) {
         fprintf (stderr, "zconfig E: (%d) '/' not valid at name start or end\n", lineno);
         free (name);
+	name = NULL;
     }
     return name;
 }
@@ -644,8 +645,10 @@ s_collect_value (char **start, int lineno)
         rc = s_verify_eoln (readptr, lineno);
     }
     //  If we had an error, drop value and return NULL
-    if (rc)
+    if (rc) {
         free (value);
+	value = NULL;
+    }
     return value;
 }
 
