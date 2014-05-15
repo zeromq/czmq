@@ -102,7 +102,7 @@ zframe_t *
 zframe_recv (void *source)
 {
     assert (source);
-    void *handle = zsock_resolve ((zsock_t *) source);
+    void *handle = zsock_resolve (source);
     zframe_t *self = zframe_new (NULL, 0);
     if (self) {
         if (zmq_recvmsg (handle, &self->zmsg, 0) < 0) {
@@ -125,7 +125,7 @@ zframe_send (zframe_t **self_p, void *dest, int flags)
     assert (dest);
     assert (self_p);
 
-    void *handle = zsock_resolve ((zsock_t *) dest);
+    void *handle = zsock_resolve (dest);
     if (*self_p) {
         zframe_t *self = *self_p;
         assert (zframe_is (self));
@@ -393,7 +393,7 @@ zframe_t *
 zframe_recv_nowait (void *source)
 {
     assert (source);
-    void *handle = zsock_resolve ((zsock_t *) source);
+    void *handle = zsock_resolve (source);
     
     zframe_t *self = zframe_new (NULL, 0);
     if (self) {
