@@ -130,7 +130,7 @@ zclock_timestr (void)
 //  --------------------------------------------------------------------------
 //  Self test of this class
 
-int
+void
 zclock_test (bool verbose)
 {
     printf (" * zclock: ");
@@ -146,5 +146,4 @@ zclock_test (bool verbose)
     //  @end
 
     printf ("OK\n");
-    return 0;
 }

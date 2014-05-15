@@ -13,7 +13,13 @@
 
 /*
 @header
-    The zactor class provides a simple actor framework.
+    The zactor class provides a simple actor framework. It replaces the 
+    CZMQ zthread class, which had a complex API that did not fit the CLASS
+    standard. A CZMQ actors is implemented as a thread and a PAIR-PAIR 
+    pipe. The constructor and destructor are always synchronized, so the
+    caller can be sure all resources are created, and destroyed, when these
+    calls complete. (This solves a major problem with zthread, that a caller
+    could not be sure when a child thread had finished.)
 @discuss
 @end
 */
@@ -28,21 +34,111 @@
 
 struct _zactor_t {
     uint32_t tag;               //  Object tag for runtime detection
-    void *handle;               //  The libzmq actor handle
+    zsock_t *pipe;              //  Front-end pipe through to actor
 };
+
+
+//  This shims the OS thread APIs
+
+typedef struct {
+    zactor_fn *handler;
+    zsock_t *pipe;              //  Pipe back to parent
+    void *args;                 //  Application arguments
+} shim_t;
+
+
+//  --------------------------------------------------------------------------
+//  Thread creation code, wrapping POSIX and Win32 thread APIs
+
+#if defined (__UNIX__)
+//  Thread shim for UNIX calls the actual thread and cleans up afterwards.
+static void *
+s_thread_shim (void *args)
+{
+    assert (args);
+    shim_t *shim = (shim_t *) args;
+    shim->handler (shim->pipe, shim->args);
+    zsock_signal (shim->pipe);
+    zsock_destroy (&shim->pipe);
+    free (shim);
+    return NULL;
+}
+
+#elif defined (__WINDOWS__)
+//  Thread shim for Windows that wraps a POSIX-style thread handler
+//  and does the _endthreadex for us automatically.
+static unsigned __stdcall
+s_thread_shim (void *arglist)
+{
+    assert (arglist);
+    shim_t *shim = (shim_t *) args;
+    shim->handler (shim->pipe, shim->args);
+    zsock_signal (shim->pipe);
+    zsock_destroy (&shim->pipe);
+    free (shim);
+    _endthreadex (0);           //  Terminates thread
+    return 0;
+}
+#endif
 
 
 //  --------------------------------------------------------------------------
 //  Create a new actor.
 
 zactor_t *
-zactor_new (zactor_fn *task, void *args)
+zactor_new (zactor_fn *actor, void *args)
 {
     zactor_t *self = (zactor_t *) zmalloc (sizeof (zactor_t));
     if (!self)
         return NULL;
-
     self->tag = ZACTOR_TAG;
+
+    shim_t *shim = (shim_t *) zmalloc (sizeof (shim_t));
+    if (!shim)
+        return NULL;
+
+    //  Create front-to-back pipe pair
+    self->pipe = zsock_new (ZMQ_PAIR);
+    assert (self->pipe);
+    int rc = zsock_bind (self->pipe, "inproc://zactor-pipe-%p", (void *) self);
+    assert (rc != -1);
+
+    shim->pipe = zsock_new (ZMQ_PAIR);
+    assert (shim->pipe);
+    rc = zsock_connect (shim->pipe, "inproc://zactor-pipe-%p", (void *) self);
+    assert (rc != -1);
+
+    shim->handler = actor;
+    shim->args = args;
+
+#if defined (__UNIX__)
+    pthread_t thread;
+    pthread_create (&thread, NULL, s_thread_shim, shim);
+    pthread_detach (thread);
+
+#elif defined (__WINDOWS__)
+    HANDLE handle = (HANDLE) _beginthreadex (
+        NULL,                   //  Handle is private to this process
+        0,                      //  Use a default stack size for new thread
+        &s_thread_shim,         //  Start real thread function via this shim
+        shim,                   //  Which gets arguments shim
+        CREATE_SUSPENDED,       //  Set thread priority before starting it
+        NULL);                  //  We don't use the thread ID
+    assert (handle);
+
+    //  Set child thread priority to same as current
+    int priority = GetThreadPriority (GetCurrentThread ());
+    SetThreadPriority (handle, priority);
+
+    //  Start thread & release resources
+    ResumeThread (handle);
+    CloseHandle (handle);
+#endif
+
+    //  Mandatory handshake for new actor so that constructor returns only
+    //  when actor has also initialized. This eliminates timing issues at
+    //  application start up.
+    zsock_wait (self->pipe);
     return self;
 }
 
@@ -57,10 +153,39 @@ zactor_destroy (zactor_t **self_p)
     if (*self_p) {
         zactor_t *self = *self_p;
         assert (zactor_is (self));
+
+        //  Signal the actor to end and wait for the thread exit code
+        zstr_send (self->pipe, "$TERM");
+        zsock_wait (self->pipe);
+
+        zsock_destroy (&self->pipe);
         self->tag = 0xDeadBeef;
         free (self);
         *self_p = NULL;
     }
+}
+
+
+//  --------------------------------------------------------------------------
+//  Send a zmsg message to the actor, take ownership of the message
+//  and destroy when it has been sent.
+
+int
+zactor_send (zactor_t *self, zmsg_t **msg_p)
+{
+    return zmsg_send (msg_p, self);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Receive a zmsg message from the actor. Returns NULL if the actor
+//  was interrupted before the message could be received, or if there
+//  was a timeout on the actor.
+
+zmsg_t *
+zactor_recv (zactor_t *self)
+{
+    return zmsg_recv (self);
 }
 
 
@@ -85,27 +210,62 @@ zactor_resolve (void *self)
 {
     assert (self);
     if (zactor_is (self))
-//         return ((zactor_t *) self)->handle;
-        return NULL;
+        return zsock_resolve (((zactor_t *) self)->pipe);
     else
         return self;
 }
 
 
 //  --------------------------------------------------------------------------
+//  Actor
+//  must call zsock_signal (pipe) when initialized
+//  must listen to pipe and exit on $TERM command
+
+static void 
+echo_actor (zsock_t *pipe, void *args)
+{
+    //  Do some initialization
+    assert (streq ((char *) args, "Hello, World"));
+    zsock_signal (pipe);
+
+    bool terminated = false;
+    while (!terminated) {
+        zmsg_t *msg = zmsg_recv (pipe);
+        if (!msg)
+            break;              //  Interrupted
+        char *command = zmsg_popstr (msg);
+        if (streq (command, "$TERM")) 
+            terminated = true;
+        else
+        if (streq (command, "ECHO")) 
+            zmsg_send (&msg, pipe);
+        else {
+            puts ("E: invalid message to actor");
+            assert (false);
+        }
+        free (command);
+        zmsg_destroy (&msg);
+    }
+}
+
+
+//  --------------------------------------------------------------------------
 //  Selftest
 
-int
+void
 zactor_test (bool verbose)
 {
     printf (" * zactor: ");
 
     //  @selftest
-    zactor_t *actor = zactor_new (NULL, NULL);
+    zactor_t *actor = zactor_new (echo_actor, "Hello, World");
     assert (actor);
+    zstr_sendx (actor, "ECHO", "This is a string", NULL);
+    char *string = zstr_recv (actor);
+    assert (streq (string, "This is a string"));
+    free (string);
     zactor_destroy (&actor);
     //  @end
 
     printf ("OK\n");
-    return 0;
 }

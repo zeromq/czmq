@@ -165,7 +165,8 @@ zdir_patch_digest (zdir_patch_t *self)
 
 //  --------------------------------------------------------------------------
 //  Self test of this class
-int
+
+void
 zdir_patch_test (bool verbose)
 {
     printf (" * zdir_patch: ");
@@ -182,5 +183,4 @@ zdir_patch_test (bool verbose)
     //  @end
 
     printf ("OK\n");
-    return 0;
 }

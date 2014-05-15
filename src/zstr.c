@@ -27,7 +27,7 @@ static int
 s_send_string (void *dest, bool more, char *string)
 {
     assert (dest);
-    void *handle = zsock_resolve ((zsock_t *) dest);
+    void *handle = zsock_resolve (dest);
 
     int len = strlen (string);
     zmq_msg_t message;
@@ -51,7 +51,7 @@ char *
 zstr_recv (void *source)
 {
     assert (source);
-    void *handle = zsock_resolve ((zsock_t *) source);
+    void *handle = zsock_resolve (source);
 
     zmq_msg_t message;
     zmq_msg_init (&message);
@@ -170,7 +170,7 @@ int
 zstr_recvx (void *source, char **string_p, ...)
 {
     assert (source);
-    void *handle = zsock_resolve ((zsock_t *) source);
+    void *handle = zsock_resolve (source);
     
     zmsg_t *msg = zmsg_recv (handle);
     if (!msg)
@@ -212,7 +212,7 @@ char *
 zstr_recv_nowait (void *dest)
 {
     assert (dest);
-    void *handle = zsock_resolve ((zsock_t *) dest);
+    void *handle = zsock_resolve (dest);
 
     zmq_msg_t message;
     zmq_msg_init (&message);
@@ -231,7 +231,7 @@ zstr_recv_nowait (void *dest)
 //  --------------------------------------------------------------------------
 //  Selftest
 
-int
+void
 zstr_test (bool verbose)
 {
     printf (" * zstr: ");
@@ -269,5 +269,4 @@ zstr_test (bool verbose)
     //  @end
 
     printf ("OK\n");
-    return 0;
 }

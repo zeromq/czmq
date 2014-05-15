@@ -184,7 +184,7 @@ zlog_debug (zlog_t *self, const char *format, ...)
 //  --------------------------------------------------------------------------
 //  Selftest
 
-int
+void
 zlog_test (bool verbose)
 {
     printf (" * zlog: ");
@@ -205,5 +205,4 @@ zlog_test (bool verbose)
     //  @end
 
     printf ("OK\n");
-    return 0;
 }

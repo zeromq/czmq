@@ -535,7 +535,7 @@ zdir_print (zdir_t *self, int indent)
 //  --------------------------------------------------------------------------
 //  Self test of this class
 
-int
+void
 zdir_test (bool verbose)
 {
     printf (" * zdir: ");
@@ -563,5 +563,4 @@ zdir_test (bool verbose)
     //  @end
 
     printf ("OK\n");
-    return 0;
 }

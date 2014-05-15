@@ -69,7 +69,7 @@ CZMQ_EXPORT void
     zstr_free (char **string_p);
 
 //  Self test of this class
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zstr_test (bool verbose);
 //  @end
 

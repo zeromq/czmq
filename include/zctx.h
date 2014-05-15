@@ -79,7 +79,7 @@ CZMQ_EXPORT void *
     zctx_underlying (zctx_t *self);
 
 //  Self test of this class
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zctx_test (bool verbose);
 
 //  Global signal indicator, TRUE when user presses Ctrl-C or the process

@@ -64,7 +64,7 @@ CZMQ_EXPORT const char *
     zrex_hit (zrex_t *self, uint index);
 
 //  Self test of this class
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zrex_test (bool verbose);
 //  @end
 

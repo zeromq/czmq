@@ -146,7 +146,7 @@ CZMQ_EXPORT int
     zsys_run_as (const char *lockfile, const char *group, const char *user);
 
 //  Self test of this class
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zsys_test (bool verbose);
 //  @end
 

@@ -408,7 +408,7 @@ zcert_print (zcert_t *self)
 //  --------------------------------------------------------------------------
 //  Selftest
 
-int
+void
 zcert_test (bool verbose)
 {
     printf (" * zcert: ");
@@ -467,6 +467,5 @@ zcert_test (bool verbose)
     //  @end
 #endif
     printf ("OK\n");
-    return 0;
 }
 

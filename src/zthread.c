@@ -72,7 +72,7 @@ typedef struct {
 
 #if defined (__UNIX__)
 //  Thread shim for UNIX calls the real thread and cleans up afterwards.
-void *
+static void *
 s_thread_shim (void *args)
 {
     assert (args);
@@ -90,7 +90,7 @@ s_thread_shim (void *args)
 #elif defined (__WINDOWS__)
 //  Thread shim for Windows that wraps a POSIX-style thread handler
 //  and does the _endthreadex for us automatically.
-unsigned __stdcall
+static unsigned __stdcall
 s_thread_shim (void *args)
 {
     assert (args);
@@ -230,7 +230,7 @@ s_test_attached (void *args, zctx_t *ctx, void *pipe)
 
 //  @end
 
-int
+void
 zthread_test (bool verbose)
 {
     printf (" * zthread: ");
@@ -258,5 +258,4 @@ zthread_test (bool verbose)
     //  @end
 
     printf ("OK\n");
-    return 0;
 }

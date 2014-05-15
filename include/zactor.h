@@ -19,8 +19,8 @@ extern "C" {
 #endif
 
 //  @interface
-//  Actors get arguments from caller
-typedef void (zactor_fn) (void *args);
+//  Actors get a pipe and arguments from caller
+typedef void (zactor_fn) (zsock_t *pipe, void *args);
 
 //  Create a new actor passing arbitrary arguments reference.
 CZMQ_EXPORT zactor_t *
@@ -29,6 +29,17 @@ CZMQ_EXPORT zactor_t *
 //  Destroy an actor.
 CZMQ_EXPORT void
     zactor_destroy (zactor_t **p_self);
+
+//  Send a zmsg message to the actor, take ownership of the message
+//  and destroy when it has been sent.
+CZMQ_EXPORT int
+    zactor_send (zactor_t *self, zmsg_t **msg_p);
+
+//  Receive a zmsg message from the actor. Returns NULL if the actor
+//  was interrupted before the message could be received, or if there
+//  was a timeout on the actor.
+CZMQ_EXPORT zmsg_t *
+    zactor_recv (zactor_t *self);
 
 //  Probe the supplied object, and report if it looks like a zactor_t.
 CZMQ_EXPORT bool
@@ -41,7 +52,7 @@ CZMQ_EXPORT void *
     zactor_resolve (void *self);
 
 //  Self test of this class
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zactor_test (bool verbose);
 //  @end
 

@@ -217,7 +217,7 @@ zcertstore_print (zcertstore_t *self)
 //  --------------------------------------------------------------------------
 //  Selftest
 
-int
+void
 zcertstore_test (bool verbose)
 {
     printf (" * zcertstore: ");
@@ -255,5 +255,4 @@ zcertstore_test (bool verbose)
     //  @end
 #endif    
     printf ("OK\n");
-    return 0;
 }

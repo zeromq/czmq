@@ -93,6 +93,7 @@ zfile_new (const char *path, const char *name)
     return self;
 }
 
+
 //  --------------------------------------------------------------------------
 //  Destroy a file item
 
@@ -261,6 +262,27 @@ zfile_is_stable (zfile_t *self)
 {
     assert (self);
     return self->stable;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return true if the file was changed on disk since the zfile_t object
+//  was created, or the last zfile_restat() call made on it. Note that the
+//  file will not necessarily yet be stable.
+
+bool
+zfile_has_changed (zfile_t *self)
+{
+    assert (self);
+    struct stat stat_buf;
+    char *real_name = self->link? self->link: self->fullname;
+    if (stat (real_name, &stat_buf) == 0) {
+        //  It's not a foolproof heuristic but catches most cases
+        if (stat_buf.st_mtime != self->modified
+        ||  stat_buf.st_size != self->cursize)
+            return true;
+    }
+    return false;
 }
 
 
@@ -478,7 +500,7 @@ void zfile_mode_default (void) {
 //  --------------------------------------------------------------------------
 //  Self test of this class
 
-int
+void
 zfile_test (bool verbose)
 {
     printf (" * zfile: ");
@@ -495,6 +517,7 @@ zfile_test (bool verbose)
     assert (rc == 0);
     zchunk_t *chunk = zchunk_new (NULL, 100);
     zchunk_fill (chunk, 0, 100);
+    
     //  Write 100 bytes at position 1,000,000 in the file
     rc = zfile_write (file, chunk, 1000000);
     assert (rc == 0);
@@ -502,20 +525,29 @@ zfile_test (bool verbose)
     zfile_close (file);
     assert (zfile_is_readable (file));
     assert (zfile_cursize (file) == 1000100);
-    zfile_restat (file);
     assert (!zfile_is_stable (file));
+    
+    //  Now append one byte to file from outside
+    int handle = open ("./this/is/a/test/bilbo", O_WRONLY | O_TRUNC, 0);
+    assert (handle >= 0);
+    rc = write (handle, "Hello, World\n", 13);
+    assert (rc == 13);
+    close (handle);
+    assert (zfile_has_changed (file));
     zclock_sleep (1001);
+    assert (zfile_has_changed (file));
+    
     assert (!zfile_is_stable (file));
     zfile_restat (file);
     assert (zfile_is_stable (file));
-    assert (streq (zfile_digest (file), "F6CA2B0E6609C2B556F651F46A5A14C86153D0BF"));
+    assert (streq (zfile_digest (file), "4AB299C8AD6ED14F31923DD94F8B5F5CB89DFB54"));
     
     //  Check we can read from file
     rc = zfile_input (file);
     assert (rc == 0);
     chunk = zfile_read (file, 1000100, 0);
     assert (chunk);
-    assert (zchunk_size (chunk) == 1000100);
+    assert (zchunk_size (chunk) == 13);
     zchunk_destroy (&chunk);
     zfile_close (file);
 
@@ -531,13 +563,13 @@ zfile_test (bool verbose)
     assert (rc == 0);
     chunk = zfile_read (link, 1000100, 0);
     assert (chunk);
-    assert (zchunk_size (chunk) == 1000100);
+    assert (zchunk_size (chunk) == 13);
     zchunk_destroy (&chunk);
     zfile_destroy (&link);
 
     //  Remove file and directory
     zdir_t *dir = zdir_new ("./this", NULL);
-    assert (zdir_cursize (dir) == 2000200);
+    assert (zdir_cursize (dir) == 26);
     zdir_remove (dir, true);
     assert (zdir_cursize (dir) == 0);
     zdir_destroy (&dir);
@@ -552,5 +584,4 @@ zfile_test (bool verbose)
     //  @end
 
     printf ("OK\n");
-    return 0;
 }
