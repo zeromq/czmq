@@ -52,6 +52,8 @@ zsock_new (int type)
     if (!self)
         return NULL;
 
+    self->tag = ZSOCK_TAG;
+    self->type = type;
     self->handle = zsys_socket (type);
     if (!self->handle) {
         free (self);
@@ -60,9 +62,7 @@ zsock_new (int type)
     //  Set default shutdown behavior to "immediate"; if the caller wants to
     //  provide time for message delivery before shutdown; they can set the
     //  linger value to something higher.
-    zsocket_set_linger (self->handle, 0);
-    self->type = type;
-    self->tag = ZSOCK_TAG;
+    zsock_set_linger (self, 0);
     return self;
 }
 
@@ -226,6 +226,29 @@ zsock_type_str (zsock_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  Send a zmsg message to the socket, take ownership of the message
+//  and destroy when it has been sent.
+
+int
+zsock_send (zsock_t *self, zmsg_t **msg_p)
+{
+    return zmsg_send (msg_p, self);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Receive a zmsg message from the socket. Returns NULL if the process was
+//  interrupted before the message could be received, or if a receive timeout
+//  expired.
+
+zmsg_t *
+zsock_recv (zsock_t *self)
+{
+    return zmsg_recv (self);
+}
+
+
+//  --------------------------------------------------------------------------
 //  Send a signal over a socket. A signal is a zero-byte message.
 //  Signals are used primarily between threads, over pipe sockets.
 //  Returns -1 if there was an error sending the signal.
@@ -235,15 +258,8 @@ zsock_signal (zsock_t *self)
 {
     assert (self);
     assert (zsock_is (self));
-
-    zmq_msg_t msg;
-    zmq_msg_init_size (&msg, 0);
-    if (zmq_sendmsg (self->handle, &msg, 0) == -1) {
-        zmq_msg_close (&msg);
-        return -1;
-    }
-    else
-        return 0;
+    
+    return zstr_send (self, "");
 }
 
 
@@ -257,13 +273,14 @@ zsock_wait (zsock_t *self)
 {
     assert (self);
     assert (zsock_is (self));
-
-    zmq_msg_t msg;
-    zmq_msg_init (&msg);
-    if (zmq_recvmsg (self->handle, &msg, 0) == -1)
-        return -1;
-    else
+    
+    char *message = zstr_recv (self);
+    if (message) {
+        free (message);
         return 0;
+    }
+    else
+        return -1;
 }
 
 
@@ -337,11 +354,13 @@ zsock_test (bool verbose)
 
     rc = zsock_connect (reader, "tcp://%s:%d", "localhost", service);
     assert (rc == 0);
-    zstr_send (writer->handle, "HELLO");
-    char *message = zstr_recv (reader->handle);
-    assert (message);
-    assert (streq (message, "HELLO"));
-    free (message);
+    zstr_send (writer, "Hello, World");
+    zmsg_t *msg = zsock_recv (reader);
+    assert (msg);
+    char *string = zmsg_popstr (msg);
+    assert (streq (string, "Hello, World"));
+    free (string);
+    zmsg_destroy (&msg);
 
     //  Test binding to ports
     int port = zsock_bind (writer, "tcp://%s:*", "127.0.0.1");
