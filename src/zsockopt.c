@@ -962,6 +962,7 @@ zsocket_set_linger (void *zocket, int linger)
 {
 #   if defined (ZMQ_LINGER)
     int rc = zmq_setsockopt (zocket, ZMQ_LINGER, &linger, sizeof (int));
+    if (rc != 0) puts (zmq_strerror (zmq_errno ()));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1854,6 +1855,7 @@ zsocket_set_linger (void *zocket, int linger)
 {
 #   if defined (ZMQ_LINGER)
     int rc = zmq_setsockopt (zocket, ZMQ_LINGER, &linger, sizeof (int));
+    if (rc != 0) puts (zmq_strerror (zmq_errno ()));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2761,6 +2763,7 @@ zsocket_set_linger (void *zocket, int linger)
 {
 #   if defined (ZMQ_LINGER)
     int rc = zmq_setsockopt (zocket, ZMQ_LINGER, &linger, sizeof (int));
+    if (rc != 0) puts (zmq_strerror (zmq_errno ()));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }

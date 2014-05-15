@@ -52,13 +52,17 @@ zsock_new (int type)
     if (!self)
         return NULL;
 
-    self->tag = ZSOCK_TAG;
     self->handle = zsys_socket (type);
-    self->type = type;
     if (!self->handle) {
         free (self);
         return NULL;
     }
+    //  Set default shutdown behavior to "immediate"; if the caller wants to
+    //  provide time for message delivery before shutdown; they can set the
+    //  linger value to something higher.
+    zsocket_set_linger (self->handle, 0);
+    self->type = type;
+    self->tag = ZSOCK_TAG;
     return self;
 }
 
@@ -75,7 +79,6 @@ zsock_destroy (zsock_t **self_p)
         zsock_t *self = *self_p;
         assert (zsock_is (self));
         self->tag = 0xDeadBeef;
-        zsocket_set_linger (self->handle, 0);
         zmq_close (self->handle);
         free (self);
         *self_p = NULL;
@@ -276,9 +279,10 @@ zsock_is (void *self)
 
 
 //  --------------------------------------------------------------------------
-//  Probe the supplied reference. If it looks like a zsock_t instance,
-//  return the underlying libzmq socket handle; else if it looks like
-//  a libzmq socket handle, return the supplied value.
+//  Probe the supplied reference, which can be to a zsock_t, a zactor_t, or
+//  a libzmq void * socket reference. In all of these cases, returns the
+//  libzmq socket handle. If you pass any other reference, returns the same
+//  value.
 
 void *
 zsock_resolve (void *self)
@@ -287,6 +291,9 @@ zsock_resolve (void *self)
     if (zsock_is (self))
         return ((zsock_t *) self)->handle;
     else
+    if (zactor_is (self))
+        return zactor_resolve (self);
+    else 
         return self;
 }
 

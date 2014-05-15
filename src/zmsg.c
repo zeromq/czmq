@@ -106,7 +106,7 @@ zmsg_recv (void *source)
     if (!self)
         return NULL;
 
-    void *handle = zsock_resolve ((zsock_t *) source);
+    void *handle = zsock_resolve (source);
     while (true) {
         zframe_t *frame = zframe_recv (handle);
         if (!frame) {
@@ -137,7 +137,7 @@ zmsg_send (zmsg_t **self_p, void *dest)
     zmsg_t *self = *self_p;
 
     int rc = 0;
-    void *handle = zsock_resolve ((zsock_t *) dest);
+    void *handle = zsock_resolve (dest);
     if (zlist_size (self->frames) == 0)
         return -1;
     else

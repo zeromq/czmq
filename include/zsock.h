@@ -70,6 +70,17 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zsock_wait (zsock_t *self);
 
+//  Send a zmsg message to the socket, take ownership of the message
+//  and destroy when it has been sent.
+CZMQ_EXPORT int
+    zsock_send (zsock_t *self, zmsg_t **msg_p);
+
+//  Receive a zmsg message from the socket. Returns NULL if the socket
+//  was interrupted before the message could be received, or if there
+//  was a timeout on the socket.
+CZMQ_EXPORT zmsg_t *
+    zsock_recv (zsock_t *self);
+
 //  Probe the supplied object, and report if it looks like a zsock_t.
 CZMQ_EXPORT bool
     zsock_is (void *self);
