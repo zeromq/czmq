@@ -24,12 +24,19 @@ extern "C" {
 //  Callback for interrupt signal handler
 typedef void (zsys_handler_fn) (int signal_value);
 
-//  Get a new ZMQ socket, automagically creating a ZMQ context
-//  if this is the first time. Caller is responsible for destroying
-//  the ZMQ socket before process exits, to avoid a ZMQ deadlock.
+//  Get a new ZMQ socket, automagically creating a ZMQ context if this is
+//  the first time. Caller is responsible for destroying the ZMQ socket
+//  before process exits, to avoid a ZMQ deadlock. Note: you should not use
+//  this method in CZMQ apps, use zsock_new() instead. This is for system
+//  use only, really.
 CZMQ_EXPORT void *
     zsys_socket (int type);
 
+//  Destroy/close a ZMQ socket. You should call this for every socket you
+//  create using zsys_socket().
+CZMQ_EXPORT int
+    zsys_close (void *self);
+    
 //  Set interrupt handler (NULL means external handler)
 CZMQ_EXPORT void
     zsys_handler_set (zsys_handler_fn *handler_fn);

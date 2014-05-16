@@ -79,7 +79,7 @@ zsock_destroy (zsock_t **self_p)
         zsock_t *self = *self_p;
         assert (zsock_is (self));
         self->tag = 0xDeadBeef;
-        zmq_close (self->handle);
+        zsys_close (self->handle);
         free (self);
         *self_p = NULL;
     }
