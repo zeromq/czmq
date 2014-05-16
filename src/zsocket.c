@@ -239,8 +239,10 @@ zsocket_wait (void *zocket)
     zmq_msg_init (&msg);
     if (zmq_recvmsg (zocket, &msg, 0) == -1)
         return -1;
-    else
+    else {
+        zmq_msg_close (&msg);
         return 0;
+    }
 }
 
 
