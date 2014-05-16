@@ -107,7 +107,6 @@ zactor_new (zactor_fn *actor, void *args)
     char endpoint [32];
     while (true) {
         sprintf (endpoint, "inproc://zactor-%x", randof (0x100000000));
-        puts (endpoint);
         if (zsock_bind (self->pipe, "%s", endpoint) == 0)
             break;
     }
