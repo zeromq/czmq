@@ -718,7 +718,7 @@ zhash_unpack (zframe_t *frame)
 static int
 test_foreach (const char *key, void *item, void *arg)
 {
-    assert (NULL != zhash_lookup ((zhash_t*) arg, key));
+    assert (zhash_lookup ((zhash_t*) arg, key));
     return 0;
 }
 
@@ -821,8 +821,10 @@ zhash_test (int verbose)
     zhash_destroy (&copy);
 
     // Test foreach
-    assert (0 == zhash_foreach (hash, test_foreach, hash));
-    assert (-1 == zhash_foreach (hash, test_foreach_error, hash));
+    rc = zhash_foreach (hash, test_foreach, hash);
+    assert (rc == 0);
+    rc = zhash_foreach (hash, test_foreach_error, hash);
+    assert (rc == -1);
 
     //  Test save and load
     zhash_comment (hash, "This is a test file");

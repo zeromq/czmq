@@ -187,9 +187,9 @@ zsocket_type_str (void *self)
 //  Accepts these flags: ZFRAME_MORE and ZFRAME_DONTWAIT.
 
 int
-zsocket_sendmem (void *zocket, const void *data, size_t size, int flags)
+zsocket_sendmem (void *self, const void *data, size_t size, int flags)
 {
-    assert (zocket);
+    assert (self);
     assert (size == 0 || data);
 
     int snd_flags = (flags & ZFRAME_MORE)? ZMQ_SNDMORE : 0;
@@ -199,7 +199,7 @@ zsocket_sendmem (void *zocket, const void *data, size_t size, int flags)
     zmq_msg_init_size (&msg, size);
     memcpy (zmq_msg_data (&msg), data, size);
 
-    if (zmq_sendmsg (zocket, &msg, snd_flags) == -1) {
+    if (zmq_sendmsg (self, &msg, snd_flags) == -1) {
         zmq_msg_close (&msg);
         return -1;
     }
@@ -214,16 +214,10 @@ zsocket_sendmem (void *zocket, const void *data, size_t size, int flags)
 //  Returns -1 if there was an error sending the signal.
 
 int
-zsocket_signal (void *zocket)
+zsocket_signal (void *self)
 {
-    zmq_msg_t msg;
-    zmq_msg_init_size (&msg, 0);
-    if (zmq_sendmsg (zocket, &msg, 0) == -1) {
-        zmq_msg_close (&msg);
-        return -1;
-    }
-    else
-        return 0;
+    assert (self);
+    return zstr_send (self, "");
 }
 
 
@@ -233,16 +227,16 @@ zsocket_signal (void *zocket)
 //  0 on success.
 
 int
-zsocket_wait (void *zocket)
+zsocket_wait (void *self)
 {
-    zmq_msg_t msg;
-    zmq_msg_init (&msg);
-    if (zmq_recvmsg (zocket, &msg, 0) == -1)
-        return -1;
-    else {
-        zmq_msg_close (&msg);
+    assert (self);
+    char *message = zstr_recv (self);
+    if (message) {
+        free (message);
         return 0;
     }
+    else
+        return -1;
 }
 
 
@@ -250,10 +244,10 @@ zsocket_wait (void *zocket)
 //  Set socket high-water mark, emulating 2.x API
 
 void
-zsocket_set_hwm (void *zocket, int hwm)
+zsocket_set_hwm (void *self, int hwm)
 {
-    zsocket_set_sndhwm (zocket, hwm);
-    zsocket_set_rcvhwm (zocket, hwm);
+    zsocket_set_sndhwm (self, hwm);
+    zsocket_set_rcvhwm (self, hwm);
 }
 
 
