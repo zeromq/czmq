@@ -162,6 +162,9 @@ zlist_next (zlist_t *self)
 int
 zlist_append (zlist_t *self, void *item)
 {
+    if (!item)
+        return -1;
+
     node_t *node;
     node = (node_t *) zmalloc (sizeof (node_t));
     if (!node)
