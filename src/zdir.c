@@ -323,6 +323,11 @@ s_dir_compare (void *item1, void *item2)
 static bool
 s_file_compare (void *item1, void *item2)
 {
+    if (!item2)
+        return false;
+    if (!item1)
+        return true;
+
     if (strcmp (zfile_filename ((zfile_t *) item1, NULL),
                 zfile_filename ((zfile_t *) item2, NULL)) > 0)
         return true;
