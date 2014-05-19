@@ -105,6 +105,7 @@ s_destroy_process_ctx (void)
     //  No matter, we are now going to shut down
     //  Print the source reference for any sockets the app did not
     //  destroy properly.
+    ZMUTEX_LOCK (s_mutex);
     s_sockref_t *sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
     while (sockref) {
         printf ("E: dangling socket created at %s:%zd\n",
@@ -114,6 +115,8 @@ s_destroy_process_ctx (void)
         sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
     }
     zlist_destroy (&s_sockref_list);
+    ZMUTEX_UNLOCK (s_mutex);
+    
     zmq_ctx_term (process_ctx);
     ZMUTEX_DESTROY (s_mutex);
 }
@@ -171,6 +174,7 @@ zsys_close (void *handle)
     while (sockref) {
         if (sockref->handle == handle) {
             zlist_remove (s_sockref_list, sockref);
+            free (sockref);
             destroyed = true;
             s_open_sockets--;
             zmq_close (handle);
