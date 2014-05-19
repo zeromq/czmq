@@ -42,11 +42,11 @@ struct _zsock_t {
 
 
 //  --------------------------------------------------------------------------
-//  Create a new socket.
-//  TODO: set-up global context safely using a mutex.
+//  Create a new socket. This macro passes the caller source and line
+//  number so that CZMQ can report socket leaks intelligently.
 
 zsock_t *
-zsock_new (int type)
+zsock_new_ (int type, const char *filename, size_t line_nbr)
 {
     zsock_t *self = (zsock_t *) zmalloc (sizeof (zsock_t));
     if (!self)
@@ -54,7 +54,7 @@ zsock_new (int type)
 
     self->tag = ZSOCK_TAG;
     self->type = type;
-    self->handle = zsys_socket (type);
+    self->handle = zsys_socket (type, filename, line_nbr);
     if (!self->handle) {
         free (self);
         return NULL;
@@ -63,6 +63,7 @@ zsock_new (int type)
     //  provide time for message delivery before shutdown; they can set the
     //  linger value to something higher.
     zsock_set_linger (self, 0);
+
     return self;
 }
 
@@ -79,7 +80,8 @@ zsock_destroy (zsock_t **self_p)
         zsock_t *self = *self_p;
         assert (zsock_is (self));
         self->tag = 0xDeadBeef;
-        zsys_close (self->handle);
+        int rc = zsys_close (self->handle);
+        assert (rc == 0);
         free (self);
         *self_p = NULL;
     }
@@ -249,38 +251,44 @@ zsock_recv (zsock_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Send a signal over a socket. A signal is a zero-byte message.
-//  Signals are used primarily between threads, over pipe sockets.
-//  Returns -1 if there was an error sending the signal.
+//  Send a signal over a socket. A signal is a zero-byte message. Signals
+//  are used primarily between threads, over pipe sockets. Returns -1 if
+//  there was an error sending the signal. Accepts a zsock_t or a zactor_t
+//  as argument.
 
 int
-zsock_signal (zsock_t *self)
+zsock_signal (void *self)
 {
     assert (self);
-    assert (zsock_is (self));
-    
     return zstr_send (self, "");
 }
 
 
 //  --------------------------------------------------------------------------
-//  Wait on a signal. Use this to coordinate between threads, over
-//  pipe pairs. Blocks until the signal is received. Returns -1 on error,
-//  0 on success.
+//  Wait on a signal. Use this to coordinate between threads, over pipe
+//  pairs. Blocks until the signal is received. Returns -1 on error, 0 on
+//  success. Accepts a zsock_t or a zactor_t as argument.
 
 int
-zsock_wait (zsock_t *self)
+zsock_wait (void *self)
 {
     assert (self);
-    assert (zsock_is (self));
-    
-    char *message = zstr_recv (self);
-    if (message) {
-        free (message);
-        return 0;
+
+    //  A signal is a message containing one empty frame
+    //  If we get anything else, we discard it and continue
+    //  to look for the signal message
+    while (true) {
+        zmsg_t *msg = zmsg_recv (self);
+        if (!msg)
+            return -1;
+        if (zmsg_size (msg) == 1
+        &&  zmsg_content_size (msg) == 0) {
+            zmsg_destroy (&msg);
+            return 0;
+        }
+        zmsg_destroy (&msg);
     }
-    else
-        return -1;
+    return -1;
 }
 
 

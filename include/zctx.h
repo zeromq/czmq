@@ -81,10 +81,6 @@ CZMQ_EXPORT void *
 //  Self test of this class
 CZMQ_EXPORT void
     zctx_test (bool verbose);
-
-//  Global signal indicator, TRUE when user presses Ctrl-C or the process
-//  gets a SIGTERM signal.
-CZMQ_EXPORT extern volatile int zctx_interrupted;
 //  @end
 
 //  Create socket within this context, for CZMQ use only

@@ -1015,7 +1015,6 @@ zsock_set_linger (zsock_t *self, int linger)
     assert(self);
 #   if defined (ZMQ_LINGER)
     int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_LINGER, &linger, sizeof (int));
-    if (rc != 0) puts (zmq_strerror (zmq_errno ()));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
