@@ -122,7 +122,7 @@ zpoller_wait (zpoller_t *self, int timeout)
     if (rc == 0)
         self->expired = true;
     else
-    if (rc == -1 || zctx_interrupted)
+    if (rc == -1 || zsys_interrupted)
         self->terminated = true;
 
     return NULL;

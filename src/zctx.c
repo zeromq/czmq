@@ -57,19 +57,6 @@ struct _zctx_t {
 };
 
 
-//  ---------------------------------------------------------------------
-//  Signal handling
-//  This is a global variable accessible to CZMQ application code
-
-volatile int zctx_interrupted = 0;
-
-static void
-s_signal_handler (int signal_value)
-{
-    zctx_interrupted = 1;
-}
-
-
 //  --------------------------------------------------------------------------
 //  Constructor
 
@@ -92,7 +79,7 @@ zctx_new (void)
     self->pipehwm = 1000;   
     self->sndhwm = 1000;
     self->rcvhwm = 1000;
-    zsys_handler_set (s_signal_handler);
+    zsys_catch_interrupts ();
     return self;
 }
 

@@ -205,7 +205,7 @@ zstr_free (char **string_p)
 //  DEPRECATED as poor style -- callers should use zloop or zpoller
 //  Receive C string from socket, if socket had input ready. Caller must
 //  free returned string using zstr_free. Returns NULL if there was no input
-//  waiting, or if the context was terminated. Use zctx_interrupted to exit
+//  waiting, or if the context was terminated. Use zsys_interrupted to exit
 //  any loop that relies on this method.
 
 char *
