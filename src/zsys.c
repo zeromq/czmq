@@ -47,25 +47,76 @@ static BOOL WINAPI s_handler_fn_shim (DWORD ctrltype)
 //  Global ZeroMQ context for this process
 void *process_ctx = NULL;
 
+//  Track number of open sockets so we can zmq_ctx_term() safely
+static size_t s_open_sockets = 0;
+
+#if defined (__UNIX__)
+typedef pthread_mutex_t zsys_mutex_t;
+#   define ZMUTEX_INIT(m)    pthread_mutex_init (&m, NULL);
+#   define ZMUTEX_LOCK(m)    pthread_mutex_lock (&m);
+#   define ZMUTEX_UNLOCK(m)  pthread_mutex_unlock (&m);
+#   define ZMUTEX_DESTROY(m) pthread_mutex_destroy (&m);
+#elif defined (__WINDOWS__)
+typedef CRITICAL_SECTION  zsys_mutex_t;
+#   define ZMUTEX_INIT(m)    InitializeCriticalSection (&m);
+#   define ZMUTEX_LOCK(m)    EnterCriticalSection (&m);
+#   define ZMUTEX_UNLOCK(m)  LeaveCriticalSection (&m);
+#   define ZMUTEX_DESTROY(m) DeleteCriticalSection (&m);
+#endif
+
+//  Mutex to guard socket counter
+static zsys_mutex_t s_mutex;
+
 static void
 s_destroy_process_ctx (void)
 {
-    zmq_ctx_term (process_ctx);
+    ZMUTEX_DESTROY (s_mutex);
+    if (s_open_sockets)
+        printf ("E: process terminated with open ZeroMQ sockets\n");
+    else
+        zmq_ctx_term (process_ctx);
 }
 
+
 //  --------------------------------------------------------------------------
-//  Get a new ZMQ socket, automagically creating a ZMQ context
-//  if this is the first time. Caller is responsible for destroying
-//  the ZMQ socket before process exits, to avoid a ZMQ deadlock.
+//  Get a new ZMQ socket, automagically creating a ZMQ context if this is
+//  the first time. Caller is responsible for destroying the ZMQ socket
+//  before process exits, to avoid a ZMQ deadlock. Note: you should not use
+//  this method in CZMQ apps, use zsock_new() instead. This is for system
+//  use only, really.
 
 void *
 zsys_socket (int type)
 {
+    //  First time initialization; if the application is mixing
+    //  its own threading calls with zsock, this may fail if two
+    //  threads try to create sockets at the same time. In such
+    //  apps, they MUST create a socket in the main program before
+    //  starting any threads. If the app uses zactor for its threads
+    //  then this is guaranteed to always be safe.
     if (!process_ctx) {
         process_ctx = zmq_ctx_new ();
+        ZMUTEX_INIT (s_mutex);
         atexit (s_destroy_process_ctx);
     }
+    ZMUTEX_LOCK (s_mutex);
+    s_open_sockets++;
+    ZMUTEX_UNLOCK (s_mutex);
     return zmq_socket (process_ctx, type);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Destroy/close a ZMQ socket. You should call this for every socket you 
+//  create using zsys_socket().
+
+int
+zsys_close (void *self)
+{
+    ZMUTEX_LOCK (s_mutex);
+    s_open_sockets--;
+    ZMUTEX_UNLOCK (s_mutex);
+    return zmq_close (self);
 }
 
 
