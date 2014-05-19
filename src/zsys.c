@@ -22,25 +22,36 @@
 
 #include "../include/czmq.h"
 
-//  We use these variables for signal handling
+//  Signal handling
+//  This is a global variable accessible to CZMQ application code
+
+volatile int zsys_interrupted = 0;  //  Current name
+volatile int zctx_interrupted = 0;  //  Deprecated name
+static bool s_first_time = true;
 
 #if defined (__UNIX__)
-static bool s_first_time = true;
 static struct sigaction sigint_default;
 static struct sigaction sigterm_default;
 
-#elif defined (__WINDOWS__)
-static bool s_shim_installed = false;
-static zsys_handler_fn *installed_handler_fn;
-static BOOL WINAPI s_handler_fn_shim (DWORD ctrltype)
+static void
+s_signal_handler (int signal_value)
 {
-   //  Return TRUE for events that we handle
-   if (ctrltype == CTRL_C_EVENT && installed_handler_fn != NULL) {
-       installed_handler_fn (ctrltype);
-       return TRUE;
-   }
-   else
-       return FALSE;
+    zctx_interrupted = 1;
+    zsys_interrupted = 1;
+}
+
+#elif defined (__WINDOWS__)
+static BOOL WINAPI
+s_signal_handler (DWORD ctrltype)
+{
+    //  Return TRUE for events that we handle
+    if (ctrltype == CTRL_C_EVENT) {
+        zctx_interrupted = 1;
+        zsys_interrupted = 1;
+        return TRUE;
+    }
+    else
+        return FALSE;
 }
 #endif
 
@@ -49,6 +60,15 @@ void *process_ctx = NULL;
 
 //  Track number of open sockets so we can zmq_ctx_term() safely
 static size_t s_open_sockets = 0;
+//  We keep a list of open sockets to report leaks to developers
+static zlist_t *s_sockref_list = NULL;
+
+//  This defines a single zsocket_new() caller instance
+typedef struct {
+    void *handle;
+    const char *filename;
+    size_t line_nbr;
+} s_sockref_t;
 
 #if defined (__UNIX__)
 typedef pthread_mutex_t zsys_mutex_t;
@@ -70,11 +90,32 @@ static zsys_mutex_t s_mutex;
 static void
 s_destroy_process_ctx (void)
 {
+    //  The atexit handler is called when the main function exits;
+    //  however we may have zactor threads shutting down and still
+    //  trying to close their sockets. So if we suspect there are
+    //  actors busy (s_open_sockets > 0), then we sleep for a few
+    //  hundred milliseconds to allow the actors, if any, to get in
+    //  and close their sockets.
+    ZMUTEX_LOCK (s_mutex);
+    size_t busy = s_open_sockets;
+    ZMUTEX_UNLOCK (s_mutex);
+    if (busy)
+        zclock_sleep (100);
+
+    //  No matter, we are now going to shut down
+    //  Print the source reference for any sockets the app did not
+    //  destroy properly.
+    s_sockref_t *sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
+    while (sockref) {
+        printf ("E: dangling socket created at %s:%zd\n",
+                sockref->filename, sockref->line_nbr);
+        zmq_close (sockref->handle);
+        free (sockref);
+        sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
+    }
+    zlist_destroy (&s_sockref_list);
+    zmq_ctx_term (process_ctx);
     ZMUTEX_DESTROY (s_mutex);
-    if (s_open_sockets)
-        printf ("E: process terminated with open ZeroMQ sockets\n");
-    else
-        zmq_ctx_term (process_ctx);
 }
 
 
@@ -86,7 +127,7 @@ s_destroy_process_ctx (void)
 //  use only, really.
 
 void *
-zsys_socket (int type)
+zsys_socket (int type, const char *filename, size_t line_nbr)
 {
     //  First time initialization; if the application is mixing
     //  its own threading calls with zsock, this may fail if two
@@ -97,12 +138,23 @@ zsys_socket (int type)
     if (!process_ctx) {
         process_ctx = zmq_ctx_new ();
         ZMUTEX_INIT (s_mutex);
+        s_sockref_list = zlist_new ();
+        zsys_catch_interrupts ();
+        srandom ((unsigned) time (NULL));
         atexit (s_destroy_process_ctx);
     }
     ZMUTEX_LOCK (s_mutex);
+    void *handle = zmq_socket (process_ctx, type);
+    if (filename) {
+        s_sockref_t *sockref = (s_sockref_t *) malloc (sizeof (s_sockref_t));
+        sockref->handle = handle;
+        sockref->filename = filename;
+        sockref->line_nbr = line_nbr;
+        zlist_append (s_sockref_list, sockref);
+    }
     s_open_sockets++;
     ZMUTEX_UNLOCK (s_mutex);
-    return zmq_socket (process_ctx, type);
+    return handle;
 }
 
 
@@ -111,74 +163,48 @@ zsys_socket (int type)
 //  create using zsys_socket().
 
 int
-zsys_close (void *self)
+zsys_close (void *handle)
 {
+    bool destroyed = false;
     ZMUTEX_LOCK (s_mutex);
-    s_open_sockets--;
+    s_sockref_t *sockref = (s_sockref_t *) zlist_first (s_sockref_list);
+    while (sockref) {
+        if (sockref->handle == handle) {
+            zlist_remove (s_sockref_list, sockref);
+            destroyed = true;
+            s_open_sockets--;
+            zmq_close (handle);
+            break;
+        }
+        sockref = (s_sockref_t *) zlist_next (s_sockref_list);
+    }
     ZMUTEX_UNLOCK (s_mutex);
-    return zmq_close (self);
+    assert (destroyed);
+    return 0;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Set interrupt handler (NULL means external handler)
-//  Idempotent; safe to call multiple times
+//  Set interrupt handler, so Ctrl-C or SIGTERM will set zsys_interrupted
+//  Idempotent; safe to call multiple times.
 
 void
-zsys_handler_set (zsys_handler_fn *handler_fn)
+zsys_catch_interrupts (void)
 {
-#if defined (__UNIX__)
-    //  Install signal handler for SIGINT and SIGTERM if not NULL
-    //  and if this is the first time we've been called
-    if (s_first_time) {
+    if (!s_first_time) {
         s_first_time = false;
-        if (handler_fn) {
-            struct sigaction action;
-            action.sa_handler = handler_fn;
-            action.sa_flags = 0;
-            sigemptyset (&action.sa_mask);
-            sigaction (SIGINT, &action, &sigint_default);
-            sigaction (SIGTERM, &action, &sigterm_default);
-        }
-        else {
-            //  Save default handlers if not already done
-            sigaction (SIGINT, NULL, &sigint_default);
-            sigaction (SIGTERM, NULL, &sigterm_default);
-        }
-    }
-#elif defined (__WINDOWS__)
-    installed_handler_fn = handler_fn;
-    if (!s_shim_installed) {
-        s_shim_installed = true;
-        SetConsoleCtrlHandler (s_handler_fn_shim, TRUE);
-    }
-#endif
-}
-
-
-//  --------------------------------------------------------------------------
-//  Reset interrupt handler, call this at exit if needed
-//  Idempotent; safe to call multiple times
-
-void
-zsys_handler_reset (void)
-{
 #if defined (__UNIX__)
-    //  Restore default handlers if not already done
-    if (sigint_default.sa_handler) {
-        sigaction (SIGINT, &sigint_default, NULL);
-        sigaction (SIGTERM, &sigterm_default, NULL);
-        sigint_default.sa_handler = NULL;
-        sigterm_default.sa_handler = NULL;
-        s_first_time = true;
-    }
+        //  Install signal handler for SIGINT and SIGTERM
+        struct sigaction action;
+        action.sa_handler = s_signal_handler;
+        action.sa_flags = 0;
+        sigemptyset (&action.sa_mask);
+        sigaction (SIGINT, &action, &sigint_default);
+        sigaction (SIGTERM, &action, &sigterm_default);
 #elif defined (__WINDOWS__)
-    if (s_shim_installed) {
-        SetConsoleCtrlHandler (s_handler_fn_shim, FALSE);
-        s_shim_installed = false;
-    }
-    installed_handler_fn = NULL;
+        SetConsoleCtrlHandler (s_signal_handler, TRUE);
 #endif
+    }
 }
 
 
@@ -776,11 +802,7 @@ zsys_test (bool verbose)
     printf (" * zsys: ");
 
     //  @selftest
-    zsys_handler_reset ();
-    zsys_handler_set (NULL);
-    zsys_handler_set (NULL);
-    zsys_handler_reset ();
-    zsys_handler_reset ();
+    zsys_catch_interrupts ();
 
     int rc = zsys_file_delete ("nosuchfile");
     assert (rc == -1);

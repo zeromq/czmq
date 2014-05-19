@@ -165,7 +165,6 @@ zactor_destroy (zactor_t **self_p)
         //  Signal the actor to end and wait for the thread exit code
         zstr_send (self->pipe, "$TERM");
         zsock_wait (self->pipe);
-
         zsock_destroy (&self->pipe);
         self->tag = 0xDeadBeef;
         free (self);
