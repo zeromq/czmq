@@ -106,7 +106,8 @@ zactor_new (zactor_fn *actor, void *args)
     assert (self->pipe);
     char endpoint [32];
     while (true) {
-        sprintf (endpoint, "inproc://zactor-%x", randof (0x100000000));
+        sprintf (endpoint, "inproc://zactor-%04x-%04x\n",
+                 randof (0x10000), randof (0x10000));
         if (zsock_bind (self->pipe, "%s", endpoint) == 0)
             break;
     }
@@ -164,7 +165,6 @@ zactor_destroy (zactor_t **self_p)
         //  Signal the actor to end and wait for the thread exit code
         zstr_send (self->pipe, "$TERM");
         zsock_wait (self->pipe);
-
         zsock_destroy (&self->pipe);
         self->tag = 0xDeadBeef;
         free (self);

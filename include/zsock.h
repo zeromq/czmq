@@ -20,9 +20,18 @@ extern "C" {
 
 //  @interface
 
-//  Create a new socket.
+//  Create a new socket. This macro passes the caller source and line
+//  number so that CZMQ can report socket leaks intelligently. To switch
+//  off this checking, which may be costly if you use a LOT of sockets,
+//  define ZSOCK_NOCHECK before compiling your code.
+#if defined (ZSOCK_NOCHECK)
+#   define zsock_new(t) zsock_new_((t), NULL, 0)
+#else
+#   define zsock_new(t) zsock_new_((t), __FILE__, __LINE__)
+#endif
+
 CZMQ_EXPORT zsock_t *
-    zsock_new (int type);
+    zsock_new_ (int type, const char *filename, size_t line_nbr);
 
 //  Destroy the socket. You must use this for any socket created via the
 //  zsock_new method.
@@ -70,27 +79,18 @@ CZMQ_EXPORT int
 CZMQ_EXPORT zmsg_t *
     zsock_recv (zsock_t *self);
 
-//  Send a signal over a socket. A signal is a zero-byte message.
-//  Signals are used primarily between threads, over pipe sockets.
-//  Returns -1 if there was an error sending the signal.
+//  Send a signal over a socket. A signal is a zero-byte message. Signals
+//  are used primarily between threads, over pipe sockets. Returns -1 if
+//  there was an error sending the signal. Accepts a zsock_t or a zactor_t
+//  as argument.
 CZMQ_EXPORT int
-    zsock_signal (zsock_t *self);
+    zsock_signal (void *self);
 
-//  Wait on a signal. Use this to coordinate between threads, over
-//  pipe pairs. Returns -1 on error, 0 on success.
+//  Wait on a signal. Use this to coordinate between threads, over pipe
+//  pairs. Blocks until the signal is received. Returns -1 on error, 0 on
+//  success. Accepts a zsock_t or a zactor_t as argument.
 CZMQ_EXPORT int
-    zsock_wait (zsock_t *self);
-
-//  Send a zmsg message to the socket, take ownership of the message
-//  and destroy when it has been sent.
-CZMQ_EXPORT int
-    zsock_send (zsock_t *self, zmsg_t **msg_p);
-
-//  Receive a zmsg message from the socket. Returns NULL if the socket
-//  was interrupted before the message could be received, or if there
-//  was a timeout on the socket.
-CZMQ_EXPORT zmsg_t *
-    zsock_recv (zsock_t *self);
+    zsock_wait (void *self);
 
 //  Probe the supplied object, and report if it looks like a zsock_t.
 CZMQ_EXPORT bool
@@ -105,7 +105,6 @@ CZMQ_EXPORT void *
 //  Self test of this class
 CZMQ_EXPORT void
     zsock_test (bool verbose);
-
 //  @end
 
 //  Compiler hints

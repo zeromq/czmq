@@ -37,6 +37,7 @@
 struct _zbeacon_t {
     void *pipe;                 //  Pipe through to backend agent
     char *hostname;             //  Our own address as string
+    zctx_t *ctx;    //TODO actorize this class
 };
 
 
@@ -55,8 +56,9 @@ zbeacon_new (zctx_t *ctx, int port_nbr)
     assert (self);
 
     //  Start background agent and wait for it to initialize
-    assert (ctx);
-    self->pipe = zthread_fork (ctx, s_agent_task, NULL);
+    self->ctx = zctx_new ();
+    assert (self->ctx);
+    self->pipe = zthread_fork (self->ctx, s_agent_task, NULL);
     if (self->pipe) {
         zstr_sendf (self->pipe, "%d", port_nbr);
         self->hostname = zstr_recv (self->pipe);
@@ -81,6 +83,7 @@ zbeacon_destroy (zbeacon_t **self_p)
         zstr_send (self->pipe, "TERMINATE");
         char *reply = zstr_recv (self->pipe);
         zstr_free (&reply);
+        zctx_destroy (&self->ctx);
         free (self->hostname);
         free (self);
         *self_p = NULL;
