@@ -38,8 +38,16 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT int
     zsys_close (void *handle);
     
-//  Set interrupt handler, so Ctrl-C or SIGTERM will set zsys_interrupted
-//  Idempotent; safe to call multiple times.
+//  Set interrupt handler (NULL means external handler)
+CZMQ_EXPORT void
+    zsys_handler_set (zsys_handler_fn *handler_fn);
+
+//  Reset interrupt handler, call this at exit if needed
+CZMQ_EXPORT void
+    zsys_handler_reset (void);
+
+//  Set default interrupt handler, so Ctrl-C or SIGTERM will set
+//  zsys_interrupted. Idempotent; safe to call multiple times.
 //  *** This is for CZMQ internal use only and may change arbitrarily ***
 CZMQ_EXPORT void
     zsys_catch_interrupts (void);
@@ -164,11 +172,9 @@ CZMQ_EXPORT void
 //  Global signal indicator, TRUE when user presses Ctrl-C or the process
 //  gets a SIGTERM signal.
 CZMQ_EXPORT extern volatile int zsys_interrupted;
-//  @end
-
-//  Deprecated
-#define zsys_handler_set (x) zsys_catch_interrupts ()
+//  Deprecated name for this variable
 CZMQ_EXPORT extern volatile int zctx_interrupted;
+//  @end
 
 #ifdef __cplusplus
 }

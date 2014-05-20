@@ -25,7 +25,7 @@ CZMQ_EXPORT void *
 
 //  Destroy a socket within our CZMQ context, replaces zmq_close.
 CZMQ_EXPORT void
-    zsocket_destroy (zctx_t *self, void *socket);
+    zsocket_destroy (zctx_t *ctx, void *self);
 
 //  Bind a socket to a formatted endpoint. If the port is specified as
 //  '*', binds to any free port from ZSOCKET_DYNFROM to ZSOCKET_DYNTO
@@ -33,54 +33,54 @@ CZMQ_EXPORT void
 //  bind succeeded with the specified port number. Always returns the
 //  port number if successful.
 CZMQ_EXPORT int
-    zsocket_bind (void *socket, const char *format, ...);
+    zsocket_bind (void *self, const char *format, ...);
 
 //  Unbind a socket from a formatted endpoint.
 //  Returns 0 if OK, -1 if the endpoint was invalid or the function
 //  isn't supported.
 CZMQ_EXPORT int
-    zsocket_unbind (void *socket, const char *format, ...);
+    zsocket_unbind (void *self, const char *format, ...);
 
 //  Connect a socket to a formatted endpoint
 //  Returns 0 if OK, -1 if the endpoint was invalid.
 CZMQ_EXPORT int
-    zsocket_connect (void *socket, const char *format, ...);
+    zsocket_connect (void *self, const char *format, ...);
 
 //  Disconnect a socket from a formatted endpoint
 //  Returns 0 if OK, -1 if the endpoint was invalid or the function
 //  isn't supported.
 CZMQ_EXPORT int
-    zsocket_disconnect (void *socket, const char *format, ...);
+    zsocket_disconnect (void *self, const char *format, ...);
 
 //  Poll for input events on the socket. Returns TRUE if there is input
 //  ready on the socket, else FALSE.
 CZMQ_EXPORT bool
-    zsocket_poll (void *socket, int msecs);
+    zsocket_poll (void *self, int msecs);
 
 //  Returns socket type as printable constant string
 CZMQ_EXPORT const char *
-    zsocket_type_str (void *socket);
+    zsocket_type_str (void *self);
 
 //  Send data over a socket as a single message frame.
 //  Accepts these flags: ZFRAME_MORE and ZFRAME_DONTWAIT.
 CZMQ_EXPORT int
-    zsocket_sendmem (void *socket, const void *data, size_t size, int flags);
+    zsocket_sendmem (void *self, const void *data, size_t size, int flags);
 
 //  Send a signal over a socket. A signal is a zero-byte message.
 //  Signals are used primarily between threads, over pipe sockets.
 //  Returns -1 if there was an error sending the signal.
 CZMQ_EXPORT int
-    zsocket_signal (void *socket);
+    zsocket_signal (void *self);
 
 //  Wait on a signal. Use this to coordinate between threads, over
 //  pipe pairs. Returns -1 on error, 0 on success.
 CZMQ_EXPORT int
-    zsocket_wait (void *socket);
+    zsocket_wait (void *self);
 
 //  Send data over a socket as a single message frame.
 //  Returns -1 on error, 0 on success
 CZMQ_EXPORT int
-    zsocket_sendmem (void *socket, const void *data, size_t size, int flags);
+    zsocket_sendmem (void *self, const void *data, size_t size, int flags);
 
 //  Self test of this class
 CZMQ_EXPORT void
