@@ -39,13 +39,12 @@ s_signal_handler (int signal_value)
 }
 
 //  We use these variables for signal handling
+static bool s_first_time = true;
 #if defined (__UNIX__)
-static bool s_handler_installed = false;
 static struct sigaction sigint_default;
 static struct sigaction sigterm_default;
 
 #elif defined (__WINDOWS__)
-static bool s_handler_installed = false;
 static zsys_handler_fn *installed_handler_fn;
 static BOOL WINAPI s_handler_fn_shim (DWORD ctrltype)
 {
@@ -199,36 +198,36 @@ zsys_close (void *handle)
 
 
 //  --------------------------------------------------------------------------
-//  Set interrupt handler (NULL means external handler)
-//  Idempotent; safe to call multiple times
+//  Set interrupt handler; this saves the default handlers so that a
+//  zsys_handler_reset () can restore them. If you call this multiple times
+//  then the last handler will take affect. Note handler_fn cannot be null.
 
 void
 zsys_handler_set (zsys_handler_fn *handler_fn)
 {
+    //  After 2014-04-20 this code does not accept NULL handlers, which
+    //  was complexity for no known benefit.
+    assert (handler_fn);
+
 #if defined (__UNIX__)
-    //  Install signal handler for SIGINT and SIGTERM if not NULL
-    //  and if this is the first time we've been called
-    if (!s_handler_installed) {
-        s_handler_installed = true;
-        if (handler_fn) {
-            struct sigaction action;
-            action.sa_handler = handler_fn;
-            action.sa_flags = 0;
-            sigemptyset (&action.sa_mask);
-            sigaction (SIGINT, &action, &sigint_default);
-            sigaction (SIGTERM, &action, &sigterm_default);
-        }
-        else {
-            //  Save default handlers if not already done
-            sigaction (SIGINT, NULL, &sigint_default);
-            sigaction (SIGTERM, NULL, &sigterm_default);
-        }
+    //  If first time, save default handlers
+    if (s_first_time) {
+        sigaction (SIGINT, NULL, &sigint_default);
+        sigaction (SIGTERM, NULL, &sigterm_default);
+        s_first_time = false;
     }
+    //  Install signal handler for SIGINT and SIGTERM
+    struct sigaction action;
+    action.sa_handler = handler_fn;
+    action.sa_flags = 0;
+    sigemptyset (&action.sa_mask);
+    sigaction (SIGINT, &action, NULL);
+    sigaction (SIGTERM, &action, NULL);
 #elif defined (__WINDOWS__)
     installed_handler_fn = handler_fn;
-    if (!s_handler_installed) {
-        s_handler_installed = true;
+    if (s_first_time) {
         SetConsoleCtrlHandler (s_handler_fn_shim, TRUE);
+        s_first_time = false;
     }
 #endif
 }
@@ -243,19 +242,19 @@ zsys_handler_reset (void)
 {
 #if defined (__UNIX__)
     //  Restore default handlers if not already done
-    if (sigint_default.sa_handler) {
+    if (!s_first_time) {
         sigaction (SIGINT, &sigint_default, NULL);
         sigaction (SIGTERM, &sigterm_default, NULL);
         sigint_default.sa_handler = NULL;
         sigterm_default.sa_handler = NULL;
-        s_handler_installed = false;
+        s_first_time = true;
     }
 #elif defined (__WINDOWS__)
-    if (s_handler_installed) {
+    if (!s_first_time) {
         SetConsoleCtrlHandler (s_handler_fn_shim, FALSE);
-        s_handler_installed = false;
+        installed_handler_fn = NULL;
+        s_first_time = true;
     }
-    installed_handler_fn = NULL;
 #endif
 }
 
