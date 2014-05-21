@@ -453,7 +453,6 @@ s_get_interface (agent_t *self)
                 if (self->address.sin_addr.s_addr != ntohl (INADDR_LOOPBACK))
                     num_interfaces++;
 
-puts (interface->ifa_name);
                 //  If this is the specified interface then move on
                 if (streq (interface->ifa_name, zsys_interface ()))
                     break;
