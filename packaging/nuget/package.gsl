@@ -38,38 +38,7 @@
     <files>
         <!-- include -->
         
-        <file src="..\\..\\include\\czmq.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\czmq_prelude.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\platform.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zchunk.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zclock.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zframe.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zlist.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zhash.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zconfig.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zctx.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zfile.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zdir.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zdir_patch.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zdigest.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zlog.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zloop.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zmsg.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zmonitor.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zmutex.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zpoller.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zsocket.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zsockopt.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zstr.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zsys.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zthread.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zrex.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zbeacon.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zauth.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zcert.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zcertstore.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zproxy.h" target="build\\native\\include" />
-        <file src="..\\..\\include\\zuuid.h" target="build\\native\\include" />
+        <file src="..\\..\\include\\*.h" target="build\\native\\include" />
 
         <!-- targets -->
       
