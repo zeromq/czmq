@@ -22,44 +22,51 @@
 
 #include "../include/czmq.h"
 
+//  --------------------------------------------------------------------------
 //  Signal handling
-//  This is a global variable accessible to CZMQ application code
 
+//  These are global variables accessible to CZMQ application code
 volatile int zsys_interrupted = 0;  //  Current name
 volatile int zctx_interrupted = 0;  //  Deprecated name
-static bool s_first_time = true;
 
-#if defined (__UNIX__)
-static struct sigaction sigint_default;
-static struct sigaction sigterm_default;
-
+//  Default internal signal handler
 static void
 s_signal_handler (int signal_value)
 {
+    puts ("INTERRUPTED");
     zctx_interrupted = 1;
     zsys_interrupted = 1;
 }
 
+//  We use these variables for signal handling
+static bool s_first_time = true;
+#if defined (__UNIX__)
+static struct sigaction sigint_default;
+static struct sigaction sigterm_default;
+
 #elif defined (__WINDOWS__)
-static BOOL WINAPI
-s_signal_handler (DWORD ctrltype)
+static zsys_handler_fn *installed_handler_fn;
+static BOOL WINAPI s_handler_fn_shim (DWORD ctrltype)
 {
-    //  Return TRUE for events that we handle
-    if (ctrltype == CTRL_C_EVENT) {
-        zctx_interrupted = 1;
-        zsys_interrupted = 1;
-        return TRUE;
-    }
-    else
-        return FALSE;
+   //  Return TRUE for events that we handle
+   if (ctrltype == CTRL_C_EVENT && installed_handler_fn != NULL) {
+       installed_handler_fn (ctrltype);
+       return TRUE;
+   }
+   else
+       return FALSE;
 }
 #endif
+
+//  --------------------------------------------------------------------------
+//  Global context handling
 
 //  Global ZeroMQ context for this process
 void *process_ctx = NULL;
 
 //  Track number of open sockets so we can zmq_ctx_term() safely
 static size_t s_open_sockets = 0;
+
 //  We keep a list of open sockets to report leaks to developers
 static zlist_t *s_sockref_list = NULL;
 
@@ -70,6 +77,7 @@ typedef struct {
     size_t line_nbr;
 } s_sockref_t;
 
+//  Mutex macros
 #if defined (__UNIX__)
 typedef pthread_mutex_t zsys_mutex_t;
 #   define ZMUTEX_INIT(m)    pthread_mutex_init (&m, NULL);
@@ -87,6 +95,7 @@ typedef CRITICAL_SECTION  zsys_mutex_t;
 //  Mutex to guard socket counter
 static zsys_mutex_t s_mutex;
 
+//  atexit handler to destroy process-global context
 static void
 s_destroy_process_ctx (void)
 {
@@ -116,7 +125,7 @@ s_destroy_process_ctx (void)
     }
     zlist_destroy (&s_sockref_list);
     ZMUTEX_UNLOCK (s_mutex);
-    
+
     zmq_ctx_term (process_ctx);
     ZMUTEX_DESTROY (s_mutex);
 }
@@ -189,26 +198,75 @@ zsys_close (void *handle)
 
 
 //  --------------------------------------------------------------------------
-//  Set interrupt handler, so Ctrl-C or SIGTERM will set zsys_interrupted
-//  Idempotent; safe to call multiple times.
+//  Set interrupt handler; this saves the default handlers so that a
+//  zsys_handler_reset () can restore them. If you call this multiple times
+//  then the last handler will take affect. Note handler_fn cannot be null.
+
+void
+zsys_handler_set (zsys_handler_fn *handler_fn)
+{
+    //  After 2014-04-20 this code does not accept NULL handlers, which
+    //  was complexity for no known benefit.
+    assert (handler_fn);
+
+#if defined (__UNIX__)
+    //  If first time, save default handlers
+    if (s_first_time) {
+        sigaction (SIGINT, NULL, &sigint_default);
+        sigaction (SIGTERM, NULL, &sigterm_default);
+        s_first_time = false;
+    }
+    //  Install signal handler for SIGINT and SIGTERM
+    struct sigaction action;
+    action.sa_handler = handler_fn;
+    action.sa_flags = 0;
+    sigemptyset (&action.sa_mask);
+    sigaction (SIGINT, &action, NULL);
+    sigaction (SIGTERM, &action, NULL);
+#elif defined (__WINDOWS__)
+    installed_handler_fn = handler_fn;
+    if (s_first_time) {
+        SetConsoleCtrlHandler (s_handler_fn_shim, TRUE);
+        s_first_time = false;
+    }
+#endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Reset interrupt handler, call this at exit if needed
+//  Idempotent; safe to call multiple times
+
+void
+zsys_handler_reset (void)
+{
+#if defined (__UNIX__)
+    //  Restore default handlers if not already done
+    if (!s_first_time) {
+        sigaction (SIGINT, &sigint_default, NULL);
+        sigaction (SIGTERM, &sigterm_default, NULL);
+        sigint_default.sa_handler = NULL;
+        sigterm_default.sa_handler = NULL;
+        s_first_time = true;
+    }
+#elif defined (__WINDOWS__)
+    if (!s_first_time) {
+        SetConsoleCtrlHandler (s_handler_fn_shim, FALSE);
+        installed_handler_fn = NULL;
+        s_first_time = true;
+    }
+#endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set default interrupt handler, so Ctrl-C or SIGTERM will set
+//  zsys_interrupted. Idempotent; safe to call multiple times.
 
 void
 zsys_catch_interrupts (void)
 {
-    if (!s_first_time) {
-        s_first_time = false;
-#if defined (__UNIX__)
-        //  Install signal handler for SIGINT and SIGTERM
-        struct sigaction action;
-        action.sa_handler = s_signal_handler;
-        action.sa_flags = 0;
-        sigemptyset (&action.sa_mask);
-        sigaction (SIGINT, &action, &sigint_default);
-        sigaction (SIGTERM, &action, &sigterm_default);
-#elif defined (__WINDOWS__)
-        SetConsoleCtrlHandler (s_signal_handler, TRUE);
-#endif
-    }
+    zsys_handler_set (s_signal_handler);
 }
 
 

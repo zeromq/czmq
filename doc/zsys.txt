@@ -13,12 +13,20 @@ SYNOPSIS
 //  Callback for interrupt signal handler
 typedef void (zsys_handler_fn) (int signal_value);
 
-//  Get a new ZMQ socket, automagically creating a ZMQ context
-//  if this is the first time. Caller is responsible for destroying
-//  the ZMQ socket before process exits, to avoid a ZMQ deadlock.
+//  Get a new ZMQ socket, automagically creating a ZMQ context if this is
+//  the first time. Caller is responsible for destroying the ZMQ socket
+//  before process exits, to avoid a ZMQ deadlock. Note: you should not use
+//  this method in CZMQ apps, use zsock_new() instead.
+//  *** This is for CZMQ internal use only and may change arbitrarily ***
 CZMQ_EXPORT void *
-    zsys_socket (int type);
+    zsys_socket (int type, const char *filename, size_t line_nbr);
 
+//  Destroy/close a ZMQ socket. You should call this for every socket you
+//  create using zsys_socket().
+//  *** This is for CZMQ internal use only and may change arbitrarily ***
+CZMQ_EXPORT int
+    zsys_close (void *handle);
+    
 //  Set interrupt handler (NULL means external handler)
 CZMQ_EXPORT void
     zsys_handler_set (zsys_handler_fn *handler_fn);
@@ -27,15 +35,23 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zsys_handler_reset (void);
 
+//  Set default interrupt handler, so Ctrl-C or SIGTERM will set
+//  zsys_interrupted. Idempotent; safe to call multiple times.
+//  *** This is for CZMQ internal use only and may change arbitrarily ***
+CZMQ_EXPORT void
+    zsys_catch_interrupts (void);
+
 //  Set network interface name to use for broadcasts
 //  Use this to force the interface for beacons
 //  This is experimental; may be merged into zbeacon class.
+//  *** This is for CZMQ internal use only and may change arbitrarily ***
 CZMQ_EXPORT void
     zsys_set_interface (const char *interface_name);
 
 //  Return network interface name to use for broadcasts.
 //  Returns "" if no interface was set.
 //  This is experimental; may be merged into zbeacon class.
+//  *** This is for CZMQ internal use only and may change arbitrarily ***
 CZMQ_EXPORT char *
     zsys_interface (void);
 
@@ -82,7 +98,7 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zsys_file_mode_default (void);
 
-//  Return the czmq version for run-time API detection
+//  Return the CZMQ version for run-time API detection
 CZMQ_EXPORT void
     zsys_version (int *major, int *minor, int *patch);
 
@@ -101,20 +117,24 @@ CZMQ_EXPORT char *
 //  Create UDP beacon socket; if the routable option is true, uses
 //  multicast (not yet implemented), else uses broadcast. This method
 //  and related ones might _eventually_ be moved to a zudp class.
+//  *** This is for CZMQ internal use only and may change arbitrarily ***
 CZMQ_EXPORT SOCKET
     zsys_udp_new (bool routable);
 
 //  Send zframe to UDP socket
+//  *** This is for CZMQ internal use only and may change arbitrarily ***
 CZMQ_EXPORT void
     zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address);
 
 //  Receive zframe from UDP socket, and set address of peer that sent it
 //  The peername must be a char [INET_ADDRSTRLEN] array.
+//  *** This is for CZMQ internal use only and may change arbitrarily ***
 CZMQ_EXPORT zframe_t *
     zsys_udp_recv (SOCKET udpsock, char *peername);
 
 //  Handle an I/O error on some socket operation; will report and die on
 //  fatal errors, and continue silently on "try again" errors.
+//  *** This is for CZMQ internal use only and may change arbitrarily ***
 CZMQ_EXPORT void
     zsys_socket_error (const char *reason);
     
@@ -137,6 +157,12 @@ CZMQ_EXPORT int
 //  Self test of this class
 CZMQ_EXPORT void
     zsys_test (bool verbose);
+    
+//  Global signal indicator, TRUE when user presses Ctrl-C or the process
+//  gets a SIGTERM signal.
+CZMQ_EXPORT extern volatile int zsys_interrupted;
+//  Deprecated name for this variable
+CZMQ_EXPORT extern volatile int zctx_interrupted;
 ----
 
 DESCRIPTION
@@ -151,11 +177,7 @@ EXAMPLE
 -------
 .From zsys_test method
 ----
-    zsys_handler_reset ();
-    zsys_handler_set (NULL);
-    zsys_handler_set (NULL);
-    zsys_handler_reset ();
-    zsys_handler_reset ();
+    zsys_catch_interrupts ();
 
     int rc = zsys_file_delete ("nosuchfile");
     assert (rc == -1);
