@@ -400,26 +400,21 @@ s_agent_new (void *pipe, int port_nbr)
 #if (defined (__WINDOWS__))
     inaddr_t sockaddr = self->address;
 #else
-#   ifndef gai_strerrorA
-#       define gai_strerrorA gai_strerror
-#   endif
     inaddr_t sockaddr = self->broadcast;
 #endif
-    if (bind (self->udpsock, (struct sockaddr *) &sockaddr, sizeof (sockaddr)) == SOCKET_ERROR)
+    int rc = bind (self->udpsock, (struct sockaddr *) &sockaddr, sizeof (inaddr_t));
+    if (rc == SOCKET_ERROR)
         zsys_socket_error ("bind");
 
     //  Send our hostname back to API
     //  PROBLEM: this hostname will not be accurate when the node
     //  has more than one active interface.
-    char hostname [255];
-    int rc = getnameinfo ((struct sockaddr *) &self->address, sizeof (self->address),
-                           hostname, 255, NULL, 0, NI_NUMERICHOST);
-    if (rc) {
-        puts (gai_strerrorA (rc));
+    char hostname [NI_MAXHOST];
+    rc = getnameinfo ((struct sockaddr *) &self->address, sizeof (inaddr_t),
+                       hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+    if (rc)
         strcpy (hostname, "127.0.0.1");
-    }
     zstr_send (pipe, hostname);
-    
     return self;
 }
 
