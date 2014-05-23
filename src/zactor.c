@@ -62,7 +62,7 @@ s_thread_shim (void *args)
     assert (args);
     shim_t *shim = (shim_t *) args;
     shim->handler (shim->pipe, shim->args);
-    zsock_signal (shim->pipe);
+    zsock_signal (shim->pipe, 0);
     zsock_destroy (&shim->pipe);
     free (shim);
     return NULL;
@@ -77,7 +77,7 @@ s_thread_shim (void *arglist)
     assert (arglist);
     shim_t *shim = (shim_t *) args;
     shim->handler (shim->pipe, shim->args);
-    zsock_signal (shim->pipe);
+    zsock_signal (shim->pipe, 0);
     zsock_destroy (&shim->pipe);
     free (shim);
     _endthreadex (0);           //  Terminates thread
@@ -233,7 +233,7 @@ echo_actor (zsock_t *pipe, void *args)
 {
     //  Do some initialization
     assert (streq ((char *) args, "Hello, World"));
-    zsock_signal (pipe);
+    zsock_signal (pipe, 0);
 
     bool terminated = false;
     while (!terminated) {
