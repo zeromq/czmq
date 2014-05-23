@@ -138,11 +138,11 @@ zmsg_send (zmsg_t **self_p, void *dest)
 
     int rc = 0;
     void *handle = zsock_resolve (dest);
-    if (zlist_size (self->frames) == 0)
-        return -1;
-    else
     if (self) {
         assert (zmsg_is (self));
+        if (zlist_size (self->frames) == 0)
+            return -1;          //  Sending an empty message is an error
+        
         zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
         while (frame) {
             rc = zframe_send (&frame, handle,
@@ -958,6 +958,7 @@ zmsg_test (bool verbose)
     assert (zmsg_send (&msg, output) == -1);
     assert (msg != NULL);
     zmsg_destroy (&msg);
+    assert (zmsg_send (&msg, output) == 0);
 
     zsock_destroy (&input);
     zsock_destroy (&output);
