@@ -251,40 +251,47 @@ zsock_recv (zsock_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Send a signal over a socket. A signal is a zero-byte message. Signals
-//  are used primarily between threads, over pipe sockets. Returns -1 if
-//  there was an error sending the signal. Accepts a zsock_t or a zactor_t
-//  as argument.
+//  Send a signal over a socket. A signal is a short message carrying a
+//  success/failure code (by convention, 0 means OK). Signals are encoded
+//  to be distinguishable from "normal" messages. Accepts a zock_t or a
+//  zactor_t argument, and returns 0 if successful, -1 if the signal could
+//  not be sent.
 
 int
-zsock_signal (void *self)
+zsock_signal (void *self, byte status)
 {
     assert (self);
-    return zstr_send (self, "");
+    int64_t signal_value = 0x7766554433221100L + status;
+    zmsg_t *msg = zmsg_new ();
+    zmsg_addmem (msg, &signal_value, 8);
+    return zmsg_send (&msg, self);
 }
 
 
 //  --------------------------------------------------------------------------
 //  Wait on a signal. Use this to coordinate between threads, over pipe
-//  pairs. Blocks until the signal is received. Returns -1 on error, 0 on
-//  success. Accepts a zsock_t or a zactor_t as argument.
-
+//  pairs. Blocks until the signal is received. Returns -1 on error, 0 or
+//  greater on success. Accepts a zsock_t or a zactor_t as argument.
 int
 zsock_wait (void *self)
 {
     assert (self);
 
-    //  A signal is a message containing one empty frame
-    //  If we get anything else, we discard it and continue
-    //  to look for the signal message
+    //  A signal is a message containing one frame with our 8-byte magic 
+    //  value. If we get anything else, we discard it and continue to look
+    //  for the signal message
     while (true) {
         zmsg_t *msg = zmsg_recv (self);
         if (!msg)
             return -1;
         if (zmsg_size (msg) == 1
-        &&  zmsg_content_size (msg) == 0) {
-            zmsg_destroy (&msg);
-            return 0;
+        &&  zmsg_content_size (msg) == 8) {
+            zframe_t *frame = zmsg_first (msg);
+            int64_t signal_value = *((int64_t *) zframe_data (frame));
+            if ((signal_value & 0xFFFFFFFFFFFFFF00L) == 0x7766554433221100L) {
+                zmsg_destroy (&msg);
+                return signal_value & 255;
+            }
         }
         zmsg_destroy (&msg);
     }
@@ -379,10 +386,10 @@ zsock_test (bool verbose)
     rc = zsock_connect (reader, "txp://localhost:%d", service);
     assert (rc == -1);
 
-    rc = zsock_signal (writer);
+    rc = zsock_signal (writer, 123);
     assert (rc == 0);
     rc = zsock_wait (reader);
-    assert (rc == 0);
+    assert (rc == 123);
 
     zsock_destroy (&reader);
     zsock_destroy (&writer);
