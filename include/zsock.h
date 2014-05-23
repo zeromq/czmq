@@ -79,16 +79,17 @@ CZMQ_EXPORT int
 CZMQ_EXPORT zmsg_t *
     zsock_recv (zsock_t *self);
 
-//  Send a signal over a socket. A signal is a zero-byte message. Signals
-//  are used primarily between threads, over pipe sockets. Returns -1 if
-//  there was an error sending the signal. Accepts a zsock_t or a zactor_t
-//  as argument.
+//  Send a signal over a socket. A signal is a short message carrying a
+//  success/failure code (by convention, 0 means OK). Signals are encoded
+//  to be distinguishable from "normal" messages. Accepts a zock_t or a
+//  zactor_t argument, and returns 0 if successful, -1 if the signal could
+//  not be sent.
 CZMQ_EXPORT int
-    zsock_signal (void *self);
-
+    zsock_signal (void *self, byte status);
+    
 //  Wait on a signal. Use this to coordinate between threads, over pipe
-//  pairs. Blocks until the signal is received. Returns -1 on error, 0 on
-//  success. Accepts a zsock_t or a zactor_t as argument.
+//  pairs. Blocks until the signal is received. Returns -1 on error, 0 or
+//  greater on success. Accepts a zsock_t or a zactor_t as argument.
 CZMQ_EXPORT int
     zsock_wait (void *self);
 
