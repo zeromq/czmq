@@ -47,7 +47,10 @@ static void
 
 
 //  --------------------------------------------------------------------------
-//  Create a new beacon
+//  Create a new beacon on a certain UDP port. If the system does not
+//  support UDP broadcasts (lacking a useful interface), returns NULL.
+//  To force the beacon to operate on a given port, set the environment
+//  variable ZSYS_INTERFACE, or call zsys_set_interface() beforehand.
 
 zbeacon_t *
 zbeacon_new (zctx_t *ctx, int port_nbr)
@@ -62,6 +65,12 @@ zbeacon_new (zctx_t *ctx, int port_nbr)
     if (self->pipe) {
         zstr_sendf (self->pipe, "%d", port_nbr);
         self->hostname = zstr_recv (self->pipe);
+        if (streq (self->hostname, "-")) {
+            free (self->hostname);
+            zctx_destroy (&self->ctx);
+            free (self);
+            self = NULL;
+        }
     }
     else {
         free (self);
@@ -211,6 +220,10 @@ zbeacon_test (bool verbose)
     //  Create beacon to broadcast our service
     byte announcement [2] = { (port_nbr >> 8) & 0xFF, port_nbr & 0xFF };
     zbeacon_t *service_beacon = zbeacon_new (ctx, 9999);
+    if (service_beacon == NULL) {
+        printf ("OK (skipping test, no UDP discovery)\n");
+        return;
+    }
     zbeacon_set_interval (service_beacon, 100);
     zbeacon_publish (service_beacon, announcement, 2);
 
@@ -410,12 +423,20 @@ s_agent_new (void *pipe, int port_nbr)
     //  PROBLEM: this hostname will not be accurate when the node
     //  has more than one active interface.
     char hostname [NI_MAXHOST];
-    rc = getnameinfo ((struct sockaddr *) &self->address, sizeof (inaddr_t),
-                       hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
-    if (rc)
-        strcpy (hostname, "127.0.0.1");
-    zstr_send (pipe, hostname);
-    return self;
+    rc = getnameinfo ((struct sockaddr *) &self->address,
+            sizeof (inaddr_t), hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+    if (rc == 0) {
+        //  It all looks OK
+        zstr_send (pipe, hostname);
+        return self;
+    }
+    else {
+        //  Interface looks unsupported, abort
+        zstr_send (pipe, "-");
+        closesocket (self->udpsock);
+        free (self);
+        return NULL;
+    }
 }
 
 
