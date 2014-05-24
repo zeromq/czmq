@@ -19,7 +19,10 @@ extern "C" {
 #endif
 
 //  @interface
-//  Create a new beacon on a certain UDP port
+//  Create a new beacon on a certain UDP port. If the system does not
+//  support UDP broadcasts (lacking a useful interface), returns NULL.
+//  To force the beacon to operate on a given port, set the environment
+//  variable ZSYS_INTERFACE, or call zsys_set_interface() beforehand.
 CZMQ_EXPORT zbeacon_t *
     zbeacon_new (zctx_t *ctx, int port_nbr);
     
