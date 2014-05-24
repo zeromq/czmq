@@ -220,6 +220,10 @@ zbeacon_test (bool verbose)
     //  Create beacon to broadcast our service
     byte announcement [2] = { (port_nbr >> 8) & 0xFF, port_nbr & 0xFF };
     zbeacon_t *service_beacon = zbeacon_new (ctx, 9999);
+    if (service_beacon == NULL) {
+        printf ("OK (skipping test, no UDP discovery)\n");
+        return;
+    }
     zbeacon_set_interval (service_beacon, 100);
     zbeacon_publish (service_beacon, announcement, 2);
 
