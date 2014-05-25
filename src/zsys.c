@@ -124,7 +124,6 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
 
     //  Configure socket with process defaults
     zsock_set_linger (handle, s_linger);
-    zsock_set_ipv6 (handle, s_ipv6);
 #if (ZMQ_VERSION_MAJOR == 2)
     //  For ZeroMQ/2.x we use sndhwm for both send and receive
     zsock_set_hwm (handle, s_sndhwm);
@@ -132,6 +131,11 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
     //  For later versions we use separate SNDHWM and RCVHWM
     zsock_set_sndhwm (handle, s_sndhwm);
     zsock_set_rcvhwm (handle, s_rcvhwm);
+#   if defined (ZMQ_IPV6)
+    zsock_set_ipv6 (handle, s_ipv6);
+#   else
+    zsock_set_ipv4only (handle, s_ipv6? 0: 1);
+#   endif
 #endif
     //  Add socket to reference tracker so we can report leaks
     //  TODO: let user disable this via environment variable; by default
@@ -941,7 +945,7 @@ zsys_set_rcvhwm (size_t rcvhwm)
 //  and connect to both IPv4 and IPv6 peers. You can override the setting on
 //  each zsock_t instance. The default is IPv4 only (ipv6 set to 0). If the
 //  environment variable ZSYS_IPV6 is defined (as 1 or 0), this provides the
-//  default.
+//  default. Note: has no effect on ZMQ v2.
 
 void
 zsys_set_ipv6 (int ipv6)
