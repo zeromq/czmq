@@ -74,6 +74,7 @@ CZMQ_EXPORT const char *
 
 //  Send data over a socket as a single message frame.
 //  Accepts these flags: ZFRAME_MORE and ZFRAME_DONTWAIT.
+//  Returns -1 on error, 0 on success
 CZMQ_EXPORT int
     zsocket_sendmem (void *self, const void *data, size_t size, int flags);
 
@@ -87,11 +88,6 @@ CZMQ_EXPORT int
 //  pipe pairs. Returns -1 on error, 0 on success.
 CZMQ_EXPORT int
     zsocket_wait (void *self);
-
-//  Send data over a socket as a single message frame.
-//  Returns -1 on error, 0 on success
-CZMQ_EXPORT int
-    zsocket_sendmem (void *self, const void *data, size_t size, int flags);
 
 //  Self test of this class
 CZMQ_EXPORT void
