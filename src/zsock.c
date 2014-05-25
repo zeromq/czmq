@@ -59,11 +59,20 @@ zsock_new_ (int type, const char *filename, size_t line_nbr)
         free (self);
         return NULL;
     }
+    //  TODO: linger and HWMs should come from zsys
     //  Set default shutdown behavior to "immediate"; if the caller wants to
     //  provide time for message delivery before shutdown; they can set the
     //  linger value to something higher.
     zsock_set_linger (self, 0);
 
+#if (ZMQ_VERSION_MAJOR == 2)
+    //  For ZeroMQ/2.x we use sndhwm for both send and receive
+    zsock_set_hwm (self, 1000);
+#else
+    //  For later versions we use separate SNDHWM and RCVHWM
+    zsock_set_sndhwm (self, 1000);
+    zsock_set_rcvhwm (self, 1000);
+#endif
     return self;
 }
 
@@ -272,6 +281,7 @@ zsock_signal (void *self, byte status)
 //  Wait on a signal. Use this to coordinate between threads, over pipe
 //  pairs. Blocks until the signal is received. Returns -1 on error, 0 or
 //  greater on success. Accepts a zsock_t or a zactor_t as argument.
+
 int
 zsock_wait (void *self)
 {
