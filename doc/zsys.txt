@@ -177,7 +177,7 @@ CZMQ_EXPORT void
 //  and connect to both IPv4 and IPv6 peers. You can override the setting on
 //  each zsock_t instance. The default is IPv4 only (ipv6 set to 0). If the
 //  environment variable ZSYS_IPV6 is defined (as 1 or 0), this provides the
-//  default.
+//  default. Note: has no effect on ZMQ v2.
 CZMQ_EXPORT void
     zsys_set_ipv6 (int ipv6);
 
