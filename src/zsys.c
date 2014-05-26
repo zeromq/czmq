@@ -20,6 +20,7 @@
 @end
 */
 
+#include "platform.h"
 #include "../include/czmq.h"
 
 //  --------------------------------------------------------------------------
@@ -29,14 +30,9 @@
 volatile int zsys_interrupted = 0;  //  Current name
 volatile int zctx_interrupted = 0;  //  Deprecated name
 
-//  Default internal signal handler
-static void
-s_signal_handler (int signal_value)
-{
-    puts ("INTERRUPTED");
-    zctx_interrupted = 1;
-    zsys_interrupted = 1;
-}
+static void s_initialize_process (void);
+static void s_terminate_process (void);
+static void s_signal_handler (int signal_value);
 
 //  We use these variables for signal handling
 static bool s_first_time = true;
@@ -63,6 +59,15 @@ static BOOL WINAPI s_handler_fn_shim (DWORD ctrltype)
 
 //  Global ZeroMQ context for this process
 void *process_ctx = NULL;
+
+//  Default globals for new sockets and other joys; these can all be set
+//  from the environment, or via the zsys_set_xxx API.
+static size_t s_iothreads = 1;      //  ZSYS_IOTHREADS=1
+static size_t s_linger = 0;         //  ZSYS_LINGER=0
+static size_t s_sndhwm = 1000;      //  ZSYS_SNDHWM=1000
+static size_t s_rcvhwm = 1000;      //  ZSYS_RCVHWM=1000
+static int s_ipv6 = 0;              //  ZSYS_IPV6=0
+static char *s_interface = NULL;    //  ZSYS_INTERFACE=
 
 //  Track number of open sockets so we can zmq_ctx_term() safely
 static size_t s_open_sockets = 0;
@@ -95,9 +100,89 @@ typedef CRITICAL_SECTION  zsys_mutex_t;
 //  Mutex to guard socket counter
 static zsys_mutex_t s_mutex;
 
-//  atexit handler to destroy process-global context
+
+//  --------------------------------------------------------------------------
+//  Get a new ZMQ socket, automagically creating a ZMQ context if this is
+//  the first time. Caller is responsible for destroying the ZMQ socket
+//  before process exits, to avoid a ZMQ deadlock. Note: you should not use
+//  this method in CZMQ apps, use zsock_new() instead. This is for system
+//  use only, really.
+
+void *
+zsys_socket (int type, const char *filename, size_t line_nbr)
+{
+    //  First time initialization; if the application is mixing
+    //  its own threading calls with zsock, this may fail if two
+    //  threads try to create sockets at the same time. In such
+    //  apps, they MUST create a socket in the main program before
+    //  starting any threads. If the app uses zactor for its threads
+    //  then we can guarantee this to always be safe.
+    if (!process_ctx)
+        s_initialize_process ();
+
+    ZMUTEX_LOCK (s_mutex);
+    void *handle = zmq_socket (process_ctx, type);
+
+    //  Configure socket with process defaults
+    zsock_set_linger (handle, s_linger);
+#if (ZMQ_VERSION_MAJOR == 2)
+    //  For ZeroMQ/2.x we use sndhwm for both send and receive
+    zsock_set_hwm (handle, s_sndhwm);
+#else
+    //  For later versions we use separate SNDHWM and RCVHWM
+    zsock_set_sndhwm (handle, s_sndhwm);
+    zsock_set_rcvhwm (handle, s_rcvhwm);
+#   if defined (ZMQ_IPV6)
+    zsock_set_ipv6 (handle, s_ipv6);
+#   else
+    zsock_set_ipv4only (handle, s_ipv6? 0: 1);
+#   endif
+#endif
+    //  Add socket to reference tracker so we can report leaks
+    //  TODO: let user disable this via environment variable; by default
+    //  it should be enabled to force correct destruction of sockets.
+    if (filename) {
+        s_sockref_t *sockref = (s_sockref_t *) malloc (sizeof (s_sockref_t));
+        sockref->handle = handle;
+        sockref->filename = filename;
+        sockref->line_nbr = line_nbr;
+        zlist_append (s_sockref_list, sockref);
+    }
+    s_open_sockets++;
+    ZMUTEX_UNLOCK (s_mutex);
+    return handle;
+}
+
+//  First-time initializations for the process
 static void
-s_destroy_process_ctx (void)
+s_initialize_process (void)
+{
+    //  Pull process defaults from environment
+    if (getenv ("ZSYS_IOTHREADS"))
+        s_iothreads = atoi (getenv ("ZSYS_IOTHREADS"));
+    if (getenv ("ZSYS_LINGER"))
+        s_linger = atoi (getenv ("ZSYS_LINGER"));
+    if (getenv ("ZSYS_SNDHWM"))
+        s_sndhwm = atoi (getenv ("ZSYS_SNDHWM"));
+    if (getenv ("ZSYS_RCVHWM"))
+        s_rcvhwm = atoi (getenv ("ZSYS_RCVHWM"));
+    if (getenv ("ZSYS_IPV6"))
+        s_ipv6 = atoi (getenv ("ZSYS_IPV6"));
+    if (getenv ("ZSYS_INTERFACE"))
+        s_interface = strdup (getenv ("ZSYS_INTERFACE"));
+
+    //  This call keeps compatibility back to ZMQ v2
+    process_ctx = zmq_init (s_iothreads);
+    ZMUTEX_INIT (s_mutex);
+    s_sockref_list = zlist_new ();
+    zsys_catch_interrupts ();
+    srandom ((unsigned) time (NULL));
+    atexit (s_terminate_process);
+}
+
+//  atexit termination for the process
+static void
+s_terminate_process (void)
 {
     //  The atexit handler is called when the main function exits;
     //  however we may have zactor threads shutting down and still
@@ -128,45 +213,9 @@ s_destroy_process_ctx (void)
 
     zmq_ctx_term (process_ctx);
     ZMUTEX_DESTROY (s_mutex);
-}
 
-
-//  --------------------------------------------------------------------------
-//  Get a new ZMQ socket, automagically creating a ZMQ context if this is
-//  the first time. Caller is responsible for destroying the ZMQ socket
-//  before process exits, to avoid a ZMQ deadlock. Note: you should not use
-//  this method in CZMQ apps, use zsock_new() instead. This is for system
-//  use only, really.
-
-void *
-zsys_socket (int type, const char *filename, size_t line_nbr)
-{
-    //  First time initialization; if the application is mixing
-    //  its own threading calls with zsock, this may fail if two
-    //  threads try to create sockets at the same time. In such
-    //  apps, they MUST create a socket in the main program before
-    //  starting any threads. If the app uses zactor for its threads
-    //  then this is guaranteed to always be safe.
-    if (!process_ctx) {
-        process_ctx = zmq_ctx_new ();
-        ZMUTEX_INIT (s_mutex);
-        s_sockref_list = zlist_new ();
-        zsys_catch_interrupts ();
-        srandom ((unsigned) time (NULL));
-        atexit (s_destroy_process_ctx);
-    }
-    ZMUTEX_LOCK (s_mutex);
-    void *handle = zmq_socket (process_ctx, type);
-    if (filename) {
-        s_sockref_t *sockref = (s_sockref_t *) malloc (sizeof (s_sockref_t));
-        sockref->handle = handle;
-        sockref->filename = filename;
-        sockref->line_nbr = line_nbr;
-        zlist_append (s_sockref_list, sockref);
-    }
-    s_open_sockets++;
-    ZMUTEX_UNLOCK (s_mutex);
-    return handle;
+    //  Free dynamically allocated properties
+    free (s_interface);
 }
 
 
@@ -269,43 +318,13 @@ zsys_catch_interrupts (void)
     zsys_handler_set (s_signal_handler);
 }
 
-
-//  --------------------------------------------------------------------------
-//  Set network interface name to use for broadcasts
-//  Use this to force the interface for beacons
-//  This is experimental; may be merged into zbeacon class.
-
-//  NOT thread safe, not a good design; this is to test the feasibility
-//  of forcing a network interface name instead of writing code to find it.
-static char *
-    s_interface = NULL;
-
-void
-zsys_set_interface (const char *interface_name)
+//  Default internal signal handler
+static void
+s_signal_handler (int signal_value)
 {
-    free (s_interface);
-    s_interface = strdup (interface_name);
-}
-
-
-//  Return network interface name to use for broadcasts.
-//  Returns "" if no interface was set.
-
-char *
-zsys_interface (void)
-{
-    if (s_interface)
-        return s_interface;
-
-    //  If the environment variable ZSYS_INTERFACE is set, use that as
-    //  the default interface name. This lets the environment variable
-    //  be configured for test environments where required. For example,
-    //  on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is the
-    //  default when there is no specified interface.
-    char *env = getenv ("ZSYS_INTERFACE");
-    if (env)
-        return env;
-    return "";
+    puts ("INTERRUPTED");
+    zctx_interrupted = 1;
+    zsys_interrupted = 1;
 }
 
 
@@ -352,7 +371,8 @@ zsys_file_modified (const char *filename)
 
 
 //  --------------------------------------------------------------------------
-//  Return file mode
+//  Return file mode; provides at least support for the POSIX S_ISREG(m)
+//  and S_ISDIR(m) macros and the S_IRUSR and S_IWUSR bits, on all boxes.
 
 mode_t
 zsys_file_mode (const char *filename)
@@ -368,10 +388,9 @@ zsys_file_mode (const char *filename)
     else
         mode |= S_IFREG;
     if (!(dwfa & FILE_ATTRIBUTE_HIDDEN))
-        mode |= S_IREAD;
+        mode |= S_IRUSR;
     if (!(dwfa & FILE_ATTRIBUTE_READONLY))
-        mode |= S_IWRITE;
-
+        mode |= S_IWUSR;
     return mode;
 #else
     struct stat stat_buf;
@@ -856,6 +875,116 @@ zsys_run_as (const char *lockfile, const char *group, const char *user)
 
 
 //  --------------------------------------------------------------------------
+//  Configure the number of I/O threads that ZeroMQ will use. A good
+//  rule of thumb is one thread per gigabit of traffic in or out. The
+//  default is 1, sufficient for most applications. If the environment
+//  variable ZSYS_IOTHREADS is defined, that provides the default.
+//  Note that this method is valid only before any socket is created.
+
+void
+zsys_set_iothreads (size_t iothreads)
+{
+    ZMUTEX_LOCK (s_mutex);
+    //  If the app is misusing this method, burn it with fire
+    if (process_ctx)
+        zclock_log ("E: zsys_iothreads() is not valid after creating sockets");
+    assert (process_ctx == NULL);
+    s_iothreads = iothreads;
+    ZMUTEX_UNLOCK (s_mutex);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Configure the default linger timeout in msecs for new zsock instances.
+//  You can also set this separately on each zsock_t instance. The default
+//  linger time is zero, i.e. any pending messages will be dropped. If the
+//  environment variable ZSYS_LINGER is defined, that provides the default.
+//  Note that process exit will typically be delayed by the linger time.
+
+void
+zsys_set_linger (size_t linger)
+{
+    ZMUTEX_LOCK (s_mutex);
+    s_linger = linger;
+    ZMUTEX_UNLOCK (s_mutex);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Configure the default outgoing pipe limit (HWM) for new zsock instances.
+//  You can also set this separately on each zsock_t instance. The default
+//  HWM is 1,000, on all versions of ZeroMQ. If the environment variable
+//  ZSYS_SNDHWM is defined, that provides the default. Note that a value of
+//  zero means no limit, i.e. infinite memory consumption.
+
+void
+zsys_set_sndhwm (size_t sndhwm)
+{
+    ZMUTEX_LOCK (s_mutex);
+    s_sndhwm = sndhwm;
+    ZMUTEX_UNLOCK (s_mutex);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Configure the default incoming pipe limit (HWM) for new zsock instances.
+//  You can also set this separately on each zsock_t instance. The default
+//  HWM is 1,000, on all versions of ZeroMQ. If the environment variable
+//  ZSYS_RCVHWM is defined, that provides the default. Note that a value of
+//  zero means no limit, i.e. infinite memory consumption.
+
+void
+zsys_set_rcvhwm (size_t rcvhwm)
+{
+    ZMUTEX_LOCK (s_mutex);
+    s_rcvhwm = rcvhwm;
+    ZMUTEX_UNLOCK (s_mutex);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Configure use of IPv6 for new zsock instances. By default sockets accept
+//  and make only IPv4 connections. When you enable IPv6, sockets will accept
+//  and connect to both IPv4 and IPv6 peers. You can override the setting on
+//  each zsock_t instance. The default is IPv4 only (ipv6 set to 0). If the
+//  environment variable ZSYS_IPV6 is defined (as 1 or 0), this provides the
+//  default. Note: has no effect on ZMQ v2.
+
+void
+zsys_set_ipv6 (int ipv6)
+{
+    ZMUTEX_LOCK (s_mutex);
+    s_ipv6 = ipv6;
+    ZMUTEX_UNLOCK (s_mutex);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set network interface name to use for broadcasts, particularly zbeacon.
+//  This lets the interface be configured for test environments where required.
+//  For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is
+//  the default when there is no specified interface. If the environment
+//  variable ZSYS_INTERFACE is set, use that as the default interface name.
+
+void
+zsys_set_interface (const char *value)
+{
+    free (s_interface);
+    s_interface = strdup (value);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return network interface to use for broadcasts, or "" if none was set.
+
+const char *
+zsys_interface (void)
+{
+    return s_interface? s_interface: "";
+}
+
+
+//  --------------------------------------------------------------------------
 //  Selftest
 
 void
@@ -865,8 +994,29 @@ zsys_test (bool verbose)
 
     //  @selftest
     zsys_catch_interrupts ();
+    int rc;
 
-    int rc = zsys_file_delete ("nosuchfile");
+    zsys_set_iothreads (1);
+    zsys_set_linger (0);
+    zsys_set_sndhwm (1000);
+    zsys_set_rcvhwm (1000);
+    zsys_set_ipv6 (0);
+
+    void *handle = zsys_socket (ZMQ_ROUTER, __FILE__, __LINE__);
+    //  Sanity check on libzmq/CZMQ build consistency
+#if defined (ZMQ_CURVE_SERVER) && defined (HAVE_LIBSODIUM)
+    int as_server = 1;
+    rc = zmq_setsockopt (handle, ZMQ_CURVE_SERVER, &as_server, sizeof (int));
+    if (rc == -1) {
+        zclock_log ("E: libzmq was built without libsodium. Please rebuild libzmq and CZMQ.");
+        zsys_close (handle);
+        exit (1);
+    }
+#endif
+    rc = zsys_close (handle);
+    assert (rc == 0);
+
+    rc = zsys_file_delete ("nosuchfile");
     assert (rc == -1);
 
     bool rc_bool = zsys_file_exists ("nosuchfile");
@@ -878,14 +1028,22 @@ zsys_test (bool verbose)
     time_t when = zsys_file_modified (".");
     assert (when > 0);
 
+    mode_t mode = zsys_file_mode (".");
+    assert (S_ISDIR (mode));
+    assert (mode & S_IRUSR);
+    assert (mode & S_IWUSR);
+
+    zsys_file_mode_private ();
     rc = zsys_dir_create ("%s/%s", ".", ".testsys/subdir");
     assert (rc == 0);
     when = zsys_file_modified ("./.testsys/subdir");
     assert (when > 0);
+    assert (!zsys_file_stable ("./.testsys/subdir"));
     rc = zsys_dir_delete ("%s/%s", ".", ".testsys/subdir");
     assert (rc == 0);
     rc = zsys_dir_delete ("%s/%s", ".", ".testsys");
     assert (rc == 0);
+    zsys_file_mode_default ();
 
     int major, minor, patch;
     zsys_version (&major, &minor, &patch);
@@ -902,6 +1060,7 @@ zsys_test (bool verbose)
     string = zsys_sprintf ("%s%s%s%s%d", str64, str64, str64, str64, num10);
     assert (strlen (string) == (4 * 64 + 10));
     zstr_free (&string);
+
     //  @end
 
     printf ("OK\n");

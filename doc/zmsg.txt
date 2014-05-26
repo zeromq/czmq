@@ -346,6 +346,7 @@ EXAMPLE
     assert (zmsg_send (&msg, output) == -1);
     assert (msg != NULL);
     zmsg_destroy (&msg);
+    assert (zmsg_send (&msg, output) == 0);
 
     zsock_destroy (&input);
     zsock_destroy (&output);
