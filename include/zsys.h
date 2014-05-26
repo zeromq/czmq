@@ -64,7 +64,8 @@ CZMQ_EXPORT ssize_t
 CZMQ_EXPORT time_t
     zsys_file_modified (const char *filename);
 
-//  Return file mode
+//  Return file mode; provides at least support for the POSIX S_ISREG(m)
+//  and S_ISDIR(m) macros and the S_IRUSR and S_IWUSR bits, on all boxes.
 CZMQ_EXPORT mode_t
     zsys_file_mode (const char *filename);
 

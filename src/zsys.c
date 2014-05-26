@@ -20,6 +20,7 @@
 @end
 */
 
+#include "platform.h"
 #include "../include/czmq.h"
 
 //  --------------------------------------------------------------------------
@@ -370,7 +371,8 @@ zsys_file_modified (const char *filename)
 
 
 //  --------------------------------------------------------------------------
-//  Return file mode
+//  Return file mode; provides at least support for the POSIX S_ISREG(m)
+//  and S_ISDIR(m) macros and the S_IRUSR and S_IWUSR bits, on all boxes.
 
 mode_t
 zsys_file_mode (const char *filename)
@@ -386,10 +388,9 @@ zsys_file_mode (const char *filename)
     else
         mode |= S_IFREG;
     if (!(dwfa & FILE_ATTRIBUTE_HIDDEN))
-        mode |= S_IREAD;
+        mode |= S_IRUSR;
     if (!(dwfa & FILE_ATTRIBUTE_READONLY))
-        mode |= S_IWRITE;
-
+        mode |= S_IWUSR;
     return mode;
 #else
     struct stat stat_buf;
@@ -885,7 +886,9 @@ zsys_set_iothreads (size_t iothreads)
 {
     ZMUTEX_LOCK (s_mutex);
     //  If the app is misusing this method, burn it with fire
-    assert (s_open_sockets == 0);
+    if (process_ctx)
+        zclock_log ("E: zsys_iothreads() is not valid after creating sockets");
+    assert (process_ctx == NULL);
     s_iothreads = iothreads;
     ZMUTEX_UNLOCK (s_mutex);
 }
@@ -991,8 +994,29 @@ zsys_test (bool verbose)
 
     //  @selftest
     zsys_catch_interrupts ();
+    int rc;
 
-    int rc = zsys_file_delete ("nosuchfile");
+    zsys_set_iothreads (1);
+    zsys_set_linger (0);
+    zsys_set_sndhwm (1000);
+    zsys_set_rcvhwm (1000);
+    zsys_set_ipv6 (0);
+
+    void *handle = zsys_socket (ZMQ_ROUTER, __FILE__, __LINE__);
+    //  Sanity check on libzmq/CZMQ build consistency
+#if defined (ZMQ_CURVE_SERVER) && defined (HAVE_LIBSODIUM)
+    int as_server = 1;
+    rc = zmq_setsockopt (handle, ZMQ_CURVE_SERVER, &as_server, sizeof (int));
+    if (rc == -1) {
+        zclock_log ("E: libzmq was built without libsodium. Please rebuild libzmq and CZMQ.");
+        zsys_close (handle);
+        exit (1);
+    }
+#endif
+    rc = zsys_close (handle);
+    assert (rc == 0);
+
+    rc = zsys_file_delete ("nosuchfile");
     assert (rc == -1);
 
     bool rc_bool = zsys_file_exists ("nosuchfile");
@@ -1004,14 +1028,22 @@ zsys_test (bool verbose)
     time_t when = zsys_file_modified (".");
     assert (when > 0);
 
+    mode_t mode = zsys_file_mode (".");
+    assert (S_ISDIR (mode));
+    assert (mode & S_IRUSR);
+    assert (mode & S_IWUSR);
+
+    zsys_file_mode_private ();
     rc = zsys_dir_create ("%s/%s", ".", ".testsys/subdir");
     assert (rc == 0);
     when = zsys_file_modified ("./.testsys/subdir");
     assert (when > 0);
+    assert (!zsys_file_stable ("./.testsys/subdir"));
     rc = zsys_dir_delete ("%s/%s", ".", ".testsys/subdir");
     assert (rc == 0);
     rc = zsys_dir_delete ("%s/%s", ".", ".testsys");
     assert (rc == 0);
+    zsys_file_mode_default ();
 
     int major, minor, patch;
     zsys_version (&major, &minor, &patch);
@@ -1028,6 +1060,7 @@ zsys_test (bool verbose)
     string = zsys_sprintf ("%s%s%s%s%d", str64, str64, str64, str64, num10);
     assert (strlen (string) == (4 * 64 + 10));
     zstr_free (&string);
+
     //  @end
 
     printf ("OK\n");
