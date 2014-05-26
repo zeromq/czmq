@@ -41,20 +41,6 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zsys_catch_interrupts (void);
 
-//  Set network interface name to use for broadcasts
-//  Use this to force the interface for beacons
-//  This is experimental; may be merged into zbeacon class.
-//  *** This is for CZMQ internal use only and may change arbitrarily ***
-CZMQ_EXPORT void
-    zsys_set_interface (const char *interface_name);
-
-//  Return network interface name to use for broadcasts.
-//  Returns "" if no interface was set.
-//  This is experimental; may be merged into zbeacon class.
-//  *** This is for CZMQ internal use only and may change arbitrarily ***
-CZMQ_EXPORT char *
-    zsys_interface (void);
-
 //  Return 1 if file exists, else zero
 CZMQ_EXPORT bool
     zsys_file_exists (const char *filename);
@@ -67,7 +53,8 @@ CZMQ_EXPORT ssize_t
 CZMQ_EXPORT time_t
     zsys_file_modified (const char *filename);
 
-//  Return file mode
+//  Return file mode; provides at least support for the POSIX S_ISREG(m)
+//  and S_ISDIR(m) macros and the S_IRUSR and S_IWUSR bits, on all boxes.
 CZMQ_EXPORT mode_t
     zsys_file_mode (const char *filename);
 
@@ -154,6 +141,59 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zsys_run_as (const char *lockfile, const char *group, const char *user);
 
+//  Configure the number of I/O threads that ZeroMQ will use. A good
+//  rule of thumb is one thread per gigabit of traffic in or out. The
+//  default is 1, sufficient for most applications. If the environment
+//  variable ZSYS_IOTHREADS is defined, that provides the default.
+//  Note that this method is valid only before any socket is created.
+CZMQ_EXPORT void
+    zsys_set_iothreads (size_t iothreads);
+
+//  Configure the default linger timeout in msecs for new zsock instances.
+//  You can also set this separately on each zsock_t instance. The default
+//  linger time is zero, i.e. any pending messages will be dropped. If the
+//  environment variable ZSYS_LINGER is defined, that provides the default.
+//  Note that process exit will typically be delayed by the linger time.
+CZMQ_EXPORT void
+    zsys_set_linger (size_t linger);
+
+//  Configure the default outgoing pipe limit (HWM) for new zsock instances.
+//  You can also set this separately on each zsock_t instance. The default
+//  HWM is 1,000, on all versions of ZeroMQ. If the environment variable
+//  ZSYS_SNDHWM is defined, that provides the default. Note that a value of
+//  zero means no limit, i.e. infinite memory consumption.
+CZMQ_EXPORT void
+    zsys_set_sndhwm (size_t sndhwm);
+
+//  Configure the default incoming pipe limit (HWM) for new zsock instances.
+//  You can also set this separately on each zsock_t instance. The default
+//  HWM is 1,000, on all versions of ZeroMQ. If the environment variable
+//  ZSYS_RCVHWM is defined, that provides the default. Note that a value of
+//  zero means no limit, i.e. infinite memory consumption.
+CZMQ_EXPORT void
+    zsys_set_rcvhwm (size_t rcvhwm);
+
+//  Configure use of IPv6 for new zsock instances. By default sockets accept
+//  and make only IPv4 connections. When you enable IPv6, sockets will accept
+//  and connect to both IPv4 and IPv6 peers. You can override the setting on
+//  each zsock_t instance. The default is IPv4 only (ipv6 set to 0). If the
+//  environment variable ZSYS_IPV6 is defined (as 1 or 0), this provides the
+//  default. Note: has no effect on ZMQ v2.
+CZMQ_EXPORT void
+    zsys_set_ipv6 (int ipv6);
+
+//  Set network interface name to use for broadcasts, particularly zbeacon.
+//  This lets the interface be configured for test environments where required.
+//  For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is
+//  the default when there is no specified interface. If the environment
+//  variable ZSYS_INTERFACE is set, use that as the default interface name.
+CZMQ_EXPORT void
+    zsys_set_interface (const char *value);
+
+//  Return network interface to use for broadcasts, or "" if none was set.
+CZMQ_EXPORT const char *
+    zsys_interface (void);
+
 //  Self test of this class
 CZMQ_EXPORT void
     zsys_test (bool verbose);
@@ -178,8 +218,29 @@ EXAMPLE
 .From zsys_test method
 ----
     zsys_catch_interrupts ();
+    int rc;
 
-    int rc = zsys_file_delete ("nosuchfile");
+    zsys_set_iothreads (1);
+    zsys_set_linger (0);
+    zsys_set_sndhwm (1000);
+    zsys_set_rcvhwm (1000);
+    zsys_set_ipv6 (0);
+
+    void *handle = zsys_socket (ZMQ_ROUTER, __FILE__, __LINE__);
+    //  Sanity check on libzmq/CZMQ build consistency
+#if defined (ZMQ_CURVE_SERVER) && defined (HAVE_LIBSODIUM)
+    int as_server = 1;
+    rc = zmq_setsockopt (handle, ZMQ_CURVE_SERVER, &as_server, sizeof (int));
+    if (rc == -1) {
+        zclock_log ("E: libzmq was built without libsodium. Please rebuild libzmq and CZMQ.");
+        zsys_close (handle);
+        exit (1);
+    }
+#endif
+    rc = zsys_close (handle);
+    assert (rc == 0);
+
+    rc = zsys_file_delete ("nosuchfile");
     assert (rc == -1);
 
     bool rc_bool = zsys_file_exists ("nosuchfile");
@@ -191,14 +252,22 @@ EXAMPLE
     time_t when = zsys_file_modified (".");
     assert (when > 0);
 
+    mode_t mode = zsys_file_mode (".");
+    assert (S_ISDIR (mode));
+    assert (mode & S_IRUSR);
+    assert (mode & S_IWUSR);
+
+    zsys_file_mode_private ();
     rc = zsys_dir_create ("%s/%s", ".", ".testsys/subdir");
     assert (rc == 0);
     when = zsys_file_modified ("./.testsys/subdir");
     assert (when > 0);
+    assert (!zsys_file_stable ("./.testsys/subdir"));
     rc = zsys_dir_delete ("%s/%s", ".", ".testsys/subdir");
     assert (rc == 0);
     rc = zsys_dir_delete ("%s/%s", ".", ".testsys");
     assert (rc == 0);
+    zsys_file_mode_default ();
 
     int major, minor, patch;
     zsys_version (&major, &minor, &patch);
@@ -215,6 +284,7 @@ EXAMPLE
     string = zsys_sprintf ("%s%s%s%s%d", str64, str64, str64, str64, num10);
     assert (strlen (string) == (4 * 64 + 10));
     zstr_free (&string);
+
 ----
 
 SEE ALSO

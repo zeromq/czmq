@@ -42,10 +42,12 @@ struct _zchunk_t {
 zchunk_t *
 zchunk_new (const void *data, size_t size)
 {
-    zchunk_t *self = (zchunk_t *) zmalloc (sizeof (zchunk_t) + size);
+    zchunk_t *self = (zchunk_t *) malloc (sizeof (zchunk_t) + size);
     if (self) {
         self->tag = ZCHUNK_TAG;
+        self->size = 0;
         self->max_size = size;
+        self->consumed = 0;
         self->data = (byte *) self + sizeof (zchunk_t);
         if (data) {
             self->size = size;
@@ -257,6 +259,30 @@ zchunk_write (zchunk_t *self, FILE *handle)
     size_t items = fwrite (self->data, 1, self->size, handle);
     int rc = (items < self->size)? -1: 0;
     return rc;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Try to slurp an entire file into a chunk. Will read up to maxsize of
+//  the file. If maxsize is 0, will attempt to read the entire file and
+//  fail with an assertion if that cannot fit into memory. Returns a new
+//  chunk containing the file data, or NULL if the file could not be read.
+
+zchunk_t *
+zchunk_slurp (const char *filename, size_t maxsize)
+{
+    ssize_t size = zsys_file_size (filename);
+    if (size == -1)
+        return NULL;
+
+    if (size > maxsize && maxsize != 0)
+        size = maxsize;
+
+    FILE *handle = fopen (filename, "r");
+    zchunk_t *chunk = zchunk_read (handle, size);
+    assert (chunk);
+    fclose (handle);
+    return chunk;
 }
 
 
