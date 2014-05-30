@@ -231,22 +231,23 @@ s_terminate_process (void)
 int
 zsys_close (void *handle)
 {
-    bool destroyed = false;
     ZMUTEX_LOCK (s_mutex);
-    s_sockref_t *sockref = (s_sockref_t *) zlist_first (s_sockref_list);
-    while (sockref) {
-        if (sockref->handle == handle) {
-            zlist_remove (s_sockref_list, sockref);
-            free (sockref);
-            destroyed = true;
-            s_open_sockets--;
-            zmq_close (handle);
-            break;
+    //  It's possible atexit() has already happened if we're running under
+    //  a debugger that redirects the main thread exit.
+    if (s_sockref_list) {
+        s_sockref_t *sockref = (s_sockref_t *) zlist_first (s_sockref_list);
+        while (sockref) {
+            if (sockref->handle == handle) {
+                zlist_remove (s_sockref_list, sockref);
+                free (sockref);
+                s_open_sockets--;
+                zmq_close (handle);
+                break;
+            }
+            sockref = (s_sockref_t *) zlist_next (s_sockref_list);
         }
-        sockref = (s_sockref_t *) zlist_next (s_sockref_list);
     }
     ZMUTEX_UNLOCK (s_mutex);
-    assert (destroyed);
     return 0;
 }
 
