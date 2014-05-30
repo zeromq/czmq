@@ -72,9 +72,9 @@ s_thread_shim (void *args)
 //  Thread shim for Windows that wraps a POSIX-style thread handler
 //  and does the _endthreadex for us automatically.
 static unsigned __stdcall
-s_thread_shim (void *arglist)
+s_thread_shim (void *args)
 {
-    assert (arglist);
+    assert (args);
     shim_t *shim = (shim_t *) args;
     shim->handler (shim->pipe, shim->args);
     zsock_signal (shim->pipe, 0);

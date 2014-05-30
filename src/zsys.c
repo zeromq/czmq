@@ -202,8 +202,13 @@ s_terminate_process (void)
     ZMUTEX_LOCK (s_mutex);
     s_sockref_t *sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
     while (sockref) {
+#ifdef __WINDOWS__
+		printf ("E: dangling socket created at %s:%u\n",
+                sockref->filename, sockref->line_nbr);
+#else
         printf ("E: dangling socket created at %s:%zd\n",
                 sockref->filename, sockref->line_nbr);
+#endif
         zmq_close (sockref->handle);
         free (sockref);
         sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
@@ -576,7 +581,7 @@ zsys_vprintf (const char *format, va_list argptr)
     va_copy (my_argptr, argptr);
     int required = vsnprintf (string, size, format, my_argptr);
     va_end (my_argptr);
-#ifdef _MSC_VER
+#if (defined (_MSC_VER) || defined (__MINGW32__))
     if (required < 0 || required >= size) {
         va_copy (my_argptr, argptr);
         required = _vscprintf (format, argptr);
