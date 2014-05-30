@@ -613,7 +613,6 @@ zsys_udp_new (bool routable)
         zsys_socket_error ("socket");
         return INVALID_SOCKET;
     }
-
     //  Ask operating system for broadcast permissions on socket
     int on = 1;
     if (setsockopt (udpsock, SOL_SOCKET, SO_BROADCAST,
@@ -736,6 +735,21 @@ zsys_socket_error (const char *reason)
         zclock_log ("E: (UDP) error '%s' on %s", strerror (errno), reason);
         assert (false);
     }
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return current host name, for use in public tcp:// endpoints. Caller gets
+//  a freshly allocated string, should free it using zstr_free().
+
+char *
+zsys_hostname (void)
+{
+    char hostname [NI_MAXHOST];
+    gethostname (hostname, NI_MAXHOST);
+    hostname [NI_MAXHOST - 1] = 0;
+    struct hostent *host = gethostbyname (hostname);
+    return strdup (host->h_name);
 }
 
 
@@ -1013,6 +1027,11 @@ zsys_test (bool verbose)
         exit (1);
     }
 #endif
+    if (verbose) {
+        char *hostname = zsys_hostname ();
+        printf ("I: host name is %s\n", hostname);
+        zstr_free (&hostname);
+    }
     rc = zsys_close (handle);
     assert (rc == 0);
 
