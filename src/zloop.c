@@ -447,8 +447,13 @@ zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_timer_fn handler, 
     if (zlist_append (self->timers, timer))
         return -1;
     if (self->verbose)
+#ifdef __WINDOWS__
+		zclock_log ("I: zloop: register timer id=%d delay=%u times=%u", 
+                    timer_id, delay, times);
+#else
         zclock_log ("I: zloop: register timer id=%d delay=%zd times=%zd", 
                     timer_id, delay, times);
+#endif
     
     return timer_id;
 }
