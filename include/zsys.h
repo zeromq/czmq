@@ -135,7 +135,12 @@ CZMQ_EXPORT zframe_t *
 //  *** This is for CZMQ internal use only and may change arbitrarily ***
 CZMQ_EXPORT void
     zsys_socket_error (const char *reason);
-    
+
+//  Return current host name, for use in public tcp:// endpoints. Caller gets
+//  a freshly allocated string, should free it using zstr_free().
+CZMQ_EXPORT char *
+    zsys_hostname (void);
+
 //  Move the current process into the background. The precise effect depends
 //  on the operating system. On POSIX boxes, moves to a specified working
 //  directory (if specified), closes all file handles, reopens stdin, stdout,
