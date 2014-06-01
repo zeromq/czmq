@@ -122,7 +122,7 @@ CZMQ_EXPORT SOCKET
 //  Close a UDP socket
 //  *** This is for CZMQ internal use only and may change arbitrarily ***
 CZMQ_EXPORT int
-    zsys_udp_close (SOCKET handle)
+    zsys_udp_close (SOCKET handle);
 
 //  Send zframe to UDP socket
 //  *** This is for CZMQ internal use only and may change arbitrarily ***
