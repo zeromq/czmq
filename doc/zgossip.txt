@@ -1,0 +1,53 @@
+zgossip(3)
+==========
+
+NAME
+----
+zgossip - gossip discovery service
+
+SYNOPSIS
+--------
+----
+//  This is the gossip service, implemented as a CZMQ zactor task
+CZMQ_EXPORT void
+    zgossip (zsock_t *pipe, void *args);
+    
+//  Self test of this class
+CZMQ_EXPORT void
+    zgossip_test (bool verbose);
+----
+
+DESCRIPTION
+-----------
+
+Implements the Zero Gossip protocol.
+
+
+EXAMPLE
+-------
+.From zgossip_test method
+----
+    zactor_t *base = zactor_new (zgossip, NULL);
+    assert (base);
+    zactor_t *alpha = zactor_new (zgossip, NULL);
+    assert (alpha);
+    zactor_t *beta = zactor_new (zgossip, NULL);
+    assert (beta);
+    
+    zstr_sendx (base, "BIND", "inproc://base", NULL);
+    zsock_wait (base);
+    
+    zstr_sendx (alpha, "CONNECT", "inproc://base", NULL);
+    zsock_wait (alpha);
+    
+    zstr_sendx (beta, "CONNECT", "inproc://base", NULL);
+    zsock_wait (beta);
+
+    zactor_destroy (&base);
+    zactor_destroy (&alpha);
+    zactor_destroy (&beta);
+----
+
+SEE ALSO
+--------
+linkczmq:czmq[7]

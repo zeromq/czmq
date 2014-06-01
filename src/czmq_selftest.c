@@ -68,6 +68,7 @@ int main (int argc, char *argv [])
     zloop_test (verbose);
     zproxy_test (verbose);
     zbeacon_test (verbose);
+    zgossip_test (verbose);
     zcert_test (verbose);
     zcertstore_test (verbose);
     zauth_test (verbose);
