@@ -642,6 +642,20 @@ zsys_udp_new (bool routable)
 
 
 //  --------------------------------------------------------------------------
+//  Close a UDP socket
+
+int
+zsys_udp_close (SOCKET handle)
+{
+#if (defined (__WINDOWS__))
+    return closesocket (handle);
+#else
+    return close (handle);
+#endif
+}
+
+
+//  --------------------------------------------------------------------------
 //  Send zframe to UDP socket
 
 void
