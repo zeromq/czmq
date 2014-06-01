@@ -49,6 +49,9 @@
     <ClCompile Include="..\..\..\..\src\zhash.c">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\zgossip.c">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zlist.c">
       <Filter>src</Filter>
     </ClCompile>
