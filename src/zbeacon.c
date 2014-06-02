@@ -433,7 +433,7 @@ s_agent_new (void *pipe, int port_nbr)
     else {
         //  Interface looks unsupported, abort
         zstr_send (pipe, "-");
-        closesocket (self->udpsock);
+        zsys_udp_close (self->udpsock);
         free (self);
         return NULL;
     }
@@ -659,7 +659,7 @@ s_agent_destroy (agent_t **self_p)
     assert (self_p);
     if (*self_p) {
         agent_t *self = *self_p;
-        closesocket (self->udpsock);
+        zsys_udp_close (self->udpsock);
         zframe_destroy (&self->transmit);
         zframe_destroy (&self->filter);
         free (self);
