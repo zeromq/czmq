@@ -121,19 +121,19 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
         s_initialize_process ();
 
     ZMUTEX_LOCK (s_mutex);
-    void *handle = zmq_socket (process_ctx, type);
+    zsock_t *socket = (zsock_t *) zmq_socket(process_ctx, type);
 
     //  Configure socket with process defaults
-    zsock_set_linger (handle, s_linger);
+    zsock_set_linger(socket, (int) s_linger);
 #if (ZMQ_VERSION_MAJOR == 2)
     //  For ZeroMQ/2.x we use sndhwm for both send and receive
     zsock_set_hwm (handle, s_sndhwm);
 #else
     //  For later versions we use separate SNDHWM and RCVHWM
-    zsock_set_sndhwm (handle, s_sndhwm);
-    zsock_set_rcvhwm (handle, s_rcvhwm);
+    zsock_set_sndhwm(socket, (int) s_sndhwm);
+    zsock_set_rcvhwm(socket, (int) s_rcvhwm);
 #   if defined (ZMQ_IPV6)
-    zsock_set_ipv6 (handle, s_ipv6);
+    zsock_set_ipv6(socket, s_ipv6);
 #   else
     zsock_set_ipv4only (handle, s_ipv6? 0: 1);
 #   endif
@@ -143,14 +143,14 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
     //  it should be enabled to force correct destruction of sockets.
     if (filename) {
         s_sockref_t *sockref = (s_sockref_t *) malloc (sizeof (s_sockref_t));
-        sockref->handle = handle;
+        sockref->handle = socket;
         sockref->filename = filename;
         sockref->line_nbr = line_nbr;
         zlist_append (s_sockref_list, sockref);
     }
     s_open_sockets++;
     ZMUTEX_UNLOCK (s_mutex);
-    return handle;
+    return socket;
 }
 
 //  First-time initializations for the process
@@ -172,7 +172,7 @@ s_initialize_process (void)
         s_interface = strdup (getenv ("ZSYS_INTERFACE"));
 
     //  This call keeps compatibility back to ZMQ v2
-    process_ctx = zmq_init (s_iothreads);
+    process_ctx = zmq_init ((int) s_iothreads);
     ZMUTEX_INIT (s_mutex);
     s_sockref_list = zlist_new ();
     zsys_catch_interrupts ();
@@ -393,10 +393,14 @@ zsys_file_mode (const char *filename)
         mode |= S_IFDIR;
     else
         mode |= S_IFREG;
+
+#ifdef __UTYPE_ANDROID
     if (!(dwfa & FILE_ATTRIBUTE_HIDDEN))
         mode |= S_IRUSR;
     if (!(dwfa & FILE_ATTRIBUTE_READONLY))
         mode |= S_IWUSR;
+#endif
+
     return mode;
 #else
     struct stat stat_buf;
@@ -614,7 +618,7 @@ zsys_udp_new (bool routable)
 {
     //  We haven't implemented multicast yet
     assert (!routable);
-    int udpsock = socket (AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    SOCKET udpsock = socket (AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (udpsock == INVALID_SOCKET) {
         zsys_socket_error ("socket");
         return INVALID_SOCKET;
@@ -668,9 +672,9 @@ zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address)
     //  don't try to report the error. We might log this or send to an error
     //  console at some point.
     sendto (udpsock,
-            (char *) zframe_data (frame), zframe_size (frame),
+            (char *) zframe_data (frame), (int) zframe_size (frame),
             0,      //  Flags
-            (struct sockaddr *) address, sizeof (inaddr_t));
+            (struct sockaddr *) address, (int) sizeof (inaddr_t));
 }
 
 
@@ -1068,9 +1072,12 @@ zsys_test (bool verbose)
     assert (when > 0);
 
     mode_t mode = zsys_file_mode (".");
+
+#ifdef __UTYPE_ANDROID
     assert (S_ISDIR (mode));
     assert (mode & S_IRUSR);
     assert (mode & S_IWUSR);
+#endif
 
     zsys_file_mode_private ();
     rc = zsys_dir_create ("%s/%s", ".", ".testsys/subdir");
