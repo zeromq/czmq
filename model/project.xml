@@ -34,6 +34,12 @@
     <class name = "zsys" />
     <class name = "zuuid" />
 
+    <!-- Models that we build using GSL -->
+    <model name = "sockopts" />
+    <model name = "zgossip" />
+    <model name = "zgossip_msg" />
+    <class name = "zgossip_msg" private = "1" />
+
     <!-- Experimentally deprecated, remove some time after 3.0 -->
     <class name = "zctx" />
     <class name = "zmonitor" />
