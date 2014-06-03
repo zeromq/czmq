@@ -1,7 +1,6 @@
-#   Run all code generation scripts
+#   Rebuild project files
 #   Requires iMatix GSL4, from http://github.com/imatix/gsl
 #   Use this when:
-#       - you add a socket option (sockopts.xml)
 #       - add a new project class (project.xml)
 
 mkdir -p ../builds/mingw32
@@ -15,5 +14,4 @@ mkdir -p ../builds/msvc/vs2012/czmq_selftest
 mkdir -p ../builds/msvc/vs2013/czmq
 mkdir -p ../builds/msvc/vs2013/czmq_selftest
 
-gsl -q sockopts.xml
 gsl -q project.xml

@@ -1,8 +1,7 @@
 @ECHO OFF
-REM   Run all code generation scripts
+REM   Rebuild project files
 REM   Requires iMatix GSL4, from http:\\www.nuget.org\packages\gsl
 REM   Use this when:
-REM       - you add a socket option (sockopts.xml)
 REM       - add a new project class (project.xml)
 REM       - modify one of the referenced gsl templates (*.gsl)
 
@@ -17,5 +16,4 @@ mkdir ..\builds\msvc\vs2012\czmq_selftest
 mkdir ..\builds\msvc\vs2013\czmq
 mkdir ..\builds\msvc\vs2013\czmq_selftest
 
-gsl -q -script:sockopts.gsl sockopts.xml
 gsl -q -script:project.gsl project.xml
