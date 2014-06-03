@@ -341,14 +341,18 @@
 #   endif
 #endif
 
-//  Add missing defines for Android
-#ifdef __UTYPE_ANDROID
-#   ifndef S_IREAD
-#       define S_IREAD S_IRUSR
-#   endif
-#   ifndef S_IWRITE
-#       define S_IWRITE S_IWUSR
-#   endif
+//  Add missing defines for non-POSIX systems
+#ifndef S_IRUSR
+#   define S_IRUSR S_IREAD
+#endif
+#ifndef S_IWUSR
+#   define S_IWUSR S_IWRITE 
+#endif
+#ifndef S_ISDIR
+#   define S_ISDIR(m) (((m) & S_IFDIR) != 0)
+#endif
+#ifndef S_ISREG
+#   define S_ISREG(m) (((m) & S_IFREG) != 0)
 #endif
 
 
