@@ -271,8 +271,8 @@ zchunk_write (zchunk_t *self, FILE *handle)
 zchunk_t *
 zchunk_slurp (const char *filename, size_t maxsize)
 {
-    ssize_t size = zsys_file_size (filename);
-    if (size == -1)
+    size_t size = zsys_file_size (filename);
+    if ((ssize_t) size == -1)
         return NULL;
 
     if (size > maxsize && maxsize != 0)
