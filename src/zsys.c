@@ -121,21 +121,21 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
         s_initialize_process ();
 
     ZMUTEX_LOCK (s_mutex);
-    zsock_t *socket = (zsock_t *) zmq_socket(process_ctx, type);
+    void *handle = zmq_socket (process_ctx, type);
 
     //  Configure socket with process defaults
-    zsock_set_linger(socket, (int) s_linger);
+    zsocket_set_linger (handle, (int) s_linger);
 #if (ZMQ_VERSION_MAJOR == 2)
     //  For ZeroMQ/2.x we use sndhwm for both send and receive
-    zsock_set_hwm (handle, s_sndhwm);
+    zsocket_set_hwm (handle, s_sndhwm);
 #else
     //  For later versions we use separate SNDHWM and RCVHWM
-    zsock_set_sndhwm(socket, (int) s_sndhwm);
-    zsock_set_rcvhwm(socket, (int) s_rcvhwm);
+    zsocket_set_sndhwm (handle, (int) s_sndhwm);
+    zsocket_set_rcvhwm (handle, (int) s_rcvhwm);
 #   if defined (ZMQ_IPV6)
-    zsock_set_ipv6(socket, s_ipv6);
+    zsocket_set_ipv6 (handle, s_ipv6);
 #   else
-    zsock_set_ipv4only (handle, s_ipv6? 0: 1);
+    zsocket_set_ipv4only (handle, s_ipv6? 0: 1);
 #   endif
 #endif
     //  Add socket to reference tracker so we can report leaks
@@ -143,14 +143,14 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
     //  it should be enabled to force correct destruction of sockets.
     if (filename) {
         s_sockref_t *sockref = (s_sockref_t *) malloc (sizeof (s_sockref_t));
-        sockref->handle = socket;
+        sockref->handle = handle;
         sockref->filename = filename;
         sockref->line_nbr = line_nbr;
         zlist_append (s_sockref_list, sockref);
     }
     s_open_sockets++;
     ZMUTEX_UNLOCK (s_mutex);
-    return socket;
+    return handle;
 }
 
 //  First-time initializations for the process
@@ -1072,12 +1072,9 @@ zsys_test (bool verbose)
     assert (when > 0);
 
     mode_t mode = zsys_file_mode (".");
-
-#ifdef __UTYPE_ANDROID
     assert (S_ISDIR (mode));
     assert (mode & S_IRUSR);
     assert (mode & S_IWUSR);
-#endif
 
     zsys_file_mode_private ();
     rc = zsys_dir_create ("%s/%s", ".", ".testsys/subdir");
