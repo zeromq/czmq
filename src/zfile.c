@@ -210,7 +210,7 @@ bool
 zfile_is_directory (zfile_t *self)
 {
     assert (self);
-    return (self->mode & S_IFDIR) != 0;
+    return S_ISDIR (self->mode);
 }
 
 
@@ -222,7 +222,7 @@ bool
 zfile_is_regular (zfile_t *self)
 {
     assert (self);
-    return (self->mode & S_IFREG) != 0;
+    return S_ISREG (self->mode);
 }
 
 
@@ -235,7 +235,7 @@ bool
 zfile_is_readable (zfile_t *self)
 {
     assert (self);
-    return (self->mode & S_IREAD) != 0;
+    return (self->mode & S_IRUSR) != 0;
 }
 
 
@@ -248,7 +248,7 @@ bool
 zfile_is_writeable (zfile_t *self)
 {
     assert (self);
-    return (self->mode & S_IWRITE) != 0;
+    return (self->mode & S_IWUSR) != 0;
 }
 
 

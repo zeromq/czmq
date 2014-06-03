@@ -341,14 +341,18 @@
 #   endif
 #endif
 
-//  Add missing defines for Android
-#ifdef __UTYPE_ANDROID
-#   ifndef S_IREAD
-#       define S_IREAD S_IRUSR
-#   endif
-#   ifndef S_IWRITE
-#       define S_IWRITE S_IWUSR
-#   endif
+//  Add missing defines for non-POSIX systems
+#ifndef S_IRUSR
+#   define S_IRUSR S_IREAD
+#endif
+#ifndef S_IWUSR
+#   define S_IWUSR S_IWRITE 
+#endif
+#ifndef S_ISDIR
+#   define S_ISDIR(m) (((m) & S_IFDIR) != 0)
+#endif
+#ifndef S_ISREG
+#   define S_ISREG(m) (((m) & S_IFREG) != 0)
 #endif
 
 
@@ -415,7 +419,11 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
     typedef unsigned int  uint;
 #   if (!defined (__MINGW32__))
     typedef int mode_t;
+#if defined (__IS_64BIT__)
+    typedef long long ssize_t;
+#else
     typedef long ssize_t;
+#endif
     typedef __int32 int32_t;
     typedef __int64 int64_t;
     typedef unsigned __int32 uint32_t;
