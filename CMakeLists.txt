@@ -104,6 +104,7 @@ set (czmq_headers
     include/zstr.h
     include/zsys.h
     include/zuuid.h
+    include/zgossip_msg.h
     include/zctx.h
     include/zmonitor.h
     include/zmutex.h
@@ -149,6 +150,7 @@ set (czmq_sources
     src/zstr.c
     src/zsys.c
     src/zuuid.c
+    src/zgossip_msg.c
     src/zctx.c
     src/zmonitor.c
     src/zmutex.c

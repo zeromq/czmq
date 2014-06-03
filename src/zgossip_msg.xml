@@ -1,0 +1,36 @@
+<class
+    name = "zgossip_msg"
+    title = "zgossip protocol"
+    script = "zproto_codec_c"
+    header = "."
+    >
+    This is a server implementation of the ZeroMQ Gossip Discovery Protocol
+    <include filename = "license.xml" />
+
+    <grammar>
+        C:HELLO [ *S:ANNOUNCE ]
+        C:ANNOUNCE / S:ANNOUNCE / C:PING S:PONG
+    </grammar>
+
+    <message name = "hello">
+        Client says hello to server
+    </message>
+    
+    <message name = "announce">
+        Client or server announces a new service
+        <field name = "endpoint" type = "string">ZeroMQ endpoint</field>
+        <field name = "service" type = "string">Service name</field>
+    </message>
+
+    <message name = "ping">
+        Client signals liveness
+    </message>
+
+    <message name = "pong">
+        Server responds to ping
+    </message>
+
+    <message name = "invalid">
+        Server rejects command as invalid
+    </message>
+</class>

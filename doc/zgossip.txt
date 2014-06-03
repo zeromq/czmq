@@ -8,44 +8,136 @@ zgossip - gossip discovery service
 SYNOPSIS
 --------
 ----
-//  This is the gossip service, implemented as a CZMQ zactor task
-CZMQ_EXPORT void
+//  This is zgossip, implemented as a CZMQ zactor task
+void
     zgossip (zsock_t *pipe, void *args);
-    
+
 //  Self test of this class
-CZMQ_EXPORT void
+void
     zgossip_test (bool verbose);
 ----
 
 DESCRIPTION
 -----------
 
-Implements the ZeroMQ Gossip Discovery Protocol, ZGDP, (RFC TBD).
+Implements a gossip protocol (RFC TBD).
 
+The gossip protocol solves the problem of discovering a set of services
+on a local area network. It provides an alternative to UDP beacons as
+implemented by zbeacon.
+
+The gossip network consists of a set of loosely-coupled nodes that
+exchange endpoint=service pairs. The endpoints must be addressable by
+all nodes, so can be sockets in a process (inproc://), sockets on a
+box (ipc://), or sockets on a network (tcp://). Mixing will not work.
+
+Every node runs the same stack, which is a server-client hybrid using
+a modified Harmony pattern (from Chapter 8 of the Guide):
+
+http://zguide.zeromq.org/page:all#True-Peer-Connectivity-Harmony-Pattern
+
+Each node provides a ROUTER socket that accepts client connections on an
+endpoint defined by the application via a BIND command. The state machine
+for these connections is in zgossip.xml, and the generated code is in
+zgossip_engine.h.
+
+Each node additionally creates outbound connections via DEALER sockets
+to a set of peers, and under control of the calling application, which
+sends CONNECT commands for each configured peer.
+
+The messages between client and server are defined in zgossip_msg.xml.
+This stack is built using the zeromq/zproto toolkit.
+
+The goal is that connecting to any other node is sufficient to connect
+to the whole network. Each node accepts service announcements from its
+owning application, and forwards these to the peers it is connected to,
+either as server, or as client.
+
+The protocol uses ping-pong heartbeating to monitor presence. This code
+doesn't do anything with expired peers yet.
+
+The gossip network should be very scalable, as we need only two sockets
+per node to get the equivalence of full interconnection.
+
+The assumptions in this design are:
+
+* All nodes are on the same ZeroMQ transport, fully interaddressable.
+
+* The topology is slow changing. Thus, the cost of the gossip protocol
+  is irrelevant with respect to other traffic.
+
+TODO:
+ * Broadcast ANNOUNCE commands from the application to all clients, as
+   well as all servers.
+
+ * Write a large-scale test case that simulates some thousands of nodes
+   coming and going. This can run in one process, using inproc.
 
 EXAMPLE
 -------
 .From zgossip_test method
 ----
+    //  Test basic client-to-server operation
+    zactor_t *server = zactor_new (zgossip, NULL);
+    zstr_sendx (server, "SET", "server/animate", verbose? "1": "0", NULL);
+    zstr_sendx (server, "BIND", "ipc://@/zgossip", NULL);
+    char *port_str = zstr_recv (server);
+    assert (streq (port_str, "0"));
+    zstr_free (&port_str);
+
+    zsock_t *client = zsock_new (ZMQ_DEALER);
+    assert (client);
+    zsock_set_rcvtimeo (client, 2000);
+    zsock_connect (client, "ipc://@/zgossip");
+
+    //  Send HELLO, which gets no reply
+    zgossip_msg_t *request, *reply;
+    request = zgossip_msg_new (ZGOSSIP_MSG_HELLO);
+    zgossip_msg_send (&request, client);
+
+    //  Send PING, expect PONG back
+    request = zgossip_msg_new (ZGOSSIP_MSG_PING);
+    zgossip_msg_send (&request, client);
+    reply = zgossip_msg_recv (client);
+    assert (reply);
+    assert (zgossip_msg_id (reply) == ZGOSSIP_MSG_PONG);
+    zgossip_msg_destroy (&reply);
+    
+    zactor_destroy (&server);
+
+    zsock_destroy (&client);
+    zactor_destroy (&server);
+
+    //  Test peer-to-peer operations
     zactor_t *base = zactor_new (zgossip, NULL);
     assert (base);
+    zstr_sendx (base, "SET", "server/animate", verbose? "1": "0", NULL);
+    //  Set a 100msec timeout on clients so we can test expiry
+    zstr_sendx (base, "SET", "server/timeout", "100", NULL);
+    zstr_sendx (base, "BIND", "inproc://base", NULL);
+    port_str = zstr_recv (base);
+    assert (streq (port_str, "0"));
+    zstr_free (&port_str);
+
     zactor_t *alpha = zactor_new (zgossip, NULL);
     assert (alpha);
+    zstr_sendx (alpha, "CONNECT", "inproc://base", NULL);
+    zstr_sendx (alpha, "ANNOUNCE", "inproc://alpha-1", "service1", NULL);
+    zstr_sendx (alpha, "ANNOUNCE", "inproc://alpha-2", "service2", NULL);
+
     zactor_t *beta = zactor_new (zgossip, NULL);
     assert (beta);
-    
-    zstr_sendx (base, "BIND", "inproc://base", NULL);
-    zsock_wait (base);
-    
-    zstr_sendx (alpha, "CONNECT", "inproc://base", NULL);
-    zsock_wait (alpha);
-    
     zstr_sendx (beta, "CONNECT", "inproc://base", NULL);
-    zsock_wait (beta);
+    zstr_sendx (beta, "ANNOUNCE", "inproc://beta-1", "service1", NULL);
+    zstr_sendx (beta, "ANNOUNCE", "inproc://beta-2", "service2", NULL);
 
+    //  got nothing
+    zclock_sleep (200);
+    
     zactor_destroy (&base);
     zactor_destroy (&alpha);
     zactor_destroy (&beta);
+    
 ----
 
 SEE ALSO
