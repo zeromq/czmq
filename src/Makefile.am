@@ -38,6 +38,7 @@ include_HEADERS = \
     ../include/zstr.h \
     ../include/zsys.h \
     ../include/zuuid.h \
+    zgossip_msg.h \
     ../include/zctx.h \
     ../include/zmonitor.h \
     ../include/zmutex.h \
@@ -75,6 +76,7 @@ libczmq_la_SOURCES = \
     zstr.c \
     zsys.c \
     zuuid.c \
+    zgossip_msg.c \
     zctx.c \
     zmonitor.c \
     zmutex.c \
@@ -95,6 +97,12 @@ libczmq_la_LDFLAGS = -version-info @LTVER@
 endif
 
 TESTS = czmq_selftest
+
+# Produce generated models; do this manually in src directory
+code:
+	gsl -q sockopts.xml
+	gsl -q zgossip.xml
+	gsl -q zgossip_msg.xml
 
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #

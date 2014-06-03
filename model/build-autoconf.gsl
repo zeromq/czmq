@@ -55,6 +55,14 @@ lib$(project.name)_la_LDFLAGS = -version-info @LTVER@
 endif
 
 TESTS = $(project.name)_selftest
+.for model
+.   if first ()
+
+# Produce generated models; do this manually in src directory
+code:
+.   endif
+\tgsl -q $(name).xml
+.endfor
 
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #

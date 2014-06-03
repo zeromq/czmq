@@ -70,11 +70,15 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT size_t
     zhash_size (zhash_t *self);
 
-//  Make copy of hash table
+//  Make copy of hash table; if supplied table is null, returns null.
+//  Does not copy items themselves. Rebuilds new table so may be slow on
+//  very large tables. NOTE: only works with item values that are strings
+//  since there's no other way to know how to duplicate the item value.
 CZMQ_EXPORT zhash_t *
     zhash_dup (zhash_t *self);
 
-//  Return keys for items in table
+//  Return keys for items in table. If you remove items from this list you
+//  must free the key value yourself.
 CZMQ_EXPORT zlist_t *
     zhash_keys (zhash_t *self);
     
