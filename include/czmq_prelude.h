@@ -415,7 +415,11 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
     typedef unsigned int  uint;
 #   if (!defined (__MINGW32__))
     typedef int mode_t;
+#if defined (__IS_64BIT__)
+    typedef long long ssize_t;
+#else
     typedef long ssize_t;
+#endif
     typedef __int32 int32_t;
     typedef __int64 int64_t;
     typedef unsigned __int32 uint32_t;
