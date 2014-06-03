@@ -20,7 +20,7 @@ CZMQ_EXPORT void
 DESCRIPTION
 -----------
 
-Implements the Zero Gossip protocol.
+Implements the ZeroMQ Gossip Discovery Protocol, ZGDP, (RFC TBD).
 
 
 EXAMPLE
