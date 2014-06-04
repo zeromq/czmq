@@ -10,26 +10,30 @@ find_path(
     HINTS ${PC_ZEROMQ_INCLUDE_DIRS}
 )
 
-#
-# find release libraries
-#
-find_library(
-    ZEROMQ_LIBRARIES_RELEASE
-    NAMES libzmq-mt-4_1_0.lib
-    HINTS ${PC_ZEROMQ_LIBRARY_DIRS}
-)
+if(CMAKE_BUILD_TYPE MATCHES "Release")
+    #
+    # find release libraries
+    #
+    find_library(
+        ZEROMQ_LIBRARIES_RELEASE
+        NAMES libzmq-mt-4_1_0.lib
+        HINTS ${PC_ZEROMQ_LIBRARY_DIRS}
+    )
 
-#
-# find debug libraries
-#
-find_library(
-    ZEROMQ_LIBRARIES_DEBUG
-    NAMES libzmq-mt-gd-4_1_0.lib
-    HINTS ${PC_ZEROMQ_LIBRARY_DIRS}
-)
+    set(ZEROMQ_LIBRARIES ${ZEROMQ_LIBRARIES_RELEASE})
+else()
+    #
+    # find debug libraries
+    #
+    find_library(
+        ZEROMQ_LIBRARIES_DEBUG
+        NAMES libzmq-mt-gd-4_1_0.lib
+        HINTS ${PC_ZEROMQ_LIBRARY_DIRS}
+    )
 
-set(ZEROMQ_LIBRARIES debug ${ZEROMQ_LIBRARIES_DEBUG}
-                     optimized ${ZEROMQ_LIBRARIES_RELEASE})
+    set(ZEROMQ_LIBRARIES ${ZEROMQ_LIBRARIES_DEBUG})
+endif()
+
 
 include(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(ZEROMQ DEFAULT_MSG ZEROMQ_LIBRARIES ZEROMQ_INCLUDE_DIRS)
