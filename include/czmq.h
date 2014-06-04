@@ -71,7 +71,7 @@ typedef struct _zuuid_t zuuid_t;
 #include "zdir_patch.h"
 #include "zfile.h"
 #include "zframe.h"
-#include "zgossip.h"
+/*#include "zgossip.h"*/
 #include "zhash.h"
 #include "zlist.h"
 #include "zlog.h"
