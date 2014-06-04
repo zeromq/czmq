@@ -30,11 +30,11 @@ extern "C" {
 
 //  @interface
 //  This is zgossip, implemented as a CZMQ zactor task
-void
+CZMQ_EXPORT void
     zgossip (zsock_t *pipe, void *args);
 
 //  Self test of this class
-void
+CZMQ_EXPORT void
     zgossip_test (bool verbose);
 //  @end
 
