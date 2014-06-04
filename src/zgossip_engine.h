@@ -220,7 +220,7 @@ engine_handle_socket (server_t *server, zsock_t *socket, zloop_reader_fn handler
 {
     if (server) {
         s_server_t *self = (s_server_t *) server;
-        if (handler) {
+        if (handler != NULL) {
             int rc = zloop_reader (self->loop, socket, handler, self);
             assert (rc == 0);
             zloop_reader_set_tolerant (self->loop, socket);
@@ -309,11 +309,11 @@ engine_configure (server_t *server, const char *path, const char *value)
 static void
 s_satisfy_pedantic_compilers (void)
 {
-    engine_set_next_event (NULL, 0);
-    engine_set_exception (NULL, 0);
-    engine_set_wakeup_event (NULL, 0, 0);
-    engine_send_event (NULL, 0);
-    engine_broadcast_event (NULL, NULL, 0);
+    engine_set_next_event (NULL, NULL_event);
+    engine_set_exception (NULL, NULL_event);
+    engine_set_wakeup_event (NULL, 0, NULL_event);
+    engine_send_event (NULL, NULL_event);
+    engine_broadcast_event (NULL, NULL, NULL_event);
     engine_handle_socket (NULL, 0, NULL);
     engine_set_monitor (NULL, 0, NULL);
     engine_log (NULL, NULL);
@@ -456,7 +456,7 @@ s_client_filter_mailbox (s_client_t *self)
 static void
 s_client_execute (s_client_t *self, int event)
 {
-    self->next_event = event;
+    self->next_event = (event_t) event;
     //  Cancel wakeup timer, if any was pending
     if (self->wakeup_timer) {
         zloop_timer_end (self->server->loop, self->wakeup_timer);
@@ -716,7 +716,7 @@ s_server_config_self (s_server_t *self)
     //  
     //  Animation is disabled by default
     self->animate = atoi (
-        zconfig_resolve (self->config, "server/animate", "0"));
+        zconfig_resolve (self->config, "server/animate", "0")) != 0;
 
     //  Default client timeout is 60 seconds
     self->timeout = atoi (
