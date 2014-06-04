@@ -357,7 +357,7 @@ peer_handler (zloop_t *loop, zsock_t *peer, void *argument)
     }
     else
     if (zgossip_msg_id (msg) == ZGOSSIP_MSG_PONG)
-        ;   //  Do nothing with PONGs
+        assert(true);   //  Do nothing with PONGs
         
     zgossip_msg_destroy (&msg);
     return 0;
