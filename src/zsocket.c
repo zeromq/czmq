@@ -240,6 +240,7 @@ zsocket_wait (void *self)
 }
 
 
+#if (ZMQ_VERSION_MAJOR > 2)
 //  --------------------------------------------------------------------------
 //  Set socket high-water mark, emulating 2.x API
 
@@ -249,7 +250,7 @@ zsocket_set_hwm (void *self, int hwm)
     zsocket_set_sndhwm (self, hwm);
     zsocket_set_rcvhwm (self, hwm);
 }
-
+#endif
 
 //  --------------------------------------------------------------------------
 //  Selftest

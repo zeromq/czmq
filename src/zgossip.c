@@ -376,7 +376,7 @@ zgossip_test (bool verbose)
     //  Test basic client-to-server operation
     zactor_t *server = zactor_new (zgossip, NULL);
     zstr_sendx (server, "SET", "server/animate", verbose? "1": "0", NULL);
-    zstr_sendx (server, "BIND", "ipc://@/zgossip", NULL);
+    zstr_sendx (server, "BIND", "ipc:///tmp/zgossip", NULL);
     char *port_str = zstr_recv (server);
     assert (streq (port_str, "0"));
     zstr_free (&port_str);
@@ -384,7 +384,7 @@ zgossip_test (bool verbose)
     zsock_t *client = zsock_new (ZMQ_DEALER);
     assert (client);
     zsock_set_rcvtimeo (client, 2000);
-    zsock_connect (client, "ipc://@/zgossip");
+    zsock_connect (client, "ipc:///tmp/zgossip");
 
     //  Send HELLO, which gets no reply
     zgossip_msg_t *request, *reply;
