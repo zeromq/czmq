@@ -27,6 +27,7 @@ foreach(which MAJOR MINOR PATCH)
 endforeach(which)
 
 set(CZMQ_VERSION ${CZMQ_MAJOR_VERSION}.${CZMQ_MINOR_VERSION}.${CZMQ_PATCH_VERSION})
+message(STATUS "Detected CZMQ Version - ${CZMQ_VERSION}")
 
 ########################################################################
 # platform.h
@@ -65,7 +66,7 @@ if (MINGW)
 endif()
 
 ########################################################################
-# zeromq depedency
+# zeromq dependency
 ########################################################################
 list(APPEND CMAKE_MODULE_PATH ${CZMQ_SOURCE_DIR})
 find_package(ZeroMQ REQUIRED)
@@ -90,7 +91,7 @@ set (czmq_headers
     include/zfile.h
     include/zframe.h
     include/zhash.h
-    include/zgossip.h
+#    include/zgossip.h
     include/zlist.h
     include/zlog.h
     include/zloop.h
@@ -104,7 +105,7 @@ set (czmq_headers
     include/zstr.h
     include/zsys.h
     include/zuuid.h
-    include/zgossip_msg.h
+ #   include/zgossip_msg.h
     include/zctx.h
     include/zmonitor.h
     include/zmutex.h
@@ -136,7 +137,7 @@ set (czmq_sources
     src/zfile.c
     src/zframe.c
     src/zhash.c
-    src/zgossip.c
+#    src/zgossip.c
     src/zlist.c
     src/zlog.c
     src/zloop.c
@@ -150,7 +151,7 @@ set (czmq_sources
     src/zstr.c
     src/zsys.c
     src/zuuid.c
-    src/zgossip_msg.c
+#    src/zgossip_msg.c
     src/zctx.c
     src/zmonitor.c
     src/zmutex.c
@@ -159,9 +160,23 @@ set (czmq_sources
     src/zthread.c
 )
 source_group ("Source Files" FILES ${czmq_sources})
+
 add_library(czmq SHARED ${czmq_sources})
-set_target_properties(czmq PROPERTIES DEFINE_SYMBOL "LIBCZMQ_EXPORTS")
 target_link_libraries(czmq ${ZEROMQ_LIBRARIES} ${MORE_LIBRARIES})
+
+if(MSVC)
+    set_target_properties(czmq PROPERTIES DEFINE_SYMBOL   "LIBCZMQ_EXPORTS"
+                                          PUBLIC_HEADER   "${public_headers}"
+                                          RELEASE_POSTFIX "-mt-${CZMQ_MAJOR_VERSION}_${CZMQ_MINOR_VERSION}_${CZMQ_PATCH_VERSION}"
+                                          DEBUG_POSTFIX   "-mt-gd-${CZMQ_MAJOR_VERSION}_${CZMQ_MINOR_VERSION}_${CZMQ_PATCH_VERSION}"
+                                          RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin")
+else()
+    set_target_properties(czmq PROPERTIES DEFINE_SYMBOL   "LIBCZMQ_EXPORTS"
+                                          PUBLIC_HEADER   "${public_headers}"
+                                          RELEASE_POSTFIX "-${CZMQ_MAJOR_VERSION}_${CZMQ_MINOR_VERSION}_${CZMQ_PATCH_VERSION}"
+                                          DEBUG_POSTFIX   "-gd-${CZMQ_MAJOR_VERSION}_${CZMQ_MINOR_VERSION}_${CZMQ_PATCH_VERSION}"
+                                          RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin")
+endif()
 
 install(TARGETS czmq
     LIBRARY DESTINATION lib${LIB_SUFFIX} # .so file
