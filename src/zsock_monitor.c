@@ -178,7 +178,9 @@ s_agent_destroy (agent_t **self_p)
     assert (self_p);
     if (*self_p) {
         agent_t *self = *self_p;
+#if defined (ZMQ_EVENT_ALL)
         zmq_socket_monitor (self->monitored, NULL, 0);
+#endif
         zpoller_destroy (&self->poller);
         zsock_destroy (&self->sink);
         free (self);
@@ -191,8 +193,11 @@ s_agent_start (agent_t *self)
 {
     assert (!self->sink);
     char *endpoint = zsys_sprintf ("inproc://zsock_monitor-%p", self->monitored);
-    int rc = zmq_socket_monitor (self->monitored, endpoint, self->events);
+    int rc;
+#if defined (ZMQ_EVENT_ALL)
+    rc = zmq_socket_monitor (self->monitored, endpoint, self->events);
     assert (rc == 0);
+#endif
     self->sink = zsock_new (ZMQ_PAIR);
     assert (self->sink);
     rc = zsock_connect (self->sink, "%s", endpoint);
@@ -241,6 +246,7 @@ s_api_command (agent_t *self)
 static void
 s_monitor_event (agent_t *self)
 {
+#if defined (ZMQ_EVENT_ALL)
 #if (ZMQ_VERSION_MAJOR == 4)
     //  First frame is event number and value
     zframe_t *frame = zframe_recv (self->sink);
@@ -314,6 +320,7 @@ s_monitor_event (agent_t *self)
     zstr_sendm  (self->pipe, address);
     zstr_send   (self->pipe, description);
     free (address);
+#endif
 }
 
 //  This is the background task that monitors socket events
@@ -343,6 +350,7 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
 //  --------------------------------------------------------------------------
 //  Selftest of this class
 
+#if defined (ZMQ_EVENT_ALL)
 static bool
 s_check_event (zsock_monitor_t *self, int expected_event)
 {
@@ -354,6 +362,7 @@ s_check_event (zsock_monitor_t *self, int expected_event)
     zmsg_destroy (&msg);
     return event == expected_event;
 }
+#endif
 
 void
 zsock_monitor_test (bool verbose)
@@ -363,6 +372,7 @@ zsock_monitor_test (bool verbose)
         printf ("\n");
 
     //  @selftest
+#if defined (ZMQ_EVENT_ALL)
     zsock_t *sink = zsock_new (ZMQ_PULL);
     zsock_monitor_t *sinkmon = zsock_monitor_new (sink);
     zsock_monitor_set_verbose (sinkmon, verbose);
@@ -399,6 +409,7 @@ zsock_monitor_test (bool verbose)
     zsock_monitor_destroy (&sourcemon);
     zsock_destroy (&sink);
     zsock_destroy (&source);
+#endif
     //  @end
     printf ("OK\n");
 }

@@ -818,6 +818,8 @@ s_server_api_message (zloop_t *loop, zsock_t *reader, void *argument)
     if (streq (method, "BIND")) {
         char *endpoint = zmsg_popstr (msg);
         self->port = zsock_bind (self->router, "%s", endpoint);
+        puts (endpoint);
+        puts (zmq_strerror (zmq_errno ()));
         assert (self->port != -1);
         zstr_sendf (self->pipe, "%d", self->port);
         free (endpoint);
