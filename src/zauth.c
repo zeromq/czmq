@@ -604,7 +604,7 @@ s_can_connect (zctx_t *ctx, void **server, void **client)
     assert (rc == 0);
     zstr_send (*server, "Hello, World");
     zpoller_t *poller = zpoller_new (*client, NULL);
-    bool success = (zpoller_wait (poller, 1000) == *client);
+    bool success = (zpoller_wait (poller, 200) == *client);
     zpoller_destroy (&poller);
     zsocket_destroy (ctx, *client);
     zsocket_destroy (ctx, *server);
@@ -677,12 +677,14 @@ zauth_test (bool verbose)
     zauth_configure_plain (auth, "*", TESTDIR "/password-file");
     success = s_can_connect (ctx, &server, &client);
     assert (success);
+puts ("1: ----");
 
     zsocket_set_plain_server (server, 1);
     zsocket_set_plain_username (client, "admin");
     zsocket_set_plain_password (client, "Bogus");
     success = s_can_connect (ctx, &server, &client);
     assert (!success);
+puts ("2: ----");
 
 #   if defined (HAVE_LIBSODIUM)
     //  Try CURVE authentication
@@ -723,7 +725,6 @@ zauth_test (bool verbose)
     zcert_destroy (&server_cert);
     zcert_destroy (&client_cert);
 #   endif
-
     //  Remove the authenticator and check a normal connection works
     zauth_destroy (&auth);
     success = s_can_connect (ctx, &server, &client);
