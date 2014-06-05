@@ -222,6 +222,7 @@ zbeacon_test (bool verbose)
     zbeacon_t *service_beacon = zbeacon_new (ctx, 9999);
     if (service_beacon == NULL) {
         printf ("OK (skipping test, no UDP discovery)\n");
+        zctx_destroy (&ctx);
         return;
     }
     zbeacon_set_interval (service_beacon, 100);
