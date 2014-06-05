@@ -16,7 +16,7 @@ if(CMAKE_BUILD_TYPE MATCHES "Release")
     #
     find_library(
         ZEROMQ_LIBRARIES_RELEASE
-        NAMES libzmq-mt-4_1_0.lib
+        NAMES zmq libzmq-mt-4_1_0.lib
         HINTS ${PC_ZEROMQ_LIBRARY_DIRS}
     )
 
@@ -27,7 +27,7 @@ else()
     #
     find_library(
         ZEROMQ_LIBRARIES_DEBUG
-        NAMES libzmq-mt-gd-4_1_0.lib
+        NAMES zmq libzmq-mt-gd-4_1_0.lib
         HINTS ${PC_ZEROMQ_LIBRARY_DIRS}
     )
 
