@@ -677,14 +677,12 @@ zauth_test (bool verbose)
     zauth_configure_plain (auth, "*", TESTDIR "/password-file");
     success = s_can_connect (ctx, &server, &client);
     assert (success);
-puts ("1: ----");
 
     zsocket_set_plain_server (server, 1);
     zsocket_set_plain_username (client, "admin");
     zsocket_set_plain_password (client, "Bogus");
     success = s_can_connect (ctx, &server, &client);
     assert (!success);
-puts ("2: ----");
 
 #   if defined (HAVE_LIBSODIUM)
     //  Try CURVE authentication
