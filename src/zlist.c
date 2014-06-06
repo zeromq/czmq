@@ -97,6 +97,26 @@ zlist_first (zlist_t *self)
         return NULL;
 }
 
+
+//  --------------------------------------------------------------------------
+//  Return the next item. If the list is empty, returns NULL. To move to
+//  the start of the list call zlist_first (). Advances the cursor.
+
+void *
+zlist_next (zlist_t *self)
+{
+    assert (self);
+    if (self->cursor)
+        self->cursor = self->cursor->next;
+    else
+        self->cursor = self->head;
+    if (self->cursor)
+        return self->cursor->item;
+    else
+        return NULL;
+}
+
+
 //  --------------------------------------------------------------------------
 //  Return the item at the tail of list. If the list is empty, returns NULL.
 //  Leaves cursor pointing at the tail item, or NULL if the list is empty.
@@ -134,24 +154,6 @@ zlist_tail (zlist_t *self)
 {
     assert (self);
     return self->tail? self->tail->item: NULL;
-}
-
-//  --------------------------------------------------------------------------
-//  Return the next item. If the list is empty, returns NULL. To move to
-//  the start of the list call zlist_first (). Advances the cursor.
-
-void *
-zlist_next (zlist_t *self)
-{
-    assert (self);
-    if (self->cursor)
-        self->cursor = self->cursor->next;
-    else
-        self->cursor = self->head;
-    if (self->cursor)
-        return self->cursor->item;
-    else
-        return NULL;
 }
 
 
