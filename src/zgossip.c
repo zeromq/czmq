@@ -107,9 +107,6 @@ struct _client_t {
     server_t *server;           //  Reference to parent server
     zgossip_msg_t *request;     //  Last received request
     zgossip_msg_t *reply;       //  Reply to send out, if any
-
-    zlist_t *keys;              //  List of known tuple keys
-    char *cur_key;              //  Next tuple key, if any
 };
 
 
@@ -181,23 +178,16 @@ server_connect (server_t *self, const char *endpoint)
         zsock_destroy (&remote);
         return;
     }
-    zlist_append (self->remotes, remote);
-    
     //  Send HELLO and then PUBLISH for each tuple we have
     zgossip_msg_send_hello (remote);
-
-    zlist_t *keys = zhash_keys (self->tuples);
-    char *key = (char *) zlist_first (keys);
-    while (key) {
-        tuple_t *tuple = (tuple_t *) zhash_lookup (self->tuples, key);
-        assert (tuple);
+    tuple_t *tuple = (tuple_t *) zhash_first (self->tuples);
+    while (tuple) {
         zgossip_msg_send_publish (remote, tuple->key, tuple->value);
-        key = (char *) zlist_next (keys);
+        tuple = (tuple_t *) zhash_next (self->tuples);
     }
-    zlist_destroy (&keys);
-    
     //  Now monitor this remote for incoming messages
     engine_handle_socket (self, remote, remote_handler);
+    zlist_append (self->remotes, remote);
 }
 
     
@@ -286,10 +276,14 @@ client_terminate (client_t *self)
 static void
 get_first_tuple (client_t *self)
 {
-    assert (!self->keys);
-    self->keys = zhash_keys (self->server->tuples);
-    self->cur_key = (char *) zlist_first (self->keys);
-    get_next_tuple (self);
+    tuple_t *tuple = (tuple_t *) zhash_first (self->server->tuples);
+    if (tuple) {
+        zgossip_msg_set_key (self->reply, tuple->key);
+        zgossip_msg_set_value (self->reply, tuple->value);
+        engine_set_next_event (self, ok_event);
+    }
+    else
+        engine_set_next_event (self, finished_event);
 }
 
 
@@ -300,19 +294,14 @@ get_first_tuple (client_t *self)
 static void
 get_next_tuple (client_t *self)
 {
-    if (self->cur_key) {
-        tuple_t *tuple = (tuple_t *)
-            zhash_lookup (self->server->tuples, self->cur_key);
-        assert (tuple);
+    tuple_t *tuple = (tuple_t *) zhash_next (self->server->tuples);
+    if (tuple) {
         zgossip_msg_set_key (self->reply, tuple->key);
         zgossip_msg_set_value (self->reply, tuple->value);
         engine_set_next_event (self, ok_event);
-        self->cur_key = (char *) zlist_next (self->keys);
     }
-    else {
-        zlist_destroy (&self->keys);
+    else
         engine_set_next_event (self, finished_event);
-    }
 }
 
 
