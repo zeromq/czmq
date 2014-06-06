@@ -8,33 +8,33 @@
     <include filename = "license.xml" />
 
     <state name = "start" inherit = "external">
-        <!-- Peer says HELLO and we send it all known services -->
-        <event name = "HELLO" next = "have service">
-            <action name = "get first service" />
+        <!-- Peer says HELLO and we send it all known tuples -->
+        <event name = "HELLO" next = "have tuple">
+            <action name = "get first tuple" />
         </event>
     </state>
 
-    <state name = "have service">
+    <state name = "have tuple">
         <event name = "ok">
-            <action name = "send" message = "ANNOUNCE" />
-            <action name = "get next service" />
+            <action name = "send" message = "PUBLISH" />
+            <action name = "get next tuple" />
         </event>
         <event name = "finished" next = "connected" />
     </state>
 
     <state name = "connected" inherit = "external">
-        <!-- Peer announces a new service -->
-        <event name = "ANNOUNCE">
-            <action name = "store service if new" />
+        <!-- Peer publishes a new tuple -->
+        <event name = "PUBLISH">
+            <action name = "store tuple if new" />
         </event>
         <!-- Peer signals it's alive -->
         <event name = "PING">
             <action name = "send" message = "PONG" />
         </event>
-        <!-- Forward a new service to this client -->
+        <!-- Forward a new tuple to this client -->
         <event name = "forward">
-            <action name = "get service to forward" />
-            <action name = "send" message = "ANNOUNCE" />
+            <action name = "get tuple to forward" />
+            <action name = "send" message = "PUBLISH" />
         </event>
     </state>
 
@@ -46,7 +46,7 @@
             <action name = "terminate" />
         </event>
         
-        <!-- This built-in event hits on a connection timeout -->
+        <!-- This built-in event hits on a client timeout -->
         <event name = "expired">
             <action name = "terminate" />
         </event>

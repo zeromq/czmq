@@ -49,6 +49,9 @@ struct _zhash_t {
     size_t limit;               //  Current hash table limit
     item_t **items;             //  Array of items
     uint cached_index;          //  Avoids duplicate hash calculations
+    uint cursor_index;          //  For first/next iteration
+    item_t *cursor_item;        //  For first/next iteration
+    char *cursor_key;           //  After first/next call, points to key
     bool autofree;              //  If true, free values in destructor
     zlist_t *comments;          //  File comments, if any
     time_t modified;            //  Set during zhash_load
@@ -164,7 +167,7 @@ zhash_insert (zhash_t *self, const char *key, void *value)
         //  Move all items to the new hash table, rehashing to
         //  take into account new hash table limit
         uint index;
-        for (index = 0; index != self->limit; index++) {
+        for (index = 0; index < self->limit; index++) {
             item_t *cur_item = self->items [index];
             while (cur_item) {
                 item_t *next_item = cur_item->next;
@@ -388,7 +391,7 @@ zhash_dup (zhash_t *self)
     zhash_autofree (copy);
     if (copy) {
         uint index;
-        for (index = 0; index != self->limit; index++) {
+        for (index = 0; index < self->limit; index++) {
             item_t *item = self->items [index];
             while (item) {
                 zhash_insert (copy, item->key, item->value);
@@ -412,7 +415,7 @@ zhash_keys (zhash_t *self)
     zlist_autofree (keys);
 
     uint index;
-    for (index = 0; index != self->limit; index++) {
+    for (index = 0; index < self->limit; index++) {
         item_t *item = self->items [index];
         while (item) {
             zlist_append (keys, item->key);
@@ -424,33 +427,67 @@ zhash_keys (zhash_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Apply function to each item in the hash table. Items are iterated in no
-//  defined order.  Stops if callback function returns non-zero and returns
-//  final return code from callback function (zero = success).
+//  Simple iterator; returns first item in hash table, in no given order,
+//  or NULL if the table is empty. This method is simpler to use than the
+//  foreach() method, which is deprecated. NOTE: do NOT modify the table
+//  while iterating.
 
-int
-zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument)
+void *
+zhash_first (zhash_t *self)
 {
     assert (self);
-    int rc = 0;
-    uint index;
-    for (index = 0; index != self->limit; index++) {
-        item_t *item = self->items [index];
-        while (item) {
-            //  Invoke callback, passing item properties and argument
-            item_t *next = item->next;
-            rc = callback (item->key, item->value, argument);
-            if (rc)
-                return rc;      //  End if non-zero return code
-            item = next;
-        }
-    }
-    return rc;
+    //  Point to before or at first item
+    self->cursor_index = 0;
+    self->cursor_item = self->items [self->cursor_index];
+    //  Now scan forwards to find it, leave cursor after item
+    return zhash_next (self);
 }
 
 
 //  --------------------------------------------------------------------------
-//  Add comment to hash table before saving to disk. You can add as many
+//  Simple iterator; returns next item in hash table, in no given order,
+//  or NULL if the last item was already returned. Use this together with
+//  zhash_first() to process all items in a hash table. If you need the
+//  items in sorted order, use zhash_keys() and then zlist_sort(). NOTE:
+//  do NOT modify the table while iterating.
+
+void *
+zhash_next (zhash_t *self)
+{
+    assert (self);
+    //  Scan forward from cursor until we find an item
+    while (self->cursor_item == NULL) {
+        if (self->cursor_index < self->limit - 1)
+            self->cursor_index++;
+        else
+            return NULL;        //  At end of table
+
+        //  Get first item in next bucket
+        self->cursor_item = self->items [self->cursor_index];
+    }
+    //  We have an item, so return it, and bump past it
+    assert (self->cursor_item);
+    item_t *item = self->cursor_item;
+    self->cursor_key = item->key;
+    self->cursor_item = self->cursor_item->next;
+    return item->value;
+}
+
+
+//  --------------------------------------------------------------------------
+//  After a successful first/next method, returns the key for the item
+//  that was returned. After an unsuccessful first/next, returns NULL.
+
+char *
+zhash_cursor (zhash_t *self)
+{
+    assert (self);
+    return self->cursor_key;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Add a comment to hash table before saving to disk. You can add as many
 //  comment lines as you like. These comment lines are discarded when loading
 //  the file. If you use a null format, all comments are deleted.
 
@@ -497,7 +534,7 @@ zhash_save (zhash_t *self, const char *filename)
         fprintf (handle, "\n");
     }
     uint index;
-    for (index = 0; index != self->limit; index++) {
+    for (index = 0; index < self->limit; index++) {
         item_t *item = self->items [index];
         while (item) {
             fprintf (handle, "%s=%s\n", item->key, (char *) item->value);
@@ -627,7 +664,7 @@ zhash_pack (zhash_t *self)
     //  First, calculate packed data size
     size_t frame_size = 4;      //  Dictionary size, number-4
     uint index;
-    for (index = 0; index != self->limit; index++) {
+    for (index = 0; index < self->limit; index++) {
         item_t *item = self->items [index];
         while (item) {
             //  We store key as short string
@@ -643,7 +680,7 @@ zhash_pack (zhash_t *self)
     //  Store size as number-4
     *(uint32_t *) needle = htonl (self->size);
     needle += 4;
-    for (index = 0; index != self->limit; index++) {
+    for (index = 0; index < self->limit; index++) {
         item_t *item = self->items [index];
         while (item) {
             //  Store key as string
@@ -713,21 +750,36 @@ zhash_unpack (zframe_t *frame)
 
             
 //  --------------------------------------------------------------------------
+//  Apply function to each item in the hash table. Items are iterated in no
+//  defined order.  Stops if callback function returns non-zero and returns
+//  final return code from callback function (zero = success).
+//  NOTE: this is deprecated in favor of zhash_first/next since the callback
+//  design is clumsy and over-complex, and unnecessary.
+
+int
+zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument)
+{
+    assert (self);
+    int rc = 0;
+    uint index;
+    for (index = 0; index < self->limit; index++) {
+        item_t *item = self->items [index];
+        while (item) {
+            //  Invoke callback, passing item properties and argument
+            item_t *next = item->next;
+            rc = callback (item->key, item->value, argument);
+            if (rc)
+                return rc;      //  End if non-zero return code
+            item = next;
+        }
+    }
+    return rc;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Runs selftest of class
 //
-
-static int
-test_foreach (const char *key, void *item, void *arg)
-{
-    assert (zhash_lookup ((zhash_t*) arg, key));
-    return 0;
-}
-
-static int
-test_foreach_error (const char *key, void *item, void *arg)
-{
-    return -1;
-}
 
 void
 zhash_test (int verbose)
@@ -738,10 +790,15 @@ zhash_test (int verbose)
     zhash_t *hash = zhash_new ();
     assert (hash);
     assert (zhash_size (hash) == 0);
-
+    assert (zhash_first (hash) == NULL);
+    assert (zhash_cursor (hash) == NULL);
+    
     //  Insert some items
     int rc;
     rc = zhash_insert (hash, "DEADBEEF", "dead beef");
+    char *item = (char *) zhash_first (hash);
+    assert (streq (zhash_cursor (hash), "DEADBEEF"));
+    assert (streq (item, "dead beef"));
     assert (rc == 0);
     rc = zhash_insert (hash, "ABADCAFE", "a bad cafe");
     assert (rc == 0);
@@ -752,7 +809,6 @@ zhash_test (int verbose)
     assert (zhash_size (hash) == 4);
 
     //  Look for existing items
-    char *item;
     item = (char *) zhash_lookup (hash, "DEADBEEF");
     assert (streq (item, "dead beef"));
     item = (char *) zhash_lookup (hash, "ABADCAFE");
@@ -820,12 +876,6 @@ zhash_test (int verbose)
     assert (item);
     assert (streq (item, "dead beef"));
     zhash_destroy (&copy);
-
-    // Test foreach
-    rc = zhash_foreach (hash, test_foreach, hash);
-    assert (rc == 0);
-    rc = zhash_foreach (hash, test_foreach_error, hash);
-    assert (rc == -1);
 
     //  Test save and load
     zhash_comment (hash, "This is a test file");

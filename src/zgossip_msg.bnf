@@ -1,16 +1,16 @@
-The following ABNF grammar defines the zgossip protocol:
+The following ABNF grammar defines the ZeroMQ Gossip Protocol:
 
-        C:HELLO [ *S:ANNOUNCE ]
-        C:ANNOUNCE / S:ANNOUNCE / C:PING S:PONG
+        C:HELLO [ *S:PUBLISH ]
+        C:PUBLISH / S:PUBLISH / C:PING S:PONG
 
     ;         Client says hello to server
     hello           = signature %d1
     signature       = %xAA %xA0             ; two octets
 
-    ;         Client or server announces a new service
-    announce        = signature %d2 endpoint service
-    endpoint        = string                ; ZeroMQ endpoint
-    service         = string                ; Service name
+    ;         Client or server announces a new tuple
+    publish         = signature %d2 key value
+    key             = string                ; The key
+    value           = string                ; The value
 
     ;         Client signals liveness
     ping            = signature %d3
