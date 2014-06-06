@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zgossip_msg - zgossip protocol
+    zgossip_msg - ZeroMQ Gossip Protocol
     
     Codec header for zgossip_msg.
 
@@ -29,9 +29,9 @@
 
     HELLO - Client says hello to server
 
-    ANNOUNCE - Client or server announces a new service
-        endpoint            string      ZeroMQ endpoint
-        service             string      Service name
+    PUBLISH - Client or server announces a new tuple
+        key                 string      The key
+        value               string      The value
 
     PING - Client signals liveness
 
@@ -42,7 +42,7 @@
 
 
 #define ZGOSSIP_MSG_HELLO                   1
-#define ZGOSSIP_MSG_ANNOUNCE                2
+#define ZGOSSIP_MSG_PUBLISH                 2
 #define ZGOSSIP_MSG_PING                    3
 #define ZGOSSIP_MSG_PONG                    4
 #define ZGOSSIP_MSG_INVALID                 5
@@ -100,11 +100,11 @@ CZMQ_EXPORT zmsg_t *
     zgossip_msg_encode_hello (
 );
 
-//  Encode the ANNOUNCE 
+//  Encode the PUBLISH 
 CZMQ_EXPORT zmsg_t *
-    zgossip_msg_encode_announce (
-        const char *endpoint,
-        const char *service);
+    zgossip_msg_encode_publish (
+        const char *key,
+        const char *value);
 
 //  Encode the PING 
 CZMQ_EXPORT zmsg_t *
@@ -127,12 +127,12 @@ CZMQ_EXPORT zmsg_t *
 CZMQ_EXPORT int
     zgossip_msg_send_hello (void *output);
     
-//  Send the ANNOUNCE to the output in one step
+//  Send the PUBLISH to the output in one step
 //  WARNING, this call will fail if output is of type ZMQ_ROUTER.
 CZMQ_EXPORT int
-    zgossip_msg_send_announce (void *output,
-        const char *endpoint,
-        const char *service);
+    zgossip_msg_send_publish (void *output,
+        const char *key,
+        const char *value);
     
 //  Send the PING to the output in one step
 //  WARNING, this call will fail if output is of type ZMQ_ROUTER.
@@ -171,17 +171,17 @@ CZMQ_EXPORT void
 CZMQ_EXPORT const char *
     zgossip_msg_command (zgossip_msg_t *self);
 
-//  Get/set the endpoint field
+//  Get/set the key field
 CZMQ_EXPORT const char *
-    zgossip_msg_endpoint (zgossip_msg_t *self);
+    zgossip_msg_key (zgossip_msg_t *self);
 CZMQ_EXPORT void
-    zgossip_msg_set_endpoint (zgossip_msg_t *self, const char *format, ...);
+    zgossip_msg_set_key (zgossip_msg_t *self, const char *format, ...);
 
-//  Get/set the service field
+//  Get/set the value field
 CZMQ_EXPORT const char *
-    zgossip_msg_service (zgossip_msg_t *self);
+    zgossip_msg_value (zgossip_msg_t *self);
 CZMQ_EXPORT void
-    zgossip_msg_set_service (zgossip_msg_t *self, const char *format, ...);
+    zgossip_msg_set_value (zgossip_msg_t *self, const char *format, ...);
 
 //  Self test of this class
 CZMQ_EXPORT int
