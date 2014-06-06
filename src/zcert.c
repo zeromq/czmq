@@ -244,22 +244,19 @@ zcert_load (const char *filename)
 //  Save full certificate (public + secret) to file for persistent storage
 //  This creates one public file and one secret file (filename + "_secret").
 
-static int
-s_save_metadata (const char *name, void *value, void *args)
-{
-    zconfig_t *item = zconfig_new ((char *) name, (zconfig_t *) args);
-    zconfig_set_value (item, "%s", (char *) value);
-    return 0;
-}
-
 static void
 s_save_metadata_all (zcert_t *self)
 {
     zconfig_destroy (&self->config);
     self->config = zconfig_new ("root", NULL);
     zconfig_t *section = zconfig_new ("metadata", self->config);
-    zhash_foreach (self->metadata, s_save_metadata, section);
     
+    char *value = (char *) zhash_first (self->metadata);
+    while (value) {
+        zconfig_t *item = zconfig_new (zhash_cursor (self->metadata), section);
+        zconfig_set_value (item, "%s", value);
+        value = (char *) zhash_next (self->metadata);
+    }
     char *timestr = zclock_timestr ();
     zconfig_set_comment (self->config,
         "   ****  Generated on %s by CZMQ  ****", timestr);
@@ -374,13 +371,6 @@ zcert_eq (zcert_t *self, zcert_t *compare)
 }
 
 
-static int
-s_print_metadata (const char *name, void *value, void *args)
-{
-    fprintf ((FILE *) args, "    %s = \"%s\"\n", name, (char *) value);
-    return 0;
-}
-
 //  --------------------------------------------------------------------------
 //  Print certificate contents to open stream
 
@@ -389,7 +379,13 @@ zcert_fprint (zcert_t *self, FILE *file)
 {
     assert (self);
     fprintf (file, "metadata\n");
-    zhash_foreach (self->metadata, s_print_metadata, file);
+
+    char *value = (char *) zhash_first (self->metadata);
+    while (value) {
+        fprintf (file, "    %s = \"%s\"\n",
+                 zhash_cursor (self->metadata), value);
+        value = (char *) zhash_next (self->metadata);
+    }
     fprintf (file, "curve\n");
     fprintf (file, "    public-key = \"%s\"\n", self->public_txt);
     fprintf (file, "    secret-key = \"%s\"\n", self->secret_txt);
