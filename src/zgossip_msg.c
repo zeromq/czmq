@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zgossip_msg - zgossip protocol
+    zgossip_msg - ZeroMQ Gossip Protocol
 
     Codec class for zgossip_msg.
 
@@ -25,7 +25,7 @@
 
 /*
 @header
-    zgossip_msg - zgossip protocol
+    zgossip_msg - ZeroMQ Gossip Protocol
 @discuss
 @end
 */
@@ -40,8 +40,8 @@ struct _zgossip_msg_t {
     int id;                             //  zgossip_msg message ID
     byte *needle;                       //  Read/write pointer for serialization
     byte *ceiling;                      //  Valid upper limit for read pointer
-    char *endpoint;                     //  ZeroMQ endpoint
-    char *service;                      //  Service name
+    char *key;                          //  The key
+    char *value;                        //  The value
 };
 
 //  --------------------------------------------------------------------------
@@ -204,8 +204,8 @@ zgossip_msg_destroy (zgossip_msg_t **self_p)
 
         //  Free class properties
         zframe_destroy (&self->routing_id);
-        free (self->endpoint);
-        free (self->service);
+        free (self->key);
+        free (self->value);
 
         //  Free object itself
         free (self);
@@ -249,9 +249,9 @@ zgossip_msg_decode (zmsg_t **msg_p)
         case ZGOSSIP_MSG_HELLO:
             break;
 
-        case ZGOSSIP_MSG_ANNOUNCE:
-            GET_STRING (self->endpoint);
-            GET_STRING (self->service);
+        case ZGOSSIP_MSG_PUBLISH:
+            GET_STRING (self->key);
+            GET_STRING (self->value);
             break;
 
         case ZGOSSIP_MSG_PING:
@@ -302,15 +302,15 @@ zgossip_msg_encode (zgossip_msg_t **self_p)
         case ZGOSSIP_MSG_HELLO:
             break;
             
-        case ZGOSSIP_MSG_ANNOUNCE:
-            //  endpoint is a string with 1-byte length
+        case ZGOSSIP_MSG_PUBLISH:
+            //  key is a string with 1-byte length
             frame_size++;       //  Size is one octet
-            if (self->endpoint)
-                frame_size += strlen (self->endpoint);
-            //  service is a string with 1-byte length
+            if (self->key)
+                frame_size += strlen (self->key);
+            //  value is a string with 1-byte length
             frame_size++;       //  Size is one octet
-            if (self->service)
-                frame_size += strlen (self->service);
+            if (self->value)
+                frame_size += strlen (self->value);
             break;
             
         case ZGOSSIP_MSG_PING:
@@ -337,14 +337,14 @@ zgossip_msg_encode (zgossip_msg_t **self_p)
         case ZGOSSIP_MSG_HELLO:
             break;
 
-        case ZGOSSIP_MSG_ANNOUNCE:
-            if (self->endpoint) {
-                PUT_STRING (self->endpoint);
+        case ZGOSSIP_MSG_PUBLISH:
+            if (self->key) {
+                PUT_STRING (self->key);
             }
             else
                 PUT_NUMBER1 (0);    //  Empty string
-            if (self->service) {
-                PUT_STRING (self->service);
+            if (self->value) {
+                PUT_STRING (self->value);
             }
             else
                 PUT_NUMBER1 (0);    //  Empty string
@@ -482,16 +482,16 @@ zgossip_msg_encode_hello (
 
 
 //  --------------------------------------------------------------------------
-//  Encode ANNOUNCE message
+//  Encode PUBLISH message
 
 zmsg_t * 
-zgossip_msg_encode_announce (
-    const char *endpoint,
-    const char *service)
+zgossip_msg_encode_publish (
+    const char *key,
+    const char *value)
 {
-    zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_ANNOUNCE);
-    zgossip_msg_set_endpoint (self, endpoint);
-    zgossip_msg_set_service (self, service);
+    zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_PUBLISH);
+    zgossip_msg_set_key (self, key);
+    zgossip_msg_set_value (self, value);
     return zgossip_msg_encode (&self);
 }
 
@@ -545,17 +545,17 @@ zgossip_msg_send_hello (
 
 
 //  --------------------------------------------------------------------------
-//  Send the ANNOUNCE to the socket in one step
+//  Send the PUBLISH to the socket in one step
 
 int
-zgossip_msg_send_announce (
+zgossip_msg_send_publish (
     void *output,
-    const char *endpoint,
-    const char *service)
+    const char *key,
+    const char *value)
 {
-    zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_ANNOUNCE);
-    zgossip_msg_set_endpoint (self, endpoint);
-    zgossip_msg_set_service (self, service);
+    zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_PUBLISH);
+    zgossip_msg_set_key (self, key);
+    zgossip_msg_set_value (self, value);
     return zgossip_msg_send (&self, output);
 }
 
@@ -612,9 +612,9 @@ zgossip_msg_dup (zgossip_msg_t *self)
         case ZGOSSIP_MSG_HELLO:
             break;
 
-        case ZGOSSIP_MSG_ANNOUNCE:
-            copy->endpoint = self->endpoint? strdup (self->endpoint): NULL;
-            copy->service = self->service? strdup (self->service): NULL;
+        case ZGOSSIP_MSG_PUBLISH:
+            copy->key = self->key? strdup (self->key): NULL;
+            copy->value = self->value? strdup (self->value): NULL;
             break;
 
         case ZGOSSIP_MSG_PING:
@@ -644,16 +644,16 @@ zgossip_msg_print (zgossip_msg_t *self)
             puts ("HELLO:");
             break;
             
-        case ZGOSSIP_MSG_ANNOUNCE:
-            puts ("ANNOUNCE:");
-            if (self->endpoint)
-                printf ("    endpoint='%s'\n", self->endpoint);
+        case ZGOSSIP_MSG_PUBLISH:
+            puts ("PUBLISH:");
+            if (self->key)
+                printf ("    key='%s'\n", self->key);
             else
-                printf ("    endpoint=\n");
-            if (self->service)
-                printf ("    service='%s'\n", self->service);
+                printf ("    key=\n");
+            if (self->value)
+                printf ("    value='%s'\n", self->value);
             else
-                printf ("    service=\n");
+                printf ("    value=\n");
             break;
             
         case ZGOSSIP_MSG_PING:
@@ -718,8 +718,8 @@ zgossip_msg_command (zgossip_msg_t *self)
         case ZGOSSIP_MSG_HELLO:
             return ("HELLO");
             break;
-        case ZGOSSIP_MSG_ANNOUNCE:
-            return ("ANNOUNCE");
+        case ZGOSSIP_MSG_PUBLISH:
+            return ("PUBLISH");
             break;
         case ZGOSSIP_MSG_PING:
             return ("PING");
@@ -735,47 +735,47 @@ zgossip_msg_command (zgossip_msg_t *self)
 }
 
 //  --------------------------------------------------------------------------
-//  Get/set the endpoint field
+//  Get/set the key field
 
 const char *
-zgossip_msg_endpoint (zgossip_msg_t *self)
+zgossip_msg_key (zgossip_msg_t *self)
 {
     assert (self);
-    return self->endpoint;
+    return self->key;
 }
 
 void
-zgossip_msg_set_endpoint (zgossip_msg_t *self, const char *format, ...)
+zgossip_msg_set_key (zgossip_msg_t *self, const char *format, ...)
 {
-    //  Format endpoint from provided arguments
+    //  Format key from provided arguments
     assert (self);
     va_list argptr;
     va_start (argptr, format);
-    free (self->endpoint);
-    self->endpoint = zsys_vprintf (format, argptr);
+    free (self->key);
+    self->key = zsys_vprintf (format, argptr);
     va_end (argptr);
 }
 
 
 //  --------------------------------------------------------------------------
-//  Get/set the service field
+//  Get/set the value field
 
 const char *
-zgossip_msg_service (zgossip_msg_t *self)
+zgossip_msg_value (zgossip_msg_t *self)
 {
     assert (self);
-    return self->service;
+    return self->value;
 }
 
 void
-zgossip_msg_set_service (zgossip_msg_t *self, const char *format, ...)
+zgossip_msg_set_value (zgossip_msg_t *self, const char *format, ...)
 {
-    //  Format service from provided arguments
+    //  Format value from provided arguments
     assert (self);
     va_list argptr;
     va_start (argptr, format);
-    free (self->service);
-    self->service = zsys_vprintf (format, argptr);
+    free (self->value);
+    self->value = zsys_vprintf (format, argptr);
     va_end (argptr);
 }
 
@@ -825,15 +825,15 @@ zgossip_msg_test (bool verbose)
         
         zgossip_msg_destroy (&self);
     }
-    self = zgossip_msg_new (ZGOSSIP_MSG_ANNOUNCE);
+    self = zgossip_msg_new (ZGOSSIP_MSG_PUBLISH);
     
     //  Check that _dup works on empty message
     copy = zgossip_msg_dup (self);
     assert (copy);
     zgossip_msg_destroy (&copy);
 
-    zgossip_msg_set_endpoint (self, "Life is short but Now lasts for ever");
-    zgossip_msg_set_service (self, "Life is short but Now lasts for ever");
+    zgossip_msg_set_key (self, "Life is short but Now lasts for ever");
+    zgossip_msg_set_value (self, "Life is short but Now lasts for ever");
     //  Send twice from same object
     zgossip_msg_send_again (self, output);
     zgossip_msg_send (&self, output);
@@ -843,8 +843,8 @@ zgossip_msg_test (bool verbose)
         assert (self);
         assert (zgossip_msg_routing_id (self));
         
-        assert (streq (zgossip_msg_endpoint (self), "Life is short but Now lasts for ever"));
-        assert (streq (zgossip_msg_service (self), "Life is short but Now lasts for ever"));
+        assert (streq (zgossip_msg_key (self), "Life is short but Now lasts for ever"));
+        assert (streq (zgossip_msg_value (self), "Life is short but Now lasts for ever"));
         zgossip_msg_destroy (&self);
     }
     self = zgossip_msg_new (ZGOSSIP_MSG_PING);

@@ -19,8 +19,6 @@ extern "C" {
 #endif
 
 //  @interface
-//  Callback function for zhash_foreach method
-typedef int (zhash_foreach_fn) (const char *key, void *item, void *argument);
 //  Callback function for zhash_freefn method
 typedef void (zhash_free_fn) (void *data);
 
@@ -82,13 +80,28 @@ CZMQ_EXPORT zhash_t *
 CZMQ_EXPORT zlist_t *
     zhash_keys (zhash_t *self);
     
-//  Apply function to each item in the hash table. Items are iterated in no
-//  defined order. Stops if callback function returns non-zero and returns
-//  final return code from callback function (zero = success).
-CZMQ_EXPORT int
-    zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument);
+//  Simple iterator; returns first item in hash table, in no given order,
+//  or NULL if the table is empty. This method is simpler to use than the
+//  foreach() method, which is deprecated. To access the key for this item
+//  use zhash_cursor(). NOTE: do NOT modify the table while iterating.
+CZMQ_EXPORT void *
+    zhash_first (zhash_t *self);
 
-//  Add comment to hash table before saving to disk. You can add as many
+//  Simple iterator; returns next item in hash table, in no given order,
+//  or NULL if the last item was already returned. Use this together with
+//  zhash_first() to process all items in a hash table. If you need the
+//  items in sorted order, use zhash_keys() and then zlist_sort(). To
+//  access the key for this item use zhash_cursor(). NOTE: do NOT modify
+//  the table while iterating.
+CZMQ_EXPORT void *
+    zhash_next (zhash_t *self);
+
+//  After a successful first/next method, returns the key for the item
+//  that was returned. After an unsuccessful first/next, returns NULL.
+CZMQ_EXPORT char *
+    zhash_cursor (zhash_t *self);
+
+//  Add a comment to hash table before saving to disk. You can add as many
 //  comment lines as you like. These comment lines are discarded when loading
 //  the file. If you use a null format, all comments are deleted.
 CZMQ_EXPORT void
@@ -145,6 +158,18 @@ CZMQ_EXPORT zframe_t *
 //  unpacks to an empty hash table.
 CZMQ_EXPORT zhash_t *
     zhash_unpack (zframe_t *frame);
+
+//  Apply function to each item in the hash table. Items are iterated in no
+//  defined order. Stops if callback function returns non-zero and returns
+//  final return code from callback function (zero = success).
+//  NOTE: this is deprecated in favor of zhash_first/next since the callback
+//  design is clumsy and over-complex, and unnecessary.
+    
+//  Callback function for zhash_foreach method
+typedef int (zhash_foreach_fn) (const char *key, void *item, void *argument);
+
+CZMQ_EXPORT int
+    zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument);
 
 //  Self test of this class
 CZMQ_EXPORT void

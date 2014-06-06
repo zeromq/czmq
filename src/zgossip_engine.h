@@ -27,7 +27,7 @@
 
 typedef enum {
     start_state = 1,
-    have_service_state = 2,
+    have_tuple_state = 2,
     connected_state = 3,
     external_state = 4
 } state_t;
@@ -38,7 +38,7 @@ typedef enum {
     hello_event = 1,
     ok_event = 2,
     finished_event = 3,
-    announce_event = 4,
+    publish_event = 4,
     ping_event = 5,
     forward_event = 6,
     expired_event = 7
@@ -49,7 +49,7 @@ static char *
 s_state_name [] = {
     "(NONE)",
     "start",
-    "have service",
+    "have tuple",
     "connected",
     "external"
 };
@@ -60,7 +60,7 @@ s_event_name [] = {
     "HELLO",
     "ok",
     "finished",
-    "ANNOUNCE",
+    "PUBLISH",
     "PING",
     "forward",
     "expired"
@@ -124,13 +124,13 @@ static void
 static int
     s_client_wakeup (zloop_t *loop, int timer_id, void *argument);
 static void
-    get_first_service (client_t *self);
+    get_first_tuple (client_t *self);
 static void
-    get_next_service (client_t *self);
+    get_next_tuple (client_t *self);
 static void
-    store_service_if_new (client_t *self);
+    store_tuple_if_new (client_t *self);
 static void
-    get_service_to_forward (client_t *self);
+    get_tuple_to_forward (client_t *self);
 
 //  ---------------------------------------------------------------------
 //  These methods are an internal API for actions
@@ -335,8 +335,8 @@ s_protocol_event (zgossip_msg_t *request)
         case ZGOSSIP_MSG_HELLO:
             return hello_event;
             break;
-        case ZGOSSIP_MSG_ANNOUNCE:
-            return announce_event;
+        case ZGOSSIP_MSG_PUBLISH:
+            return publish_event;
             break;
         case ZGOSSIP_MSG_PING:
             return ping_event;
@@ -476,14 +476,14 @@ s_client_execute (s_client_t *self, int event)
             case start_state:
                 if (self->event == hello_event) {
                     if (!self->exception) {
-                        //  get first service
+                        //  get first tuple
                         if (self->server->animate)
                             zlog_debug (self->server->log,
-                                "%s:         $ get first service", self->log_prefix);
-                        get_first_service (&self->client);
+                                "%s:         $ get first tuple", self->log_prefix);
+                        get_first_tuple (&self->client);
                     }
                     if (!self->exception)
-                        self->state = have_service_state;
+                        self->state = have_tuple_state;
                 }
                 else
                 if (self->event == expired_event) {
@@ -517,24 +517,24 @@ s_client_execute (s_client_t *self, int event)
                 }
                 break;
 
-            case have_service_state:
+            case have_tuple_state:
                 if (self->event == ok_event) {
                     if (!self->exception) {
-                        //  send announce
+                        //  send publish
                         if (self->server->animate)
                             zlog_debug (self->server->log,
-                                "%s:         $ send ANNOUNCE", self->log_prefix);
-                        zgossip_msg_set_id (self->client.reply, ZGOSSIP_MSG_ANNOUNCE);
+                                "%s:         $ send PUBLISH", self->log_prefix);
+                        zgossip_msg_set_id (self->client.reply, ZGOSSIP_MSG_PUBLISH);
                         zgossip_msg_send (&self->client.reply, self->server->router);
                         self->client.reply = zgossip_msg_new (0);
                         zgossip_msg_set_routing_id (self->client.reply, self->routing_id);
                     }
                     if (!self->exception) {
-                        //  get next service
+                        //  get next tuple
                         if (self->server->animate)
                             zlog_debug (self->server->log,
-                                "%s:         $ get next service", self->log_prefix);
-                        get_next_service (&self->client);
+                                "%s:         $ get next tuple", self->log_prefix);
+                        get_next_tuple (&self->client);
                     }
                 }
                 else
@@ -553,13 +553,13 @@ s_client_execute (s_client_t *self, int event)
                 break;
 
             case connected_state:
-                if (self->event == announce_event) {
+                if (self->event == publish_event) {
                     if (!self->exception) {
-                        //  store service if new
+                        //  store tuple if new
                         if (self->server->animate)
                             zlog_debug (self->server->log,
-                                "%s:         $ store service if new", self->log_prefix);
-                        store_service_if_new (&self->client);
+                                "%s:         $ store tuple if new", self->log_prefix);
+                        store_tuple_if_new (&self->client);
                     }
                 }
                 else
@@ -578,18 +578,18 @@ s_client_execute (s_client_t *self, int event)
                 else
                 if (self->event == forward_event) {
                     if (!self->exception) {
-                        //  get service to forward
+                        //  get tuple to forward
                         if (self->server->animate)
                             zlog_debug (self->server->log,
-                                "%s:         $ get service to forward", self->log_prefix);
-                        get_service_to_forward (&self->client);
+                                "%s:         $ get tuple to forward", self->log_prefix);
+                        get_tuple_to_forward (&self->client);
                     }
                     if (!self->exception) {
-                        //  send announce
+                        //  send publish
                         if (self->server->animate)
                             zlog_debug (self->server->log,
-                                "%s:         $ send ANNOUNCE", self->log_prefix);
-                        zgossip_msg_set_id (self->client.reply, ZGOSSIP_MSG_ANNOUNCE);
+                                "%s:         $ send PUBLISH", self->log_prefix);
+                        zgossip_msg_set_id (self->client.reply, ZGOSSIP_MSG_PUBLISH);
                         zgossip_msg_send (&self->client.reply, self->server->router);
                         self->client.reply = zgossip_msg_new (0);
                         zgossip_msg_set_routing_id (self->client.reply, self->routing_id);
@@ -818,8 +818,6 @@ s_server_api_message (zloop_t *loop, zsock_t *reader, void *argument)
     if (streq (method, "BIND")) {
         char *endpoint = zmsg_popstr (msg);
         self->port = zsock_bind (self->router, "%s", endpoint);
-        puts (endpoint);
-        puts (zmq_strerror (zmq_errno ()));
         assert (self->port != -1);
         zstr_sendf (self->pipe, "%d", self->port);
         free (endpoint);
