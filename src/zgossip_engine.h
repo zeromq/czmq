@@ -740,7 +740,7 @@ s_server_new (zsock_t *pipe)
     self->pipe = pipe;
     self->router = zsock_new (ZMQ_ROUTER);
     self->clients = zhash_new ();
-    self->log = zlog_new ("zgossip", 0, LOG_DAEMON);
+    self->log = zlog_new ("zgossip");
     self->config = zconfig_new ("root", NULL);
     self->loop = zloop_new ();
     srandom ((unsigned int) zclock_time ());

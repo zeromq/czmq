@@ -11,7 +11,7 @@ SYNOPSIS
 //  Constructor; the sender name is prepended to every message, and may
 //  not be null.
 CZMQ_EXPORT zlog_t *
-    zlog_new (const char *sender, int syslog_option, int syslog_facility);
+    zlog_new (const char *sender);
 
 //  Destructor
 CZMQ_EXPORT void
@@ -43,10 +43,6 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zlog_debug (zlog_t *self, const char *format, ...);
 
-//  Sets level mask for syslog
-CZMQ_EXPORT int
-    zlog_set_logmask (zlog_t *self, int logmask);
-
 //  Self test of this class
 CZMQ_EXPORT void
     zlog_test (bool verbose);
@@ -63,7 +59,7 @@ EXAMPLE
 -------
 .From zlog_test method
 ----
-    zlog_t *log = zlog_new ("zlog_test", 0, LOG_DAEMON);
+    zlog_t *log = zlog_new ("zlog_test");
     assert (log);
     zlog_error   (log, "%s", "My pizza was stolen!");
     zlog_warning (log, "%s", "My pizza is late :(");
