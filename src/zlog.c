@@ -34,14 +34,14 @@ struct _zlog_t {
 //  not be null.
 
 zlog_t *
-zlog_new (const char *sender)
+zlog_new (const char *sender, int syslog_option, int syslog_facility)
 {
     assert (sender);
     zlog_t *self = (zlog_t *) zmalloc (sizeof (zlog_t));
     //  We take a copy of sender since syslog assumes it's always accessible
     self->sender = strdup (sender);
 #if defined (__UNIX__)
-    openlog (self->sender, 0, LOG_DAEMON);
+    openlog (self->sender, syslog_option, syslog_facility);
 #else
     self->foreground = true;
 #endif
@@ -180,6 +180,19 @@ zlog_debug (zlog_t *self, const char *format, ...)
     free (string);
 }
 
+//  --------------------------------------------------------------------------
+//  Sets level mask for	syslog
+
+int
+zlog_set_logmask (zlog_t *self, int logmask)
+{
+    assert (self);
+    int lastmask = 0;
+#if defined (__UNIX__)
+    lastmask = setlogmask (logmask);
+#endif
+    return lastmask;
+}
 
 //  --------------------------------------------------------------------------
 //  Selftest
@@ -190,7 +203,7 @@ zlog_test (bool verbose)
     printf (" * zlog: ");
 
     //  @selftest
-    zlog_t *log = zlog_new ("zlog_test");
+    zlog_t *log = zlog_new ("zlog_test", 0, LOG_DAEMON);
     assert (log);
     zlog_error   (log, "%s", "My pizza was stolen!");
     zlog_warning (log, "%s", "My pizza is late :(");
