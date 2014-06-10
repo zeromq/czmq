@@ -84,6 +84,7 @@ typedef struct {
     uint client_id;             //  Client identifier counter
     size_t timeout;             //  Default client expiry timeout
     bool animate;               //  Is animation enabled?
+    char *log_prefix;           //  Default log prefix
 } s_server_t;
 
 
@@ -363,7 +364,7 @@ s_client_new (s_server_t *server, zframe_t *routing_id)
     self->routing_id = zframe_dup (routing_id);
     self->mailbox = zlist_new ();
     self->unique_id = server->client_id++;
-    engine_set_log_prefix (&self->client, "");
+    engine_set_log_prefix (&self->client, server->log_prefix);
 
     self->client.server = (server_t *) server;
     self->client.reply = zgossip_msg_new (0);
@@ -739,7 +740,7 @@ s_server_new (zsock_t *pipe)
     self->pipe = pipe;
     self->router = zsock_new (ZMQ_ROUTER);
     self->clients = zhash_new ();
-    self->log = zlog_new ("zgossip", 0, LOG_DAEMON);
+    self->log = zlog_new ("zgossip");
     self->config = zconfig_new ("root", NULL);
     self->loop = zloop_new ();
     srandom ((unsigned int) zclock_time ());
@@ -921,6 +922,8 @@ zgossip (zsock_t *pipe, void *args)
     s_server_t *self = s_server_new (pipe);
     assert (self);
     zsock_signal (pipe, 0);
+    //  Actor argument may be a string used for logging
+    self->log_prefix = args? (char *) args: "";
 
     //  Set-up server monitor to watch for config file changes
     engine_set_monitor ((server_t *) self, 1000, s_watch_server_config);
