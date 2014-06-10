@@ -328,7 +328,6 @@ zsys_catch_interrupts (void)
 static void
 s_signal_handler (int signal_value)
 {
-    puts ("INTERRUPTED");
     zctx_interrupted = 1;
     zsys_interrupted = 1;
 }
