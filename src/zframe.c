@@ -324,26 +324,27 @@ zframe_reset (zframe_t *self, const void *data, size_t size)
 
 
 //  --------------------------------------------------------------------------
-//  Print contents of frame to FILE stream, prefix is ignored if null.
+//  Send message to zsys log sink (may be stdout, or system facility as
+//  configured by zsys_set_logstream). Prefix shows before frame, if not null.
 
 void
-zframe_fprint (zframe_t *self, const char *prefix, FILE *file)
+zframe_print (zframe_t *self, const char *prefix)
 {
     assert (self);
     assert (zframe_is (self));
 
-    if (prefix)
-        fprintf (file, "%s", prefix);
     byte *data = zframe_data (self);
     size_t size = zframe_size (self);
 
+    //  Probe data to check if it looks like unprintable binary
     int is_bin = 0;
     uint char_nbr;
     for (char_nbr = 0; char_nbr < size; char_nbr++)
         if (data [char_nbr] < 9 || data [char_nbr] > 127)
             is_bin = 1;
 
-    fprintf (file, "[%03d] ", (int) size);
+    char buffer [256] = "";
+    snprintf (buffer, 30, "%s[%03d] ", prefix? prefix: "", (int) size);
     size_t max_size = is_bin? 35: 70;
     const char *ellipsis = "";
     if (size > max_size) {
@@ -352,24 +353,12 @@ zframe_fprint (zframe_t *self, const char *prefix, FILE *file)
     }
     for (char_nbr = 0; char_nbr < size; char_nbr++) {
         if (is_bin)
-            fprintf (file, "%02X", (unsigned char) data [char_nbr]);
+            sprintf (buffer + strlen (buffer), "%02X", (unsigned char) data [char_nbr]);
         else
-            fprintf (file, "%c", data [char_nbr]);
+            sprintf (buffer + strlen (buffer), "%c", data [char_nbr]);
     }
-    fprintf (file, "%s\n", ellipsis);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Print contents of frame to stdout, prefix is ignored if null.
-
-void
-zframe_print (zframe_t *self, const char *prefix)
-{
-    assert (self);
-    assert (zframe_is (self));
-
-    zframe_fprint (self, prefix, stdout);
+    strcat (buffer, ellipsis);
+    zsys_debug (buffer);
 }
 
 
@@ -404,6 +393,45 @@ zframe_recv_nowait (void *source)
         self->more = zsocket_rcvmore (handle);
     }
     return self;
+}
+
+
+//  --------------------------------------------------------------------------
+//  DEPRECATED as inconsistent; breaks principle that logging should all go
+//  to a single destination.
+//  Print contents of frame to FILE stream, prefix is ignored if null.
+
+void
+zframe_fprint (zframe_t *self, const char *prefix, FILE *file)
+{
+    assert (self);
+    assert (zframe_is (self));
+
+    if (prefix)
+        fprintf (file, "%s", prefix);
+    byte *data = zframe_data (self);
+    size_t size = zframe_size (self);
+
+    int is_bin = 0;
+    uint char_nbr;
+    for (char_nbr = 0; char_nbr < size; char_nbr++)
+        if (data [char_nbr] < 9 || data [char_nbr] > 127)
+            is_bin = 1;
+
+    fprintf (file, "[%03d] ", (int) size);
+    size_t max_size = is_bin? 35: 70;
+    const char *ellipsis = "";
+    if (size > max_size) {
+        size = max_size;
+        ellipsis = "...";
+    }
+    for (char_nbr = 0; char_nbr < size; char_nbr++) {
+        if (is_bin)
+            fprintf (file, "%02X", (unsigned char) data [char_nbr]);
+        else
+            fprintf (file, "%c", data [char_nbr]);
+    }
+    fprintf (file, "%s\n", ellipsis);
 }
 
 

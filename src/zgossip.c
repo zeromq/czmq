@@ -87,7 +87,6 @@ typedef struct _tuple_t tuple_t;
 struct _server_t {
     //  These properties must always be present in the server_t
     //  and are set by the generated engine; do not modify them!
-    zlog_t *log;                //  For any logging needed
     zconfig_t *config;          //  Current loaded configuration
     
     //  Add any properties you need here
@@ -174,7 +173,7 @@ server_connect (server_t *self, const char *endpoint)
     zsock_t *remote = zsock_new (ZMQ_DEALER);
     assert (remote);          //  No recovery if exhausted
     if (zsock_connect (remote, "%s", endpoint)) {
-        zclock_log ("E (zgossip): bad endpoint '%s'", endpoint);
+        zsys_error ("bad zgossip endpoint '%s'", endpoint);
         zsock_destroy (&remote);
         return;
     }
@@ -244,7 +243,7 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
         zstr_free (&value);
     }
     else
-        zclock_log ("E (zgossip): unknown method '%s'", method);
+        zsys_error ("unknown zgossip method '%s'", method);
     
     return NULL;
 }
@@ -369,6 +368,8 @@ void
 zgossip_test (bool verbose)
 {
     printf (" * zgossip: ");
+    if (verbose)
+        printf ("\n");
     
     //  @selftest
     //  Test basic client-to-server operation of the protocol

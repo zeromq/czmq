@@ -45,7 +45,6 @@ typedef struct _zfile_t zfile_t;
 typedef struct _zframe_t zframe_t;
 typedef struct _zhash_t zhash_t;
 typedef struct _zlist_t zlist_t;
-typedef struct _zlog_t zlog_t;
 typedef struct _zloop_t zloop_t;
 typedef struct _zmonitor_t zmonitor_t;
 typedef struct _zmsg_t zmsg_t;
@@ -74,7 +73,6 @@ typedef struct _zuuid_t zuuid_t;
 #include "zgossip.h"
 #include "zhash.h"
 #include "zlist.h"
-#include "zlog.h"
 #include "zloop.h"
 #include "zmsg.h"
 #include "zpoller.h"

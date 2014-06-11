@@ -149,7 +149,7 @@ zsock_unbind (zsock_t *self, const char *format, ...)
     assert (self);
     assert (zsock_is (self));
 
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0))
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
     char endpoint [256];
     va_list argptr;
     va_start (argptr, format);
@@ -191,7 +191,7 @@ zsock_disconnect (zsock_t *self, const char *format, ...)
     assert (self);
     assert (zsock_is (self));
 
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0))
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
     char endpoint [256];
     va_list argptr;
     va_start (argptr, format);

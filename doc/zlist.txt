@@ -26,6 +26,10 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void *
     zlist_first (zlist_t *self);
 
+//  Return next item in the list, or null
+CZMQ_EXPORT void *
+    zlist_next (zlist_t *self);
+
 //  Return last item in the list, or null
 CZMQ_EXPORT void *
     zlist_last (zlist_t *self);
@@ -37,10 +41,6 @@ CZMQ_EXPORT void *
 //  Return last item in the list, or null, leaves the cursor
 CZMQ_EXPORT void *
     zlist_tail (zlist_t *self);
-
-//  Return next item in the list, or null
-CZMQ_EXPORT void *
-    zlist_next (zlist_t *self);
 
 //  Append an item to the end of the list, return 0 if OK
 //  or -1 if this failed for some reason (out of memory).

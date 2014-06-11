@@ -62,6 +62,8 @@ s_thread_shim (void *args)
     assert (args);
     shim_t *shim = (shim_t *) args;
     shim->handler (shim->pipe, shim->args);
+    //  Do not block, if the other end of the pipe is already deleted
+    zsock_set_sndtimeo (shim->pipe, 0);
     zsock_signal (shim->pipe, 0);
     zsock_destroy (&shim->pipe);
     free (shim);
@@ -77,6 +79,8 @@ s_thread_shim (void *args)
     assert (args);
     shim_t *shim = (shim_t *) args;
     shim->handler (shim->pipe, shim->args);
+    //  Do not block, if the other end of the pipe is already deleted
+    zsock_set_sndtimeo (shim->pipe, 0);
     zsock_signal (shim->pipe, 0);
     zsock_destroy (&shim->pipe);
     free (shim);

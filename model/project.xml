@@ -21,7 +21,6 @@
     <class name = "zhash" />
     <class name = "zgossip" />
     <class name = "zlist" />
-    <class name = "zlog" />
     <class name = "zloop" />
     <class name = "zmsg" />
     <class name = "zpoller" />
