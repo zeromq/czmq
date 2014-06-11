@@ -370,7 +370,8 @@ zconfig_load (const char *filename)
         if (chunk) {
             self = zconfig_chunk_load (chunk);
             zchunk_destroy (&chunk);
-            self->file = file;
+            if (self)
+                self->file = file;
             zfile_close (file);
             file = NULL;        //  Config tree now owns file handle
         }
@@ -546,7 +547,7 @@ zconfig_chunk_load (zchunk_t *chunk)
                     item->value = value;
                 }
                 else {
-                    fprintf (stderr, "zconfig E: (%d) indentation error\n", lineno);
+                    zclock_log ("E (zconfig): (%d) indentation error", lineno);
                     free (value);
                     valid = false;
                 }
@@ -577,7 +578,7 @@ s_collect_level (char **start, int lineno)
         readptr++;
     int level = (readptr - *start) / 4;
     if (level * 4 != readptr - *start) {
-        fprintf (stderr, "zconfig E: (%d) indent 4 spaces at once\n", lineno);
+        zclock_log ("E (zconfig): (%d) indent 4 spaces at once", lineno);
         level = -1;
     }
     *start = readptr;
@@ -614,9 +615,9 @@ s_collect_name (char **start, int lineno)
 
     if (length > 0
     && (name [0] == '/' || name [length - 1] == '/')) {
-        fprintf (stderr, "zconfig E: (%d) '/' not valid at name start or end\n", lineno);
+        zclock_log ("E (zconfig): (%d) '/' not valid at name start or end", lineno);
         free (name);
-	name = NULL;
+        name = NULL;
     }
     return name;
 }
@@ -633,8 +634,7 @@ s_verify_eoln (char *readptr, int lineno)
         if (*readptr == '#')
             break;
         else {
-            fprintf (stderr, "E: (%d) invalid syntax '%s'\n",
-                lineno, readptr);
+            zclock_log ("E (zconfig): (%d) invalid syntax '%s'", lineno, readptr);
             return -1;
             break;
         }
@@ -670,7 +670,7 @@ s_collect_value (char **start, int lineno)
                 rc = s_verify_eoln (endquote + 1, lineno);
             }
             else {
-                fprintf (stderr, "zconfig E: (%d) missing %c\n", lineno, *readptr);
+                zclock_log ("E (zconfig): (%d) missing %c", lineno, *readptr);
                 rc = -1;
             }
         }
