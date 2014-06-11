@@ -99,7 +99,7 @@ zsocket_bind (void *self, const char *format, ...)
 int
 zsocket_unbind (void *self, const char *format, ...)
 {
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0))
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
     char endpoint [256];
     va_list argptr;
     va_start (argptr, format);
@@ -134,7 +134,7 @@ zsocket_connect (void *self, const char *format, ...)
 int
 zsocket_disconnect (void *self, const char *format, ...)
 {
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION(3,2,0))
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
     char endpoint [256];
     va_list argptr;
     va_start (argptr, format);
