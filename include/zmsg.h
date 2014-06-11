@@ -153,12 +153,8 @@ CZMQ_EXPORT zmsg_t *
 CZMQ_EXPORT zmsg_t *
     zmsg_dup (zmsg_t *self);
 
-//  Print message to open stream
-//  Truncates to first 10 frames, for readability.
-CZMQ_EXPORT void
-    zmsg_fprint (zmsg_t *self, FILE *file);
-
-//  Dump message to stdout, for debugging. See zmsg_fprint for details
+//  Send message to zsys log sink (may be stdout, or system facility as
+//  configured by zsys_set_logstream).
 CZMQ_EXPORT void
     zmsg_print (zmsg_t *self);
 
@@ -199,6 +195,13 @@ CZMQ_EXPORT int
 //  DEPRECATED - will be removed for next stable release
 CZMQ_EXPORT int
     zmsg_add (zmsg_t *self, zframe_t *frame);
+
+//  DEPRECATED as inconsistent; breaks principle that logging should all go
+//  to a single destination.
+//  Print message to open stream
+//  Truncates to first 10 frames, for readability.
+CZMQ_EXPORT void
+    zmsg_fprint (zmsg_t *self, FILE *file);
 
 //  Compiler hints
 CZMQ_EXPORT int zmsg_addstrf (zmsg_t *self, const char *format, ...) CHECK_PRINTF (2);

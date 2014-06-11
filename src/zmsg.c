@@ -631,31 +631,8 @@ zmsg_dup (zmsg_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Dump message to FILE stream, for debugging and tracing.
-//  Truncates to first 10 frames, for readability.
-
-void
-zmsg_fprint (zmsg_t *self, FILE *file)
-{
-    assert (self);
-    assert (zmsg_is (self));
-
-    fprintf (file, "--------------------------------------\n");
-    if (!self) {
-        fprintf (file, "NULL");
-        return;
-    }
-    zframe_t *frame = zmsg_first (self);
-    int frame_nbr = 0;
-    while (frame && frame_nbr++ < 10) {
-        zframe_fprint (frame, NULL, file);
-        frame = zmsg_next (self);
-    }
-}
-
-
-//  --------------------------------------------------------------------------
-//  Dump message to stdout, for debugging. See zmsg_fprint for details
+//  Send message to zsys log sink (may be stdout, or system facility as
+//  configured by zsys_set_logstream).
 
 void
 zmsg_print (zmsg_t *self)
@@ -663,7 +640,15 @@ zmsg_print (zmsg_t *self)
     assert (self);
     assert (zmsg_is (self));
     
-    zmsg_fprint (self, stdout);
+    if (!self) {
+        zsys_debug ("(NULL)");
+        return;
+    }
+    zframe_t *frame = zmsg_first (self);
+    while (frame) {
+        zframe_print (frame, NULL);
+        frame = zmsg_next (self);
+    }
 }
 
 
@@ -772,6 +757,32 @@ zmsg_add (zmsg_t *self, zframe_t *frame)
     assert (frame);
     self->content_size += zframe_size (frame);
     return zlist_append (self->frames, frame);
+}
+
+
+//  --------------------------------------------------------------------------
+//  DEPRECATED as inconsistent; breaks principle that logging should all go
+//  to a single destination.
+//  Dump message to FILE stream, for debugging and tracing.
+//  Truncates to first 10 frames, for readability.
+
+void
+zmsg_fprint (zmsg_t *self, FILE *file)
+{
+    assert (self);
+    assert (zmsg_is (self));
+
+    fprintf (file, "--------------------------------------\n");
+    if (!self) {
+        fprintf (file, "NULL");
+        return;
+    }
+    zframe_t *frame = zmsg_first (self);
+    int frame_nbr = 0;
+    while (frame && frame_nbr++ < 10) {
+        zframe_fprint (frame, NULL, file);
+        frame = zmsg_next (self);
+    }
 }
 
 
