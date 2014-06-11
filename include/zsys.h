@@ -215,6 +215,40 @@ CZMQ_EXPORT void
 CZMQ_EXPORT const char *
     zsys_interface (void);
 
+//  Set log identity, which is a string that prefixes all log messages sent
+//  by this process. The log identity defaults to the environment variable
+//  ZSYS_LOGIDENT, if that is set.
+CZMQ_EXPORT void
+    zsys_set_logident (const char *value);
+
+//  Set stream to receive log traffic. By default log traffic is sent to the
+//  system logging facility (syslog on POSIX, event log on Windows). When you
+//  set the logstream to an open file stream (typically stdout or stderr),
+//  log traffic goes here instead. If stream is NULL, traffic is sent to the
+//  system logging facility (as by default).
+CZMQ_EXPORT void
+    zsys_set_logstream (FILE *stream);
+    
+//  Log error condition - highest priority
+CZMQ_EXPORT void
+    zsys_error (const char *format, ...);
+
+//  Log warning condition - high priority
+CZMQ_EXPORT void
+    zsys_warning (const char *format, ...);
+    
+//  Log normal, but significant, condition - normal priority
+CZMQ_EXPORT void
+    zsys_notice (const char *format, ...);
+    
+//  Log informational message - low priority
+CZMQ_EXPORT void
+    zsys_info (const char *format, ...);
+    
+//  Log debug-level message - lowest priority
+CZMQ_EXPORT void
+    zsys_debug (const char *format, ...);
+
 //  Self test of this class
 CZMQ_EXPORT void
     zsys_test (bool verbose);
