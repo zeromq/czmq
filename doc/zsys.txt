@@ -13,6 +13,13 @@ SYNOPSIS
 //  Callback for interrupt signal handler
 typedef void (zsys_handler_fn) (int signal_value);
 
+//  Initialize CZMQ zsys layer; this happens automatically when you create
+//  a socket or an actor; however this call lets you force initialization
+//  earlier, so e.g. logging is properly set-up before you start working.
+//  Not threadsafe, so call only from main thread.
+CZMQ_EXPORT void
+    zsys_init (void);
+    
 //  Get a new ZMQ socket, automagically creating a ZMQ context if this is
 //  the first time. Caller is responsible for destroying the ZMQ socket
 //  before process exits, to avoid a ZMQ deadlock. Note: you should not use
