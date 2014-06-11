@@ -125,7 +125,6 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
 
     ZMUTEX_LOCK (s_mutex);
     void *handle = zmq_socket (process_ctx, type);
-
     //  Configure socket with process defaults
     zsocket_set_linger (handle, (int) s_linger);
 #if (ZMQ_VERSION_MAJOR == 2)
@@ -181,7 +180,7 @@ s_initialize_process (void)
 
     if (getenv ("ZSYS_INTERFACE")) {
         s_interface = strdup (getenv ("ZSYS_INTERFACE"));
-        zclock_log ("D (zsys): set ZSYS_INTERFACE=%s", s_interface);
+        zsys_debug ("(zsys): set ZSYS_INTERFACE=%s", s_interface);
     }
     if (getenv ("ZSYS_LOGIDENT"))
         s_interface = strdup (getenv ("ZSYS_LOGIDENT"));
@@ -1078,7 +1077,7 @@ zsys_set_interface (const char *value)
 {
     free (s_interface);
     s_interface = strdup (value);
-    zclock_log ("D (zsys): zsys_set_interface (%s)", s_interface);
+    zsys_debug ("(zsys): zsys_set_interface (%s)", s_interface);
 }
 
 
@@ -1258,7 +1257,7 @@ zsys_test (bool verbose)
     int rc;
 
     if (verbose)
-        printf ("System supports up to %zd ZeroMQ sockets\n", zsys_socket_limit ());
+        zsys_info ("system limit is %zd ZeroMQ sockets\n", zsys_socket_limit ());
     zsys_set_io_threads (1);
     zsys_set_max_sockets (0);
     zsys_set_linger (0);
