@@ -424,7 +424,7 @@ s_agent_handle_pipe (agent_t *self)
         zsocket_signal (self->pipe);
     }
     else {
-        printf ("E: invalid command from API: %s\n", command);
+        zsys_error ("invalid command from API: %s\n", command);
         assert (false);
     }
     zstr_free (&command);

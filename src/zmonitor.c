@@ -297,7 +297,7 @@ s_api_command (agent_t *self)
         free (verbose);
     }
     else
-        printf ("E: zmonitor unexpected API command '%s'\n", command);
+        zsys_error ("zmonitor unexpected API command '%s'\n", command);
 
     free (command);
 }
@@ -353,11 +353,11 @@ s_socket_event (agent_t *self)
             description = "Monitor stopped";
             break;
         default:
-            printf ("E: illegal socket monitor event: %d", event);
+            zsys_error ("illegal socket monitor event: %d", event);
             break;
     }
     if (self->verbose)
-        printf ("I: zmonitor: %s - %s\n", description, address);
+        zsys_info ("zmonitor: %s - %s\n", description, address);
 
     zstr_sendfm (self->pipe, "%d", event);
     zstr_sendfm (self->pipe, "%d", value);

@@ -224,10 +224,10 @@ s_terminate_process (void)
     s_sockref_t *sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
     while (sockref) {
 #if defined (__WINDOWS__)
-		printf ("E: dangling socket created at %s:%u\n",
+		zsys_error ("dangling socket created at %s:%u\n",
                 sockref->filename, sockref->line_nbr);
 #else
-        printf ("E: dangling socket created at %s:%zd\n",
+        zsys_error ("dangling socket created at %s:%zd\n",
                 sockref->filename, sockref->line_nbr);
 #endif
         zmq_close (sockref->handle);
@@ -1202,6 +1202,8 @@ void
 zsys_test (bool verbose)
 {
     printf (" * zsys: ");
+    if (verbose)
+        printf ("\n");
 
     //  @selftest
     zsys_catch_interrupts ();
