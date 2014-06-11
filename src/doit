@@ -1,2 +1,0 @@
-gcc -g -o czmq_selftest czmq_selftest.c z*.c ${CFLAGS} ${LDFLAGS} -lzmq -lpthread -lsodium -luuid
-./czmq_selftest -v
