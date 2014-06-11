@@ -168,9 +168,10 @@ s_initialize_process (void)
         s_rcvhwm = atoi (getenv ("ZSYS_RCVHWM"));
     if (getenv ("ZSYS_IPV6"))
         s_ipv6 = atoi (getenv ("ZSYS_IPV6"));
-    if (getenv ("ZSYS_INTERFACE"))
+    if (getenv ("ZSYS_INTERFACE")) {
         s_interface = strdup (getenv ("ZSYS_INTERFACE"));
-
+        zclock_log ("D (zsys): set ZSYS_INTERFACE=%s", s_interface);
+    }
     //  This call keeps compatibility back to ZMQ v2
     process_ctx = zmq_init ((int) s_iothreads);
     ZMUTEX_INIT (s_mutex);
@@ -1008,6 +1009,7 @@ zsys_set_interface (const char *value)
 {
     free (s_interface);
     s_interface = strdup (value);
+    zclock_log ("D (zsys): zsys_set_interface (%s)", s_interface);
 }
 
 
