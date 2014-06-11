@@ -71,6 +71,7 @@ static int s_ipv6 = 0;              //  ZSYS_IPV6=0
 static char *s_interface = NULL;    //  ZSYS_INTERFACE=
 static char *s_logident = NULL;     //  ZSYS_LOGIDENT=
 static FILE *s_logstream = NULL;    //  ZSYS_LOGSTREAM=stdout/stderr
+static bool s_logsystem = false;    //  ZSYS_LOGSYSTEM=true/false
 
 //  Track number of open sockets so we can zmq_ctx_term() safely
 static size_t s_open_sockets = 0;
@@ -195,6 +196,16 @@ s_initialize_process (void)
     else
         s_logstream = stdout;
     
+    if (getenv ("ZSYS_LOGSYSTEM")) {
+        if (streq (getenv ("ZSYS_LOGSYSTEM"), "true"))
+            s_logsystem = true;
+        else
+        if (streq (getenv ("ZSYS_LOGSYSTEM"), "false"))
+            s_logsystem = false;
+    }
+    else
+        s_logsystem = false;
+
     //  This call keeps compatibility back to ZMQ v2
     process_ctx = zmq_init ((int) s_io_threads);
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
@@ -1111,19 +1122,30 @@ zsys_set_logident (const char *value)
 
 //  --------------------------------------------------------------------------
 //  Set stream to receive log traffic. By default, log traffic is sent to
-//  stdout. If you want traffic to go to the system logging facility (syslog
-//  on POSIX, event log on Windows), call zsys_set_logstream (NULL). You can
-//  send traffic to any open file stream.
+//  stdout. If you set the stream to NULL, no stream will receive the log
+//  traffic (it may still be sent to the system facility).
 
 void
 zsys_set_logstream (FILE *stream)
 {
     s_logstream = stream;
-#if defined (__UNIX__)
-    if (!stream)
-        openlog (s_logident, 0, LOG_DAEMON);
-#endif
+}
 
+
+//  --------------------------------------------------------------------------
+//  Enable or disable logging to the system facility (syslog on POSIX boxes,
+//  event log on Windows). By default this is disabled.
+
+void
+zsys_set_logsystem (bool logsystem)
+{
+    s_logsystem = logsystem;
+#if defined (__UNIX__)
+    if (s_logsystem)
+        openlog (s_logident, 0, LOG_DAEMON);
+#elif defined (__WINDOWS__)
+    //  TODO: hook into Windows event log
+#endif
 }
 
 
@@ -1144,7 +1166,7 @@ s_log (char loglevel, char *string)
         fflush (s_logstream);
     }
 #if defined (__UNIX__)
-    else {
+    if (s_logsystem) {
         int priority;
         if (loglevel == 'E')
             priority = LOG_ERR;

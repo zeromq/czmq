@@ -232,11 +232,9 @@ CZMQ_EXPORT const char *
 CZMQ_EXPORT void
     zsys_set_logident (const char *value);
 
-//  Set stream to receive log traffic. By default log traffic is sent to the
-//  system logging facility (syslog on POSIX, event log on Windows). When you
-//  set the logstream to an open file stream (typically stdout or stderr),
-//  log traffic goes here instead. If stream is NULL, traffic is sent to the
-//  system logging facility (as by default).
+//  Set stream to receive log traffic. By default, log traffic is sent to
+//  stdout. If you set the stream to NULL, no stream will receive the log
+//  traffic (it may still be sent to the system facility).
 CZMQ_EXPORT void
     zsys_set_logstream (FILE *stream);
     
