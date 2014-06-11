@@ -189,20 +189,15 @@ s_initialize_process (void)
         if (streq (getenv ("ZSYS_LOGIDENT"), "stderr"))
             s_logstream = stderr;
     }
+    else
+        s_logstream = stdout;
+    
     //  This call keeps compatibility back to ZMQ v2
     process_ctx = zmq_init ((int) s_iothreads);
     ZMUTEX_INIT (s_mutex);
     s_sockref_list = zlist_new ();
     zsys_catch_interrupts ();
     srandom ((unsigned) time (NULL));
-#if defined (__UNIX__)
-    openlog (s_logident, 0, LOG_DAEMON);
-#elif defined (__WINDOWS__)
-    //  TODO: hook in Windows event log for Windows
-    s_logstream = stdout;       
-#else
-    s_logstream = stdout;       //  If we have no system facility
-#endif
     atexit (s_terminate_process);
 }
 
@@ -1061,41 +1056,47 @@ zsys_set_logident (const char *value)
     s_logident = strdup (value);
 #if defined (__UNIX__)
     openlog (s_logident, 0, LOG_DAEMON);
+#elif defined (__WINDOWS__)
+    //  TODO: hook in Windows event log for Windows
 #endif
 }
 
 
 //  --------------------------------------------------------------------------
-//  Set stream to receive log traffic. By default log traffic is sent to the
-//  system logging facility (syslog on POSIX, event log on Windows). When you
-//  set the logstream to an open file stream (typically stdout or stderr),
-//  log traffic goes here instead. If stream is NULL, traffic is sent to the
-//  system logging facility (as by default).
+//  Set stream to receive log traffic. By default, log traffic is sent to
+//  stdout. If you want traffic to go to the system logging facility (syslog
+//  on POSIX, event log on Windows), call zsys_set_logstream (NULL). You can
+//  send traffic to any open file stream.
 
 void
 zsys_set_logstream (FILE *stream)
 {
     s_logstream = stream;
+#if defined (__UNIX__)
+    if (!stream)
+        openlog (s_logident, 0, LOG_DAEMON);
+#endif
+
 }
 
 
-    static void
-    s_log (char loglevel, char *string)
-    {
-        if (s_logstream) {
-            time_t curtime = time (NULL);
-            struct tm *loctime = localtime (&curtime);
-            char formatted [20];
-            strftime (formatted, 20, "%y-%m-%d %H:%M:%S", loctime);
-            if (s_logident) 
-                fprintf (s_logstream, "%c: (%s) %s %s\n",
-                         loglevel, s_logident, formatted, string);
-            else
-                fprintf (s_logstream, "%c: %s %s\n", loglevel, formatted, string);
-                
-            fflush (s_logstream);
-        }
-    #if defined (__UNIX__)
+static void
+s_log (char loglevel, char *string)
+{
+    if (s_logstream) {
+        time_t curtime = time (NULL);
+        struct tm *loctime = localtime (&curtime);
+        char formatted [20];
+        strftime (formatted, 20, "%y-%m-%d %H:%M:%S", loctime);
+        if (s_logident)
+            fprintf (s_logstream, "%c: (%s) %s %s\n",
+                        loglevel, s_logident, formatted, string);
+        else
+            fprintf (s_logstream, "%c: %s %s\n", loglevel, formatted, string);
+
+        fflush (s_logstream);
+    }
+#if defined (__UNIX__)
     else {
         int priority;
         if (loglevel == 'E')
@@ -1278,7 +1279,6 @@ zsys_test (bool verbose)
 
     //  Test logging system
     zsys_set_logident ("czmq_selftest");
-    zsys_set_logstream (stdout);
     if (verbose) {
         zsys_error ("This is an %s message", "error");
         zsys_warning ("This is a %s message", "warning");
