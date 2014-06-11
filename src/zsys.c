@@ -62,7 +62,8 @@ void *process_ctx = NULL;
 
 //  Default globals for new sockets and other joys; these can all be set
 //  from the environment, or via the zsys_set_xxx API.
-static size_t s_iothreads = 1;      //  ZSYS_IOTHREADS=1
+static size_t s_io_threads = 1;     //  ZSYS_IO_THREADS=1
+static size_t s_max_sockets = 1024; //  ZSYS_MAX_SOCKETS=1024
 static size_t s_linger = 0;         //  ZSYS_LINGER=0
 static size_t s_sndhwm = 1000;      //  ZSYS_SNDHWM=1000
 static size_t s_rcvhwm = 1000;      //  ZSYS_RCVHWM=1000
@@ -160,8 +161,11 @@ static void
 s_initialize_process (void)
 {
     //  Pull process defaults from environment
-    if (getenv ("ZSYS_IOTHREADS"))
-        s_iothreads = atoi (getenv ("ZSYS_IOTHREADS"));
+    if (getenv ("ZSYS_IO_THREADS"))
+        s_io_threads = atoi (getenv ("ZSYS_IO_THREADS"));
+
+    if (getenv ("ZSYS_MAX_SOCKETS"))
+        s_max_sockets = atoi (getenv ("ZSYS_MAX_SOCKETS"));
 
     if (getenv ("ZSYS_LINGER"))
         s_linger = atoi (getenv ("ZSYS_LINGER"));
@@ -193,7 +197,10 @@ s_initialize_process (void)
         s_logstream = stdout;
     
     //  This call keeps compatibility back to ZMQ v2
-    process_ctx = zmq_init ((int) s_iothreads);
+    process_ctx = zmq_init ((int) s_io_threads);
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
+    zmq_ctx_set (process_ctx, ZMQ_MAX_SOCKETS, s_max_sockets);
+#endif
     ZMUTEX_INIT (s_mutex);
     s_sockref_list = zlist_new ();
     zsys_catch_interrupts ();
@@ -937,19 +944,60 @@ zsys_run_as (const char *lockfile, const char *group, const char *user)
 //  Configure the number of I/O threads that ZeroMQ will use. A good
 //  rule of thumb is one thread per gigabit of traffic in or out. The
 //  default is 1, sufficient for most applications. If the environment
-//  variable ZSYS_IOTHREADS is defined, that provides the default.
+//  variable ZSYS_IO_THREADS is defined, that provides the default.
 //  Note that this method is valid only before any socket is created.
 
 void
-zsys_set_iothreads (size_t iothreads)
+zsys_set_io_threads (size_t io_threads)
 {
     ZMUTEX_LOCK (s_mutex);
     //  If the app is misusing this method, burn it with fire
     if (process_ctx)
-        zsys_error ("zsys_iothreads() is not valid after creating sockets");
+        zsys_error ("zsys_io_threads() is not valid after creating sockets");
     assert (process_ctx == NULL);
-    s_iothreads = iothreads;
+    s_io_threads = io_threads;
     ZMUTEX_UNLOCK (s_mutex);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Configure the number of sockets that ZeroMQ will allow. The default
+//  is 1024. The actual limit depends on the system, and you can query it
+//  by using zsys_socket_limit (). A value of zero means "maximum".
+//  Note that this method is valid only before any socket is created.
+
+void
+zsys_set_max_sockets (size_t max_sockets)
+{
+    ZMUTEX_LOCK (s_mutex);
+    //  If the app is misusing this method, burn it with fire
+    if (process_ctx)
+        zsys_error ("zsys_max_sockets() is not valid after creating sockets");
+    assert (process_ctx == NULL);
+    s_max_sockets = max_sockets? max_sockets: zsys_socket_limit ();
+    ZMUTEX_UNLOCK (s_mutex);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return maximum number of ZeroMQ sockets that the system will support.
+
+size_t
+zsys_socket_limit (void)
+{
+    int socket_limit;
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
+    if (process_ctx)
+        socket_limit = zmq_ctx_get (process_ctx, ZMQ_SOCKET_LIMIT);
+    else {
+        void *ctx = zmq_init (1);
+        socket_limit = zmq_ctx_get (ctx, ZMQ_SOCKET_LIMIT);
+        zmq_term (ctx);
+    }
+#else
+    socket_limit = 1024;
+#endif
+    return (size_t) socket_limit;
 }
 
 
@@ -1209,7 +1257,10 @@ zsys_test (bool verbose)
     zsys_catch_interrupts ();
     int rc;
 
-    zsys_set_iothreads (1);
+    if (verbose)
+        printf ("System supports up to %zd ZeroMQ sockets\n", zsys_socket_limit ());
+    zsys_set_io_threads (1);
+    zsys_set_max_sockets (0);
     zsys_set_linger (0);
     zsys_set_sndhwm (1000);
     zsys_set_rcvhwm (1000);

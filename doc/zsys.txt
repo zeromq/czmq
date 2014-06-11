@@ -154,10 +154,21 @@ CZMQ_EXPORT int
 //  Configure the number of I/O threads that ZeroMQ will use. A good
 //  rule of thumb is one thread per gigabit of traffic in or out. The
 //  default is 1, sufficient for most applications. If the environment
-//  variable ZSYS_IOTHREADS is defined, that provides the default.
+//  variable ZSYS_IO_THREADS is defined, that provides the default.
 //  Note that this method is valid only before any socket is created.
 CZMQ_EXPORT void
-    zsys_set_iothreads (size_t iothreads);
+    zsys_set_io_threads (size_t io_threads);
+
+//  Configure the number of sockets that ZeroMQ will allow. The default
+//  is 1024. The actual limit depends on the system, and you can query it
+//  by using zsys_socket_limit (). A value of zero means "maximum".
+//  Note that this method is valid only before any socket is created.
+CZMQ_EXPORT void
+    zsys_set_max_sockets (size_t max_sockets);
+
+//  Return maximum number of ZeroMQ sockets that the system will support.
+CZMQ_EXPORT size_t
+    zsys_socket_limit (void);
 
 //  Configure the default linger timeout in msecs for new zsock instances.
 //  You can also set this separately on each zsock_t instance. The default
@@ -264,7 +275,10 @@ EXAMPLE
     zsys_catch_interrupts ();
     int rc;
 
-    zsys_set_iothreads (1);
+    if (verbose)
+        printf ("System supports up to %zd ZeroMQ sockets\n", zsys_socket_limit ());
+    zsys_set_io_threads (1);
+    zsys_set_max_sockets (0);
     zsys_set_linger (0);
     zsys_set_sndhwm (1000);
     zsys_set_rcvhwm (1000);
