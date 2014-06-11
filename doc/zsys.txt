@@ -227,6 +227,11 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zsys_set_logstream (FILE *stream);
     
+//  Enable or disable logging to the system facility (syslog on POSIX boxes,
+//  event log on Windows). By default this is disabled.
+CZMQ_EXPORT void
+    zsys_set_logsystem (bool logsystem);
+    
 //  Log error condition - highest priority
 CZMQ_EXPORT void
     zsys_error (const char *format, ...);
