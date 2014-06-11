@@ -106,6 +106,20 @@ static zsys_mutex_t s_mutex;
 
 
 //  --------------------------------------------------------------------------
+//  Initialize CZMQ zsys layer; this happens automatically when you create
+//  a socket or an actor; however this call lets you force initialization
+//  earlier, so e.g. logging is properly set-up before you start working.
+//  Not threadsafe, so call only from main thread.
+
+void
+zsys_init (void)
+{
+    if (!process_ctx)
+        s_initialize_process ();
+}
+
+
+//  --------------------------------------------------------------------------
 //  Get a new ZMQ socket, automagically creating a ZMQ context if this is
 //  the first time. Caller is responsible for destroying the ZMQ socket
 //  before process exits, to avoid a ZMQ deadlock. Note: you should not use
@@ -209,7 +223,9 @@ s_initialize_process (void)
     //  This call keeps compatibility back to ZMQ v2
     process_ctx = zmq_init ((int) s_io_threads);
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
-    zmq_ctx_set (process_ctx, ZMQ_MAX_SOCKETS, s_max_sockets);
+//  TODO: this causes TravisCI to break; libzmq does not return a
+//  valid socket on zmq_socket(), after this...
+//     zmq_ctx_set (process_ctx, ZMQ_MAX_SOCKETS, s_max_sockets);
 #endif
     ZMUTEX_INIT (s_mutex);
     s_sockref_list = zlist_new ();
@@ -1113,7 +1129,8 @@ zsys_set_logident (const char *value)
     free (s_logident);
     s_logident = strdup (value);
 #if defined (__UNIX__)
-    openlog (s_logident, 0, LOG_DAEMON);
+    if (s_logsystem)
+        openlog (s_logident, LOG_PID, LOG_USER);
 #elif defined (__WINDOWS__)
     //  TODO: hook in Windows event log for Windows
 #endif
@@ -1142,7 +1159,7 @@ zsys_set_logsystem (bool logsystem)
     s_logsystem = logsystem;
 #if defined (__UNIX__)
     if (s_logsystem)
-        openlog (s_logident, 0, LOG_DAEMON);
+        openlog (s_logident, LOG_PID, LOG_USER);
 #elif defined (__WINDOWS__)
     //  TODO: hook into Windows event log
 #endif
@@ -1182,7 +1199,7 @@ s_log (char loglevel, char *string)
         else
         if (loglevel == 'D')
             priority = LOG_DEBUG;
-        
+
         syslog (priority, "%s", string);
     }
 #endif
