@@ -215,7 +215,7 @@ s_terminate_process (void)
     size_t busy = s_open_sockets;
     ZMUTEX_UNLOCK (s_mutex);
     if (busy)
-        zclock_sleep (100);
+        zclock_sleep (200);
 
     //  No matter, we are now going to shut down
     //  Print the source reference for any sockets the app did not
