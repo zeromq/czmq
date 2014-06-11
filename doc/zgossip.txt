@@ -3,17 +3,17 @@ zgossip(3)
 
 NAME
 ----
-zgossip - gossip discovery service
+zgossip - gossip protocol service
 
 SYNOPSIS
 --------
 ----
 //  This is zgossip, implemented as a CZMQ zactor task
-void
+CZMQ_EXPORT void
     zgossip (zsock_t *pipe, void *args);
 
 //  Self test of this class
-void
+CZMQ_EXPORT void
     zgossip_test (bool verbose);
 ----
 
@@ -22,56 +22,57 @@ DESCRIPTION
 
 Implements a gossip protocol (RFC TBD).
 
-The gossip protocol solves the problem of discovering a set of services
-on a local area network. It provides an alternative to UDP beacons as
-implemented by zbeacon.
+The gossip protocol distributes information around a loosely-connected
+network of gossip services. The information consists of name/value pairs
+published by applications at any point in the network. The goal of the
+gossip protocol is to create eventual consistency between all the using
+applications.
+
+The name/value pairs (tuples) can be used for configuration data, for
+status updates, for presence, or for discovery. When used for discovery,
+the gossip protocol works as an alternative to e.g. UDP beaconing.
 
 The gossip network consists of a set of loosely-coupled nodes that
-exchange endpoint=service pairs. The endpoints must be addressable by
-all nodes, so can be sockets in a process (inproc://), sockets on a
-box (ipc://), or sockets on a network (tcp://). Mixing will not work.
+exchange tuples. Nodes can be connected across arbitrary transports,
+so the gossip network can have nodes that communicate over inproc,
+over IPC, and/or over TCP, at the same time.
 
-Every node runs the same stack, which is a server-client hybrid using
+Each node runs the same stack, which is a server-client hybrid using
 a modified Harmony pattern (from Chapter 8 of the Guide):
-
 http://zguide.zeromq.org/page:all#True-Peer-Connectivity-Harmony-Pattern
 
 Each node provides a ROUTER socket that accepts client connections on an
-endpoint defined by the application via a BIND command. The state machine
+key defined by the application via a BIND command. The state machine
 for these connections is in zgossip.xml, and the generated code is in
 zgossip_engine.h.
 
 Each node additionally creates outbound connections via DEALER sockets
-to a set of peers, and under control of the calling application, which
-sends CONNECT commands for each configured peer.
+to a set of servers ("remotes"), and under control of the calling app,
+which sends CONNECT commands for each configured remote.
 
 The messages between client and server are defined in zgossip_msg.xml.
 This stack is built using the zeromq/zproto toolkit.
 
-The goal is that connecting to any other node is sufficient to connect
-to the whole network. Each node accepts service announcements from its
-owning application, and forwards these to the peers it is connected to,
-either as server, or as client.
+To join the gossip network, a node has to connect to one or more peers.
+Every peer acts as a forwarder. This loosely-coupled network can scale
+to thousands of nodes. However the gossip protocol is NOT designed to
+be efficient, and should not be used for application data, as the same
+tuples may be sent many times across the network.
+
+The basic logic of the gossip service is to accept PUBLISH messages
+from its owning application, and to forward these to every remote, and
+every client it talks to. When a node gets a duplicate tuple, it throws
+it away. When a node gets a new tuple, it stores it, and fowards it as
+just described. At any point the application can access the node's set
+of tuples.
 
 The protocol uses ping-pong heartbeating to monitor presence. This code
-doesn't do anything with expired peers yet.
-
-The gossip network should be very scalable, as we need only two sockets
-per node to get the equivalence of full interconnection.
+doesn't do anything with expired nodes yet.
 
 The assumptions in this design are:
 
-* All nodes are on the same ZeroMQ transport, fully interaddressable.
-
-* The topology is slow changing. Thus, the cost of the gossip protocol
+* The data set is slow-changing. Thus, the cost of the gossip protocol
   is irrelevant with respect to other traffic.
-
-TODO:
- * Broadcast ANNOUNCE commands from the application to all clients, as
-   well as all servers.
-
- * Write a large-scale test case that simulates some thousands of nodes
-   coming and going. This can run in one process, using inproc.
 
 EXAMPLE
 -------
@@ -80,7 +81,7 @@ EXAMPLE
     //  Test basic client-to-server operation
     zactor_t *server = zactor_new (zgossip, NULL);
     zstr_sendx (server, "SET", "server/animate", verbose? "1": "0", NULL);
-    zstr_sendx (server, "BIND", "ipc://@/zgossip", NULL);
+    zstr_sendx (server, "BIND", "ipc:///tmp/zgossip", NULL);
     char *port_str = zstr_recv (server);
     assert (streq (port_str, "0"));
     zstr_free (&port_str);
@@ -88,7 +89,7 @@ EXAMPLE
     zsock_t *client = zsock_new (ZMQ_DEALER);
     assert (client);
     zsock_set_rcvtimeo (client, 2000);
-    zsock_connect (client, "ipc://@/zgossip");
+    zsock_connect (client, "ipc:///tmp/zgossip");
 
     //  Send HELLO, which gets no reply
     zgossip_msg_t *request, *reply;
@@ -122,14 +123,14 @@ EXAMPLE
     zactor_t *alpha = zactor_new (zgossip, NULL);
     assert (alpha);
     zstr_sendx (alpha, "CONNECT", "inproc://base", NULL);
-    zstr_sendx (alpha, "ANNOUNCE", "inproc://alpha-1", "service1", NULL);
-    zstr_sendx (alpha, "ANNOUNCE", "inproc://alpha-2", "service2", NULL);
+    zstr_sendx (alpha, "PUBLISH", "inproc://alpha-1", "service1", NULL);
+    zstr_sendx (alpha, "PUBLISH", "inproc://alpha-2", "service2", NULL);
 
     zactor_t *beta = zactor_new (zgossip, NULL);
     assert (beta);
     zstr_sendx (beta, "CONNECT", "inproc://base", NULL);
-    zstr_sendx (beta, "ANNOUNCE", "inproc://beta-1", "service1", NULL);
-    zstr_sendx (beta, "ANNOUNCE", "inproc://beta-2", "service2", NULL);
+    zstr_sendx (beta, "PUBLISH", "inproc://beta-1", "service1", NULL);
+    zstr_sendx (beta, "PUBLISH", "inproc://beta-2", "service2", NULL);
 
     //  got nothing
     zclock_sleep (200);
