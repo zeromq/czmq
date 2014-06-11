@@ -368,6 +368,8 @@ void
 zgossip_test (bool verbose)
 {
     printf (" * zgossip: ");
+    if (verbose)
+        printf ("\n");
     
     //  @selftest
     //  Test basic client-to-server operation of the protocol

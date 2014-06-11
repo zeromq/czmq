@@ -236,7 +236,7 @@ s_api_command (agent_t *self)
         zstr_send (self->pipe, "OK");
     }
     else
-        zsys_error ("zsock_monitor unexpected API command '%s'\n", command);
+        zsys_error ("zsock_monitor unexpected API command '%s'", command);
 
     free (command);
 }
@@ -313,7 +313,7 @@ s_monitor_event (agent_t *self)
             break;
     }
     if (self->verbose)
-        zsys_info ("zsock_monitor: %s - %s\n", description, address);
+        zsys_info ("zsock_monitor: %s - %s", description, address);
 
     zstr_sendfm (self->pipe, "%d", event);
     zstr_sendfm (self->pipe, "%d", value);
