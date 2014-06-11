@@ -26,7 +26,6 @@ include_HEADERS = \
     ../include/zhash.h \
     ../include/zgossip.h \
     ../include/zlist.h \
-    ../include/zlog.h \
     ../include/zloop.h \
     ../include/zmsg.h \
     ../include/zpoller.h \
@@ -64,7 +63,6 @@ libczmq_la_SOURCES = \
     zhash.c \
     zgossip.c \
     zlist.c \
-    zlog.c \
     zloop.c \
     zmsg.c \
     zpoller.c \

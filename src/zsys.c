@@ -68,6 +68,8 @@ static size_t s_sndhwm = 1000;      //  ZSYS_SNDHWM=1000
 static size_t s_rcvhwm = 1000;      //  ZSYS_RCVHWM=1000
 static int s_ipv6 = 0;              //  ZSYS_IPV6=0
 static char *s_interface = NULL;    //  ZSYS_INTERFACE=
+static char *s_logident = NULL;     //  ZSYS_LOGIDENT=
+static FILE *s_logstream = NULL;    //  ZSYS_LOGSTREAM=stdout/stderr
 
 //  Track number of open sockets so we can zmq_ctx_term() safely
 static size_t s_open_sockets = 0;
@@ -160,17 +162,32 @@ s_initialize_process (void)
     //  Pull process defaults from environment
     if (getenv ("ZSYS_IOTHREADS"))
         s_iothreads = atoi (getenv ("ZSYS_IOTHREADS"));
+
     if (getenv ("ZSYS_LINGER"))
         s_linger = atoi (getenv ("ZSYS_LINGER"));
+
     if (getenv ("ZSYS_SNDHWM"))
         s_sndhwm = atoi (getenv ("ZSYS_SNDHWM"));
+
     if (getenv ("ZSYS_RCVHWM"))
         s_rcvhwm = atoi (getenv ("ZSYS_RCVHWM"));
+
     if (getenv ("ZSYS_IPV6"))
         s_ipv6 = atoi (getenv ("ZSYS_IPV6"));
+
     if (getenv ("ZSYS_INTERFACE")) {
         s_interface = strdup (getenv ("ZSYS_INTERFACE"));
         zclock_log ("D (zsys): set ZSYS_INTERFACE=%s", s_interface);
+    }
+    if (getenv ("ZSYS_LOGIDENT"))
+        s_interface = strdup (getenv ("ZSYS_LOGIDENT"));
+    
+    if (getenv ("ZSYS_LOGSTREAM")) {
+        if (streq (getenv ("ZSYS_LOGIDENT"), "stdout"))
+            s_logstream = stdout;
+        else
+        if (streq (getenv ("ZSYS_LOGIDENT"), "stderr"))
+            s_logstream = stderr;
     }
     //  This call keeps compatibility back to ZMQ v2
     process_ctx = zmq_init ((int) s_iothreads);
@@ -178,6 +195,14 @@ s_initialize_process (void)
     s_sockref_list = zlist_new ();
     zsys_catch_interrupts ();
     srandom ((unsigned) time (NULL));
+#if defined (__UNIX__)
+    openlog (s_logident, 0, LOG_DAEMON);
+#elif defined (__WINDOWS__)
+    //  TODO: hook in Windows event log for Windows
+    s_logstream = stdout;       
+#else
+    s_logstream = stdout;       //  If we have no system facility
+#endif
     atexit (s_terminate_process);
 }
 
@@ -203,7 +228,7 @@ s_terminate_process (void)
     ZMUTEX_LOCK (s_mutex);
     s_sockref_t *sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
     while (sockref) {
-#ifdef __WINDOWS__
+#if defined (__WINDOWS__)
 		printf ("E: dangling socket created at %s:%u\n",
                 sockref->filename, sockref->line_nbr);
 #else
@@ -222,6 +247,11 @@ s_terminate_process (void)
 
     //  Free dynamically allocated properties
     free (s_interface);
+    free (s_logident);
+    
+#if defined (__UNIX__)
+    closelog ();                //  Just to be pedantic
+#endif
 }
 
 
@@ -394,7 +424,7 @@ zsys_file_mode (const char *filename)
     else
         mode |= S_IFREG;
 
-#ifdef __UTYPE_ANDROID
+#if defined (__UTYPE_ANDROID)
     if (!(dwfa & FILE_ATTRIBUTE_HIDDEN))
         mode |= S_IRUSR;
     if (!(dwfa & FILE_ATTRIBUTE_READONLY))
@@ -756,7 +786,7 @@ zsys_socket_error (const char *reason)
     )
         return;             //  Ignore error and try again
     else {
-        zclock_log ("E: (UDP) error '%s' on %s", strerror (errno), reason);
+        zsys_error ("(UDP) error '%s' on %s", strerror (errno), reason);
         assert (false);
     }
 }
@@ -802,7 +832,7 @@ zsys_daemonize (const char *workdir)
     //  Move to a safe and known directory, which is supplied as an
     //  argument to this function (or not, if workdir is NULL or empty).
     if (workdir && chdir (workdir)) {
-        fprintf (stderr, "E: cannot chdir to '%s'\n", workdir);
+        zsys_error ("cannot chdir to '%s'", workdir);
         return -1;
     }
     //  Close all open file descriptors inherited from the parent
@@ -843,8 +873,7 @@ zsys_run_as (const char *lockfile, const char *group, const char *user)
     //  system services this should be root, so that we can write
     //  the PID file into e.g. /var/run/
     if (seteuid (geteuid ())) {
-        zclock_log ("E: cannot set effective user id: %s\n",
-                    strerror (errno));
+        zsys_error ("cannot set effective user id: %s", strerror (errno));
         return -1;
     }
     if (lockfile) {
@@ -852,8 +881,7 @@ zsys_run_as (const char *lockfile, const char *group, const char *user)
         //  only one copy of the process can run at once.
         int handle = open (lockfile, O_RDWR | O_CREAT, 0640);
         if (handle < 0) {
-            zclock_log ("E: cannot open lockfile '%s': %s\n",
-                        lockfile, strerror (errno));
+            zsys_error ("cannot open lockfile '%s': %s", lockfile, strerror (errno));
             return -1;
         }
         else {
@@ -864,43 +892,41 @@ zsys_run_as (const char *lockfile, const char *group, const char *user)
             filelock.l_len    = 0;          //  length, 0 = to EOF
             filelock.l_pid    = getpid ();
             if (fcntl (handle, F_SETLK, &filelock)) {
-                zclock_log ("E: cannot get lock: %s\n", strerror (errno));
+                zsys_error ("cannot get lock: %s", strerror (errno));
                 return -1;
             }
         }
-        //   We record the broker's process id in the lock file
+        //   We record the current process id in the lock file
         char pid_buffer [10];
         snprintf (pid_buffer, sizeof (pid_buffer), "%6d\n", getpid ());
         if (write (handle, pid_buffer, strlen (pid_buffer)) != strlen (pid_buffer)) {
-            zclock_log ("E: cannot write to lockfile: %s\n",
-                        strerror (errno));
+            zsys_error ("cannot write to lockfile: %s", strerror (errno));
             return -1;
         }
         close (handle);
     }
     if (group) {
-        zclock_log ("I: broker running under group '%s'", group);
+        zsys_info ("running under group '%s'", group);
         struct group *grpbuf = NULL;
         grpbuf = getgrnam (group);
         if (grpbuf == NULL || setgid (grpbuf->gr_gid)) {
-            zclock_log ("E: could not switch group: %s", strerror (errno));
+            zsys_error ("could not switch group: %s", strerror (errno));
             return -1;
         }
     }
     if (user) {
-        zclock_log ("I: broker running under user '%s'", user);
+        zsys_info ("running under user '%s'", user);
         struct passwd *pwdbuf = NULL;
         pwdbuf = getpwnam (user);
         if (pwdbuf == NULL || setuid (pwdbuf->pw_uid)) {
-            zclock_log ("E: could not switch user: %s", strerror (errno));
+            zsys_error ("could not switch user: %s", strerror (errno));
             return -1;
         }
     }
     else {
         //  Switch back to real user ID (who started process)
         if (setuid (getuid ())) {
-            zclock_log ("E: cannot set real user id: %s\n",
-                        strerror (errno));
+            zsys_error ("cannot set real user id: %s", strerror (errno));
             return -1;
         }
     }
@@ -925,7 +951,7 @@ zsys_set_iothreads (size_t iothreads)
     ZMUTEX_LOCK (s_mutex);
     //  If the app is misusing this method, burn it with fire
     if (process_ctx)
-        zclock_log ("E: zsys_iothreads() is not valid after creating sockets");
+        zsys_error ("zsys_iothreads() is not valid after creating sockets");
     assert (process_ctx == NULL);
     s_iothreads = iothreads;
     ZMUTEX_UNLOCK (s_mutex);
@@ -1024,6 +1050,151 @@ zsys_interface (void)
 
 
 //  --------------------------------------------------------------------------
+//  Set log identity, which is a string that prefixes all log messages sent
+//  by this process. The log identity defaults to the environment variable
+//  ZSYS_LOGIDENT, if that is set.
+
+void
+zsys_set_logident (const char *value)
+{
+    free (s_logident);
+    s_logident = strdup (value);
+#if defined (__UNIX__)
+    openlog (s_logident, 0, LOG_DAEMON);
+#endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set stream to receive log traffic. By default log traffic is sent to the
+//  system logging facility (syslog on POSIX, event log on Windows). When you
+//  set the logstream to an open file stream (typically stdout or stderr),
+//  log traffic goes here instead. If stream is NULL, traffic is sent to the
+//  system logging facility (as by default).
+
+void
+zsys_set_logstream (FILE *stream)
+{
+    s_logstream = stream;
+}
+
+
+    static void
+    s_log (char loglevel, char *string)
+    {
+        if (s_logstream) {
+            time_t curtime = time (NULL);
+            struct tm *loctime = localtime (&curtime);
+            char formatted [20];
+            strftime (formatted, 20, "%y-%m-%d %H:%M:%S", loctime);
+            if (s_logident) 
+                fprintf (s_logstream, "%c: (%s) %s %s\n",
+                         loglevel, s_logident, formatted, string);
+            else
+                fprintf (s_logstream, "%c: %s %s\n", loglevel, formatted, string);
+                
+            fflush (s_logstream);
+        }
+    #if defined (__UNIX__)
+    else {
+        int priority;
+        if (loglevel == 'E')
+            priority = LOG_ERR;
+        else
+        if (loglevel == 'W')
+            priority = LOG_WARNING;
+        else
+        if (loglevel == 'N')
+            priority = LOG_NOTICE;
+        else
+        if (loglevel == 'I')
+            priority = LOG_INFO;
+        else
+        if (loglevel == 'D')
+            priority = LOG_DEBUG;
+        
+        syslog (priority, "%s", string);
+    }
+#endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Log error condition - highest priority
+
+void
+zsys_error (const char *format, ...)
+{
+    va_list argptr;
+    va_start (argptr, format);
+    char *string = zsys_vprintf (format, argptr);
+    va_end (argptr);
+    s_log ('E', string);
+    free (string);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Log warning condition - high priority
+
+void
+zsys_warning (const char *format, ...)
+{
+    va_list argptr;
+    va_start (argptr, format);
+    char *string = zsys_vprintf (format, argptr);
+    va_end (argptr);
+    s_log ('W', string);
+    free (string);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Log normal, but significant, condition - normal priority
+
+void
+zsys_notice (const char *format, ...)
+{
+    va_list argptr;
+    va_start (argptr, format);
+    char *string = zsys_vprintf (format, argptr);
+    va_end (argptr);
+    s_log ('N', string);
+    free (string);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Log informational message - low priority
+
+void
+zsys_info (const char *format, ...)
+{
+    va_list argptr;
+    va_start (argptr, format);
+    char *string = zsys_vprintf (format, argptr);
+    va_end (argptr);
+    s_log ('I', string);
+    free (string);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Log debug-level message - lowest priority
+
+void
+zsys_debug (const char *format, ...)
+{
+    va_list argptr;
+    va_start (argptr, format);
+    char *string = zsys_vprintf (format, argptr);
+    va_end (argptr);
+    s_log ('D', string);
+    free (string);
+}
+
+
+//  --------------------------------------------------------------------------
 //  Selftest
 
 void
@@ -1047,7 +1218,7 @@ zsys_test (bool verbose)
     int as_server = 1;
     rc = zmq_setsockopt (handle, ZMQ_CURVE_SERVER, &as_server, sizeof (int));
     if (rc == -1) {
-        zclock_log ("E: libzmq was built without libsodium. Please rebuild libzmq and CZMQ.");
+        zsys_error ("libzmq was built without libsodium. Please rebuild libzmq and CZMQ.");
         zsys_close (handle);
         exit (1);
     }
@@ -1105,6 +1276,19 @@ zsys_test (bool verbose)
     assert (strlen (string) == (4 * 64 + 10));
     zstr_free (&string);
 
+    //  Test logging system
+    zsys_set_logident ("czmq_selftest");
+    zsys_set_logstream (stdout);
+    if (verbose) {
+        zsys_error ("This is an %s message", "error");
+        zsys_warning ("This is a %s message", "warning");
+        zsys_notice ("This is a %s message", "notice");
+        zsys_info ("This is a %s message", "info");
+        zsys_debug ("This is a %s message", "debug");
+        zsys_set_logident ("hello, world");
+        zsys_info ("This is a %s message", "info");
+        zsys_debug ("This is a %s message", "debug");
+    }
     //  @end
 
     printf ("OK\n");

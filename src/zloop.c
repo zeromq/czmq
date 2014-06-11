@@ -200,7 +200,7 @@ s_tickless_timer (zloop_t *self)
     if (timeout < 0)
         timeout = 0;
     if (self->verbose)
-	zclock_log ("I: zloop: polling for %d msec", (int) timeout);
+        zsys_debug ("zloop polling for %d msec", (int) timeout);
     return timeout;
 }
 
@@ -295,7 +295,7 @@ zloop_reader (zloop_t *self, zsock_t *sock, zloop_reader_fn handler, void *arg)
 
         self->need_rebuild = true;
         if (self->verbose)
-            zclock_log ("I: zloop: register %s reader", zsock_type_str (sock));
+            zsys_debug ("zloop: register %s reader", zsock_type_str (sock));
         return 0;
     }
     else
@@ -323,7 +323,7 @@ zloop_reader_end (zloop_t *self, zsock_t *sock)
         reader = (s_reader_t *) zlist_next (self->readers);
     }
     if (self->verbose)
-        zclock_log ("I: zloop: cancel %s reader", zsock_type_str (sock));
+        zsys_debug ("zloop: cancel %s reader", zsock_type_str (sock));
 }
 
 
@@ -369,7 +369,7 @@ zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
 
         self->need_rebuild = true;
         if (self->verbose)
-            zclock_log ("I: zloop: register %s poller (%p, %d)",
+            zsys_debug ("zloop: register %s poller (%p, %d)",
                 item->socket? zsocket_type_str (item->socket): "FD",
                 item->socket, item->fd);
         return 0;
@@ -402,7 +402,7 @@ zloop_poller_end (zloop_t *self, zmq_pollitem_t *item)
         poller = (s_poller_t *) zlist_next (self->pollers);
     }
     if (self->verbose)
-        zclock_log ("I: zloop: cancel %s poller (%p, %d)",
+        zsys_debug ("zloop: cancel %s poller (%p, %d)",
             item->socket? zsocket_type_str (item->socket): "FD",
             item->socket, item->fd);
 }
@@ -448,10 +448,10 @@ zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_timer_fn handler, 
         return -1;
     if (self->verbose)
 #ifdef __WINDOWS__
-		zclock_log ("I: zloop: register timer id=%d delay=%u times=%u", 
+		zsys_debug ("zloop: register timer id=%d delay=%u times=%u",
                     timer_id, delay, times);
 #else
-        zclock_log ("I: zloop: register timer id=%d delay=%zd times=%zd", 
+        zsys_debug ("zloop: register timer id=%d delay=%zd times=%zd",
                     timer_id, delay, times);
 #endif
     
@@ -479,7 +479,7 @@ zloop_timer_end (zloop_t *self, int timer_id)
         return -1;
 
     if (self->verbose)
-        zclock_log ("I: zloop: cancel timer id=%d", timer_id);
+        zsys_debug ("zloop: cancel timer id=%d", timer_id);
     
     return 0;
 }
@@ -528,7 +528,7 @@ zloop_start (zloop_t *self)
                        s_tickless_timer (self) * ZMQ_POLL_MSEC);
         if (rc == -1 || zsys_interrupted) {
             if (self->verbose)
-                zclock_log ("I: zloop: interrupted (%d) - %s", rc, 
+                zsys_debug ("zloop: interrupted (%d) - %s", rc,
                             zmq_strerror (zmq_errno ()));
             rc = 0;
             break;              //  Context has been shut down
@@ -538,7 +538,7 @@ zloop_start (zloop_t *self)
         while (timer) {
             if (zclock_time () >= timer->when && timer->when != -1) {
                 if (self->verbose)
-                    zclock_log ("I: zloop: call timer id=%d handler", timer->timer_id);
+                    zsys_debug ("zloop: call timer id=%d handler", timer->timer_id);
                 rc = timer->handler (self, timer->timer_id, timer->arg);
                 if (rc == -1)
                     break;      //  Timer handler signaled break
@@ -559,7 +559,7 @@ zloop_start (zloop_t *self)
                 if ((self->pollset [item_nbr].revents & ZMQ_POLLERR)
                 && !reader->tolerant) {
                     if (self->verbose)
-                        zclock_log ("W: zloop: can't read %s socket: %s",
+                        zsys_warning ("zloop: can't read %s socket: %s",
                             zsock_type_str (reader->sock),
                             zmq_strerror (zmq_errno ()));
                     //  Give handler one chance to handle error, then kill
@@ -574,7 +574,7 @@ zloop_start (zloop_t *self)
 
                 if (self->pollset [item_nbr].revents) {
                     if (self->verbose)
-                        zclock_log ("I: zloop: call %s socket handler",
+                        zsys_debug ("zloop: call %s socket handler",
                             zsock_type_str (reader->sock));
                     rc = reader->handler (self, reader->sock, reader->arg);
                     if (rc == -1 || self->need_rebuild)
@@ -588,7 +588,7 @@ zloop_start (zloop_t *self)
                 if ((self->pollset [item_nbr].revents & ZMQ_POLLERR)
                 && !poller->tolerant) {
                     if (self->verbose)
-                        zclock_log ("W: zloop: can't poll %s socket (%p, %d): %s",
+                        zsys_warning ("zloop: can't poll %s socket (%p, %d): %s",
                             poller->item.socket?
                                 zsocket_type_str (poller->item.socket): "FD",
                             poller->item.socket, poller->item.fd,
@@ -605,7 +605,7 @@ zloop_start (zloop_t *self)
 
                 if (self->pollset [item_nbr].revents) {
                     if (self->verbose)
-                        zclock_log ("I: zloop: call %s socket handler (%p, %d)",
+                        zsys_debug ("zloop: call %s socket handler (%p, %d)",
                             poller->item.socket?
                                 zsocket_type_str (poller->item.socket): "FD",
                             poller->item.socket, poller->item.fd);

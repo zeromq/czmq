@@ -55,9 +55,6 @@
     <ClCompile Include="..\..\..\..\src\zlist.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zlog.c">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zloop.c">
       <Filter>src</Filter>
     </ClCompile>
