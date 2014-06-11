@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zauth - authentication for ZeroMQ security mechanisms
+    zauthenticator - authentication for ZeroMQ security mechanisms
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -13,10 +13,9 @@
 
 /*
 @header
-    A zauth object takes over authentication for all incoming connections in 
-    its context. Note that libzmq provides four levels of security: default 
-    NULL (which zauth does not see), and authenticated NULL, PLAIN, and CURVE,
-    which zauth can see.
+    A zauthenticator handles authentication for all incoming connections in
+    the process. This class is implemented as a zactor. You can only start
+    one zauthenticator per process.
 @discuss
 
 @end
@@ -25,69 +24,165 @@
 #include "platform.h"
 #include "../include/czmq.h"
 
-//  Structure of our class
-//  All work is done by a background thread, the "agent", which we talk
-//  to over a pipe (created by zthread_fork). This lets the agent do work
-//  asynchronously in the background while our application does other 
-//  things. This is invisible to the caller, who sees a classic API.
+typedef struct _actor_t actor_t;
 
-struct _zauth_t {
-    void *pipe;                 //  Pipe through to background agent
-};
-
-//  The background agent task does all the real work
+static actor_t *
+    s_actor_new (zsock_t *pipe);
 static void
-    s_agent_task (void *args, zctx_t *ctx, void *pipe);
+    s_actor_destroy (actor_t **self_p);
+
+//  Actor task
+//  Call zactor_new (zauthenticator, NULL);
+
+void
+zauthenticator (zsock_t *pipe, void *args)
+{
+    //  Create our working actor context
+    actor_t *self = s_actor_new (pipe);
 
 
-//  --------------------------------------------------------------------------
-//  Constructor
-//  
-//  Install authentication for the specified context. Returns a new zauth
-//  object that you can use to configure authentication. Note that until you
-//  add policies, all incoming NULL connections are allowed (classic ZeroMQ
-//  behavior), and all PLAIN and CURVE connections are denied. If there was
-//  an error during initialization, returns NULL.
-
-zauth_t *
-zauth_new (zctx_t *ctx)
-{    
-    zauth_t *self = (zauth_t *) zmalloc (sizeof (zauth_t));
-    assert (self);
-
-    //  Start background agent and wait for it to initialize
-    assert (ctx);
-    self->pipe = zthread_fork (ctx, s_agent_task, NULL);
-    if (self->pipe) {
-        char *status = zstr_recv (self->pipe);
-        if (strneq (status, "OK"))
-            zauth_destroy (&self);
-        zstr_free (&status);
-    }
-    else {
-        free (self);
-        self = NULL;
-    }
-    return self;
+    s_actor_destroy (&self);
 }
 
 
-//  --------------------------------------------------------------------------
-//  Destructor
+//  This structure holds the context for our actor, so we can
+//  pass that around cleanly to methods which need it
 
-void
-zauth_destroy (zauth_t **self_p)
+typedef struct {
+    void *pipe;                 //  Pipe back to application API
+    void *handler;              //  ZAP handler socket
+    bool verbose;               //  Trace activity to stdout
+    bool terminated;            //  Did API ask us to quit?
+    //  Used for all authenticated connections
+    zhash_t *whitelist;         //  Whitelisted addresses
+    zhash_t *blacklist;         //  Blacklisted addresses
+    //  Used for PLAIN authentication
+    zhash_t *passwords;         //  PLAIN passwords, if loaded
+    //  Used for CURVE authentication
+    zcertstore_t *certstore;    //  CURVE certificate store, if loaded
+    bool allow_any;             //  CURVE allows arbitrary clients
+} actor_t;
+
+static actor_t *
+s_actor_new (void)
+{
+    actor_t *self = (actor_t *) zmalloc (sizeof (actor_t));
+    self->pipe = pipe;
+    self->whitelist = zhash_new ();
+    self->blacklist = zhash_new ();
+
+    //  Create ZAP handler and get ready for requests
+    self->handler = zsock_new (ZMQ_REP);
+    //  We cannot have run out of ZeroMQ sockets at this stage
+    assert (self->handler);
+    int rc = zsock_bind (self->handler, "inproc://zeromq.zap.01");
+    //  Do not let application try to start multiple zauthenticators
+    assert (rc != -1);
+    return self;
+}
+
+static void
+s_actor_destroy (actor_t **self_p)
 {
     assert (self_p);
     if (*self_p) {
-        zauth_t *self = *self_p;
-        zstr_send (self->pipe, "TERMINATE");
-        char *reply = zstr_recv (self->pipe);
-        zstr_free (&reply);
+        actor_t *self = *self_p;
+        zhash_destroy (&self->passwords);
+        zhash_destroy (&self->whitelist);
+        zhash_destroy (&self->blacklist);
+        zcertstore_destroy (&self->certstore);
         free (self);
         *self_p = NULL;
     }
 }
+
+
+
+    //  Create actor instance as we start this task
+    actor_t *self = s_actor_new (ctx, pipe);
+    if (!self)                  //  Interrupted
+        return;
+
+    zpoller_t *poller = zpoller_new (self->pipe, self->handler, NULL);
+    while (!zpoller_terminated (poller) && !self->terminated) {
+        void *which = zpoller_wait (poller, -1);
+        if (which == self->pipe)
+            s_actor_handle_pipe (self);
+        else
+        if (which == self->handler)
+            s_actor_authenticate (self);
+    }
+    //  Done, free all actor resources
+    zpoller_destroy (&poller);
+    s_actor_destroy (&self);
+}
+
+{
+    zap_request_t *request = zap_request_new (self->handler);
+    if (request) {
+        //  Is address explicitly whitelisted or blacklisted?
+        bool allowed = false;
+        bool denied = false;
+
+        if (zhash_size (self->whitelist)) {
+            if (zhash_lookup (self->whitelist, request->address)) {
+                allowed = true;
+                if (self->verbose)
+                    printf ("ZAUTH I: PASSED (whitelist) address=%s\n", request->address);
+            }
+            else {
+                denied = true;
+                if (self->verbose)
+                    printf ("ZAUTH I: DENIED (not in whitelist) address=%s\n", request->address);
+            }
+        }
+        else
+        if (zhash_size (self->blacklist)) {
+            if (zhash_lookup (self->blacklist, request->address)) {
+                denied = true;
+                if (self->verbose)
+                    printf ("ZAUTH I: DENIED (blacklist) address=%s\n", request->address);
+            }
+            else {
+                allowed = true;
+                if (self->verbose)
+                    printf ("ZAUTH I: PASSED (not in blacklist) address=%s\n", request->address);
+            }
+        }
+        //  Mechanism-specific checks
+        if (!denied) {
+            if (streq (request->mechanism, "NULL") && !allowed) {
+                //  For NULL, we allow if the address wasn't blacklisted
+                if (self->verbose)
+                    printf ("ZAUTH I: ALLOWED (NULL)\n");
+                allowed = true;
+            }
+            else
+            if (streq (request->mechanism, "PLAIN"))
+                //  For PLAIN, even a whitelisted address must authenticate
+                allowed = s_authenticate_plain (self, request);
+            else
+            if (streq (request->mechanism, "CURVE"))
+                //  For CURVE, even a whitelisted address must authenticate
+                allowed = s_authenticate_curve (self, request);
+            else
+            if (streq (request->mechanism, "GSSAPI"))
+                //  For GSSAPI, even a whitelisted address must authenticate
+                allowed = s_authenticate_gssapi (self, request);
+        }
+        if (allowed)
+            zap_request_reply (request, "200", "OK");
+        else
+            zap_request_reply (request, "400", "NO ACCESS");
+
+        zap_request_destroy (&request);
+    }
+    else
+        zap_request_reply (request, "500", "Internal error");
+    return 0;
+}
+
+
 
 
 //  --------------------------------------------------------------------------
@@ -101,7 +196,7 @@ void
 zauth_allow (zauth_t *self, const char *address)
 {
     zstr_sendx (self->pipe, "ALLOW", address, NULL);
-    zsocket_wait (self->pipe);
+    zsock_wait (self->pipe);
 }
 
 
@@ -115,7 +210,7 @@ void
 zauth_deny (zauth_t *self, const char *address)
 {
     zstr_sendx (self->pipe, "DENY", address, NULL);
-    zsocket_wait (self->pipe);
+    zsock_wait (self->pipe);
 }
 
 
@@ -131,7 +226,7 @@ zauth_configure_plain (zauth_t *self, const char *domain, const char *filename)
     assert (domain);
     assert (filename);
     zstr_sendx (self->pipe, "PLAIN", domain, filename, NULL);
-    zsocket_wait (self->pipe);
+    zsock_wait (self->pipe);
 }
 
 
@@ -150,7 +245,7 @@ zauth_configure_curve (zauth_t *self, const char *domain, const char *location)
     assert (domain);
     assert (location);
     zstr_sendx (self->pipe, "CURVE", domain, location, NULL);
-    zsocket_wait (self->pipe);
+    zsock_wait (self->pipe);
 }
 
 
@@ -165,7 +260,7 @@ zauth_configure_gssapi (zauth_t *self, char *domain, ...)
     assert (self);
     assert (domain);
     zstr_sendx (self->pipe, "GSSAPI", domain, NULL);
-    zsocket_wait (self->pipe);
+    zsock_wait (self->pipe);
 }
 
 
@@ -178,7 +273,7 @@ zauth_set_verbose (zauth_t *self, bool verbose)
     assert (self);
     zstr_sendm (self->pipe, "VERBOSE");
     zstr_sendf (self->pipe, "%d", verbose);
-    zsocket_wait (self->pipe);
+    zsock_wait (self->pipe);
 }
 
 
@@ -297,61 +392,10 @@ zap_request_dump (zap_request_t *self)
         
 //  *************************    BACK END AGENT    *************************
 
-//  This structure holds the context for our agent, so we can
-//  pass that around cleanly to methods which need it
-
-typedef struct {
-    zctx_t *ctx;                //  CZMQ context we're working for
-    void *pipe;                 //  Pipe back to application API
-    void *handler;              //  ZAP handler socket
-    bool verbose;               //  Trace activity to stdout
-    zhash_t *whitelist;         //  Whitelisted addresses
-    zhash_t *blacklist;         //  Blacklisted addresses
-    zhash_t *passwords;         //  PLAIN passwords, if loaded
-    zcertstore_t *certstore;    //  CURVE certificate store, if loaded
-    bool allow_any;             //  CURVE allows arbitrary clients
-    bool terminated;            //  Did API ask us to quit?
-} agent_t;
-
-static agent_t *
-s_agent_new (zctx_t *ctx, void *pipe)
-{
-    agent_t *self = (agent_t *) zmalloc (sizeof (agent_t));
-    self->ctx = ctx;
-    self->pipe = pipe;
-    self->whitelist = zhash_new ();
-    self->blacklist = zhash_new ();
-
-    //  Create ZAP handler and get ready for requests
-    self->handler = zsocket_new (self->ctx, ZMQ_REP);
-    if (self->handler
-    &&  zsocket_bind (self->handler, "inproc://zeromq.zap.01") == 0)
-        zstr_send (self->pipe, "OK");
-    else
-        zstr_send (self->pipe, "ERROR");
-        
-    return self;
-}
-
-static void
-s_agent_destroy (agent_t **self_p)
-{
-    assert (self_p);
-    if (*self_p) {
-        agent_t *self = *self_p;
-        zhash_destroy (&self->passwords);
-        zhash_destroy (&self->whitelist);
-        zhash_destroy (&self->blacklist);
-        zcertstore_destroy (&self->certstore);
-        free (self);
-        *self_p = NULL;
-    }
-}
-
 //  Handle a message from front-end API
 
 static int
-s_agent_handle_pipe (agent_t *self)
+s_actor_handle_pipe (actor_t *self)
 {
     //  Get the whole message off the pipe in one go
     zmsg_t *request = zmsg_recv (self->pipe);
@@ -363,14 +407,14 @@ s_agent_handle_pipe (agent_t *self)
         char *address = zmsg_popstr (request);
         zhash_insert (self->whitelist, address, "OK");
         zstr_free (&address);
-        zsocket_signal (self->pipe);
+        zsock_signal (self->pipe);
     }
     else
     if (streq (command, "DENY")) {
         char *address = zmsg_popstr (request);
         zhash_insert (self->blacklist, address, "OK");
         zstr_free (&address);
-        zsocket_signal (self->pipe);
+        zsock_signal (self->pipe);
     }
     else
     if (streq (command, "PLAIN")) {
@@ -384,7 +428,7 @@ s_agent_handle_pipe (agent_t *self)
         self->passwords = zhash_new ();
         zhash_load (self->passwords, filename);
         zstr_free (&filename);
-        zsocket_signal (self->pipe);
+        zsock_signal (self->pipe);
     }
     else
     if (streq (command, "CURVE")) {
@@ -402,29 +446,29 @@ s_agent_handle_pipe (agent_t *self)
             self->allow_any = false;
         }
         zstr_free (&location);
-        zsocket_signal (self->pipe);
+        zsock_signal (self->pipe);
     }
     else
     if (streq (command, "GSSAPI")) {
         char *domain = zmsg_popstr (request);
         //  For now we don't do anything with domains
         zstr_free (&domain);
-        zsocket_signal (self->pipe);
+        zsock_signal (self->pipe);
     }
     else
     if (streq (command, "VERBOSE")) {
         char *verbose = zmsg_popstr (request);
         self->verbose = *verbose == '1';
         zstr_free (&verbose);
-        zsocket_signal (self->pipe);
+        zsock_signal (self->pipe);
     }
     else
     if (streq (command, "TERMINATE")) {
         self->terminated = true;
-        zsocket_signal (self->pipe);
+        zsock_signal (self->pipe);
     }
     else {
-        zsys_error ("invalid command from API: %s\n", command);
+        printf ("E: invalid command from API: %s\n", command);
         assert (false);
     }
     zstr_free (&command);
@@ -435,80 +479,12 @@ s_agent_handle_pipe (agent_t *self)
 
 //  Handle an authentication request from libzmq core
 
-static bool s_authenticate_plain (agent_t *self, zap_request_t *request);
-static bool s_authenticate_curve (agent_t *self, zap_request_t *request);
-static bool s_authenticate_gssapi (agent_t *self, zap_request_t *request);
-
-static int
-s_agent_authenticate (agent_t *self)
-{
-    zap_request_t *request = zap_request_new (self->handler);
-    if (request) {
-        //  Is address explicitly whitelisted or blacklisted?
-        bool allowed = false;
-        bool denied = false;
-
-        if (zhash_size (self->whitelist)) {
-            if (zhash_lookup (self->whitelist, request->address)) {
-                allowed = true;
-                if (self->verbose) 
-                    printf ("ZAUTH I: PASSED (whitelist) address=%s\n", request->address);
-            }
-            else {
-                denied = true;
-                if (self->verbose) 
-                    printf ("ZAUTH I: DENIED (not in whitelist) address=%s\n", request->address);
-            }
-        }
-        else
-        if (zhash_size (self->blacklist)) {
-            if (zhash_lookup (self->blacklist, request->address)) {
-                denied = true;
-                if (self->verbose) 
-                    printf ("ZAUTH I: DENIED (blacklist) address=%s\n", request->address);
-            }
-            else {
-                allowed = true;
-                if (self->verbose) 
-                    printf ("ZAUTH I: PASSED (not in blacklist) address=%s\n", request->address);
-            }
-        }
-        //  Mechanism-specific checks
-        if (!denied) {
-            if (streq (request->mechanism, "NULL") && !allowed) {
-                //  For NULL, we allow if the address wasn't blacklisted
-                if (self->verbose) 
-                    printf ("ZAUTH I: ALLOWED (NULL)\n");
-                allowed = true;
-            }
-            else
-            if (streq (request->mechanism, "PLAIN"))
-                //  For PLAIN, even a whitelisted address must authenticate
-                allowed = s_authenticate_plain (self, request);
-            else
-            if (streq (request->mechanism, "CURVE"))
-                //  For CURVE, even a whitelisted address must authenticate
-                allowed = s_authenticate_curve (self, request);
-            else
-            if (streq (request->mechanism, "GSSAPI"))
-                //  For GSSAPI, even a whitelisted address must authenticate
-                allowed = s_authenticate_gssapi (self, request);
-        }
-        if (allowed)
-            zap_request_reply (request, "200", "OK");
-        else
-            zap_request_reply (request, "400", "NO ACCESS");
-
-        zap_request_destroy (&request);
-    }
-    else
-        zap_request_reply (request, "500", "Internal error");
-    return 0;
-}
-
+static bool s_authenticate_plain (actor_t *self, zap_request_t *request);
+static bool s_authenticate_curve (actor_t *self, zap_request_t *request);
+static bool s_authenticate_gssapi (actor_t *self, zap_request_t *request);
 
 static bool 
-s_authenticate_plain (agent_t *self, zap_request_t *request)
+s_authenticate_plain (actor_t *self, zap_request_t *request)
 {
     if (self->passwords) {
         zhash_refresh (self->passwords);
@@ -535,7 +511,7 @@ s_authenticate_plain (agent_t *self, zap_request_t *request)
 
 
 static bool 
-s_authenticate_curve (agent_t *self, zap_request_t *request)
+s_authenticate_curve (actor_t *self, zap_request_t *request)
 {
     //  TODO: load metadata from certificate and return via ZAP response
     if (self->allow_any) {
@@ -558,35 +534,11 @@ s_authenticate_curve (agent_t *self, zap_request_t *request)
 }
 
 static bool 
-s_authenticate_gssapi (agent_t *self, zap_request_t *request)
+s_authenticate_gssapi (actor_t *self, zap_request_t *request)
 {
     if (self->verbose) 
         printf ("I: ALLOWED (GSSAPI) principal=%s identity=%s\n", request->principal, request->identity);
     return true;
-}
-
-//  Handle a message from front-end API
-
-static void
-s_agent_task (void *args, zctx_t *ctx, void *pipe)
-{
-    //  Create agent instance as we start this task
-    agent_t *self = s_agent_new (ctx, pipe);
-    if (!self)                  //  Interrupted
-        return;
-        
-    zpoller_t *poller = zpoller_new (self->pipe, self->handler, NULL);
-    while (!zpoller_terminated (poller) && !self->terminated) {
-        void *which = zpoller_wait (poller, -1);
-        if (which == self->pipe)
-            s_agent_handle_pipe (self);
-        else
-        if (which == self->handler)
-            s_agent_authenticate (self);
-    }
-    //  Done, free all agent resources
-    zpoller_destroy (&poller);
-    s_agent_destroy (&self);
 }
 
 
@@ -598,18 +550,18 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
 static bool
 s_can_connect (zctx_t *ctx, void **server, void **client)
 {
-    int port_nbr = zsocket_bind (*server, "tcp://127.0.0.1:*");
+    int port_nbr = zsock_bind (*server, "tcp://127.0.0.1:*");
     assert (port_nbr > 0);
-    int rc = zsocket_connect (*client, "tcp://127.0.0.1:%d", port_nbr);
+    int rc = zsock_connect (*client, "tcp://127.0.0.1:%d", port_nbr);
     assert (rc == 0);
     zstr_send (*server, "Hello, World");
     zpoller_t *poller = zpoller_new (*client, NULL);
     bool success = (zpoller_wait (poller, 200) == *client);
     zpoller_destroy (&poller);
-    zsocket_destroy (ctx, *client);
-    zsocket_destroy (ctx, *server);
-    *server = zsocket_new (ctx, ZMQ_PUSH);
-    *client = zsocket_new (ctx, ZMQ_PULL);
+    zsock_destroy (ctx, *client);
+    zsock_destroy (ctx, *server);
+    *server = zsock_new (ctx, ZMQ_PUSH);
+    *client = zsock_new (ctx, ZMQ_PULL);
     return success;
 }
 #endif
@@ -636,34 +588,34 @@ zauth_test (bool verbose)
     
     //  A default NULL connection should always success, and not 
     //  go through our authentication infrastructure at all.
-    void *server = zsocket_new (ctx, ZMQ_PUSH);
-    void *client = zsocket_new (ctx, ZMQ_PULL);
+    void *server = zsock_new (ctx, ZMQ_PUSH);
+    void *client = zsock_new (ctx, ZMQ_PULL);
     bool success = s_can_connect (ctx, &server, &client);
     assert (success);
     
     //  When we set a domain on the server, we switch on authentication
     //  for NULL sockets, but with no policies, the client connection 
     //  will be allowed.
-    zsocket_set_zap_domain (server, "global");
+    zsock_set_zap_domain (server, "global");
     success = s_can_connect (ctx, &server, &client);
     assert (success);
     
     //  Blacklist 127.0.0.1, connection should fail
-    zsocket_set_zap_domain (server, "global");
+    zsock_set_zap_domain (server, "global");
     zauth_deny (auth, "127.0.0.1");
     success = s_can_connect (ctx, &server, &client);
     assert (!success);
 
     //  Whitelist our address, which overrides the blacklist
-    zsocket_set_zap_domain (server, "global");
+    zsock_set_zap_domain (server, "global");
     zauth_allow (auth, "127.0.0.1");
     success = s_can_connect (ctx, &server, &client);
     assert (success);
 
     //  Try PLAIN authentication
-    zsocket_set_plain_server (server, 1);
-    zsocket_set_plain_username (client, "admin");
-    zsocket_set_plain_password (client, "Password");
+    zsock_set_plain_server (server, 1);
+    zsock_set_plain_username (client, "admin");
+    zsock_set_plain_password (client, "Password");
     success = s_can_connect (ctx, &server, &client);
     assert (!success);
     
@@ -671,16 +623,16 @@ zauth_test (bool verbose)
     assert (password);
     fprintf (password, "admin=Password\n");
     fclose (password);
-    zsocket_set_plain_server (server, 1);
-    zsocket_set_plain_username (client, "admin");
-    zsocket_set_plain_password (client, "Password");
+    zsock_set_plain_server (server, 1);
+    zsock_set_plain_username (client, "admin");
+    zsock_set_plain_password (client, "Password");
     zauth_configure_plain (auth, "*", TESTDIR "/password-file");
     success = s_can_connect (ctx, &server, &client);
     assert (success);
 
-    zsocket_set_plain_server (server, 1);
-    zsocket_set_plain_username (client, "admin");
-    zsocket_set_plain_password (client, "Bogus");
+    zsock_set_plain_server (server, 1);
+    zsock_set_plain_username (client, "admin");
+    zsock_set_plain_password (client, "Bogus");
     success = s_can_connect (ctx, &server, &client);
     assert (!success);
 
@@ -696,16 +648,16 @@ zauth_test (bool verbose)
     //  Test without setting-up any authentication
     zcert_apply (server_cert, server);
     zcert_apply (client_cert, client);
-    zsocket_set_curve_server (server, 1);
-    zsocket_set_curve_serverkey (client, server_key);
+    zsock_set_curve_server (server, 1);
+    zsock_set_curve_serverkey (client, server_key);
     success = s_can_connect (ctx, &server, &client);
     assert (!success);
 
     //  Test CURVE_ALLOW_ANY
     zcert_apply (server_cert, server);
     zcert_apply (client_cert, client);
-    zsocket_set_curve_server (server, 1);
-    zsocket_set_curve_serverkey (client, server_key);
+    zsock_set_curve_server (server, 1);
+    zsock_set_curve_serverkey (client, server_key);
     zauth_configure_curve (auth, "*", CURVE_ALLOW_ANY);
     success = s_can_connect (ctx, &server, &client);
     assert (success);
@@ -713,8 +665,8 @@ zauth_test (bool verbose)
     //  Test full client authentication using certificates
     zcert_apply (server_cert, server);
     zcert_apply (client_cert, client);
-    zsocket_set_curve_server (server, 1);
-    zsocket_set_curve_serverkey (client, server_key);
+    zsock_set_curve_server (server, 1);
+    zsock_set_curve_serverkey (client, server_key);
     zcert_save_public (client_cert, TESTDIR "/mycert.txt");
     zauth_configure_curve (auth, "*", TESTDIR);
     success = s_can_connect (ctx, &server, &client);
@@ -723,6 +675,7 @@ zauth_test (bool verbose)
     zcert_destroy (&server_cert);
     zcert_destroy (&client_cert);
 #   endif
+
     //  Remove the authenticator and check a normal connection works
     zauth_destroy (&auth);
     success = s_can_connect (ctx, &server, &client);

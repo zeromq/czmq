@@ -92,6 +92,21 @@ zclock_time (void)
 
 
 //  --------------------------------------------------------------------------
+//  Return formatted date/time as fresh string. Free using zstr_free().
+
+char *
+zclock_timestr (void)
+{
+    time_t curtime = time (NULL);
+    struct tm *loctime = localtime (&curtime);
+    char formatted [20];
+    strftime (formatted, 20, "%Y-%m-%d %H:%M:%S", loctime);
+    return strdup (formatted);
+}
+
+
+//  --------------------------------------------------------------------------
+//  DEPRECATED in favor of zsys logging, see issue #519
 //  Print formatted string to stdout, prefixed by date/time and
 //  terminated with a newline.
 
@@ -110,20 +125,6 @@ zclock_log (const char *format, ...)
     va_end (argptr);
     printf ("\n");
     fflush (stdout);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Return formatted date/time as fresh string. Free using zstr_free().
-
-char *
-zclock_timestr (void)
-{
-    time_t curtime = time (NULL);
-    struct tm *loctime = localtime (&curtime);
-    char formatted [20];
-    strftime (formatted, 20, "%Y-%m-%d %H:%M:%S", loctime);
-    return strdup (formatted);
 }
 
 

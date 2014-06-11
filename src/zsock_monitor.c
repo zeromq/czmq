@@ -236,7 +236,7 @@ s_api_command (agent_t *self)
         zstr_send (self->pipe, "OK");
     }
     else
-        printf ("E: zsock_monitor unexpected API command '%s'\n", command);
+        zsys_error ("zsock_monitor unexpected API command '%s'", command);
 
     free (command);
 }
@@ -309,11 +309,11 @@ s_monitor_event (agent_t *self)
             break;
 #endif
         default:
-            printf ("E: illegal socket monitor event: %d", event);
+            zsys_error ("illegal socket monitor event: %d", event);
             break;
     }
     if (self->verbose)
-        printf ("I: zsock_monitor: %s - %s\n", description, address);
+        zsys_info ("zsock_monitor: %s - %s", description, address);
 
     zstr_sendfm (self->pipe, "%d", event);
     zstr_sendfm (self->pipe, "%d", value);

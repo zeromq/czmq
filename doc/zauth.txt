@@ -181,7 +181,6 @@ EXAMPLE
     zcert_destroy (&server_cert);
     zcert_destroy (&client_cert);
 #   endif
-
     //  Remove the authenticator and check a normal connection works
     zauth_destroy (&auth);
     success = s_can_connect (ctx, &server, &client);

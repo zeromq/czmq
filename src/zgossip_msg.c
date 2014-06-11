@@ -273,7 +273,7 @@ zgossip_msg_decode (zmsg_t **msg_p)
 
     //  Error returns
     malformed:
-        printf ("E: malformed message '%d'\n", self->id);
+        zsys_error ("malformed message '%d'\n", self->id);
     empty:
         zframe_destroy (&frame);
         zmsg_destroy (msg_p);
@@ -323,7 +323,7 @@ zgossip_msg_encode (zgossip_msg_t **self_p)
             break;
             
         default:
-            printf ("E: bad message type '%d', not sent\n", self->id);
+            zsys_error ("bad message type '%d', not sent\n", self->id);
             //  No recovery, this is a fatal application error
             assert (false);
     }
@@ -631,7 +631,6 @@ zgossip_msg_dup (zgossip_msg_t *self)
 }
 
 
-
 //  --------------------------------------------------------------------------
 //  Print contents of message to stdout
 
@@ -647,13 +646,13 @@ zgossip_msg_print (zgossip_msg_t *self)
         case ZGOSSIP_MSG_PUBLISH:
             puts ("PUBLISH:");
             if (self->key)
-                printf ("    key='%s'\n", self->key);
+                zsys_debug ("    key='%s'", self->key);
             else
-                printf ("    key=\n");
+                zsys_debug ("    key=");
             if (self->value)
-                printf ("    value='%s'\n", self->value);
+                zsys_debug ("    value='%s'", self->value);
             else
-                printf ("    value=\n");
+                zsys_debug ("    value=");
             break;
             
         case ZGOSSIP_MSG_PING:

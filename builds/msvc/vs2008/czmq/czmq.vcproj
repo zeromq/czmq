@@ -710,38 +710,6 @@
           <Tool Name="VCCLCompilerTool" CompileAs="2" />
         </FileConfiguration>
       </File>
-      <File RelativePath="..\..\..\..\src\zlog.c">
-        <FileConfiguration Name="Release|Win32">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="Release|x64">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="Debug|Win32">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="Debug|x64">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="DebugDLL|Win32">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="DebugDLL|x64">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="ReleaseDLL|Win32">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="ReleaseDLL|x64">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="RelWithDebInfo|Win32">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-        <FileConfiguration Name="RelWithDebInfo|x64">
-          <Tool Name="VCCLCompilerTool" CompileAs="2" />
-        </FileConfiguration>
-      </File>
       <File RelativePath="..\..\..\..\src\zloop.c">
         <FileConfiguration Name="Release|Win32">
           <Tool Name="VCCLCompilerTool" CompileAs="2" />
@@ -1339,7 +1307,6 @@
       <File RelativePath="..\..\..\..\include\zhash.h" />
       <File RelativePath="..\..\..\..\include\zgossip.h" />
       <File RelativePath="..\..\..\..\include\zlist.h" />
-      <File RelativePath="..\..\..\..\include\zlog.h" />
       <File RelativePath="..\..\..\..\include\zloop.h" />
       <File RelativePath="..\..\..\..\include\zmsg.h" />
       <File RelativePath="..\..\..\..\include\zpoller.h" />

@@ -129,9 +129,6 @@
     <ClCompile Include="..\..\..\..\src\zlist.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zlog.c">
-      <CompileAs>CompileAsCpp</CompileAs>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zloop.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>

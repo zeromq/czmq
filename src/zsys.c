@@ -62,12 +62,16 @@ void *process_ctx = NULL;
 
 //  Default globals for new sockets and other joys; these can all be set
 //  from the environment, or via the zsys_set_xxx API.
-static size_t s_iothreads = 1;      //  ZSYS_IOTHREADS=1
+static size_t s_io_threads = 1;     //  ZSYS_IO_THREADS=1
+static size_t s_max_sockets = 1024; //  ZSYS_MAX_SOCKETS=1024
 static size_t s_linger = 0;         //  ZSYS_LINGER=0
 static size_t s_sndhwm = 1000;      //  ZSYS_SNDHWM=1000
 static size_t s_rcvhwm = 1000;      //  ZSYS_RCVHWM=1000
 static int s_ipv6 = 0;              //  ZSYS_IPV6=0
 static char *s_interface = NULL;    //  ZSYS_INTERFACE=
+static char *s_logident = NULL;     //  ZSYS_LOGIDENT=
+static FILE *s_logstream = NULL;    //  ZSYS_LOGSTREAM=stdout/stderr
+static bool s_logsystem = false;    //  ZSYS_LOGSYSTEM=true/false
 
 //  Track number of open sockets so we can zmq_ctx_term() safely
 static size_t s_open_sockets = 0;
@@ -102,6 +106,20 @@ static zsys_mutex_t s_mutex;
 
 
 //  --------------------------------------------------------------------------
+//  Initialize CZMQ zsys layer; this happens automatically when you create
+//  a socket or an actor; however this call lets you force initialization
+//  earlier, so e.g. logging is properly set-up before you start working.
+//  Not threadsafe, so call only from main thread.
+
+void
+zsys_init (void)
+{
+    if (!process_ctx)
+        s_initialize_process ();
+}
+
+
+//  --------------------------------------------------------------------------
 //  Get a new ZMQ socket, automagically creating a ZMQ context if this is
 //  the first time. Caller is responsible for destroying the ZMQ socket
 //  before process exits, to avoid a ZMQ deadlock. Note: you should not use
@@ -122,7 +140,6 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
 
     ZMUTEX_LOCK (s_mutex);
     void *handle = zmq_socket (process_ctx, type);
-
     //  Configure socket with process defaults
     zsocket_set_linger (handle, (int) s_linger);
 #if (ZMQ_VERSION_MAJOR == 2)
@@ -158,21 +175,58 @@ static void
 s_initialize_process (void)
 {
     //  Pull process defaults from environment
-    if (getenv ("ZSYS_IOTHREADS"))
-        s_iothreads = atoi (getenv ("ZSYS_IOTHREADS"));
+    if (getenv ("ZSYS_IO_THREADS"))
+        s_io_threads = atoi (getenv ("ZSYS_IO_THREADS"));
+
+    if (getenv ("ZSYS_MAX_SOCKETS"))
+        s_max_sockets = atoi (getenv ("ZSYS_MAX_SOCKETS"));
+
     if (getenv ("ZSYS_LINGER"))
         s_linger = atoi (getenv ("ZSYS_LINGER"));
+
     if (getenv ("ZSYS_SNDHWM"))
         s_sndhwm = atoi (getenv ("ZSYS_SNDHWM"));
+
     if (getenv ("ZSYS_RCVHWM"))
         s_rcvhwm = atoi (getenv ("ZSYS_RCVHWM"));
+
     if (getenv ("ZSYS_IPV6"))
         s_ipv6 = atoi (getenv ("ZSYS_IPV6"));
-    if (getenv ("ZSYS_INTERFACE"))
+
+    if (getenv ("ZSYS_INTERFACE")) {
         s_interface = strdup (getenv ("ZSYS_INTERFACE"));
+        zsys_debug ("(zsys): set ZSYS_INTERFACE=%s", s_interface);
+    }
+    if (getenv ("ZSYS_LOGIDENT"))
+        s_interface = strdup (getenv ("ZSYS_LOGIDENT"));
+    
+    if (getenv ("ZSYS_LOGSTREAM")) {
+        if (streq (getenv ("ZSYS_LOGIDENT"), "stdout"))
+            s_logstream = stdout;
+        else
+        if (streq (getenv ("ZSYS_LOGIDENT"), "stderr"))
+            s_logstream = stderr;
+    }
+    else
+        s_logstream = stdout;
+    
+    if (getenv ("ZSYS_LOGSYSTEM")) {
+        if (streq (getenv ("ZSYS_LOGSYSTEM"), "true"))
+            s_logsystem = true;
+        else
+        if (streq (getenv ("ZSYS_LOGSYSTEM"), "false"))
+            s_logsystem = false;
+    }
+    else
+        s_logsystem = false;
 
     //  This call keeps compatibility back to ZMQ v2
-    process_ctx = zmq_init ((int) s_iothreads);
+    process_ctx = zmq_init ((int) s_io_threads);
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
+//  TODO: this causes TravisCI to break; libzmq does not return a
+//  valid socket on zmq_socket(), after this...
+//     zmq_ctx_set (process_ctx, ZMQ_MAX_SOCKETS, s_max_sockets);
+#endif
     ZMUTEX_INIT (s_mutex);
     s_sockref_list = zlist_new ();
     zsys_catch_interrupts ();
@@ -194,7 +248,7 @@ s_terminate_process (void)
     size_t busy = s_open_sockets;
     ZMUTEX_UNLOCK (s_mutex);
     if (busy)
-        zclock_sleep (100);
+        zclock_sleep (200);
 
     //  No matter, we are now going to shut down
     //  Print the source reference for any sockets the app did not
@@ -202,11 +256,11 @@ s_terminate_process (void)
     ZMUTEX_LOCK (s_mutex);
     s_sockref_t *sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
     while (sockref) {
-#ifdef __WINDOWS__
-		printf ("E: dangling socket created at %s:%u\n",
+#if defined (__WINDOWS__)
+		zsys_error ("dangling socket created at %s:%u\n",
                 sockref->filename, sockref->line_nbr);
 #else
-        printf ("E: dangling socket created at %s:%zd\n",
+        zsys_error ("dangling socket created at %s:%zd\n",
                 sockref->filename, sockref->line_nbr);
 #endif
         zmq_close (sockref->handle);
@@ -221,6 +275,11 @@ s_terminate_process (void)
 
     //  Free dynamically allocated properties
     free (s_interface);
+    free (s_logident);
+    
+#if defined (__UNIX__)
+    closelog ();                //  Just to be pedantic
+#endif
 }
 
 
@@ -393,7 +452,7 @@ zsys_file_mode (const char *filename)
     else
         mode |= S_IFREG;
 
-#ifdef __UTYPE_ANDROID
+#if defined (__UTYPE_ANDROID)
     if (!(dwfa & FILE_ATTRIBUTE_HIDDEN))
         mode |= S_IRUSR;
     if (!(dwfa & FILE_ATTRIBUTE_READONLY))
@@ -755,7 +814,7 @@ zsys_socket_error (const char *reason)
     )
         return;             //  Ignore error and try again
     else {
-        zclock_log ("E: (UDP) error '%s' on %s", strerror (errno), reason);
+        zsys_error ("(UDP) error '%s' on %s", strerror (errno), reason);
         assert (false);
     }
 }
@@ -801,7 +860,7 @@ zsys_daemonize (const char *workdir)
     //  Move to a safe and known directory, which is supplied as an
     //  argument to this function (or not, if workdir is NULL or empty).
     if (workdir && chdir (workdir)) {
-        fprintf (stderr, "E: cannot chdir to '%s'\n", workdir);
+        zsys_error ("cannot chdir to '%s'", workdir);
         return -1;
     }
     //  Close all open file descriptors inherited from the parent
@@ -842,8 +901,7 @@ zsys_run_as (const char *lockfile, const char *group, const char *user)
     //  system services this should be root, so that we can write
     //  the PID file into e.g. /var/run/
     if (seteuid (geteuid ())) {
-        zclock_log ("E: cannot set effective user id: %s\n",
-                    strerror (errno));
+        zsys_error ("cannot set effective user id: %s", strerror (errno));
         return -1;
     }
     if (lockfile) {
@@ -851,8 +909,7 @@ zsys_run_as (const char *lockfile, const char *group, const char *user)
         //  only one copy of the process can run at once.
         int handle = open (lockfile, O_RDWR | O_CREAT, 0640);
         if (handle < 0) {
-            zclock_log ("E: cannot open lockfile '%s': %s\n",
-                        lockfile, strerror (errno));
+            zsys_error ("cannot open lockfile '%s': %s", lockfile, strerror (errno));
             return -1;
         }
         else {
@@ -863,43 +920,41 @@ zsys_run_as (const char *lockfile, const char *group, const char *user)
             filelock.l_len    = 0;          //  length, 0 = to EOF
             filelock.l_pid    = getpid ();
             if (fcntl (handle, F_SETLK, &filelock)) {
-                zclock_log ("E: cannot get lock: %s\n", strerror (errno));
+                zsys_error ("cannot get lock: %s", strerror (errno));
                 return -1;
             }
         }
-        //   We record the broker's process id in the lock file
+        //   We record the current process id in the lock file
         char pid_buffer [10];
         snprintf (pid_buffer, sizeof (pid_buffer), "%6d\n", getpid ());
         if (write (handle, pid_buffer, strlen (pid_buffer)) != strlen (pid_buffer)) {
-            zclock_log ("E: cannot write to lockfile: %s\n",
-                        strerror (errno));
+            zsys_error ("cannot write to lockfile: %s", strerror (errno));
             return -1;
         }
         close (handle);
     }
     if (group) {
-        zclock_log ("I: broker running under group '%s'", group);
+        zsys_info ("running under group '%s'", group);
         struct group *grpbuf = NULL;
         grpbuf = getgrnam (group);
         if (grpbuf == NULL || setgid (grpbuf->gr_gid)) {
-            zclock_log ("E: could not switch group: %s", strerror (errno));
+            zsys_error ("could not switch group: %s", strerror (errno));
             return -1;
         }
     }
     if (user) {
-        zclock_log ("I: broker running under user '%s'", user);
+        zsys_info ("running under user '%s'", user);
         struct passwd *pwdbuf = NULL;
         pwdbuf = getpwnam (user);
         if (pwdbuf == NULL || setuid (pwdbuf->pw_uid)) {
-            zclock_log ("E: could not switch user: %s", strerror (errno));
+            zsys_error ("could not switch user: %s", strerror (errno));
             return -1;
         }
     }
     else {
         //  Switch back to real user ID (who started process)
         if (setuid (getuid ())) {
-            zclock_log ("E: cannot set real user id: %s\n",
-                        strerror (errno));
+            zsys_error ("cannot set real user id: %s", strerror (errno));
             return -1;
         }
     }
@@ -915,19 +970,60 @@ zsys_run_as (const char *lockfile, const char *group, const char *user)
 //  Configure the number of I/O threads that ZeroMQ will use. A good
 //  rule of thumb is one thread per gigabit of traffic in or out. The
 //  default is 1, sufficient for most applications. If the environment
-//  variable ZSYS_IOTHREADS is defined, that provides the default.
+//  variable ZSYS_IO_THREADS is defined, that provides the default.
 //  Note that this method is valid only before any socket is created.
 
 void
-zsys_set_iothreads (size_t iothreads)
+zsys_set_io_threads (size_t io_threads)
 {
     ZMUTEX_LOCK (s_mutex);
     //  If the app is misusing this method, burn it with fire
     if (process_ctx)
-        zclock_log ("E: zsys_iothreads() is not valid after creating sockets");
+        zsys_error ("zsys_io_threads() is not valid after creating sockets");
     assert (process_ctx == NULL);
-    s_iothreads = iothreads;
+    s_io_threads = io_threads;
     ZMUTEX_UNLOCK (s_mutex);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Configure the number of sockets that ZeroMQ will allow. The default
+//  is 1024. The actual limit depends on the system, and you can query it
+//  by using zsys_socket_limit (). A value of zero means "maximum".
+//  Note that this method is valid only before any socket is created.
+
+void
+zsys_set_max_sockets (size_t max_sockets)
+{
+    ZMUTEX_LOCK (s_mutex);
+    //  If the app is misusing this method, burn it with fire
+    if (process_ctx)
+        zsys_error ("zsys_max_sockets() is not valid after creating sockets");
+    assert (process_ctx == NULL);
+    s_max_sockets = max_sockets? max_sockets: zsys_socket_limit ();
+    ZMUTEX_UNLOCK (s_mutex);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return maximum number of ZeroMQ sockets that the system will support.
+
+size_t
+zsys_socket_limit (void)
+{
+    int socket_limit;
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (4,1,0))
+    if (process_ctx)
+        socket_limit = zmq_ctx_get (process_ctx, ZMQ_SOCKET_LIMIT);
+    else {
+        void *ctx = zmq_init (1);
+        socket_limit = zmq_ctx_get (ctx, ZMQ_SOCKET_LIMIT);
+        zmq_term (ctx);
+    }
+#else
+    socket_limit = 1024;
+#endif
+    return (size_t) socket_limit;
 }
 
 
@@ -1008,6 +1104,7 @@ zsys_set_interface (const char *value)
 {
     free (s_interface);
     s_interface = strdup (value);
+    zsys_debug ("(zsys): zsys_set_interface (%s)", s_interface);
 }
 
 
@@ -1022,18 +1119,186 @@ zsys_interface (void)
 
 
 //  --------------------------------------------------------------------------
+//  Set log identity, which is a string that prefixes all log messages sent
+//  by this process. The log identity defaults to the environment variable
+//  ZSYS_LOGIDENT, if that is set.
+
+void
+zsys_set_logident (const char *value)
+{
+    free (s_logident);
+    s_logident = strdup (value);
+#if defined (__UNIX__)
+    if (s_logsystem)
+        openlog (s_logident, LOG_PID, LOG_USER);
+#elif defined (__WINDOWS__)
+    //  TODO: hook in Windows event log for Windows
+#endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set stream to receive log traffic. By default, log traffic is sent to
+//  stdout. If you set the stream to NULL, no stream will receive the log
+//  traffic (it may still be sent to the system facility).
+
+void
+zsys_set_logstream (FILE *stream)
+{
+    s_logstream = stream;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Enable or disable logging to the system facility (syslog on POSIX boxes,
+//  event log on Windows). By default this is disabled.
+
+void
+zsys_set_logsystem (bool logsystem)
+{
+    s_logsystem = logsystem;
+#if defined (__UNIX__)
+    if (s_logsystem)
+        openlog (s_logident, LOG_PID, LOG_USER);
+#elif defined (__WINDOWS__)
+    //  TODO: hook into Windows event log
+#endif
+}
+
+
+static void
+s_log (char loglevel, char *string)
+{
+    if (s_logstream) {
+        time_t curtime = time (NULL);
+        struct tm *loctime = localtime (&curtime);
+        char formatted [20];
+        strftime (formatted, 20, "%y-%m-%d %H:%M:%S", loctime);
+        if (s_logident)
+            fprintf (s_logstream, "%c: (%s) %s %s\n",
+                        loglevel, s_logident, formatted, string);
+        else
+            fprintf (s_logstream, "%c: %s %s\n", loglevel, formatted, string);
+
+        fflush (s_logstream);
+    }
+#if defined (__UNIX__)
+    if (s_logsystem) {
+        int priority;
+        if (loglevel == 'E')
+            priority = LOG_ERR;
+        else
+        if (loglevel == 'W')
+            priority = LOG_WARNING;
+        else
+        if (loglevel == 'N')
+            priority = LOG_NOTICE;
+        else
+        if (loglevel == 'I')
+            priority = LOG_INFO;
+        else
+        if (loglevel == 'D')
+            priority = LOG_DEBUG;
+
+        syslog (priority, "%s", string);
+    }
+#endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Log error condition - highest priority
+
+void
+zsys_error (const char *format, ...)
+{
+    va_list argptr;
+    va_start (argptr, format);
+    char *string = zsys_vprintf (format, argptr);
+    va_end (argptr);
+    s_log ('E', string);
+    free (string);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Log warning condition - high priority
+
+void
+zsys_warning (const char *format, ...)
+{
+    va_list argptr;
+    va_start (argptr, format);
+    char *string = zsys_vprintf (format, argptr);
+    va_end (argptr);
+    s_log ('W', string);
+    free (string);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Log normal, but significant, condition - normal priority
+
+void
+zsys_notice (const char *format, ...)
+{
+    va_list argptr;
+    va_start (argptr, format);
+    char *string = zsys_vprintf (format, argptr);
+    va_end (argptr);
+    s_log ('N', string);
+    free (string);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Log informational message - low priority
+
+void
+zsys_info (const char *format, ...)
+{
+    va_list argptr;
+    va_start (argptr, format);
+    char *string = zsys_vprintf (format, argptr);
+    va_end (argptr);
+    s_log ('I', string);
+    free (string);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Log debug-level message - lowest priority
+
+void
+zsys_debug (const char *format, ...)
+{
+    va_list argptr;
+    va_start (argptr, format);
+    char *string = zsys_vprintf (format, argptr);
+    va_end (argptr);
+    s_log ('D', string);
+    free (string);
+}
+
+
+//  --------------------------------------------------------------------------
 //  Selftest
 
 void
 zsys_test (bool verbose)
 {
     printf (" * zsys: ");
+    if (verbose)
+        printf ("\n");
 
     //  @selftest
     zsys_catch_interrupts ();
     int rc;
 
-    zsys_set_iothreads (1);
+    if (verbose)
+        zsys_info ("system limit is %zd ZeroMQ sockets\n", zsys_socket_limit ());
+    zsys_set_io_threads (1);
+    zsys_set_max_sockets (0);
     zsys_set_linger (0);
     zsys_set_sndhwm (1000);
     zsys_set_rcvhwm (1000);
@@ -1045,7 +1310,7 @@ zsys_test (bool verbose)
     int as_server = 1;
     rc = zmq_setsockopt (handle, ZMQ_CURVE_SERVER, &as_server, sizeof (int));
     if (rc == -1) {
-        zclock_log ("E: libzmq was built without libsodium. Please rebuild libzmq and CZMQ.");
+        zsys_error ("libzmq was built without libsodium. Please rebuild libzmq and CZMQ.");
         zsys_close (handle);
         exit (1);
     }
@@ -1103,6 +1368,18 @@ zsys_test (bool verbose)
     assert (strlen (string) == (4 * 64 + 10));
     zstr_free (&string);
 
+    //  Test logging system
+    zsys_set_logident ("czmq_selftest");
+    if (verbose) {
+        zsys_error ("This is an %s message", "error");
+        zsys_warning ("This is a %s message", "warning");
+        zsys_notice ("This is a %s message", "notice");
+        zsys_info ("This is a %s message", "info");
+        zsys_debug ("This is a %s message", "debug");
+        zsys_set_logident ("hello, world");
+        zsys_info ("This is a %s message", "info");
+        zsys_debug ("This is a %s message", "debug");
+    }
     //  @end
 
     printf ("OK\n");
