@@ -986,7 +986,7 @@ size_t
 zsys_socket_limit (void)
 {
     int socket_limit;
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (4,1,0))
     if (process_ctx)
         socket_limit = zmq_ctx_get (process_ctx, ZMQ_SOCKET_LIMIT);
     else {
