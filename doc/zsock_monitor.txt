@@ -59,6 +59,7 @@ EXAMPLE
 -------
 .From zsock_monitor_test method
 ----
+#if defined (ZMQ_EVENT_ALL)
     zsock_t *sink = zsock_new (ZMQ_PULL);
     zsock_monitor_t *sinkmon = zsock_monitor_new (sink);
     zsock_monitor_set_verbose (sinkmon, verbose);
@@ -95,6 +96,7 @@ EXAMPLE
     zsock_monitor_destroy (&sourcemon);
     zsock_destroy (&sink);
     zsock_destroy (&source);
+#endif
 ----
 
 SEE ALSO

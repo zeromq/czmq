@@ -78,8 +78,8 @@ EXAMPLE
 -------
 .From zgossip_test method
 ----
-    //  Test basic client-to-server operation
-    zactor_t *server = zactor_new (zgossip, NULL);
+    //  Test basic client-to-server operation of the protocol
+    zactor_t *server = zactor_new (zgossip, "server");
     zstr_sendx (server, "SET", "server/animate", verbose? "1": "0", NULL);
     zstr_sendx (server, "BIND", "ipc:///tmp/zgossip", NULL);
     char *port_str = zstr_recv (server);
@@ -110,7 +110,7 @@ EXAMPLE
     zactor_destroy (&server);
 
     //  Test peer-to-peer operations
-    zactor_t *base = zactor_new (zgossip, NULL);
+    zactor_t *base = zactor_new (zgossip, "base");
     assert (base);
     zstr_sendx (base, "SET", "server/animate", verbose? "1": "0", NULL);
     //  Set a 100msec timeout on clients so we can test expiry
@@ -120,13 +120,13 @@ EXAMPLE
     assert (streq (port_str, "0"));
     zstr_free (&port_str);
 
-    zactor_t *alpha = zactor_new (zgossip, NULL);
+    zactor_t *alpha = zactor_new (zgossip, "alpha");
     assert (alpha);
     zstr_sendx (alpha, "CONNECT", "inproc://base", NULL);
     zstr_sendx (alpha, "PUBLISH", "inproc://alpha-1", "service1", NULL);
     zstr_sendx (alpha, "PUBLISH", "inproc://alpha-2", "service2", NULL);
 
-    zactor_t *beta = zactor_new (zgossip, NULL);
+    zactor_t *beta = zactor_new (zgossip, "beta");
     assert (beta);
     zstr_sendx (beta, "CONNECT", "inproc://base", NULL);
     zstr_sendx (beta, "PUBLISH", "inproc://beta-1", "service1", NULL);
