@@ -16,11 +16,6 @@ CZMQ_EXPORT void
 CZMQ_EXPORT int64_t
     zclock_time (void);
 
-//  Print formatted string to stdout, prefixed by date/time and
-//  terminated with a newline.
-CZMQ_EXPORT void
-    zclock_log (const char *format, ...);
-
 //  Return formatted date/time as fresh string. Free using zstr_free().
 CZMQ_EXPORT char *
     zclock_timestr (void);
