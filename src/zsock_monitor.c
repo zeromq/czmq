@@ -313,7 +313,7 @@ s_monitor_event (agent_t *self)
             break;
     }
     if (self->verbose)
-        zsys_ifo ("zsock_monitor: %s - %s\n", description, address);
+        zsys_info ("zsock_monitor: %s - %s\n", description, address);
 
     zstr_sendfm (self->pipe, "%d", event);
     zstr_sendfm (self->pipe, "%d", value);
