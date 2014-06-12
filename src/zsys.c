@@ -225,7 +225,7 @@ s_initialize_process (void)
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
 //  TODO: this causes TravisCI to break; libzmq does not return a
 //  valid socket on zmq_socket(), after this...
-//     zmq_ctx_set (process_ctx, ZMQ_MAX_SOCKETS, s_max_sockets);
+    zmq_ctx_set (process_ctx, ZMQ_MAX_SOCKETS, s_max_sockets);
 #endif
     ZMUTEX_INIT (s_mutex);
     s_sockref_list = zlist_new ();
@@ -1020,6 +1020,11 @@ zsys_socket_limit (void)
         socket_limit = zmq_ctx_get (ctx, ZMQ_SOCKET_LIMIT);
         zmq_term (ctx);
     }
+    //  ZeroMQ used to report a nonsense value (2^31) which if used would
+    //  on zmq_ctx_set (ZMQ_MAX_SOCKETS) cause an out-of-memory error. So
+    //  if we're running on an older library, enforce a sane limit.
+    if (socket_limit > 65535)
+        socket_limit = 65535;
 #else
     socket_limit = 1024;
 #endif
