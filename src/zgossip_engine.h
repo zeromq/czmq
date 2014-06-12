@@ -276,11 +276,11 @@ engine_configure (server_t *server, const char *path, const char *value)
 static void
 s_satisfy_pedantic_compilers (void)
 {
-    engine_set_next_event (NULL, 0);
-    engine_set_exception (NULL, 0);
-    engine_set_wakeup_event (NULL, 0, 0);
-    engine_send_event (NULL, 0);
-    engine_broadcast_event (NULL, NULL, 0);
+    engine_set_next_event (NULL, NULL_event);
+    engine_set_exception (NULL, NULL_event);
+    engine_set_wakeup_event (NULL, 0, NULL_event);
+    engine_send_event (NULL, NULL_event);
+    engine_broadcast_event (NULL, NULL, NULL_event);
     engine_handle_socket (NULL, 0, NULL);
     engine_set_monitor (NULL, 0, NULL);
     engine_set_log_prefix (NULL, NULL);
@@ -421,7 +421,7 @@ s_client_filter_mailbox (s_client_t *self)
 static void
 s_client_execute (s_client_t *self, int event)
 {
-    self->next_event = event;
+    self->next_event = (event_t) event;
     //  Cancel wakeup timer, if any was pending
     if (self->wakeup_timer) {
         zloop_timer_end (self->server->loop, self->wakeup_timer);
