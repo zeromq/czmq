@@ -669,7 +669,7 @@ s_server_config_self (s_server_t *self)
     //  
     //  Animation is disabled by default
     self->animate = atoi (
-        zconfig_resolve (self->config, "server/animate", "0"));
+        zconfig_resolve (self->config, "server/animate", "0")) != 0;
 
     //  Default client timeout is 60 seconds
     self->timeout = atoi (
