@@ -1184,7 +1184,7 @@ s_log (char loglevel, char *string)
     }
 #if defined (__UNIX__)
     if (s_logsystem) {
-        int priority;
+        int priority = LOG_INFO;
         if (loglevel == 'E')
             priority = LOG_ERR;
         else
