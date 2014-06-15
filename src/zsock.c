@@ -68,14 +68,14 @@ zsock_new_ (int type, const char *filename, size_t line_nbr)
 //  zsock_new method.
 
 void
-zsock_destroy (zsock_t **self_p)
+zsock_destroy_ (zsock_t **self_p, const char *filename, size_t line_nbr)
 {
     assert (self_p);
     if (*self_p) {
         zsock_t *self = *self_p;
         assert (zsock_is (self));
         self->tag = 0xDeadBeef;
-        int rc = zsys_close (self->handle);
+        int rc = zsys_close (self->handle, filename, line_nbr);
         assert (rc == 0);
         free (self);
         *self_p = NULL;
