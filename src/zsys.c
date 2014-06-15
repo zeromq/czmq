@@ -155,9 +155,8 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
     zsocket_set_ipv4only (handle, s_ipv6? 0: 1);
 #   endif
 #endif
-    //  Add socket to reference tracker so we can report leaks
-    //  TODO: let user disable this via environment variable; by default
-    //  it should be enabled to force correct destruction of sockets.
+    //  Add socket to reference tracker so we can report leaks; this is
+    //  done only when the caller passes a filename/line_nbr
     if (filename) {
         s_sockref_t *sockref = (s_sockref_t *) malloc (sizeof (s_sockref_t));
         sockref->handle = handle;
@@ -256,13 +255,9 @@ s_terminate_process (void)
     ZMUTEX_LOCK (s_mutex);
     s_sockref_t *sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
     while (sockref) {
-#if defined (__WINDOWS__)
-		zsys_error ("dangling socket created at %s:%u\n",
-                sockref->filename, sockref->line_nbr);
-#else
-        zsys_error ("dangling socket created at %s:%zd\n",
-                sockref->filename, sockref->line_nbr);
-#endif
+        assert (sockref->filename);
+		zsys_error ("dangling socket created at %s:%d",
+                sockref->filename, (int) sockref->line_nbr);
         zmq_close (sockref->handle);
         free (sockref);
         sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
@@ -270,7 +265,11 @@ s_terminate_process (void)
     zlist_destroy (&s_sockref_list);
     ZMUTEX_UNLOCK (s_mutex);
 
-    zmq_ctx_term (process_ctx);
+    if (s_open_sockets == 0)
+        zmq_ctx_term (process_ctx);
+    else
+        zsys_error ("dangling sockets: rebuild without ZSOCKS_NOCHECK");
+    
     ZMUTEX_DESTROY (s_mutex);
 
     //  Free dynamically allocated properties
@@ -288,24 +287,24 @@ s_terminate_process (void)
 //  create using zsys_socket().
 
 int
-zsys_close (void *handle)
+zsys_close (void *handle, const char *filename, size_t line_nbr)
 {
     ZMUTEX_LOCK (s_mutex);
     //  It's possible atexit() has already happened if we're running under
     //  a debugger that redirects the main thread exit.
-    if (s_sockref_list) {
+    if (filename && s_sockref_list) {
         s_sockref_t *sockref = (s_sockref_t *) zlist_first (s_sockref_list);
         while (sockref) {
             if (sockref->handle == handle) {
                 zlist_remove (s_sockref_list, sockref);
                 free (sockref);
-                s_open_sockets--;
-                zmq_close (handle);
                 break;
             }
             sockref = (s_sockref_t *) zlist_next (s_sockref_list);
         }
     }
+    s_open_sockets--;
+    zmq_close (handle);
     ZMUTEX_UNLOCK (s_mutex);
     return 0;
 }
@@ -1316,7 +1315,7 @@ zsys_test (bool verbose)
     rc = zmq_setsockopt (handle, ZMQ_CURVE_SERVER, &as_server, sizeof (int));
     if (rc == -1) {
         zsys_error ("libzmq was built without libsodium. Please rebuild libzmq and CZMQ.");
-        zsys_close (handle);
+        zsys_close (handle, __FILE__, __LINE__);
         exit (1);
     }
 #endif
@@ -1325,7 +1324,7 @@ zsys_test (bool verbose)
         printf ("I: host name is %s\n", hostname);
         zstr_free (&hostname);
     }
-    rc = zsys_close (handle);
+    rc = zsys_close (handle, __FILE__, __LINE__);
     assert (rc == 0);
 
     rc = zsys_file_delete ("nosuchfile");
