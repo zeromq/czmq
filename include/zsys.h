@@ -43,7 +43,7 @@ CZMQ_EXPORT void *
 //  create using zsys_socket().
 //  *** This is for CZMQ internal use only and may change arbitrarily ***
 CZMQ_EXPORT int
-    zsys_close (void *handle);
+    zsys_close (void *handle, const char *filename, size_t line_nbr);
     
 //  Set interrupt handler (NULL means external handler)
 CZMQ_EXPORT void
