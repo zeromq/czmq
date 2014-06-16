@@ -347,7 +347,7 @@ char *
 zsocket_curve_publickey (void *zocket)
 {
 #   if defined (ZMQ_CURVE_PUBLICKEY)
-    size_t option_len = 255;
+    size_t option_len = 41; // string key length (40) + 1 /0 character
     char *curve_publickey = (char *) zmalloc (option_len);
     zmq_getsockopt (zocket, ZMQ_CURVE_PUBLICKEY, curve_publickey, &option_len);
     return (char *) curve_publickey;
@@ -397,7 +397,7 @@ char *
 zsocket_curve_secretkey (void *zocket)
 {
 #   if defined (ZMQ_CURVE_SECRETKEY)
-    size_t option_len = 255;
+	size_t option_len = 41; // string key length (40) + 1 /0 character
     char *curve_secretkey = (char *) zmalloc (option_len);
     zmq_getsockopt (zocket, ZMQ_CURVE_SECRETKEY, curve_secretkey, &option_len);
     return (char *) curve_secretkey;
@@ -447,7 +447,7 @@ char *
 zsocket_curve_serverkey (void *zocket)
 {
 #   if defined (ZMQ_CURVE_SERVERKEY)
-    size_t option_len = 255;
+	size_t option_len = 41; // string key length (40) + 1 /0 character
     char *curve_serverkey = (char *) zmalloc (option_len);
     zmq_getsockopt (zocket, ZMQ_CURVE_SERVERKEY, curve_serverkey, &option_len);
     return (char *) curve_serverkey;
