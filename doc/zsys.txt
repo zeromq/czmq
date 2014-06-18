@@ -32,7 +32,7 @@ CZMQ_EXPORT void *
 //  create using zsys_socket().
 //  *** This is for CZMQ internal use only and may change arbitrarily ***
 CZMQ_EXPORT int
-    zsys_close (void *handle);
+    zsys_close (void *handle, const char *filename, size_t line_nbr);
     
 //  Set interrupt handler (NULL means external handler)
 CZMQ_EXPORT void
@@ -301,7 +301,7 @@ EXAMPLE
     rc = zmq_setsockopt (handle, ZMQ_CURVE_SERVER, &as_server, sizeof (int));
     if (rc == -1) {
         zsys_error ("libzmq was built without libsodium. Please rebuild libzmq and CZMQ.");
-        zsys_close (handle);
+        zsys_close (handle, __FILE__, __LINE__);
         exit (1);
     }
 #endif
@@ -310,7 +310,7 @@ EXAMPLE
         printf ("I: host name is %s\n", hostname);
         zstr_free (&hostname);
     }
-    rc = zsys_close (handle);
+    rc = zsys_close (handle, __FILE__, __LINE__);
     assert (rc == 0);
 
     rc = zsys_file_delete ("nosuchfile");

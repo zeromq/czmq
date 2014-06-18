@@ -365,7 +365,7 @@ zsock_curve_publickey (zsock_t *self)
 {
     assert(self);
 #   if defined (ZMQ_CURVE_PUBLICKEY)
-    size_t option_len = 255;
+    size_t option_len = 40 + 1;     //  Z85 key + terminator
     char *curve_publickey = (char *) zmalloc (option_len);
     zmq_getsockopt (zsock_resolve (self), ZMQ_CURVE_PUBLICKEY, curve_publickey, &option_len);
     return (char *) curve_publickey;
@@ -417,7 +417,7 @@ zsock_curve_secretkey (zsock_t *self)
 {
     assert(self);
 #   if defined (ZMQ_CURVE_SECRETKEY)
-    size_t option_len = 255;
+    size_t option_len = 40 + 1;     //  Z85 key + terminator
     char *curve_secretkey = (char *) zmalloc (option_len);
     zmq_getsockopt (zsock_resolve (self), ZMQ_CURVE_SECRETKEY, curve_secretkey, &option_len);
     return (char *) curve_secretkey;
@@ -469,7 +469,7 @@ zsock_curve_serverkey (zsock_t *self)
 {
     assert(self);
 #   if defined (ZMQ_CURVE_SERVERKEY)
-    size_t option_len = 255;
+    size_t option_len = 40 + 1;     //  Z85 key + terminator
     char *curve_serverkey = (char *) zmalloc (option_len);
     zmq_getsockopt (zsock_resolve (self), ZMQ_CURVE_SERVERKEY, curve_serverkey, &option_len);
     return (char *) curve_serverkey;
