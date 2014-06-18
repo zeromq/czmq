@@ -15,8 +15,10 @@ SYNOPSIS
 //  define ZSOCK_NOCHECK before compiling your code.
 #if defined (ZSOCK_NOCHECK)
 #   define zsock_new(t) zsock_new_((t), NULL, 0)
+#   define zsock_destroy(t) zsock_destroy_((t), NULL, 0)
 #else
 #   define zsock_new(t) zsock_new_((t), __FILE__, __LINE__)
+#   define zsock_destroy(t) zsock_destroy_((t), __FILE__, __LINE__)
 #endif
 
 CZMQ_EXPORT zsock_t *
@@ -25,7 +27,7 @@ CZMQ_EXPORT zsock_t *
 //  Destroy the socket. You must use this for any socket created via the
 //  zsock_new method.
 CZMQ_EXPORT void
-    zsock_destroy (zsock_t **p_self);
+    zsock_destroy_ (zsock_t **self_p, const char *filename, size_t line_nbr);
 
 //  Bind a socket to a formatted endpoint. If the port is specified as '*'
 //  and the endpoint starts with "tcp://", binds to an ephemeral TCP port in
