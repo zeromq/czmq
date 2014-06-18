@@ -1,0 +1,10 @@
+#  Run selftests and check memory
+gcc -g -o test_zgossip \
+    test_zgossip.c \
+    z*.c \
+    ${CFLAGS} ${LDFLAGS} \
+    -lzmq -lpthread -lsodium -luuid
+    
+rm -f core
+./test_zgossip
+test -f core && gdb test_zgossip core
