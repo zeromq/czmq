@@ -230,8 +230,12 @@ zsock_$(name) (zsock_t *self)
     int $(name);
     size_t option_len = sizeof (int);
     zmq_getsockopt (zsock_resolve (self), ZMQ_$(NAME), &$(name), &option_len);
-.           elsif type = "string" | type = "key"
+.           elsif type = "string"
     size_t option_len = 255;
+    char *$(name) = (char *) zmalloc (option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_$(NAME), $(name), &option_len);
+.           elsif type = "key"
+    size_t option_len = 40 + 1;     //  Z85 key + terminator
     char *$(name) = (char *) zmalloc (option_len);
     zmq_getsockopt (zsock_resolve (self), ZMQ_$(NAME), $(name), &option_len);
 .           endif
