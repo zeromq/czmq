@@ -234,6 +234,16 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zsys_set_logstream (FILE *stream);
     
+//  Sends log output to a PUB socket bound to the specified endpoint. To
+//  collect such log output, create a SUB socket, subscribe to the traffic
+//  you care about, and connect to the endpoint. Log traffic is sent as a
+//  single string frame, in the same format as when sent to stdout. The
+//  log system supports a single sender; multiple calls to this method will
+//  bind the same sender to multiple endpoints. To disable the sender, call
+//  this method with a null argument.
+CZMQ_EXPORT void
+    zsys_set_logsender (const char *endpoint);
+
 //  Enable or disable logging to the system facility (syslog on POSIX boxes,
 //  event log on Windows). By default this is disabled.
 CZMQ_EXPORT void
@@ -308,7 +318,7 @@ EXAMPLE
     if (verbose) {
         char *hostname = zsys_hostname ();
         printf ("I: host name is %s\n", hostname);
-        zstr_free (&hostname);
+        free (hostname);
     }
     rc = zsys_close (handle, __FILE__, __LINE__);
     assert (rc == 0);
@@ -350,16 +360,24 @@ EXAMPLE
 
     char *string = zsys_sprintf ("%s %02x", "Hello", 16);
     assert (streq (string, "Hello 10"));
-    zstr_free (&string);
+    free (string);
 
     char *str64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890,.";
     int num10 = 1234567890;
     string = zsys_sprintf ("%s%s%s%s%d", str64, str64, str64, str64, num10);
     assert (strlen (string) == (4 * 64 + 10));
-    zstr_free (&string);
+    free (string);
 
     //  Test logging system
     zsys_set_logident ("czmq_selftest");
+    zsys_set_logsender ("inproc://logging");
+    void *logger = zsys_socket (ZMQ_SUB, NULL, 0);
+    assert (logger);
+    rc = zsocket_connect (logger, "inproc://logging");
+    assert (rc == 0);
+    rc = zmq_setsockopt (logger, ZMQ_SUBSCRIBE, "", 0);
+    assert (rc == 0);
+        
     if (verbose) {
         zsys_error ("This is an %s message", "error");
         zsys_warning ("This is a %s message", "warning");
@@ -369,7 +387,14 @@ EXAMPLE
         zsys_set_logident ("hello, world");
         zsys_info ("This is a %s message", "info");
         zsys_debug ("This is a %s message", "debug");
+
+        //  Check that logsender functionality is working
+        char *received = zstr_recv (logger);
+        assert (received);
+        zstr_free (&received);
     }
+    zsys_close (logger, NULL, 0);
+
 ----
 
 SEE ALSO

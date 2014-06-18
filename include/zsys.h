@@ -245,6 +245,16 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zsys_set_logstream (FILE *stream);
     
+//  Sends log output to a PUB socket bound to the specified endpoint. To
+//  collect such log output, create a SUB socket, subscribe to the traffic
+//  you care about, and connect to the endpoint. Log traffic is sent as a
+//  single string frame, in the same format as when sent to stdout. The
+//  log system supports a single sender; multiple calls to this method will
+//  bind the same sender to multiple endpoints. To disable the sender, call
+//  this method with a null argument.
+CZMQ_EXPORT void
+    zsys_set_logsender (const char *endpoint);
+
 //  Enable or disable logging to the system facility (syslog on POSIX boxes,
 //  event log on Windows). By default this is disabled.
 CZMQ_EXPORT void
