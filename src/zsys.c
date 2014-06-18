@@ -72,6 +72,7 @@ static char *s_interface = NULL;    //  ZSYS_INTERFACE=
 static char *s_logident = NULL;     //  ZSYS_LOGIDENT=
 static FILE *s_logstream = NULL;    //  ZSYS_LOGSTREAM=stdout/stderr
 static bool s_logsystem = false;    //  ZSYS_LOGSYSTEM=true/false
+static void *s_logsender = NULL;    //  ZSYS_LOGSENDER=
 
 //  Track number of open sockets so we can zmq_ctx_term() safely
 static size_t s_open_sockets = 0;
@@ -192,22 +193,24 @@ s_initialize_process (void)
     if (getenv ("ZSYS_IPV6"))
         s_ipv6 = atoi (getenv ("ZSYS_IPV6"));
 
-    if (getenv ("ZSYS_INTERFACE")) {
-        s_interface = strdup (getenv ("ZSYS_INTERFACE"));
-        zsys_debug ("(zsys): set ZSYS_INTERFACE=%s", s_interface);
-    }
+    if (getenv ("ZSYS_INTERFACE"))
+        zsys_set_interface (getenv ("ZSYS_INTERFACE"));
+    
     if (getenv ("ZSYS_LOGIDENT"))
-        s_interface = strdup (getenv ("ZSYS_LOGIDENT"));
+        zsys_set_logident (getenv ("ZSYS_LOGIDENT"));
     
     if (getenv ("ZSYS_LOGSTREAM")) {
-        if (streq (getenv ("ZSYS_LOGIDENT"), "stdout"))
+        if (streq (getenv ("ZSYS_LOGSTREAM"), "stdout"))
             s_logstream = stdout;
         else
-        if (streq (getenv ("ZSYS_LOGIDENT"), "stderr"))
+        if (streq (getenv ("ZSYS_LOGSTREAM"), "stderr"))
             s_logstream = stderr;
     }
     else
         s_logstream = stdout;
+
+    if (getenv ("ZSYS_LOGSENDER"))
+        zsys_set_logsender (getenv ("ZSYS_LOGSENDER"));
     
     if (getenv ("ZSYS_LOGSYSTEM")) {
         if (streq (getenv ("ZSYS_LOGSYSTEM"), "true"))
@@ -216,8 +219,6 @@ s_initialize_process (void)
         if (streq (getenv ("ZSYS_LOGSYSTEM"), "false"))
             s_logsystem = false;
     }
-    else
-        s_logsystem = false;
 
     //  This call keeps compatibility back to ZMQ v2
     process_ctx = zmq_init ((int) s_io_threads);
@@ -265,10 +266,15 @@ s_terminate_process (void)
     zlist_destroy (&s_sockref_list);
     ZMUTEX_UNLOCK (s_mutex);
 
+    //  Close logsender socket if opened (don't do this in critical section)
+    if (s_logsender) {
+        zsys_close (s_logsender, NULL, 0);
+        s_logsender = NULL;
+    }
     if (s_open_sockets == 0)
         zmq_ctx_term (process_ctx);
     else
-        zsys_error ("dangling sockets: rebuild without ZSOCKS_NOCHECK");
+        zsys_error ("dangling sockets: cannot terminate ZMQ safely");
     
     ZMUTEX_DESTROY (s_mutex);
 
@@ -1154,6 +1160,36 @@ zsys_set_logstream (FILE *stream)
 
 
 //  --------------------------------------------------------------------------
+//  Sends log output to a PUB socket bound to the specified endpoint. To
+//  collect such log output, create a SUB socket, subscribe to the traffic
+//  you care about, and connect to the endpoint. Log traffic is sent as a
+//  single string frame, in the same format as when sent to stdout. The
+//  log system supports a single sender; multiple calls to this method will
+//  bind the same sender to multiple endpoints. To disable the sender, call
+//  this method with a null argument.
+
+void
+zsys_set_logsender (const char *endpoint)
+{
+    if (endpoint) {
+        //  Create log sender if needed
+        if (!s_logsender) {
+            s_logsender = zsys_socket (ZMQ_PUB, NULL, 0);
+            assert (s_logsender);
+        }
+        //  Bind to specified endpoint
+        int rc = zmq_bind (s_logsender, endpoint);
+        assert (rc == 0);
+    }
+    else
+    if (s_logsender) {
+        zsys_close (s_logsender, NULL, 0);
+        s_logsender = NULL;
+    }
+}
+
+
+//  --------------------------------------------------------------------------
 //  Enable or disable logging to the system facility (syslog on POSIX boxes,
 //  event log on Windows). By default this is disabled.
 
@@ -1173,18 +1209,23 @@ zsys_set_logsystem (bool logsystem)
 static void
 s_log (char loglevel, char *string)
 {
-    if (s_logstream) {
+    if (s_logstream || s_logsender) {
         time_t curtime = time (NULL);
         struct tm *loctime = localtime (&curtime);
-        char formatted [20];
-        strftime (formatted, 20, "%y-%m-%d %H:%M:%S", loctime);
+        char date [20];
+        strftime (date, 20, "%y-%m-%d %H:%M:%S", loctime);
+        char log_text [1024];
         if (s_logident)
-            fprintf (s_logstream, "%c: (%s) %s %s\n",
-                        loglevel, s_logident, formatted, string);
+            snprintf (log_text, 1024, "%c: (%s) %s %s", loglevel, s_logident, date, string);
         else
-            fprintf (s_logstream, "%c: %s %s\n", loglevel, formatted, string);
-
-        fflush (s_logstream);
+            snprintf (log_text, 1024, "%c: %s %s", loglevel, date, string);
+        
+        if (s_logstream) {
+            fprintf (s_logstream, "%s\n", log_text);
+            fflush (s_logstream);
+        }
+        if (s_logsender)
+            zstr_send (s_logsender, log_text);
     }
 #if defined (__UNIX__)
     if (s_logsystem) {
@@ -1322,7 +1363,7 @@ zsys_test (bool verbose)
     if (verbose) {
         char *hostname = zsys_hostname ();
         printf ("I: host name is %s\n", hostname);
-        zstr_free (&hostname);
+        free (hostname);
     }
     rc = zsys_close (handle, __FILE__, __LINE__);
     assert (rc == 0);
@@ -1364,16 +1405,24 @@ zsys_test (bool verbose)
 
     char *string = zsys_sprintf ("%s %02x", "Hello", 16);
     assert (streq (string, "Hello 10"));
-    zstr_free (&string);
+    free (string);
 
     char *str64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890,.";
     int num10 = 1234567890;
     string = zsys_sprintf ("%s%s%s%s%d", str64, str64, str64, str64, num10);
     assert (strlen (string) == (4 * 64 + 10));
-    zstr_free (&string);
+    free (string);
 
     //  Test logging system
     zsys_set_logident ("czmq_selftest");
+    zsys_set_logsender ("inproc://logging");
+    void *logger = zsys_socket (ZMQ_SUB, NULL, 0);
+    assert (logger);
+    rc = zsocket_connect (logger, "inproc://logging");
+    assert (rc == 0);
+    rc = zmq_setsockopt (logger, ZMQ_SUBSCRIBE, "", 0);
+    assert (rc == 0);
+        
     if (verbose) {
         zsys_error ("This is an %s message", "error");
         zsys_warning ("This is a %s message", "warning");
@@ -1383,7 +1432,14 @@ zsys_test (bool verbose)
         zsys_set_logident ("hello, world");
         zsys_info ("This is a %s message", "info");
         zsys_debug ("This is a %s message", "debug");
+
+        //  Check that logsender functionality is working
+        char *received = zstr_recv (logger);
+        assert (received);
+        zstr_free (&received);
     }
+    zsys_close (logger, NULL, 0);
+
     //  @end
 
     printf ("OK\n");
