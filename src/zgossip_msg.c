@@ -30,7 +30,7 @@
 @end
 */
 
-#include <czmq.h>
+#include "../include/czmq.h"
 #include "./zgossip_msg.h"
 
 //  Structure of our class
@@ -640,11 +640,11 @@ zgossip_msg_print (zgossip_msg_t *self)
     assert (self);
     switch (self->id) {
         case ZGOSSIP_MSG_HELLO:
-            puts ("HELLO:");
+            zsys_debug ("ZGOSSIP_MSG_HELLO:");
             break;
             
         case ZGOSSIP_MSG_PUBLISH:
-            puts ("PUBLISH:");
+            zsys_debug ("ZGOSSIP_MSG_PUBLISH:");
             if (self->key)
                 zsys_debug ("    key='%s'", self->key);
             else
@@ -656,15 +656,15 @@ zgossip_msg_print (zgossip_msg_t *self)
             break;
             
         case ZGOSSIP_MSG_PING:
-            puts ("PING:");
+            zsys_debug ("ZGOSSIP_MSG_PING:");
             break;
             
         case ZGOSSIP_MSG_PONG:
-            puts ("PONG:");
+            zsys_debug ("ZGOSSIP_MSG_PONG:");
             break;
             
         case ZGOSSIP_MSG_INVALID:
-            puts ("INVALID:");
+            zsys_debug ("ZGOSSIP_MSG_INVALID:");
             break;
             
     }
