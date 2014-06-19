@@ -186,6 +186,59 @@ zsock_set_conflate (zsock_t *self, int conflate)
 
 
 //  --------------------------------------------------------------------------
+//  Set socket ZMQ_ZAP_DOMAIN value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsock_set_zap_domain (zsock_t *self, const char * zap_domain)
+{
+    assert(self);
+#   if defined (ZMQ_ZAP_DOMAIN)
+    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_ZAP_DOMAIN, zap_domain, strlen (zap_domain));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_ZAP_DOMAIN value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+char * 
+zsock_zap_domain (zsock_t *self)
+{
+    assert(self);
+#   if defined (ZMQ_ZAP_DOMAIN)
+    size_t option_len = 255;
+    char *zap_domain = (char *) zmalloc (option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_ZAP_DOMAIN, zap_domain, &option_len);
+    return (char *) zap_domain;
+#   else
+    return NULL;
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_MECHANISM value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int 
+zsock_mechanism (zsock_t *self)
+{
+    assert(self);
+#   if defined (ZMQ_MECHANISM)
+    int mechanism;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_MECHANISM, &mechanism, &option_len);
+    return mechanism;
+#   else
+    return 0;
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
 //  Set socket ZMQ_PLAIN_SERVER value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
@@ -296,10 +349,8 @@ zsock_set_curve_server (zsock_t *self, int curve_server)
 {
     assert(self);
 #   if defined (ZMQ_CURVE_SERVER)
-#     if defined (HAVE_LIBSODIUM)
     int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_CURVE_SERVER, &curve_server, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
-#     endif
 #   endif
 }
 
@@ -332,10 +383,8 @@ zsock_set_curve_publickey (zsock_t *self, const char * curve_publickey)
 {
     assert(self);
 #   if defined (ZMQ_CURVE_PUBLICKEY)
-#     if defined (HAVE_LIBSODIUM)
     int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_CURVE_PUBLICKEY, curve_publickey, strlen (curve_publickey));
     assert (rc == 0 || zmq_errno () == ETERM);
-#     endif
 #   endif
 }
 
@@ -348,10 +397,8 @@ void
 zsock_set_curve_publickey_bin (zsock_t *self, const byte *curve_publickey)
 {
 #   if defined (ZMQ_CURVE_PUBLICKEY)
-#     if defined (HAVE_LIBSODIUM)
     int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_CURVE_PUBLICKEY, curve_publickey, 32);
     assert (rc == 0 || zmq_errno () == ETERM);
-#     endif
 #   endif
 }
 
@@ -384,10 +431,8 @@ zsock_set_curve_secretkey (zsock_t *self, const char * curve_secretkey)
 {
     assert(self);
 #   if defined (ZMQ_CURVE_SECRETKEY)
-#     if defined (HAVE_LIBSODIUM)
     int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_CURVE_SECRETKEY, curve_secretkey, strlen (curve_secretkey));
     assert (rc == 0 || zmq_errno () == ETERM);
-#     endif
 #   endif
 }
 
@@ -400,10 +445,8 @@ void
 zsock_set_curve_secretkey_bin (zsock_t *self, const byte *curve_secretkey)
 {
 #   if defined (ZMQ_CURVE_SECRETKEY)
-#     if defined (HAVE_LIBSODIUM)
     int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_CURVE_SECRETKEY, curve_secretkey, 32);
     assert (rc == 0 || zmq_errno () == ETERM);
-#     endif
 #   endif
 }
 
@@ -436,10 +479,8 @@ zsock_set_curve_serverkey (zsock_t *self, const char * curve_serverkey)
 {
     assert(self);
 #   if defined (ZMQ_CURVE_SERVERKEY)
-#     if defined (HAVE_LIBSODIUM)
     int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_CURVE_SERVERKEY, curve_serverkey, strlen (curve_serverkey));
     assert (rc == 0 || zmq_errno () == ETERM);
-#     endif
 #   endif
 }
 
@@ -452,10 +493,8 @@ void
 zsock_set_curve_serverkey_bin (zsock_t *self, const byte *curve_serverkey)
 {
 #   if defined (ZMQ_CURVE_SERVERKEY)
-#     if defined (HAVE_LIBSODIUM)
     int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_CURVE_SERVERKEY, curve_serverkey, 32);
     assert (rc == 0 || zmq_errno () == ETERM);
-#     endif
 #   endif
 }
 
@@ -475,59 +514,6 @@ zsock_curve_serverkey (zsock_t *self)
     return (char *) curve_serverkey;
 #   else
     return NULL;
-#   endif
-}
-
-
-//  --------------------------------------------------------------------------
-//  Set socket ZMQ_ZAP_DOMAIN value
-//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
-
-void
-zsock_set_zap_domain (zsock_t *self, const char * zap_domain)
-{
-    assert(self);
-#   if defined (ZMQ_ZAP_DOMAIN)
-    int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_ZAP_DOMAIN, zap_domain, strlen (zap_domain));
-    assert (rc == 0 || zmq_errno () == ETERM);
-#   endif
-}
-
-
-//  --------------------------------------------------------------------------
-//  Return socket ZMQ_ZAP_DOMAIN value
-//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
-
-char * 
-zsock_zap_domain (zsock_t *self)
-{
-    assert(self);
-#   if defined (ZMQ_ZAP_DOMAIN)
-    size_t option_len = 255;
-    char *zap_domain = (char *) zmalloc (option_len);
-    zmq_getsockopt (zsock_resolve (self), ZMQ_ZAP_DOMAIN, zap_domain, &option_len);
-    return (char *) zap_domain;
-#   else
-    return NULL;
-#   endif
-}
-
-
-//  --------------------------------------------------------------------------
-//  Return socket ZMQ_MECHANISM value
-//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
-
-int 
-zsock_mechanism (zsock_t *self)
-{
-    assert(self);
-#   if defined (ZMQ_MECHANISM)
-    int mechanism;
-    size_t option_len = sizeof (int);
-    zmq_getsockopt (zsock_resolve (self), ZMQ_MECHANISM, &mechanism, &option_len);
-    return mechanism;
-#   else
-    return 0;
 #   endif
 }
 
@@ -3221,6 +3207,21 @@ zsock_option_test (bool verbose)
     zsock_set_conflate (self, 1);
     zsock_destroy (&self);
 #     endif
+#     if defined (ZMQ_ZAP_DOMAIN)
+    self = zsock_new (ZMQ_SUB);
+    assert (self);
+    zsock_set_zap_domain (self, "test");
+    char *zap_domain = zsock_zap_domain (self);
+    assert (zap_domain);
+    free (zap_domain);
+    zsock_destroy (&self);
+#     endif
+#     if defined (ZMQ_MECHANISM)
+    self = zsock_new (ZMQ_SUB);
+    assert (self);
+    zsock_mechanism (self);
+    zsock_destroy (&self);
+#     endif
 #     if defined (ZMQ_PLAIN_SERVER)
     self = zsock_new (ZMQ_PUB);
     assert (self);
@@ -3245,64 +3246,6 @@ zsock_option_test (bool verbose)
     char *plain_password = zsock_plain_password (self);
     assert (plain_password);
     free (plain_password);
-    zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_CURVE_SERVER)
-#       if defined (HAVE_LIBSODIUM)
-    self = zsock_new (ZMQ_PUB);
-    assert (self);
-    zsock_set_curve_server (self, 1);
-    assert (zsock_curve_server (self) == 1);
-    zsock_curve_server (self);
-    zsock_destroy (&self);
-#       endif
-#     endif
-#     if defined (ZMQ_CURVE_PUBLICKEY)
-#       if defined (HAVE_LIBSODIUM)
-    self = zsock_new (ZMQ_PUB);
-    assert (self);
-    zsock_set_curve_publickey (self, "Yne@$w-vo<fVvi]a<NY6T1ed:M$fCG*[IaLV{hID");
-    char *curve_publickey = zsock_curve_publickey (self);
-    assert (curve_publickey);
-    free (curve_publickey);
-    zsock_destroy (&self);
-#       endif
-#     endif
-#     if defined (ZMQ_CURVE_SECRETKEY)
-#       if defined (HAVE_LIBSODIUM)
-    self = zsock_new (ZMQ_PUB);
-    assert (self);
-    zsock_set_curve_secretkey (self, "D:)Q[IlAW!ahhC2ac:9*A}h:p?([4%wOTJ%JR%cs");
-    char *curve_secretkey = zsock_curve_secretkey (self);
-    assert (curve_secretkey);
-    free (curve_secretkey);
-    zsock_destroy (&self);
-#       endif
-#     endif
-#     if defined (ZMQ_CURVE_SERVERKEY)
-#       if defined (HAVE_LIBSODIUM)
-    self = zsock_new (ZMQ_SUB);
-    assert (self);
-    zsock_set_curve_serverkey (self, "rq:rM>}U?@Lns47E1%kR.o@n%FcmmsL/@{H8]yf7");
-    char *curve_serverkey = zsock_curve_serverkey (self);
-    assert (curve_serverkey);
-    free (curve_serverkey);
-    zsock_destroy (&self);
-#       endif
-#     endif
-#     if defined (ZMQ_ZAP_DOMAIN)
-    self = zsock_new (ZMQ_SUB);
-    assert (self);
-    zsock_set_zap_domain (self, "test");
-    char *zap_domain = zsock_zap_domain (self);
-    assert (zap_domain);
-    free (zap_domain);
-    zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_MECHANISM)
-    self = zsock_new (ZMQ_SUB);
-    assert (self);
-    zsock_mechanism (self);
     zsock_destroy (&self);
 #     endif
 #     if defined (ZMQ_IPV6)

@@ -53,15 +53,23 @@ struct _zcert_t {
 zcert_t *
 zcert_new (void)
 {
-#if defined (HAVE_LIBSODIUM)
-    byte public_key [32] = { 0 };
-    byte secret_key [32] = { 0 };
-    int rc = crypto_box_keypair (public_key, secret_key);
+    zcert_t *self = (zcert_t *) zmalloc (sizeof (zcert_t));
+    assert (self);
+
+    //  Initialize metadata, even if keys aren't working
+    self->metadata = zhash_new ();
+    zhash_autofree (self->metadata);
+    
+#if (ZMQ_VERSION_MAJOR == 4)
+    int rc = zmq_curve_keypair (self->public_txt, self->secret_txt);
     assert (rc == 0);
-    return zcert_new_from (public_key, secret_key);
+    zmq_z85_decode (self->public_key, self->public_txt);
+    zmq_z85_decode (self->secret_key, self->secret_txt);
 #else
-    return NULL;
+    strcpy (self->public_txt, "0000000000000000000000000000000000000000");
+    strcpy (self->secret_txt, "0000000000000000000000000000000000000000");
 #endif
+    return self;
 }
 
 
@@ -71,26 +79,24 @@ zcert_new (void)
 zcert_t *
 zcert_new_from (byte *public_key, byte *secret_key)
 {
-#if (ZMQ_VERSION_MAJOR == 4)
-    zcert_t *self =
-        (zcert_t *) zmalloc (sizeof (zcert_t));
+    zcert_t *self = (zcert_t *) zmalloc (sizeof (zcert_t));
     assert (self);
-
     assert (public_key);
-    memcpy (self->public_key, public_key, 32);
-    zmq_z85_encode (self->public_txt, self->public_key, 32);
-
     assert (secret_key);
-    memcpy (self->secret_key, secret_key, 32);
-    zmq_z85_encode (self->secret_txt, self->secret_key, 32);
 
     self->metadata = zhash_new ();
     zhash_autofree (self->metadata);
-
-    return self;
+    memcpy (self->public_key, public_key, 32);
+    memcpy (self->secret_key, secret_key, 32);
+    
+#if (ZMQ_VERSION_MAJOR == 4)
+    zmq_z85_encode (self->public_txt, self->public_key, 32);
+    zmq_z85_encode (self->secret_txt, self->secret_key, 32);
 #else
-    return NULL;
+    strcpy (self->public_txt, "0000000000000000000000000000000000000000");
+    strcpy (self->secret_txt, "0000000000000000000000000000000000000000");
 #endif
+    return self;
 }
 
 
@@ -200,7 +206,6 @@ zcert_meta_keys (zcert_t *self)
 zcert_t *
 zcert_load (const char *filename)
 {
-#if (ZMQ_VERSION_MAJOR == 4)
     assert (filename);
 
     //  Try first to load secret certificate, which has both keys
@@ -214,14 +219,15 @@ zcert_load (const char *filename)
     zcert_t *self = NULL;
     if (root) {
         char *public_text = zconfig_resolve (root, "/curve/public-key", NULL);
-        char *secret_text = zconfig_resolve (root, "/curve/secret-key", NULL);
         if (public_text && strlen (public_text) == 40) {
             byte public_key [32] = { 0 };
             byte secret_key [32] = { 0 };
+#if (ZMQ_VERSION_MAJOR == 4)
+            char *secret_text = zconfig_resolve (root, "/curve/secret-key", NULL);
             zmq_z85_decode (public_key, public_text);
             if (secret_text && strlen (secret_text) == 40)
                 zmq_z85_decode (secret_key, secret_text);
-
+#endif
             //  Load metadata into certificate
             self = zcert_new_from (public_key, secret_key);
             zconfig_t *metadata = zconfig_locate (root, "/metadata");
@@ -234,9 +240,6 @@ zcert_load (const char *filename)
     }
     zconfig_destroy (&root);
     return self;
-#else   
-    return NULL;
-#endif
 }
 
 
@@ -338,8 +341,10 @@ zcert_apply (zcert_t *self, void *zocket)
 {
     assert (self);
 #if (ZMQ_VERSION_MAJOR == 4)
-    zsocket_set_curve_secretkey_bin (zocket, self->secret_key);
-    zsocket_set_curve_publickey_bin (zocket, self->public_key);
+    if (zsys_has_curve ()) {
+        zsocket_set_curve_secretkey_bin (zocket, self->secret_key);
+        zsocket_set_curve_publickey_bin (zocket, self->public_key);
+    }
 #endif
 }
 
@@ -408,7 +413,6 @@ void
 zcert_test (bool verbose)
 {
     printf (" * zcert: ");
-#if (ZMQ_VERSION_MAJOR == 4)
     //  @selftest
     //  Create temporary directory for test files
 #   define TESTDIR ".test_zcert"
@@ -416,7 +420,6 @@ zcert_test (bool verbose)
     
     //  Create a simple certificate with metadata
     zcert_t *cert = zcert_new ();
-#   if defined (HAVE_LIBSODIUM)
     zcert_set_meta (cert, "email", "ph@imatix.com");
     zcert_set_meta (cert, "name", "Pieter Hintjens");
     zcert_set_meta (cert, "organization", "iMatix Corporation");
@@ -446,22 +449,20 @@ zcert_test (bool verbose)
     int rc = zsys_file_delete (TESTDIR "/mycert.txt_secret");
     assert (rc == 0);
     shadow = zcert_load (TESTDIR "/mycert.txt");
+    
     //  32-byte null key encodes as 40 '0' characters
     assert (streq (zcert_secret_txt (shadow),
-        "0000000000000000000000000000000000000000"));
+                   "0000000000000000000000000000000000000000"));
+    
     zcert_destroy (&shadow);
     zcert_destroy (&cert);
-#   else
-    //  Libsodium isn't installed; should have returned NULL
-    assert (cert == NULL);
-#   endif
     
     //  Delete all test files
     zdir_t *dir = zdir_new (TESTDIR, NULL);
     zdir_remove (dir, true);
     zdir_destroy (&dir);
     //  @end
-#endif
+    
     printf ("OK\n");
 }
 
