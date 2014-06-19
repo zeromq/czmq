@@ -127,9 +127,6 @@ zsock_set_$(name) (zsock_t *self, $(ctype_const) $(name))
 .       if style = "macro"
 #   if defined (ZMQ_$(NAME))
 .       endif
-.       if defined (.ifdef)
-#     if defined ($(ifdef:))
-.       endif
 .           if count (restrict)
 .               for restrict
 .                   if first()
@@ -165,9 +162,6 @@ zsock_set_$(name) (zsock_t *self, $(ctype_const) $(name))
     int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_$(NAME), $(name), strlen ($(name)));
 .           endif
     assert (rc == 0 || zmq_errno () == ETERM);
-.       if defined (.ifdef)
-#     endif
-.       endif
 .       if style = "macro"
 #   endif
 .       endif
@@ -186,14 +180,8 @@ zsock_set_$(name)_bin (zsock_t *self, const byte *$(name))
 .       if style = "macro"
 #   if defined (ZMQ_$(NAME))
 .       endif
-.       if defined (.ifdef)
-#     if defined ($(ifdef:))
-.       endif
     int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_$(NAME), $(name), 32);
     assert (rc == 0 || zmq_errno () == ETERM);
-.       if defined (.ifdef)
-#     endif
-.       endif
 .       if style = "macro"
 #   endif
 .       endif
@@ -281,15 +269,12 @@ zsock_option_test (bool verbose)
     zsock_t *self;
 .for version
 #if (ZMQ_VERSION_MAJOR == $(major))
-.   for option
+.   for option where defined (test)
 .       if defined (.minor)
 #   if (ZMQ_VERSION_MINOR == $(minor))
 .       endif
 .       if style = "macro"
 #     if defined (ZMQ_$(NAME))
-.       endif
-.       if defined (.ifdef)
-#       if defined ($(ifdef:))
 .       endif
     self = zsock_new (ZMQ_$(TEST));
     assert (self);
@@ -313,9 +298,6 @@ zsock_option_test (bool verbose)
 .           endif
 .       endif
     zsock_destroy (&self);
-.       if defined (.ifdef)
-#       endif
-.       endif
 .       if style = "macro"
 #     endif
 .       endif

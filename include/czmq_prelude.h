@@ -500,14 +500,6 @@ typedef int SOCKET;
 #   endif
 #endif
 
-#if defined (HAVE_LIBSODIUM)
-#   include <sodium.h>
-#   if crypto_box_PUBLICKEYBYTES != 32 \
-    || crypto_box_SECRETKEYBYTES != 32
-#       error "libsodium not built correctly"
-#   endif
-#endif
-
 #if defined (__WINDOWS__) && !defined (HAVE_LIBUUID)
 #   define HAVE_LIBUUID 1
 #endif

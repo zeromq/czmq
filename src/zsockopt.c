@@ -178,6 +178,56 @@ zsocket_set_conflate (void *zocket, int conflate)
 
 
 //  --------------------------------------------------------------------------
+//  Set socket ZMQ_ZAP_DOMAIN value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsocket_set_zap_domain (void *zocket, const char * zap_domain)
+{
+#   if defined (ZMQ_ZAP_DOMAIN)
+    int rc = zmq_setsockopt (zocket, ZMQ_ZAP_DOMAIN, zap_domain, strlen (zap_domain));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_ZAP_DOMAIN value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+char * 
+zsocket_zap_domain (void *zocket)
+{
+#   if defined (ZMQ_ZAP_DOMAIN)
+    size_t option_len = 255;
+    char *zap_domain = (char *) zmalloc (option_len);
+    zmq_getsockopt (zocket, ZMQ_ZAP_DOMAIN, zap_domain, &option_len);
+    return (char *) zap_domain;
+#   else
+    return NULL;
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_MECHANISM value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int 
+zsocket_mechanism (void *zocket)
+{
+#   if defined (ZMQ_MECHANISM)
+    int mechanism;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zocket, ZMQ_MECHANISM, &mechanism, &option_len);
+    return mechanism;
+#   else
+    return 0;
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
 //  Set socket ZMQ_PLAIN_SERVER value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
@@ -281,10 +331,8 @@ void
 zsocket_set_curve_server (void *zocket, int curve_server)
 {
 #   if defined (ZMQ_CURVE_SERVER)
-#     if defined (HAVE_LIBSODIUM)
     int rc = zmq_setsockopt (zocket, ZMQ_CURVE_SERVER, &curve_server, sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
-#     endif
 #   endif
 }
 
@@ -315,10 +363,8 @@ void
 zsocket_set_curve_publickey (void *zocket, const char * curve_publickey)
 {
 #   if defined (ZMQ_CURVE_PUBLICKEY)
-#     if defined (HAVE_LIBSODIUM)
     int rc = zmq_setsockopt (zocket, ZMQ_CURVE_PUBLICKEY, curve_publickey, strlen (curve_publickey));
     assert (rc == 0 || zmq_errno () == ETERM);
-#     endif
 #   endif
 }
 
@@ -331,10 +377,8 @@ void
 zsocket_set_curve_publickey_bin (void *zocket, const byte *curve_publickey)
 {
 #   if defined (ZMQ_CURVE_PUBLICKEY)
-#     if defined (HAVE_LIBSODIUM)
     int rc = zmq_setsockopt (zocket, ZMQ_CURVE_PUBLICKEY, curve_publickey, 32);
     assert (rc == 0 || zmq_errno () == ETERM);
-#     endif
 #   endif
 }
 
@@ -365,10 +409,8 @@ void
 zsocket_set_curve_secretkey (void *zocket, const char * curve_secretkey)
 {
 #   if defined (ZMQ_CURVE_SECRETKEY)
-#     if defined (HAVE_LIBSODIUM)
     int rc = zmq_setsockopt (zocket, ZMQ_CURVE_SECRETKEY, curve_secretkey, strlen (curve_secretkey));
     assert (rc == 0 || zmq_errno () == ETERM);
-#     endif
 #   endif
 }
 
@@ -381,10 +423,8 @@ void
 zsocket_set_curve_secretkey_bin (void *zocket, const byte *curve_secretkey)
 {
 #   if defined (ZMQ_CURVE_SECRETKEY)
-#     if defined (HAVE_LIBSODIUM)
     int rc = zmq_setsockopt (zocket, ZMQ_CURVE_SECRETKEY, curve_secretkey, 32);
     assert (rc == 0 || zmq_errno () == ETERM);
-#     endif
 #   endif
 }
 
@@ -415,10 +455,8 @@ void
 zsocket_set_curve_serverkey (void *zocket, const char * curve_serverkey)
 {
 #   if defined (ZMQ_CURVE_SERVERKEY)
-#     if defined (HAVE_LIBSODIUM)
     int rc = zmq_setsockopt (zocket, ZMQ_CURVE_SERVERKEY, curve_serverkey, strlen (curve_serverkey));
     assert (rc == 0 || zmq_errno () == ETERM);
-#     endif
 #   endif
 }
 
@@ -431,10 +469,8 @@ void
 zsocket_set_curve_serverkey_bin (void *zocket, const byte *curve_serverkey)
 {
 #   if defined (ZMQ_CURVE_SERVERKEY)
-#     if defined (HAVE_LIBSODIUM)
     int rc = zmq_setsockopt (zocket, ZMQ_CURVE_SERVERKEY, curve_serverkey, 32);
     assert (rc == 0 || zmq_errno () == ETERM);
-#     endif
 #   endif
 }
 
@@ -453,56 +489,6 @@ zsocket_curve_serverkey (void *zocket)
     return (char *) curve_serverkey;
 #   else
     return NULL;
-#   endif
-}
-
-
-//  --------------------------------------------------------------------------
-//  Set socket ZMQ_ZAP_DOMAIN value
-//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
-
-void
-zsocket_set_zap_domain (void *zocket, const char * zap_domain)
-{
-#   if defined (ZMQ_ZAP_DOMAIN)
-    int rc = zmq_setsockopt (zocket, ZMQ_ZAP_DOMAIN, zap_domain, strlen (zap_domain));
-    assert (rc == 0 || zmq_errno () == ETERM);
-#   endif
-}
-
-
-//  --------------------------------------------------------------------------
-//  Return socket ZMQ_ZAP_DOMAIN value
-//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
-
-char * 
-zsocket_zap_domain (void *zocket)
-{
-#   if defined (ZMQ_ZAP_DOMAIN)
-    size_t option_len = 255;
-    char *zap_domain = (char *) zmalloc (option_len);
-    zmq_getsockopt (zocket, ZMQ_ZAP_DOMAIN, zap_domain, &option_len);
-    return (char *) zap_domain;
-#   else
-    return NULL;
-#   endif
-}
-
-
-//  --------------------------------------------------------------------------
-//  Return socket ZMQ_MECHANISM value
-//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
-
-int 
-zsocket_mechanism (void *zocket)
-{
-#   if defined (ZMQ_MECHANISM)
-    int mechanism;
-    size_t option_len = sizeof (int);
-    zmq_getsockopt (zocket, ZMQ_MECHANISM, &mechanism, &option_len);
-    return mechanism;
-#   else
-    return 0;
 #   endif
 }
 
@@ -3048,6 +3034,21 @@ zsockopt_test (bool verbose)
     zsocket_set_conflate (zocket, 1);
     zsocket_destroy (ctx, zocket);
 #     endif
+#     if defined (ZMQ_ZAP_DOMAIN)
+    zocket = zsocket_new (ctx, ZMQ_SUB);
+    assert (zocket);
+    zsocket_set_zap_domain (zocket, "test");
+    char *zap_domain = zsocket_zap_domain (zocket);
+    assert (zap_domain);
+    free (zap_domain);
+    zsocket_destroy (ctx, zocket);
+#     endif
+#     if defined (ZMQ_MECHANISM)
+    zocket = zsocket_new (ctx, ZMQ_SUB);
+    assert (zocket);
+    zsocket_mechanism (zocket);
+    zsocket_destroy (ctx, zocket);
+#     endif
 #     if defined (ZMQ_PLAIN_SERVER)
     zocket = zsocket_new (ctx, ZMQ_PUB);
     assert (zocket);
@@ -3072,64 +3073,6 @@ zsockopt_test (bool verbose)
     char *plain_password = zsocket_plain_password (zocket);
     assert (plain_password);
     free (plain_password);
-    zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_CURVE_SERVER)
-#       if defined (HAVE_LIBSODIUM)
-    zocket = zsocket_new (ctx, ZMQ_PUB);
-    assert (zocket);
-    zsocket_set_curve_server (zocket, 1);
-    assert (zsocket_curve_server (zocket) == 1);
-    zsocket_curve_server (zocket);
-    zsocket_destroy (ctx, zocket);
-#       endif
-#     endif
-#     if defined (ZMQ_CURVE_PUBLICKEY)
-#       if defined (HAVE_LIBSODIUM)
-    zocket = zsocket_new (ctx, ZMQ_PUB);
-    assert (zocket);
-    zsocket_set_curve_publickey (zocket, "Yne@$w-vo<fVvi]a<NY6T1ed:M$fCG*[IaLV{hID");
-    char *curve_publickey = zsocket_curve_publickey (zocket);
-    assert (curve_publickey);
-    free (curve_publickey);
-    zsocket_destroy (ctx, zocket);
-#       endif
-#     endif
-#     if defined (ZMQ_CURVE_SECRETKEY)
-#       if defined (HAVE_LIBSODIUM)
-    zocket = zsocket_new (ctx, ZMQ_PUB);
-    assert (zocket);
-    zsocket_set_curve_secretkey (zocket, "D:)Q[IlAW!ahhC2ac:9*A}h:p?([4%wOTJ%JR%cs");
-    char *curve_secretkey = zsocket_curve_secretkey (zocket);
-    assert (curve_secretkey);
-    free (curve_secretkey);
-    zsocket_destroy (ctx, zocket);
-#       endif
-#     endif
-#     if defined (ZMQ_CURVE_SERVERKEY)
-#       if defined (HAVE_LIBSODIUM)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    assert (zocket);
-    zsocket_set_curve_serverkey (zocket, "rq:rM>}U?@Lns47E1%kR.o@n%FcmmsL/@{H8]yf7");
-    char *curve_serverkey = zsocket_curve_serverkey (zocket);
-    assert (curve_serverkey);
-    free (curve_serverkey);
-    zsocket_destroy (ctx, zocket);
-#       endif
-#     endif
-#     if defined (ZMQ_ZAP_DOMAIN)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    assert (zocket);
-    zsocket_set_zap_domain (zocket, "test");
-    char *zap_domain = zsocket_zap_domain (zocket);
-    assert (zap_domain);
-    free (zap_domain);
-    zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_MECHANISM)
-    zocket = zsocket_new (ctx, ZMQ_SUB);
-    assert (zocket);
-    zsocket_mechanism (zocket);
     zsocket_destroy (ctx, zocket);
 #     endif
 #     if defined (ZMQ_IPV6)

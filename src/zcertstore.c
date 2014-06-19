@@ -221,7 +221,6 @@ void
 zcertstore_test (bool verbose)
 {
     printf (" * zcertstore: ");
-#if (ZMQ_VERSION_MAJOR == 4)
     //  @selftest
     //  Create temporary directory for test files
 #   define TESTDIR ".test_zcertstore"
@@ -230,7 +229,6 @@ zcertstore_test (bool verbose)
     //  Load certificate store from disk; it will be empty
     zcertstore_t *certstore = zcertstore_new (TESTDIR);
     
-#   if defined (HAVE_LIBSODIUM)
     //  Create a single new certificate and save to disk
     zcert_t *cert = zcert_new ();
     char *client_key = strdup (zcert_public_txt (cert));
@@ -243,7 +241,7 @@ zcertstore_test (bool verbose)
     assert (cert);
     assert (streq (zcert_meta (cert, "name"), "John Doe"));
     free (client_key);
-#   endif
+    
     if (verbose)
         zcertstore_print (certstore);
     zcertstore_destroy (&certstore);
@@ -253,6 +251,5 @@ zcertstore_test (bool verbose)
     zdir_remove (dir, true);
     zdir_destroy (&dir);
     //  @end
-#endif    
     printf ("OK\n");
 }
