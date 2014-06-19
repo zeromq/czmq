@@ -972,6 +972,33 @@ zsys_run_as (const char *lockfile, const char *group, const char *user)
 
 
 //  --------------------------------------------------------------------------
+//  Returns true if the underlying libzmq supports CURVE security.
+//  Uses a heuristic probe according to the version of libzmq being used.
+
+bool
+zsys_has_curve (void)
+{
+#if defined (ZMQ_CURVE_SERVER)
+#   if defined (ZMQ_HAS_CAPABILITIES)
+    //  This is the most modern way of probing libzmq capabilities
+    return zmq_has ("curve");
+#   else
+    //  However trying the zmq_setsockopt will also work
+    void *ctx = zmq_ctx_new ();
+    void *pub = zmq_socket (ctx, ZMQ_PUB);
+    int as_server = 1;
+    int rc = zmq_setsockopt (pub, ZMQ_CURVE_SERVER, &as_server, sizeof (int));
+    zmq_close (pub);
+    zmq_ctx_term (ctx);
+    return rc != EINVAL;
+#   endif
+#else
+    return false;
+#endif
+}
+
+
+//  --------------------------------------------------------------------------
 //  Configure the number of I/O threads that ZeroMQ will use. A good
 //  rule of thumb is one thread per gigabit of traffic in or out. The
 //  default is 1, sufficient for most applications. If the environment
@@ -1338,35 +1365,22 @@ zsys_test (bool verbose)
 
     //  @selftest
     zsys_catch_interrupts ();
-    int rc;
 
-    if (verbose)
+    //  Check capabilities without using the return value
+    int rc = zsys_has_curve ();
+    
+    if (verbose) {
+        char *hostname = zsys_hostname ();
+        zsys_info ("host name is %s\n", hostname);
+        free (hostname);
         zsys_info ("system limit is %zd ZeroMQ sockets\n", zsys_socket_limit ());
+    }
     zsys_set_io_threads (1);
     zsys_set_max_sockets (0);
     zsys_set_linger (0);
     zsys_set_sndhwm (1000);
     zsys_set_rcvhwm (1000);
     zsys_set_ipv6 (0);
-
-    void *handle = zsys_socket (ZMQ_ROUTER, __FILE__, __LINE__);
-    //  Sanity check on libzmq/CZMQ build consistency
-#if defined (ZMQ_CURVE_SERVER) && defined (HAVE_LIBSODIUM)
-    int as_server = 1;
-    rc = zmq_setsockopt (handle, ZMQ_CURVE_SERVER, &as_server, sizeof (int));
-    if (rc == -1) {
-        zsys_error ("libzmq was built without libsodium. Please rebuild libzmq and CZMQ.");
-        zsys_close (handle, __FILE__, __LINE__);
-        exit (1);
-    }
-#endif
-    if (verbose) {
-        char *hostname = zsys_hostname ();
-        printf ("I: host name is %s\n", hostname);
-        free (hostname);
-    }
-    rc = zsys_close (handle, __FILE__, __LINE__);
-    assert (rc == 0);
 
     rc = zsys_file_delete ("nosuchfile");
     assert (rc == -1);

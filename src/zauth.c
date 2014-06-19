@@ -684,45 +684,45 @@ zauth_test (bool verbose)
     success = s_can_connect (ctx, &server, &client);
     assert (!success);
 
-#   if defined (HAVE_LIBSODIUM)
-    //  Try CURVE authentication
-    //  We'll create two new certificates and save the client public
-    //  certificate on disk; in a real case we'd transfer this securely
-    //  from the client machine to the server machine.
-    zcert_t *server_cert = zcert_new ();
-    zcert_t *client_cert = zcert_new ();
-    char *server_key = zcert_public_txt (server_cert);
-    
-    //  Test without setting-up any authentication
-    zcert_apply (server_cert, server);
-    zcert_apply (client_cert, client);
-    zsocket_set_curve_server (server, 1);
-    zsocket_set_curve_serverkey (client, server_key);
-    success = s_can_connect (ctx, &server, &client);
-    assert (!success);
+    if (zsys_has_curve ()) {
+        //  Try CURVE authentication
+        //  We'll create two new certificates and save the client public
+        //  certificate on disk; in a real case we'd transfer this securely
+        //  from the client machine to the server machine.
+        zcert_t *server_cert = zcert_new ();
+        zcert_t *client_cert = zcert_new ();
+        char *server_key = zcert_public_txt (server_cert);
 
-    //  Test CURVE_ALLOW_ANY
-    zcert_apply (server_cert, server);
-    zcert_apply (client_cert, client);
-    zsocket_set_curve_server (server, 1);
-    zsocket_set_curve_serverkey (client, server_key);
-    zauth_configure_curve (auth, "*", CURVE_ALLOW_ANY);
-    success = s_can_connect (ctx, &server, &client);
-    assert (success);
+        //  Test without setting-up any authentication
+        zcert_apply (server_cert, server);
+        zcert_apply (client_cert, client);
+        zsocket_set_curve_server (server, 1);
+        zsocket_set_curve_serverkey (client, server_key);
+        success = s_can_connect (ctx, &server, &client);
+        assert (!success);
 
-    //  Test full client authentication using certificates
-    zcert_apply (server_cert, server);
-    zcert_apply (client_cert, client);
-    zsocket_set_curve_server (server, 1);
-    zsocket_set_curve_serverkey (client, server_key);
-    zcert_save_public (client_cert, TESTDIR "/mycert.txt");
-    zauth_configure_curve (auth, "*", TESTDIR);
-    success = s_can_connect (ctx, &server, &client);
-    assert (success);
-    
-    zcert_destroy (&server_cert);
-    zcert_destroy (&client_cert);
-#   endif
+        //  Test CURVE_ALLOW_ANY
+        zcert_apply (server_cert, server);
+        zcert_apply (client_cert, client);
+        zsocket_set_curve_server (server, 1);
+        zsocket_set_curve_serverkey (client, server_key);
+        zauth_configure_curve (auth, "*", CURVE_ALLOW_ANY);
+        success = s_can_connect (ctx, &server, &client);
+        assert (success);
+
+        //  Test full client authentication using certificates
+        zcert_apply (server_cert, server);
+        zcert_apply (client_cert, client);
+        zsocket_set_curve_server (server, 1);
+        zsocket_set_curve_serverkey (client, server_key);
+        zcert_save_public (client_cert, TESTDIR "/mycert.txt");
+        zauth_configure_curve (auth, "*", TESTDIR);
+        success = s_can_connect (ctx, &server, &client);
+        assert (success);
+
+        zcert_destroy (&server_cert);
+        zcert_destroy (&client_cert);
+    }
     //  Remove the authenticator and check a normal connection works
     zauth_destroy (&auth);
     success = s_can_connect (ctx, &server, &client);
