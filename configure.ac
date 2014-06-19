@@ -54,44 +54,6 @@ AC_PROG_AWK
 AC_CHECK_LIB([pthread], [pthread_create])
 AC_CHECK_LIB([uuid], [uuid_generate])
 
-# Allow libsodium to be installed in a custom path:
-AC_ARG_WITH([libsodium],
-            [AS_HELP_STRING([--with-libsodium],
-                            [Specify libsodium prefix])],
-            [zmq_search_libsodium="yes"],
-            [])
-
-if test "x$zmq_search_libsodium" = "xyes"; then
-    if test -r "${with_libsodium}/include/sodium.h"; then
-        CPPFLAGS="-I${with_libsodium}/include ${CPPFLAGS}"
-        LDFLAGS="-L${with_libsodium}/lib ${LDFLAGS}"
-    fi
-fi
-
-AC_ARG_WITH([libsodium-include-dir],
-            [AS_HELP_STRING([--with-libsodium-include-dir],
-                            [Specify libsodium include prefix])],
-            [zmq_search_libsodium_include="yes"],
-            [])
-
-if test "x$zmq_search_libsodium_include" = "xyes"; then
-    if test -r "${with_libsodium_include_dir}/sodium.h"; then
-        CPPFLAGS="-I${with_libsodium_include_dir}/include ${CPPFLAGS}"
-    fi
-fi
-
-AC_ARG_WITH([libsodium_lib_dir],
-            [AS_HELP_STRING([--with-libsodium-lib-dir],
-                            [Specify libsodium library prefix])],
-            [zmq_search_libsodium_lib="yes"],
-            [])
-
-if test "x$zmq_search_libsodium_lib" = "xyes"; then
-    if test -r "${with_libsodium_lib_dir}/libsodium.{a|so|dylib}"; then
-        LDFLAGS="-L${with_libsodium}/lib ${LDFLAGS}"
-    fi
-fi
-
 # Code coverage
 AC_ARG_WITH(gcov, [AS_HELP_STRING([--with-gcov=yes/no],
                   [With GCC Code Coverage reporting.])],
@@ -266,9 +228,6 @@ case "${host_os}" in
         AC_MSG_ERROR([unsupported system: ${host_os}.])
         ;;
 esac
-
-# Check for libsodium
-AC_CHECK_LIB([sodium], [sodium_init],,AC_MSG_WARN(libsodium is needed for CURVE security))
 
 # Checks for header files.
 AC_HEADER_STDC

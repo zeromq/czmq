@@ -28,6 +28,8 @@ extern "C" {
 #if (ZMQ_VERSION_MAJOR == 4)
 //  Get socket options
 CZMQ_EXPORT int zsock_tos (zsock_t *self);
+CZMQ_EXPORT char * zsock_zap_domain (zsock_t *self);
+CZMQ_EXPORT int zsock_mechanism (zsock_t *self);
 CZMQ_EXPORT int zsock_plain_server (zsock_t *self);
 CZMQ_EXPORT char * zsock_plain_username (zsock_t *self);
 CZMQ_EXPORT char * zsock_plain_password (zsock_t *self);
@@ -35,8 +37,6 @@ CZMQ_EXPORT int zsock_curve_server (zsock_t *self);
 CZMQ_EXPORT char * zsock_curve_publickey (zsock_t *self);
 CZMQ_EXPORT char * zsock_curve_secretkey (zsock_t *self);
 CZMQ_EXPORT char * zsock_curve_serverkey (zsock_t *self);
-CZMQ_EXPORT char * zsock_zap_domain (zsock_t *self);
-CZMQ_EXPORT int zsock_mechanism (zsock_t *self);
 CZMQ_EXPORT int zsock_ipv6 (zsock_t *self);
 CZMQ_EXPORT int zsock_immediate (zsock_t *self);
 CZMQ_EXPORT int zsock_ipv4only (zsock_t *self);
@@ -75,6 +75,7 @@ CZMQ_EXPORT void zsock_set_probe_router (zsock_t *self, int probe_router);
 CZMQ_EXPORT void zsock_set_req_relaxed (zsock_t *self, int req_relaxed);
 CZMQ_EXPORT void zsock_set_req_correlate (zsock_t *self, int req_correlate);
 CZMQ_EXPORT void zsock_set_conflate (zsock_t *self, int conflate);
+CZMQ_EXPORT void zsock_set_zap_domain (zsock_t *self, const char * zap_domain);
 CZMQ_EXPORT void zsock_set_plain_server (zsock_t *self, int plain_server);
 CZMQ_EXPORT void zsock_set_plain_username (zsock_t *self, const char * plain_username);
 CZMQ_EXPORT void zsock_set_plain_password (zsock_t *self, const char * plain_password);
@@ -85,7 +86,6 @@ CZMQ_EXPORT void zsock_set_curve_secretkey (zsock_t *self, const char * curve_se
 CZMQ_EXPORT void zsock_set_curve_secretkey_bin (zsock_t *self, const byte *curve_secretkey);
 CZMQ_EXPORT void zsock_set_curve_serverkey (zsock_t *self, const char * curve_serverkey);
 CZMQ_EXPORT void zsock_set_curve_serverkey_bin (zsock_t *self, const byte *curve_serverkey);
-CZMQ_EXPORT void zsock_set_zap_domain (zsock_t *self, const char * zap_domain);
 CZMQ_EXPORT void zsock_set_ipv6 (zsock_t *self, int ipv6);
 CZMQ_EXPORT void zsock_set_immediate (zsock_t *self, int immediate);
 CZMQ_EXPORT void zsock_set_router_raw (zsock_t *self, int router_raw);
