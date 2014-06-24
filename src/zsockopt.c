@@ -494,6 +494,134 @@ zsocket_curve_serverkey (void *zocket)
 
 
 //  --------------------------------------------------------------------------
+//  Set socket ZMQ_GSSAPI_SERVER value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsocket_set_gssapi_server (void *zocket, int gssapi_server)
+{
+#   if defined (ZMQ_GSSAPI_SERVER)
+    int rc = zmq_setsockopt (zocket, ZMQ_GSSAPI_SERVER, &gssapi_server, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_GSSAPI_SERVER value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int 
+zsocket_gssapi_server (void *zocket)
+{
+#   if defined (ZMQ_GSSAPI_SERVER)
+    int gssapi_server;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zocket, ZMQ_GSSAPI_SERVER, &gssapi_server, &option_len);
+    return gssapi_server;
+#   else
+    return 0;
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_GSSAPI_PLAINTEXT value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsocket_set_gssapi_plaintext (void *zocket, int gssapi_plaintext)
+{
+#   if defined (ZMQ_GSSAPI_PLAINTEXT)
+    int rc = zmq_setsockopt (zocket, ZMQ_GSSAPI_PLAINTEXT, &gssapi_plaintext, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_GSSAPI_PLAINTEXT value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int 
+zsocket_gssapi_plaintext (void *zocket)
+{
+#   if defined (ZMQ_GSSAPI_PLAINTEXT)
+    int gssapi_plaintext;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zocket, ZMQ_GSSAPI_PLAINTEXT, &gssapi_plaintext, &option_len);
+    return gssapi_plaintext;
+#   else
+    return 0;
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_GSSAPI_PRINCIPAL value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsocket_set_gssapi_principal (void *zocket, const char * gssapi_principal)
+{
+#   if defined (ZMQ_GSSAPI_PRINCIPAL)
+    int rc = zmq_setsockopt (zocket, ZMQ_GSSAPI_PRINCIPAL, gssapi_principal, strlen (gssapi_principal));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_GSSAPI_PRINCIPAL value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+char * 
+zsocket_gssapi_principal (void *zocket)
+{
+#   if defined (ZMQ_GSSAPI_PRINCIPAL)
+    size_t option_len = 255;
+    char *gssapi_principal = (char *) zmalloc (option_len);
+    zmq_getsockopt (zocket, ZMQ_GSSAPI_PRINCIPAL, gssapi_principal, &option_len);
+    return (char *) gssapi_principal;
+#   else
+    return NULL;
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_GSSAPI_SERVICE_PRINCIPAL value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsocket_set_gssapi_service_principal (void *zocket, const char * gssapi_service_principal)
+{
+#   if defined (ZMQ_GSSAPI_SERVICE_PRINCIPAL)
+    int rc = zmq_setsockopt (zocket, ZMQ_GSSAPI_SERVICE_PRINCIPAL, gssapi_service_principal, strlen (gssapi_service_principal));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_GSSAPI_SERVICE_PRINCIPAL value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+char * 
+zsocket_gssapi_service_principal (void *zocket)
+{
+#   if defined (ZMQ_GSSAPI_SERVICE_PRINCIPAL)
+    size_t option_len = 255;
+    char *gssapi_service_principal = (char *) zmalloc (option_len);
+    zmq_getsockopt (zocket, ZMQ_GSSAPI_SERVICE_PRINCIPAL, gssapi_service_principal, &option_len);
+    return (char *) gssapi_service_principal;
+#   else
+    return NULL;
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
 //  Set socket ZMQ_IPV6 value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 

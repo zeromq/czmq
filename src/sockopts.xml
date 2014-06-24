@@ -49,6 +49,13 @@
         <option name = "curve_secretkey"   type = "key"    mode = "rw" />
         <option name = "curve_serverkey"   type = "key"    mode = "rw" />
 
+        <!-- We don't test these as libzmq doesn't always support GSSAPI security -->
+        <option name = "gssapi_server"     type = "int"    mode = "rw" />
+        <option name = "gssapi_plaintext"  type = "int"    mode = "rw" />
+        <option name = "gssapi_principal"  type = "string" mode = "rw" />
+        <option name = "gssapi_service_principal"
+                                           type = "string" mode = "rw" />
+
         <!-- New names for deprecated 3.x options -->
         <option name = "ipv6"              type = "int"    mode = "rw" test = "SUB" />
         <option name = "immediate"         type = "int"    mode = "rw" test = "DEALER" />
