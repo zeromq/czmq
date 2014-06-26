@@ -219,6 +219,9 @@ s_initialize_process (void)
         if (streq (getenv ("ZSYS_LOGSYSTEM"), "false"))
             s_logsystem = false;
     }
+    bool handle_signals = true;
+    if (getenv ("ZSYS_SIGHANDLER"))
+        handle_signals = streq (getenv ("ZSYS_SIGHANDLER"), "true");
 
     //  This call keeps compatibility back to ZMQ v2
     process_ctx = zmq_init ((int) s_io_threads);
@@ -229,7 +232,8 @@ s_initialize_process (void)
 #endif
     ZMUTEX_INIT (s_mutex);
     s_sockref_list = zlist_new ();
-    zsys_catch_interrupts ();
+    if (handle_signals)
+        zsys_catch_interrupts ();
     srandom ((unsigned) time (NULL));
     atexit (s_terminate_process);
 }
