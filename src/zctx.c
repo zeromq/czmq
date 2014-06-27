@@ -79,7 +79,12 @@ zctx_new (void)
     self->pipehwm = 1000;   
     self->sndhwm = 1000;
     self->rcvhwm = 1000;
-    zsys_catch_interrupts ();
+
+    //  Catch SIGINT and SIGTERM unless ZSYS_SIGHANDLER=false
+    if (getenv ("ZSYS_SIGHANDLER") == NULL
+    || strneq (getenv ("ZSYS_SIGHANDLER"), "true"))
+        zsys_catch_interrupts ();
+    
     return self;
 }
 
