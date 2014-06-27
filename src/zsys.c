@@ -994,7 +994,7 @@ zsys_has_curve (void)
     int rc = zmq_setsockopt (pub, ZMQ_CURVE_SERVER, &as_server, sizeof (int));
     zmq_close (pub);
     zmq_ctx_term (ctx);
-    return rc != EINVAL;
+    return rc != -1;
 #   endif
 #else
     return false;

@@ -46,6 +46,8 @@ struct _zcert_t {
     zconfig_t *config;          //  Config tree to save
 };
 
+//  This is a null key, when curve is not available
+#define FORTY_ZEROES "0000000000000000000000000000000000000000"
 
 //  --------------------------------------------------------------------------
 //  Constructor
@@ -61,13 +63,19 @@ zcert_new (void)
     zhash_autofree (self->metadata);
     
 #if (ZMQ_VERSION_MAJOR == 4)
-    int rc = zmq_curve_keypair (self->public_txt, self->secret_txt);
-    assert (rc == 0);
-    zmq_z85_decode (self->public_key, self->public_txt);
-    zmq_z85_decode (self->secret_key, self->secret_txt);
+    if (zsys_has_curve ()) {
+        int rc = zmq_curve_keypair (self->public_txt, self->secret_txt);
+        assert (rc == 0);
+        zmq_z85_decode (self->public_key, self->public_txt);
+        zmq_z85_decode (self->secret_key, self->secret_txt);
+    }
+    else {
+        strcpy (self->public_txt, FORTY_ZEROES);
+        strcpy (self->secret_txt, FORTY_ZEROES);
+    }
 #else
-    strcpy (self->public_txt, "0000000000000000000000000000000000000000");
-    strcpy (self->secret_txt, "0000000000000000000000000000000000000000");
+    strcpy (self->public_txt, FORTY_ZEROES);
+    strcpy (self->secret_txt, FORTY_ZEROES);
 #endif
     return self;
 }
@@ -93,8 +101,8 @@ zcert_new_from (byte *public_key, byte *secret_key)
     zmq_z85_encode (self->public_txt, self->public_key, 32);
     zmq_z85_encode (self->secret_txt, self->secret_key, 32);
 #else
-    strcpy (self->public_txt, "0000000000000000000000000000000000000000");
-    strcpy (self->secret_txt, "0000000000000000000000000000000000000000");
+    strcpy (self->public_txt, FORTY_ZEROES);
+    strcpy (self->secret_txt, FORTY_ZEROES);
 #endif
     return self;
 }
@@ -452,7 +460,7 @@ zcert_test (bool verbose)
     
     //  32-byte null key encodes as 40 '0' characters
     assert (streq (zcert_secret_txt (shadow),
-                   "0000000000000000000000000000000000000000"));
+                   FORTY_ZEROES));
     
     zcert_destroy (&shadow);
     zcert_destroy (&cert);
