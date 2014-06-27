@@ -204,7 +204,7 @@ engine_broadcast_event (server_t *server, client_t *client, event_t event)
         char *key = (char *) zlist_first (keys);
         while (key) {
             s_client_t *target = (s_client_t *) zhash_lookup (self->clients, key);
-            if (client && target != (s_client_t *) client)
+            if (target != (s_client_t *) client)
                 s_client_execute (target, event);
             key = (char *) zlist_next (keys);
         }
