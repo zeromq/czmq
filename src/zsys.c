@@ -663,7 +663,8 @@ zsys_vprintf (const char *format, va_list argptr)
     //  larger buffer for it.
     if (required >= size) {
         size = required + 1;
-        string = (char *) realloc (string, size);
+        free (string);
+        string = (char *) malloc (size);
         if (string) {
             va_copy (my_argptr, argptr);
             vsnprintf (string, size, format, my_argptr);
