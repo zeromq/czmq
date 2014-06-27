@@ -728,6 +728,10 @@ zsys_udp_close (SOCKET handle)
 //  --------------------------------------------------------------------------
 //  Send zframe to UDP socket
 
+#include <errno.h>
+
+extern int errno;
+
 void
 zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address)
 {
@@ -737,10 +741,13 @@ zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address)
     //  Sending can fail if the OS is blocking multicast. In such cases we
     //  don't try to report the error. We might log this or send to an error
     //  console at some point.
-    sendto (udpsock,
+    int rv = sendto (udpsock,
             (char *) zframe_data (frame), (int) zframe_size (frame),
             0,      //  Flags
             (struct sockaddr *) address, (int) sizeof (inaddr_t));
+    if (rv < 0) {
+        fprintf(stderr, "Error in sendto() - %d, %s\n", errno, strerror(errno));
+    }
 }
 
 
