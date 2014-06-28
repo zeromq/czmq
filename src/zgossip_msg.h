@@ -28,16 +28,21 @@
 /*  These are the zgossip_msg messages:
 
     HELLO - Client says hello to server
+        version             number 1    Version = 1
 
     PUBLISH - Client or server announces a new tuple
+        version             number 1    Version = 1
         key                 string      The key
         value               string      The value
 
     PING - Client signals liveness
+        version             number 1    Version = 1
 
     PONG - Server responds to ping
+        version             number 1    Version = 1
 
     INVALID - Server rejects command as invalid
+        version             number 1    Version = 1
 */
 
 
