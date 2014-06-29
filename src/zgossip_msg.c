@@ -40,6 +40,7 @@ struct _zgossip_msg_t {
     int id;                             //  zgossip_msg message ID
     byte *needle;                       //  Read/write pointer for serialization
     byte *ceiling;                      //  Valid upper limit for read pointer
+    byte version;                       //  Version = 1
     char *key;                          //  The key
     char *value;                        //  The value
 };
@@ -247,20 +248,35 @@ zgossip_msg_decode (zmsg_t **msg_p)
 
     switch (self->id) {
         case ZGOSSIP_MSG_HELLO:
+            GET_NUMBER1 (self->version);
+            if (self->version != 1)
+                goto malformed;
             break;
 
         case ZGOSSIP_MSG_PUBLISH:
+            GET_NUMBER1 (self->version);
+            if (self->version != 1)
+                goto malformed;
             GET_STRING (self->key);
             GET_STRING (self->value);
             break;
 
         case ZGOSSIP_MSG_PING:
+            GET_NUMBER1 (self->version);
+            if (self->version != 1)
+                goto malformed;
             break;
 
         case ZGOSSIP_MSG_PONG:
+            GET_NUMBER1 (self->version);
+            if (self->version != 1)
+                goto malformed;
             break;
 
         case ZGOSSIP_MSG_INVALID:
+            GET_NUMBER1 (self->version);
+            if (self->version != 1)
+                goto malformed;
             break;
 
         default:
@@ -300,9 +316,13 @@ zgossip_msg_encode (zgossip_msg_t **self_p)
     size_t frame_size = 2 + 1;          //  Signature and message ID
     switch (self->id) {
         case ZGOSSIP_MSG_HELLO:
+            //  version is a 1-byte integer
+            frame_size += 1;
             break;
             
         case ZGOSSIP_MSG_PUBLISH:
+            //  version is a 1-byte integer
+            frame_size += 1;
             //  key is a string with 1-byte length
             frame_size++;       //  Size is one octet
             if (self->key)
@@ -314,12 +334,18 @@ zgossip_msg_encode (zgossip_msg_t **self_p)
             break;
             
         case ZGOSSIP_MSG_PING:
+            //  version is a 1-byte integer
+            frame_size += 1;
             break;
             
         case ZGOSSIP_MSG_PONG:
+            //  version is a 1-byte integer
+            frame_size += 1;
             break;
             
         case ZGOSSIP_MSG_INVALID:
+            //  version is a 1-byte integer
+            frame_size += 1;
             break;
             
         default:
@@ -335,9 +361,11 @@ zgossip_msg_encode (zgossip_msg_t **self_p)
 
     switch (self->id) {
         case ZGOSSIP_MSG_HELLO:
+            PUT_NUMBER1 (1);
             break;
 
         case ZGOSSIP_MSG_PUBLISH:
+            PUT_NUMBER1 (1);
             if (self->key) {
                 PUT_STRING (self->key);
             }
@@ -351,12 +379,15 @@ zgossip_msg_encode (zgossip_msg_t **self_p)
             break;
 
         case ZGOSSIP_MSG_PING:
+            PUT_NUMBER1 (1);
             break;
 
         case ZGOSSIP_MSG_PONG:
+            PUT_NUMBER1 (1);
             break;
 
         case ZGOSSIP_MSG_INVALID:
+            PUT_NUMBER1 (1);
             break;
 
     }
@@ -610,20 +641,25 @@ zgossip_msg_dup (zgossip_msg_t *self)
         copy->routing_id = zframe_dup (self->routing_id);
     switch (self->id) {
         case ZGOSSIP_MSG_HELLO:
+            copy->version = self->version;
             break;
 
         case ZGOSSIP_MSG_PUBLISH:
+            copy->version = self->version;
             copy->key = self->key? strdup (self->key): NULL;
             copy->value = self->value? strdup (self->value): NULL;
             break;
 
         case ZGOSSIP_MSG_PING:
+            copy->version = self->version;
             break;
 
         case ZGOSSIP_MSG_PONG:
+            copy->version = self->version;
             break;
 
         case ZGOSSIP_MSG_INVALID:
+            copy->version = self->version;
             break;
 
     }
@@ -641,10 +677,12 @@ zgossip_msg_print (zgossip_msg_t *self)
     switch (self->id) {
         case ZGOSSIP_MSG_HELLO:
             zsys_debug ("ZGOSSIP_MSG_HELLO:");
+            zsys_debug ("    version=1");
             break;
             
         case ZGOSSIP_MSG_PUBLISH:
             zsys_debug ("ZGOSSIP_MSG_PUBLISH:");
+            zsys_debug ("    version=1");
             if (self->key)
                 zsys_debug ("    key='%s'", self->key);
             else
@@ -657,14 +695,17 @@ zgossip_msg_print (zgossip_msg_t *self)
             
         case ZGOSSIP_MSG_PING:
             zsys_debug ("ZGOSSIP_MSG_PING:");
+            zsys_debug ("    version=1");
             break;
             
         case ZGOSSIP_MSG_PONG:
             zsys_debug ("ZGOSSIP_MSG_PONG:");
+            zsys_debug ("    version=1");
             break;
             
         case ZGOSSIP_MSG_INVALID:
             zsys_debug ("ZGOSSIP_MSG_INVALID:");
+            zsys_debug ("    version=1");
             break;
             
     }
