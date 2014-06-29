@@ -12,6 +12,11 @@
         C:PUBLISH / S:PUBLISH / C:PING S:PONG
     </grammar>
 
+    <!-- Header for all messages -->
+    <header>
+        <field name = "version" type = "number" size = "1" value = "1">Version = 1</field>
+    </header>
+
     <message name = "hello">
         Client says hello to server
     </message>

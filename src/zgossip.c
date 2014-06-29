@@ -243,6 +243,12 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
         zstr_free (&value);
     }
     else
+    if (streq (method, "DUMP")) {
+        char *name = zmsg_popstr (msg);
+        printf ("%s - %d\n", name, (int) zhash_size (self->tuples));
+        zstr_free (&name);
+    }
+    else
         zsys_error ("unknown zgossip method '%s'", method);
     
     return NULL;
@@ -312,8 +318,8 @@ static void
 store_tuple_if_new (client_t *self)
 {
     server_accept (self->server,
-                     zgossip_msg_key (self->request),
-                     zgossip_msg_value (self->request));
+                   zgossip_msg_key (self->request),
+                   zgossip_msg_value (self->request));
 }
 
 
@@ -348,13 +354,12 @@ remote_handler (zloop_t *loop, zsock_t *remote, void *argument)
                         zgossip_msg_key (msg),
                         zgossip_msg_value (msg));
     else
-    if (zgossip_msg_id (msg) == ZGOSSIP_MSG_INVALID) {
+    if (zgossip_msg_id (msg) == ZGOSSIP_MSG_INVALID)
         //  Connection was reset, so send HELLO again
         zgossip_msg_send_hello (remote);
-    }
     else
     if (zgossip_msg_id (msg) == ZGOSSIP_MSG_PONG)
-        assert(true);   //  Do nothing with PONGs
+        assert (true);   //  Do nothing with PONGs
         
     zgossip_msg_destroy (&msg);
     return 0;
