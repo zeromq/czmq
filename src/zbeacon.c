@@ -413,6 +413,9 @@ s_agent_new (void *pipe, int port_nbr)
     //  Bind to the port on all interfaces
 #if (defined (__WINDOWS__))
     inaddr_t sockaddr = self->address;
+#elif (defined(__APPLE__))
+    inaddr_t sockaddr = self->broadcast;
+    sockaddr.sin_addr.s_addr = htons(INADDR_ANY);
 #else
     inaddr_t sockaddr = self->broadcast;
 #endif
