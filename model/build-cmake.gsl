@@ -41,12 +41,17 @@ set(CZMQ_VERSION ${CZMQ_MAJOR_VERSION}.${CZMQ_MINOR_VERSION}.${CZMQ_PATCH_VERSIO
 ########################################################################
 include(CheckIncludeFile)
 CHECK_INCLUDE_FILE("linux/wireless.h" HAVE_LINUX_WIRELESS_H)
-CHECK_INCLUDE_FILE("net/if.h" HAVE_NET_IF_H)
 CHECK_INCLUDE_FILE("net/if_media.h" HAVE_NET_IF_MEDIA_H)
 
 include(CheckFunctionExists)
 CHECK_FUNCTION_EXISTS("getifaddrs" HAVE_GETIFADDRS)
 CHECK_FUNCTION_EXISTS("freeifaddrs" HAVE_FREEIFADDRS)
+
+include(CheckIncludeFiles)
+check_include_files("sys/socket.h;net/if.h" HAVE_NET_IF_H)
+if (NOT HAVE_NET_IF_H)
+    CHECK_INCLUDE_FILE("net/if.h" HAVE_NET_IF_H)
+endif()
 
 file(WRITE ${CZMQ_BINARY_DIR}/platform.h.in "
 #cmakedefine HAVE_LINUX_WIRELESS_H
