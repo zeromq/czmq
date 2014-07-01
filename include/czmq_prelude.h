@@ -146,7 +146,7 @@
 #elif (defined (__ANDROID__))
 #   define __UTYPE_ANDROID
 #   define __UNIX__
-#elif (defined (LINUX) || defined (linux))
+#elif (defined (LINUX) || defined (linux) || defined (__linux__))
 #   define __UTYPE_LINUX
 #   define __UNIX__
 #   ifndef __NO_CTYPE
@@ -436,6 +436,11 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
 #elif (defined (__UTYPE_OSX))
     typedef unsigned long ulong;
     typedef unsigned int uint;
+    //  This fixes header-order dependence problem with some Linux versions
+#elif (defined (__UTYPE_LINUX)) 
+#   if (__STDC_VERSION__ >= 199901L)
+    typedef unsigned int uint;
+#   endif
 #endif
 
 //- Error reporting ---------------------------------------------------------
