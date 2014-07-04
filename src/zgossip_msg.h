@@ -32,8 +32,9 @@
 
     PUBLISH - Client or server announces a new tuple
         version             number 1    Version = 1
-        key                 string      The key
-        value               string      The value
+        key                 string      Tuple key, globally unique
+        value               longstr     Tuple value, as printable string
+        ttl                 number 4    Time to live, msec
 
     PING - Client signals liveness
         version             number 1    Version = 1
@@ -109,7 +110,8 @@ CZMQ_EXPORT zmsg_t *
 CZMQ_EXPORT zmsg_t *
     zgossip_msg_encode_publish (
         const char *key,
-        const char *value);
+        const char *value,
+        uint32_t ttl);
 
 //  Encode the PING 
 CZMQ_EXPORT zmsg_t *
@@ -137,7 +139,8 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zgossip_msg_send_publish (void *output,
         const char *key,
-        const char *value);
+        const char *value,
+        uint32_t ttl);
     
 //  Send the PING to the output in one step
 //  WARNING, this call will fail if output is of type ZMQ_ROUTER.
@@ -187,6 +190,12 @@ CZMQ_EXPORT const char *
     zgossip_msg_value (zgossip_msg_t *self);
 CZMQ_EXPORT void
     zgossip_msg_set_value (zgossip_msg_t *self, const char *format, ...);
+
+//  Get/set the ttl field
+CZMQ_EXPORT uint32_t
+    zgossip_msg_ttl (zgossip_msg_t *self);
+CZMQ_EXPORT void
+    zgossip_msg_set_ttl (zgossip_msg_t *self, uint32_t ttl);
 
 //  Self test of this class
 CZMQ_EXPORT int

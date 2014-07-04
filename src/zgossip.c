@@ -181,7 +181,7 @@ server_connect (server_t *self, const char *endpoint)
     zgossip_msg_send_hello (remote);
     tuple_t *tuple = (tuple_t *) zhash_first (self->tuples);
     while (tuple) {
-        zgossip_msg_send_publish (remote, tuple->key, tuple->value);
+        zgossip_msg_send_publish (remote, tuple->key, tuple->value, 0);
         tuple = (tuple_t *) zhash_next (self->tuples);
     }
     //  Now monitor this remote for incoming messages
@@ -217,7 +217,7 @@ server_accept (server_t *self, const char *key, const char *value)
     //  Copy new tuple announcement to all remotes
     zsock_t *remote = (zsock_t *) zlist_first (self->remotes);
     while (remote) {
-        zgossip_msg_send_publish (remote, key, value);
+        zgossip_msg_send_publish (remote, key, value, 0);
         remote = (zsock_t *) zlist_next (self->remotes);
     }
 }
@@ -228,6 +228,7 @@ static zmsg_t *
 server_method (server_t *self, const char *method, zmsg_t *msg)
 {
     //  Connect to a remote
+    zmsg_t *reply = NULL;
     if (streq (method, "CONNECT")) {
         char *endpoint = zmsg_popstr (msg);
         assert (endpoint);
@@ -243,15 +244,15 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
         zstr_free (&value);
     }
     else
-    if (streq (method, "DUMP")) {
-        char *name = zmsg_popstr (msg);
-        printf ("%s - %d\n", name, (int) zhash_size (self->tuples));
-        zstr_free (&name);
+    if (streq (method, "STATUS")) {
+        //  Return number of tuples we have stored
+        reply = zmsg_new ();
+        zmsg_addstrf (reply, "%d", (int) zhash_size (self->tuples));
     }
     else
         zsys_error ("unknown zgossip method '%s'", method);
     
-    return NULL;
+    return reply;
 }
 
 
@@ -380,15 +381,12 @@ zgossip_test (bool verbose)
     //  Test basic client-to-server operation of the protocol
     zactor_t *server = zactor_new (zgossip, "server");
     zstr_sendx (server, "SET", "server/animate", verbose? "1": "0", NULL);
-    zstr_sendx (server, "BIND", "ipc:///tmp/zgossip", NULL);
-    char *port_str = zstr_recv (server);
-    assert (streq (port_str, "0"));
-    zstr_free (&port_str);
+    zstr_sendx (server, "BIND", "inproc://zgossip", NULL);
 
     zsock_t *client = zsock_new (ZMQ_DEALER);
     assert (client);
     zsock_set_rcvtimeo (client, 2000);
-    zsock_connect (client, "ipc:///tmp/zgossip");
+    zsock_connect (client, "inproc://zgossip");
 
     //  Send HELLO, which gets no reply
     zgossip_msg_t *request, *reply;
@@ -415,9 +413,6 @@ zgossip_test (bool verbose)
     //  Set a 100msec timeout on clients so we can test expiry
     zstr_sendx (base, "SET", "server/timeout", "100", NULL);
     zstr_sendx (base, "BIND", "inproc://base", NULL);
-    port_str = zstr_recv (base);
-    assert (streq (port_str, "0"));
-    zstr_free (&port_str);
 
     zactor_t *alpha = zactor_new (zgossip, "alpha");
     assert (alpha);

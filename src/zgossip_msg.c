@@ -41,8 +41,9 @@ struct _zgossip_msg_t {
     byte *needle;                       //  Read/write pointer for serialization
     byte *ceiling;                      //  Valid upper limit for read pointer
     byte version;                       //  Version = 1
-    char *key;                          //  The key
-    char *value;                        //  The value
+    char *key;                          //  Tuple key, globally unique
+    char *value;                        //  Tuple value, as printable string
+    uint32_t ttl;                       //  Time to live, msec
 };
 
 //  --------------------------------------------------------------------------
@@ -258,7 +259,8 @@ zgossip_msg_decode (zmsg_t **msg_p)
             if (self->version != 1)
                 goto malformed;
             GET_STRING (self->key);
-            GET_STRING (self->value);
+            GET_LONGSTR (self->value);
+            GET_NUMBER4 (self->ttl);
             break;
 
         case ZGOSSIP_MSG_PING:
@@ -327,10 +329,12 @@ zgossip_msg_encode (zgossip_msg_t **self_p)
             frame_size++;       //  Size is one octet
             if (self->key)
                 frame_size += strlen (self->key);
-            //  value is a string with 1-byte length
-            frame_size++;       //  Size is one octet
+            //  value is a string with 4-byte length
+            frame_size += 4;
             if (self->value)
                 frame_size += strlen (self->value);
+            //  ttl is a 4-byte integer
+            frame_size += 4;
             break;
             
         case ZGOSSIP_MSG_PING:
@@ -372,10 +376,11 @@ zgossip_msg_encode (zgossip_msg_t **self_p)
             else
                 PUT_NUMBER1 (0);    //  Empty string
             if (self->value) {
-                PUT_STRING (self->value);
+                PUT_LONGSTR (self->value);
             }
             else
-                PUT_NUMBER1 (0);    //  Empty string
+                PUT_NUMBER4 (0);    //  Empty string
+            PUT_NUMBER4 (self->ttl);
             break;
 
         case ZGOSSIP_MSG_PING:
@@ -420,8 +425,8 @@ zgossip_msg_recv (void *input)
         if (!routing_id || !zmsg_next (msg))
             return NULL;        //  Malformed or empty
     }
-    zgossip_msg_t * zgossip_msg = zgossip_msg_decode (&msg);
-    if (zsocket_type (zsock_resolve (input)) == ZMQ_ROUTER)
+    zgossip_msg_t *zgossip_msg = zgossip_msg_decode (&msg);
+    if (zgossip_msg && zsocket_type (zsock_resolve (input)) == ZMQ_ROUTER)
         zgossip_msg->routing_id = routing_id;
 
     return zgossip_msg;
@@ -445,8 +450,8 @@ zgossip_msg_recv_nowait (void *input)
         if (!routing_id || !zmsg_next (msg))
             return NULL;        //  Malformed or empty
     }
-    zgossip_msg_t * zgossip_msg = zgossip_msg_decode (&msg);
-    if (zsocket_type (zsock_resolve (input)) == ZMQ_ROUTER)
+    zgossip_msg_t *zgossip_msg = zgossip_msg_decode (&msg);
+    if (zgossip_msg && zsocket_type (zsock_resolve (input)) == ZMQ_ROUTER)
         zgossip_msg->routing_id = routing_id;
 
     return zgossip_msg;
@@ -518,11 +523,13 @@ zgossip_msg_encode_hello (
 zmsg_t * 
 zgossip_msg_encode_publish (
     const char *key,
-    const char *value)
+    const char *value,
+    uint32_t ttl)
 {
     zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_PUBLISH);
     zgossip_msg_set_key (self, key);
     zgossip_msg_set_value (self, value);
+    zgossip_msg_set_ttl (self, ttl);
     return zgossip_msg_encode (&self);
 }
 
@@ -582,11 +589,13 @@ int
 zgossip_msg_send_publish (
     void *output,
     const char *key,
-    const char *value)
+    const char *value,
+    uint32_t ttl)
 {
     zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_PUBLISH);
     zgossip_msg_set_key (self, key);
     zgossip_msg_set_value (self, value);
+    zgossip_msg_set_ttl (self, ttl);
     return zgossip_msg_send (&self, output);
 }
 
@@ -648,6 +657,7 @@ zgossip_msg_dup (zgossip_msg_t *self)
             copy->version = self->version;
             copy->key = self->key? strdup (self->key): NULL;
             copy->value = self->value? strdup (self->value): NULL;
+            copy->ttl = self->ttl;
             break;
 
         case ZGOSSIP_MSG_PING:
@@ -691,6 +701,7 @@ zgossip_msg_print (zgossip_msg_t *self)
                 zsys_debug ("    value='%s'", self->value);
             else
                 zsys_debug ("    value=");
+            zsys_debug ("    ttl=%ld", (long) self->ttl);
             break;
             
         case ZGOSSIP_MSG_PING:
@@ -820,6 +831,24 @@ zgossip_msg_set_value (zgossip_msg_t *self, const char *format, ...)
 }
 
 
+//  --------------------------------------------------------------------------
+//  Get/set the ttl field
+
+uint32_t
+zgossip_msg_ttl (zgossip_msg_t *self)
+{
+    assert (self);
+    return self->ttl;
+}
+
+void
+zgossip_msg_set_ttl (zgossip_msg_t *self, uint32_t ttl)
+{
+    assert (self);
+    self->ttl = ttl;
+}
+
+
 
 //  --------------------------------------------------------------------------
 //  Selftest
@@ -874,6 +903,7 @@ zgossip_msg_test (bool verbose)
 
     zgossip_msg_set_key (self, "Life is short but Now lasts for ever");
     zgossip_msg_set_value (self, "Life is short but Now lasts for ever");
+    zgossip_msg_set_ttl (self, 123);
     //  Send twice from same object
     zgossip_msg_send_again (self, output);
     zgossip_msg_send (&self, output);
@@ -885,6 +915,7 @@ zgossip_msg_test (bool verbose)
         
         assert (streq (zgossip_msg_key (self), "Life is short but Now lasts for ever"));
         assert (streq (zgossip_msg_value (self), "Life is short but Now lasts for ever"));
+        assert (zgossip_msg_ttl (self) == 123);
         zgossip_msg_destroy (&self);
     }
     self = zgossip_msg_new (ZGOSSIP_MSG_PING);

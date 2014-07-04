@@ -23,8 +23,9 @@
     
     <message name = "publish">
         Client or server announces a new tuple
-        <field name = "key" type = "string">The key</field>
-        <field name = "value" type = "string">The value</field>
+        <field name = "key" type = "string">Tuple key, globally unique</field>
+        <field name = "value" type = "longstr">Tuple value, as printable string</field>
+        <field name = "ttl" type = "number" size = "4">Time to live, msec</field>
     </message>
 
     <message name = "ping">
