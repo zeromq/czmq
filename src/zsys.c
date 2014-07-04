@@ -30,7 +30,6 @@
 volatile int zsys_interrupted = 0;  //  Current name
 volatile int zctx_interrupted = 0;  //  Deprecated name
 
-static void s_initialize_process (void);
 static void s_terminate_process (void);
 static void s_signal_handler (int signal_value);
 
@@ -59,6 +58,7 @@ static BOOL WINAPI s_handler_fn_shim (DWORD ctrltype)
 
 //  Global ZeroMQ context for this process
 void *process_ctx = NULL;
+bool s_initialized = false;
 
 //  Default globals for new sockets and other joys; these can all be set
 //  from the environment, or via the zsys_set_xxx API.
@@ -115,8 +115,117 @@ static zsys_mutex_t s_mutex;
 void
 zsys_init (void)
 {
-    if (!process_ctx)
-        s_initialize_process ();
+    if (s_initialized)
+        return;
+
+    //  Pull process defaults from environment
+    if (getenv ("ZSYS_IO_THREADS"))
+        s_io_threads = atoi (getenv ("ZSYS_IO_THREADS"));
+
+    if (getenv ("ZSYS_MAX_SOCKETS"))
+        s_max_sockets = atoi (getenv ("ZSYS_MAX_SOCKETS"));
+
+    if (getenv ("ZSYS_LINGER"))
+        s_linger = atoi (getenv ("ZSYS_LINGER"));
+
+    if (getenv ("ZSYS_SNDHWM"))
+        s_sndhwm = atoi (getenv ("ZSYS_SNDHWM"));
+
+    if (getenv ("ZSYS_RCVHWM"))
+        s_rcvhwm = atoi (getenv ("ZSYS_RCVHWM"));
+
+    if (getenv ("ZSYS_IPV6"))
+        s_ipv6 = atoi (getenv ("ZSYS_IPV6"));
+
+    if (getenv ("ZSYS_INTERFACE"))
+        zsys_set_interface (getenv ("ZSYS_INTERFACE"));
+
+    if (getenv ("ZSYS_LOGIDENT"))
+        zsys_set_logident (getenv ("ZSYS_LOGIDENT"));
+
+    if (getenv ("ZSYS_LOGSTREAM")) {
+        if (streq (getenv ("ZSYS_LOGSTREAM"), "stdout"))
+            s_logstream = stdout;
+        else
+        if (streq (getenv ("ZSYS_LOGSTREAM"), "stderr"))
+            s_logstream = stderr;
+    }
+    else
+        s_logstream = stdout;
+
+    if (getenv ("ZSYS_LOGSENDER"))
+        zsys_set_logsender (getenv ("ZSYS_LOGSENDER"));
+
+    if (getenv ("ZSYS_LOGSYSTEM")) {
+        if (streq (getenv ("ZSYS_LOGSYSTEM"), "true"))
+            s_logsystem = true;
+        else
+        if (streq (getenv ("ZSYS_LOGSYSTEM"), "false"))
+            s_logsystem = false;
+    }
+    //  Catch SIGINT and SIGTERM unless ZSYS_SIGHANDLER=false
+    if (getenv ("ZSYS_SIGHANDLER") == NULL
+    || strneq (getenv ("ZSYS_SIGHANDLER"), "true"))
+        zsys_catch_interrupts ();
+
+    ZMUTEX_INIT (s_mutex);
+    s_sockref_list = zlist_new ();
+    srandom ((unsigned) time (NULL));
+    atexit (s_terminate_process);
+    s_initialized = true;
+}
+
+//  atexit termination for the process
+static void
+s_terminate_process (void)
+{
+    //  The atexit handler is called when the main function exits;
+    //  however we may have zactor threads shutting down and still
+    //  trying to close their sockets. So if we suspect there are
+    //  actors busy (s_open_sockets > 0), then we sleep for a few
+    //  hundred milliseconds to allow the actors, if any, to get in
+    //  and close their sockets.
+    ZMUTEX_LOCK (s_mutex);
+    size_t busy = s_open_sockets;
+    ZMUTEX_UNLOCK (s_mutex);
+    if (busy)
+        zclock_sleep (200);
+
+    //  No matter, we are now going to shut down
+    //  Print the source reference for any sockets the app did not
+    //  destroy properly.
+    ZMUTEX_LOCK (s_mutex);
+    s_sockref_t *sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
+    while (sockref) {
+        assert (sockref->filename);
+        zsys_error ("dangling socket created at %s:%d",
+                sockref->filename, (int) sockref->line_nbr);
+        zmq_close (sockref->handle);
+        free (sockref);
+        sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
+    }
+    zlist_destroy (&s_sockref_list);
+    ZMUTEX_UNLOCK (s_mutex);
+
+    //  Close logsender socket if opened (don't do this in critical section)
+    if (s_logsender) {
+        zsys_close (s_logsender, NULL, 0);
+        s_logsender = NULL;
+    }
+    if (process_ctx && s_open_sockets == 0)
+        zmq_ctx_term (process_ctx);
+    else
+        zsys_error ("dangling sockets: cannot terminate ZMQ safely");
+
+    ZMUTEX_DESTROY (s_mutex);
+
+    //  Free dynamically allocated properties
+    free (s_interface);
+    free (s_logident);
+
+#if defined (__UNIX__)
+    closelog ();                //  Just to be pedantic
+#endif
 }
 
 
@@ -136,9 +245,16 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
     //  apps, they MUST create a socket in the main program before
     //  starting any threads. If the app uses zactor for its threads
     //  then we can guarantee this to always be safe.
-    if (!process_ctx)
-        s_initialize_process ();
-
+    zsys_init ();
+    if (!process_ctx) {
+        //  This call keeps compatibility back to ZMQ v2
+        process_ctx = zmq_init ((int) s_io_threads);
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
+        //  TODO: this causes TravisCI to break; libzmq does not return a
+        //  valid socket on zmq_socket(), after this...
+        zmq_ctx_set (process_ctx, ZMQ_MAX_SOCKETS, s_max_sockets);
+#endif
+    }
     ZMUTEX_LOCK (s_mutex);
     void *handle = zmq_socket (process_ctx, type);
     //  Configure socket with process defaults
@@ -169,127 +285,6 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
     ZMUTEX_UNLOCK (s_mutex);
     return handle;
 }
-
-//  First-time initializations for the process
-static void
-s_initialize_process (void)
-{
-    //  Pull process defaults from environment
-    if (getenv ("ZSYS_IO_THREADS"))
-        s_io_threads = atoi (getenv ("ZSYS_IO_THREADS"));
-
-    if (getenv ("ZSYS_MAX_SOCKETS"))
-        s_max_sockets = atoi (getenv ("ZSYS_MAX_SOCKETS"));
-
-    if (getenv ("ZSYS_LINGER"))
-        s_linger = atoi (getenv ("ZSYS_LINGER"));
-
-    if (getenv ("ZSYS_SNDHWM"))
-        s_sndhwm = atoi (getenv ("ZSYS_SNDHWM"));
-
-    if (getenv ("ZSYS_RCVHWM"))
-        s_rcvhwm = atoi (getenv ("ZSYS_RCVHWM"));
-
-    if (getenv ("ZSYS_IPV6"))
-        s_ipv6 = atoi (getenv ("ZSYS_IPV6"));
-
-    if (getenv ("ZSYS_INTERFACE"))
-        zsys_set_interface (getenv ("ZSYS_INTERFACE"));
-    
-    if (getenv ("ZSYS_LOGIDENT"))
-        zsys_set_logident (getenv ("ZSYS_LOGIDENT"));
-    
-    if (getenv ("ZSYS_LOGSTREAM")) {
-        if (streq (getenv ("ZSYS_LOGSTREAM"), "stdout"))
-            s_logstream = stdout;
-        else
-        if (streq (getenv ("ZSYS_LOGSTREAM"), "stderr"))
-            s_logstream = stderr;
-    }
-    else
-        s_logstream = stdout;
-
-    if (getenv ("ZSYS_LOGSENDER"))
-        zsys_set_logsender (getenv ("ZSYS_LOGSENDER"));
-    
-    if (getenv ("ZSYS_LOGSYSTEM")) {
-        if (streq (getenv ("ZSYS_LOGSYSTEM"), "true"))
-            s_logsystem = true;
-        else
-        if (streq (getenv ("ZSYS_LOGSYSTEM"), "false"))
-            s_logsystem = false;
-    }
-    //  Catch SIGINT and SIGTERM unless ZSYS_SIGHANDLER=false
-    if (getenv ("ZSYS_SIGHANDLER") == NULL
-    || strneq (getenv ("ZSYS_SIGHANDLER"), "true"))
-        zsys_catch_interrupts ();
-
-    //  This call keeps compatibility back to ZMQ v2
-    process_ctx = zmq_init ((int) s_io_threads);
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
-//  TODO: this causes TravisCI to break; libzmq does not return a
-//  valid socket on zmq_socket(), after this...
-    zmq_ctx_set (process_ctx, ZMQ_MAX_SOCKETS, s_max_sockets);
-#endif
-    ZMUTEX_INIT (s_mutex);
-    s_sockref_list = zlist_new ();
-    srandom ((unsigned) time (NULL));
-    atexit (s_terminate_process);
-}
-
-//  atexit termination for the process
-static void
-s_terminate_process (void)
-{
-    //  The atexit handler is called when the main function exits;
-    //  however we may have zactor threads shutting down and still
-    //  trying to close their sockets. So if we suspect there are
-    //  actors busy (s_open_sockets > 0), then we sleep for a few
-    //  hundred milliseconds to allow the actors, if any, to get in
-    //  and close their sockets.
-    ZMUTEX_LOCK (s_mutex);
-    size_t busy = s_open_sockets;
-    ZMUTEX_UNLOCK (s_mutex);
-    if (busy)
-        zclock_sleep (200);
-
-    //  No matter, we are now going to shut down
-    //  Print the source reference for any sockets the app did not
-    //  destroy properly.
-    ZMUTEX_LOCK (s_mutex);
-    s_sockref_t *sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
-    while (sockref) {
-        assert (sockref->filename);
-		zsys_error ("dangling socket created at %s:%d",
-                sockref->filename, (int) sockref->line_nbr);
-        zmq_close (sockref->handle);
-        free (sockref);
-        sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
-    }
-    zlist_destroy (&s_sockref_list);
-    ZMUTEX_UNLOCK (s_mutex);
-
-    //  Close logsender socket if opened (don't do this in critical section)
-    if (s_logsender) {
-        zsys_close (s_logsender, NULL, 0);
-        s_logsender = NULL;
-    }
-    if (s_open_sockets == 0)
-        zmq_ctx_term (process_ctx);
-    else
-        zsys_error ("dangling sockets: cannot terminate ZMQ safely");
-    
-    ZMUTEX_DESTROY (s_mutex);
-
-    //  Free dynamically allocated properties
-    free (s_interface);
-    free (s_logident);
-    
-#if defined (__UNIX__)
-    closelog ();                //  Just to be pedantic
-#endif
-}
-
 
 //  --------------------------------------------------------------------------
 //  Destroy/close a ZMQ socket. You should call this for every socket you 
@@ -1017,6 +1012,7 @@ zsys_has_curve (void)
 void
 zsys_set_io_threads (size_t io_threads)
 {
+    zsys_init ();
     ZMUTEX_LOCK (s_mutex);
     //  If the app is misusing this method, burn it with fire
     if (process_ctx)
@@ -1036,6 +1032,7 @@ zsys_set_io_threads (size_t io_threads)
 void
 zsys_set_max_sockets (size_t max_sockets)
 {
+    zsys_init ();
     ZMUTEX_LOCK (s_mutex);
     //  If the app is misusing this method, burn it with fire
     if (process_ctx)
@@ -1083,6 +1080,7 @@ zsys_socket_limit (void)
 void
 zsys_set_linger (size_t linger)
 {
+    zsys_init ();
     ZMUTEX_LOCK (s_mutex);
     s_linger = linger;
     ZMUTEX_UNLOCK (s_mutex);
@@ -1099,6 +1097,7 @@ zsys_set_linger (size_t linger)
 void
 zsys_set_sndhwm (size_t sndhwm)
 {
+    zsys_init ();
     ZMUTEX_LOCK (s_mutex);
     s_sndhwm = sndhwm;
     ZMUTEX_UNLOCK (s_mutex);
@@ -1115,6 +1114,7 @@ zsys_set_sndhwm (size_t sndhwm)
 void
 zsys_set_rcvhwm (size_t rcvhwm)
 {
+    zsys_init ();
     ZMUTEX_LOCK (s_mutex);
     s_rcvhwm = rcvhwm;
     ZMUTEX_UNLOCK (s_mutex);
@@ -1132,6 +1132,7 @@ zsys_set_rcvhwm (size_t rcvhwm)
 void
 zsys_set_ipv6 (int ipv6)
 {
+    zsys_init ();
     ZMUTEX_LOCK (s_mutex);
     s_ipv6 = ipv6;
     ZMUTEX_UNLOCK (s_mutex);
@@ -1148,9 +1149,9 @@ zsys_set_ipv6 (int ipv6)
 void
 zsys_set_interface (const char *value)
 {
+    zsys_init ();
     free (s_interface);
     s_interface = strdup (value);
-    zsys_debug ("(zsys): zsys_set_interface (%s)", s_interface);
 }
 
 
@@ -1172,6 +1173,7 @@ zsys_interface (void)
 void
 zsys_set_logident (const char *value)
 {
+    zsys_init ();
     free (s_logident);
     s_logident = strdup (value);
 #if defined (__UNIX__)
@@ -1191,6 +1193,7 @@ zsys_set_logident (const char *value)
 void
 zsys_set_logstream (FILE *stream)
 {
+    zsys_init ();
     s_logstream = stream;
 }
 
@@ -1207,6 +1210,7 @@ zsys_set_logstream (FILE *stream)
 void
 zsys_set_logsender (const char *endpoint)
 {
+    zsys_init ();
     if (endpoint) {
         //  Create log sender if needed
         if (!s_logsender) {
@@ -1232,6 +1236,7 @@ zsys_set_logsender (const char *endpoint)
 void
 zsys_set_logsystem (bool logsystem)
 {
+    zsys_init ();
     s_logsystem = logsystem;
 #if defined (__UNIX__)
     if (s_logsystem)
@@ -1373,7 +1378,6 @@ zsys_test (bool verbose)
         printf ("\n");
 
     //  @selftest
-    zsys_init ();
     zsys_catch_interrupts ();
 
     //  Check capabilities without using the return value
