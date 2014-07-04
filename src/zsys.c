@@ -460,12 +460,10 @@ zsys_file_mode (const char *filename)
     else
         mode |= S_IFREG;
 
-#if defined (__UTYPE_ANDROID)
     if (!(dwfa & FILE_ATTRIBUTE_HIDDEN))
         mode |= S_IRUSR;
     if (!(dwfa & FILE_ATTRIBUTE_READONLY))
         mode |= S_IWUSR;
-#endif
 
     return mode;
 #else
