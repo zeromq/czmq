@@ -760,18 +760,23 @@ s_server_api_message (zloop_t *loop, zsock_t *reader, void *argument)
         return -1;              //  Interrupted; exit zloop
     char *method = zmsg_popstr (msg);
     if (streq (method, "$TERM")) {
+        //  Shutdown the engine
         free (method);
         zmsg_destroy (&msg);
         return -1;
     }
     else
     if (streq (method, "BIND")) {
+        //  Bind to a specified endpoint, which may use an ephemeral port
         char *endpoint = zmsg_popstr (msg);
         self->port = zsock_bind (self->router, "%s", endpoint);
         assert (self->port != -1);
-        zstr_sendf (self->pipe, "%d", self->port);
         free (endpoint);
     }
+    else
+    if (streq (method, "PORT"))
+        //  Return port number from the last bind, if any
+        zstr_sendf (self->pipe, "%d", self->port);
     else
     if (streq (method, "CONFIGURE")) {
         char *config_file = zmsg_popstr (msg);
