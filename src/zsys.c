@@ -1375,6 +1375,7 @@ zsys_test (bool verbose)
         printf ("\n");
 
     //  @selftest
+    zsys_init ();
     zsys_catch_interrupts ();
 
     //  Check capabilities without using the return value
