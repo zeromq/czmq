@@ -311,12 +311,12 @@ typedef struct {
     zcertstore_t *certstore;    //  CURVE certificate store, if loaded
     bool allow_any;             //  CURVE allows arbitrary clients
     bool terminated;            //  Did API ask us to quit?
-} agent_t;
+} auth_t;
 
-static agent_t *
+static auth_t *
 s_agent_new (zctx_t *ctx, void *pipe)
 {
-    agent_t *self = (agent_t *) zmalloc (sizeof (agent_t));
+    auth_t *self = (auth_t *) zmalloc (sizeof (auth_t));
     self->ctx = ctx;
     self->pipe = pipe;
     self->whitelist = zhash_new ();
@@ -334,11 +334,11 @@ s_agent_new (zctx_t *ctx, void *pipe)
 }
 
 static void
-s_agent_destroy (agent_t **self_p)
+s_agent_destroy (auth_t **self_p)
 {
     assert (self_p);
     if (*self_p) {
-        agent_t *self = *self_p;
+        auth_t *self = *self_p;
         zhash_destroy (&self->passwords);
         zhash_destroy (&self->whitelist);
         zhash_destroy (&self->blacklist);
@@ -351,7 +351,7 @@ s_agent_destroy (agent_t **self_p)
 //  Handle a message from front-end API
 
 static int
-s_agent_handle_pipe (agent_t *self)
+s_agent_handle_pipe (auth_t *self)
 {
     //  Get the whole message off the pipe in one go
     zmsg_t *request = zmsg_recv (self->pipe);
@@ -435,12 +435,12 @@ s_agent_handle_pipe (agent_t *self)
 
 //  Handle an authentication request from libzmq core
 
-static bool s_authenticate_plain (agent_t *self, zap_request_t *request);
-static bool s_authenticate_curve (agent_t *self, zap_request_t *request);
-static bool s_authenticate_gssapi (agent_t *self, zap_request_t *request);
+static bool s_authenticate_plain (auth_t *self, zap_request_t *request);
+static bool s_authenticate_curve (auth_t *self, zap_request_t *request);
+static bool s_authenticate_gssapi (auth_t *self, zap_request_t *request);
 
 static int
-s_agent_authenticate (agent_t *self)
+s_agent_authenticate (auth_t *self)
 {
     zap_request_t *request = zap_request_new (self->handler);
     if (request) {
@@ -508,7 +508,7 @@ s_agent_authenticate (agent_t *self)
 
 
 static bool 
-s_authenticate_plain (agent_t *self, zap_request_t *request)
+s_authenticate_plain (auth_t *self, zap_request_t *request)
 {
     if (self->passwords) {
         zhash_refresh (self->passwords);
@@ -535,7 +535,7 @@ s_authenticate_plain (agent_t *self, zap_request_t *request)
 
 
 static bool 
-s_authenticate_curve (agent_t *self, zap_request_t *request)
+s_authenticate_curve (auth_t *self, zap_request_t *request)
 {
     //  TODO: load metadata from certificate and return via ZAP response
     if (self->allow_any) {
@@ -558,7 +558,7 @@ s_authenticate_curve (agent_t *self, zap_request_t *request)
 }
 
 static bool 
-s_authenticate_gssapi (agent_t *self, zap_request_t *request)
+s_authenticate_gssapi (auth_t *self, zap_request_t *request)
 {
     if (self->verbose) 
         printf ("I: ALLOWED (GSSAPI) principal=%s identity=%s\n", request->principal, request->identity);
@@ -571,7 +571,7 @@ static void
 s_agent_task (void *args, zctx_t *ctx, void *pipe)
 {
     //  Create agent instance as we start this task
-    agent_t *self = s_agent_new (ctx, pipe);
+    auth_t *self = s_agent_new (ctx, pipe);
     if (!self)                  //  Interrupted
         return;
         

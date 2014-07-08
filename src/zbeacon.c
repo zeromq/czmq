@@ -325,20 +325,20 @@ typedef struct {
     zframe_t *filter;           //  Beacon filter data
     inaddr_t address;           //  Our own address
     inaddr_t broadcast;         //  Our broadcast address
-} agent_t;
+} beacon_t;
 
 //  Prototypes for local functions we use in the agent
 
-static agent_t *
+static beacon_t *
     s_agent_new (void *pipe, int port_nbr);
 static void
-    s_agent_destroy (agent_t **self_p);
+    s_agent_destroy (beacon_t **self_p);
 static void
-    s_get_interface (agent_t *self);
+    s_get_interface (beacon_t *self);
 static void
-    s_api_command (agent_t *self);
+    s_api_command (beacon_t *self);
 static void
-    s_beacon_recv (agent_t *self);
+    s_beacon_recv (beacon_t *self);
 
 
 //  This is the background task
@@ -351,7 +351,7 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
     assert (port_str);
 
     //  Create agent instance
-    agent_t *self = s_agent_new (pipe, atoi (port_str));
+    beacon_t *self = s_agent_new (pipe, atoi (port_str));
     zstr_free (&port_str);
     if (!self)
         return;                 //  Give up if we couldn't initialize
@@ -389,10 +389,10 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
 
 //  Create and initialize new agent instance
 
-static agent_t *
+static beacon_t *
 s_agent_new (void *pipe, int port_nbr)
 {
-    agent_t *self = (agent_t *) zmalloc (sizeof (agent_t));
+    beacon_t *self = (beacon_t *) zmalloc (sizeof (beacon_t));
     assert (self);
     
     self->pipe = pipe;
@@ -448,7 +448,7 @@ s_agent_new (void *pipe, int port_nbr)
 //  Currently implemented for POSIX and for Windows
 
 static void
-s_get_interface (agent_t *self)
+s_get_interface (beacon_t *self)
 {
 #if defined (HAVE_GETIFADDRS)
     struct ifaddrs *interfaces;
@@ -574,7 +574,7 @@ s_get_interface (agent_t *self)
 //  Handle command from API
 
 static void
-s_api_command (agent_t *self)
+s_api_command (beacon_t *self)
 {
     char *command = zstr_recv (self->pipe);
     if (streq (command, "INTERVAL")) {
@@ -619,7 +619,7 @@ s_api_command (agent_t *self)
 //  Receive and filter the waiting beacon
 
 static void
-s_beacon_recv (agent_t *self)
+s_beacon_recv (beacon_t *self)
 {
     assert (self);
 
@@ -658,11 +658,11 @@ s_beacon_recv (agent_t *self)
 //  Destroy agent instance
 
 static void
-s_agent_destroy (agent_t **self_p)
+s_agent_destroy (beacon_t **self_p)
 {
     assert (self_p);
     if (*self_p) {
-        agent_t *self = *self_p;
+        beacon_t *self = *self_p;
         zsys_udp_close (self->udpsock);
         zframe_destroy (&self->transmit);
         zframe_destroy (&self->filter);

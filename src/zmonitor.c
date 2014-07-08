@@ -211,18 +211,18 @@ typedef struct {
     char *endpoint;         //  Monitored endpoint
     bool verbose;           //  Trace activity to stdout
     bool terminated;
-} agent_t;
+} monitor_t;
 
 //  Prototypes for local functions we use in the agent
 
-static agent_t *
+static monitor_t *
     s_agent_new (zctx_t *ctx, void *pipe, char *endpoint);
 static void
-    s_api_command (agent_t *self);
+    s_api_command (monitor_t *self);
 static void
-    s_socket_event (agent_t *self);
+    s_socket_event (monitor_t *self);
 static void
-    s_agent_destroy (agent_t **self_p);
+    s_agent_destroy (monitor_t **self_p);
 
 
 //  This is the background task that monitors socket events
@@ -233,7 +233,7 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
     char *endpoint = zstr_recv (pipe);
     assert (endpoint);
 
-    agent_t *self = s_agent_new (ctx, pipe, endpoint);
+    monitor_t *self = s_agent_new (ctx, pipe, endpoint);
     zpoller_t *poller = zpoller_new (self->pipe, self->socket, NULL);
 
     while (!self->terminated) {
@@ -256,10 +256,10 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
 //  --------------------------------------------------------------------------
 //  Create and initialize new agent instance
 
-static agent_t *
+static monitor_t *
 s_agent_new (zctx_t *ctx, void *pipe, char *endpoint)
 {
-    agent_t *self = (agent_t *) zmalloc (sizeof (agent_t));
+    monitor_t *self = (monitor_t *) zmalloc (sizeof (monitor_t));
     assert (self);
 
     self->ctx = ctx;
@@ -283,7 +283,7 @@ s_agent_new (zctx_t *ctx, void *pipe, char *endpoint)
 //  Handle command from API
 
 static void
-s_api_command (agent_t *self)
+s_api_command (monitor_t *self)
 {
     char *command = zstr_recv (self->pipe);
     if (streq (command, "TERMINATE")) {
@@ -307,7 +307,7 @@ s_api_command (agent_t *self)
 // Handle event from socket monitor
 
 static void
-s_socket_event (agent_t *self)
+s_socket_event (monitor_t *self)
 {
     //  First frame is event number and value
     zframe_t *frame = zframe_recv (self->socket);
@@ -371,11 +371,11 @@ s_socket_event (agent_t *self)
 //  Destroy agent instance
 
 static void
-s_agent_destroy (agent_t **self_p)
+s_agent_destroy (monitor_t **self_p)
 {
     assert (self_p);
     if (*self_p) {
-        agent_t *self = *self_p;
+        monitor_t *self = *self_p;
         free (self->endpoint);
         free (self);
         *self_p = NULL;

@@ -157,13 +157,13 @@ typedef struct {
     int events;             //  Monitored event mask
     bool verbose;           //  Trace activity to stdout
     bool terminated;
-} agent_t;
+} sock_monitor_t;
 
 
-static agent_t *
+static sock_monitor_t *
 s_agent_new (void *pipe, zsock_t *sock)
 {
-    agent_t *self = (agent_t *) zmalloc (sizeof (agent_t));
+    sock_monitor_t *self = (sock_monitor_t *) zmalloc (sizeof (sock_monitor_t));
     assert (self);
     self->pipe = pipe;
     self->monitored = zsock_resolve (sock);
@@ -173,11 +173,11 @@ s_agent_new (void *pipe, zsock_t *sock)
 }
 
 static void
-s_agent_destroy (agent_t **self_p)
+s_agent_destroy (sock_monitor_t **self_p)
 {
     assert (self_p);
     if (*self_p) {
-        agent_t *self = *self_p;
+        sock_monitor_t *self = *self_p;
 #if defined (ZMQ_EVENT_ALL)
         zmq_socket_monitor (self->monitored, NULL, 0);
 #endif
@@ -189,7 +189,7 @@ s_agent_destroy (agent_t **self_p)
 }
 
 static void
-s_agent_start (agent_t *self)
+s_agent_start (sock_monitor_t *self)
 {
     assert (!self->sink);
     char *endpoint = zsys_sprintf ("inproc://zsock_monitor-%p", self->monitored);
@@ -209,7 +209,7 @@ s_agent_start (agent_t *self)
 //  Handle command from API
 
 static void
-s_api_command (agent_t *self)
+s_api_command (sock_monitor_t *self)
 {
     char *command = zstr_recv (self->pipe);
     if (streq (command, "LISTEN")) {
@@ -244,7 +244,7 @@ s_api_command (agent_t *self)
 //  Handle event from socket monitor
 
 static void
-s_monitor_event (agent_t *self)
+s_monitor_event (sock_monitor_t *self)
 {
 #if defined (ZMQ_EVENT_ALL)
 #if (ZMQ_VERSION_MAJOR == 4)
@@ -329,7 +329,7 @@ static void
 s_agent_task (void *args, zctx_t *ctx, void *pipe)
 {
     zsock_t *sock = (zsock_t *) args;
-    agent_t *self = s_agent_new (pipe, sock);
+    sock_monitor_t *self = s_agent_new (pipe, sock);
 
     while (!self->terminated) {
         //  Poll on API pipe and on monitor socket
