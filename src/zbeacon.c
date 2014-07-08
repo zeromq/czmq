@@ -571,9 +571,13 @@ s_get_interface (agent_t *self)
 
         if (filter && valid && pUnicast && pPrefix) {
             self->address = *(inaddr_t *)(pUnicast->Address.lpSockaddr);
+            self->address.sin_port = htons (self->port_nbr);
+
             self->broadcast = *(inaddr_t *)(pPrefix->Address.lpSockaddr);
             self->broadcast.sin_addr.s_addr
                 |= htonl ((1 << (32 - pPrefix->PrefixLength)) - 1);
+            self->broadcast.sin_port = htons (self->port_nbr);
+
             found = 1;
             break;
         }
