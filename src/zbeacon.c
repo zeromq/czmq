@@ -566,7 +566,7 @@ s_get_interface (agent_t *self)
         char *asciiFriendlyName = (char*) zmalloc(asciiSize);
         wcstombs_s (&friendlyLength, asciiFriendlyName, asciiSize, friendlyName, _TRUNCATE);
 
-        int filter = any_interface || (strcmp (zsys_interface (), asciiFriendlyName));
+        int filter = any_interface || (strcmp (zsys_interface (), asciiFriendlyName) == 0);
         int valid = cur_address->OperStatus == IfOperStatusUp;
 
         if (filter && valid && pUnicast && pPrefix) {
