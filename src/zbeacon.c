@@ -503,7 +503,8 @@ s_get_interface (agent_t *self)
     }
     freeifaddrs (interfaces);
 
-#else
+#   elif defined (__UNIX__)
+
     //  Our default if we fail to find an interface
     self->broadcast.sin_family = AF_INET;
     self->broadcast.sin_addr.s_addr = INADDR_BROADCAST;
@@ -516,7 +517,6 @@ s_get_interface (agent_t *self)
     if (strlen (zsys_interface ()) == 0)
         return;         //  Use defaults
 
-#   if defined (__UNIX__)
     struct ifreq ifr;
     memset (&ifr, 0, sizeof (ifr));
 
@@ -541,6 +541,9 @@ s_get_interface (agent_t *self)
     close (sock);
 
 #   elif defined (__WINDOWS__)
+
+    int any_interface = (strlen (zsys_interface ()) == 0);
+
     ULONG addr_size = 0;
     DWORD rc = GetAdaptersAddresses (AF_INET,
         GAA_FLAG_INCLUDE_PREFIX, NULL, NULL, &addr_size);
@@ -551,24 +554,40 @@ s_get_interface (agent_t *self)
         GAA_FLAG_INCLUDE_PREFIX, NULL, pip_addresses, &addr_size);
     assert (rc == NO_ERROR);
 
+    int found = 0;
     PIP_ADAPTER_ADDRESSES cur_address = pip_addresses;
     while (cur_address) {
         PIP_ADAPTER_UNICAST_ADDRESS pUnicast = cur_address->FirstUnicastAddress;
         PIP_ADAPTER_PREFIX pPrefix = cur_address->FirstPrefix;
 
-        if (pUnicast && pPrefix) {
+        PWCHAR friendlyName = cur_address->FriendlyName;
+        size_t friendlyLength = 0;
+        size_t asciiSize = wcslen(friendlyName) * 2;
+        char *asciiFriendlyName = (char*) zmalloc(asciiSize);
+        wcstombs_s (&friendlyLength, asciiFriendlyName, asciiSize, friendlyName, _TRUNCATE);
+
+        int filter = any_interface || (strcmp (zsys_interface (), asciiFriendlyName) == 0);
+        int valid = cur_address->OperStatus == IfOperStatusUp;
+
+        if (filter && valid && pUnicast && pPrefix) {
             self->address = *(inaddr_t *)(pUnicast->Address.lpSockaddr);
             self->broadcast = *(inaddr_t *)(pPrefix->Address.lpSockaddr);
             self->broadcast.sin_addr.s_addr
                 |= htonl ((1 << (32 - pPrefix->PrefixLength)) - 1);
+            found = 1;
+            break;
         }
         cur_address = cur_address->Next;
     }
     free (pip_addresses);
+
+    if (!found)
+    {
+        zsys_socket_error("No adapter found or ZSYS_INTERFACE not equal to any adapter friendly name");
+    }
 #   else
 #       error "Interface detection TBD on this operating system"
 #   endif
-#endif
 }
 
 //  Handle command from API
