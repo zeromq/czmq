@@ -4,7 +4,6 @@ void assert_status (zactor_t *actor, int status)
 {
     zstr_sendx (actor, "STATUS", NULL);
     char *reply = zstr_recv (actor);
-    puts (reply);
     assert (atoi (reply) == status);
     free (reply);
 }
@@ -14,6 +13,7 @@ int main (void)
 {
     //  Test case 1: two servers, bunch of clients.
     printf ("Starting test case 1: ");
+    fflush (stdout);
     
     zactor_t *server1 = zactor_new (zgossip, "server1");
     assert (server1);
@@ -69,7 +69,69 @@ int main (void)
 
     //  Test case 2: swarm of peers
     printf ("Starting test case 2: ");
-    printf ("OK\n");
+    fflush (stdout);
 
+    size_t swarm_size = 200;
+    size_t set_size = 8000;
+    //  Should be able to set actor HWMs
+    zsys_set_sndhwm (set_size * 2);
+    zactor_t *nodes [swarm_size];
+
+    //  Create swarm
+    uint node_nbr;
+    for (node_nbr = 0; node_nbr < swarm_size; node_nbr++)
+        nodes [node_nbr] = zactor_new (zgossip, NULL);
+    printf (".");
+    fflush (stdout);
+
+    //  Interconnect swarm; ever node connects to one arbitrary node to
+    //  create a directed graph, then oldest node connects to youngest
+    //  node to create a loop, to test we're robust against cycles.
+    for (node_nbr = 0; node_nbr < swarm_size; node_nbr++) {
+        zstr_sendm (nodes [node_nbr], "BIND");
+        zstr_sendf (nodes [node_nbr], "inproc://swarm-%d", node_nbr);
+        if (node_nbr > 0) {
+            zstr_sendm (nodes [node_nbr], "CONNECT");
+            zstr_sendf (nodes [node_nbr], "inproc://swarm-%d", randof (node_nbr));
+        }
+    }
+    zstr_sendm (nodes [0], "CONNECT");
+    zstr_sendf (nodes [0], "inproc://swarm-%d", node_nbr - 1);
+    printf (".");
+    fflush (stdout);
+
+    //  Publish the data set randomly across the swarm
+    int item_nbr;
+    for (item_nbr = 0; item_nbr < set_size; item_nbr++) {
+        node_nbr = randof (swarm_size);
+        zstr_sendm  (nodes [node_nbr], "PUBLISH");
+        zstr_sendfm (nodes [node_nbr], "key-%d", item_nbr);
+        zstr_send   (nodes [node_nbr], "value");
+    }
+    printf (".");
+    fflush (stdout);
+    
+    //  Allow time for traffic to propagate across whole swarm
+    for (node_nbr = 0; node_nbr < swarm_size; node_nbr++) {
+        while (true) {
+            printf ("%d\n", node_nbr);
+            zstr_sendx (nodes [node_nbr], "STATUS", NULL);
+            char *reply = zstr_recv (nodes [node_nbr]);
+            int status = atoi (reply);
+            free (reply);
+            if (status == set_size)
+                break;
+            zclock_sleep (250);
+            printf (".");
+            fflush (stdout);
+        }
+    }
+        
+    //  Destroy swarm
+    for (node_nbr = 0; node_nbr < swarm_size; node_nbr++)
+        zactor_destroy (&nodes [node_nbr]);
+    
+    printf ("OK\n");
+    
     return 0;
 }
