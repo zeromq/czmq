@@ -528,7 +528,7 @@ zfile_test (bool verbose)
     assert (!zfile_is_stable (file));
     
     //  Now append one byte to file from outside
-    int handle = open ("./this/is/a/test/bilbo", O_WRONLY | O_TRUNC, 0);
+    int handle = open ("./this/is/a/test/bilbo", O_WRONLY | O_TRUNC | O_BINARY, 0);
     assert (handle >= 0);
     rc = write (handle, "Hello, World\n", 13);
     assert (rc == 13);

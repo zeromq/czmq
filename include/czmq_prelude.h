@@ -487,9 +487,10 @@ static inline void *
 //  Lets us write code that compiles both on Windows and normal platforms
 #if !defined (__WINDOWS__)
 typedef int SOCKET;
-#   define closesocket close
-#   define INVALID_SOCKET -1
-#   define SOCKET_ERROR -1
+#   define closesocket      close
+#   define INVALID_SOCKET   -1
+#   define SOCKET_ERROR     -1
+#   define O_BINARY         0
 #endif
 
 //- Include non-portable header files based on platform.h -------------------

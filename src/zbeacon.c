@@ -586,9 +586,8 @@ s_get_interface (agent_t *self)
     free (pip_addresses);
 
     if (!found)
-    {
         zsys_socket_error("No adapter found or ZSYS_INTERFACE not equal to any adapter friendly name");
-    }
+
 #   else
 #       error "Interface detection TBD on this operating system"
 #   endif
