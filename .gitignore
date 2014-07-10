@@ -83,3 +83,5 @@ examples/security/strawhouse
 examples/security/strawhouse.o
 examples/security/woodhouse
 examples/security/woodhouse.o
+src/test_gossip
+
