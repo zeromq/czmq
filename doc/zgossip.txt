@@ -9,11 +9,11 @@ SYNOPSIS
 --------
 ----
 //  This is zgossip, implemented as a CZMQ zactor task
-void
+CZMQ_EXPORT void
     zgossip (zsock_t *pipe, void *args);
 
 //  Self test of this class
-void
+CZMQ_EXPORT void
     zgossip_test (bool verbose);
 ----
 
@@ -81,15 +81,12 @@ EXAMPLE
     //  Test basic client-to-server operation of the protocol
     zactor_t *server = zactor_new (zgossip, "server");
     zstr_sendx (server, "SET", "server/animate", verbose? "1": "0", NULL);
-    zstr_sendx (server, "BIND", "ipc:///tmp/zgossip", NULL);
-    char *port_str = zstr_recv (server);
-    assert (streq (port_str, "0"));
-    zstr_free (&port_str);
+    zstr_sendx (server, "BIND", "inproc://zgossip", NULL);
 
     zsock_t *client = zsock_new (ZMQ_DEALER);
     assert (client);
     zsock_set_rcvtimeo (client, 2000);
-    zsock_connect (client, "ipc:///tmp/zgossip");
+    zsock_connect (client, "inproc://zgossip");
 
     //  Send HELLO, which gets no reply
     zgossip_msg_t *request, *reply;
@@ -116,9 +113,6 @@ EXAMPLE
     //  Set a 100msec timeout on clients so we can test expiry
     zstr_sendx (base, "SET", "server/timeout", "100", NULL);
     zstr_sendx (base, "BIND", "inproc://base", NULL);
-    port_str = zstr_recv (base);
-    assert (streq (port_str, "0"));
-    zstr_free (&port_str);
 
     zactor_t *alpha = zactor_new (zgossip, "alpha");
     assert (alpha);

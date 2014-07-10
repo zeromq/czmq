@@ -9,10 +9,11 @@ The following ABNF grammar defines the ZeroMQ Gossip Protocol:
     version         = number-1              ; Version = 1
 
     ;         Client or server announces a new tuple
-    publish         = signature %d2 version key value
+    publish         = signature %d2 version key value ttl
     version         = number-1              ; Version = 1
-    key             = string                ; The key
-    value           = string                ; The value
+    key             = string                ; Tuple key, globally unique
+    value           = longstr               ; Tuple value, as printable string
+    ttl             = number-4              ; Time to live, msec
 
     ;         Client signals liveness
     ping            = signature %d3 version
@@ -28,6 +29,8 @@ The following ABNF grammar defines the ZeroMQ Gossip Protocol:
 
     ; Strings are always length + text contents
     string          = number-1 *VCHAR
+    longstr         = number-4 *VCHAR
 
     ; Numbers are unsigned integers in network byte order
     number-1        = 1OCTET
+    number-4        = 4OCTET
