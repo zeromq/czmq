@@ -691,6 +691,12 @@ s_server_new (zsock_t *pipe)
 
     self->pipe = pipe;
     self->router = zsock_new (ZMQ_ROUTER);
+    //  By default the socket will discard outgoing messages above the
+    //  HWM of 1,000. This isn't helpful for high-volume streaming. We
+    //  will use a unbounded queue here. If applications need to guard
+    //  against queue overflow, they should use a credit-based flow
+    //  control scheme.
+    zsock_set_sndhwm (self->router, 0);
     self->clients = zhash_new ();
     self->config = zconfig_new ("root", NULL);
     self->loop = zloop_new ();
