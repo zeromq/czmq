@@ -70,9 +70,6 @@
 
         <!-- Options that are the same in 3.x -->
         <include name = "3-x options" />
-
-        <!-- Emulation of 2.x ZMQ_HWM option -->
-        <include name = "set_hwm" />
     </version>
     
     <version major = "3" style = "macro">
@@ -86,9 +83,6 @@
         <option name = "ipv4only"          type = "int"    mode = "rw" test = "SUB" />
         <option name = "delay_attach_on_connect"
                                            type = "int"    mode = "w"  test = "PUB" />
-
-        <!-- Emulation of 2.x ZMQ_HWM option -->
-        <include name = "set_hwm" />
     </version>
 
     <!-- Legacy version 2 -->
