@@ -218,9 +218,8 @@ zgossip_msg_destroy (zgossip_msg_t **self_p)
 
 //  --------------------------------------------------------------------------
 //  Parse a zgossip_msg from zmsg_t. Returns a new object, or NULL if
-//  the message could not be parsed, or was NULL. If the socket type is
-//  ZMQ_ROUTER, then parses the first frame as a routing_id. Destroys msg
-//  and nullifies the msg refernce.
+//  the message could not be parsed, or was NULL. Destroys msg and 
+//  nullifies the msg reference.
 
 zgossip_msg_t *
 zgossip_msg_decode (zmsg_t **msg_p)
@@ -303,8 +302,6 @@ zgossip_msg_decode (zmsg_t **msg_p)
 //  --------------------------------------------------------------------------
 //  Encode zgossip_msg into zmsg and destroy it. Returns a newly created
 //  object or NULL if error. Use when not in control of sending the message.
-//  If the socket_type is ZMQ_ROUTER, then stores the routing_id as the
-//  first frame of the resulting message.
 
 zmsg_t *
 zgossip_msg_encode (zgossip_msg_t **self_p)

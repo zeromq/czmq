@@ -67,6 +67,7 @@ static size_t s_max_sockets = 1024; //  ZSYS_MAX_SOCKETS=1024
 static size_t s_linger = 0;         //  ZSYS_LINGER=0
 static size_t s_sndhwm = 1000;      //  ZSYS_SNDHWM=1000
 static size_t s_rcvhwm = 1000;      //  ZSYS_RCVHWM=1000
+static size_t s_pipehwm = 1000;     //  ZSYS_PIPEHWM=1000
 static int s_ipv6 = 0;              //  ZSYS_IPV6=0
 static char *s_interface = NULL;    //  ZSYS_INTERFACE=
 static char *s_logident = NULL;     //  ZSYS_LOGIDENT=
@@ -133,6 +134,9 @@ zsys_init (void)
 
     if (getenv ("ZSYS_RCVHWM"))
         s_rcvhwm = atoi (getenv ("ZSYS_RCVHWM"));
+
+    if (getenv ("ZSYS_PIPEHWM"))
+        s_pipehwm = atoi (getenv ("ZSYS_PIPEHWM"));
 
     if (getenv ("ZSYS_IPV6"))
         s_ipv6 = atoi (getenv ("ZSYS_IPV6"));
@@ -1122,6 +1126,33 @@ zsys_set_rcvhwm (size_t rcvhwm)
 
 
 //  --------------------------------------------------------------------------
+//  Configure the default HWM for zactor internal pipes; this is set on both
+//  ends of the pipe, for outgoing messages only (sndhwm). The default HWM is
+//  1,000, on all versions of ZeroMQ. If the environment var ZSYS_ACTORHWM is
+//  defined, that provides the default. Note that a value of zero means no
+//  limit, i.e. infinite memory consumption.
+
+void
+zsys_set_pipehwm (size_t pipehwm)
+{
+    zsys_init ();
+    ZMUTEX_LOCK (s_mutex);
+    s_pipehwm = pipehwm;
+    ZMUTEX_UNLOCK (s_mutex);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return the HWM for zactor internal pipes.
+
+size_t
+zsys_pipehwm (void)
+{
+    return s_pipehwm;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Configure use of IPv6 for new zsock instances. By default sockets accept
 //  and make only IPv4 connections. When you enable IPv6, sockets will accept
 //  and connect to both IPv4 and IPv6 peers. You can override the setting on
@@ -1394,6 +1425,9 @@ zsys_test (bool verbose)
     zsys_set_linger (0);
     zsys_set_sndhwm (1000);
     zsys_set_rcvhwm (1000);
+    zsys_set_pipehwm (2500);
+    assert (zsys_pipehwm () == 2500);
+
     zsys_set_ipv6 (0);
 
     rc = zsys_file_delete ("nosuchfile");

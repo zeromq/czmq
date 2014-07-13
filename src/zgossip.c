@@ -172,6 +172,11 @@ server_connect (server_t *self, const char *endpoint)
 {
     zsock_t *remote = zsock_new (ZMQ_DEALER);
     assert (remote);          //  No recovery if exhausted
+
+    //  Never block on sending; we use an infinite HWM and buffer as many
+    //  messages as needed in outgoing pipes. Note that the maximum number
+    //  is the overall tuple set size.
+    zsock_set_sndhwm (remote, 0);
     if (zsock_connect (remote, "%s", endpoint)) {
         zsys_error ("bad zgossip endpoint '%s'", endpoint);
         zsock_destroy (&remote);
@@ -181,7 +186,8 @@ server_connect (server_t *self, const char *endpoint)
     zgossip_msg_send_hello (remote);
     tuple_t *tuple = (tuple_t *) zhash_first (self->tuples);
     while (tuple) {
-        zgossip_msg_send_publish (remote, tuple->key, tuple->value, 0);
+        int rc = zgossip_msg_send_publish (remote, tuple->key, tuple->value, 0);
+        assert (rc == 0);
         tuple = (tuple_t *) zhash_next (self->tuples);
     }
     //  Now monitor this remote for incoming messages
@@ -217,7 +223,8 @@ server_accept (server_t *self, const char *key, const char *value)
     //  Copy new tuple announcement to all remotes
     zsock_t *remote = (zsock_t *) zlist_first (self->remotes);
     while (remote) {
-        zgossip_msg_send_publish (remote, key, value, 0);
+        int rc = zgossip_msg_send_publish (remote, key, value, 0);
+        assert (rc == 0);
         remote = (zsock_t *) zlist_next (self->remotes);
     }
 }
