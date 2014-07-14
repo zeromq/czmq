@@ -44,12 +44,12 @@
     which sends CONNECT commands for each configured remote.
 
     The messages between client and server are defined in zgossip_msg.xml.
-    This stack is built using the zeromq/zproto toolkit.
+    We built this stack using the zeromq/zproto toolkit.
 
-    To join the gossip network, a node has to connect to one or more peers.
-    Every peer acts as a forwarder. This loosely-coupled network can scale
-    to thousands of nodes. However the gossip protocol is NOT designed to
-    be efficient, and should not be used for application data, as the same
+    To join the gossip network, a node connects to one or more peers. Each
+    peer acts as a forwarder. This loosely-coupled network can scale to
+    thousands of nodes. However the gossip protocol is NOT designed to be
+    efficient, and should not be used for application data, as the same
     tuples may be sent many times across the network.
 
     The basic logic of the gossip service is to accept PUBLISH messages
@@ -59,8 +59,7 @@
     just described. At any point the application can access the node's set
     of tuples.
     
-    The protocol uses ping-pong heartbeating to monitor presence. This code
-    doesn't do anything with expired nodes yet.
+    At present there is no way to expire tuples from the network.
 
     The assumptions in this design are:
 
