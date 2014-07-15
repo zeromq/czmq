@@ -68,6 +68,7 @@ And these utility classes add value:
 * linkczmq:zchunk[3] - work with memory chunks
 * linkczmq:zconfig[3] - work with textual config files
 * linkczmq:zrex[3] - work with regular expressions
+* linkczmq:zgossip[3] - gossip protocol service
 
 These classes are deprecated:
 

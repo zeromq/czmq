@@ -43,7 +43,7 @@ struct _zgossip_msg_t {
     byte version;                       //  Version = 1
     char *key;                          //  Tuple key, globally unique
     char *value;                        //  Tuple value, as printable string
-    uint32_t ttl;                       //  Time to live, msec
+    uint32_t ttl;                       //  Time to live, msecs
 };
 
 //  --------------------------------------------------------------------------

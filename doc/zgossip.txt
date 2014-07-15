@@ -3,12 +3,30 @@ zgossip(3)
 
 NAME
 ----
-zgossip - gossip protocol service
+zgossip - decentralized configuration management
 
 SYNOPSIS
 --------
 ----
-//  This is zgossip, implemented as a CZMQ zactor task
+//  To work with zgossip, use the CZMQ zactor API:
+//
+//  Create new zgossip instance, passing logging prefix:
+//      zactor_t *zgossip = zactor_new (zgossip, "myname");
+//  
+//  Destroy zgossip instance
+//      zactor_destroy (&zgossip);
+//  
+//  Send zmsg instance message to zgossip instance:
+//      zactor_send (zgossip, &msg);
+//  
+//  Send command to zgossip instance:
+//      zstr_sendx (zgossip, "COMMAND", "ARG1", "ARG2", NULL);
+//  
+//  Receive zmsg message from zgossip instance:
+//      zmsg_t *msg = zactor_recv (zgossip);
+//
+//  This is the zgossip constructor as a zactor_fn:
+//
 CZMQ_EXPORT void
     zgossip (zsock_t *pipe, void *args);
 
@@ -20,7 +38,11 @@ CZMQ_EXPORT void
 DESCRIPTION
 -----------
 
-Implements a gossip protocol (RFC TBD).
+Implements a gossip protocol for decentralized configuration management.
+Your applications nodes form a loosely connected network (which can have
+cycles), and publish name/value tuples. Each node re-distributes the new
+tuples it receives, so that the entire network eventually achieves a
+consistent state. The current design does not expire tuples.
 
 The gossip protocol distributes information around a loosely-connected
 network of gossip services. The information consists of name/value pairs
@@ -51,12 +73,12 @@ to a set of servers ("remotes"), and under control of the calling app,
 which sends CONNECT commands for each configured remote.
 
 The messages between client and server are defined in zgossip_msg.xml.
-This stack is built using the zeromq/zproto toolkit.
+We built this stack using the zeromq/zproto toolkit.
 
-To join the gossip network, a node has to connect to one or more peers.
-Every peer acts as a forwarder. This loosely-coupled network can scale
-to thousands of nodes. However the gossip protocol is NOT designed to
-be efficient, and should not be used for application data, as the same
+To join the gossip network, a node connects to one or more peers. Each
+peer acts as a forwarder. This loosely-coupled network can scale to
+thousands of nodes. However the gossip protocol is NOT designed to be
+efficient, and should not be used for application data, as the same
 tuples may be sent many times across the network.
 
 The basic logic of the gossip service is to accept PUBLISH messages
@@ -66,8 +88,7 @@ it away. When a node gets a new tuple, it stores it, and fowards it as
 just described. At any point the application can access the node's set
 of tuples.
 
-The protocol uses ping-pong heartbeating to monitor presence. This code
-doesn't do anything with expired nodes yet.
+At present there is no way to expire tuples from the network.
 
 The assumptions in this design are:
 

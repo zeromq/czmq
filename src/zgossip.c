@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zgossip - gossip protocol service
+    zgossip - decentralized configuration management
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -13,7 +13,11 @@
 
 /*
 @header
-    Implements a gossip protocol (RFC TBD).
+    Implements a gossip protocol for decentralized configuration management.
+    Your applications nodes form a loosely connected network (which can have
+    cycles), and publish name/value tuples. Each node re-distributes the new
+    tuples it receives, so that the entire network eventually achieves a
+    consistent state. The current design does not expire tuples.
 @discuss
     The gossip protocol distributes information around a loosely-connected
     network of gossip services. The information consists of name/value pairs
