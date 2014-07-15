@@ -124,7 +124,17 @@ This is a list of known higher-level wrappers around CZMQ:
 * https://github.com/gar1t/erlang-czmq - Erlang
 * https://github.com/mtortonesi/ruby-czmq-ffi - Ruby FFI
 
-### API Summary
+### API Summary (Alphabetical Order)
+
+#### zactor - simple actor framework
+
+.pull src/zactor.c@header,left
+
+This is the class interface:
+
+.pull include/zactor.h@interface,code
+
+.pull src/zactor.c@discuss,left
 
 #### zauth - authentication for ZeroMQ security mechanisms
 
@@ -236,6 +246,16 @@ This is the class interface:
 
 .pull src/zframe.c@discuss,left
 
+####  zgossip - decentralized configuration management
+
+.pull src/zgossip.c@header,left
+
+This is the class interface:
+
+.pull include/zgossip.h@interface,code
+
+.pull src/zgossip.c@discuss,left
+
 #### zhash - generic hash table container
 
 .pull src/zhash.c@header,left
@@ -255,16 +275,6 @@ This is the class interface:
 .pull include/zlist.h@interface,code
 
 .pull src/zlist.c@discuss,left
-
-#### zlog - system-provided logging service
-
-.pull src/zlog.c@header,left
-
-This is the class interface:
-
-.pull include/zlog.h@interface,code
-
-.pull src/zlog.c@discuss,left
 
 #### zloop - event-driven reactor
 
