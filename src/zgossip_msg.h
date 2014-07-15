@@ -34,7 +34,7 @@
         version             number 1    Version = 1
         key                 string      Tuple key, globally unique
         value               longstr     Tuple value, as printable string
-        ttl                 number 4    Time to live, msec
+        ttl                 number 4    Time to live, msecs
 
     PING - Client signals liveness
         version             number 1    Version = 1
