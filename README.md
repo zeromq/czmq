@@ -1222,6 +1222,16 @@ cycles), and publish name/value tuples. Each node re-distributes the new
 tuples it receives, so that the entire network eventually achieves a
 consistent state. The current design does not expire tuples.
 
+Provides these commands (sent as multipart strings to the actor):
+
+* BIND endpoint -- binds the gossip service to specified endpoint
+* PORT -- returns the last TCP port, if any, used for binding
+* CONFIGURE configfile -- load configuration from specified file
+* SET configpath value -- set configuration path = value
+* CONNECT endpoint -- connect the gossip service to the specified peer
+* PUBLISH key value -- publish a key/value pair to the gossip cluster
+* STATUS -- return number of key/value pairs held by gossip service
+
 This is the class interface:
 
     //  To work with zgossip, use the CZMQ zactor API:
