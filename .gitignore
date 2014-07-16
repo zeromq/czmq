@@ -85,3 +85,5 @@ examples/security/woodhouse
 examples/security/woodhouse.o
 src/test_zgossip
 
+.cproject
+.project
