@@ -43,7 +43,10 @@ struct _zsock_t {
 
 //  --------------------------------------------------------------------------
 //  Create a new socket. This macro passes the caller source and line
-//  number so that CZMQ can report socket leaks intelligently.
+//  number so that CZMQ can report socket leaks intelligently. To switch
+//  off this checking, which may be costly if you use a LOT of sockets,
+//  define ZSOCK_NOCHECK before compiling your code. Returns the new
+//  socket, or NULL if the new socket could not be created.
 
 zsock_t *
 zsock_new_ (int type, const char *filename, size_t line_nbr)
@@ -80,6 +83,174 @@ zsock_destroy_ (zsock_t **self_p, const char *filename, size_t line_nbr)
         free (self);
         *self_p = NULL;
     }
+}
+
+
+//  --------------------------------------------------------------------------
+//  Create a PUB socket. Returns the new socket, or NULL if the new socket
+//  could not be created.
+
+zsock_t *
+zsock_new_pub_ (const char *endpoints, const char *filename, size_t line_nbr)
+{
+    zsock_t *sock = zsock_new_ (ZMQ_PUB, filename, line_nbr);
+    if (zsock_attach (sock, endpoints))
+        zsock_destroy (&sock);
+    return sock;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Create a SUB socket, and optionally subscribe to some prefix string.
+//  Returns the new socket, or NULL if the new socket could not be created.
+
+zsock_t *
+zsock_new_sub_ (const char *endpoints, const char *subscribe, const char *filename, size_t line_nbr)
+{
+    zsock_t *sock = zsock_new_ (ZMQ_SUB, filename, line_nbr);
+    if (zsock_attach (sock, endpoints))
+        zsock_destroy (&sock);
+    return sock;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Create a REQ socket. Returns the new socket, or NULL if the new socket
+//  could not be created.
+
+zsock_t *
+zsock_new_req_ (const char *endpoints, const char *filename, size_t line_nbr)
+{
+    zsock_t *sock = zsock_new_ (ZMQ_REQ, filename, line_nbr);
+    if (zsock_attach (sock, endpoints))
+        zsock_destroy (&sock);
+    return sock;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Create a REP socket. Returns the new socket, or NULL if the new socket
+//  could not be created.
+
+zsock_t *
+zsock_new_rep_ (const char *endpoints, const char *filename, size_t line_nbr)
+{
+    zsock_t *sock = zsock_new_ (ZMQ_REP, filename, line_nbr);
+    if (zsock_attach (sock, endpoints))
+        zsock_destroy (&sock);
+    return sock;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Create a DEALER socket. Returns the new socket, or NULL if the new socket
+//  could not be created.
+
+zsock_t *
+zsock_new_dealer_ (const char *endpoints, const char *filename, size_t line_nbr)
+{
+    zsock_t *sock = zsock_new_ (ZMQ_DEALER, filename, line_nbr);
+    if (zsock_attach (sock, endpoints))
+        zsock_destroy (&sock);
+    return sock;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Create a ROUTER socket. Returns the new socket, or NULL if the new socket
+//  could not be created.
+
+zsock_t *
+zsock_new_router_ (const char *endpoints, const char *filename, size_t line_nbr)
+{
+    zsock_t *sock = zsock_new_ (ZMQ_ROUTER, filename, line_nbr);
+    if (zsock_attach (sock, endpoints))
+        zsock_destroy (&sock);
+    return sock;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Create a PULL socket. Returns the new socket, or NULL if the new socket
+//  could not be created.
+
+zsock_t *
+zsock_new_pull_ (const char *endpoints, const char *filename, size_t line_nbr)
+{
+    zsock_t *sock = zsock_new_ (ZMQ_PULL, filename, line_nbr);
+    if (zsock_attach (sock, endpoints))
+        zsock_destroy (&sock);
+    return sock;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Create a PUSH socket. Returns the new socket, or NULL if the new socket
+//  could not be created.
+
+zsock_t *
+zsock_new_push_ (const char *endpoints, const char *filename, size_t line_nbr)
+{
+    zsock_t *sock = zsock_new_ (ZMQ_PUSH, filename, line_nbr);
+    if (zsock_attach (sock, endpoints))
+        zsock_destroy (&sock);
+    return sock;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Create an XPUB socket. Returns the new socket, or NULL if the new socket
+//  could not be created.
+
+zsock_t *
+zsock_new_xpub_ (const char *endpoints, const char *filename, size_t line_nbr)
+{
+    zsock_t *sock = zsock_new_ (ZMQ_XPUB, filename, line_nbr);
+    if (zsock_attach (sock, endpoints))
+        zsock_destroy (&sock);
+    return sock;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Create an XSUB socket. Returns the new socket, or NULL if the new socket
+//  could not be created.
+
+zsock_t *
+zsock_new_xsub_ (const char *endpoints, const char *filename, size_t line_nbr)
+{
+    zsock_t *sock = zsock_new_ (ZMQ_XSUB, filename, line_nbr);
+    if (zsock_attach (sock, endpoints))
+        zsock_destroy (&sock);
+    return sock;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Create a PAIR socket. Returns the new socket, or NULL if the new socket
+//  could not be created.
+
+zsock_t *
+zsock_new_pair_ (const char *endpoints, const char *filename, size_t line_nbr)
+{
+    zsock_t *sock = zsock_new_ (ZMQ_PAIR, filename, line_nbr);
+    if (zsock_attach (sock, endpoints))
+        zsock_destroy (&sock);
+    return sock;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Create a STREAM socket. Returns the new socket, or NULL if the new socket
+//  could not be created.
+
+zsock_t *
+zsock_new_stream_ (const char *endpoints, const char *filename, size_t line_nbr)
+{
+    zsock_t *sock = zsock_new_ (ZMQ_STREAM, filename, line_nbr);
+    if (zsock_attach (sock, endpoints))
+        zsock_destroy (&sock);
+    return sock;
 }
 
 
@@ -201,6 +372,49 @@ zsock_disconnect (zsock_t *self, const char *format, ...)
 #else
     return -1;
 #endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Attach a socket to zero or more endpoints. If endpoints is not null,
+//  parses as list of ZeroMQ endpoints, separated by commas, and prefixed by
+//  '@' (to bind the socket) or '>' (to attach the socket). Returns 0 if all
+//  endpoints were valid, or -1 if there was a syntax error.
+
+int
+zsock_attach (zsock_t *self, const char *endpoints)
+{
+    assert (self);
+    if (!endpoints)
+        return 0;
+
+    //  We hold each individual endpoint here
+    char endpoint [256];
+    while (*endpoints) {
+        const char *delimiter = strchr (endpoints, ',');
+        if (!delimiter)
+            delimiter = endpoints + strlen (endpoints);
+        if (delimiter - endpoints > 255)
+            return -1;
+        memcpy (endpoint, endpoints, delimiter - endpoints);
+        endpoint [delimiter - endpoints] = 0;
+        if (endpoint [0] == '@') {
+            if (zsock_bind (self, "%s", endpoint + 1) == -1)
+                return -1;
+        }
+        else
+        if (endpoint [0] == '>') {
+            if (zsock_connect (self, "%s", endpoint + 1) == -1)
+                return -1;
+        }
+        else
+            return -1;          //  Unrecognizable syntax
+
+        if (*delimiter == 0)
+            break;
+        endpoints = delimiter + 1;
+    }
+    return 0;
 }
 
 
@@ -335,22 +549,15 @@ zsock_test (bool verbose)
     printf (" * zsock: ");
 
     //  @selftest
-    int service = 5560;
-
-    zsock_t *writer = zsock_new (ZMQ_PUSH);
+    zsock_t *writer = zsock_new_push ("@tcp://127.0.0.1:5560");
     assert (writer);
     assert (zsock_resolve (writer) != writer);
-    zsock_t *reader = zsock_new (ZMQ_PULL);
-    assert (reader);
-    assert (zsock_resolve (reader) != reader);
     assert (streq (zsock_type_str (writer), "PUSH"));
-    assert (streq (zsock_type_str (reader), "PULL"));
-    int rc = zsock_bind (writer, "tcp://%s:%d", "127.0.0.1", service);
-    assert (rc == service);
 
+    int rc;
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
     //  Check unbind
-    rc = zsock_unbind (writer, "tcp://%s:%d", "127.0.0.1", service);
+    rc = zsock_unbind (writer, "tcp://127.0.0.1:5560");
     assert (rc == 0);
 
     //  In some cases and especially when running under Valgrind, doing
@@ -359,12 +566,15 @@ zsock_test (bool verbose)
     zclock_sleep (100);
 
     //  Bind again
-    rc = zsock_bind (writer, "tcp://%s:%d", "127.0.0.1", service);
-    assert (rc == service);
+    rc = zsock_bind (writer, "tcp://127.0.0.1:5560");
+    assert (rc == 5560);
 #endif
 
-    rc = zsock_connect (reader, "tcp://%s:%d", "localhost", service);
-    assert (rc == 0);
+    zsock_t *reader = zsock_new_pull (">tcp://127.0.0.1:5560");
+    assert (reader);
+    assert (zsock_resolve (reader) != reader);
+    assert (streq (zsock_type_str (reader), "PULL"));
+
     zstr_send (writer, "Hello, World");
     zmsg_t *msg = zsock_recv (reader);
     assert (msg);
@@ -379,7 +589,7 @@ zsock_test (bool verbose)
 
     //  Test error state when connecting to an invalid socket type
     //  ('txp://' instead of 'tcp://', typo intentional)
-    rc = zsock_connect (reader, "txp://localhost:%d", service);
+    rc = zsock_connect (reader, "txp://localhost:5560");
     assert (rc == -1);
 
     rc = zsock_signal (writer, 123);
@@ -389,6 +599,18 @@ zsock_test (bool verbose)
 
     zsock_destroy (&reader);
     zsock_destroy (&writer);
+
+    //  Test zsock_attach method
+    zsock_t *server = zsock_new (ZMQ_DEALER);
+    rc = zsock_attach (server, "@inproc://myendpoint,@tcp://127.0.0.1:5556,>inproc://others");
+    assert (rc == 0);
+    rc = zsock_attach (server, "");
+    assert (rc == 0);
+    rc = zsock_attach (server, NULL);
+    assert (rc == 0);
+    rc = zsock_attach (server, ">a,@b, c,, ");
+    assert (rc == -1);
+    zsock_destroy (&server);
     //  @end
 
     printf ("OK\n");
