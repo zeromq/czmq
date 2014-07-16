@@ -108,11 +108,15 @@ int main (int argn, char *argv [])
 
     //  Swarm is an array of actors
     zactor_t *nodes [swarm_size];
+    //  We'll poll all actors for activity (actors act like sockets)
+    zpoller_t *poller = zpoller_new (NULL);
 
     //  Create swarm
     uint node_nbr;
-    for (node_nbr = 0; node_nbr < swarm_size; node_nbr++)
+    for (node_nbr = 0; node_nbr < swarm_size; node_nbr++) {
         nodes [node_nbr] = zactor_new (zgossip, NULL);
+        zpoller_add (poller, nodes [node_nbr]);
+    }
     printf (".");
     fflush (stdout);
 
@@ -140,37 +144,35 @@ int main (int argn, char *argv [])
         zstr_sendfm (nodes [node_nbr], "key-%d", item_nbr);
         zstr_send   (nodes [node_nbr], "value");
     }
-    printf (".");
+    printf (". ");
     fflush (stdout);
     
-    //  Allow time for traffic to propagate across whole swarm
-    for (node_nbr = 0; node_nbr < swarm_size; node_nbr++) {
-        while (true) {
-            zstr_sendx (nodes [node_nbr], "STATUS", NULL);
-            char *command, *status;
-            zstr_recvx (nodes [node_nbr], &command, &status, NULL);
-            while (strneq (command, "STATUS")) {
-                free (command);
-                free (status);
-                zstr_recvx (nodes [node_nbr], &command, &status, NULL);
-            }
-            int status_value = atoi (status);
-            free (command);
-            free (status);
-            if (status_value == set_size)
-                break;
-            
-            zclock_sleep (250);
-            printf (".");
+    //  Each actor will deliver us tuples; count these until we're done
+    int total = set_size * swarm_size;
+    int pending = total;
+    int64_t ticker = zclock_time () + 2000;
+    while (pending) {
+        zsock_t *which = (zsock_t *) zpoller_wait (poller, 100);
+        if (!which) {
+            puts (" - stuck test, aborting");
+            break;
+        }
+        char *command;
+        zstr_recvx (which, &command, NULL);
+        assert (streq (command, "DELIVER"));
+        pending--;
+        free (command);
+        if (zclock_time () > ticker) {
+            printf ("(%d%%)", (int) ((100 * (total - pending)) / total));
             fflush (stdout);
+            ticker = zclock_time () + 2000;
         }
     }
-        
     //  Destroy swarm
     for (node_nbr = 0; node_nbr < swarm_size; node_nbr++)
         zactor_destroy (&nodes [node_nbr]);
     
-    printf ("OK\n");
+    printf ("(100%%) OK\n");
     
     return 0;
 }
