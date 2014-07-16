@@ -190,6 +190,8 @@ END
     $output =~ s/&amp;/&/g;
     $output =~ s/&#8217;/'/g;
     $output =~ s/&#8230;/.../g;
+    $output =~ s/&#8201;/ /g;
+    $output =~ s/&#8212;/--/g;
 
     print $output if $output;
 }

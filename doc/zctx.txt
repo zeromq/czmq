@@ -3,7 +3,7 @@ zctx(3)
 
 NAME
 ----
-zctx - working with 0MQ contexts
+zctx - working with 0MQ contexts (deprecated)
 
 SYNOPSIS
 --------
