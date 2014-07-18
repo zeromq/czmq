@@ -102,7 +102,7 @@ And then to build CZMQ against this installation of libzmq:
     export LDFLAGS=-L$HOME/local/lib64
     ./configure
 
-You will need the libtool and autotools packages. After building, run the CZMQ selftests:
+You will need the pkg-config, libtool, and autoreconf packages. After building, run the CZMQ selftests:
 
     make check
 
