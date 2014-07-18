@@ -30,6 +30,12 @@
 #include "platform.h"
 #include "../include/czmq.h"
 
+#ifdef __WINDOWS__
+#ifndef _TRUNCATE
+#define _TRUNCATE ((size_t)-1)
+#endif
+#endif
+
 //  Constants
 #define INTERVAL_DFLT  1000         //  Default interval = 1 second
 
