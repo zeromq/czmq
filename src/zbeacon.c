@@ -458,6 +458,7 @@ s_get_interface (agent_t *self)
         while (interface) {
             //  On Solaris, loopback interfaces have a NULL in ifa_broadaddr
             if  (interface->ifa_broadaddr
+            &&  (interface->ifa_flags & IFF_UP)             //  Only use interfaces that are running
             && !(interface->ifa_flags & IFF_LOOPBACK)       //  Ignore loopback interface
             &&  (interface->ifa_flags & IFF_BROADCAST)      //  Only use interfaces that have BROADCAST
             && !(interface->ifa_flags & IFF_POINTOPOINT)    //  Ignore point to point interfaces.
