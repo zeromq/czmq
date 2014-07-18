@@ -450,6 +450,16 @@ s_agent_new (void *pipe, int port_nbr)
 static void
 s_get_interface (agent_t *self)
 {
+    if (streq(zsys_interface(), "*")) {
+        // Special device to force binding to INADDR_ANY and sending to INADDR_BROADCAST
+        self->broadcast.sin_family = AF_INET;
+        self->broadcast.sin_addr.s_addr = INADDR_BROADCAST;
+        self->broadcast.sin_port = htons (self->port_nbr);
+
+        self->address = self->broadcast;
+        self->address.sin_addr.s_addr = INADDR_ANY;
+        return;
+    }
 #if defined (HAVE_GETIFADDRS)
     struct ifaddrs *interfaces;
     if (getifaddrs (&interfaces) == 0) {
