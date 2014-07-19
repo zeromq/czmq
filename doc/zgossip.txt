@@ -54,6 +54,12 @@ Provides these commands (sent as multipart strings to the actor):
 * PUBLISH key value -- publish a key/value pair to the gossip cluster
 * STATUS -- return number of key/value pairs held by gossip service
 
+Returns these messages:
+
+* PORT number -- reply to PORT command
+* STATUS number -- reply to STATUS command
+* DELIVER key value -- new tuple delivered from network
+
 The gossip protocol distributes information around a loosely-connected
 network of gossip services. The information consists of name/value pairs
 published by applications at any point in the network. The goal of the
