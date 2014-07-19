@@ -67,53 +67,55 @@ CZMQ_EXPORT void
 
 //  Smart constructors, which create sockets with additional set-up. In all of
 //  these, the endpoint is NULL, or starts with '@' (connect) or '>' (bind).
-//  Multiple endpoints are allowed, separated by commas.
+//  Multiple endpoints are allowed, separated by commas. If endpoint does not
+//  start with '@' or '>', default action depends on socket type.
 
-//  Create a PUB socket.
+//  Create a PUB socket. Default action is bind.
 CZMQ_EXPORT zsock_t *
     zsock_new_pub_ (const char *endpoint, const char *filename, size_t line_nbr);
 
-//  Create a SUB socket, and optionally subscribe to some prefix string.
+//  Create a SUB socket, and optionally subscribe to some prefix string. Default
+//  action is connect.
 CZMQ_EXPORT zsock_t *
     zsock_new_sub_ (const char *endpoint, const char *subscribe, const char *filename, size_t line_nbr);
 
-//  Create a REQ socket.
+//  Create a REQ socket. Default action is connect.
 CZMQ_EXPORT zsock_t *
     zsock_new_req_ (const char *endpoint, const char *filename, size_t line_nbr);
 
-//  Create a REP socket.
+//  Create a REP socket. Default action is bind.
 CZMQ_EXPORT zsock_t *
     zsock_new_rep_ (const char *endpoint, const char *filename, size_t line_nbr);
 
-//  Create a DEALER socket.
+//  Create a DEALER socket. Default action is connect.
 CZMQ_EXPORT zsock_t *
     zsock_new_dealer_ (const char *endpoint, const char *filename, size_t line_nbr);
 
-//  Create a ROUTER socket.
+//  Create a ROUTER socket. Default action is bind.
 CZMQ_EXPORT zsock_t *
     zsock_new_router_ (const char *endpoint, const char *filename, size_t line_nbr);
 
-//  Create a PULL socket.
-CZMQ_EXPORT zsock_t *
-    zsock_new_pull_ (const char *endpoint, const char *filename, size_t line_nbr);
-
-//  Create a PUSH socket.
+//  Create a PUSH socket. Default action is connect.
 CZMQ_EXPORT zsock_t *
     zsock_new_push_ (const char *endpoint, const char *filename, size_t line_nbr);
 
-//  Create an XPUB socket.
+//  Create a PULL socket. Default action is bind.
+CZMQ_EXPORT zsock_t *
+    zsock_new_pull_ (const char *endpoint, const char *filename, size_t line_nbr);
+
+//  Create an XPUB socket. Default action is bind.
 CZMQ_EXPORT zsock_t *
     zsock_new_xpub_ (const char *endpoint, const char *filename, size_t line_nbr);
 
-//  Create an XSUB socket.
+//  Create an XSUB socket. Default action is connect.
 CZMQ_EXPORT zsock_t *
     zsock_new_xsub_ (const char *endpoint, const char *filename, size_t line_nbr);
 
-//  Create a PAIR socket.
+//  Create a PAIR socket. Default action is connect.
 CZMQ_EXPORT zsock_t *
     zsock_new_pair_ (const char *endpoint, const char *filename, size_t line_nbr);
 
-//  Create a STREAM socket.
+//  Create a STREAM socket. Default action is connect.
 CZMQ_EXPORT zsock_t *
     zsock_new_stream_ (const char *endpoint, const char *filename, size_t line_nbr);
 
@@ -146,9 +148,11 @@ CZMQ_EXPORT int
 //  Attach a socket to zero or more endpoints. If endpoints is not null,
 //  parses as list of ZeroMQ endpoints, separated by commas, and prefixed by
 //  '@' (to bind the socket) or '>' (to attach the socket). Returns 0 if all
-//  endpoints were valid, or -1 if there was a syntax error.
+//  endpoints were valid, or -1 if there was a syntax error. If the endpoint
+//  does not start with '@' or '>', the serverish argument defines whether
+//  it is used to bind (serverish = true) or connect (serverish = false).
 CZMQ_EXPORT int
-    zsock_attach (zsock_t *self, const char *endpoints);
+    zsock_attach (zsock_t *self, const char *endpoints, bool serverish);
 
 //  Returns socket type as printable constant string
 CZMQ_EXPORT const char *
