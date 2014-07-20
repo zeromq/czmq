@@ -79,7 +79,7 @@ zpoller_destroy (zpoller_t **self_p)
 
 
 //  --------------------------------------------------------------------------
-//  Add a reader to be polled
+//  Add a reader to be polled. Returns 0 if OK, -1 on failure.
 
 int
 zpoller_add (zpoller_t *self, void *reader)
@@ -90,6 +90,20 @@ zpoller_add (zpoller_t *self, void *reader)
     if (rc != -1)
         self->need_rebuild = true;
     return rc;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Remove a reader from the poller; returns 0 if OK, -1 on failure.
+
+int
+zpoller_remove (zpoller_t *self, void *reader)
+{
+    assert (self);
+    assert (reader);
+    zlist_remove (self->reader_list, reader);
+    self->need_rebuild = true;
+    return 0;
 }
 
 
@@ -207,7 +221,7 @@ zpoller_test (bool verbose)
 
     // Add a reader the existing poller
     rc = zpoller_add (poller, sink);
-    assert (rc != -1);
+    assert (rc == 0);
 
     zstr_send (vent, "Hello, World");
 
@@ -220,6 +234,10 @@ zpoller_test (bool verbose)
     assert (streq (message, "Hello, World"));
     zstr_free (&message);
 
+    // Stop polling reader
+    rc = zpoller_remove (poller, sink);
+    assert (rc == 0);
+    
     //  Destroy poller and sockets
     zpoller_destroy (&poller);
 
