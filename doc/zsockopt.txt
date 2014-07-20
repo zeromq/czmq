@@ -3,7 +3,7 @@ zsockopt(3)
 
 NAME
 ----
-zsockopt - get/set 0MQ socket options
+zsockopt - get/set 0MQ socket options (deprecated)
 
 SYNOPSIS
 --------
