@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zmutex - working with mutexes
+    zmutex - working with mutexes (deprecated)
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:

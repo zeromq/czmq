@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zsocket - working with 0MQ sockets
+    zsocket - working with 0MQ sockets (deprecated)
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:

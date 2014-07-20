@@ -3,7 +3,7 @@ zmutex(3)
 
 NAME
 ----
-zmutex - working with mutexes
+zmutex - working with mutexes (deprecated)
 
 SYNOPSIS
 --------

@@ -3,7 +3,7 @@ zsocket(3)
 
 NAME
 ----
-zsocket - working with 0MQ sockets
+zsocket - working with 0MQ sockets (deprecated)
 
 SYNOPSIS
 --------

@@ -27,9 +27,13 @@ CZMQ_EXPORT zpoller_t *
 CZMQ_EXPORT void
     zpoller_destroy (zpoller_t **self_p);
 
-//  Add a reader to be polled
+//  Add a reader to be polled. Returns 0 if OK, -1 on failure.
 CZMQ_EXPORT int
     zpoller_add (zpoller_t *self, void *reader);
+
+//  Remove a reader from the poller; returns 0 if OK, -1 on failure.
+CZMQ_EXPORT int
+    zpoller_remove (zpoller_t *self, void *reader);
 
 //  Poll the registered readers for I/O, return first socket that has input.
 //  This means the order that sockets are defined in the poll list affects

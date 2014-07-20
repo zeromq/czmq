@@ -1,11 +1,20 @@
 #include "../include/czmq.h"
 
-void assert_status (zactor_t *actor, int status)
+void assert_status (zactor_t *actor, int count)
 {
     zstr_sendx (actor, "STATUS", NULL);
-    char *reply = zstr_recv (actor);
-    assert (atoi (reply) == status);
-    free (reply);
+    //  Get STATUS reply and check it
+    bool ready = false;
+    while (!ready) {
+        char *command, *status;
+        zstr_recvx (actor, &command, &status, NULL);
+        if (streq (command, "STATUS")) {
+            assert (atoi (status) == count);
+            ready = true;
+        }
+        free (command);
+        free (status);
+    }
 }
 
 
@@ -17,61 +26,61 @@ int main (int argn, char *argv [])
     //  though real limit will be set by the process file handle limit.
     zsys_set_max_sockets (65535);
 
-//     //  Test case 1: two servers, bunch of clients.
-//     printf ("Starting small test case: ");
-//     fflush (stdout);
-//     
-//     zactor_t *server1 = zactor_new (zgossip, "server1");
-//     assert (server1);
-//     zstr_sendx (server1, "SET", "server/animate", "0", NULL);
-//     zstr_sendx (server1, "BIND", "inproc://server1", NULL);
-//     
-//     zactor_t *server2 = zactor_new (zgossip, "server2");
-//     assert (server2);
-//     zstr_sendx (server2, "SET", "server/animate", "0", NULL);
-//     zstr_sendx (server2, "BIND", "inproc://server2", NULL);
-//     zstr_sendx (server2, "CONNECT", "inproc://server1", NULL);
-//     
-//     zactor_t *client1 = zactor_new (zgossip, "client1");
-//     assert (client1);
-//     zstr_sendx (client1, "BIND", "inproc://client1", NULL);
-//     zstr_sendx (client1, "PUBLISH", "client1-00", "0000", NULL);
-//     zstr_sendx (client1, "PUBLISH", "client1-11", "1111", NULL);
-//     zstr_sendx (client1, "PUBLISH", "client1-22", "2222", NULL);
-//     zstr_sendx (client1, "CONNECT", "inproc://server1", NULL);
-//     
-//     zactor_t *client2 = zactor_new (zgossip, "client2");
-//     assert (client2);
-//     zstr_sendx (client2, "BIND", "inproc://client2", NULL);
-//     zstr_sendx (client2, "CONNECT", "inproc://server1", NULL);
-//     zstr_sendx (client2, "PUBLISH", "client2-00", "0000", NULL);
-//     zstr_sendx (client2, "PUBLISH", "client2-11", "1111", NULL);
-//     zstr_sendx (client2, "PUBLISH", "client2-22", "2222", NULL);
-//     
-//     zactor_t *client3 = zactor_new (zgossip, "client3");
-//     assert (client3);
-//     zstr_sendx (client3, "CONNECT", "inproc://server2", NULL);
-//     
-//     zactor_t *client4 = zactor_new (zgossip, "client4");
-//     assert (client4);
-//     zstr_sendx (client4, "CONNECT", "inproc://server2", NULL);
-//     
-//     zclock_sleep (100);
-// 
-//     assert_status (server1, 6);
-//     assert_status (server2, 6);
-//     assert_status (client1, 6);
-//     assert_status (client2, 6);
-//     assert_status (client3, 6);
-//     assert_status (client4, 6);
-//         
-//     zactor_destroy (&server1);
-//     zactor_destroy (&server2);
-//     zactor_destroy (&client1);
-//     zactor_destroy (&client2);
-//     zactor_destroy (&client3);
-//     zactor_destroy (&client4);
-//     printf ("OK\n");
+    //  Test case 1: two servers, bunch of clients.
+    printf ("Starting small test case: ");
+    fflush (stdout);
+
+    zactor_t *server1 = zactor_new (zgossip, "server1");
+    assert (server1);
+    zstr_sendx (server1, "SET", "server/animate", "0", NULL);
+    zstr_sendx (server1, "BIND", "inproc://server1", NULL);
+
+    zactor_t *server2 = zactor_new (zgossip, "server2");
+    assert (server2);
+    zstr_sendx (server2, "SET", "server/animate", "0", NULL);
+    zstr_sendx (server2, "BIND", "inproc://server2", NULL);
+    zstr_sendx (server2, "CONNECT", "inproc://server1", NULL);
+
+    zactor_t *client1 = zactor_new (zgossip, "client1");
+    assert (client1);
+    zstr_sendx (client1, "BIND", "inproc://client1", NULL);
+    zstr_sendx (client1, "PUBLISH", "client1-00", "0000", NULL);
+    zstr_sendx (client1, "PUBLISH", "client1-11", "1111", NULL);
+    zstr_sendx (client1, "PUBLISH", "client1-22", "2222", NULL);
+    zstr_sendx (client1, "CONNECT", "inproc://server1", NULL);
+
+    zactor_t *client2 = zactor_new (zgossip, "client2");
+    assert (client2);
+    zstr_sendx (client2, "BIND", "inproc://client2", NULL);
+    zstr_sendx (client2, "CONNECT", "inproc://server1", NULL);
+    zstr_sendx (client2, "PUBLISH", "client2-00", "0000", NULL);
+    zstr_sendx (client2, "PUBLISH", "client2-11", "1111", NULL);
+    zstr_sendx (client2, "PUBLISH", "client2-22", "2222", NULL);
+
+    zactor_t *client3 = zactor_new (zgossip, "client3");
+    assert (client3);
+    zstr_sendx (client3, "CONNECT", "inproc://server2", NULL);
+
+    zactor_t *client4 = zactor_new (zgossip, "client4");
+    assert (client4);
+    zstr_sendx (client4, "CONNECT", "inproc://server2", NULL);
+
+    zclock_sleep (100);
+
+    assert_status (server1, 6);
+    assert_status (server2, 6);
+    assert_status (client1, 6);
+    assert_status (client2, 6);
+    assert_status (client3, 6);
+    assert_status (client4, 6);
+
+    zactor_destroy (&server1);
+    zactor_destroy (&server2);
+    zactor_destroy (&client1);
+    zactor_destroy (&client2);
+    zactor_destroy (&client3);
+    zactor_destroy (&client4);
+    printf ("OK\n");
 
     //  Test case 2: swarm of peers
     printf ("Starting swarm test case: ");
@@ -99,11 +108,15 @@ int main (int argn, char *argv [])
 
     //  Swarm is an array of actors
     zactor_t *nodes [swarm_size];
-    
+    //  We'll poll all actors for activity (actors act like sockets)
+    zpoller_t *poller = zpoller_new (NULL);
+
     //  Create swarm
     uint node_nbr;
-    for (node_nbr = 0; node_nbr < swarm_size; node_nbr++)
+    for (node_nbr = 0; node_nbr < swarm_size; node_nbr++) {
         nodes [node_nbr] = zactor_new (zgossip, NULL);
+        zpoller_add (poller, nodes [node_nbr]);
+    }
     printf (".");
     fflush (stdout);
 
@@ -131,29 +144,35 @@ int main (int argn, char *argv [])
         zstr_sendfm (nodes [node_nbr], "key-%d", item_nbr);
         zstr_send   (nodes [node_nbr], "value");
     }
-    printf (".");
+    printf (". ");
     fflush (stdout);
     
-    //  Allow time for traffic to propagate across whole swarm
-    for (node_nbr = 0; node_nbr < swarm_size; node_nbr++) {
-        while (true) {
-            zstr_sendx (nodes [node_nbr], "STATUS", NULL);
-            char *reply = zstr_recv (nodes [node_nbr]);
-            int status = atoi (reply);
-            free (reply);
-            if (status == set_size)
-                break;
-            zclock_sleep (250);
-            printf (".");
+    //  Each actor will deliver us tuples; count these until we're done
+    int total = set_size * swarm_size;
+    int pending = total;
+    int64_t ticker = zclock_time () + 2000;
+    while (pending) {
+        zsock_t *which = (zsock_t *) zpoller_wait (poller, 100);
+        if (!which) {
+            puts (" - stuck test, aborting");
+            break;
+        }
+        char *command;
+        zstr_recvx (which, &command, NULL);
+        assert (streq (command, "DELIVER"));
+        pending--;
+        free (command);
+        if (zclock_time () > ticker) {
+            printf ("(%d%%)", (int) ((100 * (total - pending)) / total));
             fflush (stdout);
+            ticker = zclock_time () + 2000;
         }
     }
-        
     //  Destroy swarm
     for (node_nbr = 0; node_nbr < swarm_size; node_nbr++)
         zactor_destroy (&nodes [node_nbr]);
     
-    printf ("OK\n");
+    printf ("(100%%) OK\n");
     
     return 0;
 }

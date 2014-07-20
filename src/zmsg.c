@@ -797,13 +797,10 @@ zmsg_test (bool verbose)
     int rc = 0;
     //  @selftest
     //  Create two PAIR sockets and connect over inproc
-    zsock_t *output = zsock_new (ZMQ_PAIR);
+    zsock_t *output = zsock_new_pair ("@inproc://zmsg.test");
     assert (output);
-    zsock_bind (output, "inproc://zmsg.test");
-
-    zsock_t *input = zsock_new (ZMQ_PAIR);
+    zsock_t *input = zsock_new_pair (">inproc://zmsg.test");
     assert (input);
-    zsock_connect (input, "inproc://zmsg.test");
 
     //  Test send and receive of single-frame message
     zmsg_t *msg = zmsg_new ();

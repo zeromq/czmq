@@ -18,6 +18,22 @@
     cycles), and publish name/value tuples. Each node re-distributes the new
     tuples it receives, so that the entire network eventually achieves a
     consistent state. The current design does not expire tuples.
+
+    Provides these commands (sent as multipart strings to the actor):
+
+    * BIND endpoint -- binds the gossip service to specified endpoint
+    * PORT -- returns the last TCP port, if any, used for binding
+    * CONFIGURE configfile -- load configuration from specified file
+    * SET configpath value -- set configuration path = value
+    * CONNECT endpoint -- connect the gossip service to the specified peer
+    * PUBLISH key value -- publish a key/value pair to the gossip cluster
+    * STATUS -- return number of key/value pairs held by gossip service
+    
+    Returns these messages:
+
+    * PORT number -- reply to PORT command
+    * STATUS number -- reply to STATUS command
+    * DELIVER key value -- new tuple delivered from network
 @discuss
     The gossip protocol distributes information around a loosely-connected
     network of gossip services. The information consists of name/value pairs
@@ -90,6 +106,7 @@ typedef struct _tuple_t tuple_t;
 struct _server_t {
     //  These properties must always be present in the server_t
     //  and are set by the generated engine; do not modify them!
+    zsock_t *pipe;              //  Actor pipe back to caller
     zconfig_t *config;          //  Current loaded configuration
     
     //  Add any properties you need here
@@ -219,6 +236,9 @@ server_accept (server_t *self, const char *key, const char *value)
     zhash_update (tuple->container, key, tuple);
     zhash_freefn (tuple->container, key, tuple_free);
 
+    //  Deliver to calling application
+    zstr_sendx (self->pipe, "DELIVER", key, value, NULL);
+
     //  Hold in server context so we can broadcast to all clients
     self->cur_tuple = tuple;
     engine_broadcast_event (self, NULL, forward_event);
@@ -257,6 +277,7 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
     if (streq (method, "STATUS")) {
         //  Return number of tuples we have stored
         reply = zmsg_new ();
+        zmsg_addstr (reply, "STATUS");
         zmsg_addstrf (reply, "%d", (int) zhash_size (self->tuples));
     }
     else

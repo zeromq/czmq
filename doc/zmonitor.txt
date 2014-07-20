@@ -3,7 +3,7 @@ zmonitor(3)
 
 NAME
 ----
-zmonitor - socket event monitor
+zmonitor - socket event monitor (deprecated)
 
 SYNOPSIS
 --------

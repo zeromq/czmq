@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zctx - working with 0MQ contexts
+    zctx - working with 0MQ contexts (deprecated)
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:

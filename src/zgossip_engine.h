@@ -705,6 +705,7 @@ s_server_new (zsock_t *pipe)
     s_server_config_self (self);
 
     //  Initialize application server context
+    self->server.pipe = self->pipe;
     self->server.config = self->config;
     server_initialize (&self->server);
 
@@ -780,9 +781,11 @@ s_server_api_message (zloop_t *loop, zsock_t *reader, void *argument)
         free (endpoint);
     }
     else
-    if (streq (method, "PORT"))
-        //  Return port number from the last bind, if any
+    if (streq (method, "PORT")) {
+        //  Return PORT + port number from the last bind, if any
+        zstr_sendm (self->pipe, "PORT");
         zstr_sendf (self->pipe, "%d", self->port);
+    }
     else
     if (streq (method, "CONFIGURE")) {
         char *config_file = zmsg_popstr (msg);
