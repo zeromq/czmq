@@ -447,12 +447,10 @@ zframe_test (bool verbose)
 
     //  @selftest
     //  Create two PAIR sockets and connect over inproc
-    zsock_t *output = zsock_new (ZMQ_PAIR);
+    zsock_t *output = zsock_new_pair ("@inproc://zframe.test");
     assert (output);
-    zsock_bind (output, "inproc://zframe.test");
-    zsock_t *input = zsock_new (ZMQ_PAIR);
+    zsock_t *input = zsock_new_pair (">inproc://zframe.test");
     assert (input);
-    zsock_connect (input, "inproc://zframe.test");
 
     //  Send five different frames, test ZFRAME_MORE
     int frame_nbr;

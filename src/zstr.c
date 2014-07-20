@@ -238,13 +238,10 @@ zstr_test (bool verbose)
 
     //  @selftest
     //  Create two PAIR sockets and connect over inproc
-    zsock_t *output = zsock_new (ZMQ_PAIR);
+    zsock_t *output = zsock_new_pair ("@inproc://zstr.test");
     assert (output);
-    zsock_bind (output, "inproc://zstr.test");
-    
-    zsock_t *input = zsock_new (ZMQ_PAIR);
+    zsock_t *input = zsock_new_pair (">inproc://zstr.test");
     assert (input);
-    zsock_connect (input, "inproc://zstr.test");
 
     //  Send ten strings, five strings with MORE flag and then END
     int string_nbr;

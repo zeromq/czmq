@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zsockopt - get/set 0MQ socket options
+    zsockopt - get/set 0MQ socket options (deprecated)
 
             ****************************************************
             *   GENERATED SOURCE CODE, DO NOT EDIT!!           *

@@ -16,9 +16,13 @@ CZMQ_EXPORT zpoller_t *
 CZMQ_EXPORT void
     zpoller_destroy (zpoller_t **self_p);
 
-//  Add a reader to be polled
+//  Add a reader to be polled. Returns 0 if OK, -1 on failure.
 CZMQ_EXPORT int
     zpoller_add (zpoller_t *self, void *reader);
+
+//  Remove a reader from the poller; returns 0 if OK, -1 on failure.
+CZMQ_EXPORT int
+    zpoller_remove (zpoller_t *self, void *reader);
 
 //  Poll the registered readers for I/O, return first socket that has input.
 //  This means the order that sockets are defined in the poll list affects
@@ -74,7 +78,7 @@ EXAMPLE
 
     // Add a reader the existing poller
     rc = zpoller_add (poller, sink);
-    assert (rc != -1);
+    assert (rc == 0);
 
     zstr_send (vent, "Hello, World");
 
@@ -87,6 +91,10 @@ EXAMPLE
     assert (streq (message, "Hello, World"));
     zstr_free (&message);
 
+    // Stop polling reader
+    rc = zpoller_remove (poller, sink);
+    assert (rc == 0);
+    
     //  Destroy poller and sockets
     zpoller_destroy (&poller);
 

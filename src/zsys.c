@@ -607,7 +607,7 @@ zsys_file_mode_default (void)
 
 
 //  --------------------------------------------------------------------------
-//  Return the czmq version for run-time API detection
+//  Return the CZMQ version for run-time API detection
 
 void zsys_version (int *major, int *minor, int *patch)
 {
