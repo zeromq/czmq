@@ -30,12 +30,6 @@
 #include "platform.h"
 #include "../include/czmq.h"
 
-#ifdef __WINDOWS__
-#ifndef _TRUNCATE
-#define _TRUNCATE ((size_t)-1)
-#endif
-#endif
-
 //  Constants
 #define INTERVAL_DFLT  1000         //  Default interval = 1 second
 
@@ -582,9 +576,9 @@ s_get_interface (agent_t *self)
 
         PWCHAR friendlyName = cur_address->FriendlyName;
         size_t friendlyLength = 0;
-        size_t asciiSize = wcslen(friendlyName) * 2;
+        size_t asciiSize = wcstombs(0, friendlyName, 0) + 1;
         char *asciiFriendlyName = (char*) zmalloc(asciiSize);
-        wcstombs_s (&friendlyLength, asciiFriendlyName, asciiSize, friendlyName, _TRUNCATE);
+        friendlyLength = wcstombs(asciiFriendlyName, friendlyName, asciiSize);
 
         int filter = any_interface || (strcmp (zsys_interface (), asciiFriendlyName) == 0);
         int valid = cur_address->OperStatus == IfOperStatusUp;
