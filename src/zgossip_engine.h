@@ -220,7 +220,7 @@ engine_handle_socket (server_t *server, zsock_t *socket, zloop_reader_fn handler
 {
     if (server) {
         s_server_t *self = (s_server_t *) server;
-        if (handler) {
+        if (handler != NULL) {
             int rc = zloop_reader (self->loop, socket, handler, self);
             assert (rc == 0);
             zloop_reader_set_tolerant (self->loop, socket);
@@ -669,7 +669,7 @@ s_server_config_self (s_server_t *self)
     //  
     //  Animation is disabled by default
     self->animate = atoi (
-        zconfig_resolve (self->config, "server/animate", "0"));
+        zconfig_resolve (self->config, "server/animate", "0")) != 0;
 
     //  Default client timeout is 60 seconds
     self->timeout = atoi (
