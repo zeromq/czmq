@@ -732,7 +732,9 @@ zsys_udp_close (SOCKET handle)
 
 #include <errno.h>
 
-extern int errno;
+#ifndef _CRT_ERRNO_DEFINED
+    extern int errno;
+#endif
 
 void
 zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address)
@@ -993,7 +995,7 @@ zsys_has_curve (void)
 #if defined (ZMQ_CURVE_SERVER)
 #   if defined (ZMQ_HAS_CAPABILITIES)
     //  This is the most modern way of probing libzmq capabilities
-    return zmq_has ("curve");
+    return zmq_has ("curve") != 0;
 #   else
     //  However trying the zmq_setsockopt will also work
     void *ctx = zmq_ctx_new ();
