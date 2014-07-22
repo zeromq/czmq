@@ -649,10 +649,14 @@ zsys_vprintf (const char *format, va_list argptr)
     va_copy (my_argptr, argptr);
     int required = vsnprintf (string, size, format, my_argptr);
     va_end (my_argptr);
-#if (defined (_MSC_VER) || defined (__MINGW32__))
+#ifdef __WINDOWS__
     if (required < 0 || required >= size) {
         va_copy (my_argptr, argptr);
+#ifdef _MSC_VER
         required = _vscprintf (format, argptr);
+#else
+        required = vsnprintf (NULL, 0, format, argptr);
+#endif
         va_end (my_argptr);
     }
 #endif
