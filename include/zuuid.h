@@ -45,6 +45,11 @@ CZMQ_EXPORT char *
 CZMQ_EXPORT void
     zuuid_set (zuuid_t *self, byte *source);
     
+//  Set UUID to new supplied 32-char string value; return 0 if OK,
+//  else returns -1.
+CZMQ_EXPORT int
+    zuuid_set_str (zuuid_t *self, const char *source);
+
 //  Store UUID blob in target array
 CZMQ_EXPORT void
     zuuid_export (zuuid_t *self, byte *target);
