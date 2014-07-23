@@ -82,7 +82,7 @@ zuuid_destroy (zuuid_t **self_p)
 
 
 //  -----------------------------------------------------------------
-//  Set UUID to new supplied value
+//  Set UUID to new supplied 16-octet value
 
 void
 zuuid_set (zuuid_t *self, byte *source)
@@ -97,6 +97,28 @@ zuuid_set (zuuid_t *self, byte *source)
         self->str [byte_nbr * 2 + 1] = hex_char [val & 15];
     }
     self->str [ZUUID_LEN * 2] = 0;
+}
+
+
+//  -----------------------------------------------------------------
+//  Set UUID to new supplied 32-char string value; return 0 if OK,
+//  else returns -1.
+
+int
+zuuid_set_str (zuuid_t *self, const char *source)
+{
+    assert (self);
+    assert (strlen (source) == 32);
+
+    int byte_nbr = 0;
+    while (*source) {
+        if (sscanf (source, "%02x", (uint *) &self->uuid [byte_nbr]) != 1)
+            return -1;
+        byte_nbr++;
+        source += 2;
+    }
+    strcpy (self->str, source);
+    return 0;
 }
 
 
@@ -198,6 +220,14 @@ zuuid_test (bool verbose)
     assert (strlen (zuuid_str (uuid)) == 32);
     zuuid_t *copy = zuuid_dup (uuid);
     assert (streq (zuuid_str (uuid), zuuid_str (copy)));
+
+    //  Check set/set_str/export methods
+    zuuid_set_str (uuid, "8CB3E9A9649B4BEF8DE225E9C2CEBB38");
+    byte copy_uuid [16];
+    zuuid_export (uuid, copy_uuid);
+    zuuid_set (uuid, copy_uuid);
+    assert (streq (zuuid_str (uuid), "8CB3E9A9649B4BEF8DE225E9C2CEBB38"));
+    
     zuuid_destroy (&uuid);
     zuuid_destroy (&copy);
     //  @end
