@@ -41,6 +41,29 @@ s_filetime_to_msec (const FILETIME *ft)
 
     return (int64_t) (dateTime.QuadPart / 10000);
 }
+
+static int64_t
+s_get_frequencey (void)
+{
+    LARGE_INTEGER freq;
+    QueryPerformanceFrequency (&freq);
+    // Windows documentation says that XP and later will always return non-zero
+    assert (freq.QuadPart != 0);
+    return freq.QuadPart;
+}
+
+//  --------------------------------------------------------------------------
+//  Convert PerformanceCounter count to msec
+
+static int64_t
+s_perfcounter_to_msec (const LARGE_INTEGER *count)
+{
+    // System frequency does not change at run-time, cache it
+    static int64_t freq = s_get_frequencey ();
+
+    return (int64_t)(count->QuadPart  * 1000) / freq;
+}
+
 #endif
 
 
@@ -92,6 +115,24 @@ zclock_time (void)
 
 
 //  --------------------------------------------------------------------------
+//  Return current monotonic clock in milliseconds
+
+int64_t
+zclock_mono (void)
+{
+#if defined (__UNIX__)
+    struct timespec ts;
+    clock_gettime (CLOCK_MONOTONIC, &ts);
+
+    return (int64_t) ((int64_t) ts.tv_sec * 1000 + (int64_t) ts.tv_nsec / 1000000);
+#elif (defined (__WINDOWS__))
+    LARGE_INTEGER count;
+    QueryPerformanceCounter(&count);
+    return s_perfcounter_to_msec (&count);
+#endif
+}
+
+//  --------------------------------------------------------------------------
 //  Return formatted date/time as fresh string. Free using zstr_free().
 
 char *
@@ -130,7 +171,6 @@ zclock_log (const char *format, ...)
 
 //  --------------------------------------------------------------------------
 //  Self test of this class
-
 void
 zclock_test (bool verbose)
 {
@@ -140,6 +180,9 @@ zclock_test (bool verbose)
     int64_t start = zclock_time ();
     zclock_sleep (10);
     assert ((zclock_time () - start) >= 10);
+    start = zclock_mono ();
+    zclock_sleep (10);
+    assert ((zclock_mono () - start) >= 10);
     char *timestr = zclock_timestr ();
     if (verbose)
         puts (timestr);
