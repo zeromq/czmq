@@ -201,10 +201,14 @@ zsock_new_pull_ (const char *endpoints, const char *filename, size_t line_nbr)
 zsock_t *
 zsock_new_xpub_ (const char *endpoints, const char *filename, size_t line_nbr)
 {
+#if defined ZMQ_XPUB
     zsock_t *sock = zsock_new_ (ZMQ_XPUB, filename, line_nbr);
     if (zsock_attach (sock, endpoints, true))
         zsock_destroy (&sock);
     return sock;
+#else
+    return NULL;            //  Not implemented
+#endif
 }
 
 
@@ -214,10 +218,14 @@ zsock_new_xpub_ (const char *endpoints, const char *filename, size_t line_nbr)
 zsock_t *
 zsock_new_xsub_ (const char *endpoints, const char *filename, size_t line_nbr)
 {
+#if defined ZMQ_XSUB
     zsock_t *sock = zsock_new_ (ZMQ_XSUB, filename, line_nbr);
     if (zsock_attach (sock, endpoints, false))
         zsock_destroy (&sock);
     return sock;
+#else
+    return NULL;            //  Not implemented
+#endif
 }
 
 
@@ -240,10 +248,14 @@ zsock_new_pair_ (const char *endpoints, const char *filename, size_t line_nbr)
 zsock_t *
 zsock_new_stream_ (const char *endpoints, const char *filename, size_t line_nbr)
 {
+#if defined ZMQ_STREAM
     zsock_t *sock = zsock_new_ (ZMQ_STREAM, filename, line_nbr);
     if (zsock_attach (sock, endpoints, false))
         zsock_destroy (&sock);
     return sock;
+#else
+    return NULL;            //  Not implemented
+#endif
 }
 
 
@@ -393,7 +405,7 @@ zsock_attach (zsock_t *self, const char *endpoints, bool serverish)
             return -1;
         memcpy (endpoint, endpoints, delimiter - endpoints);
         endpoint [delimiter - endpoints] = 0;
-        
+
         int rc;
         if (endpoint [0] == '@')
             rc = zsock_bind (self, "%s", endpoint + 1);
@@ -405,6 +417,7 @@ zsock_attach (zsock_t *self, const char *endpoints, bool serverish)
             rc = zsock_bind (self, "%s", endpoint);
         else
             rc = zsock_connect (self, "%s", endpoint);
+        
         if (rc == -1)
             return -1;          //  Bad endpoint syntax
             
@@ -454,6 +467,23 @@ zmsg_t *
 zsock_recv (zsock_t *self)
 {
     return zmsg_recv (self);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket to use unbounded pipes (HWM=0); use this in cases when you are
+//  totally certain the message volume can fit in memory. This method works
+//  across all versions of ZeroMQ.
+
+void
+zsock_set_unbounded (zsock_t *self)
+{
+#if (ZMQ_VERSION_MAJOR == 2)
+    zsock_set_hwm (self, 0);
+#else
+    zsock_set_sndhwm (self, 0);
+    zsock_set_rcvhwm (self, 0);
+#endif
 }
 
 
@@ -600,7 +630,7 @@ zsock_test (bool verbose)
 
     //  Test zsock_attach method
     zsock_t *server = zsock_new (ZMQ_DEALER);
-    rc = zsock_attach (server, "@inproc://myendpoint,tcp://127.0.0.1:5556,inproc://others", false);
+    rc = zsock_attach (server, "@inproc://myendpoint,tcp://127.0.0.1:5556,inproc://others", true);
     assert (rc == 0);
     rc = zsock_attach (server, "", false);
     assert (rc == 0);
