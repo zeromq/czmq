@@ -413,12 +413,12 @@ zgossip_test (bool verbose)
     zactor_t *server = zactor_new (zgossip, "server");
     zstr_sendx (server, "SET", "server/animate", verbose? "1": "0", NULL);
     zstr_sendx (server, "BIND", "inproc://zgossip", NULL);
-    zclock_sleep (100);
 
     zsock_t *client = zsock_new (ZMQ_DEALER);
     assert (client);
     zsock_set_rcvtimeo (client, 2000);
-    zsock_connect (client, "inproc://zgossip");
+    int rc = zsock_connect (client, "inproc://zgossip");
+    assert (rc == 0);
 
     //  Send HELLO, which gets no reply
     zgossip_msg_t *request, *reply;

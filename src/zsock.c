@@ -353,7 +353,17 @@ zsock_connect (zsock_t *self, const char *format, ...)
     va_start (argptr, format);
     vsnprintf (endpoint, 256, format, argptr);
     va_end (argptr);
-    return zmq_connect (self->handle, endpoint);
+    
+    int rc = zmq_connect (self->handle, endpoint);
+#if (ZMQ_VERSION < ZMQ_MAKE_VERSION (4,0,0))
+    int retries = 4;
+    while (rc == -1 && zmq_errno() == ECONNREFUSED && retries) {
+        zclock_sleep (250);
+        rc = zmq_connect (self->handle, endpoint);
+        retries--;
+    }
+#endif
+    return rc;
 }
 
 
