@@ -196,7 +196,7 @@ server_connect (server_t *self, const char *endpoint)
     //  Never block on sending; we use an infinite HWM and buffer as many
     //  messages as needed in outgoing pipes. Note that the maximum number
     //  is the overall tuple set size.
-    zsock_set_sndhwm (remote, 0);
+    zsock_set_unbounded (remote);
     if (zsock_connect (remote, "%s", endpoint)) {
         zsys_error ("bad zgossip endpoint '%s'", endpoint);
         zsock_destroy (&remote);
@@ -417,7 +417,8 @@ zgossip_test (bool verbose)
     zsock_t *client = zsock_new (ZMQ_DEALER);
     assert (client);
     zsock_set_rcvtimeo (client, 2000);
-    zsock_connect (client, "inproc://zgossip");
+    int rc = zsock_connect (client, "inproc://zgossip");
+    assert (rc == 0);
 
     //  Send HELLO, which gets no reply
     zgossip_msg_t *request, *reply;
