@@ -169,6 +169,12 @@ CZMQ_EXPORT int
 CZMQ_EXPORT zmsg_t *
     zsock_recv (zsock_t *self);
 
+//  Set socket to use unbounded pipes (HWM=0); use this in cases when you are
+//  totally certain the message volume can fit in memory. This method works
+//  across all versions of ZeroMQ.
+CZMQ_EXPORT void
+    zsock_set_unbounded (zsock_t *self);
+
 //  Send a signal over a socket. A signal is a short message carrying a
 //  success/failure code (by convention, 0 means OK). Signals are encoded
 //  to be distinguishable from "normal" messages. Accepts a zock_t or a
