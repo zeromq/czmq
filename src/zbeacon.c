@@ -271,9 +271,9 @@ zbeacon_test (bool verbose)
         zbeacon_socket (node2), 
         zbeacon_socket (node3), NULL);
         
-    int64_t stop_at = zclock_time () + 1000;
-    while (zclock_time () < stop_at) {
-        long timeout = (long) (stop_at - zclock_time ());
+    int64_t stop_at = zclock_mono () + 1000;
+    while (zclock_mono () < stop_at) {
+        long timeout = (long) (stop_at - zclock_mono ());
         if (timeout < 0)
             timeout = 0;
         void *which = zpoller_wait (poller, timeout * ZMQ_POLL_MSEC);
@@ -364,7 +364,7 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
         };
         long timeout = -1;
         if (self->transmit) {
-            timeout = (long) (self->ping_at - zclock_time ());
+            timeout = (long) (self->ping_at - zclock_mono ());
             if (timeout < 0)
                 timeout = 0;
         }
@@ -377,10 +377,10 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
             s_beacon_recv (self);
 
         if (self->transmit
-        &&  zclock_time () >= self->ping_at) {
+        &&  zclock_mono () >= self->ping_at) {
             //  Send beacon to any listening peers
             zsys_udp_send (self->udpsock, self->transmit, &self->broadcast);
-            self->ping_at = zclock_time () + self->interval;
+            self->ping_at = zclock_mono () + self->interval;
         }
     }
     s_agent_destroy (&self);
@@ -627,7 +627,7 @@ s_api_command (agent_t *self)
         self->transmit = zframe_recv (self->pipe);
         assert (self->transmit);
         //  Start broadcasting immediately
-        self->ping_at = zclock_time ();
+        self->ping_at = zclock_mono ();
     }
     else
     if (streq (command, "SILENCE"))

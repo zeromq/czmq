@@ -27,6 +27,10 @@ CZMQ_EXPORT void
 CZMQ_EXPORT int64_t
     zclock_time (void);
 
+//  Return current monotonic clock in milliseconds
+CZMQ_EXPORT int64_t
+    zclock_mono (void);
+
 //  Return formatted date/time as fresh string. Free using zstr_free().
 CZMQ_EXPORT char *
     zclock_timestr (void);
