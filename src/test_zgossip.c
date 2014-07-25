@@ -150,7 +150,7 @@ int main (int argn, char *argv [])
     //  Each actor will deliver us tuples; count these until we're done
     int total = set_size * swarm_size;
     int pending = total;
-    int64_t ticker = zclock_time () + 2000;
+    int64_t ticker = zclock_mono () + 2000;
     while (pending) {
         zsock_t *which = (zsock_t *) zpoller_wait (poller, 100);
         if (!which) {
@@ -162,10 +162,10 @@ int main (int argn, char *argv [])
         assert (streq (command, "DELIVER"));
         pending--;
         free (command);
-        if (zclock_time () > ticker) {
+        if (zclock_mono () > ticker) {
             printf ("(%d%%)", (int) ((100 * (total - pending)) / total));
             fflush (stdout);
-            ticker = zclock_time () + 2000;
+            ticker = zclock_mono () + 2000;
         }
     }
     //  Destroy swarm
