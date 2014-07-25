@@ -186,17 +186,17 @@ static long
 s_tickless_timer (zloop_t *self)
 {
     //  Calculate tickless timer, up to 1 hour
-    int64_t tickless = zclock_time () + 1000 * 3600;
+    int64_t tickless = zclock_mono () + 1000 * 3600;
     s_timer_t *timer = (s_timer_t *) zlist_first (self->timers);
     while (timer) {
         //  Find earliest timer
         if (timer->when == -1)
-            timer->when = timer->delay + zclock_time ();
+            timer->when = timer->delay + zclock_mono ();
         if (tickless > timer->when)
             tickless = timer->when;
         timer = (s_timer_t *) zlist_next (self->timers);
     }
-    long timeout = (long) (tickless - zclock_time ());
+    long timeout = (long) (tickless - zclock_mono ());
     if (timeout < 0)
         timeout = 0;
     if (self->verbose)
@@ -512,7 +512,7 @@ zloop_start (zloop_t *self)
     //  Recalculate all timers now
     s_timer_t *timer = (s_timer_t *) zlist_first (self->timers);
     while (timer) {
-        timer->when = timer->delay + zclock_time ();
+        timer->when = timer->delay + zclock_mono ();
         timer = (s_timer_t *) zlist_next (self->timers);
     }
     //  Main reactor loop
@@ -536,7 +536,7 @@ zloop_start (zloop_t *self)
         //  Handle any timers that have now expired
         timer = (s_timer_t *) zlist_first (self->timers);
         while (timer) {
-            if (zclock_time () >= timer->when && timer->when != -1) {
+            if (zclock_mono () >= timer->when && timer->when != -1) {
                 if (self->verbose)
                     zsys_debug ("zloop: call timer id=%d handler", timer->timer_id);
                 rc = timer->handler (self, timer->timer_id, timer->arg);
@@ -547,7 +547,7 @@ zloop_start (zloop_t *self)
                     free (timer);
                 }
                 else
-                    timer->when = timer->delay + zclock_time ();
+                    timer->when = timer->delay + zclock_mono ();
             }
             timer = (s_timer_t *) zlist_next (self->timers);
         }
