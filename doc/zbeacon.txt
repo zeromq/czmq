@@ -136,9 +136,9 @@ EXAMPLE
         zbeacon_socket (node2), 
         zbeacon_socket (node3), NULL);
         
-    int64_t stop_at = zclock_time () + 1000;
-    while (zclock_time () < stop_at) {
-        long timeout = (long) (stop_at - zclock_time ());
+    int64_t stop_at = zclock_mono () + 1000;
+    while (zclock_mono () < stop_at) {
+        long timeout = (long) (stop_at - zclock_mono ());
         if (timeout < 0)
             timeout = 0;
         void *which = zpoller_wait (poller, timeout * ZMQ_POLL_MSEC);
