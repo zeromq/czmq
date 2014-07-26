@@ -5,6 +5,7 @@ language: c
 
 #   Build-check all subprojects, without installing anything
 before_script:
+- sudo apt-get install uuid-dev
 - git clone git://github.com/jedisct1/libsodium.git
 - git clone git://github.com/zeromq/zeromq2-x.git
 - git clone git://github.com/zeromq/zeromq3-x.git
