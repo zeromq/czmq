@@ -175,8 +175,12 @@ zactor_destroy (zactor_t **self_p)
         assert (zactor_is (self));
 
         //  Signal the actor to end and wait for the thread exit code
-        zstr_send (self->pipe, "$TERM");
-        zsock_wait (self->pipe);
+        //  If the pipe isn't connected any longer, assume child thread
+        //  has already quit due to other reasons and don't collect the
+        //  exit signal.
+        zsock_set_sndtimeo (self->pipe, 0);
+        if (zstr_send (self->pipe, "$TERM") == 0)
+            zsock_wait (self->pipe);
         zsock_destroy (&self->pipe);
         self->tag = 0xDeadBeef;
         free (self);
