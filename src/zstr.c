@@ -70,14 +70,14 @@ zstr_recv (void *source)
 //  --------------------------------------------------------------------------
 //  Send a C string to a socket, as a frame. The string is sent without
 //  trailing null byte; to read this you can use zstr_recv, or a similar
-//  method that adds a null terminator on the received string.
+//  method that adds a null terminator on the received string. String
+//  may be NULL, which is sent as "".
 
 int
 zstr_send (void *dest, const char *string)
 {
     assert (dest);
-    assert (string);
-    return s_send_string (dest, false, (char *) string);
+    return s_send_string (dest, false, string? (char *) string: "");
 }
 
 
