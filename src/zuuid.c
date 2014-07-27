@@ -109,15 +109,15 @@ zuuid_set_str (zuuid_t *self, const char *source)
 {
     assert (self);
     assert (strlen (source) == 32);
-
-    int byte_nbr = 0;
-    while (*source) {
-        if (sscanf (source, "%02x", (uint *) &self->uuid [byte_nbr]) != 1)
-            return -1;
-        byte_nbr++;
-        source += 2;
-    }
+    
     strcpy (self->str, source);
+    int byte_nbr;
+    for (byte_nbr = 0; byte_nbr < ZUUID_LEN; byte_nbr++) {
+        uint value;
+        if (sscanf (source + byte_nbr * 2, "%02x", &value) != 1)
+            return -1;
+        self->uuid [byte_nbr] = (byte) value;
+    }
     return 0;
 }
 
@@ -222,11 +222,13 @@ zuuid_test (bool verbose)
     assert (streq (zuuid_str (uuid), zuuid_str (copy)));
 
     //  Check set/set_str/export methods
-    zuuid_set_str (uuid, "8CB3E9A9649B4BEF8DE225E9C2CEBB38");
+    const char *myuuid = "8CB3E9A9649B4BEF8DE225E9C2CEBB38";
+    zuuid_set_str (uuid, myuuid);
+    assert (streq (zuuid_str (uuid), myuuid));
     byte copy_uuid [16];
     zuuid_export (uuid, copy_uuid);
     zuuid_set (uuid, copy_uuid);
-    assert (streq (zuuid_str (uuid), "8CB3E9A9649B4BEF8DE225E9C2CEBB38"));
+    assert (streq (zuuid_str (uuid), myuuid));
     
     zuuid_destroy (&uuid);
     zuuid_destroy (&copy);
