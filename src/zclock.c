@@ -59,7 +59,9 @@ static int64_t
 s_perfcounter_to_msec (const LARGE_INTEGER *count)
 {
     // System frequency does not change at run-time, cache it
-    static int64_t freq = s_get_frequencey ();
+    static int64_t freq = 0;
+    if (freq == 0)
+        freq = s_get_frequencey ();
 
     return (int64_t)(count->QuadPart  * 1000) / freq;
 }
