@@ -748,8 +748,8 @@ s_server_apply_config (s_server_t *self)
         else
         if (streq (zconfig_name (section), "bind")) {
             char *endpoint = zconfig_resolve (section, "endpoint", "?");
-            int rc = zsock_bind (self->router, "%s", endpoint);
-            assert (rc != -1);
+            if (zsock_bind (self->router, "%s", endpoint) == -1)
+                zsys_warning ("failed to bind to %s", endpoint);
         }
         section = zconfig_next (section);
     }
@@ -777,7 +777,8 @@ s_server_api_message (zloop_t *loop, zsock_t *reader, void *argument)
         //  Bind to a specified endpoint, which may use an ephemeral port
         char *endpoint = zmsg_popstr (msg);
         self->port = zsock_bind (self->router, "%s", endpoint);
-        assert (self->port != -1);
+        if (self->port == -1)
+            zsys_warning ("failed to bind to %s", endpoint);
         free (endpoint);
     }
     else

@@ -198,7 +198,7 @@ server_connect (server_t *self, const char *endpoint)
     //  is the overall tuple set size.
     zsock_set_unbounded (remote);
     if (zsock_connect (remote, "%s", endpoint)) {
-        zsys_error ("bad zgossip endpoint '%s'", endpoint);
+        zsys_warning ("bad zgossip endpoint '%s'", endpoint);
         zsock_destroy (&remote);
         return;
     }
