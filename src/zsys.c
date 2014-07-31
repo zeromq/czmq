@@ -1421,10 +1421,11 @@ zsys_test (bool verbose)
     int rc = zsys_has_curve ();
     
     if (verbose) {
+        zsys_set_logstream (stdout);
         char *hostname = zsys_hostname ();
-        zsys_info ("host name is %s\n", hostname);
+        zsys_info ("host name is %s", hostname);
         free (hostname);
-        zsys_info ("system limit is %zd ZeroMQ sockets\n", zsys_socket_limit ());
+        zsys_info ("system limit is %zd ZeroMQ sockets", zsys_socket_limit ());
     }
     zsys_set_io_threads (1);
     zsys_set_max_sockets (0);
@@ -1507,7 +1508,6 @@ zsys_test (bool verbose)
         zstr_free (&received);
     }
     zsys_close (logger, NULL, 0);
-
     //  @end
 
     printf ("OK\n");
