@@ -80,11 +80,13 @@ EXAMPLE
     assert (streq (zuuid_str (uuid), zuuid_str (copy)));
 
     //  Check set/set_str/export methods
-    zuuid_set_str (uuid, "8CB3E9A9649B4BEF8DE225E9C2CEBB38");
+    const char *myuuid = "8CB3E9A9649B4BEF8DE225E9C2CEBB38";
+    zuuid_set_str (uuid, myuuid);
+    assert (streq (zuuid_str (uuid), myuuid));
     byte copy_uuid [16];
     zuuid_export (uuid, copy_uuid);
     zuuid_set (uuid, copy_uuid);
-    assert (streq (zuuid_str (uuid), "8CB3E9A9649B4BEF8DE225E9C2CEBB38"));
+    assert (streq (zuuid_str (uuid), myuuid));
     
     zuuid_destroy (&uuid);
     zuuid_destroy (&copy);
