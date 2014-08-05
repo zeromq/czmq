@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zthread - working with system threads
+    zthread - working with system threads (deprecated)
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -17,6 +17,7 @@
     that look like normal OS threads, or attached threads that share the
     caller's 0MQ context, and get an inproc pipe to talk back to the parent
     thread. Detached threads create their own 0MQ contexts as needed.
+    NOTE: this class is deprecated in favor of zactor.
 @discuss
     We have several use cases for multiple threads. One is to simulate many
     processes, so we can test 0MQ designs and flows more easily. Another is
