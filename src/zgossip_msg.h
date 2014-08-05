@@ -39,7 +39,9 @@
     PING - Client signals liveness
         version             number 1    Version = 1
 
-    PONG - Server responds to ping
+    PONG - Server responds to ping; note that pongs are not correlated with pings,
+and may be mixed with other commands, and the client should treat any
+incoming traffic as valid activity.
         version             number 1    Version = 1
 
     INVALID - Server rejects command as invalid

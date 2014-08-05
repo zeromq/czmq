@@ -1,7 +1,7 @@
 The following ABNF grammar defines the ZeroMQ Gossip Protocol:
 
-        C:HELLO [ *S:PUBLISH ]
-        C:PUBLISH / S:PUBLISH / C:PING S:PONG
+        C:HELLO ( C:PUBLISH / S:PUBLISH / heartbeat )
+        heartbeat = C:PING / S:PONG
 
     ;         Client says hello to server
     hello           = signature %d1 version
@@ -19,7 +19,9 @@ The following ABNF grammar defines the ZeroMQ Gossip Protocol:
     ping            = signature %d3 version
     version         = number-1              ; Version = 1
 
-    ;         Server responds to ping
+    ;         Server responds to ping; note that pongs are not correlated with pings,
+        and may be mixed with other commands, and the client should treat any
+        incoming traffic as valid activity.
     pong            = signature %d4 version
     version         = number-1              ; Version = 1
 

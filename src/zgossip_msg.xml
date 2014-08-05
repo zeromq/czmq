@@ -8,8 +8,8 @@
     <include filename = "license.xml" />
 
     <grammar>
-        C:HELLO [ *S:PUBLISH ]
-        C:PUBLISH / S:PUBLISH / C:PING S:PONG
+        C:HELLO ( C:PUBLISH / S:PUBLISH / heartbeat )
+        heartbeat = C:PING / S:PONG
     </grammar>
 
     <!-- Header for all messages -->
@@ -33,7 +33,9 @@
     </message>
 
     <message name = "pong">
-        Server responds to ping
+        Server responds to ping; note that pongs are not correlated with pings,
+        and may be mixed with other commands, and the client should treat any
+        incoming traffic as valid activity.
     </message>
 
     <message name = "invalid">

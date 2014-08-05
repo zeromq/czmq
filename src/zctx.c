@@ -37,6 +37,9 @@
     such as zmq_recv() and zmq_poll() will return when the user presses
     Ctrl-C.
 @discuss
+    NOTE: this class is deprecated in favor of zsock, which does not expose
+    contexts in the API at all. All zsock instances use the same global
+    context.
 @end
 */
 
