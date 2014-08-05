@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zthread - working with system threads
+    zthread - working with system threads (deprecated)
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
