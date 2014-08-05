@@ -16,6 +16,7 @@
     The zmonitor class provides an API for obtaining socket events such as
     connected, listen, disconnected, etc. Socket events are only available
     for sockets connecting or bound to ipc:// and tcp:// endpoints.
+    NOTE: this class is deprecated in favor of zsock_monitor.
 @discuss
     This class wraps the ZMQ socket monitor API, see zmq_socket_monitor for
     details. Currently this class requires libzmq v4.0 or later and is empty
