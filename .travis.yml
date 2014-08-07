@@ -25,7 +25,7 @@ before_script:
 
 #   libzmq
 - git clone git://github.com/zeromq/libzmq.git
-- ( cd libzmq-x; ./autogen.sh; ./configure; make check )
+- ( cd libzmq; ./autogen.sh; ./configure; make check )
 
 #   Now rebuild CZMQ against each supported version of ZeroMQ
 script:
