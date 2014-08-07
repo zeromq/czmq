@@ -290,6 +290,8 @@
 #   endif
 #   if (defined (__UTYPE_OSX))
 #       include <crt_externs.h>         //  For _NSGetEnviron()
+#       include <mach/clock.h>
+#       include <mach/mach.h>           //  For monotonic clocks
 #   endif
 #endif
 
