@@ -575,10 +575,9 @@ s_get_interface (agent_t *self)
         PIP_ADAPTER_PREFIX pPrefix = cur_address->FirstPrefix;
 
         PWCHAR friendlyName = cur_address->FriendlyName;
-        size_t friendlyLength = 0;
-        size_t asciiSize = wcstombs(0, friendlyName, 0) + 1;
-        char *asciiFriendlyName = (char*) zmalloc(asciiSize);
-        friendlyLength = wcstombs(asciiFriendlyName, friendlyName, asciiSize);
+        size_t asciiFriendlyLength = wcstombs(0, friendlyName, 0) + 1;
+        char *asciiFriendlyName = (char*) zmalloc(asciiFriendlyLength);
+        wcstombs(asciiFriendlyName, friendlyName, asciiFriendlyLength);
 
         int filter = any_interface || (strcmp (zsys_interface (), asciiFriendlyName) == 0);
         int valid = cur_address->OperStatus == IfOperStatusUp;
