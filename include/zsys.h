@@ -45,7 +45,10 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT int
     zsys_close (void *handle, const char *filename, size_t line_nbr);
     
-//  Set interrupt handler (NULL means external handler)
+//  Set interrupt handler; this saves the default handlers so that a
+//  zsys_handler_reset () can restore them. If you call this multiple times
+//  then the last handler will take affect. If handler_fn is NULL, disables
+//  default SIGINT/SIGTERM handling in CZMQ.
 CZMQ_EXPORT void
     zsys_handler_set (zsys_handler_fn *handler_fn);
 
