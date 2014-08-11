@@ -3,6 +3,7 @@
     title = "ZeroMQ Gossip Protocol"
     script = "zproto_codec_c"
     header = "."
+    include = "../include/czmq.h"
     export = "CZMQ_EXPORT"
     >
     This is a server implementation of the ZeroMQ Gossip Protocol (ZGP)
