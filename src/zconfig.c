@@ -268,6 +268,8 @@ zconfig_next (zconfig_t *self)
 zconfig_t *
 zconfig_locate (zconfig_t *self, const char *path)
 {
+    assert (self);
+    
     //  Check length of next path segment
     if (*path == '/')
         path++;
@@ -298,6 +300,7 @@ zconfig_locate (zconfig_t *self, const char *path)
 char *
 zconfig_resolve (zconfig_t *self, const char *path, const char *default_value)
 {
+    assert (self);
     zconfig_t *item = zconfig_locate (self, path);
     if (item)
         return zconfig_value (item);
@@ -313,6 +316,8 @@ zconfig_resolve (zconfig_t *self, const char *path, const char *default_value)
 zconfig_t *
 zconfig_at_depth (zconfig_t *self, int level)
 {
+    assert (self);
+    
     while (level > 0) {
         if (self->child) {
             self = self->child;
@@ -446,6 +451,7 @@ s_config_save (zconfig_t *self, void *arg, int level)
 char *
 zconfig_filename (zconfig_t *self)
 {
+    assert (self);
     if (self->file)
         return (zfile_filename (self->file, NULL));
     else
