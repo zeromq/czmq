@@ -3,6 +3,7 @@
     title = "zgossip server"
     proto = "zgossip_msg"
     script = "zproto_server_c"
+    include = "../include/czmq.h"
     >
     This is a server implementation of the ZeroMQ Gossip Discovery Protocol
     <include filename = "license.xml" />
