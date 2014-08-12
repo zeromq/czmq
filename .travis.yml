@@ -3,48 +3,34 @@
 
 language: c
 
-#   Build-check all subprojects, without installing them
-before_script:
+before-script:
 - sudo apt-get install uuid-dev
-
-#   libsodium
-- git clone git://github.com/jedisct1/libsodium.git
-- ( cd libsodium; ./autogen.sh; ./configure; make check )
-
-#   zeromq2-x
-- git clone git://github.com/zeromq/zeromq2-x.git
-- ( cd zeromq2-x; ./autogen.sh; ./configure; make check )
-
-#   zeromq3-x
-- git clone git://github.com/zeromq/zeromq3-x.git
-- ( cd zeromq3-x; ./autogen.sh; ./configure; make check )
-
-#   zeromq4-x
-- git clone git://github.com/zeromq/zeromq4-x.git
-- ( cd zeromq4-x; ./autogen.sh; ./configure; make check )
-
-#   libzmq
-- git clone git://github.com/zeromq/libzmq.git
-- ( cd libzmq; ./autogen.sh; ./configure; make check )
-
-#   Now rebuild CZMQ against each supported version of ZeroMQ
-script:
 - git clone git://github.com/zeromq/czmq.git
 - ./autogen.sh
 
+script:
 # Perform regression test build against ZeroMQ v2.x
-- ( cd zeromq2-x; sudo make install; sudo ldconfig )
+- git clone git://github.com/zeromq/zeromq2-x.git
+- ( cd zeromq2-x; ./autogen.sh; ./configure; make; sudo make install; sudo ldconfig )
 - ./configure && make check
+- echo "*** CZMQ OK against ZeroMQ v2.x"
 
 # Perform regression test build against ZeroMQ v3.x
-- ( cd zeromq3-x; sudo make install; sudo ldconfig )
+- git clone git://github.com/zeromq/zeromq3-x.git
+- ( cd zeromq3-x; ./autogen.sh; ./configure; make; sudo make install; sudo ldconfig )
 - ./configure && make check
+- echo "*** CZMQ OK against ZeroMQ v3.x"
 
-# Perform regression test build against ZeroMQ v4.x + sodium
-- ( cd libsodium; sudo make install; sudo ldconfig )
-- ( cd zeromq4-x; sudo make install; sudo ldconfig )
+# Perform regression test build against ZeroMQ v4.x + libsodium
+- git clone git://github.com/jedisct1/libsodium.git
+- ( cd libsodium; ./autogen.sh; ./configure; make; sudo make install; sudo ldconfig )
+- git clone git://github.com/zeromq/zeromq4-x.git
+- ( cd zeromq4-x; ./autogen.sh; ./configure; make; sudo make install; sudo ldconfig )
 - ./configure && make check
+- echo "*** CZMQ OK against ZeroMQ v4.x"
 
-# Perform regression test build against ZeroMQ master + sodium
-- ( cd libzmq; sudo make install; sudo ldconfig )
+# Perform regression test build against ZeroMQ master + libsodium
+- git clone git://github.com/zeromq/libzmq.git
+- ( cd libzmq; ./autogen.sh; ./configure; make; sudo make install; sudo ldconfig )
 - ./configure && make check
+- echo "*** CZMQ OK against libzmq master"
