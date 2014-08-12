@@ -321,36 +321,42 @@ zsys_close (void *handle, const char *filename, size_t line_nbr)
 //  --------------------------------------------------------------------------
 //  Set interrupt handler; this saves the default handlers so that a
 //  zsys_handler_reset () can restore them. If you call this multiple times
-//  then the last handler will take affect. Note handler_fn cannot be null.
+//  then the last handler will take affect. If handler_fn is NULL, disables
+//  default SIGINT/SIGTERM handling in CZMQ.
 
 void
 zsys_handler_set (zsys_handler_fn *handler_fn)
 {
-    //  After 2014-04-20 this code does not accept NULL handlers, which
-    //  was complexity for no known benefit.
-    assert (handler_fn);
-
+    if (!handler_fn) {
+        //  Disable existing or future signal handling
+        zsys_handler_reset ();
+        s_first_time = false;
+    }
+    else {
 #if defined (__UNIX__)
-    //  If first time, save default handlers
-    if (s_first_time) {
-        sigaction (SIGINT, NULL, &sigint_default);
-        sigaction (SIGTERM, NULL, &sigterm_default);
-        s_first_time = false;
-    }
-    //  Install signal handler for SIGINT and SIGTERM
-    struct sigaction action;
-    action.sa_handler = handler_fn;
-    action.sa_flags = 0;
-    sigemptyset (&action.sa_mask);
-    sigaction (SIGINT, &action, NULL);
-    sigaction (SIGTERM, &action, NULL);
+        if (s_first_time) {
+            //  If first time, save default handlers
+            sigaction (SIGINT, NULL, &sigint_default);
+            sigaction (SIGTERM, NULL, &sigterm_default);
+            s_first_time = false;
+        }
+        //  Install signal handler for SIGINT and SIGTERM
+        struct sigaction action;
+        action.sa_handler = handler_fn;
+        action.sa_flags = 0;
+        sigemptyset (&action.sa_mask);
+        sigaction (SIGINT, &action, NULL);
+        sigaction (SIGTERM, &action, NULL);
 #elif defined (__WINDOWS__)
-    installed_handler_fn = handler_fn;
-    if (s_first_time) {
-        SetConsoleCtrlHandler (s_handler_fn_shim, TRUE);
-        s_first_time = false;
-    }
+        installed_handler_fn = handler_fn;
+        if (s_first_time) {
+            SetConsoleCtrlHandler (s_handler_fn_shim, TRUE);
+            s_first_time = false;
+        }
+#else
+#   error "No signal handling defined for this platform"
 #endif
+    }
 }
 
 
