@@ -27,6 +27,7 @@ extern "C" {
 //  add policies, all incoming NULL connections are allowed (classic ZeroMQ
 //  behaviour), and all PLAIN and CURVE connections are denied. If there was
 //  an error during initialization, returns NULL.
+//  If you are using the new zsock API then pass NULL as the ctx here.
 CZMQ_EXPORT zauth_t *
     zauth_new (zctx_t *ctx);
     
