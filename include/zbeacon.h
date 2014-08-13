@@ -23,6 +23,7 @@ extern "C" {
 //  support UDP broadcasts (lacking a useful interface), returns NULL.
 //  To force the beacon to operate on a given port, set the environment
 //  variable ZSYS_INTERFACE, or call zsys_set_interface() beforehand.
+//  If you are using the new zsock API then pass NULL as the ctx here.
 CZMQ_EXPORT zbeacon_t *
     zbeacon_new (zctx_t *ctx, int port_nbr);
     

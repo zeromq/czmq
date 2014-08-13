@@ -16,6 +16,7 @@ SYNOPSIS
 //  add policies, all incoming NULL connections are allowed (classic ZeroMQ
 //  behaviour), and all PLAIN and CURVE connections are denied. If there was
 //  an error during initialization, returns NULL.
+//  If you are using the new zsock API then pass NULL as the ctx here.
 CZMQ_EXPORT zauth_t *
     zauth_new (zctx_t *ctx);
     
@@ -87,59 +88,58 @@ EXAMPLE
     zsys_dir_create (TESTDIR);
     
     //  Install the authenticator
-    zctx_t *ctx = zctx_new ();
-    zauth_t *auth = zauth_new (ctx);
+    zauth_t *auth = zauth_new (NULL);
     assert (auth);
     zauth_set_verbose (auth, verbose);
     
     //  A default NULL connection should always success, and not 
     //  go through our authentication infrastructure at all.
-    void *server = zsocket_new (ctx, ZMQ_PUSH);
-    void *client = zsocket_new (ctx, ZMQ_PULL);
-    bool success = s_can_connect (ctx, &server, &client);
+    zsock_t *server = zsock_new (ZMQ_PUSH);
+    zsock_t *client = zsock_new (ZMQ_PULL);
+    bool success = s_can_connect (&server, &client);
     assert (success);
     
     //  When we set a domain on the server, we switch on authentication
     //  for NULL sockets, but with no policies, the client connection 
     //  will be allowed.
-    zsocket_set_zap_domain (server, "global");
-    success = s_can_connect (ctx, &server, &client);
+    zsock_set_zap_domain (server, "global");
+    success = s_can_connect (&server, &client);
     assert (success);
     
     //  Blacklist 127.0.0.1, connection should fail
-    zsocket_set_zap_domain (server, "global");
+    zsock_set_zap_domain (server, "global");
     zauth_deny (auth, "127.0.0.1");
-    success = s_can_connect (ctx, &server, &client);
+    success = s_can_connect (&server, &client);
     assert (!success);
 
     //  Whitelist our address, which overrides the blacklist
-    zsocket_set_zap_domain (server, "global");
+    zsock_set_zap_domain (server, "global");
     zauth_allow (auth, "127.0.0.1");
-    success = s_can_connect (ctx, &server, &client);
+    success = s_can_connect (&server, &client);
     assert (success);
 
     //  Try PLAIN authentication
-    zsocket_set_plain_server (server, 1);
-    zsocket_set_plain_username (client, "admin");
-    zsocket_set_plain_password (client, "Password");
-    success = s_can_connect (ctx, &server, &client);
+    zsock_set_plain_server (server, 1);
+    zsock_set_plain_username (client, "admin");
+    zsock_set_plain_password (client, "Password");
+    success = s_can_connect (&server, &client);
     assert (!success);
     
     FILE *password = fopen (TESTDIR "/password-file", "w");
     assert (password);
     fprintf (password, "admin=Password\n");
     fclose (password);
-    zsocket_set_plain_server (server, 1);
-    zsocket_set_plain_username (client, "admin");
-    zsocket_set_plain_password (client, "Password");
+    zsock_set_plain_server (server, 1);
+    zsock_set_plain_username (client, "admin");
+    zsock_set_plain_password (client, "Password");
     zauth_configure_plain (auth, "*", TESTDIR "/password-file");
-    success = s_can_connect (ctx, &server, &client);
+    success = s_can_connect (&server, &client);
     assert (success);
 
-    zsocket_set_plain_server (server, 1);
-    zsocket_set_plain_username (client, "admin");
-    zsocket_set_plain_password (client, "Bogus");
-    success = s_can_connect (ctx, &server, &client);
+    zsock_set_plain_server (server, 1);
+    zsock_set_plain_username (client, "admin");
+    zsock_set_plain_password (client, "Bogus");
+    success = s_can_connect (&server, &client);
     assert (!success);
 
     if (zsys_has_curve ()) {
@@ -154,28 +154,28 @@ EXAMPLE
         //  Test without setting-up any authentication
         zcert_apply (server_cert, server);
         zcert_apply (client_cert, client);
-        zsocket_set_curve_server (server, 1);
-        zsocket_set_curve_serverkey (client, server_key);
-        success = s_can_connect (ctx, &server, &client);
+        zsock_set_curve_server (server, 1);
+        zsock_set_curve_serverkey (client, server_key);
+        success = s_can_connect (&server, &client);
         assert (!success);
 
         //  Test CURVE_ALLOW_ANY
         zcert_apply (server_cert, server);
         zcert_apply (client_cert, client);
-        zsocket_set_curve_server (server, 1);
-        zsocket_set_curve_serverkey (client, server_key);
+        zsock_set_curve_server (server, 1);
+        zsock_set_curve_serverkey (client, server_key);
         zauth_configure_curve (auth, "*", CURVE_ALLOW_ANY);
-        success = s_can_connect (ctx, &server, &client);
+        success = s_can_connect (&server, &client);
         assert (success);
 
         //  Test full client authentication using certificates
         zcert_apply (server_cert, server);
         zcert_apply (client_cert, client);
-        zsocket_set_curve_server (server, 1);
-        zsocket_set_curve_serverkey (client, server_key);
+        zsock_set_curve_server (server, 1);
+        zsock_set_curve_serverkey (client, server_key);
         zcert_save_public (client_cert, TESTDIR "/mycert.txt");
         zauth_configure_curve (auth, "*", TESTDIR);
-        success = s_can_connect (ctx, &server, &client);
+        success = s_can_connect (&server, &client);
         assert (success);
 
         zcert_destroy (&server_cert);
@@ -183,10 +183,11 @@ EXAMPLE
     }
     //  Remove the authenticator and check a normal connection works
     zauth_destroy (&auth);
-    success = s_can_connect (ctx, &server, &client);
+    success = s_can_connect (&server, &client);
     assert (success);
 
-    zctx_destroy (&ctx);
+    zsock_destroy (&server);
+    zsock_destroy (&client);
     
     //  Delete all test files
     zdir_t *dir = zdir_new (TESTDIR, NULL);

@@ -27,8 +27,9 @@ typedef void (zsys_handler_fn) (int signal_value);
 //  Initialize CZMQ zsys layer; this happens automatically when you create
 //  a socket or an actor; however this call lets you force initialization
 //  earlier, so e.g. logging is properly set-up before you start working.
-//  Not threadsafe, so call only from main thread.
-CZMQ_EXPORT void
+//  Not threadsafe, so call only from main thread. Safe to call multiple
+//  times. Returns global CZMQ context.
+CZMQ_EXPORT void *
     zsys_init (void);
     
 //  Get a new ZMQ socket, automagically creating a ZMQ context if this is

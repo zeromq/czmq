@@ -3,7 +3,7 @@ zthread(3)
 
 NAME
 ----
-zthread - working with system threads
+zthread - working with system threads (deprecated)
 
 SYNOPSIS
 --------
@@ -39,6 +39,7 @@ The zthread class wraps OS thread creation. It creates detached threads
 that look like normal OS threads, or attached threads that share the
 caller's 0MQ context, and get an inproc pipe to talk back to the parent
 thread. Detached threads create their own 0MQ contexts as needed.
+NOTE: this class is deprecated in favor of zactor.
 
 We have several use cases for multiple threads. One is to simulate many
 processes, so we can test 0MQ designs and flows more easily. Another is
