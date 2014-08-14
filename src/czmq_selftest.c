@@ -71,6 +71,7 @@ int main (int argc, char *argv [])
     zcert_test (verbose);
     zcertstore_test (verbose);
     zauth_test (verbose);
+    zinterface_test (verbose);
     printf ("Tests passed OK\n");
     return 0;
 }
