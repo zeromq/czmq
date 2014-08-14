@@ -595,6 +595,8 @@ s_get_interface (agent_t *self)
             found = 1;
             break;
         }
+
+        free (asciiFriendlyName);
         cur_address = cur_address->Next;
     }
     free (pip_addresses);
