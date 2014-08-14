@@ -582,6 +582,7 @@ s_get_interface (agent_t *self)
 
         int filter = any_interface || (strcmp (zsys_interface (), asciiFriendlyName) == 0);
         int valid = cur_address->OperStatus == IfOperStatusUp;
+        free (asciiFriendlyName);
 
         if (filter && valid && pUnicast && pPrefix) {
             self->address = *(inaddr_t *)(pUnicast->Address.lpSockaddr);
@@ -596,7 +597,6 @@ s_get_interface (agent_t *self)
             break;
         }
 
-        free (asciiFriendlyName);
         cur_address = cur_address->Next;
     }
     free (pip_addresses);
