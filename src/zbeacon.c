@@ -445,7 +445,6 @@ s_agent_new (void *pipe, int port_nbr)
 
 
 //  Get the actual network interface we're working on.
-//  Currently implemented for POSIX and for Windows
 
 static void
 s_get_interface (agent_t *self)
@@ -458,154 +457,31 @@ s_get_interface (agent_t *self)
 
         self->address = self->broadcast;
         self->address.sin_addr.s_addr = INADDR_ANY;
-        return;
     }
-#if defined (HAVE_GETIFADDRS)
-    struct ifaddrs *interfaces;
-    if (getifaddrs (&interfaces) == 0) {
-        int num_interfaces = 0;
-        struct ifaddrs *interface = interfaces;
-        while (interface) {
-            //  On Solaris, loopback interfaces have a NULL in ifa_broadaddr
-            if  (interface->ifa_broadaddr
-            &&  (interface->ifa_flags & IFF_UP)             //  Only use interfaces that are running
-            && !(interface->ifa_flags & IFF_LOOPBACK)       //  Ignore loopback interface
-            &&  (interface->ifa_flags & IFF_BROADCAST)      //  Only use interfaces that have BROADCAST
-            && !(interface->ifa_flags & IFF_POINTOPOINT)    //  Ignore point to point interfaces.
-#if defined(IFF_SLAVE)
-            && !(interface->ifa_flags & IFF_SLAVE)          //  Ignore devices that are bonding slaves.
-#endif
-            &&   interface->ifa_addr
-            &&  (interface->ifa_addr->sa_family == AF_INET)) {
-                self->address = *(inaddr_t *) interface->ifa_addr;
-                self->broadcast = *(inaddr_t *) interface->ifa_broadaddr;
-                self->broadcast.sin_port = htons (self->port_nbr);
-
-                //  If the returned broadcast address is the same as source
-                //  address, build the broadcast address from the source
-                //  address and netmask.
-                if (self->address.sin_addr.s_addr == self->broadcast.sin_addr.s_addr)
-                    self->broadcast.sin_addr.s_addr
-                        |= ~(((inaddr_t *) interface->ifa_netmask)->sin_addr.s_addr);
-
-                //  Keep track of the number of interfaces on this host
-                if (self->address.sin_addr.s_addr != ntohl (INADDR_LOOPBACK))
-                    num_interfaces++;
-
-                //  If this is the specified interface then move on
-                if (streq (interface->ifa_name, zsys_interface ()))
-                    break;
-            }
-            interface = interface->ifa_next;
-        }
-        if (strlen (zsys_interface ()) == 0) {
-            if (num_interfaces == 0) {
-                //  Subnet broadcast addresses don't work on some platforms 
-                //  but is assumed to work if the interface is specified.
-                self->broadcast.sin_family = AF_INET;
-                self->broadcast.sin_addr.s_addr = INADDR_BROADCAST;
-                self->broadcast.sin_port = htons (self->port_nbr);
-            }
-            else
-            if (num_interfaces > 1) {
-                //  Our source address is unknown in this case so set it to
-                //  INADDR_ANY so self->hostname isn't set to an incorrect IP.
-                self->address = self->broadcast;
-                self->address.sin_addr.s_addr = INADDR_ANY;
+    else {
+        zlist_t* interfaces = zinterface_list();
+        zinterface_t *iface = zlist_first(interfaces);
+        if (strlen (zsys_interface ()) != 0) {
+            while (iface) {
+                if (streq (zinterface_name(iface), zsys_interface ())) break;
+                iface = zlist_next (interfaces);
             }
         }
-    }
-    freeifaddrs (interfaces);
-
-#   elif defined (__UNIX__)
-
-    //  Our default if we fail to find an interface
-    self->broadcast.sin_family = AF_INET;
-    self->broadcast.sin_addr.s_addr = INADDR_BROADCAST;
-    self->broadcast.sin_port = htons (self->port_nbr);
-
-    //  Our source address is unknown in this case so set it to
-    //  INADDR_ANY so self->hostname isn't set to an incorrect IP.
-    self->address = self->broadcast;
-    self->address.sin_addr.s_addr = INADDR_ANY;
-    if (strlen (zsys_interface ()) == 0)
-        return;         //  Use defaults
-
-    struct ifreq ifr;
-    memset (&ifr, 0, sizeof (ifr));
-
-    int sock = 0;
-    if ((sock = socket (AF_INET, SOCK_DGRAM, 0)) == -1)
-        return;         //  Use defaults
-
-    //  Get interface address
-    ifr.ifr_addr.sa_family = AF_INET;
-    strncpy (ifr.ifr_name, zsys_interface (), sizeof (ifr.ifr_name));
-    int rc = ioctl (sock, SIOCGIFADDR, (caddr_t) &ifr, sizeof (struct ifreq));
-    if (rc == -1)
-        zsys_socket_error ("siocgifaddr");
-
-    //  Get interface broadcast address
-    memcpy (&self->address, ((inaddr_t *) &ifr.ifr_addr), sizeof (inaddr_t));
-    rc = ioctl (sock, SIOCGIFBRDADDR, (caddr_t) &ifr, sizeof (struct ifreq));
-    if (rc == -1)
-        zsys_socket_error ("siocgifbrdaddr");
-
-    memcpy (&self->broadcast, ((inaddr_t *) &ifr.ifr_broadaddr), sizeof (inaddr_t));
-    close (sock);
-
-#   elif defined (__WINDOWS__)
-
-    int any_interface = (strlen (zsys_interface ()) == 0);
-
-    ULONG addr_size = 0;
-    DWORD rc = GetAdaptersAddresses (AF_INET,
-        GAA_FLAG_INCLUDE_PREFIX, NULL, NULL, &addr_size);
-    assert (rc == ERROR_BUFFER_OVERFLOW);
-
-    PIP_ADAPTER_ADDRESSES pip_addresses = (PIP_ADAPTER_ADDRESSES) malloc (addr_size);
-    rc = GetAdaptersAddresses (AF_INET,
-        GAA_FLAG_INCLUDE_PREFIX, NULL, pip_addresses, &addr_size);
-    assert (rc == NO_ERROR);
-
-    int found = 0;
-    PIP_ADAPTER_ADDRESSES cur_address = pip_addresses;
-    while (cur_address) {
-        PIP_ADAPTER_UNICAST_ADDRESS pUnicast = cur_address->FirstUnicastAddress;
-        PIP_ADAPTER_PREFIX pPrefix = cur_address->FirstPrefix;
-
-        PWCHAR friendlyName = cur_address->FriendlyName;
-        size_t asciiFriendlyLength = wcstombs(0, friendlyName, 0) + 1;
-        char *asciiFriendlyName = (char*) zmalloc(asciiFriendlyLength);
-        wcstombs(asciiFriendlyName, friendlyName, asciiFriendlyLength);
-
-        int filter = any_interface || (strcmp (zsys_interface (), asciiFriendlyName) == 0);
-        int valid = cur_address->OperStatus == IfOperStatusUp;
-        free (asciiFriendlyName);
-
-        if (filter && valid && pUnicast && pPrefix) {
-            self->address = *(inaddr_t *)(pUnicast->Address.lpSockaddr);
-            self->address.sin_port = htons (self->port_nbr);
-
-            self->broadcast = *(inaddr_t *)(pPrefix->Address.lpSockaddr);
-            self->broadcast.sin_addr.s_addr
-                |= htonl ((1 << (32 - pPrefix->PrefixLength)) - 1);
+        if (iface) {
+            // Using inet_addr instead of inet_aton or inet_atop because these are
+            // not supported in Win XP
+            self->broadcast.sin_family = AF_INET;
+            self->broadcast.sin_addr.s_addr = inet_addr (zinterface_broadcast (iface));
             self->broadcast.sin_port = htons (self->port_nbr);
 
-            found = 1;
-            break;
+            self->address = self->broadcast;
+            self->address.sin_addr.s_addr = inet_addr (zinterface_address (iface));
         }
-
-        cur_address = cur_address->Next;
+        else {
+            fprintf (stderr, "No adapter found or ZSYS_INTERFACE not equal to any adapter friendly name\n");
+        }
+        zlist_destroy(&interfaces);
     }
-    free (pip_addresses);
-
-    if (!found)
-        zsys_socket_error("No adapter found or ZSYS_INTERFACE not equal to any adapter friendly name");
-
-#   else
-#       error "Interface detection TBD on this operating system"
-#   endif
 }
 
 //  Handle command from API
