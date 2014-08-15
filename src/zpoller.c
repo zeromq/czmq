@@ -39,7 +39,8 @@ static int s_rebuild_poll_set (zpoller_t *self);
 
 //  --------------------------------------------------------------------------
 //  Constructor
-//  Create new poller from a list of sockets (end in NULL)
+//  Create new poller; the reader can be a libzmq socket (void *), a zsock_t
+//  instance, or a zactor_t instance.
 
 zpoller_t *
 zpoller_new (void *reader, ...)
@@ -79,7 +80,8 @@ zpoller_destroy (zpoller_t **self_p)
 
 
 //  --------------------------------------------------------------------------
-//  Add a reader to be polled. Returns 0 if OK, -1 on failure.
+//  Add a reader to be polled. Returns 0 if OK, -1 on failure. The reader may
+//  be a libzmq void * socket, a zsock_t instance, or a zactor_t instance.
 
 int
 zpoller_add (zpoller_t *self, void *reader)
@@ -94,7 +96,9 @@ zpoller_add (zpoller_t *self, void *reader)
 
 
 //  --------------------------------------------------------------------------
-//  Remove a reader from the poller; returns 0 if OK, -1 on failure.
+//  Remove a reader from the poller; returns 0 if OK, -1 on failure. The
+//  reader may be a libzmq void * socket, a zsock_t instance, or a zactor_t
+//  instance.
 
 int
 zpoller_remove (zpoller_t *self, void *reader)
@@ -108,13 +112,15 @@ zpoller_remove (zpoller_t *self, void *reader)
 
 
 //  --------------------------------------------------------------------------
-//  Poll the registered readers for I/O, return first socket that has input.
-//  This means the order that sockets are defined in the poll list affects
-//  their priority. If you need a balanced poll, use the low level zmq_poll
-//  method directly. If the poll call was interrupted (SIGINT), or the ZMQ
-//  context was destroyed, or the timeout expired, returns NULL. You can
-//  test the actual exit condition by calling zpoller_expired () and 
-//  zpoller_terminated (). Timeout is in msec.
+//  Poll the registered readers for I/O, return first reader that has input.
+//  The reader will be a libzmq void * socket, or a zsock_t or zactor_t
+//  instance as specified in zpoller_new/zpoller_add. The order that
+//  sockets are defined in the poll list affects their priority. If you
+//  need a balanced poll, use the low level zmq_poll method directly. If
+//  the poll call was interrupted (SIGINT), or the ZMQ context was
+//  destroyed, or the timeout expired, returns NULL. You can test the
+//  actual exit condition by calling zpoller_expired () and
+//  zpoller_terminated (). The timeout is in msec.
 
 void *
 zpoller_wait (zpoller_t *self, int timeout)

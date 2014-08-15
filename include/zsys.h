@@ -107,7 +107,8 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zsys_file_mode_default (void);
 
-//  Return the CZMQ version for run-time API detection
+//  Return the CZMQ version for run-time API detection; returns version
+//  number into provided fields, providing reference isn't null in each case.
 CZMQ_EXPORT void
     zsys_version (int *major, int *minor, int *patch);
 
