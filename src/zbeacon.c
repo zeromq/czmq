@@ -453,7 +453,7 @@ s_agent_new (void *pipe, int port_nbr)
 static void
 s_get_interface (agent_t *self)
 {
-    if (streq(zsys_interface(), "*")) {
+    if (streq (zsys_interface(), "*")) {
         // Special device to force binding to INADDR_ANY and sending to INADDR_BROADCAST
         self->broadcast.sin_family = AF_INET;
         self->broadcast.sin_addr.s_addr = INADDR_BROADCAST;
@@ -463,11 +463,12 @@ s_get_interface (agent_t *self)
         self->address.sin_addr.s_addr = INADDR_ANY;
     }
     else {
-        zlist_t* interfaces = zinterface_list();
-        zinterface_t *iface = zlist_first(interfaces);
+        zlist_t *interfaces = zinterface_list ();
+        zinterface_t *iface = zlist_first (interfaces);
         if (strlen (zsys_interface ()) != 0) {
             while (iface) {
-                if (streq (zinterface_name(iface), zsys_interface ())) break;
+                if (streq (zinterface_name(iface), zsys_interface ()))
+                    break;
                 iface = zlist_next (interfaces);
             }
         }
@@ -481,9 +482,9 @@ s_get_interface (agent_t *self)
             self->address = self->broadcast;
             self->address.sin_addr.s_addr = inet_addr (zinterface_address (iface));
         }
-        else {
-            fprintf (stderr, "No adapter found or ZSYS_INTERFACE not equal to any adapter friendly name\n");
-        }
+        else
+            zsys_error ("No adapter found or ZSYS_INTERFACE not equal to any adapter friendly name");
+        
         zlist_destroy(&interfaces);
     }
 }
@@ -527,7 +528,7 @@ s_api_command (agent_t *self)
         zstr_send (self->pipe, "OK");
     }
     else
-        printf ("E: unexpected API command '%s'\n", command);
+        zsys_error ("zbeacon: unexpected API command '%s'\n", command);
     
     zstr_free (&command);
 }
