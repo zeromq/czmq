@@ -41,6 +41,7 @@ int main (int argc, char *argv [])
     //  These are ordered from lowest level to highest level
     zrex_test (verbose);
     zsys_test (verbose);
+    zinterface_test (verbose);
     zchunk_test (verbose);
     zconfig_test (verbose);
     zclock_test (verbose);
@@ -66,9 +67,6 @@ int main (int argc, char *argv [])
     zcert_test (verbose);
     zcertstore_test (verbose);
     zauth_test (verbose);
-<<<<<<< HEAD
-    zinterface_test (verbose);
-=======
 
     //  Deprecated V2 classes
     zauth_v2_test (verbose);
@@ -79,7 +77,6 @@ int main (int argc, char *argv [])
     zsockopt_test (verbose);
     zthread_test (verbose);
 
->>>>>>> Implemented zauth using actor style
     printf ("Tests passed OK\n");
     return 0;
 }

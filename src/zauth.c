@@ -434,6 +434,7 @@ s_can_connect (zsock_t **server, zsock_t **client)
     assert (port_nbr > 0);
     int rc = zsock_connect (*client, "tcp://127.0.0.1:%d", port_nbr);
     assert (rc == 0);
+
     zstr_send (*server, "Hello, World");
     zpoller_t *poller = zpoller_new (*client, NULL);
     bool success = (zpoller_wait (poller, 200) == *client);
@@ -471,9 +472,12 @@ zauth_test (bool verbose)
     //  Install the authenticator
     zactor_t *auth = zactor_new (zauth, NULL);
     assert (auth);
-    if (verbose)
-        zstr_sendx (auth, "VERBOSE", NULL);
-
+    if (verbose) {
+        zstr_send (auth, "VERBOSE");
+        //  Ensure the command was processed before we continue...
+        zstr_sendx (auth, "WAIT", NULL);
+        zsock_wait (auth);
+    }
     //  Check there's no authentication on a default NULL server
     success = s_can_connect (&server, &client);
     assert (success);
@@ -488,12 +492,16 @@ zauth_test (bool verbose)
     //  Blacklist 127.0.0.1, connection should fail
     zsock_set_zap_domain (server, "global");
     zstr_sendx (auth, "DENY", "127.0.0.1", NULL);
+    zstr_sendx (auth, "WAIT", NULL);
+    zsock_wait (auth);
     success = s_can_connect (&server, &client);
     assert (!success);
 
     //  Whitelist our address, which overrides the blacklist
     zsock_set_zap_domain (server, "global");
     zstr_sendx (auth, "ALLOW", "127.0.0.1", NULL);
+    zstr_sendx (auth, "WAIT", NULL);
+    zsock_wait (auth);
     success = s_can_connect (&server, &client);
     assert (success);
 
@@ -512,6 +520,8 @@ zauth_test (bool verbose)
     zsock_set_plain_username (client, "admin");
     zsock_set_plain_password (client, "Password");
     zstr_sendx (auth, "PLAIN", TESTDIR "/password-file", NULL);
+    zstr_sendx (auth, "WAIT", NULL);
+    zsock_wait (auth);
     success = s_can_connect (&server, &client);
     assert (success);
 
@@ -544,6 +554,8 @@ zauth_test (bool verbose)
         zsock_set_curve_server (server, 1);
         zsock_set_curve_serverkey (client, server_key);
         zstr_sendx (auth, "CURVE", CURVE_ALLOW_ANY, NULL);
+        zstr_sendx (auth, "WAIT", NULL);
+        zsock_wait (auth);
         success = s_can_connect (&server, &client);
         assert (success);
 
@@ -554,6 +566,8 @@ zauth_test (bool verbose)
         zsock_set_curve_serverkey (client, server_key);
         zcert_save_public (client_cert, TESTDIR "/mycert.txt");
         zstr_sendx (auth, "CURVE", TESTDIR, NULL);
+        zstr_sendx (auth, "WAIT", NULL);
+        zsock_wait (auth);
         success = s_can_connect (&server, &client);
         assert (success);
 
