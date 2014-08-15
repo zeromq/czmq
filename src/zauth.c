@@ -214,7 +214,9 @@ s_zap_request_new (zsock_t *handler, bool verbose)
         zframe_t *frame = zmsg_pop (request);
         assert (zframe_size (frame) == 32);
         self->client_key = (char *) zmalloc (41);
+#if (ZMQ_VERSION_MAJOR == 4)
         zmq_z85_encode (self->client_key, zframe_data (frame), 32);
+#endif
         zframe_destroy (&frame);
     }
     else
