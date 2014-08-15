@@ -141,12 +141,6 @@ zsys_init (void)
     if (getenv ("ZSYS_IPV6"))
         s_ipv6 = atoi (getenv ("ZSYS_IPV6"));
 
-    if (getenv ("ZSYS_INTERFACE"))
-        zsys_set_interface (getenv ("ZSYS_INTERFACE"));
-
-    if (getenv ("ZSYS_LOGIDENT"))
-        zsys_set_logident (getenv ("ZSYS_LOGIDENT"));
-
     if (getenv ("ZSYS_LOGSTREAM")) {
         if (streq (getenv ("ZSYS_LOGSTREAM"), "stdout"))
             s_logstream = stdout;
@@ -156,9 +150,6 @@ zsys_init (void)
     }
     else
         s_logstream = stdout;
-
-    if (getenv ("ZSYS_LOGSENDER"))
-        zsys_set_logsender (getenv ("ZSYS_LOGSENDER"));
 
     if (getenv ("ZSYS_LOGSYSTEM")) {
         if (streq (getenv ("ZSYS_LOGSYSTEM"), "true"))
@@ -177,6 +168,17 @@ zsys_init (void)
     srandom ((unsigned) time (NULL));
     atexit (s_terminate_process);
     s_initialized = true;
+
+    //  The following functions call zsys_init(), so they MUST be called after
+    //  s_initialized is set in order to avoid an infinite recursion
+    if (getenv ("ZSYS_INTERFACE"))
+        zsys_set_interface (getenv ("ZSYS_INTERFACE"));
+
+    if (getenv ("ZSYS_LOGIDENT"))
+        zsys_set_logident (getenv ("ZSYS_LOGIDENT"));
+
+    if (getenv ("ZSYS_LOGSENDER"))
+        zsys_set_logsender (getenv ("ZSYS_LOGSENDER"));
 }
 
 //  atexit termination for the process
