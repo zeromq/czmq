@@ -73,6 +73,7 @@ zbeacon_new (zctx_t *ctx, int port_nbr)
         zstr_sendf (self->pipe, "%d", port_nbr);
         self->hostname = zstr_recv (self->pipe);
         if (streq (self->hostname, "-")) {
+            zctx_destroy (&self->ctx);
             free (self->hostname);
             free (self);
             self = NULL;
@@ -98,8 +99,8 @@ zbeacon_destroy (zbeacon_t **self_p)
         zstr_send (self->pipe, "TERMINATE");
         char *reply = zstr_recv (self->pipe);
         zstr_free (&reply);
-        free (self->hostname);
         zctx_destroy (&self->ctx);
+        free (self->hostname);
         free (self);
         *self_p = NULL;
     }
@@ -225,6 +226,7 @@ zbeacon_test (bool verbose)
     zbeacon_t *service_beacon = zbeacon_new (NULL, 9999);
     if (service_beacon == NULL) {
         printf ("OK (skipping test, no UDP discovery)\n");
+        zsock_destroy (&service);
         return;
     }
     zbeacon_set_interval (service_beacon, 100);
