@@ -161,20 +161,20 @@ zinterface_list ()
         char *asciiFriendlyName = (char*) zmalloc(asciiSize);
         friendlyLength = wcstombs(asciiFriendlyName, friendlyName, asciiSize);
 
-        int valid = cur_address->OperStatus == IfOperStatusUp;
+        bool valid = (cur_address->OperStatus == IfOperStatusUp)
+                  && (pUnicast && pPrefix)
+                  && (pUnicast->Address.lpSockaddr->sa_family == AF_INET)
+                  && (pPrefix->PrefixLength <= 32);
         
-        if (valid && pUnicast && pPrefix) {
-            if (pUnicast->Address.lpSockaddr->sa_family != AF_INET) continue;
-        
+        if (valid) {
             inaddr_t address   = *(inaddr_t*) pUnicast->Address.lpSockaddr;
             inaddr_t netmask;
-            
-            if (pPrefix->PrefixLength > 32) continue;
+
             netmask.sin_addr.s_addr = htonl((0xffffffffU) << (32 - pPrefix->PrefixLength));
             
             inaddr_t broadcast = address;
             broadcast.sin_addr.s_addr |= ~(netmask.sin_addr.s_addr);
-                        
+
             zinterface_t* ziface = s_zinterface_new(asciiFriendlyName,
                 address, netmask, broadcast);
             zlist_append(ifaces, ziface);
