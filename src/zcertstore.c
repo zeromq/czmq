@@ -186,6 +186,26 @@ zcertstore_insert (zcertstore_t *self, zcert_t **cert_p)
 
 
 //  --------------------------------------------------------------------------
+//  Print list of certificates in store to stdout
+
+void
+zcertstore_print (zcertstore_t *self)
+{
+    if (self->location)
+        zsys_info ("zcertstore: certificates at location=%s:", self->location);
+    else
+        zsys_info ("zcertstore: certificates in memory");
+
+    zcert_t *cert = (zcert_t *) zlist_first (self->cert_list);
+    while (cert) {
+        zcert_print (cert);
+        cert = (zcert_t *) (zcert_t *) zlist_next (self->cert_list);
+    }
+}
+
+
+//  --------------------------------------------------------------------------
+//  DEPRECATED as incompatible with centralized logging
 //  Print list of certificates in store to open stream
 
 void
@@ -205,22 +225,15 @@ zcertstore_fprint (zcertstore_t *self, FILE *file)
 
 
 //  --------------------------------------------------------------------------
-//  Print list of certificates in store to stdout
-
-void
-zcertstore_print (zcertstore_t *self)
-{
-    zcertstore_fprint (self, stdout);
-}
-
-
-//  --------------------------------------------------------------------------
 //  Selftest
 
 void
 zcertstore_test (bool verbose)
 {
     printf (" * zcertstore: ");
+    if (verbose)
+        printf ("\n");
+    
     //  @selftest
     //  Create temporary directory for test files
 #   define TESTDIR ".test_zcertstore"

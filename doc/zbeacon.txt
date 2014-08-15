@@ -85,6 +85,7 @@ EXAMPLE
     zbeacon_t *service_beacon = zbeacon_new (NULL, 9999);
     if (service_beacon == NULL) {
         printf ("OK (skipping test, no UDP discovery)\n");
+        zsock_destroy (&service);
         return;
     }
     zbeacon_set_interval (service_beacon, 100);

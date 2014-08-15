@@ -619,13 +619,18 @@ zsys_file_mode_default (void)
 
 
 //  --------------------------------------------------------------------------
-//  Return the CZMQ version for run-time API detection
+//  Return the CZMQ version for run-time API detection; returns version
+//  number into provided fields, providing reference isn't null in each case.
 
-void zsys_version (int *major, int *minor, int *patch)
+void
+zsys_version (int *major, int *minor, int *patch)
 {
-    *major = CZMQ_VERSION_MAJOR;
-    *minor = CZMQ_VERSION_MINOR;
-    *patch = CZMQ_VERSION_PATCH;
+    if (major)
+        *major = CZMQ_VERSION_MAJOR;
+    if (minor)
+        *minor = CZMQ_VERSION_MINOR;
+    if (patch)
+        *patch = CZMQ_VERSION_PATCH;
 }
 
 

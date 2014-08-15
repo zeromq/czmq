@@ -32,19 +32,19 @@ extern "C" {
 //  To work with zgossip, use the CZMQ zactor API:
 //
 //  Create new zgossip instance, passing logging prefix:
-//      zactor_t *zgossip = zactor_new (zgossip, "myname");
+//      zactor_t *gossip = zactor_new (zgossip, "myname");
 //  
 //  Destroy zgossip instance
-//      zactor_destroy (&zgossip);
+//      zactor_destroy (&gossip);
 //  
 //  Send zmsg instance message to zgossip instance:
-//      zactor_send (zgossip, &msg);
+//      zactor_send (gossip, &msg);
 //  
 //  Send command to zgossip instance:
-//      zstr_sendx (zgossip, "COMMAND", "ARG1", "ARG2", NULL);
+//      zstr_sendx (gossip, "COMMAND", "ARG1", "ARG2", NULL);
 //  
 //  Receive zmsg message from zgossip instance:
-//      zmsg_t *msg = zactor_recv (zgossip);
+//      zmsg_t *msg = zactor_recv (gossip);
 //
 //  This is the zgossip constructor as a zactor_fn:
 //

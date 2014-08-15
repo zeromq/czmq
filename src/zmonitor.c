@@ -298,7 +298,7 @@ s_api_command (agent_t *self)
         free (verbose);
     }
     else
-        zsys_error ("zmonitor unexpected API command '%s'\n", command);
+        zsys_error ("zmonitor unexpected API command '%s'", command);
 
     free (command);
 }
@@ -358,7 +358,7 @@ s_socket_event (agent_t *self)
             break;
     }
     if (self->verbose)
-        zsys_info ("zmonitor: %s - %s\n", description, address);
+        zsys_info ("zmonitor: %s - %s", description, address);
 
     zstr_sendfm (self->pipe, "%d", event);
     zstr_sendfm (self->pipe, "%d", value);
