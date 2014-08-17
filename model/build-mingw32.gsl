@@ -16,7 +16,7 @@ CC=gcc
 PREFIX=c:/mingw/msys/1.0/local
 INCDIR=-I$\(PREFIX)/include -I.
 LIBDIR=-L$\(PREFIX)/lib
-CFLAGS=-Wall -Os -g -DDLL_EXPORT $\(INCDIR)
+CFLAGS=-Wall -Os -g -DLIBCZMQ_EXPORTS $\(INCDIR)
 
 OBJS =\
 .for class
