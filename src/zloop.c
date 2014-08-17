@@ -388,12 +388,18 @@ void
 zloop_poller_end (zloop_t *self, zmq_pollitem_t *item)
 {
     assert (self);
-    assert (item->socket || item->fd);
 
     s_poller_t *poller = (s_poller_t *) zlist_first (self->pollers);
     while (poller) {
-        if ((item->socket && item->socket == poller->item.socket)
-        ||  (item->fd     && item->fd     == poller->item.fd)) {
+        bool match = false;
+        if (item->socket) {
+            if (item->socket == poller->item.socket)
+                match = true;
+        } else {
+            if (item->fd  == poller->item.fd)
+                match = true;
+        }
+        if (match) {
             zlist_remove (self->pollers, poller);
             free (poller);
             //  Force rebuild to avoid reading from freed poller
@@ -416,14 +422,21 @@ void
 zloop_poller_set_tolerant (zloop_t *self, zmq_pollitem_t *item)
 {
     assert (self);
-    assert (item->socket || item->fd);
 
     //  Find matching poller(s) and mark as tolerant
     s_poller_t *poller = (s_poller_t *) zlist_first (self->pollers);
     while (poller) {
-        if ((item->socket && item->socket == poller->item.socket)
-        ||  (item->fd     && item->fd     == poller->item.fd))
+        bool match = false;
+        if (item->socket) {
+            if (item->socket == poller->item.socket)
+                match = true;
+        } else {
+            if (item->fd  == poller->item.fd)
+                match = true;
+        }
+        if (match) {
             poller->tolerant = true;
+        }
             
         poller = (s_poller_t *) zlist_next (self->pollers);
     }
