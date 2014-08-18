@@ -25,9 +25,11 @@
 
 //  Hash table performance parameters
 
-#define INITIAL_PRIME	4	//  Initial size in items (index into primes)
+#define INITIAL_PRIME	0	//  Initial size in items (index into primes)
 #define GROWTH_FACTOR	5	//  Increase after splitting (index into primes)
 #define LOAD_FACTOR     75      //  Percent loading before splitting
+#define INITIAL_CHAIN	1	//  Initial chaining limit
+#define CHAIN_GROWS	1	//  Increase after splitting (chaining limit)
 
 // 5 largest primes less than 2^n for n = 4...63
 size_t primes[] = {
@@ -142,6 +144,7 @@ zhash_new (void)
     zhash_t *self = (zhash_t *) zmalloc (sizeof (zhash_t));
     if (self) {
         self->prime_index = INITIAL_PRIME;
+	self->chain_limit = INITIAL_CHAIN;
 	size_t limit = primes[self->prime_index];
         self->items = (item_t **) zmalloc (sizeof (item_t *) * limit);
         if (!self->items)
@@ -268,7 +271,9 @@ zhash_insert (zhash_t *self, const char *key, void *value)
     if (self->size >= limit * LOAD_FACTOR / 100) {
         //  Create new hash table
 	uint new_prime_index = self->prime_index + GROWTH_FACTOR;
-	s_zhash_rehash(self, new_prime_index);
+	int rc = s_zhash_rehash(self, new_prime_index);
+	if (rc != 0) return rc;
+	self->chain_limit += CHAIN_GROWS;
     }
     //  If necessary, take duplicate of item (string) value
     if (self->autofree)
@@ -334,11 +339,22 @@ s_item_lookup (zhash_t *self, const char *key)
     size_t limit = primes[self->prime_index];
     self->cached_index = s_item_hash (key, limit);
     item_t *item = self->items [self->cached_index];
+    uint len = 0;
     while (item) {
         if (streq (item->key, key))
             break;
         item = item->next;
+	++len;
     }
+    if (len > self->chain_limit) {
+        //  Create new hash table
+	uint new_prime_index = self->prime_index + GROWTH_FACTOR;
+	int rc = s_zhash_rehash(self, new_prime_index);
+	assert (rc == 0);
+	limit = primes[self->prime_index];
+	self->cached_index = s_item_hash (key, limit);
+    }
+
     return item;
 }
 
