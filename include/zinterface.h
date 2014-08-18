@@ -51,7 +51,7 @@ CZMQ_EXPORT char *
 
 // Prints all detected interfaces on the screen
 CZMQ_EXPORT void
-    zinterface_test(bool verbose);
+    zinterface_test (bool verbose);
 //  @end
 
 #ifdef __cplusplus
