@@ -147,6 +147,7 @@ zinterface_list ()
             zlist_freefn (ifaces, ziface, s_freefn, true);
         }
 
+        free (ifconfig.ifc_buf);
         close (sock);
     }
 
