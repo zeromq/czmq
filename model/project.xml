@@ -40,7 +40,8 @@
     <model name = "zgossip_msg" />
     <class name = "zgossip_msg" private = "1" />
 
-    <!-- Experimentally deprecated, remove some time after 3.0 -->
+    <!-- Deprecated V2 API, remove some time after 3.0 stability -->
+    <class name = "zauth_v2" />
     <class name = "zctx" />
     <class name = "zmonitor" />
     <class name = "zmutex" />

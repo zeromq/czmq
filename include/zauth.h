@@ -21,58 +21,67 @@ extern "C" {
 //  @interface
 #define CURVE_ALLOW_ANY "*"
 
-//  Constructor
-//  Install authentication for the specified context. Returns a new zauth
-//  object that you can use to configure authentication. Note that until you
-//  add policies, all incoming NULL connections are allowed (classic ZeroMQ
-//  behaviour), and all PLAIN and CURVE connections are denied. If there was
-//  an error during initialization, returns NULL.
-CZMQ_EXPORT zauth_t *
-    zauth_new (zctx_t *ctx);
-    
-//  Allow (whitelist) a single IP address. For NULL, all clients from this
-//  address will be accepted. For PLAIN and CURVE, they will be allowed to
-//  continue with authentication. You can call this method multiple times 
-//  to whitelist multiple IP addresses. If you whitelist a single address,
-//  any non-whitelisted addresses are treated as blacklisted.
+//  CZMQ v3 API (for use with zsock, not zsocket, which is deprecated).
+//
+//  Create new zauth actor instance. This installs authentication on all 
+//  zsock sockets. Until you add policies, all incoming NULL connections are
+//  allowed (classic ZeroMQ behaviour), and all PLAIN and CURVE connections
+//  are denied.
+//  
+//      zactor_t *auth = zactor_new (zauth, NULL);
+//
+//  Destroy zauth instance. This removes authentication and allows all 
+//      zactor_destroy (&auth);
+//
+//  Allow (whitelist) a list of IP addresses. For NULL, all clients from
+//  these addresses will be accepted. For PLAIN and CURVE, they will be
+//  allowed to continue with authentication. You can call this method
+//  multiple times to whitelist more IP addresses. If you whitelist one
+//  or nmore addresses, any non-whitelisted addresses are treated as
+//  blacklisted.
+//  
+//      zstr_sendx (auth, "ALLOW", "127.0.0.1", "127.0.0.2", NULL);
+//  
+//  Deny (blacklist) a list of IP addresses. For all security mechanisms,
+//  this rejects the connection without any further authentication. Use
+//  either a whitelist, or a blacklist, not not both. If you define both
+//  a whitelist and a blacklist, only the whitelist takes effect.
+//  
+//      zstr_sendx (auth, "DENY", "192.168.0.1", "192.168.0.2", NULL);
+//
+//  Configure PLAIN authentication using a plain-text password file. You can
+//  modify the password file at any time; zauth will reload it automatically
+//  if modified externally.
+//  
+//      zstr_sendx (auth, "PLAIN", filename, NULL);
+//
+//  Configure CURVE authentication, using a directory that holds all public
+//  client certificates, i.e. their public keys. The certificates must be in
+//  zcert_save format. You can add and remove certificates in that directory
+//  at any time. To allow all client keys without checking, specify
+//  CURVE_ALLOW_ANY for the directory name.
+//
+//      zstr_sendx (auth, "CURVE", directory, NULL);
+//
+//  Configure GSSAPI authentication, using an underlying mechanism (usually
+//  Kerberos) to establish a secure context and perform mutual authentication.
+//
+//      zstr_sendx (auth, "GSSAPI", NULL);
+//
+//  Enable verbose logging of commands and activity. Verbose logging can help
+//  debug non-trivial authentication policies.
+//
+//      zstr_sendx (auth, "VERBOSE", NULL);
+//
+//  Ask authenticator to signal us when it is ready. This command lets you wait
+//  on the authenticator to process all other commands on its pipe before you
+//  start working with sockets.
+//
+//      zstr_sendx (auth, "SIGNAL", NULL);
+//  
+//  This is the zauth constructor as a zactor_fn:
 CZMQ_EXPORT void
-    zauth_allow (zauth_t *self, const char *address);
-
-//  Deny (blacklist) a single IP address. For all security mechanisms, this
-//  rejects the connection without any further authentication. Use either a
-//  whitelist, or a blacklist, not not both. If you define both a whitelist 
-//  and a blacklist, only the whitelist takes effect.
-CZMQ_EXPORT void
-    zauth_deny (zauth_t *self, const char *address);
-
-//  Configure PLAIN authentication for a given domain. PLAIN authentication
-//  uses a plain-text password file. To cover all domains, use "*". You can
-//  modify the password file at any time; it is reloaded automatically.
-CZMQ_EXPORT void
-    zauth_configure_plain (zauth_t *self, const char *domain, const char *filename);
-    
-//  Configure CURVE authentication for a given domain. CURVE authentication
-//  uses a directory that holds all public client certificates, i.e. their
-//  public keys. The certificates must be in zcert_save () format. To cover
-//  all domains, use "*". You can add and remove certificates in that
-//  directory at any time. To allow all client keys without checking, specify
-//  CURVE_ALLOW_ANY for the location.
-CZMQ_EXPORT void
-    zauth_configure_curve (zauth_t *self, const char *domain, const char *location);
-    
-//  Configure GSSAPI authentication for a given domain. GSSAPI authentication
-//  uses an underlying mechanism (usually Kerberos) to establish a secure
-//  context and perform mutual authentication. To cover all domains, use "*".
-CZMQ_EXPORT void
-    zauth_configure_gssapi (zauth_t *self, char *domain, ...);
-
-//  Enable verbose tracing of commands and activity
-CZMQ_EXPORT void
-    zauth_set_verbose (zauth_t *self, bool verbose);
-    
-//  Destructor
-CZMQ_EXPORT void
-    zauth_destroy (zauth_t **self_p);
+    zauth (zsock_t *pipe, void *args);
 
 //  Selftest
 CZMQ_EXPORT void

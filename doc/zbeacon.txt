@@ -12,6 +12,7 @@ SYNOPSIS
 //  support UDP broadcasts (lacking a useful interface), returns NULL.
 //  To force the beacon to operate on a given port, set the environment
 //  variable ZSYS_INTERFACE, or call zsys_set_interface() beforehand.
+//  If you are using the new zsock API then pass NULL as the ctx here.
 CZMQ_EXPORT zbeacon_t *
     zbeacon_new (zctx_t *ctx, int port_nbr);
     
@@ -75,26 +76,23 @@ EXAMPLE
 -------
 .From zbeacon_test method
 ----
-    //  Basic test: create a service and announce it
-    zctx_t *ctx = zctx_new ();
-
     //  Create a service socket and bind to an ephemeral port
-    void *service = zsocket_new (ctx, ZMQ_PUB);
-    int port_nbr = zsocket_bind (service, "tcp://127.0.0.1:*");
+    zsock_t *service = zsock_new (ZMQ_PUB);
+    int port_nbr = zsock_bind (service, "tcp://127.0.0.1:*");
     
     //  Create beacon to broadcast our service
     byte announcement [2] = { (port_nbr >> 8) & 0xFF, port_nbr & 0xFF };
-    zbeacon_t *service_beacon = zbeacon_new (ctx, 9999);
+    zbeacon_t *service_beacon = zbeacon_new (NULL, 9999);
     if (service_beacon == NULL) {
         printf ("OK (skipping test, no UDP discovery)\n");
-        zctx_destroy (&ctx);
+        zsock_destroy (&service);
         return;
     }
     zbeacon_set_interval (service_beacon, 100);
     zbeacon_publish (service_beacon, announcement, 2);
 
     //  Create beacon to lookup service
-    zbeacon_t *client_beacon = zbeacon_new (ctx, 9999);
+    zbeacon_t *client_beacon = zbeacon_new (NULL, 9999);
     zbeacon_subscribe (client_beacon, NULL, 0);
 
     //  Wait for at most 1/2 second if there's no broadcast networking
@@ -113,9 +111,9 @@ EXAMPLE
     zbeacon_destroy (&client_beacon);
     zbeacon_destroy (&service_beacon);
     
-    zbeacon_t *node1 = zbeacon_new (ctx, 5670);
-    zbeacon_t *node2 = zbeacon_new (ctx, 5670);
-    zbeacon_t *node3 = zbeacon_new (ctx, 5670);
+    zbeacon_t *node1 = zbeacon_new (NULL, 5670);
+    zbeacon_t *node2 = zbeacon_new (NULL, 5670);
+    zbeacon_t *node3 = zbeacon_new (NULL, 5670);
 
     assert (*zbeacon_hostname (node1));
     assert (*zbeacon_hostname (node2));
@@ -166,7 +164,7 @@ EXAMPLE
     zbeacon_destroy (&node2);
     zbeacon_destroy (&node3);
     
-    zctx_destroy (&ctx);
+    zsock_destroy (&service);
 ----
 
 SEE ALSO

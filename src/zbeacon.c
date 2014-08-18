@@ -37,7 +37,7 @@
 struct _zbeacon_t {
     void *pipe;                 //  Pipe through to backend agent
     char *hostname;             //  Our own address as string
-    zctx_t *ctx;    //TODO actorize this class
+    zctx_t *ctx;                //  TODO: actorize this class
 };
 
 
@@ -51,6 +51,7 @@ static void
 //  support UDP broadcasts (lacking a useful interface), returns NULL.
 //  To force the beacon to operate on a given port, set the environment
 //  variable ZSYS_INTERFACE, or call zsys_set_interface() beforehand.
+//  If you are using the new zsock API then pass NULL as the ctx here.
 
 zbeacon_t *
 zbeacon_new (zctx_t *ctx, int port_nbr)
@@ -58,16 +59,22 @@ zbeacon_new (zctx_t *ctx, int port_nbr)
     zbeacon_t *self = (zbeacon_t *) zmalloc (sizeof (zbeacon_t));
     assert (self);
 
+    //  If user passes a ctx, use that, else take the global context from
+    //  zsys and use that. This provides compatibility with old zsocket
+    //  and new zsock APIs.
+    if (ctx)
+        self->ctx = zctx_shadow (ctx);
+    else
+        self->ctx = zctx_shadow_zmq_ctx (zsys_init ());
+    
     //  Start background agent and wait for it to initialize
-    self->ctx = zctx_new ();
-    assert (self->ctx);
     self->pipe = zthread_fork (self->ctx, s_agent_task, NULL);
     if (self->pipe) {
         zstr_sendf (self->pipe, "%d", port_nbr);
         self->hostname = zstr_recv (self->pipe);
         if (streq (self->hostname, "-")) {
-            free (self->hostname);
             zctx_destroy (&self->ctx);
+            free (self->hostname);
             free (self);
             self = NULL;
         }
@@ -210,26 +217,23 @@ zbeacon_test (bool verbose)
     printf (" * zbeacon: ");
 
     //  @selftest
-    //  Basic test: create a service and announce it
-    zctx_t *ctx = zctx_new ();
-
     //  Create a service socket and bind to an ephemeral port
-    void *service = zsocket_new (ctx, ZMQ_PUB);
-    int port_nbr = zsocket_bind (service, "tcp://127.0.0.1:*");
+    zsock_t *service = zsock_new (ZMQ_PUB);
+    int port_nbr = zsock_bind (service, "tcp://127.0.0.1:*");
     
     //  Create beacon to broadcast our service
     byte announcement [2] = { (port_nbr >> 8) & 0xFF, port_nbr & 0xFF };
-    zbeacon_t *service_beacon = zbeacon_new (ctx, 9999);
+    zbeacon_t *service_beacon = zbeacon_new (NULL, 9999);
     if (service_beacon == NULL) {
         printf ("OK (skipping test, no UDP discovery)\n");
-        zctx_destroy (&ctx);
+        zsock_destroy (&service);
         return;
     }
     zbeacon_set_interval (service_beacon, 100);
     zbeacon_publish (service_beacon, announcement, 2);
 
     //  Create beacon to lookup service
-    zbeacon_t *client_beacon = zbeacon_new (ctx, 9999);
+    zbeacon_t *client_beacon = zbeacon_new (NULL, 9999);
     zbeacon_subscribe (client_beacon, NULL, 0);
 
     //  Wait for at most 1/2 second if there's no broadcast networking
@@ -248,9 +252,9 @@ zbeacon_test (bool verbose)
     zbeacon_destroy (&client_beacon);
     zbeacon_destroy (&service_beacon);
     
-    zbeacon_t *node1 = zbeacon_new (ctx, 5670);
-    zbeacon_t *node2 = zbeacon_new (ctx, 5670);
-    zbeacon_t *node3 = zbeacon_new (ctx, 5670);
+    zbeacon_t *node1 = zbeacon_new (NULL, 5670);
+    zbeacon_t *node2 = zbeacon_new (NULL, 5670);
+    zbeacon_t *node3 = zbeacon_new (NULL, 5670);
 
     assert (*zbeacon_hostname (node1));
     assert (*zbeacon_hostname (node2));
@@ -301,7 +305,7 @@ zbeacon_test (bool verbose)
     zbeacon_destroy (&node2);
     zbeacon_destroy (&node3);
     
-    zctx_destroy (&ctx);
+    zsock_destroy (&service);
     //  @end
     printf ("OK\n");
 }
@@ -449,7 +453,7 @@ s_agent_new (void *pipe, int port_nbr)
 static void
 s_get_interface (agent_t *self)
 {
-    if (streq(zsys_interface(), "*")) {
+    if (streq (zsys_interface(), "*")) {
         // Special device to force binding to INADDR_ANY and sending to INADDR_BROADCAST
         self->broadcast.sin_family = AF_INET;
         self->broadcast.sin_addr.s_addr = INADDR_BROADCAST;
@@ -459,11 +463,12 @@ s_get_interface (agent_t *self)
         self->address.sin_addr.s_addr = INADDR_ANY;
     }
     else {
-        zlist_t* interfaces = zinterface_list();
-        zinterface_t *iface = zlist_first(interfaces);
+        zlist_t *interfaces = zinterface_list ();
+        zinterface_t *iface = zlist_first (interfaces);
         if (strlen (zsys_interface ()) != 0) {
             while (iface) {
-                if (streq (zinterface_name(iface), zsys_interface ())) break;
+                if (streq (zinterface_name(iface), zsys_interface ()))
+                    break;
                 iface = zlist_next (interfaces);
             }
         }
@@ -477,9 +482,9 @@ s_get_interface (agent_t *self)
             self->address = self->broadcast;
             self->address.sin_addr.s_addr = inet_addr (zinterface_address (iface));
         }
-        else {
-            fprintf (stderr, "No adapter found or ZSYS_INTERFACE not equal to any adapter friendly name\n");
-        }
+        else
+            zsys_error ("No adapter found or ZSYS_INTERFACE not equal to any adapter friendly name");
+        
         zlist_destroy(&interfaces);
     }
 }
@@ -523,7 +528,7 @@ s_api_command (agent_t *self)
         zstr_send (self->pipe, "OK");
     }
     else
-        printf ("E: unexpected API command '%s'\n", command);
+        zsys_error ("zbeacon: unexpected API command '%s'\n", command);
     
     zstr_free (&command);
 }
