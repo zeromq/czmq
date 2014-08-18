@@ -56,9 +56,9 @@ static BOOL WINAPI s_handler_fn_shim (DWORD ctrltype)
 //  --------------------------------------------------------------------------
 //  Global context handling
 
-//  Global ZeroMQ context for this process
-void *process_ctx = NULL;
-bool s_initialized = false;
+//  ZeroMQ context for this process
+static void *s_process_ctx = NULL;
+static bool s_initialized = false;
 
 //  Default globals for new sockets and other joys; these can all be set
 //  from the environment, or via the zsys_set_xxx API.
@@ -75,7 +75,7 @@ static FILE *s_logstream = NULL;    //  ZSYS_LOGSTREAM=stdout/stderr
 static bool s_logsystem = false;    //  ZSYS_LOGSYSTEM=true/false
 static void *s_logsender = NULL;    //  ZSYS_LOGSENDER=
 
-//  Track number of open sockets so we can zmq_ctx_term() safely
+//  Track number of open sockets so we can zmq_term() safely
 static size_t s_open_sockets = 0;
 
 //  We keep a list of open sockets to report leaks to developers
@@ -111,14 +111,16 @@ static zsys_mutex_t s_mutex;
 //  Initialize CZMQ zsys layer; this happens automatically when you create
 //  a socket or an actor; however this call lets you force initialization
 //  earlier, so e.g. logging is properly set-up before you start working.
-//  Not threadsafe, so call only from main thread.
+//  Not threadsafe, so call only from main thread. Safe to call multiple
+//  times. Returns global CZMQ context.
 
-void
+void *
 zsys_init (void)
 {
-    if (s_initialized)
-        return;
-
+    if (s_initialized) {
+        assert (s_process_ctx);
+        return s_process_ctx;
+    }
     //  Pull process defaults from environment
     if (getenv ("ZSYS_IO_THREADS"))
         s_io_threads = atoi (getenv ("ZSYS_IO_THREADS"));
@@ -167,6 +169,15 @@ zsys_init (void)
     s_sockref_list = zlist_new ();
     srandom ((unsigned) time (NULL));
     atexit (s_terminate_process);
+    
+    assert (!s_process_ctx);
+    //  We use zmq_init/zmq_term to keep compatibility back to ZMQ v2
+    s_process_ctx = zmq_init ((int) s_io_threads);
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
+    //  TODO: this causes TravisCI to break; libzmq does not return a
+    //  valid socket on zmq_socket(), after this...
+    zmq_ctx_set (s_process_ctx, ZMQ_MAX_SOCKETS, s_max_sockets);
+#endif
     s_initialized = true;
 
     //  The following functions call zsys_init(), so they MUST be called after
@@ -179,6 +190,8 @@ zsys_init (void)
 
     if (getenv ("ZSYS_LOGSENDER"))
         zsys_set_logsender (getenv ("ZSYS_LOGSENDER"));
+
+    return s_process_ctx;
 }
 
 //  atexit termination for the process
@@ -218,8 +231,8 @@ s_terminate_process (void)
         zsys_close (s_logsender, NULL, 0);
         s_logsender = NULL;
     }
-    if (process_ctx && s_open_sockets == 0)
-        zmq_ctx_term (process_ctx);
+    if (s_open_sockets == 0)
+        zmq_term (s_process_ctx);
     else
         zsys_error ("dangling sockets: cannot terminate ZMQ safely");
 
@@ -252,17 +265,8 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
     //  starting any threads. If the app uses zactor for its threads
     //  then we can guarantee this to always be safe.
     zsys_init ();
-    if (!process_ctx) {
-        //  This call keeps compatibility back to ZMQ v2
-        process_ctx = zmq_init ((int) s_io_threads);
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
-        //  TODO: this causes TravisCI to break; libzmq does not return a
-        //  valid socket on zmq_socket(), after this...
-        zmq_ctx_set (process_ctx, ZMQ_MAX_SOCKETS, s_max_sockets);
-#endif
-    }
     ZMUTEX_LOCK (s_mutex);
-    void *handle = zmq_socket (process_ctx, type);
+    void *handle = zmq_socket (s_process_ctx, type);
     //  Configure socket with process defaults
     zsocket_set_linger (handle, (int) s_linger);
 #if (ZMQ_VERSION_MAJOR == 2)
@@ -615,13 +619,18 @@ zsys_file_mode_default (void)
 
 
 //  --------------------------------------------------------------------------
-//  Return the CZMQ version for run-time API detection
+//  Return the CZMQ version for run-time API detection; returns version
+//  number into provided fields, providing reference isn't null in each case.
 
-void zsys_version (int *major, int *minor, int *patch)
+void
+zsys_version (int *major, int *minor, int *patch)
 {
-    *major = CZMQ_VERSION_MAJOR;
-    *minor = CZMQ_VERSION_MINOR;
-    *patch = CZMQ_VERSION_PATCH;
+    if (major)
+        *major = CZMQ_VERSION_MAJOR;
+    if (minor)
+        *minor = CZMQ_VERSION_MINOR;
+    if (patch)
+        *patch = CZMQ_VERSION_PATCH;
 }
 
 
@@ -1011,7 +1020,7 @@ zsys_has_curve (void)
     int as_server = 1;
     int rc = zmq_setsockopt (pub, ZMQ_CURVE_SERVER, &as_server, sizeof (int));
     zmq_close (pub);
-    zmq_ctx_term (ctx);
+    zmq_term (ctx);
     return rc != -1;
 #   endif
 #else
@@ -1032,11 +1041,17 @@ zsys_set_io_threads (size_t io_threads)
 {
     zsys_init ();
     ZMUTEX_LOCK (s_mutex);
-    //  If the app is misusing this method, burn it with fire
-    if (process_ctx)
+    if (s_open_sockets)
         zsys_error ("zsys_io_threads() is not valid after creating sockets");
-    assert (process_ctx == NULL);
+    assert (s_open_sockets == 0);
+    zmq_term (s_process_ctx);
     s_io_threads = io_threads;
+    s_process_ctx = zmq_init ((int) s_io_threads);
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
+    //  TODO: this causes TravisCI to break; libzmq does not return a
+    //  valid socket on zmq_socket(), after this...
+    zmq_ctx_set (s_process_ctx, ZMQ_MAX_SOCKETS, s_max_sockets);
+#endif
     ZMUTEX_UNLOCK (s_mutex);
 }
 
@@ -1053,9 +1068,9 @@ zsys_set_max_sockets (size_t max_sockets)
     zsys_init ();
     ZMUTEX_LOCK (s_mutex);
     //  If the app is misusing this method, burn it with fire
-    if (process_ctx)
+    if (s_open_sockets)
         zsys_error ("zsys_max_sockets() is not valid after creating sockets");
-    assert (process_ctx == NULL);
+    assert (s_open_sockets == 0);
     s_max_sockets = max_sockets? max_sockets: zsys_socket_limit ();
     ZMUTEX_UNLOCK (s_mutex);
 }
@@ -1069,8 +1084,8 @@ zsys_socket_limit (void)
 {
     int socket_limit;
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (4,1,0))
-    if (process_ctx)
-        socket_limit = zmq_ctx_get (process_ctx, ZMQ_SOCKET_LIMIT);
+    if (s_process_ctx)
+        socket_limit = zmq_ctx_get (s_process_ctx, ZMQ_SOCKET_LIMIT);
     else {
         void *ctx = zmq_init (1);
         socket_limit = zmq_ctx_get (ctx, ZMQ_SOCKET_LIMIT);

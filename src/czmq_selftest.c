@@ -41,9 +41,9 @@ int main (int argc, char *argv [])
     //  These are ordered from lowest level to highest level
     zrex_test (verbose);
     zsys_test (verbose);
+    zinterface_test (verbose);
     zchunk_test (verbose);
     zconfig_test (verbose);
-    zmutex_test (verbose);
     zclock_test (verbose);
     zdir_patch_test (verbose);
     zdir_test (verbose);
@@ -55,15 +55,11 @@ int main (int argc, char *argv [])
     zhash_test (verbose);
     zlist_test (verbose);
     zuuid_test (verbose);
-    zctx_test (verbose);
-    zsocket_test (verbose);
-    zsockopt_test (verbose);
     zsock_test (verbose);
     zsock_option_test (verbose);
     zsock_monitor_test (verbose);
     zactor_test (verbose);
     zpoller_test (verbose);
-    zthread_test (verbose);
     zloop_test (verbose);
     zproxy_test (verbose);
     zbeacon_test (verbose);
@@ -71,7 +67,16 @@ int main (int argc, char *argv [])
     zcert_test (verbose);
     zcertstore_test (verbose);
     zauth_test (verbose);
-    zinterface_test (verbose);
+
+    //  Deprecated V2 classes
+    zauth_v2_test (verbose);
+    zctx_test (verbose);
+    zmonitor_test (verbose);
+    zmutex_test (verbose);
+    zsocket_test (verbose);
+    zsockopt_test (verbose);
+    zthread_test (verbose);
+
     printf ("Tests passed OK\n");
     return 0;
 }

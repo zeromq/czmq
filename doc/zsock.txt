@@ -152,6 +152,11 @@ CZMQ_EXPORT const char *
 CZMQ_EXPORT int
     zsock_send (zsock_t *self, zmsg_t **msg_p);
 
+//  Send data over a socket as a single message frame.
+//  Returns -1 on error, 0 on success
+CZMQ_EXPORT int
+    zsock_sendmem (zsock_t *self, const void *data, size_t size);
+
 //  Receive a zmsg message from the socket. Returns NULL if the process was
 //  interrupted before the message could be received, or if a receive timeout
 //  expired.

@@ -348,10 +348,11 @@ void
 zcert_apply (zcert_t *self, void *zocket)
 {
     assert (self);
+    void *handle = zsock_resolve (zocket);
 #if (ZMQ_VERSION_MAJOR == 4)
     if (zsys_has_curve ()) {
-        zsocket_set_curve_secretkey_bin (zocket, self->secret_key);
-        zsocket_set_curve_publickey_bin (zocket, self->public_key);
+        zsocket_set_curve_secretkey_bin (handle, self->secret_key);
+        zsocket_set_curve_publickey_bin (handle, self->public_key);
     }
 #endif
 }
@@ -385,6 +386,28 @@ zcert_eq (zcert_t *self, zcert_t *compare)
 
 
 //  --------------------------------------------------------------------------
+//  Print certificate contents to stdout
+
+void
+zcert_print (zcert_t *self)
+{
+    assert (self);
+    zsys_info ("zcert: metadata");
+
+    char *value = (char *) zhash_first (self->metadata);
+    while (value) {
+        zsys_info ("zcert:     %s = \"%s\"",
+                 zhash_cursor (self->metadata), value);
+        value = (char *) zhash_next (self->metadata);
+    }
+    zsys_info ("zcert: curve");
+    zsys_info ("zcert:     public-key = \"%s\"", self->public_txt);
+    zsys_info ("zcert:     secret-key = \"%s\"", self->secret_txt);
+}
+
+
+//  --------------------------------------------------------------------------
+//  DEPRECATED as incompatible with centralized logging
 //  Print certificate contents to open stream
 
 void
@@ -403,16 +426,6 @@ zcert_fprint (zcert_t *self, FILE *file)
     fprintf (file, "    public-key = \"%s\"\n", self->public_txt);
     fprintf (file, "    secret-key = \"%s\"\n", self->secret_txt);
 }
-
-//  --------------------------------------------------------------------------
-//  Print certificate contents to stdout
-
-void
-zcert_print (zcert_t *self)
-{
-    zcert_fprint (self, stdout);
-}
-
 
 //  --------------------------------------------------------------------------
 //  Selftest

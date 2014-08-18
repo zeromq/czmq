@@ -10,20 +10,43 @@ SYNOPSIS
 ----
 //  To work with zgossip, use the CZMQ zactor API:
 //
-//  Create new zgossip instance, passing logging prefix:
-//      zactor_t *zgossip = zactor_new (zgossip, "myname");
+//  Create new zgossip server instance, passing logging prefix:
+//
+//      zactor_t *zgossip_server = zactor_new (zgossip, "myname");
 //  
-//  Destroy zgossip instance
-//      zactor_destroy (&zgossip);
+//  Destroy zgossip server instance
+//
+//      zactor_destroy (&zgossip_server);
 //  
-//  Send zmsg instance message to zgossip instance:
-//      zactor_send (zgossip, &msg);
-//  
-//  Send command to zgossip instance:
-//      zstr_sendx (zgossip, "COMMAND", "ARG1", "ARG2", NULL);
-//  
-//  Receive zmsg message from zgossip instance:
-//      zmsg_t *msg = zactor_recv (zgossip);
+//  Bind zgossip server to specified endpoint. TCP endpoints may specify
+//  the port number as "*" to aquire an ephemeral port:
+//
+//      zstr_sendx (zgossip_server, "BIND", endpoint, NULL);
+//
+//  Return assigned port number, specifically when BIND was done using an
+//  an ephemeral port:
+//
+//      zstr_sendx (zgossip_server, "PORT", NULL);
+//      char *command, *port_str;
+//      zstr_recvx (zgossip_server, &command, &port_str, NULL);
+//      assert (streq (command, "PORT"));
+//
+//  Specify configuration file to load, overwriting any previous loaded
+//  configuration file or options:
+//
+//      zstr_sendx (zgossip_server, "CONFIGURE", filename, NULL);
+//
+//  Set configuration path valuu:
+//
+//      zstr_sendx (zgossip_server, "SET", path, value, NULL);
+//    
+//  Send zmsg_t instance to zgossip server:
+//
+//      zactor_send (zgossip_server, &msg);
+//
+//  Receive zmsg_t instance from zgossip server:
+//
+//      zmsg_t *msg = zactor_recv (zgossip_server);
 //
 //  This is the zgossip constructor as a zactor_fn:
 //

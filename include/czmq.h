@@ -87,7 +87,8 @@ typedef struct _zuuid_t zuuid_t;
 #include "zsys.h"
 #include "zuuid.h"
 
-//  Experimentally deprecated, remove some time after 3.0
+//  Deprecated V2 classes, remove some time after 3.0 stability
+#include "zauth_v2.h"
 #include "zctx.h"
 #include "zmonitor.h"
 #include "zmutex.h"
