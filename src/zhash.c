@@ -214,6 +214,44 @@ s_item_destroy (zhash_t *self, item_t *item, bool hard)
 
 
 //  --------------------------------------------------------------------------
+//  Rehash hash table with specified new prime index
+//  Returns 0 on success.
+static int
+s_zhash_rehash (zhash_t *self, uint new_prime_index)
+{
+    assert (self);
+    assert (new_prime_index < NUM_PRIMES);
+
+    size_t limit = primes[self->prime_index];
+    size_t new_limit = primes[new_prime_index];
+    item_t **new_items = (item_t **) zmalloc (sizeof (item_t *) * new_limit);
+    if (!new_items)
+	return ENOMEM;
+
+    //  Move all items to the new hash table, rehashing to
+    //  take into account new hash table limit
+    size_t index;
+    for (index = 0; index < limit; index++) {
+	item_t *cur_item = self->items [index];
+	while (cur_item) {
+	    item_t *next_item = cur_item->next;
+	    uint new_index = s_item_hash (cur_item->key, new_limit);
+	    cur_item->index = new_index;
+	    cur_item->next = new_items [new_index];
+	    new_items [new_index] = cur_item;
+	    cur_item = next_item;
+	}
+    }
+    //  Destroy old hash table
+    free (self->items);
+    self->items = new_items;
+    self->prime_index = new_prime_index;
+
+    return 0;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Insert item into hash table with specified key and item
 //  If key is already present returns -1 and leaves existing item unchanged
 //  Returns 0 on success.
@@ -230,30 +268,7 @@ zhash_insert (zhash_t *self, const char *key, void *value)
     if (self->size >= limit * LOAD_FACTOR / 100) {
         //  Create new hash table
 	uint new_prime_index = self->prime_index + GROWTH_FACTOR;
-	assert (new_prime_index < NUM_PRIMES);
-        size_t new_limit = primes[new_prime_index];
-        item_t **new_items = (item_t **) zmalloc (sizeof (item_t *) * new_limit);
-        if (!new_items)
-            return ENOMEM;
-
-        //  Move all items to the new hash table, rehashing to
-        //  take into account new hash table limit
-        uint index;
-        for (index = 0; index < limit; index++) {
-            item_t *cur_item = self->items [index];
-            while (cur_item) {
-                item_t *next_item = cur_item->next;
-                uint new_index = s_item_hash (cur_item->key, new_limit);
-                cur_item->index = new_index;
-                cur_item->next = new_items [new_index];
-                new_items [new_index] = cur_item;
-                cur_item = next_item;
-            }
-        }
-        //  Destroy old hash table
-        free (self->items);
-        self->items = new_items;
-        self->prime_index = new_prime_index;
+	s_zhash_rehash(self, new_prime_index);
     }
     //  If necessary, take duplicate of item (string) value
     if (self->autofree)
