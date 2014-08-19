@@ -63,6 +63,8 @@ int main (int argc, char *argv [])
     zloop_test (verbose);
     zproxy_test (verbose);
     zbeacon_test (verbose);
+    zsocket_test (verbose);
+    zsockopt_test (verbose);
     zgossip_test (verbose);
     zcert_test (verbose);
     zcertstore_test (verbose);
@@ -73,8 +75,6 @@ int main (int argc, char *argv [])
     zctx_test (verbose);
     zmonitor_test (verbose);
     zmutex_test (verbose);
-    zsocket_test (verbose);
-    zsockopt_test (verbose);
     zthread_test (verbose);
 
     printf ("Tests passed OK\n");

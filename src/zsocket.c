@@ -47,43 +47,139 @@ zsocket_destroy (zctx_t *ctx, void *self)
         zctx__socket_destroy (ctx, self);
 }
 
+static int is_rand_initd = 0;
+
+static unsigned int get_rand_in_range(unsigned int min, unsigned int max)
+{
+    if (!is_rand_initd ) {
+        srandom(time(NULL));
+        is_rand_initd = 1;
+    }
+    double scaled = (double)random()/(RAND_MAX+1.0);
+    return (unsigned int)((max-min+1) * scaled) + min;
+}
+
+static int parse_port_notation(const char *endpoint, int *min, int *max)
+{
+    char *colonptr = strrchr(endpoint,':'); // there are TWO :'s in the spec
+    char *rangespec = strchr(colonptr, '[');
+    if (rangespec) {
+        char *rangesep = strchr(rangespec, '-');
+        if (rangesep) {
+            int p1 = atoi(rangespec+1);
+            int p2 = atoi(rangesep+1);
+            if (p1 > 0) {
+                *min = p1;
+            }
+            *max = 0; // just in case
+            if (p2 > 0) {
+                *max = p2;
+            }
+            return 0;
+        }
+        else {
+            int p1 = atoi(rangespec+1);
+            if (p1 > 0) {
+                *min = p1;
+                *max = 0; // no max, set to 0
+            }
+            return 0;
+        }
+    }
+    *min = 0;
+    *max = 0;
+    return -1;
+}
+
 
 //  --------------------------------------------------------------------------
 //  Bind a socket to a formatted endpoint. If the port is specified as
-//  '*', binds to any free port from ZSOCKET_DYNFROM to ZSOCKET_DYNTO
-//  and returns the actual port number used.  Always returns the
-//  port number if successful. Note that if a previous process or thread
+//  '*', or '!',  binds to any free port from ZSOCKET_DYNFROM to ZSOCKET_DYNTO
+//  and returns the actual port number used.  To override the given range, which
+//  is the IANA designated range from C000 (49152) to FFFF (65535), after the * or !,
+//  you can include the notation "[<min>-<max>]". 
+//  '*' will test ports starting at 'min' (default ZSOCKET_DYNFROM), and increment 
+//      upwards to 'max' (default ZSOCKET_DYNTO).
+//  '!' will randomly choose ports from within the range. It will iterate from one
+//      random port number to the next. It will give up if it attempts more than
+//      total possible number of ports in the range, with a max of 30. Then it will
+//      revert to a linear search (as with '*'). Therefore, '!' works best in large,
+//      sparsely populated ranges.
+//  The first open port is bound and its number returned.
+//  Always returns the port number if successful. 
+//  Returns -1 if not successful. 
+//  Note that if a previous process or thread
 //  used the same port, peers may connect to the caller thinking it was
 //  the previous process/thread.
+
 
 int
 zsocket_bind (void *self, const char *format, ...)
 {
     //  Ephemeral port needs 4 additional characters
-    char endpoint [256 + 4];
+    //  and range notation adds 8 ([,],-, and another (possibly) 5 digit port number)
+    char endpoint [256 + 12];
     va_list argptr;
     va_start (argptr, format);
-    int endpoint_size = vsnprintf (endpoint, 256, format, argptr);
+    vsnprintf (endpoint, 264, format, argptr);
     va_end (argptr);
+    char *colonptr = strrchr(endpoint,':');
 
     //  Port must be at end of endpoint
-    if (endpoint [endpoint_size - 2] == ':'
-    &&  endpoint [endpoint_size - 1] == '*') {
-        int port = ZSOCKET_DYNFROM;
-        while (port <= ZSOCKET_DYNTO) {
+    if ( colonptr 
+    &&  *(colonptr + 1) == '*') { // sequential search in range
+        int port = ZSOCKET_DYNFROM;  // these values act as defaults
+	int lim = ZSOCKET_DYNTO;
+        int p1;
+        int p2;
+        int ret = parse_port_notation(endpoint, &p1, &p2);
+        if (ret == 0 && p1 > 0) port = p1;
+        if (ret == 0 && p2 > 0) lim = p2;
+        while (port <= lim) {
             //  Try to bind on the next plausible port
-            sprintf (endpoint + endpoint_size - 1, "%d", port);
+            sprintf (colonptr + 1, "%d", port);
             if (zmq_bind (self, endpoint) == 0)
                 return port;
             port++;
         }
         return -1;
     }
+    else if ( colonptr
+    &&  *(colonptr + 1)  == '!') { // Random search in range
+        int port = ZSOCKET_DYNFROM;  // these values act as defaults
+	int lim = ZSOCKET_DYNTO;
+        int p1;
+        int p2;
+        int ret = parse_port_notation(endpoint, &p1, &p2);
+        if (ret == 0 && p1 > 0) port = p1;
+        if (ret == 0 && p2 > 0) lim = p2;
+	int its=0;
+        int limits = lim-port;
+        if (limits > 30)
+            limits = 30; // arbitrary cutoff; if you can't get an usable port in 30 moves, switch to a linear search
+        do {
+            int p1 = get_rand_in_range(port, lim);
+            sprintf (colonptr + 1, "%d", p1);
+            if (zmq_bind (self, endpoint) == 0)
+                return p1;
+            its++;
+        } while ( its < limits ); // if you end up with your range entirely (or almost entirely)  allocated, .... well, ....
+        while (port <= lim) { // OK, if we have filled up the range to some extent, choosing new random ports
+                              // ends up being way inefficient, so we revert to a linear traversal to find the few remaining (if any) ports.
+            //  Try to bind on the next plausible port
+            sprintf (colonptr + 1, "%d", port);
+            if (zmq_bind (self, endpoint) == 0)
+                return port;
+            port++;
+        }
+        // How do we indicate to the user/developer that we couldn't find an empty slot in his range?
+	return -1;
+    }
     else {
         //  Return actual port used for binding
         int port = zmq_bind (self, endpoint);
         if (port == 0)
-            port = atoi (strrchr (endpoint, ':') + 1);
+            port = atoi (colonptr + 1);
         else
             port = -1;
         return port;
@@ -337,6 +433,42 @@ zsocket_test (bool verbose)
 
     zsocket_destroy (ctx, reader);
     zsocket_destroy (ctx, writer);
+
+    void *arr[7];
+    int   parr[7];
+    int i3;
+    for (i3=0; i3 < 7; i3++) {
+       int rc3;
+       arr[i3] = zsocket_new(ctx, ZMQ_REP);
+       rc3 = zsocket_bind(arr[i3], "tcp://*:*[50000-50005]");
+       if (i3 < 6) {
+           assert( rc3 == 50000+i3 );
+       } else {
+           assert( rc3 == -1);
+       }
+    }
+    for (i3=0; i3 < 6; i3++) {
+       int rc3 = zsocket_unbind( arr[i3], "tcp://*:%d", i3+50000);
+       assert(rc3 == 0);
+    }
+    for (i3=0; i3 < 7; i3++) {
+       int rc3;
+       arr[i3] = zsocket_new(ctx, ZMQ_REP);
+       rc3 = zsocket_bind(arr[i3], "tcp://*:![50000-50005]");
+       parr[i3] = rc3;
+       if (i3 < 6) {
+           assert( rc3 <= 50005 && rc3 >=  50000 );
+       } else {
+           assert( rc3 == -1);
+       }
+    }
+    for (i3=0; i3 < 6; i3++) {
+       if (parr[i3] != -1) {
+           int rc3 = zsocket_unbind( arr[i3], "tcp://*:%d", parr[i3]);
+           assert(rc3 == 0);
+       }
+    }
+
     zctx_destroy (&ctx);
     //  @end
 
