@@ -28,12 +28,12 @@ include_HEADERS = \
     ../include/zinterface.h \
     ../include/zlist.h \
     ../include/zloop.h \
+    ../include/zmonitor.h \
     ../include/zmsg.h \
     ../include/zpoller.h \
     ../include/zproxy.h \
     ../include/zrex.h \
     ../include/zsock.h \
-    ../include/zsock_monitor.h \
     ../include/zsock_option.h \
     ../include/zstr.h \
     ../include/zsys.h \
@@ -41,7 +41,7 @@ include_HEADERS = \
     zgossip_msg.h \
     ../include/zauth_v2.h \
     ../include/zctx.h \
-    ../include/zmonitor.h \
+    ../include/zmonitor_v2.h \
     ../include/zmutex.h \
     ../include/zsocket.h \
     ../include/zsockopt.h \
@@ -67,12 +67,12 @@ libczmq_la_SOURCES = \
     zinterface.c \
     zlist.c \
     zloop.c \
+    zmonitor.c \
     zmsg.c \
     zpoller.c \
     zproxy.c \
     zrex.c \
     zsock.c \
-    zsock_monitor.c \
     zsock_option.c \
     zstr.c \
     zsys.c \
@@ -80,7 +80,7 @@ libczmq_la_SOURCES = \
     zgossip_msg.c \
     zauth_v2.c \
     zctx.c \
-    zmonitor.c \
+    zmonitor_v2.c \
     zmutex.c \
     zsocket.c \
     zsockopt.c \

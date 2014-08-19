@@ -21,9 +21,7 @@
 @end
 */
 
-#include "platform.h"
 #include "../include/czmq.h"
-
 
 //  --------------------------------------------------------------------------
 //  The self_t structure holds the state for one actor instance
@@ -36,8 +34,8 @@ typedef struct {
     zhash_t *passwords;         //  PLAIN passwords, if loaded
     zpoller_t *poller;          //  Socket poller
     zcertstore_t *certstore;    //  CURVE certificate store, if loaded
-    bool terminated;            //  Did caller ask us to quit?
     bool allow_any;             //  CURVE allows arbitrary clients
+    bool terminated;            //  Did caller ask us to quit?
     bool verbose;               //  Verbose logging enabled?
 } self_t;
 
@@ -448,9 +446,6 @@ s_can_connect (zsock_t **server, zsock_t **client)
     return success;
 }
 #endif
-
-//  --------------------------------------------------------------------------
-//  Selftest
 
 void
 zauth_test (bool verbose)

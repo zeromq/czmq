@@ -31,7 +31,7 @@ CZMQ_EXPORT void
 
 // Self test of this class
 CZMQ_EXPORT void
-    zmonitor_test (bool verbose);
+    zmonitor_v2_test (bool verbose);
 
 ----
 
@@ -78,13 +78,6 @@ EXAMPLE
     //  Check sink accepted connection
     result = s_check_event (sinkmon, ZMQ_EVENT_ACCEPTED);
     assert (result);
-
-    //  Destroy sink to trigger a disconnect event on the source
-    //  PH: disabled since this causes an access violation in
-    //  zmonitor_destroy as the socket is no longer valid.
-//     zsocket_destroy (ctx, sink);
-//     result = s_check_event (sourcemon, ZMQ_EVENT_DISCONNECTED);
-//     assert (result);
 
     zmonitor_destroy (&sinkmon);
     zmonitor_destroy (&sourcemon);

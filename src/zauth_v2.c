@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zauth_v2 - authentication for ZeroMQ security mechanisms (old V2 class)
+    zauth_v2 - authentication for ZeroMQ servers (deprecated)
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -22,7 +22,6 @@
 @end
 */
 
-#include "platform.h"
 #include "../include/czmq.h"
 
 //  Structure of our class
@@ -613,7 +612,7 @@ s_can_connect (zctx_t *ctx, void **server, void **client)
 void
 zauth_v2_test (bool verbose)
 {
-    printf (" * zauth: ");
+    printf (" * zauth (deprecated): ");
 #if (ZMQ_VERSION_MAJOR == 4)
     if (verbose)
         printf ("\n");

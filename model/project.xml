@@ -23,12 +23,12 @@
     <class name = "zinterface" />
     <class name = "zlist" />
     <class name = "zloop" />
+    <class name = "zmonitor" />
     <class name = "zmsg" />
     <class name = "zpoller" />
     <class name = "zproxy" />
     <class name = "zrex" />
     <class name = "zsock" />
-    <class name = "zsock_monitor" />
     <class name = "zsock_option" />
     <class name = "zstr" />
     <class name = "zsys" />
@@ -43,7 +43,7 @@
     <!-- Deprecated V2 API, remove some time after 3.0 stability -->
     <class name = "zauth_v2" />
     <class name = "zctx" />
-    <class name = "zmonitor" />
+    <class name = "zmonitor_v2" />
     <class name = "zmutex" />
     <class name = "zsocket" />
     <class name = "zsockopt" />

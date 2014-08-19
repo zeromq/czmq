@@ -57,11 +57,11 @@ int main (int argc, char *argv [])
     zuuid_test (verbose);
     zsock_test (verbose);
     zsock_option_test (verbose);
-    zsock_monitor_test (verbose);
     zactor_test (verbose);
     zpoller_test (verbose);
     zloop_test (verbose);
     zproxy_test (verbose);
+    zmonitor_test (verbose);
     zbeacon_test (verbose);
     zgossip_test (verbose);
     zcert_test (verbose);
@@ -71,7 +71,9 @@ int main (int argc, char *argv [])
     //  Deprecated V2 classes
     zauth_v2_test (verbose);
     zctx_test (verbose);
-    zmonitor_test (verbose);
+#if (ZMQ_VERSION_MAJOR == 4)
+    zmonitor_v2_test (verbose);
+#endif
     zmutex_test (verbose);
     zsocket_test (verbose);
     zsockopt_test (verbose);
