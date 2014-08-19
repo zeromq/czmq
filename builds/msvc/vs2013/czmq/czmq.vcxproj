@@ -180,6 +180,9 @@
     <ClCompile Include="..\..\..\..\src\zmutex.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\zproxy_v2.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zsocket.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>

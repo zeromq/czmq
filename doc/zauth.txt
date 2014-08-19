@@ -15,64 +15,67 @@ SYNOPSIS
 //  Create new zauth actor instance. This installs authentication on all 
 //  zsock sockets. Until you add policies, all incoming NULL connections are
 //  allowed (classic ZeroMQ behaviour), and all PLAIN and CURVE connections
-//  are denied.
+//  are denied:
 //  
 //      zactor_t *auth = zactor_new (zauth, NULL);
 //
 //  Destroy zauth instance. This removes authentication and allows all
-//  connections to pass, without authentication.
+//  connections to pass, without authentication:
 //  
 //      zactor_destroy (&auth);
+//
+//  Note that all zauth commands are synchronous, so your application always
+//  waits for a signal from the actor after each command.
 //
 //  Allow (whitelist) a list of IP addresses. For NULL, all clients from
 //  these addresses will be accepted. For PLAIN and CURVE, they will be
 //  allowed to continue with authentication. You can call this method
 //  multiple times to whitelist more IP addresses. If you whitelist one
 //  or nmore addresses, any non-whitelisted addresses are treated as
-//  blacklisted.
+//  blacklisted:
 //  
 //      zstr_sendx (auth, "ALLOW", "127.0.0.1", "127.0.0.2", NULL);
+//      zsock_wait (auth);
 //  
 //  Deny (blacklist) a list of IP addresses. For all security mechanisms,
 //  this rejects the connection without any further authentication. Use
 //  either a whitelist, or a blacklist, not not both. If you define both
-//  a whitelist and a blacklist, only the whitelist takes effect.
+//  a whitelist and a blacklist, only the whitelist takes effect:
 //  
 //      zstr_sendx (auth, "DENY", "192.168.0.1", "192.168.0.2", NULL);
+//      zsock_wait (auth);
 //
 //  Configure PLAIN authentication using a plain-text password file. You can
 //  modify the password file at any time; zauth will reload it automatically
-//  if modified externally.
+//  if modified externally:
 //  
 //      zstr_sendx (auth, "PLAIN", filename, NULL);
+//      zsock_wait (auth);
 //
 //  Configure CURVE authentication, using a directory that holds all public
 //  client certificates, i.e. their public keys. The certificates must be in
 //  zcert_save format. You can add and remove certificates in that directory
 //  at any time. To allow all client keys without checking, specify
-//  CURVE_ALLOW_ANY for the directory name.
+//  CURVE_ALLOW_ANY for the directory name:
 //
 //      zstr_sendx (auth, "CURVE", directory, NULL);
+//      zsock_wait (auth);
 //
 //  Configure GSSAPI authentication, using an underlying mechanism (usually
-//  Kerberos) to establish a secure context and perform mutual authentication.
+//  Kerberos) to establish a secure context and perform mutual authentication:
 //
 //      zstr_sendx (auth, "GSSAPI", NULL);
+//      zsock_wait (auth);
 //
 //  Enable verbose logging of commands and activity. Verbose logging can help
-//  debug non-trivial authentication policies.
+//  debug non-trivial authentication policies:
 //
 //      zstr_sendx (auth, "VERBOSE", NULL);
+//      zsock_wait (auth);
 //
-//  Ask authenticator to signal us when it is ready. This command lets you wait
-//  on the authenticator to process all other commands on its pipe before you
-//  start working with sockets.
-//
-//      zstr_sendx (auth, "SIGNAL", NULL);
-//  
 //  This is the zauth constructor as a zactor_fn:
 CZMQ_EXPORT void
-    zauth (zsock_t *pipe, void *args);
+    zauth (zsock_t *pipe, void *unused);
 
 //  Selftest
 CZMQ_EXPORT void
@@ -86,7 +89,8 @@ A zauth actor takes over authentication for all incoming connections in
 its context. You can whitelist or blacklist peers based on IP address,
 and define policies for securing PLAIN, CURVE, and GSSAPI connections.
 
-
+This class replaces zauth_v2, and is meant for applications that use the
+CZMQ v3 API (meaning, zsock).
 
 EXAMPLE
 -------
@@ -106,9 +110,7 @@ EXAMPLE
     zactor_t *auth = zactor_new (zauth, NULL);
     assert (auth);
     if (verbose) {
-        zstr_send (auth, "VERBOSE");
-        //  Ensure the command was processed before we continue...
-        zstr_sendx (auth, "WAIT", NULL);
+        zstr_sendx (auth, "VERBOSE", NULL);
         zsock_wait (auth);
     }
     //  Check there's no authentication on a default NULL server
@@ -125,7 +127,6 @@ EXAMPLE
     //  Blacklist 127.0.0.1, connection should fail
     zsock_set_zap_domain (server, "global");
     zstr_sendx (auth, "DENY", "127.0.0.1", NULL);
-    zstr_sendx (auth, "WAIT", NULL);
     zsock_wait (auth);
     success = s_can_connect (&server, &client);
     assert (!success);
@@ -133,7 +134,6 @@ EXAMPLE
     //  Whitelist our address, which overrides the blacklist
     zsock_set_zap_domain (server, "global");
     zstr_sendx (auth, "ALLOW", "127.0.0.1", NULL);
-    zstr_sendx (auth, "WAIT", NULL);
     zsock_wait (auth);
     success = s_can_connect (&server, &client);
     assert (success);
@@ -153,7 +153,6 @@ EXAMPLE
     zsock_set_plain_username (client, "admin");
     zsock_set_plain_password (client, "Password");
     zstr_sendx (auth, "PLAIN", TESTDIR "/password-file", NULL);
-    zstr_sendx (auth, "WAIT", NULL);
     zsock_wait (auth);
     success = s_can_connect (&server, &client);
     assert (success);
@@ -187,7 +186,6 @@ EXAMPLE
         zsock_set_curve_server (server, 1);
         zsock_set_curve_serverkey (client, server_key);
         zstr_sendx (auth, "CURVE", CURVE_ALLOW_ANY, NULL);
-        zstr_sendx (auth, "WAIT", NULL);
         zsock_wait (auth);
         success = s_can_connect (&server, &client);
         assert (success);
@@ -199,7 +197,6 @@ EXAMPLE
         zsock_set_curve_serverkey (client, server_key);
         zcert_save_public (client_cert, TESTDIR "/mycert.txt");
         zstr_sendx (auth, "CURVE", TESTDIR, NULL);
-        zstr_sendx (auth, "WAIT", NULL);
         zsock_wait (auth);
         success = s_can_connect (&server, &client);
         assert (success);

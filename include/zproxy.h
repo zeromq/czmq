@@ -19,38 +19,67 @@ extern "C" {
 #endif
 
 //  @interface
-
-//  Constructor
-//  Create a new zproxy object. You must create the frontend and backend
-//  sockets, configure them, and connect or bind them, before you pass them
-//  to the constructor. Do NOT use the sockets again, after passing them to
-//  this method.
-CZMQ_EXPORT zproxy_t *
-    zproxy_new (zctx_t *ctx, void *frontend, void *backend);
-
-//  Destructor
-//  Destroy a zproxy object; note this first stops the proxy.
+//  Create new zproxy actor instance. The proxy switches messages between
+//  a frontend socket and a backend socket; use the FRONTEND and BACKEND
+//  commands to configure these:
+//
+//      zactor_t *proxy = zactor_new (zproxy, NULL);
+//
+//  Destroy zproxy instance. This destroys the two sockets and stops any
+//  message flow between them:
+//
+//      zactor_destroy (&proxy);
+//
+//  Note that all zproxy commands are synchronous, so your application always
+//  waits for a signal from the actor after each command.
+//
+//  Enable verbose logging of commands and activity:
+//
+//      zstr_sendx (proxy, "VERBOSE", NULL);
+//      zsock_wait (proxy);
+//
+//  Specify frontend socket type -- see zsock_type_str () -- and attach to
+//  endpoints, see zsock_attach (). Note that a proxy socket is always
+//  serverish:
+//
+//      zstr_sendx (proxy, "FRONTEND", "XSUB", endpoints, NULL);
+//      zsock_wait (proxy);
+//
+//  Specify backend socket type -- see zsock_type_str () -- and attach to
+//  endpoints, see zsock_attach (). Note that a proxy socket is always
+//  serverish:
+//
+//      zstr_sendx (proxy, "BACKEND", "XPUB", endpoints, NULL);
+//      zsock_wait (proxy);
+//
+//  Capture all proxied messages; these are delivered to the application
+//  via an inproc PULL socket that you have already bound to the specified
+//  endpoint:
+//
+//      zstr_sendx (proxy, "CAPTURE", endpoint, NULL);
+//      zsock_wait (proxy);
+//
+//  Pause the proxy. A paused proxy will cease processing messages, causing
+//  them to be queued up and potentially hit the high-water mark on the
+//  frontend or backend socket, causing messages to be dropped, or writing
+//  applications to block:
+//
+//      zstr_sendx (proxy, "PAUSE", NULL);
+//      zsock_wait (proxy);
+//
+//  Resume the proxy. Note that the proxy starts automatically as soon as it
+//  has a properly attached frontend and backend socket:
+//
+//      zstr_sendx (proxy, "RESUME", NULL);
+//      zsock_wait (proxy);
+//
+//  This is the zproxy constructor as a zactor_fn; the argument is a
+//  character string specifying frontend and backend socket types as two
+//  uppercase strings separated by a hyphen:
 CZMQ_EXPORT void
-    zproxy_destroy (zproxy_t **self_p);
+    zproxy (zsock_t *pipe, void *unused);
 
-//  Copy all proxied messages to specified endpoint; if this is NULL, any
-//  in-progress capturing will be stopped. You must already have bound the
-//  endpoint to a PULL socket.
-CZMQ_EXPORT void
-    zproxy_capture (zproxy_t *self, const char *endpoint);
-
-//  Pauses a zproxy object; a paused proxy will cease processing messages,
-//  causing them to be queued up and potentially hit the high-water mark on
-//  the frontend socket, causing messages to be dropped, or writing
-//  applications to block.
-CZMQ_EXPORT void
-    zproxy_pause (zproxy_t *self);
-
-//  Resume a zproxy object
-CZMQ_EXPORT void
-    zproxy_resume (zproxy_t *self);
-
-// Self test of this class
+//  Selftest
 CZMQ_EXPORT void
     zproxy_test (bool verbose);
 //  @end

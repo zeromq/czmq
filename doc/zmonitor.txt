@@ -8,9 +8,9 @@ zmonitor - socket event monitor
 SYNOPSIS
 --------
 ----
-//  Create new zmonitor actor instance.
+//  Create new zmonitor actor instance to monitor a zsock_t socket:
 //
-//      zactor_t *monitor = zactor_new (zmonitor, NULL);
+//      zactor_t *monitor = zactor_new (zmonitor, mysocket);
 //
 //  Destroy zmonitor instance.
 //
@@ -46,9 +46,10 @@ SYNOPSIS
 //
 //      zmsg_t *msg = zmsg_recv (monitor);
 //
-//  This is the zmonitor constructor as a zactor_fn:
+//  This is the zmonitor constructor as a zactor_fn; the argument can be
+//  a zactor_t, zsock_t, or libzmq void * socket:
 CZMQ_EXPORT void
-    zmonitor (zsock_t *pipe, void *args);
+    zmonitor (zsock_t *pipe, void *sock);
 
 //  Selftest
 CZMQ_EXPORT void
@@ -63,8 +64,9 @@ connected, listen, disconnected, etc. Socket events are only available
 for sockets connecting or bound to ipc:// and tcp:// endpoints.
 
 This class wraps the ZMQ socket monitor API, see zmq_socket_monitor for
-details. Currently this class requires libzmq v4.0 or later and is empty
-on older versions of libzmq.
+details. Works on all versions of libzmq from 3.2 onwards. This class
+replaces zproxy_v2, and is meant for applications that use the CZMQ v3
+API (meaning, zsock).
 
 EXAMPLE
 -------

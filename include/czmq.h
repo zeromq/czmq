@@ -92,6 +92,7 @@ typedef struct _zuuid_t zuuid_t;
 #include "zctx.h"
 #include "zmonitor_v2.h"
 #include "zmutex.h"
+#include "zproxy_v2.h"
 #include "zsocket.h"
 #include "zsockopt.h"
 #include "zthread.h"

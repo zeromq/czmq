@@ -31,12 +31,12 @@ These classes provide the main socket and message API:
 * linkczmq:zactor[3] - Actor class (socket + thread)
 * linkczmq:zloop[3] - event-driven reactor
 * linkczmq:zpoller[3] - trivial socket poller class
-* linkczmq:zproxy[3] - convenient zmq_proxy api
+* linkczmq:zproxy[3] - proxy actor (like zmq_proxy_steerable)
 * linkczmq:zmonitor[3] - monitor events on ZeroMQ sockets
 
 These classes support authentication and encryption:
 
-* linkczmq:zauth[3] - authentication for ZeroMQ servers
+* linkczmq:zauth[3] - authentication actor for ZeroMQ servers
 * linkczmq:zcert[3] - work with CURVE security certificates
 * linkczmq:zcertstore[3] - work with CURVE security certificate stores
 
@@ -68,8 +68,9 @@ These classes are deprecated:
 * linkczmq:zsocket[3] - working with ZeroMQ sockets (low-level)
 * linkczmq:zsockopt[3] - get/set ZeroMQ socket options
 * linkczmq:zthread[3] - working with system threads
-* linkczmq:zmonitor_v2[3] - socket event monitor
 * linkczmq:zauth_v2[3] - authentication for ZeroMQ servers
+* linkczmq:zmonitor_v2[3] - socket event monitor
+* linkczmq:zproxy_v2[3] - zmq_proxy wrapper
 
 Scope and Goals
 ~~~~~~~~~~~~~~~
