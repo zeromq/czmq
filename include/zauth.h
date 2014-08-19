@@ -30,7 +30,9 @@ extern "C" {
 //  
 //      zactor_t *auth = zactor_new (zauth, NULL);
 //
-//  Destroy zauth instance. This removes authentication and allows all 
+//  Destroy zauth instance. This removes authentication and allows all
+//  connections to pass, without authentication.
+//  
 //      zactor_destroy (&auth);
 //
 //  Allow (whitelist) a list of IP addresses. For NULL, all clients from

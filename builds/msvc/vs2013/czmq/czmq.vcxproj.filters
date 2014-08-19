@@ -61,6 +61,9 @@
     <ClCompile Include="..\..\..\..\src\zloop.c">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\zmonitor.c">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zmsg.c">
       <Filter>src</Filter>
     </ClCompile>
@@ -74,9 +77,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\zsock.c">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zsock_monitor.c">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\zsock_option.c">
@@ -100,7 +100,7 @@
     <ClCompile Include="..\..\..\..\src\zctx.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zmonitor.c">
+    <ClCompile Include="..\..\..\..\src\zmonitor_v2.c">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\zmutex.c">

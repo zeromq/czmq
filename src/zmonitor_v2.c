@@ -335,7 +335,7 @@ s_check_event (zmonitor_t *self, int expected_event)
 void
 zmonitor_v2_test (bool verbose)
 {
-    printf (" * zmonitor: ");
+    printf (" * zmonitor (deprecated): ");
     if (verbose)
         printf ("\n");
 
@@ -376,4 +376,3 @@ zmonitor_v2_test (bool verbose)
 }
 
 #endif          //  ZeroMQ 4.0 or later
-

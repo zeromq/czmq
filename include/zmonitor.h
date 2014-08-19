@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zmonitor - socket event monitor
+    zsock_monitor - socket event monitor
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -11,48 +11,62 @@
     =========================================================================
 */
 
-#ifndef __ZMONITOR_H_INCLUDED__
-#define __ZMONITOR_H_INCLUDED__
-
-//  This code needs backporting to work with ZMQ v3.2
-#if (ZMQ_VERSION_MAJOR == 4)
+#ifndef __ZSOCK_MONITOR_H_INCLUDED__
+#define __ZSOCK_MONITOR_H_INCLUDED__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 //  @interface
-//  Create a new socket monitor
-CZMQ_EXPORT zmonitor_t *
-    zmonitor_new (zctx_t *ctx, void *socket, int events);
-
-//  Destroy a socket monitor
+//  Create new zmonitor actor instance.
+//
+//      zactor_t *monitor = zactor_new (zmonitor, NULL);
+//
+//  Destroy zmonitor instance.
+//
+//      zactor_destroy (&monitor);
+//
+//  Enable verbose logging of commands and activity.
+//
+//      zstr_sendx (monitor, "VERBOSE", NULL);
+//
+//  Listen to monitor event type:
+//      zstr_sendx (monitor, "LISTEN", type, type, type, NULL);
+//  
+//      Events:
+//      CONNECTED
+//      CONNECT_DELAYED
+//      CONNECT_RETRIED
+//      LISTENING
+//      BIND_FAILED
+//      ACCEPTED
+//      ACCEPT_FAILED
+//      CLOSED
+//      CLOSE_FAILED
+//      DISCONNECTED
+//      MONITOR_STOPPED
+//      ALL
+//
+//  Start monitor; after this, any further LISTEN commands are ignored.
+//
+//      zstr_sendx (monitor, "START", NULL);
+//      zsock_wait (monitor);
+//
+//  Receive next monitor event:
+//
+//      zmsg_t *msg = zmsg_recv (monitor);
+//
+//  This is the zmonitor constructor as a zactor_fn:
 CZMQ_EXPORT void
-    zmonitor_destroy (zmonitor_t **self_p);
+    zmonitor (zsock_t *pipe, void *args);
 
-//  Receive a status message from the monitor; if no message arrives within
-//  500 msec, or the call was interrupted, returns NULL.
-CZMQ_EXPORT zmsg_t *
-    zmonitor_recv (zmonitor_t *self);
-
-//  Get the ZeroMQ socket, for polling 
-CZMQ_EXPORT void *
-    zmonitor_socket (zmonitor_t *self);
-
-//  Enable verbose tracing of commands and activity
-CZMQ_EXPORT void
-    zmonitor_set_verbose (zmonitor_t *self, bool verbose);
-
-// Self test of this class
+//  Selftest
 CZMQ_EXPORT void
     zmonitor_test (bool verbose);
-
-// @end
-
+//  @end
 #ifdef __cplusplus
 }
 #endif
-
-#endif          //  ZeroMQ 4.0 or later
 
 #endif
