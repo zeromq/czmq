@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zauth_v2 - authentication for ZeroMQ security mechanisms (old V2 class)
+    zauth_v2 - authentication for ZeroMQ servers (deprecated)
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -29,10 +29,13 @@ extern "C" {
 //  add policies, all incoming NULL connections are allowed (classic ZeroMQ
 //  behaviour), and all PLAIN and CURVE connections are denied. If there was
 //  an error during initialization, returns NULL.
-//  If you are using the new zsock API then pass NULL as the ctx here.
 CZMQ_EXPORT zauth_t *
     zauth_new (zctx_t *ctx);
     
+//  Destructor
+CZMQ_EXPORT void
+    zauth_destroy (zauth_t **self_p);
+
 //  Allow (whitelist) a single IP address. For NULL, all clients from this
 //  address will be accepted. For PLAIN and CURVE, they will be allowed to
 //  continue with authentication. You can call this method multiple times 
@@ -73,10 +76,6 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zauth_set_verbose (zauth_t *self, bool verbose);
     
-//  Destructor
-CZMQ_EXPORT void
-    zauth_destroy (zauth_t **self_p);
-
 //  Selftest
 CZMQ_EXPORT void
     zauth_v2_test (bool verbose);
