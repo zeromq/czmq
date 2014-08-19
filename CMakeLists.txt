@@ -114,6 +114,7 @@ set (czmq_headers
     include/zctx.h
     include/zmonitor_v2.h
     include/zmutex.h
+    include/zproxy_v2.h
     include/zsocket.h
     include/zsockopt.h
     include/zthread.h
@@ -161,6 +162,7 @@ set (czmq_sources
     src/zctx.c
     src/zmonitor_v2.c
     src/zmutex.c
+    src/zproxy_v2.c
     src/zsocket.c
     src/zsockopt.c
     src/zthread.c

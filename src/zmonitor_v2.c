@@ -16,11 +16,13 @@
     The zmonitor class provides an API for obtaining socket events such as
     connected, listen, disconnected, etc. Socket events are only available
     for sockets connecting or bound to ipc:// and tcp:// endpoints.
-    NOTE: this class is deprecated in favor of zsock_monitor.
-@discuss
     This class wraps the ZMQ socket monitor API, see zmq_socket_monitor for
     details. Currently this class requires libzmq v4.0 or later and is empty
-    on older versions of libzmq. Deprecated in favor of zsock_monitor.
+    on older versions of libzmq.
+@discuss
+    This class is deprecated in CZMQ v3; it works together with zctx, zsocket,
+    and other deprecated V2 classes. New applications should use the V3 zmonitor
+    interface, based on zactor, together with the zsock class for sockets.
 @end
 */
 
@@ -331,6 +333,7 @@ s_check_event (zmonitor_t *self, int expected_event)
     zmsg_destroy (&msg);
     return event == expected_event;
 }
+#endif          //  ZeroMQ 4.0 or later
 
 void
 zmonitor_v2_test (bool verbose)
@@ -339,6 +342,7 @@ zmonitor_v2_test (bool verbose)
     if (verbose)
         printf ("\n");
 
+#if (ZMQ_VERSION_MAJOR == 4)
     //  @selftest
     zctx_t *ctx = zctx_new ();
     bool result;
@@ -372,7 +376,8 @@ zmonitor_v2_test (bool verbose)
     zmonitor_destroy (&sourcemon);
     zctx_destroy (&ctx);
     //  @end
+#endif          //  ZeroMQ 4.0 or later
+    
     printf ("OK\n");
 }
 
-#endif          //  ZeroMQ 4.0 or later
