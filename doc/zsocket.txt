@@ -171,6 +171,42 @@ EXAMPLE
 
     zsocket_destroy (ctx, reader);
     zsocket_destroy (ctx, writer);
+
+    void *arr[7];
+    int   parr[7];
+    int i3;
+    for (i3=0; i3 < 7; i3++) {
+       int rc3;
+       arr[i3] = zsocket_new(ctx, ZMQ_REP);
+       rc3 = zsocket_bind(arr[i3], "tcp://*:*[50000-50005]");
+       if (i3 < 6) {
+           assert( rc3 == 50000+i3 );
+       } else {
+           assert( rc3 == -1);
+       }
+    }
+    for (i3=0; i3 < 6; i3++) {
+       int rc3 = zsocket_unbind( arr[i3], "tcp://*:%d", i3+50000);
+       assert(rc3 == 0);
+    }
+    for (i3=0; i3 < 7; i3++) {
+       int rc3;
+       arr[i3] = zsocket_new(ctx, ZMQ_REP);
+       rc3 = zsocket_bind(arr[i3], "tcp://*:![50000-50005]");
+       parr[i3] = rc3;
+       if (i3 < 6) {
+           assert( rc3 <= 50005 && rc3 >=  50000 );
+       } else {
+           assert( rc3 == -1);
+       }
+    }
+    for (i3=0; i3 < 6; i3++) {
+       if (parr[i3] != -1) {
+           int rc3 = zsocket_unbind( arr[i3], "tcp://*:%d", parr[i3]);
+           assert(rc3 == 0);
+       }
+    }
+
     zctx_destroy (&ctx);
 ----
 
