@@ -23,7 +23,7 @@
 */
 
 #include "platform.h"
-#include "czmq.h"
+#include "../include/czmq.h"
 
 struct _zinterface_t {
     char *name;      //  The interfaces's name as reported by the OS
