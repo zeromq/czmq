@@ -17,7 +17,8 @@
     its context. You can whitelist or blacklist peers based on IP address,
     and define policies for securing PLAIN, CURVE, and GSSAPI connections.
 @discuss
-
+    This class replaces zauth_v2, and is meant for applications that use the
+    CZMQ v3 API (meaning, zsock).
 @end
 */
 
@@ -88,6 +89,7 @@ s_self_handle_pipe (self_t *self)
     char *command = zmsg_popstr (request);
     if (self->verbose)
         zsys_info ("zauth: API command=%s", command);
+    
     if (streq (command, "ALLOW")) {
         char *address = zmsg_popstr (request);
         while (address) {
@@ -97,6 +99,7 @@ s_self_handle_pipe (self_t *self)
             zstr_free (&address);
             address = zmsg_popstr (request);
         }
+        zsock_signal (self->pipe, 0);
     }
     else
     if (streq (command, "DENY")) {
@@ -108,6 +111,7 @@ s_self_handle_pipe (self_t *self)
             zstr_free (&address);
             address = zmsg_popstr (request);
         }
+        zsock_signal (self->pipe, 0);
     }
     else
     if (streq (command, "PLAIN")) {
@@ -118,6 +122,7 @@ s_self_handle_pipe (self_t *self)
         self->passwords = zhash_new ();
         zhash_load (self->passwords, filename);
         zstr_free (&filename);
+        zsock_signal (self->pipe, 0);
     }
     else
     if (streq (command, "CURVE")) {
@@ -132,16 +137,17 @@ s_self_handle_pipe (self_t *self)
             self->allow_any = false;
         }
         zstr_free (&location);
+        zsock_signal (self->pipe, 0);
     }
     else
     if (streq (command, "GSSAPI"))
-        ;   //  GSSAPI authentication is not yet implemented here
-    else
-    if (streq (command, "VERBOSE"))
-        self->verbose = true;
-    else
-    if (streq (command, "WAIT"))
+        //  GSSAPI authentication is not yet implemented here
         zsock_signal (self->pipe, 0);
+    else
+    if (streq (command, "VERBOSE")) {
+        self->verbose = true;
+        zsock_signal (self->pipe, 0);
+    }
     else
     if (streq (command, "$TERM"))
         self->terminated = true;
@@ -401,7 +407,7 @@ s_self_authenticate (self_t *self)
 //  zauth() implements the zauth actor interface
 
 void
-zauth (zsock_t *pipe, void *args)
+zauth (zsock_t *pipe, void *unused)
 {
     self_t *self = s_self_new (pipe);
     //  Signal successful initialization
@@ -470,9 +476,7 @@ zauth_test (bool verbose)
     zactor_t *auth = zactor_new (zauth, NULL);
     assert (auth);
     if (verbose) {
-        zstr_send (auth, "VERBOSE");
-        //  Ensure the command was processed before we continue...
-        zstr_sendx (auth, "WAIT", NULL);
+        zstr_sendx (auth, "VERBOSE", NULL);
         zsock_wait (auth);
     }
     //  Check there's no authentication on a default NULL server
@@ -489,7 +493,6 @@ zauth_test (bool verbose)
     //  Blacklist 127.0.0.1, connection should fail
     zsock_set_zap_domain (server, "global");
     zstr_sendx (auth, "DENY", "127.0.0.1", NULL);
-    zstr_sendx (auth, "WAIT", NULL);
     zsock_wait (auth);
     success = s_can_connect (&server, &client);
     assert (!success);
@@ -497,7 +500,6 @@ zauth_test (bool verbose)
     //  Whitelist our address, which overrides the blacklist
     zsock_set_zap_domain (server, "global");
     zstr_sendx (auth, "ALLOW", "127.0.0.1", NULL);
-    zstr_sendx (auth, "WAIT", NULL);
     zsock_wait (auth);
     success = s_can_connect (&server, &client);
     assert (success);
@@ -517,7 +519,6 @@ zauth_test (bool verbose)
     zsock_set_plain_username (client, "admin");
     zsock_set_plain_password (client, "Password");
     zstr_sendx (auth, "PLAIN", TESTDIR "/password-file", NULL);
-    zstr_sendx (auth, "WAIT", NULL);
     zsock_wait (auth);
     success = s_can_connect (&server, &client);
     assert (success);
@@ -551,7 +552,6 @@ zauth_test (bool verbose)
         zsock_set_curve_server (server, 1);
         zsock_set_curve_serverkey (client, server_key);
         zstr_sendx (auth, "CURVE", CURVE_ALLOW_ANY, NULL);
-        zstr_sendx (auth, "WAIT", NULL);
         zsock_wait (auth);
         success = s_can_connect (&server, &client);
         assert (success);
@@ -563,7 +563,6 @@ zauth_test (bool verbose)
         zsock_set_curve_serverkey (client, server_key);
         zcert_save_public (client_cert, TESTDIR "/mycert.txt");
         zstr_sendx (auth, "CURVE", TESTDIR, NULL);
-        zstr_sendx (auth, "WAIT", NULL);
         zsock_wait (auth);
         success = s_can_connect (&server, &client);
         assert (success);
