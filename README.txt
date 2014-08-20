@@ -276,6 +276,16 @@ This is the class interface:
 
 .pull src/zlist.c@discuss,left
 
+#### zdlist - generic doubly linked list container
+
+.pull src/zdlist.c@header,left
+
+This is the class interface:
+
+.pull include/zdlist.h@interface,code
+
+.pull src/zdlist.c@discuss,left
+
 #### zloop - event-driven reactor
 
 .pull src/zloop.c@header,left

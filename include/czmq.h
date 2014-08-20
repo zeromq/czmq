@@ -41,6 +41,8 @@ typedef struct _zctx_t zctx_t;
 typedef struct _zdigest_t zdigest_t;
 typedef struct _zdir_t zdir_t;
 typedef struct _zdir_patch_t zdir_patch_t;
+typedef struct _zdlist_t zdlist_t;
+typedef struct _zdlist_node_t zdlist_node_t;
 typedef struct _zfile_t zfile_t;
 typedef struct _zframe_t zframe_t;
 typedef struct _zhash_t zhash_t;
@@ -69,6 +71,7 @@ typedef struct _zuuid_t zuuid_t;
 #include "zdigest.h"
 #include "zdir.h"
 #include "zdir_patch.h"
+#include "zdlist.h"
 #include "zfile.h"
 #include "zframe.h"
 #include "zgossip.h"
