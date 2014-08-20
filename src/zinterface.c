@@ -58,7 +58,8 @@ zinterface_new ()
             return NULL;
         }
         self->current_interface = NULL;
-        s_list_interfaces(self);
+        s_list_interfaces (self);
+        zinterface_first (self);
     }
 
     return self;
@@ -354,8 +355,8 @@ zinterface_test (bool verbose)
         if (zinterface_first (interfaces)) {
             do {
                 printf ("%s\t%s\t%s\t%s\n", zinterface_name (interfaces),
-                    zinterface_address (interfaces), zinterface_netmask(interfaces),
-                    zinterface_broadcast(interfaces));
+                    zinterface_address (interfaces), zinterface_netmask (interfaces),
+                    zinterface_broadcast (interfaces));
             } while (zinterface_next (interfaces));
         }
     }
