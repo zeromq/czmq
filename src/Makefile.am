@@ -43,6 +43,7 @@ include_HEADERS = \
     ../include/zctx.h \
     ../include/zmonitor_v2.h \
     ../include/zmutex.h \
+    ../include/zproxy_v2.h \
     ../include/zsocket.h \
     ../include/zsockopt.h \
     ../include/zthread.h
@@ -82,6 +83,7 @@ libczmq_la_SOURCES = \
     zctx.c \
     zmonitor_v2.c \
     zmutex.c \
+    zproxy_v2.c \
     zsocket.c \
     zsockopt.c \
     zthread.c

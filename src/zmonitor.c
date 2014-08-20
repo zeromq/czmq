@@ -18,38 +18,11 @@
     for sockets connecting or bound to ipc:// and tcp:// endpoints.
 @discuss
     This class wraps the ZMQ socket monitor API, see zmq_socket_monitor for
-    details. Currently this class requires libzmq v4.0 or later and is empty
-    on older versions of libzmq.
+    details. Works on all versions of libzmq from 3.2 onwards. This class
+    replaces zproxy_v2, and is meant for applications that use the CZMQ v3
+    API (meaning, zsock).
 @end
 */
-
-#include "../include/czmq.h"
-
-//  @interface
-//  Create new zmonitor actor instance.
-//
-//      zactor_t *monitor = zactor_new (zmonitor, NULL);
-//
-//  Destroy zmonitor instance.
-//
-//      zactor_destroy (&monitor);
-//
-//  Enable verbose logging of commands and activity.
-//
-//      zstr_sendx (monitor, "VERBOSE", NULL);
-//
-//  Listen to monitor event type:
-//
-//      zstr_sendx (monitor, "LISTEN", type, type, type, NULL);
-//
-//  Start monitor; after this, any further LISTEN commands are ignored.
-//
-//      zstr_sendx (monitor, "START", NULL);
-//
-//  Receive next monitor event:
-//
-//      zmsg_t *msg = zmsg_recv (monitor);
-
 
 #include "../include/czmq.h"
 
@@ -67,7 +40,7 @@ typedef struct {
 } self_t;
 
 static self_t *
-s_self_new (zsock_t *pipe, zsock_t *sock)
+s_self_new (zsock_t *pipe, void *sock)
 {
     self_t *self = (self_t *) zmalloc (sizeof (self_t));
     self->pipe = pipe;
@@ -296,9 +269,9 @@ s_self_handle_sink (self_t *self)
 //  zmonitor() implements the zmonitor actor interface
 
 void
-zmonitor (zsock_t *pipe, void *args)
+zmonitor (zsock_t *pipe, void *sock)
 {
-    self_t *self = s_self_new (pipe, (zsock_t *) args);
+    self_t *self = s_self_new (pipe, sock);
     //  Signal successful initialization
     zsock_signal (pipe, 0);
 

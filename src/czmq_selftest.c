@@ -71,10 +71,9 @@ int main (int argc, char *argv [])
     //  Deprecated V2 classes
     zauth_v2_test (verbose);
     zctx_test (verbose);
-#if (ZMQ_VERSION_MAJOR == 4)
     zmonitor_v2_test (verbose);
-#endif
     zmutex_test (verbose);
+    zproxy_v2_test (verbose);
     zsocket_test (verbose);
     zsockopt_test (verbose);
     zthread_test (verbose);
