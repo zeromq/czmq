@@ -8,33 +8,39 @@ zinterface - Information about network interfaces
 SYNOPSIS
 --------
 ----
-//  Return a list of available network interfaces. The interfaces remain
-//  valid while the list is not destroyed. If one interface is to be valid
-//  after destroyed, it must be duplicated, and then destroyed.
-CZMQ_EXPORT zlist_t *
-    zinterface_list ();
-
-//  Duplicate an interface
+//  Return a list of available network interfaces.
 CZMQ_EXPORT zinterface_t *
-    zinterface_dup (zinterface_t *self);
+    zinterface_new ();
 
-//  Destroy an interface
+//  Destroy a list of network interfaces
 CZMQ_EXPORT void
     zinterface_destroy (zinterface_t **self_p);
 
-//  Return the interface's name as a printable string
+//  Return the number of interfaces
+CZMQ_EXPORT size_t
+    zinterface_count (zinterface_t *self);
+
+//  Set the current interface to be the first one. Returns true if the list is not empty
+CZMQ_EXPORT bool
+    zinterface_first (zinterface_t *self);
+
+//  Advances the current interface. Returns false if there's no more items, true otherwise
+CZMQ_EXPORT bool
+    zinterface_next (zinterface_t *self);
+
+//  Return the current interface's name as a printable string
 CZMQ_EXPORT char *
     zinterface_name (zinterface_t *self);
 
-//  Return the interface's IP address as a printable string
+//  Return the current interface's IP address as a printable string
 CZMQ_EXPORT char *
     zinterface_address (zinterface_t *self);
 
-//  Return the interface's broadcast address as a printable string
+//  Return the current interface's broadcast address as a printable string
 CZMQ_EXPORT char *
     zinterface_broadcast (zinterface_t *self);
 
-//  Return the interface's network mask as a printable string
+//  Return the current interface's network mask as a printable string
 CZMQ_EXPORT char *
     zinterface_netmask (zinterface_t *self);
 
