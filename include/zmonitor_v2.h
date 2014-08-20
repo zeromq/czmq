@@ -14,14 +14,14 @@
 #ifndef __ZMONITOR_V2_H_INCLUDED__
 #define __ZMONITOR_V2_H_INCLUDED__
 
-//  This code needs backporting to work with ZMQ v3.2
-#if (ZMQ_VERSION_MAJOR == 4)
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 //  @interface
+//  This code needs backporting to work with ZMQ v3.2
+#if (ZMQ_VERSION_MAJOR == 4)
+
 //  Create a new socket monitor
 CZMQ_EXPORT zmonitor_t *
     zmonitor_new (zctx_t *ctx, void *socket, int events);
@@ -42,17 +42,15 @@ CZMQ_EXPORT void *
 //  Enable verbose tracing of commands and activity
 CZMQ_EXPORT void
     zmonitor_set_verbose (zmonitor_t *self, bool verbose);
+#endif          //  ZeroMQ 4.0 or later
 
 // Self test of this class
 CZMQ_EXPORT void
     zmonitor_v2_test (bool verbose);
-
 // @end
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif          //  ZeroMQ 4.0 or later
 
 #endif

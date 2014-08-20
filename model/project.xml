@@ -45,6 +45,7 @@
     <class name = "zctx" />
     <class name = "zmonitor_v2" />
     <class name = "zmutex" />
+    <class name = "zproxy_v2" />
     <class name = "zsocket" />
     <class name = "zsockopt" />
     <class name = "zthread" />

@@ -19,9 +19,9 @@ extern "C" {
 #endif
 
 //  @interface
-//  Create new zmonitor actor instance.
+//  Create new zmonitor actor instance to monitor a zsock_t socket:
 //
-//      zactor_t *monitor = zactor_new (zmonitor, NULL);
+//      zactor_t *monitor = zactor_new (zmonitor, mysocket);
 //
 //  Destroy zmonitor instance.
 //
@@ -57,9 +57,10 @@ extern "C" {
 //
 //      zmsg_t *msg = zmsg_recv (monitor);
 //
-//  This is the zmonitor constructor as a zactor_fn:
+//  This is the zmonitor constructor as a zactor_fn; the argument can be
+//  a zactor_t, zsock_t, or libzmq void * socket:
 CZMQ_EXPORT void
-    zmonitor (zsock_t *pipe, void *args);
+    zmonitor (zsock_t *pipe, void *sock);
 
 //  Selftest
 CZMQ_EXPORT void
