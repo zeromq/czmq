@@ -71,6 +71,7 @@ int main (int argc, char *argv [])
     zauth_test (verbose);
 
     //  Deprecated V2 classes
+    zsocket_test (verbose);
     zauth_v2_test (verbose);
     zctx_test (verbose);
     zmonitor_v2_test (verbose);
