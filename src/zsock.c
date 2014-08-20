@@ -782,6 +782,7 @@ zsock_test (bool verbose)
        assert(rc3 == 0);
        zsock_destroy(&arr[i3]);
     }
+    zsock_destroy(&arr[6]); // The last socket didn't get bound, but it does need to get destroyed when done!
     for (i3=0; i3 < 7; i3++) {
        int rc3;
        arr2[i3] = zsock_new(ZMQ_REP);
@@ -800,6 +801,7 @@ zsock_test (bool verbose)
        }
        zsock_destroy(&arr2[i3]);
     }
+    zsock_destroy(&arr2[6]); // The last socket didn't get bound, but it does need to get destroyed when done!
 
 
     //  Test zsock_attach method
