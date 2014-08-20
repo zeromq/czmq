@@ -1211,6 +1211,7 @@ zsys_set_interface (const char *value)
 {
     zsys_init ();
     free (s_interface);
+    zsys_info ("zsys: set interface to %s", value);
     s_interface = strdup (value);
 }
 
