@@ -463,29 +463,33 @@ s_get_interface (agent_t *self)
         self->address.sin_addr.s_addr = INADDR_ANY;
     }
     else {
-        zlist_t *interfaces = zinterface_list ();
-        zinterface_t *iface = zlist_first (interfaces);
-        if (strlen (zsys_interface ()) != 0) {
-            while (iface) {
-                if (streq (zinterface_name(iface), zsys_interface ()))
+        zinterface_t *interfaces = zinterface_new ();
+        bool found = false;
+        if (strlen (zsys_interface ()) != 0 && zinterface_first (interfaces)) {
+            do {
+                if (streq (zinterface_name (interfaces), zsys_interface ())) {
+                    found = true;
                     break;
-                iface = zlist_next (interfaces);
-            }
+                }
+            } while (zinterface_next (interfaces));
         }
-        if (iface) {
+        else
+            found = zinterface_count (interfaces) > 0;
+
+        if (found) {
             // Using inet_addr instead of inet_aton or inet_atop because these are
             // not supported in Win XP
             self->broadcast.sin_family = AF_INET;
-            self->broadcast.sin_addr.s_addr = inet_addr (zinterface_broadcast (iface));
+            self->broadcast.sin_addr.s_addr = inet_addr (zinterface_broadcast (interfaces));
             self->broadcast.sin_port = htons (self->port_nbr);
 
             self->address = self->broadcast;
-            self->address.sin_addr.s_addr = inet_addr (zinterface_address (iface));
+            self->address.sin_addr.s_addr = inet_addr (zinterface_address (interfaces));
         }
         else
             zsys_error ("No adapter found or ZSYS_INTERFACE not equal to any adapter friendly name");
         
-        zlist_destroy(&interfaces);
+        zinterface_destroy(&interfaces);
     }
 }
 
