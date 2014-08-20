@@ -474,7 +474,7 @@ s_get_interface (agent_t *self)
             } while (zinterface_next (interfaces));
         }
         else
-            found = zinterface_count (interfaces) > 0;
+            found = zinterface_first (interfaces);
 
         if (found) {
             // Using inet_addr instead of inet_aton or inet_atop because these are
