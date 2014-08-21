@@ -51,6 +51,8 @@ typedef struct _zrex_t zrex_t;
 typedef struct _zring_t zring_t;
 typedef struct _zring_node_t zring_node_t;
 typedef struct _zsock_t zsock_t;
+typedef struct _ztimeout_t ztimeout_t;
+typedef struct _ztimeout_node_t ztimeout_node_t;
 typedef struct _zuuid_t zuuid_t;
 //  Deprecated V2 classes, remove some time after 3.0 stability
 typedef struct _zauth_t zauth_t;
@@ -101,6 +103,7 @@ typedef int (czmq_comparator) (const void *item1, const void *item2);
 #include "zsock_option.h"
 #include "zstr.h"
 #include "zsys.h"
+#include "ztimeout.h"
 #include "zuuid.h"
 
 //  Deprecated V2 classes, remove some time after 3.0 stability
