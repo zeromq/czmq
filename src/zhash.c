@@ -731,7 +731,7 @@ zhash_pack (zhash_t *self)
     zframe_t *frame = zframe_new (NULL, frame_size);
     byte *needle = zframe_data (frame);
     //  Store size as number-4
-    *(uint32_t *) needle = htonl (self->size);
+    *(uint32_t *) needle = htonl ((uint32_t) self->size);
     needle += 4;
     for (index = 0; index < limit; index++) {
         item_t *item = self->items [index];
