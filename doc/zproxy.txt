@@ -149,7 +149,10 @@ EXAMPLE
     assert (streq (world, "World"));
     zstr_free (&hello);
     zstr_free (&world);
-    
+
+    zsock_destroy (&faucet);
+    zsock_destroy (&sink);
+    zsock_destroy (&capture);
     zactor_destroy (&proxy);
 ----
 

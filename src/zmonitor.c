@@ -72,6 +72,7 @@ s_self_destroy (self_t **self_p)
 static void
 s_self_listen (self_t *self, const char *event)
 {
+#if defined (ZMQ_EVENT_ALL)
     if (streq (event, "CONNECTED"))
         self->events |= ZMQ_EVENT_CONNECTED;
     else
@@ -111,6 +112,7 @@ s_self_listen (self_t *self, const char *event)
         self->events |= ZMQ_EVENT_ALL;
     else
         zsys_warning ("zmonitor: - invalid listen event=%s", event);
+#endif
 }
 
 
