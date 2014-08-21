@@ -70,12 +70,12 @@ s_create_socket (char *type_name, char *endpoints)
     char *type_names [] = {
         "PAIR", "PUB", "SUB", "REQ", "REP",
         "DEALER", "ROUTER", "PULL", "PUSH",
-        "XPUB", "XSUB", "STREAM", type_name
+        "XPUB", "XSUB", type_name
     };
     //  We always match type at least at end of table
     int index;
     for (index = 0; strneq (type_name, type_names [index]); index++);
-    if (index > ZMQ_STREAM) {
+    if (index > ZMQ_XSUB) {
         zsys_error ("zproxy: invalid socket type '%s'", type_name);
         return NULL;
     }
