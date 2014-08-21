@@ -71,7 +71,7 @@ zinterface_new ()
 static void
 s_freefn (void *ptr)
 {
-    zinterface_item_t *self = ptr;
+    zinterface_item_t *self = (zinterface_item_t *) ptr;
     free (self->address);
     free (self->netmask);
     free (self->broadcast);
@@ -242,7 +242,7 @@ zinterface_item_t *
 s_zinterface_item_new (char *name, inaddr_t address, inaddr_t netmask, inaddr_t broadcast)
 {
     assert (name);
-    zinterface_item_t *self = zmalloc ( sizeof(struct _zinterface_item_t));
+    zinterface_item_t *self = (zinterface_item_t *) zmalloc (sizeof(struct _zinterface_item_t));
     
     assert (self);
     self->name      = strdup (name);
@@ -287,7 +287,7 @@ bool
 zinterface_first (zinterface_t *self)
 {
     assert (self);
-    self->current_interface = zlist_first (self->interfaces);
+    self->current_interface = (zinterface_item_t *) zlist_first (self->interfaces);
     return self->current_interface != NULL;
 }
 
@@ -297,7 +297,7 @@ bool
 zinterface_next (zinterface_t *self)
 {
     assert (self);
-    self->current_interface = zlist_next (self->interfaces);
+    self->current_interface = (zinterface_item_t *) zlist_next (self->interfaces);
     return self->current_interface != NULL;
 }
 
