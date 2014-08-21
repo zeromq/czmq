@@ -41,24 +41,25 @@ struct _zdlist_t {
     zdlist_node_t *cursor;      //  Current node for iteration
     size_t size;                //  Number of items in list
     zdlist_free_fn *free_fn;    //  Callback to destroy an item
+    zdlist_dup_fn *dup_fn;      //  Callback to duplicate an item
 };
 
 
+// //  --------------------------------------------------------------------------
+// //  Simple free_fn function that calls free
+// 
+// void
+// zdlist_item_destroy (void **item)
+// {
+//     free (*item);
+//     *item = NULL;
+// }
+// 
 //  --------------------------------------------------------------------------
-//  Simple free_fn function that calls free
-
-void
-zdlist_item_destroy (void **item)
-{
-    free (*item);
-    *item = NULL;
-}
-
-//  --------------------------------------------------------------------------
-//  Node initializer
+//  Initialize a list node
 
 static void
-s_zdlist_node_init (
+s_node_init (
     zdlist_node_t *node,
     zdlist_node_t *next,
     zdlist_node_t *prev,
@@ -72,28 +73,21 @@ s_zdlist_node_init (
 
 //  --------------------------------------------------------------------------
 //  Create a new list container
-//  TODO: other containers have a free_fn per item. Setting one per container
-//  is a nice idea, but should this not be done with an explicit method,
-//  rather than an argument to the constructor? Is there something special
-//  about zdlist that makes it different from zhash and zlist? I'd rather
-//  see consistent methods across containers, e.g. zhash_set_free_fn ()
-//  -- PH 2014/08/21
 
 zdlist_t *
-zdlist_new (zdlist_free_fn free_fn)
+zdlist_new (void)
 {
     zdlist_t *self = (zdlist_t *) zmalloc (sizeof (zdlist_t));
     if (self) {
-        s_zdlist_node_init(&self->head, &self->head, &self->head, NULL);
+        s_node_init (&self->head, &self->head, &self->head, NULL);
         self->cursor = &self->head;
-        self->free_fn = free_fn;
     }
     return self;
 }
 
 
 //  --------------------------------------------------------------------------
-//  List destructor
+//  Destroy a list container
 
 void
 zdlist_destroy (zdlist_t **self_p)
@@ -165,12 +159,13 @@ zdlist_last (zdlist_t *self)
 
 //  --------------------------------------------------------------------------
 //  Return the previous item. If the list is empty, returns NULL. To move to
-//  the end of the list call zdlist_last (). Advances the cursor backwards.
+//  the end of the list call zdlist_last (). Moves the cursor backwards.
 
 void *
 zdlist_prev (zdlist_t *self)
 {
     assert (self);
+    //  TODO: why is this code asymmetric from zdlist_next?
     zdlist_node_t *node = self->cursor;
     self->cursor = self->cursor->prev;
     if (node != &self->head)
@@ -222,10 +217,9 @@ zdlist_append (zdlist_t *self, void *item)
     if (!node)
         return NULL;
 
-    s_zdlist_node_init (node, &self->head, self->head.prev, item);
+    s_node_init (node, &self->head, self->head.prev, item);
     self->head.prev->next = node;
     self->head.prev = node;
-    
     self->size++;
     return node;
 }
@@ -238,15 +232,15 @@ zdlist_append (zdlist_t *self, void *item)
 zdlist_node_t *
 zdlist_push (zdlist_t *self, void *item)
 {
+    assert (self);
     zdlist_node_t *node;
     node = (zdlist_node_t *) zmalloc (sizeof (zdlist_node_t));
     if (!node)
         return NULL;
 
-    s_zdlist_node_init(node, self->head.next, &self->head, item);
+    s_node_init (node, self->head.next, &self->head, item);
     self->head.next->prev = node;
     self->head.next = node;
-    
     self->size++;
     return node;
 }
@@ -282,6 +276,7 @@ zdlist_pop (zdlist_t *self)
 void
 zdlist_remove (zdlist_t *self, zdlist_node_t **node_p)
 {
+    assert (self);
     assert (node_p);
     zdlist_node_t *node = *node_p;
     assert (node);
@@ -297,34 +292,6 @@ zdlist_remove (zdlist_t *self, zdlist_node_t **node_p)
     self->size--;
 }
 
-//  --------------------------------------------------------------------------
-//  Make a copy of list using the dup callback if any to duplicate each item.
-//  The new list will use the new free_fn function to destroy items in the
-//  future.
-
-zdlist_t *
-zdlist_dup (zdlist_t *self, zdlist_dup_fn dup, zdlist_free_fn free_fn)
-{
-    if (!self)
-        return NULL;
-
-    zdlist_t *copy = zdlist_new (free_fn);
-
-    if (copy) {
-        zdlist_node_t *node;
-        for (node = self->head.next; node != &self->head; node = node->next) {
-            void *item = node->item;
-            if (dup)
-                item = dup (item);
-            if (zdlist_append (copy, item) == NULL) {
-                zdlist_destroy (&copy);
-                break;
-            }
-        }
-    }
-    return copy;
-}
-
 
 //  --------------------------------------------------------------------------
 //  Return the number of items in the list
@@ -332,7 +299,62 @@ zdlist_dup (zdlist_t *self, zdlist_dup_fn dup, zdlist_free_fn free_fn)
 size_t
 zdlist_size (zdlist_t *self)
 {
+    assert (self);
     return self->size;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set a user-defined deallocator for list items; by default items are not
+//  freed when the list is destroyed.
+
+void
+zdlist_set_free_fn (zdlist_t *self, zdlist_free_fn free_fn)
+{
+    assert (self);
+    self->free_fn = free_fn;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set a user-defined duplicator for list items; by default items are not
+//  copied when the list is duplicated.
+
+void
+zdlist_set_dup_fn (zdlist_t *self, zdlist_dup_fn dup_fn)
+{
+    assert (self);
+    self->dup_fn = dup_fn;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Make a copy of the list; items are duplicated if you set a duplicator
+//  for the list.
+
+zdlist_t *
+zdlist_dup (zdlist_t *self)
+{
+    //  Duplicating a null reference returns a null reference
+    if (!self)
+        return NULL;
+
+    zdlist_t *copy = zdlist_new ();
+    if (copy) {
+        copy->free_fn = self->free_fn;
+        copy->dup_fn = self->dup_fn;
+        zdlist_node_t *node;
+        for (node = self->head.next; node != &self->head; node = node->next) {
+            void *item = node->item;
+            if (self->dup_fn)
+                item = self->dup_fn (item);
+            if (zdlist_append (copy, item) == NULL) {
+                zdlist_destroy (&copy);
+                break;
+            }
+        }
+    }
+    return copy;
 }
 
 
@@ -345,7 +367,7 @@ zdlist_test (int verbose)
     printf (" * zdlist: ");
 
     //  @selftest
-    zdlist_t *list = zdlist_new (NULL);
+    zdlist_t *list = zdlist_new ();
     assert (list);
     assert (zdlist_size (list) == 0);
 
@@ -408,11 +430,11 @@ zdlist_test (int verbose)
     assert (zdlist_size (list) == 3);
     assert (zdlist_first (list) == bread);
 
-    zdlist_t *dup_list = zdlist_dup (list, NULL, NULL);
+    zdlist_t *dup_list = zdlist_dup (list);
     assert (dup_list);
     assert (zdlist_size (dup_list) == 3);
 
-    zdlist_t *list_list = zdlist_new ((zdlist_free_fn *) zdlist_destroy);
+    zdlist_t *list_list = zdlist_new ();
     zdlist_push (list_list, list);
     zdlist_push (list_list, dup_list);
     assert (zdlist_size (list_list) == 2);
