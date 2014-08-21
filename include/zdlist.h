@@ -19,18 +19,9 @@ extern "C" {
 #endif
 
 //  @interface
-//  Dup function for zdlist items
-typedef void * (zdlist_dup_fn) (void *item);
-
-//  Free function for zdlist items
-typedef void (zdlist_free_fn) (void **item);
-
-//  Simple free_fn function that calls free
-zdlist_free_fn zdlist_item_destroy;
-    
 //  Create a new list container
 CZMQ_EXPORT zdlist_t *
-    zdlist_new (zdlist_free_fn free_fn);
+    zdlist_new (void);
 
 //  Destroy a list container
 CZMQ_EXPORT void
@@ -76,15 +67,26 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void
     zdlist_remove (zdlist_t *self, zdlist_node_t **node_p);
 
-//  Make a copy of list using the dup callback if any to duplicate each item.
-//  The new list will use the new free_fn function to destroy items in the
-//  future.
-CZMQ_EXPORT zdlist_t *
-    zdlist_dup (zdlist_t *self, zdlist_dup_fn dup, zdlist_free_fn free_fn);
-
 //  Return number of items in the list
 CZMQ_EXPORT size_t
     zdlist_size (zdlist_t *self);
+
+//  Set a user-defined deallocator for list items; by default items are not
+//  freed when the list is destroyed.
+typedef void (zdlist_free_fn) (void **item);
+CZMQ_EXPORT void
+    zdlist_set_free_fn (zdlist_t *self, zdlist_free_fn free_fn);
+
+//  Set a user-defined duplicator for list items; by default items are not
+//  copied when the list is duplicated.
+typedef void * (zdlist_dup_fn) (void *item);
+CZMQ_EXPORT void
+    zdlist_set_dup_fn (zdlist_t *self, zdlist_dup_fn dup_fn);
+
+//  Make a copy of the list; items are duplicated if you set a duplicator
+//  for the list.
+CZMQ_EXPORT zdlist_t *
+    zdlist_dup (zdlist_t *self);
 
 //  Self test of this class
 CZMQ_EXPORT void
