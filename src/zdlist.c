@@ -37,10 +37,10 @@ struct _zdlist_node_t {
 //  Structure of our class
 
 struct _zdlist_t {
-    zdlist_node_t head;		//  Dummy node acting as head in list
-    zdlist_node_t *cursor;	//  Current node for iteration
+    zdlist_node_t head;         //  Dummy node acting as head in list
+    zdlist_node_t *cursor;      //  Current node for iteration
     size_t size;                //  Number of items in list
-    zdlist_free_fn *free_fn;	//  Callback to destroy an item
+    zdlist_free_fn *free_fn;    //  Callback to destroy an item
 };
 
 
@@ -48,9 +48,9 @@ struct _zdlist_t {
 //  Simple free_fn function that calls free
 
 void
-zdlist_item_destroy(void **item)
+zdlist_item_destroy (void **item)
 {
-    free(*item);
+    free (*item);
     *item = NULL;
 }
 
@@ -58,8 +58,11 @@ zdlist_item_destroy(void **item)
 //  Node initializer
 
 static void
-s_zdlist_node_init(zdlist_node_t *node, zdlist_node_t *next,
-                   zdlist_node_t *prev, void *item)
+s_zdlist_node_init (
+    zdlist_node_t *node,
+    zdlist_node_t *next,
+    zdlist_node_t *prev,
+    void *item)
 {
     node->next = next;
     node->prev = prev;
@@ -68,7 +71,13 @@ s_zdlist_node_init(zdlist_node_t *node, zdlist_node_t *next,
 
 
 //  --------------------------------------------------------------------------
-//  List constructor
+//  Create a new list container
+//  TODO: other containers have a free_fn per item. Setting one per container
+//  is a nice idea, but should this not be done with an explicit method,
+//  rather than an argument to the constructor? Is there something special
+//  about zdlist that makes it different from zhash and zlist? I'd rather
+//  see consistent methods across containers, e.g. zhash_set_free_fn ()
+//  -- PH 2014/08/21
 
 zdlist_t *
 zdlist_new (zdlist_free_fn free_fn)
@@ -213,7 +222,7 @@ zdlist_append (zdlist_t *self, void *item)
     if (!node)
         return NULL;
 
-    s_zdlist_node_init(node, &self->head, self->head.prev, item);
+    s_zdlist_node_init (node, &self->head, self->head.prev, item);
     self->head.prev->next = node;
     self->head.prev = node;
     
@@ -275,7 +284,7 @@ zdlist_remove (zdlist_t *self, zdlist_node_t **node_p)
 {
     assert (node_p);
     zdlist_node_t *node = *node_p;
-    assert(node);
+    assert (node);
     
     node->next->prev = node->prev;
     node->prev->next = node->next;
@@ -306,7 +315,7 @@ zdlist_dup (zdlist_t *self, zdlist_dup_fn dup, zdlist_free_fn free_fn)
         for (node = self->head.next; node != &self->head; node = node->next) {
             void *item = node->item;
             if (dup)
-                item = dup(item);
+                item = dup (item);
             if (zdlist_append (copy, item) == NULL) {
                 zdlist_destroy (&copy);
                 break;
@@ -403,7 +412,7 @@ zdlist_test (int verbose)
     assert (dup_list);
     assert (zdlist_size (dup_list) == 3);
 
-    zdlist_t *list_list = zdlist_new ((zdlist_free_fn*)zdlist_destroy);
+    zdlist_t *list_list = zdlist_new ((zdlist_free_fn *) zdlist_destroy);
     zdlist_push (list_list, list);
     zdlist_push (list_list, dup_list);
     assert (zdlist_size (list_list) == 2);
