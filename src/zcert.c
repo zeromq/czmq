@@ -348,8 +348,8 @@ void
 zcert_apply (zcert_t *self, void *zocket)
 {
     assert (self);
-    void *handle = zsock_resolve (zocket);
 #if (ZMQ_VERSION_MAJOR == 4)
+    void *handle = zsock_resolve (zocket);
     if (zsys_has_curve ()) {
         zsocket_set_curve_secretkey_bin (handle, self->secret_key);
         zsocket_set_curve_publickey_bin (handle, self->public_key);
