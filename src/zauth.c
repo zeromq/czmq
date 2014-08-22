@@ -414,7 +414,7 @@ zauth (zsock_t *pipe, void *unused)
     zsock_signal (pipe, 0);
 
     while (!self->terminated) {
-        zsock_t *which = zpoller_wait (self->poller, -1);
+        zsock_t *which = (zsock_t*)zpoller_wait (self->poller, -1);
         if (which == self->pipe)
             s_self_handle_pipe (self);
         else
