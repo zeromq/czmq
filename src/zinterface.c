@@ -275,7 +275,7 @@ zinterface_destroy (zinterface_t **self_p)
 //  --------------------------------------------------------------------------
 //  Return the number of interfaces
 size_t
-zinterface_count (zinterface_t *self)
+zinterface_size (zinterface_t *self)
 {
     assert (self);
     return zlist_size (self->interfaces);
@@ -351,7 +351,7 @@ zinterface_test (bool verbose)
     assert (interfaces);
 
     if (verbose) {
-        printf ("Len: %zu\n", zinterface_count (interfaces));
+        printf ("Len: %zu\n", zinterface_size (interfaces));
         if (zinterface_first (interfaces)) {
             do {
                 printf ("%s\t%s\t%s\t%s\n", zinterface_name (interfaces),
