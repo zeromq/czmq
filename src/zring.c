@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zdlist - generic type-free doubly linked list container
+    zring - generic type-free doubly linked ring container
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -13,18 +13,18 @@
 
 /*
 @header
-    Provides a generic container implementing a fast doubly-linked list. You
-    can use this to construct multi-dimensional lists, and other structures
-    together with other generic containers like zhash.
+    Provides a generic container implementing a fast doubly-linked list, aka
+    a ring. You can use this to construct multi-dimensional rings, and other
+    structures together with other generic containers like zhash.
 @discuss
-    To iterate through a list, use zdlist_first to get the first item, then
-    loop while not null, and do zdlist_next at the end of each iteration.
+    To iterate through a ring, use zring_first to get the first item, then
+    loop while not null, and do zring_next at the end of each iteration.
 @end
 */
 
 #include "../include/czmq.h"
 
-//  List node, used internally only
+//  Ring node, used internally only
 
 typedef struct _node_t {
     struct _node_t *next;
@@ -35,17 +35,17 @@ typedef struct _node_t {
 //  ---------------------------------------------------------------------
 //  Structure of our class
 
-struct _zdlist_t {
-    node_t head;         //  Dummy node acting as head in list
+struct _zring_t {
+    node_t head;         //  Dummy node acting as head in ring
     node_t *cursor;      //  Current node for iteration
-    size_t size;                //  Number of items in list
-    zdlist_free_fn *free_fn;    //  Callback to destroy an item
-    zdlist_dup_fn *dup_fn;      //  Callback to duplicate an item
+    size_t size;                //  Number of items in ring
+    zring_free_fn *free_fn;    //  Callback to destroy an item
+    zring_dup_fn *dup_fn;      //  Callback to duplicate an item
 };
 
 
 //  --------------------------------------------------------------------------
-//  Initialize a list node
+//  Initialize a ring node
 
 static void
 s_node_init (
@@ -61,12 +61,12 @@ s_node_init (
 
 
 //  --------------------------------------------------------------------------
-//  Create a new list container
+//  Create a new ring container (a ring is a doubly-linked ring)
 
-zdlist_t *
-zdlist_new (void)
+zring_t *
+zring_new (void)
 {
-    zdlist_t *self = (zdlist_t *) zmalloc (sizeof (zdlist_t));
+    zring_t *self = (zring_t *) zmalloc (sizeof (zring_t));
     if (self) {
         s_node_init (&self->head, &self->head, &self->head, NULL);
         self->cursor = &self->head;
@@ -76,14 +76,14 @@ zdlist_new (void)
 
 
 //  --------------------------------------------------------------------------
-//  Destroy a list container
+//  Destroy a ring container
 
 void
-zdlist_destroy (zdlist_t **self_p)
+zring_destroy (zring_t **self_p)
 {
     assert (self_p);
     if (*self_p) {
-        zdlist_t *self = *self_p;
+        zring_t *self = *self_p;
         node_t *node = self->head.next;
         while (node != &self->head) {
             node_t *next = node->next;
@@ -99,38 +99,38 @@ zdlist_destroy (zdlist_t **self_p)
 
 
 //  --------------------------------------------------------------------------
-//  Return the item at the head of list. If the list is empty, returns NULL.
-//  Leaves cursor pointing at the head item, or NULL if the list is empty.
+//  Return the item at the head of ring. If the ring is empty, returns NULL.
+//  Leaves cursor pointing at the head item, or NULL if the ring is empty.
 
 void *
-zdlist_first (zdlist_t *self)
+zring_first (zring_t *self)
 {
     assert (self);
     self->cursor = &self->head;
-    return zdlist_next (self);
+    return zring_next (self);
 }
 
 
 //  --------------------------------------------------------------------------
-//  Return the item at the tail of list. If the list is empty, returns NULL.
-//  Leaves cursor pointing at the tail item, or NULL if the list is empty.
+//  Return the item at the tail of ring. If the ring is empty, returns NULL.
+//  Leaves cursor pointing at the tail item, or NULL if the ring is empty.
 
 void *
-zdlist_last (zdlist_t *self)
+zring_last (zring_t *self)
 {
     assert (self);
     self->cursor = &self->head;
-    return zdlist_prev (self);
+    return zring_prev (self);
 }
 
 
 //  --------------------------------------------------------------------------
-//  Return the next item. At the end of the list (or in an empty list),
-//  returns NULL. Use repeated zdlist_next () calls to work through the list
-//  from zdlist_first ().
+//  Return the next item. At the end of the ring (or in an empty ring),
+//  returns NULL. Use repeated zring_next () calls to work through the ring
+//  from zring_first ().
 
 void *
-zdlist_next (zdlist_t *self)
+zring_next (zring_t *self)
 {
     assert (self);
     self->cursor = self->cursor->next;
@@ -142,12 +142,12 @@ zdlist_next (zdlist_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Return the previous item. At the start of the list (or in an empty list),
-//  returns NULL. Use repeated zdlist_prev () calls to work through the list
-//  backwards from zdlist_last ().
+//  Return the previous item. At the start of the ring (or in an empty ring),
+//  returns NULL. Use repeated zring_prev () calls to work through the ring
+//  backwards from zring_last ().
 
 void *
-zdlist_prev (zdlist_t *self)
+zring_prev (zring_t *self)
 {
     assert (self);
     self->cursor = self->cursor->prev;
@@ -159,10 +159,10 @@ zdlist_prev (zdlist_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Append an item to the end of the list, return 0 if OK, else -1.
+//  Append an item to the end of the ring, return 0 if OK, else -1.
 
 int
-zdlist_append (zdlist_t *self, void *item)
+zring_append (zring_t *self, void *item)
 {
     assert (self);
     node_t *node = (node_t *) zmalloc (sizeof (node_t));
@@ -178,10 +178,10 @@ zdlist_append (zdlist_t *self, void *item)
 
 
 //  --------------------------------------------------------------------------
-//  Push an item to the start of the list, return 0 if OK, else -1.
+//  Push an item to the start of the ring, return 0 if OK, else -1.
 
 int
-zdlist_push (zdlist_t *self, void *item)
+zring_push (zring_t *self, void *item)
 {
     assert (self);
     node_t *node = (node_t *) zmalloc (sizeof (node_t));
@@ -197,27 +197,27 @@ zdlist_push (zdlist_t *self, void *item)
 
 
 //  --------------------------------------------------------------------------
-//  Pop and destroy item off the start of the list, if any. Sets cursor to
-//  first remaining item in list.
+//  Pop and destroy item off the start of the ring, if any. Sets cursor to
+//  first remaining item in ring.
 //  
 //  TODO: can't really mix this with returning a value, if we're using
 //  free_fn, as that will return deallocated values. Thus I removed the
 //  return value. Ditto for _remove. -- PH 2014/08/21
 
 void
-zdlist_pop (zdlist_t *self)
+zring_pop (zring_t *self)
 {
-    zdlist_first (self);
-    zdlist_remove (self);
+    zring_first (self);
+    zring_remove (self);
 }
 
 
 //  --------------------------------------------------------------------------
-//  Remove the current item from the list (as set by first/last/next/prev
+//  Remove the current item from the ring (as set by first/last/next/prev
 //  calls). Sets the cursor to the next node. 
 
 void
-zdlist_remove (zdlist_t *self)
+zring_remove (zring_t *self)
 {
     assert (self);
     if (self->cursor != &self->head) {
@@ -237,17 +237,17 @@ zdlist_remove (zdlist_t *self)
 //  Insert an item after cursor, return 0 if OK, else -1.
 
 int
-zdlist_insert (zdlist_t *self, void *item)
+zring_insert (zring_t *self, void *item)
 {
     return -1;          //  TODO
 }
 
 
 //  --------------------------------------------------------------------------
-//  Return the number of items in the list
+//  Return the number of items in the ring
 
 size_t
-zdlist_size (zdlist_t *self)
+zring_size (zring_t *self)
 {
     assert (self);
     return self->size;
@@ -255,11 +255,11 @@ zdlist_size (zdlist_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Set a user-defined deallocator for list items; by default items are not
-//  freed when the list is destroyed.
+//  Set a user-defined deallocator for ring items; by default items are not
+//  freed when the ring is destroyed.
 
 void
-zdlist_set_free_fn (zdlist_t *self, zdlist_free_fn free_fn)
+zring_set_free_fn (zring_t *self, zring_free_fn free_fn)
 {
     assert (self);
     self->free_fn = free_fn;
@@ -267,11 +267,11 @@ zdlist_set_free_fn (zdlist_t *self, zdlist_free_fn free_fn)
 
 
 //  --------------------------------------------------------------------------
-//  Set a user-defined duplicator for list items; by default items are not
-//  copied when the list is duplicated.
+//  Set a user-defined duplicator for ring items; by default items are not
+//  copied when the ring is duplicated.
 
 void
-zdlist_set_dup_fn (zdlist_t *self, zdlist_dup_fn dup_fn)
+zring_set_dup_fn (zring_t *self, zring_dup_fn dup_fn)
 {
     assert (self);
     self->dup_fn = dup_fn;
@@ -279,17 +279,17 @@ zdlist_set_dup_fn (zdlist_t *self, zdlist_dup_fn dup_fn)
 
 
 //  --------------------------------------------------------------------------
-//  Make a copy of the list; items are duplicated if you set a duplicator
-//  for the list.
+//  Make a copy of the ring; items are duplicated if you set a duplicator
+//  for the ring.
 
-zdlist_t *
-zdlist_dup (zdlist_t *self)
+zring_t *
+zring_dup (zring_t *self)
 {
     //  Duplicating a null reference returns a null reference
     if (!self)
         return NULL;
 
-    zdlist_t *copy = zdlist_new ();
+    zring_t *copy = zring_new ();
     if (copy) {
         copy->free_fn = self->free_fn;
         copy->dup_fn = self->dup_fn;
@@ -298,8 +298,8 @@ zdlist_dup (zdlist_t *self)
             void *item = node->item;
             if (self->dup_fn)
                 item = self->dup_fn (item);
-            if (zdlist_append (copy, item)) {
-                zdlist_destroy (&copy);
+            if (zring_append (copy, item)) {
+                zring_destroy (&copy);
                 break;
             }
         }
@@ -312,80 +312,80 @@ zdlist_dup (zdlist_t *self)
 //  Runs selftest of class
 
 void
-zdlist_test (int verbose)
+zring_test (int verbose)
 {
-    printf (" * zdlist: ");
+    printf (" * zring: ");
 
     //  @selftest
-    zdlist_t *list = zdlist_new ();
-    assert (list);
-    assert (zdlist_size (list) == 0);
+    zring_t *ring = zring_new ();
+    assert (ring);
+    assert (zring_size (ring) == 0);
 
     //  Three items we'll use as test data
-    //  List items are void *, not particularly strings
+    //  Ring items are void *, not particularly strings
     char *cheese = "boursin";
     char *bread = "baguette";
     char *wine = "bordeaux";
 
-    int rc = zdlist_append (list, cheese);
+    int rc = zring_append (ring, cheese);
     assert (!rc);
-    assert (zdlist_size (list) == 1);
-    rc = zdlist_append (list, bread);
+    assert (zring_size (ring) == 1);
+    rc = zring_append (ring, bread);
     assert (!rc);
-    assert (zdlist_size (list) == 2);
-    rc = zdlist_append (list, wine);
+    assert (zring_size (ring) == 2);
+    rc = zring_append (ring, wine);
     assert (!rc);
-    assert (zdlist_size (list) == 3);
+    assert (zring_size (ring) == 3);
 
-    assert (zdlist_next (list) == cheese);
-    assert (zdlist_first (list) == cheese);
-    assert (zdlist_next (list) == bread);
-    assert (zdlist_next (list) == wine);
-    assert (zdlist_next (list) == NULL);
-    //  After we reach end of list, next wraps around
-    assert (zdlist_next (list) == cheese);
+    assert (zring_next (ring) == cheese);
+    assert (zring_first (ring) == cheese);
+    assert (zring_next (ring) == bread);
+    assert (zring_next (ring) == wine);
+    assert (zring_next (ring) == NULL);
+    //  After we reach end of ring, next wraps around
+    assert (zring_next (ring) == cheese);
     
-    assert (zdlist_last (list) == wine);
-    assert (zdlist_prev (list) == bread);
-    assert (zdlist_prev (list) == cheese);
-    assert (zdlist_prev (list) == NULL);
-    //  After we reach start of list, prev wraps around
-    assert (zdlist_prev (list) == wine);
+    assert (zring_last (ring) == wine);
+    assert (zring_prev (ring) == bread);
+    assert (zring_prev (ring) == cheese);
+    assert (zring_prev (ring) == NULL);
+    //  After we reach start of ring, prev wraps around
+    assert (zring_prev (ring) == wine);
 
-    assert (zdlist_first (list) == cheese);
-    zdlist_remove (list);
-    assert (zdlist_size (list) == 2);
-    assert (zdlist_first (list) == bread);
-    zdlist_remove (list);
-    assert (zdlist_size (list) == 1);
-    assert (zdlist_first (list) == wine);
-    zdlist_remove (list);
-    assert (zdlist_size (list) == 0);
-    assert (zdlist_first (list) == NULL);
+    assert (zring_first (ring) == cheese);
+    zring_remove (ring);
+    assert (zring_size (ring) == 2);
+    assert (zring_first (ring) == bread);
+    zring_remove (ring);
+    assert (zring_size (ring) == 1);
+    assert (zring_first (ring) == wine);
+    zring_remove (ring);
+    assert (zring_size (ring) == 0);
+    assert (zring_first (ring) == NULL);
 
-    rc = zdlist_push (list, cheese);
+    rc = zring_push (ring, cheese);
     assert (!rc);
-    assert (zdlist_size (list) == 1);
-    assert (zdlist_first (list) == cheese);
+    assert (zring_size (ring) == 1);
+    assert (zring_first (ring) == cheese);
 
-    rc = zdlist_push (list, bread);
+    rc = zring_push (ring, bread);
     assert (!rc);
-    assert (zdlist_size (list) == 2);
-    assert (zdlist_first (list) == bread);
+    assert (zring_size (ring) == 2);
+    assert (zring_first (ring) == bread);
 
-    rc = zdlist_append (list, wine);
+    rc = zring_append (ring, wine);
     assert (!rc);
-    assert (zdlist_size (list) == 3);
-    assert (zdlist_first (list) == bread);
+    assert (zring_size (ring) == 3);
+    assert (zring_first (ring) == bread);
 
-    zdlist_t *dup_list = zdlist_dup (list);
-    assert (dup_list);
-    assert (zdlist_size (dup_list) == 3);
+    zring_t *dup_ring = zring_dup (ring);
+    assert (dup_ring);
+    assert (zring_size (dup_ring) == 3);
 
     //  Destructor should be safe to call twice
-    zdlist_destroy (&list);
-    assert (list == NULL);
-    zdlist_destroy (&list);
+    zring_destroy (&ring);
+    assert (ring == NULL);
+    zring_destroy (&ring);
     //  @end
 
     printf ("OK\n");
