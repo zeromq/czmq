@@ -57,7 +57,7 @@ extern "C" {
 //
 //      zstr_sendx (zgossip_server, "CONFIGURE", filename, NULL);
 //
-//  Set configuration path valuu:
+//  Set configuration path value:
 //
 //      zstr_sendx (zgossip_server, "SET", path, value, NULL);
 //    

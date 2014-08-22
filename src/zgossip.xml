@@ -28,10 +28,6 @@
         <event name = "PUBLISH">
             <action name = "store tuple if new" />
         </event>
-        <!-- Peer signals it's alive -->
-        <event name = "PING">
-            <action name = "send" message = "PONG" />
-        </event>
         <!-- Forward a new tuple to this client -->
         <event name = "forward">
             <action name = "get tuple to forward" />
@@ -41,6 +37,11 @@
 
     <!-- Superstate for external states -->
     <state name = "external">
+        <!-- Peer signals it's alive -->
+        <event name = "PING">
+            <action name = "send" message = "PONG" />
+        </event>
+        
         <!-- All other protocol messages are invalid -->
         <event name = "*">
             <action name = "send" message = "INVALID" />
