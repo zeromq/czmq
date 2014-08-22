@@ -42,8 +42,9 @@ These classes support authentication and encryption:
 
 These classes provide generic containers:
 
-* linkczmq:zhash[3] - generic type-free hash container
-* linkczmq:zlist[3] - generic type-free list container
+* linkczmq:zhash[3] - generic type-free hash container (dictionary)
+* linkczmq:zlist[3] - generic type-free list container (singly-linked list)
+* linkczmq:zring[3] - generic type-free ring container (doubly-linked list)
 
 These classes wrap-up non-portable functionality:
 
