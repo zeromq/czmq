@@ -560,7 +560,7 @@ zloop_start (zloop_t *self)
                     free (timer);
                 }
                 else
-                    timer->when = timer->delay + zclock_mono ();
+                    timer->when += timer->delay;
             }
             timer = (s_timer_t *) zlist_next (self->timers);
         }
