@@ -134,30 +134,6 @@ zlist_last (zlist_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Return the item at the head of list. If the list is empty, returns NULL.
-//  Leaves cursor as-is.
-
-void *
-zlist_head (zlist_t *self)
-{
-    assert (self);
-    return self->head? self->head->item: NULL;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Return the item at the tail of list. If the list is empty, returns NULL.
-//  Leaves cursor as-is.
-
-void *
-zlist_tail (zlist_t *self)
-{
-    assert (self);
-    return self->tail? self->tail->item: NULL;
-}
-
-
-//  --------------------------------------------------------------------------
 //  Append an item to the end of the list, return 0 if OK
 //  or -1 if this failed for some reason (out of memory).
 
@@ -403,6 +379,32 @@ zlist_autofree (zlist_t *self)
 {
     assert (self);
     self->autofree = true;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return the item at the head of list. If the list is empty, returns NULL.
+//  Leaves cursor as-is.
+//  DEPRECATED as over-designed and not useful
+
+void *
+zlist_head (zlist_t *self)
+{
+    assert (self);
+    return self->head? self->head->item: NULL;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return the item at the tail of list. If the list is empty, returns NULL.
+//  Leaves cursor as-is.
+//  DEPRECATED as over-designed and not useful
+
+void *
+zlist_tail (zlist_t *self)
+{
+    assert (self);
+    return self->tail? self->tail->item: NULL;
 }
 
 
