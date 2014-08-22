@@ -39,7 +39,6 @@ typedef struct _zconfig_t zconfig_t;
 typedef struct _zdigest_t zdigest_t;
 typedef struct _zdir_t zdir_t;
 typedef struct _zdir_patch_t zdir_patch_t;
-typedef struct _zdlist_t zdlist_t;
 typedef struct _zfile_t zfile_t;
 typedef struct _zframe_t zframe_t;
 typedef struct _zhash_t zhash_t;
@@ -49,6 +48,7 @@ typedef struct _zloop_t zloop_t;
 typedef struct _zmsg_t zmsg_t;
 typedef struct _zpoller_t zpoller_t;
 typedef struct _zrex_t zrex_t;
+typedef struct _zring_t zring_t;
 typedef struct _zsock_t zsock_t;
 typedef struct _zuuid_t zuuid_t;
 //  Deprecated V2 classes, remove some time after 3.0 stability
@@ -71,7 +71,6 @@ typedef struct _zproxy_t zproxy_t;
 #include "zdigest.h"
 #include "zdir.h"
 #include "zdir_patch.h"
-#include "zdlist.h"
 #include "zfile.h"
 #include "zframe.h"
 #include "zgossip.h"
@@ -84,6 +83,7 @@ typedef struct _zproxy_t zproxy_t;
 #include "zpoller.h"
 #include "zproxy.h"
 #include "zrex.h"
+#include "zring.h"
 #include "zsock.h"
 #include "zsock_option.h"
 #include "zstr.h"

@@ -21,7 +21,6 @@ include_HEADERS = \
     ../include/zdigest.h \
     ../include/zdir.h \
     ../include/zdir_patch.h \
-    ../include/zdlist.h \
     ../include/zfile.h \
     ../include/zframe.h \
     ../include/zhash.h \
@@ -34,6 +33,7 @@ include_HEADERS = \
     ../include/zpoller.h \
     ../include/zproxy.h \
     ../include/zrex.h \
+    ../include/zring.h \
     ../include/zsock.h \
     ../include/zsock_option.h \
     ../include/zstr.h \
@@ -62,7 +62,6 @@ libczmq_la_SOURCES = \
     zdigest.c \
     zdir.c \
     zdir_patch.c \
-    zdlist.c \
     zfile.c \
     zframe.c \
     zhash.c \
@@ -75,6 +74,7 @@ libczmq_la_SOURCES = \
     zpoller.c \
     zproxy.c \
     zrex.c \
+    zring.c \
     zsock.c \
     zsock_option.c \
     zstr.c \

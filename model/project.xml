@@ -16,7 +16,6 @@
     <class name = "zdigest" />
     <class name = "zdir" />
     <class name = "zdir_patch" />
-    <class name = "zdlist" />
     <class name = "zfile" />
     <class name = "zframe" />
     <class name = "zhash" />
@@ -29,6 +28,7 @@
     <class name = "zpoller" />
     <class name = "zproxy" />
     <class name = "zrex" />
+    <class name = "zring" />
     <class name = "zsock" />
     <class name = "zsock_option" />
     <class name = "zstr" />
