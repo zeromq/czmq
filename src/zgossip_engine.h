@@ -39,8 +39,8 @@ typedef enum {
     ok_event = 2,
     finished_event = 3,
     publish_event = 4,
-    ping_event = 5,
-    forward_event = 6,
+    forward_event = 5,
+    ping_event = 6,
     expired_event = 7
 } event_t;
 
@@ -61,8 +61,8 @@ s_event_name [] = {
     "ok",
     "finished",
     "PUBLISH",
-    "PING",
     "forward",
+    "PING",
     "expired"
 };
  
@@ -450,6 +450,19 @@ s_client_execute (s_client_t *self, int event)
                         self->state = have_tuple_state;
                 }
                 else
+                if (self->event == ping_event) {
+                    if (!self->exception) {
+                        //  send pong
+                        if (self->server->animate)
+                            zsys_debug ("%s:         $ send PONG",
+                                self->log_prefix);
+                        zgossip_msg_set_id (self->client.reply, ZGOSSIP_MSG_PONG);
+                        zgossip_msg_send (&self->client.reply, self->server->router);
+                        self->client.reply = zgossip_msg_new (0);
+                        zgossip_msg_set_routing_id (self->client.reply, self->routing_id);
+                    }
+                }
+                else
                 if (self->event == expired_event) {
                     if (!self->exception) {
                         //  terminate
@@ -523,19 +536,6 @@ s_client_execute (s_client_t *self, int event)
                     }
                 }
                 else
-                if (self->event == ping_event) {
-                    if (!self->exception) {
-                        //  send pong
-                        if (self->server->animate)
-                            zsys_debug ("%s:         $ send PONG",
-                                self->log_prefix);
-                        zgossip_msg_set_id (self->client.reply, ZGOSSIP_MSG_PONG);
-                        zgossip_msg_send (&self->client.reply, self->server->router);
-                        self->client.reply = zgossip_msg_new (0);
-                        zgossip_msg_set_routing_id (self->client.reply, self->routing_id);
-                    }
-                }
-                else
                 if (self->event == forward_event) {
                     if (!self->exception) {
                         //  get tuple to forward
@@ -549,6 +549,19 @@ s_client_execute (s_client_t *self, int event)
                             zsys_debug ("%s:         $ send PUBLISH",
                                 self->log_prefix);
                         zgossip_msg_set_id (self->client.reply, ZGOSSIP_MSG_PUBLISH);
+                        zgossip_msg_send (&self->client.reply, self->server->router);
+                        self->client.reply = zgossip_msg_new (0);
+                        zgossip_msg_set_routing_id (self->client.reply, self->routing_id);
+                    }
+                }
+                else
+                if (self->event == ping_event) {
+                    if (!self->exception) {
+                        //  send pong
+                        if (self->server->animate)
+                            zsys_debug ("%s:         $ send PONG",
+                                self->log_prefix);
+                        zgossip_msg_set_id (self->client.reply, ZGOSSIP_MSG_PONG);
                         zgossip_msg_send (&self->client.reply, self->server->router);
                         self->client.reply = zgossip_msg_new (0);
                         zgossip_msg_set_routing_id (self->client.reply, self->routing_id);
@@ -585,6 +598,19 @@ s_client_execute (s_client_t *self, int event)
                 break;
 
             case external_state:
+                if (self->event == ping_event) {
+                    if (!self->exception) {
+                        //  send pong
+                        if (self->server->animate)
+                            zsys_debug ("%s:         $ send PONG",
+                                self->log_prefix);
+                        zgossip_msg_set_id (self->client.reply, ZGOSSIP_MSG_PONG);
+                        zgossip_msg_send (&self->client.reply, self->server->router);
+                        self->client.reply = zgossip_msg_new (0);
+                        zgossip_msg_set_routing_id (self->client.reply, self->routing_id);
+                    }
+                }
+                else
                 if (self->event == expired_event) {
                     if (!self->exception) {
                         //  terminate
@@ -593,7 +619,7 @@ s_client_execute (s_client_t *self, int event)
                         self->next_event = terminate_event;
                     }
                 }
-                {
+                else {
                     //  Handle unexpected protocol events
                     if (!self->exception) {
                         //  send invalid
