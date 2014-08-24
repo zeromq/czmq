@@ -299,6 +299,30 @@ zchunk_dup (zchunk_t *self)
     return zchunk_new (self->data, self->max_size);
 }
 
+//  --------------------------------------------------------------------------
+//  Create a zframe from a zchunk.  The zframe can be sent in a message.
+
+zframe_t *
+zchunk_pack (zchunk_t *self)
+{
+    assert(self);
+    assert(zchunk_is(self));
+
+    return zframe_new (self->data, self->max_size);
+}
+
+//  --------------------------------------------------------------------------
+//  Create a zchunk from a zframe.  
+
+zchunk_t *
+zchunk_unpack (zframe_t *frame)
+{
+    assert(frame);
+    assert(zframe_is(frame));
+
+    return zchunk_new (zframe_data (frame), zframe_size (frame) );
+}
+
 
 //  --------------------------------------------------------------------------
 //  Dump chunk to FILE stream, for debugging and tracing.
@@ -389,7 +413,15 @@ zchunk_test (bool verbose)
     zchunk_append (chunk, "GHIJKLMN", 8);
     assert (memcmp (zchunk_data (chunk), "1234567890", 10) == 0);
     assert (zchunk_size (chunk) == 10);
-    
+
+    zframe_t *frame = zchunk_pack (chunk);
+    assert(frame);
+
+    zchunk_t *chunk2 = zchunk_unpack (frame);
+    assert (memcmp (zchunk_data (chunk2), "1234567890", 10) == 0);
+    zframe_destroy(&frame);
+    zchunk_destroy(&chunk2);
+
     zchunk_t *copy = zchunk_dup (chunk);
     assert (memcmp (zchunk_data (copy), "1234567890", 10) == 0);
     assert (zchunk_size (copy) == 10);

@@ -88,6 +88,14 @@ CZMQ_EXPORT zchunk_t *
 CZMQ_EXPORT zchunk_t *
     zchunk_dup (zchunk_t *self);
 
+//  Transform zchunk into a zframe that can be sent in a message.
+CZMQ_EXPORT zframe_t *
+    zchunk_pack (zchunk_t *self);
+
+//  Transform a zframe into a zchunk.
+CZMQ_EXPORT zchunk_t *
+    zchunk_unpack (zframe_t *frame);
+
 //  Dump chunk to FILE stream, for debugging and tracing.
 CZMQ_EXPORT void
     zchunk_fprint (zchunk_t *self, FILE *file);
