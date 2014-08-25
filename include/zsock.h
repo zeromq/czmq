@@ -119,12 +119,27 @@ CZMQ_EXPORT zsock_t *
 CZMQ_EXPORT zsock_t *
     zsock_new_stream_ (const char *endpoint, const char *filename, size_t line_nbr);
 
-//  Bind a socket to a formatted endpoint. If the port is specified as '*'
-//  and the endpoint starts with "tcp://", binds to an ephemeral TCP port in
-//  a high range. Always returns the port number on successful TCP binds, else
-//  returns zero on success. Returns -1 on failure. When using ephemeral ports,
-//  note that ports may be reused by different threads, without clients being
-//  aware.
+//  Bind a socket to a formatted endpoint. If the port is specified as '*' or '!'
+//  and the endpoint starts with a "tcp://", binds to an ephemeral TCP port
+//  from DYNAMIC_FIRST to DYNAMIC_LAST
+//  and returns the actual port number used.  To override the given range, which
+//  is the IANA designated range from C000 (49152) to FFFF (65535), after the * or !,
+//  you can include the notation "[<min>-<max>]". 
+//  '*' will test ports starting at 'min' (default DYNAMIC_FIRST), and increment 
+//      upwards to 'max' (default DYNAMIC_LAST). 
+//       Examples: "tcp://192.168.3.1:*[50100-50500]", "tcp://*:*"
+//  '!' will randomly choose ports from within the range. It will iterate from one
+//      random port number to the next. It will give up if it attempts more than
+//      total possible number of ports in the range, with a max of 30. Then it will
+//      revert to a linear search (as with '*'). Therefore, '!' works best in large,
+//      sparsely populated ranges.
+//       Examples: "tcp://192.168.3.1:![55000-60000]", "tcp://*:!"
+//  The first open port is bound and its number returned.
+//  If a TCP endpoint was given, returns the port number if successful. 
+//  If not, returns a 0 on success.
+//  Returns -1 if not successful. 
+//  When using ephemeral ports, note that ports may be reused by different threads, 
+//  without clients being aware.
 CZMQ_EXPORT int
     zsock_bind (zsock_t *self, const char *format, ...);
 

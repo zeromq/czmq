@@ -29,8 +29,8 @@
 
 //  This port range is defined by IANA for dynamic or private ports
 //  We use this when choosing a port for dynamic binding.
-#define DYNAMIC_FIRST       0xc000
-#define DYNAMIC_LAST        0xffff
+#define DYNAMIC_FIRST       0xc000    // 49152
+#define DYNAMIC_LAST        0xffff    // 65535
 
 //  Structure of our class
 
@@ -260,12 +260,76 @@ zsock_new_stream_ (const char *endpoints, const char *filename, size_t line_nbr)
 
 
 //  --------------------------------------------------------------------------
-//  Bind a socket to a formatted endpoint. If the port is specified as '*'
-//  and the endpoint starts with "tcp://", binds to an ephemeral TCP port in
-//  a high range. Always returns the port number on successful TCP binds, else
-//  returns zero on success. Returns -1 on failure. When using ephemeral ports,
-//  note that ports may be reused by different threads, without clients being
-//  aware.
+//  return a random number within the specified range (min, max) inclusive.
+static int is_rand_initd = 0;
+static unsigned int get_rand_in_range(unsigned int min, unsigned int max)
+{
+    if (!is_rand_initd ) {
+        srandom(time(NULL));
+        is_rand_initd = 1;
+    }
+    double scaled = (double)random()/(RAND_MAX+1.0);
+    return (unsigned int)((max-min+1) * scaled) + min;
+}
+
+//  --------------------------------------------------------------------------
+//  Parse the port range notation (if there), and return the min, max values
+static int parse_port_notation(const char *endpoint, int *min, int *max)
+{
+    char *colonptr = strrchr(endpoint,':'); // there are TWO :'s in the spec
+    char *rangespec = strchr(colonptr, '[');
+    if (rangespec) {
+        char *rangesep = strchr(rangespec, '-');
+        if (rangesep) {
+            int p1 = atoi(rangespec+1);
+            int p2 = atoi(rangesep+1);
+            if (p1 > 0) {
+                *min = p1;
+            }
+            *max = 0; // just in case
+            if (p2 > 0) {
+                *max = p2;
+            }
+            return 0;
+        }
+        else {
+            int p1 = atoi(rangespec+1);
+            if (p1 > 0) {
+                *min = p1;
+                *max = 0; // no max, set to 0
+            }
+            return 0;
+        }
+    }
+    *min = 0;
+    *max = 0;
+    return -1;
+}
+
+
+
+//  --------------------------------------------------------------------------
+//  Bind a socket to a formatted endpoint. If the port is specified as '*' or '!'
+//  and the endpoint starts with a "tcp://", binds to an ephemeral TCP port
+//  from DYNAMIC_FIRST to DYNAMIC_LAST
+//  and returns the actual port number used.  To override the given range, which
+//  is the IANA designated range from C000 (49152) to FFFF (65535), after the * or !,
+//  you can include the notation "[<min>-<max>]". 
+//  '*' will test ports starting at 'min' (default DYNAMIC_FIRST), and increment 
+//      upwards to 'max' (default DYNAMIC_LAST). 
+//       Examples: "tcp://192.168.3.1:*[50100-50500]", "tcp://*:*"
+//  '!' will randomly choose ports from within the range. It will iterate from one
+//      random port number to the next. It will give up if it attempts more than
+//      total possible number of ports in the range, with a max of 30. Then it will
+//      revert to a linear search (as with '*'). Therefore, '!' works best in large,
+//      sparsely populated ranges.
+//       Examples: "tcp://192.168.3.1:![55000-60000]", "tcp://*:!"
+//  The first open port is bound and its number returned.
+//  If a TCP endpoint was given, returns the port number if successful. 
+//  If not, returns a 0 on success.
+//  Returns -1 if not successful. 
+//  When using ephemeral ports, note that ports may be reused by different threads, 
+//  without clients being aware.
 
 int
 zsock_bind (zsock_t *self, const char *format, ...)
@@ -274,38 +338,82 @@ zsock_bind (zsock_t *self, const char *format, ...)
     assert (zsock_is (self));
 
     //  Ephemeral port endpoint needs 4 additional characters
-    char endpoint [256 + 4];
+    //  and range notation adds 8 ([,],-, and another (possibly) 5 digit port number)
+    char endpoint [256 + 12];
     va_list argptr;
     va_start (argptr, format);
-    int endpoint_size = vsnprintf (endpoint, 256, format, argptr);
+    vsnprintf (endpoint, 264, format, argptr);
     va_end (argptr);
+    char *colonptr = strrchr(endpoint,':');
 
-    bool tcp_endpoint = (endpoint_size > 6
+    bool tcp_endpoint = (strlen(endpoint) > 6
                          && memcmp (endpoint, "tcp://", 6) == 0);
 
     //  We implement ephemeral ports here ourselves, so that we can
     //  run on older versions of libzmq that don't do this properly.
     if (tcp_endpoint
-    &&  endpoint [endpoint_size - 2] == ':'
-    &&  endpoint [endpoint_size - 1] == '*') {
-        //  Always start at DYNAMIC_FORST; this makes reuse collisions
+    &&  colonptr
+    &&  *(colonptr + 1) == '*') { 
+        //  Always start at DYNAMIC_FIRST; this makes reuse collisions
         //  more likely, and forces protocol designers to think about
         //  this upfront.
         int port = DYNAMIC_FIRST;
-        while (port <= DYNAMIC_LAST) {
+        int lim = DYNAMIC_LAST;
+        int p1;
+        int p2;
+        int ret = parse_port_notation(endpoint, &p1, &p2);
+        if (ret == 0 && p1 > 0) port = p1;
+        if (ret == 0 && p2 > 0) lim = p2;
+
+        while (port <= lim) {
             //  Try to bind on the next plausible port
-            sprintf (endpoint + endpoint_size - 1, "%d", port);
+            sprintf (colonptr + 1, "%d", port);
             if (zmq_bind (self->handle, endpoint) == 0)
                 return port;
             port++;
         }
         return -1;              //  Can't find a free port
     }
+    else if (tcp_endpoint
+    &&  colonptr
+    &&  *(colonptr + 1)  == '!') { // Random search in range
+        int port = DYNAMIC_FIRST;  // these values act as defaults
+        int lim = DYNAMIC_LAST;
+        int p1;
+        int p2;
+        int ret = parse_port_notation(endpoint, &p1, &p2);
+        if (ret == 0 && p1 > 0) port = p1;
+        if (ret == 0 && p2 > 0) lim = p2;
+
+        int its=0;
+        int limits = lim-port;
+        if (limits > 30)
+            limits = 30; // arbitrary cutoff; if you can't get an usable port in 30 moves, switch to a linear search
+        do {
+            int p3 = get_rand_in_range(port, lim);
+            sprintf (colonptr + 1, "%d", p3);
+            if (zmq_bind (self->handle, endpoint) == 0) {
+                return p3;
+            }
+            its++;
+        } while ( its < limits ); // if you end up with your range entirely (or almost entirely)  allocated, .... well, ....
+        while (port <= lim) { // OK, if we have filled up the range to some extent, choosing new random ports
+                              // ends up being way inefficient, so we revert to a linear traversal to find the few remaining (if any) ports.
+            //  Try to bind on the next plausible port
+            sprintf (colonptr + 1, "%d", port);
+            if (zmq_bind (self->handle, endpoint) == 0) {
+                return port;
+            }
+            port++;
+        }
+        // How do we indicate to the user/developer that we couldn't find an empty slot in his range?
+        return -1;
+    }
     else
     if (zmq_bind (self->handle, endpoint) == 0) {
         if (tcp_endpoint)
             //  Return actual port used for binding
-            return atoi (strrchr (endpoint, ':') + 1);
+            return atoi (colonptr + 1);
         else
             return 0;
     }
@@ -654,6 +762,49 @@ zsock_test (bool verbose)
 
     zsock_destroy (&reader);
     zsock_destroy (&writer);
+
+    // test the *, !, and [min-max] notation parsing, etc.
+
+    zsock_t *arr[7];
+    zsock_t *arr2[7];
+    int   parr[7];
+    int i3;
+    for (i3=0; i3 < 7; i3++) {
+       int rc3;
+       arr[i3] = zsock_new(ZMQ_REP);
+       rc3 = zsock_bind(arr[i3], "tcp://*:*[50000-50005]");
+       if (i3 < 6) {
+           assert( rc3 == 50000+i3 );
+       } else {
+           assert( rc3 == -1);
+       }
+    }
+    for (i3=0; i3 < 6; i3++) {
+       int rc3 = zsock_unbind( arr[i3], "tcp://*:%d", i3+50000);
+       assert(rc3 == 0);
+       zsock_destroy(&arr[i3]);
+    }
+    zsock_destroy(&arr[6]); // The last socket didn't get bound, but it does need to get destroyed when done!
+    for (i3=0; i3 < 7; i3++) {
+       int rc3;
+       arr2[i3] = zsock_new(ZMQ_REP);
+       rc3 = zsock_bind(arr2[i3], "tcp://*:![60000-60005]");
+       parr[i3] = rc3;
+       if (i3 < 6) {
+           assert( rc3 <= 60005 && rc3 >=  60000 );
+       } else {
+           assert( rc3 == -1);
+       }
+    }
+    for (i3=0; i3 < 6; i3++) {
+       if (parr[i3] != -1) {
+           int rc3 = zsock_unbind( arr2[i3], "tcp://*:%d", parr[i3]);
+           assert(rc3 == 0);
+       }
+       zsock_destroy(&arr2[i3]);
+    }
+    zsock_destroy(&arr2[6]); // The last socket didn't get bound, but it does need to get destroyed when done!
+
 
     //  Test zsock_attach method
     zsock_t *server = zsock_new (ZMQ_DEALER);
