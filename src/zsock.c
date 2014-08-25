@@ -320,7 +320,7 @@ static int parse_port_notation(const char *endpoint, int *min, int *max)
 //       Examples: "tcp://192.168.3.1:*[50100-50500]", "tcp://*:*"
 //  '!' will randomly choose ports from within the range. It will iterate from one
 //      random port number to the next. It will give up if it attempts more than
-//      total possible number of ports in the range, with a max of 30. Then it will
+//      total possible number of ports in the range, with a max of 10. Then it will
 //      revert to a linear search (as with '*'). Therefore, '!' works best in large,
 //      sparsely populated ranges.
 //       Examples: "tcp://192.168.3.1:![55000-60000]", "tcp://*:!"
@@ -387,8 +387,8 @@ zsock_bind (zsock_t *self, const char *format, ...)
 
         int its=0;
         int limits = lim-port;
-        if (limits > 30)
-            limits = 30; // arbitrary cutoff; if you can't get an usable port in 30 moves, switch to a linear search
+        if (limits > 10)
+            limits = 10; // arbitrary cutoff; if you can't get an usable port in 10 moves, switch to a linear search
         do {
             int p3 = get_rand_in_range(port, lim);
             sprintf (colonptr + 1, "%d", p3);
@@ -767,7 +767,6 @@ zsock_test (bool verbose)
 
     zsock_t *arr[7];
     zsock_t *arr2[7];
-    int   parr[7];
     int i3;
     for (i3=0; i3 < 7; i3++) {
        int rc3;
@@ -779,28 +778,39 @@ zsock_test (bool verbose)
            assert( rc3 == -1);
        }
     }
+    // Hmmm, source code above returns -1 on calls to zsock_unbind before 3.2.0... So, let's skip it.
     for (i3=0; i3 < 6; i3++) {
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
        int rc3 = zsock_unbind( arr[i3], "tcp://*:%d", i3+50000);
        assert(rc3 == 0);
+#endif
        zsock_destroy(&arr[i3]);
     }
     zsock_destroy(&arr[6]); // The last socket didn't get bound, but it does need to get destroyed when done!
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
+    int   parr[7];
+#endif
     for (i3=0; i3 < 7; i3++) {
        int rc3;
        arr2[i3] = zsock_new(ZMQ_REP);
        rc3 = zsock_bind(arr2[i3], "tcp://*:![60000-60005]");
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
        parr[i3] = rc3;
+#endif
        if (i3 < 6) {
            assert( rc3 <= 60005 && rc3 >=  60000 );
        } else {
            assert( rc3 == -1);
        }
     }
+    // Hmmm, source code above returns -1 on calls to zsock_unbind before 3.2.0... So, let's skip it.
     for (i3=0; i3 < 6; i3++) {
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
        if (parr[i3] != -1) {
            int rc3 = zsock_unbind( arr2[i3], "tcp://*:%d", parr[i3]);
            assert(rc3 == 0);
        }
+#endif
        zsock_destroy(&arr2[i3]);
     }
     zsock_destroy(&arr2[6]); // The last socket didn't get bound, but it does need to get destroyed when done!
