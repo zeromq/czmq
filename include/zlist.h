@@ -45,11 +45,6 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void *
     zlist_last (zlist_t *self);
 
-//  Return current item in the list, or null
-CZMQ_EXPORT void *
-    zlist_curr (zlist_t *self);
-
-
 //  Append an item to the end of the list, return 0 if OK
 //  or -1 if this failed for some reason (out of memory).
 CZMQ_EXPORT int
