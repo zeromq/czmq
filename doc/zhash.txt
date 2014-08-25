@@ -180,12 +180,6 @@ linked list. The hash table size is increased slightly (up to 5 times
 before roughly doubling the size) when an overly long chain (between 1
 and 63 items depending on table size) is detected.
 
-The hash table always has a size that is prime and roughly doubles its
-size when 75% full. In case of hash collisions items are chained in a
-linked list. The hash table size is increased slightly (up to 5 times
-before roughly doubling the size) when an overly long chain (between 1
-and 63 items depending on table size) is detected.
-
 EXAMPLE
 -------
 .From zhash_test method
