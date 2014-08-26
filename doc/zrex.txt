@@ -59,6 +59,32 @@ CZMQ_EXPORT void
 DESCRIPTION
 -----------
 
+Wraps a very simple regular expression library (SLRE) as a CZMQ class.
+Supports this syntax:
+
+  ^               Match beginning of a buffer
+  $               Match end of a buffer
+  ()              Grouping and substring capturing
+  [...]           Match any character from set
+  [^...]          Match any character but ones from set
+  .               Match any character
+  \s              Match whitespace
+  \S              Match non-whitespace
+  \d              Match decimal digit
+  \D              Match non decimal digit
+  \a              Match alphabetic character
+  \A              Match non-alphabetic character
+  \w              Match alphanumeric character
+  \W              Match non-alphanumeric character
+  \r              Match carriage return
+  \n              Match newline
+  +               Match one or more times (greedy)
+  +?              Match one or more times (non-greedy)
+  *               Match zero or more times (greedy)
+  *?              Match zero or more times (non-greedy)
+  ?               Match zero or once
+  \xDD            Match byte with hex value 0xDD
+  \meta           Match one of the meta character: ^$().[*+?\
 
 
 EXAMPLE
