@@ -60,52 +60,7 @@ CZMQ_EXPORT void
 DESCRIPTION
 -----------
 
-The zrex class provides a simple API for regular expressions, wrapping
-Alberto Demichelis's T-Rex library from http://tiny-rex.sourceforge.net/.
 
-The underlying TRex class implements the following expressions:
-
-\   Quote the next metacharacter
-^   Match the beginning of the string
-.   Match any character
-$   Match the end of the string
-|   Alternation
-()  Grouping (captures a 'hit')
-[]  Character class
-
-==GREEDY CLOSURES==
-*      Match 0 or more times
-+      Match 1 or more times
-?      Match 1 or 0 times
-{n}    Match exactly n times
-{n,}   Match at least n times
-{n,m}  Match at least n but not more than m times
-
-==ESCAPE CHARACTERS==
-\t      tab                   (HT, TAB)
-\n      newline               (LF, NL)
-\r      return                (CR)
-\f      form feed             (FF)
-
-==PREDEFINED CLASSES==
-\l      lowercase next char
-\u      uppercase next char
-\a      alpha [a-zA-Z]
-\w      alphanumeric [0-9a-zA-Z]
-\s      space characters
-\d      decimal digits
-\x      hexadecimal digits
-\c      control characters
-\p      punctuation
-\b      word boundary
-\A      non letters
-\W      non alphanumeric
-\S      non space
-\D      non decimal digits
-\X      non hexadecimal digits
-\C      non control characters
-\P      non punctuation
-\B      non word boundary
 
 EXAMPLE
 -------

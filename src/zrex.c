@@ -13,70 +13,25 @@
 
 /*
 @header
-    The zrex class provides a simple API for regular expressions, wrapping
-    Alberto Demichelis's T-Rex library from http://tiny-rex.sourceforge.net/.
 @discuss
-    The underlying TRex class implements the following expressions:
-
-    \   Quote the next metacharacter
-    ^   Match the beginning of the string
-    .   Match any character
-    $   Match the end of the string
-    |   Alternation
-    ()  Grouping (captures a 'hit')
-    []  Character class
-
-    ==GREEDY CLOSURES==
-    *      Match 0 or more times
-    +      Match 1 or more times
-    ?      Match 1 or 0 times
-    {n}    Match exactly n times
-    {n,}   Match at least n times
-    {n,m}  Match at least n but not more than m times
-
-    ==ESCAPE CHARACTERS==
-    \t      tab                   (HT, TAB)
-    \n      newline               (LF, NL)
-    \r      return                (CR)
-    \f      form feed             (FF)
-
-    ==PREDEFINED CLASSES==
-    \l      lowercase next char
-    \u      uppercase next char
-    \a      alpha [a-zA-Z]
-    \w      alphanumeric [0-9a-zA-Z]
-    \s      space characters
-    \d      decimal digits
-    \x      hexadecimal digits
-    \c      control characters
-    \p      punctuation
-    \b      word boundary
-    \A      non letters
-    \W      non alphanumeric
-    \S      non space
-    \D      non decimal digits
-    \X      non hexadecimal digits
-    \C      non control characters
-    \P      non punctuation
-    \B      non word boundary
 @end
 */
 
-#undef _UNICODE
-#define TREX_API    //  Empty, trex not exported to API
-#include "../foreign/trex/trex.h"
-#include "../foreign/trex/trex.c"
 #include "../include/czmq.h"
+#include "../foreign/slre/slre.h"
+#include "../foreign/slre/slre.c"
 
 #define MAX_HITS 100            //  Should be enough for anyone :)
 
 //  Structure of our class
 
 struct _zrex_t {
-    TRex *trex;                 //  Compiled regular expression
+    struct slre slre;           //  Compiled regular expression
+    bool valid;                 //  Is expression valid or not?
     const char *strerror;       //  Error message if any
     uint hits;                  //  Number of hits matched
     char *hit [MAX_HITS];       //  Captured hits
+    struct cap caps [MAX_HITS]; //  Position/length for each hit
 };
 
 
@@ -91,14 +46,14 @@ zrex_new (const char *expression)
 {
     zrex_t *self = (zrex_t *) zmalloc (sizeof (zrex_t));
     assert (self);
+
     self->strerror = "No error";
-    //  Trex cannot handle an empty pattern, which doesn't inspire huge
-    //  confidence but apart from this, seems to be working...
     if (expression) {
-        if (*expression)
-            self->trex = trex_compile (expression, &self->strerror);
-        else
-            self->strerror = "Missing pattern";
+        //  Returns 1 on success, 0 on failure
+        self->valid = (slre_compile (&self->slre, expression) == 1);
+        if (!self->valid)
+            self->strerror = self->slre.err_str;
+        assert (self->slre.num_caps < MAX_HITS);
     }
     return self;
 }
@@ -113,7 +68,6 @@ zrex_destroy (zrex_t **self_p)
     assert (self_p);
     if (*self_p) {
         zrex_t *self = *self_p;
-        trex_free (self->trex);
         uint index;
         for (index = 0; index < self->hits; index++)
             free (self->hit [index]);
@@ -130,7 +84,7 @@ bool
 zrex_valid (zrex_t *self)
 {
     assert (self);
-    return self->trex != NULL;
+    return self->valid;
 }
 
 
@@ -158,23 +112,21 @@ zrex_hits (zrex_t *self, const char *text)
 {
     assert (self);
     assert (text);
-    assert (self->trex);
 
     uint index;
     for (index = 0; index < self->hits; index++) {
         free (self->hit [index]);
         self->hit [index] = NULL;
     }
-    bool matched = trex_match (self->trex, text) == TRex_True;
-    if (matched) {
-        //  Get number of hits, setting a sane limit
-        self->hits = trex_getsubexpcount (self->trex);
+    if (slre_match (&self->slre, text, strlen (text), self->caps)) {
+        //  Count number of captures plus whole string
+        self->hits = self->slre.num_caps + 1;
         if (self->hits > MAX_HITS)
             self->hits = MAX_HITS;
     }
     else
         self->hits = 0;
-
+    
     return self->hits;
 }
 
@@ -193,21 +145,17 @@ zrex_eq (zrex_t *self, const char *text, const char *expression)
     assert (self);
     assert (text);
     assert (expression);
-
-    //  If we had any previous expression, destroy it
-    if (self->trex) {
-        trex_free (self->trex);
-        self->trex = NULL;
-    }
     //  Compile the new expression
-    if (*expression)
-        self->trex = trex_compile (expression, &self->strerror);
-    else
-        self->strerror = "Missing pattern";
+    self->valid = (slre_compile (&self->slre, expression) == 1);
+    if (!self->valid)
+        self->strerror = self->slre.err_str;
+    assert (self->slre.num_caps < MAX_HITS);
 
     //  zrex_hits takes care of the rest for us
-    return zrex_hits (self, text);
-
+    if (self->valid)
+        return zrex_hits (self, text);
+    else
+        return 0;
 }
 
 
@@ -221,18 +169,17 @@ const char *
 zrex_hit (zrex_t *self, uint index)
 {
     assert (self);
-    assert (self->trex);
 
     if (index < self->hits) {
         //  We collect hits opportunistically to minimize use of the heap for
         //  complex expressions where the caller wants only a few hits.
         if (self->hit [index] == NULL) {
             //  We haven't fetched this hit yet, so grab it now
-            TRexMatch match = { 0 };
-            trex_getsubexp (self->trex, index, &match);
-            self->hit [index] = (char *) malloc (match.len + 1);
-            memcpy (self->hit [index], match.begin, match.len);
-            self->hit [index][match.len] = 0;
+            int capture_len = self->caps [index].len;
+            const char *capture_ptr = self->caps [index].ptr;
+            self->hit [index] = (char *) malloc (capture_len + 1);
+            memcpy (self->hit [index], capture_ptr, capture_len);
+            self->hit [index][capture_len] = 0;
         }
         return self->hit [index];
     }
@@ -249,16 +196,10 @@ zrex_test (bool verbose)
 {
     printf (" * zrex: ");
 
-    zrex_t *rex = zrex_new ("");
-    assert (rex);
-    assert (!zrex_valid (rex));
-    if (verbose)
-        puts (zrex_strerror (rex));
-    zrex_destroy (&rex);
-
     //  This shows the pattern of matching many lines to a single pattern
-    rex = zrex_new ("[0-9]+\\-[0-9]+\\-[0-9]+");
+    zrex_t *rex = zrex_new ("\\d+-\\d+-\\d+");
     assert (rex);
+    assert (zrex_valid (rex));
     int hits = zrex_hits (rex, "123-456-789");
     assert (hits == 1);
     assert (streq (zrex_hit (rex, 0), "123-456-789"));
@@ -266,7 +207,7 @@ zrex_test (bool verbose)
     zrex_destroy (&rex);
 
     //  Here we pick out hits using capture groups
-    rex = zrex_new ("([0-9]+)\\-([0-9]+)\\-([0-9]+)");
+    rex = zrex_new ("(\\d+)-(\\d+)-(\\d+)");
     assert (rex);
     assert (zrex_valid (rex));
     hits = zrex_hits (rex, "123-456-ABC");
