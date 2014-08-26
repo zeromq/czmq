@@ -18,7 +18,7 @@ CZMQ_EXPORT void
 
 //  Return the number of interfaces
 CZMQ_EXPORT size_t
-    zinterface_count (zinterface_t *self);
+    zinterface_size (zinterface_t *self);
 
 //  Set the current interface to be the first one. Returns true if the list is not empty
 CZMQ_EXPORT bool

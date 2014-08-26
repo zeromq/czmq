@@ -11,7 +11,7 @@ SYNOPSIS
 //  Constructor. Optionally, sets an expression against which we can match
 //  text and capture hits. If there is an error in the expression, reports
 //  zrex_valid() as false and provides the error in zrex_strerror(). If you
-//  set a pattern, you can call zrex_hits() to test it against text.
+//  set a pattern, you can call zrex_matches() to test it against text.
 CZMQ_EXPORT zrex_t *
     zrex_new (const char *expression);
 
@@ -27,28 +27,27 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT const char *
     zrex_strerror (zrex_t *self);
 
-//  Matches the text against a previously set expression, and reports the
-//  number of hits (aka "capture groups" in e.g. Perl). If the text does
-//  not match, returns 0. If it matches, returns 1 or greater, depending on
-//  how many "(...)" groups the expression has. An expression with one group
-//  will produce 2 hits, one for the whole expression and one for the group.
-//  To retrieve the individual hits, call zrex_hit ().
-CZMQ_EXPORT int
-    zrex_hits (zrex_t *self, const char *text);
+//  Returns true if the text matches the previously compiled expression.
+//  Use this method to compare one expression against many strings.
+CZMQ_EXPORT bool
+    zrex_matches (zrex_t *self, const char *text);
 
-//  Matches the text against a new expression, and reports the number of
-//  hits. If the text does not match, returns 0. If it matches, returns 1 or
-//  greater, depending on how many "(...)" groups the expression has. An
-//  expression with one group will produce 2 hits, one for the whole
-//  expression and one for the group. To retrieve the individual hits, call
-//  zrex_hit ().
-CZMQ_EXPORT int
+//  Returns true if the text matches the supplied expression. Use this
+//  method to compare one string against several expressions.
+CZMQ_EXPORT bool
     zrex_eq (zrex_t *self, const char *text, const char *expression);
 
-//  Returns the Nth sequence captured from the last expression match, where
-//  N is 0 to the value returned by zrex_hits() or zrex_eq(). Sequence 0
-//  is always the whole matching string. Sequence 1 is the first capture
-//  group, if any, and so on.
+//  Returns number of hits from last zrex_matches or zrex_eq. If the text
+//  matched, returns 1 plus the number of capture groups. If the text did
+//  not match, returns zero. To retrieve individual capture groups, call
+//  zrex_hit ().
+CZMQ_EXPORT int
+    zrex_hits (zrex_t *self);
+
+//  Returns the Nth capture group from the last expression match, where
+//  N is 0 to the value returned by zrex_hits(). Capture group 0 is the
+//  whole matching string. Sequence 1 is the first capture group, if any,
+//  and so on.
 CZMQ_EXPORT const char *
     zrex_hit (zrex_t *self, uint index);
 
@@ -60,52 +59,33 @@ CZMQ_EXPORT void
 DESCRIPTION
 -----------
 
-The zrex class provides a simple API for regular expressions, wrapping
-Alberto Demichelis's T-Rex library from http://tiny-rex.sourceforge.net/.
+Wraps a very simple regular expression library (SLRE) as a CZMQ class.
+Supports this syntax:
 
-The underlying TRex class implements the following expressions:
+  ^               Match beginning of a buffer
+  $               Match end of a buffer
+  ()              Grouping and substring capturing
+  [...]           Match any character from set
+  [^...]          Match any character but ones from set
+  .               Match any character
+  \s              Match whitespace
+  \S              Match non-whitespace
+  \d              Match decimal digit
+  \D              Match non decimal digit
+  \a              Match alphabetic character
+  \A              Match non-alphabetic character
+  \w              Match alphanumeric character
+  \W              Match non-alphanumeric character
+  \r              Match carriage return
+  \n              Match newline
+  +               Match one or more times (greedy)
+  +?              Match one or more times (non-greedy)
+  *               Match zero or more times (greedy)
+  *?              Match zero or more times (non-greedy)
+  ?               Match zero or once
+  \xDD            Match byte with hex value 0xDD
+  \meta           Match one of the meta character: ^$().[*+?\
 
-\   Quote the next metacharacter
-^   Match the beginning of the string
-.   Match any character
-$   Match the end of the string
-|   Alternation
-()  Grouping (captures a 'hit')
-[]  Character class
-
-==GREEDY CLOSURES==
-*      Match 0 or more times
-+      Match 1 or more times
-?      Match 1 or 0 times
-{n}    Match exactly n times
-{n,}   Match at least n times
-{n,m}  Match at least n but not more than m times
-
-==ESCAPE CHARACTERS==
-\t      tab                   (HT, TAB)
-\n      newline               (LF, NL)
-\r      return                (CR)
-\f      form feed             (FF)
-
-==PREDEFINED CLASSES==
-\l      lowercase next char
-\u      uppercase next char
-\a      alpha [a-zA-Z]
-\w      alphanumeric [0-9a-zA-Z]
-\s      space characters
-\d      decimal digits
-\x      hexadecimal digits
-\c      control characters
-\p      punctuation
-\b      word boundary
-\A      non letters
-\W      non alphanumeric
-\S      non space
-\D      non decimal digits
-\X      non hexadecimal digits
-\C      non control characters
-\P      non punctuation
-\B      non word boundary
 
 EXAMPLE
 -------
