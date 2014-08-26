@@ -79,7 +79,6 @@ zrex_new (const char *expression)
         self->valid = (slre_compile (&self->slre, expression) == 1);
         if (!self->valid)
             self->strerror = self->slre.err_str;
-printf ("a: NUMCAPS=%d\n", self->slre.num_caps); ///
         assert (self->slre.num_caps < MAX_HITS);
     }
     return self;
@@ -144,17 +143,13 @@ zrex_matches (zrex_t *self, const char *text)
     }
     bool matches = slre_match (&self->slre, text, strlen (text), self->caps);
     if (matches) {
-printf ("b: NUMCAPS=%d\n", self->slre.num_caps); ///
         //  Count number of captures plus whole string
         self->hits = self->slre.num_caps + 1;
-        puts ("RESET 2");
         if (self->hits > MAX_HITS)
             self->hits = MAX_HITS;
     }
-    else {
-        puts ("RESET 1");
+    else
         self->hits = 0;
-    }
 
     return matches;
 }
@@ -195,7 +190,6 @@ int
 zrex_hits (zrex_t *self)
 {
     assert (self);
-printf ("c: NUMCAPS=%d\n", self->slre.num_caps); ///
     return self->hits;
 }
 
