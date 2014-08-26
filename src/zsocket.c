@@ -53,13 +53,13 @@ static int is_rand_initd = 0;
 //  This functions returns a random number between args min and max.
 
 static unsigned int
-s_get_rand_in_range(unsigned int min, unsigned int max)
+s_get_rand_in_range (unsigned int min, unsigned int max)
 {
     if (!is_rand_initd ) {
-        srandom(time(NULL));
+        srandom (time (NULL));
         is_rand_initd = 1;
     }
-    double scaled = (double)random() / (RAND_MAX + 1.0);
+    double scaled = (double)random () / (RAND_MAX + 1.0);
     return (unsigned int)((max - min + 1) * scaled) + min;
 }
 
@@ -70,7 +70,7 @@ s_get_rand_in_range(unsigned int min, unsigned int max)
 //  If range numbers are parsed, the func returns 0.
 
 static int
-s_parse_port_notation(const char *endpoint, int *min, int *max)
+s_parse_port_notation (const char *endpoint, int *min, int *max)
 {
     char *colonptr = strrchr (endpoint,':'); // there are TWO :'s in the spec
     char *rangespec = strchr (colonptr, '[');
@@ -101,7 +101,6 @@ s_parse_port_notation(const char *endpoint, int *min, int *max)
     *max = 0;
     return -1;
 }
-
 
 //  --------------------------------------------------------------------------
 //  Bind a socket to a formatted endpoint. If the port is specified as
@@ -185,7 +184,7 @@ zsocket_bind (void *self, const char *format, ...)
             if (zmq_bind (self, endpoint) == 0)
                 return p1;
             its++;
-        } while ( its < limits );   // if you end up with your range entirely (or almost entirely) allocated...
+        } while (its < limits);   // if you end up with your range entirely (or almost entirely) allocated...
 
         while (port <= lim) {       // OK, if we have filled up the range to some extent, choosing new random ports
                                     // ends up being way inefficient, so we revert to a linear traversal to
@@ -463,7 +462,7 @@ zsocket_test (bool verbose)
        arr[i3] = zsocket_new (ctx, ZMQ_REP);
        rc3 = zsocket_bind (arr[i3], "tcp://*:*[52000-52005]");
        if (i3 < 6)
-           assert (rc3 == 52000+i3 );
+           assert (rc3 == 52000+i3);
        else
            assert (rc3 == -1);
     }

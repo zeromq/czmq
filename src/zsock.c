@@ -258,19 +258,20 @@ zsock_new_stream_ (const char *endpoints, const char *filename, size_t line_nbr)
 #endif
 }
 
+static int is_rand_initd = 0;
 
 //  --------------------------------------------------------------------------
 //  return a random number within the specified range (min, max) inclusive.
 
-static int is_rand_initd = 0;
+
 static unsigned int 
-s_get_rand_in_range(unsigned int min, unsigned int max)
+s_get_rand_in_range (unsigned int min, unsigned int max)
 {
     if (!is_rand_initd ) {
-        srandom (time(NULL));
+        srandom (time (NULL));
         is_rand_initd = 1;
     }
-    double scaled = (double)random() / (RAND_MAX + 1.0);
+    double scaled = (double)random () / (RAND_MAX + 1.0);
     return (unsigned int)((max - min + 1) * scaled) + min;
 }
 
@@ -278,7 +279,7 @@ s_get_rand_in_range(unsigned int min, unsigned int max)
 //  Parse the port range notation (if there), and return the min, max values
 
 static int 
-s_parse_port_notation(const char *endpoint, int *min, int *max)
+s_parse_port_notation (const char *endpoint, int *min, int *max)
 {
     char *colonptr = strrchr(endpoint, ':');     // there are TWO :'s in the spec
     char *rangespec = strchr(colonptr, '[');
