@@ -259,22 +259,11 @@ zsock_new_stream_ (const char *endpoints, const char *filename, size_t line_nbr)
 }
 
 
-//  --------------------------------------------------------------------------
-//  return a random number within the specified range (min, max) inclusive.
-static int is_rand_initd = 0;
-static unsigned int get_rand_in_range(unsigned int min, unsigned int max)
-{
-    if (!is_rand_initd ) {
-        srandom(time(NULL));
-        is_rand_initd = 1;
-    }
-    double scaled = (double)random()/(RAND_MAX+1.0);
-    return (unsigned int)((max-min+1) * scaled) + min;
-}
 
 //  --------------------------------------------------------------------------
 //  Parse the port range notation (if there), and return the min, max values
-static int parse_port_notation(const char *endpoint, int *min, int *max)
+
+static int parse_port_notation (const char *endpoint, int *min, int *max)
 {
     char *colonptr = strrchr(endpoint,':'); // there are TWO :'s in the spec
     char *rangespec = strchr(colonptr, '[');
@@ -390,7 +379,7 @@ zsock_bind (zsock_t *self, const char *format, ...)
         if (limits > 30)
             limits = 30; // arbitrary cutoff; if you can't get an usable port in 30 moves, switch to a linear search
         do {
-            int p3 = get_rand_in_range(port, lim);
+            int p3 = port + randof (lim - port);
             sprintf (colonptr + 1, "%d", p3);
             if (zmq_bind (self->handle, endpoint) == 0) {
                 return p3;
@@ -466,6 +455,9 @@ zsock_connect (zsock_t *self, const char *format, ...)
 #if (ZMQ_VERSION < ZMQ_MAKE_VERSION (4,0,0))
     int retries = 4;
     while (rc == -1 && zmq_errno () == ECONNREFUSED && retries) {
+        //  This bruteforces a synchronization between connecting and
+        //  binding threads on ZeroMQ v3.2 and earlier, where the bind
+        //  MUST happen before the connect on inproc transports.
         zclock_sleep (250);
         rc = zmq_connect (self->handle, endpoint);
         retries--;
