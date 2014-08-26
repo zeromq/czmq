@@ -261,28 +261,32 @@ zsock_new_stream_ (const char *endpoints, const char *filename, size_t line_nbr)
 
 //  --------------------------------------------------------------------------
 //  return a random number within the specified range (min, max) inclusive.
+
 static int is_rand_initd = 0;
-static unsigned int get_rand_in_range(unsigned int min, unsigned int max)
+static unsigned int 
+s_get_rand_in_range(unsigned int min, unsigned int max)
 {
     if (!is_rand_initd ) {
-        srandom(time(NULL));
+        srandom (time(NULL));
         is_rand_initd = 1;
     }
-    double scaled = (double)random()/(RAND_MAX+1.0);
-    return (unsigned int)((max-min+1) * scaled) + min;
+    double scaled = (double)random() / (RAND_MAX + 1.0);
+    return (unsigned int)((max - min + 1) * scaled) + min;
 }
 
 //  --------------------------------------------------------------------------
 //  Parse the port range notation (if there), and return the min, max values
-static int parse_port_notation(const char *endpoint, int *min, int *max)
+
+static int 
+s_parse_port_notation(const char *endpoint, int *min, int *max)
 {
-    char *colonptr = strrchr(endpoint,':'); // there are TWO :'s in the spec
+    char *colonptr = strrchr(endpoint, ':');     // there are TWO :'s in the spec
     char *rangespec = strchr(colonptr, '[');
     if (rangespec) {
-        char *rangesep = strchr(rangespec, '-');
+        char *rangesep = strchr (rangespec, '-');
         if (rangesep) {
-            int p1 = atoi(rangespec+1);
-            int p2 = atoi(rangesep+1);
+            int p1 = atoi (rangespec+1);
+            int p2 = atoi (rangesep+1);
             if (p1 > 0) {
                 *min = p1;
             }
@@ -293,7 +297,7 @@ static int parse_port_notation(const char *endpoint, int *min, int *max)
             return 0;
         }
         else {
-            int p1 = atoi(rangespec+1);
+            int p1 = atoi (rangespec+1);
             if (p1 > 0) {
                 *min = p1;
                 *max = 0; // no max, set to 0
@@ -305,8 +309,6 @@ static int parse_port_notation(const char *endpoint, int *min, int *max)
     *max = 0;
     return -1;
 }
-
-
 
 //  --------------------------------------------------------------------------
 //  Bind a socket to a formatted endpoint. If the port is specified as '*' or '!'
@@ -344,9 +346,9 @@ zsock_bind (zsock_t *self, const char *format, ...)
     va_start (argptr, format);
     vsnprintf (endpoint, 264, format, argptr);
     va_end (argptr);
-    char *colonptr = strrchr(endpoint,':');
+    char *colonptr = strrchr (endpoint,':');
 
-    bool tcp_endpoint = (strlen(endpoint) > 6
+    bool tcp_endpoint = (strlen (endpoint) > 6
                          && memcmp (endpoint, "tcp://", 6) == 0);
 
     //  We implement ephemeral ports here ourselves, so that we can
@@ -361,9 +363,11 @@ zsock_bind (zsock_t *self, const char *format, ...)
         int lim = DYNAMIC_LAST;
         int p1;
         int p2;
-        int ret = parse_port_notation(endpoint, &p1, &p2);
-        if (ret == 0 && p1 > 0) port = p1;
-        if (ret == 0 && p2 > 0) lim = p2;
+        int ret = s_parse_port_notation (endpoint, &p1, &p2);
+        if (ret == 0 && p1 > 0)
+            port = p1;
+        if (ret == 0 && p2 > 0)
+            lim = p2;
 
         while (port <= lim) {
             //  Try to bind on the next plausible port
@@ -372,34 +376,41 @@ zsock_bind (zsock_t *self, const char *format, ...)
                 return port;
             port++;
         }
-        return -1;              //  Can't find a free port
+        return -1;                        //  Can't find a free port
     }
-    else if (tcp_endpoint
+    else
+    if (tcp_endpoint
     &&  colonptr
-    &&  *(colonptr + 1)  == '!') { // Random search in range
-        int port = DYNAMIC_FIRST;  // these values act as defaults
+    &&  *(colonptr + 1)  == '!') {        // Random search in range
+        int port = DYNAMIC_FIRST;         // these values act as defaults
         int lim = DYNAMIC_LAST;
         int p1;
         int p2;
-        int ret = parse_port_notation(endpoint, &p1, &p2);
-        if (ret == 0 && p1 > 0) port = p1;
-        if (ret == 0 && p2 > 0) lim = p2;
+        int ret = s_parse_port_notation (endpoint, &p1, &p2);
+        if (ret == 0 && p1 > 0)
+            port = p1;
+        if (ret == 0 && p2 > 0)
+            lim = p2;
 
         int its=0;
         int limits = lim-port;
         if (limits > 10)
-            limits = 10; // arbitrary cutoff; if you can't get an usable port in 10 moves, switch to a linear search
+            limits = 10;                  // arbitrary cutoff; if you can't get an usable 
+                                          // port in 10 moves, switch to a linear search
+
         do {
-            int p3 = get_rand_in_range(port, lim);
+            int p3 = s_get_rand_in_range (port, lim);
             sprintf (colonptr + 1, "%d", p3);
             if (zmq_bind (self->handle, endpoint) == 0) {
                 return p3;
             }
             its++;
-        } while ( its < limits ); // if you end up with your range entirely (or almost entirely)  allocated, .... well, ....
-        while (port <= lim) { // OK, if we have filled up the range to some extent, choosing new random ports
-                              // ends up being way inefficient, so we revert to a linear traversal to find the few remaining (if any) ports.
-            //  Try to bind on the next plausible port
+        } while ( its < limits );         // if you end up with your range entirely 
+                                          // (or almost entirely)  allocated...
+
+        while (port <= lim) {             // OK, if we have filled up the range to some extent, 
+                                          // choosing new random ports ends up being way inefficient, 
+                                          // so we revert to a linear traversal to find the few remaining (if any) ports.
             sprintf (colonptr + 1, "%d", port);
             if (zmq_bind (self->handle, endpoint) == 0) {
                 return port;
@@ -766,54 +777,52 @@ zsock_test (bool verbose)
     // test the *, !, and [min-max] notation parsing, etc.
 
     zsock_t *arr[7];
-    zsock_t *arr2[7];
     int i3;
-    for (i3=0; i3 < 7; i3++) {
+    for (i3 = 0; i3 < 7; i3++) {
        int rc3;
-       arr[i3] = zsock_new(ZMQ_REP);
-       rc3 = zsock_bind(arr[i3], "tcp://*:*[50000-50005]");
-       if (i3 < 6) {
-           assert( rc3 == 50000+i3 );
-       } else {
-           assert( rc3 == -1);
-       }
+       arr[i3] = zsock_new (ZMQ_REP);
+       rc3 = zsock_bind (arr[i3], "tcp://*:*[50000-50005]");
+       if (i3 < 6)
+           assert (rc3 == 50000+i3);
+       else
+           assert (rc3 == -1);
     }
-    // Hmmm, source code above returns -1 on calls to zsock_unbind before 3.2.0... So, let's skip it.
-    for (i3=0; i3 < 6; i3++) {
+
+    for (i3 = 0; i3 < 6; i3++) {
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
-       int rc3 = zsock_unbind( arr[i3], "tcp://*:%d", i3+50000);
+       int rc3 = zsock_unbind (arr[i3], "tcp://*:%d", i3+50000);
        assert(rc3 == 0);
 #endif
        zsock_destroy(&arr[i3]);
     }
-    zsock_destroy(&arr[6]); // The last socket didn't get bound, but it does need to get destroyed when done!
+    zsock_destroy(&arr[6]);     // The last socket didn't get bound, but it does need to get destroyed when done!
+    zsock_t *arr2[7];
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
     int   parr[7];
 #endif
-    for (i3=0; i3 < 7; i3++) {
+    for (i3 = 0; i3 < 7; i3++) {
        int rc3;
-       arr2[i3] = zsock_new(ZMQ_REP);
-       rc3 = zsock_bind(arr2[i3], "tcp://*:![60000-60005]");
+       arr2[i3] = zsock_new (ZMQ_REP);
+       rc3 = zsock_bind (arr2[i3], "tcp://*:![60000-60005]");
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
        parr[i3] = rc3;
 #endif
-       if (i3 < 6) {
-           assert( rc3 <= 60005 && rc3 >=  60000 );
-       } else {
-           assert( rc3 == -1);
-       }
+       if (i3 < 6)
+           assert (rc3 <= 60005 && rc3 >=  60000);
+       else
+           assert (rc3 == -1);
     }
     // Hmmm, source code above returns -1 on calls to zsock_unbind before 3.2.0... So, let's skip it.
-    for (i3=0; i3 < 6; i3++) {
+    for (i3 = 0; i3 < 6; i3++) {
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
        if (parr[i3] != -1) {
-           int rc3 = zsock_unbind( arr2[i3], "tcp://*:%d", parr[i3]);
-           assert(rc3 == 0);
+           int rc3 = zsock_unbind (arr2[i3], "tcp://*:%d", parr[i3]);
+           assert (rc3 == 0);
        }
 #endif
        zsock_destroy(&arr2[i3]);
     }
-    zsock_destroy(&arr2[6]); // The last socket didn't get bound, but it does need to get destroyed when done!
+    zsock_destroy (&arr2[6]);    // The last socket didn't get bound, but it does need to get destroyed when done!
 
 
     //  Test zsock_attach method
