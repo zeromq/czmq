@@ -335,7 +335,7 @@ zsock_bind (zsock_t *self, const char *format, ...)
     va_end (argptr);
     char *colonptr = strrchr(endpoint,':');
 
-    bool tcp_endpoint = (strlen(endpoint) > 6
+    bool tcp_endpoint = (strlen (endpoint) > 6
                          && memcmp (endpoint, "tcp://", 6) == 0);
 
     //  We implement ephemeral ports here ourselves, so that we can
