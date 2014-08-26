@@ -455,6 +455,9 @@ zsock_connect (zsock_t *self, const char *format, ...)
 #if (ZMQ_VERSION < ZMQ_MAKE_VERSION (4,0,0))
     int retries = 4;
     while (rc == -1 && zmq_errno () == ECONNREFUSED && retries) {
+        //  This bruteforces a synchronization between connecting and
+        //  binding threads on ZeroMQ v3.2 and earlier, where the bind
+        //  MUST happen before the connect on inproc transports.
         zclock_sleep (250);
         rc = zmq_connect (self->handle, endpoint);
         retries--;
