@@ -20,7 +20,7 @@
 enum {
     END, BRANCH, ANY, EXACT, ANYOF, ANYBUT, OPEN, CLOSE, BOL, EOL,
     STAR, PLUS, STARQ, PLUSQ, QUEST,
-    SPACE, NONSPACE, DIGIT, NONDIGIT, ALPHA, NONALPHA, WORD, NONWORD
+    SPACE, NONSPACE, DIGIT, NONDIGIT, ALPHA, NONALPHA, ALNUM, NONALNUM
 };
 
 static struct {
@@ -49,8 +49,8 @@ static struct {
     {"NONDIGIT",0, ""},     /* Match non-digit, "\D"        */
     {"ALPHA",   0, ""},     /* Match alpha, "\a"            */
     {"NONALPHA",0, ""},     /* Match non-alpha, "\A"        */
-    {"WORD",    0, ""},     /* Match letter, "\w"           */
-    {"NONWORD", 0, ""}      /* Match non-letter, "\W"       */
+    {"ALNUM",   0, ""},     /* Match letter, "\w"           */
+    {"NONALNUM", 0, ""}     /* Match non-letter, "\W"       */
 };
 
 /*
@@ -212,9 +212,9 @@ get_escape_char (const char **re)
         case 'D': res = NONDIGIT << 8;    break;
         case 'a': res = ALPHA << 8;       break;
         case 'A': res = NONALPHA << 8;    break;
-        case 'w': res = WORD << 8;        break;
-        case 'W': res = NONWORD << 8;     break;
-        default:  res = (*re) [-1];        break;
+        case 'w': res = ALNUM << 8;       break;
+        case 'W': res = NONALNUM << 8;    break;
+        default:  res = (*re) [-1];       break;
     }
     return (res);
 }
@@ -575,7 +575,7 @@ match (const struct slre *r, int pc, const char *s, int len, int *ofs, struct ca
                 }
                 pc++;
                 break;
-            case WORD:
+            case ALNUM:
                 res = 0;
                 if (*ofs < len && isalnum (((unsigned char *)s) [*ofs])) {
                     (*ofs)++;
@@ -583,7 +583,7 @@ match (const struct slre *r, int pc, const char *s, int len, int *ofs, struct ca
                 }
                 pc++;
                 break;
-            case NONWORD:
+            case NONALNUM:
                 res = 0;
                 if (*ofs < len && !isalnum (((unsigned char *)s) [*ofs])) {
                     (*ofs)++;
