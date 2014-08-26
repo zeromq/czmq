@@ -250,7 +250,6 @@ zrex_test (bool verbose)
     assert (!matches);
     matches = zrex_matches (rex, "123-456-789");
     assert (matches);
-    printf ("HITS=%d\n", zrex_hits (rex));
     assert (zrex_hits (rex) == 4);
     assert (streq (zrex_hit (rex, 0), "123-456-789"));
     assert (streq (zrex_hit (rex, 1), "123"));
