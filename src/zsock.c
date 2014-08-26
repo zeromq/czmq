@@ -265,10 +265,10 @@ zsock_new_stream_ (const char *endpoints, const char *filename, size_t line_nbr)
 
 static int parse_port_notation (const char *endpoint, int *min, int *max)
 {
-    char *colonptr = strrchr(endpoint,':'); // there are TWO :'s in the spec
-    char *rangespec = strchr(colonptr, '[');
+    const char *colonptr = strrchr(endpoint,':'); // there are TWO :'s in the spec
+    const char *rangespec = strchr(colonptr, '[');
     if (rangespec) {
-        char *rangesep = strchr(rangespec, '-');
+        const char *rangesep = strchr(rangespec, '-');
         if (rangesep) {
             int p1 = atoi(rangespec+1);
             int p2 = atoi(rangesep+1);
