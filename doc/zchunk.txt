@@ -77,6 +77,14 @@ CZMQ_EXPORT zchunk_t *
 CZMQ_EXPORT zchunk_t *
     zchunk_dup (zchunk_t *self);
 
+//  Transform zchunk into a zframe that can be sent in a message.
+CZMQ_EXPORT zframe_t *
+    zchunk_pack (zchunk_t *self);
+
+//  Transform a zframe into a zchunk.
+CZMQ_EXPORT zchunk_t *
+    zchunk_unpack (zframe_t *frame);
+
 //  Dump chunk to FILE stream, for debugging and tracing.
 CZMQ_EXPORT void
     zchunk_fprint (zchunk_t *self, FILE *file);
@@ -119,7 +127,15 @@ EXAMPLE
     zchunk_append (chunk, "GHIJKLMN", 8);
     assert (memcmp (zchunk_data (chunk), "1234567890", 10) == 0);
     assert (zchunk_size (chunk) == 10);
-    
+
+    zframe_t *frame = zchunk_pack (chunk);
+    assert(frame);
+
+    zchunk_t *chunk2 = zchunk_unpack (frame);
+    assert (memcmp (zchunk_data (chunk2), "1234567890", 10) == 0);
+    zframe_destroy(&frame);
+    zchunk_destroy(&chunk2);
+
     zchunk_t *copy = zchunk_dup (chunk);
     assert (memcmp (zchunk_data (copy), "1234567890", 10) == 0);
     assert (zchunk_size (copy) == 10);
