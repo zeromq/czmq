@@ -352,12 +352,14 @@ zsock_unbind (zsock_t *self, const char *format, ...)
     assert (zsock_is (self));
 
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
-    char endpoint [256];
+    //  Expand format to get full endpoint
     va_list argptr;
     va_start (argptr, format);
-    vsnprintf (endpoint, 256, format, argptr);
+    char *endpoint = zsys_vprintf (format, argptr);
     va_end (argptr);
-    return zmq_unbind (self->handle, endpoint);
+    int rc = zmq_unbind (self->handle, endpoint);
+    free (endpoint);
+    return rc;
 #else
     return -1;
 #endif
@@ -374,13 +376,13 @@ zsock_connect (zsock_t *self, const char *format, ...)
     assert (self);
     assert (zsock_is (self));
 
-    char endpoint [256];
+    //  Expand format to get full endpoint
     va_list argptr;
     va_start (argptr, format);
-    vsnprintf (endpoint, 256, format, argptr);
+    char *endpoint = zsys_vprintf (format, argptr);
     va_end (argptr);
-    
     int rc = zmq_connect (self->handle, endpoint);
+    
 #if (ZMQ_VERSION < ZMQ_MAKE_VERSION (4,0,0))
     int retries = 4;
     while (rc == -1 && zmq_errno () == ECONNREFUSED && retries) {
@@ -392,6 +394,7 @@ zsock_connect (zsock_t *self, const char *format, ...)
         retries--;
     }
 #endif
+    free (endpoint);
     return rc;
 }
 
@@ -407,12 +410,14 @@ zsock_disconnect (zsock_t *self, const char *format, ...)
     assert (zsock_is (self));
 
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
-    char endpoint [256];
+    //  Expand format to get full endpoint
     va_list argptr;
     va_start (argptr, format);
-    vsnprintf (endpoint, 256, format, argptr);
+    char *endpoint = zsys_vprintf (format, argptr);
     va_end (argptr);
-    return zmq_disconnect (self->handle, endpoint);
+    int rc = zmq_disconnect (self->handle, endpoint);
+    free (endpoint);
+    return rc;
 #else
     return -1;
 #endif
