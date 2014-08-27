@@ -130,6 +130,10 @@ CZMQ_EXPORT zsock_t *
 CZMQ_EXPORT int
     zsock_bind (zsock_t *self, const char *format, ...);
 
+//  Returns last bound endpoint, if any.
+CZMQ_EXPORT char *
+    zsock_endpoint (zsock_t *self);
+
 //  Unbind a socket from a formatted endpoint.
 //  Returns 0 if OK, -1 if the endpoint was invalid or the function
 //  isn't supported.
