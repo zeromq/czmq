@@ -46,7 +46,8 @@ static zinterface_item_t *
 
 //  --------------------------------------------------------------------------
 //  Return a list of available network interfaces.
-CZMQ_EXPORT zinterface_t *
+
+zinterface_t *
 zinterface_new ()
 {
     zinterface_t *self = (zinterface_t*) zmalloc (sizeof (struct _zinterface_t));
@@ -72,6 +73,7 @@ static void
 s_freefn (void *ptr)
 {
     zinterface_item_t *self = (zinterface_item_t *) ptr;
+    free (self->name);
     free (self->address);
     free (self->netmask);
     free (self->broadcast);
@@ -241,15 +243,13 @@ s_list_interfaces (zinterface_t* self)
 zinterface_item_t *
 s_zinterface_item_new (char *name, inaddr_t address, inaddr_t netmask, inaddr_t broadcast)
 {
-    assert (name);
-    zinterface_item_t *self = (zinterface_item_t *) zmalloc (sizeof(struct _zinterface_item_t));
-    
+    zinterface_item_t *self = (zinterface_item_t *) zmalloc (sizeof (struct _zinterface_item_t));
     assert (self);
+    assert (name);
     self->name      = strdup (name);
     self->address   = strdup (inet_ntoa (address.sin_addr));
     self->netmask   = strdup (inet_ntoa (netmask.sin_addr));
     self->broadcast = strdup (inet_ntoa (broadcast.sin_addr));
-
     assert (self->name);
     assert (self->address);
     assert (self->netmask);
@@ -274,6 +274,7 @@ zinterface_destroy (zinterface_t **self_p)
 
 //  --------------------------------------------------------------------------
 //  Return the number of interfaces
+
 size_t
 zinterface_size (zinterface_t *self)
 {
@@ -283,6 +284,7 @@ zinterface_size (zinterface_t *self)
 
 //  --------------------------------------------------------------------------
 //  Set the current interface to be the first one. Returns true if the list is not empty
+
 bool
 zinterface_first (zinterface_t *self)
 {
@@ -293,6 +295,7 @@ zinterface_first (zinterface_t *self)
 
 //  --------------------------------------------------------------------------
 //  Advances the current interface. Returns false if there's no more items, true otherwise
+
 bool
 zinterface_next (zinterface_t *self)
 {
@@ -351,16 +354,17 @@ zinterface_test (bool verbose)
     assert (interfaces);
 
     if (verbose) {
-        printf ("Len: %zu\n", zinterface_size (interfaces));
-        if (zinterface_first (interfaces)) {
-            do {
-                printf ("%s\t%s\t%s\t%s\n", zinterface_name (interfaces),
-                    zinterface_address (interfaces), zinterface_netmask (interfaces),
-                    zinterface_broadcast (interfaces));
-            } while (zinterface_next (interfaces));
+        printf ("Length: %zu\n", zinterface_size (interfaces));
+        bool more = zinterface_first (interfaces);
+        while (more) {
+            printf ("%s\t%s\t%s\t%s\n",
+                zinterface_name      (interfaces),
+                zinterface_address   (interfaces),
+                zinterface_netmask   (interfaces),
+                zinterface_broadcast (interfaces));
+            more = zinterface_next (interfaces);
         }
     }
-
     zinterface_destroy (&interfaces);
     printf ("OK\n");
 }
