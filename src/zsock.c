@@ -306,24 +306,26 @@ zsock_bind (zsock_t *self, const char *format, ...)
     else
     if (zrex_eq (rex, endpoint, "^(tcp://.*):([*!])(\\[(\\d+)?-(\\d+)?\\])?$")) {
         assert (zrex_hits (rex) == 6);
-
-        int first = *zrex_hit (rex, 4)? atoi (zrex_hit (rex, 4)): DYNAMIC_FIRST;
-        int last = *zrex_hit (rex, 5)? atoi (zrex_hit (rex, 5)): DYNAMIC_LAST;
+        const char *hostname, *opcode, *group, *first_str, *last_str;
+        zrex_fetch (rex, &hostname, &opcode, &group, &first_str, &last_str, NULL);
+        
+        int first = *first_str? atoi (first_str): DYNAMIC_FIRST;
+        int last = *last_str? atoi (last_str): DYNAMIC_LAST;
 
         //  This is how many times we'll try before giving up
         int attempts = last - first + 1;
-        
-        //  Find free port in range
-        int port = first;
+
+        //  If operator is '*', take first available port.
         //  If operator is '!', take a random leap into our port space; we'll
         //  still scan sequentially to make sure we find a free slot rapidly.
-        if (streq (zrex_hit (rex, 2), "!"))
+        int port = first;
+        if (streq (opcode, "!"))
             port += randof (attempts);
             
         rc = -1;                //  Assume we don't succeed
         while (rc == -1 && attempts--) {
             free (endpoint);
-            endpoint = zsys_sprintf ("%s:%d", zrex_hit (rex, 1), port);
+            endpoint = zsys_sprintf ("%s:%d", hostname, port);
             if (zmq_bind (self->handle, endpoint) == 0)
                 rc = port;
             if (++port > last)

@@ -223,6 +223,29 @@ zrex_hit (zrex_t *self, uint index)
 
 
 //  --------------------------------------------------------------------------
+//  Fetches hits into string variables provided by caller; this makes for
+//  nicer code than accessing hits by index. Caller should not modify nor
+//  free the returned values. Returns number of strings returned. This
+//  method starts at hit 1, i.e. first capture group, as hit 0 is always
+//  the original matched string.
+
+int
+zrex_fetch (zrex_t *self, const char **string_p, ...)
+{
+    assert (self);
+    va_list args;
+    va_start (args, string_p);
+    uint index = 0;
+    while (string_p) {
+        *string_p = zrex_hit (self, ++index);
+        string_p = va_arg (args, const char **);
+    }
+    va_end (args);
+    return index;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Selftest
 
 void
@@ -266,7 +289,10 @@ zrex_test (bool verbose)
     matches = zrex_eq (rex, input, "Mechanism: (.+)");
     assert (matches);
     assert (zrex_hits (rex) == 2);
+    const char *mechanism;
+    zrex_fetch (rex, &mechanism, NULL);
     assert (streq (zrex_hit (rex, 1), "CURVE"));
+    assert (streq (mechanism, "CURVE"));
     zrex_destroy (&rex);
     printf ("OK\n");
 }

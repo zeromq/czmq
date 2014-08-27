@@ -51,6 +51,14 @@ CZMQ_EXPORT int
 CZMQ_EXPORT const char *
     zrex_hit (zrex_t *self, uint index);
 
+//  Fetches hits into string variables provided by caller; this makes for
+//  nicer code than accessing hits by index. Caller should not modify nor
+//  free the returned values. Returns number of strings returned. This
+//  method starts at hit 1, i.e. first capture group, as hit 0 is always
+//  the original matched string.
+CZMQ_EXPORT int
+    zrex_fetch (zrex_t *self, const char **string_p, ...);
+
 //  Self test of this class
 CZMQ_EXPORT void
     zrex_test (bool verbose);
