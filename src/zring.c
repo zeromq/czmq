@@ -381,6 +381,7 @@ zring_test (int verbose)
     zring_t *dup_ring = zring_dup (ring);
     assert (dup_ring);
     assert (zring_size (dup_ring) == 3);
+    zring_destroy (&dup_ring);
 
     //  Destructor should be safe to call twice
     zring_destroy (&ring);
