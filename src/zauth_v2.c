@@ -1,4 +1,4 @@
-/*  =========================================================================
+h/*  =========================================================================
     zauth_v2 - authentication for ZeroMQ servers (deprecated)
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -23,6 +23,7 @@
 */
 
 #include "../include/czmq.h"
+#define ZAP_ENDPOINT  "inproc://zeromq.zap.01"
 
 //  Structure of our class
 //  All work is done by a background thread, the "agent", which we talk
@@ -317,7 +318,7 @@ s_agent_new (zctx_t *ctx, void *pipe)
     //  Create ZAP handler and get ready for requests
     self->handler = zsocket_new (self->ctx, ZMQ_REP);
     if (self->handler
-    &&  zsocket_bind (self->handler, "inproc://zeromq.zap.01") == 0)
+    &&  zsocket_bind (self->handler, ZAP_ENDPOINT) == 0)
         zstr_send (self->pipe, "OK");
     else
         zstr_send (self->pipe, "ERROR");
@@ -335,6 +336,8 @@ s_agent_destroy (agent_t **self_p)
         zhash_destroy (&self->whitelist);
         zhash_destroy (&self->blacklist);
         zcertstore_destroy (&self->certstore);
+        zsocket_unbind (self->handler, ZAP_ENDPOINT);
+        zsocket_destroy (self->ctx, self->handler);
         free (self);
         *self_p = NULL;
     }
