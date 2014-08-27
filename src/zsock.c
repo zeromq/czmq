@@ -38,6 +38,7 @@ struct _zsock_t {
     uint32_t tag;               //  Object tag for runtime detection
     void *handle;               //  The libzmq socket handle
     int type;                   //  The socket type
+    char *endpoint;             //  Last bound endpoint, if any
 };
 
 
@@ -80,6 +81,7 @@ zsock_destroy_ (zsock_t **self_p, const char *filename, size_t line_nbr)
         self->tag = 0xDeadBeef;
         int rc = zsys_close (self->handle, filename, line_nbr);
         assert (rc == 0);
+        free (self->endpoint);
         free (self);
         *self_p = NULL;
     }
@@ -268,11 +270,10 @@ zsock_new_stream_ (const char *endpoints, const char *filename, size_t line_nbr)
 //  range, use "!" in place of "*".
 //
 //  Examples:
-//      tcp://127.0.0.1:*           bind to first free port from C000 up
-//      tcp://127.0.0.1:!           bind to random port from C000 to FFFF
-//      tcp://127.0.0.1:*[60000-]   bind to first free port from 60000 up
-//      tcp://127.0.0.1:![55000-55999]
-//                                  bind to random port from 55000 to 55999
+//  tcp://127.0.0.1:*                bind to first free port from C000 up
+//  tcp://127.0.0.1:!                bind to random port from C000 to FFFF
+//  tcp://127.0.0.1:*[60000-]        bind to first free port from 60000 up
+//  tcp://127.0.0.1:![55000-55999]   bind to random port from 55000-55999
 //
 //  On success, returns the actual port number used, for tcp:// endpoints,
 //  and 0 for other transports. On failure, returns -1. Note that when using
@@ -321,10 +322,10 @@ zsock_bind (zsock_t *self, const char *format, ...)
             
         rc = -1;                //  Assume we don't succeed
         while (rc == -1 && attempts--) {
-            char *formatted = zsys_sprintf ("%s:%d", zrex_hit (rex, 1), port);
-            if (zmq_bind (self->handle, formatted) == 0)
+            free (endpoint);
+            endpoint = zsys_sprintf ("%s:%d", zrex_hit (rex, 1), port);
+            if (zmq_bind (self->handle, endpoint) == 0)
                 rc = port;
-            free (formatted);
             if (++port > last)
                 port = first;
         }
@@ -332,9 +333,27 @@ zsock_bind (zsock_t *self, const char *format, ...)
     else
         rc = zmq_bind (self->handle, endpoint);
 
+    //  Store successful endpoint for later reference
+    if (rc >= 0) {
+        free (self->endpoint);
+        self->endpoint = endpoint;
+    }
+    else
+        free (endpoint);
+    
     zrex_destroy (&rex);
-    free (endpoint);
     return rc;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Returns last bound endpoint, if any.
+
+char *
+zsock_endpoint (zsock_t *self)
+{
+    assert (self);
+    return self->endpoint;
 }
 
 
@@ -655,6 +674,7 @@ zsock_test (bool verbose)
     //  Bind again
     rc = zsock_bind (writer, "tcp://127.0.0.1:%d", 5560);
     assert (rc == 5560);
+    assert (streq (zsock_endpoint (writer), "tcp://127.0.0.1:5560"));
 #endif
 
     zsock_t *reader = zsock_new_pull (">tcp://127.0.0.1:5560");
@@ -689,6 +709,11 @@ zsock_test (bool verbose)
     port = zsock_bind (writer, "tcp://127.0.0.1:![60000-60010]");
     assert (port >= 60000 && port <= 60010);
 
+    //  Test zsock_endpoint method
+    rc = zsock_bind (writer, "inproc://test.%s", "writer");
+    assert (rc == 0);
+    assert (streq (zsock_endpoint (writer), "inproc://test.writer"));
+    
     //  Test error state when connecting to an invalid socket type
     //  ('txp://' instead of 'tcp://', typo intentional)
     rc = zsock_connect (reader, "txp://127.0.0.1:5560");

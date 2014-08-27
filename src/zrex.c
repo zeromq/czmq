@@ -56,7 +56,8 @@ struct _zrex_t {
     bool valid;                 //  Is expression valid or not?
     const char *strerror;       //  Error message if any
     uint hits;                  //  Number of hits matched
-    char *hit [MAX_HITS];       //  Captured hits
+    char *hit_set;              //  Captured hits as single string
+    char *hit [MAX_HITS];       //  Pointers into hit_set
     struct cap caps [MAX_HITS]; //  Position/length for each hit
 };
 
@@ -94,9 +95,7 @@ zrex_destroy (zrex_t **self_p)
     assert (self_p);
     if (*self_p) {
         zrex_t *self = *self_p;
-        uint index;
-        for (index = 0; index < self->hits; index++)
-            free (self->hit [index]);
+        zstr_free (&self->hit_set);
         free (self);
         *self_p = NULL;
     }
@@ -136,21 +135,33 @@ zrex_matches (zrex_t *self, const char *text)
     assert (text);
 
     //  Free any previously-allocated hits
-    uint index;
-    for (index = 0; index < self->hits; index++) {
-        free (self->hit [index]);
-        self->hit [index] = NULL;
-    }
+    self->hits = 0;
+    zstr_free (&self->hit_set);
+    
     bool matches = slre_match (&self->slre, text, strlen (text), self->caps);
     if (matches) {
         //  Count number of captures plus whole string
         self->hits = self->slre.num_caps + 1;
         if (self->hits > MAX_HITS)
             self->hits = MAX_HITS;
-    }
-    else
-        self->hits = 0;
 
+        //  Collect hits and prepare hit array, which is a single block of
+        //  memory holding all hits as null-terminated strings
+        uint index;
+        //  First count total length of hit strings
+        uint hit_set_len = 0;
+        for (index = 0; index < self->hits; index++)
+            hit_set_len += self->caps [index].len + 1;
+        self->hit_set = (char *) zmalloc (hit_set_len);
+
+        //  Now prepare hit strings for access by caller
+        char *hit_set_ptr = self->hit_set;
+        for (index = 0; index < self->hits; index++) {
+            memcpy (hit_set_ptr, self->caps [index].ptr, self->caps [index].len);
+            self->hit [index] = hit_set_ptr;
+            hit_set_ptr += self->caps [index].len + 1;
+        }
+    }
     return matches;
 }
 
@@ -204,20 +215,8 @@ const char *
 zrex_hit (zrex_t *self, uint index)
 {
     assert (self);
-
-    if (index < self->hits) {
-        //  We collect hits opportunistically to minimize use of the heap for
-        //  complex expressions where the caller wants only a few hits.
-        if (self->hit [index] == NULL) {
-            //  We haven't fetched this hit yet, so grab it now
-            int capture_len = self->caps [index].len;
-            const char *capture_ptr = self->caps [index].ptr;
-            self->hit [index] = (char *) malloc (capture_len + 1);
-            memcpy (self->hit [index], capture_ptr, capture_len);
-            self->hit [index][capture_len] = 0;
-        }
+    if (index < self->hits)
         return self->hit [index];
-    }
     else
         return NULL;
 }
