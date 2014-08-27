@@ -338,6 +338,8 @@ s_agent_destroy (agent_t **self_p)
         zcertstore_destroy (&self->certstore);
         zsocket_unbind (self->handler, ZAP_ENDPOINT);
         zsocket_destroy (self->ctx, self->handler);
+        //  Workaround for https://github.com/zeromq/libzmq/issues/1169
+        zclock_sleep (100);
         free (self);
         *self_p = NULL;
     }
