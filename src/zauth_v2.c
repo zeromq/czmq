@@ -1,4 +1,4 @@
-h/*  =========================================================================
+/*  =========================================================================
     zauth_v2 - authentication for ZeroMQ servers (deprecated)
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
