@@ -42,7 +42,7 @@ typedef struct _zdir_patch_t zdir_patch_t;
 typedef struct _zfile_t zfile_t;
 typedef struct _zframe_t zframe_t;
 typedef struct _zhash_t zhash_t;
-typedef struct _ziface_t ziface_t;
+typedef struct _ziflist_t ziflist_t;
 typedef struct _zlist_t zlist_t;
 typedef struct _zloop_t zloop_t;
 typedef struct _zmsg_t zmsg_t;
@@ -75,7 +75,7 @@ typedef struct _zproxy_t zproxy_t;
 #include "zframe.h"
 #include "zgossip.h"
 #include "zhash.h"
-#include "ziface.h"
+#include "ziflist.h"
 #include "zlist.h"
 #include "zloop.h"
 #include "zmonitor.h"

@@ -463,28 +463,28 @@ s_get_interface (agent_t *self)
         self->address.sin_addr.s_addr = INADDR_ANY;
     }
     else {
-        ziface_t *iflist = ziface_new ();
-        const char *name = ziface_first (iflist);
+        ziflist_t *iflist = ziflist_new ();
+        const char *name = ziflist_first (iflist);
         if (*iface) {
             while (name) {
                 if (streq (iface, name))
                     break;      //  iface is known, so allow it
-                name = ziface_next (iflist);
+                name = ziflist_next (iflist);
             }
         }
         if (name) {
             //  Using inet_addr instead of inet_aton or inet_atop because these 
             //  are not supported in Win XP
             self->broadcast.sin_family = AF_INET;
-            self->broadcast.sin_addr.s_addr = inet_addr (ziface_broadcast (iflist));
+            self->broadcast.sin_addr.s_addr = inet_addr (ziflist_broadcast (iflist));
             self->broadcast.sin_port = htons (self->port_nbr);
             self->address = self->broadcast;
-            self->address.sin_addr.s_addr = inet_addr (ziface_address (iflist));
+            self->address.sin_addr.s_addr = inet_addr (ziflist_address (iflist));
         }
         else
-            zsys_error ("No adapter found, and ZSYS_INTERFACE isn't helping");
+            zsys_error ("No adapter found, ZSYS_INTERFACE=%s isn't helping", iface);
         
-        ziface_destroy (&iflist);
+        ziflist_destroy (&iflist);
     }
 }
 
