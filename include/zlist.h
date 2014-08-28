@@ -33,22 +33,25 @@ CZMQ_EXPORT zlist_t *
 CZMQ_EXPORT void
     zlist_destroy (zlist_t **self_p);
 
-//  Return first item in the list, or null
+//  Return the item at the head of list. If the list is empty, returns NULL.
+//  Leaves cursor pointing at the head item, or NULL if the list is empty.
 CZMQ_EXPORT void *
     zlist_first (zlist_t *self);
 
-//  Return next item in the list, or null
+//  Return the next item. If the list is empty, returns NULL. To move to
+//  the start of the list call zlist_first (). Advances the cursor.
 CZMQ_EXPORT void *
     zlist_next (zlist_t *self);
 
-//  Return last item in the list, or null
+//  Return the item at the tail of list. If the list is empty, returns NULL.
+//  Leaves cursor pointing at the tail item, or NULL if the list is empty.
 CZMQ_EXPORT void *
     zlist_last (zlist_t *self);
 
-//  Return current item in the list, or null
+//  Return the current item of list. If the list is empty, returns NULL.
+//  Leaves cursor pointing at the current item, or NULL if the list is empty.
 CZMQ_EXPORT void *
-    zlist_curr (zlist_t *self);
-
+    zlist_item (zlist_t *self);
 
 //  Append an item to the end of the list, return 0 if OK
 //  or -1 if this failed for some reason (out of memory).
