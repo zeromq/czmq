@@ -678,7 +678,7 @@
           <Tool Name="VCCLCompilerTool" CompileAs="2" />
         </FileConfiguration>
       </File>
-      <File RelativePath="..\..\..\..\src\zinterface.c">
+      <File RelativePath="..\..\..\..\src\ziface.c">
         <FileConfiguration Name="Release|Win32">
           <Tool Name="VCCLCompilerTool" CompileAs="2" />
         </FileConfiguration>
@@ -1434,7 +1434,7 @@
       <File RelativePath="..\..\..\..\include\zframe.h" />
       <File RelativePath="..\..\..\..\include\zhash.h" />
       <File RelativePath="..\..\..\..\include\zgossip.h" />
-      <File RelativePath="..\..\..\..\include\zinterface.h" />
+      <File RelativePath="..\..\..\..\include\ziface.h" />
       <File RelativePath="..\..\..\..\include\zlist.h" />
       <File RelativePath="..\..\..\..\include\zloop.h" />
       <File RelativePath="..\..\..\..\include\zmonitor.h" />

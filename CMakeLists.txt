@@ -96,7 +96,7 @@ set (czmq_headers
     include/zframe.h
     include/zhash.h
     include/zgossip.h
-    include/zinterface.h
+    include/ziface.h
     include/zlist.h
     include/zloop.h
     include/zmonitor.h
@@ -145,7 +145,7 @@ set (czmq_sources
     src/zframe.c
     src/zhash.c
     src/zgossip.c
-    src/zinterface.c
+    src/ziface.c
     src/zlist.c
     src/zloop.c
     src/zmonitor.c
