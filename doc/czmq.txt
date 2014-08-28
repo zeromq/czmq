@@ -55,7 +55,7 @@ These classes wrap-up non-portable functionality:
 * linkczmq:zfile[3] - work with file-system files
 * linkczmq:zsys[3] - system-level methods
 * linkczmq:zuuid[3] - UUID support class
-* linkczmq:ziflist[3] - iterate network interfaces
+* linkczmq:ziflist[3] - list available network interfaces
 
 And these utility classes add value:
 
