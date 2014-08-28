@@ -463,36 +463,28 @@ s_get_interface (agent_t *self)
         self->address.sin_addr.s_addr = INADDR_ANY;
     }
     else {
-        ziface_t *interfaces = ziface_new ();
-        bool have_interface = false;
+        ziface_t *iflist = ziface_new ();
+        const char *name = ziface_first (iflist);
         if (*iface) {
-            //  Check if the zsys_interface is valid on this system
-            bool check_interface = ziface_first (interfaces);
-            while (check_interface) {
-                if (streq (iface, ziface_name (interfaces))) {
-                    have_interface = true;
-                    break;
-                }
-                check_interface = ziface_next (interfaces);
+            while (name) {
+                if (streq (iface, name))
+                    break;      //  iface is known, so allow it
+                name = ziface_next (iflist);
             }
         }
-        else
-            //  Use first interface, if any are available
-            have_interface = ziface_first (interfaces);
-        
-        if (have_interface) {
+        if (name) {
             //  Using inet_addr instead of inet_aton or inet_atop because these 
             //  are not supported in Win XP
             self->broadcast.sin_family = AF_INET;
-            self->broadcast.sin_addr.s_addr = inet_addr (ziface_broadcast (interfaces));
+            self->broadcast.sin_addr.s_addr = inet_addr (ziface_broadcast (iflist));
             self->broadcast.sin_port = htons (self->port_nbr);
             self->address = self->broadcast;
-            self->address.sin_addr.s_addr = inet_addr (ziface_address (interfaces));
+            self->address.sin_addr.s_addr = inet_addr (ziface_address (iflist));
         }
         else
             zsys_error ("No adapter found, and ZSYS_INTERFACE isn't helping");
         
-        ziface_destroy (&interfaces);
+        ziface_destroy (&iflist);
     }
 }
 

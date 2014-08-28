@@ -19,43 +19,44 @@ extern "C" {
 #endif
 
 //  @interface
-//  Return a list of available network interfaces.
+//  Create a new ziface instance to take a snapshot of network interfaces
+//  currently defined on the system.
 CZMQ_EXPORT ziface_t *
-    ziface_new ();
+    ziface_new (void);
 
-//  Destroy a list of network interfaces
+//  Destroy a ziface instance
 CZMQ_EXPORT void
     ziface_destroy (ziface_t **self_p);
 
-//  Return the number of interfaces
+//  Reload network interfaces from system
+CZMQ_EXPORT void
+    ziface_reload (ziface_t *self);
+
+//  Return the number of network interfaces on system
 CZMQ_EXPORT size_t
     ziface_size (ziface_t *self);
 
-//  Set the current interface to be the first one. Returns true if the list is not empty
-CZMQ_EXPORT bool
+//  Get first network interface, return NULL if there are none
+CZMQ_EXPORT const char *
     ziface_first (ziface_t *self);
 
-//  Advances the current interface. Returns false if there's no more items, true otherwise
-CZMQ_EXPORT bool
+//  Get next network interface, return NULL if we hit the last one
+CZMQ_EXPORT const char *
     ziface_next (ziface_t *self);
 
-//  Return the current interface's name as a printable string
-CZMQ_EXPORT char *
-    ziface_name (ziface_t *self);
-
-//  Return the current interface's IP address as a printable string
-CZMQ_EXPORT char *
+//  Return the current interface IP address as a printable string
+CZMQ_EXPORT const char *
     ziface_address (ziface_t *self);
 
-//  Return the current interface's broadcast address as a printable string
-CZMQ_EXPORT char *
+//  Return the current interface broadcast address as a printable string
+CZMQ_EXPORT const char *
     ziface_broadcast (ziface_t *self);
 
-//  Return the current interface's network mask as a printable string
-CZMQ_EXPORT char *
+//  Return the current interface network mask as a printable string
+CZMQ_EXPORT const char *
     ziface_netmask (ziface_t *self);
 
-// Prints all detected interfaces on the screen
+//  Selftest for this class
 CZMQ_EXPORT void
     ziface_test (bool verbose);
 //  @end
