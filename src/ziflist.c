@@ -115,6 +115,16 @@ s_valid_flags (short flags)
 void
 ziflist_reload (ziflist_t *self)
 {
+    //  Empty lists of any previous values
+    while (zlist_size (self->names))
+        zlist_remove (self->names, zlist_first (self->names));
+    while (zlist_size (self->addresses))
+        zlist_remove (self->addresses, zlist_first (self->addresses));
+    while (zlist_size (self->netmasks))
+        zlist_remove (self->netmasks, zlist_first (self->netmasks));
+    while (zlist_size (self->broadcasts))
+        zlist_remove (self->broadcasts, zlist_first (self->broadcasts));
+
 #if defined (HAVE_GETIFADDRS)
     struct ifaddrs *interfaces;
     if (getifaddrs (&interfaces) == 0) {
@@ -316,6 +326,7 @@ ziflist_test (bool verbose)
     
     ziflist_t *iflist = ziflist_new ();
     assert (iflist);
+    size_t items = ziflist_size (iflist);
 
     if (verbose) {
         printf ("ziflist: interfaces=%zu\n", ziflist_size (iflist));
@@ -326,6 +337,8 @@ ziflist_test (bool verbose)
             name = ziflist_next (iflist);
         }
     }
+    ziflist_reload (iflist);
+    assert (items == ziflist_size (iflist));
     ziflist_destroy (&iflist);
     printf ("OK\n");
 }
