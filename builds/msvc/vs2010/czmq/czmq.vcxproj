@@ -126,7 +126,7 @@
     <ClCompile Include="..\..\..\..\src\zgossip.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\ziface.c">
+    <ClCompile Include="..\..\..\..\src\ziflist.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\zlist.c">

@@ -20,7 +20,7 @@
     <class name = "zframe" />
     <class name = "zhash" />
     <class name = "zgossip" />
-    <class name = "ziface" />
+    <class name = "ziflist" />
     <class name = "zlist" />
     <class name = "zloop" />
     <class name = "zmonitor" />

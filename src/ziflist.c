@@ -1,5 +1,5 @@
 /*  =========================================================================
-    ziface - Information about network interfaces
+    ziflist - List of network interfaces available on system
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -13,7 +13,7 @@
 
 /*
 @header
-    The ziface class takes a snapshot of the network interfaces that the
+    The ziflist class takes a snapshot of the network interfaces that the
     system currently supports (this can change arbitrarily, especially on
     mobile devices). The caller can then access the network interface
     information using an iterator that works like zlist. Only stores those
@@ -26,7 +26,7 @@
 #include "../include/czmq.h"
 
 //  Structure of our class
-struct _ziface_t {
+struct _ziflist_t {
     //  We store our interfaces as separate lists for each property
     zlist_t *names;             //  Name as reported by the OS
     zlist_t *addresses;         //  IP(v4) address as a string
@@ -36,7 +36,7 @@ struct _ziface_t {
 
 
 static void
-s_store (ziface_t *self, char *name, inaddr_t address, inaddr_t netmask, inaddr_t broadcast)
+s_store (ziflist_t *self, char *name, inaddr_t address, inaddr_t netmask, inaddr_t broadcast)
 {
     zlist_append (self->names, name);
     zlist_append (self->addresses, inet_ntoa (address.sin_addr));
@@ -46,13 +46,12 @@ s_store (ziface_t *self, char *name, inaddr_t address, inaddr_t netmask, inaddr_
 
 
 //  --------------------------------------------------------------------------
-//  Create a new ziface instance to take a snapshot of network interfaces
-//  currently defined on the system.
+//  Get a list of network interfaces currently defined on the system
 
-ziface_t *
-ziface_new (void)
+ziflist_t *
+ziflist_new (void)
 {
-    ziface_t *self = (ziface_t *) zmalloc (sizeof (struct _ziface_t));
+    ziflist_t *self = (ziflist_t *) zmalloc (sizeof (struct _ziflist_t));
     if (self) {
         self->names = zlist_new ();
         self->addresses = zlist_new ();
@@ -64,24 +63,24 @@ ziface_new (void)
             zlist_autofree (self->addresses);
             zlist_autofree (self->netmasks);
             zlist_autofree (self->broadcasts);
-            ziface_reload (self);
+            ziflist_reload (self);
         }
         else
-            ziface_destroy (&self);
+            ziflist_destroy (&self);
     }
     return self;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Destroy a ziface instance
+//  Destroy a ziflist instance
 
 void
-ziface_destroy (ziface_t **self_p)
+ziflist_destroy (ziflist_t **self_p)
 {
     assert (self_p);
     if (*self_p) {
-        ziface_t *self = *self_p;
+        ziflist_t *self = *self_p;
         zlist_destroy (&self->names);
         zlist_destroy (&self->addresses);
         zlist_destroy (&self->netmasks);
@@ -114,7 +113,7 @@ s_valid_flags (short flags)
 //  Reload network interfaces from system
 
 void
-ziface_reload (ziface_t *self)
+ziflist_reload (ziflist_t *self)
 {
 #if defined (HAVE_GETIFADDRSx)
     struct ifaddrs *interfaces;
@@ -237,7 +236,7 @@ ziface_reload (ziface_t *self)
 //  Return the number of network interfaces on system
 
 size_t
-ziface_size (ziface_t *self)
+ziflist_size (ziflist_t *self)
 {
     assert (self);
     return zlist_size (self->names);
@@ -248,7 +247,7 @@ ziface_size (ziface_t *self)
 //  Get first network interface, return NULL if there are none
 
 const char *
-ziface_first (ziface_t *self)
+ziflist_first (ziflist_t *self)
 {
     assert (self);
     zlist_first (self->addresses);
@@ -262,7 +261,7 @@ ziface_first (ziface_t *self)
 //  Get next network interface, return NULL if we hit the last one
 
 const char *
-ziface_next (ziface_t *self)
+ziflist_next (ziflist_t *self)
 {
     assert (self);
     zlist_next (self->addresses);
@@ -276,7 +275,7 @@ ziface_next (ziface_t *self)
 //  Return the current interface IP address as a printable string
 
 const char *
-ziface_address (ziface_t *self)
+ziflist_address (ziflist_t *self)
 {
     assert (self);
     return (const char *) zlist_item (self->addresses);
@@ -287,7 +286,7 @@ ziface_address (ziface_t *self)
 //  Return the current interface broadcast address as a printable string
 
 const char *
-ziface_broadcast (ziface_t *self)
+ziflist_broadcast (ziflist_t *self)
 {
     assert (self);
     return (const char *) zlist_item (self->broadcasts);
@@ -298,7 +297,7 @@ ziface_broadcast (ziface_t *self)
 //  Return the current interface network mask as a printable string
 
 const char *
-ziface_netmask (ziface_t *self)
+ziflist_netmask (ziflist_t *self)
 {
     assert (self);
     return (const char *) zlist_item (self->netmasks);
@@ -309,24 +308,24 @@ ziface_netmask (ziface_t *self)
 //  Selftest for this class
 
 void
-ziface_test (bool verbose)
+ziflist_test (bool verbose)
 {
-    printf (" * ziface: ");
+    printf (" * ziflist: ");
     if (verbose)
         printf ("\n");
     
-    ziface_t *iflist = ziface_new ();
+    ziflist_t *iflist = ziflist_new ();
     assert (iflist);
 
     if (verbose) {
-        printf ("ziface: interfaces=%zu\n", ziface_size (iflist));
-        const char *name = ziface_first (iflist);
+        printf ("ziflist: interfaces=%zu\n", ziflist_size (iflist));
+        const char *name = ziflist_first (iflist);
         while (name) {
             printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
-                name, ziface_address (iflist), ziface_netmask (iflist), ziface_broadcast (iflist));
-            name = ziface_next (iflist);
+                name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
+            name = ziflist_next (iflist);
         }
     }
-    ziface_destroy (&iflist);
+    ziflist_destroy (&iflist);
     printf ("OK\n");
 }
