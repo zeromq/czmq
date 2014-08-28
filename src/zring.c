@@ -94,6 +94,7 @@ zring_destroy (zring_t **self_p)
             free (node);
             node = next;
         }
+        free (self->head);
         free (self);
         *self_p = NULL;
     }
