@@ -25,7 +25,7 @@ include_HEADERS = \
     ../include/zframe.h \
     ../include/zhash.h \
     ../include/zgossip.h \
-    ../include/zinterface.h \
+    ../include/ziface.h \
     ../include/zlist.h \
     ../include/zloop.h \
     ../include/zmonitor.h \
@@ -66,7 +66,7 @@ libczmq_la_SOURCES = \
     zframe.c \
     zhash.c \
     zgossip.c \
-    zinterface.c \
+    ziface.c \
     zlist.c \
     zloop.c \
     zmonitor.c \

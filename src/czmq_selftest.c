@@ -41,7 +41,7 @@ int main (int argc, char *argv [])
     //  These are ordered from lowest level to highest level
     zrex_test (verbose);
     zsys_test (verbose);
-    zinterface_test (verbose);
+    ziface_test (verbose);
     zchunk_test (verbose);
     zconfig_test (verbose);
     zclock_test (verbose);

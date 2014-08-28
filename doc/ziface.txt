@@ -1,67 +1,67 @@
-zinterface(3)
-=============
+ziface(3)
+=========
 
 NAME
 ----
-zinterface - Information about network interfaces
+ziface - Information about network interfaces
 
 SYNOPSIS
 --------
 ----
 //  Return a list of available network interfaces.
-CZMQ_EXPORT zinterface_t *
-    zinterface_new ();
+CZMQ_EXPORT ziface_t *
+    ziface_new ();
 
 //  Destroy a list of network interfaces
 CZMQ_EXPORT void
-    zinterface_destroy (zinterface_t **self_p);
+    ziface_destroy (ziface_t **self_p);
 
 //  Return the number of interfaces
 CZMQ_EXPORT size_t
-    zinterface_size (zinterface_t *self);
+    ziface_size (ziface_t *self);
 
 //  Set the current interface to be the first one. Returns true if the list is not empty
 CZMQ_EXPORT bool
-    zinterface_first (zinterface_t *self);
+    ziface_first (ziface_t *self);
 
 //  Advances the current interface. Returns false if there's no more items, true otherwise
 CZMQ_EXPORT bool
-    zinterface_next (zinterface_t *self);
+    ziface_next (ziface_t *self);
 
 //  Return the current interface's name as a printable string
 CZMQ_EXPORT char *
-    zinterface_name (zinterface_t *self);
+    ziface_name (ziface_t *self);
 
 //  Return the current interface's IP address as a printable string
 CZMQ_EXPORT char *
-    zinterface_address (zinterface_t *self);
+    ziface_address (ziface_t *self);
 
 //  Return the current interface's broadcast address as a printable string
 CZMQ_EXPORT char *
-    zinterface_broadcast (zinterface_t *self);
+    ziface_broadcast (ziface_t *self);
 
 //  Return the current interface's network mask as a printable string
 CZMQ_EXPORT char *
-    zinterface_netmask (zinterface_t *self);
+    ziface_netmask (ziface_t *self);
 
 // Prints all detected interfaces on the screen
 CZMQ_EXPORT void
-    zinterface_test (bool verbose);
+    ziface_test (bool verbose);
 ----
 
 DESCRIPTION
 -----------
 
-The zinterface class contains information about a network interface, 
+The ziface class contains information about a network interface,
 namely the IP address, network mask and broadcast address. A list of
-all interfaces present in the system is obtained by the zinterface_list
+all interfaces present in the system is obtained by the ziface_list
 function. This list "owns" all the interfaces contained in it, so it is
 only necessary to destroy the list, not every listed interface.
 
 
 EXAMPLE
 -------
-.From zinterface_test method
+.From ziface_test method
 ----
 ----
 

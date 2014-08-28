@@ -52,7 +52,7 @@
     <ClCompile Include="..\..\..\..\src\zgossip.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zinterface.c">
+    <ClCompile Include="..\..\..\..\src\ziface.c">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\zlist.c">
