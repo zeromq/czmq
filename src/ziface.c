@@ -13,11 +13,11 @@
 
 /*
 @header
-    The ziface class contains information about a network interface,
-    namely the IP address, network mask and broadcast address. A list of
-    all interfaces present in the system is obtained by the ziface_list
-    function. This list "owns" all the interfaces contained in it, so it is
-    only necessary to destroy the list, not every listed interface.
+    The ziface class takes a snapshot of the network interfaces that the
+    system currently supports (this can change arbitrarily, especially on
+    mobile devices). The caller can then access the network interface
+    information using an iterator that works like zlist. Only stores those
+    interfaces with broadcast capability, and ignores the loopback interface.
 @discuss
 @end
 */
@@ -25,66 +25,79 @@
 #include "platform.h"
 #include "../include/czmq.h"
 
-typedef struct _ziface_item_t ziface_item_t;
-
-struct _ziface_item_t {
-    char *name;      //  The interfaces's name as reported by the OS
-    char *address;   //  The interfaces's IP(v4) address as a string
-    char *netmask;   //  The interfaces's network mask as a string
-    char *broadcast; //  The interfaces's broadcast address as a string
-};
-
+//  Structure of our class
 struct _ziface_t {
-    zlist_t *interfaces;  // List of interfaces
-    ziface_item_t *current_interface;  // Current interface
+    //  We store our interfaces as separate lists for each property
+    zlist_t *names;             //  Name as reported by the OS
+    zlist_t *addresses;         //  IP(v4) address as a string
+    zlist_t *netmasks;          //  Network mask as a string
+    zlist_t *broadcasts;        //  Broadcast address as a string
 };
+
 
 static void
-    s_list_interfaces (ziface_t *self);
-static ziface_item_t *
-    s_ziface_item_new (char *name, inaddr_t address, inaddr_t netmask, inaddr_t broadcast);
+s_store (ziface_t *self, char *name, inaddr_t address, inaddr_t netmask, inaddr_t broadcast)
+{
+    zlist_append (self->names, name);
+    zlist_append (self->addresses, inet_ntoa (address.sin_addr));
+    zlist_append (self->netmasks, inet_ntoa (netmask.sin_addr));
+    zlist_append (self->broadcasts, inet_ntoa (broadcast.sin_addr));
+}
+
 
 //  --------------------------------------------------------------------------
-//  Return a list of available network interfaces.
+//  Create a new ziface instance to take a snapshot of network interfaces
+//  currently defined on the system.
 
 ziface_t *
-ziface_new ()
+ziface_new (void)
 {
-    ziface_t *self = (ziface_t*) zmalloc (sizeof (struct _ziface_t));
-
+    ziface_t *self = (ziface_t *) zmalloc (sizeof (struct _ziface_t));
     if (self) {
-        self->interfaces = zlist_new ();
-        if (!self->interfaces) {
-            free (self);
-            return NULL;
+        self->names = zlist_new ();
+        self->addresses = zlist_new ();
+        self->netmasks = zlist_new ();
+        self->broadcasts = zlist_new ();
+        
+        if (self->names && self->addresses && self->netmasks && self->broadcasts) {
+            zlist_autofree (self->names);
+            zlist_autofree (self->addresses);
+            zlist_autofree (self->netmasks);
+            zlist_autofree (self->broadcasts);
+            ziface_reload (self);
         }
-        self->current_interface = NULL;
-        s_list_interfaces (self);
-        ziface_first (self);
+        else
+            ziface_destroy (&self);
     }
-
     return self;
 }
 
-//  --------------------------------------------------------------------------
-//  Automatic destructor for zlist
 
-static void
-s_freefn (void *ptr)
+//  --------------------------------------------------------------------------
+//  Destroy a ziface instance
+
+void
+ziface_destroy (ziface_t **self_p)
 {
-    ziface_item_t *self = (ziface_item_t *) ptr;
-    free (self->name);
-    free (self->address);
-    free (self->netmask);
-    free (self->broadcast);
-    free (self);
+    assert (self_p);
+    if (*self_p) {
+        ziface_t *self = *self_p;
+        zlist_destroy (&self->names);
+        zlist_destroy (&self->addresses);
+        zlist_destroy (&self->netmasks);
+        zlist_destroy (&self->broadcasts);
+        free (self);
+        *self_p = NULL;
+    }
 }
+
 
 #ifdef __UNIX__
 //  --------------------------------------------------------------------------
 //  Helper function to verify if one interface's flags are what we want.
+
 static bool
-s_check_flags (short flags)
+s_valid_flags (short flags)
 {
     return (flags & IFF_UP)             //  Only use interfaces that are running
        && !(flags & IFF_LOOPBACK)       //  Ignore loopback interface
@@ -96,29 +109,26 @@ s_check_flags (short flags)
 }
 #endif
 
+
 //  --------------------------------------------------------------------------
-//  Builds a list of available interfaces.
-//  Currently implemented for POSIX and Windows
+//  Reload network interfaces from system
 
 void
-s_list_interfaces (ziface_t* self)
+ziface_reload (ziface_t *self)
 {
-    // Clear the list (in case we rescan the interfaces later)
-    while (zlist_pop (self->interfaces));
-
-#if defined (HAVE_GETIFADDRS)
+#if defined (HAVE_GETIFADDRSx)
     struct ifaddrs *interfaces;
     if (getifaddrs (&interfaces) == 0) {
         struct ifaddrs *interface = interfaces;
         while (interface) {
             //  On Solaris, loopback interfaces have a NULL in ifa_broadaddr
-            if  (interface->ifa_broadaddr
-            &&  s_check_flags (interface->ifa_flags)
-            &&   interface->ifa_addr
-            &&  (interface->ifa_addr->sa_family == AF_INET)) {
-                inaddr_t address   = *(inaddr_t*) interface->ifa_addr;
-                inaddr_t netmask   = *(inaddr_t*) interface->ifa_netmask;
-                inaddr_t broadcast = *(inaddr_t*) interface->ifa_broadaddr;
+            if (interface->ifa_addr->sa_family == AF_INET
+            &&  interface->ifa_broadaddr
+            &&  interface->ifa_addr
+            &&  s_valid_flags (interface->ifa_flags)) {
+                inaddr_t address = *(inaddr_t *) interface->ifa_addr;
+                inaddr_t netmask = *(inaddr_t *) interface->ifa_netmask;
+                inaddr_t broadcast = *(inaddr_t *) interface->ifa_broadaddr;
 
                 //  If the returned broadcast address is the same as source
                 //  address, build the broadcast address from the source
@@ -126,10 +136,7 @@ s_list_interfaces (ziface_t* self)
                 if (address.sin_addr.s_addr == broadcast.sin_addr.s_addr)
                     broadcast.sin_addr.s_addr |= ~(netmask.sin_addr.s_addr);
 
-                ziface_item_t* ziface = s_ziface_item_new (interface->ifa_name,
-                    address, netmask, broadcast);
-                zlist_append (self->interfaces, ziface);
-                zlist_freefn (self->interfaces, ziface, s_freefn, true);
+                s_store (self, interface->ifa_name, address, netmask, broadcast);
             }
             interface = interface->ifa_next;
         }
@@ -139,50 +146,44 @@ s_list_interfaces (ziface_t* self)
 #   elif defined (__UNIX__)
     int sock = socket (AF_INET, SOCK_DGRAM, 0);
     if (sock != -1) {
-        int rc;
         int num_interfaces = 0;
-        struct ifconf ifconfig;
-        ifconfig.ifc_len = 0;
-        ifconfig.ifc_req = NULL;
-
-        rc = ioctl (sock, SIOCGIFCONF, (caddr_t) &ifconfig, sizeof (struct ifconf));
-        if (rc != -1) {
-            ifconfig.ifc_buf = (struct ifreq *) zmalloc (ifconfig.ifc_len);
-            rc = ioctl (sock, SIOCGIFCONF, (caddr_t) &ifconfig, sizeof (struct ifconf));
-            if (rc != -1) {
+        struct ifconf ifconfig = { 0 };
+        //  First ioctl call gets us length of buffer; second call gets us contents
+        if (!ioctl (sock, SIOCGIFCONF, (caddr_t) &ifconfig, sizeof (struct ifconf))) {
+            ifconfig.ifc_buf = (char *) zmalloc (ifconfig.ifc_len);
+            if (!ioctl (sock, SIOCGIFCONF, (caddr_t) &ifconfig, sizeof (struct ifconf)))
                 num_interfaces = ifconfig.ifc_len / sizeof (struct ifreq);
-            }
         }
+        int index;
+        for (index = 0; index < num_interfaces; index++) {
+            struct ifreq *ifr = &ifconfig.ifc_req [index];
+            //  Check interface flags
+            bool is_valid = false;
+            if (!ioctl (sock, SIOCGIFFLAGS, (caddr_t) ifr, sizeof (struct ifreq)))
+                is_valid = s_valid_flags (ifr->ifr_flags);
+            
+            //  Get interface properties
+            inaddr_t address = { 0 };
+            if (!ioctl (sock, SIOCGIFADDR, (caddr_t) ifr, sizeof (struct ifreq)))
+                address = *((inaddr_t *) &ifr->ifr_addr);
+            else
+                is_valid = false;
+            
+            inaddr_t broadcast = { 0 };
+            if (!ioctl (sock, SIOCGIFBRDADDR, (caddr_t) ifr, sizeof (struct ifreq)))
+                broadcast = *((inaddr_t *) &ifr->ifr_addr);
+            else
+                is_valid = false;
+            
+            inaddr_t netmask = { 0 };
+            if (!ioctl (sock, SIOCGIFNETMASK, (caddr_t) ifr, sizeof (struct ifreq)))
+                netmask = *((inaddr_t *) &ifr->ifr_addr);
+            else
+                is_valid = false;
 
-        for (int i = 0; i < num_interfaces; i++) {
-            struct ifreq* ifr = &ifconfig.ifc_req [i];
-            rc = ioctl (sock, SIOCGIFFLAGS, (caddr_t) ifr, sizeof (struct ifreq));
-            if (rc == -1) continue;
-            if (!s_check_flags (ifr->ifr_flags)) continue;
-
-            ifr->ifr_addr.sa_family = AF_INET;
-
-            //  Get interface address
-            rc = ioctl (sock, SIOCGIFADDR, (caddr_t) ifr, sizeof (struct ifreq));
-            if (rc == -1) continue;
-            inaddr_t address = *((inaddr_t*) &ifr->ifr_addr);
-
-            //  Get interface netmask
-            rc = ioctl (sock, SIOCGIFBRDADDR, (caddr_t) ifr, sizeof (struct ifreq));
-            if (rc == -1) continue;
-            inaddr_t broadcast = *((inaddr_t*) &ifr->ifr_addr);
-
-            //  Get interface broadcast address
-            rc = ioctl (sock, SIOCGIFNETMASK, (caddr_t) ifr, sizeof (struct ifreq));
-            if (rc == -1) continue;
-            inaddr_t netmask = *((inaddr_t*) &ifr->ifr_addr);
-
-            ziface_item_t* ziface = s_ziface_item_new (ifr->ifr_name,
-                address, netmask, broadcast);
-            zlist_append (self->interfaces, ziface);
-            zlist_freefn (self->interfaces, ziface, s_freefn, true);
+            if (is_valid)
+                s_store (self, ifr->ifr_name, address, netmask, broadcast);
         }
-
         free (ifconfig.ifc_buf);
         close (sock);
     }
@@ -212,20 +213,14 @@ s_list_interfaces (ziface_t* self)
                   && (pUnicast && pPrefix)
                   && (pUnicast->Address.lpSockaddr->sa_family == AF_INET)
                   && (pPrefix->PrefixLength <= 32);
-        
-        if (valid) {
-            inaddr_t address   = *(inaddr_t*) pUnicast->Address.lpSockaddr;
-            inaddr_t netmask;
 
+        if (valid) {
+            inaddr_t address = *(inaddr_t *) pUnicast->Address.lpSockaddr;
+            inaddr_t netmask;
             netmask.sin_addr.s_addr = htonl ((0xffffffffU) << (32 - pPrefix->PrefixLength));
-            
             inaddr_t broadcast = address;
             broadcast.sin_addr.s_addr |= ~(netmask.sin_addr.s_addr);
-
-            ziface_item_t* ziface = s_ziface_item_new (asciiFriendlyName,
-                address, netmask, broadcast);
-            zlist_append (self->interfaces, ziface);
-            zlist_freefn (self->interfaces, ziface, s_freefn, true);
+            s_store (self, asciiFriendlyName, address, netmask, broadcast);
         }
         free (asciiFriendlyName);
         cur_address = cur_address->Next;
@@ -237,134 +232,101 @@ s_list_interfaces (ziface_t* self)
 #   endif
 }
 
-//  --------------------------------------------------------------------------
-//  Private constructor
-
-ziface_item_t *
-s_ziface_item_new (char *name, inaddr_t address, inaddr_t netmask, inaddr_t broadcast)
-{
-    ziface_item_t *self = (ziface_item_t *) zmalloc (sizeof (struct _ziface_item_t));
-    assert (self);
-    assert (name);
-    self->name      = strdup (name);
-    self->address   = strdup (inet_ntoa (address.sin_addr));
-    self->netmask   = strdup (inet_ntoa (netmask.sin_addr));
-    self->broadcast = strdup (inet_ntoa (broadcast.sin_addr));
-    assert (self->name);
-    assert (self->address);
-    assert (self->netmask);
-    assert (self->broadcast);
-    return self;
-}
 
 //  --------------------------------------------------------------------------
-//  Destructor
-
-void
-ziface_destroy (ziface_t **self_p)
-{
-    assert (self_p);
-    if (*self_p) {
-        ziface_t *self = *self_p;
-        zlist_destroy (&self->interfaces);
-        free (self);
-        *self_p = NULL;
-    }
-}
-
-//  --------------------------------------------------------------------------
-//  Return the number of interfaces
+//  Return the number of network interfaces on system
 
 size_t
 ziface_size (ziface_t *self)
 {
     assert (self);
-    return zlist_size (self->interfaces);
+    return zlist_size (self->names);
 }
 
-//  --------------------------------------------------------------------------
-//  Set the current interface to be the first one. Returns true if the list is not empty
 
-bool
+//  --------------------------------------------------------------------------
+//  Get first network interface, return NULL if there are none
+
+const char *
 ziface_first (ziface_t *self)
 {
     assert (self);
-    self->current_interface = (ziface_item_t *) zlist_first (self->interfaces);
-    return self->current_interface != NULL;
+    zlist_first (self->addresses);
+    zlist_first (self->netmasks);
+    zlist_first (self->broadcasts);
+    return (const char *) zlist_first (self->names);
 }
 
-//  --------------------------------------------------------------------------
-//  Advances the current interface. Returns false if there's no more items, true otherwise
 
-bool
+//  --------------------------------------------------------------------------
+//  Get next network interface, return NULL if we hit the last one
+
+const char *
 ziface_next (ziface_t *self)
 {
     assert (self);
-    self->current_interface = (ziface_item_t *) zlist_next (self->interfaces);
-    return self->current_interface != NULL;
+    zlist_next (self->addresses);
+    zlist_next (self->netmasks);
+    zlist_next (self->broadcasts);
+    return (const char *) zlist_next (self->names);
 }
 
-//  --------------------------------------------------------------------------
-//  "name" property accessor
-
-char *
-ziface_name (ziface_t *self)
-{
-    assert (self);
-    return self->current_interface? self->current_interface->name: NULL;
-}
 
 //  --------------------------------------------------------------------------
-//  "address" property accessor
+//  Return the current interface IP address as a printable string
 
-char *
+const char *
 ziface_address (ziface_t *self)
 {
     assert (self);
-    return self->current_interface? self->current_interface->address: NULL;
+    return (const char *) zlist_item (self->addresses);
 }
 
-//  --------------------------------------------------------------------------
-//  "broadcast" property accessor
 
-char *
+//  --------------------------------------------------------------------------
+//  Return the current interface broadcast address as a printable string
+
+const char *
 ziface_broadcast (ziface_t *self)
 {
     assert (self);
-    return self->current_interface? self->current_interface->broadcast: NULL;
+    return (const char *) zlist_item (self->broadcasts);
 }
 
-//  --------------------------------------------------------------------------
-//  "netmask" property accessor
 
-char *
+//  --------------------------------------------------------------------------
+//  Return the current interface network mask as a printable string
+
+const char *
 ziface_netmask (ziface_t *self)
 {
     assert (self);
-    return self->current_interface? self->current_interface->netmask: NULL;
+    return (const char *) zlist_item (self->netmasks);
 }
 
+
 //  --------------------------------------------------------------------------
+//  Selftest for this class
 
 void
 ziface_test (bool verbose)
 {
     printf (" * ziface: ");
-    ziface_t *interfaces = ziface_new ();
-    assert (interfaces);
+    if (verbose)
+        printf ("\n");
+    
+    ziface_t *iflist = ziface_new ();
+    assert (iflist);
 
     if (verbose) {
-        printf ("Length: %zu\n", ziface_size (interfaces));
-        bool more = ziface_first (interfaces);
-        while (more) {
-            printf ("%s\t%s\t%s\t%s\n",
-                ziface_name      (interfaces),
-                ziface_address   (interfaces),
-                ziface_netmask   (interfaces),
-                ziface_broadcast (interfaces));
-            more = ziface_next (interfaces);
+        printf ("ziface: interfaces=%zu\n", ziface_size (iflist));
+        const char *name = ziface_first (iflist);
+        while (name) {
+            printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
+                name, ziface_address (iflist), ziface_netmask (iflist), ziface_broadcast (iflist));
+            name = ziface_next (iflist);
         }
     }
-    ziface_destroy (&interfaces);
+    ziface_destroy (&iflist);
     printf ("OK\n");
 }
