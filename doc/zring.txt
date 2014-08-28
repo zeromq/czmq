@@ -38,6 +38,12 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void *
     zring_prev (zring_t *self);
 
+//  Insert an item after cursor, return 0 if OK, else -1. Cursor is set to
+//  inserted item (zring_remove() will remove it again). In any empty ring,
+//  inserts after the head.
+CZMQ_EXPORT int
+    zring_insert (zring_t *self, void *item);
+
 //  Append an item to the end of the ring, return 0 if OK, else -1.
 CZMQ_EXPORT int
     zring_append (zring_t *self, void *item);
@@ -46,19 +52,17 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zring_push (zring_t *self, void *item);
 
-//  Pop and destroy item off the start of the ring, if any. Sets cursor to
-//  first remaining item in ring.
-CZMQ_EXPORT void
-    zring_pop (zring_t *self);
-
-//  Insert an item after cursor, return 0 if OK, else -1.
-CZMQ_EXPORT int
-    zring_insert (zring_t *self, void *item);
-
-//  Remove the current item from the ring (as set by first/last/next/prev
-//  calls). Sets the cursor to the next item.
-CZMQ_EXPORT void
+//  Remove current item from the ring (as set by first/last/next/prev calls),
+//  and return item. Sets the cursor to the next item. If ring was empty,
+//  returns null. Caller should destroy item when finished with it.
+CZMQ_EXPORT void *
     zring_remove (zring_t *self);
+
+//  Pop item off the start of the ring, and return item. If the ring is empty.
+//  returns null. Sets cursor to first remaining item in ring. Caller should
+//  destroy item when finished with it.
+CZMQ_EXPORT void *
+    zring_pop (zring_t *self);
 
 //  Return number of items in the ring
 CZMQ_EXPORT size_t
@@ -136,13 +140,16 @@ EXAMPLE
     assert (zring_prev (ring) == wine);
 
     assert (zring_first (ring) == cheese);
-    zring_remove (ring);
+    char *item = (char *) zring_remove (ring);
+    assert (item == cheese);
     assert (zring_size (ring) == 2);
     assert (zring_first (ring) == bread);
-    zring_remove (ring);
+    item = zring_remove (ring);
+    assert (item == bread);
     assert (zring_size (ring) == 1);
     assert (zring_first (ring) == wine);
-    zring_remove (ring);
+    item = zring_remove (ring);
+    assert (item == wine);
     assert (zring_size (ring) == 0);
     assert (zring_first (ring) == NULL);
 
@@ -160,11 +167,20 @@ EXAMPLE
     assert (!rc);
     assert (zring_size (ring) == 3);
     assert (zring_first (ring) == bread);
+    assert (zring_last (ring) == wine);
+    rc = zring_insert (ring, cheese);
+    item = (char *) zring_remove (ring);
+    assert (item == cheese);
 
     zring_t *dup_ring = zring_dup (ring);
     assert (dup_ring);
     assert (zring_size (dup_ring) == 3);
+    zring_destroy (&dup_ring);
 
+    //  Test pop
+    item = (char *) zring_pop (ring);
+    assert (item == bread);
+    
     //  Destructor should be safe to call twice
     zring_destroy (&ring);
     assert (ring == NULL);
