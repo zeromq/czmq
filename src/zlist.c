@@ -134,11 +134,11 @@ zlist_last (zlist_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Return the current item of list. If the list is empty, returns NULL.
-//  Leaves cursor pointing at the current item, or NULL if the list is empty.
+//  Return current item in the list. If the list is empty, or the cursor
+//  passed the end of the list, returns NULL. Does not change the cursor.
 
 void *
-zlist_curr (zlist_t *self)
+zlist_item (zlist_t *self)
 {
     assert (self);
     if (self->cursor)
@@ -146,7 +146,6 @@ zlist_curr (zlist_t *self)
     else
         return NULL;
 }
-
 
 
 //  --------------------------------------------------------------------------
@@ -491,7 +490,7 @@ zlist_test (int verbose)
     zlist_push (list, bread);
     assert (zlist_size (list) == 2);
     assert (zlist_first (list) == bread);
-    assert (zlist_curr (list) == bread);
+    assert (zlist_item (list) == bread);
 
     zlist_append (list, wine);
     assert (zlist_size (list) == 3);
