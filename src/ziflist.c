@@ -115,7 +115,7 @@ s_valid_flags (short flags)
 void
 ziflist_reload (ziflist_t *self)
 {
-#if defined (HAVE_GETIFADDRSx)
+#if defined (HAVE_GETIFADDRS)
     struct ifaddrs *interfaces;
     if (getifaddrs (&interfaces) == 0) {
         struct ifaddrs *interface = interfaces;
