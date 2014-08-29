@@ -20,7 +20,7 @@
     <class name = "zframe" />
     <class name = "zhash" />
     <class name = "zgossip" />
-    <class name = "zinterface" />
+    <class name = "ziflist" />
     <class name = "zlist" />
     <class name = "zloop" />
     <class name = "zmonitor" />
@@ -40,6 +40,10 @@
     <model name = "zgossip" />
     <model name = "zgossip_msg" />
     <class name = "zgossip_msg" private = "1" />
+
+    <!-- Other source files in src that we need to package -->
+    <extra name = "zgossip_engine.inc" />
+    <extra name = "zhash_primes.inc" />
 
     <!-- Deprecated V2 API, remove some time after 3.0 stability -->
     <class name = "zauth_v2" />

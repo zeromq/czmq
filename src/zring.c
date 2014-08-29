@@ -36,27 +36,29 @@ typedef struct _node_t {
 //  Structure of our class
 
 struct _zring_t {
-    node_t head;         //  Dummy node acting as head in ring
-    node_t *cursor;      //  Current node for iteration
+    node_t *head;               //  Dummy node acting as head in ring
+    node_t *cursor;             //  Current node for iteration
     size_t size;                //  Number of items in ring
-    zring_free_fn *free_fn;    //  Callback to destroy an item
-    zring_dup_fn *dup_fn;      //  Callback to duplicate an item
+    zring_free_fn *free_fn;     //  Callback to destroy an item
+    zring_dup_fn *dup_fn;       //  Callback to duplicate an item
 };
 
 
 //  --------------------------------------------------------------------------
-//  Initialize a ring node
+//  Initialize a ring node and attach to the prev and next nodes, or itself
+//  if these are specified as null. Returns new node, or NULL if process ran
+//  out of heap memory.
 
-static void
-s_node_init (
-    node_t *node,
-    node_t *next,
-    node_t *prev,
-    void *item)
+static node_t *
+s_node_new (node_t *prev, node_t *next, void *item)
 {
-    node->next = next;
-    node->prev = prev;
-    node->item = item;
+    node_t *self = (node_t *) zmalloc (sizeof (node_t));
+    if (self) {
+        self->prev = prev? prev: self;
+        self->next = next? next: self;
+        self->item = item;
+    }
+    return self;
 }
 
 
@@ -68,8 +70,8 @@ zring_new (void)
 {
     zring_t *self = (zring_t *) zmalloc (sizeof (zring_t));
     if (self) {
-        s_node_init (&self->head, &self->head, &self->head, NULL);
-        self->cursor = &self->head;
+        self->head = s_node_new (NULL, NULL, NULL);
+        self->cursor = self->head;
     }
     return self;
 }
@@ -84,14 +86,15 @@ zring_destroy (zring_t **self_p)
     assert (self_p);
     if (*self_p) {
         zring_t *self = *self_p;
-        node_t *node = self->head.next;
-        while (node != &self->head) {
+        node_t *node = self->head->next;
+        while (node != self->head) {
             node_t *next = node->next;
             if (self->free_fn)
                 (self->free_fn) (&node->item);
             free (node);
             node = next;
         }
+        free (self->head);
         free (self);
         *self_p = NULL;
     }
@@ -106,7 +109,7 @@ void *
 zring_first (zring_t *self)
 {
     assert (self);
-    self->cursor = &self->head;
+    self->cursor = self->head;
     return zring_next (self);
 }
 
@@ -119,7 +122,7 @@ void *
 zring_last (zring_t *self)
 {
     assert (self);
-    self->cursor = &self->head;
+    self->cursor = self->head;
     return zring_prev (self);
 }
 
@@ -134,8 +137,8 @@ zring_next (zring_t *self)
 {
     assert (self);
     self->cursor = self->cursor->next;
-    if (self->cursor == &self->head)
-        return NULL;        //  Reached head, so finished
+    if (self->cursor == self->head)
+        return NULL;            //  Reached head, so finished
     else
         return self->cursor->item;
 }
@@ -151,10 +154,32 @@ zring_prev (zring_t *self)
 {
     assert (self);
     self->cursor = self->cursor->prev;
-    if (self->cursor == &self->head)
-        return NULL;        //  Reached head, so finished
+    if (self->cursor == self->head)
+        return NULL;            //  Reached head, so finished
     else
         return self->cursor->item;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Insert an item after cursor, return 0 if OK, else -1. Cursor is set to
+//  inserted item (zring_remove() will remove it again). In any empty ring,
+//  inserts after the head.
+
+int
+zring_insert (zring_t *self, void *item)
+{
+    assert (self);
+    node_t *node = s_node_new (self->cursor, self->cursor->next, item);
+    if (node) {
+        self->cursor->next->prev = node;
+        self->cursor->next = node;
+        self->cursor = node;
+        self->size++;
+        return 0;
+    }
+    else
+        return -1;              //  Ran out of heap memory
 }
 
 
@@ -165,15 +190,15 @@ int
 zring_append (zring_t *self, void *item)
 {
     assert (self);
-    node_t *node = (node_t *) zmalloc (sizeof (node_t));
-    if (!node)
-        return -1;
-    
-    s_node_init (node, &self->head, self->head.prev, item);
-    self->head.prev->next = node;
-    self->head.prev = node;
-    self->size++;
-    return 0;
+    node_t *node = s_node_new (self->head->prev, self->head, item);
+    if (node) {
+        self->head->prev->next = node;
+        self->head->prev = node;
+        self->size++;
+        return 0;
+    }
+    else
+        return -1;              //  Ran out of heap memory
 }
 
 
@@ -184,62 +209,50 @@ int
 zring_push (zring_t *self, void *item)
 {
     assert (self);
-    node_t *node = (node_t *) zmalloc (sizeof (node_t));
-    if (!node)
-        return -1;
-
-    s_node_init (node, self->head.next, &self->head, item);
-    self->head.next->prev = node;
-    self->head.next = node;
-    self->size++;
-    return 0;
+    node_t *node = s_node_new (self->head, self->head->next, item);
+    if (node) {
+        self->head->next->prev = node;
+        self->head->next = node;
+        self->size++;
+        return 0;
+    }
+    else
+        return -1;              //  Ran out of heap memory
 }
 
 
 //  --------------------------------------------------------------------------
-//  Pop and destroy item off the start of the ring, if any. Sets cursor to
-//  first remaining item in ring.
-//  
-//  TODO: can't really mix this with returning a value, if we're using
-//  free_fn, as that will return deallocated values. Thus I removed the
-//  return value. Ditto for _remove. -- PH 2014/08/21
+//  Remove current item from the ring (as set by first/last/next/prev calls),
+//  and return item. Sets the cursor to the next item. If ring was empty,
+//  returns null. Caller should destroy item when finished with it.
 
-void
-zring_pop (zring_t *self)
-{
-    zring_first (self);
-    zring_remove (self);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Remove the current item from the ring (as set by first/last/next/prev
-//  calls). Sets the cursor to the next node. 
-
-void
+void *
 zring_remove (zring_t *self)
 {
     assert (self);
-    if (self->cursor != &self->head) {
+    void *item = NULL;
+    if (self->cursor != self->head) {
         node_t *node = self->cursor;
         node->next->prev = self->cursor = node->prev;
         node->prev->next = node->next;
-
-        if (self->free_fn)
-            (self->free_fn) (&node->item);
+        item = node->item;
         free (node);
         self->size--;
     }
+    return item;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Insert an item after cursor, return 0 if OK, else -1.
+//  Pop item off the start of the ring, and return item. If the ring is empty.
+//  returns null. Sets cursor to first remaining item in ring. Caller should
+//  destroy item when finished with it.
 
-int
-zring_insert (zring_t *self, void *item)
+void *
+zring_pop (zring_t *self)
 {
-    return -1;          //  TODO
+    zring_first (self);
+    return zring_remove (self);
 }
 
 
@@ -294,7 +307,7 @@ zring_dup (zring_t *self)
         copy->free_fn = self->free_fn;
         copy->dup_fn = self->dup_fn;
         node_t *node;
-        for (node = self->head.next; node != &self->head; node = node->next) {
+        for (node = self->head->next; node != self->head; node = node->next) {
             void *item = node->item;
             if (self->dup_fn)
                 item = self->dup_fn (item);
@@ -353,13 +366,16 @@ zring_test (int verbose)
     assert (zring_prev (ring) == wine);
 
     assert (zring_first (ring) == cheese);
-    zring_remove (ring);
+    char *item = (char *) zring_remove (ring);
+    assert (item == cheese);
     assert (zring_size (ring) == 2);
     assert (zring_first (ring) == bread);
-    zring_remove (ring);
+    item = zring_remove (ring);
+    assert (item == bread);
     assert (zring_size (ring) == 1);
     assert (zring_first (ring) == wine);
-    zring_remove (ring);
+    item = zring_remove (ring);
+    assert (item == wine);
     assert (zring_size (ring) == 0);
     assert (zring_first (ring) == NULL);
 
@@ -377,12 +393,20 @@ zring_test (int verbose)
     assert (!rc);
     assert (zring_size (ring) == 3);
     assert (zring_first (ring) == bread);
+    assert (zring_last (ring) == wine);
+    rc = zring_insert (ring, cheese);
+    item = (char *) zring_remove (ring);
+    assert (item == cheese);
 
     zring_t *dup_ring = zring_dup (ring);
     assert (dup_ring);
     assert (zring_size (dup_ring) == 3);
     zring_destroy (&dup_ring);
 
+    //  Test pop
+    item = (char *) zring_pop (ring);
+    assert (item == bread);
+    
     //  Destructor should be safe to call twice
     zring_destroy (&ring);
     assert (ring == NULL);

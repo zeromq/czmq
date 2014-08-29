@@ -56,37 +56,37 @@ EXAMPLE
 -------
 .From zmonitor_v2_test method
 ----
-    zctx_t *ctx = zctx_new ();
-    bool result;
+zctx_t *ctx = zctx_new ();
+bool result;
 
-    void *sink = zsocket_new (ctx, ZMQ_PULL);
-    zmonitor_t *sinkmon = zmonitor_new (ctx,
-        sink, ZMQ_EVENT_LISTENING | ZMQ_EVENT_ACCEPTED);
-    zmonitor_set_verbose (sinkmon, verbose);
+void *sink = zsocket_new (ctx, ZMQ_PULL);
+zmonitor_t *sinkmon = zmonitor_new (ctx,
+    sink, ZMQ_EVENT_LISTENING | ZMQ_EVENT_ACCEPTED);
+zmonitor_set_verbose (sinkmon, verbose);
 
-    //  Check sink is now listening
-    int port_nbr = zsocket_bind (sink, "tcp://127.0.0.1:*");
-    assert (port_nbr != -1);
-    result = s_check_event (sinkmon, ZMQ_EVENT_LISTENING);
-    assert (result);
+//  Check sink is now listening
+int port_nbr = zsocket_bind (sink, "tcp://127.0.0.1:*");
+assert (port_nbr != -1);
+result = s_check_event (sinkmon, ZMQ_EVENT_LISTENING);
+assert (result);
 
-    void *source = zsocket_new (ctx, ZMQ_PUSH);
-    zmonitor_t *sourcemon = zmonitor_new (ctx,
-        source, ZMQ_EVENT_CONNECTED | ZMQ_EVENT_DISCONNECTED);
-    zmonitor_set_verbose (sourcemon, verbose);
-    zsocket_connect (source, "tcp://127.0.0.1:%d", port_nbr);
+void *source = zsocket_new (ctx, ZMQ_PUSH);
+zmonitor_t *sourcemon = zmonitor_new (ctx,
+    source, ZMQ_EVENT_CONNECTED | ZMQ_EVENT_DISCONNECTED);
+zmonitor_set_verbose (sourcemon, verbose);
+zsocket_connect (source, "tcp://127.0.0.1:%d", port_nbr);
 
-    //  Check source connected to sink
-    result = s_check_event (sourcemon, ZMQ_EVENT_CONNECTED);
-    assert (result);
+//  Check source connected to sink
+result = s_check_event (sourcemon, ZMQ_EVENT_CONNECTED);
+assert (result);
 
-    //  Check sink accepted connection
-    result = s_check_event (sinkmon, ZMQ_EVENT_ACCEPTED);
-    assert (result);
+//  Check sink accepted connection
+result = s_check_event (sinkmon, ZMQ_EVENT_ACCEPTED);
+assert (result);
 
-    zmonitor_destroy (&sinkmon);
-    zmonitor_destroy (&sourcemon);
-    zctx_destroy (&ctx);
+zmonitor_destroy (&sinkmon);
+zmonitor_destroy (&sourcemon);
+zctx_destroy (&ctx);
 ----
 
 SEE ALSO

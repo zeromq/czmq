@@ -87,73 +87,73 @@ EXAMPLE
 -------
 .From zproxy_test method
 ----
-    //  Create and configure our proxy
-    zactor_t *proxy = zactor_new (zproxy, NULL);
-    assert (proxy);
-    if (verbose) {
-        zstr_sendx (proxy, "VERBOSE", NULL);
-        zsock_wait (proxy);
-    }
-    zstr_sendx (proxy, "FRONTEND", "PULL", "inproc://frontend", NULL);
+//  Create and configure our proxy
+zactor_t *proxy = zactor_new (zproxy, NULL);
+assert (proxy);
+if (verbose) {
+    zstr_sendx (proxy, "VERBOSE", NULL);
     zsock_wait (proxy);
-    zstr_sendx (proxy, "BACKEND", "PUSH", "inproc://backend", NULL);
-    zsock_wait (proxy);
+}
+zstr_sendx (proxy, "FRONTEND", "PULL", "inproc://frontend", NULL);
+zsock_wait (proxy);
+zstr_sendx (proxy, "BACKEND", "PUSH", "inproc://backend", NULL);
+zsock_wait (proxy);
 
-    //  Connect application sockets to proxy
-    zsock_t *faucet = zsock_new_push (">inproc://frontend");
-    assert (faucet);
-    zsock_t *sink = zsock_new_pull (">inproc://backend");
-    assert (sink);
-    
-    //  Send some messages and check they arrived
-    char *hello, *world;
-    zstr_sendx (faucet, "Hello", "World", NULL);
-    zstr_recvx (sink, &hello, &world, NULL);
-    assert (streq (hello, "Hello"));
-    assert (streq (world, "World"));
-    zstr_free (&hello);
-    zstr_free (&world);
+//  Connect application sockets to proxy
+zsock_t *faucet = zsock_new_push (">inproc://frontend");
+assert (faucet);
+zsock_t *sink = zsock_new_pull (">inproc://backend");
+assert (sink);
 
-    //  Test pause/resume functionality
-    zstr_sendx (proxy, "PAUSE", NULL);
-    zsock_wait (proxy);
-    zstr_sendx (faucet, "Hello", "World", NULL);
-    zsock_set_rcvtimeo (sink, 100);
-    zstr_recvx (sink, &hello, &world, NULL);
-    assert (!hello && !world);
-    
-    zstr_sendx (proxy, "RESUME", NULL);
-    zsock_wait (proxy);
-    zstr_recvx (sink, &hello, &world, NULL);
-    assert (streq (hello, "Hello"));
-    assert (streq (world, "World"));
-    zstr_free (&hello);
-    zstr_free (&world);
+//  Send some messages and check they arrived
+char *hello, *world;
+zstr_sendx (faucet, "Hello", "World", NULL);
+zstr_recvx (sink, &hello, &world, NULL);
+assert (streq (hello, "Hello"));
+assert (streq (world, "World"));
+zstr_free (&hello);
+zstr_free (&world);
 
-    //  Test capture functionality
-    zsock_t *capture = zsock_new_pull ("inproc://capture");
-    assert (capture);
+//  Test pause/resume functionality
+zstr_sendx (proxy, "PAUSE", NULL);
+zsock_wait (proxy);
+zstr_sendx (faucet, "Hello", "World", NULL);
+zsock_set_rcvtimeo (sink, 100);
+zstr_recvx (sink, &hello, &world, NULL);
+assert (!hello && !world);
 
-    //  Switch on capturing, check that it works
-    zstr_sendx (proxy, "CAPTURE", "inproc://capture", NULL);
-    zsock_wait (proxy);
-    zstr_sendx (faucet, "Hello", "World", NULL);
-    zstr_recvx (sink, &hello, &world, NULL);
-    assert (streq (hello, "Hello"));
-    assert (streq (world, "World"));
-    zstr_free (&hello);
-    zstr_free (&world);
-    
-    zstr_recvx (capture, &hello, &world, NULL);
-    assert (streq (hello, "Hello"));
-    assert (streq (world, "World"));
-    zstr_free (&hello);
-    zstr_free (&world);
+zstr_sendx (proxy, "RESUME", NULL);
+zsock_wait (proxy);
+zstr_recvx (sink, &hello, &world, NULL);
+assert (streq (hello, "Hello"));
+assert (streq (world, "World"));
+zstr_free (&hello);
+zstr_free (&world);
 
-    zsock_destroy (&faucet);
-    zsock_destroy (&sink);
-    zsock_destroy (&capture);
-    zactor_destroy (&proxy);
+//  Test capture functionality
+zsock_t *capture = zsock_new_pull ("inproc://capture");
+assert (capture);
+
+//  Switch on capturing, check that it works
+zstr_sendx (proxy, "CAPTURE", "inproc://capture", NULL);
+zsock_wait (proxy);
+zstr_sendx (faucet, "Hello", "World", NULL);
+zstr_recvx (sink, &hello, &world, NULL);
+assert (streq (hello, "Hello"));
+assert (streq (world, "World"));
+zstr_free (&hello);
+zstr_free (&world);
+
+zstr_recvx (capture, &hello, &world, NULL);
+assert (streq (hello, "Hello"));
+assert (streq (world, "World"));
+zstr_free (&hello);
+zstr_free (&world);
+
+zsock_destroy (&faucet);
+zsock_destroy (&sink);
+zsock_destroy (&capture);
+zactor_destroy (&proxy);
 ----
 
 SEE ALSO

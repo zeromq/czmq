@@ -1,0 +1,81 @@
+#### zuuid - UUID support class
+
+The zuuid class generates UUIDs and provides methods for working with
+them. If you build CZMQ with libuuid, on Unix/Linux, it will use that
+library. On Windows it will use UuidCreate(). Otherwise it will use a
+random number generator to produce convincing imitations of uuids.
+
+
+This is the class interface:
+
+    //  Constructor
+    CZMQ_EXPORT zuuid_t *
+        zuuid_new (void);
+    
+    //  Destructor
+    CZMQ_EXPORT void
+        zuuid_destroy (zuuid_t **self_p);
+    
+    //  Return UUID binary data
+    CZMQ_EXPORT byte *
+        zuuid_data (zuuid_t *self);
+    
+    //  Return UUID binary size
+    CZMQ_EXPORT size_t
+        zuuid_size (zuuid_t *self);
+    
+    //  Returns UUID as string
+    CZMQ_EXPORT char *
+        zuuid_str (zuuid_t *self);
+    
+    //  Set UUID to new supplied value 
+    CZMQ_EXPORT void
+        zuuid_set (zuuid_t *self, byte *source);
+        
+    //  Set UUID to new supplied 32-char string value; return 0 if OK,
+    //  else returns -1.
+    CZMQ_EXPORT int
+        zuuid_set_str (zuuid_t *self, const char *source);
+    
+    //  Store UUID blob in target array
+    CZMQ_EXPORT void
+        zuuid_export (zuuid_t *self, byte *target);
+    
+    //  Check if UUID is same as supplied value
+    CZMQ_EXPORT bool
+        zuuid_eq (zuuid_t *self, byte *compare);
+    
+    //  Check if UUID is different from supplied value
+    CZMQ_EXPORT bool
+        zuuid_neq (zuuid_t *self, byte *compare);
+    
+    //  Make copy of UUID object
+    CZMQ_EXPORT zuuid_t *
+        zuuid_dup (zuuid_t *self);
+    
+    //  Self test of this class
+    CZMQ_EXPORT void
+        zuuid_test (bool verbose);
+
+This is the class self test code:
+
+    //  Simple create/destroy test
+    zuuid_t *uuid = zuuid_new ();
+    assert (uuid);
+    assert (zuuid_size (uuid) == 16);
+    assert (strlen (zuuid_str (uuid)) == 32);
+    zuuid_t *copy = zuuid_dup (uuid);
+    assert (streq (zuuid_str (uuid), zuuid_str (copy)));
+
+    //  Check set/set_str/export methods
+    const char *myuuid = "8CB3E9A9649B4BEF8DE225E9C2CEBB38";
+    zuuid_set_str (uuid, myuuid);
+    assert (streq (zuuid_str (uuid), myuuid));
+    byte copy_uuid [16];
+    zuuid_export (uuid, copy_uuid);
+    zuuid_set (uuid, copy_uuid);
+    assert (streq (zuuid_str (uuid), myuuid));
+    
+    zuuid_destroy (&uuid);
+    zuuid_destroy (&copy);
+

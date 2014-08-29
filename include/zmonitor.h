@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zsock_monitor - socket event monitor
+    zmonitor - socket event monitor
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -11,8 +11,8 @@
     =========================================================================
 */
 
-#ifndef __ZSOCK_MONITOR_H_INCLUDED__
-#define __ZSOCK_MONITOR_H_INCLUDED__
+#ifndef __ZMONITOR_H_INCLUDED__
+#define __ZMONITOR_H_INCLUDED__
 
 #ifdef __cplusplus
 extern "C" {

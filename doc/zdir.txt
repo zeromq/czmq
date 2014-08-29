@@ -96,25 +96,25 @@ EXAMPLE
 -------
 .From zdir_test method
 ----
-    zdir_t *older = zdir_new (".", NULL);
-    assert (older);
-    if (verbose) {
-        printf ("\n");
-        zdir_dump (older, 0);
-    }
-    zdir_t *newer = zdir_new ("..", NULL);
-    zlist_t *patches = zdir_diff (older, newer, "/");
-    assert (patches);
-    while (zlist_size (patches)) {
-        zdir_patch_t *patch = (zdir_patch_t *) zlist_pop (patches);
-        zdir_patch_destroy (&patch);
-    }
-    zlist_destroy (&patches);
-    zdir_destroy (&older);
-    zdir_destroy (&newer);
+zdir_t *older = zdir_new (".", NULL);
+assert (older);
+if (verbose) {
+    printf ("\n");
+    zdir_dump (older, 0);
+}
+zdir_t *newer = zdir_new ("..", NULL);
+zlist_t *patches = zdir_diff (older, newer, "/");
+assert (patches);
+while (zlist_size (patches)) {
+    zdir_patch_t *patch = (zdir_patch_t *) zlist_pop (patches);
+    zdir_patch_destroy (&patch);
+}
+zlist_destroy (&patches);
+zdir_destroy (&older);
+zdir_destroy (&newer);
 
-    zdir_t *nosuch = zdir_new ("does-not-exist", NULL);
-    assert (nosuch == NULL);
+zdir_t *nosuch = zdir_new ("does-not-exist", NULL);
+assert (nosuch == NULL);
 ----
 
 SEE ALSO
