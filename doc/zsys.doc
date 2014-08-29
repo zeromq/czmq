@@ -395,3 +395,4 @@ This is the class self test code:
         zstr_free (&received);
     }
     zsys_close (logger, NULL, 0);
+

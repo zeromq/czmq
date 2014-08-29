@@ -63,3 +63,4 @@ This is the class self test code:
     assert (streq (string, "This is a string"));
     free (string);
     zactor_destroy (&actor);
+

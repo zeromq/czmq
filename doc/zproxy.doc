@@ -142,3 +142,4 @@ This is the class self test code:
     zsock_destroy (&sink);
     zsock_destroy (&capture);
     zactor_destroy (&proxy);
+

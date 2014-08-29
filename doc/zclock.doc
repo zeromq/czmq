@@ -42,3 +42,4 @@ This is the class self test code:
     if (verbose)
         puts (timestr);
     free (timestr);
+

@@ -5,6 +5,15 @@ strings across 0MQ sockets. It sends strings without a terminating null,
 and appends a null byte on received strings. This class is for simple
 message sending.
 
+       Memory                       Wire
+       +-------------+---+          +---+-------------+
+Send   | S t r i n g | 0 |  ---->   | 6 | S t r i n g |
+       +-------------+---+          +---+-------------+
+
+       Wire                         Heap
+       +---+-------------+          +-------------+---+
+Recv   | 6 | S t r i n g |  ---->   | S t r i n g | 0 |
+       +---+-------------+          +-------------+---+
 
 This is the class interface:
 
@@ -65,3 +74,4 @@ This is the class interface:
 This is the class self test code:
 
     //  Create two PAIR sockets and connect over inproc
+
