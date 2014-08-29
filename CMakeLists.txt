@@ -11,14 +11,14 @@ project(czmq)
 enable_language(C)
 enable_testing()
 
-set(CZMQ_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-set(CZMQ_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
+set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 ########################################################################
 # determine version
 ########################################################################
 foreach(which MAJOR MINOR PATCH)
-    file(STRINGS "${CZMQ_SOURCE_DIR}/include/czmq.h" CZMQ_VERSION_STRING REGEX "#define CZMQ_VERSION_${which}")
+    file(STRINGS "${SOURCE_DIR}/include/czmq.h" CZMQ_VERSION_STRING REGEX "#define CZMQ_VERSION_${which}")
     string(REGEX MATCH "#define CZMQ_VERSION_${which} ([0-9_]+)" CZMQ_REGEX_MATCH "${CZMQ_VERSION_STRING}")
     if (NOT CZMQ_REGEX_MATCH)
         message(FATAL_ERROR "failed to parse CZMQ_VERSION_${which} from czmq.h")
@@ -45,7 +45,7 @@ if (NOT HAVE_NET_IF_H)
     CHECK_INCLUDE_FILE("net/if.h" HAVE_NET_IF_H)
 endif()
 
-file(WRITE ${CZMQ_BINARY_DIR}/platform.h.in "
+file(WRITE ${BINARY_DIR}/platform.h.in "
 #cmakedefine HAVE_LINUX_WIRELESS_H
 #cmakedefine HAVE_NET_IF_H
 #cmakedefine HAVE_NET_IF_MEDIA_H
@@ -53,13 +53,13 @@ file(WRITE ${CZMQ_BINARY_DIR}/platform.h.in "
 #cmakedefine HAVE_FREEIFADDRS
 ")
 
-configure_file(${CZMQ_BINARY_DIR}/platform.h.in ${CZMQ_BINARY_DIR}/platform.h)
+configure_file(${BINARY_DIR}/platform.h.in ${BINARY_DIR}/platform.h)
 
 #The MSVC C compiler is too out of date,
 #so the sources have to be compiled as c++
 if (MSVC)
     enable_language(CXX)
-    file(GLOB sources ${CZMQ_SOURCE_DIR}/src/*.c)
+    file(GLOB sources ${SOURCE_DIR}/src/*.c)
     set_source_files_properties(${sources} PROPERTIES LANGUAGE CXX)
     set(MORE_LIBRARIES ws2_32 Rpcrt4 Iphlpapi)
 endif()
@@ -70,9 +70,9 @@ if (MINGW)
 endif()
 
 ########################################################################
-# zeromq depedency
+# ZeroMQ depedency
 ########################################################################
-list(APPEND CMAKE_MODULE_PATH ${CZMQ_SOURCE_DIR})
+list(APPEND CMAKE_MODULE_PATH ${SOURCE_DIR})
 find_package(ZeroMQ REQUIRED)
 
 ########################################################################
@@ -110,7 +110,7 @@ set (czmq_headers
     include/zstr.h
     include/zsys.h
     include/zuuid.h
-    include/zgossip_msg.h
+    src/zgossip_msg.h
     include/zauth_v2.h
     include/zctx.h
     include/zmonitor_v2.h
@@ -119,6 +119,8 @@ set (czmq_headers
     include/zsocket.h
     include/zsockopt.h
     include/zthread.h
+    src/zgossip_engine.inc
+    src/zhash_primes.inc
 )
 source_group ("Header Files" FILES ${czmq_headers})
 install(FILES ${czmq_headers} DESTINATION include)
@@ -126,8 +128,8 @@ install(FILES ${czmq_headers} DESTINATION include)
 ########################################################################
 # library
 ########################################################################
-include_directories(${CZMQ_BINARY_DIR})
-include_directories(${CZMQ_SOURCE_DIR}/include)
+include_directories(${BINARY_DIR})
+include_directories(${SOURCE_DIR}/include)
 include_directories(${ZEROMQ_INCLUDE_DIRS})
 set (czmq_sources
     src/zactor.c
@@ -189,19 +191,19 @@ set(exec_prefix "\${prefix}")
 set(libdir "\${prefix}/lib${LIB_SUFFIX}")
 set(includedir "\${prefix}/include")
 configure_file(
-    ${CZMQ_SOURCE_DIR}/src/libczmq.pc.in
-    ${CZMQ_BINARY_DIR}/libczmq.pc
+    ${SOURCE_DIR}/src/libczmq.pc.in
+    ${BINARY_DIR}/libczmq.pc
 @ONLY)
 
 install(
-    FILES ${CZMQ_BINARY_DIR}/libczmq.pc
+    FILES ${BINARY_DIR}/libczmq.pc
     DESTINATION lib${LIB_SUFFIX}/pkgconfig
 )
 
 ########################################################################
 # tests
 ########################################################################
-add_executable(czmq_selftest ${CZMQ_SOURCE_DIR}/src/czmq_selftest.c)
+add_executable(czmq_selftest ${SOURCE_DIR}/src/czmq_selftest.c)
 target_link_libraries(czmq_selftest czmq ${ZEROMQ_LIBRARIES})
 add_test(czmq_selftest czmq_selftest)
 

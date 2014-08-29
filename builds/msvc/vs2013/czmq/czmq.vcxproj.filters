@@ -129,6 +129,12 @@
     <ClInclude Include="..\..\..\..\include\czmq_prelude.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\src\zgossip_engine.inc">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\zhash_primes.inc">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\builds\msvc\platform.h">

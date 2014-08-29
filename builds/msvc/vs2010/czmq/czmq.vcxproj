@@ -79,6 +79,8 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\..\include\czmq.h" />
     <ClInclude Include="..\..\..\..\include\czmq_prelude.h" />
+    <ClInclude Include="..\..\..\..\src\zgossip_engine.inc" />
+    <ClInclude Include="..\..\..\..\src\zhash_primes.inc" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\zactor.c">

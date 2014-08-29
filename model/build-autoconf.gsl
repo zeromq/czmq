@@ -21,19 +21,22 @@ include_HEADERS = \\
 .endfor
 .for class
 .   if class.private ?= 1
-.       class.classdir = ""
+.       class.classdir = "src"
 .   else
-.       class.classdir = "../include/"
+.       class.classdir = "include"
 .   endif
 .   if last ()
-    $(classdir)$(name).h
+    ../$(classdir)/$(name).h
 .   else
-    $(classdir)$(name).h \\
+    ../$(classdir)/$(name).h \\
 .   endif
 .endfor
 
 lib$(project.name)_la_SOURCES = \\
     platform.h \\
+.for extra
+    $(name) \\
+.endfor
 .for class
 .   if last ()
     $(name).c
