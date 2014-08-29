@@ -184,159 +184,159 @@ EXAMPLE
 -------
 .From zhash_test method
 ----
-    zhash_t *hash = zhash_new ();
-    assert (hash);
-    assert (zhash_size (hash) == 0);
-    assert (zhash_first (hash) == NULL);
-    assert (zhash_cursor (hash) == NULL);
-    
-    //  Insert some items
-    int rc;
-    rc = zhash_insert (hash, "DEADBEEF", "dead beef");
-    char *item = (char *) zhash_first (hash);
-    assert (streq (zhash_cursor (hash), "DEADBEEF"));
-    assert (streq (item, "dead beef"));
-    assert (rc == 0);
-    rc = zhash_insert (hash, "ABADCAFE", "a bad cafe");
-    assert (rc == 0);
-    rc = zhash_insert (hash, "C0DEDBAD", "coded bad");
-    assert (rc == 0);
-    rc = zhash_insert (hash, "DEADF00D", "dead food");
-    assert (rc == 0);
-    assert (zhash_size (hash) == 4);
+zhash_t *hash = zhash_new ();
+assert (hash);
+assert (zhash_size (hash) == 0);
+assert (zhash_first (hash) == NULL);
+assert (zhash_cursor (hash) == NULL);
 
-    //  Look for existing items
-    item = (char *) zhash_lookup (hash, "DEADBEEF");
-    assert (streq (item, "dead beef"));
-    item = (char *) zhash_lookup (hash, "ABADCAFE");
-    assert (streq (item, "a bad cafe"));
-    item = (char *) zhash_lookup (hash, "C0DEDBAD");
-    assert (streq (item, "coded bad"));
-    item = (char *) zhash_lookup (hash, "DEADF00D");
-    assert (streq (item, "dead food"));
+//  Insert some items
+int rc;
+rc = zhash_insert (hash, "DEADBEEF", "dead beef");
+char *item = (char *) zhash_first (hash);
+assert (streq (zhash_cursor (hash), "DEADBEEF"));
+assert (streq (item, "dead beef"));
+assert (rc == 0);
+rc = zhash_insert (hash, "ABADCAFE", "a bad cafe");
+assert (rc == 0);
+rc = zhash_insert (hash, "C0DEDBAD", "coded bad");
+assert (rc == 0);
+rc = zhash_insert (hash, "DEADF00D", "dead food");
+assert (rc == 0);
+assert (zhash_size (hash) == 4);
 
-    //  Look for non-existent items
-    item = (char *) zhash_lookup (hash, "foo");
-    assert (item == NULL);
+//  Look for existing items
+item = (char *) zhash_lookup (hash, "DEADBEEF");
+assert (streq (item, "dead beef"));
+item = (char *) zhash_lookup (hash, "ABADCAFE");
+assert (streq (item, "a bad cafe"));
+item = (char *) zhash_lookup (hash, "C0DEDBAD");
+assert (streq (item, "coded bad"));
+item = (char *) zhash_lookup (hash, "DEADF00D");
+assert (streq (item, "dead food"));
 
-    //  Try to insert duplicate items
-    rc = zhash_insert (hash, "DEADBEEF", "foo");
-    assert (rc == -1);
-    item = (char *) zhash_lookup (hash, "DEADBEEF");
-    assert (streq (item, "dead beef"));
+//  Look for non-existent items
+item = (char *) zhash_lookup (hash, "foo");
+assert (item == NULL);
 
-    //  Some rename tests
+//  Try to insert duplicate items
+rc = zhash_insert (hash, "DEADBEEF", "foo");
+assert (rc == -1);
+item = (char *) zhash_lookup (hash, "DEADBEEF");
+assert (streq (item, "dead beef"));
 
-    //  Valid rename, key is now LIVEBEEF
-    rc = zhash_rename (hash, "DEADBEEF", "LIVEBEEF");
-    assert (rc == 0);
-    item = (char *) zhash_lookup (hash, "LIVEBEEF");
-    assert (streq (item, "dead beef"));
+//  Some rename tests
 
-    //  Trying to rename an unknown item to a non-existent key
-    rc = zhash_rename (hash, "WHATBEEF", "NONESUCH");
-    assert (rc == -1);
+//  Valid rename, key is now LIVEBEEF
+rc = zhash_rename (hash, "DEADBEEF", "LIVEBEEF");
+assert (rc == 0);
+item = (char *) zhash_lookup (hash, "LIVEBEEF");
+assert (streq (item, "dead beef"));
 
-    //  Trying to rename an unknown item to an existing key
-    rc = zhash_rename (hash, "WHATBEEF", "LIVEBEEF");
-    assert (rc == -1);
-    item = (char *) zhash_lookup (hash, "LIVEBEEF");
-    assert (streq (item, "dead beef"));
+//  Trying to rename an unknown item to a non-existent key
+rc = zhash_rename (hash, "WHATBEEF", "NONESUCH");
+assert (rc == -1);
 
-    //  Trying to rename an existing item to another existing item
-    rc = zhash_rename (hash, "LIVEBEEF", "ABADCAFE");
-    assert (rc == -1);
-    item = (char *) zhash_lookup (hash, "LIVEBEEF");
-    assert (streq (item, "dead beef"));
-    item = (char *) zhash_lookup (hash, "ABADCAFE");
-    assert (streq (item, "a bad cafe"));
+//  Trying to rename an unknown item to an existing key
+rc = zhash_rename (hash, "WHATBEEF", "LIVEBEEF");
+assert (rc == -1);
+item = (char *) zhash_lookup (hash, "LIVEBEEF");
+assert (streq (item, "dead beef"));
 
-    //  Test keys method
-    zlist_t *keys = zhash_keys (hash);
-    assert (zlist_size (keys) == 4);
-    zlist_destroy (&keys);
+//  Trying to rename an existing item to another existing item
+rc = zhash_rename (hash, "LIVEBEEF", "ABADCAFE");
+assert (rc == -1);
+item = (char *) zhash_lookup (hash, "LIVEBEEF");
+assert (streq (item, "dead beef"));
+item = (char *) zhash_lookup (hash, "ABADCAFE");
+assert (streq (item, "a bad cafe"));
 
-    //  Test dup method
-    zhash_t *copy = zhash_dup (hash);
-    assert (zhash_size (copy) == 4);
-    item = (char *) zhash_lookup (copy, "LIVEBEEF");
-    assert (item);
-    assert (streq (item, "dead beef"));
-    zhash_destroy (&copy);
+//  Test keys method
+zlist_t *keys = zhash_keys (hash);
+assert (zlist_size (keys) == 4);
+zlist_destroy (&keys);
 
-    //  Test pack/unpack methods
-    zframe_t *frame = zhash_pack (hash);
-    copy = zhash_unpack (frame);
-    zframe_destroy (&frame);
-    assert (zhash_size (copy) == 4);
-    item = (char *) zhash_lookup (copy, "LIVEBEEF");
-    assert (item);
-    assert (streq (item, "dead beef"));
-    zhash_destroy (&copy);
+//  Test dup method
+zhash_t *copy = zhash_dup (hash);
+assert (zhash_size (copy) == 4);
+item = (char *) zhash_lookup (copy, "LIVEBEEF");
+assert (item);
+assert (streq (item, "dead beef"));
+zhash_destroy (&copy);
 
-    //  Test save and load
-    zhash_comment (hash, "This is a test file");
-    zhash_comment (hash, "Created by %s", "czmq_selftest");
-    zhash_save (hash, ".cache");
-    copy = zhash_new ();
-    zhash_load (copy, ".cache");
-    item = (char *) zhash_lookup (copy, "LIVEBEEF");
-    assert (item);
-    assert (streq (item, "dead beef"));
-    zhash_destroy (&copy);
-    zsys_file_delete (".cache");
+//  Test pack/unpack methods
+zframe_t *frame = zhash_pack (hash);
+copy = zhash_unpack (frame);
+zframe_destroy (&frame);
+assert (zhash_size (copy) == 4);
+item = (char *) zhash_lookup (copy, "LIVEBEEF");
+assert (item);
+assert (streq (item, "dead beef"));
+zhash_destroy (&copy);
 
-    //  Delete a item
-    zhash_delete (hash, "LIVEBEEF");
-    item = (char *) zhash_lookup (hash, "LIVEBEEF");
-    assert (item == NULL);
-    assert (zhash_size (hash) == 3);
+//  Test save and load
+zhash_comment (hash, "This is a test file");
+zhash_comment (hash, "Created by %s", "czmq_selftest");
+zhash_save (hash, ".cache");
+copy = zhash_new ();
+zhash_load (copy, ".cache");
+item = (char *) zhash_lookup (copy, "LIVEBEEF");
+assert (item);
+assert (streq (item, "dead beef"));
+zhash_destroy (&copy);
+zsys_file_delete (".cache");
 
-    //  Check that the queue is robust against random usage
-    struct {
-        char name [100];
-        bool exists;
-    } testset [200];
-    memset (testset, 0, sizeof (testset));
-    int testmax = 200, testnbr, iteration;
+//  Delete a item
+zhash_delete (hash, "LIVEBEEF");
+item = (char *) zhash_lookup (hash, "LIVEBEEF");
+assert (item == NULL);
+assert (zhash_size (hash) == 3);
 
-    srandom ((unsigned) time (NULL));
-    for (iteration = 0; iteration < 25000; iteration++) {
-        testnbr = randof (testmax);
-        if (testset [testnbr].exists) {
-            item = (char *) zhash_lookup (hash, testset [testnbr].name);
-            assert (item);
-            zhash_delete (hash, testset [testnbr].name);
-            testset [testnbr].exists = false;
-        }
-        else {
-            sprintf (testset [testnbr].name, "%x-%x", rand (), rand ());
-            if (zhash_insert (hash, testset [testnbr].name, "") == 0)
-                testset [testnbr].exists = true;
-        }
+//  Check that the queue is robust against random usage
+struct {
+    char name [100];
+    bool exists;
+} testset [200];
+memset (testset, 0, sizeof (testset));
+int testmax = 200, testnbr, iteration;
+
+srandom ((unsigned) time (NULL));
+for (iteration = 0; iteration < 25000; iteration++) {
+    testnbr = randof (testmax);
+    if (testset [testnbr].exists) {
+        item = (char *) zhash_lookup (hash, testset [testnbr].name);
+        assert (item);
+        zhash_delete (hash, testset [testnbr].name);
+        testset [testnbr].exists = false;
     }
-    //  Test 10K lookups
-    for (iteration = 0; iteration < 10000; iteration++)
-        item = (char *) zhash_lookup (hash, "DEADBEEFABADCAFE");
+    else {
+        sprintf (testset [testnbr].name, "%x-%x", rand (), rand ());
+        if (zhash_insert (hash, testset [testnbr].name, "") == 0)
+            testset [testnbr].exists = true;
+    }
+}
+//  Test 10K lookups
+for (iteration = 0; iteration < 10000; iteration++)
+    item = (char *) zhash_lookup (hash, "DEADBEEFABADCAFE");
 
-    //  Destructor should be safe to call twice
-    zhash_destroy (&hash);
-    zhash_destroy (&hash);
-    assert (hash == NULL);
+//  Destructor should be safe to call twice
+zhash_destroy (&hash);
+zhash_destroy (&hash);
+assert (hash == NULL);
 
-    // Test autofree; automatically copies and frees string values
-    hash = zhash_new ();
-    zhash_autofree (hash);
-    char value [255];
-    strcpy (value, "This is a string");
-    rc = zhash_insert (hash, "key1", value);
-    assert (rc == 0);
-    strcpy (value, "Ring a ding ding");
-    rc = zhash_insert (hash, "key2", value);
-    assert (rc == 0);
-    assert (streq ((char *) zhash_lookup (hash, "key1"), "This is a string"));
-    assert (streq ((char *) zhash_lookup (hash, "key2"), "Ring a ding ding"));
-    zhash_destroy (&hash);
+// Test autofree; automatically copies and frees string values
+hash = zhash_new ();
+zhash_autofree (hash);
+char value [255];
+strcpy (value, "This is a string");
+rc = zhash_insert (hash, "key1", value);
+assert (rc == 0);
+strcpy (value, "Ring a ding ding");
+rc = zhash_insert (hash, "key2", value);
+assert (rc == 0);
+assert (streq ((char *) zhash_lookup (hash, "key1"), "This is a string"));
+assert (streq ((char *) zhash_lookup (hash, "key2"), "Ring a ding ding"));
+zhash_destroy (&hash);
 ----
 
 SEE ALSO

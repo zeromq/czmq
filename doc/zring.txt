@@ -104,87 +104,87 @@ EXAMPLE
 -------
 .From zring_test method
 ----
-    zring_t *ring = zring_new ();
-    assert (ring);
-    assert (zring_size (ring) == 0);
+zring_t *ring = zring_new ();
+assert (ring);
+assert (zring_size (ring) == 0);
 
-    //  Three items we'll use as test data
-    //  Ring items are void *, not particularly strings
-    char *cheese = "boursin";
-    char *bread = "baguette";
-    char *wine = "bordeaux";
+//  Three items we'll use as test data
+//  Ring items are void *, not particularly strings
+char *cheese = "boursin";
+char *bread = "baguette";
+char *wine = "bordeaux";
 
-    int rc = zring_append (ring, cheese);
-    assert (!rc);
-    assert (zring_size (ring) == 1);
-    rc = zring_append (ring, bread);
-    assert (!rc);
-    assert (zring_size (ring) == 2);
-    rc = zring_append (ring, wine);
-    assert (!rc);
-    assert (zring_size (ring) == 3);
+int rc = zring_append (ring, cheese);
+assert (!rc);
+assert (zring_size (ring) == 1);
+rc = zring_append (ring, bread);
+assert (!rc);
+assert (zring_size (ring) == 2);
+rc = zring_append (ring, wine);
+assert (!rc);
+assert (zring_size (ring) == 3);
 
-    assert (zring_next (ring) == cheese);
-    assert (zring_first (ring) == cheese);
-    assert (zring_next (ring) == bread);
-    assert (zring_next (ring) == wine);
-    assert (zring_next (ring) == NULL);
-    //  After we reach end of ring, next wraps around
-    assert (zring_next (ring) == cheese);
-    
-    assert (zring_last (ring) == wine);
-    assert (zring_prev (ring) == bread);
-    assert (zring_prev (ring) == cheese);
-    assert (zring_prev (ring) == NULL);
-    //  After we reach start of ring, prev wraps around
-    assert (zring_prev (ring) == wine);
+assert (zring_next (ring) == cheese);
+assert (zring_first (ring) == cheese);
+assert (zring_next (ring) == bread);
+assert (zring_next (ring) == wine);
+assert (zring_next (ring) == NULL);
+//  After we reach end of ring, next wraps around
+assert (zring_next (ring) == cheese);
 
-    assert (zring_first (ring) == cheese);
-    char *item = (char *) zring_remove (ring);
-    assert (item == cheese);
-    assert (zring_size (ring) == 2);
-    assert (zring_first (ring) == bread);
-    item = zring_remove (ring);
-    assert (item == bread);
-    assert (zring_size (ring) == 1);
-    assert (zring_first (ring) == wine);
-    item = zring_remove (ring);
-    assert (item == wine);
-    assert (zring_size (ring) == 0);
-    assert (zring_first (ring) == NULL);
+assert (zring_last (ring) == wine);
+assert (zring_prev (ring) == bread);
+assert (zring_prev (ring) == cheese);
+assert (zring_prev (ring) == NULL);
+//  After we reach start of ring, prev wraps around
+assert (zring_prev (ring) == wine);
 
-    rc = zring_push (ring, cheese);
-    assert (!rc);
-    assert (zring_size (ring) == 1);
-    assert (zring_first (ring) == cheese);
+assert (zring_first (ring) == cheese);
+char *item = (char *) zring_remove (ring);
+assert (item == cheese);
+assert (zring_size (ring) == 2);
+assert (zring_first (ring) == bread);
+item = zring_remove (ring);
+assert (item == bread);
+assert (zring_size (ring) == 1);
+assert (zring_first (ring) == wine);
+item = zring_remove (ring);
+assert (item == wine);
+assert (zring_size (ring) == 0);
+assert (zring_first (ring) == NULL);
 
-    rc = zring_push (ring, bread);
-    assert (!rc);
-    assert (zring_size (ring) == 2);
-    assert (zring_first (ring) == bread);
+rc = zring_push (ring, cheese);
+assert (!rc);
+assert (zring_size (ring) == 1);
+assert (zring_first (ring) == cheese);
 
-    rc = zring_append (ring, wine);
-    assert (!rc);
-    assert (zring_size (ring) == 3);
-    assert (zring_first (ring) == bread);
-    assert (zring_last (ring) == wine);
-    rc = zring_insert (ring, cheese);
-    item = (char *) zring_remove (ring);
-    assert (item == cheese);
+rc = zring_push (ring, bread);
+assert (!rc);
+assert (zring_size (ring) == 2);
+assert (zring_first (ring) == bread);
 
-    zring_t *dup_ring = zring_dup (ring);
-    assert (dup_ring);
-    assert (zring_size (dup_ring) == 3);
-    zring_destroy (&dup_ring);
+rc = zring_append (ring, wine);
+assert (!rc);
+assert (zring_size (ring) == 3);
+assert (zring_first (ring) == bread);
+assert (zring_last (ring) == wine);
+rc = zring_insert (ring, cheese);
+item = (char *) zring_remove (ring);
+assert (item == cheese);
 
-    //  Test pop
-    item = (char *) zring_pop (ring);
-    assert (item == bread);
-    
-    //  Destructor should be safe to call twice
-    zring_destroy (&ring);
-    assert (ring == NULL);
-    zring_destroy (&ring);
+zring_t *dup_ring = zring_dup (ring);
+assert (dup_ring);
+assert (zring_size (dup_ring) == 3);
+zring_destroy (&dup_ring);
+
+//  Test pop
+item = (char *) zring_pop (ring);
+assert (item == bread);
+
+//  Destructor should be safe to call twice
+zring_destroy (&ring);
+assert (ring == NULL);
+zring_destroy (&ring);
 ----
 
 SEE ALSO

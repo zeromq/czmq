@@ -105,7 +105,7 @@ http://zguide.zeromq.org/page:all#True-Peer-Connectivity-Harmony-Pattern
 Each node provides a ROUTER socket that accepts client connections on an
 key defined by the application via a BIND command. The state machine
 for these connections is in zgossip.xml, and the generated code is in
-zgossip_engine.h.
+zgossip_engine.inc.
 
 Each node additionally creates outbound connections via DEALER sockets
 to a set of servers ("remotes"), and under control of the calling app,
@@ -138,62 +138,62 @@ EXAMPLE
 -------
 .From zgossip_test method
 ----
-    //  Test basic client-to-server operation of the protocol
-    zactor_t *server = zactor_new (zgossip, "server");
-    zstr_sendx (server, "SET", "server/animate", verbose? "1": "0", NULL);
-    zstr_sendx (server, "BIND", "inproc://zgossip", NULL);
+//  Test basic client-to-server operation of the protocol
+zactor_t *server = zactor_new (zgossip, "server");
+zstr_sendx (server, "SET", "server/animate", verbose? "1": "0", NULL);
+zstr_sendx (server, "BIND", "inproc://zgossip", NULL);
 
-    zsock_t *client = zsock_new (ZMQ_DEALER);
-    assert (client);
-    zsock_set_rcvtimeo (client, 2000);
-    int rc = zsock_connect (client, "inproc://zgossip");
-    assert (rc == 0);
+zsock_t *client = zsock_new (ZMQ_DEALER);
+assert (client);
+zsock_set_rcvtimeo (client, 2000);
+int rc = zsock_connect (client, "inproc://zgossip");
+assert (rc == 0);
 
-    //  Send HELLO, which gets no reply
-    zgossip_msg_t *request, *reply;
-    request = zgossip_msg_new (ZGOSSIP_MSG_HELLO);
-    zgossip_msg_send (&request, client);
+//  Send HELLO, which gets no reply
+zgossip_msg_t *request, *reply;
+request = zgossip_msg_new (ZGOSSIP_MSG_HELLO);
+zgossip_msg_send (&request, client);
 
-    //  Send PING, expect PONG back
-    request = zgossip_msg_new (ZGOSSIP_MSG_PING);
-    zgossip_msg_send (&request, client);
-    reply = zgossip_msg_recv (client);
-    assert (reply);
-    assert (zgossip_msg_id (reply) == ZGOSSIP_MSG_PONG);
-    zgossip_msg_destroy (&reply);
-    
-    zactor_destroy (&server);
+//  Send PING, expect PONG back
+request = zgossip_msg_new (ZGOSSIP_MSG_PING);
+zgossip_msg_send (&request, client);
+reply = zgossip_msg_recv (client);
+assert (reply);
+assert (zgossip_msg_id (reply) == ZGOSSIP_MSG_PONG);
+zgossip_msg_destroy (&reply);
 
-    zsock_destroy (&client);
-    zactor_destroy (&server);
+zactor_destroy (&server);
 
-    //  Test peer-to-peer operations
-    zactor_t *base = zactor_new (zgossip, "base");
-    assert (base);
-    zstr_sendx (base, "SET", "server/animate", verbose? "1": "0", NULL);
-    //  Set a 100msec timeout on clients so we can test expiry
-    zstr_sendx (base, "SET", "server/timeout", "100", NULL);
-    zstr_sendx (base, "BIND", "inproc://base", NULL);
+zsock_destroy (&client);
+zactor_destroy (&server);
 
-    zactor_t *alpha = zactor_new (zgossip, "alpha");
-    assert (alpha);
-    zstr_sendx (alpha, "CONNECT", "inproc://base", NULL);
-    zstr_sendx (alpha, "PUBLISH", "inproc://alpha-1", "service1", NULL);
-    zstr_sendx (alpha, "PUBLISH", "inproc://alpha-2", "service2", NULL);
+//  Test peer-to-peer operations
+zactor_t *base = zactor_new (zgossip, "base");
+assert (base);
+zstr_sendx (base, "SET", "server/animate", verbose? "1": "0", NULL);
+//  Set a 100msec timeout on clients so we can test expiry
+zstr_sendx (base, "SET", "server/timeout", "100", NULL);
+zstr_sendx (base, "BIND", "inproc://base", NULL);
 
-    zactor_t *beta = zactor_new (zgossip, "beta");
-    assert (beta);
-    zstr_sendx (beta, "CONNECT", "inproc://base", NULL);
-    zstr_sendx (beta, "PUBLISH", "inproc://beta-1", "service1", NULL);
-    zstr_sendx (beta, "PUBLISH", "inproc://beta-2", "service2", NULL);
+zactor_t *alpha = zactor_new (zgossip, "alpha");
+assert (alpha);
+zstr_sendx (alpha, "CONNECT", "inproc://base", NULL);
+zstr_sendx (alpha, "PUBLISH", "inproc://alpha-1", "service1", NULL);
+zstr_sendx (alpha, "PUBLISH", "inproc://alpha-2", "service2", NULL);
 
-    //  got nothing
-    zclock_sleep (200);
-    
-    zactor_destroy (&base);
-    zactor_destroy (&alpha);
-    zactor_destroy (&beta);
-    
+zactor_t *beta = zactor_new (zgossip, "beta");
+assert (beta);
+zstr_sendx (beta, "CONNECT", "inproc://base", NULL);
+zstr_sendx (beta, "PUBLISH", "inproc://beta-1", "service1", NULL);
+zstr_sendx (beta, "PUBLISH", "inproc://beta-2", "service2", NULL);
+
+//  got nothing
+zclock_sleep (200);
+
+zactor_destroy (&base);
+zactor_destroy (&alpha);
+zactor_destroy (&beta);
+
 ----
 
 SEE ALSO

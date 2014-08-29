@@ -102,37 +102,37 @@ EXAMPLE
 -------
 .From zloop_test method
 ----
-    //  Create two PAIR sockets and connect over inproc
-    zsock_t *output = zsock_new (ZMQ_PAIR);
-    assert (output);
-    zsock_bind (output, "inproc://zloop.test");
-    
-    zsock_t *input = zsock_new (ZMQ_PAIR);
-    assert (input);
-    zsock_connect (input, "inproc://zloop.test");
+//  Create two PAIR sockets and connect over inproc
+zsock_t *output = zsock_new (ZMQ_PAIR);
+assert (output);
+zsock_bind (output, "inproc://zloop.test");
 
-    zloop_t *loop = zloop_new ();
-    assert (loop);
-    zloop_set_verbose (loop, verbose);
+zsock_t *input = zsock_new (ZMQ_PAIR);
+assert (input);
+zsock_connect (input, "inproc://zloop.test");
 
-    //  Create a timer that will be cancelled
-    int timer_id = zloop_timer (loop, 1000, 1, s_timer_event, NULL);
-    zloop_timer (loop, 5, 1, s_cancel_timer_event, &timer_id);
-    
-    //  After 20 msecs, send a ping message to output3
-    zloop_timer (loop, 20, 1, s_timer_event, output);
-    
-    //  When we get the ping message, end the reactor
-    rc = zloop_reader (loop, input, s_socket_event, NULL);
-    assert (rc == 0);
-    zloop_reader_set_tolerant (loop, input);
-    zloop_start (loop);
+zloop_t *loop = zloop_new ();
+assert (loop);
+zloop_set_verbose (loop, verbose);
 
-    zloop_destroy (&loop);
-    assert (loop == NULL);
+//  Create a timer that will be cancelled
+int timer_id = zloop_timer (loop, 1000, 1, s_timer_event, NULL);
+zloop_timer (loop, 5, 1, s_cancel_timer_event, &timer_id);
 
-    zsock_destroy (&input);
-    zsock_destroy (&output);
+//  After 20 msecs, send a ping message to output3
+zloop_timer (loop, 20, 1, s_timer_event, output);
+
+//  When we get the ping message, end the reactor
+rc = zloop_reader (loop, input, s_socket_event, NULL);
+assert (rc == 0);
+zloop_reader_set_tolerant (loop, input);
+zloop_start (loop);
+
+zloop_destroy (&loop);
+assert (loop == NULL);
+
+zsock_destroy (&input);
+zsock_destroy (&output);
 ----
 
 SEE ALSO
