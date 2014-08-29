@@ -44,16 +44,16 @@ EXAMPLE
 -------
 .From zclock_test method
 ----
-    int64_t start = zclock_time ();
-    zclock_sleep (10);
-    assert ((zclock_time () - start) >= 10);
-    start = zclock_mono ();
-    zclock_sleep (10);
-    assert ((zclock_mono () - start) >= 10);
-    char *timestr = zclock_timestr ();
-    if (verbose)
-        puts (timestr);
-    free (timestr);
+int64_t start = zclock_time ();
+zclock_sleep (10);
+assert ((zclock_time () - start) >= 10);
+start = zclock_mono ();
+zclock_sleep (10);
+assert ((zclock_mono () - start) >= 10);
+char *timestr = zclock_timestr ();
+if (verbose)
+    puts (timestr);
+free (timestr);
 ----
 
 SEE ALSO

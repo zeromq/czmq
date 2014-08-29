@@ -81,46 +81,46 @@ EXAMPLE
 static void *
 s_test_detached (void *args)
 {
-    //  Create a socket to check it'll be automatically deleted
-    zctx_t *ctx = zctx_new ();
-    assert (ctx);
+//  Create a socket to check it'll be automatically deleted
+zctx_t *ctx = zctx_new ();
+assert (ctx);
 
-    void *push = zsocket_new (ctx, ZMQ_PUSH);
-    assert (push);
-    zctx_destroy (&ctx);
-    return NULL;
+void *push = zsocket_new (ctx, ZMQ_PUSH);
+assert (push);
+zctx_destroy (&ctx);
+return NULL;
 }
 
 static void
 s_test_attached (void *args, zctx_t *ctx, void *pipe)
 {
-    //  Create a socket to check it'll be automatically deleted
-    zsocket_new (ctx, ZMQ_PUSH);
-    //  Wait for our parent to ping us, and pong back
-    char *ping = zstr_recv (pipe);
-    zstr_free (&ping);
-    zstr_send (pipe, "pong");
+//  Create a socket to check it'll be automatically deleted
+zsocket_new (ctx, ZMQ_PUSH);
+//  Wait for our parent to ping us, and pong back
+char *ping = zstr_recv (pipe);
+zstr_free (&ping);
+zstr_send (pipe, "pong");
 }
 
-    zctx_t *ctx = zctx_new ();
-    assert (ctx);
-    int rc = 0;
+zctx_t *ctx = zctx_new ();
+assert (ctx);
+int rc = 0;
 
-    //  Create a detached thread, let it run
-    rc = zthread_new (s_test_detached, NULL);
-    assert (rc == 0);
-    zclock_sleep (100);
+//  Create a detached thread, let it run
+rc = zthread_new (s_test_detached, NULL);
+assert (rc == 0);
+zclock_sleep (100);
 
-    //  Create an attached thread, check it's safely alive
-    void *pipe = zthread_fork (ctx, s_test_attached, NULL);
-    assert (pipe);
-    zstr_send (pipe, "ping");
-    char *pong = zstr_recv (pipe);
-    assert (streq (pong, "pong"));
-    zstr_free (&pong);
+//  Create an attached thread, check it's safely alive
+void *pipe = zthread_fork (ctx, s_test_attached, NULL);
+assert (pipe);
+zstr_send (pipe, "ping");
+char *pong = zstr_recv (pipe);
+assert (streq (pong, "pong"));
+zstr_free (&pong);
 
-    //  Everything should be cleanly closed now
-    zctx_destroy (&ctx);
+//  Everything should be cleanly closed now
+zctx_destroy (&ctx);
 ----
 
 SEE ALSO
