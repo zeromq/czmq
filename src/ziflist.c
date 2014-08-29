@@ -131,9 +131,9 @@ ziflist_reload (ziflist_t *self)
         struct ifaddrs *interface = interfaces;
         while (interface) {
             //  On Solaris, loopback interfaces have a NULL in ifa_broadaddr
-            if (interface->ifa_addr->sa_family == AF_INET
-            &&  interface->ifa_broadaddr
+            if (interface->ifa_broadaddr
             &&  interface->ifa_addr
+            &&  interface->ifa_addr->sa_family == AF_INET
             &&  s_valid_flags (interface->ifa_flags)) {
                 inaddr_t address = *(inaddr_t *) interface->ifa_addr;
                 inaddr_t netmask = *(inaddr_t *) interface->ifa_netmask;
