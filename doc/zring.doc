@@ -1,0 +1,176 @@
+#### zring - generic type-free doubly linked ring container
+
+Provides a generic container implementing a fast doubly-linked list, aka
+a ring. You can use this to construct multi-dimensional rings, and other
+structures together with other generic containers like zhash.
+
+To iterate through a ring, use zring_first to get the first item, then
+loop while not null, and do zring_next at the end of each iteration.
+
+This is the class interface:
+
+    //  Create a new ring container (a ring is a doubly-linked list)
+    CZMQ_EXPORT zring_t *
+        zring_new (void);
+    
+    //  Destroy a ring container
+    CZMQ_EXPORT void
+        zring_destroy (zring_t **self_p);
+    
+    //  Return the item at the head of ring. If the ring is empty, returns NULL.
+    //  Leaves cursor pointing at the head item, or NULL if the ring is empty.
+    CZMQ_EXPORT void *
+        zring_first (zring_t *self);
+    
+    //  Return the item at the tail of ring. If the ring is empty, returns NULL.
+    //  Leaves cursor pointing at the tail item, or NULL if the ring is empty.
+    CZMQ_EXPORT void *
+        zring_last (zring_t *self);
+        
+    //  Return the next item. At the end of the ring (or in an empty ring),
+    //  returns NULL. Use repeated zring_next () calls to work through the ring
+    //  from zring_first ().
+    CZMQ_EXPORT void *
+        zring_next (zring_t *self);
+        
+    //  Return the previous item. At the start of the ring (or in an empty ring),
+    //  returns NULL. Use repeated zring_prev () calls to work through the ring
+    //  backwards from zring_last ().
+    CZMQ_EXPORT void *
+        zring_prev (zring_t *self);
+    
+    //  Insert an item after cursor, return 0 if OK, else -1. Cursor is set to
+    //  inserted item (zring_remove() will remove it again). In any empty ring,
+    //  inserts after the head.
+    CZMQ_EXPORT int
+        zring_insert (zring_t *self, void *item);
+    
+    //  Append an item to the end of the ring, return 0 if OK, else -1.
+    CZMQ_EXPORT int
+        zring_append (zring_t *self, void *item);
+    
+    //  Push an item to the start of the ring, return 0 if OK, else -1.
+    CZMQ_EXPORT int
+        zring_push (zring_t *self, void *item);
+    
+    //  Remove current item from the ring (as set by first/last/next/prev calls),
+    //  and return item. Sets the cursor to the next item. If ring was empty,
+    //  returns null. Caller should destroy item when finished with it.
+    CZMQ_EXPORT void *
+        zring_remove (zring_t *self);
+    
+    //  Pop item off the start of the ring, and return item. If the ring is empty.
+    //  returns null. Sets cursor to first remaining item in ring. Caller should
+    //  destroy item when finished with it.
+    CZMQ_EXPORT void *
+        zring_pop (zring_t *self);
+    
+    //  Return number of items in the ring
+    CZMQ_EXPORT size_t
+        zring_size (zring_t *self);
+    
+    //  Set a user-defined deallocator for ring items; by default items are not
+    //  freed when the ring is destroyed.
+    typedef void (zring_free_fn) (void **item);
+    CZMQ_EXPORT void
+        zring_set_free_fn (zring_t *self, zring_free_fn free_fn);
+    
+    //  Set a user-defined duplicator for ring items; by default items are not
+    //  copied when the ring is duplicated.
+    typedef void * (zring_dup_fn) (void *item);
+    CZMQ_EXPORT void
+        zring_set_dup_fn (zring_t *self, zring_dup_fn dup_fn);
+    
+    //  Make a copy of the ring; items are duplicated if you set a duplicator
+    //  for the ring.
+    CZMQ_EXPORT zring_t *
+        zring_dup (zring_t *self);
+    
+    //  Self test of this class
+    CZMQ_EXPORT void
+        zring_test (int verbose);
+
+This is the class self test code:
+
+    zring_t *ring = zring_new ();
+    assert (ring);
+    assert (zring_size (ring) == 0);
+
+    //  Three items we'll use as test data
+    //  Ring items are void *, not particularly strings
+    char *cheese = "boursin";
+    char *bread = "baguette";
+    char *wine = "bordeaux";
+
+    int rc = zring_append (ring, cheese);
+    assert (!rc);
+    assert (zring_size (ring) == 1);
+    rc = zring_append (ring, bread);
+    assert (!rc);
+    assert (zring_size (ring) == 2);
+    rc = zring_append (ring, wine);
+    assert (!rc);
+    assert (zring_size (ring) == 3);
+
+    assert (zring_next (ring) == cheese);
+    assert (zring_first (ring) == cheese);
+    assert (zring_next (ring) == bread);
+    assert (zring_next (ring) == wine);
+    assert (zring_next (ring) == NULL);
+    //  After we reach end of ring, next wraps around
+    assert (zring_next (ring) == cheese);
+    
+    assert (zring_last (ring) == wine);
+    assert (zring_prev (ring) == bread);
+    assert (zring_prev (ring) == cheese);
+    assert (zring_prev (ring) == NULL);
+    //  After we reach start of ring, prev wraps around
+    assert (zring_prev (ring) == wine);
+
+    assert (zring_first (ring) == cheese);
+    char *item = (char *) zring_remove (ring);
+    assert (item == cheese);
+    assert (zring_size (ring) == 2);
+    assert (zring_first (ring) == bread);
+    item = zring_remove (ring);
+    assert (item == bread);
+    assert (zring_size (ring) == 1);
+    assert (zring_first (ring) == wine);
+    item = zring_remove (ring);
+    assert (item == wine);
+    assert (zring_size (ring) == 0);
+    assert (zring_first (ring) == NULL);
+
+    rc = zring_push (ring, cheese);
+    assert (!rc);
+    assert (zring_size (ring) == 1);
+    assert (zring_first (ring) == cheese);
+
+    rc = zring_push (ring, bread);
+    assert (!rc);
+    assert (zring_size (ring) == 2);
+    assert (zring_first (ring) == bread);
+
+    rc = zring_append (ring, wine);
+    assert (!rc);
+    assert (zring_size (ring) == 3);
+    assert (zring_first (ring) == bread);
+    assert (zring_last (ring) == wine);
+    rc = zring_insert (ring, cheese);
+    item = (char *) zring_remove (ring);
+    assert (item == cheese);
+
+    zring_t *dup_ring = zring_dup (ring);
+    assert (dup_ring);
+    assert (zring_size (dup_ring) == 3);
+    zring_destroy (&dup_ring);
+
+    //  Test pop
+    item = (char *) zring_pop (ring);
+    assert (item == bread);
+    
+    //  Destructor should be safe to call twice
+    zring_destroy (&ring);
+    assert (ring == NULL);
+    zring_destroy (&ring);
+

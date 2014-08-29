@@ -72,43 +72,43 @@ EXAMPLE
 -------
 .From zmonitor_test method
 ----
-    zsock_t *client = zsock_new (ZMQ_DEALER);
-    zactor_t *clientmon = zactor_new (zmonitor, client);
-    assert (clientmon);
-    if (verbose)
-        zstr_sendx (clientmon, "VERBOSE", NULL);
-    zstr_sendx (clientmon, "LISTEN", "LISTENING", "ACCEPTED", NULL);
-    zstr_sendx (clientmon, "START", NULL);
-    zsock_wait (clientmon);
+zsock_t *client = zsock_new (ZMQ_DEALER);
+zactor_t *clientmon = zactor_new (zmonitor, client);
+assert (clientmon);
+if (verbose)
+    zstr_sendx (clientmon, "VERBOSE", NULL);
+zstr_sendx (clientmon, "LISTEN", "LISTENING", "ACCEPTED", NULL);
+zstr_sendx (clientmon, "START", NULL);
+zsock_wait (clientmon);
 
-    zsock_t *server = zsock_new (ZMQ_DEALER);
-    zactor_t *servermon = zactor_new (zmonitor, server);
-    assert (servermon);
-    if (verbose)
-        zstr_sendx (servermon, "VERBOSE", NULL);
-    zstr_sendx (servermon, "LISTEN", "CONNECTED", "DISCONNECTED", NULL);
-    zstr_sendx (servermon, "START", NULL);
-    zsock_wait (servermon);
-    
-    //  Allow a brief time for the message to get there...
-    zmq_poll (NULL, 0, 200);
+zsock_t *server = zsock_new (ZMQ_DEALER);
+zactor_t *servermon = zactor_new (zmonitor, server);
+assert (servermon);
+if (verbose)
+    zstr_sendx (servermon, "VERBOSE", NULL);
+zstr_sendx (servermon, "LISTEN", "CONNECTED", "DISCONNECTED", NULL);
+zstr_sendx (servermon, "START", NULL);
+zsock_wait (servermon);
 
-    //  Check client is now listening
-    int port_nbr = zsock_bind (client, "tcp://127.0.0.1:*");
-    assert (port_nbr != -1);
-    s_assert_event (clientmon, "LISTENING");
+//  Allow a brief time for the message to get there...
+zmq_poll (NULL, 0, 200);
 
-    //  Check server connected to client
-    zsock_connect (server, "tcp://127.0.0.1:%d", port_nbr);
-    s_assert_event (servermon, "CONNECTED");
+//  Check client is now listening
+int port_nbr = zsock_bind (client, "tcp://127.0.0.1:*");
+assert (port_nbr != -1);
+s_assert_event (clientmon, "LISTENING");
 
-    //  Check client accepted connection
-    s_assert_event (clientmon, "ACCEPTED");
+//  Check server connected to client
+zsock_connect (server, "tcp://127.0.0.1:%d", port_nbr);
+s_assert_event (servermon, "CONNECTED");
 
-    zactor_destroy (&clientmon);
-    zactor_destroy (&servermon);
-    zsock_destroy (&client);
-    zsock_destroy (&server);
+//  Check client accepted connection
+s_assert_event (clientmon, "ACCEPTED");
+
+zactor_destroy (&clientmon);
+zactor_destroy (&servermon);
+zsock_destroy (&client);
+zsock_destroy (&server);
 #endif
 ----
 

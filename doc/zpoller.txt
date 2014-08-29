@@ -68,46 +68,46 @@ EXAMPLE
 -------
 .From zpoller_test method
 ----
-    //  Create a few sockets
-    zsock_t *vent = zsock_new (ZMQ_PUSH);
-    int port_nbr = zsock_bind (vent, "tcp://127.0.0.1:*");
-    assert (port_nbr != -1);
-    zsock_t *sink = zsock_new (ZMQ_PULL);
-    int rc = zsock_connect (sink, "tcp://127.0.0.1:%d", port_nbr);
-    assert (rc != -1);
-    zsock_t *bowl = zsock_new (ZMQ_PULL);
-    zsock_t *dish = zsock_new (ZMQ_PULL);
+//  Create a few sockets
+zsock_t *vent = zsock_new (ZMQ_PUSH);
+int port_nbr = zsock_bind (vent, "tcp://127.0.0.1:*");
+assert (port_nbr != -1);
+zsock_t *sink = zsock_new (ZMQ_PULL);
+int rc = zsock_connect (sink, "tcp://127.0.0.1:%d", port_nbr);
+assert (rc != -1);
+zsock_t *bowl = zsock_new (ZMQ_PULL);
+zsock_t *dish = zsock_new (ZMQ_PULL);
 
-    //  Set-up poller
-    zpoller_t *poller = zpoller_new (bowl, dish, NULL);
-    assert (poller);
+//  Set-up poller
+zpoller_t *poller = zpoller_new (bowl, dish, NULL);
+assert (poller);
 
-    // Add a reader the existing poller
-    rc = zpoller_add (poller, sink);
-    assert (rc == 0);
+// Add a reader the existing poller
+rc = zpoller_add (poller, sink);
+assert (rc == 0);
 
-    zstr_send (vent, "Hello, World");
+zstr_send (vent, "Hello, World");
 
-    //  We expect a message only on the sink
-    zsock_t *which = (zsock_t *) zpoller_wait (poller, -1);
-    assert (which == sink);
-    assert (zpoller_expired (poller) == false);
-    assert (zpoller_terminated (poller) == false);
-    char *message = zstr_recv (which);
-    assert (streq (message, "Hello, World"));
-    zstr_free (&message);
+//  We expect a message only on the sink
+zsock_t *which = (zsock_t *) zpoller_wait (poller, -1);
+assert (which == sink);
+assert (zpoller_expired (poller) == false);
+assert (zpoller_terminated (poller) == false);
+char *message = zstr_recv (which);
+assert (streq (message, "Hello, World"));
+zstr_free (&message);
 
-    // Stop polling reader
-    rc = zpoller_remove (poller, sink);
-    assert (rc == 0);
-    
-    //  Destroy poller and sockets
-    zpoller_destroy (&poller);
+// Stop polling reader
+rc = zpoller_remove (poller, sink);
+assert (rc == 0);
 
-    zsock_destroy (&vent);
-    zsock_destroy (&sink);
-    zsock_destroy (&bowl);
-    zsock_destroy (&dish);
+//  Destroy poller and sockets
+zpoller_destroy (&poller);
+
+zsock_destroy (&vent);
+zsock_destroy (&sink);
+zsock_destroy (&bowl);
+zsock_destroy (&dish);
 ----
 
 SEE ALSO
