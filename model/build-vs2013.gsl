@@ -88,6 +88,9 @@
 .for header
     <ClInclude Include="..\\..\\..\\..\\include\\$(name).h" />
 .endfor
+.for extra
+    <ClInclude Include="..\\..\\..\\..\\src\\$(name)" />
+.endfor
   </ItemGroup>
   <ItemGroup>
 .for class
@@ -136,6 +139,11 @@
 .for header
     <ClInclude Include="..\\..\\..\\..\\include\\$(name).h">
       <Filter>include</Filter>
+    </ClInclude>
+.endfor
+.for extra
+    <ClInclude Include="..\\..\\..\\..\\src\\$(name)">
+      <Filter>src</Filter>
     </ClInclude>
 .endfor
   </ItemGroup>

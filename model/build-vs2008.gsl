@@ -243,10 +243,19 @@
     </Filter>
     <Filter Name="Header Files">
       <File RelativePath="..\\..\\..\\..\\builds\\msvc\\platform.h" />
-      <File RelativePath="..\\..\\..\\..\\include\\$(project.name).h" />
-      <File RelativePath="..\\..\\..\\..\\include\\$(project.name)_prelude.h" />
 .for class
+.   if class.private ?= 1
+.       class.classdir = "src"
+.   else
+.       class.classdir = "include"
+.   endif
+      <File RelativePath="..\\..\\..\\..\\$(classdir)\\$(name).h" />
+.endfor
+.for header
       <File RelativePath="..\\..\\..\\..\\include\\$(name).h" />
+.endfor
+.for extra
+      <File RelativePath="..\\..\\..\\..\\src\\$(name)" />
 .endfor
     </Filter>
   </Files>

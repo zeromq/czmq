@@ -39,7 +39,7 @@ include_HEADERS = \
     ../include/zstr.h \
     ../include/zsys.h \
     ../include/zuuid.h \
-    zgossip_msg.h \
+    ../src/zgossip_msg.h \
     ../include/zauth_v2.h \
     ../include/zctx.h \
     ../include/zmonitor_v2.h \
@@ -51,6 +51,8 @@ include_HEADERS = \
 
 libczmq_la_SOURCES = \
     platform.h \
+    zgossip_engine.inc \
+    zhash_primes.inc \
     zactor.c \
     zauth.c \
     zbeacon.c \
