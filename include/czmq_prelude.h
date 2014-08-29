@@ -44,6 +44,7 @@
  *  __UTYPE_NEXT        NeXT
  *  __UTYPE_OPENBSD     OpenBSD
  *  __UTYPE_OSX         Apple Macintosh OS X
+ *  __UTYPE_IOS         Apple iOS
  *  __UTYPE_QNX         QNX
  *  __UTYPE_IRIX        Silicon Graphics IRIX
  *  __UTYPE_SINIX       SINIX-N (Siemens-Nixdorf Unix)
@@ -168,8 +169,13 @@
 #   define __UTYPE_OPENBSD
 #   define __UNIX__
 #elif (defined (APPLE) || defined (__APPLE__))
-#   define __UTYPE_OSX
+#   include <TargetConditionals.h>
 #   define __UNIX__
+#   if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+#      define __UTYPE_IOS
+#   else
+#      define __UTYPE_OSX
+#   endif
 #elif (defined (NeXT))
 #   define __UTYPE_NEXT
 #   define __UNIX__
