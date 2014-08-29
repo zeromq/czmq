@@ -124,6 +124,7 @@ print OUTPUT "\nThis is the class interface:\n\n";
 print OUTPUT pull ("$top_srcdir/include/$class.h\@interface,code");
 print OUTPUT "\nThis is the class self test code:\n\n";
 print OUTPUT pull ("$top_srcdir/src/$class.c\@selftest");
+print OUTPUT "\n";
 close OUTPUT;
 
 

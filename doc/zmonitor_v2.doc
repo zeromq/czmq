@@ -75,3 +75,4 @@ This is the class self test code:
     zmonitor_destroy (&sinkmon);
     zmonitor_destroy (&sourcemon);
     zctx_destroy (&ctx);
+

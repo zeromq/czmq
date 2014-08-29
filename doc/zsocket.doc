@@ -160,3 +160,4 @@ This is the class self test code:
     zsocket_destroy (ctx, reader);
     zsocket_destroy (ctx, writer);
     zctx_destroy (&ctx);
+

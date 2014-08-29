@@ -165,3 +165,4 @@ This is the class self test code:
     
     section = zconfig_new ("headers", root);
     item = zconfig_new ("email", section);
+

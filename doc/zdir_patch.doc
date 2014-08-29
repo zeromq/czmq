@@ -57,3 +57,4 @@ This is the class self test code:
     assert (streq (zfile_filename (file, "."), "bilbo"));
     assert (streq (zdir_patch_vpath (patch), "/bilbo"));
     zdir_patch_destroy (&patch);
+

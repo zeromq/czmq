@@ -39,3 +39,4 @@ This is the class self test code:
     zmutex_lock (mutex);
     zmutex_unlock (mutex);
     zmutex_destroy (&mutex);
+

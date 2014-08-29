@@ -18,6 +18,15 @@
     and appends a null byte on received strings. This class is for simple
     message sending.
 @discuss
+           Memory                       Wire
+           +-------------+---+          +---+-------------+
+    Send   | S t r i n g | 0 |  ---->   | 6 | S t r i n g |
+           +-------------+---+          +---+-------------+
+
+           Wire                         Heap
+           +---+-------------+          +-------------+---+
+    Recv   | 6 | S t r i n g |  ---->   | S t r i n g | 0 |
+           +---+-------------+          +-------------+---+
 @end
 */
 

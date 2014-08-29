@@ -112,3 +112,4 @@ This is the class self test code:
     zsocket_connect (s6, "tcp://127.0.0.1:5555");
     assert (zctx_underlying (ctx));
     zctx_destroy (&ctx);
+

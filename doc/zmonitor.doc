@@ -98,3 +98,4 @@ This is the class self test code:
     zsock_destroy (&client);
     zsock_destroy (&server);
 #endif
+
