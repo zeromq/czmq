@@ -125,9 +125,10 @@ zmsg_recv (void *source)
 
 
 //  --------------------------------------------------------------------------
-//  Send message to socket, destroy after sending. If the message has no
-//  frames, sends nothing but destroys the message anyhow. Safe to call
-//  if zmsg is null.
+//  Send message to destination socket, and destroy the message after sending
+//  it successfully. If the message has no frames, sends nothing but destroys
+//  the message anyhow. Nullifies the caller's reference to the message (as
+//  it is a destructor).
 
 int
 zmsg_send (zmsg_t **self_p, void *dest)
@@ -140,9 +141,6 @@ zmsg_send (zmsg_t **self_p, void *dest)
     void *handle = zsock_resolve (dest);
     if (self) {
         assert (zmsg_is (self));
-        if (zlist_size (self->frames) == 0)
-            return -1;          //  Sending an empty message is an error
-        
         zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
         while (frame) {
             rc = zframe_send (&frame, handle,
@@ -963,10 +961,9 @@ zmsg_test (bool verbose)
     assert (zmsg_last (msg) == NULL);
     assert (zmsg_next (msg) == NULL);
     assert (zmsg_pop (msg) == NULL);
-    assert (zmsg_send (&msg, output) == -1);
-    assert (msg != NULL);
-    zmsg_destroy (&msg);
+    //  Sending an empty message is valid and destroys the message
     assert (zmsg_send (&msg, output) == 0);
+    assert (!msg);
 
     zsock_destroy (&input);
     zsock_destroy (&output);
