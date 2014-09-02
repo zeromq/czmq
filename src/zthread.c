@@ -234,7 +234,7 @@ s_test_attached (void *args, zctx_t *ctx, void *pipe)
 void
 zthread_test (bool verbose)
 {
-    printf (" * zthread: ");
+    printf (" * zthread (deprecated): ");
 
     //  @selftest
     zctx_t *ctx = zctx_new ();

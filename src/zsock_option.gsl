@@ -39,6 +39,7 @@ extern "C" {
 .       endif
 .       if mode = "rw" | mode = "r"
 CZMQ_EXPORT $(ctype) zsock_$(name) (zsock_t *self);
+CZMQ_EXPORT $(ctype) zactor_$(name) (zactor_t *self);   //  For zactors
 .       endif
 .       if defined (.minor)
 #   endif
@@ -52,8 +53,10 @@ CZMQ_EXPORT $(ctype) zsock_$(name) (zsock_t *self);
 .       endif
 .       if mode = "rw" | mode = "w"
 CZMQ_EXPORT void zsock_set_$(name) (zsock_t *self, $(ctype_const) $(name));
+CZMQ_EXPORT void zactor_set_$(name) (zactor_t *self, $(ctype_const) $(name));
 .           if type = "key"
 CZMQ_EXPORT void zsock_set_$(name)_bin (zsock_t *self, const byte *$(name));
+CZMQ_EXPORT void zactor_set_$(name)_bin (zactor_t *self, const byte *$(name));
 .           endif
 .       endif
 .       if defined (.minor)
@@ -107,7 +110,6 @@ CZMQ_EXPORT void zsock_option_test (bool verbose);
 */
 
 #include "../include/czmq.h"
-#include "platform.h"
 
 .for version
 #if (ZMQ_VERSION_MAJOR == $(major))
@@ -123,7 +125,7 @@ CZMQ_EXPORT void zsock_option_test (bool verbose);
 void
 zsock_set_$(name) (zsock_t *self, $(ctype_const) $(name))
 {
-    assert(self);
+    assert (self);
 .       if style = "macro"
 #   if defined (ZMQ_$(NAME))
 .       endif
@@ -167,6 +169,12 @@ zsock_set_$(name) (zsock_t *self, $(ctype_const) $(name))
 .       endif
 }
 
+void
+zactor_set_$(name) (zactor_t *self, $(ctype_const) $(name))
+{
+    zsock_set_$(name) ((zsock_t *) self, $(name));
+}
+
 
 .# Generate additional set_xxx_bin method
 .if type = "key"
@@ -187,6 +195,12 @@ zsock_set_$(name)_bin (zsock_t *self, const byte *$(name))
 .       endif
 }
 
+void
+zactor_set_$(name)_bin (zactor_t *self, const byte *$(name))
+{
+    zsock_set_$(name)_bin ((zsock_t *) self, $(name));
+}
+
 
 .endif
 .           endif
@@ -198,7 +212,7 @@ zsock_set_$(name)_bin (zsock_t *self, const byte *$(name))
 $(ctype) 
 zsock_$(name) (zsock_t *self)
 {
-    assert(self);
+    assert (self);
 .           if style = "macro"
 #   if defined (ZMQ_$(NAME))
 .           endif
@@ -243,6 +257,11 @@ zsock_$(name) (zsock_t *self)
 .           endif
 }
 
+$(ctype)
+zactor_$(name) (zactor_t *self)
+{
+    return zsock_$(name) ((zsock_t *) self);
+}
 
 .       endif
 .       if defined (.minor)

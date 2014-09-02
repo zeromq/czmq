@@ -135,7 +135,7 @@ zmutex_try_lock (zmutex_t *self)
 void
 zmutex_test (bool verbose)
 {
-    printf (" * zmutex: ");
+    printf (" * zmutex (deprecated): ");
 
     //  @selftest
     zmutex_t *mutex = zmutex_new ();

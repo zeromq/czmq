@@ -515,26 +515,16 @@ zsock_type_str (zsock_t *self)
 //  --------------------------------------------------------------------------
 //  Send a zmsg message to the socket, take ownership of the message
 //  and destroy when it has been sent.
+//  send (self, picture, ...)
+//     s = string
+//     m = memory (ptr, size)
+//     i = integer
+    
 
 int
 zsock_send (zsock_t *self, zmsg_t **msg_p)
 {
     return zmsg_send (msg_p, self);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Send data over a socket as a single message frame.
-//  Returns -1 on error, 0 on success
-
-int
-zsock_sendmem (zsock_t *self, const void *data, size_t size)
-{
-    assert (self);
-    assert (data);
-    zmsg_t *msg = zmsg_new ();
-    zmsg_addmem (msg, data, size);
-    return zmsg_send (&msg, self);
 }
 
 

@@ -258,7 +258,7 @@ zsocket_set_hwm (void *self, int hwm)
 void
 zsocket_test (bool verbose)
 {
-    printf (" * zsocket: ");
+    printf (" * zsocket (deprecated): ");
 
     //  @selftest
     zctx_t *ctx = zctx_new ();
