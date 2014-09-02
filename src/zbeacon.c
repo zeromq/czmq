@@ -345,7 +345,7 @@ zbeacon_test (bool verbose)
     zmsg_send (&msg, listener);
 
     //  Wait for at most 1/2 second if there's no broadcasting
-    zactor_set_rcvtimeo (listener, 500);
+    zsock_set_rcvtimeo (listener, 500);
     char *ipaddress = zstr_recv (listener);
     if (ipaddress) {
         zframe_t *content = zframe_recv (listener);

@@ -15,8 +15,8 @@
 @header
     The zsock class wraps the libzmq socket handle (a void *) with a proper
     structure that follows the CLASS rules for construction and destruction.
-    CZMQ methods that accept a socket will accept either a zsock_t * or a
-    libzmq void *, and will detect the type at runtime.
+    Some zsock methods take a void * "polymorphic" reference, which can be
+    either a zsock_t or a zactor_r reference, or a libzmq void *.
 @discuss
 @end
 */
@@ -493,7 +493,7 @@ zsock_attach (zsock_t *self, const char *endpoints, bool serverish)
 
 
 //  --------------------------------------------------------------------------
-//  Returns socket type as printable constant string
+//  Returns socket type as printable constant string. 
 
 const char *
 zsock_type_str (zsock_t *self)
@@ -522,9 +522,10 @@ zsock_type_str (zsock_t *self)
     
 
 int
-zsock_send (zsock_t *self, zmsg_t **msg_p)
+zsock_send (void *self, zmsg_t **msg_p)
 {
-    return zmsg_send (msg_p, self);
+    void *handle = zsock_resolve (self);
+    return zmsg_send (msg_p, handle);
 }
 
 
@@ -534,19 +535,20 @@ zsock_send (zsock_t *self, zmsg_t **msg_p)
 //  expired.
 
 zmsg_t *
-zsock_recv (zsock_t *self)
+zsock_recv (void *self)
 {
-    return zmsg_recv (self);
+    void *handle = zsock_resolve (self);
+    return zmsg_recv (handle);
 }
 
 
 //  --------------------------------------------------------------------------
 //  Set socket to use unbounded pipes (HWM=0); use this in cases when you are
 //  totally certain the message volume can fit in memory. This method works
-//  across all versions of ZeroMQ.
+//  across all versions of ZeroMQ. Takes a polymorphic socket reference.
 
 void
-zsock_set_unbounded (zsock_t *self)
+zsock_set_unbounded (void *self)
 {
 #if (ZMQ_VERSION_MAJOR == 2)
     zsock_set_hwm (self, 0);
@@ -562,7 +564,7 @@ zsock_set_unbounded (zsock_t *self)
 //  success/failure code (by convention, 0 means OK). Signals are encoded
 //  to be distinguishable from "normal" messages. Accepts a zock_t or a
 //  zactor_t argument, and returns 0 if successful, -1 if the signal could
-//  not be sent.
+//  not be sent. Takes a polymorphic socket reference.
 
 int
 zsock_signal (void *self, byte status)
@@ -579,6 +581,7 @@ zsock_signal (void *self, byte status)
 //  Wait on a signal. Use this to coordinate between threads, over pipe
 //  pairs. Blocks until the signal is received. Returns -1 on error, 0 or
 //  greater on success. Accepts a zsock_t or a zactor_t as argument.
+//  Takes a polymorphic socket reference.
 
 int
 zsock_wait (void *self)
@@ -609,6 +612,7 @@ zsock_wait (void *self)
 
 //  --------------------------------------------------------------------------
 //  Probe the supplied object, and report if it looks like a zsock_t.
+//  Takes a polymorphic socket reference.
 
 bool
 zsock_is (void *self)
@@ -619,10 +623,10 @@ zsock_is (void *self)
 
 
 //  --------------------------------------------------------------------------
-//  Probe the supplied reference, which can be to a zsock_t, a zactor_t, or
-//  a libzmq void * socket reference. In all of these cases, returns the
-//  libzmq socket handle. If you pass any other reference, returns the same
-//  value.
+//  Probe the supplied reference. If it looks like a zsock_t instance,
+//  return the underlying libzmq socket handle; else if it looks like
+//  a libzmq socket handle, return the supplied value. Takes a
+//  polymorphic socket reference.
 
 void *
 zsock_resolve (void *self)
