@@ -31,7 +31,6 @@
 
 //  Opaque class structures to allow forward references
 typedef struct _zactor_t zactor_t;
-typedef struct _zbeacon_t zbeacon_t;
 typedef struct _zcert_t zcert_t;
 typedef struct _zcertstore_t zcertstore_t;
 typedef struct _zchunk_t zchunk_t;
@@ -53,6 +52,7 @@ typedef struct _zsock_t zsock_t;
 typedef struct _zuuid_t zuuid_t;
 //  Deprecated V2 classes, remove some time after 3.0 stability
 typedef struct _zauth_t zauth_t;
+typedef struct _zbeacon_t zbeacon_t;
 typedef struct _zctx_t zctx_t;
 typedef struct _zmonitor_t zmonitor_t;
 typedef struct _zmutex_t zmutex_t;
@@ -92,6 +92,7 @@ typedef struct _zproxy_t zproxy_t;
 
 //  Deprecated V2 classes, remove some time after 3.0 stability
 #include "zauth_v2.h"
+#include "zbeacon_v2.h"
 #include "zctx.h"
 #include "zmonitor_v2.h"
 #include "zmutex.h"

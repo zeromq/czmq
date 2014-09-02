@@ -248,6 +248,7 @@ CZMQ_EXPORT void
 //  For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is
 //  the default when there is no specified interface. If the environment
 //  variable ZSYS_INTERFACE is set, use that as the default interface name.
+//  Setting the interface to "*" means "use all available interfaces".
 CZMQ_EXPORT void
     zsys_set_interface (const char *value);
 

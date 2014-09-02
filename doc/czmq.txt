@@ -71,6 +71,7 @@ These classes are deprecated:
 * linkczmq:zsockopt[3] - get/set ZeroMQ socket options
 * linkczmq:zthread[3] - working with system threads
 * linkczmq:zauth_v2[3] - authentication for ZeroMQ servers
+* linkczmq:zbeacon_v2[3] - LAN discovery and presence
 * linkczmq:zmonitor_v2[3] - socket event monitor
 * linkczmq:zproxy_v2[3] - zmq_proxy wrapper
 

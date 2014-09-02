@@ -176,6 +176,9 @@
     <ClCompile Include="..\..\..\..\src\zauth_v2.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\zbeacon_v2.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zctx.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>

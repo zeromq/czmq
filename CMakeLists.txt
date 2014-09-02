@@ -112,6 +112,7 @@ set (czmq_headers
     include/zuuid.h
     src/zgossip_msg.h
     include/zauth_v2.h
+    include/zbeacon_v2.h
     include/zctx.h
     include/zmonitor_v2.h
     include/zmutex.h
@@ -163,6 +164,7 @@ set (czmq_sources
     src/zuuid.c
     src/zgossip_msg.c
     src/zauth_v2.c
+    src/zbeacon_v2.c
     src/zctx.c
     src/zmonitor_v2.c
     src/zmutex.c

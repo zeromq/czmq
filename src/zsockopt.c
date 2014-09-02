@@ -28,7 +28,6 @@
 */
 
 #include "../include/czmq.h"
-#include "platform.h"
 
 #if (ZMQ_VERSION_MAJOR == 4)
 //  --------------------------------------------------------------------------
@@ -3111,7 +3110,7 @@ zsocket_events (void *zocket)
 void
 zsockopt_test (bool verbose)
 {
-    printf (" * zsockopt: ");
+    printf (" * zsockopt (deprecated): ");
 
     //  @selftest
     zctx_t *ctx = zctx_new ();

@@ -363,7 +363,7 @@ zctx__socket_destroy (zctx_t *self, void *zocket)
 void
 zctx_test (bool verbose)
 {
-    printf (" * zctx: ");
+    printf (" * zctx (deprecated): ");
 
     //  @selftest
     //  Create and destroy a context without using it
