@@ -54,7 +54,7 @@ int main (int argc, char *argv [])
     zfile_test (verbose);
     zhash_test (verbose);
     zlist_test (verbose);
-    zring_test(verbose);
+    zring_test (verbose);
     zuuid_test (verbose);
     zsock_test (verbose);
     zsock_option_test (verbose);
@@ -71,6 +71,7 @@ int main (int argc, char *argv [])
 
     //  Deprecated V2 classes
     zauth_v2_test (verbose);
+    zbeacon_v2_test (verbose);
     zctx_test (verbose);
     zmonitor_v2_test (verbose);
     zmutex_test (verbose);

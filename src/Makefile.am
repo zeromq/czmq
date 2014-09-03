@@ -41,6 +41,7 @@ include_HEADERS = \
     ../include/zuuid.h \
     ../src/zgossip_msg.h \
     ../include/zauth_v2.h \
+    ../include/zbeacon_v2.h \
     ../include/zctx.h \
     ../include/zmonitor_v2.h \
     ../include/zmutex.h \
@@ -84,6 +85,7 @@ libczmq_la_SOURCES = \
     zuuid.c \
     zgossip_msg.c \
     zauth_v2.c \
+    zbeacon_v2.c \
     zctx.c \
     zmonitor_v2.c \
     zmutex.c \
