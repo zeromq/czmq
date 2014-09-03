@@ -159,12 +159,11 @@ s_self_configure (self_t *self, int port_nbr)
 static int
 s_self_handle_pipe (self_t *self)
 {
-    //  Get the whole message off the pipe in one go
-    zmsg_t *request = zmsg_recv (self->pipe);
-    if (!request)
+    //  Get just the command off the pipe
+    char *command = zstr_recv (self->pipe);
+    if (!command)
         return -1;                  //  Interrupted
 
-    char *command = zmsg_popstr (request);
     if (self->verbose)
         zsys_info ("zbeacon: API command=%s", command);
     
@@ -172,17 +171,15 @@ s_self_handle_pipe (self_t *self)
         self->verbose = true;
     else
     if (streq (command, "CONFIGURE")) {
-        char *port_value = zmsg_popstr (request);
-        s_self_configure (self, atoi (port_value));
-        free (port_value);
+        int port;
+        int rc = zsock_recv (self->pipe, "i", &port);
+        assert (rc == 0);
+        s_self_configure (self, port);
     }
     else
     if (streq (command, "PUBLISH")) {
         zframe_destroy (&self->transmit);
-        self->transmit = zmsg_pop (request);
-        char *interval = zmsg_popstr (request);
-        self->interval = atoi (interval);
-        zstr_free (&interval);
+        zsock_recv (self->pipe, "fi", &self->transmit, &self->interval);
         assert (zframe_size (self->transmit) <= UDP_FRAME_MAX);
         //  Start broadcasting immediately
         self->ping_at = zclock_mono ();
@@ -193,7 +190,7 @@ s_self_handle_pipe (self_t *self)
     else
     if (streq (command, "SUBSCRIBE")) {
         zframe_destroy (&self->filter);
-        self->filter = zmsg_pop (request);
+        self->filter = zframe_recv (self->pipe);
         assert (zframe_size (self->filter) <= UDP_FRAME_MAX);
     }
     else
@@ -207,7 +204,6 @@ s_self_handle_pipe (self_t *self)
         assert (false);
     }
     zstr_free (&command);
-    zmsg_destroy (&request);
     return 0;
 }
 
@@ -311,8 +307,19 @@ zbeacon_test (bool verbose)
     if (verbose)
         zstr_sendx (speaker, "VERBOSE", NULL);
 
-    //  Beacon will use UDP port 9999
-    zstr_sendx (speaker, "CONFIGURE", "9999", NULL);
+//
+//  Stop broadcasting the beacon:
+//
+//      zstr_sendx (beacon, "SILENCE", NULL);
+//
+//  Start listening to beacons from peers. The filter is used to do a prefix
+//  match on received beacons, to remove junk. Note that any received data
+//  that is identical to our broadcast beacon_data is discarded in any case.
+//  If the filter size is zero, we get all peer beacons:
+//
+//      zsock_send (beacon, "sb", "SUBSCRIBE", filter_data, filter_size);
+
+    zsock_send (speaker, "si", "CONFIGURE", 9999);
     char *hostname = zstr_recv (speaker);
     if (!*hostname) {
         printf ("OK (skipping test, no UDP broadcasting)\n");
@@ -322,27 +329,20 @@ zbeacon_test (bool verbose)
     }
     free (hostname);
 
-    //  We will broadcast the magic value 0xCAFE
-    byte announcement [2] = { 0xCA, 0xFE };
-    zmsg_t *msg = zmsg_new ();
-    zmsg_addstr (msg, "PUBLISH");
-    zmsg_addmem (msg, announcement, 2);
-    zmsg_addstrf (msg, "%d", 100);
-    zmsg_send (&msg, speaker);
-
     //  Create listener beacon on port 9999 to lookup service
     zactor_t *listener = zactor_new (zbeacon, NULL);
     if (verbose)
         zstr_sendx (listener, "VERBOSE", NULL);
-    zstr_sendx (listener, "CONFIGURE", "9999", NULL);
+    zsock_send (listener, "si", "CONFIGURE", 9999);
     hostname = zstr_recv (listener);
     assert (*hostname);
     free (hostname);
 
-    msg = zmsg_new ();
-    zmsg_addstr (msg, "SUBSCRIBE");
-    zmsg_addmem (msg, "", 0);
-    zmsg_send (&msg, listener);
+    //  We will broadcast the magic value 0xCAFE
+    byte announcement [2] = { 0xCA, 0xFE };
+    zsock_send (speaker, "sbi", "PUBLISH", announcement, 2, 100);
+    //  We will listen to anything (empty subscription)
+    zsock_send (listener, "sb", "SUBSCRIBE", "", 0);
 
     //  Wait for at most 1/2 second if there's no broadcasting
     zsock_set_rcvtimeo (listener, 500);
@@ -362,47 +362,29 @@ zbeacon_test (bool verbose)
     //  Test subscription filter using a 3-node setup
     zactor_t *node1 = zactor_new (zbeacon, NULL);
     assert (node1);
-    zstr_sendx (node1, "CONFIGURE", "5670", NULL);
+    zsock_send (node1, "si", "CONFIGURE", 5670);
     hostname = zstr_recv (node1);
     assert (*hostname);
     free (hostname);
 
     zactor_t *node2 = zactor_new (zbeacon, NULL);
     assert (node2);
-    zstr_sendx (node2, "CONFIGURE", "5670", NULL);
+    zsock_send (node2, "si", "CONFIGURE", 5670);
     hostname = zstr_recv (node2);
     assert (*hostname);
     free (hostname);
 
     zactor_t *node3 = zactor_new (zbeacon, NULL);
     assert (node3);
-    zstr_sendx (node3, "CONFIGURE", "5670", NULL);
+    zsock_send (node3, "si", "CONFIGURE", 5670);
     hostname = zstr_recv (node3);
     assert (*hostname);
     free (hostname);
 
-    msg = zmsg_new ();
-    zmsg_addstr (msg, "PUBLISH");
-    zmsg_addmem (msg, "NODE/1", 6);
-    zmsg_addstr (msg, "250");
-    zmsg_send (&msg, node1);
-
-    msg = zmsg_new ();
-    zmsg_addstr (msg, "PUBLISH");
-    zmsg_addmem (msg, "NODE/2", 6);
-    zmsg_addstr (msg, "250");
-    zmsg_send (&msg, node2);
-
-    msg = zmsg_new ();
-    zmsg_addstr (msg, "PUBLISH");
-    zmsg_addmem (msg, "GARBAGE", 7);
-    zmsg_addstr (msg, "250");
-    zmsg_send (&msg, node3);
-
-    msg = zmsg_new ();
-    zmsg_addstr (msg, "SUBSCRIBE");
-    zmsg_addmem (msg, "NODE", 4);
-    zmsg_send (&msg, node1);
+    zsock_send (node1, "sbi", "PUBLISH", "NODE/1", 6, 250);
+    zsock_send (node2, "sbi", "PUBLISH", "NODE/2", 6, 250);
+    zsock_send (node3, "sbi", "PUBLISH", "RANDOM", 6, 250);
+    zsock_send (node1, "sb", "SUBSCRIBE", "NODE", 4);
 
     //  Poll on three API sockets at once
     zpoller_t *poller = zpoller_new (node1, node2, node3, NULL);
