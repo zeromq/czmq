@@ -1205,6 +1205,7 @@ zsys_set_ipv6 (int ipv6)
 //  For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is
 //  the default when there is no specified interface. If the environment
 //  variable ZSYS_INTERFACE is set, use that as the default interface name.
+//  Setting the interface to "*" means "use all interfaces".
 
 void
 zsys_set_interface (const char *value)
