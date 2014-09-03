@@ -175,16 +175,40 @@ CZMQ_EXPORT int
 CZMQ_EXPORT const char *
     zsock_type_str (zsock_t *self);
 
-//  Send a zmsg message to the socket, take ownership of the message
-//  and destroy when it has been sent.
+//  Send a 'picture' message to the socket (or actor). The picture is a
+//  string that defines the type of each frame. This makes it easy to send
+//  a complex multiframe message in one call. The picture can contain any
+//  of these characters, each corresponding to one or two arguments:
+//
+//     i = int
+//     s = char *
+//     b = byte *, size_t (2 arguments)
+//     c = zchunk_t *
+//     f = zframe_t *
+//
+//  Note that b, c, and f are encoded the same way and the choice is offered
+//  as a convenience to the sender, which may or may not already have data
+//  in a zchunk or zframe. Does not change or take ownership of any arguments.
+//  Returns 0 if successful, -1 if sending failed for any reason.
 CZMQ_EXPORT int
-    zsock_send (void *self, zmsg_t **msg_p);
+    zsock_send (void *self, const char *picture, ...);
 
-//  Receive a zmsg message from the socket. Returns NULL if the process was
-//  interrupted before the message could be received, or if a receive timeout
-//  expired.
-CZMQ_EXPORT zmsg_t *
-    zsock_recv (void *self);
+//  Receive a 'picture' message to the socket (or actor). See zsock_send for
+//  the format and meaning of the picture. Returns the picture elements into
+//  a series of pointers as provided by the caller:
+//
+//     i = int *
+//     s = char **
+//     b = byte **, size_t * (2 arguments)
+//     c = zchunk_t **
+//     f = zframe_t **
+//
+//  Note that zsock_recv creates the returned objects, and the caller must
+//  destroy them when finished with them. The supplied pointers do not need
+//  to be initialized. Returns 0 if successful, or -1 if it failed to recv
+//  a message, in which case the pointers are not modified.
+CZMQ_EXPORT int
+    zsock_recv (void *self, const char *picture, ...);
 
 //  Set socket to use unbounded pipes (HWM=0); use this in cases when you are
 //  totally certain the message volume can fit in memory. This method works
