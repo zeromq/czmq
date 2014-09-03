@@ -180,11 +180,12 @@ CZMQ_EXPORT const char *
 //  a complex multiframe message in one call. The picture can contain any
 //  of these characters, each corresponding to one or two arguments:
 //
-//     i = int
-//     s = char *
-//     b = byte *, size_t (2 arguments)
-//     c = zchunk_t *
-//     f = zframe_t *
+//      i = int
+//      s = char *
+//      b = byte *, size_t (2 arguments)
+//      c = zchunk_t *
+//      f = zframe_t *
+//      p = void * (sends the pointer value, only meaningful over inproc)
 //
 //  Note that b, c, and f are encoded the same way and the choice is offered
 //  as a convenience to the sender, which may or may not already have data
@@ -197,11 +198,12 @@ CZMQ_EXPORT int
 //  the format and meaning of the picture. Returns the picture elements into
 //  a series of pointers as provided by the caller:
 //
-//     i = int *
-//     s = char **
-//     b = byte **, size_t * (2 arguments)
-//     c = zchunk_t **
-//     f = zframe_t **
+//      i = int * (stores integer)
+//      s = char ** (allocates new string)
+//      b = byte **, size_t * (2 arguments) (allocates memory)
+//      c = zchunk_t ** (creates zchunk)
+//      f = zframe_t ** (creates zframe)
+//      p = void ** (stores pointer)
 //
 //  Note that zsock_recv creates the returned objects, and the caller must
 //  destroy them when finished with them. The supplied pointers do not need

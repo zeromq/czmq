@@ -415,58 +415,73 @@ networks. A beacon can broadcast and/or capture service announcements
 using UDP messages on the local area network. This implementation uses
 IPv4 UDP broadcasts. You can define the format of your outgoing beacons,
 and set a filter that validates incoming beacons. Beacons are sent and
-received asynchronously in the background. The zbeacon API provides a
-incoming beacons on a ZeroMQ socket (the pipe) that you can configure,
-poll on, and receive messages on. Incoming beacons are always delivered
-as two frames: the ipaddress of the sender (a string), and the beacon
-data itself (binary, as published).
+received asynchronously in the background.
 
+This class replaces zbeacon_v2, and is meant for applications that use
+the CZMQ v3 API (meaning, zsock).
 
 This is the class interface:
 
-    //  Create a new beacon on a certain UDP port. If the system does not
-    //  support UDP broadcasts (lacking a useful interface), returns NULL.
-    //  To force the beacon to operate on a given port, set the environment
-    //  variable ZSYS_INTERFACE, or call zsys_set_interface() beforehand.
-    //  If you are using the new zsock API then pass NULL as the ctx here.
-    CZMQ_EXPORT zbeacon_t *
-        zbeacon_new (zctx_t *ctx, int port_nbr);
-        
-    //  Destroy a beacon
-    CZMQ_EXPORT void
-        zbeacon_destroy (zbeacon_t **self_p);
-    
-    //  Return our own IP address as printable string
-    CZMQ_EXPORT char *
-        zbeacon_hostname (zbeacon_t *self);
-    
-    //  Set broadcast interval in milliseconds (default is 1000 msec)
-    CZMQ_EXPORT void
-        zbeacon_set_interval (zbeacon_t *self, int interval);
-    
-    //  Filter out any beacon that looks exactly like ours
-    CZMQ_EXPORT void
-        zbeacon_noecho (zbeacon_t *self);
-    
-    //  Start broadcasting beacon to peers at the specified interval
-    CZMQ_EXPORT void
-        zbeacon_publish (zbeacon_t *self, byte *transmit, size_t size);
-        
-    //  Stop broadcasting beacons
-    CZMQ_EXPORT void
-        zbeacon_silence (zbeacon_t *self);
-    
-    //  Start listening to other peers; zero-sized filter means get everything
-    CZMQ_EXPORT void
-        zbeacon_subscribe (zbeacon_t *self, byte *filter, size_t size);
-    
+    //  Create new zbeacon actor instance:
+    //
+    //      zactor_t *beacon = zactor_new (zbeacon, NULL);
+    //
+    //  Destroy zbeacon instance:
+    //
+    //      zactor_destroy (&beacon);
+    //
+    //  Enable verbose logging of commands and activity:
+    //
+    //      zstr_sendx (beacon, "VERBOSE", NULL);
+    //
+    //  Configure beacon to run on specified UDP port, and return the name of
+    //  the host, which can be used as endpoint for incoming connections. To
+    //  force the beacon to operate on a given interface, set the environment
+    //  variable ZSYS_INTERFACE, or call zsys_set_interface() before creating
+    //  the beacon. If the system does not support UDP broadcasts (lacking a
+    //  workable interface), returns an empty hostname:
+    //
+    //      zstr_sendm (beacon, "CONFIGURE");
+    //      zstr_sendf (beacon, "%d", port_number);
+    //      char *hostname = zstr_recv (beacon);
+    //
+    //  Start broadcasting a beacon at a specified interval in msec. The beacon
+    //  data can be at most UDP_FRAME_MAX bytes; this constant is defined in
+    //  zsys.h to be 255:
+    //
+    //      zmsg_t *msg = zmsg_new ();
+    //      zmsg_addstr (msg, "PUBLISH");
+    //      zmsg_addmem (msg, beacon_data, beacon_size);
+    //      zmsg_addstrf (msg, "%d", interval);
+    //      zmsg_send (&msg, beacon);
+    //
+    //  Stop broadcasting the beacon:
+    //
+    //      zstr_sendx (beacon, "SILENCE", NULL);
+    //
+    //  Start listening to beacons from peers. The filter is used to do a prefix
+    //  match on received beacons, to remove junk. Note that any received data
+    //  that is identical to our broadcast beacon_data is discarded in any case.
+    //  If the filter size is zero, we get all peer beacons:
+    //  
+    //      zmsg_t *msg = zmsg_new ();
+    //      zmsg_addstr (msg, "SUBSCRIBE");
+    //      zmsg_addmem (msg, filter_data, filter_size);
+    //      zmsg_send (&msg, beacon);
+    //
     //  Stop listening to other peers
+    //
+    //      zstr_sendx (beacon, "UNSUBSCRIBE", NULL);
+    //
+    //  Receive next beacon from a peer. Received beacons are always a 2-frame
+    //  message containing the ipaddress of the sender, and then the binary
+    //  beacon data as published by the sender:
+    //
+    //      zmsg_t *msg = zmsg_recv (beacon);
+    //
+    //  This is the zbeacon constructor as a zactor_fn:
     CZMQ_EXPORT void
-        zbeacon_unsubscribe (zbeacon_t *self);
-    
-    //  Get beacon ZeroMQ socket, for polling or receiving messages
-    CZMQ_EXPORT void *
-        zbeacon_socket (zbeacon_t *self);
+        zbeacon (zsock_t *pipe, void *unused);
     
     //  Self test of this class
     CZMQ_EXPORT void
@@ -474,64 +489,108 @@ This is the class interface:
 
 This is the class self test code:
 
-    //  Create a service socket and bind to an ephemeral port
-    zsock_t *service = zsock_new (ZMQ_PUB);
-    int port_nbr = zsock_bind (service, "tcp://127.0.0.1:*");
-    
-    //  Create beacon to broadcast our service
-    byte announcement [2] = { (port_nbr >> 8) & 0xFF, port_nbr & 0xFF };
-    zbeacon_t *service_beacon = zbeacon_new (NULL, 9999);
-    if (service_beacon == NULL) {
-        printf ("OK (skipping test, no UDP discovery)\n");
-        zsock_destroy (&service);
+    //  Test 1 - two beacons, one speaking, one listening
+    //  Create speaker beacon to broadcast our service
+    zactor_t *speaker = zactor_new (zbeacon, NULL);
+    assert (speaker);
+    if (verbose)
+        zstr_sendx (speaker, "VERBOSE", NULL);
+
+    //  Beacon will use UDP port 9999
+    zstr_sendx (speaker, "CONFIGURE", "9999", NULL);
+    char *hostname = zstr_recv (speaker);
+    if (!*hostname) {
+        printf ("OK (skipping test, no UDP broadcasting)\n");
+        zactor_destroy (&speaker);
+        free (hostname);
         return;
     }
-    zbeacon_set_interval (service_beacon, 100);
-    zbeacon_publish (service_beacon, announcement, 2);
+    free (hostname);
 
-    //  Create beacon to lookup service
-    zbeacon_t *client_beacon = zbeacon_new (NULL, 9999);
-    zbeacon_subscribe (client_beacon, NULL, 0);
+    //  We will broadcast the magic value 0xCAFE
+    byte announcement [2] = { 0xCA, 0xFE };
+    zmsg_t *msg = zmsg_new ();
+    zmsg_addstr (msg, "PUBLISH");
+    zmsg_addmem (msg, announcement, 2);
+    zmsg_addstrf (msg, "%d", 100);
+    zmsg_send (&msg, speaker);
 
-    //  Wait for at most 1/2 second if there's no broadcast networking
-    zsocket_set_rcvtimeo (zbeacon_socket (client_beacon), 500);
+    //  Create listener beacon on port 9999 to lookup service
+    zactor_t *listener = zactor_new (zbeacon, NULL);
+    if (verbose)
+        zstr_sendx (listener, "VERBOSE", NULL);
+    zstr_sendx (listener, "CONFIGURE", "9999", NULL);
+    hostname = zstr_recv (listener);
+    assert (*hostname);
+    free (hostname);
 
-    char *ipaddress = zstr_recv (zbeacon_socket (client_beacon));
+    msg = zmsg_new ();
+    zmsg_addstr (msg, "SUBSCRIBE");
+    zmsg_addmem (msg, "", 0);
+    zmsg_send (&msg, listener);
+
+    //  Wait for at most 1/2 second if there's no broadcasting
+    zsock_set_rcvtimeo (listener, 500);
+    char *ipaddress = zstr_recv (listener);
     if (ipaddress) {
-        zframe_t *content = zframe_recv (zbeacon_socket (client_beacon));
-        int received_port = (zframe_data (content) [0] << 8)
-                        +  zframe_data (content) [1];
-        assert (received_port == port_nbr);
+        zframe_t *content = zframe_recv (listener);
+        assert (zframe_size (content) == 2);
+        assert (zframe_data (content) [0] == 0xCA);
+        assert (zframe_data (content) [1] == 0xFE);
         zframe_destroy (&content);
-        zbeacon_silence (service_beacon);
         zstr_free (&ipaddress);
+        zstr_sendx (speaker, "SILENCE", NULL);
     }
-    zbeacon_destroy (&client_beacon);
-    zbeacon_destroy (&service_beacon);
-    
-    zbeacon_t *node1 = zbeacon_new (NULL, 5670);
-    zbeacon_t *node2 = zbeacon_new (NULL, 5670);
-    zbeacon_t *node3 = zbeacon_new (NULL, 5670);
+    zactor_destroy (&listener);
+    zactor_destroy (&speaker);
 
-    assert (*zbeacon_hostname (node1));
-    assert (*zbeacon_hostname (node2));
-    assert (*zbeacon_hostname (node3));
-    
-    zbeacon_set_interval (node1, 250);
-    zbeacon_set_interval (node2, 250);
-    zbeacon_set_interval (node3, 250);
-    zbeacon_noecho (node1);
-    zbeacon_publish (node1, (byte *) "NODE/1", 6);
-    zbeacon_publish (node2, (byte *) "NODE/2", 6);
-    zbeacon_publish (node3, (byte *) "GARBAGE", 7);
-    zbeacon_subscribe (node1, (byte *) "NODE", 4);
+    //  Test subscription filter using a 3-node setup
+    zactor_t *node1 = zactor_new (zbeacon, NULL);
+    assert (node1);
+    zstr_sendx (node1, "CONFIGURE", "5670", NULL);
+    hostname = zstr_recv (node1);
+    assert (*hostname);
+    free (hostname);
+
+    zactor_t *node2 = zactor_new (zbeacon, NULL);
+    assert (node2);
+    zstr_sendx (node2, "CONFIGURE", "5670", NULL);
+    hostname = zstr_recv (node2);
+    assert (*hostname);
+    free (hostname);
+
+    zactor_t *node3 = zactor_new (zbeacon, NULL);
+    assert (node3);
+    zstr_sendx (node3, "CONFIGURE", "5670", NULL);
+    hostname = zstr_recv (node3);
+    assert (*hostname);
+    free (hostname);
+
+    msg = zmsg_new ();
+    zmsg_addstr (msg, "PUBLISH");
+    zmsg_addmem (msg, "NODE/1", 6);
+    zmsg_addstr (msg, "250");
+    zmsg_send (&msg, node1);
+
+    msg = zmsg_new ();
+    zmsg_addstr (msg, "PUBLISH");
+    zmsg_addmem (msg, "NODE/2", 6);
+    zmsg_addstr (msg, "250");
+    zmsg_send (&msg, node2);
+
+    msg = zmsg_new ();
+    zmsg_addstr (msg, "PUBLISH");
+    zmsg_addmem (msg, "GARBAGE", 7);
+    zmsg_addstr (msg, "250");
+    zmsg_send (&msg, node3);
+
+    msg = zmsg_new ();
+    zmsg_addstr (msg, "SUBSCRIBE");
+    zmsg_addmem (msg, "NODE", 4);
+    zmsg_send (&msg, node1);
 
     //  Poll on three API sockets at once
-    zpoller_t *poller = zpoller_new (
-        zbeacon_socket (node1), 
-        zbeacon_socket (node2), 
-        zbeacon_socket (node3), NULL);
-        
+    zpoller_t *poller = zpoller_new (node1, node2, node3, NULL);
     int64_t stop_at = zclock_mono () + 1000;
     while (zclock_mono () < stop_at) {
         long timeout = (long) (stop_at - zclock_mono ());
@@ -539,30 +598,28 @@ This is the class self test code:
             timeout = 0;
         void *which = zpoller_wait (poller, timeout * ZMQ_POLL_MSEC);
         if (which) {
-            assert (which == zbeacon_socket (node1));
-            char *ipaddress, *beacon;
-            zstr_recvx (zbeacon_socket (node1), &ipaddress, &beacon, NULL);
-            assert (streq (beacon, "NODE/2"));
+            assert (which == node1);
+            char *ipaddress, *received;
+            zstr_recvx (node1, &ipaddress, &received, NULL);
+            assert (streq (received, "NODE/2"));
             zstr_free (&ipaddress);
-            zstr_free (&beacon);
+            zstr_free (&received);
         }
     }
     zpoller_destroy (&poller);
-    
+
     //  Stop listening
-    zbeacon_unsubscribe (node1);
-    
+    zstr_sendx (node1, "UNSUBSCRIBE", NULL);
+
     //  Stop all node broadcasts
-    zbeacon_silence (node1);
-    zbeacon_silence (node2);
-    zbeacon_silence (node3);
+    zstr_sendx (node1, "SILENCE", NULL);
+    zstr_sendx (node2, "SILENCE", NULL);
+    zstr_sendx (node3, "SILENCE", NULL);
 
     //  Destroy the test nodes
-    zbeacon_destroy (&node1);
-    zbeacon_destroy (&node2);
-    zbeacon_destroy (&node3);
-    
-    zsock_destroy (&service);
+    zactor_destroy (&node1);
+    zactor_destroy (&node2);
+    zactor_destroy (&node3);
 
 #### zcert - work with CURVE security certificates
 
@@ -3356,8 +3413,8 @@ This is the class self test code:
 
 The zsock class wraps the libzmq socket handle (a void *) with a proper
 structure that follows the CLASS rules for construction and destruction.
-CZMQ methods that accept a socket will accept either a zsock_t * or a
-libzmq void *, and will detect the type at runtime.
+Some zsock methods take a void * "polymorphic" reference, which can be
+either a zsock_t or a zactor_r reference, or a libzmq void *.
 
 
 This is the class interface:
@@ -3518,49 +3575,73 @@ This is the class interface:
     CZMQ_EXPORT const char *
         zsock_type_str (zsock_t *self);
     
-    //  Send a zmsg message to the socket, take ownership of the message
-    //  and destroy when it has been sent.
+    //  Send a 'picture' message to the socket (or actor). The picture is a
+    //  string that defines the type of each frame. This makes it easy to send
+    //  a complex multiframe message in one call. The picture can contain any
+    //  of these characters, each corresponding to one or two arguments:
+    //
+    //      i = int
+    //      s = char *
+    //      b = byte *, size_t (2 arguments)
+    //      c = zchunk_t *
+    //      f = zframe_t *
+    //      p = void * (sends the pointer value, only meaningful over inproc)
+    //
+    //  Note that b, c, and f are encoded the same way and the choice is offered
+    //  as a convenience to the sender, which may or may not already have data
+    //  in a zchunk or zframe. Does not change or take ownership of any arguments.
+    //  Returns 0 if successful, -1 if sending failed for any reason.
     CZMQ_EXPORT int
-        zsock_send (zsock_t *self, zmsg_t **msg_p);
+        zsock_send (void *self, const char *picture, ...);
     
-    //  Send data over a socket as a single message frame.
-    //  Returns -1 on error, 0 on success
+    //  Receive a 'picture' message to the socket (or actor). See zsock_send for
+    //  the format and meaning of the picture. Returns the picture elements into
+    //  a series of pointers as provided by the caller:
+    //
+    //      i = int * (stores integer)
+    //      s = char ** (allocates new string)
+    //      b = byte **, size_t * (2 arguments) (allocates memory)
+    //      c = zchunk_t ** (creates zchunk)
+    //      f = zframe_t ** (creates zframe)
+    //      p = void ** (stores pointer)
+    //
+    //  Note that zsock_recv creates the returned objects, and the caller must
+    //  destroy them when finished with them. The supplied pointers do not need
+    //  to be initialized. Returns 0 if successful, or -1 if it failed to recv
+    //  a message, in which case the pointers are not modified.
     CZMQ_EXPORT int
-        zsock_sendmem (zsock_t *self, const void *data, size_t size);
-    
-    //  Receive a zmsg message from the socket. Returns NULL if the process was
-    //  interrupted before the message could be received, or if a receive timeout
-    //  expired.
-    CZMQ_EXPORT zmsg_t *
-        zsock_recv (zsock_t *self);
+        zsock_recv (void *self, const char *picture, ...);
     
     //  Set socket to use unbounded pipes (HWM=0); use this in cases when you are
     //  totally certain the message volume can fit in memory. This method works
-    //  across all versions of ZeroMQ.
+    //  across all versions of ZeroMQ. Takes a polymorphic socket reference.
     CZMQ_EXPORT void
-        zsock_set_unbounded (zsock_t *self);
+        zsock_set_unbounded (void *self);
     
     //  Send a signal over a socket. A signal is a short message carrying a
     //  success/failure code (by convention, 0 means OK). Signals are encoded
     //  to be distinguishable from "normal" messages. Accepts a zock_t or a
     //  zactor_t argument, and returns 0 if successful, -1 if the signal could
-    //  not be sent.
+    //  not be sent. Takes a polymorphic socket reference.
     CZMQ_EXPORT int
         zsock_signal (void *self, byte status);
         
     //  Wait on a signal. Use this to coordinate between threads, over pipe
     //  pairs. Blocks until the signal is received. Returns -1 on error, 0 or
     //  greater on success. Accepts a zsock_t or a zactor_t as argument.
+    //  Takes a polymorphic socket reference.
     CZMQ_EXPORT int
         zsock_wait (void *self);
     
     //  Probe the supplied object, and report if it looks like a zsock_t.
+    //  Takes a polymorphic socket reference.
     CZMQ_EXPORT bool
         zsock_is (void *self);
     
     //  Probe the supplied reference. If it looks like a zsock_t instance,
     //  return the underlying libzmq socket handle; else if it looks like
-    //  a libzmq socket handle, return the supplied value.
+    //  a libzmq socket handle, return the supplied value. Takes a
+    //  polymorphic socket reference.
     CZMQ_EXPORT void *
         zsock_resolve (void *self);
     
@@ -3574,6 +3655,8 @@ This is the class self test code:
 #### zsock_option - get/set ØMQ socket options
 
 The zsock_option class provides access to the ØMQ getsockopt/setsockopt API.
+All methods in this class take a void * "polymorphic" reference, which
+can be either a zsock_t or a zactor_r reference, or a libzmq void *.
 
 This class is generated, using the GSL code generator. See the sockopts
 XML file, which provides the metadata, and the sock_option.gsl template,
@@ -3583,214 +3666,214 @@ This is the class interface:
 
     #if (ZMQ_VERSION_MAJOR == 4)
     //  Get socket options
-    CZMQ_EXPORT int zsock_tos (zsock_t *self);
-    CZMQ_EXPORT char * zsock_zap_domain (zsock_t *self);
-    CZMQ_EXPORT int zsock_mechanism (zsock_t *self);
-    CZMQ_EXPORT int zsock_plain_server (zsock_t *self);
-    CZMQ_EXPORT char * zsock_plain_username (zsock_t *self);
-    CZMQ_EXPORT char * zsock_plain_password (zsock_t *self);
-    CZMQ_EXPORT int zsock_curve_server (zsock_t *self);
-    CZMQ_EXPORT char * zsock_curve_publickey (zsock_t *self);
-    CZMQ_EXPORT char * zsock_curve_secretkey (zsock_t *self);
-    CZMQ_EXPORT char * zsock_curve_serverkey (zsock_t *self);
-    CZMQ_EXPORT int zsock_gssapi_server (zsock_t *self);
-    CZMQ_EXPORT int zsock_gssapi_plaintext (zsock_t *self);
-    CZMQ_EXPORT char * zsock_gssapi_principal (zsock_t *self);
-    CZMQ_EXPORT char * zsock_gssapi_service_principal (zsock_t *self);
-    CZMQ_EXPORT int zsock_ipv6 (zsock_t *self);
-    CZMQ_EXPORT int zsock_immediate (zsock_t *self);
-    CZMQ_EXPORT int zsock_ipv4only (zsock_t *self);
-    CZMQ_EXPORT int zsock_type (zsock_t *self);
-    CZMQ_EXPORT int zsock_sndhwm (zsock_t *self);
-    CZMQ_EXPORT int zsock_rcvhwm (zsock_t *self);
-    CZMQ_EXPORT int zsock_affinity (zsock_t *self);
-    CZMQ_EXPORT char * zsock_identity (zsock_t *self);
-    CZMQ_EXPORT int zsock_rate (zsock_t *self);
-    CZMQ_EXPORT int zsock_recovery_ivl (zsock_t *self);
-    CZMQ_EXPORT int zsock_sndbuf (zsock_t *self);
-    CZMQ_EXPORT int zsock_rcvbuf (zsock_t *self);
-    CZMQ_EXPORT int zsock_linger (zsock_t *self);
-    CZMQ_EXPORT int zsock_reconnect_ivl (zsock_t *self);
-    CZMQ_EXPORT int zsock_reconnect_ivl_max (zsock_t *self);
-    CZMQ_EXPORT int zsock_backlog (zsock_t *self);
-    CZMQ_EXPORT int zsock_maxmsgsize (zsock_t *self);
-    CZMQ_EXPORT int zsock_multicast_hops (zsock_t *self);
-    CZMQ_EXPORT int zsock_rcvtimeo (zsock_t *self);
-    CZMQ_EXPORT int zsock_sndtimeo (zsock_t *self);
-    CZMQ_EXPORT int zsock_tcp_keepalive (zsock_t *self);
-    CZMQ_EXPORT int zsock_tcp_keepalive_idle (zsock_t *self);
-    CZMQ_EXPORT int zsock_tcp_keepalive_cnt (zsock_t *self);
-    CZMQ_EXPORT int zsock_tcp_keepalive_intvl (zsock_t *self);
-    CZMQ_EXPORT char * zsock_tcp_accept_filter (zsock_t *self);
-    CZMQ_EXPORT int zsock_rcvmore (zsock_t *self);
-    CZMQ_EXPORT int zsock_fd (zsock_t *self);
-    CZMQ_EXPORT int zsock_events (zsock_t *self);
-    CZMQ_EXPORT char * zsock_last_endpoint (zsock_t *self);
+    CZMQ_EXPORT int zsock_tos (void *self);
+    CZMQ_EXPORT char * zsock_zap_domain (void *self);
+    CZMQ_EXPORT int zsock_mechanism (void *self);
+    CZMQ_EXPORT int zsock_plain_server (void *self);
+    CZMQ_EXPORT char * zsock_plain_username (void *self);
+    CZMQ_EXPORT char * zsock_plain_password (void *self);
+    CZMQ_EXPORT int zsock_curve_server (void *self);
+    CZMQ_EXPORT char * zsock_curve_publickey (void *self);
+    CZMQ_EXPORT char * zsock_curve_secretkey (void *self);
+    CZMQ_EXPORT char * zsock_curve_serverkey (void *self);
+    CZMQ_EXPORT int zsock_gssapi_server (void *self);
+    CZMQ_EXPORT int zsock_gssapi_plaintext (void *self);
+    CZMQ_EXPORT char * zsock_gssapi_principal (void *self);
+    CZMQ_EXPORT char * zsock_gssapi_service_principal (void *self);
+    CZMQ_EXPORT int zsock_ipv6 (void *self);
+    CZMQ_EXPORT int zsock_immediate (void *self);
+    CZMQ_EXPORT int zsock_ipv4only (void *self);
+    CZMQ_EXPORT int zsock_type (void *self);
+    CZMQ_EXPORT int zsock_sndhwm (void *self);
+    CZMQ_EXPORT int zsock_rcvhwm (void *self);
+    CZMQ_EXPORT int zsock_affinity (void *self);
+    CZMQ_EXPORT char * zsock_identity (void *self);
+    CZMQ_EXPORT int zsock_rate (void *self);
+    CZMQ_EXPORT int zsock_recovery_ivl (void *self);
+    CZMQ_EXPORT int zsock_sndbuf (void *self);
+    CZMQ_EXPORT int zsock_rcvbuf (void *self);
+    CZMQ_EXPORT int zsock_linger (void *self);
+    CZMQ_EXPORT int zsock_reconnect_ivl (void *self);
+    CZMQ_EXPORT int zsock_reconnect_ivl_max (void *self);
+    CZMQ_EXPORT int zsock_backlog (void *self);
+    CZMQ_EXPORT int zsock_maxmsgsize (void *self);
+    CZMQ_EXPORT int zsock_multicast_hops (void *self);
+    CZMQ_EXPORT int zsock_rcvtimeo (void *self);
+    CZMQ_EXPORT int zsock_sndtimeo (void *self);
+    CZMQ_EXPORT int zsock_tcp_keepalive (void *self);
+    CZMQ_EXPORT int zsock_tcp_keepalive_idle (void *self);
+    CZMQ_EXPORT int zsock_tcp_keepalive_cnt (void *self);
+    CZMQ_EXPORT int zsock_tcp_keepalive_intvl (void *self);
+    CZMQ_EXPORT char * zsock_tcp_accept_filter (void *self);
+    CZMQ_EXPORT int zsock_rcvmore (void *self);
+    CZMQ_EXPORT int zsock_fd (void *self);
+    CZMQ_EXPORT int zsock_events (void *self);
+    CZMQ_EXPORT char * zsock_last_endpoint (void *self);
     
     //  Set socket options
-    CZMQ_EXPORT void zsock_set_tos (zsock_t *self, int tos);
-    CZMQ_EXPORT void zsock_set_router_handover (zsock_t *self, int router_handover);
-    CZMQ_EXPORT void zsock_set_router_mandatory (zsock_t *self, int router_mandatory);
-    CZMQ_EXPORT void zsock_set_probe_router (zsock_t *self, int probe_router);
-    CZMQ_EXPORT void zsock_set_req_relaxed (zsock_t *self, int req_relaxed);
-    CZMQ_EXPORT void zsock_set_req_correlate (zsock_t *self, int req_correlate);
-    CZMQ_EXPORT void zsock_set_conflate (zsock_t *self, int conflate);
-    CZMQ_EXPORT void zsock_set_zap_domain (zsock_t *self, const char * zap_domain);
-    CZMQ_EXPORT void zsock_set_plain_server (zsock_t *self, int plain_server);
-    CZMQ_EXPORT void zsock_set_plain_username (zsock_t *self, const char * plain_username);
-    CZMQ_EXPORT void zsock_set_plain_password (zsock_t *self, const char * plain_password);
-    CZMQ_EXPORT void zsock_set_curve_server (zsock_t *self, int curve_server);
-    CZMQ_EXPORT void zsock_set_curve_publickey (zsock_t *self, const char * curve_publickey);
-    CZMQ_EXPORT void zsock_set_curve_publickey_bin (zsock_t *self, const byte *curve_publickey);
-    CZMQ_EXPORT void zsock_set_curve_secretkey (zsock_t *self, const char * curve_secretkey);
-    CZMQ_EXPORT void zsock_set_curve_secretkey_bin (zsock_t *self, const byte *curve_secretkey);
-    CZMQ_EXPORT void zsock_set_curve_serverkey (zsock_t *self, const char * curve_serverkey);
-    CZMQ_EXPORT void zsock_set_curve_serverkey_bin (zsock_t *self, const byte *curve_serverkey);
-    CZMQ_EXPORT void zsock_set_gssapi_server (zsock_t *self, int gssapi_server);
-    CZMQ_EXPORT void zsock_set_gssapi_plaintext (zsock_t *self, int gssapi_plaintext);
-    CZMQ_EXPORT void zsock_set_gssapi_principal (zsock_t *self, const char * gssapi_principal);
-    CZMQ_EXPORT void zsock_set_gssapi_service_principal (zsock_t *self, const char * gssapi_service_principal);
-    CZMQ_EXPORT void zsock_set_ipv6 (zsock_t *self, int ipv6);
-    CZMQ_EXPORT void zsock_set_immediate (zsock_t *self, int immediate);
-    CZMQ_EXPORT void zsock_set_router_raw (zsock_t *self, int router_raw);
-    CZMQ_EXPORT void zsock_set_ipv4only (zsock_t *self, int ipv4only);
-    CZMQ_EXPORT void zsock_set_delay_attach_on_connect (zsock_t *self, int delay_attach_on_connect);
-    CZMQ_EXPORT void zsock_set_sndhwm (zsock_t *self, int sndhwm);
-    CZMQ_EXPORT void zsock_set_rcvhwm (zsock_t *self, int rcvhwm);
-    CZMQ_EXPORT void zsock_set_affinity (zsock_t *self, int affinity);
-    CZMQ_EXPORT void zsock_set_subscribe (zsock_t *self, const char * subscribe);
-    CZMQ_EXPORT void zsock_set_unsubscribe (zsock_t *self, const char * unsubscribe);
-    CZMQ_EXPORT void zsock_set_identity (zsock_t *self, const char * identity);
-    CZMQ_EXPORT void zsock_set_rate (zsock_t *self, int rate);
-    CZMQ_EXPORT void zsock_set_recovery_ivl (zsock_t *self, int recovery_ivl);
-    CZMQ_EXPORT void zsock_set_sndbuf (zsock_t *self, int sndbuf);
-    CZMQ_EXPORT void zsock_set_rcvbuf (zsock_t *self, int rcvbuf);
-    CZMQ_EXPORT void zsock_set_linger (zsock_t *self, int linger);
-    CZMQ_EXPORT void zsock_set_reconnect_ivl (zsock_t *self, int reconnect_ivl);
-    CZMQ_EXPORT void zsock_set_reconnect_ivl_max (zsock_t *self, int reconnect_ivl_max);
-    CZMQ_EXPORT void zsock_set_backlog (zsock_t *self, int backlog);
-    CZMQ_EXPORT void zsock_set_maxmsgsize (zsock_t *self, int maxmsgsize);
-    CZMQ_EXPORT void zsock_set_multicast_hops (zsock_t *self, int multicast_hops);
-    CZMQ_EXPORT void zsock_set_rcvtimeo (zsock_t *self, int rcvtimeo);
-    CZMQ_EXPORT void zsock_set_sndtimeo (zsock_t *self, int sndtimeo);
-    CZMQ_EXPORT void zsock_set_xpub_verbose (zsock_t *self, int xpub_verbose);
-    CZMQ_EXPORT void zsock_set_tcp_keepalive (zsock_t *self, int tcp_keepalive);
-    CZMQ_EXPORT void zsock_set_tcp_keepalive_idle (zsock_t *self, int tcp_keepalive_idle);
-    CZMQ_EXPORT void zsock_set_tcp_keepalive_cnt (zsock_t *self, int tcp_keepalive_cnt);
-    CZMQ_EXPORT void zsock_set_tcp_keepalive_intvl (zsock_t *self, int tcp_keepalive_intvl);
-    CZMQ_EXPORT void zsock_set_tcp_accept_filter (zsock_t *self, const char * tcp_accept_filter);
+    CZMQ_EXPORT void zsock_set_tos (void *self, int tos);
+    CZMQ_EXPORT void zsock_set_router_handover (void *self, int router_handover);
+    CZMQ_EXPORT void zsock_set_router_mandatory (void *self, int router_mandatory);
+    CZMQ_EXPORT void zsock_set_probe_router (void *self, int probe_router);
+    CZMQ_EXPORT void zsock_set_req_relaxed (void *self, int req_relaxed);
+    CZMQ_EXPORT void zsock_set_req_correlate (void *self, int req_correlate);
+    CZMQ_EXPORT void zsock_set_conflate (void *self, int conflate);
+    CZMQ_EXPORT void zsock_set_zap_domain (void *self, const char * zap_domain);
+    CZMQ_EXPORT void zsock_set_plain_server (void *self, int plain_server);
+    CZMQ_EXPORT void zsock_set_plain_username (void *self, const char * plain_username);
+    CZMQ_EXPORT void zsock_set_plain_password (void *self, const char * plain_password);
+    CZMQ_EXPORT void zsock_set_curve_server (void *self, int curve_server);
+    CZMQ_EXPORT void zsock_set_curve_publickey (void *self, const char * curve_publickey);
+    CZMQ_EXPORT void zsock_set_curve_publickey_bin (void *self, const byte *curve_publickey);
+    CZMQ_EXPORT void zsock_set_curve_secretkey (void *self, const char * curve_secretkey);
+    CZMQ_EXPORT void zsock_set_curve_secretkey_bin (void *self, const byte *curve_secretkey);
+    CZMQ_EXPORT void zsock_set_curve_serverkey (void *self, const char * curve_serverkey);
+    CZMQ_EXPORT void zsock_set_curve_serverkey_bin (void *self, const byte *curve_serverkey);
+    CZMQ_EXPORT void zsock_set_gssapi_server (void *self, int gssapi_server);
+    CZMQ_EXPORT void zsock_set_gssapi_plaintext (void *self, int gssapi_plaintext);
+    CZMQ_EXPORT void zsock_set_gssapi_principal (void *self, const char * gssapi_principal);
+    CZMQ_EXPORT void zsock_set_gssapi_service_principal (void *self, const char * gssapi_service_principal);
+    CZMQ_EXPORT void zsock_set_ipv6 (void *self, int ipv6);
+    CZMQ_EXPORT void zsock_set_immediate (void *self, int immediate);
+    CZMQ_EXPORT void zsock_set_router_raw (void *self, int router_raw);
+    CZMQ_EXPORT void zsock_set_ipv4only (void *self, int ipv4only);
+    CZMQ_EXPORT void zsock_set_delay_attach_on_connect (void *self, int delay_attach_on_connect);
+    CZMQ_EXPORT void zsock_set_sndhwm (void *self, int sndhwm);
+    CZMQ_EXPORT void zsock_set_rcvhwm (void *self, int rcvhwm);
+    CZMQ_EXPORT void zsock_set_affinity (void *self, int affinity);
+    CZMQ_EXPORT void zsock_set_subscribe (void *self, const char * subscribe);
+    CZMQ_EXPORT void zsock_set_unsubscribe (void *self, const char * unsubscribe);
+    CZMQ_EXPORT void zsock_set_identity (void *self, const char * identity);
+    CZMQ_EXPORT void zsock_set_rate (void *self, int rate);
+    CZMQ_EXPORT void zsock_set_recovery_ivl (void *self, int recovery_ivl);
+    CZMQ_EXPORT void zsock_set_sndbuf (void *self, int sndbuf);
+    CZMQ_EXPORT void zsock_set_rcvbuf (void *self, int rcvbuf);
+    CZMQ_EXPORT void zsock_set_linger (void *self, int linger);
+    CZMQ_EXPORT void zsock_set_reconnect_ivl (void *self, int reconnect_ivl);
+    CZMQ_EXPORT void zsock_set_reconnect_ivl_max (void *self, int reconnect_ivl_max);
+    CZMQ_EXPORT void zsock_set_backlog (void *self, int backlog);
+    CZMQ_EXPORT void zsock_set_maxmsgsize (void *self, int maxmsgsize);
+    CZMQ_EXPORT void zsock_set_multicast_hops (void *self, int multicast_hops);
+    CZMQ_EXPORT void zsock_set_rcvtimeo (void *self, int rcvtimeo);
+    CZMQ_EXPORT void zsock_set_sndtimeo (void *self, int sndtimeo);
+    CZMQ_EXPORT void zsock_set_xpub_verbose (void *self, int xpub_verbose);
+    CZMQ_EXPORT void zsock_set_tcp_keepalive (void *self, int tcp_keepalive);
+    CZMQ_EXPORT void zsock_set_tcp_keepalive_idle (void *self, int tcp_keepalive_idle);
+    CZMQ_EXPORT void zsock_set_tcp_keepalive_cnt (void *self, int tcp_keepalive_cnt);
+    CZMQ_EXPORT void zsock_set_tcp_keepalive_intvl (void *self, int tcp_keepalive_intvl);
+    CZMQ_EXPORT void zsock_set_tcp_accept_filter (void *self, const char * tcp_accept_filter);
     #endif
     
     #if (ZMQ_VERSION_MAJOR == 3)
     //  Get socket options
-    CZMQ_EXPORT int zsock_ipv4only (zsock_t *self);
-    CZMQ_EXPORT int zsock_type (zsock_t *self);
-    CZMQ_EXPORT int zsock_sndhwm (zsock_t *self);
-    CZMQ_EXPORT int zsock_rcvhwm (zsock_t *self);
-    CZMQ_EXPORT int zsock_affinity (zsock_t *self);
-    CZMQ_EXPORT char * zsock_identity (zsock_t *self);
-    CZMQ_EXPORT int zsock_rate (zsock_t *self);
-    CZMQ_EXPORT int zsock_recovery_ivl (zsock_t *self);
-    CZMQ_EXPORT int zsock_sndbuf (zsock_t *self);
-    CZMQ_EXPORT int zsock_rcvbuf (zsock_t *self);
-    CZMQ_EXPORT int zsock_linger (zsock_t *self);
-    CZMQ_EXPORT int zsock_reconnect_ivl (zsock_t *self);
-    CZMQ_EXPORT int zsock_reconnect_ivl_max (zsock_t *self);
-    CZMQ_EXPORT int zsock_backlog (zsock_t *self);
-    CZMQ_EXPORT int zsock_maxmsgsize (zsock_t *self);
-    CZMQ_EXPORT int zsock_multicast_hops (zsock_t *self);
-    CZMQ_EXPORT int zsock_rcvtimeo (zsock_t *self);
-    CZMQ_EXPORT int zsock_sndtimeo (zsock_t *self);
-    CZMQ_EXPORT int zsock_tcp_keepalive (zsock_t *self);
-    CZMQ_EXPORT int zsock_tcp_keepalive_idle (zsock_t *self);
-    CZMQ_EXPORT int zsock_tcp_keepalive_cnt (zsock_t *self);
-    CZMQ_EXPORT int zsock_tcp_keepalive_intvl (zsock_t *self);
-    CZMQ_EXPORT char * zsock_tcp_accept_filter (zsock_t *self);
-    CZMQ_EXPORT int zsock_rcvmore (zsock_t *self);
-    CZMQ_EXPORT int zsock_fd (zsock_t *self);
-    CZMQ_EXPORT int zsock_events (zsock_t *self);
-    CZMQ_EXPORT char * zsock_last_endpoint (zsock_t *self);
+    CZMQ_EXPORT int zsock_ipv4only (void *self);
+    CZMQ_EXPORT int zsock_type (void *self);
+    CZMQ_EXPORT int zsock_sndhwm (void *self);
+    CZMQ_EXPORT int zsock_rcvhwm (void *self);
+    CZMQ_EXPORT int zsock_affinity (void *self);
+    CZMQ_EXPORT char * zsock_identity (void *self);
+    CZMQ_EXPORT int zsock_rate (void *self);
+    CZMQ_EXPORT int zsock_recovery_ivl (void *self);
+    CZMQ_EXPORT int zsock_sndbuf (void *self);
+    CZMQ_EXPORT int zsock_rcvbuf (void *self);
+    CZMQ_EXPORT int zsock_linger (void *self);
+    CZMQ_EXPORT int zsock_reconnect_ivl (void *self);
+    CZMQ_EXPORT int zsock_reconnect_ivl_max (void *self);
+    CZMQ_EXPORT int zsock_backlog (void *self);
+    CZMQ_EXPORT int zsock_maxmsgsize (void *self);
+    CZMQ_EXPORT int zsock_multicast_hops (void *self);
+    CZMQ_EXPORT int zsock_rcvtimeo (void *self);
+    CZMQ_EXPORT int zsock_sndtimeo (void *self);
+    CZMQ_EXPORT int zsock_tcp_keepalive (void *self);
+    CZMQ_EXPORT int zsock_tcp_keepalive_idle (void *self);
+    CZMQ_EXPORT int zsock_tcp_keepalive_cnt (void *self);
+    CZMQ_EXPORT int zsock_tcp_keepalive_intvl (void *self);
+    CZMQ_EXPORT char * zsock_tcp_accept_filter (void *self);
+    CZMQ_EXPORT int zsock_rcvmore (void *self);
+    CZMQ_EXPORT int zsock_fd (void *self);
+    CZMQ_EXPORT int zsock_events (void *self);
+    CZMQ_EXPORT char * zsock_last_endpoint (void *self);
     
     //  Set socket options
-    CZMQ_EXPORT void zsock_set_router_raw (zsock_t *self, int router_raw);
-    CZMQ_EXPORT void zsock_set_ipv4only (zsock_t *self, int ipv4only);
-    CZMQ_EXPORT void zsock_set_delay_attach_on_connect (zsock_t *self, int delay_attach_on_connect);
-    CZMQ_EXPORT void zsock_set_sndhwm (zsock_t *self, int sndhwm);
-    CZMQ_EXPORT void zsock_set_rcvhwm (zsock_t *self, int rcvhwm);
-    CZMQ_EXPORT void zsock_set_affinity (zsock_t *self, int affinity);
-    CZMQ_EXPORT void zsock_set_subscribe (zsock_t *self, const char * subscribe);
-    CZMQ_EXPORT void zsock_set_unsubscribe (zsock_t *self, const char * unsubscribe);
-    CZMQ_EXPORT void zsock_set_identity (zsock_t *self, const char * identity);
-    CZMQ_EXPORT void zsock_set_rate (zsock_t *self, int rate);
-    CZMQ_EXPORT void zsock_set_recovery_ivl (zsock_t *self, int recovery_ivl);
-    CZMQ_EXPORT void zsock_set_sndbuf (zsock_t *self, int sndbuf);
-    CZMQ_EXPORT void zsock_set_rcvbuf (zsock_t *self, int rcvbuf);
-    CZMQ_EXPORT void zsock_set_linger (zsock_t *self, int linger);
-    CZMQ_EXPORT void zsock_set_reconnect_ivl (zsock_t *self, int reconnect_ivl);
-    CZMQ_EXPORT void zsock_set_reconnect_ivl_max (zsock_t *self, int reconnect_ivl_max);
-    CZMQ_EXPORT void zsock_set_backlog (zsock_t *self, int backlog);
-    CZMQ_EXPORT void zsock_set_maxmsgsize (zsock_t *self, int maxmsgsize);
-    CZMQ_EXPORT void zsock_set_multicast_hops (zsock_t *self, int multicast_hops);
-    CZMQ_EXPORT void zsock_set_rcvtimeo (zsock_t *self, int rcvtimeo);
-    CZMQ_EXPORT void zsock_set_sndtimeo (zsock_t *self, int sndtimeo);
-    CZMQ_EXPORT void zsock_set_xpub_verbose (zsock_t *self, int xpub_verbose);
-    CZMQ_EXPORT void zsock_set_tcp_keepalive (zsock_t *self, int tcp_keepalive);
-    CZMQ_EXPORT void zsock_set_tcp_keepalive_idle (zsock_t *self, int tcp_keepalive_idle);
-    CZMQ_EXPORT void zsock_set_tcp_keepalive_cnt (zsock_t *self, int tcp_keepalive_cnt);
-    CZMQ_EXPORT void zsock_set_tcp_keepalive_intvl (zsock_t *self, int tcp_keepalive_intvl);
-    CZMQ_EXPORT void zsock_set_tcp_accept_filter (zsock_t *self, const char * tcp_accept_filter);
+    CZMQ_EXPORT void zsock_set_router_raw (void *self, int router_raw);
+    CZMQ_EXPORT void zsock_set_ipv4only (void *self, int ipv4only);
+    CZMQ_EXPORT void zsock_set_delay_attach_on_connect (void *self, int delay_attach_on_connect);
+    CZMQ_EXPORT void zsock_set_sndhwm (void *self, int sndhwm);
+    CZMQ_EXPORT void zsock_set_rcvhwm (void *self, int rcvhwm);
+    CZMQ_EXPORT void zsock_set_affinity (void *self, int affinity);
+    CZMQ_EXPORT void zsock_set_subscribe (void *self, const char * subscribe);
+    CZMQ_EXPORT void zsock_set_unsubscribe (void *self, const char * unsubscribe);
+    CZMQ_EXPORT void zsock_set_identity (void *self, const char * identity);
+    CZMQ_EXPORT void zsock_set_rate (void *self, int rate);
+    CZMQ_EXPORT void zsock_set_recovery_ivl (void *self, int recovery_ivl);
+    CZMQ_EXPORT void zsock_set_sndbuf (void *self, int sndbuf);
+    CZMQ_EXPORT void zsock_set_rcvbuf (void *self, int rcvbuf);
+    CZMQ_EXPORT void zsock_set_linger (void *self, int linger);
+    CZMQ_EXPORT void zsock_set_reconnect_ivl (void *self, int reconnect_ivl);
+    CZMQ_EXPORT void zsock_set_reconnect_ivl_max (void *self, int reconnect_ivl_max);
+    CZMQ_EXPORT void zsock_set_backlog (void *self, int backlog);
+    CZMQ_EXPORT void zsock_set_maxmsgsize (void *self, int maxmsgsize);
+    CZMQ_EXPORT void zsock_set_multicast_hops (void *self, int multicast_hops);
+    CZMQ_EXPORT void zsock_set_rcvtimeo (void *self, int rcvtimeo);
+    CZMQ_EXPORT void zsock_set_sndtimeo (void *self, int sndtimeo);
+    CZMQ_EXPORT void zsock_set_xpub_verbose (void *self, int xpub_verbose);
+    CZMQ_EXPORT void zsock_set_tcp_keepalive (void *self, int tcp_keepalive);
+    CZMQ_EXPORT void zsock_set_tcp_keepalive_idle (void *self, int tcp_keepalive_idle);
+    CZMQ_EXPORT void zsock_set_tcp_keepalive_cnt (void *self, int tcp_keepalive_cnt);
+    CZMQ_EXPORT void zsock_set_tcp_keepalive_intvl (void *self, int tcp_keepalive_intvl);
+    CZMQ_EXPORT void zsock_set_tcp_accept_filter (void *self, const char * tcp_accept_filter);
     #endif
     
     #if (ZMQ_VERSION_MAJOR == 2)
     //  Get socket options
-    CZMQ_EXPORT int zsock_hwm (zsock_t *self);
-    CZMQ_EXPORT int zsock_swap (zsock_t *self);
-    CZMQ_EXPORT int zsock_affinity (zsock_t *self);
-    CZMQ_EXPORT char * zsock_identity (zsock_t *self);
-    CZMQ_EXPORT int zsock_rate (zsock_t *self);
-    CZMQ_EXPORT int zsock_recovery_ivl (zsock_t *self);
-    CZMQ_EXPORT int zsock_recovery_ivl_msec (zsock_t *self);
-    CZMQ_EXPORT int zsock_mcast_loop (zsock_t *self);
+    CZMQ_EXPORT int zsock_hwm (void *self);
+    CZMQ_EXPORT int zsock_swap (void *self);
+    CZMQ_EXPORT int zsock_affinity (void *self);
+    CZMQ_EXPORT char * zsock_identity (void *self);
+    CZMQ_EXPORT int zsock_rate (void *self);
+    CZMQ_EXPORT int zsock_recovery_ivl (void *self);
+    CZMQ_EXPORT int zsock_recovery_ivl_msec (void *self);
+    CZMQ_EXPORT int zsock_mcast_loop (void *self);
     #   if (ZMQ_VERSION_MINOR == 2)
-    CZMQ_EXPORT int zsock_rcvtimeo (zsock_t *self);
+    CZMQ_EXPORT int zsock_rcvtimeo (void *self);
     #   endif
     #   if (ZMQ_VERSION_MINOR == 2)
-    CZMQ_EXPORT int zsock_sndtimeo (zsock_t *self);
+    CZMQ_EXPORT int zsock_sndtimeo (void *self);
     #   endif
-    CZMQ_EXPORT int zsock_sndbuf (zsock_t *self);
-    CZMQ_EXPORT int zsock_rcvbuf (zsock_t *self);
-    CZMQ_EXPORT int zsock_linger (zsock_t *self);
-    CZMQ_EXPORT int zsock_reconnect_ivl (zsock_t *self);
-    CZMQ_EXPORT int zsock_reconnect_ivl_max (zsock_t *self);
-    CZMQ_EXPORT int zsock_backlog (zsock_t *self);
-    CZMQ_EXPORT int zsock_type (zsock_t *self);
-    CZMQ_EXPORT int zsock_rcvmore (zsock_t *self);
-    CZMQ_EXPORT int zsock_fd (zsock_t *self);
-    CZMQ_EXPORT int zsock_events (zsock_t *self);
+    CZMQ_EXPORT int zsock_sndbuf (void *self);
+    CZMQ_EXPORT int zsock_rcvbuf (void *self);
+    CZMQ_EXPORT int zsock_linger (void *self);
+    CZMQ_EXPORT int zsock_reconnect_ivl (void *self);
+    CZMQ_EXPORT int zsock_reconnect_ivl_max (void *self);
+    CZMQ_EXPORT int zsock_backlog (void *self);
+    CZMQ_EXPORT int zsock_type (void *self);
+    CZMQ_EXPORT int zsock_rcvmore (void *self);
+    CZMQ_EXPORT int zsock_fd (void *self);
+    CZMQ_EXPORT int zsock_events (void *self);
     
     //  Set socket options
-    CZMQ_EXPORT void zsock_set_hwm (zsock_t *self, int hwm);
-    CZMQ_EXPORT void zsock_set_swap (zsock_t *self, int swap);
-    CZMQ_EXPORT void zsock_set_affinity (zsock_t *self, int affinity);
-    CZMQ_EXPORT void zsock_set_identity (zsock_t *self, const char * identity);
-    CZMQ_EXPORT void zsock_set_rate (zsock_t *self, int rate);
-    CZMQ_EXPORT void zsock_set_recovery_ivl (zsock_t *self, int recovery_ivl);
-    CZMQ_EXPORT void zsock_set_recovery_ivl_msec (zsock_t *self, int recovery_ivl_msec);
-    CZMQ_EXPORT void zsock_set_mcast_loop (zsock_t *self, int mcast_loop);
+    CZMQ_EXPORT void zsock_set_hwm (void *self, int hwm);
+    CZMQ_EXPORT void zsock_set_swap (void *self, int swap);
+    CZMQ_EXPORT void zsock_set_affinity (void *self, int affinity);
+    CZMQ_EXPORT void zsock_set_identity (void *self, const char * identity);
+    CZMQ_EXPORT void zsock_set_rate (void *self, int rate);
+    CZMQ_EXPORT void zsock_set_recovery_ivl (void *self, int recovery_ivl);
+    CZMQ_EXPORT void zsock_set_recovery_ivl_msec (void *self, int recovery_ivl_msec);
+    CZMQ_EXPORT void zsock_set_mcast_loop (void *self, int mcast_loop);
     #   if (ZMQ_VERSION_MINOR == 2)
-    CZMQ_EXPORT void zsock_set_rcvtimeo (zsock_t *self, int rcvtimeo);
+    CZMQ_EXPORT void zsock_set_rcvtimeo (void *self, int rcvtimeo);
     #   endif
     #   if (ZMQ_VERSION_MINOR == 2)
-    CZMQ_EXPORT void zsock_set_sndtimeo (zsock_t *self, int sndtimeo);
+    CZMQ_EXPORT void zsock_set_sndtimeo (void *self, int sndtimeo);
     #   endif
-    CZMQ_EXPORT void zsock_set_sndbuf (zsock_t *self, int sndbuf);
-    CZMQ_EXPORT void zsock_set_rcvbuf (zsock_t *self, int rcvbuf);
-    CZMQ_EXPORT void zsock_set_linger (zsock_t *self, int linger);
-    CZMQ_EXPORT void zsock_set_reconnect_ivl (zsock_t *self, int reconnect_ivl);
-    CZMQ_EXPORT void zsock_set_reconnect_ivl_max (zsock_t *self, int reconnect_ivl_max);
-    CZMQ_EXPORT void zsock_set_backlog (zsock_t *self, int backlog);
-    CZMQ_EXPORT void zsock_set_subscribe (zsock_t *self, const char * subscribe);
-    CZMQ_EXPORT void zsock_set_unsubscribe (zsock_t *self, const char * unsubscribe);
+    CZMQ_EXPORT void zsock_set_sndbuf (void *self, int sndbuf);
+    CZMQ_EXPORT void zsock_set_rcvbuf (void *self, int rcvbuf);
+    CZMQ_EXPORT void zsock_set_linger (void *self, int linger);
+    CZMQ_EXPORT void zsock_set_reconnect_ivl (void *self, int reconnect_ivl);
+    CZMQ_EXPORT void zsock_set_reconnect_ivl_max (void *self, int reconnect_ivl_max);
+    CZMQ_EXPORT void zsock_set_backlog (void *self, int backlog);
+    CZMQ_EXPORT void zsock_set_subscribe (void *self, const char * subscribe);
+    CZMQ_EXPORT void zsock_set_unsubscribe (void *self, const char * unsubscribe);
     #endif
     
     //  Self test of this class
@@ -4874,6 +4957,7 @@ This is the class interface:
     //  For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is
     //  the default when there is no specified interface. If the environment
     //  variable ZSYS_INTERFACE is set, use that as the default interface name.
+    //  Setting the interface to "*" means "use all available interfaces".
     CZMQ_EXPORT void
         zsys_set_interface (const char *value);
     

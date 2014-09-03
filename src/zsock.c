@@ -518,11 +518,12 @@ zsock_type_str (zsock_t *self)
 //  a complex multiframe message in one call. The picture can contain any
 //  of these characters, each corresponding to one or two arguments:
 //  
-//     i = int
-//     s = char *
-//     b = byte *, size_t (2 arguments)
-//     c = zchunk_t *
-//     f = zframe_t *
+//      i = int
+//      s = char *
+//      b = byte *, size_t (2 arguments)
+//      c = zchunk_t *
+//      f = zframe_t *
+//      p = void * (sends the pointer value, only meaningful over inproc)
 //
 //  Note that b, c, and f are encoded the same way and the choice is offered
 //  as a convenience to the sender, which may or may not already have data
@@ -563,6 +564,11 @@ zsock_send (void *self, const char *picture, ...)
             assert (zframe_is (frame));
             zmsg_addmem (msg, zframe_data (frame), zframe_size (frame));
         }
+        else
+        if (*picture == 'p') {
+            void *pointer = va_arg (argptr, void *);
+            zmsg_addmem (msg, &pointer, sizeof (void *));
+        }
         else {
             zsys_error ("zsock: invalid picture element '%c'", *picture);
             assert (false);
@@ -579,11 +585,12 @@ zsock_send (void *self, const char *picture, ...)
 //  the format and meaning of the picture. Returns the picture elements into
 //  a series of pointers as provided by the caller:
 //
-//     i = int *
-//     s = char ** (allocates new string)
-//     b = byte **, size_t * (2 arguments) (allocates memory)
-//     c = zchunk_t ** (creates zchunk)
-//     f = zframe_t ** (creates zframe)
+//      i = int * (stores integer)
+//      s = char ** (allocates new string)
+//      b = byte **, size_t * (2 arguments) (allocates memory)
+//      c = zchunk_t ** (creates zchunk)
+//      f = zframe_t ** (creates zframe)
+//      p = void ** (stores pointer)
 //
 //  Note that zsock_recv creates the returned objects, and the caller must
 //  destroy them when finished with them. The supplied pointers do not need
@@ -629,6 +636,13 @@ zsock_recv (void *self, const char *picture, ...)
         else
         if (*picture == 'f')
             *(va_arg (argptr, zframe_t **)) = zmsg_pop (msg);
+        else
+        if (*picture == 'p') {
+            zframe_t *frame = zmsg_pop (msg);
+            assert (zframe_size (frame) == sizeof (void *));
+            *(va_arg (argptr, void **)) = *((void **) zframe_data (frame));
+            zframe_destroy (&frame);
+        }
         else {
             zsys_error ("zsock: invalid picture element '%c'", *picture);
             assert (false);
@@ -790,21 +804,25 @@ zsock_test (bool verbose)
     //  Test zsock_send/recv pictures
     zchunk_t *chunk = zchunk_new ("HELLO", 5);
     zframe_t *frame = zframe_new ("WORLD", 5);
+    char *original = "pointer";
     
-    zsock_send (writer, "isbcf", 12345, "This is a string", "ABCDE", 5, chunk, frame);
+    zsock_send (writer, "isbcfp",
+                12345, "This is a string", "ABCDE", 5, chunk, frame, original);
     msg = zmsg_recv (reader);
     assert (msg);
     if (verbose)
         zmsg_print (msg);
     zmsg_destroy (&msg);
     
-    zsock_send (writer, "isbcf", 12345, "This is a string", "ABCDE", 5, chunk, frame);
+    zsock_send (writer, "isbcfp",
+                12345, "This is a string", "ABCDE", 5, chunk, frame, original);
     zframe_destroy (&frame);
     zchunk_destroy (&chunk);
     int integer;
     byte *data;
     size_t size;
-    rc = zsock_recv (reader, "isbcf", &integer, &string, &data, &size, &chunk, &frame);
+    char *copy;
+    rc = zsock_recv (reader, "isbcfp", &integer, &string, &data, &size, &chunk, &frame, &copy);
     assert (rc == 0);
     assert (integer == 12345);
     assert (streq (string, "This is a string"));
@@ -814,6 +832,7 @@ zsock_test (bool verbose)
     assert (zchunk_size (chunk) == 5);
     assert (memcmp (zframe_data (frame), "WORLD", 5) == 0);
     assert (zframe_size (frame) == 5);
+    assert (original == copy);
     free (string);
     free (data);
     zframe_destroy (&frame);
