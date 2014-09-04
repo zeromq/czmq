@@ -308,10 +308,11 @@ zlist_set_duplicator (zlist_t *self, czmq_duplicator duplicator)
 //  --------------------------------------------------------------------------
 //  Make a copy of the list; items are duplicated if you set a duplicator
 //  for the list, otherwise not. Copying a null reference returns a null
-//  reference.
+//  reference. Note that this method's behavior changed slightly for CZMQ
+//  v3.x. The old behavior is in zhash_dup_v2.
 
 zlist_t *
-zlist_copy (zlist_t *self)
+zlist_dup (zlist_t *self)
 {
     if (!self)
         return NULL;
@@ -460,7 +461,7 @@ zlist_remove (zlist_t *self, void *item)
 //  pointers back to the items in the original list.
 
 zlist_t *
-zlist_dup (zlist_t *self)
+zlist_dup_v2 (zlist_t *self)
 {
     if (!self)
         return NULL;
@@ -638,7 +639,7 @@ zlist_test (int verbose)
     assert (zlist_size (list) == 3);
     assert (zlist_first (list) == bread);
 
-    zlist_t *sub_list = zlist_copy (list);
+    zlist_t *sub_list = zlist_dup (list);
     assert (sub_list);
     assert (zlist_size (sub_list) == 3);
 
@@ -654,7 +655,7 @@ zlist_test (int verbose)
 
     assert (zlist_size (sub_list) == 3);
     zlist_prepend (list, sub_list);
-    zlist_t *sub_list_2 = zlist_copy (sub_list);
+    zlist_t *sub_list_2 = zlist_dup (sub_list);
     zlist_append (list, sub_list_2);
     zlist_set_destructor (list, (czmq_destructor *) zlist_destroy);
 
@@ -717,7 +718,7 @@ zlist_test (int verbose)
     assert (zlist_size (list) == 3);
     assert (zlist_first (list) == bread);
 
-    sub_list = zlist_dup (list);
+    sub_list = zlist_dup_v2 (list);
     assert (sub_list);
     assert (zlist_size (sub_list) == 3);
 
@@ -732,7 +733,7 @@ zlist_test (int verbose)
 
     assert (zlist_size (sub_list) == 3);
     zlist_push (list, sub_list);
-    sub_list_2 = zlist_dup (sub_list);
+    sub_list_2 = zlist_dup_v2 (sub_list);
     zlist_append (list, sub_list_2);
     assert (zlist_freefn (list, sub_list, &s_zlist_free, false) == sub_list);
     assert (zlist_freefn (list, sub_list_2, &s_zlist_free, true) == sub_list_2);

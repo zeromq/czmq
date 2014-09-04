@@ -77,7 +77,7 @@ CZMQ_EXPORT size_t
 //  for the ring, otherwise not. Copying a null reference returns a null
 //  reference.
 CZMQ_EXPORT zring_t *
-    zring_copy (zring_t *self);
+    zring_dup (zring_t *self);
 
 //  Set a user-defined deallocator for ring items; by default items are not
 //  freed when the ring is destroyed.

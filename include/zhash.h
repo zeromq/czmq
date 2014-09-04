@@ -148,10 +148,12 @@ CZMQ_EXPORT zframe_t *
 CZMQ_EXPORT zhash_t *
     zhash_unpack (zframe_t *frame);
 
-//  Make a copy of the hash; items are duplicated if you set a duplicator
-//  for the hash, otherwise not.
+//  Make a copy of the list; items are duplicated if you set a duplicator
+//  for the list, otherwise not. Copying a null reference returns a null
+//  reference. Note that this method's behavior changed slightly for CZMQ
+//  v3.x. The old behavior is in zhash_dup_v2.
 CZMQ_EXPORT zhash_t *
-    zhash_copy (zhash_t *self);
+    zhash_dup (zhash_t *self);
 
 //  Set a user-defined deallocator for hash items; by default items are not
 //  freed when the hash is destroyed.
@@ -163,13 +165,13 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zhash_set_duplicator (zhash_t *self, czmq_duplicator duplicator);
 
-//  DEPRECATED by zhash_copy
+//  DEPRECATED by zhash_dup
 //  Make copy of hash table; if supplied table is null, returns null.
 //  Does not copy items themselves. Rebuilds new table so may be slow on
 //  very large tables. NOTE: only works with item values that are strings
 //  since there's no other way to know how to duplicate the item value.
 CZMQ_EXPORT zhash_t *
-    zhash_dup (zhash_t *self);
+    zhash_dup_v2 (zhash_t *self);
 
 //  DEPRECATED as clumsy -- use set_destructor instead
 //  Set hash for automatic value destruction
