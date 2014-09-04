@@ -292,7 +292,7 @@ zring_set_duplicator (zring_t *self, czmq_duplicator duplicator)
 //  reference.
 
 zring_t *
-zring_copy (zring_t *self)
+zring_dup (zring_t *self)
 {
     if (!self)
         return NULL;
@@ -387,10 +387,10 @@ zring_test (int verbose)
     assert (zring_first (ring) == bread);
     assert (zring_last (ring) == wine);
 
-    zring_t *copy = zring_copy (ring);
-    assert (copy);
-    assert (zring_size (copy) == 3);
-    zring_destroy (&copy);
+    zring_t *dup = zring_dup (ring);
+    assert (dup);
+    assert (zring_size (dup) == 3);
+    zring_destroy (&dup);
 
     //  Destructor should be safe to call twice
     zring_destroy (&ring);

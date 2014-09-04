@@ -69,9 +69,10 @@ CZMQ_EXPORT int
 
 //  Make a copy of the list; items are duplicated if you set a duplicator
 //  for the list, otherwise not. Copying a null reference returns a null
-//  reference.
+//  reference. Note that this method's behavior changed slightly for CZMQ
+//  v3.x. The old behavior is in zhash_dup_v2.
 CZMQ_EXPORT zlist_t *
-    zlist_copy (zlist_t *self);
+    zlist_dup (zlist_t *self);
 
 //  Return number of items in the list
 CZMQ_EXPORT size_t
@@ -113,7 +114,7 @@ CZMQ_EXPORT void
 //  duplicate all items, which must be strings. Otherwise, the list will hold
 //  pointers back to the items in the original list.
 CZMQ_EXPORT zlist_t *
-    zlist_dup (zlist_t *self);
+    zlist_dup_v2 (zlist_t *self);
 
 //  DEPRECATED as clumsy -- use set_destructor instead
 //  Set list for automatic item destruction; item values MUST be strings.
