@@ -595,7 +595,9 @@ zsock_send (void *self, const char *picture, ...)
 //  Note that zsock_recv creates the returned objects, and the caller must
 //  destroy them when finished with them. The supplied pointers do not need
 //  to be initialized. Returns 0 if successful, or -1 if it failed to recv
-//  a message, in which case the pointers are not modified.
+//  a message, in which case the pointers are not modified. When message
+//  frames are truncated (a short message), sets return values to zero/null.
+//  If an argument pointer is NULL, does not store any value (skips it).
 
 int
 zsock_recv (void *self, const char *picture, ...)
@@ -611,36 +613,71 @@ zsock_recv (void *self, const char *picture, ...)
     while (*picture) {
         if (*picture == 'i') {
             char *string = zmsg_popstr (msg);
-            *(va_arg (argptr, int *)) = atoi (string);
+            int *integer_p = va_arg (argptr, int *);
+            if (integer_p)
+                *integer_p = string? atoi (string): 0;
             free (string);
         }
         else
-        if (*picture == 's')
-            *(va_arg (argptr, char **)) = zmsg_popstr (msg);
+        if (*picture == 's') {
+            char *string = zmsg_popstr (msg);
+            char **string_p = va_arg (argptr, char **);
+            if (string_p)
+                *string_p = string;
+            else
+                free (string);
+        }
         else
         if (*picture == 'b') {
             zframe_t *frame = zmsg_pop (msg);
-            byte **data = va_arg (argptr, byte **);
+            byte **data_p = va_arg (argptr, byte **);
             size_t *size = va_arg (argptr, size_t *);
-            *size = zframe_size (frame);
-            *data = malloc (*size);
-            memcpy (*data, zframe_data (frame), *size);
+            if (data_p) {
+                if (frame) {
+                    *size = zframe_size (frame);
+                    *data_p = malloc (*size);
+                    memcpy (*data_p, zframe_data (frame), *size);
+                }
+                else {
+                    *data_p = NULL;
+                    *size = 0;
+                }
+            }
             zframe_destroy (&frame);
         }
         else
         if (*picture == 'c') {
             zframe_t *frame = zmsg_pop (msg);
-            *(va_arg (argptr, zchunk_t **)) = zchunk_new (zframe_data (frame), zframe_size (frame));
+            zchunk_t **chunk_p = va_arg (argptr, zchunk_t **);
+            if (chunk_p) {
+                if (frame)
+                    *chunk_p = zchunk_new (zframe_data (frame), zframe_size (frame));
+                else
+                    *chunk_p = NULL;
+            }
             zframe_destroy (&frame);
         }
         else
-        if (*picture == 'f')
-            *(va_arg (argptr, zframe_t **)) = zmsg_pop (msg);
+        if (*picture == 'f') {
+            zframe_t *frame = zmsg_pop (msg);
+            zframe_t **frame_p = va_arg (argptr, zframe_t **);
+            if (frame_p)
+                *frame_p = frame;
+            else
+                zframe_destroy (&frame);
+        }
         else
         if (*picture == 'p') {
             zframe_t *frame = zmsg_pop (msg);
-            assert (zframe_size (frame) == sizeof (void *));
-            *(va_arg (argptr, void **)) = *((void **) zframe_data (frame));
+            void **pointer_p = va_arg (argptr, void **);
+            if (pointer_p) {
+                if (frame) {
+                    assert (zframe_size (frame) == sizeof (void *));
+                    *pointer_p = *((void **) zframe_data (frame));
+                }
+                else
+                    *pointer_p = NULL;
+            }
             zframe_destroy (&frame);
         }
         else {
@@ -805,38 +842,66 @@ zsock_test (bool verbose)
     zchunk_t *chunk = zchunk_new ("HELLO", 5);
     zframe_t *frame = zframe_new ("WORLD", 5);
     char *original = "pointer";
+
+    //  We can send signed integers, strings, blocks of memory, chunks,
+    //  frames, and pointers
+//     zsock_send (writer, "isbcfp",
+//                 -12345, "This is a string", "ABCDE", 5, chunk, frame, original);
+//     msg = zmsg_recv (reader);
+//     assert (msg);
+//     if (verbose)
+//         zmsg_print (msg);
+//     zmsg_destroy (&msg);
+// 
+//     //  Test zsock_recv into each supported type
+//     zsock_send (writer, "isbcfp",
+//                 -12345, "This is a string", "ABCDE", 5, chunk, frame, original);
+//     zframe_destroy (&frame);
+//     zchunk_destroy (&chunk);
+    int integer;
+//     byte *data;
+//     size_t size;
+//     char *pointer;
+//     rc = zsock_recv (reader, "isbcfp", &integer, &string, &data, &size, &chunk, &frame, &pointer);
+//     assert (rc == 0);
+//     assert (integer == -12345);
+//     assert (streq (string, "This is a string"));
+//     assert (memcmp (data, "ABCDE", 5) == 0);
+//     assert (size == 5);
+//     assert (memcmp (zchunk_data (chunk), "HELLO", 5) == 0);
+//     assert (zchunk_size (chunk) == 5);
+//     assert (memcmp (zframe_data (frame), "WORLD", 5) == 0);
+//     assert (zframe_size (frame) == 5);
+//     assert (original == pointer);
+//     free (string);
+//     free (data);
+//     zframe_destroy (&frame);
+//     zchunk_destroy (&chunk);
+// 
+//     //  Test zsock_recv of short message; this lets us return a failure
+//     //  with a status code and then nothing else; the receiver will get
+//     //  the status code and NULL/zero for all other values
+//     zsock_send (writer, "i", -1);
+//     zsock_recv (reader, "isbcfp", &integer, &string, &data, &size, &chunk, &frame, &pointer);
+//     assert (integer == -1);
+//     assert (string == NULL);
+//     assert (data == NULL);
+//     assert (size == 0);
+//     assert (chunk == NULL);
+//     assert (frame == NULL);
+//     assert (pointer == NULL);
     
+    //  Test zsock_recv with null arguments
+    chunk = zchunk_new ("HELLO", 5);
+    frame = zframe_new ("WORLD", 5);
     zsock_send (writer, "isbcfp",
-                12345, "This is a string", "ABCDE", 5, chunk, frame, original);
-    msg = zmsg_recv (reader);
-    assert (msg);
-    if (verbose)
-        zmsg_print (msg);
-    zmsg_destroy (&msg);
-    
-    zsock_send (writer, "isbcfp",
-                12345, "This is a string", "ABCDE", 5, chunk, frame, original);
+                -12345, "This is a string", "ABCDE", 5, chunk, frame, original);
     zframe_destroy (&frame);
     zchunk_destroy (&chunk);
-    int integer;
-    byte *data;
-    size_t size;
-    char *copy;
-    rc = zsock_recv (reader, "isbcfp", &integer, &string, &data, &size, &chunk, &frame, &copy);
-    assert (rc == 0);
-    assert (integer == 12345);
-    assert (streq (string, "This is a string"));
-    assert (memcmp (data, "ABCDE", 5) == 0);
-    assert (size == 5);
+    zsock_recv (reader, "isbcfp", &integer, NULL, NULL, NULL, &chunk, NULL, NULL);
+    assert (integer == -12345);
     assert (memcmp (zchunk_data (chunk), "HELLO", 5) == 0);
     assert (zchunk_size (chunk) == 5);
-    assert (memcmp (zframe_data (frame), "WORLD", 5) == 0);
-    assert (zframe_size (frame) == 5);
-    assert (original == copy);
-    free (string);
-    free (data);
-    zframe_destroy (&frame);
-    zchunk_destroy (&chunk);
     
     //  Test binding to ephemeral ports, sequential and random
     int port = zsock_bind (writer, "tcp://127.0.0.1:*");
