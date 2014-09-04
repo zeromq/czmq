@@ -590,16 +590,16 @@ zsys_dir_delete (const char *pathname, ...)
 //  Set private file creation mode; all files created from here will be
 //  readable/writable by the owner only.
 
-#if !defined(__WINDOWS__)
+#if !defined (__WINDOWS__)
 static mode_t s_old_mask = 0;
 #endif
 
 void
 zsys_file_mode_private (void)
 {
-#   if !defined(__WINDOWS__)
+#if !defined (__WINDOWS__)
     s_old_mask = umask (S_IWGRP | S_IWOTH | S_IRGRP | S_IROTH);
-#   endif
+#endif
 }
 
 
@@ -611,10 +611,10 @@ void
 zsys_file_mode_default (void)
 {
     //  Reset process file create mask
-#   if !defined(__WINDOWS__)
+#if !defined (__WINDOWS__)
     if (s_old_mask)
         umask (s_old_mask);
-#   endif
+#endif
 }
 
 
@@ -766,9 +766,8 @@ zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address)
             (char *) zframe_data (frame), (int) zframe_size (frame),
             0,      //  Flags
             (struct sockaddr *) address, (int) sizeof (inaddr_t));
-    if (rv < 0) {
-        fprintf(stderr, "Error in sendto() - %d, %s\n", errno, strerror(errno));
-    }
+    if (rv < 0)
+        fprintf (stderr, "Error in sendto() - %d, %s\n", errno, strerror(errno));
 }
 
 

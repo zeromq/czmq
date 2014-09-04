@@ -101,9 +101,9 @@ s_valid_flags (short flags)
     return (flags & IFF_UP)             //  Only use interfaces that are running
        && !(flags & IFF_LOOPBACK)       //  Ignore loopback interface
        &&  (flags & IFF_BROADCAST)      //  Only use interfaces that have BROADCAST
-    #if defined(IFF_SLAVE)
+#   if defined (IFF_SLAVE)
        && !(flags & IFF_SLAVE)          //  Ignore devices that are bonding slaves.
-    #endif
+#   endif
        && !(flags & IFF_POINTOPOINT);   //  Ignore point to point interfaces.
 }
 #endif

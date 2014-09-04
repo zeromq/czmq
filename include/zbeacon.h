@@ -38,19 +38,14 @@ extern "C" {
 //  the beacon. If the system does not support UDP broadcasts (lacking a
 //  workable interface), returns an empty hostname:
 //
-//      zstr_sendm (beacon, "CONFIGURE");
-//      zstr_sendf (beacon, "%d", port_number);
+//      zsock_send (beacon, "si", "CONFIGURE", port_number);
 //      char *hostname = zstr_recv (beacon);
 //
 //  Start broadcasting a beacon at a specified interval in msec. The beacon
 //  data can be at most UDP_FRAME_MAX bytes; this constant is defined in
 //  zsys.h to be 255:
 //
-//      zmsg_t *msg = zmsg_new ();
-//      zmsg_addstr (msg, "PUBLISH");
-//      zmsg_addmem (msg, beacon_data, beacon_size);
-//      zmsg_addstrf (msg, "%d", interval);
-//      zmsg_send (&msg, beacon);
+//      zsock_send (beacon, "sbi", "PUBLISH", data, size, interval);
 //
 //  Stop broadcasting the beacon:
 //
@@ -61,10 +56,7 @@ extern "C" {
 //  that is identical to our broadcast beacon_data is discarded in any case.
 //  If the filter size is zero, we get all peer beacons:
 //  
-//      zmsg_t *msg = zmsg_new ();
-//      zmsg_addstr (msg, "SUBSCRIBE");
-//      zmsg_addmem (msg, filter_data, filter_size);
-//      zmsg_send (&msg, beacon);
+//      zsock_send (beacon, "sb", "SUBSCRIBE", filter_data, filter_size);
 //
 //  Stop listening to other peers
 //
