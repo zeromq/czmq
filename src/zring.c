@@ -13,7 +13,7 @@
 
 /*
 @header
-    Provides a generic container implementing a fast doubly-linked list, aka
+    Provides a generic container implementing a fast doubly-linked ring, aka
     a ring. You can use this to construct multi-dimensional rings, and other
     structures together with other generic containers like zhash.
 @discuss
@@ -39,8 +39,9 @@ struct _zring_t {
     node_t *head;               //  Dummy node acting as head in ring
     node_t *cursor;             //  Current node for iteration
     size_t size;                //  Number of items in ring
-    zring_free_fn *free_fn;     //  Callback to destroy an item
-    zring_dup_fn *dup_fn;       //  Callback to duplicate an item
+    //  Function callbacks for duplicating and destroying items, if any
+    czmq_duplicator *duplicator;
+    czmq_destructor *destructor;
 };
 
 
@@ -89,8 +90,8 @@ zring_destroy (zring_t **self_p)
         node_t *node = self->head->next;
         while (node != self->head) {
             node_t *next = node->next;
-            if (self->free_fn)
-                (self->free_fn) (&node->item);
+            if (self->destructor)
+                (self->destructor) (&node->item);
             free (node);
             node = next;
         }
@@ -162,19 +163,16 @@ zring_prev (zring_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Insert an item after cursor, return 0 if OK, else -1. Cursor is set to
-//  inserted item (zring_remove() will remove it again). In any empty ring,
-//  inserts after the head.
+//  Prepend an item to the start of the ring, return 0 if OK, else -1.
 
 int
-zring_insert (zring_t *self, void *item)
+zring_prepend (zring_t *self, void *item)
 {
     assert (self);
-    node_t *node = s_node_new (self->cursor, self->cursor->next, item);
+    node_t *node = s_node_new (self->head, self->head->next, item);
     if (node) {
-        self->cursor->next->prev = node;
-        self->cursor->next = node;
-        self->cursor = node;
+        self->head->next->prev = node;
+        self->head->next = node;
         self->size++;
         return 0;
     }
@@ -203,56 +201,53 @@ zring_append (zring_t *self, void *item)
 
 
 //  --------------------------------------------------------------------------
-//  Push an item to the start of the ring, return 0 if OK, else -1.
+//  Detach specified item from the ring. If the item is not present in the
+//  ring, returns null. Caller must destroy item when finished with it.
+//  Returns 0 if an item was detached, else -1.
 
 int
-zring_push (zring_t *self, void *item)
+zring_detach (zring_t *self, void *item)
 {
     assert (self);
-    node_t *node = s_node_new (self->head, self->head->next, item);
-    if (node) {
-        self->head->next->prev = node;
-        self->head->next = node;
-        self->size++;
-        return 0;
+    //  Find item in ring, and detach if present
+    node_t *node;
+    for (node = self->head->next; node != self->head; node = node->next) {
+        if (node->item == item) {
+            node->next->prev = node->prev;
+            node->prev->next = node->next;
+            free (node);
+            self->cursor = self->head;
+            self->size--;
+            return 0;
+        }
     }
-    else
-        return -1;              //  Ran out of heap memory
+    return -1;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Remove current item from the ring (as set by first/last/next/prev calls),
-//  and return item. Sets the cursor to the next item. If ring was empty,
-//  returns null. Caller should destroy item when finished with it.
+//  Delete specified item from the ring. If the item is not present in the
+//  ring, returns null. Calls the ring item destructor if one was set.
+//  Returns 0 if an item was deleted, else -1.
 
-void *
-zring_remove (zring_t *self)
+int
+zring_delete (zring_t *self, void *item)
 {
-    assert (self);
-    void *item = NULL;
-    if (self->cursor != self->head) {
-        node_t *node = self->cursor;
-        node->next->prev = self->cursor = node->prev;
-        node->prev->next = node->next;
-        item = node->item;
-        free (node);
-        self->size--;
+    //  Find item in ring, and detach if present
+    node_t *node;
+    for (node = self->head->next; node != self->head; node = node->next) {
+        if (node->item == item) {
+            node->next->prev = node->prev;
+            node->prev->next = node->next;
+            if (self->destructor)
+                (self->destructor) (&node->item);
+            free (node);
+            self->cursor = self->head;
+            self->size--;
+            return 0;
+        }
     }
-    return item;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Pop item off the start of the ring, and return item. If the ring is empty.
-//  returns null. Sets cursor to first remaining item in ring. Caller should
-//  destroy item when finished with it.
-
-void *
-zring_pop (zring_t *self)
-{
-    zring_first (self);
-    return zring_remove (self);
+    return -1;
 }
 
 
@@ -272,10 +267,10 @@ zring_size (zring_t *self)
 //  freed when the ring is destroyed.
 
 void
-zring_set_free_fn (zring_t *self, zring_free_fn free_fn)
+zring_set_destructor (zring_t *self, czmq_destructor destructor)
 {
     assert (self);
-    self->free_fn = free_fn;
+    self->destructor = destructor;
 }
 
 
@@ -284,33 +279,33 @@ zring_set_free_fn (zring_t *self, zring_free_fn free_fn)
 //  copied when the ring is duplicated.
 
 void
-zring_set_dup_fn (zring_t *self, zring_dup_fn dup_fn)
+zring_set_duplicator (zring_t *self, czmq_duplicator duplicator)
 {
     assert (self);
-    self->dup_fn = dup_fn;
+    self->duplicator = duplicator;
 }
 
 
 //  --------------------------------------------------------------------------
 //  Make a copy of the ring; items are duplicated if you set a duplicator
-//  for the ring.
+//  for the ring, otherwise not. Copying a null reference returns a null
+//  reference.
 
 zring_t *
-zring_dup (zring_t *self)
+zring_copy (zring_t *self)
 {
-    //  Duplicating a null reference returns a null reference
     if (!self)
         return NULL;
 
     zring_t *copy = zring_new ();
     if (copy) {
-        copy->free_fn = self->free_fn;
-        copy->dup_fn = self->dup_fn;
+        copy->destructor = self->destructor;
+        copy->duplicator = self->duplicator;
         node_t *node;
         for (node = self->head->next; node != self->head; node = node->next) {
             void *item = node->item;
-            if (self->dup_fn)
-                item = self->dup_fn (item);
+            if (self->duplicator)
+                item = self->duplicator (item);
             if (zring_append (copy, item)) {
                 zring_destroy (&copy);
                 break;
@@ -366,25 +361,22 @@ zring_test (int verbose)
     assert (zring_prev (ring) == wine);
 
     assert (zring_first (ring) == cheese);
-    char *item = (char *) zring_remove (ring);
-    assert (item == cheese);
+    zring_delete (ring, cheese);
     assert (zring_size (ring) == 2);
     assert (zring_first (ring) == bread);
-    item = zring_remove (ring);
-    assert (item == bread);
+    zring_delete (ring, bread);
     assert (zring_size (ring) == 1);
     assert (zring_first (ring) == wine);
-    item = zring_remove (ring);
-    assert (item == wine);
+    zring_delete (ring, wine);
     assert (zring_size (ring) == 0);
     assert (zring_first (ring) == NULL);
 
-    rc = zring_push (ring, cheese);
+    rc = zring_prepend (ring, cheese);
     assert (!rc);
     assert (zring_size (ring) == 1);
     assert (zring_first (ring) == cheese);
 
-    rc = zring_push (ring, bread);
+    rc = zring_prepend (ring, bread);
     assert (!rc);
     assert (zring_size (ring) == 2);
     assert (zring_first (ring) == bread);
@@ -394,19 +386,12 @@ zring_test (int verbose)
     assert (zring_size (ring) == 3);
     assert (zring_first (ring) == bread);
     assert (zring_last (ring) == wine);
-    rc = zring_insert (ring, cheese);
-    item = (char *) zring_remove (ring);
-    assert (item == cheese);
 
-    zring_t *dup_ring = zring_dup (ring);
-    assert (dup_ring);
-    assert (zring_size (dup_ring) == 3);
-    zring_destroy (&dup_ring);
+    zring_t *copy = zring_copy (ring);
+    assert (copy);
+    assert (zring_size (copy) == 3);
+    zring_destroy (&copy);
 
-    //  Test pop
-    item = (char *) zring_pop (ring);
-    assert (item == bread);
-    
     //  Destructor should be safe to call twice
     zring_destroy (&ring);
     assert (ring == NULL);
