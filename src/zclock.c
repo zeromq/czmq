@@ -123,24 +123,21 @@ int64_t
 zclock_mono (void)
 {
 #if defined (__UNIX__)
-#if defined (__UTYPE_OSX)
+#   if defined (__UTYPE_OSX)
     clock_serv_t cclock;
     mach_timespec_t mts;
-
-    host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &cclock);
-    clock_get_time(cclock, &mts);
-    mach_port_deallocate(mach_task_self(), cclock);
-
+    host_get_clock_service (mach_host_self (), SYSTEM_CLOCK, &cclock);
+    clock_get_time (cclock, &mts);
+    mach_port_deallocate (mach_task_self (), cclock);
     return (int64_t) ((int64_t) mts.tv_sec * 1000 + (int64_t) mts.tv_nsec / 1000000);
-#else
+#   else
     struct timespec ts;
     clock_gettime (CLOCK_MONOTONIC, &ts);
-
     return (int64_t) ((int64_t) ts.tv_sec * 1000 + (int64_t) ts.tv_nsec / 1000000);
-#endif
+#   endif
 #elif (defined (__WINDOWS__))
     LARGE_INTEGER count;
-    QueryPerformanceCounter(&count);
+    QueryPerformanceCounter (&count);
     return s_perfcounter_to_msec (&count);
 #endif
 }

@@ -214,7 +214,7 @@ zhash_insert (zhash_t *self, const char *key, void *value)
     if (self->size >= limit * LOAD_FACTOR / 100) {
         //  Create new hash table
         uint new_prime_index = self->prime_index + GROWTH_FACTOR;
-        int rc = s_zhash_rehash(self, new_prime_index);
+        int rc = s_zhash_rehash (self, new_prime_index);
         if (rc != 0)
             return rc;
         self->chain_limit += CHAIN_GROWS;
@@ -293,7 +293,7 @@ s_item_lookup (zhash_t *self, const char *key)
     if (len > self->chain_limit) {
         //  Create new hash table
         uint new_prime_index = self->prime_index + GROWTH_FACTOR;
-        int rc = s_zhash_rehash(self, new_prime_index);
+        int rc = s_zhash_rehash (self, new_prime_index);
         assert (rc == 0);
         limit = primes [self->prime_index];
         self->cached_index = s_item_hash (key, limit);
