@@ -197,7 +197,9 @@ CZMQ_EXPORT int
 //  Note that zsock_recv creates the returned objects, and the caller must
 //  destroy them when finished with them. The supplied pointers do not need
 //  to be initialized. Returns 0 if successful, or -1 if it failed to recv
-//  a message, in which case the pointers are not modified.
+//  a message, in which case the pointers are not modified. When message
+//  frames are truncated (a short message), sets return values to zero/null.
+//  If an argument pointer is NULL, does not store any value (skips it).
 CZMQ_EXPORT int
     zsock_recv (void *self, const char *picture, ...);
 
