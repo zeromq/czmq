@@ -38,6 +38,12 @@ extern "C" {
 //  Note that all zauth commands are synchronous, so your application always
 //  waits for a signal from the actor after each command.
 //
+//  Enable verbose logging of commands and activity. Verbose logging can help
+//  debug non-trivial authentication policies:
+//
+//      zstr_send (auth, "VERBOSE");
+//      zsock_wait (auth);
+//
 //  Allow (whitelist) a list of IP addresses. For NULL, all clients from
 //  these addresses will be accepted. For PLAIN and CURVE, they will be
 //  allowed to continue with authentication. You can call this method
@@ -76,12 +82,6 @@ extern "C" {
 //  Kerberos) to establish a secure context and perform mutual authentication:
 //
 //      zstr_sendx (auth, "GSSAPI", NULL);
-//      zsock_wait (auth);
-//
-//  Enable verbose logging of commands and activity. Verbose logging can help
-//  debug non-trivial authentication policies:
-//
-//      zstr_sendx (auth, "VERBOSE", NULL);
 //      zsock_wait (auth);
 //
 //  This is the zauth constructor as a zactor_fn:

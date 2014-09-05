@@ -49,52 +49,45 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void *
     zring_prev (zring_t *self);
 
-//  Insert an item after cursor, return 0 if OK, else -1. Cursor is set to
-//  inserted item (zring_remove() will remove it again). In any empty ring,
-//  inserts after the head.
+//  Prepend an item to the start of the ring, return 0 if OK, else -1.
 CZMQ_EXPORT int
-    zring_insert (zring_t *self, void *item);
+    zring_prepend (zring_t *self, void *item);
 
 //  Append an item to the end of the ring, return 0 if OK, else -1.
 CZMQ_EXPORT int
     zring_append (zring_t *self, void *item);
 
-//  Push an item to the start of the ring, return 0 if OK, else -1.
+//  Detach specified item from the ring. If the item is not present in the
+//  ring, returns null. Caller must destroy item when finished with it.
+//  Returns 0 if an item was detached, else -1.
 CZMQ_EXPORT int
-    zring_push (zring_t *self, void *item);
+    zring_detach (zring_t *self, void *item);
 
-//  Remove current item from the ring (as set by first/last/next/prev calls),
-//  and return item. Sets the cursor to the next item. If ring was empty,
-//  returns null. Caller should destroy item when finished with it.
-CZMQ_EXPORT void *
-    zring_remove (zring_t *self);
-
-//  Pop item off the start of the ring, and return item. If the ring is empty.
-//  returns null. Sets cursor to first remaining item in ring. Caller should
-//  destroy item when finished with it.
-CZMQ_EXPORT void *
-    zring_pop (zring_t *self);
+//  Delete specified item from the ring. If the item is not present in the
+//  ring, returns null. Calls the ring item destructor if one was set.
+//  Returns 0 if an item was deleted, else -1.
+CZMQ_EXPORT int
+    zring_delete (zring_t *self, void *item);
 
 //  Return number of items in the ring
 CZMQ_EXPORT size_t
     zring_size (zring_t *self);
 
+//  Make a copy of the ring; items are duplicated if you set a duplicator
+//  for the ring, otherwise not. Copying a null reference returns a null
+//  reference.
+CZMQ_EXPORT zring_t *
+    zring_dup (zring_t *self);
+
 //  Set a user-defined deallocator for ring items; by default items are not
 //  freed when the ring is destroyed.
-typedef void (zring_free_fn) (void **item);
 CZMQ_EXPORT void
-    zring_set_free_fn (zring_t *self, zring_free_fn free_fn);
+    zring_set_destructor (zring_t *self, czmq_destructor destructor);
 
 //  Set a user-defined duplicator for ring items; by default items are not
 //  copied when the ring is duplicated.
-typedef void * (zring_dup_fn) (void *item);
 CZMQ_EXPORT void
-    zring_set_dup_fn (zring_t *self, zring_dup_fn dup_fn);
-
-//  Make a copy of the ring; items are duplicated if you set a duplicator
-//  for the ring.
-CZMQ_EXPORT zring_t *
-    zring_dup (zring_t *self);
+    zring_set_duplicator (zring_t *self, czmq_duplicator duplicator);
 
 //  Self test of this class
 CZMQ_EXPORT void

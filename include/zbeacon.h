@@ -29,7 +29,7 @@ extern "C" {
 //
 //  Enable verbose logging of commands and activity:
 //
-//      zstr_sendx (beacon, "VERBOSE", NULL);
+//      zstr_send (beacon, "VERBOSE");
 //
 //  Configure beacon to run on specified UDP port, and return the name of
 //  the host, which can be used as endpoint for incoming connections. To
@@ -38,6 +38,7 @@ extern "C" {
 //  the beacon. If the system does not support UDP broadcasts (lacking a
 //  workable interface), returns an empty hostname:
 //
+//      //  Pictures: 's' = C string, 'i' = int
 //      zsock_send (beacon, "si", "CONFIGURE", port_number);
 //      char *hostname = zstr_recv (beacon);
 //
@@ -45,6 +46,7 @@ extern "C" {
 //  data can be at most UDP_FRAME_MAX bytes; this constant is defined in
 //  zsys.h to be 255:
 //
+//      //  Pictures: 'b' = byte * data + size_t size
 //      zsock_send (beacon, "sbi", "PUBLISH", data, size, interval);
 //
 //  Stop broadcasting the beacon:
