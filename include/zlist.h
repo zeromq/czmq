@@ -42,11 +42,6 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void *
     zlist_last (zlist_t *self);
 
-//  Return the current item of list. If the list is empty, returns NULL.
-//  Leaves cursor pointing at the current item, or NULL if the list is empty.
-CZMQ_EXPORT void *
-    zlist_item (zlist_t *self);
-
 //  Return current item in the list. If the list is empty, or the cursor
 //  passed the end of the list, returns NULL. Does not change the cursor.
 CZMQ_EXPORT void *
