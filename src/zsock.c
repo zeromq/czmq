@@ -878,6 +878,7 @@ zsock_test (bool verbose)
     zchunk_t *chunk = zchunk_new ("HELLO", 5);
     zframe_t *frame = zframe_new ("WORLD", 5);
     zhash_t *hash = zhash_new ();
+    zhash_autofree (hash);
     zhash_insert (hash, "1", "value A");
     zhash_insert (hash, "2", "value B");
     char *original = "pointer";
@@ -939,7 +940,7 @@ zsock_test (bool verbose)
     //  Test zsock_recv with null arguments
     chunk = zchunk_new ("HELLO", 5);
     frame = zframe_new ("WORLD", 5);
-    zsock_send (writer, "insbcfph",
+    zsock_send (writer, "insbcfp",
                 -12345, "This is a string", "ABCDE", 5, chunk, frame, original);
     zframe_destroy (&frame);
     zchunk_destroy (&chunk);
