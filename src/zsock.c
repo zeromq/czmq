@@ -643,7 +643,7 @@ zsock_recv (void *self, const char *picture, ...)
             if (data_p) {
                 if (frame) {
                     *size = zframe_size (frame);
-                    *data_p = malloc (*size);
+                    *data_p = (byte *) malloc (*size);
                     memcpy (*data_p, zframe_data (frame), *size);
                 }
                 else {

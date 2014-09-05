@@ -437,7 +437,7 @@ zring_test (int verbose)
     rc = zring_delete (ring, three);
     assert (rc == 0);
     item = zring_detach (ring, NULL);
-    puts (item);
+    puts ((const char *) item);
 
     //  Destructor should be safe to call twice
     zring_destroy (&ring);
