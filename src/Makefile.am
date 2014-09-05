@@ -25,7 +25,7 @@ include_HEADERS = \
     ../include/zframe.h \
     ../include/zhash.h \
     ../include/zgossip.h \
-    ../include/zinterface.h \
+    ../include/ziflist.h \
     ../include/zlist.h \
     ../include/zloop.h \
     ../include/zmonitor.h \
@@ -39,7 +39,7 @@ include_HEADERS = \
     ../include/zstr.h \
     ../include/zsys.h \
     ../include/zuuid.h \
-    zgossip_msg.h \
+    ../src/zgossip_msg.h \
     ../include/zauth_v2.h \
     ../include/zctx.h \
     ../include/zmonitor_v2.h \
@@ -51,6 +51,8 @@ include_HEADERS = \
 
 libczmq_la_SOURCES = \
     platform.h \
+    zgossip_engine.inc \
+    zhash_primes.inc \
     zactor.c \
     zauth.c \
     zbeacon.c \
@@ -66,7 +68,7 @@ libczmq_la_SOURCES = \
     zframe.c \
     zhash.c \
     zgossip.c \
-    zinterface.c \
+    ziflist.c \
     zlist.c \
     zloop.c \
     zmonitor.c \

@@ -77,6 +77,14 @@ CZMQ_EXPORT zchunk_t *
 CZMQ_EXPORT zchunk_t *
     zchunk_dup (zchunk_t *self);
 
+//  Transform zchunk into a zframe that can be sent in a message.
+CZMQ_EXPORT zframe_t *
+    zchunk_pack (zchunk_t *self);
+
+//  Transform a zframe into a zchunk.
+CZMQ_EXPORT zchunk_t *
+    zchunk_unpack (zframe_t *frame);
+
 //  Dump chunk to FILE stream, for debugging and tracing.
 CZMQ_EXPORT void
     zchunk_fprint (zchunk_t *self, FILE *file);
@@ -107,41 +115,49 @@ EXAMPLE
 -------
 .From zchunk_test method
 ----
-    zchunk_t *chunk = zchunk_new ("1234567890", 10);
-    assert (chunk);
-    assert (zchunk_size (chunk) == 10);
-    assert (memcmp (zchunk_data (chunk), "1234567890", 10) == 0);
-    zchunk_destroy (&chunk);
+zchunk_t *chunk = zchunk_new ("1234567890", 10);
+assert (chunk);
+assert (zchunk_size (chunk) == 10);
+assert (memcmp (zchunk_data (chunk), "1234567890", 10) == 0);
+zchunk_destroy (&chunk);
 
-    chunk = zchunk_new (NULL, 10);
-    zchunk_append (chunk, "12345678", 8);
-    zchunk_append (chunk, "90ABCDEF", 8);
-    zchunk_append (chunk, "GHIJKLMN", 8);
-    assert (memcmp (zchunk_data (chunk), "1234567890", 10) == 0);
-    assert (zchunk_size (chunk) == 10);
-    
-    zchunk_t *copy = zchunk_dup (chunk);
-    assert (memcmp (zchunk_data (copy), "1234567890", 10) == 0);
-    assert (zchunk_size (copy) == 10);
-    zchunk_destroy (&copy);
-    zchunk_destroy (&chunk);
+chunk = zchunk_new (NULL, 10);
+zchunk_append (chunk, "12345678", 8);
+zchunk_append (chunk, "90ABCDEF", 8);
+zchunk_append (chunk, "GHIJKLMN", 8);
+assert (memcmp (zchunk_data (chunk), "1234567890", 10) == 0);
+assert (zchunk_size (chunk) == 10);
 
-    copy = zchunk_new ("1234567890abcdefghij", 20);
-    chunk = zchunk_new (NULL, 8);
-    zchunk_consume (chunk, copy);
-    assert (!zchunk_exhausted (copy));
-    assert (memcmp (zchunk_data (chunk), "12345678", 8) == 0);
-    zchunk_set (chunk, NULL, 0);
-    zchunk_consume (chunk, copy);
-    assert (!zchunk_exhausted (copy));
-    assert (memcmp (zchunk_data (chunk), "90abcdef", 8) == 0);
-    zchunk_set (chunk, NULL, 0);
-    zchunk_consume (chunk, copy);
-    assert (zchunk_exhausted (copy));
-    assert (zchunk_size (chunk) == 4);
-    assert (memcmp (zchunk_data (chunk), "ghij", 4) == 0);
-    zchunk_destroy (&copy);
-    zchunk_destroy (&chunk);
+zframe_t *frame = zchunk_pack (chunk);
+assert(frame);
+
+zchunk_t *chunk2 = zchunk_unpack (frame);
+assert (memcmp (zchunk_data (chunk2), "1234567890", 10) == 0);
+zframe_destroy(&frame);
+zchunk_destroy(&chunk2);
+
+zchunk_t *copy = zchunk_dup (chunk);
+assert (memcmp (zchunk_data (copy), "1234567890", 10) == 0);
+assert (zchunk_size (copy) == 10);
+zchunk_destroy (&copy);
+zchunk_destroy (&chunk);
+
+copy = zchunk_new ("1234567890abcdefghij", 20);
+chunk = zchunk_new (NULL, 8);
+zchunk_consume (chunk, copy);
+assert (!zchunk_exhausted (copy));
+assert (memcmp (zchunk_data (chunk), "12345678", 8) == 0);
+zchunk_set (chunk, NULL, 0);
+zchunk_consume (chunk, copy);
+assert (!zchunk_exhausted (copy));
+assert (memcmp (zchunk_data (chunk), "90abcdef", 8) == 0);
+zchunk_set (chunk, NULL, 0);
+zchunk_consume (chunk, copy);
+assert (zchunk_exhausted (copy));
+assert (zchunk_size (chunk) == 4);
+assert (memcmp (zchunk_data (chunk), "ghij", 4) == 0);
+zchunk_destroy (&copy);
+zchunk_destroy (&chunk);
 ----
 
 SEE ALSO

@@ -23,6 +23,7 @@
 */
 
 #include "../include/czmq.h"
+#define ZAP_ENDPOINT  "inproc://zeromq.zap.01"
 
 //  --------------------------------------------------------------------------
 //  The self_t structure holds the state for one actor instance
@@ -51,7 +52,7 @@ s_self_new (zsock_t *pipe)
     //  Create ZAP handler and get ready for requests
     self->handler = zsock_new (ZMQ_REP);
     assert (self->handler);
-    int rc = zsock_bind (self->handler, "inproc://zeromq.zap.01");
+    int rc = zsock_bind (self->handler, ZAP_ENDPOINT);
     assert (rc == 0);
     self->poller = zpoller_new (self->pipe, self->handler, NULL);
     return self;
@@ -67,7 +68,10 @@ s_self_destroy (self_t **self_p)
         zhash_destroy (&self->whitelist);
         zhash_destroy (&self->blacklist);
         zcertstore_destroy (&self->certstore);
+        zsock_unbind (self->handler, ZAP_ENDPOINT);
         zsock_destroy (&self->handler);
+        //  Workaround for https://github.com/zeromq/libzmq/issues/1169
+        zclock_sleep (100);
         zpoller_destroy (&self->poller);
         free (self);
         *self_p = NULL;

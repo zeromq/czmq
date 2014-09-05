@@ -37,7 +37,7 @@
 #define INITIAL_CHAIN    1    //  Initial chaining limit
 #define CHAIN_GROWS      1    //  Increase after splitting (chaining limit)
 
-#include "zhash_primes.h"
+#include "zhash_primes.inc"
 
 
 //  Hash item, used internally only
