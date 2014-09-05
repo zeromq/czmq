@@ -226,11 +226,11 @@ zring_detach (zring_t *self, void *item)
     node_t *found = NULL;
 
     //  Use item at cursor, if possible
-    if (self->cursor != self->head) {
-        if (item == NULL || self->cursor->item == item)
-            found = self->cursor;
-    }
-    else {
+    if (self->cursor != self->head
+    && (item == NULL || self->cursor->item == item))
+        found = self->cursor;
+    else
+    if (item) {
         //  Scan list for item, this is a O(N) operation
         node_t *node = self->head->next;
         while (node != self->head) {
@@ -267,12 +267,15 @@ zring_delete (zring_t *self, void *item)
 {
     assert (self);
     if ((item = zring_detach (self, item))) {
+        printf ("DELETE OK\n");
         if (self->destructor)
             (self->destructor) (&item);
         return 0;
     }
-    else
+    else {
+        printf ("DELETE NF\n");
         return -1;
+    }
 }
 
 
@@ -425,6 +428,16 @@ zring_test (int verbose)
     zring_set_destructor (dup, (czmq_destructor *) zstr_free);
     assert (zring_size (dup) == 5);
     zring_destroy (&dup);
+
+    puts ("--------------");
+    rc = zring_delete (ring, two);
+    assert (rc == 0);
+    rc = zring_delete (ring, five);
+    assert (rc == 0);
+    rc = zring_delete (ring, three);
+    assert (rc == 0);
+    item = zring_detach (ring, NULL);
+    puts (item);
 
     //  Destructor should be safe to call twice
     zring_destroy (&ring);
