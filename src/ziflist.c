@@ -38,10 +38,10 @@ struct _ziflist_t {
 static void
 s_store (ziflist_t *self, char *name, inaddr_t address, inaddr_t netmask, inaddr_t broadcast)
 {
-    zlist_append (self->names, name);
-    zlist_append (self->addresses, inet_ntoa (address.sin_addr));
-    zlist_append (self->netmasks, inet_ntoa (netmask.sin_addr));
-    zlist_append (self->broadcasts, inet_ntoa (broadcast.sin_addr));
+    zlist_append (self->names, strdup (name));
+    zlist_append (self->addresses, strdup (inet_ntoa (address.sin_addr)));
+    zlist_append (self->netmasks, strdup (inet_ntoa (netmask.sin_addr)));
+    zlist_append (self->broadcasts, strdup (inet_ntoa (broadcast.sin_addr)));
 }
 
 
@@ -54,15 +54,20 @@ ziflist_new (void)
     ziflist_t *self = (ziflist_t *) zmalloc (sizeof (struct _ziflist_t));
     if (self) {
         self->names = zlist_new ();
-        self->addresses = zlist_new ();
-        self->netmasks = zlist_new ();
-        self->broadcasts = zlist_new ();
-        
-        if (self->names && self->addresses && self->netmasks && self->broadcasts) {
-            zlist_autofree (self->names);
-            zlist_autofree (self->addresses);
-            zlist_autofree (self->netmasks);
-            zlist_autofree (self->broadcasts);
+        if (self->names) {
+            zlist_set_destructor (self->names, (czmq_destructor *) zstr_free);
+            self->addresses = zlist_new ();
+        }
+        if (self->addresses) {
+            zlist_set_destructor (self->addresses, (czmq_destructor *) zstr_free);
+            self->netmasks = zlist_new ();
+        }
+        if (self->netmasks) {
+            zlist_set_destructor (self->netmasks, (czmq_destructor *) zstr_free);
+            self->broadcasts = zlist_new ();
+        }
+        if (self->broadcasts) {
+            zlist_set_destructor (self->broadcasts, (czmq_destructor *) zstr_free);
             ziflist_reload (self);
         }
         else
@@ -101,9 +106,9 @@ s_valid_flags (short flags)
     return (flags & IFF_UP)             //  Only use interfaces that are running
        && !(flags & IFF_LOOPBACK)       //  Ignore loopback interface
        &&  (flags & IFF_BROADCAST)      //  Only use interfaces that have BROADCAST
-    #if defined(IFF_SLAVE)
+#   if defined (IFF_SLAVE)
        && !(flags & IFF_SLAVE)          //  Ignore devices that are bonding slaves.
-    #endif
+#   endif
        && !(flags & IFF_POINTOPOINT);   //  Ignore point to point interfaces.
 }
 #endif
@@ -115,15 +120,10 @@ s_valid_flags (short flags)
 void
 ziflist_reload (ziflist_t *self)
 {
-    //  Empty lists of any previous values
-    while (zlist_size (self->names))
-        zlist_remove (self->names, zlist_first (self->names));
-    while (zlist_size (self->addresses))
-        zlist_remove (self->addresses, zlist_first (self->addresses));
-    while (zlist_size (self->netmasks))
-        zlist_remove (self->netmasks, zlist_first (self->netmasks));
-    while (zlist_size (self->broadcasts))
-        zlist_remove (self->broadcasts, zlist_first (self->broadcasts));
+    zlist_purge (self->names);
+    zlist_purge (self->addresses);
+    zlist_purge (self->netmasks);
+    zlist_purge (self->broadcasts);
 
 #if defined (HAVE_GETIFADDRS)
     struct ifaddrs *interfaces;

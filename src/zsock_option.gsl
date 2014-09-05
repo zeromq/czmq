@@ -38,7 +38,7 @@ extern "C" {
 #   if (ZMQ_VERSION_MINOR == $(minor))
 .       endif
 .       if mode = "rw" | mode = "r"
-CZMQ_EXPORT $(ctype) zsock_$(name) (zsock_t *self);
+CZMQ_EXPORT $(ctype) zsock_$(name) (void *self);
 .       endif
 .       if defined (.minor)
 #   endif
@@ -51,9 +51,9 @@ CZMQ_EXPORT $(ctype) zsock_$(name) (zsock_t *self);
 #   if (ZMQ_VERSION_MINOR == $(minor))
 .       endif
 .       if mode = "rw" | mode = "w"
-CZMQ_EXPORT void zsock_set_$(name) (zsock_t *self, $(ctype_const) $(name));
+CZMQ_EXPORT void zsock_set_$(name) (void *self, $(ctype_const) $(name));
 .           if type = "key"
-CZMQ_EXPORT void zsock_set_$(name)_bin (zsock_t *self, const byte *$(name));
+CZMQ_EXPORT void zsock_set_$(name)_bin (void *self, const byte *$(name));
 .           endif
 .       endif
 .       if defined (.minor)
@@ -99,6 +99,8 @@ CZMQ_EXPORT void zsock_option_test (bool verbose);
 /*
 @header
     The zsock_option class provides access to the 0MQ getsockopt/setsockopt API.
+    All methods in this class take a void * "polymorphic" reference, which
+    can be either a zsock_t or a zactor_r reference, or a libzmq void *.
 @discuss
     This class is generated, using the GSL code generator. See the sockopts
     XML file, which provides the metadata, and the sock_option.gsl template,
@@ -107,7 +109,6 @@ CZMQ_EXPORT void zsock_option_test (bool verbose);
 */
 
 #include "../include/czmq.h"
-#include "platform.h"
 
 .for version
 #if (ZMQ_VERSION_MAJOR == $(major))
@@ -121,9 +122,9 @@ CZMQ_EXPORT void zsock_option_test (bool verbose);
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
-zsock_set_$(name) (zsock_t *self, $(ctype_const) $(name))
+zsock_set_$(name) (void *self, $(ctype_const) $(name))
 {
-    assert(self);
+    assert (self);
 .       if style = "macro"
 #   if defined (ZMQ_$(NAME))
 .       endif
@@ -175,7 +176,7 @@ zsock_set_$(name) (zsock_t *self, $(ctype_const) $(name))
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
-zsock_set_$(name)_bin (zsock_t *self, const byte *$(name))
+zsock_set_$(name)_bin (void *self, const byte *$(name))
 {
 .       if style = "macro"
 #   if defined (ZMQ_$(NAME))
@@ -196,9 +197,9 @@ zsock_set_$(name)_bin (zsock_t *self, const byte *$(name))
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 $(ctype) 
-zsock_$(name) (zsock_t *self)
+zsock_$(name) (void *self)
 {
-    assert(self);
+    assert (self);
 .           if style = "macro"
 #   if defined (ZMQ_$(NAME))
 .           endif
@@ -242,7 +243,6 @@ zsock_$(name) (zsock_t *self)
 #   endif
 .           endif
 }
-
 
 .       endif
 .       if defined (.minor)

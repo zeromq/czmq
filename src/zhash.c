@@ -47,6 +47,7 @@ typedef struct _item_t {
     struct _item_t *next;       //  Next item in the hash slot
     qbyte index;                //  Index of item in table
     char *key;                  //  Item's original key
+    //  Supporting deprecated v2 functionality
     zhash_free_fn *free_fn;     //  Value free function if any
 } item_t;
 
@@ -63,10 +64,14 @@ struct _zhash_t {
     uint cursor_index;          //  For first/next iteration
     item_t *cursor_item;        //  For first/next iteration
     char *cursor_key;           //  After first/next call, points to key
-    bool autofree;              //  If true, free values in destructor
     zlist_t *comments;          //  File comments, if any
     time_t modified;            //  Set during zhash_load
     char *filename;             //  Set during zhash_load
+    //  Function callbacks for duplicating and destroying items, if any
+    czmq_duplicator *duplicator;
+    czmq_destructor *destructor;
+    //  Supporting deprecated v2 functionality
+    bool autofree;              //  If true, free values in destructor
 };
 
 //  Local helper functions
@@ -146,6 +151,9 @@ s_item_destroy (zhash_t *self, item_t *item, bool hard)
     *prev_item = item->next;
     self->size--;
     if (hard) {
+        if (self->destructor)
+            (self->destructor) (&item->value);
+        else
         if (item->free_fn)
             (item->free_fn) (item->value);
         else
@@ -214,7 +222,7 @@ zhash_insert (zhash_t *self, const char *key, void *value)
     if (self->size >= limit * LOAD_FACTOR / 100) {
         //  Create new hash table
         uint new_prime_index = self->prime_index + GROWTH_FACTOR;
-        int rc = s_zhash_rehash(self, new_prime_index);
+        int rc = s_zhash_rehash (self, new_prime_index);
         if (rc != 0)
             return rc;
         self->chain_limit += CHAIN_GROWS;
@@ -293,7 +301,7 @@ s_item_lookup (zhash_t *self, const char *key)
     if (len > self->chain_limit) {
         //  Create new hash table
         uint new_prime_index = self->prime_index + GROWTH_FACTOR;
-        int rc = s_zhash_rehash(self, new_prime_index);
+        int rc = s_zhash_rehash (self, new_prime_index);
         assert (rc == 0);
         limit = primes [self->prime_index];
         self->cached_index = s_item_hash (key, limit);
@@ -423,51 +431,22 @@ zhash_size (zhash_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Make copy of hash table; if supplied table is null, returns null.
-//  Does not copy items themselves. Rebuilds new table so may be slow on
-//  very large tables. NOTE: only works with item values that are strings
-//  since there's no other way to know how to duplicate the item value.
-
-zhash_t *
-zhash_dup (zhash_t *self)
-{
-    if (!self)
-        return NULL;
-
-    zhash_t *copy = zhash_new ();
-    zhash_autofree (copy);
-    if (copy) {
-        uint index;
-        size_t limit = primes [self->prime_index];
-        for (index = 0; index < limit; index++) {
-            item_t *item = self->items [index];
-            while (item) {
-                zhash_insert (copy, item->key, item->value);
-                item = item->next;
-            }
-        }
-    }
-    return copy;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Return keys for items in table. If you remove items from this list you
-//  must free the key value yourself.
+//  Return a zlist_t containing the keys for the items in the table. It is
+//  safe to use this list after destroying the hash table or items in it.
 
 zlist_t *
 zhash_keys (zhash_t *self)
 {
     assert (self);
     zlist_t *keys = zlist_new ();
-    zlist_autofree (keys);
+    zlist_set_destructor (keys, (czmq_destructor *) zstr_free);
 
     uint index;
     size_t limit = primes [self->prime_index];
     for (index = 0; index < limit; index++) {
         item_t *item = self->items [index];
         while (item) {
-            zlist_append (keys, item->key);
+            zlist_append (keys, strdup (item->key));
             item = item->next;
         }
     }
@@ -676,17 +655,6 @@ zhash_refresh (zhash_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Set hash for automatic value destruction
-
-void
-zhash_autofree (zhash_t *self)
-{
-    assert (self);
-    self->autofree = true;
-}
-
-
-//  --------------------------------------------------------------------------
 //  Serialize hash table to a binary frame that can be sent in a message.
 //  The packed format is compatible with the 'dictionary' type defined in
 //  http://rfc.zeromq.org/spec:35/FILEMQ, and implemented by zproto:
@@ -801,13 +769,111 @@ zhash_unpack (zframe_t *frame)
     return self;
 }
 
-            
+
 //  --------------------------------------------------------------------------
+//  Make a copy of the list; items are duplicated if you set a duplicator
+//  for the list, otherwise not. Copying a null reference returns a null
+//  reference. Note that this method's behavior changed slightly for CZMQ
+//  v3.x. The old behavior is in zhash_dup_v2.
+
+zhash_t *
+zhash_dup (zhash_t *self)
+{
+    if (!self)
+        return NULL;
+
+    zhash_t *copy = zhash_new ();
+    if (copy) {
+        copy->destructor = self->destructor;
+        copy->duplicator = self->duplicator;
+        uint index;
+        size_t limit = primes [self->prime_index];
+        for (index = 0; index < limit; index++) {
+            item_t *item = self->items [index];
+            while (item) {
+                void *value = item->value;
+                if (self->duplicator)
+                    value = self->duplicator (value);
+                zhash_insert (copy, item->key, value);
+                item = item->next;
+            }
+        }
+    }
+    return copy;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set a user-defined deallocator for hash items; by default items are not
+//  freed when the hash is destroyed.
+
+void
+zhash_set_destructor (zhash_t *self, czmq_destructor destructor)
+{
+    assert (self);
+    self->destructor = destructor;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set a user-defined duplicator for hash items; by default items are not
+//  copied when the hash is duplicated.
+
+void
+zhash_set_duplicator (zhash_t *self, czmq_duplicator duplicator)
+{
+    assert (self);
+    self->duplicator = duplicator;
+}
+
+
+//  --------------------------------------------------------------------------
+//  DEPRECATED by zhash_dup
+//  Make copy of hash table; if supplied table is null, returns null.
+//  Does not copy items themselves. Rebuilds new table so may be slow on
+//  very large tables. NOTE: only works with item values that are strings
+//  since there's no other way to know how to duplicate the item value.
+
+zhash_t *
+zhash_dup_v2 (zhash_t *self)
+{
+    if (!self)
+        return NULL;
+
+    zhash_t *copy = zhash_new ();
+    zhash_autofree (copy);
+    if (copy) {
+        uint index;
+        size_t limit = primes [self->prime_index];
+        for (index = 0; index < limit; index++) {
+            item_t *item = self->items [index];
+            while (item) {
+                zhash_insert (copy, item->key, item->value);
+                item = item->next;
+            }
+        }
+    }
+    return copy;
+}
+
+
+//  --------------------------------------------------------------------------
+//  DEPRECATED as clumsy -- use set_destructor instead
+//  Set hash for automatic value destruction
+
+void
+zhash_autofree (zhash_t *self)
+{
+    assert (self);
+    self->autofree = true;
+}
+
+
+//  --------------------------------------------------------------------------
+//  DEPRECATED as clumsy -- use zhash_first/_next instead
 //  Apply function to each item in the hash table. Items are iterated in no
 //  defined order.  Stops if callback function returns non-zero and returns
 //  final return code from callback function (zero = success).
-//  NOTE: this is deprecated in favor of zhash_first/next since the callback
-//  design is clumsy and over-complex, and unnecessary.
 
 int
 zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument)

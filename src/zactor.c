@@ -260,9 +260,11 @@ echo_actor (zsock_t *pipe, void *args)
         if (!msg)
             break;              //  Interrupted
         char *command = zmsg_popstr (msg);
+        //  All actors must handle $TERM in this way
         if (streq (command, "$TERM")) 
             terminated = true;
         else
+        //  This is an example command for our test actor
         if (streq (command, "ECHO")) 
             zmsg_send (&msg, pipe);
         else {

@@ -32,7 +32,6 @@
 @end
 */
 
-#include "platform.h"
 #include "../include/czmq.h"
 
 //  Structure of our class
@@ -60,7 +59,8 @@ zcert_new (void)
 
     //  Initialize metadata, even if keys aren't working
     self->metadata = zhash_new ();
-    zhash_autofree (self->metadata);
+    zhash_set_destructor (self->metadata, (czmq_destructor *) zstr_free);
+    zhash_set_duplicator (self->metadata, (czmq_duplicator *) strdup);
     
 #if (ZMQ_VERSION_MAJOR == 4)
     if (zsys_has_curve ()) {
@@ -93,7 +93,9 @@ zcert_new_from (byte *public_key, byte *secret_key)
     assert (secret_key);
 
     self->metadata = zhash_new ();
-    zhash_autofree (self->metadata);
+    zhash_set_destructor (self->metadata, (czmq_destructor *) zstr_free);
+    zhash_set_duplicator (self->metadata, (czmq_duplicator *) strdup);
+    
     memcpy (self->public_key, public_key, 32);
     memcpy (self->secret_key, secret_key, 32);
     
@@ -180,7 +182,6 @@ zcert_set_meta (zcert_t *self, const char *name, const char *format, ...)
     char *value = zsys_vprintf (format, argptr);
     va_end (argptr);
     zhash_insert (self->metadata, name, value);
-    zstr_free (&value);
 }
 
 

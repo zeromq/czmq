@@ -15,8 +15,8 @@
 @header
     The zsock class wraps the libzmq socket handle (a void *) with a proper
     structure that follows the CLASS rules for construction and destruction.
-    CZMQ methods that accept a socket will accept either a zsock_t * or a
-    libzmq void *, and will detect the type at runtime.
+    Some zsock methods take a void * "polymorphic" reference, which can be
+    either a zsock_t or a zactor_r reference, or a libzmq void *.
 @discuss
 @end
 */
@@ -493,7 +493,7 @@ zsock_attach (zsock_t *self, const char *endpoints, bool serverish)
 
 
 //  --------------------------------------------------------------------------
-//  Returns socket type as printable constant string
+//  Returns socket type as printable constant string. 
 
 const char *
 zsock_type_str (zsock_t *self)
@@ -513,50 +513,209 @@ zsock_type_str (zsock_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Send a zmsg message to the socket, take ownership of the message
-//  and destroy when it has been sent.
+//  Send a 'picture' message to the socket (or actor). The picture is a
+//  string that defines the type of each frame. This makes it easy to send
+//  a complex multiframe message in one call. The picture can contain any
+//  of these characters, each corresponding to one or two arguments:
+//  
+//      i = int
+//      s = char *
+//      b = byte *, size_t (2 arguments)
+//      c = zchunk_t *
+//      f = zframe_t *
+//      p = void * (sends the pointer value, only meaningful over inproc)
+//      n = null, sends empty frame (0 arguments)
+//
+//  Note that b, c, and f are encoded the same way and the choice is offered
+//  as a convenience to the sender, which may or may not already have data
+//  in a zchunk or zframe. Does not change or take ownership of any arguments.
+//  Returns 0 if successful, -1 if sending failed for any reason.
 
 int
-zsock_send (zsock_t *self, zmsg_t **msg_p)
-{
-    return zmsg_send (msg_p, self);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Send data over a socket as a single message frame.
-//  Returns -1 on error, 0 on success
-
-int
-zsock_sendmem (zsock_t *self, const void *data, size_t size)
+zsock_send (void *self, const char *picture, ...)
 {
     assert (self);
-    assert (data);
+    assert (picture);
+
+    va_list argptr;
+    va_start (argptr, picture);
     zmsg_t *msg = zmsg_new ();
-    zmsg_addmem (msg, data, size);
+    while (*picture) {
+        if (*picture == 'i')
+            zmsg_addstrf (msg, "%d", va_arg (argptr, int));
+        else
+        if (*picture == 's')
+            zmsg_addstr (msg, va_arg (argptr, char *));
+        else
+        if (*picture == 'b') {
+            //  Note function arguments may be expanded in reverse order,
+            //  so we cannot use va_arg macro twice in a single call
+            byte *data = va_arg (argptr, byte *);
+            zmsg_addmem (msg, data, va_arg (argptr, size_t));
+        }
+        else
+        if (*picture == 'c') {
+            zchunk_t *chunk = va_arg (argptr, zchunk_t *);
+            assert (zchunk_is (chunk));
+            zmsg_addmem (msg, zchunk_data (chunk), zchunk_size (chunk));
+        }
+        else
+        if (*picture == 'f') {
+            zframe_t *frame = va_arg (argptr, zframe_t *);
+            assert (zframe_is (frame));
+            zmsg_addmem (msg, zframe_data (frame), zframe_size (frame));
+        }
+        else
+        if (*picture == 'p') {
+            void *pointer = va_arg (argptr, void *);
+            zmsg_addmem (msg, &pointer, sizeof (void *));
+        }
+        else
+        if (*picture == 'n')
+            zmsg_addmem (msg, NULL, 0);
+        else {
+            zsys_error ("zsock: invalid picture element '%c'", *picture);
+            assert (false);
+        }
+        picture++;
+    }
+    va_end (argptr);
     return zmsg_send (&msg, self);
 }
 
 
 //  --------------------------------------------------------------------------
-//  Receive a zmsg message from the socket. Returns NULL if the process was
-//  interrupted before the message could be received, or if a receive timeout
-//  expired.
+//  Receive a 'picture' message to the socket (or actor). See zsock_send for
+//  the format and meaning of the picture. Returns the picture elements into
+//  a series of pointers as provided by the caller:
+//
+//      i = int * (stores integer)
+//      s = char ** (allocates new string)
+//      b = byte **, size_t * (2 arguments) (allocates memory)
+//      c = zchunk_t ** (creates zchunk)
+//      f = zframe_t ** (creates zframe)
+//      p = void ** (stores pointer)
+//      n = null, asserts empty frame (0 arguments)
+//
+//  Note that zsock_recv creates the returned objects, and the caller must
+//  destroy them when finished with them. The supplied pointers do not need
+//  to be initialized. Returns 0 if successful, or -1 if it failed to recv
+//  a message, in which case the pointers are not modified. When message
+//  frames are truncated (a short message), sets return values to zero/null.
+//  If an argument pointer is NULL, does not store any value (skips it).
+//  An 'n' picture matches an empty frame; if the message does not match,
+//  the method will return -1.
 
-zmsg_t *
-zsock_recv (zsock_t *self)
+int
+zsock_recv (void *self, const char *picture, ...)
 {
-    return zmsg_recv (self);
+    assert (self);
+    assert (picture);
+    zmsg_t *msg = zmsg_recv (self);
+    if (!msg)
+        return -1;              //  Interrupted
+
+    int rc = 0;
+    va_list argptr;
+    va_start (argptr, picture);
+    while (*picture) {
+        if (*picture == 'i') {
+            char *string = zmsg_popstr (msg);
+            int *integer_p = va_arg (argptr, int *);
+            if (integer_p)
+                *integer_p = string? atoi (string): 0;
+            free (string);
+        }
+        else
+        if (*picture == 's') {
+            char *string = zmsg_popstr (msg);
+            char **string_p = va_arg (argptr, char **);
+            if (string_p)
+                *string_p = string;
+            else
+                free (string);
+        }
+        else
+        if (*picture == 'b') {
+            zframe_t *frame = zmsg_pop (msg);
+            byte **data_p = va_arg (argptr, byte **);
+            size_t *size = va_arg (argptr, size_t *);
+            if (data_p) {
+                if (frame) {
+                    *size = zframe_size (frame);
+                    *data_p = malloc (*size);
+                    memcpy (*data_p, zframe_data (frame), *size);
+                }
+                else {
+                    *data_p = NULL;
+                    *size = 0;
+                }
+            }
+            zframe_destroy (&frame);
+        }
+        else
+        if (*picture == 'c') {
+            zframe_t *frame = zmsg_pop (msg);
+            zchunk_t **chunk_p = va_arg (argptr, zchunk_t **);
+            if (chunk_p) {
+                if (frame)
+                    *chunk_p = zchunk_new (zframe_data (frame), zframe_size (frame));
+                else
+                    *chunk_p = NULL;
+            }
+            zframe_destroy (&frame);
+        }
+        else
+        if (*picture == 'f') {
+            zframe_t *frame = zmsg_pop (msg);
+            zframe_t **frame_p = va_arg (argptr, zframe_t **);
+            if (frame_p)
+                *frame_p = frame;
+            else
+                zframe_destroy (&frame);
+        }
+        else
+        if (*picture == 'p') {
+            zframe_t *frame = zmsg_pop (msg);
+            void **pointer_p = va_arg (argptr, void **);
+            if (pointer_p) {
+                if (frame) {
+                    if (zframe_size (frame) == sizeof (void *))
+                        *pointer_p = *((void **) zframe_data (frame));
+                    else
+                        rc = -1;
+                }
+                else
+                    *pointer_p = NULL;
+            }
+            zframe_destroy (&frame);
+        }
+        else
+        if (*picture == 'n') {
+            zframe_t *frame = zmsg_pop (msg);
+            if (frame && zframe_size (frame) != 0)
+                rc = -1;
+            zframe_destroy (&frame);
+        }
+        else {
+            zsys_error ("zsock: invalid picture element '%c'", *picture);
+            assert (false);
+        }
+        picture++;
+    }
+    va_end (argptr);
+    zmsg_destroy (&msg);
+    return rc;
 }
 
 
 //  --------------------------------------------------------------------------
 //  Set socket to use unbounded pipes (HWM=0); use this in cases when you are
 //  totally certain the message volume can fit in memory. This method works
-//  across all versions of ZeroMQ.
+//  across all versions of ZeroMQ. Takes a polymorphic socket reference.
 
 void
-zsock_set_unbounded (zsock_t *self)
+zsock_set_unbounded (void *self)
 {
 #if (ZMQ_VERSION_MAJOR == 2)
     zsock_set_hwm (self, 0);
@@ -572,7 +731,7 @@ zsock_set_unbounded (zsock_t *self)
 //  success/failure code (by convention, 0 means OK). Signals are encoded
 //  to be distinguishable from "normal" messages. Accepts a zock_t or a
 //  zactor_t argument, and returns 0 if successful, -1 if the signal could
-//  not be sent.
+//  not be sent. Takes a polymorphic socket reference.
 
 int
 zsock_signal (void *self, byte status)
@@ -589,6 +748,7 @@ zsock_signal (void *self, byte status)
 //  Wait on a signal. Use this to coordinate between threads, over pipe
 //  pairs. Blocks until the signal is received. Returns -1 on error, 0 or
 //  greater on success. Accepts a zsock_t or a zactor_t as argument.
+//  Takes a polymorphic socket reference.
 
 int
 zsock_wait (void *self)
@@ -619,6 +779,7 @@ zsock_wait (void *self)
 
 //  --------------------------------------------------------------------------
 //  Probe the supplied object, and report if it looks like a zsock_t.
+//  Takes a polymorphic socket reference.
 
 bool
 zsock_is (void *self)
@@ -629,10 +790,10 @@ zsock_is (void *self)
 
 
 //  --------------------------------------------------------------------------
-//  Probe the supplied reference, which can be to a zsock_t, a zactor_t, or
-//  a libzmq void * socket reference. In all of these cases, returns the
-//  libzmq socket handle. If you pass any other reference, returns the same
-//  value.
+//  Probe the supplied reference. If it looks like a zsock_t instance,
+//  return the underlying libzmq socket handle; else if it looks like
+//  a libzmq socket handle, return the supplied value. Takes a
+//  polymorphic socket reference.
 
 void *
 zsock_resolve (void *self)
@@ -655,6 +816,8 @@ void
 zsock_test (bool verbose)
 {
     printf (" * zsock: ");
+    if (verbose)
+        printf ("\n");
 
     //  @selftest
     zsock_t *writer = zsock_new_push ("@tcp://127.0.0.1:5560");
@@ -685,13 +848,79 @@ zsock_test (bool verbose)
     assert (streq (zsock_type_str (reader), "PULL"));
 
     zstr_send (writer, "Hello, World");
-    zmsg_t *msg = zsock_recv (reader);
+    zmsg_t *msg = zmsg_recv (reader);
     assert (msg);
     char *string = zmsg_popstr (msg);
     assert (streq (string, "Hello, World"));
     free (string);
     zmsg_destroy (&msg);
 
+    //  Test zsock_send/recv pictures
+    zchunk_t *chunk = zchunk_new ("HELLO", 5);
+    zframe_t *frame = zframe_new ("WORLD", 5);
+    char *original = "pointer";
+
+    //  We can send signed integers, strings, blocks of memory, chunks,
+    //  frames, and pointers
+    zsock_send (writer, "insbcfp",
+                -12345, "This is a string", "ABCDE", 5, chunk, frame, original);
+    msg = zmsg_recv (reader);
+    assert (msg);
+    if (verbose)
+        zmsg_print (msg);
+    zmsg_destroy (&msg);
+
+    //  Test zsock_recv into each supported type
+    zsock_send (writer, "insbcfp",
+                -12345, "This is a string", "ABCDE", 5, chunk, frame, original);
+    zframe_destroy (&frame);
+    zchunk_destroy (&chunk);
+    int integer;
+    byte *data;
+    size_t size;
+    char *pointer;
+    rc = zsock_recv (reader, "insbcfp", &integer, &string, &data, &size, &chunk, &frame, &pointer);
+    assert (rc == 0);
+    assert (integer == -12345);
+    assert (streq (string, "This is a string"));
+    assert (memcmp (data, "ABCDE", 5) == 0);
+    assert (size == 5);
+    assert (memcmp (zchunk_data (chunk), "HELLO", 5) == 0);
+    assert (zchunk_size (chunk) == 5);
+    assert (memcmp (zframe_data (frame), "WORLD", 5) == 0);
+    assert (zframe_size (frame) == 5);
+    assert (original == pointer);
+    free (string);
+    free (data);
+    zframe_destroy (&frame);
+    zchunk_destroy (&chunk);
+
+    //  Test zsock_recv of short message; this lets us return a failure
+    //  with a status code and then nothing else; the receiver will get
+    //  the status code and NULL/zero for all other values
+    zsock_send (writer, "i", -1);
+    zsock_recv (reader, "insbcfp", &integer, &string, &data, &size, &chunk, &frame, &pointer);
+    assert (integer == -1);
+    assert (string == NULL);
+    assert (data == NULL);
+    assert (size == 0);
+    assert (chunk == NULL);
+    assert (frame == NULL);
+    assert (pointer == NULL);
+    
+    //  Test zsock_recv with null arguments
+    chunk = zchunk_new ("HELLO", 5);
+    frame = zframe_new ("WORLD", 5);
+    zsock_send (writer, "insbcfp",
+                -12345, "This is a string", "ABCDE", 5, chunk, frame, original);
+    zframe_destroy (&frame);
+    zchunk_destroy (&chunk);
+    zsock_recv (reader, "insbcfp", &integer, NULL, NULL, NULL, &chunk, NULL, NULL);
+    assert (integer == -12345);
+    assert (memcmp (zchunk_data (chunk), "HELLO", 5) == 0);
+    assert (zchunk_size (chunk) == 5);
+    zchunk_destroy (&chunk);
+    
     //  Test binding to ephemeral ports, sequential and random
     int port = zsock_bind (writer, "tcp://127.0.0.1:*");
     assert (port >= DYNAMIC_FIRST && port <= DYNAMIC_LAST);
