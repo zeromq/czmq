@@ -300,6 +300,7 @@ zlist_purge (zlist_t *self)
         node = next;
     }
     self->head = self->tail = self->cursor = NULL;
+    self->size = 0;
 }
 
 
