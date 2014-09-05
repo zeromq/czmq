@@ -29,7 +29,6 @@
 @end
 */
 
-#include "platform.h"
 #include "../include/czmq.h"
 
 //  Structure of our class

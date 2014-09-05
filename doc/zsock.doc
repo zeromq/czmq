@@ -2,8 +2,8 @@
 
 The zsock class wraps the libzmq socket handle (a void *) with a proper
 structure that follows the CLASS rules for construction and destruction.
-CZMQ methods that accept a socket will accept either a zsock_t * or a
-libzmq void *, and will detect the type at runtime.
+Some zsock methods take a void * "polymorphic" reference, which can be
+either a zsock_t or a zactor_r reference, or a libzmq void *.
 
 
 This is the class interface:
@@ -164,49 +164,75 @@ This is the class interface:
     CZMQ_EXPORT const char *
         zsock_type_str (zsock_t *self);
     
-    //  Send a zmsg message to the socket, take ownership of the message
-    //  and destroy when it has been sent.
+    //  Send a 'picture' message to the socket (or actor). The picture is a
+    //  string that defines the type of each frame. This makes it easy to send
+    //  a complex multiframe message in one call. The picture can contain any
+    //  of these characters, each corresponding to one or two arguments:
+    //
+    //      i = int
+    //      s = char *
+    //      b = byte *, size_t (2 arguments)
+    //      c = zchunk_t *
+    //      f = zframe_t *
+    //      p = void * (sends the pointer value, only meaningful over inproc)
+    //
+    //  Note that b, c, and f are encoded the same way and the choice is offered
+    //  as a convenience to the sender, which may or may not already have data
+    //  in a zchunk or zframe. Does not change or take ownership of any arguments.
+    //  Returns 0 if successful, -1 if sending failed for any reason.
     CZMQ_EXPORT int
-        zsock_send (zsock_t *self, zmsg_t **msg_p);
+        zsock_send (void *self, const char *picture, ...);
     
-    //  Send data over a socket as a single message frame.
-    //  Returns -1 on error, 0 on success
+    //  Receive a 'picture' message to the socket (or actor). See zsock_send for
+    //  the format and meaning of the picture. Returns the picture elements into
+    //  a series of pointers as provided by the caller:
+    //
+    //      i = int * (stores integer)
+    //      s = char ** (allocates new string)
+    //      b = byte **, size_t * (2 arguments) (allocates memory)
+    //      c = zchunk_t ** (creates zchunk)
+    //      f = zframe_t ** (creates zframe)
+    //      p = void ** (stores pointer)
+    //
+    //  Note that zsock_recv creates the returned objects, and the caller must
+    //  destroy them when finished with them. The supplied pointers do not need
+    //  to be initialized. Returns 0 if successful, or -1 if it failed to recv
+    //  a message, in which case the pointers are not modified. When message
+    //  frames are truncated (a short message), sets return values to zero/null.
+    //  If an argument pointer is NULL, does not store any value (skips it).
     CZMQ_EXPORT int
-        zsock_sendmem (zsock_t *self, const void *data, size_t size);
-    
-    //  Receive a zmsg message from the socket. Returns NULL if the process was
-    //  interrupted before the message could be received, or if a receive timeout
-    //  expired.
-    CZMQ_EXPORT zmsg_t *
-        zsock_recv (zsock_t *self);
+        zsock_recv (void *self, const char *picture, ...);
     
     //  Set socket to use unbounded pipes (HWM=0); use this in cases when you are
     //  totally certain the message volume can fit in memory. This method works
-    //  across all versions of ZeroMQ.
+    //  across all versions of ZeroMQ. Takes a polymorphic socket reference.
     CZMQ_EXPORT void
-        zsock_set_unbounded (zsock_t *self);
+        zsock_set_unbounded (void *self);
     
     //  Send a signal over a socket. A signal is a short message carrying a
     //  success/failure code (by convention, 0 means OK). Signals are encoded
     //  to be distinguishable from "normal" messages. Accepts a zock_t or a
     //  zactor_t argument, and returns 0 if successful, -1 if the signal could
-    //  not be sent.
+    //  not be sent. Takes a polymorphic socket reference.
     CZMQ_EXPORT int
         zsock_signal (void *self, byte status);
         
     //  Wait on a signal. Use this to coordinate between threads, over pipe
     //  pairs. Blocks until the signal is received. Returns -1 on error, 0 or
     //  greater on success. Accepts a zsock_t or a zactor_t as argument.
+    //  Takes a polymorphic socket reference.
     CZMQ_EXPORT int
         zsock_wait (void *self);
     
     //  Probe the supplied object, and report if it looks like a zsock_t.
+    //  Takes a polymorphic socket reference.
     CZMQ_EXPORT bool
         zsock_is (void *self);
     
     //  Probe the supplied reference. If it looks like a zsock_t instance,
     //  return the underlying libzmq socket handle; else if it looks like
-    //  a libzmq socket handle, return the supplied value.
+    //  a libzmq socket handle, return the supplied value. Takes a
+    //  polymorphic socket reference.
     CZMQ_EXPORT void *
         zsock_resolve (void *self);
     

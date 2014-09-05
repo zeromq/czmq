@@ -305,8 +305,8 @@ zchunk_dup (zchunk_t *self)
 zframe_t *
 zchunk_pack (zchunk_t *self)
 {
-    assert(self);
-    assert(zchunk_is(self));
+    assert (self);
+    assert (zchunk_is (self));
 
     return zframe_new (self->data, self->max_size);
 }
@@ -317,10 +317,10 @@ zchunk_pack (zchunk_t *self)
 zchunk_t *
 zchunk_unpack (zframe_t *frame)
 {
-    assert(frame);
-    assert(zframe_is(frame));
+    assert (frame);
+    assert (zframe_is (frame));
 
-    return zchunk_new (zframe_data (frame), zframe_size (frame) );
+    return zchunk_new (zframe_data (frame), zframe_size (frame));
 }
 
 
@@ -415,12 +415,12 @@ zchunk_test (bool verbose)
     assert (zchunk_size (chunk) == 10);
 
     zframe_t *frame = zchunk_pack (chunk);
-    assert(frame);
+    assert (frame);
 
     zchunk_t *chunk2 = zchunk_unpack (frame);
     assert (memcmp (zchunk_data (chunk2), "1234567890", 10) == 0);
-    zframe_destroy(&frame);
-    zchunk_destroy(&chunk2);
+    zframe_destroy (&frame);
+    zchunk_destroy (&chunk2);
 
     zchunk_t *copy = zchunk_dup (chunk);
     assert (memcmp (zchunk_data (copy), "1234567890", 10) == 0);

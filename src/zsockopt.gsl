@@ -107,7 +107,6 @@ CZMQ_EXPORT void zsockopt_test (bool verbose);
 */
 
 #include "../include/czmq.h"
-#include "platform.h"
 
 .for version
 #if (ZMQ_VERSION_MAJOR == $(major))
@@ -261,7 +260,7 @@ $(string.trim(.):)
 void
 zsockopt_test (bool verbose)
 {
-    printf (" * zsockopt: ");
+    printf (" * zsockopt (deprecated): ");
 
     //  @selftest
     zctx_t *ctx = zctx_new ();

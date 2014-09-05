@@ -47,6 +47,7 @@
 
     <!-- Deprecated V2 API, remove some time after 3.0 stability -->
     <class name = "zauth_v2" />
+    <class name = "zbeacon_v2" />
     <class name = "zctx" />
     <class name = "zmonitor_v2" />
     <class name = "zmutex" />
