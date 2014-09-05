@@ -59,7 +59,6 @@ CZMQ_EXPORT int
 
 //  Append an item to the end of the list, return 0 if OK, else -1.
 //  Leaves cursor at newly inserted item.
->>>>>>> upstream/master
 CZMQ_EXPORT int
     zlist_append (zlist_t *self, void *item);
 
