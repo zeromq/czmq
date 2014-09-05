@@ -158,6 +158,7 @@ zlist_item (zlist_t *self)
 
 //  --------------------------------------------------------------------------
 //  Prepend an item to the start of the list, return 0 if OK, else -1.
+//  Leaves cursor at newly inserted item.
 
 int
 zlist_prepend (zlist_t *self, void *item)
@@ -178,13 +179,14 @@ zlist_prepend (zlist_t *self, void *item)
         self->tail = node;
 
     self->size++;
-    self->cursor = NULL;
+    self->cursor = node;
     return 0;
 }
 
 
 //  --------------------------------------------------------------------------
 //  Append an item to the end of the list, return 0 if OK, else -1.
+//  Leaves cursor at newly inserted item.
 
 int
 zlist_append (zlist_t *self, void *item)
@@ -210,7 +212,7 @@ zlist_append (zlist_t *self, void *item)
     node->next = NULL;
 
     self->size++;
-    self->cursor = NULL;
+    self->cursor = node;
     return 0;
 }
 
@@ -278,6 +280,27 @@ zlist_delete (zlist_t *self, void *item)
         prev = node;
     }
     return -1;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Delete all items from the list. If the item destructor is set, calls it
+//  on every item.
+
+void
+zlist_purge (zlist_t *self)
+{
+    assert (self);
+    node_t *node = self->head;
+    while (node) {
+        node_t *next = node->next;
+        if (self->destructor)
+            (self->destructor) (&node->item);
+        free (node);
+        node = next;
+    }
+    self->head = self->tail = self->cursor = NULL;
+    self->size = 0;
 }
 
 
@@ -591,12 +614,14 @@ zlist_test (int verbose)
 
     zlist_append (list, cheese);
     assert (zlist_size (list) == 1);
+    assert (zlist_item (list) == cheese);
     zlist_append (list, bread);
     assert (zlist_size (list) == 2);
+    assert (zlist_item (list) == bread);
     zlist_append (list, wine);
     assert (zlist_size (list) == 3);
-
-    assert (zlist_next (list) == cheese);
+    assert (zlist_item (list) == wine);
+    
     assert (zlist_first (list) == cheese);
     assert (zlist_next (list) == bread);
     assert (zlist_first (list) == cheese);
@@ -607,53 +632,32 @@ zlist_test (int verbose)
     assert (zlist_next (list) == cheese);
     assert (zlist_size (list) == 3);
 
-    zlist_delete (list, wine);
-    assert (zlist_size (list) == 2);
+    char *item;
+    //  Test delete and detach
+//     char *item = (void *) zlist_detach (list, NULL);
+//     assert (item == cheese);
+//     item = (void *) zlist_detach (list, NULL);
+//     assert (item == bread);
+//     item = (void *) zlist_detach (list, NULL);
+//     assert (item == wine);
+    
+//     void zlist_delete (list, wine);
+//     assert (zlist_size (list) == 2);
+//     assert (zlist_first (list) == cheese);
+//     zlist_delete (list, cheese);
+//     assert (zlist_size (list) == 1);
+//     assert (zlist_first (list) == bread);
+//     zlist_delete (list, NULL);
+//     assert (zlist_size (list) == 0);
 
-    assert (zlist_first (list) == cheese);
-    zlist_delete (list, cheese);
-    assert (zlist_size (list) == 1);
-    assert (zlist_first (list) == bread);
-
-    zlist_delete (list, bread);
-    assert (zlist_size (list) == 0);
-
-    zlist_append (list, cheese);
-    zlist_append (list, bread);
-    assert (zlist_last (list) == bread);
-    zlist_delete (list, bread);
-    assert (zlist_last (list) == cheese);
-    zlist_delete (list, cheese);
-    assert (zlist_last (list) == NULL);
-
-    zlist_prepend (list, cheese);
-    assert (zlist_size (list) == 1);
-    assert (zlist_first (list) == cheese);
-
-    zlist_prepend (list, bread);
-    assert (zlist_size (list) == 2);
-    assert (zlist_first (list) == bread);
-    assert (zlist_item (list) == bread);
-
-    zlist_append (list, wine);
-    assert (zlist_size (list) == 3);
-    assert (zlist_first (list) == bread);
+    
+    zlist_sort (list, s_compare);
 
     zlist_t *sub_list = zlist_dup (list);
     assert (sub_list);
     assert (zlist_size (sub_list) == 3);
 
-    zlist_sort (list, s_compare);
-    char *item;
-    item = (char *) zlist_pop (list);
-    assert (item == bread);
-    item = (char *) zlist_pop (list);
-    assert (item == wine);
-    item = (char *) zlist_pop (list);
-    assert (item == cheese);
-    assert (zlist_size (list) == 0);
-
-    assert (zlist_size (sub_list) == 3);
+    zlist_purge (list);
     zlist_prepend (list, sub_list);
     zlist_t *sub_list_2 = zlist_dup (sub_list);
     zlist_append (list, sub_list_2);
@@ -672,8 +676,6 @@ zlist_test (int verbose)
     zlist_append (list, wine);
 
     assert (zlist_head (list) == cheese);
-    assert (zlist_next (list) == cheese);
-
     assert (zlist_first (list) == cheese);
     assert (zlist_tail (list) == wine);
     assert (zlist_next (list) == bread);
