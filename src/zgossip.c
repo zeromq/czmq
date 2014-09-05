@@ -57,7 +57,7 @@
     Each node provides a ROUTER socket that accepts client connections on an
     key defined by the application via a BIND command. The state machine
     for these connections is in zgossip.xml, and the generated code is in
-    zgossip_engine.h.
+    zgossip_engine.inc.
 
     Each node additionally creates outbound connections via DEALER sockets
     to a set of servers ("remotes"), and under control of the calling app,
@@ -156,7 +156,7 @@ remote_handler (zloop_t *loop, zsock_t *remote, void *argument);
 //  ---------------------------------------------------------------------
 //  Include the generated server engine
 
-#include "zgossip_engine.h"
+#include "zgossip_engine.inc"
 
 //  Allocate properties and structures for a new server instance.
 //  Return 0 if OK, or -1 if there was an error.

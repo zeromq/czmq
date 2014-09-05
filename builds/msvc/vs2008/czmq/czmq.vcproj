@@ -678,7 +678,7 @@
           <Tool Name="VCCLCompilerTool" CompileAs="2" />
         </FileConfiguration>
       </File>
-      <File RelativePath="..\..\..\..\src\zinterface.c">
+      <File RelativePath="..\..\..\..\src\ziflist.c">
         <FileConfiguration Name="Release|Win32">
           <Tool Name="VCCLCompilerTool" CompileAs="2" />
         </FileConfiguration>
@@ -1417,8 +1417,6 @@
     </Filter>
     <Filter Name="Header Files">
       <File RelativePath="..\..\..\..\builds\msvc\platform.h" />
-      <File RelativePath="..\..\..\..\include\czmq.h" />
-      <File RelativePath="..\..\..\..\include\czmq_prelude.h" />
       <File RelativePath="..\..\..\..\include\zactor.h" />
       <File RelativePath="..\..\..\..\include\zauth.h" />
       <File RelativePath="..\..\..\..\include\zbeacon.h" />
@@ -1434,7 +1432,7 @@
       <File RelativePath="..\..\..\..\include\zframe.h" />
       <File RelativePath="..\..\..\..\include\zhash.h" />
       <File RelativePath="..\..\..\..\include\zgossip.h" />
-      <File RelativePath="..\..\..\..\include\zinterface.h" />
+      <File RelativePath="..\..\..\..\include\ziflist.h" />
       <File RelativePath="..\..\..\..\include\zlist.h" />
       <File RelativePath="..\..\..\..\include\zloop.h" />
       <File RelativePath="..\..\..\..\include\zmonitor.h" />
@@ -1448,7 +1446,7 @@
       <File RelativePath="..\..\..\..\include\zstr.h" />
       <File RelativePath="..\..\..\..\include\zsys.h" />
       <File RelativePath="..\..\..\..\include\zuuid.h" />
-      <File RelativePath="..\..\..\..\include\zgossip_msg.h" />
+      <File RelativePath="..\..\..\..\src\zgossip_msg.h" />
       <File RelativePath="..\..\..\..\include\zauth_v2.h" />
       <File RelativePath="..\..\..\..\include\zctx.h" />
       <File RelativePath="..\..\..\..\include\zmonitor_v2.h" />
@@ -1457,6 +1455,10 @@
       <File RelativePath="..\..\..\..\include\zsocket.h" />
       <File RelativePath="..\..\..\..\include\zsockopt.h" />
       <File RelativePath="..\..\..\..\include\zthread.h" />
+      <File RelativePath="..\..\..\..\include\czmq.h" />
+      <File RelativePath="..\..\..\..\include\czmq_prelude.h" />
+      <File RelativePath="..\..\..\..\src\zgossip_engine.inc" />
+      <File RelativePath="..\..\..\..\src\zhash_primes.inc" />
     </Filter>
   </Files>
   <Globals />

@@ -15,8 +15,8 @@
 
 CZMQ has these goals:
 
-* To wrap the 0MQ core API in semantics that are natural and lead to shorter, more readable applications.
-* To hide the differences between versions of 0MQ, particularly 2.x and 3.x.
+* To wrap the 0MQ core API in semantics that lead to shorter, more readable applications.
+* To hide as far as possible the differences between different versions of 0MQ (2.x, 3.x, 4.x).
 * To provide a space for development of more sophisticated API semantics.
 * To wrap the 0MQ security features with high-level tools and APIs.
 * To become the basis for other language bindings built on top of CZMQ.
@@ -124,311 +124,213 @@ This is a list of known higher-level wrappers around CZMQ:
 * https://github.com/gar1t/erlang-czmq - Erlang
 * https://github.com/mtortonesi/ruby-czmq-ffi - Ruby FFI
 
-### API Summary (Alphabetical Order)
-
-#### zactor - simple actor framework
-
-.pull src/zactor.c@header,left
-
-This is the class interface:
-
-.pull include/zactor.h@interface,code
-
-.pull src/zactor.c@discuss,left
-
-#### zauth - authentication for ZeroMQ security mechanisms
-
-.pull src/zauth.c@header,left
-
-This is the class interface:
-
-.pull include/zauth.h@interface,code
-
-.pull src/zauth.c@discuss,left
-
-#### zbeacon - LAN service announcement and discovery
-
-.pull src/zbeacon.c@header,left
-
-This is the class interface:
-
-.pull include/zbeacon.h@interface,code
-
-.pull src/zbeacon.c@discuss,left
-
-#### zcert - work with CURVE security certificates
-
-.pull src/zcert.c@header,left
-
-This is the class interface:
-
-.pull include/zcert.h@interface,code
-
-.pull src/zcert.c@discuss,left
-
-#### zcertstore - work with CURVE security certificate stores
-
-.pull src/zcertstore.c@header,left
-
-This is the class interface:
-
-.pull include/zcertstore.h@interface,code
-
-.pull src/zcertstore.c@discuss,left
-
-#### zchunk - work with memory chunks
-
-.pull src/zchunk.c@header,left
-
-This is the class interface:
-
-.pull include/zchunk.h@interface,code
-
-.pull src/zchunk.c@discuss,left
-
-#### zclock - millisecond clocks and delays
-
-.pull src/zclock.c@header,left
-
-This is the class interface:
-
-.pull include/zclock.h@interface,code
-
-.pull src/zclock.c@discuss,left
-
-#### zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.
-
-.pull src/zconfig.c@header,left
-
-This is the class interface:
-
-.pull include/zconfig.h@interface,code
-
-.pull src/zconfig.c@discuss,left
-
-#### zctx - working with 0MQ contexts
-
-.pull src/zctx.c@header,left
-
-This is the class interface:
-
-.pull include/zctx.h@interface,code
-
-.pull src/zctx.c@discuss,left
-
-#### zdir - work with file-system directories
-
-.pull src/zdir.c@header,left
-
-This is the class interface:
-
-.pull include/zdir.h@interface,code
-
-.pull src/zdir.c@discuss,left
-
-#### zfile - work with files
-
-.pull src/zfile.c@header,left
-
-This is the class interface:
-
-.pull include/zfile.h@interface,code
-
-.pull src/zfile.c@discuss,left
-
-#### zframe - working with single message frames
-
-.pull src/zframe.c@header,left
-
-This is the class interface:
-
-.pull include/zframe.h@interface,code
-
-.pull src/zframe.c@discuss,left
-
-####  zgossip - decentralized configuration management
-
-.pull src/zgossip.c@header,left
-
-This is the class interface:
-
-.pull include/zgossip.h@interface,code
-
-.pull src/zgossip.c@discuss,left
-
-#### zhash - generic hash table container
-
-.pull src/zhash.c@header,left
-
-This is the class interface:
-
-.pull include/zhash.h@interface,code
-
-.pull src/zhash.c@discuss,left
-
-#### zlist - generic list container
-
-.pull src/zlist.c@header,left
-
-This is the class interface:
-
-.pull include/zlist.h@interface,code
-
-.pull src/zlist.c@discuss,left
-
-#### zdlist - generic doubly linked list container
-
-.pull src/zdlist.c@header,left
-
-This is the class interface:
-
-.pull include/zdlist.h@interface,code
-
-.pull src/zdlist.c@discuss,left
-
-#### zloop - event-driven reactor
-
-.pull src/zloop.c@header,left
-
-This is the class interface:
-
-.pull include/zloop.h@interface,code
-
-.pull src/zloop.c@discuss,left
-
-#### zmonitor - socket event monitor
-
-.pull src/zmonitor.c@header,left
-
-This is the class interface:
-
-.pull include/zmonitor.h@interface,code
-
-.pull src/zmonitor.c@discuss,left
-
-#### zmsg - working with multipart messages
-
-.pull src/zmsg.c@header,left
-
-This is the class interface:
-
-.pull include/zmsg.h@interface,code
-
-.pull src/zmsg.c@discuss,left
-
-#### zmutex - wrap lightweight mutexes
-
-.pull src/zmutex.c@header,left
-
-This is the class interface:
-
-.pull include/zmutex.h@interface,code
-
-.pull src/zmutex.c@discuss,left
-
-#### zpoller - trivial socket poller class
-
-.pull src/zpoller.c@header,left
-
-This is the class interface:
-
-.pull include/zpoller.h@interface,code
-
-.pull src/zpoller.c@discuss,left
-
-#### zproxy - convenient zmq_proxy API
-
-.pull src/zproxy.c@header,left
-
-This is the class interface:
-
-.pull include/zproxy.h@interface,code
-
-.pull src/zproxy.c@discuss,left
-
-#### zsocket - working with 0MQ sockets
-
-.pull src/zsocket.c@header,left
-
-This is the class interface:
-
-.pull include/zsocket.h@interface,code
-
-.pull src/zsocket.c@discuss,left
-
-#### zsockopt - working with 0MQ socket options
-
-.pull src/zsockopt.c@header,left
-
-This is the class interface:
-
-.pull include/zsockopt.h@interface,code
-
-.pull src/zsockopt.c@discuss,left
-
-#### zstr - sending and receiving strings
-
-.pull src/zstr.c@header,left
-
-[diagram]
-
-           Memory                       Wire
-           +-------------+---+          +---+-------------+
-    Send   | S t r i n g | 0 |  ---->   | 6 | S t r i n g |
-           +-------------+---+          +---+-------------+
-
-           Wire                         Heap
-           +---+-------------+          +-------------+---+
-    Recv   | 6 | S t r i n g |  ---->   | S t r i n g | 0 |
-           +---+-------------+          +-------------+---+
-
-[/diagram]
-
-This is the class interface:
-
-.pull include/zstr.h@interface,code
-
-.pull src/zstr.c@discuss,left
-
-#### zsys - system-level methods
-
-.pull src/zsys.c@header,left
-
-This is the class interface:
-
-.pull include/zsys.h@interface,code
-
-.pull src/zsys.c@discuss,left
-
-#### zrex - working with regular expressions
-
-.pull src/zrex.c@header,left
-
-This is the class interface:
-
-.pull include/zrex.h@interface,code
-
-.pull src/zrex.c@discuss,left
-
-#### zthread - working with system threads
-
-.pull src/zthread.c@header,left
-
-This is the class interface:
-
-.pull include/zthread.h@interface,code
-
-.pull src/zthread.c@discuss,left
-
-#### zuuid - UUID management
-
-.pull src/zuuid.c@header,left
-
-This is the class interface:
-
-.pull include/zuuid.h@interface,code
-
-.pull src/zuuid.c@discuss,left
+### API v3 Summary
+
+This is the API provided by CZMQ v3.x, in alphabetical order.
+
+.pull doc/zactor.doc
+.pull doc/zauth.doc
+.pull doc/zbeacon.doc
+.pull doc/zcert.doc
+.pull doc/zcertstore.doc
+.pull doc/zchunk.doc
+.pull doc/zclock.doc
+.pull doc/zconfig.doc
+.pull doc/zdigest.doc
+.pull doc/zdir.doc
+.pull doc/zdir_patch.doc
+.pull doc/zfile.doc
+.pull doc/zframe.doc
+.pull doc/zgossip.doc
+.pull doc/zhash.doc
+.pull doc/ziflist.doc
+.pull doc/zlist.doc
+.pull doc/zloop.doc
+.pull doc/zmonitor.doc
+.pull doc/zmsg.doc
+.pull doc/zpoller.doc
+.pull doc/zproxy.doc
+.pull doc/zrex.doc
+.pull doc/zring.doc
+.pull doc/zsock.doc
+.pull doc/zsock_option.doc
+.pull doc/zstr.doc
+.pull doc/zsys.doc
+.pull doc/zuuid.doc
+
+### API v2 Summary
+
+This is the deprecated API provided by CZMQ v2.x, in alphabetical order.
+
+.pull doc/zauth_v2.doc
+.pull doc/zctx.doc
+.pull doc/zmonitor_v2.doc
+.pull doc/zmutex.doc
+.pull doc/zproxy_v2.doc
+.pull doc/zsocket.doc
+.pull doc/zsockopt.doc
+.pull doc/zthread.doc
+
+## Error Handling
+
+The CZMQ policy is to reduce the error flow to 0/-1 where possible. libzmq still does a lot of errno setting. CZMQ does not do that, as it creates a fuzzy API. Things either work as expected, or they fail, and the application's best strategy is usually to assert on non-zero return codes.
+
+Some older libraries still return plethora of error codes, to indicate different types of failure. This ironically makes both library and application more likely to be buggy. The reason is simply that it needs more code on both sides of the API, and the more code, the more bugs.
+
+The use of black/white error handling fits the CLASS style for APIs where each call is explicit and without side effects of any kind, and where damage is either impossible, or fatal.
+
+The one exception is running out of resources (memory, sockets). In that case, there are two strategies that work, for different types of app. One is to assert, to force better sizing of the machine and/or limits such as max connections. Two is to degrade carefully, e.g. refuse new connections, however that is considerably harder to do correctly and probably unrealistic for most developers.
+
+Some CZMQ methods used to actually assert, e.g. in zsocket_bind, if the action failed, instead of returning -1. That was just closer to the majority case where the action MUST work, or nothing can continue. However there's a small slice of cases where failure means something positive, and for these cases, such calls return -1 on failure. 99% of calling code simply asserts the return value is not -1.
+
+There are a few cases where the return value is overloaded to return -1, 0, or other values. These are somewhat confusing special cases and we aim to eliminate them over time.
+
+The overall goal with this strategy is robustness, and absolute minimal and predictable expression in the code. You can see that it works: the CZMQ code is generally very simple and clear, with a few exceptions of places where people have used their old C style (we fix these over time).
+
+## CZMQ Actors
+
+The v2 API had a zthread class that let you create "attached threads" connected to their parent by an inproc:// PIPE socket. In v3 this has been simplified and better wrapped as the zactor class. CZMQ actors are in effect threads with a socket interface. A zactor_t instance works like a socket, and the CZMQ classes that deal with sockets (like zmsg and zpoller) all accept zactor_t references as well as zsock_t and libzmq void * socket handles.
+
+To write an actor, use this template. Note that your actor is a single function "void myname (zsock_t *pipe, void *args)" function:
+
+/*  =========================================================================
+        someclass - some description
+
+        Copyright (c) the Contributors as noted in the AUTHORS file.
+        This file is part of CZMQ, the high-level C binding for 0MQ:
+        http://czmq.zeromq.org.
+
+        This Source Code Form is subject to the terms of the Mozilla Public
+        License, v. 2.0. If a copy of the MPL was not distributed with this
+        file, You can obtain one at http://mozilla.org/MPL/2.0/.
+        =========================================================================
+    */
+
+    /*
+    @header
+        Please take e.g. include/zmonitor.h as basis for your public API.
+        And delete this text, and write your own, when you create an actor :-)
+    @discuss
+
+    @end
+    */
+
+    #include "../include/czmq.h"
+
+    //  --------------------------------------------------------------------------
+    //  The self_t structure holds the state for one actor instance
+
+    typedef struct {
+        zsock_t *pipe;              //  Actor command pipe
+        zpoller_t *poller;          //  Socket poller
+        //  ... you'll be adding other stuff here
+        bool terminated;            //  Did caller ask us to quit?
+        bool verbose;               //  Verbose logging enabled?
+    } self_t;
+
+    static self_t *
+    s_self_new (zsock_t *pipe)
+    {
+        self_t *self = (self_t *) zmalloc (sizeof (self_t));
+        self->pipe = pipe;
+        //  ... initialize your own state including any other
+        //  sockets, which you can add to the poller:
+        self->poller = zpoller_new (self->pipe, NULL);
+        return self;
+    }
+
+    static void
+    s_self_destroy (self_t **self_p)
+    {
+        assert (self_p);
+        if (*self_p) {
+            self_t *self = *self_p;
+            zpoller_destroy (&self->poller);
+            //  ... destroy your own state here
+            free (self);
+            *self_p = NULL;
+        }
+    }
+
+
+    //  --------------------------------------------------------------------------
+    //  Handle a command from calling application
+
+    static int
+    s_self_handle_pipe (self_t *self)
+    {
+        //  Get the whole message off the pipe in one go
+        zmsg_t *request = zmsg_recv (self->pipe);
+        if (!request)
+            return -1;                  //  Interrupted
+
+        char *command = zmsg_popstr (request);
+        if (self->verbose)
+            zsys_info ("zxxx: API command=%s", command);
+        if (streq (command, "VERBOSE"))
+            self->verbose = true;
+        else
+        //  An example of a command that the caller would wait for
+        //  via a signal, so that the two threads synchronize
+        if (streq (command, "WAIT"))
+            zsock_signal (self->pipe, 0);
+        else
+        if (streq (command, "$TERM"))
+            self->terminated = true;
+        else {
+            zsys_error ("zxxx: - invalid command: %s", command);
+            assert (false);
+        }
+        zstr_free (&command);
+        zmsg_destroy (&request);
+        return 0;
+    }
+
+
+    //  --------------------------------------------------------------------------
+    //  zxxx() implements the zxxx actor interface
+
+    void
+    zxxx (zsock_t *pipe, void *args)
+    {
+        self_t *self = s_self_new (pipe);
+        //  Signal successful initialization
+        zsock_signal (pipe, 0);
+
+        while (!self->terminated) {
+            zsock_t *which = zpoller_wait (self->poller, -1);
+            if (which == self->pipe)
+                s_self_handle_pipe (self);
+            else
+            if (zpoller_terminated (self->poller))
+                break;          //  Interrupted
+        }
+        s_self_destroy (&self);
+    }
+
+
+    //  --------------------------------------------------------------------------
+    //  Selftest
+
+    void
+    zxxx_test (bool verbose)
+    {
+        printf (" * zxxx: ");
+        if (verbose)
+            printf ("\n");
+
+        //  @selftest
+        zactor_t *xxx = zactor_new (zxxx, NULL);
+        assert (xxx);
+        if (verbose)
+            zstr_sendx (xxx, "VERBOSE", NULL);
+
+        zactor_destroy (&xxx);
+        //  @end
+        printf ("OK\n");
+    }
+
+The selftest code shows how to create, talk to, and destroy an actor.
 
 ## Under the Hood
 

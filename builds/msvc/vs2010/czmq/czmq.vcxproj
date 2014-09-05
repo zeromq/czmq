@@ -79,6 +79,8 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\..\include\czmq.h" />
     <ClInclude Include="..\..\..\..\include\czmq_prelude.h" />
+    <ClInclude Include="..\..\..\..\src\zgossip_engine.inc" />
+    <ClInclude Include="..\..\..\..\src\zhash_primes.inc" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\zactor.c">
@@ -126,7 +128,7 @@
     <ClCompile Include="..\..\..\..\src\zgossip.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zinterface.c">
+    <ClCompile Include="..\..\..\..\src\ziflist.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\zlist.c">

@@ -49,6 +49,12 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void *
     zring_prev (zring_t *self);
 
+//  Insert an item after cursor, return 0 if OK, else -1. Cursor is set to
+//  inserted item (zring_remove() will remove it again). In any empty ring,
+//  inserts after the head.
+CZMQ_EXPORT int
+    zring_insert (zring_t *self, void *item);
+
 //  Append an item to the end of the ring, return 0 if OK, else -1.
 CZMQ_EXPORT int
     zring_append (zring_t *self, void *item);
@@ -57,19 +63,17 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zring_push (zring_t *self, void *item);
 
-//  Pop and destroy item off the start of the ring, if any. Sets cursor to
-//  first remaining item in ring.
-CZMQ_EXPORT void
-    zring_pop (zring_t *self);
-
-//  Insert an item after cursor, return 0 if OK, else -1.
-CZMQ_EXPORT int
-    zring_insert (zring_t *self, void *item);
-
-//  Remove the current item from the ring (as set by first/last/next/prev
-//  calls). Sets the cursor to the next item.
-CZMQ_EXPORT void
+//  Remove current item from the ring (as set by first/last/next/prev calls),
+//  and return item. Sets the cursor to the next item. If ring was empty,
+//  returns null. Caller should destroy item when finished with it.
+CZMQ_EXPORT void *
     zring_remove (zring_t *self);
+
+//  Pop item off the start of the ring, and return item. If the ring is empty.
+//  returns null. Sets cursor to first remaining item in ring. Caller should
+//  destroy item when finished with it.
+CZMQ_EXPORT void *
+    zring_pop (zring_t *self);
 
 //  Return number of items in the ring
 CZMQ_EXPORT size_t

@@ -169,7 +169,7 @@ EXAMPLE
 -------
 .From zmsg_test method
 ----
-    //  Create two PAIR sockets and connect over inproc
+//  Create two PAIR sockets and connect over inproc
 ----
 
 SEE ALSO

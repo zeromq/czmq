@@ -68,13 +68,13 @@ EXAMPLE
 -------
 .From zactor_test method
 ----
-    zactor_t *actor = zactor_new (echo_actor, "Hello, World");
-    assert (actor);
-    zstr_sendx (actor, "ECHO", "This is a string", NULL);
-    char *string = zstr_recv (actor);
-    assert (streq (string, "This is a string"));
-    free (string);
-    zactor_destroy (&actor);
+zactor_t *actor = zactor_new (echo_actor, "Hello, World");
+assert (actor);
+zstr_sendx (actor, "ECHO", "This is a string", NULL);
+char *string = zstr_recv (actor);
+assert (streq (string, "This is a string"));
+free (string);
+zactor_destroy (&actor);
 ----
 
 SEE ALSO

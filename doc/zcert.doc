@@ -1,0 +1,117 @@
+#### zcert - work with CURVE security certificates
+
+The zcert class provides a way to create and work with security
+certificates for the ZMQ CURVE mechanism. A certificate contains a
+public + secret key pair, plus metadata. It can be used as a
+temporary object in memory, or persisted to disk. On disk, a
+certificate is stored as two files. One is public and contains only
+the public key. The second is secret and contains both keys. The
+two have the same filename, with the secret file adding "_secret".
+To exchange certificates, send the public file via some secure route. 
+Certificates are not signed but are text files that can be verified by 
+eye.
+
+Certificates are stored in the ZPL (ZMQ RFC 4) format. They have two
+sections, "metadata" and "curve". The first contains a list of 'name =
+value' pairs, one per line. Values may be enclosed in quotes. The curve
+section has a 'public-key = keyvalue' and, for secret certificates, a
+'secret-key = keyvalue' line. The keyvalue is a Z85-encoded CURVE key.
+
+This is the class interface:
+
+    
+    //  Create and initialize a new certificate in memory
+    CZMQ_EXPORT zcert_t *
+        zcert_new (void);
+    
+    //  Constructor, accepts public/secret key pair from caller
+    CZMQ_EXPORT zcert_t *
+        zcert_new_from (byte *public_key, byte *secret_key);
+    
+    //  Destroy a certificate in memory
+    CZMQ_EXPORT void
+        zcert_destroy (zcert_t **self_p);
+    
+    //  Return public part of key pair as 32-byte binary string
+    CZMQ_EXPORT byte *
+        zcert_public_key (zcert_t *self);
+    
+    //  Return secret part of key pair as 32-byte binary string
+    CZMQ_EXPORT byte *
+        zcert_secret_key (zcert_t *self);
+    
+    //  Return public part of key pair as Z85 armored string
+    CZMQ_EXPORT char *
+        zcert_public_txt (zcert_t *self);
+    
+    //  Return secret part of key pair as Z85 armored string
+    CZMQ_EXPORT char *
+        zcert_secret_txt (zcert_t *self);
+    
+    //  Set certificate metadata from formatted string.
+    CZMQ_EXPORT void
+        zcert_set_meta (zcert_t *self, const char *name, const char *format, ...);
+    
+    //  Get metadata value from certificate; if the metadata value doesn't 
+    //  exist, returns NULL.
+    CZMQ_EXPORT char *
+        zcert_meta (zcert_t *self, const char *name);
+    
+    //  Get list of metadata fields from certificate. Caller is responsible for
+    //  destroying list. Caller should not modify the values of list items.
+    CZMQ_EXPORT zlist_t *
+        zcert_meta_keys (zcert_t *self);
+    
+    //  Load certificate from file (constructor)
+    CZMQ_EXPORT zcert_t *
+        zcert_load (const char *filename);
+    
+    //  Save full certificate (public + secret) to file for persistent storage
+    //  This creates one public file and one secret file (filename + "_secret").
+    CZMQ_EXPORT int
+        zcert_save (zcert_t *self, const char *filename);
+    
+    //  Save public certificate only to file for persistent storage
+    CZMQ_EXPORT int
+        zcert_save_public (zcert_t *self, const char *filename);
+    
+    //  Save secret certificate only to file for persistent storage
+    CZMQ_EXPORT int
+        zcert_save_secret (zcert_t *self, const char *filename);
+    
+    //  Apply certificate to socket, i.e. use for CURVE security on socket.
+    //  If certificate was loaded from public file, the secret key will be
+    //  undefined, and this certificate will not work successfully.
+    CZMQ_EXPORT void
+        zcert_apply (zcert_t *self, void *zocket);
+    
+    //  Return copy of certificate
+    CZMQ_EXPORT zcert_t *
+        zcert_dup (zcert_t *self);
+    
+    //  Return true if two certificates have the same keys
+    CZMQ_EXPORT bool
+        zcert_eq (zcert_t *self, zcert_t *compare);
+    
+    //  Print certificate contents to stdout
+    CZMQ_EXPORT void
+        zcert_print (zcert_t *self);
+    
+    //  DEPRECATED as incompatible with centralized logging
+    //  Print certificate contents to open stream
+    CZMQ_EXPORT void
+        zcert_fprint (zcert_t *self, FILE *file);
+    
+    //  Self test of this class
+    CZMQ_EXPORT void
+        zcert_test (bool verbose);
+
+This is the class self test code:
+
+    //  Create temporary directory for test files
+#   define TESTDIR ".test_zcert"
+    zsys_dir_create (TESTDIR);
+    
+    //  Create a simple certificate with metadata
+    zcert_t *cert = zcert_new ();
+

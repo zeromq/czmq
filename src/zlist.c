@@ -134,6 +134,24 @@ zlist_last (zlist_t *self)
 
 
 //  --------------------------------------------------------------------------
+<<<<<<< HEAD
+=======
+//  Return current item in the list. If the list is empty, or the cursor
+//  passed the end of the list, returns NULL. Does not change the cursor.
+
+void *
+zlist_item (zlist_t *self)
+{
+    assert (self);
+    if (self->cursor)
+        return self->cursor->item;
+    else
+        return NULL;
+}
+
+
+//  --------------------------------------------------------------------------
+>>>>>>> upstream/master
 //  Append an item to the end of the list, return 0 if OK
 //  or -1 if this failed for some reason (out of memory).
 
@@ -475,6 +493,10 @@ zlist_test (int verbose)
     zlist_push (list, bread);
     assert (zlist_size (list) == 2);
     assert (zlist_first (list) == bread);
+<<<<<<< HEAD
+=======
+    assert (zlist_item (list) == bread);
+>>>>>>> upstream/master
 
     zlist_append (list, wine);
     assert (zlist_size (list) == 3);

@@ -229,7 +229,7 @@ s_proxy_task (void *args, zctx_t *ctx, void *command_pipe)
 void
 zproxy_v2_test (bool verbose)
 {
-    printf (" * zproxy:  (deprecated)");
+    printf (" * zproxy (deprecated): ");
     if (verbose)
         printf ("\n");
 
