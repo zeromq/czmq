@@ -42,16 +42,18 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void *
     zlist_last (zlist_t *self);
 
-//  Return the current item of list. If the list is empty, returns NULL.
-//  Leaves cursor pointing at the current item, or NULL if the list is empty.
+//  Return current item in the list. If the list is empty, or the cursor
+//  passed the end of the list, returns NULL. Does not change the cursor.
 CZMQ_EXPORT void *
     zlist_item (zlist_t *self);
 
 //  Prepend an item to the start of the list, return 0 if OK, else -1.
+//  Leaves cursor at newly inserted item.
 CZMQ_EXPORT int
     zlist_prepend (zlist_t *self, void *item);
 
 //  Append an item to the end of the list, return 0 if OK, else -1.
+//  Leaves cursor at newly inserted item.
 CZMQ_EXPORT int
     zlist_append (zlist_t *self, void *item);
 
@@ -82,6 +84,11 @@ CZMQ_EXPORT size_t
 //  The sort is not stable, so may reorder items with the same keys.
 CZMQ_EXPORT void
     zlist_sort (zlist_t *self, czmq_comparator *compare);
+
+//  Delete all items from the list. If the item destructor is set, calls it
+//  on every item.
+CZMQ_EXPORT void
+    zlist_purge (zlist_t *self);
 
 //  Set a user-defined deallocator for list items; by default items are not
 //  freed when the list is destroyed.

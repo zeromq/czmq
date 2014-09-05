@@ -695,6 +695,7 @@ zsock_recv (void *self, const char *picture, ...)
             zframe_t *frame = zmsg_pop (msg);
             if (frame && zframe_size (frame) != 0)
                 rc = -1;
+            zframe_destroy (&frame);
         }
         else {
             zsys_error ("zsock: invalid picture element '%c'", *picture);
@@ -918,6 +919,7 @@ zsock_test (bool verbose)
     assert (integer == -12345);
     assert (memcmp (zchunk_data (chunk), "HELLO", 5) == 0);
     assert (zchunk_size (chunk) == 5);
+    zchunk_destroy (&chunk);
     
     //  Test binding to ephemeral ports, sequential and random
     int port = zsock_bind (writer, "tcp://127.0.0.1:*");
