@@ -175,6 +175,7 @@ This is the class interface:
     //      c = zchunk_t *
     //      f = zframe_t *
     //      p = void * (sends the pointer value, only meaningful over inproc)
+    //      n = null, sends empty frame (0 arguments)
     //
     //  Note that b, c, and f are encoded the same way and the choice is offered
     //  as a convenience to the sender, which may or may not already have data
@@ -193,6 +194,7 @@ This is the class interface:
     //      c = zchunk_t ** (creates zchunk)
     //      f = zframe_t ** (creates zframe)
     //      p = void ** (stores pointer)
+    //      n = null, asserts empty frame (0 arguments)
     //
     //  Note that zsock_recv creates the returned objects, and the caller must
     //  destroy them when finished with them. The supplied pointers do not need
@@ -200,6 +202,8 @@ This is the class interface:
     //  a message, in which case the pointers are not modified. When message
     //  frames are truncated (a short message), sets return values to zero/null.
     //  If an argument pointer is NULL, does not store any value (skips it).
+    //  An 'n' picture matches an empty frame; if the message does not match, 
+    //  the method will return -1.
     CZMQ_EXPORT int
         zsock_recv (void *self, const char *picture, ...);
     
