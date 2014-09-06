@@ -27,6 +27,41 @@ CZMQ_EXPORT zring_t *
 CZMQ_EXPORT void
     zring_destroy (zring_t **self_p);
 
+//  Prepend an item to the start of the ring, return 0 if OK, else -1.
+//  Leaves cursor at newly inserted item.
+CZMQ_EXPORT int
+    zring_prepend (zring_t *self, void *item);
+
+//  Append an item to the end of the ring, return 0 if OK, else -1.
+//  Leaves cursor at newly inserted item.
+CZMQ_EXPORT int
+    zring_append (zring_t *self, void *item);
+
+//  Detach an item from the ring, without destroying the item. Searches the
+//  ring for the item, always starting with the cursor, if any is set, and
+//  then from the start of the ring. If item is null, detaches the item at the
+//  cursor, if set. If the item was found and detached, leaves the cursor at
+//  the next item, if any, and returns the item. Else, returns null.
+CZMQ_EXPORT void *
+    zring_detach (zring_t *self, void *item);
+
+//  Delete an item from the ring, and destroy it, if the item destructor is
+//  set. Searches the ring for the item, always starting with the cursor, if
+//  any is set, and then from the start of the ring. If item is null, deletes
+//  the item at the cursor, if set. If the item was found and deleted, leaves
+//  the cursor at the next item, if any, and returns 0. Else, returns -1.
+CZMQ_EXPORT int
+    zring_delete (zring_t *self, void *item);
+
+//  Delete all items from the ring. If the item destructor is set, calls it
+//  on every item.
+CZMQ_EXPORT void
+    zring_purge (zring_t *self);
+
+//  Return number of items in the ring
+CZMQ_EXPORT size_t
+    zring_size (zring_t *self);
+
 //  Return the item at the head of ring. If the ring is empty, returns NULL.
 //  Leaves cursor pointing at the head item, or NULL if the ring is empty.
 CZMQ_EXPORT void *
@@ -62,40 +97,10 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void *
     zring_find (zring_t *self, void *target);
 
-//  Prepend an item to the start of the ring, return 0 if OK, else -1.
-//  Leaves cursor at newly inserted item.
-CZMQ_EXPORT int
-    zring_prepend (zring_t *self, void *item);
-
-//  Append an item to the end of the ring, return 0 if OK, else -1.
-//  Leaves cursor at newly inserted item.
-CZMQ_EXPORT int
-    zring_append (zring_t *self, void *item);
-
-//  Detach an item from the ring, without destroying the item. Searches the
-//  ring for the item, always starting with the cursor, if any is set, and
-//  then from the start of the ring. If item is null, detaches the item at the
-//  cursor, if set. If the item was found and detached, leaves the cursor at
-//  the next item, if any, and returns the item. Else, returns null.
-CZMQ_EXPORT void *
-    zring_detach (zring_t *self, void *item);
-
-//  Delete an item from the ring, and destroy it, if the item destructor is
-//  set. Searches the ring for the item, always starting with the cursor, if
-//  any is set, and then from the start of the ring. If item is null, deletes
-//  the item at the cursor, if set. If the item was found and deleted, leaves
-//  the cursor at the next item, if any, and returns 0. Else, returns -1.
-CZMQ_EXPORT int
-    zring_delete (zring_t *self, void *item);
-
-//  Delete all items from the ring. If the item destructor is set, calls it
-//  on every item.
+//  Sort the list using the compare function.
+//  The sort is not stable, so may reorder items with the same keys.
 CZMQ_EXPORT void
-    zring_purge (zring_t *self);
-
-//  Return number of items in the ring
-CZMQ_EXPORT size_t
-    zring_size (zring_t *self);
+    zlist_sort (zlist_t *self, zlist_compare_fn *compare);
 
 //  Make a copy of the ring; items are duplicated if you set a duplicator
 //  for the ring, otherwise not. Copying a null reference returns a null

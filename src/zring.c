@@ -97,101 +97,6 @@ zring_destroy (zring_t **self_p)
 
 
 //  --------------------------------------------------------------------------
-//  Return the item at the head of ring. If the ring is empty, returns NULL.
-//  Leaves cursor pointing at the head item, or NULL if the ring is empty.
-
-void *
-zring_first (zring_t *self)
-{
-    assert (self);
-    self->cursor = self->head;
-    return zring_next (self);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Return the item at the tail of ring. If the ring is empty, returns NULL.
-//  Leaves cursor pointing at the tail item, or NULL if the ring is empty.
-
-void *
-zring_last (zring_t *self)
-{
-    assert (self);
-    self->cursor = self->head;
-    return zring_prev (self);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Return the next item. At the end of the ring (or in an empty ring),
-//  returns NULL. Use repeated zring_next () calls to work through the ring
-//  from zring_first ().
-
-void *
-zring_next (zring_t *self)
-{
-    assert (self);
-    self->cursor = self->cursor->next;
-    return zring_item (self);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Return the previous item. At the start of the ring (or in an empty ring),
-//  returns NULL. Use repeated zring_prev () calls to work through the ring
-//  backwards from zring_last ().
-
-void *
-zring_prev (zring_t *self)
-{
-    assert (self);
-    self->cursor = self->cursor->prev;
-    return zring_item (self);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Return current item in the ring. If the ring is empty, or the cursor
-//  passed the end of the ring, returns NULL. Does not change the cursor.
-
-void *
-zring_item (zring_t *self)
-{
-    assert (self);
-    if (self->cursor != self->head)
-        return self->cursor->item;
-    else
-        return NULL;            //  Reached head, so finished
-}
-
-
-//  --------------------------------------------------------------------------
-//  Find an item in the ring. If a comparator was set on the ring, calls this
-//  to compare each item in the ring with the supplied target item. If no
-//  comparator was set, compares the two item pointers for equality. If the
-//  item is found, leaves the cursor at the found item. Returns the item if
-//  found, else null.
-
-void *
-zring_find (zring_t *self, void *target)
-{
-    assert (self);
-    void *item = zring_first (self);
-    while (item) {
-        if (self->comparator) {
-            if ((self->comparator) (item, target) == 0)
-                return item;
-        }
-        else
-        if (item == target)
-            return item;
-        item = zring_next (self);
-    }
-    return NULL;
-}
-
-
-//  --------------------------------------------------------------------------
 //  Prepend an item to the start of the ring, return 0 if OK, else -1.
 //  Leaves cursor at newly inserted item.
 
@@ -289,7 +194,7 @@ zring_delete (zring_t *self, void *item)
     assert (self);
     if ((item = zring_detach (self, item))) {
         if (self->destructor)
-            (self->destructor) (&item);
+            self->destructor (&item);
         return 0;
     }
     else
@@ -321,6 +226,150 @@ zring_size (zring_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  Return the item at the head of ring. If the ring is empty, returns NULL.
+//  Leaves cursor pointing at the head item, or NULL if the ring is empty.
+
+void *
+zring_first (zring_t *self)
+{
+    assert (self);
+    self->cursor = self->head;
+    return zring_next (self);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return the item at the tail of ring. If the ring is empty, returns NULL.
+//  Leaves cursor pointing at the tail item, or NULL if the ring is empty.
+
+void *
+zring_last (zring_t *self)
+{
+    assert (self);
+    self->cursor = self->head;
+    return zring_prev (self);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return the next item. At the end of the ring (or in an empty ring),
+//  returns NULL. Use repeated zring_next () calls to work through the ring
+//  from zring_first ().
+
+void *
+zring_next (zring_t *self)
+{
+    assert (self);
+    self->cursor = self->cursor->next;
+    return zring_item (self);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return the previous item. At the start of the ring (or in an empty ring),
+//  returns NULL. Use repeated zring_prev () calls to work through the ring
+//  backwards from zring_last ().
+
+void *
+zring_prev (zring_t *self)
+{
+    assert (self);
+    self->cursor = self->cursor->prev;
+    return zring_item (self);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return current item in the ring. If the ring is empty, or the cursor
+//  passed the end of the ring, returns NULL. Does not change the cursor.
+
+void *
+zring_item (zring_t *self)
+{
+    assert (self);
+    if (self->cursor != self->head)
+        return self->cursor->item;
+    else
+        return NULL;            //  Reached head, so finished
+}
+
+
+//  --------------------------------------------------------------------------
+//  Find an item in the ring. If a comparator was set on the ring, calls this
+//  to compare each item in the ring with the supplied target item. If no
+//  comparator was set, compares the two item pointers for equality. If the
+//  item is found, leaves the cursor at the found item. Returns the item if
+//  found, else null.
+
+void *
+zring_find (zring_t *self, void *target)
+{
+    assert (self);
+    void *item = zring_first (self);
+    while (item) {
+        if (self->comparator) {
+            if (self->comparator (item, target) == 0)
+                return item;
+        }
+        else
+        if (item == target)
+            return item;
+        
+        item = zring_next (self);
+    }
+    return NULL;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Sort the ring using the container comparator, which must have been
+//  specified. The sort is not stable, so may reorder equal items.
+
+void
+zring_sort (zring_t *self)
+{
+    assert (self);
+    
+    //  Uses a comb sort, which is simple and reasonably fast. The
+    //  algorithm is based on Wikipedia's C pseudo-code for comb sort.
+    size_t gap = self->size;
+    bool swapped = false;
+    while (gap > 1 || swapped) {
+        if (gap > 1)
+            gap = (size_t) ((double) gap / 1.247330950103979);
+
+        node_t *base = self->head;
+        node_t *test = self->head;
+        int jump = gap;
+        while (jump--)
+            test = test->next;
+
+        swapped = false;
+        while (base != self->head && test != self->head) {
+            int compare;
+            if (self->comparator)
+                compare = self->comparator (base->item, test->item);
+            else
+                compare = (base->item < test->item);
+            
+            if (compare) {
+                //  We don't actually swap nodes, just the items in the nodes.
+                //  This is ridiculously simple and confuses the heck out of
+                //  me every time I re-read the code, as I expect to see the
+                //  nodes being swapped. Hence this comment. -- PH 2014/09/06
+                void *item = base->item;
+                base->item = test->item;
+                test->item = item;
+                swapped = true;
+            }
+            base = base->next;
+            test = test->next;
+        }
+    }
+}
+
+
+//  --------------------------------------------------------------------------
 //  Make a copy of the ring; items are duplicated if you set a duplicator
 //  for the ring, otherwise not. Copying a null reference returns a null
 //  reference.
@@ -335,12 +384,14 @@ zring_dup (zring_t *self)
     if (copy) {
         copy->destructor = self->destructor;
         copy->duplicator = self->duplicator;
+        copy->comparator = self->comparator;
+        
         node_t *node;
         for (node = self->head->next; node != self->head; node = node->next) {
             void *item = node->item;
             if (self->duplicator)
                 item = self->duplicator (item);
-            if (zring_append (copy, item)) {
+            if (!item || zring_append (copy, item)) {
                 zring_destroy (&copy);
                 break;
             }
@@ -442,22 +493,28 @@ zring_test (int verbose)
     char *five = "5";
     zring_purge (ring);
     assert (zring_size (ring) == 0);
+    zring_prepend (ring, four);
     zring_append (ring, three);
-    zring_prepend (ring, two);
-    zring_prepend (ring, one);
-    zring_append (ring, four);
-    zring_append (ring, five);
+    zring_prepend (ring, five);
+    zring_append (ring, two);
     zring_prepend (ring, zero);
+    zring_append (ring, one);
     assert (zring_size (ring) == 6);
-    void *item = zring_detach (ring, NULL);
-    assert (item == zero);
+
+    //  Try the comparator
+    zring_set_comparator (ring, (czmq_comparator *) strcmp);
+    zring_sort (ring);
+    
+    assert (zring_first (ring) == zero);
+    void *item = zring_find (ring, five);
+    assert (item == five);
 
     //  Try the duplicator and destructor
     zring_set_duplicator (ring, (czmq_duplicator *) strdup);
     zring_t *dup = zring_dup (ring);
     assert (dup);
     zring_set_destructor (dup, (czmq_destructor *) zstr_free);
-    assert (zring_size (dup) == 5);
+    assert (zring_size (dup) == 6);
     zring_destroy (&dup);
 
     rc = zring_delete (ring, two);
