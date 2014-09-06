@@ -231,6 +231,12 @@ This is the class interface:
     //  Note that all zauth commands are synchronous, so your application always
     //  waits for a signal from the actor after each command.
     //
+    //  Enable verbose logging of commands and activity. Verbose logging can help
+    //  debug non-trivial authentication policies:
+    //
+    //      zstr_send (auth, "VERBOSE");
+    //      zsock_wait (auth);
+    //
     //  Allow (whitelist) a list of IP addresses. For NULL, all clients from
     //  these addresses will be accepted. For PLAIN and CURVE, they will be
     //  allowed to continue with authentication. You can call this method
@@ -269,12 +275,6 @@ This is the class interface:
     //  Kerberos) to establish a secure context and perform mutual authentication:
     //
     //      zstr_sendx (auth, "GSSAPI", NULL);
-    //      zsock_wait (auth);
-    //
-    //  Enable verbose logging of commands and activity. Verbose logging can help
-    //  debug non-trivial authentication policies:
-    //
-    //      zstr_sendx (auth, "VERBOSE", NULL);
     //      zsock_wait (auth);
     //
     //  This is the zauth constructor as a zactor_fn:
@@ -432,7 +432,7 @@ This is the class interface:
     //
     //  Enable verbose logging of commands and activity:
     //
-    //      zstr_sendx (beacon, "VERBOSE", NULL);
+    //      zstr_send (beacon, "VERBOSE");
     //
     //  Configure beacon to run on specified UDP port, and return the name of
     //  the host, which can be used as endpoint for incoming connections. To
@@ -441,19 +441,16 @@ This is the class interface:
     //  the beacon. If the system does not support UDP broadcasts (lacking a
     //  workable interface), returns an empty hostname:
     //
-    //      zstr_sendm (beacon, "CONFIGURE");
-    //      zstr_sendf (beacon, "%d", port_number);
+    //      //  Pictures: 's' = C string, 'i' = int
+    //      zsock_send (beacon, "si", "CONFIGURE", port_number);
     //      char *hostname = zstr_recv (beacon);
     //
     //  Start broadcasting a beacon at a specified interval in msec. The beacon
     //  data can be at most UDP_FRAME_MAX bytes; this constant is defined in
     //  zsys.h to be 255:
     //
-    //      zmsg_t *msg = zmsg_new ();
-    //      zmsg_addstr (msg, "PUBLISH");
-    //      zmsg_addmem (msg, beacon_data, beacon_size);
-    //      zmsg_addstrf (msg, "%d", interval);
-    //      zmsg_send (&msg, beacon);
+    //      //  Pictures: 'b' = byte * data + size_t size
+    //      zsock_send (beacon, "sbi", "PUBLISH", data, size, interval);
     //
     //  Stop broadcasting the beacon:
     //
@@ -464,10 +461,7 @@ This is the class interface:
     //  that is identical to our broadcast beacon_data is discarded in any case.
     //  If the filter size is zero, we get all peer beacons:
     //  
-    //      zmsg_t *msg = zmsg_new ();
-    //      zmsg_addstr (msg, "SUBSCRIBE");
-    //      zmsg_addmem (msg, filter_data, filter_size);
-    //      zmsg_send (&msg, beacon);
+    //      zsock_send (beacon, "sb", "SUBSCRIBE", filter_data, filter_size);
     //
     //  Stop listening to other peers
     //
@@ -496,8 +490,19 @@ This is the class self test code:
     if (verbose)
         zstr_sendx (speaker, "VERBOSE", NULL);
 
-    //  Beacon will use UDP port 9999
-    zstr_sendx (speaker, "CONFIGURE", "9999", NULL);
+//
+//  Stop broadcasting the beacon:
+//
+//      zstr_sendx (beacon, "SILENCE", NULL);
+//
+//  Start listening to beacons from peers. The filter is used to do a prefix
+//  match on received beacons, to remove junk. Note that any received data
+//  that is identical to our broadcast beacon_data is discarded in any case.
+//  If the filter size is zero, we get all peer beacons:
+//
+//      zsock_send (beacon, "sb", "SUBSCRIBE", filter_data, filter_size);
+
+    zsock_send (speaker, "si", "CONFIGURE", 9999);
     char *hostname = zstr_recv (speaker);
     if (!*hostname) {
         printf ("OK (skipping test, no UDP broadcasting)\n");
@@ -507,27 +512,20 @@ This is the class self test code:
     }
     free (hostname);
 
-    //  We will broadcast the magic value 0xCAFE
-    byte announcement [2] = { 0xCA, 0xFE };
-    zmsg_t *msg = zmsg_new ();
-    zmsg_addstr (msg, "PUBLISH");
-    zmsg_addmem (msg, announcement, 2);
-    zmsg_addstrf (msg, "%d", 100);
-    zmsg_send (&msg, speaker);
-
     //  Create listener beacon on port 9999 to lookup service
     zactor_t *listener = zactor_new (zbeacon, NULL);
     if (verbose)
         zstr_sendx (listener, "VERBOSE", NULL);
-    zstr_sendx (listener, "CONFIGURE", "9999", NULL);
+    zsock_send (listener, "si", "CONFIGURE", 9999);
     hostname = zstr_recv (listener);
     assert (*hostname);
     free (hostname);
 
-    msg = zmsg_new ();
-    zmsg_addstr (msg, "SUBSCRIBE");
-    zmsg_addmem (msg, "", 0);
-    zmsg_send (&msg, listener);
+    //  We will broadcast the magic value 0xCAFE
+    byte announcement [2] = { 0xCA, 0xFE };
+    zsock_send (speaker, "sbi", "PUBLISH", announcement, 2, 100);
+    //  We will listen to anything (empty subscription)
+    zsock_send (listener, "sb", "SUBSCRIBE", "", 0);
 
     //  Wait for at most 1/2 second if there's no broadcasting
     zsock_set_rcvtimeo (listener, 500);
@@ -547,47 +545,29 @@ This is the class self test code:
     //  Test subscription filter using a 3-node setup
     zactor_t *node1 = zactor_new (zbeacon, NULL);
     assert (node1);
-    zstr_sendx (node1, "CONFIGURE", "5670", NULL);
+    zsock_send (node1, "si", "CONFIGURE", 5670);
     hostname = zstr_recv (node1);
     assert (*hostname);
     free (hostname);
 
     zactor_t *node2 = zactor_new (zbeacon, NULL);
     assert (node2);
-    zstr_sendx (node2, "CONFIGURE", "5670", NULL);
+    zsock_send (node2, "si", "CONFIGURE", 5670);
     hostname = zstr_recv (node2);
     assert (*hostname);
     free (hostname);
 
     zactor_t *node3 = zactor_new (zbeacon, NULL);
     assert (node3);
-    zstr_sendx (node3, "CONFIGURE", "5670", NULL);
+    zsock_send (node3, "si", "CONFIGURE", 5670);
     hostname = zstr_recv (node3);
     assert (*hostname);
     free (hostname);
 
-    msg = zmsg_new ();
-    zmsg_addstr (msg, "PUBLISH");
-    zmsg_addmem (msg, "NODE/1", 6);
-    zmsg_addstr (msg, "250");
-    zmsg_send (&msg, node1);
-
-    msg = zmsg_new ();
-    zmsg_addstr (msg, "PUBLISH");
-    zmsg_addmem (msg, "NODE/2", 6);
-    zmsg_addstr (msg, "250");
-    zmsg_send (&msg, node2);
-
-    msg = zmsg_new ();
-    zmsg_addstr (msg, "PUBLISH");
-    zmsg_addmem (msg, "GARBAGE", 7);
-    zmsg_addstr (msg, "250");
-    zmsg_send (&msg, node3);
-
-    msg = zmsg_new ();
-    zmsg_addstr (msg, "SUBSCRIBE");
-    zmsg_addmem (msg, "NODE", 4);
-    zmsg_send (&msg, node1);
+    zsock_send (node1, "sbi", "PUBLISH", "NODE/1", 6, 250);
+    zsock_send (node2, "sbi", "PUBLISH", "NODE/2", 6, 250);
+    zsock_send (node3, "sbi", "PUBLISH", "RANDOM", 6, 250);
+    zsock_send (node1, "sb", "SUBSCRIBE", "NODE", 4);
 
     //  Poll on three API sockets at once
     zpoller_t *poller = zpoller_new (node1, node2, node3, NULL);
@@ -951,12 +931,12 @@ This is the class self test code:
     assert (zchunk_size (chunk) == 10);
 
     zframe_t *frame = zchunk_pack (chunk);
-    assert(frame);
+    assert (frame);
 
     zchunk_t *chunk2 = zchunk_unpack (frame);
     assert (memcmp (zchunk_data (chunk2), "1234567890", 10) == 0);
-    zframe_destroy(&frame);
-    zchunk_destroy(&chunk2);
+    zframe_destroy (&frame);
+    zchunk_destroy (&chunk2);
 
     zchunk_t *copy = zchunk_dup (chunk);
     assert (memcmp (zchunk_data (copy), "1234567890", 10) == 0);
@@ -1996,15 +1976,8 @@ This is the class interface:
     CZMQ_EXPORT size_t
         zhash_size (zhash_t *self);
     
-    //  Make copy of hash table; if supplied table is null, returns null.
-    //  Does not copy items themselves. Rebuilds new table so may be slow on
-    //  very large tables. NOTE: only works with item values that are strings
-    //  since there's no other way to know how to duplicate the item value.
-    CZMQ_EXPORT zhash_t *
-        zhash_dup (zhash_t *self);
-    
-    //  Return keys for items in table. If you remove items from this list you
-    //  must free the key value yourself.
+    //  Return a zlist_t containing the keys for the items in the table. It is
+    //  safe to use this list after destroying the hash table or items in it.
     CZMQ_EXPORT zlist_t *
         zhash_keys (zhash_t *self);
         
@@ -2054,10 +2027,6 @@ This is the class interface:
     CZMQ_EXPORT int
         zhash_refresh (zhash_t *self);
     
-    //  Set hash for automatic value destruction
-    CZMQ_EXPORT void
-        zhash_autofree (zhash_t *self);
-        
     //  Serialize hash table to a binary frame that can be sent in a message.
     //  The packed format is compatible with the 'dictionary' type defined in
     //  http://rfc.zeromq.org/spec:35/FILEMQ, and implemented by zproto:
@@ -2087,15 +2056,44 @@ This is the class interface:
     CZMQ_EXPORT zhash_t *
         zhash_unpack (zframe_t *frame);
     
+    //  Make a copy of the list; items are duplicated if you set a duplicator
+    //  for the list, otherwise not. Copying a null reference returns a null
+    //  reference. Note that this method's behavior changed slightly for CZMQ
+    //  v3.x. The old behavior is in zhash_dup_v2.
+    CZMQ_EXPORT zhash_t *
+        zhash_dup (zhash_t *self);
+    
+    //  Set a user-defined deallocator for hash items; by default items are not
+    //  freed when the hash is destroyed.
+    CZMQ_EXPORT void
+        zhash_set_destructor (zhash_t *self, czmq_destructor destructor);
+    
+    //  Set a user-defined duplicator for hash items; by default items are not
+    //  copied when the hash is duplicated.
+    CZMQ_EXPORT void
+        zhash_set_duplicator (zhash_t *self, czmq_duplicator duplicator);
+    
+    //  DEPRECATED by zhash_dup
+    //  Make copy of hash table; if supplied table is null, returns null.
+    //  Does not copy items themselves. Rebuilds new table so may be slow on
+    //  very large tables. NOTE: only works with item values that are strings
+    //  since there's no other way to know how to duplicate the item value.
+    CZMQ_EXPORT zhash_t *
+        zhash_dup_v2 (zhash_t *self);
+    
+    //  DEPRECATED as clumsy -- use set_destructor instead
+    //  Set hash for automatic value destruction
+    CZMQ_EXPORT void
+        zhash_autofree (zhash_t *self);
+    
+    //  DEPRECATED as clumsy -- use zhash_first/_next instead
+    typedef int (zhash_foreach_fn) (const char *key, void *item, void *argument);
+    
+    //  DEPRECATED as clumsy -- use zhash_first/_next instead
     //  Apply function to each item in the hash table. Items are iterated in no
     //  defined order. Stops if callback function returns non-zero and returns
     //  final return code from callback function (zero = success).
-    //  NOTE: this is deprecated in favor of zhash_first/next since the callback
-    //  design is clumsy and over-complex, and unnecessary.
-        
     //  Callback function for zhash_foreach method
-    typedef int (zhash_foreach_fn) (const char *key, void *item, void *argument);
-    
     CZMQ_EXPORT int
         zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument);
     
@@ -2353,6 +2351,14 @@ This is the class interface:
     CZMQ_EXPORT void *
         zlist_last (zlist_t *self);
     
+    //  Return first item in the list, or null, leaves the cursor
+    CZMQ_EXPORT void *
+        zlist_head (zlist_t *self);
+    
+    //  Return last item in the list, or null, leaves the cursor
+    CZMQ_EXPORT void *
+        zlist_tail (zlist_t *self);
+    
     //  Return the current item of list. If the list is empty, returns NULL.
     //  Leaves cursor pointing at the current item, or NULL if the list is empty.
     CZMQ_EXPORT void *
@@ -2406,16 +2412,6 @@ This is the class interface:
     //  list is empty.
     CZMQ_EXPORT void
         zlist_autofree (zlist_t *self);
-    
-    //  DEPRECATED as over-designed and not useful
-    //  Return first item in the list, or null, leaves the cursor
-    CZMQ_EXPORT void *
-        zlist_head (zlist_t *self);
-    
-    //  DEPRECATED as over-designed and not useful
-    //  Return last item in the list, or null, leaves the cursor
-    CZMQ_EXPORT void *
-        zlist_tail (zlist_t *self);
     
     //  Self test of this class
     CZMQ_EXPORT void
@@ -2660,10 +2656,10 @@ This is the class interface:
     //
     //  Enable verbose logging of commands and activity.
     //
-    //      zstr_sendx (monitor, "VERBOSE", NULL);
+    //      zstr_send (monitor, "VERBOSE");
     //
-    //  Listen to monitor event type:
-    //      zstr_sendx (monitor, "LISTEN", type, type, type, NULL);
+    //  Listen to monitor event type (zero or types, ending in NULL):
+    //      zstr_sendx (monitor, "LISTEN", type, ..., NULL);
     //  
     //      Events:
     //      CONNECTED
@@ -2681,7 +2677,7 @@ This is the class interface:
     //
     //  Start monitor; after this, any further LISTEN commands are ignored.
     //
-    //      zstr_sendx (monitor, "START", NULL);
+    //      zstr_send (monitor, "START");
     //      zsock_wait (monitor);
     //
     //  Receive next monitor event:
@@ -3025,7 +3021,7 @@ This is the class interface:
     //
     //  Enable verbose logging of commands and activity:
     //
-    //      zstr_sendx (proxy, "VERBOSE", NULL);
+    //      zstr_send (proxy, "VERBOSE");
     //      zsock_wait (proxy);
     //
     //  Specify frontend socket type -- see zsock_type_str () -- and attach to
@@ -3235,7 +3231,7 @@ This is the class self test code:
 
 #### zring - generic type-free doubly linked ring container
 
-Provides a generic container implementing a fast doubly-linked list, aka
+Provides a generic container implementing a fast doubly-linked ring, aka
 a ring. You can use this to construct multi-dimensional rings, and other
 structures together with other generic containers like zhash.
 
@@ -3244,7 +3240,7 @@ loop while not null, and do zring_next at the end of each iteration.
 
 This is the class interface:
 
-    //  Create a new ring container (a ring is a doubly-linked list)
+    //  Create a new ring container (a ring is a doubly-linked ring)
     CZMQ_EXPORT zring_t *
         zring_new (void);
     
@@ -3274,52 +3270,75 @@ This is the class interface:
     CZMQ_EXPORT void *
         zring_prev (zring_t *self);
     
-    //  Insert an item after cursor, return 0 if OK, else -1. Cursor is set to
-    //  inserted item (zring_remove() will remove it again). In any empty ring,
-    //  inserts after the head.
+    //  Return current item in the ring. If the ring is empty, or the cursor
+    //  passed the end of the ring, returns NULL. Does not change the cursor.
+    CZMQ_EXPORT void *
+        zring_item (zring_t *self);
+    
+    //  Find an item in the ring. If a comparator was set on the ring, calls this
+    //  to compare each item in the ring with the supplied target item. If no
+    //  comparator was set, compares the two item pointers for equality. If the
+    //  item is found, leaves the cursor at the found item. Returns the item if
+    //  found, else null.
+    CZMQ_EXPORT void *
+        zring_find (zring_t *self, void *target);
+    
+    //  Prepend an item to the start of the ring, return 0 if OK, else -1.
+    //  Leaves cursor at newly inserted item.
     CZMQ_EXPORT int
-        zring_insert (zring_t *self, void *item);
+        zring_prepend (zring_t *self, void *item);
     
     //  Append an item to the end of the ring, return 0 if OK, else -1.
+    //  Leaves cursor at newly inserted item.
     CZMQ_EXPORT int
         zring_append (zring_t *self, void *item);
     
-    //  Push an item to the start of the ring, return 0 if OK, else -1.
+    //  Detach an item from the ring, without destroying the item. Searches the
+    //  ring for the item, always starting with the cursor, if any is set, and
+    //  then from the start of the ring. If item is null, detaches the item at the
+    //  cursor, if set. If the item was found and detached, leaves the cursor at
+    //  the next item, if any, and returns the item. Else, returns null.
+    CZMQ_EXPORT void *
+        zring_detach (zring_t *self, void *item);
+    
+    //  Delete an item from the ring, and destroy it, if the item destructor is
+    //  set. Searches the ring for the item, always starting with the cursor, if
+    //  any is set, and then from the start of the ring. If item is null, deletes
+    //  the item at the cursor, if set. If the item was found and deleted, leaves
+    //  the cursor at the next item, if any, and returns 0. Else, returns -1.
     CZMQ_EXPORT int
-        zring_push (zring_t *self, void *item);
+        zring_delete (zring_t *self, void *item);
     
-    //  Remove current item from the ring (as set by first/last/next/prev calls),
-    //  and return item. Sets the cursor to the next item. If ring was empty,
-    //  returns null. Caller should destroy item when finished with it.
-    CZMQ_EXPORT void *
-        zring_remove (zring_t *self);
-    
-    //  Pop item off the start of the ring, and return item. If the ring is empty.
-    //  returns null. Sets cursor to first remaining item in ring. Caller should
-    //  destroy item when finished with it.
-    CZMQ_EXPORT void *
-        zring_pop (zring_t *self);
+    //  Delete all items from the ring. If the item destructor is set, calls it
+    //  on every item.
+    CZMQ_EXPORT void
+        zring_purge (zring_t *self);
     
     //  Return number of items in the ring
     CZMQ_EXPORT size_t
         zring_size (zring_t *self);
     
+    //  Make a copy of the ring; items are duplicated if you set a duplicator
+    //  for the ring, otherwise not. Copying a null reference returns a null
+    //  reference.
+    CZMQ_EXPORT zring_t *
+        zring_dup (zring_t *self);
+    
     //  Set a user-defined deallocator for ring items; by default items are not
     //  freed when the ring is destroyed.
-    typedef void (zring_free_fn) (void **item);
     CZMQ_EXPORT void
-        zring_set_free_fn (zring_t *self, zring_free_fn free_fn);
+        zring_set_destructor (zring_t *self, czmq_destructor destructor);
     
     //  Set a user-defined duplicator for ring items; by default items are not
     //  copied when the ring is duplicated.
-    typedef void * (zring_dup_fn) (void *item);
     CZMQ_EXPORT void
-        zring_set_dup_fn (zring_t *self, zring_dup_fn dup_fn);
+        zring_set_duplicator (zring_t *self, czmq_duplicator duplicator);
     
-    //  Make a copy of the ring; items are duplicated if you set a duplicator
-    //  for the ring.
-    CZMQ_EXPORT zring_t *
-        zring_dup (zring_t *self);
+    //  Set a user-defined comparator for zring_find and zring_sort; the method
+    //  must return -1, 0, or 1 depending on whether item1 is less than, equal to,
+    //  or greater than, item2.
+    CZMQ_EXPORT void
+        zring_set_comparator (zring_t *self, czmq_comparator comparator);
     
     //  Self test of this class
     CZMQ_EXPORT void
@@ -3340,14 +3359,16 @@ This is the class self test code:
     int rc = zring_append (ring, cheese);
     assert (!rc);
     assert (zring_size (ring) == 1);
+    assert (zring_item (ring) == cheese);
     rc = zring_append (ring, bread);
     assert (!rc);
     assert (zring_size (ring) == 2);
+    assert (zring_item (ring) == bread);
     rc = zring_append (ring, wine);
     assert (!rc);
     assert (zring_size (ring) == 3);
+    assert (zring_item (ring) == wine);
 
-    assert (zring_next (ring) == cheese);
     assert (zring_first (ring) == cheese);
     assert (zring_next (ring) == bread);
     assert (zring_next (ring) == wine);
@@ -3362,48 +3383,41 @@ This is the class self test code:
     //  After we reach start of ring, prev wraps around
     assert (zring_prev (ring) == wine);
 
-    assert (zring_first (ring) == cheese);
-    char *item = (char *) zring_remove (ring);
-    assert (item == cheese);
-    assert (zring_size (ring) == 2);
-    assert (zring_first (ring) == bread);
-    item = zring_remove (ring);
-    assert (item == bread);
-    assert (zring_size (ring) == 1);
-    assert (zring_first (ring) == wine);
-    item = zring_remove (ring);
-    assert (item == wine);
+    //  Test some insert/delete combos
+    char *zero = "0";
+    char *one = "1";
+    char *two = "2";
+    char *three = "3";
+    char *four = "4";
+    char *five = "5";
+    zring_purge (ring);
     assert (zring_size (ring) == 0);
-    assert (zring_first (ring) == NULL);
+    zring_append (ring, three);
+    zring_prepend (ring, two);
+    zring_prepend (ring, one);
+    zring_append (ring, four);
+    zring_append (ring, five);
+    zring_prepend (ring, zero);
+    assert (zring_size (ring) == 6);
+    void *item = zring_detach (ring, NULL);
+    assert (item == zero);
 
-    rc = zring_push (ring, cheese);
-    assert (!rc);
-    assert (zring_size (ring) == 1);
-    assert (zring_first (ring) == cheese);
+    //  Try the duplicator and destructor
+    zring_set_duplicator (ring, (czmq_duplicator *) strdup);
+    zring_t *dup = zring_dup (ring);
+    assert (dup);
+    zring_set_destructor (dup, (czmq_destructor *) zstr_free);
+    assert (zring_size (dup) == 5);
+    zring_destroy (&dup);
 
-    rc = zring_push (ring, bread);
-    assert (!rc);
-    assert (zring_size (ring) == 2);
-    assert (zring_first (ring) == bread);
+    rc = zring_delete (ring, two);
+    assert (rc == 0);
+    rc = zring_delete (ring, five);
+    assert (rc == 0);
+    rc = zring_delete (ring, three);
+    assert (rc == 0);
+    item = zring_detach (ring, NULL);
 
-    rc = zring_append (ring, wine);
-    assert (!rc);
-    assert (zring_size (ring) == 3);
-    assert (zring_first (ring) == bread);
-    assert (zring_last (ring) == wine);
-    rc = zring_insert (ring, cheese);
-    item = (char *) zring_remove (ring);
-    assert (item == cheese);
-
-    zring_t *dup_ring = zring_dup (ring);
-    assert (dup_ring);
-    assert (zring_size (dup_ring) == 3);
-    zring_destroy (&dup_ring);
-
-    //  Test pop
-    item = (char *) zring_pop (ring);
-    assert (item == bread);
-    
     //  Destructor should be safe to call twice
     zring_destroy (&ring);
     assert (ring == NULL);
@@ -3586,6 +3600,7 @@ This is the class interface:
     //      c = zchunk_t *
     //      f = zframe_t *
     //      p = void * (sends the pointer value, only meaningful over inproc)
+    //      n = null, sends empty frame (0 arguments)
     //
     //  Note that b, c, and f are encoded the same way and the choice is offered
     //  as a convenience to the sender, which may or may not already have data
@@ -3604,11 +3619,16 @@ This is the class interface:
     //      c = zchunk_t ** (creates zchunk)
     //      f = zframe_t ** (creates zframe)
     //      p = void ** (stores pointer)
+    //      n = null, asserts empty frame (0 arguments)
     //
     //  Note that zsock_recv creates the returned objects, and the caller must
     //  destroy them when finished with them. The supplied pointers do not need
     //  to be initialized. Returns 0 if successful, or -1 if it failed to recv
-    //  a message, in which case the pointers are not modified.
+    //  a message, in which case the pointers are not modified. When message
+    //  frames are truncated (a short message), sets return values to zero/null.
+    //  If an argument pointer is NULL, does not store any value (skips it).
+    //  An 'n' picture matches an empty frame; if the message does not match, 
+    //  the method will return -1.
     CZMQ_EXPORT int
         zsock_recv (void *self, const char *picture, ...);
     

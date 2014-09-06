@@ -25,7 +25,7 @@ This is the class interface:
     //
     //  Enable verbose logging of commands and activity:
     //
-    //      zstr_sendx (proxy, "VERBOSE", NULL);
+    //      zstr_send (proxy, "VERBOSE");
     //      zsock_wait (proxy);
     //
     //  Specify frontend socket type -- see zsock_type_str () -- and attach to
