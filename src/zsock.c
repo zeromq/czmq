@@ -571,6 +571,12 @@ zsock_send (void *self, const char *picture, ...)
             zmsg_addmem (msg, &pointer, sizeof (void *));
         }
         else
+	if (*picture == 'h') {
+	    zhash_t *hash = va_arg (argptr, zhash_t *);
+	    zframe_t *frame = zhash_pack (hash);
+	    zmsg_append ( msg, &frame);
+	}
+	else
         if (*picture == 'n')
             zmsg_addmem (msg, NULL, 0);
         else {
@@ -690,6 +696,19 @@ zsock_recv (void *self, const char *picture, ...)
             }
             zframe_destroy (&frame);
         }
+	else 
+	if (*picture == 'h') {
+            zframe_t *frame = zmsg_pop (msg);
+            zhash_t **hash_p = va_arg (argptr, zhash_t **);
+	    if (hash_p) {
+                if (frame) 
+		    *hash_p = zhash_unpack (frame);
+		else
+		    *hash_p = NULL;
+		
+	    }
+	    zframe_destroy (&frame);
+	}
         else
         if (*picture == 'n') {
             zframe_t *frame = zmsg_pop (msg);
@@ -858,10 +877,14 @@ zsock_test (bool verbose)
     //  Test zsock_send/recv pictures
     zchunk_t *chunk = zchunk_new ("HELLO", 5);
     zframe_t *frame = zframe_new ("WORLD", 5);
+    zhash_t *hash = zhash_new ();
+    zhash_autofree (hash);
+    zhash_insert (hash, "1", "value A");
+    zhash_insert (hash, "2", "value B");
     char *original = "pointer";
 
     //  We can send signed integers, strings, blocks of memory, chunks,
-    //  frames, and pointers
+    //  frames, hashes and pointers
     zsock_send (writer, "insbcfp",
                 -12345, "This is a string", "ABCDE", 5, chunk, frame, original);
     msg = zmsg_recv (reader);
@@ -871,15 +894,16 @@ zsock_test (bool verbose)
     zmsg_destroy (&msg);
 
     //  Test zsock_recv into each supported type
-    zsock_send (writer, "insbcfp",
-                -12345, "This is a string", "ABCDE", 5, chunk, frame, original);
+    zsock_send (writer, "insbcfhp",
+                -12345, "This is a string", "ABCDE", 5, chunk, frame, hash, original);
     zframe_destroy (&frame);
     zchunk_destroy (&chunk);
+    zhash_destroy (&hash);
     int integer;
     byte *data;
     size_t size;
     char *pointer;
-    rc = zsock_recv (reader, "insbcfp", &integer, &string, &data, &size, &chunk, &frame, &pointer);
+    rc = zsock_recv (reader, "insbcfhp", &integer, &string, &data, &size, &chunk, &frame, &hash, &pointer);
     assert (rc == 0);
     assert (integer == -12345);
     assert (streq (string, "This is a string"));
@@ -889,11 +913,16 @@ zsock_test (bool verbose)
     assert (zchunk_size (chunk) == 5);
     assert (memcmp (zframe_data (frame), "WORLD", 5) == 0);
     assert (zframe_size (frame) == 5);
+    char *value = (char *) zhash_lookup (hash, "1");
+    assert (streq(value, "value A"));
+    value = (char *) zhash_lookup (hash, "2");
+    assert (streq(value, "value B"));
     assert (original == pointer);
     free (string);
     free (data);
     zframe_destroy (&frame);
     zchunk_destroy (&chunk);
+    zhash_destroy (&hash);
 
     //  Test zsock_recv of short message; this lets us return a failure
     //  with a status code and then nothing else; the receiver will get
