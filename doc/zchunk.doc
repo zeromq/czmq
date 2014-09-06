@@ -117,12 +117,12 @@ This is the class self test code:
     assert (zchunk_size (chunk) == 10);
 
     zframe_t *frame = zchunk_pack (chunk);
-    assert(frame);
+    assert (frame);
 
     zchunk_t *chunk2 = zchunk_unpack (frame);
     assert (memcmp (zchunk_data (chunk2), "1234567890", 10) == 0);
-    zframe_destroy(&frame);
-    zchunk_destroy(&chunk2);
+    zframe_destroy (&frame);
+    zchunk_destroy (&chunk2);
 
     zchunk_t *copy = zchunk_dup (chunk);
     assert (memcmp (zchunk_data (copy), "1234567890", 10) == 0);

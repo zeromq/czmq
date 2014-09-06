@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zring - generic type-free doubly linked list container
+    zring - generic type-free doubly linked ring container
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -19,7 +19,7 @@ extern "C" {
 #endif
 
 //  @interface
-//  Create a new ring container (a ring is a doubly-linked list)
+//  Create a new ring container (a ring is a doubly-linked ring)
 CZMQ_EXPORT zring_t *
     zring_new (void);
 
@@ -54,6 +54,14 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void *
     zring_item (zring_t *self);
 
+//  Find an item in the ring. If a comparator was set on the ring, calls this
+//  to compare each item in the ring with the supplied target item. If no
+//  comparator was set, compares the two item pointers for equality. If the
+//  item is found, leaves the cursor at the found item. Returns the item if
+//  found, else null.
+CZMQ_EXPORT void *
+    zring_find (zring_t *self, void *target);
+
 //  Prepend an item to the start of the ring, return 0 if OK, else -1.
 //  Leaves cursor at newly inserted item.
 CZMQ_EXPORT int
@@ -66,7 +74,7 @@ CZMQ_EXPORT int
 
 //  Detach an item from the ring, without destroying the item. Searches the
 //  ring for the item, always starting with the cursor, if any is set, and
-//  then from the start of the list. If item is null, detaches the item at the
+//  then from the start of the ring. If item is null, detaches the item at the
 //  cursor, if set. If the item was found and detached, leaves the cursor at
 //  the next item, if any, and returns the item. Else, returns null.
 CZMQ_EXPORT void *
@@ -74,11 +82,16 @@ CZMQ_EXPORT void *
 
 //  Delete an item from the ring, and destroy it, if the item destructor is
 //  set. Searches the ring for the item, always starting with the cursor, if
-//  any is set, and then from the start of the list. If item is null, deletes
+//  any is set, and then from the start of the ring. If item is null, deletes
 //  the item at the cursor, if set. If the item was found and deleted, leaves
 //  the cursor at the next item, if any, and returns 0. Else, returns -1.
 CZMQ_EXPORT int
     zring_delete (zring_t *self, void *item);
+
+//  Delete all items from the ring. If the item destructor is set, calls it
+//  on every item.
+CZMQ_EXPORT void
+    zring_purge (zring_t *self);
 
 //  Return number of items in the ring
 CZMQ_EXPORT size_t
@@ -90,11 +103,6 @@ CZMQ_EXPORT size_t
 CZMQ_EXPORT zring_t *
     zring_dup (zring_t *self);
 
-//  Delete all items from the ring. If the item destructor is set, calls it
-//  on every item.
-CZMQ_EXPORT void
-    zring_purge (zring_t *self);
-
 //  Set a user-defined deallocator for ring items; by default items are not
 //  freed when the ring is destroyed.
 CZMQ_EXPORT void
@@ -104,6 +112,12 @@ CZMQ_EXPORT void
 //  copied when the ring is duplicated.
 CZMQ_EXPORT void
     zring_set_duplicator (zring_t *self, czmq_duplicator duplicator);
+
+//  Set a user-defined comparator for zring_find and zring_sort; the method
+//  must return -1, 0, or 1 depending on whether item1 is less than, equal to,
+//  or greater than, item2.
+CZMQ_EXPORT void
+    zring_set_comparator (zring_t *self, czmq_comparator comparator);
 
 //  Self test of this class
 CZMQ_EXPORT void
