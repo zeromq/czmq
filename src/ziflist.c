@@ -16,7 +16,7 @@
     The ziflist class takes a snapshot of the network interfaces that the
     system currently supports (this can change arbitrarily, especially on
     mobile devices). The caller can then access the network interface
-    information using an iterator that works like zlist. Only stores those
+    information using an iterator that works like zring. Only stores those
     interfaces with broadcast capability, and ignores the loopback interface.
 @discuss
 @end
@@ -28,20 +28,20 @@
 //  Structure of our class
 struct _ziflist_t {
     //  We store our interfaces as separate lists for each property
-    zlist_t *names;             //  Name as reported by the OS
-    zlist_t *addresses;         //  IP(v4) address as a string
-    zlist_t *netmasks;          //  Network mask as a string
-    zlist_t *broadcasts;        //  Broadcast address as a string
+    zring_t *names;             //  Name as reported by the OS
+    zring_t *addresses;         //  IP(v4) address as a string
+    zring_t *netmasks;          //  Network mask as a string
+    zring_t *broadcasts;        //  Broadcast address as a string
 };
 
 
 static void
 s_store (ziflist_t *self, char *name, inaddr_t address, inaddr_t netmask, inaddr_t broadcast)
 {
-    zlist_append (self->names, strdup (name));
-    zlist_append (self->addresses, strdup (inet_ntoa (address.sin_addr)));
-    zlist_append (self->netmasks, strdup (inet_ntoa (netmask.sin_addr)));
-    zlist_append (self->broadcasts, strdup (inet_ntoa (broadcast.sin_addr)));
+    zring_append (self->names, strdup (name));
+    zring_append (self->addresses, strdup (inet_ntoa (address.sin_addr)));
+    zring_append (self->netmasks, strdup (inet_ntoa (netmask.sin_addr)));
+    zring_append (self->broadcasts, strdup (inet_ntoa (broadcast.sin_addr)));
 }
 
 
@@ -51,23 +51,23 @@ s_store (ziflist_t *self, char *name, inaddr_t address, inaddr_t netmask, inaddr
 ziflist_t *
 ziflist_new (void)
 {
-    ziflist_t *self = (ziflist_t *) zmalloc (sizeof (struct _ziflist_t));
+    ziflist_t *self = (ziflist_t *) zmalloc (sizeof (ziflist_t));
     if (self) {
-        self->names = zlist_new ();
+        self->names = zring_new ();
         if (self->names) {
-            zlist_set_destructor (self->names, (czmq_destructor *) zstr_free);
-            self->addresses = zlist_new ();
+            zring_set_destructor (self->names, (czmq_destructor *) zstr_free);
+            self->addresses = zring_new ();
         }
         if (self->addresses) {
-            zlist_set_destructor (self->addresses, (czmq_destructor *) zstr_free);
-            self->netmasks = zlist_new ();
+            zring_set_destructor (self->addresses, (czmq_destructor *) zstr_free);
+            self->netmasks = zring_new ();
         }
         if (self->netmasks) {
-            zlist_set_destructor (self->netmasks, (czmq_destructor *) zstr_free);
-            self->broadcasts = zlist_new ();
+            zring_set_destructor (self->netmasks, (czmq_destructor *) zstr_free);
+            self->broadcasts = zring_new ();
         }
         if (self->broadcasts) {
-            zlist_set_destructor (self->broadcasts, (czmq_destructor *) zstr_free);
+            zring_set_destructor (self->broadcasts, (czmq_destructor *) zstr_free);
             ziflist_reload (self);
         }
         else
@@ -86,10 +86,10 @@ ziflist_destroy (ziflist_t **self_p)
     assert (self_p);
     if (*self_p) {
         ziflist_t *self = *self_p;
-        zlist_destroy (&self->names);
-        zlist_destroy (&self->addresses);
-        zlist_destroy (&self->netmasks);
-        zlist_destroy (&self->broadcasts);
+        zring_destroy (&self->names);
+        zring_destroy (&self->addresses);
+        zring_destroy (&self->netmasks);
+        zring_destroy (&self->broadcasts);
         free (self);
         *self_p = NULL;
     }
@@ -120,10 +120,10 @@ s_valid_flags (short flags)
 void
 ziflist_reload (ziflist_t *self)
 {
-    zlist_purge (self->names);
-    zlist_purge (self->addresses);
-    zlist_purge (self->netmasks);
-    zlist_purge (self->broadcasts);
+    zring_purge (self->names);
+    zring_purge (self->addresses);
+    zring_purge (self->netmasks);
+    zring_purge (self->broadcasts);
 
 #if defined (HAVE_GETIFADDRS)
     struct ifaddrs *interfaces;
@@ -249,7 +249,7 @@ size_t
 ziflist_size (ziflist_t *self)
 {
     assert (self);
-    return zlist_size (self->names);
+    return zring_size (self->names);
 }
 
 
@@ -260,10 +260,10 @@ const char *
 ziflist_first (ziflist_t *self)
 {
     assert (self);
-    zlist_first (self->addresses);
-    zlist_first (self->netmasks);
-    zlist_first (self->broadcasts);
-    return (const char *) zlist_first (self->names);
+    zring_first (self->addresses);
+    zring_first (self->netmasks);
+    zring_first (self->broadcasts);
+    return (const char *) zring_first (self->names);
 }
 
 
@@ -274,10 +274,10 @@ const char *
 ziflist_next (ziflist_t *self)
 {
     assert (self);
-    zlist_next (self->addresses);
-    zlist_next (self->netmasks);
-    zlist_next (self->broadcasts);
-    return (const char *) zlist_next (self->names);
+    zring_next (self->addresses);
+    zring_next (self->netmasks);
+    zring_next (self->broadcasts);
+    return (const char *) zring_next (self->names);
 }
 
 
@@ -288,7 +288,7 @@ const char *
 ziflist_address (ziflist_t *self)
 {
     assert (self);
-    return (const char *) zlist_item (self->addresses);
+    return (const char *) zring_item (self->addresses);
 }
 
 
@@ -299,7 +299,7 @@ const char *
 ziflist_broadcast (ziflist_t *self)
 {
     assert (self);
-    return (const char *) zlist_item (self->broadcasts);
+    return (const char *) zring_item (self->broadcasts);
 }
 
 
@@ -310,7 +310,7 @@ const char *
 ziflist_netmask (ziflist_t *self)
 {
     assert (self);
-    return (const char *) zlist_item (self->netmasks);
+    return (const char *) zring_item (self->netmasks);
 }
 
 
