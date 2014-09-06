@@ -439,14 +439,14 @@ zhash_keys (zhash_t *self)
 {
     assert (self);
     zlist_t *keys = zlist_new ();
-    zlist_set_destructor (keys, (czmq_destructor *) zstr_free);
+    zlist_autofree (keys);
 
     uint index;
     size_t limit = primes [self->prime_index];
     for (index = 0; index < limit; index++) {
         item_t *item = self->items [index];
         while (item) {
-            zlist_append (keys, strdup (item->key));
+            zlist_append (keys, item->key);
             item = item->next;
         }
     }

@@ -63,15 +63,8 @@ This is the class interface:
     CZMQ_EXPORT size_t
         zhash_size (zhash_t *self);
     
-    //  Make copy of hash table; if supplied table is null, returns null.
-    //  Does not copy items themselves. Rebuilds new table so may be slow on
-    //  very large tables. NOTE: only works with item values that are strings
-    //  since there's no other way to know how to duplicate the item value.
-    CZMQ_EXPORT zhash_t *
-        zhash_dup (zhash_t *self);
-    
-    //  Return keys for items in table. If you remove items from this list you
-    //  must free the key value yourself.
+    //  Return a zlist_t containing the keys for the items in the table. It is
+    //  safe to use this list after destroying the hash table or items in it.
     CZMQ_EXPORT zlist_t *
         zhash_keys (zhash_t *self);
         
@@ -121,10 +114,6 @@ This is the class interface:
     CZMQ_EXPORT int
         zhash_refresh (zhash_t *self);
     
-    //  Set hash for automatic value destruction
-    CZMQ_EXPORT void
-        zhash_autofree (zhash_t *self);
-        
     //  Serialize hash table to a binary frame that can be sent in a message.
     //  The packed format is compatible with the 'dictionary' type defined in
     //  http://rfc.zeromq.org/spec:35/FILEMQ, and implemented by zproto:
@@ -154,15 +143,44 @@ This is the class interface:
     CZMQ_EXPORT zhash_t *
         zhash_unpack (zframe_t *frame);
     
+    //  Make a copy of the list; items are duplicated if you set a duplicator
+    //  for the list, otherwise not. Copying a null reference returns a null
+    //  reference. Note that this method's behavior changed slightly for CZMQ
+    //  v3.x. The old behavior is in zhash_dup_v2.
+    CZMQ_EXPORT zhash_t *
+        zhash_dup (zhash_t *self);
+    
+    //  Set a user-defined deallocator for hash items; by default items are not
+    //  freed when the hash is destroyed.
+    CZMQ_EXPORT void
+        zhash_set_destructor (zhash_t *self, czmq_destructor destructor);
+    
+    //  Set a user-defined duplicator for hash items; by default items are not
+    //  copied when the hash is duplicated.
+    CZMQ_EXPORT void
+        zhash_set_duplicator (zhash_t *self, czmq_duplicator duplicator);
+    
+    //  DEPRECATED by zhash_dup
+    //  Make copy of hash table; if supplied table is null, returns null.
+    //  Does not copy items themselves. Rebuilds new table so may be slow on
+    //  very large tables. NOTE: only works with item values that are strings
+    //  since there's no other way to know how to duplicate the item value.
+    CZMQ_EXPORT zhash_t *
+        zhash_dup_v2 (zhash_t *self);
+    
+    //  DEPRECATED as clumsy -- use set_destructor instead
+    //  Set hash for automatic value destruction
+    CZMQ_EXPORT void
+        zhash_autofree (zhash_t *self);
+    
+    //  DEPRECATED as clumsy -- use zhash_first/_next instead
+    typedef int (zhash_foreach_fn) (const char *key, void *item, void *argument);
+    
+    //  DEPRECATED as clumsy -- use zhash_first/_next instead
     //  Apply function to each item in the hash table. Items are iterated in no
     //  defined order. Stops if callback function returns non-zero and returns
     //  final return code from callback function (zero = success).
-    //  NOTE: this is deprecated in favor of zhash_first/next since the callback
-    //  design is clumsy and over-complex, and unnecessary.
-        
     //  Callback function for zhash_foreach method
-    typedef int (zhash_foreach_fn) (const char *key, void *item, void *argument);
-    
     CZMQ_EXPORT int
         zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument);
     
