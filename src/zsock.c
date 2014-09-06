@@ -571,12 +571,12 @@ zsock_send (void *self, const char *picture, ...)
             zmsg_addmem (msg, &pointer, sizeof (void *));
         }
         else
-	if (*picture == 'h') {
-	    zhash_t *hash = va_arg (argptr, zhash_t *);
-	    zframe_t *frame = zhash_pack (hash);
-	    zmsg_append ( msg, &frame);
-	}
-	else
+        if (*picture == 'h') {
+            zhash_t *hash = va_arg (argptr, zhash_t *);
+            zframe_t *frame = zhash_pack (hash);
+            zmsg_append ( msg, &frame);
+        }
+        else
         if (*picture == 'n')
             zmsg_addmem (msg, NULL, 0);
         else {
@@ -696,19 +696,18 @@ zsock_recv (void *self, const char *picture, ...)
             }
             zframe_destroy (&frame);
         }
-	else 
-	if (*picture == 'h') {
+        else 
+        if (*picture == 'h') {
             zframe_t *frame = zmsg_pop (msg);
             zhash_t **hash_p = va_arg (argptr, zhash_t **);
-	    if (hash_p) {
+            if (hash_p) {
                 if (frame) 
-		    *hash_p = zhash_unpack (frame);
-		else
-		    *hash_p = NULL;
-		
-	    }
-	    zframe_destroy (&frame);
-	}
+                    *hash_p = zhash_unpack (frame);
+                else
+                    *hash_p = NULL;
+            }
+            zframe_destroy (&frame);
+        }
         else
         if (*picture == 'n') {
             zframe_t *frame = zmsg_pop (msg);
