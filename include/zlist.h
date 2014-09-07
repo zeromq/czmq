@@ -94,10 +94,10 @@ CZMQ_EXPORT zlist_t *
 CZMQ_EXPORT size_t
     zlist_size (zlist_t *self);
 
-//  Sort the list by ascending key value using a straight ASCII comparison.
-//  The sort is not stable, so may reorder items with the same keys.
+//  Sort the ring using the container comparator, which must have been
+//  specified. The sort is not stable, so may reorder equal items.
 CZMQ_EXPORT void
-    zlist_sort (zlist_t *self, zlist_compare_fn *compare);
+    zring_sort (zring_t *self);
 
 //  Set list for automatic item destruction; item values MUST be strings.
 //  By default a list item refers to a value held elsewhere. When you set
