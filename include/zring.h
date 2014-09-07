@@ -45,13 +45,13 @@ CZMQ_EXPORT int
 CZMQ_EXPORT void *
     zring_detach (zring_t *self, void *item);
 
-//  Delete an item from the ring, and destroy it, if the item destructor is
+//  Remove an item from the ring, and destroy it, if the item destructor is
 //  set. Searches the ring for the item, always starting with the cursor, if
-//  any is set, and then from the start of the ring. If item is null, deletes
-//  the item at the cursor, if set. If the item was found and deleted, leaves
+//  any is set, and then from the start of the ring. If item is null, removes
+//  the item at the cursor, if set. If the item was found and removed, leaves
 //  the cursor at the next item, if any, and returns 0. Else, returns -1.
 CZMQ_EXPORT int
-    zring_delete (zring_t *self, void *item);
+    zring_remove (zring_t *self, void *item);
 
 //  Delete all items from the ring. If the item destructor is set, calls it
 //  on every item.
@@ -89,13 +89,14 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void *
     zring_item (zring_t *self);
 
-//  Find an item in the ring. If a comparator was set on the ring, calls this
-//  to compare each item in the ring with the supplied target item. If no
-//  comparator was set, compares the two item pointers for equality. If the
-//  item is found, leaves the cursor at the found item. Returns the item if
-//  found, else null.
+//  Find an item in the ring, looking first at the cursor, and then from the
+//  first to last item. If a comparator was set on container, calls this to
+//  compare each item in the ring with the supplied target item. If none
+//  was set, compares the two item pointers for equality. If the item is
+//  found, leaves the cursor at the found item. Returns the item if found,
+//  else null.
 CZMQ_EXPORT void *
-    zring_find (zring_t *self, void *target);
+    zring_find (zring_t *self, void *item);
 
 //  Sort the list using the compare function.
 //  The sort is not stable, so may reorder items with the same keys.

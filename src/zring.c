@@ -149,24 +149,13 @@ void *
 zring_detach (zring_t *self, void *item)
 {
     assert (self);
+    
     node_t *found = NULL;
-
-    //  Use item at cursor, if possible
-    if (self->cursor != self->head
-    && (item == NULL || self->cursor->item == item))
+    if ((item && zring_find (self, item))
+    || (!item && self->cursor != self->head))
         found = self->cursor;
-    else
-    if (item) {
-        //  Scan ring for item, this is a O(N) operation
-        node_t *node = self->head->next;
-        while (node != self->head) {
-            if (node->item == item) {
-                found = node;
-                break;
-            }
-            node = node->next;
-        }
-    }
+
+    //  Now detach node from list, without destroying it
     if (found) {
         item = found->item;
         found->next->prev = found->prev;
@@ -182,14 +171,14 @@ zring_detach (zring_t *self, void *item)
 
 
 //  --------------------------------------------------------------------------
-//  Delete an item from the ring, and destroy it, if the item destructor is
+//  Remove an item from the ring, and destroy it, if the item destructor is
 //  set. Searches the ring for the item, always starting with the cursor, if
-//  any is set, and then from the start of the ring. If item is null, deletes
-//  the item at the cursor, if set. If the item was found and deleted, leaves
+//  any is set, and then from the start of the ring. If item is null, removes
+//  the item at the cursor, if set. If the item was found and removed, leaves
 //  the cursor at the next item, if any, and returns 0. Else, returns -1.
 
 int
-zring_delete (zring_t *self, void *item)
+zring_remove (zring_t *self, void *item)
 {
     assert (self);
     if ((item = zring_detach (self, item))) {
@@ -203,14 +192,14 @@ zring_delete (zring_t *self, void *item)
 
 
 //  --------------------------------------------------------------------------
-//  Delete all items from the ring. If the item destructor is set, calls it
+//  Remove all items from the ring. If the item destructor is set, calls it
 //  on every item.
 
 void
 zring_purge (zring_t *self)
 {
     assert (self);
-    while (zring_delete (self, zring_first (self)) == 0);
+    while (zring_remove (self, zring_first (self)) == 0);
 }
 
 
@@ -295,27 +284,41 @@ zring_item (zring_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Find an item in the ring. If a comparator was set on the ring, calls this
-//  to compare each item in the ring with the supplied target item. If no
-//  comparator was set, compares the two item pointers for equality. If the
-//  item is found, leaves the cursor at the found item. Returns the item if
-//  found, else null.
+//  Find an item in the ring, looking first at the cursor, and then from the
+//  first to last item. If a comparator was set on container, calls this to
+//  compare each item in the ring with the supplied target item. If none
+//  was set, compares the two item pointers for equality. If the item is
+//  found, leaves the cursor at the found item. Returns the item if found,
+//  else null.
 
 void *
-zring_find (zring_t *self, void *target)
+zring_find (zring_t *self, void *item)
 {
     assert (self);
-    void *item = zring_first (self);
-    while (item) {
+    assert (item);
+    
+    //  First check item at cursor
+    if (self->cursor != self->head) {
         if (self->comparator) {
-            if (self->comparator (item, target) == 0)
-                return item;
+            if (self->comparator (self->cursor->item, item) == 0)
+                return self->cursor->item;
         }
         else
-        if (item == target)
-            return item;
+        if (self->cursor->item == item)
+            return self->cursor->item;
+    }
+    //  Now scan ring for item, this is a O(N) operation
+    node_t *node = self->head->next;
+    while (node != self->head) {
+        if (self->comparator) {
+            if (self->comparator (node->item, item) == 0)
+                return node->item;
+        }
+        else
+        if (node->item == item)
+            return node->item;
         
-        item = zring_next (self);
+        node = node->next;
     }
     return NULL;
 }
@@ -483,15 +486,15 @@ zring_test (int verbose)
     assert (zring_prev (ring) == NULL);
     //  After we reach start of ring, prev wraps around
     assert (zring_prev (ring) == wine);
+    zring_purge (ring);
 
-    //  Test some insert/delete combos
+    //  Test some list insertion-deletion combos
     char *zero = "0";
     char *one = "1";
     char *two = "2";
     char *three = "3";
     char *four = "4";
     char *five = "5";
-    zring_purge (ring);
     assert (zring_size (ring) == 0);
     zring_prepend (ring, four);
     zring_append (ring, three);
@@ -517,11 +520,11 @@ zring_test (int verbose)
     assert (zring_size (dup) == 6);
     zring_destroy (&dup);
 
-    rc = zring_delete (ring, two);
+    rc = zring_remove (ring, two);
     assert (rc == 0);
-    rc = zring_delete (ring, five);
+    rc = zring_remove (ring, five);
     assert (rc == 0);
-    rc = zring_delete (ring, three);
+    rc = zring_remove (ring, three);
     assert (rc == 0);
     item = zring_detach (ring, NULL);
 
