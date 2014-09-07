@@ -36,9 +36,10 @@ CZMQ_EXPORT void
 CZMQ_EXPORT int
     zhash_insert (zhash_t *self, const char *key, void *item);
 
-//  Update item into hash table with specified key and item.
-//  If key is already present, destroys old item and inserts new one.
-//  Use free_fn method to ensure deallocator is properly called on item.
+//  Update item into hash table with specified key and item. If the key is
+//  already present, destroys old item and inserts new one. If you set a
+//  container item destructor, this is called on the old value. Sets the
+//  hash cursor to the item, if found.
 CZMQ_EXPORT void
     zhash_update (zhash_t *self, const char *key, void *item);
 
@@ -89,8 +90,10 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void *
     zhash_next (zhash_t *self);
 
-//  After a successful first/next method, returns the key for the item
-//  that was returned. After an unsuccessful first/next, returns NULL.
+//  After a successful insert, update, or first/next method, returns the key
+//  for the item that was returned. This is a constant string that you may
+//  not modify or deallocate, and which lasts as long as the item in the hash.
+//  After an unsuccessful first/next, returns NULL.
 CZMQ_EXPORT char *
     zhash_cursor (zhash_t *self);
 
@@ -151,7 +154,8 @@ CZMQ_EXPORT zhash_t *
 //  Make a copy of the list; items are duplicated if you set a duplicator
 //  for the list, otherwise not. Copying a null reference returns a null
 //  reference. Note that this method's behavior changed slightly for CZMQ
-//  v3.x. The old behavior is in zhash_dup_v2.
+//  v3.x, as it does not set nor respect autofree. It does however let you
+//  duplicate any hash table safely. The old behavior is in zhash_dup_v2.
 CZMQ_EXPORT zhash_t *
     zhash_dup (zhash_t *self);
 
