@@ -65,7 +65,7 @@ typedef void (czmq_destructor) (void **item);
 //  -- duplicate an item
 typedef void * (czmq_duplicator) (void *item);
 //  - compare two items, for sorting
-typedef bool (czmq_comparator) (void *item1, void *item2);
+typedef int (czmq_comparator) (void *item1, void *item2);
 
 
 //  Public API classes
