@@ -473,8 +473,7 @@ zcert_test (bool verbose)
     shadow = zcert_load (TESTDIR "/mycert.txt");
     
     //  32-byte null key encodes as 40 '0' characters
-    assert (streq (zcert_secret_txt (shadow),
-                   FORTY_ZEROES));
+    assert (streq (zcert_secret_txt (shadow), FORTY_ZEROES));
     
     zcert_destroy (&shadow);
     zcert_destroy (&cert);
