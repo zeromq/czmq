@@ -89,6 +89,20 @@ CZMQ_EXPORT zchunk_t *
 CZMQ_EXPORT zchunk_t *
     zchunk_dup (zchunk_t *self);
 
+//  Return chunk data encoded as printable hex string. Caller must free
+//  string when finished with it.
+CZMQ_EXPORT char *
+    zchunk_strhex (zchunk_t *self);
+
+//  Return chunk data copied into freshly allocated string
+//  Caller must free string when finished with it.
+CZMQ_EXPORT char *
+    zchunk_strdup (zchunk_t *self);
+
+//  Return TRUE if chunk body is equal to string, excluding terminator
+CZMQ_EXPORT bool
+    zchunk_streq (zchunk_t *self, const char *string);
+
 //  Transform zchunk into a zframe that can be sent in a message.
 CZMQ_EXPORT zframe_t *
     zchunk_pack (zchunk_t *self);
