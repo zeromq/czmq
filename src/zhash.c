@@ -318,10 +318,11 @@ s_item_lookup (zhash_t *self, const char *key)
 
 
 //  --------------------------------------------------------------------------
-//  Update item into hash table with specified key and item. If the key is
-//  already present, destroys old item and inserts new one. If you set a
-//  container item destructor, this is called on the old value. Sets the
-//  hash cursor to the item, if found.
+//  Update or insert item into hash table with specified key and item. If the
+//  key is already present, destroys old item and inserts new one. If you set
+//  a container item destructor, this is called on the old value. If the key
+//  was not already present, inserts a new item. Sets the hash cursor to the
+//  new item.
 
 void
 zhash_update (zhash_t *self, const char *key, void *value)
