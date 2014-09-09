@@ -2,8 +2,8 @@
 
 To authenticate new clients using the ZeroMQ CURVE security mechanism,
 we have to check that the client's public key matches a key we know and
-accept. There are numerous ways to store accepted client public keys. 
-The mechanism CZMQ implements is "certificates" (plain text files) held 
+accept. There are numerous ways to store accepted client public keys.
+The mechanism CZMQ implements is "certificates" (plain text files) held
 in a "certificate store" (a disk directory). This class works with such
 certificate stores, and lets you easily load them from disk, and check
 if a given client public key is known or not. The zcert class does the
@@ -12,11 +12,11 @@ work of managing a single certificate.
 The certificate store can be memory-only, in which case you can load it
 yourself by inserting certificate objects one by one, or it can be loaded
 from disk, in which case you can add, modify, or remove certificates on
-disk at any time, and the store will detect such changes and refresh 
+disk at any time, and the store will detect such changes and refresh
 itself automatically. In most applications you won't use this class
 directly but through the zauth class, which provides a high-level API for
 authentication (and manages certificate stores for you). To actually
-create certificates on disk, use the zcert class in code, or the 
+create certificates on disk, use the zcert class in code, or the
 tools/makecert.c command line tool, or any text editor. The format of a
 certificate file is defined in the zcert man page.
 
@@ -66,23 +66,23 @@ This is the class self test code:
     //  Create temporary directory for test files
 #   define TESTDIR ".test_zcertstore"
     zsys_dir_create (TESTDIR);
-    
+
     //  Load certificate store from disk; it will be empty
     zcertstore_t *certstore = zcertstore_new (TESTDIR);
-    
+
     //  Create a single new certificate and save to disk
     zcert_t *cert = zcert_new ();
     char *client_key = strdup (zcert_public_txt (cert));
     zcert_set_meta (cert, "name", "John Doe");
     zcert_save (cert, TESTDIR "/mycert.txt");
     zcert_destroy (&cert);
-    
+
     //  Check that certificate store refreshes as expected
     cert = zcertstore_lookup (certstore, client_key);
     assert (cert);
     assert (streq (zcert_meta (cert, "name"), "John Doe"));
     free (client_key);
-    
+
     if (verbose)
         zcertstore_print (certstore);
     zcertstore_destroy (&certstore);
