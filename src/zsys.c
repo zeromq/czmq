@@ -1336,24 +1336,6 @@ zsys_set_logsystem (bool logsystem)
 static void
 s_log (char loglevel, char *string)
 {
-    if (s_logstream || s_logsender) {
-        time_t curtime = time (NULL);
-        struct tm *loctime = localtime (&curtime);
-        char date [20];
-        strftime (date, 20, "%y-%m-%d %H:%M:%S", loctime);
-        char log_text [1024];
-        if (s_logident)
-            snprintf (log_text, 1024, "%c: (%s) %s %s", loglevel, s_logident, date, string);
-        else
-            snprintf (log_text, 1024, "%c: %s %s", loglevel, date, string);
-        
-        if (s_logstream) {
-            fprintf (s_logstream, "%s\n", log_text);
-            fflush (s_logstream);
-        }
-        if (s_logsender)
-            zstr_send (s_logsender, log_text);
-    }
 #if defined (__UNIX__)
     if (s_logsystem) {
         int priority = LOG_INFO;
@@ -1374,7 +1356,30 @@ s_log (char loglevel, char *string)
 
         syslog (priority, "%s", string);
     }
+    else
 #endif
+    //  Set s_logstream to stdout by default, unless we're using s_logsystem
+    if (!s_logstream)
+        s_logstream = stdout;
+    
+    if (s_logstream || s_logsender) {
+        time_t curtime = time (NULL);
+        struct tm *loctime = localtime (&curtime);
+        char date [20];
+        strftime (date, 20, "%y-%m-%d %H:%M:%S", loctime);
+        char log_text [1024];
+        if (s_logident)
+            snprintf (log_text, 1024, "%c: (%s) %s %s", loglevel, s_logident, date, string);
+        else
+            snprintf (log_text, 1024, "%c: %s %s", loglevel, date, string);
+        
+        if (s_logstream) {
+            fprintf (s_logstream, "%s\n", log_text);
+            fflush (s_logstream);
+        }
+        if (s_logsender)
+            zstr_send (s_logsender, log_text);
+    }
 }
 
 
@@ -1470,7 +1475,6 @@ zsys_test (bool verbose)
     int rc = zsys_has_curve ();
     
     if (verbose) {
-        zsys_set_logstream (stdout);
         char *hostname = zsys_hostname ();
         zsys_info ("host name is %s", hostname);
         free (hostname);
