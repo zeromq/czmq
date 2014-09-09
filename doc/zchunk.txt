@@ -73,7 +73,8 @@ CZMQ_EXPORT zchunk_t *
     zchunk_slurp (const char *filename, size_t maxsize);
 
 //  Create copy of chunk, as new chunk object. Returns a fresh zchunk_t
-//  object, or NULL if there was not enough heap memory.
+//  object, or null if there was not enough heap memory. If chunk is null,
+//  returns null.
 CZMQ_EXPORT zchunk_t *
     zchunk_dup (zchunk_t *self);
 

@@ -288,15 +288,18 @@ zchunk_slurp (const char *filename, size_t maxsize)
 
 //  --------------------------------------------------------------------------
 //  Create copy of chunk, as new chunk object. Returns a fresh zchunk_t
-//  object, or NULL if there was not enough heap memory.
+//  object, or null if there was not enough heap memory. If chunk is null,
+//  or memory was exhausted, returns null.
 
 zchunk_t *
 zchunk_dup (zchunk_t *self)
 {
-    assert (self);
-    assert (zchunk_is (self));
-
-    return zchunk_new (self->data, self->max_size);
+    if (self) {
+        assert (zchunk_is (self));
+        return zchunk_new (self->data, self->max_size);
+    }
+    else
+        return NULL;
 }
 
 //  --------------------------------------------------------------------------

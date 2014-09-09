@@ -49,7 +49,8 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT bool
     zuuid_neq (zuuid_t *self, byte *compare);
 
-//  Make copy of UUID object
+//  Make copy of UUID object; if uuid is null, or memory was exhausted,
+//  returns null.
 CZMQ_EXPORT zuuid_t *
     zuuid_dup (zuuid_t *self);
 

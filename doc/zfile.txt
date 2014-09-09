@@ -20,7 +20,8 @@ CZMQ_EXPORT zfile_t *
 CZMQ_EXPORT void
     zfile_destroy (zfile_t **self_p);
 
-//  Duplicate a file item, returns a newly constructed item
+//  Duplicate a file item, returns a newly constructed item. If the file
+//  is null, or memory was exhausted, returns null.
 CZMQ_EXPORT zfile_t *
     zfile_dup (zfile_t *self);
 

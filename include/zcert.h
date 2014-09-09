@@ -85,7 +85,8 @@ CZMQ_EXPORT int
 CZMQ_EXPORT void
     zcert_apply (zcert_t *self, void *zocket);
 
-//  Return copy of certificate
+//  Return copy of certificate; if certificate is null or we exhausted
+//  heap memory, returns null.
 CZMQ_EXPORT zcert_t *
     zcert_dup (zcert_t *self);
 
