@@ -175,6 +175,7 @@ CZMQ_EXPORT const char *
 //      c = zchunk_t *
 //      f = zframe_t *
 //      p = void * (sends the pointer value, only meaningful over inproc)
+//      h = zhash_t * (sends a zhash)
 //      n = null, sends empty frame (0 arguments)
 //
 //  Note that b, c, and f are encoded the same way and the choice is offered
@@ -194,6 +195,7 @@ CZMQ_EXPORT int
 //      c = zchunk_t ** (creates zchunk)
 //      f = zframe_t ** (creates zframe)
 //      p = void ** (stores pointer)
+//      h = zhash_t ** (creates zhash)
 //      n = null, asserts empty frame (0 arguments)
 //
 //  Note that zsock_recv creates the returned objects, and the caller must
