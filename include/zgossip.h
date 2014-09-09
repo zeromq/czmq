@@ -39,6 +39,10 @@ extern "C" {
 //
 //      zactor_destroy (&zgossip_server);
 //  
+//  Enable verbose logging of commands and activity:
+//
+//      zstr_send (ca, "VERBOSE");
+//
 //  Bind zgossip server to specified endpoint. TCP endpoints may specify
 //  the port number as "*" to aquire an ephemeral port:
 //

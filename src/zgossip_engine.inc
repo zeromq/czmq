@@ -44,7 +44,7 @@ typedef enum {
     expired_event = 7
 } event_t;
 
-//  Names for animation and error reporting
+//  Names for state machine logging and error reporting
 static char *
 s_state_name [] = {
     "(NONE)",
@@ -82,7 +82,7 @@ typedef struct {
     zconfig_t *config;          //  Configuration tree
     uint client_id;             //  Client identifier counter
     size_t timeout;             //  Default client expiry timeout
-    bool animate;               //  Is animation enabled?
+    bool verbose;               //  Verbose logging enabled?
     char *log_prefix;           //  Default log prefix
 } s_server_t;
 
@@ -256,10 +256,9 @@ engine_set_log_prefix (client_t *client, const char *string)
     }
 }
 
-//  Set a configuration value in the server's configuration tree.
-//  The properties this engine uses are: server/animate,
-//  server/timeout, and server/background. You can also configure
-//  other abitrary properties.
+//  Set a configuration value in the server's configuration tree. The
+//  properties this engine uses are: server/verbose, server/timeout, and
+//  server/background. You can also configure other abitrary properties.
 
 static void
 engine_configure (server_t *server, const char *path, const char *value)
@@ -431,7 +430,7 @@ s_client_execute (s_client_t *self, int event)
         self->event = self->next_event;
         self->next_event = NULL_event;
         self->exception = NULL_event;
-        if (self->server->animate) {
+        if (self->server->verbose) {
             zsys_debug ("%s: %s:",
                 self->log_prefix, s_state_name [self->state]);
             zsys_debug ("%s:     %s",
@@ -442,7 +441,7 @@ s_client_execute (s_client_t *self, int event)
                 if (self->event == hello_event) {
                     if (!self->exception) {
                         //  get first tuple
-                        if (self->server->animate)
+                        if (self->server->verbose)
                             zsys_debug ("%s:         $ get first tuple", self->log_prefix);
                         get_first_tuple (&self->client);
                     }
@@ -453,7 +452,7 @@ s_client_execute (s_client_t *self, int event)
                 if (self->event == ping_event) {
                     if (!self->exception) {
                         //  send pong
-                        if (self->server->animate)
+                        if (self->server->verbose)
                             zsys_debug ("%s:         $ send PONG",
                                 self->log_prefix);
                         zgossip_msg_set_id (self->client.reply, ZGOSSIP_MSG_PONG);
@@ -466,7 +465,7 @@ s_client_execute (s_client_t *self, int event)
                 if (self->event == expired_event) {
                     if (!self->exception) {
                         //  terminate
-                        if (self->server->animate)
+                        if (self->server->verbose)
                             zsys_debug ("%s:         $ terminate", self->log_prefix);
                         self->next_event = terminate_event;
                     }
@@ -475,7 +474,7 @@ s_client_execute (s_client_t *self, int event)
                     //  Handle unexpected protocol events
                     if (!self->exception) {
                         //  send invalid
-                        if (self->server->animate)
+                        if (self->server->verbose)
                             zsys_debug ("%s:         $ send INVALID",
                                 self->log_prefix);
                         zgossip_msg_set_id (self->client.reply, ZGOSSIP_MSG_INVALID);
@@ -485,7 +484,7 @@ s_client_execute (s_client_t *self, int event)
                     }
                     if (!self->exception) {
                         //  terminate
-                        if (self->server->animate)
+                        if (self->server->verbose)
                             zsys_debug ("%s:         $ terminate", self->log_prefix);
                         self->next_event = terminate_event;
                     }
@@ -496,7 +495,7 @@ s_client_execute (s_client_t *self, int event)
                 if (self->event == ok_event) {
                     if (!self->exception) {
                         //  send publish
-                        if (self->server->animate)
+                        if (self->server->verbose)
                             zsys_debug ("%s:         $ send PUBLISH",
                                 self->log_prefix);
                         zgossip_msg_set_id (self->client.reply, ZGOSSIP_MSG_PUBLISH);
@@ -506,7 +505,7 @@ s_client_execute (s_client_t *self, int event)
                     }
                     if (!self->exception) {
                         //  get next tuple
-                        if (self->server->animate)
+                        if (self->server->verbose)
                             zsys_debug ("%s:         $ get next tuple", self->log_prefix);
                         get_next_tuple (&self->client);
                     }
@@ -530,7 +529,7 @@ s_client_execute (s_client_t *self, int event)
                 if (self->event == publish_event) {
                     if (!self->exception) {
                         //  store tuple if new
-                        if (self->server->animate)
+                        if (self->server->verbose)
                             zsys_debug ("%s:         $ store tuple if new", self->log_prefix);
                         store_tuple_if_new (&self->client);
                     }
@@ -539,13 +538,13 @@ s_client_execute (s_client_t *self, int event)
                 if (self->event == forward_event) {
                     if (!self->exception) {
                         //  get tuple to forward
-                        if (self->server->animate)
+                        if (self->server->verbose)
                             zsys_debug ("%s:         $ get tuple to forward", self->log_prefix);
                         get_tuple_to_forward (&self->client);
                     }
                     if (!self->exception) {
                         //  send publish
-                        if (self->server->animate)
+                        if (self->server->verbose)
                             zsys_debug ("%s:         $ send PUBLISH",
                                 self->log_prefix);
                         zgossip_msg_set_id (self->client.reply, ZGOSSIP_MSG_PUBLISH);
@@ -558,7 +557,7 @@ s_client_execute (s_client_t *self, int event)
                 if (self->event == ping_event) {
                     if (!self->exception) {
                         //  send pong
-                        if (self->server->animate)
+                        if (self->server->verbose)
                             zsys_debug ("%s:         $ send PONG",
                                 self->log_prefix);
                         zgossip_msg_set_id (self->client.reply, ZGOSSIP_MSG_PONG);
@@ -571,7 +570,7 @@ s_client_execute (s_client_t *self, int event)
                 if (self->event == expired_event) {
                     if (!self->exception) {
                         //  terminate
-                        if (self->server->animate)
+                        if (self->server->verbose)
                             zsys_debug ("%s:         $ terminate", self->log_prefix);
                         self->next_event = terminate_event;
                     }
@@ -580,7 +579,7 @@ s_client_execute (s_client_t *self, int event)
                     //  Handle unexpected protocol events
                     if (!self->exception) {
                         //  send invalid
-                        if (self->server->animate)
+                        if (self->server->verbose)
                             zsys_debug ("%s:         $ send INVALID",
                                 self->log_prefix);
                         zgossip_msg_set_id (self->client.reply, ZGOSSIP_MSG_INVALID);
@@ -590,7 +589,7 @@ s_client_execute (s_client_t *self, int event)
                     }
                     if (!self->exception) {
                         //  terminate
-                        if (self->server->animate)
+                        if (self->server->verbose)
                             zsys_debug ("%s:         $ terminate", self->log_prefix);
                         self->next_event = terminate_event;
                     }
@@ -601,7 +600,7 @@ s_client_execute (s_client_t *self, int event)
                 if (self->event == ping_event) {
                     if (!self->exception) {
                         //  send pong
-                        if (self->server->animate)
+                        if (self->server->verbose)
                             zsys_debug ("%s:         $ send PONG",
                                 self->log_prefix);
                         zgossip_msg_set_id (self->client.reply, ZGOSSIP_MSG_PONG);
@@ -614,7 +613,7 @@ s_client_execute (s_client_t *self, int event)
                 if (self->event == expired_event) {
                     if (!self->exception) {
                         //  terminate
-                        if (self->server->animate)
+                        if (self->server->verbose)
                             zsys_debug ("%s:         $ terminate", self->log_prefix);
                         self->next_event = terminate_event;
                     }
@@ -623,7 +622,7 @@ s_client_execute (s_client_t *self, int event)
                     //  Handle unexpected protocol events
                     if (!self->exception) {
                         //  send invalid
-                        if (self->server->animate)
+                        if (self->server->verbose)
                             zsys_debug ("%s:         $ send INVALID",
                                 self->log_prefix);
                         zgossip_msg_set_id (self->client.reply, ZGOSSIP_MSG_INVALID);
@@ -633,7 +632,7 @@ s_client_execute (s_client_t *self, int event)
                     }
                     if (!self->exception) {
                         //  terminate
-                        if (self->server->animate)
+                        if (self->server->verbose)
                             zsys_debug ("%s:         $ terminate", self->log_prefix);
                         self->next_event = terminate_event;
                     }
@@ -642,7 +641,7 @@ s_client_execute (s_client_t *self, int event)
         }
         //  If we had an exception event, interrupt normal programming
         if (self->exception) {
-            if (self->server->animate)
+            if (self->server->verbose)
                 zsys_debug ("%s:         ! %s",
                     self->log_prefix, s_event_name [self->exception]);
 
@@ -654,7 +653,7 @@ s_client_execute (s_client_t *self, int event)
             break;
         }
         else {
-            if (self->server->animate)
+            if (self->server->verbose)
                 zsys_debug ("%s:         > %s",
                     self->log_prefix, s_state_name [self->state]);
 
@@ -693,9 +692,9 @@ s_server_config_self (s_server_t *self)
 {
     //  Built-in server configuration options
     //  
-    //  Animation is disabled by default
-    self->animate = atoi (
-        zconfig_resolve (self->config, "server/animate", "0")) != 0;
+    //  By default the server is silent
+    self->verbose = atoi (
+        zconfig_resolve (self->config, "server/verbose", "0")) != 0;
 
     //  Default client timeout is 60 seconds
     self->timeout = atoi (
@@ -792,6 +791,12 @@ s_server_api_message (zloop_t *loop, zsock_t *reader, void *argument)
     if (!msg)
         return -1;              //  Interrupted; exit zloop
     char *method = zmsg_popstr (msg);
+    if (self->verbose)
+        zsys_debug ("%s:     API command=", self->log_prefix, method);
+    
+    if (streq (method, "VERBOSE"))
+        self->verbose = true;
+    else
     if (streq (method, "$TERM")) {
         //  Shutdown the engine
         free (method);
@@ -833,6 +838,11 @@ s_server_api_message (zloop_t *loop, zsock_t *reader, void *argument)
         char *path = zmsg_popstr (msg);
         char *value = zmsg_popstr (msg);
         zconfig_put (self->config, path, value);
+        //  TODO: remove after October 9, 2014
+        if (streq (path, "server/animate")) {
+            zsys_warning ("'%s' is deprecated, use VERBOSE command instead", path);
+            self->verbose = atoi (value);
+        }
         s_server_config_self (self);
         free (path);
         free (value);
