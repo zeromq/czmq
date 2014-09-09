@@ -692,10 +692,11 @@ s_server_config_self (s_server_t *self)
 {
     //  Built-in server configuration options
     //  
-    //  By default the server is silent
-    self->verbose = atoi (
-        zconfig_resolve (self->config, "server/verbose", "0")) != 0;
-
+    //  If we didn't already set verbose, check if the config tree wants it
+    if (!self->verbose
+    && atoi (zconfig_resolve (self->config, "server/verbose", "0")))
+        self->verbose = true;
+        
     //  Default client timeout is 60 seconds
     self->timeout = atoi (
         zconfig_resolve (self->config, "server/timeout", "60000"));
@@ -792,7 +793,7 @@ s_server_api_message (zloop_t *loop, zsock_t *reader, void *argument)
         return -1;              //  Interrupted; exit zloop
     char *method = zmsg_popstr (msg);
     if (self->verbose)
-        zsys_debug ("%s:     API command=", self->log_prefix, method);
+        zsys_debug ("%s:     API command=%s", self->log_prefix, method);
     
     if (streq (method, "VERBOSE"))
         self->verbose = true;
