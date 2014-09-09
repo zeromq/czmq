@@ -84,9 +84,24 @@ CZMQ_EXPORT zchunk_t *
     zchunk_slurp (const char *filename, size_t maxsize);
 
 //  Create copy of chunk, as new chunk object. Returns a fresh zchunk_t
-//  object, or NULL if there was not enough heap memory.
+//  object, or null if there was not enough heap memory. If chunk is null,
+//  returns null.
 CZMQ_EXPORT zchunk_t *
     zchunk_dup (zchunk_t *self);
+
+//  Return chunk data encoded as printable hex string. Caller must free
+//  string when finished with it.
+CZMQ_EXPORT char *
+    zchunk_strhex (zchunk_t *self);
+
+//  Return chunk data copied into freshly allocated string
+//  Caller must free string when finished with it.
+CZMQ_EXPORT char *
+    zchunk_strdup (zchunk_t *self);
+
+//  Return TRUE if chunk body is equal to string, excluding terminator
+CZMQ_EXPORT bool
+    zchunk_streq (zchunk_t *self, const char *string);
 
 //  Transform zchunk into a zframe that can be sent in a message.
 CZMQ_EXPORT zframe_t *

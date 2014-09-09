@@ -500,15 +500,7 @@ zsock_type_str (zsock_t *self)
 {
     assert (self);
     assert (zsock_is (self));
-
-    //  This array matches ZMQ_XXX type definitions
-    assert (ZMQ_PAIR == 0);
-    char *type_names [] = {
-        "PAIR", "PUB", "SUB", "REQ", "REP",
-        "DEALER", "ROUTER", "PULL", "PUSH",
-        "XPUB", "XSUB", "STREAM"
-    };
-    return type_names [self->type];
+    return zsys_sockname (self->type);
 }
 
 

@@ -360,15 +360,24 @@ zcert_apply (zcert_t *self, void *zocket)
 
 
 //  --------------------------------------------------------------------------
-//  Return copy of certificate
+//  Return copy of certificate; if certificate is null or we exhausted
+//  heap memory, returns null.
 
 zcert_t *
-zcert_dup (zcert_t *source)
+zcert_dup (zcert_t *self)
 {
-    zcert_t *self = zcert_new_from (source->public_key, source->secret_key);
-    zhash_destroy (&self->metadata);
-    self->metadata = zhash_dup (source->metadata);
-    return self;
+    if (self) {
+        zcert_t *copy = zcert_new_from (self->public_key, self->secret_key);
+        if (copy) {
+            zhash_destroy (&copy->metadata);
+            copy->metadata = zhash_dup (self->metadata);
+            if (copy->metadata == NULL)
+                zcert_destroy (&copy);
+        }
+        return copy;
+    }
+    else
+        return NULL;
 }
 
 
