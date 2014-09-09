@@ -411,7 +411,8 @@ zgossip_test (bool verbose)
     //  @selftest
     //  Test basic client-to-server operation of the protocol
     zactor_t *server = zactor_new (zgossip, "server");
-    zstr_sendx (server, "SET", "server/animate", verbose? "1": "0", NULL);
+    if (verbose)
+        zstr_send (server, "VERBOSE");
     zstr_sendx (server, "BIND", "inproc://zgossip", NULL);
 
     zsock_t *client = zsock_new (ZMQ_DEALER);
@@ -441,7 +442,8 @@ zgossip_test (bool verbose)
     //  Test peer-to-peer operations
     zactor_t *base = zactor_new (zgossip, "base");
     assert (base);
-    zstr_sendx (base, "SET", "server/animate", verbose? "1": "0", NULL);
+    if (verbose)
+        zstr_send (base, "VERBOSE");
     //  Set a 100msec timeout on clients so we can test expiry
     zstr_sendx (base, "SET", "server/timeout", "100", NULL);
     zstr_sendx (base, "BIND", "inproc://base", NULL);
