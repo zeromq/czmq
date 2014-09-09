@@ -722,8 +722,8 @@ This is the class self test code:
 
 To authenticate new clients using the ZeroMQ CURVE security mechanism,
 we have to check that the client's public key matches a key we know and
-accept. There are numerous ways to store accepted client public keys. 
-The mechanism CZMQ implements is "certificates" (plain text files) held 
+accept. There are numerous ways to store accepted client public keys.
+The mechanism CZMQ implements is "certificates" (plain text files) held
 in a "certificate store" (a disk directory). This class works with such
 certificate stores, and lets you easily load them from disk, and check
 if a given client public key is known or not. The zcert class does the
@@ -732,11 +732,11 @@ work of managing a single certificate.
 The certificate store can be memory-only, in which case you can load it
 yourself by inserting certificate objects one by one, or it can be loaded
 from disk, in which case you can add, modify, or remove certificates on
-disk at any time, and the store will detect such changes and refresh 
+disk at any time, and the store will detect such changes and refresh
 itself automatically. In most applications you won't use this class
 directly but through the zauth class, which provides a high-level API for
 authentication (and manages certificate stores for you). To actually
-create certificates on disk, use the zcert class in code, or the 
+create certificates on disk, use the zcert class in code, or the
 tools/makecert.c command line tool, or any text editor. The format of a
 certificate file is defined in the zcert man page.
 
@@ -786,23 +786,23 @@ This is the class self test code:
     //  Create temporary directory for test files
 #   define TESTDIR ".test_zcertstore"
     zsys_dir_create (TESTDIR);
-    
+
     //  Load certificate store from disk; it will be empty
     zcertstore_t *certstore = zcertstore_new (TESTDIR);
-    
+
     //  Create a single new certificate and save to disk
     zcert_t *cert = zcert_new ();
     char *client_key = strdup (zcert_public_txt (cert));
     zcert_set_meta (cert, "name", "John Doe");
     zcert_save (cert, TESTDIR "/mycert.txt");
     zcert_destroy (&cert);
-    
+
     //  Check that certificate store refreshes as expected
     cert = zcertstore_lookup (certstore, client_key);
     assert (cert);
     assert (streq (zcert_meta (cert, "name"), "John Doe"));
     free (client_key);
-    
+
     if (verbose)
         zcertstore_print (certstore);
     zcertstore_destroy (&certstore);
@@ -1107,7 +1107,8 @@ This is the class interface:
     CZMQ_EXPORT zconfig_t *
         zconfig_at_depth (zconfig_t *self, int level);
     
-    //  Execute a callback for each config item in the tree
+    //  Execute a callback for each config item in the tree; returns zero if
+    //  successful, else -1.
     CZMQ_EXPORT int
         zconfig_execute (zconfig_t *self, zconfig_fct handler, void *arg);
     
@@ -1813,6 +1814,10 @@ This is the class interface:
     //
     //      zactor_destroy (&zgossip_server);
     //  
+    //  Enable verbose logging of commands and activity:
+    //
+    //      zstr_send (ca, "VERBOSE");
+    //
     //  Bind zgossip server to specified endpoint. TCP endpoints may specify
     //  the port number as "*" to aquire an ephemeral port:
     //
@@ -1856,7 +1861,8 @@ This is the class self test code:
 
     //  Test basic client-to-server operation of the protocol
     zactor_t *server = zactor_new (zgossip, "server");
-    zstr_sendx (server, "SET", "server/animate", verbose? "1": "0", NULL);
+    if (verbose)
+        zstr_send (server, "VERBOSE");
     zstr_sendx (server, "BIND", "inproc://zgossip", NULL);
 
     zsock_t *client = zsock_new (ZMQ_DEALER);
@@ -1886,7 +1892,8 @@ This is the class self test code:
     //  Test peer-to-peer operations
     zactor_t *base = zactor_new (zgossip, "base");
     assert (base);
-    zstr_sendx (base, "SET", "server/animate", verbose? "1": "0", NULL);
+    if (verbose)
+        zstr_send (base, "VERBOSE");
     //  Set a 100msec timeout on clients so we can test expiry
     zstr_sendx (base, "SET", "server/timeout", "100", NULL);
     zstr_sendx (base, "BIND", "inproc://base", NULL);
@@ -1944,9 +1951,11 @@ This is the class interface:
     CZMQ_EXPORT int
         zhash_insert (zhash_t *self, const char *key, void *item);
     
-    //  Update item into hash table with specified key and item.
-    //  If key is already present, destroys old item and inserts new one.
-    //  Use free_fn method to ensure deallocator is properly called on item.
+    //  Update or insert item into hash table with specified key and item. If the
+    //  key is already present, destroys old item and inserts new one. If you set
+    //  a container item destructor, this is called on the old value. If the key
+    //  was not already present, inserts a new item. Sets the hash cursor to the
+    //  new item.
     CZMQ_EXPORT void
         zhash_update (zhash_t *self, const char *key, void *item);
     
@@ -1997,8 +2006,10 @@ This is the class interface:
     CZMQ_EXPORT void *
         zhash_next (zhash_t *self);
     
-    //  After a successful first/next method, returns the key for the item
-    //  that was returned. After an unsuccessful first/next, returns NULL.
+    //  After a successful insert, update, or first/next method, returns the key
+    //  for the item that was returned. This is a constant string that you may
+    //  not modify or deallocate, and which lasts as long as the item in the hash.
+    //  After an unsuccessful first/next, returns NULL.
     CZMQ_EXPORT char *
         zhash_cursor (zhash_t *self);
     
@@ -2059,7 +2070,8 @@ This is the class interface:
     //  Make a copy of the list; items are duplicated if you set a duplicator
     //  for the list, otherwise not. Copying a null reference returns a null
     //  reference. Note that this method's behavior changed slightly for CZMQ
-    //  v3.x. The old behavior is in zhash_dup_v2.
+    //  v3.x, as it does not set nor respect autofree. It does however let you
+    //  duplicate any hash table safely. The old behavior is in zhash_dup_v2.
     CZMQ_EXPORT zhash_t *
         zhash_dup (zhash_t *self);
     
@@ -2262,7 +2274,7 @@ This is the class self test code:
 The ziflist class takes a snapshot of the network interfaces that the
 system currently supports (this can change arbitrarily, especially on
 mobile devices). The caller can then access the network interface
-information using an iterator that works like zlist. Only stores those
+information using an iterator that works like zring. Only stores those
 interfaces with broadcast capability, and ignores the loopback interface.
 
 
@@ -2397,10 +2409,10 @@ This is the class interface:
     CZMQ_EXPORT size_t
         zlist_size (zlist_t *self);
     
-    //  Sort the list by ascending key value using a straight ASCII comparison.
-    //  The sort is not stable, so may reorder items with the same keys.
+    //  Sort the ring using the container comparator, which must have been
+    //  specified. The sort is not stable, so may reorder equal items.
     CZMQ_EXPORT void
-        zlist_sort (zlist_t *self, zlist_compare_fn *compare);
+        zring_sort (zring_t *self);
     
     //  Set list for automatic item destruction; item values MUST be strings.
     //  By default a list item refers to a value held elsewhere. When you set
@@ -3231,12 +3243,15 @@ This is the class self test code:
 
 #### zring - generic type-free doubly linked ring container
 
-Provides a generic container implementing a fast doubly-linked ring, aka
-a ring. You can use this to construct multi-dimensional rings, and other
-structures together with other generic containers like zhash.
+Provides a generic "ring" container, which mixes a doubly-linked list
+with a hash table to provide both ordered and direct keyed access to
+items. The zring class is more complex and powerful than zlist, which
+is considered a 'basic' list container. This container provides hooks
+for duplicator, comparator, and destructor functions. These tie into
+CZMQ and standard C semantics, so e.g. for string items you can use
+strdup, strcmp, and zstr_free. To store custom objects, define your
+own duplicator and comparator, and use the standard object destructor.
 
-To iterate through a ring, use zring_first to get the first item, then
-loop while not null, and do zring_next at the end of each iteration.
 
 This is the class interface:
 
@@ -3247,6 +3262,73 @@ This is the class interface:
     //  Destroy a ring container
     CZMQ_EXPORT void
         zring_destroy (zring_t **self_p);
+    
+    //  Prepend an item to the start of the ring, return 0 if OK, else -1.
+    //  Leaves cursor at newly inserted item.
+    CZMQ_EXPORT int
+        zring_prepend (zring_t *self, void *item);
+    
+    //  Append an item to the end of the ring, return 0 if OK, else -1.
+    //  Leaves cursor at newly inserted item.
+    CZMQ_EXPORT int
+        zring_append (zring_t *self, void *item);
+    
+    //  Append an item to the end of the ring, and insert into the ring
+    //  dictionary, so that you can find the item rapidly using zring_lookup.
+    //  If you do a lot of item searches, this is faster than zring_find,
+    //  which is at worst an O(N) operation. When items leave the ring, they
+    //  are always removed from the dictionary. Returns 0 on success, -1 if
+    //  the key already existed in the dictionary, or heap memory ran out.
+    CZMQ_EXPORT int
+        zring_insert (zring_t *self, const char *key, void *item);
+        
+    //  Find an item in the ring, looking first at the cursor, and then from the
+    //  first to last item. If a comparator was set on container, calls this to
+    //  compare each item in the ring with the supplied target item. If none
+    //  was set, compares the two item pointers for equality. If the item is
+    //  found, leaves the cursor at the found item. Returns the item if found,
+    //  else null.
+    CZMQ_EXPORT void *
+        zring_find (zring_t *self, void *item);
+    
+    //  Search the ring dictionary for an item, by key. If the item is in the
+    //  dictionary (via zring_insert), then sets the ring cursor to the item,
+    //  and returns the item value. If not, leaves the cursor unchanged, and
+    //  returns NULL.
+    CZMQ_EXPORT void *
+        zring_lookup (zring_t *self, const char *key);
+    
+    //  Detach an item from the ring, without destroying the item. Searches the
+    //  ring for the item, always starting with the cursor, if any is set, and
+    //  then from the start of the ring. If item is null, detaches the item at the
+    //  cursor, if set. If the item was found and detached, leaves the cursor at
+    //  the next item, if any, and returns the item. Else, returns null.
+    CZMQ_EXPORT void *
+        zring_detach (zring_t *self, void *item);
+    
+    //  Remove an item from the ring, and destroy it, if the item destructor is
+    //  set. Searches the ring for the item, always starting with the cursor, if
+    //  any is set, and then from the start of the ring. If item is null, removes
+    //  the item at the cursor, if set. If the item was found and removed, leaves
+    //  the cursor at the next item, if any, and returns 0. Else, returns -1.
+    CZMQ_EXPORT int
+        zring_remove (zring_t *self, void *item);
+    
+    //  Search the ring dictionary for an item, by key. If the item is in the
+    //  dictionary (via zring_insert), then removes the item from the ring and
+    //  calls the item destructor, if any is found. Returns 0 if the item was
+    //  found and removed, else -1 if not found.
+    CZMQ_EXPORT int
+        zring_delete (zring_t *self, const char *key);
+        
+    //  Delete all items from the ring. If the item destructor is set, calls it
+    //  on every item.
+    CZMQ_EXPORT void
+        zring_purge (zring_t *self);
+    
+    //  Return number of items in the ring
+    CZMQ_EXPORT size_t
+        zring_size (zring_t *self);
     
     //  Return the item at the head of ring. If the ring is empty, returns NULL.
     //  Leaves cursor pointing at the head item, or NULL if the ring is empty.
@@ -3275,55 +3357,17 @@ This is the class interface:
     CZMQ_EXPORT void *
         zring_item (zring_t *self);
     
-    //  Find an item in the ring. If a comparator was set on the ring, calls this
-    //  to compare each item in the ring with the supplied target item. If no
-    //  comparator was set, compares the two item pointers for equality. If the
-    //  item is found, leaves the cursor at the found item. Returns the item if
-    //  found, else null.
-    CZMQ_EXPORT void *
-        zring_find (zring_t *self, void *target);
-    
-    //  Prepend an item to the start of the ring, return 0 if OK, else -1.
-    //  Leaves cursor at newly inserted item.
-    CZMQ_EXPORT int
-        zring_prepend (zring_t *self, void *item);
-    
-    //  Append an item to the end of the ring, return 0 if OK, else -1.
-    //  Leaves cursor at newly inserted item.
-    CZMQ_EXPORT int
-        zring_append (zring_t *self, void *item);
-    
-    //  Detach an item from the ring, without destroying the item. Searches the
-    //  ring for the item, always starting with the cursor, if any is set, and
-    //  then from the start of the ring. If item is null, detaches the item at the
-    //  cursor, if set. If the item was found and detached, leaves the cursor at
-    //  the next item, if any, and returns the item. Else, returns null.
-    CZMQ_EXPORT void *
-        zring_detach (zring_t *self, void *item);
-    
-    //  Delete an item from the ring, and destroy it, if the item destructor is
-    //  set. Searches the ring for the item, always starting with the cursor, if
-    //  any is set, and then from the start of the ring. If item is null, deletes
-    //  the item at the cursor, if set. If the item was found and deleted, leaves
-    //  the cursor at the next item, if any, and returns 0. Else, returns -1.
-    CZMQ_EXPORT int
-        zring_delete (zring_t *self, void *item);
-    
-    //  Delete all items from the ring. If the item destructor is set, calls it
-    //  on every item.
+    //  Sort the list using the compare function.
+    //  The sort is not stable, so may reorder items with the same keys.
     CZMQ_EXPORT void
-        zring_purge (zring_t *self);
-    
-    //  Return number of items in the ring
-    CZMQ_EXPORT size_t
-        zring_size (zring_t *self);
+        zlist_sort (zlist_t *self, zlist_compare_fn *compare);
     
     //  Make a copy of the ring; items are duplicated if you set a duplicator
     //  for the ring, otherwise not. Copying a null reference returns a null
     //  reference.
     CZMQ_EXPORT zring_t *
         zring_dup (zring_t *self);
-    
+        
     //  Set a user-defined deallocator for ring items; by default items are not
     //  freed when the ring is destroyed.
     CZMQ_EXPORT void
@@ -3382,42 +3426,73 @@ This is the class self test code:
     assert (zring_prev (ring) == NULL);
     //  After we reach start of ring, prev wraps around
     assert (zring_prev (ring) == wine);
-
-    //  Test some insert/delete combos
-    char *zero = "0";
-    char *one = "1";
-    char *two = "2";
-    char *three = "3";
-    char *four = "4";
-    char *five = "5";
     zring_purge (ring);
+
+    //  Test some list insertion-deletion combos
     assert (zring_size (ring) == 0);
-    zring_append (ring, three);
-    zring_prepend (ring, two);
-    zring_prepend (ring, one);
-    zring_append (ring, four);
-    zring_append (ring, five);
-    zring_prepend (ring, zero);
+    zring_prepend (ring, "4");
+    zring_append (ring, "3");
+    zring_prepend (ring, "5");
+    zring_append (ring, "2");
+    zring_prepend (ring, "0");
+    zring_append (ring, "1");
     assert (zring_size (ring) == 6);
-    void *item = zring_detach (ring, NULL);
-    assert (item == zero);
+
+    //  Try the comparator functionality
+    zring_set_comparator (ring, (czmq_comparator *) strcmp);
+    zring_sort (ring);
+    
+    char *item = (char *) zring_first (ring);
+    assert (streq (item, "0"));
+    item = (char *) zring_find (ring, "5");
+    assert (streq (item, "5"));
 
     //  Try the duplicator and destructor
     zring_set_duplicator (ring, (czmq_duplicator *) strdup);
     zring_t *dup = zring_dup (ring);
     assert (dup);
     zring_set_destructor (dup, (czmq_destructor *) zstr_free);
-    assert (zring_size (dup) == 5);
+    assert (zring_size (dup) == 6);
     zring_destroy (&dup);
 
-    rc = zring_delete (ring, two);
+    //  We're comparing as strings, not item pointers
+    rc = zring_remove (ring, "2");
     assert (rc == 0);
-    rc = zring_delete (ring, five);
+    rc = zring_remove (ring, "5");
     assert (rc == 0);
-    rc = zring_delete (ring, three);
+    rc = zring_remove (ring, "3");
     assert (rc == 0);
     item = zring_detach (ring, NULL);
+    zring_purge (ring);
 
+    //  Try the dictionary insert/delete functionality
+    rc = zring_insert (ring, "1", "one");
+    assert (rc == 0);
+    rc = zring_insert (ring, "3", "three");
+    assert (rc == 0);
+    rc = zring_insert (ring, "2", "two");
+    assert (rc == 0);
+    rc = zring_insert (ring, "2", "two");
+    assert (rc == -1);
+    
+    item = (char *) zring_lookup (ring, "2");
+    assert (streq (item, "two"));
+    item = (char *) zring_lookup (ring, "1");
+    assert (streq (item, "one"));
+    item = (char *) zring_item (ring);
+    assert (streq (item, "one"));
+    
+    rc = zring_delete (ring, "3");
+    assert (rc == 0);
+    rc = zring_delete (ring, "3");
+    assert (rc == -1);
+    //  Using detach/remove will also remove from dictionary
+    rc = zring_remove (ring, "two");
+    assert (rc == 0);
+    rc = zring_delete (ring, "2");
+    assert (rc == -1);
+    zring_purge (ring);
+    
     //  Destructor should be safe to call twice
     zring_destroy (&ring);
     assert (ring == NULL);
@@ -3600,6 +3675,7 @@ This is the class interface:
     //      c = zchunk_t *
     //      f = zframe_t *
     //      p = void * (sends the pointer value, only meaningful over inproc)
+    //      h = zhash_t * (sends a zhash)
     //      n = null, sends empty frame (0 arguments)
     //
     //  Note that b, c, and f are encoded the same way and the choice is offered
@@ -3619,6 +3695,7 @@ This is the class interface:
     //      c = zchunk_t ** (creates zchunk)
     //      f = zframe_t ** (creates zframe)
     //      p = void ** (stores pointer)
+    //      h = zhash_t ** (creates zhash)
     //      n = null, asserts empty frame (0 arguments)
     //
     //  Note that zsock_recv creates the returned objects, and the caller must

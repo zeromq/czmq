@@ -67,7 +67,8 @@ CZMQ_EXPORT void
 CZMQ_EXPORT zconfig_t *
     zconfig_at_depth (zconfig_t *self, int level);
 
-//  Execute a callback for each config item in the tree
+//  Execute a callback for each config item in the tree; returns zero if
+//  successful, else -1.
 CZMQ_EXPORT int
     zconfig_execute (zconfig_t *self, zconfig_fct handler, void *arg);
 
