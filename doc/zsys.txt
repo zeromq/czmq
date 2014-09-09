@@ -34,6 +34,11 @@ CZMQ_EXPORT void *
 //  *** This is for CZMQ internal use only and may change arbitrarily ***
 CZMQ_EXPORT int
     zsys_close (void *handle, const char *filename, size_t line_nbr);
+
+//  Return ZMQ socket name for socket type
+//  *** This is for CZMQ internal use only and may change arbitrarily ***
+CZMQ_EXPORT char *
+    zsys_sockname (int socktype);
     
 //  Set interrupt handler; this saves the default handlers so that a
 //  zsys_handler_reset () can restore them. If you call this multiple times

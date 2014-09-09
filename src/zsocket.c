@@ -165,20 +165,8 @@ zsocket_poll (void *self, int msecs)
 const char *
 zsocket_type_str (void *self)
 {
-    char *type_name [] = {
-        "PAIR", "PUB", "SUB", "REQ", "REP",
-        "DEALER", "ROUTER", "PULL", "PUSH",
-        "XPUB", "XSUB", "STREAM"
-    };
-    int type = zsocket_type (self);
-#if ZMQ_VERSION_MAJOR == 4
-    if (type < 0 || type > ZMQ_STREAM)
-#else
-    if (type < 0 || type > ZMQ_XSUB)
-#endif
-        return "UNKNOWN";
-    else
-        return type_name [type];
+    assert (self);
+    return zsys_sockname (zsocket_type (self));
 }
 
 
