@@ -302,6 +302,69 @@ zchunk_dup (zchunk_t *self)
         return NULL;
 }
 
+
+//  --------------------------------------------------------------------------
+//  Return chunk data encoded as printable hex string. Caller must free
+//  string when finished with it.
+
+char *
+zchunk_strhex (zchunk_t *self)
+{
+    assert (self);
+    assert (zchunk_is (self));
+
+    static const char
+        hex_char [] = "0123456789ABCDEF";
+
+    size_t size = zchunk_size (self);
+    byte *data = zchunk_data (self);
+    char *hex_str = (char *) malloc (size * 2 + 1);
+
+    uint byte_nbr;
+    for (byte_nbr = 0; byte_nbr < size; byte_nbr++) {
+        hex_str [byte_nbr * 2 + 0] = hex_char [data [byte_nbr] >> 4];
+        hex_str [byte_nbr * 2 + 1] = hex_char [data [byte_nbr] & 15];
+    }
+    hex_str [size * 2] = 0;
+    return hex_str;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return chunk data copied into freshly allocated string
+//  Caller must free string when finished with it.
+
+char *
+zchunk_strdup (zchunk_t *self)
+{
+    assert (self);
+    assert (zchunk_is (self));
+
+    size_t size = zchunk_size (self);
+    char *string = (char *) malloc (size + 1);
+    memcpy (string, zchunk_data (self), size);
+    string [size] = 0;
+    return string;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return true if chunk body is equal to string, excluding terminator
+
+bool
+zchunk_streq (zchunk_t *self, const char *string)
+{
+    assert (self);
+    assert (zchunk_is (self));
+
+    if (zchunk_size (self) == strlen (string)
+    &&  memcmp (zchunk_data (self), string, strlen (string)) == 0)
+        return true;
+    else
+        return false;
+}
+
+
 //  --------------------------------------------------------------------------
 //  Create a zframe from a zchunk.  The zframe can be sent in a message.
 
@@ -416,6 +479,13 @@ zchunk_test (bool verbose)
     zchunk_append (chunk, "GHIJKLMN", 8);
     assert (memcmp (zchunk_data (chunk), "1234567890", 10) == 0);
     assert (zchunk_size (chunk) == 10);
+    assert (zchunk_streq (chunk, "1234567890"));
+    char *string = zchunk_strdup (chunk);
+    assert (streq (string, "1234567890"));
+    free (string);
+    string = zchunk_strhex (chunk);
+    assert (streq (string, "31323334353637383930"));
+    free (string);
 
     zframe_t *frame = zchunk_pack (chunk);
     assert (frame);
