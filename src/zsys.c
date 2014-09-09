@@ -84,6 +84,7 @@ static zlist_t *s_sockref_list = NULL;
 //  This defines a single zsocket_new() caller instance
 typedef struct {
     void *handle;
+    int type;
     const char *filename;
     size_t line_nbr;
 } s_sockref_t;
@@ -217,8 +218,9 @@ s_terminate_process (void)
     s_sockref_t *sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
     while (sockref) {
         assert (sockref->filename);
-        zsys_error ("dangling socket created at %s:%d",
-                sockref->filename, (int) sockref->line_nbr);
+        zsys_error ("dangling '%s' socket created at %s:%d",
+                    zsys_sockname (sockref->type),
+                    sockref->filename, (int) sockref->line_nbr);
         zmq_close (sockref->handle);
         free (sockref);
         sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
@@ -287,6 +289,7 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
     if (filename) {
         s_sockref_t *sockref = (s_sockref_t *) malloc (sizeof (s_sockref_t));
         sockref->handle = handle;
+        sockref->type = type;
         sockref->filename = filename;
         sockref->line_nbr = line_nbr;
         zlist_append (s_sockref_list, sockref);
@@ -321,6 +324,24 @@ zsys_close (void *handle, const char *filename, size_t line_nbr)
     zmq_close (handle);
     ZMUTEX_UNLOCK (s_mutex);
     return 0;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return ZMQ socket name for socket type
+
+char *
+zsys_sockname (int socktype)
+{
+    char *type_names [] = {
+        "PAIR", "PUB", "SUB", "REQ", "REP",
+        "DEALER", "ROUTER", "PULL", "PUSH",
+        "XPUB", "XSUB", "STREAM"
+    };
+    //  This array matches ZMQ_XXX type definitions
+    assert (ZMQ_PAIR == 0);
+    assert (socktype <= ZMQ_STREAM);
+    return type_names [socktype];
 }
 
 
