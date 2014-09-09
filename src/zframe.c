@@ -179,7 +179,8 @@ zframe_data (zframe_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Create a new frame that duplicates an existing frame
+//  Create a new frame that duplicates an existing frame. If frame is null,
+//  or memory was exhausted, returns null.
 
 zframe_t *
 zframe_dup (zframe_t *self)

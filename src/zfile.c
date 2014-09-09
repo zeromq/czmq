@@ -114,21 +114,28 @@ zfile_destroy (zfile_t **self_p)
 
 
 //  --------------------------------------------------------------------------
-//  Duplicate a file item
+//  Duplicate a file item, returns a newly constructed item. If the file
+//  is null, or memory was exhausted, returns null.
 
 zfile_t *
 zfile_dup (zfile_t *self)
 {
-    zfile_t
-        *copy;
-
-    copy = (zfile_t *) zmalloc (sizeof (zfile_t));
-    copy->fullname = strdup (self->fullname);
-    copy->modified = self->modified;
-    copy->cursize = self->cursize;
-    copy->link = self->link? strdup (self->link): NULL;
-    copy->mode = self->mode;
-    return copy;
+    if (self) {
+        zfile_t *copy = (zfile_t *) zmalloc (sizeof (zfile_t));
+        if (copy)
+            copy->fullname = strdup (self->fullname);
+        if (copy->fullname) {
+            copy->modified = self->modified;
+            copy->cursize = self->cursize;
+            copy->link = self->link? strdup (self->link): NULL;
+            copy->mode = self->mode;
+        }
+        else
+            zfile_destroy (&copy);
+        return copy;
+    }
+    else
+        return NULL;
 }
 
 

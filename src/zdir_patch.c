@@ -80,19 +80,32 @@ zdir_patch_destroy (zdir_patch_t **self_p)
 
 
 //  --------------------------------------------------------------------------
-//  Create copy of a patch
+//  Create copy of a patch. If the patch is null, or memory was exhausted,
+//  returns null.
 
 zdir_patch_t *
 zdir_patch_dup (zdir_patch_t *self)
 {
-    zdir_patch_t *copy = (zdir_patch_t *) zmalloc (sizeof (zdir_patch_t));
-    copy->path = strdup (self->path);
-    copy->file = zfile_dup (self->file);
-    copy->op = self->op;
-    copy->vpath = strdup (self->vpath);
-    //  Don't recalculate hash when we duplicate patch
-    copy->digest = self->digest? strdup (self->digest): NULL;
-    return copy;
+    if (self) {
+        zdir_patch_t *copy = (zdir_patch_t *) zmalloc (sizeof (zdir_patch_t));
+        if (copy) {
+            copy->op = self->op;
+            copy->path = strdup (self->path);
+            if (copy->path)
+                copy->file = zfile_dup (self->file);
+            if (copy->file)
+                copy->vpath = strdup (self->vpath);
+            if (copy->vpath)
+                //  Don't recalculate hash when we duplicate patch
+                copy->digest = self->digest? strdup (self->digest): NULL;
+            
+            if (copy->digest == NULL)
+                zdir_patch_destroy (&copy);
+        }
+        return copy;
+    }
+    else
+        return NULL;
 }
 
 

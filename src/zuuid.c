@@ -189,18 +189,20 @@ zuuid_neq (zuuid_t *self, byte *compare)
 
 
 //  --------------------------------------------------------------------------
-//  Make copy of UUID object
+//  Make copy of UUID object; if uuid is null, or memory was exhausted,
+//  returns null.
 
 zuuid_t *
 zuuid_dup (zuuid_t *self)
 {
-    if (!self)
+    if (self) {
+        zuuid_t *copy = zuuid_new ();
+        if (copy)
+            zuuid_set (copy, zuuid_data (self));
+        return copy;
+    }
+    else
         return NULL;
-
-    zuuid_t *copy = zuuid_new ();
-    if (copy)
-        zuuid_set (copy, zuuid_data (self));
-    return copy;
 }
 
 

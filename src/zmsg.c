@@ -604,27 +604,28 @@ zmsg_decode (byte *buffer, size_t buffer_size)
 
 //  --------------------------------------------------------------------------
 //  Create copy of message, as new message object. Returns a fresh zmsg_t
-//  object, or NULL if there was not enough heap memory.
+//  object. If message is null, or memory was exhausted, returns null.
 
 zmsg_t *
 zmsg_dup (zmsg_t *self)
 {
-    assert (self);
-    assert (zmsg_is (self));
-
-    zmsg_t *copy = zmsg_new ();
-    if (!copy)
-        return NULL;
-
-    zframe_t *frame = zmsg_first (self);
-    while (frame) {
-        if (zmsg_addmem (copy, zframe_data (frame), zframe_size (frame))) {
-            zmsg_destroy (&copy);
-            return NULL;
+    if (self) {
+        assert (zmsg_is (self));
+        zmsg_t *copy = zmsg_new ();
+        if (copy) {
+            zframe_t *frame = zmsg_first (self);
+            while (frame) {
+                if (zmsg_addmem (copy, zframe_data (frame), zframe_size (frame))) {
+                    zmsg_destroy (&copy);
+                    break;      //  Abandon attempt to copy message
+                }
+                frame = zmsg_next (self);
+            }
         }
-        frame = zmsg_next (self);
+        return copy;
     }
-    return copy;
+    else
+        return NULL;
 }
 
 
