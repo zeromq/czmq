@@ -340,7 +340,11 @@ zsys_sockname (int socktype)
     };
     //  This array matches ZMQ_XXX type definitions
     assert (ZMQ_PAIR == 0);
-    assert (socktype <= ZMQ_STREAM);
+#if defined (ZMQ_STREAM)
+    assert (socktype >= 0 && socktype <= ZMQ_STREAM);
+#else
+    assert (socktype >= 0 && socktype <= ZMQ_XSUB);
+#endif
     return type_names [socktype];
 }
 
