@@ -74,7 +74,7 @@ AC_ARG_WITH([libzmq],
         [build with ZeroMQ library installed in PREFIX [default=autodetect]])],
     [case "x$withval" in
         xno)
-            AC_MSG_ERROR([czmq requires the ZeroMQ library])
+            AC_MSG_ERROR([CZMQ requires the ZeroMQ library])
             ;;
         xyes|x)
             ;;
@@ -100,24 +100,6 @@ if test "x$czmq_search_libzmq" = "xyes"; then
         LDFLAGS="-L${with_libzmq}/lib ${LDFLAGS}"
     fi
 fi
-
-AC_ARG_WITH([libzmq-include-dir],
-            [AS_HELP_STRING([--with-libzmq-include-dir],
-                            [Specify libzmq include prefix])],
-            [czmq_search_libzmq_include="yes"],
-            [])
-
-if test "x$czmq_search_libzmq_include" = "xyes"; then
-    if test -r "${with_libzmq_include_dir}/include/zmq.h"; then
-        CFLAGS="-I${with_libzmq_include_dir}/include ${CFLAGS}"
-    fi
-fi
-
-AC_ARG_WITH([libzmq_lib_dir],
-            [AS_HELP_STRING([--with-libzmq-lib-dir],
-                            [Specify libzmq library prefix])],
-            [czmq_search_libzmq_lib="yes"],
-            [])
 
 AC_CHECK_HEADER([zmq.h], [], [AC_MSG_ERROR([cannot find zmq.h])])
 
@@ -149,7 +131,7 @@ if test "x$czmq_have_asciidoc" = "xno" -o "x$czmq_have_xmlto" = "xno"; then
     # Tarballs built with 'make dist' ship with prebuilt documentation.
     if ! test -f doc/czmq.7; then
         czmq_install_man="no"
-        AC_MSG_WARN([You are building an unreleased version of libczmq and asciidoc or xmlto are not installed.])
+        AC_MSG_WARN([You are building an unreleased version of CZMQ and asciidoc or xmlto are not installed.])
         AC_MSG_WARN([Documentation will not be built and manual pages will not be installed.])
     fi
 fi
