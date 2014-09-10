@@ -516,12 +516,13 @@ zsock_type_str (zsock_t *self)
 //      c = zchunk_t *
 //      f = zframe_t *
 //      p = void * (sends the pointer value, only meaningful over inproc)
-//      n = null, sends empty frame (0 arguments)
+//      z = sends zero-sized frame (0 arguments)
 //
-//  Note that b, c, and f are encoded the same way and the choice is offered
-//  as a convenience to the sender, which may or may not already have data
-//  in a zchunk or zframe. Does not change or take ownership of any arguments.
-//  Returns 0 if successful, -1 if sending failed for any reason.
+//  Note that s, b, c, and f are encoded the same way and the choice is
+//  offered as a convenience to the sender, which may or may not already
+//  have data in a zchunk or zframe. Does not change or take ownership of
+//  any arguments. Returns 0 if successful, -1 if sending failed for any
+//  reason.
 
 int
 zsock_send (void *self, const char *picture, ...)
@@ -569,7 +570,7 @@ zsock_send (void *self, const char *picture, ...)
             zmsg_append ( msg, &frame);
         }
         else
-        if (*picture == 'n')
+        if (*picture == 'z')
             zmsg_addmem (msg, NULL, 0);
         else {
             zsys_error ("zsock: invalid picture element '%c'", *picture);
@@ -593,7 +594,7 @@ zsock_send (void *self, const char *picture, ...)
 //      c = zchunk_t ** (creates zchunk)
 //      f = zframe_t ** (creates zframe)
 //      p = void ** (stores pointer)
-//      n = null, asserts empty frame (0 arguments)
+//      z = null, asserts empty frame (0 arguments)
 //
 //  Note that zsock_recv creates the returned objects, and the caller must
 //  destroy them when finished with them. The supplied pointers do not need
@@ -701,7 +702,7 @@ zsock_recv (void *self, const char *picture, ...)
             zframe_destroy (&frame);
         }
         else
-        if (*picture == 'n') {
+        if (*picture == 'z') {
             zframe_t *frame = zmsg_pop (msg);
             if (frame && zframe_size (frame) != 0)
                 rc = -1;
@@ -876,7 +877,7 @@ zsock_test (bool verbose)
 
     //  We can send signed integers, strings, blocks of memory, chunks,
     //  frames, hashes and pointers
-    zsock_send (writer, "insbcfp",
+    zsock_send (writer, "izsbcfp",
                 -12345, "This is a string", "ABCDE", 5, chunk, frame, original);
     msg = zmsg_recv (reader);
     assert (msg);
@@ -885,7 +886,7 @@ zsock_test (bool verbose)
     zmsg_destroy (&msg);
 
     //  Test zsock_recv into each supported type
-    zsock_send (writer, "insbcfhp",
+    zsock_send (writer, "izsbcfhp",
                 -12345, "This is a string", "ABCDE", 5, chunk, frame, hash, original);
     zframe_destroy (&frame);
     zchunk_destroy (&chunk);
@@ -894,7 +895,7 @@ zsock_test (bool verbose)
     byte *data;
     size_t size;
     char *pointer;
-    rc = zsock_recv (reader, "insbcfhp", &integer, &string, &data, &size, &chunk, &frame, &hash, &pointer);
+    rc = zsock_recv (reader, "izsbcfhp", &integer, &string, &data, &size, &chunk, &frame, &hash, &pointer);
     assert (rc == 0);
     assert (integer == -12345);
     assert (streq (string, "This is a string"));
@@ -919,7 +920,7 @@ zsock_test (bool verbose)
     //  with a status code and then nothing else; the receiver will get
     //  the status code and NULL/zero for all other values
     zsock_send (writer, "i", -1);
-    zsock_recv (reader, "insbcfp", &integer, &string, &data, &size, &chunk, &frame, &pointer);
+    zsock_recv (reader, "izsbcfp", &integer, &string, &data, &size, &chunk, &frame, &pointer);
     assert (integer == -1);
     assert (string == NULL);
     assert (data == NULL);
@@ -931,11 +932,11 @@ zsock_test (bool verbose)
     //  Test zsock_recv with null arguments
     chunk = zchunk_new ("HELLO", 5);
     frame = zframe_new ("WORLD", 5);
-    zsock_send (writer, "insbcfp",
+    zsock_send (writer, "izsbcfp",
                 -12345, "This is a string", "ABCDE", 5, chunk, frame, original);
     zframe_destroy (&frame);
     zchunk_destroy (&chunk);
-    zsock_recv (reader, "insbcfp", &integer, NULL, NULL, NULL, &chunk, NULL, NULL);
+    zsock_recv (reader, "izsbcfp", &integer, NULL, NULL, NULL, &chunk, NULL, NULL);
     assert (integer == -12345);
     assert (memcmp (zchunk_data (chunk), "HELLO", 5) == 0);
     assert (zchunk_size (chunk) == 5);
