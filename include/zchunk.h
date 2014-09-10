@@ -19,7 +19,9 @@ extern "C" {
 #endif
 
 //  @interface
-//  Create new chunk
+//  Create a new chunk of the specified size. If you specify the data, it
+//  is copied into the chunk. If you do not specify the data, the chunk is
+//  allocated and left empty, and you can then add data using zchunk_append.
 CZMQ_EXPORT zchunk_t *
     zchunk_new (const void *data, size_t size);
 
