@@ -19,8 +19,9 @@ extern "C" {
 #endif
 
 //  @interface
-//  Create a new directory item that loads in the full tree of the
-//  specified path, optionally located under some parent path.
+//  Create a new directory item that loads in the full tree of the specified
+//  path, optionally located under some parent path. If parent is "-", then
+//  loads only the top-level directory (and does not use parent as a path).
 CZMQ_EXPORT zdir_t *
     zdir_new (const char *path, const char *parent);
 
