@@ -43,6 +43,7 @@ struct _zdir_t {
     time_t modified;        //  Most recent file including subdirs
     off_t  cursize;         //  Total file size including subdirs
     size_t count;           //  Total file count including subdirs
+    bool trimmed;           //  Load only top level directory
 };
 
 #if (defined (WIN32))
@@ -54,8 +55,10 @@ s_win32_populate_entry (zdir_t *self, WIN32_FIND_DATAA *entry)
     else
     //  If we have a subdirectory, go load that
     if (entry->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-        zdir_t *subdir = zdir_new (entry->cFileName, self->path);
-        zlist_append (self->subdirs, subdir);
+        if (!self->trimmed) {
+            zdir_t *subdir = zdir_new (entry->cFileName, self->path);
+            zlist_append (self->subdirs, subdir);
+        }
     }
     else {
         //  Add file entry to directory list
@@ -84,8 +87,10 @@ s_posix_populate_entry (zdir_t *self, struct dirent *entry)
     else
     //  If we have a subdirectory, go load that
     if (stat_buf.st_mode & S_IFDIR) {
-        zdir_t *subdir = zdir_new (entry->d_name, self->path);
-        zlist_append (self->subdirs, subdir);
+        if (!self->trimmed) {
+            zdir_t *subdir = zdir_new (entry->d_name, self->path);
+            zlist_append (self->subdirs, subdir);
+        }
     }
     else {
         //  Add file entry to directory list
@@ -97,20 +102,27 @@ s_posix_populate_entry (zdir_t *self, struct dirent *entry)
 
 
 //  --------------------------------------------------------------------------
-//  Constructor
-//  Create a new directory item that loads in the full tree of the
-//  specified path, optionally located under some parent path.
+//  Create a new directory item that loads in the full tree of the specified
+//  path, optionally located under some parent path. If parent is "-", then
+//  loads only the top-level directory (and does not use parent as a path).
 
 zdir_t *
 zdir_new (const char *path, const char *parent)
 {
     zdir_t *self = (zdir_t *) zmalloc (sizeof (zdir_t));
     if (parent) {
-        self->path = (char *) malloc (strlen (path) + strlen (parent) + 2);
-        sprintf (self->path, "%s/%s", parent, path);
+        if (streq (parent, "-")) {
+            self->trimmed = true;
+            self->path = strdup (path);
+        }
+        else {
+            self->path = (char *) malloc (strlen (path) + strlen (parent) + 2);
+            sprintf (self->path, "%s/%s", parent, path);
+        }
     }
     else
         self->path = strdup (path);
+    
     self->files = zlist_new ();
     self->subdirs = zlist_new ();
 
