@@ -171,9 +171,10 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zsock_attach (zsock_t *self, const char *endpoints, bool serverish);
 
-//  Returns socket type as printable constant string
+//  Returns socket type as printable constant string. Takes a polymorphic
+//  socket reference.
 CZMQ_EXPORT const char *
-    zsock_type_str (zsock_t *self);
+    zsock_type_str (void *self);
 
 //  Send a 'picture' message to the socket (or actor). The picture is a
 //  string that defines the type of each frame. This makes it easy to send
