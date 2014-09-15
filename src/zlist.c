@@ -41,7 +41,9 @@ struct _zlist_t {
     node_t *tail;               //  Last item in list, if any
     node_t *cursor;             //  Current cursors for iteration
     size_t size;                //  Number of items in list
-    bool autofree;              //  If true, free items in destructor
+    //  Function callbacks for duplicating and destroying items, if any
+    czmq_duplicator *duplicator;
+    czmq_destructor *destructor;
 };
 
 
@@ -68,11 +70,10 @@ zlist_destroy (zlist_t **self_p)
         node_t *node = (*self_p)->head;
         while (node) {
             node_t *next = node->next;
-            if (node->free_fn)
-                (node->free_fn) (node->item);
-            else
-            if (self->autofree)
-                free (node->item);
+	    if (self->destructor)
+		(self->destructor) (&node->item);
+	    else if (node->free_fn)
+		(node->free_fn) (node->item);
             free (node);
             node = next;
         }
@@ -188,8 +189,8 @@ zlist_append (zlist_t *self, void *item)
         return -1;
 
     //  If necessary, take duplicate of (string) item
-    if (self->autofree)
-        item = strdup ((char *) item);
+    if (self->duplicator)
+        item = (self->duplicator) (item);
     
     node->item = item;
     if (self->tail)
@@ -219,8 +220,8 @@ zlist_push (zlist_t *self, void *item)
         return -1;
 
     //  If necessary, take duplicate of (string) item
-    if (self->autofree)
-        item = strdup ((char *) item);
+    if (self->duplicator)
+        item = (self->duplicator) (item);
 
     node->item = item;
     node->next = self->head;
@@ -280,11 +281,10 @@ zlist_remove (zlist_t *self, void *item)
             self->tail = prev;
         if (self->cursor == node)
             self->cursor = prev;
-        if (node->free_fn)
-            (node->free_fn) (node->item);
-        else
-        if (self->autofree)
-            free (node->item);
+	if (self->destructor)
+	    (self->destructor) (node->item);
+        else if (node->free_fn)
+	    (node->free_fn) (node->item);
         free (node);
         self->size--;
     }
@@ -321,9 +321,9 @@ s_zlist_free (void *data)
 }
 
 //  --------------------------------------------------------------------------
-//  Make a copy of list. If the list has autofree set, the copied list will
-//  duplicate all items, which must be strings. Otherwise, the list will hold
-//  pointers back to the items in the original list.
+//  Make a copy of list. If the list has a duplicator set, the copied list will
+//  duplicate all items. Otherwise, the list will hold pointers back
+//  to the items in the original list.
 
 zlist_t *
 zlist_dup (zlist_t *self)
@@ -332,7 +332,8 @@ zlist_dup (zlist_t *self)
         return NULL;
 
     zlist_t *copy = zlist_new ();
-    copy->autofree = self->autofree;
+    copy->destructor = self->destructor;
+    copy->duplicator = self->duplicator;
 
     if (copy) {
         node_t *node;
@@ -404,6 +405,31 @@ s_compare (void *item1, void *item2)
 
 
 //  --------------------------------------------------------------------------
+//  Set a user-defined deallocator for items; by default items are not
+//  freed when the list is destroyed.
+
+void
+zlist_set_destructor (zlist_t *self, czmq_destructor destructor)
+{
+    assert (self);
+    self->destructor = destructor;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set a user-defined duplicator for items; by default items are not
+//  copied when the list is duplicated.
+
+void
+zlist_set_duplicator (zlist_t *self, czmq_duplicator duplicator)
+{
+    assert (self);
+    self->duplicator = duplicator;
+}
+
+
+//  --------------------------------------------------------------------------
+//  DEPRECATED by zlist_set_duplicator/zlist_set_destructor
 //  Set list for automatic item destruction; item values MUST be strings.
 //  By default a list item refers to a value held elsewhere. When you set
 //  this, each time you append or push a list item, zlist will take a copy
@@ -417,7 +443,8 @@ void
 zlist_autofree (zlist_t *self)
 {
     assert (self);
-    self->autofree = true;
+    zlist_set_destructor (self, (czmq_destructor*) zstr_free);
+    zlist_set_duplicator (self, (czmq_duplicator*) strdup);
 }
 
 
