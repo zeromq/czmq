@@ -871,6 +871,10 @@ zsock_test (bool verbose)
     assert (zsock_resolve (reader) != reader);
     assert (streq (zsock_type_str (reader), "PULL"));
 
+    // Test resolve fd
+    int fd = zsock_fd(reader);
+    assert (zsock_resolve ((void*) &fd) == NULL);
+
     zstr_send (writer, "Hello, World");
     zmsg_t *msg = zmsg_recv (reader);
     assert (msg);
