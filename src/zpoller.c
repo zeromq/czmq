@@ -238,7 +238,7 @@ zpoller_test (bool verbose)
     zpoller_t *poller = zpoller_new (bowl, dish, NULL);
     assert (poller);
 
-    // Add a reader the existing poller
+    // Add a reader to the existing poller
     rc = zpoller_add (poller, sink);
     assert (rc == 0);
 
