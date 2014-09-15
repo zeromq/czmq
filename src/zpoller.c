@@ -256,6 +256,15 @@ zpoller_test (bool verbose)
     // Stop polling reader
     rc = zpoller_remove (poller, sink);
     assert (rc == 0);
+
+    // Check fd works
+    rc = zsock_connect (bowl, "tcp://127.0.0.1:%d", port_nbr);
+    assert (rc != -1);
+    int fd = zsock_fd (bowl);
+    rc = zpoller_add (poller, (void*)&fd);
+    assert (rc != -1);
+    zstr_send (vent, "Hello again, world");
+    assert (zpoller_wait (poller, 500) == &fd);
     
     //  Destroy poller and sockets
     zpoller_destroy (&poller);
