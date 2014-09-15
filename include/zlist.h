@@ -99,6 +99,17 @@ CZMQ_EXPORT size_t
 CZMQ_EXPORT void
     zring_sort (zring_t *self);
 
+//  Set a user-defined destructor for items; by default items are not
+//  freed when the list is destroyed.
+CZMQ_EXPORT void
+    zlist_set_destructor (zlist_t *self, czmq_destructor destructor);
+
+//  Set a user-defined duplicator for items; by default items are not
+//  copied when the list is duplicated.
+CZMQ_EXPORT void
+    zlist_set_duplicator (zlist_t *self, czmq_duplicator duplicator);
+
+//  DEPRECATED by zlist_set_duplicator/zlist_set_destructor
 //  Set list for automatic item destruction; item values MUST be strings.
 //  By default a list item refers to a value held elsewhere. When you set
 //  this, each time you append or push a list item, zlist will take a copy

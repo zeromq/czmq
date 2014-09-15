@@ -59,8 +59,8 @@ zcert_new (void)
 
     //  Initialize metadata, even if keys aren't working
     self->metadata = zhash_new ();
-    zhash_set_destructor (self->metadata, (czmq_destructor *) zstr_free);
-    zhash_set_duplicator (self->metadata, (czmq_duplicator *) strdup);
+    zhash_set_item_destructor (self->metadata, (czmq_destructor *) zstr_free);
+    zhash_set_item_duplicator (self->metadata, (czmq_duplicator *) strdup);
     
 #if (ZMQ_VERSION_MAJOR == 4)
     if (zsys_has_curve ()) {
@@ -93,8 +93,8 @@ zcert_new_from (byte *public_key, byte *secret_key)
     assert (secret_key);
 
     self->metadata = zhash_new ();
-    zhash_set_destructor (self->metadata, (czmq_destructor *) zstr_free);
-    zhash_set_duplicator (self->metadata, (czmq_duplicator *) strdup);
+    zhash_set_item_destructor (self->metadata, (czmq_destructor *) zstr_free);
+    zhash_set_item_duplicator (self->metadata, (czmq_duplicator *) strdup);
     
     memcpy (self->public_key, public_key, 32);
     memcpy (self->secret_key, secret_key, 32);
@@ -181,7 +181,7 @@ zcert_set_meta (zcert_t *self, const char *name, const char *format, ...)
     va_start (argptr, format);
     char *value = zsys_vprintf (format, argptr);
     va_end (argptr);
-    zhash_insert (self->metadata, name, value);
+    zhash_insert (self->metadata, (void *)name, value);
 }
 
 
@@ -193,7 +193,7 @@ char *
 zcert_meta (zcert_t *self, const char *name)
 {
     assert (self);
-    return (char *) zhash_lookup (self->metadata, name);
+    return (char *) zhash_lookup (self->metadata, (void *)name);
 }
 
 
@@ -429,7 +429,7 @@ zcert_fprint (zcert_t *self, FILE *file)
     char *value = (char *) zhash_first (self->metadata);
     while (value) {
         fprintf (file, "    %s = \"%s\"\n",
-                 zhash_cursor (self->metadata), value);
+                 (char *)zhash_cursor (self->metadata), value);
         value = (char *) zhash_next (self->metadata);
     }
     fprintf (file, "curve\n");
