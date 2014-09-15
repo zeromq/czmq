@@ -818,15 +818,17 @@ zsock_resolve (void *self)
     if (zactor_is (self))
         return zactor_resolve (self);
     else
-#ifdef _WIN32
     {
         int sock_type;
+#ifdef _WIN32
         int size = sizeof sock_type;
+#else
+        socklen_t size = sizeof sock_type;
+#endif
         const int rc = getsockopt(*(SOCKET *) self, SOL_SOCKET, SO_TYPE, (char *) &(sock_type), &size);
         if (rc == 0)
             return NULL; // It's a socket descriptor
     }
-#endif
     return self;
 }
 
