@@ -168,20 +168,20 @@ s_rebuild_poll_set (zpoller_t *self)
     void *reader = zlist_first (self->reader_list);
     while (reader) {
         self->poll_readers [reader_nbr] = reader;
-#ifdef _WIN32
         void *socket = zsock_resolve (reader);
         if (socket == NULL)
         {
             self->poll_set [reader_nbr].socket = NULL;
+#ifdef _WIN32
             self->poll_set [reader_nbr].fd = *(SOCKET *) reader;
+#else
+            self->poll_set [reader_nbr].fd = *(int *) reader;
+#endif
         }
         else
         {
             self->poll_set [reader_nbr].socket = socket;
         }
-#else
-        self->poll_set [reader_nbr].socket = zsock_resolve (reader);
-#endif  
         self->poll_set [reader_nbr].events = ZMQ_POLLIN;
         reader_nbr++;
         reader = zlist_next (self->reader_list);
