@@ -58,13 +58,13 @@ typedef struct _item_t {
 
 struct _zhash_t {
     size_t size;                //  Current size of hash table
-    uint prime_index;        //  Current prime number used as limit
-    uint chain_limit;        //  Current limit on chain length
+    uint prime_index;           //  Current prime number used as limit
+    uint chain_limit;           //  Current limit on chain length
     item_t **items;             //  Array of items
-    uint cached_index;          //  Avoids duplicate hash calculations
-    uint cursor_index;          //  For first/next iteration
+    size_t cached_index;        //  Avoids duplicate hash calculations
+    size_t cursor_index;        //  For first/next iteration
     item_t *cursor_item;        //  For first/next iteration
-    char *cursor_key;           //  After first/next call, points to key
+    const char *cursor_key;     //  After first/next call, points to key
     zlist_t *comments;          //  File comments, if any
     time_t modified;            //  Set during zhash_load
     char *filename;             //  Set during zhash_load
@@ -73,13 +73,28 @@ struct _zhash_t {
     czmq_destructor *destructor;
     //  Supporting deprecated v2 functionality
     bool autofree;              //  If true, free values in destructor
+    //  Custom hash function
+    zhash_hash_fn *hasher;
 };
 
 //  Local helper functions
-static uint s_item_hash (const char *key, size_t limit);
 static item_t *s_item_lookup (zhash_t *self, const char *key);
 static item_t *s_item_insert (zhash_t *self, const char *key, void *value);
 static void s_item_destroy (zhash_t *self, item_t *item, bool hard);
+
+
+//  --------------------------------------------------------------------------
+//  Modified Bernstein hashing function
+
+static size_t
+s_bernstein_hash (const char *key)
+{
+    const char *p = (const char*)key;
+    size_t key_hash = 0;
+    while (*p)
+        key_hash = 33 * key_hash ^ *p++;
+    return key_hash;
+}
 
 
 //  --------------------------------------------------------------------------
@@ -96,6 +111,7 @@ zhash_new (void)
         self->items = (item_t **) zmalloc (sizeof (item_t *) * limit);
         if (!self->items)
             zhash_destroy (&self);
+	self->hasher = s_bernstein_hash;
     }
     return self;
 }
@@ -193,7 +209,8 @@ s_zhash_rehash (zhash_t *self, uint new_prime_index)
         item_t *cur_item = self->items [index];
         while (cur_item) {
             item_t *next_item = cur_item->next;
-            uint new_index = s_item_hash (cur_item->key, new_limit);
+            size_t new_index = self->hasher (cur_item->key);
+	    new_index %= new_limit;
             cur_item->index = new_index;
             cur_item->next = new_items [new_index];
             new_items [new_index] = cur_item;
@@ -240,22 +257,6 @@ zhash_insert (zhash_t *self, const char *key, void *value)
 
 //  --------------------------------------------------------------------------
 //  Local helper function
-//  Compute hash for key string
-
-static uint
-s_item_hash (const char *key, size_t limit)
-{
-    //  Modified Bernstein hashing function
-    uint key_hash = 0;
-    while (*key)
-        key_hash = 33 * key_hash ^ *key++;
-    key_hash %= limit;
-    return key_hash;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Local helper function
 //  Insert new item into hash table, returns item
 //  If item already existed, returns NULL
 //  Sets the hash cursor to the item, if found.
@@ -296,7 +297,7 @@ s_item_lookup (zhash_t *self, const char *key)
 {
     //  Look in bucket list for item by key
     size_t limit = primes [self->prime_index];
-    self->cached_index = s_item_hash (key, limit);
+    self->cached_index = self->hasher (key) % limit;
     item_t *item = self->items [self->cached_index];
     uint len = 0;
     while (item) {
@@ -311,7 +312,7 @@ s_item_lookup (zhash_t *self, const char *key)
         if (s_zhash_rehash (self, new_prime_index))
             return NULL;
         limit = primes [self->prime_index];
-        self->cached_index = s_item_hash (key, limit);
+        self->cached_index = self->hasher (key) % limit;
     }
     return item;
 }
@@ -524,11 +525,11 @@ zhash_next (zhash_t *self)
 
 //  --------------------------------------------------------------------------
 //  After a successful insert, update, or first/next method, returns the key
-//  for the item that was returned. This is a constant string that you may
-//  not modify or deallocate, and which lasts as long as the item in the hash.
+//  for the item that was returned. You may not modify or deallocate
+//  the key, and it lasts as long as the item in the hash.
 //  After an unsuccessful first/next, returns NULL.
 
-char *
+const char *
 zhash_cursor (zhash_t *self)
 {
     assert (self);
@@ -846,6 +847,17 @@ zhash_set_duplicator (zhash_t *self, czmq_duplicator duplicator)
 {
     assert (self);
     self->duplicator = duplicator;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set a user-defined hash function for keys; by default keys are
+//  hashed by a modified Bernstein hashing function.
+
+void
+zhash_set_hasher (zhash_t *self, zhash_hash_fn hasher) {
+    assert (self);
+    self->hasher = hasher;
 }
 
 
