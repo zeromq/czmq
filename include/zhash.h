@@ -22,6 +22,9 @@ extern "C" {
 //  Callback function for zhash_freefn method
 typedef void (zhash_free_fn) (void *data);
 
+//  Callback function for hashing keys
+typedef size_t (zhash_hash_fn) (const char *key);
+
 //  Create a new, empty hash container
 CZMQ_EXPORT zhash_t *
     zhash_new (void);
@@ -95,7 +98,7 @@ CZMQ_EXPORT void *
 //  for the item that was returned. This is a constant string that you may
 //  not modify or deallocate, and which lasts as long as the item in the hash.
 //  After an unsuccessful first/next, returns NULL.
-CZMQ_EXPORT char *
+CZMQ_EXPORT const char *
     zhash_cursor (zhash_t *self);
 
 //  Add a comment to hash table before saving to disk. You can add as many
@@ -169,6 +172,11 @@ CZMQ_EXPORT void
 //  copied when the hash is duplicated.
 CZMQ_EXPORT void
     zhash_set_duplicator (zhash_t *self, czmq_duplicator duplicator);
+
+//  Set a user-defined hash function for keys; by default keys are
+//  hashed by a modified Bernstein hashing function.
+CZMQ_EXPORT void
+    zhash_set_hasher (zhash_t *self, zhash_hash_fn hasher);
 
 //  DEPRECATED by zhash_dup
 //  Make copy of hash table; if supplied table is null, returns null.
