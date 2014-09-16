@@ -37,15 +37,6 @@ typedef struct {
     bool verbose;               //  Verbose logging enabled?
 } self_t;
 
-static self_t *
-s_self_new (zsock_t *pipe)
-{
-    self_t *self = (self_t *) zmalloc (sizeof (self_t));
-    self->pipe = pipe;
-    self->poller = zpoller_new (self->pipe, NULL);
-    return self;
-}
-
 static void
 s_self_destroy (self_t **self_p)
 {
@@ -59,6 +50,19 @@ s_self_destroy (self_t **self_p)
         free (self);
         *self_p = NULL;
     }
+}
+
+static self_t *
+s_self_new (zsock_t *pipe)
+{
+    self_t *self = (self_t *) zmalloc (sizeof (self_t));
+    if (self) {
+        self->pipe = pipe;
+        self->poller = zpoller_new (self->pipe, NULL);
+        if (!self->poller)
+            s_self_destroy (&self);
+    }
+    return self;
 }
 
 
