@@ -84,9 +84,11 @@ s_create_socket (char *type_name, char *endpoints)
         return NULL;
     }
     zsock_t *sock = zsock_new (index);
-    if (zsock_attach (sock, endpoints, true)) {
-        zsys_error ("zproxy: invalid endpoints '%s'", endpoints);
-        zsock_destroy (&sock);
+    if (sock) {
+        if (zsock_attach (sock, endpoints, true)) {
+            zsys_error ("zproxy: invalid endpoints '%s'", endpoints);
+            zsock_destroy (&sock);
+        }
     }
     return sock;
 }
@@ -145,12 +147,14 @@ s_self_handle_pipe (self_t *self)
     if (streq (command, "PAUSE")) {
         zpoller_destroy (&self->poller);
         self->poller = zpoller_new (self->pipe, NULL);
+        assert (self->poller);
         zsock_signal (self->pipe, 0);
     }
     else
     if (streq (command, "RESUME")) {
         zpoller_destroy (&self->poller);
         self->poller = zpoller_new (self->pipe, self->frontend, self->backend, NULL);
+        assert (self->poller);
         zsock_signal (self->pipe, 0);
     }
     else
@@ -215,6 +219,7 @@ void
 zproxy (zsock_t *pipe, void *unused)
 {
     self_t *self = s_self_new (pipe);
+    assert (self);
     //  Signal successful initialization
     zsock_signal (pipe, 0);
 
