@@ -892,8 +892,11 @@ zsock_test (bool verbose)
 
     //  Test zsock_send/recv pictures
     zchunk_t *chunk = zchunk_new ("HELLO", 5);
+    assert (chunk);
     zframe_t *frame = zframe_new ("WORLD", 5);
+    assert (frame);
     zhash_t *hash = zhash_new ();
+    assert (hash);
     zhash_autofree (hash);
     zhash_insert (hash, "1", "value A");
     zhash_insert (hash, "2", "value B");
@@ -955,7 +958,9 @@ zsock_test (bool verbose)
     
     //  Test zsock_recv with null arguments
     chunk = zchunk_new ("HELLO", 5);
+    assert (chunk);
     frame = zframe_new ("WORLD", 5);
+    assert (frame);
     zsock_send (writer, "izsbcfp",
                 -12345, "This is a string", "ABCDE", 5, chunk, frame, original);
     zframe_destroy (&frame);
@@ -1005,6 +1010,7 @@ zsock_test (bool verbose)
 
     //  Test zsock_attach method
     zsock_t *server = zsock_new (ZMQ_DEALER);
+    assert (server);
     rc = zsock_attach (server, "@inproc://myendpoint,tcp://127.0.0.1:5556,inproc://others", true);
     assert (rc == 0);
     rc = zsock_attach (server, "", false);
