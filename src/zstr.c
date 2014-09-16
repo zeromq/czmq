@@ -155,6 +155,8 @@ int
 zstr_sendx (void *dest, const char *string, ...)
 {
     zmsg_t *msg = zmsg_new ();
+    if (!msg)
+        return -1;
     va_list args;
     va_start (args, string);
     while (string) {
