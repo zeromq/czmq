@@ -70,10 +70,12 @@ zlist_destroy (zlist_t **self_p)
         node_t *node = (*self_p)->head;
         while (node) {
             node_t *next = node->next;
-	    if (self->destructor)
-		(self->destructor) (&node->item);
-	    else if (node->free_fn)
-		(node->free_fn) (node->item);
+            if (self->destructor)
+                (self->destructor) (&node->item);
+            else
+            if (node->free_fn)
+                (node->free_fn) (node->item);
+            
             free (node);
             node = next;
         }
@@ -135,21 +137,6 @@ zlist_last (zlist_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Return current item in the list. If the list is empty, or the cursor
-//  passed the end of the list, returns NULL. Does not change the cursor.
-
-void *
-zlist_item (zlist_t *self)
-{
-    assert (self);
-    if (self->cursor)
-        return self->cursor->item;
-    else
-        return NULL;
-}
-
-
-//  --------------------------------------------------------------------------
 //  Return the item at the head of list. If the list is empty, returns NULL.
 //  Leaves cursor as-is.
 
@@ -174,8 +161,24 @@ zlist_tail (zlist_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Append an item to the end of the list, return 0 if OK
-//  or -1 if this failed for some reason (out of memory).
+//  Return current item in the list. If the list is empty, or the cursor
+//  passed the end of the list, returns NULL. Does not change the cursor.
+
+void *
+zlist_item (zlist_t *self)
+{
+    assert (self);
+    if (self->cursor)
+        return self->cursor->item;
+    else
+        return NULL;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Append an item to the end of the list, return 0 if OK or -1 if this
+//  failed for some reason (out of memory). Note that if a duplicator has
+//  been set, this method will also duplicate the item.
 
 int
 zlist_append (zlist_t *self, void *item)
@@ -208,8 +211,9 @@ zlist_append (zlist_t *self, void *item)
 
 
 //  --------------------------------------------------------------------------
-//  Push an item to the start of the list, return 0 if OK
-//  or -1 if this failed for some reason (out of memory).
+//  Push an item to the start of the list, return 0 if OK or -1 if this
+//  failed for some reason (out of memory). Note that if a duplicator has
+//  been set, this method will also duplicate the item.
 
 int
 zlist_push (zlist_t *self, void *item)
@@ -281,44 +285,18 @@ zlist_remove (zlist_t *self, void *item)
             self->tail = prev;
         if (self->cursor == node)
             self->cursor = prev;
-	if (self->destructor)
-	    (self->destructor) (node->item);
-        else if (node->free_fn)
-	    (node->free_fn) (node->item);
+        
+        if (self->destructor)
+            (self->destructor) (node->item);
+        else
+        if (node->free_fn)
+            (node->free_fn) (node->item);
+        
         free (node);
         self->size--;
     }
 }
 
-//  --------------------------------------------------------------------------
-//  Set a free function for the specified list item. When the item is
-//  destroyed, the free function, if any, is called on that item.
-//  Use this when list items are dynamically allocated, to ensure that
-//  you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
-//  Returns the item, or NULL if there is no such item.
-
-void *
-zlist_freefn (zlist_t *self, void *item, zlist_free_fn *fn, bool at_tail)
-{
-    node_t *node = self->head;
-    if (at_tail)
-        node = self->tail;
-    while (node) {
-        if (node->item == item) {
-            node->free_fn = fn;
-            return item;
-        }
-        node = node->next;
-    }
-    return NULL;
-}
-
-static void
-s_zlist_free (void *data)
-{
-    zlist_t *self = (zlist_t *)data;
-    zlist_destroy (&self);
-}
 
 //  --------------------------------------------------------------------------
 //  Make a copy of list. If the list has a duplicator set, the copied list will
@@ -394,15 +372,6 @@ zlist_sort (zlist_t *self, zlist_compare_fn *compare)
     }
 }
 
-static bool
-s_compare (void *item1, void *item2)
-{
-    if (strcmp ((char *) item1, (char *) item2) > 0)
-        return true;
-    else
-        return false;
-}
-
 
 //  --------------------------------------------------------------------------
 //  Set a user-defined deallocator for items; by default items are not
@@ -430,6 +399,31 @@ zlist_set_duplicator (zlist_t *self, czmq_duplicator duplicator)
 
 //  --------------------------------------------------------------------------
 //  DEPRECATED by zlist_set_duplicator/zlist_set_destructor
+//  Set a free function for the specified list item. When the item is
+//  destroyed, the free function, if any, is called on that item.
+//  Use this when list items are dynamically allocated, to ensure that
+//  you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
+//  Returns the item, or NULL if there is no such item.
+
+void *
+zlist_freefn (zlist_t *self, void *item, zlist_free_fn *fn, bool at_tail)
+{
+    node_t *node = self->head;
+    if (at_tail)
+        node = self->tail;
+
+    while (node) {
+        if (node->item == item) {
+            node->free_fn = fn;
+            return item;
+        }
+        node = node->next;
+    }
+    return NULL;
+}
+
+//  --------------------------------------------------------------------------
+//  DEPRECATED by zlist_set_duplicator/zlist_set_destructor
 //  Set list for automatic item destruction; item values MUST be strings.
 //  By default a list item refers to a value held elsewhere. When you set
 //  this, each time you append or push a list item, zlist will take a copy
@@ -445,6 +439,23 @@ zlist_autofree (zlist_t *self)
     assert (self);
     zlist_set_destructor (self, (czmq_destructor*) zstr_free);
     zlist_set_duplicator (self, (czmq_duplicator*) strdup);
+}
+
+
+static void
+s_zlist_free (void *data)
+{
+    zlist_t *self = (zlist_t *)data;
+    zlist_destroy (&self);
+}
+
+static bool
+s_compare (void *item1, void *item2)
+{
+    if (strcmp ((char *) item1, (char *) item2) > 0)
+        return true;
+    else
+        return false;
 }
 
 
