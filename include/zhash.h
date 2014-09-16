@@ -164,6 +164,16 @@ CZMQ_EXPORT zhash_t *
 CZMQ_EXPORT zhash_t *
     zhash_dup (zhash_t *self);
 
+//  Set a user-defined deallocator for hash items; by default items are not
+//  freed when the hash is destroyed.
+CZMQ_EXPORT void
+    zhash_set_destructor (zhash_t *self, czmq_destructor destructor);
+
+//  Set a user-defined duplicator for hash items; by default items are not
+//  copied when the hash is duplicated.
+CZMQ_EXPORT void
+    zhash_set_duplicator (zhash_t *self, czmq_duplicator duplicator);
+
 //  Set a user-defined deallocator for keys; by default keys are freed
 //  when the hash is destroyed using free().
 CZMQ_EXPORT void
@@ -179,20 +189,10 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zhash_set_key_comparator (zhash_t *self, czmq_comparator comparator);
 
-//  Set a user-defined deallocator for hash items; by default items are not
-//  freed when the hash is destroyed.
-CZMQ_EXPORT void
-    zhash_set_item_destructor (zhash_t *self, czmq_destructor destructor);
-
-//  Set a user-defined duplicator for hash items; by default items are not
-//  copied when the hash is duplicated.
-CZMQ_EXPORT void
-    zhash_set_item_duplicator (zhash_t *self, czmq_duplicator duplicator);
-
 //  Set a user-defined hash function for keys; by default keys are
 //  hashed by a modified Bernstein hashing function.
 CZMQ_EXPORT void
-    zhash_set_hasher (zhash_t *self, zhash_hash_fn hasher);
+    zhash_set_key_hasher (zhash_t *self, zhash_hash_fn hasher);
 
 //  DEPRECATED by zhash_dup
 //  Make copy of hash table; if supplied table is null, returns null.
