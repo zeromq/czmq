@@ -46,17 +46,23 @@ zpoller_t *
 zpoller_new (void *reader, ...)
 {
     zpoller_t *self = (zpoller_t *) zmalloc (sizeof (zpoller_t));
-    assert (self);
-    self->reader_list = zlist_new ();
-    self->need_rebuild = true;
+    if (self) {
+        self->reader_list = zlist_new ();
+        if (self->reader_list) {
+            self->need_rebuild = true;
 
-    va_list args;
-    va_start (args, reader);
-    while (reader) {
-        zlist_append (self->reader_list, reader);
-        reader = va_arg (args, void *);
+            va_list args;
+            va_start (args, reader);
+            while (reader) {
+                if (zlist_append (self->reader_list, reader) == -1) {
+                    zpoller_destroy (&self);
+                    break;
+                }
+                reader = va_arg (args, void *);
+            }
+            va_end (args);
+        }
     }
-    va_end (args);
     return self;
 }
 
