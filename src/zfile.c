@@ -461,6 +461,8 @@ zfile_digest (zfile_t *self)
         off_t offset = 0;
 
         self->digest = zdigest_new ();
+        if (!self->digest)
+            return NULL;
         zchunk_t *chunk = zfile_read (self, blocksz, offset);
         while (zchunk_size (chunk)) {
             zdigest_update (self->digest,
