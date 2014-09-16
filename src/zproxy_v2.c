@@ -51,8 +51,7 @@ zproxy_t *
 zproxy_new (zctx_t *ctx, void *frontend, void *backend)
 {
     assert (ctx);
-    zproxy_t *self;
-    self = (zproxy_t *) zmalloc (sizeof (zproxy_t));
+    zproxy_t *self = (zproxy_t *) zmalloc (sizeof (zproxy_t));
     if (self) {
         self->ctx = ctx;
         self->frontend = frontend;
