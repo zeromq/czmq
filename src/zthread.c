@@ -226,6 +226,7 @@ s_test_attached (void *args, zctx_t *ctx, void *pipe)
     assert (ctx);
     //  Wait for our parent to ping us, and pong back
     char *ping = zstr_recv (pipe);
+    assert (ping);
     zstr_free (&ping);
     zstr_send (pipe, "pong");
 }
@@ -252,6 +253,7 @@ zthread_test (bool verbose)
     assert (pipe);
     zstr_send (pipe, "ping");
     char *pong = zstr_recv (pipe);
+    assert (pong);
     assert (streq (pong, "pong"));
     zstr_free (&pong);
 
