@@ -63,32 +63,39 @@ zfile_new (const char *path, const char *name)
 {
     zfile_t *self = (zfile_t *) zmalloc (sizeof (zfile_t));
 
-    //  Format full path to file
-    if (path) {
-        self->fullname = (char *) zmalloc (strlen (path) + strlen (name) + 2);
-        sprintf (self->fullname, "%s/%s", path, name);
-    }
-    else
-        self->fullname = strdup (name);
-
-    //  Resolve symbolic link if possible
-    if (strlen (self->fullname) > 3
-    &&  streq (self->fullname + strlen (self->fullname) - 3, ".ln")) {
-        FILE *handle = fopen (self->fullname, "r");
-        if (handle) {
-            char buffer [256];
-            if (fgets (buffer, 256, handle)) {
-                //  We have the contents of the symbolic link
-                if (buffer [strlen (buffer) - 1] == '\n')
-                    buffer [strlen (buffer) - 1] = 0;
-                self->link = strdup (buffer);
-                //  Chop ".ln" off name for external use
-                self->fullname [strlen (self->fullname) - 3] = 0;
-            }
-            fclose (handle);
+    if (self) {
+        //  Format full path to file
+        if (path) {
+            self->fullname = (char *) zmalloc (strlen (path) + strlen (name) + 2);
+            if (self->fullname)
+                sprintf (self->fullname, "%s/%s", path, name);
         }
+        else
+            self->fullname = strdup (name);
+
+        if (self->fullname) {
+            //  Resolve symbolic link if possible
+            if (strlen (self->fullname) > 3
+                &&  streq (self->fullname + strlen (self->fullname) - 3, ".ln")) {
+                FILE *handle = fopen (self->fullname, "r");
+                if (handle) {
+                    char buffer [256];
+                    if (fgets (buffer, 256, handle)) {
+                        //  We have the contents of the symbolic link
+                        if (buffer [strlen (buffer) - 1] == '\n')
+                            buffer [strlen (buffer) - 1] = 0;
+                        self->link = strdup (buffer);
+                        //  Chop ".ln" off name for external use
+                        self->fullname [strlen (self->fullname) - 3] = 0;
+                    }
+                    fclose (handle);
+                }
+            }
+            zfile_restat (self);
+        }
+        else
+            zfile_destroy (&self);
     }
-    zfile_restat (self);
     return self;
 }
 
