@@ -900,6 +900,7 @@ zhash_set_key_duplicator (zhash_t *self, czmq_duplicator duplicator)
 //  --------------------------------------------------------------------------
 //  Set a user-defined comparator for keys; by default keys are
 //  compared using streq.
+
 void
 zhash_set_key_comparator (zhash_t *self, czmq_comparator comparator)
 {
