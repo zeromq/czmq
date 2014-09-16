@@ -153,6 +153,8 @@ zrex_matches (zrex_t *self, const char *text)
         for (index = 0; index < self->hits; index++)
             hit_set_len += self->caps [index].len + 1;
         self->hit_set = (char *) zmalloc (hit_set_len);
+        // FIXME: no way to return an error
+        assert (self->hit_set);
 
         //  Now prepare hit strings for access by caller
         char *hit_set_ptr = self->hit_set;
