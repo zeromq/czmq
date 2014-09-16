@@ -61,8 +61,7 @@ zproxy_new (zctx_t *ctx, void *frontend, void *backend)
             zsocket_wait (self->pipe);
         else {
             //  If we ran out of sockets, signal failure to caller
-            free (self);
-            self = NULL;
+            zproxy_destroy (&self);
         }
     }
     return self;
@@ -78,8 +77,10 @@ zproxy_destroy (zproxy_t **self_p)
     assert (self_p);
     if (*self_p) {
         zproxy_t *self = *self_p;
-        zstr_send (self->pipe, "STOP");
-        zsocket_wait (self->pipe);
+        if (self->pipe) {
+            zstr_send (self->pipe, "STOP");
+            zsocket_wait (self->pipe);
+        }
         free (self);
         *self_p = NULL;
     }
