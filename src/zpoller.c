@@ -219,13 +219,17 @@ zpoller_test (bool verbose)
     //  @selftest
     //  Create a few sockets
     zsock_t *vent = zsock_new (ZMQ_PUSH);
+    assert (vent);
     int port_nbr = zsock_bind (vent, "tcp://127.0.0.1:*");
     assert (port_nbr != -1);
     zsock_t *sink = zsock_new (ZMQ_PULL);
+    assert (sink);
     int rc = zsock_connect (sink, "tcp://127.0.0.1:%d", port_nbr);
     assert (rc != -1);
     zsock_t *bowl = zsock_new (ZMQ_PULL);
+    assert (bowl);
     zsock_t *dish = zsock_new (ZMQ_PULL);
+    assert (dish);
 
     //  Set-up poller
     zpoller_t *poller = zpoller_new (bowl, dish, NULL);
