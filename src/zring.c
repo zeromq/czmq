@@ -162,12 +162,14 @@ zring_insert (zring_t *self, const void *key, void *item)
     
     if (!self->hash)
         self->hash = zhash_new ();
+    if (!self->hash)
+        return -1;
 
     //  If item isn't already in dictionary, append to list and then
     //  store item node (which is in cursor) in dictionary
     if (!zhash_lookup (self->hash, key)
     &&  !zring_append (self, item)
-	&&  !zhash_insert (self->hash, key, self->cursor)) {
+    &&  !zhash_insert (self->hash, key, self->cursor)) {
         self->cursor->key = zhash_cursor (self->hash);
         return 0;
     }
