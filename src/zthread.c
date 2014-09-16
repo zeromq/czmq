@@ -223,6 +223,7 @@ s_test_attached (void *args, zctx_t *ctx, void *pipe)
 {
     //  Create a socket to check it'll be automatically deleted
     zsocket_new (ctx, ZMQ_PUSH);
+    assert (ctx);
     //  Wait for our parent to ping us, and pong back
     char *ping = zstr_recv (pipe);
     zstr_free (&ping);
