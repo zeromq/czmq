@@ -772,8 +772,10 @@ zsock_signal (void *self, byte status)
     assert (self);
     int64_t signal_value = 0x7766554433221100L + status;
     zmsg_t *msg = zmsg_new ();
-    zmsg_addmem (msg, &signal_value, 8);
-    return zmsg_send (&msg, self);
+    int rc = zmsg_addmem (msg, &signal_value, 8);
+    if (rc == 0)
+        rc = zmsg_send (&msg, self);
+    return rc;
 }
 
 
