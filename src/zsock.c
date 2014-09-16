@@ -52,14 +52,12 @@ zsock_t *
 zsock_new_ (int type, const char *filename, size_t line_nbr)
 {
     zsock_t *self = (zsock_t *) zmalloc (sizeof (zsock_t));
-    if (!self)
-        return NULL;
-
-    self->tag = ZSOCK_TAG;
-    self->handle = zsys_socket (type, filename, line_nbr);
-    if (!self->handle) {
-        free (self);
-        return NULL;
+    if (self) {
+        self->tag = ZSOCK_TAG;
+        self->handle = zsys_socket (type, filename, line_nbr);
+        if (!self->handle) {
+            zsock_destroy (&self);
+        }
     }
     return self;
 }
@@ -97,8 +95,9 @@ zsock_t *
 zsock_new_pub_ (const char *endpoints, const char *filename, size_t line_nbr)
 {
     zsock_t *sock = zsock_new_ (ZMQ_PUB, filename, line_nbr);
-    if (zsock_attach (sock, endpoints, true))
-        zsock_destroy (&sock);
+    if (sock)
+        if (zsock_attach (sock, endpoints, true))
+            zsock_destroy (&sock);
     return sock;
 }
 
@@ -111,8 +110,9 @@ zsock_t *
 zsock_new_sub_ (const char *endpoints, const char *subscribe, const char *filename, size_t line_nbr)
 {
     zsock_t *sock = zsock_new_ (ZMQ_SUB, filename, line_nbr);
-    if (zsock_attach (sock, endpoints, false))
-        zsock_destroy (&sock);
+    if (sock)
+        if (zsock_attach (sock, endpoints, false))
+            zsock_destroy (&sock);
     return sock;
 }
 
@@ -124,8 +124,9 @@ zsock_t *
 zsock_new_req_ (const char *endpoints, const char *filename, size_t line_nbr)
 {
     zsock_t *sock = zsock_new_ (ZMQ_REQ, filename, line_nbr);
-    if (zsock_attach (sock, endpoints, false))
-        zsock_destroy (&sock);
+    if (sock)
+        if (zsock_attach (sock, endpoints, false))
+            zsock_destroy (&sock);
     return sock;
 }
 
@@ -137,8 +138,9 @@ zsock_t *
 zsock_new_rep_ (const char *endpoints, const char *filename, size_t line_nbr)
 {
     zsock_t *sock = zsock_new_ (ZMQ_REP, filename, line_nbr);
-    if (zsock_attach (sock, endpoints, true))
-        zsock_destroy (&sock);
+    if (sock)
+        if (zsock_attach (sock, endpoints, true))
+            zsock_destroy (&sock);
     return sock;
 }
 
@@ -150,8 +152,9 @@ zsock_t *
 zsock_new_dealer_ (const char *endpoints, const char *filename, size_t line_nbr)
 {
     zsock_t *sock = zsock_new_ (ZMQ_DEALER, filename, line_nbr);
-    if (zsock_attach (sock, endpoints, false))
-        zsock_destroy (&sock);
+    if (sock)
+        if (zsock_attach (sock, endpoints, false))
+            zsock_destroy (&sock);
     return sock;
 }
 
@@ -163,8 +166,9 @@ zsock_t *
 zsock_new_router_ (const char *endpoints, const char *filename, size_t line_nbr)
 {
     zsock_t *sock = zsock_new_ (ZMQ_ROUTER, filename, line_nbr);
-    if (zsock_attach (sock, endpoints, true))
-        zsock_destroy (&sock);
+    if (sock)
+        if (zsock_attach (sock, endpoints, true))
+            zsock_destroy (&sock);
     return sock;
 }
 
@@ -176,8 +180,9 @@ zsock_t *
 zsock_new_push_ (const char *endpoints, const char *filename, size_t line_nbr)
 {
     zsock_t *sock = zsock_new_ (ZMQ_PUSH, filename, line_nbr);
-    if (zsock_attach (sock, endpoints, false))
-        zsock_destroy (&sock);
+    if (sock)
+        if (zsock_attach (sock, endpoints, false))
+            zsock_destroy (&sock);
     return sock;
 }
 
@@ -189,8 +194,9 @@ zsock_t *
 zsock_new_pull_ (const char *endpoints, const char *filename, size_t line_nbr)
 {
     zsock_t *sock = zsock_new_ (ZMQ_PULL, filename, line_nbr);
-    if (zsock_attach (sock, endpoints, true))
-        zsock_destroy (&sock);
+    if (sock)
+        if (zsock_attach (sock, endpoints, true))
+            zsock_destroy (&sock);
     return sock;
 }
 
@@ -203,8 +209,9 @@ zsock_new_xpub_ (const char *endpoints, const char *filename, size_t line_nbr)
 {
 #if defined ZMQ_XPUB
     zsock_t *sock = zsock_new_ (ZMQ_XPUB, filename, line_nbr);
-    if (zsock_attach (sock, endpoints, true))
-        zsock_destroy (&sock);
+    if (sock)
+        if (zsock_attach (sock, endpoints, true))
+            zsock_destroy (&sock);
     return sock;
 #else
     return NULL;            //  Not implemented
@@ -220,8 +227,9 @@ zsock_new_xsub_ (const char *endpoints, const char *filename, size_t line_nbr)
 {
 #if defined ZMQ_XSUB
     zsock_t *sock = zsock_new_ (ZMQ_XSUB, filename, line_nbr);
-    if (zsock_attach (sock, endpoints, false))
-        zsock_destroy (&sock);
+    if (sock)
+        if (zsock_attach (sock, endpoints, false))
+            zsock_destroy (&sock);
     return sock;
 #else
     return NULL;            //  Not implemented
@@ -236,8 +244,9 @@ zsock_t *
 zsock_new_pair_ (const char *endpoints, const char *filename, size_t line_nbr)
 {
     zsock_t *sock = zsock_new_ (ZMQ_PAIR, filename, line_nbr);
-    if (zsock_attach (sock, endpoints, false))
-        zsock_destroy (&sock);
+    if (sock)
+        if (zsock_attach (sock, endpoints, false))
+            zsock_destroy (&sock);
     return sock;
 }
 
@@ -250,8 +259,9 @@ zsock_new_stream_ (const char *endpoints, const char *filename, size_t line_nbr)
 {
 #if defined ZMQ_STREAM
     zsock_t *sock = zsock_new_ (ZMQ_STREAM, filename, line_nbr);
-    if (zsock_attach (sock, endpoints, false))
-        zsock_destroy (&sock);
+    if (sock)
+        if (zsock_attach (sock, endpoints, false))
+            zsock_destroy (&sock);
     return sock;
 #else
     return NULL;            //  Not implemented
