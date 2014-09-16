@@ -310,10 +310,10 @@ zlist_dup (zlist_t *self)
         return NULL;
 
     zlist_t *copy = zlist_new ();
-    copy->destructor = self->destructor;
-    copy->duplicator = self->duplicator;
 
     if (copy) {
+        copy->destructor = self->destructor;
+        copy->duplicator = self->duplicator;
         node_t *node;
         for (node = self->head; node; node = node->next) {
             if (zlist_append (copy, node->item) == -1) {
