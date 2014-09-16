@@ -300,6 +300,8 @@ zsock_bind (zsock_t *self, const char *format, ...)
     va_start (argptr, format);
     char *endpoint = zsys_vprintf (format, argptr);
     va_end (argptr);
+    if (!endpoint)
+        return -1;
     int rc;
     
     //  If tcp:// endpoint, parse to get or make port number
@@ -334,6 +336,8 @@ zsock_bind (zsock_t *self, const char *format, ...)
         while (rc == -1 && attempts--) {
             free (endpoint);
             endpoint = zsys_sprintf ("%s:%d", hostname, port);
+            if (!endpoint)
+                break;
             if (zmq_bind (self->handle, endpoint) == 0)
                 rc = port;
             if (++port > last)
@@ -384,6 +388,8 @@ zsock_unbind (zsock_t *self, const char *format, ...)
     va_start (argptr, format);
     char *endpoint = zsys_vprintf (format, argptr);
     va_end (argptr);
+    if (!endpoint)
+        return -1;
     int rc = zmq_unbind (self->handle, endpoint);
     free (endpoint);
     return rc;
@@ -408,6 +414,8 @@ zsock_connect (zsock_t *self, const char *format, ...)
     va_start (argptr, format);
     char *endpoint = zsys_vprintf (format, argptr);
     va_end (argptr);
+    if (!endpoint)
+        return -1;
     int rc = zmq_connect (self->handle, endpoint);
     
 #if (ZMQ_VERSION < ZMQ_MAKE_VERSION (4,0,0))
@@ -442,6 +450,8 @@ zsock_disconnect (zsock_t *self, const char *format, ...)
     va_start (argptr, format);
     char *endpoint = zsys_vprintf (format, argptr);
     va_end (argptr);
+    if (!endpoint)
+        return -1;
     int rc = zmq_disconnect (self->handle, endpoint);
     free (endpoint);
     return rc;
