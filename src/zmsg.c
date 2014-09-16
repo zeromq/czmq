@@ -54,17 +54,14 @@ struct _zmsg_t {
 zmsg_t *
 zmsg_new (void)
 {
-    zmsg_t
-        *self;
+    zmsg_t *self;
 
     self = (zmsg_t *) zmalloc (sizeof (zmsg_t));
     if (self) {
         self->tag = ZMSG_TAG;
         self->frames = zlist_new ();
-        if (!self->frames) {
-            free (self);
-            return NULL;
-        }
+        if (!self->frames)
+          zmsg_destroy (&self);
     }
     return self;
 }
