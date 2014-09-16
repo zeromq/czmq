@@ -284,6 +284,7 @@ zrex_test (bool verbose)
     //  This shows the pattern of matching one line against many
     //  patterns and then handling the case when it hits
     rex = zrex_new (NULL);      //  No initial pattern
+    assert (rex);
     char *input = "Mechanism: CURVE";
     matches = zrex_eq (rex, input, "Version: (.+)");
     assert (!matches);
