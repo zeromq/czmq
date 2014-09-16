@@ -168,6 +168,10 @@ zsys_init (void)
 
     ZMUTEX_INIT (s_mutex);
     s_sockref_list = zlist_new ();
+    if (!s_sockref_list) {
+        s_terminate_process();
+        return NULL;
+    }
     srandom ((unsigned) time (NULL));
     atexit (s_terminate_process);
     
