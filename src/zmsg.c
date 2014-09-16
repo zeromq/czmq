@@ -555,28 +555,30 @@ zmsg_encode (zmsg_t *self, byte **buffer)
     }
     *buffer = (byte *) malloc (buffer_size);
 
-    //  Encode message now
-    byte *dest = *buffer;
-    frame = zmsg_first (self);
-    while (frame) {
-        size_t frame_size = zframe_size (frame);
-        if (frame_size < 255) {
-            *dest++ = (byte) frame_size;
-            memcpy (dest, zframe_data (frame), frame_size);
-            dest += frame_size;
+    if (*buffer) {
+        //  Encode message now
+        byte *dest = *buffer;
+        frame = zmsg_first (self);
+        while (frame) {
+            size_t frame_size = zframe_size (frame);
+            if (frame_size < 255) {
+                *dest++ = (byte) frame_size;
+                memcpy (dest, zframe_data (frame), frame_size);
+                dest += frame_size;
+            }
+            else {
+                *dest++ = 0xFF;
+                *dest++ = (frame_size >> 24) & 255;
+                *dest++ = (frame_size >> 16) & 255;
+                *dest++ = (frame_size >>  8) & 255;
+                *dest++ =  frame_size        & 255;
+                memcpy (dest, zframe_data (frame), frame_size);
+                dest += frame_size;
+            }
+            frame = zmsg_next (self);
         }
-        else {
-            *dest++ = 0xFF;
-            *dest++ = (frame_size >> 24) & 255;
-            *dest++ = (frame_size >> 16) & 255;
-            *dest++ = (frame_size >>  8) & 255;
-            *dest++ =  frame_size        & 255;
-            memcpy (dest, zframe_data (frame), frame_size);
-            dest += frame_size;
-        }
-        frame = zmsg_next (self);
+        assert ((dest - *buffer) == buffer_size);
     }
-    assert ((dest - *buffer) == buffer_size);
     return buffer_size;
 }
 
