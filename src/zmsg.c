@@ -61,7 +61,7 @@ zmsg_new (void)
         self->tag = ZMSG_TAG;
         self->frames = zlist_new ();
         if (!self->frames)
-          zmsg_destroy (&self);
+            zmsg_destroy (&self);
     }
     return self;
 }
@@ -285,9 +285,14 @@ zmsg_pushstr (zmsg_t *self, const char *string)
     assert (zmsg_is (self));
     assert (string);
 
-    self->content_size += strlen (string);
-    zlist_push (self->frames, zframe_new (string, strlen (string)));
-    return 0;
+    size_t len = strlen (string);
+    zframe_t *frame = zframe_new (string, len);
+    if (frame) {
+        self->content_size += len;
+        return zlist_push (self->frames, frame);
+    }
+    else
+        return -1;
 }
 
 
@@ -302,9 +307,14 @@ zmsg_addstr (zmsg_t *self, const char *string)
     assert (zmsg_is (self));
     assert (string);
 
-    self->content_size += strlen (string);
-    zlist_append (self->frames, zframe_new (string, strlen (string)));
-    return 0;
+    size_t len = strlen (string);
+    zframe_t *frame = zframe_new (string, len);
+    if (frame) {
+        self->content_size += len;
+        return zlist_append (self->frames, frame);
+    }
+    else
+        return -1;
 }
 
 
@@ -323,12 +333,18 @@ zmsg_pushstrf (zmsg_t *self, const char *format, ...)
     va_start (argptr, format);
     char *string = zsys_vprintf (format, argptr);
     va_end (argptr);
+    if (!string)
+        return -1;
 
-    self->content_size += strlen (string);
-    zlist_push (self->frames, zframe_new (string, strlen (string)));
+    size_t len = strlen (string);
+    zframe_t *frame = zframe_new (string, len);
     free (string);
-
-    return 0;
+    if (frame) {
+        self->content_size += len;
+        return zlist_push (self->frames, frame);
+    }
+    else
+        return -1;
 }
 
 
@@ -347,12 +363,18 @@ zmsg_addstrf (zmsg_t *self, const char *format, ...)
     va_start (argptr, format);
     char *string = zsys_vprintf (format, argptr);
     va_end (argptr);
+    if (!string)
+        return -1;
 
-    self->content_size += strlen (string);
-    zlist_append (self->frames, zframe_new (string, strlen (string)));
+    size_t len = strlen (string);
+    zframe_t *frame = zframe_new (string, len);
     free (string);
-
-    return 0;
+    if (frame) {
+        self->content_size += len;
+        return zlist_append (self->frames, frame);
+    }
+    else
+        return -1;
 }
 
 
@@ -478,12 +500,20 @@ zmsg_load (zmsg_t *self, FILE *file)
         size_t rc = fread (&frame_size, sizeof (frame_size), 1, file);
         if (rc == 1) {
             zframe_t *frame = zframe_new (NULL, frame_size);
+            if (!frame) {
+                zmsg_destroy (&self);
+                return NULL;    //  Unable to allocate frame, fail
+            }
             rc = fread (zframe_data (frame), frame_size, 1, file);
             if (frame_size > 0 && rc != 1) {
                 zframe_destroy (&frame);
-                break;          //  Unable to read properly, quit
+                zmsg_destroy (&self);
+                return NULL;    //  Corrupt file, fail
             }
-            zmsg_append (self, &frame);
+            if (zmsg_append (self, &frame) == -1) {
+                zmsg_destroy (&self);
+                return NULL;    //  Unable to add frame, fail
+            }
         }
         else
             break;              //  Unable to read properly, quit
