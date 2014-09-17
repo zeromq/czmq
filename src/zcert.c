@@ -265,7 +265,7 @@ s_save_metadata_all (zcert_t *self)
     
     char *value = (char *) zhash_first (self->metadata);
     while (value) {
-        zconfig_t *item = zconfig_new (zhash_cursor (self->metadata), section);
+        zconfig_t *item = zconfig_new ((char *) zhash_cursor (self->metadata), section);
         zconfig_set_value (item, "%s", value);
         value = (char *) zhash_next (self->metadata);
     }
