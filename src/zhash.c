@@ -734,7 +734,7 @@ zhash_pack (zhash_t *self)
         item_t *item = self->items [index];
         while (item) {
             //  We store key as short string
-            frame_size += 1 + strlen (item->key);
+            frame_size += 1 + strlen ((char *) item->key);
             //  We store value as long string
             frame_size += 4 + strlen ((char *) item->value);
             item = item->next;
@@ -750,9 +750,9 @@ zhash_pack (zhash_t *self)
         item_t *item = self->items [index];
         while (item) {
             //  Store key as string
-            *needle++ = (byte) strlen (item->key);
-            memcpy (needle, item->key, strlen (item->key));
-            needle += strlen (item->key);
+            *needle++ = (byte) strlen ((char *) item->key);
+            memcpy (needle, item->key, strlen ((char *) item->key));
+            needle += strlen ((char *) item->key);
 
             //  Store value as longstr
             *(uint32_t *) needle = htonl (strlen ((char *) item->value));
@@ -1012,7 +1012,7 @@ zhash_test (int verbose)
     int rc;
     rc = zhash_insert (hash, "DEADBEEF", "dead beef");
     char *item = (char *) zhash_first (hash);
-    assert (streq (zhash_cursor (hash), "DEADBEEF"));
+    assert (streq ((char *) zhash_cursor (hash), "DEADBEEF"));
     assert (streq (item, "dead beef"));
     assert (rc == 0);
     rc = zhash_insert (hash, "ABADCAFE", "a bad cafe");
