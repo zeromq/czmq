@@ -61,13 +61,15 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void *
     zlist_item (zlist_t *self);
 
-//  Append an item to the end of the list, return 0 if OK
-//  or -1 if this failed for some reason (out of memory).
+//  Append an item to the end of the list, return 0 if OK or -1 if this
+//  failed for some reason (out of memory). Note that if a duplicator has 
+//  been set, this method will also duplicate the item.
 CZMQ_EXPORT int
     zlist_append (zlist_t *self, void *item);
 
-//  Push an item to the start of the list, return 0 if OK
-//  or -1 if this failed for some reason (out of memory).
+//  Push an item to the start of the list, return 0 if OK or -1 if this
+//  failed for some reason (out of memory). Note that if a duplicator has
+//  been set, this method will also duplicate the item.
 CZMQ_EXPORT int
     zlist_push (zlist_t *self, void *item);
 
@@ -79,11 +81,6 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void
     zlist_remove (zlist_t *self, void *item);
 
-// Add an explicit free function to the item including a hint as to
-// whether it can be found at the tail
-CZMQ_EXPORT void *
-    zlist_freefn (zlist_t *self, void *item, zlist_free_fn *fn, bool at_tail);
-
 //  Make a copy of list. If the list has autofree set, the copied list will
 //  duplicate all items, which must be strings. Otherwise, the list will hold
 //  pointers back to the items in the original list.
@@ -94,10 +91,10 @@ CZMQ_EXPORT zlist_t *
 CZMQ_EXPORT size_t
     zlist_size (zlist_t *self);
 
-//  Sort the ring using the container comparator, which must have been
-//  specified. The sort is not stable, so may reorder equal items.
+//  Sort the list by ascending key value using a straight ASCII comparison.
+//  The sort is not stable, so may reorder items with the same keys.
 CZMQ_EXPORT void
-    zring_sort (zring_t *self);
+    zlist_sort (zlist_t *self, zlist_compare_fn *compare);
 
 //  Set a user-defined destructor for items; by default items are not
 //  freed when the list is destroyed.
@@ -120,6 +117,15 @@ CZMQ_EXPORT void
 //  list is empty.
 CZMQ_EXPORT void
     zlist_autofree (zlist_t *self);
+
+//  DEPRECATED by zlist_set_duplicator/zlist_set_destructor
+//  Set a free function for the specified list item. When the item is
+//  destroyed, the free function, if any, is called on that item.
+//  Use this when list items are dynamically allocated, to ensure that
+//  you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
+//  Returns the item, or NULL if there is no such item.
+CZMQ_EXPORT void *
+    zlist_freefn (zlist_t *self, void *item, zlist_free_fn *fn, bool at_tail);
 
 //  Self test of this class
 CZMQ_EXPORT void
