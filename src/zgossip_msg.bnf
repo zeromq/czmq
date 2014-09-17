@@ -1,7 +1,7 @@
 The following ABNF grammar defines the ZeroMQ Gossip Protocol:
 
-        C:HELLO ( C:PUBLISH / S:PUBLISH / heartbeat )
-        heartbeat = C:PING / S:PONG
+    C:HELLO ( C:PUBLISH / S:PUBLISH / heartbeat )
+    heartbeat = C:PING / S:PONG
 
     ;         Client says hello to server
     hello           = signature %d1 version
