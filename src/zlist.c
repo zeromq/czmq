@@ -287,7 +287,7 @@ zlist_remove (zlist_t *self, void *item)
             self->cursor = prev;
         
         if (self->destructor)
-            (self->destructor) (node->item);
+            (self->destructor) (&node->item);
         else
         if (node->free_fn)
             (node->free_fn) (node->item);
