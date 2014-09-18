@@ -450,6 +450,7 @@ zcert_test (bool verbose)
     
     //  Create a simple certificate with metadata
     zcert_t *cert = zcert_new ();
+    assert (cert);
     zcert_set_meta (cert, "email", "ph@imatix.com");
     zcert_set_meta (cert, "name", "Pieter Hintjens");
     zcert_set_meta (cert, "organization", "iMatix Corporation");
@@ -488,6 +489,7 @@ zcert_test (bool verbose)
     
     //  Delete all test files
     zdir_t *dir = zdir_new (TESTDIR, NULL);
+    assert (dir);
     zdir_remove (dir, true);
     zdir_destroy (&dir);
     //  @end
