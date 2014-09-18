@@ -142,6 +142,7 @@ zdigest_test (bool verbose)
     memset (buffer, 0xAA, 1024);
     
     zdigest_t *digest = zdigest_new ();
+    assert (digest);
     zdigest_update (digest, buffer, 1024);
     byte *data = zdigest_data (digest);
     assert (data [0] == 0xDE);
