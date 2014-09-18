@@ -193,6 +193,7 @@ zconfig_put (zconfig_t *self, const char *path, const char *value)
     }
     //  This segment doesn't exist, create it
     child = zconfig_new (path, self);
+    assert (child);
     child->name [length] = 0;
     if (slash)                  //  Recurse down further
         zconfig_put (child, slash, value);
@@ -369,6 +370,7 @@ zconfig_load (const char *filename)
     //  Load entire file into memory as a chunk, then process it
     zconfig_t *self = NULL;
     zfile_t *file = zfile_new (NULL, filename);
+    assert (file);
     if (zfile_input (file) == 0) {
         zchunk_t *chunk = zfile_read (file, zfile_cursize (file), 0);
         if (chunk) {
@@ -511,6 +513,7 @@ zconfig_chunk_load (zchunk_t *chunk)
 {
     //  Parse the chunk line by line
     zconfig_t *self = zconfig_new ("root", NULL);
+    assert (self);
     bool valid = true;
     int lineno = 0;
     char *data_ptr = (char *) zchunk_data (chunk);
@@ -545,6 +548,7 @@ zconfig_chunk_load (zchunk_t *chunk)
         if (cur_line [0] == '#') {
             if (!self->comments) {
                 self->comments = zlist_new ();
+                assert (self->comments);
                 zlist_autofree (self->comments);
             }
             zlist_append (self->comments, cur_line + 1);
@@ -570,6 +574,7 @@ zconfig_chunk_load (zchunk_t *chunk)
                 zconfig_t *parent = zconfig_at_depth (self, level);
                 if (parent) {
                     zconfig_t *item = zconfig_new (name, parent);
+                    assert (item);
                     item->value = value;
                 }
                 else {
@@ -766,6 +771,7 @@ zconfig_set_comment (zconfig_t *self, const char *format, ...)
     if (format) {
         if (!self->comments) {
             self->comments = zlist_new ();
+            assert (self->comments);
             zlist_autofree (self->comments);
         }
         va_list argptr;
