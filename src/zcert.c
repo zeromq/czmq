@@ -177,6 +177,7 @@ zcert_set_meta (zcert_t *self, const char *name, const char *format, ...)
     va_start (argptr, format);
     char *value = zsys_vprintf (format, argptr);
     va_end (argptr);
+    assert (value);
     zhash_insert (self->metadata, name, value);
 }
 
@@ -257,11 +258,13 @@ s_save_metadata_all (zcert_t *self)
 {
     zconfig_destroy (&self->config);
     self->config = zconfig_new ("root", NULL);
+    assert (self->config);
     zconfig_t *section = zconfig_new ("metadata", self->config);
     
     char *value = (char *) zhash_first (self->metadata);
     while (value) {
         zconfig_t *item = zconfig_new ((char *) zhash_cursor (self->metadata), section);
+        assert (item);
         zconfig_set_value (item, "%s", value);
         value = (char *) zhash_next (self->metadata);
     }
