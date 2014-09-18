@@ -244,7 +244,8 @@ zchunk_read (FILE *handle, size_t bytes)
     assert (handle);
 
     zchunk_t *self = zchunk_new (NULL, bytes);
-    self->size = fread (self->data, 1, bytes, handle);
+    if (self)
+        self->size = fread (self->data, 1, bytes, handle);
     return self;
 }
 
