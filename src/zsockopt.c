@@ -38,7 +38,7 @@ void
 zsocket_set_tos (void *zocket, int tos)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_tos () on zsock_t instances\n");
+        printf ("Please use zsock_set_tos () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_TOS)
@@ -74,7 +74,7 @@ void
 zsocket_set_router_handover (void *zocket, int router_handover)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_router_handover () on zsock_t instances\n");
+        printf ("Please use zsock_set_router_handover () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_ROUTER_HANDOVER)
@@ -96,7 +96,7 @@ void
 zsocket_set_router_mandatory (void *zocket, int router_mandatory)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_router_mandatory () on zsock_t instances\n");
+        printf ("Please use zsock_set_router_mandatory () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_ROUTER_MANDATORY)
@@ -118,7 +118,7 @@ void
 zsocket_set_probe_router (void *zocket, int probe_router)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_probe_router () on zsock_t instances\n");
+        printf ("Please use zsock_set_probe_router () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_PROBE_ROUTER)
@@ -142,7 +142,7 @@ void
 zsocket_set_req_relaxed (void *zocket, int req_relaxed)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_req_relaxed () on zsock_t instances\n");
+        printf ("Please use zsock_set_req_relaxed () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_REQ_RELAXED)
@@ -164,7 +164,7 @@ void
 zsocket_set_req_correlate (void *zocket, int req_correlate)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_req_correlate () on zsock_t instances\n");
+        printf ("Please use zsock_set_req_correlate () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_REQ_CORRELATE)
@@ -186,7 +186,7 @@ void
 zsocket_set_conflate (void *zocket, int conflate)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_conflate () on zsock_t instances\n");
+        printf ("Please use zsock_set_conflate () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_CONFLATE)
@@ -212,7 +212,7 @@ void
 zsocket_set_zap_domain (void *zocket, const char * zap_domain)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_zap_domain () on zsock_t instances\n");
+        printf ("Please use zsock_set_zap_domain () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_ZAP_DOMAIN)
@@ -266,7 +266,7 @@ void
 zsocket_set_plain_server (void *zocket, int plain_server)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_plain_server () on zsock_t instances\n");
+        printf ("Please use zsock_set_plain_server () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_PLAIN_SERVER)
@@ -302,7 +302,7 @@ void
 zsocket_set_plain_username (void *zocket, const char * plain_username)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_plain_username () on zsock_t instances\n");
+        printf ("Please use zsock_set_plain_username () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_PLAIN_USERNAME)
@@ -338,7 +338,7 @@ void
 zsocket_set_plain_password (void *zocket, const char * plain_password)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_plain_password () on zsock_t instances\n");
+        printf ("Please use zsock_set_plain_password () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_PLAIN_PASSWORD)
@@ -374,7 +374,7 @@ void
 zsocket_set_curve_server (void *zocket, int curve_server)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_curve_server () on zsock_t instances\n");
+        printf ("Please use zsock_set_curve_server () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_CURVE_SERVER)
@@ -410,7 +410,7 @@ void
 zsocket_set_curve_publickey (void *zocket, const char * curve_publickey)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_curve_publickey () on zsock_t instances\n");
+        printf ("Please use zsock_set_curve_publickey () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_CURVE_PUBLICKEY)
@@ -460,7 +460,7 @@ void
 zsocket_set_curve_secretkey (void *zocket, const char * curve_secretkey)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_curve_secretkey () on zsock_t instances\n");
+        printf ("Please use zsock_set_curve_secretkey () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_CURVE_SECRETKEY)
@@ -510,7 +510,7 @@ void
 zsocket_set_curve_serverkey (void *zocket, const char * curve_serverkey)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_curve_serverkey () on zsock_t instances\n");
+        printf ("Please use zsock_set_curve_serverkey () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_CURVE_SERVERKEY)
@@ -560,7 +560,7 @@ void
 zsocket_set_gssapi_server (void *zocket, int gssapi_server)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_gssapi_server () on zsock_t instances\n");
+        printf ("Please use zsock_set_gssapi_server () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_GSSAPI_SERVER)
@@ -596,7 +596,7 @@ void
 zsocket_set_gssapi_plaintext (void *zocket, int gssapi_plaintext)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_gssapi_plaintext () on zsock_t instances\n");
+        printf ("Please use zsock_set_gssapi_plaintext () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_GSSAPI_PLAINTEXT)
@@ -632,7 +632,7 @@ void
 zsocket_set_gssapi_principal (void *zocket, const char * gssapi_principal)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_gssapi_principal () on zsock_t instances\n");
+        printf ("Please use zsock_set_gssapi_principal () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_GSSAPI_PRINCIPAL)
@@ -668,7 +668,7 @@ void
 zsocket_set_gssapi_service_principal (void *zocket, const char * gssapi_service_principal)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_gssapi_service_principal () on zsock_t instances\n");
+        printf ("Please use zsock_set_gssapi_service_principal () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_GSSAPI_SERVICE_PRINCIPAL)
@@ -704,7 +704,7 @@ void
 zsocket_set_ipv6 (void *zocket, int ipv6)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_ipv6 () on zsock_t instances\n");
+        printf ("Please use zsock_set_ipv6 () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_IPV6)
@@ -740,7 +740,7 @@ void
 zsocket_set_immediate (void *zocket, int immediate)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_immediate () on zsock_t instances\n");
+        printf ("Please use zsock_set_immediate () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_IMMEDIATE)
@@ -776,7 +776,7 @@ void
 zsocket_set_router_raw (void *zocket, int router_raw)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_router_raw () on zsock_t instances\n");
+        printf ("Please use zsock_set_router_raw () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_ROUTER_RAW)
@@ -798,7 +798,7 @@ void
 zsocket_set_ipv4only (void *zocket, int ipv4only)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_ipv4only () on zsock_t instances\n");
+        printf ("Please use zsock_set_ipv4only () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_IPV4ONLY)
@@ -834,7 +834,7 @@ void
 zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_delay_attach_on_connect () on zsock_t instances\n");
+        printf ("Please use zsock_set_delay_attach_on_connect () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
@@ -870,7 +870,7 @@ void
 zsocket_set_sndhwm (void *zocket, int sndhwm)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_sndhwm () on zsock_t instances\n");
+        printf ("Please use zsock_set_sndhwm () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_SNDHWM)
@@ -906,7 +906,7 @@ void
 zsocket_set_rcvhwm (void *zocket, int rcvhwm)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_rcvhwm () on zsock_t instances\n");
+        printf ("Please use zsock_set_rcvhwm () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_RCVHWM)
@@ -942,7 +942,7 @@ void
 zsocket_set_affinity (void *zocket, int affinity)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_affinity () on zsock_t instances\n");
+        printf ("Please use zsock_set_affinity () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_AFFINITY)
@@ -979,7 +979,7 @@ void
 zsocket_set_subscribe (void *zocket, const char * subscribe)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_subscribe () on zsock_t instances\n");
+        printf ("Please use zsock_set_subscribe () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_SUBSCRIBE)
@@ -1001,7 +1001,7 @@ void
 zsocket_set_unsubscribe (void *zocket, const char * unsubscribe)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_unsubscribe () on zsock_t instances\n");
+        printf ("Please use zsock_set_unsubscribe () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_UNSUBSCRIBE)
@@ -1023,7 +1023,7 @@ void
 zsocket_set_identity (void *zocket, const char * identity)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_identity () on zsock_t instances\n");
+        printf ("Please use zsock_set_identity () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_IDENTITY)
@@ -1066,7 +1066,7 @@ void
 zsocket_set_rate (void *zocket, int rate)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_rate () on zsock_t instances\n");
+        printf ("Please use zsock_set_rate () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_RATE)
@@ -1102,7 +1102,7 @@ void
 zsocket_set_recovery_ivl (void *zocket, int recovery_ivl)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_recovery_ivl () on zsock_t instances\n");
+        printf ("Please use zsock_set_recovery_ivl () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_RECOVERY_IVL)
@@ -1138,7 +1138,7 @@ void
 zsocket_set_sndbuf (void *zocket, int sndbuf)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_sndbuf () on zsock_t instances\n");
+        printf ("Please use zsock_set_sndbuf () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_SNDBUF)
@@ -1174,7 +1174,7 @@ void
 zsocket_set_rcvbuf (void *zocket, int rcvbuf)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_rcvbuf () on zsock_t instances\n");
+        printf ("Please use zsock_set_rcvbuf () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_RCVBUF)
@@ -1210,7 +1210,7 @@ void
 zsocket_set_linger (void *zocket, int linger)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_linger () on zsock_t instances\n");
+        printf ("Please use zsock_set_linger () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_LINGER)
@@ -1246,7 +1246,7 @@ void
 zsocket_set_reconnect_ivl (void *zocket, int reconnect_ivl)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_reconnect_ivl () on zsock_t instances\n");
+        printf ("Please use zsock_set_reconnect_ivl () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_RECONNECT_IVL)
@@ -1282,7 +1282,7 @@ void
 zsocket_set_reconnect_ivl_max (void *zocket, int reconnect_ivl_max)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_reconnect_ivl_max () on zsock_t instances\n");
+        printf ("Please use zsock_set_reconnect_ivl_max () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_RECONNECT_IVL_MAX)
@@ -1318,7 +1318,7 @@ void
 zsocket_set_backlog (void *zocket, int backlog)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_backlog () on zsock_t instances\n");
+        printf ("Please use zsock_set_backlog () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_BACKLOG)
@@ -1354,7 +1354,7 @@ void
 zsocket_set_maxmsgsize (void *zocket, int maxmsgsize)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_maxmsgsize () on zsock_t instances\n");
+        printf ("Please use zsock_set_maxmsgsize () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_MAXMSGSIZE)
@@ -1391,7 +1391,7 @@ void
 zsocket_set_multicast_hops (void *zocket, int multicast_hops)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_multicast_hops () on zsock_t instances\n");
+        printf ("Please use zsock_set_multicast_hops () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_MULTICAST_HOPS)
@@ -1427,7 +1427,7 @@ void
 zsocket_set_rcvtimeo (void *zocket, int rcvtimeo)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_rcvtimeo () on zsock_t instances\n");
+        printf ("Please use zsock_set_rcvtimeo () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_RCVTIMEO)
@@ -1463,7 +1463,7 @@ void
 zsocket_set_sndtimeo (void *zocket, int sndtimeo)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_sndtimeo () on zsock_t instances\n");
+        printf ("Please use zsock_set_sndtimeo () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_SNDTIMEO)
@@ -1499,7 +1499,7 @@ void
 zsocket_set_xpub_verbose (void *zocket, int xpub_verbose)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_xpub_verbose () on zsock_t instances\n");
+        printf ("Please use zsock_set_xpub_verbose () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_XPUB_VERBOSE)
@@ -1521,7 +1521,7 @@ void
 zsocket_set_tcp_keepalive (void *zocket, int tcp_keepalive)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_tcp_keepalive () on zsock_t instances\n");
+        printf ("Please use zsock_set_tcp_keepalive () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_TCP_KEEPALIVE)
@@ -1557,7 +1557,7 @@ void
 zsocket_set_tcp_keepalive_idle (void *zocket, int tcp_keepalive_idle)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_tcp_keepalive_idle () on zsock_t instances\n");
+        printf ("Please use zsock_set_tcp_keepalive_idle () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_TCP_KEEPALIVE_IDLE)
@@ -1593,7 +1593,7 @@ void
 zsocket_set_tcp_keepalive_cnt (void *zocket, int tcp_keepalive_cnt)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_tcp_keepalive_cnt () on zsock_t instances\n");
+        printf ("Please use zsock_set_tcp_keepalive_cnt () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_TCP_KEEPALIVE_CNT)
@@ -1629,7 +1629,7 @@ void
 zsocket_set_tcp_keepalive_intvl (void *zocket, int tcp_keepalive_intvl)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_tcp_keepalive_intvl () on zsock_t instances\n");
+        printf ("Please use zsock_set_tcp_keepalive_intvl () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_TCP_KEEPALIVE_INTVL)
@@ -1665,7 +1665,7 @@ void
 zsocket_set_tcp_accept_filter (void *zocket, const char * tcp_accept_filter)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_tcp_accept_filter () on zsock_t instances\n");
+        printf ("Please use zsock_set_tcp_accept_filter () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_TCP_ACCEPT_FILTER)
@@ -1776,7 +1776,7 @@ void
 zsocket_set_router_raw (void *zocket, int router_raw)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_router_raw () on zsock_t instances\n");
+        printf ("Please use zsock_set_router_raw () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_ROUTER_RAW)
@@ -1798,7 +1798,7 @@ void
 zsocket_set_ipv4only (void *zocket, int ipv4only)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_ipv4only () on zsock_t instances\n");
+        printf ("Please use zsock_set_ipv4only () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_IPV4ONLY)
@@ -1834,7 +1834,7 @@ void
 zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_delay_attach_on_connect () on zsock_t instances\n");
+        printf ("Please use zsock_set_delay_attach_on_connect () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
@@ -1870,7 +1870,7 @@ void
 zsocket_set_sndhwm (void *zocket, int sndhwm)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_sndhwm () on zsock_t instances\n");
+        printf ("Please use zsock_set_sndhwm () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_SNDHWM)
@@ -1906,7 +1906,7 @@ void
 zsocket_set_rcvhwm (void *zocket, int rcvhwm)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_rcvhwm () on zsock_t instances\n");
+        printf ("Please use zsock_set_rcvhwm () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_RCVHWM)
@@ -1942,7 +1942,7 @@ void
 zsocket_set_affinity (void *zocket, int affinity)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_affinity () on zsock_t instances\n");
+        printf ("Please use zsock_set_affinity () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_AFFINITY)
@@ -1979,7 +1979,7 @@ void
 zsocket_set_subscribe (void *zocket, const char * subscribe)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_subscribe () on zsock_t instances\n");
+        printf ("Please use zsock_set_subscribe () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_SUBSCRIBE)
@@ -2001,7 +2001,7 @@ void
 zsocket_set_unsubscribe (void *zocket, const char * unsubscribe)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_unsubscribe () on zsock_t instances\n");
+        printf ("Please use zsock_set_unsubscribe () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_UNSUBSCRIBE)
@@ -2023,7 +2023,7 @@ void
 zsocket_set_identity (void *zocket, const char * identity)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_identity () on zsock_t instances\n");
+        printf ("Please use zsock_set_identity () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_IDENTITY)
@@ -2066,7 +2066,7 @@ void
 zsocket_set_rate (void *zocket, int rate)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_rate () on zsock_t instances\n");
+        printf ("Please use zsock_set_rate () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_RATE)
@@ -2102,7 +2102,7 @@ void
 zsocket_set_recovery_ivl (void *zocket, int recovery_ivl)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_recovery_ivl () on zsock_t instances\n");
+        printf ("Please use zsock_set_recovery_ivl () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_RECOVERY_IVL)
@@ -2138,7 +2138,7 @@ void
 zsocket_set_sndbuf (void *zocket, int sndbuf)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_sndbuf () on zsock_t instances\n");
+        printf ("Please use zsock_set_sndbuf () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_SNDBUF)
@@ -2174,7 +2174,7 @@ void
 zsocket_set_rcvbuf (void *zocket, int rcvbuf)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_rcvbuf () on zsock_t instances\n");
+        printf ("Please use zsock_set_rcvbuf () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_RCVBUF)
@@ -2210,7 +2210,7 @@ void
 zsocket_set_linger (void *zocket, int linger)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_linger () on zsock_t instances\n");
+        printf ("Please use zsock_set_linger () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_LINGER)
@@ -2246,7 +2246,7 @@ void
 zsocket_set_reconnect_ivl (void *zocket, int reconnect_ivl)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_reconnect_ivl () on zsock_t instances\n");
+        printf ("Please use zsock_set_reconnect_ivl () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_RECONNECT_IVL)
@@ -2282,7 +2282,7 @@ void
 zsocket_set_reconnect_ivl_max (void *zocket, int reconnect_ivl_max)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_reconnect_ivl_max () on zsock_t instances\n");
+        printf ("Please use zsock_set_reconnect_ivl_max () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_RECONNECT_IVL_MAX)
@@ -2318,7 +2318,7 @@ void
 zsocket_set_backlog (void *zocket, int backlog)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_backlog () on zsock_t instances\n");
+        printf ("Please use zsock_set_backlog () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_BACKLOG)
@@ -2354,7 +2354,7 @@ void
 zsocket_set_maxmsgsize (void *zocket, int maxmsgsize)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_maxmsgsize () on zsock_t instances\n");
+        printf ("Please use zsock_set_maxmsgsize () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_MAXMSGSIZE)
@@ -2391,7 +2391,7 @@ void
 zsocket_set_multicast_hops (void *zocket, int multicast_hops)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_multicast_hops () on zsock_t instances\n");
+        printf ("Please use zsock_set_multicast_hops () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_MULTICAST_HOPS)
@@ -2427,7 +2427,7 @@ void
 zsocket_set_rcvtimeo (void *zocket, int rcvtimeo)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_rcvtimeo () on zsock_t instances\n");
+        printf ("Please use zsock_set_rcvtimeo () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_RCVTIMEO)
@@ -2463,7 +2463,7 @@ void
 zsocket_set_sndtimeo (void *zocket, int sndtimeo)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_sndtimeo () on zsock_t instances\n");
+        printf ("Please use zsock_set_sndtimeo () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_SNDTIMEO)
@@ -2499,7 +2499,7 @@ void
 zsocket_set_xpub_verbose (void *zocket, int xpub_verbose)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_xpub_verbose () on zsock_t instances\n");
+        printf ("Please use zsock_set_xpub_verbose () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_XPUB_VERBOSE)
@@ -2521,7 +2521,7 @@ void
 zsocket_set_tcp_keepalive (void *zocket, int tcp_keepalive)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_tcp_keepalive () on zsock_t instances\n");
+        printf ("Please use zsock_set_tcp_keepalive () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_TCP_KEEPALIVE)
@@ -2557,7 +2557,7 @@ void
 zsocket_set_tcp_keepalive_idle (void *zocket, int tcp_keepalive_idle)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_tcp_keepalive_idle () on zsock_t instances\n");
+        printf ("Please use zsock_set_tcp_keepalive_idle () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_TCP_KEEPALIVE_IDLE)
@@ -2593,7 +2593,7 @@ void
 zsocket_set_tcp_keepalive_cnt (void *zocket, int tcp_keepalive_cnt)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_tcp_keepalive_cnt () on zsock_t instances\n");
+        printf ("Please use zsock_set_tcp_keepalive_cnt () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_TCP_KEEPALIVE_CNT)
@@ -2629,7 +2629,7 @@ void
 zsocket_set_tcp_keepalive_intvl (void *zocket, int tcp_keepalive_intvl)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_tcp_keepalive_intvl () on zsock_t instances\n");
+        printf ("Please use zsock_set_tcp_keepalive_intvl () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_TCP_KEEPALIVE_INTVL)
@@ -2665,7 +2665,7 @@ void
 zsocket_set_tcp_accept_filter (void *zocket, const char * tcp_accept_filter)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_tcp_accept_filter () on zsock_t instances\n");
+        printf ("Please use zsock_set_tcp_accept_filter () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_TCP_ACCEPT_FILTER)
@@ -2776,7 +2776,7 @@ void
 zsocket_set_hwm (void *zocket, int hwm)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_hwm () on zsock_t instances\n");
+        printf ("Please use zsock_set_hwm () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_HWM)
@@ -2813,7 +2813,7 @@ void
 zsocket_set_swap (void *zocket, int swap)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_swap () on zsock_t instances\n");
+        printf ("Please use zsock_set_swap () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_SWAP)
@@ -2850,7 +2850,7 @@ void
 zsocket_set_affinity (void *zocket, int affinity)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_affinity () on zsock_t instances\n");
+        printf ("Please use zsock_set_affinity () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_AFFINITY)
@@ -2887,7 +2887,7 @@ void
 zsocket_set_identity (void *zocket, const char * identity)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_identity () on zsock_t instances\n");
+        printf ("Please use zsock_set_identity () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_IDENTITY)
@@ -2923,7 +2923,7 @@ void
 zsocket_set_rate (void *zocket, int rate)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_rate () on zsock_t instances\n");
+        printf ("Please use zsock_set_rate () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_RATE)
@@ -2960,7 +2960,7 @@ void
 zsocket_set_recovery_ivl (void *zocket, int recovery_ivl)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_recovery_ivl () on zsock_t instances\n");
+        printf ("Please use zsock_set_recovery_ivl () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_RECOVERY_IVL)
@@ -2997,7 +2997,7 @@ void
 zsocket_set_recovery_ivl_msec (void *zocket, int recovery_ivl_msec)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_recovery_ivl_msec () on zsock_t instances\n");
+        printf ("Please use zsock_set_recovery_ivl_msec () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_RECOVERY_IVL_MSEC)
@@ -3034,7 +3034,7 @@ void
 zsocket_set_mcast_loop (void *zocket, int mcast_loop)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_mcast_loop () on zsock_t instances\n");
+        printf ("Please use zsock_set_mcast_loop () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_MCAST_LOOP)
@@ -3072,7 +3072,7 @@ void
 zsocket_set_rcvtimeo (void *zocket, int rcvtimeo)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_rcvtimeo () on zsock_t instances\n");
+        printf ("Please use zsock_set_rcvtimeo () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_RCVTIMEO)
@@ -3110,7 +3110,7 @@ void
 zsocket_set_sndtimeo (void *zocket, int sndtimeo)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_sndtimeo () on zsock_t instances\n");
+        printf ("Please use zsock_set_sndtimeo () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_SNDTIMEO)
@@ -3147,7 +3147,7 @@ void
 zsocket_set_sndbuf (void *zocket, int sndbuf)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_sndbuf () on zsock_t instances\n");
+        printf ("Please use zsock_set_sndbuf () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_SNDBUF)
@@ -3184,7 +3184,7 @@ void
 zsocket_set_rcvbuf (void *zocket, int rcvbuf)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_rcvbuf () on zsock_t instances\n");
+        printf ("Please use zsock_set_rcvbuf () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_RCVBUF)
@@ -3221,7 +3221,7 @@ void
 zsocket_set_linger (void *zocket, int linger)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_linger () on zsock_t instances\n");
+        printf ("Please use zsock_set_linger () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_LINGER)
@@ -3257,7 +3257,7 @@ void
 zsocket_set_reconnect_ivl (void *zocket, int reconnect_ivl)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_reconnect_ivl () on zsock_t instances\n");
+        printf ("Please use zsock_set_reconnect_ivl () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_RECONNECT_IVL)
@@ -3293,7 +3293,7 @@ void
 zsocket_set_reconnect_ivl_max (void *zocket, int reconnect_ivl_max)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_reconnect_ivl_max () on zsock_t instances\n");
+        printf ("Please use zsock_set_reconnect_ivl_max () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_RECONNECT_IVL_MAX)
@@ -3329,7 +3329,7 @@ void
 zsocket_set_backlog (void *zocket, int backlog)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_backlog () on zsock_t instances\n");
+        printf ("Please use zsock_set_backlog () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_BACKLOG)
@@ -3365,7 +3365,7 @@ void
 zsocket_set_subscribe (void *zocket, const char * subscribe)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_subscribe () on zsock_t instances\n");
+        printf ("Please use zsock_set_subscribe () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_SUBSCRIBE)
@@ -3387,7 +3387,7 @@ void
 zsocket_set_unsubscribe (void *zocket, const char * unsubscribe)
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_unsubscribe () on zsock_t instances\n");
+        printf ("Please use zsock_set_unsubscribe () on zsock_t instances\n");
         assert (false);
     }
 #   if defined (ZMQ_UNSUBSCRIBE)
