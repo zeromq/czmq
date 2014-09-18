@@ -123,7 +123,7 @@ void
 zsocket_set_$(name) (void *zocket, $(ctype_const) $(name))
 {
     if (zsock_is (zocket)) {
-        printf ("Please use zsocket_set_$(name) () on zsock_t instances\\n");
+        printf ("Please use zsock_set_$(name) () on zsock_t instances\\n");
         assert (false);
     }
 .       if style = "macro"
