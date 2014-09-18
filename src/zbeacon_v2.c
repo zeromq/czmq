@@ -285,7 +285,8 @@ static agent_t *
 s_agent_new (void *pipe, int port_nbr)
 {
     agent_t *self = (agent_t *) zmalloc (sizeof (agent_t));
-    assert (self);
+    if (!self)
+        return NULL;
     
     self->pipe = pipe;
     self->port_nbr = port_nbr;
