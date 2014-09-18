@@ -189,7 +189,8 @@ zgossip_msg_t *
 zgossip_msg_new (int id)
 {
     zgossip_msg_t *self = (zgossip_msg_t *) zmalloc (sizeof (zgossip_msg_t));
-    self->id = id;
+    if (self)
+        self->id = id;
     return self;
 }
 
