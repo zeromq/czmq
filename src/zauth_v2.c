@@ -363,9 +363,13 @@ s_agent_handle_pipe (agent_t *self)
 {
     //  Get the whole message off the pipe in one go
     zmsg_t *request = zmsg_recv (self->pipe);
-    char *command = zmsg_popstr (request);
-    if (!command)
+    if (!request)
         return -1;                  //  Interrupted
+    char *command = zmsg_popstr (request);
+    if (!command) {
+        zmsg_destroy (&request);
+        return -1;                  //  Interrupted
+    }
 
     if (streq (command, "ALLOW")) {
         char *address = zmsg_popstr (request);
@@ -584,14 +588,15 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
         return;
 
     zpoller_t *poller = zpoller_new (self->pipe, self->handler, NULL);
-    while (!zpoller_terminated (poller) && !self->terminated) {
-        void *which = zpoller_wait (poller, -1);
-        if (which == self->pipe)
-            s_agent_handle_pipe (self);
-        else
-        if (which == self->handler)
-            s_agent_authenticate (self);
-    }
+    if (poller)
+        while (!zpoller_terminated (poller) && !self->terminated) {
+            void *which = zpoller_wait (poller, -1);
+            if (which == self->pipe)
+                s_agent_handle_pipe (self);
+            else
+                if (which == self->handler)
+                    s_agent_authenticate (self);
+        }
     //  Done, free all agent resources
     zpoller_destroy (&poller);
     s_agent_destroy (&self);
