@@ -477,6 +477,7 @@ zchunk_test (bool verbose)
     zchunk_destroy (&chunk);
 
     chunk = zchunk_new (NULL, 10);
+    assert (chunk);
     zchunk_append (chunk, "12345678", 8);
     zchunk_append (chunk, "90ABCDEF", 8);
     zchunk_append (chunk, "GHIJKLMN", 8);
@@ -494,18 +495,22 @@ zchunk_test (bool verbose)
     assert (frame);
 
     zchunk_t *chunk2 = zchunk_unpack (frame);
+    assert (chunk2);
     assert (memcmp (zchunk_data (chunk2), "1234567890", 10) == 0);
     zframe_destroy (&frame);
     zchunk_destroy (&chunk2);
 
     zchunk_t *copy = zchunk_dup (chunk);
+    assert (copy);
     assert (memcmp (zchunk_data (copy), "1234567890", 10) == 0);
     assert (zchunk_size (copy) == 10);
     zchunk_destroy (&copy);
     zchunk_destroy (&chunk);
 
     copy = zchunk_new ("1234567890abcdefghij", 20);
+    assert (copy);
     chunk = zchunk_new (NULL, 8);
+    assert (chunk);
     zchunk_consume (chunk, copy);
     assert (!zchunk_exhausted (copy));
     assert (memcmp (zchunk_data (chunk), "12345678", 8) == 0);
