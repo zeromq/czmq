@@ -63,6 +63,7 @@ s_win32_populate_entry (zdir_t *self, WIN32_FIND_DATAA *entry)
     else {
         //  Add file entry to directory list
         zfile_t *file = zfile_new (self->path, entry->cFileName);
+        assert (file);
         zlist_append (self->files, file);
     }
 }
@@ -89,12 +90,14 @@ s_posix_populate_entry (zdir_t *self, struct dirent *entry)
     if (stat_buf.st_mode & S_IFDIR) {
         if (!self->trimmed) {
             zdir_t *subdir = zdir_new (entry->d_name, self->path);
+            assert (subdir);
             zlist_append (self->subdirs, subdir);
         }
     }
     else {
         //  Add file entry to directory list
         zfile_t *file = zfile_new (self->path, entry->d_name);
+        assert (file);
         zlist_append (self->files, file);
     }
 }
@@ -403,6 +406,9 @@ zlist_t *
 zdir_diff (zdir_t *older, zdir_t *newer, const char *alias)
 {
     zlist_t *patches = zlist_new ();
+    if (!patches)
+        return NULL;
+
     zfile_t **old_files = zdir_flatten (older);
     zfile_t **new_files = zdir_flatten (newer);
 
@@ -426,15 +432,25 @@ zdir_diff (zdir_t *older, zdir_t *newer, const char *alias)
 
         if (cmp > 0) {
             //  New file was created
-            if (zfile_is_stable (new_file))
-                zlist_append (patches, zdir_patch_new (newer->path, new_file, patch_create, alias));
+            if (zfile_is_stable (new_file)) {
+                int rc = zlist_append (patches, zdir_patch_new (newer->path, new_file, patch_create, alias));
+                if (rc != 0) {
+                    zlist_destroy (&patches);
+                    break;
+                }
+            }
             old_index--;
         }
         else
         if (cmp < 0) {
             //  Old file was deleted
-            if (zfile_is_stable (old_file))
-                zlist_append (patches, zdir_patch_new (older->path, old_file, patch_delete, alias));
+            if (zfile_is_stable (old_file)) {
+                int rc = zlist_append (patches, zdir_patch_new (older->path, old_file, patch_delete, alias));
+                if (rc != 0) {
+                    zlist_destroy (&patches);
+                    break;
+                }
+            }
             new_index--;
         }
         else
@@ -444,12 +460,22 @@ zdir_diff (zdir_t *older, zdir_t *newer, const char *alias)
                 //  Since we don't check file contents, treat as created
                 //  Could better do SHA check on file here
                 if (zfile_modified (new_file) != zfile_modified (old_file)
-                ||  zfile_cursize (new_file) != zfile_cursize (old_file))
-                    zlist_append (patches, zdir_patch_new (newer->path, new_file, patch_create, alias));
+                ||  zfile_cursize (new_file) != zfile_cursize (old_file)) {
+                    int rc = zlist_append (patches, zdir_patch_new (newer->path, new_file, patch_create, alias));
+                    if (rc != 0) {
+                        zlist_destroy (&patches);
+                        break;
+                    }
+                }
             }
-            else
+            else {
                 //  File was created over some period of time
-                zlist_append (patches, zdir_patch_new (newer->path, new_file, patch_create, alias));
+                int rc = zlist_append (patches, zdir_patch_new (newer->path, new_file, patch_create, alias));
+                if (rc != 0) {
+                    zlist_destroy (&patches);
+                    break;
+                }
+            }
         }
         old_index++;
         new_index++;
@@ -469,13 +495,19 @@ zlist_t *
 zdir_resync (zdir_t *self, const char *alias)
 {
     zlist_t *patches = zlist_new ();
+    if (!patches)
+        return NULL;
     zfile_t **files = zdir_flatten (self);
     uint index;
     for (index = 0;; index++) {
         zfile_t *file = files [index];
         if (!file)
             break;
-        zlist_append (patches, zdir_patch_new (self->path, file, patch_create, alias));
+        int rc = zlist_append (patches, zdir_patch_new (self->path, file, patch_create, alias));
+        if (rc != 0) {
+            zlist_destroy (&patches);
+            break;
+        }
     }
     free (files);
     return patches;
@@ -494,8 +526,14 @@ zdir_cache (zdir_t *self)
 
     //  Load any previous cache from disk
     zhash_t *cache = zhash_new ();
+    if (!cache)
+        return NULL;
     zhash_autofree (cache);
     char *cache_file = (char *) zmalloc (strlen (self->path) + strlen ("/.cache") + 1);
+    if (!cache_file) {
+        zhash_destroy (&cache);
+        return NULL;
+    }
     sprintf (cache_file, "%s/.cache", self->path);
     zhash_load (cache, cache_file);
 
@@ -507,13 +545,19 @@ zdir_cache (zdir_t *self)
         if (!file)
             break;
         char *filename = zfile_filename (file, self->path);
-        if (zhash_lookup (cache, zfile_filename (file, self->path)) == NULL)
-            zhash_insert (cache, filename, zfile_digest (file));
+        if (zhash_lookup (cache, zfile_filename (file, self->path)) == NULL) {
+            int rc = zhash_insert (cache, filename, zfile_digest (file));
+            if (rc != 0) {
+                zhash_destroy (&cache);
+                break;
+            }
+        }
     }
     free (files);
 
     //  Save cache to disk for future reference
-    zhash_save (cache, cache_file);
+    if (cache)
+        zhash_save (cache, cache_file);
     free (cache_file);
     return cache;
 }
