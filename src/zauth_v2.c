@@ -205,6 +205,27 @@ typedef struct {
 } zap_request_t;
 
 
+static void
+zap_request_destroy (zap_request_t **self_p)
+{
+    assert (self_p);
+    if (*self_p) {
+        zap_request_t *self = *self_p;
+        free (self->version);
+        free (self->sequence);
+        free (self->domain);
+        free (self->address);
+        free (self->identity);
+        free (self->mechanism);
+        free (self->username);
+        free (self->password);
+        free (self->client_key);
+        free (self->principal);
+        free (self);
+        *self_p = NULL;
+    }
+}
+
 //  Receive a valid ZAP request from the handler socket
 //  If the request was not valid, returns NULL.
 
@@ -213,11 +234,16 @@ zap_request_new (void *handler)
 {
 #if (ZMQ_VERSION_MAJOR == 4)
     zap_request_t *self = (zap_request_t *) zmalloc (sizeof (zap_request_t));
-    assert (self);
+    if (!self)
+        return NULL;
 
     //  Store handler socket so we can send a reply easily
     self->handler = handler;
     zmsg_t *request = zmsg_recv (handler);
+    if (!request) {
+        zap_request_destroy (&self);
+        return NULL;
+    }
 
     //  Get all standard frames off the handler socket
     self->version = zmsg_popstr (request);
@@ -254,27 +280,6 @@ zap_request_new (void *handler)
 #endif
 }
 
-
-static void
-zap_request_destroy (zap_request_t **self_p)
-{
-    assert (self_p);
-    if (*self_p) {
-        zap_request_t *self = *self_p;
-        free (self->version);
-        free (self->sequence);
-        free (self->domain);
-        free (self->address);
-        free (self->identity);
-        free (self->mechanism);
-        free (self->username);
-        free (self->password);
-        free (self->client_key);
-        free (self->principal);
-        free (self);
-        *self_p = NULL;
-    }
-}
 
 //  Send a ZAP reply to the handler socket
 
