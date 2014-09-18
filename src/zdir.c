@@ -113,6 +113,9 @@ zdir_t *
 zdir_new (const char *path, const char *parent)
 {
     zdir_t *self = (zdir_t *) zmalloc (sizeof (zdir_t));
+    if (!self)
+        return NULL;
+
     if (parent) {
         if (streq (parent, "-")) {
             self->trimmed = true;
@@ -120,14 +123,21 @@ zdir_new (const char *path, const char *parent)
         }
         else {
             self->path = (char *) malloc (strlen (path) + strlen (parent) + 2);
-            sprintf (self->path, "%s/%s", parent, path);
+            if (self->path)
+                sprintf (self->path, "%s/%s", parent, path);
         }
     }
     else
         self->path = strdup (path);
     
-    self->files = zlist_new ();
-    self->subdirs = zlist_new ();
+    if (self->path)
+        self->files = zlist_new ();
+    if (self->files)
+        self->subdirs = zlist_new ();
+    if (!self->subdirs) {
+        zdir_destroy (&self);
+        return NULL;
+    }
 
 #if (defined (WIN32))
     //  On Windows, replace backslashes by normal slashes
@@ -143,6 +153,10 @@ zdir_new (const char *path, const char *parent)
 
     //  Win32 wants a wildcard at the end of the path
     char *wildcard = (char *) malloc (strlen (self->path) + 3);
+    if (!wildcard) {
+        zdir_destroy (&self);
+        return NULL;
+    }
     sprintf (wildcard, "%s/*", self->path);
     WIN32_FIND_DATAA entry;
     HANDLE handle = FindFirstFileA (wildcard, &entry);
@@ -211,14 +225,16 @@ zdir_destroy (zdir_t **self_p)
     assert (self_p);
     if (*self_p) {
         zdir_t *self = *self_p;
-        while (zlist_size (self->subdirs)) {
-            zdir_t *subdir = (zdir_t *) zlist_pop (self->subdirs);
-            zdir_destroy (&subdir);
-        }
-        while (zlist_size (self->files)) {
-            zfile_t *file = (zfile_t *) zlist_pop (self->files);
-            zfile_destroy (&file);
-        }
+        if (self->subdirs)
+            while (zlist_size (self->subdirs)) {
+                zdir_t *subdir = (zdir_t *) zlist_pop (self->subdirs);
+                zdir_destroy (&subdir);
+            }
+        if (self->files)
+            while (zlist_size (self->files)) {
+                zfile_t *file = (zfile_t *) zlist_pop (self->files);
+                zfile_destroy (&file);
+            }
         zlist_destroy (&self->subdirs);
         zlist_destroy (&self->files);
         free (self->path);
