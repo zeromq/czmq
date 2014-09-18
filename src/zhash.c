@@ -1132,6 +1132,7 @@ zhash_test (int verbose)
     zhash_comment (hash, "Created by %s", "czmq_selftest");
     zhash_save (hash, ".cache");
     copy = zhash_new ();
+    assert (copy);
     zhash_load (copy, ".cache");
     item = (char *) zhash_lookup (copy, "LIVEBEEF");
     assert (item);
@@ -1179,6 +1180,7 @@ zhash_test (int verbose)
 
     // Test autofree; automatically copies and frees string values
     hash = zhash_new ();
+    assert (hash);
     zhash_autofree (hash);
     char value [255];
     strcpy (value, "This is a string");
