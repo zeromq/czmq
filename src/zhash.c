@@ -490,6 +490,8 @@ zhash_keys (zhash_t *self)
 {
     assert (self);
     zlist_t *keys = zlist_new ();
+    if (!keys)
+        return NULL;
     zlist_set_destructor (keys, self->key_destructor);
     zlist_set_duplicator (keys, self->key_duplicator);
 
@@ -498,7 +500,11 @@ zhash_keys (zhash_t *self)
     for (index = 0; index < limit; index++) {
         item_t *item = self->items [index];
         while (item) {
-            zlist_append (keys, (void*) item->key);
+          int rc = zlist_append (keys, (void *) item->key);
+            if (rc != 0) {
+                zlist_destroy (&keys);
+                break;
+            }
             item = item->next;
         }
     }
@@ -573,6 +579,7 @@ zhash_cursor (zhash_t *self)
 //  Add a comment to hash table before saving to disk. You can add as many
 //  comment lines as you like. These comment lines are discarded when loading
 //  the file. If you use a null format, all comments are deleted.
+//  FIXME: return 0 on success, -1 on error
 
 void
 zhash_comment (zhash_t *self, const char *format, ...)
@@ -580,13 +587,16 @@ zhash_comment (zhash_t *self, const char *format, ...)
     if (format) {
         if (!self->comments) {
             self->comments = zlist_new ();
+            if (!self->comments)
+                return;
             zlist_autofree (self->comments);
         }
         va_list argptr;
         va_start (argptr, format);
         char *string = zsys_vprintf (format, argptr);
         va_end (argptr);
-        zlist_append (self->comments, string);
+        if (string)
+            zlist_append (self->comments, string);
         free (string);
     }
     else
@@ -751,6 +761,8 @@ zhash_pack (zhash_t *self)
     }
     //  Now serialize items into the frame
     zframe_t *frame = zframe_new (NULL, frame_size);
+    if (!frame)
+        return NULL;
     byte *needle = zframe_data (frame);
     //  Store size as number-4
     *(uint32_t *) needle = htonl ((uint32_t) self->size);
@@ -784,7 +796,8 @@ zhash_t *
 zhash_unpack (zframe_t *frame)
 {
     zhash_t *self = zhash_new ();
-    assert (self);
+    if (!self)
+        return NULL;
     assert (frame);
     if (zframe_size (frame) < 4)
         return self;            //  Arguable...
@@ -813,13 +826,18 @@ zhash_unpack (zframe_t *frame)
                     value [value_size] = 0;
                     needle += value_size;
                     //  Hash takes ownership of value
-                    zhash_insert (self, key, value);
+                    int rc = zhash_insert (self, key, value);
+                    if (rc != 0) {
+                        zhash_destroy (&self);
+                        break;
+                    }
                 }
             }
         }
     }
     //  Hash will free values in destructor
-    zhash_autofree (self);
+    if (self)
+        zhash_autofree (self);
     return self;
 }
 
@@ -849,7 +867,11 @@ zhash_dup (zhash_t *self)
                 void *value = item->value;
                 if (self->item_duplicator)
                     value = self->item_duplicator (value);
-                zhash_insert (copy, item->key, value);
+                int rc = zhash_insert (copy, item->key, value);
+                if (rc != 0) {
+                    zhash_destroy (&copy);
+                    break;
+                }
                 item = item->next;
             }
         }
@@ -945,14 +967,18 @@ zhash_dup_v2 (zhash_t *self)
         return NULL;
 
     zhash_t *copy = zhash_new ();
-    zhash_autofree (copy);
     if (copy) {
+        zhash_autofree (copy);
         uint index;
         size_t limit = primes [self->prime_index];
         for (index = 0; index < limit; index++) {
             item_t *item = self->items [index];
             while (item) {
-                zhash_insert (copy, item->key, item->value);
+                int rc = zhash_insert (copy, item->key, item->value);
+                if (rc != 0) {
+                    zhash_destroy (&copy);
+                    break;
+                }
                 item = item->next;
             }
         }
