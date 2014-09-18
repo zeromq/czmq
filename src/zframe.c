@@ -457,6 +457,7 @@ zframe_test (bool verbose)
     int frame_nbr;
     for (frame_nbr = 0; frame_nbr < 5; frame_nbr++) {
         frame = zframe_new ("Hello", 5);
+        assert (frame);
         rc = zframe_send (&frame, output, ZFRAME_MORE);
         assert (rc == 0);
     }
