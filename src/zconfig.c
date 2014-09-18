@@ -832,12 +832,16 @@ zconfig_test (bool verbose)
     zsys_dir_create (TESTDIR);
     
     zconfig_t *root = zconfig_new ("root", NULL);
+    assert (root);
     zconfig_t *section, *item;
     
     section = zconfig_new ("headers", root);
+    assert (section);
     item = zconfig_new ("email", section);
+    assert (item);
     zconfig_set_value (item, "some@random.com");
     item = zconfig_new ("name", section);
+    assert (item);
     zconfig_set_value (item, "Justin Kayce");
     zconfig_put (root, "/curve/secret-key", "Top Secret");
     zconfig_set_comment (root, "   CURVE certificate");
@@ -866,10 +870,14 @@ zconfig_test (bool verbose)
 
     //  Test chunk load/save
     root = zconfig_new ("root", NULL);
+    assert (root);
     section = zconfig_new ("section", root);
+    assert (section);
     item = zconfig_new ("value", section);
+    assert (item);
     zconfig_set_value (item, "somevalue");
     zchunk_t *chunk = zconfig_chunk_save (root);
+    assert (chunk);
     zconfig_destroy (&root);
     
     root = zconfig_chunk_load (chunk);
@@ -888,6 +896,7 @@ zconfig_test (bool verbose)
     
     //  Delete all test files
     zdir_t *dir = zdir_new (TESTDIR, NULL);
+    assert (dir);
     zdir_remove (dir, true);
     zdir_destroy (&dir);
     //  @end
