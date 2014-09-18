@@ -79,11 +79,16 @@ zcert_t *
 zcert_new_from (byte *public_key, byte *secret_key)
 {
     zcert_t *self = (zcert_t *) zmalloc (sizeof (zcert_t));
-    assert (self);
+    if (!self)
+        return NULL;
     assert (public_key);
     assert (secret_key);
 
     self->metadata = zhash_new ();
+    if (!self->metadata) {
+        zcert_destroy (&self);
+        return NULL;
+    }
     zhash_set_destructor (self->metadata, (czmq_destructor *) zstr_free);
     zhash_set_duplicator (self->metadata, (czmq_duplicator *) strdup);
     
