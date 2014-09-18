@@ -343,6 +343,7 @@ zbeacon_test (bool verbose)
 
     //  Create listener beacon on port 9999 to lookup service
     zactor_t *listener = zactor_new (zbeacon, NULL);
+    assert (listener);
     if (verbose)
         zstr_sendx (listener, "VERBOSE", NULL);
     zsock_send (listener, "si", "CONFIGURE", 9999);
@@ -400,6 +401,7 @@ zbeacon_test (bool verbose)
 
     //  Poll on three API sockets at once
     zpoller_t *poller = zpoller_new (node1, node2, node3, NULL);
+    assert (poller);
     int64_t stop_at = zclock_mono () + 1000;
     while (zclock_mono () < stop_at) {
         long timeout = (long) (stop_at - zclock_mono ());
