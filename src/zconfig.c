@@ -125,10 +125,8 @@ zconfig_destroy (zconfig_t **self_p)
         zconfig_t *self = *self_p;
 
         //  Destroy all children and siblings recursively
-        if (self->child)
-            zconfig_destroy (&self->child);
-        if (self->next)
-            zconfig_destroy (&self->next);
+        zconfig_destroy (&self->child);
+        zconfig_destroy (&self->next);
 
         //  Destroy other properties and then self
         zlist_destroy (&self->comments);
