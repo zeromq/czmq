@@ -73,9 +73,7 @@ zctx_new (void)
     self->sockets = zlist_new ();
     self->mutex = zmutex_new ();
     if (!self->sockets || !self->mutex) {
-        zlist_destroy (&self->sockets);
-        zmutex_destroy (&self->mutex);
-        free (self);
+        zctx_destroy (&self);
         return NULL;
     }
     self->iothreads = 1;
@@ -103,8 +101,9 @@ zctx_destroy (zctx_t **self_p)
         zctx_t *self = *self_p;
 
         //  Destroy all sockets
-        while (zlist_size (self->sockets))
-            zctx__socket_destroy (self, zlist_first (self->sockets));
+        if (self->sockets)
+            while (zlist_size (self->sockets))
+                zctx__socket_destroy (self, zlist_first (self->sockets));
         zlist_destroy (&self->sockets);
         zmutex_destroy (&self->mutex);
 
