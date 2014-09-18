@@ -463,12 +463,15 @@ s_can_connect (zsock_t **server, zsock_t **client)
 
     zstr_send (*server, "Hello, World");
     zpoller_t *poller = zpoller_new (*client, NULL);
+    assert (poller);
     bool success = (zpoller_wait (poller, 200) == *client);
     zpoller_destroy (&poller);
     zsock_destroy (client);
     zsock_destroy (server);
     *server = zsock_new (ZMQ_PUSH);
+    assert (*server);
     *client = zsock_new (ZMQ_PULL);
+    assert (*client);
     return success;
 }
 #endif
@@ -488,7 +491,9 @@ zauth_test (bool verbose)
 
     //  Check there's no authentication
     zsock_t *server = zsock_new (ZMQ_PUSH);
+    assert (server);
     zsock_t *client = zsock_new (ZMQ_PULL);
+    assert (client);
     bool success = s_can_connect (&server, &client);
     assert (success);
     
@@ -555,7 +560,9 @@ zauth_test (bool verbose)
         //  certificate on disk; in a real case we'd transfer this securely
         //  from the client machine to the server machine.
         zcert_t *server_cert = zcert_new ();
+        assert (server_cert);
         zcert_t *client_cert = zcert_new ();
+        assert (client_cert);
         char *server_key = zcert_public_txt (server_cert);
 
         //  Test without setting-up any authentication
@@ -600,6 +607,7 @@ zauth_test (bool verbose)
     
     //  Delete all test files
     zdir_t *dir = zdir_new (TESTDIR, NULL);
+    assert (dir);
     zdir_remove (dir, true);
     zdir_destroy (&dir);
     //  @end
