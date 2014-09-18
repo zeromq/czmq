@@ -41,23 +41,6 @@ typedef struct {
     bool verbose;               //  Verbose logging enabled?
 } self_t;
 
-static self_t *
-s_self_new (zsock_t *pipe)
-{
-    self_t *self = (self_t *) zmalloc (sizeof (self_t));
-    self->pipe = pipe;
-    self->whitelist = zhash_new ();
-    self->blacklist = zhash_new ();
-
-    //  Create ZAP handler and get ready for requests
-    self->handler = zsock_new (ZMQ_REP);
-    assert (self->handler);
-    int rc = zsock_bind (self->handler, ZAP_ENDPOINT);
-    assert (rc == 0);
-    self->poller = zpoller_new (self->pipe, self->handler, NULL);
-    return self;
-}
-
 static void
 s_self_destroy (self_t **self_p)
 {
@@ -69,11 +52,37 @@ s_self_destroy (self_t **self_p)
         zhash_destroy (&self->blacklist);
         zcertstore_destroy (&self->certstore);
         zpoller_destroy (&self->poller);
-        zsock_unbind (self->handler, ZAP_ENDPOINT);
-        zsock_destroy (&self->handler);
+        if (self->handler) {
+            zsock_unbind (self->handler, ZAP_ENDPOINT);
+            zsock_destroy (&self->handler);
+        }
         free (self);
         *self_p = NULL;
     }
+}
+
+static self_t *
+s_self_new (zsock_t *pipe)
+{
+    self_t *self = (self_t *) zmalloc (sizeof (self_t));
+    int rc = -1;
+    if (self) {
+        self->pipe = pipe;
+        self->whitelist = zhash_new ();
+        if (self->whitelist)
+            self->blacklist = zhash_new ();
+      
+        //  Create ZAP handler and get ready for requests
+        if (self->blacklist)
+            self->handler = zsock_new (ZMQ_REP);
+        if (self->handler)
+            rc = zsock_bind (self->handler, ZAP_ENDPOINT);
+        if (rc == 0)
+            self->poller = zpoller_new (self->pipe, self->handler, NULL);
+        if (!self->poller)
+            s_self_destroy (&self);
+    }
+    return self;
 }
 
 
