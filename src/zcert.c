@@ -54,30 +54,21 @@ struct _zcert_t {
 zcert_t *
 zcert_new (void)
 {
-    zcert_t *self = (zcert_t *) zmalloc (sizeof (zcert_t));
-    assert (self);
+    byte public_key [32] = { 0 };
+    byte secret_key [32] = { 0 };
 
-    //  Initialize metadata, even if keys aren't working
-    self->metadata = zhash_new ();
-    zhash_set_destructor (self->metadata, (czmq_destructor *) zstr_free);
-    zhash_set_duplicator (self->metadata, (czmq_duplicator *) strdup);
-    
 #if (ZMQ_VERSION_MAJOR == 4)
     if (zsys_has_curve ()) {
-        int rc = zmq_curve_keypair (self->public_txt, self->secret_txt);
-        assert (rc == 0);
-        zmq_z85_decode (self->public_key, self->public_txt);
-        zmq_z85_decode (self->secret_key, self->secret_txt);
+        char public_txt [40];
+        char secret_txt [40];
+        int rc = zmq_curve_keypair (public_txt, secret_txt);
+        if (rc != 0)
+            return NULL;
+        zmq_z85_decode (public_key, public_txt);
+        zmq_z85_decode (secret_key, secret_txt);
     }
-    else {
-        strcpy (self->public_txt, FORTY_ZEROES);
-        strcpy (self->secret_txt, FORTY_ZEROES);
-    }
-#else
-    strcpy (self->public_txt, FORTY_ZEROES);
-    strcpy (self->secret_txt, FORTY_ZEROES);
 #endif
-    return self;
+    return zcert_new_from(public_key, secret_key);
 }
 
 
