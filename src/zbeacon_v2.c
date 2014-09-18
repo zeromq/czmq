@@ -134,6 +134,7 @@ zbeacon_publish (zbeacon_t *self, byte *transmit, size_t size)
     assert (transmit);
     assert (size > 0 && size <= UDP_FRAME_MAX);
     zmsg_t *msg = zmsg_new ();
+    assert (msg);
     zmsg_addstr (msg, "PUBLISH");
     zmsg_addmem (msg, transmit, size);
     zmsg_send (&msg, self->pipe);
@@ -160,6 +161,7 @@ zbeacon_subscribe (zbeacon_t *self, byte *filter, size_t size)
     assert (self);
     assert (size <= UDP_FRAME_MAX);
     zmsg_t *msg = zmsg_new ();
+    assert (msg);
     zmsg_addstr (msg, "SUBSCRIBE");
     zmsg_addmem (msg, filter, size);
     zmsg_send (&msg, self->pipe);
@@ -350,6 +352,7 @@ s_get_interface (agent_t *self)
     }
     else {
         ziflist_t *iflist = ziflist_new ();
+        assert (iflist);
         const char *name = ziflist_first (iflist);
         if (*iface) {
             while (name) {
@@ -449,6 +452,7 @@ s_beacon_recv (agent_t *self)
     //  If still a valid beacon, send on to the API
     if (is_valid) {
         zmsg_t *msg = zmsg_new ();
+        assert (msg);
         zmsg_addstr (msg, peername);
         zmsg_add (msg, frame);
         zmsg_send (&msg, self->pipe);
