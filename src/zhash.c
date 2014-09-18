@@ -113,14 +113,14 @@ zhash_new (void)
         self->chain_limit = INITIAL_CHAIN;
         size_t limit = primes [self->prime_index];
         self->items = (item_t **) zmalloc (sizeof (item_t *) * limit);
-        if (!self->items)
-            zhash_destroy (&self);
-        else {
+        if (self->items) {
             self->hasher = s_bernstein_hash;
             self->key_destructor = (czmq_destructor *) zstr_free;
             self->key_duplicator = (czmq_duplicator *) strdup;
             self->key_comparator = (czmq_comparator *) strcmp;
         }
+        else
+            zhash_destroy (&self);
     }
     return self;
 }
