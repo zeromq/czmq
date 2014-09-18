@@ -168,8 +168,12 @@ server_initialize (server_t *self)
     //  override this with a SET message.
     engine_configure (self, "server/timeout", "1000");
     self->remotes = zlist_new ();
-    self->tuples = zhash_new ();
-    return 0;
+    if (self->remotes)
+        self->tuples = zhash_new ();
+    if (self->tuples)
+        return 0;
+    else
+        return -1;
 }
 
 //  Free properties and structures for a server instance
@@ -177,10 +181,11 @@ server_initialize (server_t *self)
 static void
 server_terminate (server_t *self)
 {
-    while (zlist_size (self->remotes) > 0) {
-        zsock_t *remote = (zsock_t *) zlist_pop (self->remotes);
-        zsock_destroy (&remote);
-    }
+    if (self->remotes)
+        while (zlist_size (self->remotes) > 0) {
+            zsock_t *remote = (zsock_t *) zlist_pop (self->remotes);
+            zsock_destroy (&remote);
+        }
     zlist_destroy (&self->remotes);
     zhash_destroy (&self->tuples);
 }
@@ -277,6 +282,7 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
     if (streq (method, "STATUS")) {
         //  Return number of tuples we have stored
         reply = zmsg_new ();
+        assert (reply);
         zmsg_addstr (reply, "STATUS");
         zmsg_addstrf (reply, "%d", (int) zhash_size (self->tuples));
     }
@@ -411,6 +417,7 @@ zgossip_test (bool verbose)
     //  @selftest
     //  Test basic client-to-server operation of the protocol
     zactor_t *server = zactor_new (zgossip, "server");
+    assert (server);
     if (verbose)
         zstr_send (server, "VERBOSE");
     zstr_sendx (server, "BIND", "inproc://zgossip", NULL);
@@ -424,10 +431,12 @@ zgossip_test (bool verbose)
     //  Send HELLO, which gets no reply
     zgossip_msg_t *request, *reply;
     request = zgossip_msg_new (ZGOSSIP_MSG_HELLO);
+    assert (request);
     zgossip_msg_send (&request, client);
 
     //  Send PING, expect PONG back
     request = zgossip_msg_new (ZGOSSIP_MSG_PING);
+    assert (request);
     zgossip_msg_send (&request, client);
     reply = zgossip_msg_recv (client);
     assert (reply);
