@@ -352,11 +352,14 @@ zmonitor_v2_test (bool verbose)
 #if (ZMQ_VERSION_MAJOR == 4)
     //  @selftest
     zctx_t *ctx = zctx_new ();
+    assert (ctx);
     bool result;
 
     void *sink = zsocket_new (ctx, ZMQ_PULL);
+    assert (sink);
     zmonitor_t *sinkmon = zmonitor_new (ctx,
         sink, ZMQ_EVENT_LISTENING | ZMQ_EVENT_ACCEPTED);
+    assert (sinkmon);
     zmonitor_set_verbose (sinkmon, verbose);
 
     //  Check sink is now listening
@@ -366,8 +369,10 @@ zmonitor_v2_test (bool verbose)
     assert (result);
 
     void *source = zsocket_new (ctx, ZMQ_PUSH);
+    assert (source);
     zmonitor_t *sourcemon = zmonitor_new (ctx,
         source, ZMQ_EVENT_CONNECTED | ZMQ_EVENT_DISCONNECTED);
+    assert (sourcemon);
     zmonitor_set_verbose (sourcemon, verbose);
     zsocket_connect (source, "tcp://127.0.0.1:%d", port_nbr);
 
