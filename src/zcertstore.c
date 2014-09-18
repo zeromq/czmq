@@ -66,14 +66,19 @@ zcertstore_t *
 zcertstore_new (const char *location)
 {
     zcertstore_t *self = (zcertstore_t *) zmalloc (sizeof (zcertstore_t));
-    assert (self);
+    if (!self)
+        return NULL;
 
     self->certs = zring_new ();
-    zring_set_destructor (self->certs, (czmq_destructor *) zcert_destroy);
-    if (location) {
-        self->location = strdup (location);
-        s_load_certs_from_disk (self);
+    if (self->certs) {
+        zring_set_destructor (self->certs, (czmq_destructor *) zcert_destroy);
+        if (location) {
+            self->location = strdup (location);
+            s_load_certs_from_disk (self);
+        }
     }
+    else
+        zcertstore_destroy (&self);
     return self;
 }
 
