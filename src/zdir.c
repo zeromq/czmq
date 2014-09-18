@@ -625,6 +625,7 @@ zdir_test (bool verbose)
         zdir_dump (older, 0);
     }
     zdir_t *newer = zdir_new ("..", NULL);
+    assert (newer);
     zlist_t *patches = zdir_diff (older, newer, "/");
     assert (patches);
     while (zlist_size (patches)) {
