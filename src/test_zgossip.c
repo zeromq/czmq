@@ -110,11 +110,13 @@ int main (int argn, char *argv [])
     zactor_t *nodes [swarm_size];
     //  We'll poll all actors for activity (actors act like sockets)
     zpoller_t *poller = zpoller_new (NULL);
+    assert (poller);
 
     //  Create swarm
     uint node_nbr;
     for (node_nbr = 0; node_nbr < swarm_size; node_nbr++) {
         nodes [node_nbr] = zactor_new (zgossip, NULL);
+        assert (nodes [node_nbr]);
         zpoller_add (poller, nodes [node_nbr]);
     }
     printf (".");
