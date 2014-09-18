@@ -945,7 +945,8 @@ zgossip_msg_test (bool verbose)
     int instance;
     zgossip_msg_t *copy;
     self = zgossip_msg_new (ZGOSSIP_MSG_HELLO);
-    
+    assert (self);
+
     //  Check that _dup works on empty message
     copy = zgossip_msg_dup (self);
     assert (copy);
@@ -987,6 +988,7 @@ zgossip_msg_test (bool verbose)
         zgossip_msg_destroy (&self);
     }
     self = zgossip_msg_new (ZGOSSIP_MSG_PING);
+    assert (self);
     
     //  Check that _dup works on empty message
     copy = zgossip_msg_dup (self);
@@ -1023,7 +1025,8 @@ zgossip_msg_test (bool verbose)
         zgossip_msg_destroy (&self);
     }
     self = zgossip_msg_new (ZGOSSIP_MSG_INVALID);
-    
+    assert (self);
+
     //  Check that _dup works on empty message
     copy = zgossip_msg_dup (self);
     assert (copy);
