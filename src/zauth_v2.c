@@ -311,26 +311,6 @@ typedef struct {
     bool terminated;            //  Did API ask us to quit?
 } agent_t;
 
-static agent_t *
-s_agent_new (zctx_t *ctx, void *pipe)
-{
-    agent_t *self = (agent_t *) zmalloc (sizeof (agent_t));
-    self->ctx = ctx;
-    self->pipe = pipe;
-    self->whitelist = zhash_new ();
-    self->blacklist = zhash_new ();
-
-    //  Create ZAP handler and get ready for requests
-    self->handler = zsocket_new (self->ctx, ZMQ_REP);
-    if (self->handler
-    &&  zsocket_bind (self->handler, ZAP_ENDPOINT) == 0)
-        zstr_send (self->pipe, "OK");
-    else
-        zstr_send (self->pipe, "ERROR");
-
-    return self;
-}
-
 static void
 s_agent_destroy (agent_t **self_p)
 {
@@ -346,6 +326,34 @@ s_agent_destroy (agent_t **self_p)
         free (self);
         *self_p = NULL;
     }
+}
+
+static agent_t *
+s_agent_new (zctx_t *ctx, void *pipe)
+{
+    agent_t *self = (agent_t *) zmalloc (sizeof (agent_t));
+    if (!self)
+        return NULL;
+
+    self->ctx = ctx;
+    self->pipe = pipe;
+    self->whitelist = zhash_new ();
+    if (self->whitelist)
+        self->blacklist = zhash_new ();
+
+    //  Create ZAP handler and get ready for requests
+    if (self->blacklist)
+        self->handler = zsocket_new (self->ctx, ZMQ_REP);
+    if (self->handler) {
+        if (zsocket_bind (self->handler, ZAP_ENDPOINT) == 0)
+            zstr_send (self->pipe, "OK");
+        else
+            zstr_send (self->pipe, "ERROR");
+    }
+    else
+        s_agent_destroy (&self);
+
+    return self;
 }
 
 //  Handle a message from front-end API
