@@ -93,6 +93,9 @@ zconfig_t *
 zconfig_new (const char *name, zconfig_t *parent)
 {
     zconfig_t *self = (zconfig_t *) zmalloc (sizeof (zconfig_t));
+    if (!self)
+        return NULL;
+
     zconfig_set_name (self, name);
     if (parent) {
         if (parent->child) {
