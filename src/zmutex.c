@@ -138,6 +138,7 @@ zmutex_test (bool verbose)
 
     //  @selftest
     zmutex_t *mutex = zmutex_new ();
+    assert (mutex);
     zmutex_lock (mutex);
     zmutex_unlock (mutex);
     zmutex_destroy (&mutex);
