@@ -60,9 +60,10 @@ zbeacon_new (zctx_t *ctx, int port_nbr)
 {
     assert (ctx);
     zbeacon_t *self = (zbeacon_t *) zmalloc (sizeof (zbeacon_t));
-    
+    if (!self)
+        return NULL;
+
     //  Start background agent and wait for it to initialize
-    assert (self);
     self->pipe = zthread_fork (ctx, s_agent_task, NULL);
     if (self->pipe) {
         zstr_sendf (self->pipe, "%d", port_nbr);
@@ -73,10 +74,8 @@ zbeacon_new (zctx_t *ctx, int port_nbr)
             self = NULL;
         }
     }
-    else {
-        free (self);
-        self = NULL;
-    }
+    else
+        zbeacon_destroy (&self);
     return self;
 }
 
@@ -90,9 +89,11 @@ zbeacon_destroy (zbeacon_t **self_p)
     assert (self_p);
     if (*self_p) {
         zbeacon_t *self = *self_p;
-        zstr_send (self->pipe, "TERMINATE");
-        char *reply = zstr_recv (self->pipe);
-        zstr_free (&reply);
+        if (self->pipe) {
+            zstr_send (self->pipe, "TERMINATE");
+            char *reply = zstr_recv (self->pipe);
+            zstr_free (&reply);
+        }
         free (self->hostname);
         free (self);
         *self_p = NULL;
