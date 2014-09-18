@@ -494,6 +494,7 @@ zbeacon_v2_test (bool verbose)
     //  @selftest
     //  Create beacon to broadcast our service
     zctx_t *ctx = zctx_new ();
+    assert (ctx);
     zbeacon_t *service_beacon = zbeacon_new (ctx, 9999);
     if (service_beacon == NULL) {
         printf ("OK (skipping test, no UDP discovery)\n");
@@ -501,6 +502,7 @@ zbeacon_v2_test (bool verbose)
     }
     //  Create a service socket and bind to an ephemeral port
     zsock_t *service = zsock_new (ZMQ_PUB);
+    assert (service);
     int port_nbr = zsock_bind (service, "tcp://127.0.0.1:*");
     byte announcement [2] = { (port_nbr >> 8) & 0xFF, port_nbr & 0xFF };
     zbeacon_set_interval (service_beacon, 100);
@@ -508,6 +510,7 @@ zbeacon_v2_test (bool verbose)
 
     //  Create beacon to lookup service
     zbeacon_t *client_beacon = zbeacon_new (ctx, 9999);
+    assert (client_beacon);
     zbeacon_subscribe (client_beacon, NULL, 0);
 
     //  Wait for at most 1/2 second if there's no broadcast networking
@@ -527,8 +530,11 @@ zbeacon_v2_test (bool verbose)
     zbeacon_destroy (&service_beacon);
 
     zbeacon_t *node1 = zbeacon_new (ctx, 5670);
+    assert (node1);
     zbeacon_t *node2 = zbeacon_new (ctx, 5670);
+    assert (node2);
     zbeacon_t *node3 = zbeacon_new (ctx, 5670);
+    assert (node3);
 
     assert (*zbeacon_hostname (node1));
     assert (*zbeacon_hostname (node2));
@@ -548,6 +554,7 @@ zbeacon_v2_test (bool verbose)
         zbeacon_socket (node1),
         zbeacon_socket (node2),
         zbeacon_socket (node3), NULL);
+    assert (poller);
 
     int64_t stop_at = zclock_mono () + 1000;
     while (zclock_mono () < stop_at) {
