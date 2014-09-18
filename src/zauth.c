@@ -144,6 +144,7 @@ s_self_handle_pipe (self_t *self)
             self->allow_any = true;
         else {
             zcertstore_destroy (&self->certstore);
+            // FIXME: what if this fails?
             self->certstore = zcertstore_new (location);
             self->allow_any = false;
         }
