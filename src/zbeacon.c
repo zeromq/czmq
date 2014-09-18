@@ -109,6 +109,7 @@ s_self_configure (self_t *self, int port_nbr)
     else {
         //  Look for matching interface, or first ziflist item
         ziflist_t *iflist = ziflist_new ();
+        assert (iflist);
         const char *name = ziflist_first (iflist);
         while (name) {
             if (streq (iface, name) || streq (iface, "")) {
@@ -248,6 +249,7 @@ s_self_handle_udp (self_t *self)
     //  If still a valid beacon, send on to the API
     if (is_valid) {
         zmsg_t *msg = zmsg_new ();
+        assert (msg);
         zmsg_addstr (msg, peername);
         zmsg_add (msg, frame);
         zmsg_send (&msg, self->pipe);
@@ -264,6 +266,7 @@ void
 zbeacon (zsock_t *pipe, void *args)
 {
     self_t *self = s_self_new (pipe);
+    assert (self);
     //  Signal successful initialization
     zsock_signal (pipe, 0);
 
