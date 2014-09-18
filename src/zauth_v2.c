@@ -53,7 +53,8 @@ zauth_t *
 zauth_new (zctx_t *ctx)
 {
     zauth_t *self = (zauth_t *) zmalloc (sizeof (zauth_t));
-    assert (self);
+    if (!self)
+        return NULL;
 
     //  Start background agent and wait for it to initialize
     assert (ctx);
@@ -65,8 +66,7 @@ zauth_new (zctx_t *ctx)
         zstr_free (&status);
     }
     else {
-        free (self);
-        self = NULL;
+        zauth_destroy (&self);
     }
     return self;
 }
