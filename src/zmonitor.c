@@ -279,6 +279,7 @@ void
 zmonitor (zsock_t *pipe, void *sock)
 {
     self_t *self = s_self_new (pipe, sock);
+    assert (self);
     //  Signal successful initialization
     zsock_signal (pipe, 0);
 
@@ -323,6 +324,7 @@ zmonitor_test (bool verbose)
 #if defined (ZMQ_EVENT_ALL)
     //  @selftest
     zsock_t *client = zsock_new (ZMQ_DEALER);
+    assert (client);
     zactor_t *clientmon = zactor_new (zmonitor, client);
     assert (clientmon);
     if (verbose)
@@ -332,6 +334,7 @@ zmonitor_test (bool verbose)
     zsock_wait (clientmon);
 
     zsock_t *server = zsock_new (ZMQ_DEALER);
+    assert (server);
     zactor_t *servermon = zactor_new (zmonitor, server);
     assert (servermon);
     if (verbose)
