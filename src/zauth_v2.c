@@ -622,7 +622,9 @@ s_can_connect (zctx_t *ctx, void **server, void **client)
     zsocket_destroy (ctx, *client);
     zsocket_destroy (ctx, *server);
     *server = zsocket_new (ctx, ZMQ_PUSH);
+    assert (*server);
     *client = zsocket_new (ctx, ZMQ_PULL);
+    assert (*client);
     return success;
 }
 #endif
@@ -645,6 +647,7 @@ zauth_v2_test (bool verbose)
 
     //  Install the authenticator
     zctx_t *ctx = zctx_new ();
+    assert (ctx);
     zauth_t *auth = zauth_new (ctx);
     assert (auth);
     zauth_set_verbose (auth, verbose);
@@ -652,7 +655,9 @@ zauth_v2_test (bool verbose)
     //  A default NULL connection should always success, and not
     //  go through our authentication infrastructure at all.
     void *server = zsocket_new (ctx, ZMQ_PUSH);
+    assert (server);
     void *client = zsocket_new (ctx, ZMQ_PULL);
+    assert (client);
     bool success = s_can_connect (ctx, &server, &client);
     assert (success);
 
@@ -705,7 +710,9 @@ zauth_v2_test (bool verbose)
         //  certificate on disk; in a real case we'd transfer this securely
         //  from the client machine to the server machine.
         zcert_t *server_cert = zcert_new ();
+        assert (server_cert);
         zcert_t *client_cert = zcert_new ();
+        assert (client_cert);
         char *server_key = zcert_public_txt (server_cert);
 
         //  Test without setting-up any authentication
@@ -747,6 +754,7 @@ zauth_v2_test (bool verbose)
 
     //  Delete all test files
     zdir_t *dir = zdir_new (TESTDIR, NULL);
+    assert (dir);
     zdir_remove (dir, true);
     zdir_destroy (&dir);
     //  @end
