@@ -197,10 +197,13 @@ zdir_patch_test (bool verbose)
 
     //  @selftest
     zfile_t *file = zfile_new (".", "bilbo");
+    assert (file);
     zdir_patch_t *patch = zdir_patch_new (".", file, patch_create, "/");
+    assert (patch);
     zfile_destroy (&file);
     
     file = zdir_patch_file (patch);
+    assert (file);
     assert (streq (zfile_filename (file, "."), "bilbo"));
     assert (streq (zdir_patch_vpath (patch), "/bilbo"));
     zdir_patch_destroy (&patch);
