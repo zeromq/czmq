@@ -131,26 +131,14 @@ zctx_shadow (zctx_t *ctx)
         if (!ctx->context)
             return NULL;
     }
-    //  Shares same 0MQ context but has its own list of sockets so that
-    //  we create, use, and destroy sockets only within a single thread.
-    zctx_t *self = (zctx_t *) zmalloc (sizeof (zctx_t));
-    if (!self)
-        return NULL;
-
-    self->sockets = zlist_new ();
-    self->mutex = zmutex_new ();
-    if (!self->sockets || !self->mutex) {
-        zlist_destroy (&self->sockets);
-        zmutex_destroy (&self->mutex);
-        free (self);
-        return NULL;
+    zctx_t *self = zctx_shadow_zmq_ctx (ctx->context);
+    if (self) {
+        // copy high water marks and linger from old context
+        self->pipehwm = ctx->pipehwm;
+        self->sndhwm = ctx->sndhwm;
+        self->rcvhwm = ctx->rcvhwm;
+        self->linger = ctx->linger;
     }
-    self->context = ctx->context;
-    self->pipehwm = ctx->pipehwm;
-    self->sndhwm = ctx->sndhwm;
-    self->rcvhwm = ctx->rcvhwm;
-    self->linger = ctx->linger;
-    self->shadow = true;             //  This is a shadow context
     return self;
 }
 
@@ -168,19 +156,17 @@ zctx_shadow_zmq_ctx (void *zmqctx)
     if (!self)
         return NULL;
 
+    self->shadow = true;             //  This is a shadow context
     self->sockets = zlist_new ();
     self->mutex = zmutex_new ();
     if (!self->sockets || !self->mutex) {
-        zlist_destroy (&self->sockets);
-        zmutex_destroy (&self->mutex);
-        free (self);
+        zctx_destroy (&self);
         return NULL;
     }
     self->context = zmqctx;
     self->pipehwm = 1000;   
     self->sndhwm = 1000;
     self->rcvhwm = 1000;
-    self->shadow = true;             //  This is a shadow context
     return self;
 }
 
