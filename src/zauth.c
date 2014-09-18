@@ -427,6 +427,9 @@ void
 zauth (zsock_t *pipe, void *unused)
 {
     self_t *self = s_self_new (pipe);
+    if (!self)
+        return;
+
     //  Signal successful initialization
     zsock_signal (pipe, 0);
 
