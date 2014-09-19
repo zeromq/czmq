@@ -848,7 +848,7 @@ zhash_dup (zhash_t *self)
                 void *value = item->value;
                 if (self->item_duplicator)
                     value = self->item_duplicator (value);
-                zhash_insert (copy, item->key, value);
+                zhash_insert (copy, (char *) item->key, value);
                 item = item->next;
             }
         }
@@ -951,7 +951,7 @@ zhash_dup_v2 (zhash_t *self)
         for (index = 0; index < limit; index++) {
             item_t *item = self->items [index];
             while (item) {
-                zhash_insert (copy, item->key, item->value);
+                zhash_insert (copy, (char *) item->key, item->value);
                 item = item->next;
             }
         }

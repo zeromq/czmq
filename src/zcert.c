@@ -181,7 +181,7 @@ zcert_set_meta (zcert_t *self, const char *name, const char *format, ...)
     va_start (argptr, format);
     char *value = zsys_vprintf (format, argptr);
     va_end (argptr);
-    zhash_insert (self->metadata, (void *)name, value);
+    zhash_insert (self->metadata, (char *)name, value);
 }
 
 
@@ -193,7 +193,7 @@ char *
 zcert_meta (zcert_t *self, const char *name)
 {
     assert (self);
-    return (char *) zhash_lookup (self->metadata, (void *)name);
+    return (char *) zhash_lookup (self->metadata, (char *)name);
 }
 
 
