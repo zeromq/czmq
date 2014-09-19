@@ -219,7 +219,7 @@ This is the class self test code:
     assert (rc == 0);
     rc = zring_remove (ring, "3");
     assert (rc == 0);
-    item = zring_detach (ring, NULL);
+    item = (char *) zring_detach (ring, NULL);
     zring_purge (ring);
 
     //  Try the dictionary insert/delete functionality
