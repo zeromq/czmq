@@ -37,7 +37,7 @@ CZMQ_EXPORT void
 //  If key is already present returns -1 and leaves existing item unchanged
 //  Returns 0 on success.
 CZMQ_EXPORT int
-    zhash_insert (zhash_t *self, void *key, void *item);
+    zhash_insert (zhash_t *self, const char *key, void *item);
 
 //  Update or insert item into hash table with specified key and item. If the
 //  key is already present, destroys old item and inserts new one. If you set
@@ -45,21 +45,21 @@ CZMQ_EXPORT int
 //  was not already present, inserts a new item. Sets the hash cursor to the
 //  new item.
 CZMQ_EXPORT void
-    zhash_update (zhash_t *self, void *key, void *item);
+    zhash_update (zhash_t *self, const char *key, void *item);
 
 //  Remove an item specified by key from the hash table. If there was no such
 //  item, this function does nothing.
 CZMQ_EXPORT void
-    zhash_delete (zhash_t *self, void *key);
+    zhash_delete (zhash_t *self, const char *key);
 
 //  Return the item at the specified key, or null
 CZMQ_EXPORT void *
-    zhash_lookup (zhash_t *self, void *key);
+    zhash_lookup (zhash_t *self, const char *key);
 
 //  Reindexes an item from an old key to a new key. If there was no such
 //  item, does nothing. Returns 0 if successful, else -1.
 CZMQ_EXPORT int
-    zhash_rename (zhash_t *self, void *old_key, void *new_key);
+    zhash_rename (zhash_t *self, const char *old_key, const char *new_key);
 
 //  Set a free function for the specified hash table item. When the item is
 //  destroyed, the free function, if any, is called on that item.
@@ -67,7 +67,7 @@ CZMQ_EXPORT int
 //  you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
 //  Returns the item, or NULL if there is no such item.
 CZMQ_EXPORT void *
-    zhash_freefn (zhash_t *self, void *key, zhash_free_fn *free_fn);
+    zhash_freefn (zhash_t *self, const char *key, zhash_free_fn *free_fn);
 
 //  Return the number of keys/items in the hash table
 CZMQ_EXPORT size_t
@@ -164,6 +164,16 @@ CZMQ_EXPORT zhash_t *
 CZMQ_EXPORT zhash_t *
     zhash_dup (zhash_t *self);
 
+//  Set a user-defined deallocator for hash items; by default items are not
+//  freed when the hash is destroyed.
+CZMQ_EXPORT void
+    zhash_set_destructor (zhash_t *self, czmq_destructor destructor);
+
+//  Set a user-defined duplicator for hash items; by default items are not
+//  copied when the hash is duplicated.
+CZMQ_EXPORT void
+    zhash_set_duplicator (zhash_t *self, czmq_duplicator duplicator);
+
 //  Set a user-defined deallocator for keys; by default keys are freed
 //  when the hash is destroyed using free().
 CZMQ_EXPORT void
@@ -179,20 +189,10 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zhash_set_key_comparator (zhash_t *self, czmq_comparator comparator);
 
-//  Set a user-defined deallocator for hash items; by default items are not
-//  freed when the hash is destroyed.
-CZMQ_EXPORT void
-    zhash_set_item_destructor (zhash_t *self, czmq_destructor destructor);
-
-//  Set a user-defined duplicator for hash items; by default items are not
-//  copied when the hash is duplicated.
-CZMQ_EXPORT void
-    zhash_set_item_duplicator (zhash_t *self, czmq_duplicator duplicator);
-
 //  Set a user-defined hash function for keys; by default keys are
 //  hashed by a modified Bernstein hashing function.
 CZMQ_EXPORT void
-    zhash_set_hasher (zhash_t *self, zhash_hash_fn hasher);
+    zhash_set_key_hasher (zhash_t *self, zhash_hash_fn hasher);
 
 //  DEPRECATED by zhash_dup
 //  Make copy of hash table; if supplied table is null, returns null.
