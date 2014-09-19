@@ -68,11 +68,9 @@ s_self_destroy (self_t **self_p)
         zhash_destroy (&self->whitelist);
         zhash_destroy (&self->blacklist);
         zcertstore_destroy (&self->certstore);
+        zpoller_destroy (&self->poller);
         zsock_unbind (self->handler, ZAP_ENDPOINT);
         zsock_destroy (&self->handler);
-        //  Workaround for https://github.com/zeromq/libzmq/issues/1169
-        zclock_sleep (100);
-        zpoller_destroy (&self->poller);
         free (self);
         *self_p = NULL;
     }
