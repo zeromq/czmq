@@ -33,7 +33,7 @@ typedef struct _node_t {
     struct _node_t *next;
     struct _node_t *prev;
     void *item;
-    const char *key;            //  Dictionary key, if any
+    const void *key;            //  Dictionary key, if any
 } node_t;
 
 //  ---------------------------------------------------------------------
@@ -154,7 +154,7 @@ zring_append (zring_t *self, void *item)
 //  the key already existed in the dictionary, or heap memory ran out.
 
 int
-zring_insert (zring_t *self, const char *key, void *item)
+zring_insert (zring_t *self, const void *key, void *item)
 {
     assert (self);
     assert (key);
@@ -165,10 +165,10 @@ zring_insert (zring_t *self, const char *key, void *item)
 
     //  If item isn't already in dictionary, append to list and then
     //  store item node (which is in cursor) in dictionary
-    if (!zhash_lookup (self->hash, (char *) key)
+    if (!zhash_lookup (self->hash, key)
     &&  !zring_append (self, item)
-	&&  !zhash_insert (self->hash, (char *) key, self->cursor)) {
-        self->cursor->key = (char *) zhash_cursor (self->hash);
+	&&  !zhash_insert (self->hash, key, self->cursor)) {
+        self->cursor->key = zhash_cursor (self->hash);
         return 0;
     }
     else
@@ -224,13 +224,13 @@ zring_find (zring_t *self, void *item)
 //  returns NULL.
 
 void *
-zring_lookup (zring_t *self, const char *key)
+zring_lookup (zring_t *self, const void *key)
 {
     assert (self);
     assert (key);
     
     if (self->hash) {
-      node_t *node = (node_t *) zhash_lookup (self->hash, (char *) key);
+      node_t *node = (node_t *) zhash_lookup (self->hash, key);
         if (node) {
             self->cursor = node;
             return node->item;
@@ -265,7 +265,7 @@ zring_detach (zring_t *self, void *item)
         self->cursor = found->next;
         self->size--;
         if (found->key)
-	  zhash_delete (self->hash, (char *) found->key);
+            zhash_delete (self->hash, found->key);
         free (found);
         return item;
     }
@@ -302,7 +302,7 @@ zring_remove (zring_t *self, void *item)
 //  found and removed, else -1 if not found.
 
 int
-zring_delete (zring_t *self, const char *key)
+zring_delete (zring_t *self, const void *key)
 {
     assert (self);
     assert (key);
