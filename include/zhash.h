@@ -37,7 +37,7 @@ CZMQ_EXPORT void
 //  If key is already present returns -1 and leaves existing item unchanged
 //  Returns 0 on success.
 CZMQ_EXPORT int
-    zhash_insert (zhash_t *self, const char *key, void *item);
+    zhash_insert (zhash_t *self, void *key, void *item);
 
 //  Update or insert item into hash table with specified key and item. If the
 //  key is already present, destroys old item and inserts new one. If you set
@@ -45,21 +45,21 @@ CZMQ_EXPORT int
 //  was not already present, inserts a new item. Sets the hash cursor to the
 //  new item.
 CZMQ_EXPORT void
-    zhash_update (zhash_t *self, const char *key, void *item);
+    zhash_update (zhash_t *self, void *key, void *item);
 
 //  Remove an item specified by key from the hash table. If there was no such
 //  item, this function does nothing.
 CZMQ_EXPORT void
-    zhash_delete (zhash_t *self, const char *key);
+    zhash_delete (zhash_t *self, void *key);
 
 //  Return the item at the specified key, or null
 CZMQ_EXPORT void *
-    zhash_lookup (zhash_t *self, const char *key);
+    zhash_lookup (zhash_t *self, void *key);
 
 //  Reindexes an item from an old key to a new key. If there was no such
 //  item, does nothing. Returns 0 if successful, else -1.
 CZMQ_EXPORT int
-    zhash_rename (zhash_t *self, const char *old_key, const char *new_key);
+    zhash_rename (zhash_t *self, void *old_key, void *new_key);
 
 //  Set a free function for the specified hash table item. When the item is
 //  destroyed, the free function, if any, is called on that item.
@@ -67,7 +67,7 @@ CZMQ_EXPORT int
 //  you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
 //  Returns the item, or NULL if there is no such item.
 CZMQ_EXPORT void *
-    zhash_freefn (zhash_t *self, const char *key, zhash_free_fn *free_fn);
+    zhash_freefn (zhash_t *self, void *key, zhash_free_fn *free_fn);
 
 //  Return the number of keys/items in the hash table
 CZMQ_EXPORT size_t
