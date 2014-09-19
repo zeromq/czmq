@@ -63,9 +63,9 @@ typedef struct _zproxy_t zproxy_t;
 //  -- destroy an item
 typedef void (czmq_destructor) (void **item);
 //  -- duplicate an item
-typedef void * (czmq_duplicator) (void *item);
+typedef void * (czmq_duplicator) (const void *item);
 //  - compare two items, for sorting
-typedef int (czmq_comparator) (void *item1, void *item2);
+typedef int (czmq_comparator) (const void *item1, const void *item2);
 
 
 //  Public API classes
