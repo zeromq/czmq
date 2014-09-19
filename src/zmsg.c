@@ -54,17 +54,14 @@ struct _zmsg_t {
 zmsg_t *
 zmsg_new (void)
 {
-    zmsg_t
-        *self;
+    zmsg_t *self;
 
     self = (zmsg_t *) zmalloc (sizeof (zmsg_t));
     if (self) {
         self->tag = ZMSG_TAG;
         self->frames = zlist_new ();
-        if (!self->frames) {
-            free (self);
-            return NULL;
-        }
+        if (!self->frames)
+            zmsg_destroy (&self);
     }
     return self;
 }
@@ -288,9 +285,14 @@ zmsg_pushstr (zmsg_t *self, const char *string)
     assert (zmsg_is (self));
     assert (string);
 
-    self->content_size += strlen (string);
-    zlist_push (self->frames, zframe_new (string, strlen (string)));
-    return 0;
+    size_t len = strlen (string);
+    zframe_t *frame = zframe_new (string, len);
+    if (frame) {
+        self->content_size += len;
+        return zlist_push (self->frames, frame);
+    }
+    else
+        return -1;
 }
 
 
@@ -305,9 +307,14 @@ zmsg_addstr (zmsg_t *self, const char *string)
     assert (zmsg_is (self));
     assert (string);
 
-    self->content_size += strlen (string);
-    zlist_append (self->frames, zframe_new (string, strlen (string)));
-    return 0;
+    size_t len = strlen (string);
+    zframe_t *frame = zframe_new (string, len);
+    if (frame) {
+        self->content_size += len;
+        return zlist_append (self->frames, frame);
+    }
+    else
+        return -1;
 }
 
 
@@ -326,12 +333,18 @@ zmsg_pushstrf (zmsg_t *self, const char *format, ...)
     va_start (argptr, format);
     char *string = zsys_vprintf (format, argptr);
     va_end (argptr);
+    if (!string)
+        return -1;
 
-    self->content_size += strlen (string);
-    zlist_push (self->frames, zframe_new (string, strlen (string)));
+    size_t len = strlen (string);
+    zframe_t *frame = zframe_new (string, len);
     free (string);
-
-    return 0;
+    if (frame) {
+        self->content_size += len;
+        return zlist_push (self->frames, frame);
+    }
+    else
+        return -1;
 }
 
 
@@ -350,12 +363,18 @@ zmsg_addstrf (zmsg_t *self, const char *format, ...)
     va_start (argptr, format);
     char *string = zsys_vprintf (format, argptr);
     va_end (argptr);
+    if (!string)
+        return -1;
 
-    self->content_size += strlen (string);
-    zlist_append (self->frames, zframe_new (string, strlen (string)));
+    size_t len = strlen (string);
+    zframe_t *frame = zframe_new (string, len);
     free (string);
-
-    return 0;
+    if (frame) {
+        self->content_size += len;
+        return zlist_append (self->frames, frame);
+    }
+    else
+        return -1;
 }
 
 
@@ -481,12 +500,20 @@ zmsg_load (zmsg_t *self, FILE *file)
         size_t rc = fread (&frame_size, sizeof (frame_size), 1, file);
         if (rc == 1) {
             zframe_t *frame = zframe_new (NULL, frame_size);
+            if (!frame) {
+                zmsg_destroy (&self);
+                return NULL;    //  Unable to allocate frame, fail
+            }
             rc = fread (zframe_data (frame), frame_size, 1, file);
             if (frame_size > 0 && rc != 1) {
                 zframe_destroy (&frame);
-                break;          //  Unable to read properly, quit
+                zmsg_destroy (&self);
+                return NULL;    //  Corrupt file, fail
             }
-            zmsg_append (self, &frame);
+            if (zmsg_append (self, &frame) == -1) {
+                zmsg_destroy (&self);
+                return NULL;    //  Unable to add frame, fail
+            }
         }
         else
             break;              //  Unable to read properly, quit
@@ -528,28 +555,30 @@ zmsg_encode (zmsg_t *self, byte **buffer)
     }
     *buffer = (byte *) malloc (buffer_size);
 
-    //  Encode message now
-    byte *dest = *buffer;
-    frame = zmsg_first (self);
-    while (frame) {
-        size_t frame_size = zframe_size (frame);
-        if (frame_size < 255) {
-            *dest++ = (byte) frame_size;
-            memcpy (dest, zframe_data (frame), frame_size);
-            dest += frame_size;
+    if (*buffer) {
+        //  Encode message now
+        byte *dest = *buffer;
+        frame = zmsg_first (self);
+        while (frame) {
+            size_t frame_size = zframe_size (frame);
+            if (frame_size < 255) {
+                *dest++ = (byte) frame_size;
+                memcpy (dest, zframe_data (frame), frame_size);
+                dest += frame_size;
+            }
+            else {
+                *dest++ = 0xFF;
+                *dest++ = (frame_size >> 24) & 255;
+                *dest++ = (frame_size >> 16) & 255;
+                *dest++ = (frame_size >>  8) & 255;
+                *dest++ =  frame_size        & 255;
+                memcpy (dest, zframe_data (frame), frame_size);
+                dest += frame_size;
+            }
+            frame = zmsg_next (self);
         }
-        else {
-            *dest++ = 0xFF;
-            *dest++ = (frame_size >> 24) & 255;
-            *dest++ = (frame_size >> 16) & 255;
-            *dest++ = (frame_size >>  8) & 255;
-            *dest++ =  frame_size        & 255;
-            memcpy (dest, zframe_data (frame), frame_size);
-            dest += frame_size;
-        }
-        frame = zmsg_next (self);
+        assert ((dest - *buffer) == buffer_size);
     }
-    assert ((dest - *buffer) == buffer_size);
     return buffer_size;
 }
 

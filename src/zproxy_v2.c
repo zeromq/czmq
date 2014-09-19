@@ -51,8 +51,7 @@ zproxy_t *
 zproxy_new (zctx_t *ctx, void *frontend, void *backend)
 {
     assert (ctx);
-    zproxy_t *self;
-    self = (zproxy_t *) zmalloc (sizeof (zproxy_t));
+    zproxy_t *self = (zproxy_t *) zmalloc (sizeof (zproxy_t));
     if (self) {
         self->ctx = ctx;
         self->frontend = frontend;
@@ -62,8 +61,7 @@ zproxy_new (zctx_t *ctx, void *frontend, void *backend)
             zsocket_wait (self->pipe);
         else {
             //  If we ran out of sockets, signal failure to caller
-            free (self);
-            self = NULL;
+            zproxy_destroy (&self);
         }
     }
     return self;
@@ -79,8 +77,10 @@ zproxy_destroy (zproxy_t **self_p)
     assert (self_p);
     if (*self_p) {
         zproxy_t *self = *self_p;
-        zstr_send (self->pipe, "STOP");
-        zsocket_wait (self->pipe);
+        if (self->pipe) {
+            zstr_send (self->pipe, "STOP");
+            zsocket_wait (self->pipe);
+        }
         free (self);
         *self_p = NULL;
     }
@@ -143,6 +143,7 @@ s_proxy_task (void *args, zctx_t *ctx, void *command_pipe)
 
     //  Create poller to work on all three sockets
     zpoller_t *poller = zpoller_new (self->frontend, self->backend, command_pipe, NULL);
+    assert (poller);
 
     bool stopped = false;
     while (!stopped) {
@@ -187,17 +188,20 @@ s_proxy_task (void *args, zctx_t *ctx, void *command_pipe)
                 if (streq (command, "PAUSE")) {
                     zpoller_destroy (&poller);
                     poller = zpoller_new (command_pipe, NULL);
+                    assert (poller);
                 }
                 else
                 if (streq (command, "RESUME")) {
                     zpoller_destroy (&poller);
                     poller = zpoller_new (self->frontend, self->backend, command_pipe, NULL);
+                    assert (poller);
                 }
                 else
                 if (streq (command, "CAPTURE")) {
                     //  Capture flow is always PUSH-to-PULL
                     capture = zsocket_new (self->ctx, ZMQ_PUSH);
                     char *endpoint = zstr_recv (command_pipe);
+                    assert (endpoint);
                     if (capture) {
                         int rc = zsocket_connect (capture, "%s", endpoint);
                         assert (rc == 0);
@@ -235,19 +239,25 @@ zproxy_v2_test (bool verbose)
 
     //  @selftest
     zctx_t *ctx = zctx_new ();
+    assert (ctx);
     void *frontend = zsocket_new (ctx, ZMQ_PULL);
+    assert (frontend);
     int rc = zsocket_bind (frontend, "inproc://frontend");
     assert (rc == 0);
     void *backend = zsocket_new (ctx, ZMQ_PUSH);
+    assert (backend);
     rc = zsocket_bind (backend, "inproc://backend");
     assert (rc == 0);
     zproxy_t *proxy = zproxy_new (ctx, frontend, backend);
+    assert (proxy);
 
     //  Connect application sockets to proxy
     void *faucet = zsocket_new (ctx, ZMQ_PUSH);
+    assert (faucet);
     rc = zsocket_connect (faucet, "inproc://frontend");
     assert (rc == 0);
     void *sink = zsocket_new (ctx, ZMQ_PULL);
+    assert (sink);
     rc = zsocket_connect (sink, "inproc://backend");
     assert (rc == 0);
 
@@ -268,6 +278,7 @@ zproxy_v2_test (bool verbose)
     
     //  Create capture socket, must be a PULL socket
     void *capture = zsocket_new (ctx, ZMQ_PULL);
+    assert (capture);
     rc = zsocket_bind (capture, "inproc://capture");
     assert (rc == 0);
 
