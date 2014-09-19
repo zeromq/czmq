@@ -326,7 +326,6 @@ zsys_catch_interrupts ();
 int rc = zsys_has_curve ();
 
 if (verbose) {
-    zsys_set_logstream (stdout);
     char *hostname = zsys_hostname ();
     zsys_info ("host name is %s", hostname);
     free (hostname);

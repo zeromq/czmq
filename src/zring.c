@@ -168,7 +168,7 @@ zring_insert (zring_t *self, const char *key, void *item)
     if (!zhash_lookup (self->hash, (void *) key)
     &&  !zring_append (self, item)
 	&&  !zhash_insert (self->hash, (void *) key, self->cursor)) {
-        self->cursor->key = zhash_cursor (self->hash);
+        self->cursor->key = (char *) zhash_cursor (self->hash);
         return 0;
     }
     else
@@ -604,7 +604,7 @@ zring_test (int verbose)
     assert (rc == 0);
     rc = zring_remove (ring, "3");
     assert (rc == 0);
-    item = zring_detach (ring, NULL);
+    item = (char *) zring_detach (ring, NULL);
     zring_purge (ring);
 
     //  Try the dictionary insert/delete functionality

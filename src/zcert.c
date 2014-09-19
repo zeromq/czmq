@@ -59,8 +59,8 @@ zcert_new (void)
 
     //  Initialize metadata, even if keys aren't working
     self->metadata = zhash_new ();
-    zhash_set_item_destructor (self->metadata, (czmq_destructor *) zstr_free);
-    zhash_set_item_duplicator (self->metadata, (czmq_duplicator *) strdup);
+    zhash_set_destructor (self->metadata, (czmq_destructor *) zstr_free);
+    zhash_set_duplicator (self->metadata, (czmq_duplicator *) strdup);
     
 #if (ZMQ_VERSION_MAJOR == 4)
     if (zsys_has_curve ()) {
@@ -93,8 +93,8 @@ zcert_new_from (byte *public_key, byte *secret_key)
     assert (secret_key);
 
     self->metadata = zhash_new ();
-    zhash_set_item_destructor (self->metadata, (czmq_destructor *) zstr_free);
-    zhash_set_item_duplicator (self->metadata, (czmq_duplicator *) strdup);
+    zhash_set_destructor (self->metadata, (czmq_destructor *) zstr_free);
+    zhash_set_duplicator (self->metadata, (czmq_duplicator *) strdup);
     
     memcpy (self->public_key, public_key, 32);
     memcpy (self->secret_key, secret_key, 32);
@@ -265,7 +265,7 @@ s_save_metadata_all (zcert_t *self)
     
     char *value = (char *) zhash_first (self->metadata);
     while (value) {
-        zconfig_t *item = zconfig_new (zhash_cursor (self->metadata), section);
+        zconfig_t *item = zconfig_new ((char *) zhash_cursor (self->metadata), section);
         zconfig_set_value (item, "%s", value);
         value = (char *) zhash_next (self->metadata);
     }

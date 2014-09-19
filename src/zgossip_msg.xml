@@ -10,8 +10,8 @@
     <include filename = "license.xml" />
 
     <grammar>
-        C:HELLO ( C:PUBLISH / S:PUBLISH / heartbeat )
-        heartbeat = C:PING / S:PONG
+    C:HELLO ( C:PUBLISH / S:PUBLISH / heartbeat )
+    heartbeat = C:PING / S:PONG
     </grammar>
 
     <!-- Header for all messages -->
