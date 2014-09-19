@@ -44,7 +44,7 @@ CZMQ_EXPORT int
 //  are always removed from the dictionary. Returns 0 on success, -1 if
 //  the key already existed in the dictionary, or heap memory ran out.
 CZMQ_EXPORT int
-    zring_insert (zring_t *self, const char *key, void *item);
+    zring_insert (zring_t *self, const void *key, void *item);
     
 //  Find an item in the ring, looking first at the cursor, and then from the
 //  first to last item. If a comparator was set on container, calls this to
@@ -60,7 +60,7 @@ CZMQ_EXPORT void *
 //  and returns the item value. If not, leaves the cursor unchanged, and
 //  returns NULL.
 CZMQ_EXPORT void *
-    zring_lookup (zring_t *self, const char *key);
+    zring_lookup (zring_t *self, const void *key);
 
 //  Detach an item from the ring, without destroying the item. Searches the
 //  ring for the item, always starting with the cursor, if any is set, and
@@ -83,7 +83,7 @@ CZMQ_EXPORT int
 //  calls the item destructor, if any is found. Returns 0 if the item was
 //  found and removed, else -1 if not found.
 CZMQ_EXPORT int
-    zring_delete (zring_t *self, const char *key);
+    zring_delete (zring_t *self, const void *key);
     
 //  Delete all items from the ring. If the item destructor is set, calls it
 //  on every item.
