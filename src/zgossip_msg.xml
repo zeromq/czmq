@@ -2,9 +2,9 @@
     name = "zgossip_msg"
     title = "ZeroMQ Gossip Protocol"
     script = "zproto_codec_c"
-    header = "."
-    include = "../include/czmq.h"
-    export = "CZMQ_EXPORT"
+    package_dir = "."
+    project_header = "../include/czmq.h"
+    export_macro = "CZMQ_EXPORT"
     >
     This is a server implementation of the ZeroMQ Gossip Protocol (ZGP)
     <include filename = "license.xml" />
