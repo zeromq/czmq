@@ -221,7 +221,7 @@ server_connect (server_t *self, const char *endpoint)
 static void
 server_accept (server_t *self, const char *key, const char *value)
 {
-  tuple_t *tuple = (tuple_t *) zhash_lookup (self->tuples, (char *) key);
+  tuple_t *tuple = (tuple_t *) zhash_lookup (self->tuples, (void *) key);
     if (tuple && streq (tuple->value, value))
         return;                 //  Duplicate tuple, do nothing
 
@@ -233,8 +233,8 @@ server_accept (server_t *self, const char *key, const char *value)
     tuple->value = strdup (value);
 
     //  Store new tuple
-    zhash_update (tuple->container, (char *) key, tuple);
-    zhash_freefn (tuple->container, (char *) key, tuple_free);
+    zhash_update (tuple->container, (void *) key, tuple);
+    zhash_freefn (tuple->container, (void *) key, tuple_free);
 
     //  Deliver to calling application
     zstr_sendx (self->pipe, "DELIVER", key, value, NULL);
