@@ -190,7 +190,7 @@ s_item_destroy (zhash_t *self, item_t *item, bool hard)
         self->cursor_key = NULL;
         
         if (self->key_destructor)
-            (self->key_destructor) ((void **) item->key);
+            (self->key_destructor) ((void **) &item->key);
         free (item);
     }
 }
