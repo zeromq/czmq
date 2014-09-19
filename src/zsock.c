@@ -819,13 +819,13 @@ zsock_resolve (void *self)
         return zactor_resolve (self);
     else
     {
-        int sock_type;
+        int sock_type = -1;
 #ifdef _WIN32
-        int size = sizeof sock_type;
+        int sock_type_size = sizeof (int);
 #else
-        socklen_t size = sizeof sock_type;
+        socklen_t size = sizeof (socklen_t);
 #endif
-        const int rc = getsockopt(*(SOCKET *) self, SOL_SOCKET, SO_TYPE, (char *) &(sock_type), &size);
+        const int rc = getsockopt(*(SOCKET *)self, SOL_SOCKET, SO_TYPE, (char *) &sock_type, &sock_type_size);
         if (rc == 0)
             return NULL; // It's a socket descriptor
     }
