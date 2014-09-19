@@ -82,8 +82,8 @@ struct _zhash_t {
 };
 
 //  Local helper functions
-static item_t *s_item_lookup (zhash_t *self, const char *key);
-static item_t *s_item_insert (zhash_t *self, const char *key, void *value);
+static item_t *s_item_lookup (zhash_t *self, void *key);
+static item_t *s_item_insert (zhash_t *self, void *key, void *value);
 static void s_item_destroy (zhash_t *self, item_t *item, bool hard);
 
 
@@ -93,10 +93,10 @@ static void s_item_destroy (zhash_t *self, item_t *item, bool hard);
 static size_t
 s_bernstein_hash (const void *key)
 {
-    const char *pointer = (const char *) key;
+    const char *p = (const char*)key;
     size_t key_hash = 0;
-    while (*pointer)
-        key_hash = 33 * key_hash ^ *pointer++;
+    while (*p)
+        key_hash = 33 * key_hash ^ *p++;
     return key_hash;
 }
 
@@ -115,11 +115,10 @@ zhash_new (void)
         self->items = (item_t **) zmalloc (sizeof (item_t *) * limit);
         if (!self->items)
             zhash_destroy (&self);
-        
-        self->hasher = s_bernstein_hash;
-        self->key_destructor = (czmq_destructor *) zstr_free;
-        self->key_duplicator = (czmq_duplicator *) strdup;
-        self->key_comparator = (czmq_comparator *) strcmp;
+	self->hasher = s_bernstein_hash;
+	self->key_destructor = (czmq_destructor *) zstr_free;
+	self->key_duplicator = (czmq_duplicator *) strdup;
+	self->key_comparator = (czmq_comparator *) strcmp;
     }
     return self;
 }
@@ -188,9 +187,8 @@ s_item_destroy (zhash_t *self, item_t *item, bool hard)
 
         self->cursor_item = NULL;
         self->cursor_key = NULL;
-        
-        if (self->key_destructor)
-            (self->key_destructor) ((void **) &item->key);
+	if (self->key_destructor)
+	    (self->key_destructor) (&item->key);
         free (item);
     }
 }
@@ -220,7 +218,7 @@ s_zhash_rehash (zhash_t *self, uint new_prime_index)
         while (cur_item) {
             item_t *next_item = cur_item->next;
             size_t new_index = self->hasher (cur_item->key);
-            new_index %= new_limit;
+	    new_index %= new_limit;
             cur_item->index = new_index;
             cur_item->next = new_items [new_index];
             new_items [new_index] = cur_item;
@@ -242,7 +240,7 @@ s_zhash_rehash (zhash_t *self, uint new_prime_index)
 //  to the item, if found.
 
 int
-zhash_insert (zhash_t *self, const char *key, void *value)
+zhash_insert (zhash_t *self, void *key, void *value)
 {
     assert (self);
     assert (key);
@@ -272,7 +270,7 @@ zhash_insert (zhash_t *self, const char *key, void *value)
 //  Sets the hash cursor to the item, if found.
 
 static item_t *
-s_item_insert (zhash_t *self, const char *key, void *value)
+s_item_insert (zhash_t *self, void *key, void *value)
 {
     //  Check that item does not already exist in hash table
     //  Leaves self->cached_index with calculated hash item
@@ -281,19 +279,15 @@ s_item_insert (zhash_t *self, const char *key, void *value)
         item = (item_t *) zmalloc (sizeof (item_t));
         if (!item)
             return NULL;
-        
-        if (self->key_duplicator)
-            item->key = (self->key_duplicator) ((void *) key);
-        else
-            item->key = (void *) key;
-        
-        if (self->item_duplicator)
-            item->value = (self->item_duplicator) (value);
-        else
-            item->value = value;
-        
+	if (self->key_duplicator)
+	    item->key = (self->key_duplicator) (key);
+	else
+	    item->key = key;
+	if (self->item_duplicator)
+	    item->value = (self->item_duplicator) (value);
+	else
+	    item->value = value;
         item->index = self->cached_index;
-        
         //  Insert into start of bucket list
         item->next = self->items [self->cached_index];
         self->items [self->cached_index] = item;
@@ -313,7 +307,7 @@ s_item_insert (zhash_t *self, const char *key, void *value)
 //  Lookup item in hash table, returns item or NULL
 
 static item_t *
-s_item_lookup (zhash_t *self, const char *key)
+s_item_lookup (zhash_t *self, void *key)
 {
     //  Look in bucket list for item by key
     size_t limit = primes [self->prime_index];
@@ -321,8 +315,8 @@ s_item_lookup (zhash_t *self, const char *key)
     item_t *item = self->items [self->cached_index];
     uint len = 0;
     while (item) {
-        if ((self->key_comparator) (item->key, (void *) key) == 0)
-            break;
+	if ((self->key_comparator) (item->key, key) == 0)
+	    break;
         item = item->next;
         ++len;
     }
@@ -346,7 +340,7 @@ s_item_lookup (zhash_t *self, const char *key)
 //  new item.
 
 void
-zhash_update (zhash_t *self, const char *key, void *value)
+zhash_update (zhash_t *self, void *key, void *value)
 {
     assert (self);
     assert (key);
@@ -363,12 +357,12 @@ zhash_update (zhash_t *self, const char *key, void *value)
             free (item->value);
 
         //  If necessary, take duplicate of item (string) value
-        if (self->item_duplicator)
-            item->value = (self->item_duplicator) (value);
-        else if (self->autofree)
+	if (self->item_duplicator)
+	    item->value = (self->item_duplicator) (value);
+	else if (self->autofree)
             item->value = strdup ((char *) value);
-        else
-            item->value = value;
+	else
+	    item->value = value;
     }
     else
         zhash_insert (self, key, value);
@@ -380,7 +374,7 @@ zhash_update (zhash_t *self, const char *key, void *value)
 //  item, this function does nothing.
 
 void
-zhash_delete (zhash_t *self, const char *key)
+zhash_delete (zhash_t *self, void *key)
 {
     assert (self);
     assert (key);
@@ -396,7 +390,7 @@ zhash_delete (zhash_t *self, const char *key)
 //  cursor to the item, if found.
 
 void *
-zhash_lookup (zhash_t *self, const char *key)
+zhash_lookup (zhash_t *self, void *key)
 {
     assert (self);
     assert (key);
@@ -418,20 +412,18 @@ zhash_lookup (zhash_t *self, const char *key)
 //  Sets the item cursor to the renamed item.
 
 int
-zhash_rename (zhash_t *self, const char *old_key, const char *new_key)
+zhash_rename (zhash_t *self, void *old_key, void *new_key)
 {
     item_t *old_item = s_item_lookup (self, old_key);
     item_t *new_item = s_item_lookup (self, new_key);
     if (old_item && !new_item) {
         s_item_destroy (self, old_item, false);
-        if (self->key_destructor)
-            (self->key_destructor) (&old_item->key);
-        
-        if (self->key_duplicator)
-            old_item->key = (self->key_duplicator) ((void *) new_key);
-        else
-            old_item->key = (void *) new_key;
-        
+	if (self->key_destructor)
+	    (self->key_destructor) (&old_item->key);
+	if (self->key_duplicator)
+	    old_item->key = (self->key_duplicator) (new_key);
+	else
+	    old_item->key = new_key;
         old_item->index = self->cached_index;
         old_item->next = self->items [self->cached_index];
         self->items [self->cached_index] = old_item;
@@ -453,7 +445,7 @@ zhash_rename (zhash_t *self, const char *old_key, const char *new_key)
 //  Returns the item, or NULL if there is no such item.
 
 void *
-zhash_freefn (zhash_t *self, const char *key, zhash_free_fn *free_fn)
+zhash_freefn (zhash_t *self, void *key, zhash_free_fn *free_fn)
 {
     assert (self);
     assert (key);
