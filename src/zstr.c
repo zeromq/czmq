@@ -155,6 +155,8 @@ int
 zstr_sendx (void *dest, const char *string, ...)
 {
     zmsg_t *msg = zmsg_new ();
+    if (!msg)
+        return -1;
     va_list args;
     va_start (args, string);
     while (string) {
@@ -262,6 +264,7 @@ zstr_test (bool verbose)
     string_nbr = 0;
     for (string_nbr = 0;; string_nbr++) {
         char *string = zstr_recv (input);
+        assert (string);
         if (streq (string, "END")) {
             zstr_free (&string);
             break;

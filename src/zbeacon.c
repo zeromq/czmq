@@ -49,15 +49,6 @@ typedef struct {
     bool verbose;               //  Verbose logging enabled?
 } self_t;
 
-static self_t *
-s_self_new (zsock_t *pipe)
-{
-    self_t *self = (self_t *) zmalloc (sizeof (self_t));
-    self->pipe = pipe;
-    self->poller = zpoller_new (self->pipe, NULL);
-    return self;
-}
-
 static void
 s_self_destroy (self_t **self_p)
 {
@@ -71,6 +62,20 @@ s_self_destroy (self_t **self_p)
         free (self);
         *self_p = NULL;
     }
+}
+
+static self_t *
+s_self_new (zsock_t *pipe)
+{
+    self_t *self = (self_t *) zmalloc (sizeof (self_t));
+    if (!self)
+        return NULL;
+
+    self->pipe = pipe;
+    self->poller = zpoller_new (self->pipe, NULL);
+    if (!self->poller)
+        s_self_destroy (&self);
+    return self;
 }
 
 //  --------------------------------------------------------------------------
@@ -104,6 +109,7 @@ s_self_configure (self_t *self, int port_nbr)
     else {
         //  Look for matching interface, or first ziflist item
         ziflist_t *iflist = ziflist_new ();
+        assert (iflist);
         const char *name = ziflist_first (iflist);
         while (name) {
             if (streq (iface, name) || streq (iface, "")) {
@@ -243,6 +249,7 @@ s_self_handle_udp (self_t *self)
     //  If still a valid beacon, send on to the API
     if (is_valid) {
         zmsg_t *msg = zmsg_new ();
+        assert (msg);
         zmsg_addstr (msg, peername);
         zmsg_add (msg, frame);
         zmsg_send (&msg, self->pipe);
@@ -259,6 +266,7 @@ void
 zbeacon (zsock_t *pipe, void *args)
 {
     self_t *self = s_self_new (pipe);
+    assert (self);
     //  Signal successful initialization
     zsock_signal (pipe, 0);
 
@@ -335,6 +343,7 @@ zbeacon_test (bool verbose)
 
     //  Create listener beacon on port 9999 to lookup service
     zactor_t *listener = zactor_new (zbeacon, NULL);
+    assert (listener);
     if (verbose)
         zstr_sendx (listener, "VERBOSE", NULL);
     zsock_send (listener, "si", "CONFIGURE", 9999);
@@ -392,6 +401,7 @@ zbeacon_test (bool verbose)
 
     //  Poll on three API sockets at once
     zpoller_t *poller = zpoller_new (node1, node2, node3, NULL);
+    assert (poller);
     int64_t stop_at = zclock_mono () + 1000;
     while (zclock_mono () < stop_at) {
         long timeout = (long) (stop_at - zclock_mono ());

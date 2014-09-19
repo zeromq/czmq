@@ -168,6 +168,10 @@ zsys_init (void)
 
     ZMUTEX_INIT (s_mutex);
     s_sockref_list = zlist_new ();
+    if (!s_sockref_list) {
+        s_terminate_process();
+        return NULL;
+    }
     srandom ((unsigned) time (NULL));
     atexit (s_terminate_process);
     
@@ -1039,12 +1043,17 @@ zsys_has_curve (void)
     return zmq_has ("curve") != 0;
 #   else
     //  However trying the zmq_setsockopt will also work
+    int rc = -1; // assume we fail
     void *ctx = zmq_ctx_new ();
-    void *pub = zmq_socket (ctx, ZMQ_PUB);
-    int as_server = 1;
-    int rc = zmq_setsockopt (pub, ZMQ_CURVE_SERVER, &as_server, sizeof (int));
-    zmq_close (pub);
-    zmq_term (ctx);
+    if (ctx) {
+        void *pub = zmq_socket (ctx, ZMQ_PUB);
+        if (pub) {
+            int as_server = 1;
+            rc = zmq_setsockopt (pub, ZMQ_CURVE_SERVER, &as_server, sizeof (int));
+            zmq_close (pub);
+        }
+        zmq_term (ctx);
+    }
     return rc != -1;
 #   endif
 #else

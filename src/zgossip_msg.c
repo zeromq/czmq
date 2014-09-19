@@ -189,7 +189,8 @@ zgossip_msg_t *
 zgossip_msg_new (int id)
 {
     zgossip_msg_t *self = (zgossip_msg_t *) zmalloc (sizeof (zgossip_msg_t));
-    self->id = id;
+    if (self)
+        self->id = id;
     return self;
 }
 
@@ -230,6 +231,8 @@ zgossip_msg_decode (zmsg_t **msg_p)
         return NULL;
         
     zgossip_msg_t *self = zgossip_msg_new (0);
+    if (!self)
+        return NULL;
     //  Read and parse command in frame
     zframe_t *frame = zmsg_pop (msg);
     if (!frame) 
@@ -311,6 +314,8 @@ zgossip_msg_encode (zgossip_msg_t **self_p)
     
     zgossip_msg_t *self = *self_p;
     zmsg_t *msg = zmsg_new ();
+    if (!msg)
+        return NULL;
 
     size_t frame_size = 2 + 1;          //  Signature and message ID
     switch (self->id) {
@@ -356,6 +361,11 @@ zgossip_msg_encode (zgossip_msg_t **self_p)
     }
     //  Now serialize message into the frame
     zframe_t *frame = zframe_new (NULL, frame_size);
+    if (!frame) {
+        zmsg_destroy (&msg);
+        return NULL;
+    }
+
     self->needle = zframe_data (frame);
     PUT_NUMBER2 (0xAAA0 | 0);
     PUT_NUMBER1 (self->id);
@@ -396,7 +406,6 @@ zgossip_msg_encode (zgossip_msg_t **self_p)
     //  Now send the data frame
     if (zmsg_append (msg, &frame)) {
         zmsg_destroy (&msg);
-        zgossip_msg_destroy (self_p);
         return NULL;
     }
     //  Destroy zgossip_msg object
@@ -514,7 +523,12 @@ zgossip_msg_encode_hello (
 )
 {
     zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_HELLO);
-    return zgossip_msg_encode (&self);
+    if (!self)
+        return NULL;
+    zmsg_t *msg = zgossip_msg_encode (&self);
+    if (!msg)
+        zgossip_msg_destroy (&self);
+    return msg;
 }
 
 
@@ -528,10 +542,15 @@ zgossip_msg_encode_publish (
     uint32_t ttl)
 {
     zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_PUBLISH);
+    if (!self)
+        return NULL;
     zgossip_msg_set_key (self, key);
     zgossip_msg_set_value (self, value);
     zgossip_msg_set_ttl (self, ttl);
-    return zgossip_msg_encode (&self);
+    zmsg_t *msg = zgossip_msg_encode (&self);
+    if (!msg)
+        zgossip_msg_destroy (&self);
+    return msg;
 }
 
 
@@ -543,7 +562,12 @@ zgossip_msg_encode_ping (
 )
 {
     zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_PING);
-    return zgossip_msg_encode (&self);
+    if (!self)
+        return NULL;
+    zmsg_t *msg = zgossip_msg_encode (&self);
+    if (!msg)
+        zgossip_msg_destroy (&self);
+    return msg;
 }
 
 
@@ -555,7 +579,12 @@ zgossip_msg_encode_pong (
 )
 {
     zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_PONG);
-    return zgossip_msg_encode (&self);
+    if (!self)
+        return NULL;
+    zmsg_t *msg = zgossip_msg_encode (&self);
+    if (!msg)
+        zgossip_msg_destroy (&self);
+    return msg;
 }
 
 
@@ -567,7 +596,12 @@ zgossip_msg_encode_invalid (
 )
 {
     zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_INVALID);
-    return zgossip_msg_encode (&self);
+    if (!self)
+        return NULL;
+    zmsg_t *msg = zgossip_msg_encode (&self);
+    if (!msg)
+        zgossip_msg_destroy (&self);
+    return msg;
 }
 
 
@@ -579,7 +613,10 @@ zgossip_msg_send_hello (
     void *output)
 {
     zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_HELLO);
-    return zgossip_msg_send (&self, output);
+    if (self)
+        return zgossip_msg_send (&self, output);
+    else
+        return -1;
 }
 
 
@@ -594,10 +631,14 @@ zgossip_msg_send_publish (
     uint32_t ttl)
 {
     zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_PUBLISH);
-    zgossip_msg_set_key (self, key);
-    zgossip_msg_set_value (self, value);
-    zgossip_msg_set_ttl (self, ttl);
-    return zgossip_msg_send (&self, output);
+    if (self) {
+        zgossip_msg_set_key (self, key);
+        zgossip_msg_set_value (self, value);
+        zgossip_msg_set_ttl (self, ttl);
+        return zgossip_msg_send (&self, output);
+    }
+    else
+        return -1;
 }
 
 
@@ -609,7 +650,10 @@ zgossip_msg_send_ping (
     void *output)
 {
     zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_PING);
-    return zgossip_msg_send (&self, output);
+    if (self)
+        return zgossip_msg_send (&self, output);
+    else
+        return -1;
 }
 
 
@@ -621,7 +665,10 @@ zgossip_msg_send_pong (
     void *output)
 {
     zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_PONG);
-    return zgossip_msg_send (&self, output);
+    if (self)
+        return zgossip_msg_send (&self, output);
+    else
+        return -1;
 }
 
 
@@ -633,7 +680,10 @@ zgossip_msg_send_invalid (
     void *output)
 {
     zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_INVALID);
-    return zgossip_msg_send (&self, output);
+    if (self)
+        return zgossip_msg_send (&self, output);
+    else
+        return -1;
 }
 
 
@@ -647,8 +697,13 @@ zgossip_msg_dup (zgossip_msg_t *self)
         return NULL;
         
     zgossip_msg_t *copy = zgossip_msg_new (self->id);
-    if (self->routing_id)
+    if (!copy)
+        return NULL;
+    if (self->routing_id) {
         copy->routing_id = zframe_dup (self->routing_id);
+        if (!copy->routing_id)
+            goto error;
+    }
     switch (self->id) {
         case ZGOSSIP_MSG_HELLO:
             copy->version = self->version;
@@ -656,8 +711,16 @@ zgossip_msg_dup (zgossip_msg_t *self)
 
         case ZGOSSIP_MSG_PUBLISH:
             copy->version = self->version;
-            copy->key = self->key? strdup (self->key): NULL;
-            copy->value = self->value? strdup (self->value): NULL;
+            if (self->key) {
+                copy->key = strdup (self->key);
+                if (!copy->key)
+                    goto error;
+            }
+            if (self->value) {
+                copy->value = strdup (self->value);
+                if (!copy->value)
+                    goto error;
+            }
             copy->ttl = self->ttl;
             break;
 
@@ -675,6 +738,10 @@ zgossip_msg_dup (zgossip_msg_t *self)
 
     }
     return copy;
+
+  error:
+    zgossip_msg_destroy (&copy);
+    return NULL;
 }
 
 
@@ -878,7 +945,8 @@ zgossip_msg_test (bool verbose)
     int instance;
     zgossip_msg_t *copy;
     self = zgossip_msg_new (ZGOSSIP_MSG_HELLO);
-    
+    assert (self);
+
     //  Check that _dup works on empty message
     copy = zgossip_msg_dup (self);
     assert (copy);
@@ -920,6 +988,7 @@ zgossip_msg_test (bool verbose)
         zgossip_msg_destroy (&self);
     }
     self = zgossip_msg_new (ZGOSSIP_MSG_PING);
+    assert (self);
     
     //  Check that _dup works on empty message
     copy = zgossip_msg_dup (self);
@@ -956,7 +1025,8 @@ zgossip_msg_test (bool verbose)
         zgossip_msg_destroy (&self);
     }
     self = zgossip_msg_new (ZGOSSIP_MSG_INVALID);
-    
+    assert (self);
+
     //  Check that _dup works on empty message
     copy = zgossip_msg_dup (self);
     assert (copy);

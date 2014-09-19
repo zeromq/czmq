@@ -63,32 +63,39 @@ zfile_new (const char *path, const char *name)
 {
     zfile_t *self = (zfile_t *) zmalloc (sizeof (zfile_t));
 
-    //  Format full path to file
-    if (path) {
-        self->fullname = (char *) zmalloc (strlen (path) + strlen (name) + 2);
-        sprintf (self->fullname, "%s/%s", path, name);
-    }
-    else
-        self->fullname = strdup (name);
-
-    //  Resolve symbolic link if possible
-    if (strlen (self->fullname) > 3
-    &&  streq (self->fullname + strlen (self->fullname) - 3, ".ln")) {
-        FILE *handle = fopen (self->fullname, "r");
-        if (handle) {
-            char buffer [256];
-            if (fgets (buffer, 256, handle)) {
-                //  We have the contents of the symbolic link
-                if (buffer [strlen (buffer) - 1] == '\n')
-                    buffer [strlen (buffer) - 1] = 0;
-                self->link = strdup (buffer);
-                //  Chop ".ln" off name for external use
-                self->fullname [strlen (self->fullname) - 3] = 0;
-            }
-            fclose (handle);
+    if (self) {
+        //  Format full path to file
+        if (path) {
+            self->fullname = (char *) zmalloc (strlen (path) + strlen (name) + 2);
+            if (self->fullname)
+                sprintf (self->fullname, "%s/%s", path, name);
         }
+        else
+            self->fullname = strdup (name);
+
+        if (self->fullname) {
+            //  Resolve symbolic link if possible
+            if (strlen (self->fullname) > 3
+                &&  streq (self->fullname + strlen (self->fullname) - 3, ".ln")) {
+                FILE *handle = fopen (self->fullname, "r");
+                if (handle) {
+                    char buffer [256];
+                    if (fgets (buffer, 256, handle)) {
+                        //  We have the contents of the symbolic link
+                        if (buffer [strlen (buffer) - 1] == '\n')
+                            buffer [strlen (buffer) - 1] = 0;
+                        self->link = strdup (buffer);
+                        //  Chop ".ln" off name for external use
+                        self->fullname [strlen (self->fullname) - 3] = 0;
+                    }
+                    fclose (handle);
+                }
+            }
+            zfile_restat (self);
+        }
+        else
+            zfile_destroy (&self);
     }
-    zfile_restat (self);
     return self;
 }
 
@@ -454,6 +461,8 @@ zfile_digest (zfile_t *self)
         off_t offset = 0;
 
         self->digest = zdigest_new ();
+        if (!self->digest)
+            return NULL;
         zchunk_t *chunk = zfile_read (self, blocksz, offset);
         while (zchunk_size (chunk)) {
             zdigest_update (self->digest,
@@ -513,15 +522,18 @@ zfile_test (bool verbose)
 
     //  @selftest
     zfile_t *file = zfile_new (NULL, "bilbo");
+    assert (file);
     assert (streq (zfile_filename (file, "."), "bilbo"));
     assert (zfile_is_readable (file) == false);
     zfile_destroy (&file);
 
     //  Create a test file in some random subdirectory
     file = zfile_new ("./this/is/a/test", "bilbo");
+    assert (file);
     int rc = zfile_output (file);
     assert (rc == 0);
     zchunk_t *chunk = zchunk_new (NULL, 100);
+    assert (chunk);
     zchunk_fill (chunk, 0, 100);
     
     //  Write 100 bytes at position 1,000,000 in the file
@@ -559,12 +571,14 @@ zfile_test (bool verbose)
 
     //  Try some fun with symbolic links
     zfile_t *link = zfile_new ("./this/is/a/test", "bilbo.ln");
+    assert (link);
     rc = zfile_output (link);
     assert (rc == 0);
     fprintf (zfile_handle (link), "./this/is/a/test/bilbo\n");
     zfile_destroy (&link);
 
     link = zfile_new ("./this/is/a/test", "bilbo.ln");
+    assert (link);
     rc = zfile_input (link);
     assert (rc == 0);
     chunk = zfile_read (link, 1000100, 0);
@@ -575,6 +589,7 @@ zfile_test (bool verbose)
 
     //  Remove file and directory
     zdir_t *dir = zdir_new ("./this", NULL);
+    assert (dir);
     assert (zdir_cursize (dir) == 26);
     zdir_remove (dir, true);
     assert (zdir_cursize (dir) == 0);

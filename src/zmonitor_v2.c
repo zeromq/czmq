@@ -50,7 +50,8 @@ zmonitor_t *
 zmonitor_new (zctx_t *ctx, void *socket, int events)
 {
     zmonitor_t *self = (zmonitor_t *) zmalloc (sizeof (zmonitor_t));
-    assert (self);
+    if (!self)
+        return NULL;
 
     //  Start background agent to connect to the inproc monitor socket
     assert (ctx);
@@ -73,10 +74,8 @@ zmonitor_new (zctx_t *ctx, void *socket, int events)
             zmonitor_destroy (&self);
         zstr_free (&status);
     }
-    else {
-        free (self);
-        self = NULL;
-    }
+    else
+        zmonitor_destroy (&self);
     return self;
 }
 
@@ -91,10 +90,13 @@ zmonitor_destroy (zmonitor_t **self_p)
     if (*self_p) {
         zmonitor_t *self = *self_p;
         //  Deregister monitor endpoint
-        zmq_socket_monitor (self->socket, NULL, 0);
-        zstr_send (self->pipe, "TERMINATE");
-        char *reply = zstr_recv (self->pipe);
-        zstr_free (&reply);
+        if (self->socket)
+            zmq_socket_monitor (self->socket, NULL, 0);
+        if (self->pipe) {
+            zstr_send (self->pipe, "TERMINATE");
+            char *reply = zstr_recv (self->pipe);
+            zstr_free (&reply);
+        }
         free (self);
         *self_p = NULL;
     }
@@ -171,22 +173,40 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
     assert (endpoint);
 
     agent_t *self = s_agent_new (ctx, pipe, endpoint);
+    if (!self)
+        return;
     zpoller_t *poller = zpoller_new (self->pipe, self->socket, NULL);
-
-    while (!self->terminated) {
-        //  Poll on API pipe and on monitor socket
-        void *result = zpoller_wait (poller, -1);
-        if (result == NULL)
-            break;              // Interrupted
-        else
-        if (result == self->pipe)
-            s_api_command (self);
-        else
-        if (result == self->socket)
-            s_socket_event (self);
-    }
+    if (poller)
+        while (!self->terminated) {
+            //  Poll on API pipe and on monitor socket
+            void *result = zpoller_wait (poller, -1);
+            if (result == NULL)
+                break;              // Interrupted
+            else
+                if (result == self->pipe)
+                    s_api_command (self);
+                else
+                    if (result == self->socket)
+                        s_socket_event (self);
+        }
     zpoller_destroy (&poller);
     s_agent_destroy (&self);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Destroy agent instance
+
+static void
+s_agent_destroy (agent_t **self_p)
+{
+    assert (self_p);
+    if (*self_p) {
+        agent_t *self = *self_p;
+        free (self->endpoint);
+        free (self);
+        *self_p = NULL;
+    }
 }
 
 
@@ -197,7 +217,8 @@ static agent_t *
 s_agent_new (zctx_t *ctx, void *pipe, char *endpoint)
 {
     agent_t *self = (agent_t *) zmalloc (sizeof (agent_t));
-    assert (self);
+    if (!self)
+        return NULL;
 
     self->ctx = ctx;
     self->pipe = pipe;
@@ -205,13 +226,14 @@ s_agent_new (zctx_t *ctx, void *pipe, char *endpoint)
 
     // connect to the socket monitor inproc endpoint
     self->socket = zsocket_new (self->ctx, ZMQ_PAIR);
-    assert (self->socket);
-
-    if (zsocket_connect (self->socket, "%s", self->endpoint) == 0)
-        zstr_send (self->pipe, "OK");
+    if (self->socket) {
+        if (zsocket_connect (self->socket, "%s", self->endpoint) == 0)
+            zstr_send (self->pipe, "OK");
+        else
+            zstr_send (self->pipe, "ERROR");
+    }
     else
-        zstr_send (self->pipe, "ERROR");
-
+        s_agent_destroy (&self);
     return self;
 }
 
@@ -305,21 +327,6 @@ s_socket_event (agent_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Destroy agent instance
-
-static void
-s_agent_destroy (agent_t **self_p)
-{
-    assert (self_p);
-    if (*self_p) {
-        agent_t *self = *self_p;
-        free (self->endpoint);
-        free (self);
-        *self_p = NULL;
-    }
-}
-
-//  --------------------------------------------------------------------------
 //  Selftest of this class
 
 static bool
@@ -345,11 +352,14 @@ zmonitor_v2_test (bool verbose)
 #if (ZMQ_VERSION_MAJOR == 4)
     //  @selftest
     zctx_t *ctx = zctx_new ();
+    assert (ctx);
     bool result;
 
     void *sink = zsocket_new (ctx, ZMQ_PULL);
+    assert (sink);
     zmonitor_t *sinkmon = zmonitor_new (ctx,
         sink, ZMQ_EVENT_LISTENING | ZMQ_EVENT_ACCEPTED);
+    assert (sinkmon);
     zmonitor_set_verbose (sinkmon, verbose);
 
     //  Check sink is now listening
@@ -359,8 +369,10 @@ zmonitor_v2_test (bool verbose)
     assert (result);
 
     void *source = zsocket_new (ctx, ZMQ_PUSH);
+    assert (source);
     zmonitor_t *sourcemon = zmonitor_new (ctx,
         source, ZMQ_EVENT_CONNECTED | ZMQ_EVENT_DISCONNECTED);
+    assert (sourcemon);
     zmonitor_set_verbose (sourcemon, verbose);
     zsocket_connect (source, "tcp://127.0.0.1:%d", port_nbr);
 

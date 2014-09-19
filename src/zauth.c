@@ -41,23 +41,6 @@ typedef struct {
     bool verbose;               //  Verbose logging enabled?
 } self_t;
 
-static self_t *
-s_self_new (zsock_t *pipe)
-{
-    self_t *self = (self_t *) zmalloc (sizeof (self_t));
-    self->pipe = pipe;
-    self->whitelist = zhash_new ();
-    self->blacklist = zhash_new ();
-
-    //  Create ZAP handler and get ready for requests
-    self->handler = zsock_new (ZMQ_REP);
-    assert (self->handler);
-    int rc = zsock_bind (self->handler, ZAP_ENDPOINT);
-    assert (rc == 0);
-    self->poller = zpoller_new (self->pipe, self->handler, NULL);
-    return self;
-}
-
 static void
 s_self_destroy (self_t **self_p)
 {
@@ -69,11 +52,37 @@ s_self_destroy (self_t **self_p)
         zhash_destroy (&self->blacklist);
         zcertstore_destroy (&self->certstore);
         zpoller_destroy (&self->poller);
-        zsock_unbind (self->handler, ZAP_ENDPOINT);
-        zsock_destroy (&self->handler);
+        if (self->handler) {
+            zsock_unbind (self->handler, ZAP_ENDPOINT);
+            zsock_destroy (&self->handler);
+        }
         free (self);
         *self_p = NULL;
     }
+}
+
+static self_t *
+s_self_new (zsock_t *pipe)
+{
+    self_t *self = (self_t *) zmalloc (sizeof (self_t));
+    int rc = -1;
+    if (self) {
+        self->pipe = pipe;
+        self->whitelist = zhash_new ();
+        if (self->whitelist)
+            self->blacklist = zhash_new ();
+      
+        //  Create ZAP handler and get ready for requests
+        if (self->blacklist)
+            self->handler = zsock_new (ZMQ_REP);
+        if (self->handler)
+            rc = zsock_bind (self->handler, ZAP_ENDPOINT);
+        if (rc == 0)
+            self->poller = zpoller_new (self->pipe, self->handler, NULL);
+        if (!self->poller)
+            s_self_destroy (&self);
+    }
+    return self;
 }
 
 
@@ -135,6 +144,7 @@ s_self_handle_pipe (self_t *self)
             self->allow_any = true;
         else {
             zcertstore_destroy (&self->certstore);
+            // FIXME: what if this fails?
             self->certstore = zcertstore_new (location);
             self->allow_any = false;
         }
@@ -185,6 +195,27 @@ typedef struct {
 } zap_request_t;
 
 
+static void
+s_zap_request_destroy (zap_request_t **self_p)
+{
+    assert (self_p);
+    if (*self_p) {
+        zap_request_t *self = *self_p;
+        free (self->version);
+        free (self->sequence);
+        free (self->domain);
+        free (self->address);
+        free (self->identity);
+        free (self->mechanism);
+        free (self->username);
+        free (self->password);
+        free (self->client_key);
+        free (self->principal);
+        free (self);
+        *self_p = NULL;
+    }
+}
+
 //  Receive a valid ZAP request from the handler socket
 //  If the request was not valid, returns NULL.
 
@@ -192,12 +223,17 @@ static zap_request_t *
 s_zap_request_new (zsock_t *handler, bool verbose)
 {
     zap_request_t *self = (zap_request_t *) zmalloc (sizeof (zap_request_t));
-    assert (self);
+    if (!self)
+        return NULL;
 
     //  Store handler socket so we can send a reply easily
     self->handler = handler;
     self->verbose = verbose;
     zmsg_t *request = zmsg_recv (handler);
+    if (!request) { // interrupted
+        s_zap_request_destroy (&self);
+        return NULL;
+    }
 
     //  Get all standard frames off the handler socket
     self->version = zmsg_popstr (request);
@@ -234,27 +270,6 @@ s_zap_request_new (zsock_t *handler, bool verbose)
             self->mechanism, self->address);
     zmsg_destroy (&request);
     return self;
-}
-
-static void
-s_zap_request_destroy (zap_request_t **self_p)
-{
-    assert (self_p);
-    if (*self_p) {
-        zap_request_t *self = *self_p;
-        free (self->version);
-        free (self->sequence);
-        free (self->domain);
-        free (self->address);
-        free (self->identity);
-        free (self->mechanism);
-        free (self->username);
-        free (self->password);
-        free (self->client_key);
-        free (self->principal);
-        free (self);
-        *self_p = NULL;
-    }
 }
 
 //  Send a ZAP reply to the handler socket
@@ -412,6 +427,9 @@ void
 zauth (zsock_t *pipe, void *unused)
 {
     self_t *self = s_self_new (pipe);
+    if (!self)
+        return;
+
     //  Signal successful initialization
     zsock_signal (pipe, 0);
 
@@ -445,12 +463,15 @@ s_can_connect (zsock_t **server, zsock_t **client)
 
     zstr_send (*server, "Hello, World");
     zpoller_t *poller = zpoller_new (*client, NULL);
+    assert (poller);
     bool success = (zpoller_wait (poller, 200) == *client);
     zpoller_destroy (&poller);
     zsock_destroy (client);
     zsock_destroy (server);
     *server = zsock_new (ZMQ_PUSH);
+    assert (*server);
     *client = zsock_new (ZMQ_PULL);
+    assert (*client);
     return success;
 }
 #endif
@@ -470,7 +491,9 @@ zauth_test (bool verbose)
 
     //  Check there's no authentication
     zsock_t *server = zsock_new (ZMQ_PUSH);
+    assert (server);
     zsock_t *client = zsock_new (ZMQ_PULL);
+    assert (client);
     bool success = s_can_connect (&server, &client);
     assert (success);
     
@@ -537,7 +560,9 @@ zauth_test (bool verbose)
         //  certificate on disk; in a real case we'd transfer this securely
         //  from the client machine to the server machine.
         zcert_t *server_cert = zcert_new ();
+        assert (server_cert);
         zcert_t *client_cert = zcert_new ();
+        assert (client_cert);
         char *server_key = zcert_public_txt (server_cert);
 
         //  Test without setting-up any authentication
@@ -582,6 +607,7 @@ zauth_test (bool verbose)
     
     //  Delete all test files
     zdir_t *dir = zdir_new (TESTDIR, NULL);
+    assert (dir);
     zdir_remove (dir, true);
     zdir_destroy (&dir);
     //  @end
