@@ -241,7 +241,7 @@ assert (zhash_cursor (hash) == NULL);
 int rc;
 rc = zhash_insert (hash, "DEADBEEF", "dead beef");
 char *item = (char *) zhash_first (hash);
-assert (streq (zhash_cursor (hash), "DEADBEEF"));
+assert (streq ((char *) zhash_cursor (hash), "DEADBEEF"));
 assert (streq (item, "dead beef"));
 assert (rc == 0);
 rc = zhash_insert (hash, "ABADCAFE", "a bad cafe");
