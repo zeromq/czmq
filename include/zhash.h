@@ -208,7 +208,7 @@ CZMQ_EXPORT void
     zhash_autofree (zhash_t *self);
 
 //  DEPRECATED as clumsy -- use zhash_first/_next instead
-typedef int (zhash_foreach_fn) (const void *key, void *item, void *argument);
+typedef int (zhash_foreach_fn) (const char *key, void *item, void *argument);
 
 //  DEPRECATED as clumsy -- use zhash_first/_next instead
 //  Apply function to each item in the hash table. Items are iterated in no
