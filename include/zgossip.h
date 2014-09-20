@@ -41,7 +41,7 @@ extern "C" {
 //  
 //  Enable verbose logging of commands and activity:
 //
-//      zstr_send (ca, "VERBOSE");
+//      zstr_send (server, "VERBOSE");
 //
 //  Bind zgossip server to specified endpoint. TCP endpoints may specify
 //  the port number as "*" to aquire an ephemeral port:
@@ -75,11 +75,11 @@ extern "C" {
 //
 //  This is the zgossip constructor as a zactor_fn:
 //
-CZMQ_EXPORT void
+void
     zgossip (zsock_t *pipe, void *args);
 
 //  Self test of this class
-CZMQ_EXPORT void
+void
     zgossip_test (bool verbose);
 //  @end
 
