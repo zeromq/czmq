@@ -762,7 +762,7 @@ zsock_set_unbounded (void *self)
 //  Check whether a zsock_t has a waiting incoming message.
 //  Returns true or false.
 bool
-zsock_waiting (zsock_t *self)
+zsock_pollin (zsock_t *self)
 {
     assert (zsock_is (self));
     zmq_pollitem_t items[1];
@@ -781,7 +781,7 @@ zsock_waiting (zsock_t *self)
 // Check whether a zsock_t is ready to write to.
 // Returns true or false.
 bool
-zsock_ready (zsock_t *self)
+zsock_pollout (zsock_t *self)
 {
     assert (zsock_is (self));
     zmq_pollitem_t items[1];
@@ -790,7 +790,7 @@ zsock_ready (zsock_t *self)
     items[0].revents = 0;
 
     zmq_poll (items, 1, 0);
-    if (items[0].revents & ZMQ_POLLIN) {
+    if (items[0].revents & ZMQ_POLLOUT) {
         return true;
     }
     return false;
@@ -1069,12 +1069,12 @@ zsock_test (bool verbose)
     rc = zsock_connect (receiver, "inproc://incoming");
     assert (rc == 0);
 
-    bool waiting = zsock_waiting (receiver);
-    assert (waiting == false);
+    bool pollin = zsock_pollin (receiver);
+    assert (pollin == false);
 
     zstr_send (sender, "HELLO");
-    waiting = zsock_waiting (receiver);
-    assert (waiting == true);
+    pollin = zsock_pollin (receiver);
+    assert (pollin == true);
 
     zsock_destroy (&sender);
     zsock_destroy (&receiver);
@@ -1085,16 +1085,16 @@ zsock_test (bool verbose)
     rc = zsock_bind (sender, "inproc://incoming");
     assert (rc == 0);
 
-    bool ready = zsock_ready (sender);
-    assert (ready == false);
+    bool pollout = zsock_pollout (sender);
+    assert (pollout == false);
 
     receiver = zsock_new (ZMQ_PULL);
     assert (receiver);
     rc = zsock_connect (receiver, "inproc://incoming");
     assert (rc == 0);
 
-    ready = zsock_ready (sender);
-    assert (ready == false);
+    pollout = zsock_pollout (sender);
+    assert (pollout == true);
 
     zsock_destroy (&sender);
     zsock_destroy (&receiver);
