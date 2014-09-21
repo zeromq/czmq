@@ -762,7 +762,7 @@ zsock_set_unbounded (void *self)
 //  Check whether a zsock_t has a waiting incoming message.
 //  Returns true or false.
 bool
-zsock_pollin (zsock_t *self)
+zsock_waiting (zsock_t *self)
 {
     assert (zsock_is (self));
     zmq_pollitem_t items[1];
@@ -1039,7 +1039,7 @@ zsock_test (bool verbose)
     assert (rc == -1);
     zsock_destroy (&server);
 
-    // Test zsock_pollin method
+    // Test zsock_waiting method
     zsock_t *sender = zsock_new (ZMQ_PUSH);
     assert (sender);
     rc = zsock_bind (sender, "inproc://incoming");
@@ -1051,7 +1051,7 @@ zsock_test (bool verbose)
     assert (rc == 0);
 
     zstr_send (sender, "HELLO");
-    bool inc = zsock_pollin (receiver);
+    bool inc = zsock_waiting (receiver);
     assert (inc == true);
 
     zsock_destroy (&sender);

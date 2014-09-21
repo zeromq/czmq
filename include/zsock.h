@@ -224,7 +224,7 @@ CZMQ_EXPORT int
 // Check whether a zsock_t has a waiting incoming message.
 // Returns true or false.
 CZMQ_EXPORT bool
-    zsock_pollin (zsock_t *self);
+    zsock_waiting (zsock_t *self);
 
 //  Set socket to use unbounded pipes (HWM=0); use this in cases when you are
 //  totally certain the message volume can fit in memory. This method works
