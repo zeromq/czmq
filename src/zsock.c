@@ -758,42 +758,26 @@ zsock_set_unbounded (void *self)
 #endif
 }
 
-//  ------------------------------------------------------
-//  Check whether a zsock_t has a waiting incoming message.
-//  Returns true or false.
+//  --------------------------------------------------------------------------
+//  Check whether a zsock_t has a waiting incoming message. This checks for
+//  a POLLIN event on the socket. Returns true or false.
+
 bool
 zsock_pollin (zsock_t *self)
 {
     assert (zsock_is (self));
-    zmq_pollitem_t items[1];
-    items[0].socket = self->handle;
-    items[0].events = ZMQ_POLLIN;
-    items[0].revents = 0;
-
-    zmq_poll (items, 1, 0);
-    if (items[0].revents & ZMQ_POLLIN) {
-        return true;
-    }
-    return false;
+    return (zsock_events (self) & ZMQ_POLLIN);
 }
 
-//  ------------------------------------------------
-// Check whether a zsock_t is ready to write to.
-// Returns true or false.
+//  --------------------------------------------------------------------------
+//  Check whether a zsock_t is ready to write to. This checks for a POLLOUT
+//  event on the socket. Returns true or false.
+
 bool
-zsock_pollout (zsock_t *self)
+zsock_pollout  (zsock_t *self)
 {
     assert (zsock_is (self));
-    zmq_pollitem_t items[1];
-    items[0].socket = self->handle;
-    items[0].events = ZMQ_POLLOUT;
-    items[0].revents = 0;
-
-    zmq_poll (items, 1, 0);
-    if (items[0].revents & ZMQ_POLLOUT) {
-        return true;
-    }
-    return false;
+    return (zsock_events (self) & ZMQ_POLLOUT);
 }
 
 //  --------------------------------------------------------------------------
@@ -1058,44 +1042,32 @@ zsock_test (bool verbose)
     assert (rc == -1);
     zsock_destroy (&server);
 
-    // Test zsock_waiting method
+    // Test zsock_pollin method
     zsock_t *sender = zsock_new (ZMQ_PUSH);
     assert (sender);
-    rc = zsock_bind (sender, "inproc://incoming");
+    rc = zsock_bind (sender, "inproc://test-waiting");
     assert (rc == 0);
-
     zsock_t *receiver = zsock_new (ZMQ_PULL);
     assert (receiver);
-    rc = zsock_connect (receiver, "inproc://incoming");
+    rc = zsock_connect (receiver, "inproc://test-waiting");
     assert (rc == 0);
-
-    bool pollin = zsock_pollin (receiver);
-    assert (pollin == false);
-
+    assert (!zsock_pollin (receiver));
     zstr_send (sender, "HELLO");
-    pollin = zsock_pollin (receiver);
-    assert (pollin == true);
-
+    assert (zsock_pollin (receiver));
     zsock_destroy (&sender);
     zsock_destroy (&receiver);
 
-    // Test zsock_ready method
+    //  Test zsock_pollout method
     sender = zsock_new (ZMQ_PUSH);
     assert (sender);
-    rc = zsock_bind (sender, "inproc://incoming");
+    rc = zsock_bind (sender, "inproc://test-ready");
     assert (rc == 0);
-
-    bool pollout = zsock_pollout (sender);
-    assert (pollout == false);
-
+    assert (!zsock_pollout (sender));
     receiver = zsock_new (ZMQ_PULL);
     assert (receiver);
-    rc = zsock_connect (receiver, "inproc://incoming");
+    rc = zsock_connect (receiver, "inproc://test-ready");
     assert (rc == 0);
-
-    pollout = zsock_pollout (sender);
-    assert (pollout == true);
-
+    assert (zsock_pollout (sender));
     zsock_destroy (&sender);
     zsock_destroy (&receiver);
 
