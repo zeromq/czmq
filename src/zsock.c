@@ -758,6 +758,24 @@ zsock_set_unbounded (void *self)
 #endif
 }
 
+//  ------------------------------------------------------
+//  Check whether a zsock_t has a waiting incoming message.
+//  Returns true or false.
+bool
+zsock_waiting (zsock_t *self)
+{
+    assert (zsock_is (self));
+    zmq_pollitem_t items[1];
+    items[0].socket = self->handle;
+    items[0].events = ZMQ_POLLIN;
+    items[0].revents = 0;
+
+    zmq_poll (items, 1, 0);
+    if (items[0].revents & ZMQ_POLLIN) {
+        return true;
+    }
+    return false;
+}
 
 //  --------------------------------------------------------------------------
 //  Send a signal over a socket. A signal is a short message carrying a
@@ -1020,7 +1038,25 @@ zsock_test (bool verbose)
     rc = zsock_attach (server, ">a,@b, c,, ", false);
     assert (rc == -1);
     zsock_destroy (&server);
-    //  @end
 
+    // Test zsock_waiting method
+    zsock_t *sender = zsock_new (ZMQ_PUSH);
+    assert (sender);
+    rc = zsock_bind (sender, "inproc://incoming");
+    assert (rc == 0);
+
+    zsock_t *receiver = zsock_new (ZMQ_PULL);
+    assert (receiver);
+    rc = zsock_connect (receiver, "inproc://incoming");
+    assert (rc == 0);
+
+    zstr_send (sender, "HELLO");
+    bool inc = zsock_waiting (receiver);
+    assert (inc == true);
+
+    zsock_destroy (&sender);
+    zsock_destroy (&receiver);
+    //  @end
+    
     printf ("OK\n");
 }

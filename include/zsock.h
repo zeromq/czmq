@@ -221,6 +221,11 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zsock_recv (void *self, const char *picture, ...);
 
+// Check whether a zsock_t has a waiting incoming message.
+// Returns true or false.
+CZMQ_EXPORT bool
+    zsock_waiting (zsock_t *self);
+
 //  Set socket to use unbounded pipes (HWM=0); use this in cases when you are
 //  totally certain the message volume can fit in memory. This method works
 //  across all versions of ZeroMQ. Takes a polymorphic socket reference.
