@@ -221,15 +221,13 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zsock_recv (void *self, const char *picture, ...);
 
-// Check whether a zsock_t has a waiting incoming message.
-// This checks for a POLLIN event on the socket.
-// Returns true or false.
+//  Check whether a zsock_t has a waiting incoming message. This checks for
+//  a POLLIN event on the socket. Returns true or false.
 CZMQ_EXPORT bool
     zsock_pollin (zsock_t *self);
 
-// Check whether a zsock_t is ready to write to.
-// This checks for a POLLOUT event on the socket.
-// Returns true or false.
+//  Check whether a zsock_t is ready to write to. This checks for a POLLOUT
+//  event on the socket. Returns true or false.
 CZMQ_EXPORT bool
     zsock_pollout (zsock_t *self);
 
