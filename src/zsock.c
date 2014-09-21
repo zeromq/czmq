@@ -759,28 +759,6 @@ zsock_set_unbounded (void *self)
 }
 
 //  --------------------------------------------------------------------------
-//  Check whether a zsock_t has a waiting incoming message. This checks for
-//  a POLLIN event on the socket. Returns true or false.
-
-bool
-zsock_pollin (zsock_t *self)
-{
-    assert (zsock_is (self));
-    return (zsock_events (self) & ZMQ_POLLIN);
-}
-
-//  --------------------------------------------------------------------------
-//  Check whether a zsock_t is ready to write to. This checks for a POLLOUT
-//  event on the socket. Returns true or false.
-
-bool
-zsock_pollout  (zsock_t *self)
-{
-    assert (zsock_is (self));
-    return (zsock_events (self) & ZMQ_POLLOUT);
-}
-
-//  --------------------------------------------------------------------------
 //  Send a signal over a socket. A signal is a short message carrying a
 //  success/failure code (by convention, 0 means OK). Signals are encoded
 //  to be distinguishable from "normal" messages. Accepts a zock_t or a
@@ -1041,35 +1019,6 @@ zsock_test (bool verbose)
     rc = zsock_attach (server, ">a,@b, c,, ", false);
     assert (rc == -1);
     zsock_destroy (&server);
-
-    // Test zsock_pollin method
-    zsock_t *sender = zsock_new (ZMQ_PUSH);
-    assert (sender);
-    rc = zsock_bind (sender, "inproc://test-waiting");
-    assert (rc == 0);
-    zsock_t *receiver = zsock_new (ZMQ_PULL);
-    assert (receiver);
-    rc = zsock_connect (receiver, "inproc://test-waiting");
-    assert (rc == 0);
-    assert (!zsock_pollin (receiver));
-    zstr_send (sender, "HELLO");
-    assert (zsock_pollin (receiver));
-    zsock_destroy (&sender);
-    zsock_destroy (&receiver);
-
-    //  Test zsock_pollout method
-    sender = zsock_new (ZMQ_PUSH);
-    assert (sender);
-    rc = zsock_bind (sender, "inproc://test-ready");
-    assert (rc == 0);
-    assert (!zsock_pollout (sender));
-    receiver = zsock_new (ZMQ_PULL);
-    assert (receiver);
-    rc = zsock_connect (receiver, "inproc://test-ready");
-    assert (rc == 0);
-    assert (zsock_pollout (sender));
-    zsock_destroy (&sender);
-    zsock_destroy (&receiver);
 
     //  @end
     
