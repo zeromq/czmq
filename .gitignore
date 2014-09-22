@@ -83,6 +83,15 @@ examples/security/strawhouse
 examples/security/strawhouse.o
 examples/security/woodhouse
 examples/security/woodhouse.o
+examples/zpubsub/simple/*.o
+examples/zpubsub/simple/test_publisher
+examples/zpubsub/simple/test_subscriber
+!examples/zpubsub/simple/Makefile
+examples/zpubsub/protobuf/*.o
+examples/zpubsub/protobuf/*.pb.*
+examples/zpubsub/protobuf/testPublisher
+examples/zpubsub/protobuf/testSubscriber
+!examples/zpubsub/protobuf/Makefile
 src/test_zgossip
 
 .cproject
