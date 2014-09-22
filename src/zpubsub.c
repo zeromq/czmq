@@ -1125,6 +1125,19 @@ zpubsub_test (bool verbose)
     if (verbose)
         zsys_info ("zpubsub system test...");
 
+    //  Test for broadcast interface
+    zactor_t *test_beacon = zactor_new (zbeacon, NULL);
+    zsock_send (test_beacon, "si", "CONFIGURE", 9999);
+    char *hostname = zstr_recv (test_beacon);
+    if (!*hostname) {
+        printf ("OK (skipping test, no UDP broadcasting)\n");
+        zactor_destroy (&test_beacon);
+        free (hostname);
+        return;
+    }
+    zactor_destroy (&test_beacon);
+    free (hostname);
+    
     //  @selftest
     //  Create pubsub instance
     zpubsub_t * pubsub = zpubsub_new (25, NULL, s_serialize_filter_fn, s_deserialize_filter_fn);
