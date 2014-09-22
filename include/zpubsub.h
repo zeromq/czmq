@@ -28,6 +28,9 @@ typedef struct {
     char *partition;
 } zpubsub_filter_t;
 
+//  Function to calculate port from domain id
+typedef dbyte (zpubsub_port_fn) (int domain);
+
 //  Subscribers get a callback when a sample is available
 typedef void (zpubsub_sample_fn) (const char *topic, const char *partition, void *sample);
 

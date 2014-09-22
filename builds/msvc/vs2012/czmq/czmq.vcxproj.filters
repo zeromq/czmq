@@ -76,6 +76,9 @@
     <ClCompile Include="..\..\..\..\src\zpubsub.c">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\zpubsub_option.c">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zrex.c">
       <Filter>src</Filter>
     </ClCompile>

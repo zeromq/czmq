@@ -93,6 +93,7 @@ typedef int (czmq_comparator) (void *item1, void *item2);
 #include "zpoller.h"
 #include "zproxy.h"
 #include "zpubsub.h"
+#include "zpubsub_option.h"
 #include "zrex.h"
 #include "zring.h"
 #include "zsock.h"

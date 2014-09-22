@@ -28,6 +28,7 @@
     <class name = "zpoller" />
     <class name = "zproxy" />
     <class name = "zpubsub" />
+    <class name = "zpubsub_option" />
     <class name = "zrex" />
     <class name = "zring" />
     <class name = "zsock" />
