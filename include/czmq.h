@@ -46,6 +46,7 @@ typedef struct _zlist_t zlist_t;
 typedef struct _zloop_t zloop_t;
 typedef struct _zmsg_t zmsg_t;
 typedef struct _zpoller_t zpoller_t;
+typedef struct _zpubsub_t zpubsub_t;
 typedef struct _zrex_t zrex_t;
 typedef struct _zring_t zring_t;
 typedef struct _zsock_t zsock_t;
@@ -91,6 +92,8 @@ typedef int (czmq_comparator) (const void *item1, const void *item2);
 #include "zmsg.h"
 #include "zpoller.h"
 #include "zproxy.h"
+#include "zpubsub.h"
+#include "zpubsub_option.h"
 #include "zrex.h"
 #include "zring.h"
 #include "zsock.h"
