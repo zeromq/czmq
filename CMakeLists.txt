@@ -103,6 +103,7 @@ set (czmq_headers
     include/zmsg.h
     include/zpoller.h
     include/zproxy.h
+    include/zpubsub.h
     include/zrex.h
     include/zring.h
     include/zsock.h
@@ -155,6 +156,7 @@ set (czmq_sources
     src/zmsg.c
     src/zpoller.c
     src/zproxy.c
+    src/zpubsub.c
     src/zrex.c
     src/zring.c
     src/zsock.c
