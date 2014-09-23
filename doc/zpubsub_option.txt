@@ -1,0 +1,95 @@
+zpubsub_option(3)
+=================
+
+NAME
+----
+zpubsub_option - options for the zpubsub class
+
+SYNOPSIS
+--------
+----
+//  Get the currently installed function for calculating port number from
+//  domain id. If NULL, the default implementation in the zpubsub class
+//  will be used.
+CZMQ_EXPORT zpubsub_port_fn *
+    zpubsub_port_function (void);
+
+
+//  Set the function for calculating port number from domain id. If NULL,
+//  the default implementation in the zpubsub class will be used.
+CZMQ_EXPORT void
+    zpubsub_set_port_function (zpubsub_port_fn *port_fn);
+
+
+//  Get the beacon port number.
+CZMQ_EXPORT dbyte
+    zpubsub_beacon_port (void);
+
+
+//  Set the beacon port number (1025-65535).
+CZMQ_EXPORT void
+    zpubsub_set_beacon_port (dbyte port);
+
+
+//  Get the beacon interval.
+CZMQ_EXPORT int
+    zpubsub_beacon_interval (void);
+
+
+//  Set the beacon interval (1000-60000).
+CZMQ_EXPORT void
+    zpubsub_set_beacon_interval (int interval);
+
+
+//  Selftest
+CZMQ_EXPORT void
+    zpubsub_option_test (bool verbose);
+----
+
+DESCRIPTION
+-----------
+
+The zpubsub_option class provides global options for the zpubsub class.
+Active options at the time of creation of a zpubsub instance, will
+be used for that instance.
+
+
+EXAMPLE
+-------
+.From zpubsub_option_test method
+----
+zpubsub_port_fn *port_fn = zpubsub_port_function ();
+assert (port_fn == NULL);
+zpubsub_set_port_function (s_test_port_fn);
+port_fn = zpubsub_port_function ();
+assert (port_fn != NULL);
+dbyte port = (port_fn) (0);
+assert (port == 1025);
+port = (port_fn) (99);
+assert (port == 1124);
+zpubsub_set_port_function (NULL);
+port_fn = zpubsub_port_function ();
+assert (port_fn == NULL);
+
+dbyte beacon_port = zpubsub_beacon_port ();
+assert (beacon_port == 55666);
+zpubsub_set_beacon_port (46798);
+beacon_port = zpubsub_beacon_port ();
+assert (beacon_port == 46798);
+zpubsub_set_beacon_port (55666);
+beacon_port = zpubsub_beacon_port ();
+assert (beacon_port == 55666);
+
+int beacon_interval = zpubsub_beacon_interval ();
+assert (beacon_interval == 5000);
+zpubsub_set_beacon_interval (30000);
+beacon_interval = zpubsub_beacon_interval ();
+assert (beacon_interval == 30000);
+zpubsub_set_beacon_interval (5000);
+beacon_interval = zpubsub_beacon_interval ();
+assert (beacon_interval == 5000);
+----
+
+SEE ALSO
+--------
+linkczmq:czmq[7]
