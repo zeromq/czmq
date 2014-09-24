@@ -368,7 +368,7 @@ zcert_dup (zcert_t *self)
         if (copy) {
             zhash_destroy (&copy->metadata);
             copy->metadata = zhash_dup (self->metadata);
-            if (copy->metadata == NULL)
+            if (!copy->metadata)
                 zcert_destroy (&copy);
         }
         return copy;
