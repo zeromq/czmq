@@ -932,9 +932,9 @@ zsock_test (bool verbose)
     assert (memcmp (zframe_data (frame), "WORLD", 5) == 0);
     assert (zframe_size (frame) == 5);
     char *value = (char *) zhash_lookup (hash, "1");
-    assert (streq(value, "value A"));
+    assert (streq (value, "value A"));
     value = (char *) zhash_lookup (hash, "2");
-    assert (streq(value, "value B"));
+    assert (streq (value, "value B"));
     assert (original == pointer);
     free (string);
     free (data);
