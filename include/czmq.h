@@ -49,6 +49,7 @@ typedef struct _zpoller_t zpoller_t;
 typedef struct _zpubsub_t zpubsub_t;
 typedef struct _zrex_t zrex_t;
 typedef struct _zring_t zring_t;
+typedef struct _zring_node_t zring_node_t;
 typedef struct _zsock_t zsock_t;
 typedef struct _zuuid_t zuuid_t;
 //  Deprecated V2 classes, remove some time after 3.0 stability
