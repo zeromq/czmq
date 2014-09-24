@@ -936,7 +936,7 @@ void
 zhash_set_key_comparator (zhash_t *self, czmq_comparator comparator)
 {
     assert (self);
-    assert (comparator);
+    assert (comparator != NULL);
     self->key_comparator = comparator;
 }
 
@@ -1017,7 +1017,7 @@ zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument)
         while (item) {
             //  Invoke callback, passing item properties and argument
             item_t *next = item->next;
-            rc = callback (item->key, item->value, argument);
+            rc = callback ((const char *) item->key, item->value, argument);
             if (rc)
                 return rc;      //  End if non-zero return code
             item = next;

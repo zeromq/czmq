@@ -843,7 +843,7 @@ s_server_api_message (zloop_t *loop, zsock_t *reader, void *argument)
         //  TODO: remove after October 9, 2014
         if (streq (path, "server/animate")) {
             zsys_warning ("'%s' is deprecated, use VERBOSE command instead", path);
-            self->verbose = atoi (value);
+            self->verbose = atoi (value) != 0;
         }
         s_server_config_self (self);
         free (path);

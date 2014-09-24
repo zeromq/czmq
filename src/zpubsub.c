@@ -258,7 +258,7 @@ s_generate_key (const char *topic, const char *partition)
     assert (partition);
 
     int required_len = strlen (partition) + strlen (topic) + 2;
-    char *key = zmalloc (required_len * sizeof (char));
+    char *key = (char *) zmalloc (required_len * sizeof(char));
     assert (key);
 
     snprintf (key, required_len, "%s:%s", partition, topic);
@@ -299,7 +299,7 @@ s_serialize_filter (zpubsub_filter_t *filter, zpubsub_serialize_filter_fn *seria
     assert (size);
 
     *size = (serialize_filter_fn) (filter, NULL, 0);
-    byte *data = zmalloc (*size);
+    byte *data = (byte *) zmalloc (*size);
     assert (data);
 
     int rc = (serialize_filter_fn) (filter, data, *size);
@@ -339,7 +339,7 @@ s_serialize_message (const char *topic, const char *partition, void *message, zp
     assert (size);
 
     *size = (serialize_fn) (topic, partition, message, NULL, 0);
-    byte *data = zmalloc (*size);
+    byte *data = (byte *) zmalloc (*size);
     assert (data);
 
     int rc = (serialize_fn) (topic, partition, message, data, *size);
@@ -431,7 +431,7 @@ s_sub_ctrl_fn (zloop_t *loop, zsock_t *reader, void *args)
     else
     if (streq(command, "SUB"))
     {
-        sub_data_t * sub = zmalloc (sizeof (sub_data_t));
+        sub_data_t * sub = (sub_data_t *) zmalloc (sizeof (sub_data_t));
 
         sub->topic = zmsg_popstr (msg);
         sub->partition = zmsg_popstr (msg);
@@ -526,7 +526,7 @@ s_sub_sample_fn (zloop_t *loop, zsock_t *reader, void *args)
     char *key = s_generate_key (filter->topic, filter->partition);
     assert (key);
 
-    sub_data_t *sub = zhash_lookup (reactor_data->subscribers, key);
+    sub_data_t *sub = (sub_data_t *) zhash_lookup (reactor_data->subscribers, key);
     free (key);
 
     if (sub)
@@ -565,7 +565,7 @@ s_sub_actor (zsock_t *pipe, void *args)
     reactor_data.sub_socket = sub_socket;
     reactor_data.port = actor_data->port;
     reactor_data.default_partition = strdup (actor_data->default_partition);
-    reactor_data.filter_serialization = zmalloc (sizeof (filter_serialization_t));
+    reactor_data.filter_serialization = (filter_serialization_t *) zmalloc (sizeof (filter_serialization_t));
     reactor_data.filter_serialization->serialize_fn = actor_data->filter_serialization->serialize_fn;
     reactor_data.filter_serialization->deserialize_fn = actor_data->filter_serialization->deserialize_fn;
     reactor_data.connections = zhash_new();
@@ -645,7 +645,7 @@ zpubsub_new (int domain, const char* partition, zpubsub_serialize_filter_fn *ser
     assert (actor_data);
     actor_data->port = (port_fn) (self->domain);
     actor_data->default_partition = strdup (self->partition);
-    actor_data->filter_serialization = zmalloc (sizeof (filter_serialization_t));
+    actor_data->filter_serialization = (filter_serialization_t *) zmalloc (sizeof (filter_serialization_t));
     actor_data->filter_serialization->serialize_fn = serialize_fn;
     actor_data->filter_serialization->deserialize_fn = deserialize_fn;
     actor_data->beacon_port = zpubsub_beacon_port ();
@@ -733,10 +733,10 @@ zpubsub_subscribe (zpubsub_t *self, char *topic, char *partition, void *args, zp
     //  Wrapping function pointers inside structs. -Werror=pedantic does not allow
     //  casting function pointers to void *
 
-    message_serialization_t *message_serialization = zmalloc (sizeof (message_serialization_t));
+    message_serialization_t *message_serialization = (message_serialization_t *) zmalloc (sizeof (message_serialization_t));
     message_serialization->deserialize_fn = deserialize_fn;
 
-    sample_function_t *sample_function = zmalloc (sizeof (sample_function_t));
+    sample_function_t *sample_function = (sample_function_t *) zmalloc (sizeof (sample_function_t));
     sample_function->sample_fn = sample_fn;
 
     zsock_send (self->sub_actor, "sssppp", "SUB", topic, partition? partition: self->partition, args, message_serialization, sample_function);
@@ -1108,7 +1108,7 @@ zpubsub_test (bool verbose)
     byte *tmsg_data = s_serialize_message ("TestTopic", "TestPartition", tmsg, s_serialize_message_fn, &size);
     assert (tmsg_data);
     assert (size > 0);
-    test_msg_t *tmsg2 = s_deserialize_message ("TestTopic", "TestPartition", NULL, tmsg_data, size, s_deserialize_message_fn);
+    test_msg_t *tmsg2 = (test_msg_t *) s_deserialize_message ("TestTopic", "TestPartition", NULL, tmsg_data, size, s_deserialize_message_fn);
     assert (tmsg2);
     assert (streq (tmsg->hello, tmsg2->hello));
     assert (tmsg->world == tmsg2->world);
