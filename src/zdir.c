@@ -87,7 +87,7 @@ s_posix_populate_entry (zdir_t *self, struct dirent *entry)
         ; //  Skip hidden files
     else
     //  If we have a subdirectory, go load that
-    if (stat_buf.st_mode & S_IFDIR) {
+    if (S_ISDIR(stat_buf.st_mode)) {
         if (!self->trimmed) {
             zdir_t *subdir = zdir_new (entry->d_name, self->path);
             assert (subdir);
