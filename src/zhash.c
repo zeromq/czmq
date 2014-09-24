@@ -366,7 +366,8 @@ zhash_update (zhash_t *self, const void *key, void *value)
         //  If necessary, take duplicate of item (string) value
         if (self->item_duplicator)
             item->value = (self->item_duplicator) (value);
-        else if (self->autofree)
+        else
+        if (self->autofree)
             item->value = strdup ((char *) value);
         else
             item->value = value;
@@ -500,8 +501,7 @@ zhash_keys (zhash_t *self)
     for (index = 0; index < limit; index++) {
         item_t *item = self->items [index];
         while (item) {
-          int rc = zlist_append (keys, (void *) item->key);
-            if (rc != 0) {
+            if (zlist_append (keys, (void *) item->key)) {
                 zlist_destroy (&keys);
                 break;
             }
@@ -825,9 +825,9 @@ zhash_unpack (zframe_t *frame)
                     memcpy (value, needle, value_size);
                     value [value_size] = 0;
                     needle += value_size;
+                    
                     //  Hash takes ownership of value
-                    int rc = zhash_insert (self, key, value);
-                    if (rc != 0) {
+                    if (zhash_insert (self, key, value)) {
                         zhash_destroy (&self);
                         break;
                     }
@@ -867,8 +867,8 @@ zhash_dup (zhash_t *self)
                 void *value = item->value;
                 if (self->item_duplicator)
                     value = self->item_duplicator (value);
-                int rc = zhash_insert (copy, item->key, value);
-                if (rc != 0) {
+                
+                if (zhash_insert (copy, item->key, value)) {
                     zhash_destroy (&copy);
                     break;
                 }
@@ -974,8 +974,7 @@ zhash_dup_v2 (zhash_t *self)
         for (index = 0; index < limit; index++) {
             item_t *item = self->items [index];
             while (item) {
-                int rc = zhash_insert (copy, item->key, item->value);
-                if (rc != 0) {
+                if (zhash_insert (copy, item->key, item->value)) {
                     zhash_destroy (&copy);
                     break;
                 }
@@ -1009,7 +1008,7 @@ int
 zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument)
 {
     assert (self);
-    int rc = 0;
+    
     uint index;
     size_t limit = primes [self->prime_index];
     for (index = 0; index < limit; index++) {
@@ -1017,13 +1016,13 @@ zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument)
         while (item) {
             //  Invoke callback, passing item properties and argument
             item_t *next = item->next;
-            rc = callback ((const char *) item->key, item->value, argument);
+            int rc = callback ((const char *) item->key, item->value, argument);
             if (rc)
                 return rc;      //  End if non-zero return code
             item = next;
         }
     }
-    return rc;
+    return 0;
 }
 
 

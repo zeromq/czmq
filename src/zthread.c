@@ -117,7 +117,7 @@ s_thread_start (shim_t *shim)
     pthread_detach (thread);
 
 #elif defined (__WINDOWS__)
-    shim->handle = (HANDLE)_beginthreadex(
+    shim->handle = (HANDLE)_beginthreadex (
         NULL,                   //  Handle is private to this process
         0,                      //  Use a default stack size for new thread
         &s_thread_shim,         //  Start real thread function via this shim
