@@ -4,7 +4,7 @@ czmq(7)
 
 NAME
 ----
-CZMQ - high-level C binding for ZeroMQ
+czmq - high-level C binding for ZeroMQ
 
 
 SYNOPSIS
