@@ -68,7 +68,7 @@ zcert_new (void)
         zmq_z85_decode (secret_key, secret_txt);
     }
 #endif
-    return zcert_new_from(public_key, secret_key);
+    return zcert_new_from (public_key, secret_key);
 }
 
 
@@ -85,23 +85,20 @@ zcert_new_from (byte *public_key, byte *secret_key)
     assert (secret_key);
 
     self->metadata = zhash_new ();
-    if (!self->metadata) {
-        zcert_destroy (&self);
-        return NULL;
-    }
-    zhash_set_destructor (self->metadata, (czmq_destructor *) zstr_free);
-    zhash_set_duplicator (self->metadata, (czmq_duplicator *) strdup);
-    
-    memcpy (self->public_key, public_key, 32);
-    memcpy (self->secret_key, secret_key, 32);
-    
+    if (self->metadata) {
+        zhash_autofree (self->metadata);
+        memcpy (self->public_key, public_key, 32);
+        memcpy (self->secret_key, secret_key, 32);
 #if (ZMQ_VERSION_MAJOR == 4)
-    zmq_z85_encode (self->public_txt, self->public_key, 32);
-    zmq_z85_encode (self->secret_txt, self->secret_key, 32);
+        zmq_z85_encode (self->public_txt, self->public_key, 32);
+        zmq_z85_encode (self->secret_txt, self->secret_key, 32);
 #else
-    strcpy (self->public_txt, FORTY_ZEROES);
-    strcpy (self->secret_txt, FORTY_ZEROES);
+        strcpy (self->public_txt, FORTY_ZEROES);
+        strcpy (self->secret_txt, FORTY_ZEROES);
 #endif
+    }
+    else
+        zcert_destroy (&self);
     return self;
 }
 
@@ -179,6 +176,7 @@ zcert_set_meta (zcert_t *self, const char *name, const char *format, ...)
     va_end (argptr);
     assert (value);
     zhash_insert (self->metadata, name, value);
+    free (value);
 }
 
 
@@ -370,7 +368,7 @@ zcert_dup (zcert_t *self)
         if (copy) {
             zhash_destroy (&copy->metadata);
             copy->metadata = zhash_dup (self->metadata);
-            if (copy->metadata == NULL)
+            if (!copy->metadata)
                 zcert_destroy (&copy);
         }
         return copy;

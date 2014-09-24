@@ -1,11 +1,9 @@
-#### zpubsub - simple pubsub framework 
+#### zpubsub - simple pubsub framework
 
-The zpubsub class provides a simple pubsub framework. 
+The zpubsub class provides a simple pubsub framework.
 
 
-The zpubsub class provides a simple pubsub framework. 
-
-It allows publishing of a "topic", being a message of
+zpubsub allows publishing of a "topic", being a message of
 a certain type, known to both the publisher of said
 message, and its subscribers. Publishers and subscribers
 operate on a specific domain (an integer id) which, in the
@@ -24,7 +22,9 @@ zpubsub class.
 
 zpubsub relies heavily on the zactor and zloop implementations to
 achieve asynchronous behaviour, and uses the zbeacon to broadcast
-the presence of publishers.
+the presence of publishers. The basic mechanisms for publishing
+and subscribing are of course implemented by way of 0MQ PUB and
+SUB sockets.
 
 The protocol is fully up to the application. Callbacks are emitted
 to perform serialization and deserialization of the filter and
@@ -45,6 +45,9 @@ This is the class interface:
         char *topic;
         char *partition;
     } zpubsub_filter_t;
+    
+    //  Function to calculate port from domain id
+    typedef dbyte (zpubsub_port_fn) (int domain);
     
     //  Subscribers get a callback when a sample is available
     typedef void (zpubsub_sample_fn) (const char *topic, const char *partition, void *sample);
@@ -97,67 +100,67 @@ This is the class interface:
 
 This is the class self test code:
 
-	// Create pubsub instance
-	zpubsub_t * pubsub = zpubsub_new (25, NULL, s_serialize_filter_fn, s_deserialize_filter_fn);
-	assert (pubsub);
-	s_test_msg_recvd = false;
-	
-	// Subscribe to test topic
-	zpubsub_subscribe (pubsub, "TestTopic", NULL, NULL, s_deserialize_message_fn, s_sample_fn);
-	
-	// Sleep for 6 seconds; should have received a publisher beacon by then and connected
-	zclock_sleep (6000);
-	
-	// Create a test message
-	tmsg = (test_msg_t *) zmalloc (sizeof (test_msg_t));
-	assert (tmsg);
-	tmsg->hello = strdup ("Hello");
-	tmsg->world = 30116;
-	
-	// Publish on the test topic
-	zpubsub_publish (pubsub, "TestTopic", NULL, tmsg, s_serialize_message_fn);
-	zclock_sleep (1000); // Sleeping one second after publish to make sure subscriber processing is finished
-	
-	// Should have received the message now
-	assert (s_test_msg_recvd);
-	s_test_msg_recvd = false;
-	
-	// Publish on different partition
-	zpubsub_publish (pubsub, "TestTopic", "TestPartition", tmsg, s_serialize_message_fn);
-	zclock_sleep (1000);
-	
-	// Should not receive this message
-	assert (!s_test_msg_recvd);
-	s_test_msg_recvd = false;
-	
-	// Publish on another topic
-	zpubsub_publish (pubsub, "TestTopic2", NULL, tmsg, s_serialize_message_fn);
-	zclock_sleep (1000);
-	
-	// Should not receive this message
-	assert (!s_test_msg_recvd);
-	s_test_msg_recvd = false;
-	
-	// Publish on the test topic again
-	zpubsub_publish (pubsub, "TestTopic", NULL, tmsg, s_serialize_message_fn);
-	zclock_sleep (1000);
-	
-	// Should receive this message
-	assert (s_test_msg_recvd);
-	s_test_msg_recvd = false;
-	
-	// Unsubscribe and publish again
-	zpubsub_unsubscribe (pubsub, "TestTopic", NULL);
-	zpubsub_publish (pubsub, "TestTopic", NULL, tmsg, s_serialize_message_fn);
-	zclock_sleep (1000);
-	
-	// Should not receive this message
-	assert (!s_test_msg_recvd);
-	
-	// Destroy pubsub instance
-	zpubsub_destroy (&pubsub);
-	assert (pubsub == NULL);
-	
-	free (tmsg->hello);
-	free (tmsg);
+    //  Create pubsub instance
+    zpubsub_t * pubsub = zpubsub_new (25, NULL, s_serialize_filter_fn, s_deserialize_filter_fn);
+    assert (pubsub);
+    s_test_msg_recvd = false;
+
+    //  Subscribe to test topic
+    zpubsub_subscribe (pubsub, "TestTopic", NULL, NULL, s_deserialize_message_fn, s_sample_fn);
+
+    //  Sleep for 6 seconds; should have received a publisher beacon by then and connected
+    zclock_sleep (6000);
+
+    //  Create a test message
+    tmsg = (test_msg_t *) zmalloc (sizeof (test_msg_t));
+    assert (tmsg);
+    tmsg->hello = strdup ("Hello");
+    tmsg->world = 30116;
+
+    //  Publish on the test topic
+    zpubsub_publish (pubsub, "TestTopic", NULL, tmsg, s_serialize_message_fn);
+    zclock_sleep (1000); //  Sleeping one second after publish to make sure subscriber processing is finished
+
+    //  Should have received the message now
+    assert (s_test_msg_recvd);
+    s_test_msg_recvd = false;
+
+    //  Publish on different partition
+    zpubsub_publish (pubsub, "TestTopic", "TestPartition", tmsg, s_serialize_message_fn);
+    zclock_sleep (1000);
+
+    //  Should not receive this message
+    assert (!s_test_msg_recvd);
+    s_test_msg_recvd = false;
+
+    //  Publish on another topic
+    zpubsub_publish (pubsub, "TestTopic2", NULL, tmsg, s_serialize_message_fn);
+    zclock_sleep (1000);
+
+    //  Should not receive this message
+    assert (!s_test_msg_recvd);
+    s_test_msg_recvd = false;
+
+    //  Publish on the test topic again
+    zpubsub_publish (pubsub, "TestTopic", NULL, tmsg, s_serialize_message_fn);
+    zclock_sleep (1000);
+
+    //  Should receive this message
+    assert (s_test_msg_recvd);
+    s_test_msg_recvd = false;
+
+    //  Unsubscribe and publish again
+    zpubsub_unsubscribe (pubsub, "TestTopic", NULL);
+    zpubsub_publish (pubsub, "TestTopic", NULL, tmsg, s_serialize_message_fn);
+    zclock_sleep (1000);
+
+    //  Should not receive this message
+    assert (!s_test_msg_recvd);
+
+    //  Destroy pubsub instance
+    zpubsub_destroy (&pubsub);
+    assert (pubsub == NULL);
+
+    free (tmsg->hello);
+    free (tmsg);
 
