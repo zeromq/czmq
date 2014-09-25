@@ -22,7 +22,7 @@
 */
 
 
-//  ---------------------------------------------------------------------
+//  ---------------------------------------------------------------------------
 //  State machine constants
 
 typedef enum {
@@ -67,7 +67,7 @@ s_event_name [] = {
 };
  
 
-//  ---------------------------------------------------------------------
+//  ---------------------------------------------------------------------------
 //  Context for the whole server task. This embeds the application-level
 //  server context at its start (the entire structure, not a reference),
 //  so we can cast a pointer between server_t and s_server_t arbitrarily.
@@ -87,7 +87,7 @@ typedef struct {
 } s_server_t;
 
 
-//  ---------------------------------------------------------------------
+//  ---------------------------------------------------------------------------
 //  Context for each connected client. This embeds the application-level
 //  client context at its start (the entire structure, not a reference),
 //  so we can cast a pointer between client_t and s_client_t arbitrarily.
@@ -132,7 +132,7 @@ static void
 static void
     get_tuple_to_forward (client_t *self);
 
-//  ---------------------------------------------------------------------
+//  ---------------------------------------------------------------------------
 //  These methods are an internal API for actions
 
 //  Set the next event, needed in at least one action in an internal
@@ -287,7 +287,7 @@ s_satisfy_pedantic_compilers (void)
 }
 
 
-//  ---------------------------------------------------------------------
+//  ---------------------------------------------------------------------------
 //  Generic methods on protocol messages
 //  TODO: replace with lookup table, since ID is one byte
 
@@ -312,7 +312,7 @@ s_protocol_event (zgossip_msg_t *request)
 }
 
 
-//  ---------------------------------------------------------------------
+//  ---------------------------------------------------------------------------
 //  Client methods
 
 static s_client_t *
@@ -843,7 +843,7 @@ s_server_api_message (zloop_t *loop, zsock_t *reader, void *argument)
         //  TODO: remove after October 9, 2014
         if (streq (path, "server/animate")) {
             zsys_warning ("'%s' is deprecated, use VERBOSE command instead", path);
-            self->verbose = atoi (value);
+            self->verbose = atoi (value) != 0;
         }
         s_server_config_self (self);
         free (path);
@@ -912,7 +912,7 @@ s_watch_server_config (zloop_t *loop, int timer_id, void *argument)
 }
 
 
-//  ---------------------------------------------------------------------
+//  ---------------------------------------------------------------------------
 //  This is the server actor, which polls its two sockets and processes
 //  incoming messages
 

@@ -117,7 +117,7 @@ s_thread_start (shim_t *shim)
     pthread_detach (thread);
 
 #elif defined (__WINDOWS__)
-    shim->handle = (HANDLE)_beginthreadex(
+    shim->handle = (HANDLE)_beginthreadex (
         NULL,                   //  Handle is private to this process
         0,                      //  Use a default stack size for new thread
         &s_thread_shim,         //  Start real thread function via this shim
@@ -223,8 +223,10 @@ s_test_attached (void *args, zctx_t *ctx, void *pipe)
 {
     //  Create a socket to check it'll be automatically deleted
     zsocket_new (ctx, ZMQ_PUSH);
+    assert (ctx);
     //  Wait for our parent to ping us, and pong back
     char *ping = zstr_recv (pipe);
+    assert (ping);
     zstr_free (&ping);
     zstr_send (pipe, "pong");
 }
@@ -251,6 +253,7 @@ zthread_test (bool verbose)
     assert (pipe);
     zstr_send (pipe, "ping");
     char *pong = zstr_recv (pipe);
+    assert (pong);
     assert (streq (pong, "pong"));
     zstr_free (&pong);
 

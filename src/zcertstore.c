@@ -66,14 +66,19 @@ zcertstore_t *
 zcertstore_new (const char *location)
 {
     zcertstore_t *self = (zcertstore_t *) zmalloc (sizeof (zcertstore_t));
-    assert (self);
+    if (!self)
+        return NULL;
 
     self->certs = zring_new ();
-    zring_set_destructor (self->certs, (czmq_destructor *) zcert_destroy);
-    if (location) {
-        self->location = strdup (location);
-        s_load_certs_from_disk (self);
+    if (self->certs) {
+        zring_set_destructor (self->certs, (czmq_destructor *) zcert_destroy);
+        if (location) {
+            self->location = strdup (location);
+            s_load_certs_from_disk (self);
+        }
     }
+    else
+        zcertstore_destroy (&self);
     return self;
 }
 
@@ -226,10 +231,13 @@ zcertstore_test (bool verbose)
 
     //  Load certificate store from disk; it will be empty
     zcertstore_t *certstore = zcertstore_new (TESTDIR);
+    assert (certstore);
 
     //  Create a single new certificate and save to disk
     zcert_t *cert = zcert_new ();
+    assert (cert);
     char *client_key = strdup (zcert_public_txt (cert));
+    assert (client_key);
     zcert_set_meta (cert, "name", "John Doe");
     zcert_save (cert, TESTDIR "/mycert.txt");
     zcert_destroy (&cert);
@@ -246,6 +254,7 @@ zcertstore_test (bool verbose)
 
     //  Delete all test files
     zdir_t *dir = zdir_new (TESTDIR, NULL);
+    assert (dir);
     zdir_remove (dir, true);
     zdir_destroy (&dir);
     //  @end

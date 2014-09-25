@@ -54,30 +54,21 @@ struct _zcert_t {
 zcert_t *
 zcert_new (void)
 {
-    zcert_t *self = (zcert_t *) zmalloc (sizeof (zcert_t));
-    assert (self);
+    byte public_key [32] = { 0 };
+    byte secret_key [32] = { 0 };
 
-    //  Initialize metadata, even if keys aren't working
-    self->metadata = zhash_new ();
-    zhash_set_destructor (self->metadata, (czmq_destructor *) zstr_free);
-    zhash_set_duplicator (self->metadata, (czmq_duplicator *) strdup);
-    
 #if (ZMQ_VERSION_MAJOR == 4)
     if (zsys_has_curve ()) {
-        int rc = zmq_curve_keypair (self->public_txt, self->secret_txt);
-        assert (rc == 0);
-        zmq_z85_decode (self->public_key, self->public_txt);
-        zmq_z85_decode (self->secret_key, self->secret_txt);
+        char public_txt [40];
+        char secret_txt [40];
+        int rc = zmq_curve_keypair (public_txt, secret_txt);
+        if (rc != 0)
+            return NULL;
+        zmq_z85_decode (public_key, public_txt);
+        zmq_z85_decode (secret_key, secret_txt);
     }
-    else {
-        strcpy (self->public_txt, FORTY_ZEROES);
-        strcpy (self->secret_txt, FORTY_ZEROES);
-    }
-#else
-    strcpy (self->public_txt, FORTY_ZEROES);
-    strcpy (self->secret_txt, FORTY_ZEROES);
 #endif
-    return self;
+    return zcert_new_from (public_key, secret_key);
 }
 
 
@@ -88,24 +79,26 @@ zcert_t *
 zcert_new_from (byte *public_key, byte *secret_key)
 {
     zcert_t *self = (zcert_t *) zmalloc (sizeof (zcert_t));
-    assert (self);
+    if (!self)
+        return NULL;
     assert (public_key);
     assert (secret_key);
 
     self->metadata = zhash_new ();
-    zhash_set_destructor (self->metadata, (czmq_destructor *) zstr_free);
-    zhash_set_duplicator (self->metadata, (czmq_duplicator *) strdup);
-    
-    memcpy (self->public_key, public_key, 32);
-    memcpy (self->secret_key, secret_key, 32);
-    
+    if (self->metadata) {
+        zhash_autofree (self->metadata);
+        memcpy (self->public_key, public_key, 32);
+        memcpy (self->secret_key, secret_key, 32);
 #if (ZMQ_VERSION_MAJOR == 4)
-    zmq_z85_encode (self->public_txt, self->public_key, 32);
-    zmq_z85_encode (self->secret_txt, self->secret_key, 32);
+        zmq_z85_encode (self->public_txt, self->public_key, 32);
+        zmq_z85_encode (self->secret_txt, self->secret_key, 32);
 #else
-    strcpy (self->public_txt, FORTY_ZEROES);
-    strcpy (self->secret_txt, FORTY_ZEROES);
+        strcpy (self->public_txt, FORTY_ZEROES);
+        strcpy (self->secret_txt, FORTY_ZEROES);
 #endif
+    }
+    else
+        zcert_destroy (&self);
     return self;
 }
 
@@ -181,7 +174,9 @@ zcert_set_meta (zcert_t *self, const char *name, const char *format, ...)
     va_start (argptr, format);
     char *value = zsys_vprintf (format, argptr);
     va_end (argptr);
-    zhash_insert (self->metadata, (char *)name, value);
+    assert (value);
+    zhash_insert (self->metadata, name, value);
+    free (value);
 }
 
 
@@ -193,7 +188,7 @@ char *
 zcert_meta (zcert_t *self, const char *name)
 {
     assert (self);
-    return (char *) zhash_lookup (self->metadata, (char *)name);
+    return (char *) zhash_lookup (self->metadata, name);
 }
 
 
@@ -261,11 +256,13 @@ s_save_metadata_all (zcert_t *self)
 {
     zconfig_destroy (&self->config);
     self->config = zconfig_new ("root", NULL);
+    assert (self->config);
     zconfig_t *section = zconfig_new ("metadata", self->config);
     
     char *value = (char *) zhash_first (self->metadata);
     while (value) {
         zconfig_t *item = zconfig_new ((char *) zhash_cursor (self->metadata), section);
+        assert (item);
         zconfig_set_value (item, "%s", value);
         value = (char *) zhash_next (self->metadata);
     }
@@ -371,7 +368,7 @@ zcert_dup (zcert_t *self)
         if (copy) {
             zhash_destroy (&copy->metadata);
             copy->metadata = zhash_dup (self->metadata);
-            if (copy->metadata == NULL)
+            if (!copy->metadata)
                 zcert_destroy (&copy);
         }
         return copy;
@@ -451,6 +448,7 @@ zcert_test (bool verbose)
     
     //  Create a simple certificate with metadata
     zcert_t *cert = zcert_new ();
+    assert (cert);
     zcert_set_meta (cert, "email", "ph@imatix.com");
     zcert_set_meta (cert, "name", "Pieter Hintjens");
     zcert_set_meta (cert, "organization", "iMatix Corporation");
@@ -489,6 +487,7 @@ zcert_test (bool verbose)
     
     //  Delete all test files
     zdir_t *dir = zdir_new (TESTDIR, NULL);
+    assert (dir);
     zdir_remove (dir, true);
     zdir_destroy (&dir);
     //  @end

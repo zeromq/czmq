@@ -60,9 +60,10 @@ zbeacon_new (zctx_t *ctx, int port_nbr)
 {
     assert (ctx);
     zbeacon_t *self = (zbeacon_t *) zmalloc (sizeof (zbeacon_t));
-    
+    if (!self)
+        return NULL;
+
     //  Start background agent and wait for it to initialize
-    assert (self);
     self->pipe = zthread_fork (ctx, s_agent_task, NULL);
     if (self->pipe) {
         zstr_sendf (self->pipe, "%d", port_nbr);
@@ -73,10 +74,8 @@ zbeacon_new (zctx_t *ctx, int port_nbr)
             self = NULL;
         }
     }
-    else {
-        free (self);
-        self = NULL;
-    }
+    else
+        zbeacon_destroy (&self);
     return self;
 }
 
@@ -90,9 +89,11 @@ zbeacon_destroy (zbeacon_t **self_p)
     assert (self_p);
     if (*self_p) {
         zbeacon_t *self = *self_p;
-        zstr_send (self->pipe, "TERMINATE");
-        char *reply = zstr_recv (self->pipe);
-        zstr_free (&reply);
+        if (self->pipe) {
+            zstr_send (self->pipe, "TERMINATE");
+            char *reply = zstr_recv (self->pipe);
+            zstr_free (&reply);
+        }
         free (self->hostname);
         free (self);
         *self_p = NULL;
@@ -133,6 +134,7 @@ zbeacon_publish (zbeacon_t *self, byte *transmit, size_t size)
     assert (transmit);
     assert (size > 0 && size <= UDP_FRAME_MAX);
     zmsg_t *msg = zmsg_new ();
+    assert (msg);
     zmsg_addstr (msg, "PUBLISH");
     zmsg_addmem (msg, transmit, size);
     zmsg_send (&msg, self->pipe);
@@ -159,6 +161,7 @@ zbeacon_subscribe (zbeacon_t *self, byte *filter, size_t size)
     assert (self);
     assert (size <= UDP_FRAME_MAX);
     zmsg_t *msg = zmsg_new ();
+    assert (msg);
     zmsg_addstr (msg, "SUBSCRIBE");
     zmsg_addmem (msg, filter, size);
     zmsg_send (&msg, self->pipe);
@@ -282,7 +285,8 @@ static agent_t *
 s_agent_new (void *pipe, int port_nbr)
 {
     agent_t *self = (agent_t *) zmalloc (sizeof (agent_t));
-    assert (self);
+    if (!self)
+        return NULL;
     
     self->pipe = pipe;
     self->port_nbr = port_nbr;
@@ -349,6 +353,7 @@ s_get_interface (agent_t *self)
     }
     else {
         ziflist_t *iflist = ziflist_new ();
+        assert (iflist);
         const char *name = ziflist_first (iflist);
         if (*iface) {
             while (name) {
@@ -448,6 +453,7 @@ s_beacon_recv (agent_t *self)
     //  If still a valid beacon, send on to the API
     if (is_valid) {
         zmsg_t *msg = zmsg_new ();
+        assert (msg);
         zmsg_addstr (msg, peername);
         zmsg_add (msg, frame);
         zmsg_send (&msg, self->pipe);
@@ -488,6 +494,7 @@ zbeacon_v2_test (bool verbose)
     //  @selftest
     //  Create beacon to broadcast our service
     zctx_t *ctx = zctx_new ();
+    assert (ctx);
     zbeacon_t *service_beacon = zbeacon_new (ctx, 9999);
     if (service_beacon == NULL) {
         printf ("OK (skipping test, no UDP discovery)\n");
@@ -495,6 +502,7 @@ zbeacon_v2_test (bool verbose)
     }
     //  Create a service socket and bind to an ephemeral port
     zsock_t *service = zsock_new (ZMQ_PUB);
+    assert (service);
     int port_nbr = zsock_bind (service, "tcp://127.0.0.1:*");
     byte announcement [2] = { (port_nbr >> 8) & 0xFF, port_nbr & 0xFF };
     zbeacon_set_interval (service_beacon, 100);
@@ -502,6 +510,7 @@ zbeacon_v2_test (bool verbose)
 
     //  Create beacon to lookup service
     zbeacon_t *client_beacon = zbeacon_new (ctx, 9999);
+    assert (client_beacon);
     zbeacon_subscribe (client_beacon, NULL, 0);
 
     //  Wait for at most 1/2 second if there's no broadcast networking
@@ -521,8 +530,11 @@ zbeacon_v2_test (bool verbose)
     zbeacon_destroy (&service_beacon);
 
     zbeacon_t *node1 = zbeacon_new (ctx, 5670);
+    assert (node1);
     zbeacon_t *node2 = zbeacon_new (ctx, 5670);
+    assert (node2);
     zbeacon_t *node3 = zbeacon_new (ctx, 5670);
+    assert (node3);
 
     assert (*zbeacon_hostname (node1));
     assert (*zbeacon_hostname (node2));
@@ -542,6 +554,7 @@ zbeacon_v2_test (bool verbose)
         zbeacon_socket (node1),
         zbeacon_socket (node2),
         zbeacon_socket (node3), NULL);
+    assert (poller);
 
     int64_t stop_at = zclock_mono () + 1000;
     while (zclock_mono () < stop_at) {

@@ -41,10 +41,9 @@ struct _zmutex_t {
 zmutex_t *
 zmutex_new (void)
 {
-    zmutex_t
-        *self;
-
-    self = (zmutex_t *) zmalloc (sizeof (zmutex_t));
+    zmutex_t *self = (zmutex_t *) zmalloc (sizeof (zmutex_t));
+    if (!self)
+        return NULL;
 #if defined (__UNIX__)
     if (pthread_mutex_init (&self->mutex, NULL) != 0) {
         free (self);
@@ -139,6 +138,7 @@ zmutex_test (bool verbose)
 
     //  @selftest
     zmutex_t *mutex = zmutex_new ();
+    assert (mutex);
     zmutex_lock (mutex);
     zmutex_unlock (mutex);
     zmutex_destroy (&mutex);

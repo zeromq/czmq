@@ -215,24 +215,20 @@ zloop_new (void)
         *self;
 
     self = (zloop_t *) zmalloc (sizeof (zloop_t));
-    if (self) {
-        self->readers = zlist_new ();
+    if (!self)
+        return NULL;
+
+    self->readers = zlist_new ();
+    if (self->readers)
         self->pollers = zlist_new ();
+    if (self->pollers)
         self->timers  = zlist_new ();
+    if (self->timers)
         self->zombies = zlist_new ();
+    if (self->zombies)
         self->last_timer_id = 0;
-        if (!self->readers
-        ||  !self->pollers
-        ||  !self->timers
-        ||  !self->zombies) {
-            zlist_destroy (&self->readers);
-            zlist_destroy (&self->pollers);
-            zlist_destroy (&self->timers);
-            zlist_destroy (&self->zombies);
-            free (self);
-            return NULL;
-        }
-    }
+    else
+        zloop_destroy (&self);
     return self;
 }
 

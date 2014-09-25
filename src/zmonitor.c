@@ -39,16 +39,6 @@ typedef struct {
     bool verbose;               //  Verbose logging enabled?
 } self_t;
 
-static self_t *
-s_self_new (zsock_t *pipe, void *sock)
-{
-    self_t *self = (self_t *) zmalloc (sizeof (self_t));
-    self->pipe = pipe;
-    self->monitored = zsock_resolve (sock);
-    self->poller = zpoller_new (self->pipe, NULL);
-    return self;
-}
-
 static void
 s_self_destroy (self_t **self_p)
 {
@@ -63,6 +53,21 @@ s_self_destroy (self_t **self_p)
         free (self);
         *self_p = NULL;
     }
+}
+
+static self_t *
+s_self_new (zsock_t *pipe, void *sock)
+{
+    self_t *self = (self_t *) zmalloc (sizeof (self_t));
+    if (!self)
+        return NULL;
+
+    self->pipe = pipe;
+    self->monitored = zsock_resolve (sock);
+    self->poller = zpoller_new (self->pipe, NULL);
+    if (!self->poller)
+        s_self_destroy (&self);
+    return self;
 }
 
 
@@ -274,6 +279,7 @@ void
 zmonitor (zsock_t *pipe, void *sock)
 {
     self_t *self = s_self_new (pipe, sock);
+    assert (self);
     //  Signal successful initialization
     zsock_signal (pipe, 0);
 
@@ -318,6 +324,7 @@ zmonitor_test (bool verbose)
 #if defined (ZMQ_EVENT_ALL)
     //  @selftest
     zsock_t *client = zsock_new (ZMQ_DEALER);
+    assert (client);
     zactor_t *clientmon = zactor_new (zmonitor, client);
     assert (clientmon);
     if (verbose)
@@ -327,6 +334,7 @@ zmonitor_test (bool verbose)
     zsock_wait (clientmon);
 
     zsock_t *server = zsock_new (ZMQ_DEALER);
+    assert (server);
     zactor_t *servermon = zactor_new (zmonitor, server);
     assert (servermon);
     if (verbose)

@@ -105,8 +105,10 @@ zactor_new (zactor_fn *actor, void *args)
     self->tag = ZACTOR_TAG;
 
     shim_t *shim = (shim_t *) zmalloc (sizeof (shim_t));
-    if (!shim)
+    if (!shim) {
+        zactor_destroy (&self);
         return NULL;
+    }
 
     //  Create front-to-back pipe pair
     self->pipe = zsock_new (ZMQ_PAIR);

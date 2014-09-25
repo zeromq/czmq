@@ -46,17 +46,23 @@ zpoller_t *
 zpoller_new (void *reader, ...)
 {
     zpoller_t *self = (zpoller_t *) zmalloc (sizeof (zpoller_t));
-    assert (self);
-    self->reader_list = zlist_new ();
-    self->need_rebuild = true;
+    if (self) {
+        self->reader_list = zlist_new ();
+        if (self->reader_list) {
+            self->need_rebuild = true;
 
-    va_list args;
-    va_start (args, reader);
-    while (reader) {
-        zlist_append (self->reader_list, reader);
-        reader = va_arg (args, void *);
+            va_list args;
+            va_start (args, reader);
+            while (reader) {
+                if (zlist_append (self->reader_list, reader) == -1) {
+                    zpoller_destroy (&self);
+                    break;
+                }
+                reader = va_arg (args, void *);
+            }
+            va_end (args);
+        }
     }
-    va_end (args);
     return self;
 }
 
@@ -225,13 +231,17 @@ zpoller_test (bool verbose)
     //  @selftest
     //  Create a few sockets
     zsock_t *vent = zsock_new (ZMQ_PUSH);
+    assert (vent);
     int port_nbr = zsock_bind (vent, "tcp://127.0.0.1:*");
     assert (port_nbr != -1);
     zsock_t *sink = zsock_new (ZMQ_PULL);
+    assert (sink);
     int rc = zsock_connect (sink, "tcp://127.0.0.1:%d", port_nbr);
     assert (rc != -1);
     zsock_t *bowl = zsock_new (ZMQ_PULL);
+    assert (bowl);
     zsock_t *dish = zsock_new (ZMQ_PULL);
+    assert (dish);
 
     //  Set-up poller
     zpoller_t *poller = zpoller_new (bowl, dish, NULL);

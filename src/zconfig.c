@@ -93,6 +93,9 @@ zconfig_t *
 zconfig_new (const char *name, zconfig_t *parent)
 {
     zconfig_t *self = (zconfig_t *) zmalloc (sizeof (zconfig_t));
+    if (!self)
+        return NULL;
+
     zconfig_set_name (self, name);
     if (parent) {
         if (parent->child) {
@@ -122,10 +125,8 @@ zconfig_destroy (zconfig_t **self_p)
         zconfig_t *self = *self_p;
 
         //  Destroy all children and siblings recursively
-        if (self->child)
-            zconfig_destroy (&self->child);
-        if (self->next)
-            zconfig_destroy (&self->next);
+        zconfig_destroy (&self->child);
+        zconfig_destroy (&self->next);
 
         //  Destroy other properties and then self
         zlist_destroy (&self->comments);
@@ -192,6 +193,7 @@ zconfig_put (zconfig_t *self, const char *path, const char *value)
     }
     //  This segment doesn't exist, create it
     child = zconfig_new (path, self);
+    assert (child);
     child->name [length] = 0;
     if (slash)                  //  Recurse down further
         zconfig_put (child, slash, value);
@@ -368,6 +370,7 @@ zconfig_load (const char *filename)
     //  Load entire file into memory as a chunk, then process it
     zconfig_t *self = NULL;
     zfile_t *file = zfile_new (NULL, filename);
+    assert (file);
     if (zfile_input (file) == 0) {
         zchunk_t *chunk = zfile_read (file, zfile_cursize (file), 0);
         if (chunk) {
@@ -510,6 +513,7 @@ zconfig_chunk_load (zchunk_t *chunk)
 {
     //  Parse the chunk line by line
     zconfig_t *self = zconfig_new ("root", NULL);
+    assert (self);
     bool valid = true;
     int lineno = 0;
     char *data_ptr = (char *) zchunk_data (chunk);
@@ -544,6 +548,7 @@ zconfig_chunk_load (zchunk_t *chunk)
         if (cur_line [0] == '#') {
             if (!self->comments) {
                 self->comments = zlist_new ();
+                assert (self->comments);
                 zlist_autofree (self->comments);
             }
             zlist_append (self->comments, cur_line + 1);
@@ -569,6 +574,7 @@ zconfig_chunk_load (zchunk_t *chunk)
                 zconfig_t *parent = zconfig_at_depth (self, level);
                 if (parent) {
                     zconfig_t *item = zconfig_new (name, parent);
+                    assert (item);
                     item->value = value;
                 }
                 else {
@@ -765,6 +771,7 @@ zconfig_set_comment (zconfig_t *self, const char *format, ...)
     if (format) {
         if (!self->comments) {
             self->comments = zlist_new ();
+            assert (self->comments);
             zlist_autofree (self->comments);
         }
         va_list argptr;
@@ -825,12 +832,16 @@ zconfig_test (bool verbose)
     zsys_dir_create (TESTDIR);
     
     zconfig_t *root = zconfig_new ("root", NULL);
+    assert (root);
     zconfig_t *section, *item;
     
     section = zconfig_new ("headers", root);
+    assert (section);
     item = zconfig_new ("email", section);
+    assert (item);
     zconfig_set_value (item, "some@random.com");
     item = zconfig_new ("name", section);
+    assert (item);
     zconfig_set_value (item, "Justin Kayce");
     zconfig_put (root, "/curve/secret-key", "Top Secret");
     zconfig_set_comment (root, "   CURVE certificate");
@@ -859,10 +870,14 @@ zconfig_test (bool verbose)
 
     //  Test chunk load/save
     root = zconfig_new ("root", NULL);
+    assert (root);
     section = zconfig_new ("section", root);
+    assert (section);
     item = zconfig_new ("value", section);
+    assert (item);
     zconfig_set_value (item, "somevalue");
     zchunk_t *chunk = zconfig_chunk_save (root);
+    assert (chunk);
     zconfig_destroy (&root);
     
     root = zconfig_chunk_load (chunk);
@@ -881,6 +896,7 @@ zconfig_test (bool verbose)
     
     //  Delete all test files
     zdir_t *dir = zdir_new (TESTDIR, NULL);
+    assert (dir);
     zdir_remove (dir, true);
     zdir_destroy (&dir);
     //  @end

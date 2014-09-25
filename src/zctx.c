@@ -73,9 +73,7 @@ zctx_new (void)
     self->sockets = zlist_new ();
     self->mutex = zmutex_new ();
     if (!self->sockets || !self->mutex) {
-        zlist_destroy (&self->sockets);
-        zmutex_destroy (&self->mutex);
-        free (self);
+        zctx_destroy (&self);
         return NULL;
     }
     self->iothreads = 1;
@@ -103,8 +101,9 @@ zctx_destroy (zctx_t **self_p)
         zctx_t *self = *self_p;
 
         //  Destroy all sockets
-        while (zlist_size (self->sockets))
-            zctx__socket_destroy (self, zlist_first (self->sockets));
+        if (self->sockets)
+            while (zlist_size (self->sockets))
+                zctx__socket_destroy (self, zlist_first (self->sockets));
         zlist_destroy (&self->sockets);
         zmutex_destroy (&self->mutex);
 
@@ -132,26 +131,14 @@ zctx_shadow (zctx_t *ctx)
         if (!ctx->context)
             return NULL;
     }
-    //  Shares same 0MQ context but has its own list of sockets so that
-    //  we create, use, and destroy sockets only within a single thread.
-    zctx_t *self = (zctx_t *) zmalloc (sizeof (zctx_t));
-    if (!self)
-        return NULL;
-
-    self->sockets = zlist_new ();
-    self->mutex = zmutex_new ();
-    if (!self->sockets || !self->mutex) {
-        zlist_destroy (&self->sockets);
-        zmutex_destroy (&self->mutex);
-        free (self);
-        return NULL;
+    zctx_t *self = zctx_shadow_zmq_ctx (ctx->context);
+    if (self) {
+        // copy high water marks and linger from old context
+        self->pipehwm = ctx->pipehwm;
+        self->sndhwm = ctx->sndhwm;
+        self->rcvhwm = ctx->rcvhwm;
+        self->linger = ctx->linger;
     }
-    self->context = ctx->context;
-    self->pipehwm = ctx->pipehwm;
-    self->sndhwm = ctx->sndhwm;
-    self->rcvhwm = ctx->rcvhwm;
-    self->linger = ctx->linger;
-    self->shadow = true;             //  This is a shadow context
     return self;
 }
 
@@ -169,19 +156,17 @@ zctx_shadow_zmq_ctx (void *zmqctx)
     if (!self)
         return NULL;
 
+    self->shadow = true;             //  This is a shadow context
     self->sockets = zlist_new ();
     self->mutex = zmutex_new ();
     if (!self->sockets || !self->mutex) {
-        zlist_destroy (&self->sockets);
-        zmutex_destroy (&self->mutex);
-        free (self);
+        zctx_destroy (&self);
         return NULL;
     }
     self->context = zmqctx;
     self->pipehwm = 1000;   
     self->sndhwm = 1000;
     self->rcvhwm = 1000;
-    self->shadow = true;             //  This is a shadow context
     return self;
 }
 
@@ -378,17 +363,29 @@ zctx_test (bool verbose)
     zctx_set_iothreads (ctx, 1);
     zctx_set_linger (ctx, 5);       //  5 msecs
     void *s1 = zctx__socket_new (ctx, ZMQ_PAIR);
+    assert (s1);
     void *s2 = zctx__socket_new (ctx, ZMQ_XREQ);
+    assert (s2);
     void *s3 = zctx__socket_new (ctx, ZMQ_REQ);
+    assert (s3);
     void *s4 = zctx__socket_new (ctx, ZMQ_REP);
+    assert (s4);
     void *s5 = zctx__socket_new (ctx, ZMQ_PUB);
+    assert (s5);
     void *s6 = zctx__socket_new (ctx, ZMQ_SUB);
-    zsocket_connect (s1, "tcp://127.0.0.1:5555");
-    zsocket_connect (s2, "tcp://127.0.0.1:5555");
-    zsocket_connect (s3, "tcp://127.0.0.1:5555");
-    zsocket_connect (s4, "tcp://127.0.0.1:5555");
-    zsocket_connect (s5, "tcp://127.0.0.1:5555");
-    zsocket_connect (s6, "tcp://127.0.0.1:5555");
+    assert (s6);
+    int rc = zsocket_connect (s1, "tcp://127.0.0.1:5555");
+    assert (rc == 0);
+    rc = zsocket_connect (s2, "tcp://127.0.0.1:5555");
+    assert (rc == 0);
+    rc = zsocket_connect (s3, "tcp://127.0.0.1:5555");
+    assert (rc == 0);
+    rc = zsocket_connect (s4, "tcp://127.0.0.1:5555");
+    assert (rc == 0);
+    rc = zsocket_connect (s5, "tcp://127.0.0.1:5555");
+    assert (rc == 0);
+    rc = zsocket_connect (s6, "tcp://127.0.0.1:5555");
+    assert (rc == 0);
     assert (zctx_underlying (ctx));
     zctx_destroy (&ctx);
     //  @end

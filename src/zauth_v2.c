@@ -53,7 +53,8 @@ zauth_t *
 zauth_new (zctx_t *ctx)
 {
     zauth_t *self = (zauth_t *) zmalloc (sizeof (zauth_t));
-    assert (self);
+    if (!self)
+        return NULL;
 
     //  Start background agent and wait for it to initialize
     assert (ctx);
@@ -65,8 +66,7 @@ zauth_new (zctx_t *ctx)
         zstr_free (&status);
     }
     else {
-        free (self);
-        self = NULL;
+        zauth_destroy (&self);
     }
     return self;
 }
@@ -205,6 +205,27 @@ typedef struct {
 } zap_request_t;
 
 
+static void
+zap_request_destroy (zap_request_t **self_p)
+{
+    assert (self_p);
+    if (*self_p) {
+        zap_request_t *self = *self_p;
+        free (self->version);
+        free (self->sequence);
+        free (self->domain);
+        free (self->address);
+        free (self->identity);
+        free (self->mechanism);
+        free (self->username);
+        free (self->password);
+        free (self->client_key);
+        free (self->principal);
+        free (self);
+        *self_p = NULL;
+    }
+}
+
 //  Receive a valid ZAP request from the handler socket
 //  If the request was not valid, returns NULL.
 
@@ -213,11 +234,16 @@ zap_request_new (void *handler)
 {
 #if (ZMQ_VERSION_MAJOR == 4)
     zap_request_t *self = (zap_request_t *) zmalloc (sizeof (zap_request_t));
-    assert (self);
+    if (!self)
+        return NULL;
 
     //  Store handler socket so we can send a reply easily
     self->handler = handler;
     zmsg_t *request = zmsg_recv (handler);
+    if (!request) {
+        zap_request_destroy (&self);
+        return NULL;
+    }
 
     //  Get all standard frames off the handler socket
     self->version = zmsg_popstr (request);
@@ -255,27 +281,6 @@ zap_request_new (void *handler)
 }
 
 
-static void
-zap_request_destroy (zap_request_t **self_p)
-{
-    assert (self_p);
-    if (*self_p) {
-        zap_request_t *self = *self_p;
-        free (self->version);
-        free (self->sequence);
-        free (self->domain);
-        free (self->address);
-        free (self->identity);
-        free (self->mechanism);
-        free (self->username);
-        free (self->password);
-        free (self->client_key);
-        free (self->principal);
-        free (self);
-        *self_p = NULL;
-    }
-}
-
 //  Send a ZAP reply to the handler socket
 
 static int
@@ -306,26 +311,6 @@ typedef struct {
     bool terminated;            //  Did API ask us to quit?
 } agent_t;
 
-static agent_t *
-s_agent_new (zctx_t *ctx, void *pipe)
-{
-    agent_t *self = (agent_t *) zmalloc (sizeof (agent_t));
-    self->ctx = ctx;
-    self->pipe = pipe;
-    self->whitelist = zhash_new ();
-    self->blacklist = zhash_new ();
-
-    //  Create ZAP handler and get ready for requests
-    self->handler = zsocket_new (self->ctx, ZMQ_REP);
-    if (self->handler
-    &&  zsocket_bind (self->handler, ZAP_ENDPOINT) == 0)
-        zstr_send (self->pipe, "OK");
-    else
-        zstr_send (self->pipe, "ERROR");
-
-    return self;
-}
-
 static void
 s_agent_destroy (agent_t **self_p)
 {
@@ -343,6 +328,34 @@ s_agent_destroy (agent_t **self_p)
     }
 }
 
+static agent_t *
+s_agent_new (zctx_t *ctx, void *pipe)
+{
+    agent_t *self = (agent_t *) zmalloc (sizeof (agent_t));
+    if (!self)
+        return NULL;
+
+    self->ctx = ctx;
+    self->pipe = pipe;
+    self->whitelist = zhash_new ();
+    if (self->whitelist)
+        self->blacklist = zhash_new ();
+
+    //  Create ZAP handler and get ready for requests
+    if (self->blacklist)
+        self->handler = zsocket_new (self->ctx, ZMQ_REP);
+    if (self->handler) {
+        if (zsocket_bind (self->handler, ZAP_ENDPOINT) == 0)
+            zstr_send (self->pipe, "OK");
+        else
+            zstr_send (self->pipe, "ERROR");
+    }
+    else
+        s_agent_destroy (&self);
+
+    return self;
+}
+
 //  Handle a message from front-end API
 
 static int
@@ -350,9 +363,13 @@ s_agent_handle_pipe (agent_t *self)
 {
     //  Get the whole message off the pipe in one go
     zmsg_t *request = zmsg_recv (self->pipe);
-    char *command = zmsg_popstr (request);
-    if (!command)
+    if (!request)
         return -1;                  //  Interrupted
+    char *command = zmsg_popstr (request);
+    if (!command) {
+        zmsg_destroy (&request);
+        return -1;                  //  Interrupted
+    }
 
     if (streq (command, "ALLOW")) {
         char *address = zmsg_popstr (request);
@@ -571,14 +588,15 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
         return;
 
     zpoller_t *poller = zpoller_new (self->pipe, self->handler, NULL);
-    while (!zpoller_terminated (poller) && !self->terminated) {
-        void *which = zpoller_wait (poller, -1);
-        if (which == self->pipe)
-            s_agent_handle_pipe (self);
-        else
-        if (which == self->handler)
-            s_agent_authenticate (self);
-    }
+    if (poller)
+        while (!zpoller_terminated (poller) && !self->terminated) {
+            void *which = zpoller_wait (poller, -1);
+            if (which == self->pipe)
+                s_agent_handle_pipe (self);
+            else
+                if (which == self->handler)
+                    s_agent_authenticate (self);
+        }
     //  Done, free all agent resources
     zpoller_destroy (&poller);
     s_agent_destroy (&self);
@@ -604,7 +622,9 @@ s_can_connect (zctx_t *ctx, void **server, void **client)
     zsocket_destroy (ctx, *client);
     zsocket_destroy (ctx, *server);
     *server = zsocket_new (ctx, ZMQ_PUSH);
+    assert (*server);
     *client = zsocket_new (ctx, ZMQ_PULL);
+    assert (*client);
     return success;
 }
 #endif
@@ -627,6 +647,7 @@ zauth_v2_test (bool verbose)
 
     //  Install the authenticator
     zctx_t *ctx = zctx_new ();
+    assert (ctx);
     zauth_t *auth = zauth_new (ctx);
     assert (auth);
     zauth_set_verbose (auth, verbose);
@@ -634,7 +655,9 @@ zauth_v2_test (bool verbose)
     //  A default NULL connection should always success, and not
     //  go through our authentication infrastructure at all.
     void *server = zsocket_new (ctx, ZMQ_PUSH);
+    assert (server);
     void *client = zsocket_new (ctx, ZMQ_PULL);
+    assert (client);
     bool success = s_can_connect (ctx, &server, &client);
     assert (success);
 
@@ -687,7 +710,9 @@ zauth_v2_test (bool verbose)
         //  certificate on disk; in a real case we'd transfer this securely
         //  from the client machine to the server machine.
         zcert_t *server_cert = zcert_new ();
+        assert (server_cert);
         zcert_t *client_cert = zcert_new ();
+        assert (client_cert);
         char *server_key = zcert_public_txt (server_cert);
 
         //  Test without setting-up any authentication
@@ -729,6 +754,7 @@ zauth_v2_test (bool verbose)
 
     //  Delete all test files
     zdir_t *dir = zdir_new (TESTDIR, NULL);
+    assert (dir);
     zdir_remove (dir, true);
     zdir_destroy (&dir);
     //  @end
