@@ -64,10 +64,13 @@ int main (int argc, char *argv [])
     zproxy_test (verbose);
     zmonitor_test (verbose);
     zbeacon_test (verbose);
+    zpubsub_test (verbose);
+    zpubsub_option_test (verbose);
     zgossip_test (verbose);
     zcert_test (verbose);
     zcertstore_test (verbose);
     zauth_test (verbose);
+    ztimeout_test(verbose);
 
     //  Deprecated V2 classes
     zauth_v2_test (verbose);

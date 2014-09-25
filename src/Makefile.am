@@ -32,12 +32,15 @@ include_HEADERS = \
     ../include/zmsg.h \
     ../include/zpoller.h \
     ../include/zproxy.h \
+    ../include/zpubsub.h \
+    ../include/zpubsub_option.h \
     ../include/zrex.h \
     ../include/zring.h \
     ../include/zsock.h \
     ../include/zsock_option.h \
     ../include/zstr.h \
     ../include/zsys.h \
+    ../include/ztimeout.h \
     ../include/zuuid.h \
     ../src/zgossip_msg.h \
     ../include/zauth_v2.h \
@@ -76,12 +79,15 @@ libczmq_la_SOURCES = \
     zmsg.c \
     zpoller.c \
     zproxy.c \
+    zpubsub.c \
+    zpubsub_option.c \
     zrex.c \
     zring.c \
     zsock.c \
     zsock_option.c \
     zstr.c \
     zsys.c \
+    ztimeout.c \
     zuuid.c \
     zgossip_msg.c \
     zauth_v2.c \

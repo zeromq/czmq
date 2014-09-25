@@ -72,15 +72,15 @@ zrex_t *
 zrex_new (const char *expression)
 {
     zrex_t *self = (zrex_t *) zmalloc (sizeof (zrex_t));
-    assert (self);
-
-    self->strerror = "No error";
-    if (expression) {
-        //  Returns 1 on success, 0 on failure
-        self->valid = (slre_compile (&self->slre, expression) == 1);
-        if (!self->valid)
-            self->strerror = self->slre.err_str;
-        assert (self->slre.num_caps < MAX_HITS);
+    if (self) {
+        self->strerror = "No error";
+        if (expression) {
+            //  Returns 1 on success, 0 on failure
+            self->valid = (slre_compile (&self->slre, expression) == 1);
+            if (!self->valid)
+                self->strerror = self->slre.err_str;
+            assert (self->slre.num_caps < MAX_HITS);
+        }
     }
     return self;
 }
@@ -153,6 +153,8 @@ zrex_matches (zrex_t *self, const char *text)
         for (index = 0; index < self->hits; index++)
             hit_set_len += self->caps [index].len + 1;
         self->hit_set = (char *) zmalloc (hit_set_len);
+        // FIXME: no way to return an error
+        assert (self->hit_set);
 
         //  Now prepare hit strings for access by caller
         char *hit_set_ptr = self->hit_set;
@@ -282,6 +284,7 @@ zrex_test (bool verbose)
     //  This shows the pattern of matching one line against many
     //  patterns and then handling the case when it hits
     rex = zrex_new (NULL);      //  No initial pattern
+    assert (rex);
     char *input = "Mechanism: CURVE";
     matches = zrex_eq (rex, input, "Version: (.+)");
     assert (!matches);
