@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zpubsub - simple pubsub framework 
+    zpubsub - simple pubsub framework
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -32,41 +32,23 @@ typedef struct {
 typedef dbyte (zpubsub_port_fn) (int domain);
 
 //  Subscribers get a callback when a sample is available
-typedef void (zpubsub_sample_fn) (const char *topic, const char *partition, void *sample);
-
-//  Publishers get a callback to serialize the filter data to a byte array. If NULL is passed for data,
-//  or size is too small to hold the serialized data, the function shall return the required size. Upon
-//  successful serialization, the size of the serialized data shall be returned.
-typedef int (zpubsub_serialize_filter_fn) (zpubsub_filter_t *filter, byte *data, int size);
-
-//  Subscribers get a callback to deserialize filter data from a byte array. If deserialization fails, -1
-//  shall be returned. Upon successful deserialization, 0 shall be returned.
-typedef int (zpubsub_deserialize_filter_fn) (byte *data, int size, zpubsub_filter_t **filter);
-
-//  Publishers get a callback to serialize the message data to a byte array. If NULL is passed for data,
-//  or size is too small to hold the serialized data, the function shall return the required size. Upon
-//  successful serialization, the size of the serialized data shall be returned.
-typedef int (zpubsub_serialize_message_fn) (const char *topic, const char *partition, void *message, byte *data, int size);
-
-//  Subscribers get a callback to deserialize message data from a byte array. If deserialization fails, -1
-//  shall be returned. Upon successful deserialization, 0 shall be returned.
-typedef int (zpubsub_deserialize_message_fn) (const char *topic, const char *partition, void *args, byte *data, int size, void **message);
+typedef void (zpubsub_sample_fn) (const char *topic, const char *partition, void *args, byte *sample, size_t size);
 
 //  Create a new pubsub, passing functions to use for serializing and deserializing filters.
 CZMQ_EXPORT zpubsub_t *
-    zpubsub_new (int domain, const char* partition, zpubsub_serialize_filter_fn *serialize_fn, zpubsub_deserialize_filter_fn *deserialize_fn);
+    zpubsub_new (int domain, const char* partition);
 
 //  Publish a message on a given topic.
 CZMQ_EXPORT void
-    zpubsub_publish(zpubsub_t *self, char *topic, char *partition, void *message, zpubsub_serialize_message_fn *serialize_fn);
+    zpubsub_publish(zpubsub_t *self, const char *topic, const char *partition, byte *message, size_t size);
 
 //  Subscribe to messages on a given topic.
 CZMQ_EXPORT void
-    zpubsub_subscribe(zpubsub_t *self, char *topic, char *partition, void *args, zpubsub_deserialize_message_fn *deserialize_fn, zpubsub_sample_fn *sample_fn);
+    zpubsub_subscribe(zpubsub_t *self, const char *topic, const char *partition, void *args, zpubsub_sample_fn *sample_fn);
 
 //  Unsubscribe from messages on a given topic.
 CZMQ_EXPORT void
-    zpubsub_unsubscribe(zpubsub_t *self, char *topic, char *partition);
+    zpubsub_unsubscribe(zpubsub_t *self, const char *topic, const char *partition);
 
 //  Destroy a pubsub instance.
 CZMQ_EXPORT void
