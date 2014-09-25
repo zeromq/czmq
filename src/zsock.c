@@ -845,7 +845,7 @@ zsock_resolve (void *self)
 #ifdef _WIN32
         int sock_type_size = sizeof (int);
 #else
-        socklen_t size = sizeof (socklen_t);
+        socklen_t sock_type_size = sizeof (socklen_t);
 #endif
         const int rc = getsockopt(*(SOCKET *)self, SOL_SOCKET, SO_TYPE, (char *) &sock_type, &sock_type_size);
         if (rc == 0)
