@@ -67,18 +67,7 @@ zlist_destroy (zlist_t **self_p)
     assert (self_p);
     if (*self_p) {
         zlist_t *self = *self_p;
-        node_t *node = (*self_p)->head;
-        while (node) {
-            node_t *next = node->next;
-            if (self->destructor)
-                (self->destructor) (&node->item);
-            else
-            if (node->free_fn)
-                (node->free_fn) (node->item);
-            
-            free (node);
-            node = next;
-        }
+        zlist_purge (self);
         free (self);
         *self_p = NULL;
     }
@@ -323,6 +312,32 @@ zlist_dup (zlist_t *self)
         }
     }
     return copy;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Purge all items from list
+
+void
+zlist_purge (zlist_t *self)
+{
+    assert (self);
+    node_t *node = self->head;
+    while (node) {
+      node_t *next = node->next;
+      if (self->destructor)
+        (self->destructor) (&node->item);
+      else
+        if (node->free_fn)
+          (node->free_fn) (node->item);
+
+      free (node);
+      node = next;
+    }
+    self->head = NULL;
+    self->tail = NULL;
+    self->cursor = NULL;
+    self->size = 0;
 }
 
 
