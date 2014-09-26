@@ -330,7 +330,7 @@ s_dump (ztimeout_t *self)
         ztimeout_node_t *node = (ztimeout_node_t*)zring_first (self->bucket [i]);
         while (node) {
             printf (" %ld,", node->time - now);
-            node = zring_next (self->bucket [i]);
+            node = (ztimeout_node_t*)zring_next (self->bucket [i]);
         }
         printf ("\n");
     }
