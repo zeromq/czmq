@@ -125,6 +125,27 @@ zhash_new (void)
 
 
 //  --------------------------------------------------------------------------
+//  Purge all items from a hash table
+
+static void
+s_purge (zhash_t *self)
+{
+    uint index;
+    size_t limit = primes [self->prime_index];
+        
+    for (index = 0; index < limit; index++) {
+        //  Destroy all items in this hash bucket
+        item_t *cur_item = self->items [index];
+        while (cur_item) {
+            item_t *next_item = cur_item->next;
+            s_item_destroy (self, cur_item, true);
+            cur_item = next_item;
+        }
+        self->items [index] = NULL;
+    }
+}
+
+//  --------------------------------------------------------------------------
 //  Hash table destructor
 
 void
@@ -133,20 +154,10 @@ zhash_destroy (zhash_t **self_p)
     assert (self_p);
     if (*self_p) {
         zhash_t *self = *self_p;
-        uint index;
-        size_t limit = primes [self->prime_index];
-        
-        for (index = 0; index < limit; index++) {
-            //  Destroy all items in this hash bucket
-            item_t *cur_item = self->items [index];
-            while (cur_item) {
-                item_t *next_item = cur_item->next;
-                s_item_destroy (self, cur_item, true);
-                cur_item = next_item;
-            }
-        }
-        if (self->items)
+        if (self->items) {
+            s_purge (self);
             free (self->items);
+        }
 
         zlist_destroy (&self->comments);
         free (self->filename);
@@ -377,6 +388,31 @@ zhash_delete (zhash_t *self, const void *key)
     item_t *item = s_item_lookup (self, key);
     if (item)
         s_item_destroy (self, item, true);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Delete all items from the hash table. If the key destructor is
+//  set, calls it on every key. If the item destructor is set, calls
+//  it on every item.
+void
+zhash_purge (zhash_t *self)
+{
+    assert (self);
+    s_purge (self);
+
+    if (self->prime_index > INITIAL_PRIME) {
+        // Try to shrink hash table
+        size_t limit = primes [INITIAL_PRIME];
+        item_t **items =
+            (item_t **) zmalloc (sizeof (item_t *) * limit);
+        if (items) {
+            free (self->items);
+            self->prime_index = INITIAL_PRIME;
+            self->chain_limit = INITIAL_CHAIN;
+            self->items = items;
+        }
+    }
 }
 
 

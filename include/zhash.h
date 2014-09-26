@@ -52,6 +52,12 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zhash_delete (zhash_t *self, const void *key);
 
+//  Delete all items from the hash table. If the key destructor is
+//  set, calls it on every key. If the item destructor is set, calls
+//  it on every item.
+CZMQ_EXPORT void
+    zhash_purge (zhash_t *self);
+
 //  Return the item at the specified key, or null
 CZMQ_EXPORT void *
     zhash_lookup (zhash_t *self, const void *key);
