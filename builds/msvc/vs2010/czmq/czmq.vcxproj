@@ -179,6 +179,9 @@
     <ClCompile Include="..\..\..\..\src\zgossip_msg.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\zpubsub_filter.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zauth_v2.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>

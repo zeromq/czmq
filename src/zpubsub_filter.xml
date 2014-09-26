@@ -1,0 +1,29 @@
+<class
+    name = "zpubsub_filter"
+    signature = "7"
+    title = "zpubsub protocol"
+    script = "zproto_codec_c"
+    package_dir = "."
+    project_header = "../include/czmq.h"
+    export_macro = "CZMQ_EXPORT"
+    >
+
+    This defines the protocol for the zpubsub class. It encodes the filter
+    as typed fields. The zpubsub class then composes a message consisting
+    of the filter frame from this message, follwed by the message blob. The
+    format of the message blob is entirely up to the application.
+
+    <include filename = "license.xml" />
+
+    <define name = "MAGIC_NUMBER" value = "666" />
+    <define name = "VERSION" value = "2" />
+
+    <message name = "FILTER" id = "1">
+        <field name = "magic" type = "number" size = "2" value="ZPUBSUB_FILTER_MAGIC_NUMBER">Magic number</field>
+        <field name = "version" type = "number" size = "2" value="ZPUBSUB_FILTER_VERSION">Version</field>
+        <field name = "partition" type = "string" size = "4">Partition name</field>
+        <field name = "topic" type = "string" size = "4">Topic name</field>
+        A zpubsub filter.
+    </message>
+
+</class>

@@ -43,6 +43,7 @@ include_HEADERS = \
     ../include/ztimeout.h \
     ../include/zuuid.h \
     ../src/zgossip_msg.h \
+    ../src/zpubsub_filter.h \
     ../include/zauth_v2.h \
     ../include/zbeacon_v2.h \
     ../include/zctx.h \
@@ -90,6 +91,7 @@ libczmq_la_SOURCES = \
     ztimeout.c \
     zuuid.c \
     zgossip_msg.c \
+    zpubsub_filter.c \
     zauth_v2.c \
     zbeacon_v2.c \
     zctx.c \
@@ -119,6 +121,7 @@ code:
 	gsl -q sockopts.xml
 	gsl -q zgossip.xml
 	gsl -q zgossip_msg.xml
+	gsl -q zpubsub_filter.xml
 
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #

@@ -103,6 +103,9 @@
     <ClCompile Include="..\..\..\..\src\zgossip_msg.c">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\zpubsub_filter.c">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zauth_v2.c">
       <Filter>src</Filter>
     </ClCompile>
