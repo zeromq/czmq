@@ -74,7 +74,6 @@ s_sample (const char *topic, const char *partition, void *args, byte *sample, si
     printf ("\nReceived message:\n");
     print_msg (msg);
 
-    free (sample);
     free (msg->message);
     free (msg);
 }

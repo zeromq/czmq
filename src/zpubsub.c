@@ -56,6 +56,8 @@
 */
 
 #include "../include/czmq.h"
+#include "./zpubsub_filter.h"
+
 
 //  zpubsub_t instances always have this tag as the first 4 octets of
 //  their data, which lets us do runtime object typing & validation.
@@ -64,12 +66,12 @@
 //  Structure of our class
 
 struct _zpubsub_t {
-    uint32_t tag;                                             //  Object tag for runtime detection
-    int domain;                                               //  Domain id; basis for port selection
-    char *partition;                                          //  Default partition to use; defaults to "<default>"
-    zsock_t *pub_socket;                                      //  The publisher socket
-    zactor_t *pub_beacon;                                     //  The publisher beacon
-    zactor_t *sub_actor;                                      //  Actor for asynchronous subscriber management
+    uint32_t tag;          //  Object tag for runtime detection
+    int domain;            //  Domain id; basis for port selection
+    char *partition;       //  Default partition to use; defaults to "<default>"
+    zsock_t *pub_socket;   //  The publisher socket
+    zactor_t *pub_beacon;  //  The publisher beacon
+    zactor_t *sub_actor;   //  Actor for asynchronous subscriber management
 };
 
 
@@ -111,14 +113,6 @@ typedef struct {
 } sub_reactor_data_t;
 
 
-//  Version information encoded in filter to make sure incompatible
-//  versions don't make life hard for each other
-
-const int ZPUBSUB_MAGIC_NUMBER = 666;
-const int ZPUBSUB_MAJOR_VERSION = 1;
-const int ZPUBSUB_MINOR_VERSION = 0;
-
-
 //  --------------------------------------------------------------------------
 //  Buffer destructor function (zhash_set_destructor will not accept zstr_free)
 
@@ -149,26 +143,6 @@ s_free_subscriber (void **subscriber)
         free (sub);
 
         *subscriber = NULL;
-    }
-}
-
-
-//  --------------------------------------------------------------------------
-//  Filter destructor function
-
-static void
-s_free_filter (void **filter)
-{
-    assert (filter);
-
-    if (*filter) {
-        zpubsub_filter_t *fil = (zpubsub_filter_t *) *filter;
-
-        free (fil->topic);
-        free (fil->partition);
-        free (fil);
-
-        *filter = NULL;
     }
 }
 
@@ -211,7 +185,8 @@ s_msg_pop_frame_to_ptr (zmsg_t *msg)
 
     zframe_t *ptr_frame = zmsg_pop (msg);
     assert (ptr_frame);
-    void * ptr = s_buffer_to_ptr (zframe_data (ptr_frame), zframe_size (ptr_frame));
+    void *ptr =
+        s_buffer_to_ptr (zframe_data (ptr_frame), zframe_size (ptr_frame));
     zframe_destroy (&ptr_frame);
 
     return ptr;
@@ -237,111 +212,34 @@ s_generate_key (const char *topic, const char *partition)
 
 
 //  --------------------------------------------------------------------------
-//  Create filter
+//  Encode filter
 
-static zpubsub_filter_t *
-s_create_filter (const char *topic, const char *partition)
+static zframe_t *
+s_encode_filter (const char *topic, const char *partition)
 {
-    assert (topic);
-    assert (partition);
+    zmsg_t *msg = zpubsub_filter_encode_filter (partition, topic);
+    assert (msg);
 
-    zpubsub_filter_t *filter = (zpubsub_filter_t *) zmalloc (sizeof (zpubsub_filter_t));
-    assert (filter);
+    zframe_t *encoded_filter = zmsg_pop (msg);
+    zmsg_destroy (&msg);
 
-    filter->magic_number = ZPUBSUB_MAGIC_NUMBER;
-    filter->major_version = ZPUBSUB_MAJOR_VERSION;
-    filter->minor_version = ZPUBSUB_MINOR_VERSION;
-    filter->topic = strdup (topic);
-    filter->partition = strdup (partition);
-
-    return filter;
+    return encoded_filter;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Serialize filter
-
-static byte *
-s_serialize_filter (zpubsub_filter_t *filter, size_t *size)
-{
-    assert (filter);
-    assert (size);
-
-    dbyte part_len = (dbyte) strlen (filter->partition);
-    dbyte topic_len = (dbyte) strlen (filter->topic);
-    *size = 5 * sizeof (dbyte) + part_len + topic_len;
-    byte *data = (byte *) zmalloc (*size);
-    assert (data);
-
-    byte *ptr = data;
-    memcpy (ptr, &(filter->magic_number), sizeof (dbyte));
-
-    ptr += sizeof (dbyte);
-    memcpy (ptr, &(filter->major_version), sizeof (dbyte));
-
-    ptr += sizeof (dbyte);
-    memcpy (ptr, &(filter->minor_version), sizeof (dbyte));
-
-    ptr += sizeof (dbyte);
-    memcpy (ptr, &part_len, sizeof (dbyte));
-
-    ptr += sizeof (dbyte);
-    memcpy (ptr, filter->partition, part_len);
-
-    ptr += part_len;
-    memcpy (ptr, &topic_len, sizeof (dbyte));
-
-    ptr += sizeof (dbyte);
-    memcpy (ptr, filter->topic, topic_len);
-
-    return data;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Deserialize filter
+//  Decode filter
 
 static zpubsub_filter_t *
-s_deserialize_filter (byte *data, size_t size)
+s_decode_filter (zframe_t **encoded_filter)
 {
-    assert (data);
-    assert (size > 0);
+    assert (encoded_filter);
 
-    size_t min_size = 5 * sizeof(dbyte) + 2;
-    if (size < min_size)
-        return NULL;
+    zmsg_t *msg = zmsg_new ();
+    assert (msg);
 
-    zpubsub_filter_t *filter = (zpubsub_filter_t *) zmalloc (sizeof (zpubsub_filter_t));
-    assert (filter);
-
-    byte *ptr = data;
-    memcpy (&(filter->magic_number), ptr, sizeof (dbyte));
-
-    ptr += sizeof (dbyte);
-    memcpy (&(filter->major_version), ptr, sizeof (dbyte));
-
-    ptr += sizeof (dbyte);
-    memcpy (&(filter->minor_version), ptr, sizeof (dbyte));
-
-    ptr += sizeof (dbyte);
-    dbyte part_len = 0;
-    memcpy (&part_len, ptr, sizeof (dbyte));
-
-    ptr += sizeof (dbyte);
-    assert (part_len > 0);
-    filter->partition = (char *) zmalloc ((part_len + 1) * sizeof (char));
-    memcpy (filter->partition, ptr, part_len);
-    filter->partition[part_len] = '\0';
-
-    ptr += part_len;
-    dbyte topic_len = 0;
-    memcpy (&topic_len, ptr, sizeof (dbyte));
-
-    ptr += sizeof (dbyte);
-    assert (topic_len > 0);
-    filter->topic = (char *) zmalloc ((topic_len + 1) * sizeof (char));
-    memcpy (filter->topic, ptr, topic_len);
-    filter->topic[topic_len] = '\0';
+    zmsg_append (msg, encoded_filter);
+    zpubsub_filter_t *filter = zpubsub_filter_decode (&msg);
 
     return filter;
 }
@@ -373,10 +271,13 @@ s_sub_beacon_fn (zloop_t *loop, zmq_pollitem_t *item, void *args)
 
     if (address) {
         if (zhash_lookup (reactor_data->connections, address) == NULL) {
-            int rc = zsock_connect(reactor_data->sub_socket, "tcp://%s:%d", address, reactor_data->port);
+            int rc =
+                zsock_connect(reactor_data->sub_socket, "tcp://%s:%d", address,
+                              reactor_data->port);
 
             if (rc == 0)
-                zhash_insert (reactor_data->connections, address, strdup (address));
+                zhash_insert (reactor_data->connections, address,
+                              strdup (address));
         }
 
         free (address);
@@ -412,7 +313,8 @@ s_sub_ctrl_fn (zloop_t *loop, zsock_t *reader, void *args)
         sub->partition = zmsg_popstr (msg);
         sub->key = s_generate_key (sub->topic, sub->partition);
         sub->args = s_msg_pop_frame_to_ptr (msg);
-        sub->sample_function = (sample_function_t *) s_msg_pop_frame_to_ptr (msg);
+        sub->sample_function =
+            (sample_function_t *) s_msg_pop_frame_to_ptr (msg);
 
         assert (sub->topic);
         assert (sub->partition);
@@ -422,18 +324,16 @@ s_sub_ctrl_fn (zloop_t *loop, zsock_t *reader, void *args)
 
         zhash_update (reactor_data->subscribers, sub->key, sub);
 
-        zpubsub_filter_t *filter = s_create_filter (sub->topic, sub->partition);
-        assert (filter);
+        zframe_t *encoded_filter = s_encode_filter (sub->topic, sub->partition);
+        assert (encoded_filter);
 
-        size_t required_size;
-        byte *filter_data = s_serialize_filter (filter, &required_size);
-        assert (filter_data);
-
-        rc = zmq_setsockopt (zsock_resolve (reactor_data->sub_socket), ZMQ_SUBSCRIBE, filter_data, required_size);
+        rc = zmq_setsockopt (zsock_resolve (reactor_data->sub_socket),
+                             ZMQ_SUBSCRIBE,
+                             zframe_data (encoded_filter),
+                             zframe_size (encoded_filter));
         assert (rc == 0 || zmq_errno () == ETERM);
 
-        free (filter_data);
-        s_free_filter ((void **) &filter);
+        zframe_destroy (&encoded_filter);
     }
     else
     if (streq(command, "UNSUB")) {
@@ -448,19 +348,16 @@ s_sub_ctrl_fn (zloop_t *loop, zsock_t *reader, void *args)
         sub_data_t * sub = (sub_data_t *) zhash_lookup (reactor_data->subscribers, key);
 
         if (sub) {
-            zpubsub_filter_t *filter = s_create_filter (topic, partition);
-            assert (filter);
+            zframe_t *encoded_filter = s_encode_filter (topic, partition);
+            assert (encoded_filter);
 
-            size_t required_size;
-            byte *filter_data = s_serialize_filter (filter, &required_size);
-            assert (filter_data);
-
-            rc = zmq_setsockopt (zsock_resolve (reactor_data->sub_socket), ZMQ_UNSUBSCRIBE, filter_data, required_size);
+            rc = zmq_setsockopt (zsock_resolve (reactor_data->sub_socket),
+                                 ZMQ_UNSUBSCRIBE,
+                                 zframe_data (encoded_filter),
+                                 zframe_size (encoded_filter));
             assert (rc == 0 || zmq_errno () == ETERM);
 
-            free (filter_data);
-            s_free_filter ((void **) &filter);
-
+            zframe_destroy (&encoded_filter);
             zhash_delete (reactor_data->subscribers, key);
         }
 
@@ -484,27 +381,34 @@ s_sub_sample_fn (zloop_t *loop, zsock_t *reader, void *args)
 {
     sub_reactor_data_t *reactor_data = (sub_reactor_data_t *) args;
 
-    byte *filter_data, *message_data;
-    size_t filter_size, message_size;
-
-    int rc = zsock_recv (reader, "bb", &filter_data, &filter_size, &message_data, &message_size);
+    zframe_t *filter_frame, *message_frame;
+    int rc = zsock_recv (reader, "ff", &filter_frame, &message_frame);
     assert (rc == 0);
 
-    zpubsub_filter_t *filter = s_deserialize_filter (filter_data, filter_size);
+    zpubsub_filter_t *filter = s_decode_filter (&filter_frame);
     assert (filter);
-    free (filter_data);
 
-    char *key = s_generate_key (filter->topic, filter->partition);
+    const char *topic = zpubsub_filter_topic (filter);
+    assert (topic);
+
+    const char *partition = zpubsub_filter_partition (filter);
+    assert (partition);
+
+    char *key = s_generate_key (topic, partition);
     assert (key);
 
     sub_data_t *sub = (sub_data_t *) zhash_lookup (reactor_data->subscribers, key);
     free (key);
 
-    if (sub) {
-        (sub->sample_function->sample_fn) (filter->topic, filter->partition, sub->args, message_data, message_size);
-    }
+    if (sub)
+        (sub->sample_function->sample_fn) (topic,
+                                           partition,
+                                           sub->args,
+                                           zframe_data (message_frame),
+                                           zframe_size (message_frame));
 
-    s_free_filter ((void **) &filter);
+    zpubsub_filter_destroy (&filter);
+    zframe_destroy (&message_frame);
 
     return 0;
 }
@@ -533,14 +437,14 @@ s_sub_actor (zsock_t *pipe, void *args)
     reactor_data.sub_socket = sub_socket;
     reactor_data.port = actor_data->port;
     reactor_data.default_partition = strdup (actor_data->default_partition);
-    reactor_data.connections = zhash_new();
+    reactor_data.connections = zhash_new ();
     assert (reactor_data.connections);
     zhash_set_destructor (reactor_data.connections, s_free_buffer);
-    reactor_data.subscribers = zhash_new();
+    reactor_data.subscribers = zhash_new ();
     assert (reactor_data.subscribers);
     zhash_set_destructor (reactor_data.subscribers, s_free_subscriber);
 
-    zloop_t *sub_reactor = zloop_new();
+    zloop_t *sub_reactor = zloop_new ();
     zloop_reader (sub_reactor, pipe, s_sub_ctrl_fn, &reactor_data);
     zloop_reader_set_tolerant (sub_reactor, pipe);
     zloop_reader (sub_reactor, sub_socket, s_sub_sample_fn, &reactor_data);
@@ -549,7 +453,7 @@ s_sub_actor (zsock_t *pipe, void *args)
     //  Must use low level poller for beacon, since zloop_reader does not
     //  accept a zactor_t * for its socket parameter.
     zmq_pollitem_t poll_item;
-    memset(&poll_item, 0, sizeof(zmq_pollitem_t));
+    memset(&poll_item, 0, sizeof (zmq_pollitem_t));
     poll_item.socket = zactor_resolve (sub_beacon);
     poll_item.events = ZMQ_POLLIN;
     zloop_poller (sub_reactor, &poll_item, s_sub_beacon_fn, &reactor_data);
@@ -600,7 +504,8 @@ zpubsub_new (int domain, const char* partition)
     zsock_bind (self->pub_socket, "tcp://*:%d", (port_fn) (self->domain));
 
     //  Start actor for subscriptions
-    sub_actor_data_t *actor_data = (sub_actor_data_t*) zmalloc (sizeof (sub_actor_data_t));
+    sub_actor_data_t *actor_data =
+        (sub_actor_data_t *) zmalloc (sizeof (sub_actor_data_t));
     assert (actor_data);
     actor_data->port = (port_fn) (self->domain);
     actor_data->default_partition = strdup (self->partition);
@@ -645,27 +550,22 @@ zpubsub_destroy (zpubsub_t **self_p)
 //  Publish a message.
 
 void
-zpubsub_publish (zpubsub_t *self, const char *topic, const char *partition, byte *message, size_t size)
+zpubsub_publish (zpubsub_t *self, const char *topic, const char *partition,
+                 byte *message, size_t size)
 {
     assert (self);
     assert (topic);
     assert (message);
 
-    zpubsub_filter_t *filter = s_create_filter (topic, partition? partition: self->partition);
-    assert (filter);
-
-    size_t required_filter_size;
-    byte *filter_data = s_serialize_filter (filter, &required_filter_size);
-
-    zmsg_t *msg = zmsg_new();
+    zmsg_t *msg = zmsg_new ();
     assert (msg);
 
-    zmsg_addmem (msg, filter_data, required_filter_size);
+    zframe_t *filter = s_encode_filter (topic, partition? partition: self->partition);
+    assert (filter);
+
+    zmsg_prepend (msg, &filter);
     zmsg_addmem (msg, message, size);
     zmsg_send (&msg, self->pub_socket);
-
-    free (filter_data);
-    s_free_filter ((void **) &filter);
 }
 
 
@@ -673,19 +573,22 @@ zpubsub_publish (zpubsub_t *self, const char *topic, const char *partition, byte
 //  Subscribe to a topic.
 
 void
-zpubsub_subscribe (zpubsub_t *self, const char *topic, const char *partition, void *args, zpubsub_sample_fn *sample_fn)
+zpubsub_subscribe (zpubsub_t *self, const char *topic, const char *partition,
+                   void *args, zpubsub_sample_fn *sample_fn)
 {
     assert (self);
     assert (topic);
     assert (sample_fn);
 
-    //  Wrapping function pointers inside structs. -Werror=pedantic does not allow
-    //  casting function pointers to void *
+    //  Wrapping function pointers inside structs. -Werror=pedantic does not
+    //  allow casting function pointers to void *
 
-    sample_function_t *sample_function = (sample_function_t *) zmalloc (sizeof (sample_function_t));
+    sample_function_t *sample_function =
+        (sample_function_t *) zmalloc (sizeof (sample_function_t));
     sample_function->sample_fn = sample_fn;
 
-    zsock_send (self->sub_actor, "ssspp", "SUB", topic, partition? partition: self->partition, args, sample_function);
+    zsock_send (self->sub_actor, "ssspp", "SUB", topic,
+                partition? partition: self->partition, args, sample_function);
 }
 
 
@@ -698,7 +601,8 @@ zpubsub_unsubscribe (zpubsub_t *self, const char *topic, const char *partition)
     assert (self);
     assert (topic);
 
-    zsock_send (self->sub_actor, "sss", "UNSUB", topic, partition? partition: self->partition);
+    zsock_send (self->sub_actor, "sss", "UNSUB", topic,
+                partition? partition: self->partition);
 }
 
 
@@ -744,7 +648,7 @@ s_deserialize_message (byte *data, int size)
     message->hello = (char *) zmalloc ((hello_len + 1) * sizeof (char));
     ptr += sizeof (dbyte);
     memcpy (message->hello, ptr, hello_len);
-    message->hello[hello_len] = '\0';
+    message->hello [hello_len] = '\0';
 
     ptr += hello_len;
     memcpy (&(message->world), ptr, sizeof (int));
@@ -790,7 +694,8 @@ bool s_test_msg_recvd = false;
 //  Test sample function
 
 static void
-s_sample_fn (const char *topic, const char *partition, void *args, byte *sample, size_t size)
+s_sample_fn (const char *topic, const char *partition, void *args,
+             byte *sample, size_t size)
 {
     assert (topic);
     assert (partition);
@@ -806,7 +711,6 @@ s_sample_fn (const char *topic, const char *partition, void *args, byte *sample,
     assert (msg->world == 30116);
     free (msg->hello);
     free (msg);
-    free (sample);
 
     s_test_msg_recvd = true;
 }
@@ -831,31 +735,19 @@ zpubsub_test (bool verbose)
     sub->topic = strdup ("TestTopic");
     sub->partition = strdup ("TestPartition");
     sub->key = strdup ("TestKey");
-    sub->sample_function = (sample_function_t *) zmalloc (sizeof (sample_function_t));
+    sub->sample_function =
+        (sample_function_t *) zmalloc (sizeof (sample_function_t));
     s_free_subscriber ((void **) &sub);
     assert (sub == NULL);
     if (verbose)
         zsys_info ("s_free_subscriber OK");
 
 
-    //  s_free_filter unit test
-    if (verbose)
-        zsys_info ("s_free_filter...");
-    zpubsub_filter_t *filter = (zpubsub_filter_t *) zmalloc (sizeof (zpubsub_filter_t));
-    assert (filter);
-    filter->topic = strdup ("TestTopic");
-    filter->partition = strdup ("TestPartition");
-    s_free_filter ((void **) &filter);
-    assert (filter == NULL);
-    if (verbose)
-        zsys_info ("s_free_filter OK");
-
-
     //  s_ptr_to_buffer / s_buffer_to_ptr unit test
     if (verbose)
         zsys_info ("s_ptr_to_buffer / s_buffer_to_ptr...");
     int test_int = 23101;
-    byte buffer2[8];
+    byte buffer2 [8];
     s_ptr_to_buffer (&test_int, buffer2, 8);
     int *int_ptr = (int *) s_buffer_to_ptr (buffer2, 8);
     assert (*int_ptr == test_int);
@@ -866,7 +758,7 @@ zpubsub_test (bool verbose)
     //  s_msg_pop_frame_to_ptr unit test
     if (verbose)
         zsys_info ("s_msg_pop_frame_to_ptr...");
-    zmsg_t *msg = zmsg_new();
+    zmsg_t *msg = zmsg_new ();
     zmsg_pushmem (msg, buffer2, 8);
     int_ptr = (int *) s_msg_pop_frame_to_ptr (msg);
     assert (int_ptr);
@@ -888,20 +780,27 @@ zpubsub_test (bool verbose)
         zsys_info ("s_generate_key OK");
 
 
-    //    s_create_filter unit test
+    //  s_encode_filter unit test
     if (verbose)
-        zsys_info ("s_create_filter...");
-    filter = s_create_filter ("TestTopic", "TestPartition");
+        zsys_info ("s_encode_filter...");
+    zframe_t *filter_frame = s_encode_filter ("TestTopic", "TestPartition");
+    assert (filter_frame);
+    assert (zframe_data (filter_frame));
+    assert (zframe_size (filter_frame) > 0);
+    if (verbose)
+        zsys_info ("s_encode_filter OK");
+
+
+    //  s_decode_filter unit test
+    if (verbose)
+        zsys_info ("s_decode_filter...");
+    zpubsub_filter_t *filter = s_decode_filter (&filter_frame);
     assert (filter);
-    assert (filter->magic_number == ZPUBSUB_MAGIC_NUMBER);
-    assert (filter->major_version == ZPUBSUB_MAJOR_VERSION);
-    assert (filter->minor_version == ZPUBSUB_MINOR_VERSION);
-    assert (streq (filter->partition, "TestPartition"));
-    assert (streq (filter->topic, "TestTopic"));
-    s_free_filter((void **) &filter);
-    assert (filter == NULL);
+    assert (streq (zpubsub_filter_partition (filter), "TestPartition"));
+    assert (streq (zpubsub_filter_topic (filter), "TestTopic"));
+    zpubsub_filter_destroy (&filter);
     if (verbose)
-        zsys_info ("s_create_filter OK");
+        zsys_info ("s_decode_filter OK");
 
 
     //  zpubsub system test
@@ -930,7 +829,8 @@ zpubsub_test (bool verbose)
     //  Subscribe to test topic
     zpubsub_subscribe (pubsub, "TestTopic", NULL, NULL, s_sample_fn);
 
-    //  Sleep for 6 seconds; should have received a publisher beacon by then and connected
+    //  Sleep for 6 seconds; should have received a publisher
+    //  beacon by then and connected
     zclock_sleep (6000);
 
     //  Create a test message
@@ -940,19 +840,20 @@ zpubsub_test (bool verbose)
     tmsg->world = 30116;
 
     //  Serialize message
-    size_t required_size;
-    byte *sample = s_serialize_message (tmsg, &required_size);
+    size_t sample_size;
+    byte *sample = s_serialize_message (tmsg, &sample_size);
 
     //  Publish on the test topic
-    zpubsub_publish (pubsub, "TestTopic", NULL, sample, required_size);
-    zclock_sleep (1000); //  Sleeping one second after publish to make sure subscriber processing is finished
+    zpubsub_publish (pubsub, "TestTopic", NULL, sample, sample_size);
+    zclock_sleep (1000); //  Sleeping one second after publish to make sure
+                         //  subscriber processing is finished
 
     //  Should have received the message now
     assert (s_test_msg_recvd);
     s_test_msg_recvd = false;
 
     //  Publish on different partition
-    zpubsub_publish (pubsub, "TestTopic", "TestPartition", sample, required_size);
+    zpubsub_publish (pubsub, "TestTopic", "TestPartition", sample, sample_size);
     zclock_sleep (1000);
 
     //  Should not receive this message
@@ -960,7 +861,7 @@ zpubsub_test (bool verbose)
     s_test_msg_recvd = false;
 
     //  Publish on another topic
-    zpubsub_publish (pubsub, "TestTopic2", NULL, sample, required_size);
+    zpubsub_publish (pubsub, "TestTopic2", NULL, sample, sample_size);
     zclock_sleep (1000);
 
     //  Should not receive this message
@@ -968,7 +869,7 @@ zpubsub_test (bool verbose)
     s_test_msg_recvd = false;
 
     //  Publish on the test topic again
-    zpubsub_publish (pubsub, "TestTopic", NULL, sample, required_size);
+    zpubsub_publish (pubsub, "TestTopic", NULL, sample, sample_size);
     zclock_sleep (1000);
 
     //  Should receive this message
@@ -977,7 +878,7 @@ zpubsub_test (bool verbose)
 
     //  Unsubscribe and publish again
     zpubsub_unsubscribe (pubsub, "TestTopic", NULL);
-    zpubsub_publish (pubsub, "TestTopic", NULL, sample, required_size);
+    zpubsub_publish (pubsub, "TestTopic", NULL, sample, sample_size);
     zclock_sleep (1000);
 
     //  Should not receive this message
