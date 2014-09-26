@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
@@ -130,6 +130,9 @@
     <ClCompile Include="..\..\..\..\src\zthread.c">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\ztimeout.c">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\include\czmq.h">
@@ -154,7 +157,7 @@
     <ClInclude Include="..\..\resource.h">
       <Filter>resource</Filter>
     </ClInclude>
-  </ItemGroup>  
+  </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\czmq.rc">
       <Filter>resource</Filter>
@@ -195,12 +198,12 @@
     </None>
     <None Include="..\..\..\..\packaging\nuget\package.xml">
       <Filter>packaging</Filter>
-    </None>    
+    </None>
   </ItemGroup>
-<!--
+  <!--
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
 #   Please read the README.txt file in the model directory.     #
 #################################################################
--->  
+-->
 </Project>
