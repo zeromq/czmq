@@ -307,7 +307,7 @@ s_deserialize_filter (byte *data, size_t size)
     assert (data);
     assert (size > 0);
 
-    int min_size = 5 * sizeof (dbyte) + 2;
+    size_t min_size = 5 * sizeof(dbyte) + 2;
     if (size < min_size)
         return NULL;
 

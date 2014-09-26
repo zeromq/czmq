@@ -138,7 +138,7 @@ zrex_matches (zrex_t *self, const char *text)
     self->hits = 0;
     zstr_free (&self->hit_set);
     
-    bool matches = slre_match (&self->slre, text, strlen (text), self->caps);
+    bool matches = slre_match (&self->slre, text, strlen (text), self->caps) != 0;
     if (matches) {
         //  Count number of captures plus whole string
         self->hits = self->slre.num_caps + 1;
