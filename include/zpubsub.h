@@ -19,36 +19,33 @@ extern "C" {
 #endif
 
 //  @interface
-//  A struct defining contents of a topic filter.
-typedef struct {
-    dbyte magic_number;
-    dbyte major_version;
-    dbyte minor_version;
-    char *topic;
-    char *partition;
-} zpubsub_filter_t;
-
 //  Function to calculate port from domain id
 typedef dbyte (zpubsub_port_fn) (int domain);
 
 //  Subscribers get a callback when a sample is available
-typedef void (zpubsub_sample_fn) (const char *topic, const char *partition, void *args, byte *sample, size_t size);
+typedef void (zpubsub_sample_fn) (const char *topic, const char *partition,
+                                  void *args, byte *sample, size_t size);
 
-//  Create a new pubsub, passing functions to use for serializing and deserializing filters.
+//  Create a new pubsub, passing functions to use for serializing and
+//  deserializing filters.
 CZMQ_EXPORT zpubsub_t *
     zpubsub_new (int domain, const char* partition);
 
 //  Publish a message on a given topic.
 CZMQ_EXPORT void
-    zpubsub_publish(zpubsub_t *self, const char *topic, const char *partition, byte *message, size_t size);
+    zpubsub_publish (zpubsub_t *self, const char *topic, const char *partition,
+                     byte *message, size_t size);
 
 //  Subscribe to messages on a given topic.
 CZMQ_EXPORT void
-    zpubsub_subscribe(zpubsub_t *self, const char *topic, const char *partition, void *args, zpubsub_sample_fn *sample_fn);
+    zpubsub_subscribe (zpubsub_t *self,
+                       const char *topic, const char *partition,
+                       void *args, zpubsub_sample_fn *sample_fn);
 
 //  Unsubscribe from messages on a given topic.
 CZMQ_EXPORT void
-    zpubsub_unsubscribe(zpubsub_t *self, const char *topic, const char *partition);
+    zpubsub_unsubscribe (zpubsub_t *self,
+                         const char *topic, const char *partition);
 
 //  Destroy a pubsub instance.
 CZMQ_EXPORT void

@@ -43,6 +43,8 @@
     <model name = "zgossip" />
     <model name = "zgossip_msg" />
     <class name = "zgossip_msg" private = "1" />
+    <model name = "zpubsub_filter" />
+    <class name = "zpubsub_filter" private = "1" />
 
     <!-- Other source files in src that we need to package -->
     <extra name = "zgossip_engine.inc" />
