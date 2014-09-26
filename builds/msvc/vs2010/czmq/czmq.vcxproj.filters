@@ -97,6 +97,9 @@
     <ClCompile Include="..\..\..\..\src\zsys.c">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\ztimeout.c">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zuuid.c">
       <Filter>src</Filter>
     </ClCompile>

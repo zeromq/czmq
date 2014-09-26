@@ -111,6 +111,7 @@ set (czmq_headers
     include/zsock_option.h
     include/zstr.h
     include/zsys.h
+    include/ztimeout.h
     include/zuuid.h
     src/zgossip_msg.h
     src/zpubsub_filter.h
@@ -166,6 +167,7 @@ set (czmq_sources
     src/zsock_option.c
     src/zstr.c
     src/zsys.c
+    src/ztimeout.c
     src/zuuid.c
     src/zgossip_msg.c
     src/zpubsub_filter.c
