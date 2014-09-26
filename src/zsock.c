@@ -825,7 +825,8 @@ zsock_is (void *self)
 
 //  --------------------------------------------------------------------------
 //  Probe the supplied reference. If it looks like a zsock_t instance,
-//  return the underlying libzmq socket handle; else if it looks like
+//  return the underlying libzmq socket handle; elsie if it looks like a
+//  file descriptor, return NULL; else if it looks like
 //  a libzmq socket handle, return the supplied value. Takes a
 //  polymorphic socket reference.
 
@@ -838,8 +839,24 @@ zsock_resolve (void *self)
     else
     if (zactor_is (self))
         return zactor_resolve (self);
-    else 
-        return self;
+    else
+    {
+        int sock_type = -1;
+#ifdef _WIN32
+        int sock_type_size = sizeof (int);
+#else
+        socklen_t sock_type_size = sizeof (socklen_t);
+#endif
+        const int rc = getsockopt(*(SOCKET *)self, SOL_SOCKET, SO_TYPE, (char *) &sock_type, &sock_type_size);
+#ifdef _WIN32
+        if (rc == 0)
+            return NULL; // It's a socket descriptor
+#else
+        if (rc == 0 || (rc == -1 && errno == ENOTSOCK))
+            return NULL; // It's a socket fd or fd
+#endif
+    }
+    return self;
 }
 
 
@@ -880,6 +897,10 @@ zsock_test (bool verbose)
     assert (reader);
     assert (zsock_resolve (reader) != reader);
     assert (streq (zsock_type_str (reader), "PULL"));
+
+    // Test resolve fd
+    int fd = zsock_fd(reader);
+    assert (zsock_resolve ((void*) &fd) == NULL);
 
     zstr_send (writer, "Hello, World");
     zmsg_t *msg = zmsg_recv (reader);

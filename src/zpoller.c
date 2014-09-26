@@ -174,8 +174,20 @@ s_rebuild_poll_set (zpoller_t *self)
     void *reader = zlist_first (self->reader_list);
     while (reader) {
         self->poll_readers [reader_nbr] = reader;
-        self->poll_set [reader_nbr].socket = zsock_resolve (reader);
+        void *socket = zsock_resolve (reader);
+        if (socket == NULL)
+        {
+            self->poll_set [reader_nbr].socket = NULL;
+#ifdef _WIN32
+            self->poll_set [reader_nbr].fd = *(SOCKET *) reader;
+#else
+            self->poll_set [reader_nbr].fd = *(int *) reader;
+#endif
+        }
+        else
+            self->poll_set [reader_nbr].socket = socket;
         self->poll_set [reader_nbr].events = ZMQ_POLLIN;
+
         reader_nbr++;
         reader = zlist_next (self->reader_list);
     }
@@ -235,7 +247,7 @@ zpoller_test (bool verbose)
     zpoller_t *poller = zpoller_new (bowl, dish, NULL);
     assert (poller);
 
-    // Add a reader the existing poller
+    // Add a reader to the existing poller
     rc = zpoller_add (poller, sink);
     assert (rc == 0);
 
@@ -253,6 +265,15 @@ zpoller_test (bool verbose)
     // Stop polling reader
     rc = zpoller_remove (poller, sink);
     assert (rc == 0);
+
+    // Check fd works
+    rc = zsock_connect (bowl, "tcp://127.0.0.1:%d", port_nbr);
+    assert (rc != -1);
+    int fd = zsock_fd (bowl);
+    rc = zpoller_add (poller, (void*)&fd);
+    assert (rc != -1);
+    zstr_send (vent, "Hello again, world");
+    assert (zpoller_wait (poller, 500) == &fd);
     
     //  Destroy poller and sockets
     zpoller_destroy (&poller);
