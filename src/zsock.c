@@ -107,7 +107,9 @@ zsock_new_pub_ (const char *endpoints, const char *filename, size_t line_nbr)
 //  action is connect.
 
 zsock_t *
-zsock_new_sub_ (const char *endpoints, const char *subscribe, const char *filename, size_t line_nbr)
+zsock_new_sub_ (const char *endpoints, const char *subscribe,
+                const char *filename,
+                size_t line_nbr)
 {
     zsock_t *sock = zsock_new_ (ZMQ_SUB, filename, line_nbr);
     if (sock)
@@ -303,7 +305,7 @@ zsock_bind (zsock_t *self, const char *format, ...)
     if (!endpoint)
         return -1;
     int rc;
-    
+
     //  If tcp:// endpoint, parse to get or make port number
     zrex_t *rex = zrex_new (NULL);
     if (zrex_eq (rex, endpoint, "^tcp://.*:(\\d+)$")) {
@@ -314,13 +316,15 @@ zsock_bind (zsock_t *self, const char *format, ...)
             rc = -1;
     }
     else
-    if (zrex_eq (rex, endpoint, "^(tcp://.*):([*!])(\\[(\\d+)?-(\\d+)?\\])?$")) {
+    if (zrex_eq (rex, endpoint,
+                 "^(tcp://.*):([*!])(\\[(\\d+)?-(\\d+)?\\])?$")) {
         assert (zrex_hits (rex) == 6);
         const char *hostname, *opcode, *group, *first_str, *last_str;
-        zrex_fetch (rex, &hostname, &opcode, &group, &first_str, &last_str, NULL);
-        
-        int first = *first_str? atoi (first_str): DYNAMIC_FIRST;
-        int last = *last_str? atoi (last_str): DYNAMIC_LAST;
+        zrex_fetch (rex, &hostname, &opcode, &group, &first_str, &last_str,
+                    NULL);
+
+        int first = *first_str ? atoi (first_str) : DYNAMIC_FIRST;
+        int last = *last_str ? atoi (last_str) : DYNAMIC_LAST;
 
         //  This is how many times we'll try before giving up
         int attempts = last - first + 1;
@@ -331,7 +335,7 @@ zsock_bind (zsock_t *self, const char *format, ...)
         int port = first;
         if (streq (opcode, "!"))
             port += randof (attempts);
-            
+
         rc = -1;                //  Assume we don't succeed
         while (rc == -1 && attempts--) {
             free (endpoint);
@@ -354,7 +358,7 @@ zsock_bind (zsock_t *self, const char *format, ...)
     }
     else
         free (endpoint);
-    
+
     zrex_destroy (&rex);
     return rc;
 }
@@ -382,7 +386,7 @@ zsock_unbind (zsock_t *self, const char *format, ...)
     assert (self);
     assert (zsock_is (self));
 
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 2, 0))
     //  Expand format to get full endpoint
     va_list argptr;
     va_start (argptr, format);
@@ -417,8 +421,8 @@ zsock_connect (zsock_t *self, const char *format, ...)
     if (!endpoint)
         return -1;
     int rc = zmq_connect (self->handle, endpoint);
-    
-#if (ZMQ_VERSION < ZMQ_MAKE_VERSION (4,0,0))
+
+#if (ZMQ_VERSION < ZMQ_MAKE_VERSION (4, 0, 0))
     int retries = 4;
     while (rc == -1 && zmq_errno () == ECONNREFUSED && retries) {
         //  This bruteforces a synchronization between connecting and
@@ -444,7 +448,7 @@ zsock_disconnect (zsock_t *self, const char *format, ...)
     assert (self);
     assert (zsock_is (self));
 
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 2, 0))
     //  Expand format to get full endpoint
     va_list argptr;
     va_start (argptr, format);
@@ -498,10 +502,10 @@ zsock_attach (zsock_t *self, const char *endpoints, bool serverish)
             rc = zsock_bind (self, "%s", endpoint);
         else
             rc = zsock_connect (self, "%s", endpoint);
-        
+
         if (rc == -1)
             return -1;          //  Bad endpoint syntax
-            
+
         if (*delimiter == 0)
             break;
         endpoints = delimiter + 1;
@@ -531,7 +535,7 @@ zsock_type_str (void *self)
 //  string that defines the type of each frame. This makes it easy to send
 //  a complex multiframe message in one call. The picture can contain any
 //  of these characters, each corresponding to one or two arguments:
-//  
+//
 //      i = int
 //      s = char *
 //      b = byte *, size_t (2 arguments)
@@ -589,7 +593,7 @@ zsock_send (void *self, const char *picture, ...)
         if (*picture == 'h') {
             zhash_t *hash = va_arg (argptr, zhash_t *);
             zframe_t *frame = zhash_pack (hash);
-            zmsg_append ( msg, &frame);
+            zmsg_append (msg, &frame);
         }
         else
         if (*picture == 'z')
@@ -644,7 +648,7 @@ zsock_recv (void *self, const char *picture, ...)
             char *string = zmsg_popstr (msg);
             int *integer_p = va_arg (argptr, int *);
             if (integer_p)
-                *integer_p = string? atoi (string): 0;
+                *integer_p = string ? atoi (string) : 0;
             free (string);
         }
         else
@@ -680,7 +684,8 @@ zsock_recv (void *self, const char *picture, ...)
             zchunk_t **chunk_p = va_arg (argptr, zchunk_t **);
             if (chunk_p) {
                 if (frame)
-                    *chunk_p = zchunk_new (zframe_data (frame), zframe_size (frame));
+                    *chunk_p =
+                        zchunk_new (zframe_data (frame), zframe_size (frame));
                 else
                     *chunk_p = NULL;
             }
@@ -711,12 +716,12 @@ zsock_recv (void *self, const char *picture, ...)
             }
             zframe_destroy (&frame);
         }
-        else 
+        else
         if (*picture == 'h') {
             zframe_t *frame = zmsg_pop (msg);
             zhash_t **hash_p = va_arg (argptr, zhash_t **);
             if (hash_p) {
-                if (frame) 
+                if (frame)
                     *hash_p = zhash_unpack (frame);
                 else
                     *hash_p = NULL;
@@ -789,7 +794,7 @@ zsock_wait (void *self)
 {
     assert (self);
 
-    //  A signal is a message containing one frame with our 8-byte magic 
+    //  A signal is a message containing one frame with our 8-byte magic
     //  value. If we get anything else, we discard it and continue to look
     //  for the signal message
     while (true) {
@@ -797,7 +802,7 @@ zsock_wait (void *self)
         if (!msg)
             return -1;
         if (zmsg_size (msg) == 1
-        &&  zmsg_content_size (msg) == 8) {
+            &&  zmsg_content_size (msg) == 8) {
             zframe_t *frame = zmsg_first (msg);
             int64_t signal_value = *((int64_t *) zframe_data (frame));
             if ((signal_value & 0xFFFFFFFFFFFFFF00L) == 0x7766554433221100L) {
@@ -839,15 +844,17 @@ zsock_resolve (void *self)
     else
     if (zactor_is (self))
         return zactor_resolve (self);
-    else
-    {
+    else {
         int sock_type = -1;
 #ifdef _WIN32
         int sock_type_size = sizeof (int);
 #else
         socklen_t sock_type_size = sizeof (socklen_t);
 #endif
-        const int rc = getsockopt(*(SOCKET *)self, SOL_SOCKET, SO_TYPE, (char *) &sock_type, &sock_type_size);
+        const int rc =
+            getsockopt (*(SOCKET *) self, SOL_SOCKET, SO_TYPE,
+                        (char *) &sock_type,
+                        &sock_type_size);
 #ifdef _WIN32
         if (rc == 0)
             return NULL; // It's a socket descriptor
@@ -877,7 +884,7 @@ zsock_test (bool verbose)
     assert (streq (zsock_type_str (writer), "PUSH"));
 
     int rc;
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 2, 0))
     //  Check unbind
     rc = zsock_unbind (writer, "tcp://127.0.0.1:%d", 5560);
     assert (rc == 0);
@@ -899,8 +906,8 @@ zsock_test (bool verbose)
     assert (streq (zsock_type_str (reader), "PULL"));
 
     // Test resolve fd
-    int fd = zsock_fd(reader);
-    assert (zsock_resolve ((void*) &fd) == NULL);
+    int fd = zsock_fd (reader);
+    assert (zsock_resolve ((void *) &fd) == NULL);
 
     zstr_send (writer, "Hello, World");
     zmsg_t *msg = zmsg_recv (reader);
@@ -934,7 +941,8 @@ zsock_test (bool verbose)
 
     //  Test zsock_recv into each supported type
     zsock_send (writer, "izsbcfhp",
-                -12345, "This is a string", "ABCDE", 5, chunk, frame, hash, original);
+                -12345, "This is a string", "ABCDE", 5, chunk, frame, hash,
+                original);
     zframe_destroy (&frame);
     zchunk_destroy (&chunk);
     zhash_destroy (&hash);
@@ -942,7 +950,10 @@ zsock_test (bool verbose)
     byte *data;
     size_t size;
     char *pointer;
-    rc = zsock_recv (reader, "izsbcfhp", &integer, &string, &data, &size, &chunk, &frame, &hash, &pointer);
+    rc =
+        zsock_recv (reader, "izsbcfhp", &integer, &string, &data, &size, &chunk,
+                    &frame, &hash,
+                    &pointer);
     assert (rc == 0);
     assert (integer == -12345);
     assert (streq (string, "This is a string"));
@@ -967,7 +978,9 @@ zsock_test (bool verbose)
     //  with a status code and then nothing else; the receiver will get
     //  the status code and NULL/zero for all other values
     zsock_send (writer, "i", -1);
-    zsock_recv (reader, "izsbcfp", &integer, &string, &data, &size, &chunk, &frame, &pointer);
+    zsock_recv (reader, "izsbcfp", &integer, &string, &data, &size, &chunk,
+                &frame,
+                &pointer);
     assert (integer == -1);
     assert (string == NULL);
     assert (data == NULL);
@@ -975,7 +988,7 @@ zsock_test (bool verbose)
     assert (chunk == NULL);
     assert (frame == NULL);
     assert (pointer == NULL);
-    
+
     //  Test zsock_recv with null arguments
     chunk = zchunk_new ("HELLO", 5);
     assert (chunk);
@@ -985,12 +998,13 @@ zsock_test (bool verbose)
                 -12345, "This is a string", "ABCDE", 5, chunk, frame, original);
     zframe_destroy (&frame);
     zchunk_destroy (&chunk);
-    zsock_recv (reader, "izsbcfp", &integer, NULL, NULL, NULL, &chunk, NULL, NULL);
+    zsock_recv (reader, "izsbcfp", &integer, NULL, NULL, NULL, &chunk, NULL,
+                NULL);
     assert (integer == -12345);
     assert (memcmp (zchunk_data (chunk), "HELLO", 5) == 0);
     assert (zchunk_size (chunk) == 5);
     zchunk_destroy (&chunk);
-    
+
     //  Test binding to ephemeral ports, sequential and random
     int port = zsock_bind (writer, "tcp://127.0.0.1:*");
     assert (port >= DYNAMIC_FIRST && port <= DYNAMIC_LAST);
@@ -1000,7 +1014,7 @@ zsock_test (bool verbose)
     assert (port >= DYNAMIC_FIRST && port <= 50001);
     port = zsock_bind (writer, "tcp://127.0.0.1:*[60000-60010]");
     assert (port >= 60000 && port <= 60010);
-    
+
     port = zsock_bind (writer, "tcp://127.0.0.1:!");
     assert (port >= DYNAMIC_FIRST && port <= DYNAMIC_LAST);
     port = zsock_bind (writer, "tcp://127.0.0.1:![50000-]");
@@ -1014,7 +1028,7 @@ zsock_test (bool verbose)
     rc = zsock_bind (writer, "inproc://test.%s", "writer");
     assert (rc == 0);
     assert (streq (zsock_endpoint (writer), "inproc://test.writer"));
-    
+
     //  Test error state when connecting to an invalid socket type
     //  ('txp://' instead of 'tcp://', typo intentional)
     rc = zsock_connect (reader, "txp://127.0.0.1:5560");
@@ -1031,7 +1045,9 @@ zsock_test (bool verbose)
     //  Test zsock_attach method
     zsock_t *server = zsock_new (ZMQ_DEALER);
     assert (server);
-    rc = zsock_attach (server, "@inproc://myendpoint,tcp://127.0.0.1:5556,inproc://others", true);
+    rc = zsock_attach (
+        server, "@inproc://myendpoint,tcp://127.0.0.1:5556,inproc://others",
+        true);
     assert (rc == 0);
     rc = zsock_attach (server, "", false);
     assert (rc == 0);
@@ -1042,6 +1058,6 @@ zsock_test (bool verbose)
     zsock_destroy (&server);
 
     //  @end
-    
+
     printf ("OK\n");
 }
