@@ -54,6 +54,7 @@ int main (int argc, char *argv [])
     zhash_test (verbose);
     zlist_test (verbose);
     zhashring_test (verbose);
+    zring_test (verbose);
     ziflist_test (verbose);
     zuuid_test (verbose);
     zsock_test (verbose);

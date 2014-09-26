@@ -50,6 +50,7 @@ typedef struct _zpubsub_t zpubsub_t;
 typedef struct _zrex_t zrex_t;
 typedef struct _zhashring_t zhashring_t;
 typedef struct _zhashring_node_t zhashring_node_t;
+typedef struct _zring_t zring_t;
 typedef struct _zsock_t zsock_t;
 typedef struct _ztimeout_t ztimeout_t;
 typedef struct _ztimeout_node_t ztimeout_node_t;
@@ -99,6 +100,7 @@ typedef int (czmq_comparator) (const void *item1, const void *item2);
 #include "zpubsub_option.h"
 #include "zrex.h"
 #include "zhashring.h"
+#include "zring.h"
 #include "zsock.h"
 #include "zsock_option.h"
 #include "zstr.h"
