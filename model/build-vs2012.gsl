@@ -72,7 +72,7 @@
   <PropertyGroup Label="Configuration">
     <ConfigurationType Condition="$\(Configuration.IndexOf('DLL')) == -1">StaticLibrary</ConfigurationType>
     <ConfigurationType Condition="$\(Configuration.IndexOf('DLL')) != -1">DynamicLibrary</ConfigurationType>
-  </PropertyGroup> 
+  </PropertyGroup>
   <Import Project="$\(VCTargetsPath)\\Microsoft.Cpp.Default.props" />
   <Import Project="$\(VCTargetsPath)\\Microsoft.Cpp.props" />
   <ImportGroup Label="PropertySheets">
@@ -156,7 +156,7 @@
     <ClInclude Include="..\\..\\resource.h">
       <Filter>resource</Filter>
     </ClInclude>
-  </ItemGroup>  
+  </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\\..\\czmq.rc">
       <Filter>resource</Filter>
@@ -197,14 +197,14 @@
     </None>
     <None Include="..\\..\\..\\..\\packaging\\nuget\\package.xml">
       <Filter>packaging</Filter>
-    </None>    
+    </None>
   </ItemGroup>
 <!--
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
 #   Please read the README.txt file in the model directory.     #
 #################################################################
--->  
+-->
 </Project>
 .echo "Generating builds/msvc/vs2012/czmq_selftest/$(project.name)_selftest.vcxproj..."
 .output "../builds/msvc/vs2012/czmq_selftest/$(project.name)_selftest.vcxproj"

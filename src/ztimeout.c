@@ -390,7 +390,9 @@ ztimeout_test (int verbose)
         if (next > 2 * DELAY + 1)
             s_dump (queue);
         assert (next <= 2 * DELAY + 1);
-        zclock_sleep (next);
+        // does it make sense that ztimeout_first returns 64 bit while sleep
+        // takes int? possible loss of data here.
+        zclock_sleep ((int) next);
     }
 
     for (int i = 0; i < NUM_NODES; ++i) {

@@ -10,7 +10,7 @@ INCDIR=-I$(PREFIX)/include -I.
 LIBDIR=-L$(PREFIX)/lib
 CFLAGS=-Wall -Os -g -DLIBCZMQ_EXPORTS $(INCDIR)
 
-OBJS = zactor.o zauth.o zbeacon.o zcert.o zcertstore.o zchunk.o zclock.o zconfig.o zdigest.o zdir.o zdir_patch.o zfile.o zframe.o zhash.o zgossip.o ziflist.o zlist.o zloop.o zmonitor.o zmsg.o zpoller.o zproxy.o zpubsub.o zpubsub_option.o zrex.o zring.o zsock.o zsock_option.o zstr.o zsys.o zuuid.o zgossip_msg.o zpubsub_filter.o zauth_v2.o zbeacon_v2.o zctx.o zmonitor_v2.o zmutex.o zproxy_v2.o zsocket.o zsockopt.o zthread.o
+OBJS = zactor.o zauth.o zbeacon.o zcert.o zcertstore.o zchunk.o zclock.o zconfig.o zdigest.o zdir.o zdir_patch.o zfile.o zframe.o zhash.o zgossip.o ziflist.o zlist.o zloop.o zmonitor.o zmsg.o zpoller.o zproxy.o zpubsub.o zpubsub_option.o zrex.o zring.o zsock.o zsock_option.o zstr.o zsys.o ztimeout.o zuuid.o zgossip_msg.o zpubsub_filter.o zauth_v2.o zbeacon_v2.o zctx.o zmonitor_v2.o zmutex.o zproxy_v2.o zsocket.o zsockopt.o zthread.o
 %.o: ../../src/%.c
     $(CC) -c -o $@ $< $(CFLAGS)
 
