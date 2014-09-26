@@ -29,16 +29,16 @@
 //  ---------------------------------------------------------------------
 //  Performance parameters
 
-#define NUM_BUCKETS	32		//  Number of buckets used in queue
+#define NUM_BUCKETS        32           //  Number of buckets used in queue
 
 //  ---------------------------------------------------------------------
 //  Queue node, used internally and as abstract handle
 
 struct _ztimeout_node_t {
-    zring_node_t *node;		        // handle from zring
-    int64_t time;			// time of expirey
-    uint current_slot;			// current bucket slot in the queue
-    void *item;				// user supplied item
+    zring_node_t *node;                 // handle from zring
+    int64_t time;                       // time of expirey
+    uint current_slot;                  // current bucket slot in the queue
+    void *item;                         // user supplied item
     czmq_destructor *destructor;        // callback to destroy item
 };
 
@@ -47,10 +47,10 @@ struct _ztimeout_node_t {
 //  Structure of our class
 
 struct _ztimeout_t {
-    zring_t *bucket[NUM_BUCKETS + 1];   //  Buckets holding timeouts
-    int64_t next_time[NUM_BUCKETS + 1];	//  Next time buckets are processed
-    size_t size;                        //  Number of items in list
-    ztimeout_trigger_fn *trigger_fn;    //  Callback to trigger a timeout
+    zring_t *bucket [NUM_BUCKETS + 1];   //  Buckets holding timeouts
+    int64_t next_time [NUM_BUCKETS + 1]; //  Next time buckets are processed
+    size_t size;                         //  Number of items in list
+    ztimeout_trigger_fn *trigger_fn;     //  Callback to trigger a timeout
     //  Function callbacks for duplicating and destroying items, if any
     czmq_duplicator *duplicator;
     czmq_destructor *destructor;
@@ -73,19 +73,18 @@ s_ztimeout_node_destroy (ztimeout_node_t **node_p)
 
 //  --------------------------------------------------------------------------
 //  compute time for next process run for a bucket
-//  interleave buckets so that bucketa have a unique time
+//  interleave buckets so that buckets have a unique time
 //  bucket 0 is always processed
 //  bucket 1 is processed at time % 2 == 1
 //  bucket 2 is processed at time % 4 == 2
 //  bucket 3 is processed at time % 8 == 4
 // ...
+
 static void
 s_set_bucket_time (ztimeout_t *self, uint slot, int64_t now) {
     int64_t mask = (~0LL) << slot;
     int64_t step = (1LL << slot) / 2;
-    // fprintf(stderr, "now = 0x%lx, mask = 0x%lx, step = 0x%lx\n", now, mask, step);
-    self->next_time[slot] = ((now + step) & mask) + step;
-    // fprintf (stderr, "bucket[%d] next at 0x%lx\n", slot, self->next_time[slot]);
+    self->next_time [slot] = ((now + step) & mask) + step;
 }
 
 
@@ -97,16 +96,17 @@ ztimeout_new (ztimeout_trigger_fn trigger_fn)
 {
     ztimeout_t *self = (ztimeout_t *) zmalloc (sizeof (ztimeout_t));
     if (self) {
-	int64_t now = zclock_mono ();
+        int64_t now = zclock_mono ();
         self->trigger_fn = trigger_fn;
         for (int i = 0; i < NUM_BUCKETS + 1; ++i) {
-            self->bucket[i] = zring_new ();
-            if (self->bucket[i] == NULL) {
+            self->bucket [i] = zring_new ();
+            if (self->bucket [i] == NULL) {
                 ztimeout_destroy (&self);
                 break;
             }
-            zring_set_destructor (self->bucket[i], (czmq_destructor *) s_ztimeout_node_destroy);
-	    s_set_bucket_time (self, i, now - (1LL << i));
+            zring_set_destructor (self->bucket [i],
+                                  (czmq_destructor *) s_ztimeout_node_destroy);
+            s_set_bucket_time (self, i, now - (1LL << i));
         }
     }
     return self;
@@ -123,7 +123,7 @@ ztimeout_destroy (ztimeout_t **self_p)
     if (*self_p) {
         ztimeout_t *self = *self_p;
         for (int i = 0; i < NUM_BUCKETS + 1; ++i)
-            zring_destroy (&self->bucket[i]);
+            zring_destroy (&self->bucket [i]);
         free (self);
         *self_p = NULL;
     }
@@ -137,13 +137,13 @@ static uint
 s_calc_bucket (int64_t timeout)
 {
     if (timeout <= 0) return -1;
-    uint n = 0;
+    uint bucket_num = 0;
     while (timeout > 1) {
         timeout >>= 1;
-        ++n;
+        ++bucket_num;
     }
-    assert (n < NUM_BUCKETS);
-    return n;
+    assert (bucket_num < NUM_BUCKETS);
+    return bucket_num;
 }
 
 
@@ -154,62 +154,66 @@ s_calc_bucket (int64_t timeout)
 int64_t
 ztimeout_first (ztimeout_t *self)
 {
-    // fprintf (stderr, "%s()\n", __PRETTY_FUNCTION__);
     assert (self);
-    int64_t now = zclock_mono();
+    int64_t now = zclock_mono ();
     int64_t next = INT64_MAX;
-    // fprintf (stderr, "%s(): now = 0x%lx\n", __PRETTY_FUNCTION__, now);
     for (int i = 0; i < NUM_BUCKETS; ++i) {
-        if (self->next_time[i] <= now) {
-	    // fprintf (stderr, "%s(): process i = %d\n", __PRETTY_FUNCTION__, i);
-	    // swap bucket with the spare list so we never insert into
-	    // the list we pop from
-            zring_t *list = self->bucket[i];
-	    self->bucket[i] = self->bucket[NUM_BUCKETS];
-	    self->bucket[NUM_BUCKETS] = list;
+        // go through all buckets and check if they need processing
+        if (self->next_time [i] <= now) {
+            // process bucket
+
+            // swap bucket with the spare list so we never insert into
+            // the list we pop from
+            zring_t *list = self->bucket [i];
+            self->bucket [i] = self->bucket [NUM_BUCKETS];
+            self->bucket [NUM_BUCKETS] = list;
+
+            // process timeouts in the bucket
             zring_first (list);
             while (zring_size (list) > 0) {
-                ztimeout_node_t *node = (ztimeout_node_t *)zring_detach (list, NULL);
-		// fprintf (stderr, "%s(): node %d expires in %ld\n", __PRETTY_FUNCTION__, *(int*)node->item, node->time - now);
+                ztimeout_node_t *node =
+                    (ztimeout_node_t *)zring_detach (list, NULL);
                 int slot = s_calc_bucket (node->time - now);
                 if (slot < 0) {
+                    // timeout expired, trigger it
                     (self->trigger_fn) (&node->item);
                     if (self->destructor) {
                         (self->destructor) (&node->item);
-		    }
+                    }
                     free (node);
                     self->size--;
                 } else {
-		    // fprintf (stderr, "%s(): move to slot %d\n", __PRETTY_FUNCTION__, slot);
+                    // timeout is still pending, reshelf it
                     node->current_slot = slot;
-                    node->node = zring_append (self->bucket[slot], node);
-		    if (node->time < next) {
-			// fprintf (stderr, "  setting next = %ld\n", node->time - now);
-			next = node->time;
-		    }
+                    node->node = zring_append (self->bucket [slot], node);
+                    if (node->time < next) {
+                        next = node->time;
+                    }
                 }
-	    }
-	    s_set_bucket_time (self, i, now);
+            }
+            s_set_bucket_time (self, i, now);
         }
+        // next contains the time the next timeout expires or
+        // processing must be done. Does it need updating?
         if (self->next_time [i] < next) {
-	    // fprintf (stderr, "%s(): self->next_time [%d] [%lx] < next [%lx]\n", __PRETTY_FUNCTION__, i, self->next_time [i], next);
-	    switch (zring_size (self->bucket[i])) {
-	    case 0:
-		break;
-	    case 1: {
-		ztimeout_node_t *node = (ztimeout_node_t*)zring_first (self->bucket [i]);
-		if (node->time < next) {
-		    // fprintf (stderr, "setting next = %ld [node]\n", node->time - now);
-		    next = node->time;
-		}
-		break;
-	    }
-	    default:
-		// fprintf (stderr, "setting next = %ld [bucket]\n", self->next_time[i] - now);
-		next = self->next_time[i];
-	    }
-	}
+            // this bucket has an event earlier than next, update next
+            switch (zring_size (self->bucket [i])) {
+            case 0: // empty bucket, ignore
+                break;
+            case 1: { // only one timeout in the bucket, use its exact time
+                ztimeout_node_t *node =
+                    (ztimeout_node_t*)zring_first (self->bucket [i]);
+                if (node->time < next) {
+                    next = node->time;
+                }
+                break;
+            }
+            default: // multiple timeouts, use the buckets next processing
+                next = self->next_time [i];
+            }
+        }
     }
+    // return time interval till the next timeout or processing is required
     return next - now;
 }
 
@@ -220,13 +224,12 @@ ztimeout_first (ztimeout_t *self)
 
 ztimeout_node_t *
 ztimeout_add (ztimeout_t *self, void *item, int64_t time) {
-    // fprintf (stderr, "%s(): %d\n", __PRETTY_FUNCTION__, *(int*)item);
     assert (self);
     assert (time > 0);
     ztimeout_node_t *node;
     node = (ztimeout_node_t *) zmalloc (sizeof (ztimeout_node_t));
     if (!node)
-	return NULL;
+        return NULL;
 
     // store item
     if (self->duplicator)
@@ -240,13 +243,12 @@ ztimeout_add (ztimeout_t *self, void *item, int64_t time) {
     }
     
     uint slot = s_calc_bucket (time);
-    node->node = zring_append (self->bucket[slot], node);
+    node->node = zring_append (self->bucket [slot], node);
     node->time = zclock_mono () + time;
     node->current_slot = slot;
     node->destructor = self->destructor;
     self->size++;
     return node;
-    // fprintf (stderr, "%s(): done\n", __PRETTY_FUNCTION__);
 }
 
 
@@ -258,8 +260,8 @@ ztimeout_cancel (ztimeout_t *self, ztimeout_node_t *node)
 {
     assert (self);
     assert (node);
-    zring_goto (self->bucket[node->current_slot], node->node);
-    zring_remove (self->bucket[node->current_slot], NULL);
+    zring_goto (self->bucket [node->current_slot], node->node);
+    zring_remove (self->bucket [node->current_slot], NULL);
     self->size--;
 }
 
@@ -272,10 +274,10 @@ ztimeout_restart (ztimeout_t *self, ztimeout_node_t *node, int64_t time)
 {
     assert (self);
     assert (node);
-    zring_goto (self->bucket[node->current_slot], node->node);
-    zring_detach (self->bucket[node->current_slot], NULL);
+    zring_goto (self->bucket [node->current_slot], node->node);
+    zring_detach (self->bucket [node->current_slot], NULL);
     uint slot = s_calc_bucket (time);
-    node->node = zring_append (self->bucket[slot], node);
+    node->node = zring_append (self->bucket [slot], node);
     node->time = zclock_mono () + time;
     node->current_slot = slot;
 }
@@ -317,20 +319,20 @@ ztimeout_set_duplicator (ztimeout_t *self, czmq_duplicator duplicator)
 //  --------------------------------------------------------------------------
 //  Dump state of timeout queue
 
-void
-ztimeout_dump (ztimeout_t *self)
+static void
+s_dump (ztimeout_t *self)
 {
     assert (self);
     int64_t now = zclock_mono();
     printf ("now = %lx\n", now);
     for (int i = 0; i < NUM_BUCKETS; ++i) {
-	printf ("Bucket [%d]: next = %ld\n", i, self->next_time[i] - now);
-	ztimeout_node_t *node = (ztimeout_node_t*)zring_first (self->bucket[i]);
-	while (node) {
-	    printf (" %ld,", node->time - now);
-	    node = zring_next (self->bucket[i]);
-	}
-	printf ("\n");
+        printf ("Bucket [%d]: next = %ld\n", i, self->next_time [i] - now);
+        ztimeout_node_t *node = (ztimeout_node_t*)zring_first (self->bucket [i]);
+        while (node) {
+            printf (" %ld,", node->time - now);
+            node = zring_next (self->bucket [i]);
+        }
+        printf ("\n");
     }
 }
 
@@ -361,51 +363,47 @@ ztimeout_test (int verbose)
     //  @selftest
     int64_t start = zclock_mono ();
     struct _test_item item [NUM_NODES];
-    // fprintf (stderr, "%s(): start = 0x%lx\n", __PRETTY_FUNCTION__, start);
     ztimeout_t *queue = ztimeout_new (s_test_trigger);
     assert (queue);
     assert (ztimeout_size (queue) == 0);
 
     ztimeout_node_t *node [NUM_NODES];
     for (int i = 0; i < NUM_NODES; ++i) {
-	item [i].timeout = (i + 1) * DELAY;
-	item [i].triggered = 0;
-	node [i] = ztimeout_add (queue, (void*)&item [i], item [i].timeout);
-	assert (node [i]);
+        item [i].timeout = (i + 1) * DELAY;
+        item [i].triggered = 0;
+        node [i] = ztimeout_add (queue, (void*)&item [i], item [i].timeout);
+        assert (node [i]);
     }
     assert (ztimeout_size (queue) == NUM_NODES);
 
     for (int i = 0; i < NUM_NODES; i += 2) {
-	ztimeout_cancel (queue, node [i]);
+        ztimeout_cancel (queue, node [i]);
     }
     assert (ztimeout_size (queue) == NUM_NODES / 2);
 
     while (true) {
-	// int64_t now = zclock_mono ();
-	int64_t next = ztimeout_first (queue);
-	// fprintf (stderr, "%s(): at time %ld next = %ld\n", __PRETTY_FUNCTION__, now - start, next);
-	if (ztimeout_size (queue) == 0)
-	    break;
-	// timeouts are 2 * DELAY apart except when the clock ticked during creation
-	if (next > 2 * DELAY + 1)
-	    ztimeout_dump (queue);
-	assert (next <= 2 * DELAY + 1);
-	zclock_sleep (next);
+        int64_t next = ztimeout_first (queue);
+        if (ztimeout_size (queue) == 0)
+            break;
+        // timeouts are 2 * DELAY apart except when the clock ticked
+        // during creation
+        if (next > 2 * DELAY + 1)
+            s_dump (queue);
+        assert (next <= 2 * DELAY + 1);
+        zclock_sleep (next);
     }
 
     for (int i = 0; i < NUM_NODES; ++i) {
-	if (item [i].triggered == 0) {
-	    // fprintf (stderr, "%s(): item %d canceled\n", __PRETTY_FUNCTION__, i);
-	    assert (i % 2 == 0);
-	}
-	else {
-	    int64_t triggered = item [i].triggered - start;
-	    int64_t error = triggered - item [i].timeout;
-	    // fprintf (stderr, "%s(): item %d: timeout = %d, triggered = %ld [%ld]\n", __PRETTY_FUNCTION__, i, item [i].timeout, triggered, error);
-	    assert (i % 2 == 1);
-	    assert (error >= 0); // not too early
-	    assert (error <= MAX_ERROR); // and not too much too late
-	}
+        if (item [i].triggered == 0) {
+            assert (i % 2 == 0); // even timeouts don't get triggered
+        }
+        else {
+            int64_t triggered = item [i].triggered - start;
+            int64_t error = triggered - item [i].timeout;
+            assert (i % 2 == 1); // odd timeouts get triggered
+            assert (error >= 0); // not too early
+            assert (error <= MAX_ERROR); // and not too much too late
+        }
     }
     //  @end
     printf ("OK\n");
