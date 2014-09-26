@@ -19,15 +19,6 @@ extern "C" {
 #endif
 
 //  @interface
-//  A struct defining contents of a topic filter.
-typedef struct {
-    dbyte magic_number;
-    dbyte major_version;
-    dbyte minor_version;
-    char *topic;
-    char *partition;
-} zpubsub_filter_t;
-
 //  Function to calculate port from domain id
 typedef dbyte (zpubsub_port_fn) (int domain);
 
