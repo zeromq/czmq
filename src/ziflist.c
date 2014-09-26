@@ -282,9 +282,9 @@ ziflist_first (ziflist_t *self)
 {
     assert (self);
     zlist_t *list = (zlist_t *) self;
-    interface_t *interface = zlist_first (list);
-    if (interface)
-        return interface->name;
+    interface_t *iface = (interface_t *) zlist_first (list);
+    if (iface)
+        return iface->name;
     else
         return NULL;
 }
@@ -298,9 +298,9 @@ ziflist_next (ziflist_t *self)
 {
     assert (self);
     zlist_t *list = (zlist_t *) self;
-    interface_t *interface = zlist_next (list);
-    if (interface)
-        return interface->name;
+    interface_t *iface = (interface_t *) zlist_next (list);
+    if (iface)
+        return iface->name;
     else
         return NULL;
 }
@@ -314,9 +314,9 @@ ziflist_address (ziflist_t *self)
 {
     assert (self);
     zlist_t *list = (zlist_t *) self;
-    interface_t *interface = zlist_item (list);
-    if (interface)
-        return interface->address;
+    interface_t *iface = (interface_t *) zlist_item (list);
+    if (iface)
+        return iface->address;
     else
         return NULL;
 }
@@ -330,9 +330,9 @@ ziflist_broadcast (ziflist_t *self)
 {
     assert (self);
     zlist_t *list = (zlist_t *) self;
-    interface_t *interface = zlist_item (list);
-    if (interface)
-        return interface->broadcast;
+    interface_t *iface = (interface_t *) zlist_item (list);
+    if (iface)
+        return iface->broadcast;
     else
         return NULL;
 }
@@ -346,9 +346,9 @@ ziflist_netmask (ziflist_t *self)
 {
     assert (self);
     zlist_t *list = (zlist_t *) self;
-    interface_t *interface = zlist_item (list);
-    if (interface)
-        return interface->netmask;
+    interface_t *iface = (interface_t *) zlist_item (list);
+    if (iface)
+        return iface->netmask;
     else
         return NULL;
 }
