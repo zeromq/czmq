@@ -25,24 +25,59 @@
 #include "platform.h"
 #include "../include/czmq.h"
 
-//  Structure of our class
-struct _ziflist_t {
-    //  We store our interfaces as separate lists for each property
-    zring_t *names;             //  Name as reported by the OS
-    zring_t *addresses;         //  IP(v4) address as a string
-    zring_t *netmasks;          //  Network mask as a string
-    zring_t *broadcasts;        //  Broadcast address as a string
-};
+//  Structure of an interface
+typedef struct _interface_t {
+  const char *name;
+  const char *address;
+  const char *netmask;
+  const char *broadcast;
+} interface_t;
 
+
+//  --------------------------------------------------------------------------
+//  interface destructor
 
 static void
-s_store (ziflist_t *self, char *name, inaddr_t address, inaddr_t netmask, inaddr_t broadcast)
+s_interface_destroy (interface_t **self_p)
 {
-    zring_append (self->names, strdup (name));
-    zring_append (self->addresses, strdup (inet_ntoa (address.sin_addr)));
-    zring_append (self->netmasks, strdup (inet_ntoa (netmask.sin_addr)));
-    zring_append (self->broadcasts, strdup (inet_ntoa (broadcast.sin_addr)));
+    assert (self_p);
+    interface_t *self = *self_p;
+    if (self) {
+        free ((void *) self->name);
+        free ((void *) self->address);
+        free ((void *) self->netmask);
+        free ((void *) self->broadcast);
+        free (self);
+        *self_p = NULL;
+    }
 }
+
+
+//  --------------------------------------------------------------------------
+//  interface constructor
+
+static interface_t *
+s_interface_new (char *name, inaddr_t address, inaddr_t netmask,
+                 inaddr_t broadcast)
+{
+    interface_t *self = (interface_t *) zmalloc (sizeof (interface_t));
+    if (!self)
+        return NULL;
+    self->name = strdup (name);
+    if (self->name)
+        self->address = strdup (inet_ntoa (address.sin_addr));
+    if (self->address)
+        self->netmask = strdup (inet_ntoa (netmask.sin_addr));
+    if (self->netmask)
+        self->broadcast = strdup (inet_ntoa (broadcast.sin_addr));
+    if (!self->broadcast)
+        s_interface_destroy (&self);
+    return self;
+}
+
+
+//  Structure of our class
+struct _ziflist_t;
 
 
 //  --------------------------------------------------------------------------
@@ -51,27 +86,11 @@ s_store (ziflist_t *self, char *name, inaddr_t address, inaddr_t netmask, inaddr
 ziflist_t *
 ziflist_new (void)
 {
-    ziflist_t *self = (ziflist_t *) zmalloc (sizeof (ziflist_t));
+    zlist_t *list = zlist_new ();
+    ziflist_t *self = (ziflist_t *) list;
     if (self) {
-        self->names = zring_new ();
-        if (self->names) {
-            zring_set_destructor (self->names, (czmq_destructor *) zstr_free);
-            self->addresses = zring_new ();
-        }
-        if (self->addresses) {
-            zring_set_destructor (self->addresses, (czmq_destructor *) zstr_free);
-            self->netmasks = zring_new ();
-        }
-        if (self->netmasks) {
-            zring_set_destructor (self->netmasks, (czmq_destructor *) zstr_free);
-            self->broadcasts = zring_new ();
-        }
-        if (self->broadcasts) {
-            zring_set_destructor (self->broadcasts, (czmq_destructor *) zstr_free);
-            ziflist_reload (self);
-        }
-        else
-            ziflist_destroy (&self);
+        zlist_set_destructor (list, (czmq_destructor *) s_interface_destroy);
+        ziflist_reload (self);
     }
     return self;
 }
@@ -83,16 +102,7 @@ ziflist_new (void)
 void
 ziflist_destroy (ziflist_t **self_p)
 {
-    assert (self_p);
-    if (*self_p) {
-        ziflist_t *self = *self_p;
-        zring_destroy (&self->names);
-        zring_destroy (&self->addresses);
-        zring_destroy (&self->netmasks);
-        zring_destroy (&self->broadcasts);
-        free (self);
-        *self_p = NULL;
-    }
+    zlist_destroy ((zlist_t **) self_p);
 }
 
 
@@ -120,10 +130,9 @@ s_valid_flags (short flags)
 void
 ziflist_reload (ziflist_t *self)
 {
-    zring_purge (self->names);
-    zring_purge (self->addresses);
-    zring_purge (self->netmasks);
-    zring_purge (self->broadcasts);
+    assert (self);
+    zlist_t *list = (zlist_t *) self;
+    zlist_purge (list);
 
 #if defined (HAVE_GETIFADDRS)
     struct ifaddrs *interfaces;
@@ -145,7 +154,11 @@ ziflist_reload (ziflist_t *self)
                 if (address.sin_addr.s_addr == broadcast.sin_addr.s_addr)
                     broadcast.sin_addr.s_addr |= ~(netmask.sin_addr.s_addr);
 
-                s_store (self, interface->ifa_name, address, netmask, broadcast);
+                interface_t *item =
+                    s_interface_new (interface->ifa_name, address, netmask,
+                                     broadcast);
+                if (item)
+                    zlist_append (list, item);
             }
             interface = interface->ifa_next;
         }
@@ -190,8 +203,12 @@ ziflist_reload (ziflist_t *self)
             else
                 is_valid = false;
 
-            if (is_valid)
-                s_store (self, ifr->ifr_name, address, netmask, broadcast);
+            if (is_valid) {
+                interface_t *item = s_interface_new (ifr->ifr_name, address,
+                                                     netmask, broadcast);
+                if (item)
+                    zlist_append (list, item);
+            }
         }
         free (ifconfig.ifc_buf);
         close (sock);
@@ -229,7 +246,10 @@ ziflist_reload (ziflist_t *self)
             netmask.sin_addr.s_addr = htonl ((0xffffffffU) << (32 - pPrefix->PrefixLength));
             inaddr_t broadcast = address;
             broadcast.sin_addr.s_addr |= ~(netmask.sin_addr.s_addr);
-            s_store (self, asciiFriendlyName, address, netmask, broadcast);
+            interface_t *item = s_interface_new (asciiFriendlyName, address,
+                                                 netmask, broadcast);
+            if (item)
+                zlist_append (list, item);
         }
         free (asciiFriendlyName);
         cur_address = cur_address->Next;
@@ -249,7 +269,8 @@ size_t
 ziflist_size (ziflist_t *self)
 {
     assert (self);
-    return zring_size (self->names);
+    zlist_t *list = (zlist_t *) self;
+    return zlist_size (list);
 }
 
 
@@ -260,10 +281,12 @@ const char *
 ziflist_first (ziflist_t *self)
 {
     assert (self);
-    zring_first (self->addresses);
-    zring_first (self->netmasks);
-    zring_first (self->broadcasts);
-    return (const char *) zring_first (self->names);
+    zlist_t *list = (zlist_t *) self;
+    interface_t *iface = (interface_t *) zlist_first (list);
+    if (iface)
+        return iface->name;
+    else
+        return NULL;
 }
 
 
@@ -274,10 +297,12 @@ const char *
 ziflist_next (ziflist_t *self)
 {
     assert (self);
-    zring_next (self->addresses);
-    zring_next (self->netmasks);
-    zring_next (self->broadcasts);
-    return (const char *) zring_next (self->names);
+    zlist_t *list = (zlist_t *) self;
+    interface_t *iface = (interface_t *) zlist_next (list);
+    if (iface)
+        return iface->name;
+    else
+        return NULL;
 }
 
 
@@ -288,7 +313,12 @@ const char *
 ziflist_address (ziflist_t *self)
 {
     assert (self);
-    return (const char *) zring_item (self->addresses);
+    zlist_t *list = (zlist_t *) self;
+    interface_t *iface = (interface_t *) zlist_item (list);
+    if (iface)
+        return iface->address;
+    else
+        return NULL;
 }
 
 
@@ -299,7 +329,12 @@ const char *
 ziflist_broadcast (ziflist_t *self)
 {
     assert (self);
-    return (const char *) zring_item (self->broadcasts);
+    zlist_t *list = (zlist_t *) self;
+    interface_t *iface = (interface_t *) zlist_item (list);
+    if (iface)
+        return iface->broadcast;
+    else
+        return NULL;
 }
 
 
@@ -310,7 +345,12 @@ const char *
 ziflist_netmask (ziflist_t *self)
 {
     assert (self);
-    return (const char *) zring_item (self->netmasks);
+    zlist_t *list = (zlist_t *) self;
+    interface_t *iface = (interface_t *) zlist_item (list);
+    if (iface)
+        return iface->netmask;
+    else
+        return NULL;
 }
 
 
