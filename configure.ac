@@ -236,7 +236,7 @@ AC_C_VOLATILE
 
 # These options are GNU compiler specific.
 if test "x$GCC" = "xyes"; then
-    CPPFLAGS="-pedantic -Werror -Wall ${CPPFLAGS}"
+    CPPFLAGS="-pedantic -Werror -Wall -Wc++-compat ${CPPFLAGS}"
 fi
 
 AM_CONDITIONAL(ON_MINGW, test "x$czmq_on_mingw32" = "xyes")
