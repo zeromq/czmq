@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zring - generic type-free doubly linked ring container
+    zhashring - generic type-free doubly linked ring container
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -15,7 +15,7 @@
 @header
     Provides a generic "ring" container, which mixes a doubly-linked list
     with a hash table to provide both ordered and direct keyed access to
-    items. The zring class is more complex and powerful than zlist, which
+    items. The zhashring class is more complex and powerful than zlist, which
     is considered a 'basic' list container. This container provides hooks
     for duplicator, comparator, and destructor functions. These tie into
     CZMQ and standard C semantics, so e.g. for string items you can use
@@ -29,9 +29,9 @@
 
 //  Ring node, used internally only
 
-struct _zring_node_t {
-    struct _zring_node_t *next;
-    struct _zring_node_t *prev;
+struct _zhashring_node_t {
+    struct _zhashring_node_t *next;
+    struct _zhashring_node_t *prev;
     void *item;
     const void *key;            //  Dictionary key, if any
 };
@@ -39,9 +39,9 @@ struct _zring_node_t {
 //  ---------------------------------------------------------------------
 //  Structure of our class
 
-struct _zring_t {
-    zring_node_t *head;         //  Dummy node acting as head in ring
-    zring_node_t *cursor;       //  Current node for iteration
+struct _zhashring_t {
+    zhashring_node_t *head;         //  Dummy node acting as head in ring
+    zhashring_node_t *cursor;       //  Current node for iteration
     size_t size;                //  Number of items in ring
     zhash_t *hash;              //  Dictionary for keyed access
     //  Container-level handlers
@@ -56,10 +56,11 @@ struct _zring_t {
 //  if these are specified as null. Returns new node, or NULL if process ran
 //  out of heap memory.
 
-static zring_node_t *
-s_node_new (zring_node_t *prev, zring_node_t *next, void *item)
+static zhashring_node_t *
+s_node_new (zhashring_node_t *prev, zhashring_node_t *next, void *item)
 {
-    zring_node_t *self = (zring_node_t *) zmalloc (sizeof (zring_node_t));
+    zhashring_node_t *self =
+        (zhashring_node_t *) zmalloc (sizeof (zhashring_node_t));
     if (self) {
         self->prev = prev? prev: self;
         self->next = next? next: self;
@@ -72,10 +73,10 @@ s_node_new (zring_node_t *prev, zring_node_t *next, void *item)
 //  --------------------------------------------------------------------------
 //  Create a new ring container (a ring is a doubly-linked ring)
 
-zring_t *
-zring_new (void)
+zhashring_t *
+zhashring_new (void)
 {
-    zring_t *self = (zring_t *) zmalloc (sizeof (zring_t));
+    zhashring_t *self = (zhashring_t *) zmalloc (sizeof (zhashring_t));
     if (self) {
         self->head = s_node_new (NULL, NULL, NULL);
         self->cursor = self->head;
@@ -88,12 +89,12 @@ zring_new (void)
 //  Destroy a ring container
 
 void
-zring_destroy (zring_t **self_p)
+zhashring_destroy (zhashring_t **self_p)
 {
     assert (self_p);
     if (*self_p) {
-        zring_t *self = *self_p;
-        zring_purge (self);
+        zhashring_t *self = *self_p;
+        zhashring_purge (self);
         assert (!self->hash || zhash_size (self->hash) == 0);
         zhash_destroy (&self->hash);
         free (self->head);
@@ -107,11 +108,11 @@ zring_destroy (zring_t **self_p)
 //  Prepend an item to the start of the ring, return 0 if OK, else -1.
 //  Leaves cursor at newly inserted item.
 
-zring_node_t *
-zring_prepend (zring_t *self, void *item)
+zhashring_node_t *
+zhashring_prepend (zhashring_t *self, void *item)
 {
     assert (self);
-    zring_node_t *node = s_node_new (self->head, self->head->next, item);
+    zhashring_node_t *node = s_node_new (self->head, self->head->next, item);
     if (node) {
         self->head->next->prev = node;
         self->head->next = node;
@@ -126,11 +127,11 @@ zring_prepend (zring_t *self, void *item)
 //  Append an item to the end of the ring, return 0 if OK, else -1.
 //  Leaves cursor at newly inserted item.
 
-zring_node_t *
-zring_append (zring_t *self, void *item)
+zhashring_node_t *
+zhashring_append (zhashring_t *self, void *item)
 {
     assert (self);
-    zring_node_t *node = s_node_new (self->head->prev, self->head, item);
+    zhashring_node_t *node = s_node_new (self->head->prev, self->head, item);
     if (node) {
         self->head->prev->next = node;
         self->head->prev = node;
@@ -143,14 +144,14 @@ zring_append (zring_t *self, void *item)
 
 //  --------------------------------------------------------------------------
 //  Append an item to the end of the ring, and insert into the ring
-//  dictionary, so that you can find the item rapidly using zring_lookup.
-//  If you do a lot of item searches, this is faster than zring_find,
+//  dictionary, so that you can find the item rapidly using zhashring_lookup.
+//  If you do a lot of item searches, this is faster than zhashring_find,
 //  which is at worst an O(N) operation. When items leave the ring, they
 //  are always removed from the dictionary. Returns 0 on success, -1 if
 //  the key already existed in the dictionary, or heap memory ran out.
 
 int
-zring_insert (zring_t *self, const void *key, void *item)
+zhashring_insert (zhashring_t *self, const void *key, void *item)
 {
     assert (self);
     assert (key);
@@ -164,7 +165,7 @@ zring_insert (zring_t *self, const void *key, void *item)
     //  If item isn't already in dictionary, append to list and then
     //  store item node (which is in cursor) in dictionary
     if (!zhash_lookup (self->hash, key)
-    &&  zring_append (self, item)
+    &&  zhashring_append (self, item)
     &&  !zhash_insert (self->hash, key, self->cursor)) {
         self->cursor->key = zhash_cursor (self->hash);
         return 0;
@@ -183,7 +184,7 @@ zring_insert (zring_t *self, const void *key, void *item)
 //  else null.
 
 void *
-zring_find (zring_t *self, void *item)
+zhashring_find (zhashring_t *self, void *item)
 {
     assert (self);
     assert (item);
@@ -199,7 +200,7 @@ zring_find (zring_t *self, void *item)
             return self->cursor->item;
     }
     //  Now scan ring for item, this is a O(N) operation
-    zring_node_t *node = self->head->next;
+    zhashring_node_t *node = self->head->next;
     while (node != self->head) {
         if (self->comparator) {
             if (self->comparator (node->item, item) == 0)
@@ -217,18 +218,19 @@ zring_find (zring_t *self, void *item)
 
 //  --------------------------------------------------------------------------
 //  Search the ring dictionary for an item, by key. If the item is in the
-//  dictionary (via zring_insert), then sets the ring cursor to the item,
+//  dictionary (via zhashring_insert), then sets the ring cursor to the item,
 //  and returns the item value. If not, leaves the cursor unchanged, and
 //  returns NULL.
 
 void *
-zring_lookup (zring_t *self, const void *key)
+zhashring_lookup (zhashring_t *self, const void *key)
 {
     assert (self);
     assert (key);
     
     if (self->hash) {
-      zring_node_t *node = (zring_node_t *) zhash_lookup (self->hash, key);
+      zhashring_node_t *node =
+          (zhashring_node_t *) zhash_lookup (self->hash, key);
         if (node) {
             self->cursor = node;
             return node->item;
@@ -246,12 +248,12 @@ zring_lookup (zring_t *self, const void *key)
 //  the next item, if any, and returns the item. Else, returns null.
 
 void *
-zring_detach (zring_t *self, void *item)
+zhashring_detach (zhashring_t *self, void *item)
 {
     assert (self);
     
-    zring_node_t *found = NULL;
-    if ((item && zring_find (self, item))
+    zhashring_node_t *found = NULL;
+    if ((item && zhashring_find (self, item))
     || (!item && self->cursor != self->head))
         found = self->cursor;
 
@@ -280,10 +282,10 @@ zring_detach (zring_t *self, void *item)
 //  the cursor at the next item, if any, and returns 0. Else, returns -1.
 
 int
-zring_remove (zring_t *self, void *item)
+zhashring_remove (zhashring_t *self, void *item)
 {
     assert (self);
-    if ((item = zring_detach (self, item))) {
+    if ((item = zhashring_detach (self, item))) {
         if (self->destructor)
             self->destructor (&item);
         return 0;
@@ -295,18 +297,18 @@ zring_remove (zring_t *self, void *item)
 
 //  --------------------------------------------------------------------------
 //  Search the ring dictionary for an item, by key. If the item is in the
-//  dictionary (via zring_insert), then removes the item from the ring and
+//  dictionary (via zhashring_insert), then removes the item from the ring and
 //  calls the item destructor, if any is found. Returns 0 if the item was
 //  found and removed, else -1 if not found.
 
 int
-zring_delete (zring_t *self, const void *key)
+zhashring_delete (zhashring_t *self, const void *key)
 {
     assert (self);
     assert (key);
 
-    if (zring_lookup (self, key))
-        return zring_remove (self, NULL);
+    if (zhashring_lookup (self, key))
+        return zhashring_remove (self, NULL);
     else
         return -1;          //  Not found in dictionary
 }
@@ -317,10 +319,10 @@ zring_delete (zring_t *self, const void *key)
 //  on every item.
 
 void
-zring_purge (zring_t *self)
+zhashring_purge (zhashring_t *self)
 {
     assert (self);
-    while (zring_remove (self, zring_first (self)) == 0);
+    while (zhashring_remove (self, zhashring_first (self)) == 0);
 }
 
 
@@ -328,7 +330,7 @@ zring_purge (zring_t *self)
 //  Return the number of items in the ring
 
 size_t
-zring_size (zring_t *self)
+zhashring_size (zhashring_t *self)
 {
     assert (self);
     return self->size;
@@ -340,11 +342,11 @@ zring_size (zring_t *self)
 //  Leaves cursor pointing at the head item, or NULL if the ring is empty.
 
 void *
-zring_first (zring_t *self)
+zhashring_first (zhashring_t *self)
 {
     assert (self);
     self->cursor = self->head;
-    return zring_next (self);
+    return zhashring_next (self);
 }
 
 
@@ -353,46 +355,46 @@ zring_first (zring_t *self)
 //  Leaves cursor pointing at the tail item, or NULL if the ring is empty.
 
 void *
-zring_last (zring_t *self)
+zhashring_last (zhashring_t *self)
 {
     assert (self);
     self->cursor = self->head;
-    return zring_prev (self);
+    return zhashring_prev (self);
 }
 
 
 //  --------------------------------------------------------------------------
 //  Return the next item. At the end of the ring (or in an empty ring),
-//  returns NULL. Use repeated zring_next () calls to work through the ring
-//  from zring_first ().
+//  returns NULL. Use repeated zhashring_next () calls to work through the
+//  ring from zhashring_first ().
 
 void *
-zring_next (zring_t *self)
+zhashring_next (zhashring_t *self)
 {
     assert (self);
     self->cursor = self->cursor->next;
-    return zring_item (self);
+    return zhashring_item (self);
 }
 
 
 //  --------------------------------------------------------------------------
 //  Return the previous item. At the start of the ring (or in an empty ring),
-//  returns NULL. Use repeated zring_prev () calls to work through the ring
-//  backwards from zring_last ().
+//  returns NULL. Use repeated zhashring_prev () calls to work through the
+//  ring backwards from zhashring_last ().
 
 void *
-zring_prev (zring_t *self)
+zhashring_prev (zhashring_t *self)
 {
     assert (self);
     self->cursor = self->cursor->prev;
-    return zring_item (self);
+    return zhashring_item (self);
 }
 
 
 //  --------------------------------------------------------------------------
 //  Set cursor to handle.
 void
-zring_goto (zring_t *self, zring_node_t *handle)
+zhashring_goto (zhashring_t *self, zhashring_node_t *handle)
 {
     assert (self);
     assert (handle);
@@ -405,7 +407,7 @@ zring_goto (zring_t *self, zring_node_t *handle)
 //  passed the end of the ring, returns NULL. Does not change the cursor.
 
 void *
-zring_item (zring_t *self)
+zhashring_item (zhashring_t *self)
 {
     assert (self);
     if (self->cursor != self->head)
@@ -420,7 +422,7 @@ zring_item (zring_t *self)
 //  specified. The sort is not stable, so may reorder equal items.
 
 void
-zring_sort (zring_t *self)
+zhashring_sort (zhashring_t *self)
 {
     assert (self);
     
@@ -432,8 +434,8 @@ zring_sort (zring_t *self)
         if (gap > 1)
             gap = (size_t) ((double) gap / 1.247330950103979);
 
-        zring_node_t *base = self->head;
-        zring_node_t *test = self->head;
+        zhashring_node_t *base = self->head;
+        zhashring_node_t *test = self->head;
         int jump = gap;
         while (jump--)
             test = test->next;
@@ -468,25 +470,25 @@ zring_sort (zring_t *self)
 //  for the ring, otherwise not. Copying a null reference returns a null
 //  reference.
 
-zring_t *
-zring_dup (zring_t *self)
+zhashring_t *
+zhashring_dup (zhashring_t *self)
 {
     if (!self)
         return NULL;
 
-    zring_t *copy = zring_new ();
+    zhashring_t *copy = zhashring_new ();
     if (copy) {
         copy->destructor = self->destructor;
         copy->duplicator = self->duplicator;
         copy->comparator = self->comparator;
         
-        zring_node_t *node;
+        zhashring_node_t *node;
         for (node = self->head->next; node != self->head; node = node->next) {
             void *item = node->item;
             if (self->duplicator)
                 item = self->duplicator (item);
-            if (!item || zring_append (copy, item) == NULL) {
-                zring_destroy (&copy);
+            if (!item || zhashring_append (copy, item) == NULL) {
+                zhashring_destroy (&copy);
                 break;
             }
         }
@@ -500,7 +502,7 @@ zring_dup (zring_t *self)
 //  freed when the ring is destroyed.
 
 void
-zring_set_destructor (zring_t *self, czmq_destructor destructor)
+zhashring_set_destructor (zhashring_t *self, czmq_destructor destructor)
 {
     assert (self);
     self->destructor = destructor;
@@ -512,7 +514,7 @@ zring_set_destructor (zring_t *self, czmq_destructor destructor)
 //  copied when the ring is duplicated.
 
 void
-zring_set_duplicator (zring_t *self, czmq_duplicator duplicator)
+zhashring_set_duplicator (zhashring_t *self, czmq_duplicator duplicator)
 {
     assert (self);
     self->duplicator = duplicator;
@@ -520,12 +522,12 @@ zring_set_duplicator (zring_t *self, czmq_duplicator duplicator)
 
 
 //  --------------------------------------------------------------------------
-//  Set a user-defined comparator for zring_find and zring_sort; the method
-//  must return -1, 0, or 1 depending on whether item1 is less than, equal to,
-//  or greater than, item2.
+//  Set a user-defined comparator for zhashring_find and zhashring_sort; the
+//  method must return -1, 0, or 1 depending on whether item1 is less than,
+//  equal to, or greater than, item2.
 
 void
-zring_set_comparator (zring_t *self, czmq_comparator comparator)
+zhashring_set_comparator (zhashring_t *self, czmq_comparator comparator)
 {
     assert (self);
     self->comparator = comparator;
@@ -536,14 +538,14 @@ zring_set_comparator (zring_t *self, czmq_comparator comparator)
 //  Runs selftest of class
 
 void
-zring_test (int verbose)
+zhashring_test (int verbose)
 {
-    printf (" * zring: ");
+    printf (" * zhashring: ");
 
     //  @selftest
-    zring_t *ring = zring_new ();
+    zhashring_t *ring = zhashring_new ();
     assert (ring);
-    assert (zring_size (ring) == 0);
+    assert (zhashring_size (ring) == 0);
 
     //  Three items we'll use as test data
     //  Ring items are void *, not particularly strings
@@ -551,103 +553,103 @@ zring_test (int verbose)
     char *bread = "baguette";
     char *wine = "bordeaux";
 
-    zring_node_t *node = zring_append (ring, cheese);
+    zhashring_node_t *node = zhashring_append (ring, cheese);
     assert (node);
-    assert (zring_size (ring) == 1);
-    assert (zring_item (ring) == cheese);
-    node = zring_append (ring, bread);
+    assert (zhashring_size (ring) == 1);
+    assert (zhashring_item (ring) == cheese);
+    node = zhashring_append (ring, bread);
     assert (node);
-    assert (zring_size (ring) == 2);
-    assert (zring_item (ring) == bread);
-    node = zring_append (ring, wine);
+    assert (zhashring_size (ring) == 2);
+    assert (zhashring_item (ring) == bread);
+    node = zhashring_append (ring, wine);
     assert (node);
-    assert (zring_size (ring) == 3);
-    assert (zring_item (ring) == wine);
+    assert (zhashring_size (ring) == 3);
+    assert (zhashring_item (ring) == wine);
 
-    assert (zring_first (ring) == cheese);
-    assert (zring_next (ring) == bread);
-    assert (zring_next (ring) == wine);
-    assert (zring_next (ring) == NULL);
+    assert (zhashring_first (ring) == cheese);
+    assert (zhashring_next (ring) == bread);
+    assert (zhashring_next (ring) == wine);
+    assert (zhashring_next (ring) == NULL);
     //  After we reach end of ring, next wraps around
-    assert (zring_next (ring) == cheese);
+    assert (zhashring_next (ring) == cheese);
     
-    assert (zring_last (ring) == wine);
-    assert (zring_prev (ring) == bread);
-    assert (zring_prev (ring) == cheese);
-    assert (zring_prev (ring) == NULL);
+    assert (zhashring_last (ring) == wine);
+    assert (zhashring_prev (ring) == bread);
+    assert (zhashring_prev (ring) == cheese);
+    assert (zhashring_prev (ring) == NULL);
     //  After we reach start of ring, prev wraps around
-    assert (zring_prev (ring) == wine);
-    zring_purge (ring);
+    assert (zhashring_prev (ring) == wine);
+    zhashring_purge (ring);
 
     //  Test some list insertion-deletion combos
-    assert (zring_size (ring) == 0);
-    zring_prepend (ring, "4");
-    zring_append (ring, "3");
-    zring_prepend (ring, "5");
-    zring_append (ring, "2");
-    zring_prepend (ring, "0");
-    zring_append (ring, "1");
-    assert (zring_size (ring) == 6);
+    assert (zhashring_size (ring) == 0);
+    zhashring_prepend (ring, "4");
+    zhashring_append (ring, "3");
+    zhashring_prepend (ring, "5");
+    zhashring_append (ring, "2");
+    zhashring_prepend (ring, "0");
+    zhashring_append (ring, "1");
+    assert (zhashring_size (ring) == 6);
 
     //  Try the comparator functionality
-    zring_set_comparator (ring, (czmq_comparator *) strcmp);
-    zring_sort (ring);
+    zhashring_set_comparator (ring, (czmq_comparator *) strcmp);
+    zhashring_sort (ring);
     
-    char *item = (char *) zring_first (ring);
+    char *item = (char *) zhashring_first (ring);
     assert (streq (item, "0"));
-    item = (char *) zring_find (ring, "5");
+    item = (char *) zhashring_find (ring, "5");
     assert (streq (item, "5"));
 
     //  Try the duplicator and destructor
-    zring_set_duplicator (ring, (czmq_duplicator *) strdup);
-    zring_t *dup = zring_dup (ring);
+    zhashring_set_duplicator (ring, (czmq_duplicator *) strdup);
+    zhashring_t *dup = zhashring_dup (ring);
     assert (dup);
-    zring_set_destructor (dup, (czmq_destructor *) zstr_free);
-    assert (zring_size (dup) == 6);
-    zring_destroy (&dup);
+    zhashring_set_destructor (dup, (czmq_destructor *) zstr_free);
+    assert (zhashring_size (dup) == 6);
+    zhashring_destroy (&dup);
 
     //  We're comparing as strings, not item pointers
-    int rc = zring_remove (ring, "2");
+    int rc = zhashring_remove (ring, "2");
     assert (rc == 0);
-    rc = zring_remove (ring, "5");
+    rc = zhashring_remove (ring, "5");
     assert (rc == 0);
-    rc = zring_remove (ring, "3");
+    rc = zhashring_remove (ring, "3");
     assert (rc == 0);
-    item = (char *) zring_detach (ring, NULL);
-    zring_purge (ring);
+    item = (char *) zhashring_detach (ring, NULL);
+    zhashring_purge (ring);
 
     //  Try the dictionary insert/delete functionality
-    rc = zring_insert (ring, "1", "one");
+    rc = zhashring_insert (ring, "1", "one");
     assert (rc == 0);
-    rc = zring_insert (ring, "3", "three");
+    rc = zhashring_insert (ring, "3", "three");
     assert (rc == 0);
-    rc = zring_insert (ring, "2", "two");
+    rc = zhashring_insert (ring, "2", "two");
     assert (rc == 0);
-    rc = zring_insert (ring, "2", "two");
+    rc = zhashring_insert (ring, "2", "two");
     assert (rc == -1);
     
-    item = (char *) zring_lookup (ring, "2");
+    item = (char *) zhashring_lookup (ring, "2");
     assert (streq (item, "two"));
-    item = (char *) zring_lookup (ring, "1");
+    item = (char *) zhashring_lookup (ring, "1");
     assert (streq (item, "one"));
-    item = (char *) zring_item (ring);
+    item = (char *) zhashring_item (ring);
     assert (streq (item, "one"));
     
-    rc = zring_delete (ring, "3");
+    rc = zhashring_delete (ring, "3");
     assert (rc == 0);
-    rc = zring_delete (ring, "3");
+    rc = zhashring_delete (ring, "3");
     assert (rc == -1);
     //  Using detach/remove will also remove from dictionary
-    rc = zring_remove (ring, "two");
+    rc = zhashring_remove (ring, "two");
     assert (rc == 0);
-    rc = zring_delete (ring, "2");
+    rc = zhashring_delete (ring, "2");
     assert (rc == -1);
-    zring_purge (ring);
+    zhashring_purge (ring);
     
     //  Destructor should be safe to call twice
-    zring_destroy (&ring);
+    zhashring_destroy (&ring);
     assert (ring == NULL);
-    zring_destroy (&ring);
+    zhashring_destroy (&ring);
     //  @end
 
     printf ("OK\n");

@@ -35,7 +35,7 @@ include_HEADERS = \
     ../include/zpubsub.h \
     ../include/zpubsub_option.h \
     ../include/zrex.h \
-    ../include/zring.h \
+    ../include/zhashring.h \
     ../include/zsock.h \
     ../include/zsock_option.h \
     ../include/zstr.h \
@@ -83,7 +83,7 @@ libczmq_la_SOURCES = \
     zpubsub.c \
     zpubsub_option.c \
     zrex.c \
-    zring.c \
+    zhashring.c \
     zsock.c \
     zsock_option.c \
     zstr.c \
