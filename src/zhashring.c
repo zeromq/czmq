@@ -29,19 +29,19 @@
 
 //  Ring node, used internally only
 
-struct _zhashring_node_t {
-    struct _zhashring_node_t *next;
-    struct _zhashring_node_t *prev;
+typedef struct _node_t {
+    struct _node_t *next;
+    struct _node_t *prev;
     void *item;
     const void *key;            //  Dictionary key, if any
-};
+} node_t;
 
 //  ---------------------------------------------------------------------
 //  Structure of our class
 
 struct _zhashring_t {
-    zhashring_node_t *head;         //  Dummy node acting as head in ring
-    zhashring_node_t *cursor;       //  Current node for iteration
+    node_t *head;               //  Dummy node acting as head in ring
+    node_t *cursor;             //  Current node for iteration
     size_t size;                //  Number of items in ring
     zhash_t *hash;              //  Dictionary for keyed access
     //  Container-level handlers
@@ -56,11 +56,10 @@ struct _zhashring_t {
 //  if these are specified as null. Returns new node, or NULL if process ran
 //  out of heap memory.
 
-static zhashring_node_t *
-s_node_new (zhashring_node_t *prev, zhashring_node_t *next, void *item)
+static node_t *
+s_node_new (node_t *prev, node_t *next, void *item)
 {
-    zhashring_node_t *self =
-        (zhashring_node_t *) zmalloc (sizeof (zhashring_node_t));
+    node_t *self = (node_t *) zmalloc (sizeof (node_t));
     if (self) {
         self->prev = prev? prev: self;
         self->next = next? next: self;
@@ -108,18 +107,19 @@ zhashring_destroy (zhashring_t **self_p)
 //  Prepend an item to the start of the ring, return 0 if OK, else -1.
 //  Leaves cursor at newly inserted item.
 
-zhashring_node_t *
+int
 zhashring_prepend (zhashring_t *self, void *item)
 {
     assert (self);
-    zhashring_node_t *node = s_node_new (self->head, self->head->next, item);
+    node_t *node = s_node_new (self->head, self->head->next, item);
     if (node) {
         self->head->next->prev = node;
         self->head->next = node;
         self->cursor = node;
         self->size++;
+        return 0;
     }
-    return node;
+    return -1;
 }
 
 
@@ -127,18 +127,19 @@ zhashring_prepend (zhashring_t *self, void *item)
 //  Append an item to the end of the ring, return 0 if OK, else -1.
 //  Leaves cursor at newly inserted item.
 
-zhashring_node_t *
+int
 zhashring_append (zhashring_t *self, void *item)
 {
     assert (self);
-    zhashring_node_t *node = s_node_new (self->head->prev, self->head, item);
+    node_t *node = s_node_new (self->head->prev, self->head, item);
     if (node) {
         self->head->prev->next = node;
         self->head->prev = node;
         self->cursor = node;
         self->size++;
+        return 0;
     }
-    return node;
+    return -1;
 }
 
 
@@ -165,7 +166,7 @@ zhashring_insert (zhashring_t *self, const void *key, void *item)
     //  If item isn't already in dictionary, append to list and then
     //  store item node (which is in cursor) in dictionary
     if (!zhash_lookup (self->hash, key)
-    &&  zhashring_append (self, item)
+    &&  !zhashring_append (self, item)
     &&  !zhash_insert (self->hash, key, self->cursor)) {
         self->cursor->key = zhash_cursor (self->hash);
         return 0;
@@ -200,7 +201,7 @@ zhashring_find (zhashring_t *self, void *item)
             return self->cursor->item;
     }
     //  Now scan ring for item, this is a O(N) operation
-    zhashring_node_t *node = self->head->next;
+    node_t *node = self->head->next;
     while (node != self->head) {
         if (self->comparator) {
             if (self->comparator (node->item, item) == 0)
@@ -229,8 +230,8 @@ zhashring_lookup (zhashring_t *self, const void *key)
     assert (key);
     
     if (self->hash) {
-      zhashring_node_t *node =
-          (zhashring_node_t *) zhash_lookup (self->hash, key);
+      node_t *node =
+          (node_t *) zhash_lookup (self->hash, key);
         if (node) {
             self->cursor = node;
             return node->item;
@@ -252,7 +253,7 @@ zhashring_detach (zhashring_t *self, void *item)
 {
     assert (self);
     
-    zhashring_node_t *found = NULL;
+    node_t *found = NULL;
     if ((item && zhashring_find (self, item))
     || (!item && self->cursor != self->head))
         found = self->cursor;
@@ -392,17 +393,6 @@ zhashring_prev (zhashring_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Set cursor to handle.
-void
-zhashring_goto (zhashring_t *self, zhashring_node_t *handle)
-{
-    assert (self);
-    assert (handle);
-    self->cursor = handle;
-}
-
-
-//  --------------------------------------------------------------------------
 //  Return current item in the ring. If the ring is empty, or the cursor
 //  passed the end of the ring, returns NULL. Does not change the cursor.
 
@@ -434,8 +424,8 @@ zhashring_sort (zhashring_t *self)
         if (gap > 1)
             gap = (size_t) ((double) gap / 1.247330950103979);
 
-        zhashring_node_t *base = self->head;
-        zhashring_node_t *test = self->head;
+        node_t *base = self->head;
+        node_t *test = self->head;
         int jump = gap;
         while (jump--)
             test = test->next;
@@ -482,12 +472,12 @@ zhashring_dup (zhashring_t *self)
         copy->duplicator = self->duplicator;
         copy->comparator = self->comparator;
         
-        zhashring_node_t *node;
+        node_t *node;
         for (node = self->head->next; node != self->head; node = node->next) {
             void *item = node->item;
             if (self->duplicator)
                 item = self->duplicator (item);
-            if (!item || zhashring_append (copy, item) == NULL) {
+            if (!item || zhashring_append (copy, item) == -1) {
                 zhashring_destroy (&copy);
                 break;
             }
@@ -553,16 +543,16 @@ zhashring_test (int verbose)
     char *bread = "baguette";
     char *wine = "bordeaux";
 
-    zhashring_node_t *node = zhashring_append (ring, cheese);
-    assert (node);
+    int rc = zhashring_append (ring, cheese);
+    assert (rc == 0);
     assert (zhashring_size (ring) == 1);
     assert (zhashring_item (ring) == cheese);
-    node = zhashring_append (ring, bread);
-    assert (node);
+    rc = zhashring_append (ring, bread);
+    assert (rc == 0);
     assert (zhashring_size (ring) == 2);
     assert (zhashring_item (ring) == bread);
-    node = zhashring_append (ring, wine);
-    assert (node);
+    rc = zhashring_append (ring, wine);
+    assert (rc == 0);
     assert (zhashring_size (ring) == 3);
     assert (zhashring_item (ring) == wine);
 
@@ -609,7 +599,7 @@ zhashring_test (int verbose)
     zhashring_destroy (&dup);
 
     //  We're comparing as strings, not item pointers
-    int rc = zhashring_remove (ring, "2");
+    rc = zhashring_remove (ring, "2");
     assert (rc == 0);
     rc = zhashring_remove (ring, "5");
     assert (rc == 0);

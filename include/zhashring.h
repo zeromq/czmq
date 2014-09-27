@@ -29,12 +29,12 @@ CZMQ_EXPORT void
 
 //  Prepend an item to the start of the ring, return 0 if OK, else -1.
 //  Leaves cursor at newly inserted item.
-CZMQ_EXPORT zhashring_node_t *
+CZMQ_EXPORT int
     zhashring_prepend (zhashring_t *self, void *item);
 
 //  Append an item to the end of the ring, return 0 if OK, else -1.
 //  Leaves cursor at newly inserted item.
-CZMQ_EXPORT zhashring_node_t *
+CZMQ_EXPORT int
     zhashring_append (zhashring_t *self, void *item);
 
 //  Append an item to the end of the ring, and insert into the ring
@@ -116,10 +116,6 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void *
     zhashring_prev (zhashring_t *self);
 
-//  Set cursor to handle.
-CZMQ_EXPORT void
-zhashring_goto (zhashring_t *self, zhashring_node_t *handle);
-    
 //  Return current item in the ring. If the ring is empty, or the cursor
 //  passed the end of the ring, returns NULL. Does not change the cursor.
 CZMQ_EXPORT void *
