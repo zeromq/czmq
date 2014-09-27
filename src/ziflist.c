@@ -27,10 +27,10 @@
 
 //  Structure of an interface
 typedef struct {
-    const char *name;
-    const char *address;
-    const char *netmask;
-    const char *broadcast;
+    char *name;
+    char *address;
+    char *netmask;
+    char *broadcast;
 } interface_t;
 
 
@@ -43,10 +43,10 @@ s_interface_destroy (interface_t **self_p)
     assert (self_p);
     interface_t *self = *self_p;
     if (self) {
-        free ((void *) self->name);
-        free ((void *) self->address);
-        free ((void *) self->netmask);
-        free ((void *) self->broadcast);
+        free (self->name);
+        free (self->address);
+        free (self->netmask);
+        free (self->broadcast);
         free (self);
         *self_p = NULL;
     }
@@ -57,8 +57,7 @@ s_interface_destroy (interface_t **self_p)
 //  interface constructor
 
 static interface_t *
-s_interface_new (char *name, inaddr_t address, inaddr_t netmask,
-                 inaddr_t broadcast)
+s_interface_new (char *name, inaddr_t address, inaddr_t netmask, inaddr_t broadcast)
 {
     interface_t *self = (interface_t *) zmalloc (sizeof (interface_t));
     if (!self)
@@ -75,10 +74,8 @@ s_interface_new (char *name, inaddr_t address, inaddr_t netmask,
     return self;
 }
 
-
 //  Structure of our class
 struct _ziflist_t;
-
 
 //  --------------------------------------------------------------------------
 //  Get a list of network interfaces currently defined on the system
@@ -269,8 +266,7 @@ size_t
 ziflist_size (ziflist_t *self)
 {
     assert (self);
-    zlist_t *list = (zlist_t *) self;
-    return zlist_size (list);
+    return zlist_size ((zlist_t *) self);
 }
 
 
@@ -281,8 +277,7 @@ const char *
 ziflist_first (ziflist_t *self)
 {
     assert (self);
-    zlist_t *list = (zlist_t *) self;
-    interface_t *iface = (interface_t *) zlist_first (list);
+    interface_t *iface = (interface_t *) zlist_first ((zlist_t *) self);
     if (iface)
         return iface->name;
     else
@@ -297,8 +292,7 @@ const char *
 ziflist_next (ziflist_t *self)
 {
     assert (self);
-    zlist_t *list = (zlist_t *) self;
-    interface_t *iface = (interface_t *) zlist_next (list);
+    interface_t *iface = (interface_t *) zlist_next ((zlist_t *) self);
     if (iface)
         return iface->name;
     else
@@ -313,8 +307,7 @@ const char *
 ziflist_address (ziflist_t *self)
 {
     assert (self);
-    zlist_t *list = (zlist_t *) self;
-    interface_t *iface = (interface_t *) zlist_item (list);
+    interface_t *iface = (interface_t *) zlist_item ((zlist_t *) self);
     if (iface)
         return iface->address;
     else
@@ -329,8 +322,7 @@ const char *
 ziflist_broadcast (ziflist_t *self)
 {
     assert (self);
-    zlist_t *list = (zlist_t *) self;
-    interface_t *iface = (interface_t *) zlist_item (list);
+    interface_t *iface = (interface_t *) zlist_item ((zlist_t *) self);
     if (iface)
         return iface->broadcast;
     else
@@ -345,8 +337,7 @@ const char *
 ziflist_netmask (ziflist_t *self)
 {
     assert (self);
-    zlist_t *list = (zlist_t *) self;
-    interface_t *iface = (interface_t *) zlist_item (list);
+    interface_t *iface = (interface_t *) zlist_item ((zlist_t *) self);
     if (iface)
         return iface->netmask;
     else
