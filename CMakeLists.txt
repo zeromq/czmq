@@ -103,18 +103,14 @@ set (czmq_headers
     include/zmsg.h
     include/zpoller.h
     include/zproxy.h
-    include/zpubsub.h
-    include/zpubsub_option.h
     include/zrex.h
     include/zring.h
     include/zsock.h
     include/zsock_option.h
     include/zstr.h
     include/zsys.h
-    include/ztimeout.h
     include/zuuid.h
     src/zgossip_msg.h
-    src/zpubsub_filter.h
     include/zauth_v2.h
     include/zbeacon_v2.h
     include/zctx.h
@@ -159,18 +155,14 @@ set (czmq_sources
     src/zmsg.c
     src/zpoller.c
     src/zproxy.c
-    src/zpubsub.c
-    src/zpubsub_option.c
     src/zrex.c
     src/zring.c
     src/zsock.c
     src/zsock_option.c
     src/zstr.c
     src/zsys.c
-    src/ztimeout.c
     src/zuuid.c
     src/zgossip_msg.c
-    src/zpubsub_filter.c
     src/zauth_v2.c
     src/zbeacon_v2.c
     src/zctx.c

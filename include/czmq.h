@@ -41,18 +41,15 @@ typedef struct _zdir_patch_t zdir_patch_t;
 typedef struct _zfile_t zfile_t;
 typedef struct _zframe_t zframe_t;
 typedef struct _zhash_t zhash_t;
+typedef struct _ziflist_t ziflist_t;
 typedef struct _zlist_t zlist_t;
-typedef zlist_t ziflist_t;
 typedef struct _zloop_t zloop_t;
 typedef struct _zmsg_t zmsg_t;
 typedef struct _zpoller_t zpoller_t;
-typedef struct _zpubsub_t zpubsub_t;
 typedef struct _zrex_t zrex_t;
 typedef struct _zring_t zring_t;
 typedef struct _zring_node_t zring_node_t;
 typedef struct _zsock_t zsock_t;
-typedef struct _ztimeout_t ztimeout_t;
-typedef struct _ztimeout_node_t ztimeout_node_t;
 typedef struct _zuuid_t zuuid_t;
 //  Deprecated V2 classes, remove some time after 3.0 stability
 typedef struct _zauth_t zauth_t;
@@ -95,15 +92,12 @@ typedef int (czmq_comparator) (const void *item1, const void *item2);
 #include "zmsg.h"
 #include "zpoller.h"
 #include "zproxy.h"
-#include "zpubsub.h"
-#include "zpubsub_option.h"
 #include "zrex.h"
 #include "zring.h"
 #include "zsock.h"
 #include "zsock_option.h"
 #include "zstr.h"
 #include "zsys.h"
-#include "ztimeout.h"
 #include "zuuid.h"
 
 //  Deprecated V2 classes, remove some time after 3.0 stability
