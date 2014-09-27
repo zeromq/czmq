@@ -4,8 +4,8 @@
 .#  language. See https://github.com/imatix/gsl for details. This script
 .#  is licensed under MIT/X11.
 .#
-.echo "Generating builds/msvc/vs2013/czmq/$(project.name).vcxproj..."
-.output "../builds/msvc/vs2013/czmq/$(project.name).vcxproj"
+.echo "Generating builds/msvc/vs2013/$(project.name)/$(project.name).vcxproj..."
+.output "../builds/msvc/vs2013/$(project.name)/$(project.name).vcxproj"
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 #################################################################
@@ -100,7 +100,7 @@
 .endfor
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\\..\\czmq.rc" />
+    <ResourceCompile Include="..\\..\\$(project.name).rc" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\\..\\..\\..\\packaging\\nuget\\package.bat" />
@@ -118,8 +118,8 @@
   #################################################################
   -->
 </Project>
-.echo "Generating builds/msvc/vs2013/czmq/$(project.name).vcxproj.filters..."
-.output "../builds/msvc/vs2013/czmq/$(project.name).vcxproj.filters"
+.echo "Generating builds/msvc/vs2013/$(project.name)/$(project.name).vcxproj.filters..."
+.output "../builds/msvc/vs2013/$(project.name)/$(project.name).vcxproj.filters"
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 #################################################################
@@ -158,7 +158,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\\..\\czmq.rc">
+    <ResourceCompile Include="..\\..\\$(project.name).rc">
       <Filter>resource</Filter>
     </ResourceCompile>
   </ItemGroup>
@@ -206,8 +206,8 @@
 #################################################################
 -->
 </Project>
-.echo "Generating builds/msvc/vs2013/czmq_selftest/$(project.name)_selftest.vcxproj..."
-.output "../builds/msvc/vs2013/czmq_selftest/$(project.name)_selftest.vcxproj"
+.echo "Generating builds/msvc/vs2013/$(project.name)_selftest/$(project.name)_selftest.vcxproj..."
+.output "../builds/msvc/vs2013/$(project.name)_selftest/$(project.name)_selftest.vcxproj"
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 #################################################################
