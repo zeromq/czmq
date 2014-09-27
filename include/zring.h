@@ -19,138 +19,79 @@ extern "C" {
 #endif
 
 //  @interface
-//  Create a new ring container (a ring is a doubly-linked ring)
+//  Create a new ring container (a ring is a doubly-linked cyclic
+//  list). Produce a guard element if item is NULL. See zring_first/next.
 CZMQ_EXPORT zring_t *
-    zring_new (void);
+    zring_new (void *item);
 
 //  Destroy a ring container
 CZMQ_EXPORT void
     zring_destroy (zring_t **self_p);
 
-//  Prepend an item to the start of the ring, return 0 if OK, else -1.
-//  Leaves cursor at newly inserted item.
-CZMQ_EXPORT zring_node_t *
-    zring_prepend (zring_t *self, void *item);
+//  Insert an item after an element, return new element if OK, else
+//  NULL. Creates a new ring if self is NULL. Insert a guard element
+//  if item is NULL. See zring_first/next.
+CZMQ_EXPORT zring_t *
+    zring_insert_after (zring_t *self, void *item);
 
-//  Append an item to the end of the ring, return 0 if OK, else -1.
-//  Leaves cursor at newly inserted item.
-CZMQ_EXPORT zring_node_t *
-    zring_append (zring_t *self, void *item);
+//  Insert an item before an element, return new element if OK, else
+//  NULL. Creates a new ring if self is NULL. Insert a guard element
+//  if item is NULL. See zring_first/next.
+CZMQ_EXPORT zring_t *
+    zring_insert_before (zring_t *self, void *item);
 
-//  Append an item to the end of the ring, and insert into the ring
-//  dictionary, so that you can find the item rapidly using zring_lookup.
-//  If you do a lot of item searches, this is faster than zring_find,
-//  which is at worst an O(N) operation. When items leave the ring, they
-//  are always removed from the dictionary. Returns 0 on success, -1 if
-//  the key already existed in the dictionary, or heap memory ran out.
-CZMQ_EXPORT int
-    zring_insert (zring_t *self, const void *key, void *item);
-    
-//  Find an item in the ring, looking first at the cursor, and then from the
-//  first to last item. If a comparator was set on container, calls this to
-//  compare each item in the ring with the supplied target item. If none
-//  was set, compares the two item pointers for equality. If the item is
-//  found, leaves the cursor at the found item. Returns the item if found,
-//  else null.
+//  Detach first element from the ring and return it. Advances self_p to
+//  the next element in the ring or NULL if none left.
+CZMQ_EXPORT zring_t *
+    zring_detach (zring_t **self_p);
+
+//  Remove first element from the ring and return its item. Advances
+//  self_p to the next element in the ring or NULL if none left.
 CZMQ_EXPORT void *
-    zring_find (zring_t *self, void *item);
+    zring_remove (zring_t **self_p);
 
-//  Search the ring dictionary for an item, by key. If the item is in the
-//  dictionary (via zring_insert), then sets the ring cursor to the item,
-//  and returns the item value. If not, leaves the cursor unchanged, and
-//  returns NULL.
-CZMQ_EXPORT void *
-    zring_lookup (zring_t *self, const void *key);
-
-//  Detach an item from the ring, without destroying the item. Searches the
-//  ring for the item, always starting with the cursor, if any is set, and
-//  then from the start of the ring. If item is null, detaches the item at the
-//  cursor, if set. If the item was found and detached, leaves the cursor at
-//  the next item, if any, and returns the item. Else, returns null.
-CZMQ_EXPORT void *
-    zring_detach (zring_t *self, void *item);
-
-//  Remove an item from the ring, and destroy it, if the item destructor is
-//  set. Searches the ring for the item, always starting with the cursor, if
-//  any is set, and then from the start of the ring. If item is null, removes
-//  the item at the cursor, if set. If the item was found and removed, leaves
-//  the cursor at the next item, if any, and returns 0. Else, returns -1.
-CZMQ_EXPORT int
-    zring_remove (zring_t *self, void *item);
-
-//  Search the ring dictionary for an item, by key. If the item is in the
-//  dictionary (via zring_insert), then removes the item from the ring and
-//  calls the item destructor, if any is found. Returns 0 if the item was
-//  found and removed, else -1 if not found.
-CZMQ_EXPORT int
-    zring_delete (zring_t *self, const void *key);
-    
-//  Delete all items from the ring. If the item destructor is set, calls it
-//  on every item.
+//  Remove first element from the ring and destroy it. Advances
+//  self_p to the next element in the ring or NULL if none left.
 CZMQ_EXPORT void
-    zring_purge (zring_t *self);
+    zring_destroy_one (zring_t **self_p);
 
-//  Return number of items in the ring
-CZMQ_EXPORT size_t
-    zring_size (zring_t *self);
-
-//  Return the item at the head of ring. If the ring is empty, returns NULL.
-//  Leaves cursor pointing at the head item, or NULL if the ring is empty.
-CZMQ_EXPORT void *
-    zring_first (zring_t *self);
-
-//  Return the item at the tail of ring. If the ring is empty, returns NULL.
-//  Leaves cursor pointing at the tail item, or NULL if the ring is empty.
-CZMQ_EXPORT void *
-    zring_last (zring_t *self);
-    
-//  Return the next item. At the end of the ring (or in an empty ring),
-//  returns NULL. Use repeated zring_next () calls to work through the ring
-//  from zring_first ().
-CZMQ_EXPORT void *
-    zring_next (zring_t *self);
-    
-//  Return the previous item. At the start of the ring (or in an empty ring),
-//  returns NULL. Use repeated zring_prev () calls to work through the ring
-//  backwards from zring_last ().
-CZMQ_EXPORT void *
-    zring_prev (zring_t *self);
-
-//  Set cursor to handle.
+//  Move first element from the ring to after the destination. Destination may
+//  be another ring.
 CZMQ_EXPORT void
-zring_goto (zring_t *self, zring_node_t *handle);
-    
-//  Return current item in the ring. If the ring is empty, or the cursor
-//  passed the end of the ring, returns NULL. Does not change the cursor.
+    zring_move_after (zring_t *self, zring_t *destination);
+
+//  Move first element from the ring to before the destination. Destination
+//  may be another ring.
+CZMQ_EXPORT void
+    zring_move_before (zring_t *self, zring_t *destination);
+
+//  Return first element with item from the ring. If self is NULL
+//  return NULL. If terminator is NULL return NULL when there is no
+//  element before the next guard. Otherwise return NULL if there is
+//  no element that is not a guard before the terminator.
+CZMQ_EXPORT zring_t *
+    zring_first (zring_t *self, zring_t *terminator);
+
+//  Return next element with item from the ring. If terminator is NULL
+//  return NULL when the next element is a guard. Otherwise return
+//  NULL if the next element that is no a guard is the terminator.
+CZMQ_EXPORT zring_t *
+    zring_next (zring_t *last, zring_t *terminator);
+
+//  Return the item of an element of the ring. If self is NULL return
+//  NULL. Returns NULL on guard elements.
 CZMQ_EXPORT void *
     zring_item (zring_t *self);
 
-//  Sort the list using the compare function.
-//  The sort is not stable, so may reorder items with the same keys.
-CZMQ_EXPORT void
-    zlist_sort (zlist_t *self, zlist_compare_fn *compare);
-
-//  Make a copy of the ring; items are duplicated if you set a duplicator
-//  for the ring, otherwise not. Copying a null reference returns a null
-//  reference.
-CZMQ_EXPORT zring_t *
-    zring_dup (zring_t *self);
-    
 //  Set a user-defined deallocator for ring items; by default items are not
-//  freed when the ring is destroyed.
-CZMQ_EXPORT void
+//  freed when the ring is destroyed. This is an O(n) operation.
+CZMQ_EXPORT czmq_destructor *
     zring_set_destructor (zring_t *self, czmq_destructor destructor);
 
 //  Set a user-defined duplicator for ring items; by default items are not
-//  copied when the ring is duplicated.
-CZMQ_EXPORT void
+//  copied when inserted into the ring. This is an O(n) operation.
+CZMQ_EXPORT czmq_duplicator *
     zring_set_duplicator (zring_t *self, czmq_duplicator duplicator);
-
-//  Set a user-defined comparator for zring_find and zring_sort; the method
-//  must return -1, 0, or 1 depending on whether item1 is less than, equal to,
-//  or greater than, item2.
-CZMQ_EXPORT void
-    zring_set_comparator (zring_t *self, czmq_comparator comparator);
 
 //  Self test of this class
 CZMQ_EXPORT void
