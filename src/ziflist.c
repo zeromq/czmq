@@ -26,11 +26,11 @@
 #include "../include/czmq.h"
 
 //  Structure of an interface
-typedef struct _interface_t {
-  const char *name;
-  const char *address;
-  const char *netmask;
-  const char *broadcast;
+typedef struct {
+    const char *name;
+    const char *address;
+    const char *netmask;
+    const char *broadcast;
 } interface_t;
 
 
