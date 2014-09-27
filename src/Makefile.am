@@ -32,18 +32,14 @@ include_HEADERS = \
     ../include/zmsg.h \
     ../include/zpoller.h \
     ../include/zproxy.h \
-    ../include/zpubsub.h \
-    ../include/zpubsub_option.h \
     ../include/zrex.h \
     ../include/zring.h \
     ../include/zsock.h \
     ../include/zsock_option.h \
     ../include/zstr.h \
     ../include/zsys.h \
-    ../include/ztimeout.h \
     ../include/zuuid.h \
     ../src/zgossip_msg.h \
-    ../src/zpubsub_filter.h \
     ../include/zauth_v2.h \
     ../include/zbeacon_v2.h \
     ../include/zctx.h \
@@ -80,18 +76,14 @@ libczmq_la_SOURCES = \
     zmsg.c \
     zpoller.c \
     zproxy.c \
-    zpubsub.c \
-    zpubsub_option.c \
     zrex.c \
     zring.c \
     zsock.c \
     zsock_option.c \
     zstr.c \
     zsys.c \
-    ztimeout.c \
     zuuid.c \
     zgossip_msg.c \
-    zpubsub_filter.c \
     zauth_v2.c \
     zbeacon_v2.c \
     zctx.c \
@@ -121,7 +113,6 @@ code:
 	gsl -q sockopts.xml
 	gsl -q zgossip.xml
 	gsl -q zgossip_msg.xml
-	gsl -q zpubsub_filter.xml
 
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
