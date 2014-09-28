@@ -73,6 +73,7 @@ EXAMPLE
 .From zmonitor_test method
 ----
 zsock_t *client = zsock_new (ZMQ_DEALER);
+assert (client);
 zactor_t *clientmon = zactor_new (zmonitor, client);
 assert (clientmon);
 if (verbose)
@@ -82,6 +83,7 @@ zstr_sendx (clientmon, "START", NULL);
 zsock_wait (clientmon);
 
 zsock_t *server = zsock_new (ZMQ_DEALER);
+assert (server);
 zactor_t *servermon = zactor_new (zmonitor, server);
 assert (servermon);
 if (verbose)

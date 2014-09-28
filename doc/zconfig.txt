@@ -174,10 +174,13 @@ EXAMPLE
 zsys_dir_create (TESTDIR);
 
 zconfig_t *root = zconfig_new ("root", NULL);
+assert (root);
 zconfig_t *section, *item;
 
 section = zconfig_new ("headers", root);
+assert (section);
 item = zconfig_new ("email", section);
+assert (item);
 ----
 
 SEE ALSO

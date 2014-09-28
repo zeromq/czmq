@@ -115,4 +115,5 @@ This is the class self test code:
     
     //  Create a simple certificate with metadata
     zcert_t *cert = zcert_new ();
+    assert (cert);
 
