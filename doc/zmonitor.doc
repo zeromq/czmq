@@ -61,6 +61,7 @@ This is the class interface:
 This is the class self test code:
 
     zsock_t *client = zsock_new (ZMQ_DEALER);
+    assert (client);
     zactor_t *clientmon = zactor_new (zmonitor, client);
     assert (clientmon);
     if (verbose)
@@ -70,6 +71,7 @@ This is the class self test code:
     zsock_wait (clientmon);
 
     zsock_t *server = zsock_new (ZMQ_DEALER);
+    assert (server);
     zactor_t *servermon = zactor_new (zmonitor, server);
     assert (servermon);
     if (verbose)

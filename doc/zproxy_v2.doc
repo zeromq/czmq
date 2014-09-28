@@ -47,19 +47,25 @@ This is the class interface:
 This is the class self test code:
 
     zctx_t *ctx = zctx_new ();
+    assert (ctx);
     void *frontend = zsocket_new (ctx, ZMQ_PULL);
+    assert (frontend);
     int rc = zsocket_bind (frontend, "inproc://frontend");
     assert (rc == 0);
     void *backend = zsocket_new (ctx, ZMQ_PUSH);
+    assert (backend);
     rc = zsocket_bind (backend, "inproc://backend");
     assert (rc == 0);
     zproxy_t *proxy = zproxy_new (ctx, frontend, backend);
+    assert (proxy);
 
     //  Connect application sockets to proxy
     void *faucet = zsocket_new (ctx, ZMQ_PUSH);
+    assert (faucet);
     rc = zsocket_connect (faucet, "inproc://frontend");
     assert (rc == 0);
     void *sink = zsocket_new (ctx, ZMQ_PULL);
+    assert (sink);
     rc = zsocket_connect (sink, "inproc://backend");
     assert (rc == 0);
 
@@ -80,6 +86,7 @@ This is the class self test code:
     
     //  Create capture socket, must be a PULL socket
     void *capture = zsocket_new (ctx, ZMQ_PULL);
+    assert (capture);
     rc = zsocket_bind (capture, "inproc://capture");
     assert (rc == 0);
 
