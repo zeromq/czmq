@@ -390,6 +390,7 @@ zsock_unbind (zsock_t *self, const char *format, ...)
     va_end (argptr);
     if (!endpoint)
         return -1;
+    
     int rc = zmq_unbind (self->handle, endpoint);
     free (endpoint);
     return rc;
@@ -812,6 +813,21 @@ zsock_wait (void *self)
 
 
 //  --------------------------------------------------------------------------
+//  If there is a partial message still waiting on the socket, remove and
+//  discard it. This is useful when reading partial messages, to get specific
+//  message types.
+
+void
+zsock_flush (void *self)
+{
+    if (zsock_rcvmore (self)) {
+        zmsg_t *msg = zmsg_recv (self);
+        zmsg_destroy (&msg);
+    }
+}
+
+
+//  --------------------------------------------------------------------------
 //  Probe the supplied object, and report if it looks like a zsock_t.
 //  Takes a polymorphic socket reference.
 
@@ -824,11 +840,10 @@ zsock_is (void *self)
 
 
 //  --------------------------------------------------------------------------
-//  Probe the supplied reference. If it looks like a zsock_t instance,
-//  return the underlying libzmq socket handle; elsie if it looks like a
-//  file descriptor, return NULL; else if it looks like
-//  a libzmq socket handle, return the supplied value. Takes a
-//  polymorphic socket reference.
+//  Probe the supplied reference. If it looks like a zsock_t instance, return
+//  the underlying libzmq socket handle; elsie if it looks like a file
+//  descriptor, return NULL; else if it looks like a libzmq socket handle,
+//  return the supplied value. Takes a polymorphic socket reference.
 
 void *
 zsock_resolve (void *self)
@@ -839,23 +854,21 @@ zsock_resolve (void *self)
     else
     if (zactor_is (self))
         return zactor_resolve (self);
-    else
-    {
-        int sock_type = -1;
-#ifdef _WIN32
-        int sock_type_size = sizeof (int);
+    
+    int sock_type = -1;
+    //  TODO: this code should move to zsys_isfd ()
+#if defined (__WINDOWS__)
+    int sock_type_size = sizeof (int);
+    int rc = getsockopt (*(SOCKET *) self, SOL_SOCKET, SO_TYPE, (char *) &sock_type, &sock_type_size);
+    if (rc == 0)
+        return NULL;        //  It's a socket descriptor
 #else
-        socklen_t sock_type_size = sizeof (socklen_t);
+    socklen_t sock_type_size = sizeof (socklen_t);
+    int rc = getsockopt (*(SOCKET *) self, SOL_SOCKET, SO_TYPE, (char *) &sock_type, &sock_type_size);
+    if (rc == 0 || (rc == -1 && errno == ENOTSOCK))
+        return NULL;        //  It's a socket FD or FD
 #endif
-        const int rc = getsockopt(*(SOCKET *)self, SOL_SOCKET, SO_TYPE, (char *) &sock_type, &sock_type_size);
-#ifdef _WIN32
-        if (rc == 0)
-            return NULL; // It's a socket descriptor
-#else
-        if (rc == 0 || (rc == -1 && errno == ENOTSOCK))
-            return NULL; // It's a socket fd or fd
-#endif
-    }
+    //  Socket appears to be something else, return it as-is
     return self;
 }
 

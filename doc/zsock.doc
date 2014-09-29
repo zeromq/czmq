@@ -231,15 +231,21 @@ This is the class interface:
     CZMQ_EXPORT int
         zsock_wait (void *self);
     
+    //  If there is a partial message still waiting on the socket, remove and
+    //  discard it. This is useful when reading partial messages, to get specific
+    //  message types.
+    CZMQ_EXPORT void
+        zsock_flush (void *self);
+    
     //  Probe the supplied object, and report if it looks like a zsock_t.
     //  Takes a polymorphic socket reference.
     CZMQ_EXPORT bool
         zsock_is (void *self);
     
-    //  Probe the supplied reference. If it looks like a zsock_t instance,
-    //  return the underlying libzmq socket handle; else if it looks like
-    //  a libzmq socket handle, return the supplied value. Takes a
-    //  polymorphic socket reference.
+    //  Probe the supplied reference. If it looks like a zsock_t instance, return
+    //  the underlying libzmq socket handle; elsie if it looks like a file
+    //  descriptor, return NULL; else if it looks like a libzmq socket handle,
+    //  return the supplied value. Takes a polymorphic socket reference.
     CZMQ_EXPORT void *
         zsock_resolve (void *self);
     

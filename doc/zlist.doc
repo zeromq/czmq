@@ -77,6 +77,10 @@ This is the class interface:
     CZMQ_EXPORT zlist_t *
         zlist_dup (zlist_t *self);
     
+    //  Purge all items from list
+    CZMQ_EXPORT void
+    zlist_purge (zlist_t *self);
+    
     //  Return number of items in the list
     CZMQ_EXPORT size_t
         zlist_size (zlist_t *self);

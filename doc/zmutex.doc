@@ -36,6 +36,7 @@ This is the class interface:
 This is the class self test code:
 
     zmutex_t *mutex = zmutex_new ();
+    assert (mutex);
     zmutex_lock (mutex);
     zmutex_unlock (mutex);
     zmutex_destroy (&mutex);
