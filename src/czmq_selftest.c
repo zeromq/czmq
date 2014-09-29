@@ -80,6 +80,8 @@ int main (int argc, char *argv [])
     zsockopt_test (verbose);
     zthread_test (verbose);
 
+    zsys_shutdown ();
+
     printf ("Tests passed OK\n");
     return 0;
 }
