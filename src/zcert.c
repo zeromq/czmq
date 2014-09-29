@@ -59,8 +59,8 @@ zcert_new (void)
 
 #if (ZMQ_VERSION_MAJOR == 4)
     if (zsys_has_curve ()) {
-        char public_txt [40];
-        char secret_txt [40];
+        char public_txt [41];
+        char secret_txt [41];
         int rc = zmq_curve_keypair (public_txt, secret_txt);
         if (rc != 0)
             return NULL;
