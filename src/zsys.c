@@ -30,7 +30,6 @@
 volatile int zsys_interrupted = 0;  //  Current name
 volatile int zctx_interrupted = 0;  //  Deprecated name
 
-static void s_terminate_process (void);
 static void s_signal_handler (int signal_value);
 
 //  We use these variables for signal handling
@@ -169,12 +168,12 @@ zsys_init (void)
     ZMUTEX_INIT (s_mutex);
     s_sockref_list = zlist_new ();
     if (!s_sockref_list) {
-        s_terminate_process ();
+        zsys_shutdown ();
         return NULL;
     }
     srandom ((unsigned) time (NULL));
-    atexit (s_terminate_process);
-    
+    atexit (zsys_shutdown);
+
     assert (!s_process_ctx);
     //  We use zmq_init/zmq_term to keep compatibility back to ZMQ v2
     s_process_ctx = zmq_init ((int) s_io_threads);
@@ -199,10 +198,16 @@ zsys_init (void)
     return s_process_ctx;
 }
 
-//  atexit termination for the process
-static void
-s_terminate_process (void)
+//  atexit or manual termination for the process
+void
+zsys_shutdown (void)
 {
+    if (!s_initialized)
+    {
+        return;
+    }
+    s_initialized = false;
+
     //  The atexit handler is called when the main function exits;
     //  however we may have zactor threads shutting down and still
     //  trying to close their sockets. So if we suspect there are
