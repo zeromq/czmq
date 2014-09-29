@@ -1516,6 +1516,17 @@ zsys_test (bool verbose)
     assert (mode & S_IWUSR);
 
     zsys_file_mode_private ();
+    // delete .testsys if it already exists
+    mode = zsys_file_mode (".testsys");
+    if (S_ISDIR (mode)) {
+      mode = zsys_file_mode (".testsys/subdir");
+      if (S_ISDIR (mode)) {
+        rc = zsys_dir_delete ("%s/%s", ".", ".testsys/subdir");
+        assert (rc == 0);
+      }
+      rc = zsys_dir_delete ("%s/%s", ".", ".testsys");
+      assert (rc == 0);
+    }
     rc = zsys_dir_create ("%s/%s", ".", ".testsys/subdir");
     assert (rc == 0);
     when = zsys_file_modified ("./.testsys/subdir");
