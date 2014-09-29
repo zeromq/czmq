@@ -598,7 +598,7 @@ zsock_send (void *self, const char *picture, ...)
             for (zframe_t *frame = zmsg_first (zmsg); frame ;
                  frame = zmsg_next (zmsg) ){
                 zframe_t *frame_dup = zframe_dup(frame);
-                zmsg_append (msg, &frame);
+                zmsg_append (msg, &frame_dup);
             }
         }
         else
