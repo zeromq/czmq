@@ -26,6 +26,7 @@
     =========================================================================
 */
 
+#include "../include/czmq.h"
 #include "zpubsub.h"
 #include "zpubsub_filter.h"
 #include "zpubsub_option.h"
@@ -40,7 +41,8 @@ int main (int argc, char *argv [])
 
     printf ("Running CZMQ (LABS) selftests...\n");
 
-    zpubsub_test (verbose)
+    //  These are ordered from lowest level to highest level
+    zpubsub_test (verbose);
     zpubsub_filter_test (verbose);
     zpubsub_option_test (verbose);
 
