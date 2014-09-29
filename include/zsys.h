@@ -31,7 +31,14 @@ typedef void (zsys_handler_fn) (int signal_value);
 //  times. Returns global CZMQ context.
 CZMQ_EXPORT void *
     zsys_init (void);
-    
+
+//  Optionally shut down the CZMQ zsys layer; this normally happens automatically
+//  when the process exits; however this call lets you force a shutdown
+//  earlier, avoiding any potential problems with atexit() ordering, especially
+//  with Windows dlls.
+CZMQ_EXPORT void
+    zsys_shutdown (void);
+
 //  Get a new ZMQ socket, automagically creating a ZMQ context if this is
 //  the first time. Caller is responsible for destroying the ZMQ socket
 //  before process exits, to avoid a ZMQ deadlock. Note: you should not use
