@@ -186,6 +186,7 @@ CZMQ_EXPORT const char *
 //      b = byte *, size_t (2 arguments)
 //      c = zchunk_t *
 //      f = zframe_t *
+//      h = zhash_t *
 //      p = void * (sends the pointer value, only meaningful over inproc)
 //      z = sends zero-sized frame (0 arguments)
 //
