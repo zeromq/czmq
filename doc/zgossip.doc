@@ -87,7 +87,7 @@ This is the class interface:
     //  
     //  Enable verbose logging of commands and activity:
     //
-    //      zstr_send (ca, "VERBOSE");
+    //      zstr_send (server, "VERBOSE");
     //
     //  Bind zgossip server to specified endpoint. TCP endpoints may specify
     //  the port number as "*" to aquire an ephemeral port:
@@ -132,6 +132,7 @@ This is the class self test code:
 
     //  Test basic client-to-server operation of the protocol
     zactor_t *server = zactor_new (zgossip, "server");
+    assert (server);
     if (verbose)
         zstr_send (server, "VERBOSE");
     zstr_sendx (server, "BIND", "inproc://zgossip", NULL);
@@ -145,10 +146,12 @@ This is the class self test code:
     //  Send HELLO, which gets no reply
     zgossip_msg_t *request, *reply;
     request = zgossip_msg_new (ZGOSSIP_MSG_HELLO);
+    assert (request);
     zgossip_msg_send (&request, client);
 
     //  Send PING, expect PONG back
     request = zgossip_msg_new (ZGOSSIP_MSG_PING);
+    assert (request);
     zgossip_msg_send (&request, client);
     reply = zgossip_msg_recv (client);
     assert (reply);

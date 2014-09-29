@@ -99,17 +99,29 @@ This is the class self test code:
     zctx_set_iothreads (ctx, 1);
     zctx_set_linger (ctx, 5);       //  5 msecs
     void *s1 = zctx__socket_new (ctx, ZMQ_PAIR);
+    assert (s1);
     void *s2 = zctx__socket_new (ctx, ZMQ_XREQ);
+    assert (s2);
     void *s3 = zctx__socket_new (ctx, ZMQ_REQ);
+    assert (s3);
     void *s4 = zctx__socket_new (ctx, ZMQ_REP);
+    assert (s4);
     void *s5 = zctx__socket_new (ctx, ZMQ_PUB);
+    assert (s5);
     void *s6 = zctx__socket_new (ctx, ZMQ_SUB);
-    zsocket_connect (s1, "tcp://127.0.0.1:5555");
-    zsocket_connect (s2, "tcp://127.0.0.1:5555");
-    zsocket_connect (s3, "tcp://127.0.0.1:5555");
-    zsocket_connect (s4, "tcp://127.0.0.1:5555");
-    zsocket_connect (s5, "tcp://127.0.0.1:5555");
-    zsocket_connect (s6, "tcp://127.0.0.1:5555");
+    assert (s6);
+    int rc = zsocket_connect (s1, "tcp://127.0.0.1:5555");
+    assert (rc == 0);
+    rc = zsocket_connect (s2, "tcp://127.0.0.1:5555");
+    assert (rc == 0);
+    rc = zsocket_connect (s3, "tcp://127.0.0.1:5555");
+    assert (rc == 0);
+    rc = zsocket_connect (s4, "tcp://127.0.0.1:5555");
+    assert (rc == 0);
+    rc = zsocket_connect (s5, "tcp://127.0.0.1:5555");
+    assert (rc == 0);
+    rc = zsocket_connect (s6, "tcp://127.0.0.1:5555");
+    assert (rc == 0);
     assert (zctx_underlying (ctx));
     zctx_destroy (&ctx);
 

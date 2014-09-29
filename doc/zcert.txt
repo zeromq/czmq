@@ -127,6 +127,7 @@ zsys_dir_create (TESTDIR);
 
 //  Create a simple certificate with metadata
 zcert_t *cert = zcert_new ();
+assert (cert);
 ----
 
 SEE ALSO
