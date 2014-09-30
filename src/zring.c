@@ -52,6 +52,23 @@ struct _zring_t {
 
 
 //  --------------------------------------------------------------------------
+//  Destroy a ring node. The nodes item must already have been destroyed.
+
+static void
+s_node_destroy (node_t **self_p)
+{
+    assert (self_p);
+    node_t *self = *self_p;
+    assert (self->item == NULL);
+    // unlink node from ring
+    self->prev->next = self->next;
+    self->next->prev = self->prev;
+    // free memory
+    free (self);
+    self_p = NULL;
+}
+
+//  --------------------------------------------------------------------------
 //  Initialize a ring node and attach to the prev and next nodes, or itself
 //  if these are specified as null. Returns new node, or NULL if process ran
 //  out of heap memory.
@@ -96,7 +113,7 @@ zring_destroy (zring_t **self_p)
         zring_purge (self);
         assert (!self->hash || zhash_size (self->hash) == 0);
         zhash_destroy (&self->hash);
-        free (self->head);
+        s_node_destroy (&self->head);
         free (self);
         *self_p = NULL;
     }
@@ -111,6 +128,11 @@ int
 zring_prepend (zring_t *self, void *item)
 {
     assert (self);
+    if (self->duplicator) {
+        item = (self->duplicator) (item);
+        if (!item)
+            return -1;
+    }
     node_t *node = s_node_new (self->head, self->head->next, item);
     if (node) {
         self->head->next->prev = node;
@@ -132,6 +154,11 @@ int
 zring_append (zring_t *self, void *item)
 {
     assert (self);
+    if (self->duplicator) {
+        item = (self->duplicator) (item);
+        if (!item)
+            return -1;
+    }
     node_t *node = s_node_new (self->head->prev, self->head, item);
     if (node) {
         self->head->prev->next = node;
@@ -164,6 +191,11 @@ zring_insert (zring_t *self, const void *key, void *item)
         self->hash = zhash_new ();
     if (!self->hash)
         return -1;
+    if (self->duplicator) {
+        item = (self->duplicator) (item);
+        if (!item)
+            return -1;
+    }
 
     //  If item isn't already in dictionary, append to list and then
     //  store item node (which is in cursor) in dictionary
@@ -262,13 +294,12 @@ zring_detach (zring_t *self, void *item)
     //  Now detach node from list, without destroying it
     if (found) {
         item = found->item;
-        found->next->prev = found->prev;
-        found->prev->next = found->next;
         self->cursor = found->next;
         self->size--;
         if (found->key)
             zhash_delete (self->hash, found->key);
-        free (found);
+        found->item = NULL;
+        s_node_destroy (&found);
         return item;
     }
     else
