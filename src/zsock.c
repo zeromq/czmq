@@ -593,6 +593,15 @@ zsock_send (void *self, const char *picture, ...)
             zmsg_append ( msg, &frame);
         }
         else
+        if (*picture == 'm') {
+            zmsg_t *zmsg = va_arg (argptr, zmsg_t *);
+            for (zframe_t *frame = zmsg_first (zmsg); frame ;
+                 frame = zmsg_next (zmsg) ){
+                zframe_t *frame_dup = zframe_dup(frame);
+                zmsg_append (msg, &frame_dup);
+            }
+        }
+        else
         if (*picture == 'z')
             zmsg_addmem (msg, NULL, 0);
         else {
@@ -723,6 +732,17 @@ zsock_recv (void *self, const char *picture, ...)
                     *hash_p = NULL;
             }
             zframe_destroy (&frame);
+        }
+        else
+        if (*picture == 'm') {
+            zmsg_t **zmsg_p = va_arg (argptr, zmsg_t **);
+            if (zmsg_p) {
+                if (!*zmsg_p)
+                    *zmsg_p = zmsg_new();
+                zframe_t *frame;
+                while ((frame = zmsg_pop (msg)))
+                    zmsg_append (*zmsg_p, &frame);
+            }
         }
         else
         if (*picture == 'z') {
@@ -988,6 +1008,22 @@ zsock_test (bool verbose)
     assert (chunk == NULL);
     assert (frame == NULL);
     assert (pointer == NULL);
+
+    zmsg_t *src_msg = zmsg_new();
+    zmsg_addstr (src_msg, "frame 1");
+    zmsg_addstr (src_msg, "frame 2");
+
+    zsock_send (writer, "szm","header",src_msg);
+
+    zmsg_t *recv_msg=NULL;
+    char *header;
+    zsock_recv (reader, "szm", &header, &recv_msg);
+
+    assert (streq ("header", header));
+    assert (zmsg_size(recv_msg) == 2);
+    assert (zframe_streq (zmsg_first (recv_msg), "frame 1"));
+    assert (zframe_streq (zmsg_next (recv_msg), "frame 2"));
+
     
     //  Test zsock_recv with null arguments
     chunk = zchunk_new ("HELLO", 5);
