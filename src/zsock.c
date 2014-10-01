@@ -818,8 +818,8 @@ zsock_wait (void *self)
         zmsg_t *msg = zmsg_recv (self);
         if (!msg)
             return -1;
-        if (zmsg_size (msg) == 1
-            &&  zmsg_content_size (msg) == 8) {
+        if (  zmsg_size (msg) == 1
+           && zmsg_content_size (msg) == 8) {
             zframe_t *frame = zmsg_first (msg);
             int64_t signal_value = *((int64_t *) zframe_data (frame));
             if ((signal_value & 0xFFFFFFFFFFFFFF00L) == 0x7766554433221100L) {
@@ -881,13 +881,13 @@ zsock_resolve (void *self)
 #if defined (__WINDOWS__)
     int sock_type_size = sizeof (int);
     int rc = getsockopt (*(SOCKET *) self, SOL_SOCKET, SO_TYPE, (char *) &sock_type,
-                         &sock_type_size);
+        &sock_type_size);
     if (rc == 0)
         return NULL;        //  It's a socket descriptor
 #else
     socklen_t sock_type_size = sizeof (socklen_t);
     int rc = getsockopt (*(SOCKET *) self, SOL_SOCKET, SO_TYPE, (char *) &sock_type,
-                         &sock_type_size);
+        &sock_type_size);
     if (rc == 0 || (rc == -1 && errno == ENOTSOCK))
         return NULL;        //  It's a socket FD or FD
 #endif
@@ -961,7 +961,7 @@ zsock_test (bool verbose)
     //  We can send signed integers, strings, blocks of memory, chunks,
     //  frames, hashes and pointers
     zsock_send (writer, "izsbcfp",
-                -12345, "This is a string", "ABCDE", 5, chunk, frame, original);
+        -12345, "This is a string", "ABCDE", 5, chunk, frame, original);
     msg = zmsg_recv (reader);
     assert (msg);
     if (verbose)
@@ -970,7 +970,7 @@ zsock_test (bool verbose)
 
     //  Test zsock_recv into each supported type
     zsock_send (writer, "izsbcfhp",
-                -12345, "This is a string", "ABCDE", 5, chunk, frame, hash, original);
+        -12345, "This is a string", "ABCDE", 5, chunk, frame, hash, original);
     zframe_destroy (&frame);
     zchunk_destroy (&chunk);
     zhash_destroy (&hash);
@@ -980,8 +980,8 @@ zsock_test (bool verbose)
     char *pointer;
     rc =
         zsock_recv (reader, "izsbcfhp", &integer, &string, &data, &size, &chunk, &frame,
-                    &hash,
-                    &pointer);
+            &hash,
+            &pointer);
     assert (rc == 0);
     assert (integer == -12345);
     assert (streq (string, "This is a string"));
@@ -1007,7 +1007,7 @@ zsock_test (bool verbose)
     //  the status code and NULL/zero for all other values
     zsock_send (writer, "i", -1);
     zsock_recv (reader, "izsbcfp", &integer, &string, &data, &size, &chunk, &frame,
-                &pointer);
+        &pointer);
     assert (integer == -1);
     assert (string == NULL);
     assert (data == NULL);
@@ -1038,7 +1038,7 @@ zsock_test (bool verbose)
     frame = zframe_new ("WORLD", 5);
     assert (frame);
     zsock_send (writer, "izsbcfp",
-                -12345, "This is a string", "ABCDE", 5, chunk, frame, original);
+        -12345, "This is a string", "ABCDE", 5, chunk, frame, original);
     zframe_destroy (&frame);
     zchunk_destroy (&chunk);
     zsock_recv (reader, "izsbcfp", &integer, NULL, NULL, NULL, &chunk, NULL, NULL);
@@ -1089,7 +1089,7 @@ zsock_test (bool verbose)
     assert (server);
     rc =
         zsock_attach (server, "@inproc://myendpoint,tcp://127.0.0.1:5556,inproc://others",
-                      true);
+            true);
     assert (rc == 0);
     rc = zsock_attach (server, "", false);
     assert (rc == 0);

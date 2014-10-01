@@ -80,7 +80,7 @@ zsocket_set_router_handover (void *zocket, int router_handover)
 #   if defined (ZMQ_ROUTER_HANDOVER)
     if (zsocket_type (zocket) != ZMQ_ROUTER) {
         printf ("ZMQ_ROUTER_HANDOVER is not valid on %s sockets\n",
-                zsocket_type_str (zocket));
+            zsocket_type_str (zocket));
         assert (false);
     }
     int rc = zmq_setsockopt (zocket, ZMQ_ROUTER_HANDOVER, &router_handover, sizeof (int));
@@ -103,7 +103,7 @@ zsocket_set_router_mandatory (void *zocket, int router_mandatory)
 #   if defined (ZMQ_ROUTER_MANDATORY)
     if (zsocket_type (zocket) != ZMQ_ROUTER) {
         printf ("ZMQ_ROUTER_MANDATORY is not valid on %s sockets\n",
-                zsocket_type_str (zocket));
+            zsocket_type_str (zocket));
         assert (false);
     }
     int rc = zmq_setsockopt (zocket, ZMQ_ROUTER_MANDATORY, &router_mandatory, sizeof (int));
@@ -124,9 +124,9 @@ zsocket_set_probe_router (void *zocket, int probe_router)
         assert (false);
     }
 #   if defined (ZMQ_PROBE_ROUTER)
-    if (zsocket_type (zocket) != ZMQ_ROUTER
-        &&  zsocket_type (zocket) != ZMQ_DEALER
-        &&  zsocket_type (zocket) != ZMQ_REQ) {
+    if (  zsocket_type (zocket) != ZMQ_ROUTER
+       && zsocket_type (zocket) != ZMQ_DEALER
+       && zsocket_type (zocket) != ZMQ_REQ) {
         printf ("ZMQ_PROBE_ROUTER is not valid on %s sockets\n", zsocket_type_str (zocket));
         assert (false);
     }
@@ -172,7 +172,7 @@ zsocket_set_req_correlate (void *zocket, int req_correlate)
 #   if defined (ZMQ_REQ_CORRELATE)
     if (zsocket_type (zocket) != ZMQ_REQ) {
         printf ("ZMQ_REQ_CORRELATE is not valid on %s sockets\n",
-                zsocket_type_str (zocket));
+            zsocket_type_str (zocket));
         assert (false);
     }
     int rc = zmq_setsockopt (zocket, ZMQ_REQ_CORRELATE, &req_correlate, sizeof (int));
@@ -193,11 +193,11 @@ zsocket_set_conflate (void *zocket, int conflate)
         assert (false);
     }
 #   if defined (ZMQ_CONFLATE)
-    if (zsocket_type (zocket) != ZMQ_PUSH
-        &&  zsocket_type (zocket) != ZMQ_PULL
-        &&  zsocket_type (zocket) != ZMQ_PUB
-        &&  zsocket_type (zocket) != ZMQ_SUB
-        &&  zsocket_type (zocket) != ZMQ_DEALER) {
+    if (  zsocket_type (zocket) != ZMQ_PUSH
+       && zsocket_type (zocket) != ZMQ_PULL
+       && zsocket_type (zocket) != ZMQ_PUB
+       && zsocket_type (zocket) != ZMQ_SUB
+       && zsocket_type (zocket) != ZMQ_DEALER) {
         printf ("ZMQ_CONFLATE is not valid on %s sockets\n", zsocket_type_str (zocket));
         assert (false);
     }
@@ -311,7 +311,7 @@ zsocket_set_plain_username (void *zocket, const char * plain_username)
 #   if defined (ZMQ_PLAIN_USERNAME)
     int rc =
         zmq_setsockopt (zocket, ZMQ_PLAIN_USERNAME, plain_username,
-                        strlen (plain_username));
+            strlen (plain_username));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -349,7 +349,7 @@ zsocket_set_plain_password (void *zocket, const char * plain_password)
 #   if defined (ZMQ_PLAIN_PASSWORD)
     int rc =
         zmq_setsockopt (zocket, ZMQ_PLAIN_PASSWORD, plain_password,
-                        strlen (plain_password));
+            strlen (plain_password));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -423,7 +423,7 @@ zsocket_set_curve_publickey (void *zocket, const char * curve_publickey)
 #   if defined (ZMQ_CURVE_PUBLICKEY)
     int rc =
         zmq_setsockopt (zocket, ZMQ_CURVE_PUBLICKEY, curve_publickey,
-                        strlen (curve_publickey));
+            strlen (curve_publickey));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -475,7 +475,7 @@ zsocket_set_curve_secretkey (void *zocket, const char * curve_secretkey)
 #   if defined (ZMQ_CURVE_SECRETKEY)
     int rc =
         zmq_setsockopt (zocket, ZMQ_CURVE_SECRETKEY, curve_secretkey,
-                        strlen (curve_secretkey));
+            strlen (curve_secretkey));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -527,7 +527,7 @@ zsocket_set_curve_serverkey (void *zocket, const char * curve_serverkey)
 #   if defined (ZMQ_CURVE_SERVERKEY)
     int rc =
         zmq_setsockopt (zocket, ZMQ_CURVE_SERVERKEY, curve_serverkey,
-                        strlen (curve_serverkey));
+            strlen (curve_serverkey));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -651,7 +651,7 @@ zsocket_set_gssapi_principal (void *zocket, const char * gssapi_principal)
 #   if defined (ZMQ_GSSAPI_PRINCIPAL)
     int rc =
         zmq_setsockopt (zocket, ZMQ_GSSAPI_PRINCIPAL, gssapi_principal,
-                        strlen (gssapi_principal));
+            strlen (gssapi_principal));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -689,8 +689,8 @@ zsocket_set_gssapi_service_principal (void *zocket, const char * gssapi_service_
 #   if defined (ZMQ_GSSAPI_SERVICE_PRINCIPAL)
     int rc =
         zmq_setsockopt (zocket, ZMQ_GSSAPI_SERVICE_PRINCIPAL, gssapi_service_principal,
-                        strlen (
-                            gssapi_service_principal));
+            strlen (
+                gssapi_service_principal));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -707,7 +707,7 @@ zsocket_gssapi_service_principal (void *zocket)
     size_t option_len = 255;
     char *gssapi_service_principal = (char *) zmalloc (option_len);
     zmq_getsockopt (zocket, ZMQ_GSSAPI_SERVICE_PRINCIPAL, gssapi_service_principal,
-                    &option_len);
+        &option_len);
     return (char *) gssapi_service_principal;
 #   else
     return NULL;
@@ -859,7 +859,7 @@ zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect)
 #   if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
     int rc =
         zmq_setsockopt (zocket, ZMQ_DELAY_ATTACH_ON_CONNECT, &delay_attach_on_connect,
-                        sizeof (int));
+            sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1048,10 +1048,10 @@ zsocket_set_identity (void *zocket, const char * identity)
         assert (false);
     }
 #   if defined (ZMQ_IDENTITY)
-    if (zsocket_type (zocket) != ZMQ_REQ
-        &&  zsocket_type (zocket) != ZMQ_REP
-        &&  zsocket_type (zocket) != ZMQ_DEALER
-        &&  zsocket_type (zocket) != ZMQ_ROUTER) {
+    if (  zsocket_type (zocket) != ZMQ_REQ
+       && zsocket_type (zocket) != ZMQ_REP
+       && zsocket_type (zocket) != ZMQ_DEALER
+       && zsocket_type (zocket) != ZMQ_ROUTER) {
         printf ("ZMQ_IDENTITY is not valid on %s sockets\n", zsocket_type_str (zocket));
         assert (false);
     }
@@ -1658,7 +1658,7 @@ zsocket_set_tcp_keepalive_intvl (void *zocket, int tcp_keepalive_intvl)
     }
 #   if defined (ZMQ_TCP_KEEPALIVE_INTVL)
     int rc = zmq_setsockopt (zocket, ZMQ_TCP_KEEPALIVE_INTVL, &tcp_keepalive_intvl,
-                             sizeof (int));
+        sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1696,7 +1696,7 @@ zsocket_set_tcp_accept_filter (void *zocket, const char * tcp_accept_filter)
 #   if defined (ZMQ_TCP_ACCEPT_FILTER)
     int rc =
         zmq_setsockopt (zocket, ZMQ_TCP_ACCEPT_FILTER, tcp_accept_filter,
-                        strlen (tcp_accept_filter));
+            strlen (tcp_accept_filter));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -1867,7 +1867,7 @@ zsocket_set_delay_attach_on_connect (void *zocket, int delay_attach_on_connect)
 #   if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
     int rc =
         zmq_setsockopt (zocket, ZMQ_DELAY_ATTACH_ON_CONNECT, &delay_attach_on_connect,
-                        sizeof (int));
+            sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2056,10 +2056,10 @@ zsocket_set_identity (void *zocket, const char * identity)
         assert (false);
     }
 #   if defined (ZMQ_IDENTITY)
-    if (zsocket_type (zocket) != ZMQ_REQ
-        &&  zsocket_type (zocket) != ZMQ_REP
-        &&  zsocket_type (zocket) != ZMQ_DEALER
-        &&  zsocket_type (zocket) != ZMQ_ROUTER) {
+    if (  zsocket_type (zocket) != ZMQ_REQ
+       && zsocket_type (zocket) != ZMQ_REP
+       && zsocket_type (zocket) != ZMQ_DEALER
+       && zsocket_type (zocket) != ZMQ_ROUTER) {
         printf ("ZMQ_IDENTITY is not valid on %s sockets\n", zsocket_type_str (zocket));
         assert (false);
     }
@@ -2666,7 +2666,7 @@ zsocket_set_tcp_keepalive_intvl (void *zocket, int tcp_keepalive_intvl)
     }
 #   if defined (ZMQ_TCP_KEEPALIVE_INTVL)
     int rc = zmq_setsockopt (zocket, ZMQ_TCP_KEEPALIVE_INTVL, &tcp_keepalive_intvl,
-                             sizeof (int));
+        sizeof (int));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }
@@ -2704,7 +2704,7 @@ zsocket_set_tcp_accept_filter (void *zocket, const char * tcp_accept_filter)
 #   if defined (ZMQ_TCP_ACCEPT_FILTER)
     int rc =
         zmq_setsockopt (zocket, ZMQ_TCP_ACCEPT_FILTER, tcp_accept_filter,
-                        strlen (tcp_accept_filter));
+            strlen (tcp_accept_filter));
     assert (rc == 0 || zmq_errno () == ETERM);
 #   endif
 }

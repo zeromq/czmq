@@ -268,8 +268,8 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
         if (pollitems [1].revents & ZMQ_POLLIN)
             s_beacon_recv (self);
 
-        if (self->transmit
-            &&  zclock_mono () >= self->ping_at) {
+        if (  self->transmit
+           && zclock_mono () >= self->ping_at) {
             //  Send beacon to any listening peers
             zsys_udp_send (self->udpsock, self->transmit, &self->broadcast);
             self->ping_at = zclock_mono () + self->interval;
@@ -321,7 +321,7 @@ s_agent_new (void *pipe, int port_nbr)
     //  has more than one active interface.
     char hostname [NI_MAXHOST];
     rc = getnameinfo ((struct sockaddr *) &self->address,
-                      sizeof (inaddr_t), hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+        sizeof (inaddr_t), hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
     if (rc == 0) {
         //  It all looks OK
         zstr_send (pipe, hostname);
@@ -437,16 +437,16 @@ s_beacon_recv (agent_t *self)
     if (self->filter) {
         byte  *filter_data = zframe_data (self->filter);
         size_t filter_size = zframe_size (self->filter);
-        if (zframe_size (frame) >= filter_size
-            && memcmp (zframe_data (frame), filter_data, filter_size) == 0)
+        if (  zframe_size (frame) >= filter_size
+           && memcmp (zframe_data (frame), filter_data, filter_size) == 0)
             is_valid = true;
     }
     //  If valid, check for echoed beacons (i.e. our own broadcast)
     if (is_valid && self->noecho && self->transmit) {
         byte  *transmit_data = zframe_data (self->transmit);
         size_t transmit_size = zframe_size (self->transmit);
-        if (zframe_size (frame) == transmit_size
-            && memcmp (zframe_data (frame), transmit_data, transmit_size) == 0)
+        if (  zframe_size (frame) == transmit_size
+           && memcmp (zframe_data (frame), transmit_data, transmit_size) == 0)
             is_valid = false;
     }
     //  If still a valid beacon, send on to the API

@@ -119,7 +119,7 @@ s_self_configure (self_t *self, int port_nbr)
                 bind_to = inet_addr (ziflist_address (iflist));
                 if (self->verbose)
                     zsys_info ("zbeacon: using address=%s broadcast=%s",
-                               ziflist_address (iflist), ziflist_broadcast (iflist));
+                        ziflist_address (iflist), ziflist_broadcast (iflist));
                 break;      //  iface is known, so allow it
             }
             name = ziflist_next (iflist);
@@ -148,7 +148,7 @@ s_self_configure (self_t *self, int port_nbr)
         //  Send our hostname back to API
         char hostname [NI_MAXHOST];
         if (!getnameinfo ((struct sockaddr *) &address, sizeof (inaddr_t),
-                          hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST)) {
+                hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST)) {
             if (self->verbose)
                 zsys_info ("zbeacon: configured, hostname=%s", hostname);
             zstr_send (self->pipe, hostname);
@@ -234,16 +234,16 @@ s_self_handle_udp (self_t *self)
     if (self->filter) {
         byte  *filter_data = zframe_data (self->filter);
         size_t filter_size = zframe_size (self->filter);
-        if (zframe_size (frame) >= filter_size
-            && memcmp (zframe_data (frame), filter_data, filter_size) == 0)
+        if (  zframe_size (frame) >= filter_size
+           && memcmp (zframe_data (frame), filter_data, filter_size) == 0)
             is_valid = true;
     }
     //  If valid, discard our own broadcasts, which UDP echoes to us
     if (is_valid && self->transmit) {
         byte  *transmit_data = zframe_data (self->transmit);
         size_t transmit_size = zframe_size (self->transmit);
-        if (zframe_size (frame) == transmit_size
-            && memcmp (zframe_data (frame), transmit_data, transmit_size) == 0)
+        if (  zframe_size (frame) == transmit_size
+           && memcmp (zframe_data (frame), transmit_data, transmit_size) == 0)
             is_valid = false;
     }
     //  If still a valid beacon, send on to the API
@@ -290,8 +290,8 @@ zbeacon (zsock_t *pipe, void *args)
         if (pollitems [1].revents & ZMQ_POLLIN)
             s_self_handle_udp (self);
 
-        if (self->transmit
-            &&  zclock_mono () >= self->ping_at) {
+        if (  self->transmit
+           && zclock_mono () >= self->ping_at) {
             //  Send beacon to any listening peers
             zsys_udp_send (self->udpsock, self->transmit, &self->broadcast);
             self->ping_at = zclock_mono () + self->interval;

@@ -199,9 +199,9 @@ zring_insert (zring_t *self, const void *key, void *item)
 
     //  If item isn't already in dictionary, append to list and then
     //  store item node (which is in cursor) in dictionary
-    if (!zhash_lookup (self->hash, key)
-        &&  !zring_append (self, item)
-        &&  !zhash_insert (self->hash, key, self->cursor)) {
+    if (  !zhash_lookup (self->hash, key)
+       && !zring_append (self, item)
+       && !zhash_insert (self->hash, key, self->cursor)) {
         self->cursor->key = zhash_cursor (self->hash);
         return 0;
     }
@@ -287,8 +287,8 @@ zring_detach (zring_t *self, void *item)
     assert (self);
 
     node_t *found = NULL;
-    if ((item && zring_find (self, item))
-        || (!item && self->cursor != self->head))
+    if (  (item && zring_find (self, item))
+       || (!item && self->cursor != self->head))
         found = self->cursor;
 
     //  Now detach node from list, without destroying it

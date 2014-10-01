@@ -141,7 +141,7 @@ zmsg_send (zmsg_t **self_p, void *dest)
         zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
         while (frame) {
             rc = zframe_send (&frame, handle,
-                              zlist_size (self->frames) ? ZFRAME_MORE : 0);
+                zlist_size (self->frames) ? ZFRAME_MORE : 0);
             if (rc != 0)
                 break;
             frame = (zframe_t *) zlist_pop (self->frames);
@@ -571,7 +571,7 @@ zmsg_encode (zmsg_t *self, byte **buffer)
                 *dest++ = (frame_size >> 24) & 255;
                 *dest++ = (frame_size >> 16) & 255;
                 *dest++ = (frame_size >>  8) & 255;
-                *dest++ =  frame_size        & 255;
+                *dest++ = frame_size        & 255;
                 memcpy (dest, zframe_data (frame), frame_size);
                 dest += frame_size;
             }

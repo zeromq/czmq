@@ -222,7 +222,7 @@ zloop_new (void)
     if (self->readers)
         self->pollers = zlist_new ();
     if (self->pollers)
-        self->timers  = zlist_new ();
+        self->timers = zlist_new ();
     if (self->timers)
         self->zombies = zlist_new ();
     if (self->zombies)
@@ -354,8 +354,8 @@ zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
 {
     assert (self);
 
-    if (item->socket
-        &&  streq (zsocket_type_str (item->socket), "UNKNOWN"))
+    if (  item->socket
+       && streq (zsocket_type_str (item->socket), "UNKNOWN"))
         return -1;
 
     s_poller_t *poller = s_poller_new (item, handler, arg);
@@ -366,8 +366,8 @@ zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
         self->need_rebuild = true;
         if (self->verbose)
             zsys_debug ("zloop: register %s poller (%p, %d)",
-                        item->socket ? zsocket_type_str (item->socket) : "FD",
-                        item->socket, item->fd);
+                item->socket ? zsocket_type_str (item->socket) : "FD",
+                item->socket, item->fd);
         return 0;
     }
     else
@@ -393,7 +393,7 @@ zloop_poller_end (zloop_t *self, zmq_pollitem_t *item)
                 match = true;
         }
         else
-        if (item->fd  == poller->item.fd)
+        if (item->fd == poller->item.fd)
             match = true;
         if (match) {
             zlist_remove (self->pollers, poller);
@@ -405,8 +405,8 @@ zloop_poller_end (zloop_t *self, zmq_pollitem_t *item)
     }
     if (self->verbose)
         zsys_debug ("zloop: cancel %s poller (%p, %d)",
-                    item->socket ? zsocket_type_str (item->socket) : "FD",
-                    item->socket, item->fd);
+            item->socket ? zsocket_type_str (item->socket) : "FD",
+            item->socket, item->fd);
 }
 
 
@@ -428,7 +428,7 @@ zloop_poller_set_tolerant (zloop_t *self, zmq_pollitem_t *item)
                 match = true;
         }
         else
-        if (item->fd  == poller->item.fd)
+        if (item->fd == poller->item.fd)
             match = true;
         if (match)
             poller->tolerant = true;
@@ -457,10 +457,10 @@ zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_timer_fn handler, 
     if (self->verbose)
 #ifdef __WINDOWS__
         zsys_debug ("zloop: register timer id=%d delay=%u times=%u",
-                    timer_id, delay, times);
+            timer_id, delay, times);
 #else
         zsys_debug ("zloop: register timer id=%d delay=%zd times=%zd",
-                    timer_id, delay, times);
+            timer_id, delay, times);
 #endif
 
     return timer_id;
@@ -533,11 +533,11 @@ zloop_start (zloop_t *self)
                 break;
         }
         rc = zmq_poll (self->pollset, (int) self->poll_size,
-                       s_tickless_timer (self) * ZMQ_POLL_MSEC);
+            s_tickless_timer (self) * ZMQ_POLL_MSEC);
         if (rc == -1 || zsys_interrupted) {
             if (self->verbose)
                 zsys_debug ("zloop: interrupted (%d) - %s", rc,
-                            zmq_strerror (zmq_errno ()));
+                    zmq_strerror (zmq_errno ()));
             rc = 0;
             break;              //  Context has been shut down
         }
@@ -564,12 +564,12 @@ zloop_start (zloop_t *self)
         for (item_nbr = 0; item_nbr < self->poll_size && rc >= 0; item_nbr++) {
             s_reader_t *reader = &self->readact [item_nbr];
             if (reader->handler) {
-                if ((self->pollset [item_nbr].revents & ZMQ_POLLERR)
-                    && !reader->tolerant) {
+                if (  (self->pollset [item_nbr].revents & ZMQ_POLLERR)
+                   && !reader->tolerant) {
                     if (self->verbose)
                         zsys_warning ("zloop: can't read %s socket: %s",
-                                      zsock_type_str (reader->sock),
-                                      zmq_strerror (zmq_errno ()));
+                            zsock_type_str (reader->sock),
+                            zmq_strerror (zmq_errno ()));
                     //  Give handler one chance to handle error, then kill
                     //  reader because it'll disrupt the reactor otherwise.
                     if (reader->errors++) {
@@ -583,7 +583,7 @@ zloop_start (zloop_t *self)
                 if (self->pollset [item_nbr].revents) {
                     if (self->verbose)
                         zsys_debug ("zloop: call %s socket handler",
-                                    zsock_type_str (reader->sock));
+                            zsock_type_str (reader->sock));
                     rc = reader->handler (self, reader->sock, reader->arg);
                     if (rc == -1 || self->need_rebuild)
                         break;
@@ -593,14 +593,14 @@ zloop_start (zloop_t *self)
                 s_poller_t *poller = &self->pollact [item_nbr];
                 assert (self->pollset [item_nbr].socket == poller->item.socket);
 
-                if ((self->pollset [item_nbr].revents & ZMQ_POLLERR)
-                    && !poller->tolerant) {
+                if (  (self->pollset [item_nbr].revents & ZMQ_POLLERR)
+                   && !poller->tolerant) {
                     if (self->verbose)
                         zsys_warning ("zloop: can't poll %s socket (%p, %d): %s",
-                                      poller->item.socket ?
-                                      zsocket_type_str (poller->item.socket) : "FD",
-                                      poller->item.socket, poller->item.fd,
-                                      zmq_strerror (zmq_errno ()));
+                            poller->item.socket ?
+                            zsocket_type_str (poller->item.socket) : "FD",
+                            poller->item.socket, poller->item.fd,
+                            zmq_strerror (zmq_errno ()));
                     //  Give handler one chance to handle error, then kill
                     //  poller because it'll disrupt the reactor otherwise.
                     if (poller->errors++) {
@@ -614,9 +614,9 @@ zloop_start (zloop_t *self)
                 if (self->pollset [item_nbr].revents) {
                     if (self->verbose)
                         zsys_debug ("zloop: call %s socket handler (%p, %d)",
-                                    poller->item.socket ?
-                                    zsocket_type_str (poller->item.socket) : "FD",
-                                    poller->item.socket, poller->item.fd);
+                            poller->item.socket ?
+                            zsocket_type_str (poller->item.socket) : "FD",
+                            poller->item.socket, poller->item.fd);
                     rc = poller->handler (self, &self->pollset [item_nbr], poller->arg);
                     if (rc == -1 || self->need_rebuild)
                         break;

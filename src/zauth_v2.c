@@ -286,8 +286,8 @@ static int
 zap_request_reply (zap_request_t *self, char *status_code, char *status_text)
 {
     zstr_sendx (self->handler,
-                "1.0", self->sequence, status_code, status_text, "", "",
-                NULL);
+        "1.0", self->sequence, status_code, status_text, "", "",
+        NULL);
     return 0;
 }
 
@@ -469,7 +469,7 @@ s_agent_authenticate (agent_t *self)
                 denied = true;
                 if (self->verbose)
                     printf ("ZAUTH I: DENIED (not in whitelist) address=%s\n",
-                            request->address);
+                        request->address);
             }
         }
         else
@@ -483,7 +483,7 @@ s_agent_authenticate (agent_t *self)
                 allowed = true;
                 if (self->verbose)
                     printf ("ZAUTH I: PASSED (not in blacklist) address=%s\n",
-                            request->address);
+                        request->address);
             }
         }
         //  Mechanism-specific checks
@@ -529,13 +529,13 @@ s_authenticate_plain (agent_t *self, zap_request_t *request)
         if (password && streq (password, request->password)) {
             if (self->verbose)
                 printf ("ZAUTH I: ALLOWED (PLAIN) username=%s password=%s\n",
-                        request->username, request->password);
+                    request->username, request->password);
             return true;
         }
         else {
             if (self->verbose)
                 printf ("ZAUTH I: DENIED (PLAIN) username=%s password=%s\n",
-                        request->username, request->password);
+                    request->username, request->password);
             return false;
         }
     }
@@ -557,8 +557,8 @@ s_authenticate_curve (agent_t *self, zap_request_t *request)
         return true;
     }
     else
-    if (self->certstore
-        &&  zcertstore_lookup (self->certstore, request->client_key)) {
+    if (  self->certstore
+       && zcertstore_lookup (self->certstore, request->client_key)) {
         if (self->verbose)
             printf ("ZAUTH I: ALLOWED (CURVE) client_key=%s\n", request->client_key);
         return true;
@@ -575,7 +575,7 @@ s_authenticate_gssapi (agent_t *self, zap_request_t *request)
 {
     if (self->verbose)
         printf ("I: ALLOWED (GSSAPI) principal=%s identity=%s\n", request->principal,
-                request->identity);
+            request->identity);
     return true;
 }
 

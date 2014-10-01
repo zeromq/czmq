@@ -162,8 +162,8 @@ zsys_init (void)
             s_logsystem = false;
     }
     //  Catch SIGINT and SIGTERM unless ZSYS_SIGHANDLER=false
-    if (getenv ("ZSYS_SIGHANDLER") == NULL
-        || strneq (getenv ("ZSYS_SIGHANDLER"), "true"))
+    if (  getenv ("ZSYS_SIGHANDLER") == NULL
+       || strneq (getenv ("ZSYS_SIGHANDLER"), "true"))
         zsys_catch_interrupts ();
 
     ZMUTEX_INIT (s_mutex);
@@ -227,8 +227,8 @@ zsys_shutdown (void)
     while (sockref) {
         assert (sockref->filename);
         zsys_error ("dangling '%s' socket created at %s:%d",
-                    zsys_sockname (sockref->type),
-                    sockref->filename, (int) sockref->line_nbr);
+            zsys_sockname (sockref->type),
+            sockref->filename, (int) sockref->line_nbr);
         zmq_close (sockref->handle);
         free (sockref);
         sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
@@ -745,19 +745,19 @@ zsys_udp_new (bool routable)
     //  Ask operating system for broadcast permissions on socket
     int on = 1;
     if (setsockopt (udpsock, SOL_SOCKET, SO_BROADCAST,
-                    (char *) &on, sizeof (on)) == SOCKET_ERROR)
+            (char *) &on, sizeof (on)) == SOCKET_ERROR)
         zsys_socket_error ("setsockopt (SO_BROADCAST)");
 
     //  Allow multiple owners to bind to socket; incoming
     //  messages will replicate to each owner
     if (setsockopt (udpsock, SOL_SOCKET, SO_REUSEADDR,
-                    (char *) &on, sizeof (on)) == SOCKET_ERROR)
+            (char *) &on, sizeof (on)) == SOCKET_ERROR)
         zsys_socket_error ("setsockopt (SO_REUSEADDR)");
 
 #if defined (SO_REUSEPORT)
     //  On some platforms we have to ask to reuse the port
     if (setsockopt (udpsock, SOL_SOCKET, SO_REUSEPORT,
-                    (char *) &on, sizeof (on)) == SOCKET_ERROR)
+            (char *) &on, sizeof (on)) == SOCKET_ERROR)
         zsys_socket_error ("setsockopt (SO_REUSEPORT)");
 #endif
     return udpsock;
@@ -797,9 +797,9 @@ zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address)
     //  don't try to report the error. We might log this or send to an error
     //  console at some point.
     int rv = sendto (udpsock,
-                     (char *) zframe_data (frame), (int) zframe_size (frame),
-                     0, //  Flags
-                     (struct sockaddr *) address, (int) sizeof (inaddr_t));
+        (char *) zframe_data (frame), (int) zframe_size (frame),
+        0,              //  Flags
+        (struct sockaddr *) address, (int) sizeof (inaddr_t));
     if (rv < 0)
         fprintf (stderr, "Error in sendto() - %d, %s\n", errno, strerror (errno));
 }
@@ -826,7 +826,7 @@ zsys_udp_recv (SOCKET udpsock, char *peername)
     //  Get sender address as printable string
 #if (defined (__WINDOWS__))
     getnameinfo ((struct sockaddr *) &address, address_len,
-                 peername, INET_ADDRSTRLEN, NULL, 0, NI_NUMERICHOST);
+        peername, INET_ADDRSTRLEN, NULL, 0, NI_NUMERICHOST);
 #else
     inet_ntop (AF_INET, &address.sin_addr, peername, address_len);
 #endif
@@ -855,32 +855,32 @@ zsys_socket_error (const char *reason)
         default:              errno = GetLastError ();
     }
 #endif
-    if (errno == EAGAIN
-        ||  errno == ENETDOWN
-        ||  errno == EHOSTUNREACH
-        ||  errno == ENETUNREACH
-        ||  errno == EINTR
-        ||  errno == EPIPE
-        ||  errno == ECONNRESET
+    if (  errno == EAGAIN
+       || errno == ENETDOWN
+       || errno == EHOSTUNREACH
+       || errno == ENETUNREACH
+       || errno == EINTR
+       || errno == EPIPE
+       || errno == ECONNRESET
 #if defined (ENOPROTOOPT)
-        ||  errno == ENOPROTOOPT
+       || errno == ENOPROTOOPT
 #endif
 #if defined (EHOSTDOWN)
-        ||  errno == EHOSTDOWN
+       || errno == EHOSTDOWN
 #endif
 #if defined (EOPNOTSUPP)
-        ||  errno == EOPNOTSUPP
+       || errno == EOPNOTSUPP
 #endif
 #if defined (EWOULDBLOCK)
-        ||  errno == EWOULDBLOCK
+       || errno == EWOULDBLOCK
 #endif
 #if defined (EPROTO)
-        ||  errno == EPROTO
+       || errno == EPROTO
 #endif
 #if defined (ENONET)
-        ||  errno == ENONET
+       || errno == ENONET
 #endif
-        )
+          )
         return;             //  Ignore error and try again
     else {
         zsys_error ("(UDP) error '%s' on %s", strerror (errno), reason);
@@ -983,11 +983,11 @@ zsys_run_as (const char *lockfile, const char *group, const char *user)
         }
         else {
             struct flock filelock;
-            filelock.l_type   = F_WRLCK;    //  F_RDLCK, F_WRLCK, F_UNLCK
+            filelock.l_type = F_WRLCK;      //  F_RDLCK, F_WRLCK, F_UNLCK
             filelock.l_whence = SEEK_SET;   //  SEEK_SET, SEEK_CUR, SEEK_END
-            filelock.l_start  = 0;          //  Offset from l_whence
-            filelock.l_len    = 0;          //  length, 0 = to EOF
-            filelock.l_pid    = getpid ();
+            filelock.l_start = 0;           //  Offset from l_whence
+            filelock.l_len = 0;             //  length, 0 = to EOF
+            filelock.l_pid = getpid ();
             if (fcntl (handle, F_SETLK, &filelock)) {
                 zsys_error ("cannot get lock: %s", strerror (errno));
                 return -1;
@@ -1382,7 +1382,7 @@ s_log (char loglevel, char *string)
         char log_text [1024];
         if (s_logident)
             snprintf (log_text, 1024, "%c: (%s) %s %s", loglevel, s_logident, date,
-                      string);
+                string);
         else
             snprintf (log_text, 1024, "%c: %s %s", loglevel, date, string);
 

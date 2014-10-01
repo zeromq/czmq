@@ -77,7 +77,7 @@ zclock_sleep (int msecs)
 {
 #if defined (__UNIX__)
     struct timespec t;
-    t.tv_sec  =  msecs / 1000;
+    t.tv_sec = msecs / 1000;
     t.tv_nsec = (msecs % 1000) * 1000000;
     nanosleep (&t, NULL);
 #elif (defined (__WINDOWS__))

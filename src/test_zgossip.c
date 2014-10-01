@@ -144,9 +144,9 @@ main (int argn, char *argv [])
     int item_nbr;
     for (item_nbr = 0; item_nbr < set_size; item_nbr++) {
         node_nbr = randof (swarm_size);
-        zstr_sendm  (nodes [node_nbr], "PUBLISH");
+        zstr_sendm (nodes [node_nbr], "PUBLISH");
         zstr_sendfm (nodes [node_nbr], "key-%d", item_nbr);
-        zstr_send   (nodes [node_nbr], "value");
+        zstr_send (nodes [node_nbr], "value");
     }
     printf (". ");
     fflush (stdout);

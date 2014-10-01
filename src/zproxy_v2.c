@@ -193,7 +193,7 @@ s_proxy_task (void *args, zctx_t *ctx, void *command_pipe)
                 if (streq (command, "RESUME")) {
                     zpoller_destroy (&poller);
                     poller = zpoller_new (self->frontend, self->backend, command_pipe,
-                                          NULL);
+                        NULL);
                     assert (poller);
                 }
                 else

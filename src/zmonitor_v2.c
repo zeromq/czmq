@@ -320,8 +320,8 @@ s_socket_event (agent_t *self)
 
     zstr_sendfm (self->pipe, "%d", event);
     zstr_sendfm (self->pipe, "%d", value);
-    zstr_sendm  (self->pipe, address);
-    zstr_send   (self->pipe, description);
+    zstr_sendm (self->pipe, address);
+    zstr_send (self->pipe, description);
     free (address);
 }
 
@@ -358,7 +358,7 @@ zmonitor_v2_test (bool verbose)
     void *sink = zsocket_new (ctx, ZMQ_PULL);
     assert (sink);
     zmonitor_t *sinkmon = zmonitor_new (ctx,
-                                        sink, ZMQ_EVENT_LISTENING | ZMQ_EVENT_ACCEPTED);
+        sink, ZMQ_EVENT_LISTENING | ZMQ_EVENT_ACCEPTED);
     assert (sinkmon);
     zmonitor_set_verbose (sinkmon, verbose);
 
@@ -371,8 +371,8 @@ zmonitor_v2_test (bool verbose)
     void *source = zsocket_new (ctx, ZMQ_PUSH);
     assert (source);
     zmonitor_t *sourcemon = zmonitor_new (ctx,
-                                          source,
-                                          ZMQ_EVENT_CONNECTED | ZMQ_EVENT_DISCONNECTED);
+        source,
+        ZMQ_EVENT_CONNECTED | ZMQ_EVENT_DISCONNECTED);
     assert (sourcemon);
     zmonitor_set_verbose (sourcemon, verbose);
     zsocket_connect (source, "tcp://127.0.0.1:%d", port_nbr);

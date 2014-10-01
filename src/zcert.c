@@ -268,7 +268,7 @@ s_save_metadata_all (zcert_t *self)
     }
     char *timestr = zclock_timestr ();
     zconfig_set_comment (self->config,
-                         "   ****  Generated on %s by CZMQ  ****", timestr);
+        "   ****  Generated on %s by CZMQ  ****", timestr);
     zstr_free (&timestr);
 }
 
@@ -300,7 +300,7 @@ zcert_save_public (zcert_t *self, const char *filename)
 
     s_save_metadata_all (self);
     zconfig_set_comment (self->config,
-                         "   ZeroMQ CURVE Public Certificate");
+        "   ZeroMQ CURVE Public Certificate");
     zconfig_set_comment (
         self->config,
         "   Exchange securely, or use a secure mechanism to verify the contents");
@@ -308,7 +308,7 @@ zcert_save_public (zcert_t *self, const char *filename)
         self->config,
         "   of this file after exchange. Store public certificates in your home");
     zconfig_set_comment (self->config,
-                         "   directory, in the .curve subdirectory.");
+        "   directory, in the .curve subdirectory.");
 
     zconfig_put (self->config, "/curve/public-key", self->public_txt);
     int rc = zconfig_save (self->config, filename);
@@ -326,7 +326,7 @@ zcert_save_secret (zcert_t *self, const char *filename)
 
     s_save_metadata_all (self);
     zconfig_set_comment (self->config,
-                         "   ZeroMQ CURVE **Secret** Certificate");
+        "   ZeroMQ CURVE **Secret** Certificate");
     zconfig_set_comment (
         self->config,
         "   DO NOT PROVIDE THIS FILE TO OTHER USERS nor change its permissions.");
@@ -390,8 +390,8 @@ zcert_eq (zcert_t *self, zcert_t *compare)
     assert (self);
     assert (compare);
 
-    return (streq (self->public_txt, compare->public_txt)
-            &&  streq (self->secret_txt, compare->secret_txt));
+    return (  streq (self->public_txt, compare->public_txt)
+           && streq (self->secret_txt, compare->secret_txt));
 }
 
 
@@ -407,7 +407,7 @@ zcert_print (zcert_t *self)
     char *value = (char *) zhash_first (self->metadata);
     while (value) {
         zsys_info ("zcert:     %s = \"%s\"",
-                   zhash_cursor (self->metadata), value);
+            zhash_cursor (self->metadata), value);
         value = (char *) zhash_next (self->metadata);
     }
     zsys_info ("zcert: curve");
@@ -429,7 +429,7 @@ zcert_fprint (zcert_t *self, FILE *file)
     char *value = (char *) zhash_first (self->metadata);
     while (value) {
         fprintf (file, "    %s = \"%s\"\n",
-                 (char *) zhash_cursor (self->metadata), value);
+            (char *) zhash_cursor (self->metadata), value);
         value = (char *) zhash_next (self->metadata);
     }
     fprintf (file, "curve\n");

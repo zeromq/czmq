@@ -112,7 +112,7 @@ s_valid_flags (short flags)
 {
     return (flags & IFF_UP)             //  Only use interfaces that are running
            && !(flags & IFF_LOOPBACK)   //  Ignore loopback interface
-           &&  (flags & IFF_BROADCAST)  //  Only use interfaces that have BROADCAST
+           && (flags & IFF_BROADCAST)   //  Only use interfaces that have BROADCAST
 #   if defined (IFF_SLAVE)
            && !(flags & IFF_SLAVE)      //  Ignore devices that are bonding slaves.
 #   endif
@@ -137,10 +137,10 @@ ziflist_reload (ziflist_t *self)
         struct ifaddrs *interface = interfaces;
         while (interface) {
             //  On Solaris, loopback interfaces have a NULL in ifa_broadaddr
-            if (interface->ifa_broadaddr
-                &&  interface->ifa_addr
-                &&  interface->ifa_addr->sa_family == AF_INET
-                &&  s_valid_flags (interface->ifa_flags)) {
+            if (  interface->ifa_broadaddr
+               && interface->ifa_addr
+               && interface->ifa_addr->sa_family == AF_INET
+               && s_valid_flags (interface->ifa_flags)) {
                 inaddr_t address = *(inaddr_t *) interface->ifa_addr;
                 inaddr_t netmask = *(inaddr_t *) interface->ifa_netmask;
                 inaddr_t broadcast = *(inaddr_t *) interface->ifa_broadaddr;
@@ -153,7 +153,7 @@ ziflist_reload (ziflist_t *self)
 
                 interface_t *item =
                     s_interface_new (interface->ifa_name, address, netmask,
-                                     broadcast);
+                        broadcast);
                 if (item)
                     zlist_append (list, item);
             }
@@ -202,7 +202,7 @@ ziflist_reload (ziflist_t *self)
 
             if (is_valid) {
                 interface_t *item = s_interface_new (ifr->ifr_name, address,
-                                                     netmask, broadcast);
+                    netmask, broadcast);
                 if (item)
                     zlist_append (list, item);
             }
@@ -214,12 +214,12 @@ ziflist_reload (ziflist_t *self)
 #   elif defined (__WINDOWS__)
     ULONG addr_size = 0;
     DWORD rc = GetAdaptersAddresses (AF_INET, GAA_FLAG_INCLUDE_PREFIX, NULL, NULL,
-                                     &addr_size);
+        &addr_size);
     assert (rc == ERROR_BUFFER_OVERFLOW);
 
     PIP_ADAPTER_ADDRESSES pip_addresses = (PIP_ADAPTER_ADDRESSES) zmalloc (addr_size);
     rc = GetAdaptersAddresses (AF_INET,
-                               GAA_FLAG_INCLUDE_PREFIX, NULL, pip_addresses, &addr_size);
+        GAA_FLAG_INCLUDE_PREFIX, NULL, pip_addresses, &addr_size);
     assert (rc == NO_ERROR);
 
     PIP_ADAPTER_ADDRESSES cur_address = pip_addresses;
@@ -245,7 +245,7 @@ ziflist_reload (ziflist_t *self)
             inaddr_t broadcast = address;
             broadcast.sin_addr.s_addr |= ~(netmask.sin_addr.s_addr);
             interface_t *item = s_interface_new (asciiFriendlyName, address,
-                                                 netmask, broadcast);
+                netmask, broadcast);
             if (item)
                 zlist_append (list, item);
         }
@@ -365,8 +365,8 @@ ziflist_test (bool verbose)
         const char *name = ziflist_first (iflist);
         while (name) {
             printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
-                    name, ziflist_address (iflist), ziflist_netmask (
-                        iflist), ziflist_broadcast (iflist));
+                name, ziflist_address (iflist), ziflist_netmask (
+                    iflist), ziflist_broadcast (iflist));
             name = ziflist_next (iflist);
         }
     }

@@ -248,8 +248,8 @@ zframe_streq (zframe_t *self, const char *string)
     assert (self);
     assert (zframe_is (self));
 
-    if (zframe_size (self) == strlen (string)
-        &&  memcmp (zframe_data (self), string, strlen (string)) == 0)
+    if (  zframe_size (self) == strlen (string)
+       && memcmp (zframe_data (self), string, strlen (string)) == 0)
         return true;
     else
         return false;
@@ -297,10 +297,10 @@ zframe_eq (zframe_t *self, zframe_t *other)
         assert (zframe_is (self));
         assert (zframe_is (other));
 
-        if (zframe_size (self) == zframe_size (other)
-            && memcmp (zframe_data (self),
-                       zframe_data (other),
-                       zframe_size (self)) == 0)
+        if (  zframe_size (self) == zframe_size (other)
+           && memcmp (zframe_data (self),
+                  zframe_data (other),
+                  zframe_size (self)) == 0)
             return true;
         else
             return false;

@@ -720,8 +720,8 @@ zhash_refresh (zhash_t *self)
     assert (self);
 
     if (self->filename)
-        if (zsys_file_modified (self->filename) > self->modified
-            &&  zsys_file_stable (self->filename)) {
+        if (  zsys_file_modified (self->filename) > self->modified
+           && zsys_file_stable (self->filename)) {
             //  Empty the hash table; code is copied from zhash_destroy
             uint index;
             size_t limit = primes [self->prime_index];

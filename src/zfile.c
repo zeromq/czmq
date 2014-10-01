@@ -75,8 +75,8 @@ zfile_new (const char *path, const char *name)
 
         if (self->fullname) {
             //  Resolve symbolic link if possible
-            if (strlen (self->fullname) > 3
-                &&  streq (self->fullname + strlen (self->fullname) - 3, ".ln")) {
+            if (  strlen (self->fullname) > 3
+               && streq (self->fullname + strlen (self->fullname) - 3, ".ln")) {
                 FILE *handle = fopen (self->fullname, "r");
                 if (handle) {
                     char buffer [256];
@@ -154,9 +154,9 @@ zfile_filename (zfile_t *self, const char *path)
 {
     assert (self);
     char *name = self->fullname;
-    if (path
-        &&  strlen (self->fullname) >= strlen (path)
-        &&  memcmp (self->fullname, path, strlen (path)) == 0) {
+    if (  path
+       && strlen (self->fullname) >= strlen (path)
+       && memcmp (self->fullname, path, strlen (path)) == 0) {
         name += strlen (path);
         if (*name == '/')
             name++;
@@ -291,8 +291,8 @@ zfile_has_changed (zfile_t *self)
     char *real_name = self->link ? self->link : self->fullname;
     if (stat (real_name, &stat_buf) == 0)
         //  It's not a foolproof heuristic but catches most cases
-        if (stat_buf.st_mtime != self->modified
-            ||  stat_buf.st_size != self->cursize)
+        if (  stat_buf.st_mtime != self->modified
+           || stat_buf.st_size != self->cursize)
             return true;
     return false;
 }
@@ -465,7 +465,7 @@ zfile_digest (zfile_t *self)
         zchunk_t *chunk = zfile_read (self, blocksz, offset);
         while (zchunk_size (chunk)) {
             zdigest_update (self->digest,
-                            zchunk_data (chunk), zchunk_size (chunk));
+                zchunk_data (chunk), zchunk_size (chunk));
             zchunk_destroy (&chunk);
             offset += blocksz;
             chunk = zfile_read (self, blocksz, offset);

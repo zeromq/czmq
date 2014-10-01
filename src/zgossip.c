@@ -356,8 +356,8 @@ static void
 store_tuple_if_new (client_t *self)
 {
     server_accept (self->server,
-                   zgossip_msg_key (self->request),
-                   zgossip_msg_value (self->request));
+        zgossip_msg_key (self->request),
+        zgossip_msg_value (self->request));
 }
 
 
@@ -389,8 +389,8 @@ remote_handler (zloop_t *loop, zsock_t *remote, void *argument)
 
     if (zgossip_msg_id (msg) == ZGOSSIP_MSG_PUBLISH)
         server_accept ((server_t *) argument,
-                       zgossip_msg_key (msg),
-                       zgossip_msg_value (msg));
+            zgossip_msg_key (msg),
+            zgossip_msg_value (msg));
     else
     if (zgossip_msg_id (msg) == ZGOSSIP_MSG_INVALID)
         //  Connection was reset, so send HELLO again

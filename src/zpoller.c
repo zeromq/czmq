@@ -137,7 +137,7 @@ zpoller_wait (zpoller_t *self, int timeout)
         s_rebuild_poll_set (self);
 
     int rc = zmq_poll (self->poll_set, (int) self->poll_size,
-                       timeout * ZMQ_POLL_MSEC);
+        timeout * ZMQ_POLL_MSEC);
     if (rc > 0) {
         uint reader = 0;
         for (reader = 0; reader < self->poll_size; reader++)

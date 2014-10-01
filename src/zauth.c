@@ -267,7 +267,7 @@ s_zap_request_new (zsock_t *handler, bool verbose)
 
     if (self->verbose)
         zsys_info ("zauth: ZAP request mechanism=%s ipaddress=%s",
-                   self->mechanism, self->address);
+            self->mechanism, self->address);
     zmsg_destroy (&request);
     return self;
 }
@@ -279,11 +279,11 @@ s_zap_request_reply (zap_request_t *self, char *status_code, char *status_text)
 {
     if (self->verbose)
         zsys_info ("zauth: - ZAP reply status_code=%s status_text=%s",
-                   status_code, status_text);
+            status_code, status_text);
 
     zstr_sendx (self->handler,
-                "1.0", self->sequence, status_code, status_text, "", "",
-                NULL);
+        "1.0", self->sequence, status_code, status_text, "", "",
+        NULL);
     return 0;
 }
 
@@ -300,13 +300,13 @@ s_authenticate_plain (self_t *self, zap_request_t *request)
         if (password && streq (password, request->password)) {
             if (self->verbose)
                 zsys_info ("zauth: - allowed (PLAIN) username=%s password=%s",
-                           request->username, request->password);
+                    request->username, request->password);
             return true;
         }
         else {
             if (self->verbose)
                 zsys_info ("zauth: - denied (PLAIN) username=%s password=%s",
-                           request->username, request->password);
+                    request->username, request->password);
             return false;
         }
     }
@@ -328,8 +328,8 @@ s_authenticate_curve (self_t *self, zap_request_t *request)
         return true;
     }
     else
-    if (self->certstore
-        &&  zcertstore_lookup (self->certstore, request->client_key)) {
+    if (  self->certstore
+       && zcertstore_lookup (self->certstore, request->client_key)) {
         if (self->verbose)
             zsys_info ("zauth: - allowed (CURVE) client_key=%s", request->client_key);
         return true;
@@ -346,7 +346,7 @@ s_authenticate_gssapi (self_t *self, zap_request_t *request)
 {
     if (self->verbose)
         zsys_info ("zauth: - allowed (GSSAPI) principal=%s identity=%s",
-                   request->principal, request->identity);
+            request->principal, request->identity);
     return true;
 }
 
@@ -370,7 +370,7 @@ s_self_authenticate (self_t *self)
                 denied = true;
                 if (self->verbose)
                     zsys_info ("zauth: - denied (not in whitelist) address=%s",
-                               request->address);
+                        request->address);
             }
         }
         else
@@ -384,7 +384,7 @@ s_self_authenticate (self_t *self)
                 allowed = true;
                 if (self->verbose)
                     zsys_info ("zauth: - passed (not in blacklist) address=%s",
-                               request->address);
+                        request->address);
             }
         }
         //  Mechanism-specific checks

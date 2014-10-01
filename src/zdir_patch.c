@@ -170,8 +170,8 @@ zdir_patch_vpath (zdir_patch_t *self)
 void
 zdir_patch_digest_set (zdir_patch_t *self)
 {
-    if (self->op == patch_create
-        &&  self->digest == NULL)
+    if (  self->op == patch_create
+       && self->digest == NULL)
         self->digest = strdup (zfile_digest (self->file));
 }
 
