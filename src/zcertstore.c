@@ -95,14 +95,14 @@ s_load_certs_from_disk (zcertstore_t *self)
         zfile_t **filelist = zdir_flatten (dir);
         zrex_t *rex = zrex_new ("_secret$");
         assert (rex);
-        
+
         uint index;
         for (index = 0;; index++) {
             zfile_t *file = filelist [index];
             if (!file)
                 break;      //  End of list
             if (zfile_is_regular (file)
-            && !zrex_matches (rex, zfile_filename (file, NULL))) {
+                && !zrex_matches (rex, zfile_filename (file, NULL))) {
                 zcert_t *cert = zcert_load (zfile_filename (file, NULL));
                 if (cert)
                     zcertstore_insert (self, &cert);
@@ -150,11 +150,10 @@ zcertstore_lookup (zcertstore_t *self, const char *public_key)
     if (self->location) {
         zdir_t *dir = zdir_new (self->location, NULL);
         if (dir
-        && (self->modified != zdir_modified (dir)
-        ||  self->count    != zdir_count (dir)
-        ||  self->cursize  != zdir_cursize (dir))) {
+            && (self->modified != zdir_modified (dir)
+                ||  self->count    != zdir_count (dir)
+                ||  self->cursize  != zdir_cursize (dir)))
             s_load_certs_from_disk (self);
-        }
         zdir_destroy (&dir);
     }
     return (zcert_t *) zhash_lookup (self->certs, public_key);

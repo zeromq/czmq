@@ -140,7 +140,7 @@ zdigest_test (bool verbose)
     //  @selftest
     byte *buffer = (byte *) zmalloc (1024);
     memset (buffer, 0xAA, 1024);
-    
+
     zdigest_t *digest = zdigest_new ();
     assert (digest);
     zdigest_update (digest, buffer, 1024);
@@ -150,7 +150,7 @@ zdigest_test (bool verbose)
     assert (data [2] == 0x38);
     assert (data [3] == 0x07);
     assert (streq (zdigest_string (digest),
-        "DEB23807D4FE025E900FE9A9C7D8410C3DDE9671"));
+                   "DEB23807D4FE025E900FE9A9C7D8410C3DDE9671"));
     zdigest_destroy (&digest);
     free (buffer);
     //  @end

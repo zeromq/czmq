@@ -45,7 +45,7 @@ struct _zfile_t {
 
     //  Properties from files that exist on file system
     time_t modified;        //  Modification time
-    off_t  cursize;         //  Size of the file
+    off_t cursize;          //  Size of the file
     mode_t mode;            //  POSIX permission bits
 };
 
@@ -134,7 +134,7 @@ zfile_dup (zfile_t *self)
         if (copy->fullname) {
             copy->modified = self->modified;
             copy->cursize = self->cursize;
-            copy->link = self->link? strdup (self->link): NULL;
+            copy->link = self->link ? strdup (self->link) : NULL;
             copy->mode = self->mode;
         }
         else
@@ -155,8 +155,8 @@ zfile_filename (zfile_t *self, const char *path)
     assert (self);
     char *name = self->fullname;
     if (path
-    &&  strlen (self->fullname) >= strlen (path)
-    &&  memcmp (self->fullname, path, strlen (path)) == 0) {
+        &&  strlen (self->fullname) >= strlen (path)
+        &&  memcmp (self->fullname, path, strlen (path)) == 0) {
         name += strlen (path);
         if (*name == '/')
             name++;
@@ -175,7 +175,7 @@ zfile_restat (zfile_t *self)
 {
     assert (self);
     struct stat stat_buf;
-    char *real_name = self->link? self->link: self->fullname;
+    char *real_name = self->link ? self->link : self->fullname;
     if (stat (real_name, &stat_buf) == 0) {
         self->cursize = stat_buf.st_size;
         self->modified = stat_buf.st_mtime;
@@ -288,13 +288,12 @@ zfile_has_changed (zfile_t *self)
 {
     assert (self);
     struct stat stat_buf;
-    char *real_name = self->link? self->link: self->fullname;
-    if (stat (real_name, &stat_buf) == 0) {
+    char *real_name = self->link ? self->link : self->fullname;
+    if (stat (real_name, &stat_buf) == 0)
         //  It's not a foolproof heuristic but catches most cases
         if (stat_buf.st_mtime != self->modified
-        ||  stat_buf.st_size != self->cursize)
+            ||  stat_buf.st_size != self->cursize)
             return true;
-    }
     return false;
 }
 
@@ -325,7 +324,7 @@ zfile_input (zfile_t *self)
     if (self->handle)
         zfile_close (self);
 
-    char *real_name = self->link? self->link: self->fullname;
+    char *real_name = self->link ? self->link : self->fullname;
     self->handle = fopen (real_name, "rb");
     if (self->handle) {
         struct stat stat_buf;
@@ -334,7 +333,7 @@ zfile_input (zfile_t *self)
         else
             self->cursize = 0;
     }
-    return self->handle? 0: -1;
+    return self->handle ? 0 : -1;
 }
 
 
@@ -347,7 +346,7 @@ int
 zfile_output (zfile_t *self)
 {
     assert (self);
-    
+
     //  Wipe symbolic link if that's what the file was
     if (self->link) {
         free (self->link);
@@ -365,13 +364,13 @@ zfile_output (zfile_t *self)
     //  Create file if it doesn't exist
     if (self->handle)
         zfile_close (self);
-    self->handle = fopen (self->fullname, "r+b"); 
+    self->handle = fopen (self->fullname, "r+b");
     if (!self->handle) {
         self->handle = fopen (self->fullname, "w+b");
         if (!self->handle)
             self->handle = fopen (self->fullname, "w+b");
     }
-    return self->handle? 0: -1;
+    return self->handle ? 0 : -1;
 }
 
 
@@ -466,7 +465,7 @@ zfile_digest (zfile_t *self)
         zchunk_t *chunk = zfile_read (self, blocksz, offset);
         while (zchunk_size (chunk)) {
             zdigest_update (self->digest,
-                zchunk_data (chunk), zchunk_size (chunk));
+                            zchunk_data (chunk), zchunk_size (chunk));
             zchunk_destroy (&chunk);
             offset += blocksz;
             chunk = zfile_read (self, blocksz, offset);
@@ -483,31 +482,49 @@ zfile_digest (zfile_t *self)
 //  and lets us do more interesting things. These functions were
 //  essentially about portability, so now sit in zsys.
 
-bool zfile_exists (const char *filename) {
+bool
+zfile_exists (const char *filename)
+{
     return zsys_file_exists (filename);
 }
-ssize_t zfile_size (const char *filename) {
+ssize_t
+zfile_size (const char *filename)
+{
     return zsys_file_size (filename);
 }
-mode_t zfile_mode (const char *filename) {
+mode_t
+zfile_mode (const char *filename)
+{
     return zsys_file_mode (filename);
 }
-int zfile_delete (const char *filename) {
+int
+zfile_delete (const char *filename)
+{
     return zsys_file_delete (filename);
 }
-bool zfile_stable (const char *filename) {
+bool
+zfile_stable (const char *filename)
+{
     return zsys_file_stable (filename);
 }
-int zfile_mkdir (const char *pathname) {
+int
+zfile_mkdir (const char *pathname)
+{
     return zsys_dir_create (pathname);
 }
-int zfile_rmdir (const char *pathname) {
+int
+zfile_rmdir (const char *pathname)
+{
     return zsys_dir_delete (pathname);
 }
-void zfile_mode_private (void) {
+void
+zfile_mode_private (void)
+{
     zsys_file_mode_private ();
 }
-void zfile_mode_default (void) {
+void
+zfile_mode_default (void)
+{
     zsys_file_mode_default ();
 }
 
@@ -535,7 +552,7 @@ zfile_test (bool verbose)
     zchunk_t *chunk = zchunk_new (NULL, 100);
     assert (chunk);
     zchunk_fill (chunk, 0, 100);
-    
+
     //  Write 100 bytes at position 1,000,000 in the file
     rc = zfile_write (file, chunk, 1000000);
     assert (rc == 0);
@@ -544,7 +561,7 @@ zfile_test (bool verbose)
     assert (zfile_is_readable (file));
     assert (zfile_cursize (file) == 1000100);
     assert (!zfile_is_stable (file));
-    
+
     //  Now append one byte to file from outside
     int handle = open ("./this/is/a/test/bilbo", O_WRONLY | O_TRUNC | O_BINARY, 0);
     assert (handle >= 0);
@@ -554,12 +571,12 @@ zfile_test (bool verbose)
     assert (zfile_has_changed (file));
     zclock_sleep (1001);
     assert (zfile_has_changed (file));
-    
+
     assert (!zfile_is_stable (file));
     zfile_restat (file);
     assert (zfile_is_stable (file));
     assert (streq (zfile_digest (file), "4AB299C8AD6ED14F31923DD94F8B5F5CB89DFB54"));
-    
+
     //  Check we can read from file
     rc = zfile_input (file);
     assert (rc == 0);

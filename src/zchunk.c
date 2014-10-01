@@ -13,7 +13,7 @@
 /*
 @header
     The zchunk class works with variable sized blobs. Not as efficient as
-    ØMQ's messages but they do less weirdness and so are easier to understand.
+    MQ's messages but they do less weirdness and so are easier to understand.
     The chunk class has methods to read and write chunks from disk.
 @discuss
 @end
@@ -260,7 +260,7 @@ zchunk_write (zchunk_t *self, FILE *handle)
     assert (zchunk_is (self));
 
     size_t items = fwrite (self->data, 1, self->size, handle);
-    int rc = (items < self->size)? -1: 0;
+    int rc = (items < self->size) ? -1 : 0;
     return rc;
 }
 
@@ -361,7 +361,7 @@ zchunk_streq (zchunk_t *self, const char *string)
     assert (zchunk_is (self));
 
     if (zchunk_size (self) == strlen (string)
-    &&  memcmp (zchunk_data (self), string, strlen (string)) == 0)
+        &&  memcmp (zchunk_data (self), string, strlen (string)) == 0)
         return true;
     else
         return false;
@@ -381,7 +381,7 @@ zchunk_pack (zchunk_t *self)
 }
 
 //  --------------------------------------------------------------------------
-//  Create a zchunk from a zframe.  
+//  Create a zchunk from a zframe.
 
 zchunk_t *
 zchunk_unpack (zframe_t *frame)

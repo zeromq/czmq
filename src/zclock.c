@@ -63,7 +63,7 @@ s_perfcounter_to_msec (const LARGE_INTEGER *count)
     if (freq == 0)
         freq = s_get_frequencey ();
 
-    return (int64_t)(count->QuadPart  * 1000) / freq;
+    return (int64_t) (count->QuadPart  * 1000) / freq;
 }
 
 #endif
@@ -86,7 +86,7 @@ zclock_sleep (int msecs)
     //  is ready to run. If there are no other threads of equal priority ready
     //  to run, the function returns immediately, and the thread continues
     //  execution. This behavior changed starting with Windows Server 2003.
-    
+
 #   if defined (NTDDI_VERSION) && defined (NTDDI_WS03) && (NTDDI_VERSION >= NTDDI_WS03)
     Sleep (msecs);
 #   else
