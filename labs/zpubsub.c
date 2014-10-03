@@ -41,11 +41,8 @@
 
     The message serialization protocol is fully up to the application.
     zpubsub accepts a blob of data for publishing and delivers the
-    same blob unchanged to the subscribers. Currently, the filter
-    data is serialized in a non-portable way, so that zpubsub in
-    its current form will not be able to communicate across little/big-
-    endian platforms. This will be amended by using zproto in a near-
-    future update.
+    same blob unchanged to the subscribers. Filter data is serialized
+    through a zproto-generated codec.
 
     Two examples are included in the examples/zpubsub directory.
     The simple example is implemented in pure C, with the simplest
@@ -55,8 +52,11 @@
 @end
 */
 
+
 #include "../include/czmq.h"
-#include "./zpubsub_filter.h"
+#include "zpubsub.h"
+#include "zpubsub_option.h"
+#include "zpubsub_filter.h"
 
 
 //  zpubsub_t instances always have this tag as the first 4 octets of
