@@ -2,6 +2,7 @@
 #define __PARTICIPANT_H__
 
 #include <czmq.h>
+#include "../../../labs/zpubsub.h"
 #include "topic.h"
 #include "subscriber.h"
 
