@@ -7,3 +7,11 @@ To use an experimental class in your code, you can either copy it wholesale, or 
 We will later find a better way to package experimental classes. Our goal at present is to have a space in the git repository without any effect on the formal CZMQ API.
 
 All other rules, regarding process, patch quality, and code style apply. Ugly or poorly-argued code risks being deleted.
+
+Prerequisites: Install czmq!
+
+Step 1: ./configure --enable-labs=yes
+Step 2: make
+Step 3: make install
+
+Now you've installed a library called libczmq_labs and can link it with -lczmq_labs.
