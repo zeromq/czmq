@@ -20,7 +20,10 @@
 @end
 */
 
+
 #include "../include/czmq.h"
+#include "zpubsub.h"
+#include "zpubsub_option.h"
 
 
 //  --------------------------------------------------------------------------
@@ -71,7 +74,7 @@ void
 zpubsub_set_beacon_port (dbyte port)
 {
 	assert (port >= 1025 && port <= 65535);
-	
+
 	s_beacon_port = port;
 }
 
@@ -93,7 +96,7 @@ void
 zpubsub_set_beacon_interval (int interval)
 {
 	assert (interval >= 1000 && interval <= 60000);
-	
+
 	s_beacon_interval = interval;
 }
 
@@ -131,7 +134,7 @@ zpubsub_option_test (bool verbose)
     zpubsub_set_port_function (NULL);
     port_fn = zpubsub_port_function ();
     assert (port_fn == NULL);
-    
+
     dbyte beacon_port = zpubsub_beacon_port ();
     assert (beacon_port == 55666);
     zpubsub_set_beacon_port (46798);
@@ -140,7 +143,7 @@ zpubsub_option_test (bool verbose)
     zpubsub_set_beacon_port (55666);
     beacon_port = zpubsub_beacon_port ();
     assert (beacon_port == 55666);
-    
+
     int beacon_interval = zpubsub_beacon_interval ();
     assert (beacon_interval == 5000);
     zpubsub_set_beacon_interval (30000);
