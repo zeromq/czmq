@@ -50,6 +50,12 @@ AC_PROG_LIBTOOL
 AC_PROG_SED
 AC_PROG_AWK
 
+# 
+AC_ARG_ENABLE([labs],
+    [AS_HELP_STRING([--disable-labs], [Enable Lbas support @<:@check@:>@])],
+    [:],
+    [enable_labs=check])
+
 # Checks for libraries
 AC_CHECK_LIB([pthread], [pthread_create])
 AC_CHECK_LIB([uuid], [uuid_generate])
@@ -111,6 +117,16 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <zmq.h>],
                ],
                [AC_MSG_RESULT([yes])],
                [AC_MSG_ERROR([no. Please specify libzmq installation prefix using --with-libzmq])])
+
+# When building labs, check for czmq
+AS_IF([test "$enable_labs" != "no"],
+    [PKG_CHECK_MODULES([CZMQ], [libczmq], [enable_labs=yes],
+        [AS_IF([test "$enable_labs" = "yes"],
+        [AC_MSG_ERROR([czmq required for building labs, but not found.])],
+        [enable_labs=no])
+        ]
+    )]
+)
 
 # Platform specific checks
 czmq_on_mingw32="no"
@@ -243,6 +259,7 @@ AM_CONDITIONAL(ON_MINGW, test "x$czmq_on_mingw32" = "xyes")
 AM_CONDITIONAL(ON_ANDROID, test "x$czmq_on_android" = "xyes")
 AM_CONDITIONAL(INSTALL_MAN, test "x$czmq_install_man" = "xyes")
 AM_CONDITIONAL(BUILD_DOC, test "x$czmq_build_doc" = "xyes")
+AM_CONDITIONAL([ENABLE_LABS], [test "x$enable_labs" = "xyes"])
 
 # Checks for library functions.
 AC_TYPE_SIGNAL
@@ -254,5 +271,7 @@ AC_CONFIG_FILES([Makefile \
                 src/libczmq.pc \
                 doc/Makefile \
                 addons/Makefile \
+                labs/Makefile \
+                labs/libczmq_labs.pc \
                 model/Makefile])
 AC_OUTPUT
