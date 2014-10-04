@@ -16,7 +16,7 @@
     The zmutex class provides a portable wrapper for mutexes. Please do not
     use this class to do multi-threading. It is for the rare case where you
     absolutely need thread-safe global state. This should happen in system
-    code only. DO NOT USE THIS TO SHARE SOCKETS BETWEEN THREADS, OR DARK 
+    code only. DO NOT USE THIS TO SHARE SOCKETS BETWEEN THREADS, OR DARK
     THINGS WILL HAPPEN TO YOUR CODE.
 @discuss
 @end

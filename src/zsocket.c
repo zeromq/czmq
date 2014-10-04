@@ -67,8 +67,8 @@ zsocket_bind (void *self, const char *format, ...)
     va_end (argptr);
 
     //  Port must be at end of endpoint
-    if (endpoint [endpoint_size - 2] == ':'
-    &&  endpoint [endpoint_size - 1] == '*') {
+    if (  endpoint [endpoint_size - 2] == ':'
+       && endpoint [endpoint_size - 1] == '*') {
         int port = ZSOCKET_DYNFROM;
         while (port <= ZSOCKET_DYNTO) {
             //  Try to bind on the next plausible port
@@ -99,7 +99,7 @@ zsocket_bind (void *self, const char *format, ...)
 int
 zsocket_unbind (void *self, const char *format, ...)
 {
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 2, 0))
     char endpoint [256];
     va_list argptr;
     va_start (argptr, format);
@@ -134,7 +134,7 @@ zsocket_connect (void *self, const char *format, ...)
 int
 zsocket_disconnect (void *self, const char *format, ...)
 {
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 2, 0))
     char endpoint [256];
     va_list argptr;
     va_start (argptr, format);
@@ -180,8 +180,8 @@ zsocket_sendmem (void *self, const void *data, size_t size, int flags)
     assert (self);
     assert (size == 0 || data);
 
-    int snd_flags = (flags & ZFRAME_MORE)? ZMQ_SNDMORE : 0;
-    snd_flags |= (flags & ZFRAME_DONTWAIT)? ZMQ_DONTWAIT : 0;
+    int snd_flags = (flags & ZFRAME_MORE) ? ZMQ_SNDMORE : 0;
+    snd_flags |= (flags & ZFRAME_DONTWAIT) ? ZMQ_DONTWAIT : 0;
 
     zmq_msg_t msg;
     zmq_msg_init_size (&msg, size);
@@ -266,7 +266,7 @@ zsocket_test (bool verbose)
     int rc = zsocket_bind (writer, "tcp://%s:%d", interf, service);
     assert (rc == service);
 
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 2, 0))
     //  Check unbind
     rc = zsocket_unbind (writer, "tcp://%s:%d", interf, service);
     assert (rc == 0);
@@ -301,7 +301,7 @@ zsocket_test (bool verbose)
     assert (rc == -1);
 
     //  Test sending frames to socket
-    rc = zsocket_sendmem (writer,"ABC", 3, ZFRAME_MORE);
+    rc = zsocket_sendmem (writer, "ABC", 3, ZFRAME_MORE);
     assert (rc == 0);
     rc = zsocket_sendmem (writer, "DEFG", 4, 0);
     assert (rc == 0);
