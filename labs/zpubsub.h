@@ -18,6 +18,9 @@
 extern "C" {
 #endif
 
+//  Opaque class structure
+typedef struct _zpubsub_t zpubsub_t;
+
 //  @interface
 //  Function to calculate port from domain id
 typedef dbyte (zpubsub_port_fn) (int domain);
