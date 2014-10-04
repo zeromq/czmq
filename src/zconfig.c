@@ -61,9 +61,9 @@ struct _zconfig_t {
     char *name;                 //  Property name if any
     char *value;                //  Property value, if any
     struct _zconfig_t
-    *child,                     //  First child if any
-    *next,                      //  Next sibling if any
-    *parent;                    //  Parent if any
+        *child,                 //  First child if any
+        *next,                  //  Next sibling if any
+        *parent;                //  Parent if any
     zlist_t *comments;          //  Comments if any
     zfile_t *file;              //  Config file handle
 };
@@ -71,17 +71,17 @@ struct _zconfig_t {
 //  Local functions for parsing and saving ZPL tokens
 
 static int
-s_collect_level (char **start, int lineno);
+    s_collect_level (char **start, int lineno);
 static char *
-s_collect_name (char **start, int lineno);
+    s_collect_name (char **start, int lineno);
 static int
-s_verify_eoln (char *readptr, int lineno);
+    s_verify_eoln (char *readptr, int lineno);
 static char *
-s_collect_value (char **start, int lineno);
+    s_collect_value (char **start, int lineno);
 static int
-s_config_save (zconfig_t *self, void *arg, int level);
+    s_config_save (zconfig_t *self, void *arg, int level);
 static int
-s_config_execute (zconfig_t *self, zconfig_fct handler, void *arg, int level);
+    s_config_execute (zconfig_t *self, zconfig_fct handler, void *arg, int level);
 
 
 //  --------------------------------------------------------------------------
@@ -162,7 +162,7 @@ zconfig_value (zconfig_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Insert or update configuration key with value; leading slash is optional
+//  Insert or update configuration key with value; leading slash is optional 
 //  and ignored.
 
 void
@@ -170,7 +170,7 @@ zconfig_put (zconfig_t *self, const char *path, const char *value)
 {
     if (*path == '/')
         path++;
-
+        
     //  Check length of next path segment
     const char *slash = strchr (path, '/');
     int length = strlen (path);
@@ -180,8 +180,8 @@ zconfig_put (zconfig_t *self, const char *path, const char *value)
     //  Find or create items starting at first child of root
     zconfig_t *child = self->child;
     while (child) {
-        if (  strlen (child->name) == length
-           && memcmp (child->name, path, length) == 0) {
+        if (strlen (child->name) == length
+        &&  memcmp (child->name, path, length) == 0) {
             //  This segment exists
             if (slash)          //  Recurse to next level
                 zconfig_put (child, slash + 1, value);
@@ -201,7 +201,7 @@ zconfig_put (zconfig_t *self, const char *path, const char *value)
         zconfig_set_value (child, "%s", value);
 }
 
-
+    
 //  --------------------------------------------------------------------------
 //  Set new name for config item; this may be null.
 
@@ -210,7 +210,7 @@ zconfig_set_name (zconfig_t *self, const char *name)
 {
     assert (self);
     free (self->name);
-    self->name = name ? strdup (name) : NULL;
+    self->name = name? strdup (name): NULL;
 }
 
 
@@ -265,7 +265,7 @@ zconfig_t *
 zconfig_locate (zconfig_t *self, const char *path)
 {
     assert (self);
-
+    
     //  Check length of next path segment
     if (*path == '/')
         path++;
@@ -277,8 +277,8 @@ zconfig_locate (zconfig_t *self, const char *path)
     //  Find matching name starting at first child of root
     zconfig_t *child = self->child;
     while (child) {
-        if (  strlen (child->name) == length
-           && memcmp (child->name, path, length) == 0) {
+        if (strlen (child->name) == length
+        &&  memcmp (child->name, path, length) == 0) {
             if (slash)          //  Look deeper
                 return zconfig_locate (child, slash);
             else
@@ -313,7 +313,7 @@ zconfig_t *
 zconfig_at_depth (zconfig_t *self, int level)
 {
     assert (self);
-
+    
     while (level > 0) {
         if (self->child) {
             self = self->child;
@@ -337,7 +337,7 @@ zconfig_execute (zconfig_t *self, zconfig_fct handler, void *arg)
 {
     //  Execute top level config at level zero
     assert (self);
-    return s_config_execute (self, handler, arg, 0) >= 0 ? 0 : -1;
+    return s_config_execute (self, handler, arg, 0) >= 0? 0: -1;
 }
 
 
@@ -457,11 +457,11 @@ s_config_save (zconfig_t *self, void *arg, int level)
         if (self->value)
             size += s_config_printf (self, arg,
                 "%*s%s = \"%s\"\n", (level - 1) * 4, "",
-                self->name ? self->name : "(Unnamed)", self->value);
+                self->name? self->name: "(Unnamed)", self->value);
         else
             size += s_config_printf (self, arg,
                 "%*s%s\n", (level - 1) * 4, "",
-                self->name ? self->name : "(Unnamed)");
+                self->name? self->name: "(Unnamed)");
     }
     return size;
 }
@@ -518,7 +518,7 @@ zconfig_chunk_load (zchunk_t *chunk)
     int lineno = 0;
     char *data_ptr = (char *) zchunk_data (chunk);
     size_t remaining = zchunk_size (chunk);
-
+    
     while (remaining) {
         //  Copy stuff into cur_line; not fastest but safest option
         //  since chunk may not be null terminated, etc.
@@ -528,14 +528,14 @@ zconfig_chunk_load (zchunk_t *chunk)
             cur_size = eoln - data_ptr;
         else
             cur_size = remaining;
-
+        
         if (cur_size > 1024)
             cur_size = 1024;
         char cur_line [1024 + 1];
         memcpy (cur_line, data_ptr, cur_size);
         cur_line [cur_size] = '\0';
-        data_ptr = eoln ? eoln + 1 : NULL;
-        remaining -= cur_size + (eoln ? 1 : 0);
+        data_ptr = eoln? eoln + 1: NULL;
+        remaining -= cur_size + (eoln? 1 :0);
 
         //  Trim line
         int length = strlen (cur_line);
@@ -621,15 +621,15 @@ s_collect_level (char **start, int lineno)
 static bool
 s_is_namechar (char thischar)
 {
-    return (  isalnum (thischar)
-           || thischar == '$'
-           || thischar == '-'
-           || thischar == '_'
-           || thischar == '@'
-           || thischar == '.'
-           || thischar == '&'
-           || thischar == '+'
-           || thischar == '/');
+    return (isalnum (thischar)
+         || thischar == '$'
+         || thischar == '-'
+         || thischar == '_'
+         || thischar == '@'
+         || thischar == '.'
+         || thischar == '&'
+         || thischar == '+'
+         || thischar == '/');
 }
 
 static char *
@@ -644,8 +644,8 @@ s_collect_name (char **start, int lineno)
     memcpy (name, readptr, length);
     name [length] = 0;
 
-    if (  length > 0
-       && (name [0] == '/' || name [length - 1] == '/')) {
+    if (length > 0
+    && (name [0] == '/' || name [length - 1] == '/')) {
         zclock_log ("E (zconfig): (%d) '/' not valid at name start or end", lineno);
         free (name);
         name = NULL;
@@ -762,7 +762,7 @@ zconfig_has_changed (zconfig_t *self)
 
 //  --------------------------------------------------------------------------
 //  Add comment to config item before saving to disk. You can add as many
-//  comment lines as you like. If you use a null format, all comments are
+//  comment lines as you like. If you use a null format, all comments are 
 //  deleted.
 
 void
@@ -778,7 +778,7 @@ zconfig_set_comment (zconfig_t *self, const char *format, ...)
         va_start (argptr, format);
         char *string = zsys_vprintf (format, argptr);
         va_end (argptr);
-
+        
         zlist_append (self->comments, string);
         free (string);
     }
@@ -825,16 +825,16 @@ void
 zconfig_test (bool verbose)
 {
     printf (" * zconfig: ");
-
+    
     //  @selftest
     //  Create temporary directory for test files
 #   define TESTDIR ".test_zconfig"
     zsys_dir_create (TESTDIR);
-
+    
     zconfig_t *root = zconfig_new ("root", NULL);
     assert (root);
     zconfig_t *section, *item;
-
+    
     section = zconfig_new ("headers", root);
     assert (section);
     item = zconfig_new ("email", section);
@@ -853,7 +853,7 @@ zconfig_test (bool verbose)
     if (verbose)
         zconfig_save (root, "-");
     assert (streq (zconfig_filename (root), TESTDIR "/test.cfg"));
-
+        
     char *email = zconfig_resolve (root, "/headers/email", NULL);
     assert (email);
     assert (streq (email, "some@random.com"));
@@ -879,7 +879,7 @@ zconfig_test (bool verbose)
     zchunk_t *chunk = zconfig_chunk_save (root);
     assert (chunk);
     zconfig_destroy (&root);
-
+    
     root = zconfig_chunk_load (chunk);
     assert (root);
     char *value = zconfig_resolve (root, "/section/value", NULL);
@@ -893,7 +893,7 @@ zconfig_test (bool verbose)
 
     zconfig_destroy (&root);
     zchunk_destroy (&chunk);
-
+    
     //  Delete all test files
     zdir_t *dir = zdir_new (TESTDIR, NULL);
     assert (dir);
@@ -903,3 +903,4 @@ zconfig_test (bool verbose)
 
     printf ("OK\n");
 }
+

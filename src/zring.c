@@ -78,8 +78,8 @@ s_node_new (node_t *prev, node_t *next, void *item)
 {
     node_t *self = (node_t *) zmalloc (sizeof (node_t));
     if (self) {
-        self->prev = prev ? prev : self;
-        self->next = next ? next : self;
+        self->prev = prev? prev: self;
+        self->next = next? next: self;
         self->item = item;
     }
     return self;
@@ -129,7 +129,7 @@ zring_prepend (zring_t *self, void *item)
 {
     assert (self);
     if (self->duplicator) {
-        item = (self->duplicator)(item);
+        item = (self->duplicator) (item);
         if (!item)
             return -1;
     }
@@ -155,7 +155,7 @@ zring_append (zring_t *self, void *item)
 {
     assert (self);
     if (self->duplicator) {
-        item = (self->duplicator)(item);
+        item = (self->duplicator) (item);
         if (!item)
             return -1;
     }
@@ -186,22 +186,22 @@ zring_insert (zring_t *self, const void *key, void *item)
     assert (self);
     assert (key);
     assert (item);
-
+    
     if (!self->hash)
         self->hash = zhash_new ();
     if (!self->hash)
         return -1;
     if (self->duplicator) {
-        item = (self->duplicator)(item);
+        item = (self->duplicator) (item);
         if (!item)
             return -1;
     }
 
     //  If item isn't already in dictionary, append to list and then
     //  store item node (which is in cursor) in dictionary
-    if (  !zhash_lookup (self->hash, key)
-       && !zring_append (self, item)
-       && !zhash_insert (self->hash, key, self->cursor)) {
+    if (!zhash_lookup (self->hash, key)
+    &&  !zring_append (self, item)
+    &&  !zhash_insert (self->hash, key, self->cursor)) {
         self->cursor->key = zhash_cursor (self->hash);
         return 0;
     }
@@ -262,9 +262,9 @@ zring_lookup (zring_t *self, const void *key)
 {
     assert (self);
     assert (key);
-
+    
     if (self->hash) {
-        node_t *node = (node_t *) zhash_lookup (self->hash, key);
+      node_t *node = (node_t *) zhash_lookup (self->hash, key);
         if (node) {
             self->cursor = node;
             return node->item;
@@ -285,10 +285,10 @@ void *
 zring_detach (zring_t *self, void *item)
 {
     assert (self);
-
+    
     node_t *found = NULL;
-    if (  (item && zring_find (self, item))
-       || (!item && self->cursor != self->head))
+    if ((item && zring_find (self, item))
+    || (!item && self->cursor != self->head))
         found = self->cursor;
 
     //  Now detach node from list, without destroying it
@@ -355,7 +355,7 @@ void
 zring_purge (zring_t *self)
 {
     assert (self);
-    while (zring_remove (self, zring_first (self)) == 0) ;
+    while (zring_remove (self, zring_first (self)) == 0);
 }
 
 
@@ -447,7 +447,7 @@ void
 zring_sort (zring_t *self)
 {
     assert (self);
-
+    
     //  Uses a comb sort, which is simple and reasonably fast. The
     //  algorithm is based on Wikipedia's C pseudo-code for comb sort.
     size_t gap = self->size;
@@ -469,7 +469,7 @@ zring_sort (zring_t *self)
                 compare = self->comparator (base->item, test->item);
             else
                 compare = (base->item < test->item);
-
+            
             if (compare) {
                 //  We don't actually swap nodes, just the items in the nodes.
                 //  This is ridiculously simple and confuses the heck out of
@@ -503,7 +503,7 @@ zring_dup (zring_t *self)
         copy->destructor = self->destructor;
         copy->duplicator = self->duplicator;
         copy->comparator = self->comparator;
-
+        
         node_t *node;
         for (node = self->head->next; node != self->head; node = node->next) {
             void *item = node->item;
@@ -594,7 +594,7 @@ zring_test (int verbose)
     assert (zring_next (ring) == NULL);
     //  After we reach end of ring, next wraps around
     assert (zring_next (ring) == cheese);
-
+    
     assert (zring_last (ring) == wine);
     assert (zring_prev (ring) == bread);
     assert (zring_prev (ring) == cheese);
@@ -616,7 +616,7 @@ zring_test (int verbose)
     //  Try the comparator functionality
     zring_set_comparator (ring, (czmq_comparator *) strcmp);
     zring_sort (ring);
-
+    
     char *item = (char *) zring_first (ring);
     assert (streq (item, "0"));
     item = (char *) zring_find (ring, "5");
@@ -649,14 +649,14 @@ zring_test (int verbose)
     assert (rc == 0);
     rc = zring_insert (ring, "2", "two");
     assert (rc == -1);
-
+    
     item = (char *) zring_lookup (ring, "2");
     assert (streq (item, "two"));
     item = (char *) zring_lookup (ring, "1");
     assert (streq (item, "one"));
     item = (char *) zring_item (ring);
     assert (streq (item, "one"));
-
+    
     rc = zring_delete (ring, "3");
     assert (rc == 0);
     rc = zring_delete (ring, "3");
@@ -667,7 +667,7 @@ zring_test (int verbose)
     rc = zring_delete (ring, "2");
     assert (rc == -1);
     zring_purge (ring);
-
+    
     //  Destructor should be safe to call twice
     zring_destroy (&ring);
     assert (ring == NULL);

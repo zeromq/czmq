@@ -132,7 +132,7 @@ s_purge (zhash_t *self)
 {
     uint index;
     size_t limit = primes [self->prime_index];
-
+        
     for (index = 0; index < limit; index++) {
         //  Destroy all items in this hash bucket
         item_t *cur_item = self->items [index];
@@ -188,16 +188,16 @@ s_item_destroy (zhash_t *self, item_t *item, bool hard)
     self->size--;
     if (hard) {
         if (self->destructor)
-            (self->destructor)(&item->value);
+            (self->destructor) (&item->value);
         else
         if (item->free_fn)
-            (item->free_fn)(item->value);
+            (item->free_fn) (item->value);
 
         self->cursor_item = NULL;
         self->cursor_key = NULL;
 
         if (self->key_destructor)
-            (self->key_destructor)((void **) &item->key);
+            (self->key_destructor) ((void **) &item->key);
         free (item);
     }
 }
@@ -264,7 +264,7 @@ zhash_insert (zhash_t *self, const void *key, void *value)
             return -1;
         self->chain_limit += CHAIN_GROWS;
     }
-    return s_item_insert (self, key, value) ? 0 : -1;
+    return s_item_insert (self, key, value)? 0: -1;
 }
 
 
@@ -287,13 +287,13 @@ s_item_insert (zhash_t *self, const void *key, void *value)
 
         //  If necessary, take duplicate of item key
         if (self->key_duplicator)
-            item->key = (self->key_duplicator)((void *) key);
+            item->key = (self->key_duplicator) ((void*) key);
         else
             item->key = key;
 
         //  If necessary, take duplicate of item value
         if (self->duplicator)
-            item->value = (self->duplicator)(value);
+            item->value = (self->duplicator) (value);
         else
             item->value = value;
 
@@ -308,7 +308,7 @@ s_item_insert (zhash_t *self, const void *key, void *value)
     }
     else
         item = NULL;            //  Signal duplicate insertion
-
+        
     return item;
 }
 
@@ -326,7 +326,7 @@ s_item_lookup (zhash_t *self, const void *key)
     item_t *item = self->items [self->cached_index];
     uint len = 0;
     while (item) {
-        if ((self->key_comparator)(item->key, key) == 0)
+        if ((self->key_comparator) (item->key, key) == 0)
             break;
         item = item->next;
         ++len;
@@ -359,14 +359,14 @@ zhash_update (zhash_t *self, const void *key, void *value)
     item_t *item = s_item_lookup (self, key);
     if (item) {
         if (self->destructor)
-            (self->destructor)(&item->value);
+            (self->destructor) (&item->value);
         else
         if (item->free_fn)
-            (item->free_fn)(item->value);
+            (item->free_fn) (item->value);
 
         //  If necessary, take duplicate of item value
         if (self->duplicator)
-            item->value = (self->duplicator)(value);
+            item->value = (self->duplicator) (value);
         else
             item->value = value;
     }
@@ -450,10 +450,10 @@ zhash_rename (zhash_t *self, const void *old_key, const void *new_key)
     if (old_item && !new_item) {
         s_item_destroy (self, old_item, false);
         if (self->key_destructor)
-            (self->key_destructor)((void **) &old_item->key);
+            (self->key_destructor) ((void **)&old_item->key);
 
         if (self->key_duplicator)
-            old_item->key = (self->key_duplicator)(new_key);
+            old_item->key = (self->key_duplicator) (new_key);
         else
             old_item->key = new_key;
 
@@ -654,7 +654,7 @@ zhash_save (zhash_t *self, const char *filename)
     for (index = 0; index < limit; index++) {
         item_t *item = self->items [index];
         while (item) {
-            fprintf (handle, "%s=%s\n", (char *) item->key, (char *) item->value);
+            fprintf (handle, "%s=%s\n", (char *)item->key, (char *) item->value);
             item = item->next;
         }
     }
@@ -679,7 +679,7 @@ zhash_load (zhash_t *self, const char *filename)
     //  will always work after zhash_load (), to load a newly-created
     //  file.
 
-    //  Take copy of filename in case self->filename is same string.
+   //  Take copy of filename in case self->filename is same string.
     char *filename_copy = strdup (filename);
     free (self->filename);
     self->filename = filename_copy;
@@ -719,9 +719,9 @@ zhash_refresh (zhash_t *self)
 {
     assert (self);
 
-    if (self->filename)
-        if (  zsys_file_modified (self->filename) > self->modified
-           && zsys_file_stable (self->filename)) {
+    if (self->filename) {
+        if (zsys_file_modified (self->filename) > self->modified
+        &&  zsys_file_stable (self->filename)) {
             //  Empty the hash table; code is copied from zhash_destroy
             uint index;
             size_t limit = primes [self->prime_index];
@@ -736,6 +736,7 @@ zhash_refresh (zhash_t *self)
             }
             zhash_load (self, self->filename);
         }
+    }
     return 0;
 }
 
@@ -750,11 +751,11 @@ zhash_refresh (zhash_t *self)
 //     dict-count      = number-4
 //     dict-value      = longstr
 //     dict-name       = string
-//
+// 
 //     ; Strings are always length + text contents
 //     longstr         = number-4 *VCHAR
 //     string          = number-1 *VCHAR
-//
+// 
 //     ; Numbers are unsigned integers in network byte order
 //     number-1        = 1OCTET
 //     number-4        = 4OCTET
@@ -847,7 +848,7 @@ zhash_unpack (zframe_t *frame)
                     memcpy (value, needle, value_size);
                     value [value_size] = 0;
                     needle += value_size;
-
+                    
                     //  Hash takes ownership of value
                     if (zhash_insert (self, key, value)) {
                         zhash_destroy (&self);
@@ -1027,7 +1028,7 @@ int
 zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument)
 {
     assert (self);
-
+    
     uint index;
     size_t limit = primes [self->prime_index];
     for (index = 0; index < limit; index++) {
@@ -1060,7 +1061,7 @@ zhash_test (int verbose)
     assert (zhash_size (hash) == 0);
     assert (zhash_first (hash) == NULL);
     assert (zhash_cursor (hash) == NULL);
-
+    
     //  Insert some items
     int rc;
     rc = zhash_insert (hash, "DEADBEEF", "dead beef");

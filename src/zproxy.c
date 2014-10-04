@@ -78,17 +78,18 @@ s_create_socket (char *type_name, char *endpoints)
     };
     //  We always match type at least at end of table
     int index;
-    for (index = 0; strneq (type_name, type_names [index]); index++) ;
+    for (index = 0; strneq (type_name, type_names [index]); index++);
     if (index > ZMQ_XSUB) {
         zsys_error ("zproxy: invalid socket type '%s'", type_name);
         return NULL;
     }
     zsock_t *sock = zsock_new (index);
-    if (sock)
+    if (sock) {
         if (zsock_attach (sock, endpoints, true)) {
             zsys_error ("zproxy: invalid endpoints '%s'", endpoints);
             zsock_destroy (&sock);
         }
+    }
     return sock;
 }
 
@@ -122,7 +123,7 @@ s_self_handle_pipe (self_t *self)
     char *command = zmsg_popstr (request);
     if (self->verbose)
         zsys_info ("zproxy: API command=%s", command);
-
+    
     if (streq (command, "FRONTEND")) {
         s_self_configure (self, &self->frontend, request, "frontend");
         zsock_signal (self->pipe, 0);
@@ -185,15 +186,15 @@ s_self_switch (self_t *self, zsock_t *input, zsock_t *output)
     //  We use the low-level libzmq API for best performance
     void *zmq_input = zsock_resolve (input);
     void *zmq_output = zsock_resolve (output);
-    void *zmq_capture = self->capture ? zsock_resolve (self->capture) : NULL;
+    void *zmq_capture = self->capture? zsock_resolve (self->capture): NULL;
 
     zmq_msg_t msg;
     zmq_msg_init (&msg);
     if (zmq_recvmsg (zmq_input, &msg, 0) == -1)
         return;                 //  Nothing to do, probably interrupted
-
+        
     while (true) {
-        int send_flags = zsocket_rcvmore (zmq_input) ? ZMQ_SNDMORE : 0;
+        int send_flags = zsocket_rcvmore (zmq_input)? ZMQ_SNDMORE: 0;
         if (zmq_capture) {
             zmq_msg_t dup;
             zmq_msg_init (&dup);
@@ -268,7 +269,7 @@ zproxy_test (bool verbose)
     assert (faucet);
     zsock_t *sink = zsock_new_pull (">inproc://backend");
     assert (sink);
-
+    
     //  Send some messages and check they arrived
     char *hello, *world;
     zstr_sendx (faucet, "Hello", "World", NULL);
@@ -285,7 +286,7 @@ zproxy_test (bool verbose)
     zsock_set_rcvtimeo (sink, 100);
     zstr_recvx (sink, &hello, &world, NULL);
     assert (!hello && !world);
-
+    
     zstr_sendx (proxy, "RESUME", NULL);
     zsock_wait (proxy);
     zstr_recvx (sink, &hello, &world, NULL);
@@ -307,7 +308,7 @@ zproxy_test (bool verbose)
     assert (streq (world, "World"));
     zstr_free (&hello);
     zstr_free (&world);
-
+    
     zstr_recvx (capture, &hello, &world, NULL);
     assert (streq (hello, "Hello"));
     assert (streq (world, "World"));
