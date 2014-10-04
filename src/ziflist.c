@@ -111,12 +111,12 @@ static bool
 s_valid_flags (short flags)
 {
     return (flags & IFF_UP)             //  Only use interfaces that are running
-       && !(flags & IFF_LOOPBACK)       //  Ignore loopback interface
-       &&  (flags & IFF_BROADCAST)      //  Only use interfaces that have BROADCAST
+           && !(flags & IFF_LOOPBACK)   //  Ignore loopback interface
+           && (flags & IFF_BROADCAST)   //  Only use interfaces that have BROADCAST
 #   if defined (IFF_SLAVE)
-       && !(flags & IFF_SLAVE)          //  Ignore devices that are bonding slaves.
+           && !(flags & IFF_SLAVE)      //  Ignore devices that are bonding slaves.
 #   endif
-       && !(flags & IFF_POINTOPOINT);   //  Ignore point to point interfaces.
+           && !(flags & IFF_POINTOPOINT); //  Ignore point to point interfaces.
 }
 #endif
 
@@ -137,10 +137,10 @@ ziflist_reload (ziflist_t *self)
         struct ifaddrs *interface = interfaces;
         while (interface) {
             //  On Solaris, loopback interfaces have a NULL in ifa_broadaddr
-            if (interface->ifa_broadaddr
-            &&  interface->ifa_addr
-            &&  interface->ifa_addr->sa_family == AF_INET
-            &&  s_valid_flags (interface->ifa_flags)) {
+            if (  interface->ifa_broadaddr
+               && interface->ifa_addr
+               && interface->ifa_addr->sa_family == AF_INET
+               && s_valid_flags (interface->ifa_flags)) {
                 inaddr_t address = *(inaddr_t *) interface->ifa_addr;
                 inaddr_t netmask = *(inaddr_t *) interface->ifa_netmask;
                 inaddr_t broadcast = *(inaddr_t *) interface->ifa_broadaddr;
@@ -153,7 +153,7 @@ ziflist_reload (ziflist_t *self)
 
                 interface_t *item =
                     s_interface_new (interface->ifa_name, address, netmask,
-                                     broadcast);
+                    broadcast);
                 if (item)
                     zlist_append (list, item);
             }
@@ -180,20 +180,20 @@ ziflist_reload (ziflist_t *self)
             bool is_valid = false;
             if (!ioctl (sock, SIOCGIFFLAGS, (caddr_t) ifr, sizeof (struct ifreq)))
                 is_valid = s_valid_flags (ifr->ifr_flags);
-            
+
             //  Get interface properties
             inaddr_t address = { 0 };
             if (!ioctl (sock, SIOCGIFADDR, (caddr_t) ifr, sizeof (struct ifreq)))
                 address = *((inaddr_t *) &ifr->ifr_addr);
             else
                 is_valid = false;
-            
+
             inaddr_t broadcast = { 0 };
             if (!ioctl (sock, SIOCGIFBRDADDR, (caddr_t) ifr, sizeof (struct ifreq)))
                 broadcast = *((inaddr_t *) &ifr->ifr_addr);
             else
                 is_valid = false;
-            
+
             inaddr_t netmask = { 0 };
             if (!ioctl (sock, SIOCGIFNETMASK, (caddr_t) ifr, sizeof (struct ifreq)))
                 netmask = *((inaddr_t *) &ifr->ifr_addr);
@@ -202,7 +202,7 @@ ziflist_reload (ziflist_t *self)
 
             if (is_valid) {
                 interface_t *item = s_interface_new (ifr->ifr_name, address,
-                                                     netmask, broadcast);
+                    netmask, broadcast);
                 if (item)
                     zlist_append (list, item);
             }
@@ -229,13 +229,13 @@ ziflist_reload (ziflist_t *self)
         PWCHAR friendlyName = cur_address->FriendlyName;
         size_t friendlyLength = 0;
         size_t asciiSize = wcstombs (0, friendlyName, 0) + 1;
-        char *asciiFriendlyName = (char*) zmalloc (asciiSize);
+        char *asciiFriendlyName = (char *) zmalloc (asciiSize);
         friendlyLength = wcstombs (asciiFriendlyName, friendlyName, asciiSize);
 
         bool valid = (cur_address->OperStatus == IfOperStatusUp)
-                  && (pUnicast && pPrefix)
-                  && (pUnicast->Address.lpSockaddr->sa_family == AF_INET)
-                  && (pPrefix->PrefixLength <= 32);
+            && (pUnicast && pPrefix)
+            && (pUnicast->Address.lpSockaddr->sa_family == AF_INET)
+            && (pPrefix->PrefixLength <= 32);
 
         if (valid) {
             inaddr_t address = *(inaddr_t *) pUnicast->Address.lpSockaddr;
@@ -244,7 +244,7 @@ ziflist_reload (ziflist_t *self)
             inaddr_t broadcast = address;
             broadcast.sin_addr.s_addr |= ~(netmask.sin_addr.s_addr);
             interface_t *item = s_interface_new (asciiFriendlyName, address,
-                                                 netmask, broadcast);
+                netmask, broadcast);
             if (item)
                 zlist_append (list, item);
         }
@@ -354,7 +354,7 @@ ziflist_test (bool verbose)
     printf (" * ziflist: ");
     if (verbose)
         printf ("\n");
-    
+
     ziflist_t *iflist = ziflist_new ();
     assert (iflist);
     size_t items = ziflist_size (iflist);

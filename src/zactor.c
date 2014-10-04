@@ -13,7 +13,7 @@
 
 /*
 @header
-    The zactor class provides a simple actor framework. It replaces the 
+    The zactor class provides a simple actor framework. It replaces the
     CZMQ zthread class, which had a complex API that did not fit the CLASS
     standard. A CZMQ actor is implemented as a thread plus a PAIR-PAIR
     pipe. The constructor and destructor are always synchronized, so the
@@ -126,7 +126,7 @@ zactor_new (zactor_fn *actor, void *args)
     char endpoint [32];
     while (true) {
         sprintf (endpoint, "inproc://zactor-%04x-%04x\n",
-                 randof (0x10000), randof (0x10000));
+            randof (0x10000), randof (0x10000));
         if (zsock_bind (self->pipe, "%s", endpoint) == 0)
             break;
     }
@@ -249,7 +249,7 @@ zactor_resolve (void *self)
 //  must call zsock_signal (pipe) when initialized
 //  must listen to pipe and exit on $TERM command
 
-static void 
+static void
 echo_actor (zsock_t *pipe, void *args)
 {
     //  Do some initialization
@@ -263,11 +263,11 @@ echo_actor (zsock_t *pipe, void *args)
             break;              //  Interrupted
         char *command = zmsg_popstr (msg);
         //  All actors must handle $TERM in this way
-        if (streq (command, "$TERM")) 
+        if (streq (command, "$TERM"))
             terminated = true;
         else
         //  This is an example command for our test actor
-        if (streq (command, "ECHO")) 
+        if (streq (command, "ECHO"))
             zmsg_send (&msg, pipe);
         else {
             puts ("E: invalid message to actor");
