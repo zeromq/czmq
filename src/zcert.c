@@ -20,8 +20,8 @@
     certificate is stored as two files. One is public and contains only
     the public key. The second is secret and contains both keys. The
     two have the same filename, with the secret file adding "_secret".
-    To exchange certificates, send the public file via some secure route. 
-    Certificates are not signed but are text files that can be verified by 
+    To exchange certificates, send the public file via some secure route.
+    Certificates are not signed but are text files that can be verified by
     eye.
 @discuss
     Certificates are stored in the ZPL (ZMQ RFC 4) format. They have two
@@ -181,7 +181,7 @@ zcert_set_meta (zcert_t *self, const char *name, const char *format, ...)
 
 
 //  --------------------------------------------------------------------------
-//  Get metadata value from certificate; if the metadata value doesn't 
+//  Get metadata value from certificate; if the metadata value doesn't
 //  exist, returns NULL.
 
 char *
@@ -219,7 +219,7 @@ zcert_load (const char *filename)
     zconfig_t *root = zconfig_load (filename_secret);
     if (!root)
         root = zconfig_load (filename);
-        
+
     zcert_t *self = NULL;
     if (root) {
         char *public_text = zconfig_resolve (root, "/curve/public-key", NULL);
@@ -235,7 +235,7 @@ zcert_load (const char *filename)
             //  Load metadata into certificate
             self = zcert_new_from (public_key, secret_key);
             zconfig_t *metadata = zconfig_locate (root, "/metadata");
-            zconfig_t *item = metadata? zconfig_child (metadata): NULL;
+            zconfig_t *item = metadata ? zconfig_child (metadata) : NULL;
             while (item) {
                 zcert_set_meta (self, zconfig_name (item), zconfig_value (item));
                 item = zconfig_next (item);
@@ -258,7 +258,7 @@ s_save_metadata_all (zcert_t *self)
     self->config = zconfig_new ("root", NULL);
     assert (self->config);
     zconfig_t *section = zconfig_new ("metadata", self->config);
-    
+
     char *value = (char *) zhash_first (self->metadata);
     while (value) {
         zconfig_t *item = zconfig_new ((char *) zhash_cursor (self->metadata), section);
@@ -301,13 +301,15 @@ zcert_save_public (zcert_t *self, const char *filename)
     s_save_metadata_all (self);
     zconfig_set_comment (self->config,
         "   ZeroMQ CURVE Public Certificate");
-    zconfig_set_comment (self->config,
+    zconfig_set_comment (
+        self->config,
         "   Exchange securely, or use a secure mechanism to verify the contents");
-    zconfig_set_comment (self->config,
+    zconfig_set_comment (
+        self->config,
         "   of this file after exchange. Store public certificates in your home");
     zconfig_set_comment (self->config,
         "   directory, in the .curve subdirectory.");
-    
+
     zconfig_put (self->config, "/curve/public-key", self->public_txt);
     int rc = zconfig_save (self->config, filename);
     return rc;
@@ -325,11 +327,12 @@ zcert_save_secret (zcert_t *self, const char *filename)
     s_save_metadata_all (self);
     zconfig_set_comment (self->config,
         "   ZeroMQ CURVE **Secret** Certificate");
-    zconfig_set_comment (self->config,
+    zconfig_set_comment (
+        self->config,
         "   DO NOT PROVIDE THIS FILE TO OTHER USERS nor change its permissions.");
     zconfig_put (self->config, "/curve/public-key", self->public_txt);
     zconfig_put (self->config, "/curve/secret-key", self->secret_txt);
-    
+
     zsys_file_mode_private ();
     int rc = zconfig_save (self->config, filename);
     zsys_file_mode_default ();
@@ -387,8 +390,8 @@ zcert_eq (zcert_t *self, zcert_t *compare)
     assert (self);
     assert (compare);
 
-    return (streq (self->public_txt, compare->public_txt)
-        &&  streq (self->secret_txt, compare->secret_txt));
+    return (  streq (self->public_txt, compare->public_txt)
+           && streq (self->secret_txt, compare->secret_txt));
 }
 
 
@@ -404,7 +407,7 @@ zcert_print (zcert_t *self)
     char *value = (char *) zhash_first (self->metadata);
     while (value) {
         zsys_info ("zcert:     %s = \"%s\"",
-                 zhash_cursor (self->metadata), value);
+            zhash_cursor (self->metadata), value);
         value = (char *) zhash_next (self->metadata);
     }
     zsys_info ("zcert: curve");
@@ -426,7 +429,7 @@ zcert_fprint (zcert_t *self, FILE *file)
     char *value = (char *) zhash_first (self->metadata);
     while (value) {
         fprintf (file, "    %s = \"%s\"\n",
-                 (char *)zhash_cursor (self->metadata), value);
+            (char *) zhash_cursor (self->metadata), value);
         value = (char *) zhash_next (self->metadata);
     }
     fprintf (file, "curve\n");
@@ -445,7 +448,7 @@ zcert_test (bool verbose)
     //  Create temporary directory for test files
 #   define TESTDIR ".test_zcert"
     zsys_dir_create (TESTDIR);
-    
+
     //  Create a simple certificate with metadata
     zcert_t *cert = zcert_new ();
     assert (cert);
@@ -478,20 +481,20 @@ zcert_test (bool verbose)
     int rc = zsys_file_delete (TESTDIR "/mycert.txt_secret");
     assert (rc == 0);
     shadow = zcert_load (TESTDIR "/mycert.txt");
-    
+
     //  32-byte null key encodes as 40 '0' characters
     assert (streq (zcert_secret_txt (shadow), FORTY_ZEROES));
-    
+
     zcert_destroy (&shadow);
     zcert_destroy (&cert);
-    
+
     //  Delete all test files
     zdir_t *dir = zdir_new (TESTDIR, NULL);
     assert (dir);
     zdir_remove (dir, true);
     zdir_destroy (&dir);
     //  @end
-    
+
     printf ("OK\n");
 }
 

@@ -40,7 +40,7 @@ struct _zmonitor_t {
 
 //  Background task does the real I/O
 static void
-    s_agent_task (void *args, zctx_t *ctx, void *pipe);
+s_agent_task (void *args, zctx_t *ctx, void *pipe);
 
 
 //  --------------------------------------------------------------------------
@@ -58,13 +58,13 @@ zmonitor_new (zctx_t *ctx, void *socket, int events)
     self->pipe = zthread_fork (ctx, s_agent_task, NULL);
     if (self->pipe) {
         self->socket = socket;
-        
+
         //  Register a monitor endpoint on the socket
         char *monitor_endpoint = (char *) zmalloc (100);
         sprintf (monitor_endpoint, "inproc://zmonitor-%p", self->socket);
         int rc = zmq_socket_monitor (self->socket, monitor_endpoint, events);
         assert (rc == 0);
-        
+
         //  Configure backend agent with monitor endpoint
         zstr_sendf (self->pipe, "%s", monitor_endpoint);
         free (monitor_endpoint);
@@ -155,13 +155,13 @@ typedef struct {
 //  Prototypes for local functions we use in the agent
 
 static agent_t *
-    s_agent_new (zctx_t *ctx, void *pipe, char *endpoint);
+s_agent_new (zctx_t *ctx, void *pipe, char *endpoint);
 static void
-    s_api_command (agent_t *self);
+s_api_command (agent_t *self);
 static void
-    s_socket_event (agent_t *self);
+s_socket_event (agent_t *self);
 static void
-    s_agent_destroy (agent_t **self_p);
+s_agent_destroy (agent_t **self_p);
 
 
 //  This is the background task that monitors socket events
@@ -183,11 +183,11 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
             if (result == NULL)
                 break;              // Interrupted
             else
-                if (result == self->pipe)
-                    s_api_command (self);
-                else
-                    if (result == self->socket)
-                        s_socket_event (self);
+            if (result == self->pipe)
+                s_api_command (self);
+            else
+            if (result == self->socket)
+                s_socket_event (self);
         }
     zpoller_destroy (&poller);
     s_agent_destroy (&self);
@@ -273,7 +273,7 @@ s_socket_event (agent_t *self)
     int event = *(uint16_t *) (zframe_data (frame));
     int value = *(uint32_t *) (zframe_data (frame) + 2);
     zframe_destroy (&frame);
-    
+
     //  Second frame is address
     char *address = zstr_recv (self->socket);
     char *description = "Unknown";
@@ -320,8 +320,8 @@ s_socket_event (agent_t *self)
 
     zstr_sendfm (self->pipe, "%d", event);
     zstr_sendfm (self->pipe, "%d", value);
-    zstr_sendm  (self->pipe, address);
-    zstr_send   (self->pipe, description);
+    zstr_sendm (self->pipe, address);
+    zstr_send (self->pipe, description);
     free (address);
 }
 
@@ -371,7 +371,8 @@ zmonitor_v2_test (bool verbose)
     void *source = zsocket_new (ctx, ZMQ_PUSH);
     assert (source);
     zmonitor_t *sourcemon = zmonitor_new (ctx,
-        source, ZMQ_EVENT_CONNECTED | ZMQ_EVENT_DISCONNECTED);
+        source,
+        ZMQ_EVENT_CONNECTED | ZMQ_EVENT_DISCONNECTED);
     assert (sourcemon);
     zmonitor_set_verbose (sourcemon, verbose);
     zsocket_connect (source, "tcp://127.0.0.1:%d", port_nbr);
@@ -389,7 +390,7 @@ zmonitor_v2_test (bool verbose)
     zctx_destroy (&ctx);
     //  @end
 #endif          //  ZeroMQ 4.0 or later
-    
+
     printf ("OK\n");
 }
 

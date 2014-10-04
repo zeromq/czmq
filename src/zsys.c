@@ -40,15 +40,16 @@ static struct sigaction sigterm_default;
 
 #elif defined (__WINDOWS__)
 static zsys_handler_fn *installed_handler_fn;
-static BOOL WINAPI s_handler_fn_shim (DWORD ctrltype)
+static BOOL WINAPI
+s_handler_fn_shim (DWORD ctrltype)
 {
-   //  Return TRUE for events that we handle
-   if (ctrltype == CTRL_C_EVENT && installed_handler_fn != NULL) {
-       installed_handler_fn (ctrltype);
-       return TRUE;
-   }
-   else
-       return FALSE;
+    //  Return TRUE for events that we handle
+    if (ctrltype == CTRL_C_EVENT && installed_handler_fn != NULL) {
+        installed_handler_fn (ctrltype);
+        return TRUE;
+    }
+    else
+        return FALSE;
 }
 #endif
 
@@ -96,7 +97,7 @@ typedef pthread_mutex_t zsys_mutex_t;
 #   define ZMUTEX_UNLOCK(m)  pthread_mutex_unlock (&m);
 #   define ZMUTEX_DESTROY(m) pthread_mutex_destroy (&m);
 #elif defined (__WINDOWS__)
-typedef CRITICAL_SECTION  zsys_mutex_t;
+typedef CRITICAL_SECTION zsys_mutex_t;
 #   define ZMUTEX_INIT(m)    InitializeCriticalSection (&m);
 #   define ZMUTEX_LOCK(m)    EnterCriticalSection (&m);
 #   define ZMUTEX_UNLOCK(m)  LeaveCriticalSection (&m);
@@ -161,8 +162,8 @@ zsys_init (void)
             s_logsystem = false;
     }
     //  Catch SIGINT and SIGTERM unless ZSYS_SIGHANDLER=false
-    if (getenv ("ZSYS_SIGHANDLER") == NULL
-    || strneq (getenv ("ZSYS_SIGHANDLER"), "true"))
+    if (  getenv ("ZSYS_SIGHANDLER") == NULL
+       || strneq (getenv ("ZSYS_SIGHANDLER"), "true"))
         zsys_catch_interrupts ();
 
     ZMUTEX_INIT (s_mutex);
@@ -177,7 +178,7 @@ zsys_init (void)
     assert (!s_process_ctx);
     //  We use zmq_init/zmq_term to keep compatibility back to ZMQ v2
     s_process_ctx = zmq_init ((int) s_io_threads);
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 2, 0))
     //  TODO: this causes TravisCI to break; libzmq does not return a
     //  valid socket on zmq_socket(), after this...
     zmq_ctx_set (s_process_ctx, ZMQ_MAX_SOCKETS, s_max_sockets);
@@ -203,9 +204,7 @@ void
 zsys_shutdown (void)
 {
     if (!s_initialized)
-    {
         return;
-    }
     s_initialized = false;
 
     //  The atexit handler is called when the main function exits;
@@ -228,8 +227,8 @@ zsys_shutdown (void)
     while (sockref) {
         assert (sockref->filename);
         zsys_error ("dangling '%s' socket created at %s:%d",
-                    zsys_sockname (sockref->type),
-                    sockref->filename, (int) sockref->line_nbr);
+            zsys_sockname (sockref->type),
+            sockref->filename, (int) sockref->line_nbr);
         zmq_close (sockref->handle);
         free (sockref);
         sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
@@ -290,7 +289,7 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
 #   if defined (ZMQ_IPV6)
     zsocket_set_ipv6 (handle, s_ipv6);
 #   else
-    zsocket_set_ipv4only (handle, s_ipv6? 0: 1);
+    zsocket_set_ipv4only (handle, s_ipv6 ? 0 : 1);
 #   endif
 #endif
     //  Add socket to reference tracker so we can report leaks; this is
@@ -309,7 +308,7 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
 }
 
 //  --------------------------------------------------------------------------
-//  Destroy/close a ZMQ socket. You should call this for every socket you 
+//  Destroy/close a ZMQ socket. You should call this for every socket you
 //  create using zsys_socket().
 
 int
@@ -529,7 +528,7 @@ zsys_file_delete (const char *filename)
 {
     assert (filename);
 #if (defined (__WINDOWS__))
-    return DeleteFileA (filename) ? 0: -1;
+    return DeleteFileA (filename) ? 0 : -1;
 #else
     return unlink (filename);
 #endif
@@ -547,7 +546,8 @@ zsys_file_stable (const char *filename)
         //  File is 'stable' if more than 1 second old
 #if (defined (WIN32))
 #   define EPOCH_DIFFERENCE 11644473600LL
-        long age = (long) (zclock_time () - EPOCH_DIFFERENCE * 1000 - (stat_buf.st_mtime * 1000));
+        long age =
+            (long) (zclock_time () - EPOCH_DIFFERENCE * 1000 - (stat_buf.st_mtime * 1000));
 #else
         long age = (long) (zclock_time () - (stat_buf.st_mtime * 1000));
 #endif
@@ -576,7 +576,7 @@ zsys_dir_create (const char *pathname, ...)
         if (slash)
             *slash = 0;         //  Cut at slash
         mode_t mode = zsys_file_mode (formatted);
-        if (mode == (mode_t)-1) {
+        if (mode == (mode_t) -1) {
             //  Does not exist, try to create it
 #if (defined (__WINDOWS__))
             if (!CreateDirectoryA (formatted, NULL))
@@ -611,7 +611,7 @@ zsys_dir_delete (const char *pathname, ...)
     va_end (argptr);
 
 #if (defined (__WINDOWS__))
-    int rc = RemoveDirectoryA (formatted)? 0: -1;
+    int rc = RemoveDirectoryA (formatted) ? 0 : -1;
 #else
     int rc = rmdir (formatted);
 #endif
@@ -745,19 +745,19 @@ zsys_udp_new (bool routable)
     //  Ask operating system for broadcast permissions on socket
     int on = 1;
     if (setsockopt (udpsock, SOL_SOCKET, SO_BROADCAST,
-                   (char *) &on, sizeof (on)) == SOCKET_ERROR)
+            (char *) &on, sizeof (on)) == SOCKET_ERROR)
         zsys_socket_error ("setsockopt (SO_BROADCAST)");
 
     //  Allow multiple owners to bind to socket; incoming
     //  messages will replicate to each owner
     if (setsockopt (udpsock, SOL_SOCKET, SO_REUSEADDR,
-                   (char *) &on, sizeof (on)) == SOCKET_ERROR)
+            (char *) &on, sizeof (on)) == SOCKET_ERROR)
         zsys_socket_error ("setsockopt (SO_REUSEADDR)");
 
 #if defined (SO_REUSEPORT)
     //  On some platforms we have to ask to reuse the port
     if (setsockopt (udpsock, SOL_SOCKET, SO_REUSEPORT,
-                   (char *) &on, sizeof (on)) == SOCKET_ERROR)
+            (char *) &on, sizeof (on)) == SOCKET_ERROR)
         zsys_socket_error ("setsockopt (SO_REUSEPORT)");
 #endif
     return udpsock;
@@ -784,7 +784,7 @@ zsys_udp_close (SOCKET handle)
 #include <errno.h>
 
 #ifndef _CRT_ERRNO_DEFINED
-    extern int errno;
+extern int errno;
 #endif
 
 void
@@ -797,11 +797,11 @@ zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address)
     //  don't try to report the error. We might log this or send to an error
     //  console at some point.
     int rv = sendto (udpsock,
-            (char *) zframe_data (frame), (int) zframe_size (frame),
-            0,      //  Flags
-            (struct sockaddr *) address, (int) sizeof (inaddr_t));
+        (char *) zframe_data (frame), (int) zframe_size (frame),
+        0,              //  Flags
+        (struct sockaddr *) address, (int) sizeof (inaddr_t));
     if (rv < 0)
-        fprintf (stderr, "Error in sendto() - %d, %s\n", errno, strerror(errno));
+        fprintf (stderr, "Error in sendto() - %d, %s\n", errno, strerror (errno));
 }
 
 
@@ -826,7 +826,7 @@ zsys_udp_recv (SOCKET udpsock, char *peername)
     //  Get sender address as printable string
 #if (defined (__WINDOWS__))
     getnameinfo ((struct sockaddr *) &address, address_len,
-                peername, INET_ADDRSTRLEN, NULL, 0, NI_NUMERICHOST);
+        peername, INET_ADDRSTRLEN, NULL, 0, NI_NUMERICHOST);
 #else
     inet_ntop (AF_INET, &address.sin_addr, peername, address_len);
 #endif
@@ -843,44 +843,44 @@ zsys_socket_error (const char *reason)
 {
 #if defined (__WINDOWS__)
     switch (WSAGetLastError ()) {
-        case WSAEINTR:        errno = EINTR;      break;
-        case WSAEBADF:        errno = EBADF;      break;
-        case WSAEWOULDBLOCK:  errno = EAGAIN;     break;
-        case WSAEINPROGRESS:  errno = EAGAIN;     break;
-        case WSAENETDOWN:     errno = ENETDOWN;   break;
-        case WSAECONNRESET:   errno = ECONNRESET; break;
-        case WSAECONNABORTED: errno = EPIPE;      break;
-        case WSAESHUTDOWN:    errno = ECONNRESET; break;
-        case WSAEINVAL:       errno = EPIPE;      break;
+        case WSAEINTR:        errno = EINTR;break;
+        case WSAEBADF:        errno = EBADF;break;
+        case WSAEWOULDBLOCK:  errno = EAGAIN;break;
+        case WSAEINPROGRESS:  errno = EAGAIN;break;
+        case WSAENETDOWN:     errno = ENETDOWN;break;
+        case WSAECONNRESET:   errno = ECONNRESET;break;
+        case WSAECONNABORTED: errno = EPIPE;break;
+        case WSAESHUTDOWN:    errno = ECONNRESET;break;
+        case WSAEINVAL:       errno = EPIPE;break;
         default:              errno = GetLastError ();
     }
 #endif
-    if (errno == EAGAIN
-    ||  errno == ENETDOWN
-    ||  errno == EHOSTUNREACH
-    ||  errno == ENETUNREACH
-    ||  errno == EINTR
-    ||  errno == EPIPE
-    ||  errno == ECONNRESET
+    if (  errno == EAGAIN
+       || errno == ENETDOWN
+       || errno == EHOSTUNREACH
+       || errno == ENETUNREACH
+       || errno == EINTR
+       || errno == EPIPE
+       || errno == ECONNRESET
 #if defined (ENOPROTOOPT)
-    ||  errno == ENOPROTOOPT
+       || errno == ENOPROTOOPT
 #endif
 #if defined (EHOSTDOWN)
-    ||  errno == EHOSTDOWN
+       || errno == EHOSTDOWN
 #endif
 #if defined (EOPNOTSUPP)
-    ||  errno == EOPNOTSUPP
+       || errno == EOPNOTSUPP
 #endif
 #if defined (EWOULDBLOCK)
-    ||  errno == EWOULDBLOCK
+       || errno == EWOULDBLOCK
 #endif
 #if defined (EPROTO)
-    ||  errno == EPROTO
+       || errno == EPROTO
 #endif
 #if defined (ENONET)
-    ||  errno == ENONET
+       || errno == ENONET
 #endif
-    )
+          )
         return;             //  Ignore error and try again
     else {
         zsys_error ("(UDP) error '%s' on %s", strerror (errno), reason);
@@ -936,7 +936,7 @@ zsys_daemonize (const char *workdir)
     //  process, to reduce the resources we use
     int file_handle = sysconf (_SC_OPEN_MAX);
     while (file_handle)
-    close (file_handle--);      //  Ignore any errors
+        close (file_handle--);  //  Ignore any errors
 
     //  Set the umask for new files we might create
     umask (file_mask);
@@ -983,11 +983,11 @@ zsys_run_as (const char *lockfile, const char *group, const char *user)
         }
         else {
             struct flock filelock;
-            filelock.l_type   = F_WRLCK;    //  F_RDLCK, F_WRLCK, F_UNLCK
+            filelock.l_type = F_WRLCK;      //  F_RDLCK, F_WRLCK, F_UNLCK
             filelock.l_whence = SEEK_SET;   //  SEEK_SET, SEEK_CUR, SEEK_END
-            filelock.l_start  = 0;          //  Offset from l_whence
-            filelock.l_len    = 0;          //  length, 0 = to EOF
-            filelock.l_pid    = getpid ();
+            filelock.l_start = 0;           //  Offset from l_whence
+            filelock.l_len = 0;             //  length, 0 = to EOF
+            filelock.l_pid = getpid ();
             if (fcntl (handle, F_SETLK, &filelock)) {
                 zsys_error ("cannot get lock: %s", strerror (errno));
                 return -1;
@@ -1020,12 +1020,11 @@ zsys_run_as (const char *lockfile, const char *group, const char *user)
             return -1;
         }
     }
-    else {
-        //  Switch back to real user ID (who started process)
-        if (setuid (getuid ())) {
-            zsys_error ("cannot set real user id: %s", strerror (errno));
-            return -1;
-        }
+    else
+    //  Switch back to real user ID (who started process)
+    if (setuid (getuid ())) {
+        zsys_error ("cannot set real user id: %s", strerror (errno));
+        return -1;
     }
     return 0;
 #else
@@ -1085,7 +1084,7 @@ zsys_set_io_threads (size_t io_threads)
     zmq_term (s_process_ctx);
     s_io_threads = io_threads;
     s_process_ctx = zmq_init ((int) s_io_threads);
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 2, 0))
     //  TODO: this causes TravisCI to break; libzmq does not return a
     //  valid socket on zmq_socket(), after this...
     zmq_ctx_set (s_process_ctx, ZMQ_MAX_SOCKETS, s_max_sockets);
@@ -1109,7 +1108,7 @@ zsys_set_max_sockets (size_t max_sockets)
     if (s_open_sockets)
         zsys_error ("zsys_max_sockets() is not valid after creating sockets");
     assert (s_open_sockets == 0);
-    s_max_sockets = max_sockets? max_sockets: zsys_socket_limit ();
+    s_max_sockets = max_sockets ? max_sockets : zsys_socket_limit ();
     ZMUTEX_UNLOCK (s_mutex);
 }
 
@@ -1121,7 +1120,7 @@ size_t
 zsys_socket_limit (void)
 {
     int socket_limit;
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (4,1,0))
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (4, 1, 0))
     if (s_process_ctx)
         socket_limit = zmq_ctx_get (s_process_ctx, ZMQ_SOCKET_LIMIT);
     else {
@@ -1260,7 +1259,7 @@ zsys_set_interface (const char *value)
 const char *
 zsys_interface (void)
 {
-    return s_interface? s_interface: "";
+    return s_interface ? s_interface : "";
 }
 
 
@@ -1374,7 +1373,7 @@ s_log (char loglevel, char *string)
     //  Set s_logstream to stdout by default, unless we're using s_logsystem
     if (!s_logstream)
         s_logstream = stdout;
-    
+
     if (s_logstream || s_logsender) {
         time_t curtime = time (NULL);
         struct tm *loctime = localtime (&curtime);
@@ -1382,10 +1381,11 @@ s_log (char loglevel, char *string)
         strftime (date, 20, "%y-%m-%d %H:%M:%S", loctime);
         char log_text [1024];
         if (s_logident)
-            snprintf (log_text, 1024, "%c: (%s) %s %s", loglevel, s_logident, date, string);
+            snprintf (log_text, 1024, "%c: (%s) %s %s", loglevel, s_logident, date,
+                string);
         else
             snprintf (log_text, 1024, "%c: %s %s", loglevel, date, string);
-        
+
         if (s_logstream) {
             fprintf (s_logstream, "%s\n", log_text);
             fflush (s_logstream);
@@ -1486,7 +1486,7 @@ zsys_test (bool verbose)
 
     //  Check capabilities without using the return value
     int rc = zsys_has_curve ();
-    
+
     if (verbose) {
         char *hostname = zsys_hostname ();
         zsys_info ("host name is %s", hostname);
@@ -1557,7 +1557,7 @@ zsys_test (bool verbose)
     assert (rc == 0);
     rc = zmq_setsockopt (logger, ZMQ_SUBSCRIBE, "", 0);
     assert (rc == 0);
-        
+
     if (verbose) {
         zsys_error ("This is an %s message", "error");
         zsys_warning ("This is a %s message", "warning");

@@ -71,7 +71,7 @@ s_self_new (zsock_t *pipe)
         self->whitelist = zhash_new ();
         if (self->whitelist)
             self->blacklist = zhash_new ();
-      
+
         //  Create ZAP handler and get ready for requests
         if (self->blacklist)
             self->handler = zsock_new (ZMQ_REP);
@@ -96,11 +96,11 @@ s_self_handle_pipe (self_t *self)
     zmsg_t *request = zmsg_recv (self->pipe);
     if (!request)
         return -1;                  //  Interrupted
-        
+
     char *command = zmsg_popstr (request);
     if (self->verbose)
         zsys_info ("zauth: API command=%s", command);
-    
+
     if (streq (command, "ALLOW")) {
         char *address = zmsg_popstr (request);
         while (address) {
@@ -280,7 +280,7 @@ s_zap_request_reply (zap_request_t *self, char *status_code, char *status_text)
     if (self->verbose)
         zsys_info ("zauth: - ZAP reply status_code=%s status_text=%s",
             status_code, status_text);
-        
+
     zstr_sendx (self->handler,
         "1.0", self->sequence, status_code, status_text, "", "",
         NULL);
@@ -328,8 +328,8 @@ s_authenticate_curve (self_t *self, zap_request_t *request)
         return true;
     }
     else
-    if (self->certstore
-    &&  zcertstore_lookup (self->certstore, request->client_key)) {
+    if (  self->certstore
+       && zcertstore_lookup (self->certstore, request->client_key)) {
         if (self->verbose)
             zsys_info ("zauth: - allowed (CURVE) client_key=%s", request->client_key);
         return true;
@@ -369,7 +369,8 @@ s_self_authenticate (self_t *self)
             else {
                 denied = true;
                 if (self->verbose)
-                    zsys_info ("zauth: - denied (not in whitelist) address=%s", request->address);
+                    zsys_info ("zauth: - denied (not in whitelist) address=%s",
+                        request->address);
             }
         }
         else
@@ -382,7 +383,8 @@ s_self_authenticate (self_t *self)
             else {
                 allowed = true;
                 if (self->verbose)
-                    zsys_info ("zauth: - passed (not in blacklist) address=%s", request->address);
+                    zsys_info ("zauth: - passed (not in blacklist) address=%s",
+                        request->address);
             }
         }
         //  Mechanism-specific checks
@@ -415,7 +417,7 @@ s_self_authenticate (self_t *self)
     }
     else
         s_zap_request_reply (request, "500", "Internal error");
-    
+
     return 0;
 }
 
@@ -496,7 +498,7 @@ zauth_test (bool verbose)
     assert (client);
     bool success = s_can_connect (&server, &client);
     assert (success);
-    
+
     //  Install the authenticator
     zactor_t *auth = zactor_new (zauth, NULL);
     assert (auth);
@@ -604,7 +606,7 @@ zauth_test (bool verbose)
 
     zsock_destroy (&client);
     zsock_destroy (&server);
-    
+
     //  Delete all test files
     zdir_t *dir = zdir_new (TESTDIR, NULL);
     assert (dir);

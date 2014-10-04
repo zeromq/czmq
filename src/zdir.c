@@ -41,7 +41,7 @@ struct _zdir_t {
     zlist_t *files;         //  List of files in directory
     zlist_t *subdirs;       //  List of subdirectories
     time_t modified;        //  Most recent file including subdirs
-    off_t  cursize;         //  Total file size including subdirs
+    off_t cursize;          //  Total file size including subdirs
     size_t count;           //  Total file count including subdirs
     bool trimmed;           //  Load only top level directory
 };
@@ -73,8 +73,8 @@ static void
 s_posix_populate_entry (zdir_t *self, struct dirent *entry)
 {
     //  Skip . and ..
-    if (streq (entry->d_name, ".")
-    ||  streq (entry->d_name, ".."))
+    if (  streq (entry->d_name, ".")
+       || streq (entry->d_name, ".."))
         return;
 
     char fullpath [1024 + 1];
@@ -87,7 +87,7 @@ s_posix_populate_entry (zdir_t *self, struct dirent *entry)
         ; //  Skip hidden files
     else
     //  If we have a subdirectory, go load that
-    if (S_ISDIR(stat_buf.st_mode)) {
+    if (S_ISDIR (stat_buf.st_mode)) {
         if (!self->trimmed) {
             zdir_t *subdir = zdir_new (entry->d_name, self->path);
             assert (subdir);
@@ -129,7 +129,7 @@ zdir_new (const char *path, const char *parent)
     }
     else
         self->path = strdup (path);
-    
+
     if (self->path)
         self->files = zlist_new ();
     if (self->files)
@@ -178,7 +178,7 @@ zdir_new (const char *path, const char *parent)
     if (handle) {
         //  Calculate system-specific size of dirent block
         int dirent_size = offsetof (struct dirent, d_name)
-                        + pathconf (self->path, _PC_NAME_MAX) + 1;
+                          + pathconf (self->path, _PC_NAME_MAX) + 1;
         struct dirent *entry = (struct dirent *) malloc (dirent_size);
         struct dirent *result;
 
@@ -343,7 +343,7 @@ static bool
 s_dir_compare (void *item1, void *item2)
 {
     if (strcmp (zdir_path ((zdir_t *) item1),
-                zdir_path ((zdir_t *) item2)) > 0)
+            zdir_path ((zdir_t *) item2)) > 0)
         return true;
     else
         return false;
@@ -360,7 +360,7 @@ s_file_compare (void *item1, void *item2)
         return true;
 
     if (strcmp (zfile_filename ((zfile_t *) item1, NULL),
-                zfile_filename ((zfile_t *) item2, NULL)) > 0)
+            zfile_filename ((zfile_t *) item2, NULL)) > 0)
         return true;
     else
         return false;
@@ -406,8 +406,8 @@ zdir_remove (zdir_t *self, bool force)
         self->count = 0;
     }
     //  Remove if empty
-    if (zlist_size (self->files) == 0
-    &&  zlist_size (self->subdirs) == 0)
+    if (  zlist_size (self->files) == 0
+       && zlist_size (self->subdirs) == 0)
         zsys_dir_delete (self->path);
 }
 
@@ -449,7 +449,10 @@ zdir_diff (zdir_t *older, zdir_t *newer, const char *alias)
         if (cmp > 0) {
             //  New file was created
             if (zfile_is_stable (new_file)) {
-                int rc = zlist_append (patches, zdir_patch_new (newer->path, new_file, patch_create, alias));
+                int rc =
+                    zlist_append (patches,
+                        zdir_patch_new (newer->path, new_file, patch_create,
+                            alias));
                 if (rc != 0) {
                     zlist_destroy (&patches);
                     break;
@@ -461,7 +464,10 @@ zdir_diff (zdir_t *older, zdir_t *newer, const char *alias)
         if (cmp < 0) {
             //  Old file was deleted
             if (zfile_is_stable (old_file)) {
-                int rc = zlist_append (patches, zdir_patch_new (older->path, old_file, patch_delete, alias));
+                int rc =
+                    zlist_append (patches,
+                        zdir_patch_new (older->path, old_file, patch_delete,
+                            alias));
                 if (rc != 0) {
                     zlist_destroy (&patches);
                     break;
@@ -475,9 +481,12 @@ zdir_diff (zdir_t *older, zdir_t *newer, const char *alias)
                 //  Old file was modified or replaced
                 //  Since we don't check file contents, treat as created
                 //  Could better do SHA check on file here
-                if (zfile_modified (new_file) != zfile_modified (old_file)
-                ||  zfile_cursize (new_file) != zfile_cursize (old_file)) {
-                    int rc = zlist_append (patches, zdir_patch_new (newer->path, new_file, patch_create, alias));
+                if (  zfile_modified (new_file) != zfile_modified (old_file)
+                   || zfile_cursize (new_file) != zfile_cursize (old_file)) {
+                    int rc =
+                        zlist_append (patches,
+                            zdir_patch_new (newer->path, new_file, patch_create,
+                                alias));
                     if (rc != 0) {
                         zlist_destroy (&patches);
                         break;
@@ -486,7 +495,10 @@ zdir_diff (zdir_t *older, zdir_t *newer, const char *alias)
             }
             else {
                 //  File was created over some period of time
-                int rc = zlist_append (patches, zdir_patch_new (newer->path, new_file, patch_create, alias));
+                int rc =
+                    zlist_append (patches,
+                        zdir_patch_new (newer->path, new_file, patch_create,
+                            alias));
                 if (rc != 0) {
                     zlist_destroy (&patches);
                     break;
@@ -519,7 +531,8 @@ zdir_resync (zdir_t *self, const char *alias)
         zfile_t *file = files [index];
         if (!file)
             break;
-        int rc = zlist_append (patches, zdir_patch_new (self->path, file, patch_create, alias));
+        int rc =
+            zlist_append (patches, zdir_patch_new (self->path, file, patch_create, alias));
         if (rc != 0) {
             zlist_destroy (&patches);
             break;

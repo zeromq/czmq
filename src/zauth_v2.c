@@ -13,7 +13,7 @@
 
 /*
 @header
-    A zauth object takes over authentication for all incoming connections in 
+    A zauth object takes over authentication for all incoming connections in
     its context.
 @discuss
     This class is deprecated in CZMQ v3; it works together with zctx, zsocket,
@@ -37,7 +37,7 @@ struct _zauth_t {
 
 //  The background agent task does all the real work
 static void
-    s_agent_task (void *args, zctx_t *ctx, void *pipe);
+s_agent_task (void *args, zctx_t *ctx, void *pipe);
 
 
 //  --------------------------------------------------------------------------
@@ -65,9 +65,8 @@ zauth_new (zctx_t *ctx)
             zauth_destroy (&self);
         zstr_free (&status);
     }
-    else {
+    else
         zauth_destroy (&self);
-    }
     return self;
 }
 
@@ -469,7 +468,8 @@ s_agent_authenticate (agent_t *self)
             else {
                 denied = true;
                 if (self->verbose)
-                    printf ("ZAUTH I: DENIED (not in whitelist) address=%s\n", request->address);
+                    printf ("ZAUTH I: DENIED (not in whitelist) address=%s\n",
+                        request->address);
             }
         }
         else
@@ -482,7 +482,8 @@ s_agent_authenticate (agent_t *self)
             else {
                 allowed = true;
                 if (self->verbose)
-                    printf ("ZAUTH I: PASSED (not in blacklist) address=%s\n", request->address);
+                    printf ("ZAUTH I: PASSED (not in blacklist) address=%s\n",
+                        request->address);
             }
         }
         //  Mechanism-specific checks
@@ -556,8 +557,8 @@ s_authenticate_curve (agent_t *self, zap_request_t *request)
         return true;
     }
     else
-    if (self->certstore
-    &&  zcertstore_lookup (self->certstore, request->client_key)) {
+    if (  self->certstore
+       && zcertstore_lookup (self->certstore, request->client_key)) {
         if (self->verbose)
             printf ("ZAUTH I: ALLOWED (CURVE) client_key=%s\n", request->client_key);
         return true;
@@ -573,7 +574,8 @@ static bool
 s_authenticate_gssapi (agent_t *self, zap_request_t *request)
 {
     if (self->verbose)
-        printf ("I: ALLOWED (GSSAPI) principal=%s identity=%s\n", request->principal, request->identity);
+        printf ("I: ALLOWED (GSSAPI) principal=%s identity=%s\n", request->principal,
+            request->identity);
     return true;
 }
 
@@ -594,8 +596,8 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
             if (which == self->pipe)
                 s_agent_handle_pipe (self);
             else
-                if (which == self->handler)
-                    s_agent_authenticate (self);
+            if (which == self->handler)
+                s_agent_authenticate (self);
         }
     //  Done, free all agent resources
     zpoller_destroy (&poller);
