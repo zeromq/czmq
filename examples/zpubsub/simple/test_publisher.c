@@ -1,7 +1,7 @@
 #include <czmq.h>
-#include "../../../labs/zpubsub.h"
-#include "../../../labs/zpubsub_option.h"
-#include "../../../labs/zpubsub_filter.h"
+#include <zpubsub.h>
+#include <zpubsub_option.h>
+#include <zpubsub_filter.h>
 
 typedef struct {
     uint64_t id;
