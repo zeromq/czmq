@@ -9,16 +9,16 @@
     http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the
-    Free Software Foundation; either version 3 of the License, or (at your
+    the terms of the GNU Lesser General Public License as published by the 
+    Free Software Foundation; either version 3 of the License, or (at your 
     option) any later version.
 
     This software is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL-
-    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General
+    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General 
     Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public License
+    You should have received a copy of the GNU Lesser General Public License 
     along with this program. If not, see <http://www.gnu.org/licenses/>.
     =========================================================================
 */
@@ -141,7 +141,7 @@ zmsg_send (zmsg_t **self_p, void *dest)
         zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
         while (frame) {
             rc = zframe_send (&frame, handle,
-                zlist_size (self->frames) ? ZFRAME_MORE : 0);
+                zlist_size (self->frames)? ZFRAME_MORE: 0);
             if (rc != 0)
                 break;
             frame = (zframe_t *) zlist_pop (self->frames);
@@ -414,7 +414,7 @@ zmsg_remove (zmsg_t *self, zframe_t *frame)
 
 
 //  --------------------------------------------------------------------------
-//  Set cursor to first frame in message. Returns frame, or NULL, if the
+//  Set cursor to first frame in message. Returns frame, or NULL, if the 
 //  message is empty. Use this to navigate the frames as a list.
 
 zframe_t *
@@ -455,7 +455,7 @@ zmsg_last (zmsg_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Save message to an open file, return 0 if OK, else -1. The message is
+//  Save message to an open file, return 0 if OK, else -1. The message is 
 //  saved as a series of frames, each with length and data. Note that the
 //  file is NOT guaranteed to be portable between operating systems, not
 //  versions of CZMQ. The file format is at present undocumented and liable
@@ -571,7 +571,7 @@ zmsg_encode (zmsg_t *self, byte **buffer)
                 *dest++ = (frame_size >> 24) & 255;
                 *dest++ = (frame_size >> 16) & 255;
                 *dest++ = (frame_size >>  8) & 255;
-                *dest++ = frame_size        & 255;
+                *dest++ =  frame_size        & 255;
                 memcpy (dest, zframe_data (frame), frame_size);
                 dest += frame_size;
             }
@@ -585,7 +585,7 @@ zmsg_encode (zmsg_t *self, byte **buffer)
 
 //  --------------------------------------------------------------------------
 //  Decodes a serialized message buffer created by zmsg_encode () and returns
-//  a new zmsg_t object. Returns NULL if the buffer was badly formatted or
+//  a new zmsg_t object. Returns NULL if the buffer was badly formatted or 
 //  there was insufficient memory to work.
 
 zmsg_t *
@@ -605,9 +605,9 @@ zmsg_decode (byte *buffer, size_t buffer_size)
                 break;
             }
             frame_size = (source [0] << 24)
-                + (source [1] << 16)
-                + (source [2] << 8)
-                +  source [3];
+                       + (source [1] << 16)
+                       + (source [2] << 8)
+                       +  source [3];
             source += 4;
         }
         if (source > limit - frame_size) {
@@ -667,7 +667,7 @@ zmsg_print (zmsg_t *self)
 {
     assert (self);
     assert (zmsg_is (self));
-
+    
     if (!self) {
         zsys_debug ("(NULL)");
         return;
