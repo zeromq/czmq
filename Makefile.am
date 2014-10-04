@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I config
 
-SUBDIRS = src model doc addons 
+SUBDIRS = src model doc addons labs
 
 DIST_SUBDIRS = src model doc addons
 
