@@ -1,7 +1,6 @@
 #include "../include/czmq.h"
 
-void
-assert_status (zactor_t *actor, int count)
+void assert_status (zactor_t *actor, int count)
 {
     zstr_sendx (actor, "STATUS", NULL);
     //  Get STATUS reply and check it
@@ -21,8 +20,7 @@ assert_status (zactor_t *actor, int count)
 
 //  Argument, if any, is number of nodes in swarm test
 
-int
-main (int argn, char *argv [])
+int main (int argn, char *argv [])
 {
     //  Raise theoretical limit on how many ZeroMQ sockets we can create,
     //  though real limit will be set by the process file handle limit.
@@ -88,7 +86,7 @@ main (int argn, char *argv [])
     printf ("Starting swarm test case: ");
     fflush (stdout);
 
-    //  Default limit on file handles is 1024 (POSIX), and fixed setup
+    //  Default limit on file handles is 1024 (POSIX), and fixed setup 
     //  costs 8 handles (3 standard I/O plus 5 for CZMQ/libzmq). So the
     //  most nodes we can test by default is (1024 - 8) / 4 = 254. To
     //  test more, run "ulimit -n xxx" beforehand and pass swarm size
@@ -144,13 +142,13 @@ main (int argn, char *argv [])
     int item_nbr;
     for (item_nbr = 0; item_nbr < set_size; item_nbr++) {
         node_nbr = randof (swarm_size);
-        zstr_sendm (nodes [node_nbr], "PUBLISH");
+        zstr_sendm  (nodes [node_nbr], "PUBLISH");
         zstr_sendfm (nodes [node_nbr], "key-%d", item_nbr);
-        zstr_send (nodes [node_nbr], "value");
+        zstr_send   (nodes [node_nbr], "value");
     }
     printf (". ");
     fflush (stdout);
-
+    
     //  Each actor will deliver us tuples; count these until we're done
     int total = set_size * swarm_size;
     int pending = total;
@@ -175,8 +173,8 @@ main (int argn, char *argv [])
     //  Destroy swarm
     for (node_nbr = 0; node_nbr < swarm_size; node_nbr++)
         zactor_destroy (&nodes [node_nbr]);
-
+    
     printf ("(100%%) OK\n");
-
+    
     return 0;
 }

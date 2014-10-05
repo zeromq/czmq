@@ -33,7 +33,7 @@ struct _zloop_t {
     zlist_t *readers;           //  List of socket readers
     zlist_t *pollers;           //  List of poll items
     zlist_t *timers;            //  List of timers
-    int last_timer_id;          //  Most recent timer id
+    int last_timer_id;          //  Most recent timer id 
     size_t poll_size;           //  Size of poll set
     zmq_pollitem_t *pollset;    //  zmq_poll set
     s_reader_t *readact;        //  Readers for this poll set
@@ -212,7 +212,7 @@ zloop_t *
 zloop_new (void)
 {
     zloop_t
-    *self;
+        *self;
 
     self = (zloop_t *) zmalloc (sizeof (zloop_t));
     if (!self)
@@ -222,7 +222,7 @@ zloop_new (void)
     if (self->readers)
         self->pollers = zlist_new ();
     if (self->pollers)
-        self->timers = zlist_new ();
+        self->timers  = zlist_new ();
     if (self->timers)
         self->zombies = zlist_new ();
     if (self->zombies)
@@ -354,8 +354,8 @@ zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
 {
     assert (self);
 
-    if (  item->socket
-       && streq (zsocket_type_str (item->socket), "UNKNOWN"))
+    if (item->socket
+    &&  streq (zsocket_type_str (item->socket), "UNKNOWN"))
         return -1;
 
     s_poller_t *poller = s_poller_new (item, handler, arg);
@@ -366,7 +366,7 @@ zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
         self->need_rebuild = true;
         if (self->verbose)
             zsys_debug ("zloop: register %s poller (%p, %d)",
-                item->socket ? zsocket_type_str (item->socket) : "FD",
+                item->socket? zsocket_type_str (item->socket): "FD",
                 item->socket, item->fd);
         return 0;
     }
@@ -391,10 +391,10 @@ zloop_poller_end (zloop_t *self, zmq_pollitem_t *item)
         if (item->socket) {
             if (item->socket == poller->item.socket)
                 match = true;
+        } else {
+            if (item->fd  == poller->item.fd)
+                match = true;
         }
-        else
-        if (item->fd == poller->item.fd)
-            match = true;
         if (match) {
             zlist_remove (self->pollers, poller);
             free (poller);
@@ -405,7 +405,7 @@ zloop_poller_end (zloop_t *self, zmq_pollitem_t *item)
     }
     if (self->verbose)
         zsys_debug ("zloop: cancel %s poller (%p, %d)",
-            item->socket ? zsocket_type_str (item->socket) : "FD",
+            item->socket? zsocket_type_str (item->socket): "FD",
             item->socket, item->fd);
 }
 
@@ -426,13 +426,14 @@ zloop_poller_set_tolerant (zloop_t *self, zmq_pollitem_t *item)
         if (item->socket) {
             if (item->socket == poller->item.socket)
                 match = true;
+        } else {
+            if (item->fd  == poller->item.fd)
+                match = true;
         }
-        else
-        if (item->fd == poller->item.fd)
-            match = true;
-        if (match)
+        if (match) {
             poller->tolerant = true;
-
+        }
+            
         poller = (s_poller_t *) zlist_next (self->pollers);
     }
 }
@@ -456,13 +457,13 @@ zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_timer_fn handler, 
         return -1;
     if (self->verbose)
 #ifdef __WINDOWS__
-        zsys_debug ("zloop: register timer id=%d delay=%u times=%u",
-            timer_id, delay, times);
+		zsys_debug ("zloop: register timer id=%d delay=%u times=%u",
+                    timer_id, delay, times);
 #else
         zsys_debug ("zloop: register timer id=%d delay=%zd times=%zd",
-            timer_id, delay, times);
+                    timer_id, delay, times);
 #endif
-
+    
     return timer_id;
 }
 
@@ -475,7 +476,7 @@ int
 zloop_timer_end (zloop_t *self, int timer_id)
 {
     assert (self);
-
+    
     if (self->terminated)
         s_timer_remove (self, timer_id);
     else
@@ -488,7 +489,7 @@ zloop_timer_end (zloop_t *self, int timer_id)
 
     if (self->verbose)
         zsys_debug ("zloop: cancel timer id=%d", timer_id);
-
+    
     return 0;
 }
 
@@ -533,11 +534,11 @@ zloop_start (zloop_t *self)
                 break;
         }
         rc = zmq_poll (self->pollset, (int) self->poll_size,
-            s_tickless_timer (self) * ZMQ_POLL_MSEC);
+                       s_tickless_timer (self) * ZMQ_POLL_MSEC);
         if (rc == -1 || zsys_interrupted) {
             if (self->verbose)
                 zsys_debug ("zloop: interrupted (%d) - %s", rc,
-                    zmq_strerror (zmq_errno ()));
+                            zmq_strerror (zmq_errno ()));
             rc = 0;
             break;              //  Context has been shut down
         }
@@ -564,8 +565,8 @@ zloop_start (zloop_t *self)
         for (item_nbr = 0; item_nbr < self->poll_size && rc >= 0; item_nbr++) {
             s_reader_t *reader = &self->readact [item_nbr];
             if (reader->handler) {
-                if (  (self->pollset [item_nbr].revents & ZMQ_POLLERR)
-                   && !reader->tolerant) {
+                if ((self->pollset [item_nbr].revents & ZMQ_POLLERR)
+                && !reader->tolerant) {
                     if (self->verbose)
                         zsys_warning ("zloop: can't read %s socket: %s",
                             zsock_type_str (reader->sock),
@@ -592,13 +593,13 @@ zloop_start (zloop_t *self)
             else {
                 s_poller_t *poller = &self->pollact [item_nbr];
                 assert (self->pollset [item_nbr].socket == poller->item.socket);
-
-                if (  (self->pollset [item_nbr].revents & ZMQ_POLLERR)
-                   && !poller->tolerant) {
+            
+                if ((self->pollset [item_nbr].revents & ZMQ_POLLERR)
+                && !poller->tolerant) {
                     if (self->verbose)
                         zsys_warning ("zloop: can't poll %s socket (%p, %d): %s",
-                            poller->item.socket ?
-                            zsocket_type_str (poller->item.socket) : "FD",
+                            poller->item.socket?
+                                zsocket_type_str (poller->item.socket): "FD",
                             poller->item.socket, poller->item.fd,
                             zmq_strerror (zmq_errno ()));
                     //  Give handler one chance to handle error, then kill
@@ -614,8 +615,8 @@ zloop_start (zloop_t *self)
                 if (self->pollset [item_nbr].revents) {
                     if (self->verbose)
                         zsys_debug ("zloop: call %s socket handler (%p, %d)",
-                            poller->item.socket ?
-                            zsocket_type_str (poller->item.socket) : "FD",
+                            poller->item.socket?
+                                zsocket_type_str (poller->item.socket): "FD",
                             poller->item.socket, poller->item.fd);
                     rc = poller->handler (self, &self->pollset [item_nbr], poller->arg);
                     if (rc == -1 || self->need_rebuild)
@@ -674,7 +675,7 @@ zloop_test (bool verbose)
     zsock_t *output = zsock_new (ZMQ_PAIR);
     assert (output);
     zsock_bind (output, "inproc://zloop.test");
-
+    
     zsock_t *input = zsock_new (ZMQ_PAIR);
     assert (input);
     zsock_connect (input, "inproc://zloop.test");
@@ -686,10 +687,10 @@ zloop_test (bool verbose)
     //  Create a timer that will be cancelled
     int timer_id = zloop_timer (loop, 1000, 1, s_timer_event, NULL);
     zloop_timer (loop, 5, 1, s_cancel_timer_event, &timer_id);
-
+    
     //  After 20 msecs, send a ping message to output3
     zloop_timer (loop, 20, 1, s_timer_event, output);
-
+    
     //  When we get the ping message, end the reactor
     rc = zloop_reader (loop, input, s_socket_event, NULL);
     assert (rc == 0);
