@@ -1,3 +1,4 @@
+
 /*  =========================================================================
     zbeacon - LAN discovery and presence (deprecated)
 
@@ -45,7 +46,7 @@ struct _zbeacon_t {
 
 //  Background task does the real I/O
 static void
-    s_agent_task (void *args, zctx_t *ctx, void *pipe);
+s_agent_task (void *args, zctx_t *ctx, void *pipe);
 
 
 //  --------------------------------------------------------------------------
@@ -204,7 +205,7 @@ zbeacon_hostname (zbeacon_t *self)
 //  Backend agent implementation
 
 //  Agent instance
-    
+
 typedef struct {
     void *pipe;                 //  Socket to talk back to application
     SOCKET udpsock;             //  UDP socket for send/recv
@@ -222,15 +223,15 @@ typedef struct {
 //  Prototypes for local functions we use in the agent
 
 static agent_t *
-    s_agent_new (void *pipe, int port_nbr);
+s_agent_new (void *pipe, int port_nbr);
 static void
-    s_agent_destroy (agent_t **self_p);
+s_agent_destroy (agent_t **self_p);
 static void
-    s_get_interface (agent_t *self);
+s_get_interface (agent_t *self);
 static void
-    s_api_command (agent_t *self);
+s_api_command (agent_t *self);
 static void
-    s_beacon_recv (agent_t *self);
+s_beacon_recv (agent_t *self);
 
 
 //  This is the background task
@@ -268,8 +269,8 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
         if (pollitems [1].revents & ZMQ_POLLIN)
             s_beacon_recv (self);
 
-        if (self->transmit
-        &&  zclock_mono () >= self->ping_at) {
+        if (  self->transmit
+           && zclock_mono () >= self->ping_at) {
             //  Send beacon to any listening peers
             zsys_udp_send (self->udpsock, self->transmit, &self->broadcast);
             self->ping_at = zclock_mono () + self->interval;
@@ -287,7 +288,7 @@ s_agent_new (void *pipe, int port_nbr)
     agent_t *self = (agent_t *) zmalloc (sizeof (agent_t));
     if (!self)
         return NULL;
-    
+
     self->pipe = pipe;
     self->port_nbr = port_nbr;
     self->interval = INTERVAL_DFLT;
@@ -321,7 +322,7 @@ s_agent_new (void *pipe, int port_nbr)
     //  has more than one active interface.
     char hostname [NI_MAXHOST];
     rc = getnameinfo ((struct sockaddr *) &self->address,
-            sizeof (inaddr_t), hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+                      sizeof (inaddr_t), hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
     if (rc == 0) {
         //  It all looks OK
         zstr_send (pipe, hostname);
@@ -363,7 +364,7 @@ s_get_interface (agent_t *self)
             }
         }
         if (name) {
-            //  Using inet_addr instead of inet_aton or inet_atop because these 
+            //  Using inet_addr instead of inet_aton or inet_atop because these
             //  are not supported in Win XP
             self->broadcast.sin_family = AF_INET;
             self->broadcast.sin_addr.s_addr = inet_addr (ziflist_broadcast (iflist));
@@ -373,7 +374,7 @@ s_get_interface (agent_t *self)
         }
         else
             zsys_error ("No adapter found, ZSYS_INTERFACE=%s isn't helping", iface);
-        
+
         ziflist_destroy (&iflist);
     }
 }
@@ -418,7 +419,7 @@ s_api_command (agent_t *self)
     }
     else
         zsys_error ("zbeacon: unexpected API command '%s'\n", command);
-    
+
     zstr_free (&command);
 }
 
@@ -432,22 +433,22 @@ s_beacon_recv (agent_t *self)
 
     char peername [INET_ADDRSTRLEN];
     zframe_t *frame = zsys_udp_recv (self->udpsock, peername);
-    
+
     //  If filter is set, check that beacon matches it
     bool is_valid = false;
     if (self->filter) {
         byte  *filter_data = zframe_data (self->filter);
         size_t filter_size = zframe_size (self->filter);
-        if (zframe_size (frame) >= filter_size
-        && memcmp (zframe_data (frame), filter_data, filter_size) == 0)
+        if (  zframe_size (frame) >= filter_size
+           && memcmp (zframe_data (frame), filter_data, filter_size) == 0)
             is_valid = true;
     }
     //  If valid, check for echoed beacons (i.e. our own broadcast)
     if (is_valid && self->noecho && self->transmit) {
         byte  *transmit_data = zframe_data (self->transmit);
         size_t transmit_size = zframe_size (self->transmit);
-        if (zframe_size (frame) == transmit_size
-        && memcmp (zframe_data (frame), transmit_data, transmit_size) == 0)
+        if (  zframe_size (frame) == transmit_size
+           && memcmp (zframe_data (frame), transmit_data, transmit_size) == 0)
             is_valid = false;
     }
     //  If still a valid beacon, send on to the API
@@ -520,7 +521,7 @@ zbeacon_v2_test (bool verbose)
     if (ipaddress) {
         zframe_t *content = zframe_recv (zbeacon_socket (client_beacon));
         int received_port = (zframe_data (content) [0] << 8)
-                        +  zframe_data (content) [1];
+                            +  zframe_data (content) [1];
         assert (received_port == port_nbr);
         zframe_destroy (&content);
         zbeacon_silence (service_beacon);

@@ -1,3 +1,4 @@
+
 /*  =========================================================================
     zthread - working with system threads (deprecated)
 
@@ -50,7 +51,7 @@
 
     If you want to communicate over ipc:// or tcp:// you may be sharing
     the same context, or use separate contexts. Thus, every detached thread
-    usually starts by creating its own zctx_t instance.    
+    usually starts by creating its own zctx_t instance.
 @end
 */
 
@@ -117,7 +118,7 @@ s_thread_start (shim_t *shim)
     pthread_detach (thread);
 
 #elif defined (__WINDOWS__)
-    shim->handle = (HANDLE)_beginthreadex (
+    shim->handle = (HANDLE) _beginthreadex (
         NULL,                   //  Handle is private to this process
         0,                      //  Use a default stack size for new thread
         &s_thread_shim,         //  Start real thread function via this shim
@@ -173,7 +174,7 @@ zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args)
         zsocket_bind (pipe, "inproc://zctx-pipe-%p", pipe);
     else
         return NULL;
-    
+
     //  Prepare argument shim for child thread
     shim = (shim_t *) zmalloc (sizeof (shim_t));
     if (shim) {
@@ -187,7 +188,7 @@ zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args)
     }
     else
         return NULL;
-    
+
     //  Connect child pipe to our pipe
     shim->pipe = zctx__socket_pipe (shim->ctx);
     if (!shim->pipe) {
@@ -195,7 +196,7 @@ zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args)
         return NULL;
     }
     zsocket_connect (shim->pipe, "inproc://zctx-pipe-%p", pipe);
-    
+
     s_thread_start (shim);
     return pipe;
 }
