@@ -1,3 +1,4 @@
+
 /*  =========================================================================
     zdir_patch - work with directory patches
     A patch is a change to the directory (create/delete).
@@ -54,7 +55,7 @@ zdir_patch_new (const char *path, zfile_t *file,
     }
 
     self->op = op;
-    
+
     //  Calculate virtual path for patch (remove path, prefix alias)
     char *filename = zfile_filename (file, path);
     if (!filename) {
@@ -108,8 +109,8 @@ zdir_patch_dup (zdir_patch_t *self)
                 copy->vpath = strdup (self->vpath);
             if (copy->vpath)
                 //  Don't recalculate hash when we duplicate patch
-                copy->digest = self->digest? strdup (self->digest): NULL;
-            
+                copy->digest = self->digest ? strdup (self->digest) : NULL;
+
             if (copy->digest == NULL)
                 zdir_patch_destroy (&copy);
         }
@@ -170,8 +171,8 @@ zdir_patch_vpath (zdir_patch_t *self)
 void
 zdir_patch_digest_set (zdir_patch_t *self)
 {
-    if (self->op == patch_create
-    &&  self->digest == NULL)
+    if (  self->op == patch_create
+       && self->digest == NULL)
         self->digest = strdup (zfile_digest (self->file));
 }
 
@@ -201,7 +202,7 @@ zdir_patch_test (bool verbose)
     zdir_patch_t *patch = zdir_patch_new (".", file, patch_create, "/");
     assert (patch);
     zfile_destroy (&file);
-    
+
     file = zdir_patch_file (patch);
     assert (file);
     assert (streq (zfile_filename (file, "."), "bilbo"));

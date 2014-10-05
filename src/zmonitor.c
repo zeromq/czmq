@@ -1,3 +1,4 @@
+
 /*  =========================================================================
     zmonitor - socket event monitor
 
@@ -157,7 +158,7 @@ s_self_handle_pipe (self_t *self)
     char *command = zmsg_popstr (request);
     if (self->verbose)
         zsys_info ("zmonitor: API command=%s", command);
-    
+
     if (streq (command, "LISTEN")) {
         char *event = zmsg_popstr (request);
         while (event) {
@@ -342,7 +343,7 @@ zmonitor_test (bool verbose)
     zstr_sendx (servermon, "LISTEN", "CONNECTED", "DISCONNECTED", NULL);
     zstr_sendx (servermon, "START", NULL);
     zsock_wait (servermon);
-    
+
     //  Allow a brief time for the message to get there...
     zmq_poll (NULL, 0, 200);
 
