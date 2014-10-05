@@ -1,3 +1,4 @@
+
 /*  =========================================================================
     zgossip - decentralized configuration management
 
@@ -28,7 +29,7 @@
     * CONNECT endpoint -- connect the gossip service to the specified peer
     * PUBLISH key value -- publish a key/value pair to the gossip cluster
     * STATUS -- return number of key/value pairs held by gossip service
-    
+
     Returns these messages:
 
     * PORT number -- reply to PORT command
@@ -78,7 +79,7 @@
     it away. When a node gets a new tuple, it stores it, and fowards it as
     just described. At any point the application can access the node's set
     of tuples.
-    
+
     At present there is no way to expire tuples from the network.
 
     The assumptions in this design are:
@@ -108,7 +109,7 @@ struct _server_t {
     //  and are set by the generated engine; do not modify them!
     zsock_t *pipe;              //  Actor pipe back to caller
     zconfig_t *config;          //  Current loaded configuration
-    
+
     //  Add any properties you need here
     zlist_t *remotes;           //  Parents, as zsock_t instances
     zhash_t *tuples;            //  Tuples, indexed by key
@@ -220,13 +221,13 @@ server_connect (server_t *self, const char *endpoint)
     zlist_append (self->remotes, remote);
 }
 
-    
+
 //  Process an incoming tuple on this server.
 
 static void
 server_accept (server_t *self, const char *key, const char *value)
 {
-  tuple_t *tuple = (tuple_t *) zhash_lookup (self->tuples, key);
+    tuple_t *tuple = (tuple_t *) zhash_lookup (self->tuples, key);
     if (tuple && streq (tuple->value, value))
         return;                 //  Duplicate tuple, do nothing
 
@@ -288,7 +289,7 @@ server_method (server_t *self, const char *method, zmsg_t *msg)
     }
     else
         zsys_error ("unknown zgossip method '%s'", method);
-    
+
     return reply;
 }
 
@@ -389,8 +390,8 @@ remote_handler (zloop_t *loop, zsock_t *remote, void *argument)
 
     if (zgossip_msg_id (msg) == ZGOSSIP_MSG_PUBLISH)
         server_accept ((server_t *) argument,
-                        zgossip_msg_key (msg),
-                        zgossip_msg_value (msg));
+                       zgossip_msg_key (msg),
+                       zgossip_msg_value (msg));
     else
     if (zgossip_msg_id (msg) == ZGOSSIP_MSG_INVALID)
         //  Connection was reset, so send HELLO again
@@ -398,7 +399,7 @@ remote_handler (zloop_t *loop, zsock_t *remote, void *argument)
     else
     if (zgossip_msg_id (msg) == ZGOSSIP_MSG_PONG)
         assert (true);   //  Do nothing with PONGs
-        
+
     zgossip_msg_destroy (&msg);
     return 0;
 }
@@ -413,7 +414,7 @@ zgossip_test (bool verbose)
     printf (" * zgossip: ");
     if (verbose)
         printf ("\n");
-    
+
     //  @selftest
     //  Test basic client-to-server operation of the protocol
     zactor_t *server = zactor_new (zgossip, "server");
@@ -442,7 +443,7 @@ zgossip_test (bool verbose)
     assert (reply);
     assert (zgossip_msg_id (reply) == ZGOSSIP_MSG_PONG);
     zgossip_msg_destroy (&reply);
-    
+
     zactor_destroy (&server);
 
     zsock_destroy (&client);
@@ -471,11 +472,11 @@ zgossip_test (bool verbose)
 
     //  got nothing
     zclock_sleep (200);
-    
+
     zactor_destroy (&base);
     zactor_destroy (&alpha);
     zactor_destroy (&beta);
-    
+
     //  @end
     printf ("OK\n");
 }

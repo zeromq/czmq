@@ -1,3 +1,4 @@
+
 /*  =========================================================================
     zframe - working with single message frames
 
@@ -130,8 +131,8 @@ zframe_send (zframe_t **self_p, void *dest, int flags)
         zframe_t *self = *self_p;
         assert (zframe_is (self));
 
-        int send_flags = (flags & ZFRAME_MORE)? ZMQ_SNDMORE: 0;
-        send_flags |= (flags & ZFRAME_DONTWAIT)? ZMQ_DONTWAIT: 0;
+        int send_flags = (flags & ZFRAME_MORE) ? ZMQ_SNDMORE : 0;
+        send_flags |= (flags & ZFRAME_DONTWAIT) ? ZMQ_DONTWAIT : 0;
         if (flags & ZFRAME_REUSE) {
             zmq_msg_t copy;
             zmq_msg_init (&copy);
@@ -248,8 +249,8 @@ zframe_streq (zframe_t *self, const char *string)
     assert (self);
     assert (zframe_is (self));
 
-    if (zframe_size (self) == strlen (string)
-    &&  memcmp (zframe_data (self), string, strlen (string)) == 0)
+    if (  zframe_size (self) == strlen (string)
+       && memcmp (zframe_data (self), string, strlen (string)) == 0)
         return true;
     else
         return false;
@@ -297,10 +298,10 @@ zframe_eq (zframe_t *self, zframe_t *other)
         assert (zframe_is (self));
         assert (zframe_is (other));
 
-        if (zframe_size (self) == zframe_size (other)
-        && memcmp (zframe_data (self),
-                   zframe_data (other),
-                   zframe_size (self)) == 0)
+        if (  zframe_size (self) == zframe_size (other)
+           && memcmp (zframe_data (self),
+                      zframe_data (other),
+                      zframe_size (self)) == 0)
             return true;
         else
             return false;
@@ -345,8 +346,8 @@ zframe_print (zframe_t *self, const char *prefix)
             is_bin = 1;
 
     char buffer [256] = "";
-    snprintf (buffer, 30, "%s[%03d] ", prefix? prefix: "", (int) size);
-    size_t max_size = is_bin? 35: 70;
+    snprintf (buffer, 30, "%s[%03d] ", prefix ? prefix : "", (int) size);
+    size_t max_size = is_bin ? 35 : 70;
     const char *ellipsis = "";
     if (size > max_size) {
         size = max_size;
@@ -384,7 +385,7 @@ zframe_recv_nowait (void *source)
 {
     assert (source);
     void *handle = zsock_resolve (source);
-    
+
     zframe_t *self = zframe_new (NULL, 0);
     if (self) {
         if (zmq_recvmsg (handle, &self->zmsg, ZMQ_DONTWAIT) < 0) {
@@ -420,7 +421,7 @@ zframe_fprint (zframe_t *self, const char *prefix, FILE *file)
             is_bin = 1;
 
     fprintf (file, "[%03d] ", (int) size);
-    size_t max_size = is_bin? 35: 70;
+    size_t max_size = is_bin ? 35 : 70;
     const char *ellipsis = "";
     if (size > max_size) {
         size = max_size;

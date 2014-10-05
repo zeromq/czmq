@@ -1,3 +1,4 @@
+
 /*  =========================================================================
     zlist - generic type-free list container
 
@@ -133,7 +134,7 @@ void *
 zlist_head (zlist_t *self)
 {
     assert (self);
-    return self->head? self->head->item: NULL;
+    return self->head ? self->head->item : NULL;
 }
 
 
@@ -145,7 +146,7 @@ void *
 zlist_tail (zlist_t *self)
 {
     assert (self);
-    return self->tail? self->tail->item: NULL;
+    return self->tail ? self->tail->item : NULL;
 }
 
 
@@ -182,17 +183,17 @@ zlist_append (zlist_t *self, void *item)
 
     //  If necessary, take duplicate of (string) item
     if (self->duplicator)
-        item = (self->duplicator) (item);
-    
+        item = (self->duplicator)(item);
+
     node->item = item;
     if (self->tail)
         self->tail->next = node;
     else
         self->head = node;
-    
+
     self->tail = node;
     node->next = NULL;
-    
+
     self->size++;
     self->cursor = NULL;
     return 0;
@@ -214,14 +215,14 @@ zlist_push (zlist_t *self, void *item)
 
     //  If necessary, take duplicate of (string) item
     if (self->duplicator)
-        item = (self->duplicator) (item);
+        item = (self->duplicator)(item);
 
     node->item = item;
     node->next = self->head;
     self->head = node;
     if (self->tail == NULL)
         self->tail = node;
-    
+
     self->size++;
     self->cursor = NULL;
     return 0;
@@ -274,13 +275,13 @@ zlist_remove (zlist_t *self, void *item)
             self->tail = prev;
         if (self->cursor == node)
             self->cursor = prev;
-        
+
         if (self->destructor)
-            (self->destructor) (&node->item);
+            (self->destructor)(&node->item);
         else
         if (node->free_fn)
-            (node->free_fn) (node->item);
-        
+            (node->free_fn)(node->item);
+
         free (node);
         self->size--;
     }
@@ -324,15 +325,15 @@ zlist_purge (zlist_t *self)
     assert (self);
     node_t *node = self->head;
     while (node) {
-      node_t *next = node->next;
-      if (self->destructor)
-        (self->destructor) (&node->item);
-      else
+        node_t *next = node->next;
+        if (self->destructor)
+            (self->destructor)(&node->item);
+        else
         if (node->free_fn)
-          (node->free_fn) (node->item);
+            (node->free_fn)(node->item);
 
-      free (node);
-      node = next;
+        free (node);
+        node = next;
     }
     self->head = NULL;
     self->tail = NULL;
@@ -365,16 +366,16 @@ zlist_sort (zlist_t *self, zlist_compare_fn *compare)
     while (gap > 1 || swapped) {
         if (gap > 1)
             gap = (size_t) ((double) gap / 1.247330950103979);
-        
+
         node_t *base = self->head;
         node_t *test = self->head;
         int jump = gap;
         while (jump--)
             test = test->next;
-        
+
         swapped = false;
         while (base && test) {
-            if ((*compare) (base->item, test->item)) {
+            if ((*compare)(base->item, test->item)) {
                 //  It's trivial to swap items in a generic container
                 void *item = base->item;
                 base->item = test->item;
@@ -452,15 +453,15 @@ void
 zlist_autofree (zlist_t *self)
 {
     assert (self);
-    zlist_set_destructor (self, (czmq_destructor*) zstr_free);
-    zlist_set_duplicator (self, (czmq_duplicator*) strdup);
+    zlist_set_destructor (self, (czmq_destructor *) zstr_free);
+    zlist_set_duplicator (self, (czmq_duplicator *) strdup);
 }
 
 
 static void
 s_zlist_free (void *data)
 {
-    zlist_t *self = (zlist_t *)data;
+    zlist_t *self = (zlist_t *) data;
     zlist_destroy (&self);
 }
 
