@@ -15,7 +15,7 @@
 @header
     Wraps a very simple regular expression library (SLRE) as a CZMQ class.
     Supports this syntax:
-
+    
       ^               Match beginning of a buffer
       $               Match end of a buffer
       ()              Grouping and substring capturing
@@ -137,7 +137,7 @@ zrex_matches (zrex_t *self, const char *text)
     //  Free any previously-allocated hits
     self->hits = 0;
     zstr_free (&self->hit_set);
-
+    
     bool matches = slre_match (&self->slre, text, strlen (text), self->caps) != 0;
     if (matches) {
         //  Count number of captures plus whole string
@@ -178,7 +178,7 @@ zrex_eq (zrex_t *self, const char *text, const char *expression)
     assert (self);
     assert (text);
     assert (expression);
-
+    
     //  Compile the new expression
     self->valid = (slre_compile (&self->slre, expression) == 1);
     if (!self->valid)

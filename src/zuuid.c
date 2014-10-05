@@ -111,7 +111,7 @@ zuuid_set_str (zuuid_t *self, const char *source)
 {
     assert (self);
     assert (strlen (source) == 32);
-
+    
     strcpy (self->str, source);
     int byte_nbr;
     for (byte_nbr = 0; byte_nbr < ZUUID_LEN; byte_nbr++) {
@@ -233,7 +233,7 @@ zuuid_test (bool verbose)
     zuuid_export (uuid, copy_uuid);
     zuuid_set (uuid, copy_uuid);
     assert (streq (zuuid_str (uuid), myuuid));
-
+    
     zuuid_destroy (&uuid);
     zuuid_destroy (&copy);
     //  @end

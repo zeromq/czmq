@@ -28,8 +28,7 @@
 
 #include "../include/czmq.h"
 
-int
-main (int argc, char *argv [])
+int main (int argc, char *argv [])
 {
     bool verbose;
     if (argc == 2 && streq (argv [1], "-v"))
