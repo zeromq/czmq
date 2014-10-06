@@ -9,6 +9,6 @@ The contributors are listed in AUTHORS (add yourself). This project uses the MPL
 Remember: 
 
 * One problem, One commit, and use clear Problem-/Solution-statements which make it easier to understand your code changes.
-* Your code should look like all the other code in CZMQ. If manual adjustments seem to cumbersome have a look at #680 to get started with our code formatter.
+* Your code should look like all the other code in CZMQ. If manual adjustments seem to cumbersome have a look at issue [#680](https://github.com/zeromq/czmq/issues/680) to get started with our code formatter.
 
 Thanks!
