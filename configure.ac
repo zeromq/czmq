@@ -49,6 +49,7 @@ AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 AC_PROG_SED
 AC_PROG_AWK
+PKG_PROG_PKG_CONFIG
 
 # 
 AC_ARG_ENABLE([labs],
@@ -117,16 +118,6 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <zmq.h>],
                ],
                [AC_MSG_RESULT([yes])],
                [AC_MSG_ERROR([no. Please specify libzmq installation prefix using --with-libzmq])])
-
-# When building labs, check for czmq
-AS_IF([test "$enable_labs" != "no"],
-    [PKG_CHECK_MODULES([CZMQ], [libczmq], [enable_labs=yes],
-        [AS_IF([test "$enable_labs" = "yes"],
-        [AC_MSG_ERROR([czmq required for building labs, but not found.])],
-        [enable_labs=no])
-        ]
-    )]
-)
 
 # Platform specific checks
 czmq_on_mingw32="no"
@@ -273,5 +264,6 @@ AC_CONFIG_FILES([Makefile \
                 addons/Makefile \
                 labs/Makefile \
                 labs/libczmq_labs.pc \
-                model/Makefile])
+                model/Makefile \
+                ])
 AC_OUTPUT
