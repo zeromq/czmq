@@ -41,6 +41,7 @@
 struct _zbeacon_t {
     void *pipe;                 //  Pipe through to backend agent
     char *hostname;             //  Our own address as string
+    zctx_t *ctx;                //  TODO: actorize this class
 };
 
 
@@ -59,13 +60,20 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe);
 zbeacon_t *
 zbeacon_new (zctx_t *ctx, int port_nbr)
 {
-    assert (ctx);
     zbeacon_t *self = (zbeacon_t *) zmalloc (sizeof (zbeacon_t));
     if (!self)
         return NULL;
 
+    //  If user passes a ctx, use that, else take the global context from
+    //  zsys and use that. This provides compatibility with old zsocket
+    //  and new zsock APIs.
+    if (ctx)
+        self->ctx = zctx_shadow (ctx);
+    else
+        self->ctx = zctx_shadow_zmq_ctx (zsys_init ());
+
     //  Start background agent and wait for it to initialize
-    self->pipe = zthread_fork (ctx, s_agent_task, NULL);
+    self->pipe = zthread_fork (self->ctx, s_agent_task, NULL);
     if (self->pipe) {
         zstr_sendf (self->pipe, "%d", port_nbr);
         self->hostname = zstr_recv (self->pipe);
@@ -95,6 +103,7 @@ zbeacon_destroy (zbeacon_t **self_p)
             char *reply = zstr_recv (self->pipe);
             zstr_free (&reply);
         }
+        zctx_destroy (&self->ctx);
         free (self->hostname);
         free (self);
         *self_p = NULL;
