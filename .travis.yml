@@ -13,13 +13,13 @@ script:
 # Perform regression test build against ZeroMQ v2.x
 - git clone git://github.com/zeromq/zeromq2-x.git
 - ( cd zeromq2-x; ./autogen.sh; ./configure; make check; sudo make install; sudo ldconfig )
-- ./configure --enable-labs && make check
+- ./configure && make check
 - echo "*** CZMQ OK against ZeroMQ v2.x"
 
 # Perform regression test build against ZeroMQ v3.x
 - git clone git://github.com/zeromq/zeromq3-x.git
 - ( cd zeromq3-x; ./autogen.sh; ./configure; make check; sudo make install; sudo ldconfig )
-- ./configure --enable-labs && make check
+- ./configure && make check
 - echo "*** CZMQ OK against ZeroMQ v3.x"
 
 # Perform regression test build against ZeroMQ v4.x + libsodium
@@ -27,11 +27,11 @@ script:
 - ( cd libsodium; ./autogen.sh; ./configure; make check; sudo make install; sudo ldconfig )
 - git clone git://github.com/zeromq/zeromq4-x.git
 - ( cd zeromq4-x; ./autogen.sh; ./configure; make check; sudo make install; sudo ldconfig )
-- ./configure --enable-labs && make check
+- ./configure && make check
 - echo "*** CZMQ OK against ZeroMQ v4.x"
 
 # Perform regression test build against ZeroMQ master + libsodium
 - git clone git://github.com/zeromq/libzmq.git
 - ( cd libzmq; ./autogen.sh; ./configure; make check; sudo make install; sudo ldconfig )
-- ./configure --enable-labs && make check
+- ./configure && make check
 - echo "*** CZMQ OK against libzmq master"
