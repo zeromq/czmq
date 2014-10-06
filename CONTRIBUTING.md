@@ -2,13 +2,20 @@
 
 The contributors are listed in AUTHORS (add yourself). This project uses the MPL v2 license, see LICENSE.
 
+Please read these documents BEFORE you send a patch:
+
 * CZMQ uses the [C4.1 (Collective Code Construction Contract)](http://rfc.zeromq.org/spec:22) process for contributions. Please read this if you are unfamiliar with it.
 
-* CZMQ uses the [CLASS (C Language Style for Scalabilty)](http://rfc.zeromq.org/spec:21) guide for code style. Please read this, and also review the existing code base.
+* CZMQ uses the [CLASS (C Language Style for Scalabilty)](http://rfc.zeromq.org/spec:21) guide for code style. Please read this, and also read the existing code base.
 
-Remember: 
+CZMQ grows by the slow and careful accretion of simple, minimal solutions to real problems faced by many people. Some people seem to not understand this. So in case of doubt:
 
-* One problem, One commit, and use clear Problem-/Solution-statements which make it easier to understand your code changes.
-* Your code should look like all the other code in CZMQ. If manual adjustments seem to cumbersome have a look at issue [#680](https://github.com/zeromq/czmq/issues/680) to get started with our code formatter.
+* Each patch defines one clear and agreed problem, and one clear, minimal, plausible solution. If you come with a large, complex problem and a large, complex solution, you will provoke a negative reaction from CZMQ maintainers and users.
 
-Thanks!
+* We will usually merge patches aggressively, without significant review. If you send us bad patches, without taking the care to read and understand our rules, that reflects on you. Do NOT expect us to do your homework for you.
+
+* As rapidly we will merge poor quality patches, we will remove them again. If you insist on arguing about this and trying to justify your changes, we will simply ignore you and your patches.
+
+* CZMQ is not a sandbox where "anything goes until the next stable release". If you want to experiment, use the CZMQ Labs section, or better, experiment in your own projects.
+
+* If you absolutely cannot format your code to fit the documented style, see [#680](https://github.com/zeromq/czmq/issues/680) for tips on using our code formatter.
