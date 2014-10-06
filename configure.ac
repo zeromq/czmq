@@ -118,16 +118,6 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <zmq.h>],
                [AC_MSG_RESULT([yes])],
                [AC_MSG_ERROR([no. Please specify libzmq installation prefix using --with-libzmq])])
 
-# When building labs, check for czmq
-AS_IF([test "$enable_labs" != "no"],
-    [PKG_CHECK_MODULES([CZMQ], [libczmq], [enable_labs=yes],
-        [AS_IF([test "$enable_labs" = "yes"],
-        [AC_MSG_ERROR([czmq required for building labs, but not found.])],
-        [enable_labs=no])
-        ]
-    )]
-)
-
 # Platform specific checks
 czmq_on_mingw32="no"
 czmq_on_android="no"
