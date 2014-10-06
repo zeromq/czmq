@@ -6,4 +6,9 @@ The contributors are listed in AUTHORS (add yourself). This project uses the MPL
 
 * CZMQ uses the [CLASS (C Language Style for Scalabilty)](http://rfc.zeromq.org/spec:21) guide for code style. Please read this, and also review the existing code base.
 
-Remember: one problem, one commit, and your code should look like all the other code in CZMQ. Thanks!
+Remember: 
+
+* One problem, One commit, and use clear Problem-/Solution-statements which make it easier to understand your code changes.
+* Your code should look like all the other code in CZMQ. If manual adjustments seem to cumbersome have a look at #680 to get started with our code formatter.
+
+Thanks!
