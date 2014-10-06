@@ -410,9 +410,12 @@ Don't include system headers in source files. The right place for these is czmq_
 
 Do read your code after you write it and ask, "Can I make this simpler?" We do use a nice minimalist and yet readable style. Learn it, adopt it, use it.
 
+Before opening a pull request read our [contribution guidelines](https://github.com/zeromq/czmq/blob/master/CONTRIBUTING.md). Thanks!
+
+
 ### Code Generation
 
-We generate the zsockopt class using [https://github.com/imatix/gsl GSL], using a code generator script in scripts/sockopts.gsl. We also generate the project files.
+We generate the zsockopt class using [GSL](https://github.com/imatix/gsl), using a code generator script in scripts/sockopts.gsl. We also generate the project files.
 
 ### This Document
 
