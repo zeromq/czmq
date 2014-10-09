@@ -1,8 +1,10 @@
 ACLOCAL_AMFLAGS = -I config
 
-SUBDIRS = src model doc addons labs
+AM_CPPFLAGS = \
+    -I$(srcdir)/include
 
-DIST_SUBDIRS = src model doc addons
+SUBDIRS=doc
+DIST_SUBDIRS=doc
 
 EXTRA_DIST = \
 	version.sh \
@@ -103,3 +105,13 @@ EXTRA_DIST = \
 	builds/msvc/properties/ReleaseLEXE.props \
 	builds/msvc/properties/DebugLEXE.props \
 	builds/msvc/properties/Output.props
+
+include $(srcdir)/model/Makefile.am.supplement
+
+include $(srcdir)/src/Makefile.am.supplement
+
+include $(srcdir)/doc/Makefile.am.supplement
+
+include $(srcdir)/addons/Makefile.am.supplement
+
+include $(srcdir)/labs/Makefile.am.supplement

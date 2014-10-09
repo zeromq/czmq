@@ -11,7 +11,7 @@ AC_INIT([czmq],[m4_esyscmd([./version.sh czmq])],[zeromq-dev@lists.zeromq.org])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(config)
 AC_CONFIG_HEADERS([src/platform.h])
-AM_INIT_AUTOMAKE([tar-ustar foreign])
+AM_INIT_AUTOMAKE([subdir-objects tar-ustar foreign])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # This defines PACKAGE_VERSION_... in src/platform.h
@@ -256,14 +256,12 @@ AM_CONDITIONAL([ENABLE_LABS], [test "x$enable_labs" = "xyes"])
 AC_TYPE_SIGNAL
 AC_CHECK_FUNCS(perror gettimeofday memset getifaddrs)
 
+# Set pkgconfigdir
+AC_ARG_WITH([pkgconfigdir], AS_HELP_STRING([--with-pkgconfigdir=PATH],
+    [Path to the pkgconfig directory [[LIBDIR/pkgconfig]]]),
+    [pkgconfigdir="$withval"], [pkgconfigdir='${libdir}/pkgconfig'])
+AC_SUBST([pkgconfigdir])
+
 # Specify output files
-AC_CONFIG_FILES([Makefile \
-                src/Makefile \
-                src/libczmq.pc \
-                doc/Makefile \
-                addons/Makefile \
-                labs/Makefile \
-                labs/libczmq_labs.pc \
-                model/Makefile \
-                ])
+AC_CONFIG_FILES([Makefile doc/Makefile src/libczmq.pc labs/libczmq_labs.pc ])
 AC_OUTPUT

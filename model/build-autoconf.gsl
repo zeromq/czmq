@@ -4,20 +4,19 @@
 .#  language. See https://github.com/imatix/gsl for details. This script
 .#  is licensed under MIT/X11.
 .#
-.echo "Generating src/Makefile.am..."
-.output "../src/Makefile.am"
+.echo "Generating src/Makefile.am.supplement..."
+.output "../src/Makefile.am.supplement"
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
 #   Please read the README.txt file in the model directory.     #
 #################################################################
 lib_LTLIBRARIES = lib$(project.name).la
 
-pkgconfigdir = $\(libdir)/pkgconfig
-pkgconfig_DATA = lib$(project.name).pc
+pkgconfig_DATA = src/lib$(project.name).pc
 
 include_HEADERS = \\
 .for header
-    ../include/$(name).h \\
+    include/$(name).h \\
 .endfor
 .for class
 .   if class.private ?= 1
@@ -26,35 +25,40 @@ include_HEADERS = \\
 .       class.classdir = "include"
 .   endif
 .   if last ()
-    ../$(classdir)/$(name).h
+    $(classdir)/$(name).h
 .   else
-    ../$(classdir)/$(name).h \\
+    $(classdir)/$(name).h \\
 .   endif
 .endfor
 
 lib$(project.name)_la_SOURCES = \\
-    platform.h \\
+    src/platform.h \\
 .for extra
-    $(name) \\
+    src/$(name) \\
 .endfor
 .for class
 .   if last ()
-    $(name).c
+    src/$(name).c
 .   else
-    $(name).c \\
+    src/$(name).c \\
 .   endif
 .endfor
 
-AM_CFLAGS = -g
-AM_CPPFLAGS = -I$\(top_srcdir)/include
 bin_PROGRAMS = $(project.name)_selftest
-$(project.name)_selftest_LDADD = lib$(project.name).la
-$(project.name)_selftest_SOURCES = $(project.name)_selftest.c
+
+$(project.name)_selftest_LDADD = \\
+    lib$(project.name).la
+
+$(project.name)_selftest_SOURCES = \\
+    src/$(project.name)_selftest.c
+
+lib$(project.name)_la_LDFLAGS = \\
+    -version-info @LTVER@
 
 if ON_MINGW
-lib$(project.name)_la_LDFLAGS = -no-undefined -avoid-version -version-info @LTVER@
-else
-lib$(project.name)_la_LDFLAGS = -version-info @LTVER@
+lib$(project.name)_la_LDFLAGS += \\
+    -no-undefined \\
+    -avoid-version
 endif
 
 TESTS = $(project.name)_selftest
@@ -64,7 +68,7 @@ TESTS = $(project.name)_selftest
 # Produce generated models; do this manually in src directory
 code:
 .   endif
-\tgsl -q $(name).xml
+\tgsl -q src/$(name).xml
 .endfor
 
 #################################################################
