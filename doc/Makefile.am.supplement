@@ -29,11 +29,11 @@ SUFFIXES=.txt .xml .1 .3 .7
 	asciidoc -d manpage -b docbook -f $(srcdir)/doc/asciidoc.conf \
 		-aczmq_version=@PACKAGE_VERSION@ -o$@ $<
 .xml.1:
-	xmlto -o$(srcdir)/doc man $<
+	xmlto -o $(srcdir)/doc man $<
 .xml.3:
-	xmlto -o$(srcdir)/doc man $<
+	xmlto -o $(srcdir)/doc man $<
 .xml.7:
-	xmlto -o$(srcdir)/doc man $<
+	xmlto -o $(srcdir)/doc man $<
 endif
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #

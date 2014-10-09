@@ -116,11 +116,11 @@ SUFFIXES=.txt .xml .1 .3 .7
 \tasciidoc -d manpage -b docbook -f $\(srcdir)/doc/asciidoc.conf \\
 \t\t-a$(project.name)_version=@PACKAGE_VERSION@ -o$@ $<
 \.xml.1:
-\txmlto -o$\(srcdir)/doc man $<
+\txmlto -o $\(srcdir)/doc man $<
 \.xml.3:
-\txmlto -o$\(srcdir)/doc man $<
+\txmlto -o $\(srcdir)/doc man $<
 \.xml.7:
-\txmlto -o$\(srcdir)/doc man $<
+\txmlto -o $\(srcdir)/doc man $<
 endif
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
