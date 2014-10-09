@@ -84,43 +84,43 @@ code:
 .project.manpage = "$(project.name).7"
 .manpages = ""
 .for class where private?0 = 0
-.   manpages += " doc/$(name).3"
+.   manpages += " $\(srcdir)/doc/$(name).3"
 .   if class.name = project.name
 .       project.manpage = ""
 .   endif
 .endfor
 MAN1 =
 MAN3 =$(manpages)
-MAN7 = doc/$(project.manpage)
+MAN7 = $\(srcdir)/doc/$(project.manpage)
 MAN_DOC = $\(MAN1) $\(MAN3) $\(MAN7)
 
 MAN_TXT = $\(MAN1:%.1=%.txt)
 MAN_TXT += $\(MAN3:%.3=%.txt)
 MAN_TXT += $\(MAN7:%.7=%.txt)
 
+EXTRA_DIST += $\(srcdir)/doc/asciidoc.conf $\(srcdir)/doc/mkman $\(MAN_TXT)
+
+if BUILD_DOC
 if INSTALL_MAN
 dist_man_MANS = $\(MAN_DOC)
 endif
-
-EXTRA_DIST += doc/asciidoc.conf doc/mkman $\(MAN_TXT)
 
 MAINTAINERCLEANFILES = $\(MAN_DOC)
 
 dist-hook : $\(MAN_DOC)
 
-if BUILD_DOC
 SUFFIXES=.txt .xml .1 .3 .7
 
 \.txt.xml:
-\t$\(srcdir)/mkman $<
-\tasciidoc -d manpage -b docbook -f $\(srcdir)/asciidoc.conf \\
+\t$\(srcdir)/doc/mkman $<
+\tasciidoc -d manpage -b docbook -f $\(srcdir)/doc/asciidoc.conf \\
 \t\t-a$(project.name)_version=@PACKAGE_VERSION@ -o$@ $<
 \.xml.1:
-\txmlto man $<
+\txmlto -o$\(srcdir)/doc man $<
 \.xml.3:
-\txmlto man $<
+\txmlto -o$\(srcdir)/doc man $<
 \.xml.7:
-\txmlto man $<
+\txmlto -o$\(srcdir)/doc man $<
 endif
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
