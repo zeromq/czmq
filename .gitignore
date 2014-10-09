@@ -88,6 +88,10 @@ examples/zpubsub/protobuf/*.o
 examples/zpubsub/protobuf/*.pb.*
 examples/zpubsub/protobuf/testPublisher
 examples/zpubsub/protobuf/testSubscriber
+examples/zpubsub/zprototest/*.o
+examples/zpubsub/zprototest/*.bnf
+examples/zpubsub/zprototest/test_publisher
+examples/zpubsub/zprototest/test_subscriber
 src/test_zgossip
 labs/.deps/
 labs/.libs/
