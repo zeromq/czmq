@@ -107,8 +107,8 @@ include $(srcdir)/model/Makefile.am.supplement
 
 include $(srcdir)/src/Makefile.am.supplement
 
-include $(srcdir)/doc/Makefile.am.supplement
-
 include $(srcdir)/addons/Makefile.am.supplement
 
 include $(srcdir)/labs/Makefile.am.supplement
+
+include $(srcdir)/doc/Makefile.am.supplement
