@@ -75,8 +75,8 @@ code:
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
 #   Please read the README.txt file in the model directory.     #
 #################################################################
-.echo "Generating doc/Makefile.am..."
-.output "../doc/Makefile.am"
+.echo "Generating doc/Makefile.am.supplement..."
+.output "../doc/Makefile.am.supplement"
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
 #   Please read the README.txt file in the model directory.     #
@@ -84,14 +84,14 @@ code:
 .project.manpage = "$(project.name).7"
 .manpages = ""
 .for class where private?0 = 0
-.   manpages += " $(name).3"
+.   manpages += " doc/$(name).3"
 .   if class.name = project.name
 .       project.manpage = ""
 .   endif
 .endfor
 MAN1 =
 MAN3 =$(manpages)
-MAN7 = $(project.manpage)
+MAN7 = doc/$(project.manpage)
 MAN_DOC = $\(MAN1) $\(MAN3) $\(MAN7)
 
 MAN_TXT = $\(MAN1:%.1=%.txt)
@@ -102,7 +102,7 @@ if INSTALL_MAN
 dist_man_MANS = $\(MAN_DOC)
 endif
 
-EXTRA_DIST = asciidoc.conf mkman $\(MAN_TXT)
+EXTRA_DIST += doc/asciidoc.conf doc/mkman $\(MAN_TXT)
 
 MAINTAINERCLEANFILES = $\(MAN_DOC)
 

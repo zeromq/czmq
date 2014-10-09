@@ -3,9 +3,6 @@ ACLOCAL_AMFLAGS = -I config
 AM_CPPFLAGS = \
     -I$(srcdir)/include
 
-SUBDIRS=doc
-DIST_SUBDIRS=doc
-
 EXTRA_DIST = \
 	version.sh \
 	builds/android/Android.mk \
