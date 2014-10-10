@@ -112,7 +112,7 @@ assert (streq (zsocket_type_str (reader), "PULL"));
 int rc = zsocket_bind (writer, "tcp://%s:%d", interf, service);
 assert (rc == service);
 
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 2, 0))
 //  Check unbind
 rc = zsocket_unbind (writer, "tcp://%s:%d", interf, service);
 assert (rc == 0);
@@ -147,7 +147,7 @@ rc = zsocket_connect (reader, "txp://%s:%d", domain, service);
 assert (rc == -1);
 
 //  Test sending frames to socket
-rc = zsocket_sendmem (writer,"ABC", 3, ZFRAME_MORE);
+rc = zsocket_sendmem (writer, "ABC", 3, ZFRAME_MORE);
 assert (rc == 0);
 rc = zsocket_sendmem (writer, "DEFG", 4, 0);
 assert (rc == 0);

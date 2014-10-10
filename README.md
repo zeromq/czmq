@@ -9,28 +9,79 @@
 
 
 **<a href="#toc2-13">Overview</a>**
-&emsp;<a href="#toc3-16">Scope and Goals</a>
-&emsp;<a href="#toc3-57">Ownership and License</a>
+
+**<a href="#toc3-16">Scope and Goals</a>**
+
+**<a href="#toc3-57">Ownership and License</a>**
 
 **<a href="#toc2-68">Using CZMQ</a>**
-&emsp;<a href="#toc3-71">Building and Installing</a>
-&emsp;<a href="#toc3-115">Linking with an Application</a>
-&emsp;<a href="#toc3-122">Use from Other Languages</a>
-&emsp;<a href="#toc3-135">API v3 Summary</a>
-&emsp;<a href="#toc3-170">API v2 Summary</a>
 
-**<a href="#toc2-184">Error Handling</a>**
+**<a href="#toc3-71">Building and Installing</a>**
 
-**<a href="#toc2-201">CZMQ Actors</a>**
+**<a href="#toc3-115">Linking with an Application</a>**
 
-**<a href="#toc2-347">Under the Hood</a>**
-&emsp;<a href="#toc3-350">Adding a New Class</a>
-&emsp;<a href="#toc3-362">Documentation</a>
-&emsp;<a href="#toc3-401">Development</a>
-&emsp;<a href="#toc3-411">Porting CZMQ</a>
-&emsp;<a href="#toc3-422">Hints to Contributors</a>
-&emsp;<a href="#toc3-434">Code Generation</a>
-&emsp;<a href="#toc3-439">This Document</a>
+**<a href="#toc3-122">Use from Other Languages</a>**
+
+**<a href="#toc3-135">API v3 Summary</a>**
+&emsp;<a href="#toc4-140">zactor - simple actor framework</a>
+&emsp;<a href="#toc4-207">zauth - authentication for ZeroMQ security mechanisms</a>
+&emsp;<a href="#toc4-420">zbeacon - LAN discovery and presence</a>
+&emsp;<a href="#toc4-616">zcert - work with CURVE security certificates</a>
+&emsp;<a href="#toc4-736">zcertstore - work with CURVE security certificate stores</a>
+&emsp;<a href="#toc4-835">zchunk - work with memory chunks</a>
+&emsp;<a href="#toc4-1014">zclock - millisecond clocks and delays</a>
+&emsp;<a href="#toc4-1060">zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.</a>
+&emsp;<a href="#toc4-1233">zdigest - provides hashing functions (SHA-1 at present)</a>
+&emsp;<a href="#toc4-1296">zdir - work with file-system directories</a>
+&emsp;<a href="#toc4-1405">zdir_patch - work with directory patches</a>
+&emsp;<a href="#toc4-1470">zfile - provides methods to work with files in a portable fashion.</a>
+&emsp;<a href="#toc4-1703">zframe - working with single message frames</a>
+&emsp;<a href="#toc4-1807">zgossip - decentralized configuration management</a>
+&emsp;<a href="#toc4-2002">zhash - generic type-free hash container</a>
+&emsp;<a href="#toc4-2382">ziflist - List of network interfaces available on system</a>
+&emsp;<a href="#toc4-2453">zlist - generic type-free list container</a>
+&emsp;<a href="#toc4-2673">zloop - event-driven reactor</a>
+&emsp;<a href="#toc4-2798">zmonitor - socket event monitor</a>
+&emsp;<a href="#toc4-2902">zmsg - working with multipart messages</a>
+&emsp;<a href="#toc4-3069">zpoller - trivial socket poller class</a>
+&emsp;<a href="#toc4-3182">zproxy - run a steerable proxy in the background</a>
+&emsp;<a href="#toc4-3328">zrex - work with regular expressions</a>
+&emsp;<a href="#toc4-3419">zring - generic type-free doubly linked ring container</a>
+&emsp;<a href="#toc4-3677">zsock - high-level socket API that hides libzmq contexts and sockets</a>
+&emsp;<a href="#toc4-3939">zsock_option - get/set ØMQ socket options</a>
+&emsp;<a href="#toc4-4930">zstr - sending and receiving strings</a>
+&emsp;<a href="#toc4-5008">zsys - system-level methods</a>
+&emsp;<a href="#toc4-5419">zuuid - UUID support class</a>
+
+**<a href="#toc3-5503">API v2 Summary</a>**
+&emsp;<a href="#toc4-5508">zauth_v2 - authentication for ZeroMQ servers (deprecated)</a>
+&emsp;<a href="#toc4-5700">zctx - working with ØMQ contexts (deprecated)</a>
+&emsp;<a href="#toc4-5828">zmonitor_v2 - socket event monitor (deprecated)</a>
+&emsp;<a href="#toc4-5912">zmutex - working with mutexes (deprecated)</a>
+&emsp;<a href="#toc4-5956">zproxy_v2 - run a steerable proxy in the background (deprecated)</a>
+&emsp;<a href="#toc4-6064">zsocket - working with ØMQ sockets (deprecated)</a>
+&emsp;<a href="#toc4-6228">zsockopt - get/set ØMQ socket options (deprecated)</a>
+&emsp;<a href="#toc4-7220">zthread - working with system threads (deprecated)</a>
+
+**<a href="#toc2-7337">Error Handling</a>**
+
+**<a href="#toc2-7354">CZMQ Actors</a>**
+
+**<a href="#toc2-7500">Under the Hood</a>**
+
+**<a href="#toc3-7503">Adding a New Class</a>**
+
+**<a href="#toc3-7515">Documentation</a>**
+
+**<a href="#toc3-7554">Development</a>**
+
+**<a href="#toc3-7564">Porting CZMQ</a>**
+
+**<a href="#toc3-7575">Hints to Contributors</a>**
+
+**<a href="#toc3-7587">Code Generation</a>**
+
+**<a href="#toc3-7592">This Document</a>**
 
 <A name="toc2-13" title="Overview" />
 ## Overview
@@ -135,9 +186,10 @@ This is a list of known higher-level wrappers around CZMQ:
 
 This is the API provided by CZMQ v3.x, in alphabetical order.
 
+<A name="toc4-140" title="zactor - simple actor framework" />
 #### zactor - simple actor framework
 
-The zactor class provides a simple actor framework. It replaces the 
+The zactor class provides a simple actor framework. It replaces the
 CZMQ zthread class, which had a complex API that did not fit the CLASS
 standard. A CZMQ actor is implemented as a thread plus a PAIR-PAIR
 pipe. The constructor and destructor are always synchronized, so the
@@ -201,6 +253,7 @@ This is the class self test code:
     free (string);
     zactor_destroy (&actor);
 
+<A name="toc4-207" title="zauth - authentication for ZeroMQ security mechanisms" />
 #### zauth - authentication for ZeroMQ security mechanisms
 
 A zauth actor takes over authentication for all incoming connections in
@@ -288,9 +341,9 @@ This is the class interface:
 This is the class self test code:
 
     //  Create temporary directory for test files
-#   define TESTDIR ".test_zauth"
+    #   define TESTDIR ".test_zauth"
     zsys_dir_create (TESTDIR);
-
+    
     //  Check there's no authentication
     zsock_t *server = zsock_new (ZMQ_PUSH);
     assert (server);
@@ -309,35 +362,35 @@ This is the class self test code:
     //  Check there's no authentication on a default NULL server
     success = s_can_connect (&server, &client);
     assert (success);
-
+    
     //  When we set a domain on the server, we switch on authentication
     //  for NULL sockets, but with no policies, the client connection
     //  will be allowed.
     zsock_set_zap_domain (server, "global");
     success = s_can_connect (&server, &client);
     assert (success);
-
+    
     //  Blacklist 127.0.0.1, connection should fail
     zsock_set_zap_domain (server, "global");
     zstr_sendx (auth, "DENY", "127.0.0.1", NULL);
     zsock_wait (auth);
     success = s_can_connect (&server, &client);
     assert (!success);
-
+    
     //  Whitelist our address, which overrides the blacklist
     zsock_set_zap_domain (server, "global");
     zstr_sendx (auth, "ALLOW", "127.0.0.1", NULL);
     zsock_wait (auth);
     success = s_can_connect (&server, &client);
     assert (success);
-
+    
     //  Try PLAIN authentication
     zsock_set_plain_server (server, 1);
     zsock_set_plain_username (client, "admin");
     zsock_set_plain_password (client, "Password");
     success = s_can_connect (&server, &client);
     assert (!success);
-
+    
     FILE *password = fopen (TESTDIR "/password-file", "w");
     assert (password);
     fprintf (password, "admin=Password\n");
@@ -349,13 +402,13 @@ This is the class self test code:
     zsock_wait (auth);
     success = s_can_connect (&server, &client);
     assert (success);
-
+    
     zsock_set_plain_server (server, 1);
     zsock_set_plain_username (client, "admin");
     zsock_set_plain_password (client, "Bogus");
     success = s_can_connect (&server, &client);
     assert (!success);
-
+    
     if (zsys_has_curve ()) {
         //  Try CURVE authentication
         //  We'll create two new certificates and save the client public
@@ -366,7 +419,7 @@ This is the class self test code:
         zcert_t *client_cert = zcert_new ();
         assert (client_cert);
         char *server_key = zcert_public_txt (server_cert);
-
+    
         //  Test without setting-up any authentication
         zcert_apply (server_cert, server);
         zcert_apply (client_cert, client);
@@ -374,7 +427,7 @@ This is the class self test code:
         zsock_set_curve_serverkey (client, server_key);
         success = s_can_connect (&server, &client);
         assert (!success);
-
+    
         //  Test CURVE_ALLOW_ANY
         zcert_apply (server_cert, server);
         zcert_apply (client_cert, client);
@@ -384,7 +437,7 @@ This is the class self test code:
         zsock_wait (auth);
         success = s_can_connect (&server, &client);
         assert (success);
-
+    
         //  Test full client authentication using certificates
         zcert_apply (server_cert, server);
         zcert_apply (client_cert, client);
@@ -395,7 +448,7 @@ This is the class self test code:
         zsock_wait (auth);
         success = s_can_connect (&server, &client);
         assert (success);
-
+    
         zcert_destroy (&server_cert);
         zcert_destroy (&client_cert);
     }
@@ -403,7 +456,7 @@ This is the class self test code:
     zactor_destroy (&auth);
     success = s_can_connect (&server, &client);
     assert (success);
-
+    
     zsock_destroy (&client);
     zsock_destroy (&server);
     
@@ -413,6 +466,7 @@ This is the class self test code:
     zdir_remove (dir, true);
     zdir_destroy (&dir);
 
+<A name="toc4-420" title="zbeacon - LAN discovery and presence" />
 #### zbeacon - LAN discovery and presence
 
 The zbeacon class implements a peer-to-peer discovery service for local
@@ -494,19 +548,19 @@ This is the class self test code:
     assert (speaker);
     if (verbose)
         zstr_sendx (speaker, "VERBOSE", NULL);
-
-//
-//  Stop broadcasting the beacon:
-//
-//      zstr_sendx (beacon, "SILENCE", NULL);
-//
-//  Start listening to beacons from peers. The filter is used to do a prefix
-//  match on received beacons, to remove junk. Note that any received data
-//  that is identical to our broadcast beacon_data is discarded in any case.
-//  If the filter size is zero, we get all peer beacons:
-//
-//      zsock_send (beacon, "sb", "SUBSCRIBE", filter_data, filter_size);
-
+    
+    //
+    //  Stop broadcasting the beacon:
+    //
+    //      zstr_sendx (beacon, "SILENCE", NULL);
+    //
+    //  Start listening to beacons from peers. The filter is used to do a prefix
+    //  match on received beacons, to remove junk. Note that any received data
+    //  that is identical to our broadcast beacon_data is discarded in any case.
+    //  If the filter size is zero, we get all peer beacons:
+    //
+    //      zsock_send (beacon, "sb", "SUBSCRIBE", filter_data, filter_size);
+    
     zsock_send (speaker, "si", "CONFIGURE", 9999);
     char *hostname = zstr_recv (speaker);
     if (!*hostname) {
@@ -516,7 +570,7 @@ This is the class self test code:
         return;
     }
     free (hostname);
-
+    
     //  Create listener beacon on port 9999 to lookup service
     zactor_t *listener = zactor_new (zbeacon, NULL);
     assert (listener);
@@ -526,13 +580,13 @@ This is the class self test code:
     hostname = zstr_recv (listener);
     assert (*hostname);
     free (hostname);
-
+    
     //  We will broadcast the magic value 0xCAFE
     byte announcement [2] = { 0xCA, 0xFE };
     zsock_send (speaker, "sbi", "PUBLISH", announcement, 2, 100);
     //  We will listen to anything (empty subscription)
     zsock_send (listener, "sb", "SUBSCRIBE", "", 0);
-
+    
     //  Wait for at most 1/2 second if there's no broadcasting
     zsock_set_rcvtimeo (listener, 500);
     char *ipaddress = zstr_recv (listener);
@@ -547,7 +601,7 @@ This is the class self test code:
     }
     zactor_destroy (&listener);
     zactor_destroy (&speaker);
-
+    
     //  Test subscription filter using a 3-node setup
     zactor_t *node1 = zactor_new (zbeacon, NULL);
     assert (node1);
@@ -555,26 +609,26 @@ This is the class self test code:
     hostname = zstr_recv (node1);
     assert (*hostname);
     free (hostname);
-
+    
     zactor_t *node2 = zactor_new (zbeacon, NULL);
     assert (node2);
     zsock_send (node2, "si", "CONFIGURE", 5670);
     hostname = zstr_recv (node2);
     assert (*hostname);
     free (hostname);
-
+    
     zactor_t *node3 = zactor_new (zbeacon, NULL);
     assert (node3);
     zsock_send (node3, "si", "CONFIGURE", 5670);
     hostname = zstr_recv (node3);
     assert (*hostname);
     free (hostname);
-
+    
     zsock_send (node1, "sbi", "PUBLISH", "NODE/1", 6, 250);
     zsock_send (node2, "sbi", "PUBLISH", "NODE/2", 6, 250);
     zsock_send (node3, "sbi", "PUBLISH", "RANDOM", 6, 250);
     zsock_send (node1, "sb", "SUBSCRIBE", "NODE", 4);
-
+    
     //  Poll on three API sockets at once
     zpoller_t *poller = zpoller_new (node1, node2, node3, NULL);
     assert (poller);
@@ -594,20 +648,21 @@ This is the class self test code:
         }
     }
     zpoller_destroy (&poller);
-
+    
     //  Stop listening
     zstr_sendx (node1, "UNSUBSCRIBE", NULL);
-
+    
     //  Stop all node broadcasts
     zstr_sendx (node1, "SILENCE", NULL);
     zstr_sendx (node2, "SILENCE", NULL);
     zstr_sendx (node3, "SILENCE", NULL);
-
+    
     //  Destroy the test nodes
     zactor_destroy (&node1);
     zactor_destroy (&node2);
     zactor_destroy (&node3);
 
+<A name="toc4-616" title="zcert - work with CURVE security certificates" />
 #### zcert - work with CURVE security certificates
 
 The zcert class provides a way to create and work with security
@@ -617,8 +672,8 @@ temporary object in memory, or persisted to disk. On disk, a
 certificate is stored as two files. One is public and contains only
 the public key. The second is secret and contains both keys. The
 two have the same filename, with the secret file adding "_secret".
-To exchange certificates, send the public file via some secure route. 
-Certificates are not signed but are text files that can be verified by 
+To exchange certificates, send the public file via some secure route.
+Certificates are not signed but are text files that can be verified by
 eye.
 
 Certificates are stored in the ZPL (ZMQ RFC 4) format. They have two
@@ -720,13 +775,14 @@ This is the class interface:
 This is the class self test code:
 
     //  Create temporary directory for test files
-#   define TESTDIR ".test_zcert"
+    #   define TESTDIR ".test_zcert"
     zsys_dir_create (TESTDIR);
     
     //  Create a simple certificate with metadata
     zcert_t *cert = zcert_new ();
     assert (cert);
 
+<A name="toc4-736" title="zcertstore - work with CURVE security certificate stores" />
 #### zcertstore - work with CURVE security certificate stores
 
 To authenticate new clients using the ZeroMQ CURVE security mechanism,
@@ -793,13 +849,13 @@ This is the class interface:
 This is the class self test code:
 
     //  Create temporary directory for test files
-#   define TESTDIR ".test_zcertstore"
+    #   define TESTDIR ".test_zcertstore"
     zsys_dir_create (TESTDIR);
-
+    
     //  Load certificate store from disk; it will be empty
     zcertstore_t *certstore = zcertstore_new (TESTDIR);
     assert (certstore);
-
+    
     //  Create a single new certificate and save to disk
     zcert_t *cert = zcert_new ();
     assert (cert);
@@ -808,27 +864,28 @@ This is the class self test code:
     zcert_set_meta (cert, "name", "John Doe");
     zcert_save (cert, TESTDIR "/mycert.txt");
     zcert_destroy (&cert);
-
+    
     //  Check that certificate store refreshes as expected
     cert = zcertstore_lookup (certstore, client_key);
     assert (cert);
     assert (streq (zcert_meta (cert, "name"), "John Doe"));
     free (client_key);
-
+    
     if (verbose)
         zcertstore_print (certstore);
     zcertstore_destroy (&certstore);
-
+    
     //  Delete all test files
     zdir_t *dir = zdir_new (TESTDIR, NULL);
     assert (dir);
     zdir_remove (dir, true);
     zdir_destroy (&dir);
 
+<A name="toc4-835" title="zchunk - work with memory chunks" />
 #### zchunk - work with memory chunks
 
 The zchunk class works with variable sized blobs. Not as efficient as
-ØMQ's messages but they do less weirdness and so are easier to understand.
+MQ's messages but they do less weirdness and so are easier to understand.
 The chunk class has methods to read and write chunks from disk.
 
 
@@ -952,7 +1009,7 @@ This is the class self test code:
     assert (zchunk_size (chunk) == 10);
     assert (memcmp (zchunk_data (chunk), "1234567890", 10) == 0);
     zchunk_destroy (&chunk);
-
+    
     chunk = zchunk_new (NULL, 10);
     assert (chunk);
     zchunk_append (chunk, "12345678", 8);
@@ -967,23 +1024,23 @@ This is the class self test code:
     string = zchunk_strhex (chunk);
     assert (streq (string, "31323334353637383930"));
     free (string);
-
+    
     zframe_t *frame = zchunk_pack (chunk);
     assert (frame);
-
+    
     zchunk_t *chunk2 = zchunk_unpack (frame);
     assert (chunk2);
     assert (memcmp (zchunk_data (chunk2), "1234567890", 10) == 0);
     zframe_destroy (&frame);
     zchunk_destroy (&chunk2);
-
+    
     zchunk_t *copy = zchunk_dup (chunk);
     assert (copy);
     assert (memcmp (zchunk_data (copy), "1234567890", 10) == 0);
     assert (zchunk_size (copy) == 10);
     zchunk_destroy (&copy);
     zchunk_destroy (&chunk);
-
+    
     copy = zchunk_new ("1234567890abcdefghij", 20);
     assert (copy);
     chunk = zchunk_new (NULL, 8);
@@ -1003,6 +1060,7 @@ This is the class self test code:
     zchunk_destroy (&copy);
     zchunk_destroy (&chunk);
 
+<A name="toc4-1014" title="zclock - millisecond clocks and delays" />
 #### zclock - millisecond clocks and delays
 
 The zclock class provides essential sleep and system time functions, used
@@ -1048,6 +1106,7 @@ This is the class self test code:
         puts (timestr);
     free (timestr);
 
+<A name="toc4-1060" title="zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL." />
 #### zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.
 
 Lets applications load, work with, and save configuration files.
@@ -1208,7 +1267,7 @@ This is the class interface:
 This is the class self test code:
 
     //  Create temporary directory for test files
-#   define TESTDIR ".test_zconfig"
+    #   define TESTDIR ".test_zconfig"
     zsys_dir_create (TESTDIR);
     
     zconfig_t *root = zconfig_new ("root", NULL);
@@ -1220,6 +1279,7 @@ This is the class self test code:
     item = zconfig_new ("email", section);
     assert (item);
 
+<A name="toc4-1233" title="zdigest - provides hashing functions (SHA-1 at present)" />
 #### zdigest - provides hashing functions (SHA-1 at present)
 
 The zdigest class generates a hash from zchunks of data. The current
@@ -1278,10 +1338,11 @@ This is the class self test code:
     assert (data [2] == 0x38);
     assert (data [3] == 0x07);
     assert (streq (zdigest_string (digest),
-        "DEB23807D4FE025E900FE9A9C7D8410C3DDE9671"));
+                   "DEB23807D4FE025E900FE9A9C7D8410C3DDE9671"));
     zdigest_destroy (&digest);
     free (buffer);
 
+<A name="toc4-1296" title="zdir - work with file-system directories" />
 #### zdir - work with file-system directories
 
 The zdir class gives access to the file system index. It will load
@@ -1386,10 +1447,11 @@ This is the class self test code:
     zlist_destroy (&patches);
     zdir_destroy (&older);
     zdir_destroy (&newer);
-
+    
     zdir_t *nosuch = zdir_new ("does-not-exist", NULL);
     assert (nosuch == NULL);
 
+<A name="toc4-1405" title="zdir_patch - work with directory patches" />
 #### zdir_patch - work with directory patches
 
 The zdir_patch class works with one patch, which says "create this
@@ -1454,6 +1516,7 @@ This is the class self test code:
     assert (streq (zdir_patch_vpath (patch), "/bilbo"));
     zdir_patch_destroy (&patch);
 
+<A name="toc4-1470" title="zfile - provides methods to work with files in a portable fashion." />
 #### zfile - provides methods to work with files in a portable fashion.
 
 The zfile class provides methods to work with disk files. A file object
@@ -1609,7 +1672,7 @@ This is the class self test code:
     assert (streq (zfile_filename (file, "."), "bilbo"));
     assert (zfile_is_readable (file) == false);
     zfile_destroy (&file);
-
+    
     //  Create a test file in some random subdirectory
     file = zfile_new ("./this/is/a/test", "bilbo");
     assert (file);
@@ -1651,7 +1714,7 @@ This is the class self test code:
     assert (zchunk_size (chunk) == 13);
     zchunk_destroy (&chunk);
     zfile_close (file);
-
+    
     //  Try some fun with symbolic links
     zfile_t *link = zfile_new ("./this/is/a/test", "bilbo.ln");
     assert (link);
@@ -1659,7 +1722,7 @@ This is the class self test code:
     assert (rc == 0);
     fprintf (zfile_handle (link), "./this/is/a/test/bilbo\n");
     zfile_destroy (&link);
-
+    
     link = zfile_new ("./this/is/a/test", "bilbo.ln");
     assert (link);
     rc = zfile_input (link);
@@ -1669,7 +1732,7 @@ This is the class self test code:
     assert (zchunk_size (chunk) == 13);
     zchunk_destroy (&chunk);
     zfile_destroy (&link);
-
+    
     //  Remove file and directory
     zdir_t *dir = zdir_new ("./this", NULL);
     assert (dir);
@@ -1677,7 +1740,7 @@ This is the class self test code:
     zdir_remove (dir, true);
     assert (zdir_cursize (dir) == 0);
     zdir_destroy (&dir);
-
+    
     //  Check we can no longer read from file
     assert (zfile_is_readable (file));
     zfile_restat (file);
@@ -1686,6 +1749,7 @@ This is the class self test code:
     assert (rc == -1);
     zfile_destroy (&file);
 
+<A name="toc4-1703" title="zframe - working with single message frames" />
 #### zframe - working with single message frames
 
 The zframe class provides methods to send and receive single message
@@ -1789,6 +1853,7 @@ This is the class self test code:
 
     //  Create two PAIR sockets and connect over inproc
 
+<A name="toc4-1807" title="zgossip - decentralized configuration management" />
 #### zgossip - decentralized configuration management
 
 Implements a gossip protocol for decentralized configuration management.
@@ -1927,19 +1992,19 @@ This is the class self test code:
     if (verbose)
         zstr_send (server, "VERBOSE");
     zstr_sendx (server, "BIND", "inproc://zgossip", NULL);
-
+    
     zsock_t *client = zsock_new (ZMQ_DEALER);
     assert (client);
     zsock_set_rcvtimeo (client, 2000);
     int rc = zsock_connect (client, "inproc://zgossip");
     assert (rc == 0);
-
+    
     //  Send HELLO, which gets no reply
     zgossip_msg_t *request, *reply;
     request = zgossip_msg_new (ZGOSSIP_MSG_HELLO);
     assert (request);
     zgossip_msg_send (&request, client);
-
+    
     //  Send PING, expect PONG back
     request = zgossip_msg_new (ZGOSSIP_MSG_PING);
     assert (request);
@@ -1950,10 +2015,10 @@ This is the class self test code:
     zgossip_msg_destroy (&reply);
     
     zactor_destroy (&server);
-
+    
     zsock_destroy (&client);
     zactor_destroy (&server);
-
+    
     //  Test peer-to-peer operations
     zactor_t *base = zactor_new (zgossip, "base");
     assert (base);
@@ -1962,19 +2027,19 @@ This is the class self test code:
     //  Set a 100msec timeout on clients so we can test expiry
     zstr_sendx (base, "SET", "server/timeout", "100", NULL);
     zstr_sendx (base, "BIND", "inproc://base", NULL);
-
+    
     zactor_t *alpha = zactor_new (zgossip, "alpha");
     assert (alpha);
     zstr_sendx (alpha, "CONNECT", "inproc://base", NULL);
     zstr_sendx (alpha, "PUBLISH", "inproc://alpha-1", "service1", NULL);
     zstr_sendx (alpha, "PUBLISH", "inproc://alpha-2", "service2", NULL);
-
+    
     zactor_t *beta = zactor_new (zgossip, "beta");
     assert (beta);
     zstr_sendx (beta, "CONNECT", "inproc://base", NULL);
     zstr_sendx (beta, "PUBLISH", "inproc://beta-1", "service1", NULL);
     zstr_sendx (beta, "PUBLISH", "inproc://beta-2", "service2", NULL);
-
+    
     //  got nothing
     zclock_sleep (200);
     
@@ -1983,13 +2048,10 @@ This is the class self test code:
     zactor_destroy (&beta);
     
 
+<A name="toc4-2002" title="zhash - generic type-free hash container" />
 #### zhash - generic type-free hash container
 
-Expandable hash table container
-
-Note that it's relatively slow (~50k insertions/deletes per second), so
-don't do inserts/updates on the critical path for message I/O. It can
-do ~2.5M lookups per second for 16-char keys. Timed on a 1.6GHz CPU.
+zhash is an expandable hash table container.
 
 The hash table always has a size that is prime and roughly doubles its
 size when 75% full. In case of hash collisions items are chained in a
@@ -2230,7 +2292,7 @@ This is the class self test code:
     rc = zhash_insert (hash, "DEADF00D", "dead food");
     assert (rc == 0);
     assert (zhash_size (hash) == 4);
-
+    
     //  Look for existing items
     item = (char *) zhash_lookup (hash, "DEADBEEF");
     assert (streq (item, "dead beef"));
@@ -2240,35 +2302,35 @@ This is the class self test code:
     assert (streq (item, "coded bad"));
     item = (char *) zhash_lookup (hash, "DEADF00D");
     assert (streq (item, "dead food"));
-
+    
     //  Look for non-existent items
     item = (char *) zhash_lookup (hash, "foo");
     assert (item == NULL);
-
+    
     //  Try to insert duplicate items
     rc = zhash_insert (hash, "DEADBEEF", "foo");
     assert (rc == -1);
     item = (char *) zhash_lookup (hash, "DEADBEEF");
     assert (streq (item, "dead beef"));
-
+    
     //  Some rename tests
-
+    
     //  Valid rename, key is now LIVEBEEF
     rc = zhash_rename (hash, "DEADBEEF", "LIVEBEEF");
     assert (rc == 0);
     item = (char *) zhash_lookup (hash, "LIVEBEEF");
     assert (streq (item, "dead beef"));
-
+    
     //  Trying to rename an unknown item to a non-existent key
     rc = zhash_rename (hash, "WHATBEEF", "NONESUCH");
     assert (rc == -1);
-
+    
     //  Trying to rename an unknown item to an existing key
     rc = zhash_rename (hash, "WHATBEEF", "LIVEBEEF");
     assert (rc == -1);
     item = (char *) zhash_lookup (hash, "LIVEBEEF");
     assert (streq (item, "dead beef"));
-
+    
     //  Trying to rename an existing item to another existing item
     rc = zhash_rename (hash, "LIVEBEEF", "ABADCAFE");
     assert (rc == -1);
@@ -2276,12 +2338,12 @@ This is the class self test code:
     assert (streq (item, "dead beef"));
     item = (char *) zhash_lookup (hash, "ABADCAFE");
     assert (streq (item, "a bad cafe"));
-
+    
     //  Test keys method
     zlist_t *keys = zhash_keys (hash);
     assert (zlist_size (keys) == 4);
     zlist_destroy (&keys);
-
+    
     //  Test dup method
     zhash_t *copy = zhash_dup (hash);
     assert (zhash_size (copy) == 4);
@@ -2289,7 +2351,7 @@ This is the class self test code:
     assert (item);
     assert (streq (item, "dead beef"));
     zhash_destroy (&copy);
-
+    
     //  Test pack/unpack methods
     zframe_t *frame = zhash_pack (hash);
     copy = zhash_unpack (frame);
@@ -2299,7 +2361,7 @@ This is the class self test code:
     assert (item);
     assert (streq (item, "dead beef"));
     zhash_destroy (&copy);
-
+    
     //  Test save and load
     zhash_comment (hash, "This is a test file");
     zhash_comment (hash, "Created by %s", "czmq_selftest");
@@ -2312,13 +2374,13 @@ This is the class self test code:
     assert (streq (item, "dead beef"));
     zhash_destroy (&copy);
     zsys_file_delete (".cache");
-
+    
     //  Delete a item
     zhash_delete (hash, "LIVEBEEF");
     item = (char *) zhash_lookup (hash, "LIVEBEEF");
     assert (item == NULL);
     assert (zhash_size (hash) == 3);
-
+    
     //  Check that the queue is robust against random usage
     struct {
         char name [100];
@@ -2326,7 +2388,7 @@ This is the class self test code:
     } testset [200];
     memset (testset, 0, sizeof (testset));
     int testmax = 200, testnbr, iteration;
-
+    
     srandom ((unsigned) time (NULL));
     for (iteration = 0; iteration < 25000; iteration++) {
         testnbr = randof (testmax);
@@ -2345,12 +2407,12 @@ This is the class self test code:
     //  Test 10K lookups
     for (iteration = 0; iteration < 10000; iteration++)
         item = (char *) zhash_lookup (hash, "DEADBEEFABADCAFE");
-
+    
     //  Destructor should be safe to call twice
     zhash_destroy (&hash);
     zhash_destroy (&hash);
     assert (hash == NULL);
-
+    
     // Test autofree; automatically copies and frees string values
     hash = zhash_new ();
     assert (hash);
@@ -2366,6 +2428,7 @@ This is the class self test code:
     assert (streq ((char *) zhash_lookup (hash, "key2"), "Ring a ding ding"));
     zhash_destroy (&hash);
 
+<A name="toc4-2382" title="ziflist - List of network interfaces available on system" />
 #### ziflist - List of network interfaces available on system
 
 The ziflist class takes a snapshot of the network interfaces that the
@@ -2419,7 +2482,24 @@ This is the class interface:
 
 This is the class self test code:
 
+    ziflist_t *iflist = ziflist_new ();
+    assert (iflist);
+    size_t items = ziflist_size (iflist);
+    
+    if (verbose) {
+        printf ("ziflist: interfaces=%zu\n", ziflist_size (iflist));
+        const char *name = ziflist_first (iflist);
+        while (name) {
+            printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
+                    name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
+            name = ziflist_next (iflist);
+        }
+    }
+    ziflist_reload (iflist);
+    assert (items == ziflist_size (iflist));
+    ziflist_destroy (&iflist);
 
+<A name="toc4-2453" title="zlist - generic type-free list container" />
 #### zlist - generic type-free list container
 
 Provides a generic container implementing a fast singly-linked list. You
@@ -2552,27 +2632,27 @@ This is the class self test code:
     zlist_t *list = zlist_new ();
     assert (list);
     assert (zlist_size (list) == 0);
-
+    
     //  Three items we'll use as test data
     //  List items are void *, not particularly strings
     char *cheese = "boursin";
     char *bread = "baguette";
     char *wine = "bordeaux";
-
+    
     zlist_append (list, cheese);
     assert (zlist_size (list) == 1);
     zlist_append (list, bread);
     assert (zlist_size (list) == 2);
     zlist_append (list, wine);
     assert (zlist_size (list) == 3);
-
+    
     assert (zlist_head (list) == cheese);
     assert (zlist_next (list) == cheese);
-
+    
     assert (zlist_first (list) == cheese);
     assert (zlist_tail (list) == wine);
     assert (zlist_next (list) == bread);
-
+    
     assert (zlist_first (list) == cheese);
     assert (zlist_next (list) == bread);
     assert (zlist_next (list) == wine);
@@ -2580,18 +2660,18 @@ This is the class self test code:
     //  After we reach end of list, next wraps around
     assert (zlist_next (list) == cheese);
     assert (zlist_size (list) == 3);
-
+    
     zlist_remove (list, wine);
     assert (zlist_size (list) == 2);
-
+    
     assert (zlist_first (list) == cheese);
     zlist_remove (list, cheese);
     assert (zlist_size (list) == 1);
     assert (zlist_first (list) == bread);
-
+    
     zlist_remove (list, bread);
     assert (zlist_size (list) == 0);
-
+    
     zlist_append (list, cheese);
     zlist_append (list, bread);
     assert (zlist_last (list) == bread);
@@ -2599,24 +2679,24 @@ This is the class self test code:
     assert (zlist_last (list) == cheese);
     zlist_remove (list, cheese);
     assert (zlist_last (list) == NULL);
-
+    
     zlist_push (list, cheese);
     assert (zlist_size (list) == 1);
     assert (zlist_first (list) == cheese);
-
+    
     zlist_push (list, bread);
     assert (zlist_size (list) == 2);
     assert (zlist_first (list) == bread);
     assert (zlist_item (list) == bread);
-
+    
     zlist_append (list, wine);
     assert (zlist_size (list) == 3);
     assert (zlist_first (list) == bread);
-
+    
     zlist_t *sub_list = zlist_dup (list);
     assert (sub_list);
     assert (zlist_size (sub_list) == 3);
-
+    
     zlist_sort (list, s_compare);
     char *item;
     item = (char *) zlist_pop (list);
@@ -2626,19 +2706,20 @@ This is the class self test code:
     item = (char *) zlist_pop (list);
     assert (item == cheese);
     assert (zlist_size (list) == 0);
-
+    
     assert (zlist_size (sub_list) == 3);
     zlist_push (list, sub_list);
     zlist_t *sub_list_2 = zlist_dup (sub_list);
     zlist_append (list, sub_list_2);
     assert (zlist_freefn (list, sub_list, &s_zlist_free, false) == sub_list);
     assert (zlist_freefn (list, sub_list_2, &s_zlist_free, true) == sub_list_2);
-
+    
     //  Destructor should be safe to call twice
     zlist_destroy (&list);
     zlist_destroy (&list);
     assert (list == NULL);
 
+<A name="toc4-2673" title="zloop - event-driven reactor" />
 #### zloop - event-driven reactor
 
 The zloop class provides an event-driven reactor pattern. The reactor
@@ -2739,11 +2820,11 @@ This is the class self test code:
     zsock_t *input = zsock_new (ZMQ_PAIR);
     assert (input);
     zsock_connect (input, "inproc://zloop.test");
-
+    
     zloop_t *loop = zloop_new ();
     assert (loop);
     zloop_set_verbose (loop, verbose);
-
+    
     //  Create a timer that will be cancelled
     int timer_id = zloop_timer (loop, 1000, 1, s_timer_event, NULL);
     zloop_timer (loop, 5, 1, s_cancel_timer_event, &timer_id);
@@ -2756,13 +2837,14 @@ This is the class self test code:
     assert (rc == 0);
     zloop_reader_set_tolerant (loop, input);
     zloop_start (loop);
-
+    
     zloop_destroy (&loop);
     assert (loop == NULL);
-
+    
     zsock_destroy (&input);
     zsock_destroy (&output);
 
+<A name="toc4-2798" title="zmonitor - socket event monitor" />
 #### zmonitor - socket event monitor
 
 The zmonitor actor provides an API for obtaining socket events such as
@@ -2834,7 +2916,7 @@ This is the class self test code:
     zstr_sendx (clientmon, "LISTEN", "LISTENING", "ACCEPTED", NULL);
     zstr_sendx (clientmon, "START", NULL);
     zsock_wait (clientmon);
-
+    
     zsock_t *server = zsock_new (ZMQ_DEALER);
     assert (server);
     zactor_t *servermon = zactor_new (zmonitor, server);
@@ -2847,25 +2929,26 @@ This is the class self test code:
     
     //  Allow a brief time for the message to get there...
     zmq_poll (NULL, 0, 200);
-
+    
     //  Check client is now listening
     int port_nbr = zsock_bind (client, "tcp://127.0.0.1:*");
     assert (port_nbr != -1);
     s_assert_event (clientmon, "LISTENING");
-
+    
     //  Check server connected to client
     zsock_connect (server, "tcp://127.0.0.1:%d", port_nbr);
     s_assert_event (servermon, "CONNECTED");
-
+    
     //  Check client accepted connection
     s_assert_event (clientmon, "ACCEPTED");
-
+    
     zactor_destroy (&clientmon);
     zactor_destroy (&servermon);
     zsock_destroy (&client);
     zsock_destroy (&server);
-#endif
+    #endif
 
+<A name="toc4-2902" title="zmsg - working with multipart messages" />
 #### zmsg - working with multipart messages
 
 The zmsg class provides methods to send and receive multipart messages
@@ -2960,6 +3043,11 @@ This is the class interface:
     CZMQ_EXPORT char *
         zmsg_popstr (zmsg_t *self);
     
+    //  Pop frame off front of message, return as integer value. If there were
+    //  no more frames in the message, returns 0.
+    CZMQ_EXPORT int
+        zmsg_popint (zmsg_t *self);
+    
     //  Remove specified frame from list, if present. Does not destroy frame.
     CZMQ_EXPORT void
         zmsg_remove (zmsg_t *self, zframe_t *frame);
@@ -3027,6 +3115,7 @@ This is the class self test code:
 
     //  Create two PAIR sockets and connect over inproc
 
+<A name="toc4-3069" title="zpoller - trivial socket poller class" />
 #### zpoller - trivial socket poller class
 
 The zpoller class provides a minimalist interface to ZeroMQ's zmq_poll
@@ -3098,17 +3187,17 @@ This is the class self test code:
     assert (bowl);
     zsock_t *dish = zsock_new (ZMQ_PULL);
     assert (dish);
-
+    
     //  Set-up poller
     zpoller_t *poller = zpoller_new (bowl, dish, NULL);
     assert (poller);
-
+    
     // Add a reader to the existing poller
     rc = zpoller_add (poller, sink);
     assert (rc == 0);
-
+    
     zstr_send (vent, "Hello, World");
-
+    
     //  We expect a message only on the sink
     zsock_t *which = (zsock_t *) zpoller_wait (poller, -1);
     assert (which == sink);
@@ -3117,28 +3206,29 @@ This is the class self test code:
     char *message = zstr_recv (which);
     assert (streq (message, "Hello, World"));
     zstr_free (&message);
-
+    
     // Stop polling reader
     rc = zpoller_remove (poller, sink);
     assert (rc == 0);
-
+    
     // Check fd works
     rc = zsock_connect (bowl, "tcp://127.0.0.1:%d", port_nbr);
     assert (rc != -1);
     int fd = zsock_fd (bowl);
-    rc = zpoller_add (poller, (void*)&fd);
+    rc = zpoller_add (poller, (void *) &fd);
     assert (rc != -1);
     zstr_send (vent, "Hello again, world");
     assert (zpoller_wait (poller, 500) == &fd);
     
     //  Destroy poller and sockets
     zpoller_destroy (&poller);
-
+    
     zsock_destroy (&vent);
     zsock_destroy (&sink);
     zsock_destroy (&bowl);
     zsock_destroy (&dish);
 
+<A name="toc4-3182" title="zproxy - run a steerable proxy in the background" />
 #### zproxy - run a steerable proxy in the background
 
 A zproxy actor switches messages between a frontend and a backend socket.
@@ -3227,7 +3317,7 @@ This is the class self test code:
     zsock_wait (proxy);
     zstr_sendx (proxy, "BACKEND", "PUSH", "inproc://backend", NULL);
     zsock_wait (proxy);
-
+    
     //  Connect application sockets to proxy
     zsock_t *faucet = zsock_new_push (">inproc://frontend");
     assert (faucet);
@@ -3242,7 +3332,7 @@ This is the class self test code:
     assert (streq (world, "World"));
     zstr_free (&hello);
     zstr_free (&world);
-
+    
     //  Test pause/resume functionality
     zstr_sendx (proxy, "PAUSE", NULL);
     zsock_wait (proxy);
@@ -3258,11 +3348,11 @@ This is the class self test code:
     assert (streq (world, "World"));
     zstr_free (&hello);
     zstr_free (&world);
-
+    
     //  Test capture functionality
     zsock_t *capture = zsock_new_pull ("inproc://capture");
     assert (capture);
-
+    
     //  Switch on capturing, check that it works
     zstr_sendx (proxy, "CAPTURE", "inproc://capture", NULL);
     zsock_wait (proxy);
@@ -3278,40 +3368,41 @@ This is the class self test code:
     assert (streq (world, "World"));
     zstr_free (&hello);
     zstr_free (&world);
-
+    
     zsock_destroy (&faucet);
     zsock_destroy (&sink);
     zsock_destroy (&capture);
     zactor_destroy (&proxy);
 
+<A name="toc4-3328" title="zrex - work with regular expressions" />
 #### zrex - work with regular expressions
 
 Wraps a very simple regular expression library (SLRE) as a CZMQ class.
 Supports this syntax:
 
-  ^               Match beginning of a buffer
-  $               Match end of a buffer
-  ()              Grouping and substring capturing
-  [...]           Match any character from set
-  [^...]          Match any character but ones from set
-  .               Match any character
-  \s              Match whitespace
-  \S              Match non-whitespace
-  \d              Match decimal digit
-  \D              Match non decimal digit
-  \a              Match alphabetic character
-  \A              Match non-alphabetic character
-  \w              Match alphanumeric character
-  \W              Match non-alphanumeric character
-  \r              Match carriage return
-  \n              Match newline
-  +               Match one or more times (greedy)
-  +?              Match one or more times (non-greedy)
-  *               Match zero or more times (greedy)
-  *?              Match zero or more times (non-greedy)
-  ?               Match zero or once
-  \xDD            Match byte with hex value 0xDD
-  \meta           Match one of the meta character: ^$().[*+?\
+    ^               Match beginning of a buffer
+    $               Match end of a buffer
+    ()              Grouping and substring capturing
+    [...]           Match any character from set
+    [^...]          Match any character but ones from set
+    .               Match any character
+    \s              Match whitespace
+    \S              Match non-whitespace
+    \d              Match decimal digit
+    \D              Match non decimal digit
+    \a              Match alphabetic character
+    \A              Match non-alphabetic character
+    \w              Match alphanumeric character
+    \W              Match non-alphanumeric character
+    \r              Match carriage return
+    \n              Match newline
+    +               Match one or more times (greedy)
+    +?              Match one or more times (non-greedy)
+    *               Match zero or more times (greedy)
+    *?              Match zero or more times (non-greedy)
+    ?               Match zero or once
+    \xDD            Match byte with hex value 0xDD
+    \meta           Match one of the meta character: ^$().[*+?\
 
 
 This is the class interface:
@@ -3374,6 +3465,7 @@ This is the class interface:
 This is the class self test code:
 
 
+<A name="toc4-3419" title="zring - generic type-free doubly linked ring container" />
 #### zring - generic type-free doubly linked ring container
 
 Provides a generic "ring" container, which mixes a doubly-linked list
@@ -3526,13 +3618,13 @@ This is the class self test code:
     zring_t *ring = zring_new ();
     assert (ring);
     assert (zring_size (ring) == 0);
-
+    
     //  Three items we'll use as test data
     //  Ring items are void *, not particularly strings
     char *cheese = "boursin";
     char *bread = "baguette";
     char *wine = "bordeaux";
-
+    
     int rc = zring_append (ring, cheese);
     assert (!rc);
     assert (zring_size (ring) == 1);
@@ -3545,7 +3637,7 @@ This is the class self test code:
     assert (!rc);
     assert (zring_size (ring) == 3);
     assert (zring_item (ring) == wine);
-
+    
     assert (zring_first (ring) == cheese);
     assert (zring_next (ring) == bread);
     assert (zring_next (ring) == wine);
@@ -3560,7 +3652,7 @@ This is the class self test code:
     //  After we reach start of ring, prev wraps around
     assert (zring_prev (ring) == wine);
     zring_purge (ring);
-
+    
     //  Test some list insertion-deletion combos
     assert (zring_size (ring) == 0);
     zring_prepend (ring, "4");
@@ -3570,7 +3662,7 @@ This is the class self test code:
     zring_prepend (ring, "0");
     zring_append (ring, "1");
     assert (zring_size (ring) == 6);
-
+    
     //  Try the comparator functionality
     zring_set_comparator (ring, (czmq_comparator *) strcmp);
     zring_sort (ring);
@@ -3579,7 +3671,7 @@ This is the class self test code:
     assert (streq (item, "0"));
     item = (char *) zring_find (ring, "5");
     assert (streq (item, "5"));
-
+    
     //  Try the duplicator and destructor
     zring_set_duplicator (ring, (czmq_duplicator *) strdup);
     zring_t *dup = zring_dup (ring);
@@ -3587,7 +3679,7 @@ This is the class self test code:
     zring_set_destructor (dup, (czmq_destructor *) zstr_free);
     assert (zring_size (dup) == 6);
     zring_destroy (&dup);
-
+    
     //  We're comparing as strings, not item pointers
     rc = zring_remove (ring, "2");
     assert (rc == 0);
@@ -3597,7 +3689,7 @@ This is the class self test code:
     assert (rc == 0);
     item = (char *) zring_detach (ring, NULL);
     zring_purge (ring);
-
+    
     //  Try the dictionary insert/delete functionality
     rc = zring_insert (ring, "1", "one");
     assert (rc == 0);
@@ -3631,6 +3723,7 @@ This is the class self test code:
     assert (ring == NULL);
     zring_destroy (&ring);
 
+<A name="toc4-3677" title="zsock - high-level socket API that hides libzmq contexts and sockets" />
 #### zsock - high-level socket API that hides libzmq contexts and sockets
 
 The zsock class wraps the libzmq socket handle (a void *) with a proper
@@ -3808,6 +3901,8 @@ This is the class interface:
     //      b = byte *, size_t (2 arguments)
     //      c = zchunk_t *
     //      f = zframe_t *
+    //      h = zhash_t *
+    //      m = zmsg_t * (sends all frames in the zmsg)
     //      p = void * (sends the pointer value, only meaningful over inproc)
     //      z = sends zero-sized frame (0 arguments)
     //
@@ -3830,6 +3925,7 @@ This is the class interface:
     //      f = zframe_t ** (creates zframe)
     //      p = void ** (stores pointer)
     //      h = zhash_t ** (creates zhash)
+    //      m = zmsg_t ** (creates a zmsg with the remaing frames)    
     //      z = null, asserts empty frame (0 arguments)
     //
     //  Note that zsock_recv creates the returned objects, and the caller must
@@ -3889,6 +3985,7 @@ This is the class interface:
 This is the class self test code:
 
 
+<A name="toc4-3939" title="zsock_option - get/set ØMQ socket options" />
 #### zsock_option - get/set ØMQ socket options
 
 The zsock_option class provides access to the ØMQ getsockopt/setsockopt API.
@@ -4119,52 +4216,52 @@ This is the class interface:
 This is the class self test code:
 
     zsock_t *self;
-#if (ZMQ_VERSION_MAJOR == 4)
-#     if defined (ZMQ_TOS)
+    #if (ZMQ_VERSION_MAJOR == 4)
+    #     if defined (ZMQ_TOS)
     self = zsock_new (ZMQ_DEALER);
     assert (self);
     zsock_set_tos (self, 1);
     assert (zsock_tos (self) == 1);
     zsock_tos (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_ROUTER_HANDOVER)
+    #     endif
+    #     if defined (ZMQ_ROUTER_HANDOVER)
     self = zsock_new (ZMQ_ROUTER);
     assert (self);
     zsock_set_router_handover (self, 1);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_ROUTER_MANDATORY)
+    #     endif
+    #     if defined (ZMQ_ROUTER_MANDATORY)
     self = zsock_new (ZMQ_ROUTER);
     assert (self);
     zsock_set_router_mandatory (self, 1);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_PROBE_ROUTER)
+    #     endif
+    #     if defined (ZMQ_PROBE_ROUTER)
     self = zsock_new (ZMQ_DEALER);
     assert (self);
     zsock_set_probe_router (self, 1);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_REQ_RELAXED)
+    #     endif
+    #     if defined (ZMQ_REQ_RELAXED)
     self = zsock_new (ZMQ_REQ);
     assert (self);
     zsock_set_req_relaxed (self, 1);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_REQ_CORRELATE)
+    #     endif
+    #     if defined (ZMQ_REQ_CORRELATE)
     self = zsock_new (ZMQ_REQ);
     assert (self);
     zsock_set_req_correlate (self, 1);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_CONFLATE)
+    #     endif
+    #     if defined (ZMQ_CONFLATE)
     self = zsock_new (ZMQ_PUSH);
     assert (self);
     zsock_set_conflate (self, 1);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_ZAP_DOMAIN)
+    #     endif
+    #     if defined (ZMQ_ZAP_DOMAIN)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_zap_domain (self, "test");
@@ -4172,22 +4269,22 @@ This is the class self test code:
     assert (zap_domain);
     free (zap_domain);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_MECHANISM)
+    #     endif
+    #     if defined (ZMQ_MECHANISM)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_mechanism (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_PLAIN_SERVER)
+    #     endif
+    #     if defined (ZMQ_PLAIN_SERVER)
     self = zsock_new (ZMQ_PUB);
     assert (self);
     zsock_set_plain_server (self, 1);
     assert (zsock_plain_server (self) == 1);
     zsock_plain_server (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_PLAIN_USERNAME)
+    #     endif
+    #     if defined (ZMQ_PLAIN_USERNAME)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_plain_username (self, "test");
@@ -4195,8 +4292,8 @@ This is the class self test code:
     assert (plain_username);
     free (plain_username);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_PLAIN_PASSWORD)
+    #     endif
+    #     if defined (ZMQ_PLAIN_PASSWORD)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_plain_password (self, "test");
@@ -4204,86 +4301,86 @@ This is the class self test code:
     assert (plain_password);
     free (plain_password);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_IPV6)
+    #     endif
+    #     if defined (ZMQ_IPV6)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_ipv6 (self, 1);
     assert (zsock_ipv6 (self) == 1);
     zsock_ipv6 (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_IMMEDIATE)
+    #     endif
+    #     if defined (ZMQ_IMMEDIATE)
     self = zsock_new (ZMQ_DEALER);
     assert (self);
     zsock_set_immediate (self, 1);
     assert (zsock_immediate (self) == 1);
     zsock_immediate (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_ROUTER_RAW)
+    #     endif
+    #     if defined (ZMQ_ROUTER_RAW)
     self = zsock_new (ZMQ_ROUTER);
     assert (self);
     zsock_set_router_raw (self, 1);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_IPV4ONLY)
+    #     endif
+    #     if defined (ZMQ_IPV4ONLY)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_ipv4only (self, 1);
     assert (zsock_ipv4only (self) == 1);
     zsock_ipv4only (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
+    #     endif
+    #     if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
     self = zsock_new (ZMQ_PUB);
     assert (self);
     zsock_set_delay_attach_on_connect (self, 1);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_TYPE)
+    #     endif
+    #     if defined (ZMQ_TYPE)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_type (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_SNDHWM)
+    #     endif
+    #     if defined (ZMQ_SNDHWM)
     self = zsock_new (ZMQ_PUB);
     assert (self);
     zsock_set_sndhwm (self, 1);
     assert (zsock_sndhwm (self) == 1);
     zsock_sndhwm (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_RCVHWM)
+    #     endif
+    #     if defined (ZMQ_RCVHWM)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_rcvhwm (self, 1);
     assert (zsock_rcvhwm (self) == 1);
     zsock_rcvhwm (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_AFFINITY)
+    #     endif
+    #     if defined (ZMQ_AFFINITY)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_affinity (self, 1);
     assert (zsock_affinity (self) == 1);
     zsock_affinity (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_SUBSCRIBE)
+    #     endif
+    #     if defined (ZMQ_SUBSCRIBE)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_subscribe (self, "test");
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_UNSUBSCRIBE)
+    #     endif
+    #     if defined (ZMQ_UNSUBSCRIBE)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_unsubscribe (self, "test");
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_IDENTITY)
+    #     endif
+    #     if defined (ZMQ_IDENTITY)
     self = zsock_new (ZMQ_DEALER);
     assert (self);
     zsock_set_identity (self, "test");
@@ -4291,142 +4388,142 @@ This is the class self test code:
     assert (identity);
     free (identity);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_RATE)
+    #     endif
+    #     if defined (ZMQ_RATE)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_rate (self, 1);
     assert (zsock_rate (self) == 1);
     zsock_rate (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_RECOVERY_IVL)
+    #     endif
+    #     if defined (ZMQ_RECOVERY_IVL)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_recovery_ivl (self, 1);
     assert (zsock_recovery_ivl (self) == 1);
     zsock_recovery_ivl (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_SNDBUF)
+    #     endif
+    #     if defined (ZMQ_SNDBUF)
     self = zsock_new (ZMQ_PUB);
     assert (self);
     zsock_set_sndbuf (self, 1);
     assert (zsock_sndbuf (self) == 1);
     zsock_sndbuf (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_RCVBUF)
+    #     endif
+    #     if defined (ZMQ_RCVBUF)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_rcvbuf (self, 1);
     assert (zsock_rcvbuf (self) == 1);
     zsock_rcvbuf (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_LINGER)
+    #     endif
+    #     if defined (ZMQ_LINGER)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_linger (self, 1);
     assert (zsock_linger (self) == 1);
     zsock_linger (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_RECONNECT_IVL)
+    #     endif
+    #     if defined (ZMQ_RECONNECT_IVL)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_reconnect_ivl (self, 1);
     assert (zsock_reconnect_ivl (self) == 1);
     zsock_reconnect_ivl (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_RECONNECT_IVL_MAX)
+    #     endif
+    #     if defined (ZMQ_RECONNECT_IVL_MAX)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_reconnect_ivl_max (self, 1);
     assert (zsock_reconnect_ivl_max (self) == 1);
     zsock_reconnect_ivl_max (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_BACKLOG)
+    #     endif
+    #     if defined (ZMQ_BACKLOG)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_backlog (self, 1);
     assert (zsock_backlog (self) == 1);
     zsock_backlog (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_MAXMSGSIZE)
+    #     endif
+    #     if defined (ZMQ_MAXMSGSIZE)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_maxmsgsize (self, 1);
     assert (zsock_maxmsgsize (self) == 1);
     zsock_maxmsgsize (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_MULTICAST_HOPS)
+    #     endif
+    #     if defined (ZMQ_MULTICAST_HOPS)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_multicast_hops (self, 1);
     assert (zsock_multicast_hops (self) == 1);
     zsock_multicast_hops (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_RCVTIMEO)
+    #     endif
+    #     if defined (ZMQ_RCVTIMEO)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_rcvtimeo (self, 1);
     assert (zsock_rcvtimeo (self) == 1);
     zsock_rcvtimeo (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_SNDTIMEO)
+    #     endif
+    #     if defined (ZMQ_SNDTIMEO)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_sndtimeo (self, 1);
     assert (zsock_sndtimeo (self) == 1);
     zsock_sndtimeo (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_XPUB_VERBOSE)
+    #     endif
+    #     if defined (ZMQ_XPUB_VERBOSE)
     self = zsock_new (ZMQ_XPUB);
     assert (self);
     zsock_set_xpub_verbose (self, 1);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_TCP_KEEPALIVE)
+    #     endif
+    #     if defined (ZMQ_TCP_KEEPALIVE)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_tcp_keepalive (self, 1);
     assert (zsock_tcp_keepalive (self) == 1);
     zsock_tcp_keepalive (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_TCP_KEEPALIVE_IDLE)
+    #     endif
+    #     if defined (ZMQ_TCP_KEEPALIVE_IDLE)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_tcp_keepalive_idle (self, 1);
     assert (zsock_tcp_keepalive_idle (self) == 1);
     zsock_tcp_keepalive_idle (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_TCP_KEEPALIVE_CNT)
+    #     endif
+    #     if defined (ZMQ_TCP_KEEPALIVE_CNT)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_tcp_keepalive_cnt (self, 1);
     assert (zsock_tcp_keepalive_cnt (self) == 1);
     zsock_tcp_keepalive_cnt (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_TCP_KEEPALIVE_INTVL)
+    #     endif
+    #     if defined (ZMQ_TCP_KEEPALIVE_INTVL)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_tcp_keepalive_intvl (self, 1);
     assert (zsock_tcp_keepalive_intvl (self) == 1);
     zsock_tcp_keepalive_intvl (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_TCP_ACCEPT_FILTER)
+    #     endif
+    #     if defined (ZMQ_TCP_ACCEPT_FILTER)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_tcp_accept_filter (self, "127.0.0.1");
@@ -4434,99 +4531,99 @@ This is the class self test code:
     assert (tcp_accept_filter);
     free (tcp_accept_filter);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_RCVMORE)
+    #     endif
+    #     if defined (ZMQ_RCVMORE)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_rcvmore (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_FD)
+    #     endif
+    #     if defined (ZMQ_FD)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_fd (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_EVENTS)
+    #     endif
+    #     if defined (ZMQ_EVENTS)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_events (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_LAST_ENDPOINT)
+    #     endif
+    #     if defined (ZMQ_LAST_ENDPOINT)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     char *last_endpoint = zsock_last_endpoint (self);
     assert (last_endpoint);
     free (last_endpoint);
     zsock_destroy (&self);
-#     endif
-#endif
-
-#if (ZMQ_VERSION_MAJOR == 3)
-#     if defined (ZMQ_ROUTER_RAW)
+    #     endif
+    #endif
+    
+    #if (ZMQ_VERSION_MAJOR == 3)
+    #     if defined (ZMQ_ROUTER_RAW)
     self = zsock_new (ZMQ_ROUTER);
     assert (self);
     zsock_set_router_raw (self, 1);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_IPV4ONLY)
+    #     endif
+    #     if defined (ZMQ_IPV4ONLY)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_ipv4only (self, 1);
     assert (zsock_ipv4only (self) == 1);
     zsock_ipv4only (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
+    #     endif
+    #     if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
     self = zsock_new (ZMQ_PUB);
     assert (self);
     zsock_set_delay_attach_on_connect (self, 1);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_TYPE)
+    #     endif
+    #     if defined (ZMQ_TYPE)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_type (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_SNDHWM)
+    #     endif
+    #     if defined (ZMQ_SNDHWM)
     self = zsock_new (ZMQ_PUB);
     assert (self);
     zsock_set_sndhwm (self, 1);
     assert (zsock_sndhwm (self) == 1);
     zsock_sndhwm (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_RCVHWM)
+    #     endif
+    #     if defined (ZMQ_RCVHWM)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_rcvhwm (self, 1);
     assert (zsock_rcvhwm (self) == 1);
     zsock_rcvhwm (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_AFFINITY)
+    #     endif
+    #     if defined (ZMQ_AFFINITY)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_affinity (self, 1);
     assert (zsock_affinity (self) == 1);
     zsock_affinity (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_SUBSCRIBE)
+    #     endif
+    #     if defined (ZMQ_SUBSCRIBE)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_subscribe (self, "test");
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_UNSUBSCRIBE)
+    #     endif
+    #     if defined (ZMQ_UNSUBSCRIBE)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_unsubscribe (self, "test");
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_IDENTITY)
+    #     endif
+    #     if defined (ZMQ_IDENTITY)
     self = zsock_new (ZMQ_DEALER);
     assert (self);
     zsock_set_identity (self, "test");
@@ -4534,142 +4631,142 @@ This is the class self test code:
     assert (identity);
     free (identity);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_RATE)
+    #     endif
+    #     if defined (ZMQ_RATE)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_rate (self, 1);
     assert (zsock_rate (self) == 1);
     zsock_rate (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_RECOVERY_IVL)
+    #     endif
+    #     if defined (ZMQ_RECOVERY_IVL)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_recovery_ivl (self, 1);
     assert (zsock_recovery_ivl (self) == 1);
     zsock_recovery_ivl (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_SNDBUF)
+    #     endif
+    #     if defined (ZMQ_SNDBUF)
     self = zsock_new (ZMQ_PUB);
     assert (self);
     zsock_set_sndbuf (self, 1);
     assert (zsock_sndbuf (self) == 1);
     zsock_sndbuf (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_RCVBUF)
+    #     endif
+    #     if defined (ZMQ_RCVBUF)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_rcvbuf (self, 1);
     assert (zsock_rcvbuf (self) == 1);
     zsock_rcvbuf (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_LINGER)
+    #     endif
+    #     if defined (ZMQ_LINGER)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_linger (self, 1);
     assert (zsock_linger (self) == 1);
     zsock_linger (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_RECONNECT_IVL)
+    #     endif
+    #     if defined (ZMQ_RECONNECT_IVL)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_reconnect_ivl (self, 1);
     assert (zsock_reconnect_ivl (self) == 1);
     zsock_reconnect_ivl (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_RECONNECT_IVL_MAX)
+    #     endif
+    #     if defined (ZMQ_RECONNECT_IVL_MAX)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_reconnect_ivl_max (self, 1);
     assert (zsock_reconnect_ivl_max (self) == 1);
     zsock_reconnect_ivl_max (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_BACKLOG)
+    #     endif
+    #     if defined (ZMQ_BACKLOG)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_backlog (self, 1);
     assert (zsock_backlog (self) == 1);
     zsock_backlog (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_MAXMSGSIZE)
+    #     endif
+    #     if defined (ZMQ_MAXMSGSIZE)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_maxmsgsize (self, 1);
     assert (zsock_maxmsgsize (self) == 1);
     zsock_maxmsgsize (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_MULTICAST_HOPS)
+    #     endif
+    #     if defined (ZMQ_MULTICAST_HOPS)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_multicast_hops (self, 1);
     assert (zsock_multicast_hops (self) == 1);
     zsock_multicast_hops (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_RCVTIMEO)
+    #     endif
+    #     if defined (ZMQ_RCVTIMEO)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_rcvtimeo (self, 1);
     assert (zsock_rcvtimeo (self) == 1);
     zsock_rcvtimeo (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_SNDTIMEO)
+    #     endif
+    #     if defined (ZMQ_SNDTIMEO)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_sndtimeo (self, 1);
     assert (zsock_sndtimeo (self) == 1);
     zsock_sndtimeo (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_XPUB_VERBOSE)
+    #     endif
+    #     if defined (ZMQ_XPUB_VERBOSE)
     self = zsock_new (ZMQ_XPUB);
     assert (self);
     zsock_set_xpub_verbose (self, 1);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_TCP_KEEPALIVE)
+    #     endif
+    #     if defined (ZMQ_TCP_KEEPALIVE)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_tcp_keepalive (self, 1);
     assert (zsock_tcp_keepalive (self) == 1);
     zsock_tcp_keepalive (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_TCP_KEEPALIVE_IDLE)
+    #     endif
+    #     if defined (ZMQ_TCP_KEEPALIVE_IDLE)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_tcp_keepalive_idle (self, 1);
     assert (zsock_tcp_keepalive_idle (self) == 1);
     zsock_tcp_keepalive_idle (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_TCP_KEEPALIVE_CNT)
+    #     endif
+    #     if defined (ZMQ_TCP_KEEPALIVE_CNT)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_tcp_keepalive_cnt (self, 1);
     assert (zsock_tcp_keepalive_cnt (self) == 1);
     zsock_tcp_keepalive_cnt (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_TCP_KEEPALIVE_INTVL)
+    #     endif
+    #     if defined (ZMQ_TCP_KEEPALIVE_INTVL)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_tcp_keepalive_intvl (self, 1);
     assert (zsock_tcp_keepalive_intvl (self) == 1);
     zsock_tcp_keepalive_intvl (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_TCP_ACCEPT_FILTER)
+    #     endif
+    #     if defined (ZMQ_TCP_ACCEPT_FILTER)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_tcp_accept_filter (self, "127.0.0.1");
@@ -4677,61 +4774,61 @@ This is the class self test code:
     assert (tcp_accept_filter);
     free (tcp_accept_filter);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_RCVMORE)
+    #     endif
+    #     if defined (ZMQ_RCVMORE)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_rcvmore (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_FD)
+    #     endif
+    #     if defined (ZMQ_FD)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_fd (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_EVENTS)
+    #     endif
+    #     if defined (ZMQ_EVENTS)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_events (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_LAST_ENDPOINT)
+    #     endif
+    #     if defined (ZMQ_LAST_ENDPOINT)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     char *last_endpoint = zsock_last_endpoint (self);
     assert (last_endpoint);
     free (last_endpoint);
     zsock_destroy (&self);
-#     endif
-#endif
-
-#if (ZMQ_VERSION_MAJOR == 2)
-#     if defined (ZMQ_HWM)
+    #     endif
+    #endif
+    
+    #if (ZMQ_VERSION_MAJOR == 2)
+    #     if defined (ZMQ_HWM)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_hwm (self, 1);
     assert (zsock_hwm (self) == 1);
     zsock_hwm (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_SWAP)
+    #     endif
+    #     if defined (ZMQ_SWAP)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_swap (self, 1);
     assert (zsock_swap (self) == 1);
     zsock_swap (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_AFFINITY)
+    #     endif
+    #     if defined (ZMQ_AFFINITY)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_affinity (self, 1);
     assert (zsock_affinity (self) == 1);
     zsock_affinity (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_IDENTITY)
+    #     endif
+    #     if defined (ZMQ_IDENTITY)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_identity (self, "test");
@@ -4739,146 +4836,147 @@ This is the class self test code:
     assert (identity);
     free (identity);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_RATE)
+    #     endif
+    #     if defined (ZMQ_RATE)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_rate (self, 1);
     assert (zsock_rate (self) == 1);
     zsock_rate (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_RECOVERY_IVL)
+    #     endif
+    #     if defined (ZMQ_RECOVERY_IVL)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_recovery_ivl (self, 1);
     assert (zsock_recovery_ivl (self) == 1);
     zsock_recovery_ivl (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_RECOVERY_IVL_MSEC)
+    #     endif
+    #     if defined (ZMQ_RECOVERY_IVL_MSEC)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_recovery_ivl_msec (self, 1);
     assert (zsock_recovery_ivl_msec (self) == 1);
     zsock_recovery_ivl_msec (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_MCAST_LOOP)
+    #     endif
+    #     if defined (ZMQ_MCAST_LOOP)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_mcast_loop (self, 1);
     assert (zsock_mcast_loop (self) == 1);
     zsock_mcast_loop (self);
     zsock_destroy (&self);
-#     endif
-#   if (ZMQ_VERSION_MINOR == 2)
-#     if defined (ZMQ_RCVTIMEO)
+    #     endif
+    #   if (ZMQ_VERSION_MINOR == 2)
+    #     if defined (ZMQ_RCVTIMEO)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_rcvtimeo (self, 1);
     assert (zsock_rcvtimeo (self) == 1);
     zsock_rcvtimeo (self);
     zsock_destroy (&self);
-#     endif
-#   endif
-#   if (ZMQ_VERSION_MINOR == 2)
-#     if defined (ZMQ_SNDTIMEO)
+    #     endif
+    #   endif
+    #   if (ZMQ_VERSION_MINOR == 2)
+    #     if defined (ZMQ_SNDTIMEO)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_sndtimeo (self, 1);
     assert (zsock_sndtimeo (self) == 1);
     zsock_sndtimeo (self);
     zsock_destroy (&self);
-#     endif
-#   endif
-#     if defined (ZMQ_SNDBUF)
+    #     endif
+    #   endif
+    #     if defined (ZMQ_SNDBUF)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_sndbuf (self, 1);
     assert (zsock_sndbuf (self) == 1);
     zsock_sndbuf (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_RCVBUF)
+    #     endif
+    #     if defined (ZMQ_RCVBUF)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_rcvbuf (self, 1);
     assert (zsock_rcvbuf (self) == 1);
     zsock_rcvbuf (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_LINGER)
+    #     endif
+    #     if defined (ZMQ_LINGER)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_linger (self, 1);
     assert (zsock_linger (self) == 1);
     zsock_linger (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_RECONNECT_IVL)
+    #     endif
+    #     if defined (ZMQ_RECONNECT_IVL)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_reconnect_ivl (self, 1);
     assert (zsock_reconnect_ivl (self) == 1);
     zsock_reconnect_ivl (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_RECONNECT_IVL_MAX)
+    #     endif
+    #     if defined (ZMQ_RECONNECT_IVL_MAX)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_reconnect_ivl_max (self, 1);
     assert (zsock_reconnect_ivl_max (self) == 1);
     zsock_reconnect_ivl_max (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_BACKLOG)
+    #     endif
+    #     if defined (ZMQ_BACKLOG)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_backlog (self, 1);
     assert (zsock_backlog (self) == 1);
     zsock_backlog (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_SUBSCRIBE)
+    #     endif
+    #     if defined (ZMQ_SUBSCRIBE)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_subscribe (self, "test");
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_UNSUBSCRIBE)
+    #     endif
+    #     if defined (ZMQ_UNSUBSCRIBE)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_set_unsubscribe (self, "test");
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_TYPE)
+    #     endif
+    #     if defined (ZMQ_TYPE)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_type (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_RCVMORE)
+    #     endif
+    #     if defined (ZMQ_RCVMORE)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_rcvmore (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_FD)
+    #     endif
+    #     if defined (ZMQ_FD)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_fd (self);
     zsock_destroy (&self);
-#     endif
-#     if defined (ZMQ_EVENTS)
+    #     endif
+    #     if defined (ZMQ_EVENTS)
     self = zsock_new (ZMQ_SUB);
     assert (self);
     zsock_events (self);
     zsock_destroy (&self);
-#     endif
-#endif
+    #     endif
+    #endif
+    
 
-
+<A name="toc4-4930" title="zstr - sending and receiving strings" />
 #### zstr - sending and receiving strings
 
 The zstr class provides utility functions for sending and receiving C
@@ -4956,6 +5054,7 @@ This is the class self test code:
 
     //  Create two PAIR sockets and connect over inproc
 
+<A name="toc4-5008" title="zsys - system-level methods" />
 #### zsys - system-level methods
 
 The zsys class provides a portable wrapper for system calls. We collect
@@ -4977,7 +5076,14 @@ This is the class interface:
     //  times. Returns global CZMQ context.
     CZMQ_EXPORT void *
         zsys_init (void);
-        
+    
+    //  Optionally shut down the CZMQ zsys layer; this normally happens automatically
+    //  when the process exits; however this call lets you force a shutdown
+    //  earlier, avoiding any potential problems with atexit() ordering, especially
+    //  with Windows dlls.
+    CZMQ_EXPORT void
+        zsys_shutdown (void);
+    
     //  Get a new ZMQ socket, automagically creating a ZMQ context if this is
     //  the first time. Caller is responsible for destroying the ZMQ socket
     //  before process exits, to avoid a ZMQ deadlock. Note: you should not use
@@ -5267,7 +5373,7 @@ This is the class interface:
 This is the class self test code:
 
     zsys_catch_interrupts ();
-
+    
     //  Check capabilities without using the return value
     int rc = zsys_has_curve ();
     
@@ -5284,26 +5390,26 @@ This is the class self test code:
     zsys_set_rcvhwm (1000);
     zsys_set_pipehwm (2500);
     assert (zsys_pipehwm () == 2500);
-
+    
     zsys_set_ipv6 (0);
-
+    
     rc = zsys_file_delete ("nosuchfile");
     assert (rc == -1);
-
+    
     bool rc_bool = zsys_file_exists ("nosuchfile");
     assert (rc_bool != true);
-
+    
     rc = (int) zsys_file_size ("nosuchfile");
     assert (rc == -1);
-
+    
     time_t when = zsys_file_modified (".");
     assert (when > 0);
-
+    
     mode_t mode = zsys_file_mode (".");
     assert (S_ISDIR (mode));
     assert (mode & S_IRUSR);
     assert (mode & S_IWUSR);
-
+    
     zsys_file_mode_private ();
     rc = zsys_dir_create ("%s/%s", ".", ".testsys/subdir");
     assert (rc == 0);
@@ -5315,23 +5421,23 @@ This is the class self test code:
     rc = zsys_dir_delete ("%s/%s", ".", ".testsys");
     assert (rc == 0);
     zsys_file_mode_default ();
-
+    
     int major, minor, patch;
     zsys_version (&major, &minor, &patch);
     assert (major == CZMQ_VERSION_MAJOR);
     assert (minor == CZMQ_VERSION_MINOR);
     assert (patch == CZMQ_VERSION_PATCH);
-
+    
     char *string = zsys_sprintf ("%s %02x", "Hello", 16);
     assert (streq (string, "Hello 10"));
     free (string);
-
+    
     char *str64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890,.";
     int num10 = 1234567890;
     string = zsys_sprintf ("%s%s%s%s%d", str64, str64, str64, str64, num10);
     assert (strlen (string) == (4 * 64 + 10));
     free (string);
-
+    
     //  Test logging system
     zsys_set_logident ("czmq_selftest");
     zsys_set_logsender ("inproc://logging");
@@ -5341,7 +5447,7 @@ This is the class self test code:
     assert (rc == 0);
     rc = zmq_setsockopt (logger, ZMQ_SUBSCRIBE, "", 0);
     assert (rc == 0);
-        
+    
     if (verbose) {
         zsys_error ("This is an %s message", "error");
         zsys_warning ("This is a %s message", "warning");
@@ -5351,7 +5457,7 @@ This is the class self test code:
         zsys_set_logident ("hello, world");
         zsys_info ("This is a %s message", "info");
         zsys_debug ("This is a %s message", "debug");
-
+    
         //  Check that logsender functionality is working
         char *received = zstr_recv (logger);
         assert (received);
@@ -5359,6 +5465,7 @@ This is the class self test code:
     }
     zsys_close (logger, NULL, 0);
 
+<A name="toc4-5419" title="zuuid - UUID support class" />
 #### zuuid - UUID support class
 
 The zuuid class generates UUIDs and provides methods for working with
@@ -5428,7 +5535,7 @@ This is the class self test code:
     assert (strlen (zuuid_str (uuid)) == 32);
     zuuid_t *copy = zuuid_dup (uuid);
     assert (streq (zuuid_str (uuid), zuuid_str (copy)));
-
+    
     //  Check set/set_str/export methods
     const char *myuuid = "8CB3E9A9649B4BEF8DE225E9C2CEBB38";
     zuuid_set_str (uuid, myuuid);
@@ -5442,14 +5549,15 @@ This is the class self test code:
     zuuid_destroy (&copy);
 
 
-<A name="toc3-170" title="API v2 Summary" />
+<A name="toc3-5503" title="API v2 Summary" />
 ### API v2 Summary
 
 This is the deprecated API provided by CZMQ v2.x, in alphabetical order.
 
+<A name="toc4-5508" title="zauth_v2 - authentication for ZeroMQ servers (deprecated)" />
 #### zauth_v2 - authentication for ZeroMQ servers (deprecated)
 
-A zauth object takes over authentication for all incoming connections in 
+A zauth object takes over authentication for all incoming connections in
 its context.
 
 This class is deprecated in CZMQ v3; it works together with zctx, zsocket,
@@ -5522,16 +5630,16 @@ This is the class interface:
 This is the class self test code:
 
     //  Create temporary directory for test files
-#   define TESTDIR ".test_zauth"
+    #   define TESTDIR ".test_zauth"
     zsys_dir_create (TESTDIR);
-
+    
     //  Install the authenticator
     zctx_t *ctx = zctx_new ();
     assert (ctx);
     zauth_t *auth = zauth_new (ctx);
     assert (auth);
     zauth_set_verbose (auth, verbose);
-
+    
     //  A default NULL connection should always success, and not
     //  go through our authentication infrastructure at all.
     void *server = zsocket_new (ctx, ZMQ_PUSH);
@@ -5540,33 +5648,33 @@ This is the class self test code:
     assert (client);
     bool success = s_can_connect (ctx, &server, &client);
     assert (success);
-
+    
     //  When we set a domain on the server, we switch on authentication
     //  for NULL sockets, but with no policies, the client connection
     //  will be allowed.
     zsocket_set_zap_domain (server, "global");
     success = s_can_connect (ctx, &server, &client);
     assert (success);
-
+    
     //  Blacklist 127.0.0.1, connection should fail
     zsocket_set_zap_domain (server, "global");
     zauth_deny (auth, "127.0.0.1");
     success = s_can_connect (ctx, &server, &client);
     assert (!success);
-
+    
     //  Whitelist our address, which overrides the blacklist
     zsocket_set_zap_domain (server, "global");
     zauth_allow (auth, "127.0.0.1");
     success = s_can_connect (ctx, &server, &client);
     assert (success);
-
+    
     //  Try PLAIN authentication
     zsocket_set_plain_server (server, 1);
     zsocket_set_plain_username (client, "admin");
     zsocket_set_plain_password (client, "Password");
     success = s_can_connect (ctx, &server, &client);
     assert (!success);
-
+    
     FILE *password = fopen (TESTDIR "/password-file", "w");
     assert (password);
     fprintf (password, "admin=Password\n");
@@ -5577,13 +5685,13 @@ This is the class self test code:
     zauth_configure_plain (auth, "*", TESTDIR "/password-file");
     success = s_can_connect (ctx, &server, &client);
     assert (success);
-
+    
     zsocket_set_plain_server (server, 1);
     zsocket_set_plain_username (client, "admin");
     zsocket_set_plain_password (client, "Bogus");
     success = s_can_connect (ctx, &server, &client);
     assert (!success);
-
+    
     if (zsys_has_curve ()) {
         //  Try CURVE authentication
         //  We'll create two new certificates and save the client public
@@ -5594,7 +5702,7 @@ This is the class self test code:
         zcert_t *client_cert = zcert_new ();
         assert (client_cert);
         char *server_key = zcert_public_txt (server_cert);
-
+    
         //  Test without setting-up any authentication
         zcert_apply (server_cert, server);
         zcert_apply (client_cert, client);
@@ -5602,7 +5710,7 @@ This is the class self test code:
         zsocket_set_curve_serverkey (client, server_key);
         success = s_can_connect (ctx, &server, &client);
         assert (!success);
-
+    
         //  Test CURVE_ALLOW_ANY
         zcert_apply (server_cert, server);
         zcert_apply (client_cert, client);
@@ -5611,7 +5719,7 @@ This is the class self test code:
         zauth_configure_curve (auth, "*", CURVE_ALLOW_ANY);
         success = s_can_connect (ctx, &server, &client);
         assert (success);
-
+    
         //  Test full client authentication using certificates
         zcert_apply (server_cert, server);
         zcert_apply (client_cert, client);
@@ -5621,7 +5729,7 @@ This is the class self test code:
         zauth_configure_curve (auth, "*", TESTDIR);
         success = s_can_connect (ctx, &server, &client);
         assert (success);
-
+    
         zcert_destroy (&server_cert);
         zcert_destroy (&client_cert);
     }
@@ -5629,15 +5737,16 @@ This is the class self test code:
     zauth_destroy (&auth);
     success = s_can_connect (ctx, &server, &client);
     assert (success);
-
+    
     zctx_destroy (&ctx);
-
+    
     //  Delete all test files
     zdir_t *dir = zdir_new (TESTDIR, NULL);
     assert (dir);
     zdir_remove (dir, true);
     zdir_destroy (&dir);
 
+<A name="toc4-5700" title="zctx - working with ØMQ contexts (deprecated)" />
 #### zctx - working with ØMQ contexts (deprecated)
 
 The zctx class wraps ØMQ contexts. It manages open sockets in the context
@@ -5732,7 +5841,7 @@ This is the class self test code:
     assert (ctx);
     zctx_destroy (&ctx);
     assert (ctx == NULL);
-
+    
     //  Create a context with many busy sockets, destroy it
     ctx = zctx_new ();
     assert (ctx);
@@ -5765,6 +5874,7 @@ This is the class self test code:
     assert (zctx_underlying (ctx));
     zctx_destroy (&ctx);
 
+<A name="toc4-5828" title="zmonitor_v2 - socket event monitor (deprecated)" />
 #### zmonitor_v2 - socket event monitor (deprecated)
 
 The zmonitor class provides an API for obtaining socket events such as
@@ -5814,46 +5924,47 @@ This is the class self test code:
     zctx_t *ctx = zctx_new ();
     assert (ctx);
     bool result;
-
+    
     void *sink = zsocket_new (ctx, ZMQ_PULL);
     assert (sink);
     zmonitor_t *sinkmon = zmonitor_new (ctx,
-        sink, ZMQ_EVENT_LISTENING | ZMQ_EVENT_ACCEPTED);
+                                        sink, ZMQ_EVENT_LISTENING | ZMQ_EVENT_ACCEPTED);
     assert (sinkmon);
     zmonitor_set_verbose (sinkmon, verbose);
-
+    
     //  Check sink is now listening
     int port_nbr = zsocket_bind (sink, "tcp://127.0.0.1:*");
     assert (port_nbr != -1);
     result = s_check_event (sinkmon, ZMQ_EVENT_LISTENING);
     assert (result);
-
+    
     void *source = zsocket_new (ctx, ZMQ_PUSH);
     assert (source);
     zmonitor_t *sourcemon = zmonitor_new (ctx,
-        source, ZMQ_EVENT_CONNECTED | ZMQ_EVENT_DISCONNECTED);
+                                          source, ZMQ_EVENT_CONNECTED | ZMQ_EVENT_DISCONNECTED);
     assert (sourcemon);
     zmonitor_set_verbose (sourcemon, verbose);
     zsocket_connect (source, "tcp://127.0.0.1:%d", port_nbr);
-
+    
     //  Check source connected to sink
     result = s_check_event (sourcemon, ZMQ_EVENT_CONNECTED);
     assert (result);
-
+    
     //  Check sink accepted connection
     result = s_check_event (sinkmon, ZMQ_EVENT_ACCEPTED);
     assert (result);
-
+    
     zmonitor_destroy (&sinkmon);
     zmonitor_destroy (&sourcemon);
     zctx_destroy (&ctx);
 
+<A name="toc4-5912" title="zmutex - working with mutexes (deprecated)" />
 #### zmutex - working with mutexes (deprecated)
 
 The zmutex class provides a portable wrapper for mutexes. Please do not
 use this class to do multi-threading. It is for the rare case where you
 absolutely need thread-safe global state. This should happen in system
-code only. DO NOT USE THIS TO SHARE SOCKETS BETWEEN THREADS, OR DARK 
+code only. DO NOT USE THIS TO SHARE SOCKETS BETWEEN THREADS, OR DARK
 THINGS WILL HAPPEN TO YOUR CODE.
 
 
@@ -5891,6 +6002,7 @@ This is the class self test code:
     zmutex_unlock (mutex);
     zmutex_destroy (&mutex);
 
+<A name="toc4-5956" title="zproxy_v2 - run a steerable proxy in the background (deprecated)" />
 #### zproxy_v2 - run a steerable proxy in the background (deprecated)
 
 The zproxy class provides an equivalent to the ZMQ steerable proxy, on
@@ -5951,7 +6063,7 @@ This is the class self test code:
     assert (rc == 0);
     zproxy_t *proxy = zproxy_new (ctx, frontend, backend);
     assert (proxy);
-
+    
     //  Connect application sockets to proxy
     void *faucet = zsocket_new (ctx, ZMQ_PUSH);
     assert (faucet);
@@ -5961,7 +6073,7 @@ This is the class self test code:
     assert (sink);
     rc = zsocket_connect (sink, "inproc://backend");
     assert (rc == 0);
-
+    
     //  Send some messages and check they arrived
     zstr_send (faucet, "Hello");
     char *string = zstr_recv (sink);
@@ -5971,7 +6083,7 @@ This is the class self test code:
     //  Check pause/resume functionality
     zproxy_pause (proxy);
     zstr_send (faucet, "World");
-
+    
     zproxy_resume (proxy);
     string = zstr_recv (sink);
     assert (streq (string, "World"));
@@ -5982,7 +6094,7 @@ This is the class self test code:
     assert (capture);
     rc = zsocket_bind (capture, "inproc://capture");
     assert (rc == 0);
-
+    
     //  Switch on capturing, check that it works
     zproxy_capture (proxy, "inproc://capture");
     zstr_send (faucet, "Hello");
@@ -5996,8 +6108,9 @@ This is the class self test code:
     zstr_free (&string);
     zproxy_destroy (&proxy);
     zctx_destroy (&ctx);
+    
 
-
+<A name="toc4-6064" title="zsocket - working with ØMQ sockets (deprecated)" />
 #### zsocket - working with ØMQ sockets (deprecated)
 
 The zsocket class provides helper functions for ØMQ sockets. It doesn't
@@ -6085,12 +6198,12 @@ This is the class self test code:
 
     zctx_t *ctx = zctx_new ();
     assert (ctx);
-
+    
     //  Create a detached thread, let it run
     char *interf = "*";
     char *domain = "localhost";
     int service = 5560;
-
+    
     void *writer = zsocket_new (ctx, ZMQ_PUSH);
     assert (writer);
     void *reader = zsocket_new (ctx, ZMQ_PULL);
@@ -6099,22 +6212,22 @@ This is the class self test code:
     assert (streq (zsocket_type_str (reader), "PULL"));
     int rc = zsocket_bind (writer, "tcp://%s:%d", interf, service);
     assert (rc == service);
-
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
+    
+    #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 2, 0))
     //  Check unbind
     rc = zsocket_unbind (writer, "tcp://%s:%d", interf, service);
     assert (rc == 0);
-
+    
     //  In some cases and especially when running under Valgrind, doing
     //  a bind immediately after an unbind causes an EADDRINUSE error.
     //  Even a short sleep allows the OS to release the port for reuse.
     zclock_sleep (100);
-
+    
     //  Bind again
     rc = zsocket_bind (writer, "tcp://%s:%d", interf, service);
     assert (rc == service);
-#endif
-
+    #endif
+    
     rc = zsocket_connect (reader, "tcp://%s:%d", domain, service);
     assert (rc == 0);
     zstr_send (writer, "HELLO");
@@ -6122,45 +6235,46 @@ This is the class self test code:
     assert (message);
     assert (streq (message, "HELLO"));
     free (message);
-
+    
     //  Test binding to ports
     int port = zsocket_bind (writer, "tcp://%s:*", interf);
     assert (port >= ZSOCKET_DYNFROM && port <= ZSOCKET_DYNTO);
-
+    
     assert (zsocket_poll (writer, 100) == false);
-
+    
     //  Test error state when connecting to an invalid socket type
     //  ('txp://' instead of 'tcp://', typo intentional)
     rc = zsocket_connect (reader, "txp://%s:%d", domain, service);
     assert (rc == -1);
-
+    
     //  Test sending frames to socket
-    rc = zsocket_sendmem (writer,"ABC", 3, ZFRAME_MORE);
+    rc = zsocket_sendmem (writer, "ABC", 3, ZFRAME_MORE);
     assert (rc == 0);
     rc = zsocket_sendmem (writer, "DEFG", 4, 0);
     assert (rc == 0);
-
+    
     zframe_t *frame = zframe_recv (reader);
     assert (frame);
     assert (zframe_streq (frame, "ABC"));
     assert (zframe_more (frame));
     zframe_destroy (&frame);
-
+    
     frame = zframe_recv (reader);
     assert (frame);
     assert (zframe_streq (frame, "DEFG"));
     assert (!zframe_more (frame));
     zframe_destroy (&frame);
-
+    
     rc = zsocket_signal (writer);
     assert (rc == 0);
     rc = zsocket_wait (reader);
     assert (rc == 0);
-
+    
     zsocket_destroy (ctx, reader);
     zsocket_destroy (ctx, writer);
     zctx_destroy (&ctx);
 
+<A name="toc4-6228" title="zsockopt - get/set ØMQ socket options (deprecated)" />
 #### zsockopt - get/set ØMQ socket options (deprecated)
 
 The zsockopt class provides access to the ØMQ getsockopt/setsockopt API.
@@ -6391,52 +6505,52 @@ This is the class self test code:
     zctx_t *ctx = zctx_new ();
     assert (ctx);
     void *zocket;
-#if (ZMQ_VERSION_MAJOR == 4)
-#     if defined (ZMQ_TOS)
+    #if (ZMQ_VERSION_MAJOR == 4)
+    #     if defined (ZMQ_TOS)
     zocket = zsocket_new (ctx, ZMQ_DEALER);
     assert (zocket);
     zsocket_set_tos (zocket, 1);
     assert (zsocket_tos (zocket) == 1);
     zsocket_tos (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_ROUTER_HANDOVER)
+    #     endif
+    #     if defined (ZMQ_ROUTER_HANDOVER)
     zocket = zsocket_new (ctx, ZMQ_ROUTER);
     assert (zocket);
     zsocket_set_router_handover (zocket, 1);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_ROUTER_MANDATORY)
+    #     endif
+    #     if defined (ZMQ_ROUTER_MANDATORY)
     zocket = zsocket_new (ctx, ZMQ_ROUTER);
     assert (zocket);
     zsocket_set_router_mandatory (zocket, 1);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_PROBE_ROUTER)
+    #     endif
+    #     if defined (ZMQ_PROBE_ROUTER)
     zocket = zsocket_new (ctx, ZMQ_DEALER);
     assert (zocket);
     zsocket_set_probe_router (zocket, 1);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_REQ_RELAXED)
+    #     endif
+    #     if defined (ZMQ_REQ_RELAXED)
     zocket = zsocket_new (ctx, ZMQ_REQ);
     assert (zocket);
     zsocket_set_req_relaxed (zocket, 1);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_REQ_CORRELATE)
+    #     endif
+    #     if defined (ZMQ_REQ_CORRELATE)
     zocket = zsocket_new (ctx, ZMQ_REQ);
     assert (zocket);
     zsocket_set_req_correlate (zocket, 1);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_CONFLATE)
+    #     endif
+    #     if defined (ZMQ_CONFLATE)
     zocket = zsocket_new (ctx, ZMQ_PUSH);
     assert (zocket);
     zsocket_set_conflate (zocket, 1);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_ZAP_DOMAIN)
+    #     endif
+    #     if defined (ZMQ_ZAP_DOMAIN)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_zap_domain (zocket, "test");
@@ -6444,22 +6558,22 @@ This is the class self test code:
     assert (zap_domain);
     free (zap_domain);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_MECHANISM)
+    #     endif
+    #     if defined (ZMQ_MECHANISM)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_mechanism (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_PLAIN_SERVER)
+    #     endif
+    #     if defined (ZMQ_PLAIN_SERVER)
     zocket = zsocket_new (ctx, ZMQ_PUB);
     assert (zocket);
     zsocket_set_plain_server (zocket, 1);
     assert (zsocket_plain_server (zocket) == 1);
     zsocket_plain_server (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_PLAIN_USERNAME)
+    #     endif
+    #     if defined (ZMQ_PLAIN_USERNAME)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_plain_username (zocket, "test");
@@ -6467,8 +6581,8 @@ This is the class self test code:
     assert (plain_username);
     free (plain_username);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_PLAIN_PASSWORD)
+    #     endif
+    #     if defined (ZMQ_PLAIN_PASSWORD)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_plain_password (zocket, "test");
@@ -6476,86 +6590,86 @@ This is the class self test code:
     assert (plain_password);
     free (plain_password);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_IPV6)
+    #     endif
+    #     if defined (ZMQ_IPV6)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_ipv6 (zocket, 1);
     assert (zsocket_ipv6 (zocket) == 1);
     zsocket_ipv6 (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_IMMEDIATE)
+    #     endif
+    #     if defined (ZMQ_IMMEDIATE)
     zocket = zsocket_new (ctx, ZMQ_DEALER);
     assert (zocket);
     zsocket_set_immediate (zocket, 1);
     assert (zsocket_immediate (zocket) == 1);
     zsocket_immediate (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_ROUTER_RAW)
+    #     endif
+    #     if defined (ZMQ_ROUTER_RAW)
     zocket = zsocket_new (ctx, ZMQ_ROUTER);
     assert (zocket);
     zsocket_set_router_raw (zocket, 1);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_IPV4ONLY)
+    #     endif
+    #     if defined (ZMQ_IPV4ONLY)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_ipv4only (zocket, 1);
     assert (zsocket_ipv4only (zocket) == 1);
     zsocket_ipv4only (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
+    #     endif
+    #     if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
     zocket = zsocket_new (ctx, ZMQ_PUB);
     assert (zocket);
     zsocket_set_delay_attach_on_connect (zocket, 1);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_TYPE)
+    #     endif
+    #     if defined (ZMQ_TYPE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_type (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_SNDHWM)
+    #     endif
+    #     if defined (ZMQ_SNDHWM)
     zocket = zsocket_new (ctx, ZMQ_PUB);
     assert (zocket);
     zsocket_set_sndhwm (zocket, 1);
     assert (zsocket_sndhwm (zocket) == 1);
     zsocket_sndhwm (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_RCVHWM)
+    #     endif
+    #     if defined (ZMQ_RCVHWM)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_rcvhwm (zocket, 1);
     assert (zsocket_rcvhwm (zocket) == 1);
     zsocket_rcvhwm (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_AFFINITY)
+    #     endif
+    #     if defined (ZMQ_AFFINITY)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_affinity (zocket, 1);
     assert (zsocket_affinity (zocket) == 1);
     zsocket_affinity (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_SUBSCRIBE)
+    #     endif
+    #     if defined (ZMQ_SUBSCRIBE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_subscribe (zocket, "test");
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_UNSUBSCRIBE)
+    #     endif
+    #     if defined (ZMQ_UNSUBSCRIBE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_unsubscribe (zocket, "test");
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_IDENTITY)
+    #     endif
+    #     if defined (ZMQ_IDENTITY)
     zocket = zsocket_new (ctx, ZMQ_DEALER);
     assert (zocket);
     zsocket_set_identity (zocket, "test");
@@ -6563,142 +6677,142 @@ This is the class self test code:
     assert (identity);
     free (identity);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_RATE)
+    #     endif
+    #     if defined (ZMQ_RATE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_rate (zocket, 1);
     assert (zsocket_rate (zocket) == 1);
     zsocket_rate (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_RECOVERY_IVL)
+    #     endif
+    #     if defined (ZMQ_RECOVERY_IVL)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_recovery_ivl (zocket, 1);
     assert (zsocket_recovery_ivl (zocket) == 1);
     zsocket_recovery_ivl (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_SNDBUF)
+    #     endif
+    #     if defined (ZMQ_SNDBUF)
     zocket = zsocket_new (ctx, ZMQ_PUB);
     assert (zocket);
     zsocket_set_sndbuf (zocket, 1);
     assert (zsocket_sndbuf (zocket) == 1);
     zsocket_sndbuf (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_RCVBUF)
+    #     endif
+    #     if defined (ZMQ_RCVBUF)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_rcvbuf (zocket, 1);
     assert (zsocket_rcvbuf (zocket) == 1);
     zsocket_rcvbuf (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_LINGER)
+    #     endif
+    #     if defined (ZMQ_LINGER)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_linger (zocket, 1);
     assert (zsocket_linger (zocket) == 1);
     zsocket_linger (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_RECONNECT_IVL)
+    #     endif
+    #     if defined (ZMQ_RECONNECT_IVL)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_reconnect_ivl (zocket, 1);
     assert (zsocket_reconnect_ivl (zocket) == 1);
     zsocket_reconnect_ivl (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_RECONNECT_IVL_MAX)
+    #     endif
+    #     if defined (ZMQ_RECONNECT_IVL_MAX)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_reconnect_ivl_max (zocket, 1);
     assert (zsocket_reconnect_ivl_max (zocket) == 1);
     zsocket_reconnect_ivl_max (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_BACKLOG)
+    #     endif
+    #     if defined (ZMQ_BACKLOG)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_backlog (zocket, 1);
     assert (zsocket_backlog (zocket) == 1);
     zsocket_backlog (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_MAXMSGSIZE)
+    #     endif
+    #     if defined (ZMQ_MAXMSGSIZE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_maxmsgsize (zocket, 1);
     assert (zsocket_maxmsgsize (zocket) == 1);
     zsocket_maxmsgsize (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_MULTICAST_HOPS)
+    #     endif
+    #     if defined (ZMQ_MULTICAST_HOPS)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_multicast_hops (zocket, 1);
     assert (zsocket_multicast_hops (zocket) == 1);
     zsocket_multicast_hops (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_RCVTIMEO)
+    #     endif
+    #     if defined (ZMQ_RCVTIMEO)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_rcvtimeo (zocket, 1);
     assert (zsocket_rcvtimeo (zocket) == 1);
     zsocket_rcvtimeo (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_SNDTIMEO)
+    #     endif
+    #     if defined (ZMQ_SNDTIMEO)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_sndtimeo (zocket, 1);
     assert (zsocket_sndtimeo (zocket) == 1);
     zsocket_sndtimeo (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_XPUB_VERBOSE)
+    #     endif
+    #     if defined (ZMQ_XPUB_VERBOSE)
     zocket = zsocket_new (ctx, ZMQ_XPUB);
     assert (zocket);
     zsocket_set_xpub_verbose (zocket, 1);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_TCP_KEEPALIVE)
+    #     endif
+    #     if defined (ZMQ_TCP_KEEPALIVE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_tcp_keepalive (zocket, 1);
     assert (zsocket_tcp_keepalive (zocket) == 1);
     zsocket_tcp_keepalive (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_TCP_KEEPALIVE_IDLE)
+    #     endif
+    #     if defined (ZMQ_TCP_KEEPALIVE_IDLE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_tcp_keepalive_idle (zocket, 1);
     assert (zsocket_tcp_keepalive_idle (zocket) == 1);
     zsocket_tcp_keepalive_idle (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_TCP_KEEPALIVE_CNT)
+    #     endif
+    #     if defined (ZMQ_TCP_KEEPALIVE_CNT)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_tcp_keepalive_cnt (zocket, 1);
     assert (zsocket_tcp_keepalive_cnt (zocket) == 1);
     zsocket_tcp_keepalive_cnt (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_TCP_KEEPALIVE_INTVL)
+    #     endif
+    #     if defined (ZMQ_TCP_KEEPALIVE_INTVL)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_tcp_keepalive_intvl (zocket, 1);
     assert (zsocket_tcp_keepalive_intvl (zocket) == 1);
     zsocket_tcp_keepalive_intvl (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_TCP_ACCEPT_FILTER)
+    #     endif
+    #     if defined (ZMQ_TCP_ACCEPT_FILTER)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_tcp_accept_filter (zocket, "127.0.0.1");
@@ -6706,99 +6820,99 @@ This is the class self test code:
     assert (tcp_accept_filter);
     free (tcp_accept_filter);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_RCVMORE)
+    #     endif
+    #     if defined (ZMQ_RCVMORE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_rcvmore (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_FD)
+    #     endif
+    #     if defined (ZMQ_FD)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_fd (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_EVENTS)
+    #     endif
+    #     if defined (ZMQ_EVENTS)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_events (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_LAST_ENDPOINT)
+    #     endif
+    #     if defined (ZMQ_LAST_ENDPOINT)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     char *last_endpoint = zsocket_last_endpoint (zocket);
     assert (last_endpoint);
     free (last_endpoint);
     zsocket_destroy (ctx, zocket);
-#     endif
-#endif
-
-#if (ZMQ_VERSION_MAJOR == 3)
-#     if defined (ZMQ_ROUTER_RAW)
+    #     endif
+    #endif
+    
+    #if (ZMQ_VERSION_MAJOR == 3)
+    #     if defined (ZMQ_ROUTER_RAW)
     zocket = zsocket_new (ctx, ZMQ_ROUTER);
     assert (zocket);
     zsocket_set_router_raw (zocket, 1);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_IPV4ONLY)
+    #     endif
+    #     if defined (ZMQ_IPV4ONLY)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_ipv4only (zocket, 1);
     assert (zsocket_ipv4only (zocket) == 1);
     zsocket_ipv4only (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
+    #     endif
+    #     if defined (ZMQ_DELAY_ATTACH_ON_CONNECT)
     zocket = zsocket_new (ctx, ZMQ_PUB);
     assert (zocket);
     zsocket_set_delay_attach_on_connect (zocket, 1);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_TYPE)
+    #     endif
+    #     if defined (ZMQ_TYPE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_type (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_SNDHWM)
+    #     endif
+    #     if defined (ZMQ_SNDHWM)
     zocket = zsocket_new (ctx, ZMQ_PUB);
     assert (zocket);
     zsocket_set_sndhwm (zocket, 1);
     assert (zsocket_sndhwm (zocket) == 1);
     zsocket_sndhwm (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_RCVHWM)
+    #     endif
+    #     if defined (ZMQ_RCVHWM)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_rcvhwm (zocket, 1);
     assert (zsocket_rcvhwm (zocket) == 1);
     zsocket_rcvhwm (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_AFFINITY)
+    #     endif
+    #     if defined (ZMQ_AFFINITY)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_affinity (zocket, 1);
     assert (zsocket_affinity (zocket) == 1);
     zsocket_affinity (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_SUBSCRIBE)
+    #     endif
+    #     if defined (ZMQ_SUBSCRIBE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_subscribe (zocket, "test");
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_UNSUBSCRIBE)
+    #     endif
+    #     if defined (ZMQ_UNSUBSCRIBE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_unsubscribe (zocket, "test");
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_IDENTITY)
+    #     endif
+    #     if defined (ZMQ_IDENTITY)
     zocket = zsocket_new (ctx, ZMQ_DEALER);
     assert (zocket);
     zsocket_set_identity (zocket, "test");
@@ -6806,142 +6920,142 @@ This is the class self test code:
     assert (identity);
     free (identity);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_RATE)
+    #     endif
+    #     if defined (ZMQ_RATE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_rate (zocket, 1);
     assert (zsocket_rate (zocket) == 1);
     zsocket_rate (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_RECOVERY_IVL)
+    #     endif
+    #     if defined (ZMQ_RECOVERY_IVL)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_recovery_ivl (zocket, 1);
     assert (zsocket_recovery_ivl (zocket) == 1);
     zsocket_recovery_ivl (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_SNDBUF)
+    #     endif
+    #     if defined (ZMQ_SNDBUF)
     zocket = zsocket_new (ctx, ZMQ_PUB);
     assert (zocket);
     zsocket_set_sndbuf (zocket, 1);
     assert (zsocket_sndbuf (zocket) == 1);
     zsocket_sndbuf (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_RCVBUF)
+    #     endif
+    #     if defined (ZMQ_RCVBUF)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_rcvbuf (zocket, 1);
     assert (zsocket_rcvbuf (zocket) == 1);
     zsocket_rcvbuf (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_LINGER)
+    #     endif
+    #     if defined (ZMQ_LINGER)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_linger (zocket, 1);
     assert (zsocket_linger (zocket) == 1);
     zsocket_linger (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_RECONNECT_IVL)
+    #     endif
+    #     if defined (ZMQ_RECONNECT_IVL)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_reconnect_ivl (zocket, 1);
     assert (zsocket_reconnect_ivl (zocket) == 1);
     zsocket_reconnect_ivl (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_RECONNECT_IVL_MAX)
+    #     endif
+    #     if defined (ZMQ_RECONNECT_IVL_MAX)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_reconnect_ivl_max (zocket, 1);
     assert (zsocket_reconnect_ivl_max (zocket) == 1);
     zsocket_reconnect_ivl_max (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_BACKLOG)
+    #     endif
+    #     if defined (ZMQ_BACKLOG)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_backlog (zocket, 1);
     assert (zsocket_backlog (zocket) == 1);
     zsocket_backlog (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_MAXMSGSIZE)
+    #     endif
+    #     if defined (ZMQ_MAXMSGSIZE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_maxmsgsize (zocket, 1);
     assert (zsocket_maxmsgsize (zocket) == 1);
     zsocket_maxmsgsize (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_MULTICAST_HOPS)
+    #     endif
+    #     if defined (ZMQ_MULTICAST_HOPS)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_multicast_hops (zocket, 1);
     assert (zsocket_multicast_hops (zocket) == 1);
     zsocket_multicast_hops (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_RCVTIMEO)
+    #     endif
+    #     if defined (ZMQ_RCVTIMEO)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_rcvtimeo (zocket, 1);
     assert (zsocket_rcvtimeo (zocket) == 1);
     zsocket_rcvtimeo (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_SNDTIMEO)
+    #     endif
+    #     if defined (ZMQ_SNDTIMEO)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_sndtimeo (zocket, 1);
     assert (zsocket_sndtimeo (zocket) == 1);
     zsocket_sndtimeo (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_XPUB_VERBOSE)
+    #     endif
+    #     if defined (ZMQ_XPUB_VERBOSE)
     zocket = zsocket_new (ctx, ZMQ_XPUB);
     assert (zocket);
     zsocket_set_xpub_verbose (zocket, 1);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_TCP_KEEPALIVE)
+    #     endif
+    #     if defined (ZMQ_TCP_KEEPALIVE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_tcp_keepalive (zocket, 1);
     assert (zsocket_tcp_keepalive (zocket) == 1);
     zsocket_tcp_keepalive (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_TCP_KEEPALIVE_IDLE)
+    #     endif
+    #     if defined (ZMQ_TCP_KEEPALIVE_IDLE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_tcp_keepalive_idle (zocket, 1);
     assert (zsocket_tcp_keepalive_idle (zocket) == 1);
     zsocket_tcp_keepalive_idle (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_TCP_KEEPALIVE_CNT)
+    #     endif
+    #     if defined (ZMQ_TCP_KEEPALIVE_CNT)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_tcp_keepalive_cnt (zocket, 1);
     assert (zsocket_tcp_keepalive_cnt (zocket) == 1);
     zsocket_tcp_keepalive_cnt (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_TCP_KEEPALIVE_INTVL)
+    #     endif
+    #     if defined (ZMQ_TCP_KEEPALIVE_INTVL)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_tcp_keepalive_intvl (zocket, 1);
     assert (zsocket_tcp_keepalive_intvl (zocket) == 1);
     zsocket_tcp_keepalive_intvl (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_TCP_ACCEPT_FILTER)
+    #     endif
+    #     if defined (ZMQ_TCP_ACCEPT_FILTER)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_tcp_accept_filter (zocket, "127.0.0.1");
@@ -6949,61 +7063,61 @@ This is the class self test code:
     assert (tcp_accept_filter);
     free (tcp_accept_filter);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_RCVMORE)
+    #     endif
+    #     if defined (ZMQ_RCVMORE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_rcvmore (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_FD)
+    #     endif
+    #     if defined (ZMQ_FD)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_fd (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_EVENTS)
+    #     endif
+    #     if defined (ZMQ_EVENTS)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_events (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_LAST_ENDPOINT)
+    #     endif
+    #     if defined (ZMQ_LAST_ENDPOINT)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     char *last_endpoint = zsocket_last_endpoint (zocket);
     assert (last_endpoint);
     free (last_endpoint);
     zsocket_destroy (ctx, zocket);
-#     endif
-#endif
-
-#if (ZMQ_VERSION_MAJOR == 2)
-#     if defined (ZMQ_HWM)
+    #     endif
+    #endif
+    
+    #if (ZMQ_VERSION_MAJOR == 2)
+    #     if defined (ZMQ_HWM)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_hwm (zocket, 1);
     assert (zsocket_hwm (zocket) == 1);
     zsocket_hwm (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_SWAP)
+    #     endif
+    #     if defined (ZMQ_SWAP)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_swap (zocket, 1);
     assert (zsocket_swap (zocket) == 1);
     zsocket_swap (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_AFFINITY)
+    #     endif
+    #     if defined (ZMQ_AFFINITY)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_affinity (zocket, 1);
     assert (zsocket_affinity (zocket) == 1);
     zsocket_affinity (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_IDENTITY)
+    #     endif
+    #     if defined (ZMQ_IDENTITY)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_identity (zocket, "test");
@@ -7011,147 +7125,148 @@ This is the class self test code:
     assert (identity);
     free (identity);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_RATE)
+    #     endif
+    #     if defined (ZMQ_RATE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_rate (zocket, 1);
     assert (zsocket_rate (zocket) == 1);
     zsocket_rate (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_RECOVERY_IVL)
+    #     endif
+    #     if defined (ZMQ_RECOVERY_IVL)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_recovery_ivl (zocket, 1);
     assert (zsocket_recovery_ivl (zocket) == 1);
     zsocket_recovery_ivl (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_RECOVERY_IVL_MSEC)
+    #     endif
+    #     if defined (ZMQ_RECOVERY_IVL_MSEC)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_recovery_ivl_msec (zocket, 1);
     assert (zsocket_recovery_ivl_msec (zocket) == 1);
     zsocket_recovery_ivl_msec (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_MCAST_LOOP)
+    #     endif
+    #     if defined (ZMQ_MCAST_LOOP)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_mcast_loop (zocket, 1);
     assert (zsocket_mcast_loop (zocket) == 1);
     zsocket_mcast_loop (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#   if (ZMQ_VERSION_MINOR == 2)
-#     if defined (ZMQ_RCVTIMEO)
+    #     endif
+    #   if (ZMQ_VERSION_MINOR == 2)
+    #     if defined (ZMQ_RCVTIMEO)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_rcvtimeo (zocket, 1);
     assert (zsocket_rcvtimeo (zocket) == 1);
     zsocket_rcvtimeo (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#   endif
-#   if (ZMQ_VERSION_MINOR == 2)
-#     if defined (ZMQ_SNDTIMEO)
+    #     endif
+    #   endif
+    #   if (ZMQ_VERSION_MINOR == 2)
+    #     if defined (ZMQ_SNDTIMEO)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_sndtimeo (zocket, 1);
     assert (zsocket_sndtimeo (zocket) == 1);
     zsocket_sndtimeo (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#   endif
-#     if defined (ZMQ_SNDBUF)
+    #     endif
+    #   endif
+    #     if defined (ZMQ_SNDBUF)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_sndbuf (zocket, 1);
     assert (zsocket_sndbuf (zocket) == 1);
     zsocket_sndbuf (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_RCVBUF)
+    #     endif
+    #     if defined (ZMQ_RCVBUF)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_rcvbuf (zocket, 1);
     assert (zsocket_rcvbuf (zocket) == 1);
     zsocket_rcvbuf (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_LINGER)
+    #     endif
+    #     if defined (ZMQ_LINGER)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_linger (zocket, 1);
     assert (zsocket_linger (zocket) == 1);
     zsocket_linger (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_RECONNECT_IVL)
+    #     endif
+    #     if defined (ZMQ_RECONNECT_IVL)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_reconnect_ivl (zocket, 1);
     assert (zsocket_reconnect_ivl (zocket) == 1);
     zsocket_reconnect_ivl (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_RECONNECT_IVL_MAX)
+    #     endif
+    #     if defined (ZMQ_RECONNECT_IVL_MAX)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_reconnect_ivl_max (zocket, 1);
     assert (zsocket_reconnect_ivl_max (zocket) == 1);
     zsocket_reconnect_ivl_max (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_BACKLOG)
+    #     endif
+    #     if defined (ZMQ_BACKLOG)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_backlog (zocket, 1);
     assert (zsocket_backlog (zocket) == 1);
     zsocket_backlog (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_SUBSCRIBE)
+    #     endif
+    #     if defined (ZMQ_SUBSCRIBE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_subscribe (zocket, "test");
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_UNSUBSCRIBE)
+    #     endif
+    #     if defined (ZMQ_UNSUBSCRIBE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_set_unsubscribe (zocket, "test");
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_TYPE)
+    #     endif
+    #     if defined (ZMQ_TYPE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_type (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_RCVMORE)
+    #     endif
+    #     if defined (ZMQ_RCVMORE)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_rcvmore (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_FD)
+    #     endif
+    #     if defined (ZMQ_FD)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_fd (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#     if defined (ZMQ_EVENTS)
+    #     endif
+    #     if defined (ZMQ_EVENTS)
     zocket = zsocket_new (ctx, ZMQ_SUB);
     assert (zocket);
     zsocket_events (zocket);
     zsocket_destroy (ctx, zocket);
-#     endif
-#endif
-
+    #     endif
+    #endif
+    
     zctx_destroy (&ctx);
 
+<A name="toc4-7220" title="zthread - working with system threads (deprecated)" />
 #### zthread - working with system threads (deprecated)
 
 The zthread class wraps OS thread creation. It creates detached threads
@@ -7191,7 +7306,7 @@ a detached thread (this will crash).
 
 If you want to communicate over ipc:// or tcp:// you may be sharing
 the same context, or use separate contexts. Thus, every detached thread
-usually starts by creating its own zctx_t instance.    
+usually starts by creating its own zctx_t instance.
 
 This is the class interface:
 
@@ -7220,22 +7335,22 @@ This is the class interface:
 
 This is the class self test code:
 
-static void *
-s_test_detached (void *args)
-{
+    static void *
+    s_test_detached (void *args)
+    {
     //  Create a socket to check it'll be automatically deleted
     zctx_t *ctx = zctx_new ();
     assert (ctx);
-
+    
     void *push = zsocket_new (ctx, ZMQ_PUSH);
     assert (push);
     zctx_destroy (&ctx);
     return NULL;
-}
-
-static void
-s_test_attached (void *args, zctx_t *ctx, void *pipe)
-{
+    }
+    
+    static void
+    s_test_attached (void *args, zctx_t *ctx, void *pipe)
+    {
     //  Create a socket to check it'll be automatically deleted
     zsocket_new (ctx, ZMQ_PUSH);
     assert (ctx);
@@ -7244,17 +7359,17 @@ s_test_attached (void *args, zctx_t *ctx, void *pipe)
     assert (ping);
     zstr_free (&ping);
     zstr_send (pipe, "pong");
-}
-
+    }
+    
     zctx_t *ctx = zctx_new ();
     assert (ctx);
     int rc = 0;
-
+    
     //  Create a detached thread, let it run
     rc = zthread_new (s_test_detached, NULL);
     assert (rc == 0);
     zclock_sleep (100);
-
+    
     //  Create an attached thread, check it's safely alive
     void *pipe = zthread_fork (ctx, s_test_attached, NULL);
     assert (pipe);
@@ -7263,12 +7378,12 @@ s_test_attached (void *args, zctx_t *ctx, void *pipe)
     assert (pong);
     assert (streq (pong, "pong"));
     zstr_free (&pong);
-
+    
     //  Everything should be cleanly closed now
     zctx_destroy (&ctx);
 
 
-<A name="toc2-184" title="Error Handling" />
+<A name="toc2-7337" title="Error Handling" />
 ## Error Handling
 
 The CZMQ policy is to reduce the error flow to 0/-1 where possible. libzmq still does a lot of errno setting. CZMQ does not do that, as it creates a fuzzy API. Things either work as expected, or they fail, and the application's best strategy is usually to assert on non-zero return codes.
@@ -7285,7 +7400,7 @@ There are a few cases where the return value is overloaded to return -1, 0, or o
 
 The overall goal with this strategy is robustness, and absolute minimal and predictable expression in the code. You can see that it works: the CZMQ code is generally very simple and clear, with a few exceptions of places where people have used their old C style (we fix these over time).
 
-<A name="toc2-201" title="CZMQ Actors" />
+<A name="toc2-7354" title="CZMQ Actors" />
 ## CZMQ Actors
 
 The v2 API had a zthread class that let you create "attached threads" connected to their parent by an inproc:// PIPE socket. In v3 this has been simplified and better wrapped as the zactor class. CZMQ actors are in effect threads with a socket interface. A zactor_t instance works like a socket, and the CZMQ classes that deal with sockets (like zmsg and zpoller) all accept zactor_t references as well as zsock_t and libzmq void * socket handles.
@@ -7431,10 +7546,10 @@ To write an actor, use this template. Note that your actor is a single function 
 
 The selftest code shows how to create, talk to, and destroy an actor.
 
-<A name="toc2-347" title="Under the Hood" />
+<A name="toc2-7500" title="Under the Hood" />
 ## Under the Hood
 
-<A name="toc3-350" title="Adding a New Class" />
+<A name="toc3-7503" title="Adding a New Class" />
 ### Adding a New Class
 
 If you define a new CZMQ class `myclass` you need to:
@@ -7446,7 +7561,7 @@ If you define a new CZMQ class `myclass` you need to:
 * Add myclass to 'model/projects.xml` and read model/README.txt.
 * Add a section to README.txt.
 
-<A name="toc3-362" title="Documentation" />
+<A name="toc3-7515" title="Documentation" />
 ### Documentation
 
 Man pages are generated from the class header and source files via the doc/mkman tool, and similar functionality in the gitdown tool (http://github.com/imatix/gitdown). The header file for a class must wrap its interface as follows (example is from include/zclock.h):
@@ -7485,7 +7600,7 @@ The source file for a class then provides the self test example as follows:
 
 The template for man pages is in doc/mkman.
 
-<A name="toc3-401" title="Development" />
+<A name="toc3-7554" title="Development" />
 ### Development
 
 CZMQ is developed through a test-driven process that guarantees no memory violations or leaks in the code:
@@ -7495,7 +7610,7 @@ CZMQ is developed through a test-driven process that guarantees no memory violat
 * Run the 'selftest' script, which uses the Valgrind memcheck tool.
 * Repeat until perfect.
 
-<A name="toc3-411" title="Porting CZMQ" />
+<A name="toc3-7564" title="Porting CZMQ" />
 ### Porting CZMQ
 
 When you try CZMQ on an OS that it's not been used on (ever, or for a while), you will hit code that does not compile. In some cases the patches are trivial, in other cases (usually when porting to Windows), the work needed to build equivalent functionality may be non-trivial. In any case, the benefit is that once ported, the functionality is available to all applications.
@@ -7506,7 +7621,7 @@ Before attempting to patch code for portability, please read the `czmq_prelude.h
 * Defining macros that rename exotic library functions to more conventional names: do this in czmq_prelude.h.
 * Reimplementing specific methods to use a non-standard API: this is typically needed on Windows. Do this in the relevant class, using #ifdefs to properly differentiate code for different platforms.
 
-<A name="toc3-422" title="Hints to Contributors" />
+<A name="toc3-7575" title="Hints to Contributors" />
 ### Hints to Contributors
 
 CZMQ is a nice, neat library, and you may not immediately appreciate why. Read the CLASS style guide please, and write your code to make it indistinguishable from the rest of the code in the library. That is the only real criteria for good style: it's invisible.
@@ -7518,12 +7633,12 @@ Do read your code after you write it and ask, "Can I make this simpler?" We do u
 Before opening a pull request read our [contribution guidelines](https://github.com/zeromq/czmq/blob/master/CONTRIBUTING.md). Thanks!
 
 
-<A name="toc3-434" title="Code Generation" />
+<A name="toc3-7587" title="Code Generation" />
 ### Code Generation
 
 We generate the zsockopt class using [GSL](https://github.com/imatix/gsl), using a code generator script in scripts/sockopts.gsl. We also generate the project files.
 
-<A name="toc3-439" title="This Document" />
+<A name="toc3-7592" title="This Document" />
 ### This Document
 
 This document is originally at README.txt and is built using [gitdown](http://github.com/imatix/gitdown).

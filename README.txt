@@ -7,7 +7,7 @@
 
 ## Contents
 
-.toc
+.toc 3
 
 ## Overview
 

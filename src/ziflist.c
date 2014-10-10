@@ -1,4 +1,3 @@
-
 /*  =========================================================================
     ziflist - List of network interfaces available on system
 
@@ -356,6 +355,7 @@ ziflist_test (bool verbose)
     if (verbose)
         printf ("\n");
 
+    //  @selftest
     ziflist_t *iflist = ziflist_new ();
     assert (iflist);
     size_t items = ziflist_size (iflist);
@@ -372,5 +372,7 @@ ziflist_test (bool verbose)
     ziflist_reload (iflist);
     assert (items == ziflist_size (iflist));
     ziflist_destroy (&iflist);
+    //  @end
+    
     printf ("OK\n");
 }

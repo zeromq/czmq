@@ -1,4 +1,3 @@
-
 /*  =========================================================================
     zdir_patch - work with directory patches
     A patch is a change to the directory (create/delete).

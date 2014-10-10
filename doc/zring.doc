@@ -150,13 +150,13 @@ This is the class self test code:
     zring_t *ring = zring_new ();
     assert (ring);
     assert (zring_size (ring) == 0);
-
+    
     //  Three items we'll use as test data
     //  Ring items are void *, not particularly strings
     char *cheese = "boursin";
     char *bread = "baguette";
     char *wine = "bordeaux";
-
+    
     int rc = zring_append (ring, cheese);
     assert (!rc);
     assert (zring_size (ring) == 1);
@@ -169,7 +169,7 @@ This is the class self test code:
     assert (!rc);
     assert (zring_size (ring) == 3);
     assert (zring_item (ring) == wine);
-
+    
     assert (zring_first (ring) == cheese);
     assert (zring_next (ring) == bread);
     assert (zring_next (ring) == wine);
@@ -184,7 +184,7 @@ This is the class self test code:
     //  After we reach start of ring, prev wraps around
     assert (zring_prev (ring) == wine);
     zring_purge (ring);
-
+    
     //  Test some list insertion-deletion combos
     assert (zring_size (ring) == 0);
     zring_prepend (ring, "4");
@@ -194,7 +194,7 @@ This is the class self test code:
     zring_prepend (ring, "0");
     zring_append (ring, "1");
     assert (zring_size (ring) == 6);
-
+    
     //  Try the comparator functionality
     zring_set_comparator (ring, (czmq_comparator *) strcmp);
     zring_sort (ring);
@@ -203,7 +203,7 @@ This is the class self test code:
     assert (streq (item, "0"));
     item = (char *) zring_find (ring, "5");
     assert (streq (item, "5"));
-
+    
     //  Try the duplicator and destructor
     zring_set_duplicator (ring, (czmq_duplicator *) strdup);
     zring_t *dup = zring_dup (ring);
@@ -211,7 +211,7 @@ This is the class self test code:
     zring_set_destructor (dup, (czmq_destructor *) zstr_free);
     assert (zring_size (dup) == 6);
     zring_destroy (&dup);
-
+    
     //  We're comparing as strings, not item pointers
     rc = zring_remove (ring, "2");
     assert (rc == 0);
@@ -221,7 +221,7 @@ This is the class self test code:
     assert (rc == 0);
     item = (char *) zring_detach (ring, NULL);
     zring_purge (ring);
-
+    
     //  Try the dictionary insert/delete functionality
     rc = zring_insert (ring, "1", "one");
     assert (rc == 0);

@@ -158,7 +158,7 @@ This is the class interface:
 This is the class self test code:
 
     //  Create temporary directory for test files
-#   define TESTDIR ".test_zconfig"
+    #   define TESTDIR ".test_zconfig"
     zsys_dir_create (TESTDIR);
     
     zconfig_t *root = zconfig_new ("root", NULL);

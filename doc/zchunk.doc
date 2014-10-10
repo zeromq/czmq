@@ -1,7 +1,7 @@
 #### zchunk - work with memory chunks
 
 The zchunk class works with variable sized blobs. Not as efficient as
-ØMQ's messages but they do less weirdness and so are easier to understand.
+MQ's messages but they do less weirdness and so are easier to understand.
 The chunk class has methods to read and write chunks from disk.
 
 
@@ -125,7 +125,7 @@ This is the class self test code:
     assert (zchunk_size (chunk) == 10);
     assert (memcmp (zchunk_data (chunk), "1234567890", 10) == 0);
     zchunk_destroy (&chunk);
-
+    
     chunk = zchunk_new (NULL, 10);
     assert (chunk);
     zchunk_append (chunk, "12345678", 8);
@@ -140,23 +140,23 @@ This is the class self test code:
     string = zchunk_strhex (chunk);
     assert (streq (string, "31323334353637383930"));
     free (string);
-
+    
     zframe_t *frame = zchunk_pack (chunk);
     assert (frame);
-
+    
     zchunk_t *chunk2 = zchunk_unpack (frame);
     assert (chunk2);
     assert (memcmp (zchunk_data (chunk2), "1234567890", 10) == 0);
     zframe_destroy (&frame);
     zchunk_destroy (&chunk2);
-
+    
     zchunk_t *copy = zchunk_dup (chunk);
     assert (copy);
     assert (memcmp (zchunk_data (copy), "1234567890", 10) == 0);
     assert (zchunk_size (copy) == 10);
     zchunk_destroy (&copy);
     zchunk_destroy (&chunk);
-
+    
     copy = zchunk_new ("1234567890abcdefghij", 20);
     assert (copy);
     chunk = zchunk_new (NULL, 8);
