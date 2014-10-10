@@ -9,14 +9,20 @@
 
 
 **<a href="#toc2-13">Overview</a>**
-&emsp;<a href="#toc3-16">Scope and Goals</a>
-&emsp;<a href="#toc3-57">Ownership and License</a>
+
+**<a href="#toc3-16">Scope and Goals</a>**
+
+**<a href="#toc3-57">Ownership and License</a>**
 
 **<a href="#toc2-68">Using CZMQ</a>**
-&emsp;<a href="#toc3-71">Building and Installing</a>
-&emsp;<a href="#toc3-115">Linking with an Application</a>
-&emsp;<a href="#toc3-122">Use from Other Languages</a>
-&emsp;<a href="#toc3-135">API v3 Summary</a>
+
+**<a href="#toc3-71">Building and Installing</a>**
+
+**<a href="#toc3-115">Linking with an Application</a>**
+
+**<a href="#toc3-122">Use from Other Languages</a>**
+
+**<a href="#toc3-135">API v3 Summary</a>**
 &emsp;<a href="#toc4-140">zactor - simple actor framework</a>
 &emsp;<a href="#toc4-207">zauth - authentication for ZeroMQ security mechanisms</a>
 &emsp;<a href="#toc4-420">zbeacon - LAN discovery and presence</a>
@@ -46,7 +52,8 @@
 &emsp;<a href="#toc4-4930">zstr - sending and receiving strings</a>
 &emsp;<a href="#toc4-5008">zsys - system-level methods</a>
 &emsp;<a href="#toc4-5419">zuuid - UUID support class</a>
-&emsp;<a href="#toc3-5503">API v2 Summary</a>
+
+**<a href="#toc3-5503">API v2 Summary</a>**
 &emsp;<a href="#toc4-5508">zauth_v2 - authentication for ZeroMQ servers (deprecated)</a>
 &emsp;<a href="#toc4-5700">zctx - working with ØMQ contexts (deprecated)</a>
 &emsp;<a href="#toc4-5828">zmonitor_v2 - socket event monitor (deprecated)</a>
@@ -61,13 +68,20 @@
 **<a href="#toc2-7354">CZMQ Actors</a>**
 
 **<a href="#toc2-7500">Under the Hood</a>**
-&emsp;<a href="#toc3-7503">Adding a New Class</a>
-&emsp;<a href="#toc3-7515">Documentation</a>
-&emsp;<a href="#toc3-7554">Development</a>
-&emsp;<a href="#toc3-7564">Porting CZMQ</a>
-&emsp;<a href="#toc3-7575">Hints to Contributors</a>
-&emsp;<a href="#toc3-7587">Code Generation</a>
-&emsp;<a href="#toc3-7592">This Document</a>
+
+**<a href="#toc3-7503">Adding a New Class</a>**
+
+**<a href="#toc3-7515">Documentation</a>**
+
+**<a href="#toc3-7554">Development</a>**
+
+**<a href="#toc3-7564">Porting CZMQ</a>**
+
+**<a href="#toc3-7575">Hints to Contributors</a>**
+
+**<a href="#toc3-7587">Code Generation</a>**
+
+**<a href="#toc3-7592">This Document</a>**
 
 <A name="toc2-13" title="Overview" />
 ## Overview
