@@ -1,4 +1,3 @@
-
 /*  =========================================================================
     zhash - generic type-free hash container
 
@@ -14,12 +13,8 @@
 
 /*
 @header
-    Expandable hash table container
+    zhash is an expandable hash table container.
 @discuss
-    Note that it's relatively slow (~50k insertions/deletes per second), so
-    don't do inserts/updates on the critical path for message I/O. It can
-    do ~2.5M lookups per second for 16-char keys. Timed on a 1.6GHz CPU.
-
     The hash table always has a size that is prime and roughly doubles its
     size when 75% full. In case of hash collisions items are chained in a
     linked list. The hash table size is increased slightly (up to 5 times

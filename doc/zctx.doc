@@ -92,7 +92,7 @@ This is the class self test code:
     assert (ctx);
     zctx_destroy (&ctx);
     assert (ctx == NULL);
-
+    
     //  Create a context with many busy sockets, destroy it
     ctx = zctx_new ();
     assert (ctx);

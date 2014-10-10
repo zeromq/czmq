@@ -1,4 +1,3 @@
-
 /*  =========================================================================
     zdigest - provides hashing functions (SHA-1 at present)
 

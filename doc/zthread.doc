@@ -37,7 +37,7 @@ a detached thread (this will crash).
 
 If you want to communicate over ipc:// or tcp:// you may be sharing
 the same context, or use separate contexts. Thus, every detached thread
-usually starts by creating its own zctx_t instance.    
+usually starts by creating its own zctx_t instance.
 
 This is the class interface:
 
@@ -66,22 +66,22 @@ This is the class interface:
 
 This is the class self test code:
 
-static void *
-s_test_detached (void *args)
-{
+    static void *
+    s_test_detached (void *args)
+    {
     //  Create a socket to check it'll be automatically deleted
     zctx_t *ctx = zctx_new ();
     assert (ctx);
-
+    
     void *push = zsocket_new (ctx, ZMQ_PUSH);
     assert (push);
     zctx_destroy (&ctx);
     return NULL;
-}
-
-static void
-s_test_attached (void *args, zctx_t *ctx, void *pipe)
-{
+    }
+    
+    static void
+    s_test_attached (void *args, zctx_t *ctx, void *pipe)
+    {
     //  Create a socket to check it'll be automatically deleted
     zsocket_new (ctx, ZMQ_PUSH);
     assert (ctx);
@@ -90,17 +90,17 @@ s_test_attached (void *args, zctx_t *ctx, void *pipe)
     assert (ping);
     zstr_free (&ping);
     zstr_send (pipe, "pong");
-}
-
+    }
+    
     zctx_t *ctx = zctx_new ();
     assert (ctx);
     int rc = 0;
-
+    
     //  Create a detached thread, let it run
     rc = zthread_new (s_test_detached, NULL);
     assert (rc == 0);
     zclock_sleep (100);
-
+    
     //  Create an attached thread, check it's safely alive
     void *pipe = zthread_fork (ctx, s_test_attached, NULL);
     assert (pipe);
@@ -109,7 +109,7 @@ s_test_attached (void *args, zctx_t *ctx, void *pipe)
     assert (pong);
     assert (streq (pong, "pong"));
     zstr_free (&pong);
-
+    
     //  Everything should be cleanly closed now
     zctx_destroy (&ctx);
 

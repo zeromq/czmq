@@ -1,4 +1,3 @@
-
 /*  =========================================================================
     zauth - authentication for ZeroMQ security mechanisms
 

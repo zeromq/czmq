@@ -72,7 +72,7 @@ a detached thread (this will crash).
 
 If you want to communicate over ipc:// or tcp:// you may be sharing
 the same context, or use separate contexts. Thus, every detached thread
-usually starts by creating its own zctx_t instance.    
+usually starts by creating its own zctx_t instance.
 
 EXAMPLE
 -------

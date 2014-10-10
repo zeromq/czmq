@@ -1,4 +1,3 @@
-
 /*  =========================================================================
     zauth_v2 - authentication for ZeroMQ servers (deprecated)
 

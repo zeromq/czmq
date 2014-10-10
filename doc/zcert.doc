@@ -7,8 +7,8 @@ temporary object in memory, or persisted to disk. On disk, a
 certificate is stored as two files. One is public and contains only
 the public key. The second is secret and contains both keys. The
 two have the same filename, with the secret file adding "_secret".
-To exchange certificates, send the public file via some secure route. 
-Certificates are not signed but are text files that can be verified by 
+To exchange certificates, send the public file via some secure route.
+Certificates are not signed but are text files that can be verified by
 eye.
 
 Certificates are stored in the ZPL (ZMQ RFC 4) format. They have two
@@ -110,7 +110,7 @@ This is the class interface:
 This is the class self test code:
 
     //  Create temporary directory for test files
-#   define TESTDIR ".test_zcert"
+    #   define TESTDIR ".test_zcert"
     zsys_dir_create (TESTDIR);
     
     //  Create a simple certificate with metadata

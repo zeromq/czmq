@@ -1,4 +1,3 @@
-
 #include "../include/czmq.h"
 
 void

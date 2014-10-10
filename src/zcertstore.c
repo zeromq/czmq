@@ -1,4 +1,3 @@
-
 /*  =========================================================================
     zcertstore - work with CURVE security certificate stores
 

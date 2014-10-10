@@ -73,7 +73,7 @@ CZMQ_EXPORT void
 DESCRIPTION
 -----------
 
-A zauth object takes over authentication for all incoming connections in 
+A zauth object takes over authentication for all incoming connections in
 its context.
 
 This class is deprecated in CZMQ v3; it works together with zctx, zsocket,
