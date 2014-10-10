@@ -164,7 +164,7 @@ zsys_init (void)
     }
     //  Catch SIGINT and SIGTERM unless ZSYS_SIGHANDLER=false
     if (  getenv ("ZSYS_SIGHANDLER") == NULL
-       || strneq (getenv ("ZSYS_SIGHANDLER"), "true"))
+       || strneq (getenv ("ZSYS_SIGHANDLER"), "false"))
         zsys_catch_interrupts ();
 
     ZMUTEX_INIT (s_mutex);
