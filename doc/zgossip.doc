@@ -136,19 +136,19 @@ This is the class self test code:
     if (verbose)
         zstr_send (server, "VERBOSE");
     zstr_sendx (server, "BIND", "inproc://zgossip", NULL);
-
+    
     zsock_t *client = zsock_new (ZMQ_DEALER);
     assert (client);
     zsock_set_rcvtimeo (client, 2000);
     int rc = zsock_connect (client, "inproc://zgossip");
     assert (rc == 0);
-
+    
     //  Send HELLO, which gets no reply
     zgossip_msg_t *request, *reply;
     request = zgossip_msg_new (ZGOSSIP_MSG_HELLO);
     assert (request);
     zgossip_msg_send (&request, client);
-
+    
     //  Send PING, expect PONG back
     request = zgossip_msg_new (ZGOSSIP_MSG_PING);
     assert (request);
@@ -159,10 +159,10 @@ This is the class self test code:
     zgossip_msg_destroy (&reply);
     
     zactor_destroy (&server);
-
+    
     zsock_destroy (&client);
     zactor_destroy (&server);
-
+    
     //  Test peer-to-peer operations
     zactor_t *base = zactor_new (zgossip, "base");
     assert (base);
@@ -171,19 +171,19 @@ This is the class self test code:
     //  Set a 100msec timeout on clients so we can test expiry
     zstr_sendx (base, "SET", "server/timeout", "100", NULL);
     zstr_sendx (base, "BIND", "inproc://base", NULL);
-
+    
     zactor_t *alpha = zactor_new (zgossip, "alpha");
     assert (alpha);
     zstr_sendx (alpha, "CONNECT", "inproc://base", NULL);
     zstr_sendx (alpha, "PUBLISH", "inproc://alpha-1", "service1", NULL);
     zstr_sendx (alpha, "PUBLISH", "inproc://alpha-2", "service2", NULL);
-
+    
     zactor_t *beta = zactor_new (zgossip, "beta");
     assert (beta);
     zstr_sendx (beta, "CONNECT", "inproc://base", NULL);
     zstr_sendx (beta, "PUBLISH", "inproc://beta-1", "service1", NULL);
     zstr_sendx (beta, "PUBLISH", "inproc://beta-2", "service2", NULL);
-
+    
     //  got nothing
     zclock_sleep (200);
     

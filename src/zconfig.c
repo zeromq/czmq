@@ -1,4 +1,3 @@
-
 /*  =========================================================================
     zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.
 
@@ -20,37 +19,37 @@
 @discuss
     Here is an example ZPL stream and corresponding config structure:
 
-    context
-        iothreads = 1
-        verbose = 1      #   Ask for a trace
-    main
-        type = zqueue    #  ZMQ_DEVICE type
-        frontend
-            option
-                hwm = 1000
-                swap = 25000000     #  25MB
-            bind = 'inproc://addr1'
-            bind = 'ipc://addr2'
-        backend
-            bind = inproc://addr3
+        context
+            iothreads = 1
+            verbose = 1      #   Ask for a trace
+        main
+            type = zqueue    #  ZMQ_DEVICE type
+            frontend
+                option
+                    hwm = 1000
+                    swap = 25000000     #  25MB
+                bind = 'inproc://addr1'
+                bind = 'ipc://addr2'
+            backend
+                bind = inproc://addr3
 
-    root                    Down = child
-      |                     Across = next
-      v
-    context-->main
-      |         |
-      |         v
-      |       type=queue-->frontend-->backend
-      |                      |          |
-      |                      |          v
-      |                      |        bind=inproc://addr3
-      |                      v
-      |                    option-->bind=inproc://addr1-->bind=ipc://addr2
-      |                      |
-      |                      v
-      |                    hwm=1000-->swap=25000000
-      v
-    iothreads=1-->verbose=false
+        root                    Down = child
+        |                     Across = next
+        v
+        context-->main
+        |         |
+        |         v
+        |       type=queue-->frontend-->backend
+        |                      |          |
+        |                      |          v
+        |                      |        bind=inproc://addr3
+        |                      v
+        |                    option-->bind=inproc://addr1-->bind=ipc://addr2
+        |                      |
+        |                      v
+        |                    hwm=1000-->swap=25000000
+        v
+        iothreads=1-->verbose=false
 @end
 */
 

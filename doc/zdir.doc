@@ -102,7 +102,7 @@ This is the class self test code:
     zlist_destroy (&patches);
     zdir_destroy (&older);
     zdir_destroy (&newer);
-
+    
     zdir_t *nosuch = zdir_new ("does-not-exist", NULL);
     assert (nosuch == NULL);
 

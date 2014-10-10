@@ -1,4 +1,3 @@
-
 /*  =========================================================================
     zring - generic type-free doubly linked ring container
 

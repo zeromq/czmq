@@ -3,7 +3,7 @@ zbeacon_v2(3)
 
 NAME
 ----
-zbeacon_v2 - LAN discovery and presence (deprecated)
+zbeacon_v2 - no title found
 
 SYNOPSIS
 --------
@@ -107,7 +107,7 @@ char *ipaddress = zstr_recv (zbeacon_socket (client_beacon));
 if (ipaddress) {
     zframe_t *content = zframe_recv (zbeacon_socket (client_beacon));
     int received_port = (zframe_data (content) [0] << 8)
-                    +  zframe_data (content) [1];
+                        +  zframe_data (content) [1];
     assert (received_port == port_nbr);
     zframe_destroy (&content);
     zbeacon_silence (service_beacon);

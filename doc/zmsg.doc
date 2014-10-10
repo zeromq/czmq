@@ -92,6 +92,11 @@ This is the class interface:
     CZMQ_EXPORT char *
         zmsg_popstr (zmsg_t *self);
     
+    //  Pop frame off front of message, return as integer value. If there were
+    //  no more frames in the message, returns 0.
+    CZMQ_EXPORT int
+        zmsg_popint (zmsg_t *self);
+    
     //  Remove specified frame from list, if present. Does not destroy frame.
     CZMQ_EXPORT void
         zmsg_remove (zmsg_t *self, zframe_t *frame);

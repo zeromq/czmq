@@ -1,4 +1,3 @@
-
 /*  =========================================================================
     zmsg - working with multipart messages
 
@@ -397,6 +396,21 @@ zmsg_popstr (zmsg_t *self)
         zframe_destroy (&frame);
     }
     return string;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Pop frame off front of message, return as integer value. If there were
+//  no more frames in the message, returns 0.
+
+int
+zmsg_popint (zmsg_t *self)
+{
+    assert (self);
+    char *string = zmsg_popstr (self);
+    int rc = string? atoi (string): 0;
+    zstr_free (&string);
+    return rc;
 }
 
 

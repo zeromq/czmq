@@ -175,6 +175,8 @@ This is the class interface:
     //      b = byte *, size_t (2 arguments)
     //      c = zchunk_t *
     //      f = zframe_t *
+    //      h = zhash_t *
+    //      m = zmsg_t * (sends all frames in the zmsg)
     //      p = void * (sends the pointer value, only meaningful over inproc)
     //      z = sends zero-sized frame (0 arguments)
     //
@@ -197,6 +199,7 @@ This is the class interface:
     //      f = zframe_t ** (creates zframe)
     //      p = void ** (stores pointer)
     //      h = zhash_t ** (creates zhash)
+    //      m = zmsg_t ** (creates a zmsg with the remaing frames)    
     //      z = null, asserts empty frame (0 arguments)
     //
     //  Note that zsock_recv creates the returned objects, and the caller must

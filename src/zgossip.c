@@ -1,4 +1,3 @@
-
 /*  =========================================================================
     zgossip - decentralized configuration management
 
