@@ -1,10 +1,6 @@
 #### zhash - generic type-free hash container
 
-Expandable hash table container
-
-Note that it's relatively slow (~50k insertions/deletes per second), so
-don't do inserts/updates on the critical path for message I/O. It can
-do ~2.5M lookups per second for 16-char keys. Timed on a 1.6GHz CPU.
+zhash is an expandable hash table container.
 
 The hash table always has a size that is prime and roughly doubles its
 size when 75% full. In case of hash collisions items are chained in a
@@ -245,7 +241,7 @@ This is the class self test code:
     rc = zhash_insert (hash, "DEADF00D", "dead food");
     assert (rc == 0);
     assert (zhash_size (hash) == 4);
-
+    
     //  Look for existing items
     item = (char *) zhash_lookup (hash, "DEADBEEF");
     assert (streq (item, "dead beef"));
@@ -255,35 +251,35 @@ This is the class self test code:
     assert (streq (item, "coded bad"));
     item = (char *) zhash_lookup (hash, "DEADF00D");
     assert (streq (item, "dead food"));
-
+    
     //  Look for non-existent items
     item = (char *) zhash_lookup (hash, "foo");
     assert (item == NULL);
-
+    
     //  Try to insert duplicate items
     rc = zhash_insert (hash, "DEADBEEF", "foo");
     assert (rc == -1);
     item = (char *) zhash_lookup (hash, "DEADBEEF");
     assert (streq (item, "dead beef"));
-
+    
     //  Some rename tests
-
+    
     //  Valid rename, key is now LIVEBEEF
     rc = zhash_rename (hash, "DEADBEEF", "LIVEBEEF");
     assert (rc == 0);
     item = (char *) zhash_lookup (hash, "LIVEBEEF");
     assert (streq (item, "dead beef"));
-
+    
     //  Trying to rename an unknown item to a non-existent key
     rc = zhash_rename (hash, "WHATBEEF", "NONESUCH");
     assert (rc == -1);
-
+    
     //  Trying to rename an unknown item to an existing key
     rc = zhash_rename (hash, "WHATBEEF", "LIVEBEEF");
     assert (rc == -1);
     item = (char *) zhash_lookup (hash, "LIVEBEEF");
     assert (streq (item, "dead beef"));
-
+    
     //  Trying to rename an existing item to another existing item
     rc = zhash_rename (hash, "LIVEBEEF", "ABADCAFE");
     assert (rc == -1);
@@ -291,12 +287,12 @@ This is the class self test code:
     assert (streq (item, "dead beef"));
     item = (char *) zhash_lookup (hash, "ABADCAFE");
     assert (streq (item, "a bad cafe"));
-
+    
     //  Test keys method
     zlist_t *keys = zhash_keys (hash);
     assert (zlist_size (keys) == 4);
     zlist_destroy (&keys);
-
+    
     //  Test dup method
     zhash_t *copy = zhash_dup (hash);
     assert (zhash_size (copy) == 4);
@@ -304,7 +300,7 @@ This is the class self test code:
     assert (item);
     assert (streq (item, "dead beef"));
     zhash_destroy (&copy);
-
+    
     //  Test pack/unpack methods
     zframe_t *frame = zhash_pack (hash);
     copy = zhash_unpack (frame);
@@ -314,7 +310,7 @@ This is the class self test code:
     assert (item);
     assert (streq (item, "dead beef"));
     zhash_destroy (&copy);
-
+    
     //  Test save and load
     zhash_comment (hash, "This is a test file");
     zhash_comment (hash, "Created by %s", "czmq_selftest");
@@ -327,13 +323,13 @@ This is the class self test code:
     assert (streq (item, "dead beef"));
     zhash_destroy (&copy);
     zsys_file_delete (".cache");
-
+    
     //  Delete a item
     zhash_delete (hash, "LIVEBEEF");
     item = (char *) zhash_lookup (hash, "LIVEBEEF");
     assert (item == NULL);
     assert (zhash_size (hash) == 3);
-
+    
     //  Check that the queue is robust against random usage
     struct {
         char name [100];
@@ -341,7 +337,7 @@ This is the class self test code:
     } testset [200];
     memset (testset, 0, sizeof (testset));
     int testmax = 200, testnbr, iteration;
-
+    
     srandom ((unsigned) time (NULL));
     for (iteration = 0; iteration < 25000; iteration++) {
         testnbr = randof (testmax);
@@ -360,12 +356,12 @@ This is the class self test code:
     //  Test 10K lookups
     for (iteration = 0; iteration < 10000; iteration++)
         item = (char *) zhash_lookup (hash, "DEADBEEFABADCAFE");
-
+    
     //  Destructor should be safe to call twice
     zhash_destroy (&hash);
     zhash_destroy (&hash);
     assert (hash == NULL);
-
+    
     // Test autofree; automatically copies and frees string values
     hash = zhash_new ();
     assert (hash);

@@ -19,7 +19,14 @@ This is the class interface:
     //  times. Returns global CZMQ context.
     CZMQ_EXPORT void *
         zsys_init (void);
-        
+    
+    //  Optionally shut down the CZMQ zsys layer; this normally happens automatically
+    //  when the process exits; however this call lets you force a shutdown
+    //  earlier, avoiding any potential problems with atexit() ordering, especially
+    //  with Windows dlls.
+    CZMQ_EXPORT void
+        zsys_shutdown (void);
+    
     //  Get a new ZMQ socket, automagically creating a ZMQ context if this is
     //  the first time. Caller is responsible for destroying the ZMQ socket
     //  before process exits, to avoid a ZMQ deadlock. Note: you should not use
@@ -309,7 +316,7 @@ This is the class interface:
 This is the class self test code:
 
     zsys_catch_interrupts ();
-
+    
     //  Check capabilities without using the return value
     int rc = zsys_has_curve ();
     
@@ -326,26 +333,26 @@ This is the class self test code:
     zsys_set_rcvhwm (1000);
     zsys_set_pipehwm (2500);
     assert (zsys_pipehwm () == 2500);
-
+    
     zsys_set_ipv6 (0);
-
+    
     rc = zsys_file_delete ("nosuchfile");
     assert (rc == -1);
-
+    
     bool rc_bool = zsys_file_exists ("nosuchfile");
     assert (rc_bool != true);
-
+    
     rc = (int) zsys_file_size ("nosuchfile");
     assert (rc == -1);
-
+    
     time_t when = zsys_file_modified (".");
     assert (when > 0);
-
+    
     mode_t mode = zsys_file_mode (".");
     assert (S_ISDIR (mode));
     assert (mode & S_IRUSR);
     assert (mode & S_IWUSR);
-
+    
     zsys_file_mode_private ();
     rc = zsys_dir_create ("%s/%s", ".", ".testsys/subdir");
     assert (rc == 0);
@@ -357,23 +364,23 @@ This is the class self test code:
     rc = zsys_dir_delete ("%s/%s", ".", ".testsys");
     assert (rc == 0);
     zsys_file_mode_default ();
-
+    
     int major, minor, patch;
     zsys_version (&major, &minor, &patch);
     assert (major == CZMQ_VERSION_MAJOR);
     assert (minor == CZMQ_VERSION_MINOR);
     assert (patch == CZMQ_VERSION_PATCH);
-
+    
     char *string = zsys_sprintf ("%s %02x", "Hello", 16);
     assert (streq (string, "Hello 10"));
     free (string);
-
+    
     char *str64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890,.";
     int num10 = 1234567890;
     string = zsys_sprintf ("%s%s%s%s%d", str64, str64, str64, str64, num10);
     assert (strlen (string) == (4 * 64 + 10));
     free (string);
-
+    
     //  Test logging system
     zsys_set_logident ("czmq_selftest");
     zsys_set_logsender ("inproc://logging");
@@ -383,7 +390,7 @@ This is the class self test code:
     assert (rc == 0);
     rc = zmq_setsockopt (logger, ZMQ_SUBSCRIBE, "", 0);
     assert (rc == 0);
-        
+    
     if (verbose) {
         zsys_error ("This is an %s message", "error");
         zsys_warning ("This is a %s message", "warning");
@@ -393,7 +400,7 @@ This is the class self test code:
         zsys_set_logident ("hello, world");
         zsys_info ("This is a %s message", "info");
         zsys_debug ("This is a %s message", "debug");
-
+    
         //  Check that logsender functionality is working
         char *received = zstr_recv (logger);
         assert (received);

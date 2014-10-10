@@ -79,19 +79,19 @@ This is the class self test code:
     assert (speaker);
     if (verbose)
         zstr_sendx (speaker, "VERBOSE", NULL);
-
-//
-//  Stop broadcasting the beacon:
-//
-//      zstr_sendx (beacon, "SILENCE", NULL);
-//
-//  Start listening to beacons from peers. The filter is used to do a prefix
-//  match on received beacons, to remove junk. Note that any received data
-//  that is identical to our broadcast beacon_data is discarded in any case.
-//  If the filter size is zero, we get all peer beacons:
-//
-//      zsock_send (beacon, "sb", "SUBSCRIBE", filter_data, filter_size);
-
+    
+    //
+    //  Stop broadcasting the beacon:
+    //
+    //      zstr_sendx (beacon, "SILENCE", NULL);
+    //
+    //  Start listening to beacons from peers. The filter is used to do a prefix
+    //  match on received beacons, to remove junk. Note that any received data
+    //  that is identical to our broadcast beacon_data is discarded in any case.
+    //  If the filter size is zero, we get all peer beacons:
+    //
+    //      zsock_send (beacon, "sb", "SUBSCRIBE", filter_data, filter_size);
+    
     zsock_send (speaker, "si", "CONFIGURE", 9999);
     char *hostname = zstr_recv (speaker);
     if (!*hostname) {
@@ -101,7 +101,7 @@ This is the class self test code:
         return;
     }
     free (hostname);
-
+    
     //  Create listener beacon on port 9999 to lookup service
     zactor_t *listener = zactor_new (zbeacon, NULL);
     assert (listener);
@@ -111,13 +111,13 @@ This is the class self test code:
     hostname = zstr_recv (listener);
     assert (*hostname);
     free (hostname);
-
+    
     //  We will broadcast the magic value 0xCAFE
     byte announcement [2] = { 0xCA, 0xFE };
     zsock_send (speaker, "sbi", "PUBLISH", announcement, 2, 100);
     //  We will listen to anything (empty subscription)
     zsock_send (listener, "sb", "SUBSCRIBE", "", 0);
-
+    
     //  Wait for at most 1/2 second if there's no broadcasting
     zsock_set_rcvtimeo (listener, 500);
     char *ipaddress = zstr_recv (listener);
@@ -132,7 +132,7 @@ This is the class self test code:
     }
     zactor_destroy (&listener);
     zactor_destroy (&speaker);
-
+    
     //  Test subscription filter using a 3-node setup
     zactor_t *node1 = zactor_new (zbeacon, NULL);
     assert (node1);
@@ -140,26 +140,26 @@ This is the class self test code:
     hostname = zstr_recv (node1);
     assert (*hostname);
     free (hostname);
-
+    
     zactor_t *node2 = zactor_new (zbeacon, NULL);
     assert (node2);
     zsock_send (node2, "si", "CONFIGURE", 5670);
     hostname = zstr_recv (node2);
     assert (*hostname);
     free (hostname);
-
+    
     zactor_t *node3 = zactor_new (zbeacon, NULL);
     assert (node3);
     zsock_send (node3, "si", "CONFIGURE", 5670);
     hostname = zstr_recv (node3);
     assert (*hostname);
     free (hostname);
-
+    
     zsock_send (node1, "sbi", "PUBLISH", "NODE/1", 6, 250);
     zsock_send (node2, "sbi", "PUBLISH", "NODE/2", 6, 250);
     zsock_send (node3, "sbi", "PUBLISH", "RANDOM", 6, 250);
     zsock_send (node1, "sb", "SUBSCRIBE", "NODE", 4);
-
+    
     //  Poll on three API sockets at once
     zpoller_t *poller = zpoller_new (node1, node2, node3, NULL);
     assert (poller);
@@ -179,15 +179,15 @@ This is the class self test code:
         }
     }
     zpoller_destroy (&poller);
-
+    
     //  Stop listening
     zstr_sendx (node1, "UNSUBSCRIBE", NULL);
-
+    
     //  Stop all node broadcasts
     zstr_sendx (node1, "SILENCE", NULL);
     zstr_sendx (node2, "SILENCE", NULL);
     zstr_sendx (node3, "SILENCE", NULL);
-
+    
     //  Destroy the test nodes
     zactor_destroy (&node1);
     zactor_destroy (&node2);

@@ -153,7 +153,7 @@ This is the class self test code:
     assert (streq (zfile_filename (file, "."), "bilbo"));
     assert (zfile_is_readable (file) == false);
     zfile_destroy (&file);
-
+    
     //  Create a test file in some random subdirectory
     file = zfile_new ("./this/is/a/test", "bilbo");
     assert (file);
@@ -195,7 +195,7 @@ This is the class self test code:
     assert (zchunk_size (chunk) == 13);
     zchunk_destroy (&chunk);
     zfile_close (file);
-
+    
     //  Try some fun with symbolic links
     zfile_t *link = zfile_new ("./this/is/a/test", "bilbo.ln");
     assert (link);
@@ -203,7 +203,7 @@ This is the class self test code:
     assert (rc == 0);
     fprintf (zfile_handle (link), "./this/is/a/test/bilbo\n");
     zfile_destroy (&link);
-
+    
     link = zfile_new ("./this/is/a/test", "bilbo.ln");
     assert (link);
     rc = zfile_input (link);
@@ -213,7 +213,7 @@ This is the class self test code:
     assert (zchunk_size (chunk) == 13);
     zchunk_destroy (&chunk);
     zfile_destroy (&link);
-
+    
     //  Remove file and directory
     zdir_t *dir = zdir_new ("./this", NULL);
     assert (dir);
@@ -221,7 +221,7 @@ This is the class self test code:
     zdir_remove (dir, true);
     assert (zdir_cursize (dir) == 0);
     zdir_destroy (&dir);
-
+    
     //  Check we can no longer read from file
     assert (zfile_is_readable (file));
     zfile_restat (file);

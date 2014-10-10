@@ -87,8 +87,10 @@ sub pull {
             if (/$tag/) {
                 while (<SOURCE>) {
                     last if /@[a-zA-Z0-9]+/;
-                    $_ = "    $_" if ($opts eq "code");
-                    s/^    // if ($opts eq "left");
+                    $_ = "    $_" if $opts eq "code";
+                    s/^    // if $opts eq "left";
+                    $_ = "    $_" if $opts eq "test";
+                    s/^        /    / if $opts eq "test";
                     $text .= $_;
                 }
             }
@@ -123,9 +125,7 @@ print OUTPUT pull ("$top_srcdir/src/$class.c\@discuss,left");
 print OUTPUT "\nThis is the class interface:\n\n";
 print OUTPUT pull ("$top_srcdir/include/$class.h\@interface,code");
 print OUTPUT "\nThis is the class self test code:\n\n";
-print OUTPUT pull ("$top_srcdir/src/$class.c\@selftest");
+print OUTPUT pull ("$top_srcdir/src/$class.c\@selftest,test");
 print OUTPUT "\n";
 close OUTPUT;
-
-
 

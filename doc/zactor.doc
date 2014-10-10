@@ -1,6 +1,6 @@
 #### zactor - simple actor framework
 
-The zactor class provides a simple actor framework. It replaces the 
+The zactor class provides a simple actor framework. It replaces the
 CZMQ zthread class, which had a complex API that did not fit the CLASS
 standard. A CZMQ actor is implemented as a thread plus a PAIR-PAIR
 pipe. The constructor and destructor are always synchronized, so the

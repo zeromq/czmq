@@ -85,9 +85,9 @@ This is the class interface:
 This is the class self test code:
 
     //  Create temporary directory for test files
-#   define TESTDIR ".test_zauth"
+    #   define TESTDIR ".test_zauth"
     zsys_dir_create (TESTDIR);
-
+    
     //  Check there's no authentication
     zsock_t *server = zsock_new (ZMQ_PUSH);
     assert (server);
@@ -106,35 +106,35 @@ This is the class self test code:
     //  Check there's no authentication on a default NULL server
     success = s_can_connect (&server, &client);
     assert (success);
-
+    
     //  When we set a domain on the server, we switch on authentication
     //  for NULL sockets, but with no policies, the client connection
     //  will be allowed.
     zsock_set_zap_domain (server, "global");
     success = s_can_connect (&server, &client);
     assert (success);
-
+    
     //  Blacklist 127.0.0.1, connection should fail
     zsock_set_zap_domain (server, "global");
     zstr_sendx (auth, "DENY", "127.0.0.1", NULL);
     zsock_wait (auth);
     success = s_can_connect (&server, &client);
     assert (!success);
-
+    
     //  Whitelist our address, which overrides the blacklist
     zsock_set_zap_domain (server, "global");
     zstr_sendx (auth, "ALLOW", "127.0.0.1", NULL);
     zsock_wait (auth);
     success = s_can_connect (&server, &client);
     assert (success);
-
+    
     //  Try PLAIN authentication
     zsock_set_plain_server (server, 1);
     zsock_set_plain_username (client, "admin");
     zsock_set_plain_password (client, "Password");
     success = s_can_connect (&server, &client);
     assert (!success);
-
+    
     FILE *password = fopen (TESTDIR "/password-file", "w");
     assert (password);
     fprintf (password, "admin=Password\n");
@@ -146,13 +146,13 @@ This is the class self test code:
     zsock_wait (auth);
     success = s_can_connect (&server, &client);
     assert (success);
-
+    
     zsock_set_plain_server (server, 1);
     zsock_set_plain_username (client, "admin");
     zsock_set_plain_password (client, "Bogus");
     success = s_can_connect (&server, &client);
     assert (!success);
-
+    
     if (zsys_has_curve ()) {
         //  Try CURVE authentication
         //  We'll create two new certificates and save the client public
@@ -163,7 +163,7 @@ This is the class self test code:
         zcert_t *client_cert = zcert_new ();
         assert (client_cert);
         char *server_key = zcert_public_txt (server_cert);
-
+    
         //  Test without setting-up any authentication
         zcert_apply (server_cert, server);
         zcert_apply (client_cert, client);
@@ -171,7 +171,7 @@ This is the class self test code:
         zsock_set_curve_serverkey (client, server_key);
         success = s_can_connect (&server, &client);
         assert (!success);
-
+    
         //  Test CURVE_ALLOW_ANY
         zcert_apply (server_cert, server);
         zcert_apply (client_cert, client);
@@ -181,7 +181,7 @@ This is the class self test code:
         zsock_wait (auth);
         success = s_can_connect (&server, &client);
         assert (success);
-
+    
         //  Test full client authentication using certificates
         zcert_apply (server_cert, server);
         zcert_apply (client_cert, client);
@@ -192,7 +192,7 @@ This is the class self test code:
         zsock_wait (auth);
         success = s_can_connect (&server, &client);
         assert (success);
-
+    
         zcert_destroy (&server_cert);
         zcert_destroy (&client_cert);
     }
@@ -200,7 +200,7 @@ This is the class self test code:
     zactor_destroy (&auth);
     success = s_can_connect (&server, &client);
     assert (success);
-
+    
     zsock_destroy (&client);
     zsock_destroy (&server);
     

@@ -86,7 +86,7 @@ This is the class self test code:
     zsock_wait (proxy);
     zstr_sendx (proxy, "BACKEND", "PUSH", "inproc://backend", NULL);
     zsock_wait (proxy);
-
+    
     //  Connect application sockets to proxy
     zsock_t *faucet = zsock_new_push (">inproc://frontend");
     assert (faucet);
@@ -101,7 +101,7 @@ This is the class self test code:
     assert (streq (world, "World"));
     zstr_free (&hello);
     zstr_free (&world);
-
+    
     //  Test pause/resume functionality
     zstr_sendx (proxy, "PAUSE", NULL);
     zsock_wait (proxy);
@@ -117,11 +117,11 @@ This is the class self test code:
     assert (streq (world, "World"));
     zstr_free (&hello);
     zstr_free (&world);
-
+    
     //  Test capture functionality
     zsock_t *capture = zsock_new_pull ("inproc://capture");
     assert (capture);
-
+    
     //  Switch on capturing, check that it works
     zstr_sendx (proxy, "CAPTURE", "inproc://capture", NULL);
     zsock_wait (proxy);
@@ -137,7 +137,7 @@ This is the class self test code:
     assert (streq (world, "World"));
     zstr_free (&hello);
     zstr_free (&world);
-
+    
     zsock_destroy (&faucet);
     zsock_destroy (&sink);
     zsock_destroy (&capture);

@@ -67,7 +67,7 @@ This is the class self test code:
     assert (strlen (zuuid_str (uuid)) == 32);
     zuuid_t *copy = zuuid_dup (uuid);
     assert (streq (zuuid_str (uuid), zuuid_str (copy)));
-
+    
     //  Check set/set_str/export methods
     const char *myuuid = "8CB3E9A9649B4BEF8DE225E9C2CEBB38";
     zuuid_set_str (uuid, myuuid);

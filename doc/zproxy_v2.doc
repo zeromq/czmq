@@ -58,7 +58,7 @@ This is the class self test code:
     assert (rc == 0);
     zproxy_t *proxy = zproxy_new (ctx, frontend, backend);
     assert (proxy);
-
+    
     //  Connect application sockets to proxy
     void *faucet = zsocket_new (ctx, ZMQ_PUSH);
     assert (faucet);
@@ -68,7 +68,7 @@ This is the class self test code:
     assert (sink);
     rc = zsocket_connect (sink, "inproc://backend");
     assert (rc == 0);
-
+    
     //  Send some messages and check they arrived
     zstr_send (faucet, "Hello");
     char *string = zstr_recv (sink);
@@ -78,7 +78,7 @@ This is the class self test code:
     //  Check pause/resume functionality
     zproxy_pause (proxy);
     zstr_send (faucet, "World");
-
+    
     zproxy_resume (proxy);
     string = zstr_recv (sink);
     assert (streq (string, "World"));
@@ -89,7 +89,7 @@ This is the class self test code:
     assert (capture);
     rc = zsocket_bind (capture, "inproc://capture");
     assert (rc == 0);
-
+    
     //  Switch on capturing, check that it works
     zproxy_capture (proxy, "inproc://capture");
     zstr_send (faucet, "Hello");
@@ -103,5 +103,5 @@ This is the class self test code:
     zstr_free (&string);
     zproxy_destroy (&proxy);
     zctx_destroy (&ctx);
-
+    
 

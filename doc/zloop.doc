@@ -98,11 +98,11 @@ This is the class self test code:
     zsock_t *input = zsock_new (ZMQ_PAIR);
     assert (input);
     zsock_connect (input, "inproc://zloop.test");
-
+    
     zloop_t *loop = zloop_new ();
     assert (loop);
     zloop_set_verbose (loop, verbose);
-
+    
     //  Create a timer that will be cancelled
     int timer_id = zloop_timer (loop, 1000, 1, s_timer_event, NULL);
     zloop_timer (loop, 5, 1, s_cancel_timer_event, &timer_id);
@@ -115,10 +115,10 @@ This is the class self test code:
     assert (rc == 0);
     zloop_reader_set_tolerant (loop, input);
     zloop_start (loop);
-
+    
     zloop_destroy (&loop);
     assert (loop == NULL);
-
+    
     zsock_destroy (&input);
     zsock_destroy (&output);
 

@@ -64,13 +64,13 @@ This is the class interface:
 This is the class self test code:
 
     //  Create temporary directory for test files
-#   define TESTDIR ".test_zcertstore"
+    #   define TESTDIR ".test_zcertstore"
     zsys_dir_create (TESTDIR);
-
+    
     //  Load certificate store from disk; it will be empty
     zcertstore_t *certstore = zcertstore_new (TESTDIR);
     assert (certstore);
-
+    
     //  Create a single new certificate and save to disk
     zcert_t *cert = zcert_new ();
     assert (cert);
@@ -79,17 +79,17 @@ This is the class self test code:
     zcert_set_meta (cert, "name", "John Doe");
     zcert_save (cert, TESTDIR "/mycert.txt");
     zcert_destroy (&cert);
-
+    
     //  Check that certificate store refreshes as expected
     cert = zcertstore_lookup (certstore, client_key);
     assert (cert);
     assert (streq (zcert_meta (cert, "name"), "John Doe"));
     free (client_key);
-
+    
     if (verbose)
         zcertstore_print (certstore);
     zcertstore_destroy (&certstore);
-
+    
     //  Delete all test files
     zdir_t *dir = zdir_new (TESTDIR, NULL);
     assert (dir);
