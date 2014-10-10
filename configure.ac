@@ -53,7 +53,7 @@ PKG_PROG_PKG_CONFIG
 
 # 
 AC_ARG_ENABLE([labs],
-    [AS_HELP_STRING([--disable-labs], [Enable Lbas support @<:@check@:>@])],
+    [AS_HELP_STRING([--disable-labs], [Enable Labs support @<:@check@:>@])],
     [:],
     [enable_labs=check])
 
