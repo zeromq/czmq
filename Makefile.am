@@ -24,6 +24,7 @@ EXTRA_DIST = \
 	foreign/slre/slre.c \
 	foreign/sha1/sha1.c \
 	foreign/sha1/sha1.h \
+	packaging/dist/gitlog2changelog.py \
 	packaging/nuget/package.config \
 	packaging/nuget/package.targets \
 	packaging/nuget/package.bat \
@@ -112,3 +113,25 @@ include $(srcdir)/addons/Makefile.am.supplement
 include $(srcdir)/labs/Makefile.am.supplement
 
 include $(srcdir)/doc/Makefile.am.supplement
+
+# workaround the dist generated files that are also part of the distribution
+#distcleancheck_listfiles = \
+#	find . -type f -exec sh -c 'test -f $(srcdir)/{} || echo {}' ';'
+# Note that distcleancheck is disabled for now, while waiting for a proper
+# solution, that do not break older unix systems
+distcleancheck:
+	@:
+
+# Automatically generate the ChangeLog from Git logs:
+MAINTAINERCLEAN_FILES = ChangeLog
+# Force ChangeLog regeneration upon make dist (due to nonexistant 'dummy-stamp'),
+# in case it has already been generated previously
+#
+# Older boundary of the ChangeLog commits range
+# It can be a tag ('v2.2.0'), a commit hash, a date, ...
+# See gitrevisions for more information on specifying ranges
+GIT_START_POINT=v2.2.0
+dummy-stamp:
+ChangeLog: packaging/dist/gitlog2changelog.py dummy-stamp
+	$(top_srcdir)/packaging/dist/gitlog2changelog.py $(GIT_START_POINT) || \
+		echo "gitlog2changelog.py failed to generate the ChangeLog. See https://github.com/zeromq/czmq/commits/master" > $@
