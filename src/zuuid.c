@@ -60,8 +60,11 @@ zuuid_new (void)
             ssize_t bytes_read = read (fd, uuid, ZUUID_LEN);
             assert (bytes_read == ZUUID_LEN);
             close (fd);
-        }
-        zuuid_set (self, uuid);
+            zuuid_set (self, uuid);
+        } else
+            //  We couldn't read /dev/urandom and we have no alternative
+            //  strategy
+            assert (false);
 #endif
     }
     return self;
