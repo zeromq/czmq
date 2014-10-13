@@ -397,7 +397,7 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
 #endif
 
 // Windows MSVS doesn't have stdbool
-#if (defined (__WINDOWS__))
+#if (defined (_MSC_VER))
 #   if (!defined (__cplusplus) && (!defined (true)))
 #       define true 1
 #       define false 0
