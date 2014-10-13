@@ -24,19 +24,19 @@ OBJS =\
 .endfor
 
 %.o: ../../src/%.c
-    $\(CC) -c -o $@ $< $\(CFLAGS)
+	$\(CC) -c -o $@ $< $\(CFLAGS)
 
 all: lib$(project.name).dll $(project.name)_selftest.exe
 
 lib$(project.name).dll: $\(OBJS)
-    gcc -shared -o $@ $\(OBJS) -Wl,--out-implib,$@.a $\(LIBDIR) -lzmq -lws2_32 -liphlpapi
+	$\(CC) -shared -o $@ $\(OBJS) -Wl,--out-implib,$@.a $\(LIBDIR) -lzmq -lws2_32 -liphlpapi -lrpcrt4
 
 # the test functions are not exported into the DLL
 $(project.name)_selftest.exe: $(project.name)_selftest.o $\(OBJS)
-    gcc -o $@ $^ $\(LIBDIR) -lzmq -lws2_32 -liphlpapi
+	$\(CC) -o $@ $^ $\(LIBDIR) -lzmq -lws2_32 -liphlpapi -lrpcrt4
 
 clean:
-    del *.o *.a *.dll *.exe
+	del *.o *.a *.dll *.exe
 
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
