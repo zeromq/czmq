@@ -413,6 +413,51 @@ zmsg_popint (zmsg_t *self)
     return rc;
 }
 
+//  --------------------------------------------------------------------------
+//  Push encoded message as a new frame. Message takes ownership of submessage,
+//  so the original is destroyed in this call
+//  Returns 0 on success, -1 on error.
+
+int
+zmsg_addmsg(zmsg_t *self, zmsg_t **msg_p)
+{
+    assert (self);
+    assert (zmsg_is (self));
+    assert (msg_p);
+
+    zmsg_t *msg = *msg_p;
+    byte *data;
+    size_t len = zmsg_encode (msg, &data);
+    int r = zmsg_addmem (self, data, len);
+    if (r == 0) {
+        zmsg_destroy (&msg);
+        *msg_p = NULL;
+    }
+    free (data);
+    return r;
+}
+
+//  --------------------------------------------------------------------------
+//  Remove first submessage from message, if any. Returns zmsg_t, or NULL if
+//  decoding was not succesfull. Caller now owns message and must destroy it
+//  when finished with it.
+
+zmsg_t *
+zmsg_popmsg(zmsg_t *self)
+{
+    assert (self);
+    assert (zmsg_is (self));
+
+    zframe_t *frame = zmsg_pop (self);
+    if (!frame)
+        return NULL;
+
+    size_t len = zframe_size (frame);
+    byte *data = zframe_data (frame);
+    zmsg_t *msg = zmsg_decode (data, len);
+    zframe_destroy (&frame);
+    return msg;
+}
 
 //  --------------------------------------------------------------------------
 //  Remove specified frame from list, if present. Does not destroy frame.
@@ -996,6 +1041,26 @@ zmsg_test (bool verbose)
     assert (msg);
     free (buffer);
     zmsg_destroy (&msg);
+    
+    // Test submessages
+    msg = zmsg_new ();
+    assert (msg);
+    zmsg_t *submsg = zmsg_new ();
+    zmsg_pushstr (msg, "matr");
+    zmsg_pushstr (submsg, "joska");
+    rc = zmsg_addmsg (msg, &submsg);
+    assert (rc == 0);
+    assert (submsg == NULL);
+    submsg = zmsg_popmsg (msg);
+    assert (submsg == NULL);   // string "matr" is not encoded zmsg_t, so was discarded
+    submsg = zmsg_popmsg(msg);
+    assert (submsg);
+    body = zmsg_popstr (submsg);
+    assert (streq(body, "joska"));
+    free (body);
+    zmsg_destroy (&submsg);
+    frame = zmsg_pop(msg);
+    assert (frame == NULL);
 
     //  Now try methods on an empty message
     msg = zmsg_new ();
