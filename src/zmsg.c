@@ -419,7 +419,7 @@ zmsg_popint (zmsg_t *self)
 //  Returns 0 on success, -1 on error.
 
 int
-zmsg_addmsg(zmsg_t *self, zmsg_t **msg_p)
+zmsg_addmsg (zmsg_t *self, zmsg_t **msg_p)
 {
     assert (self);
     assert (zmsg_is (self));
@@ -443,7 +443,7 @@ zmsg_addmsg(zmsg_t *self, zmsg_t **msg_p)
 //  when finished with it.
 
 zmsg_t *
-zmsg_popmsg(zmsg_t *self)
+zmsg_popmsg (zmsg_t *self)
 {
     assert (self);
     assert (zmsg_is (self));
@@ -1041,7 +1041,7 @@ zmsg_test (bool verbose)
     assert (msg);
     free (buffer);
     zmsg_destroy (&msg);
-    
+
     // Test submessages
     msg = zmsg_new ();
     assert (msg);
@@ -1053,13 +1053,13 @@ zmsg_test (bool verbose)
     assert (submsg == NULL);
     submsg = zmsg_popmsg (msg);
     assert (submsg == NULL);   // string "matr" is not encoded zmsg_t, so was discarded
-    submsg = zmsg_popmsg(msg);
+    submsg = zmsg_popmsg (msg);
     assert (submsg);
     body = zmsg_popstr (submsg);
-    assert (streq(body, "joska"));
+    assert (streq (body, "joska"));
     free (body);
     zmsg_destroy (&submsg);
-    frame = zmsg_pop(msg);
+    frame = zmsg_pop (msg);
     assert (frame == NULL);
 
     //  Now try methods on an empty message
