@@ -119,3 +119,12 @@ labs/mtrace.txt
 labs/outbin
 labs/test-suite.log
 ChangeLog
+.libs/
+czmq_labs_selftest*
+czmq_selftest*
+makecert
+test-suite.log
+addons/.dirstamp
+labs/.dirstamp
+src/.dirstamp
+src/zbase64.xml
