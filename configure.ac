@@ -263,5 +263,5 @@ AC_ARG_WITH([pkgconfigdir], AS_HELP_STRING([--with-pkgconfigdir=PATH],
 AC_SUBST([pkgconfigdir])
 
 # Specify output files
-AC_CONFIG_FILES([Makefile src/libczmq.pc labs/libczmq_labs.pc ])
+AC_CONFIG_FILES([Makefile src/Makefile src/libczmq.pc labs/libczmq_labs.pc ])
 AC_OUTPUT
