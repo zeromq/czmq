@@ -20,7 +20,7 @@ extern "C" {
 
 //  @interface
 
-//  definition of mode enumeration
+//  Enumeration defining different encoding modes
 typedef enum {
     ZBASE64_MODE_RFC4648_STD,
     ZBASE64_MODE_RFC4648_URL
@@ -39,11 +39,13 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zbase64_print (zbase64_t *self);
 
-//  Definition of encode method
+//  Encode a stream of bytes into a base64 string.
 CZMQ_EXPORT char *
     zbase64_encode (zbase64_t *self, byte *data, size_t data_size);
 
-//  Definition of decode method
+//  Decode a base64 string into a string of bytes.
+//  The decoded output is null-terminated, so it may be treated
+//  as a string, if that's what it was prior to encoding.
 CZMQ_EXPORT byte *
     zbase64_decode (zbase64_t *self, char *data, size_t *decode_size);
 
