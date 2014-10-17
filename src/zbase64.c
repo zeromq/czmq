@@ -15,6 +15,13 @@
 @header
     zbase64 - base64 encoding and decoding
 @discuss
+    The zbase64 class implements encoding and decoding of base64 data
+    based on the definitions in RFC4648. Both the standard alphabet from
+    paragraph 4 and the URL and filename friendly one from paragraph 5
+    are supported. The class API defines a flag to specify whether to
+    pad out the encoded string to a multiple of 4 chars, but this is
+    not implemented yet. The API also defines accessors for the character
+    to use for padding. Breaking the output into lines is not implemented.
 @end
 */
 
