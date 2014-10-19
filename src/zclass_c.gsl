@@ -1,0 +1,684 @@
+.template 0
+#   zclass_c.gsl
+#
+#   Generates a skeleton for a new class. Will not overwrite existing files.
+#   See z_class_example.xml for instructions on how to specify a class.
+#
+include "zclass_lib.gsl"
+resolve_includes ()
+set_defaults ()
+.endtemplate
+.header_file = "$(class.package_dir)/$(class.name).h"
+.if !file.exists (header_file)
+.   output header_file
+/*  =========================================================================
+    $(class.name) - $(class.title:)
+
+.   for class.license
+    $(string.trim (license.):block                                         )
+.   endfor
+    =========================================================================
+*/
+
+#ifndef __$(CLASS.NAME)_H_INCLUDED__
+#define __$(CLASS.NAME)_H_INCLUDED__
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+//  Opaque class structure
+typedef struct _$(class.name)_t $(class.name)_t;
+
+//  @interface
+
+.   for class.typedef
+.       if type = "enum"
+//  definition of $(name) enumeration
+typedef enum {
+.           for item
+.               if last ()
+    $(CLASS.NAME)_$(TYPEDEF.NAME)_$(ITEM.NAME)
+.               else
+    $(CLASS.NAME)_$(TYPEDEF.NAME)_$(ITEM.NAME),
+.               endif
+.           endfor
+} $(class.name)_$(name)_t;
+.       else
+//  definition of $(name) type
+typedef $(type) $(class.name)_$(name)_t;
+.       endif
+
+.   endfor
+
+//  Create a new $(class.name)
+$(CLASS.EXPORT_MACRO)$(class.name)_t *
+    $(class.name)_new ();
+
+//  Destroy the $(class.name)
+$(CLASS.EXPORT_MACRO)void
+    $(class.name)_destroy ($(class.name)_t **self_p);
+
+//  Print properties of object
+$(CLASS.EXPORT_MACRO)void
+    $(class.name)_print ($(class.name)_t *self);
+
+.   for class.method
+//  Definition of $(name) method
+.       type_str = get_type_str (method)
+$(CLASS.EXPORT_MACRO)$(type_str)
+    $(class.name)_$(name) ($(class.name)_t *self\
+.       for method.arg
+.           arg_type_str = get_type_str (arg)
+, $(arg_type_str)$(arg.name)\
+.       endfor
+);
+
+.   endfor
+.   for class.property where !defined (value)
+.#
+.       if type = "octets"
+//  Get/set the $(name) property
+$(CLASS.EXPORT_MACRO)byte *
+    $(class.name)_$(name) ($(class.name)_t *self);
+$(CLASS.EXPORT_MACRO)size_t
+    $(class.name)_$(name)_size ($(class.name)_t *self);
+$(CLASS.EXPORT_MACRO)void
+    $(class.name)_set_$(name) ($(class.name)_t *self, byte *$(name));
+.#
+.       elsif type = "buffer"
+//  Get/set the $(name) property
+$(CLASS.EXPORT_MACRO)byte *
+    $(class.name)_$(name) ($(class.name)_t *self);
+$(CLASS.EXPORT_MACRO)size_t
+    $(class.name)_$(name)_size ($(class.name)_t *self);
+$(CLASS.EXPORT_MACRO)void
+    $(class.name)_set_$(name) ($(class.name)_t *self, byte *$(name), size_t $(name)_size);
+.#
+.       elsif type = "string"
+//  Get/set the $(name) property
+$(CLASS.EXPORT_MACRO)const char *
+    $(class.name)_$(name) ($(class.name)_t *self);
+$(CLASS.EXPORT_MACRO)void
+    $(class.name)_set_$(name) ($(class.name)_t *self, const char *format, ...);
+.#
+.       elsif type = "strings"
+//  Get/set the $(name) property
+$(CLASS.EXPORT_MACRO)zlist_t *
+    $(class.name)_$(name) ($(class.name)_t *self);
+//  Get the $(name) property and transfer ownership to caller
+$(CLASS.EXPORT_MACRO)zlist_t *
+    $(class.name)_get_$(name) ($(class.name)_t *self);
+//  Set the $(name) property, transferring ownership from caller
+$(CLASS.EXPORT_MACRO)void
+    $(class.name)_set_$(name) ($(class.name)_t *self, zlist_t **$(name)_p);
+
+//  Iterate through the $(name) property, and append a $(name) value
+$(CLASS.EXPORT_MACRO)const char *
+    $(class.name)_$(name)_first ($(class.name)_t *self);
+$(CLASS.EXPORT_MACRO)const char *
+    $(class.name)_$(name)_next ($(class.name)_t *self);
+$(CLASS.EXPORT_MACRO)void
+    $(class.name)_$(name)_append ($(class.name)_t *self, const char *format, ...);
+$(CLASS.EXPORT_MACRO)size_t
+    $(class.name)_$(name)_size ($(class.name)_t *self);
+.#
+.       elsif type = "dictionary"
+//  Get/set the $(name) property
+$(CLASS.EXPORT_MACRO)zhash_t *
+    $(class.name)_$(name) ($(class.name)_t *self);
+//  Get the $(name) property and transfer ownership to caller
+$(CLASS.EXPORT_MACRO)zhash_t *
+    $(class.name)_get_$(name) ($(class.name)_t *self);
+//  Set the $(name) property, transferring ownership from caller
+$(CLASS.EXPORT_MACRO)void
+    $(class.name)_set_$(name) ($(class.name)_t *self, zhash_t **$(name)_p);
+
+//  Get/set a value in the $(name) dictionary
+$(CLASS.EXPORT_MACRO)const char *
+    $(class.name)_$(name)_string ($(class.name)_t *self,
+        const char *key, const char *default_value);
+$(CLASS.EXPORT_MACRO)uint64_t
+    $(class.name)_$(name)_number ($(class.name)_t *self,
+        const char *key, uint64_t default_value);
+$(CLASS.EXPORT_MACRO)void
+    $(class.name)_$(name)_insert ($(class.name)_t *self,
+        const char *key, const char *format, ...);
+$(CLASS.EXPORT_MACRO)size_t
+    $(class.name)_$(name)_size ($(class.name)_t *self);
+.#
+.       elsif type = "chunk" | type = "frame" | type = "uuid" | type = "msg"
+//  Get a copy of the $(name) property
+$(CLASS.EXPORT_MACRO)z$(type)_t *
+    $(class.name)_$(name) ($(class.name)_t *self);
+//  Get the $(name) property and transfer ownership to caller
+$(CLASS.EXPORT_MACRO)z$(type)_t *
+    $(class.name)_get_$(name) ($(class.name)_t *self);
+//  Set the $(name) property, transferring ownership from caller
+$(CLASS.EXPORT_MACRO)void
+    $(class.name)_set_$(name) ($(class.name)_t *self, z$(type)_t **$(type)_p);
+.#
+.       else
+.           type_str = get_type_str (property)
+//  Get/set the $(name) property
+$(CLASS.EXPORT_MACRO)$(type_str)
+    $(class.name)_$(name) ($(class.name)_t *self);
+$(CLASS.EXPORT_MACRO)void
+    $(class.name)_set_$(name) ($(class.name)_t *self, $(type_str)$(name));
+.       endif
+
+.   endfor
+//  Self test of this class
+$(CLASS.EXPORT_MACRO)int
+    $(class.name)_test (bool verbose);
+//  @end
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
+.endif
+.source_file = "$(class.source_dir)/$(class.name).c"
+.if !file.exists (source_file)
+.   output source_file
+/*  =========================================================================
+    $(class.name) - $(class.title:)
+
+.   for class.license
+    $(string.trim (license.):block                                         )
+.   endfor
+    =========================================================================
+*/
+
+/*
+@header
+    $(class.name) - $(class.title:)
+@discuss
+@end
+*/
+
+.   if defined (class.project_header)
+#include "$(class.project_header)"
+.   endif
+#include "$(class.package_dir)/$(class.name).h"
+
+//  Structure of our class
+
+struct _$(class.name)_t {
+.   for class.property
+.       if type = "octets"
+    byte $(name) [$(size)];             //  $(property.?'':)
+.       else
+.           type_str = get_type_str (property)
+    $(type_str)$(name);                 //  $(property.?'':)
+.       endif
+.       if type = "buffer"
+    size_t $(name)_size;                //  Size of $(name) content
+.       endif
+.   endfor
+};
+
+
+//  --------------------------------------------------------------------------
+//  Create a new $(class.name)
+
+$(class.name)_t *
+$(class.name)_new ()
+{
+    $(class.name)_t *self = ($(class.name)_t *) zmalloc (sizeof ($(class.name)_t));
+    assert (self);
+
+    //  TODO: Initialize properties
+
+    return self;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Destroy the $(class.name)
+
+void
+$(class.name)_destroy ($(class.name)_t **self_p)
+{
+    assert (self_p);
+    if (*self_p) {
+        $(class.name)_t *self = *self_p;
+
+        //  Free class properties
+.   for class.property
+.       if type = "buffer"
+        free (self->$(name));
+.       elsif type = "string"
+        free (self->$(name));
+.       elsif type = "strings"
+        if (self->$(name))
+            zlist_destroy (&self->$(name));
+.       elsif type = "dictionary"
+        zhash_destroy (&self->$(name));
+.       elsif type = "chunk" | type = "frame" | type = "uuid" | type = "msg"
+        z$(type)_destroy (&self->$(name));
+.       elsif type <> "octets"
+.           if property.is_ptr = "true"
+        free (self->$(name));
+.           endif
+.       endif
+.   endfor
+
+        //  Free object itself
+        free (self);
+        *self_p = NULL;
+    }
+}
+
+
+//  --------------------------------------------------------------------------
+//  Print properties of object
+
+void
+$(class.name)_print ($(class.name)_t *self)
+{
+    assert (self);
+
+.   for class.property
+.       if type = "octets"
+    zsys_debug ("    $(name)=[ ... ]");
+.       elsif type = "string"
+.           if defined (property.value)
+    zsys_debug ("    $(name)=$(property.value)");
+.           else
+    if (self->$(name))
+        zsys_debug ("    $(name)='%s'", self->$(name));
+    else
+        zsys_debug ("    $(name)=");
+.           endif
+.       elsif type = "strings"
+    zsys_debug ("    $(name)=");
+    if (self->$(name)) {
+        char *$(name) = (char *) zlist_first (self->$(name));
+        while ($(name)) {
+            zsys_debug ("        '%s'", $(name));
+            $(name) = (char *) zlist_next (self->$(name));
+        }
+    }
+.       elsif type = "dictionary"
+    zsys_debug ("    $(name)=");
+    if (self->$(name)) {
+        char *item = (char *) zhash_first (self->$(name));
+        while (item) {
+            zsys_debug ("        %s=%s", zhash_cursor (self->$(name)), item);
+            item = (char *) zhash_next (self->$(name));
+        }
+    }
+    else
+        zsys_debug ("(NULL)");
+.       elsif type = "chunk"
+    zsys_debug ("    $(name)=[ ... ]");
+.       elsif type = "uuid"
+    zsys_debug ("    $(name)=");
+    if (self->$(name))
+        zsys_debug ("        %s", zuuid_str (self->$(name)));
+    else
+        zsys_debug ("        (NULL)");
+.       elsif type = "frame"
+    zsys_debug ("    $(name)=");
+    if (self->$(name))
+        zframe_print (self->$(name), NULL);
+    else
+        zsys_debug ("(NULL)");
+.       elsif type = "msg"
+    zsys_debug ("    $(name)=");
+    if (self->$(name))
+        zmsg_print (self->$(name));
+    else
+        zsys_debug ("(NULL)");
+.       elsif type = "buffer"
+    zsys_debug ("   $(name)=[ ... ], $(name)_size=%ld", self->$(name)_size);
+.       elsif type = "number"
+    zsys_debug ("   $(name)=%ld", (long) self->$(name));
+.       else
+    zsys_debug ("   $(name)=");
+.       endif
+.   endfor
+}
+
+
+.   for class.method
+//  Definition of $(name) method
+.       type_str = get_type_str (method)
+$(type_str)
+$(class.name)_$(name) ($(class.name)_t *self\
+.       for method.arg
+.           arg_type_str = get_type_str (arg)
+, $(arg_type_str)$(arg.name)\
+.       endfor
+)
+{
+    //  TODO: Implement $(name) method
+}
+
+
+.   endfor
+.   for class.property where !defined (value)
+.       if type = "octets"
+//  --------------------------------------------------------------------------
+//  Get/set the $(name) property
+
+byte *
+$(class.name)_$(name) ($(class.name)_t *self)
+{
+    assert (self);
+    return self->$(name);
+}
+
+size_t
+$(class.name)_$(name)_size ($(class.name)_t *self)
+{
+    assert (self);
+    return $(size);
+}
+
+void
+$(class.name)_set_$(name) ($(class.name)_t *self, byte *$(name))
+{
+    assert (self);
+    memcpy (self->$(name), $(name), $(size));
+}
+
+.       elsif type = "buffer"
+//  --------------------------------------------------------------------------
+//  Get/set the $(name) property
+
+byte *
+$(class.name)_$(name) ($(class.name)_t *self)
+{
+    assert (self);
+    return self->$(name);
+}
+
+size_t
+$(class.name)_$(name)_size ($(class.name)_t *self)
+{
+    assert (self);
+    return self->$(name)_size;
+}
+
+void
+$(class.name)_set_$(name) ($(class.name)_t *self, byte *$(name), size_t $(name)_size)
+{
+    assert (self);
+    if (self->$(name))
+        free (self->$(name));
+    self->$(name) = (byte *) zmalloc ($(name)_size);
+    assert (self->$(name));
+    memcpy (self->$(name), $(name), $(name)_size);
+    self->$(name)_size = $(name)_size;
+}
+
+.       elsif type = "string"
+//  --------------------------------------------------------------------------
+//  Get/set the $(name) property
+
+const char *
+$(class.name)_$(name) ($(class.name)_t *self)
+{
+    assert (self);
+    return self->$(name);
+}
+
+void
+$(class.name)_set_$(name) ($(class.name)_t *self, const char *format, ...)
+{
+    //  Format $(name) from provided arguments
+    assert (self);
+    va_list argptr;
+    va_start (argptr, format);
+    free (self->$(name));
+    self->$(name) = zsys_vprintf (format, argptr);
+    va_end (argptr);
+}
+
+.       elsif type = "strings"
+//  --------------------------------------------------------------------------
+//  Get the $(name) property, without transferring ownership
+
+zlist_t *
+$(class.name)_$(name) ($(class.name)_t *self)
+{
+    assert (self);
+    return self->$(name);
+}
+
+//  Get the $(name) property and transfer ownership to caller
+
+zlist_t *
+$(class.name)_get_$(name) ($(class.name)_t *self)
+{
+    assert (self);
+    zlist_t *$(name) = self->$(name);
+    self->$(name) = NULL;
+    return $(name);
+}
+
+//  Set the $(name) property, transferring ownership from caller
+
+void
+$(class.name)_set_$(name) ($(class.name)_t *self, zlist_t **$(name)_p)
+{
+    assert (self);
+    assert ($(name)_p);
+    zlist_destroy (&self->$(name));
+    self->$(name) = *$(name)_p;
+    *$(name)_p = NULL;
+}
+
+//  --------------------------------------------------------------------------
+//  Iterate through the $(name) property, and append a $(name) value
+
+const char *
+$(class.name)_$(name)_first ($(class.name)_t *self)
+{
+    assert (self);
+    if (self->$(name))
+        return (char *) (zlist_first (self->$(name)));
+    else
+        return NULL;
+}
+
+const char *
+$(class.name)_$(name)_next ($(class.name)_t *self)
+{
+    assert (self);
+    if (self->$(name))
+        return (char *) (zlist_next (self->$(name)));
+    else
+        return NULL;
+}
+
+void
+$(class.name)_$(name)_append ($(class.name)_t *self, const char *format, ...)
+{
+    //  Format into newly allocated string
+    assert (self);
+    va_list argptr;
+    va_start (argptr, format);
+    char *string = zsys_vprintf (format, argptr);
+    va_end (argptr);
+
+    //  Attach string to list
+    if (!self->$(name)) {
+        self->$(name) = zlist_new ();
+        zlist_autofree (self->$(name));
+    }
+    zlist_append (self->$(name), string);
+    free (string);
+}
+
+size_t
+$(class.name)_$(name)_size ($(class.name)_t *self)
+{
+    return zlist_size (self->$(name));
+}
+
+.       elsif type = "dictionary"
+//  --------------------------------------------------------------------------
+//  Get the $(name) property without transferring ownership
+
+zhash_t *
+$(class.name)_$(name) ($(class.name)_t *self)
+{
+    assert (self);
+    return self->$(name);
+}
+
+//  Get the $(name) property and transfer ownership to caller
+
+zhash_t *
+$(class.name)_get_$(name) ($(class.name)_t *self)
+{
+    zhash_t *$(name) = self->$(name);
+    self->$(name) = NULL;
+    return $(name);
+}
+
+//  Set the $(name) property, transferring ownership from caller
+
+void
+$(class.name)_set_$(name) ($(class.name)_t *self, zhash_t **$(name)_p)
+{
+    assert (self);
+    assert ($(name)_p);
+    zhash_destroy (&self->$(name));
+    self->$(name) = *$(name)_p;
+    *$(name)_p = NULL;
+}
+
+//  --------------------------------------------------------------------------
+//  Get/set a value in the $(name) dictionary
+
+const char *
+$(class.name)_$(name)_string ($(class.name)_t *self, const char *key, const char *default_value)
+{
+    assert (self);
+    const char *value = NULL;
+    if (self->$(name))
+        value = (const char *) (zhash_lookup (self->$(name), key));
+    if (!value)
+        value = default_value;
+
+    return value;
+}
+
+uint64_t
+$(class.name)_$(name)_number ($(class.name)_t *self, const char *key, uint64_t default_value)
+{
+    assert (self);
+    uint64_t value = default_value;
+    char *string = NULL;
+    if (self->$(name))
+        string = (char *) (zhash_lookup (self->$(name), key));
+    if (string)
+        value = atol (string);
+
+    return value;
+}
+
+void
+$(class.name)_$(name)_insert ($(class.name)_t *self, const char *key, const char *format, ...)
+{
+    //  Format into newly allocated string
+    assert (self);
+    va_list argptr;
+    va_start (argptr, format);
+    char *string = zsys_vprintf (format, argptr);
+    va_end (argptr);
+
+    //  Store string in hash table
+    if (!self->$(name)) {
+        self->$(name) = zhash_new ();
+        zhash_autofree (self->$(name));
+    }
+    zhash_update (self->$(name), key, string);
+    free (string);
+}
+
+size_t
+$(class.name)_$(name)_size ($(class.name)_t *self)
+{
+    return zhash_size (self->$(name));
+}
+
+.       elsif type = "chunk" | type = "uuid" | type = "frame" | type = "msg"
+//  --------------------------------------------------------------------------
+//  Get the $(name) property without transferring ownership
+
+z$(type)_t *
+$(class.name)_$(name) ($(class.name)_t *self)
+{
+    assert (self);
+    return self->$(name);
+}
+
+//  Get the $(name) property and transfer ownership to caller
+
+z$(type)_t *
+$(class.name)_get_$(name) ($(class.name)_t *self)
+{
+    z$(type)_t *$(name) = self->$(name);
+    self->$(name) = NULL;
+    return $(name);
+}
+
+//  Set the $(name) property, transferring ownership from caller
+
+void
+$(class.name)_set_$(name) ($(class.name)_t *self, z$(type)_t **$(type)_p)
+{
+    assert (self);
+    assert ($(type)_p);
+    z$(type)_destroy (&self->$(name));
+    self->$(name) = *$(type)_p;
+    *$(type)_p = NULL;
+}
+
+.       else
+.           type_str = get_type_str (property)
+//  --------------------------------------------------------------------------
+//  Get/set the $(name) property
+
+$(type_str)
+$(class.name)_$(name) ($(class.name)_t *self)
+{
+    assert (self);
+    return self->$(name);
+}
+
+void
+$(class.name)_set_$(name) ($(class.name)_t *self, $(type_str)$(name))
+{
+    assert (self);
+    self->$(name) = $(name);
+}
+
+.       endif
+.   endfor
+
+//  --------------------------------------------------------------------------
+//  Selftest
+
+int
+$(class.name)_test (bool verbose)
+{
+    printf (" * $(class.name): ");
+
+    //  @selftest
+    //  Simple create/destroy test
+    $(class.name)_t *self = $(class.name)_new ();
+    assert (self);
+    $(class.name)_destroy (&self);
+    //  @end
+
+    printf ("OK\\n");
+    return 0;
+}
+.endif
