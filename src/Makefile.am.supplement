@@ -97,6 +97,13 @@ libczmq_la_SOURCES = \
 
 bin_PROGRAMS = czmq_selftest
 
+dist_bin_SCRIPTS += \
+    src/zclass_c.gsl \
+    src/zclass_lib.gsl
+
+EXTRA_DIST += \
+    src/zclass_example.xml
+
 czmq_selftest_LDADD = \
     libczmq.la
 
