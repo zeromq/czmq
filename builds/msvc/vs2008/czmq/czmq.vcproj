@@ -1525,6 +1525,7 @@
       <File RelativePath="..\..\..\..\include\czmq_prelude.h" />
       <File RelativePath="..\..\..\..\src\zgossip_engine.inc" />
       <File RelativePath="..\..\..\..\src\zhash_primes.inc" />
+      <File RelativePath="..\..\..\..\src\zclass_example.xml" />
     </Filter>
   </Files>
   <Globals />
