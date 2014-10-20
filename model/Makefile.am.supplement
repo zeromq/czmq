@@ -7,4 +7,6 @@ dist_bin_SCRIPTS = \
     model/build-vs2008.gsl \
     model/build-vs2010.gsl \
     model/build-vs2012.gsl \
-    model/build-vs2013.gsl
+    model/build-vs2013.gsl \
+    src/zclass_c.gsl \
+    src/zclass_lib.gsl
