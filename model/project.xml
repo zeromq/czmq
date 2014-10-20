@@ -7,7 +7,7 @@
 
     <class name = "zactor" />
     <class name = "zauth" />
-    <class name = "zbase64" />
+    <class name = "zarmour" />
     <class name = "zbeacon" />
     <class name = "zcert" />
     <class name = "zcertstore" />
