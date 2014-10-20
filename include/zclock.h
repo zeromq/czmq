@@ -35,6 +35,12 @@ CZMQ_EXPORT int64_t
 CZMQ_EXPORT int64_t
     zclock_mono (void);
 
+//  Return current monotonic clock in microseconds. Use this when you compute
+//  time offsets. The monotonic clock is not affected by system changes and
+//  so will never be reset backwards, unlike a system clock.
+CZMQ_EXPORT int64_t
+    zclock_usec (void);
+
 //  Return formatted date/time as fresh string. Free using zstr_free().
 CZMQ_EXPORT char *
     zclock_timestr (void);
