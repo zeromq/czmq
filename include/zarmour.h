@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zbase64 - base64 encoding and decoding
+    zarmour - armoured text encoding and decoding
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -11,8 +11,8 @@
     =========================================================================
 */
 
-#ifndef __ZBASE64_H_INCLUDED__
-#define __ZBASE64_H_INCLUDED__
+#ifndef __ZARMOUR_H_INCLUDED__
+#define __ZARMOUR_H_INCLUDED__
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,54 +22,54 @@ extern "C" {
 
 //  Enumeration defining different encoding modes
 typedef enum {
-    ZBASE64_MODE_RFC4648_STD,
-    ZBASE64_MODE_RFC4648_URL
-} zbase64_mode_t;
+    ZARMOUR_MODE_BASE64_STD,   //  Standard base 64
+    ZARMOUR_MODE_BASE64_URL    //  URL and filename friendly base 64
+} zarmour_mode_t;
 
 
-//  Create a new zbase64
-CZMQ_EXPORT zbase64_t *
-    zbase64_new ();
+//  Create a new zarmour
+CZMQ_EXPORT zarmour_t *
+    zarmour_new ();
 
-//  Destroy the zbase64
+//  Destroy the zarmour
 CZMQ_EXPORT void
-    zbase64_destroy (zbase64_t **self_p);
+    zarmour_destroy (zarmour_t **self_p);
 
 //  Print properties of object
 CZMQ_EXPORT void
-    zbase64_print (zbase64_t *self);
+    zarmour_print (zarmour_t *self);
 
-//  Encode a stream of bytes into a base64 string.
+//  Encode a stream of bytes into an armoured string.
 CZMQ_EXPORT char *
-    zbase64_encode (zbase64_t *self, byte *data, size_t data_size);
+    zarmour_encode (zarmour_t *self, byte *data, size_t data_size);
 
-//  Decode a base64 string into a string of bytes.
+//  Decode an armoured string into a string of bytes.
 //  The decoded output is null-terminated, so it may be treated
 //  as a string, if that's what it was prior to encoding.
 CZMQ_EXPORT byte *
-    zbase64_decode (zbase64_t *self, char *data, size_t *decode_size);
+    zarmour_decode (zarmour_t *self, char *data, size_t *decode_size);
 
 //  Get/set the mode property
-CZMQ_EXPORT zbase64_mode_t
-    zbase64_mode (zbase64_t *self);
+CZMQ_EXPORT zarmour_mode_t
+    zarmour_mode (zarmour_t *self);
 CZMQ_EXPORT void
-    zbase64_set_mode (zbase64_t *self, zbase64_mode_t mode);
+    zarmour_set_mode (zarmour_t *self, zarmour_mode_t mode);
 
 //  Get/set the pad property
 CZMQ_EXPORT bool
-    zbase64_pad (zbase64_t *self);
+    zarmour_pad (zarmour_t *self);
 CZMQ_EXPORT void
-    zbase64_set_pad (zbase64_t *self, bool pad);
+    zarmour_set_pad (zarmour_t *self, bool pad);
 
 //  Get/set the pad_char property
 CZMQ_EXPORT char
-    zbase64_pad_char (zbase64_t *self);
+    zarmour_pad_char (zarmour_t *self);
 CZMQ_EXPORT void
-    zbase64_set_pad_char (zbase64_t *self, char pad_char);
+    zarmour_set_pad_char (zarmour_t *self, char pad_char);
 
 //  Self test of this class
 CZMQ_EXPORT int
-    zbase64_test (bool verbose);
+    zarmour_test (bool verbose);
 //  @end
 
 #ifdef __cplusplus

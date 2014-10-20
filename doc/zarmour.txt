@@ -1,69 +1,69 @@
-zbase64(3)
+zarmour(3)
 =========
 
 NAME
 ----
-zbase64 - base64 encoding and decoding
+zarmour - base64 encoding and decoding
 
 SYNOPSIS
 --------
 ----
 //  Enumeration defining different encoding modes
 typedef enum {
-    ZBASE64_MODE_RFC4648_STD,
-    ZBASE64_MODE_RFC4648_URL
-} zbase64_mode_t;
+    ZARMOUR_MODE_RFC4648_STD,
+    ZARMOUR_MODE_RFC4648_URL
+} zarmour_mode_t;
 
 
-//  Create a new zbase64
-CZMQ_EXPORT zbase64_t *
-    zbase64_new ();
+//  Create a new zarmour
+CZMQ_EXPORT zarmour_t *
+    zarmour_new ();
 
-//  Destroy the zbase64
+//  Destroy the zarmour
 CZMQ_EXPORT void
-    zbase64_destroy (zbase64_t **self_p);
+    zarmour_destroy (zarmour_t **self_p);
 
 //  Print properties of object
 CZMQ_EXPORT void
-    zbase64_print (zbase64_t *self);
+    zarmour_print (zarmour_t *self);
 
 //  Encode a stream of bytes into a base64 string.
 CZMQ_EXPORT char *
-    zbase64_encode (zbase64_t *self, byte *data, size_t data_size);
+    zarmour_encode (zarmour_t *self, byte *data, size_t data_size);
 
 //  Decode a base64 string into a string of bytes.
 //  The decoded output is null-terminated, so it may be treated
 //  as a string, if that's what it was prior to encoding.
 CZMQ_EXPORT byte *
-    zbase64_decode (zbase64_t *self, char *data, size_t *decode_size);
+    zarmour_decode (zarmour_t *self, char *data, size_t *decode_size);
 
 //  Get/set the mode property
-CZMQ_EXPORT zbase64_mode_t
-    zbase64_mode (zbase64_t *self);
+CZMQ_EXPORT zarmour_mode_t
+    zarmour_mode (zarmour_t *self);
 CZMQ_EXPORT void
-    zbase64_set_mode (zbase64_t *self, zbase64_mode_t mode);
+    zarmour_set_mode (zarmour_t *self, zarmour_mode_t mode);
 
 //  Get/set the pad property
 CZMQ_EXPORT bool
-    zbase64_pad (zbase64_t *self);
+    zarmour_pad (zarmour_t *self);
 CZMQ_EXPORT void
-    zbase64_set_pad (zbase64_t *self, bool pad);
+    zarmour_set_pad (zarmour_t *self, bool pad);
 
 //  Get/set the pad_char property
 CZMQ_EXPORT char
-    zbase64_pad_char (zbase64_t *self);
+    zarmour_pad_char (zarmour_t *self);
 CZMQ_EXPORT void
-    zbase64_set_pad_char (zbase64_t *self, char pad_char);
+    zarmour_set_pad_char (zarmour_t *self, char pad_char);
 
 //  Self test of this class
 CZMQ_EXPORT int
-    zbase64_test (bool verbose);
+    zarmour_test (bool verbose);
 ----
 
 DESCRIPTION
 -----------
 
-The zbase64 class implements encoding and decoding of base64 data
+The zarmour class implements encoding and decoding of base64 data
 based on the definitions in RFC4648. Both the standard alphabet from
 paragraph 4 and the URL and filename friendly one from paragraph 5
 are supported. The class API defines a flag to specify whether to
@@ -74,16 +74,16 @@ to use for padding. Breaking the output into lines is not implemented.
 
 EXAMPLE
 -------
-.From zbase64_test method
+.From zarmour_test method
 ----
 static void
-s_base64_test (zbase64_t *self, const char *test_string, const char *expected_result, bool verbose)
+s_base64_test (zarmour_t *self, const char *test_string, const char *expected_result, bool verbose)
 {
     assert (self);
     assert (test_string);
     assert (expected_result);
 
-    char *encoded = zbase64_encode (self, (byte *) test_string, strlen (test_string));
+    char *encoded = zarmour_encode (self, (byte *) test_string, strlen (test_string));
     assert (encoded);
     assert (strlen (encoded) == strlen (expected_result));
     assert (streq (encoded, expected_result));
@@ -92,7 +92,7 @@ s_base64_test (zbase64_t *self, const char *test_string, const char *expected_re
         zsys_debug ("       encoded '%s' into '%s'", test_string, encoded);
 
     size_t size;
-    char *decoded = (char *) zbase64_decode (self, encoded, &size);
+    char *decoded = (char *) zarmour_decode (self, encoded, &size);
     assert (decoded);
     assert (size == strlen (decoded) + 1);
     assert (streq (decoded, test_string));
@@ -106,39 +106,39 @@ s_base64_test (zbase64_t *self, const char *test_string, const char *expected_re
 
 
 int
-zbase64_test (bool verbose)
+zarmour_test (bool verbose)
 {
-    printf (" * zbase64: ");
+    printf (" * zarmour: ");
 
     if (verbose)
         printf ("\n");
 
     //  @selftest
-    zbase64_t *self = zbase64_new ();
+    zarmour_t *self = zarmour_new ();
     assert (self);
 
-    zbase64_mode_t mode = zbase64_mode (self);
-    assert (mode == ZBASE64_MODE_RFC4648_STD);
+    zarmour_mode_t mode = zarmour_mode (self);
+    assert (mode == ZARMOUR_MODE_RFC4648_STD);
 
-    zbase64_set_mode (self, ZBASE64_MODE_RFC4648_URL);
-    mode = zbase64_mode (self);
-    assert (mode == ZBASE64_MODE_RFC4648_URL);
+    zarmour_set_mode (self, ZARMOUR_MODE_RFC4648_URL);
+    mode = zarmour_mode (self);
+    assert (mode == ZARMOUR_MODE_RFC4648_URL);
 
-    bool pad = zbase64_pad (self);
+    bool pad = zarmour_pad (self);
     assert (pad);
 
-    zbase64_set_pad (self, false);
-    pad = zbase64_pad (self);
+    zarmour_set_pad (self, false);
+    pad = zarmour_pad (self);
     assert (!pad);
 
-    char pad_char = zbase64_pad_char (self);
+    char pad_char = zarmour_pad_char (self);
     assert (pad_char == '=');
 
     if (verbose)
-        zbase64_print (self);
+        zarmour_print (self);
 
-    zbase64_set_pad_char (self, '-');
-    pad_char = zbase64_pad_char (self);
+    zarmour_set_pad_char (self, '-');
+    pad_char = zarmour_pad_char (self);
     assert (pad_char == '-');
 
     //  Test against test vectors from RFC4648.
@@ -150,7 +150,7 @@ zbase64_test (bool verbose)
     s_base64_test (self, "fooba", "Zm9vYmE", verbose);
     s_base64_test (self, "foobar", "Zm9vYmFy", verbose);
 
-    zbase64_destroy (&self);
+    zarmour_destroy (&self);
 }
 ----
 

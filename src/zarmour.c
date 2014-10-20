@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zbase64 - base64 encoding and decoding
+    zarmour - armoured text encoding and decoding
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -13,41 +13,42 @@
 
 /*
 @header
-    zbase64 - base64 encoding and decoding
+    zarmour - armoured text encoding and decoding
 @discuss
-    The zbase64 class implements encoding and decoding of base64 data
-    based on the definitions in RFC4648. Both the standard alphabet from
-    paragraph 4 and the URL and filename friendly one from paragraph 5
-    are supported. The class API defines a flag to specify whether to
-    pad out the encoded string to a multiple of 4 chars, but this is
-    not implemented yet. The API also defines accessors for the character
-    to use for padding. Breaking the output into lines is not implemented.
+    The zarmour class implements encoding and decoding of armoured text data.
+    Currently, only base64 from RFC4648 (both the standard alphabet from
+    paragraph 4 and the URL and filename friendly one from paragraph 5) is
+    supported. The class API defines a flag to specify whether to
+    pad out the encoded string to the multiple of chars as specified by the
+    applicable standard, but this is not implemented yet. The API also defines
+    accessors for the character to use for padding. Breaking the output into
+    lines is not implemented.
 @end
 */
 
 #include "../include/czmq.h"
-#include "../include/zbase64.h"
+#include "../include/zarmour.h"
 
 //  Structure of our class
 
-struct _zbase64_t {
-    zbase64_mode_t mode;                //  The current mode (std or url)
+struct _zarmour_t {
+    zarmour_mode_t mode;                //  The current mode (std or url)
     bool pad;                           //  Should output be padded?
     char pad_char;                      //  The pad character
 };
 
 
 //  --------------------------------------------------------------------------
-//  Create a new zbase64
+//  Create a new zarmour
 
-zbase64_t *
-zbase64_new ()
+zarmour_t *
+zarmour_new ()
 {
-    zbase64_t *self = (zbase64_t *) zmalloc (sizeof (zbase64_t));
+    zarmour_t *self = (zarmour_t *) zmalloc (sizeof (zarmour_t));
     assert (self);
 
     //  Setup default as RFC4648 paragraph 4
-    self->mode = ZBASE64_MODE_RFC4648_STD;
+    self->mode = ZARMOUR_MODE_BASE64_STD;
     self->pad = true;
     self->pad_char = '=';
 
@@ -56,14 +57,14 @@ zbase64_new ()
 
 
 //  --------------------------------------------------------------------------
-//  Destroy the zbase64
+//  Destroy the zarmour
 
 void
-zbase64_destroy (zbase64_t **self_p)
+zarmour_destroy (zarmour_t **self_p)
 {
     assert (self_p);
     if (*self_p) {
-        zbase64_t *self = *self_p;
+        zarmour_t *self = *self_p;
 
         //  Free class properties
 
@@ -78,11 +79,11 @@ zbase64_destroy (zbase64_t **self_p)
 //  Print properties of object
 
 void
-zbase64_print (zbase64_t *self)
+zarmour_print (zarmour_t *self)
 {
     assert (self);
 
-    zsys_debug ("zbase64:");
+    zsys_debug ("zarmour:");
     zsys_debug ("   mode=%d", self->mode);
     zsys_debug ("   pad=%s", self->pad? "true": "false");
     zsys_debug ("   pad_char=%c", self->pad_char);
@@ -90,12 +91,12 @@ zbase64_print (zbase64_t *self)
 
 
 //  ---------------------------------------------------------------------------
-//  RFC 4648 Paragraph 4 (standard alphabet)
+//  RFC 4648 Paragraph 4 (standard base64 alphabet)
 static char  //        0----5----0----5----0----5----0----5----0----5----0----5----0---
 s_rfc4648p4_alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/+";
 
 //  ---------------------------------------------------------------------------
-//  RFC 4648 Paragraph 5 (URL & filename friendly alphabet)
+//  RFC 4648 Paragraph 5 (URL & filename friendly base64 alphabet)
 static char  //        0----5----0----5----0----5----0----5----0----5----0----5----0---
 s_rfc4648p5_alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 
@@ -154,39 +155,55 @@ s_base64_decode (const char *data, size_t *size, const char *alphabet)
 
 //  Definition of encode method
 char *
-zbase64_encode (zbase64_t *self, byte *data, size_t data_size)
+zarmour_encode (zarmour_t *self, byte *data, size_t data_size)
 {
     assert (self);
     assert (data);
-    const char *alphabet = self->mode == ZBASE64_MODE_RFC4648_STD? s_rfc4648p4_alphabet: s_rfc4648p5_alphabet;
-    return s_base64_encode (data, data_size, alphabet);
+
+    switch (self->mode) {
+        case ZARMOUR_MODE_BASE64_STD:
+            return s_base64_encode (data, data_size, s_rfc4648p4_alphabet);
+
+        case ZARMOUR_MODE_BASE64_URL:
+            return s_base64_encode (data, data_size, s_rfc4648p5_alphabet);
+    }
+
+    return NULL;
 }
 
 
 //  Definition of decode method
 byte *
-zbase64_decode (zbase64_t *self, char *data, size_t *decode_size)
+zarmour_decode (zarmour_t *self, char *data, size_t *decode_size)
 {
     assert (self);
     assert (data);
     assert (decode_size);
-    const char *alphabet = self->mode == ZBASE64_MODE_RFC4648_STD? s_rfc4648p4_alphabet: s_rfc4648p5_alphabet;
-    return s_base64_decode (data, decode_size, alphabet);
+
+    switch (self->mode) {
+        case ZARMOUR_MODE_BASE64_STD:
+            return s_base64_decode (data, decode_size, s_rfc4648p4_alphabet);
+
+        case ZARMOUR_MODE_BASE64_URL:
+            return s_base64_decode (data, decode_size, s_rfc4648p5_alphabet);
+    }
+
+    return NULL;
 }
 
 
 //  --------------------------------------------------------------------------
 //  Get/set the mode property
 
-zbase64_mode_t
-zbase64_mode (zbase64_t *self)
+zarmour_mode_t
+zarmour_mode (zarmour_t *self)
 {
     assert (self);
     return self->mode;
 }
 
 void
-zbase64_set_mode (zbase64_t *self, zbase64_mode_t mode)
+zarmour_set_mode (zarmour_t *self, zarmour_mode_t mode)
 {
     assert (self);
     self->mode = mode;
@@ -196,14 +213,14 @@ zbase64_set_mode (zbase64_t *self, zbase64_mode_t mode)
 //  Get/set the pad property
 
 bool
-zbase64_pad (zbase64_t *self)
+zarmour_pad (zarmour_t *self)
 {
     assert (self);
     return self->pad;
 }
 
 void
-zbase64_set_pad (zbase64_t *self, bool pad)
+zarmour_set_pad (zarmour_t *self, bool pad)
 {
     assert (self);
     self->pad = pad;
@@ -213,14 +230,14 @@ zbase64_set_pad (zbase64_t *self, bool pad)
 //  Get/set the pad_char property
 
 char
-zbase64_pad_char (zbase64_t *self)
+zarmour_pad_char (zarmour_t *self)
 {
     assert (self);
     return self->pad_char;
 }
 
 void
-zbase64_set_pad_char (zbase64_t *self, char pad_char)
+zarmour_set_pad_char (zarmour_t *self, char pad_char)
 {
     assert (self);
     self->pad_char = pad_char;
@@ -228,16 +245,16 @@ zbase64_set_pad_char (zbase64_t *self, char pad_char)
 
 
 //  ---------------------------------------------------------------------------
-//  base64 test utility
+//  armour test utility
 
 static void
-s_base64_test (zbase64_t *self, const char *test_string, const char *expected_result, bool verbose)
+s_armour_test (zarmour_t *self, const char *test_string, const char *expected_result, bool verbose)
 {
     assert (self);
     assert (test_string);
     assert (expected_result);
 
-    char *encoded = zbase64_encode (self, (byte *) test_string, strlen (test_string));
+    char *encoded = zarmour_encode (self, (byte *) test_string, strlen (test_string));
     assert (encoded);
     assert (strlen (encoded) == strlen (expected_result));
     assert (streq (encoded, expected_result));
@@ -246,7 +263,7 @@ s_base64_test (zbase64_t *self, const char *test_string, const char *expected_re
         zsys_debug ("       encoded '%s' into '%s'", test_string, encoded);
 
     size_t size;
-    char *decoded = (char *) zbase64_decode (self, encoded, &size);
+    char *decoded = (char *) zarmour_decode (self, encoded, &size);
     assert (decoded);
     assert (size == strlen (decoded) + 1);
     assert (streq (decoded, test_string));
@@ -263,51 +280,51 @@ s_base64_test (zbase64_t *self, const char *test_string, const char *expected_re
 //  Selftest
 
 int
-zbase64_test (bool verbose)
+zarmour_test (bool verbose)
 {
-    printf (" * zbase64: ");
+    printf (" * zarmour: ");
 
     if (verbose)
         printf ("\n");
 
     //  @selftest
-    zbase64_t *self = zbase64_new ();
+    zarmour_t *self = zarmour_new ();
     assert (self);
 
-    zbase64_mode_t mode = zbase64_mode (self);
-    assert (mode == ZBASE64_MODE_RFC4648_STD);
+    zarmour_mode_t mode = zarmour_mode (self);
+    assert (mode == ZARMOUR_MODE_BASE64_STD);
 
-    zbase64_set_mode (self, ZBASE64_MODE_RFC4648_URL);
-    mode = zbase64_mode (self);
-    assert (mode == ZBASE64_MODE_RFC4648_URL);
+    zarmour_set_mode (self, ZARMOUR_MODE_BASE64_URL);
+    mode = zarmour_mode (self);
+    assert (mode == ZARMOUR_MODE_BASE64_URL);
 
-    bool pad = zbase64_pad (self);
+    bool pad = zarmour_pad (self);
     assert (pad);
 
-    zbase64_set_pad (self, false);
-    pad = zbase64_pad (self);
+    zarmour_set_pad (self, false);
+    pad = zarmour_pad (self);
     assert (!pad);
 
-    char pad_char = zbase64_pad_char (self);
+    char pad_char = zarmour_pad_char (self);
     assert (pad_char == '=');
 
     if (verbose)
-        zbase64_print (self);
+        zarmour_print (self);
 
-    zbase64_set_pad_char (self, '-');
-    pad_char = zbase64_pad_char (self);
+    zarmour_set_pad_char (self, '-');
+    pad_char = zarmour_pad_char (self);
     assert (pad_char == '-');
 
     //  Test against test vectors from RFC4648.
-    s_base64_test (self, "", "", verbose);
-    s_base64_test (self, "f", "Zg", verbose);
-    s_base64_test (self, "fo", "Zm8", verbose);
-    s_base64_test (self, "foo", "Zm9v", verbose);
-    s_base64_test (self, "foob", "Zm9vYg", verbose);
-    s_base64_test (self, "fooba", "Zm9vYmE", verbose);
-    s_base64_test (self, "foobar", "Zm9vYmFy", verbose);
+    s_armour_test (self, "", "", verbose);
+    s_armour_test (self, "f", "Zg", verbose);
+    s_armour_test (self, "fo", "Zm8", verbose);
+    s_armour_test (self, "foo", "Zm9v", verbose);
+    s_armour_test (self, "foob", "Zm9vYg", verbose);
+    s_armour_test (self, "fooba", "Zm9vYmE", verbose);
+    s_armour_test (self, "foobar", "Zm9vYmFy", verbose);
 
-    zbase64_destroy (&self);
+    zarmour_destroy (&self);
     //  @end
 
     printf ("OK\n");
