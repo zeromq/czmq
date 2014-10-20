@@ -1,7 +1,7 @@
 <class
     name = "zarmour"
     title = "armoured text encoding and decoding"
-    script = "z_class_c"
+    script = "zclass_c"
     export_macro = "CZMQ_EXPORT"
     project_header = "../include/czmq.h"
     package_dir = "../include"
