@@ -123,6 +123,7 @@ set (czmq_headers
     include/zthread.h
     src/zgossip_engine.inc
     src/zhash_primes.inc
+    src/zclass_example.xml
 )
 source_group ("Header Files" FILES ${czmq_headers})
 install(FILES ${czmq_headers} DESTINATION include)

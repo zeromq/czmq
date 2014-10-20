@@ -45,6 +45,7 @@
     <!-- Other source files in src that we need to package -->
     <extra name = "zgossip_engine.inc" />
     <extra name = "zhash_primes.inc" />
+    <extra name = "zclass_example.xml" />
 
     <!-- Deprecated V2 API, remove some time after 3.0 stability -->
     <class name = "zauth_v2" />

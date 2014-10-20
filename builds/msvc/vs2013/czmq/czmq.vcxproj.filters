@@ -141,6 +141,9 @@
     <ClInclude Include="..\..\..\..\src\zhash_primes.inc">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\src\zclass_example.xml">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\builds\msvc\platform.h">
