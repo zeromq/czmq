@@ -133,6 +133,44 @@ zclock_mono (void)
 
 
 //  --------------------------------------------------------------------------
+//  Return current monotonic clock in microseconds. Use this when you compute
+//  time offsets. The monotonic clock is not affected by system changes and
+//  so will never be reset backwards, unlike a system clock.
+
+int64_t
+zclock_usecs (void)
+{
+#if defined (__UTYPE_OSX)
+    clock_serv_t cclock;
+    mach_timespec_t mts;
+    host_get_clock_service (mach_host_self (), SYSTEM_CLOCK, &cclock);
+    clock_get_time (cclock, &mts);
+    mach_port_deallocate (mach_task_self (), cclock);
+    return (int64_t) ((int64_t) mts.tv_sec * 1000000 + (int64_t) mts.tv_nsec / 1000);
+
+#elif defined (__UNIX__)
+    struct timespec ts;
+    clock_gettime (CLOCK_MONOTONIC, &ts);
+    return (int64_t) ((int64_t) ts.tv_sec * 1000000 + (int64_t) ts.tv_nsec / 1000);
+
+#elif (defined (__WINDOWS__))
+    //  System frequency does not change at run-time, cache it
+    static int64_t frequency = 0;
+    if (frequency == 0) {
+        LARGE_INTEGER freq;
+        QueryPerformanceFrequency (&freq);
+        // Windows documentation says that XP and later will always return non-zero
+        assert (freq.QuadPart != 0);
+        frequency = freq.QuadPart;
+    }
+    LARGE_INTEGER count;
+    QueryPerformanceCounter (&count);
+    return (int64_t) (count.QuadPart * 1000000) / frequency;
+#endif
+}
+
+
+//  --------------------------------------------------------------------------
 //  Return formatted date/time as fresh string. Free using zstr_free().
 
 char *
@@ -181,8 +219,10 @@ zclock_test (bool verbose)
     zclock_sleep (10);
     assert ((zclock_time () - start) >= 10);
     start = zclock_mono ();
+    int64_t usecs = zclock_usecs ();
     zclock_sleep (10);
     assert ((zclock_mono () - start) >= 10);
+    assert ((zclock_usecs () - usecs) >= 10000);
     char *timestr = zclock_timestr ();
     if (verbose)
         puts (timestr);
