@@ -54,6 +54,7 @@ libczmq_la_SOURCES = \
     src/platform.h \
     src/zgossip_engine.inc \
     src/zhash_primes.inc \
+    src/zclass_example.xml \
     src/zactor.c \
     src/zauth.c \
     src/zarmour.c \
@@ -96,13 +97,6 @@ libczmq_la_SOURCES = \
     src/zthread.c
 
 bin_PROGRAMS = czmq_selftest
-
-dist_bin_SCRIPTS += \
-    src/zclass_c.gsl \
-    src/zclass_lib.gsl
-
-EXTRA_DIST += \
-    src/zclass_example.xml
 
 czmq_selftest_LDADD = \
     libczmq.la
