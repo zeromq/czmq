@@ -738,8 +738,7 @@ zsock_recv (void *self, const char *picture, ...)
         if (*picture == 'm') {
             zmsg_t **zmsg_p = va_arg (argptr, zmsg_t **);
             if (zmsg_p) {
-                if (!*zmsg_p)
-                    *zmsg_p = zmsg_new ();
+                *zmsg_p = zmsg_new ();
                 zframe_t *frame;
                 while ((frame = zmsg_pop (msg)))
                     zmsg_append (*zmsg_p, &frame);
