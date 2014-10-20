@@ -31,7 +31,7 @@
 
 //  Opaque class structures to allow forward references
 typedef struct _zactor_t zactor_t;
-typedef struct _zbase64_t zbase64_t;
+typedef struct _zarmour_t zarmour_t;
 typedef struct _zcert_t zcert_t;
 typedef struct _zcertstore_t zcertstore_t;
 typedef struct _zchunk_t zchunk_t;
@@ -71,7 +71,7 @@ typedef int (czmq_comparator) (const void *item1, const void *item2);
 
 //  Public API classes
 #include "zactor.h"
-#include "zbase64.h"
+#include "zarmour.h"
 #include "zauth.h"
 #include "zbeacon.h"
 #include "zcert.h"

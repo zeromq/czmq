@@ -13,7 +13,7 @@
     <ClCompile Include="..\..\..\..\src\zauth.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zbase64.c">
+    <ClCompile Include="..\..\..\..\src\zarmour.c">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\zbeacon.c">

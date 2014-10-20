@@ -40,7 +40,7 @@ main (int argc, char *argv [])
     printf ("Running CZMQ selftests...\n");
 
     //  These are ordered from lowest level to highest level
-    zbase64_test (verbose);
+    zarmour_test (verbose);
     zrex_test (verbose);
     zsys_test (verbose);
     zchunk_test (verbose);

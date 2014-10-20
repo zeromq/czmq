@@ -83,7 +83,7 @@ set (czmq_headers
     include/czmq_prelude.h
     include/zactor.h
     include/zauth.h
-    include/zbase64.h
+    include/zarmour.h
     include/zbeacon.h
     include/zcert.h
     include/zcertstore.h
@@ -136,7 +136,7 @@ include_directories(${ZEROMQ_INCLUDE_DIRS})
 set (czmq_sources
     src/zactor.c
     src/zauth.c
-    src/zbase64.c
+    src/zarmour.c
     src/zbeacon.c
     src/zcert.c
     src/zcertstore.c

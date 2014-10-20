@@ -262,7 +262,7 @@
           <Tool Name="VCCLCompilerTool" CompileAs="2" />
         </FileConfiguration>
       </File>
-      <File RelativePath="..\..\..\..\src\zbase64.c">
+      <File RelativePath="..\..\..\..\src\zarmour.c">
         <FileConfiguration Name="Release|Win32">
           <Tool Name="VCCLCompilerTool" CompileAs="2" />
         </FileConfiguration>
@@ -1483,7 +1483,7 @@
       <File RelativePath="..\..\..\..\builds\msvc\platform.h" />
       <File RelativePath="..\..\..\..\include\zactor.h" />
       <File RelativePath="..\..\..\..\include\zauth.h" />
-      <File RelativePath="..\..\..\..\include\zbase64.h" />
+      <File RelativePath="..\..\..\..\include\zarmour.h" />
       <File RelativePath="..\..\..\..\include\zbeacon.h" />
       <File RelativePath="..\..\..\..\include\zcert.h" />
       <File RelativePath="..\..\..\..\include\zcertstore.h" />

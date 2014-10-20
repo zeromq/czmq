@@ -1,0 +1,42 @@
+#!/bin/bash
+
+function help() {
+    echo "usage:"
+    echo "  $0 <from class name> <to class name>"
+    echo
+    exit 1
+}
+
+if [ $# -lt 2 ]; then
+    help
+fi
+
+FROM=$1
+TO=$2
+echo Renaming ${FROM} to ${TO}
+
+FROM_CAPS=`echo $FROM | tr '[a-z]' '[A-Z]'`
+TO_CAPS=`echo $TO | tr '[a-z]' '[A-Z]'`
+SCRIPTS_DIR=$(dirname $(cd ${0%/*} 2>>/dev/null ; echo `pwd`/${0##*/}))
+PROJECT_DIR="$(realpath ${SCRIPTS_DIR}/..)"
+
+echo Entering ${PROJECT_DIR}
+cd "${PROJECT_DIR}" || exit 2
+for ext in "*.h" "*.c" "*.txt" "*.doc" "*.xml"; do
+    for f in $(find ./ -type f -name "${ext}" -exec grep -Eli "${FROM}" {} \;); do
+        echo Replacing in $f
+        sed -i -e 's/'${FROM}'/'${TO}'/g' $f || exit 3
+        sed -i -e 's/'${FROM_CAPS}'/'${TO_CAPS}'/g' $f || exit 4
+    done
+done
+
+for f in $(find ./ -type f -name "${FROM}.*" -exec echo {} \;); do
+    echo Moving $f to ${f/$FROM/$TO}
+    mv $f ${f/$FROM/$TO} || exit 7
+done
+
+echo Generating model
+cd "${SCRIPTS_DIR}" || exit 5
+./generate || exit 6
+
+echo Rename $FROM to $TO done.
