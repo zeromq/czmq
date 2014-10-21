@@ -93,7 +93,7 @@ zarmour_print (zarmour_t *self)
 //  ---------------------------------------------------------------------------
 //  RFC 4648 Paragraph 4 (standard base64 alphabet)
 static char  //        0----5----0----5----0----5----0----5----0----5----0----5----0---
-s_rfc4648p4_alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/+";
+s_rfc4648p4_alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 //  ---------------------------------------------------------------------------
 //  RFC 4648 Paragraph 5 (URL & filename friendly base64 alphabet)
