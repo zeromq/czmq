@@ -51,12 +51,6 @@ AC_PROG_SED
 AC_PROG_AWK
 PKG_PROG_PKG_CONFIG
 
-# 
-AC_ARG_ENABLE([labs],
-    [AS_HELP_STRING([--disable-labs], [Enable Labs support @<:@check@:>@])],
-    [:],
-    [enable_labs=check])
-
 # Checks for libraries
 AC_CHECK_LIB([pthread], [pthread_create])
 AC_CHECK_LIB([uuid], [uuid_generate])
@@ -250,7 +244,6 @@ AM_CONDITIONAL(ON_MINGW, test "x$czmq_on_mingw32" = "xyes")
 AM_CONDITIONAL(ON_ANDROID, test "x$czmq_on_android" = "xyes")
 AM_CONDITIONAL(INSTALL_MAN, test "x$czmq_install_man" = "xyes")
 AM_CONDITIONAL(BUILD_DOC, test "x$czmq_build_doc" = "xyes")
-AM_CONDITIONAL([ENABLE_LABS], [test "x$enable_labs" = "xyes"])
 
 # Checks for library functions.
 AC_TYPE_SIGNAL
@@ -263,5 +256,5 @@ AC_ARG_WITH([pkgconfigdir], AS_HELP_STRING([--with-pkgconfigdir=PATH],
 AC_SUBST([pkgconfigdir])
 
 # Specify output files
-AC_CONFIG_FILES([Makefile src/Makefile src/libczmq.pc labs/libczmq_labs.pc ])
+AC_CONFIG_FILES([Makefile src/Makefile src/libczmq.pc])
 AC_OUTPUT
