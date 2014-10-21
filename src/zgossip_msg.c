@@ -9,17 +9,16 @@
     statements. DO NOT MAKE ANY CHANGES YOU WISH TO KEEP. The correct places
     for commits are:
 
-    * The XML model used for this code generation: zgossip_msg.xml
-    * The code generation script that built this file: zproto_codec_c
+     * The XML model used for this code generation: zgossip_msg.xml, or
+     * The code generation script that built this file: zproto_codec_c
     ************************************************************************
-
-    Copyright (c) the Contributors as noted in the AUTHORS file.
-    This file is part of CZMQ, the high-level C binding for 0MQ:
-    http://czmq.zeromq.org.
-
+    Copyright (c) the Contributors as noted in the AUTHORS file.       
+    This file is part of CZMQ, the high-level C binding for 0MQ:       
+    http://czmq.zeromq.org.                                            
+                                                                       
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
-    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.           
     =========================================================================
 */
 
@@ -50,135 +49,135 @@ struct _zgossip_msg_t {
 //  Network data encoding macros
 
 //  Put a block of octets to the frame
-#define PUT_OCTETS(host, size) { \
-        memcpy (self->needle, (host), size); \
-        self->needle += size; \
+#define PUT_OCTETS(host,size) { \
+    memcpy (self->needle, (host), size); \
+    self->needle += size; \
 }
 
 //  Get a block of octets from the frame
-#define GET_OCTETS(host, size) { \
-        if (self->needle + size > self->ceiling) \
-            goto malformed; \
-        memcpy ((host), self->needle, size); \
-        self->needle += size; \
+#define GET_OCTETS(host,size) { \
+    if (self->needle + size > self->ceiling) \
+        goto malformed; \
+    memcpy ((host), self->needle, size); \
+    self->needle += size; \
 }
 
 //  Put a 1-byte number to the frame
 #define PUT_NUMBER1(host) { \
-        *(byte *) self->needle = (host); \
-        self->needle ++; \
+    *(byte *) self->needle = (host); \
+    self->needle++; \
 }
 
 //  Put a 2-byte number to the frame
 #define PUT_NUMBER2(host) { \
-        self->needle [0] = (byte) (((host) >> 8)  & 255); \
-        self->needle [1] = (byte) (((host))       & 255); \
-        self->needle += 2; \
+    self->needle [0] = (byte) (((host) >> 8)  & 255); \
+    self->needle [1] = (byte) (((host))       & 255); \
+    self->needle += 2; \
 }
 
 //  Put a 4-byte number to the frame
 #define PUT_NUMBER4(host) { \
-        self->needle [0] = (byte) (((host) >> 24) & 255); \
-        self->needle [1] = (byte) (((host) >> 16) & 255); \
-        self->needle [2] = (byte) (((host) >> 8)  & 255); \
-        self->needle [3] = (byte) (((host))       & 255); \
-        self->needle += 4; \
+    self->needle [0] = (byte) (((host) >> 24) & 255); \
+    self->needle [1] = (byte) (((host) >> 16) & 255); \
+    self->needle [2] = (byte) (((host) >> 8)  & 255); \
+    self->needle [3] = (byte) (((host))       & 255); \
+    self->needle += 4; \
 }
 
 //  Put a 8-byte number to the frame
 #define PUT_NUMBER8(host) { \
-        self->needle [0] = (byte) (((host) >> 56) & 255); \
-        self->needle [1] = (byte) (((host) >> 48) & 255); \
-        self->needle [2] = (byte) (((host) >> 40) & 255); \
-        self->needle [3] = (byte) (((host) >> 32) & 255); \
-        self->needle [4] = (byte) (((host) >> 24) & 255); \
-        self->needle [5] = (byte) (((host) >> 16) & 255); \
-        self->needle [6] = (byte) (((host) >> 8)  & 255); \
-        self->needle [7] = (byte) (((host))       & 255); \
-        self->needle += 8; \
+    self->needle [0] = (byte) (((host) >> 56) & 255); \
+    self->needle [1] = (byte) (((host) >> 48) & 255); \
+    self->needle [2] = (byte) (((host) >> 40) & 255); \
+    self->needle [3] = (byte) (((host) >> 32) & 255); \
+    self->needle [4] = (byte) (((host) >> 24) & 255); \
+    self->needle [5] = (byte) (((host) >> 16) & 255); \
+    self->needle [6] = (byte) (((host) >> 8)  & 255); \
+    self->needle [7] = (byte) (((host))       & 255); \
+    self->needle += 8; \
 }
 
 //  Get a 1-byte number from the frame
 #define GET_NUMBER1(host) { \
-        if (self->needle + 1 > self->ceiling) \
-            goto malformed; \
-        (host) = *(byte *) self->needle; \
-        self->needle ++; \
+    if (self->needle + 1 > self->ceiling) \
+        goto malformed; \
+    (host) = *(byte *) self->needle; \
+    self->needle++; \
 }
 
 //  Get a 2-byte number from the frame
 #define GET_NUMBER2(host) { \
-        if (self->needle + 2 > self->ceiling) \
-            goto malformed; \
-        (host) = ((uint16_t) (self->needle [0]) << 8) \
-                 +  (uint16_t) (self->needle [1]); \
-        self->needle += 2; \
+    if (self->needle + 2 > self->ceiling) \
+        goto malformed; \
+    (host) = ((uint16_t) (self->needle [0]) << 8) \
+           +  (uint16_t) (self->needle [1]); \
+    self->needle += 2; \
 }
 
 //  Get a 4-byte number from the frame
 #define GET_NUMBER4(host) { \
-        if (self->needle + 4 > self->ceiling) \
-            goto malformed; \
-        (host) = ((uint32_t) (self->needle [0]) << 24) \
-                 + ((uint32_t) (self->needle [1]) << 16) \
-                 + ((uint32_t) (self->needle [2]) << 8) \
-                 +  (uint32_t) (self->needle [3]); \
-        self->needle += 4; \
+    if (self->needle + 4 > self->ceiling) \
+        goto malformed; \
+    (host) = ((uint32_t) (self->needle [0]) << 24) \
+           + ((uint32_t) (self->needle [1]) << 16) \
+           + ((uint32_t) (self->needle [2]) << 8) \
+           +  (uint32_t) (self->needle [3]); \
+    self->needle += 4; \
 }
 
 //  Get a 8-byte number from the frame
 #define GET_NUMBER8(host) { \
-        if (self->needle + 8 > self->ceiling) \
-            goto malformed; \
-        (host) = ((uint64_t) (self->needle [0]) << 56) \
-                 + ((uint64_t) (self->needle [1]) << 48) \
-                 + ((uint64_t) (self->needle [2]) << 40) \
-                 + ((uint64_t) (self->needle [3]) << 32) \
-                 + ((uint64_t) (self->needle [4]) << 24) \
-                 + ((uint64_t) (self->needle [5]) << 16) \
-                 + ((uint64_t) (self->needle [6]) << 8) \
-                 +  (uint64_t) (self->needle [7]); \
-        self->needle += 8; \
+    if (self->needle + 8 > self->ceiling) \
+        goto malformed; \
+    (host) = ((uint64_t) (self->needle [0]) << 56) \
+           + ((uint64_t) (self->needle [1]) << 48) \
+           + ((uint64_t) (self->needle [2]) << 40) \
+           + ((uint64_t) (self->needle [3]) << 32) \
+           + ((uint64_t) (self->needle [4]) << 24) \
+           + ((uint64_t) (self->needle [5]) << 16) \
+           + ((uint64_t) (self->needle [6]) << 8) \
+           +  (uint64_t) (self->needle [7]); \
+    self->needle += 8; \
 }
 
 //  Put a string to the frame
 #define PUT_STRING(host) { \
-        size_t string_size = strlen (host); \
-        PUT_NUMBER1 (string_size); \
-        memcpy (self->needle, (host), string_size); \
-        self->needle += string_size; \
+    size_t string_size = strlen (host); \
+    PUT_NUMBER1 (string_size); \
+    memcpy (self->needle, (host), string_size); \
+    self->needle += string_size; \
 }
 
 //  Get a string from the frame
 #define GET_STRING(host) { \
-        size_t string_size; \
-        GET_NUMBER1 (string_size); \
-        if (self->needle + string_size > (self->ceiling)) \
-            goto malformed; \
-        (host) = (char *) malloc (string_size + 1); \
-        memcpy ((host), self->needle, string_size); \
-        (host) [string_size] = 0; \
-        self->needle += string_size; \
+    size_t string_size; \
+    GET_NUMBER1 (string_size); \
+    if (self->needle + string_size > (self->ceiling)) \
+        goto malformed; \
+    (host) = (char *) malloc (string_size + 1); \
+    memcpy ((host), self->needle, string_size); \
+    (host) [string_size] = 0; \
+    self->needle += string_size; \
 }
 
 //  Put a long string to the frame
 #define PUT_LONGSTR(host) { \
-        size_t string_size = strlen (host); \
-        PUT_NUMBER4 (string_size); \
-        memcpy (self->needle, (host), string_size); \
-        self->needle += string_size; \
+    size_t string_size = strlen (host); \
+    PUT_NUMBER4 (string_size); \
+    memcpy (self->needle, (host), string_size); \
+    self->needle += string_size; \
 }
 
 //  Get a long string from the frame
 #define GET_LONGSTR(host) { \
-        size_t string_size; \
-        GET_NUMBER4 (string_size); \
-        if (self->needle + string_size > (self->ceiling)) \
-            goto malformed; \
-        (host) = (char *) malloc (string_size + 1); \
-        memcpy ((host), self->needle, string_size); \
-        (host) [string_size] = 0; \
-        self->needle += string_size; \
+    size_t string_size; \
+    GET_NUMBER4 (string_size); \
+    if (self->needle + string_size > (self->ceiling)) \
+        goto malformed; \
+    (host) = (char *) malloc (string_size + 1); \
+    memcpy ((host), self->needle, string_size); \
+    (host) [string_size] = 0; \
+    self->needle += string_size; \
 }
 
 
@@ -218,7 +217,7 @@ zgossip_msg_destroy (zgossip_msg_t **self_p)
 
 //  --------------------------------------------------------------------------
 //  Parse a zgossip_msg from zmsg_t. Returns a new object, or NULL if
-//  the message could not be parsed, or was NULL. Destroys msg and
+//  the message could not be parsed, or was NULL. Destroys msg and 
 //  nullifies the msg reference.
 
 zgossip_msg_t *
@@ -228,11 +227,11 @@ zgossip_msg_decode (zmsg_t **msg_p)
     zmsg_t *msg = *msg_p;
     if (msg == NULL)
         return NULL;
-
+        
     zgossip_msg_t *self = zgossip_msg_new (0);
     //  Read and parse command in frame
     zframe_t *frame = zmsg_pop (msg);
-    if (!frame)
+    if (!frame) 
         goto empty;             //  Malformed or empty
 
     //  Get and check protocol signature
@@ -289,13 +288,13 @@ zgossip_msg_decode (zmsg_t **msg_p)
     return self;
 
     //  Error returns
-malformed:
-    zsys_error ("malformed message '%d'\n", self->id);
-empty:
-    zframe_destroy (&frame);
-    zmsg_destroy (msg_p);
-    zgossip_msg_destroy (&self);
-    return (NULL);
+    malformed:
+        zsys_error ("malformed message '%d'\n", self->id);
+    empty:
+        zframe_destroy (&frame);
+        zmsg_destroy (msg_p);
+        zgossip_msg_destroy (&self);
+        return (NULL);
 }
 
 
@@ -308,7 +307,7 @@ zgossip_msg_encode (zgossip_msg_t **self_p)
 {
     assert (self_p);
     assert (*self_p);
-
+    
     zgossip_msg_t *self = *self_p;
     zmsg_t *msg = zmsg_new ();
 
@@ -318,7 +317,7 @@ zgossip_msg_encode (zgossip_msg_t **self_p)
             //  version is a 1-byte integer
             frame_size += 1;
             break;
-
+            
         case ZGOSSIP_MSG_PUBLISH:
             //  version is a 1-byte integer
             frame_size += 1;
@@ -333,22 +332,22 @@ zgossip_msg_encode (zgossip_msg_t **self_p)
             //  ttl is a 4-byte integer
             frame_size += 4;
             break;
-
+            
         case ZGOSSIP_MSG_PING:
             //  version is a 1-byte integer
             frame_size += 1;
             break;
-
+            
         case ZGOSSIP_MSG_PONG:
             //  version is a 1-byte integer
             frame_size += 1;
             break;
-
+            
         case ZGOSSIP_MSG_INVALID:
             //  version is a 1-byte integer
             frame_size += 1;
             break;
-
+            
         default:
             zsys_error ("bad message type '%d', not sent\n", self->id);
             //  No recovery, this is a fatal application error
@@ -477,7 +476,7 @@ zgossip_msg_send (zgossip_msg_t **self_p, void *output)
 
     //  Encode zgossip_msg message to a single zmsg
     zmsg_t *msg = zgossip_msg_encode (self_p);
-
+    
     //  If we're sending to a ROUTER, send the routing_id first
     if (zsocket_type (zsock_resolve (output)) == ZMQ_ROUTER) {
         assert (routing_id);
@@ -485,7 +484,7 @@ zgossip_msg_send (zgossip_msg_t **self_p, void *output)
     }
     else
         zframe_destroy (&routing_id);
-
+        
     if (msg && zmsg_send (&msg, output) == 0)
         return 0;
     else
@@ -509,9 +508,9 @@ zgossip_msg_send_again (zgossip_msg_t *self, void *output)
 //  --------------------------------------------------------------------------
 //  Encode HELLO message
 
-zmsg_t *
+zmsg_t * 
 zgossip_msg_encode_hello (
-    )
+)
 {
     zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_HELLO);
     return zgossip_msg_encode (&self);
@@ -521,7 +520,7 @@ zgossip_msg_encode_hello (
 //  --------------------------------------------------------------------------
 //  Encode PUBLISH message
 
-zmsg_t *
+zmsg_t * 
 zgossip_msg_encode_publish (
     const char *key,
     const char *value,
@@ -538,9 +537,9 @@ zgossip_msg_encode_publish (
 //  --------------------------------------------------------------------------
 //  Encode PING message
 
-zmsg_t *
+zmsg_t * 
 zgossip_msg_encode_ping (
-    )
+)
 {
     zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_PING);
     return zgossip_msg_encode (&self);
@@ -550,9 +549,9 @@ zgossip_msg_encode_ping (
 //  --------------------------------------------------------------------------
 //  Encode PONG message
 
-zmsg_t *
+zmsg_t * 
 zgossip_msg_encode_pong (
-    )
+)
 {
     zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_PONG);
     return zgossip_msg_encode (&self);
@@ -562,9 +561,9 @@ zgossip_msg_encode_pong (
 //  --------------------------------------------------------------------------
 //  Encode INVALID message
 
-zmsg_t *
+zmsg_t * 
 zgossip_msg_encode_invalid (
-    )
+)
 {
     zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_INVALID);
     return zgossip_msg_encode (&self);
@@ -645,7 +644,7 @@ zgossip_msg_dup (zgossip_msg_t *self)
 {
     if (!self)
         return NULL;
-
+        
     zgossip_msg_t *copy = zgossip_msg_new (self->id);
     if (self->routing_id)
         copy->routing_id = zframe_dup (self->routing_id);
@@ -656,8 +655,8 @@ zgossip_msg_dup (zgossip_msg_t *self)
 
         case ZGOSSIP_MSG_PUBLISH:
             copy->version = self->version;
-            copy->key = self->key ? strdup (self->key) : NULL;
-            copy->value = self->value ? strdup (self->value) : NULL;
+            copy->key = self->key? strdup (self->key): NULL;
+            copy->value = self->value? strdup (self->value): NULL;
             copy->ttl = self->ttl;
             break;
 
@@ -690,7 +689,7 @@ zgossip_msg_print (zgossip_msg_t *self)
             zsys_debug ("ZGOSSIP_MSG_HELLO:");
             zsys_debug ("    version=1");
             break;
-
+            
         case ZGOSSIP_MSG_PUBLISH:
             zsys_debug ("ZGOSSIP_MSG_PUBLISH:");
             zsys_debug ("    version=1");
@@ -704,22 +703,22 @@ zgossip_msg_print (zgossip_msg_t *self)
                 zsys_debug ("    value=");
             zsys_debug ("    ttl=%ld", (long) self->ttl);
             break;
-
+            
         case ZGOSSIP_MSG_PING:
             zsys_debug ("ZGOSSIP_MSG_PING:");
             zsys_debug ("    version=1");
             break;
-
+            
         case ZGOSSIP_MSG_PONG:
             zsys_debug ("ZGOSSIP_MSG_PONG:");
             zsys_debug ("    version=1");
             break;
-
+            
         case ZGOSSIP_MSG_INVALID:
             zsys_debug ("ZGOSSIP_MSG_INVALID:");
             zsys_debug ("    version=1");
             break;
-
+            
     }
 }
 
@@ -878,7 +877,7 @@ zgossip_msg_test (bool verbose)
     int instance;
     zgossip_msg_t *copy;
     self = zgossip_msg_new (ZGOSSIP_MSG_HELLO);
-
+    
     //  Check that _dup works on empty message
     copy = zgossip_msg_dup (self);
     assert (copy);
@@ -892,11 +891,11 @@ zgossip_msg_test (bool verbose)
         self = zgossip_msg_recv (input);
         assert (self);
         assert (zgossip_msg_routing_id (self));
-
+        
         zgossip_msg_destroy (&self);
     }
     self = zgossip_msg_new (ZGOSSIP_MSG_PUBLISH);
-
+    
     //  Check that _dup works on empty message
     copy = zgossip_msg_dup (self);
     assert (copy);
@@ -913,14 +912,14 @@ zgossip_msg_test (bool verbose)
         self = zgossip_msg_recv (input);
         assert (self);
         assert (zgossip_msg_routing_id (self));
-
+        
         assert (streq (zgossip_msg_key (self), "Life is short but Now lasts for ever"));
         assert (streq (zgossip_msg_value (self), "Life is short but Now lasts for ever"));
         assert (zgossip_msg_ttl (self) == 123);
         zgossip_msg_destroy (&self);
     }
     self = zgossip_msg_new (ZGOSSIP_MSG_PING);
-
+    
     //  Check that _dup works on empty message
     copy = zgossip_msg_dup (self);
     assert (copy);
@@ -934,11 +933,11 @@ zgossip_msg_test (bool verbose)
         self = zgossip_msg_recv (input);
         assert (self);
         assert (zgossip_msg_routing_id (self));
-
+        
         zgossip_msg_destroy (&self);
     }
     self = zgossip_msg_new (ZGOSSIP_MSG_PONG);
-
+    
     //  Check that _dup works on empty message
     copy = zgossip_msg_dup (self);
     assert (copy);
@@ -952,11 +951,11 @@ zgossip_msg_test (bool verbose)
         self = zgossip_msg_recv (input);
         assert (self);
         assert (zgossip_msg_routing_id (self));
-
+        
         zgossip_msg_destroy (&self);
     }
     self = zgossip_msg_new (ZGOSSIP_MSG_INVALID);
-
+    
     //  Check that _dup works on empty message
     copy = zgossip_msg_dup (self);
     assert (copy);
@@ -970,7 +969,7 @@ zgossip_msg_test (bool verbose)
         self = zgossip_msg_recv (input);
         assert (self);
         assert (zgossip_msg_routing_id (self));
-
+        
         zgossip_msg_destroy (&self);
     }
 

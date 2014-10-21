@@ -7,10 +7,9 @@
     statements. DO NOT MAKE ANY CHANGES YOU WISH TO KEEP. The correct places
     for commits are:
 
-    * The XML model used for this code generation: zgossip.xml
-    * The code generation script that built this file: zproto_server_c
+     * The XML model used for this code generation: zgossip.xml, or
+     * The code generation script that built this file: zproto_server_c
     ************************************************************************
-
     Copyright (c) the Contributors as noted in the AUTHORS file.       
     This file is part of CZMQ, the high-level C binding for 0MQ:       
     http://czmq.zeromq.org.                                            
@@ -122,7 +121,7 @@ static void
 static void
     s_client_execute (s_client_t *client, int event);
 static int
-    s_client_wakeup (zloop_t *loop, int timer_id, void *argument);
+    s_client_handle_wakeup (zloop_t *loop, int timer_id, void *argument);
 static void
     get_first_tuple (client_t *self);
 static void
@@ -174,7 +173,7 @@ engine_set_wakeup_event (client_t *client, size_t delay, event_t event)
             self->wakeup_timer = 0;
         }
         self->wakeup_timer = zloop_timer (
-            self->server->loop, delay, 1, s_client_wakeup, self);
+            self->server->loop, delay, 1, s_client_handle_wakeup, self);
         self->wakeup_event = event;
     }
 }
@@ -269,6 +268,18 @@ engine_configure (server_t *server, const char *path, const char *value)
     }
 }
 
+//  Return true if server is running in verbose mode, else return false.
+
+static bool
+engine_verbose (server_t *server)
+{
+    if (server) {
+        s_server_t *self = (s_server_t *) server;
+        return self->verbose;
+    }
+    return false;
+}
+
 //  Pedantic compilers don't like unused functions, so we call the whole
 //  API, passing null references. It's nasty and horrid and sufficient.
 
@@ -284,6 +295,7 @@ s_satisfy_pedantic_compilers (void)
     engine_set_monitor (NULL, 0, NULL);
     engine_set_log_prefix (NULL, NULL);
     engine_configure (NULL, NULL, NULL);
+    engine_verbose (NULL);
 }
 
 
@@ -353,7 +365,7 @@ s_client_destroy (s_client_t **self_p)
             zloop_timer_end (self->server->loop, self->wakeup_timer);
         if (self->expiry_timer)
             zloop_timer_end (self->server->loop, self->expiry_timer);
-
+            
         //  Empty and destroy mailbox
         zgossip_msg_t *request = (zgossip_msg_t *) zlist_first (self->mailbox);
         while (request) {
@@ -418,9 +430,9 @@ s_client_filter_mailbox (s_client_t *self)
 //  Execute state machine as long as we have events
 
 static void
-s_client_execute (s_client_t *self, int event)
+s_client_execute (s_client_t *self, event_t event)
 {
-    self->next_event = (event_t) event;
+    self->next_event = event;
     //  Cancel wakeup timer, if any was pending
     if (self->wakeup_timer) {
         zloop_timer_end (self->server->loop, self->wakeup_timer);
@@ -451,7 +463,7 @@ s_client_execute (s_client_t *self, int event)
                 else
                 if (self->event == ping_event) {
                     if (!self->exception) {
-                        //  send pong
+                        //  send PONG
                         if (self->server->verbose)
                             zsys_debug ("%s:         $ send PONG",
                                 self->log_prefix);
@@ -473,7 +485,7 @@ s_client_execute (s_client_t *self, int event)
                 else {
                     //  Handle unexpected protocol events
                     if (!self->exception) {
-                        //  send invalid
+                        //  send INVALID
                         if (self->server->verbose)
                             zsys_debug ("%s:         $ send INVALID",
                                 self->log_prefix);
@@ -494,7 +506,7 @@ s_client_execute (s_client_t *self, int event)
             case have_tuple_state:
                 if (self->event == ok_event) {
                     if (!self->exception) {
-                        //  send publish
+                        //  send PUBLISH
                         if (self->server->verbose)
                             zsys_debug ("%s:         $ send PUBLISH",
                                 self->log_prefix);
@@ -543,7 +555,7 @@ s_client_execute (s_client_t *self, int event)
                         get_tuple_to_forward (&self->client);
                     }
                     if (!self->exception) {
-                        //  send publish
+                        //  send PUBLISH
                         if (self->server->verbose)
                             zsys_debug ("%s:         $ send PUBLISH",
                                 self->log_prefix);
@@ -556,7 +568,7 @@ s_client_execute (s_client_t *self, int event)
                 else
                 if (self->event == ping_event) {
                     if (!self->exception) {
-                        //  send pong
+                        //  send PONG
                         if (self->server->verbose)
                             zsys_debug ("%s:         $ send PONG",
                                 self->log_prefix);
@@ -578,7 +590,7 @@ s_client_execute (s_client_t *self, int event)
                 else {
                     //  Handle unexpected protocol events
                     if (!self->exception) {
-                        //  send invalid
+                        //  send INVALID
                         if (self->server->verbose)
                             zsys_debug ("%s:         $ send INVALID",
                                 self->log_prefix);
@@ -599,7 +611,7 @@ s_client_execute (s_client_t *self, int event)
             case external_state:
                 if (self->event == ping_event) {
                     if (!self->exception) {
-                        //  send pong
+                        //  send PONG
                         if (self->server->verbose)
                             zsys_debug ("%s:         $ send PONG",
                                 self->log_prefix);
@@ -621,7 +633,7 @@ s_client_execute (s_client_t *self, int event)
                 else {
                     //  Handle unexpected protocol events
                     if (!self->exception) {
-                        //  send invalid
+                        //  send INVALID
                         if (self->server->verbose)
                             zsys_debug ("%s:         $ send INVALID",
                                 self->log_prefix);
@@ -667,7 +679,7 @@ s_client_execute (s_client_t *self, int event)
 //  zloop callback when client inactivity timer expires
 
 static int
-s_client_expired (zloop_t *loop, int timer_id, void *argument)
+s_client_handle_timeout (zloop_t *loop, int timer_id, void *argument)
 {
     s_client_t *self = (s_client_t *) argument;
     s_client_execute (self, expired_event);
@@ -677,7 +689,7 @@ s_client_expired (zloop_t *loop, int timer_id, void *argument)
 //  zloop callback when client wakeup timer expires
 
 static int
-s_client_wakeup (zloop_t *loop, int timer_id, void *argument)
+s_client_handle_wakeup (zloop_t *loop, int timer_id, void *argument)
 {
     s_client_t *self = (s_client_t *) argument;
     s_client_execute (self, self->wakeup_event);
@@ -776,7 +788,7 @@ s_server_apply_config (s_server_t *self)
         if (streq (zconfig_name (section), "bind")) {
             char *endpoint = zconfig_resolve (section, "endpoint", "?");
             if (zsock_bind (self->router, "%s", endpoint) == -1)
-                zsys_warning ("failed to bind to %s", endpoint);
+                zsys_warning ("could not bind to %s (%s)", endpoint, zmq_strerror (zmq_errno ()));
         }
         section = zconfig_next (section);
     }
@@ -811,7 +823,7 @@ s_server_api_message (zloop_t *loop, zsock_t *reader, void *argument)
         char *endpoint = zmsg_popstr (msg);
         self->port = zsock_bind (self->router, "%s", endpoint);
         if (self->port == -1)
-            zsys_warning ("failed to bind to %s", endpoint);
+            zsys_warning ("could not bind to %s", endpoint);
         free (endpoint);
     }
     else
@@ -840,10 +852,9 @@ s_server_api_message (zloop_t *loop, zsock_t *reader, void *argument)
         char *path = zmsg_popstr (msg);
         char *value = zmsg_popstr (msg);
         zconfig_put (self->config, path, value);
-        //  TODO: remove after October 9, 2014
         if (streq (path, "server/animate")) {
             zsys_warning ("'%s' is deprecated, use VERBOSE command instead", path);
-            self->verbose = atoi (value) != 0;
+            self->verbose = atoi (value);
         }
         s_server_config_self (self);
         free (path);
@@ -880,11 +891,14 @@ s_server_client_message (zloop_t *loop, zsock_t *reader, void *argument)
     free (hashkey);
 
     //  Any input from client counts as activity
-    if (client->expiry_timer)
+    if (client->expiry_timer) {
         zloop_timer_end (self->loop, client->expiry_timer);
-    //  Reset expiry timer
-    client->expiry_timer = zloop_timer (
-        self->loop, self->timeout, 1, s_client_expired, client);
+        client->expiry_timer = 0;
+    }
+    //  Reset expiry timer if timeout is not zero
+    if (self->timeout)
+        client->expiry_timer = zloop_timer (
+            self->loop, self->timeout, 1, s_client_handle_timeout, client);
         
     //  Queue request and possibly pass it to client state machine
     zlist_append (client->mailbox, msg);
