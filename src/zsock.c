@@ -1089,8 +1089,6 @@ zsock_test (bool verbose)
     rc = zsock_attach (server, ">a,@b, c,, ", false);
     assert (rc == -1);
     zsock_destroy (&server);
-
     //  @end
-
     printf ("OK\n");
 }
