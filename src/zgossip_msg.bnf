@@ -3,30 +3,35 @@ The following ABNF grammar defines the ZeroMQ Gossip Protocol:
     C:HELLO ( C:PUBLISH / S:PUBLISH / heartbeat )
     heartbeat = C:PING / S:PONG
 
-    ;         Client says hello to server
-    hello           = signature %d1 version
+    ;  Client says hello to server                                           
+
+    HELLO           = signature %d1 version
     signature       = %xAA %xA0             ; two octets
     version         = number-1              ; Version = 1
 
-    ;         Client or server announces a new tuple
-    publish         = signature %d2 version key value ttl
+    ;  Client or server announces a new tuple                                
+
+    PUBLISH         = signature %d2 version key value ttl
     version         = number-1              ; Version = 1
     key             = string                ; Tuple key, globally unique
     value           = longstr               ; Tuple value, as printable string
     ttl             = number-4              ; Time to live, msecs
 
-    ;         Client signals liveness
-    ping            = signature %d3 version
+    ;  Client signals liveness                                               
+
+    PING            = signature %d3 version
     version         = number-1              ; Version = 1
 
-    ;         Server responds to ping; note that pongs are not correlated with pings,
-        and may be mixed with other commands, and the client should treat any
-        incoming traffic as valid activity.
-    pong            = signature %d4 version
+    ;  Server responds to ping; note that pongs are not correlated with      
+    ;  pings, and may be mixed with other commands, and the client should    
+    ;  treat any incoming traffic as valid activity.                         
+
+    PONG            = signature %d4 version
     version         = number-1              ; Version = 1
 
-    ;         Server rejects command as invalid
-    invalid         = signature %d5 version
+    ;  Server rejects command as invalid                                     
+
+    INVALID         = signature %d5 version
     version         = number-1              ; Version = 1
 
     ; Strings are always length + text contents
