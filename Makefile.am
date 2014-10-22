@@ -106,15 +106,13 @@ EXTRA_DIST = \
 	builds/msvc/properties/DebugLEXE.props \
 	builds/msvc/properties/Output.props
 
-include $(srcdir)/model/Makefile.am.supplement
+include $(srcdir)/model/Makefile.ams
 
-include $(srcdir)/src/Makefile.am.supplement
+include $(srcdir)/src/Makefile.ams
 
-include $(srcdir)/addons/Makefile.am.supplement
+include $(srcdir)/addons/Makefile.ams
 
-include $(srcdir)/labs/Makefile.am.supplement
-
-include $(srcdir)/doc/Makefile.am.supplement
+include $(srcdir)/doc/Makefile.ams
 
 # workaround the dist generated files that are also part of the distribution
 #distcleancheck_listfiles = \

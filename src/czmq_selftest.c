@@ -83,6 +83,7 @@ main (int argc, char *argv [])
     zthread_test (verbose);
 
     zsys_shutdown ();
+    printf ("Number of memory allocations=%" PRId64 "\n", zsys_allocs);
 
     printf ("Tests passed OK\n");
     return 0;

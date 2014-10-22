@@ -29,6 +29,8 @@
 //  These are global variables accessible to CZMQ application code
 volatile int zsys_interrupted = 0;  //  Current name
 volatile int zctx_interrupted = 0;  //  Deprecated name
+volatile uint64_t zsys_allocs = 0;
+
 
 static void s_signal_handler (int signal_value);
 
@@ -843,15 +845,15 @@ zsys_socket_error (const char *reason)
 {
 #if defined (__WINDOWS__)
     switch (WSAGetLastError ()) {
-        case WSAEINTR:        errno = EINTR;break;
-        case WSAEBADF:        errno = EBADF;break;
-        case WSAEWOULDBLOCK:  errno = EAGAIN;break;
-        case WSAEINPROGRESS:  errno = EAGAIN;break;
-        case WSAENETDOWN:     errno = ENETDOWN;break;
-        case WSAECONNRESET:   errno = ECONNRESET;break;
-        case WSAECONNABORTED: errno = EPIPE;break;
-        case WSAESHUTDOWN:    errno = ECONNRESET;break;
-        case WSAEINVAL:       errno = EPIPE;break;
+        case WSAEINTR:        errno = EINTR;      break;
+        case WSAEBADF:        errno = EBADF;      break;
+        case WSAEWOULDBLOCK:  errno = EAGAIN;     break;
+        case WSAEINPROGRESS:  errno = EAGAIN;     break;
+        case WSAENETDOWN:     errno = ENETDOWN;   break;
+        case WSAECONNRESET:   errno = ECONNRESET; break;
+        case WSAECONNABORTED: errno = EPIPE;      break;
+        case WSAESHUTDOWN:    errno = ECONNRESET; break;
+        case WSAEINVAL:       errno = EPIPE;      break;
         default:              errno = GetLastError ();
     }
 #endif
