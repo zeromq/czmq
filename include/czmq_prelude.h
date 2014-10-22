@@ -451,20 +451,20 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
 #   endif
 #endif
 
-//- Error reporting ---------------------------------------------------------
+//- Memory allocations ------------------------------------------------------
+
+extern volatile uint64_t zsys_allocs;
 
 //  Replacement for malloc() which asserts if we run out of heap, and
 //  which zeroes the allocated block.
 static inline void *
-    safe_malloc (
-    size_t size,
-    const char *file,
-    unsigned line)
+safe_malloc (size_t size, const char *file, unsigned line)
 {
-    void
-        *mem;
-
-    mem = calloc (1, size);
+#if defined (__UTYPE_LINUX)
+    //  On GCC we count zmalloc memory allocations
+    __sync_add_and_fetch (&zsys_allocs, 1);
+#endif
+    void *mem = calloc (1, size);
     if (mem == NULL) {
         fprintf (stderr, "FATAL ERROR at %s:%u\n", file, line);
         fprintf (stderr, "OUT OF MEMORY (malloc returned NULL)\n");
@@ -475,7 +475,7 @@ static inline void *
 }
 
 //  Define _ZMALLOC_DEBUG if you need to trace memory leaks using e.g. mtrace,
-//  otherwise all allocations will claim to come from zfl_prelude.h.  For best
+//  otherwise all allocations will claim to come from czmq_prelude.h. For best
 //  results, compile all classes so you see dangling object allocations.
 //  _ZMALLOC_PEDANTIC does the same thing, but its intention is to propagate
 //  out of memory condition back up the call stack.

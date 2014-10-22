@@ -9,8 +9,8 @@
     statements. DO NOT MAKE ANY CHANGES YOU WISH TO KEEP. The correct places
     for commits are:
 
-    * The XML model used for this code generation: zgossip_msg.xml
-    * The code generation script that built this file: zproto_codec_c
+     * The XML model used for this code generation: zgossip_msg.xml, or
+     * The code generation script that built this file: zproto_codec_c
     ************************************************************************
     Copyright (c) the Contributors as noted in the AUTHORS file.       
     This file is part of CZMQ, the high-level C binding for 0MQ:       
