@@ -1193,7 +1193,7 @@ zhash_test (int verbose)
     zhash_destroy (&hash);
     assert (hash == NULL);
 
-    // Test autofree; automatically copies and frees string values
+    //  Test autofree; automatically copies and frees string values
     hash = zhash_new ();
     assert (hash);
     zhash_autofree (hash);
