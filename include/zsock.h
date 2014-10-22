@@ -182,13 +182,14 @@ CZMQ_EXPORT const char *
 //  of these characters, each corresponding to one or two arguments:
 //
 //      i = int
+//      u = uint
 //      s = char *
 //      b = byte *, size_t (2 arguments)
 //      c = zchunk_t *
 //      f = zframe_t *
 //      h = zhash_t *
-//      m = zmsg_t * (sends all frames in the zmsg)
 //      p = void * (sends the pointer value, only meaningful over inproc)
+//      m = zmsg_t * (sends all frames in the zmsg)
 //      z = sends zero-sized frame (0 arguments)
 //
 //  Note that s, b, c, and f are encoded the same way and the choice is
@@ -204,13 +205,14 @@ CZMQ_EXPORT int
 //  a series of pointers as provided by the caller:
 //
 //      i = int * (stores integer)
+//      u = uint * (stores unsigned integer)
 //      s = char ** (allocates new string)
 //      b = byte **, size_t * (2 arguments) (allocates memory)
 //      c = zchunk_t ** (creates zchunk)
 //      f = zframe_t ** (creates zframe)
 //      p = void ** (stores pointer)
 //      h = zhash_t ** (creates zhash)
-//      m = zmsg_t ** (creates a zmsg with the remaing frames)    
+//      m = zmsg_t ** (creates a zmsg with the remaing frames)
 //      z = null, asserts empty frame (0 arguments)
 //
 //  Note that zsock_recv creates the returned objects, and the caller must
@@ -219,7 +221,7 @@ CZMQ_EXPORT int
 //  a message, in which case the pointers are not modified. When message
 //  frames are truncated (a short message), sets return values to zero/null.
 //  If an argument pointer is NULL, does not store any value (skips it).
-//  An 'n' picture matches an empty frame; if the message does not match, 
+//  An 'n' picture matches an empty frame; if the message does not match,
 //  the method will return -1.
 CZMQ_EXPORT int
     zsock_recv (void *self, const char *picture, ...);

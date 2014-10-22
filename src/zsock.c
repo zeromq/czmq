@@ -534,11 +534,14 @@ zsock_type_str (void *self)
 //  of these characters, each corresponding to one or two arguments:
 //
 //      i = int
+//      u = uint
 //      s = char *
 //      b = byte *, size_t (2 arguments)
 //      c = zchunk_t *
 //      f = zframe_t *
+//      h = zhash_t *
 //      p = void * (sends the pointer value, only meaningful over inproc)
+//      m = zmsg_t * (sends all frames in the zmsg)
 //      z = sends zero-sized frame (0 arguments)
 //
 //  Note that s, b, c, and f are encoded the same way and the choice is
@@ -559,6 +562,9 @@ zsock_send (void *self, const char *picture, ...)
     while (*picture) {
         if (*picture == 'i')
             zmsg_addstrf (msg, "%d", va_arg (argptr, int));
+        else
+        if (*picture == 'u')
+            zmsg_addstrf (msg, "%ud", va_arg (argptr, uint));
         else
         if (*picture == 's')
             zmsg_addstr (msg, va_arg (argptr, char *));
@@ -622,11 +628,14 @@ zsock_send (void *self, const char *picture, ...)
 //  a series of pointers as provided by the caller:
 //
 //      i = int * (stores integer)
+//      u = uint * (stores unsigned integer)
 //      s = char ** (allocates new string)
 //      b = byte **, size_t * (2 arguments) (allocates memory)
 //      c = zchunk_t ** (creates zchunk)
 //      f = zframe_t ** (creates zframe)
 //      p = void ** (stores pointer)
+//      h = zhash_t ** (creates zhash)
+//      m = zmsg_t ** (creates a zmsg with the remaing frames)
 //      z = null, asserts empty frame (0 arguments)
 //
 //  Note that zsock_recv creates the returned objects, and the caller must
@@ -653,9 +662,17 @@ zsock_recv (void *self, const char *picture, ...)
     while (*picture) {
         if (*picture == 'i') {
             char *string = zmsg_popstr (msg);
-            int *integer_p = va_arg (argptr, int *);
-            if (integer_p)
-                *integer_p = string ? atoi (string) : 0;
+            int *int_p = va_arg (argptr, int *);
+            if (int_p)
+                *int_p = string ? atoi (string) : 0;
+            free (string);
+        }
+        else
+        if (*picture == 'u') {
+            char *string = zmsg_popstr (msg);
+            uint *uint_p = va_arg (argptr, uint *);
+            if (uint_p)
+                *uint_p = string ? (uint) atol (string) : 0;
             free (string);
         }
         else
