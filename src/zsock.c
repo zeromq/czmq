@@ -110,9 +110,14 @@ zsock_t *
 zsock_new_sub_ (const char *endpoints, const char *subscribe, const char *filename, size_t line_nbr)
 {
     zsock_t *sock = zsock_new_ (ZMQ_SUB, filename, line_nbr);
-    if (sock)
-        if (zsock_attach (sock, endpoints, false))
+    if (sock) {
+        if (zsock_attach (sock, endpoints, false) == 0) {
+            if (subscribe)
+                zsock_set_subscribe (sock, subscribe);
+        }
+        else
             zsock_destroy (&sock);
+    }
     return sock;
 }
 
