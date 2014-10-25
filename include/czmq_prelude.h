@@ -427,15 +427,18 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
     typedef unsigned int  uint;
 #   if (!defined (__MINGW32__))
     typedef int mode_t;
-#if defined (__IS_64BIT__)
+#       if defined (__IS_64BIT__)
     typedef long long ssize_t;
-#else
+#       else
     typedef long ssize_t;
-#endif
+#       endif
     typedef __int32 int32_t;
     typedef __int64 int64_t;
     typedef unsigned __int32 uint32_t;
     typedef unsigned __int64 uint64_t;
+#   endif
+#   if (!defined (PRId64))
+#       define PRId64   %I64d
 #   endif
 #   if (!defined (va_copy))
     //  MSVC does not support C99's va_copy so we use a regular assignment
