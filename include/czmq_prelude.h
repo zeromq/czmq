@@ -438,7 +438,7 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
     typedef unsigned __int64 uint64_t;
 #   endif
 #   if (!defined (PRId64))
-#       define PRId64   %I64d
+#       define PRId64   "I64d"
 #   endif
 #   if (!defined (va_copy))
     //  MSVC does not support C99's va_copy so we use a regular assignment
