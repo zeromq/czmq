@@ -119,7 +119,7 @@ static int
 static void
     client_terminate (client_t *self);
 static void
-    s_client_execute (s_client_t *client, int event);
+    s_client_execute (s_client_t *client, event_t event);
 static int
     s_client_handle_wakeup (zloop_t *loop, int timer_id, void *argument);
 static void
