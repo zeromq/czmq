@@ -585,6 +585,7 @@ zsys_dir_create (const char *pathname, ...)
 #else
             if (mkdir (formatted, 0775))
 #endif
+                free (formatted);
                 return -1;      //  Failed
         }
         else
