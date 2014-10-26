@@ -3,6 +3,10 @@ ACLOCAL_AMFLAGS = -I config
 AM_CPPFLAGS = \
 	-I$(srcdir)/include
 
+SUBDIRS = doc
+
+DIST_SUBDIRS = doc
+
 lib_LTLIBRARIES =
 
 bin_PROGRAMS =
@@ -115,8 +119,6 @@ include $(srcdir)/model/Makemodule.am
 include $(srcdir)/src/Makemodule.am
 
 include $(srcdir)/addons/Makemodule.am
-
-include $(srcdir)/doc/Makemodule.am
 
 # workaround the dist generated files that are also part of the distribution
 #distcleancheck_listfiles = \
