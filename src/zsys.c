@@ -1001,6 +1001,7 @@ zsys_run_as (const char *lockfile, const char *group, const char *user)
         snprintf (pid_buffer, sizeof (pid_buffer), "%6d\n", getpid ());
         if (write (handle, pid_buffer, strlen (pid_buffer)) != strlen (pid_buffer)) {
             zsys_error ("cannot write to lockfile: %s", strerror (errno));
+            close (handle);
             return -1;
         }
         close (handle);
