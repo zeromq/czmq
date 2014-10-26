@@ -346,6 +346,7 @@ zfile_input (zfile_t *self)
 int
 zfile_output (zfile_t *self)
 {
+    int rc;
     assert (self);
 
     //  Wipe symbolic link if that's what the file was
@@ -358,9 +359,12 @@ zfile_output (zfile_t *self)
     char *last_slash = strrchr (file_path, '/');
     if (last_slash)
         *last_slash = 0;
-    if (zsys_dir_create (file_path))
-        return -1;
+        
+    rc = zsys_dir_create (file_path);
     free (file_path);
+    if (rc != 0) {
+        return -1;
+    }
 
     //  Create file if it doesn't exist
     if (self->handle)
