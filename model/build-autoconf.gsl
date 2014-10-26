@@ -95,8 +95,8 @@ code:
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
 #   Please read the README.txt file in the model directory.     #
 #################################################################
-.echo "Generating doc/Makemodule.am..."
-.output "../doc/Makemodule.am"
+.echo "Generating doc/Makefile.am..."
+.output "../doc/Makefile.am"
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
 #   Please read the README.txt file in the model directory.     #
@@ -104,21 +104,21 @@ code:
 .project.manpage = "$(project.name).7"
 .manpages = ""
 .for class where private?0 = 0
-.   manpages += " $\(srcdir)/doc/$(name).3"
+.   manpages += " $(name).3"
 .   if class.name = project.name
 .       project.manpage = ""
 .   endif
 .endfor
 MAN1 =
 MAN3 =$(manpages)
-MAN7 = $\(srcdir)/doc/$(project.manpage)
+MAN7 = $\(srcdir)/$(project.manpage)
 MAN_DOC = $\(MAN1) $\(MAN3) $\(MAN7)
 
 MAN_TXT = $\(MAN1:%.1=%.txt)
 MAN_TXT += $\(MAN3:%.3=%.txt)
 MAN_TXT += $\(MAN7:%.7=%.txt)
 
-EXTRA_DIST += $\(srcdir)/doc/asciidoc.conf $\(srcdir)/doc/mkman $\(MAN_TXT)
+EXTRA_DIST = asciidoc.conf mkman $\(MAN_TXT)
 
 if BUILD_DOC
 if INSTALL_MAN
@@ -132,15 +132,15 @@ dist-hook : $\(MAN_DOC)
 SUFFIXES=.txt .xml .1 .3 .7
 
 \.txt.xml:
-\t$\(srcdir)/doc/mkman $<
-\tasciidoc -d manpage -b docbook -f $\(srcdir)/doc/asciidoc.conf \\
+\t$\(srcdir)/mkman $<
+\tasciidoc -d manpage -b docbook -f $\(srcdir)/asciidoc.conf \\
 \t\t-a$(project.name)_version=@PACKAGE_VERSION@ -o$@ $<
 \.xml.1:
-\txmlto -o $\(srcdir)/doc man $<
+\txmlto man $<
 \.xml.3:
-\txmlto -o $\(srcdir)/doc man $<
+\txmlto man $<
 \.xml.7:
-\txmlto -o $\(srcdir)/doc man $<
+\txmlto man $<
 endif
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #

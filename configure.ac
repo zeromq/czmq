@@ -258,5 +258,5 @@ AC_SUBST([pkgconfigdir])
 AC_CONFIG_LINKS([src/Makefile:src/Makefile])
 
 # Specify output files
-AC_CONFIG_FILES([Makefile src/libczmq.pc])
+AC_CONFIG_FILES([Makefile doc/Makefile src/libczmq.pc])
 AC_OUTPUT
