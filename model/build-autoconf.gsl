@@ -4,13 +4,13 @@
 .#  language. See https://github.com/imatix/gsl for details. This script
 .#  is licensed under MIT/X11.
 .#
-.echo "Generating src/Makefile.am.supplement..."
-.output "../src/Makefile.am.supplement"
+.echo "Generating src/Makemodule.am..."
+.output "../src/Makemodule.am"
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
 #   Please read the README.txt file in the model directory.     #
 #################################################################
-lib_LTLIBRARIES = lib$(project.name).la
+lib_LTLIBRARIES += src/lib$(project.name).la
 
 pkgconfig_DATA = src/lib$(project.name).pc
 
@@ -31,7 +31,7 @@ include_HEADERS = \\
 .   endif
 .endfor
 
-lib$(project.name)_la_SOURCES = \\
+src_lib$(project.name)_la_SOURCES = \\
     src/platform.h \\
 .for extra
     src/$(name) \\
@@ -44,24 +44,24 @@ lib$(project.name)_la_SOURCES = \\
 .   endif
 .endfor
 
-bin_PROGRAMS = $(project.name)_selftest
-
-$(project.name)_selftest_LDADD = \\
-    lib$(project.name).la
-
-$(project.name)_selftest_SOURCES = \\
-    src/$(project.name)_selftest.c
-
-lib$(project.name)_la_LDFLAGS = \\
+src_lib$(project.name)_la_LDFLAGS = \\
     -version-info @LTVER@
 
 if ON_MINGW
-lib$(project.name)_la_LDFLAGS += \\
+src_lib$(project.name)_la_LDFLAGS += \\
     -no-undefined \\
     -avoid-version
 endif
 
-TESTS = $(project.name)_selftest
+bin_PROGRAMS += src/$(project.name)_selftest
+
+src_$(project.name)_selftest_LDADD = \\
+    src/lib$(project.name).la
+
+src_$(project.name)_selftest_SOURCES = \\
+    src/$(project.name)_selftest.c
+
+TESTS = src/$(project.name)_selftest
 .for model
 .   if first ()
 
@@ -69,12 +69,21 @@ TESTS = $(project.name)_selftest
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
 #   Please read the README.txt file in the model directory.     #
 #################################################################
-.echo "Generating src/Makefile.am..."
-.output "../src/Makefile.am"
+.echo "Generating src/Makefile..."
+.output "../src/Makefile"
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
 #   Please read the README.txt file in the model directory.     #
 #################################################################
+
+# add in make from local directory behavior
+all: lib$(project.name).la $(project.name)_selftest
+
+lib$(project.name).la:
+	cd ..; make src/lib$(project.name).la ${ARGS}; cd src
+
+$(project.name)_selftest:
+	cd ..; make src/$(project.name)_selftest ${ARGS}; cd src
 
 # Produce generated models; do this manually in src directory
 code:
@@ -86,8 +95,8 @@ code:
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
 #   Please read the README.txt file in the model directory.     #
 #################################################################
-.echo "Generating doc/Makefile.am.supplement..."
-.output "../doc/Makefile.am.supplement"
+.echo "Generating doc/Makemodule.am..."
+.output "../doc/Makemodule.am"
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
 #   Please read the README.txt file in the model directory.     #
