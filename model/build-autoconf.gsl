@@ -4,13 +4,13 @@
 .#  language. See https://github.com/imatix/gsl for details. This script
 .#  is licensed under MIT/X11.
 .#
-.echo "Generating src/Makefile.am.supplement..."
-.output "../src/Makefile.am.supplement"
+.echo "Generating src/Makemodule.am..."
+.output "../src/Makemodule.am"
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
 #   Please read the README.txt file in the model directory.     #
 #################################################################
-lib_LTLIBRARIES = lib$(project.name).la
+lib_LTLIBRARIES += src/lib$(project.name).la
 
 pkgconfig_DATA = src/lib$(project.name).pc
 
@@ -31,7 +31,7 @@ include_HEADERS = \\
 .   endif
 .endfor
 
-lib$(project.name)_la_SOURCES = \\
+src_lib$(project.name)_la_SOURCES = \\
     src/platform.h \\
 .for extra
     src/$(name) \\
@@ -44,24 +44,24 @@ lib$(project.name)_la_SOURCES = \\
 .   endif
 .endfor
 
-bin_PROGRAMS = $(project.name)_selftest
-
-$(project.name)_selftest_LDADD = \\
-    lib$(project.name).la
-
-$(project.name)_selftest_SOURCES = \\
-    src/$(project.name)_selftest.c
-
-lib$(project.name)_la_LDFLAGS = \\
+src_lib$(project.name)_la_LDFLAGS = \\
     -version-info @LTVER@
 
 if ON_MINGW
-lib$(project.name)_la_LDFLAGS += \\
+src_lib$(project.name)_la_LDFLAGS += \\
     -no-undefined \\
     -avoid-version
 endif
 
-TESTS = $(project.name)_selftest
+bin_PROGRAMS += src/$(project.name)_selftest
+
+src_$(project.name)_selftest_LDADD = \\
+    src/lib$(project.name).la
+
+src_$(project.name)_selftest_SOURCES = \\
+    src/$(project.name)_selftest.c
+
+TESTS = src/$(project.name)_selftest
 .for model
 .   if first ()
 
@@ -86,8 +86,8 @@ code:
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
 #   Please read the README.txt file in the model directory.     #
 #################################################################
-.echo "Generating doc/Makefile.am.supplement..."
-.output "../doc/Makefile.am.supplement"
+.echo "Generating doc/Makefile.am..."
+.output "../doc/Makefile.am"
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
 #   Please read the README.txt file in the model directory.     #
@@ -95,21 +95,21 @@ code:
 .project.manpage = "$(project.name).7"
 .manpages = ""
 .for class where private?0 = 0
-.   manpages += " $\(srcdir)/doc/$(name).3"
+.   manpages += " $(name).3"
 .   if class.name = project.name
 .       project.manpage = ""
 .   endif
 .endfor
 MAN1 =
 MAN3 =$(manpages)
-MAN7 = $\(srcdir)/doc/$(project.manpage)
+MAN7 = $\(srcdir)/$(project.manpage)
 MAN_DOC = $\(MAN1) $\(MAN3) $\(MAN7)
 
 MAN_TXT = $\(MAN1:%.1=%.txt)
 MAN_TXT += $\(MAN3:%.3=%.txt)
 MAN_TXT += $\(MAN7:%.7=%.txt)
 
-EXTRA_DIST += $\(srcdir)/doc/asciidoc.conf $\(srcdir)/doc/mkman $\(MAN_TXT)
+EXTRA_DIST = asciidoc.conf mkman $\(MAN_TXT)
 
 if BUILD_DOC
 if INSTALL_MAN
@@ -123,15 +123,15 @@ dist-hook : $\(MAN_DOC)
 SUFFIXES=.txt .xml .1 .3 .7
 
 \.txt.xml:
-\t$\(srcdir)/doc/mkman $<
-\tasciidoc -d manpage -b docbook -f $\(srcdir)/doc/asciidoc.conf \\
+\t$\(srcdir)/mkman $<
+\tasciidoc -d manpage -b docbook -f $\(srcdir)/asciidoc.conf \\
 \t\t-a$(project.name)_version=@PACKAGE_VERSION@ -o$@ $<
 \.xml.1:
-\txmlto -o $\(srcdir)/doc man $<
+\txmlto man $<
 \.xml.3:
-\txmlto -o $\(srcdir)/doc man $<
+\txmlto man $<
 \.xml.7:
-\txmlto -o $\(srcdir)/doc man $<
+\txmlto man $<
 endif
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #

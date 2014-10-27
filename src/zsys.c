@@ -581,12 +581,13 @@ zsys_dir_create (const char *pathname, ...)
         if (mode == (mode_t) -1) {
             //  Does not exist, try to create it
 #if (defined (__WINDOWS__))
-            if (!CreateDirectoryA (formatted, NULL))
+            if (!CreateDirectoryA (formatted, NULL)) {
 #else
-            if (mkdir (formatted, 0775))
+            if (mkdir (formatted, 0775)) {
 #endif
                 free (formatted);
                 return -1;      //  Failed
+            }
         }
         else
         if ((mode & S_IFDIR) == 0) {
