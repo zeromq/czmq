@@ -69,21 +69,12 @@ TESTS = src/$(project.name)_selftest
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
 #   Please read the README.txt file in the model directory.     #
 #################################################################
-.echo "Generating src/Makefile..."
-.output "../src/Makefile"
+.echo "Generating src/Makefile.am..."
+.output "../src/Makefile.am"
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
 #   Please read the README.txt file in the model directory.     #
 #################################################################
-
-# add in make from local directory behavior
-all: lib$(project.name).la $(project.name)_selftest
-
-lib$(project.name).la:
-	cd ..; make src/lib$(project.name).la ${ARGS}; cd src
-
-$(project.name)_selftest:
-	cd ..; make src/$(project.name)_selftest ${ARGS}; cd src
 
 # Produce generated models; do this manually in src directory
 code:
