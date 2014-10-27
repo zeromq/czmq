@@ -1,9 +1,17 @@
 ACLOCAL_AMFLAGS = -I config
 
 AM_CPPFLAGS = \
-    -I$(srcdir)/include
+	-I$(srcdir)/include
 
-SUBDIRS = src
+SUBDIRS = doc src
+
+DIST_SUBDIRS = doc
+
+lib_LTLIBRARIES =
+
+bin_PROGRAMS =
+
+check_PROGRAMS =
 
 EXTRA_DIST = \
 	version.sh \
@@ -106,13 +114,11 @@ EXTRA_DIST = \
 	builds/msvc/properties/DebugLEXE.props \
 	builds/msvc/properties/Output.props
 
-include $(srcdir)/model/Makefile.ams
+include $(srcdir)/model/Makemodule.am
 
-include $(srcdir)/src/Makefile.ams
+include $(srcdir)/src/Makemodule.am
 
-include $(srcdir)/addons/Makefile.ams
-
-include $(srcdir)/doc/Makefile.ams
+include $(srcdir)/addons/Makemodule.am
 
 # workaround the dist generated files that are also part of the distribution
 #distcleancheck_listfiles = \
