@@ -3,15 +3,6 @@
 #   Please read the README.txt file in the model directory.     #
 #################################################################
 
-# add in make from local directory behavior
-all: libczmq.la czmq_selftest
-
-libczmq.la:
-	cd ..; make src/libczmq.la ${ARGS}; cd src
-
-czmq_selftest:
-	cd ..; make src/czmq_selftest ${ARGS}; cd src
-
 # Produce generated models; do this manually in src directory
 code:
 	gsl -q sockopts.xml
