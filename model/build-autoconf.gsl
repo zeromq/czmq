@@ -65,6 +65,9 @@ TESTS = src/$(project.name)_selftest
 .for model
 .   if first ()
 
+# define custom target for all products of /src
+src: src/lib$(project.name).la src/$(project.name)_selftest
+
 # Produce generated models; do this manually in src directory
 code:
 .   endif
