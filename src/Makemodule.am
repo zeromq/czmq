@@ -115,6 +115,12 @@ src_czmq_selftest_SOURCES = \
 
 TESTS = src/czmq_selftest
 
+# Produce generated models; do this manually in src directory
+code:
+	cd $(srcdir)/src; gsl -q sockopts.xml
+	cd $(srcdir)/src; gsl -q zgossip.xml
+	cd $(srcdir)/src; gsl -q zgossip_msg.xml
+
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
 #   Please read the README.txt file in the model directory.     #
