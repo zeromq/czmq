@@ -115,6 +115,9 @@ src_czmq_selftest_SOURCES = \
 
 TESTS = src/czmq_selftest
 
+# define custom target for all products of /src
+src: src/libczmq.la src/czmq_selftest
+
 # Produce generated models; do this manually in src directory
 code:
 	cd $(srcdir)/src; gsl -q sockopts.xml
