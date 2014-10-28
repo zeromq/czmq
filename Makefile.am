@@ -3,7 +3,7 @@ ACLOCAL_AMFLAGS = -I config
 AM_CPPFLAGS = \
 	-I$(srcdir)/include
 
-SUBDIRS = doc src
+SUBDIRS = doc
 
 DIST_SUBDIRS = doc
 
