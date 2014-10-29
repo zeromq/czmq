@@ -1,8 +1,0 @@
-package zpubsub;
-
-message TestMessage
-{
-	required uint64 id = 1;
-	optional string message = 2;
-	optional int32 testint = 3;
-}
