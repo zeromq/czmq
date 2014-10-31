@@ -254,7 +254,7 @@ zsocket_test (bool verbose)
     assert (ctx);
 
     //  Create a detached thread, let it run
-    char *interf = "*";
+    char *interf = "127.0.0.1";
     char *domain = "localhost";
     int service = 5560;
 
