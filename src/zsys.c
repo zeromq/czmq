@@ -788,7 +788,9 @@ zsys_udp_close (SOCKET handle)
 #include <errno.h>
 
 #ifndef _CRT_ERRNO_DEFINED
+#ifndef errno
 extern int errno;
+#endif
 #endif
 
 void
