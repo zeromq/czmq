@@ -96,6 +96,9 @@ src_libczmq_la_SOURCES = \
     src/zsockopt.c \
     src/zthread.c
 
+src_libczmq_la_CPPFLAGS = \
+    ${AM_CPPFLAGS}
+
 src_libczmq_la_LDFLAGS = \
     -version-info @LTVER@
 
@@ -107,8 +110,13 @@ endif
 
 bin_PROGRAMS += src/czmq_selftest
 
+src_czmq_selftest_CPPFLAGS = \
+    ${src_libczmq_la_CFLAGS}
+
 src_czmq_selftest_LDADD = \
-    src/libczmq.la
+    src/libczmq.la \
+    ${zmq_LIBS}
+
 
 src_czmq_selftest_SOURCES = \
     src/czmq_selftest.c

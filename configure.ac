@@ -68,50 +68,8 @@ if test "x${CZMQ_GCOV}" == "xyes"; then
     fi
 fi
 
-# Check for libzmq library
-libzmq_prefix=detect
-AC_ARG_WITH([libzmq], 
-    [AS_HELP_STRING([--with-libzmq=PREFIX], 
-        [build with ZeroMQ library installed in PREFIX [default=autodetect]])],
-    [case "x$withval" in
-        xno)
-            AC_MSG_ERROR([CZMQ requires the ZeroMQ library])
-            ;;
-        xyes|x)
-            ;;
-        *)
-            CPPFLAGS="$CPPFLAGS -I${withval}/include"
-            LDFLAGS="$LDFLAGS -L${withval}/lib"
-            zeromq_prefix=${withval}
-            ;;
-    esac ]
-)
-if test "x$libzmq_prefix" = "xdetect"; then
-    PKG_CHECK_MODULES(
-        [ZeroMQ], [libzmq], [libzmq_prefix=pkgconfig], [libzmq_prefix=])
-        if test "x$libzmq_prefix" = "xpkgconfig"; then
-            CPPFLAGS="$CPPFLAGS ${ZeroMQ_CFLAGS}"
-            LDFLAGS="$LDFLAGS ${ZeroMQ_LIBS}"
-        fi
-fi
-
-if test "x$czmq_search_libzmq" = "xyes"; then
-    if test -r "${with_libzmq}/include/zmq.h"; then
-        CFLAGS="-I${with_libzmq}/include ${CFLAGS}"
-        LDFLAGS="-L${with_libzmq}/lib ${LDFLAGS}"
-    fi
-fi
-
-AC_CHECK_HEADER([zmq.h], [], [AC_MSG_ERROR([cannot find zmq.h])])
-
-AC_CHECK_LIB(zmq, zmq_init, ,[AC_MSG_ERROR([cannot link with -lzmq, install libzmq.])])
-
-AC_MSG_CHECKING([whether libzmq installation works])
-AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <zmq.h>],
-                                [zmq_init(1);])
-               ],
-               [AC_MSG_RESULT([yes])],
-               [AC_MSG_ERROR([no. Please specify libzmq installation prefix using --with-libzmq])])
+# Check for libzmq
+PKG_CHECK_MODULES([zmq], [libzmq])
 
 # Platform specific checks
 czmq_on_mingw32="no"

@@ -2,6 +2,9 @@
     name = "czmq"
     script = "project.gsl"
     >
+
+    <package_dependency name="zmq" pkg_name="libzmq" for_all="1" />
+
     <header name = "czmq" />
     <header name = "czmq_prelude" />
 
