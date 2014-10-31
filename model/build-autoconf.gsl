@@ -45,7 +45,8 @@ src_lib$(project.name)_la_SOURCES = \\
 .endfor
 
 src_lib$(project.name)_la_LDFLAGS = \\
-    -version-info @LTVER@
+    -version-info @LTVER@ \\
+    \$(LIBTOOL_EXTRA_LDFLAGS)
 
 if ON_MINGW
 src_lib$(project.name)_la_LDFLAGS += \\
