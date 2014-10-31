@@ -31,7 +31,6 @@ volatile int zsys_interrupted = 0;  //  Current name
 volatile int zctx_interrupted = 0;  //  Deprecated name
 volatile uint64_t zsys_allocs = 0;
 
-
 static void s_signal_handler (int signal_value);
 
 //  We use these variables for signal handling
@@ -785,14 +784,6 @@ zsys_udp_close (SOCKET handle)
 //  --------------------------------------------------------------------------
 //  Send zframe to UDP socket
 
-#include <errno.h>
-
-#ifndef _CRT_ERRNO_DEFINED
-#ifndef errno
-extern int errno;
-#endif
-#endif
-
 void
 zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address)
 {
@@ -802,12 +793,12 @@ zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address)
     //  Sending can fail if the OS is blocking multicast. In such cases we
     //  don't try to report the error. We might log this or send to an error
     //  console at some point.
-    int rv = sendto (udpsock,
+    int rc = sendto (udpsock,
                      (char *) zframe_data (frame), (int) zframe_size (frame),
                      0, //  Flags
                      (struct sockaddr *) address, (int) sizeof (inaddr_t));
-    if (rv < 0)
-        fprintf (stderr, "Error in sendto() - %d, %s\n", errno, strerror (errno));
+    if (rc < 0)
+        zsys_error ("(UDP) error '%s' on sendto", strerror (errno));
 }
 
 
@@ -826,6 +817,7 @@ zsys_udp_recv (SOCKET udpsock, char *peername)
         buffer, UDP_FRAME_MAX,
         0,      //  Flags
         (struct sockaddr *) &address, &address_len);
+    
     if (size == SOCKET_ERROR)
         zsys_socket_error ("recvfrom");
 
