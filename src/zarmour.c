@@ -27,7 +27,6 @@
 */
 
 #include "../include/czmq.h"
-#include "../include/zarmour.h"
 
 //  Structure of our class
 
