@@ -12,10 +12,8 @@ CZMQ grows by the slow and careful accretion of simple, minimal solutions to rea
 
 * Each patch defines one clear and agreed problem, and one clear, minimal, plausible solution. If you come with a large, complex problem and a large, complex solution, you will provoke a negative reaction from CZMQ maintainers and users.
 
-* We will usually merge patches aggressively, without significant review. If you send us bad patches, without taking the care to read and understand our rules, that reflects on you. Do NOT expect us to do your homework for you.
+* We will usually merge patches aggressively, without a blocking review. If you send us bad patches, without taking the care to read and understand our rules, that reflects on you. Do NOT expect us to do your homework for you.
 
-* As rapidly we will merge poor quality patches, we will remove them again. If you insist on arguing about this and trying to justify your changes, we will simply ignore you and your patches.
+* As rapidly we will merge poor quality patches, we will remove them again. If you insist on arguing about this and trying to justify your changes, we will simply ignore you and your patches. If you still insist, we will ban you.
 
-* CZMQ is not a sandbox where "anything goes until the next stable release". If you want to experiment, use the CZMQ Labs section, or better, experiment in your own projects.
-
-* If you absolutely cannot format your code to fit the documented style, see [#680](https://github.com/zeromq/czmq/issues/680) for tips on using our code formatter.
+* CZMQ is not a sandbox where "anything goes until the next stable release". If you want to experiment, please work in your own projects.
