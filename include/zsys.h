@@ -148,9 +148,10 @@ CZMQ_EXPORT SOCKET
 CZMQ_EXPORT int
     zsys_udp_close (SOCKET handle);
 
-//  Send zframe to UDP socket
+//  Send zframe to UDP socket, return -1 if sending failed due to
+//  interface having disappeared (happens easily with WiFi)
 //  *** This is for CZMQ internal use only and may change arbitrarily ***
-CZMQ_EXPORT void
+CZMQ_EXPORT int
     zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address);
 
 //  Receive zframe from UDP socket, and set address of peer that sent it
