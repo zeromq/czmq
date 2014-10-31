@@ -794,7 +794,7 @@ zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address)
     if (sendto (udpsock,
         (char *) zframe_data (frame), (int) zframe_size (frame),
         0, //  Flags
-        (struct sockaddr *) address, (int) sizeof (inaddr_t)))
+        (struct sockaddr *) address, (int) sizeof (inaddr_t)) == -1)
         return -1;              //  UDP broadcast not possible
     else
         return 0;

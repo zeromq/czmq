@@ -153,8 +153,6 @@ s_self_prepare_udp (self_t *self)
                 zsys_info ("zbeacon: configured, hostname=%s", self->hostname);
         }
     }
-    else
-        zsys_error ("No broadcast interface found, (ZSYS_INTERFACE=%s)", iface);
 }
 
 
@@ -169,6 +167,8 @@ s_self_configure (self_t *self, int port_nbr)
     self->port_nbr = port_nbr;
     s_self_prepare_udp (self);
     zstr_send (self->pipe, self->hostname);
+    if (streq (self->hostname, ""))
+        zsys_error ("No broadcast interface found, (ZSYS_INTERFACE=%s)", zsys_interface ());
 }
 
 
