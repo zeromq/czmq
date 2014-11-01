@@ -203,6 +203,11 @@ AM_CONDITIONAL(ON_ANDROID, test "x$czmq_on_android" = "xyes")
 AM_CONDITIONAL(INSTALL_MAN, test "x$czmq_install_man" = "xyes")
 AM_CONDITIONAL(BUILD_DOC, test "x$czmq_build_doc" = "xyes")
 
+# PKG_CHECK_MODULES doesn't add to LIBS on android
+if test "x$czmq_on_android" = "xyes"; then
+    LIBS="-lzmq $LIBS"
+fi
+
 # Checks for library functions.
 AC_TYPE_SIGNAL
 AC_CHECK_FUNCS(perror gettimeofday memset getifaddrs)
