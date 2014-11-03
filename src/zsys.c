@@ -782,23 +782,22 @@ zsys_udp_close (SOCKET handle)
 
 
 //  --------------------------------------------------------------------------
-//  Send zframe to UDP socket
+//  Send zframe to UDP socket, return -1 if sending failed due to
+//  interface having disappeared (happens easily with WiFi)
 
-void
+int
 zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address)
 {
     assert (frame);
     assert (address);
 
-    //  Sending can fail if the OS is blocking multicast. In such cases we
-    //  don't try to report the error. We might log this or send to an error
-    //  console at some point.
-    int rc = sendto (udpsock,
-                     (char *) zframe_data (frame), (int) zframe_size (frame),
-                     0, //  Flags
-                     (struct sockaddr *) address, (int) sizeof (inaddr_t));
-    if (rc < 0)
-        zsys_error ("(UDP) error '%s' on sendto", strerror (errno));
+    if (sendto (udpsock,
+        (char *) zframe_data (frame), (int) zframe_size (frame),
+        0, //  Flags
+        (struct sockaddr *) address, (int) sizeof (inaddr_t)) == -1)
+        return -1;              //  UDP broadcast not possible
+    else
+        return 0;
 }
 
 
