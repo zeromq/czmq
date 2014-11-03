@@ -152,6 +152,45 @@ s_base64_decode (const char *data, size_t *size, const char *alphabet)
 }
 
 
+//  ---------------------------------------------------------------------------
+//  RFC 4648 Paragraph 8 (standard base16 alphabet)
+static char  //           0----5----0----5
+s_rfc4648p8_alphabet[] = "0123456789ABCDEF";
+
+static char *
+s_base16_encode (byte *data, size_t length, const char *alphabet)
+{
+    char *str = (char *) zmalloc (2 * length + 1);
+    char *enc = str;
+    byte *needle = data, *ceiling = data + length;
+    while (needle < ceiling) {
+        *enc++ = alphabet[(*needle) >> 4];
+        *enc++ = alphabet[(*needle++) & 0x0f];
+    }
+    *enc = 0;
+    return str;
+}
+
+static byte *
+s_base16_decode (const char *data, size_t *size, const char *alphabet)
+{
+    int length = strlen (data);
+    *size = length / 2 + 1;
+    byte *bytes = (byte *) zmalloc (*size);
+    byte *dec = bytes;
+    byte *needle = (byte *) data, *ceiling = (byte *) (data + length);
+    byte i1, i2;
+    while (needle < ceiling) {
+        i1 = (byte) (strchr (alphabet, *needle) - alphabet);
+        i2 = (byte) (strchr (alphabet, *(needle + 1)) - alphabet);
+        *dec++ = i1 << 4 | i2;
+        needle += 2;
+    }
+    *dec = 0;
+    return bytes;
+}
+
+
 //  Definition of encode method
 char *
 zarmour_encode (zarmour_t *self, byte *data, size_t data_size)
@@ -165,6 +204,9 @@ zarmour_encode (zarmour_t *self, byte *data, size_t data_size)
 
         case ZARMOUR_MODE_BASE64_URL:
             return s_base64_encode (data, data_size, s_rfc4648p5_alphabet);
+
+        case ZARMOUR_MODE_BASE16:
+            return s_base16_encode (data, data_size, s_rfc4648p8_alphabet);
     }
 
     return NULL;
@@ -185,6 +227,9 @@ zarmour_decode (zarmour_t *self, char *data, size_t *decode_size)
 
         case ZARMOUR_MODE_BASE64_URL:
             return s_base64_decode (data, decode_size, s_rfc4648p5_alphabet);
+
+        case ZARMOUR_MODE_BASE16:
+            return s_base16_decode (data, decode_size, s_rfc4648p8_alphabet);
     }
 
     return NULL;
@@ -315,6 +360,7 @@ zarmour_test (bool verbose)
     assert (pad_char == '-');
 
     //  Test against test vectors from RFC4648.
+    zarmour_set_mode (self, ZARMOUR_MODE_BASE64_STD);
     s_armour_test (self, "", "", verbose);
     s_armour_test (self, "f", "Zg", verbose);
     s_armour_test (self, "fo", "Zm8", verbose);
@@ -322,6 +368,24 @@ zarmour_test (bool verbose)
     s_armour_test (self, "foob", "Zm9vYg", verbose);
     s_armour_test (self, "fooba", "Zm9vYmE", verbose);
     s_armour_test (self, "foobar", "Zm9vYmFy", verbose);
+
+    zarmour_set_mode (self, ZARMOUR_MODE_BASE64_URL);
+    s_armour_test (self, "", "", verbose);
+    s_armour_test (self, "f", "Zg", verbose);
+    s_armour_test (self, "fo", "Zm8", verbose);
+    s_armour_test (self, "foo", "Zm9v", verbose);
+    s_armour_test (self, "foob", "Zm9vYg", verbose);
+    s_armour_test (self, "fooba", "Zm9vYmE", verbose);
+    s_armour_test (self, "foobar", "Zm9vYmFy", verbose);
+
+    zarmour_set_mode (self, ZARMOUR_MODE_BASE16);
+    s_armour_test (self, "", "", verbose);
+    s_armour_test (self, "f", "66", verbose);
+    s_armour_test (self, "fo", "666F", verbose);
+    s_armour_test (self, "foo", "666F6F", verbose);
+    s_armour_test (self, "foob", "666F6F62", verbose);
+    s_armour_test (self, "fooba", "666F6F6261", verbose);
+    s_armour_test (self, "foobar", "666F6F626172", verbose);
 
     zarmour_destroy (&self);
     //  @end

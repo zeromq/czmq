@@ -23,7 +23,8 @@ extern "C" {
 //  Enumeration defining different encoding modes
 typedef enum {
     ZARMOUR_MODE_BASE64_STD,   //  Standard base 64
-    ZARMOUR_MODE_BASE64_URL    //  URL and filename friendly base 64
+    ZARMOUR_MODE_BASE64_URL,   //  URL and filename friendly base 64
+    ZARMOUR_MODE_BASE16        //  Standard base 16
 } zarmour_mode_t;
 
 
