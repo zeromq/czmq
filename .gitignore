@@ -47,6 +47,7 @@ win32/czmq_selftest.exe.embed.manifest.res
 win32/czmq_selftest.exe.intermediate.manifest
 win32/czmq_selftest.vcproj.WS200902.user.user
 builds/mingw32/*.o
+builds/qt-android/prefix/
 addons/mycert*
 addons/makecert
 addons/makecert.o
