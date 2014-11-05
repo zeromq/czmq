@@ -64,7 +64,7 @@ src_lib$(project.name)_la_LDFLAGS += \\
     -avoid-version
 endif
 
-bin_PROGRAMS += src/$(project.name)_selftest
+check_PROGRAMS += src/$(project.name)_selftest
 
 src_$(project.name)_selftest_CPPFLAGS = \\
 .for package_dependency where defined (package_dependency.for_test)
