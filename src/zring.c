@@ -666,25 +666,25 @@ zring_test (int verbose)
     const char *key;
     item = (char *) zring_lookup (ring, "2");
     assert (streq (item, "two"));
-    key = zring_key (ring);
+    key =  (char *) zring_key (ring);
     assert (streq (key, "2"));
     item = (char *) zring_lookup (ring, "1");
     assert (streq (item, "one"));
-    key = zring_key (ring);
+    key =  (char *) zring_key (ring);
     assert (streq (key, "1"));
     item = (char *) zring_item (ring);
     assert (streq (item, "one"));
-    key = zring_key (ring);
+    key = (char *) zring_key (ring);
     assert (streq (key, "1"));
 
-    item = zring_first (ring);
-    key = zring_key (ring);
+    item = (char *) zring_first (ring);
+    key = (char *) zring_key (ring);
     assert (streq (key, "1"));
-    item = zring_next (ring);
-    key = zring_key (ring);
+    item = (char *) zring_next (ring);
+    key = (char *) zring_key (ring);
     assert (streq (key, "3"));
-    item = zring_next (ring);
-    key = zring_key (ring);
+    item = (char *) zring_next (ring);
+    key = (char *) zring_key (ring);
     assert (streq (key, "2"));
 
     rc = zring_delete (ring, "3");
