@@ -423,6 +423,19 @@ zring_prev (zring_t *self)
     return zring_item (self);
 }
 
+//  -----------------------------------------------------------------------------
+//  Return the key of the current item in the ring. If the ring is empty, or the
+//  cursor passed the end of the ring, returns NULL. Does not change the cursor.
+
+const void *
+zring_key (zring_t *self)
+{
+    assert (self);
+    if (self->cursor != self->head)
+        return self->cursor->key;
+    else
+        return NULL;            //  Reached head, so finished
+}
 
 //  --------------------------------------------------------------------------
 //  Return current item in the ring. If the ring is empty, or the cursor
@@ -650,12 +663,29 @@ zring_test (int verbose)
     rc = zring_insert (ring, "2", "two");
     assert (rc == -1);
 
+    const char *key;
     item = (char *) zring_lookup (ring, "2");
     assert (streq (item, "two"));
+    key = zring_key (ring);
+    assert (streq (key, "2"));
     item = (char *) zring_lookup (ring, "1");
     assert (streq (item, "one"));
+    key = zring_key (ring);
+    assert (streq (key, "1"));
     item = (char *) zring_item (ring);
     assert (streq (item, "one"));
+    key = zring_key (ring);
+    assert (streq (key, "1"));
+
+    item = zring_first (ring);
+    key = zring_key (ring);
+    assert (streq (key, "1"));
+    item = zring_next (ring);
+    key = zring_key (ring);
+    assert (streq (key, "3"));
+    item = zring_next (ring);
+    key = zring_key (ring);
+    assert (streq (key, "2"));
 
     rc = zring_delete (ring, "3");
     assert (rc == 0);
