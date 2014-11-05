@@ -116,6 +116,11 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void *
     zring_prev (zring_t *self);
 
+//  Return the key of the current item in the ring. If the ring is empty, or the
+//  cursor passed the end of the ring, returns NULL. Does not change the cursor.
+CZMQ_EXPORT const void *
+    zring_key (zring_t *self);
+
 //  Return current item in the ring. If the ring is empty, or the cursor
 //  passed the end of the ring, returns NULL. Does not change the cursor.
 CZMQ_EXPORT void *
