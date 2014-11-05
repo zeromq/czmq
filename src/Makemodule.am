@@ -109,7 +109,7 @@ src_libczmq_la_LDFLAGS += \
     -avoid-version
 endif
 
-bin_PROGRAMS += src/czmq_selftest
+check_PROGRAMS += src/czmq_selftest
 
 src_czmq_selftest_CPPFLAGS = \
     ${src_libczmq_la_CFLAGS}
