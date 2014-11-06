@@ -1,36 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright (c) 2014, Joe Eli McIlvain
-# All rights reserved.
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-# 
-# 1. Redistributions of source code must retain the above copyright notice,
-#    this list of conditions and the following disclaimer.
-# 
-# 2. Redistributions in binary form must reproduce the above copyright notice,
-#    this list of conditions and the following disclaimer in the documentation
-#    and/or other materials provided with the distribution.
-# 
-# 3. Neither the name of the copyright holder nor the names of its
-#    contributors may be used to endorse or promote products derived from
-#    this software without specific prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-# THE POSSIBILITY OF SUCH DAMAGE.
-#
-###
-#
+# Courtesy of Joe Eli McIlvain; original code at:
 # https://github.com/jemc/android_build_helper
 #   android_build_helper.sh
 #
@@ -43,9 +13,11 @@
 # To get the latest version of this script, please download from:
 #   https://github.com/jemc/android_build_helper
 #
-# You are free to modify this script, but if you add improvements,
-# please consider submitting a pull request to the aforementioned upstream
-# repository for the benefit of other users.
+# You are free to modify and redistribute this script, but if you add
+# improvements, please consider submitting a pull request or patch to the
+# aforementioned upstream repository for the benefit of other users.
+#
+# This script is provided with no express or implied warranties.
 #
 
 # Get directory of current script (if not already set)
