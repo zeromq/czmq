@@ -23,10 +23,13 @@
       - base32
       - base32hex
       - base16
+    All RFC4648 base64 and base32 variants support padding the output. The pad
+    character is configurable. Default is padding on, with character '='.
+    Additionally, in some cases (e.g. MIME), splitting the output into lines of a
+    specific length is required. This feature is also supported, though
+    turned off by default.
     Planned features:
     * z85
-    * Padding
-    * Breaking output into lines
 @end
 */
 
@@ -40,6 +43,7 @@ struct _zarmour_t {
     char pad_char;              //  The pad character
     bool line_breaks;           //  Should output be broken into lines?
     size_t line_length;         //  The line length to use
+    char *line_end;
 };
 
 
@@ -70,6 +74,7 @@ zarmour_new ()
     self->pad_char = '=';
     self->line_breaks = false;
     self->line_length = 72;
+    self->line_end = strdup ("\n");
 
     return self;
 }
@@ -86,6 +91,7 @@ zarmour_destroy (zarmour_t **self_p)
         zarmour_t *self = *self_p;
 
         //  Free class properties
+        free (self->line_end);
 
         //  Free object itself
         free (self);
@@ -103,11 +109,11 @@ zarmour_print (zarmour_t *self)
     assert (self);
 
     zsys_debug ("zarmour:");
-    zsys_debug ("   mode:        %s", zarmour_mode_str (self));
-    zsys_debug ("   pad:         %s", self->pad? "true": "false");
-    zsys_debug ("   pad_char:    '%c'", self->pad_char);
-    zsys_debug ("   line_breaks: %s", self->line_breaks? "true": "false");
-    zsys_debug ("   line_length: %d", self->line_length);
+    zsys_debug ("    mode:        %s", zarmour_mode_str (self));
+    zsys_debug ("    pad:         %s", self->pad? "true": "false");
+    zsys_debug ("    pad_char:    '%c'", self->pad_char);
+    zsys_debug ("    line_breaks: %s", self->line_breaks? "true": "false");
+    zsys_debug ("    line_length: %d", self->line_length);
 }
 
 
@@ -130,8 +136,8 @@ zarmour_mode_str (zarmour_t *self)
 #define _UPPER_CASE(c) ((c) & ((c) & 0x40? 0xdf: 0xff))
 
 #define _NEXT_CHAR(i,n,c,a,u) \
-while ((n) < (c) && !strchr ((a), (u(*(n))))) \
-    ++(n); \
+    while ((n) < (c) && !strchr ((a), (u(*(n))))) \
+        ++(n); \
     (i) = (byte) ((n) < (c)? (strchr ((a), (u(*(n)))) - (a)): 0xff); \
     ++(n)
 
@@ -178,14 +184,15 @@ s_base64_encode (const byte *data, size_t length, const char *alphabet, bool pad
 
 
 static byte *
-s_base64_decode (const char *data, size_t *size, const char *alphabet)
+s_base64_decode (const char *data, size_t *size, const char *alphabet, int linebreakchars)
 {
     int length = strlen (data);
     while (length > 0 && !strchr (alphabet, data[length - 1])) --length;
+    const byte *needle = (const byte *) data, *ceiling = (const byte *) (data + length);
+    length -= linebreakchars;
     *size = 3 * (length / 4) + ((length % 4)? length % 4 - 1 : 0) + 1;
     byte *bytes = (byte *) zmalloc (*size);
     byte *dec = bytes;
-    const byte *needle = (const byte *) data, *ceiling = (const byte *) (data + length);
     byte i1, i2, i3, i4;
     while (needle < ceiling) {
         _NEXT_CHAR(i1,needle,ceiling,alphabet,_NO_CONVERT);
@@ -264,10 +271,12 @@ s_base32_encode (const byte *data, size_t length, const char *alphabet, bool pad
 
 
 static byte *
-s_base32_decode (const char *data, size_t *size, const char *alphabet)
+s_base32_decode (const char *data, size_t *size, const char *alphabet, int linebreakchars)
 {
     size_t length = strlen (data);
     while (length > 0 && !strchr (alphabet, _UPPER_CASE(data[length - 1]))) --length;
+    const byte *needle = (const byte *) data, *ceiling = (const byte *) (data + length);
+    length -= linebreakchars;
     size_t extra_chars = length % 8, extra_bytes = 0;
     switch (extra_chars) {
         case 0: break;
@@ -280,8 +289,7 @@ s_base32_decode (const char *data, size_t *size, const char *alphabet)
     *size = 5 * (length / 8) + extra_bytes + 1;
     byte *bytes = (byte *) zmalloc (*size);
     byte *dec = bytes;
-    const byte *needle = (const byte *) data, *ceiling = (const byte *) (data + length);
-    byte i1, i2, i3 = 0, i4 = 0, i5 = 0, i6, i7 = 0, i8;
+    byte i1, i2, i3, i4, i5, i6, i7, i8;
     while (needle < ceiling) {
         _NEXT_CHAR(i1,needle,ceiling,alphabet,_UPPER_CASE);
         _NEXT_CHAR(i2,needle,ceiling,alphabet,_UPPER_CASE);
@@ -327,19 +335,20 @@ s_base16_encode (const byte *data, size_t length, const char *alphabet)
 }
 
 static byte *
-s_base16_decode (const char *data, size_t *size, const char *alphabet)
+s_base16_decode (const char *data, size_t *size, const char *alphabet, int linebreakchars)
 {
     int length = strlen (data);
+    const byte *needle = (const byte *) data, *ceiling = (const byte *) (data + length);
+    length -= linebreakchars;
     *size = length / 2 + 1;
     byte *bytes = (byte *) zmalloc (*size);
     byte *dec = bytes;
-    const byte *needle = (const byte *) data, *ceiling = (const byte *) (data + length);
     byte i1, i2;
     while (needle < ceiling) {
-        i1 = (byte) (strchr (alphabet, _UPPER_CASE(*needle)) - alphabet);
-        i2 = (byte) (strchr (alphabet, _UPPER_CASE(*(needle + 1))) - alphabet);
-        *dec++ = i1 << 4 | i2;
-        needle += 2;
+        _NEXT_CHAR(i1,needle,ceiling,alphabet,_UPPER_CASE);
+        _NEXT_CHAR(i2,needle,ceiling,alphabet,_UPPER_CASE);
+        if (i1 != 0xff && i2 != 0xff)
+            *dec++ = i1 << 4 | i2;
     }
     *dec = 0;
     return bytes;
@@ -353,24 +362,55 @@ zarmour_encode (zarmour_t *self, const byte *data, size_t data_size)
     assert (self);
     assert (data);
 
+    char *encoded = NULL;
+
     switch (self->mode) {
         case ZARMOUR_MODE_BASE64_STD:
-            return s_base64_encode (data, data_size, s_base64_alphabet, self->pad, self->pad_char);
-
+            encoded = s_base64_encode (data, data_size, s_base64_alphabet, self->pad, self->pad_char);
+            break;
         case ZARMOUR_MODE_BASE64_URL:
-            return s_base64_encode (data, data_size, s_base64url_alphabet, self->pad, self->pad_char);
-
+            encoded = s_base64_encode (data, data_size, s_base64url_alphabet, self->pad, self->pad_char);
+            break;
         case ZARMOUR_MODE_BASE32_STD:
-            return s_base32_encode (data, data_size, s_base32_alphabet, self->pad, self->pad_char);
-
+            encoded = s_base32_encode (data, data_size, s_base32_alphabet, self->pad, self->pad_char);
+            break;
         case ZARMOUR_MODE_BASE32_HEX:
-            return s_base32_encode (data, data_size, s_base32hex_alphabet, self->pad, self->pad_char);
-
+            encoded = s_base32_encode (data, data_size, s_base32hex_alphabet, self->pad, self->pad_char);
+            break;
         case ZARMOUR_MODE_BASE16:
-            return s_base16_encode (data, data_size, s_base16_alphabet);
+            encoded = s_base16_encode (data, data_size, s_base16_alphabet);
+            break;
     }
 
-    return NULL;
+    if (self->line_breaks && self->line_length > 0 && strlen (encoded) > self->line_length) {
+        char *line_end = self->line_end;
+        int nbr_lines = strlen (encoded) / self->line_length;
+        size_t new_length =
+            nbr_lines * (self->line_length + strlen (line_end)) +
+            strlen (encoded) % self->line_length;
+        char *src = encoded;
+        char *temp = encoded;
+        encoded = (char *) zmalloc (new_length + 1);
+        assert (encoded);
+        char *dest = encoded;
+        while (strlen (src) >= self->line_length) {
+            memcpy (dest, src, self->line_length);
+            src += self->line_length;
+            dest += self->line_length;
+            if (*src) {
+                memcpy (dest, line_end, strlen (line_end));
+                dest += strlen (line_end);
+            }
+        }
+        if (*src) {
+            memcpy (dest, src, strlen (src));
+            dest += strlen (src);
+        }
+        free (temp);
+        *dest = 0;
+    }
+
+    return encoded;
 }
 
 
@@ -382,21 +422,29 @@ zarmour_decode (zarmour_t *self, const char *data, size_t *decode_size)
     assert (data);
     assert (decode_size);
 
+    int linebreakchars = 0;
+    char *line_end = self->line_end;
+    const char *pos = data;
+    while ((pos = strstr (pos, line_end))) {
+        linebreakchars += strlen (line_end);
+        pos += strlen (line_end);
+    }
+
     switch (self->mode) {
         case ZARMOUR_MODE_BASE64_STD:
-            return s_base64_decode (data, decode_size, s_base64_alphabet);
+            return s_base64_decode (data, decode_size, s_base64_alphabet, linebreakchars);
 
         case ZARMOUR_MODE_BASE64_URL:
-            return s_base64_decode (data, decode_size, s_base64url_alphabet);
+            return s_base64_decode (data, decode_size, s_base64url_alphabet, linebreakchars);
 
         case ZARMOUR_MODE_BASE32_STD:
-            return s_base32_decode (data, decode_size, s_base32_alphabet);
+            return s_base32_decode (data, decode_size, s_base32_alphabet, linebreakchars);
 
         case ZARMOUR_MODE_BASE32_HEX:
-            return s_base32_decode (data, decode_size, s_base32hex_alphabet);
+            return s_base32_decode (data, decode_size, s_base32hex_alphabet, linebreakchars);
 
         case ZARMOUR_MODE_BASE16:
-            return s_base16_decode (data, decode_size, s_base16_alphabet);
+            return s_base16_decode (data, decode_size, s_base16_alphabet, linebreakchars);
     }
 
     return NULL;
@@ -503,7 +551,7 @@ s_armour_test (zarmour_t *self, const char *test_string, const char *expected_re
     char *encoded = zarmour_encode (self, (byte *) test_string, strlen (test_string));
     assert (encoded);
     if (verbose)
-        zsys_debug ("       encoded '%s' into '%s'", test_string, encoded);
+        zsys_debug ("    encoded '%s' into '%s'", test_string, encoded);
     assert (strlen (encoded) == strlen (expected_result));
     assert (streq (encoded, expected_result));
 
@@ -511,7 +559,7 @@ s_armour_test (zarmour_t *self, const char *test_string, const char *expected_re
     char *decoded = (char *) zarmour_decode (self, encoded, &size);
     assert (decoded);
     if (verbose)
-        zsys_debug ("       decoded '%s' into '%s'", encoded, decoded);
+        zsys_debug ("    decoded '%s' into '%s'", encoded, decoded);
     assert (size == strlen (decoded) + 1);
     assert (streq (decoded, test_string));
 
@@ -530,13 +578,35 @@ s_armour_decode (zarmour_t *self, const char *test_string, const char *expected_
     char *decoded = (char *) zarmour_decode (self, test_string, &size);
     assert (decoded);
     if (verbose)
-        zsys_debug ("       decoded '%s' into '%s'", test_string, decoded);
+        zsys_debug ("    decoded '%s' into '%s'", test_string, decoded);
     assert (size == strlen (decoded) + 1);
     assert (streq (decoded, expected_result));
 
     free (decoded);
 }
 
+static void
+s_armour_test_long (zarmour_t *self, byte *test_data, size_t length, bool verbose)
+{
+    if (verbose)
+        zarmour_print (self);
+    char *test_string = zarmour_encode (self, test_data, length);
+    assert (test_string);
+    if (verbose)
+        zsys_debug ("    encoded %d bytes array to:\n%s", length, test_string);
+    size_t test_size;
+    byte *test_data2 = zarmour_decode (self, test_string, &test_size);
+    free (test_string);
+    assert (test_data2);
+    assert (test_size == length + 1);
+    int i;
+    for (i = 0; i < length; ++i) {
+        assert (test_data2[i] == i);
+    }
+    free (test_data2);
+    if (verbose)
+        zsys_debug ("    decoded %d bytes, all match", test_size - 1);
+}
 
 //  --------------------------------------------------------------------------
 //  Selftest
@@ -689,6 +759,7 @@ zarmour_test (bool verbose)
     s_armour_decode (self, "cpnmuog=", "foob", verbose);
     s_armour_decode (self, "cpnmuoj1", "fooba", verbose);
     s_armour_decode (self, "cpnmuoj1e8======", "foobar", verbose);
+    zarmour_set_pad (self, true);
 
     zarmour_set_mode (self, ZARMOUR_MODE_BASE16);
     if (verbose)
@@ -705,6 +776,24 @@ zarmour_test (bool verbose)
     s_armour_decode (self, "666f6f62", "foob", verbose);
     s_armour_decode (self, "666f6f6261", "fooba", verbose);
     s_armour_decode (self, "666f6f626172", "foobar", verbose);
+
+    zarmour_set_pad (self, true);
+    zarmour_set_line_breaks (self, true);
+    byte test_data[256];
+    int i;
+    for (i = 0; i < 256; ++i) {
+        test_data[i] = i;
+    }
+    zarmour_set_mode (self, ZARMOUR_MODE_BASE64_STD);
+    s_armour_test_long (self, test_data, 256, verbose);
+    zarmour_set_mode (self, ZARMOUR_MODE_BASE64_URL);
+    s_armour_test_long (self, test_data, 256, verbose);
+    zarmour_set_mode (self, ZARMOUR_MODE_BASE32_STD);
+    s_armour_test_long (self, test_data, 256, verbose);
+    zarmour_set_mode (self, ZARMOUR_MODE_BASE32_HEX);
+    s_armour_test_long (self, test_data, 256, verbose);
+    zarmour_set_mode (self, ZARMOUR_MODE_BASE16);
+    s_armour_test_long (self, test_data, 256, verbose);
 
     zarmour_destroy (&self);
     //  @end
