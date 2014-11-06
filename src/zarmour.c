@@ -123,6 +123,19 @@ zarmour_mode_str (zarmour_t *self)
 }
 
 
+//  --------------------------------------------------------------------------
+//  Helper macros for encoding/decoding
+
+#define _NO_CONVERT(c) (c)
+#define _UPPER_CASE(c) ((c) & ((c) & 0x40? 0xdf: 0xff))
+
+#define _NEXT_CHAR(i,n,c,a,u) \
+while ((n) < (c) && !strchr ((a), (u(*(n))))) \
+    ++(n); \
+    (i) = (byte) ((n) < (c)? (strchr ((a), (u(*(n)))) - (a)): 0xff); \
+    ++(n)
+
+
 //  ---------------------------------------------------------------------------
 //  RFC 4648 Paragraph 4 (standard base64 alphabet)
 static char  //        0----5----0----5----0----5----0----5----0----5----0----5----0---
@@ -134,9 +147,12 @@ static char  //           0----5----0----5----0----5----0----5----0----5----0---
 s_base64url_alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 
 static char *
-s_base64_encode (const byte *data, size_t length, const char *alphabet)
+s_base64_encode (const byte *data, size_t length, const char *alphabet, bool pad, char pad_char)
 {
-    char *str = (char *) zmalloc (4 * (length / 3) + ((length % 3)? length % 3 + 1: 0) + 1);
+    size_t extra_chars = ((length % 3)? length % 3 + 1: 0);
+    size_t pad_chars = (pad && extra_chars)? 4 - extra_chars: 0;
+    size_t str_chars = 4 * (length / 3) + extra_chars + pad_chars;
+    char *str = (char *) zmalloc (str_chars + 1);
     char *enc = str;
     const byte *needle = data, *ceiling = data + length;
     while (needle < ceiling) {
@@ -154,32 +170,34 @@ s_base64_encode (const byte *data, size_t length, const char *alphabet)
             *enc++ = alphabet[(*needle << 4) & 0x30];
         needle += 3;
     }
+    while (pad && enc < str + str_chars)
+        *enc++ = pad_char;
     *enc = 0;
     return str;
 }
+
 
 static byte *
 s_base64_decode (const char *data, size_t *size, const char *alphabet)
 {
     int length = strlen (data);
+    while (length > 0 && !strchr (alphabet, data[length - 1])) --length;
     *size = 3 * (length / 4) + ((length % 4)? length % 4 - 1 : 0) + 1;
     byte *bytes = (byte *) zmalloc (*size);
     byte *dec = bytes;
     const byte *needle = (const byte *) data, *ceiling = (const byte *) (data + length);
-    byte i1, i2, i3 = 0, i4;
+    byte i1, i2, i3, i4;
     while (needle < ceiling) {
-        i1 = (byte) (strchr (alphabet, *needle) - alphabet);
-        i2 = (byte) (strchr (alphabet, *(needle + 1)) - alphabet);
-        *dec++ = i1 << 2 | i2 >> 4;
-        if (needle + 2 < ceiling) {
-            i3 = (byte) (strchr (alphabet, *(needle + 2)) - alphabet);
+        _NEXT_CHAR(i1,needle,ceiling,alphabet,_NO_CONVERT);
+        _NEXT_CHAR(i2,needle,ceiling,alphabet,_NO_CONVERT);
+        if (i1 != 0xff && i2 != 0xff)
+            *dec++ = i1 << 2 | i2 >> 4;
+        _NEXT_CHAR(i3,needle,ceiling,alphabet,_NO_CONVERT);
+        if (i2 != 0xff && i3 != 0xff)
             *dec++ = i2 << 4 | i3 >> 2;
-        }
-        if (needle + 3 < ceiling) {
-            i4 = (byte) (strchr (alphabet, *(needle + 3)) - alphabet);
+        _NEXT_CHAR(i4,needle,ceiling,alphabet,_NO_CONVERT);
+        if (i3 != 0xff && i4 != 0xff)
             *dec++ = i3 << 6 | i4;
-        }
-        needle += 4;
     }
     *dec = 0;
     return bytes;
@@ -197,7 +215,7 @@ static char  //           0----5----0----5----0----5----0-
 s_base32hex_alphabet[] = "0123456789ABCDEFGHIJKLMNOPQRSTUV";
 
 static char *
-s_base32_encode (const byte *data, size_t length, const char *alphabet)
+s_base32_encode (const byte *data, size_t length, const char *alphabet, bool pad, char pad_char)
 {
     size_t extra_bytes = length % 5, extra_chars = 0;
     switch (extra_bytes) {
@@ -206,7 +224,9 @@ s_base32_encode (const byte *data, size_t length, const char *alphabet)
         case 3: extra_chars = 5; break;
         case 4: extra_chars = 7; break;
     }
-    char *str = (char *) zmalloc (8 * (length / 5) + extra_chars + 1);
+    size_t pad_chars = (pad && extra_chars)? 8 - extra_chars: 0;
+    size_t str_chars = 8 * (length / 5) + extra_chars + pad_chars;
+    char *str = (char *) zmalloc (str_chars + 1);
     char *enc = str;
     const byte *needle = data, *ceiling = data + length;
     while (needle < ceiling) {
@@ -236,16 +256,18 @@ s_base32_encode (const byte *data, size_t length, const char *alphabet)
             *enc++ = alphabet[(*needle << 2) & 0x1c];
         needle += 5;
     }
+    while (enc < str + str_chars)
+        *enc++ = pad_char;
     *enc = 0;
     return str;
 }
 
-#define _UPPER_CASE(c) ((c) & ((c) & 0x40? 0xdf: 0xff))
 
 static byte *
 s_base32_decode (const char *data, size_t *size, const char *alphabet)
 {
     size_t length = strlen (data);
+    while (length > 0 && !strchr (alphabet, _UPPER_CASE(data[length - 1]))) --length;
     size_t extra_chars = length % 8, extra_bytes = 0;
     switch (extra_chars) {
         case 0: break;
@@ -261,28 +283,24 @@ s_base32_decode (const char *data, size_t *size, const char *alphabet)
     const byte *needle = (const byte *) data, *ceiling = (const byte *) (data + length);
     byte i1, i2, i3 = 0, i4 = 0, i5 = 0, i6, i7 = 0, i8;
     while (needle < ceiling) {
-        i1 = (byte) (strchr (alphabet, _UPPER_CASE(*needle)) - alphabet);
-        i2 = (byte) (strchr (alphabet, _UPPER_CASE(*(needle + 1))) - alphabet);
-        *dec++ = i1 << 3 | i2 >> 2;
-        if (needle + 3 < ceiling) {
-            i3 = (byte) (strchr (alphabet, _UPPER_CASE(*(needle + 2))) - alphabet);
-            i4 = (byte) (strchr (alphabet, _UPPER_CASE(*(needle + 3))) - alphabet);
+        _NEXT_CHAR(i1,needle,ceiling,alphabet,_UPPER_CASE);
+        _NEXT_CHAR(i2,needle,ceiling,alphabet,_UPPER_CASE);
+        if (i1 != 0xff && i2 != 0xff)
+            *dec++ = i1 << 3 | i2 >> 2;
+        _NEXT_CHAR(i3,needle,ceiling,alphabet,_UPPER_CASE);
+        _NEXT_CHAR(i4,needle,ceiling,alphabet,_UPPER_CASE);
+        if (i2 != 0xff && i3 != 0xff && i4 != 0xff)
             *dec++ = i2 << 6 | i3 << 1 | i4 >> 4;
-        }
-        if (needle + 4 < ceiling) {
-            i5 = (byte) (strchr (alphabet, _UPPER_CASE(*(needle + 4))) - alphabet);
+        _NEXT_CHAR(i5,needle,ceiling,alphabet,_UPPER_CASE);
+        if (i4 != 0xff && i5 != 0xff)
             *dec++ = i4 << 4 | i5 >> 1;
-        }
-        if (needle + 6 < ceiling) {
-            i6 = (byte) (strchr (alphabet, _UPPER_CASE(*(needle + 5))) - alphabet);
-            i7 = (byte) (strchr (alphabet, _UPPER_CASE(*(needle + 6))) - alphabet);
+        _NEXT_CHAR(i6,needle,ceiling,alphabet,_UPPER_CASE);
+        _NEXT_CHAR(i7,needle,ceiling,alphabet,_UPPER_CASE);
+        if (i5 != 0xff && i6 != 0xff && i7 != 0xff)
             *dec++ = i5 << 7 | i6 << 2 | i7 >> 3;
-        }
-        if (needle + 7 < ceiling) {
-            i8 = (byte) (strchr (alphabet, _UPPER_CASE(*(needle + 7))) - alphabet);
+        _NEXT_CHAR(i8,needle,ceiling,alphabet,_UPPER_CASE);
+        if (i7 != 0xff && i8 != 0xff)
             *dec++ = i7 << 5 | i8;
-        }
-        needle += 8;
     }
     *dec = 0;
     return bytes;
@@ -337,16 +355,16 @@ zarmour_encode (zarmour_t *self, const byte *data, size_t data_size)
 
     switch (self->mode) {
         case ZARMOUR_MODE_BASE64_STD:
-            return s_base64_encode (data, data_size, s_base64_alphabet);
+            return s_base64_encode (data, data_size, s_base64_alphabet, self->pad, self->pad_char);
 
         case ZARMOUR_MODE_BASE64_URL:
-            return s_base64_encode (data, data_size, s_base64url_alphabet);
+            return s_base64_encode (data, data_size, s_base64url_alphabet, self->pad, self->pad_char);
 
         case ZARMOUR_MODE_BASE32_STD:
-            return s_base32_encode (data, data_size, s_base32_alphabet);
+            return s_base32_encode (data, data_size, s_base32_alphabet, self->pad, self->pad_char);
 
         case ZARMOUR_MODE_BASE32_HEX:
-            return s_base32_encode (data, data_size, s_base32hex_alphabet);
+            return s_base32_encode (data, data_size, s_base32hex_alphabet, self->pad, self->pad_char);
 
         case ZARMOUR_MODE_BASE16:
             return s_base16_encode (data, data_size, s_base16_alphabet);
@@ -571,7 +589,18 @@ zarmour_test (bool verbose)
     s_armour_test (self, "foob", "Zm9vYg", verbose);
     s_armour_test (self, "fooba", "Zm9vYmE", verbose);
     s_armour_test (self, "foobar", "Zm9vYmFy", verbose);
+    zarmour_set_pad (self, true);
+    if (verbose)
+        zarmour_print (self);
+    s_armour_test (self, "", "", verbose);
+    s_armour_test (self, "f", "Zg==", verbose);
+    s_armour_test (self, "fo", "Zm8=", verbose);
+    s_armour_test (self, "foo", "Zm9v", verbose);
+    s_armour_test (self, "foob", "Zm9vYg==", verbose);
+    s_armour_test (self, "fooba", "Zm9vYmE=", verbose);
+    s_armour_test (self, "foobar", "Zm9vYmFy", verbose);
 
+    zarmour_set_pad (self, false);
     zarmour_set_mode (self, ZARMOUR_MODE_BASE64_URL);
     if (verbose)
         zarmour_print (self);
@@ -582,7 +611,18 @@ zarmour_test (bool verbose)
     s_armour_test (self, "foob", "Zm9vYg", verbose);
     s_armour_test (self, "fooba", "Zm9vYmE", verbose);
     s_armour_test (self, "foobar", "Zm9vYmFy", verbose);
+    zarmour_set_pad (self, true);
+    if (verbose)
+        zarmour_print (self);
+    s_armour_test (self, "", "", verbose);
+    s_armour_test (self, "f", "Zg==", verbose);
+    s_armour_test (self, "fo", "Zm8=", verbose);
+    s_armour_test (self, "foo", "Zm9v", verbose);
+    s_armour_test (self, "foob", "Zm9vYg==", verbose);
+    s_armour_test (self, "fooba", "Zm9vYmE=", verbose);
+    s_armour_test (self, "foobar", "Zm9vYmFy", verbose);
 
+    zarmour_set_pad (self, false);
     zarmour_set_mode (self, ZARMOUR_MODE_BASE32_STD);
     if (verbose)
         zarmour_print (self);
@@ -599,7 +639,24 @@ zarmour_test (bool verbose)
     s_armour_decode (self, "mzxw6yq", "foob", verbose);
     s_armour_decode (self, "mzxw6ytb", "fooba", verbose);
     s_armour_decode (self, "mzxw6ytboi", "foobar", verbose);
+    zarmour_set_pad (self, true);
+    if (verbose)
+        zarmour_print (self);
+    s_armour_test (self, "", "", verbose);
+    s_armour_test (self, "f", "MY======", verbose);
+    s_armour_test (self, "fo", "MZXQ====", verbose);
+    s_armour_test (self, "foo", "MZXW6===", verbose);
+    s_armour_test (self, "foob", "MZXW6YQ=", verbose);
+    s_armour_test (self, "fooba", "MZXW6YTB", verbose);
+    s_armour_test (self, "foobar", "MZXW6YTBOI======", verbose);
+    s_armour_decode (self, "my======", "f", verbose);
+    s_armour_decode (self, "mzxq====", "fo", verbose);
+    s_armour_decode (self, "mzxw6===", "foo", verbose);
+    s_armour_decode (self, "mzxw6yq=", "foob", verbose);
+    s_armour_decode (self, "mzxw6ytb", "fooba", verbose);
+    s_armour_decode (self, "mzxw6ytboi======", "foobar", verbose);
 
+    zarmour_set_pad (self, false);
     zarmour_set_mode (self, ZARMOUR_MODE_BASE32_HEX);
     if (verbose)
         zarmour_print (self);
@@ -616,6 +673,22 @@ zarmour_test (bool verbose)
     s_armour_decode (self, "cpnmuog", "foob", verbose);
     s_armour_decode (self, "cpnmuoj1", "fooba", verbose);
     s_armour_decode (self, "cpnmuoj1e8", "foobar", verbose);
+    zarmour_set_pad (self, true);
+    if (verbose)
+        zarmour_print (self);
+    s_armour_test (self, "", "", verbose);
+    s_armour_test (self, "f", "CO======", verbose);
+    s_armour_test (self, "fo", "CPNG====", verbose);
+    s_armour_test (self, "foo", "CPNMU===", verbose);
+    s_armour_test (self, "foob", "CPNMUOG=", verbose);
+    s_armour_test (self, "fooba", "CPNMUOJ1", verbose);
+    s_armour_test (self, "foobar", "CPNMUOJ1E8======", verbose);
+    s_armour_decode (self, "co======", "f", verbose);
+    s_armour_decode (self, "cpng====", "fo", verbose);
+    s_armour_decode (self, "cpnmu===", "foo", verbose);
+    s_armour_decode (self, "cpnmuog=", "foob", verbose);
+    s_armour_decode (self, "cpnmuoj1", "fooba", verbose);
+    s_armour_decode (self, "cpnmuoj1e8======", "foobar", verbose);
 
     zarmour_set_mode (self, ZARMOUR_MODE_BASE16);
     if (verbose)
