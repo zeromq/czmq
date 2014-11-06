@@ -19,20 +19,20 @@ cache="/tmp/android_build/${TOOLCHAIN_NAME}"
 mkdir -p "${cache}"
 
 ##
-# Make sure libzmq is built and copy the prefix
+# Make sure zmq is built and copy the prefix
 
 (android_build_verify_so "libzmq.so" &> /dev/null) || {
-    # Use a default value assuming the libzmq project sits alongside this one
-    test -z "$LIBZMQ_ROOT" && LIBZMQ_ROOT="$(cd ../../../libzmq && pwd)"
+    # Use a default value assuming the zmq project sits alongside this one
+    test -z "$ZMQ_ROOT" && ZMQ_ROOT="$(cd ../../../libzmq && pwd)"
     
-    if [ ! -d "$LIBZMQ_ROOT" ]; then
-        echo "The LIBZMQ_ROOT directory does not exist"
-        echo "  ${LIBZMQ_ROOT}"
+    if [ ! -d "$ZMQ_ROOT" ]; then
+        echo "The ZMQ_ROOT directory does not exist"
+        echo "  ${ZMQ_ROOT}"
         exit 1
     fi
     
-    (${LIBZMQ_ROOT}/builds/qt-android/build.sh) || exit 1
-    UPSTREAM_PREFIX=${LIBZMQ_ROOT}/builds/qt-android/prefix/${TOOLCHAIN_NAME}
+    (${ZMQ_ROOT}/builds/qt-android/build.sh) || exit 1
+    UPSTREAM_PREFIX=${ZMQ_ROOT}/builds/qt-android/prefix/${TOOLCHAIN_NAME}
     cp -r ${UPSTREAM_PREFIX}/* ${ANDROID_BUILD_PREFIX}
 }
 
