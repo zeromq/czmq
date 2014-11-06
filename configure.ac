@@ -51,6 +51,16 @@ AC_PROG_SED
 AC_PROG_AWK
 PKG_PROG_PKG_CONFIG
 
+# Check for makecert intent
+AC_ARG_WITH([makecert],
+    AS_HELP_STRING([--with-makecert], 
+        [Include the program makecert in compilation and installation.]),
+    [with_makecert=$withval],
+    [with_makecert=yes])
+
+AM_CONDITIONAL([WITH_MAKECERT], [test x$with_makecert != xno])
+AM_COND_IF([WITH_MAKECERT], [AC_MSG_NOTICE([WITH_MAKECERT defined])])
+
 # Checks for libraries
 AC_CHECK_LIB([pthread], [pthread_create])
 AC_CHECK_LIB([uuid], [uuid_generate])

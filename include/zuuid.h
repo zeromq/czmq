@@ -14,7 +14,8 @@
 #ifndef __ZUUID_H_INCLUDED__
 #define __ZUUID_H_INCLUDED__
 
-#define ZUUID_LEN    16
+#define ZUUID_LEN     16
+#define ZUUID_STR_LEN (ZUUID_LEN * 2)
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,12 +42,12 @@ CZMQ_EXPORT size_t
 CZMQ_EXPORT char *
     zuuid_str (zuuid_t *self);
 
-//  Set UUID to new supplied value 
+//  Set UUID to new supplied ZUUID_LEN-octet value
 CZMQ_EXPORT void
     zuuid_set (zuuid_t *self, byte *source);
     
-//  Set UUID to new supplied 32-char string value; return 0 if OK,
-//  else returns -1.
+//  Set UUID to new supplied ZUUID_STR_LEN-char string value;
+//  return 0 if OK, else returns -1.
 CZMQ_EXPORT int
     zuuid_set_str (zuuid_t *self, const char *source);
 
