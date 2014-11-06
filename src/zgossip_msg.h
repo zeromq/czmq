@@ -55,12 +55,17 @@ incoming traffic as valid activity.
 #define ZGOSSIP_MSG_PONG                    4
 #define ZGOSSIP_MSG_INVALID                 5
 
+#include "czmq.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 //  Opaque class structure
+#ifndef ZGOSSIP_MSG_T_DEFINED
 typedef struct _zgossip_msg_t zgossip_msg_t;
+#define ZGOSSIP_MSG_T_DEFINED
+#endif
 
 //  @interface
 //  Create a new zgossip_msg
