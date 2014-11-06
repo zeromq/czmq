@@ -28,7 +28,7 @@
 
 struct _zuuid_t {
     byte uuid [ZUUID_LEN];              //  Binary UUID
-    char str [ZUUID_LEN * 2 + 1];       //  Printable UUID
+    char str [ZUUID_STR_LEN + 1];       //  Printable UUID
 };
 
 
@@ -87,7 +87,7 @@ zuuid_destroy (zuuid_t **self_p)
 
 
 //  -----------------------------------------------------------------
-//  Set UUID to new supplied 16-octet value
+//  Set UUID to new supplied ZUUID_LEN-octet value
 
 void
 zuuid_set (zuuid_t *self, byte *source)
@@ -106,14 +106,14 @@ zuuid_set (zuuid_t *self, byte *source)
 
 
 //  -----------------------------------------------------------------
-//  Set UUID to new supplied 32-char string value; return 0 if OK,
-//  else returns -1.
+//  Set UUID to new supplied ZUUID_STR_LEN-char string value;
+//  return 0 if OK, else returns -1.
 
 int
 zuuid_set_str (zuuid_t *self, const char *source)
 {
     assert (self);
-    assert (strlen (source) == 32);
+    assert (strlen (source) == ZUUID_STR_LEN);
 
     strcpy (self->str, source);
     int byte_nbr;
@@ -221,10 +221,13 @@ zuuid_test (bool verbose)
 
     //  @selftest
     //  Simple create/destroy test
+    assert (ZUUID_LEN == 16);
+    assert (ZUUID_STR_LEN == 32);
+    
     zuuid_t *uuid = zuuid_new ();
     assert (uuid);
-    assert (zuuid_size (uuid) == 16);
-    assert (strlen (zuuid_str (uuid)) == 32);
+    assert (zuuid_size (uuid) == ZUUID_LEN);
+    assert (strlen (zuuid_str (uuid)) == ZUUID_STR_LEN);
     zuuid_t *copy = zuuid_dup (uuid);
     assert (streq (zuuid_str (uuid), zuuid_str (copy)));
 
@@ -232,7 +235,7 @@ zuuid_test (bool verbose)
     const char *myuuid = "8CB3E9A9649B4BEF8DE225E9C2CEBB38";
     zuuid_set_str (uuid, myuuid);
     assert (streq (zuuid_str (uuid), myuuid));
-    byte copy_uuid [16];
+    byte copy_uuid [ZUUID_LEN];
     zuuid_export (uuid, copy_uuid);
     zuuid_set (uuid, copy_uuid);
     assert (streq (zuuid_str (uuid), myuuid));
