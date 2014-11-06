@@ -24,6 +24,8 @@ extern "C" {
 typedef enum {
     ZARMOUR_MODE_BASE64_STD,   //  Standard base 64
     ZARMOUR_MODE_BASE64_URL,   //  URL and filename friendly base 64
+    ZARMOUR_MODE_BASE32_STD,   //  Standard base 32
+    ZARMOUR_MODE_BASE32_HEX,   //  Extended hex base 32
     ZARMOUR_MODE_BASE16        //  Standard base 16
 } zarmour_mode_t;
 
@@ -40,15 +42,19 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zarmour_print (zarmour_t *self);
 
+//  Get printable string for mode
+CZMQ_EXPORT const char *
+    zarmour_mode_str (zarmour_t *self);
+
 //  Encode a stream of bytes into an armoured string.
 CZMQ_EXPORT char *
-    zarmour_encode (zarmour_t *self, byte *data, size_t data_size);
+    zarmour_encode (zarmour_t *self, const byte *data, size_t data_size);
 
 //  Decode an armoured string into a string of bytes.
 //  The decoded output is null-terminated, so it may be treated
 //  as a string, if that's what it was prior to encoding.
 CZMQ_EXPORT byte *
-    zarmour_decode (zarmour_t *self, char *data, size_t *decode_size);
+    zarmour_decode (zarmour_t *self, const char *data, size_t *decode_size);
 
 //  Get/set the mode property
 CZMQ_EXPORT zarmour_mode_t
@@ -67,6 +73,18 @@ CZMQ_EXPORT char
     zarmour_pad_char (zarmour_t *self);
 CZMQ_EXPORT void
     zarmour_set_pad_char (zarmour_t *self, char pad_char);
+
+//  Get/set the line_breaks property
+CZMQ_EXPORT bool
+    zarmour_line_breaks (zarmour_t *self);
+CZMQ_EXPORT void
+    zarmour_set_line_breaks (zarmour_t *self, bool line_breaks);
+
+//  Get/set the line_length property
+CZMQ_EXPORT size_t
+    zarmour_line_length (zarmour_t *self);
+CZMQ_EXPORT void
+    zarmour_set_line_length (zarmour_t *self, size_t line_length);
 
 //  Self test of this class
 CZMQ_EXPORT int
