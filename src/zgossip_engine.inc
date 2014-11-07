@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zgossip_engine - zgossip server engine
+    zgossip_engine - zgossip engine
 
     ** WARNING *************************************************************
     THIS SOURCE FILE IS 100% GENERATED. If you edit this file, you will lose
@@ -119,7 +119,7 @@ static int
 static void
     client_terminate (client_t *self);
 static void
-    s_client_execute (s_client_t *client, event_t event);
+    s_client_execute (s_client_t *client, int event);
 static int
     s_client_handle_wakeup (zloop_t *loop, int timer_id, void *argument);
 static void
@@ -854,7 +854,7 @@ s_server_api_message (zloop_t *loop, zsock_t *reader, void *argument)
         zconfig_put (self->config, path, value);
         if (streq (path, "server/animate")) {
             zsys_warning ("'%s' is deprecated, use VERBOSE command instead", path);
-            self->verbose = (atoi (value) != 0);
+            self->verbose = atoi (value);
         }
         s_server_config_self (self);
         free (path);
