@@ -114,6 +114,7 @@ struct _server_t {
     zhash_t *tuples;            //  Tuples, indexed by key
 
     tuple_t *cur_tuple;         //  Holds current tuple to publish
+    zgossip_msg_t *message;     //  Message to broadcast
 };
 
 //  ---------------------------------------------------------------------
@@ -124,8 +125,7 @@ struct _client_t {
     //  These properties must always be present in the client_t
     //  and are set by the generated engine; do not modify them!
     server_t *server;           //  Reference to parent server
-    zgossip_msg_t *request;     //  Last received request
-    zgossip_msg_t *reply;       //  Reply to send out, if any
+    zgossip_msg_t *message;     //  Message in and out
 };
 
 
@@ -167,13 +167,12 @@ server_initialize (server_t *self)
     //  Default timeout for clients is one second; the caller can
     //  override this with a SET message.
     engine_configure (self, "server/timeout", "1000");
+    self->message = zgossip_msg_new ();
     self->remotes = zlist_new ();
-    if (self->remotes)
-        self->tuples = zhash_new ();
-    if (self->tuples)
-        return 0;
-    else
-        return -1;
+    self->tuples = zhash_new ();
+    assert (self->remotes);
+    assert (self->tuples);
+    return 0;
 }
 
 //  Free properties and structures for a server instance
@@ -181,11 +180,11 @@ server_initialize (server_t *self)
 static void
 server_terminate (server_t *self)
 {
-    if (self->remotes)
-        while (zlist_size (self->remotes) > 0) {
-            zsock_t *remote = (zsock_t *) zlist_pop (self->remotes);
-            zsock_destroy (&remote);
-        }
+    while (zlist_size (self->remotes) > 0) {
+        zsock_t *remote = (zsock_t *) zlist_pop (self->remotes);
+        zsock_destroy (&remote);
+    }
+    zgossip_msg_destroy (&self->message);
     zlist_destroy (&self->remotes);
     zhash_destroy (&self->tuples);
 }
@@ -208,14 +207,20 @@ server_connect (server_t *self, const char *endpoint)
         return;
     }
     //  Send HELLO and then PUBLISH for each tuple we have
-    zgossip_msg_send_hello (remote);
+    zgossip_msg_t *gossip = zgossip_msg_new ();
+    zgossip_msg_set_id (gossip, ZGOSSIP_MSG_HELLO);
+    zgossip_msg_send (gossip, remote);
+    
     tuple_t *tuple = (tuple_t *) zhash_first (self->tuples);
     while (tuple) {
-        int rc = zgossip_msg_send_publish (remote, tuple->key, tuple->value, 0);
-        assert (rc == 0);
+        zgossip_msg_set_id (gossip, ZGOSSIP_MSG_PUBLISH);
+        zgossip_msg_set_key (gossip, tuple->key);
+        zgossip_msg_set_value (gossip, tuple->value);
+        zgossip_msg_send (gossip, remote);
         tuple = (tuple_t *) zhash_next (self->tuples);
     }
     //  Now monitor this remote for incoming messages
+    zgossip_msg_destroy (&gossip);
     engine_handle_socket (self, remote, remote_handler);
     zlist_append (self->remotes, remote);
 }
@@ -249,12 +254,16 @@ server_accept (server_t *self, const char *key, const char *value)
     engine_broadcast_event (self, NULL, forward_event);
 
     //  Copy new tuple announcement to all remotes
+    zgossip_msg_t *gossip = zgossip_msg_new ();
+    zgossip_msg_set_id (gossip, ZGOSSIP_MSG_PUBLISH);
     zsock_t *remote = (zsock_t *) zlist_first (self->remotes);
     while (remote) {
-        int rc = zgossip_msg_send_publish (remote, key, value, 0);
-        assert (rc == 0);
+        zgossip_msg_set_key (gossip, tuple->key);
+        zgossip_msg_set_value (gossip, tuple->value);
+        zgossip_msg_send (gossip, remote);
         remote = (zsock_t *) zlist_next (self->remotes);
     }
+    zgossip_msg_destroy (&gossip);
 }
 
 //  Process server API method, return reply message if any
@@ -321,8 +330,8 @@ get_first_tuple (client_t *self)
 {
     tuple_t *tuple = (tuple_t *) zhash_first (self->server->tuples);
     if (tuple) {
-        zgossip_msg_set_key (self->reply, tuple->key);
-        zgossip_msg_set_value (self->reply, tuple->value);
+        zgossip_msg_set_key (self->message, tuple->key);
+        zgossip_msg_set_value (self->message, tuple->value);
         engine_set_next_event (self, ok_event);
     }
     else
@@ -339,8 +348,8 @@ get_next_tuple (client_t *self)
 {
     tuple_t *tuple = (tuple_t *) zhash_next (self->server->tuples);
     if (tuple) {
-        zgossip_msg_set_key (self->reply, tuple->key);
-        zgossip_msg_set_value (self->reply, tuple->value);
+        zgossip_msg_set_key (self->message, tuple->key);
+        zgossip_msg_set_value (self->message, tuple->value);
         engine_set_next_event (self, ok_event);
     }
     else
@@ -356,8 +365,8 @@ static void
 store_tuple_if_new (client_t *self)
 {
     server_accept (self->server,
-                   zgossip_msg_key (self->request),
-                   zgossip_msg_value (self->request));
+                   zgossip_msg_key (self->message),
+                   zgossip_msg_value (self->message));
 }
 
 
@@ -372,8 +381,8 @@ get_tuple_to_forward (client_t *self)
     //  clients; the whole broadcast operation happens in one thread
     //  so there's no risk of confusion here.
     tuple_t *tuple = self->server->cur_tuple;
-    zgossip_msg_set_key (self->reply, tuple->key);
-    zgossip_msg_set_value (self->reply, tuple->value);
+    zgossip_msg_set_key (self->message, tuple->key);
+    zgossip_msg_set_value (self->message, tuple->value);
 }
 
 
@@ -383,23 +392,24 @@ get_tuple_to_forward (client_t *self)
 static int
 remote_handler (zloop_t *loop, zsock_t *remote, void *argument)
 {
-    zgossip_msg_t *msg = zgossip_msg_recv (remote);
-    if (!msg)
-        return -1;              //  Interrupted
+    server_t *self = (server_t *) argument;
+    if (zgossip_msg_recv (self->message, remote))
+        return -1;          //  Interrupted
 
-    if (zgossip_msg_id (msg) == ZGOSSIP_MSG_PUBLISH)
-        server_accept ((server_t *) argument,
-                       zgossip_msg_key (msg),
-                       zgossip_msg_value (msg));
+    if (zgossip_msg_id (self->message) == ZGOSSIP_MSG_PUBLISH)
+        server_accept (self,
+                       zgossip_msg_key (self->message),
+                       zgossip_msg_value (self->message));
     else
-    if (zgossip_msg_id (msg) == ZGOSSIP_MSG_INVALID)
+    if (zgossip_msg_id (self->message) == ZGOSSIP_MSG_INVALID) {
         //  Connection was reset, so send HELLO again
-        zgossip_msg_send_hello (remote);
+        zgossip_msg_set_id (self->message, ZGOSSIP_MSG_HELLO);
+        zgossip_msg_send (self->message, remote);
+    }
     else
-    if (zgossip_msg_id (msg) == ZGOSSIP_MSG_PONG)
+    if (zgossip_msg_id (self->message) == ZGOSSIP_MSG_PONG)
         assert (true);   //  Do nothing with PONGs
 
-    zgossip_msg_destroy (&msg);
     return 0;
 }
 
@@ -427,26 +437,21 @@ zgossip_test (bool verbose)
     zsock_set_rcvtimeo (client, 2000);
     int rc = zsock_connect (client, "inproc://zgossip");
     assert (rc == 0);
-
-    //  Send HELLO, which gets no reply
-    zgossip_msg_t *request, *reply;
-    request = zgossip_msg_new (ZGOSSIP_MSG_HELLO);
-    assert (request);
-    zgossip_msg_send (&request, client);
+    
+    //  Send HELLO, which gets no message
+    zgossip_msg_t *message = zgossip_msg_new ();
+    zgossip_msg_set_id (message, ZGOSSIP_MSG_HELLO);
+    zgossip_msg_send (message, client);
 
     //  Send PING, expect PONG back
-    request = zgossip_msg_new (ZGOSSIP_MSG_PING);
-    assert (request);
-    zgossip_msg_send (&request, client);
-    reply = zgossip_msg_recv (client);
-    assert (reply);
-    assert (zgossip_msg_id (reply) == ZGOSSIP_MSG_PONG);
-    zgossip_msg_destroy (&reply);
-
+    zgossip_msg_set_id (message, ZGOSSIP_MSG_PING);
+    zgossip_msg_send (message, client);
+    zgossip_msg_recv (message, client);
+    assert (zgossip_msg_id (message) == ZGOSSIP_MSG_PONG);
+    zgossip_msg_destroy (&message);
+    
     zactor_destroy (&server);
-
     zsock_destroy (&client);
-    zactor_destroy (&server);
 
     //  Test peer-to-peer operations
     zactor_t *base = zactor_new (zgossip, "base");
