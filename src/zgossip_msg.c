@@ -39,8 +39,7 @@ struct _zgossip_msg_t {
     int id;                             //  zgossip_msg message ID
     byte *needle;                       //  Read/write pointer for serialization
     byte *ceiling;                      //  Valid upper limit for read pointer
-    byte version;                       //  Version = 1
-    char *key;                          //  Tuple key, globally unique
+    char key [256];                     //  Tuple key, globally unique
     char *value;                        //  Tuple value, as printable string
     uint32_t ttl;                       //  Time to live, msecs
 };
@@ -56,8 +55,10 @@ struct _zgossip_msg_t {
 
 //  Get a block of octets from the frame
 #define GET_OCTETS(host,size) { \
-    if (self->needle + size > self->ceiling) \
+    if (self->needle + size > self->ceiling) { \
+        zsys_warning ("zgossip_msg: GET_OCTETS failed"); \
         goto malformed; \
+    } \
     memcpy ((host), self->needle, size); \
     self->needle += size; \
 }
@@ -99,16 +100,20 @@ struct _zgossip_msg_t {
 
 //  Get a 1-byte number from the frame
 #define GET_NUMBER1(host) { \
-    if (self->needle + 1 > self->ceiling) \
+    if (self->needle + 1 > self->ceiling) { \
+        zsys_warning ("zgossip_msg: GET_NUMBER1 failed"); \
         goto malformed; \
+    } \
     (host) = *(byte *) self->needle; \
     self->needle++; \
 }
 
 //  Get a 2-byte number from the frame
 #define GET_NUMBER2(host) { \
-    if (self->needle + 2 > self->ceiling) \
+    if (self->needle + 2 > self->ceiling) { \
+        zsys_warning ("zgossip_msg: GET_NUMBER2 failed"); \
         goto malformed; \
+    } \
     (host) = ((uint16_t) (self->needle [0]) << 8) \
            +  (uint16_t) (self->needle [1]); \
     self->needle += 2; \
@@ -116,8 +121,10 @@ struct _zgossip_msg_t {
 
 //  Get a 4-byte number from the frame
 #define GET_NUMBER4(host) { \
-    if (self->needle + 4 > self->ceiling) \
+    if (self->needle + 4 > self->ceiling) { \
+        zsys_warning ("zgossip_msg: GET_NUMBER4 failed"); \
         goto malformed; \
+    } \
     (host) = ((uint32_t) (self->needle [0]) << 24) \
            + ((uint32_t) (self->needle [1]) << 16) \
            + ((uint32_t) (self->needle [2]) << 8) \
@@ -127,8 +134,10 @@ struct _zgossip_msg_t {
 
 //  Get a 8-byte number from the frame
 #define GET_NUMBER8(host) { \
-    if (self->needle + 8 > self->ceiling) \
+    if (self->needle + 8 > self->ceiling) { \
+        zsys_warning ("zgossip_msg: GET_NUMBER8 failed"); \
         goto malformed; \
+    } \
     (host) = ((uint64_t) (self->needle [0]) << 56) \
            + ((uint64_t) (self->needle [1]) << 48) \
            + ((uint64_t) (self->needle [2]) << 40) \
@@ -152,9 +161,10 @@ struct _zgossip_msg_t {
 #define GET_STRING(host) { \
     size_t string_size; \
     GET_NUMBER1 (string_size); \
-    if (self->needle + string_size > (self->ceiling)) \
+    if (self->needle + string_size > (self->ceiling)) { \
+        zsys_warning ("zgossip_msg: GET_STRING failed"); \
         goto malformed; \
-    (host) = (char *) malloc (string_size + 1); \
+    } \
     memcpy ((host), self->needle, string_size); \
     (host) [string_size] = 0; \
     self->needle += string_size; \
@@ -172,8 +182,10 @@ struct _zgossip_msg_t {
 #define GET_LONGSTR(host) { \
     size_t string_size; \
     GET_NUMBER4 (string_size); \
-    if (self->needle + string_size > (self->ceiling)) \
+    if (self->needle + string_size > (self->ceiling)) { \
+        zsys_warning ("zgossip_msg: GET_LONGSTR failed"); \
         goto malformed; \
+    } \
     (host) = (char *) malloc (string_size + 1); \
     memcpy ((host), self->needle, string_size); \
     (host) [string_size] = 0; \
@@ -185,10 +197,9 @@ struct _zgossip_msg_t {
 //  Create a new zgossip_msg
 
 zgossip_msg_t *
-zgossip_msg_new (int id)
+zgossip_msg_new (void)
 {
     zgossip_msg_t *self = (zgossip_msg_t *) zmalloc (sizeof (zgossip_msg_t));
-    self->id = id;
     return self;
 }
 
@@ -205,7 +216,6 @@ zgossip_msg_destroy (zgossip_msg_t **self_p)
 
         //  Free class properties
         zframe_destroy (&self->routing_id);
-        free (self->key);
         free (self->value);
 
         //  Free object itself
@@ -216,149 +226,163 @@ zgossip_msg_destroy (zgossip_msg_t **self_p)
 
 
 //  --------------------------------------------------------------------------
-//  Parse a zgossip_msg from zmsg_t. Returns a new object, or NULL if
-//  the message could not be parsed, or was NULL. Destroys msg and 
-//  nullifies the msg reference.
+//  Receive a zgossip_msg from the socket. Returns 0 if OK, -1 if
+//  there was an error. Blocks if there is no message waiting.
 
-zgossip_msg_t *
-zgossip_msg_decode (zmsg_t **msg_p)
+int
+zgossip_msg_recv (zgossip_msg_t *self, zsock_t *input)
 {
-    assert (msg_p);
-    zmsg_t *msg = *msg_p;
-    if (msg == NULL)
-        return NULL;
-        
-    zgossip_msg_t *self = zgossip_msg_new (0);
-    //  Read and parse command in frame
-    zframe_t *frame = zmsg_pop (msg);
-    if (!frame) 
-        goto empty;             //  Malformed or empty
-
+    assert (input);
+    
+    if (zsock_type (input) == ZMQ_ROUTER) {
+        zframe_destroy (&self->routing_id);
+        self->routing_id = zframe_recv (input);
+        if (!self->routing_id || !zsock_rcvmore (input)) {
+            zsys_warning ("zgossip_msg: no routing ID");
+            return -1;          //  Interrupted or malformed
+        }
+    }
+    zmq_msg_t frame;
+    zmq_msg_init (&frame);
+    int size = zmq_msg_recv (&frame, zsock_resolve (input), 0);
+    if (size == -1) {
+        zsys_warning ("zgossip_msg: interrupted");
+        goto malformed;         //  Interrupted
+    }
     //  Get and check protocol signature
-    self->needle = zframe_data (frame);
-    self->ceiling = self->needle + zframe_size (frame);
+    self->needle = (byte *) zmq_msg_data (&frame);
+    self->ceiling = self->needle + zmq_msg_size (&frame);
+    
     uint16_t signature;
     GET_NUMBER2 (signature);
-    if (signature != (0xAAA0 | 0))
-        goto empty;             //  Invalid signature
-
+    if (signature != (0xAAA0 | 0)) {
+        zsys_warning ("zgossip_msg: invalid signature");
+        //  TODO: discard invalid messages and loop, and return
+        //  -1 only on interrupt
+        goto malformed;         //  Interrupted
+    }
     //  Get message id and parse per message type
     GET_NUMBER1 (self->id);
 
     switch (self->id) {
         case ZGOSSIP_MSG_HELLO:
-            GET_NUMBER1 (self->version);
-            if (self->version != 1)
-                goto malformed;
+            {
+                byte version;
+                GET_NUMBER1 (version);
+                if (version != 1) {
+                    zsys_warning ("zgossip_msg: version is invalid");
+                    goto malformed;
+                }
+            }
             break;
 
         case ZGOSSIP_MSG_PUBLISH:
-            GET_NUMBER1 (self->version);
-            if (self->version != 1)
-                goto malformed;
+            {
+                byte version;
+                GET_NUMBER1 (version);
+                if (version != 1) {
+                    zsys_warning ("zgossip_msg: version is invalid");
+                    goto malformed;
+                }
+            }
             GET_STRING (self->key);
             GET_LONGSTR (self->value);
             GET_NUMBER4 (self->ttl);
             break;
 
         case ZGOSSIP_MSG_PING:
-            GET_NUMBER1 (self->version);
-            if (self->version != 1)
-                goto malformed;
+            {
+                byte version;
+                GET_NUMBER1 (version);
+                if (version != 1) {
+                    zsys_warning ("zgossip_msg: version is invalid");
+                    goto malformed;
+                }
+            }
             break;
 
         case ZGOSSIP_MSG_PONG:
-            GET_NUMBER1 (self->version);
-            if (self->version != 1)
-                goto malformed;
+            {
+                byte version;
+                GET_NUMBER1 (version);
+                if (version != 1) {
+                    zsys_warning ("zgossip_msg: version is invalid");
+                    goto malformed;
+                }
+            }
             break;
 
         case ZGOSSIP_MSG_INVALID:
-            GET_NUMBER1 (self->version);
-            if (self->version != 1)
-                goto malformed;
+            {
+                byte version;
+                GET_NUMBER1 (version);
+                if (version != 1) {
+                    zsys_warning ("zgossip_msg: version is invalid");
+                    goto malformed;
+                }
+            }
             break;
 
         default:
+            zsys_warning ("zgossip_msg: bad message ID");
             goto malformed;
     }
     //  Successful return
-    zframe_destroy (&frame);
-    zmsg_destroy (msg_p);
-    return self;
+    zmq_msg_close (&frame);
+    return 0;
 
     //  Error returns
     malformed:
-        zsys_error ("malformed message '%d'\n", self->id);
-    empty:
-        zframe_destroy (&frame);
-        zmsg_destroy (msg_p);
-        zgossip_msg_destroy (&self);
-        return (NULL);
+        zsys_warning ("zgossip_msg: zgossip_msg malformed message, fail");
+        zmq_msg_close (&frame);
+        return -1;              //  Invalid message
 }
 
 
 //  --------------------------------------------------------------------------
-//  Encode zgossip_msg into zmsg and destroy it. Returns a newly created
-//  object or NULL if error. Use when not in control of sending the message.
+//  Send the zgossip_msg to the socket. Does not destroy it. Returns 0 if
+//  OK, else -1.
 
-zmsg_t *
-zgossip_msg_encode (zgossip_msg_t **self_p)
+int
+zgossip_msg_send (zgossip_msg_t *self, zsock_t *output)
 {
-    assert (self_p);
-    assert (*self_p);
-    
-    zgossip_msg_t *self = *self_p;
-    zmsg_t *msg = zmsg_new ();
+    assert (self);
+    assert (output);
+
+    if (zsock_type (output) == ZMQ_ROUTER)
+        zframe_send (&self->routing_id, output, ZFRAME_MORE + ZFRAME_REUSE);
 
     size_t frame_size = 2 + 1;          //  Signature and message ID
     switch (self->id) {
         case ZGOSSIP_MSG_HELLO:
-            //  version is a 1-byte integer
-            frame_size += 1;
+            frame_size += 1;            //  version
             break;
-            
         case ZGOSSIP_MSG_PUBLISH:
-            //  version is a 1-byte integer
-            frame_size += 1;
-            //  key is a string with 1-byte length
-            frame_size++;       //  Size is one octet
-            if (self->key)
-                frame_size += strlen (self->key);
-            //  value is a string with 4-byte length
+            frame_size += 1;            //  version
+            frame_size += 1 + strlen (self->key);
             frame_size += 4;
             if (self->value)
                 frame_size += strlen (self->value);
-            //  ttl is a 4-byte integer
-            frame_size += 4;
+            frame_size += 4;            //  ttl
             break;
-            
         case ZGOSSIP_MSG_PING:
-            //  version is a 1-byte integer
-            frame_size += 1;
+            frame_size += 1;            //  version
             break;
-            
         case ZGOSSIP_MSG_PONG:
-            //  version is a 1-byte integer
-            frame_size += 1;
+            frame_size += 1;            //  version
             break;
-            
         case ZGOSSIP_MSG_INVALID:
-            //  version is a 1-byte integer
-            frame_size += 1;
+            frame_size += 1;            //  version
             break;
-            
-        default:
-            zsys_error ("bad message type '%d', not sent\n", self->id);
-            //  No recovery, this is a fatal application error
-            assert (false);
     }
     //  Now serialize message into the frame
-    zframe_t *frame = zframe_new (NULL, frame_size);
-    self->needle = zframe_data (frame);
+    zmq_msg_t frame;
+    zmq_msg_init_size (&frame, frame_size);
+    self->needle = (byte *) zmq_msg_data (&frame);
     PUT_NUMBER2 (0xAAA0 | 0);
     PUT_NUMBER1 (self->id);
-
+    size_t nbr_frames = 1;              //  Total number of frames to send
+    
     switch (self->id) {
         case ZGOSSIP_MSG_HELLO:
             PUT_NUMBER1 (1);
@@ -366,11 +390,7 @@ zgossip_msg_encode (zgossip_msg_t **self_p)
 
         case ZGOSSIP_MSG_PUBLISH:
             PUT_NUMBER1 (1);
-            if (self->key) {
-                PUT_STRING (self->key);
-            }
-            else
-                PUT_NUMBER1 (0);    //  Empty string
+            PUT_STRING (self->key);
             if (self->value) {
                 PUT_LONGSTR (self->value);
             }
@@ -393,287 +413,9 @@ zgossip_msg_encode (zgossip_msg_t **self_p)
 
     }
     //  Now send the data frame
-    if (zmsg_append (msg, &frame)) {
-        zmsg_destroy (&msg);
-        zgossip_msg_destroy (self_p);
-        return NULL;
-    }
-    //  Destroy zgossip_msg object
-    zgossip_msg_destroy (self_p);
-    return msg;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Receive and parse a zgossip_msg from the socket. Returns new object or
-//  NULL if error. Will block if there's no message waiting.
-
-zgossip_msg_t *
-zgossip_msg_recv (void *input)
-{
-    assert (input);
-    zmsg_t *msg = zmsg_recv (input);
-    if (!msg)
-        return NULL;            //  Interrupted
-    //  If message came from a router socket, first frame is routing_id
-    zframe_t *routing_id = NULL;
-    if (zsocket_type (zsock_resolve (input)) == ZMQ_ROUTER) {
-        routing_id = zmsg_pop (msg);
-        //  If message was not valid, forget about it
-        if (!routing_id || !zmsg_next (msg))
-            return NULL;        //  Malformed or empty
-    }
-    zgossip_msg_t *zgossip_msg = zgossip_msg_decode (&msg);
-    if (zgossip_msg && zsocket_type (zsock_resolve (input)) == ZMQ_ROUTER)
-        zgossip_msg->routing_id = routing_id;
-
-    return zgossip_msg;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Receive and parse a zgossip_msg from the socket. Returns new object,
-//  or NULL either if there was no input waiting, or the recv was interrupted.
-
-zgossip_msg_t *
-zgossip_msg_recv_nowait (void *input)
-{
-    assert (input);
-    zmsg_t *msg = zmsg_recv_nowait (input);
-    if (!msg)
-        return NULL;            //  Interrupted
-    //  If message came from a router socket, first frame is routing_id
-    zframe_t *routing_id = NULL;
-    if (zsocket_type (zsock_resolve (input)) == ZMQ_ROUTER) {
-        routing_id = zmsg_pop (msg);
-        //  If message was not valid, forget about it
-        if (!routing_id || !zmsg_next (msg))
-            return NULL;        //  Malformed or empty
-    }
-    zgossip_msg_t *zgossip_msg = zgossip_msg_decode (&msg);
-    if (zgossip_msg && zsocket_type (zsock_resolve (input)) == ZMQ_ROUTER)
-        zgossip_msg->routing_id = routing_id;
-
-    return zgossip_msg;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Send the zgossip_msg to the socket, and destroy it
-//  Returns 0 if OK, else -1
-
-int
-zgossip_msg_send (zgossip_msg_t **self_p, void *output)
-{
-    assert (self_p);
-    assert (*self_p);
-    assert (output);
-
-    //  Save routing_id if any, as encode will destroy it
-    zgossip_msg_t *self = *self_p;
-    zframe_t *routing_id = self->routing_id;
-    self->routing_id = NULL;
-
-    //  Encode zgossip_msg message to a single zmsg
-    zmsg_t *msg = zgossip_msg_encode (self_p);
+    zmq_msg_send (&frame, zsock_resolve (output), --nbr_frames? ZMQ_SNDMORE: 0);
     
-    //  If we're sending to a ROUTER, send the routing_id first
-    if (zsocket_type (zsock_resolve (output)) == ZMQ_ROUTER) {
-        assert (routing_id);
-        zmsg_prepend (msg, &routing_id);
-    }
-    else
-        zframe_destroy (&routing_id);
-        
-    if (msg && zmsg_send (&msg, output) == 0)
-        return 0;
-    else
-        return -1;              //  Failed to encode, or send
-}
-
-
-//  --------------------------------------------------------------------------
-//  Send the zgossip_msg to the output, and do not destroy it
-
-int
-zgossip_msg_send_again (zgossip_msg_t *self, void *output)
-{
-    assert (self);
-    assert (output);
-    self = zgossip_msg_dup (self);
-    return zgossip_msg_send (&self, output);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Encode HELLO message
-
-zmsg_t * 
-zgossip_msg_encode_hello (
-)
-{
-    zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_HELLO);
-    return zgossip_msg_encode (&self);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Encode PUBLISH message
-
-zmsg_t * 
-zgossip_msg_encode_publish (
-    const char *key,
-    const char *value,
-    uint32_t ttl)
-{
-    zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_PUBLISH);
-    zgossip_msg_set_key (self, key);
-    zgossip_msg_set_value (self, value);
-    zgossip_msg_set_ttl (self, ttl);
-    return zgossip_msg_encode (&self);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Encode PING message
-
-zmsg_t * 
-zgossip_msg_encode_ping (
-)
-{
-    zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_PING);
-    return zgossip_msg_encode (&self);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Encode PONG message
-
-zmsg_t * 
-zgossip_msg_encode_pong (
-)
-{
-    zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_PONG);
-    return zgossip_msg_encode (&self);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Encode INVALID message
-
-zmsg_t * 
-zgossip_msg_encode_invalid (
-)
-{
-    zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_INVALID);
-    return zgossip_msg_encode (&self);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Send the HELLO to the socket in one step
-
-int
-zgossip_msg_send_hello (
-    void *output)
-{
-    zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_HELLO);
-    return zgossip_msg_send (&self, output);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Send the PUBLISH to the socket in one step
-
-int
-zgossip_msg_send_publish (
-    void *output,
-    const char *key,
-    const char *value,
-    uint32_t ttl)
-{
-    zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_PUBLISH);
-    zgossip_msg_set_key (self, key);
-    zgossip_msg_set_value (self, value);
-    zgossip_msg_set_ttl (self, ttl);
-    return zgossip_msg_send (&self, output);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Send the PING to the socket in one step
-
-int
-zgossip_msg_send_ping (
-    void *output)
-{
-    zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_PING);
-    return zgossip_msg_send (&self, output);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Send the PONG to the socket in one step
-
-int
-zgossip_msg_send_pong (
-    void *output)
-{
-    zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_PONG);
-    return zgossip_msg_send (&self, output);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Send the INVALID to the socket in one step
-
-int
-zgossip_msg_send_invalid (
-    void *output)
-{
-    zgossip_msg_t *self = zgossip_msg_new (ZGOSSIP_MSG_INVALID);
-    return zgossip_msg_send (&self, output);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Duplicate the zgossip_msg message
-
-zgossip_msg_t *
-zgossip_msg_dup (zgossip_msg_t *self)
-{
-    if (!self)
-        return NULL;
-        
-    zgossip_msg_t *copy = zgossip_msg_new (self->id);
-    if (self->routing_id)
-        copy->routing_id = zframe_dup (self->routing_id);
-    switch (self->id) {
-        case ZGOSSIP_MSG_HELLO:
-            copy->version = self->version;
-            break;
-
-        case ZGOSSIP_MSG_PUBLISH:
-            copy->version = self->version;
-            copy->key = self->key? strdup (self->key): NULL;
-            copy->value = self->value? strdup (self->value): NULL;
-            copy->ttl = self->ttl;
-            break;
-
-        case ZGOSSIP_MSG_PING:
-            copy->version = self->version;
-            break;
-
-        case ZGOSSIP_MSG_PONG:
-            copy->version = self->version;
-            break;
-
-        case ZGOSSIP_MSG_INVALID:
-            copy->version = self->version;
-            break;
-
-    }
-    return copy;
+    return 0;
 }
 
 
@@ -796,15 +538,11 @@ zgossip_msg_key (zgossip_msg_t *self)
 }
 
 void
-zgossip_msg_set_key (zgossip_msg_t *self, const char *format, ...)
+zgossip_msg_set_key (zgossip_msg_t *self, const char *value)
 {
-    //  Format key from provided arguments
     assert (self);
-    va_list argptr;
-    va_start (argptr, format);
-    free (self->key);
-    self->key = zsys_vprintf (format, argptr);
-    va_end (argptr);
+    strncpy (self->key, value, 255);
+    self->key [255] = 0;
 }
 
 
@@ -819,15 +557,11 @@ zgossip_msg_value (zgossip_msg_t *self)
 }
 
 void
-zgossip_msg_set_value (zgossip_msg_t *self, const char *format, ...)
+zgossip_msg_set_value (zgossip_msg_t *self, const char *value)
 {
-    //  Format value from provided arguments
     assert (self);
-    va_list argptr;
-    va_start (argptr, format);
-    free (self->value);
-    self->value = zsys_vprintf (format, argptr);
-    va_end (argptr);
+    zstr_free (&self->value);
+    self->value = strdup (value);
 }
 
 
@@ -860,7 +594,7 @@ zgossip_msg_test (bool verbose)
 
     //  @selftest
     //  Simple create/destroy test
-    zgossip_msg_t *self = zgossip_msg_new (0);
+    zgossip_msg_t *self = zgossip_msg_new ();
     assert (self);
     zgossip_msg_destroy (&self);
 
@@ -875,102 +609,72 @@ zgossip_msg_test (bool verbose)
 
     //  Encode/send/decode and verify each message type
     int instance;
-    zgossip_msg_t *copy;
-    self = zgossip_msg_new (ZGOSSIP_MSG_HELLO);
-    
-    //  Check that _dup works on empty message
-    copy = zgossip_msg_dup (self);
-    assert (copy);
-    zgossip_msg_destroy (&copy);
+    self = zgossip_msg_new ();
+    zgossip_msg_set_id (self, ZGOSSIP_MSG_HELLO);
 
-    //  Send twice from same object
-    zgossip_msg_send_again (self, output);
-    zgossip_msg_send (&self, output);
+    //  Send twice
+    zgossip_msg_send (self, output);
+    zgossip_msg_send (self, output);
 
     for (instance = 0; instance < 2; instance++) {
-        self = zgossip_msg_recv (input);
-        assert (self);
-        assert (zgossip_msg_routing_id (self));
-        
         zgossip_msg_destroy (&self);
+        self = zgossip_msg_new ();
+        zgossip_msg_recv (self, input);
+        assert (zgossip_msg_routing_id (self));
     }
-    self = zgossip_msg_new (ZGOSSIP_MSG_PUBLISH);
-    
-    //  Check that _dup works on empty message
-    copy = zgossip_msg_dup (self);
-    assert (copy);
-    zgossip_msg_destroy (&copy);
+    zgossip_msg_set_id (self, ZGOSSIP_MSG_PUBLISH);
 
     zgossip_msg_set_key (self, "Life is short but Now lasts for ever");
     zgossip_msg_set_value (self, "Life is short but Now lasts for ever");
     zgossip_msg_set_ttl (self, 123);
-    //  Send twice from same object
-    zgossip_msg_send_again (self, output);
-    zgossip_msg_send (&self, output);
+    //  Send twice
+    zgossip_msg_send (self, output);
+    zgossip_msg_send (self, output);
 
     for (instance = 0; instance < 2; instance++) {
-        self = zgossip_msg_recv (input);
-        assert (self);
+        zgossip_msg_destroy (&self);
+        self = zgossip_msg_new ();
+        zgossip_msg_recv (self, input);
         assert (zgossip_msg_routing_id (self));
-        
         assert (streq (zgossip_msg_key (self), "Life is short but Now lasts for ever"));
         assert (streq (zgossip_msg_value (self), "Life is short but Now lasts for ever"));
         assert (zgossip_msg_ttl (self) == 123);
-        zgossip_msg_destroy (&self);
     }
-    self = zgossip_msg_new (ZGOSSIP_MSG_PING);
-    
-    //  Check that _dup works on empty message
-    copy = zgossip_msg_dup (self);
-    assert (copy);
-    zgossip_msg_destroy (&copy);
+    zgossip_msg_set_id (self, ZGOSSIP_MSG_PING);
 
-    //  Send twice from same object
-    zgossip_msg_send_again (self, output);
-    zgossip_msg_send (&self, output);
+    //  Send twice
+    zgossip_msg_send (self, output);
+    zgossip_msg_send (self, output);
 
     for (instance = 0; instance < 2; instance++) {
-        self = zgossip_msg_recv (input);
-        assert (self);
-        assert (zgossip_msg_routing_id (self));
-        
         zgossip_msg_destroy (&self);
+        self = zgossip_msg_new ();
+        zgossip_msg_recv (self, input);
+        assert (zgossip_msg_routing_id (self));
     }
-    self = zgossip_msg_new (ZGOSSIP_MSG_PONG);
-    
-    //  Check that _dup works on empty message
-    copy = zgossip_msg_dup (self);
-    assert (copy);
-    zgossip_msg_destroy (&copy);
+    zgossip_msg_set_id (self, ZGOSSIP_MSG_PONG);
 
-    //  Send twice from same object
-    zgossip_msg_send_again (self, output);
-    zgossip_msg_send (&self, output);
+    //  Send twice
+    zgossip_msg_send (self, output);
+    zgossip_msg_send (self, output);
 
     for (instance = 0; instance < 2; instance++) {
-        self = zgossip_msg_recv (input);
-        assert (self);
-        assert (zgossip_msg_routing_id (self));
-        
         zgossip_msg_destroy (&self);
+        self = zgossip_msg_new ();
+        zgossip_msg_recv (self, input);
+        assert (zgossip_msg_routing_id (self));
     }
-    self = zgossip_msg_new (ZGOSSIP_MSG_INVALID);
-    
-    //  Check that _dup works on empty message
-    copy = zgossip_msg_dup (self);
-    assert (copy);
-    zgossip_msg_destroy (&copy);
+    zgossip_msg_set_id (self, ZGOSSIP_MSG_INVALID);
 
-    //  Send twice from same object
-    zgossip_msg_send_again (self, output);
-    zgossip_msg_send (&self, output);
+    //  Send twice
+    zgossip_msg_send (self, output);
+    zgossip_msg_send (self, output);
 
     for (instance = 0; instance < 2; instance++) {
-        self = zgossip_msg_recv (input);
-        assert (self);
-        assert (zgossip_msg_routing_id (self));
-        
         zgossip_msg_destroy (&self);
+        self = zgossip_msg_new ();
+        zgossip_msg_recv (self, input);
+        assert (zgossip_msg_routing_id (self));
     }
 
     zsock_destroy (&input);
