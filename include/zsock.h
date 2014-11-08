@@ -226,6 +226,40 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zsock_recv (void *self, const char *picture, ...);
 
+//  Send a binary encoded 'picture' message to the socket (or actor). This
+//  method is similar to zsock_send, except the arguments are encoded in a
+//  binary format that is compatible with zproto, and is designed to reduce
+//  memory allocations. The pattern argument is a string that defines the
+//  type of each argument. Supports these argument types:
+//
+//   pattern    C type                  zproto type:
+//      1       uint8_t                 type = "number" size = "1"
+//      2       uint16_t                type = "number" size = "2"
+//      4       uint32_t                type = "number" size = "3"
+//      8       uint64_t                type = "number" size = "4"
+//      s       char *, 0-255 chars     type = "string"
+//      S       char *, 0-2^32-1 chars  type = "longstr"
+//      c       zchunk_t *              type = "chunk"
+//      f       zframe_t *              type = "frame"
+//      m       zmsg_t *                type = "msg"
+//      p       void *, sends pointer value, only over inproc
+//
+//  Does not change or take ownership of any arguments. Returns 0 if
+//  successful, -1 if sending failed for any reason.
+CZMQ_EXPORT int
+    zsock_bsend (void *self, const char *picture, ...);
+    
+//  Receive a binary encoded 'picture' message from the socket (or actor).
+//  This method is similar to zsock_recv, except the arguments are encoded
+//  in a binary format that is compatible with zproto, and is designed to
+//  reduce memory allocations. The pattern argument is a string that defines
+//  the type of each argument. See zsock_bsend for the supported argument
+//  types. All arguments must be pointers; this call sets them to point to
+//  values held on a per-socket basis. Do not modify or destroy the returned
+//  values. Returns 0 if successful, or -1 if it failed to read a message.
+CZMQ_EXPORT int
+    zsock_brecv (void *self, const char *picture, ...);
+    
 //  Set socket to use unbounded pipes (HWM=0); use this in cases when you are
 //  totally certain the message volume can fit in memory. This method works
 //  across all versions of ZeroMQ. Takes a polymorphic socket reference.
