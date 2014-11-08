@@ -68,103 +68,23 @@ typedef struct _zgossip_msg_t zgossip_msg_t;
 #endif
 
 //  @interface
-//  Create a new zgossip_msg
+//  Create a new empty zgossip_msg
 CZMQ_EXPORT zgossip_msg_t *
-    zgossip_msg_new (int id);
+    zgossip_msg_new (void);
 
-//  Destroy the zgossip_msg
+//  Destroy a zgossip_msg instance
 CZMQ_EXPORT void
     zgossip_msg_destroy (zgossip_msg_t **self_p);
 
-//  Parse a zgossip_msg from zmsg_t. Returns a new object, or NULL if
-//  the message could not be parsed, or was NULL. Destroys msg and 
-//  nullifies the msg reference.
-CZMQ_EXPORT zgossip_msg_t *
-    zgossip_msg_decode (zmsg_t **msg_p);
-
-//  Encode zgossip_msg into zmsg and destroy it. Returns a newly created
-//  object or NULL if error. Use when not in control of sending the message.
-CZMQ_EXPORT zmsg_t *
-    zgossip_msg_encode (zgossip_msg_t **self_p);
-
-//  Receive and parse a zgossip_msg from the socket. Returns new object, 
-//  or NULL if error. Will block if there's no message waiting.
-CZMQ_EXPORT zgossip_msg_t *
-    zgossip_msg_recv (void *input);
-
-//  Receive and parse a zgossip_msg from the socket. Returns new object, 
-//  or NULL either if there was no input waiting, or the recv was interrupted.
-CZMQ_EXPORT zgossip_msg_t *
-    zgossip_msg_recv_nowait (void *input);
-
-//  Send the zgossip_msg to the output, and destroy it
+//  Receive a zgossip_msg from the socket. Returns 0 if OK, -1 if
+//  there was an error. Blocks if there is no message waiting.
 CZMQ_EXPORT int
-    zgossip_msg_send (zgossip_msg_t **self_p, void *output);
+    zgossip_msg_recv (zgossip_msg_t *self, zsock_t *input);
 
-//  Send the zgossip_msg to the output, and do not destroy it
+//  Send the zgossip_msg to the output socket, does not destroy it
 CZMQ_EXPORT int
-    zgossip_msg_send_again (zgossip_msg_t *self, void *output);
-
-//  Encode the HELLO 
-CZMQ_EXPORT zmsg_t *
-    zgossip_msg_encode_hello (
-);
-
-//  Encode the PUBLISH 
-CZMQ_EXPORT zmsg_t *
-    zgossip_msg_encode_publish (
-        const char *key,
-        const char *value,
-        uint32_t ttl);
-
-//  Encode the PING 
-CZMQ_EXPORT zmsg_t *
-    zgossip_msg_encode_ping (
-);
-
-//  Encode the PONG 
-CZMQ_EXPORT zmsg_t *
-    zgossip_msg_encode_pong (
-);
-
-//  Encode the INVALID 
-CZMQ_EXPORT zmsg_t *
-    zgossip_msg_encode_invalid (
-);
-
-
-//  Send the HELLO to the output in one step
-//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
-CZMQ_EXPORT int
-    zgossip_msg_send_hello (void *output);
+    zgossip_msg_send (zgossip_msg_t *self, zsock_t *output);
     
-//  Send the PUBLISH to the output in one step
-//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
-CZMQ_EXPORT int
-    zgossip_msg_send_publish (void *output,
-        const char *key,
-        const char *value,
-        uint32_t ttl);
-    
-//  Send the PING to the output in one step
-//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
-CZMQ_EXPORT int
-    zgossip_msg_send_ping (void *output);
-    
-//  Send the PONG to the output in one step
-//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
-CZMQ_EXPORT int
-    zgossip_msg_send_pong (void *output);
-    
-//  Send the INVALID to the output in one step
-//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
-CZMQ_EXPORT int
-    zgossip_msg_send_invalid (void *output);
-    
-//  Duplicate the zgossip_msg message
-CZMQ_EXPORT zgossip_msg_t *
-    zgossip_msg_dup (zgossip_msg_t *self);
-
 //  Print contents of message to stdout
 CZMQ_EXPORT void
     zgossip_msg_print (zgossip_msg_t *self);
@@ -187,13 +107,13 @@ CZMQ_EXPORT const char *
 CZMQ_EXPORT const char *
     zgossip_msg_key (zgossip_msg_t *self);
 CZMQ_EXPORT void
-    zgossip_msg_set_key (zgossip_msg_t *self, const char *format, ...);
+    zgossip_msg_set_key (zgossip_msg_t *self, const char *value);
 
 //  Get/set the value field
 CZMQ_EXPORT const char *
     zgossip_msg_value (zgossip_msg_t *self);
 CZMQ_EXPORT void
-    zgossip_msg_set_value (zgossip_msg_t *self, const char *format, ...);
+    zgossip_msg_set_value (zgossip_msg_t *self, const char *value);
 
 //  Get/set the ttl field
 CZMQ_EXPORT uint32_t
