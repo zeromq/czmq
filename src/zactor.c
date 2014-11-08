@@ -245,6 +245,19 @@ zactor_resolve (void *self)
 
 
 //  --------------------------------------------------------------------------
+//  Return the actor's zsock handle. Use this when you absolutely need
+//  to work with the zsock instance rather than the actor.
+
+zsock_t *
+zactor_sock (zactor_t *self)
+{
+    assert (self);
+    assert (zactor_is (self));
+    return self->pipe;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Actor
 //  must call zsock_signal (pipe) when initialized
 //  must listen to pipe and exit on $TERM command
