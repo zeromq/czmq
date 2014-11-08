@@ -1008,7 +1008,8 @@ zsock_bsend (void *self, const char *picture, ...)
         else
         if (*picptr == 'p') {
             void *pointer = va_arg (argptr, void *);
-            PUT_NUMBER8 ((uint64_t) pointer);
+            memcpy (needle, &pointer, sizeof (void *));
+            needle += sizeof (void *);
         }
         else
         if (*picptr == 's') {
@@ -1127,9 +1128,8 @@ zsock_brecv (void *selfish, const char *picture, ...)
         else
         if (*picptr == 'p') {
             void **pointer_p = va_arg (argptr, void **);
-            uint64_t number8;
-            GET_NUMBER8 (number8);
-            *pointer_p = (void *) number8;
+            memcpy (pointer_p, needle, sizeof (void *));
+            needle += sizeof (void *);
         }
         else
         if (*picptr == 's') {
