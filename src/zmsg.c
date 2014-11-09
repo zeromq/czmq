@@ -413,10 +413,11 @@ zmsg_popint (zmsg_t *self)
     return rc;
 }
 
+
 //  --------------------------------------------------------------------------
-//  Push encoded message as a new frame. Message takes ownership of submessage,
-//  so the original is destroyed in this call
-//  Returns 0 on success, -1 on error.
+//  Push encoded message as a new frame. Message takes ownership of 
+//  submessage, so the original is destroyed in this call. Returns 0 on
+//  success, -1 on error.
 
 int
 zmsg_addmsg (zmsg_t *self, zmsg_t **msg_p)
@@ -436,6 +437,7 @@ zmsg_addmsg (zmsg_t *self, zmsg_t **msg_p)
     free (data);
     return r;
 }
+
 
 //  --------------------------------------------------------------------------
 //  Remove first submessage from message, if any. Returns zmsg_t, or NULL if
@@ -458,6 +460,7 @@ zmsg_popmsg (zmsg_t *self)
     zframe_destroy (&frame);
     return msg;
 }
+
 
 //  --------------------------------------------------------------------------
 //  Remove specified frame from list, if present. Does not destroy frame.
@@ -631,7 +634,7 @@ zmsg_encode (zmsg_t *self, byte **buffer)
                 *dest++ = (frame_size >> 24) & 255;
                 *dest++ = (frame_size >> 16) & 255;
                 *dest++ = (frame_size >>  8) & 255;
-                *dest++ = frame_size        & 255;
+                *dest++ =  frame_size        & 255;
                 memcpy (dest, zframe_data (frame), frame_size);
                 dest += frame_size;
             }
@@ -665,9 +668,9 @@ zmsg_decode (byte *buffer, size_t buffer_size)
                 break;
             }
             frame_size = (source [0] << 24)
-                         + (source [1] << 16)
-                         + (source [2] << 8)
-                         +  source [3];
+                       + (source [1] << 16)
+                       + (source [2] << 8)
+                       +  source [3];
             source += 4;
         }
         if (source > limit - frame_size) {
