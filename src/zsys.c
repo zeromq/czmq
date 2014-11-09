@@ -1537,9 +1537,19 @@ zsys_test (bool verbose)
     zsys_set_rcvhwm (1000);
     zsys_set_pipehwm (2500);
     assert (zsys_pipehwm () == 2500);
-
     zsys_set_ipv6 (0);
 
+    //  Test pipe creation
+    zsock_t *pipe_back;
+    zsock_t *pipe_front = zsys_create_pipe (&pipe_back);
+    zstr_send (pipe_front, "Hello");
+    char *string = zstr_recv (pipe_back);
+    assert (streq (string, "Hello"));
+    free (string);
+    zsock_destroy (&pipe_back);
+    zsock_destroy (&pipe_front);
+
+    //  Test file manipulation
     rc = zsys_file_delete ("nosuchfile");
     assert (rc == -1);
 
@@ -1575,7 +1585,7 @@ zsys_test (bool verbose)
     assert (minor == CZMQ_VERSION_MINOR);
     assert (patch == CZMQ_VERSION_PATCH);
 
-    char *string = zsys_sprintf ("%s %02x", "Hello", 16);
+    string = zsys_sprintf ("%s %02x", "Hello", 16);
     assert (streq (string, "Hello 10"));
     free (string);
 
