@@ -97,6 +97,18 @@ CZMQ_EXPORT char *
 CZMQ_EXPORT int
     zmsg_popint (zmsg_t *self);
 
+//  Push encoded message as a new frame. Message takes ownership of submessage,
+//  so the original is destroyed in this call
+//  Returns 0 on success, -1 on error.
+CZMQ_EXPORT int
+zmsg_addmsg (zmsg_t *self, zmsg_t **msg_p);
+
+//  Remove first submessage from message, if any. Returns zmsg_t, or NULL if
+//  decoding was not succesfull. Caller now owns message and must destroy it
+//  when finished with it.
+CZMQ_EXPORT zmsg_t *
+zmsg_popmsg (zmsg_t *self);
+
 //  Remove specified frame from list, if present. Does not destroy frame.
 CZMQ_EXPORT void
     zmsg_remove (zmsg_t *self, zframe_t *frame);
