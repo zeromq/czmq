@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zgossip - zgossip
+    zgossip - zgossip server
 
     ** WARNING *************************************************************
     THIS SOURCE FILE IS 100% GENERATED. If you edit this file, you will lose
