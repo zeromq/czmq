@@ -58,6 +58,12 @@ CZMQ_EXPORT int
 CZMQ_EXPORT char *
     zsys_sockname (int socktype);
     
+//  Create a pipe, which consists of two PAIR sockets connected over inproc.
+//  The pipe is configured to use the zsys_pipehwm setting. Returns the
+//  frontend socket successful, NULL if failed.
+CZMQ_EXPORT zsock_t *
+    zsys_create_pipe (zsock_t **backend_p);
+    
 //  Set interrupt handler; this saves the default handlers so that a
 //  zsys_handler_reset () can restore them. If you call this multiple times
 //  then the last handler will take affect. If handler_fn is NULL, disables

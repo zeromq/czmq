@@ -109,30 +109,7 @@ zactor_new (zactor_fn *actor, void *args)
         zactor_destroy (&self);
         return NULL;
     }
-
-    //  Create front-to-back pipe pair
-    self->pipe = zsock_new (ZMQ_PAIR);
-    assert (self->pipe);
-    shim->pipe = zsock_new (ZMQ_PAIR);
-    assert (shim->pipe);
-#if (ZMQ_VERSION_MAJOR == 2)
-    zsock_set_hwm (self->pipe, zsys_pipehwm ());
-    zsock_set_hwm (shim->pipe, zsys_pipehwm ());
-#else
-    zsock_set_sndhwm (self->pipe, (int) zsys_pipehwm ());
-    zsock_set_sndhwm (shim->pipe, (int) zsys_pipehwm ());
-#endif
-    //  Now bind and connect pipe ends
-    char endpoint [32];
-    while (true) {
-        sprintf (endpoint, "inproc://zactor-%04x-%04x\n",
-                 randof (0x10000), randof (0x10000));
-        if (zsock_bind (self->pipe, "%s", endpoint) == 0)
-            break;
-    }
-    int rc = zsock_connect (shim->pipe, "%s", endpoint);
-    assert (rc != -1);
-
+    shim->pipe = zsys_create_pipe (&self->pipe);
     shim->handler = actor;
     shim->args = args;
 

@@ -360,6 +360,45 @@ zsys_sockname (int socktype)
 
 
 //  --------------------------------------------------------------------------
+//  Create a pipe, which consists of two PAIR sockets connected over inproc.
+//  The pipe is configured to use the zsys_pipehwm setting. Returns the 
+//  frontend socket successful, NULL if failed.
+
+zsock_t *
+zsys_create_pipe (zsock_t **backend_p)
+{
+    zsock_t *frontend = zsock_new (ZMQ_PAIR);
+    zsock_t *backend = zsock_new (ZMQ_PAIR);
+    if (!frontend || !backend) {
+        zsock_destroy (&frontend);
+        zsock_destroy (&backend);
+        return frontend;
+    }
+#if (ZMQ_VERSION_MAJOR == 2)
+    zsock_set_hwm (frontend, zsys_pipehwm ());
+    zsock_set_hwm (backend, zsys_pipehwm ());
+#else
+    zsock_set_sndhwm (frontend, (int) zsys_pipehwm ());
+    zsock_set_sndhwm (backend, (int) zsys_pipehwm ());
+#endif
+    //  Now bind and connect pipe ends
+    char endpoint [32];
+    while (true) {
+        sprintf (endpoint, "inproc://pipe-%04x-%04x\n",
+                 randof (0x10000), randof (0x10000));
+        if (zsock_bind (frontend, "%s", endpoint) == 0)
+            break;
+    }
+    int rc = zsock_connect (backend, "%s", endpoint);
+    assert (rc != -1);          //  Connect cannot fail
+
+    //  Return frontend and backend sockets
+    *backend_p = backend;
+    return frontend;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Set interrupt handler; this saves the default handlers so that a
 //  zsys_handler_reset () can restore them. If you call this multiple times
 //  then the last handler will take affect. If handler_fn is NULL, disables
