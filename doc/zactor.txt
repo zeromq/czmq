@@ -40,6 +40,11 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT void *
     zactor_resolve (void *self);
 
+//  Return the actor's zsock handle. Use this when you absolutely need
+//  to work with the zsock instance rather than the actor.
+CZMQ_EXPORT zsock_t *
+    zactor_sock (zactor_t *self);
+
 //  Self test of this class
 CZMQ_EXPORT void
     zactor_test (bool verbose);

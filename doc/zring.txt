@@ -105,6 +105,11 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void *
     zring_prev (zring_t *self);
 
+//  Return the key of the current item in the ring. If the ring is empty, or the
+//  cursor passed the end of the ring, returns NULL. Does not change the cursor.
+CZMQ_EXPORT const void *
+    zring_key (zring_t *self);
+
 //  Return current item in the ring. If the ring is empty, or the cursor
 //  passed the end of the ring, returns NULL. Does not change the cursor.
 CZMQ_EXPORT void *
@@ -244,12 +249,29 @@ assert (rc == 0);
 rc = zring_insert (ring, "2", "two");
 assert (rc == -1);
 
+const char *key;
 item = (char *) zring_lookup (ring, "2");
 assert (streq (item, "two"));
+key =  (char *) zring_key (ring);
+assert (streq (key, "2"));
 item = (char *) zring_lookup (ring, "1");
 assert (streq (item, "one"));
+key =  (char *) zring_key (ring);
+assert (streq (key, "1"));
 item = (char *) zring_item (ring);
 assert (streq (item, "one"));
+key = (char *) zring_key (ring);
+assert (streq (key, "1"));
+
+item = (char *) zring_first (ring);
+key = (char *) zring_key (ring);
+assert (streq (key, "1"));
+item = (char *) zring_next (ring);
+key = (char *) zring_key (ring);
+assert (streq (key, "3"));
+item = (char *) zring_next (ring);
+key = (char *) zring_key (ring);
+assert (streq (key, "2"));
 
 rc = zring_delete (ring, "3");
 assert (rc == 0);

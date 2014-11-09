@@ -80,18 +80,6 @@ This is the class self test code:
     if (verbose)
         zstr_sendx (speaker, "VERBOSE", NULL);
     
-    //
-    //  Stop broadcasting the beacon:
-    //
-    //      zstr_sendx (beacon, "SILENCE", NULL);
-    //
-    //  Start listening to beacons from peers. The filter is used to do a prefix
-    //  match on received beacons, to remove junk. Note that any received data
-    //  that is identical to our broadcast beacon_data is discarded in any case.
-    //  If the filter size is zero, we get all peer beacons:
-    //
-    //      zsock_send (beacon, "sb", "SUBSCRIBE", filter_data, filter_size);
-    
     zsock_send (speaker, "si", "CONFIGURE", 9999);
     char *hostname = zstr_recv (speaker);
     if (!*hostname) {
