@@ -1045,7 +1045,7 @@ zmsg_test (bool verbose)
     free (buffer);
     zmsg_destroy (&msg);
 
-    // Test submessages
+    //  Test submessages
     msg = zmsg_new ();
     assert (msg);
     zmsg_t *submsg = zmsg_new ();
@@ -1064,6 +1064,7 @@ zmsg_test (bool verbose)
     zmsg_destroy (&submsg);
     frame = zmsg_pop (msg);
     assert (frame == NULL);
+    zmsg_destroy (&msg);
 
     //  Now try methods on an empty message
     msg = zmsg_new ();
