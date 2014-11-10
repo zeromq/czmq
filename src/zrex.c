@@ -56,6 +56,7 @@ struct _zrex_t {
     bool valid;                 //  Is expression valid or not?
     const char *strerror;       //  Error message if any
     uint hits;                  //  Number of hits matched
+    uint hit_set_len;           //  Length of hit set
     char *hit_set;              //  Captured hits as single string
     char *hit [MAX_HITS];       //  Pointers into hit_set
     struct cap caps [MAX_HITS]; //  Position/length for each hit
@@ -136,7 +137,6 @@ zrex_matches (zrex_t *self, const char *text)
 
     //  Free any previously-allocated hits
     self->hits = 0;
-    zstr_free (&self->hit_set);
 
     bool matches = slre_match (&self->slre, text, strlen (text), self->caps) != 0;
     if (matches) {
@@ -152,7 +152,11 @@ zrex_matches (zrex_t *self, const char *text)
         uint hit_set_len = 0;
         for (index = 0; index < self->hits; index++)
             hit_set_len += self->caps [index].len + 1;
-        self->hit_set = (char *) zmalloc (hit_set_len);
+        if (hit_set_len > self->hit_set_len) {
+            zstr_free (&self->hit_set);
+            self->hit_set = (char *) zmalloc (hit_set_len);
+            self->hit_set_len = hit_set_len;
+        }
         // FIXME: no way to return an error
         assert (self->hit_set);
 
