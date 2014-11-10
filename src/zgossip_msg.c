@@ -186,6 +186,7 @@ struct _zgossip_msg_t {
         zsys_warning ("zgossip_msg: GET_LONGSTR failed"); \
         goto malformed; \
     } \
+    free ((host)); \
     (host) = (char *) malloc (string_size + 1); \
     memcpy ((host), self->needle, string_size); \
     (host) [string_size] = 0; \
@@ -541,6 +542,9 @@ void
 zgossip_msg_set_key (zgossip_msg_t *self, const char *value)
 {
     assert (self);
+    assert (value);
+    if (value == self->key)
+        return;
     strncpy (self->key, value, 255);
     self->key [255] = 0;
 }
@@ -560,7 +564,8 @@ void
 zgossip_msg_set_value (zgossip_msg_t *self, const char *value)
 {
     assert (self);
-    zstr_free (&self->value);
+    assert (value);
+    free (self->value);
     self->value = strdup (value);
 }
 
@@ -617,8 +622,6 @@ zgossip_msg_test (bool verbose)
     zgossip_msg_send (self, output);
 
     for (instance = 0; instance < 2; instance++) {
-        zgossip_msg_destroy (&self);
-        self = zgossip_msg_new ();
         zgossip_msg_recv (self, input);
         assert (zgossip_msg_routing_id (self));
     }
@@ -632,8 +635,6 @@ zgossip_msg_test (bool verbose)
     zgossip_msg_send (self, output);
 
     for (instance = 0; instance < 2; instance++) {
-        zgossip_msg_destroy (&self);
-        self = zgossip_msg_new ();
         zgossip_msg_recv (self, input);
         assert (zgossip_msg_routing_id (self));
         assert (streq (zgossip_msg_key (self), "Life is short but Now lasts for ever"));
@@ -647,8 +648,6 @@ zgossip_msg_test (bool verbose)
     zgossip_msg_send (self, output);
 
     for (instance = 0; instance < 2; instance++) {
-        zgossip_msg_destroy (&self);
-        self = zgossip_msg_new ();
         zgossip_msg_recv (self, input);
         assert (zgossip_msg_routing_id (self));
     }
@@ -659,8 +658,6 @@ zgossip_msg_test (bool verbose)
     zgossip_msg_send (self, output);
 
     for (instance = 0; instance < 2; instance++) {
-        zgossip_msg_destroy (&self);
-        self = zgossip_msg_new ();
         zgossip_msg_recv (self, input);
         assert (zgossip_msg_routing_id (self));
     }
@@ -671,12 +668,12 @@ zgossip_msg_test (bool verbose)
     zgossip_msg_send (self, output);
 
     for (instance = 0; instance < 2; instance++) {
-        zgossip_msg_destroy (&self);
-        self = zgossip_msg_new ();
         zgossip_msg_recv (self, input);
         assert (zgossip_msg_routing_id (self));
     }
+    zgossip_msg_destroy (&self);
 
+    zgossip_msg_destroy (&self);
     zsock_destroy (&input);
     zsock_destroy (&output);
     //  @end
