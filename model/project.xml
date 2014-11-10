@@ -32,7 +32,6 @@
     <class name = "zpoller" />
     <class name = "zproxy" />
     <class name = "zrex" />
-    <class name = "zring" />
     <class name = "zsock" />
     <class name = "zsock_option" />
     <class name = "zstr" />
