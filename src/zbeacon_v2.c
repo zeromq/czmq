@@ -465,7 +465,7 @@ s_beacon_recv (agent_t *self)
         zmsg_t *msg = zmsg_new ();
         assert (msg);
         zmsg_addstr (msg, peername);
-        zmsg_add (msg, frame);
+        zmsg_append (msg, &frame);
         zmsg_send (&msg, self->pipe);
     }
     else
