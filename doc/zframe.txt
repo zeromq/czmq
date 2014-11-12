@@ -112,6 +112,72 @@ EXAMPLE
 .From zframe_test method
 ----
 //  Create two PAIR sockets and connect over inproc
+zsock_t *output = zsock_new_pair ("@inproc://zframe.test");
+assert (output);
+zsock_t *input = zsock_new_pair (">inproc://zframe.test");
+assert (input);
+
+//  Send five different frames, test ZFRAME_MORE
+int frame_nbr;
+for (frame_nbr = 0; frame_nbr < 5; frame_nbr++) {
+    frame = zframe_new ("Hello", 5);
+    assert (frame);
+    rc = zframe_send (&frame, output, ZFRAME_MORE);
+    assert (rc == 0);
+}
+//  Send same frame five times, test ZFRAME_REUSE
+frame = zframe_new ("Hello", 5);
+assert (frame);
+for (frame_nbr = 0; frame_nbr < 5; frame_nbr++) {
+    rc = zframe_send (&frame, output, ZFRAME_MORE + ZFRAME_REUSE);
+    assert (rc == 0);
+}
+assert (frame);
+zframe_t *copy = zframe_dup (frame);
+assert (zframe_eq (frame, copy));
+zframe_destroy (&frame);
+assert (!zframe_eq (frame, copy));
+assert (zframe_size (copy) == 5);
+zframe_destroy (&copy);
+assert (!zframe_eq (frame, copy));
+
+//  Test zframe_new_empty
+frame = zframe_new_empty ();
+assert (frame);
+assert (zframe_size (frame) == 0);
+zframe_destroy (&frame);
+
+//  Send END frame
+frame = zframe_new ("NOT", 3);
+assert (frame);
+zframe_reset (frame, "END", 3);
+char *string = zframe_strhex (frame);
+assert (streq (string, "454E44"));
+free (string);
+string = zframe_strdup (frame);
+assert (streq (string, "END"));
+free (string);
+rc = zframe_send (&frame, output, 0);
+assert (rc == 0);
+
+//  Read and count until we receive END
+frame_nbr = 0;
+for (frame_nbr = 0;; frame_nbr++) {
+    zframe_t *frame = zframe_recv (input);
+    if (zframe_streq (frame, "END")) {
+        zframe_destroy (&frame);
+        break;
+    }
+    assert (zframe_more (frame));
+    zframe_set_more (frame, 0);
+    assert (zframe_more (frame) == 0);
+    zframe_destroy (&frame);
+}
+assert (frame_nbr == 10);
+
+zsock_destroy (&input);
+zsock_destroy (&output);
+
 ----
 
 SEE ALSO

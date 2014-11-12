@@ -116,4 +116,45 @@ This is the class self test code:
     //  Create a simple certificate with metadata
     zcert_t *cert = zcert_new ();
     assert (cert);
+    zcert_set_meta (cert, "email", "ph@imatix.com");
+    zcert_set_meta (cert, "name", "Pieter Hintjens");
+    zcert_set_meta (cert, "organization", "iMatix Corporation");
+    zcert_set_meta (cert, "version", "%d", 1);
+    assert (streq (zcert_meta (cert, "email"), "ph@imatix.com"));
+    zlist_t *keys = zcert_meta_keys (cert);
+    assert (zlist_size (keys) == 4);
+    zlist_destroy (&keys);
+    
+    //  Check the dup and eq methods
+    zcert_t *shadow = zcert_dup (cert);
+    assert (zcert_eq (cert, shadow));
+    zcert_destroy (&shadow);
+    
+    //  Check we can save and load certificate
+    zcert_save (cert, TESTDIR "/mycert.txt");
+    assert (zsys_file_exists (TESTDIR "/mycert.txt"));
+    assert (zsys_file_exists (TESTDIR "/mycert.txt_secret"));
+    
+    //  Load certificate, will in fact load secret one
+    shadow = zcert_load (TESTDIR "/mycert.txt");
+    assert (shadow);
+    assert (zcert_eq (cert, shadow));
+    zcert_destroy (&shadow);
+    
+    //  Delete secret certificate, load public one
+    int rc = zsys_file_delete (TESTDIR "/mycert.txt_secret");
+    assert (rc == 0);
+    shadow = zcert_load (TESTDIR "/mycert.txt");
+    
+    //  32-byte null key encodes as 40 '0' characters
+    assert (streq (zcert_secret_txt (shadow), FORTY_ZEROES));
+    
+    zcert_destroy (&shadow);
+    zcert_destroy (&cert);
+    
+    //  Delete all test files
+    zdir_t *dir = zdir_new (TESTDIR, NULL);
+    assert (dir);
+    zdir_remove (dir, true);
+    zdir_destroy (&dir);
 

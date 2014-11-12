@@ -74,4 +74,30 @@ This is the class interface:
 This is the class self test code:
 
     //  Create two PAIR sockets and connect over inproc
+    zsock_t *output = zsock_new_pair ("@inproc://zstr.test");
+    assert (output);
+    zsock_t *input = zsock_new_pair (">inproc://zstr.test");
+    assert (input);
+    
+    //  Send ten strings, five strings with MORE flag and then END
+    int string_nbr;
+    for (string_nbr = 0; string_nbr < 10; string_nbr++)
+        zstr_sendf (output, "this is string %d", string_nbr);
+    zstr_sendx (output, "This", "is", "almost", "the", "very", "END", NULL);
+    
+    //  Read and count until we receive END
+    string_nbr = 0;
+    for (string_nbr = 0;; string_nbr++) {
+        char *string = zstr_recv (input);
+        assert (string);
+        if (streq (string, "END")) {
+            zstr_free (&string);
+            break;
+        }
+        zstr_free (&string);
+    }
+    assert (string_nbr == 15);
+    
+    zsock_destroy (&input);
+    zsock_destroy (&output);
 

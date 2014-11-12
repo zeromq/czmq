@@ -175,4 +175,198 @@ This is the class interface:
 This is the class self test code:
 
     //  Create two PAIR sockets and connect over inproc
+    zsock_t *output = zsock_new_pair ("@inproc://zmsg.test");
+    assert (output);
+    zsock_t *input = zsock_new_pair (">inproc://zmsg.test");
+    assert (input);
+    
+    //  Test send and receive of single-frame message
+    zmsg_t *msg = zmsg_new ();
+    assert (msg);
+    zframe_t *frame = zframe_new ("Hello", 5);
+    assert (frame);
+    zmsg_prepend (msg, &frame);
+    assert (zmsg_size (msg) == 1);
+    assert (zmsg_content_size (msg) == 5);
+    rc = zmsg_send (&msg, output);
+    assert (msg == NULL);
+    assert (rc == 0);
+    
+    msg = zmsg_recv (input);
+    assert (msg);
+    assert (zmsg_size (msg) == 1);
+    assert (zmsg_content_size (msg) == 5);
+    zmsg_destroy (&msg);
+    
+    //  Test send and receive of multi-frame message
+    msg = zmsg_new ();
+    assert (msg);
+    rc = zmsg_addmem (msg, "Frame0", 6);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, "Frame1", 6);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, "Frame2", 6);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, "Frame3", 6);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, "Frame4", 6);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, "Frame5", 6);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, "Frame6", 6);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, "Frame7", 6);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, "Frame8", 6);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, "Frame9", 6);
+    assert (rc == 0);
+    zmsg_t *copy = zmsg_dup (msg);
+    assert (copy);
+    rc = zmsg_send (&copy, output);
+    assert (rc == 0);
+    rc = zmsg_send (&msg, output);
+    assert (rc == 0);
+    
+    copy = zmsg_recv (input);
+    assert (copy);
+    assert (zmsg_size (copy) == 10);
+    assert (zmsg_content_size (copy) == 60);
+    zmsg_destroy (&copy);
+    
+    msg = zmsg_recv (input);
+    assert (msg);
+    assert (zmsg_size (msg) == 10);
+    assert (zmsg_content_size (msg) == 60);
+    
+    // create empty file for null test
+    FILE *file = fopen ("zmsg.test", "w");
+    assert (file);
+    fclose (file);
+    
+    file = fopen ("zmsg.test", "r");
+    zmsg_t *null_msg = zmsg_load (NULL, file);
+    assert (null_msg == NULL);
+    fclose (file);
+    remove ("zmsg.test");
+    
+    //  Save to a file, read back
+    file = fopen ("zmsg.test", "w");
+    assert (file);
+    rc = zmsg_save (msg, file);
+    assert (rc == 0);
+    fclose (file);
+    
+    file = fopen ("zmsg.test", "r");
+    rc = zmsg_save (msg, file);
+    assert (rc == -1);
+    fclose (file);
+    zmsg_destroy (&msg);
+    
+    file = fopen ("zmsg.test", "r");
+    msg = zmsg_load (NULL, file);
+    assert (msg);
+    fclose (file);
+    remove ("zmsg.test");
+    assert (zmsg_size (msg) == 10);
+    assert (zmsg_content_size (msg) == 60);
+    
+    //  Remove all frames except first and last
+    int frame_nbr;
+    for (frame_nbr = 0; frame_nbr < 8; frame_nbr++) {
+        zmsg_first (msg);
+        frame = zmsg_next (msg);
+        zmsg_remove (msg, frame);
+        zframe_destroy (&frame);
+    }
+    //  Test message frame manipulation
+    assert (zmsg_size (msg) == 2);
+    frame = zmsg_last (msg);
+    assert (zframe_streq (frame, "Frame9"));
+    assert (zmsg_content_size (msg) == 12);
+    frame = zframe_new ("Address", 7);
+    assert (frame);
+    zmsg_prepend (msg, &frame);
+    assert (zmsg_size (msg) == 3);
+    rc = zmsg_addstr (msg, "Body");
+    assert (rc == 0);
+    assert (zmsg_size (msg) == 4);
+    frame = zmsg_pop (msg);
+    zframe_destroy (&frame);
+    assert (zmsg_size (msg) == 3);
+    char *body = zmsg_popstr (msg);
+    assert (streq (body, "Frame0"));
+    free (body);
+    zmsg_destroy (&msg);
+    
+    //  Test encoding/decoding
+    msg = zmsg_new ();
+    assert (msg);
+    byte *blank = (byte *) zmalloc (100000);
+    assert (blank);
+    rc = zmsg_addmem (msg, blank, 0);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, blank, 1);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, blank, 253);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, blank, 254);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, blank, 255);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, blank, 256);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, blank, 65535);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, blank, 65536);
+    assert (rc == 0);
+    rc = zmsg_addmem (msg, blank, 65537);
+    assert (rc == 0);
+    free (blank);
+    assert (zmsg_size (msg) == 9);
+    byte *buffer;
+    size_t buffer_size = zmsg_encode (msg, &buffer);
+    zmsg_destroy (&msg);
+    msg = zmsg_decode (buffer, buffer_size);
+    assert (msg);
+    free (buffer);
+    zmsg_destroy (&msg);
+    
+    //  Test submessages
+    msg = zmsg_new ();
+    assert (msg);
+    zmsg_t *submsg = zmsg_new ();
+    zmsg_pushstr (msg, "matr");
+    zmsg_pushstr (submsg, "joska");
+    rc = zmsg_addmsg (msg, &submsg);
+    assert (rc == 0);
+    assert (submsg == NULL);
+    submsg = zmsg_popmsg (msg);
+    assert (submsg == NULL);   // string "matr" is not encoded zmsg_t, so was discarded
+    submsg = zmsg_popmsg (msg);
+    assert (submsg);
+    body = zmsg_popstr (submsg);
+    assert (streq (body, "joska"));
+    free (body);
+    zmsg_destroy (&submsg);
+    frame = zmsg_pop (msg);
+    assert (frame == NULL);
+    zmsg_destroy (&msg);
+    
+    //  Now try methods on an empty message
+    msg = zmsg_new ();
+    assert (msg);
+    assert (zmsg_size (msg) == 0);
+    assert (zmsg_unwrap (msg) == NULL);
+    assert (zmsg_first (msg) == NULL);
+    assert (zmsg_last (msg) == NULL);
+    assert (zmsg_next (msg) == NULL);
+    assert (zmsg_pop (msg) == NULL);
+    //  Sending an empty message is valid and destroys the message
+    assert (zmsg_send (&msg, output) == 0);
+    assert (!msg);
+    
+    zsock_destroy (&input);
+    zsock_destroy (&output);
+    
 

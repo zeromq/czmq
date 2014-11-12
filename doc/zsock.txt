@@ -306,6 +306,242 @@ EXAMPLE
 -------
 .From zsock_test method
 ----
+zsock_t *writer = zsock_new_push ("@tcp://127.0.0.1:5560");
+assert (writer);
+assert (zsock_resolve (writer) != writer);
+assert (streq (zsock_type_str (writer), "PUSH"));
+
+int rc;
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 2, 0))
+//  Check unbind
+rc = zsock_unbind (writer, "tcp://127.0.0.1:%d", 5560);
+assert (rc == 0);
+
+//  In some cases and especially when running under Valgrind, doing
+//  a bind immediately after an unbind causes an EADDRINUSE error.
+//  Even a short sleep allows the OS to release the port for reuse.
+zclock_sleep (100);
+
+//  Bind again
+rc = zsock_bind (writer, "tcp://127.0.0.1:%d", 5560);
+assert (rc == 5560);
+assert (streq (zsock_endpoint (writer), "tcp://127.0.0.1:5560"));
+#endif
+
+zsock_t *reader = zsock_new_pull (">tcp://127.0.0.1:5560");
+assert (reader);
+assert (zsock_resolve (reader) != reader);
+assert (streq (zsock_type_str (reader), "PULL"));
+
+//  Basic Hello, World
+zstr_send (writer, "Hello, World");
+zmsg_t *msg = zmsg_recv (reader);
+assert (msg);
+char *string = zmsg_popstr (msg);
+assert (streq (string, "Hello, World"));
+free (string);
+zmsg_destroy (&msg);
+
+//  Test resolve FD
+int fd = zsock_fd (reader);
+assert (zsock_resolve ((void *) &fd) == NULL);
+
+//  Test binding to ephemeral ports, sequential and random
+int port = zsock_bind (writer, "tcp://127.0.0.1:*");
+assert (port >= DYNAMIC_FIRST && port <= DYNAMIC_LAST);
+port = zsock_bind (writer, "tcp://127.0.0.1:*[50000-]");
+assert (port >= 50000 && port <= DYNAMIC_LAST);
+port = zsock_bind (writer, "tcp://127.0.0.1:*[-50001]");
+assert (port >= DYNAMIC_FIRST && port <= 50001);
+port = zsock_bind (writer, "tcp://127.0.0.1:*[60000-60010]");
+assert (port >= 60000 && port <= 60010);
+
+port = zsock_bind (writer, "tcp://127.0.0.1:!");
+assert (port >= DYNAMIC_FIRST && port <= DYNAMIC_LAST);
+port = zsock_bind (writer, "tcp://127.0.0.1:![50000-]");
+assert (port >= 50000 && port <= DYNAMIC_LAST);
+port = zsock_bind (writer, "tcp://127.0.0.1:![-50001]");
+assert (port >= DYNAMIC_FIRST && port <= 50001);
+port = zsock_bind (writer, "tcp://127.0.0.1:![60000-60010]");
+assert (port >= 60000 && port <= 60010);
+
+//  Test zsock_attach method
+zsock_t *server = zsock_new (ZMQ_DEALER);
+assert (server);
+rc = zsock_attach (server, "@inproc://myendpoint,tcp://127.0.0.1:5556,inproc://others", true);
+assert (rc == 0);
+rc = zsock_attach (server, "", false);
+assert (rc == 0);
+rc = zsock_attach (server, NULL, true);
+assert (rc == 0);
+rc = zsock_attach (server, ">a,@b, c,, ", false);
+assert (rc == -1);
+zsock_destroy (&server);
+
+//  Test zsock_endpoint method
+rc = zsock_bind (writer, "inproc://test.%s", "writer");
+assert (rc == 0);
+assert (streq (zsock_endpoint (writer), "inproc://test.writer"));
+
+//  Test error state when connecting to an invalid socket type
+//  ('txp://' instead of 'tcp://', typo intentional)
+rc = zsock_connect (reader, "txp://127.0.0.1:5560");
+assert (rc == -1);
+
+//  Test signal/wait methods
+rc = zsock_signal (writer, 123);
+assert (rc == 0);
+rc = zsock_wait (reader);
+assert (rc == 123);
+
+//  Test zsock_send/recv pictures
+zchunk_t *chunk = zchunk_new ("HELLO", 5);
+assert (chunk);
+zframe_t *frame = zframe_new ("WORLD", 5);
+assert (frame);
+zhash_t *hash = zhash_new ();
+assert (hash);
+zhash_autofree (hash);
+zhash_insert (hash, "1", "value A");
+zhash_insert (hash, "2", "value B");
+char *original = "pointer";
+
+//  We can send signed integers, strings, blocks of memory, chunks,
+//  frames, hashes and pointers
+zsock_send (writer, "izsbcfp",
+            -12345, "This is a string", "ABCDE", 5, chunk, frame, original);
+msg = zmsg_recv (reader);
+assert (msg);
+if (verbose)
+    zmsg_print (msg);
+zmsg_destroy (&msg);
+
+//  Test zsock_recv into each supported type
+zsock_send (writer, "izsbcfhp",
+            -12345, "This is a string", "ABCDE", 5, chunk, frame, hash, original);
+zframe_destroy (&frame);
+zchunk_destroy (&chunk);
+zhash_destroy (&hash);
+int integer;
+byte *data;
+size_t size;
+char *pointer;
+rc = zsock_recv (reader, "izsbcfhp", &integer, &string, &data, &size, &chunk, &frame, &hash, &pointer);
+assert (rc == 0);
+assert (integer == -12345);
+assert (streq (string, "This is a string"));
+assert (memcmp (data, "ABCDE", 5) == 0);
+assert (size == 5);
+assert (memcmp (zchunk_data (chunk), "HELLO", 5) == 0);
+assert (zchunk_size (chunk) == 5);
+assert (memcmp (zframe_data (frame), "WORLD", 5) == 0);
+assert (zframe_size (frame) == 5);
+char *value = (char *) zhash_lookup (hash, "1");
+assert (streq (value, "value A"));
+value = (char *) zhash_lookup (hash, "2");
+assert (streq (value, "value B"));
+assert (original == pointer);
+free (string);
+free (data);
+zframe_destroy (&frame);
+zchunk_destroy (&chunk);
+zhash_destroy (&hash);
+
+//  Test zsock_recv of short message; this lets us return a failure
+//  with a status code and then nothing else; the receiver will get
+//  the status code and NULL/zero for all other values
+zsock_send (writer, "i", -1);
+zsock_recv (reader, "izsbcfp", &integer, &string, &data, &size, &chunk, &frame, &pointer);
+assert (integer == -1);
+assert (string == NULL);
+assert (data == NULL);
+assert (size == 0);
+assert (chunk == NULL);
+assert (frame == NULL);
+assert (pointer == NULL);
+
+msg = zmsg_new ();
+zmsg_addstr (msg, "frame 1");
+zmsg_addstr (msg, "frame 2");
+zsock_send (writer, "szm", "header", msg);
+zmsg_destroy (&msg);
+
+zsock_recv (reader, "szm", &string, &msg);
+
+assert (streq ("header", string));
+assert (zmsg_size (msg) == 2);
+assert (zframe_streq (zmsg_first (msg), "frame 1"));
+assert (zframe_streq (zmsg_next (msg), "frame 2"));
+zstr_free (&string);
+zmsg_destroy (&msg);
+
+//  Test zsock_recv with null arguments
+chunk = zchunk_new ("HELLO", 5);
+assert (chunk);
+frame = zframe_new ("WORLD", 5);
+assert (frame);
+zsock_send (writer, "izsbcfp",
+            -12345, "This is a string", "ABCDE", 5, chunk, frame, original);
+zframe_destroy (&frame);
+zchunk_destroy (&chunk);
+zsock_recv (reader, "izsbcfp", &integer, NULL, NULL, NULL, &chunk, NULL, NULL);
+assert (integer == -12345);
+assert (memcmp (zchunk_data (chunk), "HELLO", 5) == 0);
+assert (zchunk_size (chunk) == 5);
+zchunk_destroy (&chunk);
+
+//  Test zsock_bsend/brecv pictures with binary encoding
+uint8_t  number1 = 123;
+uint16_t number2 = 123 * 123;
+uint32_t number4 = 123 * 123 * 123;
+uint64_t number8 = 123 * 123 * 123 * 123;
+
+frame = zframe_new ("Hello", 5);
+chunk = zchunk_new ("World", 5);
+
+msg = zmsg_new ();
+zmsg_addstr (msg, "Hello");
+zmsg_addstr (msg, "World");
+
+zsock_bsend (writer, "1248sSpcfm",
+             number1, number2, number4, number8,
+             "Hello, World",
+             "Goodbye cruel World!",
+             original,
+             chunk, frame, msg);
+zchunk_destroy (&chunk);
+zframe_destroy (&frame);
+zmsg_destroy (&msg);
+
+number1 = number2 = number4 = number8 = 0;
+char *longstr;
+zsock_brecv (reader, "1248sSpcfm",
+             &number1, &number2, &number4, &number8,
+             &string, &longstr,
+             &pointer,
+             &chunk, &frame, &msg);
+assert (number1 == 123);
+assert (number2 == 123 * 123);
+assert (number4 == 123 * 123 * 123);
+assert (number8 == 123 * 123 * 123 * 123);
+assert (streq (string, "Hello, World"));
+assert (streq (longstr, "Goodbye cruel World!"));
+assert (pointer == original);
+zstr_free (&longstr);
+zchunk_destroy (&chunk);
+zframe_destroy (&frame);
+zmsg_destroy (&msg);
+
+//  Check that we can send a zproto format message
+zsock_bsend (writer, "1111sS4", 0xAA, 0xA0, 0x02, 0x01, "key", "value", 1234);
+zgossip_msg_t *gossip = zgossip_msg_new ();
+zgossip_msg_recv (gossip, reader);
+assert (zgossip_msg_id (gossip) == ZGOSSIP_MSG_PUBLISH);
+zgossip_msg_destroy (&gossip);
+
+zsock_destroy (&reader);
+zsock_destroy (&writer);
+
 ----
 
 SEE ALSO
