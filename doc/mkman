@@ -86,7 +86,7 @@ sub pull {
         while (<SOURCE>) {
             if (/$tag/) {
                 while (<SOURCE>) {
-                    last if /@[a-zA-Z0-9]+/;
+                    last if /\@discuss/ || /\@end/;
                     $_ = "    $_" if $opts eq "code";
                     s/^    // if $opts eq "left";
                     $_ = "    $_" if $opts eq "test";
