@@ -103,11 +103,6 @@ CZMQ_EXPORT int
 CZMQ_EXPORT char *
     zmsg_popstr (zmsg_t *self);
 
-//  Pop frame off front of message, return as integer value. If there were
-//  no more frames in the message, returns 0.
-CZMQ_EXPORT int
-    zmsg_popint (zmsg_t *self);
-
 //  Push encoded message as a new frame. Message takes ownership of
 //  submessage, so the original is destroyed in this call. Returns 0 on
 //  success, -1 on error.
