@@ -101,11 +101,11 @@ char *message = zstr_recv (which);
 assert (streq (message, "Hello, World"));
 zstr_free (&message);
 
-// Stop polling reader
+//  Stop polling reader
 rc = zpoller_remove (poller, sink);
 assert (rc == 0);
 
-// Check fd works
+//  Check we can poll an FD
 rc = zsock_connect (bowl, "tcp://127.0.0.1:%d", port_nbr);
 assert (rc != -1);
 int fd = zsock_fd (bowl);

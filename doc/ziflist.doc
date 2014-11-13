@@ -3,7 +3,7 @@
 The ziflist class takes a snapshot of the network interfaces that the
 system currently supports (this can change arbitrarily, especially on
 mobile devices). The caller can then access the network interface
-information using an iterator that works like zlist. Only stores those
+information using an iterator that works like zlistx. Only stores those
 interfaces with broadcast capability, and ignores the loopback interface.
 
 

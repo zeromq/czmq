@@ -70,10 +70,10 @@ This is the class interface:
     CZMQ_EXPORT size_t
         zhashx_size (zhashx_t *self);
     
-    //  Return a zlist_t containing the keys for the items in the
+    //  Return a zlistx_t containing the keys for the items in the
     //  table. Uses the key_duplicator to duplicate all keys and sets the
     //  key_destructor as destructor for the list.
-    CZMQ_EXPORT zlist_t *
+    CZMQ_EXPORT zlistx_t *
         zhashx_keys (zhashx_t *self);
         
     //  Simple iterator; returns first item in hash table, in no given order,
@@ -86,7 +86,7 @@ This is the class interface:
     //  Simple iterator; returns next item in hash table, in no given order,
     //  or NULL if the last item was already returned. Use this together with
     //  zhashx_first() to process all items in a hash table. If you need the
-    //  items in sorted order, use zhashx_keys() and then zlist_sort(). To
+    //  items in sorted order, use zhashx_keys() and then zlistx_sort(). To
     //  access the key for this item use zhashx_cursor(). NOTE: do NOT modify
     //  the table while iterating.
     CZMQ_EXPORT void *
@@ -288,9 +288,9 @@ This is the class self test code:
     assert (streq (item, "a bad cafe"));
     
     //  Test keys method
-    zlist_t *keys = zhashx_keys (hash);
-    assert (zlist_size (keys) == 4);
-    zlist_destroy (&keys);
+    zlistx_t *keys = zhashx_keys (hash);
+    assert (zlistx_size (keys) == 4);
+    zlistx_destroy (&keys);
     
     //  Test dup method
     zhashx_t *copy = zhashx_dup (hash);
