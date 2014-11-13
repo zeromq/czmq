@@ -519,9 +519,9 @@ zhashx_keys (zhashx_t *self)
     for (index = 0; index < limit; index++) {
         item_t *item = self->items [index];
         while (item) {
-            if (zlistx_add_end (keys, (void *) item->key)) {
+            if (zlistx_add_end (keys, (void *) item->key) == NULL) {
                 zlistx_destroy (&keys);
-                break;
+                return NULL;
             }
             item = item->next;
         }
