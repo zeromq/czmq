@@ -466,7 +466,6 @@ zmsg_first (zmsg_t *self)
 {
     assert (self);
     assert (zmsg_is (self));
-
     return (zframe_t *) zlistx_first (self->frames);
 }
 
@@ -480,7 +479,6 @@ zmsg_next (zmsg_t *self)
 {
     assert (self);
     assert (zmsg_is (self));
-
     return (zframe_t *) zlistx_next (self->frames);
 }
 
@@ -493,7 +491,6 @@ zmsg_last (zmsg_t *self)
 {
     assert (self);
     assert (zmsg_is (self));
-
     return (zframe_t *) zlistx_last (self->frames);
 }
 
