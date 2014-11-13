@@ -54,7 +54,7 @@ zpoller_new (void *reader, ...)
             va_list args;
             va_start (args, reader);
             while (reader) {
-                if (zlistx_add_end (self->reader_list, reader) == -1) {
+                if (zlistx_add_end (self->reader_list, reader) == NULL) {
                     zpoller_destroy (&self);
                     break;
                 }
@@ -94,7 +94,7 @@ zpoller_add (zpoller_t *self, void *reader)
 {
     assert (self);
     assert (reader);
-    int rc = zlistx_add_end (self->reader_list, reader);
+    int rc = zlistx_add_end (self->reader_list, reader)? 0: -1;
     self->need_rebuild = true;
     return rc;
 }
@@ -110,7 +110,9 @@ zpoller_remove (zpoller_t *self, void *reader)
 {
     assert (self);
     assert (reader);
-    zlistx_delete (self->reader_list, reader);
+    void *handle = zlistx_find (self->reader_list, reader);
+    if (handle)
+        zlistx_delete (self->reader_list, handle);
     self->need_rebuild = true;
     return 0;
 }

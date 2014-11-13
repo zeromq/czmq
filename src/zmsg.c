@@ -190,7 +190,7 @@ zmsg_prepend (zmsg_t *self, zframe_t **frame_p)
     zframe_t *frame = *frame_p;
     *frame_p = NULL;            //  We now own frame
     self->content_size += zframe_size (frame);
-    return zlistx_add_start (self->frames, frame);
+    return zlistx_add_start (self->frames, frame)? 0: -1;
 }
 
 
@@ -209,7 +209,7 @@ zmsg_append (zmsg_t *self, zframe_t **frame_p)
     zframe_t *frame = *frame_p;
     *frame_p = NULL;            //  We now own frame
     self->content_size += zframe_size (frame);
-    return zlistx_add_end (self->frames, frame);
+    return zlistx_add_end (self->frames, frame)? 0: -1;
 }
 
 
@@ -244,7 +244,7 @@ zmsg_pushmem (zmsg_t *self, const void *src, size_t size)
     zframe_t *frame = zframe_new (src, size);
     if (frame) {
         self->content_size += size;
-        return zlistx_add_start (self->frames, frame);
+        return zlistx_add_start (self->frames, frame)? 0: -1;
     }
     else
         return -1;
@@ -263,7 +263,7 @@ zmsg_addmem (zmsg_t *self, const void *src, size_t size)
     zframe_t *frame = zframe_new (src, size);
     if (frame) {
         self->content_size += size;
-        return zlistx_add_end (self->frames, frame);
+        return zlistx_add_end (self->frames, frame)? 0: -1;
     }
     else
         return -1;
@@ -285,7 +285,7 @@ zmsg_pushstr (zmsg_t *self, const char *string)
     zframe_t *frame = zframe_new (string, len);
     if (frame) {
         self->content_size += len;
-        return zlistx_add_start (self->frames, frame);
+        return zlistx_add_start (self->frames, frame)? 0: -1;
     }
     else
         return -1;
@@ -307,7 +307,7 @@ zmsg_addstr (zmsg_t *self, const char *string)
     zframe_t *frame = zframe_new (string, len);
     if (frame) {
         self->content_size += len;
-        return zlistx_add_end (self->frames, frame);
+        return zlistx_add_end (self->frames, frame)? 0: -1;
     }
     else
         return -1;
@@ -337,7 +337,7 @@ zmsg_pushstrf (zmsg_t *self, const char *format, ...)
     free (string);
     if (frame) {
         self->content_size += len;
-        return zlistx_add_start (self->frames, frame);
+        return zlistx_add_start (self->frames, frame)? 0: -1;
     }
     else
         return -1;
@@ -367,7 +367,7 @@ zmsg_addstrf (zmsg_t *self, const char *format, ...)
     free (string);
     if (frame) {
         self->content_size += len;
-        return zlistx_add_end (self->frames, frame);
+        return zlistx_add_end (self->frames, frame)? 0: -1;
     }
     else
         return -1;
@@ -453,7 +453,8 @@ zmsg_remove (zmsg_t *self, zframe_t *frame)
     assert (zmsg_is (self));
 
     self->content_size -= zframe_size (frame);
-    zlistx_detach (self->frames, frame);
+    void *handle = zlistx_find (self->frames, frame);
+    zlistx_detach (self->frames, handle);
 }
 
 
@@ -809,7 +810,7 @@ zmsg_push (zmsg_t *self, zframe_t *frame)
     assert (self);
     assert (frame);
     self->content_size += zframe_size (frame);
-    return zlistx_add_start (self->frames, frame);
+    return zlistx_add_start (self->frames, frame)? 0: -1;
 }
 
 
@@ -825,7 +826,7 @@ zmsg_add (zmsg_t *self, zframe_t *frame)
     assert (self);
     assert (frame);
     self->content_size += zframe_size (frame);
-    return zlistx_add_end (self->frames, frame);
+    return zlistx_add_end (self->frames, frame)? 0: -1;
 }
 
 

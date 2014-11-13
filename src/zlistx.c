@@ -26,9 +26,12 @@
 
 #include "../include/czmq.h"
 
+#define NODE_TAG            0x0006cafe
+
 //  List node, used internally only
 
 typedef struct _node_t {
+    uint32_t tag;                   //  Object tag for validity checking
     struct _node_t *next;
     struct _node_t *prev;
     void *item;
@@ -58,6 +61,7 @@ s_node_new (node_t *prev, node_t *next, void *item)
 {
     node_t *self = (node_t *) zmalloc (sizeof (node_t));
     if (self) {
+        self->tag = NODE_TAG;
         self->prev = prev? prev: self;
         self->next = next? next: self;
         self->item = item;
@@ -101,17 +105,19 @@ zlistx_destroy (zlistx_t **self_p)
 
 //  --------------------------------------------------------------------------
 //  Add an item to the head of the list. Calls the item duplicator, if any,
-//  on the item. Resets cursor to list head. Returns 0 on success, -1 if
-//  failed due to lack of memory.
+//  on the item. Resets cursor to list head. Returns an item handle on
+//  success, NULL if memory was exhausted.
 
-int
+void *
 zlistx_add_start (zlistx_t *self, void *item)
 {
     assert (self);
+    assert (item);
+    
     if (self->duplicator) {
         item = (self->duplicator)(item);
         if (!item)
-            return -1;
+            return NULL;        //  Out of memory
     }
     node_t *node = s_node_new (self->head, self->head->next, item);
     if (node) {
@@ -119,26 +125,28 @@ zlistx_add_start (zlistx_t *self, void *item)
         self->head->next->prev = node;
         self->head->next = node;
         self->size++;
-        return 0;
+        return node;
     }
     else
-        return -1;              //  Ran out of heap memory
+        return NULL;            //  Out of memory
 }
 
 
 //  --------------------------------------------------------------------------
 //  Add an item to the tail of the list. Calls the item duplicator, if any,
-//  on the item. Resets cursor to list head. Returns 0 on success, -1 if
-//  failed due to lack of memory.
+//  on the item. Resets cursor to list head. Returns an item handle on
+//  success, NULL if memory was exhausted.
 
-int
+void *
 zlistx_add_end (zlistx_t *self, void *item)
 {
     assert (self);
+    assert (item);
+    
     if (self->duplicator) {
         item = (self->duplicator)(item);
         if (!item)
-            return -1;
+            return NULL;        //  Out of memory
     }
     node_t *node = s_node_new (self->head->prev, self->head, item);
     if (node) {
@@ -146,36 +154,10 @@ zlistx_add_end (zlistx_t *self, void *item)
         self->head->prev->next = node;
         self->head->prev = node;
         self->size++;
-        return 0;
+        return node;
     }
     else
-        return -1;              //  Ran out of heap memory
-}
-
-
-//  --------------------------------------------------------------------------
-//  Add an item before the current cursor, if any. If no cursor is set, adds
-//  to the start of the list. Calls the item duplicator, if any, on the item.
-//  Leaves cursor at newly inserted item. Returns 0 on success, -1 if failed
-//  due to lack of memory.
-
-int
-zlistx_add_before (zlistx_t *self, void *item)
-{
-    return -1;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Add an item after the current cursor, if any. If no cursor is set, adds
-//  to the end of the list. Calls the item duplicator, if any, on the item.
-//  Leaves cursor at newly inserted item. Returns 0 on success, -1 if failed
-//  due to lack of memory.
-
-int
-zlistx_add_after (zlistx_t *self, void *item)
-{
-    return -1;
+        return NULL;            //  Out of memory
 }
 
 
@@ -198,21 +180,8 @@ void *
 zlistx_first (zlistx_t *self)
 {
     assert (self);
-    self->cursor = self->head;
-    return zlistx_next (self);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Return the item at the tail of list. If the list is empty, returns NULL.
-//  Leaves cursor pointing at the tail item, or NULL if the list is empty.
-
-void *
-zlistx_last (zlistx_t *self)
-{
-    assert (self);
-    self->cursor = self->head;
-    return zlistx_prev (self);
+    self->cursor = self->head->next;
+    return self->cursor == self->head? NULL: self->cursor->item;
 }
 
 
@@ -226,7 +195,7 @@ zlistx_next (zlistx_t *self)
 {
     assert (self);
     self->cursor = self->cursor->next;
-    return zlistx_item (self);
+    return self->cursor == self->head? NULL: self->cursor->item;
 }
 
 
@@ -240,17 +209,49 @@ zlistx_prev (zlistx_t *self)
 {
     assert (self);
     self->cursor = self->cursor->prev;
-    return zlistx_item (self);
+    return self->cursor == self->head? NULL: self->cursor->item;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Find an item in the list, looking first at the cursor, and then from 
-//  the first to last item. If an item comparator was set, calls this to
-//  compare each item in the list with the supplied target item. If none
-//  was set, compares the two item pointers for equality. If the item is
-//  found, leaves the cursor at the found item. Returns the item if found,
-//  else null.
+//  Return the item at the tail of list. If the list is empty, returns NULL.
+//  Leaves cursor pointing at the tail item, or NULL if the list is empty.
+
+void *
+zlistx_last (zlistx_t *self)
+{
+    assert (self);
+    self->cursor = self->head->prev;
+    return self->cursor == self->head? NULL: self->cursor->item;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Returns the value of the item at the cursor, or NULL if the cursor is
+//  not pointing to an item.
+
+void *
+zlistx_item (zlistx_t *self)
+{
+    return self->cursor == self->head? NULL: self->cursor->item;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Returns the handle of the item at the cursor, or NULL if the cursor is
+//  not pointing to an item.
+
+void *
+zlistx_handle (zlistx_t *self)
+{
+    return self->cursor == self->head? NULL: self->cursor;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Find an item in the list, searching from the start. Uses the item
+//  comparator, if any, else compares item values directly. Returns the
+//  item handle found, or NULL.
 
 void *
 zlistx_find (zlistx_t *self, void *item)
@@ -258,30 +259,17 @@ zlistx_find (zlistx_t *self, void *item)
     assert (self);
     assert (item);
 
-    //  First check item at cursor
-    if (self->cursor != self->head) {
-        if (self->comparator) {
-            if (self->comparator (self->cursor->item, item) == 0)
-                return self->cursor->item;
-        }
-        else
-        if (self->cursor->item == item)
-            return self->cursor->item;
-    }
-    //  Now scan list for item, this is a O(N) operation
+    //  Scan list for item, this is a O(N) operation
     node_t *node = self->head->next;
     while (node != self->head) {
         if (self->comparator) {
-            if (self->comparator (node->item, item) == 0) {
-                self->cursor = node;
-                return node->item;
-            }
+            if (self->comparator (node->item, item) == 0)
+                return node;
         }
         else
-        if (node->item == item) {
-            self->cursor = node;
-            return node->item;
-        }
+        if (node->item == item)
+            return node;
+        
         node = node->next;
     }
     return NULL;
@@ -289,58 +277,53 @@ zlistx_find (zlistx_t *self, void *item)
 
 
 //  --------------------------------------------------------------------------
-//  Remove an item from the list, and destroy it, if the item destructor is
-//  set. Searches the list for the item, always starting with the cursor, if
-//  any is set, and then from the start of the list. If item is null, removes
-//  the first item, if any. If the item was found and detached, returns the
-//  0, else returns -1.
-
-int
-zlistx_delete (zlistx_t *self, void *item)
-{
-    assert (self);
-    void *detached = zlistx_detach (self, item);
-    if (detached) {
-        if (self->destructor)
-            self->destructor (&detached);
-        return 0;
-    }
-    else
-        return -1;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Detach an item from the list, without destroying the item. Searches the
-//  list for the item, always starting with the cursor, if any is set, and
-//  then from the start of the list. If item is null, detaches the first item
-//  in the list, if any. If the item was found and detached, returns the item
-//  and resets cursor to start of list. Else, returns null.
+//  Detach an item from the list, using its handle. The item is not modified,
+//  and the caller is responsible for destroying it if necessary. If handle is
+//  null, detaches the first item on the list. Returns item that was detached,
+//  or null if none was.
 
 void *
-zlistx_detach (zlistx_t *self, void *item)
+zlistx_detach (zlistx_t *self, void *handle)
 {
     assert (self);
 
-    node_t *found = NULL;
-    if ((item == NULL && zlistx_first (self))
-    ||  (item != NULL && zlistx_find (self, item))) {
-        found = self->cursor;
-        assert (found != self->head);
-    }
+    node_t *node = (node_t *) handle;
+    if (!node)
+        node = self->head->next == self->head? NULL: self->head->next;
+
     //  Now detach node from list, without destroying it
-    if (found) {
-        item = found->item;
-        found->item = NULL;
-        found->prev->next = found->next;
-        found->next->prev = found->prev;
+    if (node) {
+        void *item = node->item;
+        node->prev->next = node->next;
+        node->next->prev = node->prev;
+        node->tag = 0xDeadBeef;
+        free (node);
         self->cursor = self->head;
         self->size--;
-        free (found);
         return item;
     }
     else
         return NULL;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Delete an item, using its handle. Calls the item destructor is any is
+//  set. If handle is null, deletes the first item on the list. Returns 0
+//  if an item was deleted, -1 if not.
+
+int
+zlistx_delete (zlistx_t *self, void *handle)
+{
+    assert (self);
+    void *item = zlistx_detach (self, handle);
+    if (item) {
+        if (self->destructor)
+            self->destructor (&item);
+        return 0;
+    }
+    else
+        return -1;
 }
 
 
@@ -353,22 +336,7 @@ zlistx_purge (zlistx_t *self)
 {
     assert (self);
     while (zlistx_size (self))
-        zlistx_delete (self, zlistx_first (self));
-}
-
-
-//  --------------------------------------------------------------------------
-//  Return current item in the list. If the list is empty, or the cursor
-//  passed the end of the list, returns NULL. Does not change the cursor.
-
-void *
-zlistx_item (zlistx_t *self)
-{
-    assert (self);
-    if (self->cursor != self->head)
-        return self->cursor->item;
-    else
-        return NULL;            //  Reached head, so finished
+        zlistx_delete (self, NULL);
 }
 
 
@@ -442,7 +410,7 @@ zlistx_dup (zlistx_t *self)
         //  Copy nodes
         node_t *node;
         for (node = self->head->next; node != self->head; node = node->next) {
-            if (zlistx_add_end (copy, node->item)) {
+            if (!zlistx_add_end (copy, node->item)) {
                 zlistx_destroy (&copy);
                 break;
             }
@@ -508,12 +476,11 @@ zlistx_test (int verbose)
     assert (zlistx_next (list) == NULL);
     assert (zlistx_prev (list) == NULL);
     assert (zlistx_find (list, "hello") == NULL);
-    assert (zlistx_delete (list, "hello") == -1);
-    assert (zlistx_detach (list, "hello") == NULL);
+    assert (zlistx_delete (list, NULL) == -1);
+    assert (zlistx_detach (list, NULL) == NULL);
     assert (zlistx_delete (list, NULL) == -1);
     assert (zlistx_detach (list, NULL) == NULL);
     zlistx_purge (list);
-    assert (zlistx_item (list) == NULL);
     zlistx_sort (list);
 
     //  Use item handlers
@@ -529,7 +496,8 @@ zlistx_test (int verbose)
     assert (streq ((char *) zlistx_prev (list), "hello"));
     zlistx_sort (list);
     assert (zlistx_size (list) == 2);
-    zlistx_delete (list, "hello");
+    void *handle = zlistx_find (list, "hello");
+    zlistx_delete (list, handle);
     assert (zlistx_size (list) == 1);
     char *string = (char *) zlistx_detach (list, NULL);
     assert (streq (string, "world"));
@@ -568,13 +536,14 @@ zlistx_test (int verbose)
     assert (streq ((char *) zlistx_last (list), "two"));
 
     zlistx_t *copy = zlistx_dup (list);
-    zlistx_purge (list);
-    zlistx_destroy (&list);
-
+    assert (copy);
     assert (zlistx_size (copy) == 10);
     assert (streq ((char *) zlistx_first (copy), "eight"));
     assert (streq ((char *) zlistx_last (copy), "two"));
     zlistx_destroy (&copy);
+
+    zlistx_purge (list);
+    zlistx_destroy (&list);
     //  @end
 
     printf ("OK\n");
