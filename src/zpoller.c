@@ -54,7 +54,7 @@ zpoller_new (void *reader, ...)
             va_list args;
             va_start (args, reader);
             while (reader) {
-                if (zlistx_append (self->reader_list, reader) == -1) {
+                if (zlistx_add_end (self->reader_list, reader) == -1) {
                     zpoller_destroy (&self);
                     break;
                 }
@@ -94,9 +94,8 @@ zpoller_add (zpoller_t *self, void *reader)
 {
     assert (self);
     assert (reader);
-    int rc = zlistx_append (self->reader_list, reader);
-    if (rc != -1)
-        self->need_rebuild = true;
+    int rc = zlistx_add_end (self->reader_list, reader);
+    self->need_rebuild = true;
     return rc;
 }
 
@@ -111,7 +110,7 @@ zpoller_remove (zpoller_t *self, void *reader)
 {
     assert (self);
     assert (reader);
-    zlistx_remove (self->reader_list, reader);
+    zlistx_delete (self->reader_list, reader);
     self->need_rebuild = true;
     return 0;
 }
@@ -261,11 +260,11 @@ zpoller_test (bool verbose)
     assert (streq (message, "Hello, World"));
     zstr_free (&message);
 
-    // Stop polling reader
+    //  Stop polling reader
     rc = zpoller_remove (poller, sink);
     assert (rc == 0);
 
-    // Check fd works
+    //  Check we can poll an FD
     rc = zsock_connect (bowl, "tcp://127.0.0.1:%d", port_nbr);
     assert (rc != -1);
     int fd = zsock_fd (bowl);

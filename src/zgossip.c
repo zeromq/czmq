@@ -168,9 +168,12 @@ server_initialize (server_t *self)
     //  override this with a SET message.
     engine_configure (self, "server/timeout", "1000");
     self->message = zgossip_msg_new ();
+    
     self->remotes = zlistx_new ();
-    self->tuples = zhashx_new ();
     assert (self->remotes);
+    zlistx_set_destructor (self->remotes, (czmq_destructor *) zsock_destroy_);
+    
+    self->tuples = zhashx_new ();
     assert (self->tuples);
     return 0;
 }
@@ -180,10 +183,6 @@ server_initialize (server_t *self)
 static void
 server_terminate (server_t *self)
 {
-    while (zlistx_size (self->remotes) > 0) {
-        zsock_t *remote = (zsock_t *) zlistx_pop (self->remotes);
-        zsock_destroy (&remote);
-    }
     zgossip_msg_destroy (&self->message);
     zlistx_destroy (&self->remotes);
     zhashx_destroy (&self->tuples);
@@ -222,7 +221,7 @@ server_connect (server_t *self, const char *endpoint)
     //  Now monitor this remote for incoming messages
     zgossip_msg_destroy (&gossip);
     engine_handle_socket (self, remote, remote_handler);
-    zlistx_append (self->remotes, remote);
+    zlistx_add_end (self->remotes, remote);
 }
 
 
