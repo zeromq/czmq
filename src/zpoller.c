@@ -25,7 +25,7 @@
 //  Structure of our class
 
 struct _zpoller_t {
-    zlist_t *reader_list;       //  List of sockets to read from
+    zlistx_t *reader_list;      //  List of sockets to read from
     zmq_pollitem_t *poll_set;   //  Current zmq_poll set
     void **poll_readers;        //  Matching table of socket readers
     size_t poll_size;           //  Size of poll set
@@ -47,14 +47,14 @@ zpoller_new (void *reader, ...)
 {
     zpoller_t *self = (zpoller_t *) zmalloc (sizeof (zpoller_t));
     if (self) {
-        self->reader_list = zlist_new ();
+        self->reader_list = zlistx_new ();
         if (self->reader_list) {
             self->need_rebuild = true;
 
             va_list args;
             va_start (args, reader);
             while (reader) {
-                if (zlist_append (self->reader_list, reader) == -1) {
+                if (zlistx_append (self->reader_list, reader) == -1) {
                     zpoller_destroy (&self);
                     break;
                 }
@@ -76,7 +76,7 @@ zpoller_destroy (zpoller_t **self_p)
     assert (self_p);
     if (*self_p) {
         zpoller_t *self = *self_p;
-        zlist_destroy (&self->reader_list);
+        zlistx_destroy (&self->reader_list);
         free (self->poll_readers);
         free (self->poll_set);
         free (self);
@@ -94,7 +94,7 @@ zpoller_add (zpoller_t *self, void *reader)
 {
     assert (self);
     assert (reader);
-    int rc = zlist_append (self->reader_list, reader);
+    int rc = zlistx_append (self->reader_list, reader);
     if (rc != -1)
         self->need_rebuild = true;
     return rc;
@@ -111,7 +111,7 @@ zpoller_remove (zpoller_t *self, void *reader)
 {
     assert (self);
     assert (reader);
-    zlist_remove (self->reader_list, reader);
+    zlistx_remove (self->reader_list, reader);
     self->need_rebuild = true;
     return 0;
 }
@@ -163,7 +163,7 @@ s_rebuild_poll_set (zpoller_t *self)
     free (self->poll_readers);
     self->poll_readers = NULL;
 
-    self->poll_size = zlist_size (self->reader_list);
+    self->poll_size = zlistx_size (self->reader_list);
     self->poll_set = (zmq_pollitem_t *)
                      zmalloc (self->poll_size * sizeof (zmq_pollitem_t));
     self->poll_readers = (void **) zmalloc (self->poll_size * sizeof (void *));
@@ -171,7 +171,7 @@ s_rebuild_poll_set (zpoller_t *self)
         return -1;
 
     uint reader_nbr = 0;
-    void *reader = zlist_first (self->reader_list);
+    void *reader = zlistx_first (self->reader_list);
     while (reader) {
         self->poll_readers [reader_nbr] = reader;
         void *socket = zsock_resolve (reader);
@@ -188,7 +188,7 @@ s_rebuild_poll_set (zpoller_t *self)
         self->poll_set [reader_nbr].events = ZMQ_POLLIN;
 
         reader_nbr++;
-        reader = zlist_next (self->reader_list);
+        reader = zlistx_next (self->reader_list);
     }
     self->need_rebuild = false;
     return 0;

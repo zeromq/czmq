@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zhash - generic type-free hash container (deprecated)
+    zhashx - extended generic hash container
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -13,8 +13,7 @@
 
 /*
 @header
-    zhash is an expandable hash table container. This is the deprecated V2
-    class. For new applications we recommend using zhashx.
+    zhashx is an expandable hash table container.
 @discuss
     The hash table always has a size that is prime and roughly doubles its
     size when 75% full. In case of hash collisions items are chained in a
@@ -45,15 +44,15 @@ typedef struct _item_t {
     qbyte index;                //  Index of item in table
     const void *key;            //  Item's original key
     //  Supporting deprecated v2 functionality; we can't quite replace
-    //  this with strdup/zstr_free as zhash_insert also uses autofree.
-    zhash_free_fn *free_fn;     //  Value free function if any
+    //  this with strdup/zstr_free as zhashx_insert also uses autofree.
+    zhashx_free_fn *free_fn;     //  Value free function if any
 } item_t;
 
 
 //  ---------------------------------------------------------------------
 //  Structure of our class
 
-struct _zhash_t {
+struct _zhashx_t {
     size_t size;                //  Current size of hash table
     uint prime_index;           //  Current prime number used as limit
     uint chain_limit;           //  Current limit on chain length
@@ -62,9 +61,9 @@ struct _zhash_t {
     size_t cursor_index;        //  For first/next iteration
     item_t *cursor_item;        //  For first/next iteration
     const void *cursor_key;     //  After first/next call, points to key
-    zlist_t *comments;          //  File comments, if any
-    time_t modified;            //  Set during zhash_load
-    char *filename;             //  Set during zhash_load
+    zlistx_t *comments;         //  File comments, if any
+    time_t modified;            //  Set during zhashx_load
+    char *filename;             //  Set during zhashx_load
     //  Function callbacks for duplicating and destroying items, if any
     czmq_duplicator *duplicator;
     czmq_destructor *destructor;
@@ -73,13 +72,13 @@ struct _zhash_t {
     czmq_destructor *key_destructor;
     czmq_comparator *key_comparator;
     //  Custom hash function
-    zhash_hash_fn *hasher;
+    zhashx_hash_fn *hasher;
 };
 
 //  Local helper functions
-static item_t *s_item_lookup (zhash_t *self, const void *key);
-static item_t *s_item_insert (zhash_t *self, const void *key, void *value);
-static void s_item_destroy (zhash_t *self, item_t *item, bool hard);
+static item_t *s_item_lookup (zhashx_t *self, const void *key);
+static item_t *s_item_insert (zhashx_t *self, const void *key, void *value);
+static void s_item_destroy (zhashx_t *self, item_t *item, bool hard);
 
 
 //  --------------------------------------------------------------------------
@@ -99,10 +98,10 @@ s_bernstein_hash (const void *key)
 //  --------------------------------------------------------------------------
 //  Hash table constructor
 
-zhash_t *
-zhash_new (void)
+zhashx_t *
+zhashx_new (void)
 {
-    zhash_t *self = (zhash_t *) zmalloc (sizeof (zhash_t));
+    zhashx_t *self = (zhashx_t *) zmalloc (sizeof (zhashx_t));
     if (self) {
         self->prime_index = INITIAL_PRIME;
         self->chain_limit = INITIAL_CHAIN;
@@ -115,7 +114,7 @@ zhash_new (void)
             self->key_comparator = (czmq_comparator *) strcmp;
         }
         else
-            zhash_destroy (&self);
+            zhashx_destroy (&self);
     }
     return self;
 }
@@ -125,7 +124,7 @@ zhash_new (void)
 //  Purge all items from a hash table
 
 static void
-s_purge (zhash_t *self)
+s_purge (zhashx_t *self)
 {
     uint index;
     size_t limit = primes [self->prime_index];
@@ -146,16 +145,16 @@ s_purge (zhash_t *self)
 //  Hash table destructor
 
 void
-zhash_destroy (zhash_t **self_p)
+zhashx_destroy (zhashx_t **self_p)
 {
     assert (self_p);
     if (*self_p) {
-        zhash_t *self = *self_p;
+        zhashx_t *self = *self_p;
         if (self->items) {
             s_purge (self);
             free (self->items);
         }
-        zlist_destroy (&self->comments);
+        zlistx_destroy (&self->comments);
         free (self->filename);
         free (self);
         *self_p = NULL;
@@ -168,7 +167,7 @@ zhash_destroy (zhash_t **self_p)
 //  Destroy item in hash table, item must exist in table
 
 static void
-s_item_destroy (zhash_t *self, item_t *item, bool hard)
+s_item_destroy (zhashx_t *self, item_t *item, bool hard)
 {
     //  Find previous item since it's a singly-linked list
     item_t *cur_item = self->items [item->index];
@@ -204,7 +203,7 @@ s_item_destroy (zhash_t *self, item_t *item, bool hard)
 //  Returns 0 on success, or -1 on failure (insufficient memory)
 
 static int
-s_zhash_rehash (zhash_t *self, uint new_prime_index)
+s_zhashx_rehash (zhashx_t *self, uint new_prime_index)
 {
     assert (self);
     assert (new_prime_index < sizeof (primes));
@@ -245,7 +244,7 @@ s_zhash_rehash (zhash_t *self, uint new_prime_index)
 //  to the item, if found.
 
 int
-zhash_insert (zhash_t *self, const void *key, void *value)
+zhashx_insert (zhashx_t *self, const void *key, void *value)
 {
     assert (self);
     assert (key);
@@ -256,7 +255,7 @@ zhash_insert (zhash_t *self, const void *key, void *value)
     if (self->size >= limit * LOAD_FACTOR / 100) {
         //  Create new hash table
         uint new_prime_index = self->prime_index + GROWTH_FACTOR;
-        if (s_zhash_rehash (self, new_prime_index))
+        if (s_zhashx_rehash (self, new_prime_index))
             return -1;
         self->chain_limit += CHAIN_GROWS;
     }
@@ -271,7 +270,7 @@ zhash_insert (zhash_t *self, const void *key, void *value)
 //  Sets the hash cursor to the item, if found.
 
 static item_t *
-s_item_insert (zhash_t *self, const void *key, void *value)
+s_item_insert (zhashx_t *self, const void *key, void *value)
 {
     //  Check that item does not already exist in hash table
     //  Leaves self->cached_index with calculated hash item
@@ -314,7 +313,7 @@ s_item_insert (zhash_t *self, const void *key, void *value)
 //  Lookup item in hash table, returns item or NULL
 
 static item_t *
-s_item_lookup (zhash_t *self, const void *key)
+s_item_lookup (zhashx_t *self, const void *key)
 {
     //  Look in bucket list for item by key
     size_t limit = primes [self->prime_index];
@@ -330,7 +329,7 @@ s_item_lookup (zhash_t *self, const void *key)
     if (len > self->chain_limit) {
         //  Create new hash table
         uint new_prime_index = self->prime_index + GROWTH_FACTOR;
-        if (s_zhash_rehash (self, new_prime_index))
+        if (s_zhashx_rehash (self, new_prime_index))
             return NULL;
         limit = primes [self->prime_index];
         self->cached_index = self->hasher (key) % limit;
@@ -347,7 +346,7 @@ s_item_lookup (zhash_t *self, const void *key)
 //  new item.
 
 void
-zhash_update (zhash_t *self, const void *key, void *value)
+zhashx_update (zhashx_t *self, const void *key, void *value)
 {
     assert (self);
     assert (key);
@@ -367,7 +366,7 @@ zhash_update (zhash_t *self, const void *key, void *value)
             item->value = value;
     }
     else
-        zhash_insert (self, key, value);
+        zhashx_insert (self, key, value);
 }
 
 
@@ -376,7 +375,7 @@ zhash_update (zhash_t *self, const void *key, void *value)
 //  item, this function does nothing.
 
 void
-zhash_delete (zhash_t *self, const void *key)
+zhashx_delete (zhashx_t *self, const void *key)
 {
     assert (self);
     assert (key);
@@ -392,7 +391,7 @@ zhash_delete (zhash_t *self, const void *key)
 //  set, calls it on every key. If the item destructor is set, calls
 //  it on every item.
 void
-zhash_purge (zhash_t *self)
+zhashx_purge (zhashx_t *self)
 {
     assert (self);
     s_purge (self);
@@ -417,7 +416,7 @@ zhash_purge (zhash_t *self)
 //  cursor to the item, if found.
 
 void *
-zhash_lookup (zhash_t *self, const void *key)
+zhashx_lookup (zhashx_t *self, const void *key)
 {
     assert (self);
     assert (key);
@@ -439,7 +438,7 @@ zhash_lookup (zhash_t *self, const void *key)
 //  Sets the item cursor to the renamed item.
 
 int
-zhash_rename (zhash_t *self, const void *old_key, const void *new_key)
+zhashx_rename (zhashx_t *self, const void *old_key, const void *new_key)
 {
     item_t *old_item = s_item_lookup (self, old_key);
     item_t *new_item = s_item_lookup (self, new_key);
@@ -474,7 +473,7 @@ zhash_rename (zhash_t *self, const void *old_key, const void *new_key)
 //  Returns the item, or NULL if there is no such item.
 
 void *
-zhash_freefn (zhash_t *self, const void *key, zhash_free_fn *free_fn)
+zhashx_freefn (zhashx_t *self, const void *key, zhashx_free_fn *free_fn)
 {
     assert (self);
     assert (key);
@@ -493,7 +492,7 @@ zhash_freefn (zhash_t *self, const void *key, zhash_free_fn *free_fn)
 //  Return size of hash table
 
 size_t
-zhash_size (zhash_t *self)
+zhashx_size (zhashx_t *self)
 {
     assert (self);
     return self->size;
@@ -501,26 +500,27 @@ zhash_size (zhash_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Return a zlist_t containing the keys for the items in the
+//  Return a zlistx_t containing the keys for the items in the
 //  table. Uses the key_duplicator to duplicate all keys and sets the
 //  key_destructor as destructor for the list.
 
-zlist_t *
-zhash_keys (zhash_t *self)
+zlistx_t *
+zhashx_keys (zhashx_t *self)
 {
     assert (self);
-    zlist_t *keys = zlist_new ();
+    zlistx_t *keys = zlistx_new ();
     if (!keys)
         return NULL;
-    zlist_autofree (keys);
+    zlistx_set_destructor (keys, self->key_destructor);
+    zlistx_set_duplicator (keys, self->key_duplicator);
 
     uint index;
     size_t limit = primes [self->prime_index];
     for (index = 0; index < limit; index++) {
         item_t *item = self->items [index];
         while (item) {
-            if (zlist_append (keys, (void *) item->key)) {
-                zlist_destroy (&keys);
+            if (zlistx_append (keys, (void *) item->key)) {
+                zlistx_destroy (&keys);
                 break;
             }
             item = item->next;
@@ -537,26 +537,26 @@ zhash_keys (zhash_t *self)
 //  while iterating.
 
 void *
-zhash_first (zhash_t *self)
+zhashx_first (zhashx_t *self)
 {
     assert (self);
     //  Point to before or at first item
     self->cursor_index = 0;
     self->cursor_item = self->items [self->cursor_index];
     //  Now scan forwards to find it, leave cursor after item
-    return zhash_next (self);
+    return zhashx_next (self);
 }
 
 
 //  --------------------------------------------------------------------------
 //  Simple iterator; returns next item in hash table, in no given order,
 //  or NULL if the last item was already returned. Use this together with
-//  zhash_first() to process all items in a hash table. If you need the
-//  items in sorted order, use zhash_keys() and then zlist_sort(). NOTE:
+//  zhashx_first() to process all items in a hash table. If you need the
+//  items in sorted order, use zhashx_keys() and then zlistx_sort(). NOTE:
 //  do NOT modify the table while iterating.
 
 void *
-zhash_next (zhash_t *self)
+zhashx_next (zhashx_t *self)
 {
     assert (self);
     //  Scan forward from cursor until we find an item
@@ -586,7 +586,7 @@ zhash_next (zhash_t *self)
 //  After an unsuccessful first/next, returns NULL.
 
 const void *
-zhash_cursor (zhash_t *self)
+zhashx_cursor (zhashx_t *self)
 {
     assert (self);
     return self->cursor_key;
@@ -600,25 +600,25 @@ zhash_cursor (zhash_t *self)
 //  FIXME: return 0 on success, -1 on error
 
 void
-zhash_comment (zhash_t *self, const char *format, ...)
+zhashx_comment (zhashx_t *self, const char *format, ...)
 {
     if (format) {
         if (!self->comments) {
-            self->comments = zlist_new ();
+            self->comments = zlistx_new ();
             if (!self->comments)
                 return;
-            zlist_autofree (self->comments);
+            zlistx_autofree (self->comments);
         }
         va_list argptr;
         va_start (argptr, format);
         char *string = zsys_vprintf (format, argptr);
         va_end (argptr);
         if (string)
-            zlist_append (self->comments, string);
+            zlistx_append (self->comments, string);
         free (string);
     }
     else
-        zlist_destroy (&self->comments);
+        zlistx_destroy (&self->comments);
 }
 
 
@@ -628,7 +628,7 @@ zhash_comment (zhash_t *self, const char *format, ...)
 //  Returns 0 if OK, else -1 if a file error occurred
 
 int
-zhash_save (zhash_t *self, const char *filename)
+zhashx_save (zhashx_t *self, const char *filename)
 {
     assert (self);
 
@@ -637,10 +637,10 @@ zhash_save (zhash_t *self, const char *filename)
         return -1;              //  Failed to create file
 
     if (self->comments) {
-        char *comment = (char *) zlist_first (self->comments);
+        char *comment = (char *) zlistx_first (self->comments);
         while (comment) {
             fprintf (handle, "#   %s\n", comment);
-            comment = (char *) zlist_next (self->comments);
+            comment = (char *) zlistx_next (self->comments);
         }
         fprintf (handle, "\n");
     }
@@ -664,14 +664,14 @@ zhash_save (zhash_t *self, const char *filename)
 //  Returns 0 if OK, else -1 if a file was not readable.
 
 int
-zhash_load (zhash_t *self, const char *filename)
+zhashx_load (zhashx_t *self, const char *filename)
 {
     assert (self);
-    zhash_autofree (self);
+    zhashx_autofree (self);
 
     //  Whether or not file exists, we'll track the filename and last
-    //  modification date (0 for unknown files), so that zhash_refresh ()
-    //  will always work after zhash_load (), to load a newly-created
+    //  modification date (0 for unknown files), so that zhashx_refresh ()
+    //  will always work after zhashx_load (), to load a newly-created
     //  file.
 
     //  Take copy of filename in case self->filename is same string.
@@ -695,7 +695,7 @@ zhash_load (zhash_t *self, const char *filename)
         if (buffer [strlen (buffer) - 1] == '\n')
             buffer [strlen (buffer) - 1] = 0;
         *equals++ = 0;
-        zhash_update (self, buffer, equals);
+        zhashx_update (self, buffer, equals);
     }
     free (buffer);
     fclose (handle);
@@ -704,20 +704,20 @@ zhash_load (zhash_t *self, const char *filename)
 
 
 //  --------------------------------------------------------------------------
-//  When a hash table was loaded from a file by zhash_load, this method will
+//  When a hash table was loaded from a file by zhashx_load, this method will
 //  reload the file if it has been modified since, and is "stable", i.e. not
 //  still changing. Returns 0 if OK, -1 if there was an error reloading the
 //  file.
 
 int
-zhash_refresh (zhash_t *self)
+zhashx_refresh (zhashx_t *self)
 {
     assert (self);
 
     if (self->filename) {
         if (  zsys_file_modified (self->filename) > self->modified
            && zsys_file_stable (self->filename)) {
-            //  Empty the hash table; code is copied from zhash_destroy
+            //  Empty the hash table; code is copied from zhashx_destroy
             uint index;
             size_t limit = primes [self->prime_index];
             for (index = 0; index < limit; index++) {
@@ -729,7 +729,7 @@ zhash_refresh (zhash_t *self)
                     cur_item = next_item;
                 }
             }
-            zhash_load (self, self->filename);
+            zhashx_load (self, self->filename);
         }
     }
     return 0;
@@ -759,7 +759,7 @@ zhash_refresh (zhash_t *self)
 //  strings.
 
 zframe_t *
-zhash_pack (zhash_t *self)
+zhashx_pack (zhashx_t *self)
 {
     assert (self);
 
@@ -807,13 +807,13 @@ zhash_pack (zhash_t *self)
 
 //  --------------------------------------------------------------------------
 //  Unpack binary frame into a new hash table. Packed data must follow format
-//  defined by zhash_pack. Hash table is set to autofree. An empty frame
+//  defined by zhashx_pack. Hash table is set to autofree. An empty frame
 //  unpacks to an empty hash table.
 
-zhash_t *
-zhash_unpack (zframe_t *frame)
+zhashx_t *
+zhashx_unpack (zframe_t *frame)
 {
-    zhash_t *self = zhash_new ();
+    zhashx_t *self = zhashx_new ();
     if (!self)
         return NULL;
     assert (frame);
@@ -845,8 +845,8 @@ zhash_unpack (zframe_t *frame)
                     needle += value_size;
 
                     //  Hash takes ownership of value
-                    if (zhash_insert (self, key, value)) {
-                        zhash_destroy (&self);
+                    if (zhashx_insert (self, key, value)) {
+                        zhashx_destroy (&self);
                         break;
                     }
                 }
@@ -855,7 +855,7 @@ zhash_unpack (zframe_t *frame)
     }
     //  Hash will free values in destructor
     if (self)
-        zhash_autofree (self);
+        zhashx_autofree (self);
     return self;
 }
 
@@ -865,15 +865,15 @@ zhash_unpack (zframe_t *frame)
 //  for the list, otherwise not. Copying a null reference returns a null
 //  reference. Note that this method's behavior changed slightly for CZMQ
 //  v3.x, as it does not set nor respect autofree. It does however let you
-//  duplicate any hash table safely. The old behavior is in zhash_dup_v2.
+//  duplicate any hash table safely. The old behavior is in zhashx_dup_v2.
 
-zhash_t *
-zhash_dup (zhash_t *self)
+zhashx_t *
+zhashx_dup (zhashx_t *self)
 {
     if (!self)
         return NULL;
 
-    zhash_t *copy = zhash_new ();
+    zhashx_t *copy = zhashx_new ();
     if (copy) {
         copy->destructor = self->destructor;
         copy->duplicator = self->duplicator;
@@ -882,8 +882,8 @@ zhash_dup (zhash_t *self)
         for (index = 0; index < limit; index++) {
             item_t *item = self->items [index];
             while (item) {
-                if (zhash_insert (copy, item->key, item->value)) {
-                    zhash_destroy (&copy);
+                if (zhashx_insert (copy, item->key, item->value)) {
+                    zhashx_destroy (&copy);
                     break;
                 }
                 item = item->next;
@@ -899,7 +899,7 @@ zhash_dup (zhash_t *self)
 //  freed when the hash is destroyed.
 
 void
-zhash_set_destructor (zhash_t *self, czmq_destructor destructor)
+zhashx_set_destructor (zhashx_t *self, czmq_destructor destructor)
 {
     assert (self);
     self->destructor = destructor;
@@ -911,7 +911,7 @@ zhash_set_destructor (zhash_t *self, czmq_destructor destructor)
 //  copied when the hash is duplicated.
 
 void
-zhash_set_duplicator (zhash_t *self, czmq_duplicator duplicator)
+zhashx_set_duplicator (zhashx_t *self, czmq_duplicator duplicator)
 {
     assert (self);
     self->duplicator = duplicator;
@@ -923,7 +923,7 @@ zhash_set_duplicator (zhash_t *self, czmq_duplicator duplicator)
 //  freed when the hash is destroyed by calling free().
 
 void
-zhash_set_key_destructor (zhash_t *self, czmq_destructor destructor)
+zhashx_set_key_destructor (zhashx_t *self, czmq_destructor destructor)
 {
     assert (self);
     self->key_destructor = destructor;
@@ -935,7 +935,7 @@ zhash_set_key_destructor (zhash_t *self, czmq_destructor destructor)
 //  duplicated by calling strdup().
 
 void
-zhash_set_key_duplicator (zhash_t *self, czmq_duplicator duplicator)
+zhashx_set_key_duplicator (zhashx_t *self, czmq_duplicator duplicator)
 {
     assert (self);
     self->key_duplicator = duplicator;
@@ -947,7 +947,7 @@ zhash_set_key_duplicator (zhash_t *self, czmq_duplicator duplicator)
 //  compared using streq.
 
 void
-zhash_set_key_comparator (zhash_t *self, czmq_comparator comparator)
+zhashx_set_key_comparator (zhashx_t *self, czmq_comparator comparator)
 {
     assert (self);
     assert (comparator != NULL);
@@ -960,7 +960,7 @@ zhash_set_key_comparator (zhash_t *self, czmq_comparator comparator)
 //  hashed by a modified Bernstein hashing function.
 
 void
-zhash_set_key_hasher (zhash_t *self, zhash_hash_fn hasher)
+zhashx_set_key_hasher (zhashx_t *self, zhashx_hash_fn hasher)
 {
     assert (self);
     self->hasher = hasher;
@@ -968,28 +968,28 @@ zhash_set_key_hasher (zhash_t *self, zhash_hash_fn hasher)
 
 
 //  --------------------------------------------------------------------------
-//  DEPRECATED by zhash_dup
+//  DEPRECATED by zhashx_dup
 //  Make copy of hash table; if supplied table is null, returns null.
 //  Does not copy items themselves. Rebuilds new table so may be slow on
 //  very large tables. NOTE: only works with item values that are strings
 //  since there's no other way to know how to duplicate the item value.
 
-zhash_t *
-zhash_dup_v2 (zhash_t *self)
+zhashx_t *
+zhashx_dup_v2 (zhashx_t *self)
 {
     if (!self)
         return NULL;
 
-    zhash_t *copy = zhash_new ();
+    zhashx_t *copy = zhashx_new ();
     if (copy) {
-        zhash_autofree (copy);
+        zhashx_autofree (copy);
         uint index;
         size_t limit = primes [self->prime_index];
         for (index = 0; index < limit; index++) {
             item_t *item = self->items [index];
             while (item) {
-                if (zhash_insert (copy, item->key, item->value)) {
-                    zhash_destroy (&copy);
+                if (zhashx_insert (copy, item->key, item->value)) {
+                    zhashx_destroy (&copy);
                     break;
                 }
                 item = item->next;
@@ -1005,22 +1005,22 @@ zhash_dup_v2 (zhash_t *self)
 //  Set hash for automatic value destruction
 
 void
-zhash_autofree (zhash_t *self)
+zhashx_autofree (zhashx_t *self)
 {
     assert (self);
-    zhash_set_destructor (self, (czmq_destructor *) zstr_free);
-    zhash_set_duplicator (self, (czmq_duplicator *) strdup);
+    zhashx_set_destructor (self, (czmq_destructor *) zstr_free);
+    zhashx_set_duplicator (self, (czmq_duplicator *) strdup);
 }
 
 
 //  --------------------------------------------------------------------------
-//  DEPRECATED as clumsy -- use zhash_first/_next instead
+//  DEPRECATED as clumsy -- use zhashx_first/_next instead
 //  Apply function to each item in the hash table. Items are iterated in no
 //  defined order.  Stops if callback function returns non-zero and returns
 //  final return code from callback function (zero = success).
 
 int
-zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument)
+zhashx_foreach (zhashx_t *self, zhashx_foreach_fn *callback, void *argument)
 {
     assert (self);
 
@@ -1046,119 +1046,119 @@ zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument)
 //
 
 void
-zhash_test (int verbose)
+zhashx_test (int verbose)
 {
-    printf (" * zhash: ");
+    printf (" * zhashx: ");
 
     //  @selftest
-    zhash_t *hash = zhash_new ();
+    zhashx_t *hash = zhashx_new ();
     assert (hash);
-    assert (zhash_size (hash) == 0);
-    assert (zhash_first (hash) == NULL);
-    assert (zhash_cursor (hash) == NULL);
+    assert (zhashx_size (hash) == 0);
+    assert (zhashx_first (hash) == NULL);
+    assert (zhashx_cursor (hash) == NULL);
 
     //  Insert some items
     int rc;
-    rc = zhash_insert (hash, "DEADBEEF", "dead beef");
-    char *item = (char *) zhash_first (hash);
-    assert (streq ((char *) zhash_cursor (hash), "DEADBEEF"));
+    rc = zhashx_insert (hash, "DEADBEEF", "dead beef");
+    char *item = (char *) zhashx_first (hash);
+    assert (streq ((char *) zhashx_cursor (hash), "DEADBEEF"));
     assert (streq (item, "dead beef"));
     assert (rc == 0);
-    rc = zhash_insert (hash, "ABADCAFE", "a bad cafe");
+    rc = zhashx_insert (hash, "ABADCAFE", "a bad cafe");
     assert (rc == 0);
-    rc = zhash_insert (hash, "C0DEDBAD", "coded bad");
+    rc = zhashx_insert (hash, "C0DEDBAD", "coded bad");
     assert (rc == 0);
-    rc = zhash_insert (hash, "DEADF00D", "dead food");
+    rc = zhashx_insert (hash, "DEADF00D", "dead food");
     assert (rc == 0);
-    assert (zhash_size (hash) == 4);
+    assert (zhashx_size (hash) == 4);
 
     //  Look for existing items
-    item = (char *) zhash_lookup (hash, "DEADBEEF");
+    item = (char *) zhashx_lookup (hash, "DEADBEEF");
     assert (streq (item, "dead beef"));
-    item = (char *) zhash_lookup (hash, "ABADCAFE");
+    item = (char *) zhashx_lookup (hash, "ABADCAFE");
     assert (streq (item, "a bad cafe"));
-    item = (char *) zhash_lookup (hash, "C0DEDBAD");
+    item = (char *) zhashx_lookup (hash, "C0DEDBAD");
     assert (streq (item, "coded bad"));
-    item = (char *) zhash_lookup (hash, "DEADF00D");
+    item = (char *) zhashx_lookup (hash, "DEADF00D");
     assert (streq (item, "dead food"));
 
     //  Look for non-existent items
-    item = (char *) zhash_lookup (hash, "foo");
+    item = (char *) zhashx_lookup (hash, "foo");
     assert (item == NULL);
 
     //  Try to insert duplicate items
-    rc = zhash_insert (hash, "DEADBEEF", "foo");
+    rc = zhashx_insert (hash, "DEADBEEF", "foo");
     assert (rc == -1);
-    item = (char *) zhash_lookup (hash, "DEADBEEF");
+    item = (char *) zhashx_lookup (hash, "DEADBEEF");
     assert (streq (item, "dead beef"));
 
     //  Some rename tests
 
     //  Valid rename, key is now LIVEBEEF
-    rc = zhash_rename (hash, "DEADBEEF", "LIVEBEEF");
+    rc = zhashx_rename (hash, "DEADBEEF", "LIVEBEEF");
     assert (rc == 0);
-    item = (char *) zhash_lookup (hash, "LIVEBEEF");
+    item = (char *) zhashx_lookup (hash, "LIVEBEEF");
     assert (streq (item, "dead beef"));
 
     //  Trying to rename an unknown item to a non-existent key
-    rc = zhash_rename (hash, "WHATBEEF", "NONESUCH");
+    rc = zhashx_rename (hash, "WHATBEEF", "NONESUCH");
     assert (rc == -1);
 
     //  Trying to rename an unknown item to an existing key
-    rc = zhash_rename (hash, "WHATBEEF", "LIVEBEEF");
+    rc = zhashx_rename (hash, "WHATBEEF", "LIVEBEEF");
     assert (rc == -1);
-    item = (char *) zhash_lookup (hash, "LIVEBEEF");
+    item = (char *) zhashx_lookup (hash, "LIVEBEEF");
     assert (streq (item, "dead beef"));
 
     //  Trying to rename an existing item to another existing item
-    rc = zhash_rename (hash, "LIVEBEEF", "ABADCAFE");
+    rc = zhashx_rename (hash, "LIVEBEEF", "ABADCAFE");
     assert (rc == -1);
-    item = (char *) zhash_lookup (hash, "LIVEBEEF");
+    item = (char *) zhashx_lookup (hash, "LIVEBEEF");
     assert (streq (item, "dead beef"));
-    item = (char *) zhash_lookup (hash, "ABADCAFE");
+    item = (char *) zhashx_lookup (hash, "ABADCAFE");
     assert (streq (item, "a bad cafe"));
 
     //  Test keys method
-    zlist_t *keys = zhash_keys (hash);
-    assert (zlist_size (keys) == 4);
-    zlist_destroy (&keys);
+    zlistx_t *keys = zhashx_keys (hash);
+    assert (zlistx_size (keys) == 4);
+    zlistx_destroy (&keys);
 
     //  Test dup method
-    zhash_t *copy = zhash_dup (hash);
-    assert (zhash_size (copy) == 4);
-    item = (char *) zhash_lookup (copy, "LIVEBEEF");
+    zhashx_t *copy = zhashx_dup (hash);
+    assert (zhashx_size (copy) == 4);
+    item = (char *) zhashx_lookup (copy, "LIVEBEEF");
     assert (item);
     assert (streq (item, "dead beef"));
-    zhash_destroy (&copy);
+    zhashx_destroy (&copy);
 
     //  Test pack/unpack methods
-    zframe_t *frame = zhash_pack (hash);
-    copy = zhash_unpack (frame);
+    zframe_t *frame = zhashx_pack (hash);
+    copy = zhashx_unpack (frame);
     zframe_destroy (&frame);
-    assert (zhash_size (copy) == 4);
-    item = (char *) zhash_lookup (copy, "LIVEBEEF");
+    assert (zhashx_size (copy) == 4);
+    item = (char *) zhashx_lookup (copy, "LIVEBEEF");
     assert (item);
     assert (streq (item, "dead beef"));
-    zhash_destroy (&copy);
+    zhashx_destroy (&copy);
 
     //  Test save and load
-    zhash_comment (hash, "This is a test file");
-    zhash_comment (hash, "Created by %s", "czmq_selftest");
-    zhash_save (hash, ".cache");
-    copy = zhash_new ();
+    zhashx_comment (hash, "This is a test file");
+    zhashx_comment (hash, "Created by %s", "czmq_selftest");
+    zhashx_save (hash, ".cache");
+    copy = zhashx_new ();
     assert (copy);
-    zhash_load (copy, ".cache");
-    item = (char *) zhash_lookup (copy, "LIVEBEEF");
+    zhashx_load (copy, ".cache");
+    item = (char *) zhashx_lookup (copy, "LIVEBEEF");
     assert (item);
     assert (streq (item, "dead beef"));
-    zhash_destroy (&copy);
+    zhashx_destroy (&copy);
     zsys_file_delete (".cache");
 
     //  Delete a item
-    zhash_delete (hash, "LIVEBEEF");
-    item = (char *) zhash_lookup (hash, "LIVEBEEF");
+    zhashx_delete (hash, "LIVEBEEF");
+    item = (char *) zhashx_lookup (hash, "LIVEBEEF");
     assert (item == NULL);
-    assert (zhash_size (hash) == 3);
+    assert (zhashx_size (hash) == 3);
 
     //  Check that the queue is robust against random usage
     struct {
@@ -1172,40 +1172,40 @@ zhash_test (int verbose)
     for (iteration = 0; iteration < 25000; iteration++) {
         testnbr = randof (testmax);
         if (testset [testnbr].exists) {
-            item = (char *) zhash_lookup (hash, testset [testnbr].name);
+            item = (char *) zhashx_lookup (hash, testset [testnbr].name);
             assert (item);
-            zhash_delete (hash, testset [testnbr].name);
+            zhashx_delete (hash, testset [testnbr].name);
             testset [testnbr].exists = false;
         }
         else {
             sprintf (testset [testnbr].name, "%x-%x", rand (), rand ());
-            if (zhash_insert (hash, testset [testnbr].name, "") == 0)
+            if (zhashx_insert (hash, testset [testnbr].name, "") == 0)
                 testset [testnbr].exists = true;
         }
     }
     //  Test 10K lookups
     for (iteration = 0; iteration < 10000; iteration++)
-        item = (char *) zhash_lookup (hash, "DEADBEEFABADCAFE");
+        item = (char *) zhashx_lookup (hash, "DEADBEEFABADCAFE");
 
     //  Destructor should be safe to call twice
-    zhash_destroy (&hash);
-    zhash_destroy (&hash);
+    zhashx_destroy (&hash);
+    zhashx_destroy (&hash);
     assert (hash == NULL);
 
     //  Test autofree; automatically copies and frees string values
-    hash = zhash_new ();
+    hash = zhashx_new ();
     assert (hash);
-    zhash_autofree (hash);
+    zhashx_autofree (hash);
     char value [255];
     strcpy (value, "This is a string");
-    rc = zhash_insert (hash, "key1", value);
+    rc = zhashx_insert (hash, "key1", value);
     assert (rc == 0);
     strcpy (value, "Ring a ding ding");
-    rc = zhash_insert (hash, "key2", value);
+    rc = zhashx_insert (hash, "key2", value);
     assert (rc == 0);
-    assert (streq ((char *) zhash_lookup (hash, "key1"), "This is a string"));
-    assert (streq ((char *) zhash_lookup (hash, "key2"), "Ring a ding ding"));
-    zhash_destroy (&hash);
+    assert (streq ((char *) zhashx_lookup (hash, "key1"), "This is a string"));
+    assert (streq ((char *) zhashx_lookup (hash, "key2"), "Ring a ding ding"));
+    zhashx_destroy (&hash);
     //  @end
 
     printf ("OK\n");

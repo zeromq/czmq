@@ -50,10 +50,13 @@ typedef struct _zpoller_t zpoller_t;
 typedef struct _zrex_t zrex_t;
 typedef struct _zsock_t zsock_t;
 typedef struct _zuuid_t zuuid_t;
+
 //  Deprecated V2 classes, remove some time after 3.0 stability
 typedef struct _zauth_t zauth_t;
 typedef struct _zbeacon_t zbeacon_t;
 typedef struct _zctx_t zctx_t;
+typedef struct _zhashx_t zhashx_t;
+typedef struct _zlistx_t zlistx_t;
 typedef struct _zmonitor_t zmonitor_t;
 typedef struct _zmutex_t zmutex_t;
 typedef struct _zproxy_t zproxy_t;
@@ -66,7 +69,6 @@ typedef void (czmq_destructor) (void **item);
 typedef void * (czmq_duplicator) (const void *item);
 //  - compare two items, for sorting
 typedef int (czmq_comparator) (const void *item1, const void *item2);
-
 
 //  Public API classes
 #include "zactor.h"
@@ -84,9 +86,9 @@ typedef int (czmq_comparator) (const void *item1, const void *item2);
 #include "zfile.h"
 #include "zframe.h"
 #include "zgossip.h"
-#include "zhash.h"
+#include "zhashx.h"
 #include "ziflist.h"
-#include "zlist.h"
+#include "zlistx.h"
 #include "zloop.h"
 #include "zmonitor.h"
 #include "zmsg.h"
@@ -103,6 +105,8 @@ typedef int (czmq_comparator) (const void *item1, const void *item2);
 #include "zauth_v2.h"
 #include "zbeacon_v2.h"
 #include "zctx.h"
+#include "zhash.h"
+#include "zlist.h"
 #include "zmonitor_v2.h"
 #include "zmutex.h"
 #include "zproxy_v2.h"
