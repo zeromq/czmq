@@ -80,7 +80,7 @@ static void *s_logsender = NULL;    //  ZSYS_LOGSENDER=
 static size_t s_open_sockets = 0;
 
 //  We keep a list of open sockets to report leaks to developers
-static zlist_t *s_sockref_list = NULL;
+static zlistx_t *s_sockref_list = NULL;
 
 //  This defines a single zsocket_new() caller instance
 typedef struct {
@@ -168,7 +168,7 @@ zsys_init (void)
         zsys_catch_interrupts ();
 
     ZMUTEX_INIT (s_mutex);
-    s_sockref_list = zlist_new ();
+    s_sockref_list = zlistx_new ();
     if (!s_sockref_list) {
         zsys_shutdown ();
         return NULL;
@@ -225,7 +225,7 @@ zsys_shutdown (void)
     //  Print the source reference for any sockets the app did not
     //  destroy properly.
     ZMUTEX_LOCK (s_mutex);
-    s_sockref_t *sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
+    s_sockref_t *sockref = (s_sockref_t *) zlistx_pop (s_sockref_list);
     while (sockref) {
         assert (sockref->filename);
         zsys_error ("dangling '%s' socket created at %s:%d",
@@ -233,9 +233,9 @@ zsys_shutdown (void)
                     sockref->filename, (int) sockref->line_nbr);
         zmq_close (sockref->handle);
         free (sockref);
-        sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
+        sockref = (s_sockref_t *) zlistx_pop (s_sockref_list);
     }
-    zlist_destroy (&s_sockref_list);
+    zlistx_destroy (&s_sockref_list);
     ZMUTEX_UNLOCK (s_mutex);
 
     //  Close logsender socket if opened (don't do this in critical section)
@@ -302,7 +302,7 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
         sockref->type = type;
         sockref->filename = filename;
         sockref->line_nbr = line_nbr;
-        zlist_append (s_sockref_list, sockref);
+        zlistx_append (s_sockref_list, sockref);
     }
     s_open_sockets++;
     ZMUTEX_UNLOCK (s_mutex);
@@ -320,14 +320,14 @@ zsys_close (void *handle, const char *filename, size_t line_nbr)
     //  It's possible atexit() has already happened if we're running under
     //  a debugger that redirects the main thread exit.
     if (filename && s_sockref_list) {
-        s_sockref_t *sockref = (s_sockref_t *) zlist_first (s_sockref_list);
+        s_sockref_t *sockref = (s_sockref_t *) zlistx_first (s_sockref_list);
         while (sockref) {
             if (sockref->handle == handle) {
-                zlist_remove (s_sockref_list, sockref);
+                zlistx_remove (s_sockref_list, sockref);
                 free (sockref);
                 break;
             }
-            sockref = (s_sockref_t *) zlist_next (s_sockref_list);
+            sockref = (s_sockref_t *) zlistx_next (s_sockref_list);
         }
     }
     s_open_sockets--;

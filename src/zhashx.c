@@ -61,7 +61,7 @@ struct _zhashx_t {
     size_t cursor_index;        //  For first/next iteration
     item_t *cursor_item;        //  For first/next iteration
     const void *cursor_key;     //  After first/next call, points to key
-    zlist_t *comments;          //  File comments, if any
+    zlistx_t *comments;         //  File comments, if any
     time_t modified;            //  Set during zhashx_load
     char *filename;             //  Set during zhashx_load
     //  Function callbacks for duplicating and destroying items, if any
@@ -154,8 +154,7 @@ zhashx_destroy (zhashx_t **self_p)
             s_purge (self);
             free (self->items);
         }
-
-        zlist_destroy (&self->comments);
+        zlistx_destroy (&self->comments);
         free (self->filename);
         free (self);
         *self_p = NULL;
@@ -501,27 +500,27 @@ zhashx_size (zhashx_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Return a zlist_t containing the keys for the items in the
+//  Return a zlistx_t containing the keys for the items in the
 //  table. Uses the key_duplicator to duplicate all keys and sets the
 //  key_destructor as destructor for the list.
 
-zlist_t *
+zlistx_t *
 zhashx_keys (zhashx_t *self)
 {
     assert (self);
-    zlist_t *keys = zlist_new ();
+    zlistx_t *keys = zlistx_new ();
     if (!keys)
         return NULL;
-    zlist_set_destructor (keys, self->key_destructor);
-    zlist_set_duplicator (keys, self->key_duplicator);
+    zlistx_set_destructor (keys, self->key_destructor);
+    zlistx_set_duplicator (keys, self->key_duplicator);
 
     uint index;
     size_t limit = primes [self->prime_index];
     for (index = 0; index < limit; index++) {
         item_t *item = self->items [index];
         while (item) {
-            if (zlist_append (keys, (void *) item->key)) {
-                zlist_destroy (&keys);
+            if (zlistx_append (keys, (void *) item->key)) {
+                zlistx_destroy (&keys);
                 break;
             }
             item = item->next;
@@ -553,7 +552,7 @@ zhashx_first (zhashx_t *self)
 //  Simple iterator; returns next item in hash table, in no given order,
 //  or NULL if the last item was already returned. Use this together with
 //  zhashx_first() to process all items in a hash table. If you need the
-//  items in sorted order, use zhashx_keys() and then zlist_sort(). NOTE:
+//  items in sorted order, use zhashx_keys() and then zlistx_sort(). NOTE:
 //  do NOT modify the table while iterating.
 
 void *
@@ -605,21 +604,21 @@ zhashx_comment (zhashx_t *self, const char *format, ...)
 {
     if (format) {
         if (!self->comments) {
-            self->comments = zlist_new ();
+            self->comments = zlistx_new ();
             if (!self->comments)
                 return;
-            zlist_autofree (self->comments);
+            zlistx_autofree (self->comments);
         }
         va_list argptr;
         va_start (argptr, format);
         char *string = zsys_vprintf (format, argptr);
         va_end (argptr);
         if (string)
-            zlist_append (self->comments, string);
+            zlistx_append (self->comments, string);
         free (string);
     }
     else
-        zlist_destroy (&self->comments);
+        zlistx_destroy (&self->comments);
 }
 
 
@@ -638,10 +637,10 @@ zhashx_save (zhashx_t *self, const char *filename)
         return -1;              //  Failed to create file
 
     if (self->comments) {
-        char *comment = (char *) zlist_first (self->comments);
+        char *comment = (char *) zlistx_first (self->comments);
         while (comment) {
             fprintf (handle, "#   %s\n", comment);
-            comment = (char *) zlist_next (self->comments);
+            comment = (char *) zlistx_next (self->comments);
         }
         fprintf (handle, "\n");
     }
@@ -1120,9 +1119,9 @@ zhashx_test (int verbose)
     assert (streq (item, "a bad cafe"));
 
     //  Test keys method
-    zlist_t *keys = zhashx_keys (hash);
-    assert (zlist_size (keys) == 4);
-    zlist_destroy (&keys);
+    zlistx_t *keys = zhashx_keys (hash);
+    assert (zlistx_size (keys) == 4);
+    zlistx_destroy (&keys);
 
     //  Test dup method
     zhashx_t *copy = zhashx_dup (hash);

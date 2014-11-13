@@ -30,9 +30,9 @@ typedef struct _s_timer_t s_timer_t;
 //  Structure of our class
 
 struct _zloop_t {
-    zlist_t *readers;           //  List of socket readers
-    zlist_t *pollers;           //  List of poll items
-    zlist_t *timers;            //  List of timers
+    zlistx_t *readers;          //  List of socket readers
+    zlistx_t *pollers;          //  List of poll items
+    zlistx_t *timers;           //  List of timers
     int last_timer_id;          //  Most recent timer id
     size_t poll_size;           //  Size of poll set
     zmq_pollitem_t *pollset;    //  zmq_poll set
@@ -41,7 +41,7 @@ struct _zloop_t {
     bool need_rebuild;          //  True if pollset needs rebuilding
     bool verbose;               //  True if verbose tracing wanted
     bool terminated;            //  True when stopped running
-    zlist_t *zombies;           //  List of timers to kill
+    zlistx_t *zombies;           //  List of timers to kill
 };
 
 //  Reactor elements are held as structures of their own
@@ -123,14 +123,14 @@ s_timer_new (int timer_id, size_t delay, size_t times, zloop_timer_fn handler, v
 static void
 s_timer_remove (zloop_t *self, int timer_id)
 {
-    s_timer_t *timer = (s_timer_t *) zlist_first (self->timers);
+    s_timer_t *timer = (s_timer_t *) zlistx_first (self->timers);
     while (timer) {
         if (timer->timer_id == timer_id) {
-            zlist_remove (self->timers, timer);
+            zlistx_remove (self->timers, timer);
             free (timer);
             break;
         }
-        timer = (s_timer_t *) zlist_next (self->timers);
+        timer = (s_timer_t *) zlistx_next (self->timers);
     }
 }
 
@@ -149,7 +149,7 @@ s_rebuild_pollset (zloop_t *self)
     self->readact = NULL;
     self->pollact = NULL;
 
-    self->poll_size = zlist_size (self->readers) + zlist_size (self->pollers);
+    self->poll_size = zlistx_size (self->readers) + zlistx_size (self->pollers);
     self->pollset = (zmq_pollitem_t *) zmalloc (self->poll_size * sizeof (zmq_pollitem_t));
     if (!self->pollset)
         return -1;
@@ -162,21 +162,21 @@ s_rebuild_pollset (zloop_t *self)
     if (!self->pollact)
         return -1;
 
-    s_reader_t *reader = (s_reader_t *) zlist_first (self->readers);
+    s_reader_t *reader = (s_reader_t *) zlistx_first (self->readers);
     uint item_nbr = 0;
     while (reader) {
         zmq_pollitem_t poll_item = { zsock_resolve (reader->sock), 0, ZMQ_POLLIN };
         self->pollset [item_nbr] = poll_item;
         self->readact [item_nbr] = *reader;
         item_nbr++;
-        reader = (s_reader_t *) zlist_next (self->readers);
+        reader = (s_reader_t *) zlistx_next (self->readers);
     }
-    s_poller_t *poller = (s_poller_t *) zlist_first (self->pollers);
+    s_poller_t *poller = (s_poller_t *) zlistx_first (self->pollers);
     while (poller) {
         self->pollset [item_nbr] = poller->item;
         self->pollact [item_nbr] = *poller;
         item_nbr++;
-        poller = (s_poller_t *) zlist_next (self->pollers);
+        poller = (s_poller_t *) zlistx_next (self->pollers);
     }
     self->need_rebuild = false;
     return 0;
@@ -187,14 +187,14 @@ s_tickless_timer (zloop_t *self)
 {
     //  Calculate tickless timer, up to 1 hour
     int64_t tickless = zclock_mono () + 1000 * 3600;
-    s_timer_t *timer = (s_timer_t *) zlist_first (self->timers);
+    s_timer_t *timer = (s_timer_t *) zlistx_first (self->timers);
     while (timer) {
         //  Find earliest timer
         if (timer->when == -1)
             timer->when = timer->delay + zclock_mono ();
         if (tickless > timer->when)
             tickless = timer->when;
-        timer = (s_timer_t *) zlist_next (self->timers);
+        timer = (s_timer_t *) zlistx_next (self->timers);
     }
     long timeout = (long) (tickless - zclock_mono ());
     if (timeout < 0)
@@ -218,13 +218,13 @@ zloop_new (void)
     if (!self)
         return NULL;
 
-    self->readers = zlist_new ();
+    self->readers = zlistx_new ();
     if (self->readers)
-        self->pollers = zlist_new ();
+        self->pollers = zlistx_new ();
     if (self->pollers)
-        self->timers = zlist_new ();
+        self->timers = zlistx_new ();
     if (self->timers)
-        self->zombies = zlist_new ();
+        self->zombies = zlistx_new ();
     if (self->zombies)
         self->last_timer_id = 0;
     else
@@ -244,24 +244,24 @@ zloop_destroy (zloop_t **self_p)
         zloop_t *self = *self_p;
 
         //  Destroy list of readers
-        while (zlist_size (self->readers))
-            free (zlist_pop (self->readers));
-        zlist_destroy (&self->readers);
+        while (zlistx_size (self->readers))
+            free (zlistx_pop (self->readers));
+        zlistx_destroy (&self->readers);
 
         //  Destroy list of pollers
-        while (zlist_size (self->pollers))
-            free (zlist_pop (self->pollers));
-        zlist_destroy (&self->pollers);
+        while (zlistx_size (self->pollers))
+            free (zlistx_pop (self->pollers));
+        zlistx_destroy (&self->pollers);
 
         //  Destroy list of timers
-        while (zlist_size (self->timers))
-            free (zlist_pop (self->timers));
-        zlist_destroy (&self->timers);
+        while (zlistx_size (self->timers))
+            free (zlistx_pop (self->timers));
+        zlistx_destroy (&self->timers);
 
         //  Destroy zombie timer list
         //  Which must always be empty here
-        assert (zlist_size (self->zombies) == 0);
-        zlist_destroy (&self->zombies);
+        assert (zlistx_size (self->zombies) == 0);
+        zlistx_destroy (&self->zombies);
 
         free (self->pollset);
         free (self->readact);
@@ -286,7 +286,7 @@ zloop_reader (zloop_t *self, zsock_t *sock, zloop_reader_fn handler, void *arg)
 
     s_reader_t *reader = s_reader_new (sock, handler, arg);
     if (reader) {
-        if (zlist_append (self->readers, reader))
+        if (zlistx_append (self->readers, reader))
             return -1;
 
         self->need_rebuild = true;
@@ -309,14 +309,14 @@ zloop_reader_end (zloop_t *self, zsock_t *sock)
     assert (self);
     assert (sock);
 
-    s_reader_t *reader = (s_reader_t *) zlist_first (self->readers);
+    s_reader_t *reader = (s_reader_t *) zlistx_first (self->readers);
     while (reader) {
         if (reader->sock == sock) {
-            zlist_remove (self->readers, reader);
+            zlistx_remove (self->readers, reader);
             free (reader);
             self->need_rebuild = true;
         }
-        reader = (s_reader_t *) zlist_next (self->readers);
+        reader = (s_reader_t *) zlistx_next (self->readers);
     }
     if (self->verbose)
         zsys_debug ("zloop: cancel %s reader", zsock_type_str (sock));
@@ -333,11 +333,11 @@ zloop_reader_set_tolerant (zloop_t *self, zsock_t *sock)
     assert (self);
     assert (sock);
 
-    s_reader_t *reader = (s_reader_t *) zlist_first (self->readers);
+    s_reader_t *reader = (s_reader_t *) zlistx_first (self->readers);
     while (reader) {
         if (reader->sock == sock)
             reader->tolerant = true;
-        reader = (s_reader_t *) zlist_next (self->readers);
+        reader = (s_reader_t *) zlistx_next (self->readers);
     }
 }
 
@@ -360,7 +360,7 @@ zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
 
     s_poller_t *poller = s_poller_new (item, handler, arg);
     if (poller) {
-        if (zlist_append (self->pollers, poller))
+        if (zlistx_append (self->pollers, poller))
             return -1;
 
         self->need_rebuild = true;
@@ -385,7 +385,7 @@ zloop_poller_end (zloop_t *self, zmq_pollitem_t *item)
 {
     assert (self);
 
-    s_poller_t *poller = (s_poller_t *) zlist_first (self->pollers);
+    s_poller_t *poller = (s_poller_t *) zlistx_first (self->pollers);
     while (poller) {
         bool match = false;
         if (item->socket) {
@@ -397,12 +397,12 @@ zloop_poller_end (zloop_t *self, zmq_pollitem_t *item)
                 match = true;
         }
         if (match) {
-            zlist_remove (self->pollers, poller);
+            zlistx_remove (self->pollers, poller);
             free (poller);
             //  Force rebuild to avoid reading from freed poller
             self->need_rebuild = true;
         }
-        poller = (s_poller_t *) zlist_next (self->pollers);
+        poller = (s_poller_t *) zlistx_next (self->pollers);
     }
     if (self->verbose)
         zsys_debug ("zloop: cancel %s poller (%p, %d)",
@@ -421,7 +421,7 @@ zloop_poller_set_tolerant (zloop_t *self, zmq_pollitem_t *item)
     assert (self);
 
     //  Find matching poller(s) and mark as tolerant
-    s_poller_t *poller = (s_poller_t *) zlist_first (self->pollers);
+    s_poller_t *poller = (s_poller_t *) zlistx_first (self->pollers);
     while (poller) {
         bool match = false;
         if (item->socket) {
@@ -436,7 +436,7 @@ zloop_poller_set_tolerant (zloop_t *self, zmq_pollitem_t *item)
             poller->tolerant = true;
         }
 
-        poller = (s_poller_t *) zlist_next (self->pollers);
+        poller = (s_poller_t *) zlistx_next (self->pollers);
     }
 }
 
@@ -455,7 +455,7 @@ zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_timer_fn handler, 
     s_timer_t *timer = s_timer_new (timer_id, delay, times, handler, arg);
     if (!timer)
         return -1;
-    if (zlist_append (self->timers, timer))
+    if (zlistx_append (self->timers, timer))
         return -1;
     if (self->verbose)
 #ifdef __WINDOWS__
@@ -486,7 +486,7 @@ zloop_timer_end (zloop_t *self, int timer_id)
     //  from inside the poll loop. So, we hold the arg on the zombie
     //  list, and process that list when we're done executing timers.
     //  This hack lets us store an integer timer ID as a pointer
-    if (zlist_append (self->zombies, (byte *) NULL + timer_id))
+    if (zlistx_append (self->zombies, (byte *) NULL + timer_id))
         return -1;
 
     if (self->verbose)
@@ -521,10 +521,10 @@ zloop_start (zloop_t *self)
     int rc = 0;
 
     //  Recalculate all timers now
-    s_timer_t *timer = (s_timer_t *) zlist_first (self->timers);
+    s_timer_t *timer = (s_timer_t *) zlistx_first (self->timers);
     while (timer) {
         timer->when = timer->delay + zclock_mono ();
-        timer = (s_timer_t *) zlist_next (self->timers);
+        timer = (s_timer_t *) zlistx_next (self->timers);
     }
     //  Main reactor loop
     while (!zsys_interrupted) {
@@ -545,7 +545,7 @@ zloop_start (zloop_t *self)
             break;              //  Context has been shut down
         }
         //  Handle any timers that have now expired
-        timer = (s_timer_t *) zlist_first (self->timers);
+        timer = (s_timer_t *) zlistx_first (self->timers);
         while (timer) {
             if (zclock_mono () >= timer->when && timer->when != -1) {
                 if (self->verbose)
@@ -554,13 +554,13 @@ zloop_start (zloop_t *self)
                 if (rc == -1)
                     break;      //  Timer handler signaled break
                 if (timer->times && --timer->times == 0) {
-                    zlist_remove (self->timers, timer);
+                    zlistx_remove (self->timers, timer);
                     free (timer);
                 }
                 else
                     timer->when += timer->delay;
             }
-            timer = (s_timer_t *) zlist_next (self->timers);
+            timer = (s_timer_t *) zlistx_next (self->timers);
         }
         //  Handle any readers and pollers that are ready
         size_t item_nbr;
@@ -629,9 +629,9 @@ zloop_start (zloop_t *self)
         //  Now handle any timer zombies
         //  This is going to be slow if we have many timers; we might use
         //  a faster lookup on the timer list.
-        while (zlist_size (self->zombies)) {
+        while (zlistx_size (self->zombies)) {
             //  Get timer_id back from pointer
-            int timer_id = (byte *) zlist_pop (self->zombies) - (byte *) NULL;
+            int timer_id = (byte *) zlistx_pop (self->zombies) - (byte *) NULL;
             s_timer_remove (self, timer_id);
         }
         if (rc == -1)
