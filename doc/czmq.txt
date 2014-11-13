@@ -42,9 +42,8 @@ These classes support authentication and encryption:
 
 These classes provide generic containers:
 
-* linkczmq:zhash[3] - generic type-free hash container (dictionary)
-* linkczmq:zlist[3] - generic type-free list container (singly-linked list)
-* linkczmq:zring[3] - generic type-free ring container (doubly-linked list)
+* linkczmq:zhashx[3] - extended generic hash container
+* linkczmq:zlistx[3] - extended generic list container
 
 These classes wrap-up non-portable functionality:
 
@@ -69,6 +68,8 @@ These classes are deprecated:
 * linkczmq:zctx[3] - working with ZeroMQ contexts
 * linkczmq:zsocket[3] - working with ZeroMQ sockets (low-level)
 * linkczmq:zsockopt[3] - get/set ZeroMQ socket options
+* linkczmq:zhash[3] - generic type-free hash container (dictionary)
+* linkczmq:zlist[3] - generic type-free list container (singly-linked list)
 * linkczmq:zthread[3] - working with system threads
 * linkczmq:zauth_v2[3] - authentication for ZeroMQ servers
 * linkczmq:zbeacon_v2[3] - LAN discovery and presence

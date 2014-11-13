@@ -95,10 +95,10 @@ set (czmq_headers
     include/zdir_patch.h
     include/zfile.h
     include/zframe.h
-    include/zhash.h
     include/zgossip.h
+    include/zhashx.h
     include/ziflist.h
-    include/zlist.h
+    include/zlistx.h
     include/zloop.h
     include/zmonitor.h
     include/zmsg.h
@@ -114,6 +114,8 @@ set (czmq_headers
     include/zauth_v2.h
     include/zbeacon_v2.h
     include/zctx.h
+    include/zhash.h
+    include/zlist.h
     include/zmonitor_v2.h
     include/zmutex.h
     include/zproxy_v2.h
@@ -148,10 +150,10 @@ set (czmq_sources
     src/zdir_patch.c
     src/zfile.c
     src/zframe.c
-    src/zhash.c
     src/zgossip.c
+    src/zhashx.c
     src/ziflist.c
-    src/zlist.c
+    src/zlistx.c
     src/zloop.c
     src/zmonitor.c
     src/zmsg.c
@@ -167,6 +169,8 @@ set (czmq_sources
     src/zauth_v2.c
     src/zbeacon_v2.c
     src/zctx.c
+    src/zhash.c
+    src/zlist.c
     src/zmonitor_v2.c
     src/zmutex.c
     src/zproxy_v2.c
