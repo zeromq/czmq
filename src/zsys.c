@@ -204,9 +204,9 @@ zsys_init (void)
 void
 zsys_shutdown (void)
 {
-    if (!s_initialized) {
+    if (!s_initialized)
         return;
-    }
+    
     s_initialized = false;
 
     //  The atexit handler is called when the main function exits;
@@ -319,7 +319,7 @@ zsys_close (void *handle, const char *filename, size_t line_nbr)
     ZMUTEX_LOCK (s_mutex);
     //  It's possible atexit() has already happened if we're running under
     //  a debugger that redirects the main thread exit.
-    if (filename && s_sockref_list) {
+    if (s_sockref_list) {
         s_sockref_t *sockref = (s_sockref_t *) zlistx_first (s_sockref_list);
         while (sockref) {
             if (sockref->handle == handle) {
