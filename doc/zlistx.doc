@@ -1,0 +1,218 @@
+#### zlistx - generic type-free list container (deprecated)
+
+Provides a generic container implementing a fast singly-linked list. You
+can use this to construct multi-dimensional lists, and other structures
+together with other generic containers like zhash. Note: this is the V2
+class, deprecated in favor of the better designed v3 zlist.
+
+To iterate through a list, use zlistx_first to get the first item, then
+loop while not null, and do zlistx_next at the end of each iteration.
+
+This is the class interface:
+
+    //  Comparison function for zlist_v2_sort method
+    typedef bool (zlist_v2_compare_fn) (void *item1, void *item2);
+    
+    // Callback function for zlist_v2_freefn method
+    typedef void (zlist_v2_free_fn) (void *data);
+    
+    //  Create a new list container
+    CZMQ_EXPORT zlist_v2_t *
+        zlist_v2_new (void);
+    
+    //  Destroy a list container
+    CZMQ_EXPORT void
+        zlist_v2_destroy (zlist_v2_t **self_p);
+    
+    //  Return the item at the head of list. If the list is empty, returns NULL.
+    //  Leaves cursor pointing at the head item, or NULL if the list is empty.
+    CZMQ_EXPORT void *
+        zlist_v2_first (zlist_v2_t *self);
+    
+    //  Return the next item. If the list is empty, returns NULL. To move to
+    //  the start of the list call zlist_v2_first (). Advances the cursor.
+    CZMQ_EXPORT void *
+        zlist_v2_next (zlist_v2_t *self);
+    
+    //  Return the item at the tail of list. If the list is empty, returns NULL.
+    //  Leaves cursor pointing at the tail item, or NULL if the list is empty.
+    CZMQ_EXPORT void *
+        zlist_v2_last (zlist_v2_t *self);
+    
+    //  Return first item in the list, or null, leaves the cursor
+    CZMQ_EXPORT void *
+        zlist_v2_head (zlist_v2_t *self);
+    
+    //  Return last item in the list, or null, leaves the cursor
+    CZMQ_EXPORT void *
+        zlist_v2_tail (zlist_v2_t *self);
+    
+    //  Return the current item of list. If the list is empty, returns NULL.
+    //  Leaves cursor pointing at the current item, or NULL if the list is empty.
+    CZMQ_EXPORT void *
+        zlist_v2_item (zlist_v2_t *self);
+    
+    //  Append an item to the end of the list, return 0 if OK or -1 if this
+    //  failed for some reason (out of memory). Note that if a duplicator has 
+    //  been set, this method will also duplicate the item.
+    CZMQ_EXPORT int
+        zlist_v2_append (zlist_v2_t *self, void *item);
+    
+    //  Push an item to the start of the list, return 0 if OK or -1 if this
+    //  failed for some reason (out of memory). Note that if a duplicator has
+    //  been set, this method will also duplicate the item.
+    CZMQ_EXPORT int
+        zlist_v2_push (zlist_v2_t *self, void *item);
+    
+    //  Pop the item off the start of the list, if any
+    CZMQ_EXPORT void *
+        zlist_v2_pop (zlist_v2_t *self);
+    
+    //  Remove the specified item from the list if present
+    CZMQ_EXPORT void
+        zlist_v2_remove (zlist_v2_t *self, void *item);
+    
+    //  Make a copy of list. If the list has autofree set, the copied list will
+    //  duplicate all items, which must be strings. Otherwise, the list will hold
+    //  pointers back to the items in the original list.
+    CZMQ_EXPORT zlist_v2_t *
+        zlist_v2_dup (zlist_v2_t *self);
+    
+    //  Purge all items from list
+    CZMQ_EXPORT void
+    zlist_v2_purge (zlist_v2_t *self);
+    
+    //  Return number of items in the list
+    CZMQ_EXPORT size_t
+        zlist_v2_size (zlist_v2_t *self);
+    
+    //  Sort the list by ascending key value using a straight ASCII comparison.
+    //  The sort is not stable, so may reorder items with the same keys.
+    CZMQ_EXPORT void
+        zlist_v2_sort (zlist_v2_t *self, zlist_v2_compare_fn *compare);
+    
+    //  Set a user-defined destructor for items; by default items are not
+    //  freed when the list is destroyed.
+    CZMQ_EXPORT void
+        zlist_v2_set_destructor (zlist_v2_t *self, czmq_destructor destructor);
+    
+    //  Set a user-defined duplicator for items; by default items are not
+    //  copied when the list is duplicated.
+    CZMQ_EXPORT void
+        zlist_v2_set_duplicator (zlist_v2_t *self, czmq_duplicator duplicator);
+    
+    //  Set list for automatic item destruction; item values MUST be strings.
+    //  By default a list item refers to a value held elsewhere. When you set
+    //  this, each time you append or push a list item, zlist_v2 will take a copy
+    //  of the string value. Then, when you destroy the list, it will free all
+    //  item values automatically. If you use any other technique to allocate
+    //  list values, you must free them explicitly before destroying the list.
+    //  The usual technique is to pop list items and destroy them, until the
+    //  list is empty.
+    CZMQ_EXPORT void
+        zlist_v2_autofree (zlist_v2_t *self);
+    
+    //  Set a free function for the specified list item. When the item is
+    //  destroyed, the free function, if any, is called on that item.
+    //  Use this when list items are dynamically allocated, to ensure that
+    //  you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
+    //  Returns the item, or NULL if there is no such item.
+    CZMQ_EXPORT void *
+        zlist_v2_freefn (zlist_v2_t *self, void *item, zlist_v2_free_fn *fn, bool at_tail);
+    
+    //  Self test of this class
+    CZMQ_EXPORT void
+        zlist_v2_test (int verbose);
+
+This is the class self test code:
+
+    zlistx_t *list = zlistx_new ();
+    assert (list);
+    assert (zlistx_size (list) == 0);
+    
+    //  Three items we'll use as test data
+    //  List items are void *, not particularly strings
+    char *cheese = "boursin";
+    char *bread = "baguette";
+    char *wine = "bordeaux";
+    
+    zlistx_append (list, cheese);
+    assert (zlistx_size (list) == 1);
+    zlistx_append (list, bread);
+    assert (zlistx_size (list) == 2);
+    zlistx_append (list, wine);
+    assert (zlistx_size (list) == 3);
+    
+    assert (zlistx_head (list) == cheese);
+    assert (zlistx_next (list) == cheese);
+    
+    assert (zlistx_first (list) == cheese);
+    assert (zlistx_tail (list) == wine);
+    assert (zlistx_next (list) == bread);
+    
+    assert (zlistx_first (list) == cheese);
+    assert (zlistx_next (list) == bread);
+    assert (zlistx_next (list) == wine);
+    assert (zlistx_next (list) == NULL);
+    //  After we reach end of list, next wraps around
+    assert (zlistx_next (list) == cheese);
+    assert (zlistx_size (list) == 3);
+    
+    zlistx_remove (list, wine);
+    assert (zlistx_size (list) == 2);
+    
+    assert (zlistx_first (list) == cheese);
+    zlistx_remove (list, cheese);
+    assert (zlistx_size (list) == 1);
+    assert (zlistx_first (list) == bread);
+    
+    zlistx_remove (list, bread);
+    assert (zlistx_size (list) == 0);
+    
+    zlistx_append (list, cheese);
+    zlistx_append (list, bread);
+    assert (zlistx_last (list) == bread);
+    zlistx_remove (list, bread);
+    assert (zlistx_last (list) == cheese);
+    zlistx_remove (list, cheese);
+    assert (zlistx_last (list) == NULL);
+    
+    zlistx_push (list, cheese);
+    assert (zlistx_size (list) == 1);
+    assert (zlistx_first (list) == cheese);
+    
+    zlistx_push (list, bread);
+    assert (zlistx_size (list) == 2);
+    assert (zlistx_first (list) == bread);
+    assert (zlistx_item (list) == bread);
+    
+    zlistx_append (list, wine);
+    assert (zlistx_size (list) == 3);
+    assert (zlistx_first (list) == bread);
+    
+    zlistx_t *sub_list = zlistx_dup (list);
+    assert (sub_list);
+    assert (zlistx_size (sub_list) == 3);
+    
+    zlistx_sort (list, s_compare);
+    char *item;
+    item = (char *) zlistx_pop (list);
+    assert (item == bread);
+    item = (char *) zlistx_pop (list);
+    assert (item == wine);
+    item = (char *) zlistx_pop (list);
+    assert (item == cheese);
+    assert (zlistx_size (list) == 0);
+    
+    assert (zlistx_size (sub_list) == 3);
+    zlistx_push (list, sub_list);
+    zlistx_t *sub_list_2 = zlistx_dup (sub_list);
+    zlistx_append (list, sub_list_2);
+    assert (zlistx_freefn (list, sub_list, &s_zlistx_free, false) == sub_list);
+    assert (zlistx_freefn (list, sub_list_2, &s_zlistx_free, true) == sub_list_2);
+    
+    //  Destructor should be safe to call twice
+    zlistx_destroy (&list);
+    zlistx_destroy (&list);
+    assert (list == NULL);
+
