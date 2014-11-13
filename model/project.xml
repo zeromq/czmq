@@ -22,10 +22,10 @@
     <class name = "zdir_patch" />
     <class name = "zfile" />
     <class name = "zframe" />
-    <class name = "zhash" />
     <class name = "zgossip" />
+    <class name = "zhashx" />
     <class name = "ziflist" />
-    <class name = "zlist" />
+    <class name = "zlistx" />
     <class name = "zloop" />
     <class name = "zmonitor" />
     <class name = "zmsg" />
@@ -53,6 +53,8 @@
     <class name = "zauth_v2" />
     <class name = "zbeacon_v2" />
     <class name = "zctx" />
+    <class name = "zhash" />
+    <class name = "zlist" />
     <class name = "zmonitor_v2" />
     <class name = "zmutex" />
     <class name = "zproxy_v2" />
