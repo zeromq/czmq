@@ -39,6 +39,7 @@ struct _zsock_t {
     void *handle;               //  The libzmq socket handle
     char *endpoint;             //  Last bound endpoint, if any
     char *cache;                //  Holds last zsock_brecv strings
+    int type;                   //  Socket type
     size_t cache_size;          //  Current size of cache
 };
 
@@ -57,9 +58,9 @@ zsock_new_ (int type, const char *filename, size_t line_nbr)
     if (self) {
         self->tag = ZSOCK_TAG;
         self->handle = zsys_socket (type, filename, line_nbr);
-        if (!self->handle) {
+        self->type = type;
+        if (!self->handle)
             zsock_destroy (&self);
-        }
     }
     return self;
 }
@@ -520,18 +521,13 @@ zsock_attach (zsock_t *self, const char *endpoints, bool serverish)
 
 
 //  --------------------------------------------------------------------------
-//  Returns socket type as printable constant string. Takes a polymorphic
-//  socket reference.
+//  Returns socket type as printable constant string.
 
 const char *
-zsock_type_str (void *self)
+zsock_type_str (zsock_t *self)
 {
     assert (self);
-
-    int type;
-    size_t option_len = sizeof (int);
-    zmq_getsockopt (zsock_resolve (self), ZMQ_TYPE, &type, &option_len);
-    return zsys_sockname (type);
+    return zsys_sockname (self->type);
 }
 
 

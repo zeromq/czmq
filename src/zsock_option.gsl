@@ -142,7 +142,7 @@ zsock_set_$(name) (void *self, $(ctype_const) $(name))
 .                   endif
     $(open)zsock_type (self) != ZMQ_$(TYPE)$(close)
 .               endfor
-        printf ("ZMQ_$(NAME) is not valid on %s sockets\\n", zsock_type_str (self));
+        printf ("ZMQ_$(NAME) is not valid on %s sockets\\n", zsys_sockname (zsock_type (self)));
         assert (false);
     }
 .           endif
