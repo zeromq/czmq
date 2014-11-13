@@ -155,7 +155,6 @@ zhash_destroy (zhash_t **self_p)
             s_purge (self);
             free (self->items);
         }
-
         zlist_destroy (&self->comments);
         free (self->filename);
         free (self);
@@ -513,8 +512,7 @@ zhash_keys (zhash_t *self)
     zlist_t *keys = zlist_new ();
     if (!keys)
         return NULL;
-    zlist_set_destructor (keys, self->key_destructor);
-    zlist_set_duplicator (keys, self->key_duplicator);
+    zlist_autofree (keys);
 
     uint index;
     size_t limit = primes [self->prime_index];

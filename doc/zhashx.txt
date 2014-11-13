@@ -3,7 +3,7 @@ zhashx(3)
 
 NAME
 ----
-zhashx - generic type-free hash container (deprecated)
+zhashx - extended generic hash container
 
 SYNOPSIS
 --------
@@ -220,8 +220,7 @@ CZMQ_EXPORT void
 DESCRIPTION
 -----------
 
-zhashx is an expandable hash table container. Note: this is the V2
-class, deprecated in favor of the better designed v3 zhash.
+zhashx is an expandable hash table container.
 
 The hash table always has a size that is prime and roughly doubles its
 size when 75% full. In case of hash collisions items are chained in a
