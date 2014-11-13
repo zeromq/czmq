@@ -101,8 +101,8 @@ zlistx_destroy (zlistx_t **self_p)
 
 //  --------------------------------------------------------------------------
 //  Add an item to the head of the list. Calls the item duplicator, if any,
-//  on the item. Leaves cursor at newly inserted item. Returns 0 on success,
-//  -1 if failed due to lack of memory.
+//  on the item. Resets cursor to list head. Returns 0 on success, -1 if
+//  failed due to lack of memory.
 
 int
 zlistx_add_start (zlistx_t *self, void *item)
@@ -115,9 +115,9 @@ zlistx_add_start (zlistx_t *self, void *item)
     }
     node_t *node = s_node_new (self->head, self->head->next, item);
     if (node) {
+        self->cursor = self->head;
         self->head->next->prev = node;
         self->head->next = node;
-        self->cursor = node;
         self->size++;
         return 0;
     }
@@ -128,8 +128,8 @@ zlistx_add_start (zlistx_t *self, void *item)
 
 //  --------------------------------------------------------------------------
 //  Add an item to the tail of the list. Calls the item duplicator, if any,
-//  on the item. Leaves cursor at newly inserted item. Returns 0 on success,
-//  -1 if failed due to lack of memory.
+//  on the item. Resets cursor to list head. Returns 0 on success, -1 if
+//  failed due to lack of memory.
 
 int
 zlistx_add_end (zlistx_t *self, void *item)
@@ -142,9 +142,9 @@ zlistx_add_end (zlistx_t *self, void *item)
     }
     node_t *node = s_node_new (self->head->prev, self->head, item);
     if (node) {
+        self->cursor = self->head;
         self->head->prev->next = node;
         self->head->prev = node;
-        self->cursor = node;
         self->size++;
         return 0;
     }
@@ -219,7 +219,7 @@ zlistx_last (zlistx_t *self)
 //  --------------------------------------------------------------------------
 //  Return the next item. At the end of the list (or in an empty list),
 //  returns NULL. Use repeated zlistx_next () calls to work through the list
-//  from zlistx_first ().
+//  from zlistx_first (). First time, acts as zlistx_first().
 
 void *
 zlistx_next (zlistx_t *self)
@@ -233,7 +233,7 @@ zlistx_next (zlistx_t *self)
 //  --------------------------------------------------------------------------
 //  Return the previous item. At the start of the list (or in an empty list),
 //  returns NULL. Use repeated zlistx_prev () calls to work through the list
-//  backwards from zlistx_last ().
+//  backwards from zlistx_last (). First time, acts as zlistx_last().
 
 void *
 zlistx_prev (zlistx_t *self)
@@ -272,8 +272,10 @@ zlistx_find (zlistx_t *self, void *item)
     node_t *node = self->head->next;
     while (node != self->head) {
         if (self->comparator) {
-            if (self->comparator (node->item, item) == 0)
+            if (self->comparator (node->item, item) == 0) {
+                self->cursor = node;
                 return node->item;
+            }
         }
         else
         if (node->item == item) {
@@ -297,9 +299,10 @@ int
 zlistx_delete (zlistx_t *self, void *item)
 {
     assert (self);
-    if ((item = zlistx_detach (self, item))) {
+    void *detached = zlistx_detach (self, item);
+    if (detached) {
         if (self->destructor)
-            self->destructor (&item);
+            self->destructor (&detached);
         return 0;
     }
     else
@@ -312,7 +315,7 @@ zlistx_delete (zlistx_t *self, void *item)
 //  list for the item, always starting with the cursor, if any is set, and
 //  then from the start of the list. If item is null, detaches the first item
 //  in the list, if any. If the item was found and detached, returns the item
-//  and leaves cursor at next item. Else, returns null.
+//  and resets cursor to start of list. Else, returns null.
 
 void *
 zlistx_detach (zlistx_t *self, void *item)
@@ -331,7 +334,7 @@ zlistx_detach (zlistx_t *self, void *item)
         found->item = NULL;
         found->prev->next = found->next;
         found->next->prev = found->prev;
-        self->cursor = found->next;
+        self->cursor = self->head;
         self->size--;
         free (found);
         return item;
@@ -518,22 +521,22 @@ zlistx_test (int verbose)
     zlistx_set_duplicator (list, (czmq_duplicator *) strdup);
     zlistx_set_comparator (list, (czmq_comparator *) strcmp);
 
-    //  Try some edge conditions with 0/1/2 items
-    zlistx_add_end (list, "hello");
+    //  Try simple insert/sort/delete/next
+    assert (zlistx_next (list) == NULL);
     zlistx_add_end (list, "world");
+    assert (streq ((char *) zlistx_next (list), "world"));
+    zlistx_add_end (list, "hello");
+    assert (streq ((char *) zlistx_prev (list), "hello"));
     zlistx_sort (list);
+    assert (zlistx_size (list) == 2);
+    zlistx_delete (list, "hello");
+    assert (zlistx_size (list) == 1);
     char *string = (char *) zlistx_detach (list, NULL);
-    assert (streq (string, "hello"));
-    free (string);
-    string = (char *) zlistx_detach (list, NULL);
     assert (streq (string, "world"));
     free (string);
-    zlistx_sort (list);
-
-    //  Check simple add/delete
-    zlistx_add_end (list, "hello");
-    zlistx_delete (list, "hello");
-
+    assert (zlistx_size (list) == 0);
+    
+    //  Check next/back work xxx
     //  Now populate the list with items
     zlistx_add_start (list, "five");
     zlistx_add_end   (list, "six");
