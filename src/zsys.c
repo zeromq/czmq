@@ -204,9 +204,9 @@ zsys_init (void)
 void
 zsys_shutdown (void)
 {
-    if (!s_initialized) {
+    if (!s_initialized)
         return;
-    }
+    
     s_initialized = false;
 
     //  The atexit handler is called when the main function exits;
@@ -225,7 +225,7 @@ zsys_shutdown (void)
     //  Print the source reference for any sockets the app did not
     //  destroy properly.
     ZMUTEX_LOCK (s_mutex);
-    s_sockref_t *sockref = (s_sockref_t *) zlistx_pop (s_sockref_list);
+    s_sockref_t *sockref = (s_sockref_t *) zlistx_detach (s_sockref_list, NULL);
     while (sockref) {
         assert (sockref->filename);
         zsys_error ("dangling '%s' socket created at %s:%d",
@@ -233,7 +233,7 @@ zsys_shutdown (void)
                     sockref->filename, (int) sockref->line_nbr);
         zmq_close (sockref->handle);
         free (sockref);
-        sockref = (s_sockref_t *) zlistx_pop (s_sockref_list);
+        sockref = (s_sockref_t *) zlistx_detach (s_sockref_list, NULL);
     }
     zlistx_destroy (&s_sockref_list);
     ZMUTEX_UNLOCK (s_mutex);
@@ -302,7 +302,7 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
         sockref->type = type;
         sockref->filename = filename;
         sockref->line_nbr = line_nbr;
-        zlistx_append (s_sockref_list, sockref);
+        zlistx_add_end (s_sockref_list, sockref);
     }
     s_open_sockets++;
     ZMUTEX_UNLOCK (s_mutex);
@@ -319,11 +319,11 @@ zsys_close (void *handle, const char *filename, size_t line_nbr)
     ZMUTEX_LOCK (s_mutex);
     //  It's possible atexit() has already happened if we're running under
     //  a debugger that redirects the main thread exit.
-    if (filename && s_sockref_list) {
+    if (s_sockref_list) {
         s_sockref_t *sockref = (s_sockref_t *) zlistx_first (s_sockref_list);
         while (sockref) {
             if (sockref->handle == handle) {
-                zlistx_remove (s_sockref_list, sockref);
+                zlistx_delete (s_sockref_list, zlistx_handle (s_sockref_list));
                 free (sockref);
                 break;
             }

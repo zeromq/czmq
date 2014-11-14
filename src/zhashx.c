@@ -519,9 +519,9 @@ zhashx_keys (zhashx_t *self)
     for (index = 0; index < limit; index++) {
         item_t *item = self->items [index];
         while (item) {
-            if (zlistx_append (keys, (void *) item->key)) {
+            if (zlistx_add_end (keys, (void *) item->key) == NULL) {
                 zlistx_destroy (&keys);
-                break;
+                return NULL;
             }
             item = item->next;
         }
@@ -607,15 +607,14 @@ zhashx_comment (zhashx_t *self, const char *format, ...)
             self->comments = zlistx_new ();
             if (!self->comments)
                 return;
-            zlistx_autofree (self->comments);
+            zlistx_set_destructor (self->comments, (czmq_destructor *) zstr_free);
         }
         va_list argptr;
         va_start (argptr, format);
         char *string = zsys_vprintf (format, argptr);
         va_end (argptr);
         if (string)
-            zlistx_append (self->comments, string);
-        free (string);
+            zlistx_add_end (self->comments, string);
     }
     else
         zlistx_destroy (&self->comments);

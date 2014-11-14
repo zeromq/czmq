@@ -344,23 +344,20 @@ zlist_size (zlist_t *self)
 void
 zlist_sort (zlist_t *self, zlist_compare_fn *compare)
 {
-    //  Uses a comb sort, which is simple and reasonably fast. The
-    //  algorithm is based on Wikipedia's C pseudo-code for comb sort.
-    size_t gap = self->size;
-    bool swapped = false;
-    while (gap > 1 || swapped) {
-        if (gap > 1)
-            gap = (size_t) ((double) gap / 1.247330950103979);
-
+    //  Uses a comb sort, which is simple and reasonably fast.
+    //  See http://en.wikipedia.org/wiki/Comb_sort
+    int gap = self->size;
+    while (gap > 1) {
+        gap = (int) ((double) gap / 1.3);
         node_t *base = self->head;
         node_t *test = self->head;
         int jump = gap;
         while (jump--)
             test = test->next;
 
-        swapped = false;
+        bool swapped = false;
         while (base && test) {
-            if ((*compare)(base->item, test->item)) {
+            if ((*compare)(base->item, test->item) > 0) {
                 //  It's trivial to swap items in a generic container
                 void *item = base->item;
                 base->item = test->item;
@@ -370,6 +367,8 @@ zlist_sort (zlist_t *self, zlist_compare_fn *compare)
             base = base->next;
             test = test->next;
         }
+        if (!swapped)
+            break;
     }
 }
 
@@ -515,9 +514,9 @@ zlist_test (int verbose)
     item = (char *) zlist_pop (list);
     assert (item == bread);
     item = (char *) zlist_pop (list);
-    assert (item == wine);
-    item = (char *) zlist_pop (list);
     assert (item == cheese);
+    item = (char *) zlist_pop (list);
+    assert (item == wine);
     assert (zlist_size (list) == 0);
 
     assert (zlist_size (sub_list) == 3);

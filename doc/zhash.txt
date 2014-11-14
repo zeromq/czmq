@@ -3,7 +3,7 @@ zhash(3)
 
 NAME
 ----
-zhash - generic type-free hash container
+zhash - generic type-free hash container (deprecated)
 
 SYNOPSIS
 --------
@@ -221,7 +221,8 @@ CZMQ_EXPORT void
 DESCRIPTION
 -----------
 
-zhash is an expandable hash table container.
+zhash is an expandable hash table container. This is the deprecated V2
+class. For new applications we recommend using zhashx.
 
 The hash table always has a size that is prime and roughly doubles its
 size when 75% full. In case of hash collisions items are chained in a

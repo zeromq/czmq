@@ -155,7 +155,7 @@ ziflist_reload (ziflist_t *self)
                     s_interface_new (interface->ifa_name, address, netmask,
                                      broadcast);
                 if (item)
-                    zlistx_append (list, item);
+                    zlistx_add_end (list, item);
             }
             interface = interface->ifa_next;
         }
@@ -204,7 +204,7 @@ ziflist_reload (ziflist_t *self)
                 interface_t *item = s_interface_new (ifr->ifr_name, address,
                                                      netmask, broadcast);
                 if (item)
-                    zlistx_append (list, item);
+                    zlistx_add_end (list, item);
             }
         }
         free (ifconfig.ifc_buf);
@@ -246,7 +246,7 @@ ziflist_reload (ziflist_t *self)
             interface_t *item = s_interface_new (asciiFriendlyName, address,
                                                  netmask, broadcast);
             if (item)
-                zlistx_append (list, item);
+                zlistx_add_end (list, item);
         }
         free (asciiFriendlyName);
         cur_address = cur_address->Next;

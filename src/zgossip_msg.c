@@ -671,7 +671,6 @@ zgossip_msg_test (bool verbose)
         zgossip_msg_recv (self, input);
         assert (zgossip_msg_routing_id (self));
     }
-    zgossip_msg_destroy (&self);
 
     zgossip_msg_destroy (&self);
     zsock_destroy (&input);
