@@ -282,9 +282,14 @@ zloop_destroy (zloop_t **self_p)
     assert (self_p);
     if (*self_p) {
         zloop_t *self = *self_p;
-        //  Destroy zombie timer list
-        //  Which must always be empty here
-        assert (zlistx_size (self->zombies) == 0);
+
+        //  If we never started the loop, yet manipulated timers, we'll have
+        //  a zombie list
+        while (zlistx_first (self->zombies)) {
+            //  Get timer_id back from pointer
+            int timer_id = (byte *) zlistx_detach (self->zombies, NULL) - (byte *) NULL;
+            s_timer_remove (self, timer_id);
+        }
         zlistx_destroy (&self->zombies);
         zlistx_destroy (&self->readers);
         zlistx_destroy (&self->pollers);
@@ -381,8 +386,8 @@ zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
 {
     assert (self);
 
-    if (  item->socket
-       && streq (zsocket_type_str (item->socket), "UNKNOWN"))
+    if (item->socket
+    &&  streq (zsocket_type_str (item->socket), "UNKNOWN"))
         return -1;
 
     s_poller_t *poller = s_poller_new (item, handler, arg);
@@ -460,10 +465,9 @@ zloop_poller_set_tolerant (zloop_t *self, zmq_pollitem_t *item)
             if (item->fd == poller->item.fd)
                 match = true;
         }
-        if (match) {
+        if (match)
             poller->tolerant = true;
-        }
-
+        
         poller = (s_poller_t *) zlistx_next (self->pollers);
     }
 }
