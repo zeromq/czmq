@@ -57,17 +57,50 @@ struct _zlistx_t {
 //  no more heap memory.
 
 static node_t *
-s_node_new (node_t *prev, node_t *next, void *item)
+s_node_new (void *item)
 {
     node_t *self = (node_t *) zmalloc (sizeof (node_t));
     if (self) {
         self->tag = NODE_TAG;
-        self->prev = prev? prev: self;
-        self->next = next? next: self;
+        self->prev = self;
+        self->next = self;
         self->item = item;
     }
     return self;
 }
+
+
+//  Removing and inserting a node are actually the same operation:
+//      swap (node->next, prev->next)
+//      swap (node->prev, next->prev)
+//  Which require only that the node be initialized to point to itself.
+//  When inserting, node goes in between prev and next.
+
+static void
+s_node_relink (node_t *node, node_t *prev, node_t *next)
+{
+    node_t *temp = node->next;
+    node->next = prev->next;
+    prev->next = temp;
+    temp = node->prev;
+    node->prev = next->prev;
+    next->prev = temp;
+}
+
+//  Default comparator
+
+static int
+s_comparator (const void *item1, const void *item2)
+{
+    if (item1 == item2)
+        return 0;
+    else
+    if (item1 < item2)
+        return -1;
+    else
+        return 1;
+}
+
 
 
 //  --------------------------------------------------------------------------
@@ -78,8 +111,9 @@ zlistx_new (void)
 {
     zlistx_t *self = (zlistx_t *) zmalloc (sizeof (zlistx_t));
     if (self) {
-        self->head = s_node_new (NULL, NULL, NULL);
+        self->head = s_node_new (NULL);
         self->cursor = self->head;
+        self->comparator = s_comparator;
     }
     return self;
 }
@@ -119,11 +153,10 @@ zlistx_add_start (zlistx_t *self, void *item)
         if (!item)
             return NULL;        //  Out of memory
     }
-    node_t *node = s_node_new (self->head, self->head->next, item);
+    node_t *node = s_node_new (item);
     if (node) {
+        s_node_relink (node, self->head, self->head->next);
         self->cursor = self->head;
-        self->head->next->prev = node;
-        self->head->next = node;
         self->size++;
         return node;
     }
@@ -148,11 +181,10 @@ zlistx_add_end (zlistx_t *self, void *item)
         if (!item)
             return NULL;        //  Out of memory
     }
-    node_t *node = s_node_new (self->head->prev, self->head, item);
+    node_t *node = s_node_new (item);
     if (node) {
+        s_node_relink (node, self->head->prev, self->head);
         self->cursor = self->head;
-        self->head->prev->next = node;
-        self->head->prev = node;
         self->size++;
         return node;
     }
@@ -262,14 +294,8 @@ zlistx_find (zlistx_t *self, void *item)
     //  Scan list for item, this is a O(N) operation
     node_t *node = self->head->next;
     while (node != self->head) {
-        if (self->comparator) {
-            if (self->comparator (node->item, item) == 0)
-                return node;
-        }
-        else
-        if (node->item == item)
+        if (self->comparator (node->item, item) == 0)
             return node;
-        
         node = node->next;
     }
     return NULL;
@@ -293,10 +319,9 @@ zlistx_detach (zlistx_t *self, void *handle)
 
     //  Now detach node from list, without destroying it
     if (node) {
-        void *item = node->item;
-        node->prev->next = node->next;
-        node->next->prev = node->prev;
+        s_node_relink (node, node->prev, node->next);
         node->tag = 0xDeadBeef;
+        void *item = node->item;
         free (node);
         self->cursor = self->head;
         self->size--;
@@ -364,13 +389,7 @@ zlistx_sort (zlistx_t *self)
 
         bool swapped = false;
         while (base != self->head && test != self->head) {
-            int compare;
-            if (self->comparator)
-                compare = self->comparator (base->item, test->item);
-            else
-                compare = (base->item < test->item);
-
-            if (compare > 0) {
+            if (self->comparator (base->item, test->item) > 0) {
                 //  We don't actually swap nodes, just the items in the nodes.
                 //  This is ridiculously simple and confuses the heck out of
                 //  me every time I re-read the code, as I expect to see the
@@ -504,7 +523,7 @@ zlistx_test (int verbose)
     free (string);
     assert (zlistx_size (list) == 0);
     
-    //  Check next/back work xxx
+    //  Check next/back work
     //  Now populate the list with items
     zlistx_add_start (list, "five");
     zlistx_add_end   (list, "six");
