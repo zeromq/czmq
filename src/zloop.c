@@ -597,8 +597,8 @@ zloop_start (zloop_t *self)
         for (item_nbr = 0; item_nbr < self->poll_size && rc >= 0; item_nbr++) {
             s_reader_t *reader = &self->readact [item_nbr];
             if (reader->handler) {
-                if (  (self->pollset [item_nbr].revents & ZMQ_POLLERR)
-                   && !reader->tolerant) {
+                if ((self->pollset [item_nbr].revents & ZMQ_POLLERR)
+                && !reader->tolerant) {
                     if (self->verbose)
                         zsys_warning ("zloop: can't read %s socket: %s",
                                       zsock_type_str (reader->sock),
@@ -626,8 +626,8 @@ zloop_start (zloop_t *self)
                 s_poller_t *poller = &self->pollact [item_nbr];
                 assert (self->pollset [item_nbr].socket == poller->item.socket);
 
-                if (  (self->pollset [item_nbr].revents & ZMQ_POLLERR)
-                   && !poller->tolerant) {
+                if ((self->pollset [item_nbr].revents & ZMQ_POLLERR)
+                && !poller->tolerant) {
                     if (self->verbose)
                         zsys_warning ("zloop: can't poll %s socket (%p, %d): %s",
                                       poller->item.socket ?
