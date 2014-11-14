@@ -81,7 +81,7 @@ CZMQ_EXPORT void *
 
 //  Find an item in the list, searching from the start. Uses the item
 //  comparator, if any, else compares item values directly. Returns the
-//  item handle found, or NULL.
+//  item handle found, or NULL. Sets the cursor to the found item, if any.
 CZMQ_EXPORT void *
     zlistx_find (zlistx_t *self, void *item);
 
@@ -97,6 +97,18 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT int
     zlistx_delete (zlistx_t *self, void *handle);
     
+//  Move an item to the start of the list, via its handle. If sorted is true,
+//  the item is inserted before the first item with a higher value, determined
+//  by the item comparator (or item value if no comparator is set).
+CZMQ_EXPORT void
+    zlistx_move_start (zlistx_t *self, void *handle, bool sorted);
+
+//  Move an item to the end of the list, via its handle. If sorted is true,
+//  the item is inserted after the last item with a lower value, determined
+//  by the item comparator (or item value if no comparator is set).
+CZMQ_EXPORT void
+    zlistx_move_end (zlistx_t *self, void *handle, bool sorted);
+
 //  Remove all items from the list, and destroy them if the item destructor
 //  is set.
 CZMQ_EXPORT void
