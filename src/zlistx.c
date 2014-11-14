@@ -155,6 +155,7 @@ zlistx_add_start (zlistx_t *self, void *item)
     }
     node_t *node = s_node_new (item);
     if (node) {
+        //  Insert after head
         s_node_relink (node, self->head, self->head->next);
         self->cursor = self->head;
         self->size++;
@@ -183,6 +184,7 @@ zlistx_add_end (zlistx_t *self, void *item)
     }
     node_t *node = s_node_new (item);
     if (node) {
+        //  Insert before head
         s_node_relink (node, self->head->prev, self->head);
         self->cursor = self->head;
         self->size++;
@@ -265,6 +267,7 @@ zlistx_last (zlistx_t *self)
 void *
 zlistx_item (zlistx_t *self)
 {
+    assert (self);
     return self->cursor == self->head? NULL: self->cursor->item;
 }
 
@@ -276,6 +279,7 @@ zlistx_item (zlistx_t *self)
 void *
 zlistx_handle (zlistx_t *self)
 {
+    assert (self);
     return self->cursor == self->head? NULL: self->cursor;
 }
 
@@ -283,7 +287,7 @@ zlistx_handle (zlistx_t *self)
 //  --------------------------------------------------------------------------
 //  Find an item in the list, searching from the start. Uses the item
 //  comparator, if any, else compares item values directly. Returns the
-//  item handle found, or NULL.
+//  item handle found, or NULL. Sets the cursor to the found item, if any.
 
 void *
 zlistx_find (zlistx_t *self, void *item)
@@ -294,8 +298,10 @@ zlistx_find (zlistx_t *self, void *item)
     //  Scan list for item, this is a O(N) operation
     node_t *node = self->head->next;
     while (node != self->head) {
-        if (self->comparator (node->item, item) == 0)
+        if (self->comparator (node->item, item) == 0) {
+            self->cursor = node;
             return node;
+        }
         node = node->next;
     }
     return NULL;
@@ -312,13 +318,13 @@ void *
 zlistx_detach (zlistx_t *self, void *handle)
 {
     assert (self);
-
     node_t *node = (node_t *) handle;
     if (!node)
         node = self->head->next == self->head? NULL: self->head->next;
 
     //  Now detach node from list, without destroying it
     if (node) {
+        //  Remove node from list
         s_node_relink (node, node->prev, node->next);
         node->tag = 0xDeadBeef;
         void *item = node->item;
@@ -353,6 +359,62 @@ zlistx_delete (zlistx_t *self, void *handle)
 
 
 //  --------------------------------------------------------------------------
+//  Move an item to the start of the list, via its handle. If sorted is true,
+//  the item is inserted before the first item with a higher value, determined
+//  by the item comparator (or item value if no comparator is set).
+
+void
+zlistx_move_start (zlistx_t *self, void *handle, bool sorted)
+{
+    assert (self);
+    assert (handle);
+    node_t *node = (node_t *) handle;
+    assert (node->tag == NODE_TAG);
+
+    //  By default, insert before first node in list
+    node_t *next = self->head->next;
+    if (sorted) {
+        while (next != self->head) {
+            if (self->comparator (node->item, next->item) < 0)
+                break;
+            next = next->next;
+        }
+    }
+    //  Remove node from list, insert before next node
+    s_node_relink (node, node->prev, node->next);
+    s_node_relink (node, next->prev, next);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Move an item to the end of the list, via its handle. If sorted is true,
+//  the item is inserted after the last item with a lower value, determined
+//  by the item comparator (or item value if no comparator is set).
+
+void
+zlistx_move_end (zlistx_t *self, void *handle, bool sorted)
+{
+    assert (self);
+    assert (handle);
+    node_t *node = (node_t *) handle;
+    assert (node->tag == NODE_TAG);
+
+    //  By default, insert after last node in list
+    node_t *prev = self->head->prev;
+    if (sorted) {
+        while (prev != self->head) {
+            if (self->comparator (prev->item, node->item) < 0)
+                break;
+            prev = prev->prev;
+        }
+    }
+    //  Remove node from list, insert after prev node
+    s_node_relink (node, node->prev, node->next);
+    s_node_relink (node, prev, prev->next);
+}
+
+
+//  --------------------------------------------------------------------------
 //  Remove all items from the list, and destroy them if the item destructor
 //  is set.
 
@@ -373,21 +435,20 @@ zlistx_purge (zlistx_t *self)
 void
 zlistx_sort (zlistx_t *self)
 {
-    assert (self);
-
     //  Uses a comb sort, which is simple and reasonably fast
     //  See http://en.wikipedia.org/wiki/Comb_sort
+    assert (self);
     int gap = self->size;
-    while (gap > 1) {
+    bool swapped = false;
+    while (gap > 1 || swapped) {
         gap = (int) ((double) gap / 1.3);
-
         node_t *base = self->head->next;
         node_t *test = self->head->next;
         int jump = gap;
         while (jump--)
             test = test->next;
 
-        bool swapped = false;
+        swapped = false;
         while (base != self->head && test != self->head) {
             if (self->comparator (base->item, test->item) > 0) {
                 //  We don't actually swap nodes, just the items in the nodes.
@@ -402,9 +463,7 @@ zlistx_sort (zlistx_t *self)
             base = base->next;
             test = test->next;
         }
-        if (!swapped)
-            break;
-   }
+    }
 }
 
 
@@ -554,6 +613,15 @@ zlistx_test (int verbose)
     assert (streq ((char *) zlistx_first (list), "eight"));
     assert (streq ((char *) zlistx_last (list), "two"));
 
+    //  Try moving items around
+    handle = zlistx_find (list, "six");
+    zlistx_move_start (list, handle, false);
+    assert (streq ((char *) zlistx_first (list), "six"));
+    zlistx_move_end (list, handle, false);
+    assert (streq ((char *) zlistx_last (list), "six"));
+    zlistx_sort (list);
+    assert (streq ((char *) zlistx_last (list), "two"));
+        
     zlistx_t *copy = zlistx_dup (list);
     assert (copy);
     assert (zlistx_size (copy) == 10);
