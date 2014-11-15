@@ -492,13 +492,8 @@ zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_timer_fn handler, 
             return -1;
         }
         if (self->verbose)
-#ifdef __WINDOWS__
-            zsys_debug ("zloop: register timer id=%d delay=%u times=%u",
-                        timer_id, delay, times);
-#else
-            zsys_debug ("zloop: register timer id=%d delay=%zd times=%zd",
-                        timer_id, delay, times);
-#endif
+            zsys_debug ("zloop: register timer id=%d delay=%d times=%d",
+                        timer_id, (int) delay, (int) times);
         return timer_id;
     }
     else
