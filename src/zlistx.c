@@ -333,8 +333,10 @@ zlistx_detach (zlistx_t *self, void *handle)
         self->size--;
         return item;
     }
-    else
+    else {
+        assert (self->size == 0);
         return NULL;
+    }
 }
 
 
@@ -380,9 +382,12 @@ zlistx_move_start (zlistx_t *self, void *handle, bool sorted)
             next = next->next;
         }
     }
-    //  Remove node from list, insert before next node
-    s_node_relink (node, node->prev, node->next);
-    s_node_relink (node, next->prev, next);
+    //  If node is already in right place, leave alone
+    if (node != next) {
+        //  Remove node from list, insert before next node
+        s_node_relink (node, node->prev, node->next);
+        s_node_relink (node, next->prev, next);
+    }
 }
 
 
@@ -408,9 +413,12 @@ zlistx_move_end (zlistx_t *self, void *handle, bool sorted)
             prev = prev->prev;
         }
     }
-    //  Remove node from list, insert after prev node
-    s_node_relink (node, node->prev, node->next);
-    s_node_relink (node, prev, prev->next);
+    //  If node is already in right place, leave alone
+    if (node != prev) {
+        //  Remove node from list, insert after prev node
+        s_node_relink (node, node->prev, node->next);
+        s_node_relink (node, prev, prev->next);
+    }
 }
 
 
@@ -422,7 +430,7 @@ void
 zlistx_purge (zlistx_t *self)
 {
     assert (self);
-    while (zlistx_size (self))
+    while (zlistx_size (self) > 0)
         zlistx_delete (self, NULL);
 }
 
