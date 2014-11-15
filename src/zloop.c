@@ -172,18 +172,30 @@ s_timer_destroy (s_timer_t **self_p)
     }
 }
 
+static int
+s_timer_comparator (s_timer_t *timer1, s_timer_t *timer2)
+{
+    if (timer1->when > timer2->when)
+        return 1;
+    else
+    if (timer1->when < timer2->when)
+        return -1;
+    else
+        return 0;
+}
+
 static s_ticket_t *
 s_ticket_new (size_t delay, zloop_timer_fn handler, void *arg)
 {
-    s_ticket_t *ticket = (s_ticket_t *) zmalloc (sizeof (s_ticket_t));
-    if (ticket) {
-        ticket->tag = TICKET_TAG;
-        ticket->delay = delay;
-        ticket->when = zclock_mono () + delay;
-        ticket->handler = handler;
-        ticket->arg = arg;
+    s_ticket_t *self = (s_ticket_t *) zmalloc (sizeof (s_ticket_t));
+    if (self) {
+        self->tag = TICKET_TAG;
+        self->delay = delay;
+        self->when = zclock_mono () + delay;
+        self->handler = handler;
+        self->arg = arg;
     }
-    return ticket;
+    return self;
 }
 
 static void
@@ -330,6 +342,7 @@ zloop_new (void)
         zlistx_set_destructor (self->readers, (czmq_destructor *) s_reader_destroy);
         zlistx_set_destructor (self->pollers, (czmq_destructor *) s_poller_destroy);
         zlistx_set_destructor (self->timers, (czmq_destructor *) s_timer_destroy);
+        zlistx_set_comparator (self->timers, (czmq_comparator *) s_timer_comparator);
         zlistx_set_destructor (self->tickets, (czmq_destructor *) s_ticket_destroy);
         zlistx_set_comparator (self->tickets, (czmq_comparator *) s_ticket_comparator);
     }
@@ -545,6 +558,10 @@ zloop_poller_set_tolerant (zloop_t *self, zmq_pollitem_t *item)
 //  times. At each expiry, will call the handler, passing the arg. To run a
 //  timer forever, use 0 times. Returns a timer_id that is used to cancel the
 //  timer in the future. Returns -1 if there was an error.
+//
+//  TODO: if we returned a void *handle to the timer then we could work
+//  directly into the list rather than scanning... how to do this without
+//  breaking the API or making the code horribly complex?
 
 int
 zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_timer_fn handler, void *arg)
