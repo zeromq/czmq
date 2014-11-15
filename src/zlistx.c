@@ -102,7 +102,6 @@ s_comparator (const void *item1, const void *item2)
 }
 
 
-
 //  --------------------------------------------------------------------------
 //  Create a new, empty list.
 
@@ -325,6 +324,7 @@ zlistx_detach (zlistx_t *self, void *handle)
     //  Now detach node from list, without destroying it
     if (node) {
         //  Remove node from list
+        assert (node->tag == NODE_TAG);
         s_node_relink (node, node->prev, node->next);
         node->tag = 0xDeadBeef;
         void *item = node->item;
@@ -333,8 +333,10 @@ zlistx_detach (zlistx_t *self, void *handle)
         self->size--;
         return item;
     }
-    else
+    else {
+        assert (self->size == 0);
         return NULL;
+    }
 }
 
 
@@ -360,8 +362,8 @@ zlistx_delete (zlistx_t *self, void *handle)
 
 //  --------------------------------------------------------------------------
 //  Move an item to the start of the list, via its handle. If sorted is true,
-//  the item is inserted before the first item with a higher value, determined
-//  by the item comparator (or item value if no comparator is set).
+//  the item is inserted before the first item with an equal or higher value,
+//  determined by the item comparator (or item value if no comparator is set).
 
 void
 zlistx_move_start (zlistx_t *self, void *handle, bool sorted)
@@ -375,21 +377,24 @@ zlistx_move_start (zlistx_t *self, void *handle, bool sorted)
     node_t *next = self->head->next;
     if (sorted) {
         while (next != self->head) {
-            if (self->comparator (node->item, next->item) < 0)
+            if (self->comparator (node->item, next->item) <= 0)
                 break;
             next = next->next;
         }
     }
-    //  Remove node from list, insert before next node
-    s_node_relink (node, node->prev, node->next);
-    s_node_relink (node, next->prev, next);
+    //  If node is already in right place, leave alone
+    if (node != next) {
+        //  Remove node from list, insert before next node
+        s_node_relink (node, node->prev, node->next);
+        s_node_relink (node, next->prev, next);
+    }
 }
 
 
 //  --------------------------------------------------------------------------
 //  Move an item to the end of the list, via its handle. If sorted is true,
-//  the item is inserted after the last item with a lower value, determined
-//  by the item comparator (or item value if no comparator is set).
+//  the item is inserted after the last item with an equal or lower value,
+//  determined by the item comparator (or item value if no comparator is set).
 
 void
 zlistx_move_end (zlistx_t *self, void *handle, bool sorted)
@@ -403,14 +408,17 @@ zlistx_move_end (zlistx_t *self, void *handle, bool sorted)
     node_t *prev = self->head->prev;
     if (sorted) {
         while (prev != self->head) {
-            if (self->comparator (prev->item, node->item) < 0)
+            if (self->comparator (prev->item, node->item) <= 0)
                 break;
             prev = prev->prev;
         }
     }
-    //  Remove node from list, insert after prev node
-    s_node_relink (node, node->prev, node->next);
-    s_node_relink (node, prev, prev->next);
+    //  If node is already in right place, leave alone
+    if (node != prev) {
+        //  Remove node from list, insert after prev node
+        s_node_relink (node, node->prev, node->next);
+        s_node_relink (node, prev, prev->next);
+    }
 }
 
 
@@ -422,7 +430,7 @@ void
 zlistx_purge (zlistx_t *self)
 {
     assert (self);
-    while (zlistx_size (self))
+    while (zlistx_size (self) > 0)
         zlistx_delete (self, NULL);
 }
 
