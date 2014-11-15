@@ -361,28 +361,17 @@ zlistx_delete (zlistx_t *self, void *handle)
 
 
 //  --------------------------------------------------------------------------
-//  Move an item to the start of the list, via its handle. If sorted is true,
-//  the item is inserted before the first item with an equal or higher value,
-//  determined by the item comparator (or item value if no comparator is set).
+//  Move an item to the start of the list, via its handle.
 
 void
-zlistx_move_start (zlistx_t *self, void *handle, bool sorted)
+zlistx_move_start (zlistx_t *self, void *handle)
 {
     assert (self);
     assert (handle);
     node_t *node = (node_t *) handle;
     assert (node->tag == NODE_TAG);
 
-    //  By default, insert before first node in list
     node_t *next = self->head->next;
-    if (sorted) {
-        while (next != self->head) {
-            if (self->comparator (node->item, next->item) <= 0)
-                break;
-            next = next->next;
-        }
-    }
-    //  If node is already in right place, leave alone
     if (node != next) {
         //  Remove node from list, insert before next node
         s_node_relink (node, node->prev, node->next);
@@ -392,28 +381,17 @@ zlistx_move_start (zlistx_t *self, void *handle, bool sorted)
 
 
 //  --------------------------------------------------------------------------
-//  Move an item to the end of the list, via its handle. If sorted is true,
-//  the item is inserted after the last item with an equal or lower value,
-//  determined by the item comparator (or item value if no comparator is set).
+//  Move an item to the end of the list, via its handle.
 
 void
-zlistx_move_end (zlistx_t *self, void *handle, bool sorted)
+zlistx_move_end (zlistx_t *self, void *handle)
 {
     assert (self);
     assert (handle);
     node_t *node = (node_t *) handle;
     assert (node->tag == NODE_TAG);
 
-    //  By default, insert after last node in list
     node_t *prev = self->head->prev;
-    if (sorted) {
-        while (prev != self->head) {
-            if (self->comparator (prev->item, node->item) <= 0)
-                break;
-            prev = prev->prev;
-        }
-    }
-    //  If node is already in right place, leave alone
     if (node != prev) {
         //  Remove node from list, insert after prev node
         s_node_relink (node, node->prev, node->next);
@@ -623,9 +601,9 @@ zlistx_test (int verbose)
 
     //  Try moving items around
     handle = zlistx_find (list, "six");
-    zlistx_move_start (list, handle, false);
+    zlistx_move_start (list, handle);
     assert (streq ((char *) zlistx_first (list), "six"));
-    zlistx_move_end (list, handle, false);
+    zlistx_move_end (list, handle);
     assert (streq ((char *) zlistx_last (list), "six"));
     zlistx_sort (list);
     assert (streq ((char *) zlistx_last (list), "two"));

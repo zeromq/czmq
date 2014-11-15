@@ -97,17 +97,13 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT int
     zlistx_delete (zlistx_t *self, void *handle);
     
-//  Move an item to the start of the list, via its handle. If sorted is true,
-//  the item is inserted before the first item with an equal or higher value,
-//  determined by the item comparator (or item value if no comparator is set).
+//  Move an item to the start of the list, via its handle.
 CZMQ_EXPORT void
-    zlistx_move_start (zlistx_t *self, void *handle, bool sorted);
+    zlistx_move_start (zlistx_t *self, void *handle);
 
-//  Move an item to the end of the list, via its handle. If sorted is true,
-//  the item is inserted after the last item with an equal or lower value,
-//  determined by the item comparator (or item value if no comparator is set).
+//  Move an item to the end of the list, via its handle.
 CZMQ_EXPORT void
-    zlistx_move_end (zlistx_t *self, void *handle, bool sorted);
+    zlistx_move_end (zlistx_t *self, void *handle);
 
 //  Remove all items from the list, and destroy them if the item destructor
 //  is set.

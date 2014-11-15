@@ -652,7 +652,7 @@ zloop_ticket_reset (zloop_t *self, void *handle)
     s_ticket_t *ticket = (s_ticket_t *) handle;
     assert (ticket->tag == TICKET_TAG);
     ticket->when = zclock_mono () + ticket->delay;
-    zlistx_move_end (self->tickets, ticket->list_handle, false);
+    zlistx_move_end (self->tickets, ticket->list_handle);
 }
 
 
