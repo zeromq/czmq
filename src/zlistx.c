@@ -102,7 +102,6 @@ s_comparator (const void *item1, const void *item2)
 }
 
 
-
 //  --------------------------------------------------------------------------
 //  Create a new, empty list.
 
@@ -362,8 +361,8 @@ zlistx_delete (zlistx_t *self, void *handle)
 
 //  --------------------------------------------------------------------------
 //  Move an item to the start of the list, via its handle. If sorted is true,
-//  the item is inserted before the first item with a higher value, determined
-//  by the item comparator (or item value if no comparator is set).
+//  the item is inserted before the first item with an equal or higher value,
+//  determined by the item comparator (or item value if no comparator is set).
 
 void
 zlistx_move_start (zlistx_t *self, void *handle, bool sorted)
@@ -377,7 +376,7 @@ zlistx_move_start (zlistx_t *self, void *handle, bool sorted)
     node_t *next = self->head->next;
     if (sorted) {
         while (next != self->head) {
-            if (self->comparator (node->item, next->item) < 0)
+            if (self->comparator (node->item, next->item) <= 0)
                 break;
             next = next->next;
         }
@@ -393,8 +392,8 @@ zlistx_move_start (zlistx_t *self, void *handle, bool sorted)
 
 //  --------------------------------------------------------------------------
 //  Move an item to the end of the list, via its handle. If sorted is true,
-//  the item is inserted after the last item with a lower value, determined
-//  by the item comparator (or item value if no comparator is set).
+//  the item is inserted after the last item with an equal or lower value,
+//  determined by the item comparator (or item value if no comparator is set).
 
 void
 zlistx_move_end (zlistx_t *self, void *handle, bool sorted)
@@ -408,7 +407,7 @@ zlistx_move_end (zlistx_t *self, void *handle, bool sorted)
     node_t *prev = self->head->prev;
     if (sorted) {
         while (prev != self->head) {
-            if (self->comparator (prev->item, node->item) < 0)
+            if (self->comparator (prev->item, node->item) <= 0)
                 break;
             prev = prev->prev;
         }
