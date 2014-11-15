@@ -135,6 +135,18 @@ code:
 	cd $(srcdir)/src; gsl -q zgossip.xml
 	cd $(srcdir)/src; gsl -q zgossip_msg.xml
 
+# Run the selftest binary under valgrind to check for memory leaks
+memcheck: src/czmq_selftest
+	libtool --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(srcdir)/src/czmq_selftest
+
+# Run the selftest binary under gdb for debugging
+debug: src/czmq_selftest
+	libtool --mode=execute gdb -q \
+		$(srcdir)/src/czmq_selftest
+
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
 #   Please read the README.txt file in the model directory.     #
