@@ -324,6 +324,7 @@ zlistx_detach (zlistx_t *self, void *handle)
     //  Now detach node from list, without destroying it
     if (node) {
         //  Remove node from list
+        assert (node->tag == NODE_TAG);
         s_node_relink (node, node->prev, node->next);
         node->tag = 0xDeadBeef;
         void *item = node->item;
