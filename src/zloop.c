@@ -456,7 +456,7 @@ zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
     assert (self);
 
     if (item->socket
-    &&  streq (zsocket_type_str (item->socket), "UNKNOWN"))
+    &&  streq (zsys_sockname (zsock_type (item->socket)), "UNKNOWN"))
         return -1;
 
     s_poller_t *poller = s_poller_new (item, handler, arg);
@@ -469,7 +469,7 @@ zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
         self->need_rebuild = true;
         if (self->verbose)
             zsys_debug ("zloop: register %s poller (%p, %d)",
-                        item->socket ? zsocket_type_str (item->socket) : "FD",
+                        item->socket ? zsys_sockname (zsock_type (item->socket)) : "FD",
                         item->socket, item->fd);
         return 0;
     }
@@ -508,7 +508,7 @@ zloop_poller_end (zloop_t *self, zmq_pollitem_t *item)
     }
     if (self->verbose)
         zsys_debug ("zloop: cancel %s poller (%p, %d)",
-                    item->socket ? zsocket_type_str (item->socket) : "FD",
+                    item->socket ? zsys_sockname (zsock_type (item->socket)) : "FD",
                     item->socket, item->fd);
 }
 
@@ -797,7 +797,7 @@ zloop_start (zloop_t *self)
                     if (self->verbose)
                         zsys_warning ("zloop: can't poll %s socket (%p, %d): %s",
                                       poller->item.socket ?
-                                      zsocket_type_str (poller->item.socket) : "FD",
+                                      zsys_sockname (zsock_type (poller->item.socket)) : "FD",
                                       poller->item.socket, poller->item.fd,
                                       zmq_strerror (zmq_errno ()));
                     //  Give handler one chance to handle error, then kill
@@ -814,7 +814,7 @@ zloop_start (zloop_t *self)
                     if (self->verbose)
                         zsys_debug ("zloop: call %s socket handler (%p, %d)",
                                     poller->item.socket ?
-                                    zsocket_type_str (poller->item.socket) : "FD",
+                                    zsys_sockname (zsock_type (poller->item.socket)) : "FD",
                                     poller->item.socket, poller->item.fd);
                     rc = poller->handler (self, &self->pollset [item_nbr], poller->arg);
                     if (rc == -1 || self->need_rebuild)
