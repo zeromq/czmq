@@ -110,7 +110,7 @@ zmsg_recv (void *source)
             zmsg_destroy (&self);
             break;
         }
-        if (!zsocket_rcvmore (handle))
+        if (!zsock_rcvmore (handle))
             break;              //  Last message frame
     }
     return self;
@@ -776,7 +776,7 @@ zmsg_recv_nowait (void *source)
             zmsg_destroy (&self);
             break;
         }
-        if (!zsocket_rcvmore (source))
+        if (!zsock_rcvmore (source))
             break;              //  Last message frame
     }
     return self;

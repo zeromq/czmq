@@ -193,7 +193,7 @@ s_self_switch (self_t *self, zsock_t *input, zsock_t *output)
     while (true) {
         if (zmq_recvmsg (zmq_input, &msg, ZMQ_DONTWAIT) == -1)
             break;      //  Presumably EAGAIN
-        int send_flags = zsocket_rcvmore (zmq_input) ? ZMQ_SNDMORE : 0;
+        int send_flags = zsock_rcvmore (zmq_input) ? ZMQ_SNDMORE : 0;
         if (zmq_capture) {
             zmq_msg_t dup;
             zmq_msg_init (&dup);
