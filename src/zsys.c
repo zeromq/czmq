@@ -280,18 +280,18 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
     ZMUTEX_LOCK (s_mutex);
     void *handle = zmq_socket (s_process_ctx, type);
     //  Configure socket with process defaults
-    zsocket_set_linger (handle, (int) s_linger);
+    zsock_set_linger (handle, (int) s_linger);
 #if (ZMQ_VERSION_MAJOR == 2)
     //  For ZeroMQ/2.x we use sndhwm for both send and receive
-    zsocket_set_hwm (handle, s_sndhwm);
+    zsock_set_hwm (handle, s_sndhwm);
 #else
     //  For later versions we use separate SNDHWM and RCVHWM
-    zsocket_set_sndhwm (handle, (int) s_sndhwm);
-    zsocket_set_rcvhwm (handle, (int) s_rcvhwm);
+    zsock_set_sndhwm (handle, (int) s_sndhwm);
+    zsock_set_rcvhwm (handle, (int) s_rcvhwm);
 #   if defined (ZMQ_IPV6)
-    zsocket_set_ipv6 (handle, s_ipv6);
+    zsock_set_ipv6 (handle, s_ipv6);
 #   else
-    zsocket_set_ipv4only (handle, s_ipv6 ? 0 : 1);
+    zsock_set_ipv4only (handle, s_ipv6 ? 0 : 1);
 #   endif
 #endif
     //  Add socket to reference tracker so we can report leaks; this is
@@ -1600,7 +1600,7 @@ zsys_test (bool verbose)
     zsys_set_logsender ("inproc://logging");
     void *logger = zsys_socket (ZMQ_SUB, NULL, 0);
     assert (logger);
-    rc = zsocket_connect (logger, "inproc://logging");
+    rc = zmq_connect (logger, "inproc://logging");
     assert (rc == 0);
     rc = zmq_setsockopt (logger, ZMQ_SUBSCRIBE, "", 0);
     assert (rc == 0);
