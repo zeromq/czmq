@@ -22,9 +22,6 @@ extern "C" {
 //  Callback function for zhash_freefn method
 typedef void (zhash_free_fn) (void *data);
 
-//  Callback function for hashing keys
-typedef size_t (zhash_hash_fn) (const void *key);
-
 //  Create a new, empty hash container
 CZMQ_EXPORT zhash_t *
     zhash_new (void);
@@ -37,35 +34,27 @@ CZMQ_EXPORT void
 //  If key is already present returns -1 and leaves existing item unchanged
 //  Returns 0 on success.
 CZMQ_EXPORT int
-    zhash_insert (zhash_t *self, const void *key, void *item);
+    zhash_insert (zhash_t *self, const char *key, void *item);
 
-//  Update or insert item into hash table with specified key and item. If the
-//  key is already present, destroys old item and inserts new one. If you set
-//  a container item destructor, this is called on the old value. If the key
-//  was not already present, inserts a new item. Sets the hash cursor to the
-//  new item.
+//  Update item into hash table with specified key and item.
+//  If key is already present, destroys old item and inserts new one.
+//  Use free_fn method to ensure deallocator is properly called on item.
 CZMQ_EXPORT void
-    zhash_update (zhash_t *self, const void *key, void *item);
+    zhash_update (zhash_t *self, const char *key, void *item);
 
 //  Remove an item specified by key from the hash table. If there was no such
 //  item, this function does nothing.
 CZMQ_EXPORT void
-    zhash_delete (zhash_t *self, const void *key);
-
-//  Delete all items from the hash table. If the key destructor is
-//  set, calls it on every key. If the item destructor is set, calls
-//  it on every item.
-CZMQ_EXPORT void
-    zhash_purge (zhash_t *self);
+    zhash_delete (zhash_t *self, const char *key);
 
 //  Return the item at the specified key, or null
 CZMQ_EXPORT void *
-    zhash_lookup (zhash_t *self, const void *key);
+    zhash_lookup (zhash_t *self, const char *key);
 
 //  Reindexes an item from an old key to a new key. If there was no such
 //  item, does nothing. Returns 0 if successful, else -1.
 CZMQ_EXPORT int
-    zhash_rename (zhash_t *self, const void *old_key, const void *new_key);
+    zhash_rename (zhash_t *self, const char *old_key, const char *new_key);
 
 //  Set a free function for the specified hash table item. When the item is
 //  destroyed, the free function, if any, is called on that item.
@@ -73,15 +62,20 @@ CZMQ_EXPORT int
 //  you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
 //  Returns the item, or NULL if there is no such item.
 CZMQ_EXPORT void *
-    zhash_freefn (zhash_t *self, const void *key, zhash_free_fn *free_fn);
+    zhash_freefn (zhash_t *self, const char *key, zhash_free_fn *free_fn);
 
 //  Return the number of keys/items in the hash table
 CZMQ_EXPORT size_t
     zhash_size (zhash_t *self);
 
-//  Return a zlist_t containing the keys for the items in the
-//  table. Uses the key_duplicator to duplicate all keys and sets the
-//  key_destructor as destructor for the list.
+//  Make copy of hash table; if supplied table is null, returns null.
+//  Does not copy items themselves. Rebuilds new table so may be slow on
+//  very large tables. NOTE: only works with item values that are strings
+//  since there's no other way to know how to duplicate the item value.
+CZMQ_EXPORT zhash_t *
+    zhash_dup (zhash_t *self);
+
+//  Return keys for items in table
 CZMQ_EXPORT zlist_t *
     zhash_keys (zhash_t *self);
     
@@ -101,10 +95,10 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void *
     zhash_next (zhash_t *self);
 
-//  After a successful insert, update, or first/next method, returns the key
-//  for the item that was returned. This is a constant string that you may
-//  not modify or deallocate, and which lasts as long as the item in the hash.
-//  After an unsuccessful first/next, returns NULL.
+//  After a successful first/next method, returns the key for the item that
+//  was returned. This is a constant string that you may not modify or
+//  deallocate, and which lasts as long as the item in the hash. After an
+//  unsuccessful first/next, returns NULL.
 CZMQ_EXPORT const void *
     zhash_cursor (zhash_t *self);
 
@@ -113,25 +107,6 @@ CZMQ_EXPORT const void *
 //  the file. If you use a null format, all comments are deleted.
 CZMQ_EXPORT void
     zhash_comment (zhash_t *self, const char *format, ...);
-
-//  Save hash table to a text file in name=value format. Hash values must be
-//  printable strings; keys may not contain '=' character. Returns 0 if OK,
-//  else -1 if a file error occurred.
-CZMQ_EXPORT int
-    zhash_save (zhash_t *self, const char *filename);
-
-//  Load hash table from a text file in name=value format; hash table must
-//  already exist. Hash values must printable strings; keys may not contain
-//  '=' character. Returns 0 if OK, else -1 if a file was not readable.
-CZMQ_EXPORT int
-    zhash_load (zhash_t *self, const char *filename);
-
-//  When a hash table was loaded from a file by zhash_load, this method will
-//  reload the file if it has been modified since, and is "stable", i.e. not
-//  still changing. Returns 0 if OK, -1 if there was an error reloading the 
-//  file.
-CZMQ_EXPORT int
-    zhash_refresh (zhash_t *self);
 
 //  Serialize hash table to a binary frame that can be sent in a message.
 //  The packed format is compatible with the 'dictionary' type defined in
@@ -155,60 +130,32 @@ CZMQ_EXPORT int
 //  strings.
 CZMQ_EXPORT zframe_t *
     zhash_pack (zhash_t *self);
-    
+
 //  Unpack binary frame into a new hash table. Packed data must follow format
 //  defined by zhash_pack. Hash table is set to autofree. An empty frame
 //  unpacks to an empty hash table.
 CZMQ_EXPORT zhash_t *
     zhash_unpack (zframe_t *frame);
 
-//  Make a copy of the list; items are duplicated if you set a duplicator
-//  for the list, otherwise not. Copying a null reference returns a null
-//  reference. Note that this method's behavior changed slightly for CZMQ
-//  v3.x, as it does not set nor respect autofree. It does however let you
-//  duplicate any hash table safely. The old behavior is in zhash_dup_v2.
-CZMQ_EXPORT zhash_t *
-    zhash_dup (zhash_t *self);
+//  Save hash table to a text file in name=value format. Hash values must be
+//  printable strings; keys may not contain '=' character. Returns 0 if OK,
+//  else -1 if a file error occurred.
+CZMQ_EXPORT int
+    zhash_save (zhash_t *self, const char *filename);
 
-//  Set a user-defined deallocator for hash items; by default items are not
-//  freed when the hash is destroyed.
-CZMQ_EXPORT void
-    zhash_set_destructor (zhash_t *self, czmq_destructor destructor);
+//  Load hash table from a text file in name=value format; hash table must
+//  already exist. Hash values must printable strings; keys may not contain
+//  '=' character. Returns 0 if OK, else -1 if a file was not readable.
+CZMQ_EXPORT int
+    zhash_load (zhash_t *self, const char *filename);
 
-//  Set a user-defined duplicator for hash items; by default items are not
-//  copied when the hash is duplicated.
-CZMQ_EXPORT void
-    zhash_set_duplicator (zhash_t *self, czmq_duplicator duplicator);
+//  When a hash table was loaded from a file by zhash_load, this method will
+//  reload the file if it has been modified since, and is "stable", i.e. not
+//  still changing. Returns 0 if OK, -1 if there was an error reloading the 
+//  file.
+CZMQ_EXPORT int
+    zhash_refresh (zhash_t *self);
 
-//  Set a user-defined deallocator for keys; by default keys are freed
-//  when the hash is destroyed using free().
-CZMQ_EXPORT void
-    zhash_set_key_destructor (zhash_t *self, czmq_destructor destructor);
-
-//  Set a user-defined duplicator for keys; by default keys are duplicated
-//  using strdup.
-CZMQ_EXPORT void
-    zhash_set_key_duplicator (zhash_t *self, czmq_duplicator duplicator);
-
-//  Set a user-defined comparator for keys; by default keys are
-//  compared using strcmp.
-CZMQ_EXPORT void
-    zhash_set_key_comparator (zhash_t *self, czmq_comparator comparator);
-
-//  Set a user-defined hash function for keys; by default keys are
-//  hashed by a modified Bernstein hashing function.
-CZMQ_EXPORT void
-    zhash_set_key_hasher (zhash_t *self, zhash_hash_fn hasher);
-
-//  DEPRECATED by zhash_dup
-//  Make copy of hash table; if supplied table is null, returns null.
-//  Does not copy items themselves. Rebuilds new table so may be slow on
-//  very large tables. NOTE: only works with item values that are strings
-//  since there's no other way to know how to duplicate the item value.
-CZMQ_EXPORT zhash_t *
-    zhash_dup_v2 (zhash_t *self);
-
-//  DEPRECATED as clumsy -- use set_destructor instead
 //  Set hash for automatic value destruction
 CZMQ_EXPORT void
     zhash_autofree (zhash_t *self);

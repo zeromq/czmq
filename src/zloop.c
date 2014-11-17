@@ -154,9 +154,9 @@ s_timer_new (int timer_id, size_t delay, size_t times, zloop_timer_fn handler, v
         self->timer_id = timer_id;
         self->delay = delay;
         self->times = times;
+        self->when = zclock_mono () + delay;
         self->handler = handler;
         self->arg = arg;
-        self->when = -1;            //  Indicates a new timer
     }
     return self;
 }
@@ -172,18 +172,30 @@ s_timer_destroy (s_timer_t **self_p)
     }
 }
 
+static int
+s_timer_comparator (s_timer_t *timer1, s_timer_t *timer2)
+{
+    if (timer1->when > timer2->when)
+        return 1;
+    else
+    if (timer1->when < timer2->when)
+        return -1;
+    else
+        return 0;
+}
+
 static s_ticket_t *
 s_ticket_new (size_t delay, zloop_timer_fn handler, void *arg)
 {
-    s_ticket_t *ticket = (s_ticket_t *) zmalloc (sizeof (s_ticket_t));
-    if (ticket) {
-        ticket->tag = TICKET_TAG;
-        ticket->delay = delay;
-        ticket->when = zclock_mono () + delay;
-        ticket->handler = handler;
-        ticket->arg = arg;
+    s_ticket_t *self = (s_ticket_t *) zmalloc (sizeof (s_ticket_t));
+    if (self) {
+        self->tag = TICKET_TAG;
+        self->delay = delay;
+        self->when = zclock_mono () + delay;
+        self->handler = handler;
+        self->arg = arg;
     }
-    return ticket;
+    return self;
 }
 
 static void
@@ -284,8 +296,6 @@ s_tickless (zloop_t *self)
     s_timer_t *timer = (s_timer_t *) zlistx_first (self->timers);
     while (timer) {
         //  Find earliest timer
-        if (timer->when == -1)
-            timer->when = timer->delay + zclock_mono ();
         if (tickless > timer->when)
             tickless = timer->when;
         timer = (s_timer_t *) zlistx_next (self->timers);
@@ -332,6 +342,7 @@ zloop_new (void)
         zlistx_set_destructor (self->readers, (czmq_destructor *) s_reader_destroy);
         zlistx_set_destructor (self->pollers, (czmq_destructor *) s_poller_destroy);
         zlistx_set_destructor (self->timers, (czmq_destructor *) s_timer_destroy);
+        zlistx_set_comparator (self->timers, (czmq_comparator *) s_timer_comparator);
         zlistx_set_destructor (self->tickets, (czmq_destructor *) s_ticket_destroy);
         zlistx_set_comparator (self->tickets, (czmq_comparator *) s_ticket_comparator);
     }
@@ -547,6 +558,10 @@ zloop_poller_set_tolerant (zloop_t *self, zmq_pollitem_t *item)
 //  times. At each expiry, will call the handler, passing the arg. To run a
 //  timer forever, use 0 times. Returns a timer_id that is used to cancel the
 //  timer in the future. Returns -1 if there was an error.
+//
+//  TODO: if we returned a void *handle to the timer then we could work
+//  directly into the list rather than scanning... how to do this without
+//  breaking the API or making the code horribly complex?
 
 int
 zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_timer_fn handler, void *arg)
@@ -591,7 +606,6 @@ zloop_timer_end (zloop_t *self, int timer_id)
     //  from inside the poll loop. So, we hold the arg on the zombie
     //  list, and process that list when we're done executing timers.
     //  This hack lets us store an integer timer ID as a pointer
-    //  TODO: store timer handle, not id, for direct deletion...
     if (zlistx_add_end (self->zombies, (byte *) NULL + timer_id) == NULL)
         return -1;
 
@@ -638,7 +652,7 @@ zloop_ticket_reset (zloop_t *self, void *handle)
     s_ticket_t *ticket = (s_ticket_t *) handle;
     assert (ticket->tag == TICKET_TAG);
     ticket->when = zclock_mono () + ticket->delay;
-    zlistx_move_end (self->tickets, ticket->list_handle, false);
+    zlistx_move_end (self->tickets, ticket->list_handle);
 }
 
 
@@ -705,12 +719,6 @@ zloop_start (zloop_t *self)
     assert (self);
     int rc = 0;
 
-    //  Recalculate all timers now
-    s_timer_t *timer = (s_timer_t *) zlistx_first (self->timers);
-    while (timer) {
-        timer->when = timer->delay + zclock_mono ();
-        timer = (s_timer_t *) zlistx_next (self->timers);
-    }
     //  Main reactor loop
     while (!zsys_interrupted) {
         if (self->need_rebuild) {
@@ -732,7 +740,7 @@ zloop_start (zloop_t *self)
         int64_t time_now = zclock_mono ();
         s_timer_t *timer = (s_timer_t *) zlistx_first (self->timers);
         while (timer) {
-            if (time_now >= timer->when && timer->when != -1) {
+            if (time_now >= timer->when) {
                 if (self->verbose)
                     zsys_debug ("zloop: call timer handler id=%d", timer->timer_id);
                 rc = timer->handler (self, timer->timer_id, timer->arg);
@@ -748,7 +756,7 @@ zloop_start (zloop_t *self)
         
         //  Handle any tickets that have now expired
         s_ticket_t *ticket = (s_ticket_t *) zlistx_first (self->tickets);
-        while (ticket && ticket->when < time_now) {
+        while (ticket && time_now >= ticket->when) {
             if (self->verbose)
                 zsys_debug ("zloop: call ticket handler");
             rc = ticket->handler (self, 0, ticket->arg);
