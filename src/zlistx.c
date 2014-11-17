@@ -454,6 +454,73 @@ zlistx_sort (zlistx_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  Create a new node and insert it into a sorted list. Calls the item
+//  duplicator, if any, on the item. If low_value is true, starts searching
+//  from the start of the list, otherwise searches from the end. Use the item
+//  comparator, if any, to find where to place the new node. Returns a handle
+//  to the new node, or NULL if memory was exhausted. Resets the cursor to the
+//  list head.
+
+void *
+zlistx_insert (zlistx_t *self, void *item, bool low_value)
+{
+    assert (self);
+    if (self->duplicator) {
+        item = (self->duplicator)(item);
+        if (!item)
+            return NULL;        //  Out of memory
+    }
+    node_t *node = s_node_new (item);
+    if (node) {
+        zlistx_reorder (self, node, low_value);
+        self->cursor = self->head;
+        self->size++;
+    }
+    return node;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Move an item, specified by handle, into position in a sorted list. Uses
+//  the item comparator, if any, to determine the new location. If low_value
+//  is true, starts searching from the start of the list, otherwise searches
+//  from the end.
+
+void
+zlistx_reorder (zlistx_t *self, void *handle, bool low_value)
+{
+    assert (self);
+    assert (handle);
+    node_t *node = (node_t *) handle;
+    assert (node->tag == NODE_TAG);
+
+    //  Remove node from list, if it's attached
+    s_node_relink (node, node->prev, node->next);
+
+    if (low_value) {
+        node_t *next = self->head->next;
+        while (next != self->head) {
+            if (self->comparator (node->item, next->item) <= 0)
+                break;
+            next = next->next;
+        }
+        //  Relink node before next node
+        s_node_relink (node, next->prev, next);
+    }
+    else {
+        node_t *prev = self->head->prev;
+        while (prev != self->head) {
+            if (self->comparator (prev->item, node->item) <= 0)
+                break;
+            prev = prev->prev;
+        }
+        //  Relink node after prev node
+        s_node_relink (node, prev, prev->next);
+    }
+}
+
+
+//  --------------------------------------------------------------------------
 //  Make a copy of the list; items are duplicated if you set a duplicator
 //  for the list, otherwise not. Copying a null reference returns a null
 //  reference.
@@ -599,7 +666,7 @@ zlistx_test (int verbose)
     assert (streq ((char *) zlistx_first (list), "eight"));
     assert (streq ((char *) zlistx_last (list), "two"));
 
-    //  Try moving items around
+    //  Moving items around
     handle = zlistx_find (list, "six");
     zlistx_move_start (list, handle);
     assert (streq ((char *) zlistx_first (list), "six"));
@@ -607,7 +674,8 @@ zlistx_test (int verbose)
     assert (streq ((char *) zlistx_last (list), "six"));
     zlistx_sort (list);
     assert (streq ((char *) zlistx_last (list), "two"));
-        
+
+    //  Copying a list
     zlistx_t *copy = zlistx_dup (list);
     assert (copy);
     assert (zlistx_size (copy) == 10);

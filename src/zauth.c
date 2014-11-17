@@ -31,9 +31,9 @@
 typedef struct {
     zsock_t *pipe;              //  Actor command pipe
     zsock_t *handler;           //  ZAP handler socket
-    zhash_t *whitelist;         //  Whitelisted addresses
-    zhash_t *blacklist;         //  Blacklisted addresses
-    zhash_t *passwords;         //  PLAIN passwords, if loaded
+    zhashx_t *whitelist;        //  Whitelisted addresses
+    zhashx_t *blacklist;        //  Blacklisted addresses
+    zhashx_t *passwords;        //  PLAIN passwords, if loaded
     zpoller_t *poller;          //  Socket poller
     zcertstore_t *certstore;    //  CURVE certificate store, if loaded
     bool allow_any;             //  CURVE allows arbitrary clients
@@ -47,9 +47,9 @@ s_self_destroy (self_t **self_p)
     assert (self_p);
     if (*self_p) {
         self_t *self = *self_p;
-        zhash_destroy (&self->passwords);
-        zhash_destroy (&self->whitelist);
-        zhash_destroy (&self->blacklist);
+        zhashx_destroy (&self->passwords);
+        zhashx_destroy (&self->whitelist);
+        zhashx_destroy (&self->blacklist);
         zcertstore_destroy (&self->certstore);
         zpoller_destroy (&self->poller);
         if (self->handler) {
@@ -68,9 +68,9 @@ s_self_new (zsock_t *pipe)
     int rc = -1;
     if (self) {
         self->pipe = pipe;
-        self->whitelist = zhash_new ();
+        self->whitelist = zhashx_new ();
         if (self->whitelist)
-            self->blacklist = zhash_new ();
+            self->blacklist = zhashx_new ();
 
         //  Create ZAP handler and get ready for requests
         if (self->blacklist)
@@ -106,7 +106,7 @@ s_self_handle_pipe (self_t *self)
         while (address) {
             if (self->verbose)
                 zsys_info ("zauth: - whitelisting ipaddress=%s", address);
-            zhash_insert (self->whitelist, address, "OK");
+            zhashx_insert (self->whitelist, address, "OK");
             zstr_free (&address);
             address = zmsg_popstr (request);
         }
@@ -118,7 +118,7 @@ s_self_handle_pipe (self_t *self)
         while (address) {
             if (self->verbose)
                 zsys_info ("zauth: - blacklisting ipaddress=%s", address);
-            zhash_insert (self->blacklist, address, "OK");
+            zhashx_insert (self->blacklist, address, "OK");
             zstr_free (&address);
             address = zmsg_popstr (request);
         }
@@ -129,9 +129,9 @@ s_self_handle_pipe (self_t *self)
         //  Get password file and load into zhash table
         //  If the file doesn't exist we'll get an empty table
         char *filename = zmsg_popstr (request);
-        zhash_destroy (&self->passwords);
-        self->passwords = zhash_new ();
-        zhash_load (self->passwords, filename);
+        zhashx_destroy (&self->passwords);
+        self->passwords = zhashx_new ();
+        zhashx_load (self->passwords, filename);
         zstr_free (&filename);
         zsock_signal (self->pipe, 0);
     }
@@ -295,8 +295,8 @@ static bool
 s_authenticate_plain (self_t *self, zap_request_t *request)
 {
     if (self->passwords) {
-        zhash_refresh (self->passwords);
-        char *password = (char *) zhash_lookup (self->passwords, request->username);
+        zhashx_refresh (self->passwords);
+        char *password = (char *) zhashx_lookup (self->passwords, request->username);
         if (password && streq (password, request->password)) {
             if (self->verbose)
                 zsys_info ("zauth: - allowed (PLAIN) username=%s password=%s",
@@ -360,8 +360,8 @@ s_self_authenticate (self_t *self)
         bool allowed = false;
         bool denied = false;
 
-        if (zhash_size (self->whitelist)) {
-            if (zhash_lookup (self->whitelist, request->address)) {
+        if (zhashx_size (self->whitelist)) {
+            if (zhashx_lookup (self->whitelist, request->address)) {
                 allowed = true;
                 if (self->verbose)
                     zsys_info ("zauth: - passed (whitelist) address=%s", request->address);
@@ -373,8 +373,8 @@ s_self_authenticate (self_t *self)
             }
         }
         else
-        if (zhash_size (self->blacklist)) {
-            if (zhash_lookup (self->blacklist, request->address)) {
+        if (zhashx_size (self->blacklist)) {
+            if (zhashx_lookup (self->blacklist, request->address)) {
                 denied = true;
                 if (self->verbose)
                     zsys_info ("zauth: - denied (blacklist) address=%s", request->address);

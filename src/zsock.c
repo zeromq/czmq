@@ -543,7 +543,7 @@ zsock_type_str (zsock_t *self)
 //      b = byte *, size_t (2 arguments)
 //      c = zchunk_t *
 //      f = zframe_t *
-//      h = zhash_t *
+//      h = zhashx_t *
 //      p = void * (sends the pointer value, only meaningful over inproc)
 //      m = zmsg_t * (sends all frames in the zmsg)
 //      z = sends zero-sized frame (0 arguments)
@@ -598,8 +598,8 @@ zsock_send (void *self, const char *picture, ...)
         }
         else
         if (*picture == 'h') {
-            zhash_t *hash = va_arg (argptr, zhash_t *);
-            zframe_t *frame = zhash_pack (hash);
+            zhashx_t *hash = va_arg (argptr, zhashx_t *);
+            zframe_t *frame = zhashx_pack (hash);
             zmsg_append (msg, &frame);
         }
         else
@@ -638,7 +638,7 @@ zsock_send (void *self, const char *picture, ...)
 //      c = zchunk_t ** (creates zchunk)
 //      f = zframe_t ** (creates zframe)
 //      p = void ** (stores pointer)
-//      h = zhash_t ** (creates zhash)
+//      h = zhashx_t ** (creates zhashx)
 //      m = zmsg_t ** (creates a zmsg with the remaing frames)
 //      z = null, asserts empty frame (0 arguments)
 //
@@ -746,10 +746,10 @@ zsock_recv (void *self, const char *picture, ...)
         else
         if (*picture == 'h') {
             zframe_t *frame = zmsg_pop (msg);
-            zhash_t **hash_p = va_arg (argptr, zhash_t **);
+            zhashx_t **hash_p = va_arg (argptr, zhashx_t **);
             if (hash_p) {
                 if (frame)
-                    *hash_p = zhash_unpack (frame);
+                    *hash_p = zhashx_unpack (frame);
                 else
                     *hash_p = NULL;
             }
@@ -1447,11 +1447,11 @@ zsock_test (bool verbose)
     assert (chunk);
     zframe_t *frame = zframe_new ("WORLD", 5);
     assert (frame);
-    zhash_t *hash = zhash_new ();
+    zhashx_t *hash = zhashx_new ();
     assert (hash);
-    zhash_autofree (hash);
-    zhash_insert (hash, "1", "value A");
-    zhash_insert (hash, "2", "value B");
+    zhashx_autofree (hash);
+    zhashx_insert (hash, "1", "value A");
+    zhashx_insert (hash, "2", "value B");
     char *original = "pointer";
 
     //  We can send signed integers, strings, blocks of memory, chunks,
@@ -1469,7 +1469,7 @@ zsock_test (bool verbose)
                 -12345, "This is a string", "ABCDE", 5, chunk, frame, hash, original);
     zframe_destroy (&frame);
     zchunk_destroy (&chunk);
-    zhash_destroy (&hash);
+    zhashx_destroy (&hash);
     int integer;
     byte *data;
     size_t size;
@@ -1484,16 +1484,16 @@ zsock_test (bool verbose)
     assert (zchunk_size (chunk) == 5);
     assert (memcmp (zframe_data (frame), "WORLD", 5) == 0);
     assert (zframe_size (frame) == 5);
-    char *value = (char *) zhash_lookup (hash, "1");
+    char *value = (char *) zhashx_lookup (hash, "1");
     assert (streq (value, "value A"));
-    value = (char *) zhash_lookup (hash, "2");
+    value = (char *) zhashx_lookup (hash, "2");
     assert (streq (value, "value B"));
     assert (original == pointer);
     free (string);
     free (data);
     zframe_destroy (&frame);
     zchunk_destroy (&chunk);
-    zhash_destroy (&hash);
+    zhashx_destroy (&hash);
 
     //  Test zsock_recv of short message; this lets us return a failure
     //  with a status code and then nothing else; the receiver will get

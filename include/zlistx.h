@@ -116,6 +116,22 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zlistx_sort (zlistx_t *self);
     
+//  Create a new node and insert it into a sorted list. Calls the item
+//  duplicator, if any, on the item. If low_value is true, starts searching
+//  from the start of the list, otherwise searches from the end. Use the item
+//  comparator, if any, to find where to place the new node. Returns a handle
+//  to the new node, or NULL if memory was exhausted. Resets the cursor to the
+//  list head.
+CZMQ_EXPORT void *
+    zlistx_insert (zlistx_t *self, void *item, bool low_value);
+    
+//  Move an item, specified by handle, into position in a sorted list. Uses
+//  the item comparator, if any, to determine the new location. If low_value
+//  is true, starts searching from the start of the list, otherwise searches
+//  from the end.
+CZMQ_EXPORT void
+    zlistx_reorder (zlistx_t *self, void *handle, bool low_value);
+
 //  Make a copy of the list; items are duplicated if you set a duplicator
 //  for the list, otherwise not. Copying a null reference returns a null
 //  reference.
