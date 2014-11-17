@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zlist - generic type-free list container (deprecated)
+    zlist - simple generic list container
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:

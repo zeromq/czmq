@@ -13,7 +13,8 @@
 
 /*
 @header
-    zhashx is an expandable hash table container.
+    zhashx is an extended hash table container with more functionality than
+    zhash, its simpler cousin.
 @discuss
     The hash table always has a size that is prime and roughly doubles its
     size when 75% full. In case of hash collisions items are chained in a

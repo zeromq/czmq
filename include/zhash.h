@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zhash - generic type-free hash container (deprecated)
+    zhash - generic type-free hash container (simple)
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:

@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zhash - generic type-free hash container (deprecated)
+    zhash - simple generic hash container
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -13,8 +13,8 @@
 
 /*
 @header
-    zhash is an expandable hash table container. This is the deprecated V2
-    class. For new applications we recommend using zhashx.
+    zhash is an expandable hash table container. This is a simple container.
+    For heavy-duty applications we recommend using zhashx.
 @discuss
     Note that it's relatively slow (~50K insertions/deletes per second), so
     don't do inserts/updates on the critical path for message I/O. It can
