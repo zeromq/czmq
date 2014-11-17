@@ -576,6 +576,8 @@ typedef int SOCKET;
 #   define zmq_recvmsg      zmq_recv
 #   define zmq_ctx_new      zmq_init
 #   define zmq_ctx_term     zmq_term
+#   define zmq_msg_send(m,s,f)  zmq_sendmsg ((s),(m),(f))
+#   define zmq_msg_recv(m,s,f)  zmq_recvmsg ((s),(m),(f))
     //  Older libzmq APIs may be missing some aspects of libzmq v3.0
 #   ifndef ZMQ_ROUTER
 #       define ZMQ_ROUTER       ZMQ_XREP
