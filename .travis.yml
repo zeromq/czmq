@@ -3,7 +3,10 @@
 language: c
 
 env:
-- BUILD_TYPE=default
+- BUILD_TYPE=default ZMQ_REPO=zeromq2-x
+- BUILD_TYPE=default ZMQ_REPO=zeromq3-x
+- BUILD_TYPE=default ZMQ_REPO=zeromq4-x WITH_LIBSODIUM=1
+- BUILD_TYPE=default ZMQ_REPO=libzmq    WITH_LIBSODIUM=1
 - BUILD_TYPE=qt-android
 
 before_script:

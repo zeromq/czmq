@@ -1,33 +1,20 @@
 #!/usr/bin/env bash
 
 if [ $BUILD_TYPE == "default" ]; then
-    ./autogen.sh
+    # Build, check, and install libsodium if WITH_LIBSODIUM is set
+    if [ -n "$WITH_LIBSODIUM" ]; then
+        git clone git://github.com/jedisct1/libsodium.git &&
+        ( cd libsodium; ./autogen.sh && ./configure &&
+            make check && sudo make install && sudo ldconfig ) || exit 1
+    fi
 
-    # Perform regression test build against ZeroMQ v2.x
-    git clone git://github.com/zeromq/zeromq2-x.git &&
-    ( cd zeromq2-x; ./autogen.sh && ./configure && make check && sudo make install && sudo ldconfig ) &&
-    ./configure && make check &&
-    echo "*** CZMQ OK against ZeroMQ v2.x"
+    # Build, check, and install the version of ZeroMQ given by ZMQ_REPO
+    git clone git://github.com/zeromq/${ZMQ_REPO}.git &&
+    ( cd ${ZMQ_REPO}; ./autogen.sh && ./configure &&
+        make check && sudo make install && sudo ldconfig ) || exit 1
 
-    # Perform regression test build against ZeroMQ v3.x
-    git clone git://github.com/zeromq/zeromq3-x.git &&
-    ( cd zeromq3-x; ./autogen.sh && ./configure && make check && sudo make install && sudo ldconfig ) &&
-    ./configure && make check &&
-    echo "*** CZMQ OK against ZeroMQ v3.x"
-
-    # Perform regression test build against ZeroMQ v4.x + libsodium
-    git clone git://github.com/jedisct1/libsodium.git &&
-    ( cd libsodium; ./autogen.sh && ./configure && make check && sudo make install && sudo ldconfig ) &&
-    git clone git://github.com/zeromq/zeromq4-x.git &&
-    ( cd zeromq4-x; ./autogen.sh && ./configure && make check && sudo make install && sudo ldconfig ) &&
-    ./configure && make check &&
-    echo "*** CZMQ OK against ZeroMQ v4.x"
-
-    # Perform regression test build against ZeroMQ master + libsodium
-    git clone git://github.com/zeromq/libzmq.git &&
-    ( cd libzmq; ./autogen.sh && ./configure && make check && sudo make install && sudo ldconfig ) &&
-    ./configure && make check &&
-    echo "*** CZMQ OK against libzmq master"
+    # Build, check, and install CZMQ from local source
+    ./autogen.sh && ./configure && make check && sudo make install
 else
     cd ./builds/${BUILD_TYPE} && ./ci_build.sh
 fi
