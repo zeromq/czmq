@@ -19,8 +19,8 @@
     use strdup, strcmp, and zstr_free. To store custom objects, define your
     own duplicator and comparator, and use the standard object destructor.
 @discuss
-    This is a reworking of the old V2 list container. It is faster to insert
-    and delete items anywhere in the list, and to keep ordered lists.
+    This is a reworking of the simpler zlist container. It is faster to 
+    insert and delete items anywhere in the list, and to keep ordered lists.
 @end
 */
 
