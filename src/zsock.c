@@ -964,7 +964,7 @@ zsock_bsend (void *self, const char *picture, ...)
                 }
             }
             else
-                frames [nbr_frames++] = NULL;
+                frames [nbr_frames++] = zframe_new_empty ();
         }
         else {
             zsys_error ("zsock_bsend: invalid picptr element '%c'", *picptr);
@@ -1048,11 +1048,8 @@ zsock_bsend (void *self, const char *picture, ...)
     int frame_nbr;
     for (frame_nbr = 0; frame_nbr < nbr_frames; frame_nbr++) {
         bool more = frame_nbr < nbr_frames - 1;
-        if (frames [frame_nbr])
-            zframe_send (&frames [frame_nbr], handle,
-                         ZFRAME_REUSE + (more? ZFRAME_MORE: 0));
-        else
-            zmq_send (handle, NULL, 0, more? ZMQ_SNDMORE: 0);
+        zframe_send (&frames [frame_nbr], handle,
+                     ZFRAME_REUSE + (more? ZFRAME_MORE: 0));
     }
     return 0;
 }
