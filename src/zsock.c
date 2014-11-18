@@ -290,6 +290,7 @@ zsock_new_stream_ (const char *endpoints, const char *filename, size_t line_nbr)
 //  tcp://127.0.0.1:*                bind to first free port from C000 up
 //  tcp://127.0.0.1:!                bind to random port from C000 to FFFF
 //  tcp://127.0.0.1:*[60000-]        bind to first free port from 60000 up
+//  tcp://127.0.0.1:![-60000]   bind to random port from C000 to 60000
 //  tcp://127.0.0.1:![55000-55999]   bind to random port from 55000-55999
 //
 //  On success, returns the actual port number used, for tcp:// endpoints,
