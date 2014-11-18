@@ -26,7 +26,7 @@ CZMQ_EXPORT void
 
 //  Receive frame from socket, returns zframe_t object or NULL if the recv
 //  was interrupted. Does a blocking recv, if you want to not block then use
-//  zframe_recv_nowait().
+//  zpoller or zloop.
 CZMQ_EXPORT zframe_t *
     zframe_recv (void *source);
 
