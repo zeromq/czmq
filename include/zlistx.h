@@ -20,8 +20,6 @@ extern "C" {
 
 //  @interface
 
-CZMQ_EXPORT
-
 //  Create a new, empty list.
 CZMQ_EXPORT zlistx_t *
     zlistx_new (void);
