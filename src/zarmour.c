@@ -599,7 +599,7 @@ s_armour_test_long (zarmour_t *self, byte *test_data, size_t length, bool verbos
     free (test_string);
     assert (test_data2);
     assert (test_size == length + 1);
-    int i;
+    unsigned int i;
     for (i = 0; i < length; ++i) {
         assert (test_data2[i] == i);
     }

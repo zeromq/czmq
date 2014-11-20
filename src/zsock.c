@@ -897,7 +897,7 @@ zsock_bsend (void *self, const char *picture, ...)
 
     //  Pass 1: calculate total size of data frame
     size_t frame_size = 0;
-    uint max_frames = 32;               //  Arbitrary limit, for now
+    const uint max_frames = 32;         //  Arbitrary limit, for now
     zframe_t *frames [max_frames];      //  Non-data frames to send
     size_t nbr_frames = 0;              //  Size of this table
     va_list argptr;
@@ -1046,7 +1046,7 @@ zsock_bsend (void *self, const char *picture, ...)
     zmq_msg_send (&msg, handle, nbr_frames? ZMQ_SNDMORE: 0);
 
     //  Now send any additional frames
-    int frame_nbr;
+    unsigned int frame_nbr;
     for (frame_nbr = 0; frame_nbr < nbr_frames; frame_nbr++) {
         bool more = frame_nbr < nbr_frames - 1;
         zframe_send (&frames [frame_nbr], handle,
@@ -1559,7 +1559,7 @@ zsock_test (bool verbose)
     zframe_destroy (&frame);
     zmsg_destroy (&msg);
 
-    number1 = number2 = number4 = number8 = 0;
+    number8 = number4 = number2 = number1 = 0;
     char *longstr;
     zsock_brecv (reader, "1248sSpcfm",
                  &number1, &number2, &number4, &number8,
