@@ -74,11 +74,11 @@ extern "C" {
 //
 //  This is the zgossip constructor as a zactor_fn:
 //
-void
+CZMQ_EXPORT void
     zgossip (zsock_t *pipe, void *args);
 
 //  Self test of this class
-void
+CZMQ_EXPORT void
     zgossip_test (bool verbose);
 //  @end
 

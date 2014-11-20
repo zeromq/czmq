@@ -84,7 +84,11 @@ main (int argc, char *argv [])
     zthread_test (verbose);
 
     zsys_shutdown ();
+
+// In VS builds zsys_allocs causes an unresolved external error.
+#ifdef _MSC_VER
     printf ("Number of memory allocations=%" PRId64 "\n", zsys_allocs);
+#endif
 
     printf ("Tests passed OK\n");
     return 0;
