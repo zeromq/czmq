@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zmsg - working with multipart messages
 
     -------------------------------------------------------------------------
@@ -396,7 +396,7 @@ zmsg_popstr (zmsg_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Push encoded message as a new frame. Message takes ownership of 
+//  Push encoded message as a new frame. Message takes ownership of
 //  submessage, so the original is destroyed in this call. Returns 0 on
 //  success, -1 on error.
 
@@ -595,7 +595,7 @@ zmsg_encode (zmsg_t *self, byte **buffer)
             buffer_size += frame_size + 1 + 4;
         frame = zmsg_next (self);
     }
-    *buffer = (byte *) malloc (buffer_size);
+    *buffer = (byte *) zmalloc (buffer_size);
 
     if (*buffer) {
         //  Encode message now

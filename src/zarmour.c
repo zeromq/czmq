@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zarmour - armoured text encoding and decoding
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -66,7 +66,8 @@ zarmour_t *
 zarmour_new ()
 {
     zarmour_t *self = (zarmour_t *) zmalloc (sizeof (zarmour_t));
-    assert (self);
+    if (!self)
+        return NULL;
 
     //  Setup default as RFC4648 paragraph 4
     self->mode = ZARMOUR_MODE_BASE64_STD;
@@ -159,6 +160,9 @@ s_base64_encode (const byte *data, size_t length, const char *alphabet, bool pad
     size_t pad_chars = (pad && extra_chars)? 4 - extra_chars: 0;
     size_t str_chars = 4 * (length / 3) + extra_chars + pad_chars;
     char *str = (char *) zmalloc (str_chars + 1);
+    if (!str)
+        return NULL;
+
     char *enc = str;
     const byte *needle = data, *ceiling = data + length;
     while (needle < ceiling) {
@@ -234,6 +238,9 @@ s_base32_encode (const byte *data, size_t length, const char *alphabet, bool pad
     size_t pad_chars = (pad && extra_chars)? 8 - extra_chars: 0;
     size_t str_chars = 8 * (length / 5) + extra_chars + pad_chars;
     char *str = (char *) zmalloc (str_chars + 1);
+    if (!str)
+        return NULL;
+
     char *enc = str;
     const byte *needle = data, *ceiling = data + length;
     while (needle < ceiling) {
@@ -324,6 +331,9 @@ static char *
 s_base16_encode (const byte *data, size_t length, const char *alphabet)
 {
     char *str = (char *) zmalloc (2 * length + 1);
+    if (!str)
+        return NULL;
+
     char *enc = str;
     const byte *needle = data, *ceiling = data + length;
     while (needle < ceiling) {
@@ -382,6 +392,9 @@ zarmour_encode (zarmour_t *self, const byte *data, size_t data_size)
             break;
     }
 
+    if (!encoded)
+        return NULL;
+
     if (self->line_breaks && self->line_length > 0 && strlen (encoded) > self->line_length) {
         char *line_end = self->line_end;
         int nbr_lines = strlen (encoded) / self->line_length;
@@ -391,7 +404,9 @@ zarmour_encode (zarmour_t *self, const byte *data, size_t data_size)
         char *src = encoded;
         char *temp = encoded;
         encoded = (char *) zmalloc (new_length + 1);
-        assert (encoded);
+        if (!encoded)
+            return NULL;
+
         char *dest = encoded;
         while (strlen (src) >= self->line_length) {
             memcpy (dest, src, self->line_length);

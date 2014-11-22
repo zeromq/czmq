@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zsock - high-level socket API that hides libzmq contexts and sockets
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -897,7 +897,7 @@ zsock_bsend (void *self, const char *picture, ...)
 
     //  Pass 1: calculate total size of data frame
     size_t frame_size = 0;
-    const uint max_frames = 32;         //  Arbitrary limit, for now
+    uint max_frames = 32;         //  Arbitrary limit, for now
     zframe_t *frames [max_frames];      //  Non-data frames to send
     size_t nbr_frames = 0;              //  Size of this table
     va_list argptr;
@@ -1014,9 +1014,9 @@ zsock_bsend (void *self, const char *picture, ...)
             if (!string)
                 string = "";
             size_t string_size = strlen (string);
-            PUT_NUMBER1 (string_size); 
+            PUT_NUMBER1 (string_size);
             memcpy (needle, string, string_size);
-            needle += string_size; 
+            needle += string_size;
         }
         else
         if (*picptr == 'S') {
@@ -1086,7 +1086,7 @@ zsock_brecv (void *selfish, const char *picture, ...)
     zsock_t *self = (zsock_t *) selfish;
     if (zactor_is (selfish))
         self = zactor_sock ((zactor_t *) selfish);
-    
+
     if (!self->cache) {
         self->cache = (char *) malloc (512);
         self->cache_size = 512;
@@ -1149,16 +1149,16 @@ zsock_brecv (void *selfish, const char *picture, ...)
         else
         if (*picptr == 'S') {
             char **string_p = va_arg (argptr, char **);
-            size_t string_size; 
+            size_t string_size;
             GET_NUMBER4 (string_size);
             if (string_size > MAX_ALLOC_SIZE
             ||  needle + string_size > (ceiling))
-                goto malformed; 
+                goto malformed;
             *string_p = (char *) malloc (string_size + 1);
             assert (string_p);
             memcpy (*string_p, needle, string_size);
             (*string_p) [string_size] = 0;
-            needle += string_size; 
+            needle += string_size;
         }
         else
         if (*picptr == 'c') {
@@ -1587,7 +1587,7 @@ zsock_test (bool verbose)
 
     zsock_destroy (&reader);
     zsock_destroy (&writer);
-    
+
     //  @end
     printf ("OK\n");
 }

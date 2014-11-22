@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zsys - system-level methods
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -206,7 +206,7 @@ zsys_shutdown (void)
 {
     if (!s_initialized)
         return;
-    
+
     s_initialized = false;
 
     //  The atexit handler is called when the main function exits;
@@ -361,7 +361,7 @@ zsys_sockname (int socktype)
 
 //  --------------------------------------------------------------------------
 //  Create a pipe, which consists of two PAIR sockets connected over inproc.
-//  The pipe is configured to use the zsys_pipehwm setting. Returns the 
+//  The pipe is configured to use the zsys_pipehwm setting. Returns the
 //  frontend socket successful, NULL if failed.
 
 zsock_t *
@@ -735,7 +735,10 @@ char *
 zsys_vprintf (const char *format, va_list argptr)
 {
     int size = 256;
-    char *string = (char *) malloc (size);
+    char *string = (char *) zmalloc (size);
+    if (!string)
+        return NULL;
+
     //  Using argptr is destructive, so we take a copy each time we need it
     //  We define va_copy for Windows in czmq_prelude.h
     va_list my_argptr;
@@ -758,7 +761,7 @@ zsys_vprintf (const char *format, va_list argptr)
     if (required >= size) {
         size = required + 1;
         free (string);
-        string = (char *) malloc (size);
+        string = (char *) zmalloc (size);
         if (string) {
             va_copy (my_argptr, argptr);
             vsnprintf (string, size, format, my_argptr);
@@ -855,7 +858,7 @@ zsys_udp_recv (SOCKET udpsock, char *peername)
         buffer, UDP_FRAME_MAX,
         0,      //  Flags
         (struct sockaddr *) &address, &address_len);
-    
+
     if (size == SOCKET_ERROR)
         zsys_socket_error ("recvfrom");
 

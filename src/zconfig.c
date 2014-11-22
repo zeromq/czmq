@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -641,6 +641,9 @@ s_collect_name (char **start, int lineno)
 
     size_t length = *start - readptr;
     char *name = (char *) zmalloc (length + 1);
+    if (!name)
+        return NULL;
+
     memcpy (name, readptr, length);
     name [length] = 0;
 
@@ -696,6 +699,9 @@ s_collect_value (char **start, int lineno)
             if (endquote) {
                 size_t value_length = endquote - readptr - 1;
                 value = (char *) zmalloc (value_length + 1);
+                if (!value)
+                    return NULL;
+
                 memcpy (value, readptr + 1, value_length);
                 value [value_length] = 0;
                 rc = s_verify_eoln (endquote + 1, lineno);

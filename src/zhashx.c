@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zhashx - extended generic hash container
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -676,6 +676,9 @@ zhashx_load (zhashx_t *self, const char *filename)
 
     //  Take copy of filename in case self->filename is same string.
     char *filename_copy = strdup (filename);
+    if (!filename_copy)
+        return -1;
+
     free (self->filename);
     self->filename = filename_copy;
     self->modified = zsys_file_modified (self->filename);
@@ -684,6 +687,9 @@ zhashx_load (zhashx_t *self, const char *filename)
         return -1;              //  Failed to open file for reading
 
     char *buffer = (char *) zmalloc (1024);
+    if (!buffer)
+        return -1;
+
     while (fgets (buffer, 1024, handle)) {
         //  Skip lines starting with "#" or that do not look like
         //  name=value data.

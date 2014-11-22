@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zfile - provides methods to work with files in a portable fashion.
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -67,8 +67,11 @@ zfile_new (const char *path, const char *name)
         //  Format full path to file
         if (path) {
             self->fullname = (char *) zmalloc (strlen (path) + strlen (name) + 2);
-            if (self->fullname)
-                sprintf (self->fullname, "%s/%s", path, name);
+            if (!self->fullname) {
+                zfile_destroy (&self);
+                return NULL;
+            }
+            sprintf (self->fullname, "%s/%s", path, name);
         }
         else
             self->fullname = strdup (name);
@@ -359,7 +362,7 @@ zfile_output (zfile_t *self)
     char *last_slash = strrchr (file_path, '/');
     if (last_slash)
         *last_slash = 0;
-        
+
     rc = zsys_dir_create (file_path);
     free (file_path);
     if (rc != 0) {

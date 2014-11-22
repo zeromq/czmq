@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zstr - sending and receiving strings
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -67,11 +67,8 @@ zstr_recv (void *source)
     if (zmq_recvmsg (handle, &message, 0) < 0)
         return NULL;
 
-    size_t size = zmq_msg_size (&message);
-    char *string = (char *) malloc (size + 1);
-    memcpy (string, zmq_msg_data (&message), size);
+    char *string = strndup (zmq_msg_data (&message), zmq_msg_size (&message));
     zmq_msg_close (&message);
-    string [size] = 0;
     return string;
 }
 
@@ -230,11 +227,8 @@ zstr_recv_nowait (void *dest)
     if (zmq_recvmsg (handle, &message, ZMQ_DONTWAIT) < 0)
         return NULL;
 
-    size_t size = zmq_msg_size (&message);
-    char *string = (char *) malloc (size + 1);
-    memcpy (string, zmq_msg_data (&message), size);
+    char *string = strndup (zmq_msg_data (&message), zmq_msg_size (&message));
     zmq_msg_close (&message);
-    string [size] = 0;
     return string;
 }
 

@@ -9,8 +9,6 @@ SYNOPSIS
 --------
 ----
 
-CZMQ_EXPORT
-
 //  Create a new, empty list.
 CZMQ_EXPORT zlistx_t *
     zlistx_new (void);
@@ -86,17 +84,13 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT int
     zlistx_delete (zlistx_t *self, void *handle);
     
-//  Move an item to the start of the list, via its handle. If sorted is true,
-//  the item is inserted before the first item with a higher value, determined
-//  by the item comparator (or item value if no comparator is set).
+//  Move an item to the start of the list, via its handle.
 CZMQ_EXPORT void
-    zlistx_move_start (zlistx_t *self, void *handle, bool sorted);
+    zlistx_move_start (zlistx_t *self, void *handle);
 
-//  Move an item to the end of the list, via its handle. If sorted is true,
-//  the item is inserted after the last item with a lower value, determined
-//  by the item comparator (or item value if no comparator is set).
+//  Move an item to the end of the list, via its handle.
 CZMQ_EXPORT void
-    zlistx_move_end (zlistx_t *self, void *handle, bool sorted);
+    zlistx_move_end (zlistx_t *self, void *handle);
 
 //  Remove all items from the list, and destroy them if the item destructor
 //  is set.
@@ -109,6 +103,22 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zlistx_sort (zlistx_t *self);
     
+//  Create a new node and insert it into a sorted list. Calls the item
+//  duplicator, if any, on the item. If low_value is true, starts searching
+//  from the start of the list, otherwise searches from the end. Use the item
+//  comparator, if any, to find where to place the new node. Returns a handle
+//  to the new node, or NULL if memory was exhausted. Resets the cursor to the
+//  list head.
+CZMQ_EXPORT void *
+    zlistx_insert (zlistx_t *self, void *item, bool low_value);
+    
+//  Move an item, specified by handle, into position in a sorted list. Uses
+//  the item comparator, if any, to determine the new location. If low_value
+//  is true, starts searching from the start of the list, otherwise searches
+//  from the end.
+CZMQ_EXPORT void
+    zlistx_reorder (zlistx_t *self, void *handle, bool low_value);
+
 //  Make a copy of the list; items are duplicated if you set a duplicator
 //  for the list, otherwise not. Copying a null reference returns a null
 //  reference.
@@ -146,8 +156,8 @@ into CZMQ and standard C semantics, so e.g. for string items you can
 use strdup, strcmp, and zstr_free. To store custom objects, define your
 own duplicator and comparator, and use the standard object destructor.
 
-This is a reworking of the old V2 list container. It is faster to insert
-and delete items anywhere in the list, and to keep ordered lists.
+This is a reworking of the simpler zlist container. It is faster to 
+insert and delete items anywhere in the list, and to keep ordered lists.
 
 EXAMPLE
 -------
@@ -222,15 +232,16 @@ zlistx_sort (list);
 assert (streq ((char *) zlistx_first (list), "eight"));
 assert (streq ((char *) zlistx_last (list), "two"));
 
-//  Try moving items around
+//  Moving items around
 handle = zlistx_find (list, "six");
-zlistx_move_start (list, handle, false);
+zlistx_move_start (list, handle);
 assert (streq ((char *) zlistx_first (list), "six"));
-zlistx_move_end (list, handle, false);
+zlistx_move_end (list, handle);
 assert (streq ((char *) zlistx_last (list), "six"));
 zlistx_sort (list);
 assert (streq ((char *) zlistx_last (list), "two"));
-    
+
+//  Copying a list
 zlistx_t *copy = zlistx_dup (list);
 assert (copy);
 assert (zlistx_size (copy) == 10);

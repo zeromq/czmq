@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zdir - work with file-system directories
 
     -------------------------------------------------------------------------
@@ -122,9 +122,12 @@ zdir_new (const char *path, const char *parent)
             self->path = strdup (path);
         }
         else {
-            self->path = (char *) malloc (strlen (path) + strlen (parent) + 2);
-            if (self->path)
-                sprintf (self->path, "%s/%s", parent, path);
+            self->path = (char *) zmalloc (strlen (path) + strlen (parent) + 2);
+            if (!self->path) {
+                zdir_destroy (&self);
+                return NULL;
+            }
+            sprintf (self->path, "%s/%s", parent, path);
         }
     }
     else
