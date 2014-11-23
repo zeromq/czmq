@@ -99,7 +99,7 @@ zstr_sendm (void *dest, const char *string)
 {
     assert (dest);
     assert (string);
-    return s_send_string (dest, true, string ? (char *) string : "");
+    return s_send_string (dest, true, (char *) string);
 }
 
 

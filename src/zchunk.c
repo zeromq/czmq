@@ -148,7 +148,7 @@ zchunk_set (zchunk_t *self, const void *data, size_t size)
     if (size > self->max_size)
         size = self->max_size;
     if (data)
-        memmove (self->data, data, size);
+        memcpy (self->data, data, size);
 
     self->size = size;
     return size;

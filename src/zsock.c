@@ -697,7 +697,7 @@ zsock_recv (void *self, const char *picture, ...)
             if (data_p) {
                 if (frame) {
                     *size = zframe_size (frame);
-                    *data_p = (byte *) zmalloc (*size);
+                    *data_p = (byte *) malloc (*size);
                     memcpy (*data_p, zframe_data (frame), *size);
                 }
                 else {
@@ -1088,7 +1088,7 @@ zsock_brecv (void *selfish, const char *picture, ...)
         self = zactor_sock ((zactor_t *) selfish);
 
     if (!self->cache) {
-        self->cache = (char *) zmalloc (512);
+        self->cache = (char *) malloc (512);
         self->cache_size = 512;
     }
     //  Last received strings are cached per socket

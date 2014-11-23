@@ -298,16 +298,18 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
     //  done only when the caller passes a filename/line_nbr
     if (filename) {
         s_sockref_t *sockref = (s_sockref_t *) zmalloc (sizeof (s_sockref_t));
-        if (!sockref) {
+        if (sockref) {
+            sockref->handle = handle;
+            sockref->type = type;
+            sockref->filename = filename;
+            sockref->line_nbr = line_nbr;
+            zlistx_add_end (s_sockref_list, sockref);
+        }
+        else {
             zmq_close (handle);
             ZMUTEX_UNLOCK (s_mutex);
             return NULL;
         }
-        sockref->handle = handle;
-        sockref->type = type;
-        sockref->filename = filename;
-        sockref->line_nbr = line_nbr;
-        zlistx_add_end (s_sockref_list, sockref);
     }
     s_open_sockets++;
     ZMUTEX_UNLOCK (s_mutex);
