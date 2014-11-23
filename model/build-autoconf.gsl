@@ -64,6 +64,17 @@ src_lib$(project.name)_la_LDFLAGS += \\
     -avoid-version
 endif
 
+.if count(package_dependency, defined(package_dependency.for_lib) | defined (package_dependency.for_all)) > 0
+src_lib$(project.name)_la_LIBS = \\
+.for package_dependency where defined (package_dependency.for_lib) | defined (package_dependency.for_all)
+.   if last()
+    \${$(package_dependency.name)_LIBS}
+.   else
+    \${$(package_dependency.name)_LIBS} \\
+.   endif
+.endfor
+.endif
+
 check_PROGRAMS += src/$(project.name)_selftest
 
 src_$(project.name)_selftest_CPPFLAGS = \\
@@ -83,14 +94,25 @@ src_$(project.name)_selftest_LDADD = \\
     \${$(package_dependency.name)_LIBS}
 .   else
     \${$(package_dependency.name)_LIBS} \\
-.endif
+.   endif
 .endfor
-
 
 src_$(project.name)_selftest_SOURCES = \\
     src/$(project.name)_selftest.c
 
 TESTS = src/$(project.name)_selftest
+
+# Run the selftest binary under valgrind to check for memory leaks
+memcheck: src/$(project.name)_selftest
+	libtool --mode=execute valgrind --tool=memcheck \\
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \\
+		--suppressions=$\(srcdir)/src/.valgrind.supp \\
+		$\(srcdir)/src/$(project.name)_selftest
+
+# Run the selftest binary under gdb for debugging
+debug: src/$(project.name)_selftest
+	libtool --mode=execute gdb -q \\
+		$\(srcdir)/src/$(project.name)_selftest
 .for model
 .   if first ()
 

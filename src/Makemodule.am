@@ -111,6 +111,9 @@ src_libczmq_la_LDFLAGS += \
     -avoid-version
 endif
 
+src_libczmq_la_LIBS = \
+    ${zmq_LIBS}
+
 check_PROGRAMS += src/czmq_selftest
 
 src_czmq_selftest_CPPFLAGS = \
@@ -120,20 +123,10 @@ src_czmq_selftest_LDADD = \
     src/libczmq.la \
     ${zmq_LIBS}
 
-
 src_czmq_selftest_SOURCES = \
     src/czmq_selftest.c
 
 TESTS = src/czmq_selftest
-
-# define custom target for all products of /src
-src: src/libczmq.la src/czmq_selftest
-
-# Produce generated models; do this manually in src directory
-code:
-	cd $(srcdir)/src; gsl -q sockopts.xml
-	cd $(srcdir)/src; gsl -q zgossip.xml
-	cd $(srcdir)/src; gsl -q zgossip_msg.xml
 
 # Run the selftest binary under valgrind to check for memory leaks
 memcheck: src/czmq_selftest
@@ -146,6 +139,15 @@ memcheck: src/czmq_selftest
 debug: src/czmq_selftest
 	libtool --mode=execute gdb -q \
 		$(srcdir)/src/czmq_selftest
+
+# define custom target for all products of /src
+src: src/libczmq.la src/czmq_selftest
+
+# Produce generated models; do this manually in src directory
+code:
+	cd $(srcdir)/src; gsl -q sockopts.xml
+	cd $(srcdir)/src; gsl -q zgossip.xml
+	cd $(srcdir)/src; gsl -q zgossip_msg.xml
 
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
