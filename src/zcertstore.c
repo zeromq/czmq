@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zcertstore - work with CURVE security certificate stores
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -74,6 +74,10 @@ zcertstore_new (const char *location)
         zhashx_set_destructor (self->certs, (czmq_destructor *) zcert_destroy);
         if (location) {
             self->location = strdup (location);
+            if (!self->location) {
+                zcertstore_destroy (&self);
+                return NULL;
+            }
             s_load_certs_from_disk (self);
         }
     }
@@ -93,6 +97,7 @@ s_load_certs_from_disk (zcertstore_t *self)
     if (dir) {
         //  Load all certificates including those in subdirectories
         zfile_t **filelist = zdir_flatten (dir);
+        assert (*filelist);
         zrex_t *rex = zrex_new ("_secret$");
         assert (rex);
 

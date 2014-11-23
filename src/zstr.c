@@ -89,14 +89,15 @@ zstr_send (void *dest, const char *string)
 
 //  --------------------------------------------------------------------------
 //  Send a C string to a socket, as zstr_send(), with a MORE flag, so that
-//  you can send further strings in the same multi-part message.
+//  you can send further strings in the same multi-part message. String
+//  may be NULL, which is sent as "".
 
 int
 zstr_sendm (void *dest, const char *string)
 {
     assert (dest);
     assert (string);
-    return s_send_string (dest, true, (char *) string);
+    return s_send_string (dest, true, string ? (char *) string : "");
 }
 
 
@@ -114,6 +115,9 @@ zstr_sendf (void *dest, const char *format, ...)
     va_list argptr;
     va_start (argptr, format);
     char *string = zsys_vprintf (format, argptr);
+    if (!string)
+        return -1;
+
     va_end (argptr);
 
     int rc = s_send_string (dest, false, string);
@@ -136,6 +140,9 @@ zstr_sendfm (void *dest, const char *format, ...)
     va_list argptr;
     va_start (argptr, format);
     char *string = zsys_vprintf (format, argptr);
+    if (!string)
+        return -1;
+
     va_end (argptr);
 
     int rc = s_send_string (dest, true, string);

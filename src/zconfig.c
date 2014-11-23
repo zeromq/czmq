@@ -370,7 +370,9 @@ zconfig_load (const char *filename)
     //  Load entire file into memory as a chunk, then process it
     zconfig_t *self = NULL;
     zfile_t *file = zfile_new (NULL, filename);
-    assert (file);
+    if (!file)
+        return NULL;
+
     if (zfile_input (file) == 0) {
         zchunk_t *chunk = zfile_read (file, zfile_cursize (file), 0);
         if (chunk) {
@@ -416,7 +418,8 @@ zconfig_save (zconfig_t *self, const char *filename)
 
 //  Save an item, polymorphic: if arg is a zchunk_t *, appends the
 //  data to the chunk; else if arg is not null, writes data to the
-//  arg as FILE *. If arg is null, stores nothing. Returns data size.
+//  arg as FILE *. If arg is null, stores nothing. Returns data size,
+//  or -1 if memory is exhausted.
 
 static int
 s_config_printf (zconfig_t *self, void *arg, char *format, ...)
@@ -425,6 +428,8 @@ s_config_printf (zconfig_t *self, void *arg, char *format, ...)
     va_start (argptr, format);
     char *string = zsys_vprintf (format, argptr);
     va_end (argptr);
+    if (!string)
+        return -1;
 
     if (arg) {
         if (zchunk_is (arg))
@@ -513,7 +518,9 @@ zconfig_chunk_load (zchunk_t *chunk)
 {
     //  Parse the chunk line by line
     zconfig_t *self = zconfig_new ("root", NULL);
-    assert (self);
+    if (!self)
+        return NULL;
+
     bool valid = true;
     int lineno = 0;
     char *data_ptr = (char *) zchunk_data (chunk);

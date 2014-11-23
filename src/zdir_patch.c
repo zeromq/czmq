@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zdir_patch - work with directory patches
     A patch is a change to the directory (create/delete).
 
@@ -63,6 +63,10 @@ zdir_patch_new (const char *path, zfile_t *file,
     }
     assert (*filename != '/');
     self->vpath = (char *) zmalloc (strlen (alias) + strlen (filename) + 2);
+    if (!self->vpath) {
+        zdir_patch_destroy (&self);
+        return NULL;
+    }
     if (alias [strlen (alias) - 1] == '/')
         sprintf (self->vpath, "%s%s", alias, filename);
     else
@@ -171,8 +175,11 @@ void
 zdir_patch_digest_set (zdir_patch_t *self)
 {
     if (  self->op == patch_create
-       && self->digest == NULL)
+       && self->digest == NULL) {
         self->digest = strdup (zfile_digest (self->file));
+        assert (self->digest);
+    }
+
 }
 
 

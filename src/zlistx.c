@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zlistx - extended generic list container
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -19,7 +19,7 @@
     use strdup, strcmp, and zstr_free. To store custom objects, define your
     own duplicator and comparator, and use the standard object destructor.
 @discuss
-    This is a reworking of the simpler zlist container. It is faster to 
+    This is a reworking of the simpler zlist container. It is faster to
     insert and delete items anywhere in the list, and to keep ordered lists.
 @end
 */
@@ -111,6 +111,10 @@ zlistx_new (void)
     zlistx_t *self = (zlistx_t *) zmalloc (sizeof (zlistx_t));
     if (self) {
         self->head = s_node_new (NULL);
+        if (!self->head) {
+            zlistx_destroy (&self);
+            return NULL;
+        }
         self->cursor = self->head;
         self->comparator = s_comparator;
     }
@@ -146,7 +150,7 @@ zlistx_add_start (zlistx_t *self, void *item)
 {
     assert (self);
     assert (item);
-    
+
     if (self->duplicator) {
         item = (self->duplicator)(item);
         if (!item)
@@ -175,7 +179,7 @@ zlistx_add_end (zlistx_t *self, void *item)
 {
     assert (self);
     assert (item);
-    
+
     if (self->duplicator) {
         item = (self->duplicator)(item);
         if (!item)
@@ -634,7 +638,7 @@ zlistx_test (int verbose)
     assert (streq (string, "world"));
     free (string);
     assert (zlistx_size (list) == 0);
-    
+
     //  Check next/back work
     //  Now populate the list with items
     zlistx_add_start (list, "five");
@@ -647,7 +651,7 @@ zlistx_test (int verbose)
     zlistx_add_end   (list, "nine");
     zlistx_add_start (list, "one");
     zlistx_add_end   (list, "ten");
-    
+
     //  Test our navigation skills
     assert (zlistx_size (list) == 10);
     assert (streq ((char *) zlistx_last (list), "ten"));

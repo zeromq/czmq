@@ -297,7 +297,12 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
     //  Add socket to reference tracker so we can report leaks; this is
     //  done only when the caller passes a filename/line_nbr
     if (filename) {
-        s_sockref_t *sockref = (s_sockref_t *) malloc (sizeof (s_sockref_t));
+        s_sockref_t *sockref = (s_sockref_t *) zmalloc (sizeof (s_sockref_t));
+        if (!sockref) {
+            zmq_close (handle);
+            ZMUTEX_UNLOCK (s_mutex);
+            return NULL;
+        }
         sockref->handle = handle;
         sockref->type = type;
         sockref->filename = filename;
@@ -609,6 +614,8 @@ zsys_dir_create (const char *pathname, ...)
     va_start (argptr, pathname);
     char *formatted = zsys_vprintf (pathname, argptr);
     va_end (argptr);
+    if (!formatted)
+        return -1;
 
     //  Create parent directory levels if needed
     char *slash = strchr (formatted + 1, '/');
@@ -651,6 +658,8 @@ zsys_dir_delete (const char *pathname, ...)
     va_start (argptr, pathname);
     char *formatted = zsys_vprintf (pathname, argptr);
     va_end (argptr);
+    if (!formatted)
+        return -1;
 
 #if (defined (__WINDOWS__))
     int rc = RemoveDirectoryA (formatted) ? 0 : -1;
@@ -1291,6 +1300,7 @@ zsys_set_interface (const char *value)
     zsys_init ();
     free (s_interface);
     s_interface = strdup (value);
+    assert (s_interface);
 }
 
 
@@ -1321,6 +1331,7 @@ zsys_set_logident (const char *value)
 #elif defined (__WINDOWS__)
     //  TODO: hook in Windows event log for Windows
 #endif
+    assert (s_logident);
 }
 
 

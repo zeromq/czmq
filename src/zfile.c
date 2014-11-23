@@ -88,6 +88,11 @@ zfile_new (const char *path, const char *name)
                         if (buffer [strlen (buffer) - 1] == '\n')
                             buffer [strlen (buffer) - 1] = 0;
                         self->link = strdup (buffer);
+                        if (!self->link) {
+                            fclose (handle);
+                            zfile_destroy (&self);
+                            return NULL;
+                        }
                         //  Chop ".ln" off name for external use
                         self->fullname [strlen (self->fullname) - 3] = 0;
                     }
@@ -352,16 +357,19 @@ zfile_output (zfile_t *self)
     int rc;
     assert (self);
 
+    //  Create file path if it doesn't exist
+    char *file_path = strdup (self->fullname);
+    if (!file_path)
+        return -1;
+    char *last_slash = strrchr (file_path, '/');
+    if (last_slash)
+        *last_slash = 0;
+
     //  Wipe symbolic link if that's what the file was
     if (self->link) {
         free (self->link);
         self->link = NULL;
     }
-    //  Create file path if it doesn't exist
-    char *file_path = strdup (self->fullname);
-    char *last_slash = strrchr (file_path, '/');
-    if (last_slash)
-        *last_slash = 0;
 
     rc = zsys_dir_create (file_path);
     free (file_path);

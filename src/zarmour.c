@@ -76,6 +76,10 @@ zarmour_new ()
     self->line_breaks = false;
     self->line_length = 72;
     self->line_end = strdup ("\n");
+    if (!self->line_end) {
+        zarmour_destroy (&self);
+        return NULL;
+    }
 
     return self;
 }
@@ -295,6 +299,9 @@ s_base32_decode (const char *data, size_t *size, const char *alphabet, int lineb
     }
     *size = 5 * (length / 8) + extra_bytes + 1;
     byte *bytes = (byte *) zmalloc (*size);
+    if (!bytes)
+        return NULL;
+
     byte *dec = bytes;
     byte i1, i2, i3, i4, i5, i6, i7, i8;
     while (needle < ceiling) {
@@ -352,6 +359,9 @@ s_base16_decode (const char *data, size_t *size, const char *alphabet, int lineb
     length -= linebreakchars;
     *size = length / 2 + 1;
     byte *bytes = (byte *) zmalloc (*size);
+    if (!bytes)
+        return NULL;
+
     byte *dec = bytes;
     byte i1, i2;
     while (needle < ceiling) {
@@ -403,7 +413,7 @@ zarmour_encode (zarmour_t *self, const byte *data, size_t data_size)
             strlen (encoded) % self->line_length;
         char *src = encoded;
         char *temp = encoded;
-        encoded = (char *) zmalloc (new_length + 1);
+        encoded = (char *) realloc (new_length + 1);
         if (!encoded)
             return NULL;
 

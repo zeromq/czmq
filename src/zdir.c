@@ -120,6 +120,10 @@ zdir_new (const char *path, const char *parent)
         if (streq (parent, "-")) {
             self->trimmed = true;
             self->path = strdup (path);
+            if (!self->path) {
+                zdir_destroy (&self);
+                return NULL;
+            }
         }
         else {
             self->path = (char *) zmalloc (strlen (path) + strlen (parent) + 2);
@@ -130,8 +134,13 @@ zdir_new (const char *path, const char *parent)
             sprintf (self->path, "%s/%s", parent, path);
         }
     }
-    else
+    else {
         self->path = strdup (path);
+        if (!self->path) {
+            zdir_destroy (&self);
+            return NULL;
+        }
+    }
 
     if (self->path)
         self->files = zlist_new ();
@@ -155,7 +164,7 @@ zdir_new (const char *path, const char *parent)
         self->path [strlen (self->path) - 1] = 0;
 
     //  Win32 wants a wildcard at the end of the path
-    char *wildcard = (char *) malloc (strlen (self->path) + 3);
+    char *wildcard = (char *) zmalloc (strlen (self->path) + 3);
     if (!wildcard) {
         zdir_destroy (&self);
         return NULL;
@@ -182,7 +191,11 @@ zdir_new (const char *path, const char *parent)
         //  Calculate system-specific size of dirent block
         int dirent_size = offsetof (struct dirent, d_name)
                           + pathconf (self->path, _PC_NAME_MAX) + 1;
-        struct dirent *entry = (struct dirent *) malloc (dirent_size);
+        struct dirent *entry = (struct dirent *) zmalloc (dirent_size);
+        if (!entry) {
+            zdir_destroy (&self);
+            return NULL;
+        }
         struct dirent *result;
 
         int rc = readdir_r (handle, entry, &result);

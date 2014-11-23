@@ -845,7 +845,11 @@ zhashx_unpack (zframe_t *frame)
                 needle += 4;
                 //  Be wary of malformed frames
                 if (needle + value_size <= ceiling) {
-                    char *value = (char *) malloc (value_size + 1);
+                    char *value = (char *) zmalloc (value_size + 1);
+                    if (!value) {
+                        zhashx_destroy (&self);
+                        return NULL;
+                    }
                     memcpy (value, needle, value_size);
                     value [value_size] = 0;
                     needle += value_size;
