@@ -164,7 +164,7 @@ zhash_insert (zhash_t *self, const char *key, void *value)
         //  Create new hash table
         size_t new_limit = self->limit * GROWTH_FACTOR / 100;
         item_t **new_items = (item_t **) zmalloc (sizeof (item_t *) * new_limit);
-        if (!*new_items)
+        if (!new_items)
             return -1;
 
         //  Move all items to the new hash table, rehashing to

@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zbeacon - LAN discovery and presence
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -94,7 +94,7 @@ s_self_prepare_udp (self_t *self)
     self->udpsock = zsys_udp_new (false);
     if (self->udpsock == INVALID_SOCKET)
         return;
-    
+
     //  Get the network interface fro ZSYS_INTERFACE or else use first
     //  broadcast interface defined on system. ZSYS_INTERFACE=* means
     //  use INADDR_ANY + INADDR_BROADCAST.
@@ -333,7 +333,7 @@ zbeacon_test (bool verbose)
 
     zsock_send (speaker, "si", "CONFIGURE", 9999);
     char *hostname = zstr_recv (speaker);
-    if (!*hostname) {
+    if (!hostname) {
         printf ("OK (skipping test, no UDP broadcasting)\n");
         zactor_destroy (&speaker);
         free (hostname);

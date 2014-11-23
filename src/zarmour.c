@@ -200,6 +200,9 @@ s_base64_decode (const char *data, size_t *size, const char *alphabet, int lineb
     length -= linebreakchars;
     *size = 3 * (length / 4) + ((length % 4)? length % 4 - 1 : 0) + 1;
     byte *bytes = (byte *) zmalloc (*size);
+    if (!bytes)
+        return NULL;
+
     byte *dec = bytes;
     byte i1, i2, i3, i4;
     while (needle < ceiling) {
@@ -413,9 +416,7 @@ zarmour_encode (zarmour_t *self, const byte *data, size_t data_size)
             strlen (encoded) % self->line_length;
         char *src = encoded;
         char *temp = encoded;
-        encoded = (char *) realloc (new_length + 1);
-        if (!encoded)
-            return NULL;
+        encoded = (char *) zmalloc (new_length + 1);
 
         char *dest = encoded;
         while (strlen (src) >= self->line_length) {

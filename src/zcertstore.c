@@ -97,7 +97,7 @@ s_load_certs_from_disk (zcertstore_t *self)
     if (dir) {
         //  Load all certificates including those in subdirectories
         zfile_t **filelist = zdir_flatten (dir);
-        assert (*filelist);
+        assert (filelist);
         zrex_t *rex = zrex_new ("_secret$");
         assert (rex);
 
