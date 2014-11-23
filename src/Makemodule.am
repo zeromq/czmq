@@ -109,6 +109,8 @@ if ON_MINGW
 src_libczmq_la_LDFLAGS += \
     -no-undefined \
     -avoid-version
+src_libczmq_la_LIBADD = \
+    ${zmq_LIBS}
 endif
 
 check_PROGRAMS += src/czmq_selftest
