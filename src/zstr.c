@@ -238,7 +238,7 @@ zstr_recv_nowait (void *dest)
 
     void *msg_data  = zmq_msg_data (&message);
     size_t msg_size = zmq_msg_size (&message);
-    char *string = strndup ((const char *) data, msg_size);
+    char *string = strndup ((const char *) msg_data, msg_size);
     zmq_msg_close (&message);
     return string;
 }
