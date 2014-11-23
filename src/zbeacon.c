@@ -333,7 +333,7 @@ zbeacon_test (bool verbose)
 
     zsock_send (speaker, "si", "CONFIGURE", 9999);
     char *hostname = zstr_recv (speaker);
-    if (!hostname) {
+    if (!*hostname) {
         printf ("OK (skipping test, no UDP broadcasting)\n");
         zactor_destroy (&speaker);
         free (hostname);

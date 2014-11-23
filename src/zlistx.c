@@ -111,12 +111,13 @@ zlistx_new (void)
     zlistx_t *self = (zlistx_t *) zmalloc (sizeof (zlistx_t));
     if (self) {
         self->head = s_node_new (NULL);
-        if (!self->head) {
-            zlistx_destroy (&self);
-            return NULL;
+        if (self->head) {
+            self->cursor = self->head;
+            self->comparator = s_comparator;
         }
-        self->cursor = self->head;
-        self->comparator = s_comparator;
+        else
+            zlistx_destroy (&self);
+
     }
     return self;
 }

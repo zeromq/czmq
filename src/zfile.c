@@ -370,7 +370,6 @@ zfile_output (zfile_t *self)
         free (self->link);
         self->link = NULL;
     }
-
     rc = zsys_dir_create (file_path);
     free (file_path);
     if (rc != 0) {

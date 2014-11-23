@@ -44,7 +44,7 @@ struct _zchunk_t {
 zchunk_t *
 zchunk_new (const void *data, size_t size)
 {
-    zchunk_t *self = (zchunk_t *) zmalloc (sizeof (zchunk_t) + size);
+    zchunk_t *self = (zchunk_t *) malloc (sizeof (zchunk_t) + size);
     if (self) {
         self->tag = ZCHUNK_TAG;
         self->size = 0;
