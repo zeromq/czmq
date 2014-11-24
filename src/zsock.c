@@ -32,6 +32,8 @@
 #define DYNAMIC_FIRST       0xc000    // 49152
 #define DYNAMIC_LAST        0xffff    // 65535
 
+#define ZSOCK_MAX_FRAMES 32
+
 //  Structure of our class
 
 struct _zsock_t {
@@ -897,9 +899,8 @@ zsock_bsend (void *self, const char *picture, ...)
 
     //  Pass 1: calculate total size of data frame
     size_t frame_size = 0;
-    const uint max_frames = 32;         //  Arbitrary limit, for now
-    zframe_t *frames [max_frames];      //  Non-data frames to send
-    size_t nbr_frames = 0;              //  Size of this table
+    zframe_t *frames [ZSOCK_MAX_FRAMES]; //  Non-data frames to send
+    size_t nbr_frames = 0;               //  Size of this table
     va_list argptr;
     va_start (argptr, picture);
     const char *picptr = picture;
@@ -946,7 +947,7 @@ zsock_bsend (void *self, const char *picture, ...)
         else
         if (*picptr == 'f') {
             zframe_t *frame = va_arg (argptr, zframe_t *);
-            assert (nbr_frames < max_frames - 1);
+            assert (nbr_frames < ZSOCK_MAX_FRAMES - 1);
             frames [nbr_frames++] = frame;
         }
         else
@@ -959,7 +960,7 @@ zsock_bsend (void *self, const char *picture, ...)
             if (msg) {
                 zframe_t *frame = zmsg_first (msg);
                 while (frame) {
-                    assert (nbr_frames < max_frames - 1);
+                    assert (nbr_frames < ZSOCK_MAX_FRAMES - 1);
                     frames [nbr_frames++] = frame;
                     frame = zmsg_next (msg);
                 }
