@@ -69,8 +69,10 @@ zstr_recv (void *source)
 
     size_t size = zmq_msg_size (&message);
     char *string = (char *) malloc (size + 1);
-    memcpy (string, zmq_msg_data (&message), size);
-    string [size] = 0;
+    if (string) {
+        memcpy (string, zmq_msg_data (&message), size);
+        string [size] = 0;
+    }
     zmq_msg_close (&message);
     return string;
 }
@@ -239,9 +241,11 @@ zstr_recv_nowait (void *dest)
 
     size_t size = zmq_msg_size (&message);
     char *string = (char *) malloc (size + 1);
-    memcpy (string, zmq_msg_data (&message), size);
+    if (string) {
+        memcpy (string, zmq_msg_data (&message), size);
+        string [size] = 0;
+    }
     zmq_msg_close (&message);
-    string [size] = 0;
     return string;
 }
 
