@@ -3,7 +3,7 @@ zlist(3)
 
 NAME
 ----
-zlist - generic type-free list container (deprecated)
+zlist - simple generic list container
 
 SYNOPSIS
 --------
@@ -118,8 +118,8 @@ DESCRIPTION
 
 Provides a generic container implementing a fast singly-linked list. You
 can use this to construct multi-dimensional lists, and other structures
-together with other generic containers like zhash. This is the deprecated
-V2 class. For new applications we recommend using zlistx.
+together with other generic containers like zhash. This is a simple
+class. For demanding applications we recommend using zlistx.
 
 To iterate through a list, use zlist_first to get the first item, then
 loop while not null, and do zlist_next at the end of each iteration.

@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zpoller - trivial socket poller class
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -62,6 +62,8 @@ zpoller_new (void *reader, ...)
             }
             va_end (args);
         }
+        else
+            zpoller_destroy (&self);
     }
     return self;
 }

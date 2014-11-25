@@ -415,7 +415,7 @@ zsys_set_logident ("czmq_selftest");
 zsys_set_logsender ("inproc://logging");
 void *logger = zsys_socket (ZMQ_SUB, NULL, 0);
 assert (logger);
-rc = zsocket_connect (logger, "inproc://logging");
+rc = zmq_connect (logger, "inproc://logging");
 assert (rc == 0);
 rc = zmq_setsockopt (logger, ZMQ_SUBSCRIBE, "", 0);
 assert (rc == 0);

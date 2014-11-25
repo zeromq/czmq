@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zmonitor - socket event monitor
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -129,6 +129,7 @@ s_self_start (self_t *self)
 {
     assert (!self->sink);
     char *endpoint = zsys_sprintf ("inproc://zmonitor-%p", self->monitored);
+    assert (endpoint);
     int rc;
 #if defined (ZMQ_EVENT_ALL)
     rc = zmq_socket_monitor (self->monitored, endpoint, self->events);
@@ -155,6 +156,10 @@ s_self_handle_pipe (self_t *self)
         return -1;                  //  Interrupted
 
     char *command = zmsg_popstr (request);
+    if (!command) {
+        s_self_destroy (&self);
+        return -1;
+    }
     if (self->verbose)
         zsys_info ("zmonitor: API command=%s", command);
 
@@ -211,6 +216,7 @@ s_self_handle_sink (self_t *self)
     int event = eptr->event;
     int value = eptr->data.listening.fd;
     char *address = strdup (eptr->data.listening.addr);
+    assert (address);
     zframe_destroy (&frame);
 
 #else

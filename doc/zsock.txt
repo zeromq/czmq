@@ -399,11 +399,11 @@ zchunk_t *chunk = zchunk_new ("HELLO", 5);
 assert (chunk);
 zframe_t *frame = zframe_new ("WORLD", 5);
 assert (frame);
-zhash_t *hash = zhash_new ();
+zhashx_t *hash = zhashx_new ();
 assert (hash);
-zhash_autofree (hash);
-zhash_insert (hash, "1", "value A");
-zhash_insert (hash, "2", "value B");
+zhashx_autofree (hash);
+zhashx_insert (hash, "1", "value A");
+zhashx_insert (hash, "2", "value B");
 char *original = "pointer";
 
 //  We can send signed integers, strings, blocks of memory, chunks,
@@ -421,7 +421,7 @@ zsock_send (writer, "izsbcfhp",
             -12345, "This is a string", "ABCDE", 5, chunk, frame, hash, original);
 zframe_destroy (&frame);
 zchunk_destroy (&chunk);
-zhash_destroy (&hash);
+zhashx_destroy (&hash);
 int integer;
 byte *data;
 size_t size;
@@ -436,16 +436,16 @@ assert (memcmp (zchunk_data (chunk), "HELLO", 5) == 0);
 assert (zchunk_size (chunk) == 5);
 assert (memcmp (zframe_data (frame), "WORLD", 5) == 0);
 assert (zframe_size (frame) == 5);
-char *value = (char *) zhash_lookup (hash, "1");
+char *value = (char *) zhashx_lookup (hash, "1");
 assert (streq (value, "value A"));
-value = (char *) zhash_lookup (hash, "2");
+value = (char *) zhashx_lookup (hash, "2");
 assert (streq (value, "value B"));
 assert (original == pointer);
 free (string);
 free (data);
 zframe_destroy (&frame);
 zchunk_destroy (&chunk);
-zhash_destroy (&hash);
+zhashx_destroy (&hash);
 
 //  Test zsock_recv of short message; this lets us return a failure
 //  with a status code and then nothing else; the receiver will get
@@ -513,7 +513,7 @@ zchunk_destroy (&chunk);
 zframe_destroy (&frame);
 zmsg_destroy (&msg);
 
-number1 = number2 = number4 = number8 = 0;
+number8 = number4 = number2 = number1 = 0;
 char *longstr;
 zsock_brecv (reader, "1248sSpcfm",
              &number1, &number2, &number4, &number8,

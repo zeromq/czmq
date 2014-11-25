@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zstr - sending and receiving strings
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -67,11 +67,10 @@ zstr_recv (void *source)
     if (zmq_recvmsg (handle, &message, 0) < 0)
         return NULL;
 
-    size_t size = zmq_msg_size (&message);
-    char *string = (char *) malloc (size + 1);
-    memcpy (string, zmq_msg_data (&message), size);
+    void *msg_data  = zmq_msg_data (&message);
+    size_t msg_size = zmq_msg_size (&message);
+    char *string = strndup ((const char *) msg_data, msg_size);
     zmq_msg_close (&message);
-    string [size] = 0;
     return string;
 }
 
@@ -92,7 +91,8 @@ zstr_send (void *dest, const char *string)
 
 //  --------------------------------------------------------------------------
 //  Send a C string to a socket, as zstr_send(), with a MORE flag, so that
-//  you can send further strings in the same multi-part message.
+//  you can send further strings in the same multi-part message. String
+//  may be NULL, which is sent as "".
 
 int
 zstr_sendm (void *dest, const char *string)
@@ -117,6 +117,9 @@ zstr_sendf (void *dest, const char *format, ...)
     va_list argptr;
     va_start (argptr, format);
     char *string = zsys_vprintf (format, argptr);
+    if (!string)
+        return -1;
+
     va_end (argptr);
 
     int rc = s_send_string (dest, false, string);
@@ -139,6 +142,9 @@ zstr_sendfm (void *dest, const char *format, ...)
     va_list argptr;
     va_start (argptr, format);
     char *string = zsys_vprintf (format, argptr);
+    if (!string)
+        return -1;
+
     va_end (argptr);
 
     int rc = s_send_string (dest, true, string);
@@ -230,11 +236,10 @@ zstr_recv_nowait (void *dest)
     if (zmq_recvmsg (handle, &message, ZMQ_DONTWAIT) < 0)
         return NULL;
 
-    size_t size = zmq_msg_size (&message);
-    char *string = (char *) malloc (size + 1);
-    memcpy (string, zmq_msg_data (&message), size);
+    void *msg_data  = zmq_msg_data (&message);
+    size_t msg_size = zmq_msg_size (&message);
+    char *string = strndup ((const char *) msg_data, msg_size);
     zmq_msg_close (&message);
-    string [size] = 0;
     return string;
 }
 

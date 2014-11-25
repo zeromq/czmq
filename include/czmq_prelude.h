@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     czmq_prelude.h - CZMQ environment
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -354,7 +354,7 @@
 #   define S_IRUSR S_IREAD
 #endif
 #ifndef S_IWUSR
-#   define S_IWUSR S_IWRITE 
+#   define S_IWUSR S_IWRITE
 #endif
 #ifndef S_ISDIR
 #   define S_ISDIR(m) (((m) & S_IFDIR) != 0)
@@ -448,7 +448,7 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
     typedef unsigned long ulong;
     typedef unsigned int uint;
     //  This fixes header-order dependence problem with some Linux versions
-#elif (defined (__UTYPE_LINUX)) 
+#elif (defined (__UTYPE_LINUX))
 #   if (__STDC_VERSION__ >= 199901L)
     typedef unsigned int uint;
 #   endif

@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zhashx - extended generic hash container
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -676,29 +676,41 @@ zhashx_load (zhashx_t *self, const char *filename)
 
     //  Take copy of filename in case self->filename is same string.
     char *filename_copy = strdup (filename);
-    free (self->filename);
-    self->filename = filename_copy;
-    self->modified = zsys_file_modified (self->filename);
-    FILE *handle = fopen (self->filename, "r");
-    if (!handle)
-        return -1;              //  Failed to open file for reading
+    if (filename_copy) {
+        free (self->filename);
+        self->filename = filename_copy;
+        self->modified = zsys_file_modified (self->filename);
+        FILE *handle = fopen (self->filename, "r");
+        if (handle) {
+            char *buffer = (char *) zmalloc (1024);
+            if (buffer) {
+                while (fgets (buffer, 1024, handle)) {
+                    //  Skip lines starting with "#" or that do not look like
+                    //  name=value data.
+                    char *equals = strchr (buffer, '=');
+                    if (buffer [0] == '#' || equals == buffer || !equals)
+                        continue;
 
-    char *buffer = (char *) zmalloc (1024);
-    while (fgets (buffer, 1024, handle)) {
-        //  Skip lines starting with "#" or that do not look like
-        //  name=value data.
-        char *equals = strchr (buffer, '=');
-        if (buffer [0] == '#' || equals == buffer || !equals)
-            continue;
-
-        //  Buffer may end in newline, which we don't want
-        if (buffer [strlen (buffer) - 1] == '\n')
-            buffer [strlen (buffer) - 1] = 0;
-        *equals++ = 0;
-        zhashx_update (self, buffer, equals);
+                    //  Buffer may end in newline, which we don't want
+                    if (buffer [strlen (buffer) - 1] == '\n')
+                        buffer [strlen (buffer) - 1] = 0;
+                    *equals++ = 0;
+                    zhashx_update (self, buffer, equals);
+                }
+                free (buffer);
+            }
+            else {
+                fclose (handle);
+                return -1; //  Out of memory
+            }
+            fclose (handle);
+        }
+        else
+            return -1; //  Failed to open file for reading
     }
-    free (buffer);
-    fclose (handle);
+    else
+        return -1; //  Out of memory
+
     return 0;
 }
 
@@ -839,7 +851,11 @@ zhashx_unpack (zframe_t *frame)
                 needle += 4;
                 //  Be wary of malformed frames
                 if (needle + value_size <= ceiling) {
-                    char *value = (char *) malloc (value_size + 1);
+                    char *value = (char *) zmalloc (value_size + 1);
+                    if (!value) {
+                        zhashx_destroy (&self);
+                        return NULL;
+                    }
                     memcpy (value, needle, value_size);
                     value [value_size] = 0;
                     needle += value_size;

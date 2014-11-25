@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zhash - simple generic hash container
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -575,29 +575,41 @@ zhash_load (zhash_t *self, const char *filename)
 
     //  Take copy of filename in case self->filename is same string.
     char *filename_copy = strdup (filename);
-    free (self->filename);
-    self->filename = filename_copy;
-    self->modified = zsys_file_modified (self->filename);
-    FILE *handle = fopen (self->filename, "r");
-    if (!handle)
-        return -1;              //  Failed to open file for reading
+    if (filename_copy) {
+        free (self->filename);
+        self->filename = filename_copy;
+        self->modified = zsys_file_modified (self->filename);
+        FILE *handle = fopen (self->filename, "r");
+        if (handle) {
+            char *buffer = (char *) zmalloc (1024);
+            if (buffer) {
+                while (fgets (buffer, 1024, handle)) {
+                    //  Skip lines starting with "#" or that do not look like
+                    //  name=value data.
+                    char *equals = strchr (buffer, '=');
+                    if (buffer [0] == '#' || equals == buffer || !equals)
+                        continue;
 
-    char *buffer = (char *) zmalloc (1024);
-    while (fgets (buffer, 1024, handle)) {
-        //  Skip lines starting with "#" or that do not look like
-        //  name=value data.
-        char *equals = strchr (buffer, '=');
-        if (buffer [0] == '#' || equals == buffer || !equals)
-            continue;
-
-        //  Buffer may end in newline, which we don't want
-        if (buffer [strlen (buffer) - 1] == '\n')
-            buffer [strlen (buffer) - 1] = 0;
-        *equals++ = 0;
-        zhash_update (self, buffer, equals);
+                    //  Buffer may end in newline, which we don't want
+                    if (buffer [strlen (buffer) - 1] == '\n')
+                        buffer [strlen (buffer) - 1] = 0;
+                    *equals++ = 0;
+                    zhash_update (self, buffer, equals);
+                }
+                free (buffer);
+            }
+            else {
+                fclose (handle);
+                return -1; // Out of memory
+            }
+            fclose (handle);
+        }
+        else
+            return -1; // Failed to open file for reading
     }
-    free (buffer);
-    fclose (handle);
+    else
+        return -1; // Out of memory
+
     return 0;
 }
 
@@ -605,7 +617,7 @@ zhash_load (zhash_t *self, const char *filename)
 //  --------------------------------------------------------------------------
 //  When a hash table was loaded from a file by zhash_load, this method will
 //  reload the file if it has been modified since, and is "stable", i.e. not
-//  still changing. Returns 0 if OK, -1 if there was an error reloading the 
+//  still changing. Returns 0 if OK, -1 if there was an error reloading the
 //  file.
 
 int
