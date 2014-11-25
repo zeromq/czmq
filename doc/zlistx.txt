@@ -156,7 +156,7 @@ into CZMQ and standard C semantics, so e.g. for string items you can
 use strdup, strcmp, and zstr_free. To store custom objects, define your
 own duplicator and comparator, and use the standard object destructor.
 
-This is a reworking of the simpler zlist container. It is faster to 
+This is a reworking of the simpler zlist container. It is faster to
 insert and delete items anywhere in the list, and to keep ordered lists.
 
 EXAMPLE
