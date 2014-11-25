@@ -37,7 +37,6 @@
 
 typedef struct {
     zsock_t *pipe;              //  Actor command pipe
-    zpoller_t *poller;          //  Socket poller
     SOCKET udpsock;             //  UDP socket for send/recv
     int port_nbr;               //  UDP port number we work on
     int interval;               //  Beacon broadcast interval
@@ -56,7 +55,6 @@ s_self_destroy (self_t **self_p)
     assert (self_p);
     if (*self_p) {
         self_t *self = *self_p;
-        zpoller_destroy (&self->poller);
         zframe_destroy (&self->transmit);
         zframe_destroy (&self->filter);
         zsys_udp_close (self->udpsock);
@@ -71,11 +69,7 @@ s_self_new (zsock_t *pipe)
     self_t *self = (self_t *) zmalloc (sizeof (self_t));
     if (!self)
         return NULL;
-
     self->pipe = pipe;
-    self->poller = zpoller_new (self->pipe, NULL);
-    if (!self->poller)
-        s_self_destroy (&self);
     return self;
 }
 
