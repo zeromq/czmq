@@ -345,7 +345,11 @@ zchunk_strdup (zchunk_t *self)
     assert (self);
     assert (zchunk_is (self));
 
-    return strndup ((const char *) zchunk_data (self), zchunk_size (self));
+    size_t size = zchunk_size (self);
+    char *string = (char *) malloc (size + 1);
+    memcpy (string, zchunk_data (self), size);
+    string [size] = 0;
+    return string;
 }
 
 

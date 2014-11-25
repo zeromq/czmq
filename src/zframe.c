@@ -233,7 +233,11 @@ zframe_strdup (zframe_t *self)
     assert (self);
     assert (zframe_is (self));
 
-    return strndup ((const char *) zframe_data (self), zframe_size (self));
+    size_t size = zframe_size (self);
+    char *string = (char *) malloc (size + 1);
+    memcpy (string, zframe_data (self), size);
+    string [size] = 0;
+    return string;
 }
 
 

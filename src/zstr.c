@@ -67,9 +67,10 @@ zstr_recv (void *source)
     if (zmq_recvmsg (handle, &message, 0) < 0)
         return NULL;
 
-    void *msg_data  = zmq_msg_data (&message);
-    size_t msg_size = zmq_msg_size (&message);
-    char *string = strndup ((const char *) msg_data, msg_size);
+    size_t size = zmq_msg_size (&message);
+    char *string = (char *) malloc (size + 1);
+    memcpy (string, zmq_msg_data (&message), size);
+    string [size] = 0;
     zmq_msg_close (&message);
     return string;
 }
@@ -236,10 +237,11 @@ zstr_recv_nowait (void *dest)
     if (zmq_recvmsg (handle, &message, ZMQ_DONTWAIT) < 0)
         return NULL;
 
-    void *msg_data  = zmq_msg_data (&message);
-    size_t msg_size = zmq_msg_size (&message);
-    char *string = strndup ((const char *) msg_data, msg_size);
+    size_t size = zmq_msg_size (&message);
+    char *string = (char *) malloc (size + 1);
+    memcpy (string, zmq_msg_data (&message), size);
     zmq_msg_close (&message);
+    string [size] = 0;
     return string;
 }
 
