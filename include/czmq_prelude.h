@@ -456,9 +456,30 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
 #   endif
 #endif
 
+//- Non-portable declaration specifiers -------------------------------------
+
+#if defined (__WINDOWS__)
+#   if defined LIBCZMQ_STATIC
+#       define CZMQ_EXPORT
+#   elif defined LIBCZMQ_EXPORTS
+#       define CZMQ_EXPORT __declspec(dllexport)
+#   else
+#       define CZMQ_EXPORT __declspec(dllimport)
+#   endif
+#else
+#   define CZMQ_EXPORT
+#endif
+
+//  For thread-local storage
+#if defined (__WINDOWS__)
+#   define CZMQ_THREADLS __declspec(thread)
+#else
+#   define CZMQ_THREADLS __thread
+#endif
+
 //- Memory allocations ------------------------------------------------------
 
-extern volatile uint64_t zsys_allocs;
+CZMQ_EXPORT extern volatile uint64_t zsys_allocs;
 
 //  Replacement for malloc() which asserts if we run out of heap, and
 //  which zeroes the allocated block.
@@ -534,27 +555,6 @@ typedef int SOCKET;
 #   elif defined (__UNIX__)
 #       include <uuid/uuid.h>
 #   endif
-#endif
-
-//- Non-portable declaration specifiers -------------------------------------
-
-#if defined (__WINDOWS__)
-#   if defined LIBCZMQ_STATIC
-#       define CZMQ_EXPORT
-#   elif defined LIBCZMQ_EXPORTS
-#       define CZMQ_EXPORT __declspec(dllexport)
-#   else
-#       define CZMQ_EXPORT __declspec(dllimport)
-#   endif
-#else
-#   define CZMQ_EXPORT
-#endif
-
-//  For thread-local storage
-#if defined (__WINDOWS__)
-#   define CZMQ_THREADLS __declspec(thread)
-#else
-#   define CZMQ_THREADLS __thread
 #endif
 
 //- Always include ZeroMQ header file ---------------------------------------
