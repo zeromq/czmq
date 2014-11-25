@@ -1544,7 +1544,7 @@ zsys_test (bool verbose)
         char *hostname = zsys_hostname ();
         zsys_info ("host name is %s", hostname);
         free (hostname);
-        zsys_info ("system limit is %zd ZeroMQ sockets", zsys_socket_limit ());
+        zsys_info ("system limit is %zu ZeroMQ sockets", zsys_socket_limit ());
     }
     zsys_set_io_threads (1);
     zsys_set_max_sockets (0);
