@@ -67,11 +67,13 @@ zfile_new (const char *path, const char *name)
         //  Format full path to file
         if (path) {
             self->fullname = (char *) zmalloc (strlen (path) + strlen (name) + 2);
-            if (!self->fullname) {
+            if (self->fullname)
+                sprintf (self->fullname, "%s/%s", path, name);
+
+            else {
                 zfile_destroy (&self);
                 return NULL;
             }
-            sprintf (self->fullname, "%s/%s", path, name);
         }
         else
             self->fullname = strdup (name);
@@ -88,13 +90,15 @@ zfile_new (const char *path, const char *name)
                         if (buffer [strlen (buffer) - 1] == '\n')
                             buffer [strlen (buffer) - 1] = 0;
                         self->link = strdup (buffer);
-                        if (!self->link) {
+                        if (self->link) {
+                            //  Chop ".ln" off name for external use
+                            self->fullname [strlen (self->fullname) - 3] = 0;
+                        }
+                        else {
                             fclose (handle);
                             zfile_destroy (&self);
                             return NULL;
                         }
-                        //  Chop ".ln" off name for external use
-                        self->fullname [strlen (self->fullname) - 3] = 0;
                     }
                     fclose (handle);
                 }

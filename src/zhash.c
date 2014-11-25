@@ -575,35 +575,41 @@ zhash_load (zhash_t *self, const char *filename)
 
     //  Take copy of filename in case self->filename is same string.
     char *filename_copy = strdup (filename);
-    if (!filename_copy)
-        return -1;
+    if (filename_copy) {
+        free (self->filename);
+        self->filename = filename_copy;
+        self->modified = zsys_file_modified (self->filename);
+        FILE *handle = fopen (self->filename, "r");
+        if (handle) {
+            char *buffer = (char *) zmalloc (1024);
+            if (buffer) {
+                while (fgets (buffer, 1024, handle)) {
+                    //  Skip lines starting with "#" or that do not look like
+                    //  name=value data.
+                    char *equals = strchr (buffer, '=');
+                    if (buffer [0] == '#' || equals == buffer || !equals)
+                        continue;
 
-    free (self->filename);
-    self->filename = filename_copy;
-    self->modified = zsys_file_modified (self->filename);
-    FILE *handle = fopen (self->filename, "r");
-    if (!handle)
-        return -1;              //  Failed to open file for reading
-
-    char *buffer = (char *) zmalloc (1024);
-    if (!buffer)
-        return -1;
-
-    while (fgets (buffer, 1024, handle)) {
-        //  Skip lines starting with "#" or that do not look like
-        //  name=value data.
-        char *equals = strchr (buffer, '=');
-        if (buffer [0] == '#' || equals == buffer || !equals)
-            continue;
-
-        //  Buffer may end in newline, which we don't want
-        if (buffer [strlen (buffer) - 1] == '\n')
-            buffer [strlen (buffer) - 1] = 0;
-        *equals++ = 0;
-        zhash_update (self, buffer, equals);
+                    //  Buffer may end in newline, which we don't want
+                    if (buffer [strlen (buffer) - 1] == '\n')
+                        buffer [strlen (buffer) - 1] = 0;
+                    *equals++ = 0;
+                    zhash_update (self, buffer, equals);
+                }
+                free (buffer);
+            }
+            else {
+                fclose (handle);
+                return -1; // Out of memory
+            }
+            fclose (handle);
+        }
+        else
+            return -1; // Failed to open file for reading
     }
-    free (buffer);
-    fclose (handle);
+    else
+        return -1; // Out of memory
+
     return 0;
 }
 

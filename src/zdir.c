@@ -127,11 +127,13 @@ zdir_new (const char *path, const char *parent)
         }
         else {
             self->path = (char *) zmalloc (strlen (path) + strlen (parent) + 2);
-            if (!self->path) {
+            if (self->path)
+                sprintf (self->path, "%s/%s", parent, path);
+
+            else {
                 zdir_destroy (&self);
                 return NULL;
             }
-            sprintf (self->path, "%s/%s", parent, path);
         }
     }
     else {
