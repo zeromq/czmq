@@ -99,7 +99,7 @@ CZMQ_EXPORT void *
 //  was returned. This is a constant string that you may not modify or
 //  deallocate, and which lasts as long as the item in the hash. After an
 //  unsuccessful first/next, returns NULL.
-CZMQ_EXPORT const void *
+CZMQ_EXPORT const char *
     zhash_cursor (zhash_t *self);
 
 //  Add a comment to hash table before saving to disk. You can add as many

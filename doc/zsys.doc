@@ -319,10 +319,6 @@ This is the class interface:
     CZMQ_EXPORT extern volatile int zsys_interrupted;
     //  Deprecated name for this variable
     CZMQ_EXPORT extern volatile int zctx_interrupted;
-    
-    //  Counts number of zmalloc calls, see czmq_prelude.h
-    CZMQ_EXPORT extern volatile int zsys_allocs;
-    
 
 This is the class self test code:
 
