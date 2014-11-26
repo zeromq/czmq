@@ -53,7 +53,7 @@ struct _zhash_t {
     bool autofree;              //  If true, free values in destructor
     size_t cursor_index;        //  For first/next iteration
     item_t *cursor_item;        //  For first/next iteration
-    const void *cursor_key;     //  After first/next call, points to key
+    const char *cursor_key;     //  After first/next call, points to key
     zlist_t *comments;          //  File comments, if any
     time_t modified;            //  Set during zhash_load
     char *filename;             //  Set during zhash_load
@@ -486,7 +486,7 @@ zhash_next (zhash_t *self)
 //  deallocate, and which lasts as long as the item in the hash. After an
 //  unsuccessful first/next, returns NULL.
 
-const void *
+const char *
 zhash_cursor (zhash_t *self)
 {
     assert (self);
@@ -827,7 +827,7 @@ zhash_test (int verbose)
     int rc;
     rc = zhash_insert (hash, "DEADBEEF", "dead beef");
     char *item = (char *) zhash_first (hash);
-    assert (streq ((char *) zhash_cursor (hash), "DEADBEEF"));
+    assert (streq (zhash_cursor (hash), "DEADBEEF"));
     assert (streq (item, "dead beef"));
     assert (rc == 0);
     rc = zhash_insert (hash, "ABADCAFE", "a bad cafe");
