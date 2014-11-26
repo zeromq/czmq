@@ -88,7 +88,7 @@ CZMQ_EXPORT void *
 //  was returned. This is a constant string that you may not modify or
 //  deallocate, and which lasts as long as the item in the hash. After an
 //  unsuccessful first/next, returns NULL.
-CZMQ_EXPORT const void *
+CZMQ_EXPORT const char *
     zhash_cursor (zhash_t *self);
 
 //  Add a comment to hash table before saving to disk. You can add as many
@@ -189,7 +189,7 @@ assert (zhash_cursor (hash) == NULL);
 int rc;
 rc = zhash_insert (hash, "DEADBEEF", "dead beef");
 char *item = (char *) zhash_first (hash);
-assert (streq ((char *) zhash_cursor (hash), "DEADBEEF"));
+assert (streq (zhash_cursor (hash), "DEADBEEF"));
 assert (streq (item, "dead beef"));
 assert (rc == 0);
 rc = zhash_insert (hash, "ABADCAFE", "a bad cafe");
