@@ -67,7 +67,7 @@ CZMQ_EXPORT int zsocket_tcp_keepalive_cnt (void *zocket);
 CZMQ_EXPORT int zsocket_tcp_keepalive_intvl (void *zocket);
 CZMQ_EXPORT char * zsocket_tcp_accept_filter (void *zocket);
 CZMQ_EXPORT int zsocket_rcvmore (void *zocket);
-CZMQ_EXPORT int zsocket_fd (void *zocket);
+CZMQ_EXPORT SOCKET zsocket_fd (void *zocket);
 CZMQ_EXPORT int zsocket_events (void *zocket);
 CZMQ_EXPORT char * zsocket_last_endpoint (void *zocket);
 
@@ -151,7 +151,7 @@ CZMQ_EXPORT int zsocket_tcp_keepalive_cnt (void *zocket);
 CZMQ_EXPORT int zsocket_tcp_keepalive_intvl (void *zocket);
 CZMQ_EXPORT char * zsocket_tcp_accept_filter (void *zocket);
 CZMQ_EXPORT int zsocket_rcvmore (void *zocket);
-CZMQ_EXPORT int zsocket_fd (void *zocket);
+CZMQ_EXPORT SOCKET zsocket_fd (void *zocket);
 CZMQ_EXPORT int zsocket_events (void *zocket);
 CZMQ_EXPORT char * zsocket_last_endpoint (void *zocket);
 
@@ -209,7 +209,7 @@ CZMQ_EXPORT int zsocket_reconnect_ivl_max (void *zocket);
 CZMQ_EXPORT int zsocket_backlog (void *zocket);
 CZMQ_EXPORT int zsocket_type (void *zocket);
 CZMQ_EXPORT int zsocket_rcvmore (void *zocket);
-CZMQ_EXPORT int zsocket_fd (void *zocket);
+CZMQ_EXPORT SOCKET zsocket_fd (void *zocket);
 CZMQ_EXPORT int zsocket_events (void *zocket);
 
 //  Set socket options
