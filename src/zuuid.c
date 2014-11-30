@@ -159,6 +159,31 @@ zuuid_str (zuuid_t *self)
     return self->str;
 }
 
+//  -----------------------------------------------------------------
+// Set target string with UUID as formatted string in the canonical format 8-4-4-4-12, lower case 
+// see: http://en.wikipedia.org/wiki/Universally_unique_identifier
+
+void
+zuuid_formatted_str (zuuid_t *self, char *target)
+{
+    assert (self);
+    target[0]='\0';
+    strncat(target,self->str,8);
+    strcat(target,"-");
+    strncat(target,self->str+8,4);
+    strcat(target,"-");
+    strncat(target,self->str+12,4);
+    strcat(target,"-");
+    strncat(target,self->str+16,4);
+    strcat(target,"-");
+    strncat(target,self->str+20,12);
+    int i = 0;
+    while (i<36)
+    {
+      target[i] = tolower(target[i]);
+      i++;
+    }
+}
 
 //  -----------------------------------------------------------------
 //  Store UUID blob into a target array

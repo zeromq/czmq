@@ -42,6 +42,11 @@ CZMQ_EXPORT size_t
 CZMQ_EXPORT char *
     zuuid_str (zuuid_t *self);
 
+// Set target string with UUID as formatted string in the canonical format 8-4-4-4-12, lower case 
+// see: http://en.wikipedia.org/wiki/Universally_unique_identifier
+CZMQ_EXPORT void
+    zuuid_formatted_str (zuuid_t *self, char *target);
+
 //  Set UUID to new supplied ZUUID_LEN-octet value
 CZMQ_EXPORT void
     zuuid_set (zuuid_t *self, byte *source);
