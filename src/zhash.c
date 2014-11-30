@@ -905,6 +905,7 @@ zhash_test (int verbose)
     item = (char *) zhash_lookup (copy, "LIVEBEEF");
     assert (item);
     assert (streq (item, "dead beef"));
+    zhash_destroy (&copy);
 
     //  Test save and load
     zhash_comment (hash, "This is a test file");
