@@ -160,29 +160,29 @@ zuuid_str (zuuid_t *self)
 }
 
 //  -----------------------------------------------------------------
-// Set target string with UUID as formatted string in the canonical format 8-4-4-4-12, lower case 
-// see: http://en.wikipedia.org/wiki/Universally_unique_identifier
+// Return UUID as formatted string in the canonical format 8-4-4-4-12,
+// lower case.  The caller should free the freshly allocated string.
+// See: http://en.wikipedia.org/wiki/Universally_unique_identifier
 
-void
-zuuid_formatted_str (zuuid_t *self, char *target)
+char *
+zuuid_formatted_str (zuuid_t *self)
 {
     assert (self);
-    target[0]='\0';
-    strncat(target,self->str,8);
-    strcat(target,"-");
-    strncat(target,self->str+8,4);
-    strcat(target,"-");
-    strncat(target,self->str+12,4);
-    strcat(target,"-");
-    strncat(target,self->str+16,4);
-    strcat(target,"-");
-    strncat(target,self->str+20,12);
-    int i = 0;
-    while (i<36)
-    {
-      target[i] = tolower(target[i]);
-      i++;
-    }
+    char *target = (char *) malloc (8 + 4 + 4 + 4 + 12 + 5);
+    target [0] = '\0';
+    strncat (target, self->str, 8);
+    strcat (target, "-");
+    strncat (target, self->str + 8, 4);
+    strcat (target, "-");
+    strncat (target, self->str + 12, 4);
+    strcat (target, "-");
+    strncat (target, self->str + 16, 4);
+    strcat (target, "-");
+    strncat (target, self->str + 20, 12);
+    int i;
+    for (i = 0; i < 36; i++)
+      target [i] = tolower (target [i]);
+    return target;
 }
 
 //  -----------------------------------------------------------------
@@ -264,6 +264,11 @@ zuuid_test (bool verbose)
     zuuid_export (uuid, copy_uuid);
     zuuid_set (uuid, copy_uuid);
     assert (streq (zuuid_str (uuid), myuuid));
+
+    // Check the formatted string output
+    char *formatted_str = zuuid_formatted_str (uuid);
+    assert (streq (formatted_str, "8cb3e9a9-649b-4bef-8de2-25e9c2cebb38"));
+    zstr_free (&formatted_str);
 
     zuuid_destroy (&uuid);
     zuuid_destroy (&copy);
