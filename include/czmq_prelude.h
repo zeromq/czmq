@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     czmq_prelude.h - CZMQ environment
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -44,6 +44,7 @@
  *  __UTYPE_NEXT        NeXT
  *  __UTYPE_OPENBSD     OpenBSD
  *  __UTYPE_OSX         Apple Macintosh OS X
+ *  __UTYPE_IOS         Apple iOS
  *  __UTYPE_QNX         QNX
  *  __UTYPE_IRIX        Silicon Graphics IRIX
  *  __UTYPE_SINIX       SINIX-N (Siemens-Nixdorf Unix)
@@ -146,14 +147,14 @@
 #elif (defined (__ANDROID__))
 #   define __UTYPE_ANDROID
 #   define __UNIX__
-#elif (defined (LINUX) || defined (linux))
+#elif (defined (LINUX) || defined (linux) || defined (__linux__))
 #   define __UTYPE_LINUX
 #   define __UNIX__
 #   ifndef __NO_CTYPE
 #   define __NO_CTYPE                   //  Suppress warnings on tolower()
 #   endif
-#   ifndef _BSD_SOURCE
-#   define _BSD_SOURCE                  //  Include stuff from 4.3 BSD Unix
+#   ifndef _DEFAULT_SOURCE
+#   define _DEFAULT_SOURCE                  //  Include stuff from 4.3 BSD Unix
 #   endif
 #elif (defined (Mips))
 #   define __UTYPE_MIPS
@@ -168,8 +169,13 @@
 #   define __UTYPE_OPENBSD
 #   define __UNIX__
 #elif (defined (APPLE) || defined (__APPLE__))
-#   define __UTYPE_OSX
+#   include <TargetConditionals.h>
 #   define __UNIX__
+#   if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+#      define __UTYPE_IOS
+#   else
+#      define __UTYPE_OSX
+#   endif
 #elif (defined (NeXT))
 #   define __UTYPE_NEXT
 #   define __UNIX__
@@ -290,6 +296,8 @@
 #   endif
 #   if (defined (__UTYPE_OSX))
 #       include <crt_externs.h>         //  For _NSGetEnviron()
+#       include <mach/clock.h>
+#       include <mach/mach.h>           //  For monotonic clocks
 #   endif
 #endif
 
@@ -346,7 +354,7 @@
 #   define S_IRUSR S_IREAD
 #endif
 #ifndef S_IWUSR
-#   define S_IWUSR S_IWRITE 
+#   define S_IWUSR S_IWRITE
 #endif
 #ifndef S_ISDIR
 #   define S_ISDIR(m) (((m) & S_IFDIR) != 0)
@@ -389,7 +397,7 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
 #endif
 
 // Windows MSVS doesn't have stdbool
-#if (defined (__WINDOWS__))
+#if (defined (_MSC_VER))
 #   if (!defined (__cplusplus) && (!defined (true)))
 #       define true 1
 #       define false 0
@@ -419,15 +427,20 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
     typedef unsigned int  uint;
 #   if (!defined (__MINGW32__))
     typedef int mode_t;
-#if defined (__IS_64BIT__)
+#       if defined (__IS_64BIT__)
     typedef long long ssize_t;
-#else
+#       else
     typedef long ssize_t;
-#endif
+#       endif
+#   endif
+#   if (!defined (__MINGW32__) || (defined (__MINGW32__) && defined (__IS_64BIT__)))
     typedef __int32 int32_t;
     typedef __int64 int64_t;
     typedef unsigned __int32 uint32_t;
     typedef unsigned __int64 uint64_t;
+#   endif    
+#   if (!defined (PRId64))
+#       define PRId64   "I64d"
 #   endif
 #   if (!defined (va_copy))
     //  MSVC does not support C99's va_copy so we use a regular assignment
@@ -436,91 +449,10 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
 #elif (defined (__UTYPE_OSX))
     typedef unsigned long ulong;
     typedef unsigned int uint;
-#endif
-
-//- Error reporting ---------------------------------------------------------
-
-//  Replacement for malloc() which asserts if we run out of heap, and
-//  which zeroes the allocated block.
-static inline void *
-    safe_malloc (
-    size_t size,
-    const char *file,
-    unsigned line)
-{
-    void
-        *mem;
-
-    mem = calloc (1, size);
-    if (mem == NULL) {
-        fprintf (stderr, "FATAL ERROR at %s:%u\n", file, line);
-        fprintf (stderr, "OUT OF MEMORY (malloc returned NULL)\n");
-        fflush (stderr);
-        abort ();
-    }
-    return mem;
-}
-
-//  Define _ZMALLOC_DEBUG if you need to trace memory leaks using e.g. mtrace,
-//  otherwise all allocations will claim to come from zfl_prelude.h.  For best
-//  results, compile all classes so you see dangling object allocations.
-//  _ZMALLOC_PEDANTIC does the same thing, but its intention is to propagate
-//  out of memory condition back up the call stack.
-#if defined _ZMALLOC_DEBUG || _ZMALLOC_PEDANTIC
-#   define zmalloc(size) calloc(1,(size))
-#else
-#   define zmalloc(size) safe_malloc((size), __FILE__, __LINE__)
-#endif
-
-//  GCC supports validating format strings for functions that act like printf
-#if defined (__GNUC__) && (__GNUC__ >= 2)
-#   define CHECK_PRINTF(a)   __attribute__((format (printf, a, a + 1)))
-#else
-#   define CHECK_PRINTF(a)
-#endif
-
-//  Lets us write code that compiles both on Windows and normal platforms
-#if !defined (__WINDOWS__)
-typedef int SOCKET;
-#   define closesocket close
-#   define INVALID_SOCKET -1
-#   define SOCKET_ERROR -1
-#endif
-
-//- Include non-portable header files based on platform.h -------------------
-
-#if defined (HAVE_LINUX_WIRELESS_H)
-#   include <linux/wireless.h>
-#else
-#   if defined (HAVE_NET_IF_H)
-#       include <net/if.h>
-#   endif
-#   if defined (HAVE_NET_IF_MEDIA_H)
-#       include <net/if_media.h>
-#   endif
-#endif
-
-#if defined (HAVE_LIBSODIUM)
-#   include <sodium.h>
-#   if crypto_box_PUBLICKEYBYTES != 32 \
-    || crypto_box_SECRETKEYBYTES != 32
-#       error "libsodium not built correctly"
-#   endif
-#endif
-
-#if defined (__WINDOWS__) && !defined (HAVE_LIBUUID)
-#   define HAVE_LIBUUID 1
-#endif
-#if defined (__UTYPE_OSX) && !defined (HAVE_LIBUUID)
-#   define HAVE_LIBUUID 1
-#endif
-#if defined (HAVE_LIBUUID)
-#   if defined (__UTYPE_FREEBSD) || defined (__UTYPE_NETBSD)
-#       include <uuid.h>
-#   elif defined __UTYPE_HPUX
-#       include <dce/uuid.h>
-#   elif defined (__UNIX__)
-#       include <uuid/uuid.h>
+    //  This fixes header-order dependence problem with some Linux versions
+#elif (defined (__UTYPE_LINUX))
+#   if (__STDC_VERSION__ >= 199901L)
+    typedef unsigned int uint;
 #   endif
 #endif
 
@@ -545,6 +477,86 @@ typedef int SOCKET;
 #   define CZMQ_THREADLS __thread
 #endif
 
+//- Memory allocations ------------------------------------------------------
+
+CZMQ_EXPORT extern volatile uint64_t zsys_allocs;
+
+//  Replacement for malloc() which asserts if we run out of heap, and
+//  which zeroes the allocated block.
+static inline void *
+safe_malloc (size_t size, const char *file, unsigned line)
+{
+//     printf ("%s:%u %08d\n", file, line, (int) size);
+#if defined (__UTYPE_LINUX)
+    //  On GCC we count zmalloc memory allocations
+    __sync_add_and_fetch (&zsys_allocs, 1);
+#endif
+    void *mem = calloc (1, size);
+    if (mem == NULL) {
+        fprintf (stderr, "FATAL ERROR at %s:%u\n", file, line);
+        fprintf (stderr, "OUT OF MEMORY (malloc returned NULL)\n");
+        fflush (stderr);
+        abort ();
+    }
+    return mem;
+}
+
+//  Define _ZMALLOC_DEBUG if you need to trace memory leaks using e.g. mtrace,
+//  otherwise all allocations will claim to come from czmq_prelude.h. For best
+//  results, compile all classes so you see dangling object allocations.
+//  _ZMALLOC_PEDANTIC does the same thing, but its intention is to propagate
+//  out of memory condition back up the call stack.
+#if defined _ZMALLOC_DEBUG || _ZMALLOC_PEDANTIC
+#   define zmalloc(size) calloc(1,(size))
+#else
+#   define zmalloc(size) safe_malloc((size), __FILE__, __LINE__)
+#endif
+
+//  GCC supports validating format strings for functions that act like printf
+#if defined (__GNUC__) && (__GNUC__ >= 2)
+#   define CHECK_PRINTF(a)   __attribute__((format (printf, a, a + 1)))
+#else
+#   define CHECK_PRINTF(a)
+#endif
+
+//  Lets us write code that compiles both on Windows and normal platforms
+#if !defined (__WINDOWS__)
+typedef int SOCKET;
+#   define closesocket      close
+#   define INVALID_SOCKET   -1
+#   define SOCKET_ERROR     -1
+#   define O_BINARY         0
+#endif
+
+//- Include non-portable header files based on platform.h -------------------
+
+#if defined (HAVE_LINUX_WIRELESS_H)
+#   include <linux/wireless.h>
+#else
+#   if defined (HAVE_NET_IF_H)
+#       include <net/if.h>
+#   endif
+#   if defined (HAVE_NET_IF_MEDIA_H)
+#       include <net/if_media.h>
+#   endif
+#endif
+
+#if defined (__WINDOWS__) && !defined (HAVE_LIBUUID)
+#   define HAVE_LIBUUID 1
+#endif
+#if defined (__UTYPE_OSX) && !defined (HAVE_LIBUUID)
+#   define HAVE_LIBUUID 1
+#endif
+#if defined (HAVE_LIBUUID)
+#   if defined (__UTYPE_FREEBSD) || defined (__UTYPE_NETBSD)
+#       include <uuid.h>
+#   elif defined __UTYPE_HPUX
+#       include <dce/uuid.h>
+#   elif defined (__UNIX__)
+#       include <uuid/uuid.h>
+#   endif
+#endif
+
 //- Always include ZeroMQ header file ---------------------------------------
 
 #include "zmq.h"
@@ -566,6 +578,8 @@ typedef int SOCKET;
 #   define zmq_recvmsg      zmq_recv
 #   define zmq_ctx_new      zmq_init
 #   define zmq_ctx_term     zmq_term
+#   define zmq_msg_send(m,s,f)  zmq_sendmsg ((s),(m),(f))
+#   define zmq_msg_recv(m,s,f)  zmq_recvmsg ((s),(m),(f))
     //  Older libzmq APIs may be missing some aspects of libzmq v3.0
 #   ifndef ZMQ_ROUTER
 #       define ZMQ_ROUTER       ZMQ_XREP

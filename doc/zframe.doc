@@ -1,0 +1,169 @@
+#### zframe - working with single message frames
+
+The zframe class provides methods to send and receive single message
+frames across 0MQ sockets. A 'frame' corresponds to one zmq_msg_t. When
+you read a frame from a socket, the zframe_more() method indicates if the
+frame is part of an unfinished multipart message. The zframe_send method
+normally destroys the frame, but with the ZFRAME_REUSE flag, you can send
+the same frame many times. Frames are binary, and this class has no
+special support for text data.
+
+
+This is the class interface:
+
+    #define ZFRAME_MORE     1
+    #define ZFRAME_REUSE    2
+    #define ZFRAME_DONTWAIT 4
+    
+    //  Create a new frame with optional size, and optional data
+    CZMQ_EXPORT zframe_t *
+        zframe_new (const void *data, size_t size);
+    
+    //  Create an empty (zero-sized) frame
+    CZMQ_EXPORT zframe_t *
+        zframe_new_empty (void);
+    
+    //  Destroy a frame
+    CZMQ_EXPORT void
+        zframe_destroy (zframe_t **self_p);
+    
+    //  Receive frame from socket, returns zframe_t object or NULL if the recv
+    //  was interrupted. Does a blocking recv, if you want to not block then use
+    //  zpoller or zloop.
+    CZMQ_EXPORT zframe_t *
+        zframe_recv (void *source);
+    
+    // Send a frame to a socket, destroy frame after sending.
+    // Return -1 on error, 0 on success.
+    CZMQ_EXPORT int
+        zframe_send (zframe_t **self_p, void *dest, int flags);
+    
+    //  Return number of bytes in frame data
+    CZMQ_EXPORT size_t
+        zframe_size (zframe_t *self);
+    
+    //  Return address of frame data
+    CZMQ_EXPORT byte *
+        zframe_data (zframe_t *self);
+    
+    //  Create a new frame that duplicates an existing frame. If frame is null,
+    //  or memory was exhausted, returns null.
+    CZMQ_EXPORT zframe_t *
+        zframe_dup (zframe_t *self);
+    
+    //  Return frame data encoded as printable hex string, useful for 0MQ UUIDs.
+    //  Caller must free string when finished with it.
+    CZMQ_EXPORT char *
+        zframe_strhex (zframe_t *self);
+    
+    //  Return frame data copied into freshly allocated string
+    //  Caller must free string when finished with it.
+    CZMQ_EXPORT char *
+        zframe_strdup (zframe_t *self);
+    
+    //  Return TRUE if frame body is equal to string, excluding terminator
+    CZMQ_EXPORT bool
+        zframe_streq (zframe_t *self, const char *string);
+    
+    //  Return frame MORE indicator (1 or 0), set when reading frame from socket
+    //  or by the zframe_set_more() method
+    CZMQ_EXPORT int
+        zframe_more (zframe_t *self);
+    
+    //  Set frame MORE indicator (1 or 0). Note this is NOT used when sending 
+    //  frame to socket, you have to specify flag explicitly.
+    CZMQ_EXPORT void
+        zframe_set_more (zframe_t *self, int more);
+        
+    //  Return TRUE if two frames have identical size and data
+    //  If either frame is NULL, equality is always false.
+    CZMQ_EXPORT bool
+        zframe_eq (zframe_t *self, zframe_t *other);
+    
+    //  Set new contents for frame
+    CZMQ_EXPORT void
+        zframe_reset (zframe_t *self, const void *data, size_t size);
+    
+    //  Send message to zsys log sink (may be stdout, or system facility as
+    //  configured by zsys_set_logstream). Prefix shows before frame, if not null.
+    CZMQ_EXPORT void
+        zframe_print (zframe_t *self, const char *prefix);
+    
+    //  Probe the supplied object, and report if it looks like a zframe_t.
+    CZMQ_EXPORT bool
+        zframe_is (void *self);
+    
+    //  Self test of this class
+    CZMQ_EXPORT void
+        zframe_test (bool verbose);
+
+This is the class self test code:
+
+    //  Create two PAIR sockets and connect over inproc
+    zsock_t *output = zsock_new_pair ("@inproc://zframe.test");
+    assert (output);
+    zsock_t *input = zsock_new_pair (">inproc://zframe.test");
+    assert (input);
+    
+    //  Send five different frames, test ZFRAME_MORE
+    int frame_nbr;
+    for (frame_nbr = 0; frame_nbr < 5; frame_nbr++) {
+        frame = zframe_new ("Hello", 5);
+        assert (frame);
+        rc = zframe_send (&frame, output, ZFRAME_MORE);
+        assert (rc == 0);
+    }
+    //  Send same frame five times, test ZFRAME_REUSE
+    frame = zframe_new ("Hello", 5);
+    assert (frame);
+    for (frame_nbr = 0; frame_nbr < 5; frame_nbr++) {
+        rc = zframe_send (&frame, output, ZFRAME_MORE + ZFRAME_REUSE);
+        assert (rc == 0);
+    }
+    assert (frame);
+    zframe_t *copy = zframe_dup (frame);
+    assert (zframe_eq (frame, copy));
+    zframe_destroy (&frame);
+    assert (!zframe_eq (frame, copy));
+    assert (zframe_size (copy) == 5);
+    zframe_destroy (&copy);
+    assert (!zframe_eq (frame, copy));
+    
+    //  Test zframe_new_empty
+    frame = zframe_new_empty ();
+    assert (frame);
+    assert (zframe_size (frame) == 0);
+    zframe_destroy (&frame);
+    
+    //  Send END frame
+    frame = zframe_new ("NOT", 3);
+    assert (frame);
+    zframe_reset (frame, "END", 3);
+    char *string = zframe_strhex (frame);
+    assert (streq (string, "454E44"));
+    free (string);
+    string = zframe_strdup (frame);
+    assert (streq (string, "END"));
+    free (string);
+    rc = zframe_send (&frame, output, 0);
+    assert (rc == 0);
+    
+    //  Read and count until we receive END
+    frame_nbr = 0;
+    for (frame_nbr = 0;; frame_nbr++) {
+        zframe_t *frame = zframe_recv (input);
+        if (zframe_streq (frame, "END")) {
+            zframe_destroy (&frame);
+            break;
+        }
+        assert (zframe_more (frame));
+        zframe_set_more (frame, 0);
+        assert (zframe_more (frame) == 0);
+        zframe_destroy (&frame);
+    }
+    assert (frame_nbr == 10);
+    
+    zsock_destroy (&input);
+    zsock_destroy (&output);
+    
+

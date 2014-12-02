@@ -23,14 +23,23 @@ extern "C" {
 CZMQ_EXPORT void
     zclock_sleep (int msecs);
 
-//  Return current system clock as milliseconds
+//  Return current system clock as milliseconds. Note that this clock can
+//  jump backwards (if the system clock is changed) so is unsafe to use for
+//  timers and time offsets. Use zclock_mono for that instead.
 CZMQ_EXPORT int64_t
     zclock_time (void);
 
-//  Print formatted string to stdout, prefixed by date/time and
-//  terminated with a newline.
-CZMQ_EXPORT void
-    zclock_log (const char *format, ...);
+//  Return current monotonic clock in milliseconds. Use this when you compute
+//  time offsets. The monotonic clock is not affected by system changes and
+//  so will never be reset backwards, unlike a system clock.
+CZMQ_EXPORT int64_t
+    zclock_mono (void);
+
+//  Return current monotonic clock in microseconds. Use this when you compute
+//  time offsets. The monotonic clock is not affected by system changes and
+//  so will never be reset backwards, unlike a system clock.
+CZMQ_EXPORT int64_t
+    zclock_usecs (void);
 
 //  Return formatted date/time as fresh string. Free using zstr_free().
 CZMQ_EXPORT char *
@@ -40,6 +49,12 @@ CZMQ_EXPORT char *
 CZMQ_EXPORT void
     zclock_test (bool verbose);
 //  @end
+
+//  DEPRECATED in favor of zsys logging, see issue #519
+//  Print formatted string to stdout, prefixed by date/time and
+//  terminated with a newline.
+CZMQ_EXPORT void
+    zclock_log (const char *format, ...);
 
 //  Compiler hints
 CZMQ_EXPORT void zclock_log (const char *format, ...) CHECK_PRINTF (1);

@@ -1,0 +1,13 @@
+EXTRA_DIST += \
+    addons/makecert.c 
+
+if WITH_MAKECERT
+bin_PROGRAMS += addons/makecert
+
+addons_makecert_LDADD = \
+    src/libczmq.la \
+    ${zmq_LIBS}
+
+addons_makecert_SOURCES = \
+    addons/makecert.c
+endif

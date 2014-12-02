@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zgossip - gossip discovery service
+    zgossip - decentralized configuration management
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -13,58 +13,78 @@
 
 /*
 @header
-    Implements a gossip protocol (RFC TBD).
+    Implements a gossip protocol for decentralized configuration management.
+    Your applications nodes form a loosely connected network (which can have
+    cycles), and publish name/value tuples. Each node re-distributes the new
+    tuples it receives, so that the entire network eventually achieves a
+    consistent state. The current design does not expire tuples.
+
+    Provides these commands (sent as multipart strings to the actor):
+
+    * BIND endpoint -- binds the gossip service to specified endpoint
+    * PORT -- returns the last TCP port, if any, used for binding
+    * CONFIGURE configfile -- load configuration from specified file
+    * SET configpath value -- set configuration path = value
+    * CONNECT endpoint -- connect the gossip service to the specified peer
+    * PUBLISH key value -- publish a key/value pair to the gossip cluster
+    * STATUS -- return number of key/value pairs held by gossip service
+
+    Returns these messages:
+
+    * PORT number -- reply to PORT command
+    * STATUS number -- reply to STATUS command
+    * DELIVER key value -- new tuple delivered from network
 @discuss
-    The gossip protocol solves the problem of discovering a set of services
-    on a local area network. It provides an alternative to UDP beacons as
-    implemented by zbeacon.
+    The gossip protocol distributes information around a loosely-connected
+    network of gossip services. The information consists of name/value pairs
+    published by applications at any point in the network. The goal of the
+    gossip protocol is to create eventual consistency between all the using
+    applications.
+
+    The name/value pairs (tuples) can be used for configuration data, for
+    status updates, for presence, or for discovery. When used for discovery,
+    the gossip protocol works as an alternative to e.g. UDP beaconing.
 
     The gossip network consists of a set of loosely-coupled nodes that
-    exchange endpoint=service pairs. The endpoints must be addressable by
-    all nodes, so can be sockets in a process (inproc://), sockets on a
-    box (ipc://), or sockets on a network (tcp://). Mixing will not work.
+    exchange tuples. Nodes can be connected across arbitrary transports,
+    so the gossip network can have nodes that communicate over inproc,
+    over IPC, and/or over TCP, at the same time.
 
-    Every node runs the same stack, which is a server-client hybrid using
+    Each node runs the same stack, which is a server-client hybrid using
     a modified Harmony pattern (from Chapter 8 of the Guide):
-
     http://zguide.zeromq.org/page:all#True-Peer-Connectivity-Harmony-Pattern
 
     Each node provides a ROUTER socket that accepts client connections on an
-    endpoint defined by the application via a BIND command. The state machine
+    key defined by the application via a BIND command. The state machine
     for these connections is in zgossip.xml, and the generated code is in
-    zgossip_engine.h.
+    zgossip_engine.inc.
 
     Each node additionally creates outbound connections via DEALER sockets
-    to a set of peers, and under control of the calling application, which
-    sends CONNECT commands for each configured peer.
+    to a set of servers ("remotes"), and under control of the calling app,
+    which sends CONNECT commands for each configured remote.
 
     The messages between client and server are defined in zgossip_msg.xml.
-    This stack is built using the zeromq/zproto toolkit.
+    We built this stack using the zeromq/zproto toolkit.
 
-    The goal is that connecting to any other node is sufficient to connect
-    to the whole network. Each node accepts service announcements from its
-    owning application, and forwards these to the peers it is connected to,
-    either as server, or as client.
+    To join the gossip network, a node connects to one or more peers. Each
+    peer acts as a forwarder. This loosely-coupled network can scale to
+    thousands of nodes. However the gossip protocol is NOT designed to be
+    efficient, and should not be used for application data, as the same
+    tuples may be sent many times across the network.
 
-    The protocol uses ping-pong heartbeating to monitor presence. This code
-    doesn't do anything with expired peers yet.
+    The basic logic of the gossip service is to accept PUBLISH messages
+    from its owning application, and to forward these to every remote, and
+    every client it talks to. When a node gets a duplicate tuple, it throws
+    it away. When a node gets a new tuple, it stores it, and fowards it as
+    just described. At any point the application can access the node's set
+    of tuples.
 
-    The gossip network should be very scalable, as we need only two sockets
-    per node to get the equivalence of full interconnection.
+    At present there is no way to expire tuples from the network.
 
     The assumptions in this design are:
 
-    * All nodes are on the same ZeroMQ transport, fully interaddressable.
-    
-    * The topology is slow changing. Thus, the cost of the gossip protocol
+    * The data set is slow-changing. Thus, the cost of the gossip protocol
       is irrelevant with respect to other traffic.
-
-    TODO:
-     * Broadcast ANNOUNCE commands from the application to all clients, as
-       well as all servers.
-
-     * Write a large-scale test case that simulates some thousands of nodes
-       coming and going. This can run in one process, using inproc.
 @end
 */
 
@@ -77,7 +97,7 @@
 
 typedef struct _server_t server_t;
 typedef struct _client_t client_t;
-typedef struct _service_t service_t;
+typedef struct _tuple_t tuple_t;
 
 //  ---------------------------------------------------------------------
 //  This structure defines the context for each running server. Store
@@ -86,14 +106,15 @@ typedef struct _service_t service_t;
 struct _server_t {
     //  These properties must always be present in the server_t
     //  and are set by the generated engine; do not modify them!
-    zlog_t *log;                //  For any logging needed
+    zsock_t *pipe;              //  Actor pipe back to caller
     zconfig_t *config;          //  Current loaded configuration
-    
-    //  Add any properties you need here
-    zlist_t *peers;             //  Peers, as zsock_t instances
-    zhash_t *services;          //  Services, indexed by endpoint
 
-    service_t *cur_service;     //  Holds current service we're announcing
+    //  Add any properties you need here
+    zlistx_t *remotes;          //  Parents, as zsock_t instances
+    zhashx_t *tuples;           //  Tuples, indexed by key
+
+    tuple_t *cur_tuple;         //  Holds current tuple to publish
+    zgossip_msg_t *message;     //  Message to broadcast
 };
 
 //  ---------------------------------------------------------------------
@@ -104,52 +125,38 @@ struct _client_t {
     //  These properties must always be present in the client_t
     //  and are set by the generated engine; do not modify them!
     server_t *server;           //  Reference to parent server
-    zgossip_msg_t *request;     //  Last received request
-    zgossip_msg_t *reply;       //  Reply to send out, if any
-
-    zlist_t *endpoints;         //  List of known services, by endpoint
-    char *endpoint;             //  Next endpoint, if any
+    zgossip_msg_t *message;     //  Message in and out
 };
 
 
 //  ---------------------------------------------------------------------
-//  This structure defines one service that we track. Either the
-//  client property, or the peer property (a server peer) must be
-//  provided.
+//  This structure defines one tuple that we track
 
-struct _service_t {
-    zhash_t *container;         //  Hash table that holds this item
-    client_t *client;           //  Originating client, or
-    zsock_t *peer;              //  Originating server peer
-    char *endpoint;             //  Service endpoint
-    char *name;                 //  Service name
+struct _tuple_t {
+    zhashx_t *container;         //  Hash table that holds this item
+    char *key;                  //  Tuple key
+    char *value;                //  Tuple value
 };
 
-//  Callback when we remove service from container
+//  Callback when we remove a tuple from its container
 
 static void
-service_free (void *argument)
+tuple_free (void *argument)
 {
-    service_t *self = (service_t *) argument;
-    free (self->endpoint);
-    free (self->name);
+    tuple_t *self = (tuple_t *) argument;
+    free (self->key);
+    free (self->value);
     free (self);
 }
 
-//  Handle traffic from peer servers
+//  Handle traffic from remotes
 static int
-    peer_handler (zloop_t *loop, zsock_t *peer, void *argument);
-    
-//  Process a ANNOUNCE message
-static void
-    process_announce (server_t *server, client_t *client,
-                      zsock_t *peer, zgossip_msg_t *msg);
-
+remote_handler (zloop_t *loop, zsock_t *remote, void *argument);
 
 //  ---------------------------------------------------------------------
 //  Include the generated server engine
 
-#include "zgossip_engine.h"
+#include "zgossip_engine.inc"
 
 //  Allocate properties and structures for a new server instance.
 //  Return 0 if OK, or -1 if there was an error.
@@ -160,8 +167,14 @@ server_initialize (server_t *self)
     //  Default timeout for clients is one second; the caller can
     //  override this with a SET message.
     engine_configure (self, "server/timeout", "1000");
-    self->peers = zlist_new ();
-    self->services = zhash_new ();
+    self->message = zgossip_msg_new ();
+    
+    self->remotes = zlistx_new ();
+    assert (self->remotes);
+    zlistx_set_destructor (self->remotes, (czmq_destructor *) zsock_destroy_);
+    
+    self->tuples = zhashx_new ();
+    assert (self->tuples);
     return 0;
 }
 
@@ -170,12 +183,86 @@ server_initialize (server_t *self)
 static void
 server_terminate (server_t *self)
 {
-    while (zlist_size (self->peers) > 0) {
-        zsock_t *peer = (zsock_t *) zlist_pop (self->peers);
-        zsock_destroy (&peer);
+    zgossip_msg_destroy (&self->message);
+    zlistx_destroy (&self->remotes);
+    zhashx_destroy (&self->tuples);
+}
+
+//  Connect to a remote server
+
+static void
+server_connect (server_t *self, const char *endpoint)
+{
+    zsock_t *remote = zsock_new (ZMQ_DEALER);
+    assert (remote);          //  No recovery if exhausted
+
+    //  Never block on sending; we use an infinite HWM and buffer as many
+    //  messages as needed in outgoing pipes. Note that the maximum number
+    //  is the overall tuple set size.
+    zsock_set_unbounded (remote);
+    if (zsock_connect (remote, "%s", endpoint)) {
+        zsys_warning ("bad zgossip endpoint '%s'", endpoint);
+        zsock_destroy (&remote);
+        return;
     }
-    zlist_destroy (&self->peers);
-    zhash_destroy (&self->services);
+    //  Send HELLO and then PUBLISH for each tuple we have
+    zgossip_msg_t *gossip = zgossip_msg_new ();
+    zgossip_msg_set_id (gossip, ZGOSSIP_MSG_HELLO);
+    zgossip_msg_send (gossip, remote);
+    
+    tuple_t *tuple = (tuple_t *) zhashx_first (self->tuples);
+    while (tuple) {
+        zgossip_msg_set_id (gossip, ZGOSSIP_MSG_PUBLISH);
+        zgossip_msg_set_key (gossip, tuple->key);
+        zgossip_msg_set_value (gossip, tuple->value);
+        zgossip_msg_send (gossip, remote);
+        tuple = (tuple_t *) zhashx_next (self->tuples);
+    }
+    //  Now monitor this remote for incoming messages
+    zgossip_msg_destroy (&gossip);
+    engine_handle_socket (self, remote, remote_handler);
+    zlistx_add_end (self->remotes, remote);
+}
+
+
+//  Process an incoming tuple on this server.
+
+static void
+server_accept (server_t *self, const char *key, const char *value)
+{
+    tuple_t *tuple = (tuple_t *) zhashx_lookup (self->tuples, key);
+    if (tuple && streq (tuple->value, value))
+        return;                 //  Duplicate tuple, do nothing
+
+    //  Create new tuple
+    tuple = (tuple_t *) zmalloc (sizeof (tuple_t));
+    assert (tuple);
+    tuple->container = self->tuples;
+    tuple->key = strdup (key);
+    tuple->value = strdup (value);
+
+    //  Store new tuple
+    zhashx_update (tuple->container, key, tuple);
+    zhashx_freefn (tuple->container, key, tuple_free);
+
+    //  Deliver to calling application
+    zstr_sendx (self->pipe, "DELIVER", key, value, NULL);
+
+    //  Hold in server context so we can broadcast to all clients
+    self->cur_tuple = tuple;
+    engine_broadcast_event (self, NULL, forward_event);
+
+    //  Copy new tuple announcement to all remotes
+    zgossip_msg_t *gossip = zgossip_msg_new ();
+    zgossip_msg_set_id (gossip, ZGOSSIP_MSG_PUBLISH);
+    zsock_t *remote = (zsock_t *) zlistx_first (self->remotes);
+    while (remote) {
+        zgossip_msg_set_key (gossip, tuple->key);
+        zgossip_msg_set_value (gossip, tuple->value);
+        zgossip_msg_send (gossip, remote);
+        remote = (zsock_t *) zlistx_next (self->remotes);
+    }
+    zgossip_msg_destroy (&gossip);
 }
 
 //  Process server API method, return reply message if any
@@ -183,41 +270,34 @@ server_terminate (server_t *self)
 static zmsg_t *
 server_method (server_t *self, const char *method, zmsg_t *msg)
 {
-    //  Connect to a peer; note that all CONNECTs must be done before
-    //  any service announcements.
+    //  Connect to a remote
+    zmsg_t *reply = NULL;
     if (streq (method, "CONNECT")) {
         char *endpoint = zmsg_popstr (msg);
         assert (endpoint);
-        zsock_t *peer = zsock_new (ZMQ_DEALER);
-        assert (peer);          //  No recovery if exhausted
-        int rc = zsock_connect (peer, "%s", endpoint);
-        if (rc) {
-            zclock_log ("E (zgossip): bad endpoint '%s'", endpoint);
-            zsock_destroy (&peer);
-        }
-        else {
-            zgossip_msg_send_hello (peer);
-            zlist_append (self->peers, peer);
-            engine_handle_socket (self, peer, peer_handler);
-        }
+        server_connect (self, endpoint);
         zstr_free (&endpoint);
     }
     else
-    if (streq (method, "ANNOUNCE")) {
-        char *endpoint = zmsg_popstr (msg);
-        char *service = zmsg_popstr (msg);
-        //  Copy announcement to all peers we're connected to
-        //  TODO: broadcast to all clients
-        zsock_t *peer = (zsock_t *) zlist_first (self->peers);
-        while (peer) {
-            zgossip_msg_send_announce (peer, endpoint, service);
-            peer = (zsock_t *) zlist_next (self->peers);
-        }
+    if (streq (method, "PUBLISH")) {
+        char *key = zmsg_popstr (msg);
+        char *value = zmsg_popstr (msg);
+        server_accept (self, key, value);
+        zstr_free (&key);
+        zstr_free (&value);
     }
     else
-        zclock_log ("E (zgossip): unknown method '%s'", method);
-    
-    return NULL;
+    if (streq (method, "STATUS")) {
+        //  Return number of tuples we have stored
+        reply = zmsg_new ();
+        assert (reply);
+        zmsg_addstr (reply, "STATUS");
+        zmsg_addstrf (reply, "%d", (int) zhashx_size (self->tuples));
+    }
+    else
+        zsys_error ("unknown zgossip method '%s'", method);
+
+    return reply;
 }
 
 
@@ -241,125 +321,94 @@ client_terminate (client_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  get_first_service
+//  get_first_tuple
 //
 
 static void
-get_first_service (client_t *self)
+get_first_tuple (client_t *self)
 {
-    assert (!self->endpoints);
-    self->endpoints = zhash_keys (self->server->services);
-    self->endpoint = (char *) zlist_first (self->endpoints);
-    get_next_service (self);
-}
-
-
-//  --------------------------------------------------------------------------
-//  get_next_service
-//
-
-static void
-get_next_service (client_t *self)
-{
-    if (self->endpoint) {
-        service_t *service = (service_t *) zhash_lookup (
-            self->server->services, self->endpoint);
-        assert (service);
-        zgossip_msg_set_endpoint (self->reply, service->endpoint);
-        zgossip_msg_set_service (self->reply, service->name);
+    tuple_t *tuple = (tuple_t *) zhashx_first (self->server->tuples);
+    if (tuple) {
+        zgossip_msg_set_key (self->message, tuple->key);
+        zgossip_msg_set_value (self->message, tuple->value);
         engine_set_next_event (self, ok_event);
-        self->endpoint = (char *) zlist_next (self->endpoints);
     }
-    else {
-        zlist_destroy (&self->endpoints);
+    else
         engine_set_next_event (self, finished_event);
+}
+
+
+//  --------------------------------------------------------------------------
+//  get_next_tuple
+//
+
+static void
+get_next_tuple (client_t *self)
+{
+    tuple_t *tuple = (tuple_t *) zhashx_next (self->server->tuples);
+    if (tuple) {
+        zgossip_msg_set_key (self->message, tuple->key);
+        zgossip_msg_set_value (self->message, tuple->value);
+        engine_set_next_event (self, ok_event);
     }
+    else
+        engine_set_next_event (self, finished_event);
 }
 
 
 //  --------------------------------------------------------------------------
-//  store_service_if_new
+//  store_tuple_if_new
 //
 
 static void
-store_service_if_new (client_t *self)
+store_tuple_if_new (client_t *self)
 {
-    process_announce (self->server, self, NULL, self->request);
-}
-
-
-//  Process a ANNOUNCE message
-
-static void
-process_announce (server_t *server, client_t *client,
-                  zsock_t *peer, zgossip_msg_t *msg)
-{
-    service_t *service = (service_t *) zhash_lookup (
-        server->services, zgossip_msg_endpoint (msg));
-    if (service && streq (service->name, zgossip_msg_service (msg)))
-        return;                 //  Service already known so do nothing
-
-    //  Create new service
-    service = (service_t *) zmalloc (sizeof (service_t));
-    assert (service);
-    assert (client || peer);
-    service->container = server->services;
-    service->client = client;
-    service->peer = peer;
-    service->endpoint = strdup (zgossip_msg_endpoint (msg));
-    service->name = strdup (zgossip_msg_service (msg));
-
-    //  Store new service using endpoint as key
-    zhash_update (service->container, service->endpoint, service);
-    zhash_freefn (service->container, service->endpoint, service_free);
-
-    //  hold it in server context so we can
-    //  broadcast that to all clients
-    server->cur_service = service;
-
-    //  Forward new service to all peers except the one it came from
-    engine_broadcast_event (server, client, forward_event);
+    server_accept (self->server,
+                   zgossip_msg_key (self->message),
+                   zgossip_msg_value (self->message));
 }
 
 
 //  --------------------------------------------------------------------------
-//  get_service_to_forward
+//  get_tuple_to_forward
 //
 
 static void
-get_service_to_forward (client_t *self)
+get_tuple_to_forward (client_t *self)
 {
-    //  Hold this in server->cur_service so it's available to all
+    //  Hold this in server->cur_tuple so it's available to all
     //  clients; the whole broadcast operation happens in one thread
     //  so there's no risk of confusion here.
-    service_t *service = self->server->cur_service;
-    zgossip_msg_set_endpoint (self->reply, service->endpoint);
-    zgossip_msg_set_service (self->reply, service->name);
+    tuple_t *tuple = self->server->cur_tuple;
+    zgossip_msg_set_key (self->message, tuple->key);
+    zgossip_msg_set_value (self->message, tuple->value);
 }
 
 
 //  --------------------------------------------------------------------------
-//  Handle messages coming from peer servers
+//  Handle messages coming from remotes
 
 static int
-peer_handler (zloop_t *loop, zsock_t *peer, void *argument)
+remote_handler (zloop_t *loop, zsock_t *remote, void *argument)
 {
-    zgossip_msg_t *msg = zgossip_msg_recv (peer);
-    if (!msg)
-        return -1;              //  Interrupted
+    server_t *self = (server_t *) argument;
+    if (zgossip_msg_recv (self->message, remote))
+        return -1;          //  Interrupted
 
-    if (zgossip_msg_id (msg) == ZGOSSIP_MSG_ANNOUNCE)
-        process_announce ((server_t *) argument, NULL, peer, msg);
+    if (zgossip_msg_id (self->message) == ZGOSSIP_MSG_PUBLISH)
+        server_accept (self,
+                       zgossip_msg_key (self->message),
+                       zgossip_msg_value (self->message));
     else
-    if (zgossip_msg_id (msg) == ZGOSSIP_MSG_INVALID) {
+    if (zgossip_msg_id (self->message) == ZGOSSIP_MSG_INVALID) {
         //  Connection was reset, so send HELLO again
-        zgossip_msg_send_hello (peer);
+        zgossip_msg_set_id (self->message, ZGOSSIP_MSG_HELLO);
+        zgossip_msg_send (self->message, remote);
     }
     else
-    if (zgossip_msg_id (msg) == ZGOSSIP_MSG_PONG)
-        assert(true);   //  Do nothing with PONGs
-        
-    zgossip_msg_destroy (&msg);
+    if (zgossip_msg_id (self->message) == ZGOSSIP_MSG_PONG)
+        assert (true);   //  Do nothing with PONGs
+
     return 0;
 }
 
@@ -370,70 +419,67 @@ peer_handler (zloop_t *loop, zsock_t *peer, void *argument)
 void
 zgossip_test (bool verbose)
 {
-    printf (" * zgossip: \n");
-    
+    printf (" * zgossip: ");
+    if (verbose)
+        printf ("\n");
+
     //  @selftest
-    //  Test basic client-to-server operation
-    zactor_t *server = zactor_new (zgossip, NULL);
-    zstr_sendx (server, "SET", "server/animate", verbose? "1": "0", NULL);
-    zstr_sendx (server, "BIND", "ipc:///tmp/zgossip", NULL);
-    char *port_str = zstr_recv (server);
-    assert (streq (port_str, "0"));
-    zstr_free (&port_str);
+    //  Test basic client-to-server operation of the protocol
+    zactor_t *server = zactor_new (zgossip, "server");
+    assert (server);
+    if (verbose)
+        zstr_send (server, "VERBOSE");
+    zstr_sendx (server, "BIND", "inproc://zgossip", NULL);
 
     zsock_t *client = zsock_new (ZMQ_DEALER);
     assert (client);
     zsock_set_rcvtimeo (client, 2000);
-    zsock_connect (client, "ipc:///tmp/zgossip");
-
-    //  Send HELLO, which gets no reply
-    zgossip_msg_t *request, *reply;
-    request = zgossip_msg_new (ZGOSSIP_MSG_HELLO);
-    zgossip_msg_send (&request, client);
+    int rc = zsock_connect (client, "inproc://zgossip");
+    assert (rc == 0);
+    
+    //  Send HELLO, which gets no message
+    zgossip_msg_t *message = zgossip_msg_new ();
+    zgossip_msg_set_id (message, ZGOSSIP_MSG_HELLO);
+    zgossip_msg_send (message, client);
 
     //  Send PING, expect PONG back
-    request = zgossip_msg_new (ZGOSSIP_MSG_PING);
-    zgossip_msg_send (&request, client);
-    reply = zgossip_msg_recv (client);
-    assert (reply);
-    assert (zgossip_msg_id (reply) == ZGOSSIP_MSG_PONG);
-    zgossip_msg_destroy (&reply);
+    zgossip_msg_set_id (message, ZGOSSIP_MSG_PING);
+    zgossip_msg_send (message, client);
+    zgossip_msg_recv (message, client);
+    assert (zgossip_msg_id (message) == ZGOSSIP_MSG_PONG);
+    zgossip_msg_destroy (&message);
     
     zactor_destroy (&server);
-
     zsock_destroy (&client);
-    zactor_destroy (&server);
 
     //  Test peer-to-peer operations
-    zactor_t *base = zactor_new (zgossip, NULL);
+    zactor_t *base = zactor_new (zgossip, "base");
     assert (base);
-    zstr_sendx (base, "SET", "server/animate", verbose? "1": "0", NULL);
+    if (verbose)
+        zstr_send (base, "VERBOSE");
     //  Set a 100msec timeout on clients so we can test expiry
     zstr_sendx (base, "SET", "server/timeout", "100", NULL);
     zstr_sendx (base, "BIND", "inproc://base", NULL);
-    port_str = zstr_recv (base);
-    assert (streq (port_str, "0"));
-    zstr_free (&port_str);
 
-    zactor_t *alpha = zactor_new (zgossip, NULL);
+    zactor_t *alpha = zactor_new (zgossip, "alpha");
     assert (alpha);
     zstr_sendx (alpha, "CONNECT", "inproc://base", NULL);
-    zstr_sendx (alpha, "ANNOUNCE", "inproc://alpha-1", "service1", NULL);
-    zstr_sendx (alpha, "ANNOUNCE", "inproc://alpha-2", "service2", NULL);
+    zstr_sendx (alpha, "PUBLISH", "inproc://alpha-1", "service1", NULL);
+    zstr_sendx (alpha, "PUBLISH", "inproc://alpha-2", "service2", NULL);
 
-    zactor_t *beta = zactor_new (zgossip, NULL);
+    zactor_t *beta = zactor_new (zgossip, "beta");
     assert (beta);
     zstr_sendx (beta, "CONNECT", "inproc://base", NULL);
-    zstr_sendx (beta, "ANNOUNCE", "inproc://beta-1", "service1", NULL);
-    zstr_sendx (beta, "ANNOUNCE", "inproc://beta-2", "service2", NULL);
+    zstr_sendx (beta, "PUBLISH", "inproc://beta-1", "service1", NULL);
+    zstr_sendx (beta, "PUBLISH", "inproc://beta-2", "service2", NULL);
 
     //  got nothing
     zclock_sleep (200);
-    
+
     zactor_destroy (&base);
     zactor_destroy (&alpha);
     zactor_destroy (&beta);
-    
+
     //  @end
     printf ("OK\n");
 }

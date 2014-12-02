@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zstr - sending and receiving strings
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -18,6 +18,15 @@
     and appends a null byte on received strings. This class is for simple
     message sending.
 @discuss
+           Memory                       Wire
+           +-------------+---+          +---+-------------+
+    Send   | S t r i n g | 0 |  ---->   | 6 | S t r i n g |
+           +-------------+---+          +---+-------------+
+
+           Wire                         Heap
+           +---+-------------+          +-------------+---+
+    Recv   | 6 | S t r i n g |  ---->   | S t r i n g | 0 |
+           +---+-------------+          +-------------+---+
 @end
 */
 
@@ -33,7 +42,7 @@ s_send_string (void *dest, bool more, char *string)
     zmq_msg_t message;
     zmq_msg_init_size (&message, len);
     memcpy (zmq_msg_data (&message), string, len);
-    if (zmq_sendmsg (handle, &message, more? ZMQ_SNDMORE: 0) == -1) {
+    if (zmq_sendmsg (handle, &message, more ? ZMQ_SNDMORE : 0) == -1) {
         zmq_msg_close (&message);
         return -1;
     }
@@ -60,9 +69,11 @@ zstr_recv (void *source)
 
     size_t size = zmq_msg_size (&message);
     char *string = (char *) malloc (size + 1);
-    memcpy (string, zmq_msg_data (&message), size);
+    if (string) {
+        memcpy (string, zmq_msg_data (&message), size);
+        string [size] = 0;
+    }
     zmq_msg_close (&message);
-    string [size] = 0;
     return string;
 }
 
@@ -70,20 +81,21 @@ zstr_recv (void *source)
 //  --------------------------------------------------------------------------
 //  Send a C string to a socket, as a frame. The string is sent without
 //  trailing null byte; to read this you can use zstr_recv, or a similar
-//  method that adds a null terminator on the received string.
+//  method that adds a null terminator on the received string. String
+//  may be NULL, which is sent as "".
 
 int
 zstr_send (void *dest, const char *string)
 {
     assert (dest);
-    assert (string);
-    return s_send_string (dest, false, (char *) string);
+    return s_send_string (dest, false, string ? (char *) string : "");
 }
 
 
 //  --------------------------------------------------------------------------
 //  Send a C string to a socket, as zstr_send(), with a MORE flag, so that
-//  you can send further strings in the same multi-part message.
+//  you can send further strings in the same multi-part message. String
+//  may be NULL, which is sent as "".
 
 int
 zstr_sendm (void *dest, const char *string)
@@ -108,6 +120,9 @@ zstr_sendf (void *dest, const char *format, ...)
     va_list argptr;
     va_start (argptr, format);
     char *string = zsys_vprintf (format, argptr);
+    if (!string)
+        return -1;
+
     va_end (argptr);
 
     int rc = s_send_string (dest, false, string);
@@ -130,6 +145,9 @@ zstr_sendfm (void *dest, const char *format, ...)
     va_list argptr;
     va_start (argptr, format);
     char *string = zsys_vprintf (format, argptr);
+    if (!string)
+        return -1;
+
     va_end (argptr);
 
     int rc = s_send_string (dest, true, string);
@@ -146,6 +164,8 @@ int
 zstr_sendx (void *dest, const char *string, ...)
 {
     zmsg_t *msg = zmsg_new ();
+    if (!msg)
+        return -1;
     va_list args;
     va_start (args, string);
     while (string) {
@@ -171,11 +191,11 @@ zstr_recvx (void *source, char **string_p, ...)
 {
     assert (source);
     void *handle = zsock_resolve (source);
-    
+
     zmsg_t *msg = zmsg_recv (handle);
     if (!msg)
         return -1;
-        
+
     va_list args;
     va_start (args, string_p);
     while (string_p) {
@@ -221,9 +241,11 @@ zstr_recv_nowait (void *dest)
 
     size_t size = zmq_msg_size (&message);
     char *string = (char *) malloc (size + 1);
-    memcpy (string, zmq_msg_data (&message), size);
+    if (string) {
+        memcpy (string, zmq_msg_data (&message), size);
+        string [size] = 0;
+    }
     zmq_msg_close (&message);
-    string [size] = 0;
     return string;
 }
 
@@ -238,13 +260,10 @@ zstr_test (bool verbose)
 
     //  @selftest
     //  Create two PAIR sockets and connect over inproc
-    zsock_t *output = zsock_new (ZMQ_PAIR);
+    zsock_t *output = zsock_new_pair ("@inproc://zstr.test");
     assert (output);
-    zsock_bind (output, "inproc://zstr.test");
-    
-    zsock_t *input = zsock_new (ZMQ_PAIR);
+    zsock_t *input = zsock_new_pair (">inproc://zstr.test");
     assert (input);
-    zsock_connect (input, "inproc://zstr.test");
 
     //  Send ten strings, five strings with MORE flag and then END
     int string_nbr;
@@ -256,6 +275,7 @@ zstr_test (bool verbose)
     string_nbr = 0;
     for (string_nbr = 0;; string_nbr++) {
         char *string = zstr_recv (input);
+        assert (string);
         if (streq (string, "END")) {
             zstr_free (&string);
             break;

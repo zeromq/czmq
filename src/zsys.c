@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zsys - system-level methods
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -29,9 +29,8 @@
 //  These are global variables accessible to CZMQ application code
 volatile int zsys_interrupted = 0;  //  Current name
 volatile int zctx_interrupted = 0;  //  Deprecated name
+volatile uint64_t zsys_allocs = 0;
 
-static void s_initialize_process (void);
-static void s_terminate_process (void);
 static void s_signal_handler (int signal_value);
 
 //  We use these variables for signal handling
@@ -42,42 +41,51 @@ static struct sigaction sigterm_default;
 
 #elif defined (__WINDOWS__)
 static zsys_handler_fn *installed_handler_fn;
-static BOOL WINAPI s_handler_fn_shim (DWORD ctrltype)
+static BOOL WINAPI
+s_handler_fn_shim (DWORD ctrltype)
 {
-   //  Return TRUE for events that we handle
-   if (ctrltype == CTRL_C_EVENT && installed_handler_fn != NULL) {
-       installed_handler_fn (ctrltype);
-       return TRUE;
-   }
-   else
-       return FALSE;
+    //  Return TRUE for events that we handle
+    if (ctrltype == CTRL_C_EVENT && installed_handler_fn != NULL) {
+        installed_handler_fn (ctrltype);
+        return TRUE;
+    }
+    else
+        return FALSE;
 }
 #endif
 
 //  --------------------------------------------------------------------------
 //  Global context handling
 
-//  Global ZeroMQ context for this process
-void *process_ctx = NULL;
+//  ZeroMQ context for this process
+static void *s_process_ctx = NULL;
+static bool s_initialized = false;
 
 //  Default globals for new sockets and other joys; these can all be set
 //  from the environment, or via the zsys_set_xxx API.
-static size_t s_iothreads = 1;      //  ZSYS_IOTHREADS=1
+static size_t s_io_threads = 1;     //  ZSYS_IO_THREADS=1
+static size_t s_max_sockets = 1024; //  ZSYS_MAX_SOCKETS=1024
 static size_t s_linger = 0;         //  ZSYS_LINGER=0
 static size_t s_sndhwm = 1000;      //  ZSYS_SNDHWM=1000
 static size_t s_rcvhwm = 1000;      //  ZSYS_RCVHWM=1000
+static size_t s_pipehwm = 1000;     //  ZSYS_PIPEHWM=1000
 static int s_ipv6 = 0;              //  ZSYS_IPV6=0
 static char *s_interface = NULL;    //  ZSYS_INTERFACE=
+static char *s_logident = NULL;     //  ZSYS_LOGIDENT=
+static FILE *s_logstream = NULL;    //  ZSYS_LOGSTREAM=stdout/stderr
+static bool s_logsystem = false;    //  ZSYS_LOGSYSTEM=true/false
+static void *s_logsender = NULL;    //  ZSYS_LOGSENDER=
 
-//  Track number of open sockets so we can zmq_ctx_term() safely
+//  Track number of open sockets so we can zmq_term() safely
 static size_t s_open_sockets = 0;
 
 //  We keep a list of open sockets to report leaks to developers
-static zlist_t *s_sockref_list = NULL;
+static zlistx_t *s_sockref_list = NULL;
 
 //  This defines a single zsocket_new() caller instance
 typedef struct {
     void *handle;
+    int type;
     const char *filename;
     size_t line_nbr;
 } s_sockref_t;
@@ -90,7 +98,7 @@ typedef pthread_mutex_t zsys_mutex_t;
 #   define ZMUTEX_UNLOCK(m)  pthread_mutex_unlock (&m);
 #   define ZMUTEX_DESTROY(m) pthread_mutex_destroy (&m);
 #elif defined (__WINDOWS__)
-typedef CRITICAL_SECTION  zsys_mutex_t;
+typedef CRITICAL_SECTION zsys_mutex_t;
 #   define ZMUTEX_INIT(m)    InitializeCriticalSection (&m);
 #   define ZMUTEX_LOCK(m)    EnterCriticalSection (&m);
 #   define ZMUTEX_UNLOCK(m)  LeaveCriticalSection (&m);
@@ -99,6 +107,157 @@ typedef CRITICAL_SECTION  zsys_mutex_t;
 
 //  Mutex to guard socket counter
 static zsys_mutex_t s_mutex;
+
+
+//  --------------------------------------------------------------------------
+//  Initialize CZMQ zsys layer; this happens automatically when you create
+//  a socket or an actor; however this call lets you force initialization
+//  earlier, so e.g. logging is properly set-up before you start working.
+//  Not threadsafe, so call only from main thread. Safe to call multiple
+//  times. Returns global CZMQ context.
+
+void *
+zsys_init (void)
+{
+    if (s_initialized) {
+        assert (s_process_ctx);
+        return s_process_ctx;
+    }
+    //  Pull process defaults from environment
+    if (getenv ("ZSYS_IO_THREADS"))
+        s_io_threads = atoi (getenv ("ZSYS_IO_THREADS"));
+
+    if (getenv ("ZSYS_MAX_SOCKETS"))
+        s_max_sockets = atoi (getenv ("ZSYS_MAX_SOCKETS"));
+
+    if (getenv ("ZSYS_LINGER"))
+        s_linger = atoi (getenv ("ZSYS_LINGER"));
+
+    if (getenv ("ZSYS_SNDHWM"))
+        s_sndhwm = atoi (getenv ("ZSYS_SNDHWM"));
+
+    if (getenv ("ZSYS_RCVHWM"))
+        s_rcvhwm = atoi (getenv ("ZSYS_RCVHWM"));
+
+    if (getenv ("ZSYS_PIPEHWM"))
+        s_pipehwm = atoi (getenv ("ZSYS_PIPEHWM"));
+
+    if (getenv ("ZSYS_IPV6"))
+        s_ipv6 = atoi (getenv ("ZSYS_IPV6"));
+
+    if (getenv ("ZSYS_LOGSTREAM")) {
+        if (streq (getenv ("ZSYS_LOGSTREAM"), "stdout"))
+            s_logstream = stdout;
+        else
+        if (streq (getenv ("ZSYS_LOGSTREAM"), "stderr"))
+            s_logstream = stderr;
+    }
+    else
+        s_logstream = stdout;
+
+    if (getenv ("ZSYS_LOGSYSTEM")) {
+        if (streq (getenv ("ZSYS_LOGSYSTEM"), "true"))
+            s_logsystem = true;
+        else
+        if (streq (getenv ("ZSYS_LOGSYSTEM"), "false"))
+            s_logsystem = false;
+    }
+    //  Catch SIGINT and SIGTERM unless ZSYS_SIGHANDLER=false
+    if (  getenv ("ZSYS_SIGHANDLER") == NULL
+       || strneq (getenv ("ZSYS_SIGHANDLER"), "false"))
+        zsys_catch_interrupts ();
+
+    ZMUTEX_INIT (s_mutex);
+    s_sockref_list = zlistx_new ();
+    if (!s_sockref_list) {
+        zsys_shutdown ();
+        return NULL;
+    }
+    srandom ((unsigned) time (NULL));
+    atexit (zsys_shutdown);
+
+    assert (!s_process_ctx);
+    //  We use zmq_init/zmq_term to keep compatibility back to ZMQ v2
+    s_process_ctx = zmq_init ((int) s_io_threads);
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 2, 0))
+    //  TODO: this causes TravisCI to break; libzmq does not return a
+    //  valid socket on zmq_socket(), after this...
+    zmq_ctx_set (s_process_ctx, ZMQ_MAX_SOCKETS, s_max_sockets);
+#endif
+    s_initialized = true;
+
+    //  The following functions call zsys_init(), so they MUST be called after
+    //  s_initialized is set in order to avoid an infinite recursion
+    if (getenv ("ZSYS_INTERFACE"))
+        zsys_set_interface (getenv ("ZSYS_INTERFACE"));
+
+    if (getenv ("ZSYS_LOGIDENT"))
+        zsys_set_logident (getenv ("ZSYS_LOGIDENT"));
+
+    if (getenv ("ZSYS_LOGSENDER"))
+        zsys_set_logsender (getenv ("ZSYS_LOGSENDER"));
+
+    return s_process_ctx;
+}
+
+//  atexit or manual termination for the process
+void
+zsys_shutdown (void)
+{
+    if (!s_initialized)
+        return;
+
+    s_initialized = false;
+
+    //  The atexit handler is called when the main function exits;
+    //  however we may have zactor threads shutting down and still
+    //  trying to close their sockets. So if we suspect there are
+    //  actors busy (s_open_sockets > 0), then we sleep for a few
+    //  hundred milliseconds to allow the actors, if any, to get in
+    //  and close their sockets.
+    ZMUTEX_LOCK (s_mutex);
+    size_t busy = s_open_sockets;
+    ZMUTEX_UNLOCK (s_mutex);
+    if (busy)
+        zclock_sleep (200);
+
+    //  No matter, we are now going to shut down
+    //  Print the source reference for any sockets the app did not
+    //  destroy properly.
+    ZMUTEX_LOCK (s_mutex);
+    s_sockref_t *sockref = (s_sockref_t *) zlistx_detach (s_sockref_list, NULL);
+    while (sockref) {
+        assert (sockref->filename);
+        zsys_error ("dangling '%s' socket created at %s:%d",
+                    zsys_sockname (sockref->type),
+                    sockref->filename, (int) sockref->line_nbr);
+        zmq_close (sockref->handle);
+        free (sockref);
+        sockref = (s_sockref_t *) zlistx_detach (s_sockref_list, NULL);
+    }
+    zlistx_destroy (&s_sockref_list);
+    ZMUTEX_UNLOCK (s_mutex);
+
+    //  Close logsender socket if opened (don't do this in critical section)
+    if (s_logsender) {
+        zsys_close (s_logsender, NULL, 0);
+        s_logsender = NULL;
+    }
+    if (s_open_sockets == 0)
+        zmq_term (s_process_ctx);
+    else
+        zsys_error ("dangling sockets: cannot terminate ZMQ safely");
+
+    ZMUTEX_DESTROY (s_mutex);
+
+    //  Free dynamically allocated properties
+    free (s_interface);
+    free (s_logident);
+
+#if defined (__UNIX__)
+    closelog ();                //  Just to be pedantic
+#endif
+}
 
 
 //  --------------------------------------------------------------------------
@@ -117,174 +276,174 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
     //  apps, they MUST create a socket in the main program before
     //  starting any threads. If the app uses zactor for its threads
     //  then we can guarantee this to always be safe.
-    if (!process_ctx)
-        s_initialize_process ();
-
+    zsys_init ();
     ZMUTEX_LOCK (s_mutex);
-    void *handle = zmq_socket (process_ctx, type);
-
+    void *handle = zmq_socket (s_process_ctx, type);
     //  Configure socket with process defaults
-    zsocket_set_linger (handle, (int) s_linger);
+    zsock_set_linger (handle, (int) s_linger);
 #if (ZMQ_VERSION_MAJOR == 2)
     //  For ZeroMQ/2.x we use sndhwm for both send and receive
-    zsocket_set_hwm (handle, s_sndhwm);
+    zsock_set_hwm (handle, s_sndhwm);
 #else
     //  For later versions we use separate SNDHWM and RCVHWM
-    zsocket_set_sndhwm (handle, (int) s_sndhwm);
-    zsocket_set_rcvhwm (handle, (int) s_rcvhwm);
+    zsock_set_sndhwm (handle, (int) s_sndhwm);
+    zsock_set_rcvhwm (handle, (int) s_rcvhwm);
 #   if defined (ZMQ_IPV6)
-    zsocket_set_ipv6 (handle, s_ipv6);
+    zsock_set_ipv6 (handle, s_ipv6);
 #   else
-    zsocket_set_ipv4only (handle, s_ipv6? 0: 1);
+    zsock_set_ipv4only (handle, s_ipv6 ? 0 : 1);
 #   endif
 #endif
-    //  Add socket to reference tracker so we can report leaks
-    //  TODO: let user disable this via environment variable; by default
-    //  it should be enabled to force correct destruction of sockets.
+    //  Add socket to reference tracker so we can report leaks; this is
+    //  done only when the caller passes a filename/line_nbr
     if (filename) {
-        s_sockref_t *sockref = (s_sockref_t *) malloc (sizeof (s_sockref_t));
-        sockref->handle = handle;
-        sockref->filename = filename;
-        sockref->line_nbr = line_nbr;
-        zlist_append (s_sockref_list, sockref);
+        s_sockref_t *sockref = (s_sockref_t *) zmalloc (sizeof (s_sockref_t));
+        if (sockref) {
+            sockref->handle = handle;
+            sockref->type = type;
+            sockref->filename = filename;
+            sockref->line_nbr = line_nbr;
+            zlistx_add_end (s_sockref_list, sockref);
+        }
+        else {
+            zmq_close (handle);
+            ZMUTEX_UNLOCK (s_mutex);
+            return NULL;
+        }
     }
     s_open_sockets++;
     ZMUTEX_UNLOCK (s_mutex);
     return handle;
 }
 
-//  First-time initializations for the process
-static void
-s_initialize_process (void)
-{
-    //  Pull process defaults from environment
-    if (getenv ("ZSYS_IOTHREADS"))
-        s_iothreads = atoi (getenv ("ZSYS_IOTHREADS"));
-    if (getenv ("ZSYS_LINGER"))
-        s_linger = atoi (getenv ("ZSYS_LINGER"));
-    if (getenv ("ZSYS_SNDHWM"))
-        s_sndhwm = atoi (getenv ("ZSYS_SNDHWM"));
-    if (getenv ("ZSYS_RCVHWM"))
-        s_rcvhwm = atoi (getenv ("ZSYS_RCVHWM"));
-    if (getenv ("ZSYS_IPV6"))
-        s_ipv6 = atoi (getenv ("ZSYS_IPV6"));
-    if (getenv ("ZSYS_INTERFACE"))
-        s_interface = strdup (getenv ("ZSYS_INTERFACE"));
-
-    //  This call keeps compatibility back to ZMQ v2
-    process_ctx = zmq_init ((int) s_iothreads);
-    ZMUTEX_INIT (s_mutex);
-    s_sockref_list = zlist_new ();
-    zsys_catch_interrupts ();
-    srandom ((unsigned) time (NULL));
-    atexit (s_terminate_process);
-}
-
-//  atexit termination for the process
-static void
-s_terminate_process (void)
-{
-    //  The atexit handler is called when the main function exits;
-    //  however we may have zactor threads shutting down and still
-    //  trying to close their sockets. So if we suspect there are
-    //  actors busy (s_open_sockets > 0), then we sleep for a few
-    //  hundred milliseconds to allow the actors, if any, to get in
-    //  and close their sockets.
-    ZMUTEX_LOCK (s_mutex);
-    size_t busy = s_open_sockets;
-    ZMUTEX_UNLOCK (s_mutex);
-    if (busy)
-        zclock_sleep (100);
-
-    //  No matter, we are now going to shut down
-    //  Print the source reference for any sockets the app did not
-    //  destroy properly.
-    ZMUTEX_LOCK (s_mutex);
-    s_sockref_t *sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
-    while (sockref) {
-#ifdef __WINDOWS__
-		printf ("E: dangling socket created at %s:%u\n",
-                sockref->filename, sockref->line_nbr);
-#else
-        printf ("E: dangling socket created at %s:%zd\n",
-                sockref->filename, sockref->line_nbr);
-#endif
-        zmq_close (sockref->handle);
-        free (sockref);
-        sockref = (s_sockref_t *) zlist_pop (s_sockref_list);
-    }
-    zlist_destroy (&s_sockref_list);
-    ZMUTEX_UNLOCK (s_mutex);
-
-    zmq_ctx_term (process_ctx);
-    ZMUTEX_DESTROY (s_mutex);
-
-    //  Free dynamically allocated properties
-    free (s_interface);
-}
-
-
 //  --------------------------------------------------------------------------
-//  Destroy/close a ZMQ socket. You should call this for every socket you 
+//  Destroy/close a ZMQ socket. You should call this for every socket you
 //  create using zsys_socket().
 
 int
-zsys_close (void *handle)
+zsys_close (void *handle, const char *filename, size_t line_nbr)
 {
     ZMUTEX_LOCK (s_mutex);
     //  It's possible atexit() has already happened if we're running under
     //  a debugger that redirects the main thread exit.
     if (s_sockref_list) {
-        s_sockref_t *sockref = (s_sockref_t *) zlist_first (s_sockref_list);
+        s_sockref_t *sockref = (s_sockref_t *) zlistx_first (s_sockref_list);
         while (sockref) {
             if (sockref->handle == handle) {
-                zlist_remove (s_sockref_list, sockref);
+                zlistx_delete (s_sockref_list, zlistx_handle (s_sockref_list));
                 free (sockref);
-                s_open_sockets--;
-                zmq_close (handle);
                 break;
             }
-            sockref = (s_sockref_t *) zlist_next (s_sockref_list);
+            sockref = (s_sockref_t *) zlistx_next (s_sockref_list);
         }
     }
+    s_open_sockets--;
+    zmq_close (handle);
     ZMUTEX_UNLOCK (s_mutex);
     return 0;
 }
 
 
 //  --------------------------------------------------------------------------
+//  Return ZMQ socket name for socket type
+
+char *
+zsys_sockname (int socktype)
+{
+    char *type_names [] = {
+        "PAIR", "PUB", "SUB", "REQ", "REP",
+        "DEALER", "ROUTER", "PULL", "PUSH",
+        "XPUB", "XSUB", "STREAM"
+    };
+    //  This array matches ZMQ_XXX type definitions
+    assert (ZMQ_PAIR == 0);
+#if defined (ZMQ_STREAM)
+    assert (socktype >= 0 && socktype <= ZMQ_STREAM);
+#else
+    assert (socktype >= 0 && socktype <= ZMQ_XSUB);
+#endif
+    return type_names [socktype];
+}
+
+
+//  --------------------------------------------------------------------------
+//  Create a pipe, which consists of two PAIR sockets connected over inproc.
+//  The pipe is configured to use the zsys_pipehwm setting. Returns the
+//  frontend socket successful, NULL if failed.
+
+zsock_t *
+zsys_create_pipe (zsock_t **backend_p)
+{
+    zsock_t *frontend = zsock_new (ZMQ_PAIR);
+    zsock_t *backend = zsock_new (ZMQ_PAIR);
+    if (!frontend || !backend) {
+        zsock_destroy (&frontend);
+        zsock_destroy (&backend);
+        return frontend;
+    }
+#if (ZMQ_VERSION_MAJOR == 2)
+    zsock_set_hwm (frontend, zsys_pipehwm ());
+    zsock_set_hwm (backend, zsys_pipehwm ());
+#else
+    zsock_set_sndhwm (frontend, (int) zsys_pipehwm ());
+    zsock_set_sndhwm (backend, (int) zsys_pipehwm ());
+#endif
+    //  Now bind and connect pipe ends
+    char endpoint [32];
+    while (true) {
+        sprintf (endpoint, "inproc://pipe-%04x-%04x\n",
+                 randof (0x10000), randof (0x10000));
+        if (zsock_bind (frontend, "%s", endpoint) == 0)
+            break;
+    }
+    int rc = zsock_connect (backend, "%s", endpoint);
+    assert (rc != -1);          //  Connect cannot fail
+
+    //  Return frontend and backend sockets
+    *backend_p = backend;
+    return frontend;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Set interrupt handler; this saves the default handlers so that a
 //  zsys_handler_reset () can restore them. If you call this multiple times
-//  then the last handler will take affect. Note handler_fn cannot be null.
+//  then the last handler will take affect. If handler_fn is NULL, disables
+//  default SIGINT/SIGTERM handling in CZMQ.
 
 void
 zsys_handler_set (zsys_handler_fn *handler_fn)
 {
-    //  After 2014-04-20 this code does not accept NULL handlers, which
-    //  was complexity for no known benefit.
-    assert (handler_fn);
-
+    if (!handler_fn) {
+        //  Disable existing or future signal handling
+        zsys_handler_reset ();
+        s_first_time = false;
+    }
+    else {
 #if defined (__UNIX__)
-    //  If first time, save default handlers
-    if (s_first_time) {
-        sigaction (SIGINT, NULL, &sigint_default);
-        sigaction (SIGTERM, NULL, &sigterm_default);
-        s_first_time = false;
-    }
-    //  Install signal handler for SIGINT and SIGTERM
-    struct sigaction action;
-    action.sa_handler = handler_fn;
-    action.sa_flags = 0;
-    sigemptyset (&action.sa_mask);
-    sigaction (SIGINT, &action, NULL);
-    sigaction (SIGTERM, &action, NULL);
+        if (s_first_time) {
+            //  If first time, save default handlers
+            sigaction (SIGINT, NULL, &sigint_default);
+            sigaction (SIGTERM, NULL, &sigterm_default);
+            s_first_time = false;
+        }
+        //  Install signal handler for SIGINT and SIGTERM
+        struct sigaction action;
+        action.sa_handler = handler_fn;
+        action.sa_flags = 0;
+        sigemptyset (&action.sa_mask);
+        sigaction (SIGINT, &action, NULL);
+        sigaction (SIGTERM, &action, NULL);
 #elif defined (__WINDOWS__)
-    installed_handler_fn = handler_fn;
-    if (s_first_time) {
-        SetConsoleCtrlHandler (s_handler_fn_shim, TRUE);
-        s_first_time = false;
-    }
+        installed_handler_fn = handler_fn;
+        if (s_first_time) {
+            SetConsoleCtrlHandler (s_handler_fn_shim, TRUE);
+            s_first_time = false;
+        }
+#else
+#   error "No signal handling defined for this platform"
 #endif
+    }
 }
 
 
@@ -328,7 +487,6 @@ zsys_catch_interrupts (void)
 static void
 s_signal_handler (int signal_value)
 {
-    puts ("INTERRUPTED");
     zctx_interrupted = 1;
     zsys_interrupted = 1;
 }
@@ -394,12 +552,10 @@ zsys_file_mode (const char *filename)
     else
         mode |= S_IFREG;
 
-#ifdef __UTYPE_ANDROID
     if (!(dwfa & FILE_ATTRIBUTE_HIDDEN))
         mode |= S_IRUSR;
     if (!(dwfa & FILE_ATTRIBUTE_READONLY))
         mode |= S_IWUSR;
-#endif
 
     return mode;
 #else
@@ -420,7 +576,7 @@ zsys_file_delete (const char *filename)
 {
     assert (filename);
 #if (defined (__WINDOWS__))
-    return DeleteFileA (filename) ? 0: -1;
+    return DeleteFileA (filename) ? 0 : -1;
 #else
     return unlink (filename);
 #endif
@@ -460,6 +616,8 @@ zsys_dir_create (const char *pathname, ...)
     va_start (argptr, pathname);
     char *formatted = zsys_vprintf (pathname, argptr);
     va_end (argptr);
+    if (!formatted)
+        return -1;
 
     //  Create parent directory levels if needed
     char *slash = strchr (formatted + 1, '/');
@@ -467,14 +625,16 @@ zsys_dir_create (const char *pathname, ...)
         if (slash)
             *slash = 0;         //  Cut at slash
         mode_t mode = zsys_file_mode (formatted);
-        if (mode == (mode_t)-1) {
+        if (mode == (mode_t) -1) {
             //  Does not exist, try to create it
 #if (defined (__WINDOWS__))
-            if (!CreateDirectoryA (formatted, NULL))
+            if (!CreateDirectoryA (formatted, NULL)) {
 #else
-            if (mkdir (formatted, 0775))
+            if (mkdir (formatted, 0775)) {
 #endif
+                free (formatted);
                 return -1;      //  Failed
+            }
         }
         else
         if ((mode & S_IFDIR) == 0) {
@@ -500,9 +660,11 @@ zsys_dir_delete (const char *pathname, ...)
     va_start (argptr, pathname);
     char *formatted = zsys_vprintf (pathname, argptr);
     va_end (argptr);
+    if (!formatted)
+        return -1;
 
 #if (defined (__WINDOWS__))
-    int rc = RemoveDirectoryA (formatted)? 0: -1;
+    int rc = RemoveDirectoryA (formatted) ? 0 : -1;
 #else
     int rc = rmdir (formatted);
 #endif
@@ -515,16 +677,16 @@ zsys_dir_delete (const char *pathname, ...)
 //  Set private file creation mode; all files created from here will be
 //  readable/writable by the owner only.
 
-#if !defined(__WINDOWS__)
+#if !defined (__WINDOWS__)
 static mode_t s_old_mask = 0;
 #endif
 
 void
 zsys_file_mode_private (void)
 {
-#   if !defined(__WINDOWS__)
+#if !defined (__WINDOWS__)
     s_old_mask = umask (S_IWGRP | S_IWOTH | S_IRGRP | S_IROTH);
-#   endif
+#endif
 }
 
 
@@ -536,21 +698,26 @@ void
 zsys_file_mode_default (void)
 {
     //  Reset process file create mask
-#   if !defined(__WINDOWS__)
+#if !defined (__WINDOWS__)
     if (s_old_mask)
         umask (s_old_mask);
-#   endif
+#endif
 }
 
 
 //  --------------------------------------------------------------------------
-//  Return the czmq version for run-time API detection
+//  Return the CZMQ version for run-time API detection; returns version
+//  number into provided fields, providing reference isn't null in each case.
 
-void zsys_version (int *major, int *minor, int *patch)
+void
+zsys_version (int *major, int *minor, int *patch)
 {
-    *major = CZMQ_VERSION_MAJOR;
-    *minor = CZMQ_VERSION_MINOR;
-    *patch = CZMQ_VERSION_PATCH;
+    if (major)
+        *major = CZMQ_VERSION_MAJOR;
+    if (minor)
+        *minor = CZMQ_VERSION_MINOR;
+    if (patch)
+        *patch = CZMQ_VERSION_PATCH;
 }
 
 
@@ -579,17 +746,24 @@ char *
 zsys_vprintf (const char *format, va_list argptr)
 {
     int size = 256;
-    char *string = (char *) malloc (size);
+    char *string = (char *) zmalloc (size);
+    if (!string)
+        return NULL;
+
     //  Using argptr is destructive, so we take a copy each time we need it
     //  We define va_copy for Windows in czmq_prelude.h
     va_list my_argptr;
     va_copy (my_argptr, argptr);
     int required = vsnprintf (string, size, format, my_argptr);
     va_end (my_argptr);
-#if (defined (_MSC_VER) || defined (__MINGW32__))
+#ifdef __WINDOWS__
     if (required < 0 || required >= size) {
         va_copy (my_argptr, argptr);
+#ifdef _MSC_VER
         required = _vscprintf (format, argptr);
+#else
+        required = vsnprintf (NULL, 0, format, argptr);
+#endif
         va_end (my_argptr);
     }
 #endif
@@ -597,7 +771,8 @@ zsys_vprintf (const char *format, va_list argptr)
     //  larger buffer for it.
     if (required >= size) {
         size = required + 1;
-        string = (char *) realloc (string, size);
+        free (string);
+        string = (char *) zmalloc (size);
         if (string) {
             va_copy (my_argptr, argptr);
             vsnprintf (string, size, format, my_argptr);
@@ -626,19 +801,19 @@ zsys_udp_new (bool routable)
     //  Ask operating system for broadcast permissions on socket
     int on = 1;
     if (setsockopt (udpsock, SOL_SOCKET, SO_BROADCAST,
-                   (char *) &on, sizeof (on)) == SOCKET_ERROR)
+                    (char *) &on, sizeof (on)) == SOCKET_ERROR)
         zsys_socket_error ("setsockopt (SO_BROADCAST)");
 
     //  Allow multiple owners to bind to socket; incoming
     //  messages will replicate to each owner
     if (setsockopt (udpsock, SOL_SOCKET, SO_REUSEADDR,
-                   (char *) &on, sizeof (on)) == SOCKET_ERROR)
+                    (char *) &on, sizeof (on)) == SOCKET_ERROR)
         zsys_socket_error ("setsockopt (SO_REUSEADDR)");
 
 #if defined (SO_REUSEPORT)
     //  On some platforms we have to ask to reuse the port
     if (setsockopt (udpsock, SOL_SOCKET, SO_REUSEPORT,
-                   (char *) &on, sizeof (on)) == SOCKET_ERROR)
+                    (char *) &on, sizeof (on)) == SOCKET_ERROR)
         zsys_socket_error ("setsockopt (SO_REUSEPORT)");
 #endif
     return udpsock;
@@ -660,21 +835,22 @@ zsys_udp_close (SOCKET handle)
 
 
 //  --------------------------------------------------------------------------
-//  Send zframe to UDP socket
+//  Send zframe to UDP socket, return -1 if sending failed due to
+//  interface having disappeared (happens easily with WiFi)
 
-void
+int
 zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address)
 {
     assert (frame);
     assert (address);
 
-    //  Sending can fail if the OS is blocking multicast. In such cases we
-    //  don't try to report the error. We might log this or send to an error
-    //  console at some point.
-    sendto (udpsock,
-            (char *) zframe_data (frame), (int) zframe_size (frame),
-            0,      //  Flags
-            (struct sockaddr *) address, (int) sizeof (inaddr_t));
+    if (sendto (udpsock,
+        (char *) zframe_data (frame), (int) zframe_size (frame),
+        0, //  Flags
+        (struct sockaddr *) address, (int) sizeof (inaddr_t)) == -1)
+        return -1;              //  UDP broadcast not possible
+    else
+        return 0;
 }
 
 
@@ -693,13 +869,14 @@ zsys_udp_recv (SOCKET udpsock, char *peername)
         buffer, UDP_FRAME_MAX,
         0,      //  Flags
         (struct sockaddr *) &address, &address_len);
+
     if (size == SOCKET_ERROR)
         zsys_socket_error ("recvfrom");
 
     //  Get sender address as printable string
 #if (defined (__WINDOWS__))
     getnameinfo ((struct sockaddr *) &address, address_len,
-                peername, INET_ADDRSTRLEN, NULL, 0, NI_NUMERICHOST);
+                 peername, INET_ADDRSTRLEN, NULL, 0, NI_NUMERICHOST);
 #else
     inet_ntop (AF_INET, &address.sin_addr, peername, address_len);
 #endif
@@ -728,35 +905,35 @@ zsys_socket_error (const char *reason)
         default:              errno = GetLastError ();
     }
 #endif
-    if (errno == EAGAIN
-    ||  errno == ENETDOWN
-    ||  errno == EHOSTUNREACH
-    ||  errno == ENETUNREACH
-    ||  errno == EINTR
-    ||  errno == EPIPE
-    ||  errno == ECONNRESET
+    if (  errno == EAGAIN
+       || errno == ENETDOWN
+       || errno == EHOSTUNREACH
+       || errno == ENETUNREACH
+       || errno == EINTR
+       || errno == EPIPE
+       || errno == ECONNRESET
 #if defined (ENOPROTOOPT)
-    ||  errno == ENOPROTOOPT
+       || errno == ENOPROTOOPT
 #endif
 #if defined (EHOSTDOWN)
-    ||  errno == EHOSTDOWN
+       || errno == EHOSTDOWN
 #endif
 #if defined (EOPNOTSUPP)
-    ||  errno == EOPNOTSUPP
+       || errno == EOPNOTSUPP
 #endif
 #if defined (EWOULDBLOCK)
-    ||  errno == EWOULDBLOCK
+       || errno == EWOULDBLOCK
 #endif
 #if defined (EPROTO)
-    ||  errno == EPROTO
+       || errno == EPROTO
 #endif
 #if defined (ENONET)
-    ||  errno == ENONET
+       || errno == ENONET
 #endif
-    )
+          )
         return;             //  Ignore error and try again
     else {
-        zclock_log ("E: (UDP) error '%s' on %s", strerror (errno), reason);
+        zsys_error ("(UDP) error '%s' on %s", strerror (errno), reason);
         assert (false);
     }
 }
@@ -802,14 +979,14 @@ zsys_daemonize (const char *workdir)
     //  Move to a safe and known directory, which is supplied as an
     //  argument to this function (or not, if workdir is NULL or empty).
     if (workdir && chdir (workdir)) {
-        fprintf (stderr, "E: cannot chdir to '%s'\n", workdir);
+        zsys_error ("cannot chdir to '%s'", workdir);
         return -1;
     }
     //  Close all open file descriptors inherited from the parent
     //  process, to reduce the resources we use
     int file_handle = sysconf (_SC_OPEN_MAX);
     while (file_handle)
-    close (file_handle--);      //  Ignore any errors
+        close (file_handle--);  //  Ignore any errors
 
     //  Set the umask for new files we might create
     umask (file_mask);
@@ -843,8 +1020,7 @@ zsys_run_as (const char *lockfile, const char *group, const char *user)
     //  system services this should be root, so that we can write
     //  the PID file into e.g. /var/run/
     if (seteuid (geteuid ())) {
-        zclock_log ("E: cannot set effective user id: %s\n",
-                    strerror (errno));
+        zsys_error ("cannot set effective user id: %s", strerror (errno));
         return -1;
     }
     if (lockfile) {
@@ -852,55 +1028,53 @@ zsys_run_as (const char *lockfile, const char *group, const char *user)
         //  only one copy of the process can run at once.
         int handle = open (lockfile, O_RDWR | O_CREAT, 0640);
         if (handle < 0) {
-            zclock_log ("E: cannot open lockfile '%s': %s\n",
-                        lockfile, strerror (errno));
+            zsys_error ("cannot open lockfile '%s': %s", lockfile, strerror (errno));
             return -1;
         }
         else {
             struct flock filelock;
-            filelock.l_type   = F_WRLCK;    //  F_RDLCK, F_WRLCK, F_UNLCK
+            filelock.l_type = F_WRLCK;      //  F_RDLCK, F_WRLCK, F_UNLCK
             filelock.l_whence = SEEK_SET;   //  SEEK_SET, SEEK_CUR, SEEK_END
-            filelock.l_start  = 0;          //  Offset from l_whence
-            filelock.l_len    = 0;          //  length, 0 = to EOF
-            filelock.l_pid    = getpid ();
+            filelock.l_start = 0;           //  Offset from l_whence
+            filelock.l_len = 0;             //  length, 0 = to EOF
+            filelock.l_pid = getpid ();
             if (fcntl (handle, F_SETLK, &filelock)) {
-                zclock_log ("E: cannot get lock: %s\n", strerror (errno));
+                zsys_error ("cannot get lock: %s", strerror (errno));
                 return -1;
             }
         }
-        //   We record the broker's process id in the lock file
+        //   We record the current process id in the lock file
         char pid_buffer [10];
         snprintf (pid_buffer, sizeof (pid_buffer), "%6d\n", getpid ());
         if (write (handle, pid_buffer, strlen (pid_buffer)) != strlen (pid_buffer)) {
-            zclock_log ("E: cannot write to lockfile: %s\n",
-                        strerror (errno));
+            zsys_error ("cannot write to lockfile: %s", strerror (errno));
+            close (handle);
             return -1;
         }
         close (handle);
     }
     if (group) {
-        zclock_log ("I: broker running under group '%s'", group);
+        zsys_info ("running under group '%s'", group);
         struct group *grpbuf = NULL;
         grpbuf = getgrnam (group);
         if (grpbuf == NULL || setgid (grpbuf->gr_gid)) {
-            zclock_log ("E: could not switch group: %s", strerror (errno));
+            zsys_error ("could not switch group: %s", strerror (errno));
             return -1;
         }
     }
     if (user) {
-        zclock_log ("I: broker running under user '%s'", user);
+        zsys_info ("running under user '%s'", user);
         struct passwd *pwdbuf = NULL;
         pwdbuf = getpwnam (user);
         if (pwdbuf == NULL || setuid (pwdbuf->pw_uid)) {
-            zclock_log ("E: could not switch user: %s", strerror (errno));
+            zsys_error ("could not switch user: %s", strerror (errno));
             return -1;
         }
     }
     else {
         //  Switch back to real user ID (who started process)
         if (setuid (getuid ())) {
-            zclock_log ("E: cannot set real user id: %s\n",
-                        strerror (errno));
+            zsys_error ("cannot set real user id: %s", strerror (errno));
             return -1;
         }
     }
@@ -913,22 +1087,108 @@ zsys_run_as (const char *lockfile, const char *group, const char *user)
 
 
 //  --------------------------------------------------------------------------
+//  Returns true if the underlying libzmq supports CURVE security.
+//  Uses a heuristic probe according to the version of libzmq being used.
+
+bool
+zsys_has_curve (void)
+{
+#if defined (ZMQ_CURVE_SERVER)
+#   if defined (ZMQ_HAS_CAPABILITIES)
+    //  This is the most modern way of probing libzmq capabilities
+    return zmq_has ("curve") != 0;
+#   else
+    //  However trying the zmq_setsockopt will also work
+    int rc = -1; // assume we fail
+    void *ctx = zmq_ctx_new ();
+    if (ctx) {
+        void *pub = zmq_socket (ctx, ZMQ_PUB);
+        if (pub) {
+            int as_server = 1;
+            rc = zmq_setsockopt (pub, ZMQ_CURVE_SERVER, &as_server, sizeof (int));
+            zmq_close (pub);
+        }
+        zmq_term (ctx);
+    }
+    return rc != -1;
+#   endif
+#else
+    return false;
+#endif
+}
+
+
+//  --------------------------------------------------------------------------
 //  Configure the number of I/O threads that ZeroMQ will use. A good
 //  rule of thumb is one thread per gigabit of traffic in or out. The
 //  default is 1, sufficient for most applications. If the environment
-//  variable ZSYS_IOTHREADS is defined, that provides the default.
+//  variable ZSYS_IO_THREADS is defined, that provides the default.
 //  Note that this method is valid only before any socket is created.
 
 void
-zsys_set_iothreads (size_t iothreads)
+zsys_set_io_threads (size_t io_threads)
 {
+    zsys_init ();
+    ZMUTEX_LOCK (s_mutex);
+    if (s_open_sockets)
+        zsys_error ("zsys_io_threads() is not valid after creating sockets");
+    assert (s_open_sockets == 0);
+    zmq_term (s_process_ctx);
+    s_io_threads = io_threads;
+    s_process_ctx = zmq_init ((int) s_io_threads);
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 2, 0))
+    //  TODO: this causes TravisCI to break; libzmq does not return a
+    //  valid socket on zmq_socket(), after this...
+    zmq_ctx_set (s_process_ctx, ZMQ_MAX_SOCKETS, s_max_sockets);
+#endif
+    ZMUTEX_UNLOCK (s_mutex);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Configure the number of sockets that ZeroMQ will allow. The default
+//  is 1024. The actual limit depends on the system, and you can query it
+//  by using zsys_socket_limit (). A value of zero means "maximum".
+//  Note that this method is valid only before any socket is created.
+
+void
+zsys_set_max_sockets (size_t max_sockets)
+{
+    zsys_init ();
     ZMUTEX_LOCK (s_mutex);
     //  If the app is misusing this method, burn it with fire
-    if (process_ctx)
-        zclock_log ("E: zsys_iothreads() is not valid after creating sockets");
-    assert (process_ctx == NULL);
-    s_iothreads = iothreads;
+    if (s_open_sockets)
+        zsys_error ("zsys_max_sockets() is not valid after creating sockets");
+    assert (s_open_sockets == 0);
+    s_max_sockets = max_sockets ? max_sockets : zsys_socket_limit ();
     ZMUTEX_UNLOCK (s_mutex);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return maximum number of ZeroMQ sockets that the system will support.
+
+size_t
+zsys_socket_limit (void)
+{
+    int socket_limit;
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (4, 1, 0))
+    if (s_process_ctx)
+        socket_limit = zmq_ctx_get (s_process_ctx, ZMQ_SOCKET_LIMIT);
+    else {
+        void *ctx = zmq_init (1);
+        socket_limit = zmq_ctx_get (ctx, ZMQ_SOCKET_LIMIT);
+        zmq_term (ctx);
+    }
+    //  ZeroMQ used to report a nonsense value (2^31) which if used would
+    //  on zmq_ctx_set (ZMQ_MAX_SOCKETS) cause an out-of-memory error. So
+    //  if we're running on an older library, enforce a sane limit.
+    if (socket_limit > 65535)
+        socket_limit = 65535;
+#else
+    socket_limit = 1024;
+#endif
+    return (size_t) socket_limit;
 }
 
 
@@ -942,6 +1202,7 @@ zsys_set_iothreads (size_t iothreads)
 void
 zsys_set_linger (size_t linger)
 {
+    zsys_init ();
     ZMUTEX_LOCK (s_mutex);
     s_linger = linger;
     ZMUTEX_UNLOCK (s_mutex);
@@ -958,6 +1219,7 @@ zsys_set_linger (size_t linger)
 void
 zsys_set_sndhwm (size_t sndhwm)
 {
+    zsys_init ();
     ZMUTEX_LOCK (s_mutex);
     s_sndhwm = sndhwm;
     ZMUTEX_UNLOCK (s_mutex);
@@ -974,9 +1236,37 @@ zsys_set_sndhwm (size_t sndhwm)
 void
 zsys_set_rcvhwm (size_t rcvhwm)
 {
+    zsys_init ();
     ZMUTEX_LOCK (s_mutex);
     s_rcvhwm = rcvhwm;
     ZMUTEX_UNLOCK (s_mutex);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Configure the default HWM for zactor internal pipes; this is set on both
+//  ends of the pipe, for outgoing messages only (sndhwm). The default HWM is
+//  1,000, on all versions of ZeroMQ. If the environment var ZSYS_ACTORHWM is
+//  defined, that provides the default. Note that a value of zero means no
+//  limit, i.e. infinite memory consumption.
+
+void
+zsys_set_pipehwm (size_t pipehwm)
+{
+    zsys_init ();
+    ZMUTEX_LOCK (s_mutex);
+    s_pipehwm = pipehwm;
+    ZMUTEX_UNLOCK (s_mutex);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return the HWM for zactor internal pipes.
+
+size_t
+zsys_pipehwm (void)
+{
+    return s_pipehwm;
 }
 
 
@@ -991,6 +1281,7 @@ zsys_set_rcvhwm (size_t rcvhwm)
 void
 zsys_set_ipv6 (int ipv6)
 {
+    zsys_init ();
     ZMUTEX_LOCK (s_mutex);
     s_ipv6 = ipv6;
     ZMUTEX_UNLOCK (s_mutex);
@@ -1003,12 +1294,15 @@ zsys_set_ipv6 (int ipv6)
 //  For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is
 //  the default when there is no specified interface. If the environment
 //  variable ZSYS_INTERFACE is set, use that as the default interface name.
+//  Setting the interface to "*" means "use all interfaces".
 
 void
 zsys_set_interface (const char *value)
 {
+    zsys_init ();
     free (s_interface);
     s_interface = strdup (value);
+    assert (s_interface);
 }
 
 
@@ -1018,7 +1312,215 @@ zsys_set_interface (const char *value)
 const char *
 zsys_interface (void)
 {
-    return s_interface? s_interface: "";
+    return s_interface ? s_interface : "";
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set log identity, which is a string that prefixes all log messages sent
+//  by this process. The log identity defaults to the environment variable
+//  ZSYS_LOGIDENT, if that is set.
+
+void
+zsys_set_logident (const char *value)
+{
+    zsys_init ();
+    free (s_logident);
+    s_logident = strdup (value);
+#if defined (__UNIX__)
+    if (s_logsystem)
+        openlog (s_logident, LOG_PID, LOG_USER);
+#elif defined (__WINDOWS__)
+    //  TODO: hook in Windows event log for Windows
+#endif
+    assert (s_logident);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set stream to receive log traffic. By default, log traffic is sent to
+//  stdout. If you set the stream to NULL, no stream will receive the log
+//  traffic (it may still be sent to the system facility).
+
+void
+zsys_set_logstream (FILE *stream)
+{
+    zsys_init ();
+    s_logstream = stream;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Sends log output to a PUB socket bound to the specified endpoint. To
+//  collect such log output, create a SUB socket, subscribe to the traffic
+//  you care about, and connect to the endpoint. Log traffic is sent as a
+//  single string frame, in the same format as when sent to stdout. The
+//  log system supports a single sender; multiple calls to this method will
+//  bind the same sender to multiple endpoints. To disable the sender, call
+//  this method with a null argument.
+
+void
+zsys_set_logsender (const char *endpoint)
+{
+    zsys_init ();
+    if (endpoint) {
+        //  Create log sender if needed
+        if (!s_logsender) {
+            s_logsender = zsys_socket (ZMQ_PUB, NULL, 0);
+            assert (s_logsender);
+        }
+        //  Bind to specified endpoint
+        int rc = zmq_bind (s_logsender, endpoint);
+        assert (rc == 0);
+    }
+    else
+    if (s_logsender) {
+        zsys_close (s_logsender, NULL, 0);
+        s_logsender = NULL;
+    }
+}
+
+
+//  --------------------------------------------------------------------------
+//  Enable or disable logging to the system facility (syslog on POSIX boxes,
+//  event log on Windows). By default this is disabled.
+
+void
+zsys_set_logsystem (bool logsystem)
+{
+    zsys_init ();
+    s_logsystem = logsystem;
+#if defined (__UNIX__)
+    if (s_logsystem)
+        openlog (s_logident, LOG_PID, LOG_USER);
+#elif defined (__WINDOWS__)
+    //  TODO: hook into Windows event log
+#endif
+}
+
+
+static void
+s_log (char loglevel, char *string)
+{
+#if defined (__UNIX__)
+    if (s_logsystem) {
+        int priority = LOG_INFO;
+        if (loglevel == 'E')
+            priority = LOG_ERR;
+        else
+        if (loglevel == 'W')
+            priority = LOG_WARNING;
+        else
+        if (loglevel == 'N')
+            priority = LOG_NOTICE;
+        else
+        if (loglevel == 'I')
+            priority = LOG_INFO;
+        else
+        if (loglevel == 'D')
+            priority = LOG_DEBUG;
+
+        syslog (priority, "%s", string);
+    }
+    else
+#endif
+    //  Set s_logstream to stdout by default, unless we're using s_logsystem
+    if (!s_logstream)
+        s_logstream = stdout;
+
+    if (s_logstream || s_logsender) {
+        time_t curtime = time (NULL);
+        struct tm *loctime = localtime (&curtime);
+        char date [20];
+        strftime (date, 20, "%y-%m-%d %H:%M:%S", loctime);
+        char log_text [1024];
+        if (s_logident)
+            snprintf (log_text, 1024, "%c: (%s) %s %s", loglevel, s_logident, date, string);
+        else
+            snprintf (log_text, 1024, "%c: %s %s", loglevel, date, string);
+
+        if (s_logstream) {
+            fprintf (s_logstream, "%s\n", log_text);
+            fflush (s_logstream);
+        }
+        if (s_logsender)
+            zstr_send (s_logsender, log_text);
+    }
+}
+
+
+//  --------------------------------------------------------------------------
+//  Log error condition - highest priority
+
+void
+zsys_error (const char *format, ...)
+{
+    va_list argptr;
+    va_start (argptr, format);
+    char *string = zsys_vprintf (format, argptr);
+    va_end (argptr);
+    s_log ('E', string);
+    free (string);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Log warning condition - high priority
+
+void
+zsys_warning (const char *format, ...)
+{
+    va_list argptr;
+    va_start (argptr, format);
+    char *string = zsys_vprintf (format, argptr);
+    va_end (argptr);
+    s_log ('W', string);
+    free (string);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Log normal, but significant, condition - normal priority
+
+void
+zsys_notice (const char *format, ...)
+{
+    va_list argptr;
+    va_start (argptr, format);
+    char *string = zsys_vprintf (format, argptr);
+    va_end (argptr);
+    s_log ('N', string);
+    free (string);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Log informational message - low priority
+
+void
+zsys_info (const char *format, ...)
+{
+    va_list argptr;
+    va_start (argptr, format);
+    char *string = zsys_vprintf (format, argptr);
+    va_end (argptr);
+    s_log ('I', string);
+    free (string);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Log debug-level message - lowest priority
+
+void
+zsys_debug (const char *format, ...)
+{
+    va_list argptr;
+    va_start (argptr, format);
+    char *string = zsys_vprintf (format, argptr);
+    va_end (argptr);
+    s_log ('D', string);
+    free (string);
 }
 
 
@@ -1029,36 +1531,41 @@ void
 zsys_test (bool verbose)
 {
     printf (" * zsys: ");
+    if (verbose)
+        printf ("\n");
 
     //  @selftest
     zsys_catch_interrupts ();
-    int rc;
 
-    zsys_set_iothreads (1);
+    //  Check capabilities without using the return value
+    int rc = zsys_has_curve ();
+
+    if (verbose) {
+        char *hostname = zsys_hostname ();
+        zsys_info ("host name is %s", hostname);
+        free (hostname);
+        zsys_info ("system limit is %zu ZeroMQ sockets", zsys_socket_limit ());
+    }
+    zsys_set_io_threads (1);
+    zsys_set_max_sockets (0);
     zsys_set_linger (0);
     zsys_set_sndhwm (1000);
     zsys_set_rcvhwm (1000);
+    zsys_set_pipehwm (2500);
+    assert (zsys_pipehwm () == 2500);
     zsys_set_ipv6 (0);
 
-    void *handle = zsys_socket (ZMQ_ROUTER, __FILE__, __LINE__);
-    //  Sanity check on libzmq/CZMQ build consistency
-#if defined (ZMQ_CURVE_SERVER) && defined (HAVE_LIBSODIUM)
-    int as_server = 1;
-    rc = zmq_setsockopt (handle, ZMQ_CURVE_SERVER, &as_server, sizeof (int));
-    if (rc == -1) {
-        zclock_log ("E: libzmq was built without libsodium. Please rebuild libzmq and CZMQ.");
-        zsys_close (handle);
-        exit (1);
-    }
-#endif
-    if (verbose) {
-        char *hostname = zsys_hostname ();
-        printf ("I: host name is %s\n", hostname);
-        zstr_free (&hostname);
-    }
-    rc = zsys_close (handle);
-    assert (rc == 0);
+    //  Test pipe creation
+    zsock_t *pipe_back;
+    zsock_t *pipe_front = zsys_create_pipe (&pipe_back);
+    zstr_send (pipe_front, "Hello");
+    char *string = zstr_recv (pipe_back);
+    assert (streq (string, "Hello"));
+    free (string);
+    zsock_destroy (&pipe_back);
+    zsock_destroy (&pipe_front);
 
+    //  Test file manipulation
     rc = zsys_file_delete ("nosuchfile");
     assert (rc == -1);
 
@@ -1094,16 +1601,42 @@ zsys_test (bool verbose)
     assert (minor == CZMQ_VERSION_MINOR);
     assert (patch == CZMQ_VERSION_PATCH);
 
-    char *string = zsys_sprintf ("%s %02x", "Hello", 16);
+    string = zsys_sprintf ("%s %02x", "Hello", 16);
     assert (streq (string, "Hello 10"));
-    zstr_free (&string);
+    free (string);
 
     char *str64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890,.";
     int num10 = 1234567890;
     string = zsys_sprintf ("%s%s%s%s%d", str64, str64, str64, str64, num10);
     assert (strlen (string) == (4 * 64 + 10));
-    zstr_free (&string);
+    free (string);
 
+    //  Test logging system
+    zsys_set_logident ("czmq_selftest");
+    zsys_set_logsender ("inproc://logging");
+    void *logger = zsys_socket (ZMQ_SUB, NULL, 0);
+    assert (logger);
+    rc = zmq_connect (logger, "inproc://logging");
+    assert (rc == 0);
+    rc = zmq_setsockopt (logger, ZMQ_SUBSCRIBE, "", 0);
+    assert (rc == 0);
+
+    if (verbose) {
+        zsys_error ("This is an %s message", "error");
+        zsys_warning ("This is a %s message", "warning");
+        zsys_notice ("This is a %s message", "notice");
+        zsys_info ("This is a %s message", "info");
+        zsys_debug ("This is a %s message", "debug");
+        zsys_set_logident ("hello, world");
+        zsys_info ("This is a %s message", "info");
+        zsys_debug ("This is a %s message", "debug");
+
+        //  Check that logsender functionality is working
+        char *received = zstr_recv (logger);
+        assert (received);
+        zstr_free (&received);
+    }
+    zsys_close (logger, NULL, 0);
     //  @end
 
     printf ("OK\n");

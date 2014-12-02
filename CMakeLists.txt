@@ -11,14 +11,14 @@ project(czmq)
 enable_language(C)
 enable_testing()
 
-set(CZMQ_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-set(CZMQ_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
+set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 ########################################################################
 # determine version
 ########################################################################
 foreach(which MAJOR MINOR PATCH)
-    file(STRINGS "${CZMQ_SOURCE_DIR}/include/czmq.h" CZMQ_VERSION_STRING REGEX "#define CZMQ_VERSION_${which}")
+    file(STRINGS "${SOURCE_DIR}/include/czmq.h" CZMQ_VERSION_STRING REGEX "#define CZMQ_VERSION_${which}")
     string(REGEX MATCH "#define CZMQ_VERSION_${which} ([0-9_]+)" CZMQ_REGEX_MATCH "${CZMQ_VERSION_STRING}")
     if (NOT CZMQ_REGEX_MATCH)
         message(FATAL_ERROR "failed to parse CZMQ_VERSION_${which} from czmq.h")
@@ -34,14 +34,19 @@ message(STATUS "Detected CZMQ Version - ${CZMQ_VERSION}")
 ########################################################################
 include(CheckIncludeFile)
 CHECK_INCLUDE_FILE("linux/wireless.h" HAVE_LINUX_WIRELESS_H)
-CHECK_INCLUDE_FILE("net/if.h" HAVE_NET_IF_H)
 CHECK_INCLUDE_FILE("net/if_media.h" HAVE_NET_IF_MEDIA_H)
 
 include(CheckFunctionExists)
 CHECK_FUNCTION_EXISTS("getifaddrs" HAVE_GETIFADDRS)
 CHECK_FUNCTION_EXISTS("freeifaddrs" HAVE_FREEIFADDRS)
 
-file(WRITE ${CZMQ_BINARY_DIR}/platform.h.in "
+include(CheckIncludeFiles)
+check_include_files("sys/socket.h;net/if.h" HAVE_NET_IF_H)
+if (NOT HAVE_NET_IF_H)
+    CHECK_INCLUDE_FILE("net/if.h" HAVE_NET_IF_H)
+endif()
+
+file(WRITE ${BINARY_DIR}/platform.h.in "
 #cmakedefine HAVE_LINUX_WIRELESS_H
 #cmakedefine HAVE_NET_IF_H
 #cmakedefine HAVE_NET_IF_MEDIA_H
@@ -49,13 +54,13 @@ file(WRITE ${CZMQ_BINARY_DIR}/platform.h.in "
 #cmakedefine HAVE_FREEIFADDRS
 ")
 
-configure_file(${CZMQ_BINARY_DIR}/platform.h.in ${CZMQ_BINARY_DIR}/platform.h)
+configure_file(${BINARY_DIR}/platform.h.in ${BINARY_DIR}/platform.h)
 
 #The MSVC C compiler is too out of date,
 #so the sources have to be compiled as c++
 if (MSVC)
     enable_language(CXX)
-    file(GLOB sources ${CZMQ_SOURCE_DIR}/src/*.c)
+    file(GLOB sources ${SOURCE_DIR}/src/*.c)
     set_source_files_properties(${sources} PROPERTIES LANGUAGE CXX)
     set(MORE_LIBRARIES ws2_32 Rpcrt4 Iphlpapi)
 endif()
@@ -66,9 +71,9 @@ if (MINGW)
 endif()
 
 ########################################################################
-# zeromq dependency
+# ZeroMQ depedency
 ########################################################################
-list(APPEND CMAKE_MODULE_PATH ${CZMQ_SOURCE_DIR})
+list(APPEND CMAKE_MODULE_PATH ${SOURCE_DIR})
 find_package(ZeroMQ REQUIRED)
 
 ########################################################################
@@ -79,6 +84,7 @@ set (czmq_headers
     include/czmq_prelude.h
     include/zactor.h
     include/zauth.h
+    include/zarmour.h
     include/zbeacon.h
     include/zcert.h
     include/zcertstore.h
@@ -90,28 +96,36 @@ set (czmq_headers
     include/zdir_patch.h
     include/zfile.h
     include/zframe.h
-    include/zhash.h
 #    include/zgossip.h
-    include/zlist.h
-    include/zlog.h
+    include/zhashx.h
+    include/ziflist.h
+    include/zlistx.h
     include/zloop.h
+    include/zmonitor.h
     include/zmsg.h
     include/zpoller.h
     include/zproxy.h
     include/zrex.h
     include/zsock.h
-    include/zsock_monitor.h
     include/zsock_option.h
     include/zstr.h
     include/zsys.h
     include/zuuid.h
- #   include/zgossip_msg.h
+    src/zgossip_msg.h
+    include/zauth_v2.h
+    include/zbeacon_v2.h
     include/zctx.h
-    include/zmonitor.h
+    include/zhash.h
+    include/zlist.h
+    include/zmonitor_v2.h
     include/zmutex.h
+    include/zproxy_v2.h
     include/zsocket.h
     include/zsockopt.h
     include/zthread.h
+    src/zgossip_engine.inc
+    src/zhash_primes.inc
+    src/zclass_example.xml
 )
 source_group ("Header Files" FILES ${czmq_headers})
 install(FILES ${czmq_headers} DESTINATION include)
@@ -119,12 +133,13 @@ install(FILES ${czmq_headers} DESTINATION include)
 ########################################################################
 # library
 ########################################################################
-include_directories(${CZMQ_BINARY_DIR})
-include_directories(${CZMQ_SOURCE_DIR}/include)
+include_directories(${BINARY_DIR})
+include_directories(${SOURCE_DIR}/include)
 include_directories(${ZEROMQ_INCLUDE_DIRS})
 set (czmq_sources
     src/zactor.c
     src/zauth.c
+    src/zarmour.c
     src/zbeacon.c
     src/zcert.c
     src/zcertstore.c
@@ -136,25 +151,30 @@ set (czmq_sources
     src/zdir_patch.c
     src/zfile.c
     src/zframe.c
-    src/zhash.c
 #    src/zgossip.c
-    src/zlist.c
-    src/zlog.c
+    src/zhashx.c
+    src/ziflist.c
+    src/zlistx.c
     src/zloop.c
+    src/zmonitor.c
     src/zmsg.c
     src/zpoller.c
     src/zproxy.c
     src/zrex.c
     src/zsock.c
-    src/zsock_monitor.c
     src/zsock_option.c
     src/zstr.c
     src/zsys.c
     src/zuuid.c
 #    src/zgossip_msg.c
+    src/zauth_v2.c
+    src/zbeacon_v2.c
     src/zctx.c
-    src/zmonitor.c
+    src/zhash.c
+    src/zlist.c
+    src/zmonitor_v2.c
     src/zmutex.c
+    src/zproxy_v2.c
     src/zsocket.c
     src/zsockopt.c
     src/zthread.c
@@ -193,19 +213,19 @@ set(exec_prefix "\${prefix}")
 set(libdir "\${prefix}/lib${LIB_SUFFIX}")
 set(includedir "\${prefix}/include")
 configure_file(
-    ${CZMQ_SOURCE_DIR}/src/libczmq.pc.in
-    ${CZMQ_BINARY_DIR}/libczmq.pc
+    ${SOURCE_DIR}/src/libczmq.pc.in
+    ${BINARY_DIR}/libczmq.pc
 @ONLY)
 
 install(
-    FILES ${CZMQ_BINARY_DIR}/libczmq.pc
+    FILES ${BINARY_DIR}/libczmq.pc
     DESTINATION lib${LIB_SUFFIX}/pkgconfig
 )
 
 ########################################################################
 # tests
 ########################################################################
-add_executable(czmq_selftest ${CZMQ_SOURCE_DIR}/src/czmq_selftest.c)
+add_executable(czmq_selftest ${SOURCE_DIR}/src/czmq_selftest.c)
 target_link_libraries(czmq_selftest czmq ${ZEROMQ_LIBRARIES})
 add_test(czmq_selftest czmq_selftest)
 

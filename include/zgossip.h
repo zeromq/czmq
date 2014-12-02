@@ -7,10 +7,9 @@
     statements. DO NOT MAKE ANY CHANGES YOU WISH TO KEEP. The correct places
     for commits are:
 
-    * The XML model used for this code generation: zgossip.xml
-    * The code generation script that built this file: zproto_server_c
+     * The XML model used for this code generation: zgossip.xml, or
+     * The code generation script that built this file: zproto_server_c
     ************************************************************************
-
     Copyright (c) the Contributors as noted in the AUTHORS file.       
     This file is part of CZMQ, the high-level C binding for 0MQ:       
     http://czmq.zeromq.org.                                            
@@ -29,7 +28,52 @@ extern "C" {
 #endif
 
 //  @interface
-//  This is zgossip, implemented as a CZMQ zactor task
+//  To work with zgossip, use the CZMQ zactor API:
+//
+//  Create new zgossip instance, passing logging prefix:
+//
+//      zactor_t *zgossip = zactor_new (zgossip, "myname");
+//  
+//  Destroy zgossip instance
+//
+//      zactor_destroy (&zgossip);
+//  
+//  Enable verbose logging of commands and activity:
+//
+//      zstr_send (zgossip, "VERBOSE");
+//
+//  Bind zgossip to specified endpoint. TCP endpoints may specify
+//  the port number as "*" to aquire an ephemeral port:
+//
+//      zstr_sendx (zgossip, "BIND", endpoint, NULL);
+//
+//  Return assigned port number, specifically when BIND was done using an
+//  an ephemeral port:
+//
+//      zstr_sendx (zgossip, "PORT", NULL);
+//      char *command, *port_str;
+//      zstr_recvx (zgossip, &command, &port_str, NULL);
+//      assert (streq (command, "PORT"));
+//
+//  Specify configuration file to load, overwriting any previous loaded
+//  configuration file or options:
+//
+//      zstr_sendx (zgossip, "CONFIGURE", filename, NULL);
+//
+//  Set configuration path value:
+//
+//      zstr_sendx (zgossip, "SET", path, value, NULL);
+//    
+//  Send zmsg_t instance to zgossip:
+//
+//      zactor_send (zgossip, &msg);
+//
+//  Receive zmsg_t instance from zgossip:
+//
+//      zmsg_t *msg = zactor_recv (zgossip);
+//
+//  This is the zgossip constructor as a zactor_fn:
+//
 CZMQ_EXPORT void
     zgossip (zsock_t *pipe, void *args);
 

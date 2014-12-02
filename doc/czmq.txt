@@ -4,7 +4,7 @@ czmq(7)
 
 NAME
 ----
-czmq - high-level C binding for ØMQ
+czmq - high-level C binding for ZeroMQ
 
 
 SYNOPSIS
@@ -22,33 +22,30 @@ DESCRIPTION
 Classes
 ~~~~~~~
 
-These classes work with low-level libzmq socket handles:
-
-* linkczmq:zctx[3] - working with 0MQ contexts
-* linkczmq:zsocket[3] - working with 0MQ sockets (low-level)
-* linkczmq:zsockopt[3] - get/set 0MQ socket options
-
 These classes provide the main socket and message API:
 
-* linkczmq:zsock[3] - working with 0MQ sockets (high-level)
-* linkczmq:zsock_monitor[3] - monitor events on 0MQ sockets
+* linkczmq:zsock[3] - working with ZeroMQ sockets (high-level)
 * linkczmq:zstr[3] - sending and receiving strings
 * linkczmq:zmsg[3] - working with multipart messages
 * linkczmq:zframe[3] - working with single message frames
+* linkczmq:zactor[3] - Actor class (socket + thread)
 * linkczmq:zloop[3] - event-driven reactor
 * linkczmq:zpoller[3] - trivial socket poller class
-* linkczmq:zproxy[3] - convenient zmq_proxy api
+* linkczmq:zproxy[3] - proxy actor (like zmq_proxy_steerable)
+* linkczmq:zmonitor[3] - monitor events on ZeroMQ sockets
 
-These classes provide additional support for authentication and encryption:
+These classes support authentication and encryption:
 
-* linkczmq:zauth[3] - authentication for ZeroMQ security mechanisms
+* linkczmq:zauth[3] - authentication actor for ZeroMQ servers
 * linkczmq:zcert[3] - work with CURVE security certificates
 * linkczmq:zcertstore[3] - work with CURVE security certificate stores
 
 These classes provide generic containers:
 
-* linkczmq:zhash[3] - generic type-free hash container
-* linkczmq:zlist[3] - generic type-free list container
+* linkczmq:zhash[3] - simple generic hash container
+* linkczmq:zhashx[3] - extended generic hash container
+* linkczmq:zlist[3] - simple generic list container
+* linkczmq:zlistx[3] - extended generic list container
 
 These classes wrap-up non-portable functionality:
 
@@ -57,21 +54,27 @@ These classes wrap-up non-portable functionality:
 * linkczmq:zdir[3] - work with file-system directories
 * linkczmq:zdir_patch[3] - work with directory differences
 * linkczmq:zfile[3] - work with file-system files
-* linkczmq:zlog[3] - work with the system logger
-* linkczmq:zmutex[3] - working with mutexes
 * linkczmq:zsys[3] - system-level methods
-* linkczmq:zthread[3] - working with system threads
 * linkczmq:zuuid[3] - UUID support class
+* linkczmq:ziflist[3] - list available network interfaces
 
 And these utility classes add value:
 
 * linkczmq:zchunk[3] - work with memory chunks
 * linkczmq:zconfig[3] - work with textual config files
 * linkczmq:zrex[3] - work with regular expressions
+* linkczmq:zgossip[3] - decentralized configuration management
 
 These classes are deprecated:
 
-* linkczmq:zmonitor[3] - socket event monitor (deprecated)
+* linkczmq:zctx[3] - working with ZeroMQ contexts
+* linkczmq:zsocket[3] - working with ZeroMQ sockets (low-level)
+* linkczmq:zsockopt[3] - get/set ZeroMQ socket options
+* linkczmq:zthread[3] - working with system threads
+* linkczmq:zauth_v2[3] - authentication for ZeroMQ servers
+* linkczmq:zbeacon_v2[3] - LAN discovery and presence
+* linkczmq:zmonitor_v2[3] - socket event monitor
+* linkczmq:zproxy_v2[3] - zmq_proxy wrapper
 
 Scope and Goals
 ~~~~~~~~~~~~~~~

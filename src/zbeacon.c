@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zbeacon - LAN discovery and presence
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -18,576 +18,184 @@
     using UDP messages on the local area network. This implementation uses
     IPv4 UDP broadcasts. You can define the format of your outgoing beacons,
     and set a filter that validates incoming beacons. Beacons are sent and
-    received asynchronously in the background. The zbeacon API provides a
-    incoming beacons on a ZeroMQ socket (the pipe) that you can configure,
-    poll on, and receive messages on. Incoming beacons are always delivered
-    as two frames: the ipaddress of the sender (a string), and the beacon
-    data itself (binary, as published).
+    received asynchronously in the background.
 @discuss
+    This class replaces zbeacon_v2, and is meant for applications that use
+    the CZMQ v3 API (meaning, zsock).
 @end
 */
 
 #include "platform.h"
 #include "../include/czmq.h"
 
-//  Constants
-#define INTERVAL_DFLT  1000         //  Default interval = 1 second
+#if (defined (__WINDOWS__))
+#define in_addr_t uint32_t
+#endif
 
-//  Structure of our class
-struct _zbeacon_t {
-    void *pipe;                 //  Pipe through to backend agent
-    char *hostname;             //  Our own address as string
-    zctx_t *ctx;    //TODO actorize this class
-};
+//  --------------------------------------------------------------------------
+//  The self_t structure holds the state for one actor instance
 
+typedef struct {
+    zsock_t *pipe;              //  Actor command pipe
+    SOCKET udpsock;             //  UDP socket for send/recv
+    int port_nbr;               //  UDP port number we work on
+    int interval;               //  Beacon broadcast interval
+    int64_t ping_at;            //  Next broadcast time
+    zframe_t *transmit;         //  Beacon transmit data
+    zframe_t *filter;           //  Beacon filter data
+    inaddr_t broadcast;         //  Our broadcast address
+    bool terminated;            //  Did caller ask us to quit?
+    bool verbose;               //  Verbose logging enabled?
+    char hostname [NI_MAXHOST]; //  Saved host name
+} self_t;
 
-//  Background task does the real I/O
 static void
-    s_agent_task (void *args, zctx_t *ctx, void *pipe);
-
-
-//  --------------------------------------------------------------------------
-//  Create a new beacon on a certain UDP port. If the system does not
-//  support UDP broadcasts (lacking a useful interface), returns NULL.
-//  To force the beacon to operate on a given port, set the environment
-//  variable ZSYS_INTERFACE, or call zsys_set_interface() beforehand.
-
-zbeacon_t *
-zbeacon_new (zctx_t *ctx, int port_nbr)
-{
-    zbeacon_t *self = (zbeacon_t *) zmalloc (sizeof (zbeacon_t));
-    assert (self);
-
-    //  Start background agent and wait for it to initialize
-    self->ctx = zctx_new ();
-    assert (self->ctx);
-    self->pipe = zthread_fork (self->ctx, s_agent_task, NULL);
-    if (self->pipe) {
-        zstr_sendf (self->pipe, "%d", port_nbr);
-        self->hostname = zstr_recv (self->pipe);
-        if (streq (self->hostname, "-")) {
-            free (self->hostname);
-            zctx_destroy (&self->ctx);
-            free (self);
-            self = NULL;
-        }
-    }
-    else {
-        free (self);
-        self = NULL;
-    }
-    return self;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Destructor
-
-void
-zbeacon_destroy (zbeacon_t **self_p)
+s_self_destroy (self_t **self_p)
 {
     assert (self_p);
     if (*self_p) {
-        zbeacon_t *self = *self_p;
-        zstr_send (self->pipe, "TERMINATE");
-        char *reply = zstr_recv (self->pipe);
-        zstr_free (&reply);
-        zctx_destroy (&self->ctx);
-        free (self->hostname);
+        self_t *self = *self_p;
+        zframe_destroy (&self->transmit);
+        zframe_destroy (&self->filter);
+        zsys_udp_close (self->udpsock);
         free (self);
         *self_p = NULL;
     }
 }
 
-
-//  --------------------------------------------------------------------------
-//  Set broadcast interval in milliseconds
-
-void
-zbeacon_set_interval (zbeacon_t *self, int interval)
+static self_t *
+s_self_new (zsock_t *pipe)
 {
-    assert (self);
-    zstr_sendm (self->pipe, "INTERVAL");
-    zstr_sendf (self->pipe, "%d", interval);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Filter out any beacon that looks exactly like ours
-
-void
-zbeacon_noecho (zbeacon_t *self)
-{
-    assert (self);
-    zstr_send (self->pipe, "NOECHO");
-}
-
-
-//  --------------------------------------------------------------------------
-//  Start broadcasting beacon to peers at the specified interval
-
-void
-zbeacon_publish (zbeacon_t *self, byte *transmit, size_t size)
-{
-    assert (self);
-    assert (transmit);
-    assert (size > 0 && size <= UDP_FRAME_MAX);
-    zmsg_t *msg = zmsg_new ();
-    zmsg_addstr (msg, "PUBLISH");
-    zmsg_addmem (msg, transmit, size);
-    zmsg_send (&msg, self->pipe);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Stop broadcasting beacons
-
-void
-zbeacon_silence (zbeacon_t *self)
-{
-    assert (self);
-    zstr_send (self->pipe, "SILENCE");
-}
-
-
-//  --------------------------------------------------------------------------
-//  Start listening to other peers; zero-sized filter means get everything
-
-void
-zbeacon_subscribe (zbeacon_t *self, byte *filter, size_t size)
-{
-    assert (self);
-    assert (size <= UDP_FRAME_MAX);
-    zmsg_t *msg = zmsg_new ();
-    zmsg_addstr (msg, "SUBSCRIBE");
-    zmsg_addmem (msg, filter, size);
-    zmsg_send (&msg, self->pipe);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Stop listening to other peers
-
-void
-zbeacon_unsubscribe (zbeacon_t *self)
-{
-    zstr_send (self->pipe, "UNSUBSCRIBE");
-}
-
-
-//  --------------------------------------------------------------------------
-//  Get beacon ZeroMQ socket, for polling or receiving messages
-
-void *
-zbeacon_socket (zbeacon_t *self)
-{
-    assert (self);
-    return self->pipe;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Return our own IP address as printable string
-
-char *
-zbeacon_hostname (zbeacon_t *self)
-{
-    assert (self);
-    return self->hostname;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Self test of this class
-//
-// If this test fails with an unable to bind error, try specifying the default
-// interface to be used for zbeacon with the ZSYS_INTERFACE environment
-// variable.
-
-void
-zbeacon_test (bool verbose)
-{
-    printf (" * zbeacon: ");
-
-    //  @selftest
-    //  Basic test: create a service and announce it
-    zctx_t *ctx = zctx_new ();
-
-    //  Create a service socket and bind to an ephemeral port
-    void *service = zsocket_new (ctx, ZMQ_PUB);
-    int port_nbr = zsocket_bind (service, "tcp://127.0.0.1:*");
-    
-    //  Create beacon to broadcast our service
-    byte announcement [2] = { (port_nbr >> 8) & 0xFF, port_nbr & 0xFF };
-    zbeacon_t *service_beacon = zbeacon_new (ctx, 9999);
-    if (service_beacon == NULL) {
-        printf ("OK (skipping test, no UDP discovery)\n");
-        return;
-    }
-    zbeacon_set_interval (service_beacon, 100);
-    zbeacon_publish (service_beacon, announcement, 2);
-
-    //  Create beacon to lookup service
-    zbeacon_t *client_beacon = zbeacon_new (ctx, 9999);
-    zbeacon_subscribe (client_beacon, NULL, 0);
-
-    //  Wait for at most 1/2 second if there's no broadcast networking
-    zsocket_set_rcvtimeo (zbeacon_socket (client_beacon), 500);
-
-    char *ipaddress = zstr_recv (zbeacon_socket (client_beacon));
-    if (ipaddress) {
-        zframe_t *content = zframe_recv (zbeacon_socket (client_beacon));
-        int received_port = (zframe_data (content) [0] << 8)
-                        +  zframe_data (content) [1];
-        assert (received_port == port_nbr);
-        zframe_destroy (&content);
-        zbeacon_silence (service_beacon);
-        zstr_free (&ipaddress);
-    }
-    zbeacon_destroy (&client_beacon);
-    zbeacon_destroy (&service_beacon);
-    
-    zbeacon_t *node1 = zbeacon_new (ctx, 5670);
-    zbeacon_t *node2 = zbeacon_new (ctx, 5670);
-    zbeacon_t *node3 = zbeacon_new (ctx, 5670);
-
-    assert (*zbeacon_hostname (node1));
-    assert (*zbeacon_hostname (node2));
-    assert (*zbeacon_hostname (node3));
-    
-    zbeacon_set_interval (node1, 250);
-    zbeacon_set_interval (node2, 250);
-    zbeacon_set_interval (node3, 250);
-    zbeacon_noecho (node1);
-    zbeacon_publish (node1, (byte *) "NODE/1", 6);
-    zbeacon_publish (node2, (byte *) "NODE/2", 6);
-    zbeacon_publish (node3, (byte *) "GARBAGE", 7);
-    zbeacon_subscribe (node1, (byte *) "NODE", 4);
-
-    //  Poll on three API sockets at once
-    zpoller_t *poller = zpoller_new (
-        zbeacon_socket (node1), 
-        zbeacon_socket (node2), 
-        zbeacon_socket (node3), NULL);
-        
-    int64_t stop_at = zclock_time () + 1000;
-    while (zclock_time () < stop_at) {
-        long timeout = (long) (stop_at - zclock_time ());
-        if (timeout < 0)
-            timeout = 0;
-        void *which = zpoller_wait (poller, timeout * ZMQ_POLL_MSEC);
-        if (which) {
-            assert (which == zbeacon_socket (node1));
-            char *ipaddress, *beacon;
-            zstr_recvx (zbeacon_socket (node1), &ipaddress, &beacon, NULL);
-            assert (streq (beacon, "NODE/2"));
-            zstr_free (&ipaddress);
-            zstr_free (&beacon);
-        }
-    }
-    zpoller_destroy (&poller);
-    
-    //  Stop listening
-    zbeacon_unsubscribe (node1);
-    
-    //  Stop all node broadcasts
-    zbeacon_silence (node1);
-    zbeacon_silence (node2);
-    zbeacon_silence (node3);
-
-    //  Destroy the test nodes
-    zbeacon_destroy (&node1);
-    zbeacon_destroy (&node2);
-    zbeacon_destroy (&node3);
-    
-    zctx_destroy (&ctx);
-    //  @end
-    printf ("OK\n");
-}
-
-
-//  --------------------------------------------------------------------------
-//  Backend agent implementation
-
-//  Agent instance
-    
-typedef struct {
-    void *pipe;                 //  Socket to talk back to application
-    SOCKET udpsock;             //  UDP socket for send/recv
-    int port_nbr;               //  UDP port number we work on
-    int interval;               //  Beacon broadcast interval
-    bool enabled;               //  Are we broadcasting?
-    bool noecho;                //  Ignore own (unique) beacons?
-    bool terminated;            //  API shut us down
-    int64_t ping_at;            //  Next broadcast time
-    zframe_t *transmit;         //  Beacon transmit data
-    zframe_t *filter;           //  Beacon filter data
-    inaddr_t address;           //  Our own address
-    inaddr_t broadcast;         //  Our broadcast address
-} agent_t;
-
-//  Prototypes for local functions we use in the agent
-
-static agent_t *
-    s_agent_new (void *pipe, int port_nbr);
-static void
-    s_agent_destroy (agent_t **self_p);
-static void
-    s_get_interface (agent_t *self);
-static void
-    s_api_command (agent_t *self);
-static void
-    s_beacon_recv (agent_t *self);
-
-
-//  This is the background task
-
-static void
-s_agent_task (void *args, zctx_t *ctx, void *pipe)
-{
-    //  Get port argument from caller
-    char *port_str = zstr_recv (pipe);
-    assert (port_str);
-
-    //  Create agent instance
-    agent_t *self = s_agent_new (pipe, atoi (port_str));
-    zstr_free (&port_str);
+    self_t *self = (self_t *) zmalloc (sizeof (self_t));
     if (!self)
-        return;                 //  Give up if we couldn't initialize
-
-    while (!self->terminated) {
-        //  Poll on API pipe and on UDP socket
-        zmq_pollitem_t pollitems [] = {
-            { self->pipe, 0, ZMQ_POLLIN, 0 },
-            { NULL, self->udpsock, ZMQ_POLLIN, 0 }
-        };
-        long timeout = -1;
-        if (self->transmit) {
-            timeout = (long) (self->ping_at - zclock_time ());
-            if (timeout < 0)
-                timeout = 0;
-        }
-        if (zmq_poll (pollitems, 2, timeout * ZMQ_POLL_MSEC) == -1)
-            break;              //  Interrupted
-
-        if (pollitems [0].revents & ZMQ_POLLIN)
-            s_api_command (self);
-        if (pollitems [1].revents & ZMQ_POLLIN)
-            s_beacon_recv (self);
-
-        if (self->transmit
-        &&  zclock_time () >= self->ping_at) {
-            //  Send beacon to any listening peers
-            zsys_udp_send (self->udpsock, self->transmit, &self->broadcast);
-            self->ping_at = zclock_time () + self->interval;
-        }
-    }
-    s_agent_destroy (&self);
+        return NULL;
+    self->pipe = pipe;
+    return self;
 }
 
 
-//  Create and initialize new agent instance
+//  --------------------------------------------------------------------------
+//  Prepare beacon to work on specified UPD port.
 
-static agent_t *
-s_agent_new (void *pipe, int port_nbr)
+static void
+s_self_prepare_udp (self_t *self)
 {
-    agent_t *self = (agent_t *) zmalloc (sizeof (agent_t));
-    assert (self);
-    
-    self->pipe = pipe;
-    self->port_nbr = port_nbr;
-    self->interval = INTERVAL_DFLT;
-
     //  Create our UDP socket
+    if (self->udpsock)
+        zsys_udp_close (self->udpsock);
+
+    self->hostname [0] = 0;
     self->udpsock = zsys_udp_new (false);
-    if (self->udpsock == INVALID_SOCKET) {
-        free (self);        //  No more file handles - forget it
-        return NULL;
-    }
-    //  PROBLEM: this design will not survive the network interface
-    //  being killed and restarted while the program is running
-    //  Get the network interface
-    s_get_interface (self);
+    if (self->udpsock == INVALID_SOCKET)
+        return;
 
-    //  Bind to the port on all interfaces
-#if (defined (__WINDOWS__))
-    inaddr_t sockaddr = self->address;
-#else
-    inaddr_t sockaddr = self->broadcast;
-#endif
-    int rc = bind (self->udpsock, (struct sockaddr *) &sockaddr, sizeof (inaddr_t));
-    if (rc == SOCKET_ERROR)
-        zsys_socket_error ("bind");
+    //  Get the network interface fro ZSYS_INTERFACE or else use first
+    //  broadcast interface defined on system. ZSYS_INTERFACE=* means
+    //  use INADDR_ANY + INADDR_BROADCAST.
+    const char *iface = zsys_interface ();
+    in_addr_t bind_to = 0;
+    in_addr_t send_to = 0;
 
-    //  Send our hostname back to API
-    //  PROBLEM: this hostname will not be accurate when the node
-    //  has more than one active interface.
-    char hostname [NI_MAXHOST];
-    rc = getnameinfo ((struct sockaddr *) &self->address,
-            sizeof (inaddr_t), hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
-    if (rc == 0) {
-        //  It all looks OK
-        zstr_send (pipe, hostname);
-        return self;
+    if (streq (iface, "*")) {
+        //  Wildcard means bind to INADDR_ANY and send to INADDR_BROADCAST
+        bind_to = INADDR_ANY;
+        send_to = INADDR_BROADCAST;
     }
     else {
-        //  Interface looks unsupported, abort
-        zstr_send (pipe, "-");
-        zsys_udp_close (self->udpsock);
-        free (self);
-        return NULL;
-    }
-}
-
-
-//  Get the actual network interface we're working on.
-//  Currently implemented for POSIX and for Windows
-
-static void
-s_get_interface (agent_t *self)
-{
-#if defined (HAVE_GETIFADDRS)
-    struct ifaddrs *interfaces;
-    if (getifaddrs (&interfaces) == 0) {
-        int num_interfaces = 0;
-        struct ifaddrs *interface = interfaces;
-        while (interface) {
-            //  On Solaris, loopback interfaces have a NULL in ifa_broadaddr
-            if  (interface->ifa_broadaddr
-            && !(interface->ifa_flags & IFF_LOOPBACK)       //  Ignore loopback interface
-            &&  (interface->ifa_flags & IFF_BROADCAST)      //  Only use interfaces that have BROADCAST
-            && !(interface->ifa_flags & IFF_POINTOPOINT)    //  Ignore point to point interfaces.
-            &&   interface->ifa_addr
-            &&  (interface->ifa_addr->sa_family == AF_INET)) {
-                self->address = *(inaddr_t *) interface->ifa_addr;
-                self->broadcast = *(inaddr_t *) interface->ifa_broadaddr;
-                self->broadcast.sin_port = htons (self->port_nbr);
-
-                //  If the returned broadcast address is the same as source
-                //  address, build the broadcast address from the source
-                //  address and netmask.
-                if (self->address.sin_addr.s_addr == self->broadcast.sin_addr.s_addr)
-                    self->broadcast.sin_addr.s_addr
-                        |= ~(((inaddr_t *) interface->ifa_netmask)->sin_addr.s_addr);
-
-                //  Keep track of the number of interfaces on this host
-                if (self->address.sin_addr.s_addr != ntohl (INADDR_LOOPBACK))
-                    num_interfaces++;
-
-                //  If this is the specified interface then move on
-                if (streq (interface->ifa_name, zsys_interface ()))
-                    break;
+        //  Look for matching interface, or first ziflist item
+        ziflist_t *iflist = ziflist_new ();
+        assert (iflist);
+        const char *name = ziflist_first (iflist);
+        while (name) {
+            if (streq (iface, name) || streq (iface, "")) {
+                //  Using inet_addr instead of inet_aton or inet_atop
+                //  because these are not supported in Win XP
+                send_to = inet_addr (ziflist_broadcast (iflist));
+                bind_to = inet_addr (ziflist_address (iflist));
+                if (self->verbose)
+                    zsys_info ("zbeacon: using address=%s broadcast=%s",
+                               ziflist_address (iflist), ziflist_broadcast (iflist));
+                break;      //  iface is known, so allow it
             }
-            interface = interface->ifa_next;
+            name = ziflist_next (iflist);
         }
-        if (strlen (zsys_interface ()) == 0) {
-            if (num_interfaces == 0) {
-                //  Subnet broadcast addresses don't work on some platforms 
-                //  but is assumed to work if the interface is specified.
-                self->broadcast.sin_family = AF_INET;
-                self->broadcast.sin_addr.s_addr = INADDR_BROADCAST;
-                self->broadcast.sin_port = htons (self->port_nbr);
-            }
-            else
-            if (num_interfaces > 1) {
-                //  Our source address is unknown in this case so set it to
-                //  INADDR_ANY so self->hostname isn't set to an incorrect IP.
-                self->address = self->broadcast;
-                self->address.sin_addr.s_addr = INADDR_ANY;
-            }
-        }
+        ziflist_destroy (&iflist);
     }
-    freeifaddrs (interfaces);
-
+    if (bind_to) {
+        self->broadcast.sin_family = AF_INET;
+        self->broadcast.sin_port = htons (self->port_nbr);
+        self->broadcast.sin_addr.s_addr = send_to;
+        inaddr_t address = self->broadcast;
+        address.sin_addr.s_addr = bind_to;
+        //  Bind to the port on all interfaces
+#if (defined (__WINDOWS__))
+        inaddr_t sockaddr = address;
+#elif (defined (__APPLE__))
+        inaddr_t sockaddr = self->broadcast;
+        sockaddr.sin_addr.s_addr = htons (INADDR_ANY);
 #else
-    //  Our default if we fail to find an interface
-    self->broadcast.sin_family = AF_INET;
-    self->broadcast.sin_addr.s_addr = INADDR_BROADCAST;
-    self->broadcast.sin_port = htons (self->port_nbr);
-
-    //  Our source address is unknown in this case so set it to
-    //  INADDR_ANY so self->hostname isn't set to an incorrect IP.
-    self->address = self->broadcast;
-    self->address.sin_addr.s_addr = INADDR_ANY;
-    if (strlen (zsys_interface ()) == 0)
-        return;         //  Use defaults
-
-#   if defined (__UNIX__)
-    struct ifreq ifr;
-    memset (&ifr, 0, sizeof (ifr));
-
-    int sock = 0;
-    if ((sock = socket (AF_INET, SOCK_DGRAM, 0)) == -1)
-        return;         //  Use defaults
-
-    //  Get interface address
-    ifr.ifr_addr.sa_family = AF_INET;
-    strncpy (ifr.ifr_name, zsys_interface (), sizeof (ifr.ifr_name));
-    int rc = ioctl (sock, SIOCGIFADDR, (caddr_t) &ifr, sizeof (struct ifreq));
-    if (rc == -1)
-        zsys_socket_error ("siocgifaddr");
-
-    //  Get interface broadcast address
-    memcpy (&self->address, ((inaddr_t *) &ifr.ifr_addr), sizeof (inaddr_t));
-    rc = ioctl (sock, SIOCGIFBRDADDR, (caddr_t) &ifr, sizeof (struct ifreq));
-    if (rc == -1)
-        zsys_socket_error ("siocgifbrdaddr");
-
-    memcpy (&self->broadcast, ((inaddr_t *) &ifr.ifr_broadaddr), sizeof (inaddr_t));
-    close (sock);
-
-#   elif defined (__WINDOWS__)
-    ULONG addr_size = 0;
-    DWORD rc = GetAdaptersAddresses (AF_INET,
-        GAA_FLAG_INCLUDE_PREFIX, NULL, NULL, &addr_size);
-    assert (rc == ERROR_BUFFER_OVERFLOW);
-
-    PIP_ADAPTER_ADDRESSES pip_addresses = (PIP_ADAPTER_ADDRESSES) malloc (addr_size);
-    rc = GetAdaptersAddresses (AF_INET,
-        GAA_FLAG_INCLUDE_PREFIX, NULL, pip_addresses, &addr_size);
-    assert (rc == NO_ERROR);
-
-    PIP_ADAPTER_ADDRESSES cur_address = pip_addresses;
-    while (cur_address) {
-        PIP_ADAPTER_UNICAST_ADDRESS pUnicast = cur_address->FirstUnicastAddress;
-        PIP_ADAPTER_PREFIX pPrefix = cur_address->FirstPrefix;
-
-        if (pUnicast && pPrefix) {
-            self->address = *(inaddr_t *)(pUnicast->Address.lpSockaddr);
-            self->broadcast = *(inaddr_t *)(pPrefix->Address.lpSockaddr);
-            self->broadcast.sin_addr.s_addr
-                |= htonl ((1 << (32 - pPrefix->PrefixLength)) - 1);
-        }
-        cur_address = cur_address->Next;
-    }
-    free (pip_addresses);
-#   else
-#       error "Interface detection TBD on this operating system"
-#   endif
+        inaddr_t sockaddr = self->broadcast;
 #endif
+        //  Bind must succeed; we treat failure here as a hard violation (assert)
+        if (bind (self->udpsock, (struct sockaddr *) &sockaddr, sizeof (inaddr_t)))
+            zsys_socket_error ("bind");
+
+        //  Send our hostname back to API
+        if (getnameinfo ((struct sockaddr *) &address, sizeof (inaddr_t),
+                          self->hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST) == 0) {
+            if (self->verbose)
+                zsys_info ("zbeacon: configured, hostname=%s", self->hostname);
+        }
+    }
 }
 
-//  Handle command from API
+
+//  --------------------------------------------------------------------------
+//  Prepare beacon to work on specified UPD port, reply hostname to
+//  pipe (or "" if this failed)
 
 static void
-s_api_command (agent_t *self)
+s_self_configure (self_t *self, int port_nbr)
 {
+    assert (port_nbr);
+    self->port_nbr = port_nbr;
+    s_self_prepare_udp (self);
+    zstr_send (self->pipe, self->hostname);
+    if (streq (self->hostname, ""))
+        zsys_error ("No broadcast interface found, (ZSYS_INTERFACE=%s)", zsys_interface ());
+}
+
+
+//  --------------------------------------------------------------------------
+//  Handle a command from calling application
+
+static int
+s_self_handle_pipe (self_t *self)
+{
+    //  Get just the command off the pipe
     char *command = zstr_recv (self->pipe);
-    if (streq (command, "INTERVAL")) {
-        char *interval = zstr_recv (self->pipe);
-        self->interval = atoi (interval);
-        zstr_free (&interval);
-    }
+    if (!command)
+        return -1;                  //  Interrupted
+
+    if (self->verbose)
+        zsys_info ("zbeacon: API command=%s", command);
+
+    if (streq (command, "VERBOSE"))
+        self->verbose = true;
     else
-    if (streq (command, "NOECHO"))
-        self->noecho = true;
+    if (streq (command, "CONFIGURE")) {
+        int port;
+        int rc = zsock_recv (self->pipe, "i", &port);
+        assert (rc == 0);
+        s_self_configure (self, port);
+    }
     else
     if (streq (command, "PUBLISH")) {
         zframe_destroy (&self->transmit);
-        self->transmit = zframe_recv (self->pipe);
-        assert (self->transmit);
+        zsock_recv (self->pipe, "fi", &self->transmit, &self->interval);
+        assert (zframe_size (self->transmit) <= UDP_FRAME_MAX);
         //  Start broadcasting immediately
-        self->ping_at = zclock_time ();
+        self->ping_at = zclock_mono ();
     }
     else
     if (streq (command, "SILENCE"))
@@ -596,32 +204,34 @@ s_api_command (agent_t *self)
     if (streq (command, "SUBSCRIBE")) {
         zframe_destroy (&self->filter);
         self->filter = zframe_recv (self->pipe);
+        assert (zframe_size (self->filter) <= UDP_FRAME_MAX);
     }
     else
     if (streq (command, "UNSUBSCRIBE"))
         zframe_destroy (&self->filter);
     else
-    if (streq (command, "TERMINATE")) {
+    if (streq (command, "$TERM"))
         self->terminated = true;
-        zstr_send (self->pipe, "OK");
+    else {
+        zsys_error ("zbeacon: - invalid command: %s", command);
+        assert (false);
     }
-    else
-        printf ("E: unexpected API command '%s'\n", command);
-    
     zstr_free (&command);
+    return 0;
 }
 
 
+//  --------------------------------------------------------------------------
 //  Receive and filter the waiting beacon
 
 static void
-s_beacon_recv (agent_t *self)
+s_self_handle_udp (self_t *self)
 {
     assert (self);
 
     char peername [INET_ADDRSTRLEN];
     zframe_t *frame = zsys_udp_recv (self->udpsock, peername);
-    
+
     //  If filter is set, check that beacon matches it
     bool is_valid = false;
     if (self->filter) {
@@ -631,8 +241,8 @@ s_beacon_recv (agent_t *self)
         && memcmp (zframe_data (frame), filter_data, filter_size) == 0)
             is_valid = true;
     }
-    //  If valid, check for echoed beacons (i.e. our own broadcast)
-    if (is_valid && self->noecho && self->transmit) {
+    //  If valid, discard our own broadcasts, which UDP echoes to us
+    if (is_valid && self->transmit) {
         byte  *transmit_data = zframe_data (self->transmit);
         size_t transmit_size = zframe_size (self->transmit);
         if (zframe_size (frame) == transmit_size
@@ -642,8 +252,9 @@ s_beacon_recv (agent_t *self)
     //  If still a valid beacon, send on to the API
     if (is_valid) {
         zmsg_t *msg = zmsg_new ();
+        assert (msg);
         zmsg_addstr (msg, peername);
-        zmsg_add (msg, frame);
+        zmsg_append (msg, &frame);
         zmsg_send (&msg, self->pipe);
     }
     else
@@ -651,18 +262,169 @@ s_beacon_recv (agent_t *self)
 }
 
 
-//  Destroy agent instance
+//  --------------------------------------------------------------------------
+//  zbeacon() implements the zbeacon actor interface
 
-static void
-s_agent_destroy (agent_t **self_p)
+void
+zbeacon (zsock_t *pipe, void *args)
 {
-    assert (self_p);
-    if (*self_p) {
-        agent_t *self = *self_p;
-        zsys_udp_close (self->udpsock);
-        zframe_destroy (&self->transmit);
-        zframe_destroy (&self->filter);
-        free (self);
-        *self_p = NULL;
+    self_t *self = s_self_new (pipe);
+    assert (self);
+    //  Signal successful initialization
+    zsock_signal (pipe, 0);
+
+    while (!self->terminated) {
+        //  Poll on API pipe and on UDP socket
+        zmq_pollitem_t pollitems [] = {
+            { zsock_resolve (self->pipe), 0, ZMQ_POLLIN, 0 },
+            { NULL, self->udpsock, ZMQ_POLLIN, 0 }
+        };
+        long timeout = -1;
+        if (self->transmit) {
+            timeout = (long) (self->ping_at - zclock_mono ());
+            if (timeout < 0)
+                timeout = 0;
+        }
+        int pollset_size = self->udpsock? 2: 1;
+        if (zmq_poll (pollitems, pollset_size, timeout * ZMQ_POLL_MSEC) == -1)
+            break;              //  Interrupted
+
+        if (pollitems [0].revents & ZMQ_POLLIN)
+            s_self_handle_pipe (self);
+        if (pollitems [1].revents & ZMQ_POLLIN)
+            s_self_handle_udp (self);
+
+        if (self->transmit
+        &&  zclock_mono () >= self->ping_at) {
+            //  Send beacon to any listening peers
+            if (zsys_udp_send (self->udpsock, self->transmit, &self->broadcast))
+                //  Try to recreate UDP socket on interface
+                s_self_prepare_udp (self);
+            self->ping_at = zclock_mono () + self->interval;
+        }
     }
+    s_self_destroy (&self);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Selftest
+
+void
+zbeacon_test (bool verbose)
+{
+    printf (" * zbeacon: ");
+    if (verbose)
+        printf ("\n");
+
+    //  @selftest
+    //  Test 1 - two beacons, one speaking, one listening
+    //  Create speaker beacon to broadcast our service
+    zactor_t *speaker = zactor_new (zbeacon, NULL);
+    assert (speaker);
+    if (verbose)
+        zstr_sendx (speaker, "VERBOSE", NULL);
+
+    zsock_send (speaker, "si", "CONFIGURE", 9999);
+    char *hostname = zstr_recv (speaker);
+    if (!*hostname) {
+        printf ("OK (skipping test, no UDP broadcasting)\n");
+        zactor_destroy (&speaker);
+        free (hostname);
+        return;
+    }
+    free (hostname);
+
+    //  Create listener beacon on port 9999 to lookup service
+    zactor_t *listener = zactor_new (zbeacon, NULL);
+    assert (listener);
+    if (verbose)
+        zstr_sendx (listener, "VERBOSE", NULL);
+    zsock_send (listener, "si", "CONFIGURE", 9999);
+    hostname = zstr_recv (listener);
+    assert (*hostname);
+    free (hostname);
+
+    //  We will broadcast the magic value 0xCAFE
+    byte announcement [2] = { 0xCA, 0xFE };
+    zsock_send (speaker, "sbi", "PUBLISH", announcement, 2, 100);
+    //  We will listen to anything (empty subscription)
+    zsock_send (listener, "sb", "SUBSCRIBE", "", 0);
+
+    //  Wait for at most 1/2 second if there's no broadcasting
+    zsock_set_rcvtimeo (listener, 500);
+    char *ipaddress = zstr_recv (listener);
+    if (ipaddress) {
+        zframe_t *content = zframe_recv (listener);
+        assert (zframe_size (content) == 2);
+        assert (zframe_data (content) [0] == 0xCA);
+        assert (zframe_data (content) [1] == 0xFE);
+        zframe_destroy (&content);
+        zstr_free (&ipaddress);
+        zstr_sendx (speaker, "SILENCE", NULL);
+    }
+    zactor_destroy (&listener);
+    zactor_destroy (&speaker);
+
+    //  Test subscription filter using a 3-node setup
+    zactor_t *node1 = zactor_new (zbeacon, NULL);
+    assert (node1);
+    zsock_send (node1, "si", "CONFIGURE", 5670);
+    hostname = zstr_recv (node1);
+    assert (*hostname);
+    free (hostname);
+
+    zactor_t *node2 = zactor_new (zbeacon, NULL);
+    assert (node2);
+    zsock_send (node2, "si", "CONFIGURE", 5670);
+    hostname = zstr_recv (node2);
+    assert (*hostname);
+    free (hostname);
+
+    zactor_t *node3 = zactor_new (zbeacon, NULL);
+    assert (node3);
+    zsock_send (node3, "si", "CONFIGURE", 5670);
+    hostname = zstr_recv (node3);
+    assert (*hostname);
+    free (hostname);
+
+    zsock_send (node1, "sbi", "PUBLISH", "NODE/1", 6, 250);
+    zsock_send (node2, "sbi", "PUBLISH", "NODE/2", 6, 250);
+    zsock_send (node3, "sbi", "PUBLISH", "RANDOM", 6, 250);
+    zsock_send (node1, "sb", "SUBSCRIBE", "NODE", 4);
+
+    //  Poll on three API sockets at once
+    zpoller_t *poller = zpoller_new (node1, node2, node3, NULL);
+    assert (poller);
+    int64_t stop_at = zclock_mono () + 1000;
+    while (zclock_mono () < stop_at) {
+        long timeout = (long) (stop_at - zclock_mono ());
+        if (timeout < 0)
+            timeout = 0;
+        void *which = zpoller_wait (poller, timeout * ZMQ_POLL_MSEC);
+        if (which) {
+            assert (which == node1);
+            char *ipaddress, *received;
+            zstr_recvx (node1, &ipaddress, &received, NULL);
+            assert (streq (received, "NODE/2"));
+            zstr_free (&ipaddress);
+            zstr_free (&received);
+        }
+    }
+    zpoller_destroy (&poller);
+
+    //  Stop listening
+    zstr_sendx (node1, "UNSUBSCRIBE", NULL);
+
+    //  Stop all node broadcasts
+    zstr_sendx (node1, "SILENCE", NULL);
+    zstr_sendx (node2, "SILENCE", NULL);
+    zstr_sendx (node3, "SILENCE", NULL);
+
+    //  Destroy the test nodes
+    zactor_destroy (&node1);
+    zactor_destroy (&node2);
+    zactor_destroy (&node3);
+    //  @end
+    printf ("OK\n");
 }

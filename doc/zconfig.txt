@@ -67,7 +67,8 @@ CZMQ_EXPORT void
 CZMQ_EXPORT zconfig_t *
     zconfig_at_depth (zconfig_t *self, int level);
 
-//  Execute a callback for each config item in the tree
+//  Execute a callback for each config item in the tree; returns zero if
+//  successful, else -1.
 CZMQ_EXPORT int
     zconfig_execute (zconfig_t *self, zconfig_fct handler, void *arg);
 
@@ -132,51 +133,114 @@ text format for configuration files.
 
 Here is an example ZPL stream and corresponding config structure:
 
-context
-    iothreads = 1
-    verbose = 1      #   Ask for a trace
-main
-    type = zqueue    #  ZMQ_DEVICE type
-    frontend
-        option
-            hwm = 1000
-            swap = 25000000     #  25MB
-        bind = 'inproc://addr1'
-        bind = 'ipc://addr2'
-    backend
-        bind = inproc://addr3
+    context
+        iothreads = 1
+        verbose = 1      #   Ask for a trace
+    main
+        type = zqueue    #  ZMQ_DEVICE type
+        frontend
+            option
+                hwm = 1000
+                swap = 25000000     #  25MB
+            bind = 'inproc://addr1'
+            bind = 'ipc://addr2'
+        backend
+            bind = inproc://addr3
 
-root                    Down = child
-  |                     Across = next
-  v
-context-->main
-  |         |
-  |         v
-  |       type=queue-->frontend-->backend
-  |                      |          |
-  |                      |          v
-  |                      |        bind=inproc://addr3
-  |                      v
-  |                    option-->bind=inproc://addr1-->bind=ipc://addr2
-  |                      |
-  |                      v
-  |                    hwm=1000-->swap=25000000
-  v
-iothreads=1-->verbose=false
+    root                    Down = child
+    |                     Across = next
+    v
+    context-->main
+    |         |
+    |         v
+    |       type=queue-->frontend-->backend
+    |                      |          |
+    |                      |          v
+    |                      |        bind=inproc://addr3
+    |                      v
+    |                    option-->bind=inproc://addr1-->bind=ipc://addr2
+    |                      |
+    |                      v
+    |                    hwm=1000-->swap=25000000
+    v
+    iothreads=1-->verbose=false
 
 EXAMPLE
 -------
 .From zconfig_test method
 ----
-    //  Create temporary directory for test files
+//  Create temporary directory for test files
 #   define TESTDIR ".test_zconfig"
-    zsys_dir_create (TESTDIR);
-    
-    zconfig_t *root = zconfig_new ("root", NULL);
-    zconfig_t *section, *item;
-    
-    section = zconfig_new ("headers", root);
-    item = zconfig_new ("email", section);
+zsys_dir_create (TESTDIR);
+
+zconfig_t *root = zconfig_new ("root", NULL);
+assert (root);
+zconfig_t *section, *item;
+
+section = zconfig_new ("headers", root);
+assert (section);
+item = zconfig_new ("email", section);
+assert (item);
+zconfig_set_value (item, "some@random.com");
+item = zconfig_new ("name", section);
+assert (item);
+zconfig_set_value (item, "Justin Kayce");
+zconfig_put (root, "/curve/secret-key", "Top Secret");
+zconfig_set_comment (root, "   CURVE certificate");
+zconfig_set_comment (root, "   -----------------");
+assert (zconfig_comments (root));
+zconfig_save (root, TESTDIR "/test.cfg");
+zconfig_destroy (&root);
+root = zconfig_load (TESTDIR "/test.cfg");
+if (verbose)
+    zconfig_save (root, "-");
+assert (streq (zconfig_filename (root), TESTDIR "/test.cfg"));
+
+char *email = zconfig_resolve (root, "/headers/email", NULL);
+assert (email);
+assert (streq (email, "some@random.com"));
+char *passwd = zconfig_resolve (root, "/curve/secret-key", NULL);
+assert (passwd);
+assert (streq (passwd, "Top Secret"));
+
+zconfig_save (root, TESTDIR "/test.cfg");
+assert (zconfig_has_changed (root));
+int rc = zconfig_reload (&root);
+assert (rc == 0);
+assert (!zconfig_has_changed (root));
+zconfig_destroy (&root);
+
+//  Test chunk load/save
+root = zconfig_new ("root", NULL);
+assert (root);
+section = zconfig_new ("section", root);
+assert (section);
+item = zconfig_new ("value", section);
+assert (item);
+zconfig_set_value (item, "somevalue");
+zchunk_t *chunk = zconfig_chunk_save (root);
+assert (chunk);
+zconfig_destroy (&root);
+
+root = zconfig_chunk_load (chunk);
+assert (root);
+char *value = zconfig_resolve (root, "/section/value", NULL);
+assert (value);
+assert (streq (value, "somevalue"));
+
+//  Test config can't be saved to a file in a path that doesn't
+//  exist or isn't writable
+rc = zconfig_save (root, TESTDIR "/path/that/doesnt/exist/test.cfg");
+assert (rc == -1);
+
+zconfig_destroy (&root);
+zchunk_destroy (&chunk);
+
+//  Delete all test files
+zdir_t *dir = zdir_new (TESTDIR, NULL);
+assert (dir);
+zdir_remove (dir, true);
+zdir_destroy (&dir);
 ----
 
 SEE ALSO

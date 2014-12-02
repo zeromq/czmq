@@ -3,6 +3,7 @@
      Requires gsl4 from https://github.com/imatix/gsl
      use 'gsl sockopts'
 -->
+
 <options script = "sockopts">
     <version major = "4" style = "macro">
         <!-- Options that are new in 4.1 -->
@@ -35,22 +36,25 @@
         </option>
         
         <!-- Security options -->
+        <option name = "zap_domain"        type = "string" mode = "rw" test = "SUB" />
+        <option name = "mechanism"         type = "int"    mode = "r"  test = "SUB" />
+
         <option name = "plain_server"      type = "int"    mode = "rw" test = "PUB" />
         <option name = "plain_username"    type = "string" mode = "rw" test = "SUB" />
         <option name = "plain_password"    type = "string" mode = "rw" test = "SUB" />
-        <option name = "curve_server"      type = "int"    mode = "rw" test = "PUB"
-                ifdef = "HAVE_LIBSODIUM" />
-        <option name = "curve_publickey"   type = "key"    mode = "rw" test = "PUB"
-                ifdef = "HAVE_LIBSODIUM"
-                test_value = "Yne@$w-vo<fVvi]a<NY6T1ed:M$fCG*[IaLV{hID" />
-        <option name = "curve_secretkey"   type = "key"    mode = "rw" test = "PUB"
-                ifdef = "HAVE_LIBSODIUM"
-                test_value = "D:)Q[IlAW!ahhC2ac:9*A}h:p?([4%wOTJ%JR%cs" />
-        <option name = "curve_serverkey"   type = "key"    mode = "rw" test = "SUB"
-                ifdef = "HAVE_LIBSODIUM"
-                test_value = "rq:rM>}U?@Lns47E1%kR.o@n%FcmmsL/@{H8]yf7" />
-        <option name = "zap_domain"        type = "string" mode = "rw" test = "SUB" />
-        <option name = "mechanism"         type = "int"    mode = "r"  test = "SUB" />
+
+        <!-- We don't test these as libzmq doesn't always support CURVE security -->
+        <option name = "curve_server"      type = "int"    mode = "rw" />
+        <option name = "curve_publickey"   type = "key"    mode = "rw" />
+        <option name = "curve_secretkey"   type = "key"    mode = "rw" />
+        <option name = "curve_serverkey"   type = "key"    mode = "rw" />
+
+        <!-- We don't test these as libzmq doesn't always support GSSAPI security -->
+        <option name = "gssapi_server"     type = "int"    mode = "rw" />
+        <option name = "gssapi_plaintext"  type = "int"    mode = "rw" />
+        <option name = "gssapi_principal"  type = "string" mode = "rw" />
+        <option name = "gssapi_service_principal"
+                                           type = "string" mode = "rw" />
 
         <!-- New names for deprecated 3.x options -->
         <option name = "ipv6"              type = "int"    mode = "rw" test = "SUB" />
@@ -66,9 +70,6 @@
 
         <!-- Options that are the same in 3.x -->
         <include name = "3-x options" />
-
-        <!-- Emulation of 2.x ZMQ_HWM option -->
-        <include name = "set_hwm" />
     </version>
     
     <version major = "3" style = "macro">
@@ -82,9 +83,6 @@
         <option name = "ipv4only"          type = "int"    mode = "rw" test = "SUB" />
         <option name = "delay_attach_on_connect"
                                            type = "int"    mode = "w"  test = "PUB" />
-
-        <!-- Emulation of 2.x ZMQ_HWM option -->
-        <include name = "set_hwm" />
     </version>
 
     <!-- Legacy version 2 -->

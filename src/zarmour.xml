@@ -1,0 +1,30 @@
+<class
+    name = "zarmour"
+    title = "armoured text encoding and decoding"
+    script = "zclass_c"
+    export_macro = "CZMQ_EXPORT"
+    project_header = "../include/czmq.h"
+    package_dir = "../include"
+    source_dir = "."
+    >
+
+    <include filename = "license.xml" />
+
+    <typedef name = "mode" type = "enum">
+        <item name = "BASE64_STD" />
+        <item name = "BASE64_URL" />
+    </typedef>
+
+    <method name = "encode" type = "string">
+        <arg name = "data" type = "buffer" />
+    </method>
+
+    <method name = "decode" type = "buffer">
+        <arg name = "data" type = "string" />
+    </method>
+
+    <property name = "mode" type = "mode" />
+    <property name = "pad" type = "bool" />
+    <property name = "pad_char" type = "char" />
+
+</class>

@@ -4,64 +4,125 @@
 .#  language. See https://github.com/imatix/gsl for details. This script
 .#  is licensed under MIT/X11.
 .#
-.echo "Generating src/Makefile.am..."
-.output "../src/Makefile.am"
+.echo "Generating src/Makemodule.am..."
+.output "../src/Makemodule.am"
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
 #   Please read the README.txt file in the model directory.     #
 #################################################################
-lib_LTLIBRARIES = lib$(project.name).la
+lib_LTLIBRARIES += src/lib$(project.name).la
 
-pkgconfigdir = $\(libdir)/pkgconfig
-pkgconfig_DATA = lib$(project.name).pc
+pkgconfig_DATA = src/lib$(project.name).pc
 
 include_HEADERS = \\
 .for header
-    ../include/$(name).h \\
+    include/$(name).h \\
 .endfor
 .for class
 .   if class.private ?= 1
-.       class.classdir = ""
+.       class.classdir = "src"
 .   else
-.       class.classdir = "../include/"
+.       class.classdir = "include"
 .   endif
 .   if last ()
-    $(classdir)$(name).h
+    $(classdir)/$(name).h
 .   else
-    $(classdir)$(name).h \\
+    $(classdir)/$(name).h \\
 .   endif
 .endfor
 
-lib$(project.name)_la_SOURCES = \\
-    platform.h \\
+src_lib$(project.name)_la_SOURCES = \\
+    src/platform.h \\
+.for extra
+    src/$(name) \\
+.endfor
 .for class
 .   if last ()
-    $(name).c
+    src/$(name).c
 .   else
-    $(name).c \\
+    src/$(name).c \\
 .   endif
 .endfor
 
-AM_CFLAGS = -g
-AM_CPPFLAGS = -I$\(top_srcdir)/include
-bin_PROGRAMS = $(project.name)_selftest
-$(project.name)_selftest_LDADD = lib$(project.name).la
-$(project.name)_selftest_SOURCES = $(project.name)_selftest.c
+src_lib$(project.name)_la_CPPFLAGS = \\
+.for package_dependency where defined (package_dependency.for_lib)
+.   if last()
+    \${$(package_dependency.name)_CFLAGS}
+.   else
+    \${$(package_dependency.name)_CFLAGS} \\
+.   endif
+.endfor
+    ${AM_CPPFLAGS}
+
+src_lib$(project.name)_la_LDFLAGS = \\
+    -version-info @LTVER@ \\
+    \$(LIBTOOL_EXTRA_LDFLAGS)
 
 if ON_MINGW
-lib$(project.name)_la_LDFLAGS = -no-undefined -avoid-version -version-info @LTVER@
-else
-lib$(project.name)_la_LDFLAGS = -version-info @LTVER@
+src_lib$(project.name)_la_LDFLAGS += \\
+    -no-undefined \\
+    -avoid-version
 endif
 
-TESTS = $(project.name)_selftest
+.if count(package_dependency, defined(package_dependency.for_lib) | defined (package_dependency.for_all)) > 0
+src_lib$(project.name)_la_LIBS = \\
+.for package_dependency where defined (package_dependency.for_lib) | defined (package_dependency.for_all)
+.   if last()
+    \${$(package_dependency.name)_LIBS}
+.   else
+    \${$(package_dependency.name)_LIBS} \\
+.   endif
+.endfor
+.endif
+
+check_PROGRAMS += src/$(project.name)_selftest
+
+src_$(project.name)_selftest_CPPFLAGS = \\
+.for package_dependency where defined (package_dependency.for_test)
+    \${$(package_dependency.name)_CFLAGS} \\
+.endfor
+    \${src_lib$(project.name)_la_CFLAGS}
+
+src_$(project.name)_selftest_LDADD = \\
+.if count (package_dependency, defined (count.for_lib) | defined (count.for_test) | defined (count.for_all)) > 0
+    src/lib$(project.name).la \\
+.else
+    src/lib$(project.name).la
+.endif
+.for package_dependency where defined (package_dependency.for_lib) | defined (package_dependency.for_test) | defined (package_dependency.for_all)
+.   if last()
+    \${$(package_dependency.name)_LIBS}
+.   else
+    \${$(package_dependency.name)_LIBS} \\
+.   endif
+.endfor
+
+src_$(project.name)_selftest_SOURCES = \\
+    src/$(project.name)_selftest.c
+
+TESTS = src/$(project.name)_selftest
+
+# Run the selftest binary under valgrind to check for memory leaks
+memcheck: src/$(project.name)_selftest
+	libtool --mode=execute valgrind --tool=memcheck \\
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \\
+		--suppressions=$\(srcdir)/src/.valgrind.supp \\
+		$\(srcdir)/src/$(project.name)_selftest
+
+# Run the selftest binary under gdb for debugging
+debug: src/$(project.name)_selftest
+	libtool --mode=execute gdb -q \\
+		$\(srcdir)/src/$(project.name)_selftest
 .for model
 .   if first ()
+
+# define custom target for all products of /src
+src: src/lib$(project.name).la src/$(project.name)_selftest
 
 # Produce generated models; do this manually in src directory
 code:
 .   endif
-\tgsl -q $(name).xml
+\tcd $\(srcdir)/src; gsl -q $(name).xml
 .endfor
 
 #################################################################
@@ -84,24 +145,24 @@ code:
 .endfor
 MAN1 =
 MAN3 =$(manpages)
-MAN7 = $(project.manpage)
+MAN7 = $\(srcdir)/$(project.manpage)
 MAN_DOC = $\(MAN1) $\(MAN3) $\(MAN7)
 
 MAN_TXT = $\(MAN1:%.1=%.txt)
 MAN_TXT += $\(MAN3:%.3=%.txt)
 MAN_TXT += $\(MAN7:%.7=%.txt)
 
+EXTRA_DIST = asciidoc.conf mkman $\(MAN_TXT)
+
+if BUILD_DOC
 if INSTALL_MAN
 dist_man_MANS = $\(MAN_DOC)
 endif
-
-EXTRA_DIST = asciidoc.conf mkman $\(MAN_TXT)
 
 MAINTAINERCLEANFILES = $\(MAN_DOC)
 
 dist-hook : $\(MAN_DOC)
 
-if BUILD_DOC
 SUFFIXES=.txt .xml .1 .3 .7
 
 \.txt.xml:

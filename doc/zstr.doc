@@ -1,0 +1,103 @@
+#### zstr - sending and receiving strings
+
+The zstr class provides utility functions for sending and receiving C
+strings across 0MQ sockets. It sends strings without a terminating null,
+and appends a null byte on received strings. This class is for simple
+message sending.
+
+       Memory                       Wire
+       +-------------+---+          +---+-------------+
+Send   | S t r i n g | 0 |  ---->   | 6 | S t r i n g |
+       +-------------+---+          +---+-------------+
+
+       Wire                         Heap
+       +---+-------------+          +-------------+---+
+Recv   | 6 | S t r i n g |  ---->   | S t r i n g | 0 |
+       +---+-------------+          +-------------+---+
+
+This is the class interface:
+
+    //  Receive C string from socket. Caller must free returned string using
+    //  zstr_free(). Returns NULL if the context is being terminated or the
+    //  process was interrupted.
+    CZMQ_EXPORT char *
+        zstr_recv (void *source);
+    
+    //  Send a C string to a socket, as a frame. The string is sent without
+    //  trailing null byte; to read this you can use zstr_recv, or a similar
+    //  method that adds a null terminator on the received string. String
+    //  may be NULL, which is sent as "".
+    CZMQ_EXPORT int
+        zstr_send (void *dest, const char *string);
+    
+    //  Send a C string to a socket, as zstr_send(), with a MORE flag, so that
+    //  you can send further strings in the same multi-part message.
+    CZMQ_EXPORT int
+        zstr_sendm (void *dest, const char *string);
+    
+    //  Send a formatted string to a socket. Note that you should NOT use
+    //  user-supplied strings in the format (they may contain '%' which
+    //  will create security holes).
+    CZMQ_EXPORT int
+        zstr_sendf (void *dest, const char *format, ...);
+    
+    //  Send a formatted string to a socket, as for zstr_sendf(), with a
+    //  MORE flag, so that you can send further strings in the same multi-part
+    //  message.
+    CZMQ_EXPORT int
+        zstr_sendfm (void *dest, const char *format, ...);
+    
+    //  Send a series of strings (until NULL) as multipart data
+    //  Returns 0 if the strings could be sent OK, or -1 on error.
+    CZMQ_EXPORT int
+        zstr_sendx (void *dest, const char *string, ...);
+    
+    //  Receive a series of strings (until NULL) from multipart data.
+    //  Each string is allocated and filled with string data; if there
+    //  are not enough frames, unallocated strings are set to NULL.
+    //  Returns -1 if the message could not be read, else returns the
+    //  number of strings filled, zero or more. Free each returned string
+    //  using zstr_free(). If not enough strings are provided, remaining
+    //  multipart frames in the message are dropped.
+    CZMQ_EXPORT int
+        zstr_recvx (void *source, char **string_p, ...);
+    
+    //  Free a provided string, and nullify the parent pointer. Safe to call on
+    //  a null pointer.
+    CZMQ_EXPORT void
+        zstr_free (char **string_p);
+    
+    //  Self test of this class
+    CZMQ_EXPORT void
+        zstr_test (bool verbose);
+
+This is the class self test code:
+
+    //  Create two PAIR sockets and connect over inproc
+    zsock_t *output = zsock_new_pair ("@inproc://zstr.test");
+    assert (output);
+    zsock_t *input = zsock_new_pair (">inproc://zstr.test");
+    assert (input);
+    
+    //  Send ten strings, five strings with MORE flag and then END
+    int string_nbr;
+    for (string_nbr = 0; string_nbr < 10; string_nbr++)
+        zstr_sendf (output, "this is string %d", string_nbr);
+    zstr_sendx (output, "This", "is", "almost", "the", "very", "END", NULL);
+    
+    //  Read and count until we receive END
+    string_nbr = 0;
+    for (string_nbr = 0;; string_nbr++) {
+        char *string = zstr_recv (input);
+        assert (string);
+        if (streq (string, "END")) {
+            zstr_free (&string);
+            break;
+        }
+        zstr_free (&string);
+    }
+    assert (string_nbr == 15);
+    
+    zsock_destroy (&input);
+    zsock_destroy (&output);
+

@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zmutex - working with mutexes
+    zmutex - working with mutexes (deprecated)
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -16,7 +16,7 @@
     The zmutex class provides a portable wrapper for mutexes. Please do not
     use this class to do multi-threading. It is for the rare case where you
     absolutely need thread-safe global state. This should happen in system
-    code only. DO NOT USE THIS TO SHARE SOCKETS BETWEEN THREADS, OR DARK 
+    code only. DO NOT USE THIS TO SHARE SOCKETS BETWEEN THREADS, OR DARK
     THINGS WILL HAPPEN TO YOUR CODE.
 @discuss
 @end
@@ -41,10 +41,9 @@ struct _zmutex_t {
 zmutex_t *
 zmutex_new (void)
 {
-    zmutex_t
-        *self;
-
-    self = (zmutex_t *) zmalloc (sizeof (zmutex_t));
+    zmutex_t *self = (zmutex_t *) zmalloc (sizeof (zmutex_t));
+    if (!self)
+        return NULL;
 #if defined (__UNIX__)
     if (pthread_mutex_init (&self->mutex, NULL) != 0) {
         free (self);
@@ -135,10 +134,11 @@ zmutex_try_lock (zmutex_t *self)
 void
 zmutex_test (bool verbose)
 {
-    printf (" * zmutex: ");
+    printf (" * zmutex (deprecated): ");
 
     //  @selftest
     zmutex_t *mutex = zmutex_new ();
+    assert (mutex);
     zmutex_lock (mutex);
     zmutex_unlock (mutex);
     zmutex_destroy (&mutex);

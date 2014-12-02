@@ -66,7 +66,7 @@ EXAMPLE
 -------
 .From $class\_test method
 ----
-pull $top_srcdir/src/$class.c\@selftest
+pull $top_srcdir/src/$class.c\@selftest,left
 ----
 
 SEE ALSO
@@ -74,27 +74,58 @@ SEE ALSO
 linkczmq:czmq[7]
 END
 
-#   Now process template
-for (split /^/, $template) {
-    if (/^pull (.*)(@[a-zA-Z0-9]+)(,(.*)\s*)?/) {
+sub pull {
+    local ($_) = @_;
+    if (/^(.*)(@[a-zA-Z0-9]+)(,(\w*)\s*)?/) {
         $source = $1;
         $tag = $2;
         $opts = $4;
+        $text = "";
         die "Can't read $source: $!"
             unless open (SOURCE, $source);
         while (<SOURCE>) {
             if (/$tag/) {
                 while (<SOURCE>) {
-                    last if /@[a-zA-Z0-9]+/;
-                    $_ = "    $_" if ($opts eq "code");
-                    s/^    // if ($opts eq "left");
-                    print OUTPUT $_;
+                    last if /\@discuss/ || /\@end/;
+                    $_ = "    $_" if $opts eq "code";
+                    s/^    // if $opts eq "left";
+                    $_ = "    $_" if $opts eq "test";
+                    s/^        /    / if $opts eq "test";
+                    $text .= $_;
                 }
             }
         }
         close (SOURCE);
+        return $text;
+    }
+    else {
+        print "E: bad pull request: $_\n";
+    }
+}
+
+#   Now process template
+for (split /^/, $template) {
+    if (/^pull (.*)$/) {
+        print OUTPUT pull ($1);
     }
     else {
         print OUTPUT $_;
     }
 }
+
+#   Generate a simple text documentation for README.txt
+close OUTPUT;
+printf "Generating $class.doc...\n";
+die "Can't create $class.doc: $!"
+    unless open (OUTPUT, ">$class.doc");
+print OUTPUT "#### $class - $title\n\n";
+print OUTPUT pull ("$top_srcdir/src/$class.c\@header,left");
+print OUTPUT "\n";
+print OUTPUT pull ("$top_srcdir/src/$class.c\@discuss,left");
+print OUTPUT "\nThis is the class interface:\n\n";
+print OUTPUT pull ("$top_srcdir/include/$class.h\@interface,code");
+print OUTPUT "\nThis is the class self test code:\n\n";
+print OUTPUT pull ("$top_srcdir/src/$class.c\@selftest,test");
+print OUTPUT "\n";
+close OUTPUT;
+

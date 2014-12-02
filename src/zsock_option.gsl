@@ -38,7 +38,7 @@ extern "C" {
 #   if (ZMQ_VERSION_MINOR == $(minor))
 .       endif
 .       if mode = "rw" | mode = "r"
-CZMQ_EXPORT $(ctype) zsock_$(name) (zsock_t *self);
+CZMQ_EXPORT $(ctype) zsock_$(name) (void *self);
 .       endif
 .       if defined (.minor)
 #   endif
@@ -51,9 +51,9 @@ CZMQ_EXPORT $(ctype) zsock_$(name) (zsock_t *self);
 #   if (ZMQ_VERSION_MINOR == $(minor))
 .       endif
 .       if mode = "rw" | mode = "w"
-CZMQ_EXPORT void zsock_set_$(name) (zsock_t *self, $(ctype_const) $(name));
+CZMQ_EXPORT void zsock_set_$(name) (void *self, $(ctype_const) $(name));
 .           if type = "key"
-CZMQ_EXPORT void zsock_set_$(name)_bin (zsock_t *self, const byte *$(name));
+CZMQ_EXPORT void zsock_set_$(name)_bin (void *self, const byte *$(name));
 .           endif
 .       endif
 .       if defined (.minor)
@@ -99,6 +99,8 @@ CZMQ_EXPORT void zsock_option_test (bool verbose);
 /*
 @header
     The zsock_option class provides access to the 0MQ getsockopt/setsockopt API.
+    All methods in this class take a void * "polymorphic" reference, which
+    can be either a zsock_t or a zactor_r reference, or a libzmq void *.
 @discuss
     This class is generated, using the GSL code generator. See the sockopts
     XML file, which provides the metadata, and the sock_option.gsl template,
@@ -107,7 +109,6 @@ CZMQ_EXPORT void zsock_option_test (bool verbose);
 */
 
 #include "../include/czmq.h"
-#include "platform.h"
 
 .for version
 #if (ZMQ_VERSION_MAJOR == $(major))
@@ -121,14 +122,11 @@ CZMQ_EXPORT void zsock_option_test (bool verbose);
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
-zsock_set_$(name) (zsock_t *self, $(ctype_const) $(name))
+zsock_set_$(name) (void *self, $(ctype_const) $(name))
 {
-    assert(self);
+    assert (self);
 .       if style = "macro"
 #   if defined (ZMQ_$(NAME))
-.       endif
-.       if defined (.ifdef)
-#     if defined ($(ifdef:))
 .       endif
 .           if count (restrict)
 .               for restrict
@@ -144,7 +142,7 @@ zsock_set_$(name) (zsock_t *self, $(ctype_const) $(name))
 .                   endif
     $(open)zsock_type (self) != ZMQ_$(TYPE)$(close)
 .               endfor
-        printf ("ZMQ_$(NAME) is not valid on %s sockets\\n", zsock_type_str (self));
+        printf ("ZMQ_$(NAME) is not valid on %s sockets\\n", zsys_sockname (zsock_type (self)));
         assert (false);
     }
 .           endif
@@ -165,9 +163,6 @@ zsock_set_$(name) (zsock_t *self, $(ctype_const) $(name))
     int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_$(NAME), $(name), strlen ($(name)));
 .           endif
     assert (rc == 0 || zmq_errno () == ETERM);
-.       if defined (.ifdef)
-#     endif
-.       endif
 .       if style = "macro"
 #   endif
 .       endif
@@ -181,19 +176,13 @@ zsock_set_$(name) (zsock_t *self, $(ctype_const) $(name))
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
-zsock_set_$(name)_bin (zsock_t *self, const byte *$(name))
+zsock_set_$(name)_bin (void *self, const byte *$(name))
 {
 .       if style = "macro"
 #   if defined (ZMQ_$(NAME))
 .       endif
-.       if defined (.ifdef)
-#     if defined ($(ifdef:))
-.       endif
     int rc = zmq_setsockopt (zsock_resolve (self), ZMQ_$(NAME), $(name), 32);
     assert (rc == 0 || zmq_errno () == ETERM);
-.       if defined (.ifdef)
-#     endif
-.       endif
 .       if style = "macro"
 #   endif
 .       endif
@@ -208,9 +197,9 @@ zsock_set_$(name)_bin (zsock_t *self, const byte *$(name))
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 $(ctype) 
-zsock_$(name) (zsock_t *self)
+zsock_$(name) (void *self)
 {
-    assert(self);
+    assert (self);
 .           if style = "macro"
 #   if defined (ZMQ_$(NAME))
 .           endif
@@ -230,8 +219,12 @@ zsock_$(name) (zsock_t *self)
     int $(name);
     size_t option_len = sizeof (int);
     zmq_getsockopt (zsock_resolve (self), ZMQ_$(NAME), &$(name), &option_len);
-.           elsif type = "string" | type = "key"
+.           elsif type = "string"
     size_t option_len = 255;
+    char *$(name) = (char *) zmalloc (option_len);
+    zmq_getsockopt (zsock_resolve (self), ZMQ_$(NAME), $(name), &option_len);
+.           elsif type = "key"
+    size_t option_len = 40 + 1;     //  Z85 key + terminator
     char *$(name) = (char *) zmalloc (option_len);
     zmq_getsockopt (zsock_resolve (self), ZMQ_$(NAME), $(name), &option_len);
 .           endif
@@ -250,7 +243,6 @@ zsock_$(name) (zsock_t *self)
 #   endif
 .           endif
 }
-
 
 .       endif
 .       if defined (.minor)
@@ -277,15 +269,12 @@ zsock_option_test (bool verbose)
     zsock_t *self;
 .for version
 #if (ZMQ_VERSION_MAJOR == $(major))
-.   for option
+.   for option where defined (test)
 .       if defined (.minor)
 #   if (ZMQ_VERSION_MINOR == $(minor))
 .       endif
 .       if style = "macro"
 #     if defined (ZMQ_$(NAME))
-.       endif
-.       if defined (.ifdef)
-#       if defined ($(ifdef:))
 .       endif
     self = zsock_new (ZMQ_$(TEST));
     assert (self);
@@ -309,9 +298,6 @@ zsock_option_test (bool verbose)
 .           endif
 .       endif
     zsock_destroy (&self);
-.       if defined (.ifdef)
-#       endif
-.       endif
 .       if style = "macro"
 #     endif
 .       endif

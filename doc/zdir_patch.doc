@@ -1,0 +1,64 @@
+#### zdir_patch - work with directory patches
+
+The zdir_patch class works with one patch, which says "create this
+file" or "delete this file" (referring to a zfile item each time).
+
+
+This is the class interface:
+
+    //  Create new patch
+    CZMQ_EXPORT zdir_patch_t *
+        zdir_patch_new (const char *path, zfile_t *file,
+                        zdir_patch_op_t op, const char *alias);
+    
+    //  Destroy a patch
+    CZMQ_EXPORT void
+        zdir_patch_destroy (zdir_patch_t **self_p);
+    
+    //  Create copy of a patch. If the patch is null, or memory was exhausted,
+    //  returns null.
+    CZMQ_EXPORT zdir_patch_t *
+        zdir_patch_dup (zdir_patch_t *self);
+    
+    //  Return patch file directory path
+    CZMQ_EXPORT char *
+        zdir_patch_path (zdir_patch_t *self);
+    
+    //  Return patch file item
+    CZMQ_EXPORT zfile_t *
+        zdir_patch_file (zdir_patch_t *self);
+    
+    //  Return operation
+    CZMQ_EXPORT zdir_patch_op_t
+        zdir_patch_op (zdir_patch_t *self);
+        
+    //  Return patch virtual file path
+    CZMQ_EXPORT char *
+        zdir_patch_vpath (zdir_patch_t *self);
+    
+    //  Calculate hash digest for file (create only)
+    CZMQ_EXPORT void
+        zdir_patch_digest_set (zdir_patch_t *self);
+    
+    //  Return hash digest for patch file 
+    CZMQ_EXPORT char *
+        zdir_patch_digest (zdir_patch_t *self);
+        
+    //  Self test of this class
+    CZMQ_EXPORT void
+        zdir_patch_test (bool verbose);
+
+This is the class self test code:
+
+    zfile_t *file = zfile_new (".", "bilbo");
+    assert (file);
+    zdir_patch_t *patch = zdir_patch_new (".", file, patch_create, "/");
+    assert (patch);
+    zfile_destroy (&file);
+    
+    file = zdir_patch_file (patch);
+    assert (file);
+    assert (streq (zfile_filename (file, "."), "bilbo"));
+    assert (streq (zdir_patch_vpath (patch), "/bilbo"));
+    zdir_patch_destroy (&patch);
+

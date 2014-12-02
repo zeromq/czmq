@@ -3,7 +3,7 @@ zctx(3)
 
 NAME
 ----
-zctx - working with 0MQ contexts
+zctx - working with 0MQ contexts (deprecated)
 
 SYNOPSIS
 --------
@@ -91,36 +91,51 @@ usage is 1 I/O thread. Lets you configure this value.
 such as zmq_recv() and zmq_poll() will return when the user presses
 Ctrl-C.
 
+NOTE: this class is deprecated in favor of zsock, which does not expose
+contexts in the API at all. All zsock instances use the same global
+context.
 
 EXAMPLE
 -------
 .From zctx_test method
 ----
-    //  Create and destroy a context without using it
-    zctx_t *ctx = zctx_new ();
-    assert (ctx);
-    zctx_destroy (&ctx);
-    assert (ctx == NULL);
+//  Create and destroy a context without using it
+zctx_t *ctx = zctx_new ();
+assert (ctx);
+zctx_destroy (&ctx);
+assert (ctx == NULL);
 
-    //  Create a context with many busy sockets, destroy it
-    ctx = zctx_new ();
-    assert (ctx);
-    zctx_set_iothreads (ctx, 1);
-    zctx_set_linger (ctx, 5);       //  5 msecs
-    void *s1 = zctx__socket_new (ctx, ZMQ_PAIR);
-    void *s2 = zctx__socket_new (ctx, ZMQ_XREQ);
-    void *s3 = zctx__socket_new (ctx, ZMQ_REQ);
-    void *s4 = zctx__socket_new (ctx, ZMQ_REP);
-    void *s5 = zctx__socket_new (ctx, ZMQ_PUB);
-    void *s6 = zctx__socket_new (ctx, ZMQ_SUB);
-    zsocket_connect (s1, "tcp://127.0.0.1:5555");
-    zsocket_connect (s2, "tcp://127.0.0.1:5555");
-    zsocket_connect (s3, "tcp://127.0.0.1:5555");
-    zsocket_connect (s4, "tcp://127.0.0.1:5555");
-    zsocket_connect (s5, "tcp://127.0.0.1:5555");
-    zsocket_connect (s6, "tcp://127.0.0.1:5555");
-    assert (zctx_underlying (ctx));
-    zctx_destroy (&ctx);
+//  Create a context with many busy sockets, destroy it
+ctx = zctx_new ();
+assert (ctx);
+zctx_set_iothreads (ctx, 1);
+zctx_set_linger (ctx, 5);       //  5 msecs
+void *s1 = zctx__socket_new (ctx, ZMQ_PAIR);
+assert (s1);
+void *s2 = zctx__socket_new (ctx, ZMQ_XREQ);
+assert (s2);
+void *s3 = zctx__socket_new (ctx, ZMQ_REQ);
+assert (s3);
+void *s4 = zctx__socket_new (ctx, ZMQ_REP);
+assert (s4);
+void *s5 = zctx__socket_new (ctx, ZMQ_PUB);
+assert (s5);
+void *s6 = zctx__socket_new (ctx, ZMQ_SUB);
+assert (s6);
+int rc = zsocket_connect (s1, "tcp://127.0.0.1:5555");
+assert (rc == 0);
+rc = zsocket_connect (s2, "tcp://127.0.0.1:5555");
+assert (rc == 0);
+rc = zsocket_connect (s3, "tcp://127.0.0.1:5555");
+assert (rc == 0);
+rc = zsocket_connect (s4, "tcp://127.0.0.1:5555");
+assert (rc == 0);
+rc = zsocket_connect (s5, "tcp://127.0.0.1:5555");
+assert (rc == 0);
+rc = zsocket_connect (s6, "tcp://127.0.0.1:5555");
+assert (rc == 0);
+assert (zctx_underlying (ctx));
+zctx_destroy (&ctx);
 ----
 
 SEE ALSO

@@ -41,6 +41,7 @@ s_filetime_to_msec (const FILETIME *ft)
 
     return (int64_t) (dateTime.QuadPart / 10000);
 }
+
 #endif
 
 
@@ -52,7 +53,7 @@ zclock_sleep (int msecs)
 {
 #if defined (__UNIX__)
     struct timespec t;
-    t.tv_sec  =  msecs / 1000;
+    t.tv_sec = msecs / 1000;
     t.tv_nsec = (msecs % 1000) * 1000000;
     nanosleep (&t, NULL);
 #elif (defined (__WINDOWS__))
@@ -61,7 +62,7 @@ zclock_sleep (int msecs)
     //  is ready to run. If there are no other threads of equal priority ready
     //  to run, the function returns immediately, and the thread continues
     //  execution. This behavior changed starting with Windows Server 2003.
-    
+
 #   if defined (NTDDI_VERSION) && defined (NTDDI_WS03) && (NTDDI_VERSION >= NTDDI_WS03)
     Sleep (msecs);
 #   else
@@ -73,7 +74,9 @@ zclock_sleep (int msecs)
 
 
 //  --------------------------------------------------------------------------
-//  Return current system clock as milliseconds
+//  Return current system clock as milliseconds. Note that this clock can
+//  jump backwards (if the system clock is changed) so is unsafe to use for
+//  timers and time offsets. Use zclock_mono for that instead.
 
 int64_t
 zclock_time (void)
@@ -92,6 +95,97 @@ zclock_time (void)
 
 
 //  --------------------------------------------------------------------------
+//  Return current monotonic clock in milliseconds. Use this when you compute
+//  time offsets. The monotonic clock is not affected by system changes and
+//  so will never be reset backwards, unlike a system clock.
+
+int64_t
+zclock_mono (void)
+{
+#if defined (__UTYPE_OSX)
+    clock_serv_t cclock;
+    mach_timespec_t mts;
+    host_get_clock_service (mach_host_self (), SYSTEM_CLOCK, &cclock);
+    clock_get_time (cclock, &mts);
+    mach_port_deallocate (mach_task_self (), cclock);
+    return (int64_t) ((int64_t) mts.tv_sec * 1000 + (int64_t) mts.tv_nsec / 1000000);
+    
+#elif defined (__UNIX__)
+    struct timespec ts;
+    clock_gettime (CLOCK_MONOTONIC, &ts);
+    return (int64_t) ((int64_t) ts.tv_sec * 1000 + (int64_t) ts.tv_nsec / 1000000);
+    
+#elif (defined (__WINDOWS__))
+    //  System frequency does not change at run-time, cache it
+    static int64_t frequency = 0;
+    if (frequency == 0) {
+        LARGE_INTEGER freq;
+        QueryPerformanceFrequency (&freq);
+        // Windows documentation says that XP and later will always return non-zero
+        assert (freq.QuadPart != 0);
+        frequency = freq.QuadPart;
+    }
+    LARGE_INTEGER count;
+    QueryPerformanceCounter (&count);
+    return (int64_t) (count.QuadPart * 1000) / frequency;
+#endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return current monotonic clock in microseconds. Use this when you compute
+//  time offsets. The monotonic clock is not affected by system changes and
+//  so will never be reset backwards, unlike a system clock.
+
+int64_t
+zclock_usecs (void)
+{
+#if defined (__UTYPE_OSX)
+    clock_serv_t cclock;
+    mach_timespec_t mts;
+    host_get_clock_service (mach_host_self (), SYSTEM_CLOCK, &cclock);
+    clock_get_time (cclock, &mts);
+    mach_port_deallocate (mach_task_self (), cclock);
+    return (int64_t) ((int64_t) mts.tv_sec * 1000000 + (int64_t) mts.tv_nsec / 1000);
+
+#elif defined (__UNIX__)
+    struct timespec ts;
+    clock_gettime (CLOCK_MONOTONIC, &ts);
+    return (int64_t) ((int64_t) ts.tv_sec * 1000000 + (int64_t) ts.tv_nsec / 1000);
+
+#elif (defined (__WINDOWS__))
+    //  System frequency does not change at run-time, cache it
+    static int64_t frequency = 0;
+    if (frequency == 0) {
+        LARGE_INTEGER freq;
+        QueryPerformanceFrequency (&freq);
+        // Windows documentation says that XP and later will always return non-zero
+        assert (freq.QuadPart != 0);
+        frequency = freq.QuadPart;
+    }
+    LARGE_INTEGER count;
+    QueryPerformanceCounter (&count);
+    return (int64_t) (count.QuadPart * 1000000) / frequency;
+#endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return formatted date/time as fresh string. Free using zstr_free().
+
+char *
+zclock_timestr (void)
+{
+    time_t curtime = time (NULL);
+    struct tm *loctime = localtime (&curtime);
+    char formatted [20];
+    strftime (formatted, 20, "%Y-%m-%d %H:%M:%S", loctime);
+    return strdup (formatted);
+}
+
+
+//  --------------------------------------------------------------------------
+//  DEPRECATED in favor of zsys logging, see issue #519
 //  Print formatted string to stdout, prefixed by date/time and
 //  terminated with a newline.
 
@@ -114,22 +208,7 @@ zclock_log (const char *format, ...)
 
 
 //  --------------------------------------------------------------------------
-//  Return formatted date/time as fresh string. Free using zstr_free().
-
-char *
-zclock_timestr (void)
-{
-    time_t curtime = time (NULL);
-    struct tm *loctime = localtime (&curtime);
-    char formatted [20];
-    strftime (formatted, 20, "%Y-%m-%d %H:%M:%S", loctime);
-    return strdup (formatted);
-}
-
-
-//  --------------------------------------------------------------------------
 //  Self test of this class
-
 void
 zclock_test (bool verbose)
 {
@@ -139,6 +218,11 @@ zclock_test (bool verbose)
     int64_t start = zclock_time ();
     zclock_sleep (10);
     assert ((zclock_time () - start) >= 10);
+    start = zclock_mono ();
+    int64_t usecs = zclock_usecs ();
+    zclock_sleep (10);
+    assert ((zclock_mono () - start) >= 10);
+    assert ((zclock_usecs () - usecs) >= 10000);
     char *timestr = zclock_timestr ();
     if (verbose)
         puts (timestr);

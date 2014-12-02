@@ -4,8 +4,8 @@
 .#  language. See https://github.com/imatix/gsl for details. This script
 .#  is licensed under MIT/X11.
 .#
-.echo "Generating builds/msvc/vs2013/czmq/$(project.name).vcxproj..."
-.output "../builds/msvc/vs2013/czmq/$(project.name).vcxproj"
+.echo "Generating builds/msvc/vs2013/$(project.name)/$(project.name).vcxproj..."
+.output "../builds/msvc/vs2013/$(project.name)/$(project.name).vcxproj"
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 #################################################################
@@ -72,7 +72,7 @@
   <PropertyGroup Label="Configuration">
     <ConfigurationType Condition="$\(Configuration.IndexOf('DLL')) == -1">StaticLibrary</ConfigurationType>
     <ConfigurationType Condition="$\(Configuration.IndexOf('DLL')) != -1">DynamicLibrary</ConfigurationType>
-  </PropertyGroup> 
+  </PropertyGroup>
   <Import Project="$\(VCTargetsPath)\\Microsoft.Cpp.Default.props" />
   <Import Project="$\(VCTargetsPath)\\Microsoft.Cpp.props" />
   <ImportGroup Label="PropertySheets">
@@ -88,6 +88,9 @@
 .for header
     <ClInclude Include="..\\..\\..\\..\\include\\$(name).h" />
 .endfor
+.for extra
+    <ClInclude Include="..\\..\\..\\..\\src\\$(name)" />
+.endfor
   </ItemGroup>
   <ItemGroup>
 .for class
@@ -97,7 +100,7 @@
 .endfor
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\\..\\czmq.rc" />
+    <ResourceCompile Include="..\\..\\$(project.name).rc" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\\..\\..\\..\\packaging\\nuget\\package.bat" />
@@ -115,8 +118,8 @@
   #################################################################
   -->
 </Project>
-.echo "Generating builds/msvc/vs2013/czmq/$(project.name).vcxproj.filters..."
-.output "../builds/msvc/vs2013/czmq/$(project.name).vcxproj.filters"
+.echo "Generating builds/msvc/vs2013/$(project.name)/$(project.name).vcxproj.filters..."
+.output "../builds/msvc/vs2013/$(project.name)/$(project.name).vcxproj.filters"
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 #################################################################
@@ -138,6 +141,11 @@
       <Filter>include</Filter>
     </ClInclude>
 .endfor
+.for extra
+    <ClInclude Include="..\\..\\..\\..\\src\\$(name)">
+      <Filter>src</Filter>
+    </ClInclude>
+.endfor
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\\..\\..\\..\\builds\\msvc\\platform.h">
@@ -148,9 +156,9 @@
     <ClInclude Include="..\\..\\resource.h">
       <Filter>resource</Filter>
     </ClInclude>
-  </ItemGroup>  
+  </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\\..\\czmq.rc">
+    <ResourceCompile Include="..\\..\\$(project.name).rc">
       <Filter>resource</Filter>
     </ResourceCompile>
   </ItemGroup>
@@ -189,17 +197,17 @@
     </None>
     <None Include="..\\..\\..\\..\\packaging\\nuget\\package.xml">
       <Filter>packaging</Filter>
-    </None>    
+    </None>
   </ItemGroup>
 <!--
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #
 #   Please read the README.txt file in the model directory.     #
 #################################################################
--->  
+-->
 </Project>
-.echo "Generating builds/msvc/vs2013/czmq_selftest/$(project.name)_selftest.vcxproj..."
-.output "../builds/msvc/vs2013/czmq_selftest/$(project.name)_selftest.vcxproj"
+.echo "Generating builds/msvc/vs2013/$(project.name)_selftest/$(project.name)_selftest.vcxproj..."
+.output "../builds/msvc/vs2013/$(project.name)_selftest/$(project.name)_selftest.vcxproj"
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 #################################################################

@@ -1,5 +1,5 @@
-/*  =========================================================================
-    zhash - generic type-free hash container
+﻿/*  =========================================================================
+    zhash - simple generic hash container
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -13,9 +13,10 @@
 
 /*
 @header
-    Expandable hash table container
+    zhash is an expandable hash table container. This is a simple container.
+    For heavy-duty applications we recommend using zhashx.
 @discuss
-    Note that it's relatively slow (~50k insertions/deletes per second), so
+    Note that it's relatively slow (~50K insertions/deletes per second), so
     don't do inserts/updates on the critical path for message I/O. It can
     do ~2.5M lookups per second for 16-char keys. Timed on a 1.6GHz CPU.
 @end
@@ -48,8 +49,11 @@ struct _zhash_t {
     size_t size;                //  Current size of hash table
     size_t limit;               //  Current hash table limit
     item_t **items;             //  Array of items
-    uint cached_index;          //  Avoids duplicate hash calculations
+    size_t cached_index;        //  Avoids duplicate hash calculations
     bool autofree;              //  If true, free values in destructor
+    size_t cursor_index;        //  For first/next iteration
+    item_t *cursor_item;        //  For first/next iteration
+    const char *cursor_key;     //  After first/next call, points to key
     zlist_t *comments;          //  File comments, if any
     time_t modified;            //  Set during zhash_load
     char *filename;             //  Set during zhash_load
@@ -60,7 +64,6 @@ static uint s_item_hash (const char *key, size_t limit);
 static item_t *s_item_lookup (zhash_t *self, const char *key);
 static item_t *s_item_insert (zhash_t *self, const char *key, void *value);
 static void s_item_destroy (zhash_t *self, item_t *item, bool hard);
-
 
 
 //  --------------------------------------------------------------------------
@@ -109,6 +112,7 @@ zhash_destroy (zhash_t **self_p)
     }
 }
 
+
 //  --------------------------------------------------------------------------
 //  Local helper function
 //  Destroy item in hash table, item must exist in table
@@ -136,6 +140,8 @@ s_item_destroy (zhash_t *self, item_t *item, bool hard)
             free (item->value);
 
         free (item->key);
+        self->cursor_item = NULL;
+        self->cursor_key = NULL;
         free (item);
     }
 }
@@ -159,7 +165,7 @@ zhash_insert (zhash_t *self, const char *key, void *value)
         size_t new_limit = self->limit * GROWTH_FACTOR / 100;
         item_t **new_items = (item_t **) zmalloc (sizeof (item_t *) * new_limit);
         if (!new_items)
-            return ENOMEM;
+            return -1;
 
         //  Move all items to the new hash table, rehashing to
         //  take into account new hash table limit
@@ -222,6 +228,7 @@ s_item_insert (zhash_t *self, const char *key, void *value)
         item->value = value;
         item->key = strdup (key);
         item->index = self->cached_index;
+
         //  Insert into start of bucket list
         item->next = self->items [self->cached_index];
         self->items [self->cached_index] = item;
@@ -229,6 +236,7 @@ s_item_insert (zhash_t *self, const char *key, void *value)
     }
     else
         item = NULL;            //  Signal duplicate insertion
+
     return item;
 }
 
@@ -373,7 +381,7 @@ zhash_size (zhash_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Make copy of hash table; if supplied table is null, returns null.
+//  Make copy of hash table
 //  Does not copy items themselves. Rebuilds new table so may be slow on
 //  very large tables. NOTE: only works with item values that are strings
 //  since there's no other way to know how to duplicate the item value.
@@ -401,14 +409,15 @@ zhash_dup (zhash_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Return keys for items in table. If you remove items from this list you
-//  must free the key value yourself.
+//  Return keys for items in table
 
 zlist_t *
 zhash_keys (zhash_t *self)
 {
     assert (self);
     zlist_t *keys = zlist_new ();
+    if (!keys)
+        return NULL;
     zlist_autofree (keys);
 
     uint index;
@@ -424,33 +433,69 @@ zhash_keys (zhash_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Apply function to each item in the hash table. Items are iterated in no
-//  defined order.  Stops if callback function returns non-zero and returns
-//  final return code from callback function (zero = success).
+//  Simple iterator; returns first item in hash table, in no given order,
+//  or NULL if the table is empty. This method is simpler to use than the
+//  foreach() method, which is deprecated. NOTE: do NOT modify the table
+//  while iterating.
 
-int
-zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument)
+void *
+zhash_first (zhash_t *self)
 {
     assert (self);
-    int rc = 0;
-    uint index;
-    for (index = 0; index != self->limit; index++) {
-        item_t *item = self->items [index];
-        while (item) {
-            //  Invoke callback, passing item properties and argument
-            item_t *next = item->next;
-            rc = callback (item->key, item->value, argument);
-            if (rc)
-                return rc;      //  End if non-zero return code
-            item = next;
-        }
-    }
-    return rc;
+    //  Point to before or at first item
+    self->cursor_index = 0;
+    self->cursor_item = self->items [self->cursor_index];
+    //  Now scan forwards to find it, leave cursor after item
+    return zhash_next (self);
 }
 
 
 //  --------------------------------------------------------------------------
-//  Add comment to hash table before saving to disk. You can add as many
+//  Simple iterator; returns next item in hash table, in no given order,
+//  or NULL if the last item was already returned. Use this together with
+//  zhash_first() to process all items in a hash table. If you need the
+//  items in sorted order, use zhash_keys() and then zlist_sort(). NOTE:
+//  do NOT modify the table while iterating.
+
+void *
+zhash_next (zhash_t *self)
+{
+    assert (self);
+    //  Scan forward from cursor until we find an item
+    while (self->cursor_item == NULL) {
+        if (self->cursor_index < self->limit - 1)
+            self->cursor_index++;
+        else
+            return NULL;        //  At end of table
+
+        //  Get first item in next bucket
+        self->cursor_item = self->items [self->cursor_index];
+    }
+    //  We have an item, so return it, and bump past it
+    assert (self->cursor_item);
+    item_t *item = self->cursor_item;
+    self->cursor_key = item->key;
+    self->cursor_item = self->cursor_item->next;
+    return item->value;
+}
+
+
+//  --------------------------------------------------------------------------
+//  After a successful first/next method, returns the key for the item that
+//  was returned. This is a constant string that you may not modify or
+//  deallocate, and which lasts as long as the item in the hash. After an
+//  unsuccessful first/next, returns NULL.
+
+const char *
+zhash_cursor (zhash_t *self)
+{
+    assert (self);
+    return self->cursor_key;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Add a comment to hash table before saving to disk. You can add as many
 //  comment lines as you like. These comment lines are discarded when loading
 //  the file. If you use a null format, all comments are deleted.
 
@@ -460,13 +505,16 @@ zhash_comment (zhash_t *self, const char *format, ...)
     if (format) {
         if (!self->comments) {
             self->comments = zlist_new ();
+            if (!self->comments)
+                return;
             zlist_autofree (self->comments);
         }
         va_list argptr;
         va_start (argptr, format);
         char *string = zsys_vprintf (format, argptr);
         va_end (argptr);
-        zlist_append (self->comments, string);
+        if (string)
+            zlist_append (self->comments, string);
         free (string);
     }
     else
@@ -527,29 +575,41 @@ zhash_load (zhash_t *self, const char *filename)
 
     //  Take copy of filename in case self->filename is same string.
     char *filename_copy = strdup (filename);
-    free (self->filename);
-    self->filename = filename_copy;
-    self->modified = zsys_file_modified (self->filename);
-    FILE *handle = fopen (self->filename, "r");
-    if (!handle)
-        return -1;              //  Failed to open file for reading
+    if (filename_copy) {
+        free (self->filename);
+        self->filename = filename_copy;
+        self->modified = zsys_file_modified (self->filename);
+        FILE *handle = fopen (self->filename, "r");
+        if (handle) {
+            char *buffer = (char *) zmalloc (1024);
+            if (buffer) {
+                while (fgets (buffer, 1024, handle)) {
+                    //  Skip lines starting with "#" or that do not look like
+                    //  name=value data.
+                    char *equals = strchr (buffer, '=');
+                    if (buffer [0] == '#' || equals == buffer || !equals)
+                        continue;
 
-    char *buffer = (char *) zmalloc (1024);
-    while (fgets (buffer, 1024, handle)) {
-        //  Skip lines starting with "#" or that do not look like
-        //  name=value data.
-        char *equals = strchr (buffer, '=');
-        if (buffer [0] == '#' || equals == buffer || !equals)
-            continue;
-
-        //  Buffer may end in newline, which we don't want
-        if (buffer [strlen (buffer) - 1] == '\n')
-            buffer [strlen (buffer) - 1] = 0;
-        *equals++ = 0;
-        zhash_update (self, buffer, equals);
+                    //  Buffer may end in newline, which we don't want
+                    if (buffer [strlen (buffer) - 1] == '\n')
+                        buffer [strlen (buffer) - 1] = 0;
+                    *equals++ = 0;
+                    zhash_update (self, buffer, equals);
+                }
+                free (buffer);
+            }
+            else {
+                fclose (handle);
+                return -1; // Out of memory
+            }
+            fclose (handle);
+        }
+        else
+            return -1; // Failed to open file for reading
     }
-    free (buffer);
-    fclose (handle);
+    else
+        return -1; // Out of memory
+
     return 0;
 }
 
@@ -587,17 +647,6 @@ zhash_refresh (zhash_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Set hash for automatic value destruction
-
-void
-zhash_autofree (zhash_t *self)
-{
-    assert (self);
-    self->autofree = true;
-}
-
-
-//  --------------------------------------------------------------------------
 //  Serialize hash table to a binary frame that can be sent in a message.
 //  The packed format is compatible with the 'dictionary' type defined in
 //  http://rfc.zeromq.org/spec:35/FILEMQ, and implemented by zproto:
@@ -607,11 +656,11 @@ zhash_autofree (zhash_t *self)
 //     dict-count      = number-4
 //     dict-value      = longstr
 //     dict-name       = string
-// 
+//
 //     ; Strings are always length + text contents
 //     longstr         = number-4 *VCHAR
 //     string          = number-1 *VCHAR
-// 
+//
 //     ; Numbers are unsigned integers in network byte order
 //     number-1        = 1OCTET
 //     number-4        = 4OCTET
@@ -627,11 +676,11 @@ zhash_pack (zhash_t *self)
     //  First, calculate packed data size
     size_t frame_size = 4;      //  Dictionary size, number-4
     uint index;
-    for (index = 0; index != self->limit; index++) {
+    for (index = 0; index < self->limit; index++) {
         item_t *item = self->items [index];
         while (item) {
             //  We store key as short string
-            frame_size += 1 + strlen (item->key);
+            frame_size += 1 + strlen ((char *) item->key);
             //  We store value as long string
             frame_size += 4 + strlen ((char *) item->value);
             item = item->next;
@@ -639,17 +688,19 @@ zhash_pack (zhash_t *self)
     }
     //  Now serialize items into the frame
     zframe_t *frame = zframe_new (NULL, frame_size);
+    if (!frame)
+        return NULL;
     byte *needle = zframe_data (frame);
     //  Store size as number-4
-    *(uint32_t *) needle = htonl (self->size);
+    *(uint32_t *) needle = htonl ((uint32_t) self->size);
     needle += 4;
-    for (index = 0; index != self->limit; index++) {
+    for (index = 0; index < self->limit; index++) {
         item_t *item = self->items [index];
         while (item) {
             //  Store key as string
-            *needle++ = (byte) strlen (item->key);
-            memcpy (needle, item->key, strlen (item->key));
-            needle += strlen (item->key);
+            *needle++ = (byte) strlen ((char *) item->key);
+            memcpy (needle, item->key, strlen ((char *) item->key));
+            needle += strlen ((char *) item->key);
 
             //  Store value as longstr
             *(uint32_t *) needle = htonl (strlen ((char *) item->value));
@@ -672,7 +723,8 @@ zhash_t *
 zhash_unpack (zframe_t *frame)
 {
     zhash_t *self = zhash_new ();
-    assert (self);
+    if (!self)
+        return NULL;
     assert (frame);
     if (zframe_size (frame) < 4)
         return self;            //  Arguable...
@@ -700,34 +752,64 @@ zhash_unpack (zframe_t *frame)
                     memcpy (value, needle, value_size);
                     value [value_size] = 0;
                     needle += value_size;
+
                     //  Hash takes ownership of value
-                    zhash_insert (self, key, value);
+                    if (zhash_insert (self, key, value)) {
+                        zhash_destroy (&self);
+                        break;
+                    }
                 }
             }
         }
     }
     //  Hash will free values in destructor
-    zhash_autofree (self);
+    if (self)
+        zhash_autofree (self);
     return self;
 }
 
-            
-//  --------------------------------------------------------------------------
-//  Runs selftest of class
-//
 
-static int
-test_foreach (const char *key, void *item, void *arg)
+//  --------------------------------------------------------------------------
+//  Set hash for automatic value destruction
+
+void
+zhash_autofree (zhash_t *self)
 {
-    assert (zhash_lookup ((zhash_t*) arg, key));
+    assert (self);
+    self->autofree = true;
+}
+
+
+//  --------------------------------------------------------------------------
+//  DEPRECATED as clumsy -- use zhash_first/_next instead
+//  Apply function to each item in the hash table. Items are iterated in no
+//  defined order.  Stops if callback function returns non-zero and returns
+//  final return code from callback function (zero = success).
+
+int
+zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument)
+{
+    assert (self);
+
+    uint index;
+    for (index = 0; index < self->limit; index++) {
+        item_t *item = self->items [index];
+        while (item) {
+            //  Invoke callback, passing item properties and argument
+            item_t *next = item->next;
+            int rc = callback ((const char *) item->key, item->value, argument);
+            if (rc)
+                return rc;      //  End if non-zero return code
+            item = next;
+        }
+    }
     return 0;
 }
 
-static int
-test_foreach_error (const char *key, void *item, void *arg)
-{
-    return -1;
-}
+
+//  --------------------------------------------------------------------------
+//  Runs selftest of class
+//
 
 void
 zhash_test (int verbose)
@@ -738,10 +820,15 @@ zhash_test (int verbose)
     zhash_t *hash = zhash_new ();
     assert (hash);
     assert (zhash_size (hash) == 0);
+    assert (zhash_first (hash) == NULL);
+    assert (zhash_cursor (hash) == NULL);
 
     //  Insert some items
     int rc;
     rc = zhash_insert (hash, "DEADBEEF", "dead beef");
+    char *item = (char *) zhash_first (hash);
+    assert (streq (zhash_cursor (hash), "DEADBEEF"));
+    assert (streq (item, "dead beef"));
     assert (rc == 0);
     rc = zhash_insert (hash, "ABADCAFE", "a bad cafe");
     assert (rc == 0);
@@ -752,7 +839,6 @@ zhash_test (int verbose)
     assert (zhash_size (hash) == 4);
 
     //  Look for existing items
-    char *item;
     item = (char *) zhash_lookup (hash, "DEADBEEF");
     assert (streq (item, "dead beef"));
     item = (char *) zhash_lookup (hash, "ABADCAFE");
@@ -821,17 +907,12 @@ zhash_test (int verbose)
     assert (streq (item, "dead beef"));
     zhash_destroy (&copy);
 
-    // Test foreach
-    rc = zhash_foreach (hash, test_foreach, hash);
-    assert (rc == 0);
-    rc = zhash_foreach (hash, test_foreach_error, hash);
-    assert (rc == -1);
-
     //  Test save and load
     zhash_comment (hash, "This is a test file");
     zhash_comment (hash, "Created by %s", "czmq_selftest");
     zhash_save (hash, ".cache");
     copy = zhash_new ();
+    assert (copy);
     zhash_load (copy, ".cache");
     item = (char *) zhash_lookup (copy, "LIVEBEEF");
     assert (item);
@@ -879,6 +960,7 @@ zhash_test (int verbose)
 
     // Test autofree; automatically copies and frees string values
     hash = zhash_new ();
+    assert (hash);
     zhash_autofree (hash);
     char value [255];
     strcpy (value, "This is a string");

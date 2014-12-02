@@ -4,7 +4,7 @@
 .#
 .output "../include/zsockopt.h"
 /*  =========================================================================
-    zsockopt - get/set 0MQ socket options
+    zsockopt - get/set 0MQ socket options (deprecated)
 
             ****************************************************
             *   GENERATED SOURCE CODE, DO NOT EDIT!!           *
@@ -78,7 +78,7 @@ CZMQ_EXPORT void zsockopt_test (bool verbose);
 #endif
 .output "../src/zsockopt.c"
 /*  =========================================================================
-    zsockopt - get/set 0MQ socket options
+    zsockopt - get/set 0MQ socket options (deprecated)
 
             ****************************************************
             *   GENERATED SOURCE CODE, DO NOT EDIT!!           *
@@ -107,7 +107,6 @@ CZMQ_EXPORT void zsockopt_test (bool verbose);
 */
 
 #include "../include/czmq.h"
-#include "platform.h"
 
 .for version
 #if (ZMQ_VERSION_MAJOR == $(major))
@@ -123,11 +122,12 @@ CZMQ_EXPORT void zsockopt_test (bool verbose);
 void
 zsocket_set_$(name) (void *zocket, $(ctype_const) $(name))
 {
+    if (zsock_is (zocket)) {
+        printf ("Please use zsock_set_$(name) () on zsock_t instances\\n");
+        assert (false);
+    }
 .       if style = "macro"
 #   if defined (ZMQ_$(NAME))
-.       endif
-.       if defined (.ifdef)
-#     if defined ($(ifdef:))
 .       endif
 .           if count (restrict)
 .               for restrict
@@ -164,9 +164,6 @@ zsocket_set_$(name) (void *zocket, $(ctype_const) $(name))
     int rc = zmq_setsockopt (zocket, ZMQ_$(NAME), $(name), strlen ($(name)));
 .           endif
     assert (rc == 0 || zmq_errno () == ETERM);
-.       if defined (.ifdef)
-#     endif
-.       endif
 .       if style = "macro"
 #   endif
 .       endif
@@ -185,14 +182,8 @@ zsocket_set_$(name)_bin (void *zocket, const byte *$(name))
 .       if style = "macro"
 #   if defined (ZMQ_$(NAME))
 .       endif
-.       if defined (.ifdef)
-#     if defined ($(ifdef:))
-.       endif
     int rc = zmq_setsockopt (zocket, ZMQ_$(NAME), $(name), 32);
     assert (rc == 0 || zmq_errno () == ETERM);
-.       if defined (.ifdef)
-#     endif
-.       endif
 .       if style = "macro"
 #   endif
 .       endif
@@ -228,8 +219,12 @@ zsocket_$(name) (void *zocket)
     int $(name);
     size_t option_len = sizeof (int);
     zmq_getsockopt (zocket, ZMQ_$(NAME), &$(name), &option_len);
-.           elsif type = "string" | type = "key"
+.           elsif type = "string"
     size_t option_len = 255;
+    char *$(name) = (char *) zmalloc (option_len);
+    zmq_getsockopt (zocket, ZMQ_$(NAME), $(name), &option_len);
+.           elsif type = "key"
+    size_t option_len = 40 + 1;     //  Z85 key + terminator
     char *$(name) = (char *) zmalloc (option_len);
     zmq_getsockopt (zocket, ZMQ_$(NAME), $(name), &option_len);
 .           endif
@@ -269,7 +264,7 @@ $(string.trim(.):)
 void
 zsockopt_test (bool verbose)
 {
-    printf (" * zsockopt: ");
+    printf (" * zsockopt (deprecated): ");
 
     //  @selftest
     zctx_t *ctx = zctx_new ();
@@ -277,15 +272,12 @@ zsockopt_test (bool verbose)
     void *zocket;
 .for version
 #if (ZMQ_VERSION_MAJOR == $(major))
-.   for option
+.   for option where defined (test)
 .       if defined (.minor)
 #   if (ZMQ_VERSION_MINOR == $(minor))
 .       endif
 .       if style = "macro"
 #     if defined (ZMQ_$(NAME))
-.       endif
-.       if defined (.ifdef)
-#       if defined ($(ifdef:))
 .       endif
     zocket = zsocket_new (ctx, ZMQ_$(TEST));
     assert (zocket);
@@ -309,9 +301,6 @@ zsockopt_test (bool verbose)
 .           endif
 .       endif
     zsocket_destroy (ctx, zocket);
-.       if defined (.ifdef)
-#       endif
-.       endif
 .       if style = "macro"
 #     endif
 .       endif

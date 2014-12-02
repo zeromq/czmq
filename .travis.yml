@@ -1,43 +1,17 @@
-#   CZMQ
+# Travis CI script
 
 language: c
 
-script:
+env:
+- BUILD_TYPE=default ZMQ_REPO=zeromq2-x
+- BUILD_TYPE=default ZMQ_REPO=zeromq3-x
+- BUILD_TYPE=default ZMQ_REPO=zeromq4-x WITH_LIBSODIUM=1
+- BUILD_TYPE=default ZMQ_REPO=libzmq    WITH_LIBSODIUM=1
+- BUILD_TYPE=qt-android
+
+before_script:
+- sudo apt-get install uuid-dev
 - ./autogen.sh
 
-#   Perform regression test build against ZeroMQ v3.x
-- git clone git://github.com/zeromq/zeromq3-x.git
-- cd zeromq3-x
-- ./autogen.sh
-- ./configure && make check
-- sudo make install
-- sudo ldconfig
-- cd ..
-
-#   Build & test CZMQ
-- ./configure && make check
-
-#   Perform regression test build against ZeroMQ v4.x
-# libsodium
-# Commit 8d0942 broke installation (sodium.h not found) so for now
-# we're checking out the last good commit.
-- git clone git://github.com/jedisct1/libsodium.git
-- cd libsodium
-- git checkout e2a30a
-- ./autogen.sh
-- ./configure && make check
-- sudo make install
-- sudo ldconfig
-- cd ..
-
-#   libzmq
-- git clone git://github.com/zeromq/libzmq.git
-- cd libzmq
-- ./autogen.sh
-- ./configure && make check
-- sudo make install
-- sudo ldconfig
-- cd ..
-
-#   Build & test CZMQ
-- ./configure && make check
+# Build and check this project according to the BUILD_TYPE
+script: ./ci_build.sh

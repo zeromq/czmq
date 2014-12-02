@@ -1,0 +1,279 @@
+#### zring - generic type-free doubly linked ring container
+
+Provides a generic "ring" container, which mixes a doubly-linked list
+with a hash table to provide both ordered and direct keyed access to
+items. The zring class is more complex and powerful than zlist, which
+is considered a 'basic' list container. This container provides hooks
+for duplicator, comparator, and destructor functions. These tie into
+CZMQ and standard C semantics, so e.g. for string items you can use
+strdup, strcmp, and zstr_free. To store custom objects, define your
+own duplicator and comparator, and use the standard object destructor.
+
+
+This is the class interface:
+
+    //  Create a new ring container (a ring is a doubly-linked ring)
+    CZMQ_EXPORT zring_t *
+        zring_new (void);
+    
+    //  Destroy a ring container
+    CZMQ_EXPORT void
+        zring_destroy (zring_t **self_p);
+    
+    //  Prepend an item to the start of the ring, return 0 if OK, else -1.
+    //  Leaves cursor at newly inserted item.
+    CZMQ_EXPORT int
+        zring_prepend (zring_t *self, void *item);
+    
+    //  Append an item to the end of the ring, return 0 if OK, else -1.
+    //  Leaves cursor at newly inserted item.
+    CZMQ_EXPORT int
+        zring_append (zring_t *self, void *item);
+    
+    //  Append an item to the end of the ring, and insert into the ring
+    //  dictionary, so that you can find the item rapidly using zring_lookup.
+    //  If you do a lot of item searches, this is faster than zring_find,
+    //  which is at worst an O(N) operation. When items leave the ring, they
+    //  are always removed from the dictionary. Returns 0 on success, -1 if
+    //  the key already existed in the dictionary, or heap memory ran out.
+    CZMQ_EXPORT int
+        zring_insert (zring_t *self, const void *key, void *item);
+        
+    //  Find an item in the ring, looking first at the cursor, and then from the
+    //  first to last item. If a comparator was set on container, calls this to
+    //  compare each item in the ring with the supplied target item. If none
+    //  was set, compares the two item pointers for equality. If the item is
+    //  found, leaves the cursor at the found item. Returns the item if found,
+    //  else null.
+    CZMQ_EXPORT void *
+        zring_find (zring_t *self, void *item);
+    
+    //  Search the ring dictionary for an item, by key. If the item is in the
+    //  dictionary (via zring_insert), then sets the ring cursor to the item,
+    //  and returns the item value. If not, leaves the cursor unchanged, and
+    //  returns NULL.
+    CZMQ_EXPORT void *
+        zring_lookup (zring_t *self, const void *key);
+    
+    //  Detach an item from the ring, without destroying the item. Searches the
+    //  ring for the item, always starting with the cursor, if any is set, and
+    //  then from the start of the ring. If item is null, detaches the item at the
+    //  cursor, if set. If the item was found and detached, leaves the cursor at
+    //  the next item, if any, and returns the item. Else, returns null.
+    CZMQ_EXPORT void *
+        zring_detach (zring_t *self, void *item);
+    
+    //  Remove an item from the ring, and destroy it, if the item destructor is
+    //  set. Searches the ring for the item, always starting with the cursor, if
+    //  any is set, and then from the start of the ring. If item is null, removes
+    //  the item at the cursor, if set. If the item was found and removed, leaves
+    //  the cursor at the next item, if any, and returns 0. Else, returns -1.
+    CZMQ_EXPORT int
+        zring_remove (zring_t *self, void *item);
+    
+    //  Search the ring dictionary for an item, by key. If the item is in the
+    //  dictionary (via zring_insert), then removes the item from the ring and
+    //  calls the item destructor, if any is found. Returns 0 if the item was
+    //  found and removed, else -1 if not found.
+    CZMQ_EXPORT int
+        zring_delete (zring_t *self, const void *key);
+        
+    //  Delete all items from the ring. If the item destructor is set, calls it
+    //  on every item.
+    CZMQ_EXPORT void
+        zring_purge (zring_t *self);
+    
+    //  Return number of items in the ring
+    CZMQ_EXPORT size_t
+        zring_size (zring_t *self);
+    
+    //  Return the item at the head of ring. If the ring is empty, returns NULL.
+    //  Leaves cursor pointing at the head item, or NULL if the ring is empty.
+    CZMQ_EXPORT void *
+        zring_first (zring_t *self);
+    
+    //  Return the item at the tail of ring. If the ring is empty, returns NULL.
+    //  Leaves cursor pointing at the tail item, or NULL if the ring is empty.
+    CZMQ_EXPORT void *
+        zring_last (zring_t *self);
+        
+    //  Return the next item. At the end of the ring (or in an empty ring),
+    //  returns NULL. Use repeated zring_next () calls to work through the ring
+    //  from zring_first ().
+    CZMQ_EXPORT void *
+        zring_next (zring_t *self);
+        
+    //  Return the previous item. At the start of the ring (or in an empty ring),
+    //  returns NULL. Use repeated zring_prev () calls to work through the ring
+    //  backwards from zring_last ().
+    CZMQ_EXPORT void *
+        zring_prev (zring_t *self);
+    
+    //  Return the key of the current item in the ring. If the ring is empty, or the
+    //  cursor passed the end of the ring, returns NULL. Does not change the cursor.
+    CZMQ_EXPORT const void *
+        zring_key (zring_t *self);
+    
+    //  Return current item in the ring. If the ring is empty, or the cursor
+    //  passed the end of the ring, returns NULL. Does not change the cursor.
+    CZMQ_EXPORT void *
+        zring_item (zring_t *self);
+    
+    //  Sort the list using the compare function.
+    //  The sort is not stable, so may reorder items with the same keys.
+    CZMQ_EXPORT void
+        zlist_sort (zlist_t *self, zlist_compare_fn *compare);
+    
+    //  Make a copy of the ring; items are duplicated if you set a duplicator
+    //  for the ring, otherwise not. Copying a null reference returns a null
+    //  reference.
+    CZMQ_EXPORT zring_t *
+        zring_dup (zring_t *self);
+        
+    //  Set a user-defined deallocator for ring items; by default items are not
+    //  freed when the ring is destroyed.
+    CZMQ_EXPORT void
+        zring_set_destructor (zring_t *self, czmq_destructor destructor);
+    
+    //  Set a user-defined duplicator for ring items; by default items are not
+    //  copied when the ring is duplicated.
+    CZMQ_EXPORT void
+        zring_set_duplicator (zring_t *self, czmq_duplicator duplicator);
+    
+    //  Set a user-defined comparator for zring_find and zring_sort; the method
+    //  must return -1, 0, or 1 depending on whether item1 is less than, equal to,
+    //  or greater than, item2.
+    CZMQ_EXPORT void
+        zring_set_comparator (zring_t *self, czmq_comparator comparator);
+    
+    //  Self test of this class
+    CZMQ_EXPORT void
+        zring_test (int verbose);
+
+This is the class self test code:
+
+    zring_t *ring = zring_new ();
+    assert (ring);
+    assert (zring_size (ring) == 0);
+    
+    //  Three items we'll use as test data
+    //  Ring items are void *, not particularly strings
+    char *cheese = "boursin";
+    char *bread = "baguette";
+    char *wine = "bordeaux";
+    
+    int rc = zring_append (ring, cheese);
+    assert (!rc);
+    assert (zring_size (ring) == 1);
+    assert (zring_item (ring) == cheese);
+    rc = zring_append (ring, bread);
+    assert (!rc);
+    assert (zring_size (ring) == 2);
+    assert (zring_item (ring) == bread);
+    rc = zring_append (ring, wine);
+    assert (!rc);
+    assert (zring_size (ring) == 3);
+    assert (zring_item (ring) == wine);
+    
+    assert (zring_first (ring) == cheese);
+    assert (zring_next (ring) == bread);
+    assert (zring_next (ring) == wine);
+    assert (zring_next (ring) == NULL);
+    //  After we reach end of ring, next wraps around
+    assert (zring_next (ring) == cheese);
+    
+    assert (zring_last (ring) == wine);
+    assert (zring_prev (ring) == bread);
+    assert (zring_prev (ring) == cheese);
+    assert (zring_prev (ring) == NULL);
+    //  After we reach start of ring, prev wraps around
+    assert (zring_prev (ring) == wine);
+    zring_purge (ring);
+    
+    //  Test some list insertion-deletion combos
+    assert (zring_size (ring) == 0);
+    zring_prepend (ring, "4");
+    zring_append (ring, "3");
+    zring_prepend (ring, "5");
+    zring_append (ring, "2");
+    zring_prepend (ring, "0");
+    zring_append (ring, "1");
+    assert (zring_size (ring) == 6);
+    
+    //  Try the comparator functionality
+    zring_set_comparator (ring, (czmq_comparator *) strcmp);
+    zring_sort (ring);
+    
+    char *item = (char *) zring_first (ring);
+    assert (streq (item, "0"));
+    item = (char *) zring_find (ring, "5");
+    assert (streq (item, "5"));
+    
+    //  Try the duplicator and destructor
+    zring_set_duplicator (ring, (czmq_duplicator *) strdup);
+    zring_t *dup = zring_dup (ring);
+    assert (dup);
+    zring_set_destructor (dup, (czmq_destructor *) zstr_free);
+    assert (zring_size (dup) == 6);
+    zring_destroy (&dup);
+    
+    //  We're comparing as strings, not item pointers
+    rc = zring_remove (ring, "2");
+    assert (rc == 0);
+    rc = zring_remove (ring, "5");
+    assert (rc == 0);
+    rc = zring_remove (ring, "3");
+    assert (rc == 0);
+    item = (char *) zring_detach (ring, NULL);
+    zring_purge (ring);
+    
+    //  Try the dictionary insert/delete functionality
+    rc = zring_insert (ring, "1", "one");
+    assert (rc == 0);
+    rc = zring_insert (ring, "3", "three");
+    assert (rc == 0);
+    rc = zring_insert (ring, "2", "two");
+    assert (rc == 0);
+    rc = zring_insert (ring, "2", "two");
+    assert (rc == -1);
+    
+    const char *key;
+    item = (char *) zring_lookup (ring, "2");
+    assert (streq (item, "two"));
+    key =  (char *) zring_key (ring);
+    assert (streq (key, "2"));
+    item = (char *) zring_lookup (ring, "1");
+    assert (streq (item, "one"));
+    key =  (char *) zring_key (ring);
+    assert (streq (key, "1"));
+    item = (char *) zring_item (ring);
+    assert (streq (item, "one"));
+    key = (char *) zring_key (ring);
+    assert (streq (key, "1"));
+    
+    item = (char *) zring_first (ring);
+    key = (char *) zring_key (ring);
+    assert (streq (key, "1"));
+    item = (char *) zring_next (ring);
+    key = (char *) zring_key (ring);
+    assert (streq (key, "3"));
+    item = (char *) zring_next (ring);
+    key = (char *) zring_key (ring);
+    assert (streq (key, "2"));
+    
+    rc = zring_delete (ring, "3");
+    assert (rc == 0);
+    rc = zring_delete (ring, "3");
+    assert (rc == -1);
+    //  Using detach/remove will also remove from dictionary
+    rc = zring_remove (ring, "two");
+    assert (rc == 0);
+    rc = zring_delete (ring, "2");
+    assert (rc == -1);
+    zring_purge (ring);
+    
+    //  Destructor should be safe to call twice
+    zring_destroy (&ring);
+    assert (ring == NULL);
+    zring_destroy (&ring);
+

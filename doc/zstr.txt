@@ -16,7 +16,8 @@ CZMQ_EXPORT char *
 
 //  Send a C string to a socket, as a frame. The string is sent without
 //  trailing null byte; to read this you can use zstr_recv, or a similar
-//  method that adds a null terminator on the received string.
+//  method that adds a null terminator on the received string. String
+//  may be NULL, which is sent as "".
 CZMQ_EXPORT int
     zstr_send (void *dest, const char *string);
 
@@ -70,40 +71,47 @@ strings across 0MQ sockets. It sends strings without a terminating null,
 and appends a null byte on received strings. This class is for simple
 message sending.
 
+       Memory                       Wire
+       +-------------+---+          +---+-------------+
+Send   | S t r i n g | 0 |  ---->   | 6 | S t r i n g |
+       +-------------+---+          +---+-------------+
+
+       Wire                         Heap
+       +---+-------------+          +-------------+---+
+Recv   | 6 | S t r i n g |  ---->   | S t r i n g | 0 |
+       +---+-------------+          +-------------+---+
 
 EXAMPLE
 -------
 .From zstr_test method
 ----
-    //  Create two PAIR sockets and connect over inproc
-    zsock_t *output = zsock_new (ZMQ_PAIR);
-    assert (output);
-    zsock_bind (output, "inproc://zstr.test");
-    
-    zsock_t *input = zsock_new (ZMQ_PAIR);
-    assert (input);
-    zsock_connect (input, "inproc://zstr.test");
+//  Create two PAIR sockets and connect over inproc
+zsock_t *output = zsock_new_pair ("@inproc://zstr.test");
+assert (output);
+zsock_t *input = zsock_new_pair (">inproc://zstr.test");
+assert (input);
 
-    //  Send ten strings, five strings with MORE flag and then END
-    int string_nbr;
-    for (string_nbr = 0; string_nbr < 10; string_nbr++)
-        zstr_sendf (output, "this is string %d", string_nbr);
-    zstr_sendx (output, "This", "is", "almost", "the", "very", "END", NULL);
+//  Send ten strings, five strings with MORE flag and then END
+int string_nbr;
+for (string_nbr = 0; string_nbr < 10; string_nbr++)
+    zstr_sendf (output, "this is string %d", string_nbr);
+zstr_sendx (output, "This", "is", "almost", "the", "very", "END", NULL);
 
-    //  Read and count until we receive END
-    string_nbr = 0;
-    for (string_nbr = 0;; string_nbr++) {
-        char *string = zstr_recv (input);
-        if (streq (string, "END")) {
-            zstr_free (&string);
-            break;
-        }
+//  Read and count until we receive END
+string_nbr = 0;
+for (string_nbr = 0;; string_nbr++) {
+    char *string = zstr_recv (input);
+    assert (string);
+    if (streq (string, "END")) {
         zstr_free (&string);
+        break;
     }
-    assert (string_nbr == 15);
+    zstr_free (&string);
+}
+assert (string_nbr == 15);
 
-    zsock_destroy (&input);
-    zsock_destroy (&output);
+zsock_destroy (&input);
+zsock_destroy (&output);
 ----
 
 SEE ALSO

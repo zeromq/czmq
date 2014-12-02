@@ -24,6 +24,21 @@ extern "C" {
 //  Callback for interrupt signal handler
 typedef void (zsys_handler_fn) (int signal_value);
 
+//  Initialize CZMQ zsys layer; this happens automatically when you create
+//  a socket or an actor; however this call lets you force initialization
+//  earlier, so e.g. logging is properly set-up before you start working.
+//  Not threadsafe, so call only from main thread. Safe to call multiple
+//  times. Returns global CZMQ context.
+CZMQ_EXPORT void *
+    zsys_init (void);
+
+//  Optionally shut down the CZMQ zsys layer; this normally happens automatically
+//  when the process exits; however this call lets you force a shutdown
+//  earlier, avoiding any potential problems with atexit() ordering, especially
+//  with Windows dlls.
+CZMQ_EXPORT void
+    zsys_shutdown (void);
+
 //  Get a new ZMQ socket, automagically creating a ZMQ context if this is
 //  the first time. Caller is responsible for destroying the ZMQ socket
 //  before process exits, to avoid a ZMQ deadlock. Note: you should not use
@@ -36,9 +51,23 @@ CZMQ_EXPORT void *
 //  create using zsys_socket().
 //  *** This is for CZMQ internal use only and may change arbitrarily ***
 CZMQ_EXPORT int
-    zsys_close (void *handle);
+    zsys_close (void *handle, const char *filename, size_t line_nbr);
+
+//  Return ZMQ socket name for socket type
+//  *** This is for CZMQ internal use only and may change arbitrarily ***
+CZMQ_EXPORT char *
+    zsys_sockname (int socktype);
     
-//  Set interrupt handler (NULL means external handler)
+//  Create a pipe, which consists of two PAIR sockets connected over inproc.
+//  The pipe is configured to use the zsys_pipehwm setting. Returns the
+//  frontend socket successful, NULL if failed.
+CZMQ_EXPORT zsock_t *
+    zsys_create_pipe (zsock_t **backend_p);
+    
+//  Set interrupt handler; this saves the default handlers so that a
+//  zsys_handler_reset () can restore them. If you call this multiple times
+//  then the last handler will take affect. If handler_fn is NULL, disables
+//  default SIGINT/SIGTERM handling in CZMQ.
 CZMQ_EXPORT void
     zsys_handler_set (zsys_handler_fn *handler_fn);
 
@@ -96,7 +125,8 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zsys_file_mode_default (void);
 
-//  Return the CZMQ version for run-time API detection
+//  Return the CZMQ version for run-time API detection; returns version
+//  number into provided fields, providing reference isn't null in each case.
 CZMQ_EXPORT void
     zsys_version (int *major, int *minor, int *patch);
 
@@ -124,9 +154,10 @@ CZMQ_EXPORT SOCKET
 CZMQ_EXPORT int
     zsys_udp_close (SOCKET handle);
 
-//  Send zframe to UDP socket
+//  Send zframe to UDP socket, return -1 if sending failed due to
+//  interface having disappeared (happens easily with WiFi)
 //  *** This is for CZMQ internal use only and may change arbitrarily ***
-CZMQ_EXPORT void
+CZMQ_EXPORT int
     zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address);
 
 //  Receive zframe from UDP socket, and set address of peer that sent it
@@ -162,13 +193,29 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zsys_run_as (const char *lockfile, const char *group, const char *user);
 
+//  Returns true if the underlying libzmq supports CURVE security.
+//  Uses a heuristic probe according to the version of libzmq being used.
+CZMQ_EXPORT bool
+    zsys_has_curve (void);
+
 //  Configure the number of I/O threads that ZeroMQ will use. A good
 //  rule of thumb is one thread per gigabit of traffic in or out. The
 //  default is 1, sufficient for most applications. If the environment
-//  variable ZSYS_IOTHREADS is defined, that provides the default.
+//  variable ZSYS_IO_THREADS is defined, that provides the default.
 //  Note that this method is valid only before any socket is created.
 CZMQ_EXPORT void
-    zsys_set_iothreads (size_t iothreads);
+    zsys_set_io_threads (size_t io_threads);
+
+//  Configure the number of sockets that ZeroMQ will allow. The default
+//  is 1024. The actual limit depends on the system, and you can query it
+//  by using zsys_socket_limit (). A value of zero means "maximum".
+//  Note that this method is valid only before any socket is created.
+CZMQ_EXPORT void
+    zsys_set_max_sockets (size_t max_sockets);
+
+//  Return maximum number of ZeroMQ sockets that the system will support.
+CZMQ_EXPORT size_t
+    zsys_socket_limit (void);
 
 //  Configure the default linger timeout in msecs for new zsock instances.
 //  You can also set this separately on each zsock_t instance. The default
@@ -194,6 +241,18 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zsys_set_rcvhwm (size_t rcvhwm);
 
+//  Configure the default HWM for zactor internal pipes; this is set on both
+//  ends of the pipe, for outgoing messages only (sndhwm). The default HWM is
+//  1,000, on all versions of ZeroMQ. If the environment var ZSYS_ACTORHWM is
+//  defined, that provides the default. Note that a value of zero means no
+//  limit, i.e. infinite memory consumption.
+CZMQ_EXPORT void
+    zsys_set_pipehwm (size_t pipehwm);
+
+//  Return the HWM for zactor internal pipes.
+CZMQ_EXPORT size_t
+    zsys_pipehwm (void);
+
 //  Configure use of IPv6 for new zsock instances. By default sockets accept
 //  and make only IPv4 connections. When you enable IPv6, sockets will accept
 //  and connect to both IPv4 and IPv6 peers. You can override the setting on
@@ -208,12 +267,60 @@ CZMQ_EXPORT void
 //  For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is
 //  the default when there is no specified interface. If the environment
 //  variable ZSYS_INTERFACE is set, use that as the default interface name.
+//  Setting the interface to "*" means "use all available interfaces".
 CZMQ_EXPORT void
     zsys_set_interface (const char *value);
 
 //  Return network interface to use for broadcasts, or "" if none was set.
 CZMQ_EXPORT const char *
     zsys_interface (void);
+
+//  Set log identity, which is a string that prefixes all log messages sent
+//  by this process. The log identity defaults to the environment variable
+//  ZSYS_LOGIDENT, if that is set.
+CZMQ_EXPORT void
+    zsys_set_logident (const char *value);
+
+//  Set stream to receive log traffic. By default, log traffic is sent to
+//  stdout. If you set the stream to NULL, no stream will receive the log
+//  traffic (it may still be sent to the system facility).
+CZMQ_EXPORT void
+    zsys_set_logstream (FILE *stream);
+    
+//  Sends log output to a PUB socket bound to the specified endpoint. To
+//  collect such log output, create a SUB socket, subscribe to the traffic
+//  you care about, and connect to the endpoint. Log traffic is sent as a
+//  single string frame, in the same format as when sent to stdout. The
+//  log system supports a single sender; multiple calls to this method will
+//  bind the same sender to multiple endpoints. To disable the sender, call
+//  this method with a null argument.
+CZMQ_EXPORT void
+    zsys_set_logsender (const char *endpoint);
+
+//  Enable or disable logging to the system facility (syslog on POSIX boxes,
+//  event log on Windows). By default this is disabled.
+CZMQ_EXPORT void
+    zsys_set_logsystem (bool logsystem);
+    
+//  Log error condition - highest priority
+CZMQ_EXPORT void
+    zsys_error (const char *format, ...);
+
+//  Log warning condition - high priority
+CZMQ_EXPORT void
+    zsys_warning (const char *format, ...);
+    
+//  Log normal, but significant, condition - normal priority
+CZMQ_EXPORT void
+    zsys_notice (const char *format, ...);
+    
+//  Log informational message - low priority
+CZMQ_EXPORT void
+    zsys_info (const char *format, ...);
+    
+//  Log debug-level message - lowest priority
+CZMQ_EXPORT void
+    zsys_debug (const char *format, ...);
 
 //  Self test of this class
 CZMQ_EXPORT void

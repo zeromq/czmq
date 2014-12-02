@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zframe - working with single message frames
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -109,7 +109,7 @@ zframe_recv (void *source)
             zframe_destroy (&self);
             return NULL;            //  Interrupted or terminated
         }
-        self->more = zsocket_rcvmore (handle);
+        self->more = zsock_rcvmore (handle);
     }
     return self;
 }
@@ -130,8 +130,8 @@ zframe_send (zframe_t **self_p, void *dest, int flags)
         zframe_t *self = *self_p;
         assert (zframe_is (self));
 
-        int send_flags = (flags & ZFRAME_MORE)? ZMQ_SNDMORE: 0;
-        send_flags |= (flags & ZFRAME_DONTWAIT)? ZMQ_DONTWAIT: 0;
+        int send_flags = (flags & ZFRAME_MORE) ? ZMQ_SNDMORE : 0;
+        send_flags |= (flags & ZFRAME_DONTWAIT) ? ZMQ_DONTWAIT : 0;
         if (flags & ZFRAME_REUSE) {
             zmq_msg_t copy;
             zmq_msg_init (&copy);
@@ -179,7 +179,8 @@ zframe_data (zframe_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Create a new frame that duplicates an existing frame
+//  Create a new frame that duplicates an existing frame. If frame is null,
+//  or memory was exhausted, returns null.
 
 zframe_t *
 zframe_dup (zframe_t *self)
@@ -208,7 +209,9 @@ zframe_strhex (zframe_t *self)
 
     size_t size = zframe_size (self);
     byte *data = zframe_data (self);
-    char *hex_str = (char *) malloc (size * 2 + 1);
+    char *hex_str = (char *) zmalloc (size * 2 + 1);
+    if (!hex_str)
+        return NULL;
 
     uint byte_nbr;
     for (byte_nbr = 0; byte_nbr < size; byte_nbr++) {
@@ -232,8 +235,10 @@ zframe_strdup (zframe_t *self)
 
     size_t size = zframe_size (self);
     char *string = (char *) malloc (size + 1);
-    memcpy (string, zframe_data (self), size);
-    string [size] = 0;
+    if (string) {
+        memcpy (string, zframe_data (self), size);
+        string [size] = 0;
+    }
     return string;
 }
 
@@ -247,8 +252,8 @@ zframe_streq (zframe_t *self, const char *string)
     assert (self);
     assert (zframe_is (self));
 
-    if (zframe_size (self) == strlen (string)
-    &&  memcmp (zframe_data (self), string, strlen (string)) == 0)
+    if (  zframe_size (self) == strlen (string)
+       && memcmp (zframe_data (self), string, strlen (string)) == 0)
         return true;
     else
         return false;
@@ -296,10 +301,10 @@ zframe_eq (zframe_t *self, zframe_t *other)
         assert (zframe_is (self));
         assert (zframe_is (other));
 
-        if (zframe_size (self) == zframe_size (other)
-        && memcmp (zframe_data (self),
-                   zframe_data (other),
-                   zframe_size (self)) == 0)
+        if (  zframe_size (self) == zframe_size (other)
+           && memcmp (zframe_data (self),
+                      zframe_data (other),
+                      zframe_size (self)) == 0)
             return true;
         else
             return false;
@@ -324,44 +329,8 @@ zframe_reset (zframe_t *self, const void *data, size_t size)
 
 
 //  --------------------------------------------------------------------------
-//  Print contents of frame to FILE stream, prefix is ignored if null.
-
-void
-zframe_fprint (zframe_t *self, const char *prefix, FILE *file)
-{
-    assert (self);
-    assert (zframe_is (self));
-
-    if (prefix)
-        fprintf (file, "%s", prefix);
-    byte *data = zframe_data (self);
-    size_t size = zframe_size (self);
-
-    int is_bin = 0;
-    uint char_nbr;
-    for (char_nbr = 0; char_nbr < size; char_nbr++)
-        if (data [char_nbr] < 9 || data [char_nbr] > 127)
-            is_bin = 1;
-
-    fprintf (file, "[%03d] ", (int) size);
-    size_t max_size = is_bin? 35: 70;
-    const char *ellipsis = "";
-    if (size > max_size) {
-        size = max_size;
-        ellipsis = "...";
-    }
-    for (char_nbr = 0; char_nbr < size; char_nbr++) {
-        if (is_bin)
-            fprintf (file, "%02X", (unsigned char) data [char_nbr]);
-        else
-            fprintf (file, "%c", data [char_nbr]);
-    }
-    fprintf (file, "%s\n", ellipsis);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Print contents of frame to stdout, prefix is ignored if null.
+//  Send message to zsys log sink (may be stdout, or system facility as
+//  configured by zsys_set_logstream). Prefix shows before frame, if not null.
 
 void
 zframe_print (zframe_t *self, const char *prefix)
@@ -369,7 +338,32 @@ zframe_print (zframe_t *self, const char *prefix)
     assert (self);
     assert (zframe_is (self));
 
-    zframe_fprint (self, prefix, stdout);
+    byte *data = zframe_data (self);
+    size_t size = zframe_size (self);
+
+    //  Probe data to check if it looks like unprintable binary
+    int is_bin = 0;
+    uint char_nbr;
+    for (char_nbr = 0; char_nbr < size; char_nbr++)
+        if (data [char_nbr] < 9 || data [char_nbr] > 127)
+            is_bin = 1;
+
+    char buffer [256] = "";
+    snprintf (buffer, 30, "%s[%03d] ", prefix ? prefix : "", (int) size);
+    size_t max_size = is_bin ? 35 : 70;
+    const char *ellipsis = "";
+    if (size > max_size) {
+        size = max_size;
+        ellipsis = "...";
+    }
+    for (char_nbr = 0; char_nbr < size; char_nbr++) {
+        if (is_bin)
+            sprintf (buffer + strlen (buffer), "%02X", (unsigned char) data [char_nbr]);
+        else
+            sprintf (buffer + strlen (buffer), "%c", data [char_nbr]);
+    }
+    strcat (buffer, ellipsis);
+    zsys_debug (buffer);
 }
 
 
@@ -394,16 +388,55 @@ zframe_recv_nowait (void *source)
 {
     assert (source);
     void *handle = zsock_resolve (source);
-    
+
     zframe_t *self = zframe_new (NULL, 0);
     if (self) {
         if (zmq_recvmsg (handle, &self->zmsg, ZMQ_DONTWAIT) < 0) {
             zframe_destroy (&self);
             return NULL;            //  Interrupted or terminated
         }
-        self->more = zsocket_rcvmore (handle);
+        self->more = zsock_rcvmore (handle);
     }
     return self;
+}
+
+
+//  --------------------------------------------------------------------------
+//  DEPRECATED as inconsistent; breaks principle that logging should all go
+//  to a single destination.
+//  Print contents of frame to FILE stream, prefix is ignored if null.
+
+void
+zframe_fprint (zframe_t *self, const char *prefix, FILE *file)
+{
+    assert (self);
+    assert (zframe_is (self));
+
+    if (prefix)
+        fprintf (file, "%s", prefix);
+    byte *data = zframe_data (self);
+    size_t size = zframe_size (self);
+
+    int is_bin = 0;
+    uint char_nbr;
+    for (char_nbr = 0; char_nbr < size; char_nbr++)
+        if (data [char_nbr] < 9 || data [char_nbr] > 127)
+            is_bin = 1;
+
+    fprintf (file, "[%03d] ", (int) size);
+    size_t max_size = is_bin ? 35 : 70;
+    const char *ellipsis = "";
+    if (size > max_size) {
+        size = max_size;
+        ellipsis = "...";
+    }
+    for (char_nbr = 0; char_nbr < size; char_nbr++) {
+        if (is_bin)
+            fprintf (file, "%02X", (unsigned char) data [char_nbr]);
+        else
+            fprintf (file, "%c", data [char_nbr]);
+    }
+    fprintf (file, "%s\n", ellipsis);
 }
 
 
@@ -419,17 +452,16 @@ zframe_test (bool verbose)
 
     //  @selftest
     //  Create two PAIR sockets and connect over inproc
-    zsock_t *output = zsock_new (ZMQ_PAIR);
+    zsock_t *output = zsock_new_pair ("@inproc://zframe.test");
     assert (output);
-    zsock_bind (output, "inproc://zframe.test");
-    zsock_t *input = zsock_new (ZMQ_PAIR);
+    zsock_t *input = zsock_new_pair (">inproc://zframe.test");
     assert (input);
-    zsock_connect (input, "inproc://zframe.test");
 
     //  Send five different frames, test ZFRAME_MORE
     int frame_nbr;
     for (frame_nbr = 0; frame_nbr < 5; frame_nbr++) {
         frame = zframe_new ("Hello", 5);
+        assert (frame);
         rc = zframe_send (&frame, output, ZFRAME_MORE);
         assert (rc == 0);
     }

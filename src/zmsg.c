@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zmsg - working with multipart messages
 
     -------------------------------------------------------------------------
@@ -9,16 +9,16 @@
     http://czmq.zeromq.org.
 
     This is free software; you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the 
-    Free Software Foundation; either version 3 of the License, or (at your 
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
 
     This software is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL-
-    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General 
+    ITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General
     Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public License 
+    You should have received a copy of the GNU Lesser General Public License
     along with this program. If not, see <http://www.gnu.org/licenses/>.
     =========================================================================
 */
@@ -43,7 +43,7 @@
 
 struct _zmsg_t {
     uint32_t tag;               //  Object tag for runtime detection
-    zlist_t *frames;            //  List of frames
+    zlistx_t *frames;            //  List of frames
     size_t content_size;        //  Total content size
 };
 
@@ -54,17 +54,14 @@ struct _zmsg_t {
 zmsg_t *
 zmsg_new (void)
 {
-    zmsg_t
-        *self;
-
-    self = (zmsg_t *) zmalloc (sizeof (zmsg_t));
+    zmsg_t *self = (zmsg_t *) zmalloc (sizeof (zmsg_t));
     if (self) {
         self->tag = ZMSG_TAG;
-        self->frames = zlist_new ();
-        if (!self->frames) {
-            free (self);
-            return NULL;
-        }
+        self->frames = zlistx_new ();
+        if (self->frames)
+            zlistx_set_destructor (self->frames, (czmq_destructor *) zframe_destroy);
+        else
+            zmsg_destroy (&self);
     }
     return self;
 }
@@ -80,11 +77,7 @@ zmsg_destroy (zmsg_t **self_p)
     if (*self_p) {
         zmsg_t *self = *self_p;
         assert (zmsg_is (self));
-        while (zlist_size (self->frames) > 0) {
-            zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
-            zframe_destroy (&frame);
-        }
-        zlist_destroy (&self->frames);
+        zlistx_destroy (&self->frames);
         self->tag = 0xDeadBeef;
         free (self);
         *self_p = NULL;
@@ -117,7 +110,7 @@ zmsg_recv (void *source)
             zmsg_destroy (&self);
             break;
         }
-        if (!zsocket_rcvmore (handle))
+        if (!zsock_rcvmore (handle))
             break;              //  Last message frame
     }
     return self;
@@ -125,9 +118,10 @@ zmsg_recv (void *source)
 
 
 //  --------------------------------------------------------------------------
-//  Send message to socket, destroy after sending. If the message has no
-//  frames, sends nothing but destroys the message anyhow. Safe to call
-//  if zmsg is null.
+//  Send message to destination socket, and destroy the message after sending
+//  it successfully. If the message has no frames, sends nothing but destroys
+//  the message anyhow. Nullifies the caller's reference to the message (as
+//  it is a destructor).
 
 int
 zmsg_send (zmsg_t **self_p, void *dest)
@@ -140,16 +134,13 @@ zmsg_send (zmsg_t **self_p, void *dest)
     void *handle = zsock_resolve (dest);
     if (self) {
         assert (zmsg_is (self));
-        if (zlist_size (self->frames) == 0)
-            return -1;          //  Sending an empty message is an error
-        
-        zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
+        zframe_t *frame = (zframe_t *) zlistx_detach (self->frames, NULL);
         while (frame) {
             rc = zframe_send (&frame, handle,
-                zlist_size (self->frames)? ZFRAME_MORE: 0);
+                              zlistx_size (self->frames) ? ZFRAME_MORE : 0);
             if (rc != 0)
                 break;
-            frame = (zframe_t *) zlist_pop (self->frames);
+            frame = (zframe_t *) zlistx_detach (self->frames, NULL);
         }
         zmsg_destroy (self_p);
     }
@@ -166,7 +157,7 @@ zmsg_size (zmsg_t *self)
     assert (self);
     assert (zmsg_is (self));
 
-    return zlist_size (self->frames);
+    return zlistx_size (self->frames);
 }
 
 
@@ -199,7 +190,7 @@ zmsg_prepend (zmsg_t *self, zframe_t **frame_p)
     zframe_t *frame = *frame_p;
     *frame_p = NULL;            //  We now own frame
     self->content_size += zframe_size (frame);
-    return zlist_push (self->frames, frame);
+    return zlistx_add_start (self->frames, frame)? 0: -1;
 }
 
 
@@ -218,7 +209,7 @@ zmsg_append (zmsg_t *self, zframe_t **frame_p)
     zframe_t *frame = *frame_p;
     *frame_p = NULL;            //  We now own frame
     self->content_size += zframe_size (frame);
-    return zlist_append (self->frames, frame);
+    return zlistx_add_end (self->frames, frame)? 0: -1;
 }
 
 
@@ -232,7 +223,7 @@ zmsg_pop (zmsg_t *self)
     assert (self);
     assert (zmsg_is (self));
 
-    zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
+    zframe_t *frame = (zframe_t *) zlistx_detach (self->frames, NULL);
     if (frame)
         self->content_size -= zframe_size (frame);
 
@@ -253,7 +244,7 @@ zmsg_pushmem (zmsg_t *self, const void *src, size_t size)
     zframe_t *frame = zframe_new (src, size);
     if (frame) {
         self->content_size += size;
-        return zlist_push (self->frames, frame);
+        return zlistx_add_start (self->frames, frame)? 0: -1;
     }
     else
         return -1;
@@ -272,7 +263,7 @@ zmsg_addmem (zmsg_t *self, const void *src, size_t size)
     zframe_t *frame = zframe_new (src, size);
     if (frame) {
         self->content_size += size;
-        return zlist_append (self->frames, frame);
+        return zlistx_add_end (self->frames, frame)? 0: -1;
     }
     else
         return -1;
@@ -290,9 +281,14 @@ zmsg_pushstr (zmsg_t *self, const char *string)
     assert (zmsg_is (self));
     assert (string);
 
-    self->content_size += strlen (string);
-    zlist_push (self->frames, zframe_new (string, strlen (string)));
-    return 0;
+    size_t len = strlen (string);
+    zframe_t *frame = zframe_new (string, len);
+    if (frame) {
+        self->content_size += len;
+        return zlistx_add_start (self->frames, frame)? 0: -1;
+    }
+    else
+        return -1;
 }
 
 
@@ -307,9 +303,14 @@ zmsg_addstr (zmsg_t *self, const char *string)
     assert (zmsg_is (self));
     assert (string);
 
-    self->content_size += strlen (string);
-    zlist_append (self->frames, zframe_new (string, strlen (string)));
-    return 0;
+    size_t len = strlen (string);
+    zframe_t *frame = zframe_new (string, len);
+    if (frame) {
+        self->content_size += len;
+        return zlistx_add_end (self->frames, frame)? 0: -1;
+    }
+    else
+        return -1;
 }
 
 
@@ -328,12 +329,18 @@ zmsg_pushstrf (zmsg_t *self, const char *format, ...)
     va_start (argptr, format);
     char *string = zsys_vprintf (format, argptr);
     va_end (argptr);
+    if (!string)
+        return -1;
 
-    self->content_size += strlen (string);
-    zlist_push (self->frames, zframe_new (string, strlen (string)));
+    size_t len = strlen (string);
+    zframe_t *frame = zframe_new (string, len);
     free (string);
-
-    return 0;
+    if (frame) {
+        self->content_size += len;
+        return zlistx_add_start (self->frames, frame)? 0: -1;
+    }
+    else
+        return -1;
 }
 
 
@@ -352,12 +359,18 @@ zmsg_addstrf (zmsg_t *self, const char *format, ...)
     va_start (argptr, format);
     char *string = zsys_vprintf (format, argptr);
     va_end (argptr);
+    if (!string)
+        return -1;
 
-    self->content_size += strlen (string);
-    zlist_append (self->frames, zframe_new (string, strlen (string)));
+    size_t len = strlen (string);
+    zframe_t *frame = zframe_new (string, len);
     free (string);
-
-    return 0;
+    if (frame) {
+        self->content_size += len;
+        return zlistx_add_end (self->frames, frame)? 0: -1;
+    }
+    else
+        return -1;
 }
 
 
@@ -371,7 +384,7 @@ zmsg_popstr (zmsg_t *self)
     assert (self);
     assert (zmsg_is (self));
 
-    zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
+    zframe_t *frame = (zframe_t *) zlistx_detach (self->frames, NULL);
     char *string = NULL;
     if (frame) {
         self->content_size -= zframe_size (frame);
@@ -379,6 +392,54 @@ zmsg_popstr (zmsg_t *self)
         zframe_destroy (&frame);
     }
     return string;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Push encoded message as a new frame. Message takes ownership of
+//  submessage, so the original is destroyed in this call. Returns 0 on
+//  success, -1 on error.
+
+int
+zmsg_addmsg (zmsg_t *self, zmsg_t **msg_p)
+{
+    assert (self);
+    assert (zmsg_is (self));
+    assert (msg_p);
+
+    zmsg_t *msg = *msg_p;
+    byte *data;
+    size_t len = zmsg_encode (msg, &data);
+    int r = zmsg_addmem (self, data, len);
+    if (r == 0) {
+        zmsg_destroy (&msg);
+        *msg_p = NULL;
+    }
+    free (data);
+    return r;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Remove first submessage from message, if any. Returns zmsg_t, or NULL if
+//  decoding was not succesfull. Caller now owns message and must destroy it
+//  when finished with it.
+
+zmsg_t *
+zmsg_popmsg (zmsg_t *self)
+{
+    assert (self);
+    assert (zmsg_is (self));
+
+    zframe_t *frame = zmsg_pop (self);
+    if (!frame)
+        return NULL;
+
+    size_t len = zframe_size (frame);
+    byte *data = zframe_data (frame);
+    zmsg_t *msg = zmsg_decode (data, len);
+    zframe_destroy (&frame);
+    return msg;
 }
 
 
@@ -392,12 +453,13 @@ zmsg_remove (zmsg_t *self, zframe_t *frame)
     assert (zmsg_is (self));
 
     self->content_size -= zframe_size (frame);
-    zlist_remove (self->frames, frame);
+    void *handle = zlistx_find (self->frames, frame);
+    zlistx_detach (self->frames, handle);
 }
 
 
 //  --------------------------------------------------------------------------
-//  Set cursor to first frame in message. Returns frame, or NULL, if the 
+//  Set cursor to first frame in message. Returns frame, or NULL, if the
 //  message is empty. Use this to navigate the frames as a list.
 
 zframe_t *
@@ -405,8 +467,7 @@ zmsg_first (zmsg_t *self)
 {
     assert (self);
     assert (zmsg_is (self));
-
-    return (zframe_t *) zlist_first (self->frames);
+    return (zframe_t *) zlistx_first (self->frames);
 }
 
 
@@ -419,8 +480,7 @@ zmsg_next (zmsg_t *self)
 {
     assert (self);
     assert (zmsg_is (self));
-
-    return (zframe_t *) zlist_next (self->frames);
+    return (zframe_t *) zlistx_next (self->frames);
 }
 
 
@@ -432,13 +492,12 @@ zmsg_last (zmsg_t *self)
 {
     assert (self);
     assert (zmsg_is (self));
-
-    return (zframe_t *) zlist_last (self->frames);
+    return (zframe_t *) zlistx_last (self->frames);
 }
 
 
 //  --------------------------------------------------------------------------
-//  Save message to an open file, return 0 if OK, else -1. The message is 
+//  Save message to an open file, return 0 if OK, else -1. The message is
 //  saved as a series of frames, each with length and data. Note that the
 //  file is NOT guaranteed to be portable between operating systems, not
 //  versions of CZMQ. The file format is at present undocumented and liable
@@ -483,12 +542,20 @@ zmsg_load (zmsg_t *self, FILE *file)
         size_t rc = fread (&frame_size, sizeof (frame_size), 1, file);
         if (rc == 1) {
             zframe_t *frame = zframe_new (NULL, frame_size);
+            if (!frame) {
+                zmsg_destroy (&self);
+                return NULL;    //  Unable to allocate frame, fail
+            }
             rc = fread (zframe_data (frame), frame_size, 1, file);
             if (frame_size > 0 && rc != 1) {
                 zframe_destroy (&frame);
-                break;          //  Unable to read properly, quit
+                zmsg_destroy (&self);
+                return NULL;    //  Corrupt file, fail
             }
-            zmsg_append (self, &frame);
+            if (zmsg_append (self, &frame) == -1) {
+                zmsg_destroy (&self);
+                return NULL;    //  Unable to add frame, fail
+            }
         }
         else
             break;              //  Unable to read properly, quit
@@ -528,37 +595,39 @@ zmsg_encode (zmsg_t *self, byte **buffer)
             buffer_size += frame_size + 1 + 4;
         frame = zmsg_next (self);
     }
-    *buffer = (byte *) malloc (buffer_size);
+    *buffer = (byte *) zmalloc (buffer_size);
 
-    //  Encode message now
-    byte *dest = *buffer;
-    frame = zmsg_first (self);
-    while (frame) {
-        size_t frame_size = zframe_size (frame);
-        if (frame_size < 255) {
-            *dest++ = (byte) frame_size;
-            memcpy (dest, zframe_data (frame), frame_size);
-            dest += frame_size;
+    if (*buffer) {
+        //  Encode message now
+        byte *dest = *buffer;
+        frame = zmsg_first (self);
+        while (frame) {
+            size_t frame_size = zframe_size (frame);
+            if (frame_size < 255) {
+                *dest++ = (byte) frame_size;
+                memcpy (dest, zframe_data (frame), frame_size);
+                dest += frame_size;
+            }
+            else {
+                *dest++ = 0xFF;
+                *dest++ = (frame_size >> 24) & 255;
+                *dest++ = (frame_size >> 16) & 255;
+                *dest++ = (frame_size >>  8) & 255;
+                *dest++ =  frame_size        & 255;
+                memcpy (dest, zframe_data (frame), frame_size);
+                dest += frame_size;
+            }
+            frame = zmsg_next (self);
         }
-        else {
-            *dest++ = 0xFF;
-            *dest++ = (frame_size >> 24) & 255;
-            *dest++ = (frame_size >> 16) & 255;
-            *dest++ = (frame_size >>  8) & 255;
-            *dest++ =  frame_size        & 255;
-            memcpy (dest, zframe_data (frame), frame_size);
-            dest += frame_size;
-        }
-        frame = zmsg_next (self);
+        assert ((dest - *buffer) == buffer_size);
     }
-    assert ((dest - *buffer) == buffer_size);
     return buffer_size;
 }
 
 
 //  --------------------------------------------------------------------------
 //  Decodes a serialized message buffer created by zmsg_encode () and returns
-//  a new zmsg_t object. Returns NULL if the buffer was badly formatted or 
+//  a new zmsg_t object. Returns NULL if the buffer was badly formatted or
 //  there was insufficient memory to work.
 
 zmsg_t *
@@ -606,64 +675,50 @@ zmsg_decode (byte *buffer, size_t buffer_size)
 
 //  --------------------------------------------------------------------------
 //  Create copy of message, as new message object. Returns a fresh zmsg_t
-//  object, or NULL if there was not enough heap memory.
+//  object. If message is null, or memory was exhausted, returns null.
 
 zmsg_t *
 zmsg_dup (zmsg_t *self)
 {
-    assert (self);
-    assert (zmsg_is (self));
-
-    zmsg_t *copy = zmsg_new ();
-    if (!copy)
-        return NULL;
-
-    zframe_t *frame = zmsg_first (self);
-    while (frame) {
-        if (zmsg_addmem (copy, zframe_data (frame), zframe_size (frame))) {
-            zmsg_destroy (&copy);
-            return NULL;
+    if (self) {
+        assert (zmsg_is (self));
+        zmsg_t *copy = zmsg_new ();
+        if (copy) {
+            zframe_t *frame = zmsg_first (self);
+            while (frame) {
+                if (zmsg_addmem (copy, zframe_data (frame), zframe_size (frame))) {
+                    zmsg_destroy (&copy);
+                    break;      //  Abandon attempt to copy message
+                }
+                frame = zmsg_next (self);
+            }
         }
-        frame = zmsg_next (self);
+        return copy;
     }
-    return copy;
+    else
+        return NULL;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Dump message to FILE stream, for debugging and tracing.
-//  Truncates to first 10 frames, for readability.
-
-void
-zmsg_fprint (zmsg_t *self, FILE *file)
-{
-    assert (self);
-    assert (zmsg_is (self));
-
-    fprintf (file, "--------------------------------------\n");
-    if (!self) {
-        fprintf (file, "NULL");
-        return;
-    }
-    zframe_t *frame = zmsg_first (self);
-    int frame_nbr = 0;
-    while (frame && frame_nbr++ < 10) {
-        zframe_fprint (frame, NULL, file);
-        frame = zmsg_next (self);
-    }
-}
-
-
-//  --------------------------------------------------------------------------
-//  Dump message to stdout, for debugging. See zmsg_fprint for details
+//  Send message to zsys log sink (may be stdout, or system facility as
+//  configured by zsys_set_logstream).
 
 void
 zmsg_print (zmsg_t *self)
 {
     assert (self);
     assert (zmsg_is (self));
-    
-    zmsg_fprint (self, stdout);
+
+    if (!self) {
+        zsys_debug ("(NULL)");
+        return;
+    }
+    zframe_t *frame = zmsg_first (self);
+    while (frame) {
+        zframe_print (frame, NULL);
+        frame = zmsg_next (self);
+    }
 }
 
 
@@ -721,7 +776,7 @@ zmsg_recv_nowait (void *source)
             zmsg_destroy (&self);
             break;
         }
-        if (!zsocket_rcvmore (source))
+        if (!zsock_rcvmore (source))
             break;              //  Last message frame
     }
     return self;
@@ -755,7 +810,7 @@ zmsg_push (zmsg_t *self, zframe_t *frame)
     assert (self);
     assert (frame);
     self->content_size += zframe_size (frame);
-    return zlist_push (self->frames, frame);
+    return zlistx_add_start (self->frames, frame)? 0: -1;
 }
 
 
@@ -771,7 +826,33 @@ zmsg_add (zmsg_t *self, zframe_t *frame)
     assert (self);
     assert (frame);
     self->content_size += zframe_size (frame);
-    return zlist_append (self->frames, frame);
+    return zlistx_add_end (self->frames, frame)? 0: -1;
+}
+
+
+//  --------------------------------------------------------------------------
+//  DEPRECATED as inconsistent; breaks principle that logging should all go
+//  to a single destination.
+//  Dump message to FILE stream, for debugging and tracing.
+//  Truncates to first 10 frames, for readability.
+
+void
+zmsg_fprint (zmsg_t *self, FILE *file)
+{
+    assert (self);
+    assert (zmsg_is (self));
+
+    fprintf (file, "--------------------------------------\n");
+    if (!self) {
+        fprintf (file, "NULL");
+        return;
+    }
+    zframe_t *frame = zmsg_first (self);
+    int frame_nbr = 0;
+    while (frame && frame_nbr++ < 10) {
+        zframe_fprint (frame, NULL, file);
+        frame = zmsg_next (self);
+    }
 }
 
 
@@ -786,13 +867,10 @@ zmsg_test (bool verbose)
     int rc = 0;
     //  @selftest
     //  Create two PAIR sockets and connect over inproc
-    zsock_t *output = zsock_new (ZMQ_PAIR);
+    zsock_t *output = zsock_new_pair ("@inproc://zmsg.test");
     assert (output);
-    zsock_bind (output, "inproc://zmsg.test");
-
-    zsock_t *input = zsock_new (ZMQ_PAIR);
+    zsock_t *input = zsock_new_pair (">inproc://zmsg.test");
     assert (input);
-    zsock_connect (input, "inproc://zmsg.test");
 
     //  Test send and receive of single-frame message
     zmsg_t *msg = zmsg_new ();
@@ -946,6 +1024,27 @@ zmsg_test (bool verbose)
     free (buffer);
     zmsg_destroy (&msg);
 
+    //  Test submessages
+    msg = zmsg_new ();
+    assert (msg);
+    zmsg_t *submsg = zmsg_new ();
+    zmsg_pushstr (msg, "matr");
+    zmsg_pushstr (submsg, "joska");
+    rc = zmsg_addmsg (msg, &submsg);
+    assert (rc == 0);
+    assert (submsg == NULL);
+    submsg = zmsg_popmsg (msg);
+    assert (submsg == NULL);   // string "matr" is not encoded zmsg_t, so was discarded
+    submsg = zmsg_popmsg (msg);
+    assert (submsg);
+    body = zmsg_popstr (submsg);
+    assert (streq (body, "joska"));
+    free (body);
+    zmsg_destroy (&submsg);
+    frame = zmsg_pop (msg);
+    assert (frame == NULL);
+    zmsg_destroy (&msg);
+
     //  Now try methods on an empty message
     msg = zmsg_new ();
     assert (msg);
@@ -955,10 +1054,9 @@ zmsg_test (bool verbose)
     assert (zmsg_last (msg) == NULL);
     assert (zmsg_next (msg) == NULL);
     assert (zmsg_pop (msg) == NULL);
-    assert (zmsg_send (&msg, output) == -1);
-    assert (msg != NULL);
-    zmsg_destroy (&msg);
+    //  Sending an empty message is valid and destroys the message
     assert (zmsg_send (&msg, output) == 0);
+    assert (!msg);
 
     zsock_destroy (&input);
     zsock_destroy (&output);

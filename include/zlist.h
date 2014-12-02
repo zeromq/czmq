@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zlist - generic type-free list container
+    zlist - simple generic list container
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -33,11 +33,18 @@ CZMQ_EXPORT zlist_t *
 CZMQ_EXPORT void
     zlist_destroy (zlist_t **self_p);
 
-//  Return first item in the list, or null
+//  Return the item at the head of list. If the list is empty, returns NULL.
+//  Leaves cursor pointing at the head item, or NULL if the list is empty.
 CZMQ_EXPORT void *
     zlist_first (zlist_t *self);
 
-//  Return last item in the list, or null
+//  Return the next item. If the list is empty, returns NULL. To move to
+//  the start of the list call zlist_first (). Advances the cursor.
+CZMQ_EXPORT void *
+    zlist_next (zlist_t *self);
+
+//  Return the item at the tail of list. If the list is empty, returns NULL.
+//  Leaves cursor pointing at the tail item, or NULL if the list is empty.
 CZMQ_EXPORT void *
     zlist_last (zlist_t *self);
 
@@ -49,17 +56,20 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void *
     zlist_tail (zlist_t *self);
 
-//  Return next item in the list, or null
+//  Return the current item of list. If the list is empty, returns NULL.
+//  Leaves cursor pointing at the current item, or NULL if the list is empty.
 CZMQ_EXPORT void *
-    zlist_next (zlist_t *self);
+    zlist_item (zlist_t *self);
 
-//  Append an item to the end of the list, return 0 if OK
-//  or -1 if this failed for some reason (out of memory).
+//  Append an item to the end of the list, return 0 if OK or -1 if this
+//  failed for some reason (out of memory). Note that if a duplicator has 
+//  been set, this method will also duplicate the item.
 CZMQ_EXPORT int
     zlist_append (zlist_t *self, void *item);
 
-//  Push an item to the start of the list, return 0 if OK
-//  or -1 if this failed for some reason (out of memory).
+//  Push an item to the start of the list, return 0 if OK or -1 if this
+//  failed for some reason (out of memory). Note that if a duplicator has
+//  been set, this method will also duplicate the item.
 CZMQ_EXPORT int
     zlist_push (zlist_t *self, void *item);
 
@@ -71,16 +81,15 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void
     zlist_remove (zlist_t *self, void *item);
 
-// Add an explicit free function to the item including a hint as to
-// whether it can be found at the tail
-CZMQ_EXPORT void *
-    zlist_freefn (zlist_t *self, void *item, zlist_free_fn *fn, bool at_tail);
-
 //  Make a copy of list. If the list has autofree set, the copied list will
 //  duplicate all items, which must be strings. Otherwise, the list will hold
 //  pointers back to the items in the original list.
 CZMQ_EXPORT zlist_t *
     zlist_dup (zlist_t *self);
+
+//  Purge all items from list
+CZMQ_EXPORT void
+zlist_purge (zlist_t *self);
 
 //  Return number of items in the list
 CZMQ_EXPORT size_t
@@ -101,6 +110,14 @@ CZMQ_EXPORT void
 //  list is empty.
 CZMQ_EXPORT void
     zlist_autofree (zlist_t *self);
+
+//  Set a free function for the specified list item. When the item is
+//  destroyed, the free function, if any, is called on that item.
+//  Use this when list items are dynamically allocated, to ensure that
+//  you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
+//  Returns the item, or NULL if there is no such item.
+CZMQ_EXPORT void *
+    zlist_freefn (zlist_t *self, void *item, zlist_free_fn *fn, bool at_tail);
 
 //  Self test of this class
 CZMQ_EXPORT void

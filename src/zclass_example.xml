@@ -1,0 +1,258 @@
+<class
+    name = "myclass"
+    title = "myclass title"
+    script = "zclass_c"
+    export_macro = "czmq_export"
+    project_header = "czmq.h"
+    package_dir = "."
+    source_dir = "."
+    >
+
+    <!--
+        This example generates a class demonstrating most capabilities of the
+        zclass_c.gsl script. To run it, make sure either zclass_c.gsl and
+        zclass_lib_c.gsl are installed to e.g. /usr/local/bin or they
+        both reside in the same directory as this example. Also make sure
+        the files myclass.h and myclass.c do not exist in the same
+        directory. Then run the following at the command prompt:
+
+        % gsl zclass_example.xml
+
+        This should give myclass.h/.c as output. The class generated from this
+        example should compile right out of the box with:
+
+        % gcc -c myclass.c
+
+        See below for explanations on how to specify your own class. The output
+        from the generation should be used as the basis for implementing the class
+        logic. Do not implement until you are satisfied with your class interface; the
+        generated files will not be regenerated if they already exist. If you make
+        changes to the class interface after starting implementation, you will have
+        to temporarily move the existing .h/.c files to a different location, generate
+        new files, then merge in the content from your edited versions. Or you could
+        just implement the changes manually, of course. But then you'll lose
+        consistency between the xml-definition and your code. (Unless, of course,
+        you also edit the xml. These choices are left entirely up to the practitioner
+        of such dark arts...)
+
+    -->
+
+    <!--
+        Includes are processed first, so XML in included files will be
+        part of the XML tree
+    -->
+    <include filename = "license.xml" />
+
+    <!--
+        typedefs can be simple: the following will be
+
+        //  definition of myint type
+        typedef int myclass_myint_t;
+    -->
+    <typedef name = "myint" type = "int" />
+
+    <!--
+        or an enum; this expands to
+
+        //  definition of myenum enumeration
+        typedef enum {
+            MYCLASS_MYENUM_ITEM1,
+            MYCLASS_MYENUM_ITEM2
+        } myclass_myenum_t;
+    -->
+    <typedef name = "myenum" type = "enum">
+        <item name = "item1" />
+        <item name = "item2" />
+    </typedef>
+
+    <!--
+        Methods have a name and return type specified as attributes.
+        Arguments are listed with name and type attributes. The following
+        definition gives this prototype:
+
+        //  Definition of mymethod method
+        CZMQ_EXPORT int
+            myclass_mymethod (myclass_t *self, int myarg);
+    -->
+    <method name = "mymethod" type = "int">
+        <arg name = "myarg" type = "int" />
+    </method>
+
+    <!--
+        Methods with type = "buffer" return byte * and gets a size
+        argument silently added to the end of its argument list:
+
+        //  Definition of getmybuffer method
+        CZMQ_EXPORT byte *
+            myclass_getmybuffer (myclass_t *self, int myarg, size_t *getmybuffer_size);
+    -->
+    <method name = "getmybuffer" type = "buffer">
+        <arg name = "myarg" type = "int" />
+    </method>
+
+    <!--
+        Arguments with type = "buffer" silently add a size argument after itself.
+
+        //  Definition of setmybuffer method
+        CZMQ_EXPORT void
+            myclass_setmybuffer (myclass_t *self, byte *mybuffer, size_t mybuffer_size);
+    -->
+    <method name = "setmybuffer" type = "void">
+        <arg name = "mybuffer" type = "buffer" />
+    </method>
+
+    <!--
+        types can be any valid c-type (no validation is done, the generated code
+        may not compile). Types defined by typedef tags in the XML, may be referred
+        to by their name attribute. The following type names receive special treatment:
+
+            buffer      - expands to byte *, plus size_t *<name>_size argument
+            octets      - expands to byte [size]
+            string      - expands to char *
+            strings     - expands to zlist_t *
+            dictionary  - expands to zhash_t *
+            chunk       - expands to zchunk_t *
+            frame       - expands to zframe_t *
+            uuid        - expands to zuuid_t *
+            msg         - expands to zmsg_t *
+            number      - expands to
+                            byte        - attribute size = "1" (the default if no size given)
+                            uint16_t    - attribute size = "2"
+                            uint32_t    - attribute size = "4"
+                            uint64_t    - attribute size = "8"
+
+        Additionally, the attribute is_ptr = "true" can be used to make a method return,
+        or an argument be, a pointer. The attribute is_buffer can be set to "true" to
+        make a buffer of a different type than byte. These two attributes have no effect
+        on the types listed above, except number, on which they have the desired effect.
+        A more complex method definition follows below:
+
+        //  Definition of complex method
+        CZMQ_EXPORT int *
+            myclass_complex (myclass_t *self, uint32_t arg1, float *arg2, size_t arg2_size, void *arg3, size_t *complex_size);
+    -->
+    <method name = "complex" type = "int" is_buffer = "true">
+        <arg name = "arg1" type = "number" size = "4" />
+        <arg name = "arg2" type = "float" is_buffer = "true" />
+        <arg name = "arg3" type = "void" is_ptr = "true" />
+    </method>
+
+    <!--
+        Properties are defined by name and type attributes. They may be buffers and
+        pointers in the same manner as methods and arguments. For most property types
+        the usual getter and setter are created:
+
+        //  Get/set the myprop property
+        CZMQ_EXPORT uint32_t
+            myclass_myprop (myclass_t *self);
+        CZMQ_EXPORT void
+            myclass_set_myprop (myclass_t *self, uint32_t myprop);
+    -->
+    <property name = "myprop" type = "number" size = "4" />
+
+    <!--
+        string properties get the following accessors:
+
+        //  Get/set the mystringprop property
+        CZMQ_EXPORT const char *
+            myclass_mystringprop (myclass_t *self);
+        CZMQ_EXPORT void
+            myclass_set_mystringprop (myclass_t *self, const char *format, ...);
+    -->
+    <property name = "mystringprop" type = "string" />
+
+    <!--
+        octets properties get the following accessors:
+
+        //  Get/set the someoctets property
+        CZMQ_EXPORT byte *
+            myclass_someoctets (myclass_t *self);
+        CZMQ_EXPORT size_t
+            myclass_someoctets_size (myclass_t *self);
+        CZMQ_EXPORT void
+            myclass_set_someoctets (myclass_t *self, byte *someoctets);
+    -->
+    <property name = "someoctets" type = "octets" size = "16" />
+
+    <!--
+        buffer properties get the following accessors:
+
+        //  Get/set the abuffer property
+        CZMQ_EXPORT byte *
+            myclass_abuffer (myclass_t *self);
+        CZMQ_EXPORT size_t
+            myclass_abuffer_size (myclass_t *self);
+        CZMQ_EXPORT void
+            myclass_set_abuffer (myclass_t *self, byte *abuffer, size_t abuffer_size);
+    -->
+    <property name = "abuffer" type = "buffer" />
+
+    <!--
+        a type of strings gives the following:
+
+        //  Get/set the mylist property
+        CZMQ_EXPORT zlist_t *
+            myclass_mylist (myclass_t *self);
+        //  Get the mylist property and transfer ownership to caller
+        CZMQ_EXPORT zlist_t *
+            myclass_get_mylist (myclass_t *self);
+        //  Set the mylist property, transferring ownership from caller
+        CZMQ_EXPORT void
+            myclass_set_mylist (myclass_t *self, zlist_t **mylist_p);
+
+        //  Iterate through the mylist property, and append a mylist value
+        CZMQ_EXPORT const char *
+            myclass_mylist_first (myclass_t *self);
+        CZMQ_EXPORT const char *
+            myclass_mylist_next (myclass_t *self);
+        CZMQ_EXPORT void
+            myclass_mylist_append (myclass_t *self, const char *format, ...);
+        CZMQ_EXPORT size_t
+            myclass_mylist_size (myclass_t *self);
+    -->
+    <property name = "mylist" type = "strings" />
+
+    <!--
+        a type of dictionary gives the following:
+
+        //  Get/set the mydict property
+        CZMQ_EXPORT zhash_t *
+            myclass_mydict (myclass_t *self);
+        //  Get the mydict property and transfer ownership to caller
+        CZMQ_EXPORT zhash_t *
+            myclass_get_mydict (myclass_t *self);
+        //  Set the mydict property, transferring ownership from caller
+        CZMQ_EXPORT void
+            myclass_set_mydict (myclass_t *self, zhash_t **mydict_p);
+
+        //  Get/set a value in the mydict dictionary
+        CZMQ_EXPORT const char *
+            myclass_mydict_string (myclass_t *self,
+                const char *key, const char *default_value);
+        CZMQ_EXPORT uint64_t
+            myclass_mydict_number (myclass_t *self,
+                const char *key, uint64_t default_value);
+        CZMQ_EXPORT void
+            myclass_mydict_insert (myclass_t *self,
+                const char *key, const char *format, ...);
+        CZMQ_EXPORT size_t
+            myclass_mydict_size (myclass_t *self);
+    -->
+    <property name = "mydict" type = "dictionary" />
+
+    <!--
+        a type of [T] = chunk, frame, uuid or msg gives the following:
+
+        //  Get a copy of the myobj property
+        CZMQ_EXPORT zmsg_t *
+            myclass_myobj (myclass_t *self);
+        //  Get the myobj property and transfer ownership to caller
+        CZMQ_EXPORT zmsg_t *
+            myclass_get_myobj (myclass_t *self);
+        //  Set the myobj property, transferring ownership from caller
+        CZMQ_EXPORT void
+            myclass_set_myobj (myclass_t *self, zmsg_t **msg_p);
+    -->
+    <property name = "myobj" type = "msg" />
+
+</class>

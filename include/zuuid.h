@@ -14,7 +14,8 @@
 #ifndef __ZUUID_H_INCLUDED__
 #define __ZUUID_H_INCLUDED__
 
-#define ZUUID_LEN    16
+#define ZUUID_LEN     16
+#define ZUUID_STR_LEN (ZUUID_LEN * 2)
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,10 +42,21 @@ CZMQ_EXPORT size_t
 CZMQ_EXPORT char *
     zuuid_str (zuuid_t *self);
 
-//  Set UUID to new supplied value 
+// Return UUID as formatted string in the canonical format 8-4-4-4-12,
+// lower case.  The caller should free the freshly allocated string.
+// See: http://en.wikipedia.org/wiki/Universally_unique_identifier
+CZMQ_EXPORT char *
+    zuuid_formatted_str (zuuid_t *self);
+
+//  Set UUID to new supplied ZUUID_LEN-octet value
 CZMQ_EXPORT void
     zuuid_set (zuuid_t *self, byte *source);
     
+//  Set UUID to new supplied ZUUID_STR_LEN-char string value;
+//  return 0 if OK, else returns -1.
+CZMQ_EXPORT int
+    zuuid_set_str (zuuid_t *self, const char *source);
+
 //  Store UUID blob in target array
 CZMQ_EXPORT void
     zuuid_export (zuuid_t *self, byte *target);
@@ -57,7 +69,8 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT bool
     zuuid_neq (zuuid_t *self, byte *compare);
 
-//  Make copy of UUID object
+//  Make copy of UUID object; if uuid is null, or memory was exhausted,
+//  returns null.
 CZMQ_EXPORT zuuid_t *
     zuuid_dup (zuuid_t *self);
 

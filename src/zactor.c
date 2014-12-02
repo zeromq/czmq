@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zactor - simple actor framework
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -13,7 +13,7 @@
 
 /*
 @header
-    The zactor class provides a simple actor framework. It replaces the 
+    The zactor class provides a simple actor framework. It replaces the
     CZMQ zthread class, which had a complex API that did not fit the CLASS
     standard. A CZMQ actor is implemented as a thread plus a PAIR-PAIR
     pipe. The constructor and destructor are always synchronized, so the
@@ -24,6 +24,9 @@
     A zactor_t instance acts like a zsock_t and you can pass it to any CZMQ
     method that would take a zsock_t argument, including methods in zframe,
     zmsg, zstr, zpoller, and zloop.
+
+    An actor function MUST call zsock_signal (pipe) when initialized
+    and MUST listen to pipe and exit on $TERM command.
 @discuss
 @end
 */
@@ -62,6 +65,8 @@ s_thread_shim (void *args)
     assert (args);
     shim_t *shim = (shim_t *) args;
     shim->handler (shim->pipe, shim->args);
+    //  Do not block, if the other end of the pipe is already deleted
+    zsock_set_sndtimeo (shim->pipe, 0);
     zsock_signal (shim->pipe, 0);
     zsock_destroy (&shim->pipe);
     free (shim);
@@ -77,6 +82,8 @@ s_thread_shim (void *args)
     assert (args);
     shim_t *shim = (shim_t *) args;
     shim->handler (shim->pipe, shim->args);
+    //  Do not block, if the other end of the pipe is already deleted
+    zsock_set_sndtimeo (shim->pipe, 0);
     zsock_signal (shim->pipe, 0);
     zsock_destroy (&shim->pipe);
     free (shim);
@@ -98,24 +105,15 @@ zactor_new (zactor_fn *actor, void *args)
     self->tag = ZACTOR_TAG;
 
     shim_t *shim = (shim_t *) zmalloc (sizeof (shim_t));
-    if (!shim)
+    if (!shim) {
+        zactor_destroy (&self);
         return NULL;
-
-    //  Create front-to-back pipe pair
-    self->pipe = zsock_new (ZMQ_PAIR);
-    assert (self->pipe);
-    char endpoint [32];
-    while (true) {
-        sprintf (endpoint, "inproc://zactor-%04x-%04x\n",
-                 randof (0x10000), randof (0x10000));
-        if (zsock_bind (self->pipe, "%s", endpoint) == 0)
-            break;
     }
-    shim->pipe = zsock_new (ZMQ_PAIR);
-    assert (shim->pipe);
-    int rc = zsock_connect (shim->pipe, "%s", endpoint);
-    assert (rc != -1);
-
+    shim->pipe = zsys_create_pipe (&self->pipe);
+    if (!shim->pipe) {
+        zactor_destroy (&self);
+        return NULL;
+    }
     shim->handler = actor;
     shim->args = args;
 
@@ -163,8 +161,12 @@ zactor_destroy (zactor_t **self_p)
         assert (zactor_is (self));
 
         //  Signal the actor to end and wait for the thread exit code
-        zstr_send (self->pipe, "$TERM");
-        zsock_wait (self->pipe);
+        //  If the pipe isn't connected any longer, assume child thread
+        //  has already quit due to other reasons and don't collect the
+        //  exit signal.
+        zsock_set_sndtimeo (self->pipe, 0);
+        if (zstr_send (self->pipe, "$TERM") == 0)
+            zsock_wait (self->pipe);
         zsock_destroy (&self->pipe);
         self->tag = 0xDeadBeef;
         free (self);
@@ -224,11 +226,24 @@ zactor_resolve (void *self)
 
 
 //  --------------------------------------------------------------------------
+//  Return the actor's zsock handle. Use this when you absolutely need
+//  to work with the zsock instance rather than the actor.
+
+zsock_t *
+zactor_sock (zactor_t *self)
+{
+    assert (self);
+    assert (zactor_is (self));
+    return self->pipe;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Actor
 //  must call zsock_signal (pipe) when initialized
 //  must listen to pipe and exit on $TERM command
 
-static void 
+static void
 echo_actor (zsock_t *pipe, void *args)
 {
     //  Do some initialization
@@ -241,10 +256,12 @@ echo_actor (zsock_t *pipe, void *args)
         if (!msg)
             break;              //  Interrupted
         char *command = zmsg_popstr (msg);
-        if (streq (command, "$TERM")) 
+        //  All actors must handle $TERM in this way
+        if (streq (command, "$TERM"))
             terminated = true;
         else
-        if (streq (command, "ECHO")) 
+        //  This is an example command for our test actor
+        if (streq (command, "ECHO"))
             zmsg_send (&msg, pipe);
         else {
             puts ("E: invalid message to actor");

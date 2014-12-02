@@ -103,6 +103,18 @@ CZMQ_EXPORT int
 CZMQ_EXPORT char *
     zmsg_popstr (zmsg_t *self);
 
+//  Push encoded message as a new frame. Message takes ownership of
+//  submessage, so the original is destroyed in this call. Returns 0 on
+//  success, -1 on error.
+CZMQ_EXPORT int
+    zmsg_addmsg (zmsg_t *self, zmsg_t **msg_p);
+
+//  Remove first submessage from message, if any. Returns zmsg_t, or NULL if
+//  decoding was not succesfull. Caller now owns message and must destroy it
+//  when finished with it.
+CZMQ_EXPORT zmsg_t *
+    zmsg_popmsg (zmsg_t *self);
+
 //  Remove specified frame from list, if present. Does not destroy frame.
 CZMQ_EXPORT void
     zmsg_remove (zmsg_t *self, zframe_t *frame);
@@ -149,16 +161,12 @@ CZMQ_EXPORT zmsg_t *
     zmsg_decode (byte *buffer, size_t buffer_size);
 
 //  Create copy of message, as new message object. Returns a fresh zmsg_t
-//  object, or NULL if there was not enough heap memory.
+//  object. If message is null, or memory was exhausted, returns null.
 CZMQ_EXPORT zmsg_t *
     zmsg_dup (zmsg_t *self);
 
-//  Print message to open stream
-//  Truncates to first 10 frames, for readability.
-CZMQ_EXPORT void
-    zmsg_fprint (zmsg_t *self, FILE *file);
-
-//  Dump message to stdout, for debugging. See zmsg_fprint for details
+//  Send message to zsys log sink (may be stdout, or system facility as
+//  configured by zsys_set_logstream).
 CZMQ_EXPORT void
     zmsg_print (zmsg_t *self);
 
@@ -199,6 +207,13 @@ CZMQ_EXPORT int
 //  DEPRECATED - will be removed for next stable release
 CZMQ_EXPORT int
     zmsg_add (zmsg_t *self, zframe_t *frame);
+
+//  DEPRECATED as inconsistent; breaks principle that logging should all go
+//  to a single destination.
+//  Print message to open stream
+//  Truncates to first 10 frames, for readability.
+CZMQ_EXPORT void
+    zmsg_fprint (zmsg_t *self, FILE *file);
 
 //  Compiler hints
 CZMQ_EXPORT int zmsg_addstrf (zmsg_t *self, const char *format, ...) CHECK_PRINTF (2);

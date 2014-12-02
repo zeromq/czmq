@@ -16,28 +16,27 @@ CC=gcc
 PREFIX=c:/mingw/msys/1.0/local
 INCDIR=-I$\(PREFIX)/include -I.
 LIBDIR=-L$\(PREFIX)/lib
-CFLAGS=-Wall -Os -g -DDLL_EXPORT $\(INCDIR)
+CFLAGS=-Wall -Os -g -DLIB$(PROJECT.NAME)_EXPORTS $\(INCDIR)
 
 OBJS =\
 .for class
  $(name).o\
 .endfor
 
-
 %.o: ../../src/%.c
-    $\(CC) -c -o $@ $< $\(CFLAGS)
+	$\(CC) -c -o $@ $< $\(CFLAGS)
 
-all: libczmq.dll czmq_selftest.exe
+all: lib$(project.name).dll $(project.name)_selftest.exe
 
-libczmq.dll: $\(OBJS)
-    gcc -shared -o $@ $\(OBJS) -Wl,--out-implib,$@.a $\(LIBDIR) -lzmq -lws2_32 -liphlpapi
+lib$(project.name).dll: $\(OBJS)
+	$\(CC) -shared -o $@ $\(OBJS) -Wl,--out-implib,$@.a $\(LIBDIR) -lzmq -lws2_32 -liphlpapi -lrpcrt4
 
 # the test functions are not exported into the DLL
-czmq_selftest.exe: czmq_selftest.o $\(OBJS)
-    gcc -o $@ $^ $\(LIBDIR) -lzmq -lws2_32 -liphlpapi
+$(project.name)_selftest.exe: $(project.name)_selftest.o $\(OBJS)
+	$\(CC) -o $@ $^ $\(LIBDIR) -lzmq -lws2_32 -liphlpapi -lrpcrt4
 
 clean:
-    del *.o *.a *.dll *.exe
+	del *.o *.a *.dll *.exe
 
 #################################################################
 #   GENERATED SOURCE CODE, DO NOT EDIT EXCEPT EXPERIMENTALLY    #

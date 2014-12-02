@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zctx - working with 0MQ contexts
+    zctx - working with 0MQ contexts (deprecated)
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -37,6 +37,9 @@
     such as zmq_recv() and zmq_poll() will return when the user presses
     Ctrl-C.
 @discuss
+    NOTE: this class is deprecated in favor of zsock, which does not expose
+    contexts in the API at all. All zsock instances use the same global
+    context.
 @end
 */
 
@@ -70,16 +73,19 @@ zctx_new (void)
     self->sockets = zlist_new ();
     self->mutex = zmutex_new ();
     if (!self->sockets || !self->mutex) {
-        zlist_destroy (&self->sockets);
-        zmutex_destroy (&self->mutex);
-        free (self);
+        zctx_destroy (&self);
         return NULL;
     }
     self->iothreads = 1;
-    self->pipehwm = 1000;   
+    self->pipehwm = 1000;
     self->sndhwm = 1000;
     self->rcvhwm = 1000;
-    zsys_catch_interrupts ();
+
+    //  Catch SIGINT and SIGTERM unless ZSYS_SIGHANDLER=false
+    if (  getenv ("ZSYS_SIGHANDLER") == NULL
+       || strneq (getenv ("ZSYS_SIGHANDLER"), "false"))
+        zsys_catch_interrupts ();
+
     return self;
 }
 
@@ -95,8 +101,9 @@ zctx_destroy (zctx_t **self_p)
         zctx_t *self = *self_p;
 
         //  Destroy all sockets
-        while (zlist_size (self->sockets))
-            zctx__socket_destroy (self, zlist_first (self->sockets));
+        if (self->sockets)
+            while (zlist_size (self->sockets))
+                zctx__socket_destroy (self, zlist_first (self->sockets));
         zlist_destroy (&self->sockets);
         zmutex_destroy (&self->mutex);
 
@@ -124,26 +131,14 @@ zctx_shadow (zctx_t *ctx)
         if (!ctx->context)
             return NULL;
     }
-    //  Shares same 0MQ context but has its own list of sockets so that
-    //  we create, use, and destroy sockets only within a single thread.
-    zctx_t *self = (zctx_t *) zmalloc (sizeof (zctx_t));
-    if (!self)
-        return NULL;
-
-    self->sockets = zlist_new ();
-    self->mutex = zmutex_new ();
-    if (!self->sockets || !self->mutex) {
-        zlist_destroy (&self->sockets);
-        zmutex_destroy (&self->mutex);
-        free (self);
-        return NULL;
+    zctx_t *self = zctx_shadow_zmq_ctx (ctx->context);
+    if (self) {
+        // copy high water marks and linger from old context
+        self->pipehwm = ctx->pipehwm;
+        self->sndhwm = ctx->sndhwm;
+        self->rcvhwm = ctx->rcvhwm;
+        self->linger = ctx->linger;
     }
-    self->context = ctx->context;
-    self->pipehwm = ctx->pipehwm;
-    self->sndhwm = ctx->sndhwm;
-    self->rcvhwm = ctx->rcvhwm;
-    self->linger = ctx->linger;
-    self->shadow = true;             //  This is a shadow context
     return self;
 }
 
@@ -161,26 +156,24 @@ zctx_shadow_zmq_ctx (void *zmqctx)
     if (!self)
         return NULL;
 
+    self->shadow = true;             //  This is a shadow context
     self->sockets = zlist_new ();
     self->mutex = zmutex_new ();
     if (!self->sockets || !self->mutex) {
-        zlist_destroy (&self->sockets);
-        zmutex_destroy (&self->mutex);
-        free (self);
+        zctx_destroy (&self);
         return NULL;
     }
     self->context = zmqctx;
-    self->pipehwm = 1000;   
+    self->pipehwm = 1000;
     self->sndhwm = 1000;
     self->rcvhwm = 1000;
-    self->shadow = true;             //  This is a shadow context
     return self;
 }
 
 
 //  --------------------------------------------------------------------------
 //  Configure number of I/O threads in context, only has effect if called
-//  before creating first socket, or calling zctx_shadow. Default I/O 
+//  before creating first socket, or calling zctx_shadow. Default I/O
 //  threads is 1, sufficient for all except very high volume applications.
 
 void
@@ -210,7 +203,7 @@ zctx_set_linger (zctx_t *self, int linger)
 
 //  --------------------------------------------------------------------------
 //  Set initial high-water mark for inter-thread pipe sockets. Note that
-//  this setting is separate from the default for normal sockets. You 
+//  this setting is separate from the default for normal sockets. You
 //  should change the default for pipe sockets *with care*. Too low values
 //  will cause blocked threads, and an infinite setting can cause memory
 //  exhaustion. The default, no matter the underlying ZeroMQ version, is
@@ -225,7 +218,7 @@ zctx_set_pipehwm (zctx_t *self, int pipehwm)
     zmutex_unlock (self->mutex);
 }
 
-    
+
 //  --------------------------------------------------------------------------
 //  Set initial send HWM for all new normal sockets created in context.
 //  You can set this per-socket after the socket is created.
@@ -240,7 +233,7 @@ zctx_set_sndhwm (zctx_t *self, int sndhwm)
     zmutex_unlock (self->mutex);
 }
 
-    
+
 //  --------------------------------------------------------------------------
 //  Set initial receive HWM for all new normal sockets created in context.
 //  You can set this per-socket after the socket is created.
@@ -273,8 +266,8 @@ zctx_underlying (zctx_t *self)
 void
 zctx__initialize_underlying (zctx_t *self)
 {
-	assert (self);
-	zmutex_lock (self->mutex);
+    assert (self);
+    zmutex_lock (self->mutex);
     if (!self->context)
         self->context = zmq_init (self->iothreads);
     zmutex_unlock (self->mutex);
@@ -298,7 +291,7 @@ zctx__socket_new (zctx_t *self, int type)
     void *zocket = zmq_socket (self->context, type);
     if (!zocket)
         return NULL;
-    
+
 #if (ZMQ_VERSION_MAJOR == 2)
     //  For ZeroMQ/2.x we use sndhwm for both send and receive
     zsocket_set_hwm (zocket, self->sndhwm);
@@ -355,7 +348,7 @@ zctx__socket_destroy (zctx_t *self, void *zocket)
 void
 zctx_test (bool verbose)
 {
-    printf (" * zctx: ");
+    printf (" * zctx (deprecated): ");
 
     //  @selftest
     //  Create and destroy a context without using it
@@ -370,17 +363,29 @@ zctx_test (bool verbose)
     zctx_set_iothreads (ctx, 1);
     zctx_set_linger (ctx, 5);       //  5 msecs
     void *s1 = zctx__socket_new (ctx, ZMQ_PAIR);
+    assert (s1);
     void *s2 = zctx__socket_new (ctx, ZMQ_XREQ);
+    assert (s2);
     void *s3 = zctx__socket_new (ctx, ZMQ_REQ);
+    assert (s3);
     void *s4 = zctx__socket_new (ctx, ZMQ_REP);
+    assert (s4);
     void *s5 = zctx__socket_new (ctx, ZMQ_PUB);
+    assert (s5);
     void *s6 = zctx__socket_new (ctx, ZMQ_SUB);
-    zsocket_connect (s1, "tcp://127.0.0.1:5555");
-    zsocket_connect (s2, "tcp://127.0.0.1:5555");
-    zsocket_connect (s3, "tcp://127.0.0.1:5555");
-    zsocket_connect (s4, "tcp://127.0.0.1:5555");
-    zsocket_connect (s5, "tcp://127.0.0.1:5555");
-    zsocket_connect (s6, "tcp://127.0.0.1:5555");
+    assert (s6);
+    int rc = zsocket_connect (s1, "tcp://127.0.0.1:5555");
+    assert (rc == 0);
+    rc = zsocket_connect (s2, "tcp://127.0.0.1:5555");
+    assert (rc == 0);
+    rc = zsocket_connect (s3, "tcp://127.0.0.1:5555");
+    assert (rc == 0);
+    rc = zsocket_connect (s4, "tcp://127.0.0.1:5555");
+    assert (rc == 0);
+    rc = zsocket_connect (s5, "tcp://127.0.0.1:5555");
+    assert (rc == 0);
+    rc = zsocket_connect (s6, "tcp://127.0.0.1:5555");
+    assert (rc == 0);
     assert (zctx_underlying (ctx));
     zctx_destroy (&ctx);
     //  @end

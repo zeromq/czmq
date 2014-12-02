@@ -1,0 +1,145 @@
+#### zproxy - run a steerable proxy in the background
+
+A zproxy actor switches messages between a frontend and a backend socket.
+It acts much like the zmq_proxy_steerable method, though it makes benefit
+of CZMQ's facilities, to be somewhat simpler to set-up.
+
+This class replaces zproxy_v2, and is meant for applications that use the
+CZMQ v3 API (meaning, zsock).
+
+This is the class interface:
+
+    //  Create new zproxy actor instance. The proxy switches messages between
+    //  a frontend socket and a backend socket; use the FRONTEND and BACKEND
+    //  commands to configure these:
+    //
+    //      zactor_t *proxy = zactor_new (zproxy, NULL);
+    //
+    //  Destroy zproxy instance. This destroys the two sockets and stops any
+    //  message flow between them:
+    //
+    //      zactor_destroy (&proxy);
+    //
+    //  Note that all zproxy commands are synchronous, so your application always
+    //  waits for a signal from the actor after each command.
+    //
+    //  Enable verbose logging of commands and activity:
+    //
+    //      zstr_send (proxy, "VERBOSE");
+    //      zsock_wait (proxy);
+    //
+    //  Specify frontend socket type -- see zsock_type_str () -- and attach to
+    //  endpoints, see zsock_attach (). Note that a proxy socket is always
+    //  serverish:
+    //
+    //      zstr_sendx (proxy, "FRONTEND", "XSUB", endpoints, NULL);
+    //      zsock_wait (proxy);
+    //
+    //  Specify backend socket type -- see zsock_type_str () -- and attach to
+    //  endpoints, see zsock_attach (). Note that a proxy socket is always
+    //  serverish:
+    //
+    //      zstr_sendx (proxy, "BACKEND", "XPUB", endpoints, NULL);
+    //      zsock_wait (proxy);
+    //
+    //  Capture all proxied messages; these are delivered to the application
+    //  via an inproc PULL socket that you have already bound to the specified
+    //  endpoint:
+    //
+    //      zstr_sendx (proxy, "CAPTURE", endpoint, NULL);
+    //      zsock_wait (proxy);
+    //
+    //  Pause the proxy. A paused proxy will cease processing messages, causing
+    //  them to be queued up and potentially hit the high-water mark on the
+    //  frontend or backend socket, causing messages to be dropped, or writing
+    //  applications to block:
+    //
+    //      zstr_sendx (proxy, "PAUSE", NULL);
+    //      zsock_wait (proxy);
+    //
+    //  Resume the proxy. Note that the proxy starts automatically as soon as it
+    //  has a properly attached frontend and backend socket:
+    //
+    //      zstr_sendx (proxy, "RESUME", NULL);
+    //      zsock_wait (proxy);
+    //
+    //  This is the zproxy constructor as a zactor_fn; the argument is a
+    //  character string specifying frontend and backend socket types as two
+    //  uppercase strings separated by a hyphen:
+    CZMQ_EXPORT void
+        zproxy (zsock_t *pipe, void *unused);
+    
+    //  Selftest
+    CZMQ_EXPORT void
+        zproxy_test (bool verbose);
+
+This is the class self test code:
+
+    //  Create and configure our proxy
+    zactor_t *proxy = zactor_new (zproxy, NULL);
+    assert (proxy);
+    if (verbose) {
+        zstr_sendx (proxy, "VERBOSE", NULL);
+        zsock_wait (proxy);
+    }
+    zstr_sendx (proxy, "FRONTEND", "PULL", "inproc://frontend", NULL);
+    zsock_wait (proxy);
+    zstr_sendx (proxy, "BACKEND", "PUSH", "inproc://backend", NULL);
+    zsock_wait (proxy);
+    
+    //  Connect application sockets to proxy
+    zsock_t *faucet = zsock_new_push (">inproc://frontend");
+    assert (faucet);
+    zsock_t *sink = zsock_new_pull (">inproc://backend");
+    assert (sink);
+    
+    //  Send some messages and check they arrived
+    char *hello, *world;
+    zstr_sendx (faucet, "Hello", "World", NULL);
+    zstr_recvx (sink, &hello, &world, NULL);
+    assert (streq (hello, "Hello"));
+    assert (streq (world, "World"));
+    zstr_free (&hello);
+    zstr_free (&world);
+    
+    //  Test pause/resume functionality
+    zstr_sendx (proxy, "PAUSE", NULL);
+    zsock_wait (proxy);
+    zstr_sendx (faucet, "Hello", "World", NULL);
+    zsock_set_rcvtimeo (sink, 100);
+    zstr_recvx (sink, &hello, &world, NULL);
+    assert (!hello && !world);
+    
+    zstr_sendx (proxy, "RESUME", NULL);
+    zsock_wait (proxy);
+    zstr_recvx (sink, &hello, &world, NULL);
+    assert (streq (hello, "Hello"));
+    assert (streq (world, "World"));
+    zstr_free (&hello);
+    zstr_free (&world);
+    
+    //  Test capture functionality
+    zsock_t *capture = zsock_new_pull ("inproc://capture");
+    assert (capture);
+    
+    //  Switch on capturing, check that it works
+    zstr_sendx (proxy, "CAPTURE", "inproc://capture", NULL);
+    zsock_wait (proxy);
+    zstr_sendx (faucet, "Hello", "World", NULL);
+    zstr_recvx (sink, &hello, &world, NULL);
+    assert (streq (hello, "Hello"));
+    assert (streq (world, "World"));
+    zstr_free (&hello);
+    zstr_free (&world);
+    
+    zstr_recvx (capture, &hello, &world, NULL);
+    assert (streq (hello, "Hello"));
+    assert (streq (world, "World"));
+    zstr_free (&hello);
+    zstr_free (&world);
+    
+    zsock_destroy (&faucet);
+    zsock_destroy (&sink);
+    zsock_destroy (&capture);
+    zactor_destroy (&proxy);
+

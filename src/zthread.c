@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zthread - working with system threads
+    zthread - working with system threads (deprecated)
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -17,6 +17,7 @@
     that look like normal OS threads, or attached threads that share the
     caller's 0MQ context, and get an inproc pipe to talk back to the parent
     thread. Detached threads create their own 0MQ contexts as needed.
+    NOTE: this class is deprecated in favor of zactor.
 @discuss
     We have several use cases for multiple threads. One is to simulate many
     processes, so we can test 0MQ designs and flows more easily. Another is
@@ -49,7 +50,7 @@
 
     If you want to communicate over ipc:// or tcp:// you may be sharing
     the same context, or use separate contexts. Thus, every detached thread
-    usually starts by creating its own zctx_t instance.    
+    usually starts by creating its own zctx_t instance.
 @end
 */
 
@@ -116,7 +117,7 @@ s_thread_start (shim_t *shim)
     pthread_detach (thread);
 
 #elif defined (__WINDOWS__)
-    shim->handle = (HANDLE)_beginthreadex(
+    shim->handle = (HANDLE) _beginthreadex (
         NULL,                   //  Handle is private to this process
         0,                      //  Use a default stack size for new thread
         &s_thread_shim,         //  Start real thread function via this shim
@@ -172,7 +173,7 @@ zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args)
         zsocket_bind (pipe, "inproc://zctx-pipe-%p", pipe);
     else
         return NULL;
-    
+
     //  Prepare argument shim for child thread
     shim = (shim_t *) zmalloc (sizeof (shim_t));
     if (shim) {
@@ -186,7 +187,7 @@ zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args)
     }
     else
         return NULL;
-    
+
     //  Connect child pipe to our pipe
     shim->pipe = zctx__socket_pipe (shim->ctx);
     if (!shim->pipe) {
@@ -194,7 +195,7 @@ zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args)
         return NULL;
     }
     zsocket_connect (shim->pipe, "inproc://zctx-pipe-%p", pipe);
-    
+
     s_thread_start (shim);
     return pipe;
 }
@@ -222,8 +223,10 @@ s_test_attached (void *args, zctx_t *ctx, void *pipe)
 {
     //  Create a socket to check it'll be automatically deleted
     zsocket_new (ctx, ZMQ_PUSH);
+    assert (ctx);
     //  Wait for our parent to ping us, and pong back
     char *ping = zstr_recv (pipe);
+    assert (ping);
     zstr_free (&ping);
     zstr_send (pipe, "pong");
 }
@@ -233,7 +236,7 @@ s_test_attached (void *args, zctx_t *ctx, void *pipe)
 void
 zthread_test (bool verbose)
 {
-    printf (" * zthread: ");
+    printf (" * zthread (deprecated): ");
 
     //  @selftest
     zctx_t *ctx = zctx_new ();
@@ -250,6 +253,7 @@ zthread_test (bool verbose)
     assert (pipe);
     zstr_send (pipe, "ping");
     char *pong = zstr_recv (pipe);
+    assert (pong);
     assert (streq (pong, "pong"));
     zstr_free (&pong);
 

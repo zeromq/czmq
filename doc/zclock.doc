@@ -1,0 +1,57 @@
+#### zclock - millisecond clocks and delays
+
+The zclock class provides essential sleep and system time functions, used
+to slow down threads for testing, and calculate timers for polling. Wraps
+the non-portable system calls in a simple portable API.
+
+The Win32 Sleep() call defaults to 16ms resolution unless the system timer
+resolution is increased with a call to timeBeginPeriod() permitting 1ms
+granularity.
+
+This is the class interface:
+
+    //  Sleep for a number of milliseconds
+    CZMQ_EXPORT void
+        zclock_sleep (int msecs);
+    
+    //  Return current system clock as milliseconds. Note that this clock can
+    //  jump backwards (if the system clock is changed) so is unsafe to use for
+    //  timers and time offsets. Use zclock_mono for that instead.
+    CZMQ_EXPORT int64_t
+        zclock_time (void);
+    
+    //  Return current monotonic clock in milliseconds. Use this when you compute
+    //  time offsets. The monotonic clock is not affected by system changes and
+    //  so will never be reset backwards, unlike a system clock.
+    CZMQ_EXPORT int64_t
+        zclock_mono (void);
+    
+    //  Return current monotonic clock in microseconds. Use this when you compute
+    //  time offsets. The monotonic clock is not affected by system changes and
+    //  so will never be reset backwards, unlike a system clock.
+    CZMQ_EXPORT int64_t
+        zclock_usecs (void);
+    
+    //  Return formatted date/time as fresh string. Free using zstr_free().
+    CZMQ_EXPORT char *
+        zclock_timestr (void);
+    
+    //  Self test of this class
+    CZMQ_EXPORT void
+        zclock_test (bool verbose);
+
+This is the class self test code:
+
+    int64_t start = zclock_time ();
+    zclock_sleep (10);
+    assert ((zclock_time () - start) >= 10);
+    start = zclock_mono ();
+    int64_t usecs = zclock_usecs ();
+    zclock_sleep (10);
+    assert ((zclock_mono () - start) >= 10);
+    assert ((zclock_usecs () - usecs) >= 10000);
+    char *timestr = zclock_timestr ();
+    if (verbose)
+        puts (timestr);
+    free (timestr);
+

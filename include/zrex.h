@@ -22,7 +22,7 @@ extern "C" {
 //  Constructor. Optionally, sets an expression against which we can match
 //  text and capture hits. If there is an error in the expression, reports
 //  zrex_valid() as false and provides the error in zrex_strerror(). If you
-//  set a pattern, you can call zrex_hits() to test it against text.
+//  set a pattern, you can call zrex_matches() to test it against text.
 CZMQ_EXPORT zrex_t *
     zrex_new (const char *expression);
 
@@ -38,30 +38,37 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT const char *
     zrex_strerror (zrex_t *self);
 
-//  Matches the text against a previously set expression, and reports the
-//  number of hits (aka "capture groups" in e.g. Perl). If the text does
-//  not match, returns 0. If it matches, returns 1 or greater, depending on
-//  how many "(...)" groups the expression has. An expression with one group
-//  will produce 2 hits, one for the whole expression and one for the group.
-//  To retrieve the individual hits, call zrex_hit ().
-CZMQ_EXPORT int
-    zrex_hits (zrex_t *self, const char *text);
+//  Returns true if the text matches the previously compiled expression.
+//  Use this method to compare one expression against many strings.
+CZMQ_EXPORT bool
+    zrex_matches (zrex_t *self, const char *text);
 
-//  Matches the text against a new expression, and reports the number of
-//  hits. If the text does not match, returns 0. If it matches, returns 1 or
-//  greater, depending on how many "(...)" groups the expression has. An
-//  expression with one group will produce 2 hits, one for the whole
-//  expression and one for the group. To retrieve the individual hits, call
-//  zrex_hit ().
-CZMQ_EXPORT int
+//  Returns true if the text matches the supplied expression. Use this
+//  method to compare one string against several expressions.
+CZMQ_EXPORT bool
     zrex_eq (zrex_t *self, const char *text, const char *expression);
 
-//  Returns the Nth sequence captured from the last expression match, where
-//  N is 0 to the value returned by zrex_hits() or zrex_eq(). Sequence 0
-//  is always the whole matching string. Sequence 1 is the first capture
-//  group, if any, and so on.
+//  Returns number of hits from last zrex_matches or zrex_eq. If the text
+//  matched, returns 1 plus the number of capture groups. If the text did
+//  not match, returns zero. To retrieve individual capture groups, call
+//  zrex_hit ().
+CZMQ_EXPORT int
+    zrex_hits (zrex_t *self);
+
+//  Returns the Nth capture group from the last expression match, where
+//  N is 0 to the value returned by zrex_hits(). Capture group 0 is the
+//  whole matching string. Sequence 1 is the first capture group, if any,
+//  and so on.
 CZMQ_EXPORT const char *
     zrex_hit (zrex_t *self, uint index);
+
+//  Fetches hits into string variables provided by caller; this makes for
+//  nicer code than accessing hits by index. Caller should not modify nor
+//  free the returned values. Returns number of strings returned. This
+//  method starts at hit 1, i.e. first capture group, as hit 0 is always
+//  the original matched string.
+CZMQ_EXPORT int
+    zrex_fetch (zrex_t *self, const char **string_p, ...);
 
 //  Self test of this class
 CZMQ_EXPORT void

@@ -3,7 +3,7 @@ zsocket(3)
 
 NAME
 ----
-zsocket - working with 0MQ sockets
+zsocket - working with 0MQ sockets (deprecated)
 
 SYNOPSIS
 --------
@@ -95,83 +95,83 @@ EXAMPLE
 -------
 .From zsocket_test method
 ----
-    zctx_t *ctx = zctx_new ();
-    assert (ctx);
+zctx_t *ctx = zctx_new ();
+assert (ctx);
 
-    //  Create a detached thread, let it run
-    char *interf = "*";
-    char *domain = "localhost";
-    int service = 5560;
+//  Create a detached thread, let it run
+char *interf = "127.0.0.1";
+char *domain = "localhost";
+int service = 5560;
 
-    void *writer = zsocket_new (ctx, ZMQ_PUSH);
-    assert (writer);
-    void *reader = zsocket_new (ctx, ZMQ_PULL);
-    assert (reader);
-    assert (streq (zsocket_type_str (writer), "PUSH"));
-    assert (streq (zsocket_type_str (reader), "PULL"));
-    int rc = zsocket_bind (writer, "tcp://%s:%d", interf, service);
-    assert (rc == service);
+void *writer = zsocket_new (ctx, ZMQ_PUSH);
+assert (writer);
+void *reader = zsocket_new (ctx, ZMQ_PULL);
+assert (reader);
+assert (streq (zsocket_type_str (writer), "PUSH"));
+assert (streq (zsocket_type_str (reader), "PULL"));
+int rc = zsocket_bind (writer, "tcp://%s:%d", interf, service);
+assert (rc == service);
 
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3,2,0))
-    //  Check unbind
-    rc = zsocket_unbind (writer, "tcp://%s:%d", interf, service);
-    assert (rc == 0);
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 2, 0))
+//  Check unbind
+rc = zsocket_unbind (writer, "tcp://%s:%d", interf, service);
+assert (rc == 0);
 
-    //  In some cases and especially when running under Valgrind, doing
-    //  a bind immediately after an unbind causes an EADDRINUSE error.
-    //  Even a short sleep allows the OS to release the port for reuse.
-    zclock_sleep (100);
+//  In some cases and especially when running under Valgrind, doing
+//  a bind immediately after an unbind causes an EADDRINUSE error.
+//  Even a short sleep allows the OS to release the port for reuse.
+zclock_sleep (100);
 
-    //  Bind again
-    rc = zsocket_bind (writer, "tcp://%s:%d", interf, service);
-    assert (rc == service);
+//  Bind again
+rc = zsocket_bind (writer, "tcp://%s:%d", interf, service);
+assert (rc == service);
 #endif
 
-    rc = zsocket_connect (reader, "tcp://%s:%d", domain, service);
-    assert (rc == 0);
-    zstr_send (writer, "HELLO");
-    char *message = zstr_recv (reader);
-    assert (message);
-    assert (streq (message, "HELLO"));
-    free (message);
+rc = zsocket_connect (reader, "tcp://%s:%d", domain, service);
+assert (rc == 0);
+zstr_send (writer, "HELLO");
+char *message = zstr_recv (reader);
+assert (message);
+assert (streq (message, "HELLO"));
+free (message);
 
-    //  Test binding to ports
-    int port = zsocket_bind (writer, "tcp://%s:*", interf);
-    assert (port >= ZSOCKET_DYNFROM && port <= ZSOCKET_DYNTO);
+//  Test binding to ports
+int port = zsocket_bind (writer, "tcp://%s:*", interf);
+assert (port >= ZSOCKET_DYNFROM && port <= ZSOCKET_DYNTO);
 
-    assert (zsocket_poll (writer, 100) == false);
+assert (zsocket_poll (writer, 100) == false);
 
-    //  Test error state when connecting to an invalid socket type
-    //  ('txp://' instead of 'tcp://', typo intentional)
-    rc = zsocket_connect (reader, "txp://%s:%d", domain, service);
-    assert (rc == -1);
+//  Test error state when connecting to an invalid socket type
+//  ('txp://' instead of 'tcp://', typo intentional)
+rc = zsocket_connect (reader, "txp://%s:%d", domain, service);
+assert (rc == -1);
 
-    //  Test sending frames to socket
-    rc = zsocket_sendmem (writer,"ABC", 3, ZFRAME_MORE);
-    assert (rc == 0);
-    rc = zsocket_sendmem (writer, "DEFG", 4, 0);
-    assert (rc == 0);
+//  Test sending frames to socket
+rc = zsocket_sendmem (writer, "ABC", 3, ZFRAME_MORE);
+assert (rc == 0);
+rc = zsocket_sendmem (writer, "DEFG", 4, 0);
+assert (rc == 0);
 
-    zframe_t *frame = zframe_recv (reader);
-    assert (frame);
-    assert (zframe_streq (frame, "ABC"));
-    assert (zframe_more (frame));
-    zframe_destroy (&frame);
+zframe_t *frame = zframe_recv (reader);
+assert (frame);
+assert (zframe_streq (frame, "ABC"));
+assert (zframe_more (frame));
+zframe_destroy (&frame);
 
-    frame = zframe_recv (reader);
-    assert (frame);
-    assert (zframe_streq (frame, "DEFG"));
-    assert (!zframe_more (frame));
-    zframe_destroy (&frame);
+frame = zframe_recv (reader);
+assert (frame);
+assert (zframe_streq (frame, "DEFG"));
+assert (!zframe_more (frame));
+zframe_destroy (&frame);
 
-    rc = zsocket_signal (writer);
-    assert (rc == 0);
-    rc = zsocket_wait (reader);
-    assert (rc == 0);
+rc = zsocket_signal (writer);
+assert (rc == 0);
+rc = zsocket_wait (reader);
+assert (rc == 0);
 
-    zsocket_destroy (ctx, reader);
-    zsocket_destroy (ctx, writer);
-    zctx_destroy (&ctx);
+zsocket_destroy (ctx, reader);
+zsocket_destroy (ctx, writer);
+zctx_destroy (&ctx);
 ----
 
 SEE ALSO

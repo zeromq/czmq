@@ -26,7 +26,7 @@ CZMQ_EXPORT void
 
 //  Receive frame from socket, returns zframe_t object or NULL if the recv
 //  was interrupted. Does a blocking recv, if you want to not block then use
-//  zframe_recv_nowait().
+//  zpoller or zloop.
 CZMQ_EXPORT zframe_t *
     zframe_recv (void *source);
 
@@ -43,15 +43,18 @@ CZMQ_EXPORT size_t
 CZMQ_EXPORT byte *
     zframe_data (zframe_t *self);
 
-//  Create a new frame that duplicates an existing frame
+//  Create a new frame that duplicates an existing frame. If frame is null,
+//  or memory was exhausted, returns null.
 CZMQ_EXPORT zframe_t *
     zframe_dup (zframe_t *self);
 
-//  Return frame data encoded as printable hex string
+//  Return frame data encoded as printable hex string, useful for 0MQ UUIDs.
+//  Caller must free string when finished with it.
 CZMQ_EXPORT char *
     zframe_strhex (zframe_t *self);
 
 //  Return frame data copied into freshly allocated string
+//  Caller must free string when finished with it.
 CZMQ_EXPORT char *
     zframe_strdup (zframe_t *self);
 
@@ -78,11 +81,8 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT void
     zframe_reset (zframe_t *self, const void *data, size_t size);
 
-//   Print contents of the frame to FILE stream.
-CZMQ_EXPORT void
-    zframe_fprint (zframe_t *self, const char *prefix, FILE *file);
-
-//  Print contents of frame to stdout
+//  Send message to zsys log sink (may be stdout, or system facility as
+//  configured by zsys_set_logstream). Prefix shows before frame, if not null.
 CZMQ_EXPORT void
     zframe_print (zframe_t *self, const char *prefix);
 
@@ -111,73 +111,72 @@ EXAMPLE
 -------
 .From zframe_test method
 ----
-    //  Create two PAIR sockets and connect over inproc
-    zsock_t *output = zsock_new (ZMQ_PAIR);
-    assert (output);
-    zsock_bind (output, "inproc://zframe.test");
-    zsock_t *input = zsock_new (ZMQ_PAIR);
-    assert (input);
-    zsock_connect (input, "inproc://zframe.test");
+//  Create two PAIR sockets and connect over inproc
+zsock_t *output = zsock_new_pair ("@inproc://zframe.test");
+assert (output);
+zsock_t *input = zsock_new_pair (">inproc://zframe.test");
+assert (input);
 
-    //  Send five different frames, test ZFRAME_MORE
-    int frame_nbr;
-    for (frame_nbr = 0; frame_nbr < 5; frame_nbr++) {
-        frame = zframe_new ("Hello", 5);
-        rc = zframe_send (&frame, output, ZFRAME_MORE);
-        assert (rc == 0);
-    }
-    //  Send same frame five times, test ZFRAME_REUSE
+//  Send five different frames, test ZFRAME_MORE
+int frame_nbr;
+for (frame_nbr = 0; frame_nbr < 5; frame_nbr++) {
     frame = zframe_new ("Hello", 5);
     assert (frame);
-    for (frame_nbr = 0; frame_nbr < 5; frame_nbr++) {
-        rc = zframe_send (&frame, output, ZFRAME_MORE + ZFRAME_REUSE);
-        assert (rc == 0);
-    }
-    assert (frame);
-    zframe_t *copy = zframe_dup (frame);
-    assert (zframe_eq (frame, copy));
-    zframe_destroy (&frame);
-    assert (!zframe_eq (frame, copy));
-    assert (zframe_size (copy) == 5);
-    zframe_destroy (&copy);
-    assert (!zframe_eq (frame, copy));
-
-    //  Test zframe_new_empty
-    frame = zframe_new_empty ();
-    assert (frame);
-    assert (zframe_size (frame) == 0);
-    zframe_destroy (&frame);
-
-    //  Send END frame
-    frame = zframe_new ("NOT", 3);
-    assert (frame);
-    zframe_reset (frame, "END", 3);
-    char *string = zframe_strhex (frame);
-    assert (streq (string, "454E44"));
-    free (string);
-    string = zframe_strdup (frame);
-    assert (streq (string, "END"));
-    free (string);
-    rc = zframe_send (&frame, output, 0);
+    rc = zframe_send (&frame, output, ZFRAME_MORE);
     assert (rc == 0);
+}
+//  Send same frame five times, test ZFRAME_REUSE
+frame = zframe_new ("Hello", 5);
+assert (frame);
+for (frame_nbr = 0; frame_nbr < 5; frame_nbr++) {
+    rc = zframe_send (&frame, output, ZFRAME_MORE + ZFRAME_REUSE);
+    assert (rc == 0);
+}
+assert (frame);
+zframe_t *copy = zframe_dup (frame);
+assert (zframe_eq (frame, copy));
+zframe_destroy (&frame);
+assert (!zframe_eq (frame, copy));
+assert (zframe_size (copy) == 5);
+zframe_destroy (&copy);
+assert (!zframe_eq (frame, copy));
 
-    //  Read and count until we receive END
-    frame_nbr = 0;
-    for (frame_nbr = 0;; frame_nbr++) {
-        zframe_t *frame = zframe_recv (input);
-        if (zframe_streq (frame, "END")) {
-            zframe_destroy (&frame);
-            break;
-        }
-        assert (zframe_more (frame));
-        zframe_set_more (frame, 0);
-        assert (zframe_more (frame) == 0);
+//  Test zframe_new_empty
+frame = zframe_new_empty ();
+assert (frame);
+assert (zframe_size (frame) == 0);
+zframe_destroy (&frame);
+
+//  Send END frame
+frame = zframe_new ("NOT", 3);
+assert (frame);
+zframe_reset (frame, "END", 3);
+char *string = zframe_strhex (frame);
+assert (streq (string, "454E44"));
+free (string);
+string = zframe_strdup (frame);
+assert (streq (string, "END"));
+free (string);
+rc = zframe_send (&frame, output, 0);
+assert (rc == 0);
+
+//  Read and count until we receive END
+frame_nbr = 0;
+for (frame_nbr = 0;; frame_nbr++) {
+    zframe_t *frame = zframe_recv (input);
+    if (zframe_streq (frame, "END")) {
         zframe_destroy (&frame);
+        break;
     }
-    assert (frame_nbr == 10);
+    assert (zframe_more (frame));
+    zframe_set_more (frame, 0);
+    assert (zframe_more (frame) == 0);
+    zframe_destroy (&frame);
+}
+assert (frame_nbr == 10);
 
-    zsock_destroy (&input);
-    zsock_destroy (&output);
+zsock_destroy (&input);
+zsock_destroy (&output);
 
 ----
 

@@ -1,0 +1,70 @@
+#### ziflist - List of network interfaces available on system
+
+The ziflist class takes a snapshot of the network interfaces that the
+system currently supports (this can change arbitrarily, especially on
+mobile devices). The caller can then access the network interface
+information using an iterator that works like zlistx. Only stores those
+interfaces with broadcast capability, and ignores the loopback interface.
+
+
+This is the class interface:
+
+    //  Get a list of network interfaces currently defined on the system
+    CZMQ_EXPORT ziflist_t *
+        ziflist_new (void);
+    
+    //  Destroy a ziflist instance
+    CZMQ_EXPORT void
+        ziflist_destroy (ziflist_t **self_p);
+    
+    //  Reload network interfaces from system
+    CZMQ_EXPORT void
+        ziflist_reload (ziflist_t *self);
+    
+    //  Return the number of network interfaces on system
+    CZMQ_EXPORT size_t
+        ziflist_size (ziflist_t *self);
+    
+    //  Get first network interface, return NULL if there are none
+    CZMQ_EXPORT const char *
+        ziflist_first (ziflist_t *self);
+    
+    //  Get next network interface, return NULL if we hit the last one
+    CZMQ_EXPORT const char *
+        ziflist_next (ziflist_t *self);
+    
+    //  Return the current interface IP address as a printable string
+    CZMQ_EXPORT const char *
+        ziflist_address (ziflist_t *self);
+    
+    //  Return the current interface broadcast address as a printable string
+    CZMQ_EXPORT const char *
+        ziflist_broadcast (ziflist_t *self);
+    
+    //  Return the current interface network mask as a printable string
+    CZMQ_EXPORT const char *
+        ziflist_netmask (ziflist_t *self);
+    
+    //  Selftest for this class
+    CZMQ_EXPORT void
+        ziflist_test (bool verbose);
+
+This is the class self test code:
+
+    ziflist_t *iflist = ziflist_new ();
+    assert (iflist);
+    size_t items = ziflist_size (iflist);
+    
+    if (verbose) {
+    //        printf ("ziflist: interfaces=%zu\n", ziflist_size (iflist));
+        const char *name = ziflist_first (iflist);
+        while (name) {
+            printf (" - name=%s address=%s netmask=%s broadcast=%s\n",
+                    name, ziflist_address (iflist), ziflist_netmask (iflist), ziflist_broadcast (iflist));
+            name = ziflist_next (iflist);
+        }
+    }
+    ziflist_reload (iflist);
+    assert (items == ziflist_size (iflist));
+    ziflist_destroy (&iflist);
+

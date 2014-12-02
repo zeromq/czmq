@@ -37,7 +37,7 @@ CZMQ_EXPORT void
 
 //  Receive frame from socket, returns zframe_t object or NULL if the recv
 //  was interrupted. Does a blocking recv, if you want to not block then use
-//  zframe_recv_nowait().
+//  zpoller or zloop.
 CZMQ_EXPORT zframe_t *
     zframe_recv (void *source);
 
@@ -54,15 +54,18 @@ CZMQ_EXPORT size_t
 CZMQ_EXPORT byte *
     zframe_data (zframe_t *self);
 
-//  Create a new frame that duplicates an existing frame
+//  Create a new frame that duplicates an existing frame. If frame is null,
+//  or memory was exhausted, returns null.
 CZMQ_EXPORT zframe_t *
     zframe_dup (zframe_t *self);
 
-//  Return frame data encoded as printable hex string
+//  Return frame data encoded as printable hex string, useful for 0MQ UUIDs.
+//  Caller must free string when finished with it.
 CZMQ_EXPORT char *
     zframe_strhex (zframe_t *self);
 
 //  Return frame data copied into freshly allocated string
+//  Caller must free string when finished with it.
 CZMQ_EXPORT char *
     zframe_strdup (zframe_t *self);
 
@@ -89,11 +92,8 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT void
     zframe_reset (zframe_t *self, const void *data, size_t size);
 
-//   Print contents of the frame to FILE stream.
-CZMQ_EXPORT void
-    zframe_fprint (zframe_t *self, const char *prefix, FILE *file);
-
-//  Print contents of frame to stdout
+//  Send message to zsys log sink (may be stdout, or system facility as
+//  configured by zsys_set_logstream). Prefix shows before frame, if not null.
 CZMQ_EXPORT void
     zframe_print (zframe_t *self, const char *prefix);
 
@@ -111,6 +111,12 @@ CZMQ_EXPORT void
 //  NULL if there was no input waiting, or if the read was interrupted.
 CZMQ_EXPORT zframe_t *
     zframe_recv_nowait (void *source);
+
+//  DEPRECATED as inconsistent; breaks principle that logging should all go
+//  to a single destination.
+//  Print contents of the frame to FILE stream.
+CZMQ_EXPORT void
+    zframe_fprint (zframe_t *self, const char *prefix, FILE *file);
 
 //  Deprecated method aliases
 #define zframe_print_to_stream(s,p,F) zframe_fprint(s,p,F)

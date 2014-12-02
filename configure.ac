@@ -11,7 +11,7 @@ AC_INIT([czmq],[m4_esyscmd([./version.sh czmq])],[zeromq-dev@lists.zeromq.org])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(config)
 AC_CONFIG_HEADERS([src/platform.h])
-AM_INIT_AUTOMAKE([tar-ustar foreign])
+AM_INIT_AUTOMAKE([subdir-objects tar-ustar foreign])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # This defines PACKAGE_VERSION_... in src/platform.h
@@ -49,48 +49,21 @@ AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 AC_PROG_SED
 AC_PROG_AWK
+PKG_PROG_PKG_CONFIG
+
+# Check for makecert intent
+AC_ARG_WITH([makecert],
+    AS_HELP_STRING([--with-makecert], 
+        [Include the program makecert in compilation and installation.]),
+    [with_makecert=$withval],
+    [with_makecert=yes])
+
+AM_CONDITIONAL([WITH_MAKECERT], [test x$with_makecert != xno])
+AM_COND_IF([WITH_MAKECERT], [AC_MSG_NOTICE([WITH_MAKECERT defined])])
 
 # Checks for libraries
 AC_CHECK_LIB([pthread], [pthread_create])
 AC_CHECK_LIB([uuid], [uuid_generate])
-
-# Allow libsodium to be installed in a custom path:
-AC_ARG_WITH([libsodium],
-            [AS_HELP_STRING([--with-libsodium],
-                            [Specify libsodium prefix])],
-            [zmq_search_libsodium="yes"],
-            [])
-
-if test "x$zmq_search_libsodium" = "xyes"; then
-    if test -r "${with_libsodium}/include/sodium.h"; then
-        CPPFLAGS="-I${with_libsodium}/include ${CPPFLAGS}"
-        LDFLAGS="-L${with_libsodium}/lib ${LDFLAGS}"
-    fi
-fi
-
-AC_ARG_WITH([libsodium-include-dir],
-            [AS_HELP_STRING([--with-libsodium-include-dir],
-                            [Specify libsodium include prefix])],
-            [zmq_search_libsodium_include="yes"],
-            [])
-
-if test "x$zmq_search_libsodium_include" = "xyes"; then
-    if test -r "${with_libsodium_include_dir}/sodium.h"; then
-        CPPFLAGS="-I${with_libsodium_include_dir}/include ${CPPFLAGS}"
-    fi
-fi
-
-AC_ARG_WITH([libsodium_lib_dir],
-            [AS_HELP_STRING([--with-libsodium-lib-dir],
-                            [Specify libsodium library prefix])],
-            [zmq_search_libsodium_lib="yes"],
-            [])
-
-if test "x$zmq_search_libsodium_lib" = "xyes"; then
-    if test -r "${with_libsodium_lib_dir}/libsodium.{a|so|dylib}"; then
-        LDFLAGS="-L${with_libsodium}/lib ${LDFLAGS}"
-    fi
-fi
 
 # Code coverage
 AC_ARG_WITH(gcov, [AS_HELP_STRING([--with-gcov=yes/no],
@@ -105,68 +78,8 @@ if test "x${CZMQ_GCOV}" == "xyes"; then
     fi
 fi
 
-# Check for libzmq library
-libzmq_prefix=detect
-AC_ARG_WITH([libzmq], 
-    [AS_HELP_STRING([--with-libzmq=PREFIX], 
-        [build with ZeroMQ library installed in PREFIX [default=autodetect]])],
-    [case "x$withval" in
-        xno)
-            AC_MSG_ERROR([czmq requires the ZeroMQ library])
-            ;;
-        xyes|x)
-            ;;
-        *)
-            CPPFLAGS="$CPPFLAGS -I${withval}/include"
-            LDFLAGS="$LDFLAGS -L${withval}/lib"
-            zeromq_prefix=${withval}
-            ;;
-    esac ]
-)
-if test "x$libzmq_prefix" = "xdetect"; then
-    PKG_CHECK_MODULES(
-        [ZeroMQ], [libzmq], [libzmq_prefix=pkgconfig], [libzmq_prefix=])
-        if test "x$libzmq_prefix" = "xpkgconfig"; then
-            CPPFLAGS="$CPPFLAGS ${ZeroMQ_CFLAGS}"
-            LDFLAGS="$LDFLAGS ${ZeroMQ_LIBS}"
-        fi
-fi
-
-if test "x$czmq_search_libzmq" = "xyes"; then
-    if test -r "${with_libzmq}/include/zmq.h"; then
-        CFLAGS="-I${with_libzmq}/include ${CFLAGS}"
-        LDFLAGS="-L${with_libzmq}/lib ${LDFLAGS}"
-    fi
-fi
-
-AC_ARG_WITH([libzmq-include-dir],
-            [AS_HELP_STRING([--with-libzmq-include-dir],
-                            [Specify libzmq include prefix])],
-            [czmq_search_libzmq_include="yes"],
-            [])
-
-if test "x$czmq_search_libzmq_include" = "xyes"; then
-    if test -r "${with_libzmq_include_dir}/include/zmq.h"; then
-        CFLAGS="-I${with_libzmq_include_dir}/include ${CFLAGS}"
-    fi
-fi
-
-AC_ARG_WITH([libzmq_lib_dir],
-            [AS_HELP_STRING([--with-libzmq-lib-dir],
-                            [Specify libzmq library prefix])],
-            [czmq_search_libzmq_lib="yes"],
-            [])
-
-AC_CHECK_HEADER([zmq.h], [], [AC_MSG_ERROR([cannot find zmq.h])])
-
-AC_CHECK_LIB(zmq, zmq_init, ,[AC_MSG_ERROR([cannot link with -lzmq, install libzmq.])])
-
-AC_MSG_CHECKING([whether libzmq installation works])
-AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <zmq.h>],
-                                [zmq_init(1);])
-               ],
-               [AC_MSG_RESULT([yes])],
-               [AC_MSG_ERROR([no. Please specify libzmq installation prefix using --with-libzmq])])
+# Check for libzmq
+PKG_CHECK_MODULES([zmq], [libzmq])
 
 # Platform specific checks
 czmq_on_mingw32="no"
@@ -187,7 +100,7 @@ if test "x$czmq_have_asciidoc" = "xno" -o "x$czmq_have_xmlto" = "xno"; then
     # Tarballs built with 'make dist' ship with prebuilt documentation.
     if ! test -f doc/czmq.7; then
         czmq_install_man="no"
-        AC_MSG_WARN([You are building an unreleased version of libczmq and asciidoc or xmlto are not installed.])
+        AC_MSG_WARN([You are building an unreleased version of CZMQ and asciidoc or xmlto are not installed.])
         AC_MSG_WARN([Documentation will not be built and manual pages will not be installed.])
     fi
 fi
@@ -267,9 +180,6 @@ case "${host_os}" in
         ;;
 esac
 
-# Check for libsodium
-AC_CHECK_LIB([sodium], [sodium_init],,AC_MSG_WARN(libsodium is needed for CURVE security))
-
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS(errno.h arpa/inet.h netinet/tcp.h netinet/in.h stddef.h \
@@ -295,7 +205,7 @@ AC_C_VOLATILE
 
 # These options are GNU compiler specific.
 if test "x$GCC" = "xyes"; then
-    CPPFLAGS="-pedantic -Werror -Wall ${CPPFLAGS}"
+    CPPFLAGS="-pedantic -Werror -Wall -Wc++-compat ${CPPFLAGS}"
 fi
 
 AM_CONDITIONAL(ON_MINGW, test "x$czmq_on_mingw32" = "xyes")
@@ -303,15 +213,21 @@ AM_CONDITIONAL(ON_ANDROID, test "x$czmq_on_android" = "xyes")
 AM_CONDITIONAL(INSTALL_MAN, test "x$czmq_install_man" = "xyes")
 AM_CONDITIONAL(BUILD_DOC, test "x$czmq_build_doc" = "xyes")
 
+# PKG_CHECK_MODULES doesn't add to LIBS on android
+if test "x$czmq_on_android" = "xyes"; then
+    LIBS="-lzmq $LIBS"
+fi
+
 # Checks for library functions.
 AC_TYPE_SIGNAL
 AC_CHECK_FUNCS(perror gettimeofday memset getifaddrs)
 
+# Set pkgconfigdir
+AC_ARG_WITH([pkgconfigdir], AS_HELP_STRING([--with-pkgconfigdir=PATH],
+    [Path to the pkgconfig directory [[LIBDIR/pkgconfig]]]),
+    [pkgconfigdir="$withval"], [pkgconfigdir='${libdir}/pkgconfig'])
+AC_SUBST([pkgconfigdir])
+
 # Specify output files
-AC_CONFIG_FILES([Makefile \
-                src/Makefile \
-                src/libczmq.pc \
-                doc/Makefile \
-                addons/Makefile \
-                model/Makefile])
+AC_CONFIG_FILES([Makefile doc/Makefile src/libczmq.pc])
 AC_OUTPUT

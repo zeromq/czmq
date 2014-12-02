@@ -1,0 +1,12 @@
+dist_bin_SCRIPTS = \
+    model/project.gsl \
+    model/build-android.gsl \
+    model/build-autoconf.gsl \
+    model/build-cmake.gsl \
+    model/build-mingw32.gsl \
+    model/build-vs2008.gsl \
+    model/build-vs2010.gsl \
+    model/build-vs2012.gsl \
+    model/build-vs2013.gsl \
+    src/zclass_c.gsl \
+    src/zclass_lib.gsl

@@ -3,7 +3,7 @@ zthread(3)
 
 NAME
 ----
-zthread - working with system threads
+zthread - working with system threads (deprecated)
 
 SYNOPSIS
 --------
@@ -39,6 +39,7 @@ The zthread class wraps OS thread creation. It creates detached threads
 that look like normal OS threads, or attached threads that share the
 caller's 0MQ context, and get an inproc pipe to talk back to the parent
 thread. Detached threads create their own 0MQ contexts as needed.
+NOTE: this class is deprecated in favor of zactor.
 
 We have several use cases for multiple threads. One is to simulate many
 processes, so we can test 0MQ designs and flows more easily. Another is
@@ -71,7 +72,7 @@ a detached thread (this will crash).
 
 If you want to communicate over ipc:// or tcp:// you may be sharing
 the same context, or use separate contexts. Thus, every detached thread
-usually starts by creating its own zctx_t instance.    
+usually starts by creating its own zctx_t instance.
 
 EXAMPLE
 -------
@@ -80,46 +81,49 @@ EXAMPLE
 static void *
 s_test_detached (void *args)
 {
-    //  Create a socket to check it'll be automatically deleted
-    zctx_t *ctx = zctx_new ();
-    assert (ctx);
+//  Create a socket to check it'll be automatically deleted
+zctx_t *ctx = zctx_new ();
+assert (ctx);
 
-    void *push = zsocket_new (ctx, ZMQ_PUSH);
-    assert (push);
-    zctx_destroy (&ctx);
-    return NULL;
+void *push = zsocket_new (ctx, ZMQ_PUSH);
+assert (push);
+zctx_destroy (&ctx);
+return NULL;
 }
 
 static void
 s_test_attached (void *args, zctx_t *ctx, void *pipe)
 {
-    //  Create a socket to check it'll be automatically deleted
-    zsocket_new (ctx, ZMQ_PUSH);
-    //  Wait for our parent to ping us, and pong back
-    char *ping = zstr_recv (pipe);
-    zstr_free (&ping);
-    zstr_send (pipe, "pong");
+//  Create a socket to check it'll be automatically deleted
+zsocket_new (ctx, ZMQ_PUSH);
+assert (ctx);
+//  Wait for our parent to ping us, and pong back
+char *ping = zstr_recv (pipe);
+assert (ping);
+zstr_free (&ping);
+zstr_send (pipe, "pong");
 }
 
-    zctx_t *ctx = zctx_new ();
-    assert (ctx);
-    int rc = 0;
+zctx_t *ctx = zctx_new ();
+assert (ctx);
+int rc = 0;
 
-    //  Create a detached thread, let it run
-    rc = zthread_new (s_test_detached, NULL);
-    assert (rc == 0);
-    zclock_sleep (100);
+//  Create a detached thread, let it run
+rc = zthread_new (s_test_detached, NULL);
+assert (rc == 0);
+zclock_sleep (100);
 
-    //  Create an attached thread, check it's safely alive
-    void *pipe = zthread_fork (ctx, s_test_attached, NULL);
-    assert (pipe);
-    zstr_send (pipe, "ping");
-    char *pong = zstr_recv (pipe);
-    assert (streq (pong, "pong"));
-    zstr_free (&pong);
+//  Create an attached thread, check it's safely alive
+void *pipe = zthread_fork (ctx, s_test_attached, NULL);
+assert (pipe);
+zstr_send (pipe, "ping");
+char *pong = zstr_recv (pipe);
+assert (pong);
+assert (streq (pong, "pong"));
+zstr_free (&pong);
 
-    //  Everything should be cleanly closed now
-    zctx_destroy (&ctx);
+//  Everything should be cleanly closed now
+zctx_destroy (&ctx);
 ----
 
 SEE ALSO

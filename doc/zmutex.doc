@@ -1,0 +1,43 @@
+#### zmutex - working with mutexes (deprecated)
+
+The zmutex class provides a portable wrapper for mutexes. Please do not
+use this class to do multi-threading. It is for the rare case where you
+absolutely need thread-safe global state. This should happen in system
+code only. DO NOT USE THIS TO SHARE SOCKETS BETWEEN THREADS, OR DARK
+THINGS WILL HAPPEN TO YOUR CODE.
+
+
+This is the class interface:
+
+    //  Create a new mutex container
+    CZMQ_EXPORT zmutex_t *
+        zmutex_new (void);
+    
+    //  Destroy a mutex container
+    CZMQ_EXPORT void
+        zmutex_destroy (zmutex_t **self_p);
+    
+    //  Lock mutex
+    CZMQ_EXPORT void
+        zmutex_lock (zmutex_t *self);
+    
+    //  Unlock mutex
+    CZMQ_EXPORT void
+        zmutex_unlock (zmutex_t *self);
+    
+    //  Try to lock mutex
+    CZMQ_EXPORT int
+        zmutex_try_lock (zmutex_t *self);
+    
+    //  Self test of this class
+    CZMQ_EXPORT void
+        zmutex_test (bool verbose);
+
+This is the class self test code:
+
+    zmutex_t *mutex = zmutex_new ();
+    assert (mutex);
+    zmutex_lock (mutex);
+    zmutex_unlock (mutex);
+    zmutex_destroy (&mutex);
+

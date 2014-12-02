@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zdir - work with file-system directories
 
     -------------------------------------------------------------------------
@@ -41,8 +41,9 @@ struct _zdir_t {
     zlist_t *files;         //  List of files in directory
     zlist_t *subdirs;       //  List of subdirectories
     time_t modified;        //  Most recent file including subdirs
-    off_t  cursize;         //  Total file size including subdirs
+    off_t cursize;          //  Total file size including subdirs
     size_t count;           //  Total file count including subdirs
+    bool trimmed;           //  Load only top level directory
 };
 
 #if (defined (WIN32))
@@ -54,12 +55,15 @@ s_win32_populate_entry (zdir_t *self, WIN32_FIND_DATAA *entry)
     else
     //  If we have a subdirectory, go load that
     if (entry->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-        zdir_t *subdir = zdir_new (entry->cFileName, self->path);
-        zlist_append (self->subdirs, subdir);
+        if (!self->trimmed) {
+            zdir_t *subdir = zdir_new (entry->cFileName, self->path);
+            zlist_append (self->subdirs, subdir);
+        }
     }
     else {
         //  Add file entry to directory list
         zfile_t *file = zfile_new (self->path, entry->cFileName);
+        assert (file);
         zlist_append (self->files, file);
     }
 }
@@ -69,8 +73,8 @@ static void
 s_posix_populate_entry (zdir_t *self, struct dirent *entry)
 {
     //  Skip . and ..
-    if (streq (entry->d_name, ".")
-    ||  streq (entry->d_name, ".."))
+    if (  streq (entry->d_name, ".")
+       || streq (entry->d_name, ".."))
         return;
 
     char fullpath [1024 + 1];
@@ -83,13 +87,17 @@ s_posix_populate_entry (zdir_t *self, struct dirent *entry)
         ; //  Skip hidden files
     else
     //  If we have a subdirectory, go load that
-    if (stat_buf.st_mode & S_IFDIR) {
-        zdir_t *subdir = zdir_new (entry->d_name, self->path);
-        zlist_append (self->subdirs, subdir);
+    if (S_ISDIR (stat_buf.st_mode)) {
+        if (!self->trimmed) {
+            zdir_t *subdir = zdir_new (entry->d_name, self->path);
+            assert (subdir);
+            zlist_append (self->subdirs, subdir);
+        }
     }
     else {
         //  Add file entry to directory list
         zfile_t *file = zfile_new (self->path, entry->d_name);
+        assert (file);
         zlist_append (self->files, file);
     }
 }
@@ -97,22 +105,53 @@ s_posix_populate_entry (zdir_t *self, struct dirent *entry)
 
 
 //  --------------------------------------------------------------------------
-//  Constructor
-//  Create a new directory item that loads in the full tree of the
-//  specified path, optionally located under some parent path.
+//  Create a new directory item that loads in the full tree of the specified
+//  path, optionally located under some parent path. If parent is "-", then
+//  loads only the top-level directory (and does not use parent as a path).
 
 zdir_t *
 zdir_new (const char *path, const char *parent)
 {
     zdir_t *self = (zdir_t *) zmalloc (sizeof (zdir_t));
+    if (!self)
+        return NULL;
+
     if (parent) {
-        self->path = (char *) malloc (strlen (path) + strlen (parent) + 2);
-        sprintf (self->path, "%s/%s", parent, path);
+        if (streq (parent, "-")) {
+            self->trimmed = true;
+            self->path = strdup (path);
+            if (!self->path) {
+                zdir_destroy (&self);
+                return NULL;
+            }
+        }
+        else {
+            self->path = (char *) zmalloc (strlen (path) + strlen (parent) + 2);
+            if (self->path)
+                sprintf (self->path, "%s/%s", parent, path);
+
+            else {
+                zdir_destroy (&self);
+                return NULL;
+            }
+        }
     }
-    else
+    else {
         self->path = strdup (path);
-    self->files = zlist_new ();
-    self->subdirs = zlist_new ();
+        if (!self->path) {
+            zdir_destroy (&self);
+            return NULL;
+        }
+    }
+
+    if (self->path)
+        self->files = zlist_new ();
+    if (self->files)
+        self->subdirs = zlist_new ();
+    if (!self->subdirs) {
+        zdir_destroy (&self);
+        return NULL;
+    }
 
 #if (defined (WIN32))
     //  On Windows, replace backslashes by normal slashes
@@ -127,7 +166,11 @@ zdir_new (const char *path, const char *parent)
         self->path [strlen (self->path) - 1] = 0;
 
     //  Win32 wants a wildcard at the end of the path
-    char *wildcard = (char *) malloc (strlen (self->path) + 3);
+    char *wildcard = (char *) zmalloc (strlen (self->path) + 3);
+    if (!wildcard) {
+        zdir_destroy (&self);
+        return NULL;
+    }
     sprintf (wildcard, "%s/*", self->path);
     WIN32_FIND_DATAA entry;
     HANDLE handle = FindFirstFileA (wildcard, &entry);
@@ -149,8 +192,12 @@ zdir_new (const char *path, const char *parent)
     if (handle) {
         //  Calculate system-specific size of dirent block
         int dirent_size = offsetof (struct dirent, d_name)
-                        + pathconf (self->path, _PC_NAME_MAX) + 1;
-        struct dirent *entry = (struct dirent *) malloc (dirent_size);
+                          + pathconf (self->path, _PC_NAME_MAX) + 1;
+        struct dirent *entry = (struct dirent *) zmalloc (dirent_size);
+        if (!entry) {
+            zdir_destroy (&self);
+            return NULL;
+        }
         struct dirent *result;
 
         int rc = readdir_r (handle, entry, &result);
@@ -196,14 +243,16 @@ zdir_destroy (zdir_t **self_p)
     assert (self_p);
     if (*self_p) {
         zdir_t *self = *self_p;
-        while (zlist_size (self->subdirs)) {
-            zdir_t *subdir = (zdir_t *) zlist_pop (self->subdirs);
-            zdir_destroy (&subdir);
-        }
-        while (zlist_size (self->files)) {
-            zfile_t *file = (zfile_t *) zlist_pop (self->files);
-            zfile_destroy (&file);
-        }
+        if (self->subdirs)
+            while (zlist_size (self->subdirs)) {
+                zdir_t *subdir = (zdir_t *) zlist_pop (self->subdirs);
+                zdir_destroy (&subdir);
+            }
+        if (self->files)
+            while (zlist_size (self->files)) {
+                zfile_t *file = (zfile_t *) zlist_pop (self->files);
+                zfile_destroy (&file);
+            }
         zlist_destroy (&self->subdirs);
         zlist_destroy (&self->files);
         free (self->path);
@@ -375,8 +424,8 @@ zdir_remove (zdir_t *self, bool force)
         self->count = 0;
     }
     //  Remove if empty
-    if (zlist_size (self->files) == 0
-    &&  zlist_size (self->subdirs) == 0)
+    if (  zlist_size (self->files) == 0
+       && zlist_size (self->subdirs) == 0)
         zsys_dir_delete (self->path);
 }
 
@@ -391,6 +440,9 @@ zlist_t *
 zdir_diff (zdir_t *older, zdir_t *newer, const char *alias)
 {
     zlist_t *patches = zlist_new ();
+    if (!patches)
+        return NULL;
+
     zfile_t **old_files = zdir_flatten (older);
     zfile_t **new_files = zdir_flatten (newer);
 
@@ -414,15 +466,25 @@ zdir_diff (zdir_t *older, zdir_t *newer, const char *alias)
 
         if (cmp > 0) {
             //  New file was created
-            if (zfile_is_stable (new_file))
-                zlist_append (patches, zdir_patch_new (newer->path, new_file, patch_create, alias));
+            if (zfile_is_stable (new_file)) {
+                int rc = zlist_append (patches, zdir_patch_new (newer->path, new_file, patch_create, alias));
+                if (rc != 0) {
+                    zlist_destroy (&patches);
+                    break;
+                }
+            }
             old_index--;
         }
         else
         if (cmp < 0) {
             //  Old file was deleted
-            if (zfile_is_stable (old_file))
-                zlist_append (patches, zdir_patch_new (older->path, old_file, patch_delete, alias));
+            if (zfile_is_stable (old_file)) {
+                int rc = zlist_append (patches, zdir_patch_new (older->path, old_file, patch_delete, alias));
+                if (rc != 0) {
+                    zlist_destroy (&patches);
+                    break;
+                }
+            }
             new_index--;
         }
         else
@@ -431,13 +493,23 @@ zdir_diff (zdir_t *older, zdir_t *newer, const char *alias)
                 //  Old file was modified or replaced
                 //  Since we don't check file contents, treat as created
                 //  Could better do SHA check on file here
-                if (zfile_modified (new_file) != zfile_modified (old_file)
-                ||  zfile_cursize (new_file) != zfile_cursize (old_file))
-                    zlist_append (patches, zdir_patch_new (newer->path, new_file, patch_create, alias));
+                if (  zfile_modified (new_file) != zfile_modified (old_file)
+                   || zfile_cursize (new_file) != zfile_cursize (old_file)) {
+                    int rc = zlist_append (patches, zdir_patch_new (newer->path, new_file, patch_create, alias));
+                    if (rc != 0) {
+                        zlist_destroy (&patches);
+                        break;
+                    }
+                }
             }
-            else
+            else {
                 //  File was created over some period of time
-                zlist_append (patches, zdir_patch_new (newer->path, new_file, patch_create, alias));
+                int rc = zlist_append (patches, zdir_patch_new (newer->path, new_file, patch_create, alias));
+                if (rc != 0) {
+                    zlist_destroy (&patches);
+                    break;
+                }
+            }
         }
         old_index++;
         new_index++;
@@ -457,13 +529,19 @@ zlist_t *
 zdir_resync (zdir_t *self, const char *alias)
 {
     zlist_t *patches = zlist_new ();
+    if (!patches)
+        return NULL;
     zfile_t **files = zdir_flatten (self);
     uint index;
     for (index = 0;; index++) {
         zfile_t *file = files [index];
         if (!file)
             break;
-        zlist_append (patches, zdir_patch_new (self->path, file, patch_create, alias));
+        int rc = zlist_append (patches, zdir_patch_new (self->path, file, patch_create, alias));
+        if (rc != 0) {
+            zlist_destroy (&patches);
+            break;
+        }
     }
     free (files);
     return patches;
@@ -482,8 +560,14 @@ zdir_cache (zdir_t *self)
 
     //  Load any previous cache from disk
     zhash_t *cache = zhash_new ();
+    if (!cache)
+        return NULL;
     zhash_autofree (cache);
     char *cache_file = (char *) zmalloc (strlen (self->path) + strlen ("/.cache") + 1);
+    if (!cache_file) {
+        zhash_destroy (&cache);
+        return NULL;
+    }
     sprintf (cache_file, "%s/.cache", self->path);
     zhash_load (cache, cache_file);
 
@@ -495,13 +579,19 @@ zdir_cache (zdir_t *self)
         if (!file)
             break;
         char *filename = zfile_filename (file, self->path);
-        if (zhash_lookup (cache, zfile_filename (file, self->path)) == NULL)
-            zhash_insert (cache, filename, zfile_digest (file));
+        if (zhash_lookup (cache, zfile_filename (file, self->path)) == NULL) {
+            int rc = zhash_insert (cache, filename, zfile_digest (file));
+            if (rc != 0) {
+                zhash_destroy (&cache);
+                break;
+            }
+        }
     }
     free (files);
 
     //  Save cache to disk for future reference
-    zhash_save (cache, cache_file);
+    if (cache)
+        zhash_save (cache, cache_file);
     free (cache_file);
     return cache;
 }
@@ -553,6 +643,7 @@ zdir_test (bool verbose)
         zdir_dump (older, 0);
     }
     zdir_t *newer = zdir_new ("..", NULL);
+    assert (newer);
     zlist_t *patches = zdir_diff (older, newer, "/");
     assert (patches);
     while (zlist_size (patches)) {

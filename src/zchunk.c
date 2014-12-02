@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zchunk - work with memory chunks
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -13,7 +13,7 @@
 /*
 @header
     The zchunk class works with variable sized blobs. Not as efficient as
-    ØMQ's messages but they do less weirdness and so are easier to understand.
+    MQ's messages but they do less weirdness and so are easier to understand.
     The chunk class has methods to read and write chunks from disk.
 @discuss
 @end
@@ -37,7 +37,9 @@ struct _zchunk_t {
 
 
 //  --------------------------------------------------------------------------
-//  Constructor
+//  Create a new chunk of the specified size. If you specify the data, it
+//  is copied into the chunk. If you do not specify the data, the chunk is
+//  allocated and left empty, and you can then add data using zchunk_append.
 
 zchunk_t *
 zchunk_new (const void *data, size_t size)
@@ -242,7 +244,8 @@ zchunk_read (FILE *handle, size_t bytes)
     assert (handle);
 
     zchunk_t *self = zchunk_new (NULL, bytes);
-    self->size = fread (self->data, 1, bytes, handle);
+    if (self)
+        self->size = fread (self->data, 1, bytes, handle);
     return self;
 }
 
@@ -257,7 +260,7 @@ zchunk_write (zchunk_t *self, FILE *handle)
     assert (zchunk_is (self));
 
     size_t items = fwrite (self->data, 1, self->size, handle);
-    int rc = (items < self->size)? -1: 0;
+    int rc = (items < self->size) ? -1 : 0;
     return rc;
 }
 
@@ -288,15 +291,109 @@ zchunk_slurp (const char *filename, size_t maxsize)
 
 //  --------------------------------------------------------------------------
 //  Create copy of chunk, as new chunk object. Returns a fresh zchunk_t
-//  object, or NULL if there was not enough heap memory.
+//  object, or null if there was not enough heap memory. If chunk is null,
+//  or memory was exhausted, returns null.
 
 zchunk_t *
 zchunk_dup (zchunk_t *self)
 {
+    if (self) {
+        assert (zchunk_is (self));
+        return zchunk_new (self->data, self->max_size);
+    }
+    else
+        return NULL;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return chunk data encoded as printable hex string. Caller must free
+//  string when finished with it.
+
+char *
+zchunk_strhex (zchunk_t *self)
+{
     assert (self);
     assert (zchunk_is (self));
 
-    return zchunk_new (self->data, self->max_size);
+    static const char
+        hex_char [] = "0123456789ABCDEF";
+
+    size_t size = zchunk_size (self);
+    byte *data = zchunk_data (self);
+    char *hex_str = (char *) zmalloc (size * 2 + 1);
+    if (!hex_str)
+        return NULL;
+
+    uint byte_nbr;
+    for (byte_nbr = 0; byte_nbr < size; byte_nbr++) {
+        hex_str [byte_nbr * 2 + 0] = hex_char [data [byte_nbr] >> 4];
+        hex_str [byte_nbr * 2 + 1] = hex_char [data [byte_nbr] & 15];
+    }
+    hex_str [size * 2] = 0;
+    return hex_str;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return chunk data copied into freshly allocated string
+//  Caller must free string when finished with it.
+
+char *
+zchunk_strdup (zchunk_t *self)
+{
+    assert (self);
+    assert (zchunk_is (self));
+
+    size_t size = zchunk_size (self);
+    char *string = (char *) malloc (size + 1);
+    if (string) {
+        memcpy (string, zchunk_data (self), size);
+        string [size] = 0;
+    }
+    return string;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return true if chunk body is equal to string, excluding terminator
+
+bool
+zchunk_streq (zchunk_t *self, const char *string)
+{
+    assert (self);
+    assert (zchunk_is (self));
+
+    if (  zchunk_size (self) == strlen (string)
+       && memcmp (zchunk_data (self), string, strlen (string)) == 0)
+        return true;
+    else
+        return false;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Create a zframe from a zchunk.  The zframe can be sent in a message.
+
+zframe_t *
+zchunk_pack (zchunk_t *self)
+{
+    assert (self);
+    assert (zchunk_is (self));
+
+    return zframe_new (self->data, self->max_size);
+}
+
+//  --------------------------------------------------------------------------
+//  Create a zchunk from a zframe.
+
+zchunk_t *
+zchunk_unpack (zframe_t *frame)
+{
+    assert (frame);
+    assert (zframe_is (frame));
+
+    return zchunk_new (zframe_data (frame), zframe_size (frame));
 }
 
 
@@ -384,20 +481,40 @@ zchunk_test (bool verbose)
     zchunk_destroy (&chunk);
 
     chunk = zchunk_new (NULL, 10);
+    assert (chunk);
     zchunk_append (chunk, "12345678", 8);
     zchunk_append (chunk, "90ABCDEF", 8);
     zchunk_append (chunk, "GHIJKLMN", 8);
     assert (memcmp (zchunk_data (chunk), "1234567890", 10) == 0);
     assert (zchunk_size (chunk) == 10);
-    
+    assert (zchunk_streq (chunk, "1234567890"));
+    char *string = zchunk_strdup (chunk);
+    assert (streq (string, "1234567890"));
+    free (string);
+    string = zchunk_strhex (chunk);
+    assert (streq (string, "31323334353637383930"));
+    free (string);
+
+    zframe_t *frame = zchunk_pack (chunk);
+    assert (frame);
+
+    zchunk_t *chunk2 = zchunk_unpack (frame);
+    assert (chunk2);
+    assert (memcmp (zchunk_data (chunk2), "1234567890", 10) == 0);
+    zframe_destroy (&frame);
+    zchunk_destroy (&chunk2);
+
     zchunk_t *copy = zchunk_dup (chunk);
+    assert (copy);
     assert (memcmp (zchunk_data (copy), "1234567890", 10) == 0);
     assert (zchunk_size (copy) == 10);
     zchunk_destroy (&copy);
     zchunk_destroy (&chunk);
 
     copy = zchunk_new ("1234567890abcdefghij", 20);
+    assert (copy);
     chunk = zchunk_new (NULL, 8);
+    assert (chunk);
     zchunk_consume (chunk, copy);
     assert (!zchunk_exhausted (copy));
     assert (memcmp (zchunk_data (chunk), "12345678", 8) == 0);

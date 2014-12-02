@@ -1,0 +1,107 @@
+#### zproxy_v2 - run a steerable proxy in the background (deprecated)
+
+The zproxy class provides an equivalent to the ZMQ steerable proxy, on
+all versions of ZeroMQ.
+
+This class is deprecated in CZMQ v3; it works together with zctx, zsocket,
+and other deprecated V2 classes. New applications should use the V3 zproxy
+interface, based on zactor, together with the zsock class for sockets.
+
+This is the class interface:
+
+    
+    //  Constructor
+    //  Create a new zproxy object. You must create the frontend and backend
+    //  sockets, configure them, and connect or bind them, before you pass them
+    //  to the constructor. Do NOT use the sockets again, after passing them to
+    //  this method.
+    CZMQ_EXPORT zproxy_t *
+        zproxy_new (zctx_t *ctx, void *frontend, void *backend);
+    
+    //  Destructor
+    //  Destroy a zproxy object; note this first stops the proxy.
+    CZMQ_EXPORT void
+        zproxy_destroy (zproxy_t **self_p);
+    
+    //  Copy all proxied messages to specified endpoint; if this is NULL, any
+    //  in-progress capturing will be stopped. You must already have bound the
+    //  endpoint to a PULL socket.
+    CZMQ_EXPORT void
+        zproxy_capture (zproxy_t *self, const char *endpoint);
+    
+    //  Pauses a zproxy object; a paused proxy will cease processing messages,
+    //  causing them to be queued up and potentially hit the high-water mark on
+    //  the frontend socket, causing messages to be dropped, or writing
+    //  applications to block.
+    CZMQ_EXPORT void
+        zproxy_pause (zproxy_t *self);
+    
+    //  Resume a zproxy object
+    CZMQ_EXPORT void
+        zproxy_resume (zproxy_t *self);
+    
+    // Self test of this class
+    CZMQ_EXPORT void
+        zproxy_v2_test (bool verbose);
+
+This is the class self test code:
+
+    zctx_t *ctx = zctx_new ();
+    assert (ctx);
+    void *frontend = zsocket_new (ctx, ZMQ_PULL);
+    assert (frontend);
+    int rc = zsocket_bind (frontend, "inproc://frontend");
+    assert (rc == 0);
+    void *backend = zsocket_new (ctx, ZMQ_PUSH);
+    assert (backend);
+    rc = zsocket_bind (backend, "inproc://backend");
+    assert (rc == 0);
+    zproxy_t *proxy = zproxy_new (ctx, frontend, backend);
+    assert (proxy);
+    
+    //  Connect application sockets to proxy
+    void *faucet = zsocket_new (ctx, ZMQ_PUSH);
+    assert (faucet);
+    rc = zsocket_connect (faucet, "inproc://frontend");
+    assert (rc == 0);
+    void *sink = zsocket_new (ctx, ZMQ_PULL);
+    assert (sink);
+    rc = zsocket_connect (sink, "inproc://backend");
+    assert (rc == 0);
+    
+    //  Send some messages and check they arrived
+    zstr_send (faucet, "Hello");
+    char *string = zstr_recv (sink);
+    assert (streq (string, "Hello"));
+    zstr_free (&string);
+    
+    //  Check pause/resume functionality
+    zproxy_pause (proxy);
+    zstr_send (faucet, "World");
+    
+    zproxy_resume (proxy);
+    string = zstr_recv (sink);
+    assert (streq (string, "World"));
+    zstr_free (&string);
+    
+    //  Create capture socket, must be a PULL socket
+    void *capture = zsocket_new (ctx, ZMQ_PULL);
+    assert (capture);
+    rc = zsocket_bind (capture, "inproc://capture");
+    assert (rc == 0);
+    
+    //  Switch on capturing, check that it works
+    zproxy_capture (proxy, "inproc://capture");
+    zstr_send (faucet, "Hello");
+    
+    string = zstr_recv (sink);
+    assert (streq (string, "Hello"));
+    zstr_free (&string);
+    
+    string = zstr_recv (capture);
+    assert (streq (string, "Hello"));
+    zstr_free (&string);
+    zproxy_destroy (&proxy);
+    zctx_destroy (&ctx);
+    
+

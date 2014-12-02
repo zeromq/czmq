@@ -1,0 +1,71 @@
+#### zactor - simple actor framework
+
+The zactor class provides a simple actor framework. It replaces the
+CZMQ zthread class, which had a complex API that did not fit the CLASS
+standard. A CZMQ actor is implemented as a thread plus a PAIR-PAIR
+pipe. The constructor and destructor are always synchronized, so the
+caller can be sure all resources are created, and destroyed, when these
+calls complete. (This solves a major problem with zthread, that a caller
+could not be sure when a child thread had finished.)
+
+A zactor_t instance acts like a zsock_t and you can pass it to any CZMQ
+method that would take a zsock_t argument, including methods in zframe,
+zmsg, zstr, zpoller, and zloop.
+
+An actor function MUST call zsock_signal (pipe) when initialized
+and MUST listen to pipe and exit on $TERM command.
+
+
+This is the class interface:
+
+    //  Actors get a pipe and arguments from caller
+    typedef void (zactor_fn) (zsock_t *pipe, void *args);
+    
+    //  Create a new actor passing arbitrary arguments reference.
+    CZMQ_EXPORT zactor_t *
+        zactor_new (zactor_fn *task, void *args);
+    
+    //  Destroy an actor.
+    CZMQ_EXPORT void
+        zactor_destroy (zactor_t **p_self);
+    
+    //  Send a zmsg message to the actor, take ownership of the message
+    //  and destroy when it has been sent.
+    CZMQ_EXPORT int
+        zactor_send (zactor_t *self, zmsg_t **msg_p);
+    
+    //  Receive a zmsg message from the actor. Returns NULL if the actor
+    //  was interrupted before the message could be received, or if there
+    //  was a timeout on the actor.
+    CZMQ_EXPORT zmsg_t *
+        zactor_recv (zactor_t *self);
+    
+    //  Probe the supplied object, and report if it looks like a zactor_t.
+    CZMQ_EXPORT bool
+        zactor_is (void *self);
+    
+    //  Probe the supplied reference. If it looks like a zactor_t instance,
+    //  return the underlying libzmq actor handle; else if it looks like
+    //  a libzmq actor handle, return the supplied value.
+    CZMQ_EXPORT void *
+        zactor_resolve (void *self);
+    
+    //  Return the actor's zsock handle. Use this when you absolutely need
+    //  to work with the zsock instance rather than the actor.
+    CZMQ_EXPORT zsock_t *
+        zactor_sock (zactor_t *self);
+    
+    //  Self test of this class
+    CZMQ_EXPORT void
+        zactor_test (bool verbose);
+
+This is the class self test code:
+
+    zactor_t *actor = zactor_new (echo_actor, "Hello, World");
+    assert (actor);
+    zstr_sendx (actor, "ECHO", "This is a string", NULL);
+    char *string = zstr_recv (actor);
+    assert (streq (string, "This is a string"));
+    free (string);
+    zactor_destroy (&actor);
+

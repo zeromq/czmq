@@ -1,5 +1,5 @@
 /*  =========================================================================
-    zlist - generic type-free list container
+    zlist - simple generic list container
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -15,7 +15,8 @@
 @header
     Provides a generic container implementing a fast singly-linked list. You
     can use this to construct multi-dimensional lists, and other structures
-    together with other generic containers like zhash.
+    together with other generic containers like zhash. This is a simple
+    class. For demanding applications we recommend using zlistx.
 @discuss
     To iterate through a list, use zlist_first to get the first item, then
     loop while not null, and do zlist_next at the end of each iteration.
@@ -65,17 +66,7 @@ zlist_destroy (zlist_t **self_p)
     assert (self_p);
     if (*self_p) {
         zlist_t *self = *self_p;
-        node_t *node = (*self_p)->head;
-        while (node) {
-            node_t *next = node->next;
-            if (node->free_fn)
-                (node->free_fn) (node->item);
-            else
-            if (self->autofree)
-                free (node->item);
-            free (node);
-            node = next;
-        }
+        zlist_purge (self);
         free (self);
         *self_p = NULL;
     }
@@ -96,6 +87,26 @@ zlist_first (zlist_t *self)
     else
         return NULL;
 }
+
+
+//  --------------------------------------------------------------------------
+//  Return the next item. If the list is empty, returns NULL. To move to
+//  the start of the list call zlist_first (). Advances the cursor.
+
+void *
+zlist_next (zlist_t *self)
+{
+    assert (self);
+    if (self->cursor)
+        self->cursor = self->cursor->next;
+    else
+        self->cursor = self->head;
+    if (self->cursor)
+        return self->cursor->item;
+    else
+        return NULL;
+}
+
 
 //  --------------------------------------------------------------------------
 //  Return the item at the tail of list. If the list is empty, returns NULL.
@@ -121,7 +132,7 @@ void *
 zlist_head (zlist_t *self)
 {
     assert (self);
-    return self->head? self->head->item: NULL;
+    return self->head ? self->head->item : NULL;
 }
 
 
@@ -133,21 +144,18 @@ void *
 zlist_tail (zlist_t *self)
 {
     assert (self);
-    return self->tail? self->tail->item: NULL;
+    return self->tail ? self->tail->item : NULL;
 }
 
+
 //  --------------------------------------------------------------------------
-//  Return the next item. If the list is empty, returns NULL. To move to
-//  the start of the list call zlist_first (). Advances the cursor.
+//  Return current item in the list. If the list is empty, or the cursor
+//  passed the end of the list, returns NULL. Does not change the cursor.
 
 void *
-zlist_next (zlist_t *self)
+zlist_item (zlist_t *self)
 {
     assert (self);
-    if (self->cursor)
-        self->cursor = self->cursor->next;
-    else
-        self->cursor = self->head;
     if (self->cursor)
         return self->cursor->item;
     else
@@ -156,8 +164,8 @@ zlist_next (zlist_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Append an item to the end of the list, return 0 if OK
-//  or -1 if this failed for some reason (out of memory).
+//  Append an item to the end of the list, return 0 if OK or -1 if this
+//  failed for some reason (out of memory).
 
 int
 zlist_append (zlist_t *self, void *item)
@@ -173,16 +181,16 @@ zlist_append (zlist_t *self, void *item)
     //  If necessary, take duplicate of (string) item
     if (self->autofree)
         item = strdup ((char *) item);
-    
+
     node->item = item;
     if (self->tail)
         self->tail->next = node;
     else
         self->head = node;
-    
+
     self->tail = node;
     node->next = NULL;
-    
+
     self->size++;
     self->cursor = NULL;
     return 0;
@@ -190,8 +198,8 @@ zlist_append (zlist_t *self, void *item)
 
 
 //  --------------------------------------------------------------------------
-//  Push an item to the start of the list, return 0 if OK
-//  or -1 if this failed for some reason (out of memory).
+//  Push an item to the start of the list, return 0 if OK or -1 if this
+//  failed for some reason (out of memory).
 
 int
 zlist_push (zlist_t *self, void *item)
@@ -201,16 +209,12 @@ zlist_push (zlist_t *self, void *item)
     if (!node)
         return -1;
 
-    //  If necessary, take duplicate of (string) item
-    if (self->autofree)
-        item = strdup ((char *) item);
-
     node->item = item;
     node->next = self->head;
     self->head = node;
     if (self->tail == NULL)
         self->tail = node;
-    
+
     self->size++;
     self->cursor = NULL;
     return 0;
@@ -263,50 +267,19 @@ zlist_remove (zlist_t *self, void *item)
             self->tail = prev;
         if (self->cursor == node)
             self->cursor = prev;
+
         if (node->free_fn)
-            (node->free_fn) (node->item);
-        else
-        if (self->autofree)
-            free (node->item);
+            (node->free_fn)(node->item);
+
         free (node);
         self->size--;
     }
 }
 
-//  --------------------------------------------------------------------------
-//  Set a free function for the specified list item. When the item is
-//  destroyed, the free function, if any, is called on that item.
-//  Use this when list items are dynamically allocated, to ensure that
-//  you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
-//  Returns the item, or NULL if there is no such item.
-
-void *
-zlist_freefn (zlist_t *self, void *item, zlist_free_fn *fn, bool at_tail)
-{
-    node_t *node = self->head;
-    if (at_tail)
-        node = self->tail;
-    while (node) {
-        if (node->item == item) {
-            node->free_fn = fn;
-            return item;
-        }
-        node = node->next;
-    }
-    return NULL;
-}
-
-static void
-s_zlist_free (void *data)
-{
-    zlist_t *self = (zlist_t *)data;
-    zlist_destroy (&self);
-}
 
 //  --------------------------------------------------------------------------
-//  Make a copy of list. If the list has autofree set, the copied list will
-//  duplicate all items, which must be strings. Otherwise, the list will hold
-//  pointers back to the items in the original list.
+//  Make a copy of list. The list will hold pointers back to the items in
+//  the original list.
 
 zlist_t *
 zlist_dup (zlist_t *self)
@@ -315,8 +288,6 @@ zlist_dup (zlist_t *self)
         return NULL;
 
     zlist_t *copy = zlist_new ();
-    copy->autofree = self->autofree;
-
     if (copy) {
         node_t *node;
         for (node = self->head; node; node = node->next) {
@@ -327,6 +298,32 @@ zlist_dup (zlist_t *self)
         }
     }
     return copy;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Purge all items from list
+
+void
+zlist_purge (zlist_t *self)
+{
+    assert (self);
+    node_t *node = self->head;
+    while (node) {
+        node_t *next = node->next;
+        if (self->autofree)
+            free (node->item);
+        else
+        if (node->free_fn)
+            (node->free_fn)(node->item);
+
+        free (node);
+        node = next;
+    }
+    self->head = NULL;
+    self->tail = NULL;
+    self->cursor = NULL;
+    self->size = 0;
 }
 
 
@@ -347,23 +344,20 @@ zlist_size (zlist_t *self)
 void
 zlist_sort (zlist_t *self, zlist_compare_fn *compare)
 {
-    //  Uses a comb sort, which is simple and reasonably fast. The
-    //  algorithm is based on Wikipedia's C pseudo-code for comb sort.
-    size_t gap = self->size;
-    bool swapped = false;
-    while (gap > 1 || swapped) {
-        if (gap > 1)
-            gap = (size_t) ((double) gap / 1.247330950103979);
-        
+    //  Uses a comb sort, which is simple and reasonably fast.
+    //  See http://en.wikipedia.org/wiki/Comb_sort
+    int gap = self->size;
+    while (gap > 1) {
+        gap = (int) ((double) gap / 1.3);
         node_t *base = self->head;
         node_t *test = self->head;
         int jump = gap;
         while (jump--)
             test = test->next;
-        
-        swapped = false;
+
+        bool swapped = false;
         while (base && test) {
-            if ((*compare) (base->item, test->item)) {
+            if ((*compare)(base->item, test->item)) {
                 //  It's trivial to swap items in a generic container
                 void *item = base->item;
                 base->item = test->item;
@@ -373,18 +367,35 @@ zlist_sort (zlist_t *self, zlist_compare_fn *compare)
             base = base->next;
             test = test->next;
         }
+        if (!swapped)
+            break;
     }
 }
 
-static bool
-s_compare (void *item1, void *item2)
-{
-    if (strcmp ((char *) item1, (char *) item2) > 0)
-        return true;
-    else
-        return false;
-}
 
+//  --------------------------------------------------------------------------
+//  Set a free function for the specified list item. When the item is
+//  destroyed, the free function, if any, is called on that item.
+//  Use this when list items are dynamically allocated, to ensure that
+//  you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
+//  Returns the item, or NULL if there is no such item.
+
+void *
+zlist_freefn (zlist_t *self, void *item, zlist_free_fn *fn, bool at_tail)
+{
+    node_t *node = self->head;
+    if (at_tail)
+        node = self->tail;
+
+    while (node) {
+        if (node->item == item) {
+            node->free_fn = fn;
+            return item;
+        }
+        node = node->next;
+    }
+    return NULL;
+}
 
 //  --------------------------------------------------------------------------
 //  Set list for automatic item destruction; item values MUST be strings.
@@ -401,6 +412,23 @@ zlist_autofree (zlist_t *self)
 {
     assert (self);
     self->autofree = true;
+}
+
+
+static void
+s_zlist_free (void *data)
+{
+    zlist_t *self = (zlist_t *) data;
+    zlist_destroy (&self);
+}
+
+static bool
+s_compare (void *item1, void *item2)
+{
+    if (strcmp ((char *) item1, (char *) item2) > 0)
+        return true;
+    else
+        return false;
 }
 
 
@@ -471,6 +499,7 @@ zlist_test (int verbose)
     zlist_push (list, bread);
     assert (zlist_size (list) == 2);
     assert (zlist_first (list) == bread);
+    assert (zlist_item (list) == bread);
 
     zlist_append (list, wine);
     assert (zlist_size (list) == 3);
@@ -485,9 +514,9 @@ zlist_test (int verbose)
     item = (char *) zlist_pop (list);
     assert (item == bread);
     item = (char *) zlist_pop (list);
-    assert (item == wine);
-    item = (char *) zlist_pop (list);
     assert (item == cheese);
+    item = (char *) zlist_pop (list);
+    assert (item == wine);
     assert (zlist_size (list) == 0);
 
     assert (zlist_size (sub_list) == 3);
