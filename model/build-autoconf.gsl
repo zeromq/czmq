@@ -65,7 +65,7 @@ src_lib$(project.name)_la_LDFLAGS += \\
 endif
 
 .if count(package_dependency, defined(package_dependency.for_lib) | defined (package_dependency.for_all)) > 0
-src_lib$(project.name)_la_LIBS = \\
+src_lib$(project.name)_la_LIBADD = \\
 .for package_dependency where defined (package_dependency.for_lib) | defined (package_dependency.for_all)
 .   if last()
     \${$(package_dependency.name)_LIBS}
