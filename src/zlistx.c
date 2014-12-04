@@ -287,6 +287,21 @@ zlistx_handle (zlistx_t *self)
     return self->cursor == self->head? NULL: self->cursor;
 }
 
+//  --------------------------------------------------------------------------
+//  Returns the item associated with the given list handle, or NULL if passed
+//  handle is NULL. asserts that the passed in ptr points to a list node.
+
+void *
+zlistx_handle_item (void *handle)
+{
+    if (!handle)
+        return NULL;
+
+    node_t *node = (node_t *) handle;
+    assert (node->tag == NODE_TAG);
+    return node->item;
+}
+
 
 //  --------------------------------------------------------------------------
 //  Find an item in the list, searching from the start. Uses the item
@@ -633,6 +648,10 @@ zlistx_test (int verbose)
     zlistx_sort (list);
     assert (zlistx_size (list) == 2);
     void *handle = zlistx_find (list, "hello");
+    char *item1 = (char *) zlistx_item (list);
+    char *item2 = (char *) zlistx_handle_item (handle);
+    assert (item1 == item2);
+    assert (streq (item1, "hello"));
     zlistx_delete (list, handle);
     assert (zlistx_size (list) == 1);
     char *string = (char *) zlistx_detach (list, NULL);
