@@ -77,6 +77,11 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void *
     zlistx_handle (zlistx_t *self);
 
+//  Returns the item associated with the given list handle, or NULL if passed
+//  in handle is NULL. Asserts that the passed in handle points to a list element.
+CZMQ_EXPORT  void *
+    zlistx_handle_item (void *handle);
+
 //  Find an item in the list, searching from the start. Uses the item
 //  comparator, if any, else compares item values directly. Returns the
 //  item handle found, or NULL. Sets the cursor to the found item, if any.
