@@ -78,12 +78,16 @@ This is the class interface:
     //  Detach an item from the list, using its handle. The item is not modified,
     //  and the caller is responsible for destroying it if necessary. If handle is
     //  null, detaches the first item on the list. Returns item that was detached,
-    //  or null if none was.
+    //  or null if none was. If cursor was at item, moves cursor to previous item,
+    //  so you can detach items while iterating forwards through a list.
     CZMQ_EXPORT void *
         zlistx_detach (zlistx_t *self, void *handle);
     
     //  Delete an item, using its handle. Calls the item destructor is any is
-    //  set. If handle is null, deletes the first item on the list.
+    //  set. If handle is null, deletes the first item on the list. Returns 0
+    //  if an item was deleted, -1 if not. If cursor was at item, moves cursor
+    //  to previous item, so you can delete items while iterating forwards
+    //  through a list.
     CZMQ_EXPORT int
         zlistx_delete (zlistx_t *self, void *handle);
         
