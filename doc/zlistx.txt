@@ -64,7 +64,7 @@ CZMQ_EXPORT void *
 //  Returns the handle of the item at the cursor, or NULL if the cursor is
 //  not pointing to an item.
 CZMQ_EXPORT void *
-    zlistx_handle (zlistx_t *self);
+    zlistx_cursor (zlistx_t *self);
 
 //  Find an item in the list, searching from the start. Uses the item
 //  comparator, if any, else compares item values directly. Returns the
@@ -252,6 +252,15 @@ assert (zlistx_size (copy) == 10);
 assert (streq ((char *) zlistx_first (copy), "eight"));
 assert (streq ((char *) zlistx_last (copy), "two"));
 zlistx_destroy (&copy);
+
+//  Delete items while iterating
+string = (char *) zlistx_first (list);
+assert (streq (string, "eight"));
+string = (char *) zlistx_next (list);
+assert (streq (string, "five"));
+zlistx_delete (list, zlistx_cursor (list));
+string = (char *) zlistx_next (list);
+assert (streq (string, "four"));
 
 zlistx_purge (list);
 zlistx_destroy (&list);

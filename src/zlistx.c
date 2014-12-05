@@ -281,7 +281,7 @@ zlistx_item (zlistx_t *self)
 //  not pointing to an item.
 
 void *
-zlistx_handle (zlistx_t *self)
+zlistx_cursor (zlistx_t *self)
 {
     assert (self);
     return self->cursor == self->head? NULL: self->cursor;
@@ -698,7 +698,7 @@ zlistx_test (int verbose)
     assert (streq (string, "eight"));
     string = (char *) zlistx_next (list);
     assert (streq (string, "five"));
-    zlistx_delete (list, zlistx_handle (list));
+    zlistx_delete (list, zlistx_cursor (list));
     string = (char *) zlistx_next (list);
     assert (streq (string, "four"));
 

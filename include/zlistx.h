@@ -75,7 +75,7 @@ CZMQ_EXPORT void *
 //  Returns the handle of the item at the cursor, or NULL if the cursor is
 //  not pointing to an item.
 CZMQ_EXPORT void *
-    zlistx_handle (zlistx_t *self);
+    zlistx_cursor (zlistx_t *self);
 
 //  Find an item in the list, searching from the start. Uses the item
 //  comparator, if any, else compares item values directly. Returns the
