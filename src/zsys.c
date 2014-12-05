@@ -330,7 +330,7 @@ zsys_close (void *handle, const char *filename, size_t line_nbr)
         s_sockref_t *sockref = (s_sockref_t *) zlistx_first (s_sockref_list);
         while (sockref) {
             if (sockref->handle == handle) {
-                zlistx_delete (s_sockref_list, zlistx_handle (s_sockref_list));
+                zlistx_delete (s_sockref_list, zlistx_cursor (s_sockref_list));
                 free (sockref);
                 break;
             }

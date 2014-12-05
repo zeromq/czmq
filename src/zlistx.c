@@ -281,7 +281,7 @@ zlistx_item (zlistx_t *self)
 //  not pointing to an item.
 
 void *
-zlistx_handle (zlistx_t *self)
+zlistx_cursor (zlistx_t *self)
 {
     assert (self);
     return self->cursor == self->head? NULL: self->cursor;
@@ -331,7 +331,8 @@ zlistx_find (zlistx_t *self, void *item)
 //  Detach an item from the list, using its handle. The item is not modified,
 //  and the caller is responsible for destroying it if necessary. If handle is
 //  null, detaches the first item on the list. Returns item that was detached,
-//  or null if none was.
+//  or null if none was. If cursor was at item, moves cursor to previous item,
+//  so you can detach items while iterating forwards through a list.
 
 void *
 zlistx_detach (zlistx_t *self, void *handle)
@@ -341,15 +342,17 @@ zlistx_detach (zlistx_t *self, void *handle)
     if (!node)
         node = self->head->next == self->head? NULL: self->head->next;
 
-    //  Now detach node from list, without destroying it
+    //  Now detach node from list, without destroying item
     if (node) {
+        //  Reposition cursor so that delete/detach works during iteration
+        if (self->cursor == node)
+            self->cursor = self->cursor->prev;
         //  Remove node from list
         assert (node->tag == NODE_TAG);
         s_node_relink (node, node->prev, node->next);
         node->tag = 0xDeadBeef;
         void *item = node->item;
         free (node);
-        self->cursor = self->head;
         self->size--;
         return item;
     }
@@ -363,7 +366,9 @@ zlistx_detach (zlistx_t *self, void *handle)
 //  --------------------------------------------------------------------------
 //  Delete an item, using its handle. Calls the item destructor is any is
 //  set. If handle is null, deletes the first item on the list. Returns 0
-//  if an item was deleted, -1 if not.
+//  if an item was deleted, -1 if not. If cursor was at item, moves cursor
+//  to previous item, so you can delete items while iterating forwards
+//  through a list.
 
 int
 zlistx_delete (zlistx_t *self, void *handle)
@@ -706,6 +711,15 @@ zlistx_test (int verbose)
     assert (streq ((char *) zlistx_first (copy), "eight"));
     assert (streq ((char *) zlistx_last (copy), "two"));
     zlistx_destroy (&copy);
+
+    //  Delete items while iterating
+    string = (char *) zlistx_first (list);
+    assert (streq (string, "eight"));
+    string = (char *) zlistx_next (list);
+    assert (streq (string, "five"));
+    zlistx_delete (list, zlistx_cursor (list));
+    string = (char *) zlistx_next (list);
+    assert (streq (string, "four"));
 
     zlistx_purge (list);
     zlistx_destroy (&list);

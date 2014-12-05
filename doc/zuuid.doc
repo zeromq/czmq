@@ -28,6 +28,12 @@ This is the class interface:
     CZMQ_EXPORT char *
         zuuid_str (zuuid_t *self);
     
+    // Return UUID as formatted string in the canonical format 8-4-4-4-12,
+    // lower case.  The caller should free the freshly allocated string.
+    // See: http://en.wikipedia.org/wiki/Universally_unique_identifier
+    CZMQ_EXPORT char *
+        zuuid_formatted_str (zuuid_t *self);
+    
     //  Set UUID to new supplied ZUUID_LEN-octet value
     CZMQ_EXPORT void
         zuuid_set (zuuid_t *self, byte *source);
@@ -79,6 +85,11 @@ This is the class self test code:
     zuuid_export (uuid, copy_uuid);
     zuuid_set (uuid, copy_uuid);
     assert (streq (zuuid_str (uuid), myuuid));
+    
+    // Check the formatted string output
+    char *formatted_str = zuuid_formatted_str (uuid);
+    assert (streq (formatted_str, "8cb3e9a9-649b-4bef-8de2-25e9c2cebb38"));
+    zstr_free (&formatted_str);
     
     zuuid_destroy (&uuid);
     zuuid_destroy (&copy);
