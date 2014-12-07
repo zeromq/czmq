@@ -131,7 +131,8 @@ s_self_handle_pipe (self_t *self)
         char *filename = zmsg_popstr (request);
         zhashx_destroy (&self->passwords);
         self->passwords = zhashx_new ();
-        zhashx_load (self->passwords, filename);
+        if (zhashx_load (self->passwords, filename) && self->verbose)
+            zsys_info ("zauth: could not load file=%s", filename);
         zstr_free (&filename);
         zsock_signal (self->pipe, 0);
     }
