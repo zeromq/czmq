@@ -23,13 +23,16 @@
       - base32
       - base32hex
       - base16
+    * Z85 (http://rfc.zeromq.org/spec:32)
     All RFC4648 base64 and base32 variants support padding the output. The pad
     character is configurable. Default is padding on, with character '='.
     Additionally, in some cases (e.g. MIME), splitting the output into lines of a
     specific length is required. This feature is also supported, though
     turned off by default.
-    Planned features:
-    * z85
+    The z85 mode does neither padding nor line breaks; it is merely a wrapping
+    of the corresponding libzmq methods. Encoding will assert if input length is
+    not divisible by 4 and decoding will assert if input length is not
+    divisible by 5.
 @end
 */
 
@@ -48,14 +51,15 @@ struct _zarmour_t {
 
 
 //  Textual names of modes
-const int _NUM_MODES = 5;
+const int _NUM_MODES = 6;
 static char
 s_codec_names[][16] = {
     "base64",
     "base64url",
     "base32",
     "base32hex",
-    "base16"
+    "base16",
+    "z85"
 };
 
 
@@ -355,6 +359,41 @@ s_base16_decode (const char *data, size_t *size, const char *alphabet, int lineb
 }
 
 
+//  ---------------------------------------------------------------------------
+//  z85
+
+static char *
+s_z85_encode (const byte *data, size_t length)
+{
+    assert (data != NULL);
+    assert (length % 4 == 0);
+    char *str = (char *) zmalloc (5 * length / 4 + 1);
+    char *result = zmq_z85_encode (str, data, length);
+    if (result == NULL) {
+        free (str);
+        str = NULL;
+    }
+    return str;
+}
+
+static byte *
+s_z85_decode (const char *data, size_t *size)
+{
+    assert (data);
+    assert (size);
+    int length = strlen (data);
+    assert (length % 5 == 0);
+    *size = 4 * length / 5 + 1;
+    byte *bytes = (byte *) zmalloc (*size);
+    uint8_t *result = zmq_z85_decode (bytes, data);
+    if (result == NULL) {
+        free (bytes);
+        bytes = NULL;
+    }
+    return bytes;
+}
+
+
 //  Definition of encode method
 char *
 zarmour_encode (zarmour_t *self, const byte *data, size_t data_size)
@@ -380,9 +419,14 @@ zarmour_encode (zarmour_t *self, const byte *data, size_t data_size)
         case ZARMOUR_MODE_BASE16:
             encoded = s_base16_encode (data, data_size, s_base16_alphabet);
             break;
+        case ZARMOUR_MODE_Z85:
+            encoded = s_z85_encode (data, data_size);
+            break;
     }
 
-    if (self->line_breaks && self->line_length > 0 && strlen (encoded) > self->line_length) {
+    if (self->mode != ZARMOUR_MODE_Z85 &&
+        self->line_breaks && self->line_length > 0 &&
+        strlen (encoded) > self->line_length) {
         char *line_end = self->line_end;
         int nbr_lines = strlen (encoded) / self->line_length;
         size_t new_length =
@@ -445,6 +489,9 @@ zarmour_decode (zarmour_t *self, const char *data, size_t *decode_size)
 
         case ZARMOUR_MODE_BASE16:
             return s_base16_decode (data, decode_size, s_base16_alphabet, linebreakchars);
+
+        case ZARMOUR_MODE_Z85:
+            return s_z85_decode (data, decode_size);
     }
 
     return NULL;
@@ -777,6 +824,32 @@ zarmour_test (bool verbose)
     s_armour_decode (self, "666f6f6261", "fooba", verbose);
     s_armour_decode (self, "666f6f626172", "foobar", verbose);
 
+
+    //  Z85 test is homemade; using 0, 4 and 8 bytes, with precalculated
+    //  test vectors created with a libzmq test.
+    //  ----------------------------------------------------------------
+
+    //  Make a fake curve key from hex (base16) string, making sure
+    //  there are no null bytes inside, so we can use our test utility
+    zarmour_set_mode (self, ZARMOUR_MODE_BASE16);
+    zarmour_set_line_breaks (self, false);
+    size_t key_len;
+    byte *key_data = zarmour_decode (self,
+                                     "4E6F87E2FB6EB22A1EF5E257B75D79124949565F0B8B36A878A4F03111C96E0B",
+                                     &key_len);
+
+    zarmour_set_mode (self, ZARMOUR_MODE_Z85);  //  Z85 mode does not support padding or line breaks
+    zarmour_set_pad (self, false);              //  so these two are superfluous;
+    zarmour_set_line_breaks (self, false);      //  just for consistency
+    if (verbose)
+        zarmour_print (self);
+    s_armour_test (self, "", "", verbose);
+    s_armour_test (self, "foob", "w]zP%", verbose);
+    s_armour_test (self, "foobar!!", "w]zP%vr9Im", verbose);
+    s_armour_test (self, (char *) key_data, "ph+{E}!&X?9}!I]W{sm(nL8@&3Yu{wC+<*-5Y[[#", verbose);
+    free (key_data);
+
+    //  Armouring longer byte array to test line breaks
     zarmour_set_pad (self, true);
     zarmour_set_line_breaks (self, true);
     byte test_data[256];
@@ -793,6 +866,8 @@ zarmour_test (bool verbose)
     zarmour_set_mode (self, ZARMOUR_MODE_BASE32_HEX);
     s_armour_test_long (self, test_data, 256, verbose);
     zarmour_set_mode (self, ZARMOUR_MODE_BASE16);
+    s_armour_test_long (self, test_data, 256, verbose);
+    zarmour_set_mode (self, ZARMOUR_MODE_Z85);
     s_armour_test_long (self, test_data, 256, verbose);
 
     zarmour_destroy (&self);
