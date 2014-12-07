@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zsys - system-level methods
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -206,7 +206,7 @@ zsys_shutdown (void)
 {
     if (!s_initialized)
         return;
-    
+
     s_initialized = false;
 
     //  The atexit handler is called when the main function exits;
@@ -297,12 +297,19 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
     //  Add socket to reference tracker so we can report leaks; this is
     //  done only when the caller passes a filename/line_nbr
     if (filename) {
-        s_sockref_t *sockref = (s_sockref_t *) malloc (sizeof (s_sockref_t));
-        sockref->handle = handle;
-        sockref->type = type;
-        sockref->filename = filename;
-        sockref->line_nbr = line_nbr;
-        zlistx_add_end (s_sockref_list, sockref);
+        s_sockref_t *sockref = (s_sockref_t *) zmalloc (sizeof (s_sockref_t));
+        if (sockref) {
+            sockref->handle = handle;
+            sockref->type = type;
+            sockref->filename = filename;
+            sockref->line_nbr = line_nbr;
+            zlistx_add_end (s_sockref_list, sockref);
+        }
+        else {
+            zmq_close (handle);
+            ZMUTEX_UNLOCK (s_mutex);
+            return NULL;
+        }
     }
     s_open_sockets++;
     ZMUTEX_UNLOCK (s_mutex);
@@ -323,7 +330,7 @@ zsys_close (void *handle, const char *filename, size_t line_nbr)
         s_sockref_t *sockref = (s_sockref_t *) zlistx_first (s_sockref_list);
         while (sockref) {
             if (sockref->handle == handle) {
-                zlistx_delete (s_sockref_list, zlistx_handle (s_sockref_list));
+                zlistx_delete (s_sockref_list, zlistx_cursor (s_sockref_list));
                 free (sockref);
                 break;
             }
@@ -361,7 +368,7 @@ zsys_sockname (int socktype)
 
 //  --------------------------------------------------------------------------
 //  Create a pipe, which consists of two PAIR sockets connected over inproc.
-//  The pipe is configured to use the zsys_pipehwm setting. Returns the 
+//  The pipe is configured to use the zsys_pipehwm setting. Returns the
 //  frontend socket successful, NULL if failed.
 
 zsock_t *
@@ -609,6 +616,8 @@ zsys_dir_create (const char *pathname, ...)
     va_start (argptr, pathname);
     char *formatted = zsys_vprintf (pathname, argptr);
     va_end (argptr);
+    if (!formatted)
+        return -1;
 
     //  Create parent directory levels if needed
     char *slash = strchr (formatted + 1, '/');
@@ -651,6 +660,8 @@ zsys_dir_delete (const char *pathname, ...)
     va_start (argptr, pathname);
     char *formatted = zsys_vprintf (pathname, argptr);
     va_end (argptr);
+    if (!formatted)
+        return -1;
 
 #if (defined (__WINDOWS__))
     int rc = RemoveDirectoryA (formatted) ? 0 : -1;
@@ -735,7 +746,10 @@ char *
 zsys_vprintf (const char *format, va_list argptr)
 {
     int size = 256;
-    char *string = (char *) malloc (size);
+    char *string = (char *) zmalloc (size);
+    if (!string)
+        return NULL;
+
     //  Using argptr is destructive, so we take a copy each time we need it
     //  We define va_copy for Windows in czmq_prelude.h
     va_list my_argptr;
@@ -758,7 +772,7 @@ zsys_vprintf (const char *format, va_list argptr)
     if (required >= size) {
         size = required + 1;
         free (string);
-        string = (char *) malloc (size);
+        string = (char *) zmalloc (size);
         if (string) {
             va_copy (my_argptr, argptr);
             vsnprintf (string, size, format, my_argptr);
@@ -855,7 +869,7 @@ zsys_udp_recv (SOCKET udpsock, char *peername)
         buffer, UDP_FRAME_MAX,
         0,      //  Flags
         (struct sockaddr *) &address, &address_len);
-    
+
     if (size == SOCKET_ERROR)
         zsys_socket_error ("recvfrom");
 
@@ -1288,6 +1302,7 @@ zsys_set_interface (const char *value)
     zsys_init ();
     free (s_interface);
     s_interface = strdup (value);
+    assert (s_interface);
 }
 
 
@@ -1318,6 +1333,7 @@ zsys_set_logident (const char *value)
 #elif defined (__WINDOWS__)
     //  TODO: hook in Windows event log for Windows
 #endif
+    assert (s_logident);
 }
 
 

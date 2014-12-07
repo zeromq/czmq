@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     czmq_prelude.h - CZMQ environment
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -354,7 +354,7 @@
 #   define S_IRUSR S_IREAD
 #endif
 #ifndef S_IWUSR
-#   define S_IWUSR S_IWRITE 
+#   define S_IWUSR S_IWRITE
 #endif
 #ifndef S_ISDIR
 #   define S_ISDIR(m) (((m) & S_IFDIR) != 0)
@@ -432,11 +432,13 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
 #       else
     typedef long ssize_t;
 #       endif
+#   endif
+#   if (!defined (__MINGW32__) || (defined (__MINGW32__) && defined (__IS_64BIT__)))
     typedef __int32 int32_t;
     typedef __int64 int64_t;
     typedef unsigned __int32 uint32_t;
     typedef unsigned __int64 uint64_t;
-#   endif
+#   endif    
 #   if (!defined (PRId64))
 #       define PRId64   "I64d"
 #   endif
@@ -448,15 +450,36 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
     typedef unsigned long ulong;
     typedef unsigned int uint;
     //  This fixes header-order dependence problem with some Linux versions
-#elif (defined (__UTYPE_LINUX)) 
+#elif (defined (__UTYPE_LINUX))
 #   if (__STDC_VERSION__ >= 199901L)
     typedef unsigned int uint;
 #   endif
 #endif
 
+//- Non-portable declaration specifiers -------------------------------------
+
+#if defined (__WINDOWS__)
+#   if defined LIBCZMQ_STATIC
+#       define CZMQ_EXPORT
+#   elif defined LIBCZMQ_EXPORTS
+#       define CZMQ_EXPORT __declspec(dllexport)
+#   else
+#       define CZMQ_EXPORT __declspec(dllimport)
+#   endif
+#else
+#   define CZMQ_EXPORT
+#endif
+
+//  For thread-local storage
+#if defined (__WINDOWS__)
+#   define CZMQ_THREADLS __declspec(thread)
+#else
+#   define CZMQ_THREADLS __thread
+#endif
+
 //- Memory allocations ------------------------------------------------------
 
-extern volatile uint64_t zsys_allocs;
+CZMQ_EXPORT extern volatile uint64_t zsys_allocs;
 
 //  Replacement for malloc() which asserts if we run out of heap, and
 //  which zeroes the allocated block.
@@ -532,27 +555,6 @@ typedef int SOCKET;
 #   elif defined (__UNIX__)
 #       include <uuid/uuid.h>
 #   endif
-#endif
-
-//- Non-portable declaration specifiers -------------------------------------
-
-#if defined (__WINDOWS__)
-#   if defined LIBCZMQ_STATIC
-#       define CZMQ_EXPORT
-#   elif defined LIBCZMQ_EXPORTS
-#       define CZMQ_EXPORT __declspec(dllexport)
-#   else
-#       define CZMQ_EXPORT __declspec(dllimport)
-#   endif
-#else
-#   define CZMQ_EXPORT
-#endif
-
-//  For thread-local storage
-#if defined (__WINDOWS__)
-#   define CZMQ_THREADLS __declspec(thread)
-#else
-#   define CZMQ_THREADLS __thread
 #endif
 
 //- Always include ZeroMQ header file ---------------------------------------

@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zframe - working with single message frames
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -209,7 +209,9 @@ zframe_strhex (zframe_t *self)
 
     size_t size = zframe_size (self);
     byte *data = zframe_data (self);
-    char *hex_str = (char *) malloc (size * 2 + 1);
+    char *hex_str = (char *) zmalloc (size * 2 + 1);
+    if (!hex_str)
+        return NULL;
 
     uint byte_nbr;
     for (byte_nbr = 0; byte_nbr < size; byte_nbr++) {
@@ -233,8 +235,10 @@ zframe_strdup (zframe_t *self)
 
     size_t size = zframe_size (self);
     char *string = (char *) malloc (size + 1);
-    memcpy (string, zframe_data (self), size);
-    string [size] = 0;
+    if (string) {
+        memcpy (string, zframe_data (self), size);
+        string [size] = 0;
+    }
     return string;
 }
 

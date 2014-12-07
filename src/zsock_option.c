@@ -51,7 +51,7 @@ zsock_set_tos (void *self, int tos)
 //  Return socket ZMQ_TOS value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_tos (void *self)
 {
     assert (self);
@@ -204,7 +204,7 @@ zsock_set_zap_domain (void *self, const char * zap_domain)
 //  Return socket ZMQ_ZAP_DOMAIN value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-char * 
+char *
 zsock_zap_domain (void *self)
 {
     assert (self);
@@ -222,7 +222,7 @@ zsock_zap_domain (void *self)
 //  Return socket ZMQ_MECHANISM value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_mechanism (void *self)
 {
     assert (self);
@@ -255,7 +255,7 @@ zsock_set_plain_server (void *self, int plain_server)
 //  Return socket ZMQ_PLAIN_SERVER value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_plain_server (void *self)
 {
     assert (self);
@@ -288,7 +288,7 @@ zsock_set_plain_username (void *self, const char * plain_username)
 //  Return socket ZMQ_PLAIN_USERNAME value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-char * 
+char *
 zsock_plain_username (void *self)
 {
     assert (self);
@@ -321,7 +321,7 @@ zsock_set_plain_password (void *self, const char * plain_password)
 //  Return socket ZMQ_PLAIN_PASSWORD value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-char * 
+char *
 zsock_plain_password (void *self)
 {
     assert (self);
@@ -354,7 +354,7 @@ zsock_set_curve_server (void *self, int curve_server)
 //  Return socket ZMQ_CURVE_SERVER value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_curve_server (void *self)
 {
     assert (self);
@@ -401,7 +401,7 @@ zsock_set_curve_publickey_bin (void *self, const byte *curve_publickey)
 //  Return socket ZMQ_CURVE_PUBLICKEY value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-char * 
+char *
 zsock_curve_publickey (void *self)
 {
     assert (self);
@@ -448,7 +448,7 @@ zsock_set_curve_secretkey_bin (void *self, const byte *curve_secretkey)
 //  Return socket ZMQ_CURVE_SECRETKEY value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-char * 
+char *
 zsock_curve_secretkey (void *self)
 {
     assert (self);
@@ -495,7 +495,7 @@ zsock_set_curve_serverkey_bin (void *self, const byte *curve_serverkey)
 //  Return socket ZMQ_CURVE_SERVERKEY value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-char * 
+char *
 zsock_curve_serverkey (void *self)
 {
     assert (self);
@@ -528,7 +528,7 @@ zsock_set_gssapi_server (void *self, int gssapi_server)
 //  Return socket ZMQ_GSSAPI_SERVER value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_gssapi_server (void *self)
 {
     assert (self);
@@ -561,7 +561,7 @@ zsock_set_gssapi_plaintext (void *self, int gssapi_plaintext)
 //  Return socket ZMQ_GSSAPI_PLAINTEXT value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_gssapi_plaintext (void *self)
 {
     assert (self);
@@ -594,7 +594,7 @@ zsock_set_gssapi_principal (void *self, const char * gssapi_principal)
 //  Return socket ZMQ_GSSAPI_PRINCIPAL value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-char * 
+char *
 zsock_gssapi_principal (void *self)
 {
     assert (self);
@@ -627,7 +627,7 @@ zsock_set_gssapi_service_principal (void *self, const char * gssapi_service_prin
 //  Return socket ZMQ_GSSAPI_SERVICE_PRINCIPAL value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-char * 
+char *
 zsock_gssapi_service_principal (void *self)
 {
     assert (self);
@@ -660,7 +660,7 @@ zsock_set_ipv6 (void *self, int ipv6)
 //  Return socket ZMQ_IPV6 value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_ipv6 (void *self)
 {
     assert (self);
@@ -693,7 +693,7 @@ zsock_set_immediate (void *self, int immediate)
 //  Return socket ZMQ_IMMEDIATE value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_immediate (void *self)
 {
     assert (self);
@@ -745,7 +745,7 @@ zsock_set_ipv4only (void *self, int ipv4only)
 //  Return socket ZMQ_IPV4ONLY value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_ipv4only (void *self)
 {
     assert (self);
@@ -778,7 +778,7 @@ zsock_set_delay_attach_on_connect (void *self, int delay_attach_on_connect)
 //  Return socket ZMQ_TYPE value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_type (void *self)
 {
     assert (self);
@@ -811,7 +811,7 @@ zsock_set_sndhwm (void *self, int sndhwm)
 //  Return socket ZMQ_SNDHWM value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_sndhwm (void *self)
 {
     assert (self);
@@ -844,7 +844,7 @@ zsock_set_rcvhwm (void *self, int rcvhwm)
 //  Return socket ZMQ_RCVHWM value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_rcvhwm (void *self)
 {
     assert (self);
@@ -878,7 +878,7 @@ zsock_set_affinity (void *self, int affinity)
 //  Return socket ZMQ_AFFINITY value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_affinity (void *self)
 {
     assert (self);
@@ -956,7 +956,7 @@ zsock_set_identity (void *self, const char * identity)
 //  Return socket ZMQ_IDENTITY value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-char * 
+char *
 zsock_identity (void *self)
 {
     assert (self);
@@ -989,7 +989,7 @@ zsock_set_rate (void *self, int rate)
 //  Return socket ZMQ_RATE value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_rate (void *self)
 {
     assert (self);
@@ -1022,7 +1022,7 @@ zsock_set_recovery_ivl (void *self, int recovery_ivl)
 //  Return socket ZMQ_RECOVERY_IVL value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_recovery_ivl (void *self)
 {
     assert (self);
@@ -1055,7 +1055,7 @@ zsock_set_sndbuf (void *self, int sndbuf)
 //  Return socket ZMQ_SNDBUF value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_sndbuf (void *self)
 {
     assert (self);
@@ -1088,7 +1088,7 @@ zsock_set_rcvbuf (void *self, int rcvbuf)
 //  Return socket ZMQ_RCVBUF value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_rcvbuf (void *self)
 {
     assert (self);
@@ -1121,7 +1121,7 @@ zsock_set_linger (void *self, int linger)
 //  Return socket ZMQ_LINGER value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_linger (void *self)
 {
     assert (self);
@@ -1154,7 +1154,7 @@ zsock_set_reconnect_ivl (void *self, int reconnect_ivl)
 //  Return socket ZMQ_RECONNECT_IVL value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_reconnect_ivl (void *self)
 {
     assert (self);
@@ -1187,7 +1187,7 @@ zsock_set_reconnect_ivl_max (void *self, int reconnect_ivl_max)
 //  Return socket ZMQ_RECONNECT_IVL_MAX value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_reconnect_ivl_max (void *self)
 {
     assert (self);
@@ -1220,7 +1220,7 @@ zsock_set_backlog (void *self, int backlog)
 //  Return socket ZMQ_BACKLOG value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_backlog (void *self)
 {
     assert (self);
@@ -1254,7 +1254,7 @@ zsock_set_maxmsgsize (void *self, int maxmsgsize)
 //  Return socket ZMQ_MAXMSGSIZE value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_maxmsgsize (void *self)
 {
     assert (self);
@@ -1287,7 +1287,7 @@ zsock_set_multicast_hops (void *self, int multicast_hops)
 //  Return socket ZMQ_MULTICAST_HOPS value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_multicast_hops (void *self)
 {
     assert (self);
@@ -1320,7 +1320,7 @@ zsock_set_rcvtimeo (void *self, int rcvtimeo)
 //  Return socket ZMQ_RCVTIMEO value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_rcvtimeo (void *self)
 {
     assert (self);
@@ -1353,7 +1353,7 @@ zsock_set_sndtimeo (void *self, int sndtimeo)
 //  Return socket ZMQ_SNDTIMEO value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_sndtimeo (void *self)
 {
     assert (self);
@@ -1405,7 +1405,7 @@ zsock_set_tcp_keepalive (void *self, int tcp_keepalive)
 //  Return socket ZMQ_TCP_KEEPALIVE value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_tcp_keepalive (void *self)
 {
     assert (self);
@@ -1438,7 +1438,7 @@ zsock_set_tcp_keepalive_idle (void *self, int tcp_keepalive_idle)
 //  Return socket ZMQ_TCP_KEEPALIVE_IDLE value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_tcp_keepalive_idle (void *self)
 {
     assert (self);
@@ -1471,7 +1471,7 @@ zsock_set_tcp_keepalive_cnt (void *self, int tcp_keepalive_cnt)
 //  Return socket ZMQ_TCP_KEEPALIVE_CNT value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_tcp_keepalive_cnt (void *self)
 {
     assert (self);
@@ -1504,7 +1504,7 @@ zsock_set_tcp_keepalive_intvl (void *self, int tcp_keepalive_intvl)
 //  Return socket ZMQ_TCP_KEEPALIVE_INTVL value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_tcp_keepalive_intvl (void *self)
 {
     assert (self);
@@ -1537,7 +1537,7 @@ zsock_set_tcp_accept_filter (void *self, const char * tcp_accept_filter)
 //  Return socket ZMQ_TCP_ACCEPT_FILTER value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-char * 
+char *
 zsock_tcp_accept_filter (void *self)
 {
     assert (self);
@@ -1555,7 +1555,7 @@ zsock_tcp_accept_filter (void *self)
 //  Return socket ZMQ_RCVMORE value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_rcvmore (void *self)
 {
     assert (self);
@@ -1573,13 +1573,13 @@ zsock_rcvmore (void *self)
 //  Return socket ZMQ_FD value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+SOCKET
 zsock_fd (void *self)
 {
     assert (self);
 #   if defined (ZMQ_FD)
-    int fd;
-    size_t option_len = sizeof (int);
+    SOCKET fd;
+    size_t option_len = sizeof (SOCKET);
     zmq_getsockopt (zsock_resolve (self), ZMQ_FD, &fd, &option_len);
     return fd;
 #   else
@@ -1591,7 +1591,7 @@ zsock_fd (void *self)
 //  Return socket ZMQ_EVENTS value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_events (void *self)
 {
     assert (self);
@@ -1609,7 +1609,7 @@ zsock_events (void *self)
 //  Return socket ZMQ_LAST_ENDPOINT value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-char * 
+char *
 zsock_last_endpoint (void *self)
 {
     assert (self);
@@ -1664,7 +1664,7 @@ zsock_set_ipv4only (void *self, int ipv4only)
 //  Return socket ZMQ_IPV4ONLY value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_ipv4only (void *self)
 {
     assert (self);
@@ -1697,7 +1697,7 @@ zsock_set_delay_attach_on_connect (void *self, int delay_attach_on_connect)
 //  Return socket ZMQ_TYPE value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_type (void *self)
 {
     assert (self);
@@ -1730,7 +1730,7 @@ zsock_set_sndhwm (void *self, int sndhwm)
 //  Return socket ZMQ_SNDHWM value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_sndhwm (void *self)
 {
     assert (self);
@@ -1763,7 +1763,7 @@ zsock_set_rcvhwm (void *self, int rcvhwm)
 //  Return socket ZMQ_RCVHWM value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_rcvhwm (void *self)
 {
     assert (self);
@@ -1797,7 +1797,7 @@ zsock_set_affinity (void *self, int affinity)
 //  Return socket ZMQ_AFFINITY value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_affinity (void *self)
 {
     assert (self);
@@ -1875,7 +1875,7 @@ zsock_set_identity (void *self, const char * identity)
 //  Return socket ZMQ_IDENTITY value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-char * 
+char *
 zsock_identity (void *self)
 {
     assert (self);
@@ -1908,7 +1908,7 @@ zsock_set_rate (void *self, int rate)
 //  Return socket ZMQ_RATE value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_rate (void *self)
 {
     assert (self);
@@ -1941,7 +1941,7 @@ zsock_set_recovery_ivl (void *self, int recovery_ivl)
 //  Return socket ZMQ_RECOVERY_IVL value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_recovery_ivl (void *self)
 {
     assert (self);
@@ -1974,7 +1974,7 @@ zsock_set_sndbuf (void *self, int sndbuf)
 //  Return socket ZMQ_SNDBUF value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_sndbuf (void *self)
 {
     assert (self);
@@ -2007,7 +2007,7 @@ zsock_set_rcvbuf (void *self, int rcvbuf)
 //  Return socket ZMQ_RCVBUF value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_rcvbuf (void *self)
 {
     assert (self);
@@ -2040,7 +2040,7 @@ zsock_set_linger (void *self, int linger)
 //  Return socket ZMQ_LINGER value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_linger (void *self)
 {
     assert (self);
@@ -2073,7 +2073,7 @@ zsock_set_reconnect_ivl (void *self, int reconnect_ivl)
 //  Return socket ZMQ_RECONNECT_IVL value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_reconnect_ivl (void *self)
 {
     assert (self);
@@ -2106,7 +2106,7 @@ zsock_set_reconnect_ivl_max (void *self, int reconnect_ivl_max)
 //  Return socket ZMQ_RECONNECT_IVL_MAX value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_reconnect_ivl_max (void *self)
 {
     assert (self);
@@ -2139,7 +2139,7 @@ zsock_set_backlog (void *self, int backlog)
 //  Return socket ZMQ_BACKLOG value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_backlog (void *self)
 {
     assert (self);
@@ -2173,7 +2173,7 @@ zsock_set_maxmsgsize (void *self, int maxmsgsize)
 //  Return socket ZMQ_MAXMSGSIZE value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_maxmsgsize (void *self)
 {
     assert (self);
@@ -2206,7 +2206,7 @@ zsock_set_multicast_hops (void *self, int multicast_hops)
 //  Return socket ZMQ_MULTICAST_HOPS value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_multicast_hops (void *self)
 {
     assert (self);
@@ -2239,7 +2239,7 @@ zsock_set_rcvtimeo (void *self, int rcvtimeo)
 //  Return socket ZMQ_RCVTIMEO value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_rcvtimeo (void *self)
 {
     assert (self);
@@ -2272,7 +2272,7 @@ zsock_set_sndtimeo (void *self, int sndtimeo)
 //  Return socket ZMQ_SNDTIMEO value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_sndtimeo (void *self)
 {
     assert (self);
@@ -2324,7 +2324,7 @@ zsock_set_tcp_keepalive (void *self, int tcp_keepalive)
 //  Return socket ZMQ_TCP_KEEPALIVE value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_tcp_keepalive (void *self)
 {
     assert (self);
@@ -2357,7 +2357,7 @@ zsock_set_tcp_keepalive_idle (void *self, int tcp_keepalive_idle)
 //  Return socket ZMQ_TCP_KEEPALIVE_IDLE value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_tcp_keepalive_idle (void *self)
 {
     assert (self);
@@ -2390,7 +2390,7 @@ zsock_set_tcp_keepalive_cnt (void *self, int tcp_keepalive_cnt)
 //  Return socket ZMQ_TCP_KEEPALIVE_CNT value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_tcp_keepalive_cnt (void *self)
 {
     assert (self);
@@ -2423,7 +2423,7 @@ zsock_set_tcp_keepalive_intvl (void *self, int tcp_keepalive_intvl)
 //  Return socket ZMQ_TCP_KEEPALIVE_INTVL value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_tcp_keepalive_intvl (void *self)
 {
     assert (self);
@@ -2456,7 +2456,7 @@ zsock_set_tcp_accept_filter (void *self, const char * tcp_accept_filter)
 //  Return socket ZMQ_TCP_ACCEPT_FILTER value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-char * 
+char *
 zsock_tcp_accept_filter (void *self)
 {
     assert (self);
@@ -2474,7 +2474,7 @@ zsock_tcp_accept_filter (void *self)
 //  Return socket ZMQ_RCVMORE value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_rcvmore (void *self)
 {
     assert (self);
@@ -2492,13 +2492,13 @@ zsock_rcvmore (void *self)
 //  Return socket ZMQ_FD value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+SOCKET
 zsock_fd (void *self)
 {
     assert (self);
 #   if defined (ZMQ_FD)
-    int fd;
-    size_t option_len = sizeof (int);
+    SOCKET fd;
+    size_t option_len = sizeof (SOCKET);
     zmq_getsockopt (zsock_resolve (self), ZMQ_FD, &fd, &option_len);
     return fd;
 #   else
@@ -2510,7 +2510,7 @@ zsock_fd (void *self)
 //  Return socket ZMQ_EVENTS value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_events (void *self)
 {
     assert (self);
@@ -2528,7 +2528,7 @@ zsock_events (void *self)
 //  Return socket ZMQ_LAST_ENDPOINT value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-char * 
+char *
 zsock_last_endpoint (void *self)
 {
     assert (self);
@@ -2565,7 +2565,7 @@ zsock_set_hwm (void *self, int hwm)
 //  Return socket ZMQ_HWM value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_hwm (void *self)
 {
     assert (self);
@@ -2599,7 +2599,7 @@ zsock_set_swap (void *self, int swap)
 //  Return socket ZMQ_SWAP value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_swap (void *self)
 {
     assert (self);
@@ -2633,7 +2633,7 @@ zsock_set_affinity (void *self, int affinity)
 //  Return socket ZMQ_AFFINITY value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_affinity (void *self)
 {
     assert (self);
@@ -2666,7 +2666,7 @@ zsock_set_identity (void *self, const char * identity)
 //  Return socket ZMQ_IDENTITY value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-char * 
+char *
 zsock_identity (void *self)
 {
     assert (self);
@@ -2700,7 +2700,7 @@ zsock_set_rate (void *self, int rate)
 //  Return socket ZMQ_RATE value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_rate (void *self)
 {
     assert (self);
@@ -2734,7 +2734,7 @@ zsock_set_recovery_ivl (void *self, int recovery_ivl)
 //  Return socket ZMQ_RECOVERY_IVL value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_recovery_ivl (void *self)
 {
     assert (self);
@@ -2768,7 +2768,7 @@ zsock_set_recovery_ivl_msec (void *self, int recovery_ivl_msec)
 //  Return socket ZMQ_RECOVERY_IVL_MSEC value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_recovery_ivl_msec (void *self)
 {
     assert (self);
@@ -2802,7 +2802,7 @@ zsock_set_mcast_loop (void *self, int mcast_loop)
 //  Return socket ZMQ_MCAST_LOOP value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_mcast_loop (void *self)
 {
     assert (self);
@@ -2836,7 +2836,7 @@ zsock_set_rcvtimeo (void *self, int rcvtimeo)
 //  Return socket ZMQ_RCVTIMEO value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_rcvtimeo (void *self)
 {
     assert (self);
@@ -2871,7 +2871,7 @@ zsock_set_sndtimeo (void *self, int sndtimeo)
 //  Return socket ZMQ_SNDTIMEO value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_sndtimeo (void *self)
 {
     assert (self);
@@ -2906,7 +2906,7 @@ zsock_set_sndbuf (void *self, int sndbuf)
 //  Return socket ZMQ_SNDBUF value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_sndbuf (void *self)
 {
     assert (self);
@@ -2940,7 +2940,7 @@ zsock_set_rcvbuf (void *self, int rcvbuf)
 //  Return socket ZMQ_RCVBUF value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_rcvbuf (void *self)
 {
     assert (self);
@@ -2973,7 +2973,7 @@ zsock_set_linger (void *self, int linger)
 //  Return socket ZMQ_LINGER value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_linger (void *self)
 {
     assert (self);
@@ -3006,7 +3006,7 @@ zsock_set_reconnect_ivl (void *self, int reconnect_ivl)
 //  Return socket ZMQ_RECONNECT_IVL value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_reconnect_ivl (void *self)
 {
     assert (self);
@@ -3039,7 +3039,7 @@ zsock_set_reconnect_ivl_max (void *self, int reconnect_ivl_max)
 //  Return socket ZMQ_RECONNECT_IVL_MAX value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_reconnect_ivl_max (void *self)
 {
     assert (self);
@@ -3072,7 +3072,7 @@ zsock_set_backlog (void *self, int backlog)
 //  Return socket ZMQ_BACKLOG value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_backlog (void *self)
 {
     assert (self);
@@ -3128,7 +3128,7 @@ zsock_set_unsubscribe (void *self, const char * unsubscribe)
 //  Return socket ZMQ_TYPE value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_type (void *self)
 {
     assert (self);
@@ -3146,7 +3146,7 @@ zsock_type (void *self)
 //  Return socket ZMQ_RCVMORE value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_rcvmore (void *self)
 {
     assert (self);
@@ -3164,13 +3164,13 @@ zsock_rcvmore (void *self)
 //  Return socket ZMQ_FD value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+SOCKET
 zsock_fd (void *self)
 {
     assert (self);
 #   if defined (ZMQ_FD)
-    int fd;
-    size_t option_len = sizeof (int);
+    SOCKET fd;
+    size_t option_len = sizeof (SOCKET);
     zmq_getsockopt (zsock_resolve (self), ZMQ_FD, &fd, &option_len);
     return fd;
 #   else
@@ -3182,7 +3182,7 @@ zsock_fd (void *self)
 //  Return socket ZMQ_EVENTS value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-int 
+int
 zsock_events (void *self)
 {
     assert (self);

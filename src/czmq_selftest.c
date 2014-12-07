@@ -51,7 +51,9 @@ main (int argc, char *argv [])
     zdigest_test (verbose);
     zframe_test (verbose);
     zstr_test (verbose);
+    zlist_test (verbose);
     zlistx_test (verbose);
+    zhash_test (verbose);
     zhashx_test (verbose);
     zmsg_test (verbose);
     zfile_test (verbose);
@@ -74,8 +76,6 @@ main (int argc, char *argv [])
     zauth_v2_test (verbose);
     zbeacon_v2_test (verbose);
     zctx_test (verbose);
-    zhash_test (verbose);
-    zlist_test (verbose);
     zmonitor_v2_test (verbose);
     zmutex_test (verbose);
     zproxy_v2_test (verbose);
@@ -85,11 +85,7 @@ main (int argc, char *argv [])
 
     zsys_shutdown ();
 
-// In VS builds zsys_allocs causes an unresolved external error.
-#ifdef _MSC_VER
     printf ("Number of memory allocations=%" PRId64 "\n", zsys_allocs);
-#endif
-
     printf ("Tests passed OK\n");
     return 0;
 }

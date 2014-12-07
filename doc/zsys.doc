@@ -331,7 +331,7 @@ This is the class self test code:
         char *hostname = zsys_hostname ();
         zsys_info ("host name is %s", hostname);
         free (hostname);
-        zsys_info ("system limit is %zd ZeroMQ sockets", zsys_socket_limit ());
+        zsys_info ("system limit is %zu ZeroMQ sockets", zsys_socket_limit ());
     }
     zsys_set_io_threads (1);
     zsys_set_max_sockets (0);
@@ -403,7 +403,7 @@ This is the class self test code:
     zsys_set_logsender ("inproc://logging");
     void *logger = zsys_socket (ZMQ_SUB, NULL, 0);
     assert (logger);
-    rc = zsocket_connect (logger, "inproc://logging");
+    rc = zmq_connect (logger, "inproc://logging");
     assert (rc == 0);
     rc = zmq_setsockopt (logger, ZMQ_SUBSCRIBE, "", 0);
     assert (rc == 0);

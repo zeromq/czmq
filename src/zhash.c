@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zhash - simple generic hash container
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -53,7 +53,7 @@ struct _zhash_t {
     bool autofree;              //  If true, free values in destructor
     size_t cursor_index;        //  For first/next iteration
     item_t *cursor_item;        //  For first/next iteration
-    const void *cursor_key;     //  After first/next call, points to key
+    const char *cursor_key;     //  After first/next call, points to key
     zlist_t *comments;          //  File comments, if any
     time_t modified;            //  Set during zhash_load
     char *filename;             //  Set during zhash_load
@@ -486,7 +486,7 @@ zhash_next (zhash_t *self)
 //  deallocate, and which lasts as long as the item in the hash. After an
 //  unsuccessful first/next, returns NULL.
 
-const void *
+const char *
 zhash_cursor (zhash_t *self)
 {
     assert (self);
@@ -575,29 +575,41 @@ zhash_load (zhash_t *self, const char *filename)
 
     //  Take copy of filename in case self->filename is same string.
     char *filename_copy = strdup (filename);
-    free (self->filename);
-    self->filename = filename_copy;
-    self->modified = zsys_file_modified (self->filename);
-    FILE *handle = fopen (self->filename, "r");
-    if (!handle)
-        return -1;              //  Failed to open file for reading
+    if (filename_copy) {
+        free (self->filename);
+        self->filename = filename_copy;
+        self->modified = zsys_file_modified (self->filename);
+        FILE *handle = fopen (self->filename, "r");
+        if (handle) {
+            char *buffer = (char *) zmalloc (1024);
+            if (buffer) {
+                while (fgets (buffer, 1024, handle)) {
+                    //  Skip lines starting with "#" or that do not look like
+                    //  name=value data.
+                    char *equals = strchr (buffer, '=');
+                    if (buffer [0] == '#' || equals == buffer || !equals)
+                        continue;
 
-    char *buffer = (char *) zmalloc (1024);
-    while (fgets (buffer, 1024, handle)) {
-        //  Skip lines starting with "#" or that do not look like
-        //  name=value data.
-        char *equals = strchr (buffer, '=');
-        if (buffer [0] == '#' || equals == buffer || !equals)
-            continue;
-
-        //  Buffer may end in newline, which we don't want
-        if (buffer [strlen (buffer) - 1] == '\n')
-            buffer [strlen (buffer) - 1] = 0;
-        *equals++ = 0;
-        zhash_update (self, buffer, equals);
+                    //  Buffer may end in newline, which we don't want
+                    if (buffer [strlen (buffer) - 1] == '\n')
+                        buffer [strlen (buffer) - 1] = 0;
+                    *equals++ = 0;
+                    zhash_update (self, buffer, equals);
+                }
+                free (buffer);
+            }
+            else {
+                fclose (handle);
+                return -1; // Out of memory
+            }
+            fclose (handle);
+        }
+        else
+            return -1; // Failed to open file for reading
     }
-    free (buffer);
-    fclose (handle);
+    else
+        return -1; // Out of memory
+
     return 0;
 }
 
@@ -605,7 +617,7 @@ zhash_load (zhash_t *self, const char *filename)
 //  --------------------------------------------------------------------------
 //  When a hash table was loaded from a file by zhash_load, this method will
 //  reload the file if it has been modified since, and is "stable", i.e. not
-//  still changing. Returns 0 if OK, -1 if there was an error reloading the 
+//  still changing. Returns 0 if OK, -1 if there was an error reloading the
 //  file.
 
 int
@@ -815,7 +827,7 @@ zhash_test (int verbose)
     int rc;
     rc = zhash_insert (hash, "DEADBEEF", "dead beef");
     char *item = (char *) zhash_first (hash);
-    assert (streq ((char *) zhash_cursor (hash), "DEADBEEF"));
+    assert (streq (zhash_cursor (hash), "DEADBEEF"));
     assert (streq (item, "dead beef"));
     assert (rc == 0);
     rc = zhash_insert (hash, "ABADCAFE", "a bad cafe");
@@ -893,6 +905,7 @@ zhash_test (int verbose)
     item = (char *) zhash_lookup (copy, "LIVEBEEF");
     assert (item);
     assert (streq (item, "dead beef"));
+    zhash_destroy (&copy);
 
     //  Test save and load
     zhash_comment (hash, "This is a test file");

@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zproxy - run a steerable proxy in the background
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -97,7 +97,9 @@ static void
 s_self_configure (self_t *self, zsock_t **sock_p, zmsg_t *request, char *name)
 {
     char *type_name = zmsg_popstr (request);
+    assert (type_name);
     char *endpoints = zmsg_popstr (request);
+    assert (endpoints);
     if (self->verbose)
         zsys_info ("zmonitor: - %s type=%s attach=%s", name, type_name, endpoints);
     assert (*sock_p == NULL);
@@ -121,6 +123,7 @@ s_self_handle_pipe (self_t *self)
         return -1;                  //  Interrupted
 
     char *command = zmsg_popstr (request);
+    assert (command);
     if (self->verbose)
         zsys_info ("zproxy: API command=%s", command);
 
@@ -138,6 +141,7 @@ s_self_handle_pipe (self_t *self)
         self->capture = zsock_new (ZMQ_PUSH);
         assert (self->capture);
         char *endpoint = zmsg_popstr (request);
+        assert (endpoint);
         int rc = zsock_connect (self->capture, "%s", endpoint);
         assert (rc == 0);
         zstr_free (&endpoint);

@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zfile - provides methods to work with files in a portable fashion.
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -69,6 +69,11 @@ zfile_new (const char *path, const char *name)
             self->fullname = (char *) zmalloc (strlen (path) + strlen (name) + 2);
             if (self->fullname)
                 sprintf (self->fullname, "%s/%s", path, name);
+
+            else {
+                zfile_destroy (&self);
+                return NULL;
+            }
         }
         else
             self->fullname = strdup (name);
@@ -85,8 +90,15 @@ zfile_new (const char *path, const char *name)
                         if (buffer [strlen (buffer) - 1] == '\n')
                             buffer [strlen (buffer) - 1] = 0;
                         self->link = strdup (buffer);
-                        //  Chop ".ln" off name for external use
-                        self->fullname [strlen (self->fullname) - 3] = 0;
+                        if (self->link) {
+                            //  Chop ".ln" off name for external use
+                            self->fullname [strlen (self->fullname) - 3] = 0;
+                        }
+                        else {
+                            fclose (handle);
+                            zfile_destroy (&self);
+                            return NULL;
+                        }
                     }
                     fclose (handle);
                 }
@@ -349,17 +361,19 @@ zfile_output (zfile_t *self)
     int rc;
     assert (self);
 
+    //  Create file path if it doesn't exist
+    char *file_path = strdup (self->fullname);
+    if (!file_path)
+        return -1;
+    char *last_slash = strrchr (file_path, '/');
+    if (last_slash)
+        *last_slash = 0;
+
     //  Wipe symbolic link if that's what the file was
     if (self->link) {
         free (self->link);
         self->link = NULL;
     }
-    //  Create file path if it doesn't exist
-    char *file_path = strdup (self->fullname);
-    char *last_slash = strrchr (file_path, '/');
-    if (last_slash)
-        *last_slash = 0;
-        
     rc = zsys_dir_create (file_path);
     free (file_path);
     if (rc != 0) {

@@ -68,7 +68,7 @@ assert (iflist);
 size_t items = ziflist_size (iflist);
 
 if (verbose) {
-    printf ("ziflist: interfaces=%zu\n", ziflist_size (iflist));
+//        printf ("ziflist: interfaces=%zu\n", ziflist_size (iflist));
     const char *name = ziflist_first (iflist);
     while (name) {
         printf (" - name=%s address=%s netmask=%s broadcast=%s\n",

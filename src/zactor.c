@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zactor - simple actor framework
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -110,6 +110,10 @@ zactor_new (zactor_fn *actor, void *args)
         return NULL;
     }
     shim->pipe = zsys_create_pipe (&self->pipe);
+    if (!shim->pipe) {
+        zactor_destroy (&self);
+        return NULL;
+    }
     shim->handler = actor;
     shim->args = args;
 
