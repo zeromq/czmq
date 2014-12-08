@@ -38,6 +38,12 @@
 
 #include "../include/czmq.h"
 
+
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 3, 0))
+#define _INCLUDE_Z85
+#endif
+
+
 //  Structure of our class
 
 struct _zarmour_t {
@@ -51,15 +57,22 @@ struct _zarmour_t {
 
 
 //  Textual names of modes
+#ifdef _INCLUDE_Z85
 const int _NUM_MODES = 6;
+#else
+const int _NUM_MODES = 5;
+#endif
+
 static char
 s_codec_names[][16] = {
-    "base64",
-    "base64url",
-    "base32",
-    "base32hex",
-    "base16",
-    "z85"
+      "base64"
+    , "base64url"
+    , "base32"
+    , "base32hex"
+    , "base16"
+#ifdef _INCLUDE_Z85
+    , "z85"
+#endif
 };
 
 
@@ -385,13 +398,14 @@ s_base16_decode (const char *data, size_t *size, const char *alphabet, int lineb
 //  ---------------------------------------------------------------------------
 //  z85
 
+#ifdef _INCLUDE_Z85
 static char *
 s_z85_encode (const byte *data, size_t length)
 {
     assert (data != NULL);
     assert (length % 4 == 0);
     char *str = (char *) zmalloc (5 * length / 4 + 1);
-    char *result = zmq_z85_encode (str, data, length);
+    char *result = zmq_z85_encode (str, (uint8_t *) data, length);
     if (result == NULL) {
         free (str);
         str = NULL;
@@ -408,13 +422,14 @@ s_z85_decode (const char *data, size_t *size)
     assert (length % 5 == 0);
     *size = 4 * length / 5 + 1;
     byte *bytes = (byte *) zmalloc (*size);
-    uint8_t *result = zmq_z85_decode (bytes, data);
+    uint8_t *result = zmq_z85_decode (bytes, (char *) data);
     if (result == NULL) {
         free (bytes);
         bytes = NULL;
     }
     return bytes;
 }
+#endif
 
 
 //  Definition of encode method
@@ -442,17 +457,23 @@ zarmour_encode (zarmour_t *self, const byte *data, size_t data_size)
         case ZARMOUR_MODE_BASE16:
             encoded = s_base16_encode (data, data_size, s_base16_alphabet);
             break;
+#ifdef _INCLUDE_Z85
         case ZARMOUR_MODE_Z85:
             encoded = s_z85_encode (data, data_size);
             break;
+#endif
     }
 
     if (!encoded)
         return NULL;
 
+#ifdef _INCLUDE_Z85
     if (self->mode != ZARMOUR_MODE_Z85 &&
         self->line_breaks && self->line_length > 0 &&
         strlen (encoded) > self->line_length) {
+#else
+    if (self->line_breaks && self->line_length > 0 && strlen (encoded) > self->line_length) {
+#endif
         char *line_end = self->line_end;
         int nbr_lines = strlen (encoded) / self->line_length;
         size_t new_length =
@@ -503,21 +524,18 @@ zarmour_decode (zarmour_t *self, const char *data, size_t *decode_size)
     switch (self->mode) {
         case ZARMOUR_MODE_BASE64_STD:
             return s_base64_decode (data, decode_size, s_base64_alphabet, linebreakchars);
-
         case ZARMOUR_MODE_BASE64_URL:
             return s_base64_decode (data, decode_size, s_base64url_alphabet, linebreakchars);
-
         case ZARMOUR_MODE_BASE32_STD:
             return s_base32_decode (data, decode_size, s_base32_alphabet, linebreakchars);
-
         case ZARMOUR_MODE_BASE32_HEX:
             return s_base32_decode (data, decode_size, s_base32hex_alphabet, linebreakchars);
-
         case ZARMOUR_MODE_BASE16:
             return s_base16_decode (data, decode_size, s_base16_alphabet, linebreakchars);
-
+#ifdef _INCLUDE_Z85
         case ZARMOUR_MODE_Z85:
             return s_z85_decode (data, decode_size);
+#endif
     }
 
     return NULL;
@@ -851,6 +869,7 @@ zarmour_test (bool verbose)
     s_armour_decode (self, "666f6f626172", "foobar", verbose);
 
 
+#ifdef _INCLUDE_Z85
     //  Z85 test is homemade; using 0, 4 and 8 bytes, with precalculated
     //  test vectors created with a libzmq test.
     //  ----------------------------------------------------------------
@@ -874,6 +893,7 @@ zarmour_test (bool verbose)
     s_armour_test (self, "foobar!!", "w]zP%vr9Im", verbose);
     s_armour_test (self, (char *) key_data, "ph+{E}!&X?9}!I]W{sm(nL8@&3Yu{wC+<*-5Y[[#", verbose);
     free (key_data);
+#endif
 
     //  Armouring longer byte array to test line breaks
     zarmour_set_pad (self, true);
@@ -893,8 +913,10 @@ zarmour_test (bool verbose)
     s_armour_test_long (self, test_data, 256, verbose);
     zarmour_set_mode (self, ZARMOUR_MODE_BASE16);
     s_armour_test_long (self, test_data, 256, verbose);
+#ifdef _INCLUDE_Z85
     zarmour_set_mode (self, ZARMOUR_MODE_Z85);
     s_armour_test_long (self, test_data, 256, verbose);
+#endif
 
     zarmour_destroy (&self);
     //  @end
@@ -902,3 +924,7 @@ zarmour_test (bool verbose)
     printf ("OK\n");
     return 0;
 }
+
+#ifdef _INCLUDE_Z85
+#undef _INCLUDE_Z85
+#endif
