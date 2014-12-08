@@ -547,10 +547,10 @@ zlist_test (int verbose)
     zlist_append (list, tmp);
     assert (zlist_size (list) == 2);
     assert (zlist_first (list) != tmp);
-    assert (streq (zlist_first (list), bread));
+    assert (streq ((const char *) zlist_first (list), bread));
     item = (char *) zlist_pop (list);
     assert (zlist_first (list) != tmp);
-    assert (streq (zlist_first (list), tmp));
+    assert (streq ((const char *) zlist_first (list), tmp));
     zlist_destroy (&list);
     assert (list == NULL);
 
