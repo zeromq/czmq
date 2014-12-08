@@ -447,16 +447,12 @@ zarmour_encode (zarmour_t *self, const byte *data, size_t data_size)
             break;
     }
 
-<<<<<<< HEAD
-    if (self->mode != ZARMOUR_MODE_Z85 &&
-        self->line_breaks && self->line_length > 0 &&
-        strlen (encoded) > self->line_length) {
-=======
     if (!encoded)
         return NULL;
 
-    if (self->line_breaks && self->line_length > 0 && strlen (encoded) > self->line_length) {
->>>>>>> upstream/master
+    if (self->mode != ZARMOUR_MODE_Z85 &&
+        self->line_breaks && self->line_length > 0 &&
+        strlen (encoded) > self->line_length) {
         char *line_end = self->line_end;
         int nbr_lines = strlen (encoded) / self->line_length;
         size_t new_length =
