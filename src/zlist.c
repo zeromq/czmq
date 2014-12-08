@@ -209,6 +209,10 @@ zlist_push (zlist_t *self, void *item)
     if (!node)
         return -1;
 
+    //  If necessary, take duplicate of (string) item
+    if (self->autofree)
+        item = strdup ((char *) item);
+
     node->item = item;
     node->next = self->head;
     self->head = node;
@@ -531,6 +535,24 @@ zlist_test (int verbose)
     zlist_destroy (&list);
     assert (list == NULL);
     //  @end
+
+    // Check autofree
+    list = zlist_new ();
+    assert (list);
+    char *tmp = NULL;
+    tmp = strdup(bread);
+    zlist_autofree (list);
+    zlist_push (list, tmp);
+    tmp[0] = 'B';
+    zlist_append (list, tmp);
+    assert (zlist_size (list) == 2);
+    assert (zlist_first (list) != tmp);
+    assert (streq (zlist_first (list), bread));
+    item = (char *) zlist_pop (list);
+    assert (zlist_first (list) != tmp);
+    assert (streq (zlist_first (list), tmp));
+    zlist_destroy (&list);
+    assert (list == NULL);
 
     printf ("OK\n");
 }
