@@ -20,6 +20,9 @@ for version
         elsif type = "string" | type = "key"
             option.ctype = "char *"   #   Enforce C strings
             option.ctype_const = "const char *"
+        elsif type = "socket"
+            option.ctype = "SOCKET"   #   Portable socket type
+            option.ctype_const = "SOCKET"
         else
             echo "E: unknown type: $(type)"
         endif

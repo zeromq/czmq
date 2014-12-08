@@ -51,7 +51,9 @@ main (int argc, char *argv [])
     zdigest_test (verbose);
     zframe_test (verbose);
     zstr_test (verbose);
+    zlist_test (verbose);
     zlistx_test (verbose);
+    zhash_test (verbose);
     zhashx_test (verbose);
     zmsg_test (verbose);
     zfile_test (verbose);
@@ -74,8 +76,6 @@ main (int argc, char *argv [])
     zauth_v2_test (verbose);
     zbeacon_v2_test (verbose);
     zctx_test (verbose);
-    zhash_test (verbose);
-    zlist_test (verbose);
     zmonitor_v2_test (verbose);
     zmutex_test (verbose);
     zproxy_v2_test (verbose);

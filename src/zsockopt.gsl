@@ -38,7 +38,7 @@ extern "C" {
 #   if (ZMQ_VERSION_MINOR == $(minor))
 .       endif
 .       if mode = "rw" | mode = "r"
-CZMQ_EXPORT $(ctype) zsocket_$(name) (void *zocket);
+CZMQ_EXPORT $(ctype:) zsocket_$(name) (void *zocket);
 .       endif
 .       if defined (.minor)
 #   endif
@@ -51,7 +51,7 @@ CZMQ_EXPORT $(ctype) zsocket_$(name) (void *zocket);
 #   if (ZMQ_VERSION_MINOR == $(minor))
 .       endif
 .       if mode = "rw" | mode = "w"
-CZMQ_EXPORT void zsocket_set_$(name) (void *zocket, $(ctype_const) $(name));
+CZMQ_EXPORT void zsocket_set_$(name) (void *zocket, $(ctype_const:) $(name));
 .           if type = "key"
 CZMQ_EXPORT void zsocket_set_$(name)_bin (void *zocket, const byte *$(name));
 .           endif
@@ -120,7 +120,7 @@ CZMQ_EXPORT void zsockopt_test (bool verbose);
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
 void
-zsocket_set_$(name) (void *zocket, $(ctype_const) $(name))
+zsocket_set_$(name) (void *zocket, $(ctype_const:) $(name))
 {
     if (zsock_is (zocket)) {
         printf ("Please use zsock_set_$(name) () on zsock_t instances\\n");
@@ -147,20 +147,18 @@ zsocket_set_$(name) (void *zocket, $(ctype_const) $(name))
         assert (false);
     }
 .           endif
-.           if ctype = "int"
-.               if type = "uint64"
+.           if type = "uint64"
     uint64_t value = $(name);
     int rc = zmq_setsockopt (zocket, ZMQ_$(NAME), &value, sizeof (uint64_t));
-.               elsif type = "int64"
+.           elsif type = "int64"
     int64_t value = $(name);
     int rc = zmq_setsockopt (zocket, ZMQ_$(NAME), &value, sizeof (int64_t));
-.               elsif type = "uint32"
+.           elsif type = "uint32"
     uint32_t value = $(name);
     int rc = zmq_setsockopt (zocket, ZMQ_$(NAME), &value, sizeof (uint32_t));
-.               else
+.           elsif type = "int"
     int rc = zmq_setsockopt (zocket, ZMQ_$(NAME), &$(name), sizeof (int));
-.               endif
-.           else
+.           elsif type = "string" | type = "key"
     int rc = zmq_setsockopt (zocket, ZMQ_$(NAME), $(name), strlen ($(name)));
 .           endif
     assert (rc == 0 || zmq_errno () == ETERM);
@@ -197,7 +195,7 @@ zsocket_set_$(name)_bin (void *zocket, const byte *$(name))
 //  Return socket ZMQ_$(NAME) value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
-$(ctype) 
+$(ctype:)
 zsocket_$(name) (void *zocket)
 {
 .           if style = "macro"
@@ -227,11 +225,15 @@ zsocket_$(name) (void *zocket)
     size_t option_len = 40 + 1;     //  Z85 key + terminator
     char *$(name) = (char *) zmalloc (option_len);
     zmq_getsockopt (zocket, ZMQ_$(NAME), $(name), &option_len);
+.           elsif type = "socket"
+    SOCKET $(name);
+    size_t option_len = sizeof (SOCKET);
+    zmq_getsockopt (zocket, ZMQ_$(NAME), &$(name), &option_len);
 .           endif
 .           if type = "int"
     return $(name);
 .           else
-    return ($(ctype)) $(name);
+    return ($(ctype:)) $(name);
 .           endif
 .           if style = "macro"
 #   else

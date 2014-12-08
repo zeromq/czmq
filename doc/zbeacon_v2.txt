@@ -3,7 +3,7 @@ zbeacon_v2(3)
 
 NAME
 ----
-zbeacon_v2 - no title found
+zbeacon_v2 - LAN discovery and presence (deprecated)
 
 SYNOPSIS
 --------

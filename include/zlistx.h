@@ -75,7 +75,12 @@ CZMQ_EXPORT void *
 //  Returns the handle of the item at the cursor, or NULL if the cursor is
 //  not pointing to an item.
 CZMQ_EXPORT void *
-    zlistx_handle (zlistx_t *self);
+    zlistx_cursor (zlistx_t *self);
+
+//  Returns the item associated with the given list handle, or NULL if passed
+//  in handle is NULL. Asserts that the passed in handle points to a list element.
+CZMQ_EXPORT  void *
+    zlistx_handle_item (void *handle);
 
 //  Find an item in the list, searching from the start. Uses the item
 //  comparator, if any, else compares item values directly. Returns the
@@ -86,12 +91,16 @@ CZMQ_EXPORT void *
 //  Detach an item from the list, using its handle. The item is not modified,
 //  and the caller is responsible for destroying it if necessary. If handle is
 //  null, detaches the first item on the list. Returns item that was detached,
-//  or null if none was.
+//  or null if none was. If cursor was at item, moves cursor to previous item,
+//  so you can detach items while iterating forwards through a list.
 CZMQ_EXPORT void *
     zlistx_detach (zlistx_t *self, void *handle);
 
 //  Delete an item, using its handle. Calls the item destructor is any is
-//  set. If handle is null, deletes the first item on the list.
+//  set. If handle is null, deletes the first item on the list. Returns 0
+//  if an item was deleted, -1 if not. If cursor was at item, moves cursor
+//  to previous item, so you can delete items while iterating forwards
+//  through a list.
 CZMQ_EXPORT int
     zlistx_delete (zlistx_t *self, void *handle);
     

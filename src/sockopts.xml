@@ -111,7 +111,7 @@
         </option>
         <option name = "type"              type = "int"    mode = "r"  test = "SUB" />
         <option name = "rcvmore"           type = "int64"  mode = "r"  test = "SUB" />
-        <option name = "fd"                type = "int"    mode = "r"  test = "SUB" />
+        <option name = "fd"                type = "socket" mode = "r"  test = "SUB" />
         <option name = "events"            type = "uint32" mode = "r"  test = "SUB" />
     </version>
     
@@ -156,7 +156,7 @@
         <option name = "tcp_accept_filter" type = "string" mode = "rw" test = "SUB"
                 test_value = "127.0.0.1" />
         <option name = "rcvmore"           type = "int"    mode = "r"  test = "SUB" />
-        <option name = "fd"                type = "int"    mode = "r"  test = "SUB" />
+        <option name = "fd"                type = "socket" mode = "r"  test = "SUB" />
         <option name = "events"            type = "int"    mode = "r"  test = "SUB" />
         <option name = "last_endpoint"     type = "string" mode = "r"  test = "SUB" />
     </macro>

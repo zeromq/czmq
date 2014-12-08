@@ -209,6 +209,10 @@ zlist_push (zlist_t *self, void *item)
     if (!node)
         return -1;
 
+    //  If necessary, take duplicate of (string) item
+    if (self->autofree)
+        item = strdup ((char *) item);
+
     node->item = item;
     node->next = self->head;
     self->head = node;
@@ -525,9 +529,23 @@ zlist_test (int verbose)
     zlist_append (list, sub_list_2);
     assert (zlist_freefn (list, sub_list, &s_zlist_free, false) == sub_list);
     assert (zlist_freefn (list, sub_list_2, &s_zlist_free, true) == sub_list_2);
-
-    //  Destructor should be safe to call twice
     zlist_destroy (&list);
+
+    //  Test autofree functionality
+    list = zlist_new ();
+    assert (list);
+    zlist_autofree (list);
+    zlist_push (list, "bread");
+    zlist_append (list, "cheese");
+    assert (zlist_size (list) == 2);
+    assert (streq ((const char *) zlist_first (list), "bread"));
+    item = (char *) zlist_pop (list);
+    assert (streq (item, "bread"));
+    free (item);
+    item = (char *) zlist_pop (list);
+    assert (streq (item, "cheese"));
+    free (item);
+    
     zlist_destroy (&list);
     assert (list == NULL);
     //  @end
