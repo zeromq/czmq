@@ -114,7 +114,7 @@ zdir_patch_dup (zdir_patch_t *self)
                 //  Don't recalculate hash when we duplicate patch
                 copy->digest = self->digest ? strdup (self->digest) : NULL;
 
-            if (copy->digest == NULL)
+            if (copy->digest == NULL && copy->op != patch_delete)
                 zdir_patch_destroy (&copy);
         }
         return copy;
