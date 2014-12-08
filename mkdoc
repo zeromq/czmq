@@ -1,12 +1,5 @@
 #! /bin/bash
 #
-#   Generate zapi documentation
-
-#   Generate man pages and website manual
-cd doc
-./mksite
-cd ..
-
 #   Generate README.md and upload to git
 gitdown README.txt
 git add README.* images
