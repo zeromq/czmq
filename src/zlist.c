@@ -529,30 +529,26 @@ zlist_test (int verbose)
     zlist_append (list, sub_list_2);
     assert (zlist_freefn (list, sub_list, &s_zlist_free, false) == sub_list);
     assert (zlist_freefn (list, sub_list_2, &s_zlist_free, true) == sub_list_2);
-
-    //  Destructor should be safe to call twice
     zlist_destroy (&list);
+
+    //  Test autofree functionality
+    list = zlist_new ();
+    assert (list);
+    zlist_autofree (list);
+    zlist_push (list, "bread");
+    zlist_append (list, "cheese");
+    assert (zlist_size (list) == 2);
+    assert (streq ((const char *) zlist_first (list), "bread"));
+    item = (char *) zlist_pop (list);
+    assert (streq (item, "bread"));
+    free (item);
+    item = (char *) zlist_pop (list);
+    assert (streq (item, "cheese"));
+    free (item);
+    
     zlist_destroy (&list);
     assert (list == NULL);
     //  @end
-
-    // Check autofree
-    list = zlist_new ();
-    assert (list);
-    char *tmp = NULL;
-    tmp = strdup(bread);
-    zlist_autofree (list);
-    zlist_push (list, tmp);
-    tmp[0] = 'B';
-    zlist_append (list, tmp);
-    assert (zlist_size (list) == 2);
-    assert (zlist_first (list) != tmp);
-    assert (streq ((const char *) zlist_first (list), bread));
-    item = (char *) zlist_pop (list);
-    assert (zlist_first (list) != tmp);
-    assert (streq ((const char *) zlist_first (list), tmp));
-    zlist_destroy (&list);
-    assert (list == NULL);
 
     printf ("OK\n");
 }
