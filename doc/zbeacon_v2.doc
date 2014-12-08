@@ -1,4 +1,4 @@
-#### zbeacon_v2 - no title found
+#### zbeacon_v2 - LAN discovery and presence (deprecated)
 
 The zbeacon class implements a peer-to-peer discovery service for local
 networks. A beacon can broadcast and/or capture service announcements

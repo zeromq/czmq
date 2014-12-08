@@ -66,6 +66,11 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void *
     zlistx_cursor (zlistx_t *self);
 
+//  Returns the item associated with the given list handle, or NULL if passed
+//  in handle is NULL. Asserts that the passed in handle points to a list element.
+CZMQ_EXPORT  void *
+    zlistx_handle_item (void *handle);
+
 //  Find an item in the list, searching from the start. Uses the item
 //  comparator, if any, else compares item values directly. Returns the
 //  item handle found, or NULL. Sets the cursor to the found item, if any.
@@ -198,6 +203,10 @@ assert (streq ((char *) zlistx_prev (list), "hello"));
 zlistx_sort (list);
 assert (zlistx_size (list) == 2);
 void *handle = zlistx_find (list, "hello");
+char *item1 = (char *) zlistx_item (list);
+char *item2 = (char *) zlistx_handle_item (handle);
+assert (item1 == item2);
+assert (streq (item1, "hello"));
 zlistx_delete (list, handle);
 assert (zlistx_size (list) == 1);
 char *string = (char *) zlistx_detach (list, NULL);
