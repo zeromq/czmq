@@ -196,15 +196,17 @@ zstr_recvx (void *source, char **string_p, ...)
     if (!msg)
         return -1;
 
+    int count = 0;
     va_list args;
     va_start (args, string_p);
     while (string_p) {
         *string_p = zmsg_popstr (msg);
         string_p = va_arg (args, char **);
+        count++;
     }
     va_end (args);
     zmsg_destroy (&msg);
-    return 0;
+    return count;
 }
 
 
