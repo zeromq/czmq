@@ -200,6 +200,7 @@ zfile_restat (zfile_t *self)
         self->mode = 0;
         self->stable = false;
     }
+    zdigest_destroy(&self->digest);
 }
 
 
@@ -447,8 +448,8 @@ zfile_close (zfile_t *self)
     if (self->handle) {
         fclose (self->handle);
         zfile_restat (self);
+        self->handle = 0;
     }
-    self->handle = 0;
 }
 
 
@@ -470,6 +471,7 @@ zfile_handle (zfile_t *self)
 char *
 zfile_digest (zfile_t *self)
 {
+    assert(self);
     if (!self->digest) {
         if (zfile_input (self) == -1)
             return NULL;            //  Problem reading file
@@ -490,7 +492,9 @@ zfile_digest (zfile_t *self)
             chunk = zfile_read (self, blocksz, offset);
         }
         zchunk_destroy (&chunk);
-        zfile_close (self);
+        // inlined zfile_close without zfile_restat
+        fclose(self->handle);
+        self->handle = 0;
     }
     return zdigest_string (self->digest);
 }
@@ -580,6 +584,7 @@ zfile_test (bool verbose)
     assert (zfile_is_readable (file));
     assert (zfile_cursize (file) == 1000100);
     assert (!zfile_is_stable (file));
+    assert (zfile_digest (file));
 
     //  Now append one byte to file from outside
     int handle = open ("./this/is/a/test/bilbo", O_WRONLY | O_TRUNC | O_BINARY, 0);
