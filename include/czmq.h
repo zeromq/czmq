@@ -85,17 +85,10 @@ typedef int (czmq_comparator) (const void *item1, const void *item2);
 #include "zdir_patch.h"
 #include "zfile.h"
 #include "zframe.h"
-<<<<<<< HEAD
-/*#include "zgossip.h"*/
-#include "zhash.h"
-#include "zlist.h"
-#include "zlog.h"
-=======
 #include "zgossip.h"
 #include "zhashx.h"
 #include "ziflist.h"
 #include "zlistx.h"
->>>>>>> 07ab3bf4a9e05f1770abc44126f3ff4cf33d1082
 #include "zloop.h"
 #include "zmonitor.h"
 #include "zmsg.h"
