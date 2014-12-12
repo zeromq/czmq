@@ -200,6 +200,12 @@ CZMQ_EXPORT const char *
 CZMQ_EXPORT int
     zsock_send (void *self, const char *picture, ...);
 
+//  Send a 'picture' message to the socket (or actor). This is a
+//  va_list version of zsock_send (), so please consult its documentation
+//  for the details.
+CZMQ_EXPORT int
+    zsock_vsend (void *self, const char *picture, va_list argptr);
+
 //  Receive a 'picture' message to the socket (or actor). See zsock_send for
 //  the format and meaning of the picture. Returns the picture elements into
 //  a series of pointers as provided by the caller:
@@ -226,6 +232,12 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zsock_recv (void *self, const char *picture, ...);
 
+//  Receive a 'picture' message from the socket (or actor). This is a
+//  va_list version of zsock_recv (), so please consult its documentation
+//  for the details.
+CZMQ_EXPORT int
+    zsock_vrecv (void *self, const char *picture, va_list argptr);
+
 //  Send a binary encoded 'picture' message to the socket (or actor). This
 //  method is similar to zsock_send, except the arguments are encoded in a
 //  binary format that is compatible with zproto, and is designed to reduce
@@ -248,7 +260,7 @@ CZMQ_EXPORT int
 //  successful, -1 if sending failed for any reason.
 CZMQ_EXPORT int
     zsock_bsend (void *self, const char *picture, ...);
-    
+
 //  Receive a binary encoded 'picture' message from the socket (or actor).
 //  This method is similar to zsock_recv, except the arguments are encoded
 //  in a binary format that is compatible with zproto, and is designed to
@@ -259,7 +271,7 @@ CZMQ_EXPORT int
 //  values. Returns 0 if successful, or -1 if it failed to read a message.
 CZMQ_EXPORT int
     zsock_brecv (void *self, const char *picture, ...);
-    
+
 //  Set socket to use unbounded pipes (HWM=0); use this in cases when you are
 //  totally certain the message volume can fit in memory. This method works
 //  across all versions of ZeroMQ. Takes a polymorphic socket reference.
@@ -273,7 +285,7 @@ CZMQ_EXPORT void
 //  not be sent. Takes a polymorphic socket reference.
 CZMQ_EXPORT int
     zsock_signal (void *self, byte status);
-    
+
 //  Wait on a signal. Use this to coordinate between threads, over pipe
 //  pairs. Blocks until the signal is received. Returns -1 on error, 0 or
 //  greater on success. Accepts a zsock_t or a zactor_t as argument.
