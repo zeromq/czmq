@@ -27,7 +27,6 @@ foreach(which MAJOR MINOR PATCH)
 endforeach(which)
 
 set(CZMQ_VERSION ${CZMQ_MAJOR_VERSION}.${CZMQ_MINOR_VERSION}.${CZMQ_PATCH_VERSION})
-message(STATUS "Detected CZMQ Version - ${CZMQ_VERSION}")
 
 ########################################################################
 # platform.h
@@ -70,6 +69,10 @@ if (MINGW)
     set(MORE_LIBRARIES -lws2_32 -lrpcrt4 -liphlpapi)
 endif()
 
+if(WIN32)
+  add_definitions(-DLIBCZMQ_STATIC)
+endif()
+
 ########################################################################
 # ZeroMQ depedency
 ########################################################################
@@ -96,7 +99,7 @@ set (czmq_headers
     include/zdir_patch.h
     include/zfile.h
     include/zframe.h
-#    include/zgossip.h
+    include/zgossip.h
     include/zhashx.h
     include/ziflist.h
     include/zlistx.h
@@ -151,7 +154,7 @@ set (czmq_sources
     src/zdir_patch.c
     src/zfile.c
     src/zframe.c
-#    src/zgossip.c
+    src/zgossip.c
     src/zhashx.c
     src/ziflist.c
     src/zlistx.c
@@ -166,7 +169,7 @@ set (czmq_sources
     src/zstr.c
     src/zsys.c
     src/zuuid.c
-#    src/zgossip_msg.c
+    src/zgossip_msg.c
     src/zauth_v2.c
     src/zbeacon_v2.c
     src/zctx.c
@@ -181,46 +184,37 @@ set (czmq_sources
 )
 source_group ("Source Files" FILES ${czmq_sources})
 
-add_library(czmq SHARED ${czmq_sources})
+#add_library(czmq SHARED ${czmq_sources})
+add_library(czmq STATIC ${czmq_sources})
 target_link_libraries(czmq ${ZEROMQ_LIBRARIES} ${MORE_LIBRARIES})
+set_target_properties(czmq PROPERTIES
+    COMPILE_FLAGS "/D LIBCZMQ_STATIC"
+    OUTPUT_NAME "czmq")
 
-if(MSVC)
-    set_target_properties(czmq PROPERTIES DEFINE_SYMBOL   "LIBCZMQ_EXPORTS"
-                                          PUBLIC_HEADER   "${public_headers}"
-                                          RELEASE_POSTFIX "-mt-${CZMQ_MAJOR_VERSION}_${CZMQ_MINOR_VERSION}_${CZMQ_PATCH_VERSION}"
-                                          DEBUG_POSTFIX   "-mt-gd-${CZMQ_MAJOR_VERSION}_${CZMQ_MINOR_VERSION}_${CZMQ_PATCH_VERSION}"
-                                          RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin")
-else()
-    set_target_properties(czmq PROPERTIES DEFINE_SYMBOL   "LIBCZMQ_EXPORTS"
-                                          PUBLIC_HEADER   "${public_headers}"
-                                          RELEASE_POSTFIX "-${CZMQ_MAJOR_VERSION}_${CZMQ_MINOR_VERSION}_${CZMQ_PATCH_VERSION}"
-                                          DEBUG_POSTFIX   "-gd-${CZMQ_MAJOR_VERSION}_${CZMQ_MINOR_VERSION}_${CZMQ_PATCH_VERSION}"
-                                          RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin")
-endif()
-
-install(TARGETS czmq
-    LIBRARY DESTINATION lib${LIB_SUFFIX} # .so file
-    ARCHIVE DESTINATION lib${LIB_SUFFIX} # .lib file
-    RUNTIME DESTINATION bin              # .dll file
-)
+#install(TARGETS czmq
+#    LIBRARY DESTINATION lib${LIB_SUFFIX} # .so file
+#    ARCHIVE DESTINATION lib${LIB_SUFFIX} # .lib file
+#    RUNTIME DESTINATION bin              # .dll file
+#)
 
 ########################################################################
 # pkgconfig
 ########################################################################
-set(VERSION "${CZMQ_VERSION}")
-set(prefix "${CMAKE_INSTALL_PREFIX}")
-set(exec_prefix "\${prefix}")
-set(libdir "\${prefix}/lib${LIB_SUFFIX}")
-set(includedir "\${prefix}/include")
-configure_file(
-    ${SOURCE_DIR}/src/libczmq.pc.in
-    ${BINARY_DIR}/libczmq.pc
-@ONLY)
+#set(VERSION "${CZMQ_VERSION}")
+#set(prefix "${CMAKE_INSTALL_PREFIX}")
+#set(exec_prefix "\${prefix}")
+#set(libdir "\${prefix}/lib${LIB_SUFFIX}")
+#set(includedir "\${prefix}/include")
+#configure_file(
+#    ${SOURCE_DIR}/src/libczmq.pc.in
+#    ${BINARY_DIR}/libczmq.pc
+#@ONLY)
+#
+#install(
+#    FILES ${BINARY_DIR}/libczmq.pc
+#    DESTINATION lib${LIB_SUFFIX}/pkgconfig
+#)
 
-install(
-    FILES ${BINARY_DIR}/libczmq.pc
-    DESTINATION lib${LIB_SUFFIX}/pkgconfig
-)
 
 ########################################################################
 # tests
