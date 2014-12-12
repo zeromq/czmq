@@ -560,11 +560,24 @@ zsock_type_str (zsock_t *self)
 int
 zsock_send (void *self, const char *picture, ...)
 {
+    va_list argptr;
+    va_start (argptr, picture);
+    int rc = zsock_vsend (self, picture, argptr);
+    va_end (argptr);
+    return rc;
+}
+
+
+//  Send a 'picture' message to the socket (or actor). This is a
+//  va_list version of zsock_send (), so please consult its documentation
+//  for the details.
+
+int
+zsock_vsend (void *self, const char *picture, va_list argptr)
+{
     assert (self);
     assert (picture);
 
-    va_list argptr;
-    va_start (argptr, picture);
     zmsg_t *msg = zmsg_new ();
     while (*picture) {
         if (*picture == 'i')
@@ -624,7 +637,6 @@ zsock_send (void *self, const char *picture, ...)
         }
         picture++;
     }
-    va_end (argptr);
     return zmsg_send (&msg, self);
 }
 
@@ -657,6 +669,21 @@ zsock_send (void *self, const char *picture, ...)
 int
 zsock_recv (void *self, const char *picture, ...)
 {
+    va_list argptr;
+    va_start (argptr, picture);
+    int rc = zsock_vrecv (self, picture, argptr);
+    va_end (argptr);
+    return rc;
+}
+
+
+//  Receive a 'picture' message from the socket (or actor). This is a
+//  va_list version of zsock_recv (), so please consult its documentation
+//  for the details.
+
+int
+zsock_vrecv (void *self, const char *picture, va_list argptr)
+{
     assert (self);
     assert (picture);
     zmsg_t *msg = zmsg_recv (self);
@@ -664,8 +691,6 @@ zsock_recv (void *self, const char *picture, ...)
         return -1;              //  Interrupted
 
     int rc = 0;
-    va_list argptr;
-    va_start (argptr, picture);
     while (*picture) {
         if (*picture == 'i') {
             char *string = zmsg_popstr (msg);
@@ -781,7 +806,6 @@ zsock_recv (void *self, const char *picture, ...)
         }
         picture++;
     }
-    va_end (argptr);
     zmsg_destroy (&msg);
     return rc;
 }
