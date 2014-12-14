@@ -723,6 +723,32 @@ zmsg_print (zmsg_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  Return true if the two messages have the same number of frames and each
+//  frame in the first message is identical to the corresponding frame in the
+//  other message. As with zframe_eq, return false if either message is NULL.
+
+bool
+zmsg_eq (zmsg_t *self, zmsg_t *other)
+{
+    if (!self || !other)
+        return false;
+    
+    if (zlistx_size (self->frames) != zlistx_size (other->frames))
+        return false;
+    
+    zframe_t *self_frame = (zframe_t *) zlistx_first (self->frames);
+    zframe_t *other_frame = (zframe_t *) zlistx_first (other->frames);
+    while (self_frame && other_frame) {
+        if (!zframe_eq (self_frame, other_frame))
+            return false;
+        self_frame = (zframe_t *) zlistx_next (self->frames);
+        other_frame = (zframe_t *) zlistx_next (other->frames);
+    }
+    return true;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Probe the supplied object, and report if it looks like a zmsg_t.
 
 bool
@@ -1044,6 +1070,30 @@ zmsg_test (bool verbose)
     frame = zmsg_pop (msg);
     assert (frame == NULL);
     zmsg_destroy (&msg);
+
+    //  Test comparison of two messages
+    msg = zmsg_new ();
+    zmsg_addstr (msg, "One");
+    zmsg_addstr (msg, "Two");
+    zmsg_addstr (msg, "Three");
+    zmsg_t *msg_other = zmsg_new ();
+    zmsg_addstr (msg_other, "One");
+    zmsg_addstr (msg_other, "Two");
+    zmsg_addstr (msg_other, "One-Hundred");
+    zmsg_t *msg_dup = zmsg_dup (msg);
+    zmsg_t *empty_msg = zmsg_new ();
+    zmsg_t *empty_msg_2 = zmsg_new ();
+    assert (zmsg_eq (msg, msg_dup));
+    assert (!zmsg_eq (msg, msg_other));
+    assert (zmsg_eq (empty_msg, empty_msg_2));
+    assert (!zmsg_eq (msg, NULL));
+    assert (!zmsg_eq (NULL, empty_msg));
+    assert (!zmsg_eq (NULL, NULL));
+    zmsg_destroy (&msg);
+    zmsg_destroy (&msg_other);
+    zmsg_destroy (&msg_dup);
+    zmsg_destroy (&empty_msg);
+    zmsg_destroy (&empty_msg_2);
 
     //  Now try methods on an empty message
     msg = zmsg_new ();
