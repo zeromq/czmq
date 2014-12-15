@@ -1287,8 +1287,8 @@ zsock_wait (void *self)
         zmsg_t *msg = zmsg_recv (self);
         if (!msg)
             return -1;
-        if (  zmsg_size (msg) == 1
-           && zmsg_content_size (msg) == 8) {
+        if (zmsg_size (msg) == 1
+        &&  zmsg_content_size (msg) == 8) {
             zframe_t *frame = zmsg_first (msg);
             int64_t signal_value = *((int64_t *) zframe_data (frame));
             if ((signal_value & 0xFFFFFFFFFFFFFF00L) == 0x7766554433221100L) {

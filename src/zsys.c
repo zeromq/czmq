@@ -163,8 +163,8 @@ zsys_init (void)
             s_logsystem = false;
     }
     //  Catch SIGINT and SIGTERM unless ZSYS_SIGHANDLER=false
-    if (  getenv ("ZSYS_SIGHANDLER") == NULL
-       || strneq (getenv ("ZSYS_SIGHANDLER"), "false"))
+    if (getenv ("ZSYS_SIGHANDLER") == NULL
+    ||  strneq (getenv ("ZSYS_SIGHANDLER"), "false"))
         zsys_catch_interrupts ();
 
     ZMUTEX_INIT (s_mutex);
@@ -905,32 +905,32 @@ zsys_socket_error (const char *reason)
         default:              errno = GetLastError ();
     }
 #endif
-    if (  errno == EAGAIN
-       || errno == ENETDOWN
-       || errno == EHOSTUNREACH
-       || errno == ENETUNREACH
-       || errno == EINTR
-       || errno == EPIPE
-       || errno == ECONNRESET
+    if (errno == EAGAIN
+    ||  errno == ENETDOWN
+    ||  errno == EHOSTUNREACH
+    ||  errno == ENETUNREACH
+    ||  errno == EINTR
+    ||  errno == EPIPE
+    ||  errno == ECONNRESET
 #if defined (ENOPROTOOPT)
-       || errno == ENOPROTOOPT
+    ||  errno == ENOPROTOOPT
 #endif
 #if defined (EHOSTDOWN)
-       || errno == EHOSTDOWN
+    ||  errno == EHOSTDOWN
 #endif
 #if defined (EOPNOTSUPP)
-       || errno == EOPNOTSUPP
+    ||  errno == EOPNOTSUPP
 #endif
 #if defined (EWOULDBLOCK)
-       || errno == EWOULDBLOCK
+    ||  errno == EWOULDBLOCK
 #endif
 #if defined (EPROTO)
-       || errno == EPROTO
+    ||  errno == EPROTO
 #endif
 #if defined (ENONET)
-       || errno == ENONET
+    ||  errno == ENONET
 #endif
-          )
+    )
         return;             //  Ignore error and try again
     else {
         zsys_error ("(UDP) error '%s' on %s", strerror (errno), reason);

@@ -67,8 +67,8 @@ zsocket_bind (void *self, const char *format, ...)
     va_end (argptr);
 
     //  Port must be at end of endpoint
-    if (  endpoint [endpoint_size - 2] == ':'
-       && endpoint [endpoint_size - 1] == '*') {
+    if (endpoint [endpoint_size - 2] == ':'
+    &&  endpoint [endpoint_size - 1] == '*') {
         int port = ZSOCKET_DYNFROM;
         while (port <= ZSOCKET_DYNTO) {
             //  Try to bind on the next plausible port
