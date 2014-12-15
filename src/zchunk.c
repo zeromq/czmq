@@ -364,8 +364,8 @@ zchunk_streq (zchunk_t *self, const char *string)
     assert (self);
     assert (zchunk_is (self));
 
-    zchunk_size (self) == strlen (string)
-       && memcmp (zchunk_data (self), string, strlen (string)) == 0)
+    if (zchunk_size (self) == strlen (string)
+    &&  memcmp (zchunk_data (self), string, strlen (string)) == 0)
         return true;
     else
         return false;
