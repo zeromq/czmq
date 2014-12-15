@@ -1260,12 +1260,8 @@ int
 zsock_signal (void *self, byte status)
 {
     assert (self);
-    int64_t signal_value = 0x7766554433221100L + status;
-    zmsg_t *msg = zmsg_new ();
-    int rc = zmsg_addmem (msg, &signal_value, 8);
-    if (rc == 0)
-        rc = zmsg_send (&msg, self);
-    return rc;
+    zmsg_t *msg = zmsg_new_signal (status);
+    return zmsg_send (&msg, self);
 }
 
 
@@ -1280,23 +1276,15 @@ zsock_wait (void *self)
 {
     assert (self);
 
-    //  A signal is a message containing one frame with our 8-byte magic
-    //  value. If we get anything else, we discard it and continue to look
-    //  for the signal message
+    //  Loop and discard messages until we get a signal value or interrupt.
     while (true) {
         zmsg_t *msg = zmsg_recv (self);
         if (!msg)
             return -1;
-        if (  zmsg_size (msg) == 1
-           && zmsg_content_size (msg) == 8) {
-            zframe_t *frame = zmsg_first (msg);
-            int64_t signal_value = *((int64_t *) zframe_data (frame));
-            if ((signal_value & 0xFFFFFFFFFFFFFF00L) == 0x7766554433221100L) {
-                zmsg_destroy (&msg);
-                return signal_value & 255;
-            }
-        }
+        int rc = zmsg_signal (msg);
         zmsg_destroy (&msg);
+        if (rc >= 0)
+            return rc;
     }
     return -1;
 }
@@ -1424,8 +1412,8 @@ zsock_test (bool verbose)
     assert (port >= 50000 && port <= DYNAMIC_LAST);
     port = zsock_bind (writer, "tcp://127.0.0.1:*[-50001]");
     assert (port >= DYNAMIC_FIRST && port <= 50001);
-    port = zsock_bind (writer, "tcp://127.0.0.1:*[60000-60010]");
-    assert (port >= 60000 && port <= 60010);
+    port = zsock_bind (writer, "tcp://127.0.0.1:*[60000-60050]");
+    assert (port >= 60000 && port <= 60050);
 
     port = zsock_bind (writer, "tcp://127.0.0.1:!");
     assert (port >= DYNAMIC_FIRST && port <= DYNAMIC_LAST);
@@ -1433,8 +1421,8 @@ zsock_test (bool verbose)
     assert (port >= 50000 && port <= DYNAMIC_LAST);
     port = zsock_bind (writer, "tcp://127.0.0.1:![-50001]");
     assert (port >= DYNAMIC_FIRST && port <= 50001);
-    port = zsock_bind (writer, "tcp://127.0.0.1:![60000-60010]");
-    assert (port >= 60000 && port <= 60010);
+    port = zsock_bind (writer, "tcp://127.0.0.1:![60000-60050]");
+    assert (port >= 60000 && port <= 60050);
 
     //  Test zsock_attach method
     zsock_t *server = zsock_new (ZMQ_DEALER);

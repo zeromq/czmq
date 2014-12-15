@@ -749,6 +749,39 @@ zmsg_eq (zmsg_t *self, zmsg_t *other)
 
 
 //  --------------------------------------------------------------------------
+//  Generate a signal message encoding the given status. A signal is a short
+//  message carrying a 1-byte success/failure code (by convention, 0 means
+//  OK). Signals are encoded to be distinguishable from "normal" messages.
+
+zmsg_t *
+zmsg_new_signal (byte status)
+{
+    zmsg_t *self = zmsg_new ();
+    int64_t signal_value = 0x7766554433221100L + status;
+    if (zmsg_addmem (self, &signal_value, 8))
+        zmsg_destroy (&self);
+    return self;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return signal value, 0 or greater, if message is a signal, -1 if not.
+
+int
+zmsg_signal (zmsg_t *self)
+{
+    if (zmsg_size (self) == 1
+    &&  zmsg_content_size (self) == 8) {
+        zframe_t *frame = zmsg_first (self);
+        int64_t signal_value = *((int64_t *) zframe_data (frame));
+        if ((signal_value & 0xFFFFFFFFFFFFFF00L) == 0x7766554433221100L)
+            return signal_value & 255;
+    }
+    return -1;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Probe the supplied object, and report if it looks like a zmsg_t.
 
 bool
@@ -1094,6 +1127,14 @@ zmsg_test (bool verbose)
     zmsg_destroy (&msg_dup);
     zmsg_destroy (&empty_msg);
     zmsg_destroy (&empty_msg_2);
+
+    //  Test signal messages
+    msg = zmsg_new_signal (0);
+    assert (zmsg_signal (msg) == 0);
+    zmsg_destroy (&msg);
+    msg = zmsg_new_signal (-1);
+    assert (zmsg_signal (msg) == 255);
+    zmsg_destroy (&msg);
 
     //  Now try methods on an empty message
     msg = zmsg_new ();

@@ -180,8 +180,8 @@ zconfig_put (zconfig_t *self, const char *path, const char *value)
     //  Find or create items starting at first child of root
     zconfig_t *child = self->child;
     while (child) {
-        if (  strlen (child->name) == length
-           && memcmp (child->name, path, length) == 0) {
+        if (strlen (child->name) == length
+        &&  memcmp (child->name, path, length) == 0) {
             //  This segment exists
             if (slash)          //  Recurse to next level
                 zconfig_put (child, slash + 1, value);
@@ -277,8 +277,8 @@ zconfig_locate (zconfig_t *self, const char *path)
     //  Find matching name starting at first child of root
     zconfig_t *child = self->child;
     while (child) {
-        if (  strlen (child->name) == length
-           && memcmp (child->name, path, length) == 0) {
+        if (strlen (child->name) == length
+        &&  memcmp (child->name, path, length) == 0) {
             if (slash)          //  Look deeper
                 return zconfig_locate (child, slash);
             else
@@ -654,8 +654,9 @@ s_collect_name (char **start, int lineno)
     memcpy (name, readptr, length);
     name [length] = 0;
 
-    if (  length > 0
-       && (name [0] == '/' || name [length - 1] == '/')) {
+    if (length > 0
+    && (name [0] == '/'
+    ||  name [length - 1] == '/')) {
         zclock_log ("E (zconfig): (%d) '/' not valid at name start or end", lineno);
         free (name);
         name = NULL;

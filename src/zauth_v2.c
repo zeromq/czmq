@@ -556,8 +556,8 @@ s_authenticate_curve (agent_t *self, zap_request_t *request)
         return true;
     }
     else
-    if (  self->certstore
-       && zcertstore_lookup (self->certstore, request->client_key)) {
+    if (self->certstore
+    &&  zcertstore_lookup (self->certstore, request->client_key)) {
         if (self->verbose)
             printf ("ZAUTH I: ALLOWED (CURVE) client_key=%s\n", request->client_key);
         return true;

@@ -73,8 +73,8 @@ static void
 s_posix_populate_entry (zdir_t *self, struct dirent *entry)
 {
     //  Skip . and ..
-    if (  streq (entry->d_name, ".")
-       || streq (entry->d_name, ".."))
+    if (streq (entry->d_name, ".")
+    ||  streq (entry->d_name, ".."))
         return;
 
     char fullpath [1024 + 1];
@@ -424,8 +424,8 @@ zdir_remove (zdir_t *self, bool force)
         self->count = 0;
     }
     //  Remove if empty
-    if (  zlist_size (self->files) == 0
-       && zlist_size (self->subdirs) == 0)
+    if (zlist_size (self->files) == 0
+    &&  zlist_size (self->subdirs) == 0)
         zsys_dir_delete (self->path);
 }
 
@@ -493,8 +493,8 @@ zdir_diff (zdir_t *older, zdir_t *newer, const char *alias)
                 //  Old file was modified or replaced
                 //  Since we don't check file contents, treat as created
                 //  Could better do SHA check on file here
-                if (  zfile_modified (new_file) != zfile_modified (old_file)
-                   || zfile_cursize (new_file) != zfile_cursize (old_file)) {
+                if (zfile_modified (new_file) != zfile_modified (old_file)
+                ||  zfile_cursize (new_file) != zfile_cursize (old_file)) {
                     int rc = zlist_append (patches, zdir_patch_new (newer->path, new_file, patch_create, alias));
                     if (rc != 0) {
                         zlist_destroy (&patches);
