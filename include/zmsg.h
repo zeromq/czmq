@@ -170,6 +170,12 @@ CZMQ_EXPORT zmsg_t *
 CZMQ_EXPORT void
     zmsg_print (zmsg_t *self);
 
+//  Return true if the two messages have the same number of frames and each
+//  frame in the first message is identical to the corresponding frame in the
+//  other message. As with zframe_eq, return false if either message is NULL.
+CZMQ_EXPORT bool
+    zmsg_eq (zmsg_t *self, zmsg_t *other);
+
 //  Probe the supplied object, and report if it looks like a zmsg_t.
 CZMQ_EXPORT bool
     zmsg_is (void *self);
