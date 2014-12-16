@@ -558,6 +558,8 @@ typedef int SOCKET;
 #       include <dce/uuid.h>
 #   elif defined (__UNIX__)
 #       include <uuid/uuid.h>
+#   elif defined (__WINDOWS__)
+#       include <rpc.h>
 #   endif
 #endif
 
