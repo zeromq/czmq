@@ -171,6 +171,7 @@ This is the class self test code:
     assert (zfile_is_readable (file));
     assert (zfile_cursize (file) == 1000100);
     assert (!zfile_is_stable (file));
+    assert (zfile_digest (file));
     
     //  Now append one byte to file from outside
     int handle = open ("./this/is/a/test/bilbo", O_WRONLY | O_TRUNC | O_BINARY, 0);
