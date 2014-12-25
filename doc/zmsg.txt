@@ -159,6 +159,22 @@ CZMQ_EXPORT zmsg_t *
 CZMQ_EXPORT void
     zmsg_print (zmsg_t *self);
 
+//  Return true if the two messages have the same number of frames and each
+//  frame in the first message is identical to the corresponding frame in the
+//  other message. As with zframe_eq, return false if either message is NULL.
+CZMQ_EXPORT bool
+    zmsg_eq (zmsg_t *self, zmsg_t *other);
+
+//  Generate a signal message encoding the given status. A signal is a short
+//  message carrying a 1-byte success/failure code (by convention, 0 means
+//  OK). Signals are encoded to be distinguishable from "normal" messages.
+CZMQ_EXPORT zmsg_t *
+    zmsg_new_signal (byte status);
+
+//  Return signal value, 0 or greater, if message is a signal, -1 if not.
+CZMQ_EXPORT int
+    zmsg_signal (zmsg_t *self);
+    
 //  Probe the supplied object, and report if it looks like a zmsg_t.
 CZMQ_EXPORT bool
     zmsg_is (void *self);
@@ -358,6 +374,38 @@ free (body);
 zmsg_destroy (&submsg);
 frame = zmsg_pop (msg);
 assert (frame == NULL);
+zmsg_destroy (&msg);
+
+//  Test comparison of two messages
+msg = zmsg_new ();
+zmsg_addstr (msg, "One");
+zmsg_addstr (msg, "Two");
+zmsg_addstr (msg, "Three");
+zmsg_t *msg_other = zmsg_new ();
+zmsg_addstr (msg_other, "One");
+zmsg_addstr (msg_other, "Two");
+zmsg_addstr (msg_other, "One-Hundred");
+zmsg_t *msg_dup = zmsg_dup (msg);
+zmsg_t *empty_msg = zmsg_new ();
+zmsg_t *empty_msg_2 = zmsg_new ();
+assert (zmsg_eq (msg, msg_dup));
+assert (!zmsg_eq (msg, msg_other));
+assert (zmsg_eq (empty_msg, empty_msg_2));
+assert (!zmsg_eq (msg, NULL));
+assert (!zmsg_eq (NULL, empty_msg));
+assert (!zmsg_eq (NULL, NULL));
+zmsg_destroy (&msg);
+zmsg_destroy (&msg_other);
+zmsg_destroy (&msg_dup);
+zmsg_destroy (&empty_msg);
+zmsg_destroy (&empty_msg_2);
+
+//  Test signal messages
+msg = zmsg_new_signal (0);
+assert (zmsg_signal (msg) == 0);
+zmsg_destroy (&msg);
+msg = zmsg_new_signal (-1);
+assert (zmsg_signal (msg) == 255);
 zmsg_destroy (&msg);
 
 //  Now try methods on an empty message
