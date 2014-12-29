@@ -121,12 +121,12 @@ zpoller_remove (zpoller_t *self, void *reader)
 //  --------------------------------------------------------------------------
 //  Poll the registered readers for I/O, return first reader that has input.
 //  The reader will be a libzmq void * socket, or a zsock_t or zactor_t
-//  instance as specified in zpoller_new/zpoller_add. The order that
-//  sockets are defined in the poll list affects their priority. If you
-//  need a balanced poll, use the low level zmq_poll method directly. If
-//  the poll call was interrupted (SIGINT), or the ZMQ context was
-//  destroyed, or the timeout expired, returns NULL. You can test the
-//  actual exit condition by calling zpoller_expired () and
+//  instance as specified in zpoller_new/zpoller_add. The timeout should be
+//  zero or greater, or -1 to wait indefinitely. Socket priority is defined
+//  by their order in the poll list. If you need a balanced poll, use the low
+//  level zmq_poll method directly. If the poll call was interrupted (SIGINT),
+//  or the ZMQ context was destroyed, or the timeout expired, returns NULL.
+//  You can test the actual exit condition by calling zpoller_expired () and
 //  zpoller_terminated (). The timeout is in msec.
 
 void *
