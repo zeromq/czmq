@@ -140,7 +140,7 @@ s_self_prepare_udp (self_t *self)
         if (bind (self->udpsock, (struct sockaddr *) &sockaddr, sizeof (inaddr_t)))
             zsys_socket_error ("bind");
 
-        //  Send our hostname back to API
+        //  Get our hostname so we can send it back to the API
         if (getnameinfo ((struct sockaddr *) &address, sizeof (inaddr_t),
                           self->hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST) == 0) {
             if (self->verbose)
