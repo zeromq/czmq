@@ -115,6 +115,10 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zsys_dir_delete (const char *pathname, ...);
 
+//  Move to a specified working directory. Returns 0 if OK, -1 if this failed.
+CZMQ_EXPORT int
+    zsys_dir_change (const char *pathname);
+
 //  Set private file creation mode; all files created from here will be
 //  readable/writable by the owner only.
 CZMQ_EXPORT void
@@ -176,10 +180,6 @@ CZMQ_EXPORT void
 //  a freshly allocated string, should free it using zstr_free().
 CZMQ_EXPORT char *
     zsys_hostname (void);
-
-//  Move to a specified working directory. Returns 0 if OK, -1 if this failed.
-CZMQ_EXPORT int
-    zsys_set_curdir (const char *workdir);
 
 //  Move the current process into the background. The precise effect depends
 //  on the operating system. On POSIX boxes, moves to a specified working

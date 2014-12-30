@@ -674,6 +674,22 @@ zsys_dir_delete (const char *pathname, ...)
 
 
 //  --------------------------------------------------------------------------
+//  Move to a specified working directory. Returns 0 if OK, -1 if this failed.
+
+int
+zsys_dir_change (const char *pathname)
+{
+    assert (pathname);
+#if (defined (__UNIX__))
+    return chdir (pathname);
+#elif (defined (__WINDOWS__))
+    return !SetCurrentDirectory (pathname);
+#endif
+    return -1;              //  Not implemented
+}
+
+
+//  --------------------------------------------------------------------------
 //  Set private file creation mode; all files created from here will be
 //  readable/writable by the owner only.
 
@@ -955,22 +971,6 @@ zsys_hostname (void)
 
 
 //  --------------------------------------------------------------------------
-//  Move to a specified working directory. Returns 0 if OK, -1 if this failed.
-
-int
-zsys_set_curdir (const char *workdir)
-{
-    assert (workdir);
-#if (defined (__UNIX__))
-    return chdir (workdir);
-#elif (defined (__WINDOWS__))
-    return !SetCurrentDirectory (workdir);
-#endif
-    return -1;              //  Not implemented
-}
-
-
-//  --------------------------------------------------------------------------
 //  Move the current process into the background. The precise effect depends
 //  on the operating system. On POSIX boxes, moves to a specified working
 //  directory (if specified), closes all file handles, reopens stdin, stdout,
@@ -994,7 +994,7 @@ zsys_daemonize (const char *workdir)
 
     //  Move to a safe and known directory, which is supplied as an
     //  argument to this function (or not, if workdir is NULL or empty).
-    if (workdir && zsys_set_curdir (workdir)) {
+    if (workdir && zsys_dir_change (workdir)) {
         zsys_error ("cannot chdir to '%s'", workdir);
         return -1;
     }
@@ -1610,8 +1610,7 @@ zsys_test (bool verbose)
     rc = zsys_dir_delete ("%s/%s", ".", ".testsys");
     assert (rc == 0);
     zsys_file_mode_default ();
-
-    assert (zsys_set_curdir (".") == 0);
+    assert (zsys_dir_change (".") == 0);
 
     int major, minor, patch;
     zsys_version (&major, &minor, &patch);
