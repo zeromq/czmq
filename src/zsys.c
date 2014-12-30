@@ -1012,6 +1012,7 @@ zsys_daemonize (const char *workdir)
 //  may be null, indicating a no-op. Returns 0 on success, -1 on failure.
 //  Note if you combine this with zsys_daemonize, run after, not before
 //  that method, or the lockfile will hold the wrong process ID.
+
 int
 zsys_run_as (const char *lockfile, const char *group, const char *user)
 {
@@ -1051,7 +1052,6 @@ zsys_run_as (const char *lockfile, const char *group, const char *user)
             close (handle);
             return -1;
         }
-        close (handle);
     }
     if (group) {
         zsys_info ("running under group '%s'", group);
