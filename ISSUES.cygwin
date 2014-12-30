@@ -1,0 +1,6 @@
+Known issues:
+
+czmq_selftest segfaults in zsock_test when sending a message with a binary picture type
+when it first calls zmsg_addmem which next invokes zframe_new, which invokes zmq_msg_data
+to get a pointer to the message content; zmq_msg_data returns a bad address and then
+memcpy segfaults.

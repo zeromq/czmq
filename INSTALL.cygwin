@@ -1,0 +1,13 @@
+  
+Cygwin users note: To do a complete build, you'll need to get iMatix' gsl and build
+it first; see https://github.com/imatix/gsl.
+
+After building and installing gsl, issue these commands in the czmq directory:
+
+cd ./model
+./generate
+cd ..
+./autogen.sh
+./configure
+cmake .
+make

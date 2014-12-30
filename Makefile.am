@@ -22,6 +22,7 @@ EXTRA_DIST = \
 	builds/android/clean.sh \
 	builds/mingw32/Makefile.mingw32 \
 	builds/mingw32/platform.h \
+	builds/cygwin/Makefile.cygwin \
 	examples/security/grasslands.c \
 	examples/security/strawhouse.c \
 	examples/security/woodhouse.c \

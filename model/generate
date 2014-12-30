@@ -4,6 +4,7 @@
 #       - add a new project class (project.xml)
 
 mkdir -p ../builds/mingw32
+mkdir -p ../builds/cygwin
 mkdir -p ../builds/android
 mkdir -p ../builds/msvc/vs2008/czmq
 mkdir -p ../builds/msvc/vs2008/czmq_selftest
