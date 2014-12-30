@@ -6,6 +6,7 @@ REM       - add a new project class (project.xml)
 REM       - modify one of the referenced gsl templates (*.gsl)
 
 mkdir ..\builds\mingw32
+mkdir ..\builds\cygwin
 mkdir ..\builds\android
 mkdir ..\builds\msvc\vs2008\czmq
 mkdir ..\builds\msvc\vs2008\czmq_selftest

@@ -1,0 +1,23 @@
+czmq-cygwin
+=============
+
+Implement a definitive build for cygwin targets.
+
+What's changed:
+  ./Makefile.am                       Add cygwin-specific target mostly the same as mingw
+  ./configure.ac                      Add cygwin-specific target mostly the same as mingw
+  ./model/build-autoconf.gsl          Make changes for cygwin-specific targets
+  ./model/build-cmake.gsl             Make changes for cygwin-specific targets
+  ./model/generate                    Make changes for cygwin-specific targets
+  ./model/generate.bat                Make changes for cygwin-specific targets
+  ./model/project.gsl                 Make changes for cygwin-specific targets
+  ./model/Makemodule.am               Make changes for cygwin-specific targets
+ 
+What's new:
+  ./README.cygwin                     This file
+  ./INSTALL.cygwin                    Notes on installing for cygwin
+  ./builds/cygwin                     Folder for cygwin-specific build files
+  ./builds/cygwin/Makefile.cygwin     Makefile for cygwin targets
+  ./model/build-cygwin.gsl            Add cygwin-specific target mostly the same as mingw
+  
+  

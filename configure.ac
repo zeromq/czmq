@@ -83,6 +83,7 @@ PKG_CHECK_MODULES([zmq], [libzmq])
 
 # Platform specific checks
 czmq_on_mingw32="no"
+czmq_on_cygwin="no"
 czmq_on_android="no"
 
 # Host speciffic checks
@@ -174,6 +175,7 @@ case "${host_os}" in
         # Define on Cygwin to enable all library features
         CPPFLAGS="-D_GNU_SOURCE $CPPFLAGS"
         AC_DEFINE(CZMQ_HAVE_CYGWIN, 1, [Have Cygwin])
+        czmq_on_mingw32="yes"
         ;;
     *)
         AC_MSG_ERROR([unsupported system: ${host_os}.])
@@ -209,6 +211,7 @@ if test "x$GCC" = "xyes"; then
 fi
 
 AM_CONDITIONAL(ON_MINGW, test "x$czmq_on_mingw32" = "xyes")
+AM_CONDITIONAL(ON_CYGWIN, test "x$czmq_on_cygwin" = "xyes")
 AM_CONDITIONAL(ON_ANDROID, test "x$czmq_on_android" = "xyes")
 AM_CONDITIONAL(INSTALL_MAN, test "x$czmq_install_man" = "xyes")
 AM_CONDITIONAL(BUILD_DOC, test "x$czmq_build_doc" = "xyes")
