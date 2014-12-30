@@ -177,6 +177,10 @@ CZMQ_EXPORT void
 CZMQ_EXPORT char *
     zsys_hostname (void);
 
+//  Move to a specified working directory. Returns 0 if OK, -1 if this failed.
+CZMQ_EXPORT int
+    zsys_set_curdir (const char *workdir);
+
 //  Move the current process into the background. The precise effect depends
 //  on the operating system. On POSIX boxes, moves to a specified working
 //  directory (if specified), closes all file handles, reopens stdin, stdout,
