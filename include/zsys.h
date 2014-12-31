@@ -115,6 +115,10 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zsys_dir_delete (const char *pathname, ...);
 
+//  Move to a specified working directory. Returns 0 if OK, -1 if this failed.
+CZMQ_EXPORT int
+    zsys_dir_change (const char *pathname);
+
 //  Set private file creation mode; all files created from here will be
 //  readable/writable by the owner only.
 CZMQ_EXPORT void

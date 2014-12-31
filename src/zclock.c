@@ -12,13 +12,13 @@
 */
 /*
 @header
-The zclock class provides essential sleep and system time functions, used
-to slow down threads for testing, and calculate timers for polling. Wraps
-the non-portable system calls in a simple portable API.
+    The zclock class provides essential sleep and system time functions,
+    used to slow down threads for testing, and calculate timers for polling.
+    Wraps the non-portable system calls in a simple portable API.
 @discuss
-The Win32 Sleep() call defaults to 16ms resolution unless the system timer
-resolution is increased with a call to timeBeginPeriod() permitting 1ms
-granularity.
+    The Win32 Sleep() call defaults to 16ms resolution unless the system
+    timer resolution is increased with a call to timeBeginPeriod() permitting
+    1ms granularity.
 @end
 */
 

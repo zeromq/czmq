@@ -674,6 +674,22 @@ zsys_dir_delete (const char *pathname, ...)
 
 
 //  --------------------------------------------------------------------------
+//  Move to a specified working directory. Returns 0 if OK, -1 if this failed.
+
+int
+zsys_dir_change (const char *pathname)
+{
+    assert (pathname);
+#if (defined (__UNIX__))
+    return chdir (pathname);
+#elif (defined (__WINDOWS__))
+    return !SetCurrentDirectory (pathname);
+#endif
+    return -1;              //  Not implemented
+}
+
+
+//  --------------------------------------------------------------------------
 //  Set private file creation mode; all files created from here will be
 //  readable/writable by the owner only.
 
@@ -978,7 +994,7 @@ zsys_daemonize (const char *workdir)
 
     //  Move to a safe and known directory, which is supplied as an
     //  argument to this function (or not, if workdir is NULL or empty).
-    if (workdir && chdir (workdir)) {
+    if (workdir && zsys_dir_change (workdir)) {
         zsys_error ("cannot chdir to '%s'", workdir);
         return -1;
     }
@@ -1012,6 +1028,7 @@ zsys_daemonize (const char *workdir)
 //  may be null, indicating a no-op. Returns 0 on success, -1 on failure.
 //  Note if you combine this with zsys_daemonize, run after, not before
 //  that method, or the lockfile will hold the wrong process ID.
+
 int
 zsys_run_as (const char *lockfile, const char *group, const char *user)
 {
@@ -1051,7 +1068,6 @@ zsys_run_as (const char *lockfile, const char *group, const char *user)
             close (handle);
             return -1;
         }
-        close (handle);
     }
     if (group) {
         zsys_info ("running under group '%s'", group);
@@ -1594,6 +1610,7 @@ zsys_test (bool verbose)
     rc = zsys_dir_delete ("%s/%s", ".", ".testsys");
     assert (rc == 0);
     zsys_file_mode_default ();
+    assert (zsys_dir_change (".") == 0);
 
     int major, minor, patch;
     zsys_version (&major, &minor, &patch);
