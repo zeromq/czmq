@@ -128,7 +128,6 @@ zuuid_set_str (zuuid_t *self, const char *source)
     assert (self);
     assert (strlen (source) == ZUUID_STR_LEN);
 
-    memcpy (self->str, source, ZUUID_STR_LEN);
     int byte_nbr;
     for (byte_nbr = 0; byte_nbr < ZUUID_LEN; byte_nbr++) {
         uint value;
@@ -136,9 +135,7 @@ zuuid_set_str (zuuid_t *self, const char *source)
             return -1;
         self->uuid [byte_nbr] = (byte) value;
     }
-    
-    self->str[ZUUID_STR_LEN-1] = '\0';
-
+    strcpy (self->str, source);
     return 0;
 }
 
