@@ -46,24 +46,24 @@ zuuid_new (void)
         assert (sizeof (uuid) == ZUUID_LEN);
         UuidCreate (&uuid);
         zuuid_set (self, (byte *) &uuid);
-#   elif defined (__UTYPE_OPENBSD) ||defined (__UTYPE_FREEBSD) ||defined (__UTYPE_NETBSD)
-	uuid_t uuid;
-	uint32_t status=0;
-	uuid_create (&uuid, &status);
-	if (status != uuid_s_ok) {
-	    zuuid_destroy (&self);
-	    return NULL;
-	}
-	byte buffer[ZUUID_LEN];
-	uuid_enc_be(&buffer,&uuid);
-	zuuid_set(self, buffer);
+#   elif defined (__UTYPE_OPENBSD) || defined (__UTYPE_FREEBSD) || defined (__UTYPE_NETBSD)
+        uuid_t uuid;
+        uint32_t status = 0;
+        uuid_create (&uuid, &status);
+        if (status != uuid_s_ok) {
+            zuuid_destroy (&self);
+            return NULL;
+        }
+        byte buffer [ZUUID_LEN];
+        uuid_enc_be (&buffer,&uuid);
+        zuuid_set (self, buffer);
 #   elif defined (__UTYPE_LINUX)
         uuid_t uuid;
         assert (sizeof (uuid) == ZUUID_LEN);
         uuid_generate (uuid);
         zuuid_set (self, (byte *) uuid);
 #   else
-	#error "Unknow UNIX TYPE"
+#       error "Unknow UNIX TYPE"
 #   endif
 #else
         //  No UUID system calls, so generate a random string
@@ -74,7 +74,8 @@ zuuid_new (void)
             assert (bytes_read == ZUUID_LEN);
             close (fd);
             zuuid_set (self, uuid);
-        } else
+        }
+        else
             //  We couldn't read /dev/urandom and we have no alternative
             //  strategy
             assert (false);
