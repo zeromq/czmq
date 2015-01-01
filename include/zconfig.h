@@ -93,7 +93,9 @@ CZMQ_EXPORT void
 CZMQ_EXPORT zlist_t *
     zconfig_comments (zconfig_t *self);
 
-//  Load a config tree from a specified ZPL text file
+//  Load a config tree from a specified ZPL text file; returns a zconfig_t
+//  reference for the root, if the file exists and is readable. Returns NULL
+//  if the file does not exist.
 CZMQ_EXPORT zconfig_t *
     zconfig_load (const char *filename);
 
