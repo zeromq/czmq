@@ -69,7 +69,6 @@ zfile_new (const char *path, const char *name)
             self->fullname = (char *) zmalloc (strlen (path) + strlen (name) + 2);
             if (self->fullname)
                 sprintf (self->fullname, "%s/%s", path, name);
-
             else {
                 zfile_destroy (&self);
                 return NULL;
@@ -90,10 +89,10 @@ zfile_new (const char *path, const char *name)
                         if (buffer [strlen (buffer) - 1] == '\n')
                             buffer [strlen (buffer) - 1] = 0;
                         self->link = strdup (buffer);
-                        if (self->link) {
-                            //  Chop ".ln" off name for external use
+                        
+                        //  Chop ".ln" off name for external use
+                        if (self->link)
                             self->fullname [strlen (self->fullname) - 3] = 0;
-                        }
                         else {
                             fclose (handle);
                             zfile_destroy (&self);
@@ -377,20 +376,18 @@ zfile_output (zfile_t *self)
     }
     rc = zsys_dir_create (file_path);
     free (file_path);
-    if (rc != 0) {
+    if (rc != 0)
         return -1;
-    }
 
     //  Create file if it doesn't exist
     if (self->handle)
         zfile_close (self);
+    
     self->handle = fopen (self->fullname, "r+b");
-    if (!self->handle) {
+    if (!self->handle)
         self->handle = fopen (self->fullname, "w+b");
-        if (!self->handle)
-            self->handle = fopen (self->fullname, "w+b");
-    }
-    return self->handle ? 0 : -1;
+    
+    return self->handle ? 0: -1;
 }
 
 
@@ -410,8 +407,7 @@ zfile_read (zfile_t *self, size_t bytes, off_t offset)
     if (bytes > (size_t) (self->cursize - offset))
         bytes = (size_t) (self->cursize - offset);
 
-    int rc = fseek (self->handle, (long) offset, SEEK_SET);
-    if (rc == -1)
+    if (fseek (self->handle, (long) offset, SEEK_SET) == -1)
         return NULL;
 
     self->eof = false;
@@ -492,8 +488,7 @@ zfile_digest (zfile_t *self)
             chunk = zfile_read (self, blocksz, offset);
         }
         zchunk_destroy (&chunk);
-        // inlined zfile_close without zfile_restat
-        fclose(self->handle);
+        fclose (self->handle);
         self->handle = 0;
     }
     return zdigest_string (self->digest);
