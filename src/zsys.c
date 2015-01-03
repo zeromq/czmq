@@ -683,7 +683,7 @@ zsys_dir_change (const char *pathname)
 #if (defined (__UNIX__))
     return chdir (pathname);
 #elif (defined (__WINDOWS__))
-    return !SetCurrentDirectory (pathname);
+    return !SetCurrentDirectoryA (pathname);
 #endif
     return -1;              //  Not implemented
 }
