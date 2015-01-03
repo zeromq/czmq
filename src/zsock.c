@@ -92,7 +92,7 @@ zsock_destroy_ (zsock_t **self_p, const char *filename, size_t line_nbr)
 
 //  --------------------------------------------------------------------------
 //  Smart constructors, which create sockets with additional set-up. In all of
-//  these, the endpoint is NULL, or starts with '@' (connect) or '>' (bind).
+//  these, the endpoint is NULL, or starts with '>' (connect) or '@' (bind).
 //  Multiple endpoints are allowed, separated by commas. If endpoint does not
 //  start with '@' or '>', default action depends on socket type.
 //  Create a PUB socket. Default action is bind.
