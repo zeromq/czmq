@@ -42,6 +42,8 @@ struct _zfile_t {
     bool eof;               //  true if at end of file
     FILE *handle;           //  Read/write handle
     zdigest_t *digest;      //  File digest, if known
+    char *curline;          //  Last read line, if any
+    size_t linemax;         //  Size of allocated buffer
 
     //  Properties from files that exist on file system
     time_t modified;        //  Modification time
@@ -124,6 +126,7 @@ zfile_destroy (zfile_t **self_p)
         if (self->handle)
             fclose (self->handle);
         free (self->fullname);
+        free (self->curline);
         free (self->link);
         free (self);
         *self_p = NULL;
@@ -393,13 +396,14 @@ zfile_output (zfile_t *self)
 
 //  --------------------------------------------------------------------------
 //  Read chunk from file at specified position. If this was the last chunk,
-//  sets self->eof. Returns a null chunk in case of error.
+//  sets the eof property. Returns a null chunk in case of error.
 
 zchunk_t *
 zfile_read (zfile_t *self, size_t bytes, off_t offset)
 {
     assert (self);
     assert (self->handle);
+    
     //  Calculate real number of bytes to read
     if (offset > self->cursize)
         bytes = 0;
@@ -415,6 +419,17 @@ zfile_read (zfile_t *self, size_t bytes, off_t offset)
     if (chunk)
         self->eof = zchunk_size (chunk) < bytes;
     return chunk;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Returns the eof property.
+
+bool
+zfile_eof (zfile_t *self)
+{
+    assert (self);
+    return self->eof;
 }
 
 
@@ -435,6 +450,45 @@ zfile_write (zfile_t *self, zchunk_t *chunk, off_t offset)
 
 
 //  --------------------------------------------------------------------------
+//  Read next line of text from file. Returns a pointer to the text line,
+//  or NULL if there was nothing more to read from the file.
+
+const char *
+zfile_readln (zfile_t *self)
+{
+    assert (self);
+    assert (self->handle);
+
+    //  Opportunistically allocate line buffer if needed; we'll grow this
+    //  if needed, so the initial linemax is not a big deal
+    if (!self->curline) {
+        self->linemax = 512; 
+        self->curline = (char *) malloc (self->linemax);
+    }
+    uint char_nbr = 0;
+    while (true) {
+        int cur_char = fgetc (self->handle);
+        if (cur_char == '\r')
+            continue;               //  Skip CR in MS-DOS format files
+        else
+        if (cur_char == EOF && char_nbr == 0)
+            return NULL;            //  Signal end of file
+        else
+        if (cur_char == '\n' || cur_char == EOF)
+            cur_char = 0;
+        if (char_nbr == self->linemax - 1) {
+            self->linemax *= 2;
+            self->curline = (char *) realloc (self->curline, self->linemax);
+        }
+        self->curline [char_nbr++] = cur_char;
+        if (cur_char == 0)
+            break;
+    }
+    return self->curline;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Close file, if open
 
 void
@@ -445,6 +499,7 @@ zfile_close (zfile_t *self)
         fclose (self->handle);
         zfile_restat (self);
         self->handle = 0;
+        self->eof = false;
     }
 }
 
@@ -603,6 +658,15 @@ zfile_test (bool verbose)
     assert (chunk);
     assert (zchunk_size (chunk) == 13);
     zchunk_destroy (&chunk);
+    zfile_close (file);
+
+    //  Check we can read lines from file
+    rc = zfile_input (file);
+    assert (rc == 0);
+    const char *line = zfile_readln (file);
+    assert (streq (line, "Hello, World"));
+    line = zfile_readln (file);
+    assert (line == NULL);
     zfile_close (file);
 
     //  Try some fun with symbolic links
