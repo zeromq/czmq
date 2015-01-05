@@ -74,6 +74,10 @@ if (MINGW)
     set(MORE_LIBRARIES -lws2_32 -lrpcrt4 -liphlpapi)
 endif()
 
+if(WIN32)
+  add_definitions(-DLIBCZMQ_STATIC)
+endif()
+
 ########################################################################
 # ZeroMQ depedency
 ########################################################################
@@ -184,33 +188,38 @@ set (czmq_sources
     src/zthread.c
 )
 source_group ("Source Files" FILES ${czmq_sources})
-add_library(czmq SHARED ${czmq_sources})
-set_target_properties(czmq PROPERTIES DEFINE_SYMBOL "LIBCZMQ_EXPORTS")
-target_link_libraries(czmq ${ZEROMQ_LIBRARIES} ${MORE_LIBRARIES})
 
-install(TARGETS czmq
-    LIBRARY DESTINATION lib${LIB_SUFFIX} # .so file
-    ARCHIVE DESTINATION lib${LIB_SUFFIX} # .lib file
-    RUNTIME DESTINATION bin              # .dll file
-)
+#add_library(czmq SHARED ${czmq_sources})
+add_library(czmq STATIC ${czmq_sources})
+target_link_libraries(czmq ${ZEROMQ_LIBRARIES} ${MORE_LIBRARIES})
+set_target_properties(czmq PROPERTIES
+    COMPILE_FLAGS "/D LIBCZMQ_STATIC"
+    OUTPUT_NAME "czmq")
+
+#install(TARGETS czmq
+#    LIBRARY DESTINATION lib${LIB_SUFFIX} # .so file
+#    ARCHIVE DESTINATION lib${LIB_SUFFIX} # .lib file
+#    RUNTIME DESTINATION bin              # .dll file
+#)
 
 ########################################################################
 # pkgconfig
 ########################################################################
-set(VERSION "${CZMQ_VERSION}")
-set(prefix "${CMAKE_INSTALL_PREFIX}")
-set(exec_prefix "\${prefix}")
-set(libdir "\${prefix}/lib${LIB_SUFFIX}")
-set(includedir "\${prefix}/include")
-configure_file(
-    ${SOURCE_DIR}/src/libczmq.pc.in
-    ${BINARY_DIR}/libczmq.pc
-@ONLY)
+#set(VERSION "${CZMQ_VERSION}")
+#set(prefix "${CMAKE_INSTALL_PREFIX}")
+#set(exec_prefix "\${prefix}")
+#set(libdir "\${prefix}/lib${LIB_SUFFIX}")
+#set(includedir "\${prefix}/include")
+#configure_file(
+#    ${SOURCE_DIR}/src/libczmq.pc.in
+#    ${BINARY_DIR}/libczmq.pc
+#@ONLY)
+#
+#install(
+#    FILES ${BINARY_DIR}/libczmq.pc
+#    DESTINATION lib${LIB_SUFFIX}/pkgconfig
+#)
 
-install(
-    FILES ${BINARY_DIR}/libczmq.pc
-    DESTINATION lib${LIB_SUFFIX}/pkgconfig
-)
 
 ########################################################################
 # tests
