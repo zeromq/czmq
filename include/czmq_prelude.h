@@ -438,8 +438,8 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
     typedef long ssize_t;
 #       endif
 #   endif
-#   if (!defined (__MINGW32__) \
-    || (defined (__MINGW32__) && defined (__IS_64BIT__)) \
+#   if ((!defined (__MINGW32__) \
+    || (defined (__MINGW32__) && defined (__IS_64BIT__))) \
     && !defined (ZMQ_DEFINED_STDINT))
     typedef __int8 int8_t;
     typedef __int16 int16_t;
