@@ -475,6 +475,49 @@ s_config_save (zconfig_t *self, void *arg, int level)
 
 
 //  --------------------------------------------------------------------------
+//  Equivalent to zconfig_load, taking a format string instead of a fixed
+//  filename.
+
+zconfig_t *
+zconfig_loadf (const char *format, ...)
+{
+    va_list argptr;
+    va_start (argptr, format);
+    char *filename = zsys_vprintf (format, argptr);
+    va_end (argptr);
+    if (filename) {
+        zconfig_t *config = zconfig_load (filename);
+        free (filename);
+        return config;
+    }
+    else
+        return NULL;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Equivalent to zconfig_save, taking a format string instead of a fixed
+//  filename.
+
+int
+zconfig_savef (zconfig_t *self, const char *format, ...)
+{
+    assert (self);
+    va_list argptr;
+    va_start (argptr, format);
+    char *filename = zsys_vprintf (format, argptr);
+    va_end (argptr);
+    if (filename) {
+        int rc = zconfig_save (self, filename);
+        free (filename);
+        return rc;
+    }
+    else
+        return -1;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Report filename used during zconfig_load, or NULL if none
 
 char *
@@ -877,7 +920,7 @@ zconfig_test (bool verbose)
     assert (passwd);
     assert (streq (passwd, "Top Secret"));
 
-    zconfig_save (root, TESTDIR "/test.cfg");
+    zconfig_savef (root, "%s/%s", TESTDIR, "test.cfg");
     assert (zconfig_has_changed (root));
     int rc = zconfig_reload (&root);
     assert (rc == 0);
@@ -904,7 +947,7 @@ zconfig_test (bool verbose)
 
     //  Test config can't be saved to a file in a path that doesn't
     //  exist or isn't writable
-    rc = zconfig_save (root, TESTDIR "/path/that/doesnt/exist/test.cfg");
+    rc = zconfig_savef (root, "%s/path/that/doesnt/exist/%s", TESTDIR, "test.cfg");
     assert (rc == -1);
 
     zconfig_destroy (&root);
