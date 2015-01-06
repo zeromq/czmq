@@ -182,6 +182,8 @@ CZMQ_EXPORT const char *
 //  of these characters, each corresponding to one or two arguments:
 //
 //      i = int (signed)
+//      1 = uint8_t
+//      2 = uint16_t
 //      4 = uint32_t
 //      8 = uint64_t
 //      b = byte *, size_t (2 arguments)

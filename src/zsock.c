@@ -541,6 +541,8 @@ zsock_type_str (zsock_t *self)
 //  of these characters, each corresponding to one or two arguments:
 //
 //      i = int (signed)
+//      1 = uint8_t
+//      2 = uint16_t
 //      4 = uint32_t
 //      8 = uint64_t
 //      b = byte *, int (2 arguments)
@@ -584,6 +586,12 @@ zsock_vsend (void *self, const char *picture, va_list argptr)
     while (*picture) {
         if (*picture == 'i')
             zmsg_addstrf (msg, "%d", va_arg (argptr, int));
+        else
+        if (*picture == '1')
+            zmsg_addstrf (msg, "%" PRIu8, va_arg (argptr, int));
+        else
+        if (*picture == '2')
+            zmsg_addstrf (msg, "%" PRIu16, va_arg (argptr, int));
         else
         if (*picture == '4')
             zmsg_addstrf (msg, "%" PRIu32, va_arg (argptr, uint32_t));
@@ -655,6 +663,8 @@ zsock_vsend (void *self, const char *picture, va_list argptr)
 //  a series of pointers as provided by the caller:
 //
 //      i = int * (stores signed integer)
+//      1 = uint8_t * (stores 8-bit unsigned integer)
+//      2 = uint16_t * (stores 16-bit unsigned integer)
 //      4 = uint32_t * (stores 32-bit unsigned integer)
 //      8 = uint64_t * (stores 64-bit unsigned integer)
 //      s = char ** (allocates new string)
@@ -707,6 +717,22 @@ zsock_vrecv (void *self, const char *picture, va_list argptr)
             int *int_p = va_arg (argptr, int *);
             if (int_p)
                 *int_p = string? atoi (string): 0;
+            free (string);
+        }
+        else
+        if (*picture == '1') {
+            char *string = zmsg_popstr (msg);
+            uint8_t *uint8_p = va_arg (argptr, uint8_t *);
+            if (uint8_p)
+                *uint8_p = string? (uint8_t) atoi (string): 0;
+            free (string);
+        }
+        else
+        if (*picture == '2') {
+            char *string = zmsg_popstr (msg);
+            uint16_t *uint16_p = va_arg (argptr, uint16_t *);
+            if (uint16_p)
+                *uint16_p = string? (uint16_t) atol (string): 0;
             free (string);
         }
         else
@@ -1480,6 +1506,8 @@ zsock_test (bool verbose)
     assert (rc == 123);
 
     //  Test zsock_send/recv pictures
+    uint8_t  number1 = 123;
+    uint16_t number2 = 123 * 123;
     uint32_t number4 = 123 * 123 * 123;
     uint64_t number8 = 123 * 123 * 123 * 123;
 
@@ -1495,8 +1523,8 @@ zsock_test (bool verbose)
     char *original = "pointer";
 
     //  Test zsock_recv into each supported type
-    zsock_send (writer, "i48zsbcfhp",
-                -12345, number4, number8,
+    zsock_send (writer, "i1248zsbcfhp",
+                -12345, number1, number2, number4, number8,
                 "This is a string", "ABCDE", 5, chunk, frame, hash, original);
     zframe_destroy (&frame);
     zchunk_destroy (&chunk);
@@ -1506,12 +1534,14 @@ zsock_test (bool verbose)
     byte *data;
     size_t size;
     char *pointer;
-    number8 = number4 = 0;
-    rc = zsock_recv (reader, "i48zsbcfhp",
-        &integer, &number4, &number8,
-        &string, &data, &size, &chunk, &frame, &hash, &pointer);
+    number8 = number4 = number2 = number1 = 0;
+    rc = zsock_recv (reader, "i1248zsbcfhp",
+                     &integer, &number1, &number2, &number4, &number8,
+                     &string, &data, &size, &chunk, &frame, &hash, &pointer);
     assert (rc == 0);
     assert (integer == -12345);
+    assert (number1 == 123);
+    assert (number2 == 123 * 123);
     assert (number4 == 123 * 123 * 123);
     assert (number8 == 123 * 123 * 123 * 123);
     assert (streq (string, "This is a string"));
@@ -1584,8 +1614,6 @@ zsock_test (bool verbose)
     zmsg_addstr (msg, "Hello");
     zmsg_addstr (msg, "World");
 
-    uint8_t  number1 = 123;
-    uint16_t number2 = 123 * 123;
     zsock_bsend (writer, "1248sSpcfm",
                  number1, number2, number4, number8,
                  "Hello, World",

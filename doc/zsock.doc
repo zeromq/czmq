@@ -171,6 +171,8 @@ This is the class interface:
     //  of these characters, each corresponding to one or two arguments:
     //
     //      i = int (signed)
+    //      1 = uint8_t
+    //      2 = uint16_t
     //      4 = uint32_t
     //      8 = uint64_t
     //      b = byte *, size_t (2 arguments)
@@ -398,6 +400,8 @@ This is the class self test code:
     assert (rc == 123);
     
     //  Test zsock_send/recv pictures
+    uint8_t  number1 = 123;
+    uint16_t number2 = 123 * 123;
     uint32_t number4 = 123 * 123 * 123;
     uint64_t number8 = 123 * 123 * 123 * 123;
     
@@ -413,8 +417,8 @@ This is the class self test code:
     char *original = "pointer";
     
     //  Test zsock_recv into each supported type
-    zsock_send (writer, "i48zsbcfhp",
-                -12345, number4, number8,
+    zsock_send (writer, "i1248zsbcfhp",
+                -12345, number1, number2, number4, number8,
                 "This is a string", "ABCDE", 5, chunk, frame, hash, original);
     zframe_destroy (&frame);
     zchunk_destroy (&chunk);
@@ -424,12 +428,14 @@ This is the class self test code:
     byte *data;
     size_t size;
     char *pointer;
-    number8 = number4 = 0;
-    rc = zsock_recv (reader, "i48zsbcfhp",
-        &integer, &number4, &number8,
-        &string, &data, &size, &chunk, &frame, &hash, &pointer);
+    number8 = number4 = number2 = number1 = 0;
+    rc = zsock_recv (reader, "i1248zsbcfhp",
+                     &integer, &number1, &number2, &number4, &number8,
+                     &string, &data, &size, &chunk, &frame, &hash, &pointer);
     assert (rc == 0);
     assert (integer == -12345);
+    assert (number1 == 123);
+    assert (number2 == 123 * 123);
     assert (number4 == 123 * 123 * 123);
     assert (number8 == 123 * 123 * 123 * 123);
     assert (streq (string, "This is a string"));
@@ -502,8 +508,6 @@ This is the class self test code:
     zmsg_addstr (msg, "Hello");
     zmsg_addstr (msg, "World");
     
-    uint8_t  number1 = 123;
-    uint16_t number2 = 123 * 123;
     zsock_bsend (writer, "1248sSpcfm",
                  number1, number2, number4, number8,
                  "Hello, World",
