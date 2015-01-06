@@ -182,7 +182,7 @@ This is the class self test code:
     assert (!zfile_is_stable (file));
     assert (zfile_digest (file));
     
-    //  Now append one byte to file from outside
+    //  Now truncate file from outside
     int handle = open ("./this/is/a/test/bilbo", O_WRONLY | O_TRUNC | O_BINARY, 0);
     assert (handle >= 0);
     rc = write (handle, "Hello, World\n", 13);

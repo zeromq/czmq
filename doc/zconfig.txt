@@ -93,6 +93,16 @@ CZMQ_EXPORT zconfig_t *
 CZMQ_EXPORT int
     zconfig_save (zconfig_t *self, const char *filename);
 
+//  Equivalent to zconfig_load, taking a format string instead of a fixed
+//  filename.
+CZMQ_EXPORT zconfig_t *
+    zconfig_loadf (const char *format, ...);
+
+//  Equivalent to zconfig_save, taking a format string instead of a fixed
+//  filename.
+CZMQ_EXPORT int
+    zconfig_savef (zconfig_t *self, const char *format, ...);
+    
 //  Report filename used during zconfig_load, or NULL if none
 CZMQ_EXPORT char *
     zconfig_filename (zconfig_t *self);
@@ -205,7 +215,7 @@ char *passwd = zconfig_resolve (root, "/curve/secret-key", NULL);
 assert (passwd);
 assert (streq (passwd, "Top Secret"));
 
-zconfig_save (root, TESTDIR "/test.cfg");
+zconfig_savef (root, "%s/%s", TESTDIR, "test.cfg");
 assert (zconfig_has_changed (root));
 int rc = zconfig_reload (&root);
 assert (rc == 0);
@@ -232,7 +242,7 @@ assert (streq (value, "somevalue"));
 
 //  Test config can't be saved to a file in a path that doesn't
 //  exist or isn't writable
-rc = zconfig_save (root, TESTDIR "/path/that/doesnt/exist/test.cfg");
+rc = zconfig_savef (root, "%s/path/that/doesnt/exist/%s", TESTDIR, "test.cfg");
 assert (rc == -1);
 
 zconfig_destroy (&root);
