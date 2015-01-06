@@ -411,6 +411,11 @@ zconfig_save (zconfig_t *self, const char *filename)
             rc = zconfig_execute (self, s_config_save, file);
             fflush (file);
             fclose (file);
+
+            //  If we saved back to original file, restat it so that
+            //  the file does not appear as "changed"
+            if (self->file && streq (filename, zconfig_filename (self)))
+                zfile_restat (self->file);
         }
         else
             rc = -1;          //  File not writeable
@@ -921,7 +926,7 @@ zconfig_test (bool verbose)
     assert (streq (passwd, "Top Secret"));
 
     zconfig_savef (root, "%s/%s", TESTDIR, "test.cfg");
-    assert (zconfig_has_changed (root));
+    assert (!zconfig_has_changed (root));
     int rc = zconfig_reload (&root);
     assert (rc == 0);
     assert (!zconfig_has_changed (root));
