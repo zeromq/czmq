@@ -42,6 +42,11 @@ CZMQ_EXPORT char *
 CZMQ_EXPORT void
     zconfig_put (zconfig_t *self, const char *path, const char *value);
 
+//  Equivalent to zconfig_put, accepting a format specifier and variable
+//  argument list, instead of a single string value.
+CZMQ_EXPORT void
+    zconfig_putf (zconfig_t *self, const char *path, const char *format, ...);
+    
 //  Set config item name, name may be NULL
 CZMQ_EXPORT void
     zconfig_set_name (zconfig_t *self, const char *name);

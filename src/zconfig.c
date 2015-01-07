@@ -203,6 +203,23 @@ zconfig_put (zconfig_t *self, const char *path, const char *value)
 
 
 //  --------------------------------------------------------------------------
+//  Equivalent to zconfig_put, accepting a format specifier and variable
+//  argument list, instead of a single string value.
+
+void
+zconfig_putf (zconfig_t *self, const char *path, const char *format, ...)
+{
+    assert (self);
+    va_list argptr;
+    va_start (argptr, format);
+    char *value = zsys_vprintf (format, argptr);
+    va_end (argptr);
+    zconfig_put (self, path, value);
+    zstr_free (&value);
+}
+
+
+//  --------------------------------------------------------------------------
 //  Set new name for config item; this may be null.
 
 void
@@ -907,7 +924,7 @@ zconfig_test (bool verbose)
     item = zconfig_new ("name", section);
     assert (item);
     zconfig_set_value (item, "Justin Kayce");
-    zconfig_put (root, "/curve/secret-key", "Top Secret");
+    zconfig_putf (root, "/curve/secret-key", "%s", "Top Secret");
     zconfig_set_comment (root, "   CURVE certificate");
     zconfig_set_comment (root, "   -----------------");
     assert (zconfig_comments (root));

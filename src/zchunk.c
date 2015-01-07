@@ -267,7 +267,7 @@ zchunk_write (zchunk_t *self, FILE *handle)
     assert (zchunk_is (self));
 
     size_t items = fwrite (self->data, 1, self->size, handle);
-    int rc = (items < self->size) ? -1 : 0;
+    int rc = (items < self->size)? -1: 0;
     return rc;
 }
 
