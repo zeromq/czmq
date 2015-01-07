@@ -101,6 +101,10 @@ This is the class interface:
     CZMQ_EXPORT zchunk_t *
         zchunk_unpack (zframe_t *frame);
     
+    //  Calculate SHA1 digest for chunk, using zdigest class.
+    CZMQ_EXPORT const char *
+        zchunk_digest (zchunk_t *self);
+    
     //  Dump chunk to FILE stream, for debugging and tracing.
     CZMQ_EXPORT void
         zchunk_fprint (zchunk_t *self, FILE *file);
@@ -134,6 +138,7 @@ This is the class self test code:
     assert (memcmp (zchunk_data (chunk), "1234567890", 10) == 0);
     assert (zchunk_size (chunk) == 10);
     assert (zchunk_streq (chunk, "1234567890"));
+    assert (streq (zchunk_digest (chunk), "01B307ACBA4F54F55AAFC33BB06BBBF6CA803E9A"));
     char *string = zchunk_strdup (chunk);
     assert (streq (string, "1234567890"));
     free (string);

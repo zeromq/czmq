@@ -216,7 +216,7 @@ assert (passwd);
 assert (streq (passwd, "Top Secret"));
 
 zconfig_savef (root, "%s/%s", TESTDIR, "test.cfg");
-assert (zconfig_has_changed (root));
+assert (!zconfig_has_changed (root));
 int rc = zconfig_reload (&root);
 assert (rc == 0);
 assert (!zconfig_has_changed (root));

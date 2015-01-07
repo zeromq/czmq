@@ -113,6 +113,10 @@ CZMQ_EXPORT zframe_t *
 CZMQ_EXPORT zchunk_t *
     zchunk_unpack (zframe_t *frame);
 
+//  Calculate SHA1 digest for chunk, using zdigest class.
+CZMQ_EXPORT const char *
+    zchunk_digest (zchunk_t *self);
+
 //  Dump chunk to FILE stream, for debugging and tracing.
 CZMQ_EXPORT void
     zchunk_fprint (zchunk_t *self, FILE *file);

@@ -143,7 +143,6 @@ zdir_new (const char *path, const char *parent)
             return NULL;
         }
     }
-
     if (self->path)
         self->files = zlist_new ();
     if (self->files)
@@ -581,7 +580,7 @@ zdir_cache (zdir_t *self)
             break;
         char *filename = zfile_filename (file, self->path);
         if (zhash_lookup (cache, zfile_filename (file, self->path)) == NULL) {
-            int rc = zhash_insert (cache, filename, zfile_digest (file));
+            int rc = zhash_insert (cache, filename, (void *) zfile_digest (file));
             if (rc != 0) {
                 zhash_destroy (&cache);
                 break;

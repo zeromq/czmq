@@ -119,9 +119,8 @@ CZMQ_EXPORT void
 CZMQ_EXPORT FILE *
     zfile_handle (zfile_t *self);
 
-//  Calculate SHA1 digest for file, using zdigest class. Caller should not
-//  modify digest.
-CZMQ_EXPORT char *
+//  Calculate SHA1 digest for file, using zdigest class.
+CZMQ_EXPORT const char *
     zfile_digest (zfile_t *self);
 
 //  Self test of this class
