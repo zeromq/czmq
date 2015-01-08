@@ -148,7 +148,7 @@ zfile_dup (zfile_t *self)
         if (copy->fullname) {
             copy->modified = self->modified;
             copy->cursize = self->cursize;
-            copy->link = self->link ? strdup (self->link) : NULL;
+            copy->link = self->link? strdup (self->link): NULL;
             copy->mode = self->mode;
         }
         else
@@ -189,7 +189,7 @@ zfile_restat (zfile_t *self)
 {
     assert (self);
     struct stat stat_buf;
-    char *real_name = self->link ? self->link : self->fullname;
+    char *real_name = self->link? self->link: self->fullname;
     if (stat (real_name, &stat_buf) == 0) {
         self->cursize = stat_buf.st_size;
         self->modified = stat_buf.st_mtime;
@@ -202,7 +202,7 @@ zfile_restat (zfile_t *self)
         self->mode = 0;
         self->stable = false;
     }
-    zdigest_destroy(&self->digest);
+    zdigest_destroy (&self->digest);
 }
 
 
@@ -303,7 +303,7 @@ zfile_has_changed (zfile_t *self)
 {
     assert (self);
     struct stat stat_buf;
-    char *real_name = self->link ? self->link : self->fullname;
+    char *real_name = self->link? self->link: self->fullname;
     if (stat (real_name, &stat_buf) == 0) {
         //  It's not a foolproof heuristic but catches most cases
         if (stat_buf.st_mtime != self->modified
@@ -340,7 +340,7 @@ zfile_input (zfile_t *self)
     if (self->handle)
         zfile_close (self);
 
-    char *real_name = self->link ? self->link : self->fullname;
+    char *real_name = self->link? self->link: self->fullname;
     self->handle = fopen (real_name, "rb");
     if (self->handle) {
         struct stat stat_buf;
@@ -349,7 +349,7 @@ zfile_input (zfile_t *self)
         else
             self->cursize = 0;
     }
-    return self->handle ? 0 : -1;
+    return self->handle? 0: -1;
 }
 
 
@@ -390,7 +390,7 @@ zfile_output (zfile_t *self)
     if (!self->handle)
         self->handle = fopen (self->fullname, "w+b");
     
-    return self->handle ? 0: -1;
+    return self->handle? 0: -1;
 }
 
 
@@ -516,13 +516,12 @@ zfile_handle (zfile_t *self)
 
 
 //  --------------------------------------------------------------------------
-//  Calculate SHA1 digest for file, using zdigest class. Caller should not
-//  modify digest.
+//  Calculate SHA1 digest for file, using zdigest class.
 
-char *
+const char *
 zfile_digest (zfile_t *self)
 {
-    assert(self);
+    assert (self);
     if (!self->digest) {
         if (zfile_input (self) == -1)
             return NULL;            //  Problem reading file

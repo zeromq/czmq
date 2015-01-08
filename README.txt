@@ -193,7 +193,7 @@ The v2 API had a zthread class that let you create "attached threads" connected 
 
 To write an actor, use this template. Note that your actor is a single function "void myname (zsock_t *pipe, void *args)" function:
 
-/*  =========================================================================
+    /*  =========================================================================
         someclass - some description
 
         Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -411,7 +411,6 @@ Don't include system headers in source files. The right place for these is czmq_
 Do read your code after you write it and ask, "Can I make this simpler?" We do use a nice minimalist and yet readable style. Learn it, adopt it, use it.
 
 Before opening a pull request read our [contribution guidelines](https://github.com/zeromq/czmq/blob/master/CONTRIBUTING.md). Thanks!
-
 
 ### Code Generation
 

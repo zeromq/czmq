@@ -143,7 +143,6 @@ zdir_new (const char *path, const char *parent)
             return NULL;
         }
     }
-
     if (self->path)
         self->files = zlist_new ();
     if (self->files)
@@ -531,14 +530,15 @@ zdir_resync (zdir_t *self, const char *alias)
     zlist_t *patches = zlist_new ();
     if (!patches)
         return NULL;
+    
     zfile_t **files = zdir_flatten (self);
     uint index;
     for (index = 0;; index++) {
         zfile_t *file = files [index];
         if (!file)
             break;
-        int rc = zlist_append (patches, zdir_patch_new (self->path, file, patch_create, alias));
-        if (rc != 0) {
+        if (zlist_append (patches, zdir_patch_new (
+            self->path, file, patch_create, alias))) {
             zlist_destroy (&patches);
             break;
         }
@@ -580,7 +580,7 @@ zdir_cache (zdir_t *self)
             break;
         char *filename = zfile_filename (file, self->path);
         if (zhash_lookup (cache, zfile_filename (file, self->path)) == NULL) {
-            int rc = zhash_insert (cache, filename, zfile_digest (file));
+            int rc = zhash_insert (cache, filename, (void *) zfile_digest (file));
             if (rc != 0) {
                 zhash_destroy (&cache);
                 break;
