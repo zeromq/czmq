@@ -450,8 +450,29 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
     typedef unsigned __int32 uint32_t;
     typedef unsigned __int64 uint64_t;
 #   endif    
+#   if (!defined (PRId8))
+#       define PRId8    "d"
+#   endif
+#   if (!defined (PRId16))
+#       define PRId16   "d"
+#   endif
+#   if (!defined (PRId32))
+#       define PRId32   "d"
+#   endif
 #   if (!defined (PRId64))
 #       define PRId64   "I64d"
+#   endif
+#   if (!defined (PRIu8))
+#       define PRIu8    "u"
+#   endif
+#   if (!defined (PRIu16))
+#       define PRIu16   "u"
+#   endif
+#   if (!defined (PRIu32))
+#       define PRIu32   "u"
+#   endif
+#   if (!defined (PRIu64))
+#       define PRIu64   "I64u"
 #   endif
 #   if (!defined (va_copy))
     //  MSVC does not support C99's va_copy so we use a regular assignment
