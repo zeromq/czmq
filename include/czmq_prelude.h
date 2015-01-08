@@ -422,6 +422,7 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
 #       define inline __inline
 #   endif
 #   define strtoull _strtoui64
+#   define atoll _atoi64
 #   define srandom srand
 #   define TIMEZONE _timezone
 #   if (!defined (__MINGW32__))
