@@ -588,10 +588,10 @@ zsock_vsend (void *self, const char *picture, va_list argptr)
             zmsg_addstrf (msg, "%d", va_arg (argptr, int));
         else
         if (*picture == '1')
-            zmsg_addstrf (msg, "%" PRIu8, va_arg (argptr, int));
+            zmsg_addstrf (msg, "%" PRIu8, (uint8_t) va_arg (argptr, int));
         else
         if (*picture == '2')
-            zmsg_addstrf (msg, "%" PRIu16, va_arg (argptr, int));
+            zmsg_addstrf (msg, "%" PRIu16, (uint16_t) va_arg (argptr, int));
         else
         if (*picture == '4')
             zmsg_addstrf (msg, "%" PRIu32, va_arg (argptr, uint32_t));
