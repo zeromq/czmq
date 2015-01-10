@@ -433,6 +433,7 @@ zcert_fprint (zcert_t *self, FILE *file)
     fprintf (file, "    secret-key = \"%s\"\n", self->secret_txt);
 }
 
+
 //  --------------------------------------------------------------------------
 //  Selftest
 
@@ -493,4 +494,3 @@ zcert_test (bool verbose)
 
     printf ("OK\n");
 }
-

@@ -143,7 +143,8 @@ zmsg_send (zmsg_t **self_p, void *dest)
                 break;
             frame = (zframe_t *) zlist_pop (self->frames);
         }
-        zmsg_destroy (self_p);
+        if (rc == 0)
+            zmsg_destroy (self_p);
     }
     return rc;
 }

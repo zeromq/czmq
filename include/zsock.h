@@ -181,16 +181,19 @@ CZMQ_EXPORT const char *
 //  a complex multiframe message in one call. The picture can contain any
 //  of these characters, each corresponding to one or two arguments:
 //
-//      i = int
-//      u = uint
-//      s = char *
+//      i = int (signed)
+//      1 = uint8_t
+//      2 = uint16_t
+//      4 = uint32_t
+//      8 = uint64_t
 //      b = byte *, size_t (2 arguments)
 //      c = zchunk_t *
 //      f = zframe_t *
-//      h = zhash_t *
+//      h = zhashx_t *
 //      p = void * (sends the pointer value, only meaningful over inproc)
 //      m = zmsg_t * (sends all frames in the zmsg)
 //      z = sends zero-sized frame (0 arguments)
+//      u = uint (deprecated)
 //
 //  Note that s, b, c, and f are encoded the same way and the choice is
 //  offered as a convenience to the sender, which may or may not already
@@ -200,9 +203,9 @@ CZMQ_EXPORT const char *
 CZMQ_EXPORT int
     zsock_send (void *self, const char *picture, ...);
 
-//  Send a 'picture' message to the socket (or actor). This is a
-//  va_list version of zsock_send (), so please consult its documentation
-//  for the details.
+//  Send a 'picture' message to the socket (or actor). This is a va_list
+//  version of zsock_send (), so please consult its documentation for the
+//  details.
 CZMQ_EXPORT int
     zsock_vsend (void *self, const char *picture, va_list argptr);
 
@@ -210,16 +213,18 @@ CZMQ_EXPORT int
 //  the format and meaning of the picture. Returns the picture elements into
 //  a series of pointers as provided by the caller:
 //
-//      i = int * (stores integer)
-//      u = uint * (stores unsigned integer)
+//      i = int * (stores signed integer)
+//      4 = uint32_t * (stores 32-bit unsigned integer)
+//      8 = uint64_t * (stores 64-bit unsigned integer)
 //      s = char ** (allocates new string)
 //      b = byte **, size_t * (2 arguments) (allocates memory)
 //      c = zchunk_t ** (creates zchunk)
 //      f = zframe_t ** (creates zframe)
 //      p = void ** (stores pointer)
-//      h = zhash_t ** (creates zhash)
+//      h = zhashx_t ** (creates zhashx)
 //      m = zmsg_t ** (creates a zmsg with the remaing frames)
 //      z = null, asserts empty frame (0 arguments)
+//      u = uint * (stores unsigned integer, deprecated)
 //
 //  Note that zsock_recv creates the returned objects, and the caller must
 //  destroy them when finished with them. The supplied pointers do not need
