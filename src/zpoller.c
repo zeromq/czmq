@@ -146,11 +146,11 @@ zpoller_wait (zpoller_t *self, int timeout)
                 return self->poll_readers [reader];
     }
     else
-    if (rc == 0)
-        self->expired = true;
-    else
     if (rc == -1 || zsys_interrupted)
         self->terminated = true;
+    else
+    if (rc == 0)
+        self->expired = true;
 
     return NULL;
 }
