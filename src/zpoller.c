@@ -133,10 +133,15 @@ void *
 zpoller_wait (zpoller_t *self, int timeout)
 {
     self->expired = false;
-    self->terminated = false;
+    if (zsys_interrupted) {
+        self->terminated = true;
+        return NULL;
+    }
+    else
+        self->terminated = false;
+    
     if (self->need_rebuild)
         s_rebuild_poll_set (self);
-
     int rc = zmq_poll (self->poll_set, (int) self->poll_size,
                        timeout * ZMQ_POLL_MSEC);
     if (rc > 0) {
