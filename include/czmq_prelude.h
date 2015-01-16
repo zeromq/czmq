@@ -392,6 +392,8 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
 
 #define streq(s1,s2)    (!strcmp ((s1), (s2)))
 #define strneq(s1,s2)   (strcmp ((s1), (s2)))
+#define min(a,b)        (((a)<(b))? (a): (b))
+#define max(a,b)        (((a)>(b))? (a): (b))
 
 //  Provide random number from 0..(num-1)
 #if (defined (__WINDOWS__)) || (defined (__UTYPE_IBMAIX)) \
