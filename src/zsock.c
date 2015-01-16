@@ -710,6 +710,14 @@ zsock_vrecv (void *self, const char *picture, va_list argptr)
     if (!msg)
         return -1;              //  Interrupted
 
+    //  Filter any signal that may come from dying actors
+    while (zmsg_signal (msg) >= 0) {
+        zmsg_destroy (&msg);
+        if (zsys_interrupted)
+            return -1;
+        msg = zmsg_recv (self);
+    }
+    //  Now parse message according to picture argument
     int rc = 0;
     while (*picture) {
         if (*picture == 'i') {

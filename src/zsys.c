@@ -391,7 +391,7 @@ zsys_create_pipe (zsock_t **backend_p)
     //  Now bind and connect pipe ends
     char endpoint [32];
     while (true) {
-        sprintf (endpoint, "inproc://pipe-%04x-%04x\n",
+        sprintf (endpoint, "inproc://pipe-%04x-%04x",
                  randof (0x10000), randof (0x10000));
         if (zsock_bind (frontend, "%s", endpoint) == 0)
             break;

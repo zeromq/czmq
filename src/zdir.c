@@ -107,7 +107,7 @@ s_posix_populate_entry (zdir_t *self, struct dirent *entry)
 //  --------------------------------------------------------------------------
 //  Create a new directory item that loads in the full tree of the specified
 //  path, optionally located under some parent path. If parent is "-", then
-//  loads only the top-level directory (and does not use parent as a path).
+//  loads only the top-level directory, and does not use parent as a path.
 
 zdir_t *
 zdir_new (const char *path, const char *parent)
@@ -129,7 +129,6 @@ zdir_new (const char *path, const char *parent)
             self->path = (char *) zmalloc (strlen (path) + strlen (parent) + 2);
             if (self->path)
                 sprintf (self->path, "%s/%s", parent, path);
-
             else {
                 zdir_destroy (&self);
                 return NULL;
