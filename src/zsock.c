@@ -1462,7 +1462,7 @@ zsock_test (bool verbose)
     zmsg_destroy (&msg);
 
     //  Test resolve FD
-    int fd = zsock_fd (reader);
+    SOCKET fd = zsock_fd (reader);
     assert (zsock_resolve ((void *) &fd) == NULL);
 
     //  Test binding to ephemeral ports, sequential and random
