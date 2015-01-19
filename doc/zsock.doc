@@ -170,16 +170,19 @@ This is the class interface:
     //  a complex multiframe message in one call. The picture can contain any
     //  of these characters, each corresponding to one or two arguments:
     //
-    //      i = int
-    //      u = uint
-    //      s = char *
+    //      i = int (signed)
+    //      1 = uint8_t
+    //      2 = uint16_t
+    //      4 = uint32_t
+    //      8 = uint64_t
     //      b = byte *, size_t (2 arguments)
     //      c = zchunk_t *
     //      f = zframe_t *
-    //      h = zhash_t *
+    //      h = zhashx_t *
     //      p = void * (sends the pointer value, only meaningful over inproc)
     //      m = zmsg_t * (sends all frames in the zmsg)
     //      z = sends zero-sized frame (0 arguments)
+    //      u = uint (deprecated)
     //
     //  Note that s, b, c, and f are encoded the same way and the choice is
     //  offered as a convenience to the sender, which may or may not already
@@ -189,9 +192,9 @@ This is the class interface:
     CZMQ_EXPORT int
         zsock_send (void *self, const char *picture, ...);
     
-    //  Send a 'picture' message to the socket (or actor). This is a
-    //  va_list version of zsock_send (), so please consult its documentation
-    //  for the details.
+    //  Send a 'picture' message to the socket (or actor). This is a va_list
+    //  version of zsock_send (), so please consult its documentation for the
+    //  details.
     CZMQ_EXPORT int
         zsock_vsend (void *self, const char *picture, va_list argptr);
     
@@ -199,16 +202,18 @@ This is the class interface:
     //  the format and meaning of the picture. Returns the picture elements into
     //  a series of pointers as provided by the caller:
     //
-    //      i = int * (stores integer)
-    //      u = uint * (stores unsigned integer)
+    //      i = int * (stores signed integer)
+    //      4 = uint32_t * (stores 32-bit unsigned integer)
+    //      8 = uint64_t * (stores 64-bit unsigned integer)
     //      s = char ** (allocates new string)
     //      b = byte **, size_t * (2 arguments) (allocates memory)
     //      c = zchunk_t ** (creates zchunk)
     //      f = zframe_t ** (creates zframe)
     //      p = void ** (stores pointer)
-    //      h = zhash_t ** (creates zhash)
+    //      h = zhashx_t ** (creates zhashx)
     //      m = zmsg_t ** (creates a zmsg with the remaing frames)
     //      z = null, asserts empty frame (0 arguments)
+    //      u = uint * (stores unsigned integer, deprecated)
     //
     //  Note that zsock_recv creates the returned objects, and the caller must
     //  destroy them when finished with them. The supplied pointers do not need
@@ -395,6 +400,11 @@ This is the class self test code:
     assert (rc == 123);
     
     //  Test zsock_send/recv pictures
+    uint8_t  number1 = 123;
+    uint16_t number2 = 123 * 123;
+    uint32_t number4 = 123 * 123 * 123;
+    uint64_t number8 = 123 * 123 * 123 * 123;
+    
     zchunk_t *chunk = zchunk_new ("HELLO", 5);
     assert (chunk);
     zframe_t *frame = zframe_new ("WORLD", 5);
@@ -406,29 +416,28 @@ This is the class self test code:
     zhashx_insert (hash, "2", "value B");
     char *original = "pointer";
     
-    //  We can send signed integers, strings, blocks of memory, chunks,
-    //  frames, hashes and pointers
-    zsock_send (writer, "izsbcfp",
-                -12345, "This is a string", "ABCDE", 5, chunk, frame, original);
-    msg = zmsg_recv (reader);
-    assert (msg);
-    if (verbose)
-        zmsg_print (msg);
-    zmsg_destroy (&msg);
-    
     //  Test zsock_recv into each supported type
-    zsock_send (writer, "izsbcfhp",
-                -12345, "This is a string", "ABCDE", 5, chunk, frame, hash, original);
+    zsock_send (writer, "i1248zsbcfhp",
+                -12345, number1, number2, number4, number8,
+                "This is a string", "ABCDE", 5, chunk, frame, hash, original);
     zframe_destroy (&frame);
     zchunk_destroy (&chunk);
     zhashx_destroy (&hash);
+    
     int integer;
     byte *data;
     size_t size;
     char *pointer;
-    rc = zsock_recv (reader, "izsbcfhp", &integer, &string, &data, &size, &chunk, &frame, &hash, &pointer);
+    number8 = number4 = number2 = number1 = 0;
+    rc = zsock_recv (reader, "i1248zsbcfhp",
+                     &integer, &number1, &number2, &number4, &number8,
+                     &string, &data, &size, &chunk, &frame, &hash, &pointer);
     assert (rc == 0);
     assert (integer == -12345);
+    assert (number1 == 123);
+    assert (number2 == 123 * 123);
+    assert (number4 == 123 * 123 * 123);
+    assert (number8 == 123 * 123 * 123 * 123);
     assert (streq (string, "This is a string"));
     assert (memcmp (data, "ABCDE", 5) == 0);
     assert (size == 5);
@@ -451,7 +460,8 @@ This is the class self test code:
     //  with a status code and then nothing else; the receiver will get
     //  the status code and NULL/zero for all other values
     zsock_send (writer, "i", -1);
-    zsock_recv (reader, "izsbcfp", &integer, &string, &data, &size, &chunk, &frame, &pointer);
+    zsock_recv (reader, "izsbcfp",
+        &integer, &string, &data, &size, &chunk, &frame, &pointer);
     assert (integer == -1);
     assert (string == NULL);
     assert (data == NULL);
@@ -491,11 +501,6 @@ This is the class self test code:
     zchunk_destroy (&chunk);
     
     //  Test zsock_bsend/brecv pictures with binary encoding
-    uint8_t  number1 = 123;
-    uint16_t number2 = 123 * 123;
-    uint32_t number4 = 123 * 123 * 123;
-    uint64_t number8 = 123 * 123 * 123 * 123;
-    
     frame = zframe_new ("Hello", 5);
     chunk = zchunk_new ("World", 5);
     

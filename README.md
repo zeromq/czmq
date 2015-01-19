@@ -180,6 +180,7 @@ This is a list of known higher-level wrappers around CZMQ:
 * https://github.com/fmp88/ocaml-czmq - Ocaml
 * https://github.com/gar1t/erlang-czmq - Erlang
 * https://github.com/mtortonesi/ruby-czmq-ffi - Ruby FFI
+* https://github.com/zeromq/goczmq - Go
 
 <A name="toc3-135" title="API v3 Summary" />
 ### API v3 Summary

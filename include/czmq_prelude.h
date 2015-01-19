@@ -417,6 +417,7 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
 #       define inline __inline
 #   endif
 #   define strtoull _strtoui64
+#   define atoll _atoi64
 #   define srandom srand
 #   define TIMEZONE _timezone
 #   if (!defined (__MINGW32__))
@@ -433,8 +434,10 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
     typedef long ssize_t;
 #       endif
 #   endif
-#   if (!defined (__MINGW32__) || (defined (__MINGW32__) && defined (__IS_64BIT__)))
-//    typedef __int8 int8_t;
+#   if ((!defined (__MINGW32__) \
+    || (defined (__MINGW32__) && defined (__IS_64BIT__))) \
+    && !defined (ZMQ_DEFINED_STDINT))
+    typedef __int8 int8_t;
     typedef __int16 int16_t;
     typedef __int32 int32_t;
     typedef __int64 int64_t;
@@ -443,8 +446,29 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
     typedef unsigned __int32 uint32_t;
     typedef unsigned __int64 uint64_t;
 #   endif    
+#   if (!defined (PRId8))
+#       define PRId8    "d"
+#   endif
+#   if (!defined (PRId16))
+#       define PRId16   "d"
+#   endif
+#   if (!defined (PRId32))
+#       define PRId32   "d"
+#   endif
 #   if (!defined (PRId64))
 #       define PRId64   "I64d"
+#   endif
+#   if (!defined (PRIu8))
+#       define PRIu8    "u"
+#   endif
+#   if (!defined (PRIu16))
+#       define PRIu16   "u"
+#   endif
+#   if (!defined (PRIu32))
+#       define PRIu32   "u"
+#   endif
+#   if (!defined (PRIu64))
+#       define PRIu64   "I64u"
 #   endif
 #   if (!defined (va_copy))
     //  MSVC does not support C99's va_copy so we use a regular assignment
@@ -482,8 +506,11 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
 #endif
 
 //- Memory allocations ------------------------------------------------------
-
-CZMQ_EXPORT extern volatile uint64_t zsys_allocs;
+#if defined(__cplusplus)
+   extern "C" CZMQ_EXPORT volatile uint64_t zsys_allocs;
+#else
+   extern CZMQ_EXPORT volatile uint64_t zsys_allocs;
+#endif
 
 //  Replacement for malloc() which asserts if we run out of heap, and
 //  which zeroes the allocated block.

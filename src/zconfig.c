@@ -203,6 +203,23 @@ zconfig_put (zconfig_t *self, const char *path, const char *value)
 
 
 //  --------------------------------------------------------------------------
+//  Equivalent to zconfig_put, accepting a format specifier and variable
+//  argument list, instead of a single string value.
+
+void
+zconfig_putf (zconfig_t *self, const char *path, const char *format, ...)
+{
+    assert (self);
+    va_list argptr;
+    va_start (argptr, format);
+    char *value = zsys_vprintf (format, argptr);
+    va_end (argptr);
+    zconfig_put (self, path, value);
+    zstr_free (&value);
+}
+
+
+//  --------------------------------------------------------------------------
 //  Set new name for config item; this may be null.
 
 void
@@ -411,6 +428,11 @@ zconfig_save (zconfig_t *self, const char *filename)
             rc = zconfig_execute (self, s_config_save, file);
             fflush (file);
             fclose (file);
+
+            //  If we saved back to original file, restat it so that
+            //  the file does not appear as "changed"
+            if (self->file && streq (filename, zconfig_filename (self)))
+                zfile_restat (self->file);
         }
         else
             rc = -1;          //  File not writeable
@@ -471,6 +493,49 @@ s_config_save (zconfig_t *self, void *arg, int level)
                                      self->name ? self->name : "(Unnamed)");
     }
     return size;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Equivalent to zconfig_load, taking a format string instead of a fixed
+//  filename.
+
+zconfig_t *
+zconfig_loadf (const char *format, ...)
+{
+    va_list argptr;
+    va_start (argptr, format);
+    char *filename = zsys_vprintf (format, argptr);
+    va_end (argptr);
+    if (filename) {
+        zconfig_t *config = zconfig_load (filename);
+        free (filename);
+        return config;
+    }
+    else
+        return NULL;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Equivalent to zconfig_save, taking a format string instead of a fixed
+//  filename.
+
+int
+zconfig_savef (zconfig_t *self, const char *format, ...)
+{
+    assert (self);
+    va_list argptr;
+    va_start (argptr, format);
+    char *filename = zsys_vprintf (format, argptr);
+    va_end (argptr);
+    if (filename) {
+        int rc = zconfig_save (self, filename);
+        free (filename);
+        return rc;
+    }
+    else
+        return -1;
 }
 
 
@@ -859,7 +924,7 @@ zconfig_test (bool verbose)
     item = zconfig_new ("name", section);
     assert (item);
     zconfig_set_value (item, "Justin Kayce");
-    zconfig_put (root, "/curve/secret-key", "Top Secret");
+    zconfig_putf (root, "/curve/secret-key", "%s", "Top Secret");
     zconfig_set_comment (root, "   CURVE certificate");
     zconfig_set_comment (root, "   -----------------");
     assert (zconfig_comments (root));
@@ -877,8 +942,8 @@ zconfig_test (bool verbose)
     assert (passwd);
     assert (streq (passwd, "Top Secret"));
 
-    zconfig_save (root, TESTDIR "/test.cfg");
-    assert (zconfig_has_changed (root));
+    zconfig_savef (root, "%s/%s", TESTDIR, "test.cfg");
+    assert (!zconfig_has_changed (root));
     int rc = zconfig_reload (&root);
     assert (rc == 0);
     assert (!zconfig_has_changed (root));
@@ -904,7 +969,7 @@ zconfig_test (bool verbose)
 
     //  Test config can't be saved to a file in a path that doesn't
     //  exist or isn't writable
-    rc = zconfig_save (root, TESTDIR "/path/that/doesnt/exist/test.cfg");
+    rc = zconfig_savef (root, "%s/path/that/doesnt/exist/%s", TESTDIR, "test.cfg");
     assert (rc == -1);
 
     zconfig_destroy (&root);

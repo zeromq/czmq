@@ -63,6 +63,11 @@ This is the class interface:
     CZMQ_EXPORT void
         zconfig_put (zconfig_t *self, const char *path, const char *value);
     
+    //  Equivalent to zconfig_put, accepting a format specifier and variable
+    //  argument list, instead of a single string value.
+    CZMQ_EXPORT void
+        zconfig_putf (zconfig_t *self, const char *path, const char *format, ...);
+        
     //  Set config item name, name may be NULL
     CZMQ_EXPORT void
         zconfig_set_name (zconfig_t *self, const char *name);
@@ -125,6 +130,16 @@ This is the class interface:
     CZMQ_EXPORT int
         zconfig_save (zconfig_t *self, const char *filename);
     
+    //  Equivalent to zconfig_load, taking a format string instead of a fixed
+    //  filename.
+    CZMQ_EXPORT zconfig_t *
+        zconfig_loadf (const char *format, ...);
+    
+    //  Equivalent to zconfig_save, taking a format string instead of a fixed
+    //  filename.
+    CZMQ_EXPORT int
+        zconfig_savef (zconfig_t *self, const char *format, ...);
+        
     //  Report filename used during zconfig_load, or NULL if none
     CZMQ_EXPORT char *
         zconfig_filename (zconfig_t *self);
@@ -175,7 +190,7 @@ This is the class self test code:
     item = zconfig_new ("name", section);
     assert (item);
     zconfig_set_value (item, "Justin Kayce");
-    zconfig_put (root, "/curve/secret-key", "Top Secret");
+    zconfig_putf (root, "/curve/secret-key", "%s", "Top Secret");
     zconfig_set_comment (root, "   CURVE certificate");
     zconfig_set_comment (root, "   -----------------");
     assert (zconfig_comments (root));
@@ -193,8 +208,8 @@ This is the class self test code:
     assert (passwd);
     assert (streq (passwd, "Top Secret"));
     
-    zconfig_save (root, TESTDIR "/test.cfg");
-    assert (zconfig_has_changed (root));
+    zconfig_savef (root, "%s/%s", TESTDIR, "test.cfg");
+    assert (!zconfig_has_changed (root));
     int rc = zconfig_reload (&root);
     assert (rc == 0);
     assert (!zconfig_has_changed (root));
@@ -220,7 +235,7 @@ This is the class self test code:
     
     //  Test config can't be saved to a file in a path that doesn't
     //  exist or isn't writable
-    rc = zconfig_save (root, TESTDIR "/path/that/doesnt/exist/test.cfg");
+    rc = zconfig_savef (root, "%s/path/that/doesnt/exist/%s", TESTDIR, "test.cfg");
     assert (rc == -1);
     
     zconfig_destroy (&root);

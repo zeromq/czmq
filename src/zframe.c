@@ -130,8 +130,8 @@ zframe_send (zframe_t **self_p, void *dest, int flags)
         zframe_t *self = *self_p;
         assert (zframe_is (self));
 
-        int send_flags = (flags & ZFRAME_MORE) ? ZMQ_SNDMORE : 0;
-        send_flags |= (flags & ZFRAME_DONTWAIT) ? ZMQ_DONTWAIT : 0;
+        int send_flags = (flags & ZFRAME_MORE)? ZMQ_SNDMORE: 0;
+        send_flags |= (flags & ZFRAME_DONTWAIT)? ZMQ_DONTWAIT: 0;
         if (flags & ZFRAME_REUSE) {
             zmq_msg_t copy;
             zmq_msg_init (&copy);
@@ -143,10 +143,10 @@ zframe_send (zframe_t **self_p, void *dest, int flags)
             }
         }
         else {
-            int rc = zmq_sendmsg (handle, &self->zmsg, send_flags);
-            zframe_destroy (self_p);
-            if (rc == -1)
-                return rc;
+            if (zmq_sendmsg (handle, &self->zmsg, send_flags) >= 0)
+                zframe_destroy (self_p);
+            else
+                return -1;
         }
     }
     return 0;
@@ -349,8 +349,8 @@ zframe_print (zframe_t *self, const char *prefix)
             is_bin = 1;
 
     char buffer [256] = "";
-    snprintf (buffer, 30, "%s[%03d] ", prefix ? prefix : "", (int) size);
-    size_t max_size = is_bin ? 35 : 70;
+    snprintf (buffer, 30, "%s[%03d] ", prefix? prefix: "", (int) size);
+    size_t max_size = is_bin? 35: 70;
     const char *ellipsis = "";
     if (size > max_size) {
         size = max_size;
@@ -424,7 +424,7 @@ zframe_fprint (zframe_t *self, const char *prefix, FILE *file)
             is_bin = 1;
 
     fprintf (file, "[%03d] ", (int) size);
-    size_t max_size = is_bin ? 35 : 70;
+    size_t max_size = is_bin? 35: 70;
     const char *ellipsis = "";
     if (size > max_size) {
         size = max_size;

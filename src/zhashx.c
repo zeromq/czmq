@@ -530,6 +530,35 @@ zhashx_keys (zhashx_t *self)
     return keys;
 }
 
+//  Return a zlistx_t containing the items in the table. If there exists
+//  a duplicator, then it is used to duplicate all items, and if there
+//  is a destructor then it set as the destructor for the list.
+
+zlistx_t *zhashx_values(zhashx_t *self) {
+    assert(self);
+    zlistx_t *values = zlistx_new ();
+    if (!values)
+        return NULL;
+
+    zlistx_set_destructor (values, self->destructor);
+    zlistx_set_duplicator (values, self->duplicator);
+
+    uint index;
+    size_t limit = primes [self->prime_index];
+    for (index = 0; index < limit; index++) {
+        item_t *item = self->items [index];
+        while (item) {
+            if (zlistx_add_end (values, (void *) item->value) == NULL) {
+                zlistx_destroy (&values);
+                return NULL;
+            }
+            item = item->next;
+        }
+     }
+
+    return values;
+}
+
 
 //  --------------------------------------------------------------------------
 //  Simple iterator; returns first item in hash table, in no given order,
@@ -1138,6 +1167,10 @@ zhashx_test (int verbose)
     zlistx_t *keys = zhashx_keys (hash);
     assert (zlistx_size (keys) == 4);
     zlistx_destroy (&keys);
+
+    zlistx_t *values = zhashx_values(hash);
+    assert (zlistx_size (values) == 4);
+    zlistx_destroy (&values);
 
     //  Test dup method
     zhashx_t *copy = zhashx_dup (hash);

@@ -84,6 +84,12 @@ CZMQ_EXPORT size_t
 //  key_destructor as destructor for the list.
 CZMQ_EXPORT zlistx_t *
     zhashx_keys (zhashx_t *self);
+
+//  Return a zlistx_t containing the values for the items in the
+//  table. Uses the duplicator to duplicate all items and sets the
+//  destructor as destructor for the list.
+CZMQ_EXPORT zlistx_t *
+    zhashx_values (zhashx_t *self);
     
 //  Simple iterator; returns first item in hash table, in no given order,
 //  or NULL if the table is empty. This method is simpler to use than the

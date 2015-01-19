@@ -133,10 +133,15 @@ void *
 zpoller_wait (zpoller_t *self, int timeout)
 {
     self->expired = false;
-    self->terminated = false;
+    if (zsys_interrupted) {
+        self->terminated = true;
+        return NULL;
+    }
+    else
+        self->terminated = false;
+    
     if (self->need_rebuild)
         s_rebuild_poll_set (self);
-
     int rc = zmq_poll (self->poll_set, (int) self->poll_size,
                        timeout * ZMQ_POLL_MSEC);
     if (rc > 0) {
@@ -146,11 +151,11 @@ zpoller_wait (zpoller_t *self, int timeout)
                 return self->poll_readers [reader];
     }
     else
-    if (rc == 0)
-        self->expired = true;
-    else
     if (rc == -1 || zsys_interrupted)
         self->terminated = true;
+    else
+    if (rc == 0)
+        self->expired = true;
 
     return NULL;
 }
@@ -269,7 +274,7 @@ zpoller_test (bool verbose)
     //  Check we can poll an FD
     rc = zsock_connect (bowl, "tcp://127.0.0.1:%d", port_nbr);
     assert (rc != -1);
-    int fd = zsock_fd (bowl);
+    SOCKET fd = zsock_fd (bowl);
     rc = zpoller_add (poller, (void *) &fd);
     assert (rc != -1);
     zstr_send (vent, "Hello again, world");
