@@ -274,7 +274,7 @@ zpoller_test (bool verbose)
     //  Check we can poll an FD
     rc = zsock_connect (bowl, "tcp://127.0.0.1:%d", port_nbr);
     assert (rc != -1);
-    int fd = zsock_fd (bowl);
+    SOCKET fd = zsock_fd (bowl);
     rc = zpoller_add (poller, (void *) &fd);
     assert (rc != -1);
     zstr_send (vent, "Hello again, world");
