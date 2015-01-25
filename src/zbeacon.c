@@ -31,10 +31,6 @@
 //  Constants
 #define INTERVAL_DFLT  1000         //  Default interval = 1 second
 
-#if (defined (__WINDOWS__))
-#define in_addr_t uint32_t
-#endif
-
 //  --------------------------------------------------------------------------
 //  The self_t structure holds the state for one actor instance
 
