@@ -291,7 +291,7 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
 #   if defined (ZMQ_IPV6)
     zsock_set_ipv6 (handle, s_ipv6);
 #   else
-    zsock_set_ipv4only (handle, s_ipv6 ? 0 : 1);
+    zsock_set_ipv4only (handle, s_ipv6? 0: 1);
 #   endif
 #endif
     //  Add socket to reference tracker so we can report leaks; this is
@@ -576,7 +576,7 @@ zsys_file_delete (const char *filename)
 {
     assert (filename);
 #if (defined (__WINDOWS__))
-    return DeleteFileA (filename) ? 0 : -1;
+    return DeleteFileA (filename)? 0: -1;
 #else
     return unlink (filename);
 #endif
@@ -664,7 +664,7 @@ zsys_dir_delete (const char *pathname, ...)
         return -1;
 
 #if (defined (__WINDOWS__))
-    int rc = RemoveDirectoryA (formatted) ? 0 : -1;
+    int rc = RemoveDirectoryA (formatted)? 0: -1;
 #else
     int rc = rmdir (formatted);
 #endif
@@ -1176,7 +1176,7 @@ zsys_set_max_sockets (size_t max_sockets)
     if (s_open_sockets)
         zsys_error ("zsys_max_sockets() is not valid after creating sockets");
     assert (s_open_sockets == 0);
-    s_max_sockets = max_sockets ? max_sockets : zsys_socket_limit ();
+    s_max_sockets = max_sockets? max_sockets: zsys_socket_limit ();
     ZMUTEX_UNLOCK (s_mutex);
 }
 
@@ -1328,7 +1328,7 @@ zsys_set_interface (const char *value)
 const char *
 zsys_interface (void)
 {
-    return s_interface ? s_interface : "";
+    return s_interface? s_interface: "";
 }
 
 
