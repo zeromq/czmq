@@ -89,6 +89,7 @@ struct _s_ticket_t {
     int64_t when;               //  Clock time to invoke the ticket
     zloop_timer_fn *handler;    //  Function to execute (use timer fn)
     void *arg;                  //  Application argument to function
+    bool deleted;               //  Flag as deleted (to clean up later)
 };
 
 static int
@@ -635,7 +636,7 @@ zloop_ticket (zloop_t *self, zloop_timer_fn handler, void *arg)
     s_ticket_t *ticket = s_ticket_new (self->ticket_delay, handler, arg);
     if (ticket) {
         ticket->list_handle = zlistx_add_end (self->tickets, ticket);
-        if (!ticket->list_handle) 
+        if (!ticket->list_handle)
             s_ticket_destroy (&ticket);
     }
     return ticket;
@@ -657,14 +658,18 @@ zloop_ticket_reset (zloop_t *self, void *handle)
 
 
 //  --------------------------------------------------------------------------
-//  Delete a ticket timer.
+//  Delete a ticket timer. We do not actually delete the ticket here, as
+//  other code may still refer to the ticket. We mark as deleted, and remove
+//  later and safely.
 
 void
 zloop_ticket_delete (zloop_t *self, void *handle)
 {
     s_ticket_t *ticket = (s_ticket_t *) handle;
     assert (ticket->tag == TICKET_TAG);
-    zlistx_delete (self->tickets, ticket->list_handle);
+    ticket->deleted = true;
+    //  Move deleted tickets to end of list for fast cleanup
+    zlistx_move_end (self->tickets, ticket->list_handle);
 }
 
 
@@ -759,11 +764,17 @@ zloop_start (zloop_t *self)
         while (ticket && time_now >= ticket->when) {
             if (self->verbose)
                 zsys_debug ("zloop: call ticket handler");
-            rc = ticket->handler (self, 0, ticket->arg);
-            if (rc == -1)
+            if (ticket->handler (self, 0, ticket->arg) == -1)
                 break;      //  Timer handler signaled break
             zlistx_delete (self->tickets, ticket->list_handle);
             ticket = (s_ticket_t *) zlistx_next (self->tickets);
+        }
+        
+        //  Handle any tickets that were flagged for deletion
+        ticket = (s_ticket_t *) zlistx_last (self->tickets);
+        while (ticket && ticket->deleted) {
+            zlistx_delete (self->tickets, ticket->list_handle);
+            ticket = (s_ticket_t *) zlistx_last (self->tickets);
         }
         
         //  Handle any readers and pollers that are ready
