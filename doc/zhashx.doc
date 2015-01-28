@@ -76,6 +76,12 @@ This is the class interface:
     //  key_destructor as destructor for the list.
     CZMQ_EXPORT zlistx_t *
         zhashx_keys (zhashx_t *self);
+    
+    //  Return a zlistx_t containing the values for the items in the
+    //  table. Uses the duplicator to duplicate all items and sets the
+    //  destructor as destructor for the list.
+    CZMQ_EXPORT zlistx_t *
+        zhashx_values (zhashx_t *self);
         
     //  Simple iterator; returns first item in hash table, in no given order,
     //  or NULL if the table is empty. This method is simpler to use than the
@@ -292,6 +298,10 @@ This is the class self test code:
     zlistx_t *keys = zhashx_keys (hash);
     assert (zlistx_size (keys) == 4);
     zlistx_destroy (&keys);
+    
+    zlistx_t *values = zhashx_values(hash);
+    assert (zlistx_size (values) == 4);
+    zlistx_destroy (&values);
     
     //  Test dup method
     zhashx_t *copy = zhashx_dup (hash);

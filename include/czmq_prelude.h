@@ -447,7 +447,8 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
     typedef unsigned __int16 uint16_t;
     typedef unsigned __int32 uint32_t;
     typedef unsigned __int64 uint64_t;
-#   endif    
+#   endif
+    typedef uint32_t in_addr_t;
 #   if (!defined (PRId8))
 #       define PRId8    "d"
 #   endif

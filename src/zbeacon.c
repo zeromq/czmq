@@ -28,9 +28,8 @@
 #include "platform.h"
 #include "../include/czmq.h"
 
-#if (defined (__WINDOWS__))
-#define in_addr_t uint32_t
-#endif
+//  Constants
+#define INTERVAL_DFLT  1000         //  Default interval = 1 second
 
 //  --------------------------------------------------------------------------
 //  The self_t structure holds the state for one actor instance
@@ -194,6 +193,8 @@ s_self_handle_pipe (self_t *self)
         zframe_destroy (&self->transmit);
         zsock_recv (self->pipe, "fi", &self->transmit, &self->interval);
         assert (zframe_size (self->transmit) <= UDP_FRAME_MAX);
+        if (self->interval == 0)
+            self->interval = INTERVAL_DFLT;
         //  Start broadcasting immediately
         self->ping_at = zclock_mono ();
     }
