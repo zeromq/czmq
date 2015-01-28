@@ -95,7 +95,8 @@ CZMQ_EXPORT time_t
 
 //  Return file mode; provides at least support for the POSIX S_ISREG(m)
 //  and S_ISDIR(m) macros and the S_IRUSR and S_IWUSR bits, on all boxes.
-CZMQ_EXPORT mode_t
+//  Returns a mode_t cast to int, or -1 in case of error.
+CZMQ_EXPORT int
     zsys_file_mode (const char *filename);
 
 //  Delete file. Does not complain if the file is absent
