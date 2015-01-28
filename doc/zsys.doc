@@ -83,7 +83,8 @@ This is the class interface:
     
     //  Return file mode; provides at least support for the POSIX S_ISREG(m)
     //  and S_ISDIR(m) macros and the S_IRUSR and S_IWUSR bits, on all boxes.
-    CZMQ_EXPORT mode_t
+    //  Returns a mode_t cast to int, or -1 in case of error.
+    CZMQ_EXPORT int
         zsys_file_mode (const char *filename);
     
     //  Delete file. Does not complain if the file is absent
@@ -369,7 +370,7 @@ This is the class self test code:
     time_t when = zsys_file_modified (".");
     assert (when > 0);
     
-    mode_t mode = zsys_file_mode (".");
+    int mode = zsys_file_mode (".");
     assert (S_ISDIR (mode));
     assert (mode & S_IRUSR);
     assert (mode & S_IWUSR);
