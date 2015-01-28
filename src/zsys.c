@@ -499,7 +499,7 @@ bool
 zsys_file_exists (const char *filename)
 {
     assert (filename);
-    return zsys_file_mode (filename) != (mode_t) -1;
+    return zsys_file_mode (filename) != -1;
 }
 
 
@@ -537,8 +537,9 @@ zsys_file_modified (const char *filename)
 //  --------------------------------------------------------------------------
 //  Return file mode; provides at least support for the POSIX S_ISREG(m)
 //  and S_ISDIR(m) macros and the S_IRUSR and S_IWUSR bits, on all boxes.
+//  Returns a mode_t cast to int, or -1 in case of error.
 
-mode_t
+int
 zsys_file_mode (const char *filename)
 {
 #if (defined (__WINDOWS__))
@@ -624,8 +625,8 @@ zsys_dir_create (const char *pathname, ...)
     while (true) {
         if (slash)
             *slash = 0;         //  Cut at slash
-        mode_t mode = zsys_file_mode (formatted);
-        if (mode == (mode_t) -1) {
+        int mode = zsys_file_mode (formatted);
+        if (mode == -1) {
             //  Does not exist, try to create it
 #if (defined (__WINDOWS__))
             if (!CreateDirectoryA (formatted, NULL)) {
@@ -1594,7 +1595,7 @@ zsys_test (bool verbose)
     time_t when = zsys_file_modified (".");
     assert (when > 0);
 
-    mode_t mode = zsys_file_mode (".");
+    int mode = zsys_file_mode (".");
     assert (S_ISDIR (mode));
     assert (mode & S_IRUSR);
     assert (mode & S_IWUSR);
