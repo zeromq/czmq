@@ -304,6 +304,9 @@
 #       include <mach/clock.h>
 #       include <mach/mach.h>           //  For monotonic clocks
 #   endif
+#   if (defined (__UTYPE_ANDROID))
+#       include <android/log.h>
+#   endif
 #endif
 
 #if (defined (__VMS__))

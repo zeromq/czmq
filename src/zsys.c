@@ -1420,6 +1420,25 @@ static void
 s_log (char loglevel, char *string)
 {
 #if defined (__UNIX__)
+#   if defined (__UTYPE_ANDROID)
+    int priority = ANDROID_LOG_INFO;
+    if (loglevel == 'E')
+        priority = ANDROID_LOG_ERROR;
+    else
+    if (loglevel == 'W')
+        priority = ANDROID_LOG_WARN;
+    else
+    if (loglevel == 'N')
+        priority = ANDROID_LOG_INFO;
+    else
+    if (loglevel == 'I')
+        priority = ANDROID_LOG_INFO;
+    else
+    if (loglevel == 'D')
+        priority = ANDROID_LOG_DEBUG;
+    
+    __android_log_print(priority, "zsys", "%s", string);
+#   else
     if (s_logsystem) {
         int priority = LOG_INFO;
         if (loglevel == 'E')
@@ -1440,6 +1459,7 @@ s_log (char loglevel, char *string)
         syslog (priority, "%s", string);
     }
     else
+#   endif
 #endif
     //  Set s_logstream to stdout by default, unless we're using s_logsystem
     if (!s_logstream)

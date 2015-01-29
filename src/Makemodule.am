@@ -114,6 +114,11 @@ endif
 src_libczmq_la_LIBADD = \
     ${zmq_LIBS}
 
+if ON_ANDROID
+src_libczmq_la_LIBADD += \
+    -llog
+endif
+
 check_PROGRAMS += src/czmq_selftest
 
 src_czmq_selftest_CPPFLAGS = \
