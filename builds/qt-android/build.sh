@@ -16,7 +16,14 @@ android_build_opts
 
 # Use a temporary build directory
 cache="/tmp/android_build/${TOOLCHAIN_NAME}"
+rm -rf "${cache}"
 mkdir -p "${cache}"
+
+# Check for environment variable to clear the prefix and do a clean build
+if [[ $ANDROID_BUILD_CLEAN ]]; then
+    echo "Doing a clean build (removing previous build and depedencies)..."
+    rm -rf "${ANDROID_BUILD_PREFIX}"/*
+fi
 
 ##
 # Make sure zmq is built and copy the prefix
@@ -31,7 +38,7 @@ mkdir -p "${cache}"
         exit 1
     fi
     
-    (${ZMQ_ROOT}/builds/qt-android/build.sh) || exit 1
+    (bash ${ZMQ_ROOT}/builds/qt-android/build.sh) || exit 1
     UPSTREAM_PREFIX=${ZMQ_ROOT}/builds/qt-android/prefix/${TOOLCHAIN_NAME}
     cp -r ${UPSTREAM_PREFIX}/* ${ANDROID_BUILD_PREFIX}
 }
