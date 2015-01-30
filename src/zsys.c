@@ -958,7 +958,8 @@ zsys_socket_error (const char *reason)
 
 //  --------------------------------------------------------------------------
 //  Return current host name, for use in public tcp:// endpoints. Caller gets
-//  a freshly allocated string, should free it using zstr_free().
+//  a freshly allocated string, should free it using zstr_free(). If the host
+//  name is not resolvable, returns NULL.
 
 char *
 zsys_hostname (void)
@@ -967,7 +968,7 @@ zsys_hostname (void)
     gethostname (hostname, NI_MAXHOST);
     hostname [NI_MAXHOST - 1] = 0;
     struct hostent *host = gethostbyname (hostname);
-    return strdup (host->h_name);
+    return host->h_name? strdup (host->h_name): NULL;
 }
 
 
