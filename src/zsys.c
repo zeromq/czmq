@@ -958,7 +958,8 @@ zsys_socket_error (const char *reason)
 
 //  --------------------------------------------------------------------------
 //  Return current host name, for use in public tcp:// endpoints. Caller gets
-//  a freshly allocated string, should free it using zstr_free().
+//  a freshly allocated string, should free it using zstr_free(). If the host
+//  name is not resolvable, returns NULL.
 
 char *
 zsys_hostname (void)
@@ -993,7 +994,7 @@ zsys_hostname (void)
         close(sock);
     }
 
-    return strdup(hostname);
+    return NULL;
 }
 
 
