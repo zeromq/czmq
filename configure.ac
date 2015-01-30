@@ -56,7 +56,7 @@ AC_ARG_WITH([makecert],
     AS_HELP_STRING([--with-makecert], 
         [Include the program makecert in compilation and installation.]),
     [with_makecert=$withval],
-    [with_makecert=yes])
+    [with_makecert=no])
 
 AM_CONDITIONAL([WITH_MAKECERT], [test x$with_makecert != xno])
 AM_COND_IF([WITH_MAKECERT], [AC_MSG_NOTICE([WITH_MAKECERT defined])])
