@@ -527,7 +527,7 @@ static inline void *
 safe_malloc (size_t size, const char *file, unsigned line)
 {
 //     printf ("%s:%u %08d\n", file, line, (int) size);
-#if defined (__UTYPE_LINUX)
+#if defined (__UTYPE_LINUX) && defined (__IS_64BIT__)
     //  On GCC we count zmalloc memory allocations
     __sync_add_and_fetch (&zsys_allocs, 1);
 #endif
