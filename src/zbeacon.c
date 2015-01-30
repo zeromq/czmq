@@ -112,8 +112,8 @@ s_self_prepare_udp (self_t *self)
                 send_to = inet_addr (ziflist_broadcast (iflist));
                 bind_to = inet_addr (ziflist_address (iflist));
                 if (self->verbose)
-                    zsys_info ("zbeacon: using address=%s broadcast=%s",
-                               ziflist_address (iflist), ziflist_broadcast (iflist));
+                    zsys_info ("zbeacon: interface=%s address=%s broadcast=%s",
+                               name, ziflist_address (iflist), ziflist_broadcast (iflist));
                 break;      //  iface is known, so allow it
             }
             name = ziflist_next (iflist);
