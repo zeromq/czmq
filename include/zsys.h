@@ -178,7 +178,8 @@ CZMQ_EXPORT void
     zsys_socket_error (const char *reason);
 
 //  Return current host name, for use in public tcp:// endpoints. Caller gets
-//  a freshly allocated string, should free it using zstr_free().
+//  a freshly allocated string, should free it using zstr_free(). If the host
+//  name is not resolvable, returns NULL.
 CZMQ_EXPORT char *
     zsys_hostname (void);
 

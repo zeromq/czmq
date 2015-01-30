@@ -299,6 +299,9 @@
 #       include <mach/clock.h>
 #       include <mach/mach.h>           //  For monotonic clocks
 #   endif
+#   if (defined (__UTYPE_ANDROID))
+#       include <android/log.h>
+#   endif
 #endif
 
 #if (defined (__VMS__))
@@ -521,7 +524,7 @@ static inline void *
 safe_malloc (size_t size, const char *file, unsigned line)
 {
 //     printf ("%s:%u %08d\n", file, line, (int) size);
-#if defined (__UTYPE_LINUX)
+#if defined (__UTYPE_LINUX) && defined (__IS_64BIT__)
     //  On GCC we count zmalloc memory allocations
     __sync_add_and_fetch (&zsys_allocs, 1);
 #endif
