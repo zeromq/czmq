@@ -967,7 +967,10 @@ zsys_hostname (void)
     gethostname (hostname, NI_MAXHOST);
     hostname [NI_MAXHOST - 1] = 0;
     struct hostent *host = gethostbyname (hostname);
-    return strdup (host->h_name);
+    if(host != NULL)
+        return strdup (host->h_name);
+    else
+        return strdup (hostname);
 }
 
 
