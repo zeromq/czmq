@@ -964,11 +964,37 @@ zsys_socket_error (const char *reason)
 char *
 zsys_hostname (void)
 {
+    // Try using hostname as network address
     char hostname [NI_MAXHOST];
     gethostname (hostname, NI_MAXHOST);
     hostname [NI_MAXHOST - 1] = 0;
     struct hostent *host = gethostbyname (hostname);
-    return host->h_name? strdup (host->h_name): NULL;
+    if(host != NULL)
+        return strdup (host->h_name);
+
+    // Try discovering IP by connecting to Google
+    struct sockaddr_in adr_inet;
+    int sock;
+    if(sock = socket(AF_INET, SOCK_DGRAM, 0) == -1)
+        return strdup(hostname);
+    memset(&adr_inet,0,sizeof adr_inet);
+    adr_inet.sin_family = AF_INET;
+    // Hardcoded to Google - ugly but works
+    adr_inet.sin_port = htons(53);
+    adr_inet.sin_addr.s_addr = inet_network("8.8.8.8");
+    if(connect(sock, (struct sockaddr *)&adr_inet, sizeof(struct sockaddr_in)) != -1) {
+        memset(&adr_inet,0,sizeof(struct sockaddr_in));
+        socklen_t len = sizeof(struct sockaddr_in);
+        getsockname(sock, (struct sockaddr*)&adr_inet, &len);
+        char *ret = inet_ntoa(((struct sockaddr_in*)&adr_inet)->sin_addr);
+        close(sock);
+        if(strcmp(ret, "0.0.0.0"))
+            return strdup(ret);
+    } else {
+        close(sock);
+    }
+
+    return NULL;
 }
 
 
