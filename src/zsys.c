@@ -279,39 +279,41 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
     zsys_init ();
     ZMUTEX_LOCK (s_mutex);
     void *handle = zmq_socket (s_process_ctx, type);
-    //  Configure socket with process defaults
-    zsock_set_linger (handle, (int) s_linger);
+    if (handle) {
+        //  Configure socket with process defaults
+        zsock_set_linger (handle, (int) s_linger);
 #if (ZMQ_VERSION_MAJOR == 2)
-    //  For ZeroMQ/2.x we use sndhwm for both send and receive
-    zsock_set_hwm (handle, s_sndhwm);
+        //  For ZeroMQ/2.x we use sndhwm for both send and receive
+        zsock_set_hwm (handle, s_sndhwm);
 #else
-    //  For later versions we use separate SNDHWM and RCVHWM
-    zsock_set_sndhwm (handle, (int) s_sndhwm);
-    zsock_set_rcvhwm (handle, (int) s_rcvhwm);
+        //  For later versions we use separate SNDHWM and RCVHWM
+        zsock_set_sndhwm (handle, (int) s_sndhwm);
+        zsock_set_rcvhwm (handle, (int) s_rcvhwm);
 #   if defined (ZMQ_IPV6)
-    zsock_set_ipv6 (handle, s_ipv6);
+        zsock_set_ipv6 (handle, s_ipv6);
 #   else
-    zsock_set_ipv4only (handle, s_ipv6? 0: 1);
+        zsock_set_ipv4only (handle, s_ipv6? 0: 1);
 #   endif
 #endif
-    //  Add socket to reference tracker so we can report leaks; this is
-    //  done only when the caller passes a filename/line_nbr
-    if (filename) {
-        s_sockref_t *sockref = (s_sockref_t *) zmalloc (sizeof (s_sockref_t));
-        if (sockref) {
-            sockref->handle = handle;
-            sockref->type = type;
-            sockref->filename = filename;
-            sockref->line_nbr = line_nbr;
-            zlist_append (s_sockref_list, sockref);
+        //  Add socket to reference tracker so we can report leaks; this is
+        //  done only when the caller passes a filename/line_nbr
+        if (filename) {
+            s_sockref_t *sockref = (s_sockref_t *) zmalloc (sizeof (s_sockref_t));
+            if (sockref) {
+                sockref->handle = handle;
+                sockref->type = type;
+                sockref->filename = filename;
+                sockref->line_nbr = line_nbr;
+                zlist_append (s_sockref_list, sockref);
+            }
+            else {
+                zmq_close (handle);
+                ZMUTEX_UNLOCK (s_mutex);
+                return NULL;
+            }
         }
-        else {
-            zmq_close (handle);
-            ZMUTEX_UNLOCK (s_mutex);
-            return NULL;
-        }
+        s_open_sockets++;
     }
-    s_open_sockets++;
     ZMUTEX_UNLOCK (s_mutex);
     return handle;
 }
