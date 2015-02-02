@@ -294,10 +294,12 @@
      || (defined (_POSIX_VERSION)  && (_POSIX_VERSION  >= 199309L)))
 #       include <sched.h>
 #   endif
-#   if (defined (__UTYPE_OSX))
-#       include <crt_externs.h>         //  For _NSGetEnviron()
+#   if (defined (__UTYPE_OSX) || defined (__UTYPE_IOS))
 #       include <mach/clock.h>
 #       include <mach/mach.h>           //  For monotonic clocks
+#   endif
+#   if (defined (__UTYPE_OSX))
+#       include <crt_externs.h>         //  For _NSGetEnviron()
 #   endif
 #   if (defined (__UTYPE_ANDROID))
 #       include <android/log.h>

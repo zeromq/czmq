@@ -53,8 +53,8 @@ PKG_PROG_PKG_CONFIG
 
 # Check for makecert intent
 AC_ARG_WITH([makecert],
-    AS_HELP_STRING([--with-makecert], 
-        [Include the program makecert in compilation and installation.]),
+    AS_HELP_STRING([--with-makecert],
+        [Include the program makecert for compilation and installation [default=yes].]),
     [with_makecert=$withval],
     [with_makecert=yes])
 

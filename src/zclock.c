@@ -102,7 +102,7 @@ zclock_time (void)
 int64_t
 zclock_mono (void)
 {
-#if defined (__UTYPE_OSX)
+#if (defined (__UTYPE_OSX) || defined (__UTYPE_IOS))
     clock_serv_t cclock;
     mach_timespec_t mts;
     host_get_clock_service (mach_host_self (), SYSTEM_CLOCK, &cclock);
@@ -140,7 +140,7 @@ zclock_mono (void)
 int64_t
 zclock_usecs (void)
 {
-#if defined (__UTYPE_OSX)
+#if (defined (__UTYPE_OSX) || defined (__UTYPE_IOS))
     clock_serv_t cclock;
     mach_timespec_t mts;
     host_get_clock_service (mach_host_self (), SYSTEM_CLOCK, &cclock);
