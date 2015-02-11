@@ -29,66 +29,66 @@
   <!-- static libraries -->
   <ItemDefinitionGroup Condition="'$(Platform)' == 'Win32' And ('$(PlatformToolset)' == 'v120' Or '$(PlatformToolset)' == 'CTP_Nov2013') And '$(Linkage-czmq)' == 'static' And $(Configuration.IndexOf('Release')) != -1">
     <Link>
-      <AdditionalDependencies>czmq-x86-v120-mt-s-2_2_0_8.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>czmq-x86-v120-mt-s-3_0_1_0.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Platform)' == 'Win32' And ('$(PlatformToolset)' == 'v120' Or '$(PlatformToolset)' == 'CTP_Nov2013') And '$(Linkage-czmq)' == 'static' And $(Configuration.IndexOf('Debug')) != -1">
     <Link>
-      <AdditionalDependencies>czmq-x86-v120-mt-sgd-2_2_0_8.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>czmq-x86-v120-mt-sgd-3_0_1_0.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Platform)' == 'x64' And ('$(PlatformToolset)' == 'v120' Or '$(PlatformToolset)' == 'CTP_Nov2013') And '$(Linkage-czmq)' == 'static' And $(Configuration.IndexOf('Release')) != -1">
     <Link>
-      <AdditionalDependencies>czmq-x64-v120-mt-s-2_2_0_8.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>czmq-x64-v120-mt-s-3_0_1_0.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Platform)' == 'x64' And ('$(PlatformToolset)' == 'v120' Or '$(PlatformToolset)' == 'CTP_Nov2013') And '$(Linkage-czmq)' == 'static' And $(Configuration.IndexOf('Debug')) != -1">
     <Link>
-      <AdditionalDependencies>czmq-x64-v120-mt-sgd-2_2_0_8.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>czmq-x64-v120-mt-sgd-3_0_1_0.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 
   <!-- static ltcg libraries -->
   <ItemDefinitionGroup Condition="'$(Platform)' == 'Win32' And ('$(PlatformToolset)' == 'v120' Or '$(PlatformToolset)' == 'CTP_Nov2013') And '$(Linkage-czmq)' == 'ltcg' And $(Configuration.IndexOf('Release')) != -1">
     <Link>
-      <AdditionalDependencies>czmq-x86-v120-mt-s-2_2_0_8.ltcg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>czmq-x86-v120-mt-s-3_0_1_0.ltcg.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Platform)' == 'Win32' And ('$(PlatformToolset)' == 'v120' Or '$(PlatformToolset)' == 'CTP_Nov2013') And '$(Linkage-czmq)' == 'ltcg' And $(Configuration.IndexOf('Debug')) != -1">
     <Link>
-      <AdditionalDependencies>czmq-x86-v120-mt-sgd-2_2_0_8.ltcg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>czmq-x86-v120-mt-sgd-3_0_1_0.ltcg.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Platform)' == 'x64' And ('$(PlatformToolset)' == 'v120' Or '$(PlatformToolset)' == 'CTP_Nov2013') And '$(Linkage-czmq)' == 'ltcg' And $(Configuration.IndexOf('Release')) != -1">
     <Link>
-      <AdditionalDependencies>czmq-x64-v120-mt-s-2_2_0_8.ltcg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>czmq-x64-v120-mt-s-3_0_1_0.ltcg.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Platform)' == 'x64' And ('$(PlatformToolset)' == 'v120' Or '$(PlatformToolset)' == 'CTP_Nov2013') And '$(Linkage-czmq)' == 'ltcg' And $(Configuration.IndexOf('Debug')) != -1">
     <Link>
-      <AdditionalDependencies>czmq-x64-v120-mt-sgd-2_2_0_8.ltcg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>czmq-x64-v120-mt-sgd-3_0_1_0.ltcg.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   
   <!-- dynamic import libraries -->
   <ItemDefinitionGroup Condition="'$(Platform)' == 'Win32' And ('$(PlatformToolset)' == 'v120' Or '$(PlatformToolset)' == 'CTP_Nov2013') And '$(Linkage-czmq)' == 'dynamic' And $(Configuration.IndexOf('Release')) != -1">
     <Link>
-      <AdditionalDependencies>czmq-x86-v120-mt-2_2_0_8.imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>czmq-x86-v120-mt-3_0_1_0.imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Platform)' == 'Win32' And ('$(PlatformToolset)' == 'v120' Or '$(PlatformToolset)' == 'CTP_Nov2013') And '$(Linkage-czmq)' == 'dynamic' And $(Configuration.IndexOf('Debug')) != -1">
     <Link>
-      <AdditionalDependencies>czmq-x86-v120-mt-gd-2_2_0_8.imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>czmq-x86-v120-mt-gd-3_0_1_0.imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Platform)' == 'x64' And ('$(PlatformToolset)' == 'v120' Or '$(PlatformToolset)' == 'CTP_Nov2013') And '$(Linkage-czmq)' == 'dynamic' And $(Configuration.IndexOf('Release')) != -1">
     <Link>
-      <AdditionalDependencies>czmq-x64-v120-mt-2_2_0_8.imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>czmq-x64-v120-mt-3_0_1_0.imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Platform)' == 'x64' And ('$(PlatformToolset)' == 'v120' Or '$(PlatformToolset)' == 'CTP_Nov2013') And '$(Linkage-czmq)' == 'dynamic' And $(Configuration.IndexOf('Debug')) != -1">
     <Link>
-      <AdditionalDependencies>czmq-x64-v120-mt-gd-2_2_0_8.imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>czmq-x64-v120-mt-gd-3_0_1_0.imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 
@@ -97,26 +97,26 @@
   <Target Name="czmq_AfterBuild_Win32_v120_Dynamic_Release"
           Condition="'$(Platform)' == 'Win32' And ('$(PlatformToolset)' == 'v120' Or '$(PlatformToolset)' == 'CTP_Nov2013') And '$(Linkage-czmq)' == 'dynamic' And $(Configuration.IndexOf('Release')) != -1"
           AfterTargets="czmq_AfterBuild">
-    <Copy SourceFiles="$(MSBuildThisFileDirectory)bin\czmq-x86-v120-mt-2_2_0_8.dll" DestinationFiles="$(TargetDir)czmq.dll" SkipUnchangedFiles="true" />
-    <!--<Copy SourceFiles="$(MSBuildThisFileDirectory)bin\czmq-x86-v120-mt-2_2_0_8.pdb" DestinationFiles="$(TargetDir)czmq.pdb" SkipUnchangedFiles="true" />-->
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)bin\czmq-x86-v120-mt-3_0_1_0.dll" DestinationFiles="$(TargetDir)czmq.dll" SkipUnchangedFiles="true" />
+    <!--<Copy SourceFiles="$(MSBuildThisFileDirectory)bin\czmq-x86-v120-mt-3_0_1_0.pdb" DestinationFiles="$(TargetDir)czmq.pdb" SkipUnchangedFiles="true" />-->
   </Target>
   <Target Name="czmq_AfterBuild_Win32_v120_Dynamic_Debug"
           Condition="'$(Platform)' == 'Win32' And ('$(PlatformToolset)' == 'v120' Or '$(PlatformToolset)' == 'CTP_Nov2013') And '$(Linkage-czmq)' == 'dynamic' And $(Configuration.IndexOf('Debug')) != -1"
           AfterTargets="czmq_AfterBuild">
-    <Copy SourceFiles="$(MSBuildThisFileDirectory)bin\czmq-x86-v120-mt-gd-2_2_0_8.dll" DestinationFiles="$(TargetDir)czmq.dll" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="$(MSBuildThisFileDirectory)bin\czmq-x86-v120-mt-gd-2_2_0_8.pdb" DestinationFiles="$(TargetDir)czmq.pdb" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)bin\czmq-x86-v120-mt-gd-3_0_1_0.dll" DestinationFiles="$(TargetDir)czmq.dll" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)bin\czmq-x86-v120-mt-gd-3_0_1_0.pdb" DestinationFiles="$(TargetDir)czmq.pdb" SkipUnchangedFiles="true" />
   </Target>
   <Target Name="czmq_AfterBuild_x64_v120_Dynamic_Release"
           Condition="'$(Platform)' == 'x64' And ('$(PlatformToolset)' == 'v120' Or '$(PlatformToolset)' == 'CTP_Nov2013') And '$(Linkage-czmq)' == 'dynamic' And $(Configuration.IndexOf('Release')) != -1"
           AfterTargets="czmq_AfterBuild">
-    <Copy SourceFiles="$(MSBuildThisFileDirectory)bin\czmq-x64-v120-mt-2_2_0_8.dll" DestinationFiles="$(TargetDir)czmq.dll" SkipUnchangedFiles="true" />
-    <!--<Copy SourceFiles="$(MSBuildThisFileDirectory)bin\czmq-x64-v120-mt-2_2_0_8.pdb" DestinationFiles="$(TargetDir)czmq.pdb" SkipUnchangedFiles="true" />-->
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)bin\czmq-x64-v120-mt-3_0_1_0.dll" DestinationFiles="$(TargetDir)czmq.dll" SkipUnchangedFiles="true" />
+    <!--<Copy SourceFiles="$(MSBuildThisFileDirectory)bin\czmq-x64-v120-mt-3_0_1_0.pdb" DestinationFiles="$(TargetDir)czmq.pdb" SkipUnchangedFiles="true" />-->
   </Target>
   <Target Name="czmq_AfterBuild_x64_v120_Dynamic_Debug"
           Condition="'$(Platform)' == 'x64' And ('$(PlatformToolset)' == 'v120' Or '$(PlatformToolset)' == 'CTP_Nov2013') And '$(Linkage-czmq)' == 'dynamic' And $(Configuration.IndexOf('Debug')) != -1"
           AfterTargets="czmq_AfterBuild">
-    <Copy SourceFiles="$(MSBuildThisFileDirectory)bin\czmq-x64-v120-mt-gd-2_2_0_8.dll" DestinationFiles="$(TargetDir)czmq.dll" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="$(MSBuildThisFileDirectory)bin\czmq-x64-v120-mt-gd-2_2_0_8.pdb" DestinationFiles="$(TargetDir)czmq.pdb" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)bin\czmq-x64-v120-mt-gd-3_0_1_0.dll" DestinationFiles="$(TargetDir)czmq.dll" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)bin\czmq-x64-v120-mt-gd-3_0_1_0.pdb" DestinationFiles="$(TargetDir)czmq.pdb" SkipUnchangedFiles="true" />
   </Target>
 
 <!--
