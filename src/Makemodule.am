@@ -117,6 +117,11 @@ src_libczmq_la_LDFLAGS += \
     -avoid-version
 endif
 
+if ON_ANDROID
+src_libczmq_la_LIBADD += \
+    -llog
+endif
+
 src_libczmq_la_LIBADD = \
     ${zmq_LIBS}
 
