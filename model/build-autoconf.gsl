@@ -70,6 +70,11 @@ src_lib$(project.name)_la_LDFLAGS += \\
     -avoid-version
 endif
 
+if ON_ANDROID
+src_libczmq_la_LIBADD += \\
+    -llog
+endif
+
 .if count(package_dependency, defined(package_dependency.for_lib) | defined (package_dependency.for_all)) > 0
 src_lib$(project.name)_la_LIBADD = \\
 .for package_dependency where defined (package_dependency.for_lib) | defined (package_dependency.for_all)
