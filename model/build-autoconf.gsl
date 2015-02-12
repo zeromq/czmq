@@ -81,6 +81,11 @@ src_lib$(project.name)_la_LIBADD = \\
 .endfor
 .endif
 
+if ON_ANDROID
+src_lib$(project.name)_la_LIBADD += \\
+    -llog
+endif
+
 check_PROGRAMS += src/$(project.name)_selftest
 
 src_$(project.name)_selftest_CPPFLAGS = \\
