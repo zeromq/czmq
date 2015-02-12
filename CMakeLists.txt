@@ -17,7 +17,7 @@ set(BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 #######################################################################
 # Do we build and register self tests ?
 ######################################################################
-set(CZMQ_BUILD_TESTS   true   CACHE BOOL "build czmq selftest")
+set(CZMQ_BUILD_TESTS true CACHE BOOL "build czmq selftest")
 
 ########################################################################
 # determine version
@@ -216,9 +216,9 @@ install(
 # tests
 ########################################################################
 if (CZMQ_BUILD_TESTS)
-  add_executable(czmq_selftest ${SOURCE_DIR}/src/czmq_selftest.c)
-  target_link_libraries(czmq_selftest czmq ${ZEROMQ_LIBRARIES})
-  add_test(czmq_selftest czmq_selftest)
+    add_executable(czmq_selftest ${SOURCE_DIR}/src/czmq_selftest.c)
+    target_link_libraries(czmq_selftest czmq ${ZEROMQ_LIBRARIES})
+    add_test(czmq_selftest czmq_selftest)
 endif()
 
 ########################################################################
