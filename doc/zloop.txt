@@ -90,9 +90,7 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void
     zloop_ticket_reset (zloop_t *self, void *handle);
     
-//  Delete a ticket timer. We do not actually delete the ticket here, as
-//  other code may still refer to the ticket. We mark as deleted, and remove
-//  later and safely.
+//  Delete a ticket timer.
 CZMQ_EXPORT void
     zloop_ticket_delete (zloop_t *self, void *handle);
 
