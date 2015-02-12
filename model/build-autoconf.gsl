@@ -64,12 +64,6 @@ src_lib$(project.name)_la_LDFLAGS += \\
     -avoid-version
 endif
 
-if ON_CYGWIN
-src_lib$(project.name)_la_LDFLAGS += \\
-    -no-undefined \\
-    -avoid-version
-endif
-
 .if count(package_dependency, defined(package_dependency.for_lib) | defined (package_dependency.for_all)) > 0
 src_lib$(project.name)_la_LIBADD = \\
 .for package_dependency where defined (package_dependency.for_lib) | defined (package_dependency.for_all)
@@ -80,6 +74,11 @@ src_lib$(project.name)_la_LIBADD = \\
 .   endif
 .endfor
 .endif
+
+if ON_ANDROID
+src_lib$(project.name)_la_LIBADD += \\
+    -llog
+endif
 
 check_PROGRAMS += src/$(project.name)_selftest
 
@@ -110,14 +109,14 @@ TESTS = src/$(project.name)_selftest
 
 # Run the selftest binary under valgrind to check for memory leaks
 memcheck: src/$(project.name)_selftest
-	libtool --mode=execute valgrind --tool=memcheck \\
+	$\(LIBTOOL) --mode=execute valgrind --tool=memcheck \\
 		--leak-check=full --show-reachable=yes --error-exitcode=1 \\
 		--suppressions=$\(srcdir)/src/.valgrind.supp \\
 		$\(srcdir)/src/$(project.name)_selftest
 
 # Run the selftest binary under gdb for debugging
 debug: src/$(project.name)_selftest
-	libtool --mode=execute gdb -q \\
+	$\(LIBTOOL) --mode=execute gdb -q \\
 		$\(srcdir)/src/$(project.name)_selftest
 .for model
 .   if first ()
@@ -151,7 +150,7 @@ code:
 .endfor
 MAN1 =
 MAN3 =$(manpages)
-MAN7 = $\(srcdir)/$(project.manpage)
+MAN7 = $(project.manpage)
 MAN_DOC = $\(MAN1) $\(MAN3) $\(MAN7)
 
 MAN_TXT = $\(MAN1:%.1=%.txt)
