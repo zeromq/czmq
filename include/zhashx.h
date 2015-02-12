@@ -18,6 +18,18 @@
 extern "C" {
 #endif
 
+//  These are signatures for handler functions that customize the
+//  behavior of CZMQ containers. These are shared between all CZMQ
+//  container types.
+
+//  -- destroy an item
+typedef void (czmq_destructor) (void **item);
+//  -- duplicate an item
+typedef void *(czmq_duplicator) (const void *item);
+//  - compare two items, for sorting
+typedef int (czmq_comparator) (const void *item1, const void *item2);
+
+
 //  @interface
 //  Callback function for zhashx_freefn method
 typedef void (zhashx_free_fn) (void *data);

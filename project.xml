@@ -1,0 +1,59 @@
+<project 
+    name = "CZMQ"
+    description = "The high-level C binding for 0MQ"
+    script = "zproject.gsl"
+    email = "zeromq-dev@lists.zeromq.org"
+    >
+    <include filename = "license.xml" />
+    <version major = "3" minor = "0" patch = "1" />
+    <use project = "zmq" />
+
+    <class name="zactor" />
+    <class name="zauth" />
+    <class name="zarmour" />
+    <class name="zbeacon" />
+    <class name="zcert" />
+    <class name="zcertstore" />
+    <class name="zchunk" />
+    <class name="zclock" />
+    <class name="zconfig" />
+    <class name="zdigest" />
+    <class name="zdir" />
+    <class name="zdir_patch" />
+    <class name="zfile" />
+    <class name="zframe" />
+    <class name="zgossip" />
+    <class name="zhashx" />
+    <class name="ziflist" />
+    <class name="zlistx" />
+    <class name="zloop" />
+    <class name="zmonitor" />
+    <class name="zmsg" />
+    <class name="zpoller" />
+    <class name="zproxy" />
+    <class name="zrex" />
+    <class name="zsock" />
+    <class name="zsock_option" />
+    <class name="zstr" />
+    <class name="zsys" />
+    <class name="zuuid" />
+    <class name="zgossip_msg" private="1" />
+    <class name="zauth_v2" />
+    <class name="zbeacon_v2" />
+    <class name="zctx" />
+    <class name="zhash" />
+    <class name="zlist" />
+    <class name="zmonitor_v2" />
+    <class name="zmutex" />
+    <class name="zproxy_v2" />
+    <class name="zsocket" />
+    <class name="zsockopt" />
+    <class name="zthread" />
+
+    <extra name="zgossip_engine.inc" />
+    <extra name="zhash_primes.inc" />
+    <extra name="zclass_example.xml" />
+
+    <main name = "test_zgossip" private = "1" />
+</project>
+   
