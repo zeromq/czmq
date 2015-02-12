@@ -22,6 +22,11 @@ enable_testing()
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
+#######################################################################
+# Do we build and register self tests ?
+######################################################################
+set($(PROJECT.NAME)_BUILD_TESTS true CACHE BOOL "build $(project.name) selftest")
+
 ########################################################################
 # determine version
 ########################################################################
@@ -75,11 +80,6 @@ endif()
 # required libraries for mingw
 if (MINGW)
     set(MORE_LIBRARIES -lws2_32 -lrpcrt4 -liphlpapi)
-endif()
-
-# required libraries for cygwin
-if (CYGWIN)
-    set(MORE_LIBRARIES -luuid)
 endif()
 
 ########################################################################
@@ -153,9 +153,11 @@ install(
 ########################################################################
 # tests
 ########################################################################
-add_executable($(project.name)_selftest ${SOURCE_DIR}/src/$(project.name)_selftest.c)
-target_link_libraries($(project.name)_selftest $(project.name) ${ZEROMQ_LIBRARIES})
-add_test($(project.name)_selftest $(project.name)_selftest)
+if ($(PROJECT.NAME)_BUILD_TESTS)
+    add_executable($(project.name)_selftest ${SOURCE_DIR}/src/$(project.name)_selftest.c)
+    target_link_libraries($(project.name)_selftest $(project.name) ${ZEROMQ_LIBRARIES})
+    add_test($(project.name)_selftest $(project.name)_selftest)
+endif()
 
 ########################################################################
 # summary
