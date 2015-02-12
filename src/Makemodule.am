@@ -111,19 +111,13 @@ src_libczmq_la_LDFLAGS += \
     -avoid-version
 endif
 
-if ON_CYGWIN
-src_libczmq_la_LDFLAGS += \
-    -no-undefined \
-    -avoid-version
-endif
+src_libczmq_la_LIBADD = \
+    ${zmq_LIBS}
 
 if ON_ANDROID
 src_libczmq_la_LIBADD += \
     -llog
 endif
-
-src_libczmq_la_LIBADD = \
-    ${zmq_LIBS}
 
 check_PROGRAMS += src/czmq_selftest
 
@@ -141,14 +135,14 @@ TESTS = src/czmq_selftest
 
 # Run the selftest binary under valgrind to check for memory leaks
 memcheck: src/czmq_selftest
-	libtool --mode=execute valgrind --tool=memcheck \
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
 		--leak-check=full --show-reachable=yes --error-exitcode=1 \
 		--suppressions=$(srcdir)/src/.valgrind.supp \
 		$(srcdir)/src/czmq_selftest
 
 # Run the selftest binary under gdb for debugging
 debug: src/czmq_selftest
-	libtool --mode=execute gdb -q \
+	$(LIBTOOL) --mode=execute gdb -q \
 		$(srcdir)/src/czmq_selftest
 
 # define custom target for all products of /src
