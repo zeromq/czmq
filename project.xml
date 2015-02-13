@@ -1,12 +1,12 @@
 <project
-    name = "czmq"
-    script = "project.gsl"
+    name = "CZMQ"
+    description = "The high-level C binding for 0MQ"
+    script = "zproject.gsl"
+    email = "zeromq-dev@lists.zeromq.org"
     >
-
-    <package_dependency name="zmq" pkg_name="libzmq" for_all="1" />
-
-    <header name = "czmq" />
-    <header name = "czmq_prelude" />
+    <include filename = "license.xml" />
+    <version major = "3" minor = "0" patch = "1" />
+    <use project = "zmq" />
 
     <class name = "zactor" />
     <class name = "zauth" />
@@ -61,4 +61,6 @@
     <class name = "zsocket" />
     <class name = "zsockopt" />
     <class name = "zthread" />
+
+    <main name = "test_zgossip" private = "1" />
 </project>
