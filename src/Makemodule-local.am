@@ -1,0 +1,7 @@
+# Project-local changes to auto-generated content
+
+# Android-qt requires this special link dependency
+if ON_ANDROID
+src_libczmq_la_LIBADD += -llog
+endif
+
