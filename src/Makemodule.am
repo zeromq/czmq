@@ -138,6 +138,12 @@ TESTS = src/czmq_selftest
 # define custom target for all products of /src
 src: src/libczmq.la src/czmq_selftest
 
+# Produce generated code from models in the src directory
+code:
+	cd $(srcdir)/src; gsl -q sockopts.xml
+	cd $(srcdir)/src; gsl -q zgossip.xml
+	cd $(srcdir)/src; gsl -q zgossip_msg.xml
+
 # Run the selftest binary under valgrind to check for memory leaks
 memcheck: src/czmq_selftest
 	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \

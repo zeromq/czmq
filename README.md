@@ -8270,10 +8270,8 @@ The selftest code shows how to create, talk to, and destroy an actor.
 If you define a new CZMQ class `myclass` you need to:
 
 * Write the `zmyclass.c` and `zmyclass.h` source files, in `src` and `include` respectively.
-* Add`#include <zmyclass.h>` to `include/czmq.h`.
-* Add the myclass header and test call to `src/czmq_selftest.c`.
 * Add a reference documentation to 'doc/zmyclass.txt'.
-* Add myclass to 'model/projects.xml` and read model/README.txt.
+* Add myclass to 'project.xml` and regenerate files using `generate.sh`
 * Add a section to README.txt.
 
 <A name="toc3-8228" title="Documentation" />
