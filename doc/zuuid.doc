@@ -5,6 +5,7 @@ them. If you build CZMQ with libuuid, on Unix/Linux, it will use that
 library. On Windows it will use UuidCreate(). Otherwise it will use a
 random number generator to produce convincing imitations of uuids.
 
+Please add @discuss section in ../src/zuuid.c.
 
 This is the class interface:
 

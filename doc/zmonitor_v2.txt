@@ -93,7 +93,3 @@ zmonitor_destroy (&sinkmon);
 zmonitor_destroy (&sourcemon);
 zctx_destroy (&ctx);
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

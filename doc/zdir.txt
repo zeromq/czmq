@@ -92,6 +92,7 @@ a directory tree (a directory plus all child directories) into a
 zdir structure and then let you navigate that structure. It exists
 mainly to wrap non-portable OS functions to do this.
 
+Please add @discuss section in ../src/zdir.c.
 
 EXAMPLE
 -------
@@ -118,7 +119,3 @@ zdir_destroy (&newer);
 zdir_t *nosuch = zdir_new ("does-not-exist", NULL);
 assert (nosuch == NULL);
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

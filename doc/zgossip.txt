@@ -200,7 +200,3 @@ zactor_destroy (&alpha);
 zactor_destroy (&beta);
 
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

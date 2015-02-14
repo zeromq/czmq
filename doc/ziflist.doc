@@ -6,6 +6,7 @@ mobile devices). The caller can then access the network interface
 information using an iterator that works like zlistx. Only stores those
 interfaces with broadcast capability, and ignores the loopback interface.
 
+Please add @discuss section in ../src/ziflist.c.
 
 This is the class interface:
 

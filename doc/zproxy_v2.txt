@@ -117,7 +117,3 @@ zproxy_destroy (&proxy);
 zctx_destroy (&ctx);
 
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

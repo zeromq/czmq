@@ -201,7 +201,3 @@ assert (dir);
 zdir_remove (dir, true);
 zdir_destroy (&dir);
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

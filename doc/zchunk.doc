@@ -4,6 +4,7 @@ The zchunk class works with variable sized blobs. Not as efficient as
 MQ's messages but they do less weirdness and so are easier to understand.
 The chunk class has methods to read and write chunks from disk.
 
+Please add @discuss section in ../src/zchunk.c.
 
 This is the class interface:
 

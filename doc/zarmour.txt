@@ -320,7 +320,3 @@ s_armour_test_long (self, test_data, 256, verbose);
 
 zarmour_destroy (&self);
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

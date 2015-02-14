@@ -125,7 +125,3 @@ zstr_free (&pong);
 //  Everything should be cleanly closed now
 zctx_destroy (&ctx);
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

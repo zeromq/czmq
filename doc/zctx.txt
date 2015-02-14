@@ -137,7 +137,3 @@ assert (rc == 0);
 assert (zctx_underlying (ctx));
 zctx_destroy (&ctx);
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

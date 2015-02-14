@@ -113,7 +113,3 @@ zsock_destroy (&client);
 zsock_destroy (&server);
 #endif
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

@@ -192,6 +192,7 @@ across 0MQ sockets. This class provides a list-like container interface,
 with methods to work with the overall container. zmsg_t messages are
 composed of zero or more zframe_t frames.
 
+Please add @discuss section in ../src/zmsg.c.
 
 EXAMPLE
 -------
@@ -425,7 +426,3 @@ zsock_destroy (&input);
 zsock_destroy (&output);
 
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

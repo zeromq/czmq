@@ -5,6 +5,7 @@ handles zmq_pollitem_t items (pollers or writers, sockets or fds), and
 once-off or repeated timers. Its resolution is 1 msec. It uses a tickless
 timer to reduce CPU interrupts in inactive processes.
 
+Please add @discuss section in ../src/zloop.c.
 
 This is the class interface:
 

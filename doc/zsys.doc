@@ -4,6 +4,7 @@ The zsys class provides a portable wrapper for system calls. We collect
 them here to reduce the number of weird #ifdefs in other classes. As far
 as possible, the bulk of CZMQ classes are fully portable.
 
+Please add @discuss section in ../src/zsys.c.
 
 This is the class interface:
 

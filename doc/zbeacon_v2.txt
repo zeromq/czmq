@@ -176,7 +176,3 @@ zbeacon_destroy (&node3);
 zsock_destroy (&service);
 zctx_destroy (&ctx);
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

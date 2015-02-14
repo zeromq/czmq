@@ -63,6 +63,7 @@ API, for the very common case of reading from a number of sockets.
 It does not provide polling for output, nor polling on file handles.
 If you need either of these, use the zmq_poll API directly.
 
+Please add @discuss section in ../src/zpoller.c.
 
 EXAMPLE
 -------
@@ -122,7 +123,3 @@ zsock_destroy (&sink);
 zsock_destroy (&bowl);
 zsock_destroy (&dish);
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

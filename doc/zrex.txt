@@ -94,13 +94,11 @@ Supports this syntax:
     \xDD            Match byte with hex value 0xDD
     \meta           Match one of the meta character: ^$().[*+?\
 
+Please add @discuss section in ../src/zrex.c.
 
 EXAMPLE
 -------
 .From zrex_test method
 ----
+Please add @selftest section in ../src/zrex.c.
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

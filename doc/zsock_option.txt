@@ -1000,7 +1000,3 @@ zsock_destroy (&self);
 #endif
 
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

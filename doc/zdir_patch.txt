@@ -57,6 +57,7 @@ DESCRIPTION
 The zdir_patch class works with one patch, which says "create this
 file" or "delete this file" (referring to a zfile item each time).
 
+Please add @discuss section in ../src/zdir_patch.c.
 
 EXAMPLE
 -------
@@ -74,7 +75,3 @@ assert (streq (zfile_filename (file, "."), "bilbo"));
 assert (streq (zdir_patch_vpath (patch), "/bilbo"));
 zdir_patch_destroy (&patch);
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

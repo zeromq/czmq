@@ -274,7 +274,3 @@ assert (streq (string, "four"));
 zlistx_purge (list);
 zlistx_destroy (&list);
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

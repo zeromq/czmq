@@ -1001,7 +1001,3 @@ zsocket_destroy (ctx, zocket);
 
 zctx_destroy (&ctx);
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

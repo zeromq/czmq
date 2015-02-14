@@ -193,7 +193,3 @@ zactor_destroy (&node1);
 zactor_destroy (&node2);
 zactor_destroy (&node3);
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]
