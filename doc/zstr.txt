@@ -113,7 +113,3 @@ assert (string_nbr == 15);
 zsock_destroy (&input);
 zsock_destroy (&output);
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

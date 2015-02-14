@@ -253,7 +253,26 @@ AM_CONDITIONAL(ON_CYGWIN, test "x$czmq_on_cygwin" = "xyes")
 AM_CONDITIONAL(ON_ANDROID, test "x$czmq_on_android" = "xyes")
 AM_CONDITIONAL(INSTALL_MAN, test "x$czmq_install_man" = "xyes")
 AM_CONDITIONAL(BUILD_DOC, test "x$czmq_build_doc" = "xyes")
-AM_CONDITIONAL([ENABLE_LABS], [test "x$enable_labs" = "xyes"])
+
+# Check for makecert intent
+AC_ARG_WITH([makecert],
+    AS_HELP_STRING([--with-makecert],
+        [Compile and install the makecert program [default=yes].]),
+    [with_makecert=$withval],
+    [with_makecert=yes])
+
+AM_CONDITIONAL([WITH_MAKECERT], [test x$with_makecert != xno])
+AM_COND_IF([WITH_MAKECERT], [AC_MSG_NOTICE([WITH_MAKECERT defined])])
+
+# Check for test_zgossip intent
+AC_ARG_WITH([test_zgossip],
+    AS_HELP_STRING([--with-test_zgossip],
+        [Compile the test_zgossip program [default=yes].]),
+    [with_test_zgossip=$withval],
+    [with_test_zgossip=yes])
+
+AM_CONDITIONAL([WITH_TEST_ZGOSSIP], [test x$with_test_zgossip != xno])
+AM_COND_IF([WITH_TEST_ZGOSSIP], [AC_MSG_NOTICE([WITH_TEST_ZGOSSIP defined])])
 
 # Checks for library functions.
 AC_TYPE_SIGNAL

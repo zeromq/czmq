@@ -58,6 +58,7 @@ mobile devices). The caller can then access the network interface
 information using an iterator that works like zlistx. Only stores those
 interfaces with broadcast capability, and ignores the loopback interface.
 
+Please add @discuss section in ../src/ziflist.c.
 
 EXAMPLE
 -------
@@ -80,7 +81,3 @@ ziflist_reload (iflist);
 assert (items == ziflist_size (iflist));
 ziflist_destroy (&iflist);
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

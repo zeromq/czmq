@@ -67,7 +67,3 @@ if (verbose)
     puts (timestr);
 free (timestr);
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

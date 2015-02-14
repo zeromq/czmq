@@ -27,6 +27,7 @@ Supports this syntax:
     \xDD            Match byte with hex value 0xDD
     \meta           Match one of the meta character: ^$().[*+?\
 
+Please add @discuss section in ../src/zrex.c.
 
 This is the class interface:
 
@@ -87,4 +88,5 @@ This is the class interface:
 
 This is the class self test code:
 
+Please add @selftest section in ../src/zrex.c.
 

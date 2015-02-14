@@ -8,6 +8,7 @@ normally destroys the frame, but with the ZFRAME_REUSE flag, you can send
 the same frame many times. Frames are binary, and this class has no
 special support for text data.
 
+Please add @discuss section in ../src/zframe.c.
 
 This is the class interface:
 

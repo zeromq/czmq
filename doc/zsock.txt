@@ -318,6 +318,7 @@ structure that follows the CLASS rules for construction and destruction.
 Some zsock methods take a void * "polymorphic" reference, which can be
 either a zsock_t or a zactor_r reference, or a libzmq void *.
 
+Please add @discuss section in ../src/zsock.c.
 
 EXAMPLE
 -------
@@ -560,7 +561,3 @@ zsock_destroy (&reader);
 zsock_destroy (&writer);
 
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

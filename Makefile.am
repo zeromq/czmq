@@ -18,7 +18,10 @@ SUBDIRS += doc
 DIST_SUBDIRS =
 lib_LTLIBRARIES =
 bin_PROGRAMS =
+noinst_PROGRAMS =
 check_PROGRAMS =
+noinst_LTLIBRARIES =
+TESTS =
 
 EXTRA_DIST = \
     zgossip_engine.inc \

@@ -155,7 +155,3 @@ zsock_destroy (&sink);
 zsock_destroy (&capture);
 zactor_destroy (&proxy);
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

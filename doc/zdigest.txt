@@ -72,7 +72,3 @@ assert (streq (zdigest_string (digest),
 zdigest_destroy (&digest);
 free (buffer);
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

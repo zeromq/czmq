@@ -232,7 +232,3 @@ free (item);
 zlist_destroy (&list);
 assert (list == NULL);
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

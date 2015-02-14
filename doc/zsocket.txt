@@ -90,6 +90,7 @@ The zsocket class provides helper functions for 0MQ sockets. It doesn't
 wrap the 0MQ socket type, to avoid breaking all libzmq socket-related
 calls.
 
+Please add @discuss section in ../src/zsocket.c.
 
 EXAMPLE
 -------
@@ -173,7 +174,3 @@ zsocket_destroy (ctx, reader);
 zsocket_destroy (ctx, writer);
 zctx_destroy (&ctx);
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

@@ -42,6 +42,7 @@ absolutely need thread-safe global state. This should happen in system
 code only. DO NOT USE THIS TO SHARE SOCKETS BETWEEN THREADS, OR DARK
 THINGS WILL HAPPEN TO YOUR CODE.
 
+Please add @discuss section in ../src/zmutex.c.
 
 EXAMPLE
 -------
@@ -53,7 +54,3 @@ zmutex_lock (mutex);
 zmutex_unlock (mutex);
 zmutex_destroy (&mutex);
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

@@ -399,7 +399,3 @@ assert (streq ((char *) zhashx_lookup (hash, "key1"), "This is a string"));
 assert (streq ((char *) zhashx_lookup (hash, "key2"), "Ring a ding ding"));
 zhashx_destroy (&hash);
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

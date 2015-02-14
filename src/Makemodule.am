@@ -122,17 +122,23 @@ endif
 
 src_libczmq_la_LIBADD = ${project_libs}
 
-bin_PROGRAMS += src/test_zgossip
+if WITH_MAKECERT
+bin_PROGRAMS += src/makecert
+src_makecert_CPPFLAGS = ${AM_CPPFLAGS}
+src_makecert_LDADD = ${program_libs}
+src_makecert_SOURCES = src/makecert.c
+endif
+if WITH_TEST_ZGOSSIP
+noinst_PROGRAMS += src/test_zgossip
 src_test_zgossip_CPPFLAGS = ${AM_CPPFLAGS}
 src_test_zgossip_LDADD = ${program_libs}
 src_test_zgossip_SOURCES = src/test_zgossip.c
-
+endif
 check_PROGRAMS += src/czmq_selftest
 src_czmq_selftest_CPPFLAGS = ${src_libczmq_la_CPPFLAGS}
 src_czmq_selftest_LDADD = ${program_libs}
 src_czmq_selftest_SOURCES = src/czmq_selftest.c
-
-TESTS = src/czmq_selftest
+TESTS += src/czmq_selftest
 
 
 # define custom target for all products of /src

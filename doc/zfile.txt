@@ -260,7 +260,3 @@ rc = zfile_input (file);
 assert (rc == -1);
 zfile_destroy (&file);
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]
