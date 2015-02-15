@@ -248,6 +248,7 @@ if test "x$GCC" = "xyes"; then
     CPPFLAGS="-pedantic -Werror -Wall -Wc++-compat ${CPPFLAGS}"
 fi
 
+AM_CONDITIONAL(ENABLE_SHARED, test "x$enable_shared" = "xyes")
 AM_CONDITIONAL(ON_MINGW, test "x$czmq_on_mingw32" = "xyes")
 AM_CONDITIONAL(ON_CYGWIN, test "x$czmq_on_cygwin" = "xyes")
 AM_CONDITIONAL(ON_ANDROID, test "x$czmq_on_android" = "xyes")
