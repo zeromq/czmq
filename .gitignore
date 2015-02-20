@@ -128,3 +128,4 @@ test-suite.log
 addons/.dirstamp
 labs/.dirstamp
 src/.dirstamp
+*.pyc

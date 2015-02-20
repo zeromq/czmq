@@ -1,0 +1,2 @@
+module QmlCZMQ
+plugin qml_czmq

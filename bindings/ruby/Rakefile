@@ -1,0 +1,8 @@
+
+require 'rspec/core/rake_task'
+
+task :default => :test
+
+# Run tests.
+RSpec::Core::RakeTask.new :test do |c|
+end
