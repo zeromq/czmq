@@ -35,87 +35,87 @@ SUFFIXES=.txt .xml .1 .3 .7
 	xmlto man $<
 
 zactor.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zauth.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zarmour.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zbeacon.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zcert.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zcertstore.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zchunk.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zclock.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zconfig.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zdigest.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zdir.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zdir_patch.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zfile.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zframe.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zgossip.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zhashx.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 ziflist.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zlistx.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zloop.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zmonitor.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zmsg.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zpoller.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zproxy.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zrex.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zsock.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zsock_option.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zstr.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zsys.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zuuid.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zauth_v2.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zbeacon_v2.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zctx.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zhash.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zlist.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zmonitor_v2.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zmutex.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zproxy_v2.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zsocket.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zsockopt.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 zthread.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 makecert.txt:
-	zproject_mkman $<
+	zproject_mkman $@
 clean:
 	rm -f *.1 *.3
 	zproject_mkman zactor zauth zarmour zbeacon zcert zcertstore zchunk zclock zconfig zdigest zdir zdir_patch zfile zframe zgossip zhashx ziflist zlistx zloop zmonitor zmsg zpoller zproxy zrex zsock zsock_option zstr zsys zuuid zauth_v2 zbeacon_v2 zctx zhash zlist zmonitor_v2 zmutex zproxy_v2 zsocket zsockopt zthread makecert 
