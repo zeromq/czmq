@@ -61,6 +61,13 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT bool
     zpoller_terminated (zpoller_t *self);
 
+//  Ignore zsys_interrupted flag in this poller. By default, a zpoller_wait will
+//  return immediately if detects zsys_interrupted is set to something other than
+//  zero. Calling zpoller_ignore_interrupts will supress this behavior.
+
+CZMQ_EXPORT void
+    zpoller_ignore_interrupts(zpoller_t *self);
+
 //  Self test of this class
 CZMQ_EXPORT void
     zpoller_test (bool verbose);

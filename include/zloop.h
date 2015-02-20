@@ -95,12 +95,12 @@ CZMQ_EXPORT int
 //  zloop_ticket_reset and zloop_ticket_delete.
 CZMQ_EXPORT void *
     zloop_ticket (zloop_t *self, zloop_timer_fn handler, void *arg);
-    
+
 //  Reset a ticket timer, which moves it to the end of the ticket list and
 //  resets its execution time. This is a very fast operation.
 CZMQ_EXPORT void
     zloop_ticket_reset (zloop_t *self, void *handle);
-    
+
 //  Delete a ticket timer. We do not actually delete the ticket here, as
 //  other code may still refer to the ticket. We mark as deleted, and remove
 //  later and safely.
@@ -130,6 +130,13 @@ CZMQ_EXPORT void
 //  cancel sockets. Returns 0 if interrupted, -1 if cancelled by a handler.
 CZMQ_EXPORT int
     zloop_start (zloop_t *self);
+
+//  Ignore zsys_interrupted flag in this loop. By default, a zloop_start will
+//  exit as soon as it detects zsys_interrupted is set to something other than
+//  zero. Calling zloop_ignore_interrupts will supress this behavior.
+
+CZMQ_EXPORT void
+    zloop_ignore_interrupts(zloop_t *self);
 
 //  Self test of this class
 CZMQ_EXPORT void
