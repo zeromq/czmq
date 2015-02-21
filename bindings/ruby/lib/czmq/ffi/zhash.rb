@@ -167,7 +167,7 @@ module CZMQ
       def dup
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zhash_dup @ptr
-        result = Zhash.__new result, false
+        result = Zhash.__new result, true
         result
       end
       
@@ -251,7 +251,7 @@ module CZMQ
       # unpacks to an empty hash table.                                          
       def self.unpack frame
         result = ::CZMQ::FFI.zhash_unpack frame
-        result = Zhash.__new result, false
+        result = Zhash.__new result, true
         result
       end
       

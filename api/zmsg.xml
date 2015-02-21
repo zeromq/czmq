@@ -17,7 +17,7 @@
         the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
         before receiving.
         <argument name="source" type="anything" />
-        <return type="zmsg" />
+        <return type="zmsg" fresh="1" />
     </method>
 
     <method name="send" singleton="1">
@@ -61,7 +61,7 @@
     <method name="pop">
         Remove first frame from message, if any. Returns frame, or NULL. Caller
         now owns frame and must destroy it when finished with it.
-        <return type="zframe" />
+        <return type="zframe" fresh="1" />
     </method>
 
     <method name="pushmem">
@@ -126,7 +126,7 @@
         Remove first submessage from message, if any. Returns zmsg_t, or NULL if
         decoding was not succesfull. Caller now owns message and must destroy it
         when finished with it.
-        <return type="zmsg" />
+        <return type="zmsg" fresh="1" />
     </method>
 
     <method name="remove">
@@ -166,7 +166,7 @@
         null message provided. Returns NULL if the message could not 
         be loaded.
         <argument name="file" type="FILE" />
-        <return type="zmsg" />
+        <return type="zmsg" fresh="1" />
     </method>
 
     <method name="encode">
@@ -184,13 +184,13 @@
         there was insufficient memory to work.
         <argument name="buffer" type="buffer" />
         <argument name="buffer size" type="size" />
-        <return type="zmsg" />
+        <return type="zmsg" fresh="1" />
     </method>
 
     <method name="dup">
         Create copy of message, as new message object. Returns a fresh zmsg_t
         object. If message is null, or memory was exhausted, returns null.
-        <return type="zmsg" />
+        <return type="zmsg" fresh="1" />
     </method>
 
     <method name="print">
@@ -211,7 +211,7 @@
         message carrying a 1-byte success/failure code (by convention, 0 means
         OK). Signals are encoded to be distinguishable from "normal" messages.
         <argument name="status" type="byte" />
-        <return type="zmsg" />
+        <return type="zmsg" fresh="1" />
     </method>
 
     <method name="signal">

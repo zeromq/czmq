@@ -74,12 +74,12 @@
         Does not copy items themselves. Rebuilds new table so may be slow on
         very large tables. NOTE: only works with item values that are strings
         since there's no other way to know how to duplicate the item value.
-        <return type="zhash" />
+        <return type="zhash" fresh="1" />
     </method>
 
     <method name="keys">
         Return keys for items in table
-        <return type="zlist" />
+        <return type="zlist" fresh="1" />
     </method>
 
     <method name="first">
@@ -136,7 +136,7 @@
 
         Comments are not included in the packed data. Item values MUST be
         strings.
-        <return type="zframe" />
+        <return type="zframe" fresh="1" />
     </method>
 
     <method name="unpack" singleton="1">
@@ -144,7 +144,7 @@
         defined by zhash_pack. Hash table is set to autofree. An empty frame
         unpacks to an empty hash table.
         <argument name="frame" type="zframe" />
-        <return type="zhash" />
+        <return type="zhash" fresh="1" />
     </method>
 
     <method name="save">
