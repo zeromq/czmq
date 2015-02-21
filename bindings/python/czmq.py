@@ -121,14 +121,17 @@ class Zmsg(object):
 
     def __init__(self, *args):
         """Create a new empty message object"""
-        if len(args) == 1 and isinstance(args[0], zmsg_p):
+        if len(args) == 2 and isinstance(args[0], zmsg_p) and isinstance(args[1], bool):
             self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
             self._as_parameter_ = lib.zmsg_new(*args) # Creation of new raw type
+            self.allow_destruct = True
 
     def __del__(self):
         """Destroy a message object and all frames it contains"""
-        lib.zmsg_destroy(byref(self._as_parameter_))
+        if self.allow_destruct:
+            lib.zmsg_destroy(byref(self._as_parameter_))
 
     @staticmethod
     def recv(source):
@@ -136,7 +139,7 @@ class Zmsg(object):
 was interrupted. Does a blocking recv. If you want to not block then use
 the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
 before receiving."""
-        return lib.zmsg_recv(source)
+        return Zmsg(lib.zmsg_recv(source), True)
 
     @staticmethod
     def send(self_p, dest):
@@ -171,7 +174,7 @@ caller's frame reference."""
     def pop(self):
         """Remove first frame from message, if any. Returns frame, or NULL. Caller
 now owns frame and must destroy it when finished with it."""
-        return lib.zmsg_pop(self._as_parameter_)
+        return Zframe(lib.zmsg_pop(self._as_parameter_), True)
 
     def pushmem(self, src, size):
         """Push block of memory to front of message, as a new frame.
@@ -218,7 +221,7 @@ success, -1 on error."""
         """Remove first submessage from message, if any. Returns zmsg_t, or NULL if
 decoding was not succesfull. Caller now owns message and must destroy it
 when finished with it."""
-        return lib.zmsg_popmsg(self._as_parameter_)
+        return Zmsg(lib.zmsg_popmsg(self._as_parameter_), True)
 
     def remove(self, frame):
         """Remove specified frame from list, if present. Does not destroy frame."""
@@ -227,16 +230,16 @@ when finished with it."""
     def first(self):
         """Set cursor to first frame in message. Returns frame, or NULL, if the 
 message is empty. Use this to navigate the frames as a list."""
-        return lib.zmsg_first(self._as_parameter_)
+        return Zframe(lib.zmsg_first(self._as_parameter_), False)
 
     def next(self):
         """Return the next frame. If there are no more frames, returns NULL. To move
 to the first frame call zmsg_first(). Advances the cursor."""
-        return lib.zmsg_next(self._as_parameter_)
+        return Zframe(lib.zmsg_next(self._as_parameter_), False)
 
     def last(self):
         """Return the last frame. If there are no frames, returns NULL."""
-        return lib.zmsg_last(self._as_parameter_)
+        return Zframe(lib.zmsg_last(self._as_parameter_), False)
 
     def save(self, file):
         """Save message to an open file, return 0 if OK, else -1. The message is 
@@ -250,26 +253,26 @@ to arbitrary change."""
         """Load/append an open file into message, create new message if
 null message provided. Returns NULL if the message could not 
 be loaded."""
-        return lib.zmsg_load(self._as_parameter_, file)
+        return Zmsg(lib.zmsg_load(self._as_parameter_, file), True)
 
     def encode(self, buffer):
         """Serialize multipart message to a single buffer. Use this method to send
 structured messages across transports that do not support multipart data.
 Allocates and returns a new buffer containing the serialized message.
 To decode a serialized message buffer, use zmsg_decode ()."""
-        return lib.zmsg_encode(self._as_parameter_, byref(pointer(c_byte).from_param(buffer)))
+        return lib.zmsg_encode(self._as_parameter_, byref(POINTER(c_byte).from_param(buffer)))
 
     @staticmethod
     def decode(buffer, buffer_size):
         """Decodes a serialized message buffer created by zmsg_encode () and returns
 a new zmsg_t object. Returns NULL if the buffer was badly formatted or 
 there was insufficient memory to work."""
-        return lib.zmsg_decode(buffer, buffer_size)
+        return Zmsg(lib.zmsg_decode(buffer, buffer_size), True)
 
     def dup(self):
         """Create copy of message, as new message object. Returns a fresh zmsg_t
 object. If message is null, or memory was exhausted, returns null."""
-        return lib.zmsg_dup(self._as_parameter_)
+        return Zmsg(lib.zmsg_dup(self._as_parameter_), True)
 
     def print(self):
         """Send message to zsys log sink (may be stdout, or system facility as
@@ -287,7 +290,7 @@ other message. As with zframe_eq, return false if either message is NULL."""
         """Generate a signal message encoding the given status. A signal is a short
 message carrying a 1-byte success/failure code (by convention, 0 means
 OK). Signals are encoded to be distinguishable from "normal" messages."""
-        return lib.zmsg_new_signal(status)
+        return Zmsg(lib.zmsg_new_signal(status), True)
 
     def signal(self):
         """Return signal value, 0 or greater, if message is a signal, -1 if not."""
@@ -359,14 +362,17 @@ class Zhash(object):
 
     def __init__(self, *args):
         """Create a new, empty hash container"""
-        if len(args) == 1 and isinstance(args[0], zhash_p):
+        if len(args) == 2 and isinstance(args[0], zhash_p) and isinstance(args[1], bool):
             self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
             self._as_parameter_ = lib.zhash_new(*args) # Creation of new raw type
+            self.allow_destruct = True
 
     def __del__(self):
         """Destroy a hash container and all items in it"""
-        lib.zhash_destroy(byref(self._as_parameter_))
+        if self.allow_destruct:
+            lib.zhash_destroy(byref(self._as_parameter_))
 
     def insert(self, key, item):
         """Insert item into hash table with specified key and item.
@@ -411,11 +417,11 @@ Returns the item, or NULL if there is no such item."""
 Does not copy items themselves. Rebuilds new table so may be slow on
 very large tables. NOTE: only works with item values that are strings
 since there's no other way to know how to duplicate the item value."""
-        return lib.zhash_dup(self._as_parameter_)
+        return Zhash(lib.zhash_dup(self._as_parameter_), True)
 
     def keys(self):
         """Return keys for items in table"""
-        return lib.zhash_keys(self._as_parameter_)
+        return Zlist(lib.zhash_keys(self._as_parameter_), True)
 
     def first(self):
         """Simple iterator; returns first item in hash table, in no given order,
@@ -467,14 +473,14 @@ http://rfc.zeromq.org/spec:35/FILEMQ, and implemented by zproto:
 
 Comments are not included in the packed data. Item values MUST be
 strings."""
-        return lib.zhash_pack(self._as_parameter_)
+        return Zframe(lib.zhash_pack(self._as_parameter_), True)
 
     @staticmethod
     def unpack(frame):
         """Unpack binary frame into a new hash table. Packed data must follow format
 defined by zhash_pack. Hash table is set to autofree. An empty frame
 unpacks to an empty hash table."""
-        return lib.zhash_unpack(frame)
+        return Zhash(lib.zhash_unpack(frame), True)
 
     def save(self, filename):
         """Save hash table to a text file in name=value format. Hash values must be

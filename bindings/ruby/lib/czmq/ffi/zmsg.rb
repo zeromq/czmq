@@ -70,7 +70,7 @@ module CZMQ
       # before receiving.                                                        
       def self.recv source
         result = ::CZMQ::FFI.zmsg_recv source
-        result = Zmsg.__new result, false
+        result = Zmsg.__new result, true
         result
       end
       
@@ -204,7 +204,7 @@ module CZMQ
       def popmsg
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zmsg_popmsg @ptr
-        result = Zmsg.__new result, false
+        result = Zmsg.__new result, true
         result
       end
       
@@ -255,7 +255,7 @@ module CZMQ
       def load file
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zmsg_load @ptr, file
-        result = Zmsg.__new result, false
+        result = Zmsg.__new result, true
         result
       end
       
@@ -275,7 +275,7 @@ module CZMQ
       def self.decode buffer, buffer_size
         buffer_size = Integer(buffer_size)
         result = ::CZMQ::FFI.zmsg_decode buffer, buffer_size
-        result = Zmsg.__new result, false
+        result = Zmsg.__new result, true
         result
       end
       
@@ -284,7 +284,7 @@ module CZMQ
       def dup
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zmsg_dup @ptr
-        result = Zmsg.__new result, false
+        result = Zmsg.__new result, true
         result
       end
       
@@ -311,7 +311,7 @@ module CZMQ
       # OK). Signals are encoded to be distinguishable from "normal" messages.  
       def self.new_signal status
         result = ::CZMQ::FFI.zmsg_new_signal status
-        result = Zmsg.__new result, false
+        result = Zmsg.__new result, true
         result
       end
       
