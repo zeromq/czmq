@@ -3,13 +3,41 @@
 #  Please refer to the README for information about making permanent changes.  #
 ################################################################################
 
+from __future__ import print_function
 from ctypes import *
 from ctypes.util import find_library
 
+# load libc to access free, etc.
+libcpath = find_library("libc")
+if not libcpath:
+    raise ImportError("Unable to find libc")
+libc = cdll.LoadLibrary(libcpath)
+libc.free.argtypes = [c_void_p]
+libc.free.restype = None
+
+def return_fresh_string(char_p):
+    s = string_at(char_p)
+    libc.free(char_p)
+    return s
+
+
+# czmq
 libpath = find_library("czmq")
 if not libpath:
     raise ImportError("Unable to find czmq C library")
 lib = cdll.LoadLibrary(libpath)
+
+class zmsg_t(Structure):
+    pass # Empty - only for type checking
+zmsg_p = POINTER(zmsg_t)
+
+class zframe_t(Structure):
+    pass # Empty - only for type checking
+zframe_p = POINTER(zframe_t)
+
+class FILE(Structure):
+    pass # Empty - only for type checking
+FILE_p = POINTER(FILE)
 
 class zhash_t(Structure):
     pass # Empty - only for type checking
@@ -19,9 +47,261 @@ class zlist_t(Structure):
     pass # Empty - only for type checking
 zlist_p = POINTER(zlist_t)
 
-class zframe_t(Structure):
-    pass # Empty - only for type checking
-zframe_p = POINTER(zframe_t)
+
+# zmsg
+lib.zmsg_new.restype = zmsg_p
+lib.zmsg_new.argtypes = []
+lib.zmsg_destroy.restype = None
+lib.zmsg_destroy.argtypes = [POINTER(zmsg_p)]
+lib.zmsg_recv.restype = zmsg_p
+lib.zmsg_recv.argtypes = [c_void_p]
+lib.zmsg_send.restype = c_int
+lib.zmsg_send.argtypes = [POINTER(zmsg_p), c_void_p]
+lib.zmsg_size.restype = c_size_t
+lib.zmsg_size.argtypes = [zmsg_p]
+lib.zmsg_content_size.restype = c_size_t
+lib.zmsg_content_size.argtypes = [zmsg_p]
+lib.zmsg_prepend.restype = c_int
+lib.zmsg_prepend.argtypes = [zmsg_p, POINTER(zframe_p)]
+lib.zmsg_append.restype = c_int
+lib.zmsg_append.argtypes = [zmsg_p, POINTER(zframe_p)]
+lib.zmsg_pop.restype = zframe_p
+lib.zmsg_pop.argtypes = [zmsg_p]
+lib.zmsg_pushmem.restype = c_int
+lib.zmsg_pushmem.argtypes = [zmsg_p, c_void_p, c_size_t]
+lib.zmsg_addmem.restype = c_int
+lib.zmsg_addmem.argtypes = [zmsg_p, c_void_p, c_size_t]
+lib.zmsg_pushstr.restype = c_int
+lib.zmsg_pushstr.argtypes = [zmsg_p, c_char_p]
+lib.zmsg_addstr.restype = c_int
+lib.zmsg_addstr.argtypes = [zmsg_p, c_char_p]
+lib.zmsg_pushstrf.restype = c_int
+lib.zmsg_pushstrf.argtypes = [zmsg_p, c_char_p]
+lib.zmsg_addstrf.restype = c_int
+lib.zmsg_addstrf.argtypes = [zmsg_p, c_char_p]
+lib.zmsg_popstr.restype = POINTER(c_char)
+lib.zmsg_popstr.argtypes = [zmsg_p]
+lib.zmsg_addmsg.restype = c_int
+lib.zmsg_addmsg.argtypes = [zmsg_p, POINTER(zmsg_p)]
+lib.zmsg_popmsg.restype = zmsg_p
+lib.zmsg_popmsg.argtypes = [zmsg_p]
+lib.zmsg_remove.restype = None
+lib.zmsg_remove.argtypes = [zmsg_p, zframe_p]
+lib.zmsg_first.restype = zframe_p
+lib.zmsg_first.argtypes = [zmsg_p]
+lib.zmsg_next.restype = zframe_p
+lib.zmsg_next.argtypes = [zmsg_p]
+lib.zmsg_last.restype = zframe_p
+lib.zmsg_last.argtypes = [zmsg_p]
+lib.zmsg_save.restype = c_int
+lib.zmsg_save.argtypes = [zmsg_p, FILE_p]
+lib.zmsg_load.restype = zmsg_p
+lib.zmsg_load.argtypes = [zmsg_p, FILE_p]
+lib.zmsg_encode.restype = c_size_t
+lib.zmsg_encode.argtypes = [zmsg_p, POINTER(POINTER(c_byte))]
+lib.zmsg_decode.restype = zmsg_p
+lib.zmsg_decode.argtypes = [POINTER(c_byte), c_size_t]
+lib.zmsg_dup.restype = zmsg_p
+lib.zmsg_dup.argtypes = [zmsg_p]
+lib.zmsg_print.restype = None
+lib.zmsg_print.argtypes = [zmsg_p]
+lib.zmsg_eq.restype = c_bool
+lib.zmsg_eq.argtypes = [zmsg_p, zmsg_p]
+lib.zmsg_new_signal.restype = zmsg_p
+lib.zmsg_new_signal.argtypes = [c_byte]
+lib.zmsg_signal.restype = c_int
+lib.zmsg_signal.argtypes = [zmsg_p]
+lib.zmsg_is.restype = c_bool
+lib.zmsg_is.argtypes = [c_void_p]
+lib.zmsg_test.restype = None
+lib.zmsg_test.argtypes = [c_bool]
+
+class Zmsg(object):
+    """working with multipart messages"""
+
+    def __init__(self, *args):
+        """Create a new empty message object"""
+        if len(args) == 1 and isinstance(args[0], zmsg_p):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+        else:
+            self._as_parameter_ = lib.zmsg_new(*args) # Creation of new raw type
+
+    def __del__(self):
+        """Destroy a message object and all frames it contains"""
+        lib.zmsg_destroy(byref(self._as_parameter_))
+
+    @staticmethod
+    def recv(source):
+        """Receive message from socket, returns zmsg_t object or NULL if the recv
+was interrupted. Does a blocking recv. If you want to not block then use
+the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
+before receiving."""
+        return lib.zmsg_recv(source)
+
+    @staticmethod
+    def send(self_p, dest):
+        """Send message to destination socket, and destroy the message after sending
+it successfully. If the message has no frames, sends nothing but destroys
+the message anyhow. Nullifies the caller's reference to the message (as
+it is a destructor)."""
+        return lib.zmsg_send(byref(zmsg_p.from_param(self_p)), dest)
+
+    def size(self):
+        """Return size of message, i.e. number of frames (0 or more)."""
+        return lib.zmsg_size(self._as_parameter_)
+
+    def content_size(self):
+        """Return total size of all frames in message."""
+        return lib.zmsg_content_size(self._as_parameter_)
+
+    def prepend(self, frame_p):
+        """Push frame to the front of the message, i.e. before all other frames.
+Message takes ownership of frame, will destroy it when message is sent.
+Returns 0 on success, -1 on error. Deprecates zmsg_push, which did not
+nullify the caller's frame reference."""
+        return lib.zmsg_prepend(self._as_parameter_, byref(zframe_p.from_param(frame_p)))
+
+    def append(self, frame_p):
+        """Add frame to the end of the message, i.e. after all other frames.
+Message takes ownership of frame, will destroy it when message is sent.
+Returns 0 on success. Deprecates zmsg_add, which did not nullify the
+caller's frame reference."""
+        return lib.zmsg_append(self._as_parameter_, byref(zframe_p.from_param(frame_p)))
+
+    def pop(self):
+        """Remove first frame from message, if any. Returns frame, or NULL. Caller
+now owns frame and must destroy it when finished with it."""
+        return lib.zmsg_pop(self._as_parameter_)
+
+    def pushmem(self, src, size):
+        """Push block of memory to front of message, as a new frame.
+Returns 0 on success, -1 on error."""
+        return lib.zmsg_pushmem(self._as_parameter_, src, size)
+
+    def addmem(self, src, size):
+        """Add block of memory to the end of the message, as a new frame.
+Returns 0 on success, -1 on error."""
+        return lib.zmsg_addmem(self._as_parameter_, src, size)
+
+    def pushstr(self, string):
+        """Push string as new frame to front of message.
+Returns 0 on success, -1 on error."""
+        return lib.zmsg_pushstr(self._as_parameter_, string)
+
+    def addstr(self, string):
+        """Push string as new frame to end of message.
+Returns 0 on success, -1 on error."""
+        return lib.zmsg_addstr(self._as_parameter_, string)
+
+    def pushstrf(self, format, *args):
+        """Push formatted string as new frame to front of message.
+Returns 0 on success, -1 on error."""
+        return lib.zmsg_pushstrf(self._as_parameter_, format, *args)
+
+    def addstrf(self, format, *args):
+        """Push formatted string as new frame to end of message.
+Returns 0 on success, -1 on error."""
+        return lib.zmsg_addstrf(self._as_parameter_, format, *args)
+
+    def popstr(self):
+        """Pop frame off front of message, return as fresh string. If there were
+no more frames in the message, returns NULL."""
+        return return_fresh_string(lib.zmsg_popstr(self._as_parameter_))
+
+    def addmsg(self, msg_p):
+        """Push encoded message as a new frame. Message takes ownership of
+submessage, so the original is destroyed in this call. Returns 0 on
+success, -1 on error."""
+        return lib.zmsg_addmsg(self._as_parameter_, byref(zmsg_p.from_param(msg_p)))
+
+    def popmsg(self):
+        """Remove first submessage from message, if any. Returns zmsg_t, or NULL if
+decoding was not succesfull. Caller now owns message and must destroy it
+when finished with it."""
+        return lib.zmsg_popmsg(self._as_parameter_)
+
+    def remove(self, frame):
+        """Remove specified frame from list, if present. Does not destroy frame."""
+        return lib.zmsg_remove(self._as_parameter_, frame)
+
+    def first(self):
+        """Set cursor to first frame in message. Returns frame, or NULL, if the 
+message is empty. Use this to navigate the frames as a list."""
+        return lib.zmsg_first(self._as_parameter_)
+
+    def next(self):
+        """Return the next frame. If there are no more frames, returns NULL. To move
+to the first frame call zmsg_first(). Advances the cursor."""
+        return lib.zmsg_next(self._as_parameter_)
+
+    def last(self):
+        """Return the last frame. If there are no frames, returns NULL."""
+        return lib.zmsg_last(self._as_parameter_)
+
+    def save(self, file):
+        """Save message to an open file, return 0 if OK, else -1. The message is 
+saved as a series of frames, each with length and data. Note that the
+file is NOT guaranteed to be portable between operating systems, not
+versions of CZMQ. The file format is at present undocumented and liable
+to arbitrary change."""
+        return lib.zmsg_save(self._as_parameter_, file)
+
+    def load(self, file):
+        """Load/append an open file into message, create new message if
+null message provided. Returns NULL if the message could not 
+be loaded."""
+        return lib.zmsg_load(self._as_parameter_, file)
+
+    def encode(self, buffer):
+        """Serialize multipart message to a single buffer. Use this method to send
+structured messages across transports that do not support multipart data.
+Allocates and returns a new buffer containing the serialized message.
+To decode a serialized message buffer, use zmsg_decode ()."""
+        return lib.zmsg_encode(self._as_parameter_, byref(pointer(c_byte).from_param(buffer)))
+
+    @staticmethod
+    def decode(buffer, buffer_size):
+        """Decodes a serialized message buffer created by zmsg_encode () and returns
+a new zmsg_t object. Returns NULL if the buffer was badly formatted or 
+there was insufficient memory to work."""
+        return lib.zmsg_decode(buffer, buffer_size)
+
+    def dup(self):
+        """Create copy of message, as new message object. Returns a fresh zmsg_t
+object. If message is null, or memory was exhausted, returns null."""
+        return lib.zmsg_dup(self._as_parameter_)
+
+    def print(self):
+        """Send message to zsys log sink (may be stdout, or system facility as
+configured by zsys_set_logstream)."""
+        return lib.zmsg_print(self._as_parameter_)
+
+    def eq(self, other):
+        """Return true if the two messages have the same number of frames and each
+frame in the first message is identical to the corresponding frame in the
+other message. As with zframe_eq, return false if either message is NULL."""
+        return lib.zmsg_eq(self._as_parameter_, other)
+
+    @staticmethod
+    def new_signal(status):
+        """Generate a signal message encoding the given status. A signal is a short
+message carrying a 1-byte success/failure code (by convention, 0 means
+OK). Signals are encoded to be distinguishable from "normal" messages."""
+        return lib.zmsg_new_signal(status)
+
+    def signal(self):
+        """Return signal value, 0 or greater, if message is a signal, -1 if not."""
+        return lib.zmsg_signal(self._as_parameter_)
+
+    @staticmethod
+    def is_(self):
+        """Probe the supplied object, and report if it looks like a zmsg_t."""
+        return lib.zmsg_is(self)
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class"""
+        return lib.zmsg_test(verbose)
 
 
 # zhash
