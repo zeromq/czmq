@@ -38,9 +38,11 @@ LIBS += -lczmq
 
 HEADERS += \
   $$SRCDIR/qml_czmq_plugin.h \
+  $$SRCDIR/QmlZmsg.h \
   $$SRCDIR/QmlZhash.h 
 
 SOURCES += \
+  $$SRCDIR/QmlZmsg.cpp \
   $$SRCDIR/QmlZhash.cpp 
 
 OBJECTS_DIR = $$BUILDDIR/.obj

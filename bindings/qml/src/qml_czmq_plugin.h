@@ -11,9 +11,12 @@
 #include <QQmlExtensionPlugin>
 #include <qqml.h>
 
+class QmlZmsg;
+class QmlZmsgAttached;
 class QmlZhash;
 class QmlZhashAttached;
 
+#include "QmlZmsg.h"
 #include "QmlZhash.h"
 
 class QmlCZMQPlugin : public QQmlExtensionPlugin
@@ -24,6 +27,8 @@ class QmlCZMQPlugin : public QQmlExtensionPlugin
 public:
     void registerTypes (const char *uri)
     {
+        qmlRegisterType<QmlZmsg> (uri, 1, 0, "QmlZmsg");
+        qmlRegisterType<QmlZmsgAttached>();
         qmlRegisterType<QmlZhash> (uri, 1, 0, "QmlZhash");
         qmlRegisterType<QmlZhashAttached>();
     };

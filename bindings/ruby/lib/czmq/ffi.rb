@@ -34,6 +34,42 @@ module CZMQ
         blocking: true  # only necessary on MRI to deal with the GIL.
       }
       
+      attach_function :zmsg_new, [], :pointer, **opts
+      attach_function :zmsg_destroy, [:pointer], :void, **opts
+      attach_function :zmsg_recv, [:pointer], :pointer, **opts
+      attach_function :zmsg_send, [:pointer, :pointer], :int, **opts
+      attach_function :zmsg_size, [:pointer], :size_t, **opts
+      attach_function :zmsg_content_size, [:pointer], :size_t, **opts
+      attach_function :zmsg_prepend, [:pointer, :pointer], :int, **opts
+      attach_function :zmsg_append, [:pointer, :pointer], :int, **opts
+      attach_function :zmsg_pop, [:pointer], :pointer, **opts
+      attach_function :zmsg_pushmem, [:pointer, :pointer, :size_t], :int, **opts
+      attach_function :zmsg_addmem, [:pointer, :pointer, :size_t], :int, **opts
+      attach_function :zmsg_pushstr, [:pointer, :string], :int, **opts
+      attach_function :zmsg_addstr, [:pointer, :string], :int, **opts
+      attach_function :zmsg_pushstrf, [:pointer, :string, :varargs], :int, **opts
+      attach_function :zmsg_addstrf, [:pointer, :string, :varargs], :int, **opts
+      attach_function :zmsg_popstr, [:pointer], :pointer, **opts
+      attach_function :zmsg_addmsg, [:pointer, :pointer], :int, **opts
+      attach_function :zmsg_popmsg, [:pointer], :pointer, **opts
+      attach_function :zmsg_remove, [:pointer, :pointer], :void, **opts
+      attach_function :zmsg_first, [:pointer], :pointer, **opts
+      attach_function :zmsg_next, [:pointer], :pointer, **opts
+      attach_function :zmsg_last, [:pointer], :pointer, **opts
+      attach_function :zmsg_save, [:pointer, :pointer], :int, **opts
+      attach_function :zmsg_load, [:pointer, :pointer], :pointer, **opts
+      attach_function :zmsg_encode, [:pointer, :pointer], :size_t, **opts
+      attach_function :zmsg_decode, [:pointer, :size_t], :pointer, **opts
+      attach_function :zmsg_dup, [:pointer], :pointer, **opts
+      attach_function :zmsg_print, [:pointer], :void, **opts
+      attach_function :zmsg_eq, [:pointer, :pointer], :bool, **opts
+      attach_function :zmsg_new_signal, [:pointer], :pointer, **opts
+      attach_function :zmsg_signal, [:pointer], :int, **opts
+      attach_function :zmsg_is, [:pointer], :bool, **opts
+      attach_function :zmsg_test, [:bool], :void, **opts
+      
+      require_relative 'ffi/zmsg'
+      
       attach_function :zhash_new, [], :pointer, **opts
       attach_function :zhash_destroy, [:pointer], :void, **opts
       attach_function :zhash_insert, [:pointer, :string, :pointer], :int, **opts

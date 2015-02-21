@@ -1,6 +1,6 @@
 import unittest
 from ctypes import *
-from czmq import Zhash, zhash_foreach_fn
+from czmq import Zmsg, Zhash, zhash_foreach_fn
 
 class TestZyre(unittest.TestCase):
     def test_zhash(self):
@@ -24,7 +24,16 @@ class TestZyre(unittest.TestCase):
 
         del h
 
+    def test_zmsg(self):
+        m = Zmsg()
+
+        self.assertEquals(m.pushstr('testing 123'), 0)
+        self.assertEquals(m.popstr(), 'testing 123')
+
+        del m
+
 if __name__ == '__main__':
     Zhash.test(0)
+    Zmsg.test(0)
     unittest.main()
 

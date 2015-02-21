@@ -632,14 +632,14 @@ zmsg_encode (zmsg_t *self, byte **buffer)
 //  there was insufficient memory to work.
 
 zmsg_t *
-zmsg_decode (byte *buffer, size_t buffer_size)
+zmsg_decode (const byte *buffer, size_t buffer_size)
 {
     zmsg_t *self = zmsg_new ();
     if (!self)
         return NULL;
 
-    byte *source = buffer;
-    byte *limit = buffer + buffer_size;
+    const byte *source = buffer;
+    const byte *limit = buffer + buffer_size;
     while (source < limit) {
         size_t frame_size = *source++;
         if (frame_size == 255) {
