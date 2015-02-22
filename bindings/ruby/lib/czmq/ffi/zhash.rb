@@ -175,6 +175,7 @@ module CZMQ
       def keys
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zhash_keys @ptr
+        result = Zlist.__new result, true
         result
       end
       

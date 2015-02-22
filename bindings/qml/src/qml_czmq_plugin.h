@@ -17,10 +17,13 @@ class QmlZmsg;
 class QmlZmsgAttached;
 class QmlZhash;
 class QmlZhashAttached;
+class QmlZlist;
+class QmlZlistAttached;
 
 #include "QmlZframe.h"
 #include "QmlZmsg.h"
 #include "QmlZhash.h"
+#include "QmlZlist.h"
 
 class QmlCZMQPlugin : public QQmlExtensionPlugin
 {
@@ -36,6 +39,8 @@ public:
         qmlRegisterType<QmlZmsgAttached>();
         qmlRegisterType<QmlZhash> (uri, 1, 0, "QmlZhash");
         qmlRegisterType<QmlZhashAttached>();
+        qmlRegisterType<QmlZlist> (uri, 1, 0, "QmlZlist");
+        qmlRegisterType<QmlZlistAttached>();
     };
 };
 

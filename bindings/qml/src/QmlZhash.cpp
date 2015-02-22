@@ -73,8 +73,10 @@ QmlZhash *QmlZhash::dup () {
 
 ///
 //  Return keys for items in table
-zlist_t *QmlZhash::keys () {
-    return zhash_keys (self);
+QmlZlist *QmlZhash::keys () {
+    QmlZlist *retQ_ = new QmlZlist ();
+    retQ_->self = zhash_keys (self);
+    return retQ_;
 };
 
 ///

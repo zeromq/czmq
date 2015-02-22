@@ -556,7 +556,7 @@ since there's no other way to know how to duplicate the item value."""
 
     def keys(self):
         """Return keys for items in table"""
-        return lib.zhash_keys(self._as_parameter_)
+        return Zlist(lib.zhash_keys(self._as_parameter_), True)
 
     def first(self):
         """Simple iterator; returns first item in hash table, in no given order,
@@ -652,6 +652,157 @@ Callback function for zhash_foreach method"""
     def test(verbose):
         """Self test of this class"""
         return lib.zhash_test(verbose)
+
+
+# zlist
+zlist_compare_fn = CFUNCTYPE(c_bool, c_void_p, c_void_p)
+zlist_free_fn = CFUNCTYPE(None, c_void_p)
+lib.zlist_new.restype = zlist_p
+lib.zlist_new.argtypes = []
+lib.zlist_destroy.restype = None
+lib.zlist_destroy.argtypes = [POINTER(zlist_p)]
+lib.zlist_first.restype = c_void_p
+lib.zlist_first.argtypes = [zlist_p]
+lib.zlist_next.restype = c_void_p
+lib.zlist_next.argtypes = [zlist_p]
+lib.zlist_last.restype = c_void_p
+lib.zlist_last.argtypes = [zlist_p]
+lib.zlist_head.restype = c_void_p
+lib.zlist_head.argtypes = [zlist_p]
+lib.zlist_tail.restype = c_void_p
+lib.zlist_tail.argtypes = [zlist_p]
+lib.zlist_item.restype = c_void_p
+lib.zlist_item.argtypes = [zlist_p]
+lib.zlist_append.restype = c_int
+lib.zlist_append.argtypes = [zlist_p, c_void_p]
+lib.zlist_push.restype = c_int
+lib.zlist_push.argtypes = [zlist_p, c_void_p]
+lib.zlist_pop.restype = c_void_p
+lib.zlist_pop.argtypes = [zlist_p]
+lib.zlist_remove.restype = None
+lib.zlist_remove.argtypes = [zlist_p, c_void_p]
+lib.zlist_dup.restype = zlist_p
+lib.zlist_dup.argtypes = [zlist_p]
+lib.zlist_purge.restype = None
+lib.zlist_purge.argtypes = [zlist_p]
+lib.zlist_size.restype = c_size_t
+lib.zlist_size.argtypes = [zlist_p]
+lib.zlist_sort.restype = None
+lib.zlist_sort.argtypes = [zlist_p, zlist_compare_fn]
+lib.zlist_autofree.restype = None
+lib.zlist_autofree.argtypes = [zlist_p]
+lib.zlist_freefn.restype = c_void_p
+lib.zlist_freefn.argtypes = [zlist_p, c_void_p, zlist_free_fn, c_bool]
+lib.zlist_test.restype = None
+lib.zlist_test.argtypes = [c_int]
+
+class Zlist(object):
+    """simple generic list container"""
+
+    def __init__(self, *args):
+        """Create a new list container"""
+        if len(args) == 2 and isinstance(args[0], zlist_p) and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            self._as_parameter_ = lib.zlist_new(*args) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destroy a list container"""
+        if self.allow_destruct:
+            lib.zlist_destroy(byref(self._as_parameter_))
+
+    def first(self):
+        """Return the item at the head of list. If the list is empty, returns NULL.
+Leaves cursor pointing at the head item, or NULL if the list is empty."""
+        return lib.zlist_first(self._as_parameter_)
+
+    def next(self):
+        """Return the next item. If the list is empty, returns NULL. To move to
+the start of the list call zlist_first (). Advances the cursor."""
+        return lib.zlist_next(self._as_parameter_)
+
+    def last(self):
+        """Return the item at the tail of list. If the list is empty, returns NULL.
+Leaves cursor pointing at the tail item, or NULL if the list is empty."""
+        return lib.zlist_last(self._as_parameter_)
+
+    def head(self):
+        """Return first item in the list, or null, leaves the cursor"""
+        return lib.zlist_head(self._as_parameter_)
+
+    def tail(self):
+        """Return last item in the list, or null, leaves the cursor"""
+        return lib.zlist_tail(self._as_parameter_)
+
+    def item(self):
+        """Return the current item of list. If the list is empty, returns NULL.
+Leaves cursor pointing at the current item, or NULL if the list is empty."""
+        return lib.zlist_item(self._as_parameter_)
+
+    def append(self, item):
+        """Append an item to the end of the list, return 0 if OK or -1 if this
+failed for some reason (out of memory). Note that if a duplicator has 
+been set, this method will also duplicate the item."""
+        return lib.zlist_append(self._as_parameter_, item)
+
+    def push(self, item):
+        """Push an item to the start of the list, return 0 if OK or -1 if this
+failed for some reason (out of memory). Note that if a duplicator has
+been set, this method will also duplicate the item."""
+        return lib.zlist_push(self._as_parameter_, item)
+
+    def pop(self):
+        """Pop the item off the start of the list, if any"""
+        return lib.zlist_pop(self._as_parameter_)
+
+    def remove(self, item):
+        """Remove the specified item from the list if present"""
+        return lib.zlist_remove(self._as_parameter_, item)
+
+    def dup(self):
+        """Make a copy of list. If the list has autofree set, the copied list will
+duplicate all items, which must be strings. Otherwise, the list will hold
+pointers back to the items in the original list."""
+        return Zlist(lib.zlist_dup(self._as_parameter_), True)
+
+    def purge(self):
+        """Purge all items from list"""
+        return lib.zlist_purge(self._as_parameter_)
+
+    def size(self):
+        """Return number of items in the list"""
+        return lib.zlist_size(self._as_parameter_)
+
+    def sort(self, compare):
+        """Sort the list by ascending key value using a straight ASCII comparison.
+The sort is not stable, so may reorder items with the same keys."""
+        return lib.zlist_sort(self._as_parameter_, compare)
+
+    def autofree(self):
+        """Set list for automatic item destruction; item values MUST be strings.
+By default a list item refers to a value held elsewhere. When you set
+this, each time you append or push a list item, zlist will take a copy
+of the string value. Then, when you destroy the list, it will free all
+item values automatically. If you use any other technique to allocate
+list values, you must free them explicitly before destroying the list.
+The usual technique is to pop list items and destroy them, until the
+list is empty."""
+        return lib.zlist_autofree(self._as_parameter_)
+
+    def freefn(self, item, fn, at_tail):
+        """Set a free function for the specified list item. When the item is
+destroyed, the free function, if any, is called on that item.
+Use this when list items are dynamically allocated, to ensure that
+you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
+Returns the item, or NULL if there is no such item."""
+        return lib.zlist_freefn(self._as_parameter_, item, fn, at_tail)
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class"""
+        return lib.zlist_test(verbose)
 
 ################################################################################
 #  THIS FILE IS 100% GENERATED BY ZPROJECT; DO NOT EDIT EXCEPT EXPERIMENTALLY  #

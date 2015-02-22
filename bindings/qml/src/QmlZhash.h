@@ -66,7 +66,7 @@ public slots:
     QmlZhash *dup ();
 
     //  Return keys for items in table
-    zlist_t *keys ();
+    QmlZlist *keys ();
 
     //  Simple iterator; returns first item in hash table, in no given order, 
     //  or NULL if the table is empty. This method is simpler to use than the 

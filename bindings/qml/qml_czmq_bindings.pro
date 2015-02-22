@@ -40,12 +40,14 @@ HEADERS += \
   $$SRCDIR/qml_czmq_plugin.h \
   $$SRCDIR/QmlZframe.h \
   $$SRCDIR/QmlZmsg.h \
-  $$SRCDIR/QmlZhash.h 
+  $$SRCDIR/QmlZhash.h \
+  $$SRCDIR/QmlZlist.h 
 
 SOURCES += \
   $$SRCDIR/QmlZframe.cpp \
   $$SRCDIR/QmlZmsg.cpp \
-  $$SRCDIR/QmlZhash.cpp 
+  $$SRCDIR/QmlZhash.cpp \
+  $$SRCDIR/QmlZlist.cpp 
 
 OBJECTS_DIR = $$BUILDDIR/.obj
 MOC_DIR     = $$BUILDDIR/.moc

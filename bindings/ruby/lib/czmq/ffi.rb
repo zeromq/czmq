@@ -116,6 +116,28 @@ module CZMQ
       attach_function :zhash_test, [:int], :void, **opts
       
       require_relative 'ffi/zhash'
+      
+      attach_function :zlist_new, [], :pointer, **opts
+      attach_function :zlist_destroy, [:pointer], :void, **opts
+      attach_function :zlist_first, [:pointer], :pointer, **opts
+      attach_function :zlist_next, [:pointer], :pointer, **opts
+      attach_function :zlist_last, [:pointer], :pointer, **opts
+      attach_function :zlist_head, [:pointer], :pointer, **opts
+      attach_function :zlist_tail, [:pointer], :pointer, **opts
+      attach_function :zlist_item, [:pointer], :pointer, **opts
+      attach_function :zlist_append, [:pointer, :pointer], :int, **opts
+      attach_function :zlist_push, [:pointer, :pointer], :int, **opts
+      attach_function :zlist_pop, [:pointer], :pointer, **opts
+      attach_function :zlist_remove, [:pointer, :pointer], :void, **opts
+      attach_function :zlist_dup, [:pointer], :pointer, **opts
+      attach_function :zlist_purge, [:pointer], :void, **opts
+      attach_function :zlist_size, [:pointer], :size_t, **opts
+      attach_function :zlist_sort, [:pointer, :pointer], :void, **opts
+      attach_function :zlist_autofree, [:pointer], :void, **opts
+      attach_function :zlist_freefn, [:pointer, :pointer, :pointer, :bool], :pointer, **opts
+      attach_function :zlist_test, [:int], :void, **opts
+      
+      require_relative 'ffi/zlist'
     end
   end
 end
