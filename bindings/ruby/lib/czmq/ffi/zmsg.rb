@@ -104,6 +104,7 @@ module CZMQ
       # nullify the caller's frame reference.                                  
       def prepend frame_p
         raise DestroyedError unless @ptr
+        frame_p = frame_p.__ptr_give_ref
         result = ::CZMQ::FFI.zmsg_prepend @ptr, frame_p
         result
       end
@@ -114,6 +115,7 @@ module CZMQ
       # caller's frame reference.                                              
       def append frame_p
         raise DestroyedError unless @ptr
+        frame_p = frame_p.__ptr_give_ref
         result = ::CZMQ::FFI.zmsg_append @ptr, frame_p
         result
       end
@@ -123,6 +125,7 @@ module CZMQ
       def pop
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zmsg_pop @ptr
+        result = Zframe.__new result, true
         result
       end
       
@@ -211,6 +214,7 @@ module CZMQ
       # Remove specified frame from list, if present. Does not destroy frame.
       def remove frame
         raise DestroyedError unless @ptr
+        frame = frame.__ptr if frame
         result = ::CZMQ::FFI.zmsg_remove @ptr, frame
         result
       end
@@ -220,6 +224,7 @@ module CZMQ
       def first
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zmsg_first @ptr
+        result = Zframe.__new result, false
         result
       end
       
@@ -228,6 +233,7 @@ module CZMQ
       def next
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zmsg_next @ptr
+        result = Zframe.__new result, false
         result
       end
       
@@ -235,6 +241,7 @@ module CZMQ
       def last
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zmsg_last @ptr
+        result = Zframe.__new result, false
         result
       end
       

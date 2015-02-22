@@ -1,0 +1,118 @@
+<class name="zframe">
+    working with single message frames
+
+    <include filename = "../license.xml" />
+
+    <constant name="more" value="1" />
+    <constant name="reuse" value="2" />
+    <constant name="dontwait" value="4" />
+
+    <constructor>
+        Create a new frame with optional size, and optional data
+        <argument name="data" type="anything" constant="1" />
+        <argument name="size" type="size" />
+    </constructor>
+
+    <destructor>
+        Destroy a frame
+    </destructor>
+
+    <method name="new empty" singleton="1">
+        Create an empty (zero-sized) frame
+        <return type="zframe" fresh="1" />
+    </method>
+
+    <method name="recv" singleton="1">
+        Receive frame from socket, returns zframe_t object or NULL if the recv
+        was interrupted. Does a blocking recv, if you want to not block then use
+        zpoller or zloop.
+        <argument name="source" type="anything" />
+        <return type="zframe" fresh="1" />
+    </method>
+
+    <method name="send" singleton="1">
+        Send a frame to a socket, destroy frame after sending.
+        Return -1 on error, 0 on success.
+        <argument name="self_p" type="zframe" by_reference="1" />
+        <argument name="dest" type="anything" />
+        <argument name="flags" type="integer" />
+        <return type="integer" />
+    </method>
+
+    <method name="size">
+        Return number of bytes in frame data
+        <return type="size" />
+    </method>
+
+    <method name="data">
+        Return address of frame data
+        <return type="buffer" constant="0" />
+    </method>
+
+    <method name="dup">
+        Create a new frame that duplicates an existing frame. If frame is null,
+        or memory was exhausted, returns null.
+        <return type="zframe" fresh="1" />
+    </method>
+
+    <method name="strhex">
+        Return frame data encoded as printable hex string, useful for 0MQ UUIDs.
+        Caller must free string when finished with it.
+        <return type="string" fresh="1" />
+    </method>
+
+    <method name="strdup">
+        Return frame data copied into freshly allocated string
+        Caller must free string when finished with it.
+        <return type="string" fresh="1" />
+    </method>
+
+    <method name="streq">
+        Return TRUE if frame body is equal to string, excluding terminator
+        <argument name="string" type="string" />
+        <return type="boolean" />
+    </method>
+
+    <method name="more">
+        Return frame MORE indicator (1 or 0), set when reading frame from socket
+        or by the zframe_set_more() method
+        <return type="integer" />
+    </method>
+
+    <method name="set more">
+        Set frame MORE indicator (1 or 0). Note this is NOT used when sending 
+        frame to socket, you have to specify flag explicitly.
+        <argument name="more" type="integer" />
+    </method>
+
+    <method name="eq">
+        Return TRUE if two frames have identical size and data
+        If either frame is NULL, equality is always false.
+        <argument name="other" type="zframe" />
+        <return type="boolean" />
+    </method>
+
+    <method name="reset">
+        Set new contents for frame
+        <argument name="data" type="anything" constant="1" />
+        <argument name="size" type="size" />
+    </method>
+
+    <method name="print">
+        Send message to zsys log sink (may be stdout, or system facility as
+        configured by zsys_set_logstream). Prefix shows before frame, if not null.
+        <argument name="prefix" type="string" />
+    </method>
+
+    <method name="is" singleton="1">
+        Probe the supplied object, and report if it looks like a zframe_t.
+        <argument name="self" type="anything" />
+        <return type="boolean" />
+    </method>
+
+    <method name="test" singleton="1">
+        Self test of this class
+        <argument name="verbose" type="boolean" />
+    </method>
+</class>
+

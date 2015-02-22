@@ -66,7 +66,7 @@ public slots:
     QmlZhash *dup ();
 
     //  Return keys for items in table
-    zlist_t *keys ();
+    QmlZlist *keys ();
 
     //  Simple iterator; returns first item in hash table, in no given order, 
     //  or NULL if the table is empty. This method is simpler to use than the 
@@ -113,7 +113,7 @@ public slots:
     //                                                                       
     //  Comments are not included in the packed data. Item values MUST be    
     //  strings.                                                             
-    zframe_t *pack ();
+    QmlZframe *pack ();
 
     //  Save hash table to a text file in name=value format. Hash values must be
     //  printable strings; keys may not contain '=' character. Returns 0 if OK, 
@@ -156,7 +156,7 @@ public slots:
     //  Unpack binary frame into a new hash table. Packed data must follow format
     //  defined by zhash_pack. Hash table is set to autofree. An empty frame     
     //  unpacks to an empty hash table.                                          
-    QmlZhash *unpack (zframe_t *frame);
+    QmlZhash *unpack (QmlZframe *frame);
 
     //  Self test of this class
     void test (int verbose);

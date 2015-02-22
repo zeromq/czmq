@@ -34,6 +34,27 @@ module CZMQ
         blocking: true  # only necessary on MRI to deal with the GIL.
       }
       
+      attach_function :zframe_new, [:pointer, :size_t], :pointer, **opts
+      attach_function :zframe_destroy, [:pointer], :void, **opts
+      attach_function :zframe_new_empty, [], :pointer, **opts
+      attach_function :zframe_recv, [:pointer], :pointer, **opts
+      attach_function :zframe_send, [:pointer, :pointer, :int], :int, **opts
+      attach_function :zframe_size, [:pointer], :size_t, **opts
+      attach_function :zframe_data, [:pointer], :pointer, **opts
+      attach_function :zframe_dup, [:pointer], :pointer, **opts
+      attach_function :zframe_strhex, [:pointer], :pointer, **opts
+      attach_function :zframe_strdup, [:pointer], :pointer, **opts
+      attach_function :zframe_streq, [:pointer, :string], :bool, **opts
+      attach_function :zframe_more, [:pointer], :int, **opts
+      attach_function :zframe_set_more, [:pointer, :int], :void, **opts
+      attach_function :zframe_eq, [:pointer, :pointer], :bool, **opts
+      attach_function :zframe_reset, [:pointer, :pointer, :size_t], :void, **opts
+      attach_function :zframe_print, [:pointer, :string], :void, **opts
+      attach_function :zframe_is, [:pointer], :bool, **opts
+      attach_function :zframe_test, [:bool], :void, **opts
+      
+      require_relative 'ffi/zframe'
+      
       attach_function :zmsg_new, [], :pointer, **opts
       attach_function :zmsg_destroy, [:pointer], :void, **opts
       attach_function :zmsg_recv, [:pointer], :pointer, **opts
@@ -95,6 +116,28 @@ module CZMQ
       attach_function :zhash_test, [:int], :void, **opts
       
       require_relative 'ffi/zhash'
+      
+      attach_function :zlist_new, [], :pointer, **opts
+      attach_function :zlist_destroy, [:pointer], :void, **opts
+      attach_function :zlist_first, [:pointer], :pointer, **opts
+      attach_function :zlist_next, [:pointer], :pointer, **opts
+      attach_function :zlist_last, [:pointer], :pointer, **opts
+      attach_function :zlist_head, [:pointer], :pointer, **opts
+      attach_function :zlist_tail, [:pointer], :pointer, **opts
+      attach_function :zlist_item, [:pointer], :pointer, **opts
+      attach_function :zlist_append, [:pointer, :pointer], :int, **opts
+      attach_function :zlist_push, [:pointer, :pointer], :int, **opts
+      attach_function :zlist_pop, [:pointer], :pointer, **opts
+      attach_function :zlist_remove, [:pointer, :pointer], :void, **opts
+      attach_function :zlist_dup, [:pointer], :pointer, **opts
+      attach_function :zlist_purge, [:pointer], :void, **opts
+      attach_function :zlist_size, [:pointer], :size_t, **opts
+      attach_function :zlist_sort, [:pointer, :pointer], :void, **opts
+      attach_function :zlist_autofree, [:pointer], :void, **opts
+      attach_function :zlist_freefn, [:pointer, :pointer, :pointer, :bool], :pointer, **opts
+      attach_function :zlist_test, [:int], :void, **opts
+      
+      require_relative 'ffi/zlist'
     end
   end
 end

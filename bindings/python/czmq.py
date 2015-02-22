@@ -27,13 +27,13 @@ if not libpath:
     raise ImportError("Unable to find czmq C library")
 lib = cdll.LoadLibrary(libpath)
 
-class zmsg_t(Structure):
-    pass # Empty - only for type checking
-zmsg_p = POINTER(zmsg_t)
-
 class zframe_t(Structure):
     pass # Empty - only for type checking
 zframe_p = POINTER(zframe_t)
+
+class zmsg_t(Structure):
+    pass # Empty - only for type checking
+zmsg_p = POINTER(zmsg_t)
 
 class FILE(Structure):
     pass # Empty - only for type checking
@@ -46,6 +46,141 @@ zhash_p = POINTER(zhash_t)
 class zlist_t(Structure):
     pass # Empty - only for type checking
 zlist_p = POINTER(zlist_t)
+
+
+# zframe
+lib.zframe_new.restype = zframe_p
+lib.zframe_new.argtypes = [c_void_p, c_size_t]
+lib.zframe_destroy.restype = None
+lib.zframe_destroy.argtypes = [POINTER(zframe_p)]
+lib.zframe_new_empty.restype = zframe_p
+lib.zframe_new_empty.argtypes = []
+lib.zframe_recv.restype = zframe_p
+lib.zframe_recv.argtypes = [c_void_p]
+lib.zframe_send.restype = c_int
+lib.zframe_send.argtypes = [POINTER(zframe_p), c_void_p, c_int]
+lib.zframe_size.restype = c_size_t
+lib.zframe_size.argtypes = [zframe_p]
+lib.zframe_data.restype = POINTER(c_byte)
+lib.zframe_data.argtypes = [zframe_p]
+lib.zframe_dup.restype = zframe_p
+lib.zframe_dup.argtypes = [zframe_p]
+lib.zframe_strhex.restype = POINTER(c_char)
+lib.zframe_strhex.argtypes = [zframe_p]
+lib.zframe_strdup.restype = POINTER(c_char)
+lib.zframe_strdup.argtypes = [zframe_p]
+lib.zframe_streq.restype = c_bool
+lib.zframe_streq.argtypes = [zframe_p, c_char_p]
+lib.zframe_more.restype = c_int
+lib.zframe_more.argtypes = [zframe_p]
+lib.zframe_set_more.restype = None
+lib.zframe_set_more.argtypes = [zframe_p, c_int]
+lib.zframe_eq.restype = c_bool
+lib.zframe_eq.argtypes = [zframe_p, zframe_p]
+lib.zframe_reset.restype = None
+lib.zframe_reset.argtypes = [zframe_p, c_void_p, c_size_t]
+lib.zframe_print.restype = None
+lib.zframe_print.argtypes = [zframe_p, c_char_p]
+lib.zframe_is.restype = c_bool
+lib.zframe_is.argtypes = [c_void_p]
+lib.zframe_test.restype = None
+lib.zframe_test.argtypes = [c_bool]
+
+class Zframe(object):
+    """working with single message frames"""
+
+    def __init__(self, *args):
+        """Create a new frame with optional size, and optional data"""
+        if len(args) == 2 and isinstance(args[0], zframe_p) and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            self._as_parameter_ = lib.zframe_new(*args) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destroy a frame"""
+        if self.allow_destruct:
+            lib.zframe_destroy(byref(self._as_parameter_))
+
+    @staticmethod
+    def new_empty():
+        """Create an empty (zero-sized) frame"""
+        return Zframe(lib.zframe_new_empty(), True)
+
+    @staticmethod
+    def recv(source):
+        """Receive frame from socket, returns zframe_t object or NULL if the recv
+was interrupted. Does a blocking recv, if you want to not block then use
+zpoller or zloop."""
+        return Zframe(lib.zframe_recv(source), True)
+
+    @staticmethod
+    def send(self_p, dest, flags):
+        """Send a frame to a socket, destroy frame after sending.
+Return -1 on error, 0 on success."""
+        return lib.zframe_send(byref(zframe_p.from_param(self_p)), dest, flags)
+
+    def size(self):
+        """Return number of bytes in frame data"""
+        return lib.zframe_size(self._as_parameter_)
+
+    def data(self):
+        """Return address of frame data"""
+        return lib.zframe_data(self._as_parameter_)
+
+    def dup(self):
+        """Create a new frame that duplicates an existing frame. If frame is null,
+or memory was exhausted, returns null."""
+        return Zframe(lib.zframe_dup(self._as_parameter_), True)
+
+    def strhex(self):
+        """Return frame data encoded as printable hex string, useful for 0MQ UUIDs.
+Caller must free string when finished with it."""
+        return return_fresh_string(lib.zframe_strhex(self._as_parameter_))
+
+    def strdup(self):
+        """Return frame data copied into freshly allocated string
+Caller must free string when finished with it."""
+        return return_fresh_string(lib.zframe_strdup(self._as_parameter_))
+
+    def streq(self, string):
+        """Return TRUE if frame body is equal to string, excluding terminator"""
+        return lib.zframe_streq(self._as_parameter_, string)
+
+    def more(self):
+        """Return frame MORE indicator (1 or 0), set when reading frame from socket
+or by the zframe_set_more() method"""
+        return lib.zframe_more(self._as_parameter_)
+
+    def set_more(self, more):
+        """Set frame MORE indicator (1 or 0). Note this is NOT used when sending 
+frame to socket, you have to specify flag explicitly."""
+        return lib.zframe_set_more(self._as_parameter_, more)
+
+    def eq(self, other):
+        """Return TRUE if two frames have identical size and data
+If either frame is NULL, equality is always false."""
+        return lib.zframe_eq(self._as_parameter_, other)
+
+    def reset(self, data, size):
+        """Set new contents for frame"""
+        return lib.zframe_reset(self._as_parameter_, data, size)
+
+    def print(self, prefix):
+        """Send message to zsys log sink (may be stdout, or system facility as
+configured by zsys_set_logstream). Prefix shows before frame, if not null."""
+        return lib.zframe_print(self._as_parameter_, prefix)
+
+    @staticmethod
+    def is_(self):
+        """Probe the supplied object, and report if it looks like a zframe_t."""
+        return lib.zframe_is(self)
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class"""
+        return lib.zframe_test(verbose)
 
 
 # zmsg
@@ -517,6 +652,157 @@ Callback function for zhash_foreach method"""
     def test(verbose):
         """Self test of this class"""
         return lib.zhash_test(verbose)
+
+
+# zlist
+zlist_compare_fn = CFUNCTYPE(c_bool, c_void_p, c_void_p)
+zlist_free_fn = CFUNCTYPE(None, c_void_p)
+lib.zlist_new.restype = zlist_p
+lib.zlist_new.argtypes = []
+lib.zlist_destroy.restype = None
+lib.zlist_destroy.argtypes = [POINTER(zlist_p)]
+lib.zlist_first.restype = c_void_p
+lib.zlist_first.argtypes = [zlist_p]
+lib.zlist_next.restype = c_void_p
+lib.zlist_next.argtypes = [zlist_p]
+lib.zlist_last.restype = c_void_p
+lib.zlist_last.argtypes = [zlist_p]
+lib.zlist_head.restype = c_void_p
+lib.zlist_head.argtypes = [zlist_p]
+lib.zlist_tail.restype = c_void_p
+lib.zlist_tail.argtypes = [zlist_p]
+lib.zlist_item.restype = c_void_p
+lib.zlist_item.argtypes = [zlist_p]
+lib.zlist_append.restype = c_int
+lib.zlist_append.argtypes = [zlist_p, c_void_p]
+lib.zlist_push.restype = c_int
+lib.zlist_push.argtypes = [zlist_p, c_void_p]
+lib.zlist_pop.restype = c_void_p
+lib.zlist_pop.argtypes = [zlist_p]
+lib.zlist_remove.restype = None
+lib.zlist_remove.argtypes = [zlist_p, c_void_p]
+lib.zlist_dup.restype = zlist_p
+lib.zlist_dup.argtypes = [zlist_p]
+lib.zlist_purge.restype = None
+lib.zlist_purge.argtypes = [zlist_p]
+lib.zlist_size.restype = c_size_t
+lib.zlist_size.argtypes = [zlist_p]
+lib.zlist_sort.restype = None
+lib.zlist_sort.argtypes = [zlist_p, zlist_compare_fn]
+lib.zlist_autofree.restype = None
+lib.zlist_autofree.argtypes = [zlist_p]
+lib.zlist_freefn.restype = c_void_p
+lib.zlist_freefn.argtypes = [zlist_p, c_void_p, zlist_free_fn, c_bool]
+lib.zlist_test.restype = None
+lib.zlist_test.argtypes = [c_int]
+
+class Zlist(object):
+    """simple generic list container"""
+
+    def __init__(self, *args):
+        """Create a new list container"""
+        if len(args) == 2 and isinstance(args[0], zlist_p) and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            self._as_parameter_ = lib.zlist_new(*args) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destroy a list container"""
+        if self.allow_destruct:
+            lib.zlist_destroy(byref(self._as_parameter_))
+
+    def first(self):
+        """Return the item at the head of list. If the list is empty, returns NULL.
+Leaves cursor pointing at the head item, or NULL if the list is empty."""
+        return lib.zlist_first(self._as_parameter_)
+
+    def next(self):
+        """Return the next item. If the list is empty, returns NULL. To move to
+the start of the list call zlist_first (). Advances the cursor."""
+        return lib.zlist_next(self._as_parameter_)
+
+    def last(self):
+        """Return the item at the tail of list. If the list is empty, returns NULL.
+Leaves cursor pointing at the tail item, or NULL if the list is empty."""
+        return lib.zlist_last(self._as_parameter_)
+
+    def head(self):
+        """Return first item in the list, or null, leaves the cursor"""
+        return lib.zlist_head(self._as_parameter_)
+
+    def tail(self):
+        """Return last item in the list, or null, leaves the cursor"""
+        return lib.zlist_tail(self._as_parameter_)
+
+    def item(self):
+        """Return the current item of list. If the list is empty, returns NULL.
+Leaves cursor pointing at the current item, or NULL if the list is empty."""
+        return lib.zlist_item(self._as_parameter_)
+
+    def append(self, item):
+        """Append an item to the end of the list, return 0 if OK or -1 if this
+failed for some reason (out of memory). Note that if a duplicator has 
+been set, this method will also duplicate the item."""
+        return lib.zlist_append(self._as_parameter_, item)
+
+    def push(self, item):
+        """Push an item to the start of the list, return 0 if OK or -1 if this
+failed for some reason (out of memory). Note that if a duplicator has
+been set, this method will also duplicate the item."""
+        return lib.zlist_push(self._as_parameter_, item)
+
+    def pop(self):
+        """Pop the item off the start of the list, if any"""
+        return lib.zlist_pop(self._as_parameter_)
+
+    def remove(self, item):
+        """Remove the specified item from the list if present"""
+        return lib.zlist_remove(self._as_parameter_, item)
+
+    def dup(self):
+        """Make a copy of list. If the list has autofree set, the copied list will
+duplicate all items, which must be strings. Otherwise, the list will hold
+pointers back to the items in the original list."""
+        return Zlist(lib.zlist_dup(self._as_parameter_), True)
+
+    def purge(self):
+        """Purge all items from list"""
+        return lib.zlist_purge(self._as_parameter_)
+
+    def size(self):
+        """Return number of items in the list"""
+        return lib.zlist_size(self._as_parameter_)
+
+    def sort(self, compare):
+        """Sort the list by ascending key value using a straight ASCII comparison.
+The sort is not stable, so may reorder items with the same keys."""
+        return lib.zlist_sort(self._as_parameter_, compare)
+
+    def autofree(self):
+        """Set list for automatic item destruction; item values MUST be strings.
+By default a list item refers to a value held elsewhere. When you set
+this, each time you append or push a list item, zlist will take a copy
+of the string value. Then, when you destroy the list, it will free all
+item values automatically. If you use any other technique to allocate
+list values, you must free them explicitly before destroying the list.
+The usual technique is to pop list items and destroy them, until the
+list is empty."""
+        return lib.zlist_autofree(self._as_parameter_)
+
+    def freefn(self, item, fn, at_tail):
+        """Set a free function for the specified list item. When the item is
+destroyed, the free function, if any, is called on that item.
+Use this when list items are dynamically allocated, to ensure that
+you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
+Returns the item, or NULL if there is no such item."""
+        return lib.zlist_freefn(self._as_parameter_, item, fn, at_tail)
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class"""
+        return lib.zlist_test(verbose)
 
 ################################################################################
 #  THIS FILE IS 100% GENERATED BY ZPROJECT; DO NOT EDIT EXCEPT EXPERIMENTALLY  #

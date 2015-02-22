@@ -38,17 +38,17 @@ public slots:
     //  Message takes ownership of frame, will destroy it when message is sent.
     //  Returns 0 on success, -1 on error. Deprecates zmsg_push, which did not 
     //  nullify the caller's frame reference.                                  
-    int prepend (zframe_t **frameP);
+    int prepend (QmlZframe *frameP);
 
     //  Add frame to the end of the message, i.e. after all other frames.      
     //  Message takes ownership of frame, will destroy it when message is sent.
     //  Returns 0 on success. Deprecates zmsg_add, which did not nullify the   
     //  caller's frame reference.                                              
-    int append (zframe_t **frameP);
+    int append (QmlZframe *frameP);
 
     //  Remove first frame from message, if any. Returns frame, or NULL. Caller
     //  now owns frame and must destroy it when finished with it.              
-    zframe_t *pop ();
+    QmlZframe *pop ();
 
     //  Push block of memory to front of message, as a new frame.
     //  Returns 0 on success, -1 on error.                       
@@ -89,18 +89,18 @@ public slots:
     QmlZmsg *popmsg ();
 
     //  Remove specified frame from list, if present. Does not destroy frame.
-    void remove (zframe_t *frame);
+    void remove (QmlZframe *frame);
 
     //  Set cursor to first frame in message. Returns frame, or NULL, if the 
     //  message is empty. Use this to navigate the frames as a list.         
-    zframe_t *first ();
+    QmlZframe *first ();
 
     //  Return the next frame. If there are no more frames, returns NULL. To move
     //  to the first frame call zmsg_first(). Advances the cursor.               
-    zframe_t *next ();
+    QmlZframe *next ();
 
     //  Return the last frame. If there are no frames, returns NULL.
-    zframe_t *last ();
+    QmlZframe *last ();
 
     //  Save message to an open file, return 0 if OK, else -1. The message is  
     //  saved as a series of frames, each with length and data. Note that the  
