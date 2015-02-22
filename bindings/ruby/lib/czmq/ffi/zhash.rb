@@ -243,6 +243,7 @@ module CZMQ
       def pack
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zhash_pack @ptr
+        result = Zframe.__new result, true
         result
       end
       
@@ -250,6 +251,7 @@ module CZMQ
       # defined by zhash_pack. Hash table is set to autofree. An empty frame     
       # unpacks to an empty hash table.                                          
       def self.unpack frame
+        frame = frame.__ptr if frame
         result = ::CZMQ::FFI.zhash_unpack frame
         result = Zhash.__new result, true
         result

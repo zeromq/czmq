@@ -25,8 +25,8 @@ size_t QmlZmsg::contentSize () {
 //  Message takes ownership of frame, will destroy it when message is sent.
 //  Returns 0 on success, -1 on error. Deprecates zmsg_push, which did not 
 //  nullify the caller's frame reference.                                  
-int QmlZmsg::prepend (zframe_t **frameP) {
-    return zmsg_prepend (self, frameP);
+int QmlZmsg::prepend (QmlZframe *frameP) {
+    return zmsg_prepend (self, &frameP->self);
 };
 
 ///
@@ -34,15 +34,17 @@ int QmlZmsg::prepend (zframe_t **frameP) {
 //  Message takes ownership of frame, will destroy it when message is sent.
 //  Returns 0 on success. Deprecates zmsg_add, which did not nullify the   
 //  caller's frame reference.                                              
-int QmlZmsg::append (zframe_t **frameP) {
-    return zmsg_append (self, frameP);
+int QmlZmsg::append (QmlZframe *frameP) {
+    return zmsg_append (self, &frameP->self);
 };
 
 ///
 //  Remove first frame from message, if any. Returns frame, or NULL. Caller
 //  now owns frame and must destroy it when finished with it.              
-zframe_t *QmlZmsg::pop () {
-    return zmsg_pop (self);
+QmlZframe *QmlZmsg::pop () {
+    QmlZframe *retQ_ = new QmlZframe ();
+    retQ_->self = zmsg_pop (self);
+    return retQ_;
 };
 
 ///
@@ -117,28 +119,34 @@ QmlZmsg *QmlZmsg::popmsg () {
 
 ///
 //  Remove specified frame from list, if present. Does not destroy frame.
-void QmlZmsg::remove (zframe_t *frame) {
-    zmsg_remove (self, frame);
+void QmlZmsg::remove (QmlZframe *frame) {
+    zmsg_remove (self, frame->self);
 };
 
 ///
 //  Set cursor to first frame in message. Returns frame, or NULL, if the 
 //  message is empty. Use this to navigate the frames as a list.         
-zframe_t *QmlZmsg::first () {
-    return zmsg_first (self);
+QmlZframe *QmlZmsg::first () {
+    QmlZframe *retQ_ = new QmlZframe ();
+    retQ_->self = zmsg_first (self);
+    return retQ_;
 };
 
 ///
 //  Return the next frame. If there are no more frames, returns NULL. To move
 //  to the first frame call zmsg_first(). Advances the cursor.               
-zframe_t *QmlZmsg::next () {
-    return zmsg_next (self);
+QmlZframe *QmlZmsg::next () {
+    QmlZframe *retQ_ = new QmlZframe ();
+    retQ_->self = zmsg_next (self);
+    return retQ_;
 };
 
 ///
 //  Return the last frame. If there are no frames, returns NULL.
-zframe_t *QmlZmsg::last () {
-    return zmsg_last (self);
+QmlZframe *QmlZmsg::last () {
+    QmlZframe *retQ_ = new QmlZframe ();
+    retQ_->self = zmsg_last (self);
+    return retQ_;
 };
 
 ///

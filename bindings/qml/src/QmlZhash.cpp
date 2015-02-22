@@ -135,8 +135,10 @@ void QmlZhash::comment (const QString &format) {
 //                                                                       
 //  Comments are not included in the packed data. Item values MUST be    
 //  strings.                                                             
-zframe_t *QmlZhash::pack () {
-    return zhash_pack (self);
+QmlZframe *QmlZhash::pack () {
+    QmlZframe *retQ_ = new QmlZframe ();
+    retQ_->self = zhash_pack (self);
+    return retQ_;
 };
 
 ///
@@ -190,9 +192,9 @@ QObject* QmlZhash::qmlAttachedProperties(QObject* object) {
 //  Unpack binary frame into a new hash table. Packed data must follow format
 //  defined by zhash_pack. Hash table is set to autofree. An empty frame     
 //  unpacks to an empty hash table.                                          
-QmlZhash *QmlZhashAttached::unpack (zframe_t *frame) {
+QmlZhash *QmlZhashAttached::unpack (QmlZframe *frame) {
     QmlZhash *retQ_ = new QmlZhash ();
-    retQ_->self = zhash_unpack (frame);
+    retQ_->self = zhash_unpack (frame->self);
     return retQ_;
 };
 
