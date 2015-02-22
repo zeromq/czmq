@@ -174,7 +174,7 @@ caller's frame reference."""
     def pop(self):
         """Remove first frame from message, if any. Returns frame, or NULL. Caller
 now owns frame and must destroy it when finished with it."""
-        return Zframe(lib.zmsg_pop(self._as_parameter_), True)
+        return lib.zmsg_pop(self._as_parameter_)
 
     def pushmem(self, src, size):
         """Push block of memory to front of message, as a new frame.
@@ -230,16 +230,16 @@ when finished with it."""
     def first(self):
         """Set cursor to first frame in message. Returns frame, or NULL, if the 
 message is empty. Use this to navigate the frames as a list."""
-        return Zframe(lib.zmsg_first(self._as_parameter_), False)
+        return lib.zmsg_first(self._as_parameter_)
 
     def next(self):
         """Return the next frame. If there are no more frames, returns NULL. To move
 to the first frame call zmsg_first(). Advances the cursor."""
-        return Zframe(lib.zmsg_next(self._as_parameter_), False)
+        return lib.zmsg_next(self._as_parameter_)
 
     def last(self):
         """Return the last frame. If there are no frames, returns NULL."""
-        return Zframe(lib.zmsg_last(self._as_parameter_), False)
+        return lib.zmsg_last(self._as_parameter_)
 
     def save(self, file):
         """Save message to an open file, return 0 if OK, else -1. The message is 
@@ -421,7 +421,7 @@ since there's no other way to know how to duplicate the item value."""
 
     def keys(self):
         """Return keys for items in table"""
-        return Zlist(lib.zhash_keys(self._as_parameter_), True)
+        return lib.zhash_keys(self._as_parameter_)
 
     def first(self):
         """Simple iterator; returns first item in hash table, in no given order,
@@ -473,7 +473,7 @@ http://rfc.zeromq.org/spec:35/FILEMQ, and implemented by zproto:
 
 Comments are not included in the packed data. Item values MUST be
 strings."""
-        return Zframe(lib.zhash_pack(self._as_parameter_), True)
+        return lib.zhash_pack(self._as_parameter_)
 
     @staticmethod
     def unpack(frame):
