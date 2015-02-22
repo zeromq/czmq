@@ -13,6 +13,8 @@
 
 class QmlZframe;
 class QmlZframeAttached;
+class QmlZloop;
+class QmlZloopAttached;
 class QmlZmsg;
 class QmlZmsgAttached;
 class QmlZhash;
@@ -21,6 +23,7 @@ class QmlZlist;
 class QmlZlistAttached;
 
 #include "QmlZframe.h"
+#include "QmlZloop.h"
 #include "QmlZmsg.h"
 #include "QmlZhash.h"
 #include "QmlZlist.h"
@@ -35,6 +38,8 @@ public:
     {
         qmlRegisterType<QmlZframe> (uri, 1, 0, "QmlZframe");
         qmlRegisterType<QmlZframeAttached>();
+        qmlRegisterType<QmlZloop> (uri, 1, 0, "QmlZloop");
+        qmlRegisterType<QmlZloopAttached>();
         qmlRegisterType<QmlZmsg> (uri, 1, 0, "QmlZmsg");
         qmlRegisterType<QmlZmsgAttached>();
         qmlRegisterType<QmlZhash> (uri, 1, 0, "QmlZhash");

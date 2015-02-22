@@ -55,6 +55,28 @@ module CZMQ
       
       require_relative 'ffi/zframe'
       
+      attach_function :zloop_new, [], :pointer, **opts
+      attach_function :zloop_destroy, [:pointer], :void, **opts
+      attach_function :zloop_reader, [:pointer, :pointer, :pointer, :pointer], :int, **opts
+      attach_function :zloop_reader_end, [:pointer, :pointer], :void, **opts
+      attach_function :zloop_reader_set_tolerant, [:pointer, :pointer], :void, **opts
+      attach_function :zloop_poller, [:pointer, :pointer, :pointer, :pointer], :int, **opts
+      attach_function :zloop_poller_end, [:pointer, :pointer], :void, **opts
+      attach_function :zloop_poller_set_tolerant, [:pointer, :pointer], :void, **opts
+      attach_function :zloop_timer, [:pointer, :size_t, :size_t, :pointer, :pointer], :int, **opts
+      attach_function :zloop_timer_end, [:pointer, :int], :int, **opts
+      attach_function :zloop_ticket, [:pointer, :pointer, :pointer], :pointer, **opts
+      attach_function :zloop_ticket_reset, [:pointer, :pointer], :void, **opts
+      attach_function :zloop_ticket_delete, [:pointer, :pointer], :void, **opts
+      attach_function :zloop_set_ticket_delay, [:pointer, :size_t], :void, **opts
+      attach_function :zloop_set_max_timers, [:pointer, :size_t], :void, **opts
+      attach_function :zloop_set_verbose, [:pointer, :bool], :void, **opts
+      attach_function :zloop_start, [:pointer], :int, **opts
+      attach_function :zloop_ignore_interrupts, [:pointer], :void, **opts
+      attach_function :zloop_test, [:bool], :void, **opts
+      
+      require_relative 'ffi/zloop'
+      
       attach_function :zmsg_new, [], :pointer, **opts
       attach_function :zmsg_destroy, [:pointer], :void, **opts
       attach_function :zmsg_recv, [:pointer], :pointer, **opts

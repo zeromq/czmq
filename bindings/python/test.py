@@ -1,6 +1,6 @@
 import unittest
 from ctypes import *
-from czmq import Zmsg, Zhash, zhash_foreach_fn
+from czmq import Zloop, zloop_timer_fn, Zmsg, Zhash, zhash_foreach_fn
 
 class TestZyre(unittest.TestCase):
     def test_zhash(self):
@@ -37,8 +37,20 @@ class TestZyre(unittest.TestCase):
         self.assertEquals(bool(m2._as_parameter_), False)
         del m2 # doesn't throw... doesn't do anything... doesn't cause following code to fail
         m3 = m.popmsg()
-        self.assertEquals(bool(m2._as_parameter_), True)
+        self.assertEquals(bool(m3._as_parameter_), True)
         self.assertEquals(m3.popstr(), 'innerstr')
+
+    def test_zloop(self):
+        l = Zloop()
+        times = [0]
+        def cb(loop, timer_id, arg):
+            times[0] += 1
+            return -1
+        cb = zloop_timer_fn(cb) # must keep a reference alive for as long as timer is active!
+        self.assertEquals(l.timer(0, 1, cb, None), 1)
+
+        self.assertEquals(l.start(), -1)
+        self.assertEquals(times[0], 1)
 
 if __name__ == '__main__':
     Zhash.test(0)
