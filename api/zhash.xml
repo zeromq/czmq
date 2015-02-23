@@ -1,11 +1,11 @@
-<class name="zhash" has_print="0">
+<class name = "zhash" has_print = "0">
     generic type-free hash container (simple)
 
     <include filename = "../license.xml" />
 
-    <callback_type name="free_fn">
+    <callback_type name = "free_fn">
         Callback function for zhash_freefn method
-        <argument name="data" type="anything" />
+        <argument name = "data" type = "anything" />
     </callback_type>
 
     <constructor>
@@ -16,106 +16,106 @@
         Destroy a hash container and all items in it
     </destructor>
 
-    <method name="insert">
+    <method name = "insert">
         Insert item into hash table with specified key and item.
         If key is already present returns -1 and leaves existing item unchanged
         Returns 0 on success.
-        <argument name="key" type="string" />
-        <argument name="item" type="anything" />
-        <return type="integer" />
+        <argument name = "key" type = "string" />
+        <argument name = "item" type = "anything" />
+        <return type = "integer" />
     </method>
 
-    <method name="update">
+    <method name = "update">
         Update item into hash table with specified key and item.
         If key is already present, destroys old item and inserts new one.
         Use free_fn method to ensure deallocator is properly called on item.
-        <argument name="key" type="string" />
-        <argument name="item" type="anything" />
+        <argument name = "key" type = "string" />
+        <argument name = "item" type = "anything" />
     </method>
 
-    <method name="delete">
+    <method name = "delete">
         Remove an item specified by key from the hash table. If there was no such
         item, this function does nothing.
-        <argument name="key" type="string" />
+        <argument name = "key" type = "string" />
     </method>
 
-    <method name="lookup">
+    <method name = "lookup">
         Return the item at the specified key, or null
-        <argument name="key" type="string" />
-        <return type="anything" />
+        <argument name = "key" type = "string" />
+        <return type = "anything" />
     </method>
 
-    <method name="rename">
+    <method name = "rename">
         Reindexes an item from an old key to a new key. If there was no such
         item, does nothing. Returns 0 if successful, else -1.
-        <argument name="old key" type="string" />
-        <argument name="new key" type="string" />
-        <return type="integer" />
+        <argument name = "old key" type = "string" />
+        <argument name = "new key" type = "string" />
+        <return type = "integer" />
     </method>
 
-    <method name="freefn">
+    <method name = "freefn">
         Set a free function for the specified hash table item. When the item is
         destroyed, the free function, if any, is called on that item.
         Use this when hash items are dynamically allocated, to ensure that
         you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
         Returns the item, or NULL if there is no such item.
-        <argument name="key" type="string" />
-        <argument name="free_fn" type="zhash_free_fn" callback="1" />
-        <return type="anything" />
+        <argument name = "key" type = "string" />
+        <argument name = "free_fn" type = "zhash_free_fn" callback = "1" />
+        <return type = "anything" />
     </method>
 
-    <method name="size">
+    <method name = "size">
         Return the number of keys/items in the hash table
-        <return type="size" />
+        <return type = "size" />
     </method>
 
-    <method name="dup">
+    <method name = "dup">
         Make copy of hash table; if supplied table is null, returns null.
         Does not copy items themselves. Rebuilds new table so may be slow on
         very large tables. NOTE: only works with item values that are strings
         since there's no other way to know how to duplicate the item value.
-        <return type="zhash" fresh="1" />
+        <return type = "zhash" fresh = "1" />
     </method>
 
-    <method name="keys">
+    <method name = "keys">
         Return keys for items in table
-        <return type="zlist" fresh="1" />
+        <return type = "zlist" fresh = "1" />
     </method>
 
-    <method name="first">
+    <method name = "first">
         Simple iterator; returns first item in hash table, in no given order,
         or NULL if the table is empty. This method is simpler to use than the
         foreach() method, which is deprecated. To access the key for this item
         use zhash_cursor(). NOTE: do NOT modify the table while iterating.
-        <return type="anything" />
+        <return type = "anything" />
     </method>
 
-    <method name="next">
+    <method name = "next">
         Simple iterator; returns next item in hash table, in no given order,
         or NULL if the last item was already returned. Use this together with
         zhash_first() to process all items in a hash table. If you need the
         items in sorted order, use zhash_keys() and then zlist_sort(). To
         access the key for this item use zhash_cursor(). NOTE: do NOT modify
         the table while iterating.
-        <return type="anything" />
+        <return type = "anything" />
     </method>
 
-    <method name="cursor">
+    <method name = "cursor">
         After a successful first/next method, returns the key for the item that
         was returned. This is a constant string that you may not modify or
         deallocate, and which lasts as long as the item in the hash. After an
         unsuccessful first/next, returns NULL.
-        <return type="string" />
+        <return type = "string" />
     </method>
 
-    <method name="comment">
+    <method name = "comment">
         Add a comment to hash table before saving to disk. You can add as many
         comment lines as you like. These comment lines are discarded when loading
         the file. If you use a null format, all comments are deleted.
-        <argument name="format" type="format" />
+        <argument name = "format" type = "format" />
     </method>
 
-    <method name="pack">
+    <method name = "pack">
         Serialize hash table to a binary frame that can be sent in a message.
         The packed format is compatible with the 'dictionary' type defined in
         http://rfc.zeromq.org/spec:35/FILEMQ, and implemented by zproto:
@@ -136,68 +136,68 @@
 
         Comments are not included in the packed data. Item values MUST be
         strings.
-        <return type="zframe" fresh="1" />
+        <return type = "zframe" fresh = "1" />
     </method>
 
-    <method name="unpack" singleton="1">
+    <method name = "unpack" singleton = "1">
         Unpack binary frame into a new hash table. Packed data must follow format
         defined by zhash_pack. Hash table is set to autofree. An empty frame
         unpacks to an empty hash table.
-        <argument name="frame" type="zframe" />
-        <return type="zhash" fresh="1" />
+        <argument name = "frame" type = "zframe" />
+        <return type = "zhash" fresh = "1" />
     </method>
 
-    <method name="save">
-        Save hash table to a text file in name=value format. Hash values must be
-        printable strings; keys may not contain '=' character. Returns 0 if OK,
+    <method name = "save">
+        Save hash table to a text file in name = value format. Hash values must be
+        printable strings; keys may not contain ' = ' character. Returns 0 if OK,
         else -1 if a file error occurred.
-        <argument name="filename" type="string" />
-        <return type="integer" />
+        <argument name = "filename" type = "string" />
+        <return type = "integer" />
     </method>
 
-    <method name="load">
-        Load hash table from a text file in name=value format; hash table must
+    <method name = "load">
+        Load hash table from a text file in name = value format; hash table must
         already exist. Hash values must printable strings; keys may not contain
-        '=' character. Returns 0 if OK, else -1 if a file was not readable.
-        <argument name="filename" type="string" />
-        <return type="integer" />
+        ' = ' character. Returns 0 if OK, else -1 if a file was not readable.
+        <argument name = "filename" type = "string" />
+        <return type = "integer" />
     </method>
 
-    <method name="refresh">
+    <method name = "refresh">
         When a hash table was loaded from a file by zhash_load, this method will
         reload the file if it has been modified since, and is "stable", i.e. not
         still changing. Returns 0 if OK, -1 if there was an error reloading the 
         file.
-        <return type="integer" />
+        <return type = "integer" />
     </method>
 
-    <method name="autofree">
+    <method name = "autofree">
         Set hash for automatic value destruction
     </method>
 
-    <callback_type name="foreach_fn">
+    <callback_type name = "foreach_fn">
         DEPRECATED as clumsy -- use zhash_first/_next instead
-        <argument name="key" type="string" />
-        <argument name="item" type="anything" />
-        <argument name="argument" type="anything" />
-        <return type="integer" />
+        <argument name = "key" type = "string" />
+        <argument name = "item" type = "anything" />
+        <argument name = "argument" type = "anything" />
+        <return type = "integer" />
     </callback_type>
 
-    <method name="foreach">
+    <method name = "foreach">
         DEPRECATED as clumsy -- use zhash_first/_next instead
         Apply function to each item in the hash table. Items are iterated in no
         defined order. Stops if callback function returns non-zero and returns
         final return code from callback function (zero = success).
         Callback function for zhash_foreach method
 
-        <argument name="callback" type="zhash_foreach_fn" callback="1" />
-        <argument name="argument" type="anything" />
-        <return type="integer" />
+        <argument name = "callback" type = "zhash_foreach_fn" callback = "1" />
+        <argument name = "argument" type = "anything" />
+        <return type = "integer" />
     </method>
 
-    <method name="test" singleton="1">
+    <method name = "test" singleton = "1">
         Self test of this class
-        <argument name="verbose" type="integer" />
+        <argument name = "verbose" type = "integer" />
     </method>
 </class>
 
