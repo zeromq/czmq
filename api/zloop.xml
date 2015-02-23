@@ -1,4 +1,4 @@
-<class name="zloop">
+<class name="zloop" has_print="0">
     event-driven reactor
 
     <include filename = "../license.xml" />

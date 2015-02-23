@@ -1,4 +1,4 @@
-<class name="zsock">
+<class name="zsock" has_print="0">
     high-level socket API that hides libzmq contexts and sockets
 
     <include filename = "../license.xml" />
