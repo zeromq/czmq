@@ -16,7 +16,7 @@
     The zsock class wraps the libzmq socket handle (a void *) with a proper
     structure that follows the CLASS rules for construction and destruction.
     Some zsock methods take a void * "polymorphic" reference, which can be
-    either a zsock_t or a zactor_r reference, or a libzmq void *.
+    either a zsock_t or a zactor_t reference, or a libzmq void *.
 @discuss
 @end
 */
@@ -448,7 +448,7 @@ zsock_bind (zsock_t *self, const char *format, ...)
 //  --------------------------------------------------------------------------
 //  Returns last bound endpoint, if any.
 
-char *
+const char *
 zsock_endpoint (zsock_t *self)
 {
     assert (self);

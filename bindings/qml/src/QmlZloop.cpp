@@ -13,22 +13,22 @@
 //  the reactor will call the handler, passing the arg. Returns 0 if OK, -1
 //  if there was an error. If you register the same socket more than once, 
 //  each instance will invoke its corresponding handler.                   
-int QmlZloop::reader (zsock_t *sock, zloop_reader_fn handler, void *arg) {
-    return zloop_reader (self, sock, handler, arg);
+int QmlZloop::reader (QmlZsock *sock, zloop_reader_fn handler, void *arg) {
+    return zloop_reader (self, sock->self, handler, arg);
 };
 
 ///
 //  Cancel a socket reader from the reactor. If multiple readers exist for
 //  same socket, cancels ALL of them.                                     
-void QmlZloop::readerEnd (zsock_t *sock) {
-    zloop_reader_end (self, sock);
+void QmlZloop::readerEnd (QmlZsock *sock) {
+    zloop_reader_end (self, sock->self);
 };
 
 ///
 //  Configure a registered reader to ignore errors. If you do not set this,
 //  then readers that have errors are removed from the reactor silently.   
-void QmlZloop::readerSetTolerant (zsock_t *sock) {
-    zloop_reader_set_tolerant (self, sock);
+void QmlZloop::readerSetTolerant (QmlZsock *sock) {
+    zloop_reader_set_tolerant (self, sock->self);
 };
 
 ///

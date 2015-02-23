@@ -61,6 +61,7 @@ module CZMQ
       def self.reader_fn
         ::FFI::Function.new :int, [:pointer, :pointer, :pointer], blocking: true do |loop, reader, arg|
           loop = Zloop.__new loop, false
+          reader = Zsock.__new reader, false
           yield loop, reader, arg
         end
       end
@@ -118,6 +119,7 @@ module CZMQ
       # each instance will invoke its corresponding handler.                   
       def reader sock, handler, arg
         raise DestroyedError unless @ptr
+        sock = sock.__ptr if sock
         result = ::CZMQ::FFI.zloop_reader @ptr, sock, handler, arg
         result
       end
@@ -126,6 +128,7 @@ module CZMQ
       # same socket, cancels ALL of them.                                     
       def reader_end sock
         raise DestroyedError unless @ptr
+        sock = sock.__ptr if sock
         result = ::CZMQ::FFI.zloop_reader_end @ptr, sock
         result
       end
@@ -134,6 +137,7 @@ module CZMQ
       # then readers that have errors are removed from the reactor silently.   
       def reader_set_tolerant sock
         raise DestroyedError unless @ptr
+        sock = sock.__ptr if sock
         result = ::CZMQ::FFI.zloop_reader_set_tolerant @ptr, sock
         result
       end

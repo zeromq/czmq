@@ -32,15 +32,15 @@ public slots:
     //  the reactor will call the handler, passing the arg. Returns 0 if OK, -1
     //  if there was an error. If you register the same socket more than once, 
     //  each instance will invoke its corresponding handler.                   
-    int reader (zsock_t *sock, zloop_reader_fn handler, void *arg);
+    int reader (QmlZsock *sock, zloop_reader_fn handler, void *arg);
 
     //  Cancel a socket reader from the reactor. If multiple readers exist for
     //  same socket, cancels ALL of them.                                     
-    void readerEnd (zsock_t *sock);
+    void readerEnd (QmlZsock *sock);
 
     //  Configure a registered reader to ignore errors. If you do not set this,
     //  then readers that have errors are removed from the reactor silently.   
-    void readerSetTolerant (zsock_t *sock);
+    void readerSetTolerant (QmlZsock *sock);
 
     //  Register low-level libzmq pollitem with the reactor. When the pollitem  
     //  is ready, will call the handler, passing the arg. Returns 0 if OK, -1   
