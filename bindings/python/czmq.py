@@ -281,7 +281,7 @@ then readers that have errors are removed from the reactor silently."""
 is ready, will call the handler, passing the arg. Returns 0 if OK, -1
 if there was an error. If you register the pollitem more than once, each
 instance will invoke its corresponding handler. A pollitem with
-socket=NULL and fd=0 means 'poll on FD zero'."""
+socket = NULL and fd = 0 means 'poll on FD zero'."""
         return lib.zloop_poller(self._as_parameter_, item, handler, arg)
 
     def poller_end(self, item):
@@ -938,7 +938,7 @@ values. Returns 0 if successful, or -1 if it failed to read a message."""
         return lib.zsock_brecv(self._as_parameter_, picture, *args)
 
     def set_unbounded(self):
-        """Set socket to use unbounded pipes (HWM=0); use this in cases when you are
+        """Set socket to use unbounded pipes (HWM = 0); use this in cases when you are
 totally certain the message volume can fit in memory. This method works
 across all versions of ZeroMQ. Takes a polymorphic socket reference."""
         return lib.zsock_set_unbounded(self._as_parameter_)
@@ -985,8 +985,8 @@ return the supplied value. Takes a polymorphic socket reference."""
 
 
 # zhash
-free_fn = CALLBACK(None, c_void_p)
-foreach_fn = CALLBACK(c_int, c_char_p, c_void_p, c_void_p)
+zhash_free_fn = CFUNCTYPE(None, c_void_p)
+zhash_foreach_fn = CFUNCTYPE(c_int, c_char_p, c_void_p, c_void_p)
 lib.zhash_new.restype = zhash_p
 lib.zhash_new.argtypes = []
 lib.zhash_destroy.restype = None
@@ -1160,15 +1160,15 @@ unpacks to an empty hash table."""
         return Zhash(lib.zhash_unpack(frame), True)
 
     def save(self, filename):
-        """Save hash table to a text file in name=value format. Hash values must be
-printable strings; keys may not contain '=' character. Returns 0 if OK,
+        """Save hash table to a text file in name = value format. Hash values must be
+printable strings; keys may not contain ' = ' character. Returns 0 if OK,
 else -1 if a file error occurred."""
         return lib.zhash_save(self._as_parameter_, filename)
 
     def load(self, filename):
-        """Load hash table from a text file in name=value format; hash table must
+        """Load hash table from a text file in name = value format; hash table must
 already exist. Hash values must printable strings; keys may not contain
-'=' character. Returns 0 if OK, else -1 if a file was not readable."""
+' = ' character. Returns 0 if OK, else -1 if a file was not readable."""
         return lib.zhash_load(self._as_parameter_, filename)
 
     def refresh(self):

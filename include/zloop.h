@@ -62,7 +62,7 @@ CZMQ_EXPORT void
 //  is ready, will call the handler, passing the arg. Returns 0 if OK, -1   
 //  if there was an error. If you register the pollitem more than once, each
 //  instance will invoke its corresponding handler. A pollitem with         
-//  socket=NULL and fd=0 means 'poll on FD zero'.                           
+//  socket = NULL and fd = 0 means 'poll on FD zero'.                       
 CZMQ_EXPORT int
     zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg);
 

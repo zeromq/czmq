@@ -258,9 +258,9 @@ module CZMQ
         result
       end
       
-      # Save hash table to a text file in name=value format. Hash values must be
-      # printable strings; keys may not contain '=' character. Returns 0 if OK, 
-      # else -1 if a file error occurred.                                       
+      # Save hash table to a text file in name = value format. Hash values must be
+      # printable strings; keys may not contain ' = ' character. Returns 0 if OK, 
+      # else -1 if a file error occurred.                                         
       def save filename
         raise DestroyedError unless @ptr
         filename = String(filename)
@@ -268,9 +268,9 @@ module CZMQ
         result
       end
       
-      # Load hash table from a text file in name=value format; hash table must 
-      # already exist. Hash values must printable strings; keys may not contain
-      # '=' character. Returns 0 if OK, else -1 if a file was not readable.    
+      # Load hash table from a text file in name = value format; hash table must
+      # already exist. Hash values must printable strings; keys may not contain 
+      # ' = ' character. Returns 0 if OK, else -1 if a file was not readable.   
       def load filename
         raise DestroyedError unless @ptr
         filename = String(filename)
