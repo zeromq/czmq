@@ -51,6 +51,10 @@ class FILE(Structure):
     pass # Empty - only for type checking
 FILE_p = POINTER(FILE)
 
+class va_list_t(Structure):
+    pass # Empty - only for type checking
+va_list_p = POINTER(va_list_t)
+
 class zhash_t(Structure):
     pass # Empty - only for type checking
 zhash_p = POINTER(zhash_t)
@@ -619,6 +623,365 @@ OK). Signals are encoded to be distinguishable from "normal" messages."""
     def test(verbose):
         """Self test of this class"""
         return lib.zmsg_test(verbose)
+
+
+# zsock
+lib.zsock_new.restype = zsock_p
+lib.zsock_new.argtypes = [c_int]
+lib.zsock_destroy.restype = None
+lib.zsock_destroy.argtypes = [POINTER(zsock_p)]
+lib.zsock_new_pub.restype = zsock_p
+lib.zsock_new_pub.argtypes = [c_char_p]
+lib.zsock_new_sub.restype = zsock_p
+lib.zsock_new_sub.argtypes = [c_char_p, c_char_p]
+lib.zsock_new_req.restype = zsock_p
+lib.zsock_new_req.argtypes = [c_char_p]
+lib.zsock_new_rep.restype = zsock_p
+lib.zsock_new_rep.argtypes = [c_char_p]
+lib.zsock_new_dealer.restype = zsock_p
+lib.zsock_new_dealer.argtypes = [c_char_p]
+lib.zsock_new_router.restype = zsock_p
+lib.zsock_new_router.argtypes = [c_char_p]
+lib.zsock_new_push.restype = zsock_p
+lib.zsock_new_push.argtypes = [c_char_p]
+lib.zsock_new_pull.restype = zsock_p
+lib.zsock_new_pull.argtypes = [c_char_p]
+lib.zsock_new_xpub.restype = zsock_p
+lib.zsock_new_xpub.argtypes = [c_char_p]
+lib.zsock_new_xsub.restype = zsock_p
+lib.zsock_new_xsub.argtypes = [c_char_p]
+lib.zsock_new_pair.restype = zsock_p
+lib.zsock_new_pair.argtypes = [c_char_p]
+lib.zsock_new_stream.restype = zsock_p
+lib.zsock_new_stream.argtypes = [c_char_p]
+lib.zsock_bind.restype = c_int
+lib.zsock_bind.argtypes = [zsock_p, c_char_p]
+lib.zsock_endpoint.restype = c_char_p
+lib.zsock_endpoint.argtypes = [zsock_p]
+lib.zsock_unbind.restype = c_int
+lib.zsock_unbind.argtypes = [zsock_p, c_char_p]
+lib.zsock_connect.restype = c_int
+lib.zsock_connect.argtypes = [zsock_p, c_char_p]
+lib.zsock_disconnect.restype = c_int
+lib.zsock_disconnect.argtypes = [zsock_p, c_char_p]
+lib.zsock_attach.restype = c_int
+lib.zsock_attach.argtypes = [zsock_p, c_char_p, c_bool]
+lib.zsock_type_str.restype = c_char_p
+lib.zsock_type_str.argtypes = [zsock_p]
+lib.zsock_send.restype = c_int
+lib.zsock_send.argtypes = [zsock_p, c_char_p]
+lib.zsock_vsend.restype = c_int
+lib.zsock_vsend.argtypes = [zsock_p, c_char_p, va_list_p]
+lib.zsock_recv.restype = c_int
+lib.zsock_recv.argtypes = [zsock_p, c_char_p]
+lib.zsock_vrecv.restype = c_int
+lib.zsock_vrecv.argtypes = [zsock_p, c_char_p, va_list_p]
+lib.zsock_bsend.restype = c_int
+lib.zsock_bsend.argtypes = [zsock_p, c_char_p]
+lib.zsock_brecv.restype = c_int
+lib.zsock_brecv.argtypes = [zsock_p, c_char_p]
+lib.zsock_set_unbounded.restype = None
+lib.zsock_set_unbounded.argtypes = [zsock_p]
+lib.zsock_signal.restype = c_int
+lib.zsock_signal.argtypes = [zsock_p, c_byte]
+lib.zsock_wait.restype = c_int
+lib.zsock_wait.argtypes = [zsock_p]
+lib.zsock_flush.restype = None
+lib.zsock_flush.argtypes = [zsock_p]
+lib.zsock_is.restype = c_bool
+lib.zsock_is.argtypes = [c_void_p]
+lib.zsock_resolve.restype = c_void_p
+lib.zsock_resolve.argtypes = [c_void_p]
+lib.zsock_test.restype = None
+lib.zsock_test.argtypes = [c_bool]
+
+class Zsock(object):
+    """high-level socket API that hides libzmq contexts and sockets"""
+
+    def __init__(self, *args):
+        """Create a new socket. Returns the new socket, or NULL if the new socket
+could not be created. Note that the symbol zsock_new (and other
+constructors/destructors for zsock) are redirected to the *_checked
+variant, enabling intelligent socket leak detection. This can have
+performance implications if you use a LOT of sockets. To turn off this
+redirection behaviour, define ZSOCK_NOCHECK."""
+        if len(args) == 2 and isinstance(args[0], zsock_p) and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            self._as_parameter_ = lib.zsock_new(*args) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destroy the socket. You must use this for any socket created via the
+zsock_new method."""
+        if self.allow_destruct:
+            lib.zsock_destroy(byref(self._as_parameter_))
+
+    @staticmethod
+    def new_pub(endpoint):
+        """Create a PUB socket. Default action is bind."""
+        return Zsock(lib.zsock_new_pub(endpoint), False)
+
+    @staticmethod
+    def new_sub(endpoint, subscribe):
+        """Create a SUB socket, and optionally subscribe to some prefix string. Default
+action is connect."""
+        return Zsock(lib.zsock_new_sub(endpoint, subscribe), False)
+
+    @staticmethod
+    def new_req(endpoint):
+        """Create a REQ socket. Default action is connect."""
+        return Zsock(lib.zsock_new_req(endpoint), False)
+
+    @staticmethod
+    def new_rep(endpoint):
+        """Create a REP socket. Default action is bind."""
+        return Zsock(lib.zsock_new_rep(endpoint), False)
+
+    @staticmethod
+    def new_dealer(endpoint):
+        """Create a DEALER socket. Default action is connect."""
+        return Zsock(lib.zsock_new_dealer(endpoint), False)
+
+    @staticmethod
+    def new_router(endpoint):
+        """Create a ROUTER socket. Default action is bind."""
+        return Zsock(lib.zsock_new_router(endpoint), False)
+
+    @staticmethod
+    def new_push(endpoint):
+        """Create a PUSH socket. Default action is connect."""
+        return Zsock(lib.zsock_new_push(endpoint), False)
+
+    @staticmethod
+    def new_pull(endpoint):
+        """Create a PULL socket. Default action is bind."""
+        return Zsock(lib.zsock_new_pull(endpoint), False)
+
+    @staticmethod
+    def new_xpub(endpoint):
+        """Create an XPUB socket. Default action is bind."""
+        return Zsock(lib.zsock_new_xpub(endpoint), False)
+
+    @staticmethod
+    def new_xsub(endpoint):
+        """Create an XSUB socket. Default action is connect."""
+        return Zsock(lib.zsock_new_xsub(endpoint), False)
+
+    @staticmethod
+    def new_pair(endpoint):
+        """Create a PAIR socket. Default action is connect."""
+        return Zsock(lib.zsock_new_pair(endpoint), False)
+
+    @staticmethod
+    def new_stream(endpoint):
+        """Create a STREAM socket. Default action is connect."""
+        return Zsock(lib.zsock_new_stream(endpoint), False)
+
+    def bind(self, format, *args):
+        """Bind a socket to a formatted endpoint. For tcp:// endpoints, supports
+ephemeral ports, if you specify the port number as "*". By default
+zsock uses the IANA designated range from C000 (49152) to FFFF (65535).
+To override this range, follow the "*" with "[first-last]". Either or
+both first and last may be empty. To bind to a random port within the
+range, use "!" in place of "*".
+
+Examples:
+    tcp://127.0.0.1:*           bind to first free port from C000 up
+    tcp://127.0.0.1:!           bind to random port from C000 to FFFF
+    tcp://127.0.0.1:*[60000-]   bind to first free port from 60000 up
+    tcp://127.0.0.1:![-60000]   bind to random port from C000 to 60000
+    tcp://127.0.0.1:![55000-55999]
+                                bind to random port from 55000 to 55999
+
+On success, returns the actual port number used, for tcp:// endpoints,
+and 0 for other transports. On failure, returns -1. Note that when using
+ephemeral ports, a port may be reused by different services without
+clients being aware. Protocols that run on ephemeral ports should take
+this into account."""
+        return lib.zsock_bind(self._as_parameter_, format, *args)
+
+    def endpoint(self):
+        """Returns last bound endpoint, if any."""
+        return lib.zsock_endpoint(self._as_parameter_)
+
+    def unbind(self, format, *args):
+        """Unbind a socket from a formatted endpoint.
+Returns 0 if OK, -1 if the endpoint was invalid or the function
+isn't supported."""
+        return lib.zsock_unbind(self._as_parameter_, format, *args)
+
+    def connect(self, format, *args):
+        """Connect a socket to a formatted endpoint
+Returns 0 if OK, -1 if the endpoint was invalid."""
+        return lib.zsock_connect(self._as_parameter_, format, *args)
+
+    def disconnect(self, format, *args):
+        """Disconnect a socket from a formatted endpoint
+Returns 0 if OK, -1 if the endpoint was invalid or the function
+isn't supported."""
+        return lib.zsock_disconnect(self._as_parameter_, format, *args)
+
+    def attach(self, endpoints, serverish):
+        """Attach a socket to zero or more endpoints. If endpoints is not null,
+parses as list of ZeroMQ endpoints, separated by commas, and prefixed by
+'@' (to bind the socket) or '>' (to attach the socket). Returns 0 if all
+endpoints were valid, or -1 if there was a syntax error. If the endpoint
+does not start with '@' or '>', the serverish argument defines whether
+it is used to bind (serverish = true) or connect (serverish = false)."""
+        return lib.zsock_attach(self._as_parameter_, endpoints, serverish)
+
+    def type_str(self):
+        """Returns socket type as printable constant string."""
+        return lib.zsock_type_str(self._as_parameter_)
+
+    def send(self, picture, *args):
+        """Send a 'picture' message to the socket (or actor). The picture is a
+string that defines the type of each frame. This makes it easy to send
+a complex multiframe message in one call. The picture can contain any
+of these characters, each corresponding to one or two arguments:
+
+    i = int (signed)
+    1 = uint8_t
+    2 = uint16_t
+    4 = uint32_t
+    8 = uint64_t
+    b = byte *, size_t (2 arguments)
+    c = zchunk_t *
+    f = zframe_t *
+    h = zhashx_t *
+    p = void * (sends the pointer value, only meaningful over inproc)
+    m = zmsg_t * (sends all frames in the zmsg)
+    z = sends zero-sized frame (0 arguments)
+    u = uint (deprecated)
+
+Note that s, b, c, and f are encoded the same way and the choice is
+offered as a convenience to the sender, which may or may not already
+have data in a zchunk or zframe. Does not change or take ownership of
+any arguments. Returns 0 if successful, -1 if sending failed for any
+reason."""
+        return lib.zsock_send(self._as_parameter_, picture, *args)
+
+    def vsend(self, picture, argptr):
+        """Send a 'picture' message to the socket (or actor). This is a va_list
+version of zsock_send (), so please consult its documentation for the
+details."""
+        return lib.zsock_vsend(self._as_parameter_, picture, argptr)
+
+    def recv(self, picture, *args):
+        """Receive a 'picture' message to the socket (or actor). See zsock_send for
+the format and meaning of the picture. Returns the picture elements into
+a series of pointers as provided by the caller:
+
+    i = int * (stores signed integer)
+    4 = uint32_t * (stores 32-bit unsigned integer)
+    8 = uint64_t * (stores 64-bit unsigned integer)
+    s = char ** (allocates new string)
+    b = byte **, size_t * (2 arguments) (allocates memory)
+    c = zchunk_t ** (creates zchunk)
+    f = zframe_t ** (creates zframe)
+    p = void ** (stores pointer)
+    h = zhashx_t ** (creates zhashx)
+    m = zmsg_t ** (creates a zmsg with the remaing frames)
+    z = null, asserts empty frame (0 arguments)
+    u = uint * (stores unsigned integer, deprecated)
+
+Note that zsock_recv creates the returned objects, and the caller must
+destroy them when finished with them. The supplied pointers do not need
+to be initialized. Returns 0 if successful, or -1 if it failed to recv
+a message, in which case the pointers are not modified. When message
+frames are truncated (a short message), sets return values to zero/null.
+If an argument pointer is NULL, does not store any value (skips it).
+An 'n' picture matches an empty frame; if the message does not match,
+the method will return -1."""
+        return lib.zsock_recv(self._as_parameter_, picture, *args)
+
+    def vrecv(self, picture, argptr):
+        """Receive a 'picture' message from the socket (or actor). This is a
+va_list version of zsock_recv (), so please consult its documentation
+for the details."""
+        return lib.zsock_vrecv(self._as_parameter_, picture, argptr)
+
+    def bsend(self, picture, *args):
+        """Send a binary encoded 'picture' message to the socket (or actor). This
+method is similar to zsock_send, except the arguments are encoded in a
+binary format that is compatible with zproto, and is designed to reduce
+memory allocations. The pattern argument is a string that defines the
+type of each argument. Supports these argument types:
+
+ pattern    C type                  zproto type:
+    1       uint8_t                 type = "number" size = "1"
+    2       uint16_t                type = "number" size = "2"
+    4       uint32_t                type = "number" size = "3"
+    8       uint64_t                type = "number" size = "4"
+    s       char *, 0-255 chars     type = "string"
+    S       char *, 0-2^32-1 chars  type = "longstr"
+    c       zchunk_t *              type = "chunk"
+    f       zframe_t *              type = "frame"
+    m       zmsg_t *                type = "msg"
+    p       void *, sends pointer value, only over inproc
+
+Does not change or take ownership of any arguments. Returns 0 if
+successful, -1 if sending failed for any reason."""
+        return lib.zsock_bsend(self._as_parameter_, picture, *args)
+
+    def brecv(self, picture, *args):
+        """Receive a binary encoded 'picture' message from the socket (or actor).
+This method is similar to zsock_recv, except the arguments are encoded
+in a binary format that is compatible with zproto, and is designed to
+reduce memory allocations. The pattern argument is a string that defines
+the type of each argument. See zsock_bsend for the supported argument
+types. All arguments must be pointers; this call sets them to point to
+values held on a per-socket basis. Do not modify or destroy the returned
+values. Returns 0 if successful, or -1 if it failed to read a message."""
+        return lib.zsock_brecv(self._as_parameter_, picture, *args)
+
+    def set_unbounded(self):
+        """Set socket to use unbounded pipes (HWM=0); use this in cases when you are
+totally certain the message volume can fit in memory. This method works
+across all versions of ZeroMQ. Takes a polymorphic socket reference."""
+        return lib.zsock_set_unbounded(self._as_parameter_)
+
+    def signal(self, status):
+        """Send a signal over a socket. A signal is a short message carrying a
+success/failure code (by convention, 0 means OK). Signals are encoded
+to be distinguishable from "normal" messages. Accepts a zock_t or a
+zactor_t argument, and returns 0 if successful, -1 if the signal could
+not be sent. Takes a polymorphic socket reference."""
+        return lib.zsock_signal(self._as_parameter_, status)
+
+    def wait(self):
+        """Wait on a signal. Use this to coordinate between threads, over pipe
+pairs. Blocks until the signal is received. Returns -1 on error, 0 or
+greater on success. Accepts a zsock_t or a zactor_t as argument.
+Takes a polymorphic socket reference."""
+        return lib.zsock_wait(self._as_parameter_)
+
+    def flush(self):
+        """If there is a partial message still waiting on the socket, remove and
+discard it. This is useful when reading partial messages, to get specific
+message types."""
+        return lib.zsock_flush(self._as_parameter_)
+
+    @staticmethod
+    def is_(self):
+        """Probe the supplied object, and report if it looks like a zsock_t.
+Takes a polymorphic socket reference."""
+        return lib.zsock_is(self)
+
+    @staticmethod
+    def resolve(self):
+        """Probe the supplied reference. If it looks like a zsock_t instance, return
+the underlying libzmq socket handle; else if it looks like a file
+descriptor, return NULL; else if it looks like a libzmq socket handle,
+return the supplied value. Takes a polymorphic socket reference."""
+        return lib.zsock_resolve(self)
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class"""
+        return lib.zsock_test(verbose)
 
 
 # zhash

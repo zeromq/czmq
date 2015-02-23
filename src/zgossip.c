@@ -172,7 +172,7 @@ server_initialize (server_t *self)
     
     self->remotes = zlistx_new ();
     assert (self->remotes);
-    zlistx_set_destructor (self->remotes, (czmq_destructor *) zsock_destroy_);
+    zlistx_set_destructor (self->remotes, (czmq_destructor *) zsock_destroy);
     
     self->tuples = zhashx_new ();
     assert (self->tuples);

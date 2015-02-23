@@ -1,4 +1,4 @@
-<class name="zlist">
+<class name="zlist" has_print="0">
     simple generic list container
 
     <include filename="../license.xml" />

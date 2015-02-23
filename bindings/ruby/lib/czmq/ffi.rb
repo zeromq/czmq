@@ -113,6 +113,43 @@ module CZMQ
       
       require_relative 'ffi/zmsg'
       
+      attach_function :zsock_new, [:int], :pointer, **opts
+      attach_function :zsock_destroy, [:pointer], :void, **opts
+      attach_function :zsock_new_pub, [:string], :pointer, **opts
+      attach_function :zsock_new_sub, [:string, :string], :pointer, **opts
+      attach_function :zsock_new_req, [:string], :pointer, **opts
+      attach_function :zsock_new_rep, [:string], :pointer, **opts
+      attach_function :zsock_new_dealer, [:string], :pointer, **opts
+      attach_function :zsock_new_router, [:string], :pointer, **opts
+      attach_function :zsock_new_push, [:string], :pointer, **opts
+      attach_function :zsock_new_pull, [:string], :pointer, **opts
+      attach_function :zsock_new_xpub, [:string], :pointer, **opts
+      attach_function :zsock_new_xsub, [:string], :pointer, **opts
+      attach_function :zsock_new_pair, [:string], :pointer, **opts
+      attach_function :zsock_new_stream, [:string], :pointer, **opts
+      attach_function :zsock_bind, [:pointer, :string, :varargs], :int, **opts
+      attach_function :zsock_endpoint, [:pointer], :string, **opts
+      attach_function :zsock_unbind, [:pointer, :string, :varargs], :int, **opts
+      attach_function :zsock_connect, [:pointer, :string, :varargs], :int, **opts
+      attach_function :zsock_disconnect, [:pointer, :string, :varargs], :int, **opts
+      attach_function :zsock_attach, [:pointer, :string, :bool], :int, **opts
+      attach_function :zsock_type_str, [:pointer], :string, **opts
+      attach_function :zsock_send, [:pointer, :string, :varargs], :int, **opts
+      attach_function :zsock_vsend, [:pointer, :string, :pointer], :int, **opts
+      attach_function :zsock_recv, [:pointer, :string, :varargs], :int, **opts
+      attach_function :zsock_vrecv, [:pointer, :string, :pointer], :int, **opts
+      attach_function :zsock_bsend, [:pointer, :string, :varargs], :int, **opts
+      attach_function :zsock_brecv, [:pointer, :string, :varargs], :int, **opts
+      attach_function :zsock_set_unbounded, [:pointer], :void, **opts
+      attach_function :zsock_signal, [:pointer, :pointer], :int, **opts
+      attach_function :zsock_wait, [:pointer], :int, **opts
+      attach_function :zsock_flush, [:pointer], :void, **opts
+      attach_function :zsock_is, [:pointer], :bool, **opts
+      attach_function :zsock_resolve, [:pointer], :pointer, **opts
+      attach_function :zsock_test, [:bool], :void, **opts
+      
+      require_relative 'ffi/zsock'
+      
       attach_function :zhash_new, [], :pointer, **opts
       attach_function :zhash_destroy, [:pointer], :void, **opts
       attach_function :zhash_insert, [:pointer, :string, :pointer], :int, **opts

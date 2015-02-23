@@ -1,4 +1,4 @@
-<class name="zhash">
+<class name="zhash" has_print="0">
     generic type-free hash container (simple)
 
     <include filename = "../license.xml" />
