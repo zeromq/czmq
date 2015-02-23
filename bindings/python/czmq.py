@@ -985,8 +985,8 @@ return the supplied value. Takes a polymorphic socket reference."""
 
 
 # zhash
-zhash_free_fn = CFUNCTYPE(None, c_void_p)
-zhash_foreach_fn = CFUNCTYPE(c_int, c_char_p, c_void_p, c_void_p)
+free_fn = CALLBACK(None, c_void_p)
+foreach_fn = CALLBACK(c_int, c_char_p, c_void_p, c_void_p)
 lib.zhash_new.restype = zhash_p
 lib.zhash_new.argtypes = []
 lib.zhash_destroy.restype = None

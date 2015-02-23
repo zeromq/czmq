@@ -102,9 +102,9 @@ src_libczmq_la_SOURCES = \
     src/zsocket.c \
     src/zsockopt.c \
     src/zthread.c \
-    src/zgossip_engine.inc \
-    src/zhash_primes.inc \
-    src/zclass_example.xml \
+    src/zgossip_engine_inc \
+    src/zhash_primes_inc \
+    src/zclass_example_xml \
     src/platform.h
 
 src_libczmq_la_CPPFLAGS = ${AM_CPPFLAGS}
