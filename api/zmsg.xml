@@ -1,4 +1,4 @@
-<class name="zmsg">
+<class name = "zmsg">
     working with multipart messages
 
     <include filename = "../license.xml" />
@@ -11,222 +11,222 @@
         Destroy a message object and all frames it contains
     </destructor>
 
-    <method name="recv" singleton="1">
+    <method name = "recv" singleton = "1">
         Receive message from socket, returns zmsg_t object or NULL if the recv
         was interrupted. Does a blocking recv. If you want to not block then use
         the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
         before receiving.
-        <argument name="source" type="anything" />
-        <return type="zmsg" fresh="1" />
+        <argument name = "source" type = "anything" />
+        <return type = "zmsg" fresh = "1" />
     </method>
 
-    <method name="send" singleton="1">
+    <method name = "send" singleton = "1">
         Send message to destination socket, and destroy the message after sending
         it successfully. If the message has no frames, sends nothing but destroys
         the message anyhow. Nullifies the caller's reference to the message (as
         it is a destructor).
-        <argument name="self_p" type="zmsg" by_reference="1" />
-        <argument name="dest" type="anything" />
-        <return type="integer" />
+        <argument name = "self_p" type = "zmsg" by_reference = "1" />
+        <argument name = "dest" type = "anything" />
+        <return type = "integer" />
     </method>
 
-    <method name="size">
+    <method name = "size">
         Return size of message, i.e. number of frames (0 or more).
-        <return type="size" />
+        <return type = "size" />
     </method>
 
-    <method name="content size">
+    <method name = "content size">
         Return total size of all frames in message.
-        <return type="size" />
+        <return type = "size" />
     </method>
 
-    <method name="prepend">
+    <method name = "prepend">
         Push frame to the front of the message, i.e. before all other frames.
         Message takes ownership of frame, will destroy it when message is sent.
         Returns 0 on success, -1 on error. Deprecates zmsg_push, which did not
         nullify the caller's frame reference.
-        <argument name="frame_p" type="zframe" by_reference="1" />
-        <return type="integer" />
+        <argument name = "frame_p" type = "zframe" by_reference = "1" />
+        <return type = "integer" />
     </method>
 
-    <method name="append">
+    <method name = "append">
         Add frame to the end of the message, i.e. after all other frames.
         Message takes ownership of frame, will destroy it when message is sent.
         Returns 0 on success. Deprecates zmsg_add, which did not nullify the
         caller's frame reference.
-        <argument name="frame_p" type="zframe" by_reference="1" />
-        <return type="integer" />
+        <argument name = "frame_p" type = "zframe" by_reference = "1" />
+        <return type = "integer" />
     </method>
 
-    <method name="pop">
+    <method name = "pop">
         Remove first frame from message, if any. Returns frame, or NULL. Caller
         now owns frame and must destroy it when finished with it.
-        <return type="zframe" fresh="1" />
+        <return type = "zframe" fresh = "1" />
     </method>
 
-    <method name="pushmem">
+    <method name = "pushmem">
         Push block of memory to front of message, as a new frame.
         Returns 0 on success, -1 on error.
-        <argument name="src" type="anything" constant="1" />
-        <argument name="size" type="size" />
-        <return type="integer" />
+        <argument name = "src" type = "anything" constant = "1" />
+        <argument name = "size" type = "size" />
+        <return type = "integer" />
     </method>
 
-    <method name="addmem">
+    <method name = "addmem">
         Add block of memory to the end of the message, as a new frame.
         Returns 0 on success, -1 on error.
-        <argument name="src" type="anything" constant="1" />
-        <argument name="size" type="size" />
-        <return type="integer" />
+        <argument name = "src" type = "anything" constant = "1" />
+        <argument name = "size" type = "size" />
+        <return type = "integer" />
     </method>
 
-    <method name="pushstr">
+    <method name = "pushstr">
         Push string as new frame to front of message.
         Returns 0 on success, -1 on error.
-        <argument name="string" type="string" />
-        <return type="integer" />
+        <argument name = "string" type = "string" />
+        <return type = "integer" />
     </method>
 
-    <method name="addstr">
+    <method name = "addstr">
         Push string as new frame to end of message.
         Returns 0 on success, -1 on error.
-        <argument name="string" type="string" />
-        <return type="integer" />
+        <argument name = "string" type = "string" />
+        <return type = "integer" />
     </method>
 
-    <method name="pushstrf">
+    <method name = "pushstrf">
         Push formatted string as new frame to front of message.
         Returns 0 on success, -1 on error.
-        <argument name="format" type="format" />
-        <return type="integer" />
+        <argument name = "format" type = "format" />
+        <return type = "integer" />
     </method>
 
-    <method name="addstrf">
+    <method name = "addstrf">
         Push formatted string as new frame to end of message.
         Returns 0 on success, -1 on error.
-        <argument name="format" type="format" />
-        <return type="integer" />
+        <argument name = "format" type = "format" />
+        <return type = "integer" />
     </method>
 
-    <method name="popstr">
+    <method name = "popstr">
         Pop frame off front of message, return as fresh string. If there were
         no more frames in the message, returns NULL.
-        <return type="string" fresh="1" />
+        <return type = "string" fresh = "1" />
     </method>
 
-    <method name="addmsg">
+    <method name = "addmsg">
         Push encoded message as a new frame. Message takes ownership of
         submessage, so the original is destroyed in this call. Returns 0 on
         success, -1 on error.
-        <argument name="msg_p" type="zmsg" by_reference="1" />
-        <return type="integer" />
+        <argument name = "msg_p" type = "zmsg" by_reference = "1" />
+        <return type = "integer" />
     </method>
 
-    <method name="popmsg">
+    <method name = "popmsg">
         Remove first submessage from message, if any. Returns zmsg_t, or NULL if
         decoding was not succesfull. Caller now owns message and must destroy it
         when finished with it.
-        <return type="zmsg" fresh="1" />
+        <return type = "zmsg" fresh = "1" />
     </method>
 
-    <method name="remove">
+    <method name = "remove">
         Remove specified frame from list, if present. Does not destroy frame.
-        <argument name="frame" type="zframe" />
+        <argument name = "frame" type = "zframe" />
     </method>
 
-    <method name="first">
+    <method name = "first">
         Set cursor to first frame in message. Returns frame, or NULL, if the 
         message is empty. Use this to navigate the frames as a list.
-        <return type="zframe" />
+        <return type = "zframe" />
     </method>
 
-    <method name="next">
+    <method name = "next">
         Return the next frame. If there are no more frames, returns NULL. To move
         to the first frame call zmsg_first(). Advances the cursor.
-        <return type="zframe" />
+        <return type = "zframe" />
     </method>
 
-    <method name="last">
+    <method name = "last">
         Return the last frame. If there are no frames, returns NULL.
-        <return type="zframe" />
+        <return type = "zframe" />
     </method>
 
-    <method name="save">
+    <method name = "save">
         Save message to an open file, return 0 if OK, else -1. The message is 
         saved as a series of frames, each with length and data. Note that the
         file is NOT guaranteed to be portable between operating systems, not
         versions of CZMQ. The file format is at present undocumented and liable
         to arbitrary change.
-        <argument name="file" type="FILE" />
-        <return type="integer" />
+        <argument name = "file" type = "FILE" />
+        <return type = "integer" />
     </method>
 
-    <method name="load">
+    <method name = "load">
         Load/append an open file into message, create new message if
         null message provided. Returns NULL if the message could not 
         be loaded.
-        <argument name="file" type="FILE" />
-        <return type="zmsg" fresh="1" />
+        <argument name = "file" type = "FILE" />
+        <return type = "zmsg" fresh = "1" />
     </method>
 
-    <method name="encode">
+    <method name = "encode">
         Serialize multipart message to a single buffer. Use this method to send
         structured messages across transports that do not support multipart data.
         Allocates and returns a new buffer containing the serialized message.
         To decode a serialized message buffer, use zmsg_decode ().
-        <argument name="buffer" type="buffer" by_reference="1" fresh="1" />
-        <return type="size" />
+        <argument name = "buffer" type = "buffer" by_reference = "1" fresh = "1" />
+        <return type = "size" />
     </method>
 
-    <method name="decode" singleton="1">
+    <method name = "decode" singleton = "1">
         Decodes a serialized message buffer created by zmsg_encode () and returns
         a new zmsg_t object. Returns NULL if the buffer was badly formatted or 
         there was insufficient memory to work.
-        <argument name="buffer" type="buffer" />
-        <argument name="buffer size" type="size" />
-        <return type="zmsg" fresh="1" />
+        <argument name = "buffer" type = "buffer" />
+        <argument name = "buffer size" type = "size" />
+        <return type = "zmsg" fresh = "1" />
     </method>
 
-    <method name="dup">
+    <method name = "dup">
         Create copy of message, as new message object. Returns a fresh zmsg_t
         object. If message is null, or memory was exhausted, returns null.
-        <return type="zmsg" fresh="1" />
+        <return type = "zmsg" fresh = "1" />
     </method>
 
-    <method name="print">
+    <method name = "print">
         Send message to zsys log sink (may be stdout, or system facility as
         configured by zsys_set_logstream).
     </method>
 
-    <method name="eq">
+    <method name = "eq">
         Return true if the two messages have the same number of frames and each
         frame in the first message is identical to the corresponding frame in the
         other message. As with zframe_eq, return false if either message is NULL.
-        <argument name="other" type="zmsg" />
-        <return type="boolean" />
+        <argument name = "other" type = "zmsg" />
+        <return type = "boolean" />
     </method>
 
-    <method name="new signal" singleton="1">
+    <method name = "new signal" singleton = "1">
         Generate a signal message encoding the given status. A signal is a short
         message carrying a 1-byte success/failure code (by convention, 0 means
         OK). Signals are encoded to be distinguishable from "normal" messages.
-        <argument name="status" type="byte" />
-        <return type="zmsg" fresh="1" />
+        <argument name = "status" type = "byte" />
+        <return type = "zmsg" fresh = "1" />
     </method>
 
-    <method name="signal">
+    <method name = "signal">
         Return signal value, 0 or greater, if message is a signal, -1 if not.
-        <return type="integer" />
+        <return type = "integer" />
     </method>
 
-    <method name="is" singleton="1">
+    <method name = "is" singleton = "1">
         Probe the supplied object, and report if it looks like a zmsg_t.
-        <argument name="self" type="anything" />
-        <return type="boolean" />
+        <argument name = "self" type = "anything" />
+        <return type = "boolean" />
     </method>
 
-    <method name="test" singleton="1">
+    <method name = "test" singleton = "1">
         Self test of this class
-        <argument name="verbose" type="boolean" />
+        <argument name = "verbose" type = "boolean" />
     </method>
 </class>
