@@ -20,50 +20,19 @@ extern "C" {
 
 //  @interface
 
-#if defined (ZSOCK_NOCHECK)
-#   define zsock_new(t) zsock_new_((t), NULL, 0)
-#   define zsock_new_pub(e) zsock_new_pub_((e), NULL, 0)
-#   define zsock_new_sub(e,s) zsock_new_sub_((e), (s), NULL, 0)
-#   define zsock_new_req(e) zsock_new_req_((e), NULL, 0)
-#   define zsock_new_rep(e) zsock_new_rep_((e), NULL, 0)
-#   define zsock_new_dealer(e) zsock_new_dealer_((e), NULL, 0)
-#   define zsock_new_router(e) zsock_new_router_((e), NULL, 0)
-#   define zsock_new_pull(e) zsock_new_pull_((e), NULL, 0)
-#   define zsock_new_push(e) zsock_new_push_((e), NULL, 0)
-#   define zsock_new_xpub(e) zsock_new_xpub_((e), NULL, 0)
-#   define zsock_new_xsub(e) zsock_new_xsub_((e), NULL, 0)
-#   define zsock_new_pair(e) zsock_new_pair_((e), NULL, 0)
-#   define zsock_new_stream(e) zsock_new_stream_((e), NULL, 0)
-#   define zsock_destroy(t) zsock_destroy_((t), NULL, 0)
-#else
-#   define zsock_new(t) zsock_new_((t), __FILE__, __LINE__)
-#   define zsock_new_pub(e) zsock_new_pub_((e), __FILE__, __LINE__)
-#   define zsock_new_sub(e,s) zsock_new_sub_((e), (s), __FILE__, __LINE__)
-#   define zsock_new_req(e) zsock_new_req_((e), __FILE__, __LINE__)
-#   define zsock_new_rep(e) zsock_new_rep_((e), __FILE__, __LINE__)
-#   define zsock_new_dealer(e) zsock_new_dealer_((e), __FILE__, __LINE__)
-#   define zsock_new_router(e) zsock_new_router_((e), __FILE__, __LINE__)
-#   define zsock_new_pull(e) zsock_new_pull_((e), __FILE__, __LINE__)
-#   define zsock_new_push(e) zsock_new_push_((e), __FILE__, __LINE__)
-#   define zsock_new_xpub(e) zsock_new_xpub_((e), __FILE__, __LINE__)
-#   define zsock_new_xsub(e) zsock_new_xsub_((e), __FILE__, __LINE__)
-#   define zsock_new_pair(e) zsock_new_pair_((e), __FILE__, __LINE__)
-#   define zsock_new_stream(e) zsock_new_stream_((e), __FILE__, __LINE__)
-#   define zsock_destroy(t) zsock_destroy_((t), __FILE__, __LINE__)
-#endif
-
-//  Create a new socket. This macro passes the caller source and line
-//  number so that CZMQ can report socket leaks intelligently. To switch
-//  off this checking, which may be costly if you use a LOT of sockets,
-//  define ZSOCK_NOCHECK before compiling your code. Returns the new
-//  socket, or NULL if the new socket could not be created.
+//  Create a new socket. Returns the new socket, or NULL if the new socket
+//  could not be created. Note that the symbol zsock_new (and other
+//  constructors/destructors for zsock) are redirected to the *_checked
+//  variant, enabling intelligent socket leak detection. This can have
+//  performance implications if you use a LOT of sockets. To turn off this
+//  redirection behaviour, define ZSOCK_NOCHECK.
 CZMQ_EXPORT zsock_t *
-    zsock_new_ (int type, const char *filename, size_t line_nbr);
+    zsock_new (int type);
 
 //  Destroy the socket. You must use this for any socket created via the
 //  zsock_new method.
 CZMQ_EXPORT void
-    zsock_destroy_ (zsock_t **self_p, const char *filename, size_t line_nbr);
+    zsock_destroy (zsock_t **self_p);
 
 //  Smart constructors, which create sockets with additional set-up. In all of
 //  these, the endpoint is NULL, or starts with '@' (connect) or '>' (bind).
@@ -72,52 +41,52 @@ CZMQ_EXPORT void
 
 //  Create a PUB socket. Default action is bind.
 CZMQ_EXPORT zsock_t *
-    zsock_new_pub_ (const char *endpoint, const char *filename, size_t line_nbr);
+    zsock_new_pub (const char *endpoint);
 
 //  Create a SUB socket, and optionally subscribe to some prefix string. Default
 //  action is connect.
 CZMQ_EXPORT zsock_t *
-    zsock_new_sub_ (const char *endpoint, const char *subscribe, const char *filename, size_t line_nbr);
+    zsock_new_sub (const char *endpoint, const char *subscribe);
 
 //  Create a REQ socket. Default action is connect.
 CZMQ_EXPORT zsock_t *
-    zsock_new_req_ (const char *endpoint, const char *filename, size_t line_nbr);
+    zsock_new_req (const char *endpoint);
 
 //  Create a REP socket. Default action is bind.
 CZMQ_EXPORT zsock_t *
-    zsock_new_rep_ (const char *endpoint, const char *filename, size_t line_nbr);
+    zsock_new_rep (const char *endpoint);
 
 //  Create a DEALER socket. Default action is connect.
 CZMQ_EXPORT zsock_t *
-    zsock_new_dealer_ (const char *endpoint, const char *filename, size_t line_nbr);
+    zsock_new_dealer (const char *endpoint);
 
 //  Create a ROUTER socket. Default action is bind.
 CZMQ_EXPORT zsock_t *
-    zsock_new_router_ (const char *endpoint, const char *filename, size_t line_nbr);
+    zsock_new_router (const char *endpoint);
 
 //  Create a PUSH socket. Default action is connect.
 CZMQ_EXPORT zsock_t *
-    zsock_new_push_ (const char *endpoint, const char *filename, size_t line_nbr);
+    zsock_new_push (const char *endpoint);
 
 //  Create a PULL socket. Default action is bind.
 CZMQ_EXPORT zsock_t *
-    zsock_new_pull_ (const char *endpoint, const char *filename, size_t line_nbr);
+    zsock_new_pull (const char *endpoint);
 
 //  Create an XPUB socket. Default action is bind.
 CZMQ_EXPORT zsock_t *
-    zsock_new_xpub_ (const char *endpoint, const char *filename, size_t line_nbr);
+    zsock_new_xpub (const char *endpoint);
 
 //  Create an XSUB socket. Default action is connect.
 CZMQ_EXPORT zsock_t *
-    zsock_new_xsub_ (const char *endpoint, const char *filename, size_t line_nbr);
+    zsock_new_xsub (const char *endpoint);
 
 //  Create a PAIR socket. Default action is connect.
 CZMQ_EXPORT zsock_t *
-    zsock_new_pair_ (const char *endpoint, const char *filename, size_t line_nbr);
+    zsock_new_pair (const char *endpoint);
 
 //  Create a STREAM socket. Default action is connect.
 CZMQ_EXPORT zsock_t *
-    zsock_new_stream_ (const char *endpoint, const char *filename, size_t line_nbr);
+    zsock_new_stream (const char *endpoint);
 
 //  Bind a socket to a formatted endpoint. For tcp:// endpoints, supports
 //  ephemeral ports, if you specify the port number as "*". By default
@@ -310,7 +279,7 @@ CZMQ_EXPORT bool
     zsock_is (void *self);
 
 //  Probe the supplied reference. If it looks like a zsock_t instance, return
-//  the underlying libzmq socket handle; elsie if it looks like a file
+//  the underlying libzmq socket handle; else if it looks like a file
 //  descriptor, return NULL; else if it looks like a libzmq socket handle,
 //  return the supplied value. Takes a polymorphic socket reference.
 CZMQ_EXPORT void *
@@ -326,6 +295,70 @@ CZMQ_EXPORT int zsock_bind (zsock_t *self, const char *format, ...) CHECK_PRINTF
 CZMQ_EXPORT int zsock_unbind (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
 CZMQ_EXPORT int zsock_connect (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
 CZMQ_EXPORT int zsock_disconnect (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
+
+// zsock leak detection - not a part of the official interface to zsock. This
+// enables CZMQ to report socket leaks intelligently.
+#if defined ZSOCK_NOCHECK 
+    // no checking active - use the above interface methods directly.
+#else
+#   define zsock_new(t) zsock_new_checked((t), __FILE__, __LINE__)
+#   define zsock_new_pub(e) zsock_new_pub_checked((e), __FILE__, __LINE__)
+#   define zsock_new_sub(e,s) zsock_new_sub_checked((e), (s), __FILE__, __LINE__)
+#   define zsock_new_req(e) zsock_new_req_checked((e), __FILE__, __LINE__)
+#   define zsock_new_rep(e) zsock_new_rep_checked((e), __FILE__, __LINE__)
+#   define zsock_new_dealer(e) zsock_new_dealer_checked((e), __FILE__, __LINE__)
+#   define zsock_new_router(e) zsock_new_router_checked((e), __FILE__, __LINE__)
+#   define zsock_new_pull(e) zsock_new_pull_checked((e), __FILE__, __LINE__)
+#   define zsock_new_push(e) zsock_new_push_checked((e), __FILE__, __LINE__)
+#   define zsock_new_xpub(e) zsock_new_xpub_checked((e), __FILE__, __LINE__)
+#   define zsock_new_xsub(e) zsock_new_xsub_checked((e), __FILE__, __LINE__)
+#   define zsock_new_pair(e) zsock_new_pair_checked((e), __FILE__, __LINE__)
+#   define zsock_new_stream(e) zsock_new_stream_checked((e), __FILE__, __LINE__)
+#   define zsock_destroy(t) zsock_destroy_checked((t), __FILE__, __LINE__)
+#endif
+
+CZMQ_EXPORT zsock_t *
+    zsock_new_checked (int type, const char *filename, size_t line_nbr);
+
+CZMQ_EXPORT void
+    zsock_destroy_checked (zsock_t **self_p, const char *filename, size_t line_nbr);
+
+CZMQ_EXPORT zsock_t *
+    zsock_new_pub_checked (const char *endpoint, const char *filename, size_t line_nbr);
+
+CZMQ_EXPORT zsock_t *
+    zsock_new_sub_checked (const char *endpoint, const char *subscribe, const char *filename, size_t line_nbr);
+
+CZMQ_EXPORT zsock_t *
+    zsock_new_req_checked (const char *endpoint, const char *filename, size_t line_nbr);
+
+CZMQ_EXPORT zsock_t *
+    zsock_new_rep_checked (const char *endpoint, const char *filename, size_t line_nbr);
+
+CZMQ_EXPORT zsock_t *
+    zsock_new_dealer_checked (const char *endpoint, const char *filename, size_t line_nbr);
+
+CZMQ_EXPORT zsock_t *
+    zsock_new_router_checked (const char *endpoint, const char *filename, size_t line_nbr);
+
+CZMQ_EXPORT zsock_t *
+    zsock_new_push_checked (const char *endpoint, const char *filename, size_t line_nbr);
+
+CZMQ_EXPORT zsock_t *
+    zsock_new_pull_checked (const char *endpoint, const char *filename, size_t line_nbr);
+
+CZMQ_EXPORT zsock_t *
+    zsock_new_xpub_checked (const char *endpoint, const char *filename, size_t line_nbr);
+
+CZMQ_EXPORT zsock_t *
+    zsock_new_xsub_checked (const char *endpoint, const char *filename, size_t line_nbr);
+
+CZMQ_EXPORT zsock_t *
+    zsock_new_pair_checked (const char *endpoint, const char *filename, size_t line_nbr);
+
+CZMQ_EXPORT zsock_t *
+    zsock_new_stream_checked (const char *endpoint, const char *filename, size_t line_nbr);
+
 
 #ifdef __cplusplus
 }

@@ -21,6 +21,8 @@
 @end
 */
 
+#define ZSOCK_NOCHECK // we are defining the methods here, so don't redirect symbols.
+
 #include "../include/czmq.h"
 
 //  zsock_t instances always have this tag as the first 4 octets of
@@ -54,7 +56,7 @@ struct _zsock_t {
 //  socket, or NULL if the new socket could not be created.
 
 zsock_t *
-zsock_new_ (int type, const char *filename, size_t line_nbr)
+zsock_new_checked (int type, const char *filename, size_t line_nbr)
 {
     zsock_t *self = (zsock_t *) zmalloc (sizeof (zsock_t));
     if (self) {
@@ -67,13 +69,18 @@ zsock_new_ (int type, const char *filename, size_t line_nbr)
     return self;
 }
 
+zsock_t *
+zsock_new (int type)
+{
+    return zsock_new_checked (type, NULL, 0);
+}
 
 //  --------------------------------------------------------------------------
 //  Destroy the socket. You must use this for any socket created via the
 //  zsock_new method.
 
 void
-zsock_destroy_ (zsock_t **self_p, const char *filename, size_t line_nbr)
+zsock_destroy_checked (zsock_t **self_p, const char *filename, size_t line_nbr)
 {
     assert (self_p);
     if (*self_p) {
@@ -89,6 +96,11 @@ zsock_destroy_ (zsock_t **self_p, const char *filename, size_t line_nbr)
     }
 }
 
+void zsock_destroy (zsock_t **self_p)
+{
+    zsock_destroy_checked (self_p, NULL, 0);
+}
+
 
 //  --------------------------------------------------------------------------
 //  Smart constructors, which create sockets with additional set-up. In all of
@@ -98,24 +110,29 @@ zsock_destroy_ (zsock_t **self_p, const char *filename, size_t line_nbr)
 //  Create a PUB socket. Default action is bind.
 
 zsock_t *
-zsock_new_pub_ (const char *endpoints, const char *filename, size_t line_nbr)
+zsock_new_pub_checked (const char *endpoints, const char *filename, size_t line_nbr)
 {
-    zsock_t *sock = zsock_new_ (ZMQ_PUB, filename, line_nbr);
+    zsock_t *sock = zsock_new_checked (ZMQ_PUB, filename, line_nbr);
     if (sock)
         if (zsock_attach (sock, endpoints, true))
             zsock_destroy (&sock);
     return sock;
 }
 
+zsock_t *
+zsock_new_pub (const char *endpoints)
+{
+    return zsock_new_pub_checked (endpoints, NULL, 0);
+}
 
 //  --------------------------------------------------------------------------
 //  Create a SUB socket, and optionally subscribe to some prefix string. Default
 //  action is connect.
 
 zsock_t *
-zsock_new_sub_ (const char *endpoints, const char *subscribe, const char *filename, size_t line_nbr)
+zsock_new_sub_checked (const char *endpoints, const char *subscribe, const char *filename, size_t line_nbr)
 {
-    zsock_t *sock = zsock_new_ (ZMQ_SUB, filename, line_nbr);
+    zsock_t *sock = zsock_new_checked (ZMQ_SUB, filename, line_nbr);
     if (sock) {
         if (zsock_attach (sock, endpoints, false) == 0) {
             if (subscribe)
@@ -127,99 +144,134 @@ zsock_new_sub_ (const char *endpoints, const char *subscribe, const char *filena
     return sock;
 }
 
+zsock_t *
+zsock_new_sub (const char *endpoints, const char *subscribe)
+{
+    return zsock_new_sub_checked (endpoints, subscribe, NULL, 0);
+}
 
 //  --------------------------------------------------------------------------
 //  Create a REQ socket. Default action is connect.
 
 zsock_t *
-zsock_new_req_ (const char *endpoints, const char *filename, size_t line_nbr)
+zsock_new_req_checked (const char *endpoints, const char *filename, size_t line_nbr)
 {
-    zsock_t *sock = zsock_new_ (ZMQ_REQ, filename, line_nbr);
+    zsock_t *sock = zsock_new_checked (ZMQ_REQ, filename, line_nbr);
     if (sock)
         if (zsock_attach (sock, endpoints, false))
             zsock_destroy (&sock);
     return sock;
 }
 
+zsock_t *
+zsock_new_req (const char *endpoints)
+{
+    return zsock_new_req_checked (endpoints, NULL, 0);
+}
 
 //  --------------------------------------------------------------------------
 //  Create a REP socket. Default action is bind.
 
 zsock_t *
-zsock_new_rep_ (const char *endpoints, const char *filename, size_t line_nbr)
+zsock_new_rep_checked (const char *endpoints, const char *filename, size_t line_nbr)
 {
-    zsock_t *sock = zsock_new_ (ZMQ_REP, filename, line_nbr);
+    zsock_t *sock = zsock_new_checked (ZMQ_REP, filename, line_nbr);
     if (sock)
         if (zsock_attach (sock, endpoints, true))
             zsock_destroy (&sock);
     return sock;
 }
 
+zsock_t *
+zsock_new_rep (const char *endpoints)
+{
+    return zsock_new_rep_checked (endpoints, NULL, 0);
+}
 
 //  --------------------------------------------------------------------------
 //  Create a DEALER socket. Default action is connect.
 
 zsock_t *
-zsock_new_dealer_ (const char *endpoints, const char *filename, size_t line_nbr)
+zsock_new_dealer_checked (const char *endpoints, const char *filename, size_t line_nbr)
 {
-    zsock_t *sock = zsock_new_ (ZMQ_DEALER, filename, line_nbr);
+    zsock_t *sock = zsock_new_checked (ZMQ_DEALER, filename, line_nbr);
     if (sock)
         if (zsock_attach (sock, endpoints, false))
             zsock_destroy (&sock);
     return sock;
 }
 
+zsock_t *
+zsock_new_dealer (const char *endpoints)
+{
+    return zsock_new_dealer_checked (endpoints, NULL, 0);
+}
 
 //  --------------------------------------------------------------------------
 //  Create a ROUTER socket. Default action is bind.
 
 zsock_t *
-zsock_new_router_ (const char *endpoints, const char *filename, size_t line_nbr)
+zsock_new_router_checked (const char *endpoints, const char *filename, size_t line_nbr)
 {
-    zsock_t *sock = zsock_new_ (ZMQ_ROUTER, filename, line_nbr);
+    zsock_t *sock = zsock_new_checked (ZMQ_ROUTER, filename, line_nbr);
     if (sock)
         if (zsock_attach (sock, endpoints, true))
             zsock_destroy (&sock);
     return sock;
 }
 
+zsock_t *
+zsock_new_router (const char *endpoints)
+{
+    return zsock_new_router_checked (endpoints, NULL, 0);
+}
 
 //  --------------------------------------------------------------------------
 //  Create a PUSH socket. Default action is connect.
 
 zsock_t *
-zsock_new_push_ (const char *endpoints, const char *filename, size_t line_nbr)
+zsock_new_push_checked (const char *endpoints, const char *filename, size_t line_nbr)
 {
-    zsock_t *sock = zsock_new_ (ZMQ_PUSH, filename, line_nbr);
+    zsock_t *sock = zsock_new_checked (ZMQ_PUSH, filename, line_nbr);
     if (sock)
         if (zsock_attach (sock, endpoints, false))
             zsock_destroy (&sock);
     return sock;
 }
 
+zsock_t *
+zsock_new_push (const char *endpoints)
+{
+    return zsock_new_push_checked(endpoints, NULL, 0);
+}
 
 //  --------------------------------------------------------------------------
 //  Create a PULL socket. Default action is bind.
 
 zsock_t *
-zsock_new_pull_ (const char *endpoints, const char *filename, size_t line_nbr)
+zsock_new_pull_checked (const char *endpoints, const char *filename, size_t line_nbr)
 {
-    zsock_t *sock = zsock_new_ (ZMQ_PULL, filename, line_nbr);
+    zsock_t *sock = zsock_new_checked (ZMQ_PULL, filename, line_nbr);
     if (sock)
         if (zsock_attach (sock, endpoints, true))
             zsock_destroy (&sock);
     return sock;
 }
 
+zsock_t *
+zsock_new_pull (const char *endpoints)
+{
+    return zsock_new_pull_checked (endpoints, NULL, 0);
+}
 
 //  --------------------------------------------------------------------------
 //  Create an XPUB socket. Default action is bind.
 
 zsock_t *
-zsock_new_xpub_ (const char *endpoints, const char *filename, size_t line_nbr)
+zsock_new_xpub_checked (const char *endpoints, const char *filename, size_t line_nbr)
 {
 #if defined ZMQ_XPUB
-    zsock_t *sock = zsock_new_ (ZMQ_XPUB, filename, line_nbr);
+    zsock_t *sock = zsock_new_checked (ZMQ_XPUB, filename, line_nbr);
     if (sock)
         if (zsock_attach (sock, endpoints, true))
             zsock_destroy (&sock);
@@ -229,15 +281,20 @@ zsock_new_xpub_ (const char *endpoints, const char *filename, size_t line_nbr)
 #endif
 }
 
+zsock_t *
+zsock_new_xpub (const char *endpoints)
+{
+    return zsock_new_xpub_checked (endpoints, NULL, 0);
+}
 
 //  --------------------------------------------------------------------------
 //  Create an XSUB socket. Default action is connect.
 
 zsock_t *
-zsock_new_xsub_ (const char *endpoints, const char *filename, size_t line_nbr)
+zsock_new_xsub_checked (const char *endpoints, const char *filename, size_t line_nbr)
 {
 #if defined ZMQ_XSUB
-    zsock_t *sock = zsock_new_ (ZMQ_XSUB, filename, line_nbr);
+    zsock_t *sock = zsock_new_checked (ZMQ_XSUB, filename, line_nbr);
     if (sock)
         if (zsock_attach (sock, endpoints, false))
             zsock_destroy (&sock);
@@ -247,29 +304,39 @@ zsock_new_xsub_ (const char *endpoints, const char *filename, size_t line_nbr)
 #endif
 }
 
+zsock_t *
+zsock_new_xsub (const char *endpoints)
+{
+    return zsock_new_xsub_checked (endpoints, NULL, 0);
+}
 
 //  --------------------------------------------------------------------------
 //  Create a PAIR socket. Default action is connect.
 
 zsock_t *
-zsock_new_pair_ (const char *endpoints, const char *filename, size_t line_nbr)
+zsock_new_pair_checked (const char *endpoints, const char *filename, size_t line_nbr)
 {
-    zsock_t *sock = zsock_new_ (ZMQ_PAIR, filename, line_nbr);
+    zsock_t *sock = zsock_new_checked (ZMQ_PAIR, filename, line_nbr);
     if (sock)
         if (zsock_attach (sock, endpoints, false))
             zsock_destroy (&sock);
     return sock;
 }
 
+zsock_t *
+zsock_new_pair (const char *endpoints)
+{
+    return zsock_new_pair_checked (endpoints, NULL, 0);
+}
 
 //  --------------------------------------------------------------------------
 //  Create a STREAM socket. Default action is connect.
 
 zsock_t *
-zsock_new_stream_ (const char *endpoints, const char *filename, size_t line_nbr)
+zsock_new_stream_checked (const char *endpoints, const char *filename, size_t line_nbr)
 {
 #if defined ZMQ_STREAM
-    zsock_t *sock = zsock_new_ (ZMQ_STREAM, filename, line_nbr);
+    zsock_t *sock = zsock_new_checked (ZMQ_STREAM, filename, line_nbr);
     if (sock)
         if (zsock_attach (sock, endpoints, false))
             zsock_destroy (&sock);
@@ -277,6 +344,12 @@ zsock_new_stream_ (const char *endpoints, const char *filename, size_t line_nbr)
 #else
     return NULL;            //  Not implemented
 #endif
+}
+
+zsock_t *
+zsock_new_stream (const char *endpoints)
+{
+    return zsock_new_stream_checked (endpoints, NULL, 0);
 }
 
 
