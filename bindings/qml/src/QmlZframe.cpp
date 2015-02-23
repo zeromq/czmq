@@ -133,7 +133,8 @@ void QmlZframeAttached::test (bool verbose) {
 };
 
 ///
-//  Create a new frame with optional size, and optional data
+//  Constructor; if size is >0, allocates frame with that size, and if data
+//  is not null, copies data into frame.                                   
 QmlZframe *QmlZframeAttached::construct (const void *data, size_t size) {
     QmlZframe *qmlSelf = new QmlZframe ();
     qmlSelf->self = zframe_new (data, size);

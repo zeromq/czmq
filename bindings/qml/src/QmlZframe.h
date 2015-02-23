@@ -98,7 +98,8 @@ public slots:
     //  Self test of this class
     void test (bool verbose);
 
-    //  Create a new frame with optional size, and optional data
+    //  Constructor; if size is >0, allocates frame with that size, and if data
+    //  is not null, copies data into frame.                                   
     QmlZframe *construct (const void *data, size_t size);
 
     //  Destroy a frame

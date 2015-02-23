@@ -141,13 +141,13 @@
     <ClInclude Include="..\..\..\..\include\czmq.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\zgossip_engine_inc">
+    <ClInclude Include="..\..\..\..\src\zgossip_engine.inc">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\zhash_primes_inc">
+    <ClInclude Include="..\..\..\..\src\zhash_primes.inc">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\zclass_example_xml">
+    <ClInclude Include="..\..\..\..\src\zclass_example.xml">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
