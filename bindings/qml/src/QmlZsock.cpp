@@ -193,9 +193,9 @@ int QmlZsock::brecv (const QString &picture) {
 };
 
 ///
-//  Set socket to use unbounded pipes (HWM=0); use this in cases when you are
-//  totally certain the message volume can fit in memory. This method works  
-//  across all versions of ZeroMQ. Takes a polymorphic socket reference.     
+//  Set socket to use unbounded pipes (HWM = 0); use this in cases when you are
+//  totally certain the message volume can fit in memory. This method works    
+//  across all versions of ZeroMQ. Takes a polymorphic socket reference.       
 void QmlZsock::setUnbounded () {
     zsock_set_unbounded (self);
 };

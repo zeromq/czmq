@@ -146,7 +146,7 @@ module CZMQ
       # is ready, will call the handler, passing the arg. Returns 0 if OK, -1   
       # if there was an error. If you register the pollitem more than once, each
       # instance will invoke its corresponding handler. A pollitem with         
-      # socket=NULL and fd=0 means 'poll on FD zero'.                           
+      # socket = NULL and fd = 0 means 'poll on FD zero'.                       
       def poller item, handler, arg
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zloop_poller @ptr, item, handler, arg

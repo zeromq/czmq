@@ -378,9 +378,9 @@ module CZMQ
         result
       end
       
-      # Set socket to use unbounded pipes (HWM=0); use this in cases when you are
-      # totally certain the message volume can fit in memory. This method works  
-      # across all versions of ZeroMQ. Takes a polymorphic socket reference.     
+      # Set socket to use unbounded pipes (HWM = 0); use this in cases when you are
+      # totally certain the message volume can fit in memory. This method works    
+      # across all versions of ZeroMQ. Takes a polymorphic socket reference.       
       def set_unbounded
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zsock_set_unbounded @ptr

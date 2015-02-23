@@ -144,17 +144,17 @@ QmlZframe *QmlZhash::pack () {
 };
 
 ///
-//  Save hash table to a text file in name=value format. Hash values must be
-//  printable strings; keys may not contain '=' character. Returns 0 if OK, 
-//  else -1 if a file error occurred.                                       
+//  Save hash table to a text file in name = value format. Hash values must be
+//  printable strings; keys may not contain ' = ' character. Returns 0 if OK, 
+//  else -1 if a file error occurred.                                         
 int QmlZhash::save (const QString &filename) {
     return zhash_save (self, filename.toUtf8().data());
 };
 
 ///
-//  Load hash table from a text file in name=value format; hash table must 
-//  already exist. Hash values must printable strings; keys may not contain
-//  '=' character. Returns 0 if OK, else -1 if a file was not readable.    
+//  Load hash table from a text file in name = value format; hash table must
+//  already exist. Hash values must printable strings; keys may not contain 
+//  ' = ' character. Returns 0 if OK, else -1 if a file was not readable.   
 int QmlZhash::load (const QString &filename) {
     return zhash_load (self, filename.toUtf8().data());
 };

@@ -115,14 +115,14 @@ public slots:
     //  strings.                                                             
     QmlZframe *pack ();
 
-    //  Save hash table to a text file in name=value format. Hash values must be
-    //  printable strings; keys may not contain '=' character. Returns 0 if OK, 
-    //  else -1 if a file error occurred.                                       
+    //  Save hash table to a text file in name = value format. Hash values must be
+    //  printable strings; keys may not contain ' = ' character. Returns 0 if OK, 
+    //  else -1 if a file error occurred.                                         
     int save (const QString &filename);
 
-    //  Load hash table from a text file in name=value format; hash table must 
-    //  already exist. Hash values must printable strings; keys may not contain
-    //  '=' character. Returns 0 if OK, else -1 if a file was not readable.    
+    //  Load hash table from a text file in name = value format; hash table must
+    //  already exist. Hash values must printable strings; keys may not contain 
+    //  ' = ' character. Returns 0 if OK, else -1 if a file was not readable.   
     int load (const QString &filename);
 
     //  When a hash table was loaded from a file by zhash_load, this method will

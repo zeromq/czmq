@@ -173,9 +173,9 @@ public slots:
     //  values. Returns 0 if successful, or -1 if it failed to read a message.  
     int brecv (const QString &picture);
 
-    //  Set socket to use unbounded pipes (HWM=0); use this in cases when you are
-    //  totally certain the message volume can fit in memory. This method works  
-    //  across all versions of ZeroMQ. Takes a polymorphic socket reference.     
+    //  Set socket to use unbounded pipes (HWM = 0); use this in cases when you are
+    //  totally certain the message volume can fit in memory. This method works    
+    //  across all versions of ZeroMQ. Takes a polymorphic socket reference.       
     void setUnbounded ();
 
     //  Send a signal over a socket. A signal is a short message carrying a   

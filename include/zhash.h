@@ -144,15 +144,15 @@ CZMQ_EXPORT zframe_t *
 CZMQ_EXPORT zhash_t *
     zhash_unpack (zframe_t *frame);
 
-//  Save hash table to a text file in name=value format. Hash values must be
-//  printable strings; keys may not contain '=' character. Returns 0 if OK, 
-//  else -1 if a file error occurred.                                       
+//  Save hash table to a text file in name = value format. Hash values must be
+//  printable strings; keys may not contain ' = ' character. Returns 0 if OK, 
+//  else -1 if a file error occurred.                                         
 CZMQ_EXPORT int
     zhash_save (zhash_t *self, const char *filename);
 
-//  Load hash table from a text file in name=value format; hash table must 
-//  already exist. Hash values must printable strings; keys may not contain
-//  '=' character. Returns 0 if OK, else -1 if a file was not readable.    
+//  Load hash table from a text file in name = value format; hash table must
+//  already exist. Hash values must printable strings; keys may not contain 
+//  ' = ' character. Returns 0 if OK, else -1 if a file was not readable.   
 CZMQ_EXPORT int
     zhash_load (zhash_t *self, const char *filename);
 
