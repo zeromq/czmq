@@ -106,7 +106,8 @@ class Zframe(object):
     """working with single message frames"""
 
     def __init__(self, *args):
-        """Create a new frame with optional size, and optional data"""
+        """Constructor; if size is >0, allocates frame with that size, and if data
+is not null, copies data into frame."""
         if len(args) == 2 and isinstance(args[0], zframe_p) and isinstance(args[1], bool):
             self._as_parameter_ = args[0] # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -985,8 +986,8 @@ return the supplied value. Takes a polymorphic socket reference."""
 
 
 # zhash
-free_fn = CALLBACK(None, c_void_p)
-foreach_fn = CALLBACK(c_int, c_char_p, c_void_p, c_void_p)
+zhash_free_fn = CFUNCTYPE(None, c_void_p)
+zhash_foreach_fn = CFUNCTYPE(c_int, c_char_p, c_void_p, c_void_p)
 lib.zhash_new.restype = zhash_p
 lib.zhash_new.argtypes = []
 lib.zhash_destroy.restype = None

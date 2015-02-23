@@ -63,7 +63,7 @@
         is ready, will call the handler, passing the arg. Returns 0 if OK, -1
         if there was an error. If you register the pollitem more than once, each
         instance will invoke its corresponding handler. A pollitem with
-        socket = NULL and fd = 0 means 'poll on FD zero'.
+        socket=NULL and fd=0 means 'poll on FD zero'.
         <argument name = "item" type = "zmq_pollitem" />
         <argument name = "handler" type = "zloop_fn" callback = "1" />
         <argument name = "arg" type = "anything" />

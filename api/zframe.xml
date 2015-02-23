@@ -8,7 +8,8 @@
     <constant name = "dontwait" value = "4" />
 
     <constructor>
-        Create a new frame with optional size, and optional data
+        Constructor; if size is >0, allocates frame with that size, and if data
+        is not null, copies data into frame.
         <argument name = "data" type = "anything" constant = "1" />
         <argument name = "size" type = "size" />
     </constructor>
