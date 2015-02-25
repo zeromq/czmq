@@ -1,4 +1,4 @@
-﻿/*  =========================================================================
+/*  =========================================================================
     czmq_prelude.h - CZMQ environment
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
