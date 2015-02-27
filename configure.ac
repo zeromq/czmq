@@ -242,6 +242,7 @@ AC_TYPE_SSIZE_T
 AC_HEADER_TIME
 AC_TYPE_UINT32_T
 AC_C_VOLATILE
+AC_C_BIGENDIAN
 
 # These options are GNU compiler specific.
 if test "x$GCC" = "xyes"; then
