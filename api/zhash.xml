@@ -1,4 +1,4 @@
-<class name = "zhash" has_print = "0">
+<class name = "zhash">
     generic type-free hash container (simple)
 
     <include filename = "../license.xml" />
@@ -15,6 +15,8 @@
     <destructor>
         Destroy a hash container and all items in it
     </destructor>
+
+    <method name = "print" exclude = "1" />
 
     <method name = "insert">
         Insert item into hash table with specified key and item.
