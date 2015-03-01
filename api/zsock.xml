@@ -1,4 +1,4 @@
-<class name = "zsock" has_print = "0">
+<class name = "zsock">
     high-level socket API that hides libzmq contexts and sockets
 
     <include filename = "../license.xml" />
@@ -17,6 +17,8 @@
         Destroy the socket. You must use this for any socket created via the
         zsock_new method.
     </destructor>
+
+    <method name = "print" exclude = "1" />
 
     <method name = "new pub" singleton = "1">
         Create a PUB socket. Default action is bind.
