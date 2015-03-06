@@ -17,8 +17,8 @@
     =========================================================================
 */
 
-#ifndef __czmq_library_H_INCLUDED__
-#define __czmq_library_H_INCLUDED__
+#ifndef czmq_library_H_INCLUDED
+#define czmq_library_H_INCLUDED
 
 //  Set up environment for the application
 #include "czmq_prelude.h"

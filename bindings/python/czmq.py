@@ -63,6 +63,25 @@ class zlist_t(Structure):
     pass # Empty - only for type checking
 zlist_p = POINTER(zlist_t)
 
+PyFile_FromFile_close_cb = CFUNCTYPE(c_int, FILE_p)
+PyFile_FromFile = pythonapi.PyFile_FromFile
+PyFile_FromFile.restype = py_object
+PyFile_FromFile.argtypes = [FILE_p,
+                            c_char_p,
+                            c_char_p,
+                            PyFile_FromFile_close_cb]
+def return_py_file(c_file):
+    return PyFile_FromFile(c_file, "", "r+", PyFile_FromFile_close_cb())
+
+PyFile_AsFile = pythonapi.PyFile_AsFile
+PyFile_AsFile.restype = FILE_p
+PyFile_AsFile.argtypes = [py_object]
+def coerce_py_file(obj):
+    if isinstance(obj, FILE_p):
+        return obj
+    else:
+        return PyFile_AsFile(obj)
+
 
 # zframe
 lib.zframe_new.restype = zframe_p
@@ -106,19 +125,32 @@ class Zframe(object):
     """working with single message frames"""
 
     def __init__(self, *args):
-        """Constructor; if size is >0, allocates frame with that size, and if data
-is not null, copies data into frame."""
-        if len(args) == 2 and isinstance(args[0], zframe_p) and isinstance(args[1], bool):
+        """Create a new frame. If size is not null, allocates the frame data
+to the specified size. If additionally, data is not null, copies
+size octets from the specified data into the frame body."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zframe_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zframe_p and isinstance(args[1], bool):
             self._as_parameter_ = args[0] # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
-            self._as_parameter_ = lib.zframe_new(*args) # Creation of new raw type
+            assert(len(args) == 2)
+            self._as_parameter_ = lib.zframe_new(args[0], args[1]) # Creation of new raw type
             self.allow_destruct = True
 
     def __del__(self):
         """Destroy a frame"""
         if self.allow_destruct:
             lib.zframe_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
 
     @staticmethod
     def new_empty():
@@ -248,17 +280,29 @@ class Zloop(object):
 
     def __init__(self, *args):
         """Create a new zloop reactor"""
-        if len(args) == 2 and isinstance(args[0], zloop_p) and isinstance(args[1], bool):
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zloop_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zloop_p and isinstance(args[1], bool):
             self._as_parameter_ = args[0] # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
-            self._as_parameter_ = lib.zloop_new(*args) # Creation of new raw type
+            assert(len(args) == 0)
+            self._as_parameter_ = lib.zloop_new() # Creation of new raw type
             self.allow_destruct = True
 
     def __del__(self):
         """Destroy a reactor"""
         if self.allow_destruct:
             lib.zloop_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
 
     def reader(self, sock, handler, arg):
         """Register socket reader with the reactor. When the reader has messages,
@@ -318,7 +362,7 @@ cost of ticket timers is constant, no matter the number of clients. You
 must set the ticket delay using zloop_set_ticket_delay before creating a
 ticket. Returns a handle to the timer that you should use in
 zloop_ticket_reset and zloop_ticket_delete."""
-        return lib.zloop_ticket(self._as_parameter_, handler, arg)
+        return c_void_p(lib.zloop_ticket(self._as_parameter_, handler, arg))
 
     def ticket_reset(self, handle):
         """Reset a ticket timer, which moves it to the end of the ticket list and
@@ -427,7 +471,7 @@ lib.zmsg_print.argtypes = [zmsg_p]
 lib.zmsg_eq.restype = c_bool
 lib.zmsg_eq.argtypes = [zmsg_p, zmsg_p]
 lib.zmsg_new_signal.restype = zmsg_p
-lib.zmsg_new_signal.argtypes = [c_byte]
+lib.zmsg_new_signal.argtypes = [c_ubyte]
 lib.zmsg_signal.restype = c_int
 lib.zmsg_signal.argtypes = [zmsg_p]
 lib.zmsg_is.restype = c_bool
@@ -440,17 +484,29 @@ class Zmsg(object):
 
     def __init__(self, *args):
         """Create a new empty message object"""
-        if len(args) == 2 and isinstance(args[0], zmsg_p) and isinstance(args[1], bool):
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zmsg_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zmsg_p and isinstance(args[1], bool):
             self._as_parameter_ = args[0] # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
-            self._as_parameter_ = lib.zmsg_new(*args) # Creation of new raw type
+            assert(len(args) == 0)
+            self._as_parameter_ = lib.zmsg_new() # Creation of new raw type
             self.allow_destruct = True
 
     def __del__(self):
         """Destroy a message object and all frames it contains"""
         if self.allow_destruct:
             lib.zmsg_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
 
     @staticmethod
     def recv(source):
@@ -566,13 +622,13 @@ saved as a series of frames, each with length and data. Note that the
 file is NOT guaranteed to be portable between operating systems, not
 versions of CZMQ. The file format is at present undocumented and liable
 to arbitrary change."""
-        return lib.zmsg_save(self._as_parameter_, file)
+        return lib.zmsg_save(self._as_parameter_, coerce_py_file(file))
 
     def load(self, file):
         """Load/append an open file into message, create new message if
 null message provided. Returns NULL if the message could not 
 be loaded."""
-        return Zmsg(lib.zmsg_load(self._as_parameter_, file), True)
+        return Zmsg(lib.zmsg_load(self._as_parameter_, coerce_py_file(file)), True)
 
     def encode(self, buffer):
         """Serialize multipart message to a single buffer. Use this method to send
@@ -684,7 +740,7 @@ lib.zsock_brecv.argtypes = [zsock_p, c_char_p]
 lib.zsock_set_unbounded.restype = None
 lib.zsock_set_unbounded.argtypes = [zsock_p]
 lib.zsock_signal.restype = c_int
-lib.zsock_signal.argtypes = [zsock_p, c_byte]
+lib.zsock_signal.argtypes = [zsock_p, c_ubyte]
 lib.zsock_wait.restype = c_int
 lib.zsock_wait.argtypes = [zsock_p]
 lib.zsock_flush.restype = None
@@ -706,11 +762,15 @@ constructors/destructors for zsock) are redirected to the *_checked
 variant, enabling intelligent socket leak detection. This can have
 performance implications if you use a LOT of sockets. To turn off this
 redirection behaviour, define ZSOCK_NOCHECK."""
-        if len(args) == 2 and isinstance(args[0], zsock_p) and isinstance(args[1], bool):
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zsock_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zsock_p and isinstance(args[1], bool):
             self._as_parameter_ = args[0] # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
-            self._as_parameter_ = lib.zsock_new(*args) # Creation of new raw type
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zsock_new(args[0]) # Creation of new raw type
             self.allow_destruct = True
 
     def __del__(self):
@@ -718,6 +778,14 @@ redirection behaviour, define ZSOCK_NOCHECK."""
 zsock_new method."""
         if self.allow_destruct:
             lib.zsock_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
 
     @staticmethod
     def new_pub(endpoint):
@@ -977,7 +1045,7 @@ Takes a polymorphic socket reference."""
 the underlying libzmq socket handle; else if it looks like a file
 descriptor, return NULL; else if it looks like a libzmq socket handle,
 return the supplied value. Takes a polymorphic socket reference."""
-        return lib.zsock_resolve(self)
+        return c_void_p(lib.zsock_resolve(self))
 
     @staticmethod
     def test(verbose):
@@ -1040,17 +1108,29 @@ class Zhash(object):
 
     def __init__(self, *args):
         """Create a new, empty hash container"""
-        if len(args) == 2 and isinstance(args[0], zhash_p) and isinstance(args[1], bool):
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zhash_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zhash_p and isinstance(args[1], bool):
             self._as_parameter_ = args[0] # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
-            self._as_parameter_ = lib.zhash_new(*args) # Creation of new raw type
+            assert(len(args) == 0)
+            self._as_parameter_ = lib.zhash_new() # Creation of new raw type
             self.allow_destruct = True
 
     def __del__(self):
         """Destroy a hash container and all items in it"""
         if self.allow_destruct:
             lib.zhash_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
 
     def insert(self, key, item):
         """Insert item into hash table with specified key and item.
@@ -1071,7 +1151,7 @@ item, this function does nothing."""
 
     def lookup(self, key):
         """Return the item at the specified key, or null"""
-        return lib.zhash_lookup(self._as_parameter_, key)
+        return c_void_p(lib.zhash_lookup(self._as_parameter_, key))
 
     def rename(self, old_key, new_key):
         """Reindexes an item from an old key to a new key. If there was no such
@@ -1084,7 +1164,7 @@ destroyed, the free function, if any, is called on that item.
 Use this when hash items are dynamically allocated, to ensure that
 you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
 Returns the item, or NULL if there is no such item."""
-        return lib.zhash_freefn(self._as_parameter_, key, free_fn)
+        return c_void_p(lib.zhash_freefn(self._as_parameter_, key, free_fn))
 
     def size(self):
         """Return the number of keys/items in the hash table"""
@@ -1106,7 +1186,7 @@ since there's no other way to know how to duplicate the item value."""
 or NULL if the table is empty. This method is simpler to use than the
 foreach() method, which is deprecated. To access the key for this item
 use zhash_cursor(). NOTE: do NOT modify the table while iterating."""
-        return lib.zhash_first(self._as_parameter_)
+        return c_void_p(lib.zhash_first(self._as_parameter_))
 
     def next(self):
         """Simple iterator; returns next item in hash table, in no given order,
@@ -1115,7 +1195,7 @@ zhash_first() to process all items in a hash table. If you need the
 items in sorted order, use zhash_keys() and then zlist_sort(). To
 access the key for this item use zhash_cursor(). NOTE: do NOT modify
 the table while iterating."""
-        return lib.zhash_next(self._as_parameter_)
+        return c_void_p(lib.zhash_next(self._as_parameter_))
 
     def cursor(self):
         """After a successful first/next method, returns the key for the item that
@@ -1244,11 +1324,15 @@ class Zlist(object):
 
     def __init__(self, *args):
         """Create a new list container"""
-        if len(args) == 2 and isinstance(args[0], zlist_p) and isinstance(args[1], bool):
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zlist_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zlist_p and isinstance(args[1], bool):
             self._as_parameter_ = args[0] # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
-            self._as_parameter_ = lib.zlist_new(*args) # Creation of new raw type
+            assert(len(args) == 0)
+            self._as_parameter_ = lib.zlist_new() # Creation of new raw type
             self.allow_destruct = True
 
     def __del__(self):
@@ -1256,33 +1340,41 @@ class Zlist(object):
         if self.allow_destruct:
             lib.zlist_destroy(byref(self._as_parameter_))
 
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
     def first(self):
         """Return the item at the head of list. If the list is empty, returns NULL.
 Leaves cursor pointing at the head item, or NULL if the list is empty."""
-        return lib.zlist_first(self._as_parameter_)
+        return c_void_p(lib.zlist_first(self._as_parameter_))
 
     def next(self):
         """Return the next item. If the list is empty, returns NULL. To move to
 the start of the list call zlist_first (). Advances the cursor."""
-        return lib.zlist_next(self._as_parameter_)
+        return c_void_p(lib.zlist_next(self._as_parameter_))
 
     def last(self):
         """Return the item at the tail of list. If the list is empty, returns NULL.
 Leaves cursor pointing at the tail item, or NULL if the list is empty."""
-        return lib.zlist_last(self._as_parameter_)
+        return c_void_p(lib.zlist_last(self._as_parameter_))
 
     def head(self):
         """Return first item in the list, or null, leaves the cursor"""
-        return lib.zlist_head(self._as_parameter_)
+        return c_void_p(lib.zlist_head(self._as_parameter_))
 
     def tail(self):
         """Return last item in the list, or null, leaves the cursor"""
-        return lib.zlist_tail(self._as_parameter_)
+        return c_void_p(lib.zlist_tail(self._as_parameter_))
 
     def item(self):
         """Return the current item of list. If the list is empty, returns NULL.
 Leaves cursor pointing at the current item, or NULL if the list is empty."""
-        return lib.zlist_item(self._as_parameter_)
+        return c_void_p(lib.zlist_item(self._as_parameter_))
 
     def append(self, item):
         """Append an item to the end of the list, return 0 if OK or -1 if this
@@ -1298,7 +1390,7 @@ been set, this method will also duplicate the item."""
 
     def pop(self):
         """Pop the item off the start of the list, if any"""
-        return lib.zlist_pop(self._as_parameter_)
+        return c_void_p(lib.zlist_pop(self._as_parameter_))
 
     def remove(self, item):
         """Remove the specified item from the list if present"""
@@ -1340,7 +1432,7 @@ destroyed, the free function, if any, is called on that item.
 Use this when list items are dynamically allocated, to ensure that
 you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
 Returns the item, or NULL if there is no such item."""
-        return lib.zlist_freefn(self._as_parameter_, item, fn, at_tail)
+        return c_void_p(lib.zlist_freefn(self._as_parameter_, item, fn, at_tail))
 
     @staticmethod
     def test(verbose):
