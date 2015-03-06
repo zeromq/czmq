@@ -34,6 +34,23 @@ module CZMQ
         blocking: true  # only necessary on MRI to deal with the GIL.
       }
       
+      attach_function :zdir_new, [:string, :string], :pointer, **opts
+      attach_function :zdir_destroy, [:pointer], :void, **opts
+      attach_function :zdir_path, [:pointer], :string, **opts
+      attach_function :zdir_modified, [:pointer], :pointer, **opts
+      attach_function :zdir_cursize, [:pointer], :pointer, **opts
+      attach_function :zdir_count, [:pointer], :size_t, **opts
+      attach_function :zdir_list, [:pointer], :pointer, **opts
+      attach_function :zdir_remove, [:pointer, :bool], :void, **opts
+      attach_function :zdir_diff, [:pointer, :pointer, :string], :pointer, **opts
+      attach_function :zdir_resync, [:pointer, :string], :pointer, **opts
+      attach_function :zdir_cache, [:pointer], :pointer, **opts
+      attach_function :zdir_fprint, [:pointer, :pointer, :int], :void, **opts
+      attach_function :zdir_print, [:pointer, :int], :void, **opts
+      attach_function :zdir_test, [:bool], :void, **opts
+      
+      require_relative 'ffi/zdir'
+      
       attach_function :zframe_new, [:pointer, :size_t], :pointer, **opts
       attach_function :zframe_destroy, [:pointer], :void, **opts
       attach_function :zframe_new_empty, [], :pointer, **opts

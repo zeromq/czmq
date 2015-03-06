@@ -27,6 +27,22 @@ if not libpath:
     raise ImportError("Unable to find czmq C library")
 lib = cdll.LoadLibrary(libpath)
 
+class zdir_t(Structure):
+    pass # Empty - only for type checking
+zdir_p = POINTER(zdir_t)
+
+class zlist_t(Structure):
+    pass # Empty - only for type checking
+zlist_p = POINTER(zlist_t)
+
+class zhash_t(Structure):
+    pass # Empty - only for type checking
+zhash_p = POINTER(zhash_t)
+
+class FILE(Structure):
+    pass # Empty - only for type checking
+FILE_p = POINTER(FILE)
+
 class zframe_t(Structure):
     pass # Empty - only for type checking
 zframe_p = POINTER(zframe_t)
@@ -47,21 +63,9 @@ class zmsg_t(Structure):
     pass # Empty - only for type checking
 zmsg_p = POINTER(zmsg_t)
 
-class FILE(Structure):
-    pass # Empty - only for type checking
-FILE_p = POINTER(FILE)
-
 class va_list_t(Structure):
     pass # Empty - only for type checking
 va_list_p = POINTER(va_list_t)
-
-class zhash_t(Structure):
-    pass # Empty - only for type checking
-zhash_p = POINTER(zhash_t)
-
-class zlist_t(Structure):
-    pass # Empty - only for type checking
-zlist_p = POINTER(zlist_t)
 
 PyFile_FromFile_close_cb = CFUNCTYPE(c_int, FILE_p)
 PyFile_FromFile = pythonapi.PyFile_FromFile
@@ -81,6 +85,129 @@ def coerce_py_file(obj):
         return obj
     else:
         return PyFile_AsFile(obj)
+
+
+# zdir
+lib.zdir_new.restype = zdir_p
+lib.zdir_new.argtypes = [c_char_p, c_char_p]
+lib.zdir_destroy.restype = None
+lib.zdir_destroy.argtypes = [POINTER(zdir_p)]
+lib.zdir_path.restype = c_char_p
+lib.zdir_path.argtypes = [zdir_p]
+lib.zdir_modified.restype = c_int
+lib.zdir_modified.argtypes = [zdir_p]
+lib.zdir_cursize.restype = c_int
+lib.zdir_cursize.argtypes = [zdir_p]
+lib.zdir_count.restype = c_size_t
+lib.zdir_count.argtypes = [zdir_p]
+lib.zdir_list.restype = zlist_p
+lib.zdir_list.argtypes = [zdir_p]
+lib.zdir_remove.restype = None
+lib.zdir_remove.argtypes = [zdir_p, c_bool]
+lib.zdir_diff.restype = zlist_p
+lib.zdir_diff.argtypes = [zdir_p, zdir_p, c_char_p]
+lib.zdir_resync.restype = zlist_p
+lib.zdir_resync.argtypes = [zdir_p, c_char_p]
+lib.zdir_cache.restype = zhash_p
+lib.zdir_cache.argtypes = [zdir_p]
+lib.zdir_fprint.restype = None
+lib.zdir_fprint.argtypes = [zdir_p, FILE_p, c_int]
+lib.zdir_print.restype = None
+lib.zdir_print.argtypes = [zdir_p, c_int]
+lib.zdir_test.restype = None
+lib.zdir_test.argtypes = [c_bool]
+
+class Zdir(object):
+    """work with file-system directories"""
+
+    def __init__(self, *args):
+        """Create a new directory item that loads in the full tree of the specified
+path, optionally located under some parent path. If parent is "-", then
+loads only the top-level directory, and does not use parent as a path."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zdir_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zdir_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 2)
+            self._as_parameter_ = lib.zdir_new(args[0], args[1]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destroy a directory tree and all children it contains."""
+        if self.allow_destruct:
+            lib.zdir_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def path(self):
+        """Return directory path"""
+        return lib.zdir_path(self._as_parameter_)
+
+    def modified(self):
+        """Return last modification time for directory."""
+        return lib.zdir_modified(self._as_parameter_)
+
+    def cursize(self):
+        """Return total hierarchy size, in bytes of data contained in all files
+in the directory tree."""
+        return lib.zdir_cursize(self._as_parameter_)
+
+    def count(self):
+        """Return directory count"""
+        return lib.zdir_count(self._as_parameter_)
+
+    def list(self):
+        """Returns a sorted list of zfile objects; Each entry in the list is a pointer
+to a zfile_t item already allocated in the zdir tree. Do not destroy the
+original zdir tree until you are done with this list. The caller must destroy
+the list when done with it."""
+        return Zlist(lib.zdir_list(self._as_parameter_), True)
+
+    def remove(self, force):
+        """Remove directory, optionally including all files that it contains, at
+all levels. If force is false, will only remove the directory if empty.
+If force is true, will remove all files and all subdirectories."""
+        return lib.zdir_remove(self._as_parameter_, force)
+
+    @staticmethod
+    def diff(older, newer, alias):
+        """Calculate differences between two versions of a directory tree.
+Returns a list of zdir_patch_t patches. Either older or newer may
+be null, indicating the directory is empty/absent. If alias is set,
+generates virtual filename (minus path, plus alias)."""
+        return Zlist(lib.zdir_diff(older, newer, alias), True)
+
+    def resync(self, alias):
+        """Return full contents of directory as a zdir_patch list."""
+        return Zlist(lib.zdir_resync(self._as_parameter_, alias), True)
+
+    def cache(self):
+        """Load directory cache; returns a hash table containing the SHA-1 digests
+of every file in the tree. The cache is saved between runs in .cache.
+The caller must destroy the hash table when done with it."""
+        return Zhash(lib.zdir_cache(self._as_parameter_), True)
+
+    def fprint(self, file, indent):
+        """Print contents of directory to open stream"""
+        return lib.zdir_fprint(self._as_parameter_, coerce_py_file(file), indent)
+
+    def print(self, indent):
+        """Print contents of directory to stdout"""
+        return lib.zdir_print(self._as_parameter_, indent)
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class."""
+        return lib.zdir_test(verbose)
 
 
 # zframe

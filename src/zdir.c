@@ -263,7 +263,7 @@ zdir_destroy (zdir_t **self_p)
 //  --------------------------------------------------------------------------
 //  Return directory path
 
-char *
+const char *
 zdir_path (zdir_t *self)
 {
     return self->path;
@@ -395,6 +395,29 @@ zdir_flatten_free (zfile_t ***files_p)
     *files_p = NULL;
 }
 
+//  --------------------------------------------------------------------------
+//  Returns a sorted list of zfile objects; Each entry in the list is a pointer
+//  to a zfile_t item already allocated in the zdir tree. Do not destroy the
+//  original zdir tree until you are done with this list.
+
+zlist_t *
+zdir_list (zdir_t *self)
+{
+    zfile_t **files = zdir_flatten (self);
+    zlist_t *list = zlist_new ();
+    size_t index;
+
+    if (files)
+    {
+        for (index = 0 ; files[index] ; index++)
+        {
+            zlist_append (list, files[index]);
+        }
+    }
+
+    zdir_flatten_free (&files);
+    return list;
+}
 
 //  --------------------------------------------------------------------------
 //  Remove directory, optionally including all files that it contains, at

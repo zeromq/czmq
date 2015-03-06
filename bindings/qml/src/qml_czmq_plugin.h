@@ -11,6 +11,8 @@
 #include <QQmlExtensionPlugin>
 #include <qqml.h>
 
+class QmlZdir;
+class QmlZdirAttached;
 class QmlZframe;
 class QmlZframeAttached;
 class QmlZloop;
@@ -24,6 +26,7 @@ class QmlZhashAttached;
 class QmlZlist;
 class QmlZlistAttached;
 
+#include "QmlZdir.h"
 #include "QmlZframe.h"
 #include "QmlZloop.h"
 #include "QmlZmsg.h"
@@ -39,6 +42,8 @@ class QmlCZMQPlugin : public QQmlExtensionPlugin
 public:
     void registerTypes (const char *uri)
     {
+        qmlRegisterType<QmlZdir> (uri, 1, 0, "QmlZdir");
+        qmlRegisterType<QmlZdirAttached>();
         qmlRegisterType<QmlZframe> (uri, 1, 0, "QmlZframe");
         qmlRegisterType<QmlZframeAttached>();
         qmlRegisterType<QmlZloop> (uri, 1, 0, "QmlZloop");
