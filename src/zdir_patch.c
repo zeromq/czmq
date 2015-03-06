@@ -56,7 +56,7 @@ zdir_patch_new (const char *path, zfile_t *file,
     self->op = op;
 
     //  Calculate virtual path for patch (remove path, prefix alias)
-    char *filename = zfile_filename (file, path);
+    const char *filename = zfile_filename (file, path);
     if (!filename) {
         zdir_patch_destroy (&self);
         return NULL;

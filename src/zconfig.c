@@ -542,7 +542,7 @@ zconfig_savef (zconfig_t *self, const char *format, ...)
 //  --------------------------------------------------------------------------
 //  Report filename used during zconfig_load, or NULL if none
 
-char *
+const char *
 zconfig_filename (zconfig_t *self)
 {
     assert (self);

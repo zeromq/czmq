@@ -43,6 +43,14 @@ class FILE(Structure):
     pass # Empty - only for type checking
 FILE_p = POINTER(FILE)
 
+class zfile_t(Structure):
+    pass # Empty - only for type checking
+zfile_p = POINTER(zfile_t)
+
+class zchunk_t(Structure):
+    pass # Empty - only for type checking
+zchunk_p = POINTER(zchunk_t)
+
 class zframe_t(Structure):
     pass # Empty - only for type checking
 zframe_p = POINTER(zframe_t)
@@ -208,6 +216,198 @@ The caller must destroy the hash table when done with it."""
     def test(verbose):
         """Self test of this class."""
         return lib.zdir_test(verbose)
+
+
+# zfile
+lib.zfile_new.restype = zfile_p
+lib.zfile_new.argtypes = [c_char_p, c_char_p]
+lib.zfile_destroy.restype = None
+lib.zfile_destroy.argtypes = [POINTER(zfile_p)]
+lib.zfile_dup.restype = zfile_p
+lib.zfile_dup.argtypes = [zfile_p]
+lib.zfile_filename.restype = c_char_p
+lib.zfile_filename.argtypes = [zfile_p, c_char_p]
+lib.zfile_restat.restype = None
+lib.zfile_restat.argtypes = [zfile_p]
+lib.zfile_modified.restype = c_int
+lib.zfile_modified.argtypes = [zfile_p]
+lib.zfile_cursize.restype = c_int
+lib.zfile_cursize.argtypes = [zfile_p]
+lib.zfile_is_directory.restype = c_bool
+lib.zfile_is_directory.argtypes = [zfile_p]
+lib.zfile_is_regular.restype = c_bool
+lib.zfile_is_regular.argtypes = [zfile_p]
+lib.zfile_is_readable.restype = c_bool
+lib.zfile_is_readable.argtypes = [zfile_p]
+lib.zfile_is_writeable.restype = c_bool
+lib.zfile_is_writeable.argtypes = [zfile_p]
+lib.zfile_is_stable.restype = c_bool
+lib.zfile_is_stable.argtypes = [zfile_p]
+lib.zfile_has_changed.restype = c_bool
+lib.zfile_has_changed.argtypes = [zfile_p]
+lib.zfile_remove.restype = None
+lib.zfile_remove.argtypes = [zfile_p]
+lib.zfile_input.restype = c_int
+lib.zfile_input.argtypes = [zfile_p]
+lib.zfile_output.restype = c_int
+lib.zfile_output.argtypes = [zfile_p]
+lib.zfile_read.restype = zchunk_p
+lib.zfile_read.argtypes = [zfile_p, c_size_t, c_int]
+lib.zfile_eof.restype = c_bool
+lib.zfile_eof.argtypes = [zfile_p]
+lib.zfile_write.restype = c_int
+lib.zfile_write.argtypes = [zfile_p, zchunk_p, c_int]
+lib.zfile_readln.restype = c_char_p
+lib.zfile_readln.argtypes = [zfile_p]
+lib.zfile_close.restype = None
+lib.zfile_close.argtypes = [zfile_p]
+lib.zfile_handle.restype = FILE_p
+lib.zfile_handle.argtypes = [zfile_p]
+lib.zfile_digest.restype = c_char_p
+lib.zfile_digest.argtypes = [zfile_p]
+lib.zfile_test.restype = None
+lib.zfile_test.argtypes = [c_bool]
+
+class Zfile(object):
+    """helper functions for working with files."""
+
+    def __init__(self, *args):
+        """If file exists, populates properties. CZMQ supports portable symbolic
+links, which are files with the extension ".ln". A symbolic link is a
+text file containing one line, the filename of a target file. Reading
+data from the symbolic link actually reads from the target file. Path
+may be NULL, in which case it is not used."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zfile_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zfile_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 2)
+            self._as_parameter_ = lib.zfile_new(args[0], args[1]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destroy a file item"""
+        if self.allow_destruct:
+            lib.zfile_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def dup(self):
+        """Duplicate a file item, returns a newly constructed item. If the file
+is null, or memory was exhausted, returns null."""
+        return Zfile(lib.zfile_dup(self._as_parameter_), True)
+
+    def filename(self, path):
+        """Return file name, remove path if provided"""
+        return lib.zfile_filename(self._as_parameter_, path)
+
+    def restat(self):
+        """Refresh file properties from disk; this is not done automatically
+on access methods, otherwise it is not possible to compare directory
+snapshots."""
+        return lib.zfile_restat(self._as_parameter_)
+
+    def modified(self):
+        """Return when the file was last modified. If you want this to reflect the
+current situation, call zfile_restat before checking this property."""
+        return lib.zfile_modified(self._as_parameter_)
+
+    def cursize(self):
+        """Return the last-known size of the file. If you want this to reflect the
+current situation, call zfile_restat before checking this property."""
+        return lib.zfile_cursize(self._as_parameter_)
+
+    def is_directory(self):
+        """Return true if the file is a directory. If you want this to reflect
+any external changes, call zfile_restat before checking this property."""
+        return lib.zfile_is_directory(self._as_parameter_)
+
+    def is_regular(self):
+        """Return true if the file is a regular file. If you want this to reflect
+any external changes, call zfile_restat before checking this property."""
+        return lib.zfile_is_regular(self._as_parameter_)
+
+    def is_readable(self):
+        """Return true if the file is readable by this process. If you want this to
+reflect any external changes, call zfile_restat before checking this
+property."""
+        return lib.zfile_is_readable(self._as_parameter_)
+
+    def is_writeable(self):
+        """Return true if the file is writeable by this process. If you want this
+to reflect any external changes, call zfile_restat before checking this
+property."""
+        return lib.zfile_is_writeable(self._as_parameter_)
+
+    def is_stable(self):
+        """Check if file has stopped changing and can be safely processed.
+Updates the file statistics from disk at every call."""
+        return lib.zfile_is_stable(self._as_parameter_)
+
+    def has_changed(self):
+        """Return true if the file was changed on disk since the zfile_t object
+was created, or the last zfile_restat() call made on it."""
+        return lib.zfile_has_changed(self._as_parameter_)
+
+    def remove(self):
+        """Remove the file from disk"""
+        return lib.zfile_remove(self._as_parameter_)
+
+    def input(self):
+        """Open file for reading
+Returns 0 if OK, -1 if not found or not accessible"""
+        return lib.zfile_input(self._as_parameter_)
+
+    def output(self):
+        """Open file for writing, creating directory if needed
+File is created if necessary; chunks can be written to file at any
+location. Returns 0 if OK, -1 if error."""
+        return lib.zfile_output(self._as_parameter_)
+
+    def read(self, bytes, offset):
+        """Read chunk from file at specified position. If this was the last chunk,
+sets the eof property. Returns a null chunk in case of error."""
+        return lib.zfile_read(self._as_parameter_, bytes, offset)
+
+    def eof(self):
+        """Returns true if zfile_read() just read the last chunk in the file."""
+        return lib.zfile_eof(self._as_parameter_)
+
+    def write(self, chunk, offset):
+        """Write chunk to file at specified position
+Return 0 if OK, else -1"""
+        return lib.zfile_write(self._as_parameter_, chunk, offset)
+
+    def readln(self):
+        """Read next line of text from file. Returns a pointer to the text line,
+or NULL if there was nothing more to read from the file."""
+        return lib.zfile_readln(self._as_parameter_)
+
+    def close(self):
+        """Close file, if open"""
+        return lib.zfile_close(self._as_parameter_)
+
+    def handle(self):
+        """Return file handle, if opened"""
+        return return_py_file(lib.zfile_handle(self._as_parameter_))
+
+    def digest(self):
+        """Calculate SHA1 digest for file, using zdigest class."""
+        return lib.zfile_digest(self._as_parameter_)
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class."""
+        return lib.zfile_test(verbose)
 
 
 # zframe

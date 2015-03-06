@@ -120,7 +120,7 @@ CZMQ_EXPORT int
     zconfig_savef (zconfig_t *self, const char *format, ...);
     
 //  Report filename used during zconfig_load, or NULL if none
-CZMQ_EXPORT char *
+CZMQ_EXPORT const char *
     zconfig_filename (zconfig_t *self);
 
 //  Reload config tree from same file that it was previously loaded from.

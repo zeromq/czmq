@@ -39,6 +39,7 @@ LIBS += -lczmq
 HEADERS += \
   $$SRCDIR/qml_czmq_plugin.h \
   $$SRCDIR/QmlZdir.h \
+  $$SRCDIR/QmlZfile.h \
   $$SRCDIR/QmlZframe.h \
   $$SRCDIR/QmlZloop.h \
   $$SRCDIR/QmlZmsg.h \
@@ -48,6 +49,7 @@ HEADERS += \
 
 SOURCES += \
   $$SRCDIR/QmlZdir.cpp \
+  $$SRCDIR/QmlZfile.cpp \
   $$SRCDIR/QmlZframe.cpp \
   $$SRCDIR/QmlZloop.cpp \
   $$SRCDIR/QmlZmsg.cpp \

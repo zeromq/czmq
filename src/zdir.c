@@ -600,7 +600,7 @@ zdir_cache (zdir_t *self)
         zfile_t *file = files [index];
         if (!file)
             break;
-        char *filename = zfile_filename (file, self->path);
+        const char *filename = zfile_filename (file, self->path);
         if (zhash_lookup (cache, zfile_filename (file, self->path)) == NULL) {
             int rc = zhash_insert (cache, filename, (void *) zfile_digest (file));
             if (rc != 0) {
