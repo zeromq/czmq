@@ -1,0 +1,59 @@
+<class name = "zdir patch">
+    work with directory patches
+
+    <include filename = "../license.xml" />
+
+    <enum name="op">
+        <constant name="create" value="1" />
+        <constant name="delete" value="2" />
+    </enum>
+
+    <constructor>
+        Create new patch
+        <argument name="path" type="string" />
+        <argument name="file" type="zfile" />
+        <argument name="op" type="enum:zdir_patch.op" />
+        <argument name="alias" type="string" />
+    </constructor>
+
+    <destructor>
+        Destroy a patch
+    </destructor>
+
+    <method name="dup">
+        Create copy of a patch. If the patch is null, or memory was exhausted,
+        returns null.
+        <return type="zdir patch" fresh="1" />
+    </method>
+
+    <method name="print" exclude="1" />
+
+    <method name="path">
+        Return patch file directory path
+        <return type="string" />
+    </method>
+
+    <method name="file">
+        Return patch file item
+        <return type="zfile" />
+    </method>
+
+    <method name="op">
+        Return operation
+        <return type="enum:zdir_patch.op" />
+    </method>
+
+    <method name="vpath">
+        Return patch virtual file path
+        <return type="string" />
+    </method>
+
+    <method name="digest set">
+        Calculate hash digest for file (create only)
+    </method>
+
+    <method name="digest">
+        Return hash digest for patch file
+        <return type="string" />
+    </method>
+</class>

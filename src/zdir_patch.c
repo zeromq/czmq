@@ -127,7 +127,7 @@ zdir_patch_dup (zdir_patch_t *self)
 //  --------------------------------------------------------------------------
 //  Return patch file directory path
 
-char *
+const char *
 zdir_patch_path (zdir_patch_t *self)
 {
     assert (self);
@@ -160,7 +160,7 @@ zdir_patch_op (zdir_patch_t *self)
 //  --------------------------------------------------------------------------
 //  Return patch virtual file path
 
-char *
+const char *
 zdir_patch_vpath (zdir_patch_t *self)
 {
     assert (self);
@@ -186,7 +186,7 @@ zdir_patch_digest_set (zdir_patch_t *self)
 //  --------------------------------------------------------------------------
 //  Return hash digest for patch file (create only)
 
-char *
+const char *
 zdir_patch_digest (zdir_patch_t *self)
 {
     assert (self);

@@ -51,6 +51,19 @@ module CZMQ
       
       require_relative 'ffi/zdir'
       
+      attach_function :zdir_patch_new, [:string, :pointer, :pointer, :string], :pointer, **opts
+      attach_function :zdir_patch_destroy, [:pointer], :void, **opts
+      attach_function :zdir_patch_dup, [:pointer], :pointer, **opts
+      attach_function :zdir_patch_path, [:pointer], :string, **opts
+      attach_function :zdir_patch_file, [:pointer], :pointer, **opts
+      attach_function :zdir_patch_op, [:pointer], :pointer, **opts
+      attach_function :zdir_patch_vpath, [:pointer], :string, **opts
+      attach_function :zdir_patch_digest_set, [:pointer], :void, **opts
+      attach_function :zdir_patch_digest, [:pointer], :string, **opts
+      attach_function :zdir_patch_test, [:bool], :void, **opts
+      
+      require_relative 'ffi/zdir_patch'
+      
       attach_function :zfile_new, [:string, :string], :pointer, **opts
       attach_function :zfile_destroy, [:pointer], :void, **opts
       attach_function :zfile_dup, [:pointer], :pointer, **opts

@@ -47,6 +47,10 @@ class zfile_t(Structure):
     pass # Empty - only for type checking
 zfile_p = POINTER(zfile_t)
 
+class zdir_patch_t(Structure):
+    pass # Empty - only for type checking
+zdir_patch_p = POINTER(zdir_patch_t)
+
 class zchunk_t(Structure):
     pass # Empty - only for type checking
 zchunk_p = POINTER(zchunk_t)
@@ -216,6 +220,102 @@ The caller must destroy the hash table when done with it."""
     def test(verbose):
         """Self test of this class."""
         return lib.zdir_test(verbose)
+
+
+# zdir patch
+lib.zdir_patch_new.restype = zdir_patch_p
+lib.zdir_patch_new.argtypes = [c_char_p, zfile_p, c_int, c_char_p]
+lib.zdir_patch_destroy.restype = None
+lib.zdir_patch_destroy.argtypes = [POINTER(zdir_patch_p)]
+lib.zdir_patch_dup.restype = zdir_patch_p
+lib.zdir_patch_dup.argtypes = [zdir_patch_p]
+lib.zdir_patch_path.restype = c_char_p
+lib.zdir_patch_path.argtypes = [zdir_patch_p]
+lib.zdir_patch_file.restype = zfile_p
+lib.zdir_patch_file.argtypes = [zdir_patch_p]
+lib.zdir_patch_op.restype = c_int
+lib.zdir_patch_op.argtypes = [zdir_patch_p]
+lib.zdir_patch_vpath.restype = c_char_p
+lib.zdir_patch_vpath.argtypes = [zdir_patch_p]
+lib.zdir_patch_digest_set.restype = None
+lib.zdir_patch_digest_set.argtypes = [zdir_patch_p]
+lib.zdir_patch_digest.restype = c_char_p
+lib.zdir_patch_digest.argtypes = [zdir_patch_p]
+lib.zdir_patch_test.restype = None
+lib.zdir_patch_test.argtypes = [c_bool]
+
+class ZdirPatch(object):
+    """work with directory patches"""
+
+    Op = {
+        'create': 1,
+        'delete': 2,
+    }
+
+    Op_out = {
+         1: 'create',
+         2: 'delete',
+    }
+
+    def __init__(self, *args):
+        """Create new patch"""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zdir_patch_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zdir_patch_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 4)
+            self._as_parameter_ = lib.zdir_patch_new(args[0], args[1], ZdirPatch.Op[args[2]], args[3]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destroy a patch"""
+        if self.allow_destruct:
+            lib.zdir_patch_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def dup(self):
+        """Create copy of a patch. If the patch is null, or memory was exhausted,
+returns null."""
+        return ZdirPatch(lib.zdir_patch_dup(self._as_parameter_), True)
+
+    def path(self):
+        """Return patch file directory path"""
+        return lib.zdir_patch_path(self._as_parameter_)
+
+    def file(self):
+        """Return patch file item"""
+        return Zfile(lib.zdir_patch_file(self._as_parameter_), False)
+
+    def op(self):
+        """Return operation"""
+        return ZdirPatch.Op_out[lib.zdir_patch_op(self._as_parameter_)]
+
+    def vpath(self):
+        """Return patch virtual file path"""
+        return lib.zdir_patch_vpath(self._as_parameter_)
+
+    def digest_set(self):
+        """Calculate hash digest for file (create only)"""
+        return lib.zdir_patch_digest_set(self._as_parameter_)
+
+    def digest(self):
+        """Return hash digest for patch file"""
+        return lib.zdir_patch_digest(self._as_parameter_)
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class."""
+        return lib.zdir_patch_test(verbose)
 
 
 # zfile
