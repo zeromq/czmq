@@ -160,16 +160,6 @@ int QmlZmsg::save (FILE *file) {
 };
 
 ///
-//  Load/append an open file into message, create new message if 
-//  null message provided. Returns NULL if the message could not 
-//  be loaded.                                                   
-QmlZmsg *QmlZmsg::load (FILE *file) {
-    QmlZmsg *retQ_ = new QmlZmsg ();
-    retQ_->self = zmsg_load (self, file);
-    return retQ_;
-};
-
-///
 //  Serialize multipart message to a single buffer. Use this method to send  
 //  structured messages across transports that do not support multipart data.
 //  Allocates and returns a new buffer containing the serialized message.    
@@ -232,6 +222,16 @@ QmlZmsg *QmlZmsgAttached::recv (void *source) {
 //  it is a destructor).                                                     
 int QmlZmsgAttached::send (QmlZmsg *selfP, void *dest) {
     return zmsg_send (&selfP->self, dest);
+};
+
+///
+//  Load/append an open file into message, create new message if 
+//  null message provided. Returns NULL if the message could not 
+//  be loaded.                                                   
+QmlZmsg *QmlZmsgAttached::load (QmlZmsg *self, FILE *file) {
+    QmlZmsg *retQ_ = new QmlZmsg ();
+    retQ_->self = zmsg_load (self->self, file);
+    return retQ_;
 };
 
 ///

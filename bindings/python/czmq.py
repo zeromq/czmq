@@ -624,11 +624,12 @@ versions of CZMQ. The file format is at present undocumented and liable
 to arbitrary change."""
         return lib.zmsg_save(self._as_parameter_, coerce_py_file(file))
 
+    @staticmethod
     def load(self, file):
         """Load/append an open file into message, create new message if
 null message provided. Returns NULL if the message could not 
 be loaded."""
-        return Zmsg(lib.zmsg_load(self._as_parameter_, coerce_py_file(file)), True)
+        return Zmsg(lib.zmsg_load(self, coerce_py_file(file)), True)
 
     def encode(self, buffer):
         """Serialize multipart message to a single buffer. Use this method to send
