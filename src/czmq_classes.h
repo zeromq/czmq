@@ -16,8 +16,8 @@
     =========================================================================
 */
 
-#ifndef __CZMQ_CLASSES_H_INCLUDED__
-#define __CZMQ_CLASSES_H_INCLUDED__
+#ifndef CZMQ_CLASSES_H_INCLUDED
+#define CZMQ_CLASSES_H_INCLUDED
 
 //  External API
 #include "../include/czmq.h"

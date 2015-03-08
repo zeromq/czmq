@@ -259,9 +259,9 @@ module CZMQ
       # Load/append an open file into message, create new message if 
       # null message provided. Returns NULL if the message could not 
       # be loaded.                                                   
-      def load file
-        raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zmsg_load @ptr, file
+      def self.load self, file
+        self = self.__ptr if self
+        result = ::CZMQ::FFI.zmsg_load self, file
         result = Zmsg.__new result, true
         result
       end

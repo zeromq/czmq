@@ -75,7 +75,7 @@ module CZMQ
       def self.new_pub endpoint
         endpoint = String(endpoint)
         result = ::CZMQ::FFI.zsock_new_pub endpoint
-        result = Zsock.__new result, false
+        result = Zsock.__new result, true
         result
       end
       
@@ -85,7 +85,7 @@ module CZMQ
         endpoint = String(endpoint)
         subscribe = String(subscribe)
         result = ::CZMQ::FFI.zsock_new_sub endpoint, subscribe
-        result = Zsock.__new result, false
+        result = Zsock.__new result, true
         result
       end
       
@@ -93,7 +93,7 @@ module CZMQ
       def self.new_req endpoint
         endpoint = String(endpoint)
         result = ::CZMQ::FFI.zsock_new_req endpoint
-        result = Zsock.__new result, false
+        result = Zsock.__new result, true
         result
       end
       
@@ -101,7 +101,7 @@ module CZMQ
       def self.new_rep endpoint
         endpoint = String(endpoint)
         result = ::CZMQ::FFI.zsock_new_rep endpoint
-        result = Zsock.__new result, false
+        result = Zsock.__new result, true
         result
       end
       
@@ -109,7 +109,7 @@ module CZMQ
       def self.new_dealer endpoint
         endpoint = String(endpoint)
         result = ::CZMQ::FFI.zsock_new_dealer endpoint
-        result = Zsock.__new result, false
+        result = Zsock.__new result, true
         result
       end
       
@@ -117,7 +117,7 @@ module CZMQ
       def self.new_router endpoint
         endpoint = String(endpoint)
         result = ::CZMQ::FFI.zsock_new_router endpoint
-        result = Zsock.__new result, false
+        result = Zsock.__new result, true
         result
       end
       
@@ -125,7 +125,7 @@ module CZMQ
       def self.new_push endpoint
         endpoint = String(endpoint)
         result = ::CZMQ::FFI.zsock_new_push endpoint
-        result = Zsock.__new result, false
+        result = Zsock.__new result, true
         result
       end
       
@@ -133,7 +133,7 @@ module CZMQ
       def self.new_pull endpoint
         endpoint = String(endpoint)
         result = ::CZMQ::FFI.zsock_new_pull endpoint
-        result = Zsock.__new result, false
+        result = Zsock.__new result, true
         result
       end
       
@@ -141,7 +141,7 @@ module CZMQ
       def self.new_xpub endpoint
         endpoint = String(endpoint)
         result = ::CZMQ::FFI.zsock_new_xpub endpoint
-        result = Zsock.__new result, false
+        result = Zsock.__new result, true
         result
       end
       
@@ -149,7 +149,7 @@ module CZMQ
       def self.new_xsub endpoint
         endpoint = String(endpoint)
         result = ::CZMQ::FFI.zsock_new_xsub endpoint
-        result = Zsock.__new result, false
+        result = Zsock.__new result, true
         result
       end
       
@@ -157,7 +157,7 @@ module CZMQ
       def self.new_pair endpoint
         endpoint = String(endpoint)
         result = ::CZMQ::FFI.zsock_new_pair endpoint
-        result = Zsock.__new result, false
+        result = Zsock.__new result, true
         result
       end
       
@@ -165,7 +165,7 @@ module CZMQ
       def self.new_stream endpoint
         endpoint = String(endpoint)
         result = ::CZMQ::FFI.zsock_new_stream endpoint
-        result = Zsock.__new result, false
+        result = Zsock.__new result, true
         result
       end
       

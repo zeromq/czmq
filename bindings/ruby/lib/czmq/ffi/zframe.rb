@@ -49,8 +49,9 @@ module CZMQ
         ptr_ptr
       end
       
-      # Constructor; if size is >0, allocates frame with that size, and if data
-      # is not null, copies data into frame.                                   
+      # Create a new frame. If size is not null, allocates the frame data
+      # to the specified size. If additionally, data is not null, copies 
+      # size octets from the specified data into the frame body.         
       def self.new data, size
         size = Integer(size)
         ptr = ::CZMQ::FFI.zframe_new data, size

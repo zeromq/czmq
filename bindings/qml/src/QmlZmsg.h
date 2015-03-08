@@ -109,11 +109,6 @@ public slots:
     //  to arbitrary change.                                                   
     int save (FILE *file);
 
-    //  Load/append an open file into message, create new message if 
-    //  null message provided. Returns NULL if the message could not 
-    //  be loaded.                                                   
-    QmlZmsg *load (FILE *file);
-
     //  Serialize multipart message to a single buffer. Use this method to send  
     //  structured messages across transports that do not support multipart data.
     //  Allocates and returns a new buffer containing the serialized message.    
@@ -159,6 +154,11 @@ public slots:
     //  the message anyhow. Nullifies the caller's reference to the message (as  
     //  it is a destructor).                                                     
     int send (QmlZmsg *selfP, void *dest);
+
+    //  Load/append an open file into message, create new message if 
+    //  null message provided. Returns NULL if the message could not 
+    //  be loaded.                                                   
+    QmlZmsg *load (QmlZmsg *self, FILE *file);
 
     //  Decodes a serialized message buffer created by zmsg_encode () and returns
     //  a new zmsg_t object. Returns NULL if the buffer was badly formatted or   

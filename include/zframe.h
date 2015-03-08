@@ -25,8 +25,9 @@ extern "C" {
 #define ZFRAME_REUSE 2                      // 
 #define ZFRAME_DONTWAIT 4                   // 
 
-//  Constructor; if size is >0, allocates frame with that size, and if data
-//  is not null, copies data into frame.                                   
+//  Create a new frame. If size is not null, allocates the frame data
+//  to the specified size. If additionally, data is not null, copies 
+//  size octets from the specified data into the frame body.         
 CZMQ_EXPORT zframe_t *
     zframe_new (const void *data, size_t size);
 
