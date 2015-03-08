@@ -790,63 +790,63 @@ zsock_new method."""
     @staticmethod
     def new_pub(endpoint):
         """Create a PUB socket. Default action is bind."""
-        return Zsock(lib.zsock_new_pub(endpoint), False)
+        return Zsock(lib.zsock_new_pub(endpoint), True)
 
     @staticmethod
     def new_sub(endpoint, subscribe):
         """Create a SUB socket, and optionally subscribe to some prefix string. Default
 action is connect."""
-        return Zsock(lib.zsock_new_sub(endpoint, subscribe), False)
+        return Zsock(lib.zsock_new_sub(endpoint, subscribe), True)
 
     @staticmethod
     def new_req(endpoint):
         """Create a REQ socket. Default action is connect."""
-        return Zsock(lib.zsock_new_req(endpoint), False)
+        return Zsock(lib.zsock_new_req(endpoint), True)
 
     @staticmethod
     def new_rep(endpoint):
         """Create a REP socket. Default action is bind."""
-        return Zsock(lib.zsock_new_rep(endpoint), False)
+        return Zsock(lib.zsock_new_rep(endpoint), True)
 
     @staticmethod
     def new_dealer(endpoint):
         """Create a DEALER socket. Default action is connect."""
-        return Zsock(lib.zsock_new_dealer(endpoint), False)
+        return Zsock(lib.zsock_new_dealer(endpoint), True)
 
     @staticmethod
     def new_router(endpoint):
         """Create a ROUTER socket. Default action is bind."""
-        return Zsock(lib.zsock_new_router(endpoint), False)
+        return Zsock(lib.zsock_new_router(endpoint), True)
 
     @staticmethod
     def new_push(endpoint):
         """Create a PUSH socket. Default action is connect."""
-        return Zsock(lib.zsock_new_push(endpoint), False)
+        return Zsock(lib.zsock_new_push(endpoint), True)
 
     @staticmethod
     def new_pull(endpoint):
         """Create a PULL socket. Default action is bind."""
-        return Zsock(lib.zsock_new_pull(endpoint), False)
+        return Zsock(lib.zsock_new_pull(endpoint), True)
 
     @staticmethod
     def new_xpub(endpoint):
         """Create an XPUB socket. Default action is bind."""
-        return Zsock(lib.zsock_new_xpub(endpoint), False)
+        return Zsock(lib.zsock_new_xpub(endpoint), True)
 
     @staticmethod
     def new_xsub(endpoint):
         """Create an XSUB socket. Default action is connect."""
-        return Zsock(lib.zsock_new_xsub(endpoint), False)
+        return Zsock(lib.zsock_new_xsub(endpoint), True)
 
     @staticmethod
     def new_pair(endpoint):
         """Create a PAIR socket. Default action is connect."""
-        return Zsock(lib.zsock_new_pair(endpoint), False)
+        return Zsock(lib.zsock_new_pair(endpoint), True)
 
     @staticmethod
     def new_stream(endpoint):
         """Create a STREAM socket. Default action is connect."""
-        return Zsock(lib.zsock_new_stream(endpoint), False)
+        return Zsock(lib.zsock_new_stream(endpoint), True)
 
     def bind(self, format, *args):
         """Bind a socket to a formatted endpoint. For tcp:// endpoints, supports
