@@ -19,6 +19,8 @@ class QmlZfile;
 class QmlZfileAttached;
 class QmlZframe;
 class QmlZframeAttached;
+class QmlZiflist;
+class QmlZiflistAttached;
 class QmlZloop;
 class QmlZloopAttached;
 class QmlZmsg;
@@ -34,6 +36,7 @@ class QmlZlistAttached;
 #include "QmlZdirPatch.h"
 #include "QmlZfile.h"
 #include "QmlZframe.h"
+#include "QmlZiflist.h"
 #include "QmlZloop.h"
 #include "QmlZmsg.h"
 #include "QmlZsock.h"
@@ -56,6 +59,8 @@ public:
         qmlRegisterType<QmlZfileAttached>();
         qmlRegisterType<QmlZframe> (uri, 1, 0, "QmlZframe");
         qmlRegisterType<QmlZframeAttached>();
+        qmlRegisterType<QmlZiflist> (uri, 1, 0, "QmlZiflist");
+        qmlRegisterType<QmlZiflistAttached>();
         qmlRegisterType<QmlZloop> (uri, 1, 0, "QmlZloop");
         qmlRegisterType<QmlZloopAttached>();
         qmlRegisterType<QmlZmsg> (uri, 1, 0, "QmlZmsg");

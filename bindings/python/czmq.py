@@ -59,6 +59,10 @@ class zframe_t(Structure):
     pass # Empty - only for type checking
 zframe_p = POINTER(zframe_t)
 
+class ziflist_t(Structure):
+    pass # Empty - only for type checking
+ziflist_p = POINTER(ziflist_t)
+
 class zloop_t(Structure):
     pass # Empty - only for type checking
 zloop_p = POINTER(zloop_t)
@@ -660,6 +664,91 @@ configured by zsys_set_logstream). Prefix shows before frame, if not null."""
     def test(verbose):
         """Self test of this class"""
         return lib.zframe_test(verbose)
+
+
+# ziflist
+lib.ziflist_new.restype = ziflist_p
+lib.ziflist_new.argtypes = []
+lib.ziflist_destroy.restype = None
+lib.ziflist_destroy.argtypes = [POINTER(ziflist_p)]
+lib.ziflist_reload.restype = None
+lib.ziflist_reload.argtypes = [ziflist_p]
+lib.ziflist_size.restype = c_size_t
+lib.ziflist_size.argtypes = [ziflist_p]
+lib.ziflist_first.restype = c_char_p
+lib.ziflist_first.argtypes = [ziflist_p]
+lib.ziflist_next.restype = c_char_p
+lib.ziflist_next.argtypes = [ziflist_p]
+lib.ziflist_address.restype = c_char_p
+lib.ziflist_address.argtypes = [ziflist_p]
+lib.ziflist_broadcast.restype = c_char_p
+lib.ziflist_broadcast.argtypes = [ziflist_p]
+lib.ziflist_netmask.restype = c_char_p
+lib.ziflist_netmask.argtypes = [ziflist_p]
+lib.ziflist_test.restype = None
+lib.ziflist_test.argtypes = [c_bool]
+
+class Ziflist(object):
+    """List of network interfaces available on system"""
+
+    def __init__(self, *args):
+        """Get a list of network interfaces currently defined on the system"""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], ziflist_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is ziflist_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 0)
+            self._as_parameter_ = lib.ziflist_new() # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destroy a ziflist instance"""
+        if self.allow_destruct:
+            lib.ziflist_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def reload(self):
+        """Reload network interfaces from system"""
+        return lib.ziflist_reload(self._as_parameter_)
+
+    def size(self):
+        """Return the number of network interfaces on system"""
+        return lib.ziflist_size(self._as_parameter_)
+
+    def first(self):
+        """Get first network interface, return NULL if there are none"""
+        return lib.ziflist_first(self._as_parameter_)
+
+    def next(self):
+        """Get next network interface, return NULL if we hit the last one"""
+        return lib.ziflist_next(self._as_parameter_)
+
+    def address(self):
+        """Return the current interface IP address as a printable string"""
+        return lib.ziflist_address(self._as_parameter_)
+
+    def broadcast(self):
+        """Return the current interface broadcast address as a printable string"""
+        return lib.ziflist_broadcast(self._as_parameter_)
+
+    def netmask(self):
+        """Return the current interface network mask as a printable string"""
+        return lib.ziflist_netmask(self._as_parameter_)
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class."""
+        return lib.ziflist_test(verbose)
 
 
 # zloop
