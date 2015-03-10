@@ -551,6 +551,9 @@ lib.zframe_test.argtypes = [c_bool]
 class Zframe(object):
     """working with single message frames"""
 
+    MORE = 1 # 
+    REUSE = 2 # 
+    DONTWAIT = 4 # 
     def __init__(self, *args):
         """Create a new frame. If size is not null, allocates the frame data
 to the specified size. If additionally, data is not null, copies
