@@ -34,6 +34,63 @@ module CZMQ
         blocking: true  # only necessary on MRI to deal with the GIL.
       }
       
+      attach_function :zdir_new, [:string, :string], :pointer, **opts
+      attach_function :zdir_destroy, [:pointer], :void, **opts
+      attach_function :zdir_path, [:pointer], :string, **opts
+      attach_function :zdir_modified, [:pointer], :pointer, **opts
+      attach_function :zdir_cursize, [:pointer], :pointer, **opts
+      attach_function :zdir_count, [:pointer], :size_t, **opts
+      attach_function :zdir_list, [:pointer], :pointer, **opts
+      attach_function :zdir_remove, [:pointer, :bool], :void, **opts
+      attach_function :zdir_diff, [:pointer, :pointer, :string], :pointer, **opts
+      attach_function :zdir_resync, [:pointer, :string], :pointer, **opts
+      attach_function :zdir_cache, [:pointer], :pointer, **opts
+      attach_function :zdir_fprint, [:pointer, :pointer, :int], :void, **opts
+      attach_function :zdir_print, [:pointer, :int], :void, **opts
+      attach_function :zdir_test, [:bool], :void, **opts
+      
+      require_relative 'ffi/zdir'
+      
+      attach_function :zdir_patch_new, [:string, :pointer, :pointer, :string], :pointer, **opts
+      attach_function :zdir_patch_destroy, [:pointer], :void, **opts
+      attach_function :zdir_patch_dup, [:pointer], :pointer, **opts
+      attach_function :zdir_patch_path, [:pointer], :string, **opts
+      attach_function :zdir_patch_file, [:pointer], :pointer, **opts
+      attach_function :zdir_patch_op, [:pointer], :pointer, **opts
+      attach_function :zdir_patch_vpath, [:pointer], :string, **opts
+      attach_function :zdir_patch_digest_set, [:pointer], :void, **opts
+      attach_function :zdir_patch_digest, [:pointer], :string, **opts
+      attach_function :zdir_patch_test, [:bool], :void, **opts
+      
+      require_relative 'ffi/zdir_patch'
+      
+      attach_function :zfile_new, [:string, :string], :pointer, **opts
+      attach_function :zfile_destroy, [:pointer], :void, **opts
+      attach_function :zfile_dup, [:pointer], :pointer, **opts
+      attach_function :zfile_filename, [:pointer, :string], :string, **opts
+      attach_function :zfile_restat, [:pointer], :void, **opts
+      attach_function :zfile_modified, [:pointer], :pointer, **opts
+      attach_function :zfile_cursize, [:pointer], :pointer, **opts
+      attach_function :zfile_is_directory, [:pointer], :bool, **opts
+      attach_function :zfile_is_regular, [:pointer], :bool, **opts
+      attach_function :zfile_is_readable, [:pointer], :bool, **opts
+      attach_function :zfile_is_writeable, [:pointer], :bool, **opts
+      attach_function :zfile_is_stable, [:pointer], :bool, **opts
+      attach_function :zfile_has_changed, [:pointer], :bool, **opts
+      attach_function :zfile_remove, [:pointer], :void, **opts
+      attach_function :zfile_input, [:pointer], :int, **opts
+      attach_function :zfile_output, [:pointer], :int, **opts
+      attach_function :zfile_read, [:pointer, :size_t, :pointer], :pointer, **opts
+      attach_function :zfile_eof, [:pointer], :bool, **opts
+      attach_function :zfile_write, [:pointer, :pointer, :pointer], :int, **opts
+      attach_function :zfile_readln, [:pointer], :string, **opts
+      attach_function :zfile_close, [:pointer], :void, **opts
+      attach_function :zfile_handle, [:pointer], :pointer, **opts
+      attach_function :zfile_digest, [:pointer], :string, **opts
+      attach_function :zfile_test, [:bool], :void, **opts
+      
+      require_relative 'ffi/zfile'
+      
       attach_function :zframe_new, [:pointer, :size_t], :pointer, **opts
       attach_function :zframe_destroy, [:pointer], :void, **opts
       attach_function :zframe_new_empty, [], :pointer, **opts

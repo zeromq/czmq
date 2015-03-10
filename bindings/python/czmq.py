@@ -27,6 +27,34 @@ if not libpath:
     raise ImportError("Unable to find czmq C library")
 lib = cdll.LoadLibrary(libpath)
 
+class zdir_t(Structure):
+    pass # Empty - only for type checking
+zdir_p = POINTER(zdir_t)
+
+class zlist_t(Structure):
+    pass # Empty - only for type checking
+zlist_p = POINTER(zlist_t)
+
+class zhash_t(Structure):
+    pass # Empty - only for type checking
+zhash_p = POINTER(zhash_t)
+
+class FILE(Structure):
+    pass # Empty - only for type checking
+FILE_p = POINTER(FILE)
+
+class zfile_t(Structure):
+    pass # Empty - only for type checking
+zfile_p = POINTER(zfile_t)
+
+class zdir_patch_t(Structure):
+    pass # Empty - only for type checking
+zdir_patch_p = POINTER(zdir_patch_t)
+
+class zchunk_t(Structure):
+    pass # Empty - only for type checking
+zchunk_p = POINTER(zchunk_t)
+
 class zframe_t(Structure):
     pass # Empty - only for type checking
 zframe_p = POINTER(zframe_t)
@@ -47,21 +75,9 @@ class zmsg_t(Structure):
     pass # Empty - only for type checking
 zmsg_p = POINTER(zmsg_t)
 
-class FILE(Structure):
-    pass # Empty - only for type checking
-FILE_p = POINTER(FILE)
-
 class va_list_t(Structure):
     pass # Empty - only for type checking
 va_list_p = POINTER(va_list_t)
-
-class zhash_t(Structure):
-    pass # Empty - only for type checking
-zhash_p = POINTER(zhash_t)
-
-class zlist_t(Structure):
-    pass # Empty - only for type checking
-zlist_p = POINTER(zlist_t)
 
 PyFile_FromFile_close_cb = CFUNCTYPE(c_int, FILE_p)
 PyFile_FromFile = pythonapi.PyFile_FromFile
@@ -81,6 +97,417 @@ def coerce_py_file(obj):
         return obj
     else:
         return PyFile_AsFile(obj)
+
+
+# zdir
+lib.zdir_new.restype = zdir_p
+lib.zdir_new.argtypes = [c_char_p, c_char_p]
+lib.zdir_destroy.restype = None
+lib.zdir_destroy.argtypes = [POINTER(zdir_p)]
+lib.zdir_path.restype = c_char_p
+lib.zdir_path.argtypes = [zdir_p]
+lib.zdir_modified.restype = c_int
+lib.zdir_modified.argtypes = [zdir_p]
+lib.zdir_cursize.restype = c_int
+lib.zdir_cursize.argtypes = [zdir_p]
+lib.zdir_count.restype = c_size_t
+lib.zdir_count.argtypes = [zdir_p]
+lib.zdir_list.restype = zlist_p
+lib.zdir_list.argtypes = [zdir_p]
+lib.zdir_remove.restype = None
+lib.zdir_remove.argtypes = [zdir_p, c_bool]
+lib.zdir_diff.restype = zlist_p
+lib.zdir_diff.argtypes = [zdir_p, zdir_p, c_char_p]
+lib.zdir_resync.restype = zlist_p
+lib.zdir_resync.argtypes = [zdir_p, c_char_p]
+lib.zdir_cache.restype = zhash_p
+lib.zdir_cache.argtypes = [zdir_p]
+lib.zdir_fprint.restype = None
+lib.zdir_fprint.argtypes = [zdir_p, FILE_p, c_int]
+lib.zdir_print.restype = None
+lib.zdir_print.argtypes = [zdir_p, c_int]
+lib.zdir_test.restype = None
+lib.zdir_test.argtypes = [c_bool]
+
+class Zdir(object):
+    """work with file-system directories"""
+
+    def __init__(self, *args):
+        """Create a new directory item that loads in the full tree of the specified
+path, optionally located under some parent path. If parent is "-", then
+loads only the top-level directory, and does not use parent as a path."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zdir_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zdir_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 2)
+            self._as_parameter_ = lib.zdir_new(args[0], args[1]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destroy a directory tree and all children it contains."""
+        if self.allow_destruct:
+            lib.zdir_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def path(self):
+        """Return directory path"""
+        return lib.zdir_path(self._as_parameter_)
+
+    def modified(self):
+        """Return last modification time for directory."""
+        return lib.zdir_modified(self._as_parameter_)
+
+    def cursize(self):
+        """Return total hierarchy size, in bytes of data contained in all files
+in the directory tree."""
+        return lib.zdir_cursize(self._as_parameter_)
+
+    def count(self):
+        """Return directory count"""
+        return lib.zdir_count(self._as_parameter_)
+
+    def list(self):
+        """Returns a sorted list of zfile objects; Each entry in the list is a pointer
+to a zfile_t item already allocated in the zdir tree. Do not destroy the
+original zdir tree until you are done with this list. The caller must destroy
+the list when done with it."""
+        return Zlist(lib.zdir_list(self._as_parameter_), True)
+
+    def remove(self, force):
+        """Remove directory, optionally including all files that it contains, at
+all levels. If force is false, will only remove the directory if empty.
+If force is true, will remove all files and all subdirectories."""
+        return lib.zdir_remove(self._as_parameter_, force)
+
+    @staticmethod
+    def diff(older, newer, alias):
+        """Calculate differences between two versions of a directory tree.
+Returns a list of zdir_patch_t patches. Either older or newer may
+be null, indicating the directory is empty/absent. If alias is set,
+generates virtual filename (minus path, plus alias)."""
+        return Zlist(lib.zdir_diff(older, newer, alias), True)
+
+    def resync(self, alias):
+        """Return full contents of directory as a zdir_patch list."""
+        return Zlist(lib.zdir_resync(self._as_parameter_, alias), True)
+
+    def cache(self):
+        """Load directory cache; returns a hash table containing the SHA-1 digests
+of every file in the tree. The cache is saved between runs in .cache.
+The caller must destroy the hash table when done with it."""
+        return Zhash(lib.zdir_cache(self._as_parameter_), True)
+
+    def fprint(self, file, indent):
+        """Print contents of directory to open stream"""
+        return lib.zdir_fprint(self._as_parameter_, coerce_py_file(file), indent)
+
+    def print(self, indent):
+        """Print contents of directory to stdout"""
+        return lib.zdir_print(self._as_parameter_, indent)
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class."""
+        return lib.zdir_test(verbose)
+
+
+# zdir patch
+lib.zdir_patch_new.restype = zdir_patch_p
+lib.zdir_patch_new.argtypes = [c_char_p, zfile_p, c_int, c_char_p]
+lib.zdir_patch_destroy.restype = None
+lib.zdir_patch_destroy.argtypes = [POINTER(zdir_patch_p)]
+lib.zdir_patch_dup.restype = zdir_patch_p
+lib.zdir_patch_dup.argtypes = [zdir_patch_p]
+lib.zdir_patch_path.restype = c_char_p
+lib.zdir_patch_path.argtypes = [zdir_patch_p]
+lib.zdir_patch_file.restype = zfile_p
+lib.zdir_patch_file.argtypes = [zdir_patch_p]
+lib.zdir_patch_op.restype = c_int
+lib.zdir_patch_op.argtypes = [zdir_patch_p]
+lib.zdir_patch_vpath.restype = c_char_p
+lib.zdir_patch_vpath.argtypes = [zdir_patch_p]
+lib.zdir_patch_digest_set.restype = None
+lib.zdir_patch_digest_set.argtypes = [zdir_patch_p]
+lib.zdir_patch_digest.restype = c_char_p
+lib.zdir_patch_digest.argtypes = [zdir_patch_p]
+lib.zdir_patch_test.restype = None
+lib.zdir_patch_test.argtypes = [c_bool]
+
+class ZdirPatch(object):
+    """work with directory patches"""
+
+    Op = {
+        'create': 1,
+        'delete': 2,
+    }
+
+    Op_out = {
+         1: 'create',
+         2: 'delete',
+    }
+
+    def __init__(self, *args):
+        """Create new patch"""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zdir_patch_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zdir_patch_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 4)
+            self._as_parameter_ = lib.zdir_patch_new(args[0], args[1], ZdirPatch.Op[args[2]], args[3]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destroy a patch"""
+        if self.allow_destruct:
+            lib.zdir_patch_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def dup(self):
+        """Create copy of a patch. If the patch is null, or memory was exhausted,
+returns null."""
+        return ZdirPatch(lib.zdir_patch_dup(self._as_parameter_), True)
+
+    def path(self):
+        """Return patch file directory path"""
+        return lib.zdir_patch_path(self._as_parameter_)
+
+    def file(self):
+        """Return patch file item"""
+        return Zfile(lib.zdir_patch_file(self._as_parameter_), False)
+
+    def op(self):
+        """Return operation"""
+        return ZdirPatch.Op_out[lib.zdir_patch_op(self._as_parameter_)]
+
+    def vpath(self):
+        """Return patch virtual file path"""
+        return lib.zdir_patch_vpath(self._as_parameter_)
+
+    def digest_set(self):
+        """Calculate hash digest for file (create only)"""
+        return lib.zdir_patch_digest_set(self._as_parameter_)
+
+    def digest(self):
+        """Return hash digest for patch file"""
+        return lib.zdir_patch_digest(self._as_parameter_)
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class."""
+        return lib.zdir_patch_test(verbose)
+
+
+# zfile
+lib.zfile_new.restype = zfile_p
+lib.zfile_new.argtypes = [c_char_p, c_char_p]
+lib.zfile_destroy.restype = None
+lib.zfile_destroy.argtypes = [POINTER(zfile_p)]
+lib.zfile_dup.restype = zfile_p
+lib.zfile_dup.argtypes = [zfile_p]
+lib.zfile_filename.restype = c_char_p
+lib.zfile_filename.argtypes = [zfile_p, c_char_p]
+lib.zfile_restat.restype = None
+lib.zfile_restat.argtypes = [zfile_p]
+lib.zfile_modified.restype = c_int
+lib.zfile_modified.argtypes = [zfile_p]
+lib.zfile_cursize.restype = c_int
+lib.zfile_cursize.argtypes = [zfile_p]
+lib.zfile_is_directory.restype = c_bool
+lib.zfile_is_directory.argtypes = [zfile_p]
+lib.zfile_is_regular.restype = c_bool
+lib.zfile_is_regular.argtypes = [zfile_p]
+lib.zfile_is_readable.restype = c_bool
+lib.zfile_is_readable.argtypes = [zfile_p]
+lib.zfile_is_writeable.restype = c_bool
+lib.zfile_is_writeable.argtypes = [zfile_p]
+lib.zfile_is_stable.restype = c_bool
+lib.zfile_is_stable.argtypes = [zfile_p]
+lib.zfile_has_changed.restype = c_bool
+lib.zfile_has_changed.argtypes = [zfile_p]
+lib.zfile_remove.restype = None
+lib.zfile_remove.argtypes = [zfile_p]
+lib.zfile_input.restype = c_int
+lib.zfile_input.argtypes = [zfile_p]
+lib.zfile_output.restype = c_int
+lib.zfile_output.argtypes = [zfile_p]
+lib.zfile_read.restype = zchunk_p
+lib.zfile_read.argtypes = [zfile_p, c_size_t, c_int]
+lib.zfile_eof.restype = c_bool
+lib.zfile_eof.argtypes = [zfile_p]
+lib.zfile_write.restype = c_int
+lib.zfile_write.argtypes = [zfile_p, zchunk_p, c_int]
+lib.zfile_readln.restype = c_char_p
+lib.zfile_readln.argtypes = [zfile_p]
+lib.zfile_close.restype = None
+lib.zfile_close.argtypes = [zfile_p]
+lib.zfile_handle.restype = FILE_p
+lib.zfile_handle.argtypes = [zfile_p]
+lib.zfile_digest.restype = c_char_p
+lib.zfile_digest.argtypes = [zfile_p]
+lib.zfile_test.restype = None
+lib.zfile_test.argtypes = [c_bool]
+
+class Zfile(object):
+    """helper functions for working with files."""
+
+    def __init__(self, *args):
+        """If file exists, populates properties. CZMQ supports portable symbolic
+links, which are files with the extension ".ln". A symbolic link is a
+text file containing one line, the filename of a target file. Reading
+data from the symbolic link actually reads from the target file. Path
+may be NULL, in which case it is not used."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zfile_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zfile_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 2)
+            self._as_parameter_ = lib.zfile_new(args[0], args[1]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destroy a file item"""
+        if self.allow_destruct:
+            lib.zfile_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def dup(self):
+        """Duplicate a file item, returns a newly constructed item. If the file
+is null, or memory was exhausted, returns null."""
+        return Zfile(lib.zfile_dup(self._as_parameter_), True)
+
+    def filename(self, path):
+        """Return file name, remove path if provided"""
+        return lib.zfile_filename(self._as_parameter_, path)
+
+    def restat(self):
+        """Refresh file properties from disk; this is not done automatically
+on access methods, otherwise it is not possible to compare directory
+snapshots."""
+        return lib.zfile_restat(self._as_parameter_)
+
+    def modified(self):
+        """Return when the file was last modified. If you want this to reflect the
+current situation, call zfile_restat before checking this property."""
+        return lib.zfile_modified(self._as_parameter_)
+
+    def cursize(self):
+        """Return the last-known size of the file. If you want this to reflect the
+current situation, call zfile_restat before checking this property."""
+        return lib.zfile_cursize(self._as_parameter_)
+
+    def is_directory(self):
+        """Return true if the file is a directory. If you want this to reflect
+any external changes, call zfile_restat before checking this property."""
+        return lib.zfile_is_directory(self._as_parameter_)
+
+    def is_regular(self):
+        """Return true if the file is a regular file. If you want this to reflect
+any external changes, call zfile_restat before checking this property."""
+        return lib.zfile_is_regular(self._as_parameter_)
+
+    def is_readable(self):
+        """Return true if the file is readable by this process. If you want this to
+reflect any external changes, call zfile_restat before checking this
+property."""
+        return lib.zfile_is_readable(self._as_parameter_)
+
+    def is_writeable(self):
+        """Return true if the file is writeable by this process. If you want this
+to reflect any external changes, call zfile_restat before checking this
+property."""
+        return lib.zfile_is_writeable(self._as_parameter_)
+
+    def is_stable(self):
+        """Check if file has stopped changing and can be safely processed.
+Updates the file statistics from disk at every call."""
+        return lib.zfile_is_stable(self._as_parameter_)
+
+    def has_changed(self):
+        """Return true if the file was changed on disk since the zfile_t object
+was created, or the last zfile_restat() call made on it."""
+        return lib.zfile_has_changed(self._as_parameter_)
+
+    def remove(self):
+        """Remove the file from disk"""
+        return lib.zfile_remove(self._as_parameter_)
+
+    def input(self):
+        """Open file for reading
+Returns 0 if OK, -1 if not found or not accessible"""
+        return lib.zfile_input(self._as_parameter_)
+
+    def output(self):
+        """Open file for writing, creating directory if needed
+File is created if necessary; chunks can be written to file at any
+location. Returns 0 if OK, -1 if error."""
+        return lib.zfile_output(self._as_parameter_)
+
+    def read(self, bytes, offset):
+        """Read chunk from file at specified position. If this was the last chunk,
+sets the eof property. Returns a null chunk in case of error."""
+        return lib.zfile_read(self._as_parameter_, bytes, offset)
+
+    def eof(self):
+        """Returns true if zfile_read() just read the last chunk in the file."""
+        return lib.zfile_eof(self._as_parameter_)
+
+    def write(self, chunk, offset):
+        """Write chunk to file at specified position
+Return 0 if OK, else -1"""
+        return lib.zfile_write(self._as_parameter_, chunk, offset)
+
+    def readln(self):
+        """Read next line of text from file. Returns a pointer to the text line,
+or NULL if there was nothing more to read from the file."""
+        return lib.zfile_readln(self._as_parameter_)
+
+    def close(self):
+        """Close file, if open"""
+        return lib.zfile_close(self._as_parameter_)
+
+    def handle(self):
+        """Return file handle, if opened"""
+        return return_py_file(lib.zfile_handle(self._as_parameter_))
+
+    def digest(self):
+        """Calculate SHA1 digest for file, using zdigest class."""
+        return lib.zfile_digest(self._as_parameter_)
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class."""
+        return lib.zfile_test(verbose)
 
 
 # zframe
