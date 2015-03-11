@@ -43,6 +43,10 @@ class FILE(Structure):
     pass # Empty - only for type checking
 FILE_p = POINTER(FILE)
 
+class zsock_t(Structure):
+    pass # Empty - only for type checking
+zsock_p = POINTER(zsock_t)
+
 class zfile_t(Structure):
     pass # Empty - only for type checking
 zfile_p = POINTER(zfile_t)
@@ -66,10 +70,6 @@ ziflist_p = POINTER(ziflist_t)
 class zloop_t(Structure):
     pass # Empty - only for type checking
 zloop_p = POINTER(zloop_t)
-
-class zsock_t(Structure):
-    pass # Empty - only for type checking
-zsock_p = POINTER(zsock_t)
 
 class zmq_pollitem_t(Structure):
     pass # Empty - only for type checking
@@ -130,6 +130,8 @@ lib.zdir_fprint.restype = None
 lib.zdir_fprint.argtypes = [zdir_p, FILE_p, c_int]
 lib.zdir_print.restype = None
 lib.zdir_print.argtypes = [zdir_p, c_int]
+lib.zdir_watch.restype = None
+lib.zdir_watch.argtypes = [zsock_p, c_void_p]
 lib.zdir_test.restype = None
 lib.zdir_test.argtypes = [c_bool]
 
@@ -219,6 +221,36 @@ The caller must destroy the hash table when done with it."""
     def print(self, indent):
         """Print contents of directory to stdout"""
         return lib.zdir_print(self._as_parameter_, indent)
+
+    @staticmethod
+    def watch(pipe, unused):
+        """Create a new zdir_watch actor instance:
+
+    zactor_t *watch = zactor_new (zdir_watch, NULL);
+
+Destroy zdir_watch instance:
+
+    zactor_destroy (&watch);
+
+Enable verbose logging of commands and activity:
+
+    zstr_send (watch, "VERBOSE");
+
+Subscribe to changes to a directory path:
+
+    zsock_send (watch, "ss", "SUBSCRIBE", "directory_path");
+
+Unsubscribe from changes to a directory path:
+
+    zsock_send (watch, "ss", "UNSUBSCRIBE", "directory_path");
+
+Receive directory changes:
+    zsock_recv (watch, "sp", &path, &patches);
+
+    // Delete the received data.
+    free (path);
+    zlist_destroy (&patches);"""
+        return lib.zdir_watch(pipe, unused)
 
     @staticmethod
     def test(verbose):

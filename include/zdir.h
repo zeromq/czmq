@@ -86,6 +86,35 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zdir_print (zdir_t *self, int indent);
 
+//  Create a new zdir_watch actor instance:                       
+//                                                                
+//      zactor_t *watch = zactor_new (zdir_watch, NULL);          
+//                                                                
+//  Destroy zdir_watch instance:                                  
+//                                                                
+//      zactor_destroy (&watch);                                  
+//                                                                
+//  Enable verbose logging of commands and activity:              
+//                                                                
+//      zstr_send (watch, "VERBOSE");                             
+//                                                                
+//  Subscribe to changes to a directory path:                     
+//                                                                
+//      zsock_send (watch, "ss", "SUBSCRIBE", "directory_path");  
+//                                                                
+//  Unsubscribe from changes to a directory path:                 
+//                                                                
+//      zsock_send (watch, "ss", "UNSUBSCRIBE", "directory_path");
+//                                                                
+//  Receive directory changes:                                    
+//      zsock_recv (watch, "sp", &path, &patches);                
+//                                                                
+//      // Delete the received data.                              
+//      free (path);                                              
+//      zlist_destroy (&patches);                                 
+CZMQ_EXPORT void
+    zdir_watch (zsock_t *pipe, void *unused);
+
 //  Self test of this class.
 CZMQ_EXPORT void
     zdir_test (bool verbose);
