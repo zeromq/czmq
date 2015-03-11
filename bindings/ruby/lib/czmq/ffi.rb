@@ -112,6 +112,19 @@ module CZMQ
       
       require_relative 'ffi/zframe'
       
+      attach_function :ziflist_new, [], :pointer, **opts
+      attach_function :ziflist_destroy, [:pointer], :void, **opts
+      attach_function :ziflist_reload, [:pointer], :void, **opts
+      attach_function :ziflist_size, [:pointer], :size_t, **opts
+      attach_function :ziflist_first, [:pointer], :string, **opts
+      attach_function :ziflist_next, [:pointer], :string, **opts
+      attach_function :ziflist_address, [:pointer], :string, **opts
+      attach_function :ziflist_broadcast, [:pointer], :string, **opts
+      attach_function :ziflist_netmask, [:pointer], :string, **opts
+      attach_function :ziflist_test, [:bool], :void, **opts
+      
+      require_relative 'ffi/ziflist'
+      
       attach_function :zloop_new, [], :pointer, **opts
       attach_function :zloop_destroy, [:pointer], :void, **opts
       attach_function :zloop_reader, [:pointer, :pointer, :pointer, :pointer], :int, **opts
