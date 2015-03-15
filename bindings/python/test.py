@@ -28,6 +28,103 @@ class TestCZMQ(unittest.TestCase):
         nosuch = Zdir("does-not-exist", None)
         self.assertFalse(nosuch)
 
+        # zdir_watch test:
+        watch = Zactor(zactor_fn(lib.zdir_watch), None)
+        self.assertTrue(watch)
+
+        if self.verbose:
+            watch.sock().send("s", "VERBOSE")
+            self.assertEquals(watch.wait(), 0)
+
+        # need to create a file in the test directory we're watching
+        # in order to ensure the directory exists
+        initfile = Zfile("./zdir-test-dir", "initial_file")
+        self.assertTrue(initfile)
+        initfile.output()
+        initfile.handle().write("initial file\n")
+        initfile.close()
+
+        time.sleep(1.001) # wait for initial file to become 'stable'
+
+        watch.sock().send("si", "TIMEOUT", 100)
+        self.assertEquals(watch.sock().wait(), 0)
+
+        watch.sock().send("ss", "SUBSCRIBE", "zdir-test-dir")
+        self.assertEquals(watch.sock().wait(), 0)
+
+        watch.sock().send("ss", "UNSUBSCRIBE", "zdir-test-dir")
+        self.assertEquals(watch.sock().wait(), 0)
+
+        watch.sock().send("ss", "SUBSCRIBE", "zdir-test-dir")
+        self.assertEquals(watch.sock().wait(), 0)
+
+        newfile = Zfile("zdir-test-dir", "test_abc")
+        newfile.output()
+        newfile.handle().write("test file\n")
+        newfile.close()
+
+        #watch_poll = Zpoller(watch, None)
+
+        # poll for a certain timeout before giving up and failing the test.
+        #assert(watch_poll.wait(1001) == watch)
+
+        # wait for notification of the file being added
+        path = c_char_p()
+        patches = zlist_p()
+        rc = watch.sock().recv("sp", byref(path), byref(patches))
+        self.assertEquals(rc, 0)
+        patches = Zlist(patches, True)
+
+        self.assertEquals(string_at(path), "zdir-test-dir")
+        libc.free (path)
+
+        self.assertEquals(patches.size(), 1)
+
+        patch = ZdirPatch(patches.pop(), True)
+        self.assertEquals(patch.path(), "zdir-test-dir")
+
+        patch_file = patch.file()
+        self.assertEquals(patch_file.filename(""), "zdir-test-dir/test_abc")
+
+        del patch
+        del patches
+
+        # remove the file
+        newfile.remove()
+        del newfile
+
+        # poll for a certain timeout before giving up and failing the test.
+        #assert(watch_poll.wait(1001) == watch)
+
+        # wait for notification of the file being removed
+        path = c_char_p()
+        patches = zlist_p()
+        rc = watch.sock().recv("sp", byref(path), byref(patches))
+        self.assertEquals(rc, 0)
+        patches = Zlist(patches, True)
+
+        self.assertEquals(string_at(path), "zdir-test-dir")
+        libc.free (path)
+
+        self.assertEquals(patches.size(), 1)
+
+        patch = ZdirPatch(patches.pop(), True)
+        self.assertEquals(patch.path(), "zdir-test-dir")
+
+        patch_file = patch.file()
+        self.assertEquals(patch_file.filename(""), "zdir-test-dir/test_abc")
+
+        del patch
+        del patches
+
+        #zpoller_destroy (&watch_poll)
+        del watch
+
+        # clean up by removing the test directory.
+        testdir = Zdir("zdir-test-dir", None)
+        testdir.remove(True)
+        del testdir
+
     def test_zdir_patch(self):
         file = Zfile(".", "bilbo")
         self.assertTrue(file)
