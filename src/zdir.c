@@ -671,14 +671,13 @@ s_on_read_timer (zloop_t *loop, int timer_id, void *arg)
 
     for (void *data = zhash_first (watch->subs); data != NULL; data = zhash_next (watch->subs))
     {
-        zdir_watch_sub_t *sub = (zdir_watch_sub_t *)data;
+        zdir_watch_sub_t *sub = (zdir_watch_sub_t *) data;
 
         zdir_t *new_dir = zdir_new (zdir_path (sub->dir), NULL);
-        if (!new_dir)
-        {
+        if (!new_dir) {
             if (watch->verbose)
                 zsys_error ("zdir_watch: Unable to create new zdir for path %s", zdir_path (sub->dir));
-            continue; 
+            continue;
         }
 
         // Determine if anything has changed.
@@ -688,27 +687,23 @@ s_on_read_timer (zloop_t *loop, int timer_id, void *arg)
         zdir_destroy (&sub->dir);
         sub->dir = new_dir;
 
-        if (!diff)
-        {
+        if (!diff) {
             if (watch->verbose)
                 zsys_error ("zdir_watch: Unable to create diff for path %s", zdir_path (sub->dir));
-            continue; 
+            continue;
         }
 
-        if (zlist_size (diff) > 0)
-        {
+        if (zlist_size (diff) > 0) {
             if (watch->verbose)
                 zsys_info ("zdir_watch: Found %d changes in %s", zlist_size (diff), zdir_path (sub->dir));
 
-            if (zsock_send(watch->pipe, "sp", zdir_path (sub->dir), diff) != 0)
-            {
+            if (zsock_send (watch->pipe, "sp", zdir_path (sub->dir), diff) != 0) {
                 if (watch->verbose)
                     zsys_error ("zdir_watch: Unable to send patch list for path %s", zdir_path (sub->dir));
                 zlist_destroy (&diff);
             }
         }
-        else
-        {
+        else {
             if (watch->verbose)
                 zsys_info ("zdir_watch: No changes in %s", zdir_path (sub->dir));
             zlist_destroy (&diff);
@@ -736,7 +731,7 @@ s_zdir_watch_destroy (zdir_watch_t **watch_p)
 static void
 s_sub_free (void *data)
 {
-    zdir_watch_sub_t *sub = (zdir_watch_sub_t *)data;
+    zdir_watch_sub_t *sub = (zdir_watch_sub_t *) data;
     zdir_destroy (&sub->dir);
 
     free (sub);
@@ -748,12 +743,11 @@ s_zdir_watch_subscribe (zdir_watch_t *watch, const char *path)
     if (watch->verbose)
         zsys_info ("zdir_watch: Subscribing to directory path: %s", path);
 
-    zdir_watch_sub_t *sub = (zdir_watch_sub_t *) zmalloc (sizeof(zdir_watch_sub_t));
+    zdir_watch_sub_t *sub = (zdir_watch_sub_t *) zmalloc (sizeof (zdir_watch_sub_t));
     sub->dir = zdir_new (path, NULL);
 
     int rc = zhash_insert (watch->subs, path, sub);
-    if (rc)
-    {
+    if (rc) {
         if (watch->verbose)
             zsys_error ("zdir_watch: Unable to insert path '%s' into subscription list", path);
         zsock_signal (watch->pipe, 1);
@@ -761,8 +755,7 @@ s_zdir_watch_subscribe (zdir_watch_t *watch, const char *path)
     }
 
     void *item = zhash_freefn (watch->subs, path, s_sub_free);
-    if (item != sub)
-    {
+    if (item != sub) {
         if (watch->verbose)
             zsys_error ("zdir_watch: Unable to set free fn for path %s", path);
         zsock_signal (watch->pipe, 1);
@@ -792,8 +785,7 @@ s_zdir_watch_timeout (zdir_watch_t *watch, int timeout)
     if (watch->verbose)
         zsys_info ("zdir_watch: Setting directory poll timeout to %d", timeout);
 
-    if (watch->read_timer_id != -1)
-    {
+    if (watch->read_timer_id != -1) {
         zloop_timer_end (watch->loop, watch->read_timer_id);
         watch->read_timer_id = -1;
     }
@@ -830,64 +822,56 @@ s_on_command (zloop_t *loop, zsock_t *reader, void *arg)
     if (watch->verbose)
         zsys_info ("zdir_watch: Command received: %s", command);
 
-    if (streq (command, "$TERM"))
-    {
+    if (streq (command, "$TERM")) {
         return -1;
     }
-    else if (streq (command, "VERBOSE"))
-    {
+    else
+    if (streq (command, "VERBOSE")) {
         watch->verbose = true;
         zsock_signal (watch->pipe, 0);
     }
-    else if (streq (command, "SUBSCRIBE"))
-    {
+    else
+    if (streq (command, "SUBSCRIBE")) {
         char *path = zmsg_popstr (msg);
-        if (path)
-        {
+        if (path) {
             s_zdir_watch_subscribe (watch, path);
             free (path);
         }
-        else
-        {
+        else {
             if (watch->verbose)
                 zsys_error ("zdir_watch: Unable to extract path from SUBSCRIBE message");
             zsock_signal (watch->pipe, 1);
         }
     }
-    else if (streq (command, "UNSUBSCRIBE"))
-    {
+    else
+    if (streq (command, "UNSUBSCRIBE")) {
         char *path = zmsg_popstr (msg);
-        if (path)
-        {
+        if (path) {
             assert (path);
             s_zdir_watch_unsubscribe (watch, path);
             free (path);
         }
-        else
-        {
+        else {
             if (watch->verbose)
                 zsys_error ("zdir_watch: Unable to extract path from UNSUBSCRIBE message");
             zsock_signal (watch->pipe, 1);
         }
     }
-    else if (streq (command, "TIMEOUT"))
-    {
+    else
+    if (streq (command, "TIMEOUT")) {
         char *timeout_string = zmsg_popstr (msg);
-        if (timeout_string)
-        {
+        if (timeout_string) {
             int timeout = atoi (timeout_string);
             zsock_signal (watch->pipe, s_zdir_watch_timeout (watch, timeout));
             free (timeout_string);
         }
-        else
-        {
+        else {
             if (watch->verbose)
                 zsys_error ("zdir_watch: Unable to extract time from TIMEOUT message");
             zsock_signal (watch->pipe, 1);
         }
     }
-    else
-    {
+    else {
         if (watch->verbose)
             zsys_warning ("zdir_watch: Unknown command '%s'", command);
         zsock_signal (watch->pipe, 1);
@@ -898,7 +882,7 @@ s_on_command (zloop_t *loop, zsock_t *reader, void *arg)
 }
 
 //  --------------------------------------------------------------------------
-//  Create a new zdir_watch actor instance                   
+//  Create a new zdir_watch actor instance
 
 void
 zdir_watch (zsock_t *pipe, void *unused)
@@ -967,8 +951,7 @@ zdir_test (bool verbose)
     zactor_t *watch = zactor_new (zdir_watch, NULL);
     assert (watch);
 
-    if (verbose)
-    {
+    if (verbose) {
         zsock_send (watch, "s", "VERBOSE");
         assert (zsock_wait (watch) == 0);
     }
