@@ -673,8 +673,8 @@ s_on_read_timer (zloop_t *loop, int timer_id, void *arg)
     {
         zdir_watch_sub_t *sub = (zdir_watch_sub_t *)data;
 
-        zdir_t *new = zdir_new (zdir_path (sub->dir), NULL);
-        if (!new)
+        zdir_t *new_dir = zdir_new (zdir_path (sub->dir), NULL);
+        if (!new_dir)
         {
             if (watch->verbose)
                 zsys_error ("zdir_watch: Unable to create new zdir for path %s", zdir_path (sub->dir));
@@ -682,11 +682,11 @@ s_on_read_timer (zloop_t *loop, int timer_id, void *arg)
         }
 
         // Determine if anything has changed.
-        zlist_t *diff = zdir_diff (sub->dir, new, "");
+        zlist_t *diff = zdir_diff (sub->dir, new_dir, "");
 
         // Do memory management before error handling...
         zdir_destroy (&sub->dir);
-        sub->dir = new;
+        sub->dir = new_dir;
 
         if (!diff)
         {
@@ -1001,7 +1001,7 @@ zdir_test (bool verbose)
 
     assert (zlist_size (patches) == 1);
 
-    zdir_patch_t *patch = zlist_pop (patches);
+    zdir_patch_t *patch = (zdir_patch_t *) zlist_pop (patches);
     assert (streq (zdir_patch_path (patch), "."));
 
     zfile_t *patch_file = zdir_patch_file (patch);
@@ -1023,7 +1023,7 @@ zdir_test (bool verbose)
 
     assert (zlist_size (patches) == 1);
 
-    patch = zlist_pop (patches);
+    patch = (zdir_patch_t *) zlist_pop (patches);
     assert (streq (zdir_patch_path (patch), "."));
 
     patch_file = zdir_patch_file (patch);
