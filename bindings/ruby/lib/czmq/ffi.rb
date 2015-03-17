@@ -47,6 +47,7 @@ module CZMQ
       attach_function :zdir_cache, [:pointer], :pointer, **opts
       attach_function :zdir_fprint, [:pointer, :pointer, :int], :void, **opts
       attach_function :zdir_print, [:pointer, :int], :void, **opts
+      attach_function :zdir_watch, [:pointer, :pointer], :void, **opts
       attach_function :zdir_test, [:bool], :void, **opts
       
       require_relative 'ffi/zdir'

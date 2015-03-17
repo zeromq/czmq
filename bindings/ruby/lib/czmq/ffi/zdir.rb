@@ -166,6 +166,38 @@ module CZMQ
         result
       end
       
+      # Create a new zdir_watch actor instance:                       
+      #                                                               
+      #     zactor_t *watch = zactor_new (zdir_watch, NULL);          
+      #                                                               
+      # Destroy zdir_watch instance:                                  
+      #                                                               
+      #     zactor_destroy (&watch);                                  
+      #                                                               
+      # Enable verbose logging of commands and activity:              
+      #                                                               
+      #     zstr_send (watch, "VERBOSE");                             
+      #                                                               
+      # Subscribe to changes to a directory path:                     
+      #                                                               
+      #     zsock_send (watch, "ss", "SUBSCRIBE", "directory_path");  
+      #                                                               
+      # Unsubscribe from changes to a directory path:                 
+      #                                                               
+      #     zsock_send (watch, "ss", "UNSUBSCRIBE", "directory_path");
+      #                                                               
+      # Receive directory changes:                                    
+      #     zsock_recv (watch, "sp", &path, &patches);                
+      #                                                               
+      #     // Delete the received data.                              
+      #     free (path);                                              
+      #     zlist_destroy (&patches);                                 
+      def self.watch pipe, unused
+        pipe = pipe.__ptr if pipe
+        result = ::CZMQ::FFI.zdir_watch pipe, unused
+        result
+      end
+      
       # Self test of this class.
       def self.test verbose
         verbose = !(0==verbose||!verbose) # boolean
