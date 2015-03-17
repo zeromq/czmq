@@ -694,18 +694,26 @@ s_on_read_timer (zloop_t *loop, int timer_id, void *arg)
         }
 
         if (zlist_size (diff) > 0) {
-            if (watch->verbose)
-                zsys_info ("zdir_watch: Found %d changes in %s", zlist_size (diff), zdir_path (sub->dir));
+            if (watch->verbose) {
+                zdir_patch_t *patch = (zdir_patch_t *) zlist_first (diff);
+
+                zsys_info ("zdir_watch: Found %d changes in %s:", zlist_size (diff), zdir_path (sub->dir));
+                while (patch)
+                {
+                    zsys_info ("zdir_watch:   %s %s", zfile_filename (zdir_patch_file (patch), NULL), zdir_patch_op (patch) == ZDIR_PATCH_CREATE ? "created" : "deleted");
+                    patch = zlist_next (diff);
+                }
+            }
 
             if (zsock_send (watch->pipe, "sp", zdir_path (sub->dir), diff) != 0) {
                 if (watch->verbose)
                     zsys_error ("zdir_watch: Unable to send patch list for path %s", zdir_path (sub->dir));
                 zlist_destroy (&diff);
             }
+
+            // Successfully sent `diff` list - now owned by receiver
         }
         else {
-            if (watch->verbose)
-                zsys_info ("zdir_watch: No changes in %s", zdir_path (sub->dir));
             zlist_destroy (&diff);
         }
     }
@@ -745,6 +753,12 @@ s_zdir_watch_subscribe (zdir_watch_t *watch, const char *path)
 
     zdir_watch_sub_t *sub = (zdir_watch_sub_t *) zmalloc (sizeof (zdir_watch_sub_t));
     sub->dir = zdir_new (path, NULL);
+    if (!sub->dir) {
+        if (watch->verbose)
+            zsys_error ("zdir_watch: Unable to create zdir for path: %s", path);
+        zsock_signal (watch->pipe, 1);
+        return;
+    }
 
     int rc = zhash_insert (watch->subs, path, sub);
     if (rc) {
@@ -956,39 +970,54 @@ zdir_test (bool verbose)
         assert (zsock_wait (watch) == 0);
     }
 
+    // need to create a file in the test directory we're watching
+    // in order to ensure the directory exists
+    zfile_t *initfile = zfile_new ("./zdir-test-dir", "initial_file");
+    assert (initfile);
+    zfile_output (initfile);
+    fprintf (zfile_handle (initfile), "initial file\n");
+    zfile_close (initfile);
+    zfile_destroy (&initfile);
+
+    zclock_sleep (1001); // wait for initial file to become 'stable'
+
     zsock_send (watch, "si", "TIMEOUT", 100);
     assert (zsock_wait (watch) == 0);
 
-    zsock_send (watch, "ss", "SUBSCRIBE", ".");
+    zsock_send (watch, "ss", "SUBSCRIBE", "zdir-test-dir");
     assert (zsock_wait (watch) == 0);
 
-    zsock_send (watch, "ss", "UNSUBSCRIBE", ".");
+    zsock_send (watch, "ss", "UNSUBSCRIBE", "zdir-test-dir");
     assert (zsock_wait (watch) == 0);
 
-    zsock_send (watch, "ss", "SUBSCRIBE", ".");
+    zsock_send (watch, "ss", "SUBSCRIBE", "zdir-test-dir");
     assert (zsock_wait (watch) == 0);
 
-    zfile_t *newfile = zfile_new (".", "test_abc");
+    zfile_t *newfile = zfile_new ("zdir-test-dir", "test_abc");
     zfile_output (newfile);
     fprintf (zfile_handle (newfile), "test file\n");
     zfile_close (newfile);
 
-    char *path;
+    zpoller_t *watch_poll = zpoller_new (watch, NULL);
+
+    // poll for a certain timeout before giving up and failing the test.
+    assert(zpoller_wait (watch_poll, 1001) == watch);
 
     // wait for notification of the file being added
+    char *path;
     int rc = zsock_recv (watch, "sp", &path, &patches);
     assert (rc == 0);
 
-    assert (streq (path, "."));
+    assert (streq (path, "zdir-test-dir"));
     free (path);
 
     assert (zlist_size (patches) == 1);
 
     zdir_patch_t *patch = (zdir_patch_t *) zlist_pop (patches);
-    assert (streq (zdir_patch_path (patch), "."));
+    assert (streq (zdir_patch_path (patch), "zdir-test-dir"));
 
     zfile_t *patch_file = zdir_patch_file (patch);
-    assert (streq (zfile_filename (patch_file, ""), "./test_abc"));
+    assert (streq (zfile_filename (patch_file, ""), "zdir-test-dir/test_abc"));
 
     zdir_patch_destroy (&patch);
     zlist_destroy (&patches);
@@ -997,25 +1026,34 @@ zdir_test (bool verbose)
     zfile_remove (newfile);
     zfile_destroy (&newfile);
 
+    // poll for a certain timeout before giving up and failing the test.
+    assert(zpoller_wait (watch_poll, 1001) == watch);
+
     // wait for notification of the file being removed
     rc = zsock_recv (watch, "sp", &path, &patches);
     assert (rc == 0);
 
-    assert (streq (path, "."));
+    assert (streq (path, "zdir-test-dir"));
     free (path);
 
     assert (zlist_size (patches) == 1);
 
     patch = (zdir_patch_t *) zlist_pop (patches);
-    assert (streq (zdir_patch_path (patch), "."));
+    assert (streq (zdir_patch_path (patch), "zdir-test-dir"));
 
     patch_file = zdir_patch_file (patch);
-    assert (streq (zfile_filename (patch_file, ""), "./test_abc"));
+    assert (streq (zfile_filename (patch_file, ""), "zdir-test-dir/test_abc"));
 
     zdir_patch_destroy (&patch);
     zlist_destroy (&patches);
 
+    zpoller_destroy (&watch_poll);
     zactor_destroy (&watch);
+
+    // clean up by removing the test directory.
+    zdir_t *testdir = zdir_new ("zdir-test-dir", NULL);
+    zdir_remove (testdir, true);
+    zdir_destroy (&testdir);
     //  @end
 
     printf ("OK\n");
