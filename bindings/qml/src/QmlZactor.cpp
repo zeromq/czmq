@@ -16,9 +16,10 @@ int QmlZactor::send (QmlZmsg *msgP) {
 };
 
 ///
-//  Receive a zmsg message from the actor. Returns NULL if the actor 
-//  was interrupted before the message could be received, or if there
-//  was a timeout on the actor.                                      
+//  Receive a zmsg message from the actor. Returns NULL if the actor                
+//  was interrupted before the message could be received, or if there               
+//  was a timeout on the actor.                                                     
+//  The caller is responsible for destroying the return value when finished with it.
 QmlZmsg *QmlZactor::recv () {
     QmlZmsg *retQ_ = new QmlZmsg ();
     retQ_->self = zactor_recv (self);

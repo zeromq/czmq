@@ -67,16 +67,18 @@ module CZMQ
         result
       end
       
-      # Create an empty (zero-sized) frame
+      # Create an empty (zero-sized) frame                                              
+      # The caller is responsible for destroying the return value when finished with it.
       def self.new_empty
         result = ::CZMQ::FFI.zframe_new_empty
         result = Zframe.__new result, true
         result
       end
       
-      # Receive frame from socket, returns zframe_t object or NULL if the recv  
-      # was interrupted. Does a blocking recv, if you want to not block then use
-      # zpoller or zloop.                                                       
+      # Receive frame from socket, returns zframe_t object or NULL if the recv          
+      # was interrupted. Does a blocking recv, if you want to not block then use        
+      # zpoller or zloop.                                                               
+      # The caller is responsible for destroying the return value when finished with it.
       def self.recv source
         result = ::CZMQ::FFI.zframe_recv source
         result = Zframe.__new result, true
@@ -106,8 +108,9 @@ module CZMQ
         result
       end
       
-      # Create a new frame that duplicates an existing frame. If frame is null,
-      # or memory was exhausted, returns null.                                 
+      # Create a new frame that duplicates an existing frame. If frame is null,         
+      # or memory was exhausted, returns null.                                          
+      # The caller is responsible for destroying the return value when finished with it.
       def dup
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zframe_dup @ptr
@@ -115,16 +118,18 @@ module CZMQ
         result
       end
       
-      # Return frame data encoded as printable hex string, useful for 0MQ UUIDs.
-      # Caller must free string when finished with it.                          
+      # Return frame data encoded as printable hex string, useful for 0MQ UUIDs.        
+      # Caller must free string when finished with it.                                  
+      # The caller is responsible for destroying the return value when finished with it.
       def strhex
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zframe_strhex @ptr
         result
       end
       
-      # Return frame data copied into freshly allocated string
-      # Caller must free string when finished with it.        
+      # Return frame data copied into freshly allocated string                          
+      # Caller must free string when finished with it.                                  
+      # The caller is responsible for destroying the return value when finished with it.
       def strdup
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zframe_strdup @ptr

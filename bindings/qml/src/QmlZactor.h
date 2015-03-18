@@ -32,9 +32,10 @@ public slots:
     //  and destroy when it has been sent.                             
     int send (QmlZmsg *msgP);
 
-    //  Receive a zmsg message from the actor. Returns NULL if the actor 
-    //  was interrupted before the message could be received, or if there
-    //  was a timeout on the actor.                                      
+    //  Receive a zmsg message from the actor. Returns NULL if the actor                
+    //  was interrupted before the message could be received, or if there               
+    //  was a timeout on the actor.                                                     
+    //  The caller is responsible for destroying the return value when finished with it.
     QmlZmsg *recv ();
 
     //  Return the actor's zsock handle. Use this when you absolutely need

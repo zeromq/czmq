@@ -85,9 +85,10 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void
     zlist_remove (zlist_t *self, void *item);
 
-//  Make a copy of list. If the list has autofree set, the copied list will  
-//  duplicate all items, which must be strings. Otherwise, the list will hold
-//  pointers back to the items in the original list.                         
+//  Make a copy of list. If the list has autofree set, the copied list will         
+//  duplicate all items, which must be strings. Otherwise, the list will hold       
+//  pointers back to the items in the original list.                                
+//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zlist_t *
     zlist_dup (zlist_t *self);
 

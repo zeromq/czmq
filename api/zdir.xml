@@ -39,8 +39,7 @@
     <method name="list">
         Returns a sorted list of zfile objects; Each entry in the list is a pointer
         to a zfile_t item already allocated in the zdir tree. Do not destroy the
-        original zdir tree until you are done with this list. The caller must destroy
-        the list when done with it.
+        original zdir tree until you are done with this list.
         <return type="zlist" fresh="1" />
     </method>
 
@@ -71,7 +70,6 @@
     <method name="cache">
         Load directory cache; returns a hash table containing the SHA-1 digests
         of every file in the tree. The cache is saved between runs in .cache.
-        The caller must destroy the hash table when done with it.
         <return type="zhash" fresh="1" />
     </method>
 

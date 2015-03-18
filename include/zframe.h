@@ -35,13 +35,15 @@ CZMQ_EXPORT zframe_t *
 CZMQ_EXPORT void
     zframe_destroy (zframe_t **self_p);
 
-//  Create an empty (zero-sized) frame
+//  Create an empty (zero-sized) frame                                              
+//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zframe_t *
     zframe_new_empty ();
 
-//  Receive frame from socket, returns zframe_t object or NULL if the recv  
-//  was interrupted. Does a blocking recv, if you want to not block then use
-//  zpoller or zloop.                                                       
+//  Receive frame from socket, returns zframe_t object or NULL if the recv          
+//  was interrupted. Does a blocking recv, if you want to not block then use        
+//  zpoller or zloop.                                                               
+//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zframe_t *
     zframe_recv (void *source);
 
@@ -58,18 +60,21 @@ CZMQ_EXPORT size_t
 CZMQ_EXPORT byte *
     zframe_data (zframe_t *self);
 
-//  Create a new frame that duplicates an existing frame. If frame is null,
-//  or memory was exhausted, returns null.                                 
+//  Create a new frame that duplicates an existing frame. If frame is null,         
+//  or memory was exhausted, returns null.                                          
+//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zframe_t *
     zframe_dup (zframe_t *self);
 
-//  Return frame data encoded as printable hex string, useful for 0MQ UUIDs.
-//  Caller must free string when finished with it.                          
+//  Return frame data encoded as printable hex string, useful for 0MQ UUIDs.        
+//  Caller must free string when finished with it.                                  
+//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT char *
     zframe_strhex (zframe_t *self);
 
-//  Return frame data copied into freshly allocated string
-//  Caller must free string when finished with it.        
+//  Return frame data copied into freshly allocated string                          
+//  Caller must free string when finished with it.                                  
+//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT char *
     zframe_strdup (zframe_t *self);
 

@@ -66,9 +66,10 @@ public slots:
     //  Remove the specified item from the list if present
     void remove (void *item);
 
-    //  Make a copy of list. If the list has autofree set, the copied list will  
-    //  duplicate all items, which must be strings. Otherwise, the list will hold
-    //  pointers back to the items in the original list.                         
+    //  Make a copy of list. If the list has autofree set, the copied list will         
+    //  duplicate all items, which must be strings. Otherwise, the list will hold       
+    //  pointers back to the items in the original list.                                
+    //  The caller is responsible for destroying the return value when finished with it.
     QmlZlist *dup ();
 
     //  Purge all items from list

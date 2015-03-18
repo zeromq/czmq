@@ -208,41 +208,53 @@ public:
     };
     
 public slots:
-    //  Create a PUB socket. Default action is bind.
+    //  Create a PUB socket. Default action is bind.                                    
+    //  The caller is responsible for destroying the return value when finished with it.
     QmlZsock *newPub (const QString &endpoint);
 
-    //  Create a SUB socket, and optionally subscribe to some prefix string. Default
-    //  action is connect.                                                          
+    //  Create a SUB socket, and optionally subscribe to some prefix string. Default    
+    //  action is connect.                                                              
+    //  The caller is responsible for destroying the return value when finished with it.
     QmlZsock *newSub (const QString &endpoint, const QString &subscribe);
 
-    //  Create a REQ socket. Default action is connect.
+    //  Create a REQ socket. Default action is connect.                                 
+    //  The caller is responsible for destroying the return value when finished with it.
     QmlZsock *newReq (const QString &endpoint);
 
-    //  Create a REP socket. Default action is bind.
+    //  Create a REP socket. Default action is bind.                                    
+    //  The caller is responsible for destroying the return value when finished with it.
     QmlZsock *newRep (const QString &endpoint);
 
-    //  Create a DEALER socket. Default action is connect.
+    //  Create a DEALER socket. Default action is connect.                              
+    //  The caller is responsible for destroying the return value when finished with it.
     QmlZsock *newDealer (const QString &endpoint);
 
-    //  Create a ROUTER socket. Default action is bind.
+    //  Create a ROUTER socket. Default action is bind.                                 
+    //  The caller is responsible for destroying the return value when finished with it.
     QmlZsock *newRouter (const QString &endpoint);
 
-    //  Create a PUSH socket. Default action is connect.
+    //  Create a PUSH socket. Default action is connect.                                
+    //  The caller is responsible for destroying the return value when finished with it.
     QmlZsock *newPush (const QString &endpoint);
 
-    //  Create a PULL socket. Default action is bind.
+    //  Create a PULL socket. Default action is bind.                                   
+    //  The caller is responsible for destroying the return value when finished with it.
     QmlZsock *newPull (const QString &endpoint);
 
-    //  Create an XPUB socket. Default action is bind.
+    //  Create an XPUB socket. Default action is bind.                                  
+    //  The caller is responsible for destroying the return value when finished with it.
     QmlZsock *newXpub (const QString &endpoint);
 
-    //  Create an XSUB socket. Default action is connect.
+    //  Create an XSUB socket. Default action is connect.                               
+    //  The caller is responsible for destroying the return value when finished with it.
     QmlZsock *newXsub (const QString &endpoint);
 
-    //  Create a PAIR socket. Default action is connect.
+    //  Create a PAIR socket. Default action is connect.                                
+    //  The caller is responsible for destroying the return value when finished with it.
     QmlZsock *newPair (const QString &endpoint);
 
-    //  Create a STREAM socket. Default action is connect.
+    //  Create a STREAM socket. Default action is connect.                              
+    //  The caller is responsible for destroying the return value when finished with it.
     QmlZsock *newStream (const QString &endpoint);
 
     //  Probe the supplied object, and report if it looks like a zsock_t.
