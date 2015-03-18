@@ -124,6 +124,41 @@ module CZMQ
       
       require_relative 'ffi/zframe'
       
+      attach_function :zhashx_new, [], :pointer, **opts
+      attach_function :zhashx_destroy, [:pointer], :void, **opts
+      attach_function :zhashx_insert, [:pointer, :pointer, :pointer], :int, **opts
+      attach_function :zhashx_update, [:pointer, :pointer, :pointer], :void, **opts
+      attach_function :zhashx_delete, [:pointer, :pointer], :void, **opts
+      attach_function :zhashx_purge, [:pointer], :void, **opts
+      attach_function :zhashx_lookup, [:pointer, :pointer], :pointer, **opts
+      attach_function :zhashx_rename, [:pointer, :pointer, :pointer], :int, **opts
+      attach_function :zhashx_freefn, [:pointer, :pointer, :pointer], :pointer, **opts
+      attach_function :zhashx_size, [:pointer], :size_t, **opts
+      attach_function :zhashx_keys, [:pointer], :pointer, **opts
+      attach_function :zhashx_values, [:pointer], :pointer, **opts
+      attach_function :zhashx_first, [:pointer], :pointer, **opts
+      attach_function :zhashx_next, [:pointer], :pointer, **opts
+      attach_function :zhashx_cursor, [:pointer], :pointer, **opts
+      attach_function :zhashx_comment, [:pointer, :string, :varargs], :void, **opts
+      attach_function :zhashx_save, [:pointer, :string], :int, **opts
+      attach_function :zhashx_load, [:pointer, :string], :int, **opts
+      attach_function :zhashx_refresh, [:pointer], :int, **opts
+      attach_function :zhashx_pack, [:pointer], :pointer, **opts
+      attach_function :zhashx_unpack, [:pointer], :pointer, **opts
+      attach_function :zhashx_dup, [:pointer], :pointer, **opts
+      attach_function :zhashx_set_destructor, [:pointer, :pointer], :void, **opts
+      attach_function :zhashx_set_duplicator, [:pointer, :pointer], :void, **opts
+      attach_function :zhashx_set_key_destructor, [:pointer, :pointer], :void, **opts
+      attach_function :zhashx_set_key_duplicator, [:pointer, :pointer], :void, **opts
+      attach_function :zhashx_set_key_comparator, [:pointer, :pointer], :void, **opts
+      attach_function :zhashx_set_key_hasher, [:pointer, :pointer], :void, **opts
+      attach_function :zhashx_dup_v2, [:pointer], :pointer, **opts
+      attach_function :zhashx_autofree, [:pointer], :void, **opts
+      attach_function :zhashx_zhashx_foreach, [:pointer, :pointer, :pointer], :int, **opts
+      attach_function :zhashx_test, [:int], :void, **opts
+      
+      require_relative 'ffi/zhashx'
+      
       attach_function :ziflist_new, [], :pointer, **opts
       attach_function :ziflist_destroy, [:pointer], :void, **opts
       attach_function :ziflist_reload, [:pointer], :void, **opts
