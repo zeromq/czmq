@@ -27,6 +27,18 @@ if not libpath:
     raise ImportError("Unable to find czmq C library")
 lib = cdll.LoadLibrary(libpath)
 
+class zsock_t(Structure):
+    pass # Empty - only for type checking
+zsock_p = POINTER(zsock_t)
+
+class zactor_t(Structure):
+    pass # Empty - only for type checking
+zactor_p = POINTER(zactor_t)
+
+class zmsg_t(Structure):
+    pass # Empty - only for type checking
+zmsg_p = POINTER(zmsg_t)
+
 class zdir_t(Structure):
     pass # Empty - only for type checking
 zdir_p = POINTER(zdir_t)
@@ -42,10 +54,6 @@ zhash_p = POINTER(zhash_t)
 class FILE(Structure):
     pass # Empty - only for type checking
 FILE_p = POINTER(FILE)
-
-class zsock_t(Structure):
-    pass # Empty - only for type checking
-zsock_p = POINTER(zsock_t)
 
 class zfile_t(Structure):
     pass # Empty - only for type checking
@@ -75,10 +83,6 @@ class zmq_pollitem_t(Structure):
     pass # Empty - only for type checking
 zmq_pollitem_p = POINTER(zmq_pollitem_t)
 
-class zmsg_t(Structure):
-    pass # Empty - only for type checking
-zmsg_p = POINTER(zmsg_t)
-
 class va_list_t(Structure):
     pass # Empty - only for type checking
 va_list_p = POINTER(va_list_t)
@@ -101,6 +105,88 @@ def coerce_py_file(obj):
         return obj
     else:
         return PyFile_AsFile(obj)
+
+
+# zactor
+zactor_fn = CFUNCTYPE(None, zsock_p, c_void_p)
+lib.zactor_new.restype = zactor_p
+lib.zactor_new.argtypes = [zactor_fn, c_void_p]
+lib.zactor_destroy.restype = None
+lib.zactor_destroy.argtypes = [POINTER(zactor_p)]
+lib.zactor_send.restype = c_int
+lib.zactor_send.argtypes = [zactor_p, POINTER(zmsg_p)]
+lib.zactor_recv.restype = zmsg_p
+lib.zactor_recv.argtypes = [zactor_p]
+lib.zactor_is.restype = c_bool
+lib.zactor_is.argtypes = [c_void_p]
+lib.zactor_resolve.restype = c_void_p
+lib.zactor_resolve.argtypes = [c_void_p]
+lib.zactor_sock.restype = zsock_p
+lib.zactor_sock.argtypes = [zactor_p]
+lib.zactor_test.restype = None
+lib.zactor_test.argtypes = [c_bool]
+
+class Zactor(object):
+    """actor"""
+
+    def __init__(self, *args):
+        """Create a new actor passing arbitrary arguments reference."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zactor_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zactor_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 2)
+            self._as_parameter_ = lib.zactor_new(args[0], args[1]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destroy an actor."""
+        if self.allow_destruct:
+            lib.zactor_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def send(self, msg_p):
+        """Send a zmsg message to the actor, take ownership of the message
+and destroy when it has been sent."""
+        return lib.zactor_send(self._as_parameter_, byref(zmsg_p.from_param(msg_p)))
+
+    def recv(self):
+        """Receive a zmsg message from the actor. Returns NULL if the actor
+was interrupted before the message could be received, or if there
+was a timeout on the actor."""
+        return Zmsg(lib.zactor_recv(self._as_parameter_), True)
+
+    @staticmethod
+    def is_(self):
+        """Probe the supplied object, and report if it looks like a zactor_t."""
+        return lib.zactor_is(self)
+
+    @staticmethod
+    def resolve(self):
+        """Probe the supplied reference. If it looks like a zactor_t instance,
+return the underlying libzmq actor handle; else if it looks like
+a libzmq actor handle, return the supplied value."""
+        return c_void_p(lib.zactor_resolve(self))
+
+    def sock(self):
+        """Return the actor's zsock handle. Use this when you absolutely need
+to work with the zsock instance rather than the actor."""
+        return Zsock(lib.zactor_sock(self._as_parameter_), False)
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class."""
+        return lib.zactor_test(verbose)
 
 
 # zdir

@@ -34,6 +34,17 @@ module CZMQ
         blocking: true  # only necessary on MRI to deal with the GIL.
       }
       
+      attach_function :zactor_new, [:pointer, :pointer], :pointer, **opts
+      attach_function :zactor_destroy, [:pointer], :void, **opts
+      attach_function :zactor_send, [:pointer, :pointer], :int, **opts
+      attach_function :zactor_recv, [:pointer], :pointer, **opts
+      attach_function :zactor_is, [:pointer], :bool, **opts
+      attach_function :zactor_resolve, [:pointer], :pointer, **opts
+      attach_function :zactor_sock, [:pointer], :pointer, **opts
+      attach_function :zactor_test, [:bool], :void, **opts
+      
+      require_relative 'ffi/zactor'
+      
       attach_function :zdir_new, [:string, :string], :pointer, **opts
       attach_function :zdir_destroy, [:pointer], :void, **opts
       attach_function :zdir_path, [:pointer], :string, **opts

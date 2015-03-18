@@ -921,5 +921,43 @@ class TestCZMQ(unittest.TestCase):
         #self.assertEquals(gossip.id(), ZGOSSIP_MSG_PUBLISH)
         #del gossip
 
+    def test_zactor(self):
+        def _echo_actor(pipe, arg):
+            # Do some initialization
+            pipe = Zsock(pipe, False) # We don't own the pipe, so False.
+            arg = string_at(arg)
+            self.assertEquals(arg, "Hello, World")
+            pipe.signal(0) # startup ok
+
+            terminated = False
+            while not terminated:
+                msg = Zmsg.recv(pipe)
+                if not msg:
+                    break # Interrupted
+
+                command = msg.popstr()
+                if command == "$TERM":
+                    # All actors must handle $TERM in this way
+                    terminated = True
+                elif command == "ECHO":
+                    # This is an example command for our test actor
+                    Zmsg.send(msg, pipe)
+                else:
+                    self.fail("Unexpected message " + command)
+        echo_actor = zactor_fn(_echo_actor) # ctypes function reference must live as long as the actor.
+
+        arg_buffer = create_string_buffer("Hello, World") # argument buffer must live as long as the actor.
+        actor = Zactor(echo_actor, arg_buffer)
+        self.assertTrue(actor)
+
+        actor.sock().send("ss", "ECHO", "This is a string");
+
+        result = c_char_p()
+        actor.sock().recv("s", byref(result))
+
+        self.assertEquals(string_at(result), "This is a string")
+
+        libc.free(result)
+
 if __name__ == '__main__':
     unittest.main()

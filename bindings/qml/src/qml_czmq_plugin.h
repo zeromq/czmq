@@ -11,6 +11,8 @@
 #include <QQmlExtensionPlugin>
 #include <qqml.h>
 
+class QmlZactor;
+class QmlZactorAttached;
 class QmlZdir;
 class QmlZdirAttached;
 class QmlZdirPatch;
@@ -32,6 +34,7 @@ class QmlZhashAttached;
 class QmlZlist;
 class QmlZlistAttached;
 
+#include "QmlZactor.h"
 #include "QmlZdir.h"
 #include "QmlZdirPatch.h"
 #include "QmlZfile.h"
@@ -51,6 +54,8 @@ class QmlCZMQPlugin : public QQmlExtensionPlugin
 public:
     void registerTypes (const char *uri)
     {
+        qmlRegisterType<QmlZactor> (uri, 1, 0, "QmlZactor");
+        qmlRegisterType<QmlZactorAttached>();
         qmlRegisterType<QmlZdir> (uri, 1, 0, "QmlZdir");
         qmlRegisterType<QmlZdirAttached>();
         qmlRegisterType<QmlZdirPatch> (uri, 1, 0, "QmlZdirPatch");
