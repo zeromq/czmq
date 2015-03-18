@@ -870,8 +870,8 @@ lib.zhashx_dup_v2.restype = zhashx_p
 lib.zhashx_dup_v2.argtypes = [zhashx_p]
 lib.zhashx_autofree.restype = None
 lib.zhashx_autofree.argtypes = [zhashx_p]
-lib.zhashx_zhashx_foreach.restype = c_int
-lib.zhashx_zhashx_foreach.argtypes = [zhashx_p, zhashx_foreach_fn, c_void_p]
+lib.zhashx_foreach.restype = c_int
+lib.zhashx_foreach.argtypes = [zhashx_p, zhashx_foreach_fn, c_void_p]
 lib.zhashx_test.restype = None
 lib.zhashx_test.argtypes = [c_int]
 
@@ -1095,13 +1095,13 @@ since there's no other way to know how to duplicate the item value."""
 Set hash for automatic value destruction"""
         return lib.zhashx_autofree(self)
 
-    def zhashx_foreach(self, callback, argument):
+    def foreach(self, callback, argument):
         """DEPRECATED as clumsy -- use zhashx_first/_next instead
 Apply function to each item in the hash table. Items are iterated in no
 defined order. Stops if callback function returns non-zero and returns
 final return code from callback function (zero = success).
 Callback function for zhashx_foreach method"""
-        return lib.zhashx_zhashx_foreach(self, callback, argument)
+        return lib.zhashx_foreach(self, callback, argument)
 
     @staticmethod
     def test(verbose):

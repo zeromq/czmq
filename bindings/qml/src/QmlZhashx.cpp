@@ -257,8 +257,8 @@ void QmlZhashx::autofree () {
 //  defined order. Stops if callback function returns non-zero and returns 
 //  final return code from callback function (zero = success).             
 //  Callback function for zhashx_foreach method                            
-int QmlZhashx::zhashxForeach (zhashx_foreach_fn callback, void *argument) {
-    return zhashx_zhashx_foreach (self, callback, argument);
+int QmlZhashx::foreach (zhashx_foreach_fn callback, void *argument) {
+    return zhashx_foreach (self, callback, argument);
 };
 
 

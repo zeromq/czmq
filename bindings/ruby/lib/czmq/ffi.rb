@@ -154,7 +154,7 @@ module CZMQ
       attach_function :zhashx_set_key_hasher, [:pointer, :pointer], :void, **opts
       attach_function :zhashx_dup_v2, [:pointer], :pointer, **opts
       attach_function :zhashx_autofree, [:pointer], :void, **opts
-      attach_function :zhashx_zhashx_foreach, [:pointer, :pointer, :pointer], :int, **opts
+      attach_function :zhashx_foreach, [:pointer, :pointer, :pointer], :int, **opts
       attach_function :zhashx_test, [:int], :void, **opts
       
       require_relative 'ffi/zhashx'
