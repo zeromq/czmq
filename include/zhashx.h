@@ -261,7 +261,7 @@ CZMQ_EXPORT void
 //  final return code from callback function (zero = success).             
 //  Callback function for zhashx_foreach method                            
 CZMQ_EXPORT int
-    zhashx_zhashx_foreach (zhashx_t *self, zhashx_foreach_fn callback, void *argument);
+    zhashx_foreach (zhashx_t *self, zhashx_foreach_fn callback, void *argument);
 
 //  Self test of this class
 CZMQ_EXPORT void

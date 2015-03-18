@@ -272,7 +272,7 @@
         <return type = "integer" />
     </callback_type>
 
-    <method name = "zhashx_foreach">
+    <method name = "foreach">
         DEPRECATED as clumsy -- use zhashx_first/_next instead
         Apply function to each item in the hash table. Items are iterated in no
         defined order. Stops if callback function returns non-zero and returns
