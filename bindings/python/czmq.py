@@ -804,9 +804,6 @@ configured by zsys_set_logstream). Prefix shows before frame, if not null."""
 
 
 # zhashx
-zhashx_czmq_destructor = CFUNCTYPE(None, POINTER(c_void_p))
-zhashx_czmq_duplicator = CFUNCTYPE(c_void_p, c_void_p)
-zhashx_czmq_comparator = CFUNCTYPE(c_int, c_void_p, c_void_p)
 zhashx_free_fn = CFUNCTYPE(None, c_void_p)
 zhashx_hash_fn = CFUNCTYPE(c_size_t, c_void_p)
 zhashx_foreach_fn = CFUNCTYPE(c_int, c_char_p, c_void_p, c_void_p)

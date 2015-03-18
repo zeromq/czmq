@@ -50,51 +50,6 @@ module CZMQ
       end
       
       # Create a new callback of the following type:
-      # Destroy an item
-      #     typedef void (zhashx_czmq_destructor) (
-      #         void **item);                      
-      #
-      # WARNING: If your Ruby code doesn't retain a reference to the
-      #   FFI::Function object after passing it to a C function call,
-      #   it may be garbage collected while C still holds the pointer,
-      #   potentially resulting in a segmentation fault.
-      def self.czmq_destructor
-        ::FFI::Function.new :void, [:pointer], blocking: true do |item|
-          yield item
-        end
-      end
-      
-      # Create a new callback of the following type:
-      # Duplicate an item
-      #     typedef void * (zhashx_czmq_duplicator) (
-      #         const void *item);                   
-      #
-      # WARNING: If your Ruby code doesn't retain a reference to the
-      #   FFI::Function object after passing it to a C function call,
-      #   it may be garbage collected while C still holds the pointer,
-      #   potentially resulting in a segmentation fault.
-      def self.czmq_duplicator
-        ::FFI::Function.new :pointer, [:pointer], blocking: true do |item|
-          yield item
-        end
-      end
-      
-      # Create a new callback of the following type:
-      # compare two items, for sorting
-      #     typedef int (zhashx_czmq_comparator) (    
-      #         const void *item1, const void *item2);
-      #
-      # WARNING: If your Ruby code doesn't retain a reference to the
-      #   FFI::Function object after passing it to a C function call,
-      #   it may be garbage collected while C still holds the pointer,
-      #   potentially resulting in a segmentation fault.
-      def self.czmq_comparator
-        ::FFI::Function.new :int, [:pointer, :pointer], blocking: true do |item1, item2|
-          yield item1, item2
-        end
-      end
-      
-      # Create a new callback of the following type:
       # compare two items, for sorting
       #     typedef void (zhashx_free_fn) (
       #         void *data);               
