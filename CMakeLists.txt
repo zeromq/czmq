@@ -186,7 +186,10 @@ set (czmq_sources
     src/zthread.c
 )
 source_group ("Source Files" FILES ${czmq_sources})
-add_library(czmq SHARED ${czmq_sources})
+if (NOT DEFINED BUILD_SHARED_LIBS)
+    SET(BUILD_SHARED_LIBS ON)
+endif()
+add_library(czmq ${czmq_sources})
 set_target_properties(czmq PROPERTIES DEFINE_SYMBOL "LIBCZMQ_EXPORTS")
 target_link_libraries(czmq ${ZEROMQ_LIBRARIES} ${MORE_LIBRARIES})
 

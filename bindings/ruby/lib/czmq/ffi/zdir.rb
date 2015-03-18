@@ -97,10 +97,10 @@ module CZMQ
         result
       end
       
-      # Returns a sorted list of zfile objects; Each entry in the list is a pointer  
-      # to a zfile_t item already allocated in the zdir tree. Do not destroy the     
-      # original zdir tree until you are done with this list. The caller must destroy
-      # the list when done with it.                                                  
+      # Returns a sorted list of zfile objects; Each entry in the list is a pointer     
+      # to a zfile_t item already allocated in the zdir tree. Do not destroy the        
+      # original zdir tree until you are done with this list.                           
+      # The caller is responsible for destroying the return value when finished with it.
       def list
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zdir_list @ptr
@@ -118,10 +118,11 @@ module CZMQ
         result
       end
       
-      # Calculate differences between two versions of a directory tree.    
-      # Returns a list of zdir_patch_t patches. Either older or newer may  
-      # be null, indicating the directory is empty/absent. If alias is set,
-      # generates virtual filename (minus path, plus alias).               
+      # Calculate differences between two versions of a directory tree.                 
+      # Returns a list of zdir_patch_t patches. Either older or newer may               
+      # be null, indicating the directory is empty/absent. If alias is set,             
+      # generates virtual filename (minus path, plus alias).                            
+      # The caller is responsible for destroying the return value when finished with it.
       def self.diff older, newer, alias
         older = older.__ptr if older
         newer = newer.__ptr if newer
@@ -131,7 +132,8 @@ module CZMQ
         result
       end
       
-      # Return full contents of directory as a zdir_patch list.
+      # Return full contents of directory as a zdir_patch list.                         
+      # The caller is responsible for destroying the return value when finished with it.
       def resync alias
         raise DestroyedError unless @ptr
         alias = String(alias)
@@ -140,9 +142,9 @@ module CZMQ
         result
       end
       
-      # Load directory cache; returns a hash table containing the SHA-1 digests
-      # of every file in the tree. The cache is saved between runs in .cache.  
-      # The caller must destroy the hash table when done with it.              
+      # Load directory cache; returns a hash table containing the SHA-1 digests         
+      # of every file in the tree. The cache is saved between runs in .cache.           
+      # The caller is responsible for destroying the return value when finished with it.
       def cache
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zdir_cache @ptr

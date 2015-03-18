@@ -59,8 +59,7 @@
     </method>
 
     <method name = "pop">
-        Remove first frame from message, if any. Returns frame, or NULL. Caller
-        now owns frame and must destroy it when finished with it.
+        Remove first frame from message, if any. Returns frame, or NULL.
         <return type = "zframe" fresh = "1" />
     </method>
 
@@ -124,8 +123,7 @@
 
     <method name = "popmsg">
         Remove first submessage from message, if any. Returns zmsg_t, or NULL if
-        decoding was not succesfull. Caller now owns message and must destroy it
-        when finished with it.
+        decoding was not succesfull.
         <return type = "zmsg" fresh = "1" />
     </method>
 

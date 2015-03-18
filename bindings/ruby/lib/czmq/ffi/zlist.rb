@@ -172,9 +172,10 @@ module CZMQ
         result
       end
       
-      # Make a copy of list. If the list has autofree set, the copied list will  
-      # duplicate all items, which must be strings. Otherwise, the list will hold
-      # pointers back to the items in the original list.                         
+      # Make a copy of list. If the list has autofree set, the copied list will         
+      # duplicate all items, which must be strings. Otherwise, the list will hold       
+      # pointers back to the items in the original list.                                
+      # The caller is responsible for destroying the return value when finished with it.
       def dup
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zlist_dup @ptr

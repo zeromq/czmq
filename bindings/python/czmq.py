@@ -163,7 +163,8 @@ and destroy when it has been sent."""
     def recv(self):
         """Receive a zmsg message from the actor. Returns NULL if the actor
 was interrupted before the message could be received, or if there
-was a timeout on the actor."""
+was a timeout on the actor.
+The caller is responsible for destroying the return value when finished with it."""
         return Zmsg(lib.zactor_recv(self._as_parameter_), True)
 
     @staticmethod
@@ -272,8 +273,8 @@ in the directory tree."""
     def list(self):
         """Returns a sorted list of zfile objects; Each entry in the list is a pointer
 to a zfile_t item already allocated in the zdir tree. Do not destroy the
-original zdir tree until you are done with this list. The caller must destroy
-the list when done with it."""
+original zdir tree until you are done with this list.
+The caller is responsible for destroying the return value when finished with it."""
         return Zlist(lib.zdir_list(self._as_parameter_), True)
 
     def remove(self, force):
@@ -287,17 +288,19 @@ If force is true, will remove all files and all subdirectories."""
         """Calculate differences between two versions of a directory tree.
 Returns a list of zdir_patch_t patches. Either older or newer may
 be null, indicating the directory is empty/absent. If alias is set,
-generates virtual filename (minus path, plus alias)."""
+generates virtual filename (minus path, plus alias).
+The caller is responsible for destroying the return value when finished with it."""
         return Zlist(lib.zdir_diff(older, newer, alias), True)
 
     def resync(self, alias):
-        """Return full contents of directory as a zdir_patch list."""
+        """Return full contents of directory as a zdir_patch list.
+The caller is responsible for destroying the return value when finished with it."""
         return Zlist(lib.zdir_resync(self._as_parameter_, alias), True)
 
     def cache(self):
         """Load directory cache; returns a hash table containing the SHA-1 digests
 of every file in the tree. The cache is saved between runs in .cache.
-The caller must destroy the hash table when done with it."""
+The caller is responsible for destroying the return value when finished with it."""
         return Zhash(lib.zdir_cache(self._as_parameter_), True)
 
     def fprint(self, file, indent):
@@ -407,7 +410,8 @@ class ZdirPatch(object):
 
     def dup(self):
         """Create copy of a patch. If the patch is null, or memory was exhausted,
-returns null."""
+returns null.
+The caller is responsible for destroying the return value when finished with it."""
         return ZdirPatch(lib.zdir_patch_dup(self._as_parameter_), True)
 
     def path(self):
@@ -525,7 +529,8 @@ may be NULL, in which case it is not used."""
 
     def dup(self):
         """Duplicate a file item, returns a newly constructed item. If the file
-is null, or memory was exhausted, returns null."""
+is null, or memory was exhausted, returns null.
+The caller is responsible for destroying the return value when finished with it."""
         return Zfile(lib.zfile_dup(self._as_parameter_), True)
 
     def filename(self, path):
@@ -597,7 +602,8 @@ location. Returns 0 if OK, -1 if error."""
 
     def read(self, bytes, offset):
         """Read chunk from file at specified position. If this was the last chunk,
-sets the eof property. Returns a null chunk in case of error."""
+sets the eof property. Returns a null chunk in case of error.
+The caller is responsible for destroying the return value when finished with it."""
         return lib.zfile_read(self._as_parameter_, bytes, offset)
 
     def eof(self):
@@ -706,14 +712,16 @@ size octets from the specified data into the frame body."""
 
     @staticmethod
     def new_empty():
-        """Create an empty (zero-sized) frame"""
+        """Create an empty (zero-sized) frame
+The caller is responsible for destroying the return value when finished with it."""
         return Zframe(lib.zframe_new_empty(), True)
 
     @staticmethod
     def recv(source):
         """Receive frame from socket, returns zframe_t object or NULL if the recv
 was interrupted. Does a blocking recv, if you want to not block then use
-zpoller or zloop."""
+zpoller or zloop.
+The caller is responsible for destroying the return value when finished with it."""
         return Zframe(lib.zframe_recv(source), True)
 
     @staticmethod
@@ -732,17 +740,20 @@ Return -1 on error, 0 on success."""
 
     def dup(self):
         """Create a new frame that duplicates an existing frame. If frame is null,
-or memory was exhausted, returns null."""
+or memory was exhausted, returns null.
+The caller is responsible for destroying the return value when finished with it."""
         return Zframe(lib.zframe_dup(self._as_parameter_), True)
 
     def strhex(self):
         """Return frame data encoded as printable hex string, useful for 0MQ UUIDs.
-Caller must free string when finished with it."""
+Caller must free string when finished with it.
+The caller is responsible for destroying the return value when finished with it."""
         return return_fresh_string(lib.zframe_strhex(self._as_parameter_))
 
     def strdup(self):
         """Return frame data copied into freshly allocated string
-Caller must free string when finished with it."""
+Caller must free string when finished with it.
+The caller is responsible for destroying the return value when finished with it."""
         return return_fresh_string(lib.zframe_strdup(self._as_parameter_))
 
     def streq(self, string):
@@ -1150,7 +1161,8 @@ class Zmsg(object):
         """Receive message from socket, returns zmsg_t object or NULL if the recv
 was interrupted. Does a blocking recv. If you want to not block then use
 the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
-before receiving."""
+before receiving.
+The caller is responsible for destroying the return value when finished with it."""
         return Zmsg(lib.zmsg_recv(source), True)
 
     @staticmethod
@@ -1184,8 +1196,8 @@ caller's frame reference."""
         return lib.zmsg_append(self._as_parameter_, byref(zframe_p.from_param(frame_p)))
 
     def pop(self):
-        """Remove first frame from message, if any. Returns frame, or NULL. Caller
-now owns frame and must destroy it when finished with it."""
+        """Remove first frame from message, if any. Returns frame, or NULL.
+The caller is responsible for destroying the return value when finished with it."""
         return Zframe(lib.zmsg_pop(self._as_parameter_), True)
 
     def pushmem(self, src, size):
@@ -1220,7 +1232,8 @@ Returns 0 on success, -1 on error."""
 
     def popstr(self):
         """Pop frame off front of message, return as fresh string. If there were
-no more frames in the message, returns NULL."""
+no more frames in the message, returns NULL.
+The caller is responsible for destroying the return value when finished with it."""
         return return_fresh_string(lib.zmsg_popstr(self._as_parameter_))
 
     def addmsg(self, msg_p):
@@ -1231,8 +1244,8 @@ success, -1 on error."""
 
     def popmsg(self):
         """Remove first submessage from message, if any. Returns zmsg_t, or NULL if
-decoding was not succesfull. Caller now owns message and must destroy it
-when finished with it."""
+decoding was not succesfull.
+The caller is responsible for destroying the return value when finished with it."""
         return Zmsg(lib.zmsg_popmsg(self._as_parameter_), True)
 
     def remove(self, frame):
@@ -1265,7 +1278,8 @@ to arbitrary change."""
     def load(self, file):
         """Load/append an open file into message, create new message if
 null message provided. Returns NULL if the message could not 
-be loaded."""
+be loaded.
+The caller is responsible for destroying the return value when finished with it."""
         return Zmsg(lib.zmsg_load(self, coerce_py_file(file)), True)
 
     def encode(self, buffer):
@@ -1279,12 +1293,14 @@ To decode a serialized message buffer, use zmsg_decode ()."""
     def decode(buffer, buffer_size):
         """Decodes a serialized message buffer created by zmsg_encode () and returns
 a new zmsg_t object. Returns NULL if the buffer was badly formatted or 
-there was insufficient memory to work."""
+there was insufficient memory to work.
+The caller is responsible for destroying the return value when finished with it."""
         return Zmsg(lib.zmsg_decode(buffer, buffer_size), True)
 
     def dup(self):
         """Create copy of message, as new message object. Returns a fresh zmsg_t
-object. If message is null, or memory was exhausted, returns null."""
+object. If message is null, or memory was exhausted, returns null.
+The caller is responsible for destroying the return value when finished with it."""
         return Zmsg(lib.zmsg_dup(self._as_parameter_), True)
 
     def print(self):
@@ -1302,7 +1318,8 @@ other message. As with zframe_eq, return false if either message is NULL."""
     def new_signal(status):
         """Generate a signal message encoding the given status. A signal is a short
 message carrying a 1-byte success/failure code (by convention, 0 means
-OK). Signals are encoded to be distinguishable from "normal" messages."""
+OK). Signals are encoded to be distinguishable from "normal" messages.
+The caller is responsible for destroying the return value when finished with it."""
         return Zmsg(lib.zmsg_new_signal(status), True)
 
     def signal(self):
@@ -1427,63 +1444,75 @@ zsock_new method."""
 
     @staticmethod
     def new_pub(endpoint):
-        """Create a PUB socket. Default action is bind."""
+        """Create a PUB socket. Default action is bind.
+The caller is responsible for destroying the return value when finished with it."""
         return Zsock(lib.zsock_new_pub(endpoint), True)
 
     @staticmethod
     def new_sub(endpoint, subscribe):
         """Create a SUB socket, and optionally subscribe to some prefix string. Default
-action is connect."""
+action is connect.
+The caller is responsible for destroying the return value when finished with it."""
         return Zsock(lib.zsock_new_sub(endpoint, subscribe), True)
 
     @staticmethod
     def new_req(endpoint):
-        """Create a REQ socket. Default action is connect."""
+        """Create a REQ socket. Default action is connect.
+The caller is responsible for destroying the return value when finished with it."""
         return Zsock(lib.zsock_new_req(endpoint), True)
 
     @staticmethod
     def new_rep(endpoint):
-        """Create a REP socket. Default action is bind."""
+        """Create a REP socket. Default action is bind.
+The caller is responsible for destroying the return value when finished with it."""
         return Zsock(lib.zsock_new_rep(endpoint), True)
 
     @staticmethod
     def new_dealer(endpoint):
-        """Create a DEALER socket. Default action is connect."""
+        """Create a DEALER socket. Default action is connect.
+The caller is responsible for destroying the return value when finished with it."""
         return Zsock(lib.zsock_new_dealer(endpoint), True)
 
     @staticmethod
     def new_router(endpoint):
-        """Create a ROUTER socket. Default action is bind."""
+        """Create a ROUTER socket. Default action is bind.
+The caller is responsible for destroying the return value when finished with it."""
         return Zsock(lib.zsock_new_router(endpoint), True)
 
     @staticmethod
     def new_push(endpoint):
-        """Create a PUSH socket. Default action is connect."""
+        """Create a PUSH socket. Default action is connect.
+The caller is responsible for destroying the return value when finished with it."""
         return Zsock(lib.zsock_new_push(endpoint), True)
 
     @staticmethod
     def new_pull(endpoint):
-        """Create a PULL socket. Default action is bind."""
+        """Create a PULL socket. Default action is bind.
+The caller is responsible for destroying the return value when finished with it."""
         return Zsock(lib.zsock_new_pull(endpoint), True)
 
     @staticmethod
     def new_xpub(endpoint):
-        """Create an XPUB socket. Default action is bind."""
+        """Create an XPUB socket. Default action is bind.
+The caller is responsible for destroying the return value when finished with it."""
         return Zsock(lib.zsock_new_xpub(endpoint), True)
 
     @staticmethod
     def new_xsub(endpoint):
-        """Create an XSUB socket. Default action is connect."""
+        """Create an XSUB socket. Default action is connect.
+The caller is responsible for destroying the return value when finished with it."""
         return Zsock(lib.zsock_new_xsub(endpoint), True)
 
     @staticmethod
     def new_pair(endpoint):
-        """Create a PAIR socket. Default action is connect."""
+        """Create a PAIR socket. Default action is connect.
+The caller is responsible for destroying the return value when finished with it."""
         return Zsock(lib.zsock_new_pair(endpoint), True)
 
     @staticmethod
     def new_stream(endpoint):
-        """Create a STREAM socket. Default action is connect."""
+        """Create a STREAM socket. Default action is connect.
+The caller is responsible for destroying the return value when finished with it."""
         return Zsock(lib.zsock_new_stream(endpoint), True)
 
     def bind(self, format, *args):
@@ -1812,11 +1841,13 @@ Returns the item, or NULL if there is no such item."""
         """Make copy of hash table; if supplied table is null, returns null.
 Does not copy items themselves. Rebuilds new table so may be slow on
 very large tables. NOTE: only works with item values that are strings
-since there's no other way to know how to duplicate the item value."""
+since there's no other way to know how to duplicate the item value.
+The caller is responsible for destroying the return value when finished with it."""
         return Zhash(lib.zhash_dup(self._as_parameter_), True)
 
     def keys(self):
-        """Return keys for items in table"""
+        """Return keys for items in table
+The caller is responsible for destroying the return value when finished with it."""
         return Zlist(lib.zhash_keys(self._as_parameter_), True)
 
     def first(self):
@@ -1868,14 +1899,16 @@ http://rfc.zeromq.org/spec:35/FILEMQ, and implemented by zproto:
    number-4        = 4OCTET
 
 Comments are not included in the packed data. Item values MUST be
-strings."""
+strings.
+The caller is responsible for destroying the return value when finished with it."""
         return Zframe(lib.zhash_pack(self._as_parameter_), True)
 
     @staticmethod
     def unpack(frame):
         """Unpack binary frame into a new hash table. Packed data must follow format
 defined by zhash_pack. Hash table is set to autofree. An empty frame
-unpacks to an empty hash table."""
+unpacks to an empty hash table.
+The caller is responsible for destroying the return value when finished with it."""
         return Zhash(lib.zhash_unpack(frame), True)
 
     def save(self, filename):
@@ -2037,7 +2070,8 @@ been set, this method will also duplicate the item."""
     def dup(self):
         """Make a copy of list. If the list has autofree set, the copied list will
 duplicate all items, which must be strings. Otherwise, the list will hold
-pointers back to the items in the original list."""
+pointers back to the items in the original list.
+The caller is responsible for destroying the return value when finished with it."""
         return Zlist(lib.zlist_dup(self._as_parameter_), True)
 
     def purge(self):

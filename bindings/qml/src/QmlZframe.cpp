@@ -21,8 +21,9 @@ byte *QmlZframe::data () {
 };
 
 ///
-//  Create a new frame that duplicates an existing frame. If frame is null,
-//  or memory was exhausted, returns null.                                 
+//  Create a new frame that duplicates an existing frame. If frame is null,         
+//  or memory was exhausted, returns null.                                          
+//  The caller is responsible for destroying the return value when finished with it.
 QmlZframe *QmlZframe::dup () {
     QmlZframe *retQ_ = new QmlZframe ();
     retQ_->self = zframe_dup (self);
@@ -30,8 +31,9 @@ QmlZframe *QmlZframe::dup () {
 };
 
 ///
-//  Return frame data encoded as printable hex string, useful for 0MQ UUIDs.
-//  Caller must free string when finished with it.                          
+//  Return frame data encoded as printable hex string, useful for 0MQ UUIDs.        
+//  Caller must free string when finished with it.                                  
+//  The caller is responsible for destroying the return value when finished with it.
 QString QmlZframe::strhex () {
     char *retStr_ = zframe_strhex (self);
     QString retQStr_ = QString (retStr_);
@@ -40,8 +42,9 @@ QString QmlZframe::strhex () {
 };
 
 ///
-//  Return frame data copied into freshly allocated string
-//  Caller must free string when finished with it.        
+//  Return frame data copied into freshly allocated string                          
+//  Caller must free string when finished with it.                                  
+//  The caller is responsible for destroying the return value when finished with it.
 QString QmlZframe::strdup () {
     char *retStr_ = zframe_strdup (self);
     QString retQStr_ = QString (retStr_);
@@ -96,7 +99,8 @@ QObject* QmlZframe::qmlAttachedProperties(QObject* object) {
 
 
 ///
-//  Create an empty (zero-sized) frame
+//  Create an empty (zero-sized) frame                                              
+//  The caller is responsible for destroying the return value when finished with it.
 QmlZframe *QmlZframeAttached::newEmpty () {
     QmlZframe *retQ_ = new QmlZframe ();
     retQ_->self = zframe_new_empty ();
@@ -104,9 +108,10 @@ QmlZframe *QmlZframeAttached::newEmpty () {
 };
 
 ///
-//  Receive frame from socket, returns zframe_t object or NULL if the recv  
-//  was interrupted. Does a blocking recv, if you want to not block then use
-//  zpoller or zloop.                                                       
+//  Receive frame from socket, returns zframe_t object or NULL if the recv          
+//  was interrupted. Does a blocking recv, if you want to not block then use        
+//  zpoller or zloop.                                                               
+//  The caller is responsible for destroying the return value when finished with it.
 QmlZframe *QmlZframeAttached::recv (void *source) {
     QmlZframe *retQ_ = new QmlZframe ();
     retQ_->self = zframe_recv (source);

@@ -28,8 +28,9 @@ public:
     static QObject* qmlAttachedProperties(QObject* object); // defined in QmlZfile.cpp
     
 public slots:
-    //  Duplicate a file item, returns a newly constructed item. If the file
-    //  is null, or memory was exhausted, returns null.                     
+    //  Duplicate a file item, returns a newly constructed item. If the file            
+    //  is null, or memory was exhausted, returns null.                                 
+    //  The caller is responsible for destroying the return value when finished with it.
     QmlZfile *dup ();
 
     //  Return file name, remove path if provided
@@ -86,8 +87,9 @@ public slots:
     //  location. Returns 0 if OK, -1 if error.                           
     int output ();
 
-    //  Read chunk from file at specified position. If this was the last chunk,
-    //  sets the eof property. Returns a null chunk in case of error.          
+    //  Read chunk from file at specified position. If this was the last chunk,         
+    //  sets the eof property. Returns a null chunk in case of error.                   
+    //  The caller is responsible for destroying the return value when finished with it.
     zchunk_t *read (size_t bytes, off_t offset);
 
     //  Returns true if zfile_read() just read the last chunk in the file.
