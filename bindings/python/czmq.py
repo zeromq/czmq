@@ -804,6 +804,9 @@ configured by zsys_set_logstream). Prefix shows before frame, if not null."""
 
 
 # zhashx
+zhashx_destructor_fn = CFUNCTYPE(None, POINTER(c_void_p))
+zhashx_duplicator_fn = CFUNCTYPE(c_void_p, c_void_p)
+zhashx_comparator_fn = CFUNCTYPE(c_int, c_void_p, c_void_p)
 zhashx_free_fn = CFUNCTYPE(None, c_void_p)
 zhashx_hash_fn = CFUNCTYPE(c_size_t, c_void_p)
 zhashx_foreach_fn = CFUNCTYPE(c_int, c_char_p, c_void_p, c_void_p)
@@ -852,15 +855,15 @@ lib.zhashx_unpack.argtypes = [zframe_p]
 lib.zhashx_dup.restype = zhashx_p
 lib.zhashx_dup.argtypes = [zhashx_p]
 lib.zhashx_set_destructor.restype = None
-lib.zhashx_set_destructor.argtypes = [zhashx_p, czmq_destructor]
+lib.zhashx_set_destructor.argtypes = [zhashx_p, zhashx_destructor_fn]
 lib.zhashx_set_duplicator.restype = None
-lib.zhashx_set_duplicator.argtypes = [zhashx_p, czmq_duplicator]
+lib.zhashx_set_duplicator.argtypes = [zhashx_p, zhashx_duplicator_fn]
 lib.zhashx_set_key_destructor.restype = None
-lib.zhashx_set_key_destructor.argtypes = [zhashx_p, czmq_destructor]
+lib.zhashx_set_key_destructor.argtypes = [zhashx_p, zhashx_destructor_fn]
 lib.zhashx_set_key_duplicator.restype = None
-lib.zhashx_set_key_duplicator.argtypes = [zhashx_p, czmq_duplicator]
+lib.zhashx_set_key_duplicator.argtypes = [zhashx_p, zhashx_duplicator_fn]
 lib.zhashx_set_key_comparator.restype = None
-lib.zhashx_set_key_comparator.argtypes = [zhashx_p, czmq_comparator]
+lib.zhashx_set_key_comparator.argtypes = [zhashx_p, zhashx_comparator_fn]
 lib.zhashx_set_key_hasher.restype = None
 lib.zhashx_set_key_hasher.argtypes = [zhashx_p, zhashx_hash_fn]
 lib.zhashx_dup_v2.restype = zhashx_p
