@@ -5,5 +5,11 @@ if ON_ANDROID
 src_libczmq_la_LIBADD += -llog
 endif
 
+check-local: src/czmq_selftest
+	src/czmq_selftest
+
+check-verbose: src/czmq_selftest
+	src/czmq_selftest -v
+
 check-py:
 	$(LIBTOOL) --mode=execute -dlopen src/.libs/libczmq.la python bindings/python/test.py
