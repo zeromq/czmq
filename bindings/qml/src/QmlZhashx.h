@@ -152,23 +152,23 @@ public slots:
 
     //  Set a user-defined deallocator for hash items; by default items are not
     //  freed when the hash is destroyed.                                      
-    void setDestructor (czmq_destructor destructor);
+    void setDestructor (zhashx_destructor_fn destructor);
 
     //  Set a user-defined duplicator for hash items; by default items are not
     //  copied when the hash is duplicated.                                   
-    void setDuplicator (czmq_duplicator duplicator);
+    void setDuplicator (zhashx_duplicator_fn duplicator);
 
     //  Set a user-defined deallocator for keys; by default keys are freed
     //  when the hash is destroyed using free().                          
-    void setKeyDestructor (czmq_destructor destructor);
+    void setKeyDestructor (zhashx_destructor_fn destructor);
 
     //  Set a user-defined duplicator for keys; by default keys are duplicated
     //  using strdup.                                                         
-    void setKeyDuplicator (czmq_duplicator duplicator);
+    void setKeyDuplicator (zhashx_duplicator_fn duplicator);
 
     //  Set a user-defined comparator for keys; by default keys are
     //  compared using strcmp.                                     
-    void setKeyComparator (czmq_comparator comparator);
+    void setKeyComparator (zhashx_comparator_fn comparator);
 
     //  Set a user-defined comparator for keys; by default keys are
     //  compared using strcmp.                                     

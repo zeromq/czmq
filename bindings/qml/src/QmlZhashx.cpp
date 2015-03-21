@@ -194,35 +194,35 @@ QmlZhashx *QmlZhashx::dup () {
 ///
 //  Set a user-defined deallocator for hash items; by default items are not
 //  freed when the hash is destroyed.                                      
-void QmlZhashx::setDestructor (czmq_destructor destructor) {
+void QmlZhashx::setDestructor (zhashx_destructor_fn destructor) {
     zhashx_set_destructor (self, destructor);
 };
 
 ///
 //  Set a user-defined duplicator for hash items; by default items are not
 //  copied when the hash is duplicated.                                   
-void QmlZhashx::setDuplicator (czmq_duplicator duplicator) {
+void QmlZhashx::setDuplicator (zhashx_duplicator_fn duplicator) {
     zhashx_set_duplicator (self, duplicator);
 };
 
 ///
 //  Set a user-defined deallocator for keys; by default keys are freed
 //  when the hash is destroyed using free().                          
-void QmlZhashx::setKeyDestructor (czmq_destructor destructor) {
+void QmlZhashx::setKeyDestructor (zhashx_destructor_fn destructor) {
     zhashx_set_key_destructor (self, destructor);
 };
 
 ///
 //  Set a user-defined duplicator for keys; by default keys are duplicated
 //  using strdup.                                                         
-void QmlZhashx::setKeyDuplicator (czmq_duplicator duplicator) {
+void QmlZhashx::setKeyDuplicator (zhashx_duplicator_fn duplicator) {
     zhashx_set_key_duplicator (self, duplicator);
 };
 
 ///
 //  Set a user-defined comparator for keys; by default keys are
 //  compared using strcmp.                                     
-void QmlZhashx::setKeyComparator (czmq_comparator comparator) {
+void QmlZhashx::setKeyComparator (zhashx_comparator_fn comparator) {
     zhashx_set_key_comparator (self, comparator);
 };
 

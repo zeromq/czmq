@@ -2,7 +2,25 @@
     extended generic type-free hash container
 
     <include filename = "../license.xml" />
-    
+
+    <callback_type name = "destructor_fn">
+        Destroy an item
+        <argument name = "item" type = "anything" by_reference = "1" />
+    </callback_type>
+
+    <callback_type name = "duplicator_fn">
+        Duplicate an item
+        <argument name = "item" type = "anything" constant = "1" />
+        <return type = "anything" />
+    </callback_type>
+
+    <callback_type name = "comparator_fn">
+        Compare two items, for sorting
+        <argument name = "item1" type = "anything" constant = "1" />
+        <argument name = "item2" type = "anything" constant = "1" />
+        <return type = "integer" />
+    </callback_type>
+
     <callback_type name = "free_fn">
         compare two items, for sorting
         <argument name = "data" type = "anything" />
@@ -200,31 +218,31 @@
     <method name = "set_destructor">
         Set a user-defined deallocator for hash items; by default items are not
         freed when the hash is destroyed.
-        <argument name = "destructor" type = "czmq_destructor" callback = "1"/>
+        <argument name = "destructor" type = "zhashx_destructor_fn" callback = "1"/>
     </method>
 
     <method name = "set_duplicator">
         Set a user-defined duplicator for hash items; by default items are not
         copied when the hash is duplicated.
-        <argument name = "duplicator" type = "czmq_duplicator" callback = "1"/>
+        <argument name = "duplicator" type = "zhashx_duplicator_fn" callback = "1"/>
     </method>
 
     <method name = "set_key_destructor">
         Set a user-defined deallocator for keys; by default keys are freed
         when the hash is destroyed using free().
-        <argument name = "destructor" type = "czmq_destructor" callback = "1"/>
+        <argument name = "destructor" type = "zhashx_destructor_fn" callback = "1"/>
     </method>
 
     <method name = "set_key_duplicator">
         Set a user-defined duplicator for keys; by default keys are duplicated
         using strdup.
-        <argument name = "duplicator" type = "czmq_duplicator" callback = "1"/>
+        <argument name = "duplicator" type = "zhashx_duplicator_fn" callback = "1"/>
     </method>
 
     <method name = "set_key_comparator">
         Set a user-defined comparator for keys; by default keys are
         compared using strcmp.
-        <argument name = "comparator" type = "czmq_comparator" callback = "1"/>
+        <argument name = "comparator" type = "zhashx_comparator_fn" callback = "1"/>
     </method>
 
     <method name = "set_key_hasher">

@@ -66,12 +66,12 @@ struct _zhashx_t {
     time_t modified;            //  Set during zhashx_load
     char *filename;             //  Set during zhashx_load
     //  Function callbacks for duplicating and destroying items, if any
-    czmq_duplicator *duplicator;
-    czmq_destructor *destructor;
+    zhashx_duplicator_fn *duplicator;
+    zhashx_destructor_fn *destructor;
     //  Function callbacks for duplicating and destroying keys, if any
-    czmq_duplicator *key_duplicator;
-    czmq_destructor *key_destructor;
-    czmq_comparator *key_comparator;
+    zhashx_duplicator_fn *key_duplicator;
+    zhashx_destructor_fn *key_destructor;
+    zhashx_comparator_fn *key_comparator;
     //  Custom hash function
     zhashx_hash_fn *hasher;
 };
@@ -110,9 +110,9 @@ zhashx_new (void)
         self->items = (item_t **) zmalloc (sizeof (item_t *) * limit);
         if (self->items) {
             self->hasher = s_bernstein_hash;
-            self->key_destructor = (czmq_destructor *) zstr_free;
-            self->key_duplicator = (czmq_duplicator *) strdup;
-            self->key_comparator = (czmq_comparator *) strcmp;
+            self->key_destructor = (zhashx_destructor_fn *) zstr_free;
+            self->key_duplicator = (zhashx_duplicator_fn *) strdup;
+            self->key_comparator = (zhashx_comparator_fn *) strcmp;
         }
         else
             zhashx_destroy (&self);
@@ -637,7 +637,7 @@ zhashx_comment (zhashx_t *self, const char *format, ...)
             self->comments = zlistx_new ();
             if (!self->comments)
                 return;
-            zlistx_set_destructor (self->comments, (czmq_destructor *) zstr_free);
+            zlistx_set_destructor (self->comments, (zhashx_destructor_fn *) zstr_free);
         }
         va_list argptr;
         va_start (argptr, format);
@@ -944,7 +944,7 @@ zhashx_dup (zhashx_t *self)
 //  freed when the hash is destroyed.
 
 void
-zhashx_set_destructor (zhashx_t *self, czmq_destructor destructor)
+zhashx_set_destructor (zhashx_t *self, zhashx_destructor_fn destructor)
 {
     assert (self);
     self->destructor = destructor;
@@ -956,7 +956,7 @@ zhashx_set_destructor (zhashx_t *self, czmq_destructor destructor)
 //  copied when the hash is duplicated.
 
 void
-zhashx_set_duplicator (zhashx_t *self, czmq_duplicator duplicator)
+zhashx_set_duplicator (zhashx_t *self, zhashx_duplicator_fn duplicator)
 {
     assert (self);
     self->duplicator = duplicator;
@@ -968,7 +968,7 @@ zhashx_set_duplicator (zhashx_t *self, czmq_duplicator duplicator)
 //  freed when the hash is destroyed by calling free().
 
 void
-zhashx_set_key_destructor (zhashx_t *self, czmq_destructor destructor)
+zhashx_set_key_destructor (zhashx_t *self, zhashx_destructor_fn destructor)
 {
     assert (self);
     self->key_destructor = destructor;
@@ -980,7 +980,7 @@ zhashx_set_key_destructor (zhashx_t *self, czmq_destructor destructor)
 //  duplicated by calling strdup().
 
 void
-zhashx_set_key_duplicator (zhashx_t *self, czmq_duplicator duplicator)
+zhashx_set_key_duplicator (zhashx_t *self, zhashx_duplicator_fn duplicator)
 {
     assert (self);
     self->key_duplicator = duplicator;
@@ -992,7 +992,7 @@ zhashx_set_key_duplicator (zhashx_t *self, czmq_duplicator duplicator)
 //  compared using streq.
 
 void
-zhashx_set_key_comparator (zhashx_t *self, czmq_comparator comparator)
+zhashx_set_key_comparator (zhashx_t *self, zhashx_comparator_fn comparator)
 {
     assert (self);
     assert (comparator != NULL);
@@ -1053,8 +1053,8 @@ void
 zhashx_autofree (zhashx_t *self)
 {
     assert (self);
-    zhashx_set_destructor (self, (czmq_destructor *) zstr_free);
-    zhashx_set_duplicator (self, (czmq_duplicator *) strdup);
+    zhashx_set_destructor (self, (zhashx_destructor_fn *) zstr_free);
+    zhashx_set_duplicator (self, (zhashx_duplicator_fn *) strdup);
 }
 
 
