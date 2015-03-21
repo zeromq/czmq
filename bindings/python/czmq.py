@@ -8,7 +8,7 @@ from ctypes import *
 from ctypes.util import find_library
 
 # load libc to access free, etc.
-libcpath = find_library("libc")
+libcpath = find_library("c")
 if not libcpath:
     raise ImportError("Unable to find libc")
 libc = cdll.LoadLibrary(libcpath)
