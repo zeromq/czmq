@@ -7,6 +7,10 @@ from __future__ import print_function
 from ctypes import *
 from ctypes.util import find_library
 
+# debug travis...
+import os
+print(os.environ)
+
 # load libc to access free, etc.
 libcpath = find_library("c")
 if not libcpath:
