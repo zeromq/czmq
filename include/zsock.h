@@ -41,63 +41,63 @@ CZMQ_EXPORT zsock_t *
 CZMQ_EXPORT void
     zsock_destroy (zsock_t **self_p);
 
-//  Create a PUB socket. Default action is bind.                                    
+//  Create a PUB socket. Default action is bind.
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_pub (const char *endpoint);
 
-//  Create a SUB socket, and optionally subscribe to some prefix string. Default    
-//  action is connect.                                                              
+//  Create a SUB socket, and optionally subscribe to some prefix string. Default
+//  action is connect.                                                          
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_sub (const char *endpoint, const char *subscribe);
 
-//  Create a REQ socket. Default action is connect.                                 
+//  Create a REQ socket. Default action is connect.
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_req (const char *endpoint);
 
-//  Create a REP socket. Default action is bind.                                    
+//  Create a REP socket. Default action is bind.
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_rep (const char *endpoint);
 
-//  Create a DEALER socket. Default action is connect.                              
+//  Create a DEALER socket. Default action is connect.
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_dealer (const char *endpoint);
 
-//  Create a ROUTER socket. Default action is bind.                                 
+//  Create a ROUTER socket. Default action is bind.
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_router (const char *endpoint);
 
-//  Create a PUSH socket. Default action is connect.                                
+//  Create a PUSH socket. Default action is connect.
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_push (const char *endpoint);
 
-//  Create a PULL socket. Default action is bind.                                   
+//  Create a PULL socket. Default action is bind.
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_pull (const char *endpoint);
 
-//  Create an XPUB socket. Default action is bind.                                  
+//  Create an XPUB socket. Default action is bind.
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_xpub (const char *endpoint);
 
-//  Create an XSUB socket. Default action is connect.                               
+//  Create an XSUB socket. Default action is connect.
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_xsub (const char *endpoint);
 
-//  Create a PAIR socket. Default action is connect.                                
+//  Create a PAIR socket. Default action is connect.
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_pair (const char *endpoint);
 
-//  Create a STREAM socket. Default action is connect.                              
+//  Create a STREAM socket. Default action is connect.
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_stream (const char *endpoint);

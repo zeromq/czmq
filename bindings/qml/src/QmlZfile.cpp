@@ -9,9 +9,8 @@
 
 
 ///
-//  Duplicate a file item, returns a newly constructed item. If the file            
-//  is null, or memory was exhausted, returns null.                                 
-//  The caller is responsible for destroying the return value when finished with it.
+//  Duplicate a file item, returns a newly constructed item. If the file
+//  is null, or memory was exhausted, returns null.                     
 QmlZfile *QmlZfile::dup () {
     QmlZfile *retQ_ = new QmlZfile ();
     retQ_->self = zfile_dup (self);
@@ -112,9 +111,8 @@ int QmlZfile::output () {
 };
 
 ///
-//  Read chunk from file at specified position. If this was the last chunk,         
-//  sets the eof property. Returns a null chunk in case of error.                   
-//  The caller is responsible for destroying the return value when finished with it.
+//  Read chunk from file at specified position. If this was the last chunk,
+//  sets the eof property. Returns a null chunk in case of error.          
 zchunk_t *QmlZfile::read (size_t bytes, off_t offset) {
     return zfile_read (self, bytes, offset);
 };

@@ -64,11 +64,10 @@ module CZMQ
         result
       end
       
-      # Receive message from socket, returns zmsg_t object or NULL if the recv          
-      # was interrupted. Does a blocking recv. If you want to not block then use        
-      # the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input       
-      # before receiving.                                                               
-      # The caller is responsible for destroying the return value when finished with it.
+      # Receive message from socket, returns zmsg_t object or NULL if the recv   
+      # was interrupted. Does a blocking recv. If you want to not block then use 
+      # the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
+      # before receiving.                                                        
       def self.recv source
         result = ::CZMQ::FFI.zmsg_recv source
         result = Zmsg.__new result, true
@@ -121,8 +120,7 @@ module CZMQ
         result
       end
       
-      # Remove first frame from message, if any. Returns frame, or NULL.                
-      # The caller is responsible for destroying the return value when finished with it.
+      # Remove first frame from message, if any. Returns frame, or NULL.
       def pop
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zmsg_pop @ptr
@@ -184,9 +182,8 @@ module CZMQ
         result
       end
       
-      # Pop frame off front of message, return as fresh string. If there were           
-      # no more frames in the message, returns NULL.                                    
-      # The caller is responsible for destroying the return value when finished with it.
+      # Pop frame off front of message, return as fresh string. If there were
+      # no more frames in the message, returns NULL.                         
       def popstr
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zmsg_popstr @ptr
@@ -203,9 +200,8 @@ module CZMQ
         result
       end
       
-      # Remove first submessage from message, if any. Returns zmsg_t, or NULL if        
-      # decoding was not succesfull.                                                    
-      # The caller is responsible for destroying the return value when finished with it.
+      # Remove first submessage from message, if any. Returns zmsg_t, or NULL if
+      # decoding was not succesfull.                                            
       def popmsg
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zmsg_popmsg @ptr
@@ -258,10 +254,9 @@ module CZMQ
         result
       end
       
-      # Load/append an open file into message, create new message if                    
-      # null message provided. Returns NULL if the message could not                    
-      # be loaded.                                                                      
-      # The caller is responsible for destroying the return value when finished with it.
+      # Load/append an open file into message, create new message if 
+      # null message provided. Returns NULL if the message could not 
+      # be loaded.                                                   
       def self.load self, file
         self = self.__ptr if self
         result = ::CZMQ::FFI.zmsg_load self, file
@@ -279,10 +274,9 @@ module CZMQ
         result
       end
       
-      # Decodes a serialized message buffer created by zmsg_encode () and returns       
-      # a new zmsg_t object. Returns NULL if the buffer was badly formatted or          
-      # there was insufficient memory to work.                                          
-      # The caller is responsible for destroying the return value when finished with it.
+      # Decodes a serialized message buffer created by zmsg_encode () and returns
+      # a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
+      # there was insufficient memory to work.                                   
       def self.decode buffer, buffer_size
         buffer_size = Integer(buffer_size)
         result = ::CZMQ::FFI.zmsg_decode buffer, buffer_size
@@ -290,9 +284,8 @@ module CZMQ
         result
       end
       
-      # Create copy of message, as new message object. Returns a fresh zmsg_t           
-      # object. If message is null, or memory was exhausted, returns null.              
-      # The caller is responsible for destroying the return value when finished with it.
+      # Create copy of message, as new message object. Returns a fresh zmsg_t
+      # object. If message is null, or memory was exhausted, returns null.   
       def dup
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zmsg_dup @ptr
@@ -318,10 +311,9 @@ module CZMQ
         result
       end
       
-      # Generate a signal message encoding the given status. A signal is a short        
-      # message carrying a 1-byte success/failure code (by convention, 0 means          
-      # OK). Signals are encoded to be distinguishable from "normal" messages.          
-      # The caller is responsible for destroying the return value when finished with it.
+      # Generate a signal message encoding the given status. A signal is a short
+      # message carrying a 1-byte success/failure code (by convention, 0 means  
+      # OK). Signals are encoded to be distinguishable from "normal" messages.  
       def self.new_signal status
         result = ::CZMQ::FFI.zmsg_new_signal status
         result = Zmsg.__new result, true

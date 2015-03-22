@@ -160,11 +160,10 @@ module CZMQ
         result
       end
       
-      # Make copy of hash table; if supplied table is null, returns null.               
-      # Does not copy items themselves. Rebuilds new table so may be slow on            
-      # very large tables. NOTE: only works with item values that are strings           
-      # since there's no other way to know how to duplicate the item value.             
-      # The caller is responsible for destroying the return value when finished with it.
+      # Make copy of hash table; if supplied table is null, returns null.    
+      # Does not copy items themselves. Rebuilds new table so may be slow on 
+      # very large tables. NOTE: only works with item values that are strings
+      # since there's no other way to know how to duplicate the item value.  
       def dup
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zhash_dup @ptr
@@ -172,8 +171,7 @@ module CZMQ
         result
       end
       
-      # Return keys for items in table                                                  
-      # The caller is responsible for destroying the return value when finished with it.
+      # Return keys for items in table
       def keys
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zhash_keys @ptr
@@ -223,27 +221,26 @@ module CZMQ
         result
       end
       
-      # Serialize hash table to a binary frame that can be sent in a message.           
-      # The packed format is compatible with the 'dictionary' type defined in           
-      # http://rfc.zeromq.org/spec:35/FILEMQ, and implemented by zproto:                
-      #                                                                                 
-      #    ; A list of name/value pairs                                                 
-      #    dictionary      = dict-count *( dict-name dict-value )                       
-      #    dict-count      = number-4                                                   
-      #    dict-value      = longstr                                                    
-      #    dict-name       = string                                                     
-      #                                                                                 
-      #    ; Strings are always length + text contents                                  
-      #    longstr         = number-4 *VCHAR                                            
-      #    string          = number-1 *VCHAR                                            
-      #                                                                                 
-      #    ; Numbers are unsigned integers in network byte order                        
-      #    number-1        = 1OCTET                                                     
-      #    number-4        = 4OCTET                                                     
-      #                                                                                 
-      # Comments are not included in the packed data. Item values MUST be               
-      # strings.                                                                        
-      # The caller is responsible for destroying the return value when finished with it.
+      # Serialize hash table to a binary frame that can be sent in a message.
+      # The packed format is compatible with the 'dictionary' type defined in
+      # http://rfc.zeromq.org/spec:35/FILEMQ, and implemented by zproto:     
+      #                                                                      
+      #    ; A list of name/value pairs                                      
+      #    dictionary      = dict-count *( dict-name dict-value )            
+      #    dict-count      = number-4                                        
+      #    dict-value      = longstr                                         
+      #    dict-name       = string                                          
+      #                                                                      
+      #    ; Strings are always length + text contents                       
+      #    longstr         = number-4 *VCHAR                                 
+      #    string          = number-1 *VCHAR                                 
+      #                                                                      
+      #    ; Numbers are unsigned integers in network byte order             
+      #    number-1        = 1OCTET                                          
+      #    number-4        = 4OCTET                                          
+      #                                                                      
+      # Comments are not included in the packed data. Item values MUST be    
+      # strings.                                                             
       def pack
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zhash_pack @ptr
@@ -251,10 +248,9 @@ module CZMQ
         result
       end
       
-      # Unpack binary frame into a new hash table. Packed data must follow format       
-      # defined by zhash_pack. Hash table is set to autofree. An empty frame            
-      # unpacks to an empty hash table.                                                 
-      # The caller is responsible for destroying the return value when finished with it.
+      # Unpack binary frame into a new hash table. Packed data must follow format
+      # defined by zhash_pack. Hash table is set to autofree. An empty frame     
+      # unpacks to an empty hash table.                                          
       def self.unpack frame
         frame = frame.__ptr if frame
         result = ::CZMQ::FFI.zhash_unpack frame

@@ -29,10 +29,10 @@ CZMQ_EXPORT zmsg_t *
 CZMQ_EXPORT void
     zmsg_destroy (zmsg_t **self_p);
 
-//  Receive message from socket, returns zmsg_t object or NULL if the recv          
-//  was interrupted. Does a blocking recv. If you want to not block then use        
-//  the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input       
-//  before receiving.                                                               
+//  Receive message from socket, returns zmsg_t object or NULL if the recv   
+//  was interrupted. Does a blocking recv. If you want to not block then use 
+//  the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
+//  before receiving.                                                        
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zmsg_t *
     zmsg_recv (void *source);
@@ -66,7 +66,7 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zmsg_append (zmsg_t *self, zframe_t **frame_p);
 
-//  Remove first frame from message, if any. Returns frame, or NULL.                
+//  Remove first frame from message, if any. Returns frame, or NULL.
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zframe_t *
     zmsg_pop (zmsg_t *self);
@@ -101,8 +101,8 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zmsg_addstrf (zmsg_t *self, const char *format, ...) CHECK_PRINTF (2);
 
-//  Pop frame off front of message, return as fresh string. If there were           
-//  no more frames in the message, returns NULL.                                    
+//  Pop frame off front of message, return as fresh string. If there were
+//  no more frames in the message, returns NULL.                         
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT char *
     zmsg_popstr (zmsg_t *self);
@@ -113,8 +113,8 @@ CZMQ_EXPORT char *
 CZMQ_EXPORT int
     zmsg_addmsg (zmsg_t *self, zmsg_t **msg_p);
 
-//  Remove first submessage from message, if any. Returns zmsg_t, or NULL if        
-//  decoding was not succesfull.                                                    
+//  Remove first submessage from message, if any. Returns zmsg_t, or NULL if
+//  decoding was not succesfull.                                            
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zmsg_t *
     zmsg_popmsg (zmsg_t *self);
@@ -145,9 +145,9 @@ CZMQ_EXPORT zframe_t *
 CZMQ_EXPORT int
     zmsg_save (zmsg_t *self, FILE *file);
 
-//  Load/append an open file into message, create new message if                    
-//  null message provided. Returns NULL if the message could not                    
-//  be loaded.                                                                      
+//  Load/append an open file into message, create new message if 
+//  null message provided. Returns NULL if the message could not 
+//  be loaded.                                                   
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zmsg_t *
     zmsg_load (zmsg_t *self, FILE *file);
@@ -159,15 +159,15 @@ CZMQ_EXPORT zmsg_t *
 CZMQ_EXPORT size_t
     zmsg_encode (zmsg_t *self, byte **buffer);
 
-//  Decodes a serialized message buffer created by zmsg_encode () and returns       
-//  a new zmsg_t object. Returns NULL if the buffer was badly formatted or          
-//  there was insufficient memory to work.                                          
+//  Decodes a serialized message buffer created by zmsg_encode () and returns
+//  a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
+//  there was insufficient memory to work.                                   
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zmsg_t *
     zmsg_decode (const byte *buffer, size_t buffer_size);
 
-//  Create copy of message, as new message object. Returns a fresh zmsg_t           
-//  object. If message is null, or memory was exhausted, returns null.              
+//  Create copy of message, as new message object. Returns a fresh zmsg_t
+//  object. If message is null, or memory was exhausted, returns null.   
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zmsg_t *
     zmsg_dup (zmsg_t *self);
@@ -183,9 +183,9 @@ CZMQ_EXPORT void
 CZMQ_EXPORT bool
     zmsg_eq (zmsg_t *self, zmsg_t *other);
 
-//  Generate a signal message encoding the given status. A signal is a short        
-//  message carrying a 1-byte success/failure code (by convention, 0 means          
-//  OK). Signals are encoded to be distinguishable from "normal" messages.          
+//  Generate a signal message encoding the given status. A signal is a short
+//  message carrying a 1-byte success/failure code (by convention, 0 means  
+//  OK). Signals are encoded to be distinguishable from "normal" messages.  
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zmsg_t *
     zmsg_new_signal (byte status);
