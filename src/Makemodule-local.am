@@ -12,4 +12,4 @@ check-verbose: src/czmq_selftest
 	src/czmq_selftest -v
 
 check-py: src/libczmq.la
-	$(LIBTOOL) --mode=execute -dlopen src/.libs/libczmq.la python bindings/python/test.py
+	$(LIBTOOL) --mode=execute -dlopen src/libczmq.la python bindings/python/test.py
