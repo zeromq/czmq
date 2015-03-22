@@ -4,11 +4,12 @@
 ################################################################################
 
 from __future__ import print_function
+import os, sys
 from ctypes import *
 from ctypes.util import find_library
 
 # load libc to access free, etc.
-libcpath = find_library("libc")
+libcpath = find_library("c")
 if not libcpath:
     raise ImportError("Unable to find libc")
 libc = cdll.LoadLibrary(libcpath)
@@ -20,12 +21,22 @@ def return_fresh_string(char_p):
     libc.free(char_p)
     return s
 
-
 # czmq
-libpath = find_library("czmq")
-if not libpath:
-    raise ImportError("Unable to find czmq C library")
-lib = cdll.LoadLibrary(libpath)
+try:
+    # If LD_LIBRARY_PATH or your OSs equivalent is set, this is the only way to
+    # load the library.  If we use find_library below, we get the wrong result.
+    if os.name == 'posix':
+        if sys.platform == 'darwin':
+            lib = cdll.LoadLibrary('libczmq.3.dylib')
+        else:
+            lib = cdll.LoadLibrary("libczmq.so.3")
+    elif os.name == 'nt':
+        lib = cdll.LoadLibrary('libczmq.3.dll')
+except OSError:
+    libpath = find_library("czmq")
+    if not libpath:
+        raise ImportError("Unable to find libczmq")
+    lib = cdll.LoadLibrary(libpath)
 
 class zsock_t(Structure):
     pass # Empty - only for type checking
