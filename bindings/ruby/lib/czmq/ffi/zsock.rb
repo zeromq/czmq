@@ -71,8 +71,7 @@ module CZMQ
         result
       end
       
-      # Create a PUB socket. Default action is bind.                                    
-      # The caller is responsible for destroying the return value when finished with it.
+      # Create a PUB socket. Default action is bind.
       def self.new_pub endpoint
         endpoint = String(endpoint)
         result = ::CZMQ::FFI.zsock_new_pub endpoint
@@ -80,9 +79,8 @@ module CZMQ
         result
       end
       
-      # Create a SUB socket, and optionally subscribe to some prefix string. Default    
-      # action is connect.                                                              
-      # The caller is responsible for destroying the return value when finished with it.
+      # Create a SUB socket, and optionally subscribe to some prefix string. Default
+      # action is connect.                                                          
       def self.new_sub endpoint, subscribe
         endpoint = String(endpoint)
         subscribe = String(subscribe)
@@ -91,8 +89,7 @@ module CZMQ
         result
       end
       
-      # Create a REQ socket. Default action is connect.                                 
-      # The caller is responsible for destroying the return value when finished with it.
+      # Create a REQ socket. Default action is connect.
       def self.new_req endpoint
         endpoint = String(endpoint)
         result = ::CZMQ::FFI.zsock_new_req endpoint
@@ -100,8 +97,7 @@ module CZMQ
         result
       end
       
-      # Create a REP socket. Default action is bind.                                    
-      # The caller is responsible for destroying the return value when finished with it.
+      # Create a REP socket. Default action is bind.
       def self.new_rep endpoint
         endpoint = String(endpoint)
         result = ::CZMQ::FFI.zsock_new_rep endpoint
@@ -109,8 +105,7 @@ module CZMQ
         result
       end
       
-      # Create a DEALER socket. Default action is connect.                              
-      # The caller is responsible for destroying the return value when finished with it.
+      # Create a DEALER socket. Default action is connect.
       def self.new_dealer endpoint
         endpoint = String(endpoint)
         result = ::CZMQ::FFI.zsock_new_dealer endpoint
@@ -118,8 +113,7 @@ module CZMQ
         result
       end
       
-      # Create a ROUTER socket. Default action is bind.                                 
-      # The caller is responsible for destroying the return value when finished with it.
+      # Create a ROUTER socket. Default action is bind.
       def self.new_router endpoint
         endpoint = String(endpoint)
         result = ::CZMQ::FFI.zsock_new_router endpoint
@@ -127,8 +121,7 @@ module CZMQ
         result
       end
       
-      # Create a PUSH socket. Default action is connect.                                
-      # The caller is responsible for destroying the return value when finished with it.
+      # Create a PUSH socket. Default action is connect.
       def self.new_push endpoint
         endpoint = String(endpoint)
         result = ::CZMQ::FFI.zsock_new_push endpoint
@@ -136,8 +129,7 @@ module CZMQ
         result
       end
       
-      # Create a PULL socket. Default action is bind.                                   
-      # The caller is responsible for destroying the return value when finished with it.
+      # Create a PULL socket. Default action is bind.
       def self.new_pull endpoint
         endpoint = String(endpoint)
         result = ::CZMQ::FFI.zsock_new_pull endpoint
@@ -145,8 +137,7 @@ module CZMQ
         result
       end
       
-      # Create an XPUB socket. Default action is bind.                                  
-      # The caller is responsible for destroying the return value when finished with it.
+      # Create an XPUB socket. Default action is bind.
       def self.new_xpub endpoint
         endpoint = String(endpoint)
         result = ::CZMQ::FFI.zsock_new_xpub endpoint
@@ -154,8 +145,7 @@ module CZMQ
         result
       end
       
-      # Create an XSUB socket. Default action is connect.                               
-      # The caller is responsible for destroying the return value when finished with it.
+      # Create an XSUB socket. Default action is connect.
       def self.new_xsub endpoint
         endpoint = String(endpoint)
         result = ::CZMQ::FFI.zsock_new_xsub endpoint
@@ -163,8 +153,7 @@ module CZMQ
         result
       end
       
-      # Create a PAIR socket. Default action is connect.                                
-      # The caller is responsible for destroying the return value when finished with it.
+      # Create a PAIR socket. Default action is connect.
       def self.new_pair endpoint
         endpoint = String(endpoint)
         result = ::CZMQ::FFI.zsock_new_pair endpoint
@@ -172,8 +161,7 @@ module CZMQ
         result
       end
       
-      # Create a STREAM socket. Default action is connect.                              
-      # The caller is responsible for destroying the return value when finished with it.
+      # Create a STREAM socket. Default action is connect.
       def self.new_stream endpoint
         endpoint = String(endpoint)
         result = ::CZMQ::FFI.zsock_new_stream endpoint

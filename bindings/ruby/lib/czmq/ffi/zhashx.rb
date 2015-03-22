@@ -224,20 +224,18 @@ module CZMQ
         result
       end
       
-      # Return a zlistx_t containing the keys for the items in the                      
-      # table. Uses the key_duplicator to duplicate all keys and sets the               
-      # key_destructor as destructor for the list.                                      
-      # The caller is responsible for destroying the return value when finished with it.
+      # Return a zlistx_t containing the keys for the items in the       
+      # table. Uses the key_duplicator to duplicate all keys and sets the
+      # key_destructor as destructor for the list.                       
       def keys
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zhashx_keys @ptr
         result
       end
       
-      # Return a zlistx_t containing the values for the items in the                    
-      # table. Uses the duplicator to duplicate all items and sets the                  
-      # destructor as destructor for the list.                                          
-      # The caller is responsible for destroying the return value when finished with it.
+      # Return a zlistx_t containing the values for the items in the  
+      # table. Uses the duplicator to duplicate all items and sets the
+      # destructor as destructor for the list.                        
       def values
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zhashx_values @ptr
@@ -316,27 +314,26 @@ module CZMQ
         result
       end
       
-      # Serialize hash table to a binary frame that can be sent in a message.           
-      # The packed format is compatible with the 'dictionary' type defined in           
-      # http://rfc.zeromq.org/spec:35/FILEMQ, and implemented by zproto:                
-      #                                                                                 
-      #    ; A list of name/value pairs                                                 
-      #    dictionary      = dict-count *( dict-name dict-value )                       
-      #    dict-count      = number-4                                                   
-      #    dict-value      = longstr                                                    
-      #    dict-name       = string                                                     
-      #                                                                                 
-      #    ; Strings are always length + text contents                                  
-      #    longstr         = number-4 *VCHAR                                            
-      #    string          = number-1 *VCHAR                                            
-      #                                                                                 
-      #    ; Numbers are unsigned integers in network byte order                        
-      #    number-1        = 1OCTET                                                     
-      #    number-4        = 4OCTET                                                     
-      #                                                                                 
-      # Comments are not included in the packed data. Item values MUST be               
-      # strings.                                                                        
-      # The caller is responsible for destroying the return value when finished with it.
+      # Serialize hash table to a binary frame that can be sent in a message.
+      # The packed format is compatible with the 'dictionary' type defined in
+      # http://rfc.zeromq.org/spec:35/FILEMQ, and implemented by zproto:     
+      #                                                                      
+      #    ; A list of name/value pairs                                      
+      #    dictionary      = dict-count *( dict-name dict-value )            
+      #    dict-count      = number-4                                        
+      #    dict-value      = longstr                                         
+      #    dict-name       = string                                          
+      #                                                                      
+      #    ; Strings are always length + text contents                       
+      #    longstr         = number-4 *VCHAR                                 
+      #    string          = number-1 *VCHAR                                 
+      #                                                                      
+      #    ; Numbers are unsigned integers in network byte order             
+      #    number-1        = 1OCTET                                          
+      #    number-4        = 4OCTET                                          
+      #                                                                      
+      # Comments are not included in the packed data. Item values MUST be    
+      # strings.                                                             
       def pack
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zhashx_pack @ptr
@@ -344,10 +341,9 @@ module CZMQ
         result
       end
       
-      # Unpack binary frame into a new hash table. Packed data must follow format       
-      # defined by zhashx_pack. Hash table is set to autofree. An empty frame           
-      # unpacks to an empty hash table.                                                 
-      # The caller is responsible for destroying the return value when finished with it.
+      # Unpack binary frame into a new hash table. Packed data must follow format
+      # defined by zhashx_pack. Hash table is set to autofree. An empty frame    
+      # unpacks to an empty hash table.                                          
       def self.unpack frame
         frame = frame.__ptr if frame
         result = ::CZMQ::FFI.zhashx_unpack frame
@@ -355,12 +351,11 @@ module CZMQ
         result
       end
       
-      # Make a copy of the list; items are duplicated if you set a duplicator           
-      # for the list, otherwise not. Copying a null reference returns a null            
-      # reference. Note that this method's behavior changed slightly for CZMQ           
-      # v3.x, as it does not set nor respect autofree. It does however let you          
-      # duplicate any hash table safely. The old behavior is in zhashx_dup_v2.          
-      # The caller is responsible for destroying the return value when finished with it.
+      # Make a copy of the list; items are duplicated if you set a duplicator 
+      # for the list, otherwise not. Copying a null reference returns a null  
+      # reference. Note that this method's behavior changed slightly for CZMQ 
+      # v3.x, as it does not set nor respect autofree. It does however let you
+      # duplicate any hash table safely. The old behavior is in zhashx_dup_v2.
       def dup
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zhashx_dup @ptr

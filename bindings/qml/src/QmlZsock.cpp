@@ -234,8 +234,7 @@ QObject* QmlZsock::qmlAttachedProperties(QObject* object) {
 
 
 ///
-//  Create a PUB socket. Default action is bind.                                    
-//  The caller is responsible for destroying the return value when finished with it.
+//  Create a PUB socket. Default action is bind.
 QmlZsock *QmlZsockAttached::newPub (const QString &endpoint) {
     QmlZsock *retQ_ = new QmlZsock ();
     retQ_->self = zsock_new_pub (endpoint.toUtf8().data());
@@ -243,9 +242,8 @@ QmlZsock *QmlZsockAttached::newPub (const QString &endpoint) {
 };
 
 ///
-//  Create a SUB socket, and optionally subscribe to some prefix string. Default    
-//  action is connect.                                                              
-//  The caller is responsible for destroying the return value when finished with it.
+//  Create a SUB socket, and optionally subscribe to some prefix string. Default
+//  action is connect.                                                          
 QmlZsock *QmlZsockAttached::newSub (const QString &endpoint, const QString &subscribe) {
     QmlZsock *retQ_ = new QmlZsock ();
     retQ_->self = zsock_new_sub (endpoint.toUtf8().data(), subscribe.toUtf8().data());
@@ -253,8 +251,7 @@ QmlZsock *QmlZsockAttached::newSub (const QString &endpoint, const QString &subs
 };
 
 ///
-//  Create a REQ socket. Default action is connect.                                 
-//  The caller is responsible for destroying the return value when finished with it.
+//  Create a REQ socket. Default action is connect.
 QmlZsock *QmlZsockAttached::newReq (const QString &endpoint) {
     QmlZsock *retQ_ = new QmlZsock ();
     retQ_->self = zsock_new_req (endpoint.toUtf8().data());
@@ -262,8 +259,7 @@ QmlZsock *QmlZsockAttached::newReq (const QString &endpoint) {
 };
 
 ///
-//  Create a REP socket. Default action is bind.                                    
-//  The caller is responsible for destroying the return value when finished with it.
+//  Create a REP socket. Default action is bind.
 QmlZsock *QmlZsockAttached::newRep (const QString &endpoint) {
     QmlZsock *retQ_ = new QmlZsock ();
     retQ_->self = zsock_new_rep (endpoint.toUtf8().data());
@@ -271,8 +267,7 @@ QmlZsock *QmlZsockAttached::newRep (const QString &endpoint) {
 };
 
 ///
-//  Create a DEALER socket. Default action is connect.                              
-//  The caller is responsible for destroying the return value when finished with it.
+//  Create a DEALER socket. Default action is connect.
 QmlZsock *QmlZsockAttached::newDealer (const QString &endpoint) {
     QmlZsock *retQ_ = new QmlZsock ();
     retQ_->self = zsock_new_dealer (endpoint.toUtf8().data());
@@ -280,8 +275,7 @@ QmlZsock *QmlZsockAttached::newDealer (const QString &endpoint) {
 };
 
 ///
-//  Create a ROUTER socket. Default action is bind.                                 
-//  The caller is responsible for destroying the return value when finished with it.
+//  Create a ROUTER socket. Default action is bind.
 QmlZsock *QmlZsockAttached::newRouter (const QString &endpoint) {
     QmlZsock *retQ_ = new QmlZsock ();
     retQ_->self = zsock_new_router (endpoint.toUtf8().data());
@@ -289,8 +283,7 @@ QmlZsock *QmlZsockAttached::newRouter (const QString &endpoint) {
 };
 
 ///
-//  Create a PUSH socket. Default action is connect.                                
-//  The caller is responsible for destroying the return value when finished with it.
+//  Create a PUSH socket. Default action is connect.
 QmlZsock *QmlZsockAttached::newPush (const QString &endpoint) {
     QmlZsock *retQ_ = new QmlZsock ();
     retQ_->self = zsock_new_push (endpoint.toUtf8().data());
@@ -298,8 +291,7 @@ QmlZsock *QmlZsockAttached::newPush (const QString &endpoint) {
 };
 
 ///
-//  Create a PULL socket. Default action is bind.                                   
-//  The caller is responsible for destroying the return value when finished with it.
+//  Create a PULL socket. Default action is bind.
 QmlZsock *QmlZsockAttached::newPull (const QString &endpoint) {
     QmlZsock *retQ_ = new QmlZsock ();
     retQ_->self = zsock_new_pull (endpoint.toUtf8().data());
@@ -307,8 +299,7 @@ QmlZsock *QmlZsockAttached::newPull (const QString &endpoint) {
 };
 
 ///
-//  Create an XPUB socket. Default action is bind.                                  
-//  The caller is responsible for destroying the return value when finished with it.
+//  Create an XPUB socket. Default action is bind.
 QmlZsock *QmlZsockAttached::newXpub (const QString &endpoint) {
     QmlZsock *retQ_ = new QmlZsock ();
     retQ_->self = zsock_new_xpub (endpoint.toUtf8().data());
@@ -316,8 +307,7 @@ QmlZsock *QmlZsockAttached::newXpub (const QString &endpoint) {
 };
 
 ///
-//  Create an XSUB socket. Default action is connect.                               
-//  The caller is responsible for destroying the return value when finished with it.
+//  Create an XSUB socket. Default action is connect.
 QmlZsock *QmlZsockAttached::newXsub (const QString &endpoint) {
     QmlZsock *retQ_ = new QmlZsock ();
     retQ_->self = zsock_new_xsub (endpoint.toUtf8().data());
@@ -325,8 +315,7 @@ QmlZsock *QmlZsockAttached::newXsub (const QString &endpoint) {
 };
 
 ///
-//  Create a PAIR socket. Default action is connect.                                
-//  The caller is responsible for destroying the return value when finished with it.
+//  Create a PAIR socket. Default action is connect.
 QmlZsock *QmlZsockAttached::newPair (const QString &endpoint) {
     QmlZsock *retQ_ = new QmlZsock ();
     retQ_->self = zsock_new_pair (endpoint.toUtf8().data());
@@ -334,8 +323,7 @@ QmlZsock *QmlZsockAttached::newPair (const QString &endpoint) {
 };
 
 ///
-//  Create a STREAM socket. Default action is connect.                              
-//  The caller is responsible for destroying the return value when finished with it.
+//  Create a STREAM socket. Default action is connect.
 QmlZsock *QmlZsockAttached::newStream (const QString &endpoint) {
     QmlZsock *retQ_ = new QmlZsock ();
     retQ_->self = zsock_new_stream (endpoint.toUtf8().data());

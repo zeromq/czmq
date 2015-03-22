@@ -46,8 +46,7 @@ public slots:
     //  caller's frame reference.                                              
     int append (QmlZframe *frameP);
 
-    //  Remove first frame from message, if any. Returns frame, or NULL.                
-    //  The caller is responsible for destroying the return value when finished with it.
+    //  Remove first frame from message, if any. Returns frame, or NULL.
     QmlZframe *pop ();
 
     //  Push block of memory to front of message, as a new frame.
@@ -74,9 +73,8 @@ public slots:
     //  Returns 0 on success, -1 on error.                   
     int addstrf (const QString &format);
 
-    //  Pop frame off front of message, return as fresh string. If there were           
-    //  no more frames in the message, returns NULL.                                    
-    //  The caller is responsible for destroying the return value when finished with it.
+    //  Pop frame off front of message, return as fresh string. If there were
+    //  no more frames in the message, returns NULL.                         
     QString popstr ();
 
     //  Push encoded message as a new frame. Message takes ownership of    
@@ -84,9 +82,8 @@ public slots:
     //  success, -1 on error.                                              
     int addmsg (QmlZmsg *msgP);
 
-    //  Remove first submessage from message, if any. Returns zmsg_t, or NULL if        
-    //  decoding was not succesfull.                                                    
-    //  The caller is responsible for destroying the return value when finished with it.
+    //  Remove first submessage from message, if any. Returns zmsg_t, or NULL if
+    //  decoding was not succesfull.                                            
     QmlZmsg *popmsg ();
 
     //  Remove specified frame from list, if present. Does not destroy frame.
@@ -116,9 +113,8 @@ public slots:
     //  To decode a serialized message buffer, use zmsg_decode ().               
     size_t encode (byte **buffer);
 
-    //  Create copy of message, as new message object. Returns a fresh zmsg_t           
-    //  object. If message is null, or memory was exhausted, returns null.              
-    //  The caller is responsible for destroying the return value when finished with it.
+    //  Create copy of message, as new message object. Returns a fresh zmsg_t
+    //  object. If message is null, or memory was exhausted, returns null.   
     QmlZmsg *dup ();
 
     //  Send message to zsys log sink (may be stdout, or system facility as
@@ -145,11 +141,10 @@ public:
     };
     
 public slots:
-    //  Receive message from socket, returns zmsg_t object or NULL if the recv          
-    //  was interrupted. Does a blocking recv. If you want to not block then use        
-    //  the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input       
-    //  before receiving.                                                               
-    //  The caller is responsible for destroying the return value when finished with it.
+    //  Receive message from socket, returns zmsg_t object or NULL if the recv   
+    //  was interrupted. Does a blocking recv. If you want to not block then use 
+    //  the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
+    //  before receiving.                                                        
     QmlZmsg *recv (void *source);
 
     //  Send message to destination socket, and destroy the message after sending
@@ -158,22 +153,19 @@ public slots:
     //  it is a destructor).                                                     
     int send (QmlZmsg *selfP, void *dest);
 
-    //  Load/append an open file into message, create new message if                    
-    //  null message provided. Returns NULL if the message could not                    
-    //  be loaded.                                                                      
-    //  The caller is responsible for destroying the return value when finished with it.
+    //  Load/append an open file into message, create new message if 
+    //  null message provided. Returns NULL if the message could not 
+    //  be loaded.                                                   
     QmlZmsg *load (QmlZmsg *self, FILE *file);
 
-    //  Decodes a serialized message buffer created by zmsg_encode () and returns       
-    //  a new zmsg_t object. Returns NULL if the buffer was badly formatted or          
-    //  there was insufficient memory to work.                                          
-    //  The caller is responsible for destroying the return value when finished with it.
+    //  Decodes a serialized message buffer created by zmsg_encode () and returns
+    //  a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
+    //  there was insufficient memory to work.                                   
     QmlZmsg *decode (const byte *buffer, size_t bufferSize);
 
-    //  Generate a signal message encoding the given status. A signal is a short        
-    //  message carrying a 1-byte success/failure code (by convention, 0 means          
-    //  OK). Signals are encoded to be distinguishable from "normal" messages.          
-    //  The caller is responsible for destroying the return value when finished with it.
+    //  Generate a signal message encoding the given status. A signal is a short
+    //  message carrying a 1-byte success/failure code (by convention, 0 means  
+    //  OK). Signals are encoded to be distinguishable from "normal" messages.  
     QmlZmsg *newSignal (byte status);
 
     //  Probe the supplied object, and report if it looks like a zmsg_t.

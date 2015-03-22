@@ -28,9 +28,8 @@ public:
     static QObject* qmlAttachedProperties(QObject* object); // defined in QmlZdirPatch.cpp
     
 public slots:
-    //  Create copy of a patch. If the patch is null, or memory was exhausted,          
-    //  returns null.                                                                   
-    //  The caller is responsible for destroying the return value when finished with it.
+    //  Create copy of a patch. If the patch is null, or memory was exhausted,
+    //  returns null.                                                         
     zdir_patch_t *dup ();
 
     //  Return patch file directory path

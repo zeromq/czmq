@@ -39,8 +39,7 @@ int QmlZmsg::append (QmlZframe *frameP) {
 };
 
 ///
-//  Remove first frame from message, if any. Returns frame, or NULL.                
-//  The caller is responsible for destroying the return value when finished with it.
+//  Remove first frame from message, if any. Returns frame, or NULL.
 QmlZframe *QmlZmsg::pop () {
     QmlZframe *retQ_ = new QmlZframe ();
     retQ_->self = zmsg_pop (self);
@@ -90,9 +89,8 @@ int QmlZmsg::addstrf (const QString &format) {
 };
 
 ///
-//  Pop frame off front of message, return as fresh string. If there were           
-//  no more frames in the message, returns NULL.                                    
-//  The caller is responsible for destroying the return value when finished with it.
+//  Pop frame off front of message, return as fresh string. If there were
+//  no more frames in the message, returns NULL.                         
 QString QmlZmsg::popstr () {
     char *retStr_ = zmsg_popstr (self);
     QString retQStr_ = QString (retStr_);
@@ -109,9 +107,8 @@ int QmlZmsg::addmsg (QmlZmsg *msgP) {
 };
 
 ///
-//  Remove first submessage from message, if any. Returns zmsg_t, or NULL if        
-//  decoding was not succesfull.                                                    
-//  The caller is responsible for destroying the return value when finished with it.
+//  Remove first submessage from message, if any. Returns zmsg_t, or NULL if
+//  decoding was not succesfull.                                            
 QmlZmsg *QmlZmsg::popmsg () {
     QmlZmsg *retQ_ = new QmlZmsg ();
     retQ_->self = zmsg_popmsg (self);
@@ -170,9 +167,8 @@ size_t QmlZmsg::encode (byte **buffer) {
 };
 
 ///
-//  Create copy of message, as new message object. Returns a fresh zmsg_t           
-//  object. If message is null, or memory was exhausted, returns null.              
-//  The caller is responsible for destroying the return value when finished with it.
+//  Create copy of message, as new message object. Returns a fresh zmsg_t
+//  object. If message is null, or memory was exhausted, returns null.   
 QmlZmsg *QmlZmsg::dup () {
     QmlZmsg *retQ_ = new QmlZmsg ();
     retQ_->self = zmsg_dup (self);
@@ -207,11 +203,10 @@ QObject* QmlZmsg::qmlAttachedProperties(QObject* object) {
 
 
 ///
-//  Receive message from socket, returns zmsg_t object or NULL if the recv          
-//  was interrupted. Does a blocking recv. If you want to not block then use        
-//  the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input       
-//  before receiving.                                                               
-//  The caller is responsible for destroying the return value when finished with it.
+//  Receive message from socket, returns zmsg_t object or NULL if the recv   
+//  was interrupted. Does a blocking recv. If you want to not block then use 
+//  the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
+//  before receiving.                                                        
 QmlZmsg *QmlZmsgAttached::recv (void *source) {
     QmlZmsg *retQ_ = new QmlZmsg ();
     retQ_->self = zmsg_recv (source);
@@ -228,10 +223,9 @@ int QmlZmsgAttached::send (QmlZmsg *selfP, void *dest) {
 };
 
 ///
-//  Load/append an open file into message, create new message if                    
-//  null message provided. Returns NULL if the message could not                    
-//  be loaded.                                                                      
-//  The caller is responsible for destroying the return value when finished with it.
+//  Load/append an open file into message, create new message if 
+//  null message provided. Returns NULL if the message could not 
+//  be loaded.                                                   
 QmlZmsg *QmlZmsgAttached::load (QmlZmsg *self, FILE *file) {
     QmlZmsg *retQ_ = new QmlZmsg ();
     retQ_->self = zmsg_load (self->self, file);
@@ -239,10 +233,9 @@ QmlZmsg *QmlZmsgAttached::load (QmlZmsg *self, FILE *file) {
 };
 
 ///
-//  Decodes a serialized message buffer created by zmsg_encode () and returns       
-//  a new zmsg_t object. Returns NULL if the buffer was badly formatted or          
-//  there was insufficient memory to work.                                          
-//  The caller is responsible for destroying the return value when finished with it.
+//  Decodes a serialized message buffer created by zmsg_encode () and returns
+//  a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
+//  there was insufficient memory to work.                                   
 QmlZmsg *QmlZmsgAttached::decode (const byte *buffer, size_t bufferSize) {
     QmlZmsg *retQ_ = new QmlZmsg ();
     retQ_->self = zmsg_decode (buffer, bufferSize);
@@ -250,10 +243,9 @@ QmlZmsg *QmlZmsgAttached::decode (const byte *buffer, size_t bufferSize) {
 };
 
 ///
-//  Generate a signal message encoding the given status. A signal is a short        
-//  message carrying a 1-byte success/failure code (by convention, 0 means          
-//  OK). Signals are encoded to be distinguishable from "normal" messages.          
-//  The caller is responsible for destroying the return value when finished with it.
+//  Generate a signal message encoding the given status. A signal is a short
+//  message carrying a 1-byte success/failure code (by convention, 0 means  
+//  OK). Signals are encoded to be distinguishable from "normal" messages.  
 QmlZmsg *QmlZmsgAttached::newSignal (byte status) {
     QmlZmsg *retQ_ = new QmlZmsg ();
     retQ_->self = zmsg_new_signal (status);

@@ -34,10 +34,9 @@ size_t QmlZdir::count () {
 };
 
 ///
-//  Returns a sorted list of zfile objects; Each entry in the list is a pointer     
-//  to a zfile_t item already allocated in the zdir tree. Do not destroy the        
-//  original zdir tree until you are done with this list.                           
-//  The caller is responsible for destroying the return value when finished with it.
+//  Returns a sorted list of zfile objects; Each entry in the list is a pointer
+//  to a zfile_t item already allocated in the zdir tree. Do not destroy the   
+//  original zdir tree until you are done with this list.                      
 QmlZlist *QmlZdir::list () {
     QmlZlist *retQ_ = new QmlZlist ();
     retQ_->self = zdir_list (self);
@@ -53,8 +52,7 @@ void QmlZdir::remove (bool force) {
 };
 
 ///
-//  Return full contents of directory as a zdir_patch list.                         
-//  The caller is responsible for destroying the return value when finished with it.
+//  Return full contents of directory as a zdir_patch list.
 QmlZlist *QmlZdir::resync (const QString &alias) {
     QmlZlist *retQ_ = new QmlZlist ();
     retQ_->self = zdir_resync (self, alias.toUtf8().data());
@@ -62,9 +60,8 @@ QmlZlist *QmlZdir::resync (const QString &alias) {
 };
 
 ///
-//  Load directory cache; returns a hash table containing the SHA-1 digests         
-//  of every file in the tree. The cache is saved between runs in .cache.           
-//  The caller is responsible for destroying the return value when finished with it.
+//  Load directory cache; returns a hash table containing the SHA-1 digests
+//  of every file in the tree. The cache is saved between runs in .cache.  
 QmlZhash *QmlZdir::cache () {
     QmlZhash *retQ_ = new QmlZhash ();
     retQ_->self = zdir_cache (self);
@@ -90,11 +87,10 @@ QObject* QmlZdir::qmlAttachedProperties(QObject* object) {
 
 
 ///
-//  Calculate differences between two versions of a directory tree.                 
-//  Returns a list of zdir_patch_t patches. Either older or newer may               
-//  be null, indicating the directory is empty/absent. If alias is set,             
-//  generates virtual filename (minus path, plus alias).                            
-//  The caller is responsible for destroying the return value when finished with it.
+//  Calculate differences between two versions of a directory tree.    
+//  Returns a list of zdir_patch_t patches. Either older or newer may  
+//  be null, indicating the directory is empty/absent. If alias is set,
+//  generates virtual filename (minus path, plus alias).               
 QmlZlist *QmlZdirAttached::diff (QmlZdir *older, QmlZdir *newer, const QString &alias) {
     QmlZlist *retQ_ = new QmlZlist ();
     retQ_->self = zdir_diff (older->self, newer->self, alias.toUtf8().data());
