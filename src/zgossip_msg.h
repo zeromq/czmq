@@ -22,8 +22,8 @@
     =========================================================================
 */
 
-#ifndef __ZGOSSIP_MSG_H_INCLUDED__
-#define __ZGOSSIP_MSG_H_INCLUDED__
+#ifndef ZGOSSIP_MSG_H_INCLUDED
+#define ZGOSSIP_MSG_H_INCLUDED
 
 /*  These are the zgossip_msg messages:
 

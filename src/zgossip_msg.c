@@ -39,9 +39,12 @@ struct _zgossip_msg_t {
     int id;                             //  zgossip_msg message ID
     byte *needle;                       //  Read/write pointer for serialization
     byte *ceiling;                      //  Valid upper limit for read pointer
-    char key [256];                     //  Tuple key, globally unique
-    char *value;                        //  Tuple value, as printable string
-    uint32_t ttl;                       //  Time to live, msecs
+    /* Tuple key, globally unique  */
+    char key [256];
+    /* Tuple value, as printable string  */
+    char *value;
+    /* Time to live, msecs  */
+    uint32_t ttl;
 };
 
 //  --------------------------------------------------------------------------
@@ -597,22 +600,16 @@ zgossip_msg_test (bool verbose)
 {
     printf (" * zgossip_msg: ");
 
-    if (verbose)
-        printf("\n");
+    //  Silence an "unused" warning by "using" the verbose variable
+    if (verbose) {;}
 
     //  @selftest
     //  Simple create/destroy test
-    if (verbose)
-        printf("create-destroy\n");
-
     zgossip_msg_t *self = zgossip_msg_new ();
     assert (self);
     zgossip_msg_destroy (&self);
 
     //  Create pair of sockets we can send through
-    if (verbose)
-        printf("socket-create\n");
-
     zsock_t *input = zsock_new (ZMQ_ROUTER);
     assert (input);
     zsock_connect (input, "inproc://selftest-zgossip_msg");
@@ -622,9 +619,6 @@ zgossip_msg_test (bool verbose)
     zsock_bind (output, "inproc://selftest-zgossip_msg");
 
     //  Encode/send/decode and verify each message type
-    if (verbose)
-        printf("encode-decode-twice 1\n");
-
     int instance;
     self = zgossip_msg_new ();
     zgossip_msg_set_id (self, ZGOSSIP_MSG_HELLO);
@@ -637,10 +631,6 @@ zgossip_msg_test (bool verbose)
         zgossip_msg_recv (self, input);
         assert (zgossip_msg_routing_id (self));
     }
-
-    if (verbose)
-        printf("encode-decode-twice 2\n");
-
     zgossip_msg_set_id (self, ZGOSSIP_MSG_PUBLISH);
 
     zgossip_msg_set_key (self, "Life is short but Now lasts for ever");
@@ -657,10 +647,6 @@ zgossip_msg_test (bool verbose)
         assert (streq (zgossip_msg_value (self), "Life is short but Now lasts for ever"));
         assert (zgossip_msg_ttl (self) == 123);
     }
-
-    if (verbose)
-        printf("encode-decode-twice 3\n");
-
     zgossip_msg_set_id (self, ZGOSSIP_MSG_PING);
 
     //  Send twice
@@ -671,10 +657,6 @@ zgossip_msg_test (bool verbose)
         zgossip_msg_recv (self, input);
         assert (zgossip_msg_routing_id (self));
     }
-
-    if (verbose)
-        printf("encode-decode-twice 4\n");
-
     zgossip_msg_set_id (self, ZGOSSIP_MSG_PONG);
 
     //  Send twice
@@ -685,10 +667,6 @@ zgossip_msg_test (bool verbose)
         zgossip_msg_recv (self, input);
         assert (zgossip_msg_routing_id (self));
     }
-
-    if (verbose)
-        printf("encode-decode-twice 5\n");
-
     zgossip_msg_set_id (self, ZGOSSIP_MSG_INVALID);
 
     //  Send twice
@@ -699,9 +677,6 @@ zgossip_msg_test (bool verbose)
         zgossip_msg_recv (self, input);
         assert (zgossip_msg_routing_id (self));
     }
-
-    if (verbose)
-        printf("destroy\n");
 
     zgossip_msg_destroy (&self);
     zsock_destroy (&input);
