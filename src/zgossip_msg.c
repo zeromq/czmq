@@ -610,13 +610,16 @@ zgossip_msg_test (bool verbose)
     zgossip_msg_destroy (&self);
 
     //  Create pair of sockets we can send through
-    zsock_t *input = zsock_new (ZMQ_ROUTER);
-    assert (input);
-    zsock_connect (input, "inproc://selftest-zgossip_msg");
-
+    //  We must bind before connect if we wish to remain compatible with ZeroMQ < v4
     zsock_t *output = zsock_new (ZMQ_DEALER);
     assert (output);
-    zsock_bind (output, "inproc://selftest-zgossip_msg");
+    int rc = zsock_bind (output, "inproc://selftest-zgossip_msg");
+    assert (rc == 0);
+
+    zsock_t *input = zsock_new (ZMQ_ROUTER);
+    assert (input);
+    rc = zsock_connect (input, "inproc://selftest-zgossip_msg");
+    assert (rc == 0);
 
     //  Encode/send/decode and verify each message type
     int instance;
