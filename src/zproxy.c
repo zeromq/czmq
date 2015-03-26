@@ -101,7 +101,7 @@ s_self_configure (self_t *self, zsock_t **sock_p, zmsg_t *request, char *name)
     char *endpoints = zmsg_popstr (request);
     assert (endpoints);
     if (self->verbose)
-        zsys_info ("zmonitor: - %s type=%s attach=%s", name, type_name, endpoints);
+        zsys_info ("zproxy: - %s type=%s attach=%s", name, type_name, endpoints);
     assert (*sock_p == NULL);
     *sock_p = s_create_socket (type_name, endpoints);
     assert (*sock_p);
