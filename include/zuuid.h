@@ -52,8 +52,8 @@ CZMQ_EXPORT char *
 CZMQ_EXPORT void
     zuuid_set (zuuid_t *self, byte *source);
     
-//  Set UUID to new supplied ZUUID_STR_LEN-char string value;
-//  return 0 if OK, else returns -1.
+//  Set UUID to new supplied string value skipping '-' and '{' '}'
+//  optional delimiters. Return 0 if OK, else returns -1.
 CZMQ_EXPORT int
     zuuid_set_str (zuuid_t *self, const char *source);
 

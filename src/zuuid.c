@@ -120,33 +120,33 @@ zuuid_set (zuuid_t *self, byte *source)
 
 
 //  -----------------------------------------------------------------
-//  Set UUID to new supplied string value skipping '-' and '{' '}' optional delimiters;
-//  return 0 if OK, else returns -1.
+//  Set UUID to new supplied string value skipping '-' and '{' '}'
+//  optional delimiters. Return 0 if OK, else returns -1.
 
 int
 zuuid_set_str (zuuid_t *self, const char *source)
 {
     assert (self);
     assert (source);
-    int str_len = strlen (source);
-    assert (str_len == ZUUID_STR_LEN || str_len == ZUUID_STR_LEN + 4 || str_len == ZUUID_STR_LEN + 6);
 
-    int byte_nbr;
-    const char *p = source;
-    for (byte_nbr = 0; byte_nbr < ZUUID_LEN; byte_nbr++) {
-        while (str_len > 0 && (*p == '-' || *p == '{' || *p == '}')) {
-            p++;
-            str_len--;
+    uint byte_nbr = 0;
+    while (*source) {
+        if (*source == '-' || *source == '{' || *source == '}')
+            source++;
+        else {
+            //  Get two hex digits
+            uint value;
+            if (sscanf (source, "%02x", &value) != 1)
+                return -1;
+            if (byte_nbr < ZUUID_LEN) {
+                self->uuid [byte_nbr] = (byte) value;
+                self->str [byte_nbr * 2 + 0] = *source++;
+                self->str [byte_nbr * 2 + 1] = *source++;
+                byte_nbr++;
+            }
+            else
+                return -1;
         }
-        if (str_len <= 0 && byte_nbr < ZUUID_LEN)
-            return -1;
-        uint value;
-        if (sscanf (p, "%02x", &value) != 1)
-            return -1;
-        self->uuid [byte_nbr] = (byte)value;
-        self->str[byte_nbr * 2] = *p++;
-        self->str[byte_nbr * 2 + 1] = *p++;
-        str_len -= 2;
     }
     return 0;
 }
@@ -285,12 +285,18 @@ zuuid_test (bool verbose)
     const char *myuuid = "8CB3E9A9649B4BEF8DE225E9C2CEBB38";
     const char *myuuid2 = "8CB3E9A9-649B-4BEF-8DE2-25E9C2CEBB38";
     const char *myuuid3 = "{8CB3E9A9-649B-4BEF-8DE2-25E9C2CEBB38}";
-    zuuid_set_str (uuid, myuuid);
+    const char *myuuid4 = "8CB3E9A9649B4BEF8DE225E9C2CEBB3838";
+    int rc = zuuid_set_str (uuid, myuuid);
+    assert (rc == 0);
     assert (streq (zuuid_str (uuid), myuuid));
-    zuuid_set_str (uuid, myuuid2);
+    rc = zuuid_set_str (uuid, myuuid2);
+    assert (rc == 0);
     assert (streq (zuuid_str (uuid), myuuid));
-    zuuid_set_str (uuid, myuuid3);
+    rc = zuuid_set_str (uuid, myuuid3);
+    assert (rc == 0);
     assert (streq (zuuid_str (uuid), myuuid));
+    rc = zuuid_set_str (uuid, myuuid4);
+    assert (rc == -1);
     byte copy_uuid [ZUUID_LEN];
     zuuid_export (uuid, copy_uuid);
     zuuid_set (uuid, copy_uuid);
