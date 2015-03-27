@@ -118,7 +118,7 @@ zuuid_set (zuuid_t *self, byte *source)
         self->str [byte_nbr * 2 + 1] = hex_char [val & 15];
     }
     self->str [ZUUID_LEN * 2] = 0;
-    free (self->str_canonical);
+    zstr_free (&self->str_canonical);
 }
 
 
@@ -151,7 +151,7 @@ zuuid_set_str (zuuid_t *self, const char *source)
                 return -1;
         }
     }
-    free (self->str_canonical);
+    zstr_free (&self->str_canonical);
     return 0;
 }
 
@@ -181,7 +181,7 @@ zuuid_size (zuuid_t *self)
 //  -----------------------------------------------------------------
 //  Returns UUID as string
 
-char *
+const char *
 zuuid_str (zuuid_t *self)
 {
     assert (self);
@@ -194,7 +194,7 @@ zuuid_str (zuuid_t *self)
 //  case. Caller does not modify or free returned value. See
 //  http://en.wikipedia.org/wiki/Universally_unique_identifier
 
-char *
+const char *
 zuuid_str_canonical (zuuid_t *self)
 {
     assert (self);
