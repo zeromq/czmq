@@ -120,23 +120,34 @@ zuuid_set (zuuid_t *self, byte *source)
 
 
 //  -----------------------------------------------------------------
-//  Set UUID to new supplied ZUUID_STR_LEN-char string value;
+//  Set UUID to new supplied string value skipping '-' and '{' '}' optional delimiters;
 //  return 0 if OK, else returns -1.
 
 int
 zuuid_set_str (zuuid_t *self, const char *source)
 {
     assert (self);
-    assert (strlen (source) == ZUUID_STR_LEN);
+    assert (source);
+    int str_len = strlen (source);
+    assert (str_len == ZUUID_STR_LEN || str_len == ZUUID_STR_LEN + 4 || str_len == ZUUID_STR_LEN + 6);
 
     int byte_nbr;
+    const char *p = source;
     for (byte_nbr = 0; byte_nbr < ZUUID_LEN; byte_nbr++) {
-        uint value;
-        if (sscanf (source + byte_nbr * 2, "%02x", &value) != 1)
+        while (str_len > 0 && (*p == '-' || *p == '{' || *p == '}')) {
+            p++;
+            str_len--;
+        }
+        if (str_len <= 0 && byte_nbr < ZUUID_LEN)
             return -1;
-        self->uuid [byte_nbr] = (byte) value;
+        uint value;
+        if (sscanf (p, "%02x", &value) != 1)
+            return -1;
+        self->uuid [byte_nbr] = (byte)value;
+        self->str[byte_nbr * 2] = *p++;
+        self->str[byte_nbr * 2 + 1] = *p++;
+        str_len -= 2;
     }
-    strcpy (self->str, source);
     return 0;
 }
 
@@ -272,7 +283,13 @@ zuuid_test (bool verbose)
 
     //  Check set/set_str/export methods
     const char *myuuid = "8CB3E9A9649B4BEF8DE225E9C2CEBB38";
+    const char *myuuid2 = "8CB3E9A9-649B-4BEF-8DE2-25E9C2CEBB38";
+    const char *myuuid3 = "{8CB3E9A9-649B-4BEF-8DE2-25E9C2CEBB38}";
     zuuid_set_str (uuid, myuuid);
+    assert (streq (zuuid_str (uuid), myuuid));
+    zuuid_set_str (uuid, myuuid2);
+    assert (streq (zuuid_str (uuid), myuuid));
+    zuuid_set_str (uuid, myuuid3);
     assert (streq (zuuid_str (uuid), myuuid));
     byte copy_uuid [ZUUID_LEN];
     zuuid_export (uuid, copy_uuid);
