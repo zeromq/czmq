@@ -29,6 +29,7 @@
 struct _zuuid_t {
     byte uuid [ZUUID_LEN];              //  Binary UUID
     char str [ZUUID_STR_LEN + 1];       //  Printable UUID
+    char *str_canonical;                //  Canonical UUID, if any
 };
 
 
@@ -55,7 +56,7 @@ zuuid_new (void)
             return NULL;
         }
         byte buffer [ZUUID_LEN];
-        uuid_enc_be (&buffer,&uuid);
+        uuid_enc_be (&buffer, &uuid);
         zuuid_set (self, buffer);
 #   elif defined (__UTYPE_LINUX) || defined (__UTYPE_OSX)
         uuid_t uuid;
@@ -95,6 +96,7 @@ zuuid_destroy (zuuid_t **self_p)
     if (*self_p) {
         zuuid_t *self = *self_p;
         free (self);
+        free (self->str_canonical);
         *self_p = NULL;
     }
 }
@@ -116,6 +118,7 @@ zuuid_set (zuuid_t *self, byte *source)
         self->str [byte_nbr * 2 + 1] = hex_char [val & 15];
     }
     self->str [ZUUID_LEN * 2] = 0;
+    free (self->str_canonical);
 }
 
 
@@ -148,6 +151,7 @@ zuuid_set_str (zuuid_t *self, const char *source)
                 return -1;
         }
     }
+    free (self->str_canonical);
     return 0;
 }
 
@@ -184,31 +188,35 @@ zuuid_str (zuuid_t *self)
     return self->str;
 }
 
+
 //  -----------------------------------------------------------------
-// Return UUID as formatted string in the canonical format 8-4-4-4-12,
-// lower case.  The caller should free the freshly allocated string.
-// See: http://en.wikipedia.org/wiki/Universally_unique_identifier
+//  Return UUID in the canonical string format: 8-4-4-4-12, in lower
+//  case. Caller does not modify or free returned value. See
+//  http://en.wikipedia.org/wiki/Universally_unique_identifier
 
 char *
-zuuid_formatted_str (zuuid_t *self)
+zuuid_str_canonical (zuuid_t *self)
 {
     assert (self);
-    char *target = (char *) malloc (8 + 4 + 4 + 4 + 12 + 5);
-    target [0] = '\0';
-    strncat (target, self->str, 8);
-    strcat (target, "-");
-    strncat (target, self->str + 8, 4);
-    strcat (target, "-");
-    strncat (target, self->str + 12, 4);
-    strcat (target, "-");
-    strncat (target, self->str + 16, 4);
-    strcat (target, "-");
-    strncat (target, self->str + 20, 12);
-    int i;
-    for (i = 0; i < 36; i++)
-      target [i] = tolower (target [i]);
-    return target;
+    if (!self->str_canonical)
+        self->str_canonical = (char *) zmalloc (8 + 4 + 4 + 4 + 12 + 5);
+    *self->str_canonical = 0;
+    strncat (self->str_canonical, self->str, 8);
+    strcat  (self->str_canonical, "-");
+    strncat (self->str_canonical, self->str + 8, 4);
+    strcat  (self->str_canonical, "-");
+    strncat (self->str_canonical, self->str + 12, 4);
+    strcat  (self->str_canonical, "-");
+    strncat (self->str_canonical, self->str + 16, 4);
+    strcat  (self->str_canonical, "-");
+    strncat (self->str_canonical, self->str + 20, 12);
+    
+    int char_nbr;
+    for (char_nbr = 0; char_nbr < 36; char_nbr++)
+        self->str_canonical [char_nbr] = tolower (self->str_canonical [char_nbr]);
+    return self->str_canonical;
 }
+
 
 //  -----------------------------------------------------------------
 //  Store UUID blob into a target array
@@ -302,10 +310,9 @@ zuuid_test (bool verbose)
     zuuid_set (uuid, copy_uuid);
     assert (streq (zuuid_str (uuid), myuuid));
 
-    // Check the formatted string output
-    char *formatted_str = zuuid_formatted_str (uuid);
-    assert (streq (formatted_str, "8cb3e9a9-649b-4bef-8de2-25e9c2cebb38"));
-    zstr_free (&formatted_str);
+    //  Check the canonical string format
+    assert (streq (zuuid_str_canonical (uuid),
+                   "8cb3e9a9-649b-4bef-8de2-25e9c2cebb38"));
 
     zuuid_destroy (&uuid);
     zuuid_destroy (&copy);
