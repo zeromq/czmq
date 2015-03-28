@@ -968,7 +968,7 @@ zhash_test (int verbose)
     assert (rc == 0);
     strcpy (value, "Inserting with the same key will fail");
     rc = zhash_insert (hash, "key1", value);
-    assert (rc == -1);    
+    assert (rc == -1);
     strcpy (value, "Ring a ding ding");
     rc = zhash_insert (hash, "key2", value);
     assert (rc == 0);
