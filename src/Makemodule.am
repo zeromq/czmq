@@ -143,7 +143,6 @@ check_PROGRAMS += src/czmq_selftest
 src_czmq_selftest_CPPFLAGS = ${src_libczmq_la_CPPFLAGS}
 src_czmq_selftest_LDADD = ${program_libs}
 src_czmq_selftest_SOURCES = src/czmq_selftest.c
-TESTS += src/czmq_selftest
 
 
 # define custom target for all products of /src
@@ -154,6 +153,12 @@ code:
 	cd $(srcdir)/src; gsl -q sockopts.xml
 	cd $(srcdir)/src; gsl -q zgossip.xml
 	cd $(srcdir)/src; gsl -q zgossip_msg.xml
+
+check-local: src/czmq_selftest
+	$(LIBTOOL) --mode=execute $(srcdir)/src/czmq_selftest
+
+check-verbose: src/czmq_selftest
+	$(LIBTOOL) --mode=execute $(srcdir)/src/czmq_selftest -v
 
 # Run the selftest binary under valgrind to check for memory leaks
 memcheck: src/czmq_selftest
