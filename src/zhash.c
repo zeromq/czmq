@@ -186,9 +186,6 @@ zhash_insert (zhash_t *self, const char *key, void *value)
         self->items = new_items;
         self->limit = new_limit;
     }
-    //  If necessary, take duplicate of item (string) value
-    if (self->autofree)
-        value = strdup ((char *) value);
 
     return s_item_insert (self, key, value)? 0: -1;
 }
@@ -225,6 +222,9 @@ s_item_insert (zhash_t *self, const char *key, void *value)
         item = (item_t *) zmalloc (sizeof (item_t));
         if (!item)
             return NULL;
+        //  If necessary, take duplicate of item (string) value
+        if (self->autofree)
+            value = strdup ((char *) value);
         item->value = value;
         item->key = strdup (key);
         item->index = self->cached_index;
@@ -966,6 +966,9 @@ zhash_test (int verbose)
     strcpy (value, "This is a string");
     rc = zhash_insert (hash, "key1", value);
     assert (rc == 0);
+    strcpy (value, "Inserting with the same key will fail");
+    rc = zhash_insert (hash, "key1", value);
+    assert (rc == -1);    
     strcpy (value, "Ring a ding ding");
     rc = zhash_insert (hash, "key2", value);
     assert (rc == 0);
