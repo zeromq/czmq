@@ -39,21 +39,21 @@ CZMQ_EXPORT size_t
     zuuid_size (zuuid_t *self);
 
 //  Returns UUID as string
-CZMQ_EXPORT char *
+CZMQ_EXPORT const char *
     zuuid_str (zuuid_t *self);
 
-// Return UUID as formatted string in the canonical format 8-4-4-4-12,
-// lower case.  The caller should free the freshly allocated string.
-// See: http://en.wikipedia.org/wiki/Universally_unique_identifier
-CZMQ_EXPORT char *
-    zuuid_formatted_str (zuuid_t *self);
+//  Return UUID in the canonical string format: 8-4-4-4-12, in lower
+//  case. Caller does not modify or free returned value. See
+//  http://en.wikipedia.org/wiki/Universally_unique_identifier
+CZMQ_EXPORT const char *
+    zuuid_str_canonical (zuuid_t *self);
 
 //  Set UUID to new supplied ZUUID_LEN-octet value
 CZMQ_EXPORT void
     zuuid_set (zuuid_t *self, byte *source);
     
-//  Set UUID to new supplied ZUUID_STR_LEN-char string value;
-//  return 0 if OK, else returns -1.
+//  Set UUID to new supplied string value skipping '-' and '{' '}'
+//  optional delimiters. Return 0 if OK, else returns -1.
 CZMQ_EXPORT int
     zuuid_set_str (zuuid_t *self, const char *source);
 
