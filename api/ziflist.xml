@@ -11,8 +11,6 @@
         Destroy a ziflist instance
     </destructor>
 
-    <method name = "print" exclude = "1" />
-
     <method name = "reload">
         Reload network interfaces from system
     </method>

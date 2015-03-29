@@ -28,6 +28,9 @@ public:
     static QObject* qmlAttachedProperties(QObject* object); // defined in QmlZiflist.cpp
     
 public slots:
+    //  Print properties of the ziflist object.
+    void print ();
+
     //  Reload network interfaces from system
     void reload ();
 
