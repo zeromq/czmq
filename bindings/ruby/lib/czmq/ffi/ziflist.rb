@@ -64,6 +64,13 @@ module CZMQ
         result
       end
       
+      # Print properties of the ziflist object.
+      def print
+        raise DestroyedError unless @ptr
+        result = ::CZMQ::FFI.ziflist_print @ptr
+        result
+      end
+      
       # Reload network interfaces from system
       def reload
         raise DestroyedError unless @ptr

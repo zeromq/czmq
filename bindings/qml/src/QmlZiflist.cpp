@@ -9,6 +9,12 @@
 
 
 ///
+//  Print properties of the ziflist object.
+void QmlZiflist::print () {
+    ziflist_print (self);
+};
+
+///
 //  Reload network interfaces from system
 void QmlZiflist::reload () {
     ziflist_reload (self);

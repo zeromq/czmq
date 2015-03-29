@@ -1107,6 +1107,8 @@ lib.ziflist_new.restype = ziflist_p
 lib.ziflist_new.argtypes = []
 lib.ziflist_destroy.restype = None
 lib.ziflist_destroy.argtypes = [POINTER(ziflist_p)]
+lib.ziflist_print.restype = None
+lib.ziflist_print.argtypes = [ziflist_p]
 lib.ziflist_reload.restype = None
 lib.ziflist_reload.argtypes = [ziflist_p]
 lib.ziflist_size.restype = c_size_t
@@ -1152,6 +1154,10 @@ class Ziflist(object):
     def __nonzero__(self):
         "Determine whether the object is valid by converting to boolean" # Python 2
         return self._as_parameter_.__nonzero__()
+
+    def print(self):
+        """Print properties of the ziflist object."""
+        return lib.ziflist_print(self._as_parameter_)
 
     def reload(self):
         """Reload network interfaces from system"""

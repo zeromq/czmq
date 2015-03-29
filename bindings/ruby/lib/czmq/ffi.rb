@@ -161,6 +161,7 @@ module CZMQ
       
       attach_function :ziflist_new, [], :pointer, **opts
       attach_function :ziflist_destroy, [:pointer], :void, **opts
+      attach_function :ziflist_print, [:pointer], :void, **opts
       attach_function :ziflist_reload, [:pointer], :void, **opts
       attach_function :ziflist_size, [:pointer], :size_t, **opts
       attach_function :ziflist_first, [:pointer], :string, **opts
