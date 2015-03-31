@@ -620,6 +620,7 @@ zsock_type_str (zsock_t *self)
 //      2 = uint16_t
 //      4 = uint32_t
 //      8 = uint64_t
+//      s = char *
 //      b = byte *, int (2 arguments)
 //      c = zchunk_t *
 //      f = zframe_t *
