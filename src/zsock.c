@@ -103,10 +103,12 @@ void zsock_destroy (zsock_t **self_p)
 
 
 //  --------------------------------------------------------------------------
-//  Smart constructors, which create sockets with additional set-up. In all of
-//  these, the endpoint is NULL, or starts with '>' (connect) or '@' (bind).
-//  Multiple endpoints are allowed, separated by commas. If endpoint does not
-//  start with '@' or '>', default action depends on socket type.
+//  This interface includes some smart constructors, which create sockets with
+//  additional set-up. In all of these, the endpoint is NULL, or starts with
+//  '@' (bind) or '>' (connect). Multiple endpoints are allowed, separated by
+//  commas. If endpoint does not start with '@' or '>', default action depends
+//  on socket type.
+
 //  Create a PUB socket. Default action is bind.
 
 zsock_t *
@@ -618,6 +620,7 @@ zsock_type_str (zsock_t *self)
 //      2 = uint16_t
 //      4 = uint32_t
 //      8 = uint64_t
+//      s = char *
 //      b = byte *, int (2 arguments)
 //      c = zchunk_t *
 //      f = zframe_t *
