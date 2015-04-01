@@ -25,6 +25,10 @@ extern "C" {
 typedef bool (zlist_compare_fn) (
     void *item1, void *item2);
 
+// Equals function
+typedef bool (zlist_equals_fn) (
+    void *item1, void *item2);
+
 // Callback function for zlist_freefn method
 typedef void (zlist_free_fn) (
     void *data);
@@ -81,6 +85,12 @@ CZMQ_EXPORT int
 CZMQ_EXPORT void *
     zlist_pop (zlist_t *self);
 
+//  Checks if an item already is present. Uses compare method to determine if  
+//  items are equal. If the compare method is NULL the check will only compare 
+//  pointers. Returns true if item is present else false.                      
+CZMQ_EXPORT bool
+    zlist_exists (zlist_t *self, void *item);
+
 //  Remove the specified item from the list if present
 CZMQ_EXPORT void
     zlist_remove (zlist_t *self, void *item);
@@ -115,6 +125,13 @@ CZMQ_EXPORT void
 //  list is empty.                                                        
 CZMQ_EXPORT void
     zlist_autofree (zlist_t *self);
+
+//  Set an equals function for the list. This function is used for the   
+//  methods zlist_exists and zlist_remove. If there is more than one item
+//  in the list that equals matchesi, only the first occurence will be   
+//  processed.                                                           
+CZMQ_EXPORT void
+    zlist_equalsfn (zlist_t *self, zlist_equals_fn fn);
 
 //  Set a free function for the specified list item. When the item is     
 //  destroyed, the free function, if any, is called on that item.         

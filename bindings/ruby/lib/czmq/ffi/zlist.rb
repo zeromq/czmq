@@ -65,6 +65,21 @@ module CZMQ
       end
       
       # Create a new callback of the following type:
+      # Equals function
+      #     typedef bool (zlist_equals_fn) (
+      #         void *item1, void *item2);  
+      #
+      # WARNING: If your Ruby code doesn't retain a reference to the
+      #   FFI::Function object after passing it to a C function call,
+      #   it may be garbage collected while C still holds the pointer,
+      #   potentially resulting in a segmentation fault.
+      def self.equals_fn
+        ::FFI::Function.new :bool, [:pointer, :pointer], blocking: true do |item1, item2|
+          yield item1, item2
+        end
+      end
+      
+      # Create a new callback of the following type:
       # Callback function for zlist_freefn method
       #     typedef void (zlist_free_fn) (
       #         void *data);              
@@ -165,6 +180,15 @@ module CZMQ
         result
       end
       
+      # Checks if an item already is present. Uses compare method to determine if  
+      # items are equal. If the compare method is NULL the check will only compare 
+      # pointers. Returns true if item is present else false.                      
+      def exists item
+        raise DestroyedError unless @ptr
+        result = ::CZMQ::FFI.zlist_exists @ptr, item
+        result
+      end
+      
       # Remove the specified item from the list if present
       def remove item
         raise DestroyedError unless @ptr
@@ -215,6 +239,16 @@ module CZMQ
       def autofree
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zlist_autofree @ptr
+        result
+      end
+      
+      # Set an equals function for the list. This function is used for the   
+      # methods zlist_exists and zlist_remove. If there is more than one item
+      # in the list that equals matchesi, only the first occurence will be   
+      # processed.                                                           
+      def equalsfn fn
+        raise DestroyedError unless @ptr
+        result = ::CZMQ::FFI.zlist_equalsfn @ptr, fn
         result
       end
       

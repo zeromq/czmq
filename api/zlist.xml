@@ -10,6 +10,13 @@
         <return type = "boolean" />
     </callback_type>
 
+    <callback_type name = "equals_fn">
+        Equals function
+        <argument name = "item1" type = "anything" />
+        <argument name = "item2" type = "anything" />
+        <return type = "boolean" />
+    </callback_type>
+
     <callback_type name = "free_fn">
         Callback function for zlist_freefn method
         <argument name = "data" type = "anything" />
@@ -80,6 +87,14 @@
         <return type = "anything" />
     </method>
 
+    <method name = "exists">
+        Checks if an item already is present. Uses compare method to determine if 
+        items are equal. If the compare method is NULL the check will only compare 
+        pointers. Returns true if item is present else false.
+        <argument name = "item" type = "anything" />
+        <return type = "boolean" />
+    </method>
+
     <method name = "remove">
         Remove the specified item from the list if present
         <argument name = "item" type = "anything" />
@@ -116,6 +131,14 @@
         list values, you must free them explicitly before destroying the list.
         The usual technique is to pop list items and destroy them, until the
         list is empty.
+    </method>
+
+    <method name = "equalsfn">
+        Set an equals function for the list. This function is used for the
+        methods zlist_exists and zlist_remove. If there is more than one item
+        in the list that equals matchesi, only the first occurence will be
+        processed.  
+        <argument name = "fn" type = "zlist_equals_fn" callback = "1" />
     </method>
 
     <method name = "freefn">
