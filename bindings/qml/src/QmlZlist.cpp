@@ -71,6 +71,14 @@ void *QmlZlist::pop () {
 };
 
 ///
+//  Checks if an item already is present. Uses compare method to determine if  
+//  items are equal. If the compare method is NULL the check will only compare 
+//  pointers. Returns true if item is present else false.                      
+bool QmlZlist::exists (void *item) {
+    return zlist_exists (self, item);
+};
+
+///
 //  Remove the specified item from the list if present
 void QmlZlist::remove (void *item) {
     zlist_remove (self, item);
@@ -116,6 +124,15 @@ void QmlZlist::sort (zlist_compare_fn compare) {
 //  list is empty.                                                        
 void QmlZlist::autofree () {
     zlist_autofree (self);
+};
+
+///
+//  Set an equals function for the list. This function is used for the   
+//  methods zlist_exists and zlist_remove. If there is more than one item
+//  in the list that equals matchesi, only the first occurence will be   
+//  processed.                                                           
+void QmlZlist::equalsfn (zlist_equals_fn fn) {
+    zlist_equalsfn (self, fn);
 };
 
 ///

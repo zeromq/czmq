@@ -63,6 +63,11 @@ public slots:
     //  Pop the item off the start of the list, if any
     void *pop ();
 
+    //  Checks if an item already is present. Uses compare method to determine if  
+    //  items are equal. If the compare method is NULL the check will only compare 
+    //  pointers. Returns true if item is present else false.                      
+    bool exists (void *item);
+
     //  Remove the specified item from the list if present
     void remove (void *item);
 
@@ -90,6 +95,12 @@ public slots:
     //  The usual technique is to pop list items and destroy them, until the  
     //  list is empty.                                                        
     void autofree ();
+
+    //  Set an equals function for the list. This function is used for the   
+    //  methods zlist_exists and zlist_remove. If there is more than one item
+    //  in the list that equals matchesi, only the first occurence will be   
+    //  processed.                                                           
+    void equalsfn (zlist_equals_fn fn);
 
     //  Set a free function for the specified list item. When the item is     
     //  destroyed, the free function, if any, is called on that item.         
