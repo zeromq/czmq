@@ -312,8 +312,8 @@ zdir_count (zdir_t *self)
 //  until you are done with this array.
 
 static int  s_dir_flatten (zdir_t *self, zfile_t **files, int index);
-static bool s_dir_compare (void *item1, void *item2);
-static bool s_file_compare (void *item1, void *item2);
+static int s_dir_compare (void *item1, void *item2);
+static int s_file_compare (void *item1, void *item2);
 
 zfile_t **
 zdir_flatten (zdir_t *self)
@@ -355,31 +355,26 @@ s_dir_flatten (zdir_t *self, zfile_t **files, int index)
 
 //  Compare two subdirs, true if they need swapping
 
-static bool
+static int
 s_dir_compare (void *item1, void *item2)
 {
-    if (strcmp (zdir_path ((zdir_t *) item1),
-                zdir_path ((zdir_t *) item2)) > 0)
-        return true;
-    else
-        return false;
+    assert (item1);
+    assert (item2);
+
+    return strcmp (zdir_path ((zdir_t *) item1),
+                   zdir_path ((zdir_t *) item2));
 }
 
 //  Compare two files, true if they need swapping. We sort by ascending name.
 
-static bool
+static int
 s_file_compare (void *item1, void *item2)
 {
-    if (!item2)
-        return false;
-    if (!item1)
-        return true;
+    assert (item1);
+    assert (item2);
 
-    if (strcmp (zfile_filename ((zfile_t *) item1, NULL),
-                zfile_filename ((zfile_t *) item2, NULL)) > 0)
-        return true;
-    else
-        return false;
+    return strcmp (zfile_filename ((zfile_t *) item1, NULL),
+                   zfile_filename ((zfile_t *) item2, NULL));
 }
 
 

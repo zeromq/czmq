@@ -38,12 +38,13 @@ typedef struct _node_t {
 //  Structure of our class
 
 struct _zlist_t {
-    node_t *head;               //  First item in list, if any
-    node_t *tail;               //  Last item in list, if any
-    node_t *cursor;             //  Current cursors for iteration
-    size_t size;                //  Number of items in list
-    bool autofree;              //  If true, free items in destructor
-    zlist_equals_fn *equals_fn; //  Function to compare two list item for equality
+    node_t *head;                 //  First item in list, if any
+    node_t *tail;                 //  Last item in list, if any
+    node_t *cursor;               //  Current cursors for iteration
+    size_t size;                  //  Number of items in list
+    bool autofree;                //  If true, free items in destructor
+    zlist_compare_fn *compare_fn; //  Function to compare two list item for 
+                                  //  less than, equals or greater than
 };
 
 
@@ -260,8 +261,8 @@ zlist_exists (zlist_t *self, void *item)
     node_t *node = self->head;
 
     while (node) {
-        if (self->equals_fn) {
-            if ((*self->equals_fn)(node->item, item)) 
+        if (self->compare_fn) {
+            if ((*self->compare_fn)(node->item, item) == 0) 
                 return true;
         }
         else {
@@ -287,8 +288,8 @@ zlist_remove (zlist_t *self, void *item)
 
     //  First off, we need to find the list node
     for (node = self->head; node != NULL; node = node->next) {
-        if (self->equals_fn) { 
-            if ((*self->equals_fn)(node->item, item)) 
+        if (self->compare_fn) { 
+            if ((*self->compare_fn)(node->item, item) == 0) 
                break;
         }
         else {
@@ -384,6 +385,9 @@ zlist_size (zlist_t *self)
 void
 zlist_sort (zlist_t *self, zlist_compare_fn *compare)
 {
+    //  If the compare function is NULL use the lists one if present
+    if (!compare && self->compare_fn)
+        compare = self->compare_fn;
     //  Uses a comb sort, which is simple and reasonably fast.
     //  See http://en.wikipedia.org/wiki/Comb_sort
     int gap = self->size;
@@ -397,7 +401,7 @@ zlist_sort (zlist_t *self, zlist_compare_fn *compare)
 
         bool swapped = false;
         while (base && test) {
-            if ((*compare)(base->item, test->item)) {
+            if ((*compare)(base->item, test->item) > 0) {
                 //  It's trivial to swap items in a generic container
                 void *item = base->item;
                 base->item = test->item;
@@ -414,16 +418,17 @@ zlist_sort (zlist_t *self, zlist_compare_fn *compare)
 
 
 //  --------------------------------------------------------------------------
-//  Set an equals function for the list. This function is used for the   
-//  methods zlist_exists and zlist_remove. If there is more than one item
-//  in the list that equals matchesi, only the first occurence will be   
-//  processed.                                                           
+//  Sets a compare function for this list. The function compares two items. 
+//  It returns an integer less than, equal to, or greater than zero if the 
+//  first item is found, respectively, to be less than, to match, or be    
+//  greater than the second item.                                          
+//  This function is used for sorting, removal and exists checking.        
 
-CZMQ_EXPORT void
-    zlist_equalsfn (zlist_t *self, zlist_equals_fn fn)
+void
+zlist_comparefn (zlist_t *self,  zlist_compare_fn fn)
 {
     assert (self);
-    self->equals_fn = fn;
+    self->compare_fn = fn;
 }
 
 
@@ -476,22 +481,10 @@ s_zlist_free (void *data)
     zlist_destroy (&self);
 }
 
-static bool
+static int
 s_compare (void *item1, void *item2)
 {
-    if (strcmp ((char *) item1, (char *) item2) > 0)
-        return true;
-    else
-        return false;
-}
-
-static bool
-s_equals (void *item1, void *item2)
-{
-    if (streq ((char *) item1, (char *) item2))
-        return true;
-    else
-        return false;
+    return strcmp ((char *) item1, (char *) item2);
 }
 
 
@@ -604,7 +597,7 @@ zlist_test (int verbose)
     assert (list);
     zlist_autofree (list);
     //  Set equals function otherwise equals will not work as autofree copies strings
-    zlist_equalsfn (list, s_equals);
+    zlist_comparefn (list, s_compare);
     zlist_push (list, bread);
     zlist_append (list, cheese);    
     assert (zlist_size (list) == 2);

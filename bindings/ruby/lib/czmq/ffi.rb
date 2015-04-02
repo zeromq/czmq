@@ -312,7 +312,7 @@ module CZMQ
       attach_function :zlist_size, [:pointer], :size_t, **opts
       attach_function :zlist_sort, [:pointer, :pointer], :void, **opts
       attach_function :zlist_autofree, [:pointer], :void, **opts
-      attach_function :zlist_equalsfn, [:pointer, :pointer], :void, **opts
+      attach_function :zlist_comparefn, [:pointer, :pointer], :void, **opts
       attach_function :zlist_freefn, [:pointer, :pointer, :pointer, :bool], :pointer, **opts
       attach_function :zlist_test, [:int], :void, **opts
       
