@@ -127,12 +127,13 @@ void QmlZlist::autofree () {
 };
 
 ///
-//  Set an equals function for the list. This function is used for the   
-//  methods zlist_exists and zlist_remove. If there is more than one item
-//  in the list that equals matchesi, only the first occurence will be   
-//  processed.                                                           
-void QmlZlist::equalsfn (zlist_equals_fn fn) {
-    zlist_equalsfn (self, fn);
+//  Sets a compare function for this list. The function compares two items. 
+//  It returns an integer less than, equal to, or greater than zero if the  
+//  first item is found, respectively, to be less than, to match, or be     
+//  greater than the second item.                                           
+//  This function is used for sorting, removal and exists checking.         
+void QmlZlist::comparefn (zlist_compare_fn fn) {
+    zlist_comparefn (self, fn);
 };
 
 ///

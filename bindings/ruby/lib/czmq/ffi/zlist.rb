@@ -50,31 +50,16 @@ module CZMQ
       end
       
       # Create a new callback of the following type:
-      # Comparison function for zlist_sort method
-      #     typedef bool (zlist_compare_fn) (
-      #         void *item1, void *item2);   
-      #
-      # WARNING: If your Ruby code doesn't retain a reference to the
-      #   FFI::Function object after passing it to a C function call,
-      #   it may be garbage collected while C still holds the pointer,
-      #   potentially resulting in a segmentation fault.
-      def self.compare_fn
-        ::FFI::Function.new :bool, [:pointer, :pointer], blocking: true do |item1, item2|
-          yield item1, item2
-        end
-      end
-      
-      # Create a new callback of the following type:
-      # Equals function
-      #     typedef bool (zlist_equals_fn) (
+      # Comparison function e.g. for sorting and removing.
+      #     typedef int (zlist_compare_fn) (
       #         void *item1, void *item2);  
       #
       # WARNING: If your Ruby code doesn't retain a reference to the
       #   FFI::Function object after passing it to a C function call,
       #   it may be garbage collected while C still holds the pointer,
       #   potentially resulting in a segmentation fault.
-      def self.equals_fn
-        ::FFI::Function.new :bool, [:pointer, :pointer], blocking: true do |item1, item2|
+      def self.compare_fn
+        ::FFI::Function.new :int, [:pointer, :pointer], blocking: true do |item1, item2|
           yield item1, item2
         end
       end
@@ -242,13 +227,14 @@ module CZMQ
         result
       end
       
-      # Set an equals function for the list. This function is used for the   
-      # methods zlist_exists and zlist_remove. If there is more than one item
-      # in the list that equals matchesi, only the first occurence will be   
-      # processed.                                                           
-      def equalsfn fn
+      # Sets a compare function for this list. The function compares two items. 
+      # It returns an integer less than, equal to, or greater than zero if the  
+      # first item is found, respectively, to be less than, to match, or be     
+      # greater than the second item.                                           
+      # This function is used for sorting, removal and exists checking.         
+      def comparefn fn
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zlist_equalsfn @ptr, fn
+        result = ::CZMQ::FFI.zlist_comparefn @ptr, fn
         result
       end
       

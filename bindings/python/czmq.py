@@ -2239,8 +2239,7 @@ Callback function for zhash_foreach method"""
 
 
 # zlist
-zlist_compare_fn = CFUNCTYPE(c_bool, c_void_p, c_void_p)
-zlist_equals_fn = CFUNCTYPE(c_bool, c_void_p, c_void_p)
+zlist_compare_fn = CFUNCTYPE(c_int, c_void_p, c_void_p)
 zlist_free_fn = CFUNCTYPE(None, c_void_p)
 lib.zlist_new.restype = zlist_p
 lib.zlist_new.argtypes = []
@@ -2278,8 +2277,8 @@ lib.zlist_sort.restype = None
 lib.zlist_sort.argtypes = [zlist_p, zlist_compare_fn]
 lib.zlist_autofree.restype = None
 lib.zlist_autofree.argtypes = [zlist_p]
-lib.zlist_equalsfn.restype = None
-lib.zlist_equalsfn.argtypes = [zlist_p, zlist_equals_fn]
+lib.zlist_comparefn.restype = None
+lib.zlist_comparefn.argtypes = [zlist_p, zlist_compare_fn]
 lib.zlist_freefn.restype = c_void_p
 lib.zlist_freefn.argtypes = [zlist_p, c_void_p, zlist_free_fn, c_bool]
 lib.zlist_test.restype = None
@@ -2398,12 +2397,13 @@ The usual technique is to pop list items and destroy them, until the
 list is empty."""
         return lib.zlist_autofree(self._as_parameter_)
 
-    def equalsfn(self, fn):
-        """Set an equals function for the list. This function is used for the
-methods zlist_exists and zlist_remove. If there is more than one item
-in the list that equals matchesi, only the first occurence will be
-processed."""
-        return lib.zlist_equalsfn(self._as_parameter_, fn)
+    def comparefn(self, fn):
+        """Sets a compare function for this list. The function compares two items. 
+It returns an integer less than, equal to, or greater than zero if the
+first item is found, respectively, to be less than, to match, or be 
+greater than the second item. 
+This function is used for sorting, removal and exists checking."""
+        return lib.zlist_comparefn(self._as_parameter_, fn)
 
     def freefn(self, item, fn, at_tail):
         """Set a free function for the specified list item. When the item is
