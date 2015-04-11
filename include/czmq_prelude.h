@@ -490,7 +490,7 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
     typedef unsigned int uint;
     //  This fixes header-order dependence problem with some Linux versions
 #elif (defined (__UTYPE_LINUX))
-#   if (__STDC_VERSION__ >= 199901L)
+#   if (__STDC_VERSION__ >= 199901L && !defined (__USE_MISC))
     typedef unsigned int uint;
 #   endif
 #endif
