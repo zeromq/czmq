@@ -832,6 +832,32 @@ zconfig_chunk_save (zconfig_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  Create a new config tree from a null-terminated string
+
+zconfig_t *
+zconfig_str_load (const char *string)
+{
+    zchunk_t *chunk = zchunk_new (string, strlen (string));
+    zconfig_t *config = zconfig_chunk_load (chunk);
+    zchunk_destroy (&chunk);
+    return config;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Save a config tree to a new null terminated string
+
+char *
+zconfig_str_save (zconfig_t *self)
+{
+    zchunk_t *chunk = zconfig_chunk_save (self);
+    char *string = strdup ((char *) zchunk_data (chunk));
+    zchunk_destroy (&chunk);
+    return string;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Return true if a configuration tree was loaded from a file and that
 //  file has changed in since the tree was loaded.
 
@@ -966,6 +992,10 @@ zconfig_test (bool verbose)
     assert (search == item);
     zchunk_t *chunk = zconfig_chunk_save (root);
     assert (strlen ((char *) zchunk_data (chunk)) == 32);
+    char *string = zconfig_str_save (root);
+    assert (string);
+    assert (streq (string, (char *) zchunk_data (chunk)));
+    free (string);
     assert (chunk);
     zconfig_destroy (&root);
 

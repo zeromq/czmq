@@ -133,6 +133,14 @@ CZMQ_EXPORT zconfig_t *
 CZMQ_EXPORT zchunk_t *
     zconfig_chunk_save (zconfig_t *self);
 
+//  Load a config tree from a null-terminated string
+CZMQ_EXPORT zconfig_t *
+    zconfig_str_load (const char *string);
+
+//  Save a config tree to a new null terminated string
+CZMQ_EXPORT char *
+    zconfig_str_save (zconfig_t *self);
+
 //  Return true if a configuration tree was loaded from a file and that 
 //  file has changed in since the tree was loaded.
 CZMQ_EXPORT bool
