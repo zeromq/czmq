@@ -150,6 +150,7 @@ CZMQ_EXPORT const char *
 //      2 = uint16_t                                                      
 //      4 = uint32_t                                                      
 //      8 = uint64_t                                                      
+//      s = char *                                                        
 //      b = byte *, size_t (2 arguments)                                  
 //      c = zchunk_t *                                                    
 //      f = zframe_t *                                                    
@@ -293,6 +294,7 @@ structure that follows the CLASS rules for construction and destruction.
 Some zsock methods take a void * "polymorphic" reference, which can be
 either a zsock_t or a zactor_t reference, or a libzmq void *.
 
+Please add @discuss section in ../src/zsock.c.
 
 EXAMPLE
 -------
@@ -535,7 +537,3 @@ zsock_destroy (&reader);
 zsock_destroy (&writer);
 
 ----
-
-SEE ALSO
---------
-linkczmq:czmq[7]

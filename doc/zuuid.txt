@@ -25,21 +25,21 @@ CZMQ_EXPORT size_t
     zuuid_size (zuuid_t *self);
 
 //  Returns UUID as string
-CZMQ_EXPORT char *
+CZMQ_EXPORT const char *
     zuuid_str (zuuid_t *self);
 
-// Return UUID as formatted string in the canonical format 8-4-4-4-12,
-// lower case.  The caller should free the freshly allocated string.
-// See: http://en.wikipedia.org/wiki/Universally_unique_identifier
-CZMQ_EXPORT char *
-    zuuid_formatted_str (zuuid_t *self);
+//  Return UUID in the canonical string format: 8-4-4-4-12, in lower
+//  case. Caller does not modify or free returned value. See
+//  http://en.wikipedia.org/wiki/Universally_unique_identifier
+CZMQ_EXPORT const char *
+    zuuid_str_canonical (zuuid_t *self);
 
 //  Set UUID to new supplied ZUUID_LEN-octet value
 CZMQ_EXPORT void
     zuuid_set (zuuid_t *self, byte *source);
     
-//  Set UUID to new supplied ZUUID_STR_LEN-char string value;
-//  return 0 if OK, else returns -1.
+//  Set UUID to new supplied string value skipping '-' and '{' '}'
+//  optional delimiters. Return 0 if OK, else returns -1.
 CZMQ_EXPORT int
     zuuid_set_str (zuuid_t *self, const char *source);
 
@@ -92,17 +92,28 @@ assert (streq (zuuid_str (uuid), zuuid_str (copy)));
 
 //  Check set/set_str/export methods
 const char *myuuid = "8CB3E9A9649B4BEF8DE225E9C2CEBB38";
-zuuid_set_str (uuid, myuuid);
+const char *myuuid2 = "8CB3E9A9-649B-4BEF-8DE2-25E9C2CEBB38";
+const char *myuuid3 = "{8CB3E9A9-649B-4BEF-8DE2-25E9C2CEBB38}";
+const char *myuuid4 = "8CB3E9A9649B4BEF8DE225E9C2CEBB3838";
+int rc = zuuid_set_str (uuid, myuuid);
+assert (rc == 0);
 assert (streq (zuuid_str (uuid), myuuid));
+rc = zuuid_set_str (uuid, myuuid2);
+assert (rc == 0);
+assert (streq (zuuid_str (uuid), myuuid));
+rc = zuuid_set_str (uuid, myuuid3);
+assert (rc == 0);
+assert (streq (zuuid_str (uuid), myuuid));
+rc = zuuid_set_str (uuid, myuuid4);
+assert (rc == -1);
 byte copy_uuid [ZUUID_LEN];
 zuuid_export (uuid, copy_uuid);
 zuuid_set (uuid, copy_uuid);
 assert (streq (zuuid_str (uuid), myuuid));
 
-// Check the formatted string output
-char *formatted_str = zuuid_formatted_str (uuid);
-assert (streq (formatted_str, "8cb3e9a9-649b-4bef-8de2-25e9c2cebb38"));
-zstr_free (&formatted_str);
+//  Check the canonical string format
+assert (streq (zuuid_str_canonical (uuid),
+               "8cb3e9a9-649b-4bef-8de2-25e9c2cebb38"));
 
 zuuid_destroy (&uuid);
 zuuid_destroy (&copy);

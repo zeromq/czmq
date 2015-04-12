@@ -60,17 +60,19 @@ This is the class interface:
         zhash_freefn (zhash_t *self, const char *key, zhash_free_fn free_fn);
     
     //  Return the number of keys/items in the hash table
-    CZMQ_EXPORT size_t *
+    CZMQ_EXPORT size_t
         zhash_size (zhash_t *self);
     
     //  Make copy of hash table; if supplied table is null, returns null.    
     //  Does not copy items themselves. Rebuilds new table so may be slow on 
     //  very large tables. NOTE: only works with item values that are strings
     //  since there's no other way to know how to duplicate the item value.  
+    //  The caller is responsible for destroying the return value when finished with it.
     CZMQ_EXPORT zhash_t *
         zhash_dup (zhash_t *self);
     
     //  Return keys for items in table
+    //  The caller is responsible for destroying the return value when finished with it.
     CZMQ_EXPORT zlist_t *
         zhash_keys (zhash_t *self);
     
@@ -101,7 +103,7 @@ This is the class interface:
     //  comment lines as you like. These comment lines are discarded when loading
     //  the file. If you use a null format, all comments are deleted.            
     CZMQ_EXPORT void
-        zhash_comment (zhash_t *self, format_t *format);
+        zhash_comment (zhash_t *self, const char *format, ...) CHECK_PRINTF (2);
     
     //  Serialize hash table to a binary frame that can be sent in a message.
     //  The packed format is compatible with the 'dictionary' type defined in
@@ -123,12 +125,14 @@ This is the class interface:
     //                                                                       
     //  Comments are not included in the packed data. Item values MUST be    
     //  strings.                                                             
+    //  The caller is responsible for destroying the return value when finished with it.
     CZMQ_EXPORT zframe_t *
         zhash_pack (zhash_t *self);
     
     //  Unpack binary frame into a new hash table. Packed data must follow format
     //  defined by zhash_pack. Hash table is set to autofree. An empty frame     
     //  unpacks to an empty hash table.                                          
+    //  The caller is responsible for destroying the return value when finished with it.
     CZMQ_EXPORT zhash_t *
         zhash_unpack (zframe_t *frame);
     
@@ -318,6 +322,9 @@ This is the class self test code:
     strcpy (value, "This is a string");
     rc = zhash_insert (hash, "key1", value);
     assert (rc == 0);
+    strcpy (value, "Inserting with the same key will fail");
+    rc = zhash_insert (hash, "key1", value);
+    assert (rc == -1);
     strcpy (value, "Ring a ding ding");
     rc = zhash_insert (hash, "key2", value);
     assert (rc == 0);

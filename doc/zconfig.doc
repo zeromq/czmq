@@ -96,10 +96,6 @@ This is the class interface:
     CZMQ_EXPORT char *
         zconfig_resolve (zconfig_t *self, const char *path, const char *default_value);
     
-    //  Set config item name, name may be NULL
-    CZMQ_EXPORT void
-        zconfig_set_path (zconfig_t *self, const char *path, const char *value);
-    
     //  Locate the last config item at a specified depth
     CZMQ_EXPORT zconfig_t *
         zconfig_at_depth (zconfig_t *self, int level);
@@ -141,7 +137,7 @@ This is the class interface:
         zconfig_savef (zconfig_t *self, const char *format, ...);
         
     //  Report filename used during zconfig_load, or NULL if none
-    CZMQ_EXPORT char *
+    CZMQ_EXPORT const char *
         zconfig_filename (zconfig_t *self);
     
     //  Reload config tree from same file that it was previously loaded from.
@@ -224,6 +220,7 @@ This is the class self test code:
     assert (item);
     zconfig_set_value (item, "somevalue");
     zchunk_t *chunk = zconfig_chunk_save (root);
+    assert (strlen ((char *) zchunk_data (chunk)) == 32);
     assert (chunk);
     zconfig_destroy (&root);
     
