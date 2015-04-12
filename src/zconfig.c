@@ -308,10 +308,11 @@ zconfig_locate (zconfig_t *self, const char *path)
 
 
 //  --------------------------------------------------------------------------
-//  Resolve a config path into a string value
+//  Get value for config item into a string value; leading slash is optional
+//  and ignored.
 
 char *
-zconfig_resolve (zconfig_t *self, const char *path, const char *default_value)
+zconfig_get (zconfig_t *self, const char *path, const char *default_value)
 {
     assert (self);
     zconfig_t *item = zconfig_locate (self, path);
@@ -831,6 +832,32 @@ zconfig_chunk_save (zconfig_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  Create a new config tree from a null-terminated string
+
+zconfig_t *
+zconfig_str_load (const char *string)
+{
+    zchunk_t *chunk = zchunk_new (string, strlen (string));
+    zconfig_t *config = zconfig_chunk_load (chunk);
+    zchunk_destroy (&chunk);
+    return config;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Save a config tree to a new null terminated string
+
+char *
+zconfig_str_save (zconfig_t *self)
+{
+    zchunk_t *chunk = zconfig_chunk_save (self);
+    char *string = strdup ((char *) zchunk_data (chunk));
+    zchunk_destroy (&chunk);
+    return string;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Return true if a configuration tree was loaded from a file and that
 //  file has changed in since the tree was loaded.
 
@@ -939,10 +966,10 @@ zconfig_test (bool verbose)
         zconfig_save (root, "-");
     assert (streq (zconfig_filename (root), TESTDIR "/test.cfg"));
 
-    char *email = zconfig_resolve (root, "/headers/email", NULL);
+    char *email = zconfig_get (root, "/headers/email", NULL);
     assert (email);
     assert (streq (email, "some@random.com"));
-    char *passwd = zconfig_resolve (root, "/curve/secret-key", NULL);
+    char *passwd = zconfig_get (root, "/curve/secret-key", NULL);
     assert (passwd);
     assert (streq (passwd, "Top Secret"));
 
@@ -961,14 +988,20 @@ zconfig_test (bool verbose)
     item = zconfig_new ("value", section);
     assert (item);
     zconfig_set_value (item, "somevalue");
+    zconfig_t *search = zconfig_locate (root, "section/value");
+    assert (search == item);
     zchunk_t *chunk = zconfig_chunk_save (root);
     assert (strlen ((char *) zchunk_data (chunk)) == 32);
+    char *string = zconfig_str_save (root);
+    assert (string);
+    assert (streq (string, (char *) zchunk_data (chunk)));
+    free (string);
     assert (chunk);
     zconfig_destroy (&root);
 
     root = zconfig_chunk_load (chunk);
     assert (root);
-    char *value = zconfig_resolve (root, "/section/value", NULL);
+    char *value = zconfig_get (root, "/section/value", NULL);
     assert (value);
     assert (streq (value, "somevalue"));
 

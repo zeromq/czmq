@@ -7,22 +7,27 @@ Please add @discuss section in ../src/zdir_patch.c.
 
 This is the class interface:
 
+    typedef enum {
+        ZDIR_PATCH_CREATE = 1,
+        ZDIR_PATCH_DELETE = 2
+    } zdir_patch_op_t;
+    
     //  Create new patch
     CZMQ_EXPORT zdir_patch_t *
-        zdir_patch_new (const char *path, zfile_t *file,
-                        zdir_patch_op_t op, const char *alias);
+        zdir_patch_new (const char *path, zfile_t *file, zdir_patch_op_t op, const char *alias);
     
     //  Destroy a patch
     CZMQ_EXPORT void
         zdir_patch_destroy (zdir_patch_t **self_p);
     
     //  Create copy of a patch. If the patch is null, or memory was exhausted,
-    //  returns null.
+    //  returns null.                                                         
+    //  The caller is responsible for destroying the return value when finished with it.
     CZMQ_EXPORT zdir_patch_t *
         zdir_patch_dup (zdir_patch_t *self);
     
     //  Return patch file directory path
-    CZMQ_EXPORT char *
+    CZMQ_EXPORT const char *
         zdir_patch_path (zdir_patch_t *self);
     
     //  Return patch file item
@@ -32,20 +37,20 @@ This is the class interface:
     //  Return operation
     CZMQ_EXPORT zdir_patch_op_t
         zdir_patch_op (zdir_patch_t *self);
-        
+    
     //  Return patch virtual file path
-    CZMQ_EXPORT char *
+    CZMQ_EXPORT const char *
         zdir_patch_vpath (zdir_patch_t *self);
     
     //  Calculate hash digest for file (create only)
     CZMQ_EXPORT void
         zdir_patch_digest_set (zdir_patch_t *self);
     
-    //  Return hash digest for patch file 
-    CZMQ_EXPORT char *
+    //  Return hash digest for patch file
+    CZMQ_EXPORT const char *
         zdir_patch_digest (zdir_patch_t *self);
-        
-    //  Self test of this class
+    
+    //  Self test of this class.
     CZMQ_EXPORT void
         zdir_patch_test (bool verbose);
 

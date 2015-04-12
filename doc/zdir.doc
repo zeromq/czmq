@@ -10,8 +10,8 @@ Please add @discuss section in ../src/zdir.c.
 This is the class interface:
 
     //  Create a new directory item that loads in the full tree of the specified
-    //  path, optionally located under some parent path. If parent is "-", then
-    //  loads only the top-level directory, and does not use parent as a path.
+    //  path, optionally located under some parent path. If parent is "-", then 
+    //  loads only the top-level directory, and does not use parent as a path.  
     CZMQ_EXPORT zdir_t *
         zdir_new (const char *path, const char *parent);
     
@@ -20,7 +20,7 @@ This is the class interface:
         zdir_destroy (zdir_t **self_p);
     
     //  Return directory path
-    CZMQ_EXPORT char *
+    CZMQ_EXPORT const char *
         zdir_path (zdir_t *self);
     
     //  Return last modification time for directory.
@@ -28,47 +28,43 @@ This is the class interface:
         zdir_modified (zdir_t *self);
     
     //  Return total hierarchy size, in bytes of data contained in all files
-    //  in the directory tree.
+    //  in the directory tree.                                              
     CZMQ_EXPORT off_t
         zdir_cursize (zdir_t *self);
     
     //  Return directory count
     CZMQ_EXPORT size_t
         zdir_count (zdir_t *self);
-        
-    //  Returns a sorted array of zfile objects; returns a single block of memory,
-    //  that you destroy by calling zstr_free(). Each entry in the array is a pointer
-    //  to a zfile_t item already allocated in the zdir tree. The array ends with
-    //  a null pointer. Do not destroy the original zdir tree until you are done
-    //  with this array.
-    CZMQ_EXPORT zfile_t **
-        zdir_flatten (zdir_t *self);
     
-    //  Free a provided string, and nullify the parent pointer. Safe to call on
-    //  a null pointer.
-    CZMQ_EXPORT void
-        zdir_flatten_free (zfile_t ***files_p);
+    //  Returns a sorted list of zfile objects; Each entry in the list is a pointer
+    //  to a zfile_t item already allocated in the zdir tree. Do not destroy the   
+    //  original zdir tree until you are done with this list.                      
+    //  The caller is responsible for destroying the return value when finished with it.
+    CZMQ_EXPORT zlist_t *
+        zdir_list (zdir_t *self);
     
-    //  Remove directory, optionally including all files that it contains, at
+    //  Remove directory, optionally including all files that it contains, at  
     //  all levels. If force is false, will only remove the directory if empty.
-    //  If force is true, will remove all files and all subdirectories.
+    //  If force is true, will remove all files and all subdirectories.        
     CZMQ_EXPORT void
         zdir_remove (zdir_t *self, bool force);
     
-    //  Calculate differences between two versions of a directory tree.
-    //  Returns a list of zdir_patch_t patches. Either older or newer may
+    //  Calculate differences between two versions of a directory tree.    
+    //  Returns a list of zdir_patch_t patches. Either older or newer may  
     //  be null, indicating the directory is empty/absent. If alias is set,
-    //  generates virtual filename (minus path, plus alias).
+    //  generates virtual filename (minus path, plus alias).               
+    //  The caller is responsible for destroying the return value when finished with it.
     CZMQ_EXPORT zlist_t *
         zdir_diff (zdir_t *older, zdir_t *newer, const char *alias);
     
     //  Return full contents of directory as a zdir_patch list.
+    //  The caller is responsible for destroying the return value when finished with it.
     CZMQ_EXPORT zlist_t *
         zdir_resync (zdir_t *self, const char *alias);
     
     //  Load directory cache; returns a hash table containing the SHA-1 digests
-    //  of every file in the tree. The cache is saved between runs in .cache.
-    //  The caller must destroy the hash table when done with it.
+    //  of every file in the tree. The cache is saved between runs in .cache.  
+    //  The caller is responsible for destroying the return value when finished with it.
     CZMQ_EXPORT zhash_t *
         zdir_cache (zdir_t *self);
     
@@ -80,7 +76,36 @@ This is the class interface:
     CZMQ_EXPORT void
         zdir_print (zdir_t *self, int indent);
     
-    //  Self test of this class
+    //  Create a new zdir_watch actor instance:                       
+    //                                                                
+    //      zactor_t *watch = zactor_new (zdir_watch, NULL);          
+    //                                                                
+    //  Destroy zdir_watch instance:                                  
+    //                                                                
+    //      zactor_destroy (&watch);                                  
+    //                                                                
+    //  Enable verbose logging of commands and activity:              
+    //                                                                
+    //      zstr_send (watch, "VERBOSE");                             
+    //                                                                
+    //  Subscribe to changes to a directory path:                     
+    //                                                                
+    //      zsock_send (watch, "ss", "SUBSCRIBE", "directory_path");  
+    //                                                                
+    //  Unsubscribe from changes to a directory path:                 
+    //                                                                
+    //      zsock_send (watch, "ss", "UNSUBSCRIBE", "directory_path");
+    //                                                                
+    //  Receive directory changes:                                    
+    //      zsock_recv (watch, "sp", &path, &patches);                
+    //                                                                
+    //      // Delete the received data.                              
+    //      free (path);                                              
+    //      zlist_destroy (&patches);                                 
+    CZMQ_EXPORT void
+        zdir_watch (zsock_t *pipe, void *unused);
+    
+    //  Self test of this class.
     CZMQ_EXPORT void
         zdir_test (bool verbose);
 
@@ -106,4 +131,98 @@ This is the class self test code:
     
     zdir_t *nosuch = zdir_new ("does-not-exist", NULL);
     assert (nosuch == NULL);
+    
+    // zdir_watch test:
+    zactor_t *watch = zactor_new (zdir_watch, NULL);
+    assert (watch);
+    
+    if (verbose) {
+        zsock_send (watch, "s", "VERBOSE");
+        assert (zsock_wait (watch) == 0);
+    }
+    
+    // need to create a file in the test directory we're watching
+    // in order to ensure the directory exists
+    zfile_t *initfile = zfile_new ("./zdir-test-dir", "initial_file");
+    assert (initfile);
+    zfile_output (initfile);
+    fprintf (zfile_handle (initfile), "initial file\n");
+    zfile_close (initfile);
+    zfile_destroy (&initfile);
+    
+    zclock_sleep (1001); // wait for initial file to become 'stable'
+    
+    zsock_send (watch, "si", "TIMEOUT", 100);
+    assert (zsock_wait (watch) == 0);
+    
+    zsock_send (watch, "ss", "SUBSCRIBE", "zdir-test-dir");
+    assert (zsock_wait (watch) == 0);
+    
+    zsock_send (watch, "ss", "UNSUBSCRIBE", "zdir-test-dir");
+    assert (zsock_wait (watch) == 0);
+    
+    zsock_send (watch, "ss", "SUBSCRIBE", "zdir-test-dir");
+    assert (zsock_wait (watch) == 0);
+    
+    zfile_t *newfile = zfile_new ("zdir-test-dir", "test_abc");
+    zfile_output (newfile);
+    fprintf (zfile_handle (newfile), "test file\n");
+    zfile_close (newfile);
+    
+    zpoller_t *watch_poll = zpoller_new (watch, NULL);
+    
+    // poll for a certain timeout before giving up and failing the test.
+    assert(zpoller_wait (watch_poll, 1001) == watch);
+    
+    // wait for notification of the file being added
+    char *path;
+    int rc = zsock_recv (watch, "sp", &path, &patches);
+    assert (rc == 0);
+    
+    assert (streq (path, "zdir-test-dir"));
+    free (path);
+    
+    assert (zlist_size (patches) == 1);
+    
+    zdir_patch_t *patch = (zdir_patch_t *) zlist_pop (patches);
+    assert (streq (zdir_patch_path (patch), "zdir-test-dir"));
+    
+    zfile_t *patch_file = zdir_patch_file (patch);
+    assert (streq (zfile_filename (patch_file, ""), "zdir-test-dir/test_abc"));
+    
+    zdir_patch_destroy (&patch);
+    zlist_destroy (&patches);
+    
+    // remove the file
+    zfile_remove (newfile);
+    zfile_destroy (&newfile);
+    
+    // poll for a certain timeout before giving up and failing the test.
+    assert(zpoller_wait (watch_poll, 1001) == watch);
+    
+    // wait for notification of the file being removed
+    rc = zsock_recv (watch, "sp", &path, &patches);
+    assert (rc == 0);
+    
+    assert (streq (path, "zdir-test-dir"));
+    free (path);
+    
+    assert (zlist_size (patches) == 1);
+    
+    patch = (zdir_patch_t *) zlist_pop (patches);
+    assert (streq (zdir_patch_path (patch), "zdir-test-dir"));
+    
+    patch_file = zdir_patch_file (patch);
+    assert (streq (zfile_filename (patch_file, ""), "zdir-test-dir/test_abc"));
+    
+    zdir_patch_destroy (&patch);
+    zlist_destroy (&patches);
+    
+    zpoller_destroy (&watch_poll);
+    zactor_destroy (&watch);
+    
+    // clean up by removing the test directory.
+    zdir_t *testdir = zdir_new ("zdir-test-dir", NULL);
+    zdir_remove (testdir, true);
+    zdir_destroy (&testdir);
 

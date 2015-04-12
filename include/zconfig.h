@@ -47,6 +47,11 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zconfig_putf (zconfig_t *self, const char *path, const char *format, ...);
     
+//  Get value for config item into a string value; leading slash is optional
+//  and ignored.
+CZMQ_EXPORT char *
+    zconfig_get (zconfig_t *self, const char *path, const char *default_value);
+
 //  Set config item name, name may be NULL
 CZMQ_EXPORT void
     zconfig_set_name (zconfig_t *self, const char *name);
@@ -69,11 +74,6 @@ CZMQ_EXPORT zconfig_t *
 //  Find a config item along a path; leading slash is optional and ignored.
 CZMQ_EXPORT zconfig_t *
     zconfig_locate (zconfig_t *self, const char *path);
-
-//  Resolve a config path into a string value; leading slash is optional
-//  and ignored.
-CZMQ_EXPORT char *
-    zconfig_resolve (zconfig_t *self, const char *path, const char *default_value);
 
 //  Locate the last config item at a specified depth
 CZMQ_EXPORT zconfig_t *
@@ -133,6 +133,14 @@ CZMQ_EXPORT zconfig_t *
 CZMQ_EXPORT zchunk_t *
     zconfig_chunk_save (zconfig_t *self);
 
+//  Load a config tree from a null-terminated string
+CZMQ_EXPORT zconfig_t *
+    zconfig_str_load (const char *string);
+
+//  Save a config tree to a new null terminated string
+CZMQ_EXPORT char *
+    zconfig_str_save (zconfig_t *self);
+
 //  Return true if a configuration tree was loaded from a file and that 
 //  file has changed in since the tree was loaded.
 CZMQ_EXPORT bool
@@ -160,5 +168,6 @@ CZMQ_EXPORT void zconfig_set_value (zconfig_t *self, const char *format, ...) CH
 
 //  Deprecated method aliases
 #define zconfig_dump(s) zconfig_print(s)
+#define zconfig_resolve(s,p,d) zconfig_get((s),(p),(d))
 
 #endif
