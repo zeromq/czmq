@@ -75,10 +75,6 @@ CZMQ_EXPORT zconfig_t *
 CZMQ_EXPORT char *
     zconfig_resolve (zconfig_t *self, const char *path, const char *default_value);
 
-//  Set config item name, name may be NULL
-CZMQ_EXPORT void
-    zconfig_set_path (zconfig_t *self, const char *path, const char *value);
-
 //  Locate the last config item at a specified depth
 CZMQ_EXPORT zconfig_t *
     zconfig_at_depth (zconfig_t *self, int level);
