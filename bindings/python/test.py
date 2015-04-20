@@ -293,7 +293,7 @@ class TestCZMQ(unittest.TestCase):
         # Note the bindings for zhash are pretty pointless for actually storing
         # things - we have to keep our ctypes buffer objects around to keep the
         # memory alive
-        buffer1 = create_string_buffer("dead beef") 
+        buffer1 = create_string_buffer("dead beef")
         self.assertEquals(hash.insert("DEADBEEF", buffer1), 0)
         self.assertEquals(string_at(hash.first()), "dead beef")
         self.assertEquals(hash.cursor(), "DEADBEEF")
@@ -462,8 +462,8 @@ class TestCZMQ(unittest.TestCase):
 
         list.sort(zlist_compare)
         self.assertEquals(list.pop().value, addressof(bread))
-        self.assertEquals(list.pop().value, addressof(cheese))
         self.assertEquals(list.pop().value, addressof(wine))
+        self.assertEquals(list.pop().value, addressof(cheese))
         self.assertEquals(list.size(), 0)
 
         self.assertEquals(sub_list.size(), 3)
@@ -866,7 +866,7 @@ class TestCZMQ(unittest.TestCase):
         del frame
         #del chunk
         #del hash
-        
+
         integer = c_int()
         number1 = c_byte()
         number2 = c_short()

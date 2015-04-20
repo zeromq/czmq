@@ -401,7 +401,7 @@ zlist_sort (zlist_t *self, zlist_compare_fn *compare)
         while (jump--)
             test = test->next;
 
-        bool swapped = false;
+        swapped = false;
         while (base && test) {
             if ((*compare)(base->item, test->item) > 0) {
                 //  It's trivial to swap items in a generic container
