@@ -482,7 +482,7 @@ zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
         self->need_rebuild = true;
         if (self->verbose)
             zsys_debug ("zloop: register %s poller (%p, %d)",
-                        item->socket ? zsys_sockname (zsock_type (item->socket)) : "FD",
+                        item->socket? zsys_sockname (zsock_type (item->socket)): "FD",
                         item->socket, item->fd);
         return 0;
     }
@@ -521,7 +521,7 @@ zloop_poller_end (zloop_t *self, zmq_pollitem_t *item)
     }
     if (self->verbose)
         zsys_debug ("zloop: cancel %s poller (%p, %d)",
-                    item->socket ? zsys_sockname (zsock_type (item->socket)) : "FD",
+                    item->socket? zsys_sockname (zsock_type (item->socket)): "FD",
                     item->socket, item->fd);
 }
 
