@@ -394,14 +394,14 @@ zlist_sort (zlist_t *self, zlist_compare_fn *compare)
     bool swapped = false;
     while (gap > 1 || swapped) {
         if (gap > 1)
-          gap = (int) ((double) gap / 1.3);
+            gap = (int) ((double) gap / 1.3);
         node_t *base = self->head;
         node_t *test = self->head;
         int jump = gap;
         while (jump--)
             test = test->next;
 
-        bool swapped = false;
+        swapped = false;
         while (base && test) {
             if ((*compare)(base->item, test->item) > 0) {
                 //  It's trivial to swap items in a generic container
