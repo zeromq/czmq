@@ -42,7 +42,7 @@
 typedef struct _item_t {
     void *value;                //  Opaque item value
     struct _item_t *next;       //  Next item in the hash slot
-    qbyte index;                //  Index of item in table
+    size_t index;               //  Index of item in table
     const void *key;            //  Item's original key
     //  Supporting deprecated v2 functionality; we can't quite replace
     //  this with strdup/zstr_free as zhashx_insert also uses autofree.
@@ -824,7 +824,7 @@ zhashx_pack (zhashx_t *self)
         return NULL;
     byte *needle = zframe_data (frame);
     //  Store size as number-4
-    *(uint32_t *) needle = htonl ((uint32_t) self->size);
+    *(uint32_t *) needle = htonl ((u_long) self->size);
     needle += 4;
     for (index = 0; index < limit; index++) {
         item_t *item = self->items [index];
@@ -835,7 +835,8 @@ zhashx_pack (zhashx_t *self)
             needle += strlen ((char *) item->key);
 
             //  Store value as longstr
-            *(uint32_t *) needle = htonl (strlen ((char *) item->value));
+            size_t lenth = strlen ((char *) item->value);
+            *(uint32_t *) needle = htonl ((u_long) lenth);
             needle += 4;
             memcpy (needle, (char *) item->value, strlen ((char *) item->value));
             needle += strlen ((char *) item->value);

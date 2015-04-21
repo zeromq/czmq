@@ -182,7 +182,7 @@ zsys_init (void)
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 2, 0))
     //  TODO: this causes TravisCI to break; libzmq does not return a
     //  valid socket on zmq_socket(), after this...
-    zmq_ctx_set (s_process_ctx, ZMQ_MAX_SOCKETS, s_max_sockets);
+    zmq_ctx_set (s_process_ctx, ZMQ_MAX_SOCKETS, (int) s_max_sockets);
 #endif
     s_initialized = true;
 
@@ -1165,7 +1165,7 @@ zsys_set_io_threads (size_t io_threads)
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 2, 0))
     //  TODO: this causes TravisCI to break; libzmq does not return a
     //  valid socket on zmq_socket(), after this...
-    zmq_ctx_set (s_process_ctx, ZMQ_MAX_SOCKETS, s_max_sockets);
+    zmq_ctx_set (s_process_ctx, ZMQ_MAX_SOCKETS, (int) s_max_sockets);
 #endif
     ZMUTEX_UNLOCK (s_mutex);
 }
@@ -1197,13 +1197,13 @@ zsys_set_max_sockets (size_t max_sockets)
 size_t
 zsys_socket_limit (void)
 {
-    int socket_limit;
+    size_t socket_limit;
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (4, 1, 0))
     if (s_process_ctx)
-        socket_limit = zmq_ctx_get (s_process_ctx, ZMQ_SOCKET_LIMIT);
+        socket_limit = (size_t) zmq_ctx_get (s_process_ctx, ZMQ_SOCKET_LIMIT);
     else {
         void *ctx = zmq_init (1);
-        socket_limit = zmq_ctx_get (ctx, ZMQ_SOCKET_LIMIT);
+        socket_limit = (size_t) zmq_ctx_get (ctx, ZMQ_SOCKET_LIMIT);
         zmq_term (ctx);
     }
     //  ZeroMQ used to report a nonsense value (2^31) which if used would
@@ -1214,7 +1214,7 @@ zsys_socket_limit (void)
 #else
     socket_limit = 1024;
 #endif
-    return (size_t) socket_limit;
+    return socket_limit;
 }
 
 

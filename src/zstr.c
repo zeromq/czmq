@@ -38,7 +38,7 @@ s_send_string (void *dest, bool more, char *string)
     assert (dest);
     void *handle = zsock_resolve (dest);
 
-    int len = strlen (string);
+    size_t len = strlen (string);
     zmq_msg_t message;
     zmq_msg_init_size (&message, len);
     memcpy (zmq_msg_data (&message), string, len);

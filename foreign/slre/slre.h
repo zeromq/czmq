@@ -67,7 +67,7 @@ struct slre {
  */
 struct cap {
     const char   *ptr;       /* Pointer to the substring */
-    int          len;        /* Substring length     */
+    size_t        len;       /* Substring length     */
 };
 
 /*
@@ -86,7 +86,7 @@ int slre_compile(struct slre *, const char *re);
  * hold all captures. The caller function must make sure it is! So, the
  * array_size = number_of_round_bracket_pairs + 1
  */
-int slre_match(const struct slre *, const char *buf, int buf_len,
+int slre_match(const struct slre *, const char *buf, size_t buf_len,
     struct cap *captured_substrings);
 
 #endif /* SLRE_HEADER_DEFINED */

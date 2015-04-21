@@ -173,7 +173,7 @@ zconfig_put (zconfig_t *self, const char *path, const char *value)
 
     //  Check length of next path segment
     const char *slash = strchr (path, '/');
-    int length = strlen (path);
+    size_t length = strlen (path);
     if (slash)
         length = slash - path;
 
@@ -287,7 +287,7 @@ zconfig_locate (zconfig_t *self, const char *path)
     if (*path == '/')
         path++;
     const char *slash = strchr (path, '/');
-    int length = strlen (path);
+    size_t length = strlen (path);
     if (slash)
         length = slash - path;
 
@@ -462,9 +462,10 @@ s_config_printf (zconfig_t *self, void *arg, char *format, ...)
         else
             fprintf ((FILE *) arg, "%s", string);
     }
-    int size = strlen (string);
+    size_t size = strlen (string);
     free (string);
-    return size;
+    assert(size <= INT_MAX);
+    return (int) size;
 }
 
 
@@ -613,7 +614,7 @@ zconfig_chunk_load (zchunk_t *chunk)
         remaining -= cur_size + (eoln? 1: 0);
 
         //  Trim line
-        int length = strlen (cur_line);
+        size_t length = strlen (cur_line);
         while (length && isspace ((byte) cur_line [length - 1]))
             cur_line [--length] = 0;
 
@@ -682,13 +683,14 @@ s_collect_level (char **start, int lineno)
     char *readptr = *start;
     while (*readptr == ' ')
         readptr++;
-    int level = (readptr - *start) / 4;
+    ptrdiff_t level = (readptr - *start) / 4;
     if (level * 4 != readptr - *start) {
         zclock_log ("E (zconfig): (%d) indent 4 spaces at once", lineno);
         level = -1;
     }
     *start = readptr;
-    return level;
+    assert (level <= INT_MAX);
+    return (int) level;
 }
 
 //  Collect property name

@@ -1173,7 +1173,7 @@ zsock_bsend (void *self, const char *picture, ...)
             if (!string)
                 string = "";
             size_t string_size = strlen (string);
-            PUT_NUMBER1 (string_size);
+            PUT_NUMBER1 ((byte) string_size);
             memcpy (needle, string, string_size);
             needle += string_size;
         }

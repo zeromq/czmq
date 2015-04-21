@@ -318,7 +318,7 @@ static int s_file_compare (void *item1, void *item2);
 zfile_t **
 zdir_flatten (zdir_t *self)
 {
-    int flat_size;
+    size_t flat_size;
     if (self)
         flat_size = self->count + 1;
     else

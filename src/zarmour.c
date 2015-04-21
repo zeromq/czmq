@@ -209,9 +209,9 @@ s_base64_encode (const byte *data, size_t length, const char *alphabet, bool pad
 
 
 static byte *
-s_base64_decode (const char *data, size_t *size, const char *alphabet, int linebreakchars)
+s_base64_decode (const char *data, size_t *size, const char *alphabet, size_t linebreakchars)
 {
-    int length = strlen (data);
+    size_t length = strlen (data);
     while (length > 0 && !strchr (alphabet, data[length - 1])) --length;
     const byte *needle = (const byte *) data, *ceiling = (const byte *) (data + length);
     length -= linebreakchars;
@@ -302,7 +302,7 @@ s_base32_encode (const byte *data, size_t length, const char *alphabet, bool pad
 
 
 static byte *
-s_base32_decode (const char *data, size_t *size, const char *alphabet, int linebreakchars)
+s_base32_decode (const char *data, size_t *size, const char *alphabet, size_t linebreakchars)
 {
     size_t length = strlen (data);
     while (length > 0 && !strchr (alphabet, _UPPER_CASE(data[length - 1]))) --length;
@@ -372,9 +372,9 @@ s_base16_encode (const byte *data, size_t length, const char *alphabet)
 }
 
 static byte *
-s_base16_decode (const char *data, size_t *size, const char *alphabet, int linebreakchars)
+s_base16_decode (const char *data, size_t *size, const char *alphabet, size_t linebreakchars)
 {
-    int length = strlen (data);
+    size_t length = strlen (data);
     const byte *needle = (const byte *) data, *ceiling = (const byte *) (data + length);
     length -= linebreakchars;
     *size = length / 2 + 1;
@@ -418,7 +418,7 @@ s_z85_decode (const char *data, size_t *size)
 {
     assert (data);
     assert (size);
-    int length = strlen (data);
+    size_t length = strlen (data);
     assert (length % 5 == 0);
     *size = 4 * length / 5 + 1;
     byte *bytes = (byte *) zmalloc (*size);
@@ -475,7 +475,7 @@ zarmour_encode (zarmour_t *self, const byte *data, size_t data_size)
     if (self->line_breaks && self->line_length > 0 && strlen (encoded) > self->line_length) {
 #endif
         char *line_end = self->line_end;
-        int nbr_lines = strlen (encoded) / self->line_length;
+        size_t nbr_lines = strlen (encoded) / self->line_length;
         size_t new_length =
             nbr_lines * (self->line_length + strlen (line_end)) +
             strlen (encoded) % self->line_length;
@@ -513,7 +513,7 @@ zarmour_decode (zarmour_t *self, const char *data, size_t *decode_size)
     assert (data);
     assert (decode_size);
 
-    int linebreakchars = 0;
+    size_t linebreakchars = 0;
     char *line_end = self->line_end;
     const char *pos = data;
     while ((pos = strstr (pos, line_end))) {

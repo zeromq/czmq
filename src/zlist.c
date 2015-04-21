@@ -390,14 +390,14 @@ zlist_sort (zlist_t *self, zlist_compare_fn *compare)
         compare = self->compare_fn;
     //  Uses a comb sort, which is simple and reasonably fast.
     //  See http://en.wikipedia.org/wiki/Comb_sort
-    int gap = self->size;
+    size_t gap = self->size;
     bool swapped = false;
     while (gap > 1 || swapped) {
         if (gap > 1)
-            gap = (int) ((double) gap / 1.3);
+            gap = (size_t) ((double) gap / 1.3);
         node_t *base = self->head;
         node_t *test = self->head;
-        int jump = gap;
+        size_t jump = gap;
         while (jump--)
             test = test->next;
 
