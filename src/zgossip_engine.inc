@@ -821,7 +821,7 @@ s_server_handle_pipe (zloop_t *loop, zsock_t *reader, void *argument)
         zconfig_put (self->config, path, value);
         if (streq (path, "server/animate")) {
             zsys_warning ("'%s' is deprecated, use VERBOSE command instead", path);
-            self->verbose = atoi (value);
+            self->verbose = atoi (value) != 0;
         }
         s_server_config_global (self);
         free (path);
