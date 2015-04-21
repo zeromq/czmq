@@ -464,7 +464,9 @@ s_config_printf (zconfig_t *self, void *arg, char *format, ...)
     }
     size_t size = strlen (string);
     free (string);
-    assert(size <= INT_MAX);
+    if (size > INT_MAX)
+        return -1;
+
     return (int) size;
 }
 
@@ -675,7 +677,7 @@ zconfig_chunk_load (zchunk_t *chunk)
 }
 
 
-//  Count and verify indentation level, -1 means a syntax error
+//  Count and verify indentation level, -1 means a syntax error or overflow
 
 static int
 s_collect_level (char **start, int lineno)
@@ -689,7 +691,9 @@ s_collect_level (char **start, int lineno)
         level = -1;
     }
     *start = readptr;
-    assert (level <= INT_MAX);
+    if (level > INT_MAX)
+        return -1;
+
     return (int) level;
 }
 
