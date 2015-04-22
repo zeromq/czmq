@@ -368,8 +368,8 @@ zloop_destroy (zloop_t **self_p)
         //  a zombie list
         while (zlistx_first (self->zombies)) {
             //  Get timer_id back from pointer
-            int timer_id = (byte *) zlistx_detach (self->zombies, NULL) - (byte *) NULL;
-            s_timer_remove (self, timer_id);
+            ptrdiff_t timer_id = (byte *) zlistx_detach (self->zombies, NULL) - (byte *) NULL;
+            s_timer_remove (self, (int) timer_id);
         }
         zlistx_destroy (&self->zombies);
         zlistx_destroy (&self->readers);
@@ -859,8 +859,8 @@ zloop_start (zloop_t *self)
         //  a faster lookup on the timer list.
         while (zlistx_first (self->zombies)) {
             //  Get timer_id back from pointer
-            int timer_id = (byte *) zlistx_detach (self->zombies, NULL) - (byte *) NULL;
-            s_timer_remove (self, timer_id);
+            ptrdiff_t timer_id = (byte *) zlistx_detach (self->zombies, NULL) - (byte *) NULL;
+            s_timer_remove (self, (int) timer_id);
         }
         if (rc == -1)
             break;

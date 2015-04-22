@@ -449,13 +449,13 @@ zlistx_sort (zlistx_t *self)
     //  Uses a comb sort, which is simple and reasonably fast
     //  See http://en.wikipedia.org/wiki/Comb_sort
     assert (self);
-    int gap = self->size;
+    size_t gap = self->size;
     bool swapped = false;
     while (gap > 1 || swapped) {
-        gap = (int) ((double) gap / 1.3);
+        gap = (size_t) ((double) gap / 1.3);
         node_t *base = self->head->next;
         node_t *test = self->head->next;
-        int jump = gap;
+        size_t jump = gap;
         while (jump--)
             test = test->next;
 

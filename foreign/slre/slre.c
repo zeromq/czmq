@@ -404,12 +404,12 @@ slre_compile (struct slre *r, const char *re)
 }
 
 static int
-match (const struct slre *, int, const char *, int, int *, struct cap *);
+match (const struct slre *, int, const char *, size_t, size_t *, struct cap *);
 
 static void
-loop_greedy (const struct slre *r, int pc, const char *s, int len, int *ofs)
+loop_greedy (const struct slre *r, int pc, const char *s, size_t len, size_t *ofs)
 {
-    int saved_offset, matched_offset;
+    size_t saved_offset, matched_offset;
 
     saved_offset = matched_offset = *ofs;
 
@@ -424,9 +424,9 @@ loop_greedy (const struct slre *r, int pc, const char *s, int len, int *ofs)
 }
 
 static void
-loop_non_greedy (const struct slre *r, int pc, const char *s,int len, int *ofs)
+loop_non_greedy (const struct slre *r, int pc, const char *s, size_t len, size_t *ofs)
 {
-    int saved_offset = *ofs;
+    size_t saved_offset = *ofs;
 
     while (match (r, pc + 2, s, len, ofs, NULL)) {
         saved_offset = *ofs;
@@ -438,7 +438,7 @@ loop_non_greedy (const struct slre *r, int pc, const char *s,int len, int *ofs)
 }
 
 static int
-is_any_of (const unsigned char *p, int len, const char *s, int *ofs)
+is_any_of (const unsigned char *p, int len, const char *s, size_t *ofs)
 {
     int i, ch;
 
@@ -454,7 +454,7 @@ is_any_of (const unsigned char *p, int len, const char *s, int *ofs)
 }
 
 static int
-is_any_but (const unsigned char *p, int len, const char *s, int *ofs)
+is_any_but (const unsigned char *p, int len, const char *s, size_t *ofs)
 {
     int i, ch;
 
@@ -469,9 +469,10 @@ is_any_but (const unsigned char *p, int len, const char *s, int *ofs)
 }
 
 static int
-match (const struct slre *r, int pc, const char *s, int len, int *ofs, struct cap *caps)
+match (const struct slre *r, int pc, const char *s, size_t len, size_t *ofs, struct cap *caps)
 {
-    int n, saved_offset, res = 1;
+    int res = 1;
+    size_t n, saved_offset;
 
     while (res && r->code [pc] != END) {
         assert (pc < r->code_size);
@@ -642,14 +643,14 @@ match (const struct slre *r, int pc, const char *s, int len, int *ofs, struct ca
 }
 
 int
-slre_match (const struct slre *r, const char *buf, int len, struct cap *caps)
+slre_match(const struct slre *r, const char *buf, size_t len, struct cap *caps)
 {
-    int ofs = 0;
     int res = 0;
+    size_t ofs = 0;
     if (r->anchored)
         res = match (r, 0, buf, len, &ofs, caps);
     else {
-        int i;
+        size_t i;
         for (i = 0; i < len && res == 0; i++) {
             ofs = i;
             res = match (r, 0, buf, len, &ofs, caps);

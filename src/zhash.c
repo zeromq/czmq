@@ -36,7 +36,7 @@
 typedef struct _item_t {
     void *value;                //  Opaque item value
     struct _item_t *next;       //  Next item in the hash slot
-    qbyte index;                //  Index of item in table
+    size_t index;               //  Index of item in table
     char *key;                  //  Item's original key
     zhash_free_fn *free_fn;     //  Value free function if any
 } item_t;
@@ -703,7 +703,8 @@ zhash_pack (zhash_t *self)
             needle += strlen ((char *) item->key);
 
             //  Store value as longstr
-            *(uint32_t *) needle = htonl (strlen ((char *) item->value));
+            size_t length = strlen ((char *) item->value);
+            *(uint32_t *) needle = htonl ((u_long) length);
             needle += 4;
             memcpy (needle, (char *) item->value, strlen ((char *) item->value));
             needle += strlen ((char *) item->value);

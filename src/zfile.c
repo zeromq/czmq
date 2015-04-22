@@ -538,7 +538,13 @@ zfile_digest (zfile_t *self)
             zdigest_update (self->digest,
                             zchunk_data (chunk), zchunk_size (chunk));
             zchunk_destroy (&chunk);
-            offset += blocksz;
+
+            //  off_t is defined as long (32 bit on Windows, 64 bit otherwise)
+            //  This guards against overflow in both contexts.
+            if (blocksz > LONG_MAX - offset)
+                return NULL;
+
+            offset += (off_t) blocksz;
             chunk = zfile_read (self, blocksz, offset);
         }
         zchunk_destroy (&chunk);
