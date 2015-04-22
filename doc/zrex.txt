@@ -100,5 +100,47 @@ EXAMPLE
 -------
 .From zrex_test method
 ----
-Please add @selftest section in ../src/zrex.c.
+//  This shows the pattern of matching many lines to a single pattern
+zrex_t *rex = zrex_new ("\\d+-\\d+-\\d+");
+assert (rex);
+assert (zrex_valid (rex));
+bool matches = zrex_matches (rex, "123-456-789");
+assert (matches);
+assert (zrex_hits (rex) == 1);
+assert (streq (zrex_hit (rex, 0), "123-456-789"));
+assert (zrex_hit (rex, 1) == NULL);
+zrex_destroy (&rex);
+
+//  Here we pick out hits using capture groups
+rex = zrex_new ("(\\d+)-(\\d+)-(\\d+)");
+assert (rex);
+assert (zrex_valid (rex));
+matches = zrex_matches (rex, "123-456-ABC");
+assert (!matches);
+matches = zrex_matches (rex, "123-456-789");
+assert (matches);
+assert (zrex_hits (rex) == 4);
+assert (streq (zrex_hit (rex, 0), "123-456-789"));
+assert (streq (zrex_hit (rex, 1), "123"));
+assert (streq (zrex_hit (rex, 2), "456"));
+assert (streq (zrex_hit (rex, 3), "789"));
+zrex_destroy (&rex);
+
+//  This shows the pattern of matching one line against many
+//  patterns and then handling the case when it hits
+rex = zrex_new (NULL);      //  No initial pattern
+assert (rex);
+char *input = "Mechanism: CURVE";
+matches = zrex_eq (rex, input, "Version: (.+)");
+assert (!matches);
+assert (zrex_hits (rex) == 0);
+matches = zrex_eq (rex, input, "Mechanism: (.+)");
+assert (matches);
+assert (zrex_hits (rex) == 2);
+const char *mechanism;
+zrex_fetch (rex, &mechanism, NULL);
+assert (streq (zrex_hit (rex, 1), "CURVE"));
+assert (streq (mechanism, "CURVE"));
+zrex_destroy (&rex);
+
 ----
