@@ -215,9 +215,9 @@ This is the class self test code:
     item = (char *) zlist_pop (list);
     assert (item == bread);
     item = (char *) zlist_pop (list);
-    assert (item == cheese);
-    item = (char *) zlist_pop (list);
     assert (item == wine);
+    item = (char *) zlist_pop (list);
+    assert (item == cheese);
     assert (zlist_size (list) == 0);
     
     assert (zlist_size (sub_list) == 3);
@@ -235,11 +235,11 @@ This is the class self test code:
     //  Set equals function otherwise equals will not work as autofree copies strings
     zlist_comparefn (list, s_compare);
     zlist_push (list, bread);
-    zlist_append (list, cheese);    
+    zlist_append (list, cheese);
     assert (zlist_size (list) == 2);
-    zlist_append (list, wine);    
+    zlist_append (list, wine);
     assert (zlist_exists (list, wine));
-    zlist_remove (list, wine);    
+    zlist_remove (list, wine);
     assert (!zlist_exists (list, wine));
     assert (streq ((const char *) zlist_first (list), bread));
     item = (char *) zlist_pop (list);
