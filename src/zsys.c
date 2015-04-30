@@ -765,7 +765,7 @@ char *
 zsys_vprintf (const char *format, va_list argptr)
 {
     int size = 256;
-    char *string = (char *) zmalloc (size);
+    char *string = (char *) malloc (size);
     if (!string)
         return NULL;
 
@@ -791,7 +791,7 @@ zsys_vprintf (const char *format, va_list argptr)
     if (required >= size) {
         size = required + 1;
         free (string);
-        string = (char *) zmalloc (size);
+        string = (char *) malloc (size);
         if (string) {
             va_copy (my_argptr, argptr);
             vsnprintf (string, size, format, my_argptr);
