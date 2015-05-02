@@ -892,7 +892,7 @@ class TestCZMQ(unittest.TestCase):
         self.assertEquals(number4.value, 123 * 123 * 123)
         self.assertEquals(number8.value, 123 * 123 * 123 * 123)
         self.assertEquals(string_at(string), "This is a string")
-        self.assertEquals(string_at(data), "ABCDE")
+        self.assertEquals(string_at(data, size.value), "ABCDE")
         self.assertEquals(size.value, 5)
         #self.assertEquals(memcmp (chunk.data(), "HELLO", 5), 0)
         #self.assertEquals(chunk.size(), 5)
