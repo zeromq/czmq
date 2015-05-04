@@ -39,12 +39,9 @@ struct _zgossip_msg_t {
     int id;                             //  zgossip_msg message ID
     byte *needle;                       //  Read/write pointer for serialization
     byte *ceiling;                      //  Valid upper limit for read pointer
-    /* Tuple key, globally unique  */
-    char key [256];
-    /* Tuple value, as printable string  */
-    char *value;
-    /* Time to live, msecs  */
-    uint32_t ttl;
+    char key [256];                     //  Tuple key, globally unique
+    char *value;                        //  Tuple value, as printable string
+    uint32_t ttl;                       //  Time to live, msecs
 };
 
 //  --------------------------------------------------------------------------
@@ -237,7 +234,7 @@ int
 zgossip_msg_recv (zgossip_msg_t *self, zsock_t *input)
 {
     assert (input);
-    
+
     if (zsock_type (input) == ZMQ_ROUTER) {
         zframe_destroy (&self->routing_id);
         self->routing_id = zframe_recv (input);
@@ -256,7 +253,7 @@ zgossip_msg_recv (zgossip_msg_t *self, zsock_t *input)
     //  Get and check protocol signature
     self->needle = (byte *) zmq_msg_data (&frame);
     self->ceiling = self->needle + zmq_msg_size (&frame);
-    
+
     uint16_t signature;
     GET_NUMBER2 (signature);
     if (signature != (0xAAA0 | 0)) {
@@ -386,7 +383,7 @@ zgossip_msg_send (zgossip_msg_t *self, zsock_t *output)
     PUT_NUMBER2 (0xAAA0 | 0);
     PUT_NUMBER1 (self->id);
     size_t nbr_frames = 1;              //  Total number of frames to send
-    
+
     switch (self->id) {
         case ZGOSSIP_MSG_HELLO:
             PUT_NUMBER1 (1);
@@ -418,7 +415,7 @@ zgossip_msg_send (zgossip_msg_t *self, zsock_t *output)
     }
     //  Now send the data frame
     zmq_msg_send (&frame, zsock_resolve (output), --nbr_frames? ZMQ_SNDMORE: 0);
-    
+
     return 0;
 }
 
@@ -435,36 +432,33 @@ zgossip_msg_print (zgossip_msg_t *self)
             zsys_debug ("ZGOSSIP_MSG_HELLO:");
             zsys_debug ("    version=1");
             break;
-            
+
         case ZGOSSIP_MSG_PUBLISH:
             zsys_debug ("ZGOSSIP_MSG_PUBLISH:");
             zsys_debug ("    version=1");
-            if (self->key)
-                zsys_debug ("    key='%s'", self->key);
-            else
-                zsys_debug ("    key=");
+            zsys_debug ("    key='%s'", self->key);
             if (self->value)
                 zsys_debug ("    value='%s'", self->value);
             else
                 zsys_debug ("    value=");
             zsys_debug ("    ttl=%ld", (long) self->ttl);
             break;
-            
+
         case ZGOSSIP_MSG_PING:
             zsys_debug ("ZGOSSIP_MSG_PING:");
             zsys_debug ("    version=1");
             break;
-            
+
         case ZGOSSIP_MSG_PONG:
             zsys_debug ("ZGOSSIP_MSG_PONG:");
             zsys_debug ("    version=1");
             break;
-            
+
         case ZGOSSIP_MSG_INVALID:
             zsys_debug ("ZGOSSIP_MSG_INVALID:");
             zsys_debug ("    version=1");
             break;
-            
+
     }
 }
 
@@ -598,7 +592,7 @@ zgossip_msg_set_ttl (zgossip_msg_t *self, uint32_t ttl)
 int
 zgossip_msg_test (bool verbose)
 {
-    printf (" * zgossip_msg: ");
+    printf (" * zgossip_msg:");
 
     //  Silence an "unused" warning by "using" the verbose variable
     if (verbose) {;}

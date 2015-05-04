@@ -61,7 +61,8 @@ zframe_new (const void *data, size_t size)
 
 
 //  --------------------------------------------------------------------------
-//  Constructor; Allocates a new empty (zero-sized) frame
+//  Create an empty (zero-sized) frame. The caller is responsible for 
+//  destroying the return value when finished with it.
 
 zframe_t *
 zframe_new_empty (void)
