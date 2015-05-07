@@ -25,7 +25,7 @@
 //  Structure of our class
 
 struct _zpoller_t {
-    zlist_t *reader_list;      //  List of sockets to read from
+    zlist_t *reader_list;       //  List of sockets to read from
     zmq_pollitem_t *poll_set;   //  Current zmq_poll set
     void **poll_readers;        //  Matching table of socket readers
     size_t poll_size;           //  Size of poll set

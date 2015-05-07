@@ -259,6 +259,7 @@ zrex_test (bool verbose)
 {
     printf (" * zrex: ");
 
+    //  @selftest
     //  This shows the pattern of matching many lines to a single pattern
     zrex_t *rex = zrex_new ("\\d+-\\d+-\\d+");
     assert (rex);
@@ -301,5 +302,7 @@ zrex_test (bool verbose)
     assert (streq (zrex_hit (rex, 1), "CURVE"));
     assert (streq (mechanism, "CURVE"));
     zrex_destroy (&rex);
+    
+    //  @end
     printf ("OK\n");
 }

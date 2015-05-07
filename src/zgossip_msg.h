@@ -1,6 +1,6 @@
 /*  =========================================================================
     zgossip_msg - ZeroMQ Gossip Protocol
-    
+
     Codec header for zgossip_msg.
 
     ** WARNING *************************************************************
@@ -84,7 +84,7 @@ CZMQ_EXPORT int
 //  Send the zgossip_msg to the output socket, does not destroy it
 CZMQ_EXPORT int
     zgossip_msg_send (zgossip_msg_t *self, zsock_t *output);
-    
+
 //  Print contents of message to stdout
 CZMQ_EXPORT void
     zgossip_msg_print (zgossip_msg_t *self);

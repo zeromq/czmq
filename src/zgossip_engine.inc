@@ -738,7 +738,7 @@ s_server_config_service (s_server_t *self)
             if (zsock_bind (self->router, "%s", endpoint) == -1)
                 zsys_warning ("could not bind to %s (%s)", endpoint, zmq_strerror (zmq_errno ()));
         }
-#if (ZMQ_MAJOR_VERSION >= 4)
+#if (ZMQ_VERSION_MAJOR >= 4)
         else
         if (streq (zconfig_name (section), "security")) {
             char *mechanism = zconfig_resolve (section, "mechanism", "null");
