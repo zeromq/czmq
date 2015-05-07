@@ -174,6 +174,7 @@ CZMQ_EXPORT const char *
 //      c = zchunk_t *                                                    
 //      f = zframe_t *                                                    
 //      h = zhashx_t *                                                    
+//      U = zuuid_t *                                                     
 //      p = void * (sends the pointer value, only meaningful over inproc) 
 //      m = zmsg_t * (sends all frames in the zmsg)                       
 //      z = sends zero-sized frame (0 arguments)                          
@@ -204,8 +205,9 @@ CZMQ_EXPORT int
 //      b = byte **, size_t * (2 arguments) (allocates memory)              
 //      c = zchunk_t ** (creates zchunk)                                    
 //      f = zframe_t ** (creates zframe)                                    
-//      p = void ** (stores pointer)                                        
+//      U = zuuid_t * (creates a zuuid with the data)                       
 //      h = zhashx_t ** (creates zhashx)                                    
+//      p = void ** (stores pointer)                                        
 //      m = zmsg_t ** (creates a zmsg with the remaing frames)              
 //      z = null, asserts empty frame (0 arguments)                         
 //      u = uint * (stores unsigned integer, deprecated)                    
@@ -242,6 +244,7 @@ CZMQ_EXPORT int
 //      S       char *, 0-2^32-1 chars  type = "longstr"                   
 //      c       zchunk_t *              type = "chunk"                     
 //      f       zframe_t *              type = "frame"                     
+//      u       zuuid_t *               type = "uuid"                      
 //      m       zmsg_t *                type = "msg"                       
 //      p       void *, sends pointer value, only over inproc              
 //                                                                         
@@ -307,7 +310,7 @@ CZMQ_EXPORT void
 
 // zsock leak detection - not a part of the official interface to zsock. This
 // enables CZMQ to report socket leaks intelligently.
-#if defined ZSOCK_NOCHECK 
+#if defined ZSOCK_NOCHECK
     // no checking active - use the above interface methods directly.
 #else
 #   define zsock_new(t) zsock_new_checked((t), __FILE__, __LINE__)

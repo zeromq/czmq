@@ -625,6 +625,7 @@ zsock_type_str (zsock_t *self)
 //      c = zchunk_t *
 //      f = zframe_t *
 //      h = zhashx_t *
+//      U = zuuid_t *
 //      p = void * (sends the pointer value, only meaningful over inproc)
 //      m = zmsg_t * (sends all frames in the zmsg)
 //      z = sends zero-sized frame (0 arguments)
@@ -700,6 +701,11 @@ zsock_vsend (void *self, const char *picture, va_list argptr)
             zmsg_addmem (msg, zframe_data (frame), zframe_size (frame));
         }
         else
+        if (*picture == 'U') {
+            zuuid_t *uuid = va_arg (argptr, zuuid_t *);
+            zmsg_addmem (msg, zuuid_data (uuid), zuuid_size (uuid));
+        }
+        else
         if (*picture == 'p') {
             void *pointer = va_arg (argptr, void *);
             zmsg_addmem (msg, &pointer, sizeof (void *));
@@ -747,8 +753,9 @@ zsock_vsend (void *self, const char *picture, va_list argptr)
 //      b = byte **, size_t * (2 arguments) (allocates memory)
 //      c = zchunk_t ** (creates zchunk)
 //      f = zframe_t ** (creates zframe)
-//      p = void ** (stores pointer)
 //      h = zhashx_t ** (creates zhashx)
+//      U = zuuid_t * (creates a zuuid with the data)
+//      p = void ** (stores pointer)
 //      m = zmsg_t ** (creates a zmsg with the remaing frames)
 //      z = null, asserts empty frame (0 arguments)
 //      u = uint * (stores unsigned integer, deprecated)
@@ -888,6 +895,20 @@ zsock_vrecv (void *self, const char *picture, va_list argptr)
                 *frame_p = frame;
             else
                 zframe_destroy (&frame);
+        }
+        else
+        if (*picture == 'U') {
+            zframe_t *frame = zmsg_pop (msg);
+            zuuid_t **uuid_p = va_arg (argptr, zuuid_t **);
+            if (uuid_p) {
+                if (frame) {
+                    *uuid_p = zuuid_new ();
+                    zuuid_set (*uuid_p, zframe_data (frame));
+                }
+                else
+                    *uuid_p = NULL;
+            }
+            zframe_destroy (&frame);
         }
         else
         if (*picture == 'p') {
@@ -1043,6 +1064,7 @@ zsock_vrecv (void *self, const char *picture, va_list argptr)
 //      S       char *, 0-2^32-1 chars  type = "longstr"
 //      c       zchunk_t *              type = "chunk"
 //      f       zframe_t *              type = "frame"
+//      u       zuuid_t *               type = "uuid"
 //      m       zmsg_t *                type = "msg"
 //      p       void *, sends pointer value, only over inproc
 //
@@ -1107,6 +1129,11 @@ zsock_bsend (void *self, const char *picture, ...)
             zframe_t *frame = va_arg (argptr, zframe_t *);
             assert (nbr_frames < ZSOCK_BSEND_MAX_FRAMES - 1);
             frames [nbr_frames++] = frame;
+        }
+        else
+        if (*picptr == 'u') {
+            zuuid_t *uuid = va_arg (argptr, zuuid_t *);
+            frame_size += zuuid_size (uuid);
         }
         else
         if (*picptr == 'm') {
@@ -1194,6 +1221,14 @@ zsock_bsend (void *self, const char *picture, ...)
                 PUT_NUMBER4 (zchunk_size (chunk));
                 memcpy (needle, zchunk_data (chunk), zchunk_size (chunk));
                 needle += zchunk_size (chunk);
+            }
+        }
+        else
+        if (*picptr == 'u') {
+            zuuid_t *uuid = va_arg (argptr, zuuid_t *);
+            if (uuid) {
+                memcpy (needle, zuuid_data (uuid), zuuid_size (uuid));
+                needle += zuuid_size (uuid);
             }
         }
         picptr++;
@@ -1329,6 +1364,16 @@ zsock_brecv (void *selfish, const char *picture, ...)
                 goto malformed;
             *chunk_p = zchunk_new (needle, chunk_size);
             needle += chunk_size;
+        }
+        else
+        if (*picptr == 'u') {
+            zuuid_t **uuid_p = va_arg (argptr, zuuid_t **);
+            *uuid_p = zuuid_new ();
+            if (zuuid_size (*uuid_p) > MAX_ALLOC_SIZE
+            ||  needle + zuuid_size (*uuid_p) > (ceiling))
+                goto malformed;
+            zuuid_set (*uuid_p, needle);
+            needle += zuuid_size (*uuid_p);
         }
         else
         if (*picptr == 'f') {
@@ -1599,27 +1644,32 @@ zsock_test (bool verbose)
     assert (frame);
     zhashx_t *hash = zhashx_new ();
     assert (hash);
+    zuuid_t *uuid = zuuid_new ();
+    assert (uuid);
     zhashx_autofree (hash);
     zhashx_insert (hash, "1", "value A");
     zhashx_insert (hash, "2", "value B");
     char *original = "pointer";
 
     //  Test zsock_recv into each supported type
-    zsock_send (writer, "i1248zsbcfhp",
+    zsock_send (writer, "i1248zsbcfuhp",
                 -12345, number1, number2, number4, number8,
-                "This is a string", "ABCDE", 5, chunk, frame, hash, original);
-    zframe_destroy (&frame);
+                "This is a string", "ABCDE", 5,
+                chunk, frame, uuid, hash, original);
+    char *uuid_str = strdup (zuuid_str (uuid));
     zchunk_destroy (&chunk);
+    zframe_destroy (&frame);
+    zuuid_destroy (&uuid);
     zhashx_destroy (&hash);
-    
+
     int integer;
     byte *data;
     size_t size;
     char *pointer;
     number8 = number4 = number2 = number1 = 0;
-    rc = zsock_recv (reader, "i1248zsbcfhp",
+    rc = zsock_recv (reader, "i1248zsbcfuhp",
                      &integer, &number1, &number2, &number4, &number8,
-                     &string, &data, &size, &chunk, &frame, &hash, &pointer);
+                     &string, &data, &size, &chunk, &frame, &uuid, &hash, &pointer);
     assert (rc == 0);
     assert (integer == -12345);
     assert (number1 == 123);
@@ -1631,6 +1681,7 @@ zsock_test (bool verbose)
     assert (size == 5);
     assert (memcmp (zchunk_data (chunk), "HELLO", 5) == 0);
     assert (zchunk_size (chunk) == 5);
+    assert (streq (uuid_str, zuuid_str (uuid)));
     assert (memcmp (zframe_data (frame), "WORLD", 5) == 0);
     assert (zframe_size (frame) == 5);
     char *value = (char *) zhashx_lookup (hash, "1");
@@ -1640,6 +1691,7 @@ zsock_test (bool verbose)
     assert (original == pointer);
     free (string);
     free (data);
+    free (uuid_str);
     zframe_destroy (&frame);
     zchunk_destroy (&chunk);
     zhashx_destroy (&hash);
