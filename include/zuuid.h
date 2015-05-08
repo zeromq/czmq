@@ -32,20 +32,20 @@ CZMQ_EXPORT void
 
 //  Create UUID object from supplied ZUUID_LEN-octet value
 CZMQ_EXPORT zuuid_t *
-    zuuid_new_from (byte *source);
-
-//  Return UUID binary data
-CZMQ_EXPORT byte *
-    zuuid_data (zuuid_t *self);
+    zuuid_new_from (const byte *source);
 
 //  Set UUID to new supplied ZUUID_LEN-octet value
 CZMQ_EXPORT void
-    zuuid_set (zuuid_t *self, byte *source);
+    zuuid_set (zuuid_t *self, const byte *source);
 
 //  Set UUID to new supplied string value skipping '-' and '{' '}'
 //  optional delimiters. Return 0 if OK, else returns -1.
 CZMQ_EXPORT int
     zuuid_set_str (zuuid_t *self, const char *source);
+
+//  Return UUID binary data
+CZMQ_EXPORT const byte *
+    zuuid_data (zuuid_t *self);
 
 //  Return UUID binary size
 CZMQ_EXPORT size_t
@@ -67,11 +67,11 @@ CZMQ_EXPORT void
 
 //  Check if UUID is same as supplied value
 CZMQ_EXPORT bool
-    zuuid_eq (zuuid_t *self, byte *compare);
+    zuuid_eq (zuuid_t *self, const byte *compare);
 
 //  Check if UUID is different from supplied value
 CZMQ_EXPORT bool
-    zuuid_neq (zuuid_t *self, byte *compare);
+    zuuid_neq (zuuid_t *self, const byte *compare);
 
 //  Make copy of UUID object; if uuid is null, or memory was exhausted,
 //  returns null.
