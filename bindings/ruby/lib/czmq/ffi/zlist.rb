@@ -140,9 +140,9 @@ module CZMQ
         result
       end
       
-      # Append an item to the end of the list, return 0 if OK or -1 if this   
-      # failed for some reason (out of memory). Note that if a duplicator has 
-      # been set, this method will also duplicate the item.                   
+      # Append an item to the end of the list, return 0 if OK or -1 if this  
+      # failed for some reason (out of memory). Note that if a duplicator has
+      # been set, this method will also duplicate the item.                  
       def append item
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zlist_append @ptr, item
@@ -165,9 +165,9 @@ module CZMQ
         result
       end
       
-      # Checks if an item already is present. Uses compare method to determine if  
-      # items are equal. If the compare method is NULL the check will only compare 
-      # pointers. Returns true if item is present else false.                      
+      # Checks if an item already is present. Uses compare method to determine if 
+      # items are equal. If the compare method is NULL the check will only compare
+      # pointers. Returns true if item is present else false.                     
       def exists item
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zlist_exists @ptr, item
@@ -183,7 +183,8 @@ module CZMQ
       
       # Make a copy of list. If the list has autofree set, the copied list will  
       # duplicate all items, which must be strings. Otherwise, the list will hold
-      # pointers back to the items in the original list.                         
+      # pointers back to the items in the original list. If list is null, returns
+      # NULL.                                                                    
       def dup
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zlist_dup @ptr
@@ -227,11 +228,11 @@ module CZMQ
         result
       end
       
-      # Sets a compare function for this list. The function compares two items. 
-      # It returns an integer less than, equal to, or greater than zero if the  
-      # first item is found, respectively, to be less than, to match, or be     
-      # greater than the second item.                                           
-      # This function is used for sorting, removal and exists checking.         
+      # Sets a compare function for this list. The function compares two items.
+      # It returns an integer less than, equal to, or greater than zero if the 
+      # first item is found, respectively, to be less than, to match, or be    
+      # greater than the second item.                                          
+      # This function is used for sorting, removal and exists checking.        
       def comparefn fn
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zlist_comparefn @ptr, fn

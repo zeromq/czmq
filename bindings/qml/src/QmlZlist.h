@@ -50,9 +50,9 @@ public slots:
     //  Leaves cursor pointing at the current item, or NULL if the list is empty.
     void *item ();
 
-    //  Append an item to the end of the list, return 0 if OK or -1 if this   
-    //  failed for some reason (out of memory). Note that if a duplicator has 
-    //  been set, this method will also duplicate the item.                   
+    //  Append an item to the end of the list, return 0 if OK or -1 if this  
+    //  failed for some reason (out of memory). Note that if a duplicator has
+    //  been set, this method will also duplicate the item.                  
     int append (void *item);
 
     //  Push an item to the start of the list, return 0 if OK or -1 if this  
@@ -63,9 +63,9 @@ public slots:
     //  Pop the item off the start of the list, if any
     void *pop ();
 
-    //  Checks if an item already is present. Uses compare method to determine if  
-    //  items are equal. If the compare method is NULL the check will only compare 
-    //  pointers. Returns true if item is present else false.                      
+    //  Checks if an item already is present. Uses compare method to determine if 
+    //  items are equal. If the compare method is NULL the check will only compare
+    //  pointers. Returns true if item is present else false.                     
     bool exists (void *item);
 
     //  Remove the specified item from the list if present
@@ -73,7 +73,8 @@ public slots:
 
     //  Make a copy of list. If the list has autofree set, the copied list will  
     //  duplicate all items, which must be strings. Otherwise, the list will hold
-    //  pointers back to the items in the original list.                         
+    //  pointers back to the items in the original list. If list is null, returns
+    //  NULL.                                                                    
     QmlZlist *dup ();
 
     //  Purge all items from list
@@ -96,11 +97,11 @@ public slots:
     //  list is empty.                                                        
     void autofree ();
 
-    //  Sets a compare function for this list. The function compares two items. 
-    //  It returns an integer less than, equal to, or greater than zero if the  
-    //  first item is found, respectively, to be less than, to match, or be     
-    //  greater than the second item.                                           
-    //  This function is used for sorting, removal and exists checking.         
+    //  Sets a compare function for this list. The function compares two items.
+    //  It returns an integer less than, equal to, or greater than zero if the 
+    //  first item is found, respectively, to be less than, to match, or be    
+    //  greater than the second item.                                          
+    //  This function is used for sorting, removal and exists checking.        
     void comparefn (zlist_compare_fn fn);
 
     //  Set a free function for the specified list item. When the item is     
