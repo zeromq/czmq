@@ -103,6 +103,19 @@ zuuid_destroy (zuuid_t **self_p)
 
 
 //  -----------------------------------------------------------------
+//  Create UUID object from supplied ZUUID_LEN-octet value
+
+zuuid_t *
+zuuid_new_from (byte *source)
+{
+    zuuid_t *self = (zuuid_t *) zmalloc (sizeof (zuuid_t));
+    if (self)
+        zuuid_set (self, source);
+    return self;
+}
+
+
+//  -----------------------------------------------------------------
 //  Set UUID to new supplied ZUUID_LEN-octet value
 
 void
@@ -210,7 +223,7 @@ zuuid_str_canonical (zuuid_t *self)
     strncat (self->str_canonical, self->str + 16, 4);
     strcat  (self->str_canonical, "-");
     strncat (self->str_canonical, self->str + 20, 12);
-    
+
     int char_nbr;
     for (char_nbr = 0; char_nbr < 36; char_nbr++)
         self->str_canonical [char_nbr] = tolower (self->str_canonical [char_nbr]);
@@ -258,12 +271,8 @@ zuuid_neq (zuuid_t *self, byte *compare)
 zuuid_t *
 zuuid_dup (zuuid_t *self)
 {
-    if (self) {
-        zuuid_t *copy = zuuid_new ();
-        if (copy)
-            zuuid_set (copy, zuuid_data (self));
-        return copy;
-    }
+    if (self)
+        return zuuid_new_from (zuuid_data (self));
     else
         return NULL;
 }
@@ -281,7 +290,7 @@ zuuid_test (bool verbose)
     //  Simple create/destroy test
     assert (ZUUID_LEN == 16);
     assert (ZUUID_STR_LEN == 32);
-    
+
     zuuid_t *uuid = zuuid_new ();
     assert (uuid);
     assert (zuuid_size (uuid) == ZUUID_LEN);

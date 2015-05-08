@@ -30,9 +30,22 @@ CZMQ_EXPORT zuuid_t *
 CZMQ_EXPORT void
     zuuid_destroy (zuuid_t **self_p);
 
+//  Create UUID object from supplied ZUUID_LEN-octet value
+CZMQ_EXPORT zuuid_t *
+    zuuid_new_from (byte *source);
+
 //  Return UUID binary data
 CZMQ_EXPORT byte *
     zuuid_data (zuuid_t *self);
+
+//  Set UUID to new supplied ZUUID_LEN-octet value
+CZMQ_EXPORT void
+    zuuid_set (zuuid_t *self, byte *source);
+
+//  Set UUID to new supplied string value skipping '-' and '{' '}'
+//  optional delimiters. Return 0 if OK, else returns -1.
+CZMQ_EXPORT int
+    zuuid_set_str (zuuid_t *self, const char *source);
 
 //  Return UUID binary size
 CZMQ_EXPORT size_t
@@ -47,15 +60,6 @@ CZMQ_EXPORT const char *
 //  http://en.wikipedia.org/wiki/Universally_unique_identifier
 CZMQ_EXPORT const char *
     zuuid_str_canonical (zuuid_t *self);
-
-//  Set UUID to new supplied ZUUID_LEN-octet value
-CZMQ_EXPORT void
-    zuuid_set (zuuid_t *self, byte *source);
-    
-//  Set UUID to new supplied string value skipping '-' and '{' '}'
-//  optional delimiters. Return 0 if OK, else returns -1.
-CZMQ_EXPORT int
-    zuuid_set_str (zuuid_t *self, const char *source);
 
 //  Store UUID blob in target array
 CZMQ_EXPORT void
