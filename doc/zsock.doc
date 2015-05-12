@@ -156,6 +156,7 @@ This is the class interface:
     //      c = zchunk_t *                                                    
     //      f = zframe_t *                                                    
     //      h = zhashx_t *                                                    
+    //      U = zuuid_t *                                                     
     //      p = void * (sends the pointer value, only meaningful over inproc) 
     //      m = zmsg_t * (sends all frames in the zmsg)                       
     //      z = sends zero-sized frame (0 arguments)                          
@@ -186,8 +187,9 @@ This is the class interface:
     //      b = byte **, size_t * (2 arguments) (allocates memory)              
     //      c = zchunk_t ** (creates zchunk)                                    
     //      f = zframe_t ** (creates zframe)                                    
-    //      p = void ** (stores pointer)                                        
+    //      U = zuuid_t * (creates a zuuid with the data)                       
     //      h = zhashx_t ** (creates zhashx)                                    
+    //      p = void ** (stores pointer)                                        
     //      m = zmsg_t ** (creates a zmsg with the remaing frames)              
     //      z = null, asserts empty frame (0 arguments)                         
     //      u = uint * (stores unsigned integer, deprecated)                    
@@ -224,6 +226,7 @@ This is the class interface:
     //      S       char *, 0-2^32-1 chars  type = "longstr"                   
     //      c       zchunk_t *              type = "chunk"                     
     //      f       zframe_t *              type = "frame"                     
+    //      u       zuuid_t *               type = "uuid"                      
     //      m       zmsg_t *                type = "msg"                       
     //      p       void *, sends pointer value, only over inproc              
     //                                                                         
@@ -388,17 +391,22 @@ This is the class self test code:
     assert (frame);
     zhashx_t *hash = zhashx_new ();
     assert (hash);
+    zuuid_t *uuid = zuuid_new ();
+    assert (uuid);
     zhashx_autofree (hash);
     zhashx_insert (hash, "1", "value A");
     zhashx_insert (hash, "2", "value B");
     char *original = "pointer";
     
     //  Test zsock_recv into each supported type
-    zsock_send (writer, "i1248zsbcfhp",
+    zsock_send (writer, "i1248zsbcfuhp",
                 -12345, number1, number2, number4, number8,
-                "This is a string", "ABCDE", 5, chunk, frame, hash, original);
-    zframe_destroy (&frame);
+                "This is a string", "ABCDE", 5,
+                chunk, frame, uuid, hash, original);
+    char *uuid_str = strdup (zuuid_str (uuid));
     zchunk_destroy (&chunk);
+    zframe_destroy (&frame);
+    zuuid_destroy (&uuid);
     zhashx_destroy (&hash);
     
     int integer;
@@ -406,9 +414,9 @@ This is the class self test code:
     size_t size;
     char *pointer;
     number8 = number4 = number2 = number1 = 0;
-    rc = zsock_recv (reader, "i1248zsbcfhp",
+    rc = zsock_recv (reader, "i1248zsbcfuhp",
                      &integer, &number1, &number2, &number4, &number8,
-                     &string, &data, &size, &chunk, &frame, &hash, &pointer);
+                     &string, &data, &size, &chunk, &frame, &uuid, &hash, &pointer);
     assert (rc == 0);
     assert (integer == -12345);
     assert (number1 == 123);
@@ -420,6 +428,7 @@ This is the class self test code:
     assert (size == 5);
     assert (memcmp (zchunk_data (chunk), "HELLO", 5) == 0);
     assert (zchunk_size (chunk) == 5);
+    assert (streq (uuid_str, zuuid_str (uuid)));
     assert (memcmp (zframe_data (frame), "WORLD", 5) == 0);
     assert (zframe_size (frame) == 5);
     char *value = (char *) zhashx_lookup (hash, "1");
@@ -429,6 +438,7 @@ This is the class self test code:
     assert (original == pointer);
     free (string);
     free (data);
+    free (uuid_str);
     zframe_destroy (&frame);
     zchunk_destroy (&chunk);
     zhashx_destroy (&hash);

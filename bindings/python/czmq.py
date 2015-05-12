@@ -2346,7 +2346,7 @@ Leaves cursor pointing at the current item, or NULL if the list is empty."""
 
     def append(self, item):
         """Append an item to the end of the list, return 0 if OK or -1 if this
-failed for some reason (out of memory). Note that if a duplicator has 
+failed for some reason (out of memory). Note that if a duplicator has
 been set, this method will also duplicate the item."""
         return lib.zlist_append(self._as_parameter_, item)
 
@@ -2361,8 +2361,8 @@ been set, this method will also duplicate the item."""
         return c_void_p(lib.zlist_pop(self._as_parameter_))
 
     def exists(self, item):
-        """Checks if an item already is present. Uses compare method to determine if 
-items are equal. If the compare method is NULL the check will only compare 
+        """Checks if an item already is present. Uses compare method to determine if
+items are equal. If the compare method is NULL the check will only compare
 pointers. Returns true if item is present else false."""
         return lib.zlist_exists(self._as_parameter_, item)
 
@@ -2373,7 +2373,8 @@ pointers. Returns true if item is present else false."""
     def dup(self):
         """Make a copy of list. If the list has autofree set, the copied list will
 duplicate all items, which must be strings. Otherwise, the list will hold
-pointers back to the items in the original list."""
+pointers back to the items in the original list. If list is null, returns
+NULL."""
         return Zlist(lib.zlist_dup(self._as_parameter_), True)
 
     def purge(self):
@@ -2401,10 +2402,10 @@ list is empty."""
         return lib.zlist_autofree(self._as_parameter_)
 
     def comparefn(self, fn):
-        """Sets a compare function for this list. The function compares two items. 
+        """Sets a compare function for this list. The function compares two items.
 It returns an integer less than, equal to, or greater than zero if the
-first item is found, respectively, to be less than, to match, or be 
-greater than the second item. 
+first item is found, respectively, to be less than, to match, or be
+greater than the second item.
 This function is used for sorting, removal and exists checking."""
         return lib.zlist_comparefn(self._as_parameter_, fn)
 

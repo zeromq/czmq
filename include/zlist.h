@@ -65,9 +65,9 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT void *
     zlist_item (zlist_t *self);
 
-//  Append an item to the end of the list, return 0 if OK or -1 if this   
-//  failed for some reason (out of memory). Note that if a duplicator has 
-//  been set, this method will also duplicate the item.                   
+//  Append an item to the end of the list, return 0 if OK or -1 if this  
+//  failed for some reason (out of memory). Note that if a duplicator has
+//  been set, this method will also duplicate the item.                  
 CZMQ_EXPORT int
     zlist_append (zlist_t *self, void *item);
 
@@ -81,9 +81,9 @@ CZMQ_EXPORT int
 CZMQ_EXPORT void *
     zlist_pop (zlist_t *self);
 
-//  Checks if an item already is present. Uses compare method to determine if  
-//  items are equal. If the compare method is NULL the check will only compare 
-//  pointers. Returns true if item is present else false.                      
+//  Checks if an item already is present. Uses compare method to determine if 
+//  items are equal. If the compare method is NULL the check will only compare
+//  pointers. Returns true if item is present else false.                     
 CZMQ_EXPORT bool
     zlist_exists (zlist_t *self, void *item);
 
@@ -93,7 +93,8 @@ CZMQ_EXPORT void
 
 //  Make a copy of list. If the list has autofree set, the copied list will  
 //  duplicate all items, which must be strings. Otherwise, the list will hold
-//  pointers back to the items in the original list.                         
+//  pointers back to the items in the original list. If list is null, returns
+//  NULL.                                                                    
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zlist_t *
     zlist_dup (zlist_t *self);
@@ -122,11 +123,11 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zlist_autofree (zlist_t *self);
 
-//  Sets a compare function for this list. The function compares two items. 
-//  It returns an integer less than, equal to, or greater than zero if the  
-//  first item is found, respectively, to be less than, to match, or be     
-//  greater than the second item.                                           
-//  This function is used for sorting, removal and exists checking.         
+//  Sets a compare function for this list. The function compares two items.
+//  It returns an integer less than, equal to, or greater than zero if the 
+//  first item is found, respectively, to be less than, to match, or be    
+//  greater than the second item.                                          
+//  This function is used for sorting, removal and exists checking.        
 CZMQ_EXPORT void
     zlist_comparefn (zlist_t *self, zlist_compare_fn fn);
 

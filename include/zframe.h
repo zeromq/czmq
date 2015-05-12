@@ -35,10 +35,10 @@ CZMQ_EXPORT zframe_t *
 CZMQ_EXPORT void
     zframe_destroy (zframe_t **self_p);
 
-//  Create an empty (zero-sized) frame. The caller is responsible for 
-//  destroying the return value when finished with it.
+//  Create an empty (zero-sized) frame
+//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zframe_t *
-    zframe_new_empty (void);
+    zframe_new_empty ();
 
 //  Receive frame from socket, returns zframe_t object or NULL if the recv  
 //  was interrupted. Does a blocking recv, if you want to not block then use
