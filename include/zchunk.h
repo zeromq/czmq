@@ -54,7 +54,9 @@ CZMQ_EXPORT size_t
 CZMQ_EXPORT size_t
     zchunk_fill (zchunk_t *self, byte filler, size_t size);
 
-//  Append user-supplied data to chunk, return resulting chunk size
+//  Append user-supplied data to chunk, return resulting chunk size. If the
+//  data would exceeed the available space, it is truncated. If you want to
+//  grow the chunk to accomodate new data, use the zchunk_extend method.
 CZMQ_EXPORT size_t
     zchunk_append (zchunk_t *self, const void *data, size_t size);
 
@@ -73,7 +75,7 @@ CZMQ_EXPORT bool
 //  Read chunk from an open file descriptor
 CZMQ_EXPORT zchunk_t *
     zchunk_read (FILE *handle, size_t bytes);
-    
+
 //  Write chunk to an open file descriptor
 CZMQ_EXPORT int
     zchunk_write (zchunk_t *self, FILE *handle);
