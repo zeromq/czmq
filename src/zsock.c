@@ -1652,7 +1652,7 @@ zsock_test (bool verbose)
     char *original = "pointer";
 
     //  Test zsock_recv into each supported type
-    zsock_send (writer, "i1248zsbcfuhp",
+    zsock_send (writer, "i1248zsbcfUhp",
                 -12345, number1, number2, number4, number8,
                 "This is a string", "ABCDE", 5,
                 chunk, frame, uuid, hash, original);
@@ -1667,7 +1667,7 @@ zsock_test (bool verbose)
     size_t size;
     char *pointer;
     number8 = number4 = number2 = number1 = 0;
-    rc = zsock_recv (reader, "i1248zsbcfuhp",
+    rc = zsock_recv (reader, "i1248zsbcfUhp",
                      &integer, &number1, &number2, &number4, &number8,
                      &string, &data, &size, &chunk, &frame, &uuid, &hash, &pointer);
     assert (rc == 0);
