@@ -60,6 +60,11 @@ CZMQ_EXPORT size_t
 CZMQ_EXPORT size_t
     zchunk_append (zchunk_t *self, const void *data, size_t size);
 
+//  Append user-supplied data to chunk, return resulting chunk size. If the
+//  data would exceeed the available space, the chunk grows in size.
+CZMQ_EXPORT size_t
+	zchunk_extend (zchunk_t *self, const void *data, size_t size);
+
 //  Copy as much data from 'source' into the chunk as possible; returns the
 //  new size of chunk. If all data from 'source' is used, returns exhausted
 //  on the source chunk. Source can be consumed as many times as needed until
