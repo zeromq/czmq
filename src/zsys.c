@@ -163,8 +163,8 @@ zsys_init (void)
             s_logsystem = false;
     }
     //  Catch SIGINT and SIGTERM unless ZSYS_SIGHANDLER=false
-    if (getenv ("ZSYS_SIGHANDLER") == NULL
-    ||  strneq (getenv ("ZSYS_SIGHANDLER"), "false"))
+    if ((getenv ("ZSYS_SIGHANDLER") == NULL
+	 ||  strneq (getenv ("ZSYS_SIGHANDLER"), "false")) && s_first_time)
         zsys_catch_interrupts ();
 
     ZMUTEX_INIT (s_mutex);
