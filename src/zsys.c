@@ -74,7 +74,7 @@ static char *s_interface = NULL;    //  ZSYS_INTERFACE=
 static char *s_logident = NULL;     //  ZSYS_LOGIDENT=
 static FILE *s_logstream = NULL;    //  ZSYS_LOGSTREAM=stdout/stderr
 static bool s_logsystem = false;    //  ZSYS_LOGSYSTEM=true/false
-static void *s_logsender = NULL;    //  ZSYS_LOGSENDER=
+static zsock_t *s_logsender = NULL;    //  ZSYS_LOGSENDER=
 
 //  Track number of open sockets so we can zmq_term() safely
 static size_t s_open_sockets = 0;
@@ -221,6 +221,11 @@ zsys_shutdown (void)
     if (busy)
         zclock_sleep (200);
 
+    //  Close logsender socket if opened (don't do this in critical section)
+    if (s_logsender) {
+        zsock_destroy (&s_logsender);
+    }
+
     //  No matter, we are now going to shut down
     //  Print the source reference for any sockets the app did not
     //  destroy properly.
@@ -238,11 +243,6 @@ zsys_shutdown (void)
     zlist_destroy (&s_sockref_list);
     ZMUTEX_UNLOCK (s_mutex);
 
-    //  Close logsender socket if opened (don't do this in critical section)
-    if (s_logsender) {
-        zsys_close (s_logsender, NULL, 0);
-        s_logsender = NULL;
-    }
     if (s_open_sockets == 0)
         zmq_term (s_process_ctx);
     else
@@ -1392,17 +1392,16 @@ zsys_set_logsender (const char *endpoint)
     if (endpoint) {
         //  Create log sender if needed
         if (!s_logsender) {
-            s_logsender = zsys_socket (ZMQ_PUB, NULL, 0);
+            s_logsender = zsock_new_pub(NULL);
             assert (s_logsender);
         }
-        //  Bind to specified endpoint
-        int rc = zmq_bind (s_logsender, endpoint);
+        //  Bind/connect to specified endpoint(s) using zsock_attach() syntax
+	int rc = zsock_attach (s_logsender, endpoint, true);
         assert (rc == 0);
     }
     else
     if (s_logsender) {
-        zsys_close (s_logsender, NULL, 0);
-        s_logsender = NULL;
+        zsock_destroy (&s_logsender);
     }
 }
 
