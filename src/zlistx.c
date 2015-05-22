@@ -364,6 +364,19 @@ zlistx_detach (zlistx_t *self, void *handle)
 
 
 //  --------------------------------------------------------------------------
+//  Detach item at the cursor, if any, from the list. The item is not modified,
+//  and the caller is responsible for destroying it as necessary. Returns item
+//  that was detached, or null if none was. Moves cursor to previous item, so
+//  you can detach items while iterating forwards through a list.
+
+void *
+zlistx_detach_cur (zlistx_t *self)
+{
+    return zlistx_detach (self, zlistx_cursor (self));
+}
+
+
+//  --------------------------------------------------------------------------
 //  Delete an item, using its handle. Calls the item destructor is any is
 //  set. If handle is null, deletes the first item on the list. Returns 0
 //  if an item was deleted, -1 if not. If cursor was at item, moves cursor
