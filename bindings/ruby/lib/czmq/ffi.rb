@@ -106,6 +106,7 @@ module CZMQ
       attach_function :zframe_new, [:pointer, :size_t], :pointer, **opts
       attach_function :zframe_destroy, [:pointer], :void, **opts
       attach_function :zframe_new_empty, [], :pointer, **opts
+      attach_function :zframe_from, [:string], :pointer, **opts
       attach_function :zframe_recv, [:pointer], :pointer, **opts
       attach_function :zframe_send, [:pointer, :pointer, :int], :int, **opts
       attach_function :zframe_size, [:pointer], :size_t, **opts
