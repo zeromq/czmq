@@ -53,8 +53,8 @@ public slots:
     //  or by the zframe_set_more() method                                      
     int more ();
 
-    //  Set frame MORE indicator (1 or 0). Note this is NOT used when sending 
-    //  frame to socket, you have to specify flag explicitly.                 
+    //  Set frame MORE indicator (1 or 0). Note this is NOT used when sending
+    //  frame to socket, you have to specify flag explicitly.                
     void setMore (int more);
 
     //  Return TRUE if two frames have identical size and data
@@ -82,6 +82,9 @@ public:
 public slots:
     //  Create an empty (zero-sized) frame
     QmlZframe *newEmpty ();
+
+    //  Create a frame with a specified string content.
+    QmlZframe *from (const QString &string);
 
     //  Receive frame from socket, returns zframe_t object or NULL if the recv  
     //  was interrupted. Does a blocking recv, if you want to not block then use

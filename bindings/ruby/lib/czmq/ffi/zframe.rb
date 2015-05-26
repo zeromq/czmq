@@ -74,6 +74,14 @@ module CZMQ
         result
       end
       
+      # Create a frame with a specified string content.
+      def self.from string
+        string = String(string)
+        result = ::CZMQ::FFI.zframe_from string
+        result = Zframe.__new result, true
+        result
+      end
+      
       # Receive frame from socket, returns zframe_t object or NULL if the recv  
       # was interrupted. Does a blocking recv, if you want to not block then use
       # zpoller or zloop.                                                       
@@ -147,8 +155,8 @@ module CZMQ
         result
       end
       
-      # Set frame MORE indicator (1 or 0). Note this is NOT used when sending 
-      # frame to socket, you have to specify flag explicitly.                 
+      # Set frame MORE indicator (1 or 0). Note this is NOT used when sending
+      # frame to socket, you have to specify flag explicitly.                
       def set_more more
         raise DestroyedError unless @ptr
         more = Integer(more)

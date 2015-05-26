@@ -63,8 +63,8 @@ int QmlZframe::more () {
 };
 
 ///
-//  Set frame MORE indicator (1 or 0). Note this is NOT used when sending 
-//  frame to socket, you have to specify flag explicitly.                 
+//  Set frame MORE indicator (1 or 0). Note this is NOT used when sending
+//  frame to socket, you have to specify flag explicitly.                
 void QmlZframe::setMore (int more) {
     zframe_set_more (self, more);
 };
@@ -100,6 +100,14 @@ QObject* QmlZframe::qmlAttachedProperties(QObject* object) {
 QmlZframe *QmlZframeAttached::newEmpty () {
     QmlZframe *retQ_ = new QmlZframe ();
     retQ_->self = zframe_new_empty ();
+    return retQ_;
+};
+
+///
+//  Create a frame with a specified string content.
+QmlZframe *QmlZframeAttached::from (const QString &string) {
+    QmlZframe *retQ_ = new QmlZframe ();
+    retQ_->self = zframe_from (string.toUtf8().data());
     return retQ_;
 };
 

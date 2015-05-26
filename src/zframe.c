@@ -61,7 +61,7 @@ zframe_new (const void *data, size_t size)
 
 
 //  --------------------------------------------------------------------------
-//  Create an empty (zero-sized) frame. The caller is responsible for 
+//  Create an empty (zero-sized) frame. The caller is responsible for
 //  destroying the return value when finished with it.
 
 zframe_t *
@@ -91,6 +91,17 @@ zframe_destroy (zframe_t **self_p)
         free (self);
         *self_p = NULL;
     }
+}
+
+
+//  --------------------------------------------------------------------------
+//  Create a frame with a specified string content.
+//  The caller is responsible for destroying the return value when finished with it.
+
+zframe_t *
+zframe_from (const char *string)
+{
+    return zframe_new (string, strlen (string));
 }
 
 
@@ -254,7 +265,7 @@ zframe_streq (zframe_t *self, const char *string)
     assert (zframe_is (self));
 
     if (zframe_size (self) == strlen (string)
-    && memcmp (zframe_data (self), string, strlen (string)) == 0) 
+    && memcmp (zframe_data (self), string, strlen (string)) == 0)
         return true;
     else
         return false;

@@ -656,6 +656,8 @@ lib.zframe_destroy.restype = None
 lib.zframe_destroy.argtypes = [POINTER(zframe_p)]
 lib.zframe_new_empty.restype = zframe_p
 lib.zframe_new_empty.argtypes = []
+lib.zframe_from.restype = zframe_p
+lib.zframe_from.argtypes = [c_char_p]
 lib.zframe_recv.restype = zframe_p
 lib.zframe_recv.argtypes = [c_void_p]
 lib.zframe_send.restype = c_int
@@ -727,6 +729,11 @@ size octets from the specified data into the frame body."""
         return Zframe(lib.zframe_new_empty(), True)
 
     @staticmethod
+    def from(string):
+        """Create a frame with a specified string content."""
+        return Zframe(lib.zframe_from(string), True)
+
+    @staticmethod
     def recv(source):
         """Receive frame from socket, returns zframe_t object or NULL if the recv
 was interrupted. Does a blocking recv, if you want to not block then use
@@ -772,7 +779,7 @@ or by the zframe_set_more() method"""
         return lib.zframe_more(self._as_parameter_)
 
     def set_more(self, more):
-        """Set frame MORE indicator (1 or 0). Note this is NOT used when sending 
+        """Set frame MORE indicator (1 or 0). Note this is NOT used when sending
 frame to socket, you have to specify flag explicitly."""
         return lib.zframe_set_more(self._as_parameter_, more)
 

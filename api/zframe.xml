@@ -24,6 +24,12 @@
         <return type = "zframe" fresh = "1" />
     </method>
 
+    <method name = "from" singleton = "1">
+        Create a frame with a specified string content.
+        <argument name = "string" type = "string" />
+        <return type = "zframe" fresh = "1" />
+    </method>
+
     <method name = "recv" singleton = "1">
         Receive frame from socket, returns zframe_t object or NULL if the recv
         was interrupted. Does a blocking recv, if you want to not block then use
@@ -82,7 +88,7 @@
     </method>
 
     <method name = "set more">
-        Set frame MORE indicator (1 or 0). Note this is NOT used when sending 
+        Set frame MORE indicator (1 or 0). Note this is NOT used when sending
         frame to socket, you have to specify flag explicitly.
         <argument name = "more" type = "integer" />
     </method>
