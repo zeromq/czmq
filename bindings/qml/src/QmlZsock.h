@@ -67,12 +67,12 @@ public slots:
     //  isn't supported.                                               
     int disconnect (const QString &format);
 
-    //  Attach a socket to zero or more endpoints. If endpoints is not null,    
-    //  parses as list of ZeroMQ endpoints, separated by commas, and prefixed by
-    //  '@' (to bind the socket) or '>' (to attach the socket). Returns 0 if all
-    //  endpoints were valid, or -1 if there was a syntax error. If the endpoint
-    //  does not start with '@' or '>', the serverish argument defines whether  
-    //  it is used to bind (serverish = true) or connect (serverish = false).   
+    //  Attach a socket to zero or more endpoints. If endpoints is not null,     
+    //  parses as list of ZeroMQ endpoints, separated by commas, and prefixed by 
+    //  '@' (to bind the socket) or '>' (to connect the socket). Returns 0 if all
+    //  endpoints were valid, or -1 if there was a syntax error. If the endpoint 
+    //  does not start with '@' or '>', the serverish argument defines whether   
+    //  it is used to bind (serverish = true) or connect (serverish = false).    
     int attach (const QString &endpoints, bool serverish);
 
     //  Returns socket type as printable constant string.
