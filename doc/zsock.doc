@@ -128,12 +128,12 @@ This is the class interface:
     CZMQ_EXPORT int
         zsock_disconnect (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
     
-    //  Attach a socket to zero or more endpoints. If endpoints is not null,    
-    //  parses as list of ZeroMQ endpoints, separated by commas, and prefixed by
-    //  '@' (to bind the socket) or '>' (to attach the socket). Returns 0 if all
-    //  endpoints were valid, or -1 if there was a syntax error. If the endpoint
-    //  does not start with '@' or '>', the serverish argument defines whether  
-    //  it is used to bind (serverish = true) or connect (serverish = false).   
+    //  Attach a socket to zero or more endpoints. If endpoints is not null,     
+    //  parses as list of ZeroMQ endpoints, separated by commas, and prefixed by 
+    //  '@' (to bind the socket) or '>' (to connect the socket). Returns 0 if all
+    //  endpoints were valid, or -1 if there was a syntax error. If the endpoint 
+    //  does not start with '@' or '>', the serverish argument defines whether   
+    //  it is used to bind (serverish = true) or connect (serverish = false).    
     CZMQ_EXPORT int
         zsock_attach (zsock_t *self, const char *endpoints, bool serverish);
     
