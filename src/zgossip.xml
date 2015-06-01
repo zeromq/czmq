@@ -4,6 +4,7 @@
     script = "zproto_server_c"
     protocol_class = "zgossip_msg"
     project_header = "../include/czmq.h"
+    export_macro = "CZMQ_EXPORT"
     >
     This is a server implementation of the ZeroMQ Gossip Discovery Protocol
     <include filename = "license.xml" />
@@ -41,13 +42,13 @@
         <event name = "PING">
             <action name = "send" message = "PONG" />
         </event>
-        
+
         <!-- All other protocol messages are invalid -->
         <event name = "*">
             <action name = "send" message = "INVALID" />
             <action name = "terminate" />
         </event>
-        
+
         <!-- This built-in event hits on a client timeout -->
         <event name = "expired">
             <action name = "terminate" />
