@@ -153,6 +153,14 @@ public slots:
     //  it is a destructor).                                                     
     int send (QmlZmsg *selfP, void *dest);
 
+    //  Send message to destination socket as part of a multipart sequence, and 
+    //  destroy the message after sending it successfully. Note that after a    
+    //  zmsg_sendm, you must call zmsg_send or another method that sends a final
+    //  message part. If the message has no frames, sends nothing but destroys  
+    //  the message anyhow. Nullifies the caller's reference to the message (as 
+    //  it is a destructor).                                                    
+    int sendm (QmlZmsg *selfP, void *dest);
+
     //  Load/append an open file into message, create new message if 
     //  null message provided. Returns NULL if the message could not 
     //  be loaded.                                                   

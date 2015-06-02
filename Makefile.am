@@ -24,9 +24,9 @@ noinst_LTLIBRARIES =
 TESTS =
 
 EXTRA_DIST = \
-    zgossip_engine.inc \
-    zhash_primes.inc \
-    zclass_example.xml \
+    src/zgossip_engine.inc \
+    src/zhash_primes.inc \
+    src/zclass_example.xml \
     version.sh
 
 include $(srcdir)/src/Makemodule.am
