@@ -83,6 +83,11 @@
     <ClInclude Include="..\..\..\..\src\zgossip_engine.inc" />
     <ClInclude Include="..\..\..\..\src\zhash_primes.inc" />
     <ClInclude Include="..\..\..\..\src\zclass_example.xml" />
+    <ClInclude Include="..\..\..\..\src\foreign/sha1/sha1.inc_c" />
+    <ClInclude Include="..\..\..\..\src\foreign/sha1/sha1.h" />
+    <ClInclude Include="..\..\..\..\src\foreign/slre/slre.inc_c" />
+    <ClInclude Include="..\..\..\..\src\foreign/slre/slre.h" />
+    <ClInclude Include="..\..\..\..\src\foreign/slre/readme.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\zactor.c">

@@ -48,6 +48,11 @@
     <extra name = "zgossip_engine.inc" />
     <extra name = "zhash_primes.inc" />
     <extra name = "zclass_example.xml" />
+    <extra name = "foreign/sha1/sha1.inc_c" />
+    <extra name = "foreign/sha1/sha1.h" />
+    <extra name = "foreign/slre/slre.inc_c" />
+    <extra name = "foreign/slre/slre.h" />
+    <extra name = "foreign/slre/readme.txt" />
 
     <!-- Deprecated V2 API, remove some time after 3.0 stability -->
     <class name = "zauth_v2" />

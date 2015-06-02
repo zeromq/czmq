@@ -13,9 +13,10 @@ project_libs = \
     ${zmq_LIBS}
 
 SUBDIRS =
-SUBDIRS += doc
-
 DIST_SUBDIRS =
+SUBDIRS += doc
+DIST_SUBDIRS += doc
+
 lib_LTLIBRARIES =
 bin_PROGRAMS =
 noinst_PROGRAMS =
@@ -27,6 +28,13 @@ EXTRA_DIST = \
     src/zgossip_engine.inc \
     src/zhash_primes.inc \
     src/zclass_example.xml \
+    src/foreign/sha1/sha1.inc_c \
+    src/foreign/sha1/sha1.h \
+    src/foreign/slre/slre.inc_c \
+    src/foreign/slre/slre.h \
+    src/foreign/slre/readme.txt \
+    src/zgossip_msg.h \
+    src/czmq_classes.h \
     version.sh
 
 include $(srcdir)/src/Makemodule.am

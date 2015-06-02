@@ -33,7 +33,7 @@
  * implemented by Jun-ichiro itojun Itoh <itojun@itojun.org>
  */
 
-#include "../../include/czmq.h"
+#include "../../../include/czmq.h"
 #include "sha1.h"
 
 /* constant table */

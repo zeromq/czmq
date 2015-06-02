@@ -134,6 +134,11 @@ set (czmq_headers
     src/zgossip_engine.inc
     src/zhash_primes.inc
     src/zclass_example.xml
+    src/foreign/sha1/sha1.inc_c
+    src/foreign/sha1/sha1.h
+    src/foreign/slre/slre.inc_c
+    src/foreign/slre/slre.h
+    src/foreign/slre/readme.txt
 )
 source_group ("Header Files" FILES ${czmq_headers})
 install(FILES ${czmq_headers} DESTINATION include)
