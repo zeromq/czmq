@@ -200,6 +200,7 @@ module CZMQ
       attach_function :zmsg_destroy, [:pointer], :void, **opts
       attach_function :zmsg_recv, [:pointer], :pointer, **opts
       attach_function :zmsg_send, [:pointer, :pointer], :int, **opts
+      attach_function :zmsg_sendm, [:pointer, :pointer], :int, **opts
       attach_function :zmsg_size, [:pointer], :size_t, **opts
       attach_function :zmsg_content_size, [:pointer], :size_t, **opts
       attach_function :zmsg_prepend, [:pointer, :pointer], :int, **opts
