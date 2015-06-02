@@ -44,6 +44,13 @@ CZMQ_EXPORT zmsg_t *
 CZMQ_EXPORT int
     zmsg_send (zmsg_t **self_p, void *dest);
 
+//  Send (More) message to destination socket, and destroy the message after sending
+//  it successfully. If the message has no frames, sends nothing but destroys
+//  the message anyhow. Nullifies the caller's reference to the message (as  
+//  it is a destructor).                                                     
+CZMQ_EXPORT int
+    zmsg_sendm (zmsg_t **self_p, void *dest);
+
 //  Return size of message, i.e. number of frames (0 or more).
 CZMQ_EXPORT size_t
     zmsg_size (zmsg_t *self);
