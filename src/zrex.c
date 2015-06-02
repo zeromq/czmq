@@ -44,8 +44,7 @@
 */
 
 #include "../include/czmq.h"
-#include "../foreign/slre/slre.h"
-#include "../foreign/slre/slre.c"
+#include "foreign/slre/slre.inc_c"
 
 #define MAX_HITS 100            //  Should be enough for anyone :)
 
