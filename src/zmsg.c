@@ -149,6 +149,34 @@ zmsg_send (zmsg_t **self_p, void *dest)
     return rc;
 }
 
+//  --------------------------------------------------------------------------
+//  Send (More) message to destination socket, and destroy the message after sending
+//  it successfully. If the message has no frames, sends nothing but destroys
+//  the message anyhow. Nullifies the caller's reference to the message (as
+//  it is a destructor).
+CZMQ_EXPORT int
+    zmsg_sendm (zmsg_t **self_p, void *dest)
+{
+    assert (self_p);
+    assert (dest);
+    zmsg_t *self = *self_p;
+
+    int rc = 0;
+    void *handle = zsock_resolve (dest);
+    if (self) {
+        assert (zmsg_is (self));
+        zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
+        while (frame) {
+            rc = zframe_send (&frame, handle,ZFRAME_MORE);
+            if (rc != 0)
+                break;
+            frame = (zframe_t *) zlist_pop (self->frames);
+        }
+        if (rc == 0)
+            zmsg_destroy (self_p);
+    }
+    return rc;
+}
 
 //  --------------------------------------------------------------------------
 //  Return size of message, i.e. number of frames (0 or more).
