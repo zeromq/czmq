@@ -35,6 +35,10 @@ EXTRA_DIST = \
     src/foreign/slre/readme.txt \
     src/zgossip_msg.h \
     src/czmq_classes.h \
+    LICENSE \
+    README.txt \
+    README.md \
+    CONTRIBUTING.md \
     version.sh
 
 include $(srcdir)/src/Makemodule.am
