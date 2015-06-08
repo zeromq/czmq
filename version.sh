@@ -9,7 +9,7 @@
 project=$1
 appendix="_library"
 if [ ! -f include/$project$appendix.h ]; then
-    echo 3.0.1 | tr -d '\n'
+    echo 3.0.2 | tr -d '\n'
     exit 0
 fi
 MAJOR=`egrep '^#define .*_VERSION_MAJOR +[0-9]+$' include/$project$appendix.h`
