@@ -13,11 +13,11 @@ MAN_TXT += $(MAN7:%.7=%.txt)
 
 EXTRA_DIST = asciidoc.conf $(MAN_TXT)
 
-if BUILD_DOC
 if INSTALL_MAN
 dist_man_MANS = $(MAN_DOC)
 endif
 
+if BUILD_DOC
 MAINTAINERCLEANFILES = $(MAN_DOC)
 
 dist-hook : $(MAN_DOC)
