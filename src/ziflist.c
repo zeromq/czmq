@@ -95,13 +95,14 @@ ziflist_new (void)
 
 //  Print properties of the ziflist object.
 //  --------------------------------------------------------------------------
-CZMQ_EXPORT void
+
+void
 ziflist_print (ziflist_t *self)
 {
-    for (interface_t *iface = (interface_t *) zlistx_first ((zlistx_t *) self) ;
-         iface != NULL ;
-         iface = (interface_t *) zlistx_next ((zlistx_t *) self))
-    {
+    interface_t *iface;
+    for (iface = (interface_t *) zlistx_first ((zlistx_t *) self);
+         iface != NULL;
+         iface = (interface_t *) zlistx_next ((zlistx_t *) self)) {
         zsys_info (" - interface name : %s", iface->name);
         zsys_info (" - interface address : %s", iface->address);
         zsys_info (" - interface netmask : %s", iface->netmask);
