@@ -1,4 +1,4 @@
-﻿/*  =========================================================================
+/*  =========================================================================
     zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.
 
     Copyright (c) the Contributors as noted in the AUTHORS file.

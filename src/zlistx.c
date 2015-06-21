@@ -1,4 +1,4 @@
-﻿/*  =========================================================================
+/*  =========================================================================
     zlistx - extended generic list container
 
     Copyright (c) the Contributors as noted in the AUTHORS file.

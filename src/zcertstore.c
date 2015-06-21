@@ -1,4 +1,4 @@
-﻿/*  =========================================================================
+/*  =========================================================================
     zcertstore - work with CURVE security certificate stores
 
     Copyright (c) the Contributors as noted in the AUTHORS file.

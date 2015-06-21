@@ -1,4 +1,4 @@
-﻿/*  =========================================================================
+/*  =========================================================================
     zframe - working with single message frames
 
     Copyright (c) the Contributors as noted in the AUTHORS file.

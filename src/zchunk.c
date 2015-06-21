@@ -1,4 +1,4 @@
-﻿/*  =========================================================================
+/*  =========================================================================
     zchunk - work with memory chunks
 
     Copyright (c) the Contributors as noted in the AUTHORS file.

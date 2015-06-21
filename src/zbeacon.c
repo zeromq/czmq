@@ -1,4 +1,4 @@
-﻿/*  =========================================================================
+/*  =========================================================================
     zbeacon - LAN discovery and presence
 
     Copyright (c) the Contributors as noted in the AUTHORS file.

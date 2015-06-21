@@ -1,4 +1,4 @@
-﻿/*  =========================================================================
+/*  =========================================================================
     zmonitor - socket event monitor
 
     Copyright (c) the Contributors as noted in the AUTHORS file.

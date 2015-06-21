@@ -1,4 +1,4 @@
-﻿/*  =========================================================================
+/*  =========================================================================
     zhash - simple generic hash container
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
