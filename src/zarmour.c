@@ -1,4 +1,4 @@
-﻿/*  =========================================================================
+/*  =========================================================================
     zarmour - armoured text encoding and decoding
 
     Copyright (c) the Contributors as noted in the AUTHORS file.

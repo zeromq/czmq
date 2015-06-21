@@ -1,4 +1,4 @@
-﻿/*  =========================================================================
+/*  =========================================================================
     zpoller - trivial socket poller class
 
     Copyright (c) the Contributors as noted in the AUTHORS file.

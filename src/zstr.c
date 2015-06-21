@@ -1,4 +1,4 @@
-﻿/*  =========================================================================
+/*  =========================================================================
     zstr - sending and receiving strings
 
     Copyright (c) the Contributors as noted in the AUTHORS file.

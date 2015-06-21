@@ -1,4 +1,4 @@
-﻿/*  =========================================================================
+/*  =========================================================================
     zfile - provides methods to work with files in a portable fashion.
 
     Copyright (c) the Contributors as noted in the AUTHORS file.

@@ -1,4 +1,4 @@
-﻿/*  =========================================================================
+/*  =========================================================================
     zsock - high-level socket API that hides libzmq contexts and sockets
 
     Copyright (c) the Contributors as noted in the AUTHORS file.

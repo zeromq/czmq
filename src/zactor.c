@@ -1,4 +1,4 @@
-﻿/*  =========================================================================
+/*  =========================================================================
     zactor - simple actor framework
 
     Copyright (c) the Contributors as noted in the AUTHORS file.

@@ -1,4 +1,4 @@
-﻿/*  =========================================================================
+/*  =========================================================================
     zauth - authentication for ZeroMQ security mechanisms
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
