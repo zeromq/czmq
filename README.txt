@@ -144,8 +144,10 @@ This is the API provided by CZMQ v3.x, in alphabetical order.
 .pull doc/zframe.doc
 .pull doc/zgossip.doc
 .pull doc/zhash.doc
+.pull doc/zhashx.doc
 .pull doc/ziflist.doc
 .pull doc/zlist.doc
+.pull doc/zlistx.doc
 .pull doc/zloop.doc
 .pull doc/zmonitor.doc
 .pull doc/zmsg.doc
