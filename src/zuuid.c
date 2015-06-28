@@ -69,6 +69,7 @@ zuuid_new (void)
 #else
         //  No UUID system calls, so generate a random string
         byte uuid [ZUUID_LEN];
+
         int fd = open ("/dev/urandom", O_RDONLY);
         if (fd != -1) {
             ssize_t bytes_read = read (fd, uuid, ZUUID_LEN);
@@ -76,10 +77,12 @@ zuuid_new (void)
             close (fd);
             zuuid_set (self, uuid);
         }
-        else
+        else {
             //  We couldn't read /dev/urandom and we have no alternative
             //  strategy
+            zsys_error (strerror (errno));
             assert (false);
+        }
 #endif
     }
     return self;
