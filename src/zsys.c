@@ -35,6 +35,7 @@ static void s_signal_handler (int signal_value);
 
 //  We use these variables for signal handling
 static bool s_first_time = true;
+static bool handle_signals = true;
 #if defined (__UNIX__)
 static struct sigaction sigint_default;
 static struct sigaction sigterm_default;
@@ -162,10 +163,8 @@ zsys_init (void)
         if (streq (getenv ("ZSYS_LOGSYSTEM"), "false"))
             s_logsystem = false;
     }
-    //  Catch SIGINT and SIGTERM unless ZSYS_SIGHANDLER=false
-    if ((getenv ("ZSYS_SIGHANDLER") == NULL
-	 ||  strneq (getenv ("ZSYS_SIGHANDLER"), "false")) && s_first_time)
-        zsys_catch_interrupts ();
+
+    zsys_catch_interrupts ();
 
     ZMUTEX_INIT (s_mutex);
     s_sockref_list = zlist_new ();
@@ -419,9 +418,10 @@ zsys_handler_set (zsys_handler_fn *handler_fn)
     if (!handler_fn) {
         //  Disable existing or future signal handling
         zsys_handler_reset ();
-        s_first_time = false;
+        handle_signals = false;
     }
     else {
+        handle_signals = true;
 #if defined (__UNIX__)
         if (s_first_time) {
             //  If first time, save default handlers
@@ -458,7 +458,7 @@ zsys_handler_reset (void)
 {
 #if defined (__UNIX__)
     //  Restore default handlers if not already done
-    if (!s_first_time) {
+    if (handle_signals && !s_first_time) {
         sigaction (SIGINT, &sigint_default, NULL);
         sigaction (SIGTERM, &sigterm_default, NULL);
         sigint_default.sa_handler = NULL;
@@ -466,7 +466,7 @@ zsys_handler_reset (void)
         s_first_time = true;
     }
 #elif defined (__WINDOWS__)
-    if (!s_first_time) {
+    if (handle_signals && !s_first_time) {
         SetConsoleCtrlHandler (s_handler_fn_shim, FALSE);
         installed_handler_fn = NULL;
         s_first_time = true;
@@ -482,7 +482,10 @@ zsys_handler_reset (void)
 void
 zsys_catch_interrupts (void)
 {
-    zsys_handler_set (s_signal_handler);
+    //  Catch SIGINT and SIGTERM unless ZSYS_SIGHANDLER=false
+    if ((getenv ("ZSYS_SIGHANDLER") == NULL
+        ||  strneq (getenv ("ZSYS_SIGHANDLER"), "false")) && handle_signals)
+        zsys_handler_set (s_signal_handler);
 }
 
 //  Default internal signal handler
