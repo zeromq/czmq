@@ -292,7 +292,7 @@ s_tickless (zloop_t *self)
 {
     //  Calculate tickless timer, up to 1 hour
     int64_t tickless = zclock_mono () + 1000 * 3600;
-    
+
     //  Scan timers, which are not sorted
     //  TODO: sort timers properly on insertion
     s_timer_t *timer = (s_timer_t *) zlistx_first (self->timers);
@@ -312,7 +312,7 @@ s_tickless (zloop_t *self)
         timeout = 0;
     if (self->verbose)
         zsys_debug ("zloop polling for %d msec", (int) timeout);
-    
+
     return timeout * ZMQ_POLL_MSEC;
 }
 
@@ -549,7 +549,7 @@ zloop_poller_set_tolerant (zloop_t *self, zmq_pollitem_t *item)
         }
         if (match)
             poller->tolerant = true;
-        
+
         poller = (s_poller_t *) zlistx_next (self->pollers);
     }
 }
@@ -702,7 +702,7 @@ zloop_set_verbose (zloop_t *self, bool verbose)
 //  zero. Calling zloop_ignore_interrupts will supress this behavior.
 
 void
-zloop_ignore_interrupts(zloop_t *self)
+zloop_ignore_interrupts (zloop_t *self)
 {
     assert (self);
     self->ignore_interrupts = true;
@@ -777,8 +777,9 @@ zloop_start (zloop_t *self)
         while (ticket && time_now >= ticket->when) {
             if (self->verbose)
                 zsys_debug ("zloop: call ticket handler");
-            if (ticket->handler (self, 0, ticket->arg) == -1)
-                break;      //  Timer handler signaled break
+            if (!ticket->deleted
+            && ticket->handler (self, 0, ticket->arg) == -1)
+                break;      //  Ticket handler signaled break
             zlistx_delete (self->tickets, ticket->list_handle);
             ticket = (s_ticket_t *) zlistx_next (self->tickets);
         }
