@@ -163,7 +163,6 @@ zsys_init (void)
         if (streq (getenv ("ZSYS_LOGSYSTEM"), "false"))
             s_logsystem = false;
     }
-
     zsys_catch_interrupts ();
 
     ZMUTEX_INIT (s_mutex);
@@ -178,9 +177,8 @@ zsys_init (void)
     assert (!s_process_ctx);
     //  We use zmq_init/zmq_term to keep compatibility back to ZMQ v2
     s_process_ctx = zmq_init ((int) s_io_threads);
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 2, 0))
-    //  TODO: this causes TravisCI to break; libzmq does not return a
-    //  valid socket on zmq_socket(), after this...
+#if defined (ZMQ_MAX_SOCKETS)
+    zsys_info ("SETTING MAX SOCKETS: %d", (int) s_max_sockets);
     zmq_ctx_set (s_process_ctx, ZMQ_MAX_SOCKETS, (int) s_max_sockets);
 #endif
     s_initialized = true;
@@ -1165,9 +1163,8 @@ zsys_set_io_threads (size_t io_threads)
     zmq_term (s_process_ctx);
     s_io_threads = io_threads;
     s_process_ctx = zmq_init ((int) s_io_threads);
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 2, 0))
-    //  TODO: this causes TravisCI to break; libzmq does not return a
-    //  valid socket on zmq_socket(), after this...
+#if defined (ZMQ_MAX_SOCKETS)
+    zsys_info ("SETTING MAX SOCKETS: %d", (int) s_max_sockets);
     zmq_ctx_set (s_process_ctx, ZMQ_MAX_SOCKETS, (int) s_max_sockets);
 #endif
     ZMUTEX_UNLOCK (s_mutex);
@@ -1190,6 +1187,10 @@ zsys_set_max_sockets (size_t max_sockets)
         zsys_error ("zsys_max_sockets() is not valid after creating sockets");
     assert (s_open_sockets == 0);
     s_max_sockets = max_sockets? max_sockets: zsys_socket_limit ();
+#if defined (ZMQ_MAX_SOCKETS)
+    zsys_info ("SETTING MAX SOCKETS: %d", (int) s_max_sockets);
+    zmq_ctx_set (s_process_ctx, ZMQ_MAX_SOCKETS, (int) s_max_sockets);
+#endif
     ZMUTEX_UNLOCK (s_mutex);
 }
 
@@ -1201,7 +1202,7 @@ size_t
 zsys_socket_limit (void)
 {
     size_t socket_limit;
-#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (4, 1, 0))
+#if defined (ZMQ_SOCKET_LIMIT)
     if (s_process_ctx)
         socket_limit = (size_t) zmq_ctx_get (s_process_ctx, ZMQ_SOCKET_LIMIT);
     else {
@@ -1447,7 +1448,7 @@ s_log (char loglevel, char *string)
     else
     if (loglevel == 'D')
         priority = ANDROID_LOG_DEBUG;
-    
+
     __android_log_print(priority, "zsys", "%s", string);
 #   else
     if (s_logsystem) {
