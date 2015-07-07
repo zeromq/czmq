@@ -30,7 +30,7 @@
     directly but through the zauth class, which provides a high-level API for
     authentication (and manages certificate stores for you). To actually
     create certificates on disk, use the zcert class in code, or the
-    tools/makecert.c command line tool, or any text editor. The format of a
+    tools/zmakecert.c command line tool, or any text editor. The format of a
     certificate file is defined in the zcert man page.
 @end
 */

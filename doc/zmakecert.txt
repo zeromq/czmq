@@ -1,0 +1,26 @@
+zmakecert(1)
+============
+
+NAME
+----
+zmakecert - no title found
+
+SYNOPSIS
+--------
+----
+Please add @interface section in ../src/zmakecert.c.
+----
+
+DESCRIPTION
+-----------
+
+Please add @header section in ../src/zmakecert.c.
+
+Please add @discuss section in ../src/zmakecert.c.
+
+EXAMPLE
+-------
+.From zmakecert_test method
+----
+Please add @selftest section in ../src/zmakecert.c.
+----

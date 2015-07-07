@@ -1,5 +1,5 @@
 /*
-    makecert
+    zmakecert
 
     Certificate generator for ZeroMQ CURVE security. Produces two files:
     
@@ -45,7 +45,7 @@ int main (void)
         return -1;
         
     char *timestr = zclock_timestr ();
-    zcert_set_meta (cert, "created-by", "CZMQ makecert");
+    zcert_set_meta (cert, "created-by", "CZMQ zmakecert");
     zcert_set_meta (cert, "date-created", timestr);
     free (timestr);
     zcert_dump (cert);

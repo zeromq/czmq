@@ -44,7 +44,7 @@ CZMQ_EXPORT zmsg_t *
 CZMQ_EXPORT int
     zmsg_send (zmsg_t **self_p, void *dest);
 
-//  Send message to destination socket as part of a multipart sequence, and
+//  Send message to destination socket as part of a multipart sequence, and 
 //  destroy the message after sending it successfully. Note that after a    
 //  zmsg_sendm, you must call zmsg_send or another method that sends a final
 //  message part. If the message has no frames, sends nothing but destroys  
