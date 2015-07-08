@@ -256,15 +256,15 @@ AM_CONDITIONAL(ON_ANDROID, test "x$czmq_on_android" = "xyes")
 AM_CONDITIONAL(INSTALL_MAN, test "x$czmq_install_man" = "xyes")
 AM_CONDITIONAL(BUILD_DOC, test "x$czmq_build_doc" = "xyes")
 
-# Check for makecert intent
-AC_ARG_WITH([makecert],
-    AS_HELP_STRING([--with-makecert],
-        [Compile and install the makecert program [default=yes].]),
-    [with_makecert=$withval],
-    [with_makecert=yes])
+# Check for zmakecert intent
+AC_ARG_WITH([zmakecert],
+    AS_HELP_STRING([--with-zmakecert],
+        [Compile and install the zmakecert program [default=yes].]),
+    [with_zmakecert=$withval],
+    [with_zmakecert=yes])
 
-AM_CONDITIONAL([WITH_MAKECERT], [test x$with_makecert != xno])
-AM_COND_IF([WITH_MAKECERT], [AC_MSG_NOTICE([WITH_MAKECERT defined])])
+AM_CONDITIONAL([WITH_ZMAKECERT], [test x$with_zmakecert != xno])
+AM_COND_IF([WITH_ZMAKECERT], [AC_MSG_NOTICE([WITH_ZMAKECERT defined])])
 
 # Check for test_zgossip intent
 AC_ARG_WITH([test_zgossip],

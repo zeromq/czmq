@@ -132,11 +132,11 @@ endif
 
 src_libczmq_la_LIBADD = ${project_libs}
 
-if WITH_MAKECERT
-bin_PROGRAMS += src/makecert
-src_makecert_CPPFLAGS = ${AM_CPPFLAGS}
-src_makecert_LDADD = ${program_libs}
-src_makecert_SOURCES = src/makecert.c
+if WITH_ZMAKECERT
+bin_PROGRAMS += src/zmakecert
+src_zmakecert_CPPFLAGS = ${AM_CPPFLAGS}
+src_zmakecert_LDADD = ${program_libs}
+src_zmakecert_SOURCES = src/zmakecert.c
 endif
 if WITH_TEST_ZGOSSIP
 noinst_PROGRAMS += src/test_zgossip
