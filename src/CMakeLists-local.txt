@@ -1,0 +1,8 @@
+# pthread requires special checks and flags to be added
+if(THREADS_HAVE_PTHREAD_ARG)
+  target_compile_options(PUBLIC czmq "-pthread")
+endif()
+if(CMAKE_THREAD_LIBS_INIT)
+  target_link_libraries(czmq "${CMAKE_THREAD_LIBS_INIT}")
+endif()
+
