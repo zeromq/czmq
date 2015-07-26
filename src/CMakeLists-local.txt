@@ -6,3 +6,6 @@ if(CMAKE_THREAD_LIBS_INIT)
   target_link_libraries(czmq "${CMAKE_THREAD_LIBS_INIT}")
 endif()
 
+# at least C99 is required for zdir which uses ‘for’ loop initial declarations
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99")
+
