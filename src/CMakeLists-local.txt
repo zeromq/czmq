@@ -1,4 +1,5 @@
 # pthread requires special checks and flags to be added
+find_package(Threads)
 if(THREADS_HAVE_PTHREAD_ARG)
   target_compile_options(PUBLIC czmq "-pthread")
 endif()
