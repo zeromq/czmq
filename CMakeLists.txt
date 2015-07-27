@@ -204,6 +204,8 @@ install(TARGETS czmq
     RUNTIME DESTINATION bin              # .dll file
 )
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/src/CMakeLists-local.txt) # Optional project-local hook
+
 ########################################################################
 # pkgconfig
 ########################################################################
