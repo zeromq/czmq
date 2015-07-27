@@ -151,7 +151,7 @@ struct _zgossip_msg_t {
 
 //  Put a string to the frame
 #define PUT_STRING(host) { \
-    size_t string_size = strlen (host); \
+    uint8_t string_size = (uint8_t) (strlen (host)); \
     PUT_NUMBER1 (string_size); \
     memcpy (self->needle, (host), string_size); \
     self->needle += string_size; \
