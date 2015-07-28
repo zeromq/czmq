@@ -1243,7 +1243,7 @@ zsock_bsend (void *self, const char *picture, ...)
     unsigned int frame_nbr;
     for (frame_nbr = 0; frame_nbr < nbr_frames; frame_nbr++) {
         bool more = frame_nbr < nbr_frames - 1;
-        zframe_send (&frames [frame_nbr], handle,
+        zframe_send (&frames [frame_nbr], self,
                      ZFRAME_REUSE + (more? ZFRAME_MORE: 0));
     }
     return 0;

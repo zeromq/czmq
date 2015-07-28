@@ -100,9 +100,8 @@ zmsg_recv (void *source)
     if (!self)
         return NULL;
 
-    void *handle = zsock_resolve (source);
     while (true) {
-        zframe_t *frame = zframe_recv (handle);
+        zframe_t *frame = zframe_recv (source);
         if (!frame) {
             zmsg_destroy (&self);
             break;              //  Interrupted or terminated
@@ -111,7 +110,7 @@ zmsg_recv (void *source)
             zmsg_destroy (&self);
             break;
         }
-        if (!zsock_rcvmore (handle))
+        if (!zsock_rcvmore (source))
             break;              //  Last message frame
     }
     return self;
@@ -132,12 +131,11 @@ zmsg_send (zmsg_t **self_p, void *dest)
     zmsg_t *self = *self_p;
 
     int rc = 0;
-    void *handle = zsock_resolve (dest);
     if (self) {
         assert (zmsg_is (self));
         zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
         while (frame) {
-            rc = zframe_send (&frame, handle,
+            rc = zframe_send (&frame, dest,
                               zlist_size (self->frames) ? ZFRAME_MORE : 0);
             if (rc != 0)
                 break;
@@ -165,12 +163,11 @@ zmsg_sendm (zmsg_t **self_p, void *dest)
     zmsg_t *self = *self_p;
 
     int rc = 0;
-    void *handle = zsock_resolve (dest);
     if (self) {
         assert (zmsg_is (self));
         zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
         while (frame) {
-            rc = zframe_send (&frame, handle,ZFRAME_MORE);
+            rc = zframe_send (&frame, dest, ZFRAME_MORE);
             if (rc != 0)
                 break;
             frame = (zframe_t *) zlist_pop (self->frames);
@@ -856,9 +853,8 @@ zmsg_recv_nowait (void *source)
     if (!self)
         return NULL;
 
-    void *handle = zsock_resolve (source);
     while (true) {
-        zframe_t *frame = zframe_recv_nowait (handle);
+        zframe_t *frame = zframe_recv_nowait (source);
         if (!frame) {
             zmsg_destroy (&self);
             break;              //  Interrupted or terminated
