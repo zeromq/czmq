@@ -56,8 +56,6 @@ AC_PROG_SED
 AC_PROG_AWK
 PKG_PROG_PKG_CONFIG
 
-AX_PROJECT_LOCAL_HOOK # Optional project-local hook (acinclude.m4)
-
 # Code coverage
 AC_ARG_WITH(gcov, [AS_HELP_STRING([--with-gcov=yes/no],
                   [With GCC Code Coverage reporting.])],
