@@ -729,7 +729,7 @@ size octets from the specified data into the frame body."""
         return Zframe(lib.zframe_new_empty(), True)
 
     @staticmethod
-    def from(string):
+    def from_(string):
         """Create a frame with a specified string content."""
         return Zframe(lib.zframe_from(string), True)
 
