@@ -5,13 +5,15 @@ if [ $BUILD_TYPE == "default" ]; then
     if [ -n "$WITH_LIBSODIUM" ]; then
         git clone git://github.com/jedisct1/libsodium.git &&
         ( cd libsodium; ./autogen.sh && ./configure &&
-            make check && sudo make install && sudo ldconfig ) || exit 1
+            make check && sudo make install &&
+            if [ $TRAVIS_OS_NAME != "osx" ] ; then sudo ldconfig ; fi ) || exit 1
     fi
 
     # Build, check, and install the version of ZeroMQ given by ZMQ_REPO
     git clone git://github.com/zeromq/${ZMQ_REPO}.git &&
     ( cd ${ZMQ_REPO}; ./autogen.sh && ./configure &&
-        make check && sudo make install && sudo ldconfig ) || exit 1
+        make check && sudo make install &&
+        if [ $TRAVIS_OS_NAME != "osx" ] ; then sudo ldconfig ; fi ) || exit 1
 
     # Build, check, and install CZMQ from local source
     ./autogen.sh && ./configure && make check-verbose VERBOSE=1 && sudo make install
