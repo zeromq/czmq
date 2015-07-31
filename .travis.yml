@@ -11,8 +11,10 @@ env:
 - BUILD_TYPE=check-py
 - BUILD_TYPE=cmake
 
+# ZMQ stress tests need more open socket (files) than the usual default
 before_script:
 - sudo apt-get install uuid-dev
+- ulimit -n 64000
 - ./autogen.sh
 
 # Build and check this project according to the BUILD_TYPE
