@@ -2,6 +2,10 @@
 
 language: c
 
+os:
+- linux
+- osx
+
 env:
 - BUILD_TYPE=default ZMQ_REPO=zeromq2-x
 - BUILD_TYPE=default ZMQ_REPO=zeromq3-x
