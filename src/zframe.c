@@ -302,6 +302,34 @@ zframe_set_more (zframe_t *self, int more)
 
 
 //  --------------------------------------------------------------------------
+//  Return frame routing id, set when reading frame from server socket
+//  or by the zframe_set_routing_id() method.
+
+uint32_t
+zframe_routing_id (zframe_t *self)
+{
+    assert (self);
+    assert (zframe_is (self));
+
+    return zmq_msg_get_routing_id(&self->zmsg);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set frame routing id. Only relevant when sending to server socket.
+
+void
+zframe_set_routing_id (zframe_t *self, uint32_t routing_id)
+{
+    assert (self);
+    assert (zframe_is (self));
+  
+    int rc = zmq_msg_set_routing_id(&self->zmsg, routing_id);
+    assert(rc==0);
+}
+
+
+//  --------------------------------------------------------------------------
 //  Return true if two frames have identical size and data
 
 bool

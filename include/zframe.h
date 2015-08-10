@@ -97,6 +97,15 @@ CZMQ_EXPORT int
 CZMQ_EXPORT void
     zframe_set_more (zframe_t *self, int more);
 
+//  Return frame routing id, set when reading frame from server socket
+//  or by the zframe_set_routing_id() method.
+CZMQ_EXPORT uint32_t
+    zframe_routing_id (zframe_t *self);
+
+//  Set frame routing id. Only relevant when sending to server socket.                 
+CZMQ_EXPORT void
+    zframe_set_routing_id (zframe_t *self, uint32_t routing_id);
+
 //  Return TRUE if two frames have identical size and data
 //  If either frame is NULL, equality is always false.    
 CZMQ_EXPORT bool
