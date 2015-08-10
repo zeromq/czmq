@@ -574,6 +574,34 @@ zframe_test (bool verbose)
     zsock_destroy (&input);
     zsock_destroy (&output);
 
+    //  Create server and client sockets and connect over inproc
+    zsock_t *server = zsock_new_server ("@inproc://zframe-server.test");
+    assert (server);
+    zsock_t *client = zsock_new_client (">inproc://zframe-server.test");
+    assert (client);
+
+    //  Send message from client to server
+    frame = zframe_new ("Hello", 5);
+    assert (frame);
+    rc = zframe_send (&frame, client, 0);
+    assert (rc == 0);
+
+    //  Read message
+    frame = zframe_recv (server);
+    assert (zframe_streq (frame, "Hello"));
+    zframe_t *reply_frame = zframe_new("Reply", 5);
+    rc = zframe_send_reply(&reply_frame, frame, server, 0);
+    assert(rc == 0);
+    zframe_destroy(&frame);
+
+    //  Read reply
+    frame = zframe_recv (client);
+    assert (zframe_streq (frame, "Reply"));   
+    zframe_destroy(&frame);
+
+    zsock_destroy (&client);
+    zsock_destroy (&server);
+
     //  @end
     printf ("OK\n");
 }
