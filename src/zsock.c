@@ -354,6 +354,47 @@ zsock_new_stream (const char *endpoints)
     return zsock_new_stream_checked (endpoints, NULL, 0);
 }
 
+#if ZMQ_VERSION_MAJOR >= 4 && ZMQ_VERSION_MINOR >= 2
+
+//  --------------------------------------------------------------------------
+//  Create a SERVER  socket. Default action is bind.
+
+zsock_t *
+zsock_new_server_checked (const char *endpoints, const char *filename, size_t line_nbr)
+{
+    zsock_t *sock = zsock_new_checked (ZMQ_SERVER, filename, line_nbr);
+    if (sock)
+        if (zsock_attach (sock, endpoints, true))
+            zsock_destroy (&sock);
+    return sock;
+}
+
+zsock_t *
+zsock_new_server (const char *endpoints)
+{
+    return zsock_new_server_checked (endpoints, NULL, 0);
+}
+
+//  --------------------------------------------------------------------------
+//  Create a CLIENT socket. Default action is connect.
+
+zsock_t *
+zsock_new_client_checked (const char *endpoints, const char *filename, size_t line_nbr)
+{
+    zsock_t *sock = zsock_new_checked (ZMQ_CLIENT, filename, line_nbr);
+    if (sock)
+        if (zsock_attach (sock, endpoints, false))
+            zsock_destroy (&sock);
+    return sock;
+}
+
+zsock_t *
+zsock_new_client (const char *endpoints)
+{
+    return zsock_new_client_checked (endpoints, NULL, 0);
+}
+
+#endif
 
 //  --------------------------------------------------------------------------
 //  Bind a socket to a formatted endpoint. For tcp:// endpoints, supports
