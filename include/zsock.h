@@ -102,6 +102,16 @@ CZMQ_EXPORT zsock_t *
 CZMQ_EXPORT zsock_t *
     zsock_new_stream (const char *endpoint);
 
+//  Create a SERVER socket. Default action is bind.
+//  The caller is responsible for destroying the return value when finished with it.
+CZMQ_EXPORT zsock_t *
+    zsock_new_server (const char *endpoint);
+
+//  Create a CLIENT socket. Default action is connect.
+//  The caller is responsible for destroying the return value when finished with it.
+CZMQ_EXPORT zsock_t *
+    zsock_new_client (const char *endpoint);
+
 //  Bind a socket to a formatted endpoint. For tcp:// endpoints, supports   
 //  ephemeral ports, if you specify the port number as "*". By default      
 //  zsock uses the IANA designated range from C000 (49152) to FFFF (65535). 
@@ -371,6 +381,11 @@ CZMQ_EXPORT zsock_t *
 CZMQ_EXPORT zsock_t *
     zsock_new_stream_checked (const char *endpoint, const char *filename, size_t line_nbr);
 
+CZMQ_EXPORT zsock_t *
+    zsock_new_server_checked (const char *endpoint, const char *filename, size_t line_nbr);
+
+CZMQ_EXPORT zsock_t *
+    zsock_new_client_checked (const char *endpoint, const char *filename, size_t line_nbr);
 
 #ifdef __cplusplus
 }
