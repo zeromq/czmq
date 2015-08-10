@@ -165,6 +165,22 @@ zframe_send (zframe_t **self_p, void *dest, int flags)
 }
 
 //  --------------------------------------------------------------------------
+//  Send frame to server socket, copy routing id from source message .destroy after sending unless ZFRAME_REUSE is
+//  set or the attempt to send the message errors out.
+
+int
+zframe_send_reply (zframe_t **self_p, zframe_t *source_msg, void *dest, int flags)
+{
+    assert (dest);
+    assert (self_p);
+    assert (source_msg);
+
+    zframe_set_routing_id(*self_p, zframe_routing_id(source_msg));
+    
+    return zframe_send(self_p, dest, flags);
+} 
+
+//  --------------------------------------------------------------------------
 //  Return size of frame.
 
 size_t

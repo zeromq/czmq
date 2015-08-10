@@ -57,6 +57,11 @@ CZMQ_EXPORT zframe_t *
 CZMQ_EXPORT int
     zframe_send (zframe_t **self_p, void *dest, int flags);
 
+//  Send a reply frame to a server socket, copy the routing id from source message, destroy frame after sending.
+//  Return -1 on error, 0 on success.                     
+CZMQ_EXPORT int
+    zframe_send_reply (zframe_t **self_p, zframe_t *source_msg, void *dest, int flags);
+
 //  Return number of bytes in frame data
 CZMQ_EXPORT size_t
     zframe_size (zframe_t *self);
