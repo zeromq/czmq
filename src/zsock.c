@@ -354,6 +354,8 @@ zsock_new_stream (const char *endpoints)
     return zsock_new_stream_checked (endpoints, NULL, 0);
 }
 
+#if ZMQ_VERSION_MAJOR >= 4 && ZMQ_VERSION_MINOR >= 2
+
 //  --------------------------------------------------------------------------
 //  Create a SERVER  socket. Default action is bind.
 
@@ -391,6 +393,8 @@ zsock_new_client (const char *endpoints)
 {
     return zsock_new_client_checked (endpoints, NULL, 0);
 }
+
+#endif
 
 //  --------------------------------------------------------------------------
 //  Bind a socket to a formatted endpoint. For tcp:// endpoints, supports

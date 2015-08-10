@@ -164,6 +164,8 @@ zframe_send (zframe_t **self_p, void *dest, int flags)
     return 0;
 }
 
+#if ZMQ_VERSION_MAJOR >= 4 && ZMQ_VERSION_MINOR >= 2
+
 //  --------------------------------------------------------------------------
 //  Send frame to server socket, copy routing id from source message .destroy after sending unless ZFRAME_REUSE is
 //  set or the attempt to send the message errors out.
@@ -179,6 +181,8 @@ zframe_send_reply (zframe_t **self_p, zframe_t *source_msg, void *dest, int flag
     
     return zframe_send(self_p, dest, flags);
 } 
+
+#endif
 
 //  --------------------------------------------------------------------------
 //  Return size of frame.
@@ -316,6 +320,7 @@ zframe_set_more (zframe_t *self, int more)
     self->more = more;
 }
 
+#if ZMQ_VERSION_MAJOR >= 4 && ZMQ_VERSION_MINOR >= 2
 
 //  --------------------------------------------------------------------------
 //  Return frame routing id, set when reading frame from server socket
@@ -344,6 +349,7 @@ zframe_set_routing_id (zframe_t *self, uint32_t routing_id)
     assert(rc==0);
 }
 
+#endif
 
 //  --------------------------------------------------------------------------
 //  Return true if two frames have identical size and data
@@ -574,6 +580,8 @@ zframe_test (bool verbose)
     zsock_destroy (&input);
     zsock_destroy (&output);
 
+#if ZMQ_VERSION_MAJOR >= 4 && ZMQ_VERSION_MINOR >= 2
+
     //  Create server and client sockets and connect over inproc
     zsock_t *server = zsock_new_server ("@inproc://zframe-server.test");
     assert (server);
@@ -601,6 +609,8 @@ zframe_test (bool verbose)
 
     zsock_destroy (&client);
     zsock_destroy (&server);
+
+#endif
 
     //  @end
     printf ("OK\n");

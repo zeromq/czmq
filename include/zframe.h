@@ -57,10 +57,14 @@ CZMQ_EXPORT zframe_t *
 CZMQ_EXPORT int
     zframe_send (zframe_t **self_p, void *dest, int flags);
 
+#if ZMQ_VERSION_MAJOR >= 4 && ZMQ_VERSION_MINOR >= 2
+
 //  Send a reply frame to a server socket, copy the routing id from source message, destroy frame after sending.
 //  Return -1 on error, 0 on success.                     
 CZMQ_EXPORT int
     zframe_send_reply (zframe_t **self_p, zframe_t *source_msg, void *dest, int flags);
+
+#endif
 
 //  Return number of bytes in frame data
 CZMQ_EXPORT size_t
@@ -102,6 +106,8 @@ CZMQ_EXPORT int
 CZMQ_EXPORT void
     zframe_set_more (zframe_t *self, int more);
 
+#if ZMQ_VERSION_MAJOR >= 4 && ZMQ_VERSION_MINOR >= 2
+
 //  Return frame routing id, set when reading frame from server socket
 //  or by the zframe_set_routing_id() method.
 CZMQ_EXPORT uint32_t
@@ -110,6 +116,8 @@ CZMQ_EXPORT uint32_t
 //  Set frame routing id. Only relevant when sending to server socket.                 
 CZMQ_EXPORT void
     zframe_set_routing_id (zframe_t *self, uint32_t routing_id);
+
+#endif
 
 //  Return TRUE if two frames have identical size and data
 //  If either frame is NULL, equality is always false.    
