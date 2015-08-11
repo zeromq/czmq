@@ -75,6 +75,7 @@ zsock_new (int type)
     return zsock_new_checked (type, NULL, 0);
 }
 
+
 //  --------------------------------------------------------------------------
 //  Destroy the socket. You must use this for any socket created via the
 //  zsock_new method.
@@ -127,6 +128,7 @@ zsock_new_pub (const char *endpoints)
     return zsock_new_pub_checked (endpoints, NULL, 0);
 }
 
+
 //  --------------------------------------------------------------------------
 //  Create a SUB socket, and optionally subscribe to some prefix string. Default
 //  action is connect.
@@ -152,6 +154,7 @@ zsock_new_sub (const char *endpoints, const char *subscribe)
     return zsock_new_sub_checked (endpoints, subscribe, NULL, 0);
 }
 
+
 //  --------------------------------------------------------------------------
 //  Create a REQ socket. Default action is connect.
 
@@ -170,6 +173,7 @@ zsock_new_req (const char *endpoints)
 {
     return zsock_new_req_checked (endpoints, NULL, 0);
 }
+
 
 //  --------------------------------------------------------------------------
 //  Create a REP socket. Default action is bind.
@@ -190,6 +194,7 @@ zsock_new_rep (const char *endpoints)
     return zsock_new_rep_checked (endpoints, NULL, 0);
 }
 
+
 //  --------------------------------------------------------------------------
 //  Create a DEALER socket. Default action is connect.
 
@@ -208,6 +213,7 @@ zsock_new_dealer (const char *endpoints)
 {
     return zsock_new_dealer_checked (endpoints, NULL, 0);
 }
+
 
 //  --------------------------------------------------------------------------
 //  Create a ROUTER socket. Default action is bind.
@@ -228,6 +234,7 @@ zsock_new_router (const char *endpoints)
     return zsock_new_router_checked (endpoints, NULL, 0);
 }
 
+
 //  --------------------------------------------------------------------------
 //  Create a PUSH socket. Default action is connect.
 
@@ -247,6 +254,7 @@ zsock_new_push (const char *endpoints)
     return zsock_new_push_checked(endpoints, NULL, 0);
 }
 
+
 //  --------------------------------------------------------------------------
 //  Create a PULL socket. Default action is bind.
 
@@ -265,6 +273,7 @@ zsock_new_pull (const char *endpoints)
 {
     return zsock_new_pull_checked (endpoints, NULL, 0);
 }
+
 
 //  --------------------------------------------------------------------------
 //  Create an XPUB socket. Default action is bind.
@@ -289,6 +298,7 @@ zsock_new_xpub (const char *endpoints)
     return zsock_new_xpub_checked (endpoints, NULL, 0);
 }
 
+
 //  --------------------------------------------------------------------------
 //  Create an XSUB socket. Default action is connect.
 
@@ -312,6 +322,7 @@ zsock_new_xsub (const char *endpoints)
     return zsock_new_xsub_checked (endpoints, NULL, 0);
 }
 
+
 //  --------------------------------------------------------------------------
 //  Create a PAIR socket. Default action is connect.
 
@@ -330,6 +341,7 @@ zsock_new_pair (const char *endpoints)
 {
     return zsock_new_pair_checked (endpoints, NULL, 0);
 }
+
 
 //  --------------------------------------------------------------------------
 //  Create a STREAM socket. Default action is connect.
