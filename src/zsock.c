@@ -1290,16 +1290,19 @@ zsock_bsend (void *self, const char *picture, ...)
 
     //  Now send the data frame
     void *handle = zsock_resolve (self);
-    zmq_msg_send (&msg, handle, nbr_frames? ZMQ_SNDMORE: 0);
-
-    //  Now send any additional frames
-    unsigned int frame_nbr;
-    for (frame_nbr = 0; frame_nbr < nbr_frames; frame_nbr++) {
-        bool more = frame_nbr < nbr_frames - 1;
-        zframe_send (&frames [frame_nbr], self,
-                     ZFRAME_REUSE + (more? ZFRAME_MORE: 0));
+    int rc = zmq_msg_send (&msg, handle, nbr_frames? ZMQ_SNDMORE: 0);
+    if (rc >= 0) {
+        //  Now send any additional frames
+        unsigned int frame_nbr;
+        for (frame_nbr = 0; frame_nbr < nbr_frames; frame_nbr++) {
+            bool more = frame_nbr < nbr_frames - 1;
+            rc = zframe_send (&frames [frame_nbr], self,
+                              ZFRAME_REUSE + (more? ZFRAME_MORE: 0));
+            if (rc == -1)
+                break;
+        }
     }
-    return 0;
+    return rc >= 0? 0: -1;
 }
 
 
