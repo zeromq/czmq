@@ -249,6 +249,14 @@ public slots:
     //  Create a STREAM socket. Default action is connect.
     QmlZsock *newStream (const QString &endpoint);
 
+    //  Create a SERVER socket. Default action is bind.                                 
+    //  The caller is responsible for destroying the return value when finished with it.
+    QmlZsock *newServer (const QString &endpoint);
+
+    //  Create a CLIENT socket. Default action is connect.                              
+    //  The caller is responsible for destroying the return value when finished with it.
+    QmlZsock *newClient (const QString &endpoint);
+
     //  Probe the supplied object, and report if it looks like a zsock_t.
     //  Takes a polymorphic socket reference.                            
     bool is (void *self);

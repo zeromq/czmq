@@ -6,7 +6,10 @@
 module CZMQ
   module FFI
     
-    # working with single message frames
+    # working with single message frames      
+    #                                         
+    #                                         
+    # -    zframe_routing_id (zframe_t *self);
     class Zframe
       class DestroyedError < RuntimeError; end
       
@@ -102,6 +105,16 @@ module CZMQ
         result
       end
       
+      # Send a reply frame to a server socket, copy the routing id from source message, destroy frame after sending.
+      # Return -1 on error, 0 on success.                                                                           
+      def self.send_reply self_p, source_msg, dest, flags
+        self_p = self_p.__ptr_give_ref
+        source_msg = source_msg.__ptr if source_msg
+        flags = Integer(flags)
+        result = ::CZMQ::FFI.zframe_send_reply self_p, source_msg, dest, flags
+        result
+      end
+      
       # Return number of bytes in frame data
       def size
         raise DestroyedError unless @ptr
@@ -163,6 +176,22 @@ module CZMQ
         raise DestroyedError unless @ptr
         more = Integer(more)
         result = ::CZMQ::FFI.zframe_set_more @ptr, more
+        result
+      end
+      
+      # Return frame routing id, set when reading frame from server socket
+      # or by the zframe_set_routing_id() method.                         
+      def routing_id
+        raise DestroyedError unless @ptr
+        result = ::CZMQ::FFI.zframe_routing_id @ptr
+        result
+      end
+      
+      # Set frame routing id. Only relevant when sending to server socket.
+      def set_routing_id routing_id
+        raise DestroyedError unless @ptr
+        routing_id = Integer(routing_id)
+        result = ::CZMQ::FFI.zframe_set_routing_id @ptr, routing_id
         result
       end
       
