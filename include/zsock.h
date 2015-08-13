@@ -102,19 +102,17 @@ CZMQ_EXPORT zsock_t *
 CZMQ_EXPORT zsock_t *
     zsock_new_stream (const char *endpoint);
 
-#if ZMQ_VERSION_MAJOR >= 4 && ZMQ_VERSION_MINOR >= 2
-
-//  Create a SERVER socket. Default action is bind.
+//  Create a SERVER socket. Default action is bind.                                 
+//  The caller is responsible for destroying the return value when finished with it.
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_server (const char *endpoint);
 
-//  Create a CLIENT socket. Default action is connect.
+//  Create a CLIENT socket. Default action is connect.                              
+//  The caller is responsible for destroying the return value when finished with it.
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_client (const char *endpoint);
-
-#endif
 
 //  Bind a socket to a formatted endpoint. For tcp:// endpoints, supports   
 //  ephemeral ports, if you specify the port number as "*". By default      
