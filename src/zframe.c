@@ -164,25 +164,26 @@ zframe_send (zframe_t **self_p, void *dest, int flags)
     return 0;
 }
 
-#if ZMQ_VERSION_MAJOR >= 4 && ZMQ_VERSION_MINOR >= 2
-
 //  --------------------------------------------------------------------------
-//  Send frame to server socket, copy routing id from source message .destroy after sending unless ZFRAME_REUSE is
-//  set or the attempt to send the message errors out.
+//  Send frame to server socket, copy routing id from source message, destroy
+//  after sending unless ZFRAME_REUSE is set or the attempt to send the
+//  message errors out.
 
 int
 zframe_send_reply (zframe_t **self_p, zframe_t *source_msg, void *dest, int flags)
 {
+#if defined ZMQ_SERVER
     assert (dest);
     assert (self_p);
     assert (source_msg);
 
-    zframe_set_routing_id(*self_p, zframe_routing_id(source_msg));
-    
-    return zframe_send(self_p, dest, flags);
-} 
+    zframe_set_routing_id (*self_p, zframe_routing_id (source_msg));
 
+    return zframe_send (self_p, dest, flags);
+#else
+    return -1;
 #endif
+}
 
 //  --------------------------------------------------------------------------
 //  Return size of frame.
@@ -320,19 +321,21 @@ zframe_set_more (zframe_t *self, int more)
     self->more = more;
 }
 
-#if ZMQ_VERSION_MAJOR >= 4 && ZMQ_VERSION_MINOR >= 2
 
 //  --------------------------------------------------------------------------
 //  Return frame routing id, set when reading frame from server socket
 //  or by the zframe_set_routing_id() method.
 
-uint32_t
+size_t
 zframe_routing_id (zframe_t *self)
 {
+#if defined ZMQ_SERVER
     assert (self);
     assert (zframe_is (self));
-
-    return zmq_msg_get_routing_id(&self->zmsg);
+    return zmq_msg_get_routing_id (&self->zmsg);
+#else
+    return 0;
+#endif
 }
 
 
@@ -340,16 +343,17 @@ zframe_routing_id (zframe_t *self)
 //  Set frame routing id. Only relevant when sending to server socket.
 
 void
-zframe_set_routing_id (zframe_t *self, uint32_t routing_id)
+zframe_set_routing_id (zframe_t *self, size_t routing_id)
 {
+#if defined ZMQ_SERVER
     assert (self);
     assert (zframe_is (self));
-  
-    int rc = zmq_msg_set_routing_id(&self->zmsg, routing_id);
-    assert(rc==0);
+
+    int rc = zmq_msg_set_routing_id (&self->zmsg, routing_id);
+    assert (rc==0);
+#endif
 }
 
-#endif
 
 //  --------------------------------------------------------------------------
 //  Return true if two frames have identical size and data
@@ -604,7 +608,7 @@ zframe_test (bool verbose)
 
     //  Read reply
     frame = zframe_recv (client);
-    assert (zframe_streq (frame, "Reply"));   
+    assert (zframe_streq (frame, "Reply"));
     zframe_destroy(&frame);
 
     zsock_destroy (&client);

@@ -57,6 +57,13 @@ public slots:
     //  frame to socket, you have to specify flag explicitly.                
     void setMore (int more);
 
+    //  Return frame routing id, set when reading frame from server socket
+    //  or by the zframe_set_routing_id() method.                         
+    size_t routingId ();
+
+    //  Set frame routing id. Only relevant when sending to server socket.
+    void setRoutingId (size_t routingId);
+
     //  Return TRUE if two frames have identical size and data
     //  If either frame is NULL, equality is always false.    
     bool eq (QmlZframe *other);
@@ -94,6 +101,10 @@ public slots:
     //  Send a frame to a socket, destroy frame after sending.
     //  Return -1 on error, 0 on success.                     
     int send (QmlZframe *selfP, void *dest, int flags);
+
+    //  Send a reply frame to a server socket, copy the routing id from source message, destroy frame after sending.
+    //  Return -1 on error, 0 on success.                                                                           
+    int sendReply (QmlZframe *selfP, QmlZframe *sourceMsg, void *dest, int flags);
 
     //  Probe the supplied object, and report if it looks like a zframe_t.
     bool is (void *self);

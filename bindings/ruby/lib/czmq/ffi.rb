@@ -109,6 +109,7 @@ module CZMQ
       attach_function :zframe_from, [:string], :pointer, **opts
       attach_function :zframe_recv, [:pointer], :pointer, **opts
       attach_function :zframe_send, [:pointer, :pointer, :int], :int, **opts
+      attach_function :zframe_send_reply, [:pointer, :pointer, :pointer, :int], :int, **opts
       attach_function :zframe_size, [:pointer], :size_t, **opts
       attach_function :zframe_data, [:pointer], :pointer, **opts
       attach_function :zframe_dup, [:pointer], :pointer, **opts
@@ -117,6 +118,8 @@ module CZMQ
       attach_function :zframe_streq, [:pointer, :string], :bool, **opts
       attach_function :zframe_more, [:pointer], :int, **opts
       attach_function :zframe_set_more, [:pointer, :int], :void, **opts
+      attach_function :zframe_routing_id, [:pointer], :size_t, **opts
+      attach_function :zframe_set_routing_id, [:pointer, :size_t], :void, **opts
       attach_function :zframe_eq, [:pointer, :pointer], :bool, **opts
       attach_function :zframe_reset, [:pointer, :pointer, :size_t], :void, **opts
       attach_function :zframe_print, [:pointer, :string], :void, **opts
@@ -247,6 +250,8 @@ module CZMQ
       attach_function :zsock_new_xsub, [:string], :pointer, **opts
       attach_function :zsock_new_pair, [:string], :pointer, **opts
       attach_function :zsock_new_stream, [:string], :pointer, **opts
+      attach_function :zsock_new_server, [:string], :pointer, **opts
+      attach_function :zsock_new_client, [:string], :pointer, **opts
       attach_function :zsock_bind, [:pointer, :string, :varargs], :int, **opts
       attach_function :zsock_endpoint, [:pointer], :string, **opts
       attach_function :zsock_unbind, [:pointer, :string, :varargs], :int, **opts

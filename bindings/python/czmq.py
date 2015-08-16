@@ -662,6 +662,8 @@ lib.zframe_recv.restype = zframe_p
 lib.zframe_recv.argtypes = [c_void_p]
 lib.zframe_send.restype = c_int
 lib.zframe_send.argtypes = [POINTER(zframe_p), c_void_p, c_int]
+lib.zframe_send_reply.restype = c_int
+lib.zframe_send_reply.argtypes = [POINTER(zframe_p), zframe_p, c_void_p, c_int]
 lib.zframe_size.restype = c_size_t
 lib.zframe_size.argtypes = [zframe_p]
 lib.zframe_data.restype = POINTER(c_byte)
@@ -678,6 +680,10 @@ lib.zframe_more.restype = c_int
 lib.zframe_more.argtypes = [zframe_p]
 lib.zframe_set_more.restype = None
 lib.zframe_set_more.argtypes = [zframe_p, c_int]
+lib.zframe_routing_id.restype = c_size_t
+lib.zframe_routing_id.argtypes = [zframe_p]
+lib.zframe_set_routing_id.restype = None
+lib.zframe_set_routing_id.argtypes = [zframe_p, c_size_t]
 lib.zframe_eq.restype = c_bool
 lib.zframe_eq.argtypes = [zframe_p, zframe_p]
 lib.zframe_reset.restype = None
@@ -690,7 +696,10 @@ lib.zframe_test.restype = None
 lib.zframe_test.argtypes = [c_bool]
 
 class Zframe(object):
-    """working with single message frames"""
+    """working with single message frames
+
+
+-    zframe_routing_id (zframe_t *self);"""
 
     MORE = 1 # 
     REUSE = 2 # 
@@ -746,6 +755,12 @@ zpoller or zloop."""
 Return -1 on error, 0 on success."""
         return lib.zframe_send(byref(zframe_p.from_param(self_p)), dest, flags)
 
+    @staticmethod
+    def send_reply(self_p, source_msg, dest, flags):
+        """Send a reply frame to a server socket, copy the routing id from source message, destroy frame after sending.
+Return -1 on error, 0 on success."""
+        return lib.zframe_send_reply(byref(zframe_p.from_param(self_p)), source_msg, dest, flags)
+
     def size(self):
         """Return number of bytes in frame data"""
         return lib.zframe_size(self._as_parameter_)
@@ -782,6 +797,15 @@ or by the zframe_set_more() method"""
         """Set frame MORE indicator (1 or 0). Note this is NOT used when sending
 frame to socket, you have to specify flag explicitly."""
         return lib.zframe_set_more(self._as_parameter_, more)
+
+    def routing_id(self):
+        """Return frame routing id, set when reading frame from server socket
+or by the zframe_set_routing_id() method."""
+        return lib.zframe_routing_id(self._as_parameter_)
+
+    def set_routing_id(self, routing_id):
+        """Set frame routing id. Only relevant when sending to server socket."""
+        return lib.zframe_set_routing_id(self._as_parameter_, routing_id)
 
     def eq(self, other):
         """Return TRUE if two frames have identical size and data
@@ -1690,6 +1714,10 @@ lib.zsock_new_pair.restype = zsock_p
 lib.zsock_new_pair.argtypes = [c_char_p]
 lib.zsock_new_stream.restype = zsock_p
 lib.zsock_new_stream.argtypes = [c_char_p]
+lib.zsock_new_server.restype = zsock_p
+lib.zsock_new_server.argtypes = [c_char_p]
+lib.zsock_new_client.restype = zsock_p
+lib.zsock_new_client.argtypes = [c_char_p]
 lib.zsock_bind.restype = c_int
 lib.zsock_bind.argtypes = [zsock_p, c_char_p]
 lib.zsock_endpoint.restype = c_char_p
@@ -1826,6 +1854,18 @@ action is connect."""
     def new_stream(endpoint):
         """Create a STREAM socket. Default action is connect."""
         return Zsock(lib.zsock_new_stream(endpoint), True)
+
+    @staticmethod
+    def new_server(endpoint):
+        """Create a SERVER socket. Default action is bind.
+The caller is responsible for destroying the return value when finished with it."""
+        return Zsock(lib.zsock_new_server(endpoint), True)
+
+    @staticmethod
+    def new_client(endpoint):
+        """Create a CLIENT socket. Default action is connect.
+The caller is responsible for destroying the return value when finished with it."""
+        return Zsock(lib.zsock_new_client(endpoint), True)
 
     def bind(self, format, *args):
         """Bind a socket to a formatted endpoint. For tcp:// endpoints, supports

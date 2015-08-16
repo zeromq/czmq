@@ -94,6 +94,20 @@
         <return type = "zsock" fresh="1" />
     </method>
 
+    <method name = "new server" singleton = "1">
+        Create a SERVER socket. Default action is bind.
+        The caller is responsible for destroying the return value when finished with it.
+        <argument name = "endpoint" type = "string" />
+        <return type = "zsock" fresh = "1" />
+    </method>
+
+    <method name = "new client" singleton = "1">
+        Create a CLIENT socket. Default action is connect.
+        The caller is responsible for destroying the return value when finished with it.
+        <argument name = "endpoint" type = "string" />
+        <return type = "zsock" fresh = "1" />
+    </method>
+
     <method name = "bind">
         Bind a socket to a formatted endpoint. For tcp:// endpoints, supports
         ephemeral ports, if you specify the port number as "*". By default

@@ -335,6 +335,24 @@ QmlZsock *QmlZsockAttached::newStream (const QString &endpoint) {
 };
 
 ///
+//  Create a SERVER socket. Default action is bind.                                 
+//  The caller is responsible for destroying the return value when finished with it.
+QmlZsock *QmlZsockAttached::newServer (const QString &endpoint) {
+    QmlZsock *retQ_ = new QmlZsock ();
+    retQ_->self = zsock_new_server (endpoint.toUtf8().data());
+    return retQ_;
+};
+
+///
+//  Create a CLIENT socket. Default action is connect.                              
+//  The caller is responsible for destroying the return value when finished with it.
+QmlZsock *QmlZsockAttached::newClient (const QString &endpoint) {
+    QmlZsock *retQ_ = new QmlZsock ();
+    retQ_->self = zsock_new_client (endpoint.toUtf8().data());
+    return retQ_;
+};
+
+///
 //  Probe the supplied object, and report if it looks like a zsock_t.
 //  Takes a polymorphic socket reference.                            
 bool QmlZsockAttached::is (void *self) {

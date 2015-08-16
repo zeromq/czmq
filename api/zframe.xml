@@ -47,6 +47,16 @@
         <return type = "integer" />
     </method>
 
+    <method  name = "send reply" singleton = "1">
+        Send a reply frame to a server socket, copy the routing id from source message, destroy frame after sending.
+        Return -1 on error, 0 on success.
+        <argument name = "self_p" type = "zframe" by_reference = "1" />
+        <argument name = "source msg" type = "zframe" />
+        <argument name = "dest" type = "anything" />
+        <argument name = "flags" type = "integer" />
+        <return type = "integer" />
+    </method>
+
     <method name = "size">
         Return number of bytes in frame data
         <return type = "size" />
@@ -91,6 +101,18 @@
         Set frame MORE indicator (1 or 0). Note this is NOT used when sending
         frame to socket, you have to specify flag explicitly.
         <argument name = "more" type = "integer" />
+    </method>
+
+    <method name = "routing id">
+        Return frame routing id, set when reading frame from server socket
+        or by the zframe_set_routing_id() method.
+        <return type = "size" />
+    </method>
+    -    zframe_routing_id (zframe_t *self);
+
+    <method  name = "set routing id">
+        Set frame routing id. Only relevant when sending to server socket.
+        <argument name = "routing id" type = "size" />
     </method>
 
     <method name = "eq">

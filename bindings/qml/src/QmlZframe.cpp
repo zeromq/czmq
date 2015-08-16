@@ -70,6 +70,19 @@ void QmlZframe::setMore (int more) {
 };
 
 ///
+//  Return frame routing id, set when reading frame from server socket
+//  or by the zframe_set_routing_id() method.                         
+size_t QmlZframe::routingId () {
+    return zframe_routing_id (self);
+};
+
+///
+//  Set frame routing id. Only relevant when sending to server socket.
+void QmlZframe::setRoutingId (size_t routingId) {
+    zframe_set_routing_id (self, routingId);
+};
+
+///
 //  Return TRUE if two frames have identical size and data
 //  If either frame is NULL, equality is always false.    
 bool QmlZframe::eq (QmlZframe *other) {
@@ -126,6 +139,13 @@ QmlZframe *QmlZframeAttached::recv (void *source) {
 //  Return -1 on error, 0 on success.                     
 int QmlZframeAttached::send (QmlZframe *selfP, void *dest, int flags) {
     return zframe_send (&selfP->self, dest, flags);
+};
+
+///
+//  Send a reply frame to a server socket, copy the routing id from source message, destroy frame after sending.
+//  Return -1 on error, 0 on success.                                                                           
+int QmlZframeAttached::sendReply (QmlZframe *selfP, QmlZframe *sourceMsg, void *dest, int flags) {
+    return zframe_send_reply (&selfP->self, sourceMsg->self, dest, flags);
 };
 
 ///
