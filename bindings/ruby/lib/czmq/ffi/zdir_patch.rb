@@ -52,11 +52,11 @@ module CZMQ
       end
       
       # Create new patch
-      def self.new path, file, op, alias
+      def self.new path, file, op, alias_
         path = String(path)
         file = file.__ptr if file
-        alias = String(alias)
-        ptr = ::CZMQ::FFI.zdir_patch_new path, file, op, alias
+        alias_ = String(alias_)
+        ptr = ::CZMQ::FFI.zdir_patch_new path, file, op, alias_
         
         __new ptr
       end

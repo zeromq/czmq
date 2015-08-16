@@ -443,8 +443,8 @@ module CZMQ
       
       # Probe the supplied object, and report if it looks like a zsock_t.
       # Takes a polymorphic socket reference.                            
-      def self.is self
-        result = ::CZMQ::FFI.zsock_is self
+      def self.is self_
+        result = ::CZMQ::FFI.zsock_is self_
         result
       end
       
@@ -452,8 +452,8 @@ module CZMQ
       # the underlying libzmq socket handle; else if it looks like a file        
       # descriptor, return NULL; else if it looks like a libzmq socket handle,   
       # return the supplied value. Takes a polymorphic socket reference.         
-      def self.resolve self
-        result = ::CZMQ::FFI.zsock_resolve self
+      def self.resolve self_
+        result = ::CZMQ::FFI.zsock_resolve self_
         result
       end
       

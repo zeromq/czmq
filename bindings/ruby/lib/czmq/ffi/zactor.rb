@@ -102,16 +102,16 @@ module CZMQ
       end
       
       # Probe the supplied object, and report if it looks like a zactor_t.
-      def self.is self
-        result = ::CZMQ::FFI.zactor_is self
+      def self.is self_
+        result = ::CZMQ::FFI.zactor_is self_
         result
       end
       
       # Probe the supplied reference. If it looks like a zactor_t instance,
       # return the underlying libzmq actor handle; else if it looks like   
       # a libzmq actor handle, return the supplied value.                  
-      def self.resolve self
-        result = ::CZMQ::FFI.zactor_resolve self
+      def self.resolve self_
+        result = ::CZMQ::FFI.zactor_resolve self_
         result
       end
       

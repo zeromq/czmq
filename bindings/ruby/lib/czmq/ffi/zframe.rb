@@ -222,8 +222,8 @@ module CZMQ
       end
       
       # Probe the supplied object, and report if it looks like a zframe_t.
-      def self.is self
-        result = ::CZMQ::FFI.zframe_is self
+      def self.is self_
+        result = ::CZMQ::FFI.zframe_is self_
         result
       end
       
