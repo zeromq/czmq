@@ -123,20 +123,20 @@ module CZMQ
       # Returns a list of zdir_patch_t patches. Either older or newer may  
       # be null, indicating the directory is empty/absent. If alias is set,
       # generates virtual filename (minus path, plus alias).               
-      def self.diff older, newer, alias
+      def self.diff older, newer, alias_
         older = older.__ptr if older
         newer = newer.__ptr if newer
-        alias = String(alias)
-        result = ::CZMQ::FFI.zdir_diff older, newer, alias
+        alias_ = String(alias_)
+        result = ::CZMQ::FFI.zdir_diff older, newer, alias_
         result = Zlist.__new result, true
         result
       end
       
       # Return full contents of directory as a zdir_patch list.
-      def resync alias
+      def resync alias_
         raise DestroyedError unless @ptr
-        alias = String(alias)
-        result = ::CZMQ::FFI.zdir_resync @ptr, alias
+        alias_ = String(alias_)
+        result = ::CZMQ::FFI.zdir_resync @ptr, alias_
         result = Zlist.__new result, true
         result
       end

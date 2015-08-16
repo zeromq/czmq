@@ -271,9 +271,9 @@ module CZMQ
       # Load/append an open file into message, create new message if 
       # null message provided. Returns NULL if the message could not 
       # be loaded.                                                   
-      def self.load self, file
-        self = self.__ptr if self
-        result = ::CZMQ::FFI.zmsg_load self, file
+      def self.load self_, file
+        self_ = self_.__ptr if self_
+        result = ::CZMQ::FFI.zmsg_load self_, file
         result = Zmsg.__new result, true
         result
       end
@@ -342,8 +342,8 @@ module CZMQ
       end
       
       # Probe the supplied object, and report if it looks like a zmsg_t.
-      def self.is self
-        result = ::CZMQ::FFI.zmsg_is self
+      def self.is self_
+        result = ::CZMQ::FFI.zmsg_is self_
         result
       end
       
