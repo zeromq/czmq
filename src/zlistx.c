@@ -43,7 +43,6 @@ typedef struct _node_t {
 
 struct _zlistx_t {
     node_t *head;                   //  First item in list, if any
-    node_t *tail;                   //  Last item in list, if any
     node_t *cursor;                 //  Current cursors for iteration
     size_t size;                    //  Number of items in list
     czmq_duplicator *duplicator;    //  Item duplicator, if any
@@ -207,6 +206,31 @@ zlistx_size (zlistx_t *self)
 {
     assert (self);
     return self->size;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return the item at the head of list. If the list is empty, returns NULL.
+//  Leaves cursor as-is.
+
+void *
+zlistx_head (zlistx_t *self)
+{
+    assert (self);
+    return self->head ? self->head->item : NULL;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return the item at the tail of list. If the list is empty, returns NULL.
+
+//  Leaves cursor as-is.
+
+void *
+zlistx_tail (zlistx_t *self)
+{
+    assert (self);
+    return self->head ? self->head->prev->item : NULL;
 }
 
 
