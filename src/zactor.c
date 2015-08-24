@@ -111,6 +111,7 @@ zactor_new (zactor_fn *actor, void *args)
     }
     shim->pipe = zsys_create_pipe (&self->pipe);
     if (!shim->pipe) {
+        free(shim);
         zactor_destroy (&self);
         return NULL;
     }
