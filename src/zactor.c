@@ -111,7 +111,7 @@ zactor_new (zactor_fn *actor, void *args)
     }
     shim->pipe = zsys_create_pipe (&self->pipe);
     if (!shim->pipe) {
-        free(shim);
+        free (shim);
         zactor_destroy (&self);
         return NULL;
     }
@@ -165,10 +165,12 @@ zactor_destroy (zactor_t **self_p)
         //  If the pipe isn't connected any longer, assume child thread
         //  has already quit due to other reasons and don't collect the
         //  exit signal.
-        zsock_set_sndtimeo (self->pipe, 0);
-        if (zstr_send (self->pipe, "$TERM") == 0)
-            zsock_wait (self->pipe);
-        zsock_destroy (&self->pipe);
+        if (self->pipe) {
+            zsock_set_sndtimeo (self->pipe, 0);
+            if (zstr_send (self->pipe, "$TERM") == 0)
+                zsock_wait (self->pipe);
+            zsock_destroy (&self->pipe);
+        }
         self->tag = 0xDeadBeef;
         free (self);
         *self_p = NULL;
