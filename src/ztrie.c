@@ -664,10 +664,10 @@ ztrie_test (bool verbose)
     assert (streq ("Hello World!", match_data));
     zhashx_t *parameters = ztrie_hit_parameters (self);
     assert (zhashx_size (parameters) == 4);
-    assert (streq ("blub", zhashx_lookup (parameters, "name")));
-    assert (streq ("11", zhashx_lookup (parameters, "id")));
-    assert (streq ("abc", zhashx_lookup (parameters, "street")));
-    assert (streq ("23", zhashx_lookup (parameters, "nr")));
+    assert (streq ("blub", (char *) zhashx_lookup (parameters, "name")));
+    assert (streq ("11", (char *) zhashx_lookup (parameters, "id")));
+    assert (streq ("abc", (char *) zhashx_lookup (parameters, "street")));
+    assert (streq ("23", (char *) zhashx_lookup (parameters, "nr")));
     zhashx_destroy (&parameters);
 
     free (data);
