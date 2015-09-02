@@ -172,6 +172,11 @@ memcheck: src/czmq_selftest
 		--suppressions=$(srcdir)/src/.valgrind.supp \
 		$(srcdir)/src/czmq_selftest
 
+# Run the selftest binary under valgrind to check for performance leaks
+callcheck: src/czmq_selftest
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(srcdir)/src/czmq_selftest
+
 # Run the selftest binary under gdb for debugging
 debug: src/czmq_selftest
 	$(LIBTOOL) --mode=execute gdb -q \
