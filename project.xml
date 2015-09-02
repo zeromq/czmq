@@ -36,6 +36,7 @@
     <class name = "zsock_option" />
     <class name = "zstr" />
     <class name = "zsys" />
+    <class name = "ztrie" />
     <class name = "zuuid" />
 
     <!-- Models that we build using GSL -->

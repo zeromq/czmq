@@ -46,6 +46,7 @@ include_HEADERS = \
     include/zsock_option.h \
     include/zstr.h \
     include/zsys.h \
+    include/ztrie.h \
     include/zuuid.h \
     include/zauth_v2.h \
     include/zbeacon_v2.h \
@@ -89,6 +90,7 @@ src_libczmq_la_SOURCES = \
     src/zsock_option.c \
     src/zstr.c \
     src/zsys.c \
+    src/ztrie.c \
     src/zuuid.c \
     src/zgossip_msg.c \
     src/zauth_v2.c \

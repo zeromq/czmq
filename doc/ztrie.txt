@@ -1,0 +1,170 @@
+ztrie(3)
+========
+
+NAME
+----
+ztrie - simple trie for tokenizable strings
+
+SYNOPSIS
+--------
+----
+//  Creates a new ztrie.
+CZMQ_EXPORT ztrie_t *
+    ztrie_new (char delimiter);
+
+//  Destroy the ztrie.
+CZMQ_EXPORT void
+    ztrie_destroy (ztrie_t **self_p);
+
+//  Inserts a new route into the tree and attaches the data. Returns -1
+//  if the route already exists, otherwise 0. This method takes ownership of
+//  the provided data if a destroy_data_fn is provided.
+CZMQ_EXPORT int
+    ztrie_insert_route (ztrie_t *self, char *path, void *data, ztrie_destroy_data_fn *destroy_data_fn);
+
+//  Removes a route from the trie and destroys its data. Returns -1 if the
+//  route does not exists, otherwise 0.
+CZMQ_EXPORT int
+   ztrie_remove_route (ztrie_t *self, char *path);
+
+//  Returns true if the path matches a route in the tree, otherwise false.
+CZMQ_EXPORT bool
+    ztrie_matches (ztrie_t *self, char *path);
+
+//  Returns the data of a matched route from last ztrie_matches. If the path
+//  did not match, returns NULL. Do not delete the data as it's owned by
+//  ztrie.
+CZMQ_EXPORT void *
+    ztrie_hit_data (ztrie_t *self);
+
+//  Returns the count of parameters that a matched route has.
+CZMQ_EXPORT size_t
+ztrie_hit_parameter_count (ztrie_t *self);
+
+//  Returns the parameters of a matched route with named regexes from last
+//  ztrie_matches. If the path did not match or the route did not contain any
+//  named regexes, returns NULL.
+CZMQ_EXPORT zhashx_t *
+    ztrie_hit_parameters (ztrie_t *self);
+
+//  Print properties of object
+CZMQ_EXPORT void
+    ztrie_print (ztrie_t *self);
+
+//  Self test of this class
+CZMQ_EXPORT void
+    ztrie_test (bool verbose);
+----
+
+DESCRIPTION
+-----------
+
+This is a variant of a trie or prefix tree where all the descendants of a
+node have a common prefix of the string associated with that node. This
+implementation is specialized for strings that can be tokenized by a delimiter
+like a URL, URI or URN. Routes in the tree can be matched by regular expressions
+and by using capturing groups parts of a matched route can be easily obtained.
+
+Note that the performance for pure string based matching is okay but on short
+strings zhash and zhashx are 3-4 times faster.
+
+EXAMPLE
+-------
+.From ztrie_test method
+----
+//  Create a new trie for matching strings that can be tokenized by a slash
+//  (e.g. URLs minus the protocol, address and port).
+ztrie_t *self = ztrie_new ('/');
+assert (self);
+
+int ret = 0;
+
+//  Let's start by inserting a couple of routes into the trie.
+//  This one is for the route '/foo/bar' the slash at the beginning of the
+//  route is importent because everything before will be discarded. The
+//  slash at the end of the route is optional. The data associated with this
+//  node is passed without destroy function which means it must be destroyed
+//  by us.
+int foo_bar_data = 10;
+ret = ztrie_insert_route (self, "/foo/bar", &foo_bar_data, NULL);
+assert (ret == 0);
+
+//  Now suppose we like to match all routes that start with '/foo' but aren't
+//  '/foo/bar'. This is posssible by using regular expressions which are enclosed
+//  in an opening and closing curly bracket. Regular expression for a route are
+//  always match after all the pure string based like '/foo/bar' have been matched.
+//  Note there is no order is you enter multiple expression for a route which may
+//  have overlapping results.
+int foo_other_data = 100;
+ret = ztrie_insert_route (self, "/foo/{[^/]+}", &foo_other_data, NULL);
+assert (ret == 0);
+
+//  Routes are identified by their endpoint, which is the last matched node. It is
+//  possible to insert routes for a node that already exists but isn't an endpoint yet.
+ret = ztrie_insert_route (self, "/foo", NULL, NULL);
+assert (ret == 0);
+
+//  If you try to insert a route which already exists the method will return -1.
+ret = ztrie_insert_route (self, "/foo", NULL, NULL);
+assert (ret == -1);
+
+//  Of course you are allowed to remove routes in case there is data associated with a
+//  route and a destroy data function has been supplied that data will be destroyed.
+ret = ztrie_remove_route (self, "/foo");
+assert (ret == 0);
+
+//  Removing a non existent route will return a -1.
+ret = ztrie_remove_route (self, "/foo");
+assert (ret == -1);
+
+//  Removing a route with regular expression must exaclty match the entered.
+ret = ztrie_remove_route (self, "/foo/{[^/]+}");
+assert (ret == 0);
+
+//  Next we like to match a path by regular expressions and also extract the matched
+//  parts of a route. This can be done by naming the regular expression. The first one is
+//  named 'name' and is seperated by a colon. If there is no capturing group defined in the
+//  regular expression the whole matched string will be associated with this parameter. In case
+//  you don't like the get the whole matched string use a capturing group like it's done with
+//  the 'id' parameter. This is nice but you can even match as many parameter for a token as
+//  you like. Therefore simply put the parameter names seperated by colons in front of the
+//  regular expression and make sure to add a capturing group for each parameter. The first
+//  parameter will be associated with the first capturing and so on.
+char *data = (char *) malloc (80);
+sprintf (data, "%s", "Hello World!");
+ret = ztrie_insert_route (self, "/baz/{name:[^/]+}/{id:--(\\d+)}/{street:nr:(\\a+)(\\d+)}", data, NULL);
+assert (ret == 0);
+
+//  Test matches
+bool hasMatch = false;
+
+//  The first match will fail as this route has never been inserted.
+hasMatch = ztrie_matches (self, "/bar/foo");
+assert (!hasMatch);
+
+//  The '/foo/bar' will match and we can obtain the data associated with it.
+hasMatch = ztrie_matches (self, "/foo/bar");
+assert (hasMatch);
+int foo_bar_hit_data = *((int *) ztrie_hit_data (self));
+assert (foo_bar_data == foo_bar_hit_data);
+
+//  This route is part of another but is no endpoint itself thus the matches will fail.
+hasMatch = ztrie_matches (self, "/baz/blub");
+assert (!hasMatch);
+
+//  Now we will match a patch with regular expressions and extract data from the matched route.
+hasMatch = ztrie_matches (self, "/baz/blub/--11/abc23");
+assert (hasMatch);
+char *match_data = (char *) ztrie_hit_data (self);
+assert (streq ("Hello World!", match_data));
+zhashx_t *parameters = ztrie_hit_parameters (self);
+assert (zhashx_size (parameters) == 4);
+assert (streq ("blub", zhashx_lookup (parameters, "name")));
+assert (streq ("11", zhashx_lookup (parameters, "id")));
+assert (streq ("abc", zhashx_lookup (parameters, "street")));
+assert (streq ("23", zhashx_lookup (parameters, "nr")));
+zhashx_destroy (&parameters);
+
+free (data);
+ztrie_destroy (&self);
+----
