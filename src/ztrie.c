@@ -358,7 +358,7 @@ s_ztrie_parse_path (ztrie_t *self, char *path, int mode)
                     }
                 }
                 //  If a match has been found it becomes the parent for next path token
-                if (match);
+                if (match)
                     parent = match;
                 //  Cleanup for next token
                 beginRegex = NULL;
