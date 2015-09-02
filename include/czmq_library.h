@@ -106,6 +106,8 @@ typedef struct _zstr_t zstr_t;
 #define ZSTR_T_DEFINED
 typedef struct _zsys_t zsys_t;
 #define ZSYS_T_DEFINED
+typedef struct _ztrie_t ztrie_t;
+#define ZTRIE_T_DEFINED
 typedef struct _zuuid_t zuuid_t;
 #define ZUUID_T_DEFINED
 typedef struct _zauth_v2_t zauth_v2_t;
@@ -161,6 +163,7 @@ typedef struct _zthread_t zthread_t;
 #include "zsock_option.h"
 #include "zstr.h"
 #include "zsys.h"
+#include "ztrie.h"
 #include "zuuid.h"
 #include "zauth_v2.h"
 #include "zbeacon_v2.h"

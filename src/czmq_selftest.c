@@ -61,6 +61,7 @@ main (int argc, char *argv [])
     zsock_option_test (verbose);
     zstr_test (verbose);
     zsys_test (verbose);
+    ztrie_test (verbose);
     zuuid_test (verbose);
     zgossip_msg_test (verbose);
     zauth_v2_test (verbose);
