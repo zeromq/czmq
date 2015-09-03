@@ -349,7 +349,7 @@ s_ztrie_parse_path (ztrie_t *self, char *path, int mode)
                 if (!match) {
                     //  Append to common prefix
                     if (mode == MODE_INSERT) {
-                        match = s_ztrie_node_new (parent, matchToken, matchTokenLen, self->params, matchType);
+                        parent = s_ztrie_node_new (parent, matchToken, matchTokenLen, self->params, matchType);
                     }
                     //  No match for path found
                     if (mode == MODE_MATCH || mode == MODE_LOOKUP) {
@@ -358,7 +358,7 @@ s_ztrie_parse_path (ztrie_t *self, char *path, int mode)
                     }
                 }
                 //  If a match has been found it becomes the parent for next path token
-                if (match)
+                else
                     parent = match;
                 //  Cleanup for next token
                 beginRegex = NULL;
@@ -586,26 +586,28 @@ ztrie_test (bool verbose)
 
     //  Let's start by inserting a couple of routes into the trie.
     //  This one is for the route '/foo/bar' the slash at the beginning of the
-    //  route is importent because everything before will be discarded. The
-    //  slash at the end of the route is optional. The data associated with this
-    //  node is passed without destroy function which means it must be destroyed
-    //  by us.
+    //  route is important because everything before the first delimiter will be
+    //  discarded. A slash at the end of a route is optional though. The data
+    //  associated with this node is passed without destroy function which means
+    //  it must be destroyed by the caller.
     int foo_bar_data = 10;
     ret = ztrie_insert_route (self, "/foo/bar", &foo_bar_data, NULL);
     assert (ret == 0);
 
     //  Now suppose we like to match all routes that start with '/foo' but aren't
-    //  '/foo/bar'. This is posssible by using regular expressions which are enclosed
-    //  in an opening and closing curly bracket. Regular expression for a route are
-    //  always match after all the pure string based like '/foo/bar' have been matched.
-    //  Note there is no order is you enter multiple expression for a route which may
-    //  have overlapping results.
+    //  '/foo/bar'. This is possible by using regular expressions which are enclosed
+    //  in an opening and closing curly bracket. Tokens that contain regular
+    //  expressions are always match after string based tokens.
+    //  Note: There is no order in which regular expressions are sorted thus if you
+    //  enter multiple expressions for a route you will have to make sure they don't
+    //  have overlapping results. For example '{/foo/{[^/]+}' and '{/foo/{\d+}.
     int foo_other_data = 100;
     ret = ztrie_insert_route (self, "/foo/{[^/]+}", &foo_other_data, NULL);
     assert (ret == 0);
 
-    //  Routes are identified by their endpoint, which is the last matched node. It is
-    //  possible to insert routes for a node that already exists but isn't an endpoint yet.
+    //  Routes are identified by their endpoint, which is the last token of the route.
+    //  It is possible to insert routes for a node that already exists but isn't an
+    //  endpoint yet.
     ret = ztrie_insert_route (self, "/foo", NULL, NULL);
     assert (ret == 0);
 
@@ -613,28 +615,31 @@ ztrie_test (bool verbose)
     ret = ztrie_insert_route (self, "/foo", NULL, NULL);
     assert (ret == -1);
 
-    //  Of course you are allowed to remove routes in case there is data associated with a
+    //  Of course you are allowed to remove routes, in case there is data associated with a
     //  route and a destroy data function has been supplied that data will be destroyed.
     ret = ztrie_remove_route (self, "/foo");
     assert (ret == 0);
 
-    //  Removing a non existent route will return a -1.
+    //  Removing a non existent route will  as well return -1.
     ret = ztrie_remove_route (self, "/foo");
     assert (ret == -1);
 
-    //  Removing a route with regular expression must exaclty match the entered.
+    //  Removing a route with a regular expression must exactly match the entered one.
     ret = ztrie_remove_route (self, "/foo/{[^/]+}");
     assert (ret == 0);
 
-    //  Next we like to match a path by regular expressions and also extract the matched
-    //  parts of a route. This can be done by naming the regular expression. The first one is
-    //  named 'name' and is seperated by a colon. If there is no capturing group defined in the
-    //  regular expression the whole matched string will be associated with this parameter. In case
-    //  you don't like the get the whole matched string use a capturing group like it's done with
-    //  the 'id' parameter. This is nice but you can even match as many parameter for a token as
-    //  you like. Therefore simply put the parameter names seperated by colons in front of the
-    //  regular expression and make sure to add a capturing group for each parameter. The first
-    //  parameter will be associated with the first capturing and so on.
+    //  Next we like to match a path by regular expressions and also extract matched
+    //  parts of a route. This can be done by naming the regular expression. The name of a
+    //  regular expression is entered at the beginning of the curly brackets and separated
+    //  by a colon from the regular expression. The fist one in this examples is named
+    //  'name' and names the expression '[^/]'. If there is no capturing group defined in
+    //  the expression the whole matched string will be associated with this parameter. In
+    //  case you don't like the get the whole matched string use a capturing group like
+    //  it have been done for the 'id' parameter. This is nice but you can even match as
+    //  many parameter for a token as you like. Therefore simply put the parameter names
+    //  separated by colons in front of the regular expression and make sure to add a
+    //  capturing group for each parameter. The first parameter will be associated with
+    //  the first capturing and so on.
     char *data = (char *) malloc (80);
     sprintf (data, "%s", "Hello World!");
     ret = ztrie_insert_route (self, "/baz/{name:[^/]+}/{id:--(\\d+)}/{street:nr:(\\a+)(\\d+)}", data, NULL);
@@ -643,11 +648,11 @@ ztrie_test (bool verbose)
     //  Test matches
     bool hasMatch = false;
 
-    //  The first match will fail as this route has never been inserted.
+    //  The route '/bar/foo' will fail to match as this route has never been inserted.
     hasMatch = ztrie_matches (self, "/bar/foo");
     assert (!hasMatch);
 
-    //  The '/foo/bar' will match and we can obtain the data associated with it.
+    //  The route '/foo/bar' will match and we can obtain the data associated with it.
     hasMatch = ztrie_matches (self, "/foo/bar");
     assert (hasMatch);
     int foo_bar_hit_data = *((int *) ztrie_hit_data (self));
@@ -657,7 +662,8 @@ ztrie_test (bool verbose)
     hasMatch = ztrie_matches (self, "/baz/blub");
     assert (!hasMatch);
 
-    //  Now we will match a patch with regular expressions and extract data from the matched route.
+    //  This route will match our named regular expressions route. Thus we can extract data
+    //  from the route by their names.
     hasMatch = ztrie_matches (self, "/baz/blub/--11/abc23");
     assert (hasMatch);
     char *match_data = (char *) ztrie_hit_data (self);
