@@ -20,6 +20,7 @@
     <class name = "zdigest" />
     <class name = "zdir" />
     <class name = "zdir_patch" />
+    <class name = "zdispatcher" />
     <class name = "zfile" />
     <class name = "zframe" />
     <class name = "zgossip" />

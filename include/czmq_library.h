@@ -74,6 +74,8 @@ typedef struct _zdir_t zdir_t;
 #define ZDIR_T_DEFINED
 typedef struct _zdir_patch_t zdir_patch_t;
 #define ZDIR_PATCH_T_DEFINED
+typedef struct _zdispatcher_t zdispatcher_t;
+#define ZDISPATCHER_T_DEFINED
 typedef struct _zfile_t zfile_t;
 #define ZFILE_T_DEFINED
 typedef struct _zframe_t zframe_t;
@@ -147,6 +149,7 @@ typedef struct _zthread_t zthread_t;
 #include "zdigest.h"
 #include "zdir.h"
 #include "zdir_patch.h"
+#include "zdispatcher.h"
 #include "zfile.h"
 #include "zframe.h"
 #include "zgossip.h"

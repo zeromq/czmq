@@ -102,6 +102,7 @@ set (czmq_headers
     include/zdigest.h
     include/zdir.h
     include/zdir_patch.h
+    include/zdispatcher.h
     include/zfile.h
     include/zframe.h
     include/zgossip.h
@@ -161,6 +162,7 @@ set (czmq_sources
     src/zdigest.c
     src/zdir.c
     src/zdir_patch.c
+    src/zdispatcher.c
     src/zfile.c
     src/zframe.c
     src/zgossip.c
