@@ -384,7 +384,7 @@ zdispatcher_test (bool verbose)
     zframe_t *parameter_frame = zframe_recv (handler);
     zhashx_t *parameters = zhashx_unpack (parameter_frame);
     assert (1 == zhashx_size (parameters));
-    assert (streq ("foo", zhashx_lookup (parameters, "name")));
+    assert (streq ("foo", (char *) zhashx_lookup (parameters, "name")));
     content = zstr_recv (handler);
     assert (streq ("Hello Bar", content));
     free (content);
