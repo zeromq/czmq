@@ -77,7 +77,9 @@ PREVIOUS_LIBS="${LIBS}"
 
 was_zmq_check_lib_detected=no
 
-PKG_CHECK_MODULES([zmq], [libzmq],,
+PKG_CHECK_MODULES([zmq], [libzmq >= 0.0.0],
+    [
+    ],
     [
         AC_ARG_WITH([libzmq],
             [
@@ -99,12 +101,12 @@ PKG_CHECK_MODULES([zmq], [libzmq],,
             fi
         fi
 
-        CFLAGS="${zmq_synthetic_cflags} ${CFLAGS}"
-        LDFLAGS="${zmq_synthetic_libs} ${LDFLAGS}"
-        LIBS="${zmq_synthetic_libs} ${LIBS}"
-
         AC_CHECK_LIB([zmq], [zmq_init],
             [
+                CFLAGS="${zmq_synthetic_cflags} ${CFLAGS}"
+                LDFLAGS="${zmq_synthetic_libs} ${LDFLAGS}"
+                LIBS="${zmq_synthetic_libs} ${LIBS}"
+
                 AC_SUBST([zmq_CFLAGS],[${zmq_synthetic_cflags}])
                 AC_SUBST([zmq_LIBS],[${zmq_synthetic_libs}])
                 was_zmq_check_lib_detected=yes

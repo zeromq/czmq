@@ -45,6 +45,7 @@ main (int argc, char *argv [])
     zdigest_test (verbose);
     zdir_test (verbose);
     zdir_patch_test (verbose);
+    zdispatcher_test (verbose);
     zfile_test (verbose);
     zframe_test (verbose);
     zgossip_test (verbose);
