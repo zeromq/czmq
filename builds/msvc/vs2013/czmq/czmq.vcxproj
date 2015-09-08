@@ -126,9 +126,6 @@
     <ClCompile Include="..\..\..\..\src\zdir_patch.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zdispatcher.c">
-      <CompileAs>CompileAsCpp</CompileAs>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zfile.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
