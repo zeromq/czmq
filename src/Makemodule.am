@@ -30,7 +30,6 @@ include_HEADERS = \
     include/zdigest.h \
     include/zdir.h \
     include/zdir_patch.h \
-    include/zdispatcher.h \
     include/zfile.h \
     include/zframe.h \
     include/zgossip.h \
@@ -75,7 +74,6 @@ src_libczmq_la_SOURCES = \
     src/zdigest.c \
     src/zdir.c \
     src/zdir_patch.c \
-    src/zdispatcher.c \
     src/zfile.c \
     src/zframe.c \
     src/zgossip.c \

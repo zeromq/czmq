@@ -43,9 +43,6 @@
     <ClCompile Include="..\..\..\..\src\zdir_patch.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zdispatcher.c">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zfile.c">
       <Filter>src</Filter>
     </ClCompile>

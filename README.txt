@@ -140,7 +140,6 @@ This is the API provided by CZMQ v3.x, in alphabetical order.
 .pull doc/zdigest.doc
 .pull doc/zdir.doc
 .pull doc/zdir_patch.doc
-.pull doc/zdispatcher.doc
 .pull doc/zfile.doc
 .pull doc/zframe.doc
 .pull doc/zgossip.doc
