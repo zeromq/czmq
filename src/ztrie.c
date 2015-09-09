@@ -318,6 +318,9 @@ s_ztrie_parse_path (ztrie_t *self, char *path, int mode)
     int len = strlen (path);
     needle = path;
     char *needle_stop = needle + len;
+    //  Ignore trailing delimiter
+    if (needle[len-1] == self->delimiter)
+        needle_stop -= 1;
     while (needle < needle_stop + 1) {
         //  It is valid not to have an delimiter at the end of the path
         if (*needle == self->delimiter || needle == needle_stop) {
@@ -338,6 +341,9 @@ s_ztrie_parse_path (ztrie_t *self, char *path, int mode)
                                     beginRegex ? NODE_TYPE_REGEX : NODE_TYPE_STRING;
                 char *matchToken = beginRegex ? beginRegex : beginToken;
                 int matchTokenLen = needle - matchToken - (beginRegex ? 1 : 0);
+                //  Illegal token
+                if (matchTokenLen == 0)
+                    return NULL;
                 ztrie_node_t *match = NULL;
                 //  In insert mode only do a string comparison
                 if (mode == MODE_INSERT || mode == MODE_LOOKUP)
@@ -408,7 +414,7 @@ ztrie_insert_route (ztrie_t *self, char *path, void *data, ztrie_destroy_data_fn
     assert (self);
     ztrie_node_t *node = s_ztrie_parse_path (self, path, MODE_INSERT);
     //  If the returned node has no endpoint, a new route can be assigned to it.
-    if (!node->endpoint) {
+    if (node && !node->endpoint) {
         node->endpoint = true;
         node->data = data;
         node->destroy_data_fn = destroy_data_fn;
@@ -607,12 +613,23 @@ ztrie_test (bool verbose)
 
     //  Routes are identified by their endpoint, which is the last token of the route.
     //  It is possible to insert routes for a node that already exists but isn't an
-    //  endpoint yet.
-    ret = ztrie_insert_route (self, "/foo", NULL, NULL);
+    //  endpoint yet. The delimiter at the end of a route is optional and has no effect.
+    ret = ztrie_insert_route (self, "/foo/", NULL, NULL);
     assert (ret == 0);
 
     //  If you try to insert a route which already exists the method will return -1.
     ret = ztrie_insert_route (self, "/foo", NULL, NULL);
+    assert (ret == -1);
+
+    //  It is not allowed to insert routes with empty tokens.
+    ret = ztrie_insert_route (self, "//foo", NULL, NULL);
+    assert (ret == -1);
+
+    //  Everything before the first delimiter is ignored so 'foo/bar/baz' is equivalent
+    //  to '/bar/baz'.
+    ret = ztrie_insert_route (self, "foo/bar/baz", NULL, NULL);
+    assert (ret == 0);
+    ret = ztrie_insert_route (self, "/bar/baz", NULL, NULL);
     assert (ret == -1);
 
     //  Of course you are allowed to remove routes, in case there is data associated with a
@@ -631,11 +648,11 @@ ztrie_test (bool verbose)
     //  Next we like to match a path by regular expressions and also extract matched
     //  parts of a route. This can be done by naming the regular expression. The name of a
     //  regular expression is entered at the beginning of the curly brackets and separated
-    //  by a colon from the regular expression. The fist one in this examples is named
+    //  by a colon from the regular expression. The first one in this examples is named
     //  'name' and names the expression '[^/]'. If there is no capturing group defined in
     //  the expression the whole matched string will be associated with this parameter. In
     //  case you don't like the get the whole matched string use a capturing group like
-    //  it have been done for the 'id' parameter. This is nice but you can even match as
+    //  it has been done for the 'id' parameter. This is nice but you can even match as
     //  many parameter for a token as you like. Therefore simply put the parameter names
     //  separated by colons in front of the regular expression and make sure to add a
     //  capturing group for each parameter. The first parameter will be associated with
