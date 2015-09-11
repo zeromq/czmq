@@ -7,10 +7,12 @@ ACLOCAL_AMFLAGS = -I config
 
 AM_CPPFLAGS = \
     ${zmq_CFLAGS} \
+    ${uuid_CFLAGS} \
     -I$(srcdir)/include
 
 project_libs = \
-    ${zmq_LIBS}
+    ${zmq_LIBS} \
+    ${uuid_LIBS}
 
 SUBDIRS =
 DIST_SUBDIRS =

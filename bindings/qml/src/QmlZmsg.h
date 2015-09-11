@@ -89,8 +89,8 @@ public slots:
     //  Remove specified frame from list, if present. Does not destroy frame.
     void remove (QmlZframe *frame);
 
-    //  Set cursor to first frame in message. Returns frame, or NULL, if the 
-    //  message is empty. Use this to navigate the frames as a list.         
+    //  Set cursor to first frame in message. Returns frame, or NULL, if the
+    //  message is empty. Use this to navigate the frames as a list.        
     QmlZframe *first ();
 
     //  Return the next frame. If there are no more frames, returns NULL. To move
@@ -161,9 +161,9 @@ public slots:
     //  it is a destructor).                                                    
     int sendm (QmlZmsg *selfP, void *dest);
 
-    //  Load/append an open file into message, create new message if 
-    //  null message provided. Returns NULL if the message could not 
-    //  be loaded.                                                   
+    //  Load/append an open file into message, create new message if
+    //  null message provided. Returns NULL if the message could not
+    //  be loaded.                                                  
     QmlZmsg *load (QmlZmsg *self, FILE *file);
 
     //  Decodes a serialized message buffer created by zmsg_encode () and returns

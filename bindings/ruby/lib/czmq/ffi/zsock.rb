@@ -171,8 +171,7 @@ module CZMQ
         result
       end
       
-      # Create a SERVER socket. Default action is bind.                                 
-      # The caller is responsible for destroying the return value when finished with it.
+      # Create a SERVER socket. Default action is bind.
       def self.new_server endpoint
         endpoint = String(endpoint)
         result = ::CZMQ::FFI.zsock_new_server endpoint
@@ -180,8 +179,7 @@ module CZMQ
         result
       end
       
-      # Create a CLIENT socket. Default action is connect.                              
-      # The caller is responsible for destroying the return value when finished with it.
+      # Create a CLIENT socket. Default action is connect.
       def self.new_client endpoint
         endpoint = String(endpoint)
         result = ::CZMQ::FFI.zsock_new_client endpoint

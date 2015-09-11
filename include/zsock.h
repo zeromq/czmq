@@ -102,14 +102,12 @@ CZMQ_EXPORT zsock_t *
 CZMQ_EXPORT zsock_t *
     zsock_new_stream (const char *endpoint);
 
-//  Create a SERVER socket. Default action is bind.                                 
-//  The caller is responsible for destroying the return value when finished with it.
+//  Create a SERVER socket. Default action is bind.
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_server (const char *endpoint);
 
-//  Create a CLIENT socket. Default action is connect.                              
-//  The caller is responsible for destroying the return value when finished with it.
+//  Create a CLIENT socket. Default action is connect.
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_client (const char *endpoint);

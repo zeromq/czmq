@@ -48,64 +48,64 @@ function android_build_check_fail {
 function android_build_env {
     ##
     # Check that necessary environment variables are set
-    
+
     if [ -z "$ANDROID_NDK_ROOT" ]; then
         ANDROID_BUILD_FAIL+=("Please set the ANDROID_NDK_ROOT environment variable")
         ANDROID_BUILD_FAIL+=("  (eg. \"/home/user/android/android-ndk-r9d\")")
     fi
-    
+
     if [ -z "$TOOLCHAIN_PATH" ]; then
         ANDROID_BUILD_FAIL+=("Please set the TOOLCHAIN_PATH environment variable")
         ANDROID_BUILD_FAIL+=("  (eg. \"/home/user/android/android-ndk-r9d/toolchains/arm-linux-androideabi-4.8/prebuilt/linux-x86_64/bin\")")
     fi
-    
+
     if [ -z "$TOOLCHAIN_NAME" ]; then
         ANDROID_BUILD_FAIL+=("Please set the TOOLCHAIN_NAME environment variable")
         ANDROID_BUILD_FAIL+=("  (eg. \"arm-linux-androideabi-4.8\")")
     fi
-    
+
     if [ -z "$TOOLCHAIN_HOST" ]; then
         ANDROID_BUILD_FAIL+=("Please set the TOOLCHAIN_HOST environment variable")
         ANDROID_BUILD_FAIL+=("  (eg. \"arm-linux-androideabi\")")
     fi
-    
+
     if [ -z "$TOOLCHAIN_ARCH" ]; then
         ANDROID_BUILD_FAIL+=("Please set the TOOLCHAIN_ARCH environment variable")
         ANDROID_BUILD_FAIL+=("  (eg. \"arm\")")
     fi
-    
+
     android_build_check_fail
-    
+
     ##
     # Check that directories given by environment variables exist
-    
+
     if [ ! -d "$ANDROID_NDK_ROOT" ]; then
         ANDROID_BUILD_FAIL+=("The ANDROID_NDK_ROOT directory does not exist")
         ANDROID_BUILD_FAIL+=("  ${ANDROID_NDK_ROOT}")
     fi
-    
+
     if [ ! -d "$TOOLCHAIN_PATH" ]; then
         ANDROID_BUILD_FAIL+=("The TOOLCHAIN_PATH directory does not exist")
         ANDROID_BUILD_FAIL+=("  ${TOOLCHAIN_PATH}")
     fi
-    
+
     ##
     # Set up some local variables and check them
-    
+
     ANDROID_BUILD_SYSROOT="${ANDROID_NDK_ROOT}/platforms/android-9/arch-${TOOLCHAIN_ARCH}"
-    
+
     if [ ! -d "$ANDROID_BUILD_SYSROOT" ]; then
         ANDROID_BUILD_FAIL+=("The ANDROID_BUILD_SYSROOT directory does not exist")
         ANDROID_BUILD_FAIL+=("  ${ANDROID_BUILD_SYSROOT}")
     fi
-    
+
     ANDROID_BUILD_PREFIX="${ANDROID_BUILD_DIR}/prefix/${TOOLCHAIN_NAME}"
-    
+
     mkdir -p "$ANDROID_BUILD_PREFIX" || {
         ANDROID_BUILD_FAIL+=("Failed to make ANDROID_BUILD_PREFIX directory")
         ANDROID_BUILD_FAIL+=("  ${ANDROID_BUILD_PREFIX}")
     }
-    
+
     android_build_check_fail
 }
 
@@ -117,42 +117,42 @@ function _android_build_opts_process_binaries {
     local AS="${TOOLCHAIN_PATH}/${TOOLCHAIN_HOST}-as"
     local AR="${TOOLCHAIN_PATH}/${TOOLCHAIN_HOST}-ar"
     local RANLIB="${TOOLCHAIN_PATH}/${TOOLCHAIN_HOST}-ranlib"
-    
+
     if [ ! -x "${CPP}" ]; then
         ANDROID_BUILD_FAIL+=("The CPP binary does not exist or is not executable")
         ANDROID_BUILD_FAIL+=("  ${CPP}")
     fi
-    
+
     if [ ! -x "${CC}" ]; then
         ANDROID_BUILD_FAIL+=("The CC binary does not exist or is not executable")
         ANDROID_BUILD_FAIL+=("  ${CC}")
     fi
-    
+
     if [ ! -x "${CXX}" ]; then
         ANDROID_BUILD_FAIL+=("The CXX binary does not exist or is not executable")
         ANDROID_BUILD_FAIL+=("  ${CXX}")
     fi
-    
+
     if [ ! -x "${LD}" ]; then
         ANDROID_BUILD_FAIL+=("The LD binary does not exist or is not executable")
         ANDROID_BUILD_FAIL+=("  ${LD}")
     fi
-    
+
     if [ ! -x "${AS}" ]; then
         ANDROID_BUILD_FAIL+=("The AS binary does not exist or is not executable")
         ANDROID_BUILD_FAIL+=("  ${AS}")
     fi
-    
+
     if [ ! -x "${AR}" ]; then
         ANDROID_BUILD_FAIL+=("The AR binary does not exist or is not executable")
         ANDROID_BUILD_FAIL+=("  ${AR}")
     fi
-    
+
     if [ ! -x "${RANLIB}" ]; then
         ANDROID_BUILD_FAIL+=("The RANLIB binary does not exist or is not executable")
         ANDROID_BUILD_FAIL+=("  ${RANLIB}")
     fi
-    
+
     ANDROID_BUILD_OPTS+=("CPP=${CPP}")
     ANDROID_BUILD_OPTS+=("CC=${CC}")
     ANDROID_BUILD_OPTS+=("CXX=${CXX}")
@@ -160,7 +160,7 @@ function _android_build_opts_process_binaries {
     ANDROID_BUILD_OPTS+=("AS=${AS}")
     ANDROID_BUILD_OPTS+=("AR=${AR}")
     ANDROID_BUILD_OPTS+=("RANLIB=${RANLIB}")
-    
+
     android_build_check_fail
 }
 
@@ -220,26 +220,26 @@ function _android_build_opts_process_cxx_stl {
 # Set the ANDROID_BUILD_OPTS variable to a bash array of configure options
 function android_build_opts {
     ANDROID_BUILD_OPTS=()
-    
+
     local CFLAGS="--sysroot=${ANDROID_BUILD_SYSROOT} -I${ANDROID_BUILD_PREFIX}/include"
     local CPPFLAGS="--sysroot=${ANDROID_BUILD_SYSROOT} -I${ANDROID_BUILD_PREFIX}/include"
     local CXXFLAGS="--sysroot=${ANDROID_BUILD_SYSROOT} -I${ANDROID_BUILD_PREFIX}/include"
     local LDFLAGS="-L${ANDROID_BUILD_PREFIX}/lib"
     local LIBS="-lc -lgcc -ldl"
-    
+
     _android_build_opts_process_binaries
     _android_build_opts_process_cxx_stl
-    
+
     ANDROID_BUILD_OPTS+=("CFLAGS=${CFLAGS} ${ANDROID_BUILD_EXTRA_CFLAGS}")
     ANDROID_BUILD_OPTS+=("CPPFLAGS=${CPPFLAGS} ${ANDROID_BUILD_EXTRA_CPPFLAGS}")
     ANDROID_BUILD_OPTS+=("CXXFLAGS=${CXXFLAGS} ${ANDROID_BUILD_EXTRA_CXXFLAGS}")
     ANDROID_BUILD_OPTS+=("LDFLAGS=${LDFLAGS} ${ANDROID_BUILD_EXTRA_LDFLAGS}")
     ANDROID_BUILD_OPTS+=("LIBS=${LIBS} ${ANDROID_BUILD_EXTRA_LIBS}")
-    
+
     ANDROID_BUILD_OPTS+=("PKG_CONFIG_PATH=${ANDROID_BUILD_PREFIX}/lib/pkgconfig")
     ANDROID_BUILD_OPTS+=("--host=${TOOLCHAIN_HOST}")
     ANDROID_BUILD_OPTS+=("--prefix=${ANDROID_BUILD_PREFIX}")
-    
+
     android_build_check_fail
 }
 
@@ -250,14 +250,14 @@ function android_build_opts {
 function android_build_verify_so {
     local soname="$1"
     shift # Get rid of first argument - the rest represent dependencies
-    
+
     local sofile="${ANDROID_BUILD_PREFIX}/lib/${soname}"
     if [ ! -f "${sofile}" ]; then
         ANDROID_BUILD_FAIL+=("Found no library named ${soname}")
         ANDROID_BUILD_FAIL+=("  ${sofile}")
     fi
     android_build_check_fail
-    
+
     if command -v readelf >/dev/null 2>&1 ; then
         local readelf_bin="readelf"
     elif command -v greadelf >/dev/null 2>&1 ; then
@@ -268,7 +268,7 @@ function android_build_verify_so {
     android_build_check_fail
 
     local elfoutput=$($readelf_bin -d ${sofile})
-    
+
     local soname_regexp='soname: \[([[:alnum:]\.]+)\]'
     if [[ $elfoutput =~ $soname_regexp ]]; then
         local parsed_soname="${BASH_REMATCH[1]}"
@@ -280,14 +280,14 @@ function android_build_verify_so {
         ANDROID_BUILD_FAIL+=("Failed to meaningfully parse readelf output for library ${soname}:")
         ANDROID_BUILD_FAIL+=("  ${elfoutput}")
     fi
-    
+
     for dep_soname do
         if [[ $elfoutput != *"library: [${dep_soname}]"* ]]; then
             ANDROID_BUILD_FAIL+=("Library ${soname} was expected to be linked to library with soname:")
             ANDROID_BUILD_FAIL+=("  ${dep_soname}")
         fi
     done
-    
+
     android_build_check_fail
 }
 
