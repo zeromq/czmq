@@ -84,13 +84,6 @@ include_directories(${ZEROMQ_INCLUDE_DIRS})
 list(APPEND MORE_LIBRARIES ${ZEROMQ_LIBRARIES})
 
 ########################################################################
-# UUID dependency
-########################################################################
-find_package(Uuid REQUIRED)
-include_directories(${UUID_INCLUDE_DIRS})
-list(APPEND MORE_LIBRARIES ${UUID_LIBRARIES})
-
-########################################################################
 # includes
 ########################################################################
 set (czmq_headers

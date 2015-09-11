@@ -68,7 +68,6 @@ fi
 # Verify shared libraries in prefix
 
 android_build_verify_so "libzmq.so"
-android_build_verify_so "libuuid.so"
 android_build_verify_so "libczmq.so" "libzmq.so"
 
 ################################################################################
