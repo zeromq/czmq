@@ -132,8 +132,8 @@ CZMQ_EXPORT zmsg_t *
 CZMQ_EXPORT void
     zmsg_remove (zmsg_t *self, zframe_t *frame);
 
-//  Set cursor to first frame in message. Returns frame, or NULL, if the 
-//  message is empty. Use this to navigate the frames as a list.         
+//  Set cursor to first frame in message. Returns frame, or NULL, if the
+//  message is empty. Use this to navigate the frames as a list.        
 CZMQ_EXPORT zframe_t *
     zmsg_first (zmsg_t *self);
 
@@ -154,9 +154,9 @@ CZMQ_EXPORT zframe_t *
 CZMQ_EXPORT int
     zmsg_save (zmsg_t *self, FILE *file);
 
-//  Load/append an open file into message, create new message if 
-//  null message provided. Returns NULL if the message could not 
-//  be loaded.                                                   
+//  Load/append an open file into message, create new message if
+//  null message provided. Returns NULL if the message could not
+//  be loaded.                                                  
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zmsg_t *
     zmsg_load (zmsg_t *self, FILE *file);

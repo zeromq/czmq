@@ -231,8 +231,8 @@ module CZMQ
         result
       end
       
-      # Set cursor to first frame in message. Returns frame, or NULL, if the 
-      # message is empty. Use this to navigate the frames as a list.         
+      # Set cursor to first frame in message. Returns frame, or NULL, if the
+      # message is empty. Use this to navigate the frames as a list.        
       def first
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zmsg_first @ptr
@@ -268,9 +268,9 @@ module CZMQ
         result
       end
       
-      # Load/append an open file into message, create new message if 
-      # null message provided. Returns NULL if the message could not 
-      # be loaded.                                                   
+      # Load/append an open file into message, create new message if
+      # null message provided. Returns NULL if the message could not
+      # be loaded.                                                  
       def self.load self_, file
         self_ = self_.__ptr if self_
         result = ::CZMQ::FFI.zmsg_load self_, file

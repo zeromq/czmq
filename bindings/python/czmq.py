@@ -1605,7 +1605,7 @@ decoding was not succesfull."""
         return lib.zmsg_remove(self._as_parameter_, frame)
 
     def first(self):
-        """Set cursor to first frame in message. Returns frame, or NULL, if the 
+        """Set cursor to first frame in message. Returns frame, or NULL, if the
 message is empty. Use this to navigate the frames as a list."""
         return Zframe(lib.zmsg_first(self._as_parameter_), False)
 
@@ -1619,7 +1619,7 @@ to the first frame call zmsg_first(). Advances the cursor."""
         return Zframe(lib.zmsg_last(self._as_parameter_), False)
 
     def save(self, file):
-        """Save message to an open file, return 0 if OK, else -1. The message is 
+        """Save message to an open file, return 0 if OK, else -1. The message is
 saved as a series of frames, each with length and data. Note that the
 file is NOT guaranteed to be portable between operating systems, not
 versions of CZMQ. The file format is at present undocumented and liable
@@ -1629,7 +1629,7 @@ to arbitrary change."""
     @staticmethod
     def load(self, file):
         """Load/append an open file into message, create new message if
-null message provided. Returns NULL if the message could not 
+null message provided. Returns NULL if the message could not
 be loaded."""
         return Zmsg(lib.zmsg_load(self, coerce_py_file(file)), True)
 
@@ -1643,7 +1643,7 @@ To decode a serialized message buffer, use zmsg_decode ()."""
     @staticmethod
     def decode(buffer, buffer_size):
         """Decodes a serialized message buffer created by zmsg_encode () and returns
-a new zmsg_t object. Returns NULL if the buffer was badly formatted or 
+a new zmsg_t object. Returns NULL if the buffer was badly formatted or
 there was insufficient memory to work."""
         return Zmsg(lib.zmsg_decode(buffer, buffer_size), True)
 
@@ -1857,14 +1857,12 @@ action is connect."""
 
     @staticmethod
     def new_server(endpoint):
-        """Create a SERVER socket. Default action is bind.
-The caller is responsible for destroying the return value when finished with it."""
+        """Create a SERVER socket. Default action is bind."""
         return Zsock(lib.zsock_new_server(endpoint), True)
 
     @staticmethod
     def new_client(endpoint):
-        """Create a CLIENT socket. Default action is connect.
-The caller is responsible for destroying the return value when finished with it."""
+        """Create a CLIENT socket. Default action is connect."""
         return Zsock(lib.zsock_new_client(endpoint), True)
 
     def bind(self, format, *args):

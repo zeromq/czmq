@@ -122,8 +122,8 @@ void QmlZmsg::remove (QmlZframe *frame) {
 };
 
 ///
-//  Set cursor to first frame in message. Returns frame, or NULL, if the 
-//  message is empty. Use this to navigate the frames as a list.         
+//  Set cursor to first frame in message. Returns frame, or NULL, if the
+//  message is empty. Use this to navigate the frames as a list.        
 QmlZframe *QmlZmsg::first () {
     QmlZframe *retQ_ = new QmlZframe ();
     retQ_->self = zmsg_first (self);
@@ -234,9 +234,9 @@ int QmlZmsgAttached::sendm (QmlZmsg *selfP, void *dest) {
 };
 
 ///
-//  Load/append an open file into message, create new message if 
-//  null message provided. Returns NULL if the message could not 
-//  be loaded.                                                   
+//  Load/append an open file into message, create new message if
+//  null message provided. Returns NULL if the message could not
+//  be loaded.                                                  
 QmlZmsg *QmlZmsgAttached::load (QmlZmsg *self, FILE *file) {
     QmlZmsg *retQ_ = new QmlZmsg ();
     retQ_->self = zmsg_load (self->self, file);
