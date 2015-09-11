@@ -48,6 +48,11 @@ This is the class interface:
     CZMQ_EXPORT int
         zframe_send (zframe_t **self_p, void *dest, int flags);
     
+    //  Send a reply frame to a server socket, copy the routing id from source message, destroy frame after sending.
+    //  Return -1 on error, 0 on success.                                                                           
+    CZMQ_EXPORT int
+        zframe_send_reply (zframe_t **self_p, zframe_t *source_msg, void *dest, int flags);
+    
     //  Return number of bytes in frame data
     CZMQ_EXPORT size_t
         zframe_size (zframe_t *self);
@@ -87,6 +92,15 @@ This is the class interface:
     //  frame to socket, you have to specify flag explicitly.                
     CZMQ_EXPORT void
         zframe_set_more (zframe_t *self, int more);
+    
+    //  Return frame routing id, set when reading frame from server socket
+    //  or by the zframe_set_routing_id() method.                         
+    CZMQ_EXPORT size_t
+        zframe_routing_id (zframe_t *self);
+    
+    //  Set frame routing id. Only relevant when sending to server socket.
+    CZMQ_EXPORT void
+        zframe_set_routing_id (zframe_t *self, size_t routing_id);
     
     //  Return TRUE if two frames have identical size and data
     //  If either frame is NULL, equality is always false.    
@@ -178,5 +192,37 @@ This is the class self test code:
     
     zsock_destroy (&input);
     zsock_destroy (&output);
+    
+    #if ZMQ_VERSION_MAJOR >= 4 && ZMQ_VERSION_MINOR >= 2
+    
+    //  Create server and client sockets and connect over inproc
+    zsock_t *server = zsock_new_server ("@inproc://zframe-server.test");
+    assert (server);
+    zsock_t *client = zsock_new_client (">inproc://zframe-server.test");
+    assert (client);
+    
+    //  Send message from client to server
+    frame = zframe_new ("Hello", 5);
+    assert (frame);
+    rc = zframe_send (&frame, client, 0);
+    assert (rc == 0);
+    
+    //  Read message
+    frame = zframe_recv (server);
+    assert (zframe_streq (frame, "Hello"));
+    zframe_t *reply_frame = zframe_new("Reply", 5);
+    rc = zframe_send_reply(&reply_frame, frame, server, 0);
+    assert(rc == 0);
+    zframe_destroy(&frame);
+    
+    //  Read reply
+    frame = zframe_recv (client);
+    assert (zframe_streq (frame, "Reply"));
+    zframe_destroy(&frame);
+    
+    zsock_destroy (&client);
+    zsock_destroy (&server);
+    
+    #endif
     
 

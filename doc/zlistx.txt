@@ -34,6 +34,14 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT size_t
     zlistx_size (zlistx_t *self);
 
+//  Return first item in the list, or null, leaves the cursor
+CZMQ_EXPORT void *
+    zlistx_head (zlistx_t *self);
+
+//  Return last item in the list, or null, leaves the cursor
+CZMQ_EXPORT void *
+    zlistx_tail (zlistx_t *self);
+
 //  Return the item at the head of list. If the list is empty, returns NULL.
 //  Leaves cursor pointing at the head item, or NULL if the list is empty.
 CZMQ_EXPORT void *
