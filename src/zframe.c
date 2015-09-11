@@ -332,7 +332,7 @@ zframe_routing_id (zframe_t *self)
 #if defined ZMQ_SERVER
     assert (self);
     assert (zframe_is (self));
-    return zmq_msg_get_routing_id (&self->zmsg);
+    return zmq_msg_routing_id (&self->zmsg);
 #else
     return 0;
 #endif
