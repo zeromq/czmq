@@ -178,7 +178,6 @@ zsys_init (void)
     //  We use zmq_init/zmq_term to keep compatibility back to ZMQ v2
     s_process_ctx = zmq_init ((int) s_io_threads);
 #if defined (ZMQ_MAX_SOCKETS)
-    zsys_info ("SETTING MAX SOCKETS: %d", (int) s_max_sockets);
     zmq_ctx_set (s_process_ctx, ZMQ_MAX_SOCKETS, (int) s_max_sockets);
 #endif
     s_initialized = true;
@@ -1164,7 +1163,6 @@ zsys_set_io_threads (size_t io_threads)
     s_io_threads = io_threads;
     s_process_ctx = zmq_init ((int) s_io_threads);
 #if defined (ZMQ_MAX_SOCKETS)
-    zsys_info ("SETTING MAX SOCKETS: %d", (int) s_max_sockets);
     zmq_ctx_set (s_process_ctx, ZMQ_MAX_SOCKETS, (int) s_max_sockets);
 #endif
     ZMUTEX_UNLOCK (s_mutex);
@@ -1188,7 +1186,6 @@ zsys_set_max_sockets (size_t max_sockets)
     assert (s_open_sockets == 0);
     s_max_sockets = max_sockets? max_sockets: zsys_socket_limit ();
 #if defined (ZMQ_MAX_SOCKETS)
-    zsys_info ("SETTING MAX SOCKETS: %d", (int) s_max_sockets);
     zmq_ctx_set (s_process_ctx, ZMQ_MAX_SOCKETS, (int) s_max_sockets);
 #endif
     ZMUTEX_UNLOCK (s_mutex);

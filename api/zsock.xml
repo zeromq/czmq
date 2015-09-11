@@ -23,7 +23,7 @@
     <method name = "new pub" singleton = "1">
         Create a PUB socket. Default action is bind.
         <argument name = "endpoint" type = "string" />
-        <return type = "zsock" fresh="1" />
+        <return type = "zsock" fresh = "1" />
     </method>
 
     <method name = "new sub" singleton = "1">
@@ -31,79 +31,77 @@
         action is connect.
         <argument name = "endpoint" type = "string" />
         <argument name = "subscribe" type = "string" />
-        <return type = "zsock" fresh="1" />
+        <return type = "zsock" fresh = "1" />
     </method>
 
     <method name = "new req" singleton = "1">
         Create a REQ socket. Default action is connect.
         <argument name = "endpoint" type = "string" />
-        <return type = "zsock" fresh="1" />
+        <return type = "zsock" fresh = "1" />
     </method>
 
     <method name = "new rep" singleton = "1">
         Create a REP socket. Default action is bind.
         <argument name = "endpoint" type = "string" />
-        <return type = "zsock" fresh="1" />
+        <return type = "zsock" fresh = "1" />
     </method>
 
     <method name = "new dealer" singleton = "1">
         Create a DEALER socket. Default action is connect.
         <argument name = "endpoint" type = "string" />
-        <return type = "zsock" fresh="1" />
+        <return type = "zsock" fresh = "1" />
     </method>
 
     <method name = "new router" singleton = "1">
         Create a ROUTER socket. Default action is bind.
         <argument name = "endpoint" type = "string" />
-        <return type = "zsock" fresh="1" />
+        <return type = "zsock" fresh = "1" />
     </method>
 
     <method name = "new push" singleton = "1">
         Create a PUSH socket. Default action is connect.
         <argument name = "endpoint" type = "string" />
-        <return type = "zsock" fresh="1" />
+        <return type = "zsock" fresh = "1" />
     </method>
 
     <method name = "new pull" singleton = "1">
         Create a PULL socket. Default action is bind.
         <argument name = "endpoint" type = "string" />
-        <return type = "zsock" fresh="1" />
+        <return type = "zsock" fresh = "1" />
     </method>
 
     <method name = "new xpub" singleton = "1">
         Create an XPUB socket. Default action is bind.
         <argument name = "endpoint" type = "string" />
-        <return type = "zsock" fresh="1" />
+        <return type = "zsock" fresh = "1" />
     </method>
 
     <method name = "new xsub" singleton = "1">
         Create an XSUB socket. Default action is connect.
         <argument name = "endpoint" type = "string" />
-        <return type = "zsock" fresh="1" />
+        <return type = "zsock" fresh = "1" />
     </method>
 
     <method name = "new pair" singleton = "1">
         Create a PAIR socket. Default action is connect.
         <argument name = "endpoint" type = "string" />
-        <return type = "zsock" fresh="1" />
+        <return type = "zsock" fresh = "1" />
     </method>
 
     <method name = "new stream" singleton = "1">
         Create a STREAM socket. Default action is connect.
         <argument name = "endpoint" type = "string" />
-        <return type = "zsock" fresh="1" />
+        <return type = "zsock" fresh = "1" />
     </method>
 
     <method name = "new server" singleton = "1">
         Create a SERVER socket. Default action is bind.
-        The caller is responsible for destroying the return value when finished with it.
         <argument name = "endpoint" type = "string" />
         <return type = "zsock" fresh = "1" />
     </method>
 
     <method name = "new client" singleton = "1">
         Create a CLIENT socket. Default action is connect.
-        The caller is responsible for destroying the return value when finished with it.
         <argument name = "endpoint" type = "string" />
         <return type = "zsock" fresh = "1" />
     </method>
