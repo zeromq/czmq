@@ -145,7 +145,7 @@
     </method>
 
     <method name = "first">
-        Set cursor to first frame in message. Returns frame, or NULL, if the 
+        Set cursor to first frame in message. Returns frame, or NULL, if the
         message is empty. Use this to navigate the frames as a list.
         <return type = "zframe" />
     </method>
@@ -162,7 +162,7 @@
     </method>
 
     <method name = "save">
-        Save message to an open file, return 0 if OK, else -1. The message is 
+        Save message to an open file, return 0 if OK, else -1. The message is
         saved as a series of frames, each with length and data. Note that the
         file is NOT guaranteed to be portable between operating systems, not
         versions of CZMQ. The file format is at present undocumented and liable
@@ -171,9 +171,9 @@
         <return type = "integer" />
     </method>
 
-    <method name = "load" singleton="1">
+    <method name = "load" singleton = "1">
         Load/append an open file into message, create new message if
-        null message provided. Returns NULL if the message could not 
+        null message provided. Returns NULL if the message could not
         be loaded.
         <argument name = "self" type = "zmsg" />
         <argument name = "file" type = "FILE" />
@@ -191,7 +191,7 @@
 
     <method name = "decode" singleton = "1">
         Decodes a serialized message buffer created by zmsg_encode () and returns
-        a new zmsg_t object. Returns NULL if the buffer was badly formatted or 
+        a new zmsg_t object. Returns NULL if the buffer was badly formatted or
         there was insufficient memory to work.
         <argument name = "buffer" type = "buffer" />
         <argument name = "buffer size" type = "size" />
