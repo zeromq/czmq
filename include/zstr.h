@@ -64,6 +64,10 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zstr_recvx (void *source, char **string_p, ...);
 
+//  Concatenates a series of strings (until NULL) to a newly allocated string.
+CZMQ_EXPORT char *
+   zstr_concat (char *first, ...);
+
 //  Free a provided string, and nullify the parent pointer. Safe to call on
 //  a null pointer.
 CZMQ_EXPORT void

@@ -216,6 +216,41 @@ zstr_recvx (void *source, char **string_p, ...)
 
 
 //  --------------------------------------------------------------------------
+//  Concatenates a series of strings (until NULL) to a newly allocated string.
+
+char *
+zstr_concat (char *first, ...)
+{
+    assert (first);
+    char *sn;
+    size_t len;
+    va_list args;
+    //  Measure the resulting string size
+    len = strlen (first) + 1;  // +1 for trailing '\0'
+    va_start (args, first);
+    sn = va_arg (args, char *);
+    while (sn) {
+        len = strlen (sn);
+        sn = va_arg (args, char *);
+    }
+    va_end (args);
+    //  Allocate new string
+    char *result = (char *) zmalloc (len * sizeof (char));
+    assert (result);
+    //  Concatenate the strings
+    (void) strcat (result, first);
+    va_start (args, first);
+    sn = va_arg (args, char *);
+    while (sn) {
+        (void) strcat (result, sn);
+        sn = va_arg (args, char *);
+    }
+    va_end (args);
+    return result;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Free a provided string, and nullify the parent pointer. Safe to call on
 //  a null pointer.
 
@@ -290,6 +325,11 @@ zstr_test (bool verbose)
         zstr_free (&string);
     }
     assert (string_nbr == 15);
+
+    //  Concatenate a series of strings
+    char *hw = zstr_concat ("Hello", " ",  "World", "!", NULL);
+    assert (streq ("Hello World!", hw));
+    free (hw);
 
     zsock_destroy (&input);
     zsock_destroy (&output);
