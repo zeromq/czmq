@@ -31,9 +31,10 @@
 #define MODE_LOOKUP 1
 #define MODE_MATCH  2
 
-#define NODE_TYPE_STRING 0  //  Node with string token
-#define NODE_TYPE_REGEX  1  //  Node with regex token
-#define NODE_TYPE_PARAM  2  //  Node with regex token and capturing group
+#define NODE_TYPE_STRING    0  //  Node with string token
+#define NODE_TYPE_REGEX     1  //  Node with regex token
+#define NODE_TYPE_PARAM     2  //  Node with named regex token and capturing group(s)
+#define NODE_TYPE_ASTERISK  3  //  Node with an asterisk, to match routes of variable length
 
 #define MIN_LEN(x,y) \
     y + ((x - y) & ((x - y) >>(sizeof(int) * CHAR_BIT - 1)))
@@ -41,14 +42,15 @@
 //  Trie node, used internally only
 
 typedef struct _ztrie_node_t {
-    char *token;         //  Part of an path between to delemiters e.g. '/{token}/'
-    int token_type;      //  Type of the token, string or regex
-    int token_len;       //  Number of characters in the token
-    size_t path_len;     //  Length of the path including this token
+    char *token;         //  Part of a path between to delemiters e.g. '/{token}/'
+    int token_type;      //  Type of the token, string, regex, asterisk
+    int token_len;       //  Number of characters of the token
+    size_t path_len;     //  Length of the path/route including this token
     bool endpoint;       //  Has a path been added that routes to this node?
     size_t parameter_count;  //  How many regex parameters does this token contain?
     char **parameter_names;  //  Names of the regex parameters for easy access at matching time
     char **parameter_values; //  Values of the parameters
+    char *asterisk_match;    //  Matched asterisk route
     zrex_t *regex;           //  Compiled regex
     void *data;              //  Custom arbitrary data assoziated with a route
     ztrie_destroy_data_fn *destroy_data_fn;  // Callback to destroy custom data
@@ -86,7 +88,7 @@ s_ztrie_node_compare (const void *item1, const void *item2) {
             return -1;
     }
     else
-        return same;
+         return same;
 }
 
 
@@ -147,7 +149,8 @@ s_ztrie_node_destroy (ztrie_node_t **self_p)
         ztrie_node_t *self = *self_p;
 
         //  Free class properties
-        free (self->token);
+        zstr_free (&self->token);
+        zstr_free (&self->asterisk_match);
         if (self->parameter_count > 0) {
             for (int i = 0; i < self->parameter_count; i++) {
                 free (self->parameter_names [i]);
@@ -265,6 +268,11 @@ s_ztrie_matches_token (ztrie_node_t *parent, char *token, int len)
                 && strncmp (child->token, token, MIN_LEN (child->token_len, len)) == 0)
                     return child;
         }
+        else
+        if (child->token_type == NODE_TYPE_ASTERISK) {
+            child->asterisk_match = strdup (token);
+            return child;
+        }
         else {
             //  Need to copy token as zrex_matches expects '\0' terminated string
             char *token_term = strndup (token, len);
@@ -324,7 +332,7 @@ s_ztrie_parse_path (ztrie_t *self, char *path, int mode)
     while (needle < needle_stop + 1) {
         //  It is valid not to have an delimiter at the end of the path
         if (*needle == self->delimiter || needle == needle_stop) {
-            //  token starts with delimiter ignore everything that comes before
+            //  Token starts with delimiter ignore everything that comes before
             if (state == 0) {
                 beginToken = needle + 1;
                 state++;
@@ -334,7 +342,7 @@ s_ztrie_parse_path (ztrie_t *self, char *path, int mode)
                     // performance boost for matching.
                     state++;
             }
-            //  token ends with delimiter.
+            //  Token ends with delimiter.
             else
             if (state < 3) {
                 int matchType = zlistx_size (self->params) > 0 ? NODE_TYPE_PARAM :
@@ -345,27 +353,55 @@ s_ztrie_parse_path (ztrie_t *self, char *path, int mode)
                 if (matchTokenLen == 0)
                     return NULL;
                 ztrie_node_t *match = NULL;
-                //  In insert mode only do a string comparison
+                //  Asterisk nodes are only allowed at the end of a route
+                if (needle == needle_stop && *matchToken == '*') {
+                    if (zlistx_size (parent->children) == 0) {
+                        matchType = NODE_TYPE_ASTERISK;
+                        matchToken = needle - 1;
+                        matchTokenLen = 1;
+                    }
+                    //  Asterisk must be a leaf in the tree
+                    else
+                        return NULL;
+                }
+                else {
+                    matchType = zlistx_size (self->params) > 0 ? NODE_TYPE_PARAM :
+                                        beginRegex ? NODE_TYPE_REGEX : NODE_TYPE_STRING;
+                    matchToken = beginRegex ? beginRegex : beginToken;
+                    matchTokenLen = needle - matchToken - (beginRegex ? 1 : 0);
+                }
+
+                //  In insert and lookup mode only do a string comparison
                 if (mode == MODE_INSERT || mode == MODE_LOOKUP)
                     match = s_ztrie_compare_token (parent, matchToken, matchTokenLen);
-                //  Otherwise evaluate regexes
                 else
+                //  Otherwise evaluate regexes
+                if (mode == MODE_MATCH)
                     match = s_ztrie_matches_token (parent, matchToken, matchTokenLen);
+
                 //  Mismatch behavior depends on mode
                 if (!match) {
                     //  Append to common prefix
                     if (mode == MODE_INSERT) {
+                        //  It's not allowed to append on asterisk
+                        if (parent->token_type == NODE_TYPE_ASTERISK ||
+                                (zlistx_size (parent->children) == 1 &&
+                                ((ztrie_node_t *) (zlistx_first (parent->children)))->token_type == NODE_TYPE_ASTERISK))
+                            return NULL;
                         parent = s_ztrie_node_new (parent, matchToken, matchTokenLen, self->params, matchType);
                     }
+                    else
                     //  No match for path found
-                    if (mode == MODE_MATCH || mode == MODE_LOOKUP) {
-                        parent = NULL;
-                        break;
-                    }
+                    if (mode == MODE_MATCH || mode == MODE_LOOKUP)
+                        return NULL;
                 }
                 //  If a match has been found it becomes the parent for next path token
-                else
+                else {
                     parent = match;
+                    //  In case a asterisk match has been made skip the rest of the route
+                    if (parent->token_type == NODE_TYPE_ASTERISK)
+                        break;
+                }
                 //  Cleanup for next token
                 beginRegex = NULL;
                 if (zlistx_size (self->params) > 0)
@@ -526,6 +562,19 @@ ztrie_hit_parameters (ztrie_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  Returns the asterisk matched part of a route, if there has been no match
+//  or no asterisk match, returns NULL.
+
+char *
+ztrie_hit_asterisk_match (ztrie_t *self)
+{
+    assert (self);
+    if (self->match)
+        return self->match->asterisk_match;
+    return NULL;
+}
+
+//  --------------------------------------------------------------------------
 //  Print properties of the ztrie object.
 //
 static void
@@ -574,6 +623,7 @@ ztrie_print (ztrie_t *self)
     s_ztrie_print_tree (self->root);
 }
 
+
 //  --------------------------------------------------------------------------
 //  Self test of this class.
 
@@ -581,7 +631,6 @@ void
 ztrie_test (bool verbose)
 {
     printf (" * ztrie: ");
-
     //  @selftest
     //  Create a new trie for matching strings that can be tokenized by a slash
     //  (e.g. URLs minus the protocol, address and port).
@@ -600,15 +649,23 @@ ztrie_test (bool verbose)
     ret = ztrie_insert_route (self, "/foo/bar", &foo_bar_data, NULL);
     assert (ret == 0);
 
-    //  Now suppose we like to match all routes that start with '/foo' but aren't
-    //  '/foo/bar'. This is possible by using regular expressions which are enclosed
-    //  in an opening and closing curly bracket. Tokens that contain regular
-    //  expressions are always match after string based tokens.
-    //  Note: There is no order in which regular expressions are sorted thus if you
-    //  enter multiple expressions for a route you will have to make sure they don't
-    //  have overlapping results. For example '{/foo/{[^/]+}' and '{/foo/{\d+}.
+    //  Now suppose we like to match all routes with two tokens that start with
+    //  '/foo/' but aren't '/foo/bar'. This is possible by using regular
+    //  expressions which are enclosed in an opening and closing curly bracket.
+    //  Tokens that contain regular  expressions are always match after string
+    //  based tokens.
+    //  Note: There is no order in which regular expressions are sorted thus
+    //  if you enter multiple expressions for a route you will have to make
+    //  sure they don't have overlapping results. For example '/foo/{[^/]+}'
+    //  and '/foo/{\d+} having could turn out badly.
     int foo_other_data = 100;
     ret = ztrie_insert_route (self, "/foo/{[^/]+}", &foo_other_data, NULL);
+    assert (ret == 0);
+
+    //  Regular expression are only matched against tokens of the same level.
+    //  This allows us to append to are route with a regular expression as if
+    //  it were a string.
+    ret = ztrie_insert_route (self, "/foo/{[^/]+}/gulp", NULL, NULL);
     assert (ret == 0);
 
     //  Routes are identified by their endpoint, which is the last token of the route.
@@ -651,7 +708,7 @@ ztrie_test (bool verbose)
     //  by a colon from the regular expression. The first one in this examples is named
     //  'name' and names the expression '[^/]'. If there is no capturing group defined in
     //  the expression the whole matched string will be associated with this parameter. In
-    //  case you don't like the get the whole matched string use a capturing group like
+    //  case you don't like the get the whole matched string use a capturing group, like
     //  it has been done for the 'id' parameter. This is nice but you can even match as
     //  many parameter for a token as you like. Therefore simply put the parameter names
     //  separated by colons in front of the regular expression and make sure to add a
@@ -661,6 +718,29 @@ ztrie_test (bool verbose)
     sprintf (data, "%s", "Hello World!");
     ret = ztrie_insert_route (self, "/baz/{name:[^/]+}/{id:--(\\d+)}/{street:nr:(\\a+)(\\d+)}", data, NULL);
     assert (ret == 0);
+
+    //  There is a lot you can do with regular expression but matching routes
+    //  of arbitrary length wont work. Therefore we make use of the asterisk
+    //  operator. Just place it at the end of your route, e.g. '/config/bar/*'.
+    ret = ztrie_insert_route (self, "/config/bar/*", NULL, NULL);
+    assert (ret == 0);
+
+    //  Appending to an asterisk as you would to with a regular expression
+    //  isn't valid.
+    ret = ztrie_insert_route (self, "/config/bar/*/bar", NULL, NULL);
+    assert (ret == -1);
+
+    //  The asterisk operator will only work as a leaf in the tree. If you
+    //  enter an asterisk in the middle of your route it will simply be
+    //  interpreted as a string.
+    ret = ztrie_insert_route (self, "/test/*/bar", NULL, NULL);
+    assert (ret == 0);
+
+    //  If a parent has an asterisk as child it is not allowed to have
+    //  other siblings.
+    ret = ztrie_insert_route (self, "/config/bar/foo/glup", NULL, NULL);
+    assert (ret != 0);
+    ztrie_print (self);
 
     //  Test matches
     bool hasMatch = false;
@@ -693,7 +773,13 @@ ztrie_test (bool verbose)
     assert (streq ("23", (char *) zhashx_lookup (parameters, "nr")));
     zhashx_destroy (&parameters);
 
-    free (data);
+    //  This will match our asterisk route '/config/bar/*'. As the result we
+    //  can obtain the asterisk matched part of the route.
+    hasMatch = ztrie_matches (self, "/config/bar/foo/bar");
+    assert (hasMatch);
+    assert (streq (ztrie_hit_asterisk_match (self), "foo/bar"));
+
+    zstr_free (&data);
     ztrie_destroy (&self);
     //  @end
 
