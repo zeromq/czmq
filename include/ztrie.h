@@ -53,13 +53,18 @@ CZMQ_EXPORT void *
 
 //  Returns the count of parameters that a matched route has.
 CZMQ_EXPORT size_t
-ztrie_hit_parameter_count (ztrie_t *self);
+   ztrie_hit_parameter_count (ztrie_t *self);
 
 //  Returns the parameters of a matched route with named regexes from last
 //  ztrie_matches. If the path did not match or the route did not contain any
 //  named regexes, returns NULL.
 CZMQ_EXPORT zhashx_t *
     ztrie_hit_parameters (ztrie_t *self);
+
+//  Returns the asterisk matched part of a route, if there has been no match
+//  or no asterisk match, returns NULL.
+CZMQ_EXPORT char *
+   ztrie_hit_asterisk_match (ztrie_t *self);
 
 //  Print properties of object
 CZMQ_EXPORT void

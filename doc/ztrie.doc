@@ -42,13 +42,18 @@ This is the class interface:
     
     //  Returns the count of parameters that a matched route has.
     CZMQ_EXPORT size_t
-    ztrie_hit_parameter_count (ztrie_t *self);
+       ztrie_hit_parameter_count (ztrie_t *self);
     
     //  Returns the parameters of a matched route with named regexes from last
     //  ztrie_matches. If the path did not match or the route did not contain any
     //  named regexes, returns NULL.
     CZMQ_EXPORT zhashx_t *
         ztrie_hit_parameters (ztrie_t *self);
+    
+    //  Returns the asterisk matched part of a route, if there has been no match
+    //  or no asterisk match, returns NULL.
+    CZMQ_EXPORT char *
+       ztrie_hit_asterisk_match (ztrie_t *self);
     
     //  Print properties of object
     CZMQ_EXPORT void
@@ -77,25 +82,44 @@ This is the class self test code:
     ret = ztrie_insert_route (self, "/foo/bar", &foo_bar_data, NULL);
     assert (ret == 0);
     
-    //  Now suppose we like to match all routes that start with '/foo' but aren't
-    //  '/foo/bar'. This is possible by using regular expressions which are enclosed
-    //  in an opening and closing curly bracket. Tokens that contain regular
-    //  expressions are always match after string based tokens.
-    //  Note: There is no order in which regular expressions are sorted thus if you
-    //  enter multiple expressions for a route you will have to make sure they don't
-    //  have overlapping results. For example '{/foo/{[^/]+}' and '{/foo/{\d+}.
+    //  Now suppose we like to match all routes with two tokens that start with
+    //  '/foo/' but aren't '/foo/bar'. This is possible by using regular
+    //  expressions which are enclosed in an opening and closing curly bracket.
+    //  Tokens that contain regular  expressions are always match after string
+    //  based tokens.
+    //  Note: There is no order in which regular expressions are sorted thus
+    //  if you enter multiple expressions for a route you will have to make
+    //  sure they don't have overlapping results. For example '/foo/{[^/]+}'
+    //  and '/foo/{\d+} having could turn out badly.
     int foo_other_data = 100;
     ret = ztrie_insert_route (self, "/foo/{[^/]+}", &foo_other_data, NULL);
     assert (ret == 0);
     
+    //  Regular expression are only matched against tokens of the same level.
+    //  This allows us to append to are route with a regular expression as if
+    //  it were a string.
+    ret = ztrie_insert_route (self, "/foo/{[^/]+}/gulp", NULL, NULL);
+    assert (ret == 0);
+    
     //  Routes are identified by their endpoint, which is the last token of the route.
     //  It is possible to insert routes for a node that already exists but isn't an
-    //  endpoint yet.
-    ret = ztrie_insert_route (self, "/foo", NULL, NULL);
+    //  endpoint yet. The delimiter at the end of a route is optional and has no effect.
+    ret = ztrie_insert_route (self, "/foo/", NULL, NULL);
     assert (ret == 0);
     
     //  If you try to insert a route which already exists the method will return -1.
     ret = ztrie_insert_route (self, "/foo", NULL, NULL);
+    assert (ret == -1);
+    
+    //  It is not allowed to insert routes with empty tokens.
+    ret = ztrie_insert_route (self, "//foo", NULL, NULL);
+    assert (ret == -1);
+    
+    //  Everything before the first delimiter is ignored so 'foo/bar/baz' is equivalent
+    //  to '/bar/baz'.
+    ret = ztrie_insert_route (self, "foo/bar/baz", NULL, NULL);
+    assert (ret == 0);
+    ret = ztrie_insert_route (self, "/bar/baz", NULL, NULL);
     assert (ret == -1);
     
     //  Of course you are allowed to remove routes, in case there is data associated with a
@@ -114,11 +138,11 @@ This is the class self test code:
     //  Next we like to match a path by regular expressions and also extract matched
     //  parts of a route. This can be done by naming the regular expression. The name of a
     //  regular expression is entered at the beginning of the curly brackets and separated
-    //  by a colon from the regular expression. The fist one in this examples is named
+    //  by a colon from the regular expression. The first one in this examples is named
     //  'name' and names the expression '[^/]'. If there is no capturing group defined in
     //  the expression the whole matched string will be associated with this parameter. In
-    //  case you don't like the get the whole matched string use a capturing group like
-    //  it have been done for the 'id' parameter. This is nice but you can even match as
+    //  case you don't like the get the whole matched string use a capturing group, like
+    //  it has been done for the 'id' parameter. This is nice but you can even match as
     //  many parameter for a token as you like. Therefore simply put the parameter names
     //  separated by colons in front of the regular expression and make sure to add a
     //  capturing group for each parameter. The first parameter will be associated with
@@ -127,6 +151,29 @@ This is the class self test code:
     sprintf (data, "%s", "Hello World!");
     ret = ztrie_insert_route (self, "/baz/{name:[^/]+}/{id:--(\\d+)}/{street:nr:(\\a+)(\\d+)}", data, NULL);
     assert (ret == 0);
+    
+    //  There is a lot you can do with regular expression but matching routes
+    //  of arbitrary length wont work. Therefore we make use of the asterisk
+    //  operator. Just place it at the end of your route, e.g. '/config/bar/*'.
+    ret = ztrie_insert_route (self, "/config/bar/*", NULL, NULL);
+    assert (ret == 0);
+    
+    //  Appending to an asterisk as you would to with a regular expression
+    //  isn't valid.
+    ret = ztrie_insert_route (self, "/config/bar/*/bar", NULL, NULL);
+    assert (ret == -1);
+    
+    //  The asterisk operator will only work as a leaf in the tree. If you
+    //  enter an asterisk in the middle of your route it will simply be
+    //  interpreted as a string.
+    ret = ztrie_insert_route (self, "/test/*/bar", NULL, NULL);
+    assert (ret == 0);
+    
+    //  If a parent has an asterisk as child it is not allowed to have
+    //  other siblings.
+    ret = ztrie_insert_route (self, "/config/bar/foo/glup", NULL, NULL);
+    assert (ret != 0);
+    ztrie_print (self);
     
     //  Test matches
     bool hasMatch = false;
@@ -159,6 +206,12 @@ This is the class self test code:
     assert (streq ("23", (char *) zhashx_lookup (parameters, "nr")));
     zhashx_destroy (&parameters);
     
-    free (data);
+    //  This will match our asterisk route '/config/bar/*'. As the result we
+    //  can obtain the asterisk matched part of the route.
+    hasMatch = ztrie_matches (self, "/config/bar/foo/bar");
+    assert (hasMatch);
+    assert (streq (ztrie_hit_asterisk_match (self), "foo/bar"));
+    
+    zstr_free (&data);
     ztrie_destroy (&self);
 
