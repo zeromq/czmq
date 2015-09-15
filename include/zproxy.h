@@ -73,6 +73,26 @@ extern "C" {
 //      zstr_sendx (proxy, "RESUME", NULL);
 //      zsock_wait (proxy);
 //
+//  Configure an authentication domain for the "FRONTEND" or "BACKEND" proxy
+//  socket -- see zsock_set_zap_domain (). Call before binding socket:
+//
+//      zstr_sendx (proxy, "DOMAIN", "FRONTEND", "global", NULL);
+//      zsock_wait (proxy);
+//
+//  Configure PLAIN authentication for the "FRONTEND" or "BACKEND" proxy
+//  socket -- see zsock_set_plain_server (). Call before binding socket:
+//
+//      zstr_sendx (proxy, "PLAIN", "BACKEND", NULL);
+//      zsock_wait (proxy);
+//
+//  Configure CURVE authentication for the "FRONTEND" or "BACKEND" proxy
+//  socket -- see zsock_set_curve_server () -- specifying both the public and
+//  secret keys of a certificate as Z85 armored strings -- see
+//  zcert_public_txt () and zcert_secret_txt (). Call before binding socket:
+//
+//      zstr_sendx (proxy, "CURVE", "FRONTEND", public_txt, secret_txt, NULL);
+//      zsock_wait (proxy);
+//
 //  This is the zproxy constructor as a zactor_fn; the argument is a
 //  character string specifying frontend and backend socket types as two
 //  uppercase strings separated by a hyphen:
