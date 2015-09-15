@@ -377,6 +377,13 @@ s_get_available_port (zsock_t **server)
     assert (*server);
     int port_nbr = zsock_bind (*server, "tcp://127.0.0.1:*");
     assert (port_nbr > 0);
+
+    // Make port more random for better results during parallel CI testing
+    if (port_nbr < 65535) {
+        srand ((unsigned) time (NULL));
+        port_nbr += rand() % (65535 - port_nbr);
+    }
+
     return port_nbr;
 }
 
