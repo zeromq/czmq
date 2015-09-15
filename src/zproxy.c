@@ -196,7 +196,7 @@ s_self_configure (self_t *self, zsock_t **sock_p, zmsg_t *request, proxy_socket 
     char *endpoints = zmsg_popstr (request);
     assert (endpoints);
     if (self->verbose)
-        zsys_info ("zproxy: - %s type=%s attach=%s authentication=%s", 
+        zsys_info ("zproxy: - %s type=%s attach=%s authentication=%s",
             s_self_selected_socket_name (selected_socket), type_name, endpoints,
             s_self_selected_socket_auth (self->auth_type[selected_socket]));
     assert (*sock_p == NULL);
@@ -391,12 +391,12 @@ s_can_connect (zactor_t **proxy, zsock_t **faucet, zsock_t **sink, const char *f
 {
     assert (frontend);
     assert (*faucet);
-    int rc = zsock_connect (*faucet, frontend);
+    int rc = zsock_connect (*faucet, "%s", frontend);
     assert (rc == 0);
 
     assert (backend);
     assert (*sink);
-    rc = zsock_connect (*sink, backend);
+    rc = zsock_connect (*sink, "%s", backend);
     assert (rc == 0);
 
     zstr_send (*faucet, "Hello, World");
@@ -404,7 +404,7 @@ s_can_connect (zactor_t **proxy, zsock_t **faucet, zsock_t **sink, const char *f
     assert (poller);
     bool success = (zpoller_wait (poller, 200) == *sink);
     zpoller_destroy (&poller);
-    
+
     zsock_destroy (faucet);
     zsock_destroy (sink);
     zactor_destroy (proxy);
