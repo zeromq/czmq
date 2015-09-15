@@ -23,6 +23,7 @@
 */
 
 #include "../include/czmq.h"
+#include "../include/zsock_option.h"
 
 typedef enum proxy_socket {
     NONE = -1,
