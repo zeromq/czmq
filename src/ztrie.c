@@ -740,7 +740,6 @@ ztrie_test (bool verbose)
     //  other siblings.
     ret = ztrie_insert_route (self, "/config/bar/foo/glup", NULL, NULL);
     assert (ret != 0);
-    ztrie_print (self);
 
     //  Test matches
     bool hasMatch = false;
