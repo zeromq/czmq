@@ -24,13 +24,14 @@
 
 #include "../include/czmq.h"
 
-enum proxy_socket
+typedef enum proxy_socket
 {
     NONE = -1,
     FRONTEND,
     BACKEND,
     SOCKETS
-};
+}
+proxy_socket;
 
 #define AUTH_NONE  0
 #define AUTH_PLAIN 1
