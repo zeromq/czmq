@@ -632,8 +632,8 @@ static int
 s_client_handle_ticket (zloop_t *loop, int timer_id, void *argument)
 {
     s_client_t *self = (s_client_t *) argument;
-    s_client_execute (self, expired_event);
     self->ticket = NULL;        //  Ticket is now dead
+    s_client_execute (self, expired_event);
     return 0;
 }
 
@@ -681,6 +681,7 @@ s_server_new (zsock_t *pipe)
 
     self->pipe = pipe;
     self->router = zsock_new (ZMQ_ROUTER);
+    assert (self->router);
     //  By default the socket will discard outgoing messages above the
     //  HWM of 1,000. This isn't helpful for high-volume streaming. We
     //  will use a unbounded queue here. If applications need to guard
@@ -827,7 +828,7 @@ s_server_handle_pipe (zloop_t *loop, zsock_t *reader, void *argument)
         zconfig_put (self->config, path, value);
         if (streq (path, "server/animate")) {
             zsys_warning ("'%s' is deprecated, use VERBOSE command instead", path);
-            self->verbose = atoi (value) != 0;
+            self->verbose = atoi (value);
         }
         s_server_config_global (self);
         free (path);
