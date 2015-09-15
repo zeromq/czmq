@@ -23,7 +23,6 @@
 */
 
 #include "../include/czmq.h"
-#include "../include/zsock_option.h"
 
 typedef enum proxy_socket {
     NONE = -1,
@@ -106,6 +105,7 @@ s_create_socket (self_t *self, char *type_name, char *endpoints, proxy_socket se
     }
     zsock_t *sock = zsock_new (index);
     if (sock) {
+#if (ZMQ_VERSION_MAJOR == 4)
         if (self->domain [selected_socket]) {
             // Apply authentication domain
             zsock_set_zap_domain (sock, self->domain [selected_socket]);
@@ -127,6 +127,7 @@ s_create_socket (self_t *self, char *type_name, char *endpoints, proxy_socket se
             // Enable curve authentication
             zsock_set_curve_server (sock, 1);
         }
+#endif
         if (zsock_attach (sock, endpoints, true)) {
             zsys_error ("zproxy: invalid endpoints '%s'", endpoints);
             zsock_destroy (&sock);
