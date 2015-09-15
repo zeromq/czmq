@@ -151,7 +151,7 @@ struct _zgossip_msg_t {
 
 //  Put a string to the frame
 #define PUT_STRING(host) { \
-    uint8_t string_size = (uint8_t) (strlen (host)); \
+    size_t string_size = strlen (host); \
     PUT_NUMBER1 (string_size); \
     memcpy (self->needle, (host), string_size); \
     self->needle += string_size; \
@@ -594,8 +594,8 @@ zgossip_msg_test (bool verbose)
 {
     printf (" * zgossip_msg:");
 
-    //  Silence an "unused" warning by "using" the verbose variable
-    if (verbose) {;}
+    if (verbose)
+        printf ("\n");
 
     //  @selftest
     //  Simple create/destroy test
