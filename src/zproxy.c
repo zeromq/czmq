@@ -24,6 +24,19 @@
 
 #include "../include/czmq.h"
 
+typedef enum proxy_socket
+{
+    NONE = -1,
+    FRONTEND,
+    BACKEND,
+    SOCKETS
+}
+proxy_socket;
+
+#define AUTH_NONE  0
+#define AUTH_PLAIN 1
+#define AUTH_CURVE 2
+
 //  --------------------------------------------------------------------------
 //  The self_t structure holds the state for one actor instance
 
@@ -33,6 +46,10 @@ typedef struct {
     zsock_t *frontend;          //  Frontend socket
     zsock_t *backend;           //  Backend socket
     zsock_t *capture;           //  Capture socket
+    int auth_type[SOCKETS];     //  Auth type for sockets
+    char *domain[SOCKETS];      //  Auth domains for sockets
+    char *public_key[SOCKETS];  //  Public keys for sockets
+    char *secret_key[SOCKETS];  //  Secret keys for sockets
     bool terminated;            //  Did caller ask us to quit?
     bool verbose;               //  Verbose logging enabled?
 } self_t;
@@ -46,6 +63,14 @@ s_self_destroy (self_t **self_p)
         zsock_destroy (&self->frontend);
         zsock_destroy (&self->backend);
         zsock_destroy (&self->capture);
+
+        for (int i = 0; i < SOCKETS; i++)
+        {
+            zstr_free (&self->domain[i]);
+            zstr_free (&self->public_key[i]);
+            zstr_free (&self->secret_key[i]);
+        }
+
         zpoller_destroy (&self->poller);
         free (self);
         *self_p = NULL;
@@ -65,9 +90,8 @@ s_self_new (zsock_t *pipe)
     return self;
 }
 
-
 static zsock_t *
-s_create_socket (char *type_name, char *endpoints)
+s_create_socket (self_t *self, char *type_name, char *endpoints, proxy_socket selected_socket)
 {
     //  This array matches ZMQ_XXX type definitions
     assert (ZMQ_PAIR == 0);
@@ -85,6 +109,28 @@ s_create_socket (char *type_name, char *endpoints)
     }
     zsock_t *sock = zsock_new (index);
     if (sock) {
+        if (self->domain[selected_socket]) {
+            // Apply authentication domain
+            zsock_set_zap_domain (sock, self->domain[selected_socket]);
+        }
+        if (self->auth_type[selected_socket] == AUTH_PLAIN) {
+            // Enable plain authentication
+            zsock_set_plain_server (sock, 1);
+        }
+        else
+        if (self->auth_type[selected_socket] == AUTH_CURVE) {
+            // Apply certificate keys
+            char *public_key = self->public_key[selected_socket];
+            assert(public_key);
+            char *secret_key = self->secret_key[selected_socket];
+            assert(secret_key);
+            zsock_set_curve_publickey (sock, public_key);
+            zsock_set_curve_secretkey (sock, secret_key);
+
+            // Enable curve authentication
+            zsock_set_curve_server (sock, 1);
+        }
+
         if (zsock_attach (sock, endpoints, true)) {
             zsys_error ("zproxy: invalid endpoints '%s'", endpoints);
             zsock_destroy (&sock);
@@ -93,23 +139,73 @@ s_create_socket (char *type_name, char *endpoints)
     return sock;
 }
 
+static const char *
+s_self_selected_socket_name (proxy_socket selected_socket)
+{
+    switch (selected_socket)
+    {
+        case FRONTEND:
+            return "FRONTEND";
+        case BACKEND:
+            return "BACKEND";
+        default:
+            return "UNDEFINED";
+    }
+}
+
+static const char *
+s_self_selected_socket_auth (int auth_type)
+{
+    switch (auth_type)
+    {
+        case AUTH_PLAIN:
+            return "PLAIN";
+        case AUTH_CURVE:
+            return "CURVE";
+        default:
+            return "NONE";
+    }
+}
+
+static proxy_socket
+s_self_selected_socket (zmsg_t *request)
+{
+    char *socket_name = zmsg_popstr (request);
+    assert (socket_name);
+
+    proxy_socket socket = NONE;
+
+    if (streq (socket_name, "FRONTEND"))
+        socket = FRONTEND;
+    else
+    if (streq (socket_name, "BACKEND"))
+        socket = BACKEND;
+    else {
+        zsys_error ("zproxy: invalid proxy socket selection: %s", socket_name);
+        assert (false);
+    }
+
+    return socket;
+}
+
 static void
-s_self_configure (self_t *self, zsock_t **sock_p, zmsg_t *request, char *name)
+s_self_configure (self_t *self, zsock_t **sock_p, zmsg_t *request, proxy_socket selected_socket)
 {
     char *type_name = zmsg_popstr (request);
     assert (type_name);
     char *endpoints = zmsg_popstr (request);
     assert (endpoints);
     if (self->verbose)
-        zsys_info ("zproxy: - %s type=%s attach=%s", name, type_name, endpoints);
+        zsys_info ("zproxy: - %s type=%s attach=%s authentication=%s", 
+            s_self_selected_socket_name (selected_socket), type_name, endpoints,
+            s_self_selected_socket_auth (self->auth_type[selected_socket]));
     assert (*sock_p == NULL);
-    *sock_p = s_create_socket (type_name, endpoints);
+    *sock_p = s_create_socket (self, type_name, endpoints, selected_socket);
     assert (*sock_p);
     zpoller_add (self->poller, *sock_p);
     zstr_free (&type_name);
     zstr_free (&endpoints);
 }
-
 
 //  --------------------------------------------------------------------------
 //  Handle a command from calling application
@@ -128,12 +224,12 @@ s_self_handle_pipe (self_t *self)
         zsys_info ("zproxy: API command=%s", command);
 
     if (streq (command, "FRONTEND")) {
-        s_self_configure (self, &self->frontend, request, "frontend");
+        s_self_configure (self, &self->frontend, request, FRONTEND);
         zsock_signal (self->pipe, 0);
     }
     else
     if (streq (command, "BACKEND")) {
-        s_self_configure (self, &self->backend, request, "backend");
+        s_self_configure (self, &self->backend, request, BACKEND);
         zsock_signal (self->pipe, 0);
     }
     else
@@ -167,6 +263,35 @@ s_self_handle_pipe (self_t *self)
         zsock_signal (self->pipe, 0);
     }
     else
+    if (streq (command, "DOMAIN")) {
+        proxy_socket selected_socket = s_self_selected_socket(request);
+        char *domain = zmsg_popstr (request);
+        assert (domain);
+        zstr_free (&self->domain[selected_socket]);
+        self->domain[selected_socket] = domain;
+        zsock_signal (self->pipe, 0);
+    }
+    else
+    if (streq (command, "PLAIN")) {
+        proxy_socket selected_socket = s_self_selected_socket(request);
+        self->auth_type[selected_socket] = AUTH_PLAIN;
+        zsock_signal (self->pipe, 0);
+    }
+    else
+    if (streq (command, "CURVE")) {
+        proxy_socket selected_socket = s_self_selected_socket(request);
+        self->auth_type[selected_socket] = AUTH_CURVE;
+        char *public_key = zmsg_popstr (request);
+        assert (public_key);
+        char *secret_key = zmsg_popstr (request);
+        assert (secret_key);
+        zstr_free (&self->public_key[selected_socket]);
+        zstr_free (&self->secret_key[selected_socket]);
+        self->public_key[selected_socket] = public_key;
+        self->secret_key[selected_socket] = secret_key;
+        zsock_signal (self->pipe, 0);
+    }
+    else
     if (streq (command, "$TERM"))
         self->terminated = true;
     else {
@@ -177,7 +302,6 @@ s_self_handle_pipe (self_t *self)
     zmsg_destroy (&request);
     return 0;
 }
-
 
 //  --------------------------------------------------------------------------
 //  Switch messages from an input socket to an output socket until there are
@@ -212,7 +336,6 @@ s_self_switch (self_t *self, zsock_t *input, zsock_t *output)
     }
 }
 
-
 //  --------------------------------------------------------------------------
 //  zproxy() implements the zproxy actor interface
 
@@ -241,9 +364,289 @@ zproxy (zsock_t *pipe, void *unused)
     s_self_destroy (&self);
 }
 
-
 //  --------------------------------------------------------------------------
 //  Selftest
+
+#if (ZMQ_VERSION_MAJOR == 4)
+
+#define LOCALENDPOINT "tcp://127.0.0.1:%d"
+
+// Define flag types for proxy sockets
+#define FRONTEND_SOCKET 1 << FRONTEND
+#define BACKEND_SOCKET  1 << BACKEND
+
+static int
+s_get_available_port (zsock_t **server)
+{
+    *server = zsock_new (ZMQ_PUSH);
+    assert (*server);
+    int port_nbr = zsock_bind (*server, "tcp://127.0.0.1:*");
+    assert (port_nbr > 0);
+    return port_nbr;
+}
+
+// Checks whether client can connect to server
+static bool
+s_can_connect (zactor_t **proxy, zsock_t **faucet, zsock_t **sink, const char *frontend, const char *backend, bool verbose)
+{
+    assert (frontend);
+    assert (*faucet);
+    int rc = zsock_connect (*faucet, frontend);
+    assert (rc == 0);
+
+    assert (backend);
+    assert (*sink);
+    rc = zsock_connect (*sink, backend);
+    assert (rc == 0);
+
+    zstr_send (*faucet, "Hello, World");
+    zpoller_t *poller = zpoller_new (*sink, NULL);
+    assert (poller);
+    bool success = (zpoller_wait (poller, 200) == *sink);
+    zpoller_destroy (&poller);
+    
+    zsock_destroy (faucet);
+    zsock_destroy (sink);
+    zactor_destroy (proxy);
+
+    *faucet = zsock_new (ZMQ_PUSH);
+    assert (*faucet);
+    *sink = zsock_new (ZMQ_PULL);
+    assert (*sink);
+    *proxy = zactor_new (zproxy, NULL);
+    assert (*proxy);
+    if (verbose) {
+        zstr_sendx (*proxy, "VERBOSE", NULL);
+        zsock_wait (*proxy);
+    }
+    return success;
+}
+
+static void
+s_bind_proxy_sockets (zactor_t *proxy, const char *frontend, const char *backend)
+{
+    zstr_sendx (proxy, "FRONTEND", "PULL", frontend, NULL);
+    zsock_wait (proxy);
+    zstr_sendx (proxy, "BACKEND", "PUSH", backend, NULL);
+    zsock_wait (proxy);
+}
+
+static void
+s_send_proxy_msg (zactor_t *proxy, const char *command, proxy_socket selected_socket, zmsg_t *msg)
+{
+    zmsg_pushstr (msg, s_self_selected_socket_name (selected_socket));
+    zmsg_pushstr (msg, command);
+    assert (zmsg_send (&msg, proxy) == 0);
+}
+
+static void
+s_send_proxy_command (zactor_t *proxy, const char *command, int selected_sockets, const char *string, ...)
+{
+    zmsg_t *msg = zmsg_new ();
+    if (!msg)
+        assert (false);
+    va_list args;
+    va_start (args, string);
+    while (string) {
+        zmsg_addstr (msg, string);
+        string = va_arg (args, char *);
+    }
+    va_end (args);
+    for (int i = 0; i < SOCKETS; i++) {
+        if (selected_sockets & (1 << i)) {
+            s_send_proxy_msg (proxy, command, (proxy_socket)i, zmsg_dup (msg));
+            zsock_wait (proxy);
+        }
+    }
+    zmsg_destroy(&msg);
+}
+
+static void
+s_configure_plain_auth (zsock_t *faucet, zsock_t *sink, int selected_sockets, const char *username, const char *password)
+{
+    assert (username);
+    assert (password);
+    if (selected_sockets & FRONTEND_SOCKET) {
+        assert (faucet);
+        zsock_set_plain_username (faucet, username);
+        zsock_set_plain_password (faucet, password);
+    }
+    if (selected_sockets & BACKEND_SOCKET) {
+        assert (sink);
+        zsock_set_plain_username (sink, username);
+        zsock_set_plain_password (sink, password);
+    }
+}
+
+static void
+s_configure_curve_auth (zsock_t *faucet, zsock_t *sink, int selected_sockets, zcert_t *client_cert, const char *public_key)
+{
+    assert (client_cert);
+    assert (public_key);
+    if (selected_sockets & FRONTEND_SOCKET) {
+        assert (faucet);
+        zcert_apply (client_cert, faucet);
+        zsock_set_curve_serverkey (faucet, public_key);
+    }
+    if (selected_sockets & BACKEND_SOCKET) {
+        assert (sink);
+        zcert_apply (client_cert, sink);
+        zsock_set_curve_serverkey (sink, public_key);
+    }
+}
+
+static void
+zproxy_test_authentication (int selected_sockets, bool verbose)
+{
+    // Create temporary directory for test files
+    # define TESTDIR ".test_zproxy"
+    zsys_dir_create (TESTDIR);
+
+    zsock_t *acquire_frontend_port;
+    char *frontend = zsys_sprintf (LOCALENDPOINT, s_get_available_port (&acquire_frontend_port));
+
+    zsock_t *acquire_backend_port;
+    char* backend = zsys_sprintf (LOCALENDPOINT, s_get_available_port (&acquire_backend_port));
+
+    zsock_destroy (&acquire_frontend_port);
+    zsock_destroy (&acquire_backend_port);
+
+    // Install the authenticator
+    zactor_t *auth = zactor_new (zauth, NULL);
+    assert (auth);
+    if (verbose) {
+        zstr_sendx (auth, "VERBOSE", NULL);
+        zsock_wait (auth);
+    }
+
+    // Create proxy socket
+    zactor_t *proxy = zactor_new (zproxy, NULL);
+    assert (proxy);
+    if (verbose) {
+        zstr_sendx (proxy, "VERBOSE", NULL);
+        zsock_wait (proxy);
+    }
+
+    // Create application sockets
+    zsock_t *faucet = zsock_new (ZMQ_PUSH);
+    assert (faucet);
+    zsock_t *sink = zsock_new (ZMQ_PULL);
+    assert (sink);
+
+    // Check there's no authentication on a default NULL server
+    s_bind_proxy_sockets (proxy, frontend, backend);
+    bool success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
+    assert (success);
+
+    // When we set a domain on the server, we switch on authentication
+    // for NULL sockets, but with no policies, the client connection
+    // will be allowed.
+    s_send_proxy_command (proxy, "DOMAIN", selected_sockets, "global", NULL);
+    s_bind_proxy_sockets (proxy, frontend, backend);
+    success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
+    assert (success);
+
+    // Blacklist 127.0.0.1, connection should fail
+    s_send_proxy_command (proxy, "DOMAIN", selected_sockets, "global", NULL);
+    s_bind_proxy_sockets (proxy, frontend, backend);
+    zstr_sendx (auth, "DENY", "127.0.0.1", NULL);
+    zsock_wait (auth);
+    success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
+    assert (!success);
+
+    // Whitelist our address, which overrides the blacklist
+    s_send_proxy_command (proxy, "DOMAIN", selected_sockets, "global", NULL);
+    s_bind_proxy_sockets (proxy, frontend, backend);
+    zstr_sendx (auth, "ALLOW", "127.0.0.1", NULL);
+    zsock_wait (auth);
+    success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
+    assert (success);
+
+    // Try PLAIN authentication
+
+    // Test negative case (no server-side passwords defined)
+    s_send_proxy_command (proxy, "PLAIN", selected_sockets, NULL);
+    s_bind_proxy_sockets (proxy, frontend, backend);
+    s_configure_plain_auth (faucet, sink, selected_sockets, "admin", "Password");
+    success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
+    assert (!success);
+
+    // Test positive case (server-side passwords defined)
+    FILE *password = fopen (TESTDIR "/password-file", "w");
+    assert (password);
+    fprintf (password, "admin=Password\n");
+    fclose (password);
+    s_send_proxy_command (proxy, "PLAIN", selected_sockets, NULL);
+    s_bind_proxy_sockets (proxy, frontend, backend);
+    s_configure_plain_auth (faucet, sink, selected_sockets, "admin", "Password");
+    zstr_sendx (auth, "PLAIN", TESTDIR "/password-file", NULL);
+    zsock_wait (auth);
+    success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
+    assert (success);
+
+    // Test negative case (bad client password)
+    s_send_proxy_command (proxy, "PLAIN", selected_sockets, NULL);
+    s_bind_proxy_sockets (proxy, frontend, backend);
+    s_configure_plain_auth (faucet, sink, selected_sockets, "admin", "Bogus");
+    success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
+    assert (!success);
+
+    if (zsys_has_curve ()) {
+        // We'll create two new certificates and save the client public
+        // certificate on disk
+        zcert_t *server_cert = zcert_new ();
+        assert (server_cert);
+        zcert_t *client_cert = zcert_new ();
+        assert (client_cert);
+
+        char *public_key = zcert_public_txt (server_cert);
+        char *secret_key = zcert_secret_txt (server_cert);
+
+        // Try CURVE authentication
+
+        // Test without setting-up any authentication
+        s_send_proxy_command (proxy, "CURVE", selected_sockets, public_key, secret_key, NULL);
+        s_bind_proxy_sockets (proxy, frontend, backend);
+        s_configure_curve_auth (faucet, sink, selected_sockets, client_cert, public_key);
+        success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
+        assert (!success);
+
+        // Test CURVE_ALLOW_ANY
+        s_send_proxy_command (proxy, "CURVE", selected_sockets, public_key, secret_key, NULL);
+        s_bind_proxy_sockets (proxy, frontend, backend);
+        s_configure_curve_auth (faucet, sink, selected_sockets, client_cert, public_key);
+        zstr_sendx (auth, "CURVE", CURVE_ALLOW_ANY, NULL);
+        zsock_wait (auth);
+        success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
+        assert (success);
+
+        // Test with client certificate file in authentication folder
+        s_send_proxy_command (proxy, "CURVE", selected_sockets, public_key, secret_key, NULL);
+        s_bind_proxy_sockets (proxy, frontend, backend);
+        s_configure_curve_auth (faucet, sink, selected_sockets, client_cert, public_key);
+        zcert_save_public (client_cert, TESTDIR "/mycert.txt");
+        zstr_sendx (auth, "CURVE", TESTDIR, NULL);
+        zsock_wait (auth);
+        success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
+        assert (success);
+
+        zcert_destroy (&server_cert);
+        zcert_destroy (&client_cert);
+    }
+
+    // Remove the authenticator and check a normal connection works
+    zactor_destroy (&auth);
+    s_bind_proxy_sockets (proxy, frontend, backend);
+    success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
+    assert (success);
+
+    zsock_destroy (&faucet);
+    zsock_destroy (&sink);
+    zactor_destroy (&proxy);
+    zstr_free (&frontend);
+    zstr_free (&backend);
+}
+#endif
 
 void
 zproxy_test (bool verbose)
@@ -320,6 +723,15 @@ zproxy_test (bool verbose)
     zsock_destroy (&sink);
     zsock_destroy (&capture);
     zactor_destroy (&proxy);
+
+#if (ZMQ_VERSION_MAJOR == 4)
+    // Test authentication on frontend server socket
+    zproxy_test_authentication (FRONTEND_SOCKET, verbose);
+    // Test authentication on backend server socket
+    zproxy_test_authentication (BACKEND_SOCKET, verbose);
+    // Test authentication on frontend and backend server sockets simultaneously
+    zproxy_test_authentication (FRONTEND_SOCKET | BACKEND_SOCKET, verbose);
+#endif
     //  @end
     printf ("OK\n");
 }
