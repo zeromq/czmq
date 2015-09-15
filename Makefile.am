@@ -5,6 +5,9 @@
 
 ACLOCAL_AMFLAGS = -I config
 
+AM_CFLAGS = \
+	-Werror=format-security
+
 AM_CPPFLAGS = \
     ${zmq_CFLAGS} \
     ${uuid_CFLAGS} \
