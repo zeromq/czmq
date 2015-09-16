@@ -7,7 +7,7 @@
     export_macro = "CZMQ_EXPORT"
     >
     This is a server implementation of the ZeroMQ Gossip Discovery Protocol
-    <include filename = "license.xml" />
+    <include filename = "../license.xml" />
 
     <state name = "start" inherit = "external">
         <!-- Peer says HELLO and we send it all known tuples -->

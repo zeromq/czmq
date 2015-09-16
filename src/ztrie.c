@@ -40,23 +40,19 @@
     y + ((x - y) & ((x - y) >>(sizeof(int) * CHAR_BIT - 1)))
 
 // TODO: Move to a more appropriate location:
-#if defined (__WINDOWS__)
 char *
-strndup (const char *s, size_t size) {
+s_strndup (const char *s, size_t size) {
     char *dup;
-    char *end = (char *) memchr (s, 0, size);
-
+    char *end = (char *) memchr (s, '\0', size);
     if (end)
-        size = end - s + 1;  
-    dup = (char *) zmalloc (size);
+        size = end - 1 - s;     //  -1 to get the last char before '\0'
+    dup = (char *) zmalloc (sizeof (char) * size + 1); //  +1 for trailing '\0'
     if (size) {
-        memcpy (dup, s, size - 1);
-        dup [size - 1] = '\0';
+        memcpy (dup, s, size);
+        dup [size] = '\0';
     }
-
     return dup;
 }
-#endif
 
 //  Trie node, used internally only
 
@@ -121,7 +117,7 @@ s_ztrie_node_new (ztrie_node_t *parent, char *token, int token_len, zlistx_t *pa
     assert (self);
 
     //  Initialize properties
-    self->token = strndup (token, token_len);
+    self->token = s_strndup (token, token_len);
     self->token_type = token_type;
     self->token_len = token_len;
     self->endpoint = false;
@@ -294,7 +290,7 @@ s_ztrie_matches_token (ztrie_node_t *parent, char *token, int len)
         }
         else {
             //  Need to copy token as zrex_matches expects '\0' terminated string
-            char *token_term = strndup (token, len);
+            char *token_term = s_strndup (token, len);
             if (zrex_matches (child->regex, token_term)) {
                 if (child->token_type == NODE_TYPE_PARAM) {
                     //  One hit means no capturing group was defined
@@ -438,7 +434,7 @@ s_ztrie_parse_path (ztrie_t *self, char *path, int mode)
         else
         //  in the middle of the regex. Found a named regex.
         if (state == 3 && (*needle == ':')) {
-            zlistx_add_end (self->params, strndup (beginRegex, needle - beginRegex));
+            zlistx_add_end (self->params, s_strndup (beginRegex, needle - beginRegex));
             beginRegex = needle + 1;
 
         }
