@@ -41,7 +41,7 @@
         Includes are processed first, so XML in included files will be
         part of the XML tree
     -->
-    <include filename = "license.xml" />
+    <include filename = "../license.xml" />
 
     <!--
         typedefs can be simple: the following will be
