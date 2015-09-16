@@ -8,7 +8,7 @@
     source_dir = "."
     >
 
-    <include filename = "license.xml" />
+    <include filename = "../license.xml" />
 
     <typedef name = "mode" type = "enum">
         <item name = "BASE64_STD" />
