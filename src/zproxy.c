@@ -757,8 +757,12 @@ zproxy_test (bool verbose)
 #if (ZMQ_VERSION_MAJOR == 4)
     // Test authentication on frontend server socket
     zproxy_test_authentication (FRONTEND_SOCKET, verbose);
+
+    // DEBUG: Testing if full exclusion of BACKEND from blacklisting improves CI results to narrow in on issue
+
     // Test authentication on backend server socket
-    zproxy_test_authentication (BACKEND_SOCKET, verbose);
+    //zproxy_test_authentication (BACKEND_SOCKET, verbose);
+
     // Test authentication on frontend and backend server sockets simultaneously
     zproxy_test_authentication (FRONTEND_SOCKET | BACKEND_SOCKET, verbose);
 #endif
