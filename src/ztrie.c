@@ -39,6 +39,25 @@
 #define MIN_LEN(x,y) \
     y + ((x - y) & ((x - y) >>(sizeof(int) * CHAR_BIT - 1)))
 
+// TODO: Move to a more appropriate location:
+#if defined (__WINDOWS__)
+char *
+strndup (const char *s, size_t size) {
+    char *dup;
+    char *end = (char *) memchr (s, 0, size);
+
+    if (end)
+        size = end - s + 1;  
+    dup = (char *) zmalloc (size);
+    if (size) {
+        memcpy (dup, s, size - 1);
+        dup [size - 1] = '\0';
+    }
+
+    return dup;
+}
+#endif
+
 //  Trie node, used internally only
 
 typedef struct _ztrie_node_t {
