@@ -1,4 +1,4 @@
-/*  =========================================================================
+﻿/*  =========================================================================
     zproxy - run a steerable proxy in the background
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
@@ -45,10 +45,10 @@ typedef struct {
     zsock_t *frontend;          //  Frontend socket
     zsock_t *backend;           //  Backend socket
     zsock_t *capture;           //  Capture socket
-    int auth_type[SOCKETS];     //  Auth type for sockets
-    char *domain[SOCKETS];      //  Auth domains for sockets
-    char *public_key[SOCKETS];  //  Public keys for sockets
-    char *secret_key[SOCKETS];  //  Secret keys for sockets
+    int auth_type [SOCKETS];    //  Auth type for sockets
+    char *domain [SOCKETS];     //  Auth domains for sockets
+    char *public_key [SOCKETS]; //  Public keys for sockets
+    char *secret_key [SOCKETS]; //  Secret keys for sockets
     bool terminated;            //  Did caller ask us to quit?
     bool verbose;               //  Verbose logging enabled?
 } self_t;
@@ -371,17 +371,24 @@ zproxy (zsock_t *pipe, void *unused)
 #define BACKEND_SOCKET  1 << BACKEND
 
 static int
-s_get_available_port (zsock_t **server)
+s_get_available_port ()
 {
-    *server = zsock_new (ZMQ_PUSH);
-    assert (*server);
-    int port_nbr = zsock_bind (*server, "tcp://127.0.0.1:*");
-    assert (port_nbr > 0);
+    int port_nbr = -1;
+    int attempts = 0;
 
-    // Make port more random for better results during parallel CI testing
-    if (port_nbr < 65535) {
-        srand ((unsigned) time (NULL));
-        port_nbr += rand() % (65535 - port_nbr);
+    // Choosing a random port for better results in case multiple tests are running
+    // in parallel on the same machine, such as during CI runs
+    while (port_nbr == -1 && attempts++ < 10) {
+        port_nbr = 49152 + randof (16383);
+        zsock_t *server = zsock_new (ZMQ_PUSH);
+        assert (server);
+        port_nbr = zsock_bind (server, LOCALENDPOINT, port_nbr);
+        zsock_destroy (&server);
+    }
+
+    if (port_nbr < 0) {
+        zsys_error ("Failed to find an available port number");
+        assert (false);
     }
 
     return port_nbr;
@@ -425,11 +432,17 @@ s_can_connect (zactor_t **proxy, zsock_t **faucet, zsock_t **sink, const char *f
 }
 
 static void
-s_bind_proxy_sockets (zactor_t *proxy, const char *frontend, const char *backend)
+s_bind_proxy_sockets (zactor_t *proxy, char **frontend, char **backend)
 {
-    zstr_sendx (proxy, "FRONTEND", "PULL", frontend, NULL);
+    if (*frontend)
+        zstr_free (frontend);
+    if (*backend)
+        zstr_free (backend);
+    *frontend = zsys_sprintf (LOCALENDPOINT, s_get_available_port ());
+    *backend = zsys_sprintf (LOCALENDPOINT, s_get_available_port ());
+    zstr_sendx (proxy, "FRONTEND", "PULL", *frontend, NULL);
     zsock_wait (proxy);
-    zstr_sendx (proxy, "BACKEND", "PUSH", backend, NULL);
+    zstr_sendx (proxy, "BACKEND", "PUSH", *backend, NULL);
     zsock_wait (proxy);
 }
 
@@ -504,14 +517,8 @@ zproxy_test_authentication (int selected_sockets, bool verbose)
 #   define TESTDIR ".test_zproxy"
     zsys_dir_create (TESTDIR);
 
-    zsock_t *acquire_frontend_port;
-    char *frontend = zsys_sprintf (LOCALENDPOINT, s_get_available_port (&acquire_frontend_port));
-
-    zsock_t *acquire_backend_port;
-    char *backend = zsys_sprintf (LOCALENDPOINT, s_get_available_port (&acquire_backend_port));
-
-    zsock_destroy (&acquire_frontend_port);
-    zsock_destroy (&acquire_backend_port);
+    char *frontend = NULL;
+    char *backend = NULL;
 
     // Install the authenticator
     zactor_t *auth = zactor_new (zauth, NULL);
@@ -536,7 +543,7 @@ zproxy_test_authentication (int selected_sockets, bool verbose)
     assert (sink);
 
     // Check there's no authentication on a default NULL server
-    s_bind_proxy_sockets (proxy, frontend, backend);
+    s_bind_proxy_sockets (proxy, &frontend, &backend);
     bool success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
     assert (success);
 
@@ -544,13 +551,13 @@ zproxy_test_authentication (int selected_sockets, bool verbose)
     // for NULL sockets, but with no policies, the client connection
     // will be allowed.
     s_send_proxy_command (proxy, "DOMAIN", selected_sockets, "global", NULL);
-    s_bind_proxy_sockets (proxy, frontend, backend);
+    s_bind_proxy_sockets (proxy, &frontend, &backend);
     success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
     assert (success);
 
     // Blacklist 127.0.0.1, connection should fail
     s_send_proxy_command (proxy, "DOMAIN", selected_sockets, "global", NULL);
-    s_bind_proxy_sockets (proxy, frontend, backend);
+    s_bind_proxy_sockets (proxy, &frontend, &backend);
     zstr_sendx (auth, "DENY", "127.0.0.1", NULL);
     zsock_wait (auth);
     success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
@@ -558,7 +565,7 @@ zproxy_test_authentication (int selected_sockets, bool verbose)
 
     // Whitelist our address, which overrides the blacklist
     s_send_proxy_command (proxy, "DOMAIN", selected_sockets, "global", NULL);
-    s_bind_proxy_sockets (proxy, frontend, backend);
+    s_bind_proxy_sockets (proxy, &frontend, &backend);
     zstr_sendx (auth, "ALLOW", "127.0.0.1", NULL);
     zsock_wait (auth);
     success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
@@ -568,7 +575,7 @@ zproxy_test_authentication (int selected_sockets, bool verbose)
 
     // Test negative case (no server-side passwords defined)
     s_send_proxy_command (proxy, "PLAIN", selected_sockets, NULL);
-    s_bind_proxy_sockets (proxy, frontend, backend);
+    s_bind_proxy_sockets (proxy, &frontend, &backend);
     s_configure_plain_auth (faucet, sink, selected_sockets, "admin", "Password");
     success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
     assert (!success);
@@ -579,7 +586,7 @@ zproxy_test_authentication (int selected_sockets, bool verbose)
     fprintf (password, "admin=Password\n");
     fclose (password);
     s_send_proxy_command (proxy, "PLAIN", selected_sockets, NULL);
-    s_bind_proxy_sockets (proxy, frontend, backend);
+    s_bind_proxy_sockets (proxy, &frontend, &backend);
     s_configure_plain_auth (faucet, sink, selected_sockets, "admin", "Password");
     zstr_sendx (auth, "PLAIN", TESTDIR "/password-file", NULL);
     zsock_wait (auth);
@@ -588,7 +595,7 @@ zproxy_test_authentication (int selected_sockets, bool verbose)
 
     // Test negative case (bad client password)
     s_send_proxy_command (proxy, "PLAIN", selected_sockets, NULL);
-    s_bind_proxy_sockets (proxy, frontend, backend);
+    s_bind_proxy_sockets (proxy, &frontend, &backend);
     s_configure_plain_auth (faucet, sink, selected_sockets, "admin", "Bogus");
     success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
     assert (!success);
@@ -608,14 +615,14 @@ zproxy_test_authentication (int selected_sockets, bool verbose)
 
         // Test without setting-up any authentication
         s_send_proxy_command (proxy, "CURVE", selected_sockets, public_key, secret_key, NULL);
-        s_bind_proxy_sockets (proxy, frontend, backend);
+        s_bind_proxy_sockets (proxy, &frontend, &backend);
         s_configure_curve_auth (faucet, sink, selected_sockets, client_cert, public_key);
         success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
         assert (!success);
 
         // Test CURVE_ALLOW_ANY
         s_send_proxy_command (proxy, "CURVE", selected_sockets, public_key, secret_key, NULL);
-        s_bind_proxy_sockets (proxy, frontend, backend);
+        s_bind_proxy_sockets (proxy, &frontend, &backend);
         s_configure_curve_auth (faucet, sink, selected_sockets, client_cert, public_key);
         zstr_sendx (auth, "CURVE", CURVE_ALLOW_ANY, NULL);
         zsock_wait (auth);
@@ -624,7 +631,7 @@ zproxy_test_authentication (int selected_sockets, bool verbose)
 
         // Test with client certificate file in authentication folder
         s_send_proxy_command (proxy, "CURVE", selected_sockets, public_key, secret_key, NULL);
-        s_bind_proxy_sockets (proxy, frontend, backend);
+        s_bind_proxy_sockets (proxy, &frontend, &backend);
         s_configure_curve_auth (faucet, sink, selected_sockets, client_cert, public_key);
         zcert_save_public (client_cert, TESTDIR "/mycert.txt");
         zstr_sendx (auth, "CURVE", TESTDIR, NULL);
@@ -638,7 +645,7 @@ zproxy_test_authentication (int selected_sockets, bool verbose)
 
     // Remove the authenticator and check a normal connection works
     zactor_destroy (&auth);
-    s_bind_proxy_sockets (proxy, frontend, backend);
+    s_bind_proxy_sockets (proxy, &frontend, &backend);
     success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
     assert (success);
 
