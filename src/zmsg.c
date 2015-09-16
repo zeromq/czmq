@@ -91,6 +91,7 @@ zmsg_destroy (zmsg_t **self_p)
 //  zsock_t object. Returns a new zmsg_t object if successful, or NULL if the
 //  receive was interrupted. The recv call blocks: if you want a non-blocking
 //  call, use the zloop or zpoller class to receive only from ready sockets.
+//  Keeps retrying if interrupted in a middle of a multipart sequence.
 
 zmsg_t *
 zmsg_recv (void *source)
@@ -103,8 +104,12 @@ zmsg_recv (void *source)
     while (true) {
         zframe_t *frame = zframe_recv (source);
         if (!frame) {
-            zmsg_destroy (&self);
-            break;              //  Interrupted or terminated
+            if (errno == EINTR && zlist_head (self->frames))
+                continue;
+            else {
+                zmsg_destroy (&self);
+                break;              //  Interrupted or terminated
+            }
         }
         if (zmsg_append (self, &frame)) {
             zmsg_destroy (&self);
@@ -122,6 +127,7 @@ zmsg_recv (void *source)
 //  it successfully. If the message has no frames, sends nothing but destroys
 //  the message anyhow. Nullifies the caller's reference to the message (as
 //  it is a destructor).
+//  Keeps retrying if interrupted in a middle of a multipart sequence.
 
 int
 zmsg_send (zmsg_t **self_p, void *dest)
@@ -133,13 +139,20 @@ zmsg_send (zmsg_t **self_p, void *dest)
     int rc = 0;
     if (self) {
         assert (zmsg_is (self));
-        zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
-        while (frame) {
+        bool sent_some = false;
+        zframe_t *frame;
+        while ((frame = (zframe_t *) zlist_head (self->frames))) {
             rc = zframe_send (&frame, dest,
-                              zlist_size (self->frames) ? ZFRAME_MORE : 0);
-            if (rc != 0)
-                break;
-            frame = (zframe_t *) zlist_pop (self->frames);
+                              zlist_size (self->frames) > 1 ?
+                                      ZFRAME_MORE : 0);
+            if (rc != 0) {
+                if (errno == EINTR && sent_some)
+                    continue;
+                else
+                    break;
+            }
+            sent_some = true;
+            (void) zlist_pop (self->frames);
         }
         if (rc == 0)
             zmsg_destroy (self_p);
@@ -154,6 +167,7 @@ zmsg_send (zmsg_t **self_p, void *dest)
 //  message part. If the message has no frames, sends nothing but destroys
 //  the message anyhow. Nullifies the caller's reference to the message (as
 //  it is a destructor).
+//  Keeps retrying if interrupted in a middle of a multipart sequence.
 
 int
 zmsg_sendm (zmsg_t **self_p, void *dest)
@@ -165,12 +179,18 @@ zmsg_sendm (zmsg_t **self_p, void *dest)
     int rc = 0;
     if (self) {
         assert (zmsg_is (self));
-        zframe_t *frame = (zframe_t *) zlist_pop (self->frames);
-        while (frame) {
+        bool sent_some = false;
+        zframe_t *frame;
+        while ((frame = (zframe_t *) zlist_head (self->frames))) {
             rc = zframe_send (&frame, dest, ZFRAME_MORE);
-            if (rc != 0)
-                break;
-            frame = (zframe_t *) zlist_pop (self->frames);
+            if (rc != 0) {
+                if (errno == EINTR && sent_some)
+                    continue;
+                else
+                    break;
+            }
+            sent_some = true;
+            (void) zlist_pop (self->frames);
         }
         if (rc == 0)
             zmsg_destroy (self_p);
