@@ -343,10 +343,11 @@ zproxy (zsock_t *pipe, void *unused)
     zsock_signal (pipe, 0);
 
     while (!self->terminated) {
-        zsock_t *which = (zsock_t *) zpoller_wait (self->poller, -1);
+        zsock_t *which = (zsock_t *) zpoller_wait (self->poller, 1000);
+        if (zpoller_expired (self->poller))
+            continue;       // Timed out
         if (zpoller_terminated (self->poller))
             break;          //  Interrupted
-        else
         if (which == self->pipe)
             s_self_handle_pipe (self);
         else
@@ -448,7 +449,7 @@ s_bind_proxy_sockets (zactor_t *proxy, char **frontend, char **backend)
         zstr_free (backend);
     assert (proxy);
 
-    srandom (time (NULL) % *(int *) proxy);
+    srandom (time (NULL) ^ *(int *) proxy);
     *frontend = zsys_sprintf (LOCALENDPOINT, s_get_available_port ());
     *backend = zsys_sprintf (LOCALENDPOINT, s_get_available_port ());
 
