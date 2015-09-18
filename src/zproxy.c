@@ -559,7 +559,7 @@ zproxy_test (bool verbose)
     //  When we set a domain on the server, we switch on authentication
     //  for NULL sockets, but with no policies, the client connection
     //  will be allowed.
-    zstr_sendx (proxy, "DOMAIN", "BACKEND", "global", NULL);
+    zstr_sendx (proxy, "DOMAIN", "FRONTEND", "global", NULL);
     zsock_wait (proxy);
     s_bind_test_sockets (proxy, &frontend, &backend);
     success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
@@ -584,15 +584,6 @@ zproxy_test (bool verbose)
     zsock_wait (auth);
     success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
     assert (success);
-
-    // Install a new authenticator
-    zactor_destroy (&auth);
-    auth = zactor_new (zauth, NULL);
-    assert (auth);
-    if (verbose) {
-        zstr_sendx (auth, "VERBOSE", NULL);
-        zsock_wait (auth);
-    }
 
     //  Try PLAIN authentication
 
@@ -628,8 +619,8 @@ zproxy_test (bool verbose)
     zstr_sendx (proxy, "PLAIN", "FRONTEND", NULL);
     zsock_wait (proxy);
     s_bind_test_sockets (proxy, &frontend, &backend);
-    zsock_set_plain_username (sink, "admin");
-    zsock_set_plain_password (sink, "Bogus");
+    zsock_set_plain_username (faucet, "admin");
+    zsock_set_plain_password (faucet, "Bogus");
     success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
     assert (!success);
 
@@ -646,11 +637,11 @@ zproxy_test (bool verbose)
         //  Try CURVE authentication
 
         //  Test without setting-up any authentication
-        zstr_sendx (proxy, "CURVE", "BACKEND", public_key, secret_key, NULL);
+        zstr_sendx (proxy, "CURVE", "FRONTEND", public_key, secret_key, NULL);
         zsock_wait (proxy);
         s_bind_test_sockets (proxy, &frontend, &backend);
-        zcert_apply (client_cert, sink);
-        zsock_set_curve_serverkey (sink, public_key);
+        zcert_apply (client_cert, faucet);
+        zsock_set_curve_serverkey (faucet, public_key);
         success = s_can_connect (&proxy, &faucet, &sink, frontend, backend, verbose);
         assert (!success);
 
