@@ -242,7 +242,7 @@ zframe_strhex (zframe_t *self)
 
     size_t size = zframe_size (self);
     byte *data = zframe_data (self);
-    char *hex_str = (char *) zmalloc (size * 2 + 1);
+    char *hex_str = (char *) malloc (size * 2 + 1);
     if (!hex_str)
         return NULL;
 
