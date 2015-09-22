@@ -1,0 +1,83 @@
+<class name = "zuuid">
+    UUID support class
+
+    <include filename = "../license.xml" />
+
+    <constructor>
+        Constructor
+    </constructor>
+
+    <destructor>
+        Destructor
+    </destructor>
+
+    <method name = "new from" singleton = "1">
+        Create UUID object from supplied ZUUID_LEN-octet value.
+        <argument  name = "source" type = "buffer"  constant = "1" />
+        <return type = "zuuid" fresh = "1" />
+    </method>
+
+    <method name = "set">
+        Set UUID to new supplied ZUUID_LEN-octet value.
+        <argument  name = "source" type = "buffer"  constant = "1" />
+    </method>
+
+    <method name = "set str">
+        Set UUID to new supplied string value skipping '-' and '{' '}'
+        optional delimiters. Return 0 if OK, else returns -1.
+        <argument  name = "source" type = "string"  constant = "1" />
+        <return type = "integer" />
+    </method>
+
+    <method name = "data">
+        Return UUID binary data.
+        <return type = "buffer"  constant = "1" />
+    </method>
+
+    <method  name = "size">
+        Return UUID binary size
+        <return type = "size" />
+    </method>
+
+    <method name = "str">
+        Returns UUID as string
+        <return type = "string" constant = "1" />
+    </method>
+
+    <method name = "str canonical">
+        Return UUID in the canonical string format: 8-4-4-4-12, in lower
+        case. Caller does not modify or free returned value. See
+        http://en.wikipedia.org/wiki/Universally_unique_identifier
+        <return type = "string" constant = "1" />
+    </method>
+
+    <method name = "export">
+        Store UUID blob in target array
+        <argument name = "target" type = "buffer" constant = "0" />
+    </method>
+
+    <method name = "eq">
+        Check if UUID is same as supplied value
+        <argument name = "compare" type = "buffer" constant = "1" />
+        <return type = "boolean" />
+    </method>
+
+    <method name = "neq">
+        Check if UUID is different from supplied value
+        <argument name = "compare" type = "buffer" constant = "1" />
+        <return type = "boolean" />
+    </method>
+
+    <method name = "dup">
+        Make copy of UUID object; if uuid is null, or memory was exhausted,
+        returns null.
+        <return type = "zuuid" />
+    </method>
+
+    <method name = "test" singleton = "1">
+        Self test of this class
+        <argument name = "verbose" type = "boolean" />
+    </method>
+</class>
+
+

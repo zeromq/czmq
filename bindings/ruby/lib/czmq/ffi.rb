@@ -275,6 +275,24 @@ module CZMQ
       
       require_relative 'ffi/zsock'
       
+      attach_function :zuuid_new, [], :pointer, **opts
+      attach_function :zuuid_destroy, [:pointer], :void, **opts
+      attach_function :zuuid_print, [:pointer], :void, **opts
+      attach_function :zuuid_new_from, [:pointer], :pointer, **opts
+      attach_function :zuuid_set, [:pointer, :pointer], :void, **opts
+      attach_function :zuuid_set_str, [:pointer, :string], :int, **opts
+      attach_function :zuuid_data, [:pointer], :pointer, **opts
+      attach_function :zuuid_size, [:pointer], :size_t, **opts
+      attach_function :zuuid_str, [:pointer], :string, **opts
+      attach_function :zuuid_str_canonical, [:pointer], :string, **opts
+      attach_function :zuuid_export, [:pointer, :pointer], :void, **opts
+      attach_function :zuuid_eq, [:pointer, :pointer], :bool, **opts
+      attach_function :zuuid_neq, [:pointer, :pointer], :bool, **opts
+      attach_function :zuuid_dup, [:pointer], :pointer, **opts
+      attach_function :zuuid_test, [:bool], :void, **opts
+      
+      require_relative 'ffi/zuuid'
+      
       attach_function :zhash_new, [], :pointer, **opts
       attach_function :zhash_destroy, [:pointer], :void, **opts
       attach_function :zhash_insert, [:pointer, :string, :pointer], :int, **opts

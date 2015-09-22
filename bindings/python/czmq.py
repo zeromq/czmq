@@ -106,6 +106,10 @@ class va_list_t(Structure):
     pass # Empty - only for type checking
 va_list_p = POINTER(va_list_t)
 
+class zuuid_t(Structure):
+    pass # Empty - only for type checking
+zuuid_p = POINTER(zuuid_t)
+
 PyFile_FromFile_close_cb = CFUNCTYPE(c_int, FILE_p)
 PyFile_FromFile = pythonapi.PyFile_FromFile
 PyFile_FromFile.restype = py_object
@@ -2072,6 +2076,126 @@ return the supplied value. Takes a polymorphic socket reference."""
     def test(verbose):
         """Self test of this class"""
         return lib.zsock_test(verbose)
+
+
+# zuuid
+lib.zuuid_new.restype = zuuid_p
+lib.zuuid_new.argtypes = []
+lib.zuuid_destroy.restype = None
+lib.zuuid_destroy.argtypes = [POINTER(zuuid_p)]
+lib.zuuid_print.restype = None
+lib.zuuid_print.argtypes = [zuuid_p]
+lib.zuuid_new_from.restype = zuuid_p
+lib.zuuid_new_from.argtypes = [POINTER(c_byte)]
+lib.zuuid_set.restype = None
+lib.zuuid_set.argtypes = [zuuid_p, POINTER(c_byte)]
+lib.zuuid_set_str.restype = c_int
+lib.zuuid_set_str.argtypes = [zuuid_p, c_char_p]
+lib.zuuid_data.restype = POINTER(c_byte)
+lib.zuuid_data.argtypes = [zuuid_p]
+lib.zuuid_size.restype = c_size_t
+lib.zuuid_size.argtypes = [zuuid_p]
+lib.zuuid_str.restype = c_char_p
+lib.zuuid_str.argtypes = [zuuid_p]
+lib.zuuid_str_canonical.restype = c_char_p
+lib.zuuid_str_canonical.argtypes = [zuuid_p]
+lib.zuuid_export.restype = None
+lib.zuuid_export.argtypes = [zuuid_p, POINTER(c_byte)]
+lib.zuuid_eq.restype = c_bool
+lib.zuuid_eq.argtypes = [zuuid_p, POINTER(c_byte)]
+lib.zuuid_neq.restype = c_bool
+lib.zuuid_neq.argtypes = [zuuid_p, POINTER(c_byte)]
+lib.zuuid_dup.restype = zuuid_p
+lib.zuuid_dup.argtypes = [zuuid_p]
+lib.zuuid_test.restype = None
+lib.zuuid_test.argtypes = [c_bool]
+
+class Zuuid(object):
+    """UUID support class"""
+
+    def __init__(self, *args):
+        """Constructor"""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zuuid_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zuuid_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 0)
+            self._as_parameter_ = lib.zuuid_new() # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destructor"""
+        if self.allow_destruct:
+            lib.zuuid_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def print(self):
+        """Print properties of the zuuid object."""
+        return lib.zuuid_print(self._as_parameter_)
+
+    @staticmethod
+    def new_from(source):
+        """Create UUID object from supplied ZUUID_LEN-octet value."""
+        return Zuuid(lib.zuuid_new_from(source), True)
+
+    def set(self, source):
+        """Set UUID to new supplied ZUUID_LEN-octet value."""
+        return lib.zuuid_set(self._as_parameter_, source)
+
+    def set_str(self, source):
+        """Set UUID to new supplied string value skipping '-' and '{' '}'
+optional delimiters. Return 0 if OK, else returns -1."""
+        return lib.zuuid_set_str(self._as_parameter_, source)
+
+    def data(self):
+        """Return UUID binary data."""
+        return lib.zuuid_data(self._as_parameter_)
+
+    def size(self):
+        """Return UUID binary size"""
+        return lib.zuuid_size(self._as_parameter_)
+
+    def str(self):
+        """Returns UUID as string"""
+        return lib.zuuid_str(self._as_parameter_)
+
+    def str_canonical(self):
+        """Return UUID in the canonical string format: 8-4-4-4-12, in lower
+case. Caller does not modify or free returned value. See
+http://en.wikipedia.org/wiki/Universally_unique_identifier"""
+        return lib.zuuid_str_canonical(self._as_parameter_)
+
+    def export(self, target):
+        """Store UUID blob in target array"""
+        return lib.zuuid_export(self._as_parameter_, target)
+
+    def eq(self, compare):
+        """Check if UUID is same as supplied value"""
+        return lib.zuuid_eq(self._as_parameter_, compare)
+
+    def neq(self, compare):
+        """Check if UUID is different from supplied value"""
+        return lib.zuuid_neq(self._as_parameter_, compare)
+
+    def dup(self):
+        """Make copy of UUID object; if uuid is null, or memory was exhausted,
+returns null."""
+        return Zuuid(lib.zuuid_dup(self._as_parameter_), False)
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class"""
+        return lib.zuuid_test(verbose)
 
 
 # zhash

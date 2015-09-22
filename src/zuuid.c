@@ -282,6 +282,16 @@ zuuid_dup (zuuid_t *self)
 
 
 //  --------------------------------------------------------------------------
+//  Print properties of the zuuid object.
+
+void
+zuuid_print (zuuid_t *self)
+{
+    printf ("%s", zuuid_str_canonical (self));
+}
+
+
+//  --------------------------------------------------------------------------
 //  Selftest
 
 void
