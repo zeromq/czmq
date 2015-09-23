@@ -48,6 +48,7 @@ HEADERS += \
   $$SRCDIR/QmlZloop.h \
   $$SRCDIR/QmlZmsg.h \
   $$SRCDIR/QmlZsock.h \
+  $$SRCDIR/QmlZtrie.h \
   $$SRCDIR/QmlZuuid.h \
   $$SRCDIR/QmlZhash.h \
   $$SRCDIR/QmlZlist.h 
@@ -63,6 +64,7 @@ SOURCES += \
   $$SRCDIR/QmlZloop.cpp \
   $$SRCDIR/QmlZmsg.cpp \
   $$SRCDIR/QmlZsock.cpp \
+  $$SRCDIR/QmlZtrie.cpp \
   $$SRCDIR/QmlZuuid.cpp \
   $$SRCDIR/QmlZhash.cpp \
   $$SRCDIR/QmlZlist.cpp 

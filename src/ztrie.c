@@ -580,7 +580,7 @@ ztrie_hit_parameters (ztrie_t *self)
 //  Returns the asterisk matched part of a route, if there has been no match
 //  or no asterisk match, returns NULL.
 
-char *
+const char *
 ztrie_hit_asterisk_match (ztrie_t *self)
 {
     assert (self);
@@ -643,7 +643,7 @@ ztrie_print (ztrie_t *self)
 //  Self test of this class.
 
 void
-ztrie_test (bool verbose)
+ztrie_test (int verbose)
 {
     printf (" * ztrie: ");
     //  @selftest

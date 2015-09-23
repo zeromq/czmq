@@ -106,6 +106,14 @@ class va_list_t(Structure):
     pass # Empty - only for type checking
 va_list_p = POINTER(va_list_t)
 
+class char_t(Structure):
+    pass # Empty - only for type checking
+char_p = POINTER(char_t)
+
+class ztrie_t(Structure):
+    pass # Empty - only for type checking
+ztrie_p = POINTER(ztrie_t)
+
 class zuuid_t(Structure):
     pass # Empty - only for type checking
 zuuid_p = POINTER(zuuid_t)
@@ -2076,6 +2084,107 @@ return the supplied value. Takes a polymorphic socket reference."""
     def test(verbose):
         """Self test of this class"""
         return lib.zsock_test(verbose)
+
+
+# ztrie
+ztrie_destroy_data_fn = CFUNCTYPE(None, POINTER(c_void_p))
+lib.ztrie_new.restype = ztrie_p
+lib.ztrie_new.argtypes = [char_p]
+lib.ztrie_destroy.restype = None
+lib.ztrie_destroy.argtypes = [POINTER(ztrie_p)]
+lib.ztrie_print.restype = None
+lib.ztrie_print.argtypes = [ztrie_p]
+lib.ztrie_insert_route.restype = c_int
+lib.ztrie_insert_route.argtypes = [ztrie_p, c_char_p, c_void_p, POINTER(ztrie_destroy_data_fn)]
+lib.ztrie_remove_route.restype = c_int
+lib.ztrie_remove_route.argtypes = [ztrie_p, c_char_p]
+lib.ztrie_matches.restype = c_bool
+lib.ztrie_matches.argtypes = [ztrie_p, c_char_p]
+lib.ztrie_hit_data.restype = c_void_p
+lib.ztrie_hit_data.argtypes = [ztrie_p]
+lib.ztrie_hit_parameter_count.restype = c_size_t
+lib.ztrie_hit_parameter_count.argtypes = [ztrie_p]
+lib.ztrie_hit_parameters.restype = zhashx_p
+lib.ztrie_hit_parameters.argtypes = [ztrie_p]
+lib.ztrie_hit_asterisk_match.restype = c_char_p
+lib.ztrie_hit_asterisk_match.argtypes = [ztrie_p]
+lib.ztrie_test.restype = None
+lib.ztrie_test.argtypes = [c_int]
+
+class Ztrie(object):
+    """simple trie for tokenizable strings"""
+
+    def __init__(self, *args):
+        """Creates a new ztrie."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], ztrie_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is ztrie_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.ztrie_new(args[0]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destroy the ztrie."""
+        if self.allow_destruct:
+            lib.ztrie_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def print(self):
+        """Print properties of the ztrie object."""
+        return lib.ztrie_print(self._as_parameter_)
+
+    def insert_route(self, path, data, destroy_data_fn):
+        """Inserts a new route into the tree and attaches the data. Returns -1
+if the route already exists, otherwise 0. This method takes ownership of
+the provided data if a destroy_data_fn is provided."""
+        return lib.ztrie_insert_route(self._as_parameter_, path, data, byref(ztrie_destroy_data_fn.from_param(destroy_data_fn)))
+
+    def remove_route(self, path):
+        """Removes a route from the trie and destroys its data. Returns -1 if the
+route does not exists, otherwise 0.
+the start of the list call zlist_first (). Advances the cursor."""
+        return lib.ztrie_remove_route(self._as_parameter_, path)
+
+    def matches(self, path):
+        """Returns true if the path matches a route in the tree, otherwise false."""
+        return lib.ztrie_matches(self._as_parameter_, path)
+
+    def hit_data(self):
+        """Returns the data of a matched route from last ztrie_matches. If the path
+did not match, returns NULL. Do not delete the data as it's owned by
+ztrie."""
+        return c_void_p(lib.ztrie_hit_data(self._as_parameter_))
+
+    def hit_parameter_count(self):
+        """Returns the count of parameters that a matched route has."""
+        return lib.ztrie_hit_parameter_count(self._as_parameter_)
+
+    def hit_parameters(self):
+        """Returns the parameters of a matched route with named regexes from last
+ztrie_matches. If the path did not match or the route did not contain any
+named regexes, returns NULL."""
+        return Zhashx(lib.ztrie_hit_parameters(self._as_parameter_), False)
+
+    def hit_asterisk_match(self):
+        """Returns the asterisk matched part of a route, if there has been no match
+or no asterisk match, returns NULL."""
+        return lib.ztrie_hit_asterisk_match(self._as_parameter_)
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class"""
+        return lib.ztrie_test(verbose)
 
 
 # zuuid
