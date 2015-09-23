@@ -275,6 +275,20 @@ module CZMQ
       
       require_relative 'ffi/zsock'
       
+      attach_function :ztrie_new, [:pointer], :pointer, **opts
+      attach_function :ztrie_destroy, [:pointer], :void, **opts
+      attach_function :ztrie_print, [:pointer], :void, **opts
+      attach_function :ztrie_insert_route, [:pointer, :pointer, :pointer, :pointer], :int, **opts
+      attach_function :ztrie_remove_route, [:pointer, :pointer], :int, **opts
+      attach_function :ztrie_matches, [:pointer, :pointer], :bool, **opts
+      attach_function :ztrie_hit_data, [:pointer], :pointer, **opts
+      attach_function :ztrie_hit_parameter_count, [:pointer], :size_t, **opts
+      attach_function :ztrie_hit_parameters, [:pointer], :pointer, **opts
+      attach_function :ztrie_hit_asterisk_match, [:pointer], :string, **opts
+      attach_function :ztrie_test, [:int], :void, **opts
+      
+      require_relative 'ffi/ztrie'
+      
       attach_function :zuuid_new, [], :pointer, **opts
       attach_function :zuuid_destroy, [:pointer], :void, **opts
       attach_function :zuuid_print, [:pointer], :void, **opts
