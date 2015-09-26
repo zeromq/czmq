@@ -6,7 +6,7 @@
     >
     <include filename = "license.xml" />
     <version major = "3" minor = "0" patch = "3" />
-    <use project = "zmq" />
+    <use project = "libzmq" />
     <use project = "uuid" optional = "1" implied = "1" />
 
     <class name = "zactor" />
