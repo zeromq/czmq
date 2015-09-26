@@ -75,9 +75,9 @@ PREVIOUS_CFLAGS="${CFLAGS}"
 PREVIOUS_LIBS="${LIBS}"
 
 
-was_zmq_check_lib_detected=no
+was_libzmq_check_lib_detected=no
 
-PKG_CHECK_MODULES([zmq], [libzmq >= 0.0.0],
+PKG_CHECK_MODULES([libzmq], [libzmq >= 0.0.0],
     [
     ],
     [
@@ -89,40 +89,40 @@ PKG_CHECK_MODULES([zmq], [libzmq >= 0.0.0],
             [search_libzmq="yes"],
             [])
 
-        zmq_synthetic_cflags=""
-        zmq_synthetic_libs="-lzmq"
+        libzmq_synthetic_cflags=""
+        libzmq_synthetic_libs="-lzmq"
 
         if test "x$search_libzmq" = "xyes"; then
             if test -r "${with_libzmq}/include/zmq.h"; then
-                zmq_synthetic_cflags="-I${with_libzmq}/include"
-                zmq_synthetic_libs="-L${with_libzmq}/lib -lzmq"
+                libzmq_synthetic_cflags="-I${with_libzmq}/include"
+                libzmq_synthetic_libs="-L${with_libzmq}/lib -lzmq"
             else
                 AC_MSG_ERROR([${with_libzmq}/include/zmq.h not found. Please check libzmq prefix])
             fi
         fi
 
-        AC_CHECK_LIB([zmq], [zmq_init],
+        AC_CHECK_LIB([libzmq], [zmq_init],
             [
-                CFLAGS="${zmq_synthetic_cflags} ${CFLAGS}"
-                LDFLAGS="${zmq_synthetic_libs} ${LDFLAGS}"
-                LIBS="${zmq_synthetic_libs} ${LIBS}"
+                CFLAGS="${libzmq_synthetic_cflags} ${CFLAGS}"
+                LDFLAGS="${libzmq_synthetic_libs} ${LDFLAGS}"
+                LIBS="${libzmq_synthetic_libs} ${LIBS}"
 
-                AC_SUBST([zmq_CFLAGS],[${zmq_synthetic_cflags}])
-                AC_SUBST([zmq_LIBS],[${zmq_synthetic_libs}])
-                was_zmq_check_lib_detected=yes
+                AC_SUBST([libzmq_CFLAGS],[${libzmq_synthetic_cflags}])
+                AC_SUBST([libzmq_LIBS],[${libzmq_synthetic_libs}])
+                was_libzmq_check_lib_detected=yes
             ],
             [AC_MSG_ERROR([cannot link with -lzmq, install libzmq.])])
     ])
 
-if test "x$was_zmq_check_lib_detected" = "xno"; then
-    CFLAGS="${zmq_CFLAGS} ${CFLAGS}"
-    LIBS="${zmq_LIBS} ${LIBS}"
+if test "x$was_libzmq_check_lib_detected" = "xno"; then
+    CFLAGS="${libzmq_CFLAGS} ${CFLAGS}"
+    LIBS="${libzmq_LIBS} ${LIBS}"
 fi
 
 
 was_uuid_check_lib_detected=no
 
-PKG_CHECK_MODULES([uuid], [libuuid >= 0.0.0],
+PKG_CHECK_MODULES([uuid], [uuid >= 0.0.0],
     [
         AC_DEFINE(HAVE_LIBUUID, 1, [The libuuid library is to be used.])
     ],
@@ -139,11 +139,11 @@ PKG_CHECK_MODULES([uuid], [libuuid >= 0.0.0],
         uuid_synthetic_libs="-luuid"
 
         if test "x$search_libuuid" = "xyes"; then
-            if test -r "${with_libuuid}/include/uuid.h"; then
+            if test -r "${with_libuuid}/include/uuid/uuid.h"; then
                 uuid_synthetic_cflags="-I${with_libuuid}/include"
                 uuid_synthetic_libs="-L${with_libuuid}/lib -luuid"
             else
-                AC_MSG_ERROR([${with_libuuid}/include/uuid.h not found. Please check libuuid prefix])
+                AC_MSG_ERROR([${with_libuuid}/include/uuid/uuid.h not found. Please check libuuid prefix])
             fi
         fi
 

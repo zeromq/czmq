@@ -32,8 +32,8 @@ export TOOLCHAIN_NAME="arm-linux-androideabi-$NDK_ABI_VER"
 export TOOLCHAIN_HOST="arm-linux-androideabi"
 export TOOLCHAIN_ARCH="arm"
 
-export ZMQ_ROOT="/tmp/zmq"
-git clone https://github.com/zeromq/libzmq $ZMQ_ROOT
+export LIBZMQ_ROOT="/tmp/libzmq"
+git clone https://github.com/zeromq/libzmq $LIBZMQ_ROOT
 
 source ./build.sh
 

@@ -77,7 +77,7 @@ endif()
 list(APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}")
 
 ########################################################################
-# ZMQ dependency
+# LIBZMQ dependency
 ########################################################################
 find_package(ZeroMQ REQUIRED)
 IF (ZEROMQ_FOUND)

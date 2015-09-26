@@ -9,12 +9,12 @@ AM_CFLAGS = \
 	-Werror=format-security
 
 AM_CPPFLAGS = \
-    ${zmq_CFLAGS} \
+    ${libzmq_CFLAGS} \
     ${uuid_CFLAGS} \
     -I$(srcdir)/include
 
 project_libs = \
-    ${zmq_LIBS} \
+    ${libzmq_LIBS} \
     ${uuid_LIBS}
 
 SUBDIRS =
