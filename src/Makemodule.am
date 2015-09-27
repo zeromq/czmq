@@ -152,6 +152,24 @@ src_czmq_selftest_LDADD = ${program_libs}
 src_czmq_selftest_SOURCES = src/czmq_selftest.c
 
 
+# Install api files into /usr/local/share/zproject
+apidir = @datadir@/zproject/czmq
+dist_api_DATA = \
+    api/zactor.xml \
+    api/zdir.xml \
+    api/zdir_patch.xml \
+    api/zfile.xml \
+    api/zframe.xml \
+    api/zhashx.xml \
+    api/ziflist.xml \
+    api/zloop.xml \
+    api/zmsg.xml \
+    api/zsock.xml \
+    api/ztrie.xml \
+    api/zuuid.xml \
+    api/zhash.xml \
+    api/zlist.xml
+
 # define custom target for all products of /src
 src: src/libczmq.la src/czmq_selftest
 
