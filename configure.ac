@@ -124,26 +124,26 @@ was_uuid_check_lib_detected=no
 
 PKG_CHECK_MODULES([uuid], [uuid >= 0.0.0],
     [
-        AC_DEFINE(HAVE_LIBUUID, 1, [The libuuid library is to be used.])
+        AC_DEFINE(HAVE_UUID, 1, [The uuid library is to be used.])
     ],
     [
-        AC_ARG_WITH([libuuid],
+        AC_ARG_WITH([uuid],
             [
-                AS_HELP_STRING([--with-libuuid],
-                [Specify libuuid prefix])
+                AS_HELP_STRING([--with-uuid],
+                [Specify uuid prefix])
             ],
-            [search_libuuid="yes"],
+            [search_uuid="yes"],
             [])
 
         uuid_synthetic_cflags=""
         uuid_synthetic_libs="-luuid"
 
-        if test "x$search_libuuid" = "xyes"; then
-            if test -r "${with_libuuid}/include/uuid/uuid.h"; then
-                uuid_synthetic_cflags="-I${with_libuuid}/include"
-                uuid_synthetic_libs="-L${with_libuuid}/lib -luuid"
+        if test "x$search_uuid" = "xyes"; then
+            if test -r "${with_uuid}/include/uuid/uuid.h"; then
+                uuid_synthetic_cflags="-I${with_uuid}/include"
+                uuid_synthetic_libs="-L${with_uuid}/lib -luuid"
             else
-                AC_MSG_ERROR([${with_libuuid}/include/uuid/uuid.h not found. Please check libuuid prefix])
+                AC_MSG_ERROR([${with_uuid}/include/uuid/uuid.h not found. Please check uuid prefix])
             fi
         fi
 
@@ -156,7 +156,7 @@ PKG_CHECK_MODULES([uuid], [uuid >= 0.0.0],
                 AC_SUBST([uuid_CFLAGS],[${uuid_synthetic_cflags}])
                 AC_SUBST([uuid_LIBS],[${uuid_synthetic_libs}])
                 was_uuid_check_lib_detected=yes
-                AC_DEFINE(HAVE_LIBUUID, 1, [The libuuid library is to be used.])
+                AC_DEFINE(HAVE_UUID, 1, [The uuid library is to be used.])
             ],
             [])
     ])
