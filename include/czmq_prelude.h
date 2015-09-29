@@ -451,7 +451,7 @@ typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
     typedef __int16 int16_t;
     typedef __int32 int32_t;
     typedef __int64 int64_t;
-    typedef unsigned __int8 uint8_t;    
+    typedef unsigned __int8 uint8_t;
     typedef unsigned __int16 uint16_t;
     typedef unsigned __int32 uint32_t;
     typedef unsigned __int64 uint64_t;
@@ -583,13 +583,13 @@ typedef int SOCKET;
 #   endif
 #endif
 
-#if defined (__WINDOWS__) && !defined (HAVE_LIBUUID)
-#   define HAVE_LIBUUID 1
+#if defined (__WINDOWS__) && !defined (HAVE_UUID)
+#   define HAVE_UUID 1
 #endif
-#if defined (__UTYPE_OSX) && !defined (HAVE_LIBUUID)
-#   define HAVE_LIBUUID 1
+#if defined (__UTYPE_OSX) && !defined (HAVE_UUID)
+#   define HAVE_UUID 1
 #endif
-#if defined (HAVE_LIBUUID)
+#if defined (HAVE_UUID)
 #   if defined (__UTYPE_FREEBSD) || defined (__UTYPE_NETBSD)
 #       include <uuid.h>
 #   elif defined __UTYPE_HPUX

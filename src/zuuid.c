@@ -41,7 +41,7 @@ zuuid_new (void)
 {
     zuuid_t *self = (zuuid_t *) zmalloc (sizeof (zuuid_t));
     if (self) {
-#if defined (HAVE_LIBUUID)
+#if defined (HAVE_UUID)
 #   if defined (__WINDOWS__)
         UUID uuid;
         assert (sizeof (uuid) == ZUUID_LEN);
