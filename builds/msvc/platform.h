@@ -29,6 +29,6 @@
 
 #define CZMQ_HAVE_WINDOWS
 
-#define HAVE_LIBUUID 1
+#define HAVE_UUID 1
 
 #endif
