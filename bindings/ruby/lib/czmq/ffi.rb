@@ -275,6 +275,18 @@ module CZMQ
       
       require_relative 'ffi/zsock'
       
+      attach_function :zstr_recv, [:pointer], :pointer, **opts
+      attach_function :zstr_send, [:pointer, :string], :int, **opts
+      attach_function :zstr_sendm, [:pointer, :string], :int, **opts
+      attach_function :zstr_sendf, [:pointer, :string, :varargs], :int, **opts
+      attach_function :zstr_sendfm, [:pointer, :string, :varargs], :int, **opts
+      attach_function :zstr_sendx, [:pointer, :string, :varargs], :int, **opts
+      attach_function :zstr_recvx, [:pointer, :pointer, :varargs], :int, **opts
+      attach_function :zstr_free, [:pointer], :void, **opts
+      attach_function :zstr_test, [:bool], :void, **opts
+      
+      require_relative 'ffi/zstr'
+      
       attach_function :ztrie_new, [:pointer], :pointer, **opts
       attach_function :ztrie_destroy, [:pointer], :void, **opts
       attach_function :ztrie_print, [:pointer], :void, **opts
