@@ -203,8 +203,7 @@
         have data in a zchunk or zframe. Does not change or take ownership of
         any arguments. Returns 0 if successful, -1 if sending failed for any
         reason.
-        <argument name = "picture" type = "string" />
-        <argument variadic = "1" />
+        <argument name = "picture" type = "string" variadic = "1" />
         <return type = "integer" />
     </method>
 
@@ -244,8 +243,7 @@
         If an argument pointer is NULL, does not store any value (skips it).
         An 'n' picture matches an empty frame; if the message does not match,
         the method will return -1.
-        <argument name = "picture" type = "string" />
-        <argument variadic = "1" />
+        <argument name = "picture" type = "string" variadic = "1" />
         <return type = "integer" />
     </method>
 
@@ -280,8 +278,7 @@
 
         Does not change or take ownership of any arguments. Returns 0 if
         successful, -1 if sending failed for any reason.
-        <argument name = "picture" type = "string" />
-        <argument variadic = "1" />
+        <argument name = "picture" type = "string" variadic = "1" />
         <return type = "integer" />
     </method>
 
@@ -294,8 +291,7 @@
         types. All arguments must be pointers; this call sets them to point to
         values held on a per-socket basis. Do not modify or destroy the returned
         values. Returns 0 if successful, or -1 if it failed to read a message.
-        <argument name = "picture" type = "string" />
-        <argument variadic = "1" />
+        <argument name = "picture" type = "string" variadic = "1" />
         <return type = "integer" />
     </method>
 
