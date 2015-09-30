@@ -2379,7 +2379,7 @@ This is the class interface:
     //      zstr_send (zgossip, "VERBOSE");
     //
     //  Bind zgossip to specified endpoint. TCP endpoints may specify
-    //  the port number as "*" to aquire an ephemeral port:
+    //  the port number as "*" to acquire an ephemeral port:
     //
     //      zstr_sendx (zgossip, "BIND", endpoint, NULL);
     //
