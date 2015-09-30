@@ -105,3 +105,8 @@ czmq_selftest*
 makecert
 test-suite.log
 *.pyc
+
+# Qt
+*pro.user
+moc_*
+build-*
