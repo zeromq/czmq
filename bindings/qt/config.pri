@@ -1,0 +1,1 @@
+QCZMQ_LIBRARY = yes
