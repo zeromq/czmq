@@ -186,8 +186,8 @@ zchunk_fill (zchunk_t *self, byte filler, size_t size)
 
 //  --------------------------------------------------------------------------
 //  Append user-supplied data to chunk, return resulting chunk size. If the
-//  data would exceeed the available space, it is truncated. If you want to
-//  grow the chunk to accomodate new data, use the zchunk_extend method.
+//  data would exceeded the available space, it is truncated. If you want to
+//  grow the chunk to accommodate new data, use the zchunk_extend method.
 
 size_t
 zchunk_append (zchunk_t *self, const void *data, size_t size)
@@ -207,7 +207,7 @@ zchunk_append (zchunk_t *self, const void *data, size_t size)
 
 //  --------------------------------------------------------------------------
 //  Append user-supplied data to chunk, return resulting chunk size. If the
-//  data would exceeed the available space, the chunk grows in size.
+//  data would exceeded the available space, the chunk grows in size.
 
 size_t
 zchunk_extend (zchunk_t *self, const void *data, size_t size)
