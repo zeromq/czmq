@@ -2086,6 +2086,101 @@ return the supplied value. Takes a polymorphic socket reference."""
         return lib.zsock_test(verbose)
 
 
+# zstr
+lib.zstr_recv.restype = c_char_p
+lib.zstr_recv.argtypes = [c_void_p]
+lib.zstr_send.restype = c_int
+lib.zstr_send.argtypes = [c_void_p, c_char_p]
+lib.zstr_sendm.restype = c_int
+lib.zstr_sendm.argtypes = [c_void_p, c_char_p]
+lib.zstr_sendf.restype = c_int
+lib.zstr_sendf.argtypes = [c_void_p, c_char_p]
+lib.zstr_sendfm.restype = c_int
+lib.zstr_sendfm.argtypes = [c_void_p, c_char_p]
+lib.zstr_sendx.restype = c_int
+lib.zstr_sendx.argtypes = [c_void_p, c_char_p]
+lib.zstr_recvx.restype = c_int
+lib.zstr_recvx.argtypes = [c_void_p, POINTER(c_char_p)]
+lib.zstr_free.restype = None
+lib.zstr_free.argtypes = [POINTER(c_char_p)]
+lib.zstr_test.restype = None
+lib.zstr_test.argtypes = [c_bool]
+
+class Zstr(object):
+    """sending and receiving strings"""
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    @staticmethod
+    def recv(source):
+        """Receive C string from socket. Caller must free returned string using
+zstr_free(). Returns NULL if the context is being terminated or the
+process was interrupted."""
+        return lib.zstr_recv(source)
+
+    @staticmethod
+    def send(dest, string):
+        """Send a C string to a socket, as a frame. The string is sent without
+trailing null byte; to read this you can use zstr_recv, or a similar
+method that adds a null terminator on the received string. String
+may be NULL, which is sent as ""."""
+        return lib.zstr_send(dest, string)
+
+    @staticmethod
+    def sendm(dest, string):
+        """Send a C string to a socket, as zstr_send(), with a MORE flag, so that
+you can send further strings in the same multi-part message."""
+        return lib.zstr_sendm(dest, string)
+
+    @staticmethod
+    def sendf(dest, format, *args):
+        """Send a formatted string to a socket. Note that you should NOT use
+user-supplied strings in the format (they may contain '%' which
+will create security holes)."""
+        return lib.zstr_sendf(dest, format, *args)
+
+    @staticmethod
+    def sendfm(dest, format, *args):
+        """Send a formatted string to a socket, as for zstr_sendf(), with a
+MORE flag, so that you can send further strings in the same multi-part
+message."""
+        return lib.zstr_sendfm(dest, format, *args)
+
+    @staticmethod
+    def sendx(dest, string, *args):
+        """Send a series of strings (until NULL) as multipart data
+Returns 0 if the strings could be sent OK, or -1 on error."""
+        return lib.zstr_sendx(dest, string, *args)
+
+    @staticmethod
+    def recvx(source, string_p, *args):
+        """Receive a series of strings (until NULL) from multipart data.
+Each string is allocated and filled with string data; if there
+are not enough frames, unallocated strings are set to NULL.
+Returns -1 if the message could not be read, else returns the
+number of strings filled, zero or more. Free each returned string
+using zstr_free(). If not enough strings are provided, remaining
+multipart frames in the message are dropped."""
+        return lib.zstr_recvx(source, byref(c_char_p.from_param(string_p)), *args)
+
+    @staticmethod
+    def free(string_p):
+        """Free a provided string, and nullify the parent pointer. Safe to call on
+a null pointer."""
+        return lib.zstr_free(byref(c_char_p.from_param(string_p)))
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class"""
+        return lib.zstr_test(verbose)
+
+
 # ztrie
 ztrie_destroy_data_fn = CFUNCTYPE(None, POINTER(c_void_p))
 lib.ztrie_new.restype = ztrie_p
