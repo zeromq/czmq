@@ -236,6 +236,18 @@ module CZMQ
       
       require_relative 'ffi/zmsg'
       
+      attach_function :zpoller_new, [:pointer, :varargs], :pointer, **opts
+      attach_function :zpoller_destroy, [:pointer], :void, **opts
+      attach_function :zpoller_add, [:pointer, :pointer], :int, **opts
+      attach_function :zpoller_remove, [:pointer, :pointer], :int, **opts
+      attach_function :zpoller_wait, [:pointer, :int], :pointer, **opts
+      attach_function :zpoller_expired, [:pointer], :bool, **opts
+      attach_function :zpoller_terminated, [:pointer], :bool, **opts
+      attach_function :zpoller_ignore_interrupts, [:pointer], :void, **opts
+      attach_function :zpoller_test, [:bool], :void, **opts
+      
+      require_relative 'ffi/zpoller'
+      
       attach_function :zsock_new, [:int], :pointer, **opts
       attach_function :zsock_destroy, [:pointer], :void, **opts
       attach_function :zsock_new_pub, [:string], :pointer, **opts

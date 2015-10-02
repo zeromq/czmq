@@ -8,8 +8,8 @@
 
 ## Overview
 
-qczmq is a Qt wrapper for czmq. It's possible to link
-statically or dynamically against it as well as use it as internal or external
+qczmq is a Qt wrapper for czmq. It's possible to
+statically or dynamically link against it as well as use it as internal or external
 library.
 
 ## Internal library
@@ -48,7 +48,7 @@ sudo make install
 ```
 
 The default installation directory prefix on unix is `/usr/local/`. If you like
-to change the prefix define the PREFIX variable when calling qmake.
+to change the prefix define the PREFIX variable when calling qmake:
 
 ```sh
 qmake PREFIX=/usr

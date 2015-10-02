@@ -37,6 +37,7 @@ class QZhashx;
 class QZiflist;
 class QZloop;
 class QZmsg;
+class QZpoller;
 class QZsock;
 class QZstr;
 class QZtrie;
@@ -54,6 +55,7 @@ class QZlist;
 #include "qziflist.h"
 #include "qzloop.h"
 #include "qzmsg.h"
+#include "qzpoller.h"
 #include "qzsock.h"
 #include "qzstr.h"
 #include "qztrie.h"
