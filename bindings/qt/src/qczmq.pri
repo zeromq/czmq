@@ -9,10 +9,43 @@ DEPENDPATH += $$PWD
 qczmq-uselib:!qczmq-buildlib {
     LIBS += -L$$QCZMQ_LIBDIR -l$$QCZMQ_LIBNAME
 } else {
-    HEADERS       += $$PWD/qczmq.h \
-                     $$PWD/qzactor.h   $$PWD/qzdir.h   $$PWD/qzdirpatch.h   $$PWD/qzfile.h   $$PWD/qzframe.h   $$PWD/qzhashx.h   $$PWD/qziflist.h   $$PWD/qzloop.h   $$PWD/qzmsg.h   $$PWD/qzsock.h   $$PWD/qzstr.h   $$PWD/qztrie.h   $$PWD/qzuuid.h   $$PWD/qzhash.h   $$PWD/qzlist.h 
+    HEADERS       += \
+                     $$PWD/qczmq.h \
+                     $$PWD/qzactor.h \
+                     $$PWD/qzdir.h \
+                     $$PWD/qzdirpatch.h \
+                     $$PWD/qzfile.h \
+                     $$PWD/qzframe.h \
+                     $$PWD/qzhashx.h \
+                     $$PWD/qziflist.h \
+                     $$PWD/qzloop.h \
+                     $$PWD/qzmsg.h \
+                     $$PWD/qzpoller.h \
+                     $$PWD/qzsock.h \
+                     $$PWD/qzstr.h \
+                     $$PWD/qztrie.h \
+                     $$PWD/qzuuid.h \
+                     $$PWD/qzhash.h \
+                     $$PWD/qzlist.h
+
     SOURCES       += \
-                     $$PWD/qzactor.cpp   $$PWD/qzdir.cpp   $$PWD/qzdirpatch.cpp   $$PWD/qzfile.cpp   $$PWD/qzframe.cpp   $$PWD/qzhashx.cpp   $$PWD/qziflist.cpp   $$PWD/qzloop.cpp   $$PWD/qzmsg.cpp   $$PWD/qzsock.cpp   $$PWD/qzstr.cpp   $$PWD/qztrie.cpp   $$PWD/qzuuid.cpp   $$PWD/qzhash.cpp   $$PWD/qzlist.cpp }
+                     $$PWD/qzactor.cpp \
+                     $$PWD/qzdir.cpp \
+                     $$PWD/qzdirpatch.cpp \
+                     $$PWD/qzfile.cpp \
+                     $$PWD/qzframe.cpp \
+                     $$PWD/qzhashx.cpp \
+                     $$PWD/qziflist.cpp \
+                     $$PWD/qzloop.cpp \
+                     $$PWD/qzmsg.cpp \
+                     $$PWD/qzpoller.cpp \
+                     $$PWD/qzsock.cpp \
+                     $$PWD/qzstr.cpp \
+                     $$PWD/qztrie.cpp \
+                     $$PWD/qzuuid.cpp \
+                     $$PWD/qzhash.cpp \
+                     $$PWD/qzlist.cpp
+}
 
 win32 {
     qczmq-buildlib:shared:DEFINES += QT_CZMQ_EXPORT

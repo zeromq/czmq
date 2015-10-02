@@ -26,6 +26,7 @@ int main(int argc, char **argv)
     QZiflist::test (verbose);
     QZloop::test (verbose);
     QZmsg::test (verbose);
+    QZpoller::test (verbose);
     QZsock::test (verbose);
     QZstr::test (verbose);
     QZtrie::test (verbose);

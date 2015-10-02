@@ -102,6 +102,10 @@ class zmq_pollitem_t(Structure):
     pass # Empty - only for type checking
 zmq_pollitem_p = POINTER(zmq_pollitem_t)
 
+class zpoller_t(Structure):
+    pass # Empty - only for type checking
+zpoller_p = POINTER(zpoller_t)
+
 class va_list_t(Structure):
     pass # Empty - only for type checking
 va_list_p = POINTER(va_list_t)
@@ -1695,6 +1699,101 @@ OK). Signals are encoded to be distinguishable from "normal" messages."""
     def test(verbose):
         """Self test of this class"""
         return lib.zmsg_test(verbose)
+
+
+# zpoller
+lib.zpoller_new.restype = zpoller_p
+lib.zpoller_new.argtypes = [c_void_p]
+lib.zpoller_destroy.restype = None
+lib.zpoller_destroy.argtypes = [POINTER(zpoller_p)]
+lib.zpoller_add.restype = c_int
+lib.zpoller_add.argtypes = [zpoller_p, c_void_p]
+lib.zpoller_remove.restype = c_int
+lib.zpoller_remove.argtypes = [zpoller_p, c_void_p]
+lib.zpoller_wait.restype = c_void_p
+lib.zpoller_wait.argtypes = [zpoller_p, c_int]
+lib.zpoller_expired.restype = c_bool
+lib.zpoller_expired.argtypes = [zpoller_p]
+lib.zpoller_terminated.restype = c_bool
+lib.zpoller_terminated.argtypes = [zpoller_p]
+lib.zpoller_ignore_interrupts.restype = None
+lib.zpoller_ignore_interrupts.argtypes = [zpoller_p]
+lib.zpoller_test.restype = None
+lib.zpoller_test.argtypes = [c_bool]
+
+class Zpoller(object):
+    """event-driven reactor"""
+
+    def __init__(self, *args):
+        """Create new poller; the reader can be a libzmq socket (void *), a zsock_t
+instance, or a zactor_t instance."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zpoller_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zpoller_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 2)
+            self._as_parameter_ = lib.zpoller_new(args[0], *args[index()-1:]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destroy a poller"""
+        if self.allow_destruct:
+            lib.zpoller_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def add(self, reader):
+        """Add a reader to be polled. Returns 0 if OK, -1 on failure. The reader may
+be a libzmq void * socket, a zsock_t instance, or a zactor_t instance."""
+        return lib.zpoller_add(self._as_parameter_, reader)
+
+    def remove(self, reader):
+        """Remove a reader from the poller; returns 0 if OK, -1 on failure. The
+reader may be a libzmq void * socket, a zsock_t instance, or a zactor_t
+instance."""
+        return lib.zpoller_remove(self._as_parameter_, reader)
+
+    def wait(self, timeout):
+        """Poll the registered readers for I/O, return first reader that has input.
+The reader will be a libzmq void * socket, or a zsock_t or zactor_t
+instance as specified in zpoller_new/zpoller_add. The timeout should be
+zero or greater, or -1 to wait indefinitely. Socket priority is defined
+by their order in the poll list. If you need a balanced poll, use the low
+level zmq_poll method directly. If the poll call was interrupted (SIGINT),
+or the ZMQ context was destroyed, or the timeout expired, returns NULL.
+You can test the actual exit condition by calling zpoller_expired () and
+zpoller_terminated (). The timeout is in msec."""
+        return c_void_p(lib.zpoller_wait(self._as_parameter_, timeout))
+
+    def expired(self):
+        """Return true if the last zpoller_wait () call ended because the timeout
+expired, without any error."""
+        return lib.zpoller_expired(self._as_parameter_)
+
+    def terminated(self):
+        """Return true if the last zpoller_wait () call ended because the process
+was interrupted, or the parent context was destroyed."""
+        return lib.zpoller_terminated(self._as_parameter_)
+
+    def ignore_interrupts(self):
+        """Ignore zsys_interrupted flag in this poller. By default, a zpoller_wait will
+return immediately if detects zsys_interrupted is set to something other than
+zero. Calling zpoller_ignore_interrupts will supress this behavior."""
+        return lib.zpoller_ignore_interrupts(self._as_parameter_)
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class"""
+        return lib.zpoller_test(verbose)
 
 
 # zsock

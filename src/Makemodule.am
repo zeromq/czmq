@@ -164,6 +164,7 @@ dist_api_DATA = \
     api/ziflist.xml \
     api/zloop.xml \
     api/zmsg.xml \
+    api/zpoller.xml \
     api/zsock.xml \
     api/zstr.xml \
     api/ztrie.xml \

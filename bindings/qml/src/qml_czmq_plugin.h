@@ -29,6 +29,8 @@ class QmlZloop;
 class QmlZloopAttached;
 class QmlZmsg;
 class QmlZmsgAttached;
+class QmlZpoller;
+class QmlZpollerAttached;
 class QmlZsock;
 class QmlZsockAttached;
 class QmlZstr;
@@ -51,6 +53,7 @@ class QmlZlistAttached;
 #include "QmlZiflist.h"
 #include "QmlZloop.h"
 #include "QmlZmsg.h"
+#include "QmlZpoller.h"
 #include "QmlZsock.h"
 #include "QmlZstr.h"
 #include "QmlZtrie.h"
@@ -84,6 +87,8 @@ public:
         qmlRegisterType<QmlZloopAttached>();
         qmlRegisterType<QmlZmsg> (uri, 1, 0, "QmlZmsg");
         qmlRegisterType<QmlZmsgAttached>();
+        qmlRegisterType<QmlZpoller> (uri, 1, 0, "QmlZpoller");
+        qmlRegisterType<QmlZpollerAttached>();
         qmlRegisterType<QmlZsock> (uri, 1, 0, "QmlZsock");
         qmlRegisterType<QmlZsockAttached>();
         qmlRegisterType<QmlZstr> (uri, 1, 0, "QmlZstr");
