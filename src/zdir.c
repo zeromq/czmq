@@ -664,7 +664,8 @@ s_on_read_timer (zloop_t *loop, int timer_id, void *arg)
 {
     zdir_watch_t *watch = (zdir_watch_t *) arg;
 
-    for (void *data = zhash_first (watch->subs); data != NULL; data = zhash_next (watch->subs))
+    void *data;
+    for (data = zhash_first (watch->subs); data != NULL; data = zhash_next (watch->subs))
     {
         zdir_watch_sub_t *sub = (zdir_watch_sub_t *) data;
 
