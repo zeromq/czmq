@@ -3,11 +3,13 @@
 #  Please refer to the README for information about making permanent changes.  #
 ################################################################################
 
+if (NOT MSVC)
 include(FindPkgConfig)
 PKG_CHECK_MODULES(PC_ZEROMQ "libzmq")
 IF (NOT PC_ZEROMQ_FOUND)
     PKG_CHECK_MODULES(PC_ZEROMQ "zmq")
 ENDIF (NOT PC_ZEROMQ_FOUND)
+endif (NOT MSVC)
 
 # some libraries install the headers is a subdirectory of the include dir
 # returned by pkg-config, so use a wildcard match to improve chances of finding

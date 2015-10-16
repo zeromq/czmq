@@ -3,11 +3,16 @@
 #  Please refer to the README for information about making permanent changes.  #
 ################################################################################
 
+if (NOT MSVC)
 include(FindPkgConfig)
 PKG_CHECK_MODULES(PC_UUID "uuid")
 IF (NOT PC_UUID_FOUND)
     PKG_CHECK_MODULES(PC_UUID "uuid")
 ENDIF (NOT PC_UUID_FOUND)
+else (NOT MSVC)
+set(PC_UUID_INCLUDE_DIRS "C:/Program Files")
+set(PC_UUID_LIBRARY_DIRS "C:/Program Files")
+endif (NOT MSVC)
 
 # some libraries install the headers is a subdirectory of the include dir
 # returned by pkg-config, so use a wildcard match to improve chances of finding
