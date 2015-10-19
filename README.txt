@@ -4,6 +4,7 @@
 # CZMQ - High-level C binding for 0MQ
 
 [![Build Status](https://travis-ci.org/zeromq/czmq.png?branch=master)](https://travis-ci.org/zeromq/czmq)
+[![Build status](https://ci.appveyor.com/api/projects/status/q7y22juu3pnl5wq6?svg=true)](https://ci.appveyor.com/project/zeromq/czmq)
 
 ## Contents
 
