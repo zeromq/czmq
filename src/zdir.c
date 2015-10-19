@@ -936,13 +936,13 @@ zdir_test (bool verbose)
     printf (" * zdir: ");
 
     //  @selftest
-    zdir_t *older = zdir_new (".", NULL);
+    zdir_t *older = zdir_new ("src", NULL);
     assert (older);
     if (verbose) {
         printf ("\n");
         zdir_dump (older, 0);
     }
-    zdir_t *newer = zdir_new ("..", NULL);
+    zdir_t *newer = zdir_new (".", NULL);
     assert (newer);
     zlist_t *patches = zdir_diff (older, newer, "/");
     assert (patches);
