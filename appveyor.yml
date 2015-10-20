@@ -27,7 +27,6 @@ init:
   #Put this line somewhere when you want to debug something using rdp
   #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
   #- set #debug: view all environment variables
-  - ps: Update-AppveyorBuild -Version "git-$($env:appveyor_repo_commit.substring(0,8))"
   - cmake --version
   - msbuild /version
   - cmd: reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" /v UserAuthentication /t REG_DWORD /d 0 /f
