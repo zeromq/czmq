@@ -936,7 +936,16 @@ zdir_test (bool verbose)
     printf (" * zdir: ");
 
     //  @selftest
-    zdir_t *older = zdir_new ("src", NULL);
+    // need to create a file in the test directory we're watching
+    // in order to ensure the directory exists
+    zfile_t *initfile = zfile_new ("./zdir-test-dir", "initial_file");
+    assert (initfile);
+    zfile_output (initfile);
+    fprintf (zfile_handle (initfile), "initial file\n");
+    zfile_close (initfile);
+    zfile_destroy (&initfile);
+
+    zdir_t *older = zdir_new ("zdir-test-dir", NULL);
     assert (older);
     if (verbose) {
         printf ("\n");
@@ -965,15 +974,6 @@ zdir_test (bool verbose)
         zsock_send (watch, "s", "VERBOSE");
         assert (zsock_wait (watch) == 0);
     }
-
-    // need to create a file in the test directory we're watching
-    // in order to ensure the directory exists
-    zfile_t *initfile = zfile_new ("./zdir-test-dir", "initial_file");
-    assert (initfile);
-    zfile_output (initfile);
-    fprintf (zfile_handle (initfile), "initial file\n");
-    zfile_close (initfile);
-    zfile_destroy (&initfile);
 
     zclock_sleep (1001); // wait for initial file to become 'stable'
 
