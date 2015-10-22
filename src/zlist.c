@@ -494,7 +494,7 @@ s_compare (void *item1, void *item2)
 //  Runs selftest of class
 
 void
-zlist_test (int verbose)
+zlist_test (bool verbose)
 {
     printf (" * zlist: ");
 

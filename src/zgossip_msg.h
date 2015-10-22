@@ -123,7 +123,7 @@ CZMQ_EXPORT void
     zgossip_msg_set_ttl (zgossip_msg_t *self, uint32_t ttl);
 
 //  Self test of this class
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zgossip_msg_test (bool verbose);
 //  @end
 

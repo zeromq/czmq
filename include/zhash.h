@@ -181,7 +181,7 @@ CZMQ_EXPORT int
 
 //  Self test of this class
 CZMQ_EXPORT void
-    zhash_test (int verbose);
+    zhash_test (bool verbose);
 //  @end
 
 #ifdef __cplusplus

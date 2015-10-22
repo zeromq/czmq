@@ -90,7 +90,7 @@ CZMQ_EXPORT void
     zarmour_set_line_length (zarmour_t *self, size_t line_length);
 
 //  Self test of this class
-CZMQ_EXPORT int
+CZMQ_EXPORT void
     zarmour_test (bool verbose);
 //  @end
 

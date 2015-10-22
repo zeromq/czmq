@@ -643,7 +643,7 @@ ztrie_print (ztrie_t *self)
 //  Self test of this class.
 
 void
-ztrie_test (int verbose)
+ztrie_test (bool verbose)
 {
     printf (" * ztrie: ");
     //  @selftest
