@@ -262,7 +262,7 @@ foreach(LINE ${SELFTEST_SOURCE})
         math(EXPR TESTNAME_START "${LEN_FUNCTION_DECLARATION}+1")
         string(SUBSTRING ${TESTNAME} ${TESTNAME_START} ${TESTNAME_LENGTH} TESTNAME)
         string(STRIP ${TESTNAME} TESTNAME)
-        add_test(NAME ${TESTNAME} COMMAND czmq_selftest -e --test "${TESTNAME}")
+        add_test(NAME ${TESTNAME} COMMAND czmq_selftest -e -v --test "${TESTNAME}")
         set_tests_properties(${TESTNAME} PROPERTIES TIMEOUT ${SUBTEST_TIMEOUT})
     endif()
 endforeach()
@@ -270,7 +270,7 @@ endforeach()
 set(TOTAL_TIMEOUT 20 CACHE STRING "The timeout for the total test")
 message(STATUS "Timeout for czmq_test = ${TOTAL_TIMEOUT} seconds.")
 
-add_test(NAME czmq_selftest COMMAND czmq_selftest -e)
+add_test(NAME czmq_selftest COMMAND czmq_selftest -e -v)
 set_tests_properties(czmq_selftest PROPERTIES TIMEOUT ${TOTAL_TIMEOUT})
 
 ########################################################################
