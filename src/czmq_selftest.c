@@ -22,61 +22,191 @@
 
 #include "czmq_classes.h"
 
+//  --------------------------------------------------------------------------
+//  Prototype of test function
+//
+
+typedef void (*testfn_t)(bool);
+
+//  --------------------------------------------------------------------------
+//  Mapping of testname and test function.
+//
+
+typedef struct
+{
+    const char *testname;
+    testfn_t    test;
+
+} test_item_t;
+
+//  --------------------------------------------------------------------------
+//  Declaration of all the tests
+//
+
+// The test suite generator depends
+// on the presence of DECLARE_TESTS.
+// So please do not remove the use this macro.
+
+#define DECLARE_TEST(TEST) {#TEST, TEST}
+
+test_item_t all_tests[] = {
+    DECLARE_TEST(zactor_test),
+    DECLARE_TEST(zarmour_test),
+    DECLARE_TEST(zauth_test),
+    DECLARE_TEST(zbeacon_test),
+    DECLARE_TEST(zcert_test),
+    DECLARE_TEST(zcertstore_test),
+    DECLARE_TEST(zchunk_test),
+    DECLARE_TEST(zclock_test),
+    DECLARE_TEST(zconfig_test),
+    DECLARE_TEST(zdigest_test),
+    DECLARE_TEST(zdir_test),
+    DECLARE_TEST(zdir_patch_test),
+    DECLARE_TEST(zfile_test),
+    DECLARE_TEST(zframe_test),
+    DECLARE_TEST(zgossip_test),
+    DECLARE_TEST(zhashx_test),
+    DECLARE_TEST(ziflist_test),
+    DECLARE_TEST(zlistx_test),
+    DECLARE_TEST(zloop_test),
+    DECLARE_TEST(zmonitor_test),
+    DECLARE_TEST(zmsg_test),
+    DECLARE_TEST(zpoller_test),
+    DECLARE_TEST(zproxy_test),
+    DECLARE_TEST(zrex_test),
+    DECLARE_TEST(zsock_test),
+    DECLARE_TEST(zsock_option_test),
+    DECLARE_TEST(zstr_test),
+    DECLARE_TEST(zsys_test),
+    DECLARE_TEST(ztrie_test),
+    DECLARE_TEST(zuuid_test),
+    DECLARE_TEST(zgossip_msg_test),
+    DECLARE_TEST(zauth_v2_test),
+    DECLARE_TEST(zbeacon_v2_test),
+    DECLARE_TEST(zctx_test),
+    DECLARE_TEST(zhash_test),
+    DECLARE_TEST(zlist_test),
+    DECLARE_TEST(zmonitor_v2_test),
+    DECLARE_TEST(zmutex_test),
+    DECLARE_TEST(zproxy_v2_test),
+    DECLARE_TEST(zsocket_test),
+    DECLARE_TEST(zsockopt_test),
+    DECLARE_TEST(zthread_test),
+    {0, 0} //Null terminator
+};
+
+//  --------------------------------------------------------------------------
+//  Return the number of available tests.
+//
+
+static inline unsigned
+test_get_number()
+{
+    unsigned nb = 0;
+    for(test_item_t *p = all_tests; p->test; ++p, ++nb)
+        ;
+    return nb;
+}
+
+//  --------------------------------------------------------------------------
+//  Print all available tests to stdout.
+//
+
+static inline void
+test_print_list()
+{
+    unsigned i = 0;
+    for(test_item_t *p = all_tests; p->test; ++p, ++i)
+        printf("%u:%s\n", i, p->testname);
+}
+
+//  --------------------------------------------------------------------------
+//  Test whether a test is available.
+//  Return a pointer to a map if available, NULL otherwise.
+//
+
+test_item_t *
+test_available(const char *test)
+{
+    for(test_item_t *p = all_tests; p->test; ++p)
+     {
+         if streq(test, p->testname)
+             return p;
+     }
+     return NULL;
+
+}
+
+//  --------------------------------------------------------------------------
+//  Run all tests.
+//
+
+static inline void
+test_runall(bool verbose)
+{
+    printf ("Running czmq selftests...\n");
+    for(test_item_t *p = all_tests; p->test; ++p)
+        p->test(verbose);
+    printf ("Tests passed OK\n");
+}
+
+
 int
 main (int argc, char *argv [])
 {
-    bool verbose;
-    if (argc == 2 && streq (argv [1], "-v"))
-        verbose = true;
-    else
-        verbose = false;
+    bool verbose = false;
+    test_item_t *test = 0;
+    for (int i = 1; i < argc; ++i)
+    {
+        if (streq(argv[i], "-v"))
+        {
+            verbose = true;
+        }
+        else if (streq(argv[i], "--nb")) {
+            printf("%d\n", test_get_number());
+            return 0;
+        }
+        else if (streq(argv[i], "--list")) {
+            test_print_list();
+            return 0;
+        }
+        else if (streq(argv[i], "--test"))
+        {
+            ++i;
+            if (i >= argc)
+            {
+                fprintf(stderr, "--test needs an argument\n");
+                return 1;
+            }
+            test = test_available(argv[i]);
+            if (!test)
+            {
+                printf("%s is not available\n", argv[i]);
+                return 1;
+            }
+        }
+        else if (streq(argv[i], "-e"))
+        {
+#ifdef _MSC_VER
+            //When receiving an abort signal, only print to stderr (no dialog)
+            _set_abort_behavior (0, _WRITE_ABORT_MSG);
+#endif
+        }
+        else
+        {
+            printf("Unknown option: %s\n", argv[i]);
+            return 1;
+        }
+    }
 
-    printf ("Running czmq selftests...\n");
+    if (test)
+    {
+          printf("Running czmq selftest '%s'...\n", test->testname);
+          test->test(verbose);
+    } else {
+        test_runall(verbose);
+    }
 
-    zactor_test (verbose);
-    zauth_test (verbose);
-    zarmour_test (verbose);
-    zbeacon_test (verbose);
-    zcert_test (verbose);
-    zcertstore_test (verbose);
-    zchunk_test (verbose);
-    zclock_test (verbose);
-    zconfig_test (verbose);
-    zdigest_test (verbose);
-    zdir_test (verbose);
-    zdir_patch_test (verbose);
-    zfile_test (verbose);
-    zframe_test (verbose);
-    zgossip_test (verbose);
-    zhashx_test (verbose);
-    ziflist_test (verbose);
-    zlistx_test (verbose);
-    zloop_test (verbose);
-    zmonitor_test (verbose);
-    zmsg_test (verbose);
-    zpoller_test (verbose);
-    zproxy_test (verbose);
-    zrex_test (verbose);
-    zsock_test (verbose);
-    zsock_option_test (verbose);
-    zstr_test (verbose);
-    zsys_test (verbose);
-    ztrie_test (verbose);
-    zuuid_test (verbose);
-    zgossip_msg_test (verbose);
-    zauth_v2_test (verbose);
-    zbeacon_v2_test (verbose);
-    zctx_test (verbose);
-    zhash_test (verbose);
-    zlist_test (verbose);
-    zmonitor_v2_test (verbose);
-    zmutex_test (verbose);
-    zproxy_v2_test (verbose);
-    zsocket_test (verbose);
-    zsockopt_test (verbose);
-    zthread_test (verbose);
-
-    printf ("Tests passed OK\n");
     return 0;
 }
 /*
