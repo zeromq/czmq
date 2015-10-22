@@ -242,7 +242,12 @@ install(
 ########################################################################
 add_executable(czmq_selftest "${SOURCE_DIR}/src/czmq_selftest.c")
 target_link_libraries(czmq_selftest czmq ${ZEROMQ_LIBRARIES})
+
+set(TOTAL_TIMEOUT 20 CACHE STRING "The timeout for the total test")
+message(STATUS "Timeout for czmq_test = ${TOTAL_TIMEOUT} seconds.")
+
 add_test(czmq_selftest czmq_selftest)
+set_tests_properties(czmq_selftest PROPERTIES TIMEOUT ${TOTAL_TIMEOUT})
 
 ########################################################################
 # summary

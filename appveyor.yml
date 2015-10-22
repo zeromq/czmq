@@ -9,7 +9,6 @@ os: Visual Studio 2015 #  Windows Server 2012
 
 environment:
   CMAKE_GENERATOR: "Visual Studio 14 2015"
-  PYTHON: "C:\\Python27-x64"
 
 matrix:
   fast_finish: false #finish build once one of the jobs fails
@@ -35,12 +34,6 @@ init:
 
 #scripts that run after cloning repository
 install:
-  # Install python test libraries
-  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
-  - "python -m pip install --upgrade pip"
-  - "pip install --disable-pip-version-check --user --upgrade pip"
-  - "pip install pypiwin32"
-  - "easy_install --no-deps winpexpect"
   # Build the dependency (libzmq)
   - cmd: if "%Platform%"=="x64" set "CMAKE_GENERATOR=%CMAKE_GENERATOR% Win64"
   - cmd: echo "Generator='%CMAKE_GENERATOR%'"
@@ -65,7 +58,7 @@ before_build:
   - cmd: set CZMQ_BUILDDIR=C:\projects\build_czmq
   - cmd: md "%CZMQ_BUILDDIR%"
   - cd "%CZMQ_BUILDDIR%"
-  - cmd: cmake -G "%CMAKE_GENERATOR%" -D PC_ZEROMQ_INCLUDE_DIRS="%ZEROMQ_INCLUDE_DIRS%" -D PC_ZEROMQ_LIBRARY_DIRS="%ZEROMQ_LIBRARY_DIRS%" -D CMAKE_CXX_FLAGS_RELEASE="/MT" -D CMAKE_CXX_FLAGS_DEBUG="/MTd" "%APPVEYOR_BUILD_FOLDER%" 
+  - cmd: cmake -G "%CMAKE_GENERATOR%" -D PC_ZEROMQ_INCLUDE_DIRS="%ZEROMQ_INCLUDE_DIRS%" -D PC_ZEROMQ_LIBRARY_DIRS="%ZEROMQ_LIBRARY_DIRS%" -D CMAKE_C_FLAGS_RELEASE="/MT" -D CMAKE_C_FLAGS_DEBUG="/MTd" "%APPVEYOR_BUILD_FOLDER%" 
 
 build:
   parallel: true
@@ -79,8 +72,9 @@ after_build:
   - cmd: copy "%LIBZMQ_BUILDDIR%\bin\%Configuration%\libzmq-*dll" .
   - cmd: 7z a -y -bd -mx=9 czmq.zip czmq_selftest.exe czmq.dll libzmq-*.dll
   - ps: Push-AppveyorArtifact "czmq.zip" -Filename "czmq-${env:Platform}-${env:Configuration}.zip"
+  - cmd: cd "%CZMQ_BUILDDIR%"
   #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-  - cmd: python %APPVEYOR_BUILD_FOLDER%\src\timeout.py -f "Tests passed OK" 60 czmq_selftest #-- -v
+  - cmd: ctest --output-on-failure -C "%Configuration%"
 
 test:
   none
