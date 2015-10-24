@@ -92,6 +92,7 @@ find_package(Uuid)
 IF (UUID_FOUND)
 include_directories(${UUID_INCLUDE_DIRS})
 list(APPEND MORE_LIBRARIES ${UUID_LIBRARIES})
+add_definitions(-DHAVE_UUID)
 ENDIF (UUID_FOUND)
 
 ########################################################################
