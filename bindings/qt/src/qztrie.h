@@ -57,7 +57,7 @@ public:
     const QString hitAsteriskMatch ();
 
     //  Self test of this class
-    static void test (int verbose);
+    static void test (bool verbose);
 
     ztrie_t *self;
 };

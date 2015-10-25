@@ -74,7 +74,7 @@ public:
     
 public slots:
     //  Self test of this class
-    void test (int verbose);
+    void test (bool verbose);
 
     //  Creates a new ztrie.
     QmlZtrie *construct (char delimiter);

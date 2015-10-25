@@ -159,7 +159,7 @@ module CZMQ
       attach_function :zhashx_dup_v2, [:pointer], :pointer, **opts
       attach_function :zhashx_autofree, [:pointer], :void, **opts
       attach_function :zhashx_foreach, [:pointer, :pointer, :pointer], :int, **opts
-      attach_function :zhashx_test, [:int], :void, **opts
+      attach_function :zhashx_test, [:bool], :void, **opts
       
       require_relative 'ffi/zhashx'
       
@@ -309,7 +309,7 @@ module CZMQ
       attach_function :ztrie_hit_parameter_count, [:pointer], :size_t, **opts
       attach_function :ztrie_hit_parameters, [:pointer], :pointer, **opts
       attach_function :ztrie_hit_asterisk_match, [:pointer], :string, **opts
-      attach_function :ztrie_test, [:int], :void, **opts
+      attach_function :ztrie_test, [:bool], :void, **opts
       
       require_relative 'ffi/ztrie'
       
@@ -353,7 +353,7 @@ module CZMQ
       attach_function :zhash_refresh, [:pointer], :int, **opts
       attach_function :zhash_autofree, [:pointer], :void, **opts
       attach_function :zhash_foreach, [:pointer, :pointer, :pointer], :int, **opts
-      attach_function :zhash_test, [:int], :void, **opts
+      attach_function :zhash_test, [:bool], :void, **opts
       
       require_relative 'ffi/zhash'
       
@@ -377,7 +377,7 @@ module CZMQ
       attach_function :zlist_autofree, [:pointer], :void, **opts
       attach_function :zlist_comparefn, [:pointer, :pointer], :void, **opts
       attach_function :zlist_freefn, [:pointer, :pointer, :pointer, :bool], :pointer, **opts
-      attach_function :zlist_test, [:int], :void, **opts
+      attach_function :zlist_test, [:bool], :void, **opts
       
       require_relative 'ffi/zlist'
     end

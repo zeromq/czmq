@@ -205,7 +205,7 @@ public slots:
     QmlZhashx *unpack (QmlZframe *frame);
 
     //  Self test of this class
-    void test (int verbose);
+    void test (bool verbose);
 
     //  Create a new, empty hash container
     QmlZhashx *construct ();

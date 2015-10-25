@@ -275,7 +275,7 @@ QmlZhashx *QmlZhashxAttached::unpack (QmlZframe *frame) {
 
 ///
 //  Self test of this class
-void QmlZhashxAttached::test (int verbose) {
+void QmlZhashxAttached::test (bool verbose) {
     zhashx_test (verbose);
 };
 

@@ -918,7 +918,7 @@ lib.zhashx_autofree.argtypes = [zhashx_p]
 lib.zhashx_foreach.restype = c_int
 lib.zhashx_foreach.argtypes = [zhashx_p, zhashx_foreach_fn, c_void_p]
 lib.zhashx_test.restype = None
-lib.zhashx_test.argtypes = [c_int]
+lib.zhashx_test.argtypes = [c_bool]
 
 class Zhashx(object):
     """extended generic type-free hash container"""
@@ -1051,7 +1051,7 @@ already exist. Hash values must printable strings; keys may not contain
     def refresh(self):
         """When a hash table was loaded from a file by zhashx_load, this method will
 reload the file if it has been modified since, and is "stable", i.e. not
-still changing. Returns 0 if OK, -1 if there was an error reloading the 
+still changing. Returns 0 if OK, -1 if there was an error reloading the
 file."""
         return lib.zhashx_refresh(self._as_parameter_)
 
@@ -2303,7 +2303,7 @@ lib.ztrie_hit_parameters.argtypes = [ztrie_p]
 lib.ztrie_hit_asterisk_match.restype = c_char_p
 lib.ztrie_hit_asterisk_match.argtypes = [ztrie_p]
 lib.ztrie_test.restype = None
-lib.ztrie_test.argtypes = [c_int]
+lib.ztrie_test.argtypes = [c_bool]
 
 class Ztrie(object):
     """simple trie for tokenizable strings"""
@@ -2549,7 +2549,7 @@ lib.zhash_autofree.argtypes = [zhash_p]
 lib.zhash_foreach.restype = c_int
 lib.zhash_foreach.argtypes = [zhash_p, zhash_foreach_fn, c_void_p]
 lib.zhash_test.restype = None
-lib.zhash_test.argtypes = [c_int]
+lib.zhash_test.argtypes = [c_bool]
 
 class Zhash(object):
     """generic type-free hash container (simple)"""
@@ -2703,7 +2703,7 @@ already exist. Hash values must printable strings; keys may not contain
     def refresh(self):
         """When a hash table was loaded from a file by zhash_load, this method will
 reload the file if it has been modified since, and is "stable", i.e. not
-still changing. Returns 0 if OK, -1 if there was an error reloading the 
+still changing. Returns 0 if OK, -1 if there was an error reloading the
 file."""
         return lib.zhash_refresh(self._as_parameter_)
 
@@ -2769,7 +2769,7 @@ lib.zlist_comparefn.argtypes = [zlist_p, zlist_compare_fn]
 lib.zlist_freefn.restype = c_void_p
 lib.zlist_freefn.argtypes = [zlist_p, c_void_p, zlist_free_fn, c_bool]
 lib.zlist_test.restype = None
-lib.zlist_test.argtypes = [c_int]
+lib.zlist_test.argtypes = [c_bool]
 
 class Zlist(object):
     """simple generic list container"""
