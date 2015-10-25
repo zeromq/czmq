@@ -340,7 +340,7 @@ int QZhashx::foreachNoConflict (zhashx_foreach_fn callback, void *argument)
 
 ///
 //  Self test of this class
-void QZhashx::test (int verbose)
+void QZhashx::test (bool verbose)
 {
     zhashx_test (verbose);
     

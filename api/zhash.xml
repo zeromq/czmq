@@ -168,7 +168,7 @@
     <method name = "refresh">
         When a hash table was loaded from a file by zhash_load, this method will
         reload the file if it has been modified since, and is "stable", i.e. not
-        still changing. Returns 0 if OK, -1 if there was an error reloading the 
+        still changing. Returns 0 if OK, -1 if there was an error reloading the
         file.
         <return type = "integer" />
     </method>
@@ -199,7 +199,7 @@
 
     <method name = "test" singleton = "1">
         Self test of this class
-        <argument name = "verbose" type = "integer" />
+        <argument name = "verbose" type = "boolean" />
     </method>
 </class>
 

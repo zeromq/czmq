@@ -156,7 +156,7 @@
         else -1 if a file error occurred.
         <argument name = "filename" type = "string" />
         <return type = "integer" />
-    </method>     
+    </method>
 
     <method name = "load">
         Load hash table from a text file in name=value format; hash table must
@@ -169,7 +169,7 @@
     <method name = "refresh">
         When a hash table was loaded from a file by zhashx_load, this method will
         reload the file if it has been modified since, and is "stable", i.e. not
-        still changing. Returns 0 if OK, -1 if there was an error reloading the 
+        still changing. Returns 0 if OK, -1 if there was an error reloading the
         file.
         <return type = "integer" />
     </method>
@@ -286,7 +286,7 @@
 
     <method name = "test" singleton = "1">
         Self test of this class
-        <argument name = "verbose" type = "integer" />
+        <argument name = "verbose" type = "boolean" />
     </method>
 </class>
 

@@ -20,5 +20,5 @@ public class Zhash {
     public native int load (String Filename);
     public native int refresh ();
     public native void autofree ();
-    public native void test (int Verbose);
+    public native void test (boolean Verbose);
 }

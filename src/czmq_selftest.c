@@ -22,37 +22,32 @@
 
 #include "czmq_classes.h"
 
-//  --------------------------------------------------------------------------
+//  -------------------------------------------------------------------------
 //  Prototype of test function
 //
 
-typedef void (*testfn_t)(bool);
+typedef void (*testfn_t) (bool);
 
-//  --------------------------------------------------------------------------
-//  Mapping of testname and test function.
+//  -------------------------------------------------------------------------
+//  Mapping of test class and test function.
 //
 
 typedef struct
 {
     const char *testname;
-    testfn_t    test;
-
+    testfn_t test;
 } test_item_t;
 
-//  --------------------------------------------------------------------------
-//  Declaration of all the tests
+//  -------------------------------------------------------------------------
+//  Declaration of all tests
 //
-
-// The test suite generator depends
-// on the presence of DECLARE_TESTS.
-// So please do not remove the use this macro.
 
 #define DECLARE_TEST(TEST) {#TEST, TEST}
 
-test_item_t all_tests[] = {
+test_item_t all_tests [] = {
     DECLARE_TEST(zactor_test),
-    DECLARE_TEST(zarmour_test),
     DECLARE_TEST(zauth_test),
+    DECLARE_TEST(zarmour_test),
     DECLARE_TEST(zbeacon_test),
     DECLARE_TEST(zcert_test),
     DECLARE_TEST(zcertstore_test),
@@ -92,120 +87,119 @@ test_item_t all_tests[] = {
     DECLARE_TEST(zsocket_test),
     DECLARE_TEST(zsockopt_test),
     DECLARE_TEST(zthread_test),
-    {0, 0} //Null terminator
+    {0, 0} // Null terminator
 };
 
-//  --------------------------------------------------------------------------
+//  -------------------------------------------------------------------------
 //  Return the number of available tests.
 //
 
 static inline unsigned
-test_get_number()
+test_get_number (void)
 {
-    unsigned nb = 0;
-    for(test_item_t *p = all_tests; p->test; ++p, ++nb)
-        ;
-    return nb;
+    unsigned count = 0;
+    test_item_t *item;
+    for (item = all_tests; item->test; item++)
+        count++;
+    return count;
 }
 
-//  --------------------------------------------------------------------------
-//  Print all available tests to stdout.
+//  -------------------------------------------------------------------------
+//  Print names of all available tests to stdout.
 //
 
 static inline void
-test_print_list()
+test_print_list (void)
 {
-    unsigned i = 0;
-    for(test_item_t *p = all_tests; p->test; ++p, ++i)
-        printf("%u:%s\n", i, p->testname);
+    unsigned count = 0;
+    test_item_t *item;
+    for (item = all_tests; item->test; item++) {
+        count++;
+        printf ("%u:%s\n", count, item->testname);
+    }
 }
 
-//  --------------------------------------------------------------------------
+//  -------------------------------------------------------------------------
 //  Test whether a test is available.
-//  Return a pointer to a map if available, NULL otherwise.
+//  Return a pointer to a test_item_t if available, NULL otherwise.
 //
 
 test_item_t *
-test_available(const char *test)
+test_available (const char *testname)
 {
-    for(test_item_t *p = all_tests; p->test; ++p)
-     {
-         if streq(test, p->testname)
-             return p;
-     }
-     return NULL;
-
+    test_item_t *item;
+    for (item = all_tests; item->test; item++) {
+        if (streq (testname, item->testname))
+            return item;
+    }
+    return NULL;
 }
 
-//  --------------------------------------------------------------------------
+//  -------------------------------------------------------------------------
 //  Run all tests.
 //
 
 static inline void
-test_runall(bool verbose)
+test_runall (bool verbose)
 {
     printf ("Running czmq selftests...\n");
-    for(test_item_t *p = all_tests; p->test; ++p)
-        p->test(verbose);
+    test_item_t *item;
+    for (item = all_tests; item->test; item++)
+        item->test (verbose);
+
     printf ("Tests passed OK\n");
 }
 
-
 int
-main (int argc, char *argv [])
+main (int argc, char **argv)
 {
     bool verbose = false;
     test_item_t *test = 0;
-    for (int i = 1; i < argc; ++i)
-    {
-        if (streq(argv[i], "-v"))
-        {
+    for (int argn = 1; argn < argc; argn++) {
+        if (streq (argv [argn], "-v"))
             verbose = true;
-        }
-        else if (streq(argv[i], "--nb")) {
-            printf("%d\n", test_get_number());
+        else
+        if (streq (argv [argn], "--nb")) {
+            printf("%d\n", test_get_number ());
             return 0;
         }
-        else if (streq(argv[i], "--list")) {
-            test_print_list();
+        else
+        if (streq (argv [argn], "--list")) {
+            test_print_list ();
             return 0;
         }
-        else if (streq(argv[i], "--test"))
-        {
-            ++i;
-            if (i >= argc)
-            {
-                fprintf(stderr, "--test needs an argument\n");
+        else
+        if (streq (argv [argn], "--test")) {
+            argn++;
+            if (argn >= argc) {
+                fprintf (stderr, "--test needs an argument\n");
                 return 1;
             }
-            test = test_available(argv[i]);
-            if (!test)
-            {
-                printf("%s is not available\n", argv[i]);
+            test = test_available (argv [argn]);
+            if (!test) {
+                fprintf (stderr, "%s is not available\n", argv [argn]);
                 return 1;
             }
         }
-        else if (streq(argv[i], "-e"))
-        {
+        else
+        if (streq (argv [argn], "-e")) {
 #ifdef _MSC_VER
-            //When receiving an abort signal, only print to stderr (no dialog)
+            //  When receiving an abort signal, only print to stderr (no dialog)
             _set_abort_behavior (0, _WRITE_ABORT_MSG);
 #endif
         }
-        else
-        {
-            printf("Unknown option: %s\n", argv[i]);
+        else {
+            printf ("Unknown option: %s\n", argv [argn]);
             return 1;
         }
     }
 
-    if (test)
-    {
-          printf("Running czmq selftest '%s'...\n", test->testname);
-          test->test(verbose);
-    } else {
-        test_runall(verbose);
+    if (test) {
+        printf ("Running czmq selftest '%s'...\n", test->testname);
+        test->test (verbose);
     }
+    else
+        test_runall (verbose);
 
     return 0;
 }
