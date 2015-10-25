@@ -78,7 +78,7 @@ CZMQ_EXPORT const char *
 
 //  Self test of this class
 CZMQ_EXPORT void
-    ztrie_test (int verbose);
+    ztrie_test (bool verbose);
 //  @end
 
 #ifdef __cplusplus

@@ -1092,7 +1092,7 @@ zhashx_foreach (zhashx_t *self, zhashx_foreach_fn *callback, void *argument)
 //
 
 void
-zhashx_test (int verbose)
+zhashx_test (bool verbose)
 {
     printf (" * zhashx: ");
 

@@ -813,7 +813,7 @@ zhash_foreach (zhash_t *self, zhash_foreach_fn *callback, void *argument)
 //
 
 void
-zhash_test (int verbose)
+zhash_test (bool verbose)
 {
     printf (" * zhash: ");
 

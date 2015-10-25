@@ -654,7 +654,7 @@ zlistx_set_comparator (zlistx_t *self, czmq_comparator comparator)
 //  Runs selftest of class
 
 void
-zlistx_test (int verbose)
+zlistx_test (bool verbose)
 {
     printf (" * zlistx: ");
 

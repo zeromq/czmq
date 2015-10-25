@@ -702,7 +702,7 @@ s_armour_test_long (zarmour_t *self, byte *test_data, size_t length, bool verbos
 //  --------------------------------------------------------------------------
 //  Selftest
 
-int
+void
 zarmour_test (bool verbose)
 {
     printf (" * zarmour: ");
@@ -922,7 +922,6 @@ zarmour_test (bool verbose)
     //  @end
 
     printf ("OK\n");
-    return 0;
 }
 
 #ifdef _INCLUDE_Z85

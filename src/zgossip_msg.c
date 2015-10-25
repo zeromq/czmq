@@ -590,7 +590,7 @@ zgossip_msg_set_ttl (zgossip_msg_t *self, uint32_t ttl)
 //  --------------------------------------------------------------------------
 //  Selftest
 
-int
+void
 zgossip_msg_test (bool verbose)
 {
     printf (" * zgossip_msg:");
@@ -682,5 +682,4 @@ zgossip_msg_test (bool verbose)
     //  @end
 
     printf ("OK\n");
-    return 0;
 }

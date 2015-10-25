@@ -1,86 +1,78 @@
 version: build-{build}
 
-clone_depth: 1 #clone entire repository history if not defined
+clone_depth: 1
 
-#do not build on tags
 skip_tags: true
 
-os: Visual Studio 2015 #  Windows Server 2012
+os: Visual Studio 2015
 
 environment:
   CMAKE_GENERATOR: "Visual Studio 14 2015"
-  PYTHON: "C:\\Python27-x64"
+  MSVCVERSION: "v140"
+  MSVCYEAR: "vs2015"
+  WITH_SODIUM: ON
+  WITH_TWEETNACL: ON
+  matrix:
+    - platform: Win32
+      configuration: Debug
+    - platform: Win32
+      configuration: Release
+    - platform: x64
+      configuration: Debug
+    - platform: x64
+      configuration: Release
 
 matrix:
-  fast_finish: false #finish build once one of the jobs fails
+  fast_finish: false
 
-platform:
-  - Win32
-  - x64
-
-configuration:
-  - Release
-  - Debug
-
-#scripts that are called at very beginning, before repo cloning
 init:
-  #Put this line somewhere when you want to debug something using rdp
   #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-  #- set #debug: view all environment variables
   - cmake --version
   - msbuild /version
   - cmd: reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" /v UserAuthentication /t REG_DWORD /d 0 /f
-  #- ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-  #- cmake --help #debug: view available generators
 
-#scripts that run after cloning repository
 install:
-  # Install python test libraries
-  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
-  - "python -m pip install --upgrade pip"
-  - "pip install --disable-pip-version-check --user --upgrade pip"
-  - "pip install pypiwin32"
-  - "easy_install --no-deps winpexpect"
-  # Build the dependency (libzmq)
   - cmd: if "%Platform%"=="x64" set "CMAKE_GENERATOR=%CMAKE_GENERATOR% Win64"
   - cmd: echo "Generator='%CMAKE_GENERATOR%'"
   - cmd: echo "Platform='%Platform%'"
-  - cmd: cd C:\projects
-  - cmd: git clone --depth 1 --quiet https://github.com/zeromq/libzmq.git
-  - cmd: set LIBZMQ_BUILDDIR=C:\projects\build_libzmq\%Platform%\%Configuration%
+  - cmd: set LIBSODIUMDIR=C:\projects\libsodium
+  - cmd: git clone --depth 1 --quiet "https://github.com/jedisct1/libsodium.git" %LIBSODIUMDIR%
+  - cmd: msbuild /v:minimal /maxcpucount:%NUMBER_OF_PROCESSORS% /p:Configuration=%Configuration%DLL %LIBSODIUMDIR%\builds\msvc\%MSVCYEAR%\libsodium\libsodium.vcxproj
+  - cmd: set SODIUM_LIBRARY_DIR="%LIBSODIUMDIR%\bin\%Platform%\%Configuration%\%MSVCVERSION%\dynamic"
+  - cmd: set SODIUM_INCLUDE_DIR="%LIBSODIUMDIR%\src\libsodium\include"
+  - cmd: move "%SODIUM_LIBRARY_DIR%\libsodium.lib" "%SODIUM_LIBRARY_DIR%\sodium.lib"
+  - cmd: set LIBZMQ_SOURCEDIR=C:\projects\libzmq
+  - cmd: git clone --depth 1 --quiet https://github.com/zeromq/libzmq.git "%LIBZMQ_SOURCEDIR%"
+  - cmd: set LIBZMQ_BUILDDIR=C:\projects\build_libzmq
   - cmd: md "%LIBZMQ_BUILDDIR%"
   - cmd: cd "%LIBZMQ_BUILDDIR%"
-  - cmd: cmake -D CMAKE_CXX_FLAGS_RELEASE="/MT" -D CMAKE_CXX_FLAGS_DEBUG="/MTd" -G "%CMAKE_GENERATOR%" C:\projects\libzmq
-  - cmd: msbuild /v:minimal /maxcpucount:%NUMBER_OF_PROCESSORS% /p:Configuration=%Configuration% libzmq.vcxproj #zeromq.sln
-  - cmd: set ZEROMQ_INCLUDE_DIRS="C:\projects\libzmq\include"
-  - cmd: set ZEROMQ_LIBRARY_DIRS="%LIBZMQ_BUILDDIR%\lib\%Configuration%"
-  - cmd: move "%ZEROMQ_LIBRARY_DIRS%\libzmq-*lib" "%ZEROMQ_LIBRARY_DIRS%\zmq.lib"
-  - cmd: cd %APPVEYOR_BUILD_FOLDER%
+  - cmd: cmake -D CMAKE_INCLUDE_PATH="%SODIUM_INCLUDE_DIR%" -D CMAKE_LIBRARY_PATH="%SODIUM_LIBRARY_DIR%" -D CMAKE_CXX_FLAGS_RELEASE="/MT" -D CMAKE_CXX_FLAGS_DEBUG="/MTd" -G "%CMAKE_GENERATOR%" %LIBZMQ_SOURCEDIR%
+  - cmd: msbuild /v:minimal /maxcpucount:%NUMBER_OF_PROCESSORS% /p:Configuration=%Configuration% libzmq.vcxproj
+  - cmd: set ZEROMQ_INCLUDE_DIR="%LIBZMQ_SOURCEDIR%\include"
+  - cmd: set ZEROMQ_LIBRARY_DIR="%LIBZMQ_BUILDDIR%\lib\%Configuration%"
+  - cmd: move "%ZEROMQ_LIBRARY_DIR%\libzmq-*lib" "%ZEROMQ_LIBRARY_DIR%\zmq.lib"
 
-#where to clone the git repository to
 clone_folder: C:\projects\czmq
 
-#scripts to run before build
 before_build:
   - cmd: set CZMQ_BUILDDIR=C:\projects\build_czmq
   - cmd: md "%CZMQ_BUILDDIR%"
-  - cd "%CZMQ_BUILDDIR%"
-  - cmd: cmake -G "%CMAKE_GENERATOR%" -D PC_ZEROMQ_INCLUDE_DIRS="%ZEROMQ_INCLUDE_DIRS%" -D PC_ZEROMQ_LIBRARY_DIRS="%ZEROMQ_LIBRARY_DIRS%" -D CMAKE_CXX_FLAGS_RELEASE="/MT" -D CMAKE_CXX_FLAGS_DEBUG="/MTd" "%APPVEYOR_BUILD_FOLDER%" 
+  - cmd: cd "%CZMQ_BUILDDIR%"
+  - cmd: cmake -G "%CMAKE_GENERATOR%" -D CMAKE_INCLUDE_PATH="%ZEROMQ_INCLUDE_DIR%" -D CMAKE_LIBRARY_PATH="%ZEROMQ_LIBRARY_DIR%" -D CMAKE_C_FLAGS_RELEASE="/MT" -D CMAKE_C_FLAGS_DEBUG="/MTd" "%APPVEYOR_BUILD_FOLDER%" 
 
 build:
   parallel: true
   project: C:\projects\build_czmq\czmq.sln
-  verbosity: minimal #quiet|minimal|normal|detailed
+  verbosity: minimal
 
-#scripts to run after build
 after_build:
-  # Pack the artifacts
   - cmd: cd "%CZMQ_BUILDDIR%\%Configuration%"
+  - cmd: copy "%SODIUM_LIBRARY_DIR%\libsodium.dll" .
   - cmd: copy "%LIBZMQ_BUILDDIR%\bin\%Configuration%\libzmq-*dll" .
-  - cmd: 7z a -y -bd -mx=9 czmq.zip czmq_selftest.exe czmq.dll libzmq-*.dll
+  - cmd: 7z a -y -bd -mx=9 czmq.zip czmq_selftest.exe czmq.dll libsodium.dll libzmq-*.dll
   - ps: Push-AppveyorArtifact "czmq.zip" -Filename "czmq-${env:Platform}-${env:Configuration}.zip"
-  #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-  - cmd: python %APPVEYOR_BUILD_FOLDER%\src\timeout.py -f "Tests passed OK" 60 czmq_selftest #-- -v
+  - cmd: cd "%CZMQ_BUILDDIR%"
+  - cmd: ctest -C "%Configuration%" -V
 
 test:
   none
