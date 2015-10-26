@@ -286,7 +286,7 @@
 
     <method name = "test" singleton = "1">
         Self test of this class
-        <argument name = "verbose" type = "integer" />
+        <argument name = "verbose" type = "boolean" />
     </method>
 </class>
 

@@ -75,7 +75,7 @@ QObject* QmlZtrie::qmlAttachedProperties(QObject* object) {
 
 ///
 //  Self test of this class
-void QmlZtrieAttached::test (int verbose) {
+void QmlZtrieAttached::test (bool verbose) {
     ztrie_test (verbose);
 };
 

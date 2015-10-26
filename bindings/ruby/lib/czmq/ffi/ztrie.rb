@@ -149,7 +149,7 @@ module CZMQ
       
       # Self test of this class
       def self.test verbose
-        verbose = Integer(verbose)
+        verbose = !(0==verbose||!verbose) # boolean
         result = ::CZMQ::FFI.ztrie_test verbose
         result
       end

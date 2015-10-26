@@ -23,5 +23,5 @@ public class Zhashx {
     public native Zhashx dup ();
     public native Zhashx dupV2 ();
     public native void autofree ();
-    public native void test (int Verbose);
+    public native void test (boolean Verbose);
 }

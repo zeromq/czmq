@@ -104,7 +104,7 @@ const QString QZtrie::hitAsteriskMatch ()
 
 ///
 //  Self test of this class
-void QZtrie::test (int verbose)
+void QZtrie::test (bool verbose)
 {
     ztrie_test (verbose);
     

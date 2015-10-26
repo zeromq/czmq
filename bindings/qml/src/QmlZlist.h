@@ -124,7 +124,7 @@ public:
     
 public slots:
     //  Self test of this class
-    void test (int verbose);
+    void test (bool verbose);
 
     //  Create a new list container
     QmlZlist *construct ();
