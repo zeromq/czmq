@@ -10,5 +10,5 @@ public class Ztrie {
     public native long hitParameterCount ();
     public native Zhashx hitParameters ();
     public native String hitAsteriskMatch ();
-    public native void test (int Verbose);
+    public native void test (boolean Verbose);
 }

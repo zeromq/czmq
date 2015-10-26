@@ -142,7 +142,7 @@ public:
     int foreachNoConflict (zhash_foreach_fn callback, void *argument);
 
     //  Self test of this class
-    static void test (int verbose);
+    static void test (bool verbose);
 
     zhash_t *self;
 };

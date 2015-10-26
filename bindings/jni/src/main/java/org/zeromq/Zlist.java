@@ -18,5 +18,5 @@ public class Zlist {
     public native void purge ();
     public native long size ();
     public native void autofree ();
-    public native void test (int Verbose);
+    public native void test (boolean Verbose);
 }

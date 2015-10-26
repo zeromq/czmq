@@ -242,38 +242,63 @@ install(
 # tests
 ########################################################################
 add_executable(czmq_selftest "${SOURCE_DIR}/src/czmq_selftest.c")
-target_link_libraries(czmq_selftest czmq)
+target_link_libraries(czmq_selftest czmq ${ZEROMQ_LIBRARIES})
 
-set(SUBTEST_TIMEOUT 5 CACHE STRING "The timeout for each subtest")
-message(STATUS "Timeout per subtest = ${SUBTEST_TIMEOUT} seconds.")
+set(CLASSTEST_TIMEOUT 5 CACHE STRING "Timeout of the selftest of a class")
+set(TOTAL_TIMEOUT 20 CACHE STRING "Timout of the total testsuite")
 
-file(READ "${SOURCE_DIR}/src/czmq_selftest.c" SELFTEST_SOURCE)
-string(REGEX REPLACE ";" "\\\\;" SELFTEST_SOURCE "${SELFTEST_SOURCE}")
-string(REGEX REPLACE "\n" ";" SELFTEST_SOURCE "${SELFTEST_SOURCE}")
+set(TEST_CLASSES
+  zactor_test
+  zauth_test
+  zarmour_test
+  zbeacon_test
+  zcert_test
+  zcertstore_test
+  zchunk_test
+  zclock_test
+  zconfig_test
+  zdigest_test
+  zdir_test
+  zdir patch_test
+  zfile_test
+  zframe_test
+  zgossip_test
+  zhashx_test
+  ziflist_test
+  zlistx_test
+  zloop_test
+  zmonitor_test
+  zmsg_test
+  zpoller_test
+  zproxy_test
+  zrex_test
+  zsock_test
+  zsock_option_test
+  zstr_test
+  zsys_test
+  ztrie_test
+  zuuid_test
+  zgossip_msg_test
+  zauth_v2_test
+  zbeacon_v2_test
+  zctx_test
+  zhash_test
+  zlist_test
+  zmonitor_v2_test
+  zmutex_test
+  zproxy_v2_test
+  zsocket_test
+  zsockopt_test
+  zthread_test
+)
 
-set(FUNCTION_DECLARATION "DECLARE_TEST")
-string(LENGTH ${FUNCTION_DECLARATION} LEN_FUNCTION_DECLARATION)
+foreach(TEST_CLASS ${TEST_CLASSES})
+  add_test(NAME ${TEST_CLASS} COMMAND czmq_selftest -e -v --test ${TEST_CLASS})
+  set_tests_properties(${TEST_CLASS} PROPERTIES TIMEOUT ${CLASSTEST_TIMEOUT})
+endforeach(TEST_CLASS)
 
-foreach(LINE ${SELFTEST_SOURCE})
-    string(REGEX MATCH "${FUNCTION_DECLARATION}\\([^\\)]+\\)" TESTNAME ${LINE})
-    string(REGEX MATCH "define" DEFINITION "${LINE}") #ignore the define
-    if(TESTNAME AND NOT DEFINITION)
-        string(LENGTH ${TESTNAME} TESTNAME_LENGTH)
-        math(EXPR TESTNAME_LENGTH "${TESTNAME_LENGTH}-${LEN_FUNCTION_DECLARATION}-2") #extra 2 because of the parentheses
-        math(EXPR TESTNAME_START "${LEN_FUNCTION_DECLARATION}+1")
-        string(SUBSTRING ${TESTNAME} ${TESTNAME_START} ${TESTNAME_LENGTH} TESTNAME)
-        string(STRIP ${TESTNAME} TESTNAME)
-        add_test(NAME ${TESTNAME} COMMAND czmq_selftest -e -v --test "${TESTNAME}")
-        set_tests_properties(${TESTNAME} PROPERTIES TIMEOUT ${SUBTEST_TIMEOUT})
-    endif()
-endforeach()
-
-set(TOTAL_TIMEOUT 20 CACHE STRING "The timeout for the total test")
-message(STATUS "Timeout for czmq_test = ${TOTAL_TIMEOUT} seconds.")
-
-add_test(NAME czmq_selftest COMMAND czmq_selftest -e -v)
+add_test(czmq_selftest czmq_selftest)
 set_tests_properties(czmq_selftest PROPERTIES TIMEOUT ${TOTAL_TIMEOUT})
-
 ########################################################################
 # summary
 ########################################################################
