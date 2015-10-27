@@ -145,7 +145,7 @@ s_ztrie_node_new (ztrie_node_t *parent, char *token, int token_len, zlistx_t *pa
         //  Sort regexes to the end to avoid conlficts
         zlistx_sort (self->parent->children);
     }
-    size_t parent_path_len = self->parent ? self->parent->path_len : 0;
+    size_t parent_path_len = self->parent? self->parent->path_len: 0;
     self->path_len = parent_path_len + strlen (self->token) + 1; // +1 path delimiter
     self->children = zlistx_new ();
     zlistx_set_comparator (self->children, s_ztrie_node_compare);
@@ -360,10 +360,10 @@ s_ztrie_parse_path (ztrie_t *self, char *path, int mode)
             //  Token ends with delimiter.
             else
             if (state < 3) {
-                int matchType = zlistx_size (self->params) > 0 ? NODE_TYPE_PARAM :
-                                    beginRegex ? NODE_TYPE_REGEX : NODE_TYPE_STRING;
-                char *matchToken = beginRegex ? beginRegex : beginToken;
-                int matchTokenLen = needle - matchToken - (beginRegex ? 1 : 0);
+                int matchType = zlistx_size (self->params) > 0? NODE_TYPE_PARAM:
+                                    beginRegex? NODE_TYPE_REGEX: NODE_TYPE_STRING;
+                char *matchToken = beginRegex? beginRegex: beginToken;
+                int matchTokenLen = needle - matchToken - (beginRegex? 1: 0);
                 //  Illegal token
                 if (matchTokenLen == 0)
                     return NULL;
@@ -380,10 +380,10 @@ s_ztrie_parse_path (ztrie_t *self, char *path, int mode)
                         return NULL;
                 }
                 else {
-                    matchType = zlistx_size (self->params) > 0 ? NODE_TYPE_PARAM :
-                                        beginRegex ? NODE_TYPE_REGEX : NODE_TYPE_STRING;
-                    matchToken = beginRegex ? beginRegex : beginToken;
-                    matchTokenLen = needle - matchToken - (beginRegex ? 1 : 0);
+                    matchType = zlistx_size (self->params) > 0? NODE_TYPE_PARAM:
+                                        beginRegex? NODE_TYPE_REGEX: NODE_TYPE_STRING;
+                    matchToken = beginRegex? beginRegex: beginToken;
+                    matchTokenLen = needle - matchToken - (beginRegex? 1: 0);
                 }
 
                 //  In insert and lookup mode only do a string comparison
@@ -517,7 +517,7 @@ ztrie_matches (ztrie_t *self, char *path)
 {
     assert (self);
     self->match = s_ztrie_parse_path (self, path, MODE_MATCH);
-    return self->match ? true : false;
+    return self->match? true: false;
 }
 
 
@@ -610,11 +610,9 @@ s_ztrie_print_tree_line (ztrie_node_t *self, bool isEOL)
                 printf ("\u2502   ");
         }
         if (isEOL) {
-            char *isEndpoint = self->endpoint ? "true" : "false";
-            printf ("%s (params: %zu, endpoint: %s, type: %d)\n", self->token,
-                                                                 self->parameter_count,
-                                                                 isEndpoint,
-                                                                 self->token_type);
+            char *isEndpoint = self->endpoint? "true": "false";
+            printf ("%s (params: %zu, endpoint: %s, type: %d)\n",
+                self->token, self->parameter_count, isEndpoint, self->token_type);
         }
     }
 }

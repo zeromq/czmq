@@ -181,8 +181,8 @@ zsocket_sendmem (void *self, const void *data, size_t size, int flags)
     assert (self);
     assert (size == 0 || data);
 
-    int snd_flags = (flags & ZFRAME_MORE) ? ZMQ_SNDMORE : 0;
-    snd_flags |= (flags & ZFRAME_DONTWAIT) ? ZMQ_DONTWAIT : 0;
+    int snd_flags = (flags & ZFRAME_MORE)? ZMQ_SNDMORE: 0;
+    snd_flags |= (flags & ZFRAME_DONTWAIT)? ZMQ_DONTWAIT: 0;
 
     zmq_msg_t msg;
     zmq_msg_init_size (&msg, size);

@@ -143,8 +143,7 @@ zmsg_send (zmsg_t **self_p, void *dest)
         zframe_t *frame;
         while ((frame = (zframe_t *) zlist_head (self->frames))) {
             rc = zframe_send (&frame, dest,
-                              zlist_size (self->frames) > 1 ?
-                                      ZFRAME_MORE : 0);
+                              zlist_size (self->frames) > 1? ZFRAME_MORE: 0);
             if (rc != 0) {
                 if (errno == EINTR && sent_some)
                     continue;

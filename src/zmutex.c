@@ -120,11 +120,11 @@ zmutex_try_lock (zmutex_t *self)
 #if defined (__UNIX__)
     //  rc is either EBUSY or 0
     int rc = pthread_mutex_trylock (&self->mutex);
-    return rc == EBUSY ? 0 : 1;
+    return rc == EBUSY? 0: 1;
 #elif defined (__WINDOWS__)
     //  rc is nonzero if the mutex lock has been acquired
     int rc = TryEnterCriticalSection (&self->mutex);
-    return rc != 0 ? 1 : 0;
+    return rc != 0? 1: 0;
 #endif
 }
 
