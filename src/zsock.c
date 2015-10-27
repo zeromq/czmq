@@ -45,6 +45,7 @@ struct _zsock_t {
     char *cache;                //  Holds last zsock_brecv strings
     int type;                   //  Socket type
     size_t cache_size;          //  Current size of cache
+    uint32_t routing_id;        //  Routing ID for server sockets
 };
 
 
@@ -1469,6 +1470,29 @@ zsock_brecv (void *selfish, const char *picture, ...)
     malformed:
         zmq_msg_close (&msg);
         return -1;              //  Invalid message
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket routing ID if any. This returns 0 if the socket is not
+//  of type ZMQ_SERVER or if no request was already received on it.
+
+uint32_t
+zsock_routing_id (zsock_t *self)
+{
+    return self->routing_id;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set routing ID on socket. The socket MUST be of type ZMQ_SERVER.
+//  This will be used when sending messages on the socket via the zsock API.
+
+void
+zsock_set_routing_id (zsock_t *self, uint32_t routing_id)
+{
+    assert (self);
+    self->routing_id = routing_id;
 }
 
 

@@ -23,6 +23,18 @@ const QString QmlZstrAttached::recv (void *source) {
 };
 
 ///
+//  Receive a series of strings (until NULL) from multipart data.    
+//  Each string is allocated and filled with string data; if there   
+//  are not enough frames, unallocated strings are set to NULL.      
+//  Returns -1 if the message could not be read, else returns the    
+//  number of strings filled, zero or more. Free each returned string
+//  using zstr_free(). If not enough strings are provided, remaining 
+//  multipart frames in the message are dropped.                     
+int QmlZstrAttached::recvx (void *source, QString stringP) {
+    return zstr_recvx (source, stringP.toUtf8().data());
+};
+
+///
 //  Send a C string to a socket, as a frame. The string is sent without 
 //  trailing null byte; to read this you can use zstr_recv, or a similar
 //  method that adds a null terminator on the received string. String   
@@ -59,18 +71,6 @@ int QmlZstrAttached::sendfm (void *dest, const QString &format) {
 //  Returns 0 if the strings could be sent OK, or -1 on error.
 int QmlZstrAttached::sendx (void *dest, const QString &string) {
     return zstr_sendx (dest, string.toUtf8().data());
-};
-
-///
-//  Receive a series of strings (until NULL) from multipart data.    
-//  Each string is allocated and filled with string data; if there   
-//  are not enough frames, unallocated strings are set to NULL.      
-//  Returns -1 if the message could not be read, else returns the    
-//  number of strings filled, zero or more. Free each returned string
-//  using zstr_free(). If not enough strings are provided, remaining 
-//  multipart frames in the message are dropped.                     
-int QmlZstrAttached::recvx (void *source, QString stringP) {
-    return zstr_recvx (source, stringP.toUtf8().data());
 };
 
 ///

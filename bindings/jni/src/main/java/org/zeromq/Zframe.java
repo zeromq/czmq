@@ -16,8 +16,6 @@ public class Zframe {
     public native boolean streq (String String);
     public native int more ();
     public native void setMore (int More);
-    public native long routingId ();
-    public native void setRoutingId (long RoutingId);
     public native boolean eq (Zframe Other);
     public native void reset (void Data, long Size);
     public native void print (String Prefix);

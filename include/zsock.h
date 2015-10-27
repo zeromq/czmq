@@ -274,6 +274,16 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zsock_brecv (void *self, const char *picture, ...);
 
+//  Return socket routing ID if any. This returns 0 if the socket is not
+//  of type ZMQ_SERVER or if no request was already received on it.     
+CZMQ_EXPORT uint32_t
+    zsock_routing_id (zsock_t *self);
+
+//  Set routing ID on socket. The socket MUST be of type ZMQ_SERVER.        
+//  This will be used when sending messages on the socket via the zsock API.
+CZMQ_EXPORT void
+    zsock_set_routing_id (zsock_t *self, uint32_t routing_id);
+
 //  Set socket to use unbounded pipes (HWM=0); use this in cases when you are
 //  totally certain the message volume can fit in memory. This method works  
 //  across all versions of ZeroMQ. Takes a polymorphic socket reference.     

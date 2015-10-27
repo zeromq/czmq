@@ -57,12 +57,13 @@ public slots:
     //  frame to socket, you have to specify flag explicitly.                
     void setMore (int more);
 
-    //  Return frame routing id, set when reading frame from server socket
-    //  or by the zframe_set_routing_id() method.                         
-    size_t routingId ();
+    //  Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
+    //  Else returns zero.                                                  
+    uint32_t routingId ();
 
-    //  Set frame routing id. Only relevant when sending to server socket.
-    void setRoutingId (size_t routingId);
+    //  Set routing ID on frame. This is used if/when the frame is sent to a
+    //  ZMQ_SERVER socket.                                                  
+    void setRoutingId (uint32_t routingId);
 
     //  Return TRUE if two frames have identical size and data
     //  If either frame is NULL, equality is always false.    

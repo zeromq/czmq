@@ -59,6 +59,18 @@ module CZMQ
         result
       end
       
+      # Receive a series of strings (until NULL) from multipart data.    
+      # Each string is allocated and filled with string data; if there   
+      # are not enough frames, unallocated strings are set to NULL.      
+      # Returns -1 if the message could not be read, else returns the    
+      # number of strings filled, zero or more. Free each returned string
+      # using zstr_free(). If not enough strings are provided, remaining 
+      # multipart frames in the message are dropped.                     
+      def self.recvx source, string_p, result
+        result = ::CZMQ::FFI.zstr_recvx source, string_p, result
+        result
+      end
+      
       # Send a C string to a socket, as a frame. The string is sent without 
       # trailing null byte; to read this you can use zstr_recv, or a similar
       # method that adds a null terminator on the received string. String   
@@ -100,18 +112,6 @@ module CZMQ
       def self.sendx dest, string, result
         string = String(string)
         result = ::CZMQ::FFI.zstr_sendx dest, string, result
-        result
-      end
-      
-      # Receive a series of strings (until NULL) from multipart data.    
-      # Each string is allocated and filled with string data; if there   
-      # are not enough frames, unallocated strings are set to NULL.      
-      # Returns -1 if the message could not be read, else returns the    
-      # number of strings filled, zero or more. Free each returned string
-      # using zstr_free(). If not enough strings are provided, remaining 
-      # multipart frames in the message are dropped.                     
-      def self.recvx source, string_p, result
-        result = ::CZMQ::FFI.zstr_recvx source, string_p, result
         result
       end
       

@@ -67,6 +67,11 @@ zstr_recv (void *source)
     if (zmq_recvmsg (handle, &message, 0) < 0)
         return NULL;
 
+#if defined (ZMQ_SERVER)
+    //  Grab routing ID if we're reading from a SERVER socket (ZMQ 4.2 and later)
+    if (zsock_is (source) && zsock_type (source) == ZMQ_SERVER)
+        zsock_set_routing_id ((zsock_t *) source, zmq_msg_routing_id (&message));
+#endif
     size_t size = zmq_msg_size (&message);
     char *string = (char *) malloc (size + 1);
     if (string) {
@@ -75,6 +80,44 @@ zstr_recv (void *source)
     }
     zmq_msg_close (&message);
     return string;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Receive a series of strings (until NULL) from multipart data.
+//  Each string is allocated and filled with string data; if there
+//  are not enough frames, unallocated strings are set to NULL.
+//  Returns -1 if the message could not be read, else returns the
+//  number of strings filled, zero or more. Free each returned string
+//  using zstr_free(). If not enough strings are provided, remaining
+//  multipart frames in the message are dropped.
+
+int
+zstr_recvx (void *source, char **string_p, ...)
+{
+    assert (source);
+    void *handle = zsock_resolve (source);
+
+    zmsg_t *msg = zmsg_recv (handle);
+    if (!msg)
+        return -1;
+
+    //  Filter a signal that may come from a dying actor
+    if (zmsg_signal (msg) >= 0) {
+        zmsg_destroy (&msg);
+        return -1;
+    }
+    int count = 0;
+    va_list args;
+    va_start (args, string_p);
+    while (string_p) {
+        *string_p = zmsg_popstr (msg);
+        string_p = va_arg (args, char **);
+        count++;
+    }
+    va_end (args);
+    zmsg_destroy (&msg);
+    return count;
 }
 
 
@@ -174,44 +217,6 @@ zstr_sendx (void *dest, const char *string, ...)
     }
     va_end (args);
     return zmsg_send (&msg, dest);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Receive a series of strings (until NULL) from multipart data.
-//  Each string is allocated and filled with string data; if there
-//  are not enough frames, unallocated strings are set to NULL.
-//  Returns -1 if the message could not be read, else returns the
-//  number of strings filled, zero or more. Free each returned string
-//  using zstr_free(). If not enough strings are provided, remaining
-//  multipart frames in the message are dropped.
-
-int
-zstr_recvx (void *source, char **string_p, ...)
-{
-    assert (source);
-    void *handle = zsock_resolve (source);
-
-    zmsg_t *msg = zmsg_recv (handle);
-    if (!msg)
-        return -1;
-
-    //  Filter a signal that may come from a dying actor
-    if (zmsg_signal (msg) >= 0) {
-        zmsg_destroy (&msg);
-        return -1;
-    }
-    int count = 0;
-    va_list args;
-    va_start (args, string_p);
-    while (string_p) {
-        *string_p = zmsg_popstr (msg);
-        string_p = va_arg (args, char **);
-        count++;
-    }
-    va_end (args);
-    zmsg_destroy (&msg);
-    return count;
 }
 
 

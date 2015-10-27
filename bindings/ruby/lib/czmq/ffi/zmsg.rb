@@ -112,6 +112,22 @@ module CZMQ
         result
       end
       
+      # Return message routing ID, if the message came from a ZMQ_SERVER socket.
+      # Else returns zero.                                                      
+      def routing_id
+        raise DestroyedError unless @ptr
+        result = ::CZMQ::FFI.zmsg_routing_id @ptr
+        result
+      end
+      
+      # Set routing ID on message. This is used if/when the message is sent to a
+      # ZMQ_SERVER socket.                                                      
+      def set_routing_id routing_id
+        raise DestroyedError unless @ptr
+        result = ::CZMQ::FFI.zmsg_set_routing_id @ptr, routing_id
+        result
+      end
+      
       # Push frame to the front of the message, i.e. before all other frames.  
       # Message takes ownership of frame, will destroy it when message is sent.
       # Returns 0 on success, -1 on error. Deprecates zmsg_push, which did not 

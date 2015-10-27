@@ -70,12 +70,13 @@ JNIEXPORT void JNICALL Java_org_zeromq_Zframe_more (JNIEnv *env, jobject thisObj
 JNIEXPORT void JNICALL Java_org_zeromq_Zframe_setMore (JNIEnv *env, jobject thisObj) {
 }
 
-//  Return frame routing id, set when reading frame from server socket
-//  or by the zframe_set_routing_id() method.                         
+//  Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
+//  Else returns zero.                                                  
 JNIEXPORT void JNICALL Java_org_zeromq_Zframe_routingId (JNIEnv *env, jobject thisObj) {
 }
 
-//  Set frame routing id. Only relevant when sending to server socket.
+//  Set routing ID on frame. This is used if/when the frame is sent to a
+//  ZMQ_SERVER socket.                                                  
 JNIEXPORT void JNICALL Java_org_zeromq_Zframe_setRoutingId (JNIEnv *env, jobject thisObj) {
 }
 

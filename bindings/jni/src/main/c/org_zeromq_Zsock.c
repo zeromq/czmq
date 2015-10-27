@@ -228,6 +228,16 @@ JNIEXPORT void JNICALL Java_org_zeromq_Zsock_bsend (JNIEnv *env, jobject thisObj
 JNIEXPORT void JNICALL Java_org_zeromq_Zsock_brecv (JNIEnv *env, jobject thisObj) {
 }
 
+//  Return socket routing ID if any. This returns 0 if the socket is not
+//  of type ZMQ_SERVER or if no request was already received on it.     
+JNIEXPORT void JNICALL Java_org_zeromq_Zsock_routingId (JNIEnv *env, jobject thisObj) {
+}
+
+//  Set routing ID on socket. The socket MUST be of type ZMQ_SERVER.        
+//  This will be used when sending messages on the socket via the zsock API.
+JNIEXPORT void JNICALL Java_org_zeromq_Zsock_setRoutingId (JNIEnv *env, jobject thisObj) {
+}
+
 //  Set socket to use unbounded pipes (HWM=0); use this in cases when you are
 //  totally certain the message volume can fit in memory. This method works  
 //  across all versions of ZeroMQ. Takes a polymorphic socket reference.     

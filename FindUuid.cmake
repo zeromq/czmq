@@ -15,7 +15,7 @@ if (NOT MSVC)
     # headers and SOs.
     set(UUID_INCLUDE_HINTS ${PC_UUID_INCLUDE_DIRS} ${PC_UUID_INCLUDE_DIRS}/*)
     set(UUID_LIBRARY_HINTS ${PC_UUID_LIBRARY_DIRS} ${PC_UUID_LIBRARY_DIRS}/*)
-  endif(PC_UUID_FOUND)
+  endif(NOT PC_UUID_FOUND)
 endif (NOT MSVC)
 
 find_path(

@@ -177,6 +177,14 @@ public slots:
     //  values. Returns 0 if successful, or -1 if it failed to read a message.  
     int brecv (const QString &picture);
 
+    //  Return socket routing ID if any. This returns 0 if the socket is not
+    //  of type ZMQ_SERVER or if no request was already received on it.     
+    uint32_t routingId ();
+
+    //  Set routing ID on socket. The socket MUST be of type ZMQ_SERVER.        
+    //  This will be used when sending messages on the socket via the zsock API.
+    void setRoutingId (uint32_t routingId);
+
     //  Set socket to use unbounded pipes (HWM=0); use this in cases when you are
     //  totally certain the message volume can fit in memory. This method works  
     //  across all versions of ZeroMQ. Takes a polymorphic socket reference.     
