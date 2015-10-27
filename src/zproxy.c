@@ -62,7 +62,8 @@ s_self_destroy (self_t **self_p)
         zsock_destroy (&self->frontend);
         zsock_destroy (&self->backend);
         zsock_destroy (&self->capture);
-        for (int index = 0; index < SOCKETS; index++) {
+        int index;
+        for (index = 0; index < SOCKETS; index++) {
             zstr_free (&self->domain [index]);
             zstr_free (&self->public_key [index]);
             zstr_free (&self->secret_key [index]);

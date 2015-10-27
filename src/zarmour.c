@@ -681,6 +681,7 @@ s_armour_test_long (zarmour_t *self, byte *test_data, size_t length, bool verbos
 {
     if (verbose)
         zarmour_print (self);
+
     char *test_string = zarmour_encode (self, test_data, length);
     assert (test_string);
     if (verbose)
@@ -690,10 +691,10 @@ s_armour_test_long (zarmour_t *self, byte *test_data, size_t length, bool verbos
     free (test_string);
     assert (test_data2);
     assert (test_size == length + 1);
-    unsigned int i;
-    for (i = 0; i < length; ++i) {
-        assert (test_data2[i] == i);
-    }
+    unsigned int index;
+    for (index = 0; index < length; index++)
+        assert (test_data2 [index] == index);
+
     free (test_data2);
     if (verbose)
         zsys_debug ("    decoded %d bytes, all match", test_size - 1);
@@ -753,6 +754,7 @@ zarmour_test (bool verbose)
     zarmour_set_pad (self, true);
     if (verbose)
         zarmour_print (self);
+
     s_armour_test (self, "", "", verbose);
     s_armour_test (self, "f", "Zg==", verbose);
     s_armour_test (self, "fo", "Zm8=", verbose);
@@ -899,10 +901,10 @@ zarmour_test (bool verbose)
     zarmour_set_pad (self, true);
     zarmour_set_line_breaks (self, true);
     byte test_data[256];
-    int i;
-    for (i = 0; i < 256; ++i) {
-        test_data[i] = i;
-    }
+    int index;
+    for (index = 0; index < 256; index++)
+        test_data [index] = index;
+
     zarmour_set_mode (self, ZARMOUR_MODE_BASE64_STD);
     s_armour_test_long (self, test_data, 256, verbose);
     zarmour_set_mode (self, ZARMOUR_MODE_BASE64_URL);
