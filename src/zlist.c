@@ -134,7 +134,7 @@ void *
 zlist_head (zlist_t *self)
 {
     assert (self);
-    return self->head ? self->head->item : NULL;
+    return self->head? self->head->item: NULL;
 }
 
 
@@ -146,7 +146,7 @@ void *
 zlist_tail (zlist_t *self)
 {
     assert (self);
-    return self->tail ? self->tail->item : NULL;
+    return self->tail? self->tail->item: NULL;
 }
 
 

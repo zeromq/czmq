@@ -42,7 +42,7 @@ s_send_string (void *dest, bool more, char *string)
     zmq_msg_t message;
     zmq_msg_init_size (&message, len);
     memcpy (zmq_msg_data (&message), string, len);
-    if (zmq_sendmsg (handle, &message, more ? ZMQ_SNDMORE : 0) == -1) {
+    if (zmq_sendmsg (handle, &message, more? ZMQ_SNDMORE: 0) == -1) {
         zmq_msg_close (&message);
         return -1;
     }
@@ -88,7 +88,7 @@ int
 zstr_send (void *dest, const char *string)
 {
     assert (dest);
-    return s_send_string (dest, false, string ? (char *) string : "");
+    return s_send_string (dest, false, string? (char *) string: "");
 }
 
 

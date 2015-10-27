@@ -154,10 +154,10 @@ s_proxy_task (void *args, zctx_t *ctx, void *command_pipe)
         int send_flags;         //  Flags for outgoing message
 
         if (which && zmq_recvmsg (which, &msg, 0) != -1) {
-            send_flags = zsocket_rcvmore (which) ? ZMQ_SNDMORE : 0;
+            send_flags = zsocket_rcvmore (which)? ZMQ_SNDMORE: 0;
             if (which == self->frontend || which == self->backend) {
-                void *output = which == self->frontend ?
-                               self->backend : self->frontend;
+                void *output = which == self->frontend?
+                               self->backend: self->frontend;
 
                 //  Loop on all waiting messages, since polling adds a
                 //  non-trivial cost per message, especially on OS/X
@@ -175,7 +175,7 @@ s_proxy_task (void *args, zctx_t *ctx, void *command_pipe)
                     }
                     if (zmq_recvmsg (which, &msg, ZMQ_DONTWAIT) == -1)
                         break;      //  Presumably EAGAIN
-                    send_flags = zsocket_rcvmore (which) ? ZMQ_SNDMORE : 0;
+                    send_flags = zsocket_rcvmore (which)? ZMQ_SNDMORE: 0;
                 }
             }
             else

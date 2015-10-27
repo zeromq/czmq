@@ -217,7 +217,7 @@ void *
 zlistx_head (zlistx_t *self)
 {
     assert (self);
-    return self->head ? self->head->item : NULL;
+    return self->head? self->head->item: NULL;
 }
 
 
@@ -230,7 +230,7 @@ void *
 zlistx_tail (zlistx_t *self)
 {
     assert (self);
-    return self->head ? self->head->prev->item : NULL;
+    return self->head? self->head->prev->item: NULL;
 }
 
 

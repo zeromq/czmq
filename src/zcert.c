@@ -235,7 +235,7 @@ zcert_load (const char *filename)
             //  Load metadata into certificate
             self = zcert_new_from (public_key, secret_key);
             zconfig_t *metadata = zconfig_locate (root, "/metadata");
-            zconfig_t *item = metadata ? zconfig_child (metadata) : NULL;
+            zconfig_t *item = metadata? zconfig_child (metadata): NULL;
             while (item) {
                 zcert_set_meta (self, zconfig_name (item), zconfig_value (item));
                 item = zconfig_next (item);

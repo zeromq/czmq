@@ -696,7 +696,7 @@ s_on_read_timer (zloop_t *loop, int timer_id, void *arg)
                 zsys_info ("zdir_watch: Found %d changes in %s:", zlist_size (diff), zdir_path (sub->dir));
                 while (patch)
                 {
-                    zsys_info ("zdir_watch:   %s %s", zfile_filename (zdir_patch_file (patch), NULL), zdir_patch_op (patch) == ZDIR_PATCH_CREATE ? "created" : "deleted");
+                    zsys_info ("zdir_watch:   %s %s", zfile_filename (zdir_patch_file (patch), NULL), zdir_patch_op (patch) == ZDIR_PATCH_CREATE? "created": "deleted");
                     patch = (zdir_patch_t *) zlist_next (diff);
                 }
             }

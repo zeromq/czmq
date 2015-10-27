@@ -260,7 +260,7 @@ zhashx_insert (zhashx_t *self, const void *key, void *value)
             return -1;
         self->chain_limit += CHAIN_GROWS;
     }
-    return s_item_insert (self, key, value) ? 0 : -1;
+    return s_item_insert (self, key, value)? 0: -1;
 }
 
 

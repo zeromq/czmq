@@ -829,8 +829,8 @@ zloop_start (zloop_t *self)
                 && !poller->tolerant) {
                     if (self->verbose)
                         zsys_warning ("zloop: can't poll %s socket (%p, %d): %s",
-                                      poller->item.socket ?
-                                      zsys_sockname (zsock_type (poller->item.socket)) : "FD",
+                                      poller->item.socket?
+                                      zsys_sockname (zsock_type (poller->item.socket)): "FD",
                                       poller->item.socket, poller->item.fd,
                                       zmq_strerror (zmq_errno ()));
                     //  Give handler one chance to handle error, then kill
@@ -846,8 +846,8 @@ zloop_start (zloop_t *self)
                 if (self->pollset [item_nbr].revents) {
                     if (self->verbose)
                         zsys_debug ("zloop: call %s socket handler (%p, %d)",
-                                    poller->item.socket ?
-                                    zsys_sockname (zsock_type (poller->item.socket)) : "FD",
+                                    poller->item.socket?
+                                    zsys_sockname (zsock_type (poller->item.socket)): "FD",
                                     poller->item.socket, poller->item.fd);
                     rc = poller->handler (self, &self->pollset [item_nbr], poller->arg);
                     if (rc == -1 || self->need_rebuild)
