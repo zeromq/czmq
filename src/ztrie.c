@@ -129,9 +129,10 @@ s_ztrie_node_new (ztrie_node_t *parent, char *token, int token_len, zlistx_t *pa
         self->parameter_names = (char **) malloc (sizeof (char *) * self->parameter_count);
         self->parameter_values = (char **) malloc (sizeof (char *) * self->parameter_count);
         char *key = (char *) zlistx_first (param_keys);
-        for (int i = 0; i < zlistx_size (param_keys); i++) {
-            self->parameter_names [i] = key;
-            self->parameter_values [i] = NULL;
+        int index;
+        for (index = 0; index < zlistx_size (param_keys); index++) {
+            self->parameter_names [index] = key;
+            self->parameter_values [index] = NULL;
             key = (char *) zlistx_next (param_keys);
         }
     }
@@ -167,10 +168,11 @@ s_ztrie_node_destroy (ztrie_node_t **self_p)
         zstr_free (&self->token);
         zstr_free (&self->asterisk_match);
         if (self->parameter_count > 0) {
-            for (int i = 0; i < self->parameter_count; i++) {
-                free (self->parameter_names [i]);
-                if (self->parameter_values [i])
-                    free (self->parameter_values [i]);
+            int index;
+            for (index = 0; index < self->parameter_count; index++) {
+                free (self->parameter_names [index]);
+                if (self->parameter_values [index])
+                    free (self->parameter_values [index]);
             }
             free (self->parameter_names);
             free (self->parameter_values);
@@ -273,7 +275,6 @@ s_ztrie_compare_token (ztrie_node_t *parent, char *token, int len)
 static ztrie_node_t *
 s_ztrie_matches_token (ztrie_node_t *parent, char *token, int len)
 {
-    unsigned int i;
     char firstbyte = *token;
     ztrie_node_t *child = (ztrie_node_t *) zlistx_first (parent->children);
     while (child) {
@@ -299,9 +300,11 @@ s_ztrie_matches_token (ztrie_node_t *parent, char *token, int len)
                     if (zrex_hits (child->regex) == 1)
                         s_ztrie_node_update_param (child, 1, zrex_hit (child->regex, 0));
                     else
-                    if (zrex_hits (child->regex) > 1)
-                        for (i = 1; i < zrex_hits (child->regex); i++)
-                            s_ztrie_node_update_param (child, i, zrex_hit (child->regex, i));
+                    if (zrex_hits (child->regex) > 1) {
+                        int index;
+                        for (index = 1; index < zrex_hits (child->regex); index++)
+                            s_ztrie_node_update_param (child, index, zrex_hit (child->regex, index));
+                    }
                 }
                 free (token_term);
                 return child;
@@ -564,10 +567,11 @@ ztrie_hit_parameters (ztrie_t *self)
         zhashx_t *route_parameters = zhashx_new ();
         ztrie_node_t *node = self->match;
         while (node) {
-            for (int i = 0; i < node->parameter_count; i++)
+            int index;
+            for (index = 0; index < node->parameter_count; index++)
                 zhashx_insert (route_parameters,
-                              node->parameter_names [i],
-                              (void *) node->parameter_values [i]);
+                               node->parameter_names [index],
+                               (void *) node->parameter_values [index]);
             node = node->parent;
         }
         return route_parameters;
