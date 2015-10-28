@@ -1557,23 +1557,31 @@ zsock_is (void *self)
 
 
 //  --------------------------------------------------------------------------
-//  Probe the supplied reference. If it looks like a zsock_t instance, return
-//  the underlying libzmq socket handle; else if it looks like a file
-//  descriptor, return NULL; else if it looks like a libzmq socket handle,
-//  return the supplied value. Takes a polymorphic socket reference.
+//  Probe the supplied 'self' pointer. Takes a polymorphic socket reference.
+//  If self is a zactor_t, zsock_t, or libzmq socket handle, returns the
+//  libzmq socket handle. If self is a valid file descriptor, returns NULL.
+//  Else returns self as-is.
 
 void *
 zsock_resolve (void *self)
 {
     assert (self);
-    if (zsock_is (self))
-        return ((zsock_t *) self)->handle;
-    else
     if (zactor_is (self))
         return zactor_resolve (self);
 
+    if (zsock_is (self))
+        return ((zsock_t *) self)->handle;
+
+    //  Check if we have a valid ZMQ socket by probing the socket type
+    int type;
+    size_t option_len = sizeof (int);
+    if (zmq_getsockopt (self, ZMQ_TYPE, &type, &option_len) == 0)
+        return self;
+
+    //  Check if self is a valid FD or socket FD
+    //  TODO: this code should move to zsys_isfd () as we don't like
+    //  non-portable code outside of that class.
     int sock_type = -1;
-    //  TODO: this code should move to zsys_isfd ()
 #if defined (__WINDOWS__)
     int sock_type_size = sizeof (int);
     int rc = getsockopt (*(SOCKET *) self, SOL_SOCKET, SO_TYPE, (char *) &sock_type, &sock_type_size);
@@ -1639,6 +1647,15 @@ zsock_test (bool verbose)
     assert (streq (string, "Hello, World"));
     free (string);
     zmsg_destroy (&msg);
+
+    //  Test resolve libzmq socket
+    void *zmq_ctx = zmq_ctx_new ();
+    assert (zmq_ctx);
+    void *zmq_sock = zmq_socket (zmq_ctx, ZMQ_PUB);
+    assert (zmq_sock);
+    assert (zsock_resolve (zmq_sock) == zmq_sock);
+    zmq_close (zmq_sock);
+    zmq_ctx_term (zmq_ctx);
 
     //  Test resolve FD
     SOCKET fd = zsock_fd (reader);
