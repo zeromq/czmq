@@ -52,6 +52,18 @@
         <return type = "size" />
     </method>
 
+    <method name = "routing id">
+        Return message routing ID, if the message came from a ZMQ_SERVER socket.
+        Else returns zero.
+        <return type = "number" size = "4" />
+    </method>
+
+    <method name = "set routing id">
+        Set routing ID on message. This is used if/when the message is sent to a
+        ZMQ_SERVER socket.
+        <argument name = "routing id" type = "number" size = "4" />
+    </method>
+
     <method name = "prepend">
         Push frame to the front of the message, i.e. before all other frames.
         Message takes ownership of frame, will destroy it when message is sent.

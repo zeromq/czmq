@@ -400,6 +400,22 @@ module CZMQ
         result
       end
       
+      # Return socket routing ID if any. This returns 0 if the socket is not
+      # of type ZMQ_SERVER or if no request was already received on it.     
+      def routing_id
+        raise DestroyedError unless @ptr
+        result = ::CZMQ::FFI.zsock_routing_id @ptr
+        result
+      end
+      
+      # Set routing ID on socket. The socket MUST be of type ZMQ_SERVER.        
+      # This will be used when sending messages on the socket via the zsock API.
+      def set_routing_id routing_id
+        raise DestroyedError unless @ptr
+        result = ::CZMQ::FFI.zsock_set_routing_id @ptr, routing_id
+        result
+      end
+      
       # Set socket to use unbounded pipes (HWM=0); use this in cases when you are
       # totally certain the message volume can fit in memory. This method works  
       # across all versions of ZeroMQ. Takes a polymorphic socket reference.     

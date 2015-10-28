@@ -6,10 +6,7 @@
 module CZMQ
   module FFI
     
-    # working with single message frames      
-    #                                         
-    #                                         
-    # -    zframe_routing_id (zframe_t *self);
+    # working with single message frames
     class Zframe
       class DestroyedError < RuntimeError; end
       
@@ -179,18 +176,18 @@ module CZMQ
         result
       end
       
-      # Return frame routing id, set when reading frame from server socket
-      # or by the zframe_set_routing_id() method.                         
+      # Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
+      # Else returns zero.                                                  
       def routing_id
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zframe_routing_id @ptr
         result
       end
       
-      # Set frame routing id. Only relevant when sending to server socket.
+      # Set routing ID on frame. This is used if/when the frame is sent to a
+      # ZMQ_SERVER socket.                                                  
       def set_routing_id routing_id
         raise DestroyedError unless @ptr
-        routing_id = Integer(routing_id)
         result = ::CZMQ::FFI.zframe_set_routing_id @ptr, routing_id
         result
       end

@@ -45,6 +45,7 @@ struct _zmsg_t {
     uint32_t tag;               //  Object tag for runtime detection
     zlist_t *frames;            //  List of frames
     size_t content_size;        //  Total content size
+    uint32_t routing_id;        //  Routing ID back to sender, if any
 };
 
 
@@ -111,6 +112,11 @@ zmsg_recv (void *source)
                 break;              //  Interrupted or terminated
             }
         }
+#if defined (ZMQ_SERVER)
+        //  Grab routing ID if we're reading from a SERVER socket (ZMQ 4.2 and later)
+        if (zsock_type (source) == ZMQ_SERVER)
+            self->routing_id = zframe_routing_id (frame);
+#endif
         if (zmsg_append (self, &frame)) {
             zmsg_destroy (&self);
             break;
@@ -142,6 +148,7 @@ zmsg_send (zmsg_t **self_p, void *dest)
         bool sent_some = false;
         zframe_t *frame;
         while ((frame = (zframe_t *) zlist_head (self->frames))) {
+            zframe_set_routing_id (frame, self->routing_id);
             rc = zframe_send (&frame, dest,
                               zlist_size (self->frames) > 1? ZFRAME_MORE: 0);
             if (rc != 0) {
@@ -181,6 +188,7 @@ zmsg_sendm (zmsg_t **self_p, void *dest)
         bool sent_some = false;
         zframe_t *frame;
         while ((frame = (zframe_t *) zlist_head (self->frames))) {
+            zframe_set_routing_id (frame, self->routing_id);
             rc = zframe_send (&frame, dest, ZFRAME_MORE);
             if (rc != 0) {
                 if (errno == EINTR && sent_some)
@@ -218,8 +226,33 @@ zmsg_content_size (zmsg_t *self)
 {
     assert (self);
     assert (zmsg_is (self));
-
     return self->content_size;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return message routing ID, if the message came from a ZMQ_SERVER socket.
+//  Else returns zero.
+
+uint32_t
+zmsg_routing_id (zmsg_t *self)
+{
+    assert (self);
+    assert (zmsg_is (self));
+    return self->routing_id;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set routing ID on message. This is used if/when the message is sent to a
+//  ZMQ_SERVER socket.
+
+void
+zmsg_set_routing_id (zmsg_t *self, uint32_t routing_id)
+{
+    assert (self);
+    assert (zmsg_is (self));
+    self->routing_id = routing_id;
 }
 
 
@@ -1198,6 +1231,48 @@ zmsg_test (bool verbose)
 
     zsock_destroy (&input);
     zsock_destroy (&output);
+
+#if defined (ZMQ_SERVER)
+    //  Create server and client sockets and connect over inproc
+    zsock_t *server = zsock_new_server ("inproc://zmsg-server.test");
+    assert (server);
+    zsock_t *client = zsock_new_client ("inproc://zmsg-server.test");
+    assert (client);
+
+    //  Send request from client to server
+    zmsg_t *request = zmsg_new ();
+    assert (request);
+    zmsg_addstr (request, "Hello");
+    rc = zmsg_send (&request, client);
+    assert (rc == 0);
+    assert (!request);
+
+    //  Read request and send reply
+    request = zmsg_recv (server);
+    assert (request);
+    char *string = zmsg_popstr (request);
+    assert (streq (string, "Hello"));
+    assert (zmsg_routing_id (request));
+    zstr_free (&string);
+
+    zmsg_t *reply = zmsg_new ();
+    assert (reply);
+    zmsg_addstr (reply, "World");
+    zmsg_set_routing_id (reply, zmsg_routing_id (request));
+    rc = zmsg_send (&reply, server);
+    assert (rc == 0);
+
+    //  Read reply
+    reply = zmsg_recv (client);
+    string = zmsg_popstr (reply);
+    assert (streq (string, "World"));
+    assert (zmsg_routing_id (reply) == 0);
+    zmsg_destroy (&reply);
+    zstr_free (&string);
+
+    zsock_destroy (&client);
+    zsock_destroy (&server);
+#endif
 
     //  @end
     printf ("OK\n");

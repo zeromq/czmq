@@ -40,6 +40,16 @@ JNIEXPORT void JNICALL Java_org_zeromq_Zmsg_size (JNIEnv *env, jobject thisObj) 
 JNIEXPORT void JNICALL Java_org_zeromq_Zmsg_contentSize (JNIEnv *env, jobject thisObj) {
 }
 
+//  Return message routing ID, if the message came from a ZMQ_SERVER socket.
+//  Else returns zero.                                                      
+JNIEXPORT void JNICALL Java_org_zeromq_Zmsg_routingId (JNIEnv *env, jobject thisObj) {
+}
+
+//  Set routing ID on message. This is used if/when the message is sent to a
+//  ZMQ_SERVER socket.                                                      
+JNIEXPORT void JNICALL Java_org_zeromq_Zmsg_setRoutingId (JNIEnv *env, jobject thisObj) {
+}
+
 //  Push frame to the front of the message, i.e. before all other frames.  
 //  Message takes ownership of frame, will destroy it when message is sent.
 //  Returns 0 on success, -1 on error. Deprecates zmsg_push, which did not 

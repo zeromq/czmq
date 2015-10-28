@@ -82,6 +82,10 @@ class zframe_t(Structure):
     pass # Empty - only for type checking
 zframe_p = POINTER(zframe_t)
 
+class number_t(Structure):
+    pass # Empty - only for type checking
+number_p = POINTER(number_t)
+
 class zhashx_t(Structure):
     pass # Empty - only for type checking
 zhashx_p = POINTER(zhashx_t)
@@ -696,10 +700,10 @@ lib.zframe_more.restype = c_int
 lib.zframe_more.argtypes = [zframe_p]
 lib.zframe_set_more.restype = None
 lib.zframe_set_more.argtypes = [zframe_p, c_int]
-lib.zframe_routing_id.restype = c_size_t
+lib.zframe_routing_id.restype = number_p
 lib.zframe_routing_id.argtypes = [zframe_p]
 lib.zframe_set_routing_id.restype = None
-lib.zframe_set_routing_id.argtypes = [zframe_p, c_size_t]
+lib.zframe_set_routing_id.argtypes = [zframe_p, number_p]
 lib.zframe_eq.restype = c_bool
 lib.zframe_eq.argtypes = [zframe_p, zframe_p]
 lib.zframe_reset.restype = None
@@ -712,10 +716,7 @@ lib.zframe_test.restype = None
 lib.zframe_test.argtypes = [c_bool]
 
 class Zframe(object):
-    """working with single message frames
-
-
--    zframe_routing_id (zframe_t *self);"""
+    """working with single message frames"""
 
     MORE = 1 # 
     REUSE = 2 # 
@@ -815,12 +816,13 @@ frame to socket, you have to specify flag explicitly."""
         return lib.zframe_set_more(self._as_parameter_, more)
 
     def routing_id(self):
-        """Return frame routing id, set when reading frame from server socket
-or by the zframe_set_routing_id() method."""
+        """Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
+Else returns zero."""
         return lib.zframe_routing_id(self._as_parameter_)
 
     def set_routing_id(self, routing_id):
-        """Set frame routing id. Only relevant when sending to server socket."""
+        """Set routing ID on frame. This is used if/when the frame is sent to a
+ZMQ_SERVER socket."""
         return lib.zframe_set_routing_id(self._as_parameter_, routing_id)
 
     def eq(self, other):
@@ -1434,6 +1436,10 @@ lib.zmsg_size.restype = c_size_t
 lib.zmsg_size.argtypes = [zmsg_p]
 lib.zmsg_content_size.restype = c_size_t
 lib.zmsg_content_size.argtypes = [zmsg_p]
+lib.zmsg_routing_id.restype = number_p
+lib.zmsg_routing_id.argtypes = [zmsg_p]
+lib.zmsg_set_routing_id.restype = None
+lib.zmsg_set_routing_id.argtypes = [zmsg_p, number_p]
 lib.zmsg_prepend.restype = c_int
 lib.zmsg_prepend.argtypes = [zmsg_p, POINTER(zframe_p)]
 lib.zmsg_append.restype = c_int
@@ -1551,6 +1557,16 @@ it is a destructor)."""
     def content_size(self):
         """Return total size of all frames in message."""
         return lib.zmsg_content_size(self._as_parameter_)
+
+    def routing_id(self):
+        """Return message routing ID, if the message came from a ZMQ_SERVER socket.
+Else returns zero."""
+        return lib.zmsg_routing_id(self._as_parameter_)
+
+    def set_routing_id(self, routing_id):
+        """Set routing ID on message. This is used if/when the message is sent to a
+ZMQ_SERVER socket."""
+        return lib.zmsg_set_routing_id(self._as_parameter_, routing_id)
 
     def prepend(self, frame_p):
         """Push frame to the front of the message, i.e. before all other frames.
@@ -1855,6 +1871,10 @@ lib.zsock_bsend.restype = c_int
 lib.zsock_bsend.argtypes = [zsock_p, c_char_p]
 lib.zsock_brecv.restype = c_int
 lib.zsock_brecv.argtypes = [zsock_p, c_char_p]
+lib.zsock_routing_id.restype = number_p
+lib.zsock_routing_id.argtypes = [zsock_p]
+lib.zsock_set_routing_id.restype = None
+lib.zsock_set_routing_id.argtypes = [zsock_p, number_p]
 lib.zsock_set_unbounded.restype = None
 lib.zsock_set_unbounded.argtypes = [zsock_p]
 lib.zsock_signal.restype = c_int
@@ -2138,6 +2158,16 @@ values held on a per-socket basis. Do not modify or destroy the returned
 values. Returns 0 if successful, or -1 if it failed to read a message."""
         return lib.zsock_brecv(self._as_parameter_, picture, *args)
 
+    def routing_id(self):
+        """Return socket routing ID if any. This returns 0 if the socket is not
+of type ZMQ_SERVER or if no request was already received on it."""
+        return lib.zsock_routing_id(self._as_parameter_)
+
+    def set_routing_id(self, routing_id):
+        """Set routing ID on socket. The socket MUST be of type ZMQ_SERVER.
+This will be used when sending messages on the socket via the zsock API."""
+        return lib.zsock_set_routing_id(self._as_parameter_, routing_id)
+
     def set_unbounded(self):
         """Set socket to use unbounded pipes (HWM=0); use this in cases when you are
 totally certain the message volume can fit in memory. This method works
@@ -2188,6 +2218,8 @@ return the supplied value. Takes a polymorphic socket reference."""
 # zstr
 lib.zstr_recv.restype = c_char_p
 lib.zstr_recv.argtypes = [c_void_p]
+lib.zstr_recvx.restype = c_int
+lib.zstr_recvx.argtypes = [c_void_p, POINTER(c_char_p)]
 lib.zstr_send.restype = c_int
 lib.zstr_send.argtypes = [c_void_p, c_char_p]
 lib.zstr_sendm.restype = c_int
@@ -2198,8 +2230,6 @@ lib.zstr_sendfm.restype = c_int
 lib.zstr_sendfm.argtypes = [c_void_p, c_char_p]
 lib.zstr_sendx.restype = c_int
 lib.zstr_sendx.argtypes = [c_void_p, c_char_p]
-lib.zstr_recvx.restype = c_int
-lib.zstr_recvx.argtypes = [c_void_p, POINTER(c_char_p)]
 lib.zstr_free.restype = None
 lib.zstr_free.argtypes = [POINTER(c_char_p)]
 lib.zstr_test.restype = None
@@ -2222,6 +2252,17 @@ class Zstr(object):
 zstr_free(). Returns NULL if the context is being terminated or the
 process was interrupted."""
         return lib.zstr_recv(source)
+
+    @staticmethod
+    def recvx(source, string_p, *args):
+        """Receive a series of strings (until NULL) from multipart data.
+Each string is allocated and filled with string data; if there
+are not enough frames, unallocated strings are set to NULL.
+Returns -1 if the message could not be read, else returns the
+number of strings filled, zero or more. Free each returned string
+using zstr_free(). If not enough strings are provided, remaining
+multipart frames in the message are dropped."""
+        return lib.zstr_recvx(source, byref(c_char_p.from_param(string_p)), *args)
 
     @staticmethod
     def send(dest, string):
@@ -2256,17 +2297,6 @@ message."""
         """Send a series of strings (until NULL) as multipart data
 Returns 0 if the strings could be sent OK, or -1 on error."""
         return lib.zstr_sendx(dest, string, *args)
-
-    @staticmethod
-    def recvx(source, string_p, *args):
-        """Receive a series of strings (until NULL) from multipart data.
-Each string is allocated and filled with string data; if there
-are not enough frames, unallocated strings are set to NULL.
-Returns -1 if the message could not be read, else returns the
-number of strings filled, zero or more. Free each returned string
-using zstr_free(). If not enough strings are provided, remaining
-multipart frames in the message are dropped."""
-        return lib.zstr_recvx(source, byref(c_char_p.from_param(string_p)), *args)
 
     @staticmethod
     def free(string_p):

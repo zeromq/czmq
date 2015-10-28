@@ -70,15 +70,16 @@ void QmlZframe::setMore (int more) {
 };
 
 ///
-//  Return frame routing id, set when reading frame from server socket
-//  or by the zframe_set_routing_id() method.                         
-size_t QmlZframe::routingId () {
+//  Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
+//  Else returns zero.                                                  
+uint32_t QmlZframe::routingId () {
     return zframe_routing_id (self);
 };
 
 ///
-//  Set frame routing id. Only relevant when sending to server socket.
-void QmlZframe::setRoutingId (size_t routingId) {
+//  Set routing ID on frame. This is used if/when the frame is sent to a
+//  ZMQ_SERVER socket.                                                  
+void QmlZframe::setRoutingId (uint32_t routingId) {
     zframe_set_routing_id (self, routingId);
 };
 
