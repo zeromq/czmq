@@ -1558,7 +1558,7 @@ zsock_is (void *self)
 
 //  --------------------------------------------------------------------------
 //  Probe the supplied reference. If it looks like a zsock_t instance, return
-//  the underlying libzmq socket handle; elsie if it looks like a file
+//  the underlying libzmq socket handle; else if it looks like a file
 //  descriptor, return NULL; else if it looks like a libzmq socket handle,
 //  return the supplied value. Takes a polymorphic socket reference.
 
