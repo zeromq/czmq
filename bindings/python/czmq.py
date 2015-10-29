@@ -126,24 +126,60 @@ class zuuid_t(Structure):
     pass # Empty - only for type checking
 zuuid_p = POINTER(zuuid_t)
 
-PyFile_FromFile_close_cb = CFUNCTYPE(c_int, FILE_p)
-PyFile_FromFile = pythonapi.PyFile_FromFile
-PyFile_FromFile.restype = py_object
-PyFile_FromFile.argtypes = [FILE_p,
-                            c_char_p,
-                            c_char_p,
-                            PyFile_FromFile_close_cb]
 def return_py_file(c_file):
-    return PyFile_FromFile(c_file, "", "r+", PyFile_FromFile_close_cb())
+    if not sys.version_info > (3,):
+        PyFile_FromFile_close_cb = CFUNCTYPE(c_int, FILE_p)
+        PyFile_FromFile = pythonapi.PyFile_FromFile
+        PyFile_FromFile.restype = py_object
+        PyFile_FromFile.argtypes = [FILE_p,
+                                    c_char_p,
+                                    c_char_p,
+                                    PyFile_FromFile_close_cb]
+        return PyFile_FromFile(c_file, "", "r+", PyFile_FromFile_close_cb())
 
-PyFile_AsFile = pythonapi.PyFile_AsFile
-PyFile_AsFile.restype = FILE_p
-PyFile_AsFile.argtypes = [py_object]
-def coerce_py_file(obj):
-    if isinstance(obj, FILE_p):
-        return obj
     else:
-        return PyFile_AsFile(obj)
+        fileno = libc.fileno
+        fileno.restype = c_int
+        fileno.argtypes = [c_void_p]
+
+        return os.fdopen(fileno(c_file), r'r+b')
+
+def coerce_py_file(obj):
+    if not sys.version_info > (3,):
+        PyFile_AsFile = pythonapi.PyFile_AsFile
+        PyFile_AsFile.restype = FILE_p
+        PyFile_AsFile.argtypes = [py_object]
+
+        if isinstance(obj, FILE_p):
+            return obj
+        else:
+            return PyFile_AsFile(obj)
+
+    # Python 3 does not provide a low level buffered I/O (FILE*) API. Had to
+    # resort to direct Standard C library calls.
+    #
+    #   https://docs.python.org/3/c-api/file.html.
+    #
+    else:
+        fdopen = libc.fdopen
+        fdopen.restype = FILE_p
+        fdopen.argtypes = [c_int, c_char_p]
+
+        setbuf = libc.setbuf
+        setbuf.restype = None
+        setbuf.argtypes = [FILE_p, c_char_p]
+
+        if isinstance(obj, FILE_p):
+            return obj
+        else:
+            fd = obj.fileno()
+            fp = fdopen(fd, obj.mode.encode())
+
+            # Make sure the file is opened in unbuffered mode. The test case
+            # "test_zmsg" of the CZMQ Python fails if this mode is not set.
+            setbuf(fp, None)
+
+            return fp
 
 
 # zactor
