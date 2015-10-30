@@ -14,8 +14,8 @@ class QT_CZMQ_EXPORT QZactor : public QObject
     Q_OBJECT
 public:
 
-   //  Copy-construct to return the proper wrapped c types
-   QZactor (zactor_t *self, QObject *qObjParent = 0);
+    //  Copy-construct to return the proper wrapped c types
+    QZactor (zactor_t *self, QObject *qObjParent = 0);
 
     //  Create a new actor passing arbitrary arguments reference.
     explicit QZactor (zactor_fn task, void *args, QObject *qObjParent = 0);

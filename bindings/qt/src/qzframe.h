@@ -14,8 +14,8 @@ class QT_CZMQ_EXPORT QZframe : public QObject
     Q_OBJECT
 public:
 
-   //  Copy-construct to return the proper wrapped c types
-   QZframe (zframe_t *self, QObject *qObjParent = 0);
+    //  Copy-construct to return the proper wrapped c types
+    QZframe (zframe_t *self, QObject *qObjParent = 0);
 
     //  Create a new frame. If size is not null, allocates the frame data
     //  to the specified size. If additionally, data is not null, copies 

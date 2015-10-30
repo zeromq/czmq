@@ -13,9 +13,9 @@ if (NOT MSVC)
     # some libraries install the headers is a subdirectory of the include dir
     # returned by pkg-config, so use a wildcard match to improve chances of finding
     # headers and SOs.
-    set(UUID_INCLUDE_HINTS ${PC_UUID_INCLUDE_DIRS} ${PC_UUID_INCLUDE_DIRS}/*)
-    set(UUID_LIBRARY_HINTS ${PC_UUID_LIBRARY_DIRS} ${PC_UUID_LIBRARY_DIRS}/*)
-  endif(NOT PC_UUID_FOUND)
+    set(PC_UUID_INCLUDE_HINTS ${PC_UUID_INCLUDE_DIRS} ${PC_UUID_INCLUDE_DIRS}/*)
+    set(PC_UUID_LIBRARY_HINTS ${PC_UUID_LIBRARY_DIRS} ${PC_UUID_LIBRARY_DIRS}/*)
+  endif(PC_UUID_FOUND)
 endif (NOT MSVC)
 
 find_path(
@@ -33,7 +33,6 @@ find_library(
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(
   UUID
-  FOUND_VAR UUID_FOUND
   REQUIRED_VARS UUID_LIBRARIES UUID_INCLUDE_DIRS
 )
 mark_as_advanced(UUID_FOUND UUID_LIBRARIES UUID_INCLUDE_DIRS)

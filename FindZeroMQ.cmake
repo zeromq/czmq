@@ -13,9 +13,9 @@ if (NOT MSVC)
     # some libraries install the headers is a subdirectory of the include dir
     # returned by pkg-config, so use a wildcard match to improve chances of finding
     # headers and SOs.
-    set(ZEROMQ_INCLUDE_HINTS ${PC_ZEROMQ_INCLUDE_DIRS} ${PC_ZEROMQ_INCLUDE_DIRS}/*)
-    set(ZEROMQ_LIBRARY_HINTS ${PC_ZEROMQ_LIBRARY_DIRS} ${PC_ZEROMQ_LIBRARY_DIRS}/*)
-  endif(NOT PC_ZEROMQ_FOUND)
+    set(PC_ZEROMQ_INCLUDE_HINTS ${PC_ZEROMQ_INCLUDE_DIRS} ${PC_ZEROMQ_INCLUDE_DIRS}/*)
+    set(PC_ZEROMQ_LIBRARY_HINTS ${PC_ZEROMQ_LIBRARY_DIRS} ${PC_ZEROMQ_LIBRARY_DIRS}/*)
+  endif(PC_ZEROMQ_FOUND)
 endif (NOT MSVC)
 
 find_path(
@@ -33,7 +33,6 @@ find_library(
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(
   ZEROMQ
-  FOUND_VAR ZEROMQ_FOUND
   REQUIRED_VARS ZEROMQ_LIBRARIES ZEROMQ_INCLUDE_DIRS
 )
 mark_as_advanced(ZEROMQ_FOUND ZEROMQ_LIBRARIES ZEROMQ_INCLUDE_DIRS)

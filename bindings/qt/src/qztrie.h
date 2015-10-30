@@ -14,8 +14,8 @@ class QT_CZMQ_EXPORT QZtrie : public QObject
     Q_OBJECT
 public:
 
-   //  Copy-construct to return the proper wrapped c types
-   QZtrie (ztrie_t *self, QObject *qObjParent = 0);
+    //  Copy-construct to return the proper wrapped c types
+    QZtrie (ztrie_t *self, QObject *qObjParent = 0);
 
     //  Creates a new ztrie.
     explicit QZtrie (char delimiter, QObject *qObjParent = 0);

@@ -14,8 +14,8 @@ class QT_CZMQ_EXPORT QZsock : public QObject
     Q_OBJECT
 public:
 
-   //  Copy-construct to return the proper wrapped c types
-   QZsock (zsock_t *self, QObject *qObjParent = 0);
+    //  Copy-construct to return the proper wrapped c types
+    QZsock (zsock_t *self, QObject *qObjParent = 0);
 
     //  Create a new socket. Returns the new socket, or NULL if the new socket
     //  could not be created. Note that the symbol zsock_new (and other       
