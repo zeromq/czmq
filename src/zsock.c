@@ -1673,7 +1673,11 @@ zsock_test (bool verbose)
     zmsg_destroy (&msg);
 
     //  Test resolve libzmq socket
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 2, 0))
     void *zmq_ctx = zmq_ctx_new ();
+#else
+    void *zmq_ctx = zmq_ctx_new (1);
+#endif
     assert (zmq_ctx);
     void *zmq_sock = zmq_socket (zmq_ctx, ZMQ_PUB);
     assert (zmq_sock);
