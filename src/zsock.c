@@ -1673,13 +1673,23 @@ zsock_test (bool verbose)
     zmsg_destroy (&msg);
 
     //  Test resolve libzmq socket
+#if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 2, 0))
     void *zmq_ctx = zmq_ctx_new ();
+#else
+    void *zmq_ctx = zmq_ctx_new (1);
+#endif
     assert (zmq_ctx);
     void *zmq_sock = zmq_socket (zmq_ctx, ZMQ_PUB);
     assert (zmq_sock);
     assert (zsock_resolve (zmq_sock) == zmq_sock);
     zmq_close (zmq_sock);
     zmq_ctx_term (zmq_ctx);
+
+    //  Test resolve zsock
+    zsock_t *resolve = zsock_new_pub("@tcp://127.0.0.1:5561");
+    assert (resolve);
+    assert (zsock_resolve (resolve) == resolve->handle);
+    zsock_destroy (&resolve);
 
     //  Test resolve FD
     SOCKET fd = zsock_fd (reader);
