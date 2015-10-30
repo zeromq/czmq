@@ -14,8 +14,8 @@ class QT_CZMQ_EXPORT QZlist : public QObject
     Q_OBJECT
 public:
 
-   //  Copy-construct to return the proper wrapped c types
-   QZlist (zlist_t *self, QObject *qObjParent = 0);
+    //  Copy-construct to return the proper wrapped c types
+    QZlist (zlist_t *self, QObject *qObjParent = 0);
 
     //  Create a new list container
     explicit QZlist (QObject *qObjParent = 0);

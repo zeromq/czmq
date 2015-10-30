@@ -14,8 +14,8 @@ class QT_CZMQ_EXPORT QZfile : public QObject
     Q_OBJECT
 public:
 
-   //  Copy-construct to return the proper wrapped c types
-   QZfile (zfile_t *self, QObject *qObjParent = 0);
+    //  Copy-construct to return the proper wrapped c types
+    QZfile (zfile_t *self, QObject *qObjParent = 0);
 
     //  If file exists, populates properties. CZMQ supports portable symbolic
     //  links, which are files with the extension ".ln". A symbolic link is a

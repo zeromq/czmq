@@ -14,8 +14,8 @@ class QT_CZMQ_EXPORT QZpoller : public QObject
     Q_OBJECT
 public:
 
-   //  Copy-construct to return the proper wrapped c types
-   QZpoller (zpoller_t *self, QObject *qObjParent = 0);
+    //  Copy-construct to return the proper wrapped c types
+    QZpoller (zpoller_t *self, QObject *qObjParent = 0);
 
     //  Destroy a poller
     ~QZpoller ();

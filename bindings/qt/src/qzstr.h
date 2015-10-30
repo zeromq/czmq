@@ -14,8 +14,8 @@ class QT_CZMQ_EXPORT QZstr : public QObject
     Q_OBJECT
 public:
 
-   //  Copy-construct to return the proper wrapped c types
-   QZstr (zstr_t *self, QObject *qObjParent = 0);
+    //  Copy-construct to return the proper wrapped c types
+    QZstr (zstr_t *self, QObject *qObjParent = 0);
 
     //  Receive C string from socket. Caller must free returned string using
     //  zstr_free(). Returns NULL if the context is being terminated or the 
