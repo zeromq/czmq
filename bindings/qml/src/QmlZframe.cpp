@@ -143,13 +143,6 @@ int QmlZframeAttached::send (QmlZframe *selfP, void *dest, int flags) {
 };
 
 ///
-//  Send a reply frame to a server socket, copy the routing id from source message, destroy frame after sending.
-//  Return -1 on error, 0 on success.                                                                           
-int QmlZframeAttached::sendReply (QmlZframe *selfP, QmlZframe *sourceMsg, void *dest, int flags) {
-    return zframe_send_reply (&selfP->self, sourceMsg->self, dest, flags);
-};
-
-///
 //  Probe the supplied object, and report if it looks like a zframe_t.
 bool QmlZframeAttached::is (void *self) {
     return zframe_is (self);

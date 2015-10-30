@@ -718,8 +718,6 @@ lib.zframe_recv.restype = zframe_p
 lib.zframe_recv.argtypes = [c_void_p]
 lib.zframe_send.restype = c_int
 lib.zframe_send.argtypes = [POINTER(zframe_p), c_void_p, c_int]
-lib.zframe_send_reply.restype = c_int
-lib.zframe_send_reply.argtypes = [POINTER(zframe_p), zframe_p, c_void_p, c_int]
 lib.zframe_size.restype = c_size_t
 lib.zframe_size.argtypes = [zframe_p]
 lib.zframe_data.restype = POINTER(c_byte)
@@ -807,12 +805,6 @@ zpoller or zloop."""
         """Send a frame to a socket, destroy frame after sending.
 Return -1 on error, 0 on success."""
         return lib.zframe_send(byref(zframe_p.from_param(self_p)), dest, flags)
-
-    @staticmethod
-    def send_reply(self_p, source_msg, dest, flags):
-        """Send a reply frame to a server socket, copy the routing id from source message, destroy frame after sending.
-Return -1 on error, 0 on success."""
-        return lib.zframe_send_reply(byref(zframe_p.from_param(self_p)), source_msg, dest, flags)
 
     def size(self):
         """Return number of bytes in frame data"""

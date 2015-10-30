@@ -103,10 +103,6 @@ public slots:
     //  Return -1 on error, 0 on success.                     
     int send (QmlZframe *selfP, void *dest, int flags);
 
-    //  Send a reply frame to a server socket, copy the routing id from source message, destroy frame after sending.
-    //  Return -1 on error, 0 on success.                                                                           
-    int sendReply (QmlZframe *selfP, QmlZframe *sourceMsg, void *dest, int flags);
-
     //  Probe the supplied object, and report if it looks like a zframe_t.
     bool is (void *self);
 

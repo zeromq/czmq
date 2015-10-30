@@ -92,6 +92,7 @@ examples/zpubsub/zprototest/*.bnf
 examples/zpubsub/zprototest/test_publisher
 examples/zpubsub/zprototest/test_subscriber
 src/test_zgossip
+.test_zproxy/
 .deps
 .libs
 .cproject

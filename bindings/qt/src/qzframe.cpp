@@ -67,15 +67,6 @@ int QZframe::send (void *dest, int flags)
 }
 
 ///
-//  Send a reply frame to a server socket, copy the routing id from source message, destroy frame after sending.
-//  Return -1 on error, 0 on success.                                                                           
-int QZframe::sendReply (QZframe *sourceMsg, void *dest, int flags)
-{
-    int rv = zframe_send_reply (&self, sourceMsg->self, dest, flags);
-    return rv;
-}
-
-///
 //  Return number of bytes in frame data
 size_t QZframe::size ()
 {

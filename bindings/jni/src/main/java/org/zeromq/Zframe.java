@@ -7,7 +7,6 @@ public class Zframe {
     public native Zframe from (String String);
     public native Zframe recv (void Source);
     public native int send (Zframe SelfP, void Dest, int Flags);
-    public native int sendReply (Zframe SelfP, Zframe SourceMsg, void Dest, int Flags);
     public native long size ();
     public native byte [] data ();
     public native Zframe dup ();

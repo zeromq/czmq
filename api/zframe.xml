@@ -47,16 +47,6 @@
         <return type = "integer" />
     </method>
 
-    <method  name = "send reply" singleton = "1">
-        Send a reply frame to a server socket, copy the routing id from source message, destroy frame after sending.
-        Return -1 on error, 0 on success.
-        <argument name = "self_p" type = "zframe" by_reference = "1" />
-        <argument name = "source msg" type = "zframe" />
-        <argument name = "dest" type = "anything" />
-        <argument name = "flags" type = "integer" />
-        <return type = "integer" />
-    </method>
-
     <method name = "size">
         Return number of bytes in frame data
         <return type = "size" />

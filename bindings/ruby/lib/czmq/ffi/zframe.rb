@@ -102,16 +102,6 @@ module CZMQ
         result
       end
       
-      # Send a reply frame to a server socket, copy the routing id from source message, destroy frame after sending.
-      # Return -1 on error, 0 on success.                                                                           
-      def self.send_reply self_p, source_msg, dest, flags
-        self_p = self_p.__ptr_give_ref
-        source_msg = source_msg.__ptr if source_msg
-        flags = Integer(flags)
-        result = ::CZMQ::FFI.zframe_send_reply self_p, source_msg, dest, flags
-        result
-      end
-      
       # Return number of bytes in frame data
       def size
         raise DestroyedError unless @ptr

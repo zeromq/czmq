@@ -28,11 +28,6 @@ JNIEXPORT void JNICALL Java_org_zeromq_Zframe_recv (JNIEnv *env, jobject thisObj
 JNIEXPORT void JNICALL Java_org_zeromq_Zframe_send (JNIEnv *env, jobject thisObj) {
 }
 
-//  Send a reply frame to a server socket, copy the routing id from source message, destroy frame after sending.
-//  Return -1 on error, 0 on success.                                                                           
-JNIEXPORT void JNICALL Java_org_zeromq_Zframe_sendReply (JNIEnv *env, jobject thisObj) {
-}
-
 //  Return number of bytes in frame data
 JNIEXPORT void JNICALL Java_org_zeromq_Zframe_size (JNIEnv *env, jobject thisObj) {
 }
