@@ -109,7 +109,6 @@ module CZMQ
       attach_function :zframe_from, [:string], :pointer, **opts
       attach_function :zframe_recv, [:pointer], :pointer, **opts
       attach_function :zframe_send, [:pointer, :pointer, :int], :int, **opts
-      attach_function :zframe_send_reply, [:pointer, :pointer, :pointer, :int], :int, **opts
       attach_function :zframe_size, [:pointer], :size_t, **opts
       attach_function :zframe_data, [:pointer], :pointer, **opts
       attach_function :zframe_dup, [:pointer], :pointer, **opts

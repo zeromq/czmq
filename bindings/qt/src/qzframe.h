@@ -40,10 +40,6 @@ public:
     //  Return -1 on error, 0 on success.                     
     int send (void *dest, int flags);
 
-    //  Send a reply frame to a server socket, copy the routing id from source message, destroy frame after sending.
-    //  Return -1 on error, 0 on success.                                                                           
-    int sendReply (QZframe *sourceMsg, void *dest, int flags);
-
     //  Return number of bytes in frame data
     size_t size ();
 
