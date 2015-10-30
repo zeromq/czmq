@@ -14,8 +14,8 @@ class QT_CZMQ_EXPORT QZmsg : public QObject
     Q_OBJECT
 public:
 
-   //  Copy-construct to return the proper wrapped c types
-   QZmsg (zmsg_t *self, QObject *qObjParent = 0);
+    //  Copy-construct to return the proper wrapped c types
+    QZmsg (zmsg_t *self, QObject *qObjParent = 0);
 
     //  Create a new empty message object
     explicit QZmsg (QObject *qObjParent = 0);

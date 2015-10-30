@@ -14,8 +14,8 @@ class QT_CZMQ_EXPORT QZdir : public QObject
     Q_OBJECT
 public:
 
-   //  Copy-construct to return the proper wrapped c types
-   QZdir (zdir_t *self, QObject *qObjParent = 0);
+    //  Copy-construct to return the proper wrapped c types
+    QZdir (zdir_t *self, QObject *qObjParent = 0);
 
     //  Create a new directory item that loads in the full tree of the specified
     //  path, optionally located under some parent path. If parent is "-", then 

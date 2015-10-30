@@ -14,8 +14,8 @@ class QT_CZMQ_EXPORT QZloop : public QObject
     Q_OBJECT
 public:
 
-   //  Copy-construct to return the proper wrapped c types
-   QZloop (zloop_t *self, QObject *qObjParent = 0);
+    //  Copy-construct to return the proper wrapped c types
+    QZloop (zloop_t *self, QObject *qObjParent = 0);
 
     //  Create a new zloop reactor
     explicit QZloop (QObject *qObjParent = 0);

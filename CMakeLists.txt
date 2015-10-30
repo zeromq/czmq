@@ -83,6 +83,8 @@ find_package(ZeroMQ REQUIRED)
 IF (ZEROMQ_FOUND)
 include_directories(${ZEROMQ_INCLUDE_DIRS})
 list(APPEND MORE_LIBRARIES ${ZEROMQ_LIBRARIES})
+ELSE (ZEROMQ_FOUND)
+message( FATAL_ERROR "ZeroMQ not found." )
 ENDIF (ZEROMQ_FOUND)
 
 ########################################################################
@@ -92,7 +94,7 @@ find_package(Uuid)
 IF (UUID_FOUND)
 include_directories(${UUID_INCLUDE_DIRS})
 list(APPEND MORE_LIBRARIES ${UUID_LIBRARIES})
-add_definition(-DHAVE_UUID)
+add_definitions(-DHAVE_UUID)
 ENDIF (UUID_FOUND)
 
 ########################################################################
@@ -243,8 +245,62 @@ install(
 ########################################################################
 add_executable(czmq_selftest "${SOURCE_DIR}/src/czmq_selftest.c")
 target_link_libraries(czmq_selftest czmq ${ZEROMQ_LIBRARIES})
-add_test(czmq_selftest czmq_selftest)
 
+set(CLASSTEST_TIMEOUT 5 CACHE STRING "Timeout of the selftest of a class")
+set(TOTAL_TIMEOUT 20 CACHE STRING "Timout of the total testsuite")
+
+set(TEST_CLASSES
+  zactor_test
+  zauth_test
+  zarmour_test
+  zbeacon_test
+  zcert_test
+  zcertstore_test
+  zchunk_test
+  zclock_test
+  zconfig_test
+  zdigest_test
+  zdir_test
+  zdir patch_test
+  zfile_test
+  zframe_test
+  zgossip_test
+  zhashx_test
+  ziflist_test
+  zlistx_test
+  zloop_test
+  zmonitor_test
+  zmsg_test
+  zpoller_test
+  zproxy_test
+  zrex_test
+  zsock_test
+  zsock_option_test
+  zstr_test
+  zsys_test
+  ztrie_test
+  zuuid_test
+  zgossip_msg_test
+  zauth_v2_test
+  zbeacon_v2_test
+  zctx_test
+  zhash_test
+  zlist_test
+  zmonitor_v2_test
+  zmutex_test
+  zproxy_v2_test
+  zsocket_test
+  zsockopt_test
+  zthread_test
+)
+
+foreach(TEST_CLASS ${TEST_CLASSES})
+  add_test(NAME ${TEST_CLASS} COMMAND czmq_selftest -e -v --test ${TEST_CLASS})
+  set_tests_properties(${TEST_CLASS} PROPERTIES TIMEOUT ${CLASSTEST_TIMEOUT})
+endforeach(TEST_CLASS)
+
+add_test(czmq_selftest czmq_selftest)
+set_tests_properties(czmq_selftest PROPERTIES TIMEOUT ${TOTAL_TIMEOUT})
 ########################################################################
 # summary
 ########################################################################

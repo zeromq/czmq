@@ -14,8 +14,8 @@ class QT_CZMQ_EXPORT QZiflist : public QObject
     Q_OBJECT
 public:
 
-   //  Copy-construct to return the proper wrapped c types
-   QZiflist (ziflist_t *self, QObject *qObjParent = 0);
+    //  Copy-construct to return the proper wrapped c types
+    QZiflist (ziflist_t *self, QObject *qObjParent = 0);
 
     //  Get a list of network interfaces currently defined on the system
     explicit QZiflist (QObject *qObjParent = 0);
