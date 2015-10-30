@@ -1685,6 +1685,12 @@ zsock_test (bool verbose)
     zmq_close (zmq_sock);
     zmq_ctx_term (zmq_ctx);
 
+    //  Test resolve zsock
+    zsock_t *resolve = zsock_new_pub("@tcp://127.0.0.1:5561");
+    assert (resolve);
+    assert (zsock_resolve (resolve) == resolve->handle);
+    zsock_destroy (&resolve);
+
     //  Test resolve FD
     SOCKET fd = zsock_fd (reader);
     assert (zsock_resolve ((void *) &fd) == NULL);
