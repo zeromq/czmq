@@ -155,14 +155,18 @@ zframe_send (zframe_t **self_p, void *dest, int flags)
             zmq_msg_init (&copy);
             if (zmq_msg_copy (&copy, &self->zmsg))
                 return -1;
+#if defined (ZMQ_SERVER)
             zmq_msg_set_routing_id (&copy, self->routing_id);
+#endif
             if (zmq_sendmsg (handle, &copy, send_flags) == -1) {
                 zmq_msg_close (&copy);
                 return -1;
             }
         }
         else {
+#if defined (ZMQ_SERVER)
             zmq_msg_set_routing_id (&self->zmsg, self->routing_id);
+#endif
             if (zmq_sendmsg (handle, &self->zmsg, send_flags) >= 0)
                 zframe_destroy (self_p);
             else
