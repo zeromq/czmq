@@ -14,8 +14,8 @@ class QT_CZMQ_EXPORT QZuuid : public QObject
     Q_OBJECT
 public:
 
-   //  Copy-construct to return the proper wrapped c types
-   QZuuid (zuuid_t *self, QObject *qObjParent = 0);
+    //  Copy-construct to return the proper wrapped c types
+    QZuuid (zuuid_t *self, QObject *qObjParent = 0);
 
     //  Constructor
     explicit QZuuid (QObject *qObjParent = 0);

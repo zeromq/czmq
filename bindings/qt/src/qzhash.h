@@ -14,8 +14,8 @@ class QT_CZMQ_EXPORT QZhash : public QObject
     Q_OBJECT
 public:
 
-   //  Copy-construct to return the proper wrapped c types
-   QZhash (zhash_t *self, QObject *qObjParent = 0);
+    //  Copy-construct to return the proper wrapped c types
+    QZhash (zhash_t *self, QObject *qObjParent = 0);
 
     //  Create a new, empty hash container
     explicit QZhash (QObject *qObjParent = 0);
