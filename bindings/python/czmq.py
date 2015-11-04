@@ -1778,7 +1778,7 @@ instance, or a zactor_t instance."""
             self._as_parameter_ = args[0] # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
-            assert(len(args) == 2)
+            assert(len(args) >= 1)
             self._as_parameter_ = lib.zpoller_new(args[0], *args[1:]) # Creation of new raw type
             self.allow_destruct = True
 
