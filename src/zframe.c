@@ -126,7 +126,7 @@ zframe_recv (void *source)
 #if defined (ZMQ_SERVER)
         //  Grab routing ID if we're reading from a SERVER socket (ZMQ 4.2 and later)
         if (zsock_type (source) == ZMQ_SERVER)
-            self->routing_id = zmq_msg_routing_id (&self->zmsg);
+            self->routing_id = zmq_msg_get_routing_id (&self->zmsg);
 #endif
     }
     return self;

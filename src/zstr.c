@@ -70,7 +70,7 @@ zstr_recv (void *source)
 #if defined (ZMQ_SERVER)
     //  Grab routing ID if we're reading from a SERVER socket (ZMQ 4.2 and later)
     if (zsock_is (source) && zsock_type (source) == ZMQ_SERVER)
-        zsock_set_routing_id ((zsock_t *) source, zmq_msg_routing_id (&message));
+        zsock_set_routing_id ((zsock_t *) source, zmq_msg_get_routing_id (&message));
 #endif
     size_t size = zmq_msg_size (&message);
     char *string = (char *) malloc (size + 1);
