@@ -42,3 +42,11 @@ Java_org_zeromq_czmq_ZMsg__1_1send (JNIEnv *env, jclass c, jlong self, jlong des
     int rc = zmsg_send((zmsg_t **) self, (void *) dest);
     return rc;
 }
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_ZMsg__1_1pushstr (JNIEnv *env, jclass c, jlong ptr, jstring string) {
+    const char *str = (const char *) (*env)->GetStringUTFChars (env, string, NULL);
+    int rc = zmsg_pushstr ((zmsg_t *) ptr, str);
+    (*env)->ReleaseStringUTFChars (env, string, str);
+    return rc;
+}

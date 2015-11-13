@@ -33,6 +33,8 @@ public class ZMsg implements AutoCloseable {
 
     native static long __send(long pointer, long dest);
 
+    native static int __pushstr(long pointer, String str);
+
     public static ZMsg recv(ZSock sock) {
         final long ptr = ZMsg.__recv(sock.pointer);
         return new ZMsg(ptr);
