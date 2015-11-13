@@ -10,7 +10,7 @@ public class ZSockTest {
              final ZSock pull = new ZSock(ZMQ.ZMQ_PULL)) {
             ZMsg msg = new ZMsg();
             pull.bind("tcp://*:1234");
-            push.connect("tcp://localhost:1234");
+            push.connect("tcp://127.0.0.1:1234");
             String expected = "hello";
             msg.pushstr(expected);
             ZMsg.send(msg, push);
