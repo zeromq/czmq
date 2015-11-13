@@ -39,7 +39,8 @@ Java_org_zeromq_czmq_ZMsg__1_1recv (JNIEnv *env, jclass c, jlong source) {
 
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_ZMsg__1_1send (JNIEnv *env, jclass c, jlong self, jlong dest) {
-    int rc = zmsg_send((zmsg_t **) self, (void *) dest);
+    zmsg_t *msg = (zmsg_t *) self;
+    int rc = zmsg_send (&msg, (void *) dest);
     return rc;
 }
 
@@ -49,4 +50,12 @@ Java_org_zeromq_czmq_ZMsg__1_1pushstr (JNIEnv *env, jclass c, jlong ptr, jstring
     int rc = zmsg_pushstr ((zmsg_t *) ptr, str);
     (*env)->ReleaseStringUTFChars (env, string, str);
     return rc;
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_zeromq_czmq_ZMsg__1_1popstr (JNIEnv *env, jclass c, jlong ptr) {
+    zmsg_t *msg = (zmsg_t *) ptr;
+    char *str = zmsg_popstr (msg);
+    // TODO: Unsure if this is a memory leak?
+    return (*env)->NewStringUTF (env, str);
 }

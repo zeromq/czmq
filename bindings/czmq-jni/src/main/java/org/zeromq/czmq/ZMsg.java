@@ -8,6 +8,15 @@ package org.zeromq.czmq;
  * </p>
  */
 public class ZMsg implements AutoCloseable {
+
+    static {
+        try {
+            System.loadLibrary("czmqjni");
+        } catch (Exception e) {
+            System.exit(-1);
+        }
+    }
+
     long pointer; // private-package
 
     /**
@@ -34,6 +43,8 @@ public class ZMsg implements AutoCloseable {
     native static long __send(long pointer, long dest);
 
     native static int __pushstr(long pointer, String str);
+
+    native static String __popstr(long pointer);
 
     public static ZMsg recv(ZSock sock) {
         final long ptr = ZMsg.__recv(sock.pointer);
@@ -71,7 +82,7 @@ public class ZMsg implements AutoCloseable {
     }
 
     public boolean pushstr(String str) {
-        return true;
+        return 0 == __pushstr(pointer, str);
     }
 
     public boolean pushstrf(String format, Object... args) {
@@ -87,11 +98,11 @@ public class ZMsg implements AutoCloseable {
     }
 
     public String popstr() {
-        return null;
+        return __popstr(pointer);
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         ZMsg.__destroy(pointer);
     }
 }
