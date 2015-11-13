@@ -1,0 +1,43 @@
+apply plugin: 'java'
+
+group = "org.zeromq"
+version = "0.1.0-SNAPSHOT"
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+dependencies {
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.hamcrest:hamcrest-all:1.3'
+}
+
+task generateJniHeaders(type: Exec, dependsOn: classes) {
+    def classpath = sourceSets.main.output.classesDir
+    def nativeIncludes = "src/native/include"
+    def jniClasses = [
+            'org.zeromq.czmq.ZCtx',
+            'org.zeromq.czmq.ZFrame',
+            'org.zeromq.czmq.ZMsg',
+            'org.zeromq.czmq.ZSock'
+    ]
+    commandLine("javah", "-d", "$nativeIncludes", "-classpath", "$classpath", *jniClasses)
+}
+
+tasks.withType(Test) {
+    systemProperty "java.library.path", "/usr/lib:/usr/local/lib:$projectDir"
+}
+
+task initCMake(type: Exec, dependsOn: generateJniHeaders) {
+    commandLine "cmake", "."
+}
+
+task buildNative(type: Exec, dependsOn: initCMake) {
+    commandLine "make"
+}
+
+tasks.build.dependsOn buildNative
