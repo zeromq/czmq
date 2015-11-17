@@ -1,4 +1,5 @@
 apply plugin: 'java'
+apply plugin: 'maven'
 
 group = "org.zeromq"
 version = "0.1.0-SNAPSHOT"
