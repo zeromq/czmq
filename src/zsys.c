@@ -651,7 +651,7 @@ zsys_dir_create (const char *pathname, ...)
         *slash = '/';
         slash = strchr (slash + 1, '/');
     }
-    free (formatted);
+    zstr_free (&formatted);
     return 0;
 }
 
@@ -674,7 +674,7 @@ zsys_dir_delete (const char *pathname, ...)
 #else
     int rc = rmdir (formatted);
 #endif
-    free (formatted);
+    zstr_free (&formatted);
     return rc;
 }
 
@@ -1509,7 +1509,7 @@ zsys_error (const char *format, ...)
     char *string = zsys_vprintf (format, argptr);
     va_end (argptr);
     s_log ('E', string);
-    free (string);
+    zstr_free (&string);
 }
 
 
@@ -1524,7 +1524,7 @@ zsys_warning (const char *format, ...)
     char *string = zsys_vprintf (format, argptr);
     va_end (argptr);
     s_log ('W', string);
-    free (string);
+    zstr_free (&string);
 }
 
 
@@ -1539,7 +1539,7 @@ zsys_notice (const char *format, ...)
     char *string = zsys_vprintf (format, argptr);
     va_end (argptr);
     s_log ('N', string);
-    free (string);
+    zstr_free (&string);
 }
 
 
@@ -1554,7 +1554,7 @@ zsys_info (const char *format, ...)
     char *string = zsys_vprintf (format, argptr);
     va_end (argptr);
     s_log ('I', string);
-    free (string);
+    zstr_free (&string);
 }
 
 
@@ -1569,7 +1569,7 @@ zsys_debug (const char *format, ...)
     char *string = zsys_vprintf (format, argptr);
     va_end (argptr);
     s_log ('D', string);
-    free (string);
+    zstr_free (&string);
 }
 
 

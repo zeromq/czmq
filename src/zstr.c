@@ -169,7 +169,7 @@ zstr_sendf (void *dest, const char *format, ...)
     va_end (argptr);
 
     int rc = s_send_string (dest, false, string);
-    free (string);
+    zstr_free (&string);
     return rc;
 }
 
@@ -194,7 +194,7 @@ zstr_sendfm (void *dest, const char *format, ...)
     va_end (argptr);
 
     int rc = s_send_string (dest, true, string);
-    free (string);
+    zstr_free (&string);
     return rc;
 }
 

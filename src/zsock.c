@@ -479,7 +479,7 @@ zsock_bind (zsock_t *self, const char *format, ...)
 
         rc = -1;                //  Assume we don't succeed
         while (rc == -1 && attempts--) {
-            free (endpoint);
+            zstr_free (&endpoint);
             endpoint = zsys_sprintf ("%s:%d", hostname, port);
             if (!endpoint)
                 break;
@@ -494,11 +494,11 @@ zsock_bind (zsock_t *self, const char *format, ...)
 
     //  Store successful endpoint for later reference
     if (rc >= 0) {
-        free (self->endpoint);
+        zstr_free (&self->endpoint);
         self->endpoint = endpoint;
     }
     else
-        free (endpoint);
+        zstr_free (&endpoint);
 
     zrex_destroy (&rex);
     return rc;
@@ -537,7 +537,7 @@ zsock_unbind (zsock_t *self, const char *format, ...)
         return -1;
 
     int rc = zmq_unbind (self->handle, endpoint);
-    free (endpoint);
+    zstr_free (&endpoint);
     return rc;
 #else
     return -1;
@@ -575,7 +575,7 @@ zsock_connect (zsock_t *self, const char *format, ...)
         retries--;
     }
 #endif
-    free (endpoint);
+    zstr_free (&endpoint);
     return rc;
 }
 
@@ -599,7 +599,7 @@ zsock_disconnect (zsock_t *self, const char *format, ...)
     if (!endpoint)
         return -1;
     int rc = zmq_disconnect (self->handle, endpoint);
-    free (endpoint);
+    zstr_free (&endpoint);
     return rc;
 #else
     return -1;
