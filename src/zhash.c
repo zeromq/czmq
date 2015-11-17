@@ -515,7 +515,7 @@ zhash_comment (zhash_t *self, const char *format, ...)
         va_end (argptr);
         if (string)
             zlist_append (self->comments, string);
-        free (string);
+        zstr_free (&string);
     }
     else
         zlist_destroy (&self->comments);

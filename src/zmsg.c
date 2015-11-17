@@ -416,7 +416,7 @@ zmsg_pushstrf (zmsg_t *self, const char *format, ...)
 
     size_t len = strlen (string);
     zframe_t *frame = zframe_new (string, len);
-    free (string);
+    zstr_free (&string);
     if (frame) {
         self->content_size += len;
         return zlist_push (self->frames, frame);
@@ -446,7 +446,7 @@ zmsg_addstrf (zmsg_t *self, const char *format, ...)
 
     size_t len = strlen (string);
     zframe_t *frame = zframe_new (string, len);
-    free (string);
+    zstr_free (&string);
     if (frame) {
         self->content_size += len;
         return zlist_append (self->frames, frame);

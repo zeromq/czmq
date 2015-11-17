@@ -176,7 +176,7 @@ zcert_set_meta (zcert_t *self, const char *name, const char *format, ...)
     va_end (argptr);
     assert (value);
     zhash_insert (self->metadata, name, value);
-    free (value);
+    zstr_free (&value);
 }
 
 

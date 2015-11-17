@@ -241,7 +241,7 @@ void
 zconfig_set_value (zconfig_t *self, const char *format, ...)
 {
     assert (self);
-    free (self->value);
+    zstr_free (&self->value);
     if (format) {
         va_list argptr;
         va_start (argptr, format);
@@ -463,7 +463,7 @@ s_config_printf (zconfig_t *self, void *arg, char *format, ...)
             fprintf ((FILE *) arg, "%s", string);
     }
     size_t size = strlen (string);
-    free (string);
+    zstr_free (&string);
     if (size > INT_MAX)
         return -1;
 
@@ -535,7 +535,7 @@ zconfig_savef (zconfig_t *self, const char *format, ...)
     va_end (argptr);
     if (filename) {
         int rc = zconfig_save (self, filename);
-        free (filename);
+        zstr_free (&filename);
         return rc;
     }
     else
@@ -898,7 +898,7 @@ zconfig_set_comment (zconfig_t *self, const char *format, ...)
         va_end (argptr);
 
         zlist_append (self->comments, string);
-        free (string);
+        zstr_free (&string);
     }
     else
         zlist_destroy (&self->comments);
