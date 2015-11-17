@@ -5,11 +5,11 @@
 
 module CZMQ
   module FFI
-    
+
     # actor
     class Zactor
       class DestroyedError < RuntimeError; end
-      
+
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
@@ -31,7 +31,7 @@ module CZMQ
         end
       end
       def null?
-        !@ptr or ptr.null?
+        !@ptr or @ptr.null?
       end
       # Return internal pointer
       def __ptr
@@ -50,7 +50,7 @@ module CZMQ
         @ptr = nil
         ptr_ptr
       end
-      
+
       # Create a new callback of the following type:
       # Actors get a pipe and arguments from caller
       #     typedef void (zactor_fn) (     
@@ -66,14 +66,14 @@ module CZMQ
           yield pipe, args
         end
       end
-      
+
       # Create a new actor passing arbitrary arguments reference.
       def self.new task, args
         ptr = ::CZMQ::FFI.zactor_new task, args
-        
+
         __new ptr
       end
-      
+
       # Destroy an actor.
       def destroy
         return unless @ptr
@@ -81,7 +81,7 @@ module CZMQ
         result = ::CZMQ::FFI.zactor_destroy self_p
         result
       end
-      
+
       # Send a zmsg message to the actor, take ownership of the message
       # and destroy when it has been sent.                             
       def send msg_p
@@ -90,7 +90,7 @@ module CZMQ
         result = ::CZMQ::FFI.zactor_send @ptr, msg_p
         result
       end
-      
+
       # Receive a zmsg message from the actor. Returns NULL if the actor 
       # was interrupted before the message could be received, or if there
       # was a timeout on the actor.                                      
@@ -100,13 +100,13 @@ module CZMQ
         result = Zmsg.__new result, true
         result
       end
-      
+
       # Probe the supplied object, and report if it looks like a zactor_t.
       def self.is self_
         result = ::CZMQ::FFI.zactor_is self_
         result
       end
-      
+
       # Probe the supplied reference. If it looks like a zactor_t instance,
       # return the underlying libzmq actor handle; else if it looks like   
       # a libzmq actor handle, return the supplied value.                  
@@ -114,7 +114,7 @@ module CZMQ
         result = ::CZMQ::FFI.zactor_resolve self_
         result
       end
-      
+
       # Return the actor's zsock handle. Use this when you absolutely need
       # to work with the zsock instance rather than the actor.            
       def sock
@@ -123,7 +123,7 @@ module CZMQ
         result = Zsock.__new result, false
         result
       end
-      
+
       # Self test of this class.
       def self.test verbose
         verbose = !(0==verbose||!verbose) # boolean
@@ -131,7 +131,7 @@ module CZMQ
         result
       end
     end
-    
+
   end
 end
 

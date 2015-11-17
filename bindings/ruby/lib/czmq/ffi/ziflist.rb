@@ -5,11 +5,11 @@
 
 module CZMQ
   module FFI
-    
+
     # List of network interfaces available on system
     class Ziflist
       class DestroyedError < RuntimeError; end
-      
+
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
@@ -31,7 +31,7 @@ module CZMQ
         end
       end
       def null?
-        !@ptr or ptr.null?
+        !@ptr or @ptr.null?
       end
       # Return internal pointer
       def __ptr
@@ -50,14 +50,14 @@ module CZMQ
         @ptr = nil
         ptr_ptr
       end
-      
+
       # Get a list of network interfaces currently defined on the system
       def self.new
         ptr = ::CZMQ::FFI.ziflist_new
-        
+
         __new ptr
       end
-      
+
       # Destroy a ziflist instance
       def destroy
         return unless @ptr
@@ -65,63 +65,63 @@ module CZMQ
         result = ::CZMQ::FFI.ziflist_destroy self_p
         result
       end
-      
+
       # Print properties of the ziflist object.
       def print
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.ziflist_print @ptr
         result
       end
-      
+
       # Reload network interfaces from system
       def reload
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.ziflist_reload @ptr
         result
       end
-      
+
       # Return the number of network interfaces on system
       def size
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.ziflist_size @ptr
         result
       end
-      
+
       # Get first network interface, return NULL if there are none
       def first
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.ziflist_first @ptr
         result
       end
-      
+
       # Get next network interface, return NULL if we hit the last one
       def next
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.ziflist_next @ptr
         result
       end
-      
+
       # Return the current interface IP address as a printable string
       def address
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.ziflist_address @ptr
         result
       end
-      
+
       # Return the current interface broadcast address as a printable string
       def broadcast
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.ziflist_broadcast @ptr
         result
       end
-      
+
       # Return the current interface network mask as a printable string
       def netmask
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.ziflist_netmask @ptr
         result
       end
-      
+
       # Self test of this class.
       def self.test verbose
         verbose = !(0==verbose||!verbose) # boolean
@@ -129,7 +129,7 @@ module CZMQ
         result
       end
     end
-    
+
   end
 end
 

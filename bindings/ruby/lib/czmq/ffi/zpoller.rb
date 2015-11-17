@@ -5,11 +5,11 @@
 
 module CZMQ
   module FFI
-    
+
     # event-driven reactor
     class Zpoller
       class DestroyedError < RuntimeError; end
-      
+
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
@@ -31,7 +31,7 @@ module CZMQ
         end
       end
       def null?
-        !@ptr or ptr.null?
+        !@ptr or @ptr.null?
       end
       # Return internal pointer
       def __ptr
@@ -50,15 +50,15 @@ module CZMQ
         @ptr = nil
         ptr_ptr
       end
-      
+
       # Create new poller; the reader can be a libzmq socket (void *), a zsock_t
       # instance, or a zactor_t instance.                                       
       def self.new reader, result
         ptr = ::CZMQ::FFI.zpoller_new reader, result
-        
+
         __new ptr
       end
-      
+
       # Destroy a poller
       def destroy
         return unless @ptr
@@ -66,7 +66,7 @@ module CZMQ
         result = ::CZMQ::FFI.zpoller_destroy self_p
         result
       end
-      
+
       # Add a reader to be polled. Returns 0 if OK, -1 on failure. The reader may
       # be a libzmq void * socket, a zsock_t instance, or a zactor_t instance.   
       def add reader
@@ -74,7 +74,7 @@ module CZMQ
         result = ::CZMQ::FFI.zpoller_add @ptr, reader
         result
       end
-      
+
       # Remove a reader from the poller; returns 0 if OK, -1 on failure. The   
       # reader may be a libzmq void * socket, a zsock_t instance, or a zactor_t
       # instance.                                                              
@@ -83,7 +83,7 @@ module CZMQ
         result = ::CZMQ::FFI.zpoller_remove @ptr, reader
         result
       end
-      
+
       # Poll the registered readers for I/O, return first reader that has input.  
       # The reader will be a libzmq void * socket, or a zsock_t or zactor_t       
       # instance as specified in zpoller_new/zpoller_add. The timeout should be   
@@ -99,7 +99,7 @@ module CZMQ
         result = ::CZMQ::FFI.zpoller_wait @ptr, timeout
         result
       end
-      
+
       # Return true if the last zpoller_wait () call ended because the timeout
       # expired, without any error.                                           
       def expired
@@ -107,7 +107,7 @@ module CZMQ
         result = ::CZMQ::FFI.zpoller_expired @ptr
         result
       end
-      
+
       # Return true if the last zpoller_wait () call ended because the process
       # was interrupted, or the parent context was destroyed.                 
       def terminated
@@ -115,7 +115,7 @@ module CZMQ
         result = ::CZMQ::FFI.zpoller_terminated @ptr
         result
       end
-      
+
       # Ignore zsys_interrupted flag in this poller. By default, a zpoller_wait will 
       # return immediately if detects zsys_interrupted is set to something other than
       # zero. Calling zpoller_ignore_interrupts will supress this behavior.          
@@ -124,7 +124,7 @@ module CZMQ
         result = ::CZMQ::FFI.zpoller_ignore_interrupts @ptr
         result
       end
-      
+
       # Self test of this class
       def self.test verbose
         verbose = !(0==verbose||!verbose) # boolean
@@ -132,7 +132,7 @@ module CZMQ
         result
       end
     end
-    
+
   end
 end
 

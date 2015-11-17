@@ -5,11 +5,11 @@
 
 module CZMQ
   module FFI
-    
+
     # generic type-free hash container (simple)
     class Zhash
       class DestroyedError < RuntimeError; end
-      
+
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
@@ -31,7 +31,7 @@ module CZMQ
         end
       end
       def null?
-        !@ptr or ptr.null?
+        !@ptr or @ptr.null?
       end
       # Return internal pointer
       def __ptr
@@ -50,7 +50,7 @@ module CZMQ
         @ptr = nil
         ptr_ptr
       end
-      
+
       # Create a new callback of the following type:
       # Callback function for zhash_freefn method
       #     typedef void (zhash_free_fn) (
@@ -65,7 +65,7 @@ module CZMQ
           yield data
         end
       end
-      
+
       # Create a new callback of the following type:
       # DEPRECATED as clumsy -- use zhash_first/_next instead
       #     typedef int (zhash_foreach_fn) (                 
@@ -80,14 +80,14 @@ module CZMQ
           yield key, item, argument
         end
       end
-      
+
       # Create a new, empty hash container
       def self.new
         ptr = ::CZMQ::FFI.zhash_new
-        
+
         __new ptr
       end
-      
+
       # Destroy a hash container and all items in it
       def destroy
         return unless @ptr
@@ -95,7 +95,7 @@ module CZMQ
         result = ::CZMQ::FFI.zhash_destroy self_p
         result
       end
-      
+
       # Insert item into hash table with specified key and item.               
       # If key is already present returns -1 and leaves existing item unchanged
       # Returns 0 on success.                                                  
@@ -105,7 +105,7 @@ module CZMQ
         result = ::CZMQ::FFI.zhash_insert @ptr, key, item
         result
       end
-      
+
       # Update item into hash table with specified key and item.            
       # If key is already present, destroys old item and inserts new one.   
       # Use free_fn method to ensure deallocator is properly called on item.
@@ -115,7 +115,7 @@ module CZMQ
         result = ::CZMQ::FFI.zhash_update @ptr, key, item
         result
       end
-      
+
       # Remove an item specified by key from the hash table. If there was no such
       # item, this function does nothing.                                        
       def delete key
@@ -124,7 +124,7 @@ module CZMQ
         result = ::CZMQ::FFI.zhash_delete @ptr, key
         result
       end
-      
+
       # Return the item at the specified key, or null
       def lookup key
         raise DestroyedError unless @ptr
@@ -132,7 +132,7 @@ module CZMQ
         result = ::CZMQ::FFI.zhash_lookup @ptr, key
         result
       end
-      
+
       # Reindexes an item from an old key to a new key. If there was no such
       # item, does nothing. Returns 0 if successful, else -1.               
       def rename old_key, new_key
@@ -142,7 +142,7 @@ module CZMQ
         result = ::CZMQ::FFI.zhash_rename @ptr, old_key, new_key
         result
       end
-      
+
       # Set a free function for the specified hash table item. When the item is
       # destroyed, the free function, if any, is called on that item.          
       # Use this when hash items are dynamically allocated, to ensure that     
@@ -154,14 +154,14 @@ module CZMQ
         result = ::CZMQ::FFI.zhash_freefn @ptr, key, free_fn
         result
       end
-      
+
       # Return the number of keys/items in the hash table
       def size
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zhash_size @ptr
         result
       end
-      
+
       # Make copy of hash table; if supplied table is null, returns null.    
       # Does not copy items themselves. Rebuilds new table so may be slow on 
       # very large tables. NOTE: only works with item values that are strings
@@ -172,7 +172,7 @@ module CZMQ
         result = Zhash.__new result, true
         result
       end
-      
+
       # Return keys for items in table
       def keys
         raise DestroyedError unless @ptr
@@ -180,7 +180,7 @@ module CZMQ
         result = Zlist.__new result, true
         result
       end
-      
+
       # Simple iterator; returns first item in hash table, in no given order, 
       # or NULL if the table is empty. This method is simpler to use than the 
       # foreach() method, which is deprecated. To access the key for this item
@@ -190,7 +190,7 @@ module CZMQ
         result = ::CZMQ::FFI.zhash_first @ptr
         result
       end
-      
+
       # Simple iterator; returns next item in hash table, in no given order, 
       # or NULL if the last item was already returned. Use this together with
       # zhash_first() to process all items in a hash table. If you need the  
@@ -202,7 +202,7 @@ module CZMQ
         result = ::CZMQ::FFI.zhash_next @ptr
         result
       end
-      
+
       # After a successful first/next method, returns the key for the item that
       # was returned. This is a constant string that you may not modify or     
       # deallocate, and which lasts as long as the item in the hash. After an  
@@ -212,7 +212,7 @@ module CZMQ
         result = ::CZMQ::FFI.zhash_cursor @ptr
         result
       end
-      
+
       # Add a comment to hash table before saving to disk. You can add as many   
       # comment lines as you like. These comment lines are discarded when loading
       # the file. If you use a null format, all comments are deleted.            
@@ -222,7 +222,7 @@ module CZMQ
         result = ::CZMQ::FFI.zhash_comment @ptr, format, result
         result
       end
-      
+
       # Serialize hash table to a binary frame that can be sent in a message.
       # The packed format is compatible with the 'dictionary' type defined in
       # http://rfc.zeromq.org/spec:35/FILEMQ, and implemented by zproto:     
@@ -249,7 +249,7 @@ module CZMQ
         result = Zframe.__new result, true
         result
       end
-      
+
       # Unpack binary frame into a new hash table. Packed data must follow format
       # defined by zhash_pack. Hash table is set to autofree. An empty frame     
       # unpacks to an empty hash table.                                          
@@ -259,7 +259,7 @@ module CZMQ
         result = Zhash.__new result, true
         result
       end
-      
+
       # Save hash table to a text file in name=value format. Hash values must be
       # printable strings; keys may not contain '=' character. Returns 0 if OK, 
       # else -1 if a file error occurred.                                       
@@ -269,7 +269,7 @@ module CZMQ
         result = ::CZMQ::FFI.zhash_save @ptr, filename
         result
       end
-      
+
       # Load hash table from a text file in name=value format; hash table must 
       # already exist. Hash values must printable strings; keys may not contain
       # '=' character. Returns 0 if OK, else -1 if a file was not readable.    
@@ -279,7 +279,7 @@ module CZMQ
         result = ::CZMQ::FFI.zhash_load @ptr, filename
         result
       end
-      
+
       # When a hash table was loaded from a file by zhash_load, this method will
       # reload the file if it has been modified since, and is "stable", i.e. not
       # still changing. Returns 0 if OK, -1 if there was an error reloading the 
@@ -289,14 +289,14 @@ module CZMQ
         result = ::CZMQ::FFI.zhash_refresh @ptr
         result
       end
-      
+
       # Set hash for automatic value destruction
       def autofree
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zhash_autofree @ptr
         result
       end
-      
+
       # DEPRECATED as clumsy -- use zhash_first/_next instead                  
       # Apply function to each item in the hash table. Items are iterated in no
       # defined order. Stops if callback function returns non-zero and returns 
@@ -307,7 +307,7 @@ module CZMQ
         result = ::CZMQ::FFI.zhash_foreach @ptr, callback, argument
         result
       end
-      
+
       # Self test of this class
       def self.test verbose
         verbose = !(0==verbose||!verbose) # boolean
@@ -315,7 +315,7 @@ module CZMQ
         result
       end
     end
-    
+
   end
 end
 

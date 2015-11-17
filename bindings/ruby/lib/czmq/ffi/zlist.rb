@@ -5,11 +5,11 @@
 
 module CZMQ
   module FFI
-    
+
     # simple generic list container
     class Zlist
       class DestroyedError < RuntimeError; end
-      
+
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
@@ -31,7 +31,7 @@ module CZMQ
         end
       end
       def null?
-        !@ptr or ptr.null?
+        !@ptr or @ptr.null?
       end
       # Return internal pointer
       def __ptr
@@ -50,7 +50,7 @@ module CZMQ
         @ptr = nil
         ptr_ptr
       end
-      
+
       # Create a new callback of the following type:
       # Comparison function e.g. for sorting and removing.
       #     typedef int (zlist_compare_fn) (
@@ -65,7 +65,7 @@ module CZMQ
           yield item1, item2
         end
       end
-      
+
       # Create a new callback of the following type:
       # Callback function for zlist_freefn method
       #     typedef void (zlist_free_fn) (
@@ -80,14 +80,14 @@ module CZMQ
           yield data
         end
       end
-      
+
       # Create a new list container
       def self.new
         ptr = ::CZMQ::FFI.zlist_new
-        
+
         __new ptr
       end
-      
+
       # Destroy a list container
       def destroy
         return unless @ptr
@@ -95,7 +95,7 @@ module CZMQ
         result = ::CZMQ::FFI.zlist_destroy self_p
         result
       end
-      
+
       # Return the item at the head of list. If the list is empty, returns NULL.
       # Leaves cursor pointing at the head item, or NULL if the list is empty.  
       def first
@@ -103,7 +103,7 @@ module CZMQ
         result = ::CZMQ::FFI.zlist_first @ptr
         result
       end
-      
+
       # Return the next item. If the list is empty, returns NULL. To move to
       # the start of the list call zlist_first (). Advances the cursor.     
       def next
@@ -111,7 +111,7 @@ module CZMQ
         result = ::CZMQ::FFI.zlist_next @ptr
         result
       end
-      
+
       # Return the item at the tail of list. If the list is empty, returns NULL.
       # Leaves cursor pointing at the tail item, or NULL if the list is empty.  
       def last
@@ -119,21 +119,21 @@ module CZMQ
         result = ::CZMQ::FFI.zlist_last @ptr
         result
       end
-      
+
       # Return first item in the list, or null, leaves the cursor
       def head
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zlist_head @ptr
         result
       end
-      
+
       # Return last item in the list, or null, leaves the cursor
       def tail
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zlist_tail @ptr
         result
       end
-      
+
       # Return the current item of list. If the list is empty, returns NULL.     
       # Leaves cursor pointing at the current item, or NULL if the list is empty.
       def item
@@ -141,7 +141,7 @@ module CZMQ
         result = ::CZMQ::FFI.zlist_item @ptr
         result
       end
-      
+
       # Append an item to the end of the list, return 0 if OK or -1 if this  
       # failed for some reason (out of memory). Note that if a duplicator has
       # been set, this method will also duplicate the item.                  
@@ -150,7 +150,7 @@ module CZMQ
         result = ::CZMQ::FFI.zlist_append @ptr, item
         result
       end
-      
+
       # Push an item to the start of the list, return 0 if OK or -1 if this  
       # failed for some reason (out of memory). Note that if a duplicator has
       # been set, this method will also duplicate the item.                  
@@ -159,14 +159,14 @@ module CZMQ
         result = ::CZMQ::FFI.zlist_push @ptr, item
         result
       end
-      
+
       # Pop the item off the start of the list, if any
       def pop
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zlist_pop @ptr
         result
       end
-      
+
       # Checks if an item already is present. Uses compare method to determine if 
       # items are equal. If the compare method is NULL the check will only compare
       # pointers. Returns true if item is present else false.                     
@@ -175,14 +175,14 @@ module CZMQ
         result = ::CZMQ::FFI.zlist_exists @ptr, item
         result
       end
-      
+
       # Remove the specified item from the list if present
       def remove item
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zlist_remove @ptr, item
         result
       end
-      
+
       # Make a copy of list. If the list has autofree set, the copied list will  
       # duplicate all items, which must be strings. Otherwise, the list will hold
       # pointers back to the items in the original list. If list is null, returns
@@ -193,21 +193,21 @@ module CZMQ
         result = Zlist.__new result, true
         result
       end
-      
+
       # Purge all items from list
       def purge
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zlist_purge @ptr
         result
       end
-      
+
       # Return number of items in the list
       def size
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zlist_size @ptr
         result
       end
-      
+
       # Sort the list by ascending key value using a straight ASCII comparison.
       # The sort is not stable, so may reorder items with the same keys.       
       def sort compare
@@ -215,7 +215,7 @@ module CZMQ
         result = ::CZMQ::FFI.zlist_sort @ptr, compare
         result
       end
-      
+
       # Set list for automatic item destruction; item values MUST be strings. 
       # By default a list item refers to a value held elsewhere. When you set 
       # this, each time you append or push a list item, zlist will take a copy
@@ -229,7 +229,7 @@ module CZMQ
         result = ::CZMQ::FFI.zlist_autofree @ptr
         result
       end
-      
+
       # Sets a compare function for this list. The function compares two items.
       # It returns an integer less than, equal to, or greater than zero if the 
       # first item is found, respectively, to be less than, to match, or be    
@@ -240,7 +240,7 @@ module CZMQ
         result = ::CZMQ::FFI.zlist_comparefn @ptr, fn
         result
       end
-      
+
       # Set a free function for the specified list item. When the item is     
       # destroyed, the free function, if any, is called on that item.         
       # Use this when list items are dynamically allocated, to ensure that    
@@ -252,7 +252,7 @@ module CZMQ
         result = ::CZMQ::FFI.zlist_freefn @ptr, item, fn, at_tail
         result
       end
-      
+
       # Self test of this class
       def self.test verbose
         verbose = !(0==verbose||!verbose) # boolean
@@ -260,7 +260,7 @@ module CZMQ
         result
       end
     end
-    
+
   end
 end
 

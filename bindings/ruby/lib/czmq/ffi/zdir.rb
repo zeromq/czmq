@@ -5,11 +5,11 @@
 
 module CZMQ
   module FFI
-    
+
     # work with file-system directories
     class Zdir
       class DestroyedError < RuntimeError; end
-      
+
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
@@ -31,7 +31,7 @@ module CZMQ
         end
       end
       def null?
-        !@ptr or ptr.null?
+        !@ptr or @ptr.null?
       end
       # Return internal pointer
       def __ptr
@@ -50,7 +50,7 @@ module CZMQ
         @ptr = nil
         ptr_ptr
       end
-      
+
       # Create a new directory item that loads in the full tree of the specified
       # path, optionally located under some parent path. If parent is "-", then 
       # loads only the top-level directory, and does not use parent as a path.  
@@ -58,10 +58,10 @@ module CZMQ
         path = String(path)
         parent = String(parent)
         ptr = ::CZMQ::FFI.zdir_new path, parent
-        
+
         __new ptr
       end
-      
+
       # Destroy a directory tree and all children it contains.
       def destroy
         return unless @ptr
@@ -69,21 +69,21 @@ module CZMQ
         result = ::CZMQ::FFI.zdir_destroy self_p
         result
       end
-      
+
       # Return directory path
       def path
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zdir_path @ptr
         result
       end
-      
+
       # Return last modification time for directory.
       def modified
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zdir_modified @ptr
         result
       end
-      
+
       # Return total hierarchy size, in bytes of data contained in all files
       # in the directory tree.                                              
       def cursize
@@ -91,14 +91,14 @@ module CZMQ
         result = ::CZMQ::FFI.zdir_cursize @ptr
         result
       end
-      
+
       # Return directory count
       def count
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zdir_count @ptr
         result
       end
-      
+
       # Returns a sorted list of zfile objects; Each entry in the list is a pointer
       # to a zfile_t item already allocated in the zdir tree. Do not destroy the   
       # original zdir tree until you are done with this list.                      
@@ -108,7 +108,7 @@ module CZMQ
         result = Zlist.__new result, true
         result
       end
-      
+
       # Remove directory, optionally including all files that it contains, at  
       # all levels. If force is false, will only remove the directory if empty.
       # If force is true, will remove all files and all subdirectories.        
@@ -118,7 +118,7 @@ module CZMQ
         result = ::CZMQ::FFI.zdir_remove @ptr, force
         result
       end
-      
+
       # Calculate differences between two versions of a directory tree.    
       # Returns a list of zdir_patch_t patches. Either older or newer may  
       # be null, indicating the directory is empty/absent. If alias is set,
@@ -131,7 +131,7 @@ module CZMQ
         result = Zlist.__new result, true
         result
       end
-      
+
       # Return full contents of directory as a zdir_patch list.
       def resync alias_
         raise DestroyedError unless @ptr
@@ -140,7 +140,7 @@ module CZMQ
         result = Zlist.__new result, true
         result
       end
-      
+
       # Load directory cache; returns a hash table containing the SHA-1 digests
       # of every file in the tree. The cache is saved between runs in .cache.  
       def cache
@@ -149,7 +149,7 @@ module CZMQ
         result = Zhash.__new result, true
         result
       end
-      
+
       # Print contents of directory to open stream
       def fprint file, indent
         raise DestroyedError unless @ptr
@@ -157,7 +157,7 @@ module CZMQ
         result = ::CZMQ::FFI.zdir_fprint @ptr, file, indent
         result
       end
-      
+
       # Print contents of directory to stdout
       def print indent
         raise DestroyedError unless @ptr
@@ -165,7 +165,7 @@ module CZMQ
         result = ::CZMQ::FFI.zdir_print @ptr, indent
         result
       end
-      
+
       # Create a new zdir_watch actor instance:                       
       #                                                               
       #     zactor_t *watch = zactor_new (zdir_watch, NULL);          
@@ -197,7 +197,7 @@ module CZMQ
         result = ::CZMQ::FFI.zdir_watch pipe, unused
         result
       end
-      
+
       # Self test of this class.
       def self.test verbose
         verbose = !(0==verbose||!verbose) # boolean
@@ -205,7 +205,7 @@ module CZMQ
         result
       end
     end
-    
+
   end
 end
 
