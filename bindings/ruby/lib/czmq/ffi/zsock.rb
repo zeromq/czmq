@@ -5,11 +5,11 @@
 
 module CZMQ
   module FFI
-    
+
     # high-level socket API that hides libzmq contexts and sockets
     class Zsock
       class DestroyedError < RuntimeError; end
-      
+
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
@@ -31,7 +31,7 @@ module CZMQ
         end
       end
       def null?
-        !@ptr or ptr.null?
+        !@ptr or @ptr.null?
       end
       # Return internal pointer
       def __ptr
@@ -50,7 +50,7 @@ module CZMQ
         @ptr = nil
         ptr_ptr
       end
-      
+
       # Create a new socket. Returns the new socket, or NULL if the new socket
       # could not be created. Note that the symbol zsock_new (and other       
       # constructors/destructors for zsock) are redirected to the *_checked   
@@ -60,10 +60,10 @@ module CZMQ
       def self.new type
         type = Integer(type)
         ptr = ::CZMQ::FFI.zsock_new type
-        
+
         __new ptr
       end
-      
+
       # Destroy the socket. You must use this for any socket created via the
       # zsock_new method.                                                   
       def destroy
@@ -72,7 +72,7 @@ module CZMQ
         result = ::CZMQ::FFI.zsock_destroy self_p
         result
       end
-      
+
       # Create a PUB socket. Default action is bind.
       def self.new_pub endpoint
         endpoint = String(endpoint)
@@ -80,7 +80,7 @@ module CZMQ
         result = Zsock.__new result, true
         result
       end
-      
+
       # Create a SUB socket, and optionally subscribe to some prefix string. Default
       # action is connect.                                                          
       def self.new_sub endpoint, subscribe
@@ -90,7 +90,7 @@ module CZMQ
         result = Zsock.__new result, true
         result
       end
-      
+
       # Create a REQ socket. Default action is connect.
       def self.new_req endpoint
         endpoint = String(endpoint)
@@ -98,7 +98,7 @@ module CZMQ
         result = Zsock.__new result, true
         result
       end
-      
+
       # Create a REP socket. Default action is bind.
       def self.new_rep endpoint
         endpoint = String(endpoint)
@@ -106,7 +106,7 @@ module CZMQ
         result = Zsock.__new result, true
         result
       end
-      
+
       # Create a DEALER socket. Default action is connect.
       def self.new_dealer endpoint
         endpoint = String(endpoint)
@@ -114,7 +114,7 @@ module CZMQ
         result = Zsock.__new result, true
         result
       end
-      
+
       # Create a ROUTER socket. Default action is bind.
       def self.new_router endpoint
         endpoint = String(endpoint)
@@ -122,7 +122,7 @@ module CZMQ
         result = Zsock.__new result, true
         result
       end
-      
+
       # Create a PUSH socket. Default action is connect.
       def self.new_push endpoint
         endpoint = String(endpoint)
@@ -130,7 +130,7 @@ module CZMQ
         result = Zsock.__new result, true
         result
       end
-      
+
       # Create a PULL socket. Default action is bind.
       def self.new_pull endpoint
         endpoint = String(endpoint)
@@ -138,7 +138,7 @@ module CZMQ
         result = Zsock.__new result, true
         result
       end
-      
+
       # Create an XPUB socket. Default action is bind.
       def self.new_xpub endpoint
         endpoint = String(endpoint)
@@ -146,7 +146,7 @@ module CZMQ
         result = Zsock.__new result, true
         result
       end
-      
+
       # Create an XSUB socket. Default action is connect.
       def self.new_xsub endpoint
         endpoint = String(endpoint)
@@ -154,7 +154,7 @@ module CZMQ
         result = Zsock.__new result, true
         result
       end
-      
+
       # Create a PAIR socket. Default action is connect.
       def self.new_pair endpoint
         endpoint = String(endpoint)
@@ -162,7 +162,7 @@ module CZMQ
         result = Zsock.__new result, true
         result
       end
-      
+
       # Create a STREAM socket. Default action is connect.
       def self.new_stream endpoint
         endpoint = String(endpoint)
@@ -170,7 +170,7 @@ module CZMQ
         result = Zsock.__new result, true
         result
       end
-      
+
       # Create a SERVER socket. Default action is bind.
       def self.new_server endpoint
         endpoint = String(endpoint)
@@ -178,7 +178,7 @@ module CZMQ
         result = Zsock.__new result, true
         result
       end
-      
+
       # Create a CLIENT socket. Default action is connect.
       def self.new_client endpoint
         endpoint = String(endpoint)
@@ -186,7 +186,7 @@ module CZMQ
         result = Zsock.__new result, true
         result
       end
-      
+
       # Bind a socket to a formatted endpoint. For tcp:// endpoints, supports   
       # ephemeral ports, if you specify the port number as "*". By default      
       # zsock uses the IANA designated range from C000 (49152) to FFFF (65535). 
@@ -213,14 +213,14 @@ module CZMQ
         result = ::CZMQ::FFI.zsock_bind @ptr, format, result
         result
       end
-      
+
       # Returns last bound endpoint, if any.
       def endpoint
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zsock_endpoint @ptr
         result
       end
-      
+
       # Unbind a socket from a formatted endpoint.                     
       # Returns 0 if OK, -1 if the endpoint was invalid or the function
       # isn't supported.                                               
@@ -230,7 +230,7 @@ module CZMQ
         result = ::CZMQ::FFI.zsock_unbind @ptr, format, result
         result
       end
-      
+
       # Connect a socket to a formatted endpoint        
       # Returns 0 if OK, -1 if the endpoint was invalid.
       def connect format, result
@@ -239,7 +239,7 @@ module CZMQ
         result = ::CZMQ::FFI.zsock_connect @ptr, format, result
         result
       end
-      
+
       # Disconnect a socket from a formatted endpoint                  
       # Returns 0 if OK, -1 if the endpoint was invalid or the function
       # isn't supported.                                               
@@ -249,7 +249,7 @@ module CZMQ
         result = ::CZMQ::FFI.zsock_disconnect @ptr, format, result
         result
       end
-      
+
       # Attach a socket to zero or more endpoints. If endpoints is not null,     
       # parses as list of ZeroMQ endpoints, separated by commas, and prefixed by 
       # '@' (to bind the socket) or '>' (to connect the socket). Returns 0 if all
@@ -263,14 +263,14 @@ module CZMQ
         result = ::CZMQ::FFI.zsock_attach @ptr, endpoints, serverish
         result
       end
-      
+
       # Returns socket type as printable constant string.
       def type_str
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zsock_type_str @ptr
         result
       end
-      
+
       # Send a 'picture' message to the socket (or actor). The picture is a   
       # string that defines the type of each frame. This makes it easy to send
       # a complex multiframe message in one call. The picture can contain any 
@@ -303,7 +303,7 @@ module CZMQ
         result = ::CZMQ::FFI.zsock_send @ptr, picture, result
         result
       end
-      
+
       # Send a 'picture' message to the socket (or actor). This is a va_list 
       # version of zsock_send (), so please consult its documentation for the
       # details.                                                             
@@ -313,7 +313,7 @@ module CZMQ
         result = ::CZMQ::FFI.zsock_vsend @ptr, picture, argptr
         result
       end
-      
+
       # Receive a 'picture' message to the socket (or actor). See zsock_send for
       # the format and meaning of the picture. Returns the picture elements into
       # a series of pointers as provided by the caller:                         
@@ -346,7 +346,7 @@ module CZMQ
         result = ::CZMQ::FFI.zsock_recv @ptr, picture, result
         result
       end
-      
+
       # Receive a 'picture' message from the socket (or actor). This is a    
       # va_list version of zsock_recv (), so please consult its documentation
       # for the details.                                                     
@@ -356,7 +356,7 @@ module CZMQ
         result = ::CZMQ::FFI.zsock_vrecv @ptr, picture, argptr
         result
       end
-      
+
       # Send a binary encoded 'picture' message to the socket (or actor). This 
       # method is similar to zsock_send, except the arguments are encoded in a 
       # binary format that is compatible with zproto, and is designed to reduce
@@ -384,7 +384,7 @@ module CZMQ
         result = ::CZMQ::FFI.zsock_bsend @ptr, picture, result
         result
       end
-      
+
       # Receive a binary encoded 'picture' message from the socket (or actor).  
       # This method is similar to zsock_recv, except the arguments are encoded  
       # in a binary format that is compatible with zproto, and is designed to   
@@ -399,7 +399,7 @@ module CZMQ
         result = ::CZMQ::FFI.zsock_brecv @ptr, picture, result
         result
       end
-      
+
       # Return socket routing ID if any. This returns 0 if the socket is not
       # of type ZMQ_SERVER or if no request was already received on it.     
       def routing_id
@@ -407,7 +407,7 @@ module CZMQ
         result = ::CZMQ::FFI.zsock_routing_id @ptr
         result
       end
-      
+
       # Set routing ID on socket. The socket MUST be of type ZMQ_SERVER.        
       # This will be used when sending messages on the socket via the zsock API.
       def set_routing_id routing_id
@@ -415,7 +415,7 @@ module CZMQ
         result = ::CZMQ::FFI.zsock_set_routing_id @ptr, routing_id
         result
       end
-      
+
       # Set socket to use unbounded pipes (HWM=0); use this in cases when you are
       # totally certain the message volume can fit in memory. This method works  
       # across all versions of ZeroMQ. Takes a polymorphic socket reference.     
@@ -424,7 +424,7 @@ module CZMQ
         result = ::CZMQ::FFI.zsock_set_unbounded @ptr
         result
       end
-      
+
       # Send a signal over a socket. A signal is a short message carrying a   
       # success/failure code (by convention, 0 means OK). Signals are encoded 
       # to be distinguishable from "normal" messages. Accepts a zock_t or a   
@@ -435,7 +435,7 @@ module CZMQ
         result = ::CZMQ::FFI.zsock_signal @ptr, status
         result
       end
-      
+
       # Wait on a signal. Use this to coordinate between threads, over pipe  
       # pairs. Blocks until the signal is received. Returns -1 on error, 0 or
       # greater on success. Accepts a zsock_t or a zactor_t as argument.     
@@ -445,7 +445,7 @@ module CZMQ
         result = ::CZMQ::FFI.zsock_wait @ptr
         result
       end
-      
+
       # If there is a partial message still waiting on the socket, remove and    
       # discard it. This is useful when reading partial messages, to get specific
       # message types.                                                           
@@ -454,14 +454,14 @@ module CZMQ
         result = ::CZMQ::FFI.zsock_flush @ptr
         result
       end
-      
+
       # Probe the supplied object, and report if it looks like a zsock_t.
       # Takes a polymorphic socket reference.                            
       def self.is self_
         result = ::CZMQ::FFI.zsock_is self_
         result
       end
-      
+
       # Probe the supplied reference. If it looks like a zsock_t instance, return
       # the underlying libzmq socket handle; else if it looks like a file        
       # descriptor, return NULL; else if it looks like a libzmq socket handle,   
@@ -470,7 +470,7 @@ module CZMQ
         result = ::CZMQ::FFI.zsock_resolve self_
         result
       end
-      
+
       # Self test of this class
       def self.test verbose
         verbose = !(0==verbose||!verbose) # boolean
@@ -478,7 +478,7 @@ module CZMQ
         result
       end
     end
-    
+
   end
 end
 

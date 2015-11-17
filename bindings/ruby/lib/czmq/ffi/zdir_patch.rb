@@ -5,11 +5,11 @@
 
 module CZMQ
   module FFI
-    
+
     # work with directory patches
     class ZdirPatch
       class DestroyedError < RuntimeError; end
-      
+
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
@@ -31,7 +31,7 @@ module CZMQ
         end
       end
       def null?
-        !@ptr or ptr.null?
+        !@ptr or @ptr.null?
       end
       # Return internal pointer
       def __ptr
@@ -50,17 +50,17 @@ module CZMQ
         @ptr = nil
         ptr_ptr
       end
-      
+
       # Create new patch
       def self.new path, file, op, alias_
         path = String(path)
         file = file.__ptr if file
         alias_ = String(alias_)
         ptr = ::CZMQ::FFI.zdir_patch_new path, file, op, alias_
-        
+
         __new ptr
       end
-      
+
       # Destroy a patch
       def destroy
         return unless @ptr
@@ -68,7 +68,7 @@ module CZMQ
         result = ::CZMQ::FFI.zdir_patch_destroy self_p
         result
       end
-      
+
       # Create copy of a patch. If the patch is null, or memory was exhausted,
       # returns null.                                                         
       def dup
@@ -76,14 +76,14 @@ module CZMQ
         result = ::CZMQ::FFI.zdir_patch_dup @ptr
         result
       end
-      
+
       # Return patch file directory path
       def path
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zdir_patch_path @ptr
         result
       end
-      
+
       # Return patch file item
       def file
         raise DestroyedError unless @ptr
@@ -91,35 +91,35 @@ module CZMQ
         result = Zfile.__new result, false
         result
       end
-      
+
       # Return operation
       def op
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zdir_patch_op @ptr
         result
       end
-      
+
       # Return patch virtual file path
       def vpath
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zdir_patch_vpath @ptr
         result
       end
-      
+
       # Calculate hash digest for file (create only)
       def digest_set
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zdir_patch_digest_set @ptr
         result
       end
-      
+
       # Return hash digest for patch file
       def digest
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zdir_patch_digest @ptr
         result
       end
-      
+
       # Self test of this class.
       def self.test verbose
         verbose = !(0==verbose||!verbose) # boolean
@@ -127,7 +127,7 @@ module CZMQ
         result
       end
     end
-    
+
   end
 end
 

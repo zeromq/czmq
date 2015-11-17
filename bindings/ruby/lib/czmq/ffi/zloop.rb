@@ -5,11 +5,11 @@
 
 module CZMQ
   module FFI
-    
+
     # event-driven reactor
     class Zloop
       class DestroyedError < RuntimeError; end
-      
+
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
@@ -31,7 +31,7 @@ module CZMQ
         end
       end
       def null?
-        !@ptr or ptr.null?
+        !@ptr or @ptr.null?
       end
       # Return internal pointer
       def __ptr
@@ -50,7 +50,7 @@ module CZMQ
         @ptr = nil
         ptr_ptr
       end
-      
+
       # Create a new callback of the following type:
       # Callback function for reactor socket activity
       #     typedef int (zloop_reader_fn) (                
@@ -67,7 +67,7 @@ module CZMQ
           yield loop, reader, arg
         end
       end
-      
+
       # Create a new callback of the following type:
       # Callback function for reactor events (low-level)
       #     typedef int (zloop_fn) (                            
@@ -83,7 +83,7 @@ module CZMQ
           yield loop, item, arg
         end
       end
-      
+
       # Create a new callback of the following type:
       # Callback for reactor timer events
       #     typedef int (zloop_timer_fn) (              
@@ -99,14 +99,14 @@ module CZMQ
           yield loop, timer_id, arg
         end
       end
-      
+
       # Create a new zloop reactor
       def self.new
         ptr = ::CZMQ::FFI.zloop_new
-        
+
         __new ptr
       end
-      
+
       # Destroy a reactor
       def destroy
         return unless @ptr
@@ -114,7 +114,7 @@ module CZMQ
         result = ::CZMQ::FFI.zloop_destroy self_p
         result
       end
-      
+
       # Register socket reader with the reactor. When the reader has messages, 
       # the reactor will call the handler, passing the arg. Returns 0 if OK, -1
       # if there was an error. If you register the same socket more than once, 
@@ -125,7 +125,7 @@ module CZMQ
         result = ::CZMQ::FFI.zloop_reader @ptr, sock, handler, arg
         result
       end
-      
+
       # Cancel a socket reader from the reactor. If multiple readers exist for
       # same socket, cancels ALL of them.                                     
       def reader_end sock
@@ -134,7 +134,7 @@ module CZMQ
         result = ::CZMQ::FFI.zloop_reader_end @ptr, sock
         result
       end
-      
+
       # Configure a registered reader to ignore errors. If you do not set this,
       # then readers that have errors are removed from the reactor silently.   
       def reader_set_tolerant sock
@@ -143,7 +143,7 @@ module CZMQ
         result = ::CZMQ::FFI.zloop_reader_set_tolerant @ptr, sock
         result
       end
-      
+
       # Register low-level libzmq pollitem with the reactor. When the pollitem  
       # is ready, will call the handler, passing the arg. Returns 0 if OK, -1   
       # if there was an error. If you register the pollitem more than once, each
@@ -154,7 +154,7 @@ module CZMQ
         result = ::CZMQ::FFI.zloop_poller @ptr, item, handler, arg
         result
       end
-      
+
       # Cancel a pollitem from the reactor, specified by socket or FD. If both
       # are specified, uses only socket. If multiple poll items exist for same
       # socket/FD, cancels ALL of them.                                       
@@ -163,7 +163,7 @@ module CZMQ
         result = ::CZMQ::FFI.zloop_poller_end @ptr, item
         result
       end
-      
+
       # Configure a registered poller to ignore errors. If you do not set this,
       # then poller that have errors are removed from the reactor silently.    
       def poller_set_tolerant item
@@ -171,7 +171,7 @@ module CZMQ
         result = ::CZMQ::FFI.zloop_poller_set_tolerant @ptr, item
         result
       end
-      
+
       # Register a timer that expires after some delay and repeats some number of
       # times. At each expiry, will call the handler, passing the arg. To run a  
       # timer forever, use 0 times. Returns a timer_id that is used to cancel the
@@ -183,7 +183,7 @@ module CZMQ
         result = ::CZMQ::FFI.zloop_timer @ptr, delay, times, handler, arg
         result
       end
-      
+
       # Cancel a specific timer identified by a specific timer_id (as returned by
       # zloop_timer).                                                            
       def timer_end timer_id
@@ -192,7 +192,7 @@ module CZMQ
         result = ::CZMQ::FFI.zloop_timer_end @ptr, timer_id
         result
       end
-      
+
       # Register a ticket timer. Ticket timers are very fast in the case where   
       # you use a lot of timers (thousands), and frequently remove and add them. 
       # The main use case is expiry timers for servers that handle many clients, 
@@ -207,7 +207,7 @@ module CZMQ
         result = ::CZMQ::FFI.zloop_ticket @ptr, handler, arg
         result
       end
-      
+
       # Reset a ticket timer, which moves it to the end of the ticket list and
       # resets its execution time. This is a very fast operation.             
       def ticket_reset handle
@@ -215,7 +215,7 @@ module CZMQ
         result = ::CZMQ::FFI.zloop_ticket_reset @ptr, handle
         result
       end
-      
+
       # Delete a ticket timer. We do not actually delete the ticket here, as    
       # other code may still refer to the ticket. We mark as deleted, and remove
       # later and safely.                                                       
@@ -224,7 +224,7 @@ module CZMQ
         result = ::CZMQ::FFI.zloop_ticket_delete @ptr, handle
         result
       end
-      
+
       # Set the ticket delay, which applies to all tickets. If you lower the   
       # delay and there are already tickets created, the results are undefined.
       def set_ticket_delay ticket_delay
@@ -233,7 +233,7 @@ module CZMQ
         result = ::CZMQ::FFI.zloop_set_ticket_delay @ptr, ticket_delay
         result
       end
-      
+
       # Set hard limit on number of timers allowed. Setting more than a small  
       # number of timers (10-100) can have a dramatic impact on the performance
       # of the reactor. For high-volume cases, use ticket timers. If the hard  
@@ -245,7 +245,7 @@ module CZMQ
         result = ::CZMQ::FFI.zloop_set_max_timers @ptr, max_timers
         result
       end
-      
+
       # Set verbose tracing of reactor on/off
       def set_verbose verbose
         raise DestroyedError unless @ptr
@@ -253,7 +253,7 @@ module CZMQ
         result = ::CZMQ::FFI.zloop_set_verbose @ptr, verbose
         result
       end
-      
+
       # Start the reactor. Takes control of the thread and returns when the 0MQ  
       # context is terminated or the process is interrupted, or any event handler
       # returns -1. Event handlers may register new sockets and timers, and      
@@ -263,7 +263,7 @@ module CZMQ
         result = ::CZMQ::FFI.zloop_start @ptr
         result
       end
-      
+
       # Ignore zsys_interrupted flag in this loop. By default, a zloop_start will 
       # exit as soon as it detects zsys_interrupted is set to something other than
       # zero. Calling zloop_ignore_interrupts will supress this behavior.         
@@ -272,7 +272,7 @@ module CZMQ
         result = ::CZMQ::FFI.zloop_ignore_interrupts @ptr
         result
       end
-      
+
       # Self test of this class
       def self.test verbose
         verbose = !(0==verbose||!verbose) # boolean
@@ -280,7 +280,7 @@ module CZMQ
         result
       end
     end
-    
+
   end
 end
 

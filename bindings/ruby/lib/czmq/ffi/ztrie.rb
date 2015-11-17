@@ -5,11 +5,11 @@
 
 module CZMQ
   module FFI
-    
+
     # simple trie for tokenizable strings
     class Ztrie
       class DestroyedError < RuntimeError; end
-      
+
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
@@ -31,7 +31,7 @@ module CZMQ
         end
       end
       def null?
-        !@ptr or ptr.null?
+        !@ptr or @ptr.null?
       end
       # Return internal pointer
       def __ptr
@@ -50,7 +50,7 @@ module CZMQ
         @ptr = nil
         ptr_ptr
       end
-      
+
       # Create a new callback of the following type:
       # Callback function for ztrie_node to destroy node data.
       #     typedef void (ztrie_destroy_data_fn) (
@@ -65,14 +65,14 @@ module CZMQ
           yield data
         end
       end
-      
+
       # Creates a new ztrie.
       def self.new delimiter
         ptr = ::CZMQ::FFI.ztrie_new delimiter
-        
+
         __new ptr
       end
-      
+
       # Destroy the ztrie.
       def destroy
         return unless @ptr
@@ -80,14 +80,14 @@ module CZMQ
         result = ::CZMQ::FFI.ztrie_destroy self_p
         result
       end
-      
+
       # Print properties of the ztrie object.
       def print
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.ztrie_print @ptr
         result
       end
-      
+
       # Inserts a new route into the tree and attaches the data. Returns -1     
       # if the route already exists, otherwise 0. This method takes ownership of
       # the provided data if a destroy_data_fn is provided.                     
@@ -96,7 +96,7 @@ module CZMQ
         result = ::CZMQ::FFI.ztrie_insert_route @ptr, path, data, destroy_data_fn
         result
       end
-      
+
       # Removes a route from the trie and destroys its data. Returns -1 if the
       # route does not exists, otherwise 0.                                   
       # the start of the list call zlist_first (). Advances the cursor.       
@@ -105,14 +105,14 @@ module CZMQ
         result = ::CZMQ::FFI.ztrie_remove_route @ptr, path
         result
       end
-      
+
       # Returns true if the path matches a route in the tree, otherwise false.
       def matches path
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.ztrie_matches @ptr, path
         result
       end
-      
+
       # Returns the data of a matched route from last ztrie_matches. If the path
       # did not match, returns NULL. Do not delete the data as it's owned by    
       # ztrie.                                                                  
@@ -121,14 +121,14 @@ module CZMQ
         result = ::CZMQ::FFI.ztrie_hit_data @ptr
         result
       end
-      
+
       # Returns the count of parameters that a matched route has.
       def hit_parameter_count
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.ztrie_hit_parameter_count @ptr
         result
       end
-      
+
       # Returns the parameters of a matched route with named regexes from last   
       # ztrie_matches. If the path did not match or the route did not contain any
       # named regexes, returns NULL.                                             
@@ -138,7 +138,7 @@ module CZMQ
         result = Zhashx.__new result, false
         result
       end
-      
+
       # Returns the asterisk matched part of a route, if there has been no match
       # or no asterisk match, returns NULL.                                     
       def hit_asterisk_match
@@ -146,7 +146,7 @@ module CZMQ
         result = ::CZMQ::FFI.ztrie_hit_asterisk_match @ptr
         result
       end
-      
+
       # Self test of this class
       def self.test verbose
         verbose = !(0==verbose||!verbose) # boolean
@@ -154,7 +154,7 @@ module CZMQ
         result
       end
     end
-    
+
   end
 end
 

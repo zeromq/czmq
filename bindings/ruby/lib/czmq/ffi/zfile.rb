@@ -5,11 +5,11 @@
 
 module CZMQ
   module FFI
-    
+
     # helper functions for working with files.
     class Zfile
       class DestroyedError < RuntimeError; end
-      
+
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
@@ -31,7 +31,7 @@ module CZMQ
         end
       end
       def null?
-        !@ptr or ptr.null?
+        !@ptr or @ptr.null?
       end
       # Return internal pointer
       def __ptr
@@ -50,7 +50,7 @@ module CZMQ
         @ptr = nil
         ptr_ptr
       end
-      
+
       # If file exists, populates properties. CZMQ supports portable symbolic
       # links, which are files with the extension ".ln". A symbolic link is a
       # text file containing one line, the filename of a target file. Reading
@@ -60,10 +60,10 @@ module CZMQ
         path = String(path)
         name = String(name)
         ptr = ::CZMQ::FFI.zfile_new path, name
-        
+
         __new ptr
       end
-      
+
       # Destroy a file item
       def destroy
         return unless @ptr
@@ -71,7 +71,7 @@ module CZMQ
         result = ::CZMQ::FFI.zfile_destroy self_p
         result
       end
-      
+
       # Duplicate a file item, returns a newly constructed item. If the file
       # is null, or memory was exhausted, returns null.                     
       def dup
@@ -80,7 +80,7 @@ module CZMQ
         result = Zfile.__new result, true
         result
       end
-      
+
       # Return file name, remove path if provided
       def filename path
         raise DestroyedError unless @ptr
@@ -88,7 +88,7 @@ module CZMQ
         result = ::CZMQ::FFI.zfile_filename @ptr, path
         result
       end
-      
+
       # Refresh file properties from disk; this is not done automatically   
       # on access methods, otherwise it is not possible to compare directory
       # snapshots.                                                          
@@ -97,7 +97,7 @@ module CZMQ
         result = ::CZMQ::FFI.zfile_restat @ptr
         result
       end
-      
+
       # Return when the file was last modified. If you want this to reflect the
       # current situation, call zfile_restat before checking this property.    
       def modified
@@ -105,7 +105,7 @@ module CZMQ
         result = ::CZMQ::FFI.zfile_modified @ptr
         result
       end
-      
+
       # Return the last-known size of the file. If you want this to reflect the
       # current situation, call zfile_restat before checking this property.    
       def cursize
@@ -113,7 +113,7 @@ module CZMQ
         result = ::CZMQ::FFI.zfile_cursize @ptr
         result
       end
-      
+
       # Return true if the file is a directory. If you want this to reflect   
       # any external changes, call zfile_restat before checking this property.
       def is_directory
@@ -121,7 +121,7 @@ module CZMQ
         result = ::CZMQ::FFI.zfile_is_directory @ptr
         result
       end
-      
+
       # Return true if the file is a regular file. If you want this to reflect
       # any external changes, call zfile_restat before checking this property.
       def is_regular
@@ -129,7 +129,7 @@ module CZMQ
         result = ::CZMQ::FFI.zfile_is_regular @ptr
         result
       end
-      
+
       # Return true if the file is readable by this process. If you want this to
       # reflect any external changes, call zfile_restat before checking this    
       # property.                                                               
@@ -138,7 +138,7 @@ module CZMQ
         result = ::CZMQ::FFI.zfile_is_readable @ptr
         result
       end
-      
+
       # Return true if the file is writeable by this process. If you want this 
       # to reflect any external changes, call zfile_restat before checking this
       # property.                                                              
@@ -147,7 +147,7 @@ module CZMQ
         result = ::CZMQ::FFI.zfile_is_writeable @ptr
         result
       end
-      
+
       # Check if file has stopped changing and can be safely processed.
       # Updates the file statistics from disk at every call.           
       def is_stable
@@ -155,7 +155,7 @@ module CZMQ
         result = ::CZMQ::FFI.zfile_is_stable @ptr
         result
       end
-      
+
       # Return true if the file was changed on disk since the zfile_t object
       # was created, or the last zfile_restat() call made on it.            
       def has_changed
@@ -163,14 +163,14 @@ module CZMQ
         result = ::CZMQ::FFI.zfile_has_changed @ptr
         result
       end
-      
+
       # Remove the file from disk
       def remove
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zfile_remove @ptr
         result
       end
-      
+
       # Open file for reading                             
       # Returns 0 if OK, -1 if not found or not accessible
       def input
@@ -178,7 +178,7 @@ module CZMQ
         result = ::CZMQ::FFI.zfile_input @ptr
         result
       end
-      
+
       # Open file for writing, creating directory if needed               
       # File is created if necessary; chunks can be written to file at any
       # location. Returns 0 if OK, -1 if error.                           
@@ -187,7 +187,7 @@ module CZMQ
         result = ::CZMQ::FFI.zfile_output @ptr
         result
       end
-      
+
       # Read chunk from file at specified position. If this was the last chunk,
       # sets the eof property. Returns a null chunk in case of error.          
       def read bytes, offset
@@ -196,14 +196,14 @@ module CZMQ
         result = ::CZMQ::FFI.zfile_read @ptr, bytes, offset
         result
       end
-      
+
       # Returns true if zfile_read() just read the last chunk in the file.
       def eof
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zfile_eof @ptr
         result
       end
-      
+
       # Write chunk to file at specified position
       # Return 0 if OK, else -1                  
       def write chunk, offset
@@ -211,7 +211,7 @@ module CZMQ
         result = ::CZMQ::FFI.zfile_write @ptr, chunk, offset
         result
       end
-      
+
       # Read next line of text from file. Returns a pointer to the text line,
       # or NULL if there was nothing more to read from the file.             
       def readln
@@ -219,28 +219,28 @@ module CZMQ
         result = ::CZMQ::FFI.zfile_readln @ptr
         result
       end
-      
+
       # Close file, if open
       def close
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zfile_close @ptr
         result
       end
-      
+
       # Return file handle, if opened
       def handle
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zfile_handle @ptr
         result
       end
-      
+
       # Calculate SHA1 digest for file, using zdigest class.
       def digest
         raise DestroyedError unless @ptr
         result = ::CZMQ::FFI.zfile_digest @ptr
         result
       end
-      
+
       # Self test of this class.
       def self.test verbose
         verbose = !(0==verbose||!verbose) # boolean
@@ -248,7 +248,7 @@ module CZMQ
         result
       end
     end
-    
+
   end
 end
 

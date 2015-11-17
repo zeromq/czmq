@@ -5,11 +5,11 @@
 
 module CZMQ
   module FFI
-    
+
     # sending and receiving strings
     class Zstr
       class DestroyedError < RuntimeError; end
-      
+
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
@@ -31,7 +31,7 @@ module CZMQ
         end
       end
       def null?
-        !@ptr or ptr.null?
+        !@ptr or @ptr.null?
       end
       # Return internal pointer
       def __ptr
@@ -50,7 +50,7 @@ module CZMQ
         @ptr = nil
         ptr_ptr
       end
-      
+
       # Receive C string from socket. Caller must free returned string using
       # zstr_free(). Returns NULL if the context is being terminated or the 
       # process was interrupted.                                            
@@ -58,7 +58,7 @@ module CZMQ
         result = ::CZMQ::FFI.zstr_recv source
         result
       end
-      
+
       # Receive a series of strings (until NULL) from multipart data.    
       # Each string is allocated and filled with string data; if there   
       # are not enough frames, unallocated strings are set to NULL.      
@@ -70,7 +70,7 @@ module CZMQ
         result = ::CZMQ::FFI.zstr_recvx source, string_p, result
         result
       end
-      
+
       # Send a C string to a socket, as a frame. The string is sent without 
       # trailing null byte; to read this you can use zstr_recv, or a similar
       # method that adds a null terminator on the received string. String   
@@ -80,7 +80,7 @@ module CZMQ
         result = ::CZMQ::FFI.zstr_send dest, string
         result
       end
-      
+
       # Send a C string to a socket, as zstr_send(), with a MORE flag, so that
       # you can send further strings in the same multi-part message.          
       def self.sendm dest, string
@@ -88,7 +88,7 @@ module CZMQ
         result = ::CZMQ::FFI.zstr_sendm dest, string
         result
       end
-      
+
       # Send a formatted string to a socket. Note that you should NOT use
       # user-supplied strings in the format (they may contain '%' which  
       # will create security holes).                                     
@@ -97,7 +97,7 @@ module CZMQ
         result = ::CZMQ::FFI.zstr_sendf dest, format, result
         result
       end
-      
+
       # Send a formatted string to a socket, as for zstr_sendf(), with a      
       # MORE flag, so that you can send further strings in the same multi-part
       # message.                                                              
@@ -106,7 +106,7 @@ module CZMQ
         result = ::CZMQ::FFI.zstr_sendfm dest, format, result
         result
       end
-      
+
       # Send a series of strings (until NULL) as multipart data   
       # Returns 0 if the strings could be sent OK, or -1 on error.
       def self.sendx dest, string, result
@@ -114,14 +114,14 @@ module CZMQ
         result = ::CZMQ::FFI.zstr_sendx dest, string, result
         result
       end
-      
+
       # Free a provided string, and nullify the parent pointer. Safe to call on
       # a null pointer.                                                        
       def self.free string_p
         result = ::CZMQ::FFI.zstr_free string_p
         result
       end
-      
+
       # Self test of this class
       def self.test verbose
         verbose = !(0==verbose||!verbose) # boolean
@@ -129,7 +129,7 @@ module CZMQ
         result
       end
     end
-    
+
   end
 end
 
