@@ -55,6 +55,10 @@ public class ZMsg implements AutoCloseable {
         return ZMsg.__send(msg.pointer, dest.pointer);
     }
 
+    public long getAddress() {
+        return pointer;
+    }
+
     /**
      * Return size of message, i.e. number of frames (0 or more).
      */
