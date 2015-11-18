@@ -7,6 +7,10 @@ public class ZList implements AutoCloseable {
         pointer = __init();
     }
 
+    public ZList(long address) {
+        pointer = address;
+    }
+
     native static long __init();
 
     native static void __destroy(long pointer);
