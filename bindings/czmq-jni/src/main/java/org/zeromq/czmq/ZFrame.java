@@ -8,6 +8,10 @@ public class ZFrame implements AutoCloseable {
         pointer = __init();
     }
 
+    public ZFrame(long address) {
+        pointer = address;
+    }
+
     native static long __init();
 
     native static long __init(byte[] buf, long size);
@@ -15,9 +19,8 @@ public class ZFrame implements AutoCloseable {
     native static void __destroy(long pointer);
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         __destroy(pointer);
         pointer = 0;
-
     }
 }
