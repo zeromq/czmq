@@ -26,7 +26,7 @@ public class ZMsg implements AutoCloseable {
         pointer = ZMsg.__init();
     }
 
-    ZMsg(long pointer) { // private-package
+    public ZMsg(long pointer) {
         this.pointer = pointer;
     }
 
@@ -45,6 +45,8 @@ public class ZMsg implements AutoCloseable {
     native static int __pushstr(long pointer, String str);
 
     native static String __popstr(long pointer);
+
+    native static long __pop(long pointer);
 
     public static ZMsg recv(ZSock sock) {
         final long ptr = ZMsg.__recv(sock.pointer);
@@ -82,7 +84,8 @@ public class ZMsg implements AutoCloseable {
     }
 
     public ZFrame pop() {
-        return null;
+        final long zframePtr = ZMsg.__pop(pointer);
+        return new ZFrame(zframePtr);
     }
 
     public boolean pushstr(String str) {

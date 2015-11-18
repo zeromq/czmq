@@ -24,7 +24,8 @@ task generateJniHeaders(type: Exec, dependsOn: 'classes') {
             'org.zeromq.czmq.ZCtx',
             'org.zeromq.czmq.ZFrame',
             'org.zeromq.czmq.ZMsg',
-            'org.zeromq.czmq.ZSock'
+            'org.zeromq.czmq.ZSock',
+            'org.zeromq.czmq.ZList'
     ]
     commandLine("javah", "-d", "$nativeIncludes", "-classpath", "$classpath", *jniClasses)
 }

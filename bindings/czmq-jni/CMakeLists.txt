@@ -17,6 +17,7 @@ set (czmqjni_sources
    src/main/c/zframe.c
    src/main/c/zmsg.c
    src/main/c/zsock.c
+   src/main/c/zlist.c
 )
 
 add_library(czmqjni SHARED ${czmqjni_sources})

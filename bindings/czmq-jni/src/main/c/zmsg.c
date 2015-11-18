@@ -59,3 +59,14 @@ Java_org_zeromq_czmq_ZMsg__1_1popstr (JNIEnv *env, jclass c, jlong ptr) {
     // TODO: Unsure if this is a memory leak?
     return (*env)->NewStringUTF (env, str);
 }
+
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_ZMsg__1_1pop (JNIEnv *env, jclass c, jlong ptr) {
+    zmsg_t *msg = (zmsg_t *) ptr;
+
+    zframe_t *frame = zmsg_pop (ptr);
+    if (frame) {
+        return (jlong) frame;
+    }
+    return -1;
+}
