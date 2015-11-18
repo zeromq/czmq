@@ -22,7 +22,7 @@ public class ZList implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         __destroy(pointer);
         pointer = 0;
     }
