@@ -66,8 +66,8 @@ module CZMQ
       # number of strings filled, zero or more. Free each returned string
       # using zstr_free(). If not enough strings are provided, remaining 
       # multipart frames in the message are dropped.                     
-      def self.recvx source, string_p, result
-        result = ::CZMQ::FFI.zstr_recvx source, string_p, result
+      def self.recvx source, string_p, *args
+        result = ::CZMQ::FFI.zstr_recvx source, string_p, *args
         result
       end
 
@@ -92,26 +92,26 @@ module CZMQ
       # Send a formatted string to a socket. Note that you should NOT use
       # user-supplied strings in the format (they may contain '%' which  
       # will create security holes).                                     
-      def self.sendf dest, format, result
+      def self.sendf dest, format, *args
         format = String(format)
-        result = ::CZMQ::FFI.zstr_sendf dest, format, result
+        result = ::CZMQ::FFI.zstr_sendf dest, format, *args
         result
       end
 
       # Send a formatted string to a socket, as for zstr_sendf(), with a      
       # MORE flag, so that you can send further strings in the same multi-part
       # message.                                                              
-      def self.sendfm dest, format, result
+      def self.sendfm dest, format, *args
         format = String(format)
-        result = ::CZMQ::FFI.zstr_sendfm dest, format, result
+        result = ::CZMQ::FFI.zstr_sendfm dest, format, *args
         result
       end
 
       # Send a series of strings (until NULL) as multipart data   
       # Returns 0 if the strings could be sent OK, or -1 on error.
-      def self.sendx dest, string, result
+      def self.sendx dest, string, *args
         string = String(string)
-        result = ::CZMQ::FFI.zstr_sendx dest, string, result
+        result = ::CZMQ::FFI.zstr_sendx dest, string, *args
         result
       end
 

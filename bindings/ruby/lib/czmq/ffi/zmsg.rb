@@ -196,19 +196,19 @@ module CZMQ
 
       # Push formatted string as new frame to front of message.
       # Returns 0 on success, -1 on error.                     
-      def pushstrf format, result
+      def pushstrf format, *args
         raise DestroyedError unless @ptr
         format = String(format)
-        result = ::CZMQ::FFI.zmsg_pushstrf @ptr, format, result
+        result = ::CZMQ::FFI.zmsg_pushstrf @ptr, format, *args
         result
       end
 
       # Push formatted string as new frame to end of message.
       # Returns 0 on success, -1 on error.                   
-      def addstrf format, result
+      def addstrf format, *args
         raise DestroyedError unless @ptr
         format = String(format)
-        result = ::CZMQ::FFI.zmsg_addstrf @ptr, format, result
+        result = ::CZMQ::FFI.zmsg_addstrf @ptr, format, *args
         result
       end
 

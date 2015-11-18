@@ -207,10 +207,10 @@ module CZMQ
       # ephemeral ports, a port may be reused by different services without     
       # clients being aware. Protocols that run on ephemeral ports should take  
       # this into account.                                                      
-      def bind format, result
+      def bind format, *args
         raise DestroyedError unless @ptr
         format = String(format)
-        result = ::CZMQ::FFI.zsock_bind @ptr, format, result
+        result = ::CZMQ::FFI.zsock_bind @ptr, format, *args
         result
       end
 
@@ -224,29 +224,29 @@ module CZMQ
       # Unbind a socket from a formatted endpoint.                     
       # Returns 0 if OK, -1 if the endpoint was invalid or the function
       # isn't supported.                                               
-      def unbind format, result
+      def unbind format, *args
         raise DestroyedError unless @ptr
         format = String(format)
-        result = ::CZMQ::FFI.zsock_unbind @ptr, format, result
+        result = ::CZMQ::FFI.zsock_unbind @ptr, format, *args
         result
       end
 
       # Connect a socket to a formatted endpoint        
       # Returns 0 if OK, -1 if the endpoint was invalid.
-      def connect format, result
+      def connect format, *args
         raise DestroyedError unless @ptr
         format = String(format)
-        result = ::CZMQ::FFI.zsock_connect @ptr, format, result
+        result = ::CZMQ::FFI.zsock_connect @ptr, format, *args
         result
       end
 
       # Disconnect a socket from a formatted endpoint                  
       # Returns 0 if OK, -1 if the endpoint was invalid or the function
       # isn't supported.                                               
-      def disconnect format, result
+      def disconnect format, *args
         raise DestroyedError unless @ptr
         format = String(format)
-        result = ::CZMQ::FFI.zsock_disconnect @ptr, format, result
+        result = ::CZMQ::FFI.zsock_disconnect @ptr, format, *args
         result
       end
 
@@ -297,10 +297,10 @@ module CZMQ
       # have data in a zchunk or zframe. Does not change or take ownership of 
       # any arguments. Returns 0 if successful, -1 if sending failed for any  
       # reason.                                                               
-      def send picture, result
+      def send picture, *args
         raise DestroyedError unless @ptr
         picture = String(picture)
-        result = ::CZMQ::FFI.zsock_send @ptr, picture, result
+        result = ::CZMQ::FFI.zsock_send @ptr, picture, *args
         result
       end
 
@@ -340,10 +340,10 @@ module CZMQ
       # If an argument pointer is NULL, does not store any value (skips it).    
       # An 'n' picture matches an empty frame; if the message does not match,   
       # the method will return -1.                                              
-      def recv picture, result
+      def recv picture, *args
         raise DestroyedError unless @ptr
         picture = String(picture)
-        result = ::CZMQ::FFI.zsock_recv @ptr, picture, result
+        result = ::CZMQ::FFI.zsock_recv @ptr, picture, *args
         result
       end
 
@@ -378,10 +378,10 @@ module CZMQ
       #                                                                        
       # Does not change or take ownership of any arguments. Returns 0 if       
       # successful, -1 if sending failed for any reason.                       
-      def bsend picture, result
+      def bsend picture, *args
         raise DestroyedError unless @ptr
         picture = String(picture)
-        result = ::CZMQ::FFI.zsock_bsend @ptr, picture, result
+        result = ::CZMQ::FFI.zsock_bsend @ptr, picture, *args
         result
       end
 
@@ -393,10 +393,10 @@ module CZMQ
       # types. All arguments must be pointers; this call sets them to point to  
       # values held on a per-socket basis. Do not modify or destroy the returned
       # values. Returns 0 if successful, or -1 if it failed to read a message.  
-      def brecv picture, result
+      def brecv picture, *args
         raise DestroyedError unless @ptr
         picture = String(picture)
-        result = ::CZMQ::FFI.zsock_brecv @ptr, picture, result
+        result = ::CZMQ::FFI.zsock_brecv @ptr, picture, *args
         result
       end
 

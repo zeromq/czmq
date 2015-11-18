@@ -53,8 +53,8 @@ module CZMQ
 
       # Create new poller; the reader can be a libzmq socket (void *), a zsock_t
       # instance, or a zactor_t instance.                                       
-      def self.new reader, result
-        ptr = ::CZMQ::FFI.zpoller_new reader, result
+      def self.new reader, *args
+        ptr = ::CZMQ::FFI.zpoller_new reader, *args
 
         __new ptr
       end
