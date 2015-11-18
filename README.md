@@ -5256,7 +5256,7 @@ This is the class interface:
     
     //  Send a signal over a socket. A signal is a short message carrying a   
     //  success/failure code (by convention, 0 means OK). Signals are encoded 
-    //  to be distinguishable from "normal" messages. Accepts a zock_t or a   
+    //  to be distinguishable from "normal" messages. Accepts a zsock_t or a   
     //  zactor_t argument, and returns 0 if successful, -1 if the signal could
     //  not be sent. Takes a polymorphic socket reference.                    
     CZMQ_EXPORT int
