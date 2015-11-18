@@ -26,7 +26,7 @@ public class ZMsg implements AutoCloseable {
         pointer = ZMsg.__init();
     }
 
-    ZMsg(long pointer) { // private-package
+    public ZMsg(long pointer) {
         this.pointer = pointer;
     }
 
