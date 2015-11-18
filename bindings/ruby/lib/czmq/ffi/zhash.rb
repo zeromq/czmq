@@ -216,10 +216,10 @@ module CZMQ
       # Add a comment to hash table before saving to disk. You can add as many   
       # comment lines as you like. These comment lines are discarded when loading
       # the file. If you use a null format, all comments are deleted.            
-      def comment format, result
+      def comment format, *args
         raise DestroyedError unless @ptr
         format = String(format)
-        result = ::CZMQ::FFI.zhash_comment @ptr, format, result
+        result = ::CZMQ::FFI.zhash_comment @ptr, format, *args
         result
       end
 
