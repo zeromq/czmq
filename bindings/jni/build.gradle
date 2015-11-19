@@ -1,6 +1,5 @@
 apply plugin: 'java'
 apply plugin: 'maven'
-
 group = "org.zeromq"
 version = "0.1.0-SNAPSHOT"
 
@@ -19,11 +18,22 @@ task generateJniHeaders(type: Exec, dependsOn: 'classes') {
     def classpath = sourceSets.main.output.classesDir
     def nativeIncludes = "src/native/include"
     def jniClasses = [
-            'org.zeromq.czmq.ZCtx',
-            'org.zeromq.czmq.ZFrame',
-            'org.zeromq.czmq.ZMsg',
-            'org.zeromq.czmq.ZSock',
-            'org.zeromq.czmq.ZList'
+            'org.zeromq.czmq.Zactor',
+            'org.zeromq.czmq.Zdir',
+            'org.zeromq.czmq.ZdirPatch',
+            'org.zeromq.czmq.Zfile',
+            'org.zeromq.czmq.Zframe',
+            'org.zeromq.czmq.Zhashx',
+            'org.zeromq.czmq.Ziflist',
+            'org.zeromq.czmq.Zloop',
+            'org.zeromq.czmq.Zmsg',
+            'org.zeromq.czmq.Zpoller',
+            'org.zeromq.czmq.Zsock',
+            'org.zeromq.czmq.Zstr',
+            'org.zeromq.czmq.Ztrie',
+            'org.zeromq.czmq.Zuuid',
+            'org.zeromq.czmq.Zhash',
+            'org.zeromq.czmq.Zlist'
     ]
     commandLine("javah", "-d", "$nativeIncludes", "-classpath", "$classpath", *jniClasses)
 }

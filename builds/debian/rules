@@ -1,0 +1,12 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+override_dh_strip:
+	dh_strip --dbg-package=czmq-dbg
+
+override_dh_auto_test:
+	echo "Skipped for now"
+%:
+	dh $@ --with=autoreconf
+
+.PHONY: override_dh_strip override_dh_auto_test
