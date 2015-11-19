@@ -8,20 +8,16 @@ ACLOCAL_AMFLAGS = -I config
 AM_CFLAGS = \
 	-Werror=format-security
 
+
 AM_CPPFLAGS = \
     ${libzmq_CFLAGS} \
     ${uuid_CFLAGS} \
     -I$(srcdir)/include
 
-project_libs = \
-    ${libzmq_LIBS} \
-    ${uuid_LIBS}
+project_libs = ${libzmq_LIBS} ${uuid_LIBS}
 
-SUBDIRS =
-DIST_SUBDIRS =
-SUBDIRS += doc
-DIST_SUBDIRS += doc
-
+SUBDIRS = doc
+DIST_SUBDIRS = doc
 lib_LTLIBRARIES =
 bin_PROGRAMS =
 noinst_PROGRAMS =
