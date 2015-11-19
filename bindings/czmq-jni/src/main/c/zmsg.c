@@ -64,9 +64,23 @@ JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_ZMsg__1_1pop (JNIEnv *env, jclass c, jlong ptr) {
     zmsg_t *msg = (zmsg_t *) ptr;
 
-    zframe_t *frame = zmsg_pop (ptr);
+    zframe_t *frame = zmsg_pop (msg);
     if (frame) {
         return (jlong) frame;
     }
     return -1;
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_ZMsg__1_1prepend (JNIEnv *env, jclass c, jlong ptr, jlong zframe_ptr) {
+    zmsg_t *msg = (zmsg_t *) ptr;
+    zframe_t *frame = (zframe_t *) zframe_ptr;
+    return zmsg_prepend (msg, &frame);
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_ZMsg__1_1append (JNIEnv *env, jclass c, jlong ptr, jlong zframe_ptr) {
+    zmsg_t *msg = (zmsg_t *) ptr;
+    zframe_t *frame = (zframe_t *) zframe_ptr;
+    return zmsg_append (msg, &frame);
 }
