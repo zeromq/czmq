@@ -8,7 +8,6 @@ repositories {
     mavenLocal()
     mavenCentral()
 }
-
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
@@ -16,7 +15,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-all:1.3'
 }
-
 task generateJniHeaders(type: Exec, dependsOn: 'classes') {
     def classpath = sourceSets.main.output.classesDir
     def nativeIncludes = "src/native/include"
@@ -29,18 +27,14 @@ task generateJniHeaders(type: Exec, dependsOn: 'classes') {
     ]
     commandLine("javah", "-d", "$nativeIncludes", "-classpath", "$classpath", *jniClasses)
 }
-
 tasks.withType(Test) {
     systemProperty "java.library.path", "/usr/lib:/usr/local/lib:$projectDir"
 }
-
 task initCMake(type: Exec, dependsOn: 'generateJniHeaders') {
     commandLine "cmake", "."
 }
-
 task buildNative(type: Exec, dependsOn: 'initCMake') {
     commandLine "make"
 }
-
 jar.dependsOn buildNative
 test.dependsOn buildNative
