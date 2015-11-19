@@ -31,4 +31,4 @@ endfor
 .endtemplate
 .gsl from "zsockopt.gsl"
 .gsl from "zsock_option.gsl"
-.gsl from "../api/zsock_option.gsl"
+.gsl from "../api/zsock.gsl"
