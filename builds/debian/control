@@ -1,0 +1,62 @@
+#
+#    czmq - The high-level C binding for 0MQ
+#
+#    Copyright (c) 1991-2012 iMatix Corporation -- http://www.imatix.com                
+#    Copyright other contributors as noted in the AUTHORS file.                         
+#                                                                                       
+#    This file is part of CZMQ, the high-level C binding for 0MQ: http://czmq.zeromq.org
+#                                                                                       
+#    This Source Code Form is subject to the terms of the Mozilla Public                
+#    License, v. 2.0. If a copy of the MPL was not distributed with this                
+#    file, You can obtain one at http://mozilla.org/MPL/2.0/.                           
+#
+
+Source:         czmq
+Section:        net
+Priority:       optional
+Maintainer:     John Doe <John.Doe@example.com>
+Uploaders:      John Doe <John.Doe@example.com>
+Standards-Version: 3.9.5
+Build-Depends: bison, debhelper (>= 8),
+    pkg-config,
+    automake,
+    autoconf,
+    libtool,
+    libzmq4-dev,
+    uuid-dev,
+    dh-autoreconf
+
+Package: libczmq3
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: czmq
+ This package contains shared library for czmq: the high-level c binding for 0mq
+
+Package: czmq-dev
+Architecture: all
+Section: libdevel
+Depends:
+    libczmq3 (= ${binary:Version}),
+    ${shlibs:Depends},
+    libzmq4-dev,
+    libuuid-dev,
+    ${misc:Depends}
+Description: development files for czmq
+ This package contains development files for czmq: the high-level c binding for 0mq
+
+Package: czmq
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: the high-level c binding for 0mq
+ Main package for czmq: the high-level c binding for 0mq
+
+Package: czmq-dbg
+Architecture: any
+Section: debug
+Priority: extra
+Depends:
+    czmq (= ${binary:Version}),
+    ${misc:Depends}
+Description: debugging symbols for czmq
+ This package contains the debugging symbols for czmq : the high-level c binding for 0mq.
+

@@ -337,6 +337,8 @@ AC_ARG_WITH([pkgconfigdir], AS_HELP_STRING([--with-pkgconfigdir=PATH],
     [pkgconfigdir="$withval"], [pkgconfigdir='${libdir}/pkgconfig'])
 AC_SUBST([pkgconfigdir])
 
+
+
 # Specify output files
 AC_CONFIG_FILES([Makefile
                  doc/Makefile
