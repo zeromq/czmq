@@ -48,6 +48,10 @@ public class ZMsg implements AutoCloseable {
 
     native static long __pop(long pointer);
 
+    native static int __prepend(long pointer, long zframePtr);
+
+    native static int __append(long pointer, long zframePtr);
+
     public static ZMsg recv(ZSock sock) {
         final long ptr = ZMsg.__recv(sock.pointer);
         return new ZMsg(ptr);
@@ -76,11 +80,11 @@ public class ZMsg implements AutoCloseable {
     }
 
     public boolean prepend(ZFrame frame) {
-        return true;
+        return 0 == ZMsg.__prepend(pointer, frame.pointer);
     }
 
     public boolean append(ZFrame frame) {
-        return true;
+        return 0 == ZMsg.__append(pointer, frame.pointer);
     }
 
     public ZFrame pop() {
