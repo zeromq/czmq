@@ -29,5 +29,5 @@ for version
     endfor
 endfor
 .endtemplate
-.include "zsockopt.gsl"
-.include "zsock_option.gsl"
+.gsl from "zsockopt.gsl"
+.gsl from "zsock_option.gsl"
