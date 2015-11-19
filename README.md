@@ -5542,7 +5542,7 @@ This is the class self test code:
 
 The zsock_option class provides access to the ØMQ getsockopt/setsockopt API.
 All methods in this class take a void * "polymorphic" reference, which
-can be either a zsock_t or a zactor_r reference, or a libzmq void *.
+can be either a zsock_t or a zactor_t reference, or a libzmq void *.
 
 This class is generated, using the GSL code generator. See the sockopts
 XML file, which provides the metadata, and the sock_option.gsl template,
