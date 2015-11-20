@@ -19,7 +19,7 @@ module CZMQ
         if @ptr.null?
           @ptr = nil # Remove null pointers so we don't have to test for them.
         elsif finalize
-          @finalizer = self.class.send :create_finalizer_for, @ptr
+          @finalizer = self.class.create_finalizer_for @ptr
           ObjectSpace.define_finalizer self, @finalizer
         end
       end
@@ -68,70 +68,71 @@ module CZMQ
       end
 
       # Create a new actor passing arbitrary arguments reference.
-      def self.new task, args
-        ptr = ::CZMQ::FFI.zactor_new task, args
-
+      def self.new(task, args)
+        ptr = ::CZMQ::FFI.zactor_new(task, args)
         __new ptr
       end
 
       # Destroy an actor.
-      def destroy
+      def destroy()
         return unless @ptr
         self_p = __ptr_give_ref
-        result = ::CZMQ::FFI.zactor_destroy self_p
+        result = ::CZMQ::FFI.zactor_destroy(self_p)
         result
       end
 
       # Send a zmsg message to the actor, take ownership of the message
       # and destroy when it has been sent.                             
-      def send msg_p
+      def send(msg_p)
         raise DestroyedError unless @ptr
+        self_p = @ptr
         msg_p = msg_p.__ptr_give_ref
-        result = ::CZMQ::FFI.zactor_send @ptr, msg_p
+        result = ::CZMQ::FFI.zactor_send(self_p, msg_p)
         result
       end
 
       # Receive a zmsg message from the actor. Returns NULL if the actor 
       # was interrupted before the message could be received, or if there
       # was a timeout on the actor.                                      
-      def recv
+      def recv()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zactor_recv @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zactor_recv(self_p)
         result = Zmsg.__new result, true
         result
       end
 
       # Probe the supplied object, and report if it looks like a zactor_t.
-      def self.is self_
-        result = ::CZMQ::FFI.zactor_is self_
+      def self.is(self_)
+        result = ::CZMQ::FFI.zactor_is(self_)
         result
       end
 
       # Probe the supplied reference. If it looks like a zactor_t instance,
       # return the underlying libzmq actor handle; else if it looks like   
       # a libzmq actor handle, return the supplied value.                  
-      def self.resolve self_
-        result = ::CZMQ::FFI.zactor_resolve self_
+      def self.resolve(self_)
+        result = ::CZMQ::FFI.zactor_resolve(self_)
         result
       end
 
       # Return the actor's zsock handle. Use this when you absolutely need
       # to work with the zsock instance rather than the actor.            
-      def sock
+      def sock()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zactor_sock @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zactor_sock(self_p)
         result = Zsock.__new result, false
         result
       end
 
       # Self test of this class.
-      def self.test verbose
+      def self.test(verbose)
         verbose = !(0==verbose||!verbose) # boolean
-        result = ::CZMQ::FFI.zactor_test verbose
+        result = ::CZMQ::FFI.zactor_test(verbose)
         result
       end
     end
-
   end
 end
 

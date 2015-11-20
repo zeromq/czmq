@@ -19,7 +19,7 @@ module CZMQ
         if @ptr.null?
           @ptr = nil # Remove null pointers so we don't have to test for them.
         elsif finalize
-          @finalizer = self.class.send :create_finalizer_for, @ptr
+          @finalizer = self.class.create_finalizer_for @ptr
           ObjectSpace.define_finalizer self, @finalizer
         end
       end
@@ -52,84 +52,90 @@ module CZMQ
       end
 
       # Get a list of network interfaces currently defined on the system
-      def self.new
-        ptr = ::CZMQ::FFI.ziflist_new
-
+      def self.new()
+        ptr = ::CZMQ::FFI.ziflist_new()
         __new ptr
       end
 
       # Destroy a ziflist instance
-      def destroy
+      def destroy()
         return unless @ptr
         self_p = __ptr_give_ref
-        result = ::CZMQ::FFI.ziflist_destroy self_p
+        result = ::CZMQ::FFI.ziflist_destroy(self_p)
         result
       end
 
       # Print properties of the ziflist object.
-      def print
+      def print()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.ziflist_print @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.ziflist_print(self_p)
         result
       end
 
       # Reload network interfaces from system
-      def reload
+      def reload()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.ziflist_reload @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.ziflist_reload(self_p)
         result
       end
 
       # Return the number of network interfaces on system
-      def size
+      def size()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.ziflist_size @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.ziflist_size(self_p)
         result
       end
 
       # Get first network interface, return NULL if there are none
-      def first
+      def first()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.ziflist_first @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.ziflist_first(self_p)
         result
       end
 
       # Get next network interface, return NULL if we hit the last one
-      def next
+      def next()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.ziflist_next @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.ziflist_next(self_p)
         result
       end
 
       # Return the current interface IP address as a printable string
-      def address
+      def address()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.ziflist_address @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.ziflist_address(self_p)
         result
       end
 
       # Return the current interface broadcast address as a printable string
-      def broadcast
+      def broadcast()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.ziflist_broadcast @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.ziflist_broadcast(self_p)
         result
       end
 
       # Return the current interface network mask as a printable string
-      def netmask
+      def netmask()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.ziflist_netmask @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.ziflist_netmask(self_p)
         result
       end
 
       # Self test of this class.
-      def self.test verbose
+      def self.test(verbose)
         verbose = !(0==verbose||!verbose) # boolean
-        result = ::CZMQ::FFI.ziflist_test verbose
+        result = ::CZMQ::FFI.ziflist_test(verbose)
         result
       end
     end
-
   end
 end
 

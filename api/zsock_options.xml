@@ -5,7 +5,7 @@
 *   AND RUN `gen sockopts` in src/.                              *
 ******************************************************************
 -->
-<methods>
+
 <method name = "tos" polymorphic = "1">
     Get socket option `tos`.
     <return type="integer" />
@@ -460,4 +460,3 @@
     Get socket option `last_endpoint`.
     <return type="string" />
 </method>
-</methods>

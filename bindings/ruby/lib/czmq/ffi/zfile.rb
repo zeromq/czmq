@@ -19,7 +19,7 @@ module CZMQ
         if @ptr.null?
           @ptr = nil # Remove null pointers so we don't have to test for them.
         elsif finalize
-          @finalizer = self.class.send :create_finalizer_for, @ptr
+          @finalizer = self.class.create_finalizer_for @ptr
           ObjectSpace.define_finalizer self, @finalizer
         end
       end
@@ -56,199 +56,218 @@ module CZMQ
       # text file containing one line, the filename of a target file. Reading
       # data from the symbolic link actually reads from the target file. Path
       # may be NULL, in which case it is not used.                           
-      def self.new path, name
+      def self.new(path, name)
         path = String(path)
         name = String(name)
-        ptr = ::CZMQ::FFI.zfile_new path, name
-
+        ptr = ::CZMQ::FFI.zfile_new(path, name)
         __new ptr
       end
 
       # Destroy a file item
-      def destroy
+      def destroy()
         return unless @ptr
         self_p = __ptr_give_ref
-        result = ::CZMQ::FFI.zfile_destroy self_p
+        result = ::CZMQ::FFI.zfile_destroy(self_p)
         result
       end
 
       # Duplicate a file item, returns a newly constructed item. If the file
       # is null, or memory was exhausted, returns null.                     
-      def dup
+      def dup()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zfile_dup @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zfile_dup(self_p)
         result = Zfile.__new result, true
         result
       end
 
       # Return file name, remove path if provided
-      def filename path
+      def filename(path)
         raise DestroyedError unless @ptr
+        self_p = @ptr
         path = String(path)
-        result = ::CZMQ::FFI.zfile_filename @ptr, path
+        result = ::CZMQ::FFI.zfile_filename(self_p, path)
         result
       end
 
       # Refresh file properties from disk; this is not done automatically   
       # on access methods, otherwise it is not possible to compare directory
       # snapshots.                                                          
-      def restat
+      def restat()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zfile_restat @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zfile_restat(self_p)
         result
       end
 
       # Return when the file was last modified. If you want this to reflect the
       # current situation, call zfile_restat before checking this property.    
-      def modified
+      def modified()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zfile_modified @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zfile_modified(self_p)
         result
       end
 
       # Return the last-known size of the file. If you want this to reflect the
       # current situation, call zfile_restat before checking this property.    
-      def cursize
+      def cursize()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zfile_cursize @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zfile_cursize(self_p)
         result
       end
 
       # Return true if the file is a directory. If you want this to reflect   
       # any external changes, call zfile_restat before checking this property.
-      def is_directory
+      def is_directory()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zfile_is_directory @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zfile_is_directory(self_p)
         result
       end
 
       # Return true if the file is a regular file. If you want this to reflect
       # any external changes, call zfile_restat before checking this property.
-      def is_regular
+      def is_regular()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zfile_is_regular @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zfile_is_regular(self_p)
         result
       end
 
       # Return true if the file is readable by this process. If you want this to
       # reflect any external changes, call zfile_restat before checking this    
       # property.                                                               
-      def is_readable
+      def is_readable()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zfile_is_readable @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zfile_is_readable(self_p)
         result
       end
 
       # Return true if the file is writeable by this process. If you want this 
       # to reflect any external changes, call zfile_restat before checking this
       # property.                                                              
-      def is_writeable
+      def is_writeable()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zfile_is_writeable @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zfile_is_writeable(self_p)
         result
       end
 
       # Check if file has stopped changing and can be safely processed.
       # Updates the file statistics from disk at every call.           
-      def is_stable
+      def is_stable()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zfile_is_stable @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zfile_is_stable(self_p)
         result
       end
 
       # Return true if the file was changed on disk since the zfile_t object
       # was created, or the last zfile_restat() call made on it.            
-      def has_changed
+      def has_changed()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zfile_has_changed @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zfile_has_changed(self_p)
         result
       end
 
       # Remove the file from disk
-      def remove
+      def remove()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zfile_remove @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zfile_remove(self_p)
         result
       end
 
       # Open file for reading                             
       # Returns 0 if OK, -1 if not found or not accessible
-      def input
+      def input()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zfile_input @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zfile_input(self_p)
         result
       end
 
       # Open file for writing, creating directory if needed               
       # File is created if necessary; chunks can be written to file at any
       # location. Returns 0 if OK, -1 if error.                           
-      def output
+      def output()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zfile_output @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zfile_output(self_p)
         result
       end
 
       # Read chunk from file at specified position. If this was the last chunk,
       # sets the eof property. Returns a null chunk in case of error.          
-      def read bytes, offset
+      def read(bytes, offset)
         raise DestroyedError unless @ptr
+        self_p = @ptr
         bytes = Integer(bytes)
-        result = ::CZMQ::FFI.zfile_read @ptr, bytes, offset
+        result = ::CZMQ::FFI.zfile_read(self_p, bytes, offset)
         result
       end
 
       # Returns true if zfile_read() just read the last chunk in the file.
-      def eof
+      def eof()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zfile_eof @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zfile_eof(self_p)
         result
       end
 
       # Write chunk to file at specified position
       # Return 0 if OK, else -1                  
-      def write chunk, offset
+      def write(chunk, offset)
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zfile_write @ptr, chunk, offset
+        self_p = @ptr
+        result = ::CZMQ::FFI.zfile_write(self_p, chunk, offset)
         result
       end
 
       # Read next line of text from file. Returns a pointer to the text line,
       # or NULL if there was nothing more to read from the file.             
-      def readln
+      def readln()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zfile_readln @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zfile_readln(self_p)
         result
       end
 
       # Close file, if open
-      def close
+      def close()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zfile_close @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zfile_close(self_p)
         result
       end
 
       # Return file handle, if opened
-      def handle
+      def handle()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zfile_handle @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zfile_handle(self_p)
         result
       end
 
       # Calculate SHA1 digest for file, using zdigest class.
-      def digest
+      def digest()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zfile_digest @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zfile_digest(self_p)
         result
       end
 
       # Self test of this class.
-      def self.test verbose
+      def self.test(verbose)
         verbose = !(0==verbose||!verbose) # boolean
-        result = ::CZMQ::FFI.zfile_test verbose
+        result = ::CZMQ::FFI.zfile_test(verbose)
         result
       end
     end
-
   end
 end
 

@@ -19,7 +19,7 @@ module CZMQ
         if @ptr.null?
           @ptr = nil # Remove null pointers so we don't have to test for them.
         elsif finalize
-          @finalizer = self.class.send :create_finalizer_for, @ptr
+          @finalizer = self.class.create_finalizer_for @ptr
           ObjectSpace.define_finalizer self, @finalizer
         end
       end
@@ -67,94 +67,100 @@ module CZMQ
       end
 
       # Creates a new ztrie.
-      def self.new delimiter
-        ptr = ::CZMQ::FFI.ztrie_new delimiter
-
+      def self.new(delimiter)
+        ptr = ::CZMQ::FFI.ztrie_new(delimiter)
         __new ptr
       end
 
       # Destroy the ztrie.
-      def destroy
+      def destroy()
         return unless @ptr
         self_p = __ptr_give_ref
-        result = ::CZMQ::FFI.ztrie_destroy self_p
+        result = ::CZMQ::FFI.ztrie_destroy(self_p)
         result
       end
 
       # Print properties of the ztrie object.
-      def print
+      def print()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.ztrie_print @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.ztrie_print(self_p)
         result
       end
 
       # Inserts a new route into the tree and attaches the data. Returns -1     
       # if the route already exists, otherwise 0. This method takes ownership of
       # the provided data if a destroy_data_fn is provided.                     
-      def insert_route path, data, destroy_data_fn
+      def insert_route(path, data, destroy_data_fn)
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.ztrie_insert_route @ptr, path, data, destroy_data_fn
+        self_p = @ptr
+        result = ::CZMQ::FFI.ztrie_insert_route(self_p, path, data, destroy_data_fn)
         result
       end
 
       # Removes a route from the trie and destroys its data. Returns -1 if the
       # route does not exists, otherwise 0.                                   
       # the start of the list call zlist_first (). Advances the cursor.       
-      def remove_route path
+      def remove_route(path)
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.ztrie_remove_route @ptr, path
+        self_p = @ptr
+        result = ::CZMQ::FFI.ztrie_remove_route(self_p, path)
         result
       end
 
       # Returns true if the path matches a route in the tree, otherwise false.
-      def matches path
+      def matches(path)
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.ztrie_matches @ptr, path
+        self_p = @ptr
+        result = ::CZMQ::FFI.ztrie_matches(self_p, path)
         result
       end
 
       # Returns the data of a matched route from last ztrie_matches. If the path
       # did not match, returns NULL. Do not delete the data as it's owned by    
       # ztrie.                                                                  
-      def hit_data
+      def hit_data()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.ztrie_hit_data @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.ztrie_hit_data(self_p)
         result
       end
 
       # Returns the count of parameters that a matched route has.
-      def hit_parameter_count
+      def hit_parameter_count()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.ztrie_hit_parameter_count @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.ztrie_hit_parameter_count(self_p)
         result
       end
 
       # Returns the parameters of a matched route with named regexes from last   
       # ztrie_matches. If the path did not match or the route did not contain any
       # named regexes, returns NULL.                                             
-      def hit_parameters
+      def hit_parameters()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.ztrie_hit_parameters @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.ztrie_hit_parameters(self_p)
         result = Zhashx.__new result, false
         result
       end
 
       # Returns the asterisk matched part of a route, if there has been no match
       # or no asterisk match, returns NULL.                                     
-      def hit_asterisk_match
+      def hit_asterisk_match()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.ztrie_hit_asterisk_match @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.ztrie_hit_asterisk_match(self_p)
         result
       end
 
       # Self test of this class
-      def self.test verbose
+      def self.test(verbose)
         verbose = !(0==verbose||!verbose) # boolean
-        result = ::CZMQ::FFI.ztrie_test verbose
+        result = ::CZMQ::FFI.ztrie_test(verbose)
         result
       end
     end
-
   end
 end
 

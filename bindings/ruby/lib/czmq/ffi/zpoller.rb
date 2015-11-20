@@ -19,7 +19,7 @@ module CZMQ
         if @ptr.null?
           @ptr = nil # Remove null pointers so we don't have to test for them.
         elsif finalize
-          @finalizer = self.class.send :create_finalizer_for, @ptr
+          @finalizer = self.class.create_finalizer_for @ptr
           ObjectSpace.define_finalizer self, @finalizer
         end
       end
@@ -53,34 +53,35 @@ module CZMQ
 
       # Create new poller; the reader can be a libzmq socket (void *), a zsock_t
       # instance, or a zactor_t instance.                                       
-      def self.new reader, *args
-        ptr = ::CZMQ::FFI.zpoller_new reader, *args
-
+      def self.new(reader, *args)
+        ptr = ::CZMQ::FFI.zpoller_new(reader, *args)
         __new ptr
       end
 
       # Destroy a poller
-      def destroy
+      def destroy()
         return unless @ptr
         self_p = __ptr_give_ref
-        result = ::CZMQ::FFI.zpoller_destroy self_p
+        result = ::CZMQ::FFI.zpoller_destroy(self_p)
         result
       end
 
       # Add a reader to be polled. Returns 0 if OK, -1 on failure. The reader may
       # be a libzmq void * socket, a zsock_t instance, or a zactor_t instance.   
-      def add reader
+      def add(reader)
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zpoller_add @ptr, reader
+        self_p = @ptr
+        result = ::CZMQ::FFI.zpoller_add(self_p, reader)
         result
       end
 
       # Remove a reader from the poller; returns 0 if OK, -1 on failure. The   
       # reader may be a libzmq void * socket, a zsock_t instance, or a zactor_t
       # instance.                                                              
-      def remove reader
+      def remove(reader)
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zpoller_remove @ptr, reader
+        self_p = @ptr
+        result = ::CZMQ::FFI.zpoller_remove(self_p, reader)
         result
       end
 
@@ -93,46 +94,49 @@ module CZMQ
       # or the ZMQ context was destroyed, or the timeout expired, returns NULL.   
       # You can test the actual exit condition by calling zpoller_expired () and  
       # zpoller_terminated (). The timeout is in msec.                            
-      def wait timeout
+      def wait(timeout)
         raise DestroyedError unless @ptr
+        self_p = @ptr
         timeout = Integer(timeout)
-        result = ::CZMQ::FFI.zpoller_wait @ptr, timeout
+        result = ::CZMQ::FFI.zpoller_wait(self_p, timeout)
         result
       end
 
       # Return true if the last zpoller_wait () call ended because the timeout
       # expired, without any error.                                           
-      def expired
+      def expired()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zpoller_expired @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zpoller_expired(self_p)
         result
       end
 
       # Return true if the last zpoller_wait () call ended because the process
       # was interrupted, or the parent context was destroyed.                 
-      def terminated
+      def terminated()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zpoller_terminated @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zpoller_terminated(self_p)
         result
       end
 
       # Ignore zsys_interrupted flag in this poller. By default, a zpoller_wait will 
       # return immediately if detects zsys_interrupted is set to something other than
       # zero. Calling zpoller_ignore_interrupts will supress this behavior.          
-      def ignore_interrupts
+      def ignore_interrupts()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zpoller_ignore_interrupts @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zpoller_ignore_interrupts(self_p)
         result
       end
 
       # Self test of this class
-      def self.test verbose
+      def self.test(verbose)
         verbose = !(0==verbose||!verbose) # boolean
-        result = ::CZMQ::FFI.zpoller_test verbose
+        result = ::CZMQ::FFI.zpoller_test(verbose)
         result
       end
     end
-
   end
 end
 

@@ -3,8 +3,8 @@
 
             ****************************************************
             *   GENERATED SOURCE CODE, DO NOT EDIT!!           *
-            *   TO CHANGE THIS, EDIT scripts/sockopts.gsl      *
-            *   AND RUN ./generate in models/.                 *
+            *   TO CHANGE THIS, EDIT src/zsockopt.gsl          *
+            *   AND RUN `gsl sockopts` in src/.                *
             ****************************************************
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
