@@ -1,7 +1,7 @@
 <class name = "zframe">
     working with single message frames
 
-    <include filename = "../license.xml" />
+    <include filename = "license.xml" />
 
     <constant name = "more" value = "1" />
     <constant name = "reuse" value = "2" />

@@ -1,7 +1,7 @@
 <class name = "zlist">
     simple generic list container
 
-    <include filename = "../license.xml" />
+    <include filename = "license.xml" />
 
     <callback_type name = "compare_fn">
         Comparison function e.g. for sorting and removing.

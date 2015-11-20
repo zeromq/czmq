@@ -1,7 +1,7 @@
 <class name = "ziflist">
     List of network interfaces available on system
 
-    <include filename = "../license.xml" />
+    <include filename = "license.xml" />
 
     <constructor>
         Get a list of network interfaces currently defined on the system

@@ -1,7 +1,7 @@
 <class name = "zpoller">
     event-driven reactor
 
-    <include filename = "../license.xml" />
+    <include filename = "license.xml" />
 
     <constructor>
         Create new poller; the reader can be a libzmq socket (void *), a zsock_t

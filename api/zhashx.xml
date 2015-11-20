@@ -1,7 +1,7 @@
 <class name = "zhashx">
     extended generic type-free hash container
 
-    <include filename = "../license.xml" />
+    <include filename = "license.xml" />
 
     <callback_type name = "destructor_fn">
         Destroy an item

@@ -1,7 +1,7 @@
 <class name = "zhash">
     generic type-free hash container (simple)
 
-    <include filename = "../license.xml" />
+    <include filename = "license.xml" />
 
     <callback_type name = "free_fn">
         Callback function for zhash_freefn method
