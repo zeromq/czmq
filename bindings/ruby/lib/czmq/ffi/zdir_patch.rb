@@ -19,7 +19,7 @@ module CZMQ
         if @ptr.null?
           @ptr = nil # Remove null pointers so we don't have to test for them.
         elsif finalize
-          @finalizer = self.class.send :create_finalizer_for, @ptr
+          @finalizer = self.class.create_finalizer_for @ptr
           ObjectSpace.define_finalizer self, @finalizer
         end
       end
@@ -52,82 +52,87 @@ module CZMQ
       end
 
       # Create new patch
-      def self.new path, file, op, alias_
+      def self.new(path, file, op, alias_)
         path = String(path)
         file = file.__ptr if file
         alias_ = String(alias_)
-        ptr = ::CZMQ::FFI.zdir_patch_new path, file, op, alias_
-
+        ptr = ::CZMQ::FFI.zdir_patch_new(path, file, op, alias_)
         __new ptr
       end
 
       # Destroy a patch
-      def destroy
+      def destroy()
         return unless @ptr
         self_p = __ptr_give_ref
-        result = ::CZMQ::FFI.zdir_patch_destroy self_p
+        result = ::CZMQ::FFI.zdir_patch_destroy(self_p)
         result
       end
 
       # Create copy of a patch. If the patch is null, or memory was exhausted,
       # returns null.                                                         
-      def dup
+      def dup()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zdir_patch_dup @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zdir_patch_dup(self_p)
         result
       end
 
       # Return patch file directory path
-      def path
+      def path()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zdir_patch_path @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zdir_patch_path(self_p)
         result
       end
 
       # Return patch file item
-      def file
+      def file()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zdir_patch_file @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zdir_patch_file(self_p)
         result = Zfile.__new result, false
         result
       end
 
       # Return operation
-      def op
+      def op()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zdir_patch_op @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zdir_patch_op(self_p)
         result
       end
 
       # Return patch virtual file path
-      def vpath
+      def vpath()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zdir_patch_vpath @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zdir_patch_vpath(self_p)
         result
       end
 
       # Calculate hash digest for file (create only)
-      def digest_set
+      def digest_set()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zdir_patch_digest_set @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zdir_patch_digest_set(self_p)
         result
       end
 
       # Return hash digest for patch file
-      def digest
+      def digest()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zdir_patch_digest @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zdir_patch_digest(self_p)
         result
       end
 
       # Self test of this class.
-      def self.test verbose
+      def self.test(verbose)
         verbose = !(0==verbose||!verbose) # boolean
-        result = ::CZMQ::FFI.zdir_patch_test verbose
+        result = ::CZMQ::FFI.zdir_patch_test(verbose)
         result
       end
     end
-
   end
 end
 

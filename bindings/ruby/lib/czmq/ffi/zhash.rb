@@ -19,7 +19,7 @@ module CZMQ
         if @ptr.null?
           @ptr = nil # Remove null pointers so we don't have to test for them.
         elsif finalize
-          @finalizer = self.class.send :create_finalizer_for, @ptr
+          @finalizer = self.class.create_finalizer_for @ptr
           ObjectSpace.define_finalizer self, @finalizer
         end
       end
@@ -82,64 +82,68 @@ module CZMQ
       end
 
       # Create a new, empty hash container
-      def self.new
-        ptr = ::CZMQ::FFI.zhash_new
-
+      def self.new()
+        ptr = ::CZMQ::FFI.zhash_new()
         __new ptr
       end
 
       # Destroy a hash container and all items in it
-      def destroy
+      def destroy()
         return unless @ptr
         self_p = __ptr_give_ref
-        result = ::CZMQ::FFI.zhash_destroy self_p
+        result = ::CZMQ::FFI.zhash_destroy(self_p)
         result
       end
 
       # Insert item into hash table with specified key and item.               
       # If key is already present returns -1 and leaves existing item unchanged
       # Returns 0 on success.                                                  
-      def insert key, item
+      def insert(key, item)
         raise DestroyedError unless @ptr
+        self_p = @ptr
         key = String(key)
-        result = ::CZMQ::FFI.zhash_insert @ptr, key, item
+        result = ::CZMQ::FFI.zhash_insert(self_p, key, item)
         result
       end
 
       # Update item into hash table with specified key and item.            
       # If key is already present, destroys old item and inserts new one.   
       # Use free_fn method to ensure deallocator is properly called on item.
-      def update key, item
+      def update(key, item)
         raise DestroyedError unless @ptr
+        self_p = @ptr
         key = String(key)
-        result = ::CZMQ::FFI.zhash_update @ptr, key, item
+        result = ::CZMQ::FFI.zhash_update(self_p, key, item)
         result
       end
 
       # Remove an item specified by key from the hash table. If there was no such
       # item, this function does nothing.                                        
-      def delete key
+      def delete(key)
         raise DestroyedError unless @ptr
+        self_p = @ptr
         key = String(key)
-        result = ::CZMQ::FFI.zhash_delete @ptr, key
+        result = ::CZMQ::FFI.zhash_delete(self_p, key)
         result
       end
 
       # Return the item at the specified key, or null
-      def lookup key
+      def lookup(key)
         raise DestroyedError unless @ptr
+        self_p = @ptr
         key = String(key)
-        result = ::CZMQ::FFI.zhash_lookup @ptr, key
+        result = ::CZMQ::FFI.zhash_lookup(self_p, key)
         result
       end
 
       # Reindexes an item from an old key to a new key. If there was no such
       # item, does nothing. Returns 0 if successful, else -1.               
-      def rename old_key, new_key
+      def rename(old_key, new_key)
         raise DestroyedError unless @ptr
+        self_p = @ptr
         old_key = String(old_key)
         new_key = String(new_key)
-        result = ::CZMQ::FFI.zhash_rename @ptr, old_key, new_key
+        result = ::CZMQ::FFI.zhash_rename(self_p, old_key, new_key)
         result
       end
 
@@ -148,17 +152,19 @@ module CZMQ
       # Use this when hash items are dynamically allocated, to ensure that     
       # you don't have memory leaks. You can pass 'free' or NULL as a free_fn. 
       # Returns the item, or NULL if there is no such item.                    
-      def freefn key, free_fn
+      def freefn(key, free_fn)
         raise DestroyedError unless @ptr
+        self_p = @ptr
         key = String(key)
-        result = ::CZMQ::FFI.zhash_freefn @ptr, key, free_fn
+        result = ::CZMQ::FFI.zhash_freefn(self_p, key, free_fn)
         result
       end
 
       # Return the number of keys/items in the hash table
-      def size
+      def size()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zhash_size @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zhash_size(self_p)
         result
       end
 
@@ -166,17 +172,19 @@ module CZMQ
       # Does not copy items themselves. Rebuilds new table so may be slow on 
       # very large tables. NOTE: only works with item values that are strings
       # since there's no other way to know how to duplicate the item value.  
-      def dup
+      def dup()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zhash_dup @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zhash_dup(self_p)
         result = Zhash.__new result, true
         result
       end
 
       # Return keys for items in table
-      def keys
+      def keys()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zhash_keys @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zhash_keys(self_p)
         result = Zlist.__new result, true
         result
       end
@@ -185,9 +193,10 @@ module CZMQ
       # or NULL if the table is empty. This method is simpler to use than the 
       # foreach() method, which is deprecated. To access the key for this item
       # use zhash_cursor(). NOTE: do NOT modify the table while iterating.    
-      def first
+      def first()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zhash_first @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zhash_first(self_p)
         result
       end
 
@@ -197,9 +206,10 @@ module CZMQ
       # items in sorted order, use zhash_keys() and then zlist_sort(). To    
       # access the key for this item use zhash_cursor(). NOTE: do NOT modify 
       # the table while iterating.                                           
-      def next
+      def next()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zhash_next @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zhash_next(self_p)
         result
       end
 
@@ -207,19 +217,21 @@ module CZMQ
       # was returned. This is a constant string that you may not modify or     
       # deallocate, and which lasts as long as the item in the hash. After an  
       # unsuccessful first/next, returns NULL.                                 
-      def cursor
+      def cursor()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zhash_cursor @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zhash_cursor(self_p)
         result
       end
 
       # Add a comment to hash table before saving to disk. You can add as many   
       # comment lines as you like. These comment lines are discarded when loading
       # the file. If you use a null format, all comments are deleted.            
-      def comment format, *args
+      def comment(format, *args)
         raise DestroyedError unless @ptr
+        self_p = @ptr
         format = String(format)
-        result = ::CZMQ::FFI.zhash_comment @ptr, format, *args
+        result = ::CZMQ::FFI.zhash_comment(self_p, format, *args)
         result
       end
 
@@ -243,9 +255,10 @@ module CZMQ
       #                                                                      
       # Comments are not included in the packed data. Item values MUST be    
       # strings.                                                             
-      def pack
+      def pack()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zhash_pack @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zhash_pack(self_p)
         result = Zframe.__new result, true
         result
       end
@@ -253,9 +266,9 @@ module CZMQ
       # Unpack binary frame into a new hash table. Packed data must follow format
       # defined by zhash_pack. Hash table is set to autofree. An empty frame     
       # unpacks to an empty hash table.                                          
-      def self.unpack frame
+      def self.unpack(frame)
         frame = frame.__ptr if frame
-        result = ::CZMQ::FFI.zhash_unpack frame
+        result = ::CZMQ::FFI.zhash_unpack(frame)
         result = Zhash.__new result, true
         result
       end
@@ -263,20 +276,22 @@ module CZMQ
       # Save hash table to a text file in name=value format. Hash values must be
       # printable strings; keys may not contain '=' character. Returns 0 if OK, 
       # else -1 if a file error occurred.                                       
-      def save filename
+      def save(filename)
         raise DestroyedError unless @ptr
+        self_p = @ptr
         filename = String(filename)
-        result = ::CZMQ::FFI.zhash_save @ptr, filename
+        result = ::CZMQ::FFI.zhash_save(self_p, filename)
         result
       end
 
       # Load hash table from a text file in name=value format; hash table must 
       # already exist. Hash values must printable strings; keys may not contain
       # '=' character. Returns 0 if OK, else -1 if a file was not readable.    
-      def load filename
+      def load(filename)
         raise DestroyedError unless @ptr
+        self_p = @ptr
         filename = String(filename)
-        result = ::CZMQ::FFI.zhash_load @ptr, filename
+        result = ::CZMQ::FFI.zhash_load(self_p, filename)
         result
       end
 
@@ -284,16 +299,18 @@ module CZMQ
       # reload the file if it has been modified since, and is "stable", i.e. not
       # still changing. Returns 0 if OK, -1 if there was an error reloading the 
       # file.                                                                   
-      def refresh
+      def refresh()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zhash_refresh @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zhash_refresh(self_p)
         result
       end
 
       # Set hash for automatic value destruction
-      def autofree
+      def autofree()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zhash_autofree @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zhash_autofree(self_p)
         result
       end
 
@@ -302,20 +319,20 @@ module CZMQ
       # defined order. Stops if callback function returns non-zero and returns 
       # final return code from callback function (zero = success).             
       # Callback function for zhash_foreach method                             
-      def foreach callback, argument
+      def foreach(callback, argument)
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zhash_foreach @ptr, callback, argument
+        self_p = @ptr
+        result = ::CZMQ::FFI.zhash_foreach(self_p, callback, argument)
         result
       end
 
       # Self test of this class
-      def self.test verbose
+      def self.test(verbose)
         verbose = !(0==verbose||!verbose) # boolean
-        result = ::CZMQ::FFI.zhash_test verbose
+        result = ::CZMQ::FFI.zhash_test(verbose)
         result
       end
     end
-
   end
 end
 

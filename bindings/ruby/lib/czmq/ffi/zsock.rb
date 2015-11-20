@@ -19,7 +19,7 @@ module CZMQ
         if @ptr.null?
           @ptr = nil # Remove null pointers so we don't have to test for them.
         elsif finalize
-          @finalizer = self.class.send :create_finalizer_for, @ptr
+          @finalizer = self.class.create_finalizer_for @ptr
           ObjectSpace.define_finalizer self, @finalizer
         end
       end
@@ -57,132 +57,131 @@ module CZMQ
       # variant, enabling intelligent socket leak detection. This can have    
       # performance implications if you use a LOT of sockets. To turn off this
       # redirection behaviour, define ZSOCK_NOCHECK.                          
-      def self.new type
+      def self.new(type)
         type = Integer(type)
-        ptr = ::CZMQ::FFI.zsock_new type
-
+        ptr = ::CZMQ::FFI.zsock_new(type)
         __new ptr
       end
 
       # Destroy the socket. You must use this for any socket created via the
       # zsock_new method.                                                   
-      def destroy
+      def destroy()
         return unless @ptr
         self_p = __ptr_give_ref
-        result = ::CZMQ::FFI.zsock_destroy self_p
+        result = ::CZMQ::FFI.zsock_destroy(self_p)
         result
       end
 
       # Create a PUB socket. Default action is bind.
-      def self.new_pub endpoint
+      def self.new_pub(endpoint)
         endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_pub endpoint
+        result = ::CZMQ::FFI.zsock_new_pub(endpoint)
         result = Zsock.__new result, true
         result
       end
 
       # Create a SUB socket, and optionally subscribe to some prefix string. Default
       # action is connect.                                                          
-      def self.new_sub endpoint, subscribe
+      def self.new_sub(endpoint, subscribe)
         endpoint = String(endpoint)
         subscribe = String(subscribe)
-        result = ::CZMQ::FFI.zsock_new_sub endpoint, subscribe
+        result = ::CZMQ::FFI.zsock_new_sub(endpoint, subscribe)
         result = Zsock.__new result, true
         result
       end
 
       # Create a REQ socket. Default action is connect.
-      def self.new_req endpoint
+      def self.new_req(endpoint)
         endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_req endpoint
+        result = ::CZMQ::FFI.zsock_new_req(endpoint)
         result = Zsock.__new result, true
         result
       end
 
       # Create a REP socket. Default action is bind.
-      def self.new_rep endpoint
+      def self.new_rep(endpoint)
         endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_rep endpoint
+        result = ::CZMQ::FFI.zsock_new_rep(endpoint)
         result = Zsock.__new result, true
         result
       end
 
       # Create a DEALER socket. Default action is connect.
-      def self.new_dealer endpoint
+      def self.new_dealer(endpoint)
         endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_dealer endpoint
+        result = ::CZMQ::FFI.zsock_new_dealer(endpoint)
         result = Zsock.__new result, true
         result
       end
 
       # Create a ROUTER socket. Default action is bind.
-      def self.new_router endpoint
+      def self.new_router(endpoint)
         endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_router endpoint
+        result = ::CZMQ::FFI.zsock_new_router(endpoint)
         result = Zsock.__new result, true
         result
       end
 
       # Create a PUSH socket. Default action is connect.
-      def self.new_push endpoint
+      def self.new_push(endpoint)
         endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_push endpoint
+        result = ::CZMQ::FFI.zsock_new_push(endpoint)
         result = Zsock.__new result, true
         result
       end
 
       # Create a PULL socket. Default action is bind.
-      def self.new_pull endpoint
+      def self.new_pull(endpoint)
         endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_pull endpoint
+        result = ::CZMQ::FFI.zsock_new_pull(endpoint)
         result = Zsock.__new result, true
         result
       end
 
       # Create an XPUB socket. Default action is bind.
-      def self.new_xpub endpoint
+      def self.new_xpub(endpoint)
         endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_xpub endpoint
+        result = ::CZMQ::FFI.zsock_new_xpub(endpoint)
         result = Zsock.__new result, true
         result
       end
 
       # Create an XSUB socket. Default action is connect.
-      def self.new_xsub endpoint
+      def self.new_xsub(endpoint)
         endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_xsub endpoint
+        result = ::CZMQ::FFI.zsock_new_xsub(endpoint)
         result = Zsock.__new result, true
         result
       end
 
       # Create a PAIR socket. Default action is connect.
-      def self.new_pair endpoint
+      def self.new_pair(endpoint)
         endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_pair endpoint
+        result = ::CZMQ::FFI.zsock_new_pair(endpoint)
         result = Zsock.__new result, true
         result
       end
 
       # Create a STREAM socket. Default action is connect.
-      def self.new_stream endpoint
+      def self.new_stream(endpoint)
         endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_stream endpoint
+        result = ::CZMQ::FFI.zsock_new_stream(endpoint)
         result = Zsock.__new result, true
         result
       end
 
       # Create a SERVER socket. Default action is bind.
-      def self.new_server endpoint
+      def self.new_server(endpoint)
         endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_server endpoint
+        result = ::CZMQ::FFI.zsock_new_server(endpoint)
         result = Zsock.__new result, true
         result
       end
 
       # Create a CLIENT socket. Default action is connect.
-      def self.new_client endpoint
+      def self.new_client(endpoint)
         endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_client endpoint
+        result = ::CZMQ::FFI.zsock_new_client(endpoint)
         result = Zsock.__new result, true
         result
       end
@@ -207,46 +206,51 @@ module CZMQ
       # ephemeral ports, a port may be reused by different services without     
       # clients being aware. Protocols that run on ephemeral ports should take  
       # this into account.                                                      
-      def bind format, *args
+      def bind(format, *args)
         raise DestroyedError unless @ptr
+        self_p = @ptr
         format = String(format)
-        result = ::CZMQ::FFI.zsock_bind @ptr, format, *args
+        result = ::CZMQ::FFI.zsock_bind(self_p, format, *args)
         result
       end
 
       # Returns last bound endpoint, if any.
-      def endpoint
+      def endpoint()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zsock_endpoint @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_endpoint(self_p)
         result
       end
 
       # Unbind a socket from a formatted endpoint.                     
       # Returns 0 if OK, -1 if the endpoint was invalid or the function
       # isn't supported.                                               
-      def unbind format, *args
+      def unbind(format, *args)
         raise DestroyedError unless @ptr
+        self_p = @ptr
         format = String(format)
-        result = ::CZMQ::FFI.zsock_unbind @ptr, format, *args
+        result = ::CZMQ::FFI.zsock_unbind(self_p, format, *args)
         result
       end
 
       # Connect a socket to a formatted endpoint        
       # Returns 0 if OK, -1 if the endpoint was invalid.
-      def connect format, *args
+      def connect(format, *args)
         raise DestroyedError unless @ptr
+        self_p = @ptr
         format = String(format)
-        result = ::CZMQ::FFI.zsock_connect @ptr, format, *args
+        result = ::CZMQ::FFI.zsock_connect(self_p, format, *args)
         result
       end
 
       # Disconnect a socket from a formatted endpoint                  
       # Returns 0 if OK, -1 if the endpoint was invalid or the function
       # isn't supported.                                               
-      def disconnect format, *args
+      def disconnect(format, *args)
         raise DestroyedError unless @ptr
+        self_p = @ptr
         format = String(format)
-        result = ::CZMQ::FFI.zsock_disconnect @ptr, format, *args
+        result = ::CZMQ::FFI.zsock_disconnect(self_p, format, *args)
         result
       end
 
@@ -256,18 +260,20 @@ module CZMQ
       # endpoints were valid, or -1 if there was a syntax error. If the endpoint 
       # does not start with '@' or '>', the serverish argument defines whether   
       # it is used to bind (serverish = true) or connect (serverish = false).    
-      def attach endpoints, serverish
+      def attach(endpoints, serverish)
         raise DestroyedError unless @ptr
+        self_p = @ptr
         endpoints = String(endpoints)
         serverish = !(0==serverish||!serverish) # boolean
-        result = ::CZMQ::FFI.zsock_attach @ptr, endpoints, serverish
+        result = ::CZMQ::FFI.zsock_attach(self_p, endpoints, serverish)
         result
       end
 
       # Returns socket type as printable constant string.
-      def type_str
+      def type_str()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zsock_type_str @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_type_str(self_p)
         result
       end
 
@@ -297,20 +303,69 @@ module CZMQ
       # have data in a zchunk or zframe. Does not change or take ownership of 
       # any arguments. Returns 0 if successful, -1 if sending failed for any  
       # reason.                                                               
-      def send picture, *args
+      def send(picture, *args)
         raise DestroyedError unless @ptr
+        self_p = @ptr
         picture = String(picture)
-        result = ::CZMQ::FFI.zsock_send @ptr, picture, *args
+        result = ::CZMQ::FFI.zsock_send(self_p, picture, *args)
+        result
+      end
+
+      # Send a 'picture' message to the socket (or actor). The picture is a   
+      # string that defines the type of each frame. This makes it easy to send
+      # a complex multiframe message in one call. The picture can contain any 
+      # of these characters, each corresponding to one or two arguments:      
+      #                                                                       
+      #     i = int (signed)                                                  
+      #     1 = uint8_t                                                       
+      #     2 = uint16_t                                                      
+      #     4 = uint32_t                                                      
+      #     8 = uint64_t                                                      
+      #     s = char *                                                        
+      #     b = byte *, size_t (2 arguments)                                  
+      #     c = zchunk_t *                                                    
+      #     f = zframe_t *                                                    
+      #     h = zhashx_t *                                                    
+      #     U = zuuid_t *                                                     
+      #     p = void * (sends the pointer value, only meaningful over inproc) 
+      #     m = zmsg_t * (sends all frames in the zmsg)                       
+      #     z = sends zero-sized frame (0 arguments)                          
+      #     u = uint (deprecated)                                             
+      #                                                                       
+      # Note that s, b, c, and f are encoded the same way and the choice is   
+      # offered as a convenience to the sender, which may or may not already  
+      # have data in a zchunk or zframe. Does not change or take ownership of 
+      # any arguments. Returns 0 if successful, -1 if sending failed for any  
+      # reason.                                                               
+      #
+      # This is the polymorphic version of #send.
+      def self.send(self_p, picture, *args)
+        raise DestroyedError unless self_p
+        picture = String(picture)
+        result = ::CZMQ::FFI.zsock_send(self_p, picture, *args)
         result
       end
 
       # Send a 'picture' message to the socket (or actor). This is a va_list 
       # version of zsock_send (), so please consult its documentation for the
       # details.                                                             
-      def vsend picture, argptr
+      def vsend(picture, argptr)
         raise DestroyedError unless @ptr
+        self_p = @ptr
         picture = String(picture)
-        result = ::CZMQ::FFI.zsock_vsend @ptr, picture, argptr
+        result = ::CZMQ::FFI.zsock_vsend(self_p, picture, argptr)
+        result
+      end
+
+      # Send a 'picture' message to the socket (or actor). This is a va_list 
+      # version of zsock_send (), so please consult its documentation for the
+      # details.                                                             
+      #
+      # This is the polymorphic version of #vsend.
+      def self.vsend(self_p, picture, argptr)
+        raise DestroyedError unless self_p
+        picture = String(picture)
+        result = ::CZMQ::FFI.zsock_vsend(self_p, picture, argptr)
         result
       end
 
@@ -340,20 +395,69 @@ module CZMQ
       # If an argument pointer is NULL, does not store any value (skips it).    
       # An 'n' picture matches an empty frame; if the message does not match,   
       # the method will return -1.                                              
-      def recv picture, *args
+      def recv(picture, *args)
         raise DestroyedError unless @ptr
+        self_p = @ptr
         picture = String(picture)
-        result = ::CZMQ::FFI.zsock_recv @ptr, picture, *args
+        result = ::CZMQ::FFI.zsock_recv(self_p, picture, *args)
+        result
+      end
+
+      # Receive a 'picture' message to the socket (or actor). See zsock_send for
+      # the format and meaning of the picture. Returns the picture elements into
+      # a series of pointers as provided by the caller:                         
+      #                                                                         
+      #     i = int * (stores signed integer)                                   
+      #     4 = uint32_t * (stores 32-bit unsigned integer)                     
+      #     8 = uint64_t * (stores 64-bit unsigned integer)                     
+      #     s = char ** (allocates new string)                                  
+      #     b = byte **, size_t * (2 arguments) (allocates memory)              
+      #     c = zchunk_t ** (creates zchunk)                                    
+      #     f = zframe_t ** (creates zframe)                                    
+      #     U = zuuid_t * (creates a zuuid with the data)                       
+      #     h = zhashx_t ** (creates zhashx)                                    
+      #     p = void ** (stores pointer)                                        
+      #     m = zmsg_t ** (creates a zmsg with the remaing frames)              
+      #     z = null, asserts empty frame (0 arguments)                         
+      #     u = uint * (stores unsigned integer, deprecated)                    
+      #                                                                         
+      # Note that zsock_recv creates the returned objects, and the caller must  
+      # destroy them when finished with them. The supplied pointers do not need 
+      # to be initialized. Returns 0 if successful, or -1 if it failed to recv  
+      # a message, in which case the pointers are not modified. When message    
+      # frames are truncated (a short message), sets return values to zero/null.
+      # If an argument pointer is NULL, does not store any value (skips it).    
+      # An 'n' picture matches an empty frame; if the message does not match,   
+      # the method will return -1.                                              
+      #
+      # This is the polymorphic version of #recv.
+      def self.recv(self_p, picture, *args)
+        raise DestroyedError unless self_p
+        picture = String(picture)
+        result = ::CZMQ::FFI.zsock_recv(self_p, picture, *args)
         result
       end
 
       # Receive a 'picture' message from the socket (or actor). This is a    
       # va_list version of zsock_recv (), so please consult its documentation
       # for the details.                                                     
-      def vrecv picture, argptr
+      def vrecv(picture, argptr)
         raise DestroyedError unless @ptr
+        self_p = @ptr
         picture = String(picture)
-        result = ::CZMQ::FFI.zsock_vrecv @ptr, picture, argptr
+        result = ::CZMQ::FFI.zsock_vrecv(self_p, picture, argptr)
+        result
+      end
+
+      # Receive a 'picture' message from the socket (or actor). This is a    
+      # va_list version of zsock_recv (), so please consult its documentation
+      # for the details.                                                     
+      #
+      # This is the polymorphic version of #vrecv.
+      def self.vrecv(self_p, picture, argptr)
+        raise DestroyedError unless self_p
+        picture = String(picture)
+        result = ::CZMQ::FFI.zsock_vrecv(self_p, picture, argptr)
         result
       end
 
@@ -378,10 +482,41 @@ module CZMQ
       #                                                                        
       # Does not change or take ownership of any arguments. Returns 0 if       
       # successful, -1 if sending failed for any reason.                       
-      def bsend picture, *args
+      def bsend(picture, *args)
         raise DestroyedError unless @ptr
+        self_p = @ptr
         picture = String(picture)
-        result = ::CZMQ::FFI.zsock_bsend @ptr, picture, *args
+        result = ::CZMQ::FFI.zsock_bsend(self_p, picture, *args)
+        result
+      end
+
+      # Send a binary encoded 'picture' message to the socket (or actor). This 
+      # method is similar to zsock_send, except the arguments are encoded in a 
+      # binary format that is compatible with zproto, and is designed to reduce
+      # memory allocations. The pattern argument is a string that defines the  
+      # type of each argument. Supports these argument types:                  
+      #                                                                        
+      #  pattern    C type                  zproto type:                       
+      #     1       uint8_t                 type = "number" size = "1"         
+      #     2       uint16_t                type = "number" size = "2"         
+      #     4       uint32_t                type = "number" size = "3"         
+      #     8       uint64_t                type = "number" size = "4"         
+      #     s       char *, 0-255 chars     type = "string"                    
+      #     S       char *, 0-2^32-1 chars  type = "longstr"                   
+      #     c       zchunk_t *              type = "chunk"                     
+      #     f       zframe_t *              type = "frame"                     
+      #     u       zuuid_t *               type = "uuid"                      
+      #     m       zmsg_t *                type = "msg"                       
+      #     p       void *, sends pointer value, only over inproc              
+      #                                                                        
+      # Does not change or take ownership of any arguments. Returns 0 if       
+      # successful, -1 if sending failed for any reason.                       
+      #
+      # This is the polymorphic version of #bsend.
+      def self.bsend(self_p, picture, *args)
+        raise DestroyedError unless self_p
+        picture = String(picture)
+        result = ::CZMQ::FFI.zsock_bsend(self_p, picture, *args)
         result
       end
 
@@ -393,46 +528,94 @@ module CZMQ
       # types. All arguments must be pointers; this call sets them to point to  
       # values held on a per-socket basis. Do not modify or destroy the returned
       # values. Returns 0 if successful, or -1 if it failed to read a message.  
-      def brecv picture, *args
+      def brecv(picture, *args)
         raise DestroyedError unless @ptr
+        self_p = @ptr
         picture = String(picture)
-        result = ::CZMQ::FFI.zsock_brecv @ptr, picture, *args
+        result = ::CZMQ::FFI.zsock_brecv(self_p, picture, *args)
+        result
+      end
+
+      # Receive a binary encoded 'picture' message from the socket (or actor).  
+      # This method is similar to zsock_recv, except the arguments are encoded  
+      # in a binary format that is compatible with zproto, and is designed to   
+      # reduce memory allocations. The pattern argument is a string that defines
+      # the type of each argument. See zsock_bsend for the supported argument   
+      # types. All arguments must be pointers; this call sets them to point to  
+      # values held on a per-socket basis. Do not modify or destroy the returned
+      # values. Returns 0 if successful, or -1 if it failed to read a message.  
+      #
+      # This is the polymorphic version of #brecv.
+      def self.brecv(self_p, picture, *args)
+        raise DestroyedError unless self_p
+        picture = String(picture)
+        result = ::CZMQ::FFI.zsock_brecv(self_p, picture, *args)
         result
       end
 
       # Return socket routing ID if any. This returns 0 if the socket is not
       # of type ZMQ_SERVER or if no request was already received on it.     
-      def routing_id
+      def routing_id()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zsock_routing_id @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_routing_id(self_p)
         result
       end
 
       # Set routing ID on socket. The socket MUST be of type ZMQ_SERVER.        
       # This will be used when sending messages on the socket via the zsock API.
-      def set_routing_id routing_id
+      def set_routing_id(routing_id)
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zsock_set_routing_id @ptr, routing_id
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_set_routing_id(self_p, routing_id)
         result
       end
 
       # Set socket to use unbounded pipes (HWM=0); use this in cases when you are
       # totally certain the message volume can fit in memory. This method works  
       # across all versions of ZeroMQ. Takes a polymorphic socket reference.     
-      def set_unbounded
+      def set_unbounded()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zsock_set_unbounded @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_set_unbounded(self_p)
+        result
+      end
+
+      # Set socket to use unbounded pipes (HWM=0); use this in cases when you are
+      # totally certain the message volume can fit in memory. This method works  
+      # across all versions of ZeroMQ. Takes a polymorphic socket reference.     
+      #
+      # This is the polymorphic version of #set_unbounded.
+      def self.set_unbounded(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_set_unbounded(self_p)
         result
       end
 
       # Send a signal over a socket. A signal is a short message carrying a   
       # success/failure code (by convention, 0 means OK). Signals are encoded 
-      # to be distinguishable from "normal" messages. Accepts a zsock_t or a   
+      # to be distinguishable from "normal" messages. Accepts a zsock_t or a  
       # zactor_t argument, and returns 0 if successful, -1 if the signal could
       # not be sent. Takes a polymorphic socket reference.                    
-      def signal status
+      def signal(status)
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zsock_signal @ptr, status
+        self_p = @ptr
+        status = Integer(status)
+        result = ::CZMQ::FFI.zsock_signal(self_p, status)
+        result
+      end
+
+      # Send a signal over a socket. A signal is a short message carrying a   
+      # success/failure code (by convention, 0 means OK). Signals are encoded 
+      # to be distinguishable from "normal" messages. Accepts a zsock_t or a  
+      # zactor_t argument, and returns 0 if successful, -1 if the signal could
+      # not be sent. Takes a polymorphic socket reference.                    
+      #
+      # This is the polymorphic version of #signal.
+      def self.signal(self_p, status)
+        raise DestroyedError unless self_p
+        status = Integer(status)
+        result = ::CZMQ::FFI.zsock_signal(self_p, status)
         result
       end
 
@@ -440,25 +623,1683 @@ module CZMQ
       # pairs. Blocks until the signal is received. Returns -1 on error, 0 or
       # greater on success. Accepts a zsock_t or a zactor_t as argument.     
       # Takes a polymorphic socket reference.                                
-      def wait
+      def wait()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zsock_wait @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_wait(self_p)
+        result
+      end
+
+      # Wait on a signal. Use this to coordinate between threads, over pipe  
+      # pairs. Blocks until the signal is received. Returns -1 on error, 0 or
+      # greater on success. Accepts a zsock_t or a zactor_t as argument.     
+      # Takes a polymorphic socket reference.                                
+      #
+      # This is the polymorphic version of #wait.
+      def self.wait(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_wait(self_p)
         result
       end
 
       # If there is a partial message still waiting on the socket, remove and    
       # discard it. This is useful when reading partial messages, to get specific
       # message types.                                                           
-      def flush
+      def flush()
         raise DestroyedError unless @ptr
-        result = ::CZMQ::FFI.zsock_flush @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_flush(self_p)
+        result
+      end
+
+      # If there is a partial message still waiting on the socket, remove and    
+      # discard it. This is useful when reading partial messages, to get specific
+      # message types.                                                           
+      #
+      # This is the polymorphic version of #flush.
+      def self.flush(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_flush(self_p)
+        result
+      end
+
+      # Get socket option `tos`.
+      def tos()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_tos(self_p)
+        result
+      end
+
+      # Get socket option `tos`.
+      #
+      # This is the polymorphic version of #tos.
+      def self.tos(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_tos(self_p)
+        result
+      end
+
+      # Set socket option `tos`.
+      def set_tos(tos)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        tos = Integer(tos)
+        result = ::CZMQ::FFI.zsock_set_tos(self_p, tos)
+        result
+      end
+
+      # Set socket option `tos`.
+      #
+      # This is the polymorphic version of #set_tos.
+      def self.set_tos(self_p, tos)
+        raise DestroyedError unless self_p
+        tos = Integer(tos)
+        result = ::CZMQ::FFI.zsock_set_tos(self_p, tos)
+        result
+      end
+
+      # Set socket option `router_handover`.
+      def set_router_handover(router_handover)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        router_handover = Integer(router_handover)
+        result = ::CZMQ::FFI.zsock_set_router_handover(self_p, router_handover)
+        result
+      end
+
+      # Set socket option `router_handover`.
+      #
+      # This is the polymorphic version of #set_router_handover.
+      def self.set_router_handover(self_p, router_handover)
+        raise DestroyedError unless self_p
+        router_handover = Integer(router_handover)
+        result = ::CZMQ::FFI.zsock_set_router_handover(self_p, router_handover)
+        result
+      end
+
+      # Set socket option `router_mandatory`.
+      def set_router_mandatory(router_mandatory)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        router_mandatory = Integer(router_mandatory)
+        result = ::CZMQ::FFI.zsock_set_router_mandatory(self_p, router_mandatory)
+        result
+      end
+
+      # Set socket option `router_mandatory`.
+      #
+      # This is the polymorphic version of #set_router_mandatory.
+      def self.set_router_mandatory(self_p, router_mandatory)
+        raise DestroyedError unless self_p
+        router_mandatory = Integer(router_mandatory)
+        result = ::CZMQ::FFI.zsock_set_router_mandatory(self_p, router_mandatory)
+        result
+      end
+
+      # Set socket option `probe_router`.
+      def set_probe_router(probe_router)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        probe_router = Integer(probe_router)
+        result = ::CZMQ::FFI.zsock_set_probe_router(self_p, probe_router)
+        result
+      end
+
+      # Set socket option `probe_router`.
+      #
+      # This is the polymorphic version of #set_probe_router.
+      def self.set_probe_router(self_p, probe_router)
+        raise DestroyedError unless self_p
+        probe_router = Integer(probe_router)
+        result = ::CZMQ::FFI.zsock_set_probe_router(self_p, probe_router)
+        result
+      end
+
+      # Set socket option `req_relaxed`.
+      def set_req_relaxed(req_relaxed)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        req_relaxed = Integer(req_relaxed)
+        result = ::CZMQ::FFI.zsock_set_req_relaxed(self_p, req_relaxed)
+        result
+      end
+
+      # Set socket option `req_relaxed`.
+      #
+      # This is the polymorphic version of #set_req_relaxed.
+      def self.set_req_relaxed(self_p, req_relaxed)
+        raise DestroyedError unless self_p
+        req_relaxed = Integer(req_relaxed)
+        result = ::CZMQ::FFI.zsock_set_req_relaxed(self_p, req_relaxed)
+        result
+      end
+
+      # Set socket option `req_correlate`.
+      def set_req_correlate(req_correlate)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        req_correlate = Integer(req_correlate)
+        result = ::CZMQ::FFI.zsock_set_req_correlate(self_p, req_correlate)
+        result
+      end
+
+      # Set socket option `req_correlate`.
+      #
+      # This is the polymorphic version of #set_req_correlate.
+      def self.set_req_correlate(self_p, req_correlate)
+        raise DestroyedError unless self_p
+        req_correlate = Integer(req_correlate)
+        result = ::CZMQ::FFI.zsock_set_req_correlate(self_p, req_correlate)
+        result
+      end
+
+      # Set socket option `conflate`.
+      def set_conflate(conflate)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        conflate = Integer(conflate)
+        result = ::CZMQ::FFI.zsock_set_conflate(self_p, conflate)
+        result
+      end
+
+      # Set socket option `conflate`.
+      #
+      # This is the polymorphic version of #set_conflate.
+      def self.set_conflate(self_p, conflate)
+        raise DestroyedError unless self_p
+        conflate = Integer(conflate)
+        result = ::CZMQ::FFI.zsock_set_conflate(self_p, conflate)
+        result
+      end
+
+      # Get socket option `zap_domain`.
+      def zap_domain()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_zap_domain(self_p)
+        result
+      end
+
+      # Get socket option `zap_domain`.
+      #
+      # This is the polymorphic version of #zap_domain.
+      def self.zap_domain(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_zap_domain(self_p)
+        result
+      end
+
+      # Set socket option `zap_domain`.
+      def set_zap_domain(zap_domain)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        zap_domain = String(zap_domain)
+        result = ::CZMQ::FFI.zsock_set_zap_domain(self_p, zap_domain)
+        result
+      end
+
+      # Set socket option `zap_domain`.
+      #
+      # This is the polymorphic version of #set_zap_domain.
+      def self.set_zap_domain(self_p, zap_domain)
+        raise DestroyedError unless self_p
+        zap_domain = String(zap_domain)
+        result = ::CZMQ::FFI.zsock_set_zap_domain(self_p, zap_domain)
+        result
+      end
+
+      # Get socket option `mechanism`.
+      def mechanism()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_mechanism(self_p)
+        result
+      end
+
+      # Get socket option `mechanism`.
+      #
+      # This is the polymorphic version of #mechanism.
+      def self.mechanism(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_mechanism(self_p)
+        result
+      end
+
+      # Get socket option `plain_server`.
+      def plain_server()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_plain_server(self_p)
+        result
+      end
+
+      # Get socket option `plain_server`.
+      #
+      # This is the polymorphic version of #plain_server.
+      def self.plain_server(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_plain_server(self_p)
+        result
+      end
+
+      # Set socket option `plain_server`.
+      def set_plain_server(plain_server)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        plain_server = Integer(plain_server)
+        result = ::CZMQ::FFI.zsock_set_plain_server(self_p, plain_server)
+        result
+      end
+
+      # Set socket option `plain_server`.
+      #
+      # This is the polymorphic version of #set_plain_server.
+      def self.set_plain_server(self_p, plain_server)
+        raise DestroyedError unless self_p
+        plain_server = Integer(plain_server)
+        result = ::CZMQ::FFI.zsock_set_plain_server(self_p, plain_server)
+        result
+      end
+
+      # Get socket option `plain_username`.
+      def plain_username()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_plain_username(self_p)
+        result
+      end
+
+      # Get socket option `plain_username`.
+      #
+      # This is the polymorphic version of #plain_username.
+      def self.plain_username(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_plain_username(self_p)
+        result
+      end
+
+      # Set socket option `plain_username`.
+      def set_plain_username(plain_username)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        plain_username = String(plain_username)
+        result = ::CZMQ::FFI.zsock_set_plain_username(self_p, plain_username)
+        result
+      end
+
+      # Set socket option `plain_username`.
+      #
+      # This is the polymorphic version of #set_plain_username.
+      def self.set_plain_username(self_p, plain_username)
+        raise DestroyedError unless self_p
+        plain_username = String(plain_username)
+        result = ::CZMQ::FFI.zsock_set_plain_username(self_p, plain_username)
+        result
+      end
+
+      # Get socket option `plain_password`.
+      def plain_password()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_plain_password(self_p)
+        result
+      end
+
+      # Get socket option `plain_password`.
+      #
+      # This is the polymorphic version of #plain_password.
+      def self.plain_password(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_plain_password(self_p)
+        result
+      end
+
+      # Set socket option `plain_password`.
+      def set_plain_password(plain_password)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        plain_password = String(plain_password)
+        result = ::CZMQ::FFI.zsock_set_plain_password(self_p, plain_password)
+        result
+      end
+
+      # Set socket option `plain_password`.
+      #
+      # This is the polymorphic version of #set_plain_password.
+      def self.set_plain_password(self_p, plain_password)
+        raise DestroyedError unless self_p
+        plain_password = String(plain_password)
+        result = ::CZMQ::FFI.zsock_set_plain_password(self_p, plain_password)
+        result
+      end
+
+      # Get socket option `curve_server`.
+      def curve_server()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_curve_server(self_p)
+        result
+      end
+
+      # Get socket option `curve_server`.
+      #
+      # This is the polymorphic version of #curve_server.
+      def self.curve_server(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_curve_server(self_p)
+        result
+      end
+
+      # Set socket option `curve_server`.
+      def set_curve_server(curve_server)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        curve_server = Integer(curve_server)
+        result = ::CZMQ::FFI.zsock_set_curve_server(self_p, curve_server)
+        result
+      end
+
+      # Set socket option `curve_server`.
+      #
+      # This is the polymorphic version of #set_curve_server.
+      def self.set_curve_server(self_p, curve_server)
+        raise DestroyedError unless self_p
+        curve_server = Integer(curve_server)
+        result = ::CZMQ::FFI.zsock_set_curve_server(self_p, curve_server)
+        result
+      end
+
+      # Get socket option `curve_publickey`.
+      def curve_publickey()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_curve_publickey(self_p)
+        result
+      end
+
+      # Get socket option `curve_publickey`.
+      #
+      # This is the polymorphic version of #curve_publickey.
+      def self.curve_publickey(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_curve_publickey(self_p)
+        result
+      end
+
+      # Set socket option `curve_publickey`.
+      def set_curve_publickey(curve_publickey)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_set_curve_publickey(self_p, curve_publickey)
+        result
+      end
+
+      # Set socket option `curve_publickey`.
+      #
+      # This is the polymorphic version of #set_curve_publickey.
+      def self.set_curve_publickey(self_p, curve_publickey)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_set_curve_publickey(self_p, curve_publickey)
+        result
+      end
+
+      # Get socket option `curve_secretkey`.
+      def curve_secretkey()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_curve_secretkey(self_p)
+        result
+      end
+
+      # Get socket option `curve_secretkey`.
+      #
+      # This is the polymorphic version of #curve_secretkey.
+      def self.curve_secretkey(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_curve_secretkey(self_p)
+        result
+      end
+
+      # Set socket option `curve_secretkey`.
+      def set_curve_secretkey(curve_secretkey)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_set_curve_secretkey(self_p, curve_secretkey)
+        result
+      end
+
+      # Set socket option `curve_secretkey`.
+      #
+      # This is the polymorphic version of #set_curve_secretkey.
+      def self.set_curve_secretkey(self_p, curve_secretkey)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_set_curve_secretkey(self_p, curve_secretkey)
+        result
+      end
+
+      # Get socket option `curve_serverkey`.
+      def curve_serverkey()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_curve_serverkey(self_p)
+        result
+      end
+
+      # Get socket option `curve_serverkey`.
+      #
+      # This is the polymorphic version of #curve_serverkey.
+      def self.curve_serverkey(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_curve_serverkey(self_p)
+        result
+      end
+
+      # Set socket option `curve_serverkey`.
+      def set_curve_serverkey(curve_serverkey)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_set_curve_serverkey(self_p, curve_serverkey)
+        result
+      end
+
+      # Set socket option `curve_serverkey`.
+      #
+      # This is the polymorphic version of #set_curve_serverkey.
+      def self.set_curve_serverkey(self_p, curve_serverkey)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_set_curve_serverkey(self_p, curve_serverkey)
+        result
+      end
+
+      # Get socket option `gssapi_server`.
+      def gssapi_server()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_gssapi_server(self_p)
+        result
+      end
+
+      # Get socket option `gssapi_server`.
+      #
+      # This is the polymorphic version of #gssapi_server.
+      def self.gssapi_server(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_gssapi_server(self_p)
+        result
+      end
+
+      # Set socket option `gssapi_server`.
+      def set_gssapi_server(gssapi_server)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        gssapi_server = Integer(gssapi_server)
+        result = ::CZMQ::FFI.zsock_set_gssapi_server(self_p, gssapi_server)
+        result
+      end
+
+      # Set socket option `gssapi_server`.
+      #
+      # This is the polymorphic version of #set_gssapi_server.
+      def self.set_gssapi_server(self_p, gssapi_server)
+        raise DestroyedError unless self_p
+        gssapi_server = Integer(gssapi_server)
+        result = ::CZMQ::FFI.zsock_set_gssapi_server(self_p, gssapi_server)
+        result
+      end
+
+      # Get socket option `gssapi_plaintext`.
+      def gssapi_plaintext()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_gssapi_plaintext(self_p)
+        result
+      end
+
+      # Get socket option `gssapi_plaintext`.
+      #
+      # This is the polymorphic version of #gssapi_plaintext.
+      def self.gssapi_plaintext(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_gssapi_plaintext(self_p)
+        result
+      end
+
+      # Set socket option `gssapi_plaintext`.
+      def set_gssapi_plaintext(gssapi_plaintext)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        gssapi_plaintext = Integer(gssapi_plaintext)
+        result = ::CZMQ::FFI.zsock_set_gssapi_plaintext(self_p, gssapi_plaintext)
+        result
+      end
+
+      # Set socket option `gssapi_plaintext`.
+      #
+      # This is the polymorphic version of #set_gssapi_plaintext.
+      def self.set_gssapi_plaintext(self_p, gssapi_plaintext)
+        raise DestroyedError unless self_p
+        gssapi_plaintext = Integer(gssapi_plaintext)
+        result = ::CZMQ::FFI.zsock_set_gssapi_plaintext(self_p, gssapi_plaintext)
+        result
+      end
+
+      # Get socket option `gssapi_principal`.
+      def gssapi_principal()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_gssapi_principal(self_p)
+        result
+      end
+
+      # Get socket option `gssapi_principal`.
+      #
+      # This is the polymorphic version of #gssapi_principal.
+      def self.gssapi_principal(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_gssapi_principal(self_p)
+        result
+      end
+
+      # Set socket option `gssapi_principal`.
+      def set_gssapi_principal(gssapi_principal)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        gssapi_principal = String(gssapi_principal)
+        result = ::CZMQ::FFI.zsock_set_gssapi_principal(self_p, gssapi_principal)
+        result
+      end
+
+      # Set socket option `gssapi_principal`.
+      #
+      # This is the polymorphic version of #set_gssapi_principal.
+      def self.set_gssapi_principal(self_p, gssapi_principal)
+        raise DestroyedError unless self_p
+        gssapi_principal = String(gssapi_principal)
+        result = ::CZMQ::FFI.zsock_set_gssapi_principal(self_p, gssapi_principal)
+        result
+      end
+
+      # Get socket option `gssapi_service_principal`.
+      def gssapi_service_principal()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_gssapi_service_principal(self_p)
+        result
+      end
+
+      # Get socket option `gssapi_service_principal`.
+      #
+      # This is the polymorphic version of #gssapi_service_principal.
+      def self.gssapi_service_principal(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_gssapi_service_principal(self_p)
+        result
+      end
+
+      # Set socket option `gssapi_service_principal`.
+      def set_gssapi_service_principal(gssapi_service_principal)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        gssapi_service_principal = String(gssapi_service_principal)
+        result = ::CZMQ::FFI.zsock_set_gssapi_service_principal(self_p, gssapi_service_principal)
+        result
+      end
+
+      # Set socket option `gssapi_service_principal`.
+      #
+      # This is the polymorphic version of #set_gssapi_service_principal.
+      def self.set_gssapi_service_principal(self_p, gssapi_service_principal)
+        raise DestroyedError unless self_p
+        gssapi_service_principal = String(gssapi_service_principal)
+        result = ::CZMQ::FFI.zsock_set_gssapi_service_principal(self_p, gssapi_service_principal)
+        result
+      end
+
+      # Get socket option `ipv6`.
+      def ipv6()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_ipv6(self_p)
+        result
+      end
+
+      # Get socket option `ipv6`.
+      #
+      # This is the polymorphic version of #ipv6.
+      def self.ipv6(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_ipv6(self_p)
+        result
+      end
+
+      # Set socket option `ipv6`.
+      def set_ipv6(ipv6)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        ipv6 = Integer(ipv6)
+        result = ::CZMQ::FFI.zsock_set_ipv6(self_p, ipv6)
+        result
+      end
+
+      # Set socket option `ipv6`.
+      #
+      # This is the polymorphic version of #set_ipv6.
+      def self.set_ipv6(self_p, ipv6)
+        raise DestroyedError unless self_p
+        ipv6 = Integer(ipv6)
+        result = ::CZMQ::FFI.zsock_set_ipv6(self_p, ipv6)
+        result
+      end
+
+      # Get socket option `immediate`.
+      def immediate()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_immediate(self_p)
+        result
+      end
+
+      # Get socket option `immediate`.
+      #
+      # This is the polymorphic version of #immediate.
+      def self.immediate(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_immediate(self_p)
+        result
+      end
+
+      # Set socket option `immediate`.
+      def set_immediate(immediate)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        immediate = Integer(immediate)
+        result = ::CZMQ::FFI.zsock_set_immediate(self_p, immediate)
+        result
+      end
+
+      # Set socket option `immediate`.
+      #
+      # This is the polymorphic version of #set_immediate.
+      def self.set_immediate(self_p, immediate)
+        raise DestroyedError unless self_p
+        immediate = Integer(immediate)
+        result = ::CZMQ::FFI.zsock_set_immediate(self_p, immediate)
+        result
+      end
+
+      # Set socket option `router_raw`.
+      def set_router_raw(router_raw)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        router_raw = Integer(router_raw)
+        result = ::CZMQ::FFI.zsock_set_router_raw(self_p, router_raw)
+        result
+      end
+
+      # Set socket option `router_raw`.
+      #
+      # This is the polymorphic version of #set_router_raw.
+      def self.set_router_raw(self_p, router_raw)
+        raise DestroyedError unless self_p
+        router_raw = Integer(router_raw)
+        result = ::CZMQ::FFI.zsock_set_router_raw(self_p, router_raw)
+        result
+      end
+
+      # Get socket option `ipv4only`.
+      def ipv4only()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_ipv4only(self_p)
+        result
+      end
+
+      # Get socket option `ipv4only`.
+      #
+      # This is the polymorphic version of #ipv4only.
+      def self.ipv4only(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_ipv4only(self_p)
+        result
+      end
+
+      # Set socket option `ipv4only`.
+      def set_ipv4only(ipv4only)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        ipv4only = Integer(ipv4only)
+        result = ::CZMQ::FFI.zsock_set_ipv4only(self_p, ipv4only)
+        result
+      end
+
+      # Set socket option `ipv4only`.
+      #
+      # This is the polymorphic version of #set_ipv4only.
+      def self.set_ipv4only(self_p, ipv4only)
+        raise DestroyedError unless self_p
+        ipv4only = Integer(ipv4only)
+        result = ::CZMQ::FFI.zsock_set_ipv4only(self_p, ipv4only)
+        result
+      end
+
+      # Set socket option `delay_attach_on_connect`.
+      def set_delay_attach_on_connect(delay_attach_on_connect)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        delay_attach_on_connect = Integer(delay_attach_on_connect)
+        result = ::CZMQ::FFI.zsock_set_delay_attach_on_connect(self_p, delay_attach_on_connect)
+        result
+      end
+
+      # Set socket option `delay_attach_on_connect`.
+      #
+      # This is the polymorphic version of #set_delay_attach_on_connect.
+      def self.set_delay_attach_on_connect(self_p, delay_attach_on_connect)
+        raise DestroyedError unless self_p
+        delay_attach_on_connect = Integer(delay_attach_on_connect)
+        result = ::CZMQ::FFI.zsock_set_delay_attach_on_connect(self_p, delay_attach_on_connect)
+        result
+      end
+
+      # Get socket option `type`.
+      def type()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_type(self_p)
+        result
+      end
+
+      # Get socket option `type`.
+      #
+      # This is the polymorphic version of #type.
+      def self.type(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_type(self_p)
+        result
+      end
+
+      # Get socket option `sndhwm`.
+      def sndhwm()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_sndhwm(self_p)
+        result
+      end
+
+      # Get socket option `sndhwm`.
+      #
+      # This is the polymorphic version of #sndhwm.
+      def self.sndhwm(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_sndhwm(self_p)
+        result
+      end
+
+      # Set socket option `sndhwm`.
+      def set_sndhwm(sndhwm)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        sndhwm = Integer(sndhwm)
+        result = ::CZMQ::FFI.zsock_set_sndhwm(self_p, sndhwm)
+        result
+      end
+
+      # Set socket option `sndhwm`.
+      #
+      # This is the polymorphic version of #set_sndhwm.
+      def self.set_sndhwm(self_p, sndhwm)
+        raise DestroyedError unless self_p
+        sndhwm = Integer(sndhwm)
+        result = ::CZMQ::FFI.zsock_set_sndhwm(self_p, sndhwm)
+        result
+      end
+
+      # Get socket option `rcvhwm`.
+      def rcvhwm()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_rcvhwm(self_p)
+        result
+      end
+
+      # Get socket option `rcvhwm`.
+      #
+      # This is the polymorphic version of #rcvhwm.
+      def self.rcvhwm(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_rcvhwm(self_p)
+        result
+      end
+
+      # Set socket option `rcvhwm`.
+      def set_rcvhwm(rcvhwm)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        rcvhwm = Integer(rcvhwm)
+        result = ::CZMQ::FFI.zsock_set_rcvhwm(self_p, rcvhwm)
+        result
+      end
+
+      # Set socket option `rcvhwm`.
+      #
+      # This is the polymorphic version of #set_rcvhwm.
+      def self.set_rcvhwm(self_p, rcvhwm)
+        raise DestroyedError unless self_p
+        rcvhwm = Integer(rcvhwm)
+        result = ::CZMQ::FFI.zsock_set_rcvhwm(self_p, rcvhwm)
+        result
+      end
+
+      # Get socket option `affinity`.
+      def affinity()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_affinity(self_p)
+        result
+      end
+
+      # Get socket option `affinity`.
+      #
+      # This is the polymorphic version of #affinity.
+      def self.affinity(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_affinity(self_p)
+        result
+      end
+
+      # Set socket option `affinity`.
+      def set_affinity(affinity)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_set_affinity(self_p, affinity)
+        result
+      end
+
+      # Set socket option `affinity`.
+      #
+      # This is the polymorphic version of #set_affinity.
+      def self.set_affinity(self_p, affinity)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_set_affinity(self_p, affinity)
+        result
+      end
+
+      # Set socket option `subscribe`.
+      def set_subscribe(subscribe)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        subscribe = String(subscribe)
+        result = ::CZMQ::FFI.zsock_set_subscribe(self_p, subscribe)
+        result
+      end
+
+      # Set socket option `subscribe`.
+      #
+      # This is the polymorphic version of #set_subscribe.
+      def self.set_subscribe(self_p, subscribe)
+        raise DestroyedError unless self_p
+        subscribe = String(subscribe)
+        result = ::CZMQ::FFI.zsock_set_subscribe(self_p, subscribe)
+        result
+      end
+
+      # Set socket option `unsubscribe`.
+      def set_unsubscribe(unsubscribe)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        unsubscribe = String(unsubscribe)
+        result = ::CZMQ::FFI.zsock_set_unsubscribe(self_p, unsubscribe)
+        result
+      end
+
+      # Set socket option `unsubscribe`.
+      #
+      # This is the polymorphic version of #set_unsubscribe.
+      def self.set_unsubscribe(self_p, unsubscribe)
+        raise DestroyedError unless self_p
+        unsubscribe = String(unsubscribe)
+        result = ::CZMQ::FFI.zsock_set_unsubscribe(self_p, unsubscribe)
+        result
+      end
+
+      # Get socket option `identity`.
+      def identity()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_identity(self_p)
+        result
+      end
+
+      # Get socket option `identity`.
+      #
+      # This is the polymorphic version of #identity.
+      def self.identity(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_identity(self_p)
+        result
+      end
+
+      # Set socket option `identity`.
+      def set_identity(identity)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        identity = String(identity)
+        result = ::CZMQ::FFI.zsock_set_identity(self_p, identity)
+        result
+      end
+
+      # Set socket option `identity`.
+      #
+      # This is the polymorphic version of #set_identity.
+      def self.set_identity(self_p, identity)
+        raise DestroyedError unless self_p
+        identity = String(identity)
+        result = ::CZMQ::FFI.zsock_set_identity(self_p, identity)
+        result
+      end
+
+      # Get socket option `rate`.
+      def rate()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_rate(self_p)
+        result
+      end
+
+      # Get socket option `rate`.
+      #
+      # This is the polymorphic version of #rate.
+      def self.rate(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_rate(self_p)
+        result
+      end
+
+      # Set socket option `rate`.
+      def set_rate(rate)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        rate = Integer(rate)
+        result = ::CZMQ::FFI.zsock_set_rate(self_p, rate)
+        result
+      end
+
+      # Set socket option `rate`.
+      #
+      # This is the polymorphic version of #set_rate.
+      def self.set_rate(self_p, rate)
+        raise DestroyedError unless self_p
+        rate = Integer(rate)
+        result = ::CZMQ::FFI.zsock_set_rate(self_p, rate)
+        result
+      end
+
+      # Get socket option `recovery_ivl`.
+      def recovery_ivl()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_recovery_ivl(self_p)
+        result
+      end
+
+      # Get socket option `recovery_ivl`.
+      #
+      # This is the polymorphic version of #recovery_ivl.
+      def self.recovery_ivl(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_recovery_ivl(self_p)
+        result
+      end
+
+      # Set socket option `recovery_ivl`.
+      def set_recovery_ivl(recovery_ivl)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        recovery_ivl = Integer(recovery_ivl)
+        result = ::CZMQ::FFI.zsock_set_recovery_ivl(self_p, recovery_ivl)
+        result
+      end
+
+      # Set socket option `recovery_ivl`.
+      #
+      # This is the polymorphic version of #set_recovery_ivl.
+      def self.set_recovery_ivl(self_p, recovery_ivl)
+        raise DestroyedError unless self_p
+        recovery_ivl = Integer(recovery_ivl)
+        result = ::CZMQ::FFI.zsock_set_recovery_ivl(self_p, recovery_ivl)
+        result
+      end
+
+      # Get socket option `sndbuf`.
+      def sndbuf()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_sndbuf(self_p)
+        result
+      end
+
+      # Get socket option `sndbuf`.
+      #
+      # This is the polymorphic version of #sndbuf.
+      def self.sndbuf(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_sndbuf(self_p)
+        result
+      end
+
+      # Set socket option `sndbuf`.
+      def set_sndbuf(sndbuf)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        sndbuf = Integer(sndbuf)
+        result = ::CZMQ::FFI.zsock_set_sndbuf(self_p, sndbuf)
+        result
+      end
+
+      # Set socket option `sndbuf`.
+      #
+      # This is the polymorphic version of #set_sndbuf.
+      def self.set_sndbuf(self_p, sndbuf)
+        raise DestroyedError unless self_p
+        sndbuf = Integer(sndbuf)
+        result = ::CZMQ::FFI.zsock_set_sndbuf(self_p, sndbuf)
+        result
+      end
+
+      # Get socket option `rcvbuf`.
+      def rcvbuf()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_rcvbuf(self_p)
+        result
+      end
+
+      # Get socket option `rcvbuf`.
+      #
+      # This is the polymorphic version of #rcvbuf.
+      def self.rcvbuf(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_rcvbuf(self_p)
+        result
+      end
+
+      # Set socket option `rcvbuf`.
+      def set_rcvbuf(rcvbuf)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        rcvbuf = Integer(rcvbuf)
+        result = ::CZMQ::FFI.zsock_set_rcvbuf(self_p, rcvbuf)
+        result
+      end
+
+      # Set socket option `rcvbuf`.
+      #
+      # This is the polymorphic version of #set_rcvbuf.
+      def self.set_rcvbuf(self_p, rcvbuf)
+        raise DestroyedError unless self_p
+        rcvbuf = Integer(rcvbuf)
+        result = ::CZMQ::FFI.zsock_set_rcvbuf(self_p, rcvbuf)
+        result
+      end
+
+      # Get socket option `linger`.
+      def linger()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_linger(self_p)
+        result
+      end
+
+      # Get socket option `linger`.
+      #
+      # This is the polymorphic version of #linger.
+      def self.linger(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_linger(self_p)
+        result
+      end
+
+      # Set socket option `linger`.
+      def set_linger(linger)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        linger = Integer(linger)
+        result = ::CZMQ::FFI.zsock_set_linger(self_p, linger)
+        result
+      end
+
+      # Set socket option `linger`.
+      #
+      # This is the polymorphic version of #set_linger.
+      def self.set_linger(self_p, linger)
+        raise DestroyedError unless self_p
+        linger = Integer(linger)
+        result = ::CZMQ::FFI.zsock_set_linger(self_p, linger)
+        result
+      end
+
+      # Get socket option `reconnect_ivl`.
+      def reconnect_ivl()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_reconnect_ivl(self_p)
+        result
+      end
+
+      # Get socket option `reconnect_ivl`.
+      #
+      # This is the polymorphic version of #reconnect_ivl.
+      def self.reconnect_ivl(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_reconnect_ivl(self_p)
+        result
+      end
+
+      # Set socket option `reconnect_ivl`.
+      def set_reconnect_ivl(reconnect_ivl)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        reconnect_ivl = Integer(reconnect_ivl)
+        result = ::CZMQ::FFI.zsock_set_reconnect_ivl(self_p, reconnect_ivl)
+        result
+      end
+
+      # Set socket option `reconnect_ivl`.
+      #
+      # This is the polymorphic version of #set_reconnect_ivl.
+      def self.set_reconnect_ivl(self_p, reconnect_ivl)
+        raise DestroyedError unless self_p
+        reconnect_ivl = Integer(reconnect_ivl)
+        result = ::CZMQ::FFI.zsock_set_reconnect_ivl(self_p, reconnect_ivl)
+        result
+      end
+
+      # Get socket option `reconnect_ivl_max`.
+      def reconnect_ivl_max()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_reconnect_ivl_max(self_p)
+        result
+      end
+
+      # Get socket option `reconnect_ivl_max`.
+      #
+      # This is the polymorphic version of #reconnect_ivl_max.
+      def self.reconnect_ivl_max(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_reconnect_ivl_max(self_p)
+        result
+      end
+
+      # Set socket option `reconnect_ivl_max`.
+      def set_reconnect_ivl_max(reconnect_ivl_max)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        reconnect_ivl_max = Integer(reconnect_ivl_max)
+        result = ::CZMQ::FFI.zsock_set_reconnect_ivl_max(self_p, reconnect_ivl_max)
+        result
+      end
+
+      # Set socket option `reconnect_ivl_max`.
+      #
+      # This is the polymorphic version of #set_reconnect_ivl_max.
+      def self.set_reconnect_ivl_max(self_p, reconnect_ivl_max)
+        raise DestroyedError unless self_p
+        reconnect_ivl_max = Integer(reconnect_ivl_max)
+        result = ::CZMQ::FFI.zsock_set_reconnect_ivl_max(self_p, reconnect_ivl_max)
+        result
+      end
+
+      # Get socket option `backlog`.
+      def backlog()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_backlog(self_p)
+        result
+      end
+
+      # Get socket option `backlog`.
+      #
+      # This is the polymorphic version of #backlog.
+      def self.backlog(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_backlog(self_p)
+        result
+      end
+
+      # Set socket option `backlog`.
+      def set_backlog(backlog)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        backlog = Integer(backlog)
+        result = ::CZMQ::FFI.zsock_set_backlog(self_p, backlog)
+        result
+      end
+
+      # Set socket option `backlog`.
+      #
+      # This is the polymorphic version of #set_backlog.
+      def self.set_backlog(self_p, backlog)
+        raise DestroyedError unless self_p
+        backlog = Integer(backlog)
+        result = ::CZMQ::FFI.zsock_set_backlog(self_p, backlog)
+        result
+      end
+
+      # Get socket option `maxmsgsize`.
+      def maxmsgsize()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_maxmsgsize(self_p)
+        result
+      end
+
+      # Get socket option `maxmsgsize`.
+      #
+      # This is the polymorphic version of #maxmsgsize.
+      def self.maxmsgsize(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_maxmsgsize(self_p)
+        result
+      end
+
+      # Set socket option `maxmsgsize`.
+      def set_maxmsgsize(maxmsgsize)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_set_maxmsgsize(self_p, maxmsgsize)
+        result
+      end
+
+      # Set socket option `maxmsgsize`.
+      #
+      # This is the polymorphic version of #set_maxmsgsize.
+      def self.set_maxmsgsize(self_p, maxmsgsize)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_set_maxmsgsize(self_p, maxmsgsize)
+        result
+      end
+
+      # Get socket option `multicast_hops`.
+      def multicast_hops()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_multicast_hops(self_p)
+        result
+      end
+
+      # Get socket option `multicast_hops`.
+      #
+      # This is the polymorphic version of #multicast_hops.
+      def self.multicast_hops(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_multicast_hops(self_p)
+        result
+      end
+
+      # Set socket option `multicast_hops`.
+      def set_multicast_hops(multicast_hops)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        multicast_hops = Integer(multicast_hops)
+        result = ::CZMQ::FFI.zsock_set_multicast_hops(self_p, multicast_hops)
+        result
+      end
+
+      # Set socket option `multicast_hops`.
+      #
+      # This is the polymorphic version of #set_multicast_hops.
+      def self.set_multicast_hops(self_p, multicast_hops)
+        raise DestroyedError unless self_p
+        multicast_hops = Integer(multicast_hops)
+        result = ::CZMQ::FFI.zsock_set_multicast_hops(self_p, multicast_hops)
+        result
+      end
+
+      # Get socket option `rcvtimeo`.
+      def rcvtimeo()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_rcvtimeo(self_p)
+        result
+      end
+
+      # Get socket option `rcvtimeo`.
+      #
+      # This is the polymorphic version of #rcvtimeo.
+      def self.rcvtimeo(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_rcvtimeo(self_p)
+        result
+      end
+
+      # Set socket option `rcvtimeo`.
+      def set_rcvtimeo(rcvtimeo)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        rcvtimeo = Integer(rcvtimeo)
+        result = ::CZMQ::FFI.zsock_set_rcvtimeo(self_p, rcvtimeo)
+        result
+      end
+
+      # Set socket option `rcvtimeo`.
+      #
+      # This is the polymorphic version of #set_rcvtimeo.
+      def self.set_rcvtimeo(self_p, rcvtimeo)
+        raise DestroyedError unless self_p
+        rcvtimeo = Integer(rcvtimeo)
+        result = ::CZMQ::FFI.zsock_set_rcvtimeo(self_p, rcvtimeo)
+        result
+      end
+
+      # Get socket option `sndtimeo`.
+      def sndtimeo()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_sndtimeo(self_p)
+        result
+      end
+
+      # Get socket option `sndtimeo`.
+      #
+      # This is the polymorphic version of #sndtimeo.
+      def self.sndtimeo(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_sndtimeo(self_p)
+        result
+      end
+
+      # Set socket option `sndtimeo`.
+      def set_sndtimeo(sndtimeo)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        sndtimeo = Integer(sndtimeo)
+        result = ::CZMQ::FFI.zsock_set_sndtimeo(self_p, sndtimeo)
+        result
+      end
+
+      # Set socket option `sndtimeo`.
+      #
+      # This is the polymorphic version of #set_sndtimeo.
+      def self.set_sndtimeo(self_p, sndtimeo)
+        raise DestroyedError unless self_p
+        sndtimeo = Integer(sndtimeo)
+        result = ::CZMQ::FFI.zsock_set_sndtimeo(self_p, sndtimeo)
+        result
+      end
+
+      # Set socket option `xpub_verbose`.
+      def set_xpub_verbose(xpub_verbose)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        xpub_verbose = Integer(xpub_verbose)
+        result = ::CZMQ::FFI.zsock_set_xpub_verbose(self_p, xpub_verbose)
+        result
+      end
+
+      # Set socket option `xpub_verbose`.
+      #
+      # This is the polymorphic version of #set_xpub_verbose.
+      def self.set_xpub_verbose(self_p, xpub_verbose)
+        raise DestroyedError unless self_p
+        xpub_verbose = Integer(xpub_verbose)
+        result = ::CZMQ::FFI.zsock_set_xpub_verbose(self_p, xpub_verbose)
+        result
+      end
+
+      # Get socket option `tcp_keepalive`.
+      def tcp_keepalive()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_tcp_keepalive(self_p)
+        result
+      end
+
+      # Get socket option `tcp_keepalive`.
+      #
+      # This is the polymorphic version of #tcp_keepalive.
+      def self.tcp_keepalive(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_tcp_keepalive(self_p)
+        result
+      end
+
+      # Set socket option `tcp_keepalive`.
+      def set_tcp_keepalive(tcp_keepalive)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        tcp_keepalive = Integer(tcp_keepalive)
+        result = ::CZMQ::FFI.zsock_set_tcp_keepalive(self_p, tcp_keepalive)
+        result
+      end
+
+      # Set socket option `tcp_keepalive`.
+      #
+      # This is the polymorphic version of #set_tcp_keepalive.
+      def self.set_tcp_keepalive(self_p, tcp_keepalive)
+        raise DestroyedError unless self_p
+        tcp_keepalive = Integer(tcp_keepalive)
+        result = ::CZMQ::FFI.zsock_set_tcp_keepalive(self_p, tcp_keepalive)
+        result
+      end
+
+      # Get socket option `tcp_keepalive_idle`.
+      def tcp_keepalive_idle()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_tcp_keepalive_idle(self_p)
+        result
+      end
+
+      # Get socket option `tcp_keepalive_idle`.
+      #
+      # This is the polymorphic version of #tcp_keepalive_idle.
+      def self.tcp_keepalive_idle(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_tcp_keepalive_idle(self_p)
+        result
+      end
+
+      # Set socket option `tcp_keepalive_idle`.
+      def set_tcp_keepalive_idle(tcp_keepalive_idle)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        tcp_keepalive_idle = Integer(tcp_keepalive_idle)
+        result = ::CZMQ::FFI.zsock_set_tcp_keepalive_idle(self_p, tcp_keepalive_idle)
+        result
+      end
+
+      # Set socket option `tcp_keepalive_idle`.
+      #
+      # This is the polymorphic version of #set_tcp_keepalive_idle.
+      def self.set_tcp_keepalive_idle(self_p, tcp_keepalive_idle)
+        raise DestroyedError unless self_p
+        tcp_keepalive_idle = Integer(tcp_keepalive_idle)
+        result = ::CZMQ::FFI.zsock_set_tcp_keepalive_idle(self_p, tcp_keepalive_idle)
+        result
+      end
+
+      # Get socket option `tcp_keepalive_cnt`.
+      def tcp_keepalive_cnt()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_tcp_keepalive_cnt(self_p)
+        result
+      end
+
+      # Get socket option `tcp_keepalive_cnt`.
+      #
+      # This is the polymorphic version of #tcp_keepalive_cnt.
+      def self.tcp_keepalive_cnt(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_tcp_keepalive_cnt(self_p)
+        result
+      end
+
+      # Set socket option `tcp_keepalive_cnt`.
+      def set_tcp_keepalive_cnt(tcp_keepalive_cnt)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        tcp_keepalive_cnt = Integer(tcp_keepalive_cnt)
+        result = ::CZMQ::FFI.zsock_set_tcp_keepalive_cnt(self_p, tcp_keepalive_cnt)
+        result
+      end
+
+      # Set socket option `tcp_keepalive_cnt`.
+      #
+      # This is the polymorphic version of #set_tcp_keepalive_cnt.
+      def self.set_tcp_keepalive_cnt(self_p, tcp_keepalive_cnt)
+        raise DestroyedError unless self_p
+        tcp_keepalive_cnt = Integer(tcp_keepalive_cnt)
+        result = ::CZMQ::FFI.zsock_set_tcp_keepalive_cnt(self_p, tcp_keepalive_cnt)
+        result
+      end
+
+      # Get socket option `tcp_keepalive_intvl`.
+      def tcp_keepalive_intvl()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_tcp_keepalive_intvl(self_p)
+        result
+      end
+
+      # Get socket option `tcp_keepalive_intvl`.
+      #
+      # This is the polymorphic version of #tcp_keepalive_intvl.
+      def self.tcp_keepalive_intvl(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_tcp_keepalive_intvl(self_p)
+        result
+      end
+
+      # Set socket option `tcp_keepalive_intvl`.
+      def set_tcp_keepalive_intvl(tcp_keepalive_intvl)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        tcp_keepalive_intvl = Integer(tcp_keepalive_intvl)
+        result = ::CZMQ::FFI.zsock_set_tcp_keepalive_intvl(self_p, tcp_keepalive_intvl)
+        result
+      end
+
+      # Set socket option `tcp_keepalive_intvl`.
+      #
+      # This is the polymorphic version of #set_tcp_keepalive_intvl.
+      def self.set_tcp_keepalive_intvl(self_p, tcp_keepalive_intvl)
+        raise DestroyedError unless self_p
+        tcp_keepalive_intvl = Integer(tcp_keepalive_intvl)
+        result = ::CZMQ::FFI.zsock_set_tcp_keepalive_intvl(self_p, tcp_keepalive_intvl)
+        result
+      end
+
+      # Get socket option `tcp_accept_filter`.
+      def tcp_accept_filter()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_tcp_accept_filter(self_p)
+        result
+      end
+
+      # Get socket option `tcp_accept_filter`.
+      #
+      # This is the polymorphic version of #tcp_accept_filter.
+      def self.tcp_accept_filter(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_tcp_accept_filter(self_p)
+        result
+      end
+
+      # Set socket option `tcp_accept_filter`.
+      def set_tcp_accept_filter(tcp_accept_filter)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        tcp_accept_filter = String(tcp_accept_filter)
+        result = ::CZMQ::FFI.zsock_set_tcp_accept_filter(self_p, tcp_accept_filter)
+        result
+      end
+
+      # Set socket option `tcp_accept_filter`.
+      #
+      # This is the polymorphic version of #set_tcp_accept_filter.
+      def self.set_tcp_accept_filter(self_p, tcp_accept_filter)
+        raise DestroyedError unless self_p
+        tcp_accept_filter = String(tcp_accept_filter)
+        result = ::CZMQ::FFI.zsock_set_tcp_accept_filter(self_p, tcp_accept_filter)
+        result
+      end
+
+      # Get socket option `rcvmore`.
+      def rcvmore()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_rcvmore(self_p)
+        result
+      end
+
+      # Get socket option `rcvmore`.
+      #
+      # This is the polymorphic version of #rcvmore.
+      def self.rcvmore(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_rcvmore(self_p)
+        result
+      end
+
+      # Get socket option `fd`.
+      def fd()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_fd(self_p)
+        result
+      end
+
+      # Get socket option `fd`.
+      #
+      # This is the polymorphic version of #fd.
+      def self.fd(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_fd(self_p)
+        result
+      end
+
+      # Get socket option `events`.
+      def events()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_events(self_p)
+        result
+      end
+
+      # Get socket option `events`.
+      #
+      # This is the polymorphic version of #events.
+      def self.events(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_events(self_p)
+        result
+      end
+
+      # Get socket option `last_endpoint`.
+      def last_endpoint()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_last_endpoint(self_p)
+        result
+      end
+
+      # Get socket option `last_endpoint`.
+      #
+      # This is the polymorphic version of #last_endpoint.
+      def self.last_endpoint(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_last_endpoint(self_p)
         result
       end
 
       # Probe the supplied object, and report if it looks like a zsock_t.
       # Takes a polymorphic socket reference.                            
-      def self.is self_
-        result = ::CZMQ::FFI.zsock_is self_
+      def self.is(self_)
+        result = ::CZMQ::FFI.zsock_is(self_)
         result
       end
 
@@ -466,19 +2307,1651 @@ module CZMQ
       # the underlying libzmq socket handle; else if it looks like a file        
       # descriptor, return NULL; else if it looks like a libzmq socket handle,   
       # return the supplied value. Takes a polymorphic socket reference.         
-      def self.resolve self_
-        result = ::CZMQ::FFI.zsock_resolve self_
+      def self.resolve(self_)
+        result = ::CZMQ::FFI.zsock_resolve(self_)
         result
       end
 
       # Self test of this class
-      def self.test verbose
+      def self.test(verbose)
         verbose = !(0==verbose||!verbose) # boolean
-        result = ::CZMQ::FFI.zsock_test verbose
+        result = ::CZMQ::FFI.zsock_test(verbose)
+        result
+      end
+
+      # 
+      def tos()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_tos(self_p)
+        result
+      end
+
+      # 
+      #
+      # This is the polymorphic version of #tos.
+      def self.tos(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_tos(self_p)
+        result
+      end
+
+      # Set socket option `tos`.
+      def set_tos(tos)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        tos = Integer(tos)
+        result = ::CZMQ::FFI.zsock_set_tos(self_p, tos)
+        result
+      end
+
+      # Set socket option `tos`.
+      #
+      # This is the polymorphic version of #set_tos.
+      def self.set_tos(self_p, tos)
+        raise DestroyedError unless self_p
+        tos = Integer(tos)
+        result = ::CZMQ::FFI.zsock_set_tos(self_p, tos)
+        result
+      end
+
+      # Set socket option `router_handover`.
+      def set_router_handover(router_handover)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        router_handover = Integer(router_handover)
+        result = ::CZMQ::FFI.zsock_set_router_handover(self_p, router_handover)
+        result
+      end
+
+      # Set socket option `router_handover`.
+      #
+      # This is the polymorphic version of #set_router_handover.
+      def self.set_router_handover(self_p, router_handover)
+        raise DestroyedError unless self_p
+        router_handover = Integer(router_handover)
+        result = ::CZMQ::FFI.zsock_set_router_handover(self_p, router_handover)
+        result
+      end
+
+      # Set socket option `router_mandatory`.
+      def set_router_mandatory(router_mandatory)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        router_mandatory = Integer(router_mandatory)
+        result = ::CZMQ::FFI.zsock_set_router_mandatory(self_p, router_mandatory)
+        result
+      end
+
+      # Set socket option `router_mandatory`.
+      #
+      # This is the polymorphic version of #set_router_mandatory.
+      def self.set_router_mandatory(self_p, router_mandatory)
+        raise DestroyedError unless self_p
+        router_mandatory = Integer(router_mandatory)
+        result = ::CZMQ::FFI.zsock_set_router_mandatory(self_p, router_mandatory)
+        result
+      end
+
+      # Set socket option `probe_router`.
+      def set_probe_router(probe_router)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        probe_router = Integer(probe_router)
+        result = ::CZMQ::FFI.zsock_set_probe_router(self_p, probe_router)
+        result
+      end
+
+      # Set socket option `probe_router`.
+      #
+      # This is the polymorphic version of #set_probe_router.
+      def self.set_probe_router(self_p, probe_router)
+        raise DestroyedError unless self_p
+        probe_router = Integer(probe_router)
+        result = ::CZMQ::FFI.zsock_set_probe_router(self_p, probe_router)
+        result
+      end
+
+      # Set socket option `req_relaxed`.
+      def set_req_relaxed(req_relaxed)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        req_relaxed = Integer(req_relaxed)
+        result = ::CZMQ::FFI.zsock_set_req_relaxed(self_p, req_relaxed)
+        result
+      end
+
+      # Set socket option `req_relaxed`.
+      #
+      # This is the polymorphic version of #set_req_relaxed.
+      def self.set_req_relaxed(self_p, req_relaxed)
+        raise DestroyedError unless self_p
+        req_relaxed = Integer(req_relaxed)
+        result = ::CZMQ::FFI.zsock_set_req_relaxed(self_p, req_relaxed)
+        result
+      end
+
+      # Set socket option `req_correlate`.
+      def set_req_correlate(req_correlate)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        req_correlate = Integer(req_correlate)
+        result = ::CZMQ::FFI.zsock_set_req_correlate(self_p, req_correlate)
+        result
+      end
+
+      # Set socket option `req_correlate`.
+      #
+      # This is the polymorphic version of #set_req_correlate.
+      def self.set_req_correlate(self_p, req_correlate)
+        raise DestroyedError unless self_p
+        req_correlate = Integer(req_correlate)
+        result = ::CZMQ::FFI.zsock_set_req_correlate(self_p, req_correlate)
+        result
+      end
+
+      # Set socket option `conflate`.
+      def set_conflate(conflate)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        conflate = Integer(conflate)
+        result = ::CZMQ::FFI.zsock_set_conflate(self_p, conflate)
+        result
+      end
+
+      # Set socket option `conflate`.
+      #
+      # This is the polymorphic version of #set_conflate.
+      def self.set_conflate(self_p, conflate)
+        raise DestroyedError unless self_p
+        conflate = Integer(conflate)
+        result = ::CZMQ::FFI.zsock_set_conflate(self_p, conflate)
+        result
+      end
+
+      # Get socket option `zap_domain`.
+      def zap_domain()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_zap_domain(self_p)
+        result
+      end
+
+      # Get socket option `zap_domain`.
+      #
+      # This is the polymorphic version of #zap_domain.
+      def self.zap_domain(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_zap_domain(self_p)
+        result
+      end
+
+      # Set socket option `zap_domain`.
+      def set_zap_domain(zap_domain)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        zap_domain = String(zap_domain)
+        result = ::CZMQ::FFI.zsock_set_zap_domain(self_p, zap_domain)
+        result
+      end
+
+      # Set socket option `zap_domain`.
+      #
+      # This is the polymorphic version of #set_zap_domain.
+      def self.set_zap_domain(self_p, zap_domain)
+        raise DestroyedError unless self_p
+        zap_domain = String(zap_domain)
+        result = ::CZMQ::FFI.zsock_set_zap_domain(self_p, zap_domain)
+        result
+      end
+
+      # Get socket option `mechanism`.
+      def mechanism()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_mechanism(self_p)
+        result
+      end
+
+      # Get socket option `mechanism`.
+      #
+      # This is the polymorphic version of #mechanism.
+      def self.mechanism(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_mechanism(self_p)
+        result
+      end
+
+      # Get socket option `plain_server`.
+      def plain_server()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_plain_server(self_p)
+        result
+      end
+
+      # Get socket option `plain_server`.
+      #
+      # This is the polymorphic version of #plain_server.
+      def self.plain_server(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_plain_server(self_p)
+        result
+      end
+
+      # Set socket option `plain_server`.
+      def set_plain_server(plain_server)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        plain_server = Integer(plain_server)
+        result = ::CZMQ::FFI.zsock_set_plain_server(self_p, plain_server)
+        result
+      end
+
+      # Set socket option `plain_server`.
+      #
+      # This is the polymorphic version of #set_plain_server.
+      def self.set_plain_server(self_p, plain_server)
+        raise DestroyedError unless self_p
+        plain_server = Integer(plain_server)
+        result = ::CZMQ::FFI.zsock_set_plain_server(self_p, plain_server)
+        result
+      end
+
+      # Get socket option `plain_username`.
+      def plain_username()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_plain_username(self_p)
+        result
+      end
+
+      # Get socket option `plain_username`.
+      #
+      # This is the polymorphic version of #plain_username.
+      def self.plain_username(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_plain_username(self_p)
+        result
+      end
+
+      # Set socket option `plain_username`.
+      def set_plain_username(plain_username)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        plain_username = String(plain_username)
+        result = ::CZMQ::FFI.zsock_set_plain_username(self_p, plain_username)
+        result
+      end
+
+      # Set socket option `plain_username`.
+      #
+      # This is the polymorphic version of #set_plain_username.
+      def self.set_plain_username(self_p, plain_username)
+        raise DestroyedError unless self_p
+        plain_username = String(plain_username)
+        result = ::CZMQ::FFI.zsock_set_plain_username(self_p, plain_username)
+        result
+      end
+
+      # Get socket option `plain_password`.
+      def plain_password()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_plain_password(self_p)
+        result
+      end
+
+      # Get socket option `plain_password`.
+      #
+      # This is the polymorphic version of #plain_password.
+      def self.plain_password(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_plain_password(self_p)
+        result
+      end
+
+      # Set socket option `plain_password`.
+      def set_plain_password(plain_password)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        plain_password = String(plain_password)
+        result = ::CZMQ::FFI.zsock_set_plain_password(self_p, plain_password)
+        result
+      end
+
+      # Set socket option `plain_password`.
+      #
+      # This is the polymorphic version of #set_plain_password.
+      def self.set_plain_password(self_p, plain_password)
+        raise DestroyedError unless self_p
+        plain_password = String(plain_password)
+        result = ::CZMQ::FFI.zsock_set_plain_password(self_p, plain_password)
+        result
+      end
+
+      # Get socket option `curve_server`.
+      def curve_server()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_curve_server(self_p)
+        result
+      end
+
+      # Get socket option `curve_server`.
+      #
+      # This is the polymorphic version of #curve_server.
+      def self.curve_server(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_curve_server(self_p)
+        result
+      end
+
+      # Set socket option `curve_server`.
+      def set_curve_server(curve_server)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        curve_server = Integer(curve_server)
+        result = ::CZMQ::FFI.zsock_set_curve_server(self_p, curve_server)
+        result
+      end
+
+      # Set socket option `curve_server`.
+      #
+      # This is the polymorphic version of #set_curve_server.
+      def self.set_curve_server(self_p, curve_server)
+        raise DestroyedError unless self_p
+        curve_server = Integer(curve_server)
+        result = ::CZMQ::FFI.zsock_set_curve_server(self_p, curve_server)
+        result
+      end
+
+      # Get socket option `curve_publickey`.
+      def curve_publickey()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_curve_publickey(self_p)
+        result
+      end
+
+      # Get socket option `curve_publickey`.
+      #
+      # This is the polymorphic version of #curve_publickey.
+      def self.curve_publickey(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_curve_publickey(self_p)
+        result
+      end
+
+      # Set socket option `curve_publickey`.
+      def set_curve_publickey(curve_publickey)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_set_curve_publickey(self_p, curve_publickey)
+        result
+      end
+
+      # Set socket option `curve_publickey`.
+      #
+      # This is the polymorphic version of #set_curve_publickey.
+      def self.set_curve_publickey(self_p, curve_publickey)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_set_curve_publickey(self_p, curve_publickey)
+        result
+      end
+
+      # Get socket option `curve_secretkey`.
+      def curve_secretkey()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_curve_secretkey(self_p)
+        result
+      end
+
+      # Get socket option `curve_secretkey`.
+      #
+      # This is the polymorphic version of #curve_secretkey.
+      def self.curve_secretkey(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_curve_secretkey(self_p)
+        result
+      end
+
+      # Set socket option `curve_secretkey`.
+      def set_curve_secretkey(curve_secretkey)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_set_curve_secretkey(self_p, curve_secretkey)
+        result
+      end
+
+      # Set socket option `curve_secretkey`.
+      #
+      # This is the polymorphic version of #set_curve_secretkey.
+      def self.set_curve_secretkey(self_p, curve_secretkey)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_set_curve_secretkey(self_p, curve_secretkey)
+        result
+      end
+
+      # Get socket option `curve_serverkey`.
+      def curve_serverkey()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_curve_serverkey(self_p)
+        result
+      end
+
+      # Get socket option `curve_serverkey`.
+      #
+      # This is the polymorphic version of #curve_serverkey.
+      def self.curve_serverkey(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_curve_serverkey(self_p)
+        result
+      end
+
+      # Set socket option `curve_serverkey`.
+      def set_curve_serverkey(curve_serverkey)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_set_curve_serverkey(self_p, curve_serverkey)
+        result
+      end
+
+      # Set socket option `curve_serverkey`.
+      #
+      # This is the polymorphic version of #set_curve_serverkey.
+      def self.set_curve_serverkey(self_p, curve_serverkey)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_set_curve_serverkey(self_p, curve_serverkey)
+        result
+      end
+
+      # Get socket option `gssapi_server`.
+      def gssapi_server()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_gssapi_server(self_p)
+        result
+      end
+
+      # Get socket option `gssapi_server`.
+      #
+      # This is the polymorphic version of #gssapi_server.
+      def self.gssapi_server(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_gssapi_server(self_p)
+        result
+      end
+
+      # Set socket option `gssapi_server`.
+      def set_gssapi_server(gssapi_server)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        gssapi_server = Integer(gssapi_server)
+        result = ::CZMQ::FFI.zsock_set_gssapi_server(self_p, gssapi_server)
+        result
+      end
+
+      # Set socket option `gssapi_server`.
+      #
+      # This is the polymorphic version of #set_gssapi_server.
+      def self.set_gssapi_server(self_p, gssapi_server)
+        raise DestroyedError unless self_p
+        gssapi_server = Integer(gssapi_server)
+        result = ::CZMQ::FFI.zsock_set_gssapi_server(self_p, gssapi_server)
+        result
+      end
+
+      # Get socket option `gssapi_plaintext`.
+      def gssapi_plaintext()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_gssapi_plaintext(self_p)
+        result
+      end
+
+      # Get socket option `gssapi_plaintext`.
+      #
+      # This is the polymorphic version of #gssapi_plaintext.
+      def self.gssapi_plaintext(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_gssapi_plaintext(self_p)
+        result
+      end
+
+      # Set socket option `gssapi_plaintext`.
+      def set_gssapi_plaintext(gssapi_plaintext)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        gssapi_plaintext = Integer(gssapi_plaintext)
+        result = ::CZMQ::FFI.zsock_set_gssapi_plaintext(self_p, gssapi_plaintext)
+        result
+      end
+
+      # Set socket option `gssapi_plaintext`.
+      #
+      # This is the polymorphic version of #set_gssapi_plaintext.
+      def self.set_gssapi_plaintext(self_p, gssapi_plaintext)
+        raise DestroyedError unless self_p
+        gssapi_plaintext = Integer(gssapi_plaintext)
+        result = ::CZMQ::FFI.zsock_set_gssapi_plaintext(self_p, gssapi_plaintext)
+        result
+      end
+
+      # Get socket option `gssapi_principal`.
+      def gssapi_principal()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_gssapi_principal(self_p)
+        result
+      end
+
+      # Get socket option `gssapi_principal`.
+      #
+      # This is the polymorphic version of #gssapi_principal.
+      def self.gssapi_principal(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_gssapi_principal(self_p)
+        result
+      end
+
+      # Set socket option `gssapi_principal`.
+      def set_gssapi_principal(gssapi_principal)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        gssapi_principal = String(gssapi_principal)
+        result = ::CZMQ::FFI.zsock_set_gssapi_principal(self_p, gssapi_principal)
+        result
+      end
+
+      # Set socket option `gssapi_principal`.
+      #
+      # This is the polymorphic version of #set_gssapi_principal.
+      def self.set_gssapi_principal(self_p, gssapi_principal)
+        raise DestroyedError unless self_p
+        gssapi_principal = String(gssapi_principal)
+        result = ::CZMQ::FFI.zsock_set_gssapi_principal(self_p, gssapi_principal)
+        result
+      end
+
+      # Get socket option `gssapi_service_principal`.
+      def gssapi_service_principal()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_gssapi_service_principal(self_p)
+        result
+      end
+
+      # Get socket option `gssapi_service_principal`.
+      #
+      # This is the polymorphic version of #gssapi_service_principal.
+      def self.gssapi_service_principal(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_gssapi_service_principal(self_p)
+        result
+      end
+
+      # Set socket option `gssapi_service_principal`.
+      def set_gssapi_service_principal(gssapi_service_principal)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        gssapi_service_principal = String(gssapi_service_principal)
+        result = ::CZMQ::FFI.zsock_set_gssapi_service_principal(self_p, gssapi_service_principal)
+        result
+      end
+
+      # Set socket option `gssapi_service_principal`.
+      #
+      # This is the polymorphic version of #set_gssapi_service_principal.
+      def self.set_gssapi_service_principal(self_p, gssapi_service_principal)
+        raise DestroyedError unless self_p
+        gssapi_service_principal = String(gssapi_service_principal)
+        result = ::CZMQ::FFI.zsock_set_gssapi_service_principal(self_p, gssapi_service_principal)
+        result
+      end
+
+      # Get socket option `ipv6`.
+      def ipv6()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_ipv6(self_p)
+        result
+      end
+
+      # Get socket option `ipv6`.
+      #
+      # This is the polymorphic version of #ipv6.
+      def self.ipv6(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_ipv6(self_p)
+        result
+      end
+
+      # Set socket option `ipv6`.
+      def set_ipv6(ipv6)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        ipv6 = Integer(ipv6)
+        result = ::CZMQ::FFI.zsock_set_ipv6(self_p, ipv6)
+        result
+      end
+
+      # Set socket option `ipv6`.
+      #
+      # This is the polymorphic version of #set_ipv6.
+      def self.set_ipv6(self_p, ipv6)
+        raise DestroyedError unless self_p
+        ipv6 = Integer(ipv6)
+        result = ::CZMQ::FFI.zsock_set_ipv6(self_p, ipv6)
+        result
+      end
+
+      # Get socket option `immediate`.
+      def immediate()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_immediate(self_p)
+        result
+      end
+
+      # Get socket option `immediate`.
+      #
+      # This is the polymorphic version of #immediate.
+      def self.immediate(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_immediate(self_p)
+        result
+      end
+
+      # Set socket option `immediate`.
+      def set_immediate(immediate)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        immediate = Integer(immediate)
+        result = ::CZMQ::FFI.zsock_set_immediate(self_p, immediate)
+        result
+      end
+
+      # Set socket option `immediate`.
+      #
+      # This is the polymorphic version of #set_immediate.
+      def self.set_immediate(self_p, immediate)
+        raise DestroyedError unless self_p
+        immediate = Integer(immediate)
+        result = ::CZMQ::FFI.zsock_set_immediate(self_p, immediate)
+        result
+      end
+
+      # Set socket option `router_raw`.
+      def set_router_raw(router_raw)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        router_raw = Integer(router_raw)
+        result = ::CZMQ::FFI.zsock_set_router_raw(self_p, router_raw)
+        result
+      end
+
+      # Set socket option `router_raw`.
+      #
+      # This is the polymorphic version of #set_router_raw.
+      def self.set_router_raw(self_p, router_raw)
+        raise DestroyedError unless self_p
+        router_raw = Integer(router_raw)
+        result = ::CZMQ::FFI.zsock_set_router_raw(self_p, router_raw)
+        result
+      end
+
+      # Get socket option `ipv4only`.
+      def ipv4only()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_ipv4only(self_p)
+        result
+      end
+
+      # Get socket option `ipv4only`.
+      #
+      # This is the polymorphic version of #ipv4only.
+      def self.ipv4only(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_ipv4only(self_p)
+        result
+      end
+
+      # Set socket option `ipv4only`.
+      def set_ipv4only(ipv4only)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        ipv4only = Integer(ipv4only)
+        result = ::CZMQ::FFI.zsock_set_ipv4only(self_p, ipv4only)
+        result
+      end
+
+      # Set socket option `ipv4only`.
+      #
+      # This is the polymorphic version of #set_ipv4only.
+      def self.set_ipv4only(self_p, ipv4only)
+        raise DestroyedError unless self_p
+        ipv4only = Integer(ipv4only)
+        result = ::CZMQ::FFI.zsock_set_ipv4only(self_p, ipv4only)
+        result
+      end
+
+      # Set socket option `delay_attach_on_connect`.
+      def set_delay_attach_on_connect(delay_attach_on_connect)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        delay_attach_on_connect = Integer(delay_attach_on_connect)
+        result = ::CZMQ::FFI.zsock_set_delay_attach_on_connect(self_p, delay_attach_on_connect)
+        result
+      end
+
+      # Set socket option `delay_attach_on_connect`.
+      #
+      # This is the polymorphic version of #set_delay_attach_on_connect.
+      def self.set_delay_attach_on_connect(self_p, delay_attach_on_connect)
+        raise DestroyedError unless self_p
+        delay_attach_on_connect = Integer(delay_attach_on_connect)
+        result = ::CZMQ::FFI.zsock_set_delay_attach_on_connect(self_p, delay_attach_on_connect)
+        result
+      end
+
+      # Get socket option `type`.
+      def type()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_type(self_p)
+        result
+      end
+
+      # Get socket option `type`.
+      #
+      # This is the polymorphic version of #type.
+      def self.type(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_type(self_p)
+        result
+      end
+
+      # Get socket option `sndhwm`.
+      def sndhwm()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_sndhwm(self_p)
+        result
+      end
+
+      # Get socket option `sndhwm`.
+      #
+      # This is the polymorphic version of #sndhwm.
+      def self.sndhwm(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_sndhwm(self_p)
+        result
+      end
+
+      # Set socket option `sndhwm`.
+      def set_sndhwm(sndhwm)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        sndhwm = Integer(sndhwm)
+        result = ::CZMQ::FFI.zsock_set_sndhwm(self_p, sndhwm)
+        result
+      end
+
+      # Set socket option `sndhwm`.
+      #
+      # This is the polymorphic version of #set_sndhwm.
+      def self.set_sndhwm(self_p, sndhwm)
+        raise DestroyedError unless self_p
+        sndhwm = Integer(sndhwm)
+        result = ::CZMQ::FFI.zsock_set_sndhwm(self_p, sndhwm)
+        result
+      end
+
+      # Get socket option `rcvhwm`.
+      def rcvhwm()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_rcvhwm(self_p)
+        result
+      end
+
+      # Get socket option `rcvhwm`.
+      #
+      # This is the polymorphic version of #rcvhwm.
+      def self.rcvhwm(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_rcvhwm(self_p)
+        result
+      end
+
+      # Set socket option `rcvhwm`.
+      def set_rcvhwm(rcvhwm)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        rcvhwm = Integer(rcvhwm)
+        result = ::CZMQ::FFI.zsock_set_rcvhwm(self_p, rcvhwm)
+        result
+      end
+
+      # Set socket option `rcvhwm`.
+      #
+      # This is the polymorphic version of #set_rcvhwm.
+      def self.set_rcvhwm(self_p, rcvhwm)
+        raise DestroyedError unless self_p
+        rcvhwm = Integer(rcvhwm)
+        result = ::CZMQ::FFI.zsock_set_rcvhwm(self_p, rcvhwm)
+        result
+      end
+
+      # Get socket option `affinity`.
+      def affinity()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_affinity(self_p)
+        result
+      end
+
+      # Get socket option `affinity`.
+      #
+      # This is the polymorphic version of #affinity.
+      def self.affinity(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_affinity(self_p)
+        result
+      end
+
+      # Set socket option `affinity`.
+      def set_affinity(affinity)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_set_affinity(self_p, affinity)
+        result
+      end
+
+      # Set socket option `affinity`.
+      #
+      # This is the polymorphic version of #set_affinity.
+      def self.set_affinity(self_p, affinity)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_set_affinity(self_p, affinity)
+        result
+      end
+
+      # Set socket option `subscribe`.
+      def set_subscribe(subscribe)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        subscribe = String(subscribe)
+        result = ::CZMQ::FFI.zsock_set_subscribe(self_p, subscribe)
+        result
+      end
+
+      # Set socket option `subscribe`.
+      #
+      # This is the polymorphic version of #set_subscribe.
+      def self.set_subscribe(self_p, subscribe)
+        raise DestroyedError unless self_p
+        subscribe = String(subscribe)
+        result = ::CZMQ::FFI.zsock_set_subscribe(self_p, subscribe)
+        result
+      end
+
+      # Set socket option `unsubscribe`.
+      def set_unsubscribe(unsubscribe)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        unsubscribe = String(unsubscribe)
+        result = ::CZMQ::FFI.zsock_set_unsubscribe(self_p, unsubscribe)
+        result
+      end
+
+      # Set socket option `unsubscribe`.
+      #
+      # This is the polymorphic version of #set_unsubscribe.
+      def self.set_unsubscribe(self_p, unsubscribe)
+        raise DestroyedError unless self_p
+        unsubscribe = String(unsubscribe)
+        result = ::CZMQ::FFI.zsock_set_unsubscribe(self_p, unsubscribe)
+        result
+      end
+
+      # Get socket option `identity`.
+      def identity()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_identity(self_p)
+        result
+      end
+
+      # Get socket option `identity`.
+      #
+      # This is the polymorphic version of #identity.
+      def self.identity(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_identity(self_p)
+        result
+      end
+
+      # Set socket option `identity`.
+      def set_identity(identity)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        identity = String(identity)
+        result = ::CZMQ::FFI.zsock_set_identity(self_p, identity)
+        result
+      end
+
+      # Set socket option `identity`.
+      #
+      # This is the polymorphic version of #set_identity.
+      def self.set_identity(self_p, identity)
+        raise DestroyedError unless self_p
+        identity = String(identity)
+        result = ::CZMQ::FFI.zsock_set_identity(self_p, identity)
+        result
+      end
+
+      # Get socket option `rate`.
+      def rate()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_rate(self_p)
+        result
+      end
+
+      # Get socket option `rate`.
+      #
+      # This is the polymorphic version of #rate.
+      def self.rate(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_rate(self_p)
+        result
+      end
+
+      # Set socket option `rate`.
+      def set_rate(rate)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        rate = Integer(rate)
+        result = ::CZMQ::FFI.zsock_set_rate(self_p, rate)
+        result
+      end
+
+      # Set socket option `rate`.
+      #
+      # This is the polymorphic version of #set_rate.
+      def self.set_rate(self_p, rate)
+        raise DestroyedError unless self_p
+        rate = Integer(rate)
+        result = ::CZMQ::FFI.zsock_set_rate(self_p, rate)
+        result
+      end
+
+      # Get socket option `recovery_ivl`.
+      def recovery_ivl()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_recovery_ivl(self_p)
+        result
+      end
+
+      # Get socket option `recovery_ivl`.
+      #
+      # This is the polymorphic version of #recovery_ivl.
+      def self.recovery_ivl(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_recovery_ivl(self_p)
+        result
+      end
+
+      # Set socket option `recovery_ivl`.
+      def set_recovery_ivl(recovery_ivl)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        recovery_ivl = Integer(recovery_ivl)
+        result = ::CZMQ::FFI.zsock_set_recovery_ivl(self_p, recovery_ivl)
+        result
+      end
+
+      # Set socket option `recovery_ivl`.
+      #
+      # This is the polymorphic version of #set_recovery_ivl.
+      def self.set_recovery_ivl(self_p, recovery_ivl)
+        raise DestroyedError unless self_p
+        recovery_ivl = Integer(recovery_ivl)
+        result = ::CZMQ::FFI.zsock_set_recovery_ivl(self_p, recovery_ivl)
+        result
+      end
+
+      # Get socket option `sndbuf`.
+      def sndbuf()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_sndbuf(self_p)
+        result
+      end
+
+      # Get socket option `sndbuf`.
+      #
+      # This is the polymorphic version of #sndbuf.
+      def self.sndbuf(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_sndbuf(self_p)
+        result
+      end
+
+      # Set socket option `sndbuf`.
+      def set_sndbuf(sndbuf)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        sndbuf = Integer(sndbuf)
+        result = ::CZMQ::FFI.zsock_set_sndbuf(self_p, sndbuf)
+        result
+      end
+
+      # Set socket option `sndbuf`.
+      #
+      # This is the polymorphic version of #set_sndbuf.
+      def self.set_sndbuf(self_p, sndbuf)
+        raise DestroyedError unless self_p
+        sndbuf = Integer(sndbuf)
+        result = ::CZMQ::FFI.zsock_set_sndbuf(self_p, sndbuf)
+        result
+      end
+
+      # Get socket option `rcvbuf`.
+      def rcvbuf()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_rcvbuf(self_p)
+        result
+      end
+
+      # Get socket option `rcvbuf`.
+      #
+      # This is the polymorphic version of #rcvbuf.
+      def self.rcvbuf(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_rcvbuf(self_p)
+        result
+      end
+
+      # Set socket option `rcvbuf`.
+      def set_rcvbuf(rcvbuf)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        rcvbuf = Integer(rcvbuf)
+        result = ::CZMQ::FFI.zsock_set_rcvbuf(self_p, rcvbuf)
+        result
+      end
+
+      # Set socket option `rcvbuf`.
+      #
+      # This is the polymorphic version of #set_rcvbuf.
+      def self.set_rcvbuf(self_p, rcvbuf)
+        raise DestroyedError unless self_p
+        rcvbuf = Integer(rcvbuf)
+        result = ::CZMQ::FFI.zsock_set_rcvbuf(self_p, rcvbuf)
+        result
+      end
+
+      # Get socket option `linger`.
+      def linger()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_linger(self_p)
+        result
+      end
+
+      # Get socket option `linger`.
+      #
+      # This is the polymorphic version of #linger.
+      def self.linger(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_linger(self_p)
+        result
+      end
+
+      # Set socket option `linger`.
+      def set_linger(linger)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        linger = Integer(linger)
+        result = ::CZMQ::FFI.zsock_set_linger(self_p, linger)
+        result
+      end
+
+      # Set socket option `linger`.
+      #
+      # This is the polymorphic version of #set_linger.
+      def self.set_linger(self_p, linger)
+        raise DestroyedError unless self_p
+        linger = Integer(linger)
+        result = ::CZMQ::FFI.zsock_set_linger(self_p, linger)
+        result
+      end
+
+      # Get socket option `reconnect_ivl`.
+      def reconnect_ivl()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_reconnect_ivl(self_p)
+        result
+      end
+
+      # Get socket option `reconnect_ivl`.
+      #
+      # This is the polymorphic version of #reconnect_ivl.
+      def self.reconnect_ivl(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_reconnect_ivl(self_p)
+        result
+      end
+
+      # Set socket option `reconnect_ivl`.
+      def set_reconnect_ivl(reconnect_ivl)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        reconnect_ivl = Integer(reconnect_ivl)
+        result = ::CZMQ::FFI.zsock_set_reconnect_ivl(self_p, reconnect_ivl)
+        result
+      end
+
+      # Set socket option `reconnect_ivl`.
+      #
+      # This is the polymorphic version of #set_reconnect_ivl.
+      def self.set_reconnect_ivl(self_p, reconnect_ivl)
+        raise DestroyedError unless self_p
+        reconnect_ivl = Integer(reconnect_ivl)
+        result = ::CZMQ::FFI.zsock_set_reconnect_ivl(self_p, reconnect_ivl)
+        result
+      end
+
+      # Get socket option `reconnect_ivl_max`.
+      def reconnect_ivl_max()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_reconnect_ivl_max(self_p)
+        result
+      end
+
+      # Get socket option `reconnect_ivl_max`.
+      #
+      # This is the polymorphic version of #reconnect_ivl_max.
+      def self.reconnect_ivl_max(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_reconnect_ivl_max(self_p)
+        result
+      end
+
+      # Set socket option `reconnect_ivl_max`.
+      def set_reconnect_ivl_max(reconnect_ivl_max)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        reconnect_ivl_max = Integer(reconnect_ivl_max)
+        result = ::CZMQ::FFI.zsock_set_reconnect_ivl_max(self_p, reconnect_ivl_max)
+        result
+      end
+
+      # Set socket option `reconnect_ivl_max`.
+      #
+      # This is the polymorphic version of #set_reconnect_ivl_max.
+      def self.set_reconnect_ivl_max(self_p, reconnect_ivl_max)
+        raise DestroyedError unless self_p
+        reconnect_ivl_max = Integer(reconnect_ivl_max)
+        result = ::CZMQ::FFI.zsock_set_reconnect_ivl_max(self_p, reconnect_ivl_max)
+        result
+      end
+
+      # Get socket option `backlog`.
+      def backlog()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_backlog(self_p)
+        result
+      end
+
+      # Get socket option `backlog`.
+      #
+      # This is the polymorphic version of #backlog.
+      def self.backlog(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_backlog(self_p)
+        result
+      end
+
+      # Set socket option `backlog`.
+      def set_backlog(backlog)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        backlog = Integer(backlog)
+        result = ::CZMQ::FFI.zsock_set_backlog(self_p, backlog)
+        result
+      end
+
+      # Set socket option `backlog`.
+      #
+      # This is the polymorphic version of #set_backlog.
+      def self.set_backlog(self_p, backlog)
+        raise DestroyedError unless self_p
+        backlog = Integer(backlog)
+        result = ::CZMQ::FFI.zsock_set_backlog(self_p, backlog)
+        result
+      end
+
+      # Get socket option `maxmsgsize`.
+      def maxmsgsize()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_maxmsgsize(self_p)
+        result
+      end
+
+      # Get socket option `maxmsgsize`.
+      #
+      # This is the polymorphic version of #maxmsgsize.
+      def self.maxmsgsize(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_maxmsgsize(self_p)
+        result
+      end
+
+      # Set socket option `maxmsgsize`.
+      def set_maxmsgsize(maxmsgsize)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_set_maxmsgsize(self_p, maxmsgsize)
+        result
+      end
+
+      # Set socket option `maxmsgsize`.
+      #
+      # This is the polymorphic version of #set_maxmsgsize.
+      def self.set_maxmsgsize(self_p, maxmsgsize)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_set_maxmsgsize(self_p, maxmsgsize)
+        result
+      end
+
+      # Get socket option `multicast_hops`.
+      def multicast_hops()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_multicast_hops(self_p)
+        result
+      end
+
+      # Get socket option `multicast_hops`.
+      #
+      # This is the polymorphic version of #multicast_hops.
+      def self.multicast_hops(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_multicast_hops(self_p)
+        result
+      end
+
+      # Set socket option `multicast_hops`.
+      def set_multicast_hops(multicast_hops)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        multicast_hops = Integer(multicast_hops)
+        result = ::CZMQ::FFI.zsock_set_multicast_hops(self_p, multicast_hops)
+        result
+      end
+
+      # Set socket option `multicast_hops`.
+      #
+      # This is the polymorphic version of #set_multicast_hops.
+      def self.set_multicast_hops(self_p, multicast_hops)
+        raise DestroyedError unless self_p
+        multicast_hops = Integer(multicast_hops)
+        result = ::CZMQ::FFI.zsock_set_multicast_hops(self_p, multicast_hops)
+        result
+      end
+
+      # Get socket option `rcvtimeo`.
+      def rcvtimeo()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_rcvtimeo(self_p)
+        result
+      end
+
+      # Get socket option `rcvtimeo`.
+      #
+      # This is the polymorphic version of #rcvtimeo.
+      def self.rcvtimeo(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_rcvtimeo(self_p)
+        result
+      end
+
+      # Set socket option `rcvtimeo`.
+      def set_rcvtimeo(rcvtimeo)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        rcvtimeo = Integer(rcvtimeo)
+        result = ::CZMQ::FFI.zsock_set_rcvtimeo(self_p, rcvtimeo)
+        result
+      end
+
+      # Set socket option `rcvtimeo`.
+      #
+      # This is the polymorphic version of #set_rcvtimeo.
+      def self.set_rcvtimeo(self_p, rcvtimeo)
+        raise DestroyedError unless self_p
+        rcvtimeo = Integer(rcvtimeo)
+        result = ::CZMQ::FFI.zsock_set_rcvtimeo(self_p, rcvtimeo)
+        result
+      end
+
+      # Get socket option `sndtimeo`.
+      def sndtimeo()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_sndtimeo(self_p)
+        result
+      end
+
+      # Get socket option `sndtimeo`.
+      #
+      # This is the polymorphic version of #sndtimeo.
+      def self.sndtimeo(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_sndtimeo(self_p)
+        result
+      end
+
+      # Set socket option `sndtimeo`.
+      def set_sndtimeo(sndtimeo)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        sndtimeo = Integer(sndtimeo)
+        result = ::CZMQ::FFI.zsock_set_sndtimeo(self_p, sndtimeo)
+        result
+      end
+
+      # Set socket option `sndtimeo`.
+      #
+      # This is the polymorphic version of #set_sndtimeo.
+      def self.set_sndtimeo(self_p, sndtimeo)
+        raise DestroyedError unless self_p
+        sndtimeo = Integer(sndtimeo)
+        result = ::CZMQ::FFI.zsock_set_sndtimeo(self_p, sndtimeo)
+        result
+      end
+
+      # Set socket option `xpub_verbose`.
+      def set_xpub_verbose(xpub_verbose)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        xpub_verbose = Integer(xpub_verbose)
+        result = ::CZMQ::FFI.zsock_set_xpub_verbose(self_p, xpub_verbose)
+        result
+      end
+
+      # Set socket option `xpub_verbose`.
+      #
+      # This is the polymorphic version of #set_xpub_verbose.
+      def self.set_xpub_verbose(self_p, xpub_verbose)
+        raise DestroyedError unless self_p
+        xpub_verbose = Integer(xpub_verbose)
+        result = ::CZMQ::FFI.zsock_set_xpub_verbose(self_p, xpub_verbose)
+        result
+      end
+
+      # Get socket option `tcp_keepalive`.
+      def tcp_keepalive()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_tcp_keepalive(self_p)
+        result
+      end
+
+      # Get socket option `tcp_keepalive`.
+      #
+      # This is the polymorphic version of #tcp_keepalive.
+      def self.tcp_keepalive(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_tcp_keepalive(self_p)
+        result
+      end
+
+      # Set socket option `tcp_keepalive`.
+      def set_tcp_keepalive(tcp_keepalive)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        tcp_keepalive = Integer(tcp_keepalive)
+        result = ::CZMQ::FFI.zsock_set_tcp_keepalive(self_p, tcp_keepalive)
+        result
+      end
+
+      # Set socket option `tcp_keepalive`.
+      #
+      # This is the polymorphic version of #set_tcp_keepalive.
+      def self.set_tcp_keepalive(self_p, tcp_keepalive)
+        raise DestroyedError unless self_p
+        tcp_keepalive = Integer(tcp_keepalive)
+        result = ::CZMQ::FFI.zsock_set_tcp_keepalive(self_p, tcp_keepalive)
+        result
+      end
+
+      # Get socket option `tcp_keepalive_idle`.
+      def tcp_keepalive_idle()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_tcp_keepalive_idle(self_p)
+        result
+      end
+
+      # Get socket option `tcp_keepalive_idle`.
+      #
+      # This is the polymorphic version of #tcp_keepalive_idle.
+      def self.tcp_keepalive_idle(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_tcp_keepalive_idle(self_p)
+        result
+      end
+
+      # Set socket option `tcp_keepalive_idle`.
+      def set_tcp_keepalive_idle(tcp_keepalive_idle)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        tcp_keepalive_idle = Integer(tcp_keepalive_idle)
+        result = ::CZMQ::FFI.zsock_set_tcp_keepalive_idle(self_p, tcp_keepalive_idle)
+        result
+      end
+
+      # Set socket option `tcp_keepalive_idle`.
+      #
+      # This is the polymorphic version of #set_tcp_keepalive_idle.
+      def self.set_tcp_keepalive_idle(self_p, tcp_keepalive_idle)
+        raise DestroyedError unless self_p
+        tcp_keepalive_idle = Integer(tcp_keepalive_idle)
+        result = ::CZMQ::FFI.zsock_set_tcp_keepalive_idle(self_p, tcp_keepalive_idle)
+        result
+      end
+
+      # Get socket option `tcp_keepalive_cnt`.
+      def tcp_keepalive_cnt()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_tcp_keepalive_cnt(self_p)
+        result
+      end
+
+      # Get socket option `tcp_keepalive_cnt`.
+      #
+      # This is the polymorphic version of #tcp_keepalive_cnt.
+      def self.tcp_keepalive_cnt(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_tcp_keepalive_cnt(self_p)
+        result
+      end
+
+      # Set socket option `tcp_keepalive_cnt`.
+      def set_tcp_keepalive_cnt(tcp_keepalive_cnt)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        tcp_keepalive_cnt = Integer(tcp_keepalive_cnt)
+        result = ::CZMQ::FFI.zsock_set_tcp_keepalive_cnt(self_p, tcp_keepalive_cnt)
+        result
+      end
+
+      # Set socket option `tcp_keepalive_cnt`.
+      #
+      # This is the polymorphic version of #set_tcp_keepalive_cnt.
+      def self.set_tcp_keepalive_cnt(self_p, tcp_keepalive_cnt)
+        raise DestroyedError unless self_p
+        tcp_keepalive_cnt = Integer(tcp_keepalive_cnt)
+        result = ::CZMQ::FFI.zsock_set_tcp_keepalive_cnt(self_p, tcp_keepalive_cnt)
+        result
+      end
+
+      # Get socket option `tcp_keepalive_intvl`.
+      def tcp_keepalive_intvl()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_tcp_keepalive_intvl(self_p)
+        result
+      end
+
+      # Get socket option `tcp_keepalive_intvl`.
+      #
+      # This is the polymorphic version of #tcp_keepalive_intvl.
+      def self.tcp_keepalive_intvl(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_tcp_keepalive_intvl(self_p)
+        result
+      end
+
+      # Set socket option `tcp_keepalive_intvl`.
+      def set_tcp_keepalive_intvl(tcp_keepalive_intvl)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        tcp_keepalive_intvl = Integer(tcp_keepalive_intvl)
+        result = ::CZMQ::FFI.zsock_set_tcp_keepalive_intvl(self_p, tcp_keepalive_intvl)
+        result
+      end
+
+      # Set socket option `tcp_keepalive_intvl`.
+      #
+      # This is the polymorphic version of #set_tcp_keepalive_intvl.
+      def self.set_tcp_keepalive_intvl(self_p, tcp_keepalive_intvl)
+        raise DestroyedError unless self_p
+        tcp_keepalive_intvl = Integer(tcp_keepalive_intvl)
+        result = ::CZMQ::FFI.zsock_set_tcp_keepalive_intvl(self_p, tcp_keepalive_intvl)
+        result
+      end
+
+      # Get socket option `tcp_accept_filter`.
+      def tcp_accept_filter()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_tcp_accept_filter(self_p)
+        result
+      end
+
+      # Get socket option `tcp_accept_filter`.
+      #
+      # This is the polymorphic version of #tcp_accept_filter.
+      def self.tcp_accept_filter(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_tcp_accept_filter(self_p)
+        result
+      end
+
+      # Set socket option `tcp_accept_filter`.
+      def set_tcp_accept_filter(tcp_accept_filter)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        tcp_accept_filter = String(tcp_accept_filter)
+        result = ::CZMQ::FFI.zsock_set_tcp_accept_filter(self_p, tcp_accept_filter)
+        result
+      end
+
+      # Set socket option `tcp_accept_filter`.
+      #
+      # This is the polymorphic version of #set_tcp_accept_filter.
+      def self.set_tcp_accept_filter(self_p, tcp_accept_filter)
+        raise DestroyedError unless self_p
+        tcp_accept_filter = String(tcp_accept_filter)
+        result = ::CZMQ::FFI.zsock_set_tcp_accept_filter(self_p, tcp_accept_filter)
+        result
+      end
+
+      # Get socket option `rcvmore`.
+      def rcvmore()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_rcvmore(self_p)
+        result
+      end
+
+      # Get socket option `rcvmore`.
+      #
+      # This is the polymorphic version of #rcvmore.
+      def self.rcvmore(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_rcvmore(self_p)
+        result
+      end
+
+      # Get socket option `fd`.
+      def fd()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_fd(self_p)
+        result
+      end
+
+      # Get socket option `fd`.
+      #
+      # This is the polymorphic version of #fd.
+      def self.fd(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_fd(self_p)
+        result
+      end
+
+      # Get socket option `events`.
+      def events()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_events(self_p)
+        result
+      end
+
+      # Get socket option `events`.
+      #
+      # This is the polymorphic version of #events.
+      def self.events(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_events(self_p)
+        result
+      end
+
+      # Get socket option `last_endpoint`.
+      def last_endpoint()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_last_endpoint(self_p)
+        result
+      end
+
+      # Get socket option `last_endpoint`.
+      #
+      # This is the polymorphic version of #last_endpoint.
+      def self.last_endpoint(self_p)
+        raise DestroyedError unless self_p
+        result = ::CZMQ::FFI.zsock_last_endpoint(self_p)
         result
       end
     end
-
   end
 end
 
