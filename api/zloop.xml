@@ -1,7 +1,7 @@
 <class name = "zloop">
     event-driven reactor
 
-    <include filename = "../license.xml" />
+    <include filename = "license.xml" />
 
     <callback_type name = "reader_fn">
         Callback function for reactor socket activity

@@ -1,7 +1,7 @@
 <class name = "ztrie">
     simple trie for tokenizable strings
 
-    <include filename = "../license.xml" />
+    <include filename = "license.xml" />
 
     <callback_type name = "destroy_data_fn">
         Callback function for ztrie_node to destroy node data.

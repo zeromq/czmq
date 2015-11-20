@@ -1,7 +1,7 @@
 <class name = "zstr">
     sending and receiving strings
 
-    <include filename = "../license.xml" />
+    <include filename = "license.xml" />
 
     <constructor exclude = "1" />
 

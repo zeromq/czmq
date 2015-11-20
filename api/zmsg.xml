@@ -1,7 +1,7 @@
 <class name = "zmsg">
     working with multipart messages
 
-    <include filename = "../license.xml" />
+    <include filename = "license.xml" />
 
     <constructor>
         Create a new empty message object

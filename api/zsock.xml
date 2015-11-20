@@ -8,7 +8,7 @@
 <class name = "zsock">
     high-level socket API that hides libzmq contexts and sockets
 
-    <include filename = "../license.xml" />
+    <include filename = "license.xml" />
 
     <constructor>
         Create a new socket. Returns the new socket, or NULL if the new socket
@@ -820,4 +820,6 @@
         Self test of this class
         <argument name = "verbose" type = "boolean" />
     </method>
+
+    <include filename = "api/zsock_options.xml" />
 </class>

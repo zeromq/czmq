@@ -1,7 +1,7 @@
 <class name = "zfile">
     helper functions for working with files.
 
-    <include filename = "../license.xml" />
+    <include filename = "license.xml" />
 
     <constructor>
         If file exists, populates properties. CZMQ supports portable symbolic

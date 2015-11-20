@@ -1,7 +1,7 @@
 <class name = "zuuid">
     UUID support class
 
-    <include filename = "../license.xml" />
+    <include filename = "license.xml" />
 
     <constructor>
         Constructor

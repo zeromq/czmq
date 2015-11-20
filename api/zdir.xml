@@ -1,7 +1,7 @@
 <class name = "zdir">
     work with file-system directories
 
-    <include filename = "../license.xml" />
+    <include filename = "license.xml" />
 
     <constructor>
         Create a new directory item that loads in the full tree of the specified
