@@ -820,4 +820,6 @@
         Self test of this class
         <argument name = "verbose" type = "boolean" />
     </method>
+
+    <include filename = "api/zsock_options.xml" />
 </class>
