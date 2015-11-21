@@ -64,7 +64,9 @@ module CZMQ
         ::FFI::Function.new :int, [:pointer, :pointer, :pointer], blocking: true do |loop, reader, arg|
           loop = Zloop.__new loop, false
           reader = Zsock.__new reader, false
-          yield loop, reader, arg
+          result = yield loop, reader, arg
+          result = Integer(result)
+          result
         end
       end
 
@@ -80,7 +82,9 @@ module CZMQ
       def self.fn
         ::FFI::Function.new :int, [:pointer, :pointer, :pointer], blocking: true do |loop, item, arg|
           loop = Zloop.__new loop, false
-          yield loop, item, arg
+          result = yield loop, item, arg
+          result = Integer(result)
+          result
         end
       end
 
@@ -96,7 +100,9 @@ module CZMQ
       def self.timer_fn
         ::FFI::Function.new :int, [:pointer, :int, :pointer], blocking: true do |loop, timer_id, arg|
           loop = Zloop.__new loop, false
-          yield loop, timer_id, arg
+          result = yield loop, timer_id, arg
+          result = Integer(result)
+          result
         end
       end
 

@@ -62,7 +62,8 @@ module CZMQ
       #   potentially resulting in a segmentation fault.
       def self.destructor_fn
         ::FFI::Function.new :void, [:pointer], blocking: true do |item|
-          yield item
+          result = yield item
+          result
         end
       end
 
@@ -77,7 +78,8 @@ module CZMQ
       #   potentially resulting in a segmentation fault.
       def self.duplicator_fn
         ::FFI::Function.new :pointer, [:pointer], blocking: true do |item|
-          yield item
+          result = yield item
+          result
         end
       end
 
@@ -92,7 +94,9 @@ module CZMQ
       #   potentially resulting in a segmentation fault.
       def self.comparator_fn
         ::FFI::Function.new :int, [:pointer, :pointer], blocking: true do |item1, item2|
-          yield item1, item2
+          result = yield item1, item2
+          result = Integer(result)
+          result
         end
       end
 
@@ -107,7 +111,8 @@ module CZMQ
       #   potentially resulting in a segmentation fault.
       def self.free_fn
         ::FFI::Function.new :void, [:pointer], blocking: true do |data|
-          yield data
+          result = yield data
+          result
         end
       end
 
@@ -122,7 +127,9 @@ module CZMQ
       #   potentially resulting in a segmentation fault.
       def self.hash_fn
         ::FFI::Function.new :size_t, [:pointer], blocking: true do |key|
-          yield key
+          result = yield key
+          result = Integer(result)
+          result
         end
       end
 
@@ -137,7 +144,9 @@ module CZMQ
       #   potentially resulting in a segmentation fault.
       def self.foreach_fn
         ::FFI::Function.new :int, [:string, :pointer, :pointer], blocking: true do |key, item, argument|
-          yield key, item, argument
+          result = yield key, item, argument
+          result = Integer(result)
+          result
         end
       end
 

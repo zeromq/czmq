@@ -62,7 +62,8 @@ module CZMQ
       #   potentially resulting in a segmentation fault.
       def self.free_fn
         ::FFI::Function.new :void, [:pointer], blocking: true do |data|
-          yield data
+          result = yield data
+          result
         end
       end
 
@@ -77,7 +78,9 @@ module CZMQ
       #   potentially resulting in a segmentation fault.
       def self.foreach_fn
         ::FFI::Function.new :int, [:string, :pointer, :pointer], blocking: true do |key, item, argument|
-          yield key, item, argument
+          result = yield key, item, argument
+          result = Integer(result)
+          result
         end
       end
 
