@@ -62,7 +62,9 @@ module CZMQ
       #   potentially resulting in a segmentation fault.
       def self.compare_fn
         ::FFI::Function.new :int, [:pointer, :pointer], blocking: true do |item1, item2|
-          yield item1, item2
+          result = yield item1, item2
+          result = Integer(result)
+          result
         end
       end
 
@@ -77,7 +79,8 @@ module CZMQ
       #   potentially resulting in a segmentation fault.
       def self.free_fn
         ::FFI::Function.new :void, [:pointer], blocking: true do |data|
-          yield data
+          result = yield data
+          result
         end
       end
 

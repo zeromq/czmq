@@ -62,7 +62,8 @@ module CZMQ
       #   potentially resulting in a segmentation fault.
       def self.destroy_data_fn
         ::FFI::Function.new :void, [:pointer], blocking: true do |data|
-          yield data
+          result = yield data
+          result
         end
       end
 

@@ -63,7 +63,8 @@ module CZMQ
       def self.fn
         ::FFI::Function.new :void, [:pointer, :pointer], blocking: true do |pipe, args|
           pipe = Zsock.__new pipe, false
-          yield pipe, args
+          result = yield pipe, args
+          result
         end
       end
 
