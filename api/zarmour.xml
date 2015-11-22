@@ -108,6 +108,5 @@
     <method name = "test" singleton = "1">
         Self test of this class
         <argument name = "verbose" type = "boolean" />
-        <return type = "integer" />
     </method>
 </class>
