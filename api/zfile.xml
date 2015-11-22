@@ -145,4 +145,9 @@
         Calculate SHA1 digest for file, using zdigest class.
         <return type = "string" />
     </method>
+
+    <method name = "test" singleton = "1">
+        Self test of this class.
+        <argument name = "verbose" type = "boolean" />
+    </method>
 </class>
