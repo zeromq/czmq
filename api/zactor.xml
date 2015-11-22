@@ -54,9 +54,4 @@
         to work with the zsock instance rather than the actor.
         <return type = "zsock" />
     </method>
-
-    <method name = "test" singleton = "1">
-        Self test of this class.
-        <argument name = "verbose" type = "boolean" />
-    </method>
 </class>
