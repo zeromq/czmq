@@ -51,7 +51,7 @@
         The decoded output is null-terminated, so it may be treated
         as a string, if that's what it was prior to encoding.
         <argument name = "data" type = "string" />
-        <argument name = "data size" type = "size" by_reference = "1" />
+        <argument name = "decode size" type = "size" by_reference = "1" />
         <return type = "buffer" fresh = "1" />
     </method>
 
