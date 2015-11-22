@@ -4,22 +4,22 @@
     <include filename = "license.xml" />
 
     <enum name = "mode">
-        <constant name = "base64 std" value = "0">
+        <constant name = "base64 std">
             Standard base 64
         </constant>
-        <constant name = "base64 url" value = "1">
+        <constant name = "base64 url">
             URL and filename friendly base 64
         </constant>
-        <constant name = "base32 std" value = "2">
+        <constant name = "base32 std">
             Standard base 32
         </constant>
-        <constant name = "base32 hex" value = "3">
+        <constant name = "base32 hex">
             Extended hex base 32
         </constant>
-        <constant name = "base16 hex" value = "4">
+        <constant name = "base16 hex">
             Standard base 16
         </constant>
-        <constant name = "z85"        value = "5">
+        <constant name = "z85">
             Z85 from ZeroMQ RFC 32
         </constant>
     </enum>
