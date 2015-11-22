@@ -4,12 +4,12 @@
     <include filename = "license.xml" />
 
     <enum name = "mode">
-        <constant name = "base64 std" value = "0" />
-        <constant name = "base64 url" value = "1" />
-        <constant name = "base32 std" value = "2" />
-        <constant name = "base32 hex" value = "3" />
-        <constant name = "base16 hex" value = "4" />
-        <constant name = "z85"        value = "5" />
+        <constant name = "base64 std" value = "1" />
+        <constant name = "base64 url" value = "2" />
+        <constant name = "base32 std" value = "3" />
+        <constant name = "base32 hex" value = "4" />
+        <constant name = "base16 hex" value = "5" />
+        <constant name = "z85"        value = "6" />
     </enum>
 
     <constructor>
