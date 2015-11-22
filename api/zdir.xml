@@ -114,4 +114,9 @@
         <argument name = "pipe" type = "zsock" />
         <argument name = "unused" type = "anything" />
     </method>
+
+    <method name = "test" singleton = "1">
+        Self test of this class.
+        <argument name = "verbose" type = "boolean" />
+    </method>
 </class>
