@@ -43,7 +43,7 @@
         Encode a stream of bytes into an armoured string.
         <argument name = "data" type = "buffer" />
         <argument name = "data size" type = "size" />
-        <return type = "string" />
+        <return type = "string" fresh = "1" />
     </method>
 
     <method name = "decode">
