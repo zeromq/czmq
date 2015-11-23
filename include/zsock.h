@@ -391,15 +391,11 @@ CZMQ_EXPORT zsock_t *
 CZMQ_EXPORT zsock_t *
     zsock_new_stream_checked (const char *endpoint, const char *filename, size_t line_nbr);
 
-#if ZMQ_VERSION_MAJOR >= 4 && ZMQ_VERSION_MINOR >= 2
-
 CZMQ_EXPORT zsock_t *
     zsock_new_server_checked (const char *endpoint, const char *filename, size_t line_nbr);
 
 CZMQ_EXPORT zsock_t *
     zsock_new_client_checked (const char *endpoint, const char *filename, size_t line_nbr);
-
-#endif
 
 #ifdef __cplusplus
 }
