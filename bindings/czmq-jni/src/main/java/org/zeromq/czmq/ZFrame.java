@@ -1,7 +1,13 @@
 package org.zeromq.czmq;
 
 public class ZFrame implements AutoCloseable {
-
+    static {
+        try {
+            System.loadLibrary("czmqjni");
+        } catch (Exception e) {
+            System.exit(-1);
+        }
+    }
     long pointer;
 
     public ZFrame() {
@@ -19,6 +25,10 @@ public class ZFrame implements AutoCloseable {
     public long size() {
         return ZFrame.__size(pointer);
     }
+
+    public byte[] data() {
+        return ZFrame.__data(pointer);
+    }
     native static long __init();
 
     native static long __init(byte[] buf, long size);
@@ -26,6 +36,8 @@ public class ZFrame implements AutoCloseable {
     native static void __destroy(long pointer);
 
     native static long __size(long pointer);
+
+    native static byte[] __data(long pointer);
 
     @Override
     public void close() {
