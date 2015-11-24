@@ -47,7 +47,7 @@
 //  Structure of our class
 
 struct _zarmour_t {
-    zarmour_mode_t mode;        //  The current mode (std or url)
+    zarmour_mode_t mode;        //  The current mode (Base64/32/16/Z85, STD/URL)
     bool pad;                   //  Should output be padded?
     char pad_char;              //  The pad character
     bool line_breaks;           //  Should output be broken into lines?
