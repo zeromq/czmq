@@ -12,6 +12,9 @@ public class ZFrame implements AutoCloseable {
         pointer = address;
     }
 
+    public ZFrame(byte[] buf, long size) {
+        pointer = __init(buf, size);
+    }
     native static long __init();
 
     native static long __init(byte[] buf, long size);
