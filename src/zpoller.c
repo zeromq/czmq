@@ -493,7 +493,7 @@ zpoller_test (bool verbose)
     assert (!zpoller_terminated (poller));
     zsys_interrupted = 0;
 
-#ifdef ZMQ_THREAD_SAFE
+#ifdef ZMQ_HAVE_POLLER
 
     //  Check thread safe sockets
     zpoller_destroy (&poller);
