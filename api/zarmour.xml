@@ -32,7 +32,7 @@
         Destroy the zarmour.
     </destructor>
 
-    <method name = "print" exclude = "1" />
+    <method name = "print"/>
 
     <method name = "mode str">
         Get printable string for mode.
