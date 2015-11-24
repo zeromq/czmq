@@ -498,9 +498,9 @@ zpoller_test (bool verbose)
     //  Check thread safe sockets
     zpoller_destroy (&poller);
     zsock_t *client = zsock_new (ZMQ_CLIENT);
-    assert (bowl);
+    assert (client);
     zsock_t *server = zsock_new (ZMQ_SERVER);
-    assert (dish);
+    assert (server);
     poller = zpoller_new (client, server);
     assert (poller);
     port_nbr = zsock_bind (server, "tcp://127.0.0.1:*");
