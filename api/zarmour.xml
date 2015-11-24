@@ -33,7 +33,9 @@
         Destroy the zarmour.
     </destructor>
 
-    <method name = "print"/>
+    <method name = "print">
+        Print properties of object
+    </method>
 
     <method name = "mode str">
         Get printable string for mode.
