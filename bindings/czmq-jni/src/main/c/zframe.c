@@ -29,3 +29,21 @@ Java_org_zeromq_czmq_ZFrame__1_1destroy(JNIEnv *env, jclass c, jlong ptr) {
     zframe_t * frame = (zframe_t *) ptr;
     zframe_destroy (&frame);
 }
+
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_ZFrame__1_1size (JNIEnv *env, jclass c, jlong ptr) {
+    zframe_t *frame = (zframe_t *) ptr;
+    size_t size = zframe_size(frame);
+    return (jlong) size;
+}
+
+JNIEXPORT jbyteArray JNICALL
+Java_org_zeromq_czmq_ZFrame__1_1data (JNIEnv *env, jclass c, jlong ptr) {
+    zframe_t *frame = (zframe_t *) ptr;
+    byte *data = zframe_data (frame);
+    size_t size = zframe_size (frame);
+
+    jbyteArray buf = (*env)->NewByteArray (env, (jint) size);
+    (*env)->SetByteArrayRegion (env, buf, 0, size, (jbyte*) data);
+    return buf;
+}
