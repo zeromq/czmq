@@ -18,6 +18,10 @@ public class ZFrame implements AutoCloseable {
         pointer = address;
     }
 
+    public ZFrame(byte[] buf) {
+        this(buf, buf.length);
+    }
+
     public ZFrame(byte[] buf, long size) {
         pointer = ZFrame.__init(buf, size);
     }
