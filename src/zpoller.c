@@ -501,7 +501,7 @@ zpoller_test (bool verbose)
     assert (client);
     zsock_t *server = zsock_new (ZMQ_SERVER);
     assert (server);
-    poller = zpoller_new (client, server);
+    poller = zpoller_new (client, server, NULL);
     assert (poller);
     port_nbr = zsock_bind (server, "tcp://127.0.0.1:*");
     assert (port_nbr != -1);
