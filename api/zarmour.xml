@@ -4,6 +4,7 @@
     <include filename = "license.xml" />
 
     <enum name = "mode">
+        Enumeration defining different encoding modes
         <constant name = "base64 std" value = "0">
             Standard base 64
         </constant>
