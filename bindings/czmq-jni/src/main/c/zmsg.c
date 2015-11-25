@@ -84,3 +84,22 @@ Java_org_zeromq_czmq_ZMsg__1_1append (JNIEnv *env, jclass c, jlong ptr, jlong zf
     zframe_t *frame = (zframe_t *) zframe_ptr;
     return zmsg_append (msg, &frame);
 }
+
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_ZMsg__1_1popmsg (JNIEnv *env, jclass c, jlong ptr) {
+    zmsg_t *msg = (zmsg_t *) ptr;
+    zmsg_t *sub_msg = zmsg_popmsg (msg);
+    if (sub_msg) {
+        return (jlong) sub_msg;
+    }
+    return -1;
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_ZMsg__1_1addstr (JNIEnv *env, jclass c, jlong ptr, jstring jstr) {
+    zmsg_t *msg = (zmsg_t *) ptr;
+    const char *str = (const char *) (*env)->GetStringUTFChars (env, jstr, NULL);
+    int rc = zmsg_addstr (msg, str);
+    (*env)->ReleaseStringUTFChars (env, jstr, str);
+    return rc;
+}

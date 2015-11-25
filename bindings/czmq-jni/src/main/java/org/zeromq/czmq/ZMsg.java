@@ -52,6 +52,10 @@ public class ZMsg implements AutoCloseable {
 
     native static int __append(long pointer, long zframePtr);
 
+    native static long __popmsg(long pointer);
+
+    native static int __addstr(long pointer, String str);
+
     public static ZMsg recv(ZSock sock) {
         final long ptr = ZMsg.__recv(sock.pointer);
         return new ZMsg(ptr);
@@ -97,15 +101,22 @@ public class ZMsg implements AutoCloseable {
     }
 
     public boolean pushstrf(String format, Object... args) {
-        return true;
+        String str = String.format(format, args);
+        return pushstr(str);
     }
 
     public ZMsg popmsg() {
-        return null;
+        long ptr = ZMsg.__popmsg(pointer);
+        return new ZMsg(ptr);
+    }
+
+    public boolean addstr(String str) {
+        return 0 == ZMsg.__addstr(pointer, str);
     }
 
     public boolean addstrf(String format, Object... args) {
-        return true;
+        String str = String.format(format, args);
+        return addstr(str);
     }
 
     public String popstr() {
@@ -115,5 +126,6 @@ public class ZMsg implements AutoCloseable {
     @Override
     public void close() {
         ZMsg.__destroy(pointer);
+        pointer = 0;
     }
 }
