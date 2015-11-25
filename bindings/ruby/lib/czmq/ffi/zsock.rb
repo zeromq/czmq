@@ -2521,7 +2521,7 @@ module CZMQ
         result
       end
 
-      # 
+      # Get socket option `tos`.
       def tos()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -2529,7 +2529,7 @@ module CZMQ
         result
       end
 
-      # 
+      # Get socket option `tos`.
       #
       # This is the polymorphic version of #tos.
       #

@@ -133,6 +133,7 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zframe_strhex(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -142,6 +143,7 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zframe_strdup(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
