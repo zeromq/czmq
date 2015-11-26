@@ -27,7 +27,7 @@ typedef enum {
     ZARMOUR_MODE_BASE64_URL = 1,                            //  URL and filename friendly base 64
     ZARMOUR_MODE_BASE32_STD = 2,                            //  Standard base 32
     ZARMOUR_MODE_BASE32_HEX = 3,                            //  Extended hex base 32
-    ZARMOUR_MODE_BASE16_HEX = 4,                            //  Standard base 16
+    ZARMOUR_MODE_BASE16 = 4,                            //  Standard base 16
     ZARMOUR_MODE_Z85 = 5                                    //  Z85 from ZeroMQ RFC 32
 } zarmour_mode_t;
 
