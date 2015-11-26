@@ -1,14 +1,16 @@
 /*  =========================================================================
-    zsock_option - get/set 0MQ socket options
+    zsock_option - get/set ZeroMQ socket options
 
-            ****************************************************
-            *   GENERATED SOURCE CODE, DO NOT EDIT!!           *
-            *   TO CHANGE THIS, EDIT scripts/sockopts.gsl      *
-            *   AND RUN ./generate in models/.                 *
-            ****************************************************
+    ******************************************************************
+    *   GENERATED SOURCE CODE, DO NOT EDIT!!                         *
+    *   TO CHANGE THIS FILE:                                         *
+    *    - EDIT src/zsock_option.gsl and/or                          *
+    *    - EDIT src/zsock_option.xml and then                        *
+    *    - RUN 'make code'                                           *
+    ******************************************************************
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
-    This file is part of CZMQ, the high-level C binding for 0MQ:
+    This file is part of CZMQ, the high-level C binding for ZeroMQ:
     http://czmq.zeromq.org.
 
     This Source Code Form is subject to the terms of the Mozilla Public
