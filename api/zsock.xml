@@ -358,5 +358,5 @@
         <argument name = "verbose" type = "boolean" />
     </method>
 
-    <include filename = "zsock_option.xml" />
+    <include filename = "api/zsock_option.xml" />
 </class>
