@@ -230,6 +230,7 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zmsg_popstr(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
