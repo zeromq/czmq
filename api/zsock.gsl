@@ -3,7 +3,7 @@
 ******************************************************************
 *   GENERATED SOURCE CODE, DO NOT EDIT!!                         *
 *   TO CHANGE THIS, EDIT api/zsock.gsl AND/OR src/sockopts.xml   *
-*   AND RUN `gen sockopts` in src/.                              *
+*   AND RUN `gsl sockopts` in src/.                              *
 ******************************************************************
 -->
 <class name = "zsock">
@@ -347,23 +347,23 @@
 
 .for version where version.major = "4" # ZMQ version 4
 .  for option
-.    option.api_name = string.replace(option.name, "_| ")
+.    option.api_name = string.replace (option.name, "_| ")
 .    if option.type = "int"
 .      option.api_type = "integer"
 .    endif
 .    option.api_type ?= option.type
-.    if regexp.match("r", option.mode)
+.    if regexp.match ("r", option.mode)
 
     <method name = "$(option.api_name:)" polymorphic = "1">
         Get socket option `$(option.name:)`.
-        <return type="$(option.api_type:)" />
+        <return type = "$(option.api_type:)" />
     </method>
 .    endif
 .    if regexp.match("w", option.mode)
 
     <method name = "set $(option.api_name:)" polymorphic = "1">
         Set socket option `$(option.name:)`.
-        <argument name = "$(option.api_name:)" type="$(option.api_type:)" />
+        <argument name = "$(option.api_name:)" type = "$(option.api_type:)" />
     </method>
 .    endif
 .  endfor
