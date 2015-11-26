@@ -1,8 +1,10 @@
 <!--
 ******************************************************************
 *   GENERATED SOURCE CODE, DO NOT EDIT!!                         *
-*   TO CHANGE THIS, EDIT api/zsock.gsl AND/OR src/sockopts.xml   *
-*   AND RUN `gsl sockopts` in src/.                              *
+*   TO CHANGE THIS FILE:                                         *
+*    - EDIT src/zsock_option.gsl and/or                          *
+*    - EDIT src/zsock_option.xml and then                        *
+*    - RUN 'make code'                                           *
 ******************************************************************
 -->
 

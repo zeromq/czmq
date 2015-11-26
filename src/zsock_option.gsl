@@ -2,92 +2,54 @@
 .#  language. See https://github.com/imatix/gsl for details. This script 
 .#  is licensed under MIT/X11.
 .#
-.output "../include/zsock_option.h"
-/*  =========================================================================
-    zsock_option - get/set 0MQ socket options
-
-            ****************************************************
-            *   GENERATED SOURCE CODE, DO NOT EDIT!!           *
-            *   TO CHANGE THIS, EDIT src/zsock_option.gsl      *
-            *   AND RUN `gsl sockopts` in src/.                *
-            ****************************************************
-
-    Copyright (c) the Contributors as noted in the AUTHORS file.
-    This file is part of CZMQ, the high-level C binding for 0MQ:
-    http://czmq.zeromq.org.
-
-    This Source Code Form is subject to the terms of the Mozilla Public
-    License, v. 2.0. If a copy of the MPL was not distributed with this
-    file, You can obtain one at http://mozilla.org/MPL/2.0/.
-    =========================================================================
-*/
-
-#ifndef __ZSOCK_OPTION_H_INCLUDED__
-#define __ZSOCK_OPTION_H_INCLUDED__
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-//  @interface
-.for version
-#if (ZMQ_VERSION_MAJOR == $(major))
-//  Get socket options
+.output "../api/zsock_option.xml"
+<!--
+******************************************************************
+*   GENERATED SOURCE CODE, DO NOT EDIT!!                         *
+*   TO CHANGE THIS FILE:                                         *
+*    - EDIT src/zsock_option.gsl and/or                          *
+*    - EDIT src/zsock_option.xml and then                        *
+*    - RUN 'make code'                                           *
+******************************************************************
+-->
+.for version where major = "4"
 .   for option
-.       if defined (.minor)
-#   if (ZMQ_VERSION_MINOR == $(minor))
+.       option.api_name = string.replace (option.name, "_| ")
+.       if type = "int"
+.           option.api_type = "integer"
+.       else
+.           option.api_type ?= type
 .       endif
 .       if mode = "rw" | mode = "r"
-CZMQ_EXPORT $(ctype:) zsock_$(name) (void *self);
-.       endif
-.       if defined (.minor)
-#   endif
-.       endif
-.   endfor
 
-//  Set socket options
-.   for option
-.       if defined (.minor)
-#   if (ZMQ_VERSION_MINOR == $(minor))
-.       endif
-.       if mode = "rw" | mode = "w"
-CZMQ_EXPORT void zsock_set_$(name) (void *self, $(ctype_const:) $(name));
-.           if type = "key"
-CZMQ_EXPORT void zsock_set_$(name)_bin (void *self, const byte *$(name));
-.           endif
-.       endif
-.       if defined (.minor)
-#   endif
-.       endif
-.   endfor
-.   for header
+<method name = "$(option.api_name:)" polymorphic = "1">
+    Get socket option `$(option.name:)`.
+    <return type = "$(option.api_type:)" />
+</method>
+.    endif
+.    if mode = "rw" | mode = "w"
 
-$(string.trim(.):)
-.   endfor
-#endif
-
+<method name = "set $(option.api_name:)" polymorphic = "1">
+    Set socket option `$(option.name:)`.
+    <argument name = "$(option.api_name:)" type = "$(option.api_type:)" />
+</method>
+.    endif
+.  endfor
 .endfor
-//  Self test of this class
-CZMQ_EXPORT void zsock_option_test (bool verbose);
-//  @end
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
 .output "../src/zsock_option.c"
 /*  =========================================================================
-    zsock_option - get/set 0MQ socket options
+    zsock_option - get/set ZeroMQ socket options
 
-            ****************************************************
-            *   GENERATED SOURCE CODE, DO NOT EDIT!!           *
-            *   TO CHANGE THIS, EDIT scripts/sockopts.gsl      *
-            *   AND RUN ./generate in models/.                 *
-            ****************************************************
+    ******************************************************************
+    *   GENERATED SOURCE CODE, DO NOT EDIT!!                         *
+    *   TO CHANGE THIS FILE:                                         *
+    *    - EDIT src/zsock_option.gsl and/or                          *
+    *    - EDIT src/zsock_option.xml and then                        *
+    *    - RUN 'make code'                                           *
+    ******************************************************************
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
-    This file is part of CZMQ, the high-level C binding for 0MQ:
+    This file is part of CZMQ, the high-level C binding for ZeroMQ:
     http://czmq.zeromq.org.
 
     This Source Code Form is subject to the terms of the Mozilla Public
