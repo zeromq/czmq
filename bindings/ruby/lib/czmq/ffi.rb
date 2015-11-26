@@ -54,7 +54,7 @@ module CZMQ
         :mode_base64_url, 1,
         :mode_base32_std, 2,
         :mode_base32_hex, 3,
-        :mode_base16_hex, 4,
+        :mode_base16, 4,
         :mode_z85, 5,
       ]
 
@@ -322,97 +322,6 @@ module CZMQ
       attach_function :zsock_signal, [:pointer, :char], :int, **opts
       attach_function :zsock_wait, [:pointer], :int, **opts
       attach_function :zsock_flush, [:pointer], :void, **opts
-      attach_function :zsock_tos, [:pointer], :int, **opts
-      attach_function :zsock_set_tos, [:pointer, :int], :void, **opts
-      attach_function :zsock_set_router_handover, [:pointer, :int], :void, **opts
-      attach_function :zsock_set_router_mandatory, [:pointer, :int], :void, **opts
-      attach_function :zsock_set_probe_router, [:pointer, :int], :void, **opts
-      attach_function :zsock_set_req_relaxed, [:pointer, :int], :void, **opts
-      attach_function :zsock_set_req_correlate, [:pointer, :int], :void, **opts
-      attach_function :zsock_set_conflate, [:pointer, :int], :void, **opts
-      attach_function :zsock_zap_domain, [:pointer], :string, **opts
-      attach_function :zsock_set_zap_domain, [:pointer, :string], :void, **opts
-      attach_function :zsock_mechanism, [:pointer], :int, **opts
-      attach_function :zsock_plain_server, [:pointer], :int, **opts
-      attach_function :zsock_set_plain_server, [:pointer, :int], :void, **opts
-      attach_function :zsock_plain_username, [:pointer], :string, **opts
-      attach_function :zsock_set_plain_username, [:pointer, :string], :void, **opts
-      attach_function :zsock_plain_password, [:pointer], :string, **opts
-      attach_function :zsock_set_plain_password, [:pointer, :string], :void, **opts
-      attach_function :zsock_curve_server, [:pointer], :int, **opts
-      attach_function :zsock_set_curve_server, [:pointer, :int], :void, **opts
-      attach_function :zsock_curve_publickey, [:pointer], :pointer, **opts
-      attach_function :zsock_set_curve_publickey, [:pointer, :pointer], :void, **opts
-      attach_function :zsock_curve_secretkey, [:pointer], :pointer, **opts
-      attach_function :zsock_set_curve_secretkey, [:pointer, :pointer], :void, **opts
-      attach_function :zsock_curve_serverkey, [:pointer], :pointer, **opts
-      attach_function :zsock_set_curve_serverkey, [:pointer, :pointer], :void, **opts
-      attach_function :zsock_gssapi_server, [:pointer], :int, **opts
-      attach_function :zsock_set_gssapi_server, [:pointer, :int], :void, **opts
-      attach_function :zsock_gssapi_plaintext, [:pointer], :int, **opts
-      attach_function :zsock_set_gssapi_plaintext, [:pointer, :int], :void, **opts
-      attach_function :zsock_gssapi_principal, [:pointer], :string, **opts
-      attach_function :zsock_set_gssapi_principal, [:pointer, :string], :void, **opts
-      attach_function :zsock_gssapi_service_principal, [:pointer], :string, **opts
-      attach_function :zsock_set_gssapi_service_principal, [:pointer, :string], :void, **opts
-      attach_function :zsock_ipv6, [:pointer], :int, **opts
-      attach_function :zsock_set_ipv6, [:pointer, :int], :void, **opts
-      attach_function :zsock_immediate, [:pointer], :int, **opts
-      attach_function :zsock_set_immediate, [:pointer, :int], :void, **opts
-      attach_function :zsock_set_router_raw, [:pointer, :int], :void, **opts
-      attach_function :zsock_ipv4only, [:pointer], :int, **opts
-      attach_function :zsock_set_ipv4only, [:pointer, :int], :void, **opts
-      attach_function :zsock_set_delay_attach_on_connect, [:pointer, :int], :void, **opts
-      attach_function :zsock_type, [:pointer], :int, **opts
-      attach_function :zsock_sndhwm, [:pointer], :int, **opts
-      attach_function :zsock_set_sndhwm, [:pointer, :int], :void, **opts
-      attach_function :zsock_rcvhwm, [:pointer], :int, **opts
-      attach_function :zsock_set_rcvhwm, [:pointer, :int], :void, **opts
-      attach_function :zsock_affinity, [:pointer], :pointer, **opts
-      attach_function :zsock_set_affinity, [:pointer, :pointer], :void, **opts
-      attach_function :zsock_set_subscribe, [:pointer, :string], :void, **opts
-      attach_function :zsock_set_unsubscribe, [:pointer, :string], :void, **opts
-      attach_function :zsock_identity, [:pointer], :string, **opts
-      attach_function :zsock_set_identity, [:pointer, :string], :void, **opts
-      attach_function :zsock_rate, [:pointer], :int, **opts
-      attach_function :zsock_set_rate, [:pointer, :int], :void, **opts
-      attach_function :zsock_recovery_ivl, [:pointer], :int, **opts
-      attach_function :zsock_set_recovery_ivl, [:pointer, :int], :void, **opts
-      attach_function :zsock_sndbuf, [:pointer], :int, **opts
-      attach_function :zsock_set_sndbuf, [:pointer, :int], :void, **opts
-      attach_function :zsock_rcvbuf, [:pointer], :int, **opts
-      attach_function :zsock_set_rcvbuf, [:pointer, :int], :void, **opts
-      attach_function :zsock_linger, [:pointer], :int, **opts
-      attach_function :zsock_set_linger, [:pointer, :int], :void, **opts
-      attach_function :zsock_reconnect_ivl, [:pointer], :int, **opts
-      attach_function :zsock_set_reconnect_ivl, [:pointer, :int], :void, **opts
-      attach_function :zsock_reconnect_ivl_max, [:pointer], :int, **opts
-      attach_function :zsock_set_reconnect_ivl_max, [:pointer, :int], :void, **opts
-      attach_function :zsock_backlog, [:pointer], :int, **opts
-      attach_function :zsock_set_backlog, [:pointer, :int], :void, **opts
-      attach_function :zsock_maxmsgsize, [:pointer], :pointer, **opts
-      attach_function :zsock_set_maxmsgsize, [:pointer, :pointer], :void, **opts
-      attach_function :zsock_multicast_hops, [:pointer], :int, **opts
-      attach_function :zsock_set_multicast_hops, [:pointer, :int], :void, **opts
-      attach_function :zsock_rcvtimeo, [:pointer], :int, **opts
-      attach_function :zsock_set_rcvtimeo, [:pointer, :int], :void, **opts
-      attach_function :zsock_sndtimeo, [:pointer], :int, **opts
-      attach_function :zsock_set_sndtimeo, [:pointer, :int], :void, **opts
-      attach_function :zsock_set_xpub_verbose, [:pointer, :int], :void, **opts
-      attach_function :zsock_tcp_keepalive, [:pointer], :int, **opts
-      attach_function :zsock_set_tcp_keepalive, [:pointer, :int], :void, **opts
-      attach_function :zsock_tcp_keepalive_idle, [:pointer], :int, **opts
-      attach_function :zsock_set_tcp_keepalive_idle, [:pointer, :int], :void, **opts
-      attach_function :zsock_tcp_keepalive_cnt, [:pointer], :int, **opts
-      attach_function :zsock_set_tcp_keepalive_cnt, [:pointer, :int], :void, **opts
-      attach_function :zsock_tcp_keepalive_intvl, [:pointer], :int, **opts
-      attach_function :zsock_set_tcp_keepalive_intvl, [:pointer, :int], :void, **opts
-      attach_function :zsock_tcp_accept_filter, [:pointer], :string, **opts
-      attach_function :zsock_set_tcp_accept_filter, [:pointer, :string], :void, **opts
-      attach_function :zsock_rcvmore, [:pointer], :int, **opts
-      attach_function :zsock_fd, [:pointer], :pointer, **opts
-      attach_function :zsock_events, [:pointer], :int, **opts
-      attach_function :zsock_last_endpoint, [:pointer], :string, **opts
       attach_function :zsock_is, [:pointer], :bool, **opts
       attach_function :zsock_resolve, [:pointer], :pointer, **opts
       attach_function :zsock_test, [:bool], :void, **opts
