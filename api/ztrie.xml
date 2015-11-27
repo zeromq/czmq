@@ -1,7 +1,14 @@
 <class name = "ztrie">
-    simple trie for tokenizable strings
+    <!--
+    Copyright (c) the Contributors as noted in the AUTHORS file.
+    This file is part of CZMQ, the high-level C binding for 0MQ:
+    http://czmq.zeromq.org.
 
-    <include filename = "license.xml" />
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    -->
+    simple trie for tokenizable strings
 
     <callback_type name = "destroy_data_fn">
         Callback function for ztrie_node to destroy node data.
@@ -67,9 +74,8 @@
         <return type = "string" />
     </method>
 
-    <method name = "test" singleton = "1">
-        Self test of this class
-        <argument name = "verbose" type = "boolean" />
+    <method name = "print">
+        Print the trie
     </method>
 </class>
 

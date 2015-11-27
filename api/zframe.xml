@@ -1,7 +1,14 @@
 <class name = "zframe">
-    working with single message frames
+    <!--
+    Copyright (c) the Contributors as noted in the AUTHORS file.
+    This file is part of CZMQ, the high-level C binding for 0MQ:
+    http://czmq.zeromq.org.
 
-    <include filename = "license.xml" />
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    -->
+    working with single message frames
 
     <constant name = "more" value = "1" />
     <constant name = "reuse" value = "2" />
@@ -128,11 +135,6 @@
         Probe the supplied object, and report if it looks like a zframe_t.
         <argument name = "self" type = "anything" />
         <return type = "boolean" />
-    </method>
-
-    <method name = "test" singleton = "1">
-        Self test of this class
-        <argument name = "verbose" type = "boolean" />
     </method>
 </class>
 

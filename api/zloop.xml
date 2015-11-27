@@ -1,7 +1,14 @@
 <class name = "zloop">
-    event-driven reactor
+    <!--
+    Copyright (c) the Contributors as noted in the AUTHORS file.
+    This file is part of CZMQ, the high-level C binding for 0MQ:
+    http://czmq.zeromq.org.
 
-    <include filename = "license.xml" />
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    -->
+    event-driven reactor
 
     <callback_type name = "reader_fn">
         Callback function for reactor socket activity
@@ -34,8 +41,6 @@
     <destructor>
         Destroy a reactor
     </destructor>
-
-    <method name = "print" exclude = "1" />
 
     <method name = "reader">
         Register socket reader with the reactor. When the reader has messages,
@@ -164,10 +169,5 @@
         Ignore zsys_interrupted flag in this loop. By default, a zloop_start will
         exit as soon as it detects zsys_interrupted is set to something other than
         zero. Calling zloop_ignore_interrupts will supress this behavior.
-    </method>
-
-    <method name = "test" singleton = "1">
-        Self test of this class
-        <argument name = "verbose" type = "boolean" />
     </method>
 </class>

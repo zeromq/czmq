@@ -1,10 +1,13 @@
-<?xml?>
-<!-- Used to generate the socket options interface
-     Requires gsl4 from https://github.com/imatix/gsl
-     use 'gsl sockopts'
--->
-
 <options script = "sockopts">
+    <!--
+    Copyright (c) the Contributors as noted in the AUTHORS file.
+    This file is part of CZMQ, the high-level C binding for 0MQ:
+    http://czmq.zeromq.org.
+
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    -->
     <version major = "4" style = "macro">
         <!-- Options that are new in 4.1 -->
         <option name = "tos"               type = "int"    mode = "rw" test = "DEALER" />

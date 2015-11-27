@@ -1,7 +1,14 @@
-<class name = "zdir patch">
-    work with directory patches
+<class name = "zdir_patch">
+    <!--
+    Copyright (c) the Contributors as noted in the AUTHORS file.
+    This file is part of CZMQ, the high-level C binding for 0MQ:
+    http://czmq.zeromq.org.
 
-    <include filename = "license.xml" />
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    -->
+    work with directory patches
 
     <enum name = "op">
         <constant name = "create" value = "1" />
@@ -23,10 +30,8 @@
     <method name = "dup">
         Create copy of a patch. If the patch is null, or memory was exhausted,
         returns null.
-        <return type = "zdir patch" fresh = "1" />
+        <return type = "zdir_patch" fresh = "1" />
     </method>
-
-    <method name = "print" exclude = "1" />
 
     <method name = "path">
         Return patch file directory path
@@ -55,10 +60,5 @@
     <method name = "digest">
         Return hash digest for patch file
         <return type = "string" />
-    </method>
-
-    <method name = "test" singleton = "1">
-        Self test of this class.
-        <argument name = "verbose" type = "boolean" />
     </method>
 </class>

@@ -1,14 +1,21 @@
 <class name = "zuuid">
+    <!--
+    Copyright (c) the Contributors as noted in the AUTHORS file.
+    This file is part of CZMQ, the high-level C binding for 0MQ:
+    http://czmq.zeromq.org.
+
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    -->
     UUID support class
 
-    <include filename = "license.xml" />
-
     <constructor>
-        Constructor
+        Create a new UUID object.
     </constructor>
 
     <destructor>
-        Destructor
+        Destroy a specified UUID object.
     </destructor>
 
     <method name = "new from" singleton = "1">
@@ -72,11 +79,6 @@
         Make copy of UUID object; if uuid is null, or memory was exhausted,
         returns null.
         <return type = "zuuid" />
-    </method>
-
-    <method name = "test" singleton = "1">
-        Self test of this class
-        <argument name = "verbose" type = "boolean" />
     </method>
 </class>
 

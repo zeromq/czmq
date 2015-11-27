@@ -1,7 +1,14 @@
 <class name = "zactor">
-    The zactor class provides a simple actor framework.
+    <!--
+    Copyright (c) the Contributors as noted in the AUTHORS file.
+    This file is part of CZMQ, the high-level C binding for 0MQ:
+    http://czmq.zeromq.org.
 
-    <include filename = "license.xml" />
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    -->
+    The zactor class provides a simple actor framework.
 
     <callback_type name = "fn">
         Actors get a pipe and arguments from caller
@@ -18,8 +25,6 @@
     <destructor>
         Destroy an actor.
     </destructor>
-
-    <method name = "print" exclude = "1" />
 
     <method name = "send">
         Send a zmsg message to the actor, take ownership of the message
@@ -53,10 +58,5 @@
         Return the actor's zsock handle. Use this when you absolutely need
         to work with the zsock instance rather than the actor.
         <return type = "zsock" />
-    </method>
-
-    <method name = "test" singleton = "1">
-        Self test of this class.
-        <argument name = "verbose" type = "boolean" />
     </method>
 </class>
