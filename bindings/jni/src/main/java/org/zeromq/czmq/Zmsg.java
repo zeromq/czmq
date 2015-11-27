@@ -89,13 +89,13 @@ public class Zmsg implements AutoCloseable {
         return Zmsg.__addstr (pointer,string);
     }
 
-    native static int __pushstrf (long pointer, );
-    public int pushstrf (long pointer, ) {
+    native static int __pushstrf (long pointer,Object... );
+    public int pushstrf (long pointer,Object... ) {
         return Zmsg.__pushstrf (pointer,);
     }
 
-    native static int __addstrf (long pointer, );
-    public int addstrf (long pointer, ) {
+    native static int __addstrf (long pointer,Object... );
+    public int addstrf (long pointer,Object... ) {
         return Zmsg.__addstrf (pointer,);
     }
 

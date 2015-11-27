@@ -16,8 +16,8 @@ public class Zstr implements AutoCloseable {
         return Zstr.__recv (source);
     }
 
-    native static int __recvx (void * source, String stringP,  );
-    public int recvx (void * source, String stringP,  ) {
+    native static int __recvx (void * source, String stringP, Object... );
+    public int recvx (void * source, String stringP, Object... ) {
         return Zstr.__recvx (source, stringP, );
     }
 
@@ -31,18 +31,18 @@ public class Zstr implements AutoCloseable {
         return Zstr.__sendm (dest, string);
     }
 
-    native static int __sendf (void * dest,  );
-    public int sendf (void * dest,  ) {
+    native static int __sendf (void * dest, Object... );
+    public int sendf (void * dest, Object... ) {
         return Zstr.__sendf (dest, );
     }
 
-    native static int __sendfm (void * dest,  );
-    public int sendfm (void * dest,  ) {
+    native static int __sendfm (void * dest, Object... );
+    public int sendfm (void * dest, Object... ) {
         return Zstr.__sendfm (dest, );
     }
 
-    native static int __sendx (void * dest, String string,  );
-    public int sendx (void * dest, String string,  ) {
+    native static int __sendx (void * dest, String string, Object... );
+    public int sendx (void * dest, String string, Object... ) {
         return Zstr.__sendx (dest, string, );
     }
 

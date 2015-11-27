@@ -39,6 +39,7 @@ LIBS += -lczmq
 HEADERS += \
   $$SRCDIR/qml_czmq_plugin.h \
   $$SRCDIR/QmlZactor.h \
+  $$SRCDIR/QmlZarmour.h \
   $$SRCDIR/QmlZdir.h \
   $$SRCDIR/QmlZdirPatch.h \
   $$SRCDIR/QmlZfile.h \
@@ -57,6 +58,7 @@ HEADERS += \
 
 SOURCES += \
   $$SRCDIR/QmlZactor.cpp \
+  $$SRCDIR/QmlZarmour.cpp \
   $$SRCDIR/QmlZdir.cpp \
   $$SRCDIR/QmlZdirPatch.cpp \
   $$SRCDIR/QmlZfile.cpp \

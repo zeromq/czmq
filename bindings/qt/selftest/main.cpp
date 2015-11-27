@@ -18,6 +18,7 @@ int main(int argc, char **argv)
     qDebug() << "Running qczmq selftests...\n";
 
     QZactor::test (verbose);
+    QZarmour::test (verbose);
     QZdir::test (verbose);
     QZdirPatch::test (verbose);
     QZfile::test (verbose);

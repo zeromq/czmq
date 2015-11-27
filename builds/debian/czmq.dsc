@@ -11,7 +11,7 @@ Build-Depends: bison, debhelper (>= 8),
     autoconf,
     libtool,
     libzmq4-dev,
-    uuid-dev,
+    libuuid-dev,
     dh-autoreconf
 
 Package-List:

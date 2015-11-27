@@ -7,9 +7,10 @@ Please add @discuss section in ../src/zdir_patch.c.
 
 This is the class interface:
 
+    // 
     typedef enum {
-        ZDIR_PATCH_CREATE = 1,
-        ZDIR_PATCH_DELETE = 2
+        ZDIR_PATCH_CREATE = 1,                                  //  
+        ZDIR_PATCH_DELETE = 2                                   //  
     } zdir_patch_op_t;
     
     //  Create new patch

@@ -80,6 +80,7 @@
     <ClInclude Include="..\..\..\..\include\czmq_library.h" />
     <ClInclude Include="..\..\..\..\include\czmq_prelude.h" />
     <ClInclude Include="..\..\..\..\include\czmq.h" />
+    <ClInclude Include="..\..\..\..\src\zsock_option.inc" />
     <ClInclude Include="..\..\..\..\src\zgossip_engine.inc" />
     <ClInclude Include="..\..\..\..\src\zhash_primes.inc" />
     <ClInclude Include="..\..\..\..\src\zclass_example.xml" />
@@ -163,9 +164,6 @@
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\zsock.c">
-      <CompileAs>CompileAsCpp</CompileAs>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zsock_option.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\zstr.c">

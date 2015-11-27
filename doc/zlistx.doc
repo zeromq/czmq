@@ -170,7 +170,7 @@ This is the class interface:
     
     //  Runs selftest of class
     CZMQ_EXPORT void
-        zlistx_test (int verbose);
+        zlistx_test (bool verbose);
     
 
 This is the class self test code:

@@ -12,6 +12,7 @@ qczmq-uselib:!qczmq-buildlib {
     HEADERS       += \
                      $$PWD/qczmq.h \
                      $$PWD/qzactor.h \
+                     $$PWD/qzarmour.h \
                      $$PWD/qzdir.h \
                      $$PWD/qzdirpatch.h \
                      $$PWD/qzfile.h \
@@ -30,6 +31,7 @@ qczmq-uselib:!qczmq-buildlib {
 
     SOURCES       += \
                      $$PWD/qzactor.cpp \
+                     $$PWD/qzarmour.cpp \
                      $$PWD/qzdir.cpp \
                      $$PWD/qzdirpatch.cpp \
                      $$PWD/qzfile.cpp \

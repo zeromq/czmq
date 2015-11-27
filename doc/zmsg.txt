@@ -48,6 +48,16 @@ CZMQ_EXPORT size_t
 CZMQ_EXPORT size_t
     zmsg_content_size (zmsg_t *self);
 
+//  Return message routing ID, if the message came from a ZMQ_SERVER socket.
+//  Else returns zero.                                                      
+CZMQ_EXPORT uint32_t
+    zmsg_routing_id (zmsg_t *self);
+
+//  Set routing ID on message. This is used if/when the message is sent to a
+//  ZMQ_SERVER socket.                                                      
+CZMQ_EXPORT void
+    zmsg_set_routing_id (zmsg_t *self, uint32_t routing_id);
+
 //  Push frame to the front of the message, i.e. before all other frames.  
 //  Message takes ownership of frame, will destroy it when message is sent.
 //  Returns 0 on success, -1 on error. Deprecates zmsg_push, which did not 
@@ -119,8 +129,8 @@ CZMQ_EXPORT zmsg_t *
 CZMQ_EXPORT void
     zmsg_remove (zmsg_t *self, zframe_t *frame);
 
-//  Set cursor to first frame in message. Returns frame, or NULL, if the 
-//  message is empty. Use this to navigate the frames as a list.         
+//  Set cursor to first frame in message. Returns frame, or NULL, if the
+//  message is empty. Use this to navigate the frames as a list.        
 CZMQ_EXPORT zframe_t *
     zmsg_first (zmsg_t *self);
 
@@ -141,9 +151,9 @@ CZMQ_EXPORT zframe_t *
 CZMQ_EXPORT int
     zmsg_save (zmsg_t *self, FILE *file);
 
-//  Load/append an open file into message, create new message if 
-//  null message provided. Returns NULL if the message could not 
-//  be loaded.                                                   
+//  Load/append an open file into message, create new message if
+//  null message provided. Returns NULL if the message could not
+//  be loaded.                                                  
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zmsg_t *
     zmsg_load (zmsg_t *self, FILE *file);
@@ -439,5 +449,47 @@ assert (!msg);
 
 zsock_destroy (&input);
 zsock_destroy (&output);
+
+#if defined (ZMQ_SERVER)
+//  Create server and client sockets and connect over inproc
+zsock_t *server = zsock_new_server ("inproc://zmsg-server.test");
+assert (server);
+zsock_t *client = zsock_new_client ("inproc://zmsg-server.test");
+assert (client);
+
+//  Send request from client to server
+zmsg_t *request = zmsg_new ();
+assert (request);
+zmsg_addstr (request, "Hello");
+rc = zmsg_send (&request, client);
+assert (rc == 0);
+assert (!request);
+
+//  Read request and send reply
+request = zmsg_recv (server);
+assert (request);
+char *string = zmsg_popstr (request);
+assert (streq (string, "Hello"));
+assert (zmsg_routing_id (request));
+zstr_free (&string);
+
+zmsg_t *reply = zmsg_new ();
+assert (reply);
+zmsg_addstr (reply, "World");
+zmsg_set_routing_id (reply, zmsg_routing_id (request));
+rc = zmsg_send (&reply, server);
+assert (rc == 0);
+
+//  Read reply
+reply = zmsg_recv (client);
+string = zmsg_popstr (reply);
+assert (streq (string, "World"));
+assert (zmsg_routing_id (reply) == 0);
+zmsg_destroy (&reply);
+zstr_free (&string);
+
+zsock_destroy (&client);
+zsock_destroy (&server);
+#endif
 
 ----

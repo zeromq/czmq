@@ -877,6 +877,7 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zsock_zap_domain(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -888,6 +889,7 @@ module CZMQ
       def self.zap_domain(self_p)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
         result = ::CZMQ::FFI.zsock_zap_domain(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -976,6 +978,7 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zsock_plain_username(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -987,6 +990,7 @@ module CZMQ
       def self.plain_username(self_p)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
         result = ::CZMQ::FFI.zsock_plain_username(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -1016,6 +1020,7 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zsock_plain_password(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -1027,6 +1032,7 @@ module CZMQ
       def self.plain_password(self_p)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
         result = ::CZMQ::FFI.zsock_plain_password(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -1096,6 +1102,7 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zsock_curve_publickey(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -1107,6 +1114,7 @@ module CZMQ
       def self.curve_publickey(self_p)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
         result = ::CZMQ::FFI.zsock_curve_publickey(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -1114,6 +1122,7 @@ module CZMQ
       def set_curve_publickey(curve_publickey)
         raise DestroyedError unless @ptr
         self_p = @ptr
+        curve_publickey = String(curve_publickey)
         result = ::CZMQ::FFI.zsock_set_curve_publickey(self_p, curve_publickey)
         result
       end
@@ -1125,7 +1134,27 @@ module CZMQ
       # @param self_p [CZMQ::Zsock, #__ptr, FFI::Pointer, nil] object reference to use this method on
       def self.set_curve_publickey(self_p, curve_publickey)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        curve_publickey = String(curve_publickey)
         result = ::CZMQ::FFI.zsock_set_curve_publickey(self_p, curve_publickey)
+        result
+      end
+
+      # Set socket option `curve_publickey` from 32-octet binary
+      def set_curve_publickey_bin(curve_publickey)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_set_curve_publickey_bin(self_p, curve_publickey)
+        result
+      end
+
+      # Set socket option `curve_publickey` from 32-octet binary
+      #
+      # This is the polymorphic version of #set_curve_publickey_bin.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, FFI::Pointer, nil] object reference to use this method on
+      def self.set_curve_publickey_bin(self_p, curve_publickey)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_set_curve_publickey_bin(self_p, curve_publickey)
         result
       end
 
@@ -1134,6 +1163,7 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zsock_curve_secretkey(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -1145,6 +1175,7 @@ module CZMQ
       def self.curve_secretkey(self_p)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
         result = ::CZMQ::FFI.zsock_curve_secretkey(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -1152,6 +1183,7 @@ module CZMQ
       def set_curve_secretkey(curve_secretkey)
         raise DestroyedError unless @ptr
         self_p = @ptr
+        curve_secretkey = String(curve_secretkey)
         result = ::CZMQ::FFI.zsock_set_curve_secretkey(self_p, curve_secretkey)
         result
       end
@@ -1163,7 +1195,27 @@ module CZMQ
       # @param self_p [CZMQ::Zsock, #__ptr, FFI::Pointer, nil] object reference to use this method on
       def self.set_curve_secretkey(self_p, curve_secretkey)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        curve_secretkey = String(curve_secretkey)
         result = ::CZMQ::FFI.zsock_set_curve_secretkey(self_p, curve_secretkey)
+        result
+      end
+
+      # Set socket option `curve_secretkey` from 32-octet binary
+      def set_curve_secretkey_bin(curve_secretkey)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_set_curve_secretkey_bin(self_p, curve_secretkey)
+        result
+      end
+
+      # Set socket option `curve_secretkey` from 32-octet binary
+      #
+      # This is the polymorphic version of #set_curve_secretkey_bin.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, FFI::Pointer, nil] object reference to use this method on
+      def self.set_curve_secretkey_bin(self_p, curve_secretkey)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_set_curve_secretkey_bin(self_p, curve_secretkey)
         result
       end
 
@@ -1172,6 +1224,7 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zsock_curve_serverkey(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -1183,6 +1236,7 @@ module CZMQ
       def self.curve_serverkey(self_p)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
         result = ::CZMQ::FFI.zsock_curve_serverkey(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -1190,6 +1244,7 @@ module CZMQ
       def set_curve_serverkey(curve_serverkey)
         raise DestroyedError unless @ptr
         self_p = @ptr
+        curve_serverkey = String(curve_serverkey)
         result = ::CZMQ::FFI.zsock_set_curve_serverkey(self_p, curve_serverkey)
         result
       end
@@ -1201,7 +1256,27 @@ module CZMQ
       # @param self_p [CZMQ::Zsock, #__ptr, FFI::Pointer, nil] object reference to use this method on
       def self.set_curve_serverkey(self_p, curve_serverkey)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        curve_serverkey = String(curve_serverkey)
         result = ::CZMQ::FFI.zsock_set_curve_serverkey(self_p, curve_serverkey)
+        result
+      end
+
+      # Set socket option `curve_serverkey` from 32-octet binary
+      def set_curve_serverkey_bin(curve_serverkey)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_set_curve_serverkey_bin(self_p, curve_serverkey)
+        result
+      end
+
+      # Set socket option `curve_serverkey` from 32-octet binary
+      #
+      # This is the polymorphic version of #set_curve_serverkey_bin.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, FFI::Pointer, nil] object reference to use this method on
+      def self.set_curve_serverkey_bin(self_p, curve_serverkey)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_set_curve_serverkey_bin(self_p, curve_serverkey)
         result
       end
 
@@ -1290,6 +1365,7 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zsock_gssapi_principal(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -1301,6 +1377,7 @@ module CZMQ
       def self.gssapi_principal(self_p)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
         result = ::CZMQ::FFI.zsock_gssapi_principal(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -1330,6 +1407,7 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zsock_gssapi_service_principal(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -1341,6 +1419,7 @@ module CZMQ
       def self.gssapi_service_principal(self_p)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
         result = ::CZMQ::FFI.zsock_gssapi_service_principal(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -1649,6 +1728,7 @@ module CZMQ
       def set_affinity(affinity)
         raise DestroyedError unless @ptr
         self_p = @ptr
+        affinity = Integer(affinity)
         result = ::CZMQ::FFI.zsock_set_affinity(self_p, affinity)
         result
       end
@@ -1660,6 +1740,7 @@ module CZMQ
       # @param self_p [CZMQ::Zsock, #__ptr, FFI::Pointer, nil] object reference to use this method on
       def self.set_affinity(self_p, affinity)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        affinity = Integer(affinity)
         result = ::CZMQ::FFI.zsock_set_affinity(self_p, affinity)
         result
       end
@@ -1711,6 +1792,7 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zsock_identity(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -1722,6 +1804,7 @@ module CZMQ
       def self.identity(self_p)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
         result = ::CZMQ::FFI.zsock_identity(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -2089,6 +2172,7 @@ module CZMQ
       def set_maxmsgsize(maxmsgsize)
         raise DestroyedError unless @ptr
         self_p = @ptr
+        maxmsgsize = Integer(maxmsgsize)
         result = ::CZMQ::FFI.zsock_set_maxmsgsize(self_p, maxmsgsize)
         result
       end
@@ -2100,6 +2184,7 @@ module CZMQ
       # @param self_p [CZMQ::Zsock, #__ptr, FFI::Pointer, nil] object reference to use this method on
       def self.set_maxmsgsize(self_p, maxmsgsize)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        maxmsgsize = Integer(maxmsgsize)
         result = ::CZMQ::FFI.zsock_set_maxmsgsize(self_p, maxmsgsize)
         result
       end
@@ -2410,6 +2495,7 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zsock_tcp_accept_filter(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -2421,6 +2507,7 @@ module CZMQ
       def self.tcp_accept_filter(self_p)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
         result = ::CZMQ::FFI.zsock_tcp_accept_filter(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -2507,6 +2594,7 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zsock_last_endpoint(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -2518,6 +2606,7 @@ module CZMQ
       def self.last_endpoint(self_p)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
         result = ::CZMQ::FFI.zsock_last_endpoint(self_p)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
     end

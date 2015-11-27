@@ -14,29 +14,30 @@
 -->
 .for version where major = "4"
 .   for option
-.       option.api_name = string.replace (option.name, "_| ")
-.       if type = "int"
-.           option.api_type = "integer"
-.       else
-.           option.api_type ?= type
-.       endif
 .       if mode = "rw" | mode = "r"
 
 <method name = "$(option.api_name:)" polymorphic = "1">
     Get socket option `$(option.name:)`.
-    <return type = "$(option.api_type:)" />
+    <return type = "$(option.api_type:)" fresh = "1" />
 </method>
-.    endif
-.    if mode = "rw" | mode = "w"
+.       endif
+.       if mode = "rw" | mode = "w"
 
 <method name = "set $(option.api_name:)" polymorphic = "1">
     Set socket option `$(option.name:)`.
     <argument name = "$(option.api_name:)" type = "$(option.api_type:)" />
 </method>
-.    endif
-.  endfor
+.       endif
+.       if type = "key"
+
+<method name = "set $(option.api_name:) bin" polymorphic = "1">
+    Set socket option `$(option.name:)` from 32-octet binary
+    <argument name = "$(option.api_name:)" type = "buffer" />
+</method>
+.       endif
+.   endfor
 .endfor
-.output "../src/zsock_option.c"
+.output "../src/zsock_option.inc"
 /*  =========================================================================
     zsock_option - get/set ZeroMQ socket options
 
@@ -57,20 +58,6 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
     =========================================================================
 */
-
-/*
-@header
-    The zsock_option class provides access to the 0MQ getsockopt/setsockopt API.
-    All methods in this class take a void * "polymorphic" reference, which
-    can be either a zsock_t or a zactor_t reference, or a libzmq void *.
-@discuss
-    This class is generated, using the GSL code generator. See the sockopts
-    XML file, which provides the metadata, and the sock_option.gsl template,
-    which does the work.
-@end
-*/
-
-#include "../include/czmq.h"
 
 .for version
 #if (ZMQ_VERSION_MAJOR == $(major))

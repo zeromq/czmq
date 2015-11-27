@@ -8,9 +8,10 @@ zdir_patch - work with directory patches
 SYNOPSIS
 --------
 ----
+// 
 typedef enum {
-    ZDIR_PATCH_CREATE = 1,
-    ZDIR_PATCH_DELETE = 2
+    ZDIR_PATCH_CREATE = 1,                                  //  
+    ZDIR_PATCH_DELETE = 2                                   //  
 } zdir_patch_op_t;
 
 //  Create new patch

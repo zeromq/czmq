@@ -129,7 +129,6 @@ set (czmq_headers
     include/zproxy.h
     include/zrex.h
     include/zsock.h
-    include/zsock_option.h
     include/zstr.h
     include/zsys.h
     include/ztrie.h
@@ -146,6 +145,7 @@ set (czmq_headers
     include/zsocket.h
     include/zsockopt.h
     include/zthread.h
+    src/zsock_option.inc
     src/zgossip_engine.inc
     src/zhash_primes.inc
     src/zclass_example.xml
@@ -188,7 +188,6 @@ set (czmq_sources
     src/zproxy.c
     src/zrex.c
     src/zsock.c
-    src/zsock_option.c
     src/zstr.c
     src/zsys.c
     src/ztrie.c
@@ -275,7 +274,6 @@ set(TEST_CLASSES
   zproxy_test
   zrex_test
   zsock_test
-  zsock_option_test
   zstr_test
   zsys_test
   ztrie_test

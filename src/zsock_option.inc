@@ -19,20 +19,6 @@
     =========================================================================
 */
 
-/*
-@header
-    The zsock_option class provides access to the 0MQ getsockopt/setsockopt API.
-    All methods in this class take a void * "polymorphic" reference, which
-    can be either a zsock_t or a zactor_t reference, or a libzmq void *.
-@discuss
-    This class is generated, using the GSL code generator. See the sockopts
-    XML file, which provides the metadata, and the sock_option.gsl template,
-    which does the work.
-@end
-*/
-
-#include "../include/czmq.h"
-
 #if (ZMQ_VERSION_MAJOR == 4)
 //  --------------------------------------------------------------------------
 //  Set socket ZMQ_TOS value

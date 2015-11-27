@@ -6,7 +6,7 @@
 module CZMQ
   module FFI
 
-    # actor
+    # The zactor class provides a simple actor framework.
     class Zactor
       class DestroyedError < RuntimeError; end
 

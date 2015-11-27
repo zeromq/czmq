@@ -34,7 +34,6 @@
     <class name = "zproxy" />
     <class name = "zrex" />
     <class name = "zsock" />
-    <class name = "zsock_option" />
     <class name = "zstr" />
     <class name = "zsys" />
     <class name = "ztrie" />
@@ -47,6 +46,7 @@
     <class name = "zgossip_msg" private = "1" />
 
     <!-- Other source files in src that we need to package -->
+    <extra name = "zsock_option.inc" />
     <extra name = "zgossip_engine.inc" />
     <extra name = "zhash_primes.inc" />
     <extra name = "zclass_example.xml" />

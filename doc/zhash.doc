@@ -169,7 +169,7 @@ This is the class interface:
     
     //  Self test of this class
     CZMQ_EXPORT void
-        zhash_test (int verbose);
+        zhash_test (bool verbose);
 
 This is the class self test code:
 
