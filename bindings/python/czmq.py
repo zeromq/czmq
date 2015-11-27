@@ -50,6 +50,14 @@ class zmsg_t(Structure):
     pass # Empty - only for type checking
 zmsg_p = POINTER(zmsg_t)
 
+class zarmour_t(Structure):
+    pass # Empty - only for type checking
+zarmour_p = POINTER(zarmour_t)
+
+class char_t(Structure):
+    pass # Empty - only for type checking
+char_p = POINTER(char_t)
+
 class zdir_t(Structure):
     pass # Empty - only for type checking
 zdir_p = POINTER(zdir_t)
@@ -114,9 +122,9 @@ class va_list_t(Structure):
     pass # Empty - only for type checking
 va_list_p = POINTER(va_list_t)
 
-class char_t(Structure):
+class socket_t(Structure):
     pass # Empty - only for type checking
-char_p = POINTER(char_t)
+socket_p = POINTER(socket_t)
 
 class ztrie_t(Structure):
     pass # Empty - only for type checking
@@ -202,7 +210,7 @@ lib.zactor_test.restype = None
 lib.zactor_test.argtypes = [c_bool]
 
 class Zactor(object):
-    """actor"""
+    """The zactor class provides a simple actor framework."""
 
     def __init__(self, *args):
         """Create a new actor passing arbitrary arguments reference."""
@@ -262,6 +270,153 @@ to work with the zsock instance rather than the actor."""
     def test(verbose):
         """Self test of this class."""
         return lib.zactor_test(verbose)
+
+
+# zarmour
+lib.zarmour_new.restype = zarmour_p
+lib.zarmour_new.argtypes = []
+lib.zarmour_destroy.restype = None
+lib.zarmour_destroy.argtypes = [POINTER(zarmour_p)]
+lib.zarmour_print.restype = None
+lib.zarmour_print.argtypes = [zarmour_p]
+lib.zarmour_mode_str.restype = c_char_p
+lib.zarmour_mode_str.argtypes = [zarmour_p]
+lib.zarmour_encode.restype = POINTER(c_char)
+lib.zarmour_encode.argtypes = [zarmour_p, POINTER(c_byte), c_size_t]
+lib.zarmour_decode.restype = POINTER(c_byte)
+lib.zarmour_decode.argtypes = [zarmour_p, c_char_p, POINTER(c_size_t)]
+lib.zarmour_mode.restype = c_int
+lib.zarmour_mode.argtypes = [zarmour_p]
+lib.zarmour_set_mode.restype = None
+lib.zarmour_set_mode.argtypes = [zarmour_p, c_int]
+lib.zarmour_pad.restype = c_bool
+lib.zarmour_pad.argtypes = [zarmour_p]
+lib.zarmour_set_pad.restype = None
+lib.zarmour_set_pad.argtypes = [zarmour_p, c_bool]
+lib.zarmour_pad_char.restype = char_p
+lib.zarmour_pad_char.argtypes = [zarmour_p]
+lib.zarmour_set_pad_char.restype = None
+lib.zarmour_set_pad_char.argtypes = [zarmour_p, char_p]
+lib.zarmour_line_breaks.restype = c_bool
+lib.zarmour_line_breaks.argtypes = [zarmour_p]
+lib.zarmour_set_line_breaks.restype = None
+lib.zarmour_set_line_breaks.argtypes = [zarmour_p, c_bool]
+lib.zarmour_line_length.restype = c_size_t
+lib.zarmour_line_length.argtypes = [zarmour_p]
+lib.zarmour_set_line_length.restype = None
+lib.zarmour_set_line_length.argtypes = [zarmour_p, c_size_t]
+lib.zarmour_test.restype = None
+lib.zarmour_test.argtypes = [c_bool]
+
+class Zarmour(object):
+    """zarmour - armoured text encoding and decoding"""
+
+    Mode = {
+        'mode base64 std': 0,
+        'mode base64 url': 1,
+        'mode base32 std': 2,
+        'mode base32 hex': 3,
+        'mode base16': 4,
+        'mode z85': 5,
+    }
+
+    Mode_out = {
+         0: 'mode base64 std',
+         1: 'mode base64 url',
+         2: 'mode base32 std',
+         3: 'mode base32 hex',
+         4: 'mode base16',
+         5: 'mode z85',
+    }
+
+    def __init__(self, *args):
+        """Create a new zarmour."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zarmour_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zarmour_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 0)
+            self._as_parameter_ = lib.zarmour_new() # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destroy the zarmour."""
+        if self.allow_destruct:
+            lib.zarmour_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def print(self):
+        """Print properties of object"""
+        return lib.zarmour_print(self._as_parameter_)
+
+    def mode_str(self):
+        """Get printable string for mode."""
+        return lib.zarmour_mode_str(self._as_parameter_)
+
+    def encode(self, data, data_size):
+        """Encode a stream of bytes into an armoured string."""
+        return return_fresh_string(lib.zarmour_encode(self._as_parameter_, data, data_size))
+
+    def decode(self, data, decode_size):
+        """Decode an armoured string into a string of bytes.
+The decoded output is null-terminated, so it may be treated
+as a string, if that's what it was prior to encoding."""
+        return lib.zarmour_decode(self._as_parameter_, data, byref(c_size_t.from_param(decode_size)))
+
+    def mode(self):
+        """Get the mode property."""
+        return Zarmour.Mode_out[lib.zarmour_mode(self._as_parameter_)]
+
+    def set_mode(self, mode):
+        """Set the mode property."""
+        return lib.zarmour_set_mode(self._as_parameter_, Zarmour.Mode[mode])
+
+    def pad(self):
+        """Return true if padding is turned on."""
+        return lib.zarmour_pad(self._as_parameter_)
+
+    def set_pad(self, pad):
+        """Turn padding on or off. Default is on."""
+        return lib.zarmour_set_pad(self._as_parameter_, pad)
+
+    def pad_char(self):
+        """Get the padding character."""
+        return lib.zarmour_pad_char(self._as_parameter_)
+
+    def set_pad_char(self, pad_char):
+        """Set the padding character."""
+        return lib.zarmour_set_pad_char(self._as_parameter_, pad_char)
+
+    def line_breaks(self):
+        """Return if splitting output into lines is turned on. Default is off."""
+        return lib.zarmour_line_breaks(self._as_parameter_)
+
+    def set_line_breaks(self, line_breaks):
+        """Turn splitting output into lines on or off."""
+        return lib.zarmour_set_line_breaks(self._as_parameter_, line_breaks)
+
+    def line_length(self):
+        """Get the line length used for splitting lines."""
+        return lib.zarmour_line_length(self._as_parameter_)
+
+    def set_line_length(self, line_length):
+        """Set the line length used for splitting lines."""
+        return lib.zarmour_set_line_length(self._as_parameter_, line_length)
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class"""
+        return lib.zarmour_test(verbose)
 
 
 # zdir
@@ -1917,6 +2072,194 @@ lib.zsock_resolve.restype = c_void_p
 lib.zsock_resolve.argtypes = [c_void_p]
 lib.zsock_test.restype = None
 lib.zsock_test.argtypes = [c_bool]
+lib.zsock_tos.restype = c_int
+lib.zsock_tos.argtypes = [zsock_p]
+lib.zsock_set_tos.restype = None
+lib.zsock_set_tos.argtypes = [zsock_p, c_int]
+lib.zsock_set_router_handover.restype = None
+lib.zsock_set_router_handover.argtypes = [zsock_p, c_int]
+lib.zsock_set_router_mandatory.restype = None
+lib.zsock_set_router_mandatory.argtypes = [zsock_p, c_int]
+lib.zsock_set_probe_router.restype = None
+lib.zsock_set_probe_router.argtypes = [zsock_p, c_int]
+lib.zsock_set_req_relaxed.restype = None
+lib.zsock_set_req_relaxed.argtypes = [zsock_p, c_int]
+lib.zsock_set_req_correlate.restype = None
+lib.zsock_set_req_correlate.argtypes = [zsock_p, c_int]
+lib.zsock_set_conflate.restype = None
+lib.zsock_set_conflate.argtypes = [zsock_p, c_int]
+lib.zsock_zap_domain.restype = POINTER(c_char)
+lib.zsock_zap_domain.argtypes = [zsock_p]
+lib.zsock_set_zap_domain.restype = None
+lib.zsock_set_zap_domain.argtypes = [zsock_p, c_char_p]
+lib.zsock_mechanism.restype = c_int
+lib.zsock_mechanism.argtypes = [zsock_p]
+lib.zsock_plain_server.restype = c_int
+lib.zsock_plain_server.argtypes = [zsock_p]
+lib.zsock_set_plain_server.restype = None
+lib.zsock_set_plain_server.argtypes = [zsock_p, c_int]
+lib.zsock_plain_username.restype = POINTER(c_char)
+lib.zsock_plain_username.argtypes = [zsock_p]
+lib.zsock_set_plain_username.restype = None
+lib.zsock_set_plain_username.argtypes = [zsock_p, c_char_p]
+lib.zsock_plain_password.restype = POINTER(c_char)
+lib.zsock_plain_password.argtypes = [zsock_p]
+lib.zsock_set_plain_password.restype = None
+lib.zsock_set_plain_password.argtypes = [zsock_p, c_char_p]
+lib.zsock_curve_server.restype = c_int
+lib.zsock_curve_server.argtypes = [zsock_p]
+lib.zsock_set_curve_server.restype = None
+lib.zsock_set_curve_server.argtypes = [zsock_p, c_int]
+lib.zsock_curve_publickey.restype = POINTER(c_char)
+lib.zsock_curve_publickey.argtypes = [zsock_p]
+lib.zsock_set_curve_publickey.restype = None
+lib.zsock_set_curve_publickey.argtypes = [zsock_p, c_char_p]
+lib.zsock_set_curve_publickey_bin.restype = None
+lib.zsock_set_curve_publickey_bin.argtypes = [zsock_p, POINTER(c_byte)]
+lib.zsock_curve_secretkey.restype = POINTER(c_char)
+lib.zsock_curve_secretkey.argtypes = [zsock_p]
+lib.zsock_set_curve_secretkey.restype = None
+lib.zsock_set_curve_secretkey.argtypes = [zsock_p, c_char_p]
+lib.zsock_set_curve_secretkey_bin.restype = None
+lib.zsock_set_curve_secretkey_bin.argtypes = [zsock_p, POINTER(c_byte)]
+lib.zsock_curve_serverkey.restype = POINTER(c_char)
+lib.zsock_curve_serverkey.argtypes = [zsock_p]
+lib.zsock_set_curve_serverkey.restype = None
+lib.zsock_set_curve_serverkey.argtypes = [zsock_p, c_char_p]
+lib.zsock_set_curve_serverkey_bin.restype = None
+lib.zsock_set_curve_serverkey_bin.argtypes = [zsock_p, POINTER(c_byte)]
+lib.zsock_gssapi_server.restype = c_int
+lib.zsock_gssapi_server.argtypes = [zsock_p]
+lib.zsock_set_gssapi_server.restype = None
+lib.zsock_set_gssapi_server.argtypes = [zsock_p, c_int]
+lib.zsock_gssapi_plaintext.restype = c_int
+lib.zsock_gssapi_plaintext.argtypes = [zsock_p]
+lib.zsock_set_gssapi_plaintext.restype = None
+lib.zsock_set_gssapi_plaintext.argtypes = [zsock_p, c_int]
+lib.zsock_gssapi_principal.restype = POINTER(c_char)
+lib.zsock_gssapi_principal.argtypes = [zsock_p]
+lib.zsock_set_gssapi_principal.restype = None
+lib.zsock_set_gssapi_principal.argtypes = [zsock_p, c_char_p]
+lib.zsock_gssapi_service_principal.restype = POINTER(c_char)
+lib.zsock_gssapi_service_principal.argtypes = [zsock_p]
+lib.zsock_set_gssapi_service_principal.restype = None
+lib.zsock_set_gssapi_service_principal.argtypes = [zsock_p, c_char_p]
+lib.zsock_ipv6.restype = c_int
+lib.zsock_ipv6.argtypes = [zsock_p]
+lib.zsock_set_ipv6.restype = None
+lib.zsock_set_ipv6.argtypes = [zsock_p, c_int]
+lib.zsock_immediate.restype = c_int
+lib.zsock_immediate.argtypes = [zsock_p]
+lib.zsock_set_immediate.restype = None
+lib.zsock_set_immediate.argtypes = [zsock_p, c_int]
+lib.zsock_set_router_raw.restype = None
+lib.zsock_set_router_raw.argtypes = [zsock_p, c_int]
+lib.zsock_ipv4only.restype = c_int
+lib.zsock_ipv4only.argtypes = [zsock_p]
+lib.zsock_set_ipv4only.restype = None
+lib.zsock_set_ipv4only.argtypes = [zsock_p, c_int]
+lib.zsock_set_delay_attach_on_connect.restype = None
+lib.zsock_set_delay_attach_on_connect.argtypes = [zsock_p, c_int]
+lib.zsock_type.restype = c_int
+lib.zsock_type.argtypes = [zsock_p]
+lib.zsock_sndhwm.restype = c_int
+lib.zsock_sndhwm.argtypes = [zsock_p]
+lib.zsock_set_sndhwm.restype = None
+lib.zsock_set_sndhwm.argtypes = [zsock_p, c_int]
+lib.zsock_rcvhwm.restype = c_int
+lib.zsock_rcvhwm.argtypes = [zsock_p]
+lib.zsock_set_rcvhwm.restype = None
+lib.zsock_set_rcvhwm.argtypes = [zsock_p, c_int]
+lib.zsock_affinity.restype = c_int
+lib.zsock_affinity.argtypes = [zsock_p]
+lib.zsock_set_affinity.restype = None
+lib.zsock_set_affinity.argtypes = [zsock_p, c_int]
+lib.zsock_set_subscribe.restype = None
+lib.zsock_set_subscribe.argtypes = [zsock_p, c_char_p]
+lib.zsock_set_unsubscribe.restype = None
+lib.zsock_set_unsubscribe.argtypes = [zsock_p, c_char_p]
+lib.zsock_identity.restype = POINTER(c_char)
+lib.zsock_identity.argtypes = [zsock_p]
+lib.zsock_set_identity.restype = None
+lib.zsock_set_identity.argtypes = [zsock_p, c_char_p]
+lib.zsock_rate.restype = c_int
+lib.zsock_rate.argtypes = [zsock_p]
+lib.zsock_set_rate.restype = None
+lib.zsock_set_rate.argtypes = [zsock_p, c_int]
+lib.zsock_recovery_ivl.restype = c_int
+lib.zsock_recovery_ivl.argtypes = [zsock_p]
+lib.zsock_set_recovery_ivl.restype = None
+lib.zsock_set_recovery_ivl.argtypes = [zsock_p, c_int]
+lib.zsock_sndbuf.restype = c_int
+lib.zsock_sndbuf.argtypes = [zsock_p]
+lib.zsock_set_sndbuf.restype = None
+lib.zsock_set_sndbuf.argtypes = [zsock_p, c_int]
+lib.zsock_rcvbuf.restype = c_int
+lib.zsock_rcvbuf.argtypes = [zsock_p]
+lib.zsock_set_rcvbuf.restype = None
+lib.zsock_set_rcvbuf.argtypes = [zsock_p, c_int]
+lib.zsock_linger.restype = c_int
+lib.zsock_linger.argtypes = [zsock_p]
+lib.zsock_set_linger.restype = None
+lib.zsock_set_linger.argtypes = [zsock_p, c_int]
+lib.zsock_reconnect_ivl.restype = c_int
+lib.zsock_reconnect_ivl.argtypes = [zsock_p]
+lib.zsock_set_reconnect_ivl.restype = None
+lib.zsock_set_reconnect_ivl.argtypes = [zsock_p, c_int]
+lib.zsock_reconnect_ivl_max.restype = c_int
+lib.zsock_reconnect_ivl_max.argtypes = [zsock_p]
+lib.zsock_set_reconnect_ivl_max.restype = None
+lib.zsock_set_reconnect_ivl_max.argtypes = [zsock_p, c_int]
+lib.zsock_backlog.restype = c_int
+lib.zsock_backlog.argtypes = [zsock_p]
+lib.zsock_set_backlog.restype = None
+lib.zsock_set_backlog.argtypes = [zsock_p, c_int]
+lib.zsock_maxmsgsize.restype = c_int
+lib.zsock_maxmsgsize.argtypes = [zsock_p]
+lib.zsock_set_maxmsgsize.restype = None
+lib.zsock_set_maxmsgsize.argtypes = [zsock_p, c_int]
+lib.zsock_multicast_hops.restype = c_int
+lib.zsock_multicast_hops.argtypes = [zsock_p]
+lib.zsock_set_multicast_hops.restype = None
+lib.zsock_set_multicast_hops.argtypes = [zsock_p, c_int]
+lib.zsock_rcvtimeo.restype = c_int
+lib.zsock_rcvtimeo.argtypes = [zsock_p]
+lib.zsock_set_rcvtimeo.restype = None
+lib.zsock_set_rcvtimeo.argtypes = [zsock_p, c_int]
+lib.zsock_sndtimeo.restype = c_int
+lib.zsock_sndtimeo.argtypes = [zsock_p]
+lib.zsock_set_sndtimeo.restype = None
+lib.zsock_set_sndtimeo.argtypes = [zsock_p, c_int]
+lib.zsock_set_xpub_verbose.restype = None
+lib.zsock_set_xpub_verbose.argtypes = [zsock_p, c_int]
+lib.zsock_tcp_keepalive.restype = c_int
+lib.zsock_tcp_keepalive.argtypes = [zsock_p]
+lib.zsock_set_tcp_keepalive.restype = None
+lib.zsock_set_tcp_keepalive.argtypes = [zsock_p, c_int]
+lib.zsock_tcp_keepalive_idle.restype = c_int
+lib.zsock_tcp_keepalive_idle.argtypes = [zsock_p]
+lib.zsock_set_tcp_keepalive_idle.restype = None
+lib.zsock_set_tcp_keepalive_idle.argtypes = [zsock_p, c_int]
+lib.zsock_tcp_keepalive_cnt.restype = c_int
+lib.zsock_tcp_keepalive_cnt.argtypes = [zsock_p]
+lib.zsock_set_tcp_keepalive_cnt.restype = None
+lib.zsock_set_tcp_keepalive_cnt.argtypes = [zsock_p, c_int]
+lib.zsock_tcp_keepalive_intvl.restype = c_int
+lib.zsock_tcp_keepalive_intvl.argtypes = [zsock_p]
+lib.zsock_set_tcp_keepalive_intvl.restype = None
+lib.zsock_set_tcp_keepalive_intvl.argtypes = [zsock_p, c_int]
+lib.zsock_tcp_accept_filter.restype = POINTER(c_char)
+lib.zsock_tcp_accept_filter.argtypes = [zsock_p]
+lib.zsock_set_tcp_accept_filter.restype = None
+lib.zsock_set_tcp_accept_filter.argtypes = [zsock_p, c_char_p]
+lib.zsock_rcvmore.restype = c_int
+lib.zsock_rcvmore.argtypes = [zsock_p]
+lib.zsock_fd.restype = socket_p
+lib.zsock_fd.argtypes = [zsock_p]
+lib.zsock_events.restype = c_int
+lib.zsock_events.argtypes = [zsock_p]
+lib.zsock_last_endpoint.restype = POINTER(c_char)
+lib.zsock_last_endpoint.argtypes = [zsock_p]
 
 class Zsock(object):
     """high-level socket API that hides libzmq contexts and sockets"""
@@ -2241,6 +2584,382 @@ return the supplied value. Takes a polymorphic socket reference."""
     def test(verbose):
         """Self test of this class"""
         return lib.zsock_test(verbose)
+
+    def tos(self):
+        """Get socket option `tos`."""
+        return lib.zsock_tos(self._as_parameter_)
+
+    def set_tos(self, tos):
+        """Set socket option `tos`."""
+        return lib.zsock_set_tos(self._as_parameter_, tos)
+
+    def set_router_handover(self, router_handover):
+        """Set socket option `router_handover`."""
+        return lib.zsock_set_router_handover(self._as_parameter_, router_handover)
+
+    def set_router_mandatory(self, router_mandatory):
+        """Set socket option `router_mandatory`."""
+        return lib.zsock_set_router_mandatory(self._as_parameter_, router_mandatory)
+
+    def set_probe_router(self, probe_router):
+        """Set socket option `probe_router`."""
+        return lib.zsock_set_probe_router(self._as_parameter_, probe_router)
+
+    def set_req_relaxed(self, req_relaxed):
+        """Set socket option `req_relaxed`."""
+        return lib.zsock_set_req_relaxed(self._as_parameter_, req_relaxed)
+
+    def set_req_correlate(self, req_correlate):
+        """Set socket option `req_correlate`."""
+        return lib.zsock_set_req_correlate(self._as_parameter_, req_correlate)
+
+    def set_conflate(self, conflate):
+        """Set socket option `conflate`."""
+        return lib.zsock_set_conflate(self._as_parameter_, conflate)
+
+    def zap_domain(self):
+        """Get socket option `zap_domain`."""
+        return return_fresh_string(lib.zsock_zap_domain(self._as_parameter_))
+
+    def set_zap_domain(self, zap_domain):
+        """Set socket option `zap_domain`."""
+        return lib.zsock_set_zap_domain(self._as_parameter_, zap_domain)
+
+    def mechanism(self):
+        """Get socket option `mechanism`."""
+        return lib.zsock_mechanism(self._as_parameter_)
+
+    def plain_server(self):
+        """Get socket option `plain_server`."""
+        return lib.zsock_plain_server(self._as_parameter_)
+
+    def set_plain_server(self, plain_server):
+        """Set socket option `plain_server`."""
+        return lib.zsock_set_plain_server(self._as_parameter_, plain_server)
+
+    def plain_username(self):
+        """Get socket option `plain_username`."""
+        return return_fresh_string(lib.zsock_plain_username(self._as_parameter_))
+
+    def set_plain_username(self, plain_username):
+        """Set socket option `plain_username`."""
+        return lib.zsock_set_plain_username(self._as_parameter_, plain_username)
+
+    def plain_password(self):
+        """Get socket option `plain_password`."""
+        return return_fresh_string(lib.zsock_plain_password(self._as_parameter_))
+
+    def set_plain_password(self, plain_password):
+        """Set socket option `plain_password`."""
+        return lib.zsock_set_plain_password(self._as_parameter_, plain_password)
+
+    def curve_server(self):
+        """Get socket option `curve_server`."""
+        return lib.zsock_curve_server(self._as_parameter_)
+
+    def set_curve_server(self, curve_server):
+        """Set socket option `curve_server`."""
+        return lib.zsock_set_curve_server(self._as_parameter_, curve_server)
+
+    def curve_publickey(self):
+        """Get socket option `curve_publickey`."""
+        return return_fresh_string(lib.zsock_curve_publickey(self._as_parameter_))
+
+    def set_curve_publickey(self, curve_publickey):
+        """Set socket option `curve_publickey`."""
+        return lib.zsock_set_curve_publickey(self._as_parameter_, curve_publickey)
+
+    def set_curve_publickey_bin(self, curve_publickey):
+        """Set socket option `curve_publickey` from 32-octet binary"""
+        return lib.zsock_set_curve_publickey_bin(self._as_parameter_, curve_publickey)
+
+    def curve_secretkey(self):
+        """Get socket option `curve_secretkey`."""
+        return return_fresh_string(lib.zsock_curve_secretkey(self._as_parameter_))
+
+    def set_curve_secretkey(self, curve_secretkey):
+        """Set socket option `curve_secretkey`."""
+        return lib.zsock_set_curve_secretkey(self._as_parameter_, curve_secretkey)
+
+    def set_curve_secretkey_bin(self, curve_secretkey):
+        """Set socket option `curve_secretkey` from 32-octet binary"""
+        return lib.zsock_set_curve_secretkey_bin(self._as_parameter_, curve_secretkey)
+
+    def curve_serverkey(self):
+        """Get socket option `curve_serverkey`."""
+        return return_fresh_string(lib.zsock_curve_serverkey(self._as_parameter_))
+
+    def set_curve_serverkey(self, curve_serverkey):
+        """Set socket option `curve_serverkey`."""
+        return lib.zsock_set_curve_serverkey(self._as_parameter_, curve_serverkey)
+
+    def set_curve_serverkey_bin(self, curve_serverkey):
+        """Set socket option `curve_serverkey` from 32-octet binary"""
+        return lib.zsock_set_curve_serverkey_bin(self._as_parameter_, curve_serverkey)
+
+    def gssapi_server(self):
+        """Get socket option `gssapi_server`."""
+        return lib.zsock_gssapi_server(self._as_parameter_)
+
+    def set_gssapi_server(self, gssapi_server):
+        """Set socket option `gssapi_server`."""
+        return lib.zsock_set_gssapi_server(self._as_parameter_, gssapi_server)
+
+    def gssapi_plaintext(self):
+        """Get socket option `gssapi_plaintext`."""
+        return lib.zsock_gssapi_plaintext(self._as_parameter_)
+
+    def set_gssapi_plaintext(self, gssapi_plaintext):
+        """Set socket option `gssapi_plaintext`."""
+        return lib.zsock_set_gssapi_plaintext(self._as_parameter_, gssapi_plaintext)
+
+    def gssapi_principal(self):
+        """Get socket option `gssapi_principal`."""
+        return return_fresh_string(lib.zsock_gssapi_principal(self._as_parameter_))
+
+    def set_gssapi_principal(self, gssapi_principal):
+        """Set socket option `gssapi_principal`."""
+        return lib.zsock_set_gssapi_principal(self._as_parameter_, gssapi_principal)
+
+    def gssapi_service_principal(self):
+        """Get socket option `gssapi_service_principal`."""
+        return return_fresh_string(lib.zsock_gssapi_service_principal(self._as_parameter_))
+
+    def set_gssapi_service_principal(self, gssapi_service_principal):
+        """Set socket option `gssapi_service_principal`."""
+        return lib.zsock_set_gssapi_service_principal(self._as_parameter_, gssapi_service_principal)
+
+    def ipv6(self):
+        """Get socket option `ipv6`."""
+        return lib.zsock_ipv6(self._as_parameter_)
+
+    def set_ipv6(self, ipv6):
+        """Set socket option `ipv6`."""
+        return lib.zsock_set_ipv6(self._as_parameter_, ipv6)
+
+    def immediate(self):
+        """Get socket option `immediate`."""
+        return lib.zsock_immediate(self._as_parameter_)
+
+    def set_immediate(self, immediate):
+        """Set socket option `immediate`."""
+        return lib.zsock_set_immediate(self._as_parameter_, immediate)
+
+    def set_router_raw(self, router_raw):
+        """Set socket option `router_raw`."""
+        return lib.zsock_set_router_raw(self._as_parameter_, router_raw)
+
+    def ipv4only(self):
+        """Get socket option `ipv4only`."""
+        return lib.zsock_ipv4only(self._as_parameter_)
+
+    def set_ipv4only(self, ipv4only):
+        """Set socket option `ipv4only`."""
+        return lib.zsock_set_ipv4only(self._as_parameter_, ipv4only)
+
+    def set_delay_attach_on_connect(self, delay_attach_on_connect):
+        """Set socket option `delay_attach_on_connect`."""
+        return lib.zsock_set_delay_attach_on_connect(self._as_parameter_, delay_attach_on_connect)
+
+    def type(self):
+        """Get socket option `type`."""
+        return lib.zsock_type(self._as_parameter_)
+
+    def sndhwm(self):
+        """Get socket option `sndhwm`."""
+        return lib.zsock_sndhwm(self._as_parameter_)
+
+    def set_sndhwm(self, sndhwm):
+        """Set socket option `sndhwm`."""
+        return lib.zsock_set_sndhwm(self._as_parameter_, sndhwm)
+
+    def rcvhwm(self):
+        """Get socket option `rcvhwm`."""
+        return lib.zsock_rcvhwm(self._as_parameter_)
+
+    def set_rcvhwm(self, rcvhwm):
+        """Set socket option `rcvhwm`."""
+        return lib.zsock_set_rcvhwm(self._as_parameter_, rcvhwm)
+
+    def affinity(self):
+        """Get socket option `affinity`."""
+        return lib.zsock_affinity(self._as_parameter_)
+
+    def set_affinity(self, affinity):
+        """Set socket option `affinity`."""
+        return lib.zsock_set_affinity(self._as_parameter_, affinity)
+
+    def set_subscribe(self, subscribe):
+        """Set socket option `subscribe`."""
+        return lib.zsock_set_subscribe(self._as_parameter_, subscribe)
+
+    def set_unsubscribe(self, unsubscribe):
+        """Set socket option `unsubscribe`."""
+        return lib.zsock_set_unsubscribe(self._as_parameter_, unsubscribe)
+
+    def identity(self):
+        """Get socket option `identity`."""
+        return return_fresh_string(lib.zsock_identity(self._as_parameter_))
+
+    def set_identity(self, identity):
+        """Set socket option `identity`."""
+        return lib.zsock_set_identity(self._as_parameter_, identity)
+
+    def rate(self):
+        """Get socket option `rate`."""
+        return lib.zsock_rate(self._as_parameter_)
+
+    def set_rate(self, rate):
+        """Set socket option `rate`."""
+        return lib.zsock_set_rate(self._as_parameter_, rate)
+
+    def recovery_ivl(self):
+        """Get socket option `recovery_ivl`."""
+        return lib.zsock_recovery_ivl(self._as_parameter_)
+
+    def set_recovery_ivl(self, recovery_ivl):
+        """Set socket option `recovery_ivl`."""
+        return lib.zsock_set_recovery_ivl(self._as_parameter_, recovery_ivl)
+
+    def sndbuf(self):
+        """Get socket option `sndbuf`."""
+        return lib.zsock_sndbuf(self._as_parameter_)
+
+    def set_sndbuf(self, sndbuf):
+        """Set socket option `sndbuf`."""
+        return lib.zsock_set_sndbuf(self._as_parameter_, sndbuf)
+
+    def rcvbuf(self):
+        """Get socket option `rcvbuf`."""
+        return lib.zsock_rcvbuf(self._as_parameter_)
+
+    def set_rcvbuf(self, rcvbuf):
+        """Set socket option `rcvbuf`."""
+        return lib.zsock_set_rcvbuf(self._as_parameter_, rcvbuf)
+
+    def linger(self):
+        """Get socket option `linger`."""
+        return lib.zsock_linger(self._as_parameter_)
+
+    def set_linger(self, linger):
+        """Set socket option `linger`."""
+        return lib.zsock_set_linger(self._as_parameter_, linger)
+
+    def reconnect_ivl(self):
+        """Get socket option `reconnect_ivl`."""
+        return lib.zsock_reconnect_ivl(self._as_parameter_)
+
+    def set_reconnect_ivl(self, reconnect_ivl):
+        """Set socket option `reconnect_ivl`."""
+        return lib.zsock_set_reconnect_ivl(self._as_parameter_, reconnect_ivl)
+
+    def reconnect_ivl_max(self):
+        """Get socket option `reconnect_ivl_max`."""
+        return lib.zsock_reconnect_ivl_max(self._as_parameter_)
+
+    def set_reconnect_ivl_max(self, reconnect_ivl_max):
+        """Set socket option `reconnect_ivl_max`."""
+        return lib.zsock_set_reconnect_ivl_max(self._as_parameter_, reconnect_ivl_max)
+
+    def backlog(self):
+        """Get socket option `backlog`."""
+        return lib.zsock_backlog(self._as_parameter_)
+
+    def set_backlog(self, backlog):
+        """Set socket option `backlog`."""
+        return lib.zsock_set_backlog(self._as_parameter_, backlog)
+
+    def maxmsgsize(self):
+        """Get socket option `maxmsgsize`."""
+        return lib.zsock_maxmsgsize(self._as_parameter_)
+
+    def set_maxmsgsize(self, maxmsgsize):
+        """Set socket option `maxmsgsize`."""
+        return lib.zsock_set_maxmsgsize(self._as_parameter_, maxmsgsize)
+
+    def multicast_hops(self):
+        """Get socket option `multicast_hops`."""
+        return lib.zsock_multicast_hops(self._as_parameter_)
+
+    def set_multicast_hops(self, multicast_hops):
+        """Set socket option `multicast_hops`."""
+        return lib.zsock_set_multicast_hops(self._as_parameter_, multicast_hops)
+
+    def rcvtimeo(self):
+        """Get socket option `rcvtimeo`."""
+        return lib.zsock_rcvtimeo(self._as_parameter_)
+
+    def set_rcvtimeo(self, rcvtimeo):
+        """Set socket option `rcvtimeo`."""
+        return lib.zsock_set_rcvtimeo(self._as_parameter_, rcvtimeo)
+
+    def sndtimeo(self):
+        """Get socket option `sndtimeo`."""
+        return lib.zsock_sndtimeo(self._as_parameter_)
+
+    def set_sndtimeo(self, sndtimeo):
+        """Set socket option `sndtimeo`."""
+        return lib.zsock_set_sndtimeo(self._as_parameter_, sndtimeo)
+
+    def set_xpub_verbose(self, xpub_verbose):
+        """Set socket option `xpub_verbose`."""
+        return lib.zsock_set_xpub_verbose(self._as_parameter_, xpub_verbose)
+
+    def tcp_keepalive(self):
+        """Get socket option `tcp_keepalive`."""
+        return lib.zsock_tcp_keepalive(self._as_parameter_)
+
+    def set_tcp_keepalive(self, tcp_keepalive):
+        """Set socket option `tcp_keepalive`."""
+        return lib.zsock_set_tcp_keepalive(self._as_parameter_, tcp_keepalive)
+
+    def tcp_keepalive_idle(self):
+        """Get socket option `tcp_keepalive_idle`."""
+        return lib.zsock_tcp_keepalive_idle(self._as_parameter_)
+
+    def set_tcp_keepalive_idle(self, tcp_keepalive_idle):
+        """Set socket option `tcp_keepalive_idle`."""
+        return lib.zsock_set_tcp_keepalive_idle(self._as_parameter_, tcp_keepalive_idle)
+
+    def tcp_keepalive_cnt(self):
+        """Get socket option `tcp_keepalive_cnt`."""
+        return lib.zsock_tcp_keepalive_cnt(self._as_parameter_)
+
+    def set_tcp_keepalive_cnt(self, tcp_keepalive_cnt):
+        """Set socket option `tcp_keepalive_cnt`."""
+        return lib.zsock_set_tcp_keepalive_cnt(self._as_parameter_, tcp_keepalive_cnt)
+
+    def tcp_keepalive_intvl(self):
+        """Get socket option `tcp_keepalive_intvl`."""
+        return lib.zsock_tcp_keepalive_intvl(self._as_parameter_)
+
+    def set_tcp_keepalive_intvl(self, tcp_keepalive_intvl):
+        """Set socket option `tcp_keepalive_intvl`."""
+        return lib.zsock_set_tcp_keepalive_intvl(self._as_parameter_, tcp_keepalive_intvl)
+
+    def tcp_accept_filter(self):
+        """Get socket option `tcp_accept_filter`."""
+        return return_fresh_string(lib.zsock_tcp_accept_filter(self._as_parameter_))
+
+    def set_tcp_accept_filter(self, tcp_accept_filter):
+        """Set socket option `tcp_accept_filter`."""
+        return lib.zsock_set_tcp_accept_filter(self._as_parameter_, tcp_accept_filter)
+
+    def rcvmore(self):
+        """Get socket option `rcvmore`."""
+        return lib.zsock_rcvmore(self._as_parameter_)
+
+    def fd(self):
+        """Get socket option `fd`."""
+        return lib.zsock_fd(self._as_parameter_)
+
+    def events(self):
+        """Get socket option `events`."""
+        return lib.zsock_events(self._as_parameter_)
+
+    def last_endpoint(self):
+        """Get socket option `last_endpoint`."""
+        return return_fresh_string(lib.zsock_last_endpoint(self._as_parameter_))
 
 
 # zstr

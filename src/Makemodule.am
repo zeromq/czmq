@@ -40,7 +40,6 @@ include_HEADERS = \
     include/zproxy.h \
     include/zrex.h \
     include/zsock.h \
-    include/zsock_option.h \
     include/zstr.h \
     include/zsys.h \
     include/ztrie.h \
@@ -84,7 +83,6 @@ src_libczmq_la_SOURCES = \
     src/zproxy.c \
     src/zrex.c \
     src/zsock.c \
-    src/zsock_option.c \
     src/zstr.c \
     src/zsys.c \
     src/ztrie.c \
@@ -101,6 +99,7 @@ src_libczmq_la_SOURCES = \
     src/zsocket.c \
     src/zsockopt.c \
     src/zthread.c \
+    src/zsock_option.inc \
     src/zgossip_engine.inc \
     src/zhash_primes.inc \
     src/zclass_example.xml \
@@ -153,6 +152,7 @@ endif
 apidir = @datadir@/zproject/czmq
 dist_api_DATA = \
     api/zactor.xml \
+    api/zarmour.xml \
     api/zdir.xml \
     api/zdir_patch.xml \
     api/zfile.xml \

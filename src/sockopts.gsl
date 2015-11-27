@@ -14,15 +14,19 @@ for version
     endfor
     #   Preprocess options
     for option
+        option.api_name = string.replace (option.name, "_| ")
         if type = "uint64" | type = "int64" | type = "uint32" | type = "int"
             option.ctype = "int"
             option.ctype_const = "int"
+            option.api_type = "integer"
         elsif type = "string" | type = "key"
             option.ctype = "char *"   #   Enforce C strings
             option.ctype_const = "const char *"
+            option.api_type = "string"
         elsif type = "socket"
             option.ctype = "SOCKET"   #   Portable socket type
             option.ctype_const = "SOCKET"
+            option.api_type = "socket"
         else
             echo "E: unknown type: $(type)"
         endif

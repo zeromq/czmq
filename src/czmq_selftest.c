@@ -70,7 +70,6 @@ test_item_t all_tests [] = {
     DECLARE_TEST(zproxy_test),
     DECLARE_TEST(zrex_test),
     DECLARE_TEST(zsock_test),
-    DECLARE_TEST(zsock_option_test),
     DECLARE_TEST(zstr_test),
     DECLARE_TEST(zsys_test),
     DECLARE_TEST(ztrie_test),

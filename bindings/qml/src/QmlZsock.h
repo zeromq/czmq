@@ -192,7 +192,7 @@ public slots:
 
     //  Send a signal over a socket. A signal is a short message carrying a   
     //  success/failure code (by convention, 0 means OK). Signals are encoded 
-    //  to be distinguishable from "normal" messages. Accepts a zsock_t or a   
+    //  to be distinguishable from "normal" messages. Accepts a zsock_t or a  
     //  zactor_t argument, and returns 0 if successful, -1 if the signal could
     //  not be sent. Takes a polymorphic socket reference.                    
     int signal (byte status);
@@ -207,6 +207,288 @@ public slots:
     //  discard it. This is useful when reading partial messages, to get specific
     //  message types.                                                           
     void flush ();
+
+    //  Get socket option `tos`.
+    int tos ();
+
+    //  Set socket option `tos`.
+    void setTos (int tos);
+
+    //  Set socket option `router_handover`.
+    void setRouterHandover (int routerHandover);
+
+    //  Set socket option `router_mandatory`.
+    void setRouterMandatory (int routerMandatory);
+
+    //  Set socket option `probe_router`.
+    void setProbeRouter (int probeRouter);
+
+    //  Set socket option `req_relaxed`.
+    void setReqRelaxed (int reqRelaxed);
+
+    //  Set socket option `req_correlate`.
+    void setReqCorrelate (int reqCorrelate);
+
+    //  Set socket option `conflate`.
+    void setConflate (int conflate);
+
+    //  Get socket option `zap_domain`.
+    QString zapDomain ();
+
+    //  Set socket option `zap_domain`.
+    void setZapDomain (const QString &zapDomain);
+
+    //  Get socket option `mechanism`.
+    int mechanism ();
+
+    //  Get socket option `plain_server`.
+    int plainServer ();
+
+    //  Set socket option `plain_server`.
+    void setPlainServer (int plainServer);
+
+    //  Get socket option `plain_username`.
+    QString plainUsername ();
+
+    //  Set socket option `plain_username`.
+    void setPlainUsername (const QString &plainUsername);
+
+    //  Get socket option `plain_password`.
+    QString plainPassword ();
+
+    //  Set socket option `plain_password`.
+    void setPlainPassword (const QString &plainPassword);
+
+    //  Get socket option `curve_server`.
+    int curveServer ();
+
+    //  Set socket option `curve_server`.
+    void setCurveServer (int curveServer);
+
+    //  Get socket option `curve_publickey`.
+    QString curvePublickey ();
+
+    //  Set socket option `curve_publickey`.
+    void setCurvePublickey (const QString &curvePublickey);
+
+    //  Set socket option `curve_publickey` from 32-octet binary
+    void setCurvePublickeyBin (const byte *curvePublickey);
+
+    //  Get socket option `curve_secretkey`.
+    QString curveSecretkey ();
+
+    //  Set socket option `curve_secretkey`.
+    void setCurveSecretkey (const QString &curveSecretkey);
+
+    //  Set socket option `curve_secretkey` from 32-octet binary
+    void setCurveSecretkeyBin (const byte *curveSecretkey);
+
+    //  Get socket option `curve_serverkey`.
+    QString curveServerkey ();
+
+    //  Set socket option `curve_serverkey`.
+    void setCurveServerkey (const QString &curveServerkey);
+
+    //  Set socket option `curve_serverkey` from 32-octet binary
+    void setCurveServerkeyBin (const byte *curveServerkey);
+
+    //  Get socket option `gssapi_server`.
+    int gssapiServer ();
+
+    //  Set socket option `gssapi_server`.
+    void setGssapiServer (int gssapiServer);
+
+    //  Get socket option `gssapi_plaintext`.
+    int gssapiPlaintext ();
+
+    //  Set socket option `gssapi_plaintext`.
+    void setGssapiPlaintext (int gssapiPlaintext);
+
+    //  Get socket option `gssapi_principal`.
+    QString gssapiPrincipal ();
+
+    //  Set socket option `gssapi_principal`.
+    void setGssapiPrincipal (const QString &gssapiPrincipal);
+
+    //  Get socket option `gssapi_service_principal`.
+    QString gssapiServicePrincipal ();
+
+    //  Set socket option `gssapi_service_principal`.
+    void setGssapiServicePrincipal (const QString &gssapiServicePrincipal);
+
+    //  Get socket option `ipv6`.
+    int ipv6 ();
+
+    //  Set socket option `ipv6`.
+    void setIpv6 (int ipv6);
+
+    //  Get socket option `immediate`.
+    int immediate ();
+
+    //  Set socket option `immediate`.
+    void setImmediate (int immediate);
+
+    //  Set socket option `router_raw`.
+    void setRouterRaw (int routerRaw);
+
+    //  Get socket option `ipv4only`.
+    int ipv4only ();
+
+    //  Set socket option `ipv4only`.
+    void setIpv4only (int ipv4only);
+
+    //  Set socket option `delay_attach_on_connect`.
+    void setDelayAttachOnConnect (int delayAttachOnConnect);
+
+    //  Get socket option `type`.
+    int type ();
+
+    //  Get socket option `sndhwm`.
+    int sndhwm ();
+
+    //  Set socket option `sndhwm`.
+    void setSndhwm (int sndhwm);
+
+    //  Get socket option `rcvhwm`.
+    int rcvhwm ();
+
+    //  Set socket option `rcvhwm`.
+    void setRcvhwm (int rcvhwm);
+
+    //  Get socket option `affinity`.
+    int affinity ();
+
+    //  Set socket option `affinity`.
+    void setAffinity (int affinity);
+
+    //  Set socket option `subscribe`.
+    void setSubscribe (const QString &subscribe);
+
+    //  Set socket option `unsubscribe`.
+    void setUnsubscribe (const QString &unsubscribe);
+
+    //  Get socket option `identity`.
+    QString identity ();
+
+    //  Set socket option `identity`.
+    void setIdentity (const QString &identity);
+
+    //  Get socket option `rate`.
+    int rate ();
+
+    //  Set socket option `rate`.
+    void setRate (int rate);
+
+    //  Get socket option `recovery_ivl`.
+    int recoveryIvl ();
+
+    //  Set socket option `recovery_ivl`.
+    void setRecoveryIvl (int recoveryIvl);
+
+    //  Get socket option `sndbuf`.
+    int sndbuf ();
+
+    //  Set socket option `sndbuf`.
+    void setSndbuf (int sndbuf);
+
+    //  Get socket option `rcvbuf`.
+    int rcvbuf ();
+
+    //  Set socket option `rcvbuf`.
+    void setRcvbuf (int rcvbuf);
+
+    //  Get socket option `linger`.
+    int linger ();
+
+    //  Set socket option `linger`.
+    void setLinger (int linger);
+
+    //  Get socket option `reconnect_ivl`.
+    int reconnectIvl ();
+
+    //  Set socket option `reconnect_ivl`.
+    void setReconnectIvl (int reconnectIvl);
+
+    //  Get socket option `reconnect_ivl_max`.
+    int reconnectIvlMax ();
+
+    //  Set socket option `reconnect_ivl_max`.
+    void setReconnectIvlMax (int reconnectIvlMax);
+
+    //  Get socket option `backlog`.
+    int backlog ();
+
+    //  Set socket option `backlog`.
+    void setBacklog (int backlog);
+
+    //  Get socket option `maxmsgsize`.
+    int maxmsgsize ();
+
+    //  Set socket option `maxmsgsize`.
+    void setMaxmsgsize (int maxmsgsize);
+
+    //  Get socket option `multicast_hops`.
+    int multicastHops ();
+
+    //  Set socket option `multicast_hops`.
+    void setMulticastHops (int multicastHops);
+
+    //  Get socket option `rcvtimeo`.
+    int rcvtimeo ();
+
+    //  Set socket option `rcvtimeo`.
+    void setRcvtimeo (int rcvtimeo);
+
+    //  Get socket option `sndtimeo`.
+    int sndtimeo ();
+
+    //  Set socket option `sndtimeo`.
+    void setSndtimeo (int sndtimeo);
+
+    //  Set socket option `xpub_verbose`.
+    void setXpubVerbose (int xpubVerbose);
+
+    //  Get socket option `tcp_keepalive`.
+    int tcpKeepalive ();
+
+    //  Set socket option `tcp_keepalive`.
+    void setTcpKeepalive (int tcpKeepalive);
+
+    //  Get socket option `tcp_keepalive_idle`.
+    int tcpKeepaliveIdle ();
+
+    //  Set socket option `tcp_keepalive_idle`.
+    void setTcpKeepaliveIdle (int tcpKeepaliveIdle);
+
+    //  Get socket option `tcp_keepalive_cnt`.
+    int tcpKeepaliveCnt ();
+
+    //  Set socket option `tcp_keepalive_cnt`.
+    void setTcpKeepaliveCnt (int tcpKeepaliveCnt);
+
+    //  Get socket option `tcp_keepalive_intvl`.
+    int tcpKeepaliveIntvl ();
+
+    //  Set socket option `tcp_keepalive_intvl`.
+    void setTcpKeepaliveIntvl (int tcpKeepaliveIntvl);
+
+    //  Get socket option `tcp_accept_filter`.
+    QString tcpAcceptFilter ();
+
+    //  Set socket option `tcp_accept_filter`.
+    void setTcpAcceptFilter (const QString &tcpAcceptFilter);
+
+    //  Get socket option `rcvmore`.
+    int rcvmore ();
+
+    //  Get socket option `fd`.
+    SOCKET fd ();
+
+    //  Get socket option `events`.
+    int events ();
+
+    //  Get socket option `last_endpoint`.
+    QString lastEndpoint ();
 };
 
 class QmlZsockAttached : public QObject

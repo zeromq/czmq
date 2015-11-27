@@ -17,8 +17,8 @@
     =========================================================================
 */
 
-#ifndef czmq_library_H_INCLUDED
-#define czmq_library_H_INCLUDED
+#ifndef CZMQ_LIBRARY_H_INCLUDED
+#define CZMQ_LIBRARY_H_INCLUDED
 
 //  Set up environment for the application
 #include "czmq_prelude.h"
@@ -100,8 +100,6 @@ typedef struct _zrex_t zrex_t;
 #define ZREX_T_DEFINED
 typedef struct _zsock_t zsock_t;
 #define ZSOCK_T_DEFINED
-typedef struct _zsock_option_t zsock_option_t;
-#define ZSOCK_OPTION_T_DEFINED
 typedef struct _zstr_t zstr_t;
 #define ZSTR_T_DEFINED
 typedef struct _zsys_t zsys_t;
@@ -160,7 +158,6 @@ typedef struct _zthread_t zthread_t;
 #include "zproxy.h"
 #include "zrex.h"
 #include "zsock.h"
-#include "zsock_option.h"
 #include "zstr.h"
 #include "zsys.h"
 #include "ztrie.h"

@@ -79,8 +79,8 @@ public class Zhash implements AutoCloseable {
         return Zhash.__cursor (pointer);
     }
 
-    native static void __comment (long pointer, );
-    public void comment (long pointer, ) {
+    native static void __comment (long pointer,Object... );
+    public void comment (long pointer,Object... ) {
         return Zhash.__comment (pointer,);
     }
 

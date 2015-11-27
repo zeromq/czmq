@@ -1,5 +1,5 @@
 <class name = "zactor">
-    actor
+    The zactor class provides a simple actor framework.
 
     <include filename = "license.xml" />
 

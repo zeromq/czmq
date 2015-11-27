@@ -356,7 +356,7 @@ void QZsock::setUnbounded ()
 ///
 //  Send a signal over a socket. A signal is a short message carrying a   
 //  success/failure code (by convention, 0 means OK). Signals are encoded 
-//  to be distinguishable from "normal" messages. Accepts a zsock_t or a   
+//  to be distinguishable from "normal" messages. Accepts a zsock_t or a  
 //  zactor_t argument, and returns 0 if successful, -1 if the signal could
 //  not be sent. Takes a polymorphic socket reference.                    
 int QZsock::signal (byte status)
@@ -412,6 +412,780 @@ void QZsock::test (bool verbose)
 {
     zsock_test (verbose);
     
+}
+
+///
+//  Get socket option `tos`.
+int QZsock::tos ()
+{
+    int rv = zsock_tos (self);
+    return rv;
+}
+
+///
+//  Set socket option `tos`.
+void QZsock::setTos (int tos)
+{
+    zsock_set_tos (self, tos);
+    
+}
+
+///
+//  Set socket option `router_handover`.
+void QZsock::setRouterHandover (int routerHandover)
+{
+    zsock_set_router_handover (self, routerHandover);
+    
+}
+
+///
+//  Set socket option `router_mandatory`.
+void QZsock::setRouterMandatory (int routerMandatory)
+{
+    zsock_set_router_mandatory (self, routerMandatory);
+    
+}
+
+///
+//  Set socket option `probe_router`.
+void QZsock::setProbeRouter (int probeRouter)
+{
+    zsock_set_probe_router (self, probeRouter);
+    
+}
+
+///
+//  Set socket option `req_relaxed`.
+void QZsock::setReqRelaxed (int reqRelaxed)
+{
+    zsock_set_req_relaxed (self, reqRelaxed);
+    
+}
+
+///
+//  Set socket option `req_correlate`.
+void QZsock::setReqCorrelate (int reqCorrelate)
+{
+    zsock_set_req_correlate (self, reqCorrelate);
+    
+}
+
+///
+//  Set socket option `conflate`.
+void QZsock::setConflate (int conflate)
+{
+    zsock_set_conflate (self, conflate);
+    
+}
+
+///
+//  Get socket option `zap_domain`.
+QString QZsock::zapDomain ()
+{
+    char *retStr_ = zsock_zap_domain (self);
+    QString rv = QString (retStr_);
+    free (retStr_);;
+    return rv;
+}
+
+///
+//  Set socket option `zap_domain`.
+void QZsock::setZapDomain (const QString &zapDomain)
+{
+    zsock_set_zap_domain (self, zapDomain.toUtf8().data());
+    
+}
+
+///
+//  Get socket option `mechanism`.
+int QZsock::mechanism ()
+{
+    int rv = zsock_mechanism (self);
+    return rv;
+}
+
+///
+//  Get socket option `plain_server`.
+int QZsock::plainServer ()
+{
+    int rv = zsock_plain_server (self);
+    return rv;
+}
+
+///
+//  Set socket option `plain_server`.
+void QZsock::setPlainServer (int plainServer)
+{
+    zsock_set_plain_server (self, plainServer);
+    
+}
+
+///
+//  Get socket option `plain_username`.
+QString QZsock::plainUsername ()
+{
+    char *retStr_ = zsock_plain_username (self);
+    QString rv = QString (retStr_);
+    free (retStr_);;
+    return rv;
+}
+
+///
+//  Set socket option `plain_username`.
+void QZsock::setPlainUsername (const QString &plainUsername)
+{
+    zsock_set_plain_username (self, plainUsername.toUtf8().data());
+    
+}
+
+///
+//  Get socket option `plain_password`.
+QString QZsock::plainPassword ()
+{
+    char *retStr_ = zsock_plain_password (self);
+    QString rv = QString (retStr_);
+    free (retStr_);;
+    return rv;
+}
+
+///
+//  Set socket option `plain_password`.
+void QZsock::setPlainPassword (const QString &plainPassword)
+{
+    zsock_set_plain_password (self, plainPassword.toUtf8().data());
+    
+}
+
+///
+//  Get socket option `curve_server`.
+int QZsock::curveServer ()
+{
+    int rv = zsock_curve_server (self);
+    return rv;
+}
+
+///
+//  Set socket option `curve_server`.
+void QZsock::setCurveServer (int curveServer)
+{
+    zsock_set_curve_server (self, curveServer);
+    
+}
+
+///
+//  Get socket option `curve_publickey`.
+QString QZsock::curvePublickey ()
+{
+    char *retStr_ = zsock_curve_publickey (self);
+    QString rv = QString (retStr_);
+    free (retStr_);;
+    return rv;
+}
+
+///
+//  Set socket option `curve_publickey`.
+void QZsock::setCurvePublickey (const QString &curvePublickey)
+{
+    zsock_set_curve_publickey (self, curvePublickey.toUtf8().data());
+    
+}
+
+///
+//  Set socket option `curve_publickey` from 32-octet binary
+void QZsock::setCurvePublickeyBin (const byte *curvePublickey)
+{
+    zsock_set_curve_publickey_bin (self, curvePublickey);
+    
+}
+
+///
+//  Get socket option `curve_secretkey`.
+QString QZsock::curveSecretkey ()
+{
+    char *retStr_ = zsock_curve_secretkey (self);
+    QString rv = QString (retStr_);
+    free (retStr_);;
+    return rv;
+}
+
+///
+//  Set socket option `curve_secretkey`.
+void QZsock::setCurveSecretkey (const QString &curveSecretkey)
+{
+    zsock_set_curve_secretkey (self, curveSecretkey.toUtf8().data());
+    
+}
+
+///
+//  Set socket option `curve_secretkey` from 32-octet binary
+void QZsock::setCurveSecretkeyBin (const byte *curveSecretkey)
+{
+    zsock_set_curve_secretkey_bin (self, curveSecretkey);
+    
+}
+
+///
+//  Get socket option `curve_serverkey`.
+QString QZsock::curveServerkey ()
+{
+    char *retStr_ = zsock_curve_serverkey (self);
+    QString rv = QString (retStr_);
+    free (retStr_);;
+    return rv;
+}
+
+///
+//  Set socket option `curve_serverkey`.
+void QZsock::setCurveServerkey (const QString &curveServerkey)
+{
+    zsock_set_curve_serverkey (self, curveServerkey.toUtf8().data());
+    
+}
+
+///
+//  Set socket option `curve_serverkey` from 32-octet binary
+void QZsock::setCurveServerkeyBin (const byte *curveServerkey)
+{
+    zsock_set_curve_serverkey_bin (self, curveServerkey);
+    
+}
+
+///
+//  Get socket option `gssapi_server`.
+int QZsock::gssapiServer ()
+{
+    int rv = zsock_gssapi_server (self);
+    return rv;
+}
+
+///
+//  Set socket option `gssapi_server`.
+void QZsock::setGssapiServer (int gssapiServer)
+{
+    zsock_set_gssapi_server (self, gssapiServer);
+    
+}
+
+///
+//  Get socket option `gssapi_plaintext`.
+int QZsock::gssapiPlaintext ()
+{
+    int rv = zsock_gssapi_plaintext (self);
+    return rv;
+}
+
+///
+//  Set socket option `gssapi_plaintext`.
+void QZsock::setGssapiPlaintext (int gssapiPlaintext)
+{
+    zsock_set_gssapi_plaintext (self, gssapiPlaintext);
+    
+}
+
+///
+//  Get socket option `gssapi_principal`.
+QString QZsock::gssapiPrincipal ()
+{
+    char *retStr_ = zsock_gssapi_principal (self);
+    QString rv = QString (retStr_);
+    free (retStr_);;
+    return rv;
+}
+
+///
+//  Set socket option `gssapi_principal`.
+void QZsock::setGssapiPrincipal (const QString &gssapiPrincipal)
+{
+    zsock_set_gssapi_principal (self, gssapiPrincipal.toUtf8().data());
+    
+}
+
+///
+//  Get socket option `gssapi_service_principal`.
+QString QZsock::gssapiServicePrincipal ()
+{
+    char *retStr_ = zsock_gssapi_service_principal (self);
+    QString rv = QString (retStr_);
+    free (retStr_);;
+    return rv;
+}
+
+///
+//  Set socket option `gssapi_service_principal`.
+void QZsock::setGssapiServicePrincipal (const QString &gssapiServicePrincipal)
+{
+    zsock_set_gssapi_service_principal (self, gssapiServicePrincipal.toUtf8().data());
+    
+}
+
+///
+//  Get socket option `ipv6`.
+int QZsock::ipv6 ()
+{
+    int rv = zsock_ipv6 (self);
+    return rv;
+}
+
+///
+//  Set socket option `ipv6`.
+void QZsock::setIpv6 (int ipv6)
+{
+    zsock_set_ipv6 (self, ipv6);
+    
+}
+
+///
+//  Get socket option `immediate`.
+int QZsock::immediate ()
+{
+    int rv = zsock_immediate (self);
+    return rv;
+}
+
+///
+//  Set socket option `immediate`.
+void QZsock::setImmediate (int immediate)
+{
+    zsock_set_immediate (self, immediate);
+    
+}
+
+///
+//  Set socket option `router_raw`.
+void QZsock::setRouterRaw (int routerRaw)
+{
+    zsock_set_router_raw (self, routerRaw);
+    
+}
+
+///
+//  Get socket option `ipv4only`.
+int QZsock::ipv4only ()
+{
+    int rv = zsock_ipv4only (self);
+    return rv;
+}
+
+///
+//  Set socket option `ipv4only`.
+void QZsock::setIpv4only (int ipv4only)
+{
+    zsock_set_ipv4only (self, ipv4only);
+    
+}
+
+///
+//  Set socket option `delay_attach_on_connect`.
+void QZsock::setDelayAttachOnConnect (int delayAttachOnConnect)
+{
+    zsock_set_delay_attach_on_connect (self, delayAttachOnConnect);
+    
+}
+
+///
+//  Get socket option `type`.
+int QZsock::type ()
+{
+    int rv = zsock_type (self);
+    return rv;
+}
+
+///
+//  Get socket option `sndhwm`.
+int QZsock::sndhwm ()
+{
+    int rv = zsock_sndhwm (self);
+    return rv;
+}
+
+///
+//  Set socket option `sndhwm`.
+void QZsock::setSndhwm (int sndhwm)
+{
+    zsock_set_sndhwm (self, sndhwm);
+    
+}
+
+///
+//  Get socket option `rcvhwm`.
+int QZsock::rcvhwm ()
+{
+    int rv = zsock_rcvhwm (self);
+    return rv;
+}
+
+///
+//  Set socket option `rcvhwm`.
+void QZsock::setRcvhwm (int rcvhwm)
+{
+    zsock_set_rcvhwm (self, rcvhwm);
+    
+}
+
+///
+//  Get socket option `affinity`.
+int QZsock::affinity ()
+{
+    int rv = zsock_affinity (self);
+    return rv;
+}
+
+///
+//  Set socket option `affinity`.
+void QZsock::setAffinity (int affinity)
+{
+    zsock_set_affinity (self, affinity);
+    
+}
+
+///
+//  Set socket option `subscribe`.
+void QZsock::setSubscribe (const QString &subscribe)
+{
+    zsock_set_subscribe (self, subscribe.toUtf8().data());
+    
+}
+
+///
+//  Set socket option `unsubscribe`.
+void QZsock::setUnsubscribe (const QString &unsubscribe)
+{
+    zsock_set_unsubscribe (self, unsubscribe.toUtf8().data());
+    
+}
+
+///
+//  Get socket option `identity`.
+QString QZsock::identity ()
+{
+    char *retStr_ = zsock_identity (self);
+    QString rv = QString (retStr_);
+    free (retStr_);;
+    return rv;
+}
+
+///
+//  Set socket option `identity`.
+void QZsock::setIdentity (const QString &identity)
+{
+    zsock_set_identity (self, identity.toUtf8().data());
+    
+}
+
+///
+//  Get socket option `rate`.
+int QZsock::rate ()
+{
+    int rv = zsock_rate (self);
+    return rv;
+}
+
+///
+//  Set socket option `rate`.
+void QZsock::setRate (int rate)
+{
+    zsock_set_rate (self, rate);
+    
+}
+
+///
+//  Get socket option `recovery_ivl`.
+int QZsock::recoveryIvl ()
+{
+    int rv = zsock_recovery_ivl (self);
+    return rv;
+}
+
+///
+//  Set socket option `recovery_ivl`.
+void QZsock::setRecoveryIvl (int recoveryIvl)
+{
+    zsock_set_recovery_ivl (self, recoveryIvl);
+    
+}
+
+///
+//  Get socket option `sndbuf`.
+int QZsock::sndbuf ()
+{
+    int rv = zsock_sndbuf (self);
+    return rv;
+}
+
+///
+//  Set socket option `sndbuf`.
+void QZsock::setSndbuf (int sndbuf)
+{
+    zsock_set_sndbuf (self, sndbuf);
+    
+}
+
+///
+//  Get socket option `rcvbuf`.
+int QZsock::rcvbuf ()
+{
+    int rv = zsock_rcvbuf (self);
+    return rv;
+}
+
+///
+//  Set socket option `rcvbuf`.
+void QZsock::setRcvbuf (int rcvbuf)
+{
+    zsock_set_rcvbuf (self, rcvbuf);
+    
+}
+
+///
+//  Get socket option `linger`.
+int QZsock::linger ()
+{
+    int rv = zsock_linger (self);
+    return rv;
+}
+
+///
+//  Set socket option `linger`.
+void QZsock::setLinger (int linger)
+{
+    zsock_set_linger (self, linger);
+    
+}
+
+///
+//  Get socket option `reconnect_ivl`.
+int QZsock::reconnectIvl ()
+{
+    int rv = zsock_reconnect_ivl (self);
+    return rv;
+}
+
+///
+//  Set socket option `reconnect_ivl`.
+void QZsock::setReconnectIvl (int reconnectIvl)
+{
+    zsock_set_reconnect_ivl (self, reconnectIvl);
+    
+}
+
+///
+//  Get socket option `reconnect_ivl_max`.
+int QZsock::reconnectIvlMax ()
+{
+    int rv = zsock_reconnect_ivl_max (self);
+    return rv;
+}
+
+///
+//  Set socket option `reconnect_ivl_max`.
+void QZsock::setReconnectIvlMax (int reconnectIvlMax)
+{
+    zsock_set_reconnect_ivl_max (self, reconnectIvlMax);
+    
+}
+
+///
+//  Get socket option `backlog`.
+int QZsock::backlog ()
+{
+    int rv = zsock_backlog (self);
+    return rv;
+}
+
+///
+//  Set socket option `backlog`.
+void QZsock::setBacklog (int backlog)
+{
+    zsock_set_backlog (self, backlog);
+    
+}
+
+///
+//  Get socket option `maxmsgsize`.
+int QZsock::maxmsgsize ()
+{
+    int rv = zsock_maxmsgsize (self);
+    return rv;
+}
+
+///
+//  Set socket option `maxmsgsize`.
+void QZsock::setMaxmsgsize (int maxmsgsize)
+{
+    zsock_set_maxmsgsize (self, maxmsgsize);
+    
+}
+
+///
+//  Get socket option `multicast_hops`.
+int QZsock::multicastHops ()
+{
+    int rv = zsock_multicast_hops (self);
+    return rv;
+}
+
+///
+//  Set socket option `multicast_hops`.
+void QZsock::setMulticastHops (int multicastHops)
+{
+    zsock_set_multicast_hops (self, multicastHops);
+    
+}
+
+///
+//  Get socket option `rcvtimeo`.
+int QZsock::rcvtimeo ()
+{
+    int rv = zsock_rcvtimeo (self);
+    return rv;
+}
+
+///
+//  Set socket option `rcvtimeo`.
+void QZsock::setRcvtimeo (int rcvtimeo)
+{
+    zsock_set_rcvtimeo (self, rcvtimeo);
+    
+}
+
+///
+//  Get socket option `sndtimeo`.
+int QZsock::sndtimeo ()
+{
+    int rv = zsock_sndtimeo (self);
+    return rv;
+}
+
+///
+//  Set socket option `sndtimeo`.
+void QZsock::setSndtimeo (int sndtimeo)
+{
+    zsock_set_sndtimeo (self, sndtimeo);
+    
+}
+
+///
+//  Set socket option `xpub_verbose`.
+void QZsock::setXpubVerbose (int xpubVerbose)
+{
+    zsock_set_xpub_verbose (self, xpubVerbose);
+    
+}
+
+///
+//  Get socket option `tcp_keepalive`.
+int QZsock::tcpKeepalive ()
+{
+    int rv = zsock_tcp_keepalive (self);
+    return rv;
+}
+
+///
+//  Set socket option `tcp_keepalive`.
+void QZsock::setTcpKeepalive (int tcpKeepalive)
+{
+    zsock_set_tcp_keepalive (self, tcpKeepalive);
+    
+}
+
+///
+//  Get socket option `tcp_keepalive_idle`.
+int QZsock::tcpKeepaliveIdle ()
+{
+    int rv = zsock_tcp_keepalive_idle (self);
+    return rv;
+}
+
+///
+//  Set socket option `tcp_keepalive_idle`.
+void QZsock::setTcpKeepaliveIdle (int tcpKeepaliveIdle)
+{
+    zsock_set_tcp_keepalive_idle (self, tcpKeepaliveIdle);
+    
+}
+
+///
+//  Get socket option `tcp_keepalive_cnt`.
+int QZsock::tcpKeepaliveCnt ()
+{
+    int rv = zsock_tcp_keepalive_cnt (self);
+    return rv;
+}
+
+///
+//  Set socket option `tcp_keepalive_cnt`.
+void QZsock::setTcpKeepaliveCnt (int tcpKeepaliveCnt)
+{
+    zsock_set_tcp_keepalive_cnt (self, tcpKeepaliveCnt);
+    
+}
+
+///
+//  Get socket option `tcp_keepalive_intvl`.
+int QZsock::tcpKeepaliveIntvl ()
+{
+    int rv = zsock_tcp_keepalive_intvl (self);
+    return rv;
+}
+
+///
+//  Set socket option `tcp_keepalive_intvl`.
+void QZsock::setTcpKeepaliveIntvl (int tcpKeepaliveIntvl)
+{
+    zsock_set_tcp_keepalive_intvl (self, tcpKeepaliveIntvl);
+    
+}
+
+///
+//  Get socket option `tcp_accept_filter`.
+QString QZsock::tcpAcceptFilter ()
+{
+    char *retStr_ = zsock_tcp_accept_filter (self);
+    QString rv = QString (retStr_);
+    free (retStr_);;
+    return rv;
+}
+
+///
+//  Set socket option `tcp_accept_filter`.
+void QZsock::setTcpAcceptFilter (const QString &tcpAcceptFilter)
+{
+    zsock_set_tcp_accept_filter (self, tcpAcceptFilter.toUtf8().data());
+    
+}
+
+///
+//  Get socket option `rcvmore`.
+int QZsock::rcvmore ()
+{
+    int rv = zsock_rcvmore (self);
+    return rv;
+}
+
+///
+//  Get socket option `fd`.
+SOCKET QZsock::fd ()
+{
+    SOCKET rv = zsock_fd (self);
+    return rv;
+}
+
+///
+//  Get socket option `events`.
+int QZsock::events ()
+{
+    int rv = zsock_events (self);
+    return rv;
+}
+
+///
+//  Get socket option `last_endpoint`.
+QString QZsock::lastEndpoint ()
+{
+    char *retStr_ = zsock_last_endpoint (self);
+    QString rv = QString (retStr_);
+    free (retStr_);;
+    return rv;
 }
 /*
 ################################################################################

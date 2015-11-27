@@ -221,7 +221,7 @@ void QmlZsock::setUnbounded () {
 ///
 //  Send a signal over a socket. A signal is a short message carrying a   
 //  success/failure code (by convention, 0 means OK). Signals are encoded 
-//  to be distinguishable from "normal" messages. Accepts a zsock_t or a   
+//  to be distinguishable from "normal" messages. Accepts a zsock_t or a  
 //  zactor_t argument, and returns 0 if successful, -1 if the signal could
 //  not be sent. Takes a polymorphic socket reference.                    
 int QmlZsock::signal (byte status) {
@@ -243,6 +243,603 @@ int QmlZsock::wait () {
 //  message types.                                                           
 void QmlZsock::flush () {
     zsock_flush (self);
+};
+
+///
+//  Get socket option `tos`.
+int QmlZsock::tos () {
+    return zsock_tos (self);
+};
+
+///
+//  Set socket option `tos`.
+void QmlZsock::setTos (int tos) {
+    zsock_set_tos (self, tos);
+};
+
+///
+//  Set socket option `router_handover`.
+void QmlZsock::setRouterHandover (int routerHandover) {
+    zsock_set_router_handover (self, routerHandover);
+};
+
+///
+//  Set socket option `router_mandatory`.
+void QmlZsock::setRouterMandatory (int routerMandatory) {
+    zsock_set_router_mandatory (self, routerMandatory);
+};
+
+///
+//  Set socket option `probe_router`.
+void QmlZsock::setProbeRouter (int probeRouter) {
+    zsock_set_probe_router (self, probeRouter);
+};
+
+///
+//  Set socket option `req_relaxed`.
+void QmlZsock::setReqRelaxed (int reqRelaxed) {
+    zsock_set_req_relaxed (self, reqRelaxed);
+};
+
+///
+//  Set socket option `req_correlate`.
+void QmlZsock::setReqCorrelate (int reqCorrelate) {
+    zsock_set_req_correlate (self, reqCorrelate);
+};
+
+///
+//  Set socket option `conflate`.
+void QmlZsock::setConflate (int conflate) {
+    zsock_set_conflate (self, conflate);
+};
+
+///
+//  Get socket option `zap_domain`.
+QString QmlZsock::zapDomain () {
+    char *retStr_ = zsock_zap_domain (self);
+    QString retQStr_ = QString (retStr_);
+    free (retStr_);
+    return retQStr_;
+};
+
+///
+//  Set socket option `zap_domain`.
+void QmlZsock::setZapDomain (const QString &zapDomain) {
+    zsock_set_zap_domain (self, zapDomain.toUtf8().data());
+};
+
+///
+//  Get socket option `mechanism`.
+int QmlZsock::mechanism () {
+    return zsock_mechanism (self);
+};
+
+///
+//  Get socket option `plain_server`.
+int QmlZsock::plainServer () {
+    return zsock_plain_server (self);
+};
+
+///
+//  Set socket option `plain_server`.
+void QmlZsock::setPlainServer (int plainServer) {
+    zsock_set_plain_server (self, plainServer);
+};
+
+///
+//  Get socket option `plain_username`.
+QString QmlZsock::plainUsername () {
+    char *retStr_ = zsock_plain_username (self);
+    QString retQStr_ = QString (retStr_);
+    free (retStr_);
+    return retQStr_;
+};
+
+///
+//  Set socket option `plain_username`.
+void QmlZsock::setPlainUsername (const QString &plainUsername) {
+    zsock_set_plain_username (self, plainUsername.toUtf8().data());
+};
+
+///
+//  Get socket option `plain_password`.
+QString QmlZsock::plainPassword () {
+    char *retStr_ = zsock_plain_password (self);
+    QString retQStr_ = QString (retStr_);
+    free (retStr_);
+    return retQStr_;
+};
+
+///
+//  Set socket option `plain_password`.
+void QmlZsock::setPlainPassword (const QString &plainPassword) {
+    zsock_set_plain_password (self, plainPassword.toUtf8().data());
+};
+
+///
+//  Get socket option `curve_server`.
+int QmlZsock::curveServer () {
+    return zsock_curve_server (self);
+};
+
+///
+//  Set socket option `curve_server`.
+void QmlZsock::setCurveServer (int curveServer) {
+    zsock_set_curve_server (self, curveServer);
+};
+
+///
+//  Get socket option `curve_publickey`.
+QString QmlZsock::curvePublickey () {
+    char *retStr_ = zsock_curve_publickey (self);
+    QString retQStr_ = QString (retStr_);
+    free (retStr_);
+    return retQStr_;
+};
+
+///
+//  Set socket option `curve_publickey`.
+void QmlZsock::setCurvePublickey (const QString &curvePublickey) {
+    zsock_set_curve_publickey (self, curvePublickey.toUtf8().data());
+};
+
+///
+//  Set socket option `curve_publickey` from 32-octet binary
+void QmlZsock::setCurvePublickeyBin (const byte *curvePublickey) {
+    zsock_set_curve_publickey_bin (self, curvePublickey);
+};
+
+///
+//  Get socket option `curve_secretkey`.
+QString QmlZsock::curveSecretkey () {
+    char *retStr_ = zsock_curve_secretkey (self);
+    QString retQStr_ = QString (retStr_);
+    free (retStr_);
+    return retQStr_;
+};
+
+///
+//  Set socket option `curve_secretkey`.
+void QmlZsock::setCurveSecretkey (const QString &curveSecretkey) {
+    zsock_set_curve_secretkey (self, curveSecretkey.toUtf8().data());
+};
+
+///
+//  Set socket option `curve_secretkey` from 32-octet binary
+void QmlZsock::setCurveSecretkeyBin (const byte *curveSecretkey) {
+    zsock_set_curve_secretkey_bin (self, curveSecretkey);
+};
+
+///
+//  Get socket option `curve_serverkey`.
+QString QmlZsock::curveServerkey () {
+    char *retStr_ = zsock_curve_serverkey (self);
+    QString retQStr_ = QString (retStr_);
+    free (retStr_);
+    return retQStr_;
+};
+
+///
+//  Set socket option `curve_serverkey`.
+void QmlZsock::setCurveServerkey (const QString &curveServerkey) {
+    zsock_set_curve_serverkey (self, curveServerkey.toUtf8().data());
+};
+
+///
+//  Set socket option `curve_serverkey` from 32-octet binary
+void QmlZsock::setCurveServerkeyBin (const byte *curveServerkey) {
+    zsock_set_curve_serverkey_bin (self, curveServerkey);
+};
+
+///
+//  Get socket option `gssapi_server`.
+int QmlZsock::gssapiServer () {
+    return zsock_gssapi_server (self);
+};
+
+///
+//  Set socket option `gssapi_server`.
+void QmlZsock::setGssapiServer (int gssapiServer) {
+    zsock_set_gssapi_server (self, gssapiServer);
+};
+
+///
+//  Get socket option `gssapi_plaintext`.
+int QmlZsock::gssapiPlaintext () {
+    return zsock_gssapi_plaintext (self);
+};
+
+///
+//  Set socket option `gssapi_plaintext`.
+void QmlZsock::setGssapiPlaintext (int gssapiPlaintext) {
+    zsock_set_gssapi_plaintext (self, gssapiPlaintext);
+};
+
+///
+//  Get socket option `gssapi_principal`.
+QString QmlZsock::gssapiPrincipal () {
+    char *retStr_ = zsock_gssapi_principal (self);
+    QString retQStr_ = QString (retStr_);
+    free (retStr_);
+    return retQStr_;
+};
+
+///
+//  Set socket option `gssapi_principal`.
+void QmlZsock::setGssapiPrincipal (const QString &gssapiPrincipal) {
+    zsock_set_gssapi_principal (self, gssapiPrincipal.toUtf8().data());
+};
+
+///
+//  Get socket option `gssapi_service_principal`.
+QString QmlZsock::gssapiServicePrincipal () {
+    char *retStr_ = zsock_gssapi_service_principal (self);
+    QString retQStr_ = QString (retStr_);
+    free (retStr_);
+    return retQStr_;
+};
+
+///
+//  Set socket option `gssapi_service_principal`.
+void QmlZsock::setGssapiServicePrincipal (const QString &gssapiServicePrincipal) {
+    zsock_set_gssapi_service_principal (self, gssapiServicePrincipal.toUtf8().data());
+};
+
+///
+//  Get socket option `ipv6`.
+int QmlZsock::ipv6 () {
+    return zsock_ipv6 (self);
+};
+
+///
+//  Set socket option `ipv6`.
+void QmlZsock::setIpv6 (int ipv6) {
+    zsock_set_ipv6 (self, ipv6);
+};
+
+///
+//  Get socket option `immediate`.
+int QmlZsock::immediate () {
+    return zsock_immediate (self);
+};
+
+///
+//  Set socket option `immediate`.
+void QmlZsock::setImmediate (int immediate) {
+    zsock_set_immediate (self, immediate);
+};
+
+///
+//  Set socket option `router_raw`.
+void QmlZsock::setRouterRaw (int routerRaw) {
+    zsock_set_router_raw (self, routerRaw);
+};
+
+///
+//  Get socket option `ipv4only`.
+int QmlZsock::ipv4only () {
+    return zsock_ipv4only (self);
+};
+
+///
+//  Set socket option `ipv4only`.
+void QmlZsock::setIpv4only (int ipv4only) {
+    zsock_set_ipv4only (self, ipv4only);
+};
+
+///
+//  Set socket option `delay_attach_on_connect`.
+void QmlZsock::setDelayAttachOnConnect (int delayAttachOnConnect) {
+    zsock_set_delay_attach_on_connect (self, delayAttachOnConnect);
+};
+
+///
+//  Get socket option `type`.
+int QmlZsock::type () {
+    return zsock_type (self);
+};
+
+///
+//  Get socket option `sndhwm`.
+int QmlZsock::sndhwm () {
+    return zsock_sndhwm (self);
+};
+
+///
+//  Set socket option `sndhwm`.
+void QmlZsock::setSndhwm (int sndhwm) {
+    zsock_set_sndhwm (self, sndhwm);
+};
+
+///
+//  Get socket option `rcvhwm`.
+int QmlZsock::rcvhwm () {
+    return zsock_rcvhwm (self);
+};
+
+///
+//  Set socket option `rcvhwm`.
+void QmlZsock::setRcvhwm (int rcvhwm) {
+    zsock_set_rcvhwm (self, rcvhwm);
+};
+
+///
+//  Get socket option `affinity`.
+int QmlZsock::affinity () {
+    return zsock_affinity (self);
+};
+
+///
+//  Set socket option `affinity`.
+void QmlZsock::setAffinity (int affinity) {
+    zsock_set_affinity (self, affinity);
+};
+
+///
+//  Set socket option `subscribe`.
+void QmlZsock::setSubscribe (const QString &subscribe) {
+    zsock_set_subscribe (self, subscribe.toUtf8().data());
+};
+
+///
+//  Set socket option `unsubscribe`.
+void QmlZsock::setUnsubscribe (const QString &unsubscribe) {
+    zsock_set_unsubscribe (self, unsubscribe.toUtf8().data());
+};
+
+///
+//  Get socket option `identity`.
+QString QmlZsock::identity () {
+    char *retStr_ = zsock_identity (self);
+    QString retQStr_ = QString (retStr_);
+    free (retStr_);
+    return retQStr_;
+};
+
+///
+//  Set socket option `identity`.
+void QmlZsock::setIdentity (const QString &identity) {
+    zsock_set_identity (self, identity.toUtf8().data());
+};
+
+///
+//  Get socket option `rate`.
+int QmlZsock::rate () {
+    return zsock_rate (self);
+};
+
+///
+//  Set socket option `rate`.
+void QmlZsock::setRate (int rate) {
+    zsock_set_rate (self, rate);
+};
+
+///
+//  Get socket option `recovery_ivl`.
+int QmlZsock::recoveryIvl () {
+    return zsock_recovery_ivl (self);
+};
+
+///
+//  Set socket option `recovery_ivl`.
+void QmlZsock::setRecoveryIvl (int recoveryIvl) {
+    zsock_set_recovery_ivl (self, recoveryIvl);
+};
+
+///
+//  Get socket option `sndbuf`.
+int QmlZsock::sndbuf () {
+    return zsock_sndbuf (self);
+};
+
+///
+//  Set socket option `sndbuf`.
+void QmlZsock::setSndbuf (int sndbuf) {
+    zsock_set_sndbuf (self, sndbuf);
+};
+
+///
+//  Get socket option `rcvbuf`.
+int QmlZsock::rcvbuf () {
+    return zsock_rcvbuf (self);
+};
+
+///
+//  Set socket option `rcvbuf`.
+void QmlZsock::setRcvbuf (int rcvbuf) {
+    zsock_set_rcvbuf (self, rcvbuf);
+};
+
+///
+//  Get socket option `linger`.
+int QmlZsock::linger () {
+    return zsock_linger (self);
+};
+
+///
+//  Set socket option `linger`.
+void QmlZsock::setLinger (int linger) {
+    zsock_set_linger (self, linger);
+};
+
+///
+//  Get socket option `reconnect_ivl`.
+int QmlZsock::reconnectIvl () {
+    return zsock_reconnect_ivl (self);
+};
+
+///
+//  Set socket option `reconnect_ivl`.
+void QmlZsock::setReconnectIvl (int reconnectIvl) {
+    zsock_set_reconnect_ivl (self, reconnectIvl);
+};
+
+///
+//  Get socket option `reconnect_ivl_max`.
+int QmlZsock::reconnectIvlMax () {
+    return zsock_reconnect_ivl_max (self);
+};
+
+///
+//  Set socket option `reconnect_ivl_max`.
+void QmlZsock::setReconnectIvlMax (int reconnectIvlMax) {
+    zsock_set_reconnect_ivl_max (self, reconnectIvlMax);
+};
+
+///
+//  Get socket option `backlog`.
+int QmlZsock::backlog () {
+    return zsock_backlog (self);
+};
+
+///
+//  Set socket option `backlog`.
+void QmlZsock::setBacklog (int backlog) {
+    zsock_set_backlog (self, backlog);
+};
+
+///
+//  Get socket option `maxmsgsize`.
+int QmlZsock::maxmsgsize () {
+    return zsock_maxmsgsize (self);
+};
+
+///
+//  Set socket option `maxmsgsize`.
+void QmlZsock::setMaxmsgsize (int maxmsgsize) {
+    zsock_set_maxmsgsize (self, maxmsgsize);
+};
+
+///
+//  Get socket option `multicast_hops`.
+int QmlZsock::multicastHops () {
+    return zsock_multicast_hops (self);
+};
+
+///
+//  Set socket option `multicast_hops`.
+void QmlZsock::setMulticastHops (int multicastHops) {
+    zsock_set_multicast_hops (self, multicastHops);
+};
+
+///
+//  Get socket option `rcvtimeo`.
+int QmlZsock::rcvtimeo () {
+    return zsock_rcvtimeo (self);
+};
+
+///
+//  Set socket option `rcvtimeo`.
+void QmlZsock::setRcvtimeo (int rcvtimeo) {
+    zsock_set_rcvtimeo (self, rcvtimeo);
+};
+
+///
+//  Get socket option `sndtimeo`.
+int QmlZsock::sndtimeo () {
+    return zsock_sndtimeo (self);
+};
+
+///
+//  Set socket option `sndtimeo`.
+void QmlZsock::setSndtimeo (int sndtimeo) {
+    zsock_set_sndtimeo (self, sndtimeo);
+};
+
+///
+//  Set socket option `xpub_verbose`.
+void QmlZsock::setXpubVerbose (int xpubVerbose) {
+    zsock_set_xpub_verbose (self, xpubVerbose);
+};
+
+///
+//  Get socket option `tcp_keepalive`.
+int QmlZsock::tcpKeepalive () {
+    return zsock_tcp_keepalive (self);
+};
+
+///
+//  Set socket option `tcp_keepalive`.
+void QmlZsock::setTcpKeepalive (int tcpKeepalive) {
+    zsock_set_tcp_keepalive (self, tcpKeepalive);
+};
+
+///
+//  Get socket option `tcp_keepalive_idle`.
+int QmlZsock::tcpKeepaliveIdle () {
+    return zsock_tcp_keepalive_idle (self);
+};
+
+///
+//  Set socket option `tcp_keepalive_idle`.
+void QmlZsock::setTcpKeepaliveIdle (int tcpKeepaliveIdle) {
+    zsock_set_tcp_keepalive_idle (self, tcpKeepaliveIdle);
+};
+
+///
+//  Get socket option `tcp_keepalive_cnt`.
+int QmlZsock::tcpKeepaliveCnt () {
+    return zsock_tcp_keepalive_cnt (self);
+};
+
+///
+//  Set socket option `tcp_keepalive_cnt`.
+void QmlZsock::setTcpKeepaliveCnt (int tcpKeepaliveCnt) {
+    zsock_set_tcp_keepalive_cnt (self, tcpKeepaliveCnt);
+};
+
+///
+//  Get socket option `tcp_keepalive_intvl`.
+int QmlZsock::tcpKeepaliveIntvl () {
+    return zsock_tcp_keepalive_intvl (self);
+};
+
+///
+//  Set socket option `tcp_keepalive_intvl`.
+void QmlZsock::setTcpKeepaliveIntvl (int tcpKeepaliveIntvl) {
+    zsock_set_tcp_keepalive_intvl (self, tcpKeepaliveIntvl);
+};
+
+///
+//  Get socket option `tcp_accept_filter`.
+QString QmlZsock::tcpAcceptFilter () {
+    char *retStr_ = zsock_tcp_accept_filter (self);
+    QString retQStr_ = QString (retStr_);
+    free (retStr_);
+    return retQStr_;
+};
+
+///
+//  Set socket option `tcp_accept_filter`.
+void QmlZsock::setTcpAcceptFilter (const QString &tcpAcceptFilter) {
+    zsock_set_tcp_accept_filter (self, tcpAcceptFilter.toUtf8().data());
+};
+
+///
+//  Get socket option `rcvmore`.
+int QmlZsock::rcvmore () {
+    return zsock_rcvmore (self);
+};
+
+///
+//  Get socket option `fd`.
+SOCKET QmlZsock::fd () {
+    return zsock_fd (self);
+};
+
+///
+//  Get socket option `events`.
+int QmlZsock::events () {
+    return zsock_events (self);
+};
+
+///
+//  Get socket option `last_endpoint`.
+QString QmlZsock::lastEndpoint () {
+    char *retStr_ = zsock_last_endpoint (self);
+    QString retQStr_ = QString (retStr_);
+    free (retStr_);
+    return retQStr_;
 };
 
 

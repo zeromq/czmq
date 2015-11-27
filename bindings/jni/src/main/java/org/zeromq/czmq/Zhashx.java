@@ -84,8 +84,8 @@ public class Zhashx implements AutoCloseable {
         return Zhashx.__cursor (pointer);
     }
 
-    native static void __comment (long pointer, );
-    public void comment (long pointer, ) {
+    native static void __comment (long pointer,Object... );
+    public void comment (long pointer,Object... ) {
         return Zhashx.__comment (pointer,);
     }
 

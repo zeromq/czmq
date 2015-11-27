@@ -82,9 +82,6 @@
     <ClCompile Include="..\..\..\..\src\zsock.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\zsock_option.c">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zstr.c">
       <Filter>src</Filter>
     </ClCompile>
@@ -143,6 +140,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\include\czmq.h">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\zsock_option.inc">
+      <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\zgossip_engine.inc">
       <Filter>src</Filter>

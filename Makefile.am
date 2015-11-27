@@ -26,6 +26,7 @@ noinst_LTLIBRARIES =
 TESTS =
 
 EXTRA_DIST = \
+    src/zsock_option.inc \
     src/zgossip_engine.inc \
     src/zhash_primes.inc \
     src/zclass_example.xml \

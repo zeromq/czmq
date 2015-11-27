@@ -24,6 +24,7 @@
 #define ZSOCK_NOCHECK // we are defining the methods here, so don't redirect symbols.
 
 #include "../include/czmq.h"
+#include "zsock_option.inc"
 
 //  zsock_t instances always have this tag as the first 4 octets of
 //  their data, which lets us do runtime object typing & validation.
@@ -1898,6 +1899,8 @@ zsock_test (bool verbose)
     zsock_destroy (&reader);
     zsock_destroy (&writer);
 
+    zsock_option_test (verbose);
+    
     //  @end
     printf ("OK\n");
 }
