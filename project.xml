@@ -24,8 +24,10 @@
     <class name = "zfile" />
     <class name = "zframe" />
     <class name = "zgossip" />
+    <class name = "zhash" />
     <class name = "zhashx" />
     <class name = "ziflist" />
+    <class name = "zlist" />
     <class name = "zlistx" />
     <class name = "zloop" />
     <class name = "zmonitor" />
@@ -60,14 +62,12 @@
     <class name = "zauth_v2" />
     <class name = "zbeacon_v2" />
     <class name = "zctx" />
-    <class name = "zhash" />
-    <class name = "zlist" />
     <class name = "zmonitor_v2" />
     <class name = "zmutex" />
     <class name = "zproxy_v2" />
     <class name = "zsocket" />
     <class name = "zsockopt" />
-    <class name = "zthread" />
+    <class name = "zthread" />-->
 
     <!-- Command-line utilities -->
     <main name = "zmakecert" />

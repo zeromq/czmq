@@ -323,10 +323,6 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT void *
     zsock_resolve (void *self);
 
-//  Self test of this class
-CZMQ_EXPORT void
-    zsock_test (bool verbose);
-
 //  Get socket option `tos`.
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT int
@@ -745,6 +741,10 @@ CZMQ_EXPORT int
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT char *
     zsock_last_endpoint (void *self);
+
+//  Self test of this class.
+CZMQ_EXPORT void
+    zsock_test (bool verbose);
 //  @end
 
 // zsock leak detection - not a part of the official interface to zsock. This

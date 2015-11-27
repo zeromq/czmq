@@ -139,7 +139,7 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void *
     zlist_freefn (zlist_t *self, void *item, zlist_free_fn fn, bool at_tail);
 
-//  Self test of this class
+//  Self test of this class.
 CZMQ_EXPORT void
     zlist_test (bool verbose);
 //  @end

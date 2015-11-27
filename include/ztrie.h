@@ -35,10 +35,6 @@ CZMQ_EXPORT ztrie_t *
 CZMQ_EXPORT void
     ztrie_destroy (ztrie_t **self_p);
 
-//  Print properties of the ztrie object.
-CZMQ_EXPORT void
-    ztrie_print (ztrie_t *self);
-
 //  Inserts a new route into the tree and attaches the data. Returns -1     
 //  if the route already exists, otherwise 0. This method takes ownership of
 //  the provided data if a destroy_data_fn is provided.                     
@@ -76,7 +72,11 @@ CZMQ_EXPORT zhashx_t *
 CZMQ_EXPORT const char *
     ztrie_hit_asterisk_match (ztrie_t *self);
 
-//  Self test of this class
+//  Print the trie
+CZMQ_EXPORT void
+    ztrie_print (ztrie_t *self);
+
+//  Self test of this class.
 CZMQ_EXPORT void
     ztrie_test (bool verbose);
 //  @end

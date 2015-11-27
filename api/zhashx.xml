@@ -1,7 +1,14 @@
 <class name = "zhashx">
-    extended generic type-free hash container
+    <!--
+    Copyright (c) the Contributors as noted in the AUTHORS file.
+    This file is part of CZMQ, the high-level C binding for 0MQ:
+    http://czmq.zeromq.org.
 
-    <include filename = "license.xml" />
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    -->
+    extended generic type-free hash container
 
     <callback_type name = "destructor_fn">
         Destroy an item
@@ -39,8 +46,6 @@
     <destructor>
         Destroy a hash container and all items in it
     </destructor>
-
-    <method name = "print" exclude = "1" />
 
     <method name = "insert">
         Insert item into hash table with specified key and item.
@@ -283,11 +288,4 @@
         <argument name = "argument" type = "anything" />
         <return type = "integer" />
     </method>
-
-    <method name = "test" singleton = "1">
-        Self test of this class
-        <argument name = "verbose" type = "boolean" />
-    </method>
 </class>
-
-

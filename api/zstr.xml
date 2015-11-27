@@ -1,13 +1,14 @@
 <class name = "zstr">
+    <!--
+    Copyright (c) the Contributors as noted in the AUTHORS file.
+    This file is part of CZMQ, the high-level C binding for 0MQ:
+    http://czmq.zeromq.org.
+
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    -->
     sending and receiving strings
-
-    <include filename = "license.xml" />
-
-    <constructor exclude = "1" />
-
-    <destructor exclude = "1" />
-
-    <method name = "print" exclude = "1" />
 
     <method name = "recv" singleton = "1">
         Receive C string from socket. Caller must free returned string using
@@ -81,10 +82,5 @@
         a null pointer.
         <argument name = "string_p" type = "string" constant = "0"
                   by_reference = "1" />
-    </method>
-
-    <method name = "test" singleton = "1">
-        Self test of this class
-        <argument name = "verbose" type = "boolean" />
     </method>
 </class>

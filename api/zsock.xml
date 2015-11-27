@@ -1,7 +1,14 @@
 <class name = "zsock">
-    high-level socket API that hides libzmq contexts and sockets
+    <!--
+    Copyright (c) the Contributors as noted in the AUTHORS file.
+    This file is part of CZMQ, the high-level C binding for 0MQ:
+    http://czmq.zeromq.org.
 
-    <include filename = "license.xml" />
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    -->
+    high-level socket API that hides libzmq contexts and sockets
 
     <constructor>
         Create a new socket. Returns the new socket, or NULL if the new socket
@@ -17,8 +24,6 @@
         Destroy the socket. You must use this for any socket created via the
         zsock_new method.
     </destructor>
-
-    <method name = "print" exclude = "1" />
 
     <method name = "new pub" singleton = "1">
         Create a PUB socket. Default action is bind.
@@ -351,11 +356,6 @@
         return the supplied value. Takes a polymorphic socket reference.
         <argument name = "self" type = "anything" />
         <return type = "anything" />
-    </method>
-
-    <method name = "test" singleton = "1">
-        Self test of this class
-        <argument name = "verbose" type = "boolean" />
     </method>
 
     <include filename = "api/zsock_option.xml" />

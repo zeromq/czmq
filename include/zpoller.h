@@ -69,7 +69,7 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT void
     zpoller_ignore_interrupts (zpoller_t *self);
 
-//  Self test of this class
+//  Self test of this class.
 CZMQ_EXPORT void
     zpoller_test (bool verbose);
 //  @end

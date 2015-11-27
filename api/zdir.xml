@@ -1,7 +1,14 @@
 <class name = "zdir">
-    work with file-system directories
+    <!--
+    Copyright (c) the Contributors as noted in the AUTHORS file.
+    This file is part of CZMQ, the high-level C binding for 0MQ:
+    http://czmq.zeromq.org.
 
-    <include filename = "license.xml" />
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    -->
+    work with file-system directories
 
     <constructor>
         Create a new directory item that loads in the full tree of the specified
@@ -113,10 +120,5 @@
             zlist_destroy (&amp;patches);
         <argument name = "pipe" type = "zsock" />
         <argument name = "unused" type = "anything" />
-    </method>
-
-    <method name = "test" singleton = "1">
-        Self test of this class.
-        <argument name = "verbose" type = "boolean" />
     </method>
 </class>

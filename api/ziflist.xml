@@ -1,7 +1,14 @@
 <class name = "ziflist">
-    List of network interfaces available on system
+    <!--
+    Copyright (c) the Contributors as noted in the AUTHORS file.
+    This file is part of CZMQ, the high-level C binding for 0MQ:
+    http://czmq.zeromq.org.
 
-    <include filename = "license.xml" />
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    -->
+    List of network interfaces available on system
 
     <constructor>
         Get a list of network interfaces currently defined on the system
@@ -45,8 +52,7 @@
         <return type = "string" />
     </method>
 
-    <method name = "test" singleton = "1">
-        Self test of this class.
-        <argument name = "verbose" type = "boolean" />
+    <method name = "print">
+        Return the list of interfaces.
     </method>
 </class>

@@ -252,7 +252,7 @@ CZMQ_EXPORT void
 CZMQ_EXPORT int
     zhashx_foreach (zhashx_t *self, zhashx_foreach_fn callback, void *argument);
 
-//  Self test of this class
+//  Self test of this class.
 CZMQ_EXPORT void
     zhashx_test (bool verbose);
 //  @end

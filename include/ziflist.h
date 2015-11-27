@@ -29,10 +29,6 @@ CZMQ_EXPORT ziflist_t *
 CZMQ_EXPORT void
     ziflist_destroy (ziflist_t **self_p);
 
-//  Print properties of the ziflist object.
-CZMQ_EXPORT void
-    ziflist_print (ziflist_t *self);
-
 //  Reload network interfaces from system
 CZMQ_EXPORT void
     ziflist_reload (ziflist_t *self);
@@ -60,6 +56,10 @@ CZMQ_EXPORT const char *
 //  Return the current interface network mask as a printable string
 CZMQ_EXPORT const char *
     ziflist_netmask (ziflist_t *self);
+
+//  Return the list of interfaces.
+CZMQ_EXPORT void
+    ziflist_print (ziflist_t *self);
 
 //  Self test of this class.
 CZMQ_EXPORT void

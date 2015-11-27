@@ -39,10 +39,6 @@ CZMQ_EXPORT zarmour_t *
 CZMQ_EXPORT void
     zarmour_destroy (zarmour_t **self_p);
 
-//  Print properties of object
-CZMQ_EXPORT void
-    zarmour_print (zarmour_t *self);
-
 //  Get printable string for mode.
 CZMQ_EXPORT const char *
     zarmour_mode_str (zarmour_t *self);
@@ -99,7 +95,11 @@ CZMQ_EXPORT size_t
 CZMQ_EXPORT void
     zarmour_set_line_length (zarmour_t *self, size_t line_length);
 
-//  Self test of this class
+//  Print properties of object
+CZMQ_EXPORT void
+    zarmour_print (zarmour_t *self);
+
+//  Self test of this class.
 CZMQ_EXPORT void
     zarmour_test (bool verbose);
 //  @end
