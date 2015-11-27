@@ -67,7 +67,7 @@
     <class name = "zproxy_v2" />
     <class name = "zsocket" />
     <class name = "zsockopt" />
-    <class name = "zthread" />-->
+    <class name = "zthread" />
 
     <!-- Command-line utilities -->
     <main name = "zmakecert" />
