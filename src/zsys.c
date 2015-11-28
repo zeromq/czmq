@@ -280,7 +280,9 @@ zsys_socket (int type, const char *filename, size_t line_nbr)
         zsock_set_linger (handle, (int) s_linger);
 #if (ZMQ_VERSION_MAJOR == 2)
         //  For ZeroMQ/2.x we use sndhwm for both send and receive
-        zsock_set_hwm (handle, s_sndhwm);
+        //  Use the deprecated zsockopt API as the current zsock_option
+        //  API does not support ZeroMQ/2.x
+        zsocket_set_hwm (handle, s_sndhwm);
 #else
         //  For later versions we use separate SNDHWM and RCVHWM
         zsock_set_sndhwm (handle, (int) s_sndhwm);
@@ -383,8 +385,10 @@ zsys_create_pipe (zsock_t **backend_p)
         return frontend;
     }
 #if (ZMQ_VERSION_MAJOR == 2)
-    zsock_set_hwm (frontend, zsys_pipehwm ());
-    zsock_set_hwm (backend, zsys_pipehwm ());
+    //  Use the deprecated zsockopt API as the current zsock_option
+    //  API does not support ZeroMQ/2.x
+    zsocket_set_hwm (zsock_resolve (frontend), zsys_pipehwm ());
+    zsocket_set_hwm (zsock_resolve (backend), zsys_pipehwm ());
 #else
     zsock_set_sndhwm (frontend, (int) zsys_pipehwm ());
     zsock_set_sndhwm (backend, (int) zsys_pipehwm ());
