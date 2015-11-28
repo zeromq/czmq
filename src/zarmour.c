@@ -62,15 +62,8 @@ const int _NUM_MODES = 5;
 #endif
 
 static char
-s_codec_names[][16] = {
-      "base64"
-    , "base64url"
-    , "base32"
-    , "base32hex"
-    , "base16"
-#ifdef _INCLUDE_Z85
-    , "z85"
-#endif
+*s_codec_names [] = {
+    "base64", "base64url", "base32", "base32hex", "base16", "z85"
 };
 
 
@@ -144,7 +137,7 @@ zarmour_mode_str (zarmour_t *self)
 {
     assert (self);
     assert ((int) self->mode >= 0 && (int) self->mode < _NUM_MODES);
-    return s_codec_names[(int) self->mode];
+    return s_codec_names [(int) self->mode];
 }
 
 
@@ -154,29 +147,27 @@ zarmour_mode_str (zarmour_t *self)
 #define _NO_CONVERT(c) (c)
 #define _UPPER_CASE(c) ((c) & ((c) & 0x40? 0xdf: 0xff))
 
-#define _NEXT_CHAR(i,n,c,a,u) \
-    while ((n) < (c) && !strchr ((a), (u(*(n))))) \
-        ++(n); \
-    (i) = (byte) ((n) < (c)? (strchr ((a), (u(*(n)))) - (a)): 0xff); \
-    ++(n)
+#define _NEXT_CHAR(i, n, c, a, u) \
+    while ((n) < (c) && !strchr ((a), (u (*(n))))) \
+        ++ (n); \
+    (i) = (byte) ((n) < (c)? (strchr ((a), (u (*(n)))) - (a)): 0xff); \
+    ++ (n)
 
 
-//  ---------------------------------------------------------------------------
 //  RFC 4648 Paragraph 4 (standard base64 alphabet)
 static char  //        0----5----0----5----0----5----0----5----0----5----0----5----0---
-s_base64_alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+s_base64_alphabet [] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-//  ---------------------------------------------------------------------------
 //  RFC 4648 Paragraph 5 (URL & filename friendly base64 alphabet)
 static char  //           0----5----0----5----0----5----0----5----0----5----0----5----0---
-s_base64url_alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+s_base64url_alphabet [] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 
 static char *
 s_base64_encode (const byte *data, size_t length, const char *alphabet, bool pad, char pad_char)
 {
     size_t extra_chars = ((length % 3)? length % 3 + 1: 0);
     size_t pad_chars = (pad && extra_chars)? 4 - extra_chars: 0;
-    size_t str_chars = 4 * (length / 3) + extra_chars + pad_chars;
+    size_t str_chars = 4 *(length / 3) + extra_chars + pad_chars;
     char *str = (char *) zmalloc (str_chars + 1);
     if (!str)
         return NULL;
@@ -184,18 +175,18 @@ s_base64_encode (const byte *data, size_t length, const char *alphabet, bool pad
     char *enc = str;
     const byte *needle = data, *ceiling = data + length;
     while (needle < ceiling) {
-        *enc++ = alphabet[(*needle) >> 2];
+        *enc++ = alphabet [(*needle) >> 2];
         if (needle + 1 < ceiling) {
-            *enc++ = alphabet[((*needle << 4) & 0x30) | (*(needle + 1) >> 4)];
+            *enc++ = alphabet [((*needle << 4) & 0x30) | (*(needle + 1) >> 4)];
             if (needle + 2 < ceiling) {
-                *enc++ = alphabet[((*(needle + 1) << 2) & 0x3c) | (*(needle + 2) >> 6)];
-                *enc++ = alphabet[*(needle + 2) & 0x3f];
+                *enc++ = alphabet [((*(needle + 1) << 2) & 0x3c) | (*(needle + 2) >> 6)];
+                *enc++ = alphabet [*(needle + 2) & 0x3f];
             }
             else
-                *enc++ = alphabet[(*(needle + 1) << 2) & 0x3c];
+                *enc++ = alphabet [(*(needle + 1) << 2) & 0x3c];
         }
         else
-            *enc++ = alphabet[(*needle << 4) & 0x30];
+            *enc++ = alphabet [(*needle << 4) & 0x30];
         needle += 3;
     }
     while (pad && enc < str + str_chars)
@@ -209,10 +200,10 @@ static byte *
 s_base64_decode (const char *data, size_t *size, const char *alphabet, size_t linebreakchars)
 {
     size_t length = strlen (data);
-    while (length > 0 && !strchr (alphabet, data[length - 1])) --length;
+    while (length > 0 && !strchr (alphabet, data [length - 1])) --length;
     const byte *needle = (const byte *) data, *ceiling = (const byte *) (data + length);
     length -= linebreakchars;
-    *size = 3 * (length / 4) + ((length % 4)? length % 4 - 1 : 0) + 1;
+    *size = 3 *(length / 4) + ((length % 4)? length % 4 - 1 : 0) + 1;
     byte *bytes = (byte *) zmalloc (*size);
     if (!bytes)
         return NULL;
@@ -220,14 +211,14 @@ s_base64_decode (const char *data, size_t *size, const char *alphabet, size_t li
     byte *dec = bytes;
     byte i1, i2, i3, i4;
     while (needle < ceiling) {
-        _NEXT_CHAR(i1,needle,ceiling,alphabet,_NO_CONVERT);
-        _NEXT_CHAR(i2,needle,ceiling,alphabet,_NO_CONVERT);
+        _NEXT_CHAR (i1, needle, ceiling, alphabet, _NO_CONVERT);
+        _NEXT_CHAR (i2, needle, ceiling, alphabet, _NO_CONVERT);
         if (i1 != 0xff && i2 != 0xff)
             *dec++ = i1 << 2 | i2 >> 4;
-        _NEXT_CHAR(i3,needle,ceiling,alphabet,_NO_CONVERT);
+        _NEXT_CHAR (i3, needle, ceiling, alphabet, _NO_CONVERT);
         if (i2 != 0xff && i3 != 0xff)
             *dec++ = i2 << 4 | i3 >> 2;
-        _NEXT_CHAR(i4,needle,ceiling,alphabet,_NO_CONVERT);
+        _NEXT_CHAR (i4, needle, ceiling, alphabet, _NO_CONVERT);
         if (i3 != 0xff && i4 != 0xff)
             *dec++ = i3 << 6 | i4;
     }
@@ -236,15 +227,15 @@ s_base64_decode (const char *data, size_t *size, const char *alphabet, size_t li
 }
 
 
-//  ---------------------------------------------------------------------------
 //  RFC 4648 Paragraph 6 (standard base32 alphabet)
-static char  //        0----5----0----5----0----5----0-
-s_base32_alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
-//  ---------------------------------------------------------------------------
+static char  //        0----5----0----5----0----5----0-
+s_base32_alphabet [] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+
 //  RFC 4648 Paragraph 7 (base32hex alphabet)
+
 static char  //           0----5----0----5----0----5----0-
-s_base32hex_alphabet[] = "0123456789ABCDEFGHIJKLMNOPQRSTUV";
+s_base32hex_alphabet [] = "0123456789ABCDEFGHIJKLMNOPQRSTUV";
 
 static char *
 s_base32_encode (const byte *data, size_t length, const char *alphabet, bool pad, char pad_char)
@@ -257,7 +248,7 @@ s_base32_encode (const byte *data, size_t length, const char *alphabet, bool pad
         case 4: extra_chars = 7; break;
     }
     size_t pad_chars = (pad && extra_chars)? 8 - extra_chars: 0;
-    size_t str_chars = 8 * (length / 5) + extra_chars + pad_chars;
+    size_t str_chars = 8 *(length / 5) + extra_chars + pad_chars;
     char *str = (char *) zmalloc (str_chars + 1);
     if (!str)
         return NULL;
@@ -265,30 +256,30 @@ s_base32_encode (const byte *data, size_t length, const char *alphabet, bool pad
     char *enc = str;
     const byte *needle = data, *ceiling = data + length;
     while (needle < ceiling) {
-        *enc++ = alphabet[(*needle) >> 3];
+        *enc++ = alphabet [(*needle) >> 3];
         if (needle + 1 < ceiling) {
-            *enc++ = alphabet[((*needle << 2) & 0x1c) | (*(needle + 1) >> 6)];
-            *enc++ = alphabet[(*(needle + 1) >> 1) & 0x1f];
+            *enc++ = alphabet [((*needle << 2) & 0x1c) | (*(needle + 1) >> 6)];
+            *enc++ = alphabet [(*(needle + 1) >> 1) & 0x1f];
             if (needle + 2 < ceiling) {
-                *enc++ = alphabet[((*(needle + 1) << 4) & 0x10) | (*(needle + 2) >> 4)];
+                *enc++ = alphabet [((*(needle + 1) << 4) & 0x10) | (*(needle + 2) >> 4)];
                 if (needle + 3 < ceiling) {
-                    *enc++ = alphabet[((*(needle + 2) << 1) & 0x1e) | (*(needle + 3) >> 7)];
-                    *enc++ = alphabet[(*(needle + 3) >> 2) & 0x1f];
+                    *enc++ = alphabet [((*(needle + 2) << 1) & 0x1e) | (*(needle + 3) >> 7)];
+                    *enc++ = alphabet [(*(needle + 3) >> 2) & 0x1f];
                     if (needle + 4 < ceiling) {
-                        *enc++ = alphabet[((*(needle + 3) << 3) & 0x18) | (*(needle + 4) >> 5)];
-                        *enc++ = alphabet[*(needle + 4) & 0x1f];
+                        *enc++ = alphabet [((*(needle + 3) << 3) & 0x18) | (*(needle + 4) >> 5)];
+                        *enc++ = alphabet [*(needle + 4) & 0x1f];
                     }
                     else
-                        *enc++ = alphabet[(*(needle + 3) << 3) & 0x18];
+                        *enc++ = alphabet [(*(needle + 3) << 3) & 0x18];
                 }
                 else
-                    *enc++ = alphabet[(*(needle + 2) << 1) & 0x1e];
+                    *enc++ = alphabet [(*(needle + 2) << 1) & 0x1e];
             }
             else
-                *enc++ = alphabet[(*(needle + 1) << 4) & 0x10];
+                *enc++ = alphabet [(*(needle + 1) << 4) & 0x10];
         }
         else
-            *enc++ = alphabet[(*needle << 2) & 0x1c];
+            *enc++ = alphabet [(*needle << 2) & 0x1c];
         needle += 5;
     }
     while (enc < str + str_chars)
@@ -302,7 +293,7 @@ static byte *
 s_base32_decode (const char *data, size_t *size, const char *alphabet, size_t linebreakchars)
 {
     size_t length = strlen (data);
-    while (length > 0 && !strchr (alphabet, _UPPER_CASE(data[length - 1]))) --length;
+    while (length > 0 && !strchr (alphabet, _UPPER_CASE (data [length - 1]))) --length;
     const byte *needle = (const byte *) data, *ceiling = (const byte *) (data + length);
     length -= linebreakchars;
     size_t extra_chars = length % 8, extra_bytes = 0;
@@ -314,7 +305,7 @@ s_base32_decode (const char *data, size_t *size, const char *alphabet, size_t li
         case 7: extra_bytes = 4; break;
         default: assert (false); break;
     }
-    *size = 5 * (length / 8) + extra_bytes + 1;
+    *size = 5 *(length / 8) + extra_bytes + 1;
     byte *bytes = (byte *) zmalloc (*size);
     if (!bytes)
         return NULL;
@@ -322,22 +313,22 @@ s_base32_decode (const char *data, size_t *size, const char *alphabet, size_t li
     byte *dec = bytes;
     byte i1, i2, i3, i4, i5, i6, i7, i8;
     while (needle < ceiling) {
-        _NEXT_CHAR(i1,needle,ceiling,alphabet,_UPPER_CASE);
-        _NEXT_CHAR(i2,needle,ceiling,alphabet,_UPPER_CASE);
+        _NEXT_CHAR (i1, needle, ceiling, alphabet, _UPPER_CASE);
+        _NEXT_CHAR (i2, needle, ceiling, alphabet, _UPPER_CASE);
         if (i1 != 0xff && i2 != 0xff)
             *dec++ = i1 << 3 | i2 >> 2;
-        _NEXT_CHAR(i3,needle,ceiling,alphabet,_UPPER_CASE);
-        _NEXT_CHAR(i4,needle,ceiling,alphabet,_UPPER_CASE);
+        _NEXT_CHAR (i3, needle, ceiling, alphabet, _UPPER_CASE);
+        _NEXT_CHAR (i4, needle, ceiling, alphabet, _UPPER_CASE);
         if (i2 != 0xff && i3 != 0xff && i4 != 0xff)
             *dec++ = i2 << 6 | i3 << 1 | i4 >> 4;
-        _NEXT_CHAR(i5,needle,ceiling,alphabet,_UPPER_CASE);
+        _NEXT_CHAR (i5, needle, ceiling, alphabet, _UPPER_CASE);
         if (i4 != 0xff && i5 != 0xff)
             *dec++ = i4 << 4 | i5 >> 1;
-        _NEXT_CHAR(i6,needle,ceiling,alphabet,_UPPER_CASE);
-        _NEXT_CHAR(i7,needle,ceiling,alphabet,_UPPER_CASE);
+        _NEXT_CHAR (i6, needle, ceiling, alphabet, _UPPER_CASE);
+        _NEXT_CHAR (i7, needle, ceiling, alphabet, _UPPER_CASE);
         if (i5 != 0xff && i6 != 0xff && i7 != 0xff)
             *dec++ = i5 << 7 | i6 << 2 | i7 >> 3;
-        _NEXT_CHAR(i8,needle,ceiling,alphabet,_UPPER_CASE);
+        _NEXT_CHAR (i8, needle, ceiling, alphabet, _UPPER_CASE);
         if (i7 != 0xff && i8 != 0xff)
             *dec++ = i7 << 5 | i8;
     }
@@ -346,10 +337,10 @@ s_base32_decode (const char *data, size_t *size, const char *alphabet, size_t li
 }
 
 
-//  ---------------------------------------------------------------------------
 //  RFC 4648 Paragraph 8 (standard base16 alphabet)
+
 static char  //        0----5----0----5
-s_base16_alphabet[] = "0123456789ABCDEF";
+s_base16_alphabet [] = "0123456789ABCDEF";
 
 static char *
 s_base16_encode (const byte *data, size_t length, const char *alphabet)
@@ -361,8 +352,8 @@ s_base16_encode (const byte *data, size_t length, const char *alphabet)
     char *enc = str;
     const byte *needle = data, *ceiling = data + length;
     while (needle < ceiling) {
-        *enc++ = alphabet[(*needle) >> 4];
-        *enc++ = alphabet[(*needle++) & 0x0f];
+        *enc++ = alphabet [(*needle) >> 4];
+        *enc++ = alphabet [(*needle++) & 0x0f];
     }
     *enc = 0;
     return str;
@@ -382,8 +373,8 @@ s_base16_decode (const char *data, size_t *size, const char *alphabet, size_t li
     byte *dec = bytes;
     byte i1, i2;
     while (needle < ceiling) {
-        _NEXT_CHAR(i1,needle,ceiling,alphabet,_UPPER_CASE);
-        _NEXT_CHAR(i2,needle,ceiling,alphabet,_UPPER_CASE);
+        _NEXT_CHAR (i1, needle, ceiling, alphabet, _UPPER_CASE);
+        _NEXT_CHAR (i2, needle, ceiling, alphabet, _UPPER_CASE);
         if (i1 != 0xff && i2 != 0xff)
             *dec++ = i1 << 4 | i2;
     }
@@ -392,8 +383,7 @@ s_base16_decode (const char *data, size_t *size, const char *alphabet, size_t li
 }
 
 
-//  ---------------------------------------------------------------------------
-//  z85
+//  Z85 encoding/decoding
 
 #ifdef _INCLUDE_Z85
 static char *
@@ -462,17 +452,17 @@ zarmour_encode (zarmour_t *self, const byte *data, size_t data_size)
     if (!encoded)
         return NULL;
 
+    if (self->line_breaks
+    &&  self->line_length > 0
+    &&  strlen (encoded) > self->line_length
 #ifdef _INCLUDE_Z85
-    if (self->mode != ZARMOUR_MODE_Z85 &&
-        self->line_breaks && self->line_length > 0 &&
-        strlen (encoded) > self->line_length) {
-#else
-    if (self->line_breaks && self->line_length > 0 && strlen (encoded) > self->line_length) {
+    &&  self->mode != ZARMOUR_MODE_Z85
 #endif
+    ) {
         char *line_end = self->line_end;
         size_t nbr_lines = strlen (encoded) / self->line_length;
         size_t new_length =
-            nbr_lines * (self->line_length + strlen (line_end)) +
+            nbr_lines *(self->line_length + strlen (line_end)) +
             strlen (encoded) % self->line_length;
         char *src = encoded;
         char *temp = encoded;
@@ -499,8 +489,6 @@ zarmour_encode (zarmour_t *self, const byte *data, size_t data_size)
     return encoded;
 }
 
-
-//  Definition of decode method
 byte *
 zarmour_decode (zarmour_t *self, const char *data, size_t *decode_size)
 {
@@ -554,6 +542,7 @@ zarmour_set_mode (zarmour_t *self, zarmour_mode_t mode)
     self->mode = mode;
 }
 
+
 //  --------------------------------------------------------------------------
 //  Get/set the pad property
 
@@ -570,6 +559,7 @@ zarmour_set_pad (zarmour_t *self, bool pad)
     assert (self);
     self->pad = pad;
 }
+
 
 //  --------------------------------------------------------------------------
 //  Get/set the pad_char property
@@ -628,18 +618,18 @@ zarmour_set_line_length (zarmour_t *self, size_t line_length)
 //  armour test utility
 
 static void
-s_armour_test (zarmour_t *self, const char *test_string, const char *expected_result, bool verbose)
+s_armour_test (zarmour_t *self, const char *test_string, const char *expected, bool verbose)
 {
     assert (self);
     assert (test_string);
-    assert (expected_result);
+    assert (expected);
 
     char *encoded = zarmour_encode (self, (byte *) test_string, strlen (test_string));
     assert (encoded);
     if (verbose)
-        zsys_debug ("    encoded '%s' into '%s'", test_string, encoded);
-    assert (strlen (encoded) == strlen (expected_result));
-    assert (streq (encoded, expected_result));
+        zsys_debug ("    encoded '%s' into '%s' ('%s')", test_string, encoded, expected);
+    assert (strlen (encoded) == strlen (expected));
+    assert (streq (encoded, expected));
 
     size_t size;
     char *decoded = (char *) zarmour_decode (self, encoded, &size);
@@ -654,11 +644,11 @@ s_armour_test (zarmour_t *self, const char *test_string, const char *expected_re
 }
 
 static void
-s_armour_decode (zarmour_t *self, const char *test_string, const char *expected_result, bool verbose)
+s_armour_decode (zarmour_t *self, const char *test_string, const char *expected, bool verbose)
 {
     assert (self);
     assert (test_string);
-    assert (expected_result);
+    assert (expected);
 
     size_t size;
     char *decoded = (char *) zarmour_decode (self, test_string, &size);
@@ -666,7 +656,7 @@ s_armour_decode (zarmour_t *self, const char *test_string, const char *expected_
     if (verbose)
         zsys_debug ("    decoded '%s' into '%s'", test_string, decoded);
     assert (size == strlen (decoded) + 1);
-    assert (streq (decoded, expected_result));
+    assert (streq (decoded, expected));
 
     free (decoded);
 }
@@ -739,6 +729,7 @@ zarmour_test (bool verbose)
     zarmour_set_mode (self, ZARMOUR_MODE_BASE64_STD);
     if (verbose)
         zarmour_print (self);
+
     s_armour_test (self, "", "", verbose);
     s_armour_test (self, "f", "Zg", verbose);
     s_armour_test (self, "fo", "Zm8", verbose);
@@ -762,6 +753,7 @@ zarmour_test (bool verbose)
     zarmour_set_mode (self, ZARMOUR_MODE_BASE64_URL);
     if (verbose)
         zarmour_print (self);
+
     s_armour_test (self, "", "", verbose);
     s_armour_test (self, "f", "Zg", verbose);
     s_armour_test (self, "fo", "Zm8", verbose);
@@ -772,6 +764,7 @@ zarmour_test (bool verbose)
     zarmour_set_pad (self, true);
     if (verbose)
         zarmour_print (self);
+
     s_armour_test (self, "", "", verbose);
     s_armour_test (self, "f", "Zg==", verbose);
     s_armour_test (self, "fo", "Zm8=", verbose);
@@ -784,6 +777,7 @@ zarmour_test (bool verbose)
     zarmour_set_mode (self, ZARMOUR_MODE_BASE32_STD);
     if (verbose)
         zarmour_print (self);
+
     s_armour_test (self, "", "", verbose);
     s_armour_test (self, "f", "MY", verbose);
     s_armour_test (self, "fo", "MZXQ", verbose);
@@ -800,6 +794,7 @@ zarmour_test (bool verbose)
     zarmour_set_pad (self, true);
     if (verbose)
         zarmour_print (self);
+
     s_armour_test (self, "", "", verbose);
     s_armour_test (self, "f", "MY======", verbose);
     s_armour_test (self, "fo", "MZXQ====", verbose);
@@ -818,6 +813,7 @@ zarmour_test (bool verbose)
     zarmour_set_mode (self, ZARMOUR_MODE_BASE32_HEX);
     if (verbose)
         zarmour_print (self);
+
     s_armour_test (self, "", "", verbose);
     s_armour_test (self, "f", "CO", verbose);
     s_armour_test (self, "fo", "CPNG", verbose);
@@ -834,6 +830,7 @@ zarmour_test (bool verbose)
     zarmour_set_pad (self, true);
     if (verbose)
         zarmour_print (self);
+
     s_armour_test (self, "", "", verbose);
     s_armour_test (self, "f", "CO======", verbose);
     s_armour_test (self, "fo", "CPNG====", verbose);
@@ -852,6 +849,7 @@ zarmour_test (bool verbose)
     zarmour_set_mode (self, ZARMOUR_MODE_BASE16);
     if (verbose)
         zarmour_print (self);
+
     s_armour_test (self, "", "", verbose);
     s_armour_test (self, "f", "66", verbose);
     s_armour_test (self, "fo", "666F", verbose);
@@ -865,7 +863,6 @@ zarmour_test (bool verbose)
     s_armour_decode (self, "666f6f6261", "fooba", verbose);
     s_armour_decode (self, "666f6f626172", "foobar", verbose);
 
-
 #ifdef _INCLUDE_Z85
     //  Z85 test is homemade; using 0, 4 and 8 bytes, with precalculated
     //  test vectors created with a libzmq test.
@@ -876,26 +873,29 @@ zarmour_test (bool verbose)
     zarmour_set_mode (self, ZARMOUR_MODE_BASE16);
     zarmour_set_line_breaks (self, false);
     size_t key_len;
-    byte *key_data = zarmour_decode (self,
-                                     "4E6F87E2FB6EB22A1EF5E257B75D79124949565F0B8B36A878A4F03111C96E0B",
-                                     &key_len);
+    byte *key_data = zarmour_decode (
+        self,
+        "4E6F87E2FB6EB22A1EF5E257B75D79124949565F0B8B36A878A4F03111C96E0B",
+        &key_len);
 
     zarmour_set_mode (self, ZARMOUR_MODE_Z85);  //  Z85 mode does not support padding or line breaks
     zarmour_set_pad (self, false);              //  so these two are superfluous;
     zarmour_set_line_breaks (self, false);      //  just for consistency
     if (verbose)
         zarmour_print (self);
+
     s_armour_test (self, "", "", verbose);
     s_armour_test (self, "foob", "w]zP%", verbose);
     s_armour_test (self, "foobar!!", "w]zP%vr9Im", verbose);
-    s_armour_test (self, (char *) key_data, "ph+{E}!&X?9}!I]W{sm(nL8@&3Yu{wC+<*-5Y[[#", verbose);
+    s_armour_test (self, (char *) key_data,
+                   "ph+{E}!&X?9}!I]W{sm(nL8@&3Yu{wC+<*-5Y[[#", verbose);
     free (key_data);
 #endif
 
     //  Armouring longer byte array to test line breaks
     zarmour_set_pad (self, true);
     zarmour_set_line_breaks (self, true);
-    byte test_data[256];
+    byte test_data [256];
     int index;
     for (index = 0; index < 256; index++)
         test_data [index] = index;
@@ -920,7 +920,3 @@ zarmour_test (bool verbose)
 
     printf ("OK\n");
 }
-
-#ifdef _INCLUDE_Z85
-#undef _INCLUDE_Z85
-#endif
