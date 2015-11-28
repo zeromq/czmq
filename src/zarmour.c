@@ -38,11 +38,9 @@
 
 #include "../include/czmq.h"
 
-
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 3, 0))
-#define _INCLUDE_Z85
+#   define _INCLUDE_Z85
 #endif
-
 
 //  Structure of our class
 
@@ -97,7 +95,6 @@ zarmour_new ()
         zarmour_destroy (&self);
         return NULL;
     }
-
     return self;
 }
 
@@ -440,7 +437,6 @@ zarmour_encode (zarmour_t *self, const byte *data, size_t data_size)
     assert (data);
 
     char *encoded = NULL;
-
     switch (self->mode) {
         case ZARMOUR_MODE_BASE64_STD:
             encoded = s_base64_encode (data, data_size, s_base64_alphabet, self->pad, self->pad_char);
@@ -457,13 +453,12 @@ zarmour_encode (zarmour_t *self, const byte *data, size_t data_size)
         case ZARMOUR_MODE_BASE16:
             encoded = s_base16_encode (data, data_size, s_base16_alphabet);
             break;
-#ifdef _INCLUDE_Z85
         case ZARMOUR_MODE_Z85:
+#ifdef _INCLUDE_Z85
             encoded = s_z85_encode (data, data_size);
-            break;
 #endif
+            break;
     }
-
     if (!encoded)
         return NULL;
 
@@ -520,7 +515,6 @@ zarmour_decode (zarmour_t *self, const char *data, size_t *decode_size)
         linebreakchars += strlen (line_end);
         pos += strlen (line_end);
     }
-
     switch (self->mode) {
         case ZARMOUR_MODE_BASE64_STD:
             return s_base64_decode (data, decode_size, s_base64_alphabet, linebreakchars);
@@ -532,12 +526,13 @@ zarmour_decode (zarmour_t *self, const char *data, size_t *decode_size)
             return s_base32_decode (data, decode_size, s_base32hex_alphabet, linebreakchars);
         case ZARMOUR_MODE_BASE16:
             return s_base16_decode (data, decode_size, s_base16_alphabet, linebreakchars);
-#ifdef _INCLUDE_Z85
         case ZARMOUR_MODE_Z85:
+#ifdef _INCLUDE_Z85
             return s_z85_decode (data, decode_size);
+#else
+            break;
 #endif
     }
-
     return NULL;
 }
 
