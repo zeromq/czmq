@@ -55,14 +55,9 @@ struct _zarmour_t {
 
 
 //  Textual names of modes
-#ifdef _INCLUDE_Z85
-const int _NUM_MODES = 6;
-#else
-const int _NUM_MODES = 5;
-#endif
 
 static char
-*s_codec_names [] = {
+*s_mode_names [] = {
     "base64", "base64url", "base32", "base32hex", "base16", "z85"
 };
 
@@ -71,7 +66,7 @@ static char
 //  Create a new zarmour
 
 zarmour_t *
-zarmour_new ()
+zarmour_new (void)
 {
     zarmour_t *self = (zarmour_t *) zmalloc (sizeof (zarmour_t));
     if (!self)
@@ -136,8 +131,7 @@ const char *
 zarmour_mode_str (zarmour_t *self)
 {
     assert (self);
-    assert ((int) self->mode >= 0 && (int) self->mode < _NUM_MODES);
-    return s_codec_names [(int) self->mode];
+    return s_mode_names [(int) self->mode];
 }
 
 
@@ -385,12 +379,12 @@ s_base16_decode (const char *data, size_t *size, const char *alphabet, size_t li
 
 //  Z85 encoding/decoding
 
-#ifdef _INCLUDE_Z85
 static char *
 s_z85_encode (const byte *data, size_t length)
 {
     assert (data != NULL);
     assert (length % 4 == 0);
+#ifdef _INCLUDE_Z85
     char *str = (char *) zmalloc (5 * length / 4 + 1);
     char *result = zmq_z85_encode (str, (uint8_t *) data, length);
     if (result == NULL) {
@@ -398,6 +392,9 @@ s_z85_encode (const byte *data, size_t length)
         str = NULL;
     }
     return str;
+#else
+    return NULL;
+#endif
 }
 
 static byte *
@@ -405,6 +402,7 @@ s_z85_decode (const char *data, size_t *size)
 {
     assert (data);
     assert (size);
+#ifdef _INCLUDE_Z85
     size_t length = strlen (data);
     assert (length % 5 == 0);
     *size = 4 * length / 5 + 1;
@@ -415,8 +413,10 @@ s_z85_decode (const char *data, size_t *size)
         bytes = NULL;
     }
     return bytes;
-}
+#else
+    return NULL;
 #endif
+}
 
 
 //  Definition of encode method
@@ -444,9 +444,7 @@ zarmour_encode (zarmour_t *self, const byte *data, size_t data_size)
             encoded = s_base16_encode (data, data_size, s_base16_alphabet);
             break;
         case ZARMOUR_MODE_Z85:
-#ifdef _INCLUDE_Z85
             encoded = s_z85_encode (data, data_size);
-#endif
             break;
     }
     if (!encoded)
@@ -455,9 +453,7 @@ zarmour_encode (zarmour_t *self, const byte *data, size_t data_size)
     if (self->line_breaks
     &&  self->line_length > 0
     &&  strlen (encoded) > self->line_length
-#ifdef _INCLUDE_Z85
     &&  self->mode != ZARMOUR_MODE_Z85
-#endif
     ) {
         char *line_end = self->line_end;
         size_t nbr_lines = strlen (encoded) / self->line_length;
@@ -485,7 +481,6 @@ zarmour_encode (zarmour_t *self, const byte *data, size_t data_size)
         free (temp);
         *dest = 0;
     }
-
     return encoded;
 }
 
@@ -515,11 +510,8 @@ zarmour_decode (zarmour_t *self, const char *data, size_t *decode_size)
         case ZARMOUR_MODE_BASE16:
             return s_base16_decode (data, decode_size, s_base16_alphabet, linebreakchars);
         case ZARMOUR_MODE_Z85:
-#ifdef _INCLUDE_Z85
             return s_z85_decode (data, decode_size);
-#else
             break;
-#endif
     }
     return NULL;
 }
