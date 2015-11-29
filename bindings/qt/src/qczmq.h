@@ -34,8 +34,10 @@ class QZdir;
 class QZdirPatch;
 class QZfile;
 class QZframe;
+class QZhash;
 class QZhashx;
 class QZiflist;
+class QZlist;
 class QZloop;
 class QZmsg;
 class QZpoller;
@@ -43,8 +45,6 @@ class QZsock;
 class QZstr;
 class QZtrie;
 class QZuuid;
-class QZhash;
-class QZlist;
 
 //  Public API classes
 #include "qzactor.h"
@@ -53,8 +53,10 @@ class QZlist;
 #include "qzdirpatch.h"
 #include "qzfile.h"
 #include "qzframe.h"
+#include "qzhash.h"
 #include "qzhashx.h"
 #include "qziflist.h"
+#include "qzlist.h"
 #include "qzloop.h"
 #include "qzmsg.h"
 #include "qzpoller.h"
@@ -62,8 +64,6 @@ class QZlist;
 #include "qzstr.h"
 #include "qztrie.h"
 #include "qzuuid.h"
-#include "qzhash.h"
-#include "qzlist.h"
 
 #endif //  Q_CZMQ_H
 /*

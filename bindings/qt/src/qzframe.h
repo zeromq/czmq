@@ -91,7 +91,7 @@ public:
     //  Probe the supplied object, and report if it looks like a zframe_t.
     static bool is (void *self);
 
-    //  Self test of this class
+    //  Self test of this class.
     static void test (bool verbose);
 
     zframe_t *self;

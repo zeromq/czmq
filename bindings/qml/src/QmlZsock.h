@@ -555,7 +555,7 @@ public slots:
     //  return the supplied value. Takes a polymorphic socket reference.         
     void *resolve (void *self);
 
-    //  Self test of this class
+    //  Self test of this class.
     void test (bool verbose);
 
     //  Create a new socket. Returns the new socket, or NULL if the new socket

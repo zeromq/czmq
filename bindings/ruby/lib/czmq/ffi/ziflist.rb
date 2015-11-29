@@ -65,14 +65,6 @@ module CZMQ
         result
       end
 
-      # Print properties of the ziflist object.
-      def print()
-        raise DestroyedError unless @ptr
-        self_p = @ptr
-        result = ::CZMQ::FFI.ziflist_print(self_p)
-        result
-      end
-
       # Reload network interfaces from system
       def reload()
         raise DestroyedError unless @ptr
@@ -126,6 +118,14 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.ziflist_netmask(self_p)
+        result
+      end
+
+      # Return the list of interfaces.
+      def print()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.ziflist_print(self_p)
         result
       end
 

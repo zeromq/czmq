@@ -44,17 +44,17 @@ HEADERS += \
   $$SRCDIR/QmlZdirPatch.h \
   $$SRCDIR/QmlZfile.h \
   $$SRCDIR/QmlZframe.h \
+  $$SRCDIR/QmlZhash.h \
   $$SRCDIR/QmlZhashx.h \
   $$SRCDIR/QmlZiflist.h \
+  $$SRCDIR/QmlZlist.h \
   $$SRCDIR/QmlZloop.h \
   $$SRCDIR/QmlZmsg.h \
   $$SRCDIR/QmlZpoller.h \
   $$SRCDIR/QmlZsock.h \
   $$SRCDIR/QmlZstr.h \
   $$SRCDIR/QmlZtrie.h \
-  $$SRCDIR/QmlZuuid.h \
-  $$SRCDIR/QmlZhash.h \
-  $$SRCDIR/QmlZlist.h 
+  $$SRCDIR/QmlZuuid.h 
 
 SOURCES += \
   $$SRCDIR/QmlZactor.cpp \
@@ -63,17 +63,17 @@ SOURCES += \
   $$SRCDIR/QmlZdirPatch.cpp \
   $$SRCDIR/QmlZfile.cpp \
   $$SRCDIR/QmlZframe.cpp \
+  $$SRCDIR/QmlZhash.cpp \
   $$SRCDIR/QmlZhashx.cpp \
   $$SRCDIR/QmlZiflist.cpp \
+  $$SRCDIR/QmlZlist.cpp \
   $$SRCDIR/QmlZloop.cpp \
   $$SRCDIR/QmlZmsg.cpp \
   $$SRCDIR/QmlZpoller.cpp \
   $$SRCDIR/QmlZsock.cpp \
   $$SRCDIR/QmlZstr.cpp \
   $$SRCDIR/QmlZtrie.cpp \
-  $$SRCDIR/QmlZuuid.cpp \
-  $$SRCDIR/QmlZhash.cpp \
-  $$SRCDIR/QmlZlist.cpp 
+  $$SRCDIR/QmlZuuid.cpp 
 
 OBJECTS_DIR = $$BUILDDIR/.obj
 MOC_DIR     = $$BUILDDIR/.moc

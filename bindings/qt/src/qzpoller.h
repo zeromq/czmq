@@ -53,7 +53,7 @@ public:
     //  zero. Calling zpoller_ignore_interrupts will supress this behavior.          
     void ignoreInterrupts ();
 
-    //  Self test of this class
+    //  Self test of this class.
     static void test (bool verbose);
 
     zpoller_t *self;

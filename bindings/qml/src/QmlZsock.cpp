@@ -978,7 +978,7 @@ void *QmlZsockAttached::resolve (void *self) {
 };
 
 ///
-//  Self test of this class
+//  Self test of this class.
 void QmlZsockAttached::test (bool verbose) {
     zsock_test (verbose);
 };

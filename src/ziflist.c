@@ -1,5 +1,5 @@
 /*  =========================================================================
-    ziflist - List of network interfaces available on system
+    ziflist - list of network interfaces available on system
 
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:

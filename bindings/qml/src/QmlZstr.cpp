@@ -81,7 +81,7 @@ void QmlZstrAttached::free (QString stringP) {
 };
 
 ///
-//  Self test of this class
+//  Self test of this class.
 void QmlZstrAttached::test (bool verbose) {
     zstr_test (verbose);
 };

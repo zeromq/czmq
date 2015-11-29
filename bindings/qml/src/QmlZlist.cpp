@@ -154,7 +154,7 @@ QObject* QmlZlist::qmlAttachedProperties(QObject* object) {
 
 
 ///
-//  Self test of this class
+//  Self test of this class.
 void QmlZlistAttached::test (bool verbose) {
     zlist_test (verbose);
 };

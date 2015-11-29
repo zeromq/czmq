@@ -204,7 +204,7 @@ public slots:
     //  unpacks to an empty hash table.                                          
     QmlZhashx *unpack (QmlZframe *frame);
 
-    //  Self test of this class
+    //  Self test of this class.
     void test (bool verbose);
 
     //  Create a new, empty hash container

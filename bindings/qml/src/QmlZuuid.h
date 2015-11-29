@@ -28,9 +28,6 @@ public:
     static QObject* qmlAttachedProperties(QObject* object); // defined in QmlZuuid.cpp
     
 public slots:
-    //  Print properties of the zuuid object.
-    void print ();
-
     //  Set UUID to new supplied ZUUID_LEN-octet value.
     void set (const byte *source);
 
@@ -80,13 +77,13 @@ public slots:
     //  Create UUID object from supplied ZUUID_LEN-octet value.
     QmlZuuid *newFrom (const byte *source);
 
-    //  Self test of this class
+    //  Self test of this class.
     void test (bool verbose);
 
-    //  Constructor
+    //  Create a new UUID object.
     QmlZuuid *construct ();
 
-    //  Destructor
+    //  Destroy a specified UUID object.
     void destruct (QmlZuuid *qmlSelf);
 };
 

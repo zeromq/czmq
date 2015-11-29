@@ -187,7 +187,7 @@ public:
     //  Callback function for zhashx_foreach method                            
     int foreachNoConflict (zhashx_foreach_fn callback, void *argument);
 
-    //  Self test of this class
+    //  Self test of this class.
     static void test (bool verbose);
 
     zhashx_t *self;

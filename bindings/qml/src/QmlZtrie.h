@@ -28,9 +28,6 @@ public:
     static QObject* qmlAttachedProperties(QObject* object); // defined in QmlZtrie.cpp
     
 public slots:
-    //  Print properties of the ztrie object.
-    void print ();
-
     //  Inserts a new route into the tree and attaches the data. Returns -1     
     //  if the route already exists, otherwise 0. This method takes ownership of
     //  the provided data if a destroy_data_fn is provided.                     
@@ -60,6 +57,9 @@ public slots:
     //  Returns the asterisk matched part of a route, if there has been no match
     //  or no asterisk match, returns NULL.                                     
     const QString hitAsteriskMatch ();
+
+    //  Print the trie
+    void print ();
 };
 
 class QmlZtrieAttached : public QObject
@@ -73,7 +73,7 @@ public:
     };
     
 public slots:
-    //  Self test of this class
+    //  Self test of this class.
     void test (bool verbose);
 
     //  Creates a new ztrie.

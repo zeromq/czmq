@@ -28,9 +28,6 @@ public:
     static QObject* qmlAttachedProperties(QObject* object); // defined in QmlZiflist.cpp
     
 public slots:
-    //  Print properties of the ziflist object.
-    void print ();
-
     //  Reload network interfaces from system
     void reload ();
 
@@ -51,6 +48,9 @@ public slots:
 
     //  Return the current interface network mask as a printable string
     const QString netmask ();
+
+    //  Return the list of interfaces.
+    void print ();
 };
 
 class QmlZiflistAttached : public QObject

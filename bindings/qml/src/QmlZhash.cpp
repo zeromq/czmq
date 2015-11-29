@@ -201,7 +201,7 @@ QmlZhash *QmlZhashAttached::unpack (QmlZframe *frame) {
 };
 
 ///
-//  Self test of this class
+//  Self test of this class.
 void QmlZhashAttached::test (bool verbose) {
     zhash_test (verbose);
 };

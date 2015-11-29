@@ -149,7 +149,7 @@ bool QmlZframeAttached::is (void *self) {
 };
 
 ///
-//  Self test of this class
+//  Self test of this class.
 void QmlZframeAttached::test (bool verbose) {
     zframe_test (verbose);
 };

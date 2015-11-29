@@ -23,10 +23,14 @@ class QmlZfile;
 class QmlZfileAttached;
 class QmlZframe;
 class QmlZframeAttached;
+class QmlZhash;
+class QmlZhashAttached;
 class QmlZhashx;
 class QmlZhashxAttached;
 class QmlZiflist;
 class QmlZiflistAttached;
+class QmlZlist;
+class QmlZlistAttached;
 class QmlZloop;
 class QmlZloopAttached;
 class QmlZmsg;
@@ -41,10 +45,6 @@ class QmlZtrie;
 class QmlZtrieAttached;
 class QmlZuuid;
 class QmlZuuidAttached;
-class QmlZhash;
-class QmlZhashAttached;
-class QmlZlist;
-class QmlZlistAttached;
 
 #include "QmlZactor.h"
 #include "QmlZarmour.h"
@@ -52,8 +52,10 @@ class QmlZlistAttached;
 #include "QmlZdirPatch.h"
 #include "QmlZfile.h"
 #include "QmlZframe.h"
+#include "QmlZhash.h"
 #include "QmlZhashx.h"
 #include "QmlZiflist.h"
+#include "QmlZlist.h"
 #include "QmlZloop.h"
 #include "QmlZmsg.h"
 #include "QmlZpoller.h"
@@ -61,8 +63,6 @@ class QmlZlistAttached;
 #include "QmlZstr.h"
 #include "QmlZtrie.h"
 #include "QmlZuuid.h"
-#include "QmlZhash.h"
-#include "QmlZlist.h"
 
 class QmlCZMQPlugin : public QQmlExtensionPlugin
 {
@@ -84,10 +84,14 @@ public:
         qmlRegisterType<QmlZfileAttached>();
         qmlRegisterType<QmlZframe> (uri, 1, 0, "QmlZframe");
         qmlRegisterType<QmlZframeAttached>();
+        qmlRegisterType<QmlZhash> (uri, 1, 0, "QmlZhash");
+        qmlRegisterType<QmlZhashAttached>();
         qmlRegisterType<QmlZhashx> (uri, 1, 0, "QmlZhashx");
         qmlRegisterType<QmlZhashxAttached>();
         qmlRegisterType<QmlZiflist> (uri, 1, 0, "QmlZiflist");
         qmlRegisterType<QmlZiflistAttached>();
+        qmlRegisterType<QmlZlist> (uri, 1, 0, "QmlZlist");
+        qmlRegisterType<QmlZlistAttached>();
         qmlRegisterType<QmlZloop> (uri, 1, 0, "QmlZloop");
         qmlRegisterType<QmlZloopAttached>();
         qmlRegisterType<QmlZmsg> (uri, 1, 0, "QmlZmsg");
@@ -102,10 +106,6 @@ public:
         qmlRegisterType<QmlZtrieAttached>();
         qmlRegisterType<QmlZuuid> (uri, 1, 0, "QmlZuuid");
         qmlRegisterType<QmlZuuidAttached>();
-        qmlRegisterType<QmlZhash> (uri, 1, 0, "QmlZhash");
-        qmlRegisterType<QmlZhashAttached>();
-        qmlRegisterType<QmlZlist> (uri, 1, 0, "QmlZlist");
-        qmlRegisterType<QmlZlistAttached>();
     };
 };
 

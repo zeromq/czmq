@@ -9,12 +9,6 @@
 
 
 ///
-//  Print properties of the zuuid object.
-void QmlZuuid::print () {
-    zuuid_print (self);
-};
-
-///
 //  Set UUID to new supplied ZUUID_LEN-octet value.
 void QmlZuuid::set (const byte *source) {
     zuuid_set (self, source);
@@ -95,13 +89,13 @@ QmlZuuid *QmlZuuidAttached::newFrom (const byte *source) {
 };
 
 ///
-//  Self test of this class
+//  Self test of this class.
 void QmlZuuidAttached::test (bool verbose) {
     zuuid_test (verbose);
 };
 
 ///
-//  Constructor
+//  Create a new UUID object.
 QmlZuuid *QmlZuuidAttached::construct () {
     QmlZuuid *qmlSelf = new QmlZuuid ();
     qmlSelf->self = zuuid_new ();
@@ -109,7 +103,7 @@ QmlZuuid *QmlZuuidAttached::construct () {
 };
 
 ///
-//  Destructor
+//  Destroy a specified UUID object.
 void QmlZuuidAttached::destruct (QmlZuuid *qmlSelf) {
     zuuid_destroy (&qmlSelf->self);
 };

@@ -66,7 +66,7 @@ QObject* QmlZpoller::qmlAttachedProperties(QObject* object) {
 
 
 ///
-//  Self test of this class
+//  Self test of this class.
 void QmlZpollerAttached::test (bool verbose) {
     zpoller_test (verbose);
 };

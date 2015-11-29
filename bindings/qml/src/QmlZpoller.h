@@ -73,7 +73,7 @@ public:
     };
     
 public slots:
-    //  Self test of this class
+    //  Self test of this class.
     void test (bool verbose);
 
     //  Create new poller; the reader can be a libzmq socket (void *), a zsock_t

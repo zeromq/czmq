@@ -28,9 +28,6 @@ public:
     static QObject* qmlAttachedProperties(QObject* object); // defined in QmlZarmour.cpp
     
 public slots:
-    //  Print properties of object
-    void print ();
-
     //  Get printable string for mode.
     const QString modeStr ();
 
@@ -71,6 +68,9 @@ public slots:
 
     //  Set the line length used for splitting lines.
     void setLineLength (size_t lineLength);
+
+    //  Print properties of object
+    void print ();
 };
 
 class QmlZarmourAttached : public QObject
@@ -84,7 +84,7 @@ public:
     };
     
 public slots:
-    //  Self test of this class
+    //  Self test of this class.
     void test (bool verbose);
 
     //  Create a new zarmour.

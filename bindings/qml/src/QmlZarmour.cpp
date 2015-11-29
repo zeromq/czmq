@@ -9,12 +9,6 @@
 
 
 ///
-//  Print properties of object
-void QmlZarmour::print () {
-    zarmour_print (self);
-};
-
-///
 //  Get printable string for mode.
 const QString QmlZarmour::modeStr () {
     return QString (zarmour_mode_str (self));
@@ -97,6 +91,12 @@ void QmlZarmour::setLineLength (size_t lineLength) {
     zarmour_set_line_length (self, lineLength);
 };
 
+///
+//  Print properties of object
+void QmlZarmour::print () {
+    zarmour_print (self);
+};
+
 
 QObject* QmlZarmour::qmlAttachedProperties(QObject* object) {
     return new QmlZarmourAttached(object);
@@ -104,7 +104,7 @@ QObject* QmlZarmour::qmlAttachedProperties(QObject* object) {
 
 
 ///
-//  Self test of this class
+//  Self test of this class.
 void QmlZarmourAttached::test (bool verbose) {
     zarmour_test (verbose);
 };

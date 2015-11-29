@@ -195,7 +195,7 @@ void QZloop::ignoreInterrupts ()
 }
 
 ///
-//  Self test of this class
+//  Self test of this class.
 void QZloop::test (bool verbose)
 {
     zloop_test (verbose);

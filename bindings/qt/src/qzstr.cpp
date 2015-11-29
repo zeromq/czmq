@@ -66,7 +66,7 @@ int QZstr::sendfm (void *dest, const QString &param)
 }
 
 ///
-//  Self test of this class
+//  Self test of this class.
 void QZstr::test (bool verbose)
 {
     zstr_test (verbose);

@@ -86,7 +86,7 @@ void QZpoller::ignoreInterrupts ()
 }
 
 ///
-//  Self test of this class
+//  Self test of this class.
 void QZpoller::test (bool verbose)
 {
     zpoller_test (verbose);

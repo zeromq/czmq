@@ -74,6 +74,7 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zdir_patch_dup(self_p)
+        result = ZdirPatch.__new result, true
         result
       end
 

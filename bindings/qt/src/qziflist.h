@@ -23,9 +23,6 @@ public:
     //  Destroy a ziflist instance
     ~QZiflist ();
 
-    //  Print properties of the ziflist object.
-    void print ();
-
     //  Reload network interfaces from system
     void reload ();
 
@@ -46,6 +43,9 @@ public:
 
     //  Return the current interface network mask as a printable string
     const QString netmask ();
+
+    //  Return the list of interfaces.
+    void print ();
 
     //  Self test of this class.
     static void test (bool verbose);

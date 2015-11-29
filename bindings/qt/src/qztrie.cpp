@@ -30,14 +30,6 @@ QZtrie::~QZtrie ()
 }
 
 ///
-//  Print properties of the ztrie object.
-void QZtrie::print ()
-{
-    ztrie_print (self);
-    
-}
-
-///
 //  Inserts a new route into the tree and attaches the data. Returns -1     
 //  if the route already exists, otherwise 0. This method takes ownership of
 //  the provided data if a destroy_data_fn is provided.                     
@@ -103,7 +95,15 @@ const QString QZtrie::hitAsteriskMatch ()
 }
 
 ///
-//  Self test of this class
+//  Print the trie
+void QZtrie::print ()
+{
+    ztrie_print (self);
+    
+}
+
+///
+//  Self test of this class.
 void QZtrie::test (bool verbose)
 {
     ztrie_test (verbose);

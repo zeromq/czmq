@@ -16,25 +16,17 @@ QZuuid::QZuuid (zuuid_t *self, QObject *qObjParent) : QObject (qObjParent)
 
 
 ///
-//  Constructor
+//  Create a new UUID object.
 QZuuid::QZuuid (QObject *qObjParent) : QObject (qObjParent)
 {
     this->self = zuuid_new ();
 }
 
 ///
-//  Destructor
+//  Destroy a specified UUID object.
 QZuuid::~QZuuid ()
 {
     zuuid_destroy (&self);
-}
-
-///
-//  Print properties of the zuuid object.
-void QZuuid::print ()
-{
-    zuuid_print (self);
-    
 }
 
 ///
@@ -130,7 +122,7 @@ QZuuid * QZuuid::dup ()
 }
 
 ///
-//  Self test of this class
+//  Self test of this class.
 void QZuuid::test (bool verbose)
 {
     zuuid_test (verbose);
