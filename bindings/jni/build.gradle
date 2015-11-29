@@ -20,6 +20,7 @@ task generateJniHeaders(type: Exec, dependsOn: 'classes') {
     def jniClasses = [
             'org.zeromq.czmq.Zactor',
             'org.zeromq.czmq.Zarmour',
+            'org.zeromq.czmq.Zconfig',
             'org.zeromq.czmq.Zdir',
             'org.zeromq.czmq.ZdirPatch',
             'org.zeromq.czmq.Zfile',

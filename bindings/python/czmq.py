@@ -58,21 +58,29 @@ class char_t(Structure):
     pass # Empty - only for type checking
 char_p = POINTER(char_t)
 
-class zdir_t(Structure):
+class zconfig_t(Structure):
     pass # Empty - only for type checking
-zdir_p = POINTER(zdir_t)
+zconfig_p = POINTER(zconfig_t)
 
 class zlist_t(Structure):
     pass # Empty - only for type checking
 zlist_p = POINTER(zlist_t)
 
-class zhash_t(Structure):
+class zchunk_t(Structure):
     pass # Empty - only for type checking
-zhash_p = POINTER(zhash_t)
+zchunk_p = POINTER(zchunk_t)
 
 class FILE(Structure):
     pass # Empty - only for type checking
 FILE_p = POINTER(FILE)
+
+class zdir_t(Structure):
+    pass # Empty - only for type checking
+zdir_p = POINTER(zdir_t)
+
+class zhash_t(Structure):
+    pass # Empty - only for type checking
+zhash_p = POINTER(zhash_t)
 
 class zfile_t(Structure):
     pass # Empty - only for type checking
@@ -81,10 +89,6 @@ zfile_p = POINTER(zfile_t)
 class zdir_patch_t(Structure):
     pass # Empty - only for type checking
 zdir_patch_p = POINTER(zdir_patch_t)
-
-class zchunk_t(Structure):
-    pass # Empty - only for type checking
-zchunk_p = POINTER(zchunk_t)
 
 class zframe_t(Structure):
     pass # Empty - only for type checking
@@ -417,6 +421,237 @@ as a string, if that's what it was prior to encoding."""
     def test(verbose):
         """Self test of this class."""
         return lib.zarmour_test(verbose)
+
+
+# zconfig
+zconfig_fct = CFUNCTYPE(c_int, zconfig_p, c_void_p, c_int)
+lib.zconfig_new.restype = zconfig_p
+lib.zconfig_new.argtypes = [c_char_p, zconfig_p]
+lib.zconfig_destroy.restype = None
+lib.zconfig_destroy.argtypes = [POINTER(zconfig_p)]
+lib.zconfig_name.restype = POINTER(c_char)
+lib.zconfig_name.argtypes = [zconfig_p]
+lib.zconfig_value.restype = POINTER(c_char)
+lib.zconfig_value.argtypes = [zconfig_p]
+lib.zconfig_put.restype = None
+lib.zconfig_put.argtypes = [zconfig_p, c_char_p, c_char_p]
+lib.zconfig_putf.restype = None
+lib.zconfig_putf.argtypes = [zconfig_p, c_char_p, c_char_p]
+lib.zconfig_get.restype = POINTER(c_char)
+lib.zconfig_get.argtypes = [zconfig_p, c_char_p, c_char_p]
+lib.zconfig_set_name.restype = None
+lib.zconfig_set_name.argtypes = [zconfig_p, c_char_p]
+lib.zconfig_set_value.restype = None
+lib.zconfig_set_value.argtypes = [zconfig_p, c_char_p]
+lib.zconfig_child.restype = zconfig_p
+lib.zconfig_child.argtypes = [zconfig_p]
+lib.zconfig_next.restype = zconfig_p
+lib.zconfig_next.argtypes = [zconfig_p]
+lib.zconfig_locate.restype = zconfig_p
+lib.zconfig_locate.argtypes = [zconfig_p, c_char_p]
+lib.zconfig_at_depth.restype = zconfig_p
+lib.zconfig_at_depth.argtypes = [zconfig_p, c_int]
+lib.zconfig_execute.restype = c_int
+lib.zconfig_execute.argtypes = [zconfig_p, zconfig_fct, c_void_p]
+lib.zconfig_set_comment.restype = None
+lib.zconfig_set_comment.argtypes = [zconfig_p, c_char_p]
+lib.zconfig_comments.restype = zlist_p
+lib.zconfig_comments.argtypes = [zconfig_p]
+lib.zconfig_load.restype = zconfig_p
+lib.zconfig_load.argtypes = [c_char_p]
+lib.zconfig_save.restype = c_int
+lib.zconfig_save.argtypes = [zconfig_p, c_char_p]
+lib.zconfig_loadf.restype = zconfig_p
+lib.zconfig_loadf.argtypes = [c_char_p]
+lib.zconfig_savef.restype = c_int
+lib.zconfig_savef.argtypes = [zconfig_p, c_char_p]
+lib.zconfig_filename.restype = c_char_p
+lib.zconfig_filename.argtypes = [zconfig_p]
+lib.zconfig_reload.restype = c_int
+lib.zconfig_reload.argtypes = [POINTER(zconfig_p)]
+lib.zconfig_chunk_load.restype = zconfig_p
+lib.zconfig_chunk_load.argtypes = [zchunk_p]
+lib.zconfig_chunk_save.restype = zchunk_p
+lib.zconfig_chunk_save.argtypes = [zconfig_p]
+lib.zconfig_str_load.restype = zconfig_p
+lib.zconfig_str_load.argtypes = [c_char_p]
+lib.zconfig_str_save.restype = POINTER(c_char)
+lib.zconfig_str_save.argtypes = [zconfig_p]
+lib.zconfig_has_changed.restype = c_bool
+lib.zconfig_has_changed.argtypes = [zconfig_p]
+lib.zconfig_fprint.restype = None
+lib.zconfig_fprint.argtypes = [zconfig_p, FILE_p]
+lib.zconfig_print.restype = None
+lib.zconfig_print.argtypes = [zconfig_p]
+lib.zconfig_test.restype = None
+lib.zconfig_test.argtypes = [c_bool]
+
+class Zconfig(object):
+    """zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.
+
+
+
+-    zconfig_new (const char *name, zconfig_t *parent);"""
+
+    def __init__(self, *args):
+        """Create new config item"""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zconfig_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zconfig_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 2)
+            self._as_parameter_ = lib.zconfig_new(args[0], args[1]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destroy a config item and all its children"""
+        if self.allow_destruct:
+            lib.zconfig_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def name(self):
+        """Return name of config item"""
+        return return_fresh_string(lib.zconfig_name(self._as_parameter_))
+
+    def value(self):
+        """Return value of config item"""
+        return return_fresh_string(lib.zconfig_value(self._as_parameter_))
+
+    def put(self, path, value):
+        """Insert or update configuration key with value"""
+        return lib.zconfig_put(self._as_parameter_, path, value)
+
+    def putf(self, path, format, *args):
+        """Equivalent to zconfig_put, accepting a format specifier and variable
+argument list, instead of a single string value."""
+        return lib.zconfig_putf(self._as_parameter_, path, format, *args)
+
+    def get(self, path, default_value):
+        """Get value for config item into a string value; leading slash is optional
+and ignored."""
+        return return_fresh_string(lib.zconfig_get(self._as_parameter_, path, default_value))
+
+    def set_name(self, name):
+        """Set config item name, name may be NULL"""
+        return lib.zconfig_set_name(self._as_parameter_, name)
+
+    def set_value(self, format, *args):
+        """Set new value for config item. The new value may be a string, a printf
+format, or NULL. Note that if string may possibly contain '%', or if it
+comes from an insecure source, you must use '%s' as the format, followed
+by the string."""
+        return lib.zconfig_set_value(self._as_parameter_, format, *args)
+
+    def child(self):
+        """Find our first child, if any"""
+        return Zconfig(lib.zconfig_child(self._as_parameter_), False)
+
+    def next(self):
+        """Find our first sibling, if any"""
+        return Zconfig(lib.zconfig_next(self._as_parameter_), False)
+
+    def locate(self, path):
+        """Find a config item along a path; leading slash is optional and ignored."""
+        return Zconfig(lib.zconfig_locate(self._as_parameter_, path), False)
+
+    def at_depth(self, level):
+        """Locate the last config item at a specified depth"""
+        return Zconfig(lib.zconfig_at_depth(self._as_parameter_, level), False)
+
+    def execute(self, handler, arg):
+        """Execute a callback for each config item in the tree; returns zero if
+successful, else -1."""
+        return lib.zconfig_execute(self._as_parameter_, handler, arg)
+
+    def set_comment(self, format, *args):
+        """Add comment to config item before saving to disk. You can add as many
+comment lines as you like. If you use a null format, all comments are
+deleted."""
+        return lib.zconfig_set_comment(self._as_parameter_, format, *args)
+
+    def comments(self):
+        """Return comments of config item, as zlist."""
+        return Zlist(lib.zconfig_comments(self._as_parameter_), False)
+
+    @staticmethod
+    def load(filename):
+        """Load a config tree from a specified ZPL text file; returns a zconfig_t
+reference for the root, if the file exists and is readable. Returns NULL
+if the file does not exist."""
+        return Zconfig(lib.zconfig_load(filename), False)
+
+    def save(self, filename):
+        """Save a config tree to a specified ZPL text file, where a filename
+"-" means dump to standard output."""
+        return lib.zconfig_save(self._as_parameter_, filename)
+
+    @staticmethod
+    def loadf(format, *args):
+        """Equivalent to zconfig_load, taking a format string instead of a fixed
+filename."""
+        return Zconfig(lib.zconfig_loadf(format, *args), False)
+
+    def savef(self, format, *args):
+        """Equivalent to zconfig_save, taking a format string instead of a fixed
+filename."""
+        return lib.zconfig_savef(self._as_parameter_, format, *args)
+
+    def filename(self):
+        """Report filename used during zconfig_load, or NULL if none"""
+        return lib.zconfig_filename(self._as_parameter_)
+
+    @staticmethod
+    def reload(self_p):
+        """Reload config tree from same file that it was previously loaded from.
+Returns 0 if OK, -1 if there was an error (and then does not change
+existing data)."""
+        return lib.zconfig_reload(byref(zconfig_p.from_param(self_p)))
+
+    @staticmethod
+    def chunk_load(chunk):
+        """Load a config tree from a memory chunk"""
+        return Zconfig(lib.zconfig_chunk_load(chunk), False)
+
+    def chunk_save(self):
+        """Save a config tree to a new memory chunk"""
+        return lib.zconfig_chunk_save(self._as_parameter_)
+
+    @staticmethod
+    def str_load(string):
+        """Load a config tree from a null-terminated string"""
+        return Zconfig(lib.zconfig_str_load(string), False)
+
+    def str_save(self):
+        """Save a config tree to a new null terminated string"""
+        return return_fresh_string(lib.zconfig_str_save(self._as_parameter_))
+
+    def has_changed(self):
+        """Return true if a configuration tree was loaded from a file and that
+file has changed in since the tree was loaded."""
+        return lib.zconfig_has_changed(self._as_parameter_)
+
+    def fprint(self, file):
+        """Print the config file to open stream"""
+        return lib.zconfig_fprint(self._as_parameter_, coerce_py_file(file))
+
+    def print(self):
+        """Print properties of object"""
+        return lib.zconfig_print(self._as_parameter_)
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class"""
+        return lib.zconfig_test(verbose)
 
 
 # zdir
