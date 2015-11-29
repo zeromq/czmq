@@ -9,12 +9,6 @@
 
 
 ///
-//  Print properties of the ziflist object.
-void QmlZiflist::print () {
-    ziflist_print (self);
-};
-
-///
 //  Reload network interfaces from system
 void QmlZiflist::reload () {
     ziflist_reload (self);
@@ -54,6 +48,12 @@ const QString QmlZiflist::broadcast () {
 //  Return the current interface network mask as a printable string
 const QString QmlZiflist::netmask () {
     return QString (ziflist_netmask (self));
+};
+
+///
+//  Return the list of interfaces.
+void QmlZiflist::print () {
+    ziflist_print (self);
 };
 
 

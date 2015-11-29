@@ -344,7 +344,7 @@ bool QZmsg::is (void *self)
 }
 
 ///
-//  Self test of this class
+//  Self test of this class.
 void QZmsg::test (bool verbose)
 {
     zmsg_test (verbose);

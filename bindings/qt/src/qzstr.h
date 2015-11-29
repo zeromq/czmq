@@ -42,7 +42,7 @@ public:
     //  message.                                                              
     static int sendfm (void *dest, const QString &param);
 
-    //  Self test of this class
+    //  Self test of this class.
     static void test (bool verbose);
 
     zstr_t *self;

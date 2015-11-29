@@ -17,14 +17,11 @@ public:
     //  Copy-construct to return the proper wrapped c types
     QZuuid (zuuid_t *self, QObject *qObjParent = 0);
 
-    //  Constructor
+    //  Create a new UUID object.
     explicit QZuuid (QObject *qObjParent = 0);
 
-    //  Destructor
+    //  Destroy a specified UUID object.
     ~QZuuid ();
-
-    //  Print properties of the zuuid object.
-    void print ();
 
     //  Create UUID object from supplied ZUUID_LEN-octet value.
     static QZuuid * newFrom (const byte *source);
@@ -63,7 +60,7 @@ public:
     //  returns null.                                                      
     QZuuid * dup ();
 
-    //  Self test of this class
+    //  Self test of this class.
     static void test (bool verbose);
 
     zuuid_t *self;

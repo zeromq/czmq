@@ -108,7 +108,7 @@ public:
     //  zero. Calling zloop_ignore_interrupts will supress this behavior.         
     void ignoreInterrupts ();
 
-    //  Self test of this class
+    //  Self test of this class.
     static void test (bool verbose);
 
     zloop_t *self;

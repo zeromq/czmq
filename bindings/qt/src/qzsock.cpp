@@ -407,14 +407,6 @@ void * QZsock::resolve (void *self)
 }
 
 ///
-//  Self test of this class
-void QZsock::test (bool verbose)
-{
-    zsock_test (verbose);
-    
-}
-
-///
 //  Get socket option `tos`.
 int QZsock::tos ()
 {
@@ -1186,6 +1178,14 @@ QString QZsock::lastEndpoint ()
     QString rv = QString (retStr_);
     free (retStr_);;
     return rv;
+}
+
+///
+//  Self test of this class.
+void QZsock::test (bool verbose)
+{
+    zsock_test (verbose);
+    
 }
 /*
 ################################################################################

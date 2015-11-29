@@ -32,9 +32,9 @@ QZdirPatch::~QZdirPatch ()
 ///
 //  Create copy of a patch. If the patch is null, or memory was exhausted,
 //  returns null.                                                         
-zdir_patch_t * QZdirPatch::dup ()
+QZdirPatch * QZdirPatch::dup ()
 {
-    zdir_patch_t * rv = zdir_patch_dup (self);
+    QZdirPatch *rv = new QZdirPatch (zdir_patch_dup (self));
     return rv;
 }
 

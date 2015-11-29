@@ -187,7 +187,7 @@ public slots:
     //  Probe the supplied object, and report if it looks like a zmsg_t.
     bool is (void *self);
 
-    //  Self test of this class
+    //  Self test of this class.
     void test (bool verbose);
 
     //  Create a new empty message object

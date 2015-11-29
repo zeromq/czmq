@@ -65,14 +65,6 @@ module CZMQ
         result
       end
 
-      # Print properties of object
-      def print()
-        raise DestroyedError unless @ptr
-        self_p = @ptr
-        result = ::CZMQ::FFI.zarmour_print(self_p)
-        result
-      end
-
       # Get printable string for mode.
       def mode_str()
         raise DestroyedError unless @ptr
@@ -185,7 +177,15 @@ module CZMQ
         result
       end
 
-      # Self test of this class
+      # Print properties of object
+      def print()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zarmour_print(self_p)
+        result
+      end
+
+      # Self test of this class.
       def self.test(verbose)
         verbose = !(0==verbose||!verbose) # boolean
         result = ::CZMQ::FFI.zarmour_test(verbose)

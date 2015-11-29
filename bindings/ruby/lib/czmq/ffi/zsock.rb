@@ -699,13 +699,6 @@ module CZMQ
         result
       end
 
-      # Self test of this class
-      def self.test(verbose)
-        verbose = !(0==verbose||!verbose) # boolean
-        result = ::CZMQ::FFI.zsock_test(verbose)
-        result
-      end
-
       # Get socket option `tos`.
       def tos()
         raise DestroyedError unless @ptr
@@ -2607,6 +2600,13 @@ module CZMQ
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
         result = ::CZMQ::FFI.zsock_last_endpoint(self_p)
         result = ::FFI::AutoPointer.new(result, LibC.method(:free))
+        result
+      end
+
+      # Self test of this class.
+      def self.test(verbose)
+        verbose = !(0==verbose||!verbose) # boolean
+        result = ::CZMQ::FFI.zsock_test(verbose)
         result
       end
     end

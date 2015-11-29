@@ -119,8 +119,10 @@ set (czmq_headers
     include/zfile.h
     include/zframe.h
     include/zgossip.h
+    include/zhash.h
     include/zhashx.h
     include/ziflist.h
+    include/zlist.h
     include/zlistx.h
     include/zloop.h
     include/zmonitor.h
@@ -137,8 +139,6 @@ set (czmq_headers
     include/zauth_v2.h
     include/zbeacon_v2.h
     include/zctx.h
-    include/zhash.h
-    include/zlist.h
     include/zmonitor_v2.h
     include/zmutex.h
     include/zproxy_v2.h
@@ -178,8 +178,10 @@ set (czmq_sources
     src/zfile.c
     src/zframe.c
     src/zgossip.c
+    src/zhash.c
     src/zhashx.c
     src/ziflist.c
+    src/zlist.c
     src/zlistx.c
     src/zloop.c
     src/zmonitor.c
@@ -196,8 +198,6 @@ set (czmq_sources
     src/zauth_v2.c
     src/zbeacon_v2.c
     src/zctx.c
-    src/zhash.c
-    src/zlist.c
     src/zmonitor_v2.c
     src/zmutex.c
     src/zproxy_v2.c
@@ -260,12 +260,14 @@ set(TEST_CLASSES
   zconfig_test
   zdigest_test
   zdir_test
-  zdir patch_test
+  zdir_patch_test
   zfile_test
   zframe_test
   zgossip_test
+  zhash_test
   zhashx_test
   ziflist_test
+  zlist_test
   zlistx_test
   zloop_test
   zmonitor_test
@@ -282,8 +284,6 @@ set(TEST_CLASSES
   zauth_v2_test
   zbeacon_v2_test
   zctx_test
-  zhash_test
-  zlist_test
   zmonitor_v2_test
   zmutex_test
   zproxy_v2_test

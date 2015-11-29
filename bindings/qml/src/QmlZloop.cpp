@@ -148,7 +148,7 @@ QObject* QmlZloop::qmlAttachedProperties(QObject* object) {
 
 
 ///
-//  Self test of this class
+//  Self test of this class.
 void QmlZloopAttached::test (bool verbose) {
     zloop_test (verbose);
 };

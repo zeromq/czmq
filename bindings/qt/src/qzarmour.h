@@ -23,9 +23,6 @@ public:
     //  Destroy the zarmour.
     ~QZarmour ();
 
-    //  Print properties of object
-    void print ();
-
     //  Get printable string for mode.
     const QString modeStr ();
 
@@ -67,7 +64,10 @@ public:
     //  Set the line length used for splitting lines.
     void setLineLength (size_t lineLength);
 
-    //  Self test of this class
+    //  Print properties of object
+    void print ();
+
+    //  Self test of this class.
     static void test (bool verbose);
 
     zarmour_t *self;

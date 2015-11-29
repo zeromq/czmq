@@ -229,9 +229,6 @@ public:
     //  return the supplied value. Takes a polymorphic socket reference.         
     static void * resolve (void *self);
 
-    //  Self test of this class
-    static void test (bool verbose);
-
     //  Get socket option `tos`.
     int tos ();
 
@@ -513,6 +510,9 @@ public:
 
     //  Get socket option `last_endpoint`.
     QString lastEndpoint ();
+
+    //  Self test of this class.
+    static void test (bool verbose);
 
     zsock_t *self;
 };

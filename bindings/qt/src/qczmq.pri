@@ -17,17 +17,17 @@ qczmq-uselib:!qczmq-buildlib {
                      $$PWD/qzdirpatch.h \
                      $$PWD/qzfile.h \
                      $$PWD/qzframe.h \
+                     $$PWD/qzhash.h \
                      $$PWD/qzhashx.h \
                      $$PWD/qziflist.h \
+                     $$PWD/qzlist.h \
                      $$PWD/qzloop.h \
                      $$PWD/qzmsg.h \
                      $$PWD/qzpoller.h \
                      $$PWD/qzsock.h \
                      $$PWD/qzstr.h \
                      $$PWD/qztrie.h \
-                     $$PWD/qzuuid.h \
-                     $$PWD/qzhash.h \
-                     $$PWD/qzlist.h
+                     $$PWD/qzuuid.h
 
     SOURCES       += \
                      $$PWD/qzactor.cpp \
@@ -36,17 +36,17 @@ qczmq-uselib:!qczmq-buildlib {
                      $$PWD/qzdirpatch.cpp \
                      $$PWD/qzfile.cpp \
                      $$PWD/qzframe.cpp \
+                     $$PWD/qzhash.cpp \
                      $$PWD/qzhashx.cpp \
                      $$PWD/qziflist.cpp \
+                     $$PWD/qzlist.cpp \
                      $$PWD/qzloop.cpp \
                      $$PWD/qzmsg.cpp \
                      $$PWD/qzpoller.cpp \
                      $$PWD/qzsock.cpp \
                      $$PWD/qzstr.cpp \
                      $$PWD/qztrie.cpp \
-                     $$PWD/qzuuid.cpp \
-                     $$PWD/qzhash.cpp \
-                     $$PWD/qzlist.cpp
+                     $$PWD/qzuuid.cpp
 }
 
 win32 {

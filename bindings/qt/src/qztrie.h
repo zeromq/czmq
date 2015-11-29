@@ -23,9 +23,6 @@ public:
     //  Destroy the ztrie.
     ~QZtrie ();
 
-    //  Print properties of the ztrie object.
-    void print ();
-
     //  Inserts a new route into the tree and attaches the data. Returns -1     
     //  if the route already exists, otherwise 0. This method takes ownership of
     //  the provided data if a destroy_data_fn is provided.                     
@@ -56,7 +53,10 @@ public:
     //  or no asterisk match, returns NULL.                                     
     const QString hitAsteriskMatch ();
 
-    //  Self test of this class
+    //  Print the trie
+    void print ();
+
+    //  Self test of this class.
     static void test (bool verbose);
 
     ztrie_t *self;

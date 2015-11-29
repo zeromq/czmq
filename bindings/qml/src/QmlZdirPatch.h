@@ -30,7 +30,7 @@ public:
 public slots:
     //  Create copy of a patch. If the patch is null, or memory was exhausted,
     //  returns null.                                                         
-    zdir_patch_t *dup ();
+    QmlZdirPatch *dup ();
 
     //  Return patch file directory path
     const QString path ();

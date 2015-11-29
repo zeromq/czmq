@@ -284,7 +284,7 @@ bool QmlZmsgAttached::is (void *self) {
 };
 
 ///
-//  Self test of this class
+//  Self test of this class.
 void QmlZmsgAttached::test (bool verbose) {
     zmsg_test (verbose);
 };

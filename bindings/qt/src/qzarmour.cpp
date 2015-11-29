@@ -30,14 +30,6 @@ QZarmour::~QZarmour ()
 }
 
 ///
-//  Print properties of object
-void QZarmour::print ()
-{
-    zarmour_print (self);
-    
-}
-
-///
 //  Get printable string for mode.
 const QString QZarmour::modeStr ()
 {
@@ -146,7 +138,15 @@ void QZarmour::setLineLength (size_t lineLength)
 }
 
 ///
-//  Self test of this class
+//  Print properties of object
+void QZarmour::print ()
+{
+    zarmour_print (self);
+    
+}
+
+///
+//  Self test of this class.
 void QZarmour::test (bool verbose)
 {
     zarmour_test (verbose);

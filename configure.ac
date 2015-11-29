@@ -11,7 +11,7 @@ AC_PREREQ(2.61)
 # the version.sh script. Hence, it should be updated there.
 # The version in git should reflect the *next* version planned.
 #
-AC_INIT([czmq],[m4_esyscmd([./version.sh czmq])],[zeromq-dev@lists.zeromq.org])
+AC_INIT([czmq],[m4_esyscmd([./version.sh czmq.h])],[zeromq-dev@lists.zeromq.org])
 
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(config)

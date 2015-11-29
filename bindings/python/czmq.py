@@ -277,8 +277,6 @@ lib.zarmour_new.restype = zarmour_p
 lib.zarmour_new.argtypes = []
 lib.zarmour_destroy.restype = None
 lib.zarmour_destroy.argtypes = [POINTER(zarmour_p)]
-lib.zarmour_print.restype = None
-lib.zarmour_print.argtypes = [zarmour_p]
 lib.zarmour_mode_str.restype = c_char_p
 lib.zarmour_mode_str.argtypes = [zarmour_p]
 lib.zarmour_encode.restype = POINTER(c_char)
@@ -305,6 +303,8 @@ lib.zarmour_line_length.restype = c_size_t
 lib.zarmour_line_length.argtypes = [zarmour_p]
 lib.zarmour_set_line_length.restype = None
 lib.zarmour_set_line_length.argtypes = [zarmour_p, c_size_t]
+lib.zarmour_print.restype = None
+lib.zarmour_print.argtypes = [zarmour_p]
 lib.zarmour_test.restype = None
 lib.zarmour_test.argtypes = [c_bool]
 
@@ -354,10 +354,6 @@ class Zarmour(object):
     def __nonzero__(self):
         "Determine whether the object is valid by converting to boolean" # Python 2
         return self._as_parameter_.__nonzero__()
-
-    def print(self):
-        """Print properties of object"""
-        return lib.zarmour_print(self._as_parameter_)
 
     def mode_str(self):
         """Get printable string for mode."""
@@ -413,9 +409,13 @@ as a string, if that's what it was prior to encoding."""
         """Set the line length used for splitting lines."""
         return lib.zarmour_set_line_length(self._as_parameter_, line_length)
 
+    def print(self):
+        """Print properties of object"""
+        return lib.zarmour_print(self._as_parameter_)
+
     @staticmethod
     def test(verbose):
-        """Self test of this class"""
+        """Self test of this class."""
         return lib.zarmour_test(verbose)
 
 
@@ -572,7 +572,7 @@ Receive directory changes:
         return lib.zdir_test(verbose)
 
 
-# zdir patch
+# zdir_patch
 lib.zdir_patch_new.restype = zdir_patch_p
 lib.zdir_patch_new.argtypes = [c_char_p, zfile_p, c_int, c_char_p]
 lib.zdir_patch_destroy.restype = None
@@ -1029,8 +1029,232 @@ configured by zsys_set_logstream). Prefix shows before frame, if not null."""
 
     @staticmethod
     def test(verbose):
-        """Self test of this class"""
+        """Self test of this class."""
         return lib.zframe_test(verbose)
+
+
+# zhash
+zhash_free_fn = CFUNCTYPE(None, c_void_p)
+zhash_foreach_fn = CFUNCTYPE(c_int, c_char_p, c_void_p, c_void_p)
+lib.zhash_new.restype = zhash_p
+lib.zhash_new.argtypes = []
+lib.zhash_destroy.restype = None
+lib.zhash_destroy.argtypes = [POINTER(zhash_p)]
+lib.zhash_insert.restype = c_int
+lib.zhash_insert.argtypes = [zhash_p, c_char_p, c_void_p]
+lib.zhash_update.restype = None
+lib.zhash_update.argtypes = [zhash_p, c_char_p, c_void_p]
+lib.zhash_delete.restype = None
+lib.zhash_delete.argtypes = [zhash_p, c_char_p]
+lib.zhash_lookup.restype = c_void_p
+lib.zhash_lookup.argtypes = [zhash_p, c_char_p]
+lib.zhash_rename.restype = c_int
+lib.zhash_rename.argtypes = [zhash_p, c_char_p, c_char_p]
+lib.zhash_freefn.restype = c_void_p
+lib.zhash_freefn.argtypes = [zhash_p, c_char_p, zhash_free_fn]
+lib.zhash_size.restype = c_size_t
+lib.zhash_size.argtypes = [zhash_p]
+lib.zhash_dup.restype = zhash_p
+lib.zhash_dup.argtypes = [zhash_p]
+lib.zhash_keys.restype = zlist_p
+lib.zhash_keys.argtypes = [zhash_p]
+lib.zhash_first.restype = c_void_p
+lib.zhash_first.argtypes = [zhash_p]
+lib.zhash_next.restype = c_void_p
+lib.zhash_next.argtypes = [zhash_p]
+lib.zhash_cursor.restype = c_char_p
+lib.zhash_cursor.argtypes = [zhash_p]
+lib.zhash_comment.restype = None
+lib.zhash_comment.argtypes = [zhash_p, c_char_p]
+lib.zhash_pack.restype = zframe_p
+lib.zhash_pack.argtypes = [zhash_p]
+lib.zhash_unpack.restype = zhash_p
+lib.zhash_unpack.argtypes = [zframe_p]
+lib.zhash_save.restype = c_int
+lib.zhash_save.argtypes = [zhash_p, c_char_p]
+lib.zhash_load.restype = c_int
+lib.zhash_load.argtypes = [zhash_p, c_char_p]
+lib.zhash_refresh.restype = c_int
+lib.zhash_refresh.argtypes = [zhash_p]
+lib.zhash_autofree.restype = None
+lib.zhash_autofree.argtypes = [zhash_p]
+lib.zhash_foreach.restype = c_int
+lib.zhash_foreach.argtypes = [zhash_p, zhash_foreach_fn, c_void_p]
+lib.zhash_test.restype = None
+lib.zhash_test.argtypes = [c_bool]
+
+class Zhash(object):
+    """generic type-free hash container (simple)"""
+
+    def __init__(self, *args):
+        """Create a new, empty hash container"""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zhash_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zhash_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 0)
+            self._as_parameter_ = lib.zhash_new() # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destroy a hash container and all items in it"""
+        if self.allow_destruct:
+            lib.zhash_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def insert(self, key, item):
+        """Insert item into hash table with specified key and item.
+If key is already present returns -1 and leaves existing item unchanged
+Returns 0 on success."""
+        return lib.zhash_insert(self._as_parameter_, key, item)
+
+    def update(self, key, item):
+        """Update item into hash table with specified key and item.
+If key is already present, destroys old item and inserts new one.
+Use free_fn method to ensure deallocator is properly called on item."""
+        return lib.zhash_update(self._as_parameter_, key, item)
+
+    def delete(self, key):
+        """Remove an item specified by key from the hash table. If there was no such
+item, this function does nothing."""
+        return lib.zhash_delete(self._as_parameter_, key)
+
+    def lookup(self, key):
+        """Return the item at the specified key, or null"""
+        return c_void_p(lib.zhash_lookup(self._as_parameter_, key))
+
+    def rename(self, old_key, new_key):
+        """Reindexes an item from an old key to a new key. If there was no such
+item, does nothing. Returns 0 if successful, else -1."""
+        return lib.zhash_rename(self._as_parameter_, old_key, new_key)
+
+    def freefn(self, key, free_fn):
+        """Set a free function for the specified hash table item. When the item is
+destroyed, the free function, if any, is called on that item.
+Use this when hash items are dynamically allocated, to ensure that
+you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
+Returns the item, or NULL if there is no such item."""
+        return c_void_p(lib.zhash_freefn(self._as_parameter_, key, free_fn))
+
+    def size(self):
+        """Return the number of keys/items in the hash table"""
+        return lib.zhash_size(self._as_parameter_)
+
+    def dup(self):
+        """Make copy of hash table; if supplied table is null, returns null.
+Does not copy items themselves. Rebuilds new table so may be slow on
+very large tables. NOTE: only works with item values that are strings
+since there's no other way to know how to duplicate the item value."""
+        return Zhash(lib.zhash_dup(self._as_parameter_), True)
+
+    def keys(self):
+        """Return keys for items in table"""
+        return Zlist(lib.zhash_keys(self._as_parameter_), True)
+
+    def first(self):
+        """Simple iterator; returns first item in hash table, in no given order,
+or NULL if the table is empty. This method is simpler to use than the
+foreach() method, which is deprecated. To access the key for this item
+use zhash_cursor(). NOTE: do NOT modify the table while iterating."""
+        return c_void_p(lib.zhash_first(self._as_parameter_))
+
+    def next(self):
+        """Simple iterator; returns next item in hash table, in no given order,
+or NULL if the last item was already returned. Use this together with
+zhash_first() to process all items in a hash table. If you need the
+items in sorted order, use zhash_keys() and then zlist_sort(). To
+access the key for this item use zhash_cursor(). NOTE: do NOT modify
+the table while iterating."""
+        return c_void_p(lib.zhash_next(self._as_parameter_))
+
+    def cursor(self):
+        """After a successful first/next method, returns the key for the item that
+was returned. This is a constant string that you may not modify or
+deallocate, and which lasts as long as the item in the hash. After an
+unsuccessful first/next, returns NULL."""
+        return lib.zhash_cursor(self._as_parameter_)
+
+    def comment(self, format, *args):
+        """Add a comment to hash table before saving to disk. You can add as many
+comment lines as you like. These comment lines are discarded when loading
+the file. If you use a null format, all comments are deleted."""
+        return lib.zhash_comment(self._as_parameter_, format, *args)
+
+    def pack(self):
+        """Serialize hash table to a binary frame that can be sent in a message.
+The packed format is compatible with the 'dictionary' type defined in
+http://rfc.zeromq.org/spec:35/FILEMQ, and implemented by zproto:
+
+   ; A list of name/value pairs
+   dictionary      = dict-count *( dict-name dict-value )
+   dict-count      = number-4
+   dict-value      = longstr
+   dict-name       = string
+
+   ; Strings are always length + text contents
+   longstr         = number-4 *VCHAR
+   string          = number-1 *VCHAR
+
+   ; Numbers are unsigned integers in network byte order
+   number-1        = 1OCTET
+   number-4        = 4OCTET
+
+Comments are not included in the packed data. Item values MUST be
+strings."""
+        return Zframe(lib.zhash_pack(self._as_parameter_), True)
+
+    @staticmethod
+    def unpack(frame):
+        """Unpack binary frame into a new hash table. Packed data must follow format
+defined by zhash_pack. Hash table is set to autofree. An empty frame
+unpacks to an empty hash table."""
+        return Zhash(lib.zhash_unpack(frame), True)
+
+    def save(self, filename):
+        """Save hash table to a text file in name=value format. Hash values must be
+printable strings; keys may not contain '=' character. Returns 0 if OK,
+else -1 if a file error occurred."""
+        return lib.zhash_save(self._as_parameter_, filename)
+
+    def load(self, filename):
+        """Load hash table from a text file in name=value format; hash table must
+already exist. Hash values must printable strings; keys may not contain
+'=' character. Returns 0 if OK, else -1 if a file was not readable."""
+        return lib.zhash_load(self._as_parameter_, filename)
+
+    def refresh(self):
+        """When a hash table was loaded from a file by zhash_load, this method will
+reload the file if it has been modified since, and is "stable", i.e. not
+still changing. Returns 0 if OK, -1 if there was an error reloading the 
+file."""
+        return lib.zhash_refresh(self._as_parameter_)
+
+    def autofree(self):
+        """Set hash for automatic value destruction"""
+        return lib.zhash_autofree(self._as_parameter_)
+
+    def foreach(self, callback, argument):
+        """DEPRECATED as clumsy -- use zhash_first/_next instead
+Apply function to each item in the hash table. Items are iterated in no
+defined order. Stops if callback function returns non-zero and returns
+final return code from callback function (zero = success).
+Callback function for zhash_foreach method"""
+        return lib.zhash_foreach(self._as_parameter_, callback, argument)
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class."""
+        return lib.zhash_test(verbose)
 
 
 # zhashx
@@ -1330,7 +1554,7 @@ Callback function for zhashx_foreach method"""
 
     @staticmethod
     def test(verbose):
-        """Self test of this class"""
+        """Self test of this class."""
         return lib.zhashx_test(verbose)
 
 
@@ -1339,8 +1563,6 @@ lib.ziflist_new.restype = ziflist_p
 lib.ziflist_new.argtypes = []
 lib.ziflist_destroy.restype = None
 lib.ziflist_destroy.argtypes = [POINTER(ziflist_p)]
-lib.ziflist_print.restype = None
-lib.ziflist_print.argtypes = [ziflist_p]
 lib.ziflist_reload.restype = None
 lib.ziflist_reload.argtypes = [ziflist_p]
 lib.ziflist_size.restype = c_size_t
@@ -1355,6 +1577,8 @@ lib.ziflist_broadcast.restype = c_char_p
 lib.ziflist_broadcast.argtypes = [ziflist_p]
 lib.ziflist_netmask.restype = c_char_p
 lib.ziflist_netmask.argtypes = [ziflist_p]
+lib.ziflist_print.restype = None
+lib.ziflist_print.argtypes = [ziflist_p]
 lib.ziflist_test.restype = None
 lib.ziflist_test.argtypes = [c_bool]
 
@@ -1387,10 +1611,6 @@ class Ziflist(object):
         "Determine whether the object is valid by converting to boolean" # Python 2
         return self._as_parameter_.__nonzero__()
 
-    def print(self):
-        """Print properties of the ziflist object."""
-        return lib.ziflist_print(self._as_parameter_)
-
     def reload(self):
         """Reload network interfaces from system"""
         return lib.ziflist_reload(self._as_parameter_)
@@ -1419,10 +1639,196 @@ class Ziflist(object):
         """Return the current interface network mask as a printable string"""
         return lib.ziflist_netmask(self._as_parameter_)
 
+    def print(self):
+        """Return the list of interfaces."""
+        return lib.ziflist_print(self._as_parameter_)
+
     @staticmethod
     def test(verbose):
         """Self test of this class."""
         return lib.ziflist_test(verbose)
+
+
+# zlist
+zlist_compare_fn = CFUNCTYPE(c_int, c_void_p, c_void_p)
+zlist_free_fn = CFUNCTYPE(None, c_void_p)
+lib.zlist_new.restype = zlist_p
+lib.zlist_new.argtypes = []
+lib.zlist_destroy.restype = None
+lib.zlist_destroy.argtypes = [POINTER(zlist_p)]
+lib.zlist_first.restype = c_void_p
+lib.zlist_first.argtypes = [zlist_p]
+lib.zlist_next.restype = c_void_p
+lib.zlist_next.argtypes = [zlist_p]
+lib.zlist_last.restype = c_void_p
+lib.zlist_last.argtypes = [zlist_p]
+lib.zlist_head.restype = c_void_p
+lib.zlist_head.argtypes = [zlist_p]
+lib.zlist_tail.restype = c_void_p
+lib.zlist_tail.argtypes = [zlist_p]
+lib.zlist_item.restype = c_void_p
+lib.zlist_item.argtypes = [zlist_p]
+lib.zlist_append.restype = c_int
+lib.zlist_append.argtypes = [zlist_p, c_void_p]
+lib.zlist_push.restype = c_int
+lib.zlist_push.argtypes = [zlist_p, c_void_p]
+lib.zlist_pop.restype = c_void_p
+lib.zlist_pop.argtypes = [zlist_p]
+lib.zlist_exists.restype = c_bool
+lib.zlist_exists.argtypes = [zlist_p, c_void_p]
+lib.zlist_remove.restype = None
+lib.zlist_remove.argtypes = [zlist_p, c_void_p]
+lib.zlist_dup.restype = zlist_p
+lib.zlist_dup.argtypes = [zlist_p]
+lib.zlist_purge.restype = None
+lib.zlist_purge.argtypes = [zlist_p]
+lib.zlist_size.restype = c_size_t
+lib.zlist_size.argtypes = [zlist_p]
+lib.zlist_sort.restype = None
+lib.zlist_sort.argtypes = [zlist_p, zlist_compare_fn]
+lib.zlist_autofree.restype = None
+lib.zlist_autofree.argtypes = [zlist_p]
+lib.zlist_comparefn.restype = None
+lib.zlist_comparefn.argtypes = [zlist_p, zlist_compare_fn]
+lib.zlist_freefn.restype = c_void_p
+lib.zlist_freefn.argtypes = [zlist_p, c_void_p, zlist_free_fn, c_bool]
+lib.zlist_test.restype = None
+lib.zlist_test.argtypes = [c_bool]
+
+class Zlist(object):
+    """simple generic list container"""
+
+    def __init__(self, *args):
+        """Create a new list container"""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zlist_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zlist_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 0)
+            self._as_parameter_ = lib.zlist_new() # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destroy a list container"""
+        if self.allow_destruct:
+            lib.zlist_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def first(self):
+        """Return the item at the head of list. If the list is empty, returns NULL.
+Leaves cursor pointing at the head item, or NULL if the list is empty."""
+        return c_void_p(lib.zlist_first(self._as_parameter_))
+
+    def next(self):
+        """Return the next item. If the list is empty, returns NULL. To move to
+the start of the list call zlist_first (). Advances the cursor."""
+        return c_void_p(lib.zlist_next(self._as_parameter_))
+
+    def last(self):
+        """Return the item at the tail of list. If the list is empty, returns NULL.
+Leaves cursor pointing at the tail item, or NULL if the list is empty."""
+        return c_void_p(lib.zlist_last(self._as_parameter_))
+
+    def head(self):
+        """Return first item in the list, or null, leaves the cursor"""
+        return c_void_p(lib.zlist_head(self._as_parameter_))
+
+    def tail(self):
+        """Return last item in the list, or null, leaves the cursor"""
+        return c_void_p(lib.zlist_tail(self._as_parameter_))
+
+    def item(self):
+        """Return the current item of list. If the list is empty, returns NULL.
+Leaves cursor pointing at the current item, or NULL if the list is empty."""
+        return c_void_p(lib.zlist_item(self._as_parameter_))
+
+    def append(self, item):
+        """Append an item to the end of the list, return 0 if OK or -1 if this
+failed for some reason (out of memory). Note that if a duplicator has
+been set, this method will also duplicate the item."""
+        return lib.zlist_append(self._as_parameter_, item)
+
+    def push(self, item):
+        """Push an item to the start of the list, return 0 if OK or -1 if this
+failed for some reason (out of memory). Note that if a duplicator has
+been set, this method will also duplicate the item."""
+        return lib.zlist_push(self._as_parameter_, item)
+
+    def pop(self):
+        """Pop the item off the start of the list, if any"""
+        return c_void_p(lib.zlist_pop(self._as_parameter_))
+
+    def exists(self, item):
+        """Checks if an item already is present. Uses compare method to determine if
+items are equal. If the compare method is NULL the check will only compare
+pointers. Returns true if item is present else false."""
+        return lib.zlist_exists(self._as_parameter_, item)
+
+    def remove(self, item):
+        """Remove the specified item from the list if present"""
+        return lib.zlist_remove(self._as_parameter_, item)
+
+    def dup(self):
+        """Make a copy of list. If the list has autofree set, the copied list will
+duplicate all items, which must be strings. Otherwise, the list will hold
+pointers back to the items in the original list. If list is null, returns
+NULL."""
+        return Zlist(lib.zlist_dup(self._as_parameter_), True)
+
+    def purge(self):
+        """Purge all items from list"""
+        return lib.zlist_purge(self._as_parameter_)
+
+    def size(self):
+        """Return number of items in the list"""
+        return lib.zlist_size(self._as_parameter_)
+
+    def sort(self, compare):
+        """Sort the list by ascending key value using a straight ASCII comparison.
+The sort is not stable, so may reorder items with the same keys."""
+        return lib.zlist_sort(self._as_parameter_, compare)
+
+    def autofree(self):
+        """Set list for automatic item destruction; item values MUST be strings.
+By default a list item refers to a value held elsewhere. When you set
+this, each time you append or push a list item, zlist will take a copy
+of the string value. Then, when you destroy the list, it will free all
+item values automatically. If you use any other technique to allocate
+list values, you must free them explicitly before destroying the list.
+The usual technique is to pop list items and destroy them, until the
+list is empty."""
+        return lib.zlist_autofree(self._as_parameter_)
+
+    def comparefn(self, fn):
+        """Sets a compare function for this list. The function compares two items.
+It returns an integer less than, equal to, or greater than zero if the
+first item is found, respectively, to be less than, to match, or be
+greater than the second item.
+This function is used for sorting, removal and exists checking."""
+        return lib.zlist_comparefn(self._as_parameter_, fn)
+
+    def freefn(self, item, fn, at_tail):
+        """Set a free function for the specified list item. When the item is
+destroyed, the free function, if any, is called on that item.
+Use this when list items are dynamically allocated, to ensure that
+you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
+Returns the item, or NULL if there is no such item."""
+        return c_void_p(lib.zlist_freefn(self._as_parameter_, item, fn, at_tail))
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class."""
+        return lib.zlist_test(verbose)
 
 
 # zloop
@@ -1600,7 +2006,7 @@ zero. Calling zloop_ignore_interrupts will supress this behavior."""
 
     @staticmethod
     def test(verbose):
-        """Self test of this class"""
+        """Self test of this class."""
         return lib.zloop_test(verbose)
 
 
@@ -1896,7 +2302,7 @@ OK). Signals are encoded to be distinguishable from "normal" messages."""
 
     @staticmethod
     def test(verbose):
-        """Self test of this class"""
+        """Self test of this class."""
         return lib.zmsg_test(verbose)
 
 
@@ -1991,7 +2397,7 @@ zero. Calling zpoller_ignore_interrupts will supress this behavior."""
 
     @staticmethod
     def test(verbose):
-        """Self test of this class"""
+        """Self test of this class."""
         return lib.zpoller_test(verbose)
 
 
@@ -2070,8 +2476,6 @@ lib.zsock_is.restype = c_bool
 lib.zsock_is.argtypes = [c_void_p]
 lib.zsock_resolve.restype = c_void_p
 lib.zsock_resolve.argtypes = [c_void_p]
-lib.zsock_test.restype = None
-lib.zsock_test.argtypes = [c_bool]
 lib.zsock_tos.restype = c_int
 lib.zsock_tos.argtypes = [zsock_p]
 lib.zsock_set_tos.restype = None
@@ -2260,6 +2664,8 @@ lib.zsock_events.restype = c_int
 lib.zsock_events.argtypes = [zsock_p]
 lib.zsock_last_endpoint.restype = POINTER(c_char)
 lib.zsock_last_endpoint.argtypes = [zsock_p]
+lib.zsock_test.restype = None
+lib.zsock_test.argtypes = [c_bool]
 
 class Zsock(object):
     """high-level socket API that hides libzmq contexts and sockets"""
@@ -2579,11 +2985,6 @@ the underlying libzmq socket handle; else if it looks like a file
 descriptor, return NULL; else if it looks like a libzmq socket handle,
 return the supplied value. Takes a polymorphic socket reference."""
         return c_void_p(lib.zsock_resolve(self))
-
-    @staticmethod
-    def test(verbose):
-        """Self test of this class"""
-        return lib.zsock_test(verbose)
 
     def tos(self):
         """Get socket option `tos`."""
@@ -2961,6 +3362,11 @@ return the supplied value. Takes a polymorphic socket reference."""
         """Get socket option `last_endpoint`."""
         return return_fresh_string(lib.zsock_last_endpoint(self._as_parameter_))
 
+    @staticmethod
+    def test(verbose):
+        """Self test of this class."""
+        return lib.zsock_test(verbose)
+
 
 # zstr
 lib.zstr_recv.restype = c_char_p
@@ -3053,7 +3459,7 @@ a null pointer."""
 
     @staticmethod
     def test(verbose):
-        """Self test of this class"""
+        """Self test of this class."""
         return lib.zstr_test(verbose)
 
 
@@ -3063,8 +3469,6 @@ lib.ztrie_new.restype = ztrie_p
 lib.ztrie_new.argtypes = [char_p]
 lib.ztrie_destroy.restype = None
 lib.ztrie_destroy.argtypes = [POINTER(ztrie_p)]
-lib.ztrie_print.restype = None
-lib.ztrie_print.argtypes = [ztrie_p]
 lib.ztrie_insert_route.restype = c_int
 lib.ztrie_insert_route.argtypes = [ztrie_p, c_char_p, c_void_p, POINTER(ztrie_destroy_data_fn)]
 lib.ztrie_remove_route.restype = c_int
@@ -3079,6 +3483,8 @@ lib.ztrie_hit_parameters.restype = zhashx_p
 lib.ztrie_hit_parameters.argtypes = [ztrie_p]
 lib.ztrie_hit_asterisk_match.restype = c_char_p
 lib.ztrie_hit_asterisk_match.argtypes = [ztrie_p]
+lib.ztrie_print.restype = None
+lib.ztrie_print.argtypes = [ztrie_p]
 lib.ztrie_test.restype = None
 lib.ztrie_test.argtypes = [c_bool]
 
@@ -3110,10 +3516,6 @@ class Ztrie(object):
     def __nonzero__(self):
         "Determine whether the object is valid by converting to boolean" # Python 2
         return self._as_parameter_.__nonzero__()
-
-    def print(self):
-        """Print properties of the ztrie object."""
-        return lib.ztrie_print(self._as_parameter_)
 
     def insert_route(self, path, data, destroy_data_fn):
         """Inserts a new route into the tree and attaches the data. Returns -1
@@ -3152,9 +3554,13 @@ named regexes, returns NULL."""
 or no asterisk match, returns NULL."""
         return lib.ztrie_hit_asterisk_match(self._as_parameter_)
 
+    def print(self):
+        """Print the trie"""
+        return lib.ztrie_print(self._as_parameter_)
+
     @staticmethod
     def test(verbose):
-        """Self test of this class"""
+        """Self test of this class."""
         return lib.ztrie_test(verbose)
 
 
@@ -3163,8 +3569,6 @@ lib.zuuid_new.restype = zuuid_p
 lib.zuuid_new.argtypes = []
 lib.zuuid_destroy.restype = None
 lib.zuuid_destroy.argtypes = [POINTER(zuuid_p)]
-lib.zuuid_print.restype = None
-lib.zuuid_print.argtypes = [zuuid_p]
 lib.zuuid_new_from.restype = zuuid_p
 lib.zuuid_new_from.argtypes = [POINTER(c_byte)]
 lib.zuuid_set.restype = None
@@ -3194,7 +3598,7 @@ class Zuuid(object):
     """UUID support class"""
 
     def __init__(self, *args):
-        """Constructor"""
+        """Create a new UUID object."""
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], zuuid_p) # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -3207,7 +3611,7 @@ class Zuuid(object):
             self.allow_destruct = True
 
     def __del__(self):
-        """Destructor"""
+        """Destroy a specified UUID object."""
         if self.allow_destruct:
             lib.zuuid_destroy(byref(self._as_parameter_))
 
@@ -3218,10 +3622,6 @@ class Zuuid(object):
     def __nonzero__(self):
         "Determine whether the object is valid by converting to boolean" # Python 2
         return self._as_parameter_.__nonzero__()
-
-    def print(self):
-        """Print properties of the zuuid object."""
-        return lib.zuuid_print(self._as_parameter_)
 
     @staticmethod
     def new_from(source):
@@ -3274,414 +3674,8 @@ returns null."""
 
     @staticmethod
     def test(verbose):
-        """Self test of this class"""
+        """Self test of this class."""
         return lib.zuuid_test(verbose)
-
-
-# zhash
-zhash_free_fn = CFUNCTYPE(None, c_void_p)
-zhash_foreach_fn = CFUNCTYPE(c_int, c_char_p, c_void_p, c_void_p)
-lib.zhash_new.restype = zhash_p
-lib.zhash_new.argtypes = []
-lib.zhash_destroy.restype = None
-lib.zhash_destroy.argtypes = [POINTER(zhash_p)]
-lib.zhash_insert.restype = c_int
-lib.zhash_insert.argtypes = [zhash_p, c_char_p, c_void_p]
-lib.zhash_update.restype = None
-lib.zhash_update.argtypes = [zhash_p, c_char_p, c_void_p]
-lib.zhash_delete.restype = None
-lib.zhash_delete.argtypes = [zhash_p, c_char_p]
-lib.zhash_lookup.restype = c_void_p
-lib.zhash_lookup.argtypes = [zhash_p, c_char_p]
-lib.zhash_rename.restype = c_int
-lib.zhash_rename.argtypes = [zhash_p, c_char_p, c_char_p]
-lib.zhash_freefn.restype = c_void_p
-lib.zhash_freefn.argtypes = [zhash_p, c_char_p, zhash_free_fn]
-lib.zhash_size.restype = c_size_t
-lib.zhash_size.argtypes = [zhash_p]
-lib.zhash_dup.restype = zhash_p
-lib.zhash_dup.argtypes = [zhash_p]
-lib.zhash_keys.restype = zlist_p
-lib.zhash_keys.argtypes = [zhash_p]
-lib.zhash_first.restype = c_void_p
-lib.zhash_first.argtypes = [zhash_p]
-lib.zhash_next.restype = c_void_p
-lib.zhash_next.argtypes = [zhash_p]
-lib.zhash_cursor.restype = c_char_p
-lib.zhash_cursor.argtypes = [zhash_p]
-lib.zhash_comment.restype = None
-lib.zhash_comment.argtypes = [zhash_p, c_char_p]
-lib.zhash_pack.restype = zframe_p
-lib.zhash_pack.argtypes = [zhash_p]
-lib.zhash_unpack.restype = zhash_p
-lib.zhash_unpack.argtypes = [zframe_p]
-lib.zhash_save.restype = c_int
-lib.zhash_save.argtypes = [zhash_p, c_char_p]
-lib.zhash_load.restype = c_int
-lib.zhash_load.argtypes = [zhash_p, c_char_p]
-lib.zhash_refresh.restype = c_int
-lib.zhash_refresh.argtypes = [zhash_p]
-lib.zhash_autofree.restype = None
-lib.zhash_autofree.argtypes = [zhash_p]
-lib.zhash_foreach.restype = c_int
-lib.zhash_foreach.argtypes = [zhash_p, zhash_foreach_fn, c_void_p]
-lib.zhash_test.restype = None
-lib.zhash_test.argtypes = [c_bool]
-
-class Zhash(object):
-    """generic type-free hash container (simple)"""
-
-    def __init__(self, *args):
-        """Create a new, empty hash container"""
-        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
-            self._as_parameter_ = cast(args[0], zhash_p) # Conversion from raw type to binding
-            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
-        elif len(args) == 2 and type(args[0]) is zhash_p and isinstance(args[1], bool):
-            self._as_parameter_ = args[0] # Conversion from raw type to binding
-            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
-        else:
-            assert(len(args) == 0)
-            self._as_parameter_ = lib.zhash_new() # Creation of new raw type
-            self.allow_destruct = True
-
-    def __del__(self):
-        """Destroy a hash container and all items in it"""
-        if self.allow_destruct:
-            lib.zhash_destroy(byref(self._as_parameter_))
-
-    def __bool__(self):
-        "Determine whether the object is valid by converting to boolean" # Python 3
-        return self._as_parameter_.__bool__()
-
-    def __nonzero__(self):
-        "Determine whether the object is valid by converting to boolean" # Python 2
-        return self._as_parameter_.__nonzero__()
-
-    def insert(self, key, item):
-        """Insert item into hash table with specified key and item.
-If key is already present returns -1 and leaves existing item unchanged
-Returns 0 on success."""
-        return lib.zhash_insert(self._as_parameter_, key, item)
-
-    def update(self, key, item):
-        """Update item into hash table with specified key and item.
-If key is already present, destroys old item and inserts new one.
-Use free_fn method to ensure deallocator is properly called on item."""
-        return lib.zhash_update(self._as_parameter_, key, item)
-
-    def delete(self, key):
-        """Remove an item specified by key from the hash table. If there was no such
-item, this function does nothing."""
-        return lib.zhash_delete(self._as_parameter_, key)
-
-    def lookup(self, key):
-        """Return the item at the specified key, or null"""
-        return c_void_p(lib.zhash_lookup(self._as_parameter_, key))
-
-    def rename(self, old_key, new_key):
-        """Reindexes an item from an old key to a new key. If there was no such
-item, does nothing. Returns 0 if successful, else -1."""
-        return lib.zhash_rename(self._as_parameter_, old_key, new_key)
-
-    def freefn(self, key, free_fn):
-        """Set a free function for the specified hash table item. When the item is
-destroyed, the free function, if any, is called on that item.
-Use this when hash items are dynamically allocated, to ensure that
-you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
-Returns the item, or NULL if there is no such item."""
-        return c_void_p(lib.zhash_freefn(self._as_parameter_, key, free_fn))
-
-    def size(self):
-        """Return the number of keys/items in the hash table"""
-        return lib.zhash_size(self._as_parameter_)
-
-    def dup(self):
-        """Make copy of hash table; if supplied table is null, returns null.
-Does not copy items themselves. Rebuilds new table so may be slow on
-very large tables. NOTE: only works with item values that are strings
-since there's no other way to know how to duplicate the item value."""
-        return Zhash(lib.zhash_dup(self._as_parameter_), True)
-
-    def keys(self):
-        """Return keys for items in table"""
-        return Zlist(lib.zhash_keys(self._as_parameter_), True)
-
-    def first(self):
-        """Simple iterator; returns first item in hash table, in no given order,
-or NULL if the table is empty. This method is simpler to use than the
-foreach() method, which is deprecated. To access the key for this item
-use zhash_cursor(). NOTE: do NOT modify the table while iterating."""
-        return c_void_p(lib.zhash_first(self._as_parameter_))
-
-    def next(self):
-        """Simple iterator; returns next item in hash table, in no given order,
-or NULL if the last item was already returned. Use this together with
-zhash_first() to process all items in a hash table. If you need the
-items in sorted order, use zhash_keys() and then zlist_sort(). To
-access the key for this item use zhash_cursor(). NOTE: do NOT modify
-the table while iterating."""
-        return c_void_p(lib.zhash_next(self._as_parameter_))
-
-    def cursor(self):
-        """After a successful first/next method, returns the key for the item that
-was returned. This is a constant string that you may not modify or
-deallocate, and which lasts as long as the item in the hash. After an
-unsuccessful first/next, returns NULL."""
-        return lib.zhash_cursor(self._as_parameter_)
-
-    def comment(self, format, *args):
-        """Add a comment to hash table before saving to disk. You can add as many
-comment lines as you like. These comment lines are discarded when loading
-the file. If you use a null format, all comments are deleted."""
-        return lib.zhash_comment(self._as_parameter_, format, *args)
-
-    def pack(self):
-        """Serialize hash table to a binary frame that can be sent in a message.
-The packed format is compatible with the 'dictionary' type defined in
-http://rfc.zeromq.org/spec:35/FILEMQ, and implemented by zproto:
-
-   ; A list of name/value pairs
-   dictionary      = dict-count *( dict-name dict-value )
-   dict-count      = number-4
-   dict-value      = longstr
-   dict-name       = string
-
-   ; Strings are always length + text contents
-   longstr         = number-4 *VCHAR
-   string          = number-1 *VCHAR
-
-   ; Numbers are unsigned integers in network byte order
-   number-1        = 1OCTET
-   number-4        = 4OCTET
-
-Comments are not included in the packed data. Item values MUST be
-strings."""
-        return Zframe(lib.zhash_pack(self._as_parameter_), True)
-
-    @staticmethod
-    def unpack(frame):
-        """Unpack binary frame into a new hash table. Packed data must follow format
-defined by zhash_pack. Hash table is set to autofree. An empty frame
-unpacks to an empty hash table."""
-        return Zhash(lib.zhash_unpack(frame), True)
-
-    def save(self, filename):
-        """Save hash table to a text file in name=value format. Hash values must be
-printable strings; keys may not contain '=' character. Returns 0 if OK,
-else -1 if a file error occurred."""
-        return lib.zhash_save(self._as_parameter_, filename)
-
-    def load(self, filename):
-        """Load hash table from a text file in name=value format; hash table must
-already exist. Hash values must printable strings; keys may not contain
-'=' character. Returns 0 if OK, else -1 if a file was not readable."""
-        return lib.zhash_load(self._as_parameter_, filename)
-
-    def refresh(self):
-        """When a hash table was loaded from a file by zhash_load, this method will
-reload the file if it has been modified since, and is "stable", i.e. not
-still changing. Returns 0 if OK, -1 if there was an error reloading the 
-file."""
-        return lib.zhash_refresh(self._as_parameter_)
-
-    def autofree(self):
-        """Set hash for automatic value destruction"""
-        return lib.zhash_autofree(self._as_parameter_)
-
-    def foreach(self, callback, argument):
-        """DEPRECATED as clumsy -- use zhash_first/_next instead
-Apply function to each item in the hash table. Items are iterated in no
-defined order. Stops if callback function returns non-zero and returns
-final return code from callback function (zero = success).
-Callback function for zhash_foreach method"""
-        return lib.zhash_foreach(self._as_parameter_, callback, argument)
-
-    @staticmethod
-    def test(verbose):
-        """Self test of this class"""
-        return lib.zhash_test(verbose)
-
-
-# zlist
-zlist_compare_fn = CFUNCTYPE(c_int, c_void_p, c_void_p)
-zlist_free_fn = CFUNCTYPE(None, c_void_p)
-lib.zlist_new.restype = zlist_p
-lib.zlist_new.argtypes = []
-lib.zlist_destroy.restype = None
-lib.zlist_destroy.argtypes = [POINTER(zlist_p)]
-lib.zlist_first.restype = c_void_p
-lib.zlist_first.argtypes = [zlist_p]
-lib.zlist_next.restype = c_void_p
-lib.zlist_next.argtypes = [zlist_p]
-lib.zlist_last.restype = c_void_p
-lib.zlist_last.argtypes = [zlist_p]
-lib.zlist_head.restype = c_void_p
-lib.zlist_head.argtypes = [zlist_p]
-lib.zlist_tail.restype = c_void_p
-lib.zlist_tail.argtypes = [zlist_p]
-lib.zlist_item.restype = c_void_p
-lib.zlist_item.argtypes = [zlist_p]
-lib.zlist_append.restype = c_int
-lib.zlist_append.argtypes = [zlist_p, c_void_p]
-lib.zlist_push.restype = c_int
-lib.zlist_push.argtypes = [zlist_p, c_void_p]
-lib.zlist_pop.restype = c_void_p
-lib.zlist_pop.argtypes = [zlist_p]
-lib.zlist_exists.restype = c_bool
-lib.zlist_exists.argtypes = [zlist_p, c_void_p]
-lib.zlist_remove.restype = None
-lib.zlist_remove.argtypes = [zlist_p, c_void_p]
-lib.zlist_dup.restype = zlist_p
-lib.zlist_dup.argtypes = [zlist_p]
-lib.zlist_purge.restype = None
-lib.zlist_purge.argtypes = [zlist_p]
-lib.zlist_size.restype = c_size_t
-lib.zlist_size.argtypes = [zlist_p]
-lib.zlist_sort.restype = None
-lib.zlist_sort.argtypes = [zlist_p, zlist_compare_fn]
-lib.zlist_autofree.restype = None
-lib.zlist_autofree.argtypes = [zlist_p]
-lib.zlist_comparefn.restype = None
-lib.zlist_comparefn.argtypes = [zlist_p, zlist_compare_fn]
-lib.zlist_freefn.restype = c_void_p
-lib.zlist_freefn.argtypes = [zlist_p, c_void_p, zlist_free_fn, c_bool]
-lib.zlist_test.restype = None
-lib.zlist_test.argtypes = [c_bool]
-
-class Zlist(object):
-    """simple generic list container"""
-
-    def __init__(self, *args):
-        """Create a new list container"""
-        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
-            self._as_parameter_ = cast(args[0], zlist_p) # Conversion from raw type to binding
-            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
-        elif len(args) == 2 and type(args[0]) is zlist_p and isinstance(args[1], bool):
-            self._as_parameter_ = args[0] # Conversion from raw type to binding
-            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
-        else:
-            assert(len(args) == 0)
-            self._as_parameter_ = lib.zlist_new() # Creation of new raw type
-            self.allow_destruct = True
-
-    def __del__(self):
-        """Destroy a list container"""
-        if self.allow_destruct:
-            lib.zlist_destroy(byref(self._as_parameter_))
-
-    def __bool__(self):
-        "Determine whether the object is valid by converting to boolean" # Python 3
-        return self._as_parameter_.__bool__()
-
-    def __nonzero__(self):
-        "Determine whether the object is valid by converting to boolean" # Python 2
-        return self._as_parameter_.__nonzero__()
-
-    def first(self):
-        """Return the item at the head of list. If the list is empty, returns NULL.
-Leaves cursor pointing at the head item, or NULL if the list is empty."""
-        return c_void_p(lib.zlist_first(self._as_parameter_))
-
-    def next(self):
-        """Return the next item. If the list is empty, returns NULL. To move to
-the start of the list call zlist_first (). Advances the cursor."""
-        return c_void_p(lib.zlist_next(self._as_parameter_))
-
-    def last(self):
-        """Return the item at the tail of list. If the list is empty, returns NULL.
-Leaves cursor pointing at the tail item, or NULL if the list is empty."""
-        return c_void_p(lib.zlist_last(self._as_parameter_))
-
-    def head(self):
-        """Return first item in the list, or null, leaves the cursor"""
-        return c_void_p(lib.zlist_head(self._as_parameter_))
-
-    def tail(self):
-        """Return last item in the list, or null, leaves the cursor"""
-        return c_void_p(lib.zlist_tail(self._as_parameter_))
-
-    def item(self):
-        """Return the current item of list. If the list is empty, returns NULL.
-Leaves cursor pointing at the current item, or NULL if the list is empty."""
-        return c_void_p(lib.zlist_item(self._as_parameter_))
-
-    def append(self, item):
-        """Append an item to the end of the list, return 0 if OK or -1 if this
-failed for some reason (out of memory). Note that if a duplicator has
-been set, this method will also duplicate the item."""
-        return lib.zlist_append(self._as_parameter_, item)
-
-    def push(self, item):
-        """Push an item to the start of the list, return 0 if OK or -1 if this
-failed for some reason (out of memory). Note that if a duplicator has
-been set, this method will also duplicate the item."""
-        return lib.zlist_push(self._as_parameter_, item)
-
-    def pop(self):
-        """Pop the item off the start of the list, if any"""
-        return c_void_p(lib.zlist_pop(self._as_parameter_))
-
-    def exists(self, item):
-        """Checks if an item already is present. Uses compare method to determine if
-items are equal. If the compare method is NULL the check will only compare
-pointers. Returns true if item is present else false."""
-        return lib.zlist_exists(self._as_parameter_, item)
-
-    def remove(self, item):
-        """Remove the specified item from the list if present"""
-        return lib.zlist_remove(self._as_parameter_, item)
-
-    def dup(self):
-        """Make a copy of list. If the list has autofree set, the copied list will
-duplicate all items, which must be strings. Otherwise, the list will hold
-pointers back to the items in the original list. If list is null, returns
-NULL."""
-        return Zlist(lib.zlist_dup(self._as_parameter_), True)
-
-    def purge(self):
-        """Purge all items from list"""
-        return lib.zlist_purge(self._as_parameter_)
-
-    def size(self):
-        """Return number of items in the list"""
-        return lib.zlist_size(self._as_parameter_)
-
-    def sort(self, compare):
-        """Sort the list by ascending key value using a straight ASCII comparison.
-The sort is not stable, so may reorder items with the same keys."""
-        return lib.zlist_sort(self._as_parameter_, compare)
-
-    def autofree(self):
-        """Set list for automatic item destruction; item values MUST be strings.
-By default a list item refers to a value held elsewhere. When you set
-this, each time you append or push a list item, zlist will take a copy
-of the string value. Then, when you destroy the list, it will free all
-item values automatically. If you use any other technique to allocate
-list values, you must free them explicitly before destroying the list.
-The usual technique is to pop list items and destroy them, until the
-list is empty."""
-        return lib.zlist_autofree(self._as_parameter_)
-
-    def comparefn(self, fn):
-        """Sets a compare function for this list. The function compares two items.
-It returns an integer less than, equal to, or greater than zero if the
-first item is found, respectively, to be less than, to match, or be
-greater than the second item.
-This function is used for sorting, removal and exists checking."""
-        return lib.zlist_comparefn(self._as_parameter_, fn)
-
-    def freefn(self, item, fn, at_tail):
-        """Set a free function for the specified list item. When the item is
-destroyed, the free function, if any, is called on that item.
-Use this when list items are dynamically allocated, to ensure that
-you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
-Returns the item, or NULL if there is no such item."""
-        return c_void_p(lib.zlist_freefn(self._as_parameter_, item, fn, at_tail))
-
-    @staticmethod
-    def test(verbose):
-        """Self test of this class"""
-        return lib.zlist_test(verbose)
 
 ################################################################################
 #  THIS FILE IS 100% GENERATED BY ZPROJECT; DO NOT EDIT EXCEPT EXPERIMENTALLY  #

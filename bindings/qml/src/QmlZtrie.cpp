@@ -9,12 +9,6 @@
 
 
 ///
-//  Print properties of the ztrie object.
-void QmlZtrie::print () {
-    ztrie_print (self);
-};
-
-///
 //  Inserts a new route into the tree and attaches the data. Returns -1     
 //  if the route already exists, otherwise 0. This method takes ownership of
 //  the provided data if a destroy_data_fn is provided.                     
@@ -67,6 +61,12 @@ const QString QmlZtrie::hitAsteriskMatch () {
     return QString (ztrie_hit_asterisk_match (self));
 };
 
+///
+//  Print the trie
+void QmlZtrie::print () {
+    ztrie_print (self);
+};
+
 
 QObject* QmlZtrie::qmlAttachedProperties(QObject* object) {
     return new QmlZtrieAttached(object);
@@ -74,7 +74,7 @@ QObject* QmlZtrie::qmlAttachedProperties(QObject* object) {
 
 
 ///
-//  Self test of this class
+//  Self test of this class.
 void QmlZtrieAttached::test (bool verbose) {
     ztrie_test (verbose);
 };

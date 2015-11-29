@@ -192,7 +192,7 @@ bool QZframe::is (void *self)
 }
 
 ///
-//  Self test of this class
+//  Self test of this class.
 void QZframe::test (bool verbose)
 {
     zframe_test (verbose);

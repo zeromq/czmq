@@ -51,25 +51,17 @@ module CZMQ
         ptr_ptr
       end
 
-      # Constructor
+      # Create a new UUID object.
       def self.new()
         ptr = ::CZMQ::FFI.zuuid_new()
         __new ptr
       end
 
-      # Destructor
+      # Destroy a specified UUID object.
       def destroy()
         return unless @ptr
         self_p = __ptr_give_ref
         result = ::CZMQ::FFI.zuuid_destroy(self_p)
-        result
-      end
-
-      # Print properties of the zuuid object.
-      def print()
-        raise DestroyedError unless @ptr
-        self_p = @ptr
-        result = ::CZMQ::FFI.zuuid_print(self_p)
         result
       end
 
@@ -166,7 +158,7 @@ module CZMQ
         result
       end
 
-      # Self test of this class
+      # Self test of this class.
       def self.test(verbose)
         verbose = !(0==verbose||!verbose) # boolean
         result = ::CZMQ::FFI.zuuid_test(verbose)

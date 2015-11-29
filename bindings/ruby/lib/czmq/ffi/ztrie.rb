@@ -81,14 +81,6 @@ module CZMQ
         result
       end
 
-      # Print properties of the ztrie object.
-      def print()
-        raise DestroyedError unless @ptr
-        self_p = @ptr
-        result = ::CZMQ::FFI.ztrie_print(self_p)
-        result
-      end
-
       # Inserts a new route into the tree and attaches the data. Returns -1     
       # if the route already exists, otherwise 0. This method takes ownership of
       # the provided data if a destroy_data_fn is provided.                     
@@ -155,7 +147,15 @@ module CZMQ
         result
       end
 
-      # Self test of this class
+      # Print the trie
+      def print()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.ztrie_print(self_p)
+        result
+      end
+
+      # Self test of this class.
       def self.test(verbose)
         verbose = !(0==verbose||!verbose) # boolean
         result = ::CZMQ::FFI.ztrie_test(verbose)

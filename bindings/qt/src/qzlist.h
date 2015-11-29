@@ -106,7 +106,7 @@ public:
     //  Returns the item, or NULL if there is no such item.                   
     void * freefn (void *item, zlist_free_fn fn, bool atTail);
 
-    //  Self test of this class
+    //  Self test of this class.
     static void test (bool verbose);
 
     zlist_t *self;

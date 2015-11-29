@@ -125,7 +125,7 @@ public:
     };
     
 public slots:
-    //  Self test of this class
+    //  Self test of this class.
     void test (bool verbose);
 
     //  Create a new zloop reactor

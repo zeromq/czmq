@@ -9,17 +9,13 @@ Please add @discuss section in ../src/zuuid.c.
 
 This is the class interface:
 
-    //  Constructor
+    //  Create a new UUID object.
     CZMQ_EXPORT zuuid_t *
         zuuid_new ();
     
-    //  Destructor
+    //  Destroy a specified UUID object.
     CZMQ_EXPORT void
         zuuid_destroy (zuuid_t **self_p);
-    
-    //  Print properties of the zuuid object.
-    CZMQ_EXPORT void
-        zuuid_print (zuuid_t *self);
     
     //  Create UUID object from supplied ZUUID_LEN-octet value.
     //  The caller is responsible for destroying the return value when finished with it.
@@ -70,7 +66,7 @@ This is the class interface:
     CZMQ_EXPORT zuuid_t *
         zuuid_dup (zuuid_t *self);
     
-    //  Self test of this class
+    //  Self test of this class.
     CZMQ_EXPORT void
         zuuid_test (bool verbose);
 

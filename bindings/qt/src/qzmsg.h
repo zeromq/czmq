@@ -170,7 +170,7 @@ public:
     //  Probe the supplied object, and report if it looks like a zmsg_t.
     static bool is (void *self);
 
-    //  Self test of this class
+    //  Self test of this class.
     static void test (bool verbose);
 
     zmsg_t *self;

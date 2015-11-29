@@ -106,7 +106,7 @@ public slots:
     //  Probe the supplied object, and report if it looks like a zframe_t.
     bool is (void *self);
 
-    //  Self test of this class
+    //  Self test of this class.
     void test (bool verbose);
 
     //  Create a new frame. If size is not null, allocates the frame data

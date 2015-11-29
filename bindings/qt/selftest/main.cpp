@@ -23,8 +23,10 @@ int main(int argc, char **argv)
     QZdirPatch::test (verbose);
     QZfile::test (verbose);
     QZframe::test (verbose);
+    QZhash::test (verbose);
     QZhashx::test (verbose);
     QZiflist::test (verbose);
+    QZlist::test (verbose);
     QZloop::test (verbose);
     QZmsg::test (verbose);
     QZpoller::test (verbose);
@@ -32,8 +34,6 @@ int main(int argc, char **argv)
     QZstr::test (verbose);
     QZtrie::test (verbose);
     QZuuid::test (verbose);
-    QZhash::test (verbose);
-    QZlist::test (verbose);
 
     qDebug() << "Tests passed OK\n";
     return 0;
