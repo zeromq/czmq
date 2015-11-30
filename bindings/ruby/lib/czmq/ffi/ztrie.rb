@@ -87,6 +87,7 @@ module CZMQ
       def insert_route(path, data, destroy_data_fn)
         raise DestroyedError unless @ptr
         self_p = @ptr
+        path = String(path)
         result = ::CZMQ::FFI.ztrie_insert_route(self_p, path, data, destroy_data_fn)
         result
       end
@@ -97,6 +98,7 @@ module CZMQ
       def remove_route(path)
         raise DestroyedError unless @ptr
         self_p = @ptr
+        path = String(path)
         result = ::CZMQ::FFI.ztrie_remove_route(self_p, path)
         result
       end
@@ -105,6 +107,7 @@ module CZMQ
       def matches(path)
         raise DestroyedError unless @ptr
         self_p = @ptr
+        path = String(path)
         result = ::CZMQ::FFI.ztrie_matches(self_p, path)
         result
       end

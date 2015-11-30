@@ -486,9 +486,9 @@ module CZMQ
 
       attach_function :ztrie_new, [:pointer], :pointer, **opts
       attach_function :ztrie_destroy, [:pointer], :void, **opts
-      attach_function :ztrie_insert_route, [:pointer, :pointer, :pointer, :pointer], :int, **opts
-      attach_function :ztrie_remove_route, [:pointer, :pointer], :int, **opts
-      attach_function :ztrie_matches, [:pointer, :pointer], :bool, **opts
+      attach_function :ztrie_insert_route, [:pointer, :string, :pointer, :pointer], :int, **opts
+      attach_function :ztrie_remove_route, [:pointer, :string], :int, **opts
+      attach_function :ztrie_matches, [:pointer, :string], :bool, **opts
       attach_function :ztrie_hit_data, [:pointer], :pointer, **opts
       attach_function :ztrie_hit_parameter_count, [:pointer], :size_t, **opts
       attach_function :ztrie_hit_parameters, [:pointer], :pointer, **opts

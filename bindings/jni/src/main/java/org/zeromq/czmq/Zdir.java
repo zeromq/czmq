@@ -24,6 +24,7 @@ public class Zdir implements AutoCloseable {
     */
     native static long __init (String path, String parent);
     public Zdir (String path, String parent) {
+        /*  TODO: if __init fails, self is null...  */
         self = __init (path, parent);
     }
     /*

@@ -23,6 +23,7 @@ public class Zpoller implements AutoCloseable {
     */
     native static long __init (void * reader);
     public Zpoller (void * reader) {
+        /*  TODO: if __init fails, self is null...  */
         self = __init (reader);
     }
     /*

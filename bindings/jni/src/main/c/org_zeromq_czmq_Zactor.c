@@ -11,59 +11,56 @@
 #include "../../native/include/org_zeromq_czmq_Zactor.h"
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zactor__1_1init (JNIEnv *env, jclass c, jlong args) {
-    zactor_t *self = zactor_new (args);
-    if (self)
-        return (jlong) self;
-    return -1;
+Java_zactor__1_1new (JNIEnv *env, jclass c, jlong args)
+{
+    jlong new_ = (jlong) zactor_new ((void *) args);
+    return new_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zactor__1_1destroy (JNIEnv *env, jclass c, jlong jself) {
-    zactor_t *self = (zactor_t *) jself;
-    zactor_destroy (&self);
+Java_zactor__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
+{
+    zactor_destroy ((zactor_t **) &self_p);
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zactor__1_1send (JNIEnv *env, jclass c, jlong jself, jlong msg_p) {
-    zactor_t *self = (zactor_t *) jself;
-    int rc = zactor_send (self, msgP);
-    return rc;
+Java_zactor__1_1send (JNIEnv *env, jclass c, jlong self, jlong msg_p)
+{
+    jint send_ = (jint) zactor_send ((zactor_t *) self, (zmsg_t **) &msg_p);
+    return send_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zactor__1_1recv (JNIEnv *env, jclass c, jlong jself) {
-    zactor_t *self = (zactor_t *) jself;
-    zmsg_t * rc = zactor_recv (self);
-    return rc;
+Java_zactor__1_1recv (JNIEnv *env, jclass c, jlong self)
+{
+    jlong recv_ = (jlong) zactor_recv ((zactor_t *) self);
+    return recv_;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_org_zeromq_czmq_Zactor__1_1is (JNIEnv *env, jclass c, jlong jself, jlong self) {
-    zactor_t *self = (zactor_t *) jself;
-    bool rc = zactor_is (self);
-    return rc;
+Java_zactor__1_1is (JNIEnv *env, jclass c, jlong self)
+{
+    jboolean is_ = (jboolean) zactor_is ((void *) self);
+    return is_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zactor__1_1resolve (JNIEnv *env, jclass c, jlong jself, jlong self) {
-    zactor_t *self = (zactor_t *) jself;
-    void * rc = zactor_resolve (self);
-    return rc;
+Java_zactor__1_1resolve (JNIEnv *env, jclass c, jlong self)
+{
+    jlong resolve_ = (jlong) zactor_resolve ((void *) self);
+    return resolve_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zactor__1_1sock (JNIEnv *env, jclass c, jlong jself) {
-    zactor_t *self = (zactor_t *) jself;
-    zsock_t * rc = zactor_sock (self);
-    return rc;
+Java_zactor__1_1sock (JNIEnv *env, jclass c, jlong self)
+{
+    jlong sock_ = (jlong) zactor_sock ((zactor_t *) self);
+    return sock_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zactor__1_1test (JNIEnv *env, jclass c, jlong jself, jboolean verbose) {
-    zactor_t *self = (zactor_t *) jself;
-    void rc = zactor_test (verbose);
-    return rc;
+Java_zactor__1_1test (JNIEnv *env, jclass c, jboolean verbose)
+{
+    zactor_test ((bool) verbose);
 }
 
-}

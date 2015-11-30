@@ -27,6 +27,7 @@ public class Zsock implements AutoCloseable {
     */
     native static long __init (int type);
     public Zsock (int type) {
+        /*  TODO: if __init fails, self is null...  */
         self = __init (type);
     }
     /*

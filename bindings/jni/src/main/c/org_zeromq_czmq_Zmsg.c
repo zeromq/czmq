@@ -11,241 +11,249 @@
 #include "../../native/include/org_zeromq_czmq_Zmsg.h"
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1init (JNIEnv *env, jclass c) {
-    zmsg_t *self = zmsg_new ();
-    if (self)
-        return (jlong) self;
-    return -1;
+Java_zmsg__1_1new (JNIEnv *env, jclass c)
+{
+    jlong new_ = (jlong) zmsg_new ();
+    return new_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1destroy (JNIEnv *env, jclass c, jlong jself) {
-    zmsg_t *self = (zmsg_t *) jself;
-    zmsg_destroy (&self);
+Java_zmsg__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
+{
+    zmsg_destroy ((zmsg_t **) &self_p);
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1recv (JNIEnv *env, jclass c, jlong jself, jlong source) {
-    zmsg_t *self = (zmsg_t *) jself;
-    zmsg_t * rc = zmsg_recv (source);
-    return rc;
+Java_zmsg__1_1recv (JNIEnv *env, jclass c, jlong source)
+{
+    jlong recv_ = (jlong) zmsg_recv ((void *) source);
+    return recv_;
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1send (JNIEnv *env, jclass c, jlong jself, jlong self_p, jlong dest) {
-    zmsg_t *self = (zmsg_t *) jself;
-    int rc = zmsg_send (selfP, dest);
-    return rc;
+Java_zmsg__1_1send (JNIEnv *env, jclass c, jlong self_p, jlong dest)
+{
+    jint send_ = (jint) zmsg_send ((zmsg_t **) &self_p, (void *) dest);
+    return send_;
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1sendm (JNIEnv *env, jclass c, jlong jself, jlong self_p, jlong dest) {
-    zmsg_t *self = (zmsg_t *) jself;
-    int rc = zmsg_sendm (selfP, dest);
-    return rc;
+Java_zmsg__1_1sendm (JNIEnv *env, jclass c, jlong self_p, jlong dest)
+{
+    jint sendm_ = (jint) zmsg_sendm ((zmsg_t **) &self_p, (void *) dest);
+    return sendm_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1size (JNIEnv *env, jclass c, jlong jself) {
-    zmsg_t *self = (zmsg_t *) jself;
-    size_t rc = zmsg_size (self);
-    return rc;
+Java_zmsg__1_1size (JNIEnv *env, jclass c, jlong self)
+{
+    jlong size_ = (jlong) zmsg_size ((zmsg_t *) self);
+    return size_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1content_size (JNIEnv *env, jclass c, jlong jself) {
-    zmsg_t *self = (zmsg_t *) jself;
-    size_t rc = zmsg_content_size (self);
-    return rc;
+Java_zmsg__1_1content_size (JNIEnv *env, jclass c, jlong self)
+{
+    jlong content_size_ = (jlong) zmsg_content_size ((zmsg_t *) self);
+    return content_size_;
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1routing_id (JNIEnv *env, jclass c, jlong jself) {
-    zmsg_t *self = (zmsg_t *) jself;
-    uint32_t rc = zmsg_routing_id (self);
-    return rc;
+Java_zmsg__1_1routing_id (JNIEnv *env, jclass c, jlong self)
+{
+    jint routing_id_ = (jint) zmsg_routing_id ((zmsg_t *) self);
+    return routing_id_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1set_routing_id (JNIEnv *env, jclass c, jlong jself, jint routing id) {
-    zmsg_t *self = (zmsg_t *) jself;
-    void rc = zmsg_set_routing_id (self, routingId);
-    return rc;
+Java_zmsg__1_1set_routing_id (JNIEnv *env, jclass c, jlong self, jint routing_id)
+{
+    zmsg_set_routing_id ((zmsg_t *) self, (uint32_t) routing_id);
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1prepend (JNIEnv *env, jclass c, jlong jself, jlong frame_p) {
-    zmsg_t *self = (zmsg_t *) jself;
-    int rc = zmsg_prepend (self, frameP);
-    return rc;
+Java_zmsg__1_1prepend (JNIEnv *env, jclass c, jlong self, jlong frame_p)
+{
+    jint prepend_ = (jint) zmsg_prepend ((zmsg_t *) self, (zframe_t **) &frame_p);
+    return prepend_;
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1append (JNIEnv *env, jclass c, jlong jself, jlong frame_p) {
-    zmsg_t *self = (zmsg_t *) jself;
-    int rc = zmsg_append (self, frameP);
-    return rc;
+Java_zmsg__1_1append (JNIEnv *env, jclass c, jlong self, jlong frame_p)
+{
+    jint append_ = (jint) zmsg_append ((zmsg_t *) self, (zframe_t **) &frame_p);
+    return append_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1pop (JNIEnv *env, jclass c, jlong jself) {
-    zmsg_t *self = (zmsg_t *) jself;
-    zframe_t * rc = zmsg_pop (self);
-    return rc;
+Java_zmsg__1_1pop (JNIEnv *env, jclass c, jlong self)
+{
+    jlong pop_ = (jlong) zmsg_pop ((zmsg_t *) self);
+    return pop_;
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1pushmem (JNIEnv *env, jclass c, jlong jself, jlong src, jlong size) {
-    zmsg_t *self = (zmsg_t *) jself;
-    int rc = zmsg_pushmem (self, src, size);
-    return rc;
+Java_zmsg__1_1pushmem (JNIEnv *env, jclass c, jlong self, jlong src, jlong size)
+{
+    jint pushmem_ = (jint) zmsg_pushmem ((zmsg_t *) self, (const void *) src, (size_t) size);
+    return pushmem_;
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1addmem (JNIEnv *env, jclass c, jlong jself, jlong src, jlong size) {
-    zmsg_t *self = (zmsg_t *) jself;
-    int rc = zmsg_addmem (self, src, size);
-    return rc;
+Java_zmsg__1_1addmem (JNIEnv *env, jclass c, jlong self, jlong src, jlong size)
+{
+    jint addmem_ = (jint) zmsg_addmem ((zmsg_t *) self, (const void *) src, (size_t) size);
+    return addmem_;
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1pushstr (JNIEnv *env, jclass c, jlong jself, jstring string) {
-    zmsg_t *self = (zmsg_t *) jself;
-    int rc = zmsg_pushstr (self, string);
-    return rc;
+Java_zmsg__1_1pushstr (JNIEnv *env, jclass c, jlong self, jstring string)
+{
+    char *string_ = (char *) (*env)->GetStringUTFChars (env, string, NULL);
+    jint pushstr_ = (jint) zmsg_pushstr ((zmsg_t *) self, string_);
+    (*env)->ReleaseStringUTFChars (env, string, string_);
+    return pushstr_;
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1addstr (JNIEnv *env, jclass c, jlong jself, jstring string) {
-    zmsg_t *self = (zmsg_t *) jself;
-    int rc = zmsg_addstr (self, string);
-    return rc;
+Java_zmsg__1_1addstr (JNIEnv *env, jclass c, jlong self, jstring string)
+{
+    char *string_ = (char *) (*env)->GetStringUTFChars (env, string, NULL);
+    jint addstr_ = (jint) zmsg_addstr ((zmsg_t *) self, string_);
+    (*env)->ReleaseStringUTFChars (env, string, string_);
+    return addstr_;
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1pushstrf (JNIEnv *env, jclass c, jlong jself, jstring format) {
-    zmsg_t *self = (zmsg_t *) jself;
-    int rc = zmsg_pushstrf (self, format);
-    return rc;
+Java_zmsg__1_1pushstrf (JNIEnv *env, jclass c, jlong self, jstring format)
+{
+    char *format_ = (char *) (*env)->GetStringUTFChars (env, format, NULL);
+    jint pushstrf_ = (jint) zmsg_pushstrf ((zmsg_t *) self, "%s", format_);
+    (*env)->ReleaseStringUTFChars (env, format, format_);
+    return pushstrf_;
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1addstrf (JNIEnv *env, jclass c, jlong jself, jstring format) {
-    zmsg_t *self = (zmsg_t *) jself;
-    int rc = zmsg_addstrf (self, format);
-    return rc;
+Java_zmsg__1_1addstrf (JNIEnv *env, jclass c, jlong self, jstring format)
+{
+    char *format_ = (char *) (*env)->GetStringUTFChars (env, format, NULL);
+    jint addstrf_ = (jint) zmsg_addstrf ((zmsg_t *) self, "%s", format_);
+    (*env)->ReleaseStringUTFChars (env, format, format_);
+    return addstrf_;
 }
 
 JNIEXPORT jstring JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1popstr (JNIEnv *env, jclass c, jlong jself) {
-    zmsg_t *self = (zmsg_t *) jself;
-    char * rc = zmsg_popstr (self);
-    return rc;
+Java_zmsg__1_1popstr (JNIEnv *env, jclass c, jlong self)
+{
+    char *popstr_ = (char *) zmsg_popstr ((zmsg_t *) self);
+    jstring string = (*env)->NewStringUTF (env, popstr_);
+    zstr_free (&popstr_);
+    return string;
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1addmsg (JNIEnv *env, jclass c, jlong jself, jlong msg_p) {
-    zmsg_t *self = (zmsg_t *) jself;
-    int rc = zmsg_addmsg (self, msgP);
-    return rc;
+Java_zmsg__1_1addmsg (JNIEnv *env, jclass c, jlong self, jlong msg_p)
+{
+    jint addmsg_ = (jint) zmsg_addmsg ((zmsg_t *) self, (zmsg_t **) &msg_p);
+    return addmsg_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1popmsg (JNIEnv *env, jclass c, jlong jself) {
-    zmsg_t *self = (zmsg_t *) jself;
-    zmsg_t * rc = zmsg_popmsg (self);
-    return rc;
+Java_zmsg__1_1popmsg (JNIEnv *env, jclass c, jlong self)
+{
+    jlong popmsg_ = (jlong) zmsg_popmsg ((zmsg_t *) self);
+    return popmsg_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1remove (JNIEnv *env, jclass c, jlong jself, jlong frame) {
-    zmsg_t *self = (zmsg_t *) jself;
-    void rc = zmsg_remove (self, frame);
-    return rc;
+Java_zmsg__1_1remove (JNIEnv *env, jclass c, jlong self, jlong frame)
+{
+    zmsg_remove ((zmsg_t *) self, (zframe_t *) frame);
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1first (JNIEnv *env, jclass c, jlong jself) {
-    zmsg_t *self = (zmsg_t *) jself;
-    zframe_t * rc = zmsg_first (self);
-    return rc;
+Java_zmsg__1_1first (JNIEnv *env, jclass c, jlong self)
+{
+    jlong first_ = (jlong) zmsg_first ((zmsg_t *) self);
+    return first_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1next (JNIEnv *env, jclass c, jlong jself) {
-    zmsg_t *self = (zmsg_t *) jself;
-    zframe_t * rc = zmsg_next (self);
-    return rc;
+Java_zmsg__1_1next (JNIEnv *env, jclass c, jlong self)
+{
+    jlong next_ = (jlong) zmsg_next ((zmsg_t *) self);
+    return next_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1last (JNIEnv *env, jclass c, jlong jself) {
-    zmsg_t *self = (zmsg_t *) jself;
-    zframe_t * rc = zmsg_last (self);
-    return rc;
+Java_zmsg__1_1last (JNIEnv *env, jclass c, jlong self)
+{
+    jlong last_ = (jlong) zmsg_last ((zmsg_t *) self);
+    return last_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1encode (JNIEnv *env, jclass c, jlong jself, jbyteArray buffer) {
-    zmsg_t *self = (zmsg_t *) jself;
-    size_t rc = zmsg_encode (self, buffer);
-    return rc;
+Java_zmsg__1_1encode (JNIEnv *env, jclass c, jlong self, jbyteArray buffer)
+{
+    byte *buffer_ = (byte *) (*env)->GetByteArrayElements (env, buffer, 0);
+    jlong encode_ = (jlong) zmsg_encode ((zmsg_t *) self, buffer_);
+    (*env)->ReleaseByteArrayElements (env, buffer, (jbyte *) buffer_, 0);
+    return encode_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1decode (JNIEnv *env, jclass c, jlong jself, jbyteArray buffer, jlong buffer size) {
-    zmsg_t *self = (zmsg_t *) jself;
-    zmsg_t * rc = zmsg_decode (buffer, bufferSize);
-    return rc;
+Java_zmsg__1_1decode (JNIEnv *env, jclass c, jbyteArray buffer, jlong buffer_size)
+{
+    byte *buffer_ = (byte *) (*env)->GetByteArrayElements (env, buffer, 0);
+    jlong decode_ = (jlong) zmsg_decode (buffer_, (size_t) buffer_size);
+    (*env)->ReleaseByteArrayElements (env, buffer, (jbyte *) buffer_, 0);
+    return decode_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1dup (JNIEnv *env, jclass c, jlong jself) {
-    zmsg_t *self = (zmsg_t *) jself;
-    zmsg_t * rc = zmsg_dup (self);
-    return rc;
+Java_zmsg__1_1dup (JNIEnv *env, jclass c, jlong self)
+{
+    jlong dup_ = (jlong) zmsg_dup ((zmsg_t *) self);
+    return dup_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1print (JNIEnv *env, jclass c, jlong jself) {
-    zmsg_t *self = (zmsg_t *) jself;
-    void rc = zmsg_print (self);
-    return rc;
+Java_zmsg__1_1print (JNIEnv *env, jclass c, jlong self)
+{
+    zmsg_print ((zmsg_t *) self);
 }
 
 JNIEXPORT jboolean JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1eq (JNIEnv *env, jclass c, jlong jself, jlong other) {
-    zmsg_t *self = (zmsg_t *) jself;
-    bool rc = zmsg_eq (self, other);
-    return rc;
+Java_zmsg__1_1eq (JNIEnv *env, jclass c, jlong self, jlong other)
+{
+    jboolean eq_ = (jboolean) zmsg_eq ((zmsg_t *) self, (zmsg_t *) other);
+    return eq_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1new_signal (JNIEnv *env, jclass c, jlong jself, jbyte status) {
-    zmsg_t *self = (zmsg_t *) jself;
-    zmsg_t * rc = zmsg_new_signal (status);
-    return rc;
+Java_zmsg__1_1new_signal (JNIEnv *env, jclass c, jbyte status)
+{
+    jlong new_signal_ = (jlong) zmsg_new_signal ((byte) status);
+    return new_signal_;
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1signal (JNIEnv *env, jclass c, jlong jself) {
-    zmsg_t *self = (zmsg_t *) jself;
-    int rc = zmsg_signal (self);
-    return rc;
+Java_zmsg__1_1signal (JNIEnv *env, jclass c, jlong self)
+{
+    jint signal_ = (jint) zmsg_signal ((zmsg_t *) self);
+    return signal_;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1is (JNIEnv *env, jclass c, jlong jself, jlong self) {
-    zmsg_t *self = (zmsg_t *) jself;
-    bool rc = zmsg_is (self);
-    return rc;
+Java_zmsg__1_1is (JNIEnv *env, jclass c, jlong self)
+{
+    jboolean is_ = (jboolean) zmsg_is ((void *) self);
+    return is_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1test (JNIEnv *env, jclass c, jlong jself, jboolean verbose) {
-    zmsg_t *self = (zmsg_t *) jself;
-    void rc = zmsg_test (verbose);
-    return rc;
+Java_zmsg__1_1test (JNIEnv *env, jclass c, jboolean verbose)
+{
+    zmsg_test ((bool) verbose);
 }
 
-}

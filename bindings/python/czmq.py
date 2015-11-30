@@ -862,7 +862,7 @@ or NULL if there was nothing more to read from the file."""
 
 # zframe
 lib.zframe_new.restype = zframe_p
-lib.zframe_new.argtypes = [c_void_p, c_size_t]
+lib.zframe_new.argtypes = [POINTER(c_byte), c_size_t]
 lib.zframe_destroy.restype = None
 lib.zframe_destroy.argtypes = [POINTER(zframe_p)]
 lib.zframe_new_empty.restype = zframe_p
@@ -896,7 +896,7 @@ lib.zframe_set_routing_id.argtypes = [zframe_p, number_p]
 lib.zframe_eq.restype = c_bool
 lib.zframe_eq.argtypes = [zframe_p, zframe_p]
 lib.zframe_reset.restype = None
-lib.zframe_reset.argtypes = [zframe_p, c_void_p, c_size_t]
+lib.zframe_reset.argtypes = [zframe_p, POINTER(c_byte), c_size_t]
 lib.zframe_print.restype = None
 lib.zframe_print.argtypes = [zframe_p, c_char_p]
 lib.zframe_is.restype = c_bool
@@ -3369,7 +3369,7 @@ return the supplied value. Takes a polymorphic socket reference."""
 
 
 # zstr
-lib.zstr_recv.restype = c_char_p
+lib.zstr_recv.restype = POINTER(c_char)
 lib.zstr_recv.argtypes = [c_void_p]
 lib.zstr_recvx.restype = c_int
 lib.zstr_recvx.argtypes = [c_void_p, POINTER(c_char_p)]
@@ -3404,7 +3404,7 @@ class Zstr(object):
         """Receive C string from socket. Caller must free returned string using
 zstr_free(). Returns NULL if the context is being terminated or the
 process was interrupted."""
-        return lib.zstr_recv(source)
+        return return_fresh_string(lib.zstr_recv(source))
 
     @staticmethod
     def recvx(source, string_p, *args):

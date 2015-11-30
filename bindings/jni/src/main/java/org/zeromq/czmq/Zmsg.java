@@ -22,6 +22,7 @@ public class Zmsg implements AutoCloseable {
     */
     native static long __init ();
     public Zmsg () {
+        /*  TODO: if __init fails, self is null...  */
         self = __init ();
     }
     /*

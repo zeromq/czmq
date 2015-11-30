@@ -11,66 +11,62 @@
 #include "../../native/include/org_zeromq_czmq_Zpoller.h"
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zpoller__1_1init (JNIEnv *env, jclass c, jlong reader) {
-    zpoller_t *self = zpoller_new (reader);
-    if (self)
-        return (jlong) self;
-    return -1;
+Java_zpoller__1_1new (JNIEnv *env, jclass c, jlong reader)
+{
+    jlong new_ = (jlong) zpoller_new ((void *) reader);
+    return new_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zpoller__1_1destroy (JNIEnv *env, jclass c, jlong jself) {
-    zpoller_t *self = (zpoller_t *) jself;
-    zpoller_destroy (&self);
+Java_zpoller__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
+{
+    zpoller_destroy ((zpoller_t **) &self_p);
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zpoller__1_1add (JNIEnv *env, jclass c, jlong jself, jlong reader) {
-    zpoller_t *self = (zpoller_t *) jself;
-    int rc = zpoller_add (self, reader);
-    return rc;
+Java_zpoller__1_1add (JNIEnv *env, jclass c, jlong self, jlong reader)
+{
+    jint add_ = (jint) zpoller_add ((zpoller_t *) self, (void *) reader);
+    return add_;
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zpoller__1_1remove (JNIEnv *env, jclass c, jlong jself, jlong reader) {
-    zpoller_t *self = (zpoller_t *) jself;
-    int rc = zpoller_remove (self, reader);
-    return rc;
+Java_zpoller__1_1remove (JNIEnv *env, jclass c, jlong self, jlong reader)
+{
+    jint remove_ = (jint) zpoller_remove ((zpoller_t *) self, (void *) reader);
+    return remove_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zpoller__1_1wait (JNIEnv *env, jclass c, jlong jself, jint timeout) {
-    zpoller_t *self = (zpoller_t *) jself;
-    void * rc = zpoller_wait (self, timeout);
-    return rc;
+Java_zpoller__1_1wait (JNIEnv *env, jclass c, jlong self, jint timeout)
+{
+    jlong wait_ = (jlong) zpoller_wait ((zpoller_t *) self, (int) timeout);
+    return wait_;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_org_zeromq_czmq_Zpoller__1_1expired (JNIEnv *env, jclass c, jlong jself) {
-    zpoller_t *self = (zpoller_t *) jself;
-    bool rc = zpoller_expired (self);
-    return rc;
+Java_zpoller__1_1expired (JNIEnv *env, jclass c, jlong self)
+{
+    jboolean expired_ = (jboolean) zpoller_expired ((zpoller_t *) self);
+    return expired_;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_org_zeromq_czmq_Zpoller__1_1terminated (JNIEnv *env, jclass c, jlong jself) {
-    zpoller_t *self = (zpoller_t *) jself;
-    bool rc = zpoller_terminated (self);
-    return rc;
+Java_zpoller__1_1terminated (JNIEnv *env, jclass c, jlong self)
+{
+    jboolean terminated_ = (jboolean) zpoller_terminated ((zpoller_t *) self);
+    return terminated_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zpoller__1_1ignore_interrupts (JNIEnv *env, jclass c, jlong jself) {
-    zpoller_t *self = (zpoller_t *) jself;
-    void rc = zpoller_ignore_interrupts (self);
-    return rc;
+Java_zpoller__1_1ignore_interrupts (JNIEnv *env, jclass c, jlong self)
+{
+    zpoller_ignore_interrupts ((zpoller_t *) self);
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zpoller__1_1test (JNIEnv *env, jclass c, jlong jself, jboolean verbose) {
-    zpoller_t *self = (zpoller_t *) jself;
-    void rc = zpoller_test (verbose);
-    return rc;
+Java_zpoller__1_1test (JNIEnv *env, jclass c, jboolean verbose)
+{
+    zpoller_test ((bool) verbose);
 }
 
-}

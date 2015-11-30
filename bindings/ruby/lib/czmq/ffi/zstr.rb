@@ -56,6 +56,7 @@ module CZMQ
       # process was interrupted.                                            
       def self.recv(source)
         result = ::CZMQ::FFI.zstr_recv(source)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 

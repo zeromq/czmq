@@ -11,80 +11,80 @@
 #include "../../native/include/org_zeromq_czmq_Ziflist.h"
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Ziflist__1_1init (JNIEnv *env, jclass c) {
-    ziflist_t *self = ziflist_new ();
-    if (self)
-        return (jlong) self;
-    return -1;
+Java_ziflist__1_1new (JNIEnv *env, jclass c)
+{
+    jlong new_ = (jlong) ziflist_new ();
+    return new_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Ziflist__1_1destroy (JNIEnv *env, jclass c, jlong jself) {
-    ziflist_t *self = (ziflist_t *) jself;
-    ziflist_destroy (&self);
+Java_ziflist__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
+{
+    ziflist_destroy ((ziflist_t **) &self_p);
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Ziflist__1_1reload (JNIEnv *env, jclass c, jlong jself) {
-    ziflist_t *self = (ziflist_t *) jself;
-    void rc = ziflist_reload (self);
-    return rc;
+Java_ziflist__1_1reload (JNIEnv *env, jclass c, jlong self)
+{
+    ziflist_reload ((ziflist_t *) self);
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Ziflist__1_1size (JNIEnv *env, jclass c, jlong jself) {
-    ziflist_t *self = (ziflist_t *) jself;
-    size_t rc = ziflist_size (self);
-    return rc;
+Java_ziflist__1_1size (JNIEnv *env, jclass c, jlong self)
+{
+    jlong size_ = (jlong) ziflist_size ((ziflist_t *) self);
+    return size_;
 }
 
 JNIEXPORT jstring JNICALL
-Java_org_zeromq_czmq_Ziflist__1_1first (JNIEnv *env, jclass c, jlong jself) {
-    ziflist_t *self = (ziflist_t *) jself;
-    const char * rc = ziflist_first (self);
-    return rc;
+Java_ziflist__1_1first (JNIEnv *env, jclass c, jlong self)
+{
+    char *first_ = (char *) ziflist_first ((ziflist_t *) self);
+    jstring string = (*env)->NewStringUTF (env, first_);
+    return string;
 }
 
 JNIEXPORT jstring JNICALL
-Java_org_zeromq_czmq_Ziflist__1_1next (JNIEnv *env, jclass c, jlong jself) {
-    ziflist_t *self = (ziflist_t *) jself;
-    const char * rc = ziflist_next (self);
-    return rc;
+Java_ziflist__1_1next (JNIEnv *env, jclass c, jlong self)
+{
+    char *next_ = (char *) ziflist_next ((ziflist_t *) self);
+    jstring string = (*env)->NewStringUTF (env, next_);
+    return string;
 }
 
 JNIEXPORT jstring JNICALL
-Java_org_zeromq_czmq_Ziflist__1_1address (JNIEnv *env, jclass c, jlong jself) {
-    ziflist_t *self = (ziflist_t *) jself;
-    const char * rc = ziflist_address (self);
-    return rc;
+Java_ziflist__1_1address (JNIEnv *env, jclass c, jlong self)
+{
+    char *address_ = (char *) ziflist_address ((ziflist_t *) self);
+    jstring string = (*env)->NewStringUTF (env, address_);
+    return string;
 }
 
 JNIEXPORT jstring JNICALL
-Java_org_zeromq_czmq_Ziflist__1_1broadcast (JNIEnv *env, jclass c, jlong jself) {
-    ziflist_t *self = (ziflist_t *) jself;
-    const char * rc = ziflist_broadcast (self);
-    return rc;
+Java_ziflist__1_1broadcast (JNIEnv *env, jclass c, jlong self)
+{
+    char *broadcast_ = (char *) ziflist_broadcast ((ziflist_t *) self);
+    jstring string = (*env)->NewStringUTF (env, broadcast_);
+    return string;
 }
 
 JNIEXPORT jstring JNICALL
-Java_org_zeromq_czmq_Ziflist__1_1netmask (JNIEnv *env, jclass c, jlong jself) {
-    ziflist_t *self = (ziflist_t *) jself;
-    const char * rc = ziflist_netmask (self);
-    return rc;
+Java_ziflist__1_1netmask (JNIEnv *env, jclass c, jlong self)
+{
+    char *netmask_ = (char *) ziflist_netmask ((ziflist_t *) self);
+    jstring string = (*env)->NewStringUTF (env, netmask_);
+    return string;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Ziflist__1_1print (JNIEnv *env, jclass c, jlong jself) {
-    ziflist_t *self = (ziflist_t *) jself;
-    void rc = ziflist_print (self);
-    return rc;
+Java_ziflist__1_1print (JNIEnv *env, jclass c, jlong self)
+{
+    ziflist_print ((ziflist_t *) self);
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Ziflist__1_1test (JNIEnv *env, jclass c, jlong jself, jboolean verbose) {
-    ziflist_t *self = (ziflist_t *) jself;
-    void rc = ziflist_test (verbose);
-    return rc;
+Java_ziflist__1_1test (JNIEnv *env, jclass c, jboolean verbose)
+{
+    ziflist_test ((bool) verbose);
 }
 
-}

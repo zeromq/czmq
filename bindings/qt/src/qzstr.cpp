@@ -19,9 +19,11 @@ QZstr::QZstr (zstr_t *self, QObject *qObjParent) : QObject (qObjParent)
 //  Receive C string from socket. Caller must free returned string using
 //  zstr_free(). Returns NULL if the context is being terminated or the 
 //  process was interrupted.                                            
-const QString QZstr::recv (void *source)
+QString QZstr::recv (void *source)
 {
-    const QString rv = QString (zstr_recv (source));
+    char *retStr_ = zstr_recv (source);
+    QString rv = QString (retStr_);
+    free (retStr_);;
     return rv;
 }
 

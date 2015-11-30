@@ -43,7 +43,7 @@ public slots:
     //  Receive C string from socket. Caller must free returned string using
     //  zstr_free(). Returns NULL if the context is being terminated or the 
     //  process was interrupted.                                            
-    const QString recv (void *source);
+    QString recv (void *source);
 
     //  Receive a series of strings (until NULL) from multipart data.    
     //  Each string is allocated and filled with string data; if there   

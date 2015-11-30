@@ -11,66 +11,79 @@
 #include "../../native/include/org_zeromq_czmq_Zstr.h"
 
 JNIEXPORT jstring JNICALL
-Java_org_zeromq_czmq_Zstr__1_1recv (JNIEnv *env, jclass c, jlong jself, jlong source) {
-    zstr_t *self = (zstr_t *) jself;
-    char * rc = zstr_recv (source);
-    return rc;
+Java_zstr__1_1recv (JNIEnv *env, jclass c, jlong source)
+{
+    char *recv_ = (char *) zstr_recv ((void *) source);
+    jstring string = (*env)->NewStringUTF (env, recv_);
+    zstr_free (&recv_);
+    return string;
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zstr__1_1recvx (JNIEnv *env, jclass c, jlong jself, jlong source, jstring string_p) {
-    zstr_t *self = (zstr_t *) jself;
-    int rc = zstr_recvx (source, stringP);
-    return rc;
+Java_zstr__1_1recvx (JNIEnv *env, jclass c, jlong source, jstring string_p)
+{
+    char *string_p_ = (char *) (*env)->GetStringUTFChars (env, string_p, NULL);
+    jint recvx_ = (jint) zstr_recvx ((void *) source, string_p_);
+    (*env)->ReleaseStringUTFChars (env, string_p, string_p_);
+    return recvx_;
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zstr__1_1send (JNIEnv *env, jclass c, jlong jself, jlong dest, jstring string) {
-    zstr_t *self = (zstr_t *) jself;
-    int rc = zstr_send (dest, string);
-    return rc;
+Java_zstr__1_1send (JNIEnv *env, jclass c, jlong dest, jstring string)
+{
+    char *string_ = (char *) (*env)->GetStringUTFChars (env, string, NULL);
+    jint send_ = (jint) zstr_send ((void *) dest, string_);
+    (*env)->ReleaseStringUTFChars (env, string, string_);
+    return send_;
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zstr__1_1sendm (JNIEnv *env, jclass c, jlong jself, jlong dest, jstring string) {
-    zstr_t *self = (zstr_t *) jself;
-    int rc = zstr_sendm (dest, string);
-    return rc;
+Java_zstr__1_1sendm (JNIEnv *env, jclass c, jlong dest, jstring string)
+{
+    char *string_ = (char *) (*env)->GetStringUTFChars (env, string, NULL);
+    jint sendm_ = (jint) zstr_sendm ((void *) dest, string_);
+    (*env)->ReleaseStringUTFChars (env, string, string_);
+    return sendm_;
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zstr__1_1sendf (JNIEnv *env, jclass c, jlong jself, jlong dest, jstring format) {
-    zstr_t *self = (zstr_t *) jself;
-    int rc = zstr_sendf (dest, format);
-    return rc;
+Java_zstr__1_1sendf (JNIEnv *env, jclass c, jlong dest, jstring format)
+{
+    char *format_ = (char *) (*env)->GetStringUTFChars (env, format, NULL);
+    jint sendf_ = (jint) zstr_sendf ((void *) dest, "%s", format_);
+    (*env)->ReleaseStringUTFChars (env, format, format_);
+    return sendf_;
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zstr__1_1sendfm (JNIEnv *env, jclass c, jlong jself, jlong dest, jstring format) {
-    zstr_t *self = (zstr_t *) jself;
-    int rc = zstr_sendfm (dest, format);
-    return rc;
+Java_zstr__1_1sendfm (JNIEnv *env, jclass c, jlong dest, jstring format)
+{
+    char *format_ = (char *) (*env)->GetStringUTFChars (env, format, NULL);
+    jint sendfm_ = (jint) zstr_sendfm ((void *) dest, "%s", format_);
+    (*env)->ReleaseStringUTFChars (env, format, format_);
+    return sendfm_;
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zstr__1_1sendx (JNIEnv *env, jclass c, jlong jself, jlong dest, jstring string) {
-    zstr_t *self = (zstr_t *) jself;
-    int rc = zstr_sendx (dest, string);
-    return rc;
+Java_zstr__1_1sendx (JNIEnv *env, jclass c, jlong dest, jstring string)
+{
+    char *string_ = (char *) (*env)->GetStringUTFChars (env, string, NULL);
+    jint sendx_ = (jint) zstr_sendx ((void *) dest, string_);
+    (*env)->ReleaseStringUTFChars (env, string, string_);
+    return sendx_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zstr__1_1free (JNIEnv *env, jclass c, jlong jself, jstring string_p) {
-    zstr_t *self = (zstr_t *) jself;
-    void rc = zstr_free (stringP);
-    return rc;
+Java_zstr__1_1free (JNIEnv *env, jclass c, jstring string_p)
+{
+    char *string_p_ = (char *) (*env)->GetStringUTFChars (env, string_p, NULL);
+    zstr_free (string_p_);
+    (*env)->ReleaseStringUTFChars (env, string_p, string_p_);
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zstr__1_1test (JNIEnv *env, jclass c, jlong jself, jboolean verbose) {
-    zstr_t *self = (zstr_t *) jself;
-    void rc = zstr_test (verbose);
-    return rc;
+Java_zstr__1_1test (JNIEnv *env, jclass c, jboolean verbose)
+{
+    zstr_test ((bool) verbose);
 }
 
-}
