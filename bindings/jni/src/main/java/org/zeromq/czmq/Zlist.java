@@ -22,6 +22,7 @@ public class Zlist implements AutoCloseable {
     */
     native static long __init ();
     public Zlist () {
+        /*  TODO: if __init fails, self is null...  */
         self = __init ();
     }
     /*

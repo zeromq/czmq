@@ -39,17 +39,17 @@ CZMQ_EXPORT void
 //  if the route already exists, otherwise 0. This method takes ownership of
 //  the provided data if a destroy_data_fn is provided.                     
 CZMQ_EXPORT int
-    ztrie_insert_route (ztrie_t *self, char *path, void *data, ztrie_destroy_data_fn *destroy_data_fn);
+    ztrie_insert_route (ztrie_t *self, const char *path, void *data, ztrie_destroy_data_fn *destroy_data_fn);
 
 //  Removes a route from the trie and destroys its data. Returns -1 if the
 //  route does not exists, otherwise 0.                                   
 //  the start of the list call zlist_first (). Advances the cursor.       
 CZMQ_EXPORT int
-    ztrie_remove_route (ztrie_t *self, char *path);
+    ztrie_remove_route (ztrie_t *self, const char *path);
 
 //  Returns true if the path matches a route in the tree, otherwise false.
 CZMQ_EXPORT bool
-    ztrie_matches (ztrie_t *self, char *path);
+    ztrie_matches (ztrie_t *self, const char *path);
 
 //  Returns the data of a matched route from last ztrie_matches. If the path
 //  did not match, returns NULL. Do not delete the data as it's owned by    

@@ -18,8 +18,11 @@ QObject* QmlZstr::qmlAttachedProperties(QObject* object) {
 //  Receive C string from socket. Caller must free returned string using
 //  zstr_free(). Returns NULL if the context is being terminated or the 
 //  process was interrupted.                                            
-const QString QmlZstrAttached::recv (void *source) {
-    return QString (zstr_recv (source));
+QString QmlZstrAttached::recv (void *source) {
+    char *retStr_ = zstr_recv (source);
+    QString retQStr_ = QString (retStr_);
+    free (retStr_);
+    return retQStr_;
 };
 
 ///

@@ -28,7 +28,7 @@
         Inserts a new route into the tree and attaches the data. Returns -1
         if the route already exists, otherwise 0. This method takes ownership of
         the provided data if a destroy_data_fn is provided.
-        <argument name = "path" type = "string" constant = "0" />
+        <argument name = "path" type = "string" />
         <argument name = "data" type = "anything" />
         <argument name = "destroy_data_fn" type = "ztrie_destroy_data_fn"
                   callback = "1" by_reference = "1" />
@@ -39,13 +39,13 @@
         Removes a route from the trie and destroys its data. Returns -1 if the
         route does not exists, otherwise 0.
         the start of the list call zlist_first (). Advances the cursor.
-        <argument name = "path" type = "string" constant = "0" />
+        <argument name = "path" type = "string" />
         <return type = "integer" />
     </method>
 
     <method name = "matches">
         Returns true if the path matches a route in the tree, otherwise false.
-        <argument name = "path" type = "string" constant = "0" />
+        <argument name = "path" type = "string" />
         <return type = "boolean" />
     </method>
 

@@ -22,8 +22,9 @@ public class Zframe implements AutoCloseable {
     to the specified size. If additionally, data is not null, copies 
     size octets from the specified data into the frame body.         
     */
-    native static long __init (void * data, long size);
-    public Zframe (void * data, long size) {
+    native static long __init (byte [] data, long size);
+    public Zframe (byte [] data, long size) {
+        /*  TODO: if __init fails, self is null...  */
         self = __init (data, size);
     }
     /*
@@ -154,8 +155,8 @@ public class Zframe implements AutoCloseable {
     /*
     Set new contents for frame
     */
-    native static void __reset (long self, void * data, long size);
-    public void reset (long self, void * data, long size) {
+    native static void __reset (long self, byte [] data, long size);
+    public void reset (long self, byte [] data, long size) {
         return Zframe.__reset (self, data, size);
     }
     /*

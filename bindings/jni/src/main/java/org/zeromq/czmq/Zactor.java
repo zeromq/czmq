@@ -22,6 +22,7 @@ public class Zactor implements AutoCloseable {
     */
     native static long __init (void * args);
     public Zactor (void * args) {
+        /*  TODO: if __init fails, self is null...  */
         self = __init (args);
     }
     /*

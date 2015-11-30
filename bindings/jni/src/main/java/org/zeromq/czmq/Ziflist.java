@@ -22,6 +22,7 @@ public class Ziflist implements AutoCloseable {
     */
     native static long __init ();
     public Ziflist () {
+        /*  TODO: if __init fails, self is null...  */
         self = __init ();
     }
     /*

@@ -463,7 +463,7 @@ s_ztrie_parse_path (ztrie_t *self, char *path, int mode)
 //  the provided data.
 
 int
-ztrie_insert_route (ztrie_t *self, char *path, void *data, ztrie_destroy_data_fn *destroy_data_fn)
+ztrie_insert_route (ztrie_t *self, const char *path, void *data, ztrie_destroy_data_fn *destroy_data_fn)
 {
     assert (self);
     ztrie_node_t *node = s_ztrie_parse_path (self, path, MODE_INSERT);
@@ -485,7 +485,7 @@ ztrie_insert_route (ztrie_t *self, char *path, void *data, ztrie_destroy_data_fn
 //  route does not exists, otherwise 0.
 
 int
-ztrie_remove_route (ztrie_t *self, char *path)
+ztrie_remove_route (ztrie_t *self, const char *path)
 {
     assert (self);
     ztrie_node_t *match = s_ztrie_parse_path (self, path, MODE_LOOKUP);
@@ -516,7 +516,7 @@ ztrie_remove_route (ztrie_t *self, char *path)
 //  Returns true if the path matches a route in the tree, otherwise false.
 
 bool
-ztrie_matches (ztrie_t *self, char *path)
+ztrie_matches (ztrie_t *self, const char *path)
 {
     assert (self);
     self->match = s_ztrie_parse_path (self, path, MODE_MATCH);

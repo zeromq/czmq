@@ -11,101 +11,104 @@
 #include "../../native/include/org_zeromq_czmq_Zdir.h"
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zdir__1_1init (JNIEnv *env, jclass c, jstring path, jstring parent) {
-    zdir_t *self = zdir_new (path, parent);
-    if (self)
-        return (jlong) self;
-    return -1;
+Java_zdir__1_1new (JNIEnv *env, jclass c, jstring path, jstring parent)
+{
+    char *path_ = (char *) (*env)->GetStringUTFChars (env, path, NULL);
+    char *parent_ = (char *) (*env)->GetStringUTFChars (env, parent, NULL);
+    jlong new_ = (jlong) zdir_new (path_, parent_);
+    (*env)->ReleaseStringUTFChars (env, path, path_);
+    (*env)->ReleaseStringUTFChars (env, parent, parent_);
+    return new_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zdir__1_1destroy (JNIEnv *env, jclass c, jlong jself) {
-    zdir_t *self = (zdir_t *) jself;
-    zdir_destroy (&self);
+Java_zdir__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
+{
+    zdir_destroy ((zdir_t **) &self_p);
 }
 
 JNIEXPORT jstring JNICALL
-Java_org_zeromq_czmq_Zdir__1_1path (JNIEnv *env, jclass c, jlong jself) {
-    zdir_t *self = (zdir_t *) jself;
-    const char * rc = zdir_path (self);
-    return rc;
+Java_zdir__1_1path (JNIEnv *env, jclass c, jlong self)
+{
+    char *path_ = (char *) zdir_path ((zdir_t *) self);
+    jstring string = (*env)->NewStringUTF (env, path_);
+    return string;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zdir__1_1modified (JNIEnv *env, jclass c, jlong jself) {
-    zdir_t *self = (zdir_t *) jself;
-    time_t rc = zdir_modified (self);
-    return rc;
+Java_zdir__1_1modified (JNIEnv *env, jclass c, jlong self)
+{
+    jlong modified_ = (jlong) zdir_modified ((zdir_t *) self);
+    return modified_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zdir__1_1cursize (JNIEnv *env, jclass c, jlong jself) {
-    zdir_t *self = (zdir_t *) jself;
-    off_t rc = zdir_cursize (self);
-    return rc;
+Java_zdir__1_1cursize (JNIEnv *env, jclass c, jlong self)
+{
+    jlong cursize_ = (jlong) zdir_cursize ((zdir_t *) self);
+    return cursize_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zdir__1_1count (JNIEnv *env, jclass c, jlong jself) {
-    zdir_t *self = (zdir_t *) jself;
-    size_t rc = zdir_count (self);
-    return rc;
+Java_zdir__1_1count (JNIEnv *env, jclass c, jlong self)
+{
+    jlong count_ = (jlong) zdir_count ((zdir_t *) self);
+    return count_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zdir__1_1list (JNIEnv *env, jclass c, jlong jself) {
-    zdir_t *self = (zdir_t *) jself;
-    zlist_t * rc = zdir_list (self);
-    return rc;
+Java_zdir__1_1list (JNIEnv *env, jclass c, jlong self)
+{
+    jlong list_ = (jlong) zdir_list ((zdir_t *) self);
+    return list_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zdir__1_1remove (JNIEnv *env, jclass c, jlong jself, jboolean force) {
-    zdir_t *self = (zdir_t *) jself;
-    void rc = zdir_remove (self, force);
-    return rc;
+Java_zdir__1_1remove (JNIEnv *env, jclass c, jlong self, jboolean force)
+{
+    zdir_remove ((zdir_t *) self, (bool) force);
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zdir__1_1diff (JNIEnv *env, jclass c, jlong jself, jlong older, jlong newer, jstring alias) {
-    zdir_t *self = (zdir_t *) jself;
-    zlist_t * rc = zdir_diff (older, newer, alias);
-    return rc;
+Java_zdir__1_1diff (JNIEnv *env, jclass c, jlong older, jlong newer, jstring alias)
+{
+    char *alias_ = (char *) (*env)->GetStringUTFChars (env, alias, NULL);
+    jlong diff_ = (jlong) zdir_diff ((zdir_t *) older, (zdir_t *) newer, alias_);
+    (*env)->ReleaseStringUTFChars (env, alias, alias_);
+    return diff_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zdir__1_1resync (JNIEnv *env, jclass c, jlong jself, jstring alias) {
-    zdir_t *self = (zdir_t *) jself;
-    zlist_t * rc = zdir_resync (self, alias);
-    return rc;
+Java_zdir__1_1resync (JNIEnv *env, jclass c, jlong self, jstring alias)
+{
+    char *alias_ = (char *) (*env)->GetStringUTFChars (env, alias, NULL);
+    jlong resync_ = (jlong) zdir_resync ((zdir_t *) self, alias_);
+    (*env)->ReleaseStringUTFChars (env, alias, alias_);
+    return resync_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zdir__1_1cache (JNIEnv *env, jclass c, jlong jself) {
-    zdir_t *self = (zdir_t *) jself;
-    zhash_t * rc = zdir_cache (self);
-    return rc;
+Java_zdir__1_1cache (JNIEnv *env, jclass c, jlong self)
+{
+    jlong cache_ = (jlong) zdir_cache ((zdir_t *) self);
+    return cache_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zdir__1_1print (JNIEnv *env, jclass c, jlong jself, jint indent) {
-    zdir_t *self = (zdir_t *) jself;
-    void rc = zdir_print (self, indent);
-    return rc;
+Java_zdir__1_1print (JNIEnv *env, jclass c, jlong self, jint indent)
+{
+    zdir_print ((zdir_t *) self, (int) indent);
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zdir__1_1watch (JNIEnv *env, jclass c, jlong jself, jlong pipe, jlong unused) {
-    zdir_t *self = (zdir_t *) jself;
-    void rc = zdir_watch (pipe, unused);
-    return rc;
+Java_zdir__1_1watch (JNIEnv *env, jclass c, jlong pipe, jlong unused)
+{
+    zdir_watch ((zsock_t *) pipe, (void *) unused);
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zdir__1_1test (JNIEnv *env, jclass c, jlong jself, jboolean verbose) {
-    zdir_t *self = (zdir_t *) jself;
-    void rc = zdir_test (verbose);
-    return rc;
+Java_zdir__1_1test (JNIEnv *env, jclass c, jboolean verbose)
+{
+    zdir_test ((bool) verbose);
 }
 
-}

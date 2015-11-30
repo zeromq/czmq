@@ -20,7 +20,7 @@ public:
     //  Receive C string from socket. Caller must free returned string using
     //  zstr_free(). Returns NULL if the context is being terminated or the 
     //  process was interrupted.                                            
-    static const QString recv (void *source);
+    static QString recv (void *source);
 
     //  Send a C string to a socket, as a frame. The string is sent without 
     //  trailing null byte; to read this you can use zstr_recv, or a similar

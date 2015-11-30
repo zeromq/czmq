@@ -11,108 +11,107 @@
 #include "../../native/include/org_zeromq_czmq_Zarmour.h"
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zarmour__1_1init (JNIEnv *env, jclass c) {
-    zarmour_t *self = zarmour_new ();
-    if (self)
-        return (jlong) self;
-    return -1;
+Java_zarmour__1_1new (JNIEnv *env, jclass c)
+{
+    jlong new_ = (jlong) zarmour_new ();
+    return new_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zarmour__1_1destroy (JNIEnv *env, jclass c, jlong jself) {
-    zarmour_t *self = (zarmour_t *) jself;
-    zarmour_destroy (&self);
+Java_zarmour__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
+{
+    zarmour_destroy ((zarmour_t **) &self_p);
 }
 
 JNIEXPORT jstring JNICALL
-Java_org_zeromq_czmq_Zarmour__1_1mode_str (JNIEnv *env, jclass c, jlong jself) {
-    zarmour_t *self = (zarmour_t *) jself;
-    const char * rc = zarmour_mode_str (self);
-    return rc;
+Java_zarmour__1_1mode_str (JNIEnv *env, jclass c, jlong self)
+{
+    char *mode_str_ = (char *) zarmour_mode_str ((zarmour_t *) self);
+    jstring string = (*env)->NewStringUTF (env, mode_str_);
+    return string;
 }
 
 JNIEXPORT jstring JNICALL
-Java_org_zeromq_czmq_Zarmour__1_1encode (JNIEnv *env, jclass c, jlong jself, jbyteArray data, jlong data size) {
-    zarmour_t *self = (zarmour_t *) jself;
-    char * rc = zarmour_encode (self, data, dataSize);
-    return rc;
+Java_zarmour__1_1encode (JNIEnv *env, jclass c, jlong self, jbyteArray data, jlong data_size)
+{
+    byte *data_ = (byte *) (*env)->GetByteArrayElements (env, data, 0);
+    char *encode_ = (char *) zarmour_encode ((zarmour_t *) self, data_, (size_t) data_size);
+    jstring string = (*env)->NewStringUTF (env, encode_);
+    zstr_free (&encode_);
+    (*env)->ReleaseByteArrayElements (env, data, (jbyte *) data_, 0);
+    return string;
 }
 
 JNIEXPORT jbytearray JNICALL
-Java_org_zeromq_czmq_Zarmour__1_1decode (JNIEnv *env, jclass c, jlong jself, jstring data, jlong decode size) {
-    zarmour_t *self = (zarmour_t *) jself;
-    byte * rc = zarmour_decode (self, data, decodeSize);
-    return rc;
+Java_zarmour__1_1decode (JNIEnv *env, jclass c, jlong self, jstring data, jlong decode_size)
+{
+    char *data_ = (char *) (*env)->GetStringUTFChars (env, data, NULL);
+    byte *decode_ = (byte *) zarmour_decode ((zarmour_t *) self, data_, (size_t *) &decode_size);
+    (*env)->ReleaseStringUTFChars (env, data, data_);
+    return (jlong) decode_;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_org_zeromq_czmq_Zarmour__1_1pad (JNIEnv *env, jclass c, jlong jself) {
-    zarmour_t *self = (zarmour_t *) jself;
-    bool rc = zarmour_pad (self);
-    return rc;
+Java_zarmour__1_1pad (JNIEnv *env, jclass c, jlong self)
+{
+    jboolean pad_ = (jboolean) zarmour_pad ((zarmour_t *) self);
+    return pad_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zarmour__1_1set_pad (JNIEnv *env, jclass c, jlong jself, jboolean pad) {
-    zarmour_t *self = (zarmour_t *) jself;
-    void rc = zarmour_set_pad (self, pad);
-    return rc;
+Java_zarmour__1_1set_pad (JNIEnv *env, jclass c, jlong self, jboolean pad)
+{
+    zarmour_set_pad ((zarmour_t *) self, (bool) pad);
 }
 
 JNIEXPORT jchar JNICALL
-Java_org_zeromq_czmq_Zarmour__1_1pad_char (JNIEnv *env, jclass c, jlong jself) {
-    zarmour_t *self = (zarmour_t *) jself;
-    char rc = zarmour_pad_char (self);
-    return rc;
+Java_zarmour__1_1pad_char (JNIEnv *env, jclass c, jlong self)
+{
+    jchar pad_char_ = (jchar) zarmour_pad_char ((zarmour_t *) self);
+    return pad_char_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zarmour__1_1set_pad_char (JNIEnv *env, jclass c, jlong jself, jchar pad char) {
-    zarmour_t *self = (zarmour_t *) jself;
-    void rc = zarmour_set_pad_char (self, padChar);
-    return rc;
+Java_zarmour__1_1set_pad_char (JNIEnv *env, jclass c, jlong self, jchar pad_char)
+{
+    zarmour_set_pad_char ((zarmour_t *) self, (char) pad_char);
 }
 
 JNIEXPORT jboolean JNICALL
-Java_org_zeromq_czmq_Zarmour__1_1line_breaks (JNIEnv *env, jclass c, jlong jself) {
-    zarmour_t *self = (zarmour_t *) jself;
-    bool rc = zarmour_line_breaks (self);
-    return rc;
+Java_zarmour__1_1line_breaks (JNIEnv *env, jclass c, jlong self)
+{
+    jboolean line_breaks_ = (jboolean) zarmour_line_breaks ((zarmour_t *) self);
+    return line_breaks_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zarmour__1_1set_line_breaks (JNIEnv *env, jclass c, jlong jself, jboolean line breaks) {
-    zarmour_t *self = (zarmour_t *) jself;
-    void rc = zarmour_set_line_breaks (self, lineBreaks);
-    return rc;
+Java_zarmour__1_1set_line_breaks (JNIEnv *env, jclass c, jlong self, jboolean line_breaks)
+{
+    zarmour_set_line_breaks ((zarmour_t *) self, (bool) line_breaks);
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zarmour__1_1line_length (JNIEnv *env, jclass c, jlong jself) {
-    zarmour_t *self = (zarmour_t *) jself;
-    size_t rc = zarmour_line_length (self);
-    return rc;
+Java_zarmour__1_1line_length (JNIEnv *env, jclass c, jlong self)
+{
+    jlong line_length_ = (jlong) zarmour_line_length ((zarmour_t *) self);
+    return line_length_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zarmour__1_1set_line_length (JNIEnv *env, jclass c, jlong jself, jlong line length) {
-    zarmour_t *self = (zarmour_t *) jself;
-    void rc = zarmour_set_line_length (self, lineLength);
-    return rc;
+Java_zarmour__1_1set_line_length (JNIEnv *env, jclass c, jlong self, jlong line_length)
+{
+    zarmour_set_line_length ((zarmour_t *) self, (size_t) line_length);
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zarmour__1_1print (JNIEnv *env, jclass c, jlong jself) {
-    zarmour_t *self = (zarmour_t *) jself;
-    void rc = zarmour_print (self);
-    return rc;
+Java_zarmour__1_1print (JNIEnv *env, jclass c, jlong self)
+{
+    zarmour_print ((zarmour_t *) self);
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zarmour__1_1test (JNIEnv *env, jclass c, jlong jself, jboolean verbose) {
-    zarmour_t *self = (zarmour_t *) jself;
-    void rc = zarmour_test (verbose);
-    return rc;
+Java_zarmour__1_1test (JNIEnv *env, jclass c, jboolean verbose)
+{
+    zarmour_test ((bool) verbose);
 }
 
-}

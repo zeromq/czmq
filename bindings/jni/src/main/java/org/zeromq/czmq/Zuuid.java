@@ -22,6 +22,7 @@ public class Zuuid implements AutoCloseable {
     */
     native static long __init ();
     public Zuuid () {
+        /*  TODO: if __init fails, self is null...  */
         self = __init ();
     }
     /*

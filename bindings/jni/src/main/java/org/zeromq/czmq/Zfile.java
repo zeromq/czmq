@@ -26,6 +26,7 @@ public class Zfile implements AutoCloseable {
     */
     native static long __init (String path, String name);
     public Zfile (String path, String name) {
+        /*  TODO: if __init fails, self is null...  */
         self = __init (path, name);
     }
     /*

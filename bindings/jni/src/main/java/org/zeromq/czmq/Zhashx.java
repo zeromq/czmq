@@ -22,6 +22,7 @@ public class Zhashx implements AutoCloseable {
     */
     native static long __init ();
     public Zhashx () {
+        /*  TODO: if __init fails, self is null...  */
         self = __init ();
     }
     /*
