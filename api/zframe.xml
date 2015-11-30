@@ -18,7 +18,7 @@
         Create a new frame. If size is not null, allocates the frame data
         to the specified size. If additionally, data is not null, copies
         size octets from the specified data into the frame body.
-        <argument name = "data" type = "buffer" constant = "1" />
+        <argument name = "data" type = "buffer" />
         <argument name = "size" type = "size" />
     </constructor>
 
@@ -121,7 +121,7 @@
 
     <method name = "reset">
         Set new contents for frame
-        <argument name = "data" type = "buffer" constant = "1" />
+        <argument name = "data" type = "buffer" />
         <argument name = "size" type = "size" />
     </method>
 

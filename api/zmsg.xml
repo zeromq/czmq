@@ -204,7 +204,7 @@
         structured messages across transports that do not support multipart data.
         Allocates and returns a new buffer containing the serialized message.
         To decode a serialized message buffer, use zmsg_decode ().
-        <argument name = "buffer" type = "buffer" by_reference = "1" fresh = "1" />
+        <argument name = "buffer" type = "buffer" by_reference = "1" constant = "0" />
         <return type = "size" />
     </method>
 

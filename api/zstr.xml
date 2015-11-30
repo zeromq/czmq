@@ -15,7 +15,7 @@
         zstr_free(). Returns NULL if the context is being terminated or the
         process was interrupted.
         <argument name = "source" type = "anything" />
-        <return type = "string" constant = "0" />
+        <return type = "string" fresh = "1" />
     </method>
 
     <method name = "recvx" singleton = "1">
@@ -38,7 +38,7 @@
         method that adds a null terminator on the received string. String
         may be NULL, which is sent as "".
         <argument name = "dest" type = "anything" />
-        <argument name = "string" type = "string" constant = "1" />
+        <argument name = "string" type = "string" />
         <return type = "integer" />
     </method>
 
@@ -46,7 +46,7 @@
         Send a C string to a socket, as zstr_send(), with a MORE flag, so that
         you can send further strings in the same multi-part message.
         <argument name = "dest" type = "anything" />
-        <argument name = "string" type = "string" constant = "1" />
+        <argument name = "string" type = "string" />
         <return type = "integer" />
     </method>
 
@@ -55,7 +55,7 @@
         user-supplied strings in the format (they may contain '%' which
         will create security holes).
         <argument name = "dest" type = "anything" />
-        <argument name = "format" type = "format" constant = "1" />
+        <argument name = "format" type = "format" />
         <return type = "integer" />
     </method>
 
@@ -64,7 +64,7 @@
         MORE flag, so that you can send further strings in the same multi-part
         message.
         <argument name = "dest" type = "anything" />
-        <argument name = "format" type = "format" constant = "1" />
+        <argument name = "format" type = "format" />
         <return type = "integer" />
     </method>
 
@@ -72,8 +72,7 @@
         Send a series of strings (until NULL) as multipart data
         Returns 0 if the strings could be sent OK, or -1 on error.
         <argument name = "dest" type = "anything" />
-        <argument name = "string" type = "string" constant = "1"
-                  variadic = "1" />
+        <argument name = "string" type = "string" variadic = "1" />
         <return type = "integer" />
     </method>
 
