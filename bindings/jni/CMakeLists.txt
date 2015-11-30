@@ -14,6 +14,7 @@ include_directories (${JAVA_INCLUDE_PATH} ${JAVA_INCLUDE_PATH2} src/native/inclu
 set (czmqjni_sources
    src/main/c/zactor.c
    src/main/c/zarmour.c
+   src/main/c/zconfig.c
    src/main/c/zdir.c
    src/main/c/zdir_patch.c
    src/main/c/zfile.c
