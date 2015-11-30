@@ -78,6 +78,39 @@ module CZMQ
 
       require_relative 'ffi/zarmour'
 
+      attach_function :zconfig_new, [:string, :pointer], :pointer, **opts
+      attach_function :zconfig_destroy, [:pointer], :void, **opts
+      attach_function :zconfig_name, [:pointer], :pointer, **opts
+      attach_function :zconfig_value, [:pointer], :pointer, **opts
+      attach_function :zconfig_put, [:pointer, :string, :string], :void, **opts
+      attach_function :zconfig_putf, [:pointer, :string, :string, :varargs], :void, **opts
+      attach_function :zconfig_get, [:pointer, :string, :string], :pointer, **opts
+      attach_function :zconfig_set_name, [:pointer, :string], :void, **opts
+      attach_function :zconfig_set_value, [:pointer, :string, :varargs], :void, **opts
+      attach_function :zconfig_child, [:pointer], :pointer, **opts
+      attach_function :zconfig_next, [:pointer], :pointer, **opts
+      attach_function :zconfig_locate, [:pointer, :string], :pointer, **opts
+      attach_function :zconfig_at_depth, [:pointer, :int], :pointer, **opts
+      attach_function :zconfig_execute, [:pointer, :pointer, :pointer], :int, **opts
+      attach_function :zconfig_set_comment, [:pointer, :string, :varargs], :void, **opts
+      attach_function :zconfig_comments, [:pointer], :pointer, **opts
+      attach_function :zconfig_load, [:string], :pointer, **opts
+      attach_function :zconfig_save, [:pointer, :string], :int, **opts
+      attach_function :zconfig_loadf, [:string, :varargs], :pointer, **opts
+      attach_function :zconfig_savef, [:pointer, :string, :varargs], :int, **opts
+      attach_function :zconfig_filename, [:pointer], :string, **opts
+      attach_function :zconfig_reload, [:pointer], :int, **opts
+      attach_function :zconfig_chunk_load, [:pointer], :pointer, **opts
+      attach_function :zconfig_chunk_save, [:pointer], :pointer, **opts
+      attach_function :zconfig_str_load, [:string], :pointer, **opts
+      attach_function :zconfig_str_save, [:pointer], :pointer, **opts
+      attach_function :zconfig_has_changed, [:pointer], :bool, **opts
+      attach_function :zconfig_fprint, [:pointer, :pointer], :void, **opts
+      attach_function :zconfig_print, [:pointer], :void, **opts
+      attach_function :zconfig_test, [:bool], :void, **opts
+
+      require_relative 'ffi/zconfig'
+
       attach_function :zdir_new, [:string, :string], :pointer, **opts
       attach_function :zdir_destroy, [:pointer], :void, **opts
       attach_function :zdir_path, [:pointer], :string, **opts
