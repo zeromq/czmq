@@ -97,7 +97,7 @@
     <method name = "pushmem">
         Push block of memory to front of message, as a new frame.
         Returns 0 on success, -1 on error.
-        <argument name = "src" type = "anything" constant = "1" />
+        <argument name = "src" type = "anything" mutable = "0" />
         <argument name = "size" type = "size" />
         <return type = "integer" />
     </method>
@@ -105,7 +105,7 @@
     <method name = "addmem">
         Add block of memory to the end of the message, as a new frame.
         Returns 0 on success, -1 on error.
-        <argument name = "src" type = "anything" constant = "1" />
+        <argument name = "src" type = "anything" mutable = "0" />
         <argument name = "size" type = "size" />
         <return type = "integer" />
     </method>
@@ -204,7 +204,7 @@
         structured messages across transports that do not support multipart data.
         Allocates and returns a new buffer containing the serialized message.
         To decode a serialized message buffer, use zmsg_decode ().
-        <argument name = "buffer" type = "buffer" by_reference = "1" constant = "0" />
+        <argument name = "buffer" type = "buffer" by_reference = "1" mutable = "1" />
         <return type = "size" />
     </method>
 

@@ -17,14 +17,14 @@
 
     <callback_type name = "duplicator_fn">
         Duplicate an item
-        <argument name = "item" type = "anything" constant = "1" />
+        <argument name = "item" type = "anything" mutable = "0" />
         <return type = "anything" />
     </callback_type>
 
     <callback_type name = "comparator_fn">
         Compare two items, for sorting
-        <argument name = "item1" type = "anything" constant = "1" />
-        <argument name = "item2" type = "anything" constant = "1" />
+        <argument name = "item1" type = "anything" mutable = "0" />
+        <argument name = "item2" type = "anything" mutable = "0" />
         <return type = "integer" />
     </callback_type>
 
@@ -35,7 +35,7 @@
 
     <callback_type name = "hash_fn">
         compare two items, for sorting
-        <argument name = "key" type = "anything" constant = "1"/>
+        <argument name = "key" type = "anything" mutable = "0"/>
         <return type = "size"/>
     </callback_type>
 
@@ -51,7 +51,7 @@
         Insert item into hash table with specified key and item.
         If key is already present returns -1 and leaves existing item unchanged
         Returns 0 on success.
-        <argument name = "key" type = "anything" constant = "1"/>
+        <argument name = "key" type = "anything" mutable = "0"/>
         <argument name = "item" type = "anything" />
         <return type = "integer" />
     </method>
@@ -62,14 +62,14 @@
         a container item destructor, this is called on the old value. If the key
         was not already present, inserts a new item. Sets the hash cursor to the
         new item.
-        <argument name = "key" type = "anything" constant = "1"/>
+        <argument name = "key" type = "anything" mutable = "0"/>
         <argument name = "item" type = "anything" />
     </method>
 
     <method name = "delete">
         Remove an item specified by key from the hash table. If there was no such
         item, this function does nothing.
-        <argument name = "key" type = "anything" constant = "1"/>
+        <argument name = "key" type = "anything" mutable = "0"/>
     </method>
 
     <method name = "purge">
@@ -80,15 +80,15 @@
 
     <method name = "lookup">
         Return the item at the specified key, or null
-        <argument name = "key" type = "anything" constant = "1" />
+        <argument name = "key" type = "anything" mutable = "0" />
         <return type = "anything" />
     </method>
 
     <method name = "rename">
         Reindexes an item from an old key to a new key. If there was no such
         item, does nothing. Returns 0 if successful, else -1.
-        <argument name = "old key" type = "anything" constant = "1"/>
-        <argument name = "new key" type = "anything" constant = "1"/>
+        <argument name = "old key" type = "anything" mutable = "0"/>
+        <argument name = "new key" type = "anything" mutable = "0"/>
         <return type = "integer" />
     </method>
 
@@ -98,7 +98,7 @@
         Use this when hash items are dynamically allocated, to ensure that
         you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
         Returns the item, or NULL if there is no such item.
-        <argument name = "key" type = "anything" constant = "1" />
+        <argument name = "key" type = "anything" mutable = "0" />
         <argument name = "free_fn" type = "zhashx_free_fn" callback = "1" />
         <return type = "anything" />
     </method>
@@ -145,7 +145,7 @@
         was returned. This is a constant string that you may not modify or
         deallocate, and which lasts as long as the item in the hash. After an
         unsuccessful first/next, returns NULL.
-        <return type = "anything" constant = "1"/>
+        <return type = "anything" mutable = "0"/>
     </method>
 
     <method name = "comment">

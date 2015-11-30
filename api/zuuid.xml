@@ -60,7 +60,7 @@
 
     <method name = "export">
         Store UUID blob in target array
-        <argument name = "target" type = "buffer" constant = "0" />
+        <argument name = "target" type = "buffer" mutable = "1" />
     </method>
 
     <method name = "eq">
