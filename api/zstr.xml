@@ -27,8 +27,7 @@
         using zstr_free(). If not enough strings are provided, remaining
         multipart frames in the message are dropped.
         <argument name = "source" type = "anything" />
-        <argument name = "string_p" type = "string" mutable = "1"
-                  by_reference = "1" variadic = "1" />
+        <argument name = "string_p" type = "string" by_reference = "1" variadic = "1" />
         <return type = "integer" />
     </method>
 
@@ -79,6 +78,6 @@
     <method name = "free" singleton = "1">
         Free a provided string, and nullify the parent pointer. Safe to call on
         a null pointer.
-        <argument name = "string_p" type = "string" mutable = "1" by_reference = "1" />
+        <argument name = "string_p" type = "string" by_reference = "1" />
     </method>
 </class>
