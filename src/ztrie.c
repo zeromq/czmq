@@ -333,7 +333,7 @@ s_ztrie_matches_token (ztrie_node_t *parent, char *token, int len)
 //    MODE_MATCH:  returns NULL if the comparison failed.
 
 static ztrie_node_t *
-s_ztrie_parse_path (ztrie_t *self, char *path, int mode)
+s_ztrie_parse_path (ztrie_t *self, const char *path, int mode)
 {
     int state = 0;
     char *needle, *beginToken = NULL, *beginRegex = NULL;
@@ -342,7 +342,7 @@ s_ztrie_parse_path (ztrie_t *self, char *path, int mode)
         zlistx_purge (self->params);
 
     int len = strlen (path);
-    needle = path;
+    needle = (char *) path;
     char *needle_stop = needle + len;
     //  Ignore trailing delimiter
     if (needle[len-1] == self->delimiter)
