@@ -34,7 +34,7 @@ Java_zarmour__1_1mode_str (JNIEnv *env, jclass c, jlong self)
 JNIEXPORT jstring JNICALL
 Java_zarmour__1_1encode (JNIEnv *env, jclass c, jlong self, jlong data, jlong data_size)
 {
-    char *encode_ = (char *) zarmour_encode ((zarmour_t *) self, (byte *) data, (size_t) data_size);
+    char *encode_ = (char *) zarmour_encode ((zarmour_t *) self, (const byte *) data, (size_t) data_size);
     jstring string = (*env)->NewStringUTF (env, encode_);
     zstr_free (&encode_);
     return string;

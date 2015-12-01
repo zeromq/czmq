@@ -26,14 +26,14 @@ Java_zuuid__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
 JNIEXPORT jlong JNICALL
 Java_zuuid__1_1new_from (JNIEnv *env, jclass c, jlong source)
 {
-    jlong new_from_ = (jlong) zuuid_new_from ((byte *) source);
+    jlong new_from_ = (jlong) zuuid_new_from ((const byte *) source);
     return new_from_;
 }
 
 JNIEXPORT void JNICALL
 Java_zuuid__1_1set (JNIEnv *env, jclass c, jlong self, jlong source)
 {
-    zuuid_set ((zuuid_t *) self, (byte *) source);
+    zuuid_set ((zuuid_t *) self, (const byte *) source);
 }
 
 JNIEXPORT jint JNICALL
@@ -84,14 +84,14 @@ Java_zuuid__1_1export (JNIEnv *env, jclass c, jlong self, jlong target)
 JNIEXPORT jboolean JNICALL
 Java_zuuid__1_1eq (JNIEnv *env, jclass c, jlong self, jlong compare)
 {
-    jboolean eq_ = (jboolean) zuuid_eq ((zuuid_t *) self, (byte *) compare);
+    jboolean eq_ = (jboolean) zuuid_eq ((zuuid_t *) self, (const byte *) compare);
     return eq_;
 }
 
 JNIEXPORT jboolean JNICALL
 Java_zuuid__1_1neq (JNIEnv *env, jclass c, jlong self, jlong compare)
 {
-    jboolean neq_ = (jboolean) zuuid_neq ((zuuid_t *) self, (byte *) compare);
+    jboolean neq_ = (jboolean) zuuid_neq ((zuuid_t *) self, (const byte *) compare);
     return neq_;
 }
 

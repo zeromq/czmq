@@ -202,7 +202,7 @@ Java_zmsg__1_1encode (JNIEnv *env, jclass c, jlong self, jlong buffer)
 JNIEXPORT jlong JNICALL
 Java_zmsg__1_1decode (JNIEnv *env, jclass c, jlong buffer, jlong buffer_size)
 {
-    jlong decode_ = (jlong) zmsg_decode ((byte *) buffer, (size_t) buffer_size);
+    jlong decode_ = (jlong) zmsg_decode ((const byte *) buffer, (size_t) buffer_size);
     return decode_;
 }
 

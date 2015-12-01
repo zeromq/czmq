@@ -454,7 +454,7 @@ Java_zsock__1_1set_curve_publickey (JNIEnv *env, jclass c, jlong self, jstring c
 JNIEXPORT void JNICALL
 Java_zsock__1_1set_curve_publickey_bin (JNIEnv *env, jclass c, jlong self, jlong curve_publickey)
 {
-    zsock_set_curve_publickey_bin ((zsock_t *) self, (byte *) curve_publickey);
+    zsock_set_curve_publickey_bin ((zsock_t *) self, (const byte *) curve_publickey);
 }
 
 JNIEXPORT jstring JNICALL
@@ -477,7 +477,7 @@ Java_zsock__1_1set_curve_secretkey (JNIEnv *env, jclass c, jlong self, jstring c
 JNIEXPORT void JNICALL
 Java_zsock__1_1set_curve_secretkey_bin (JNIEnv *env, jclass c, jlong self, jlong curve_secretkey)
 {
-    zsock_set_curve_secretkey_bin ((zsock_t *) self, (byte *) curve_secretkey);
+    zsock_set_curve_secretkey_bin ((zsock_t *) self, (const byte *) curve_secretkey);
 }
 
 JNIEXPORT jstring JNICALL
@@ -500,7 +500,7 @@ Java_zsock__1_1set_curve_serverkey (JNIEnv *env, jclass c, jlong self, jstring c
 JNIEXPORT void JNICALL
 Java_zsock__1_1set_curve_serverkey_bin (JNIEnv *env, jclass c, jlong self, jlong curve_serverkey)
 {
-    zsock_set_curve_serverkey_bin ((zsock_t *) self, (byte *) curve_serverkey);
+    zsock_set_curve_serverkey_bin ((zsock_t *) self, (const byte *) curve_serverkey);
 }
 
 JNIEXPORT jint JNICALL
