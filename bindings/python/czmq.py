@@ -3705,7 +3705,7 @@ lib.ztrie_new.argtypes = [char_p]
 lib.ztrie_destroy.restype = None
 lib.ztrie_destroy.argtypes = [POINTER(ztrie_p)]
 lib.ztrie_insert_route.restype = c_int
-lib.ztrie_insert_route.argtypes = [ztrie_p, c_char_p, c_void_p, POINTER(ztrie_destroy_data_fn)]
+lib.ztrie_insert_route.argtypes = [ztrie_p, c_char_p, c_void_p, ztrie_destroy_data_fn]
 lib.ztrie_remove_route.restype = c_int
 lib.ztrie_remove_route.argtypes = [ztrie_p, c_char_p]
 lib.ztrie_matches.restype = c_bool
@@ -3756,7 +3756,7 @@ class Ztrie(object):
         """Inserts a new route into the tree and attaches the data. Returns -1
 if the route already exists, otherwise 0. This method takes ownership of
 the provided data if a destroy_data_fn is provided."""
-        return lib.ztrie_insert_route(self._as_parameter_, path, data, byref(ztrie_destroy_data_fn.from_param(destroy_data_fn)))
+        return lib.ztrie_insert_route(self._as_parameter_, path, data, destroy_data_fn)
 
     def remove_route(self, path):
         """Removes a route from the trie and destroys its data. Returns -1 if the

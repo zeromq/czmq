@@ -452,11 +452,9 @@ Java_zsock__1_1set_curve_publickey (JNIEnv *env, jclass c, jlong self, jstring c
 }
 
 JNIEXPORT void JNICALL
-Java_zsock__1_1set_curve_publickey_bin (JNIEnv *env, jclass c, jlong self, jbyteArray curve_publickey)
+Java_zsock__1_1set_curve_publickey_bin (JNIEnv *env, jclass c, jlong self, jlong curve_publickey)
 {
-    byte *curve_publickey_ = (byte *) (*env)->GetByteArrayElements (env, curve_publickey, 0);
-    zsock_set_curve_publickey_bin ((zsock_t *) self, curve_publickey_);
-    (*env)->ReleaseByteArrayElements (env, curve_publickey, (jbyte *) curve_publickey_, 0);
+    zsock_set_curve_publickey_bin ((zsock_t *) self, (byte *) curve_publickey);
 }
 
 JNIEXPORT jstring JNICALL
@@ -477,11 +475,9 @@ Java_zsock__1_1set_curve_secretkey (JNIEnv *env, jclass c, jlong self, jstring c
 }
 
 JNIEXPORT void JNICALL
-Java_zsock__1_1set_curve_secretkey_bin (JNIEnv *env, jclass c, jlong self, jbyteArray curve_secretkey)
+Java_zsock__1_1set_curve_secretkey_bin (JNIEnv *env, jclass c, jlong self, jlong curve_secretkey)
 {
-    byte *curve_secretkey_ = (byte *) (*env)->GetByteArrayElements (env, curve_secretkey, 0);
-    zsock_set_curve_secretkey_bin ((zsock_t *) self, curve_secretkey_);
-    (*env)->ReleaseByteArrayElements (env, curve_secretkey, (jbyte *) curve_secretkey_, 0);
+    zsock_set_curve_secretkey_bin ((zsock_t *) self, (byte *) curve_secretkey);
 }
 
 JNIEXPORT jstring JNICALL
@@ -502,11 +498,9 @@ Java_zsock__1_1set_curve_serverkey (JNIEnv *env, jclass c, jlong self, jstring c
 }
 
 JNIEXPORT void JNICALL
-Java_zsock__1_1set_curve_serverkey_bin (JNIEnv *env, jclass c, jlong self, jbyteArray curve_serverkey)
+Java_zsock__1_1set_curve_serverkey_bin (JNIEnv *env, jclass c, jlong self, jlong curve_serverkey)
 {
-    byte *curve_serverkey_ = (byte *) (*env)->GetByteArrayElements (env, curve_serverkey, 0);
-    zsock_set_curve_serverkey_bin ((zsock_t *) self, curve_serverkey_);
-    (*env)->ReleaseByteArrayElements (env, curve_serverkey, (jbyte *) curve_serverkey_, 0);
+    zsock_set_curve_serverkey_bin ((zsock_t *) self, (byte *) curve_serverkey);
 }
 
 JNIEXPORT jint JNICALL

@@ -1,4 +1,8 @@
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
-
+.gradle
+build/
+src/native
+gradle-app.setting
+libczmqjni.so

@@ -34,7 +34,7 @@ public class Zfile implements AutoCloseable {
     */
     native static void __destroy (long self);
     @Override
-    public void close() {
+    public void close () {
         __destroy (self);
         self = 0;
     }
@@ -42,8 +42,8 @@ public class Zfile implements AutoCloseable {
     Duplicate a file item, returns a newly constructed item. If the file
     is null, or memory was exhausted, returns null.                     
     */
-    native static Zfile __dup (long self);
-    public Zfile dup (long self) {
+    native static long __dup (long self);
+    public long dup (long self) {
         return Zfile.__dup (self);
     }
     /*
@@ -60,7 +60,7 @@ public class Zfile implements AutoCloseable {
     */
     native static void __restat (long self);
     public void restat (long self) {
-        return Zfile.__restat (self);
+        Zfile.__restat (self);
     }
     /*
     Return when the file was last modified. If you want this to reflect the
@@ -133,7 +133,7 @@ public class Zfile implements AutoCloseable {
     */
     native static void __remove (long self);
     public void remove (long self) {
-        return Zfile.__remove (self);
+        Zfile.__remove (self);
     }
     /*
     Open file for reading                             
@@ -156,8 +156,8 @@ public class Zfile implements AutoCloseable {
     Read chunk from file at specified position. If this was the last chunk,
     sets the eof property. Returns a null chunk in case of error.          
     */
-    native static Zchunk __read (long self, long bytes, long offset);
-    public Zchunk read (long self, long bytes, long offset) {
+    native static long __read (long self, long bytes, long offset);
+    public long read (long self, long bytes, long offset) {
         return Zfile.__read (self, bytes, offset);
     }
     /*
@@ -171,8 +171,8 @@ public class Zfile implements AutoCloseable {
     Write chunk to file at specified position
     Return 0 if OK, else -1                  
     */
-    native static int __write (long self, Zchunk chunk, long offset);
-    public int write (long self, Zchunk chunk, long offset) {
+    native static int __write (long self, long chunk, long offset);
+    public int write (long self, long chunk, long offset) {
         return Zfile.__write (self, chunk, offset);
     }
     /*
@@ -188,7 +188,7 @@ public class Zfile implements AutoCloseable {
     */
     native static void __close (long self);
     public void close (long self) {
-        return Zfile.__close (self);
+        Zfile.__close (self);
     }
     /*
     Calculate SHA1 digest for file, using zdigest class.
@@ -202,6 +202,6 @@ public class Zfile implements AutoCloseable {
     */
     native static void __test (boolean verbose);
     public void test (boolean verbose) {
-        return Zfile.__test (verbose);
+        Zfile.__test (verbose);
     }
 }

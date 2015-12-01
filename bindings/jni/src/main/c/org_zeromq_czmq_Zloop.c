@@ -23,6 +23,13 @@ Java_zloop__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
     zloop_destroy ((zloop_t **) &self_p);
 }
 
+JNIEXPORT jint JNICALL
+Java_zloop__1_1reader (JNIEnv *env, jclass c, jlong self, jlong sock, jlong handler, jlong arg)
+{
+    jint reader_ = (jint) zloop_reader ((zloop_t *) self, (zsock_t *) sock, (zloop_reader_fn *) handler, (void *) arg);
+    return reader_;
+}
+
 JNIEXPORT void JNICALL
 Java_zloop__1_1reader_end (JNIEnv *env, jclass c, jlong self, jlong sock)
 {
@@ -36,10 +43,24 @@ Java_zloop__1_1reader_set_tolerant (JNIEnv *env, jclass c, jlong self, jlong soc
 }
 
 JNIEXPORT jint JNICALL
+Java_zloop__1_1timer (JNIEnv *env, jclass c, jlong self, jlong delay, jlong times, jlong handler, jlong arg)
+{
+    jint timer_ = (jint) zloop_timer ((zloop_t *) self, (size_t) delay, (size_t) times, (zloop_timer_fn *) handler, (void *) arg);
+    return timer_;
+}
+
+JNIEXPORT jint JNICALL
 Java_zloop__1_1timer_end (JNIEnv *env, jclass c, jlong self, jint timer_id)
 {
     jint timer_end_ = (jint) zloop_timer_end ((zloop_t *) self, (int) timer_id);
     return timer_end_;
+}
+
+JNIEXPORT jlong JNICALL
+Java_zloop__1_1ticket (JNIEnv *env, jclass c, jlong self, jlong handler, jlong arg)
+{
+    jlong ticket_ = (jlong) zloop_ticket ((zloop_t *) self, (zloop_timer_fn *) handler, (void *) arg);
+    return ticket_;
 }
 
 JNIEXPORT void JNICALL

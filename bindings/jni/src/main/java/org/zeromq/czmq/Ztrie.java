@@ -30,9 +30,18 @@ public class Ztrie implements AutoCloseable {
     */
     native static void __destroy (long self);
     @Override
-    public void close() {
+    public void close () {
         __destroy (self);
         self = 0;
+    }
+    /*
+    Inserts a new route into the tree and attaches the data. Returns -1     
+    if the route already exists, otherwise 0. This method takes ownership of
+    the provided data if a destroy_data_fn is provided.                     
+    */
+    native static int __insert_route (long self, String path, long data, long destroyDataFn);
+    public int insert_route (long self, String path, long data, long destroyDataFn) {
+        return Ztrie.__insert_route (self, path, data, destroyDataFn);
     }
     /*
     Removes a route from the trie and destroys its data. Returns -1 if the
@@ -55,8 +64,8 @@ public class Ztrie implements AutoCloseable {
     did not match, returns NULL. Do not delete the data as it's owned by    
     ztrie.                                                                  
     */
-    native static void * __hit_data (long self);
-    public void * hit_data (long self) {
+    native static long __hit_data (long self);
+    public long hit_data (long self) {
         return Ztrie.__hit_data (self);
     }
     /*
@@ -71,8 +80,8 @@ public class Ztrie implements AutoCloseable {
     ztrie_matches. If the path did not match or the route did not contain any
     named regexes, returns NULL.                                             
     */
-    native static Zhashx __hit_parameters (long self);
-    public Zhashx hit_parameters (long self) {
+    native static long __hit_parameters (long self);
+    public long hit_parameters (long self) {
         return Ztrie.__hit_parameters (self);
     }
     /*
@@ -88,13 +97,13 @@ public class Ztrie implements AutoCloseable {
     */
     native static void __print (long self);
     public void print (long self) {
-        return Ztrie.__print (self);
+        Ztrie.__print (self);
     }
     /*
     Self test of this class.
     */
     native static void __test (boolean verbose);
     public void test (boolean verbose) {
-        return Ztrie.__test (verbose);
+        Ztrie.__test (verbose);
     }
 }

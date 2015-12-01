@@ -24,6 +24,15 @@ Java_ztrie__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
 }
 
 JNIEXPORT jint JNICALL
+Java_ztrie__1_1insert_route (JNIEnv *env, jclass c, jlong self, jstring path, jlong data, jlong destroy_data_fn)
+{
+    char *path_ = (char *) (*env)->GetStringUTFChars (env, path, NULL);
+    jint insert_route_ = (jint) ztrie_insert_route ((ztrie_t *) self, path_, (void *) data, (ztrie_destroy_data_fn *) destroy_data_fn);
+    (*env)->ReleaseStringUTFChars (env, path, path_);
+    return insert_route_;
+}
+
+JNIEXPORT jint JNICALL
 Java_ztrie__1_1remove_route (JNIEnv *env, jclass c, jlong self, jstring path)
 {
     char *path_ = (char *) (*env)->GetStringUTFChars (env, path, NULL);

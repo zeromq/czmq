@@ -30,15 +30,15 @@ public class Zuuid implements AutoCloseable {
     */
     native static void __destroy (long self);
     @Override
-    public void close() {
+    public void close () {
         __destroy (self);
         self = 0;
     }
     /*
     Create UUID object from supplied ZUUID_LEN-octet value.
     */
-    native static Zuuid __new_from (byte [] source);
-    public Zuuid new_from (byte [] source) {
+    native static long __new_from (byte [] source);
+    public long new_from (byte [] source) {
         return Zuuid.__new_from (source);
     }
     /*
@@ -46,7 +46,7 @@ public class Zuuid implements AutoCloseable {
     */
     native static void __set (long self, byte [] source);
     public void set (long self, byte [] source) {
-        return Zuuid.__set (self, source);
+        Zuuid.__set (self, source);
     }
     /*
     Set UUID to new supplied string value skipping '-' and '{' '}'
@@ -91,7 +91,7 @@ public class Zuuid implements AutoCloseable {
     */
     native static void __export (long self, byte [] target);
     public void export (long self, byte [] target) {
-        return Zuuid.__export (self, target);
+        Zuuid.__export (self, target);
     }
     /*
     Check if UUID is same as supplied value
@@ -111,8 +111,8 @@ public class Zuuid implements AutoCloseable {
     Make copy of UUID object; if uuid is null, or memory was exhausted,
     returns null.                                                      
     */
-    native static Zuuid __dup (long self);
-    public Zuuid dup (long self) {
+    native static long __dup (long self);
+    public long dup (long self) {
         return Zuuid.__dup (self);
     }
     /*
@@ -120,6 +120,6 @@ public class Zuuid implements AutoCloseable {
     */
     native static void __test (boolean verbose);
     public void test (boolean verbose) {
-        return Zuuid.__test (verbose);
+        Zuuid.__test (verbose);
     }
 }

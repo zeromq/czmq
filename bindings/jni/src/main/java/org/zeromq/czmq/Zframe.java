@@ -32,22 +32,22 @@ public class Zframe implements AutoCloseable {
     */
     native static void __destroy (long self);
     @Override
-    public void close() {
+    public void close () {
         __destroy (self);
         self = 0;
     }
     /*
     Create an empty (zero-sized) frame
     */
-    native static Zframe __new_empty ();
-    public Zframe new_empty () {
+    native static long __new_empty ();
+    public long new_empty () {
         return Zframe.__new_empty ();
     }
     /*
     Create a frame with a specified string content.
     */
-    native static Zframe __from (String string);
-    public Zframe from (String string) {
+    native static long __from (String string);
+    public long from (String string) {
         return Zframe.__from (string);
     }
     /*
@@ -55,16 +55,16 @@ public class Zframe implements AutoCloseable {
     was interrupted. Does a blocking recv, if you want to not block then use
     zpoller or zloop.                                                       
     */
-    native static Zframe __recv (void * source);
-    public Zframe recv (void * source) {
+    native static long __recv (long source);
+    public long recv (long source) {
         return Zframe.__recv (source);
     }
     /*
     Send a frame to a socket, destroy frame after sending.
     Return -1 on error, 0 on success.                     
     */
-    native static int __send (Zframe selfP, void * dest, int flags);
-    public int send (Zframe selfP, void * dest, int flags) {
+    native static int __send (long selfP, long dest, int flags);
+    public int send (long selfP, long dest, int flags) {
         return Zframe.__send (selfP, dest, flags);
     }
     /*
@@ -85,8 +85,8 @@ public class Zframe implements AutoCloseable {
     Create a new frame that duplicates an existing frame. If frame is null,
     or memory was exhausted, returns null.                                 
     */
-    native static Zframe __dup (long self);
-    public Zframe dup (long self) {
+    native static long __dup (long self);
+    public long dup (long self) {
         return Zframe.__dup (self);
     }
     /*
@@ -126,7 +126,7 @@ public class Zframe implements AutoCloseable {
     */
     native static void __set_more (long self, int more);
     public void set_more (long self, int more) {
-        return Zframe.__set_more (self, more);
+        Zframe.__set_more (self, more);
     }
     /*
     Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
@@ -142,14 +142,14 @@ public class Zframe implements AutoCloseable {
     */
     native static void __set_routing_id (long self, int routingId);
     public void set_routing_id (long self, int routingId) {
-        return Zframe.__set_routing_id (self, routingId);
+        Zframe.__set_routing_id (self, routingId);
     }
     /*
     Return TRUE if two frames have identical size and data
     If either frame is NULL, equality is always false.    
     */
-    native static boolean __eq (long self, Zframe other);
-    public boolean eq (long self, Zframe other) {
+    native static boolean __eq (long self, long other);
+    public boolean eq (long self, long other) {
         return Zframe.__eq (self, other);
     }
     /*
@@ -157,7 +157,7 @@ public class Zframe implements AutoCloseable {
     */
     native static void __reset (long self, byte [] data, long size);
     public void reset (long self, byte [] data, long size) {
-        return Zframe.__reset (self, data, size);
+        Zframe.__reset (self, data, size);
     }
     /*
     Send message to zsys log sink (may be stdout, or system facility as       
@@ -165,13 +165,13 @@ public class Zframe implements AutoCloseable {
     */
     native static void __print (long self, String prefix);
     public void print (long self, String prefix) {
-        return Zframe.__print (self, prefix);
+        Zframe.__print (self, prefix);
     }
     /*
     Probe the supplied object, and report if it looks like a zframe_t.
     */
-    native static boolean __is (void * self);
-    public boolean is (void * self) {
+    native static boolean __is (long self);
+    public boolean is (long self) {
         return Zframe.__is (self);
     }
     /*
@@ -179,6 +179,6 @@ public class Zframe implements AutoCloseable {
     */
     native static void __test (boolean verbose);
     public void test (boolean verbose) {
-        return Zframe.__test (verbose);
+        Zframe.__test (verbose);
     }
 }

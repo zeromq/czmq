@@ -20,8 +20,9 @@ public class Zconfig implements AutoCloseable {
     /*
     Create new config item
     */
-    native static long __init (String name, Zconfig parent);
-    public Zconfig (String name, Zconfig parent) {
+    native static long __init (String name, long parent);
+    public Zconfig (String name, long parent) {
+        /*  TODO: if __init fails, self is null...  */
         self = __init (name, parent);
     }
     /*
@@ -29,7 +30,7 @@ public class Zconfig implements AutoCloseable {
     */
     native static void __destroy (long self);
     @Override
-    public void close() {
+    public void close () {
         __destroy (self);
         self = 0;
     }
@@ -52,7 +53,7 @@ public class Zconfig implements AutoCloseable {
     */
     native static void __put (long self, String path, String value);
     public void put (long self, String path, String value) {
-        return Zconfig.__put (self, path, value);
+        Zconfig.__put (self, path, value);
     }
     /*
     Equivalent to zconfig_put, accepting a format specifier and variable
@@ -60,7 +61,7 @@ public class Zconfig implements AutoCloseable {
     */
     native static void __putf (long self, String path, String format);
     public void putf (long self, String path, String format) {
-        return Zconfig.__putf (self, path, format);
+        Zconfig.__putf (self, path, format);
     }
     /*
     Get value for config item into a string value; leading slash is optional
@@ -75,7 +76,7 @@ public class Zconfig implements AutoCloseable {
     */
     native static void __set_name (long self, String name);
     public void set_name (long self, String name) {
-        return Zconfig.__set_name (self, name);
+        Zconfig.__set_name (self, name);
     }
     /*
     Set new value for config item. The new value may be a string, a printf  
@@ -85,35 +86,43 @@ public class Zconfig implements AutoCloseable {
     */
     native static void __set_value (long self, String format);
     public void set_value (long self, String format) {
-        return Zconfig.__set_value (self, format);
+        Zconfig.__set_value (self, format);
     }
     /*
     Find our first child, if any
     */
-    native static Zconfig __child (long self);
-    public Zconfig child (long self) {
+    native static long __child (long self);
+    public long child (long self) {
         return Zconfig.__child (self);
     }
     /*
     Find our first sibling, if any
     */
-    native static Zconfig __next (long self);
-    public Zconfig next (long self) {
+    native static long __next (long self);
+    public long next (long self) {
         return Zconfig.__next (self);
     }
     /*
     Find a config item along a path; leading slash is optional and ignored.
     */
-    native static Zconfig __locate (long self, String path);
-    public Zconfig locate (long self, String path) {
+    native static long __locate (long self, String path);
+    public long locate (long self, String path) {
         return Zconfig.__locate (self, path);
     }
     /*
     Locate the last config item at a specified depth
     */
-    native static Zconfig __at_depth (long self, int level);
-    public Zconfig at_depth (long self, int level) {
+    native static long __at_depth (long self, int level);
+    public long at_depth (long self, int level) {
         return Zconfig.__at_depth (self, level);
+    }
+    /*
+    Execute a callback for each config item in the tree; returns zero if
+    successful, else -1.                                                
+    */
+    native static int __execute (long self, long handler, long arg);
+    public int execute (long self, long handler, long arg) {
+        return Zconfig.__execute (self, handler, arg);
     }
     /*
     Add comment to config item before saving to disk. You can add as many
@@ -122,13 +131,13 @@ public class Zconfig implements AutoCloseable {
     */
     native static void __set_comment (long self, String format);
     public void set_comment (long self, String format) {
-        return Zconfig.__set_comment (self, format);
+        Zconfig.__set_comment (self, format);
     }
     /*
     Return comments of config item, as zlist.
     */
-    native static Zlist __comments (long self);
-    public Zlist comments (long self) {
+    native static long __comments (long self);
+    public long comments (long self) {
         return Zconfig.__comments (self);
     }
     /*
@@ -136,8 +145,8 @@ public class Zconfig implements AutoCloseable {
     reference for the root, if the file exists and is readable. Returns NULL
     if the file does not exist.                                             
     */
-    native static Zconfig __load (String filename);
-    public Zconfig load (String filename) {
+    native static long __load (String filename);
+    public long load (String filename) {
         return Zconfig.__load (filename);
     }
     /*
@@ -152,8 +161,8 @@ public class Zconfig implements AutoCloseable {
     Equivalent to zconfig_load, taking a format string instead of a fixed
     filename.                                                            
     */
-    native static Zconfig __loadf (String format);
-    public Zconfig loadf (String format) {
+    native static long __loadf (String format);
+    public long loadf (String format) {
         return Zconfig.__loadf (format);
     }
     /*
@@ -176,29 +185,29 @@ public class Zconfig implements AutoCloseable {
     Returns 0 if OK, -1 if there was an error (and then does not change  
     existing data).                                                      
     */
-    native static int __reload (Zconfig selfP);
-    public int reload (Zconfig selfP) {
+    native static int __reload (long selfP);
+    public int reload (long selfP) {
         return Zconfig.__reload (selfP);
     }
     /*
     Load a config tree from a memory chunk
     */
-    native static Zconfig __chunk_load (Zchunk chunk);
-    public Zconfig chunk_load (Zchunk chunk) {
+    native static long __chunk_load (long chunk);
+    public long chunk_load (long chunk) {
         return Zconfig.__chunk_load (chunk);
     }
     /*
     Save a config tree to a new memory chunk
     */
-    native static Zchunk __chunk_save (long self);
-    public Zchunk chunk_save (long self) {
+    native static long __chunk_save (long self);
+    public long chunk_save (long self) {
         return Zconfig.__chunk_save (self);
     }
     /*
     Load a config tree from a null-terminated string
     */
-    native static Zconfig __str_load (String string);
-    public Zconfig str_load (String string) {
+    native static long __str_load (String string);
+    public long str_load (String string) {
         return Zconfig.__str_load (string);
     }
     /*
@@ -221,13 +230,13 @@ public class Zconfig implements AutoCloseable {
     */
     native static void __print (long self);
     public void print (long self) {
-        return Zconfig.__print (self);
+        Zconfig.__print (self);
     }
     /*
     Self test of this class
     */
     native static void __test (boolean verbose);
     public void test (boolean verbose) {
-        return Zconfig.__test (verbose);
+        Zconfig.__test (verbose);
     }
 }

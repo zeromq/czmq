@@ -6,7 +6,7 @@
 */
 package org.zeromq.czmq;
 
-public class Zstr implements AutoCloseable {
+public class Zstr {
     static {
         try {
             System.loadLibrary ("czmqjni");
@@ -22,22 +22,9 @@ public class Zstr implements AutoCloseable {
     zstr_free(). Returns NULL if the context is being terminated or the 
     process was interrupted.                                            
     */
-    native static String __recv (void * source);
-    public String recv (void * source) {
+    native static String __recv (long source);
+    public String recv (long source) {
         return Zstr.__recv (source);
-    }
-    /*
-    Receive a series of strings (until NULL) from multipart data.    
-    Each string is allocated and filled with string data; if there   
-    are not enough frames, unallocated strings are set to NULL.      
-    Returns -1 if the message could not be read, else returns the    
-    number of strings filled, zero or more. Free each returned string
-    using zstr_free(). If not enough strings are provided, remaining 
-    multipart frames in the message are dropped.                     
-    */
-    native static int __recvx (void * source, String stringP);
-    public int recvx (void * source, String stringP) {
-        return Zstr.__recvx (source, stringP);
     }
     /*
     Send a C string to a socket, as a frame. The string is sent without 
@@ -45,16 +32,16 @@ public class Zstr implements AutoCloseable {
     method that adds a null terminator on the received string. String   
     may be NULL, which is sent as "".                                   
     */
-    native static int __send (void * dest, String string);
-    public int send (void * dest, String string) {
+    native static int __send (long dest, String string);
+    public int send (long dest, String string) {
         return Zstr.__send (dest, string);
     }
     /*
     Send a C string to a socket, as zstr_send(), with a MORE flag, so that
     you can send further strings in the same multi-part message.          
     */
-    native static int __sendm (void * dest, String string);
-    public int sendm (void * dest, String string) {
+    native static int __sendm (long dest, String string);
+    public int sendm (long dest, String string) {
         return Zstr.__sendm (dest, string);
     }
     /*
@@ -62,8 +49,8 @@ public class Zstr implements AutoCloseable {
     user-supplied strings in the format (they may contain '%' which  
     will create security holes).                                     
     */
-    native static int __sendf (void * dest, String format);
-    public int sendf (void * dest, String format) {
+    native static int __sendf (long dest, String format);
+    public int sendf (long dest, String format) {
         return Zstr.__sendf (dest, format);
     }
     /*
@@ -71,31 +58,23 @@ public class Zstr implements AutoCloseable {
     MORE flag, so that you can send further strings in the same multi-part
     message.                                                              
     */
-    native static int __sendfm (void * dest, String format);
-    public int sendfm (void * dest, String format) {
+    native static int __sendfm (long dest, String format);
+    public int sendfm (long dest, String format) {
         return Zstr.__sendfm (dest, format);
     }
     /*
     Send a series of strings (until NULL) as multipart data   
     Returns 0 if the strings could be sent OK, or -1 on error.
     */
-    native static int __sendx (void * dest, String string);
-    public int sendx (void * dest, String string) {
+    native static int __sendx (long dest, String string);
+    public int sendx (long dest, String string) {
         return Zstr.__sendx (dest, string);
-    }
-    /*
-    Free a provided string, and nullify the parent pointer. Safe to call on
-    a null pointer.                                                        
-    */
-    native static void __free (String stringP);
-    public void free (String stringP) {
-        return Zstr.__free (stringP);
     }
     /*
     Self test of this class.
     */
     native static void __test (boolean verbose);
     public void test (boolean verbose) {
-        return Zstr.__test (verbose);
+        Zstr.__test (verbose);
     }
 }

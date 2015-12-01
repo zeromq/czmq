@@ -120,9 +120,28 @@ Java_zlist__1_1size (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT void JNICALL
+Java_zlist__1_1sort (JNIEnv *env, jclass c, jlong self, jlong compare)
+{
+    zlist_sort ((zlist_t *) self, (zlist_compare_fn *) compare);
+}
+
+JNIEXPORT void JNICALL
 Java_zlist__1_1autofree (JNIEnv *env, jclass c, jlong self)
 {
     zlist_autofree ((zlist_t *) self);
+}
+
+JNIEXPORT void JNICALL
+Java_zlist__1_1comparefn (JNIEnv *env, jclass c, jlong self, jlong fn)
+{
+    zlist_comparefn ((zlist_t *) self, (zlist_compare_fn *) fn);
+}
+
+JNIEXPORT jlong JNICALL
+Java_zlist__1_1freefn (JNIEnv *env, jclass c, jlong self, jlong item, jlong fn, jboolean at_tail)
+{
+    jlong freefn_ = (jlong) zlist_freefn ((zlist_t *) self, (void *) item, (zlist_free_fn *) fn, (bool) at_tail);
+    return freefn_;
 }
 
 JNIEXPORT void JNICALL

@@ -24,20 +24,16 @@ Java_zuuid__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
 }
 
 JNIEXPORT jlong JNICALL
-Java_zuuid__1_1new_from (JNIEnv *env, jclass c, jbyteArray source)
+Java_zuuid__1_1new_from (JNIEnv *env, jclass c, jlong source)
 {
-    byte *source_ = (byte *) (*env)->GetByteArrayElements (env, source, 0);
-    jlong new_from_ = (jlong) zuuid_new_from (source_);
-    (*env)->ReleaseByteArrayElements (env, source, (jbyte *) source_, 0);
+    jlong new_from_ = (jlong) zuuid_new_from ((byte *) source);
     return new_from_;
 }
 
 JNIEXPORT void JNICALL
-Java_zuuid__1_1set (JNIEnv *env, jclass c, jlong self, jbyteArray source)
+Java_zuuid__1_1set (JNIEnv *env, jclass c, jlong self, jlong source)
 {
-    byte *source_ = (byte *) (*env)->GetByteArrayElements (env, source, 0);
-    zuuid_set ((zuuid_t *) self, source_);
-    (*env)->ReleaseByteArrayElements (env, source, (jbyte *) source_, 0);
+    zuuid_set ((zuuid_t *) self, (byte *) source);
 }
 
 JNIEXPORT jint JNICALL
@@ -49,7 +45,7 @@ Java_zuuid__1_1set_str (JNIEnv *env, jclass c, jlong self, jstring source)
     return set_str_;
 }
 
-JNIEXPORT jbytearray JNICALL
+JNIEXPORT jlong JNICALL
 Java_zuuid__1_1data (JNIEnv *env, jclass c, jlong self)
 {
     byte *data_ = (byte *) zuuid_data ((zuuid_t *) self);
@@ -80,28 +76,22 @@ Java_zuuid__1_1str_canonical (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT void JNICALL
-Java_zuuid__1_1export (JNIEnv *env, jclass c, jlong self, jbyteArray target)
+Java_zuuid__1_1export (JNIEnv *env, jclass c, jlong self, jlong target)
 {
-    byte *target_ = (byte *) (*env)->GetByteArrayElements (env, target, 0);
-    zuuid_export ((zuuid_t *) self, target_);
-    (*env)->ReleaseByteArrayElements (env, target, (jbyte *) target_, 0);
+    zuuid_export ((zuuid_t *) self, (byte *) target);
 }
 
 JNIEXPORT jboolean JNICALL
-Java_zuuid__1_1eq (JNIEnv *env, jclass c, jlong self, jbyteArray compare)
+Java_zuuid__1_1eq (JNIEnv *env, jclass c, jlong self, jlong compare)
 {
-    byte *compare_ = (byte *) (*env)->GetByteArrayElements (env, compare, 0);
-    jboolean eq_ = (jboolean) zuuid_eq ((zuuid_t *) self, compare_);
-    (*env)->ReleaseByteArrayElements (env, compare, (jbyte *) compare_, 0);
+    jboolean eq_ = (jboolean) zuuid_eq ((zuuid_t *) self, (byte *) compare);
     return eq_;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_zuuid__1_1neq (JNIEnv *env, jclass c, jlong self, jbyteArray compare)
+Java_zuuid__1_1neq (JNIEnv *env, jclass c, jlong self, jlong compare)
 {
-    byte *compare_ = (byte *) (*env)->GetByteArrayElements (env, compare, 0);
-    jboolean neq_ = (jboolean) zuuid_neq ((zuuid_t *) self, compare_);
-    (*env)->ReleaseByteArrayElements (env, compare, (jbyte *) compare_, 0);
+    jboolean neq_ = (jboolean) zuuid_neq ((zuuid_t *) self, (byte *) compare);
     return neq_;
 }
 

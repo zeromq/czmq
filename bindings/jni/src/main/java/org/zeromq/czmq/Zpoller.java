@@ -21,8 +21,8 @@ public class Zpoller implements AutoCloseable {
     Create new poller; the reader can be a libzmq socket (void *), a zsock_t
     instance, or a zactor_t instance.                                       
     */
-    native static long __init (void * reader);
-    public Zpoller (void * reader) {
+    native static long __init (long reader);
+    public Zpoller (long reader) {
         /*  TODO: if __init fails, self is null...  */
         self = __init (reader);
     }
@@ -31,7 +31,7 @@ public class Zpoller implements AutoCloseable {
     */
     native static void __destroy (long self);
     @Override
-    public void close() {
+    public void close () {
         __destroy (self);
         self = 0;
     }
@@ -39,8 +39,8 @@ public class Zpoller implements AutoCloseable {
     Add a reader to be polled. Returns 0 if OK, -1 on failure. The reader may
     be a libzmq void * socket, a zsock_t instance, or a zactor_t instance.   
     */
-    native static int __add (long self, void * reader);
-    public int add (long self, void * reader) {
+    native static int __add (long self, long reader);
+    public int add (long self, long reader) {
         return Zpoller.__add (self, reader);
     }
     /*
@@ -48,8 +48,8 @@ public class Zpoller implements AutoCloseable {
     reader may be a libzmq void * socket, a zsock_t instance, or a zactor_t
     instance.                                                              
     */
-    native static int __remove (long self, void * reader);
-    public int remove (long self, void * reader) {
+    native static int __remove (long self, long reader);
+    public int remove (long self, long reader) {
         return Zpoller.__remove (self, reader);
     }
     /*
@@ -63,8 +63,8 @@ public class Zpoller implements AutoCloseable {
     You can test the actual exit condition by calling zpoller_expired () and  
     zpoller_terminated (). The timeout is in msec.                            
     */
-    native static void * __wait (long self, int timeout);
-    public void * wait (long self, int timeout) {
+    native static long __wait (long self, int timeout);
+    public long Wait (long self, int timeout) {
         return Zpoller.__wait (self, timeout);
     }
     /*
@@ -90,13 +90,13 @@ public class Zpoller implements AutoCloseable {
     */
     native static void __ignore_interrupts (long self);
     public void ignore_interrupts (long self) {
-        return Zpoller.__ignore_interrupts (self);
+        Zpoller.__ignore_interrupts (self);
     }
     /*
     Self test of this class.
     */
     native static void __test (boolean verbose);
     public void test (boolean verbose) {
-        return Zpoller.__test (verbose);
+        Zpoller.__test (verbose);
     }
 }

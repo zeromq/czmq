@@ -30,7 +30,7 @@ public class Ziflist implements AutoCloseable {
     */
     native static void __destroy (long self);
     @Override
-    public void close() {
+    public void close () {
         __destroy (self);
         self = 0;
     }
@@ -39,7 +39,7 @@ public class Ziflist implements AutoCloseable {
     */
     native static void __reload (long self);
     public void reload (long self) {
-        return Ziflist.__reload (self);
+        Ziflist.__reload (self);
     }
     /*
     Return the number of network interfaces on system
@@ -88,13 +88,13 @@ public class Ziflist implements AutoCloseable {
     */
     native static void __print (long self);
     public void print (long self) {
-        return Ziflist.__print (self);
+        Ziflist.__print (self);
     }
     /*
     Self test of this class.
     */
     native static void __test (boolean verbose);
     public void test (boolean verbose) {
-        return Ziflist.__test (verbose);
+        Ziflist.__test (verbose);
     }
 }

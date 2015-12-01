@@ -32,7 +32,7 @@ public class Zdir implements AutoCloseable {
     */
     native static void __destroy (long self);
     @Override
-    public void close() {
+    public void close () {
         __destroy (self);
         self = 0;
     }
@@ -70,8 +70,8 @@ public class Zdir implements AutoCloseable {
     to a zfile_t item already allocated in the zdir tree. Do not destroy the   
     original zdir tree until you are done with this list.                      
     */
-    native static Zlist __list (long self);
-    public Zlist list (long self) {
+    native static long __list (long self);
+    public long list (long self) {
         return Zdir.__list (self);
     }
     /*
@@ -81,7 +81,7 @@ public class Zdir implements AutoCloseable {
     */
     native static void __remove (long self, boolean force);
     public void remove (long self, boolean force) {
-        return Zdir.__remove (self, force);
+        Zdir.__remove (self, force);
     }
     /*
     Calculate differences between two versions of a directory tree.    
@@ -89,23 +89,23 @@ public class Zdir implements AutoCloseable {
     be null, indicating the directory is empty/absent. If alias is set,
     generates virtual filename (minus path, plus alias).               
     */
-    native static Zlist __diff (Zdir older, Zdir newer, String alias);
-    public Zlist diff (Zdir older, Zdir newer, String alias) {
+    native static long __diff (long older, long newer, String alias);
+    public long diff (long older, long newer, String alias) {
         return Zdir.__diff (older, newer, alias);
     }
     /*
     Return full contents of directory as a zdir_patch list.
     */
-    native static Zlist __resync (long self, String alias);
-    public Zlist resync (long self, String alias) {
+    native static long __resync (long self, String alias);
+    public long resync (long self, String alias) {
         return Zdir.__resync (self, alias);
     }
     /*
     Load directory cache; returns a hash table containing the SHA-1 digests
     of every file in the tree. The cache is saved between runs in .cache.  
     */
-    native static Zhash __cache (long self);
-    public Zhash cache (long self) {
+    native static long __cache (long self);
+    public long cache (long self) {
         return Zdir.__cache (self);
     }
     /*
@@ -113,7 +113,7 @@ public class Zdir implements AutoCloseable {
     */
     native static void __print (long self, int indent);
     public void print (long self, int indent) {
-        return Zdir.__print (self, indent);
+        Zdir.__print (self, indent);
     }
     /*
     Create a new zdir_watch actor instance:                       
@@ -143,15 +143,15 @@ public class Zdir implements AutoCloseable {
         free (path);                                              
         zlist_destroy (&patches);                                 
     */
-    native static void __watch (Zsock pipe, void * unused);
-    public void watch (Zsock pipe, void * unused) {
-        return Zdir.__watch (pipe, unused);
+    native static void __watch (long pipe, long unused);
+    public void watch (long pipe, long unused) {
+        Zdir.__watch (pipe, unused);
     }
     /*
     Self test of this class.
     */
     native static void __test (boolean verbose);
     public void test (boolean verbose) {
-        return Zdir.__test (verbose);
+        Zdir.__test (verbose);
     }
 }
