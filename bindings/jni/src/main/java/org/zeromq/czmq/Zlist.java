@@ -6,7 +6,7 @@
 */
 package org.zeromq.czmq;
 
-public class Zlist implements AutoCloseable {
+public class Zlist implements AutoCloseable{
     static {
         try {
             System.loadLibrary ("czmqjni");
@@ -16,7 +16,6 @@ public class Zlist implements AutoCloseable {
         }
     }
     long self;
-
     /*
     Create a new list container
     */
@@ -30,7 +29,7 @@ public class Zlist implements AutoCloseable {
     */
     native static void __destroy (long self);
     @Override
-    public void close() {
+    public void close () {
         __destroy (self);
         self = 0;
     }
@@ -38,88 +37,88 @@ public class Zlist implements AutoCloseable {
     Return the item at the head of list. If the list is empty, returns NULL.
     Leaves cursor pointing at the head item, or NULL if the list is empty.  
     */
-    native static void * __first (long self);
-    public void * first (long self) {
-        return Zlist.__first (self);
+    native static long __first (long self);
+    public long first (long self) {
+        return __first (self);
     }
     /*
     Return the next item. If the list is empty, returns NULL. To move to
     the start of the list call zlist_first (). Advances the cursor.     
     */
-    native static void * __next (long self);
-    public void * next (long self) {
-        return Zlist.__next (self);
+    native static long __next (long self);
+    public long next (long self) {
+        return __next (self);
     }
     /*
     Return the item at the tail of list. If the list is empty, returns NULL.
     Leaves cursor pointing at the tail item, or NULL if the list is empty.  
     */
-    native static void * __last (long self);
-    public void * last (long self) {
-        return Zlist.__last (self);
+    native static long __last (long self);
+    public long last (long self) {
+        return __last (self);
     }
     /*
     Return first item in the list, or null, leaves the cursor
     */
-    native static void * __head (long self);
-    public void * head (long self) {
-        return Zlist.__head (self);
+    native static long __head (long self);
+    public long head (long self) {
+        return __head (self);
     }
     /*
     Return last item in the list, or null, leaves the cursor
     */
-    native static void * __tail (long self);
-    public void * tail (long self) {
-        return Zlist.__tail (self);
+    native static long __tail (long self);
+    public long tail (long self) {
+        return __tail (self);
     }
     /*
     Return the current item of list. If the list is empty, returns NULL.     
     Leaves cursor pointing at the current item, or NULL if the list is empty.
     */
-    native static void * __item (long self);
-    public void * item (long self) {
-        return Zlist.__item (self);
+    native static long __item (long self);
+    public long item (long self) {
+        return __item (self);
     }
     /*
     Append an item to the end of the list, return 0 if OK or -1 if this  
     failed for some reason (out of memory). Note that if a duplicator has
     been set, this method will also duplicate the item.                  
     */
-    native static int __append (long self, void * item);
-    public int append (long self, void * item) {
-        return Zlist.__append (self, item);
+    native static int __append (long self, long item);
+    public int append (long self, long item) {
+        return __append (self, item);
     }
     /*
     Push an item to the start of the list, return 0 if OK or -1 if this  
     failed for some reason (out of memory). Note that if a duplicator has
     been set, this method will also duplicate the item.                  
     */
-    native static int __push (long self, void * item);
-    public int push (long self, void * item) {
-        return Zlist.__push (self, item);
+    native static int __push (long self, long item);
+    public int push (long self, long item) {
+        return __push (self, item);
     }
     /*
     Pop the item off the start of the list, if any
     */
-    native static void * __pop (long self);
-    public void * pop (long self) {
-        return Zlist.__pop (self);
+    native static long __pop (long self);
+    public long pop (long self) {
+        return __pop (self);
     }
     /*
     Checks if an item already is present. Uses compare method to determine if 
     items are equal. If the compare method is NULL the check will only compare
     pointers. Returns true if item is present else false.                     
     */
-    native static boolean __exists (long self, void * item);
-    public boolean exists (long self, void * item) {
-        return Zlist.__exists (self, item);
+    native static boolean __exists (long self, long item);
+    public boolean exists (long self, long item) {
+        return __exists (self, item);
     }
     /*
     Remove the specified item from the list if present
     */
-    native static void __remove (long self, void * item);
-    public void remove (long self, void * item) {
-        return Zlist.__remove (self, item);
+    native static void __remove (long self, long item);
+    public void remove (long self, long item) {
+        __remove (self, item);
     }
     /*
     Make a copy of list. If the list has autofree set, the copied list will  
@@ -127,23 +126,31 @@ public class Zlist implements AutoCloseable {
     pointers back to the items in the original list. If list is null, returns
     NULL.                                                                    
     */
-    native static Zlist __dup (long self);
-    public Zlist dup (long self) {
-        return Zlist.__dup (self);
+    native static long __dup (long self);
+    public long dup (long self) {
+        return __dup (self);
     }
     /*
     Purge all items from list
     */
     native static void __purge (long self);
     public void purge (long self) {
-        return Zlist.__purge (self);
+        __purge (self);
     }
     /*
     Return number of items in the list
     */
     native static long __size (long self);
     public long size (long self) {
-        return Zlist.__size (self);
+        return __size (self);
+    }
+    /*
+    Sort the list by ascending key value using a straight ASCII comparison.
+    The sort is not stable, so may reorder items with the same keys.       
+    */
+    native static void __sort (long self, long compare);
+    public void sort (long self, long compare) {
+        __sort (self, compare);
     }
     /*
     Set list for automatic item destruction; item values MUST be strings. 
@@ -157,13 +164,35 @@ public class Zlist implements AutoCloseable {
     */
     native static void __autofree (long self);
     public void autofree (long self) {
-        return Zlist.__autofree (self);
+        __autofree (self);
+    }
+    /*
+    Sets a compare function for this list. The function compares two items.
+    It returns an integer less than, equal to, or greater than zero if the 
+    first item is found, respectively, to be less than, to match, or be    
+    greater than the second item.                                          
+    This function is used for sorting, removal and exists checking.        
+    */
+    native static void __comparefn (long self, long fn);
+    public void comparefn (long self, long fn) {
+        __comparefn (self, fn);
+    }
+    /*
+    Set a free function for the specified list item. When the item is     
+    destroyed, the free function, if any, is called on that item.         
+    Use this when list items are dynamically allocated, to ensure that    
+    you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
+    Returns the item, or NULL if there is no such item.                   
+    */
+    native static long __freefn (long self, long item, long fn, boolean atTail);
+    public long freefn (long self, long item, long fn, boolean atTail) {
+        return __freefn (self, item, fn, atTail);
     }
     /*
     Self test of this class.
     */
     native static void __test (boolean verbose);
     public void test (boolean verbose) {
-        return Zlist.__test (verbose);
+        __test (verbose);
     }
 }

@@ -11,11 +11,9 @@
 #include "../../native/include/org_zeromq_czmq_Zframe.h"
 
 JNIEXPORT jlong JNICALL
-Java_zframe__1_1new (JNIEnv *env, jclass c, jbyteArray data, jlong size)
+Java_zframe__1_1new (JNIEnv *env, jclass c, jlong data, jlong size)
 {
-    byte *data_ = (byte *) (*env)->GetByteArrayElements (env, data, 0);
-    jlong new_ = (jlong) zframe_new (data_, (size_t) size);
-    (*env)->ReleaseByteArrayElements (env, data, (jbyte *) data_, 0);
+    jlong new_ = (jlong) zframe_new ((const void *) data, (size_t) size);
     return new_;
 }
 
@@ -62,7 +60,7 @@ Java_zframe__1_1size (JNIEnv *env, jclass c, jlong self)
     return size_;
 }
 
-JNIEXPORT jbytearray JNICALL
+JNIEXPORT jlong JNICALL
 Java_zframe__1_1data (JNIEnv *env, jclass c, jlong self)
 {
     byte *data_ = (byte *) zframe_data ((zframe_t *) self);
@@ -137,11 +135,9 @@ Java_zframe__1_1eq (JNIEnv *env, jclass c, jlong self, jlong other)
 }
 
 JNIEXPORT void JNICALL
-Java_zframe__1_1reset (JNIEnv *env, jclass c, jlong self, jbyteArray data, jlong size)
+Java_zframe__1_1reset (JNIEnv *env, jclass c, jlong self, jlong data, jlong size)
 {
-    byte *data_ = (byte *) (*env)->GetByteArrayElements (env, data, 0);
-    zframe_reset ((zframe_t *) self, data_, (size_t) size);
-    (*env)->ReleaseByteArrayElements (env, data, (jbyte *) data_, 0);
+    zframe_reset ((zframe_t *) self, (const void *) data, (size_t) size);
 }
 
 JNIEXPORT void JNICALL

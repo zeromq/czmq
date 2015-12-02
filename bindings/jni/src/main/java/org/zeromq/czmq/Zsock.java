@@ -6,7 +6,7 @@
 */
 package org.zeromq.czmq;
 
-public class Zsock implements AutoCloseable {
+public class Zsock implements AutoCloseable{
     static {
         try {
             System.loadLibrary ("czmqjni");
@@ -16,7 +16,6 @@ public class Zsock implements AutoCloseable {
         }
     }
     long self;
-
     /*
     Create a new socket. Returns the new socket, or NULL if the new socket
     could not be created. Note that the symbol zsock_new (and other       
@@ -30,114 +29,117 @@ public class Zsock implements AutoCloseable {
         /*  TODO: if __init fails, self is null...  */
         self = __init (type);
     }
+    public Zsock () {
+        self = 0;
+    }
     /*
     Destroy the socket. You must use this for any socket created via the
     zsock_new method.                                                   
     */
     native static void __destroy (long self);
     @Override
-    public void close() {
+    public void close () {
         __destroy (self);
         self = 0;
     }
     /*
     Create a PUB socket. Default action is bind.
     */
-    native static Zsock __new_pub (String endpoint);
-    public Zsock new_pub (String endpoint) {
-        return Zsock.__new_pub (endpoint);
+    native static long __new_pub (String endpoint);
+    public long newPub (String endpoint) {
+        return __new_pub (endpoint);
     }
     /*
     Create a SUB socket, and optionally subscribe to some prefix string. Default
     action is connect.                                                          
     */
-    native static Zsock __new_sub (String endpoint, String subscribe);
-    public Zsock new_sub (String endpoint, String subscribe) {
-        return Zsock.__new_sub (endpoint, subscribe);
+    native static long __new_sub (String endpoint, String subscribe);
+    public long newSub (String endpoint, String subscribe) {
+        return __new_sub (endpoint, subscribe);
     }
     /*
     Create a REQ socket. Default action is connect.
     */
-    native static Zsock __new_req (String endpoint);
-    public Zsock new_req (String endpoint) {
-        return Zsock.__new_req (endpoint);
+    native static long __new_req (String endpoint);
+    public long newReq (String endpoint) {
+        return __new_req (endpoint);
     }
     /*
     Create a REP socket. Default action is bind.
     */
-    native static Zsock __new_rep (String endpoint);
-    public Zsock new_rep (String endpoint) {
-        return Zsock.__new_rep (endpoint);
+    native static long __new_rep (String endpoint);
+    public long newRep (String endpoint) {
+        return __new_rep (endpoint);
     }
     /*
     Create a DEALER socket. Default action is connect.
     */
-    native static Zsock __new_dealer (String endpoint);
-    public Zsock new_dealer (String endpoint) {
-        return Zsock.__new_dealer (endpoint);
+    native static long __new_dealer (String endpoint);
+    public long newDealer (String endpoint) {
+        return __new_dealer (endpoint);
     }
     /*
     Create a ROUTER socket. Default action is bind.
     */
-    native static Zsock __new_router (String endpoint);
-    public Zsock new_router (String endpoint) {
-        return Zsock.__new_router (endpoint);
+    native static long __new_router (String endpoint);
+    public long newRouter (String endpoint) {
+        return __new_router (endpoint);
     }
     /*
     Create a PUSH socket. Default action is connect.
     */
-    native static Zsock __new_push (String endpoint);
-    public Zsock new_push (String endpoint) {
-        return Zsock.__new_push (endpoint);
+    native static long __new_push (String endpoint);
+    public long newPush (String endpoint) {
+        return __new_push (endpoint);
     }
     /*
     Create a PULL socket. Default action is bind.
     */
-    native static Zsock __new_pull (String endpoint);
-    public Zsock new_pull (String endpoint) {
-        return Zsock.__new_pull (endpoint);
+    native static long __new_pull (String endpoint);
+    public long newPull (String endpoint) {
+        return __new_pull (endpoint);
     }
     /*
     Create an XPUB socket. Default action is bind.
     */
-    native static Zsock __new_xpub (String endpoint);
-    public Zsock new_xpub (String endpoint) {
-        return Zsock.__new_xpub (endpoint);
+    native static long __new_xpub (String endpoint);
+    public long newXpub (String endpoint) {
+        return __new_xpub (endpoint);
     }
     /*
     Create an XSUB socket. Default action is connect.
     */
-    native static Zsock __new_xsub (String endpoint);
-    public Zsock new_xsub (String endpoint) {
-        return Zsock.__new_xsub (endpoint);
+    native static long __new_xsub (String endpoint);
+    public long newXsub (String endpoint) {
+        return __new_xsub (endpoint);
     }
     /*
     Create a PAIR socket. Default action is connect.
     */
-    native static Zsock __new_pair (String endpoint);
-    public Zsock new_pair (String endpoint) {
-        return Zsock.__new_pair (endpoint);
+    native static long __new_pair (String endpoint);
+    public long newPair (String endpoint) {
+        return __new_pair (endpoint);
     }
     /*
     Create a STREAM socket. Default action is connect.
     */
-    native static Zsock __new_stream (String endpoint);
-    public Zsock new_stream (String endpoint) {
-        return Zsock.__new_stream (endpoint);
+    native static long __new_stream (String endpoint);
+    public long newStream (String endpoint) {
+        return __new_stream (endpoint);
     }
     /*
     Create a SERVER socket. Default action is bind.
     */
-    native static Zsock __new_server (String endpoint);
-    public Zsock new_server (String endpoint) {
-        return Zsock.__new_server (endpoint);
+    native static long __new_server (String endpoint);
+    public long newServer (String endpoint) {
+        return __new_server (endpoint);
     }
     /*
     Create a CLIENT socket. Default action is connect.
     */
-    native static Zsock __new_client (String endpoint);
-    public Zsock new_client (String endpoint) {
-        return Zsock.__new_client (endpoint);
+    native static long __new_client (String endpoint);
+    public long newClient (String endpoint) {
+        return __new_client (endpoint);
     }
     /*
     Bind a socket to a formatted endpoint. For tcp:// endpoints, supports   
@@ -163,14 +165,14 @@ public class Zsock implements AutoCloseable {
     */
     native static int __bind (long self, String format);
     public int bind (long self, String format) {
-        return Zsock.__bind (self, format);
+        return __bind (self, format);
     }
     /*
     Returns last bound endpoint, if any.
     */
     native static String __endpoint (long self);
     public String endpoint (long self) {
-        return Zsock.__endpoint (self);
+        return __endpoint (self);
     }
     /*
     Unbind a socket from a formatted endpoint.                     
@@ -179,7 +181,7 @@ public class Zsock implements AutoCloseable {
     */
     native static int __unbind (long self, String format);
     public int unbind (long self, String format) {
-        return Zsock.__unbind (self, format);
+        return __unbind (self, format);
     }
     /*
     Connect a socket to a formatted endpoint        
@@ -187,7 +189,7 @@ public class Zsock implements AutoCloseable {
     */
     native static int __connect (long self, String format);
     public int connect (long self, String format) {
-        return Zsock.__connect (self, format);
+        return __connect (self, format);
     }
     /*
     Disconnect a socket from a formatted endpoint                  
@@ -196,7 +198,7 @@ public class Zsock implements AutoCloseable {
     */
     native static int __disconnect (long self, String format);
     public int disconnect (long self, String format) {
-        return Zsock.__disconnect (self, format);
+        return __disconnect (self, format);
     }
     /*
     Attach a socket to zero or more endpoints. If endpoints is not null,     
@@ -208,14 +210,14 @@ public class Zsock implements AutoCloseable {
     */
     native static int __attach (long self, String endpoints, boolean serverish);
     public int attach (long self, String endpoints, boolean serverish) {
-        return Zsock.__attach (self, endpoints, serverish);
+        return __attach (self, endpoints, serverish);
     }
     /*
     Returns socket type as printable constant string.
     */
     native static String __type_str (long self);
-    public String type_str (long self) {
-        return Zsock.__type_str (self);
+    public String typeStr (long self) {
+        return __type_str (self);
     }
     /*
     Send a 'picture' message to the socket (or actor). The picture is a   
@@ -247,7 +249,7 @@ public class Zsock implements AutoCloseable {
     */
     native static int __send (long self, String picture);
     public int send (long self, String picture) {
-        return Zsock.__send (self, picture);
+        return __send (self, picture);
     }
     /*
     Receive a 'picture' message to the socket (or actor). See zsock_send for
@@ -279,7 +281,7 @@ public class Zsock implements AutoCloseable {
     */
     native static int __recv (long self, String picture);
     public int recv (long self, String picture) {
-        return Zsock.__recv (self, picture);
+        return __recv (self, picture);
     }
     /*
     Send a binary encoded 'picture' message to the socket (or actor). This 
@@ -306,7 +308,7 @@ public class Zsock implements AutoCloseable {
     */
     native static int __bsend (long self, String picture);
     public int bsend (long self, String picture) {
-        return Zsock.__bsend (self, picture);
+        return __bsend (self, picture);
     }
     /*
     Receive a binary encoded 'picture' message from the socket (or actor).  
@@ -320,23 +322,23 @@ public class Zsock implements AutoCloseable {
     */
     native static int __brecv (long self, String picture);
     public int brecv (long self, String picture) {
-        return Zsock.__brecv (self, picture);
+        return __brecv (self, picture);
     }
     /*
     Return socket routing ID if any. This returns 0 if the socket is not
     of type ZMQ_SERVER or if no request was already received on it.     
     */
     native static int __routing_id (long self);
-    public int routing_id (long self) {
-        return Zsock.__routing_id (self);
+    public int routingId (long self) {
+        return __routing_id (self);
     }
     /*
     Set routing ID on socket. The socket MUST be of type ZMQ_SERVER.        
     This will be used when sending messages on the socket via the zsock API.
     */
     native static void __set_routing_id (long self, int routingId);
-    public void set_routing_id (long self, int routingId) {
-        return Zsock.__set_routing_id (self, routingId);
+    public void setRoutingId (long self, int routingId) {
+        __set_routing_id (self, routingId);
     }
     /*
     Set socket to use unbounded pipes (HWM=0); use this in cases when you are
@@ -344,8 +346,8 @@ public class Zsock implements AutoCloseable {
     across all versions of ZeroMQ. Takes a polymorphic socket reference.     
     */
     native static void __set_unbounded (long self);
-    public void set_unbounded (long self) {
-        return Zsock.__set_unbounded (self);
+    public void setUnbounded (long self) {
+        __set_unbounded (self);
     }
     /*
     Send a signal over a socket. A signal is a short message carrying a   
@@ -356,7 +358,7 @@ public class Zsock implements AutoCloseable {
     */
     native static int __signal (long self, byte status);
     public int signal (long self, byte status) {
-        return Zsock.__signal (self, status);
+        return __signal (self, status);
     }
     /*
     Wait on a signal. Use this to coordinate between threads, over pipe  
@@ -365,8 +367,8 @@ public class Zsock implements AutoCloseable {
     Takes a polymorphic socket reference.                                
     */
     native static int __wait (long self);
-    public int wait (long self) {
-        return Zsock.__wait (self);
+    public int Wait (long self) {
+        return __wait (self);
     }
     /*
     If there is a partial message still waiting on the socket, remove and    
@@ -375,15 +377,15 @@ public class Zsock implements AutoCloseable {
     */
     native static void __flush (long self);
     public void flush (long self) {
-        return Zsock.__flush (self);
+        __flush (self);
     }
     /*
     Probe the supplied object, and report if it looks like a zsock_t.
     Takes a polymorphic socket reference.                            
     */
-    native static boolean __is (void * self);
-    public boolean is (void * self) {
-        return Zsock.__is (self);
+    native static boolean __is (long self);
+    public boolean is (long self) {
+        return __is (self);
     }
     /*
     Probe the supplied reference. If it looks like a zsock_t instance, return
@@ -391,666 +393,666 @@ public class Zsock implements AutoCloseable {
     descriptor, return NULL; else if it looks like a libzmq socket handle,   
     return the supplied value. Takes a polymorphic socket reference.         
     */
-    native static void * __resolve (void * self);
-    public void * resolve (void * self) {
-        return Zsock.__resolve (self);
+    native static long __resolve (long self);
+    public long resolve (long self) {
+        return __resolve (self);
     }
     /*
     Get socket option `tos`.
     */
     native static int __tos (long self);
     public int tos (long self) {
-        return Zsock.__tos (self);
+        return __tos (self);
     }
     /*
     Set socket option `tos`.
     */
     native static void __set_tos (long self, int tos);
-    public void set_tos (long self, int tos) {
-        return Zsock.__set_tos (self, tos);
+    public void setTos (long self, int tos) {
+        __set_tos (self, tos);
     }
     /*
     Set socket option `router_handover`.
     */
     native static void __set_router_handover (long self, int routerHandover);
-    public void set_router_handover (long self, int routerHandover) {
-        return Zsock.__set_router_handover (self, routerHandover);
+    public void setRouterHandover (long self, int routerHandover) {
+        __set_router_handover (self, routerHandover);
     }
     /*
     Set socket option `router_mandatory`.
     */
     native static void __set_router_mandatory (long self, int routerMandatory);
-    public void set_router_mandatory (long self, int routerMandatory) {
-        return Zsock.__set_router_mandatory (self, routerMandatory);
+    public void setRouterMandatory (long self, int routerMandatory) {
+        __set_router_mandatory (self, routerMandatory);
     }
     /*
     Set socket option `probe_router`.
     */
     native static void __set_probe_router (long self, int probeRouter);
-    public void set_probe_router (long self, int probeRouter) {
-        return Zsock.__set_probe_router (self, probeRouter);
+    public void setProbeRouter (long self, int probeRouter) {
+        __set_probe_router (self, probeRouter);
     }
     /*
     Set socket option `req_relaxed`.
     */
     native static void __set_req_relaxed (long self, int reqRelaxed);
-    public void set_req_relaxed (long self, int reqRelaxed) {
-        return Zsock.__set_req_relaxed (self, reqRelaxed);
+    public void setReqRelaxed (long self, int reqRelaxed) {
+        __set_req_relaxed (self, reqRelaxed);
     }
     /*
     Set socket option `req_correlate`.
     */
     native static void __set_req_correlate (long self, int reqCorrelate);
-    public void set_req_correlate (long self, int reqCorrelate) {
-        return Zsock.__set_req_correlate (self, reqCorrelate);
+    public void setReqCorrelate (long self, int reqCorrelate) {
+        __set_req_correlate (self, reqCorrelate);
     }
     /*
     Set socket option `conflate`.
     */
     native static void __set_conflate (long self, int conflate);
-    public void set_conflate (long self, int conflate) {
-        return Zsock.__set_conflate (self, conflate);
+    public void setConflate (long self, int conflate) {
+        __set_conflate (self, conflate);
     }
     /*
     Get socket option `zap_domain`.
     */
     native static String __zap_domain (long self);
-    public String zap_domain (long self) {
-        return Zsock.__zap_domain (self);
+    public String zapDomain (long self) {
+        return __zap_domain (self);
     }
     /*
     Set socket option `zap_domain`.
     */
     native static void __set_zap_domain (long self, String zapDomain);
-    public void set_zap_domain (long self, String zapDomain) {
-        return Zsock.__set_zap_domain (self, zapDomain);
+    public void setZapDomain (long self, String zapDomain) {
+        __set_zap_domain (self, zapDomain);
     }
     /*
     Get socket option `mechanism`.
     */
     native static int __mechanism (long self);
     public int mechanism (long self) {
-        return Zsock.__mechanism (self);
+        return __mechanism (self);
     }
     /*
     Get socket option `plain_server`.
     */
     native static int __plain_server (long self);
-    public int plain_server (long self) {
-        return Zsock.__plain_server (self);
+    public int plainServer (long self) {
+        return __plain_server (self);
     }
     /*
     Set socket option `plain_server`.
     */
     native static void __set_plain_server (long self, int plainServer);
-    public void set_plain_server (long self, int plainServer) {
-        return Zsock.__set_plain_server (self, plainServer);
+    public void setPlainServer (long self, int plainServer) {
+        __set_plain_server (self, plainServer);
     }
     /*
     Get socket option `plain_username`.
     */
     native static String __plain_username (long self);
-    public String plain_username (long self) {
-        return Zsock.__plain_username (self);
+    public String plainUsername (long self) {
+        return __plain_username (self);
     }
     /*
     Set socket option `plain_username`.
     */
     native static void __set_plain_username (long self, String plainUsername);
-    public void set_plain_username (long self, String plainUsername) {
-        return Zsock.__set_plain_username (self, plainUsername);
+    public void setPlainUsername (long self, String plainUsername) {
+        __set_plain_username (self, plainUsername);
     }
     /*
     Get socket option `plain_password`.
     */
     native static String __plain_password (long self);
-    public String plain_password (long self) {
-        return Zsock.__plain_password (self);
+    public String plainPassword (long self) {
+        return __plain_password (self);
     }
     /*
     Set socket option `plain_password`.
     */
     native static void __set_plain_password (long self, String plainPassword);
-    public void set_plain_password (long self, String plainPassword) {
-        return Zsock.__set_plain_password (self, plainPassword);
+    public void setPlainPassword (long self, String plainPassword) {
+        __set_plain_password (self, plainPassword);
     }
     /*
     Get socket option `curve_server`.
     */
     native static int __curve_server (long self);
-    public int curve_server (long self) {
-        return Zsock.__curve_server (self);
+    public int curveServer (long self) {
+        return __curve_server (self);
     }
     /*
     Set socket option `curve_server`.
     */
     native static void __set_curve_server (long self, int curveServer);
-    public void set_curve_server (long self, int curveServer) {
-        return Zsock.__set_curve_server (self, curveServer);
+    public void setCurveServer (long self, int curveServer) {
+        __set_curve_server (self, curveServer);
     }
     /*
     Get socket option `curve_publickey`.
     */
     native static String __curve_publickey (long self);
-    public String curve_publickey (long self) {
-        return Zsock.__curve_publickey (self);
+    public String curvePublickey (long self) {
+        return __curve_publickey (self);
     }
     /*
     Set socket option `curve_publickey`.
     */
     native static void __set_curve_publickey (long self, String curvePublickey);
-    public void set_curve_publickey (long self, String curvePublickey) {
-        return Zsock.__set_curve_publickey (self, curvePublickey);
+    public void setCurvePublickey (long self, String curvePublickey) {
+        __set_curve_publickey (self, curvePublickey);
     }
     /*
     Set socket option `curve_publickey` from 32-octet binary
     */
     native static void __set_curve_publickey_bin (long self, byte [] curvePublickey);
-    public void set_curve_publickey_bin (long self, byte [] curvePublickey) {
-        return Zsock.__set_curve_publickey_bin (self, curvePublickey);
+    public void setCurvePublickeyBin (long self, byte [] curvePublickey) {
+        __set_curve_publickey_bin (self, curvePublickey);
     }
     /*
     Get socket option `curve_secretkey`.
     */
     native static String __curve_secretkey (long self);
-    public String curve_secretkey (long self) {
-        return Zsock.__curve_secretkey (self);
+    public String curveSecretkey (long self) {
+        return __curve_secretkey (self);
     }
     /*
     Set socket option `curve_secretkey`.
     */
     native static void __set_curve_secretkey (long self, String curveSecretkey);
-    public void set_curve_secretkey (long self, String curveSecretkey) {
-        return Zsock.__set_curve_secretkey (self, curveSecretkey);
+    public void setCurveSecretkey (long self, String curveSecretkey) {
+        __set_curve_secretkey (self, curveSecretkey);
     }
     /*
     Set socket option `curve_secretkey` from 32-octet binary
     */
     native static void __set_curve_secretkey_bin (long self, byte [] curveSecretkey);
-    public void set_curve_secretkey_bin (long self, byte [] curveSecretkey) {
-        return Zsock.__set_curve_secretkey_bin (self, curveSecretkey);
+    public void setCurveSecretkeyBin (long self, byte [] curveSecretkey) {
+        __set_curve_secretkey_bin (self, curveSecretkey);
     }
     /*
     Get socket option `curve_serverkey`.
     */
     native static String __curve_serverkey (long self);
-    public String curve_serverkey (long self) {
-        return Zsock.__curve_serverkey (self);
+    public String curveServerkey (long self) {
+        return __curve_serverkey (self);
     }
     /*
     Set socket option `curve_serverkey`.
     */
     native static void __set_curve_serverkey (long self, String curveServerkey);
-    public void set_curve_serverkey (long self, String curveServerkey) {
-        return Zsock.__set_curve_serverkey (self, curveServerkey);
+    public void setCurveServerkey (long self, String curveServerkey) {
+        __set_curve_serverkey (self, curveServerkey);
     }
     /*
     Set socket option `curve_serverkey` from 32-octet binary
     */
     native static void __set_curve_serverkey_bin (long self, byte [] curveServerkey);
-    public void set_curve_serverkey_bin (long self, byte [] curveServerkey) {
-        return Zsock.__set_curve_serverkey_bin (self, curveServerkey);
+    public void setCurveServerkeyBin (long self, byte [] curveServerkey) {
+        __set_curve_serverkey_bin (self, curveServerkey);
     }
     /*
     Get socket option `gssapi_server`.
     */
     native static int __gssapi_server (long self);
-    public int gssapi_server (long self) {
-        return Zsock.__gssapi_server (self);
+    public int gssapiServer (long self) {
+        return __gssapi_server (self);
     }
     /*
     Set socket option `gssapi_server`.
     */
     native static void __set_gssapi_server (long self, int gssapiServer);
-    public void set_gssapi_server (long self, int gssapiServer) {
-        return Zsock.__set_gssapi_server (self, gssapiServer);
+    public void setGssapiServer (long self, int gssapiServer) {
+        __set_gssapi_server (self, gssapiServer);
     }
     /*
     Get socket option `gssapi_plaintext`.
     */
     native static int __gssapi_plaintext (long self);
-    public int gssapi_plaintext (long self) {
-        return Zsock.__gssapi_plaintext (self);
+    public int gssapiPlaintext (long self) {
+        return __gssapi_plaintext (self);
     }
     /*
     Set socket option `gssapi_plaintext`.
     */
     native static void __set_gssapi_plaintext (long self, int gssapiPlaintext);
-    public void set_gssapi_plaintext (long self, int gssapiPlaintext) {
-        return Zsock.__set_gssapi_plaintext (self, gssapiPlaintext);
+    public void setGssapiPlaintext (long self, int gssapiPlaintext) {
+        __set_gssapi_plaintext (self, gssapiPlaintext);
     }
     /*
     Get socket option `gssapi_principal`.
     */
     native static String __gssapi_principal (long self);
-    public String gssapi_principal (long self) {
-        return Zsock.__gssapi_principal (self);
+    public String gssapiPrincipal (long self) {
+        return __gssapi_principal (self);
     }
     /*
     Set socket option `gssapi_principal`.
     */
     native static void __set_gssapi_principal (long self, String gssapiPrincipal);
-    public void set_gssapi_principal (long self, String gssapiPrincipal) {
-        return Zsock.__set_gssapi_principal (self, gssapiPrincipal);
+    public void setGssapiPrincipal (long self, String gssapiPrincipal) {
+        __set_gssapi_principal (self, gssapiPrincipal);
     }
     /*
     Get socket option `gssapi_service_principal`.
     */
     native static String __gssapi_service_principal (long self);
-    public String gssapi_service_principal (long self) {
-        return Zsock.__gssapi_service_principal (self);
+    public String gssapiServicePrincipal (long self) {
+        return __gssapi_service_principal (self);
     }
     /*
     Set socket option `gssapi_service_principal`.
     */
     native static void __set_gssapi_service_principal (long self, String gssapiServicePrincipal);
-    public void set_gssapi_service_principal (long self, String gssapiServicePrincipal) {
-        return Zsock.__set_gssapi_service_principal (self, gssapiServicePrincipal);
+    public void setGssapiServicePrincipal (long self, String gssapiServicePrincipal) {
+        __set_gssapi_service_principal (self, gssapiServicePrincipal);
     }
     /*
     Get socket option `ipv6`.
     */
     native static int __ipv6 (long self);
     public int ipv6 (long self) {
-        return Zsock.__ipv6 (self);
+        return __ipv6 (self);
     }
     /*
     Set socket option `ipv6`.
     */
     native static void __set_ipv6 (long self, int ipv6);
-    public void set_ipv6 (long self, int ipv6) {
-        return Zsock.__set_ipv6 (self, ipv6);
+    public void setIpv6 (long self, int ipv6) {
+        __set_ipv6 (self, ipv6);
     }
     /*
     Get socket option `immediate`.
     */
     native static int __immediate (long self);
     public int immediate (long self) {
-        return Zsock.__immediate (self);
+        return __immediate (self);
     }
     /*
     Set socket option `immediate`.
     */
     native static void __set_immediate (long self, int immediate);
-    public void set_immediate (long self, int immediate) {
-        return Zsock.__set_immediate (self, immediate);
+    public void setImmediate (long self, int immediate) {
+        __set_immediate (self, immediate);
     }
     /*
     Set socket option `router_raw`.
     */
     native static void __set_router_raw (long self, int routerRaw);
-    public void set_router_raw (long self, int routerRaw) {
-        return Zsock.__set_router_raw (self, routerRaw);
+    public void setRouterRaw (long self, int routerRaw) {
+        __set_router_raw (self, routerRaw);
     }
     /*
     Get socket option `ipv4only`.
     */
     native static int __ipv4only (long self);
     public int ipv4only (long self) {
-        return Zsock.__ipv4only (self);
+        return __ipv4only (self);
     }
     /*
     Set socket option `ipv4only`.
     */
     native static void __set_ipv4only (long self, int ipv4only);
-    public void set_ipv4only (long self, int ipv4only) {
-        return Zsock.__set_ipv4only (self, ipv4only);
+    public void setIpv4only (long self, int ipv4only) {
+        __set_ipv4only (self, ipv4only);
     }
     /*
     Set socket option `delay_attach_on_connect`.
     */
     native static void __set_delay_attach_on_connect (long self, int delayAttachOnConnect);
-    public void set_delay_attach_on_connect (long self, int delayAttachOnConnect) {
-        return Zsock.__set_delay_attach_on_connect (self, delayAttachOnConnect);
+    public void setDelayAttachOnConnect (long self, int delayAttachOnConnect) {
+        __set_delay_attach_on_connect (self, delayAttachOnConnect);
     }
     /*
     Get socket option `type`.
     */
     native static int __type (long self);
     public int type (long self) {
-        return Zsock.__type (self);
+        return __type (self);
     }
     /*
     Get socket option `sndhwm`.
     */
     native static int __sndhwm (long self);
     public int sndhwm (long self) {
-        return Zsock.__sndhwm (self);
+        return __sndhwm (self);
     }
     /*
     Set socket option `sndhwm`.
     */
     native static void __set_sndhwm (long self, int sndhwm);
-    public void set_sndhwm (long self, int sndhwm) {
-        return Zsock.__set_sndhwm (self, sndhwm);
+    public void setSndhwm (long self, int sndhwm) {
+        __set_sndhwm (self, sndhwm);
     }
     /*
     Get socket option `rcvhwm`.
     */
     native static int __rcvhwm (long self);
     public int rcvhwm (long self) {
-        return Zsock.__rcvhwm (self);
+        return __rcvhwm (self);
     }
     /*
     Set socket option `rcvhwm`.
     */
     native static void __set_rcvhwm (long self, int rcvhwm);
-    public void set_rcvhwm (long self, int rcvhwm) {
-        return Zsock.__set_rcvhwm (self, rcvhwm);
+    public void setRcvhwm (long self, int rcvhwm) {
+        __set_rcvhwm (self, rcvhwm);
     }
     /*
     Get socket option `affinity`.
     */
     native static int __affinity (long self);
     public int affinity (long self) {
-        return Zsock.__affinity (self);
+        return __affinity (self);
     }
     /*
     Set socket option `affinity`.
     */
     native static void __set_affinity (long self, int affinity);
-    public void set_affinity (long self, int affinity) {
-        return Zsock.__set_affinity (self, affinity);
+    public void setAffinity (long self, int affinity) {
+        __set_affinity (self, affinity);
     }
     /*
     Set socket option `subscribe`.
     */
     native static void __set_subscribe (long self, String subscribe);
-    public void set_subscribe (long self, String subscribe) {
-        return Zsock.__set_subscribe (self, subscribe);
+    public void setSubscribe (long self, String subscribe) {
+        __set_subscribe (self, subscribe);
     }
     /*
     Set socket option `unsubscribe`.
     */
     native static void __set_unsubscribe (long self, String unsubscribe);
-    public void set_unsubscribe (long self, String unsubscribe) {
-        return Zsock.__set_unsubscribe (self, unsubscribe);
+    public void setUnsubscribe (long self, String unsubscribe) {
+        __set_unsubscribe (self, unsubscribe);
     }
     /*
     Get socket option `identity`.
     */
     native static String __identity (long self);
     public String identity (long self) {
-        return Zsock.__identity (self);
+        return __identity (self);
     }
     /*
     Set socket option `identity`.
     */
     native static void __set_identity (long self, String identity);
-    public void set_identity (long self, String identity) {
-        return Zsock.__set_identity (self, identity);
+    public void setIdentity (long self, String identity) {
+        __set_identity (self, identity);
     }
     /*
     Get socket option `rate`.
     */
     native static int __rate (long self);
     public int rate (long self) {
-        return Zsock.__rate (self);
+        return __rate (self);
     }
     /*
     Set socket option `rate`.
     */
     native static void __set_rate (long self, int rate);
-    public void set_rate (long self, int rate) {
-        return Zsock.__set_rate (self, rate);
+    public void setRate (long self, int rate) {
+        __set_rate (self, rate);
     }
     /*
     Get socket option `recovery_ivl`.
     */
     native static int __recovery_ivl (long self);
-    public int recovery_ivl (long self) {
-        return Zsock.__recovery_ivl (self);
+    public int recoveryIvl (long self) {
+        return __recovery_ivl (self);
     }
     /*
     Set socket option `recovery_ivl`.
     */
     native static void __set_recovery_ivl (long self, int recoveryIvl);
-    public void set_recovery_ivl (long self, int recoveryIvl) {
-        return Zsock.__set_recovery_ivl (self, recoveryIvl);
+    public void setRecoveryIvl (long self, int recoveryIvl) {
+        __set_recovery_ivl (self, recoveryIvl);
     }
     /*
     Get socket option `sndbuf`.
     */
     native static int __sndbuf (long self);
     public int sndbuf (long self) {
-        return Zsock.__sndbuf (self);
+        return __sndbuf (self);
     }
     /*
     Set socket option `sndbuf`.
     */
     native static void __set_sndbuf (long self, int sndbuf);
-    public void set_sndbuf (long self, int sndbuf) {
-        return Zsock.__set_sndbuf (self, sndbuf);
+    public void setSndbuf (long self, int sndbuf) {
+        __set_sndbuf (self, sndbuf);
     }
     /*
     Get socket option `rcvbuf`.
     */
     native static int __rcvbuf (long self);
     public int rcvbuf (long self) {
-        return Zsock.__rcvbuf (self);
+        return __rcvbuf (self);
     }
     /*
     Set socket option `rcvbuf`.
     */
     native static void __set_rcvbuf (long self, int rcvbuf);
-    public void set_rcvbuf (long self, int rcvbuf) {
-        return Zsock.__set_rcvbuf (self, rcvbuf);
+    public void setRcvbuf (long self, int rcvbuf) {
+        __set_rcvbuf (self, rcvbuf);
     }
     /*
     Get socket option `linger`.
     */
     native static int __linger (long self);
     public int linger (long self) {
-        return Zsock.__linger (self);
+        return __linger (self);
     }
     /*
     Set socket option `linger`.
     */
     native static void __set_linger (long self, int linger);
-    public void set_linger (long self, int linger) {
-        return Zsock.__set_linger (self, linger);
+    public void setLinger (long self, int linger) {
+        __set_linger (self, linger);
     }
     /*
     Get socket option `reconnect_ivl`.
     */
     native static int __reconnect_ivl (long self);
-    public int reconnect_ivl (long self) {
-        return Zsock.__reconnect_ivl (self);
+    public int reconnectIvl (long self) {
+        return __reconnect_ivl (self);
     }
     /*
     Set socket option `reconnect_ivl`.
     */
     native static void __set_reconnect_ivl (long self, int reconnectIvl);
-    public void set_reconnect_ivl (long self, int reconnectIvl) {
-        return Zsock.__set_reconnect_ivl (self, reconnectIvl);
+    public void setReconnectIvl (long self, int reconnectIvl) {
+        __set_reconnect_ivl (self, reconnectIvl);
     }
     /*
     Get socket option `reconnect_ivl_max`.
     */
     native static int __reconnect_ivl_max (long self);
-    public int reconnect_ivl_max (long self) {
-        return Zsock.__reconnect_ivl_max (self);
+    public int reconnectIvlMax (long self) {
+        return __reconnect_ivl_max (self);
     }
     /*
     Set socket option `reconnect_ivl_max`.
     */
     native static void __set_reconnect_ivl_max (long self, int reconnectIvlMax);
-    public void set_reconnect_ivl_max (long self, int reconnectIvlMax) {
-        return Zsock.__set_reconnect_ivl_max (self, reconnectIvlMax);
+    public void setReconnectIvlMax (long self, int reconnectIvlMax) {
+        __set_reconnect_ivl_max (self, reconnectIvlMax);
     }
     /*
     Get socket option `backlog`.
     */
     native static int __backlog (long self);
     public int backlog (long self) {
-        return Zsock.__backlog (self);
+        return __backlog (self);
     }
     /*
     Set socket option `backlog`.
     */
     native static void __set_backlog (long self, int backlog);
-    public void set_backlog (long self, int backlog) {
-        return Zsock.__set_backlog (self, backlog);
+    public void setBacklog (long self, int backlog) {
+        __set_backlog (self, backlog);
     }
     /*
     Get socket option `maxmsgsize`.
     */
     native static int __maxmsgsize (long self);
     public int maxmsgsize (long self) {
-        return Zsock.__maxmsgsize (self);
+        return __maxmsgsize (self);
     }
     /*
     Set socket option `maxmsgsize`.
     */
     native static void __set_maxmsgsize (long self, int maxmsgsize);
-    public void set_maxmsgsize (long self, int maxmsgsize) {
-        return Zsock.__set_maxmsgsize (self, maxmsgsize);
+    public void setMaxmsgsize (long self, int maxmsgsize) {
+        __set_maxmsgsize (self, maxmsgsize);
     }
     /*
     Get socket option `multicast_hops`.
     */
     native static int __multicast_hops (long self);
-    public int multicast_hops (long self) {
-        return Zsock.__multicast_hops (self);
+    public int multicastHops (long self) {
+        return __multicast_hops (self);
     }
     /*
     Set socket option `multicast_hops`.
     */
     native static void __set_multicast_hops (long self, int multicastHops);
-    public void set_multicast_hops (long self, int multicastHops) {
-        return Zsock.__set_multicast_hops (self, multicastHops);
+    public void setMulticastHops (long self, int multicastHops) {
+        __set_multicast_hops (self, multicastHops);
     }
     /*
     Get socket option `rcvtimeo`.
     */
     native static int __rcvtimeo (long self);
     public int rcvtimeo (long self) {
-        return Zsock.__rcvtimeo (self);
+        return __rcvtimeo (self);
     }
     /*
     Set socket option `rcvtimeo`.
     */
     native static void __set_rcvtimeo (long self, int rcvtimeo);
-    public void set_rcvtimeo (long self, int rcvtimeo) {
-        return Zsock.__set_rcvtimeo (self, rcvtimeo);
+    public void setRcvtimeo (long self, int rcvtimeo) {
+        __set_rcvtimeo (self, rcvtimeo);
     }
     /*
     Get socket option `sndtimeo`.
     */
     native static int __sndtimeo (long self);
     public int sndtimeo (long self) {
-        return Zsock.__sndtimeo (self);
+        return __sndtimeo (self);
     }
     /*
     Set socket option `sndtimeo`.
     */
     native static void __set_sndtimeo (long self, int sndtimeo);
-    public void set_sndtimeo (long self, int sndtimeo) {
-        return Zsock.__set_sndtimeo (self, sndtimeo);
+    public void setSndtimeo (long self, int sndtimeo) {
+        __set_sndtimeo (self, sndtimeo);
     }
     /*
     Set socket option `xpub_verbose`.
     */
     native static void __set_xpub_verbose (long self, int xpubVerbose);
-    public void set_xpub_verbose (long self, int xpubVerbose) {
-        return Zsock.__set_xpub_verbose (self, xpubVerbose);
+    public void setXpubVerbose (long self, int xpubVerbose) {
+        __set_xpub_verbose (self, xpubVerbose);
     }
     /*
     Get socket option `tcp_keepalive`.
     */
     native static int __tcp_keepalive (long self);
-    public int tcp_keepalive (long self) {
-        return Zsock.__tcp_keepalive (self);
+    public int tcpKeepalive (long self) {
+        return __tcp_keepalive (self);
     }
     /*
     Set socket option `tcp_keepalive`.
     */
     native static void __set_tcp_keepalive (long self, int tcpKeepalive);
-    public void set_tcp_keepalive (long self, int tcpKeepalive) {
-        return Zsock.__set_tcp_keepalive (self, tcpKeepalive);
+    public void setTcpKeepalive (long self, int tcpKeepalive) {
+        __set_tcp_keepalive (self, tcpKeepalive);
     }
     /*
     Get socket option `tcp_keepalive_idle`.
     */
     native static int __tcp_keepalive_idle (long self);
-    public int tcp_keepalive_idle (long self) {
-        return Zsock.__tcp_keepalive_idle (self);
+    public int tcpKeepaliveIdle (long self) {
+        return __tcp_keepalive_idle (self);
     }
     /*
     Set socket option `tcp_keepalive_idle`.
     */
     native static void __set_tcp_keepalive_idle (long self, int tcpKeepaliveIdle);
-    public void set_tcp_keepalive_idle (long self, int tcpKeepaliveIdle) {
-        return Zsock.__set_tcp_keepalive_idle (self, tcpKeepaliveIdle);
+    public void setTcpKeepaliveIdle (long self, int tcpKeepaliveIdle) {
+        __set_tcp_keepalive_idle (self, tcpKeepaliveIdle);
     }
     /*
     Get socket option `tcp_keepalive_cnt`.
     */
     native static int __tcp_keepalive_cnt (long self);
-    public int tcp_keepalive_cnt (long self) {
-        return Zsock.__tcp_keepalive_cnt (self);
+    public int tcpKeepaliveCnt (long self) {
+        return __tcp_keepalive_cnt (self);
     }
     /*
     Set socket option `tcp_keepalive_cnt`.
     */
     native static void __set_tcp_keepalive_cnt (long self, int tcpKeepaliveCnt);
-    public void set_tcp_keepalive_cnt (long self, int tcpKeepaliveCnt) {
-        return Zsock.__set_tcp_keepalive_cnt (self, tcpKeepaliveCnt);
+    public void setTcpKeepaliveCnt (long self, int tcpKeepaliveCnt) {
+        __set_tcp_keepalive_cnt (self, tcpKeepaliveCnt);
     }
     /*
     Get socket option `tcp_keepalive_intvl`.
     */
     native static int __tcp_keepalive_intvl (long self);
-    public int tcp_keepalive_intvl (long self) {
-        return Zsock.__tcp_keepalive_intvl (self);
+    public int tcpKeepaliveIntvl (long self) {
+        return __tcp_keepalive_intvl (self);
     }
     /*
     Set socket option `tcp_keepalive_intvl`.
     */
     native static void __set_tcp_keepalive_intvl (long self, int tcpKeepaliveIntvl);
-    public void set_tcp_keepalive_intvl (long self, int tcpKeepaliveIntvl) {
-        return Zsock.__set_tcp_keepalive_intvl (self, tcpKeepaliveIntvl);
+    public void setTcpKeepaliveIntvl (long self, int tcpKeepaliveIntvl) {
+        __set_tcp_keepalive_intvl (self, tcpKeepaliveIntvl);
     }
     /*
     Get socket option `tcp_accept_filter`.
     */
     native static String __tcp_accept_filter (long self);
-    public String tcp_accept_filter (long self) {
-        return Zsock.__tcp_accept_filter (self);
+    public String tcpAcceptFilter (long self) {
+        return __tcp_accept_filter (self);
     }
     /*
     Set socket option `tcp_accept_filter`.
     */
     native static void __set_tcp_accept_filter (long self, String tcpAcceptFilter);
-    public void set_tcp_accept_filter (long self, String tcpAcceptFilter) {
-        return Zsock.__set_tcp_accept_filter (self, tcpAcceptFilter);
+    public void setTcpAcceptFilter (long self, String tcpAcceptFilter) {
+        __set_tcp_accept_filter (self, tcpAcceptFilter);
     }
     /*
     Get socket option `rcvmore`.
     */
     native static int __rcvmore (long self);
     public int rcvmore (long self) {
-        return Zsock.__rcvmore (self);
+        return __rcvmore (self);
     }
     /*
     Get socket option `events`.
     */
     native static int __events (long self);
     public int events (long self) {
-        return Zsock.__events (self);
+        return __events (self);
     }
     /*
     Get socket option `last_endpoint`.
     */
     native static String __last_endpoint (long self);
-    public String last_endpoint (long self) {
-        return Zsock.__last_endpoint (self);
+    public String lastEndpoint (long self) {
+        return __last_endpoint (self);
     }
     /*
     Self test of this class.
     */
     native static void __test (boolean verbose);
     public void test (boolean verbose) {
-        return Zsock.__test (verbose);
+        __test (verbose);
     }
 }

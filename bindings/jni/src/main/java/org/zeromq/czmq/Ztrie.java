@@ -6,7 +6,7 @@
 */
 package org.zeromq.czmq;
 
-public class Ztrie implements AutoCloseable {
+public class Ztrie implements AutoCloseable{
     static {
         try {
             System.loadLibrary ("czmqjni");
@@ -16,7 +16,6 @@ public class Ztrie implements AutoCloseable {
         }
     }
     long self;
-
     /*
     Creates a new ztrie.
     */
@@ -25,14 +24,26 @@ public class Ztrie implements AutoCloseable {
         /*  TODO: if __init fails, self is null...  */
         self = __init (delimiter);
     }
+    public Ztrie () {
+        self = 0;
+    }
     /*
     Destroy the ztrie.
     */
     native static void __destroy (long self);
     @Override
-    public void close() {
+    public void close () {
         __destroy (self);
         self = 0;
+    }
+    /*
+    Inserts a new route into the tree and attaches the data. Returns -1     
+    if the route already exists, otherwise 0. This method takes ownership of
+    the provided data if a destroy_data_fn is provided.                     
+    */
+    native static int __insert_route (long self, String path, long data, long destroyDataFn);
+    public int insertRoute (long self, String path, long data, long destroyDataFn) {
+        return __insert_route (self, path, data, destroyDataFn);
     }
     /*
     Removes a route from the trie and destroys its data. Returns -1 if the
@@ -40,61 +51,61 @@ public class Ztrie implements AutoCloseable {
     the start of the list call zlist_first (). Advances the cursor.       
     */
     native static int __remove_route (long self, String path);
-    public int remove_route (long self, String path) {
-        return Ztrie.__remove_route (self, path);
+    public int removeRoute (long self, String path) {
+        return __remove_route (self, path);
     }
     /*
     Returns true if the path matches a route in the tree, otherwise false.
     */
     native static boolean __matches (long self, String path);
     public boolean matches (long self, String path) {
-        return Ztrie.__matches (self, path);
+        return __matches (self, path);
     }
     /*
     Returns the data of a matched route from last ztrie_matches. If the path
     did not match, returns NULL. Do not delete the data as it's owned by    
     ztrie.                                                                  
     */
-    native static void * __hit_data (long self);
-    public void * hit_data (long self) {
-        return Ztrie.__hit_data (self);
+    native static long __hit_data (long self);
+    public long hitData (long self) {
+        return __hit_data (self);
     }
     /*
     Returns the count of parameters that a matched route has.
     */
     native static long __hit_parameter_count (long self);
-    public long hit_parameter_count (long self) {
-        return Ztrie.__hit_parameter_count (self);
+    public long hitParameterCount (long self) {
+        return __hit_parameter_count (self);
     }
     /*
     Returns the parameters of a matched route with named regexes from last   
     ztrie_matches. If the path did not match or the route did not contain any
     named regexes, returns NULL.                                             
     */
-    native static Zhashx __hit_parameters (long self);
-    public Zhashx hit_parameters (long self) {
-        return Ztrie.__hit_parameters (self);
+    native static long __hit_parameters (long self);
+    public long hitParameters (long self) {
+        return __hit_parameters (self);
     }
     /*
     Returns the asterisk matched part of a route, if there has been no match
     or no asterisk match, returns NULL.                                     
     */
     native static String __hit_asterisk_match (long self);
-    public String hit_asterisk_match (long self) {
-        return Ztrie.__hit_asterisk_match (self);
+    public String hitAsteriskMatch (long self) {
+        return __hit_asterisk_match (self);
     }
     /*
     Print the trie
     */
     native static void __print (long self);
     public void print (long self) {
-        return Ztrie.__print (self);
+        __print (self);
     }
     /*
     Self test of this class.
     */
     native static void __test (boolean verbose);
     public void test (boolean verbose) {
-        return Ztrie.__test (verbose);
+        __test (verbose);
     }
 }

@@ -10,23 +10,24 @@ find_library (CZMQ_LIBRARY NAMES czmq REQUIRED)
 include_directories (${JAVA_INCLUDE_PATH} ${JAVA_INCLUDE_PATH2} src/native/include)
 
 set (czmqjni_sources
-   src/main/c/org_zeromq_czmq_Zactor.c
-   src/main/c/org_zeromq_czmq_Zarmour.c
-   src/main/c/org_zeromq_czmq_Zdir.c
-   src/main/c/org_zeromq_czmq_ZdirPatch.c
-   src/main/c/org_zeromq_czmq_Zfile.c
-   src/main/c/org_zeromq_czmq_Zframe.c
-   src/main/c/org_zeromq_czmq_Zhash.c
-   src/main/c/org_zeromq_czmq_Zhashx.c
-   src/main/c/org_zeromq_czmq_Ziflist.c
-   src/main/c/org_zeromq_czmq_Zlist.c
-   src/main/c/org_zeromq_czmq_Zloop.c
-   src/main/c/org_zeromq_czmq_Zmsg.c
-   src/main/c/org_zeromq_czmq_Zpoller.c
-   src/main/c/org_zeromq_czmq_Zsock.c
-   src/main/c/org_zeromq_czmq_Zstr.c
-   src/main/c/org_zeromq_czmq_Ztrie.c
-   src/main/c/org_zeromq_czmq_Zuuid.c
+    src/main/c/org_zeromq_czmq_Zactor.c
+    src/main/c/org_zeromq_czmq_Zarmour.c
+    src/main/c/org_zeromq_czmq_Zconfig.c
+    src/main/c/org_zeromq_czmq_Zdir.c
+    src/main/c/org_zeromq_czmq_ZdirPatch.c
+    src/main/c/org_zeromq_czmq_Zfile.c
+    src/main/c/org_zeromq_czmq_Zframe.c
+    src/main/c/org_zeromq_czmq_Zhash.c
+    src/main/c/org_zeromq_czmq_Zhashx.c
+    src/main/c/org_zeromq_czmq_Ziflist.c
+    src/main/c/org_zeromq_czmq_Zlist.c
+    src/main/c/org_zeromq_czmq_Zloop.c
+    src/main/c/org_zeromq_czmq_Zmsg.c
+    src/main/c/org_zeromq_czmq_Zpoller.c
+    src/main/c/org_zeromq_czmq_Zsock.c
+    src/main/c/org_zeromq_czmq_Zstr.c
+    src/main/c/org_zeromq_czmq_Ztrie.c
+    src/main/c/org_zeromq_czmq_Zuuid.c
 )
 
 add_library (czmqjni SHARED ${czmqjni_sources})

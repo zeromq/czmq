@@ -11,11 +11,11 @@
 #include "../../native/include/org_zeromq_czmq_ZdirPatch.h"
 
 JNIEXPORT jlong JNICALL
-Java_zdir_patch__1_1new (JNIEnv *env, jclass c, jstring path, jlong file, jstring alias)
+Java_zdir_patch__1_1new (JNIEnv *env, jclass c, jstring path, jlong file, jint op, jstring alias)
 {
     char *path_ = (char *) (*env)->GetStringUTFChars (env, path, NULL);
     char *alias_ = (char *) (*env)->GetStringUTFChars (env, alias, NULL);
-    jlong new_ = (jlong) zdir_patch_new (path_, (zfile_t *) file, alias_);
+    jlong new_ = (jlong) zdir_patch_new (path_, (zfile_t *) file, (zdir_patch_op_t) op, alias_);
     (*env)->ReleaseStringUTFChars (env, path, path_);
     (*env)->ReleaseStringUTFChars (env, alias, alias_);
     return new_;
@@ -47,6 +47,13 @@ Java_zdir_patch__1_1file (JNIEnv *env, jclass c, jlong self)
 {
     jlong file_ = (jlong) zdir_patch_file ((zdir_patch_t *) self);
     return file_;
+}
+
+JNIEXPORT jint JNICALL
+Java_zdir_patch__1_1op (JNIEnv *env, jclass c, jlong self)
+{
+    jint op_ = (jint) zdir_patch_op ((zdir_patch_t *) self);
+    return op_;
 }
 
 JNIEXPORT jstring JNICALL

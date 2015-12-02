@@ -32,23 +32,34 @@ Java_zarmour__1_1mode_str (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jstring JNICALL
-Java_zarmour__1_1encode (JNIEnv *env, jclass c, jlong self, jbyteArray data, jlong data_size)
+Java_zarmour__1_1encode (JNIEnv *env, jclass c, jlong self, jlong data, jlong data_size)
 {
-    byte *data_ = (byte *) (*env)->GetByteArrayElements (env, data, 0);
-    char *encode_ = (char *) zarmour_encode ((zarmour_t *) self, data_, (size_t) data_size);
+    char *encode_ = (char *) zarmour_encode ((zarmour_t *) self, (const byte *) data, (size_t) data_size);
     jstring string = (*env)->NewStringUTF (env, encode_);
     zstr_free (&encode_);
-    (*env)->ReleaseByteArrayElements (env, data, (jbyte *) data_, 0);
     return string;
 }
 
-JNIEXPORT jbytearray JNICALL
+JNIEXPORT jlong JNICALL
 Java_zarmour__1_1decode (JNIEnv *env, jclass c, jlong self, jstring data, jlong decode_size)
 {
     char *data_ = (char *) (*env)->GetStringUTFChars (env, data, NULL);
     byte *decode_ = (byte *) zarmour_decode ((zarmour_t *) self, data_, (size_t *) &decode_size);
     (*env)->ReleaseStringUTFChars (env, data, data_);
     return (jlong) decode_;
+}
+
+JNIEXPORT jint JNICALL
+Java_zarmour__1_1mode (JNIEnv *env, jclass c, jlong self)
+{
+    jint mode_ = (jint) zarmour_mode ((zarmour_t *) self);
+    return mode_;
+}
+
+JNIEXPORT void JNICALL
+Java_zarmour__1_1set_mode (JNIEnv *env, jclass c, jlong self, jint mode)
+{
+    zarmour_set_mode ((zarmour_t *) self, (zarmour_mode_t) mode);
 }
 
 JNIEXPORT jboolean JNICALL

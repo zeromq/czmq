@@ -11,9 +11,9 @@
 #include "../../native/include/org_zeromq_czmq_Zactor.h"
 
 JNIEXPORT jlong JNICALL
-Java_zactor__1_1new (JNIEnv *env, jclass c, jlong args)
+Java_zactor__1_1new (JNIEnv *env, jclass c, jlong task, jlong args)
 {
-    jlong new_ = (jlong) zactor_new ((void *) args);
+    jlong new_ = (jlong) zactor_new ((zactor_fn *) task, (void *) args);
     return new_;
 }
 

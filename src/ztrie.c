@@ -463,7 +463,7 @@ s_ztrie_parse_path (ztrie_t *self, const char *path, int mode)
 //  the provided data.
 
 int
-ztrie_insert_route (ztrie_t *self, const char *path, void *data, ztrie_destroy_data_fn *destroy_data_fn)
+ztrie_insert_route (ztrie_t *self, const char *path, void *data, ztrie_destroy_data_fn destroy_data_fn)
 {
     assert (self);
     ztrie_node_t *node = s_ztrie_parse_path (self, path, MODE_INSERT);

@@ -20,15 +20,6 @@ Java_zstr__1_1recv (JNIEnv *env, jclass c, jlong source)
 }
 
 JNIEXPORT jint JNICALL
-Java_zstr__1_1recvx (JNIEnv *env, jclass c, jlong source, jstring string_p)
-{
-    char *string_p_ = (char *) (*env)->GetStringUTFChars (env, string_p, NULL);
-    jint recvx_ = (jint) zstr_recvx ((void *) source, string_p_);
-    (*env)->ReleaseStringUTFChars (env, string_p, string_p_);
-    return recvx_;
-}
-
-JNIEXPORT jint JNICALL
 Java_zstr__1_1send (JNIEnv *env, jclass c, jlong dest, jstring string)
 {
     char *string_ = (char *) (*env)->GetStringUTFChars (env, string, NULL);
@@ -71,14 +62,6 @@ Java_zstr__1_1sendx (JNIEnv *env, jclass c, jlong dest, jstring string)
     jint sendx_ = (jint) zstr_sendx ((void *) dest, string_);
     (*env)->ReleaseStringUTFChars (env, string, string_);
     return sendx_;
-}
-
-JNIEXPORT void JNICALL
-Java_zstr__1_1free (JNIEnv *env, jclass c, jstring string_p)
-{
-    char *string_p_ = (char *) (*env)->GetStringUTFChars (env, string_p, NULL);
-    zstr_free (string_p_);
-    (*env)->ReleaseStringUTFChars (env, string_p, string_p_);
 }
 
 JNIEXPORT void JNICALL

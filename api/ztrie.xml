@@ -30,8 +30,7 @@
         the provided data if a destroy_data_fn is provided.
         <argument name = "path" type = "string" />
         <argument name = "data" type = "anything" />
-        <argument name = "destroy_data_fn" type = "ztrie_destroy_data_fn"
-                  callback = "1" by_reference = "1" />
+        <argument name = "destroy_data_fn" type = "ztrie_destroy_data_fn" callback = "1" />
         <return type = "integer" />
     </method>
 

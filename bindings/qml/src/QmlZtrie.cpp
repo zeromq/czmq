@@ -12,7 +12,7 @@
 //  Inserts a new route into the tree and attaches the data. Returns -1     
 //  if the route already exists, otherwise 0. This method takes ownership of
 //  the provided data if a destroy_data_fn is provided.                     
-int QmlZtrie::insertRoute (const QString &path, void *data, ztrie_destroy_data_fn *destroyDataFn) {
+int QmlZtrie::insertRoute (const QString &path, void *data, ztrie_destroy_data_fn destroyDataFn) {
     return ztrie_insert_route (self, path.toUtf8().data(), data, destroyDataFn);
 };
 

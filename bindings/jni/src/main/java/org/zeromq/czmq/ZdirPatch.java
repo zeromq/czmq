@@ -6,7 +6,7 @@
 */
 package org.zeromq.czmq;
 
-public class ZdirPatch implements AutoCloseable {
+public class ZdirPatch implements AutoCloseable{
     static {
         try {
             System.loadLibrary ("czmqjni");
@@ -16,21 +16,23 @@ public class ZdirPatch implements AutoCloseable {
         }
     }
     long self;
-
     /*
     Create new patch
     */
-    native static long __init (String path, Zfile file, String alias);
-    public ZdirPatch (String path, Zfile file, String alias) {
+    native static long __init (String path, long file, int op, String alias);
+    public ZdirPatch (String path, long file, int op, String alias) {
         /*  TODO: if __init fails, self is null...  */
-        self = __init (path, file, alias);
+        self = __init (path, file, op, alias);
+    }
+    public ZdirPatch () {
+        self = 0;
     }
     /*
     Destroy a patch
     */
     native static void __destroy (long self);
     @Override
-    public void close() {
+    public void close () {
         __destroy (self);
         self = 0;
     }
@@ -38,50 +40,57 @@ public class ZdirPatch implements AutoCloseable {
     Create copy of a patch. If the patch is null, or memory was exhausted,
     returns null.                                                         
     */
-    native static ZdirPatch __dup (long self);
-    public ZdirPatch dup (long self) {
-        return ZdirPatch.__dup (self);
+    native static long __dup (long self);
+    public long dup (long self) {
+        return __dup (self);
     }
     /*
     Return patch file directory path
     */
     native static String __path (long self);
     public String path (long self) {
-        return ZdirPatch.__path (self);
+        return __path (self);
     }
     /*
     Return patch file item
     */
-    native static Zfile __file (long self);
-    public Zfile file (long self) {
-        return ZdirPatch.__file (self);
+    native static long __file (long self);
+    public long file (long self) {
+        return __file (self);
+    }
+    /*
+    Return operation
+    */
+    native static int __op (long self);
+    public int op (long self) {
+        return __op (self);
     }
     /*
     Return patch virtual file path
     */
     native static String __vpath (long self);
     public String vpath (long self) {
-        return ZdirPatch.__vpath (self);
+        return __vpath (self);
     }
     /*
     Calculate hash digest for file (create only)
     */
     native static void __digest_set (long self);
-    public void digest_set (long self) {
-        return ZdirPatch.__digest_set (self);
+    public void digestSet (long self) {
+        __digest_set (self);
     }
     /*
     Return hash digest for patch file
     */
     native static String __digest (long self);
     public String digest (long self) {
-        return ZdirPatch.__digest (self);
+        return __digest (self);
     }
     /*
     Self test of this class.
     */
     native static void __test (boolean verbose);
     public void test (boolean verbose) {
-        return ZdirPatch.__test (verbose);
+        __test (verbose);
     }
 }

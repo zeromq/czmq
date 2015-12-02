@@ -31,7 +31,7 @@ public slots:
     //  Inserts a new route into the tree and attaches the data. Returns -1     
     //  if the route already exists, otherwise 0. This method takes ownership of
     //  the provided data if a destroy_data_fn is provided.                     
-    int insertRoute (const QString &path, void *data, ztrie_destroy_data_fn *destroyDataFn);
+    int insertRoute (const QString &path, void *data, ztrie_destroy_data_fn destroyDataFn);
 
     //  Removes a route from the trie and destroys its data. Returns -1 if the
     //  route does not exists, otherwise 0.                                   

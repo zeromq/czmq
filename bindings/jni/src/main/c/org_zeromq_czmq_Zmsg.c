@@ -193,20 +193,16 @@ Java_zmsg__1_1last (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jlong JNICALL
-Java_zmsg__1_1encode (JNIEnv *env, jclass c, jlong self, jbyteArray buffer)
+Java_zmsg__1_1encode (JNIEnv *env, jclass c, jlong self, jlong buffer)
 {
-    byte *buffer_ = (byte *) (*env)->GetByteArrayElements (env, buffer, 0);
-    jlong encode_ = (jlong) zmsg_encode ((zmsg_t *) self, buffer_);
-    (*env)->ReleaseByteArrayElements (env, buffer, (jbyte *) buffer_, 0);
+    jlong encode_ = (jlong) zmsg_encode ((zmsg_t *) self, (byte **) &buffer);
     return encode_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_zmsg__1_1decode (JNIEnv *env, jclass c, jbyteArray buffer, jlong buffer_size)
+Java_zmsg__1_1decode (JNIEnv *env, jclass c, jlong buffer, jlong buffer_size)
 {
-    byte *buffer_ = (byte *) (*env)->GetByteArrayElements (env, buffer, 0);
-    jlong decode_ = (jlong) zmsg_decode (buffer_, (size_t) buffer_size);
-    (*env)->ReleaseByteArrayElements (env, buffer, (jbyte *) buffer_, 0);
+    jlong decode_ = (jlong) zmsg_decode ((const byte *) buffer, (size_t) buffer_size);
     return decode_;
 }
 

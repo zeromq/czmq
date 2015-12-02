@@ -6,7 +6,7 @@
 */
 package org.zeromq.czmq;
 
-public class Ziflist implements AutoCloseable {
+public class Ziflist implements AutoCloseable{
     static {
         try {
             System.loadLibrary ("czmqjni");
@@ -16,7 +16,6 @@ public class Ziflist implements AutoCloseable {
         }
     }
     long self;
-
     /*
     Get a list of network interfaces currently defined on the system
     */
@@ -30,7 +29,7 @@ public class Ziflist implements AutoCloseable {
     */
     native static void __destroy (long self);
     @Override
-    public void close() {
+    public void close () {
         __destroy (self);
         self = 0;
     }
@@ -39,62 +38,62 @@ public class Ziflist implements AutoCloseable {
     */
     native static void __reload (long self);
     public void reload (long self) {
-        return Ziflist.__reload (self);
+        __reload (self);
     }
     /*
     Return the number of network interfaces on system
     */
     native static long __size (long self);
     public long size (long self) {
-        return Ziflist.__size (self);
+        return __size (self);
     }
     /*
     Get first network interface, return NULL if there are none
     */
     native static String __first (long self);
     public String first (long self) {
-        return Ziflist.__first (self);
+        return __first (self);
     }
     /*
     Get next network interface, return NULL if we hit the last one
     */
     native static String __next (long self);
     public String next (long self) {
-        return Ziflist.__next (self);
+        return __next (self);
     }
     /*
     Return the current interface IP address as a printable string
     */
     native static String __address (long self);
     public String address (long self) {
-        return Ziflist.__address (self);
+        return __address (self);
     }
     /*
     Return the current interface broadcast address as a printable string
     */
     native static String __broadcast (long self);
     public String broadcast (long self) {
-        return Ziflist.__broadcast (self);
+        return __broadcast (self);
     }
     /*
     Return the current interface network mask as a printable string
     */
     native static String __netmask (long self);
     public String netmask (long self) {
-        return Ziflist.__netmask (self);
+        return __netmask (self);
     }
     /*
     Return the list of interfaces.
     */
     native static void __print (long self);
     public void print (long self) {
-        return Ziflist.__print (self);
+        __print (self);
     }
     /*
     Self test of this class.
     */
     native static void __test (boolean verbose);
     public void test (boolean verbose) {
-        return Ziflist.__test (verbose);
+        __test (verbose);
     }
 }

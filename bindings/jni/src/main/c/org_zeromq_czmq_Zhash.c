@@ -69,6 +69,15 @@ Java_zhash__1_1rename (JNIEnv *env, jclass c, jlong self, jstring old_key, jstri
 }
 
 JNIEXPORT jlong JNICALL
+Java_zhash__1_1freefn (JNIEnv *env, jclass c, jlong self, jstring key, jlong free_fn)
+{
+    char *key_ = (char *) (*env)->GetStringUTFChars (env, key, NULL);
+    jlong freefn_ = (jlong) zhash_freefn ((zhash_t *) self, key_, (zhash_free_fn *) free_fn);
+    (*env)->ReleaseStringUTFChars (env, key, key_);
+    return freefn_;
+}
+
+JNIEXPORT jlong JNICALL
 Java_zhash__1_1size (JNIEnv *env, jclass c, jlong self)
 {
     jlong size_ = (jlong) zhash_size ((zhash_t *) self);
@@ -162,6 +171,13 @@ JNIEXPORT void JNICALL
 Java_zhash__1_1autofree (JNIEnv *env, jclass c, jlong self)
 {
     zhash_autofree ((zhash_t *) self);
+}
+
+JNIEXPORT jint JNICALL
+Java_zhash__1_1foreach (JNIEnv *env, jclass c, jlong self, jlong callback, jlong argument)
+{
+    jint foreach_ = (jint) zhash_foreach ((zhash_t *) self, (zhash_foreach_fn *) callback, (void *) argument);
+    return foreach_;
 }
 
 JNIEXPORT void JNICALL
