@@ -1,5 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'maven'
+apply plugin: 'maven-publish'
+
 group = "org.zeromq"
 version = "0.1.0-SNAPSHOT"
 
@@ -7,6 +9,17 @@ repositories {
     mavenLocal()
     mavenCentral()
 }
+
+publishing {
+    publications {
+        jniJar(MavenPublication) {
+            artifacts {
+                artifact "build/libs/${project.name}-${version}.jar"
+            }
+        }
+    }   
+}
+
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
@@ -48,14 +61,7 @@ task initCMake(type: Exec, dependsOn: 'generateJniHeaders') {
 task buildNative(type: Exec, dependsOn: 'initCMake') {
     commandLine "make"
 }
-publishing {
-    publications {
-        jniJar(MavenPublication) {
-            artifacts {
-                artifact "build/libs/${project.name}-${version}.jar"
-            }
-        }
-    }
-}
+
 jar.dependsOn buildNative
 test.dependsOn buildNative
+publishToMavenLocal.dependsOn build
