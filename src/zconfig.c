@@ -366,6 +366,8 @@ s_config_execute (zconfig_t *self, zconfig_fct handler, void *arg, int level)
 {
     assert (self);
     int size = handler (self, arg, level);
+    if (size == -1)
+        return 0; // fail early
 
     //  Process all children in one go, as a list
     zconfig_t *child = self->child;
