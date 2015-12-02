@@ -48,5 +48,14 @@ task initCMake(type: Exec, dependsOn: 'generateJniHeaders') {
 task buildNative(type: Exec, dependsOn: 'initCMake') {
     commandLine "make"
 }
+publishing {
+    publications {
+        jniJar(MavenPublication) {
+            artifacts {
+                artifact "build/libs/${project.name}-${version}.jar"
+            }
+        }
+    }
+}
 jar.dependsOn buildNative
 test.dependsOn buildNative
