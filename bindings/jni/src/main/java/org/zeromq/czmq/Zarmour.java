@@ -6,7 +6,7 @@
 */
 package org.zeromq.czmq;
 
-public class Zarmour implements AutoCloseable {
+public class Zarmour implements AutoCloseable{
     static {
         try {
             System.loadLibrary ("czmqjni");
@@ -16,7 +16,6 @@ public class Zarmour implements AutoCloseable {
         }
     }
     long self;
-
     /*
     Create a new zarmour.
     */
@@ -38,15 +37,15 @@ public class Zarmour implements AutoCloseable {
     Get printable string for mode.
     */
     native static String __mode_str (long self);
-    public String mode_str (long self) {
-        return Zarmour.__mode_str (self);
+    public String modeStr (long self) {
+        return __mode_str (self);
     }
     /*
     Encode a stream of bytes into an armoured string.
     */
     native static String __encode (long self, byte [] data, long dataSize);
     public String encode (long self, byte [] data, long dataSize) {
-        return Zarmour.__encode (self, data, dataSize);
+        return __encode (self, data, dataSize);
     }
     /*
     Decode an armoured string into a string of bytes.          
@@ -55,90 +54,90 @@ public class Zarmour implements AutoCloseable {
     */
     native static byte [] __decode (long self, String data, long decodeSize);
     public byte [] decode (long self, String data, long decodeSize) {
-        return Zarmour.__decode (self, data, decodeSize);
+        return __decode (self, data, decodeSize);
     }
     /*
     Get the mode property.
     */
     native static int __mode (long self);
     public int mode (long self) {
-        return Zarmour.__mode (self);
+        return __mode (self);
     }
     /*
     Set the mode property.
     */
     native static void __set_mode (long self, int mode);
-    public void set_mode (long self, int mode) {
-        Zarmour.__set_mode (self, mode);
+    public void setMode (long self, int mode) {
+        __set_mode (self, mode);
     }
     /*
     Return true if padding is turned on.
     */
     native static boolean __pad (long self);
     public boolean pad (long self) {
-        return Zarmour.__pad (self);
+        return __pad (self);
     }
     /*
     Turn padding on or off. Default is on.
     */
     native static void __set_pad (long self, boolean pad);
-    public void set_pad (long self, boolean pad) {
-        Zarmour.__set_pad (self, pad);
+    public void setPad (long self, boolean pad) {
+        __set_pad (self, pad);
     }
     /*
     Get the padding character.
     */
     native static char __pad_char (long self);
-    public char pad_char (long self) {
-        return Zarmour.__pad_char (self);
+    public char padChar (long self) {
+        return __pad_char (self);
     }
     /*
     Set the padding character.
     */
     native static void __set_pad_char (long self, char padChar);
-    public void set_pad_char (long self, char padChar) {
-        Zarmour.__set_pad_char (self, padChar);
+    public void setPadChar (long self, char padChar) {
+        __set_pad_char (self, padChar);
     }
     /*
     Return if splitting output into lines is turned on. Default is off.
     */
     native static boolean __line_breaks (long self);
-    public boolean line_breaks (long self) {
-        return Zarmour.__line_breaks (self);
+    public boolean lineBreaks (long self) {
+        return __line_breaks (self);
     }
     /*
     Turn splitting output into lines on or off.
     */
     native static void __set_line_breaks (long self, boolean lineBreaks);
-    public void set_line_breaks (long self, boolean lineBreaks) {
-        Zarmour.__set_line_breaks (self, lineBreaks);
+    public void setLineBreaks (long self, boolean lineBreaks) {
+        __set_line_breaks (self, lineBreaks);
     }
     /*
     Get the line length used for splitting lines.
     */
     native static long __line_length (long self);
-    public long line_length (long self) {
-        return Zarmour.__line_length (self);
+    public long lineLength (long self) {
+        return __line_length (self);
     }
     /*
     Set the line length used for splitting lines.
     */
     native static void __set_line_length (long self, long lineLength);
-    public void set_line_length (long self, long lineLength) {
-        Zarmour.__set_line_length (self, lineLength);
+    public void setLineLength (long self, long lineLength) {
+        __set_line_length (self, lineLength);
     }
     /*
     Print properties of object
     */
     native static void __print (long self);
     public void print (long self) {
-        Zarmour.__print (self);
+        __print (self);
     }
     /*
     Self test of this class.
     */
     native static void __test (boolean verbose);
     public void test (boolean verbose) {
-        Zarmour.__test (verbose);
+        __test (verbose);
     }
 }

@@ -6,7 +6,7 @@
 */
 package org.zeromq.czmq;
 
-public class Zmsg implements AutoCloseable {
+public class Zmsg implements AutoCloseable{
     static {
         try {
             System.loadLibrary ("czmqjni");
@@ -16,7 +16,6 @@ public class Zmsg implements AutoCloseable {
         }
     }
     long self;
-
     /*
     Create a new empty message object
     */
@@ -42,7 +41,7 @@ public class Zmsg implements AutoCloseable {
     */
     native static long __recv (long source);
     public long recv (long source) {
-        return Zmsg.__recv (source);
+        return __recv (source);
     }
     /*
     Send message to destination socket, and destroy the message after sending
@@ -52,7 +51,7 @@ public class Zmsg implements AutoCloseable {
     */
     native static int __send (long selfP, long dest);
     public int send (long selfP, long dest) {
-        return Zmsg.__send (selfP, dest);
+        return __send (selfP, dest);
     }
     /*
     Send message to destination socket as part of a multipart sequence, and 
@@ -64,37 +63,37 @@ public class Zmsg implements AutoCloseable {
     */
     native static int __sendm (long selfP, long dest);
     public int sendm (long selfP, long dest) {
-        return Zmsg.__sendm (selfP, dest);
+        return __sendm (selfP, dest);
     }
     /*
     Return size of message, i.e. number of frames (0 or more).
     */
     native static long __size (long self);
     public long size (long self) {
-        return Zmsg.__size (self);
+        return __size (self);
     }
     /*
     Return total size of all frames in message.
     */
     native static long __content_size (long self);
-    public long content_size (long self) {
-        return Zmsg.__content_size (self);
+    public long contentSize (long self) {
+        return __content_size (self);
     }
     /*
     Return message routing ID, if the message came from a ZMQ_SERVER socket.
     Else returns zero.                                                      
     */
     native static int __routing_id (long self);
-    public int routing_id (long self) {
-        return Zmsg.__routing_id (self);
+    public int routingId (long self) {
+        return __routing_id (self);
     }
     /*
     Set routing ID on message. This is used if/when the message is sent to a
     ZMQ_SERVER socket.                                                      
     */
     native static void __set_routing_id (long self, int routingId);
-    public void set_routing_id (long self, int routingId) {
-        Zmsg.__set_routing_id (self, routingId);
+    public void setRoutingId (long self, int routingId) {
+        __set_routing_id (self, routingId);
     }
     /*
     Push frame to the front of the message, i.e. before all other frames.  
@@ -104,7 +103,7 @@ public class Zmsg implements AutoCloseable {
     */
     native static int __prepend (long self, long frameP);
     public int prepend (long self, long frameP) {
-        return Zmsg.__prepend (self, frameP);
+        return __prepend (self, frameP);
     }
     /*
     Add frame to the end of the message, i.e. after all other frames.      
@@ -114,14 +113,14 @@ public class Zmsg implements AutoCloseable {
     */
     native static int __append (long self, long frameP);
     public int append (long self, long frameP) {
-        return Zmsg.__append (self, frameP);
+        return __append (self, frameP);
     }
     /*
     Remove first frame from message, if any. Returns frame, or NULL.
     */
     native static long __pop (long self);
     public long pop (long self) {
-        return Zmsg.__pop (self);
+        return __pop (self);
     }
     /*
     Push block of memory to front of message, as a new frame.
@@ -129,7 +128,7 @@ public class Zmsg implements AutoCloseable {
     */
     native static int __pushmem (long self, long src, long size);
     public int pushmem (long self, long src, long size) {
-        return Zmsg.__pushmem (self, src, size);
+        return __pushmem (self, src, size);
     }
     /*
     Add block of memory to the end of the message, as a new frame.
@@ -137,7 +136,7 @@ public class Zmsg implements AutoCloseable {
     */
     native static int __addmem (long self, long src, long size);
     public int addmem (long self, long src, long size) {
-        return Zmsg.__addmem (self, src, size);
+        return __addmem (self, src, size);
     }
     /*
     Push string as new frame to front of message.
@@ -145,7 +144,7 @@ public class Zmsg implements AutoCloseable {
     */
     native static int __pushstr (long self, String string);
     public int pushstr (long self, String string) {
-        return Zmsg.__pushstr (self, string);
+        return __pushstr (self, string);
     }
     /*
     Push string as new frame to end of message.
@@ -153,7 +152,7 @@ public class Zmsg implements AutoCloseable {
     */
     native static int __addstr (long self, String string);
     public int addstr (long self, String string) {
-        return Zmsg.__addstr (self, string);
+        return __addstr (self, string);
     }
     /*
     Push formatted string as new frame to front of message.
@@ -161,7 +160,7 @@ public class Zmsg implements AutoCloseable {
     */
     native static int __pushstrf (long self, String format);
     public int pushstrf (long self, String format) {
-        return Zmsg.__pushstrf (self, format);
+        return __pushstrf (self, format);
     }
     /*
     Push formatted string as new frame to end of message.
@@ -169,7 +168,7 @@ public class Zmsg implements AutoCloseable {
     */
     native static int __addstrf (long self, String format);
     public int addstrf (long self, String format) {
-        return Zmsg.__addstrf (self, format);
+        return __addstrf (self, format);
     }
     /*
     Pop frame off front of message, return as fresh string. If there were
@@ -177,7 +176,7 @@ public class Zmsg implements AutoCloseable {
     */
     native static String __popstr (long self);
     public String popstr (long self) {
-        return Zmsg.__popstr (self);
+        return __popstr (self);
     }
     /*
     Push encoded message as a new frame. Message takes ownership of    
@@ -186,7 +185,7 @@ public class Zmsg implements AutoCloseable {
     */
     native static int __addmsg (long self, long msgP);
     public int addmsg (long self, long msgP) {
-        return Zmsg.__addmsg (self, msgP);
+        return __addmsg (self, msgP);
     }
     /*
     Remove first submessage from message, if any. Returns zmsg_t, or NULL if
@@ -194,14 +193,14 @@ public class Zmsg implements AutoCloseable {
     */
     native static long __popmsg (long self);
     public long popmsg (long self) {
-        return Zmsg.__popmsg (self);
+        return __popmsg (self);
     }
     /*
     Remove specified frame from list, if present. Does not destroy frame.
     */
     native static void __remove (long self, long frame);
     public void remove (long self, long frame) {
-        Zmsg.__remove (self, frame);
+        __remove (self, frame);
     }
     /*
     Set cursor to first frame in message. Returns frame, or NULL, if the
@@ -209,7 +208,7 @@ public class Zmsg implements AutoCloseable {
     */
     native static long __first (long self);
     public long first (long self) {
-        return Zmsg.__first (self);
+        return __first (self);
     }
     /*
     Return the next frame. If there are no more frames, returns NULL. To move
@@ -217,14 +216,14 @@ public class Zmsg implements AutoCloseable {
     */
     native static long __next (long self);
     public long next (long self) {
-        return Zmsg.__next (self);
+        return __next (self);
     }
     /*
     Return the last frame. If there are no frames, returns NULL.
     */
     native static long __last (long self);
     public long last (long self) {
-        return Zmsg.__last (self);
+        return __last (self);
     }
     /*
     Serialize multipart message to a single buffer. Use this method to send  
@@ -234,7 +233,7 @@ public class Zmsg implements AutoCloseable {
     */
     native static long __encode (long self, byte [] buffer);
     public long encode (long self, byte [] buffer) {
-        return Zmsg.__encode (self, buffer);
+        return __encode (self, buffer);
     }
     /*
     Decodes a serialized message buffer created by zmsg_encode () and returns
@@ -243,7 +242,7 @@ public class Zmsg implements AutoCloseable {
     */
     native static long __decode (byte [] buffer, long bufferSize);
     public long decode (byte [] buffer, long bufferSize) {
-        return Zmsg.__decode (buffer, bufferSize);
+        return __decode (buffer, bufferSize);
     }
     /*
     Create copy of message, as new message object. Returns a fresh zmsg_t
@@ -251,7 +250,7 @@ public class Zmsg implements AutoCloseable {
     */
     native static long __dup (long self);
     public long dup (long self) {
-        return Zmsg.__dup (self);
+        return __dup (self);
     }
     /*
     Send message to zsys log sink (may be stdout, or system facility as
@@ -259,7 +258,7 @@ public class Zmsg implements AutoCloseable {
     */
     native static void __print (long self);
     public void print (long self) {
-        Zmsg.__print (self);
+        __print (self);
     }
     /*
     Return true if the two messages have the same number of frames and each  
@@ -268,7 +267,7 @@ public class Zmsg implements AutoCloseable {
     */
     native static boolean __eq (long self, long other);
     public boolean eq (long self, long other) {
-        return Zmsg.__eq (self, other);
+        return __eq (self, other);
     }
     /*
     Generate a signal message encoding the given status. A signal is a short
@@ -276,28 +275,28 @@ public class Zmsg implements AutoCloseable {
     OK). Signals are encoded to be distinguishable from "normal" messages.  
     */
     native static long __new_signal (byte status);
-    public long new_signal (byte status) {
-        return Zmsg.__new_signal (status);
+    public long newSignal (byte status) {
+        return __new_signal (status);
     }
     /*
     Return signal value, 0 or greater, if message is a signal, -1 if not.
     */
     native static int __signal (long self);
     public int signal (long self) {
-        return Zmsg.__signal (self);
+        return __signal (self);
     }
     /*
     Probe the supplied object, and report if it looks like a zmsg_t.
     */
     native static boolean __is (long self);
     public boolean is (long self) {
-        return Zmsg.__is (self);
+        return __is (self);
     }
     /*
     Self test of this class.
     */
     native static void __test (boolean verbose);
     public void test (boolean verbose) {
-        Zmsg.__test (verbose);
+        __test (verbose);
     }
 }

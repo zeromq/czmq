@@ -6,7 +6,7 @@
 */
 package org.zeromq.czmq;
 
-public class Zloop implements AutoCloseable {
+public class Zloop implements AutoCloseable{
     static {
         try {
             System.loadLibrary ("czmqjni");
@@ -16,7 +16,6 @@ public class Zloop implements AutoCloseable {
         }
     }
     long self;
-
     /*
     Create a new zloop reactor
     */
@@ -42,23 +41,23 @@ public class Zloop implements AutoCloseable {
     */
     native static int __reader (long self, long sock, long handler, long arg);
     public int reader (long self, long sock, long handler, long arg) {
-        return Zloop.__reader (self, sock, handler, arg);
+        return __reader (self, sock, handler, arg);
     }
     /*
     Cancel a socket reader from the reactor. If multiple readers exist for
     same socket, cancels ALL of them.                                     
     */
     native static void __reader_end (long self, long sock);
-    public void reader_end (long self, long sock) {
-        Zloop.__reader_end (self, sock);
+    public void readerEnd (long self, long sock) {
+        __reader_end (self, sock);
     }
     /*
     Configure a registered reader to ignore errors. If you do not set this,
     then readers that have errors are removed from the reactor silently.   
     */
     native static void __reader_set_tolerant (long self, long sock);
-    public void reader_set_tolerant (long self, long sock) {
-        Zloop.__reader_set_tolerant (self, sock);
+    public void readerSetTolerant (long self, long sock) {
+        __reader_set_tolerant (self, sock);
     }
     /*
     Register a timer that expires after some delay and repeats some number of
@@ -68,15 +67,15 @@ public class Zloop implements AutoCloseable {
     */
     native static int __timer (long self, long delay, long times, long handler, long arg);
     public int timer (long self, long delay, long times, long handler, long arg) {
-        return Zloop.__timer (self, delay, times, handler, arg);
+        return __timer (self, delay, times, handler, arg);
     }
     /*
     Cancel a specific timer identified by a specific timer_id (as returned by
     zloop_timer).                                                            
     */
     native static int __timer_end (long self, int timerId);
-    public int timer_end (long self, int timerId) {
-        return Zloop.__timer_end (self, timerId);
+    public int timerEnd (long self, int timerId) {
+        return __timer_end (self, timerId);
     }
     /*
     Register a ticket timer. Ticket timers are very fast in the case where   
@@ -91,15 +90,15 @@ public class Zloop implements AutoCloseable {
     */
     native static long __ticket (long self, long handler, long arg);
     public long ticket (long self, long handler, long arg) {
-        return Zloop.__ticket (self, handler, arg);
+        return __ticket (self, handler, arg);
     }
     /*
     Reset a ticket timer, which moves it to the end of the ticket list and
     resets its execution time. This is a very fast operation.             
     */
     native static void __ticket_reset (long self, long handle);
-    public void ticket_reset (long self, long handle) {
-        Zloop.__ticket_reset (self, handle);
+    public void ticketReset (long self, long handle) {
+        __ticket_reset (self, handle);
     }
     /*
     Delete a ticket timer. We do not actually delete the ticket here, as    
@@ -107,16 +106,16 @@ public class Zloop implements AutoCloseable {
     later and safely.                                                       
     */
     native static void __ticket_delete (long self, long handle);
-    public void ticket_delete (long self, long handle) {
-        Zloop.__ticket_delete (self, handle);
+    public void ticketDelete (long self, long handle) {
+        __ticket_delete (self, handle);
     }
     /*
     Set the ticket delay, which applies to all tickets. If you lower the   
     delay and there are already tickets created, the results are undefined.
     */
     native static void __set_ticket_delay (long self, long ticketDelay);
-    public void set_ticket_delay (long self, long ticketDelay) {
-        Zloop.__set_ticket_delay (self, ticketDelay);
+    public void setTicketDelay (long self, long ticketDelay) {
+        __set_ticket_delay (self, ticketDelay);
     }
     /*
     Set hard limit on number of timers allowed. Setting more than a small  
@@ -126,15 +125,15 @@ public class Zloop implements AutoCloseable {
     error.                                                                 
     */
     native static void __set_max_timers (long self, long maxTimers);
-    public void set_max_timers (long self, long maxTimers) {
-        Zloop.__set_max_timers (self, maxTimers);
+    public void setMaxTimers (long self, long maxTimers) {
+        __set_max_timers (self, maxTimers);
     }
     /*
     Set verbose tracing of reactor on/off
     */
     native static void __set_verbose (long self, boolean verbose);
-    public void set_verbose (long self, boolean verbose) {
-        Zloop.__set_verbose (self, verbose);
+    public void setVerbose (long self, boolean verbose) {
+        __set_verbose (self, verbose);
     }
     /*
     Start the reactor. Takes control of the thread and returns when the 0MQ  
@@ -144,7 +143,7 @@ public class Zloop implements AutoCloseable {
     */
     native static int __start (long self);
     public int start (long self) {
-        return Zloop.__start (self);
+        return __start (self);
     }
     /*
     Ignore zsys_interrupted flag in this loop. By default, a zloop_start will 
@@ -152,14 +151,14 @@ public class Zloop implements AutoCloseable {
     zero. Calling zloop_ignore_interrupts will supress this behavior.         
     */
     native static void __ignore_interrupts (long self);
-    public void ignore_interrupts (long self) {
-        Zloop.__ignore_interrupts (self);
+    public void ignoreInterrupts (long self) {
+        __ignore_interrupts (self);
     }
     /*
     Self test of this class.
     */
     native static void __test (boolean verbose);
     public void test (boolean verbose) {
-        Zloop.__test (verbose);
+        __test (verbose);
     }
 }

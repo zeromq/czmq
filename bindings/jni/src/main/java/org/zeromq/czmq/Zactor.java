@@ -6,7 +6,7 @@
 */
 package org.zeromq.czmq;
 
-public class Zactor implements AutoCloseable {
+public class Zactor implements AutoCloseable{
     static {
         try {
             System.loadLibrary ("czmqjni");
@@ -16,7 +16,6 @@ public class Zactor implements AutoCloseable {
         }
     }
     long self;
-
     /*
     Create a new actor passing arbitrary arguments reference.
     */
@@ -24,6 +23,9 @@ public class Zactor implements AutoCloseable {
     public Zactor (long task, long args) {
         /*  TODO: if __init fails, self is null...  */
         self = __init (task, args);
+    }
+    public Zactor () {
+        self = 0;
     }
     /*
     Destroy an actor.
@@ -40,7 +42,7 @@ public class Zactor implements AutoCloseable {
     */
     native static int __send (long self, long msgP);
     public int send (long self, long msgP) {
-        return Zactor.__send (self, msgP);
+        return __send (self, msgP);
     }
     /*
     Receive a zmsg message from the actor. Returns NULL if the actor 
@@ -49,14 +51,14 @@ public class Zactor implements AutoCloseable {
     */
     native static long __recv (long self);
     public long recv (long self) {
-        return Zactor.__recv (self);
+        return __recv (self);
     }
     /*
     Probe the supplied object, and report if it looks like a zactor_t.
     */
     native static boolean __is (long self);
     public boolean is (long self) {
-        return Zactor.__is (self);
+        return __is (self);
     }
     /*
     Probe the supplied reference. If it looks like a zactor_t instance,
@@ -65,7 +67,7 @@ public class Zactor implements AutoCloseable {
     */
     native static long __resolve (long self);
     public long resolve (long self) {
-        return Zactor.__resolve (self);
+        return __resolve (self);
     }
     /*
     Return the actor's zsock handle. Use this when you absolutely need
@@ -73,13 +75,13 @@ public class Zactor implements AutoCloseable {
     */
     native static long __sock (long self);
     public long sock (long self) {
-        return Zactor.__sock (self);
+        return __sock (self);
     }
     /*
     Self test of this class.
     */
     native static void __test (boolean verbose);
     public void test (boolean verbose) {
-        Zactor.__test (verbose);
+        __test (verbose);
     }
 }

@@ -6,7 +6,7 @@
 */
 package org.zeromq.czmq;
 
-public class Zlist implements AutoCloseable {
+public class Zlist implements AutoCloseable{
     static {
         try {
             System.loadLibrary ("czmqjni");
@@ -16,7 +16,6 @@ public class Zlist implements AutoCloseable {
         }
     }
     long self;
-
     /*
     Create a new list container
     */
@@ -40,7 +39,7 @@ public class Zlist implements AutoCloseable {
     */
     native static long __first (long self);
     public long first (long self) {
-        return Zlist.__first (self);
+        return __first (self);
     }
     /*
     Return the next item. If the list is empty, returns NULL. To move to
@@ -48,7 +47,7 @@ public class Zlist implements AutoCloseable {
     */
     native static long __next (long self);
     public long next (long self) {
-        return Zlist.__next (self);
+        return __next (self);
     }
     /*
     Return the item at the tail of list. If the list is empty, returns NULL.
@@ -56,21 +55,21 @@ public class Zlist implements AutoCloseable {
     */
     native static long __last (long self);
     public long last (long self) {
-        return Zlist.__last (self);
+        return __last (self);
     }
     /*
     Return first item in the list, or null, leaves the cursor
     */
     native static long __head (long self);
     public long head (long self) {
-        return Zlist.__head (self);
+        return __head (self);
     }
     /*
     Return last item in the list, or null, leaves the cursor
     */
     native static long __tail (long self);
     public long tail (long self) {
-        return Zlist.__tail (self);
+        return __tail (self);
     }
     /*
     Return the current item of list. If the list is empty, returns NULL.     
@@ -78,7 +77,7 @@ public class Zlist implements AutoCloseable {
     */
     native static long __item (long self);
     public long item (long self) {
-        return Zlist.__item (self);
+        return __item (self);
     }
     /*
     Append an item to the end of the list, return 0 if OK or -1 if this  
@@ -87,7 +86,7 @@ public class Zlist implements AutoCloseable {
     */
     native static int __append (long self, long item);
     public int append (long self, long item) {
-        return Zlist.__append (self, item);
+        return __append (self, item);
     }
     /*
     Push an item to the start of the list, return 0 if OK or -1 if this  
@@ -96,14 +95,14 @@ public class Zlist implements AutoCloseable {
     */
     native static int __push (long self, long item);
     public int push (long self, long item) {
-        return Zlist.__push (self, item);
+        return __push (self, item);
     }
     /*
     Pop the item off the start of the list, if any
     */
     native static long __pop (long self);
     public long pop (long self) {
-        return Zlist.__pop (self);
+        return __pop (self);
     }
     /*
     Checks if an item already is present. Uses compare method to determine if 
@@ -112,14 +111,14 @@ public class Zlist implements AutoCloseable {
     */
     native static boolean __exists (long self, long item);
     public boolean exists (long self, long item) {
-        return Zlist.__exists (self, item);
+        return __exists (self, item);
     }
     /*
     Remove the specified item from the list if present
     */
     native static void __remove (long self, long item);
     public void remove (long self, long item) {
-        Zlist.__remove (self, item);
+        __remove (self, item);
     }
     /*
     Make a copy of list. If the list has autofree set, the copied list will  
@@ -129,21 +128,21 @@ public class Zlist implements AutoCloseable {
     */
     native static long __dup (long self);
     public long dup (long self) {
-        return Zlist.__dup (self);
+        return __dup (self);
     }
     /*
     Purge all items from list
     */
     native static void __purge (long self);
     public void purge (long self) {
-        Zlist.__purge (self);
+        __purge (self);
     }
     /*
     Return number of items in the list
     */
     native static long __size (long self);
     public long size (long self) {
-        return Zlist.__size (self);
+        return __size (self);
     }
     /*
     Sort the list by ascending key value using a straight ASCII comparison.
@@ -151,7 +150,7 @@ public class Zlist implements AutoCloseable {
     */
     native static void __sort (long self, long compare);
     public void sort (long self, long compare) {
-        Zlist.__sort (self, compare);
+        __sort (self, compare);
     }
     /*
     Set list for automatic item destruction; item values MUST be strings. 
@@ -165,7 +164,7 @@ public class Zlist implements AutoCloseable {
     */
     native static void __autofree (long self);
     public void autofree (long self) {
-        Zlist.__autofree (self);
+        __autofree (self);
     }
     /*
     Sets a compare function for this list. The function compares two items.
@@ -176,7 +175,7 @@ public class Zlist implements AutoCloseable {
     */
     native static void __comparefn (long self, long fn);
     public void comparefn (long self, long fn) {
-        Zlist.__comparefn (self, fn);
+        __comparefn (self, fn);
     }
     /*
     Set a free function for the specified list item. When the item is     
@@ -187,13 +186,13 @@ public class Zlist implements AutoCloseable {
     */
     native static long __freefn (long self, long item, long fn, boolean atTail);
     public long freefn (long self, long item, long fn, boolean atTail) {
-        return Zlist.__freefn (self, item, fn, atTail);
+        return __freefn (self, item, fn, atTail);
     }
     /*
     Self test of this class.
     */
     native static void __test (boolean verbose);
     public void test (boolean verbose) {
-        Zlist.__test (verbose);
+        __test (verbose);
     }
 }

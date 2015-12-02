@@ -16,7 +16,9 @@ public class Zstr {
         }
     }
     long self;
-
+    public Zstr () {
+        self = 0;
+    }
     /*
     Receive C string from socket. Caller must free returned string using
     zstr_free(). Returns NULL if the context is being terminated or the 
@@ -24,7 +26,7 @@ public class Zstr {
     */
     native static String __recv (long source);
     public String recv (long source) {
-        return Zstr.__recv (source);
+        return __recv (source);
     }
     /*
     Send a C string to a socket, as a frame. The string is sent without 
@@ -34,7 +36,7 @@ public class Zstr {
     */
     native static int __send (long dest, String string);
     public int send (long dest, String string) {
-        return Zstr.__send (dest, string);
+        return __send (dest, string);
     }
     /*
     Send a C string to a socket, as zstr_send(), with a MORE flag, so that
@@ -42,7 +44,7 @@ public class Zstr {
     */
     native static int __sendm (long dest, String string);
     public int sendm (long dest, String string) {
-        return Zstr.__sendm (dest, string);
+        return __sendm (dest, string);
     }
     /*
     Send a formatted string to a socket. Note that you should NOT use
@@ -51,7 +53,7 @@ public class Zstr {
     */
     native static int __sendf (long dest, String format);
     public int sendf (long dest, String format) {
-        return Zstr.__sendf (dest, format);
+        return __sendf (dest, format);
     }
     /*
     Send a formatted string to a socket, as for zstr_sendf(), with a      
@@ -60,7 +62,7 @@ public class Zstr {
     */
     native static int __sendfm (long dest, String format);
     public int sendfm (long dest, String format) {
-        return Zstr.__sendfm (dest, format);
+        return __sendfm (dest, format);
     }
     /*
     Send a series of strings (until NULL) as multipart data   
@@ -68,13 +70,13 @@ public class Zstr {
     */
     native static int __sendx (long dest, String string);
     public int sendx (long dest, String string) {
-        return Zstr.__sendx (dest, string);
+        return __sendx (dest, string);
     }
     /*
     Self test of this class.
     */
     native static void __test (boolean verbose);
     public void test (boolean verbose) {
-        Zstr.__test (verbose);
+        __test (verbose);
     }
 }

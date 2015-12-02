@@ -6,7 +6,7 @@
 */
 package org.zeromq.czmq;
 
-public class Zdir implements AutoCloseable {
+public class Zdir implements AutoCloseable{
     static {
         try {
             System.loadLibrary ("czmqjni");
@@ -16,7 +16,6 @@ public class Zdir implements AutoCloseable {
         }
     }
     long self;
-
     /*
     Create a new directory item that loads in the full tree of the specified
     path, optionally located under some parent path. If parent is "-", then 
@@ -26,6 +25,9 @@ public class Zdir implements AutoCloseable {
     public Zdir (String path, String parent) {
         /*  TODO: if __init fails, self is null...  */
         self = __init (path, parent);
+    }
+    public Zdir () {
+        self = 0;
     }
     /*
     Destroy a directory tree and all children it contains.
@@ -41,14 +43,14 @@ public class Zdir implements AutoCloseable {
     */
     native static String __path (long self);
     public String path (long self) {
-        return Zdir.__path (self);
+        return __path (self);
     }
     /*
     Return last modification time for directory.
     */
     native static long __modified (long self);
     public long modified (long self) {
-        return Zdir.__modified (self);
+        return __modified (self);
     }
     /*
     Return total hierarchy size, in bytes of data contained in all files
@@ -56,14 +58,14 @@ public class Zdir implements AutoCloseable {
     */
     native static long __cursize (long self);
     public long cursize (long self) {
-        return Zdir.__cursize (self);
+        return __cursize (self);
     }
     /*
     Return directory count
     */
     native static long __count (long self);
     public long count (long self) {
-        return Zdir.__count (self);
+        return __count (self);
     }
     /*
     Returns a sorted list of zfile objects; Each entry in the list is a pointer
@@ -72,7 +74,7 @@ public class Zdir implements AutoCloseable {
     */
     native static long __list (long self);
     public long list (long self) {
-        return Zdir.__list (self);
+        return __list (self);
     }
     /*
     Remove directory, optionally including all files that it contains, at  
@@ -81,7 +83,7 @@ public class Zdir implements AutoCloseable {
     */
     native static void __remove (long self, boolean force);
     public void remove (long self, boolean force) {
-        Zdir.__remove (self, force);
+        __remove (self, force);
     }
     /*
     Calculate differences between two versions of a directory tree.    
@@ -91,14 +93,14 @@ public class Zdir implements AutoCloseable {
     */
     native static long __diff (long older, long newer, String alias);
     public long diff (long older, long newer, String alias) {
-        return Zdir.__diff (older, newer, alias);
+        return __diff (older, newer, alias);
     }
     /*
     Return full contents of directory as a zdir_patch list.
     */
     native static long __resync (long self, String alias);
     public long resync (long self, String alias) {
-        return Zdir.__resync (self, alias);
+        return __resync (self, alias);
     }
     /*
     Load directory cache; returns a hash table containing the SHA-1 digests
@@ -106,14 +108,14 @@ public class Zdir implements AutoCloseable {
     */
     native static long __cache (long self);
     public long cache (long self) {
-        return Zdir.__cache (self);
+        return __cache (self);
     }
     /*
     Print contents of directory to stdout
     */
     native static void __print (long self, int indent);
     public void print (long self, int indent) {
-        Zdir.__print (self, indent);
+        __print (self, indent);
     }
     /*
     Create a new zdir_watch actor instance:                       
@@ -145,13 +147,13 @@ public class Zdir implements AutoCloseable {
     */
     native static void __watch (long pipe, long unused);
     public void watch (long pipe, long unused) {
-        Zdir.__watch (pipe, unused);
+        __watch (pipe, unused);
     }
     /*
     Self test of this class.
     */
     native static void __test (boolean verbose);
     public void test (boolean verbose) {
-        Zdir.__test (verbose);
+        __test (verbose);
     }
 }
