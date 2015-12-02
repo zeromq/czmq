@@ -359,7 +359,7 @@ zconfig_execute (zconfig_t *self, zconfig_fct handler, void *arg)
 }
 
 
-//  Return number of bytes processed, or zero
+//  Return number of bytes processed if successful, otherwise -1.
 
 static int
 s_config_execute (zconfig_t *self, zconfig_fct handler, void *arg, int level)
@@ -367,7 +367,7 @@ s_config_execute (zconfig_t *self, zconfig_fct handler, void *arg, int level)
     assert (self);
     int size = handler (self, arg, level);
     if (size == -1)
-        return 0; // fail early
+        return -1; // fail early
 
     //  Process all children in one go, as a list
     zconfig_t *child = self->child;
