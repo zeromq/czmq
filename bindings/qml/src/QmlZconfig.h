@@ -29,10 +29,10 @@ public:
     
 public slots:
     //  Return name of config item
-    QString name ();
+    const QString name ();
 
     //  Return value of config item
-    QString value ();
+    const QString value ();
 
     //  Insert or update configuration key with value
     void put (const QString &path, const QString &value);
@@ -43,7 +43,7 @@ public slots:
 
     //  Get value for config item into a string value; leading slash is optional
     //  and ignored.                                                            
-    QString get (const QString &path, const QString &defaultValue);
+    const QString get (const QString &path, const QString &defaultValue);
 
     //  Set config item name, name may be NULL
     void setName (const QString &name);

@@ -31,21 +31,17 @@ QZconfig::~QZconfig ()
 
 ///
 //  Return name of config item
-QString QZconfig::name ()
+const QString QZconfig::name ()
 {
-    char *retStr_ = zconfig_name (self);
-    QString rv = QString (retStr_);
-    free (retStr_);;
+    const QString rv = QString (zconfig_name (self));
     return rv;
 }
 
 ///
 //  Return value of config item
-QString QZconfig::value ()
+const QString QZconfig::value ()
 {
-    char *retStr_ = zconfig_value (self);
-    QString rv = QString (retStr_);
-    free (retStr_);;
+    const QString rv = QString (zconfig_value (self));
     return rv;
 }
 
@@ -69,11 +65,9 @@ void QZconfig::putf (const QString &path, const QString &param)
 ///
 //  Get value for config item into a string value; leading slash is optional
 //  and ignored.                                                            
-QString QZconfig::get (const QString &path, const QString &defaultValue)
+const QString QZconfig::get (const QString &path, const QString &defaultValue)
 {
-    char *retStr_ = zconfig_get (self, path.toUtf8().data(), defaultValue.toUtf8().data());
-    QString rv = QString (retStr_);
-    free (retStr_);;
+    const QString rv = QString (zconfig_get (self, path.toUtf8().data(), defaultValue.toUtf8().data()));
     return rv;
 }
 
