@@ -34,12 +34,10 @@ CZMQ_EXPORT void
     zconfig_destroy (zconfig_t **self_p);
 
 //  Return name of config item
-//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT char *
     zconfig_name (zconfig_t *self);
 
 //  Return value of config item
-//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT char *
     zconfig_value (zconfig_t *self);
 
@@ -54,7 +52,6 @@ CZMQ_EXPORT void
 
 //  Get value for config item into a string value; leading slash is optional
 //  and ignored.                                                            
-//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT char *
     zconfig_get (zconfig_t *self, const char *path, const char *default_value);
 
@@ -103,6 +100,7 @@ CZMQ_EXPORT zlist_t *
 //  Load a config tree from a specified ZPL text file; returns a zconfig_t  
 //  reference for the root, if the file exists and is readable. Returns NULL
 //  if the file does not exist.                                             
+//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zconfig_t *
     zconfig_load (const char *filename);
 
@@ -113,6 +111,7 @@ CZMQ_EXPORT int
 
 //  Equivalent to zconfig_load, taking a format string instead of a fixed
 //  filename.                                                            
+//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zconfig_t *
     zconfig_loadf (const char *format, ...) CHECK_PRINTF (1);
 
@@ -140,6 +139,7 @@ CZMQ_EXPORT zchunk_t *
     zconfig_chunk_save (zconfig_t *self);
 
 //  Load a config tree from a null-terminated string
+//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zconfig_t *
     zconfig_str_load (const char *string);
 

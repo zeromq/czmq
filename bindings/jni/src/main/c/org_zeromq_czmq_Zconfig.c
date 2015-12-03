@@ -30,7 +30,6 @@ Java_zconfig__1_1name (JNIEnv *env, jclass c, jlong self)
 {
     char *name_ = (char *) zconfig_name ((zconfig_t *) self);
     jstring string = (*env)->NewStringUTF (env, name_);
-    zstr_free (&name_);
     return string;
 }
 
@@ -39,7 +38,6 @@ Java_zconfig__1_1value (JNIEnv *env, jclass c, jlong self)
 {
     char *value_ = (char *) zconfig_value ((zconfig_t *) self);
     jstring string = (*env)->NewStringUTF (env, value_);
-    zstr_free (&value_);
     return string;
 }
 
@@ -70,7 +68,6 @@ Java_zconfig__1_1get (JNIEnv *env, jclass c, jlong self, jstring path, jstring d
     char *default_value_ = (char *) (*env)->GetStringUTFChars (env, default_value, NULL);
     char *get_ = (char *) zconfig_get ((zconfig_t *) self, path_, default_value_);
     jstring string = (*env)->NewStringUTF (env, get_);
-    zstr_free (&get_);
     (*env)->ReleaseStringUTFChars (env, path, path_);
     (*env)->ReleaseStringUTFChars (env, default_value, default_value_);
     return string;

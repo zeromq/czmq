@@ -94,7 +94,6 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zconfig_name(self_p)
-        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -103,7 +102,6 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zconfig_value(self_p)
-        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -136,7 +134,6 @@ module CZMQ
         path = String(path)
         default_value = String(default_value)
         result = ::CZMQ::FFI.zconfig_get(self_p, path, default_value)
-        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 
@@ -234,7 +231,7 @@ module CZMQ
       def self.load(filename)
         filename = String(filename)
         result = ::CZMQ::FFI.zconfig_load(filename)
-        result = Zconfig.__new result, false
+        result = Zconfig.__new result, true
         result
       end
 
@@ -253,7 +250,7 @@ module CZMQ
       def self.loadf(format, *args)
         format = String(format)
         result = ::CZMQ::FFI.zconfig_loadf(format, *args)
-        result = Zconfig.__new result, false
+        result = Zconfig.__new result, true
         result
       end
 
@@ -303,7 +300,7 @@ module CZMQ
       def self.str_load(string)
         string = String(string)
         result = ::CZMQ::FFI.zconfig_str_load(string)
-        result = Zconfig.__new result, false
+        result = Zconfig.__new result, true
         result
       end
 

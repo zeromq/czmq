@@ -429,15 +429,15 @@ lib.zconfig_new.restype = zconfig_p
 lib.zconfig_new.argtypes = [c_char_p, zconfig_p]
 lib.zconfig_destroy.restype = None
 lib.zconfig_destroy.argtypes = [POINTER(zconfig_p)]
-lib.zconfig_name.restype = POINTER(c_char)
+lib.zconfig_name.restype = c_char_p
 lib.zconfig_name.argtypes = [zconfig_p]
-lib.zconfig_value.restype = POINTER(c_char)
+lib.zconfig_value.restype = c_char_p
 lib.zconfig_value.argtypes = [zconfig_p]
 lib.zconfig_put.restype = None
 lib.zconfig_put.argtypes = [zconfig_p, c_char_p, c_char_p]
 lib.zconfig_putf.restype = None
 lib.zconfig_putf.argtypes = [zconfig_p, c_char_p, c_char_p]
-lib.zconfig_get.restype = POINTER(c_char)
+lib.zconfig_get.restype = c_char_p
 lib.zconfig_get.argtypes = [zconfig_p, c_char_p, c_char_p]
 lib.zconfig_set_name.restype = None
 lib.zconfig_set_name.argtypes = [zconfig_p, c_char_p]
@@ -521,11 +521,11 @@ class Zconfig(object):
 
     def name(self):
         """Return name of config item"""
-        return return_fresh_string(lib.zconfig_name(self._as_parameter_))
+        return lib.zconfig_name(self._as_parameter_)
 
     def value(self):
         """Return value of config item"""
-        return return_fresh_string(lib.zconfig_value(self._as_parameter_))
+        return lib.zconfig_value(self._as_parameter_)
 
     def put(self, path, value):
         """Insert or update configuration key with value"""
@@ -539,7 +539,7 @@ argument list, instead of a single string value."""
     def get(self, path, default_value):
         """Get value for config item into a string value; leading slash is optional
 and ignored."""
-        return return_fresh_string(lib.zconfig_get(self._as_parameter_, path, default_value))
+        return lib.zconfig_get(self._as_parameter_, path, default_value)
 
     def set_name(self, name):
         """Set config item name, name may be NULL"""
@@ -588,7 +588,7 @@ deleted."""
         """Load a config tree from a specified ZPL text file; returns a zconfig_t
 reference for the root, if the file exists and is readable. Returns NULL
 if the file does not exist."""
-        return Zconfig(lib.zconfig_load(filename), False)
+        return Zconfig(lib.zconfig_load(filename), True)
 
     def save(self, filename):
         """Save a config tree to a specified ZPL text file, where a filename
@@ -599,7 +599,7 @@ if the file does not exist."""
     def loadf(format, *args):
         """Equivalent to zconfig_load, taking a format string instead of a fixed
 filename."""
-        return Zconfig(lib.zconfig_loadf(format, *args), False)
+        return Zconfig(lib.zconfig_loadf(format, *args), True)
 
     def savef(self, format, *args):
         """Equivalent to zconfig_save, taking a format string instead of a fixed
@@ -629,7 +629,7 @@ existing data)."""
     @staticmethod
     def str_load(string):
         """Load a config tree from a null-terminated string"""
-        return Zconfig(lib.zconfig_str_load(string), False)
+        return Zconfig(lib.zconfig_str_load(string), True)
 
     def str_save(self):
         """Save a config tree to a new null terminated string"""
