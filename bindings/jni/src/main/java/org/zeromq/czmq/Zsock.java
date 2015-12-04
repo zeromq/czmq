@@ -164,14 +164,14 @@ public class Zsock implements AutoCloseable{
     this into account.                                                      
     */
     native static int __bind (long self, String format);
-    public int bind (long self, String format) {
+    public int bind (String format) {
         return __bind (self, format);
     }
     /*
     Returns last bound endpoint, if any.
     */
     native static String __endpoint (long self);
-    public String endpoint (long self) {
+    public String endpoint () {
         return __endpoint (self);
     }
     /*
@@ -180,7 +180,7 @@ public class Zsock implements AutoCloseable{
     isn't supported.                                               
     */
     native static int __unbind (long self, String format);
-    public int unbind (long self, String format) {
+    public int unbind (String format) {
         return __unbind (self, format);
     }
     /*
@@ -188,7 +188,7 @@ public class Zsock implements AutoCloseable{
     Returns 0 if OK, -1 if the endpoint was invalid.
     */
     native static int __connect (long self, String format);
-    public int connect (long self, String format) {
+    public int connect (String format) {
         return __connect (self, format);
     }
     /*
@@ -197,7 +197,7 @@ public class Zsock implements AutoCloseable{
     isn't supported.                                               
     */
     native static int __disconnect (long self, String format);
-    public int disconnect (long self, String format) {
+    public int disconnect (String format) {
         return __disconnect (self, format);
     }
     /*
@@ -209,14 +209,14 @@ public class Zsock implements AutoCloseable{
     it is used to bind (serverish = true) or connect (serverish = false).    
     */
     native static int __attach (long self, String endpoints, boolean serverish);
-    public int attach (long self, String endpoints, boolean serverish) {
+    public int attach (String endpoints, boolean serverish) {
         return __attach (self, endpoints, serverish);
     }
     /*
     Returns socket type as printable constant string.
     */
     native static String __typeStr (long self);
-    public String typeStr (long self) {
+    public String typeStr () {
         return __typeStr (self);
     }
     /*
@@ -248,7 +248,7 @@ public class Zsock implements AutoCloseable{
     reason.                                                               
     */
     native static int __send (long self, String picture);
-    public int send (long self, String picture) {
+    public int send (String picture) {
         return __send (self, picture);
     }
     /*
@@ -280,7 +280,7 @@ public class Zsock implements AutoCloseable{
     the method will return -1.                                              
     */
     native static int __recv (long self, String picture);
-    public int recv (long self, String picture) {
+    public int recv (String picture) {
         return __recv (self, picture);
     }
     /*
@@ -307,7 +307,7 @@ public class Zsock implements AutoCloseable{
     successful, -1 if sending failed for any reason.                       
     */
     native static int __bsend (long self, String picture);
-    public int bsend (long self, String picture) {
+    public int bsend (String picture) {
         return __bsend (self, picture);
     }
     /*
@@ -321,7 +321,7 @@ public class Zsock implements AutoCloseable{
     values. Returns 0 if successful, or -1 if it failed to read a message.  
     */
     native static int __brecv (long self, String picture);
-    public int brecv (long self, String picture) {
+    public int brecv (String picture) {
         return __brecv (self, picture);
     }
     /*
@@ -329,7 +329,7 @@ public class Zsock implements AutoCloseable{
     of type ZMQ_SERVER or if no request was already received on it.     
     */
     native static int __routingId (long self);
-    public int routingId (long self) {
+    public int routingId () {
         return __routingId (self);
     }
     /*
@@ -337,7 +337,7 @@ public class Zsock implements AutoCloseable{
     This will be used when sending messages on the socket via the zsock API.
     */
     native static void __setRoutingId (long self, int routingId);
-    public void setRoutingId (long self, int routingId) {
+    public void setRoutingId (int routingId) {
         __setRoutingId (self, routingId);
     }
     /*
@@ -346,7 +346,7 @@ public class Zsock implements AutoCloseable{
     across all versions of ZeroMQ. Takes a polymorphic socket reference.     
     */
     native static void __setUnbounded (long self);
-    public void setUnbounded (long self) {
+    public void setUnbounded () {
         __setUnbounded (self);
     }
     /*
@@ -357,7 +357,7 @@ public class Zsock implements AutoCloseable{
     not be sent. Takes a polymorphic socket reference.                    
     */
     native static int __signal (long self, byte status);
-    public int signal (long self, byte status) {
+    public int signal (byte status) {
         return __signal (self, status);
     }
     /*
@@ -367,7 +367,7 @@ public class Zsock implements AutoCloseable{
     Takes a polymorphic socket reference.                                
     */
     native static int __wait (long self);
-    public int Wait (long self) {
+    public int Wait () {
         return __wait (self);
     }
     /*
@@ -376,7 +376,7 @@ public class Zsock implements AutoCloseable{
     message types.                                                           
     */
     native static void __flush (long self);
-    public void flush (long self) {
+    public void flush () {
         __flush (self);
     }
     /*
@@ -401,630 +401,630 @@ public class Zsock implements AutoCloseable{
     Get socket option `tos`.
     */
     native static int __tos (long self);
-    public int tos (long self) {
+    public int tos () {
         return __tos (self);
     }
     /*
     Set socket option `tos`.
     */
     native static void __setTos (long self, int tos);
-    public void setTos (long self, int tos) {
+    public void setTos (int tos) {
         __setTos (self, tos);
     }
     /*
     Set socket option `router_handover`.
     */
     native static void __setRouterHandover (long self, int routerHandover);
-    public void setRouterHandover (long self, int routerHandover) {
+    public void setRouterHandover (int routerHandover) {
         __setRouterHandover (self, routerHandover);
     }
     /*
     Set socket option `router_mandatory`.
     */
     native static void __setRouterMandatory (long self, int routerMandatory);
-    public void setRouterMandatory (long self, int routerMandatory) {
+    public void setRouterMandatory (int routerMandatory) {
         __setRouterMandatory (self, routerMandatory);
     }
     /*
     Set socket option `probe_router`.
     */
     native static void __setProbeRouter (long self, int probeRouter);
-    public void setProbeRouter (long self, int probeRouter) {
+    public void setProbeRouter (int probeRouter) {
         __setProbeRouter (self, probeRouter);
     }
     /*
     Set socket option `req_relaxed`.
     */
     native static void __setReqRelaxed (long self, int reqRelaxed);
-    public void setReqRelaxed (long self, int reqRelaxed) {
+    public void setReqRelaxed (int reqRelaxed) {
         __setReqRelaxed (self, reqRelaxed);
     }
     /*
     Set socket option `req_correlate`.
     */
     native static void __setReqCorrelate (long self, int reqCorrelate);
-    public void setReqCorrelate (long self, int reqCorrelate) {
+    public void setReqCorrelate (int reqCorrelate) {
         __setReqCorrelate (self, reqCorrelate);
     }
     /*
     Set socket option `conflate`.
     */
     native static void __setConflate (long self, int conflate);
-    public void setConflate (long self, int conflate) {
+    public void setConflate (int conflate) {
         __setConflate (self, conflate);
     }
     /*
     Get socket option `zap_domain`.
     */
     native static String __zapDomain (long self);
-    public String zapDomain (long self) {
+    public String zapDomain () {
         return __zapDomain (self);
     }
     /*
     Set socket option `zap_domain`.
     */
     native static void __setZapDomain (long self, String zapDomain);
-    public void setZapDomain (long self, String zapDomain) {
+    public void setZapDomain (String zapDomain) {
         __setZapDomain (self, zapDomain);
     }
     /*
     Get socket option `mechanism`.
     */
     native static int __mechanism (long self);
-    public int mechanism (long self) {
+    public int mechanism () {
         return __mechanism (self);
     }
     /*
     Get socket option `plain_server`.
     */
     native static int __plainServer (long self);
-    public int plainServer (long self) {
+    public int plainServer () {
         return __plainServer (self);
     }
     /*
     Set socket option `plain_server`.
     */
     native static void __setPlainServer (long self, int plainServer);
-    public void setPlainServer (long self, int plainServer) {
+    public void setPlainServer (int plainServer) {
         __setPlainServer (self, plainServer);
     }
     /*
     Get socket option `plain_username`.
     */
     native static String __plainUsername (long self);
-    public String plainUsername (long self) {
+    public String plainUsername () {
         return __plainUsername (self);
     }
     /*
     Set socket option `plain_username`.
     */
     native static void __setPlainUsername (long self, String plainUsername);
-    public void setPlainUsername (long self, String plainUsername) {
+    public void setPlainUsername (String plainUsername) {
         __setPlainUsername (self, plainUsername);
     }
     /*
     Get socket option `plain_password`.
     */
     native static String __plainPassword (long self);
-    public String plainPassword (long self) {
+    public String plainPassword () {
         return __plainPassword (self);
     }
     /*
     Set socket option `plain_password`.
     */
     native static void __setPlainPassword (long self, String plainPassword);
-    public void setPlainPassword (long self, String plainPassword) {
+    public void setPlainPassword (String plainPassword) {
         __setPlainPassword (self, plainPassword);
     }
     /*
     Get socket option `curve_server`.
     */
     native static int __curveServer (long self);
-    public int curveServer (long self) {
+    public int curveServer () {
         return __curveServer (self);
     }
     /*
     Set socket option `curve_server`.
     */
     native static void __setCurveServer (long self, int curveServer);
-    public void setCurveServer (long self, int curveServer) {
+    public void setCurveServer (int curveServer) {
         __setCurveServer (self, curveServer);
     }
     /*
     Get socket option `curve_publickey`.
     */
     native static String __curvePublickey (long self);
-    public String curvePublickey (long self) {
+    public String curvePublickey () {
         return __curvePublickey (self);
     }
     /*
     Set socket option `curve_publickey`.
     */
     native static void __setCurvePublickey (long self, String curvePublickey);
-    public void setCurvePublickey (long self, String curvePublickey) {
+    public void setCurvePublickey (String curvePublickey) {
         __setCurvePublickey (self, curvePublickey);
     }
     /*
     Get socket option `curve_secretkey`.
     */
     native static String __curveSecretkey (long self);
-    public String curveSecretkey (long self) {
+    public String curveSecretkey () {
         return __curveSecretkey (self);
     }
     /*
     Set socket option `curve_secretkey`.
     */
     native static void __setCurveSecretkey (long self, String curveSecretkey);
-    public void setCurveSecretkey (long self, String curveSecretkey) {
+    public void setCurveSecretkey (String curveSecretkey) {
         __setCurveSecretkey (self, curveSecretkey);
     }
     /*
     Get socket option `curve_serverkey`.
     */
     native static String __curveServerkey (long self);
-    public String curveServerkey (long self) {
+    public String curveServerkey () {
         return __curveServerkey (self);
     }
     /*
     Set socket option `curve_serverkey`.
     */
     native static void __setCurveServerkey (long self, String curveServerkey);
-    public void setCurveServerkey (long self, String curveServerkey) {
+    public void setCurveServerkey (String curveServerkey) {
         __setCurveServerkey (self, curveServerkey);
     }
     /*
     Get socket option `gssapi_server`.
     */
     native static int __gssapiServer (long self);
-    public int gssapiServer (long self) {
+    public int gssapiServer () {
         return __gssapiServer (self);
     }
     /*
     Set socket option `gssapi_server`.
     */
     native static void __setGssapiServer (long self, int gssapiServer);
-    public void setGssapiServer (long self, int gssapiServer) {
+    public void setGssapiServer (int gssapiServer) {
         __setGssapiServer (self, gssapiServer);
     }
     /*
     Get socket option `gssapi_plaintext`.
     */
     native static int __gssapiPlaintext (long self);
-    public int gssapiPlaintext (long self) {
+    public int gssapiPlaintext () {
         return __gssapiPlaintext (self);
     }
     /*
     Set socket option `gssapi_plaintext`.
     */
     native static void __setGssapiPlaintext (long self, int gssapiPlaintext);
-    public void setGssapiPlaintext (long self, int gssapiPlaintext) {
+    public void setGssapiPlaintext (int gssapiPlaintext) {
         __setGssapiPlaintext (self, gssapiPlaintext);
     }
     /*
     Get socket option `gssapi_principal`.
     */
     native static String __gssapiPrincipal (long self);
-    public String gssapiPrincipal (long self) {
+    public String gssapiPrincipal () {
         return __gssapiPrincipal (self);
     }
     /*
     Set socket option `gssapi_principal`.
     */
     native static void __setGssapiPrincipal (long self, String gssapiPrincipal);
-    public void setGssapiPrincipal (long self, String gssapiPrincipal) {
+    public void setGssapiPrincipal (String gssapiPrincipal) {
         __setGssapiPrincipal (self, gssapiPrincipal);
     }
     /*
     Get socket option `gssapi_service_principal`.
     */
     native static String __gssapiServicePrincipal (long self);
-    public String gssapiServicePrincipal (long self) {
+    public String gssapiServicePrincipal () {
         return __gssapiServicePrincipal (self);
     }
     /*
     Set socket option `gssapi_service_principal`.
     */
     native static void __setGssapiServicePrincipal (long self, String gssapiServicePrincipal);
-    public void setGssapiServicePrincipal (long self, String gssapiServicePrincipal) {
+    public void setGssapiServicePrincipal (String gssapiServicePrincipal) {
         __setGssapiServicePrincipal (self, gssapiServicePrincipal);
     }
     /*
     Get socket option `ipv6`.
     */
     native static int __ipv6 (long self);
-    public int ipv6 (long self) {
+    public int ipv6 () {
         return __ipv6 (self);
     }
     /*
     Set socket option `ipv6`.
     */
     native static void __setIpv6 (long self, int ipv6);
-    public void setIpv6 (long self, int ipv6) {
+    public void setIpv6 (int ipv6) {
         __setIpv6 (self, ipv6);
     }
     /*
     Get socket option `immediate`.
     */
     native static int __immediate (long self);
-    public int immediate (long self) {
+    public int immediate () {
         return __immediate (self);
     }
     /*
     Set socket option `immediate`.
     */
     native static void __setImmediate (long self, int immediate);
-    public void setImmediate (long self, int immediate) {
+    public void setImmediate (int immediate) {
         __setImmediate (self, immediate);
     }
     /*
     Set socket option `router_raw`.
     */
     native static void __setRouterRaw (long self, int routerRaw);
-    public void setRouterRaw (long self, int routerRaw) {
+    public void setRouterRaw (int routerRaw) {
         __setRouterRaw (self, routerRaw);
     }
     /*
     Get socket option `ipv4only`.
     */
     native static int __ipv4only (long self);
-    public int ipv4only (long self) {
+    public int ipv4only () {
         return __ipv4only (self);
     }
     /*
     Set socket option `ipv4only`.
     */
     native static void __setIpv4only (long self, int ipv4only);
-    public void setIpv4only (long self, int ipv4only) {
+    public void setIpv4only (int ipv4only) {
         __setIpv4only (self, ipv4only);
     }
     /*
     Set socket option `delay_attach_on_connect`.
     */
     native static void __setDelayAttachOnConnect (long self, int delayAttachOnConnect);
-    public void setDelayAttachOnConnect (long self, int delayAttachOnConnect) {
+    public void setDelayAttachOnConnect (int delayAttachOnConnect) {
         __setDelayAttachOnConnect (self, delayAttachOnConnect);
     }
     /*
     Get socket option `type`.
     */
     native static int __type (long self);
-    public int type (long self) {
+    public int type () {
         return __type (self);
     }
     /*
     Get socket option `sndhwm`.
     */
     native static int __sndhwm (long self);
-    public int sndhwm (long self) {
+    public int sndhwm () {
         return __sndhwm (self);
     }
     /*
     Set socket option `sndhwm`.
     */
     native static void __setSndhwm (long self, int sndhwm);
-    public void setSndhwm (long self, int sndhwm) {
+    public void setSndhwm (int sndhwm) {
         __setSndhwm (self, sndhwm);
     }
     /*
     Get socket option `rcvhwm`.
     */
     native static int __rcvhwm (long self);
-    public int rcvhwm (long self) {
+    public int rcvhwm () {
         return __rcvhwm (self);
     }
     /*
     Set socket option `rcvhwm`.
     */
     native static void __setRcvhwm (long self, int rcvhwm);
-    public void setRcvhwm (long self, int rcvhwm) {
+    public void setRcvhwm (int rcvhwm) {
         __setRcvhwm (self, rcvhwm);
     }
     /*
     Get socket option `affinity`.
     */
     native static int __affinity (long self);
-    public int affinity (long self) {
+    public int affinity () {
         return __affinity (self);
     }
     /*
     Set socket option `affinity`.
     */
     native static void __setAffinity (long self, int affinity);
-    public void setAffinity (long self, int affinity) {
+    public void setAffinity (int affinity) {
         __setAffinity (self, affinity);
     }
     /*
     Set socket option `subscribe`.
     */
     native static void __setSubscribe (long self, String subscribe);
-    public void setSubscribe (long self, String subscribe) {
+    public void setSubscribe (String subscribe) {
         __setSubscribe (self, subscribe);
     }
     /*
     Set socket option `unsubscribe`.
     */
     native static void __setUnsubscribe (long self, String unsubscribe);
-    public void setUnsubscribe (long self, String unsubscribe) {
+    public void setUnsubscribe (String unsubscribe) {
         __setUnsubscribe (self, unsubscribe);
     }
     /*
     Get socket option `identity`.
     */
     native static String __identity (long self);
-    public String identity (long self) {
+    public String identity () {
         return __identity (self);
     }
     /*
     Set socket option `identity`.
     */
     native static void __setIdentity (long self, String identity);
-    public void setIdentity (long self, String identity) {
+    public void setIdentity (String identity) {
         __setIdentity (self, identity);
     }
     /*
     Get socket option `rate`.
     */
     native static int __rate (long self);
-    public int rate (long self) {
+    public int rate () {
         return __rate (self);
     }
     /*
     Set socket option `rate`.
     */
     native static void __setRate (long self, int rate);
-    public void setRate (long self, int rate) {
+    public void setRate (int rate) {
         __setRate (self, rate);
     }
     /*
     Get socket option `recovery_ivl`.
     */
     native static int __recoveryIvl (long self);
-    public int recoveryIvl (long self) {
+    public int recoveryIvl () {
         return __recoveryIvl (self);
     }
     /*
     Set socket option `recovery_ivl`.
     */
     native static void __setRecoveryIvl (long self, int recoveryIvl);
-    public void setRecoveryIvl (long self, int recoveryIvl) {
+    public void setRecoveryIvl (int recoveryIvl) {
         __setRecoveryIvl (self, recoveryIvl);
     }
     /*
     Get socket option `sndbuf`.
     */
     native static int __sndbuf (long self);
-    public int sndbuf (long self) {
+    public int sndbuf () {
         return __sndbuf (self);
     }
     /*
     Set socket option `sndbuf`.
     */
     native static void __setSndbuf (long self, int sndbuf);
-    public void setSndbuf (long self, int sndbuf) {
+    public void setSndbuf (int sndbuf) {
         __setSndbuf (self, sndbuf);
     }
     /*
     Get socket option `rcvbuf`.
     */
     native static int __rcvbuf (long self);
-    public int rcvbuf (long self) {
+    public int rcvbuf () {
         return __rcvbuf (self);
     }
     /*
     Set socket option `rcvbuf`.
     */
     native static void __setRcvbuf (long self, int rcvbuf);
-    public void setRcvbuf (long self, int rcvbuf) {
+    public void setRcvbuf (int rcvbuf) {
         __setRcvbuf (self, rcvbuf);
     }
     /*
     Get socket option `linger`.
     */
     native static int __linger (long self);
-    public int linger (long self) {
+    public int linger () {
         return __linger (self);
     }
     /*
     Set socket option `linger`.
     */
     native static void __setLinger (long self, int linger);
-    public void setLinger (long self, int linger) {
+    public void setLinger (int linger) {
         __setLinger (self, linger);
     }
     /*
     Get socket option `reconnect_ivl`.
     */
     native static int __reconnectIvl (long self);
-    public int reconnectIvl (long self) {
+    public int reconnectIvl () {
         return __reconnectIvl (self);
     }
     /*
     Set socket option `reconnect_ivl`.
     */
     native static void __setReconnectIvl (long self, int reconnectIvl);
-    public void setReconnectIvl (long self, int reconnectIvl) {
+    public void setReconnectIvl (int reconnectIvl) {
         __setReconnectIvl (self, reconnectIvl);
     }
     /*
     Get socket option `reconnect_ivl_max`.
     */
     native static int __reconnectIvlMax (long self);
-    public int reconnectIvlMax (long self) {
+    public int reconnectIvlMax () {
         return __reconnectIvlMax (self);
     }
     /*
     Set socket option `reconnect_ivl_max`.
     */
     native static void __setReconnectIvlMax (long self, int reconnectIvlMax);
-    public void setReconnectIvlMax (long self, int reconnectIvlMax) {
+    public void setReconnectIvlMax (int reconnectIvlMax) {
         __setReconnectIvlMax (self, reconnectIvlMax);
     }
     /*
     Get socket option `backlog`.
     */
     native static int __backlog (long self);
-    public int backlog (long self) {
+    public int backlog () {
         return __backlog (self);
     }
     /*
     Set socket option `backlog`.
     */
     native static void __setBacklog (long self, int backlog);
-    public void setBacklog (long self, int backlog) {
+    public void setBacklog (int backlog) {
         __setBacklog (self, backlog);
     }
     /*
     Get socket option `maxmsgsize`.
     */
     native static int __maxmsgsize (long self);
-    public int maxmsgsize (long self) {
+    public int maxmsgsize () {
         return __maxmsgsize (self);
     }
     /*
     Set socket option `maxmsgsize`.
     */
     native static void __setMaxmsgsize (long self, int maxmsgsize);
-    public void setMaxmsgsize (long self, int maxmsgsize) {
+    public void setMaxmsgsize (int maxmsgsize) {
         __setMaxmsgsize (self, maxmsgsize);
     }
     /*
     Get socket option `multicast_hops`.
     */
     native static int __multicastHops (long self);
-    public int multicastHops (long self) {
+    public int multicastHops () {
         return __multicastHops (self);
     }
     /*
     Set socket option `multicast_hops`.
     */
     native static void __setMulticastHops (long self, int multicastHops);
-    public void setMulticastHops (long self, int multicastHops) {
+    public void setMulticastHops (int multicastHops) {
         __setMulticastHops (self, multicastHops);
     }
     /*
     Get socket option `rcvtimeo`.
     */
     native static int __rcvtimeo (long self);
-    public int rcvtimeo (long self) {
+    public int rcvtimeo () {
         return __rcvtimeo (self);
     }
     /*
     Set socket option `rcvtimeo`.
     */
     native static void __setRcvtimeo (long self, int rcvtimeo);
-    public void setRcvtimeo (long self, int rcvtimeo) {
+    public void setRcvtimeo (int rcvtimeo) {
         __setRcvtimeo (self, rcvtimeo);
     }
     /*
     Get socket option `sndtimeo`.
     */
     native static int __sndtimeo (long self);
-    public int sndtimeo (long self) {
+    public int sndtimeo () {
         return __sndtimeo (self);
     }
     /*
     Set socket option `sndtimeo`.
     */
     native static void __setSndtimeo (long self, int sndtimeo);
-    public void setSndtimeo (long self, int sndtimeo) {
+    public void setSndtimeo (int sndtimeo) {
         __setSndtimeo (self, sndtimeo);
     }
     /*
     Set socket option `xpub_verbose`.
     */
     native static void __setXpubVerbose (long self, int xpubVerbose);
-    public void setXpubVerbose (long self, int xpubVerbose) {
+    public void setXpubVerbose (int xpubVerbose) {
         __setXpubVerbose (self, xpubVerbose);
     }
     /*
     Get socket option `tcp_keepalive`.
     */
     native static int __tcpKeepalive (long self);
-    public int tcpKeepalive (long self) {
+    public int tcpKeepalive () {
         return __tcpKeepalive (self);
     }
     /*
     Set socket option `tcp_keepalive`.
     */
     native static void __setTcpKeepalive (long self, int tcpKeepalive);
-    public void setTcpKeepalive (long self, int tcpKeepalive) {
+    public void setTcpKeepalive (int tcpKeepalive) {
         __setTcpKeepalive (self, tcpKeepalive);
     }
     /*
     Get socket option `tcp_keepalive_idle`.
     */
     native static int __tcpKeepaliveIdle (long self);
-    public int tcpKeepaliveIdle (long self) {
+    public int tcpKeepaliveIdle () {
         return __tcpKeepaliveIdle (self);
     }
     /*
     Set socket option `tcp_keepalive_idle`.
     */
     native static void __setTcpKeepaliveIdle (long self, int tcpKeepaliveIdle);
-    public void setTcpKeepaliveIdle (long self, int tcpKeepaliveIdle) {
+    public void setTcpKeepaliveIdle (int tcpKeepaliveIdle) {
         __setTcpKeepaliveIdle (self, tcpKeepaliveIdle);
     }
     /*
     Get socket option `tcp_keepalive_cnt`.
     */
     native static int __tcpKeepaliveCnt (long self);
-    public int tcpKeepaliveCnt (long self) {
+    public int tcpKeepaliveCnt () {
         return __tcpKeepaliveCnt (self);
     }
     /*
     Set socket option `tcp_keepalive_cnt`.
     */
     native static void __setTcpKeepaliveCnt (long self, int tcpKeepaliveCnt);
-    public void setTcpKeepaliveCnt (long self, int tcpKeepaliveCnt) {
+    public void setTcpKeepaliveCnt (int tcpKeepaliveCnt) {
         __setTcpKeepaliveCnt (self, tcpKeepaliveCnt);
     }
     /*
     Get socket option `tcp_keepalive_intvl`.
     */
     native static int __tcpKeepaliveIntvl (long self);
-    public int tcpKeepaliveIntvl (long self) {
+    public int tcpKeepaliveIntvl () {
         return __tcpKeepaliveIntvl (self);
     }
     /*
     Set socket option `tcp_keepalive_intvl`.
     */
     native static void __setTcpKeepaliveIntvl (long self, int tcpKeepaliveIntvl);
-    public void setTcpKeepaliveIntvl (long self, int tcpKeepaliveIntvl) {
+    public void setTcpKeepaliveIntvl (int tcpKeepaliveIntvl) {
         __setTcpKeepaliveIntvl (self, tcpKeepaliveIntvl);
     }
     /*
     Get socket option `tcp_accept_filter`.
     */
     native static String __tcpAcceptFilter (long self);
-    public String tcpAcceptFilter (long self) {
+    public String tcpAcceptFilter () {
         return __tcpAcceptFilter (self);
     }
     /*
     Set socket option `tcp_accept_filter`.
     */
     native static void __setTcpAcceptFilter (long self, String tcpAcceptFilter);
-    public void setTcpAcceptFilter (long self, String tcpAcceptFilter) {
+    public void setTcpAcceptFilter (String tcpAcceptFilter) {
         __setTcpAcceptFilter (self, tcpAcceptFilter);
     }
     /*
     Get socket option `rcvmore`.
     */
     native static int __rcvmore (long self);
-    public int rcvmore (long self) {
+    public int rcvmore () {
         return __rcvmore (self);
     }
     /*
     Get socket option `events`.
     */
     native static int __events (long self);
-    public int events (long self) {
+    public int events () {
         return __events (self);
     }
     /*
     Get socket option `last_endpoint`.
     */
     native static String __lastEndpoint (long self);
-    public String lastEndpoint (long self) {
+    public String lastEndpoint () {
         return __lastEndpoint (self);
     }
     /*

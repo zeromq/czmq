@@ -42,7 +42,7 @@ public class Zpoller implements AutoCloseable{
     be a libzmq void * socket, a zsock_t instance, or a zactor_t instance.   
     */
     native static int __add (long self, long reader);
-    public int add (long self, long reader) {
+    public int add (long reader) {
         return __add (self, reader);
     }
     /*
@@ -51,7 +51,7 @@ public class Zpoller implements AutoCloseable{
     instance.                                                              
     */
     native static int __remove (long self, long reader);
-    public int remove (long self, long reader) {
+    public int remove (long reader) {
         return __remove (self, reader);
     }
     /*
@@ -66,7 +66,7 @@ public class Zpoller implements AutoCloseable{
     zpoller_terminated (). The timeout is in msec.                            
     */
     native static long __wait (long self, int timeout);
-    public long Wait (long self, int timeout) {
+    public long Wait (int timeout) {
         return __wait (self, timeout);
     }
     /*
@@ -74,7 +74,7 @@ public class Zpoller implements AutoCloseable{
     expired, without any error.                                           
     */
     native static boolean __expired (long self);
-    public boolean expired (long self) {
+    public boolean expired () {
         return __expired (self);
     }
     /*
@@ -82,7 +82,7 @@ public class Zpoller implements AutoCloseable{
     was interrupted, or the parent context was destroyed.                 
     */
     native static boolean __terminated (long self);
-    public boolean terminated (long self) {
+    public boolean terminated () {
         return __terminated (self);
     }
     /*
@@ -91,7 +91,7 @@ public class Zpoller implements AutoCloseable{
     zero. Calling zpoller_ignore_interrupts will supress this behavior.          
     */
     native static void __ignoreInterrupts (long self);
-    public void ignoreInterrupts (long self) {
+    public void ignoreInterrupts () {
         __ignoreInterrupts (self);
     }
     /*

@@ -38,21 +38,21 @@ public class Zuuid implements AutoCloseable{
     optional delimiters. Return 0 if OK, else returns -1.         
     */
     native static int __setStr (long self, String source);
-    public int setStr (long self, String source) {
+    public int setStr (String source) {
         return __setStr (self, source);
     }
     /*
     Return UUID binary size
     */
     native static long __size (long self);
-    public long size (long self) {
+    public long size () {
         return __size (self);
     }
     /*
     Returns UUID as string
     */
     native static String __str (long self);
-    public String str (long self) {
+    public String str () {
         return __str (self);
     }
     /*
@@ -61,7 +61,7 @@ public class Zuuid implements AutoCloseable{
     http://en.wikipedia.org/wiki/Universally_unique_identifier      
     */
     native static String __strCanonical (long self);
-    public String strCanonical (long self) {
+    public String strCanonical () {
         return __strCanonical (self);
     }
     /*
@@ -69,7 +69,7 @@ public class Zuuid implements AutoCloseable{
     returns null.                                                      
     */
     native static long __dup (long self);
-    public long dup (long self) {
+    public long dup () {
         return __dup (self);
     }
     /*

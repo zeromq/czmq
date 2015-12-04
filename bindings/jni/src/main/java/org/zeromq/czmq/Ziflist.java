@@ -37,56 +37,56 @@ public class Ziflist implements AutoCloseable{
     Reload network interfaces from system
     */
     native static void __reload (long self);
-    public void reload (long self) {
+    public void reload () {
         __reload (self);
     }
     /*
     Return the number of network interfaces on system
     */
     native static long __size (long self);
-    public long size (long self) {
+    public long size () {
         return __size (self);
     }
     /*
     Get first network interface, return NULL if there are none
     */
     native static String __first (long self);
-    public String first (long self) {
+    public String first () {
         return __first (self);
     }
     /*
     Get next network interface, return NULL if we hit the last one
     */
     native static String __next (long self);
-    public String next (long self) {
+    public String next () {
         return __next (self);
     }
     /*
     Return the current interface IP address as a printable string
     */
     native static String __address (long self);
-    public String address (long self) {
+    public String address () {
         return __address (self);
     }
     /*
     Return the current interface broadcast address as a printable string
     */
     native static String __broadcast (long self);
-    public String broadcast (long self) {
+    public String broadcast () {
         return __broadcast (self);
     }
     /*
     Return the current interface network mask as a printable string
     */
     native static String __netmask (long self);
-    public String netmask (long self) {
+    public String netmask () {
         return __netmask (self);
     }
     /*
     Return the list of interfaces.
     */
     native static void __print (long self);
-    public void print (long self) {
+    public void print () {
         __print (self);
     }
     /*

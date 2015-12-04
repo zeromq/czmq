@@ -41,49 +41,49 @@ public class ZdirPatch implements AutoCloseable{
     returns null.                                                         
     */
     native static long __dup (long self);
-    public long dup (long self) {
+    public long dup () {
         return __dup (self);
     }
     /*
     Return patch file directory path
     */
     native static String __path (long self);
-    public String path (long self) {
+    public String path () {
         return __path (self);
     }
     /*
     Return patch file item
     */
     native static long __file (long self);
-    public long file (long self) {
+    public long file () {
         return __file (self);
     }
     /*
     Return operation
     */
     native static int __op (long self);
-    public int op (long self) {
+    public int op () {
         return __op (self);
     }
     /*
     Return patch virtual file path
     */
     native static String __vpath (long self);
-    public String vpath (long self) {
+    public String vpath () {
         return __vpath (self);
     }
     /*
     Calculate hash digest for file (create only)
     */
     native static void __digestSet (long self);
-    public void digestSet (long self) {
+    public void digestSet () {
         __digestSet (self);
     }
     /*
     Return hash digest for patch file
     */
     native static String __digest (long self);
-    public String digest (long self) {
+    public String digest () {
         return __digest (self);
     }
     /*

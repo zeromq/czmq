@@ -42,14 +42,14 @@ public class Zdir implements AutoCloseable{
     Return directory path
     */
     native static String __path (long self);
-    public String path (long self) {
+    public String path () {
         return __path (self);
     }
     /*
     Return last modification time for directory.
     */
     native static long __modified (long self);
-    public long modified (long self) {
+    public long modified () {
         return __modified (self);
     }
     /*
@@ -57,14 +57,14 @@ public class Zdir implements AutoCloseable{
     in the directory tree.                                              
     */
     native static long __cursize (long self);
-    public long cursize (long self) {
+    public long cursize () {
         return __cursize (self);
     }
     /*
     Return directory count
     */
     native static long __count (long self);
-    public long count (long self) {
+    public long count () {
         return __count (self);
     }
     /*
@@ -73,7 +73,7 @@ public class Zdir implements AutoCloseable{
     original zdir tree until you are done with this list.                      
     */
     native static long __list (long self);
-    public long list (long self) {
+    public long list () {
         return __list (self);
     }
     /*
@@ -82,7 +82,7 @@ public class Zdir implements AutoCloseable{
     If force is true, will remove all files and all subdirectories.        
     */
     native static void __remove (long self, boolean force);
-    public void remove (long self, boolean force) {
+    public void remove (boolean force) {
         __remove (self, force);
     }
     /*
@@ -99,7 +99,7 @@ public class Zdir implements AutoCloseable{
     Return full contents of directory as a zdir_patch list.
     */
     native static long __resync (long self, String alias);
-    public long resync (long self, String alias) {
+    public long resync (String alias) {
         return __resync (self, alias);
     }
     /*
@@ -107,14 +107,14 @@ public class Zdir implements AutoCloseable{
     of every file in the tree. The cache is saved between runs in .cache.  
     */
     native static long __cache (long self);
-    public long cache (long self) {
+    public long cache () {
         return __cache (self);
     }
     /*
     Print contents of directory to stdout
     */
     native static void __print (long self, int indent);
-    public void print (long self, int indent) {
+    public void print (int indent) {
         __print (self, indent);
     }
     /*

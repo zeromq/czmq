@@ -38,7 +38,7 @@ public class Zlist implements AutoCloseable{
     Leaves cursor pointing at the head item, or NULL if the list is empty.  
     */
     native static long __first (long self);
-    public long first (long self) {
+    public long first () {
         return __first (self);
     }
     /*
@@ -46,7 +46,7 @@ public class Zlist implements AutoCloseable{
     the start of the list call zlist_first (). Advances the cursor.     
     */
     native static long __next (long self);
-    public long next (long self) {
+    public long next () {
         return __next (self);
     }
     /*
@@ -54,21 +54,21 @@ public class Zlist implements AutoCloseable{
     Leaves cursor pointing at the tail item, or NULL if the list is empty.  
     */
     native static long __last (long self);
-    public long last (long self) {
+    public long last () {
         return __last (self);
     }
     /*
     Return first item in the list, or null, leaves the cursor
     */
     native static long __head (long self);
-    public long head (long self) {
+    public long head () {
         return __head (self);
     }
     /*
     Return last item in the list, or null, leaves the cursor
     */
     native static long __tail (long self);
-    public long tail (long self) {
+    public long tail () {
         return __tail (self);
     }
     /*
@@ -76,7 +76,7 @@ public class Zlist implements AutoCloseable{
     Leaves cursor pointing at the current item, or NULL if the list is empty.
     */
     native static long __item (long self);
-    public long item (long self) {
+    public long item () {
         return __item (self);
     }
     /*
@@ -85,7 +85,7 @@ public class Zlist implements AutoCloseable{
     been set, this method will also duplicate the item.                  
     */
     native static int __append (long self, long item);
-    public int append (long self, long item) {
+    public int append (long item) {
         return __append (self, item);
     }
     /*
@@ -94,14 +94,14 @@ public class Zlist implements AutoCloseable{
     been set, this method will also duplicate the item.                  
     */
     native static int __push (long self, long item);
-    public int push (long self, long item) {
+    public int push (long item) {
         return __push (self, item);
     }
     /*
     Pop the item off the start of the list, if any
     */
     native static long __pop (long self);
-    public long pop (long self) {
+    public long pop () {
         return __pop (self);
     }
     /*
@@ -110,14 +110,14 @@ public class Zlist implements AutoCloseable{
     pointers. Returns true if item is present else false.                     
     */
     native static boolean __exists (long self, long item);
-    public boolean exists (long self, long item) {
+    public boolean exists (long item) {
         return __exists (self, item);
     }
     /*
     Remove the specified item from the list if present
     */
     native static void __remove (long self, long item);
-    public void remove (long self, long item) {
+    public void remove (long item) {
         __remove (self, item);
     }
     /*
@@ -127,21 +127,21 @@ public class Zlist implements AutoCloseable{
     NULL.                                                                    
     */
     native static long __dup (long self);
-    public long dup (long self) {
+    public long dup () {
         return __dup (self);
     }
     /*
     Purge all items from list
     */
     native static void __purge (long self);
-    public void purge (long self) {
+    public void purge () {
         __purge (self);
     }
     /*
     Return number of items in the list
     */
     native static long __size (long self);
-    public long size (long self) {
+    public long size () {
         return __size (self);
     }
     /*
@@ -149,7 +149,7 @@ public class Zlist implements AutoCloseable{
     The sort is not stable, so may reorder items with the same keys.       
     */
     native static void __sort (long self, long compare);
-    public void sort (long self, long compare) {
+    public void sort (long compare) {
         __sort (self, compare);
     }
     /*
@@ -163,7 +163,7 @@ public class Zlist implements AutoCloseable{
     list is empty.                                                        
     */
     native static void __autofree (long self);
-    public void autofree (long self) {
+    public void autofree () {
         __autofree (self);
     }
     /*
@@ -174,7 +174,7 @@ public class Zlist implements AutoCloseable{
     This function is used for sorting, removal and exists checking.        
     */
     native static void __comparefn (long self, long fn);
-    public void comparefn (long self, long fn) {
+    public void comparefn (long fn) {
         __comparefn (self, fn);
     }
     /*
@@ -185,7 +185,7 @@ public class Zlist implements AutoCloseable{
     Returns the item, or NULL if there is no such item.                   
     */
     native static long __freefn (long self, long item, long fn, boolean atTail);
-    public long freefn (long self, long item, long fn, boolean atTail) {
+    public long freefn (long item, long fn, boolean atTail) {
         return __freefn (self, item, fn, atTail);
     }
     /*
