@@ -919,6 +919,8 @@ zsys_udp_recv (SOCKET udpsock, char *peername)
 void
 zsys_socket_error (const char *reason)
 {
+    bool check_errno;
+
 #if defined (__WINDOWS__)
     switch (WSAGetLastError ()) {
         case WSAEINTR:        errno = EINTR;      break;
@@ -933,32 +935,34 @@ zsys_socket_error (const char *reason)
         default:              errno = GetLastError ();
     }
 #endif
-    if (errno == EAGAIN
-    ||  errno == ENETDOWN
-    ||  errno == EHOSTUNREACH
-    ||  errno == ENETUNREACH
-    ||  errno == EINTR
-    ||  errno == EPIPE
-    ||  errno == ECONNRESET
+
+    check_errno = (errno == EAGAIN
+                  ||  errno == ENETDOWN
+                  ||  errno == EHOSTUNREACH
+                  ||  errno == ENETUNREACH
+                  ||  errno == EINTR
+                  ||  errno == EPIPE
+                  ||  errno == ECONNRESET);
 #if defined (ENOPROTOOPT)
-    ||  errno == ENOPROTOOPT
+    check_errno = (check_errno ||  errno == ENOPROTOOPT);
 #endif
 #if defined (EHOSTDOWN)
-    ||  errno == EHOSTDOWN
+    check_errno = (check_errno ||  errno == EHOSTDOWN);
 #endif
 #if defined (EOPNOTSUPP)
-    ||  errno == EOPNOTSUPP
+    check_errno = (check_errno ||  errno == EOPNOTSUPP);
 #endif
 #if defined (EWOULDBLOCK)
-    ||  errno == EWOULDBLOCK
+    check_errno = (check_errno ||  errno == EWOULDBLOCK);
 #endif
 #if defined (EPROTO)
-    ||  errno == EPROTO
+    check_errno = (check_errno ||  errno == EPROTO);
 #endif
 #if defined (ENONET)
-    ||  errno == ENONET
+    check_errno = (check_errno ||  errno == ENONET);
 #endif
-    )
+
+    if (check_errno)
         return;             //  Ignore error and try again
     else {
         zsys_error ("(UDP) error '%s' on %s", strerror (errno), reason);
