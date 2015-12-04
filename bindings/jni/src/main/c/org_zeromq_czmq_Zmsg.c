@@ -52,21 +52,21 @@ Java_org_zeromq_czmq_Zmsg__1_1size (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1content_size (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zmsg__1_1contentSize (JNIEnv *env, jclass c, jlong self)
 {
     jlong content_size_ = (jlong) zmsg_content_size ((zmsg_t *) self);
     return content_size_;
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1routing_id (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zmsg__1_1routingId (JNIEnv *env, jclass c, jlong self)
 {
     jint routing_id_ = (jint) zmsg_routing_id ((zmsg_t *) self);
     return routing_id_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1set_routing_id (JNIEnv *env, jclass c, jlong self, jint routing_id)
+Java_org_zeromq_czmq_Zmsg__1_1setRoutingId (JNIEnv *env, jclass c, jlong self, jint routing_id)
 {
     zmsg_set_routing_id ((zmsg_t *) self, (uint32_t) routing_id);
 }
@@ -213,7 +213,7 @@ Java_org_zeromq_czmq_Zmsg__1_1eq (JNIEnv *env, jclass c, jlong self, jlong other
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1new_signal (JNIEnv *env, jclass c, jbyte status)
+Java_org_zeromq_czmq_Zmsg__1_1newSignal (JNIEnv *env, jclass c, jbyte status)
 {
     jlong new_signal_ = (jlong) zmsg_new_signal ((byte) status);
     return new_signal_;

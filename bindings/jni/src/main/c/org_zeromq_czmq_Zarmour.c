@@ -24,7 +24,7 @@ Java_org_zeromq_czmq_Zarmour__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
 }
 
 JNIEXPORT jstring JNICALL
-Java_org_zeromq_czmq_Zarmour__1_1mode_str (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zarmour__1_1modeStr (JNIEnv *env, jclass c, jlong self)
 {
     char *mode_str_ = (char *) zarmour_mode_str ((zarmour_t *) self);
     jstring string = (*env)->NewStringUTF (env, mode_str_);
@@ -39,7 +39,7 @@ Java_org_zeromq_czmq_Zarmour__1_1mode (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zarmour__1_1set_mode (JNIEnv *env, jclass c, jlong self, jint mode)
+Java_org_zeromq_czmq_Zarmour__1_1setMode (JNIEnv *env, jclass c, jlong self, jint mode)
 {
     zarmour_set_mode ((zarmour_t *) self, (zarmour_mode_t) mode);
 }
@@ -52,46 +52,46 @@ Java_org_zeromq_czmq_Zarmour__1_1pad (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zarmour__1_1set_pad (JNIEnv *env, jclass c, jlong self, jboolean pad)
+Java_org_zeromq_czmq_Zarmour__1_1setPad (JNIEnv *env, jclass c, jlong self, jboolean pad)
 {
     zarmour_set_pad ((zarmour_t *) self, (bool) pad);
 }
 
 JNIEXPORT jchar JNICALL
-Java_org_zeromq_czmq_Zarmour__1_1pad_char (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zarmour__1_1padChar (JNIEnv *env, jclass c, jlong self)
 {
     jchar pad_char_ = (jchar) zarmour_pad_char ((zarmour_t *) self);
     return pad_char_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zarmour__1_1set_pad_char (JNIEnv *env, jclass c, jlong self, jchar pad_char)
+Java_org_zeromq_czmq_Zarmour__1_1setPadChar (JNIEnv *env, jclass c, jlong self, jchar pad_char)
 {
     zarmour_set_pad_char ((zarmour_t *) self, (char) pad_char);
 }
 
 JNIEXPORT jboolean JNICALL
-Java_org_zeromq_czmq_Zarmour__1_1line_breaks (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zarmour__1_1lineBreaks (JNIEnv *env, jclass c, jlong self)
 {
     jboolean line_breaks_ = (jboolean) zarmour_line_breaks ((zarmour_t *) self);
     return line_breaks_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zarmour__1_1set_line_breaks (JNIEnv *env, jclass c, jlong self, jboolean line_breaks)
+Java_org_zeromq_czmq_Zarmour__1_1setLineBreaks (JNIEnv *env, jclass c, jlong self, jboolean line_breaks)
 {
     zarmour_set_line_breaks ((zarmour_t *) self, (bool) line_breaks);
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zarmour__1_1line_length (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zarmour__1_1lineLength (JNIEnv *env, jclass c, jlong self)
 {
     jlong line_length_ = (jlong) zarmour_line_length ((zarmour_t *) self);
     return line_length_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zarmour__1_1set_line_length (JNIEnv *env, jclass c, jlong self, jlong line_length)
+Java_org_zeromq_czmq_Zarmour__1_1setLineLength (JNIEnv *env, jclass c, jlong self, jlong line_length)
 {
     zarmour_set_line_length ((zarmour_t *) self, (size_t) line_length);
 }

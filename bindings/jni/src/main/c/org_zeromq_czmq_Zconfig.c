@@ -77,7 +77,7 @@ Java_org_zeromq_czmq_Zconfig__1_1get (JNIEnv *env, jclass c, jlong self, jstring
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zconfig__1_1set_name (JNIEnv *env, jclass c, jlong self, jstring name)
+Java_org_zeromq_czmq_Zconfig__1_1setName (JNIEnv *env, jclass c, jlong self, jstring name)
 {
     char *name_ = (char *) (*env)->GetStringUTFChars (env, name, NULL);
     zconfig_set_name ((zconfig_t *) self, name_);
@@ -85,7 +85,7 @@ Java_org_zeromq_czmq_Zconfig__1_1set_name (JNIEnv *env, jclass c, jlong self, js
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zconfig__1_1set_value (JNIEnv *env, jclass c, jlong self, jstring format)
+Java_org_zeromq_czmq_Zconfig__1_1setValue (JNIEnv *env, jclass c, jlong self, jstring format)
 {
     char *format_ = (char *) (*env)->GetStringUTFChars (env, format, NULL);
     zconfig_set_value ((zconfig_t *) self, "%s", format_);
@@ -116,7 +116,7 @@ Java_org_zeromq_czmq_Zconfig__1_1locate (JNIEnv *env, jclass c, jlong self, jstr
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zconfig__1_1at_depth (JNIEnv *env, jclass c, jlong self, jint level)
+Java_org_zeromq_czmq_Zconfig__1_1atDepth (JNIEnv *env, jclass c, jlong self, jint level)
 {
     jlong at_depth_ = (jlong) zconfig_at_depth ((zconfig_t *) self, (int) level);
     return at_depth_;
@@ -130,7 +130,7 @@ Java_org_zeromq_czmq_Zconfig__1_1execute (JNIEnv *env, jclass c, jlong self, jlo
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zconfig__1_1set_comment (JNIEnv *env, jclass c, jlong self, jstring format)
+Java_org_zeromq_czmq_Zconfig__1_1setComment (JNIEnv *env, jclass c, jlong self, jstring format)
 {
     char *format_ = (char *) (*env)->GetStringUTFChars (env, format, NULL);
     zconfig_set_comment ((zconfig_t *) self, "%s", format_);
@@ -196,21 +196,21 @@ Java_org_zeromq_czmq_Zconfig__1_1reload (JNIEnv *env, jclass c, jlong self_p)
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zconfig__1_1chunk_load (JNIEnv *env, jclass c, jlong chunk)
+Java_org_zeromq_czmq_Zconfig__1_1chunkLoad (JNIEnv *env, jclass c, jlong chunk)
 {
     jlong chunk_load_ = (jlong) zconfig_chunk_load ((zchunk_t *) chunk);
     return chunk_load_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zconfig__1_1chunk_save (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zconfig__1_1chunkSave (JNIEnv *env, jclass c, jlong self)
 {
     jlong chunk_save_ = (jlong) zconfig_chunk_save ((zconfig_t *) self);
     return chunk_save_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zconfig__1_1str_load (JNIEnv *env, jclass c, jstring string)
+Java_org_zeromq_czmq_Zconfig__1_1strLoad (JNIEnv *env, jclass c, jstring string)
 {
     char *string_ = (char *) (*env)->GetStringUTFChars (env, string, NULL);
     jlong str_load_ = (jlong) zconfig_str_load (string_);
@@ -219,7 +219,7 @@ Java_org_zeromq_czmq_Zconfig__1_1str_load (JNIEnv *env, jclass c, jstring string
 }
 
 JNIEXPORT jstring JNICALL
-Java_org_zeromq_czmq_Zconfig__1_1str_save (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zconfig__1_1strSave (JNIEnv *env, jclass c, jlong self)
 {
     char *str_save_ = (char *) zconfig_str_save ((zconfig_t *) self);
     jstring string = (*env)->NewStringUTF (env, str_save_);
@@ -228,7 +228,7 @@ Java_org_zeromq_czmq_Zconfig__1_1str_save (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jboolean JNICALL
-Java_org_zeromq_czmq_Zconfig__1_1has_changed (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zconfig__1_1hasChanged (JNIEnv *env, jclass c, jlong self)
 {
     jboolean has_changed_ = (jboolean) zconfig_has_changed ((zconfig_t *) self);
     return has_changed_;

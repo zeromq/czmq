@@ -65,42 +65,42 @@ Java_org_zeromq_czmq_Zfile__1_1cursize (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jboolean JNICALL
-Java_org_zeromq_czmq_Zfile__1_1is_directory (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zfile__1_1isDirectory (JNIEnv *env, jclass c, jlong self)
 {
     jboolean is_directory_ = (jboolean) zfile_is_directory ((zfile_t *) self);
     return is_directory_;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_org_zeromq_czmq_Zfile__1_1is_regular (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zfile__1_1isRegular (JNIEnv *env, jclass c, jlong self)
 {
     jboolean is_regular_ = (jboolean) zfile_is_regular ((zfile_t *) self);
     return is_regular_;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_org_zeromq_czmq_Zfile__1_1is_readable (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zfile__1_1isReadable (JNIEnv *env, jclass c, jlong self)
 {
     jboolean is_readable_ = (jboolean) zfile_is_readable ((zfile_t *) self);
     return is_readable_;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_org_zeromq_czmq_Zfile__1_1is_writeable (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zfile__1_1isWriteable (JNIEnv *env, jclass c, jlong self)
 {
     jboolean is_writeable_ = (jboolean) zfile_is_writeable ((zfile_t *) self);
     return is_writeable_;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_org_zeromq_czmq_Zfile__1_1is_stable (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zfile__1_1isStable (JNIEnv *env, jclass c, jlong self)
 {
     jboolean is_stable_ = (jboolean) zfile_is_stable ((zfile_t *) self);
     return is_stable_;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_org_zeromq_czmq_Zfile__1_1has_changed (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zfile__1_1hasChanged (JNIEnv *env, jclass c, jlong self)
 {
     jboolean has_changed_ = (jboolean) zfile_has_changed ((zfile_t *) self);
     return has_changed_;

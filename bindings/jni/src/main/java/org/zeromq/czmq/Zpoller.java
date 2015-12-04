@@ -90,9 +90,9 @@ public class Zpoller implements AutoCloseable{
     return immediately if detects zsys_interrupted is set to something other than
     zero. Calling zpoller_ignore_interrupts will supress this behavior.          
     */
-    native static void __ignore_interrupts (long self);
+    native static void __ignoreInterrupts (long self);
     public void ignoreInterrupts (long self) {
-        __ignore_interrupts (self);
+        __ignoreInterrupts (self);
     }
     /*
     Self test of this class.

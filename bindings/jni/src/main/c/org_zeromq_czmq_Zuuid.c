@@ -24,7 +24,7 @@ Java_org_zeromq_czmq_Zuuid__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zuuid__1_1set_str (JNIEnv *env, jclass c, jlong self, jstring source)
+Java_org_zeromq_czmq_Zuuid__1_1setStr (JNIEnv *env, jclass c, jlong self, jstring source)
 {
     char *source_ = (char *) (*env)->GetStringUTFChars (env, source, NULL);
     jint set_str_ = (jint) zuuid_set_str ((zuuid_t *) self, source_);
@@ -48,7 +48,7 @@ Java_org_zeromq_czmq_Zuuid__1_1str (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jstring JNICALL
-Java_org_zeromq_czmq_Zuuid__1_1str_canonical (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zuuid__1_1strCanonical (JNIEnv *env, jclass c, jlong self)
 {
     char *str_canonical_ = (char *) zuuid_str_canonical ((zuuid_t *) self);
     jstring string = (*env)->NewStringUTF (env, str_canonical_);

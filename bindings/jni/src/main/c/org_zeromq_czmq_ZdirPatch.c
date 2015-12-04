@@ -65,7 +65,7 @@ Java_org_zeromq_czmq_ZdirPatch__1_1vpath (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_ZdirPatch__1_1digest_set (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_ZdirPatch__1_1digestSet (JNIEnv *env, jclass c, jlong self)
 {
     zdir_patch_digest_set ((zdir_patch_t *) self);
 }

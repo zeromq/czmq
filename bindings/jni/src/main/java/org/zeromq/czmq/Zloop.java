@@ -47,17 +47,17 @@ public class Zloop implements AutoCloseable{
     Cancel a socket reader from the reactor. If multiple readers exist for
     same socket, cancels ALL of them.                                     
     */
-    native static void __reader_end (long self, long sock);
+    native static void __readerEnd (long self, long sock);
     public void readerEnd (long self, long sock) {
-        __reader_end (self, sock);
+        __readerEnd (self, sock);
     }
     /*
     Configure a registered reader to ignore errors. If you do not set this,
     then readers that have errors are removed from the reactor silently.   
     */
-    native static void __reader_set_tolerant (long self, long sock);
+    native static void __readerSetTolerant (long self, long sock);
     public void readerSetTolerant (long self, long sock) {
-        __reader_set_tolerant (self, sock);
+        __readerSetTolerant (self, sock);
     }
     /*
     Register a timer that expires after some delay and repeats some number of
@@ -73,9 +73,9 @@ public class Zloop implements AutoCloseable{
     Cancel a specific timer identified by a specific timer_id (as returned by
     zloop_timer).                                                            
     */
-    native static int __timer_end (long self, int timerId);
+    native static int __timerEnd (long self, int timerId);
     public int timerEnd (long self, int timerId) {
-        return __timer_end (self, timerId);
+        return __timerEnd (self, timerId);
     }
     /*
     Register a ticket timer. Ticket timers are very fast in the case where   
@@ -96,26 +96,26 @@ public class Zloop implements AutoCloseable{
     Reset a ticket timer, which moves it to the end of the ticket list and
     resets its execution time. This is a very fast operation.             
     */
-    native static void __ticket_reset (long self, long handle);
+    native static void __ticketReset (long self, long handle);
     public void ticketReset (long self, long handle) {
-        __ticket_reset (self, handle);
+        __ticketReset (self, handle);
     }
     /*
     Delete a ticket timer. We do not actually delete the ticket here, as    
     other code may still refer to the ticket. We mark as deleted, and remove
     later and safely.                                                       
     */
-    native static void __ticket_delete (long self, long handle);
+    native static void __ticketDelete (long self, long handle);
     public void ticketDelete (long self, long handle) {
-        __ticket_delete (self, handle);
+        __ticketDelete (self, handle);
     }
     /*
     Set the ticket delay, which applies to all tickets. If you lower the   
     delay and there are already tickets created, the results are undefined.
     */
-    native static void __set_ticket_delay (long self, long ticketDelay);
+    native static void __setTicketDelay (long self, long ticketDelay);
     public void setTicketDelay (long self, long ticketDelay) {
-        __set_ticket_delay (self, ticketDelay);
+        __setTicketDelay (self, ticketDelay);
     }
     /*
     Set hard limit on number of timers allowed. Setting more than a small  
@@ -124,16 +124,16 @@ public class Zloop implements AutoCloseable{
     limit is reached, the reactor stops creating new timers and logs an    
     error.                                                                 
     */
-    native static void __set_max_timers (long self, long maxTimers);
+    native static void __setMaxTimers (long self, long maxTimers);
     public void setMaxTimers (long self, long maxTimers) {
-        __set_max_timers (self, maxTimers);
+        __setMaxTimers (self, maxTimers);
     }
     /*
     Set verbose tracing of reactor on/off
     */
-    native static void __set_verbose (long self, boolean verbose);
+    native static void __setVerbose (long self, boolean verbose);
     public void setVerbose (long self, boolean verbose) {
-        __set_verbose (self, verbose);
+        __setVerbose (self, verbose);
     }
     /*
     Start the reactor. Takes control of the thread and returns when the 0MQ  
@@ -150,9 +150,9 @@ public class Zloop implements AutoCloseable{
     exit as soon as it detects zsys_interrupted is set to something other than
     zero. Calling zloop_ignore_interrupts will supress this behavior.         
     */
-    native static void __ignore_interrupts (long self);
+    native static void __ignoreInterrupts (long self);
     public void ignoreInterrupts (long self) {
-        __ignore_interrupts (self);
+        __ignoreInterrupts (self);
     }
     /*
     Self test of this class.

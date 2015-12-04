@@ -75,25 +75,25 @@ public class Zmsg implements AutoCloseable{
     /*
     Return total size of all frames in message.
     */
-    native static long __content_size (long self);
+    native static long __contentSize (long self);
     public long contentSize (long self) {
-        return __content_size (self);
+        return __contentSize (self);
     }
     /*
     Return message routing ID, if the message came from a ZMQ_SERVER socket.
     Else returns zero.                                                      
     */
-    native static int __routing_id (long self);
+    native static int __routingId (long self);
     public int routingId (long self) {
-        return __routing_id (self);
+        return __routingId (self);
     }
     /*
     Set routing ID on message. This is used if/when the message is sent to a
     ZMQ_SERVER socket.                                                      
     */
-    native static void __set_routing_id (long self, int routingId);
+    native static void __setRoutingId (long self, int routingId);
     public void setRoutingId (long self, int routingId) {
-        __set_routing_id (self, routingId);
+        __setRoutingId (self, routingId);
     }
     /*
     Push frame to the front of the message, i.e. before all other frames.  
@@ -255,9 +255,9 @@ public class Zmsg implements AutoCloseable{
     message carrying a 1-byte success/failure code (by convention, 0 means  
     OK). Signals are encoded to be distinguishable from "normal" messages.  
     */
-    native static long __new_signal (byte status);
+    native static long __newSignal (byte status);
     public long newSignal (byte status) {
-        return __new_signal (status);
+        return __newSignal (status);
     }
     /*
     Return signal value, 0 or greater, if message is a signal, -1 if not.

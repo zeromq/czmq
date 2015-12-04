@@ -24,7 +24,7 @@ Java_org_zeromq_czmq_Ztrie__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Ztrie__1_1insert_route (JNIEnv *env, jclass c, jlong self, jstring path, jlong data, jlong destroy_data_fn)
+Java_org_zeromq_czmq_Ztrie__1_1insertRoute (JNIEnv *env, jclass c, jlong self, jstring path, jlong data, jlong destroy_data_fn)
 {
     char *path_ = (char *) (*env)->GetStringUTFChars (env, path, NULL);
     jint insert_route_ = (jint) ztrie_insert_route ((ztrie_t *) self, path_, (void *) data, (ztrie_destroy_data_fn *) destroy_data_fn);
@@ -33,7 +33,7 @@ Java_org_zeromq_czmq_Ztrie__1_1insert_route (JNIEnv *env, jclass c, jlong self, 
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Ztrie__1_1remove_route (JNIEnv *env, jclass c, jlong self, jstring path)
+Java_org_zeromq_czmq_Ztrie__1_1removeRoute (JNIEnv *env, jclass c, jlong self, jstring path)
 {
     char *path_ = (char *) (*env)->GetStringUTFChars (env, path, NULL);
     jint remove_route_ = (jint) ztrie_remove_route ((ztrie_t *) self, path_);
@@ -51,28 +51,28 @@ Java_org_zeromq_czmq_Ztrie__1_1matches (JNIEnv *env, jclass c, jlong self, jstri
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Ztrie__1_1hit_data (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Ztrie__1_1hitData (JNIEnv *env, jclass c, jlong self)
 {
     jlong hit_data_ = (jlong) ztrie_hit_data ((ztrie_t *) self);
     return hit_data_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Ztrie__1_1hit_parameter_count (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Ztrie__1_1hitParameterCount (JNIEnv *env, jclass c, jlong self)
 {
     jlong hit_parameter_count_ = (jlong) ztrie_hit_parameter_count ((ztrie_t *) self);
     return hit_parameter_count_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Ztrie__1_1hit_parameters (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Ztrie__1_1hitParameters (JNIEnv *env, jclass c, jlong self)
 {
     jlong hit_parameters_ = (jlong) ztrie_hit_parameters ((ztrie_t *) self);
     return hit_parameters_;
 }
 
 JNIEXPORT jstring JNICALL
-Java_org_zeromq_czmq_Ztrie__1_1hit_asterisk_match (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Ztrie__1_1hitAsteriskMatch (JNIEnv *env, jclass c, jlong self)
 {
     char *hit_asterisk_match_ = (char *) ztrie_hit_asterisk_match ((ztrie_t *) self);
     jstring string = (*env)->NewStringUTF (env, hit_asterisk_match_);

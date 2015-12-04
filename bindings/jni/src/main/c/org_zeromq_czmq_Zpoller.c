@@ -59,7 +59,7 @@ Java_org_zeromq_czmq_Zpoller__1_1terminated (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zpoller__1_1ignore_interrupts (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zpoller__1_1ignoreInterrupts (JNIEnv *env, jclass c, jlong self)
 {
     zpoller_ignore_interrupts ((zpoller_t *) self);
 }

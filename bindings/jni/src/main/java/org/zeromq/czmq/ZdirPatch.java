@@ -75,9 +75,9 @@ public class ZdirPatch implements AutoCloseable{
     /*
     Calculate hash digest for file (create only)
     */
-    native static void __digest_set (long self);
+    native static void __digestSet (long self);
     public void digestSet (long self) {
-        __digest_set (self);
+        __digestSet (self);
     }
     /*
     Return hash digest for patch file

@@ -240,49 +240,49 @@ public class Zhashx implements AutoCloseable{
     Set a user-defined deallocator for hash items; by default items are not
     freed when the hash is destroyed.                                      
     */
-    native static void __set_destructor (long self, long destructor);
+    native static void __setDestructor (long self, long destructor);
     public void setDestructor (long self, long destructor) {
-        __set_destructor (self, destructor);
+        __setDestructor (self, destructor);
     }
     /*
     Set a user-defined duplicator for hash items; by default items are not
     copied when the hash is duplicated.                                   
     */
-    native static void __set_duplicator (long self, long duplicator);
+    native static void __setDuplicator (long self, long duplicator);
     public void setDuplicator (long self, long duplicator) {
-        __set_duplicator (self, duplicator);
+        __setDuplicator (self, duplicator);
     }
     /*
     Set a user-defined deallocator for keys; by default keys are freed
     when the hash is destroyed using free().                          
     */
-    native static void __set_key_destructor (long self, long destructor);
+    native static void __setKeyDestructor (long self, long destructor);
     public void setKeyDestructor (long self, long destructor) {
-        __set_key_destructor (self, destructor);
+        __setKeyDestructor (self, destructor);
     }
     /*
     Set a user-defined duplicator for keys; by default keys are duplicated
     using strdup.                                                         
     */
-    native static void __set_key_duplicator (long self, long duplicator);
+    native static void __setKeyDuplicator (long self, long duplicator);
     public void setKeyDuplicator (long self, long duplicator) {
-        __set_key_duplicator (self, duplicator);
+        __setKeyDuplicator (self, duplicator);
     }
     /*
     Set a user-defined comparator for keys; by default keys are
     compared using strcmp.                                     
     */
-    native static void __set_key_comparator (long self, long comparator);
+    native static void __setKeyComparator (long self, long comparator);
     public void setKeyComparator (long self, long comparator) {
-        __set_key_comparator (self, comparator);
+        __setKeyComparator (self, comparator);
     }
     /*
     Set a user-defined comparator for keys; by default keys are
     compared using strcmp.                                     
     */
-    native static void __set_key_hasher (long self, long hasher);
+    native static void __setKeyHasher (long self, long hasher);
     public void setKeyHasher (long self, long hasher) {
-        __set_key_hasher (self, hasher);
+        __setKeyHasher (self, hasher);
     }
     /*
     Make copy of hash table; if supplied table is null, returns null.    
@@ -290,9 +290,9 @@ public class Zhashx implements AutoCloseable{
     very large tables. NOTE: only works with item values that are strings
     since there's no other way to know how to duplicate the item value.  
     */
-    native static long __dup_v2 (long self);
+    native static long __dupV2 (long self);
     public long dupV2 (long self) {
-        return __dup_v2 (self);
+        return __dupV2 (self);
     }
     /*
     DEPRECATED as clumsy -- use set_destructor instead

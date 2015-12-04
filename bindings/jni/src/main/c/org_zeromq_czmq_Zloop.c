@@ -31,13 +31,13 @@ Java_org_zeromq_czmq_Zloop__1_1reader (JNIEnv *env, jclass c, jlong self, jlong 
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zloop__1_1reader_end (JNIEnv *env, jclass c, jlong self, jlong sock)
+Java_org_zeromq_czmq_Zloop__1_1readerEnd (JNIEnv *env, jclass c, jlong self, jlong sock)
 {
     zloop_reader_end ((zloop_t *) self, (zsock_t *) sock);
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zloop__1_1reader_set_tolerant (JNIEnv *env, jclass c, jlong self, jlong sock)
+Java_org_zeromq_czmq_Zloop__1_1readerSetTolerant (JNIEnv *env, jclass c, jlong self, jlong sock)
 {
     zloop_reader_set_tolerant ((zloop_t *) self, (zsock_t *) sock);
 }
@@ -50,7 +50,7 @@ Java_org_zeromq_czmq_Zloop__1_1timer (JNIEnv *env, jclass c, jlong self, jlong d
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zloop__1_1timer_end (JNIEnv *env, jclass c, jlong self, jint timer_id)
+Java_org_zeromq_czmq_Zloop__1_1timerEnd (JNIEnv *env, jclass c, jlong self, jint timer_id)
 {
     jint timer_end_ = (jint) zloop_timer_end ((zloop_t *) self, (int) timer_id);
     return timer_end_;
@@ -64,31 +64,31 @@ Java_org_zeromq_czmq_Zloop__1_1ticket (JNIEnv *env, jclass c, jlong self, jlong 
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zloop__1_1ticket_reset (JNIEnv *env, jclass c, jlong self, jlong handle)
+Java_org_zeromq_czmq_Zloop__1_1ticketReset (JNIEnv *env, jclass c, jlong self, jlong handle)
 {
     zloop_ticket_reset ((zloop_t *) self, (void *) handle);
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zloop__1_1ticket_delete (JNIEnv *env, jclass c, jlong self, jlong handle)
+Java_org_zeromq_czmq_Zloop__1_1ticketDelete (JNIEnv *env, jclass c, jlong self, jlong handle)
 {
     zloop_ticket_delete ((zloop_t *) self, (void *) handle);
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zloop__1_1set_ticket_delay (JNIEnv *env, jclass c, jlong self, jlong ticket_delay)
+Java_org_zeromq_czmq_Zloop__1_1setTicketDelay (JNIEnv *env, jclass c, jlong self, jlong ticket_delay)
 {
     zloop_set_ticket_delay ((zloop_t *) self, (size_t) ticket_delay);
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zloop__1_1set_max_timers (JNIEnv *env, jclass c, jlong self, jlong max_timers)
+Java_org_zeromq_czmq_Zloop__1_1setMaxTimers (JNIEnv *env, jclass c, jlong self, jlong max_timers)
 {
     zloop_set_max_timers ((zloop_t *) self, (size_t) max_timers);
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zloop__1_1set_verbose (JNIEnv *env, jclass c, jlong self, jboolean verbose)
+Java_org_zeromq_czmq_Zloop__1_1setVerbose (JNIEnv *env, jclass c, jlong self, jboolean verbose)
 {
     zloop_set_verbose ((zloop_t *) self, (bool) verbose);
 }
@@ -101,7 +101,7 @@ Java_org_zeromq_czmq_Zloop__1_1start (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zloop__1_1ignore_interrupts (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zloop__1_1ignoreInterrupts (JNIEnv *env, jclass c, jlong self)
 {
     zloop_ignore_interrupts ((zloop_t *) self);
 }

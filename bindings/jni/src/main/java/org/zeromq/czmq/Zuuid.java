@@ -37,9 +37,9 @@ public class Zuuid implements AutoCloseable{
     Set UUID to new supplied string value skipping '-' and '{' '}'
     optional delimiters. Return 0 if OK, else returns -1.         
     */
-    native static int __set_str (long self, String source);
+    native static int __setStr (long self, String source);
     public int setStr (long self, String source) {
-        return __set_str (self, source);
+        return __setStr (self, source);
     }
     /*
     Return UUID binary size
@@ -60,9 +60,9 @@ public class Zuuid implements AutoCloseable{
     case. Caller does not modify or free returned value. See        
     http://en.wikipedia.org/wiki/Universally_unique_identifier      
     */
-    native static String __str_canonical (long self);
+    native static String __strCanonical (long self);
     public String strCanonical (long self) {
-        return __str_canonical (self);
+        return __strCanonical (self);
     }
     /*
     Make copy of UUID object; if uuid is null, or memory was exhausted,

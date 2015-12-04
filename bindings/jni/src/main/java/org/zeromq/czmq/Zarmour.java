@@ -36,9 +36,9 @@ public class Zarmour implements AutoCloseable{
     /*
     Get printable string for mode.
     */
-    native static String __mode_str (long self);
+    native static String __modeStr (long self);
     public String modeStr (long self) {
-        return __mode_str (self);
+        return __modeStr (self);
     }
     /*
     Get the mode property.
@@ -50,9 +50,9 @@ public class Zarmour implements AutoCloseable{
     /*
     Set the mode property.
     */
-    native static void __set_mode (long self, int mode);
+    native static void __setMode (long self, int mode);
     public void setMode (long self, int mode) {
-        __set_mode (self, mode);
+        __setMode (self, mode);
     }
     /*
     Return true if padding is turned on.
@@ -64,51 +64,51 @@ public class Zarmour implements AutoCloseable{
     /*
     Turn padding on or off. Default is on.
     */
-    native static void __set_pad (long self, boolean pad);
+    native static void __setPad (long self, boolean pad);
     public void setPad (long self, boolean pad) {
-        __set_pad (self, pad);
+        __setPad (self, pad);
     }
     /*
     Get the padding character.
     */
-    native static char __pad_char (long self);
+    native static char __padChar (long self);
     public char padChar (long self) {
-        return __pad_char (self);
+        return __padChar (self);
     }
     /*
     Set the padding character.
     */
-    native static void __set_pad_char (long self, char padChar);
+    native static void __setPadChar (long self, char padChar);
     public void setPadChar (long self, char padChar) {
-        __set_pad_char (self, padChar);
+        __setPadChar (self, padChar);
     }
     /*
     Return if splitting output into lines is turned on. Default is off.
     */
-    native static boolean __line_breaks (long self);
+    native static boolean __lineBreaks (long self);
     public boolean lineBreaks (long self) {
-        return __line_breaks (self);
+        return __lineBreaks (self);
     }
     /*
     Turn splitting output into lines on or off.
     */
-    native static void __set_line_breaks (long self, boolean lineBreaks);
+    native static void __setLineBreaks (long self, boolean lineBreaks);
     public void setLineBreaks (long self, boolean lineBreaks) {
-        __set_line_breaks (self, lineBreaks);
+        __setLineBreaks (self, lineBreaks);
     }
     /*
     Get the line length used for splitting lines.
     */
-    native static long __line_length (long self);
+    native static long __lineLength (long self);
     public long lineLength (long self) {
-        return __line_length (self);
+        return __lineLength (self);
     }
     /*
     Set the line length used for splitting lines.
     */
-    native static void __set_line_length (long self, long lineLength);
+    native static void __setLineLength (long self, long lineLength);
     public void setLineLength (long self, long lineLength) {
-        __set_line_length (self, lineLength);
+        __setLineLength (self, lineLength);
     }
     /*
     Print properties of object
