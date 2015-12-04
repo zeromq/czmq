@@ -19,10 +19,10 @@ public class Zconfig implements AutoCloseable{
     /*
     Create new config item
     */
-    native static long __init (String name, long parent);
+    native static long __new (String name, long parent);
     public Zconfig (String name, long parent) {
-        /*  TODO: if __init fails, self is null...  */
-        self = __init (name, parent);
+        /*  TODO: if __new fails, self is null...  */
+        self = __new (name, parent);
     }
     public Zconfig () {
         self = 0;
@@ -76,9 +76,9 @@ public class Zconfig implements AutoCloseable{
     /*
     Set config item name, name may be NULL
     */
-    native static void __set_name (long self, String name);
+    native static void __setName (long self, String name);
     public void setName (long self, String name) {
-        __set_name (self, name);
+        __setName (self, name);
     }
     /*
     Set new value for config item. The new value may be a string, a printf  
@@ -86,9 +86,9 @@ public class Zconfig implements AutoCloseable{
     comes from an insecure source, you must use '%s' as the format, followed
     by the string.                                                          
     */
-    native static void __set_value (long self, String format);
+    native static void __setValue (long self, String format);
     public void setValue (long self, String format) {
-        __set_value (self, format);
+        __setValue (self, format);
     }
     /*
     Find our first child, if any
@@ -114,9 +114,9 @@ public class Zconfig implements AutoCloseable{
     /*
     Locate the last config item at a specified depth
     */
-    native static long __at_depth (long self, int level);
+    native static long __atDepth (long self, int level);
     public long atDepth (long self, int level) {
-        return __at_depth (self, level);
+        return __atDepth (self, level);
     }
     /*
     Execute a callback for each config item in the tree; returns zero if
@@ -131,9 +131,9 @@ public class Zconfig implements AutoCloseable{
     comment lines as you like. If you use a null format, all comments are
     deleted.                                                             
     */
-    native static void __set_comment (long self, String format);
+    native static void __setComment (long self, String format);
     public void setComment (long self, String format) {
-        __set_comment (self, format);
+        __setComment (self, format);
     }
     /*
     Return comments of config item, as zlist.
@@ -194,38 +194,38 @@ public class Zconfig implements AutoCloseable{
     /*
     Load a config tree from a memory chunk
     */
-    native static long __chunk_load (long chunk);
+    native static long __chunkLoad (long chunk);
     public long chunkLoad (long chunk) {
-        return __chunk_load (chunk);
+        return __chunkLoad (chunk);
     }
     /*
     Save a config tree to a new memory chunk
     */
-    native static long __chunk_save (long self);
+    native static long __chunkSave (long self);
     public long chunkSave (long self) {
-        return __chunk_save (self);
+        return __chunkSave (self);
     }
     /*
     Load a config tree from a null-terminated string
     */
-    native static long __str_load (String string);
+    native static long __strLoad (String string);
     public long strLoad (String string) {
-        return __str_load (string);
+        return __strLoad (string);
     }
     /*
     Save a config tree to a new null terminated string
     */
-    native static String __str_save (long self);
+    native static String __strSave (long self);
     public String strSave (long self) {
-        return __str_save (self);
+        return __strSave (self);
     }
     /*
     Return true if a configuration tree was loaded from a file and that
     file has changed in since the tree was loaded.                     
     */
-    native static boolean __has_changed (long self);
+    native static boolean __hasChanged (long self);
     public boolean hasChanged (long self) {
-        return __has_changed (self);
+        return __hasChanged (self);
     }
     /*
     Print properties of object

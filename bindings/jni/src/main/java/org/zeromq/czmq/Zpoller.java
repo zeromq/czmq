@@ -20,10 +20,10 @@ public class Zpoller implements AutoCloseable{
     Create new poller; the reader can be a libzmq socket (void *), a zsock_t
     instance, or a zactor_t instance.                                       
     */
-    native static long __init (long reader);
+    native static long __new (long reader);
     public Zpoller (long reader) {
-        /*  TODO: if __init fails, self is null...  */
-        self = __init (reader);
+        /*  TODO: if __new fails, self is null...  */
+        self = __new (reader);
     }
     public Zpoller () {
         self = 0;
@@ -90,9 +90,9 @@ public class Zpoller implements AutoCloseable{
     return immediately if detects zsys_interrupted is set to something other than
     zero. Calling zpoller_ignore_interrupts will supress this behavior.          
     */
-    native static void __ignore_interrupts (long self);
+    native static void __ignoreInterrupts (long self);
     public void ignoreInterrupts (long self) {
-        __ignore_interrupts (self);
+        __ignoreInterrupts (self);
     }
     /*
     Self test of this class.

@@ -19,10 +19,10 @@ public class Zhash implements AutoCloseable{
     /*
     Create a new, empty hash container
     */
-    native static long __init ();
+    native static long __new ();
     public Zhash () {
-        /*  TODO: if __init fails, self is null...  */
-        self = __init ();
+        /*  TODO: if __new fails, self is null...  */
+        self = __new ();
     }
     /*
     Destroy a hash container and all items in it

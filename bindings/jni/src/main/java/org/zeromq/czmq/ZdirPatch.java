@@ -19,10 +19,10 @@ public class ZdirPatch implements AutoCloseable{
     /*
     Create new patch
     */
-    native static long __init (String path, long file, int op, String alias);
+    native static long __new (String path, long file, int op, String alias);
     public ZdirPatch (String path, long file, int op, String alias) {
-        /*  TODO: if __init fails, self is null...  */
-        self = __init (path, file, op, alias);
+        /*  TODO: if __new fails, self is null...  */
+        self = __new (path, file, op, alias);
     }
     public ZdirPatch () {
         self = 0;
@@ -75,9 +75,9 @@ public class ZdirPatch implements AutoCloseable{
     /*
     Calculate hash digest for file (create only)
     */
-    native static void __digest_set (long self);
+    native static void __digestSet (long self);
     public void digestSet (long self) {
-        __digest_set (self);
+        __digestSet (self);
     }
     /*
     Return hash digest for patch file

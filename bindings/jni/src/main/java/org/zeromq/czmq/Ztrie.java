@@ -19,10 +19,10 @@ public class Ztrie implements AutoCloseable{
     /*
     Creates a new ztrie.
     */
-    native static long __init (char delimiter);
+    native static long __new (char delimiter);
     public Ztrie (char delimiter) {
-        /*  TODO: if __init fails, self is null...  */
-        self = __init (delimiter);
+        /*  TODO: if __new fails, self is null...  */
+        self = __new (delimiter);
     }
     public Ztrie () {
         self = 0;
@@ -41,18 +41,18 @@ public class Ztrie implements AutoCloseable{
     if the route already exists, otherwise 0. This method takes ownership of
     the provided data if a destroy_data_fn is provided.                     
     */
-    native static int __insert_route (long self, String path, long data, long destroyDataFn);
+    native static int __insertRoute (long self, String path, long data, long destroyDataFn);
     public int insertRoute (long self, String path, long data, long destroyDataFn) {
-        return __insert_route (self, path, data, destroyDataFn);
+        return __insertRoute (self, path, data, destroyDataFn);
     }
     /*
     Removes a route from the trie and destroys its data. Returns -1 if the
     route does not exists, otherwise 0.                                   
     the start of the list call zlist_first (). Advances the cursor.       
     */
-    native static int __remove_route (long self, String path);
+    native static int __removeRoute (long self, String path);
     public int removeRoute (long self, String path) {
-        return __remove_route (self, path);
+        return __removeRoute (self, path);
     }
     /*
     Returns true if the path matches a route in the tree, otherwise false.
@@ -66,33 +66,33 @@ public class Ztrie implements AutoCloseable{
     did not match, returns NULL. Do not delete the data as it's owned by    
     ztrie.                                                                  
     */
-    native static long __hit_data (long self);
+    native static long __hitData (long self);
     public long hitData (long self) {
-        return __hit_data (self);
+        return __hitData (self);
     }
     /*
     Returns the count of parameters that a matched route has.
     */
-    native static long __hit_parameter_count (long self);
+    native static long __hitParameterCount (long self);
     public long hitParameterCount (long self) {
-        return __hit_parameter_count (self);
+        return __hitParameterCount (self);
     }
     /*
     Returns the parameters of a matched route with named regexes from last   
     ztrie_matches. If the path did not match or the route did not contain any
     named regexes, returns NULL.                                             
     */
-    native static long __hit_parameters (long self);
+    native static long __hitParameters (long self);
     public long hitParameters (long self) {
-        return __hit_parameters (self);
+        return __hitParameters (self);
     }
     /*
     Returns the asterisk matched part of a route, if there has been no match
     or no asterisk match, returns NULL.                                     
     */
-    native static String __hit_asterisk_match (long self);
+    native static String __hitAsteriskMatch (long self);
     public String hitAsteriskMatch (long self) {
-        return __hit_asterisk_match (self);
+        return __hitAsteriskMatch (self);
     }
     /*
     Print the trie

@@ -19,10 +19,10 @@ public class Ziflist implements AutoCloseable{
     /*
     Get a list of network interfaces currently defined on the system
     */
-    native static long __init ();
+    native static long __new ();
     public Ziflist () {
-        /*  TODO: if __init fails, self is null...  */
-        self = __init ();
+        /*  TODO: if __new fails, self is null...  */
+        self = __new ();
     }
     /*
     Destroy a ziflist instance

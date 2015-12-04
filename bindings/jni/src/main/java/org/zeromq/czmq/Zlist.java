@@ -19,10 +19,10 @@ public class Zlist implements AutoCloseable{
     /*
     Create a new list container
     */
-    native static long __init ();
+    native static long __new ();
     public Zlist () {
-        /*  TODO: if __init fails, self is null...  */
-        self = __init ();
+        /*  TODO: if __new fails, self is null...  */
+        self = __new ();
     }
     /*
     Destroy a list container

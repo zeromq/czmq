@@ -23,10 +23,10 @@ public class Zfile implements AutoCloseable{
     data from the symbolic link actually reads from the target file. Path
     may be NULL, in which case it is not used.                           
     */
-    native static long __init (String path, String name);
+    native static long __new (String path, String name);
     public Zfile (String path, String name) {
-        /*  TODO: if __init fails, self is null...  */
-        self = __init (path, name);
+        /*  TODO: if __new fails, self is null...  */
+        self = __new (path, name);
     }
     public Zfile () {
         self = 0;
@@ -84,51 +84,51 @@ public class Zfile implements AutoCloseable{
     Return true if the file is a directory. If you want this to reflect   
     any external changes, call zfile_restat before checking this property.
     */
-    native static boolean __is_directory (long self);
+    native static boolean __isDirectory (long self);
     public boolean isDirectory (long self) {
-        return __is_directory (self);
+        return __isDirectory (self);
     }
     /*
     Return true if the file is a regular file. If you want this to reflect
     any external changes, call zfile_restat before checking this property.
     */
-    native static boolean __is_regular (long self);
+    native static boolean __isRegular (long self);
     public boolean isRegular (long self) {
-        return __is_regular (self);
+        return __isRegular (self);
     }
     /*
     Return true if the file is readable by this process. If you want this to
     reflect any external changes, call zfile_restat before checking this    
     property.                                                               
     */
-    native static boolean __is_readable (long self);
+    native static boolean __isReadable (long self);
     public boolean isReadable (long self) {
-        return __is_readable (self);
+        return __isReadable (self);
     }
     /*
     Return true if the file is writeable by this process. If you want this 
     to reflect any external changes, call zfile_restat before checking this
     property.                                                              
     */
-    native static boolean __is_writeable (long self);
+    native static boolean __isWriteable (long self);
     public boolean isWriteable (long self) {
-        return __is_writeable (self);
+        return __isWriteable (self);
     }
     /*
     Check if file has stopped changing and can be safely processed.
     Updates the file statistics from disk at every call.           
     */
-    native static boolean __is_stable (long self);
+    native static boolean __isStable (long self);
     public boolean isStable (long self) {
-        return __is_stable (self);
+        return __isStable (self);
     }
     /*
     Return true if the file was changed on disk since the zfile_t object
     was created, or the last zfile_restat() call made on it.            
     */
-    native static boolean __has_changed (long self);
+    native static boolean __hasChanged (long self);
     public boolean hasChanged (long self) {
-        return __has_changed (self);
+        return __hasChanged (self);
     }
     /*
     Remove the file from disk

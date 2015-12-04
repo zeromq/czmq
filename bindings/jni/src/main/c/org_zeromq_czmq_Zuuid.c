@@ -11,33 +11,20 @@
 #include "../../native/include/org_zeromq_czmq_Zuuid.h"
 
 JNIEXPORT jlong JNICALL
-Java_zuuid__1_1new (JNIEnv *env, jclass c)
+Java_org_zeromq_czmq_Zuuid__1_1new (JNIEnv *env, jclass c)
 {
     jlong new_ = (jlong) zuuid_new ();
     return new_;
 }
 
 JNIEXPORT void JNICALL
-Java_zuuid__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
+Java_org_zeromq_czmq_Zuuid__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
 {
     zuuid_destroy ((zuuid_t **) &self_p);
 }
 
-JNIEXPORT jlong JNICALL
-Java_zuuid__1_1new_from (JNIEnv *env, jclass c, jlong source)
-{
-    jlong new_from_ = (jlong) zuuid_new_from ((const byte *) source);
-    return new_from_;
-}
-
-JNIEXPORT void JNICALL
-Java_zuuid__1_1set (JNIEnv *env, jclass c, jlong self, jlong source)
-{
-    zuuid_set ((zuuid_t *) self, (const byte *) source);
-}
-
 JNIEXPORT jint JNICALL
-Java_zuuid__1_1set_str (JNIEnv *env, jclass c, jlong self, jstring source)
+Java_org_zeromq_czmq_Zuuid__1_1setStr (JNIEnv *env, jclass c, jlong self, jstring source)
 {
     char *source_ = (char *) (*env)->GetStringUTFChars (env, source, NULL);
     jint set_str_ = (jint) zuuid_set_str ((zuuid_t *) self, source_);
@@ -46,21 +33,14 @@ Java_zuuid__1_1set_str (JNIEnv *env, jclass c, jlong self, jstring source)
 }
 
 JNIEXPORT jlong JNICALL
-Java_zuuid__1_1data (JNIEnv *env, jclass c, jlong self)
-{
-    byte *data_ = (byte *) zuuid_data ((zuuid_t *) self);
-    return (jlong) data_;
-}
-
-JNIEXPORT jlong JNICALL
-Java_zuuid__1_1size (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zuuid__1_1size (JNIEnv *env, jclass c, jlong self)
 {
     jlong size_ = (jlong) zuuid_size ((zuuid_t *) self);
     return size_;
 }
 
 JNIEXPORT jstring JNICALL
-Java_zuuid__1_1str (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zuuid__1_1str (JNIEnv *env, jclass c, jlong self)
 {
     char *str_ = (char *) zuuid_str ((zuuid_t *) self);
     jstring string = (*env)->NewStringUTF (env, str_);
@@ -68,42 +48,22 @@ Java_zuuid__1_1str (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jstring JNICALL
-Java_zuuid__1_1str_canonical (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zuuid__1_1strCanonical (JNIEnv *env, jclass c, jlong self)
 {
     char *str_canonical_ = (char *) zuuid_str_canonical ((zuuid_t *) self);
     jstring string = (*env)->NewStringUTF (env, str_canonical_);
     return string;
 }
 
-JNIEXPORT void JNICALL
-Java_zuuid__1_1export (JNIEnv *env, jclass c, jlong self, jlong target)
-{
-    zuuid_export ((zuuid_t *) self, (byte *) target);
-}
-
-JNIEXPORT jboolean JNICALL
-Java_zuuid__1_1eq (JNIEnv *env, jclass c, jlong self, jlong compare)
-{
-    jboolean eq_ = (jboolean) zuuid_eq ((zuuid_t *) self, (const byte *) compare);
-    return eq_;
-}
-
-JNIEXPORT jboolean JNICALL
-Java_zuuid__1_1neq (JNIEnv *env, jclass c, jlong self, jlong compare)
-{
-    jboolean neq_ = (jboolean) zuuid_neq ((zuuid_t *) self, (const byte *) compare);
-    return neq_;
-}
-
 JNIEXPORT jlong JNICALL
-Java_zuuid__1_1dup (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zuuid__1_1dup (JNIEnv *env, jclass c, jlong self)
 {
     jlong dup_ = (jlong) zuuid_dup ((zuuid_t *) self);
     return dup_;
 }
 
 JNIEXPORT void JNICALL
-Java_zuuid__1_1test (JNIEnv *env, jclass c, jboolean verbose)
+Java_org_zeromq_czmq_Zuuid__1_1test (JNIEnv *env, jclass c, jboolean verbose)
 {
     zuuid_test ((bool) verbose);
 }

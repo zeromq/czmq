@@ -16,7 +16,6 @@ set (czmqjni_sources
     src/main/c/org_zeromq_czmq_Zdir.c
     src/main/c/org_zeromq_czmq_ZdirPatch.c
     src/main/c/org_zeromq_czmq_Zfile.c
-    src/main/c/org_zeromq_czmq_Zframe.c
     src/main/c/org_zeromq_czmq_Zhash.c
     src/main/c/org_zeromq_czmq_Zhashx.c
     src/main/c/org_zeromq_czmq_Ziflist.c

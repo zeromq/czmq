@@ -11,141 +11,141 @@
 #include "../../native/include/org_zeromq_czmq_Zlist.h"
 
 JNIEXPORT jlong JNICALL
-Java_zlist__1_1new (JNIEnv *env, jclass c)
+Java_org_zeromq_czmq_Zlist__1_1new (JNIEnv *env, jclass c)
 {
     jlong new_ = (jlong) zlist_new ();
     return new_;
 }
 
 JNIEXPORT void JNICALL
-Java_zlist__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
+Java_org_zeromq_czmq_Zlist__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
 {
     zlist_destroy ((zlist_t **) &self_p);
 }
 
 JNIEXPORT jlong JNICALL
-Java_zlist__1_1first (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zlist__1_1first (JNIEnv *env, jclass c, jlong self)
 {
     jlong first_ = (jlong) zlist_first ((zlist_t *) self);
     return first_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_zlist__1_1next (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zlist__1_1next (JNIEnv *env, jclass c, jlong self)
 {
     jlong next_ = (jlong) zlist_next ((zlist_t *) self);
     return next_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_zlist__1_1last (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zlist__1_1last (JNIEnv *env, jclass c, jlong self)
 {
     jlong last_ = (jlong) zlist_last ((zlist_t *) self);
     return last_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_zlist__1_1head (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zlist__1_1head (JNIEnv *env, jclass c, jlong self)
 {
     jlong head_ = (jlong) zlist_head ((zlist_t *) self);
     return head_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_zlist__1_1tail (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zlist__1_1tail (JNIEnv *env, jclass c, jlong self)
 {
     jlong tail_ = (jlong) zlist_tail ((zlist_t *) self);
     return tail_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_zlist__1_1item (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zlist__1_1item (JNIEnv *env, jclass c, jlong self)
 {
     jlong item_ = (jlong) zlist_item ((zlist_t *) self);
     return item_;
 }
 
 JNIEXPORT jint JNICALL
-Java_zlist__1_1append (JNIEnv *env, jclass c, jlong self, jlong item)
+Java_org_zeromq_czmq_Zlist__1_1append (JNIEnv *env, jclass c, jlong self, jlong item)
 {
     jint append_ = (jint) zlist_append ((zlist_t *) self, (void *) item);
     return append_;
 }
 
 JNIEXPORT jint JNICALL
-Java_zlist__1_1push (JNIEnv *env, jclass c, jlong self, jlong item)
+Java_org_zeromq_czmq_Zlist__1_1push (JNIEnv *env, jclass c, jlong self, jlong item)
 {
     jint push_ = (jint) zlist_push ((zlist_t *) self, (void *) item);
     return push_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_zlist__1_1pop (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zlist__1_1pop (JNIEnv *env, jclass c, jlong self)
 {
     jlong pop_ = (jlong) zlist_pop ((zlist_t *) self);
     return pop_;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_zlist__1_1exists (JNIEnv *env, jclass c, jlong self, jlong item)
+Java_org_zeromq_czmq_Zlist__1_1exists (JNIEnv *env, jclass c, jlong self, jlong item)
 {
     jboolean exists_ = (jboolean) zlist_exists ((zlist_t *) self, (void *) item);
     return exists_;
 }
 
 JNIEXPORT void JNICALL
-Java_zlist__1_1remove (JNIEnv *env, jclass c, jlong self, jlong item)
+Java_org_zeromq_czmq_Zlist__1_1remove (JNIEnv *env, jclass c, jlong self, jlong item)
 {
     zlist_remove ((zlist_t *) self, (void *) item);
 }
 
 JNIEXPORT jlong JNICALL
-Java_zlist__1_1dup (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zlist__1_1dup (JNIEnv *env, jclass c, jlong self)
 {
     jlong dup_ = (jlong) zlist_dup ((zlist_t *) self);
     return dup_;
 }
 
 JNIEXPORT void JNICALL
-Java_zlist__1_1purge (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zlist__1_1purge (JNIEnv *env, jclass c, jlong self)
 {
     zlist_purge ((zlist_t *) self);
 }
 
 JNIEXPORT jlong JNICALL
-Java_zlist__1_1size (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zlist__1_1size (JNIEnv *env, jclass c, jlong self)
 {
     jlong size_ = (jlong) zlist_size ((zlist_t *) self);
     return size_;
 }
 
 JNIEXPORT void JNICALL
-Java_zlist__1_1sort (JNIEnv *env, jclass c, jlong self, jlong compare)
+Java_org_zeromq_czmq_Zlist__1_1sort (JNIEnv *env, jclass c, jlong self, jlong compare)
 {
     zlist_sort ((zlist_t *) self, (zlist_compare_fn *) compare);
 }
 
 JNIEXPORT void JNICALL
-Java_zlist__1_1autofree (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zlist__1_1autofree (JNIEnv *env, jclass c, jlong self)
 {
     zlist_autofree ((zlist_t *) self);
 }
 
 JNIEXPORT void JNICALL
-Java_zlist__1_1comparefn (JNIEnv *env, jclass c, jlong self, jlong fn)
+Java_org_zeromq_czmq_Zlist__1_1comparefn (JNIEnv *env, jclass c, jlong self, jlong fn)
 {
     zlist_comparefn ((zlist_t *) self, (zlist_compare_fn *) fn);
 }
 
 JNIEXPORT jlong JNICALL
-Java_zlist__1_1freefn (JNIEnv *env, jclass c, jlong self, jlong item, jlong fn, jboolean at_tail)
+Java_org_zeromq_czmq_Zlist__1_1freefn (JNIEnv *env, jclass c, jlong self, jlong item, jlong fn, jboolean at_tail)
 {
     jlong freefn_ = (jlong) zlist_freefn ((zlist_t *) self, (void *) item, (zlist_free_fn *) fn, (bool) at_tail);
     return freefn_;
 }
 
 JNIEXPORT void JNICALL
-Java_zlist__1_1test (JNIEnv *env, jclass c, jboolean verbose)
+Java_org_zeromq_czmq_Zlist__1_1test (JNIEnv *env, jclass c, jboolean verbose)
 {
     zlist_test ((bool) verbose);
 }

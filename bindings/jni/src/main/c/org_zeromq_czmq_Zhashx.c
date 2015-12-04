@@ -11,108 +11,108 @@
 #include "../../native/include/org_zeromq_czmq_Zhashx.h"
 
 JNIEXPORT jlong JNICALL
-Java_zhashx__1_1new (JNIEnv *env, jclass c)
+Java_org_zeromq_czmq_Zhashx__1_1new (JNIEnv *env, jclass c)
 {
     jlong new_ = (jlong) zhashx_new ();
     return new_;
 }
 
 JNIEXPORT void JNICALL
-Java_zhashx__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
+Java_org_zeromq_czmq_Zhashx__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
 {
     zhashx_destroy ((zhashx_t **) &self_p);
 }
 
 JNIEXPORT jint JNICALL
-Java_zhashx__1_1insert (JNIEnv *env, jclass c, jlong self, jlong key, jlong item)
+Java_org_zeromq_czmq_Zhashx__1_1insert (JNIEnv *env, jclass c, jlong self, jlong key, jlong item)
 {
     jint insert_ = (jint) zhashx_insert ((zhashx_t *) self, (const void *) key, (void *) item);
     return insert_;
 }
 
 JNIEXPORT void JNICALL
-Java_zhashx__1_1update (JNIEnv *env, jclass c, jlong self, jlong key, jlong item)
+Java_org_zeromq_czmq_Zhashx__1_1update (JNIEnv *env, jclass c, jlong self, jlong key, jlong item)
 {
     zhashx_update ((zhashx_t *) self, (const void *) key, (void *) item);
 }
 
 JNIEXPORT void JNICALL
-Java_zhashx__1_1delete (JNIEnv *env, jclass c, jlong self, jlong key)
+Java_org_zeromq_czmq_Zhashx__1_1delete (JNIEnv *env, jclass c, jlong self, jlong key)
 {
     zhashx_delete ((zhashx_t *) self, (const void *) key);
 }
 
 JNIEXPORT void JNICALL
-Java_zhashx__1_1purge (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zhashx__1_1purge (JNIEnv *env, jclass c, jlong self)
 {
     zhashx_purge ((zhashx_t *) self);
 }
 
 JNIEXPORT jlong JNICALL
-Java_zhashx__1_1lookup (JNIEnv *env, jclass c, jlong self, jlong key)
+Java_org_zeromq_czmq_Zhashx__1_1lookup (JNIEnv *env, jclass c, jlong self, jlong key)
 {
     jlong lookup_ = (jlong) zhashx_lookup ((zhashx_t *) self, (const void *) key);
     return lookup_;
 }
 
 JNIEXPORT jint JNICALL
-Java_zhashx__1_1rename (JNIEnv *env, jclass c, jlong self, jlong old_key, jlong new_key)
+Java_org_zeromq_czmq_Zhashx__1_1rename (JNIEnv *env, jclass c, jlong self, jlong old_key, jlong new_key)
 {
     jint rename_ = (jint) zhashx_rename ((zhashx_t *) self, (const void *) old_key, (const void *) new_key);
     return rename_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_zhashx__1_1freefn (JNIEnv *env, jclass c, jlong self, jlong key, jlong free_fn)
+Java_org_zeromq_czmq_Zhashx__1_1freefn (JNIEnv *env, jclass c, jlong self, jlong key, jlong free_fn)
 {
     jlong freefn_ = (jlong) zhashx_freefn ((zhashx_t *) self, (const void *) key, (zhashx_free_fn *) free_fn);
     return freefn_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_zhashx__1_1size (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zhashx__1_1size (JNIEnv *env, jclass c, jlong self)
 {
     jlong size_ = (jlong) zhashx_size ((zhashx_t *) self);
     return size_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_zhashx__1_1keys (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zhashx__1_1keys (JNIEnv *env, jclass c, jlong self)
 {
     jlong keys_ = (jlong) zhashx_keys ((zhashx_t *) self);
     return keys_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_zhashx__1_1values (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zhashx__1_1values (JNIEnv *env, jclass c, jlong self)
 {
     jlong values_ = (jlong) zhashx_values ((zhashx_t *) self);
     return values_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_zhashx__1_1first (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zhashx__1_1first (JNIEnv *env, jclass c, jlong self)
 {
     jlong first_ = (jlong) zhashx_first ((zhashx_t *) self);
     return first_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_zhashx__1_1next (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zhashx__1_1next (JNIEnv *env, jclass c, jlong self)
 {
     jlong next_ = (jlong) zhashx_next ((zhashx_t *) self);
     return next_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_zhashx__1_1cursor (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zhashx__1_1cursor (JNIEnv *env, jclass c, jlong self)
 {
     jlong cursor_ = (jlong) zhashx_cursor ((zhashx_t *) self);
     return cursor_;
 }
 
 JNIEXPORT void JNICALL
-Java_zhashx__1_1comment (JNIEnv *env, jclass c, jlong self, jstring format)
+Java_org_zeromq_czmq_Zhashx__1_1comment (JNIEnv *env, jclass c, jlong self, jstring format)
 {
     char *format_ = (char *) (*env)->GetStringUTFChars (env, format, NULL);
     zhashx_comment ((zhashx_t *) self, "%s", format_);
@@ -120,7 +120,7 @@ Java_zhashx__1_1comment (JNIEnv *env, jclass c, jlong self, jstring format)
 }
 
 JNIEXPORT jint JNICALL
-Java_zhashx__1_1save (JNIEnv *env, jclass c, jlong self, jstring filename)
+Java_org_zeromq_czmq_Zhashx__1_1save (JNIEnv *env, jclass c, jlong self, jstring filename)
 {
     char *filename_ = (char *) (*env)->GetStringUTFChars (env, filename, NULL);
     jint save_ = (jint) zhashx_save ((zhashx_t *) self, filename_);
@@ -129,7 +129,7 @@ Java_zhashx__1_1save (JNIEnv *env, jclass c, jlong self, jstring filename)
 }
 
 JNIEXPORT jint JNICALL
-Java_zhashx__1_1load (JNIEnv *env, jclass c, jlong self, jstring filename)
+Java_org_zeromq_czmq_Zhashx__1_1load (JNIEnv *env, jclass c, jlong self, jstring filename)
 {
     char *filename_ = (char *) (*env)->GetStringUTFChars (env, filename, NULL);
     jint load_ = (jint) zhashx_load ((zhashx_t *) self, filename_);
@@ -138,91 +138,91 @@ Java_zhashx__1_1load (JNIEnv *env, jclass c, jlong self, jstring filename)
 }
 
 JNIEXPORT jint JNICALL
-Java_zhashx__1_1refresh (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zhashx__1_1refresh (JNIEnv *env, jclass c, jlong self)
 {
     jint refresh_ = (jint) zhashx_refresh ((zhashx_t *) self);
     return refresh_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_zhashx__1_1pack (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zhashx__1_1pack (JNIEnv *env, jclass c, jlong self)
 {
     jlong pack_ = (jlong) zhashx_pack ((zhashx_t *) self);
     return pack_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_zhashx__1_1unpack (JNIEnv *env, jclass c, jlong frame)
+Java_org_zeromq_czmq_Zhashx__1_1unpack (JNIEnv *env, jclass c, jlong frame)
 {
     jlong unpack_ = (jlong) zhashx_unpack ((zframe_t *) frame);
     return unpack_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_zhashx__1_1dup (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zhashx__1_1dup (JNIEnv *env, jclass c, jlong self)
 {
     jlong dup_ = (jlong) zhashx_dup ((zhashx_t *) self);
     return dup_;
 }
 
 JNIEXPORT void JNICALL
-Java_zhashx__1_1set_destructor (JNIEnv *env, jclass c, jlong self, jlong destructor)
+Java_org_zeromq_czmq_Zhashx__1_1setDestructor (JNIEnv *env, jclass c, jlong self, jlong destructor)
 {
     zhashx_set_destructor ((zhashx_t *) self, (zhashx_destructor_fn *) destructor);
 }
 
 JNIEXPORT void JNICALL
-Java_zhashx__1_1set_duplicator (JNIEnv *env, jclass c, jlong self, jlong duplicator)
+Java_org_zeromq_czmq_Zhashx__1_1setDuplicator (JNIEnv *env, jclass c, jlong self, jlong duplicator)
 {
     zhashx_set_duplicator ((zhashx_t *) self, (zhashx_duplicator_fn *) duplicator);
 }
 
 JNIEXPORT void JNICALL
-Java_zhashx__1_1set_key_destructor (JNIEnv *env, jclass c, jlong self, jlong destructor)
+Java_org_zeromq_czmq_Zhashx__1_1setKeyDestructor (JNIEnv *env, jclass c, jlong self, jlong destructor)
 {
     zhashx_set_key_destructor ((zhashx_t *) self, (zhashx_destructor_fn *) destructor);
 }
 
 JNIEXPORT void JNICALL
-Java_zhashx__1_1set_key_duplicator (JNIEnv *env, jclass c, jlong self, jlong duplicator)
+Java_org_zeromq_czmq_Zhashx__1_1setKeyDuplicator (JNIEnv *env, jclass c, jlong self, jlong duplicator)
 {
     zhashx_set_key_duplicator ((zhashx_t *) self, (zhashx_duplicator_fn *) duplicator);
 }
 
 JNIEXPORT void JNICALL
-Java_zhashx__1_1set_key_comparator (JNIEnv *env, jclass c, jlong self, jlong comparator)
+Java_org_zeromq_czmq_Zhashx__1_1setKeyComparator (JNIEnv *env, jclass c, jlong self, jlong comparator)
 {
     zhashx_set_key_comparator ((zhashx_t *) self, (zhashx_comparator_fn *) comparator);
 }
 
 JNIEXPORT void JNICALL
-Java_zhashx__1_1set_key_hasher (JNIEnv *env, jclass c, jlong self, jlong hasher)
+Java_org_zeromq_czmq_Zhashx__1_1setKeyHasher (JNIEnv *env, jclass c, jlong self, jlong hasher)
 {
     zhashx_set_key_hasher ((zhashx_t *) self, (zhashx_hash_fn *) hasher);
 }
 
 JNIEXPORT jlong JNICALL
-Java_zhashx__1_1dup_v2 (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zhashx__1_1dupV2 (JNIEnv *env, jclass c, jlong self)
 {
     jlong dup_v2_ = (jlong) zhashx_dup_v2 ((zhashx_t *) self);
     return dup_v2_;
 }
 
 JNIEXPORT void JNICALL
-Java_zhashx__1_1autofree (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zhashx__1_1autofree (JNIEnv *env, jclass c, jlong self)
 {
     zhashx_autofree ((zhashx_t *) self);
 }
 
 JNIEXPORT jint JNICALL
-Java_zhashx__1_1foreach (JNIEnv *env, jclass c, jlong self, jlong callback, jlong argument)
+Java_org_zeromq_czmq_Zhashx__1_1foreach (JNIEnv *env, jclass c, jlong self, jlong callback, jlong argument)
 {
     jint foreach_ = (jint) zhashx_foreach ((zhashx_t *) self, (zhashx_foreach_fn *) callback, (void *) argument);
     return foreach_;
 }
 
 JNIEXPORT void JNICALL
-Java_zhashx__1_1test (JNIEnv *env, jclass c, jboolean verbose)
+Java_org_zeromq_czmq_Zhashx__1_1test (JNIEnv *env, jclass c, jboolean verbose)
 {
     zhashx_test ((bool) verbose);
 }
