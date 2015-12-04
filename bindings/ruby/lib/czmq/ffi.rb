@@ -188,8 +188,8 @@ module CZMQ
       attach_function :zframe_streq, [:pointer, :string], :bool, **opts
       attach_function :zframe_more, [:pointer], :int, **opts
       attach_function :zframe_set_more, [:pointer, :int], :void, **opts
-      attach_function :zframe_routing_id, [:pointer], :pointer, **opts
-      attach_function :zframe_set_routing_id, [:pointer, :pointer], :void, **opts
+      attach_function :zframe_routing_id, [:pointer], :uint32, **opts
+      attach_function :zframe_set_routing_id, [:pointer, :uint32], :void, **opts
       attach_function :zframe_eq, [:pointer, :pointer], :bool, **opts
       attach_function :zframe_reset, [:pointer, :pointer, :size_t], :void, **opts
       attach_function :zframe_print, [:pointer, :string], :void, **opts
@@ -326,8 +326,8 @@ module CZMQ
       attach_function :zmsg_sendm, [:pointer, :pointer], :int, **opts
       attach_function :zmsg_size, [:pointer], :size_t, **opts
       attach_function :zmsg_content_size, [:pointer], :size_t, **opts
-      attach_function :zmsg_routing_id, [:pointer], :pointer, **opts
-      attach_function :zmsg_set_routing_id, [:pointer, :pointer], :void, **opts
+      attach_function :zmsg_routing_id, [:pointer], :uint32, **opts
+      attach_function :zmsg_set_routing_id, [:pointer, :uint32], :void, **opts
       attach_function :zmsg_prepend, [:pointer, :pointer], :int, **opts
       attach_function :zmsg_append, [:pointer, :pointer], :int, **opts
       attach_function :zmsg_pop, [:pointer], :pointer, **opts
@@ -399,8 +399,8 @@ module CZMQ
       attach_function :zsock_vrecv, [:pointer, :string, :pointer], :int, **opts
       attach_function :zsock_bsend, [:pointer, :string, :varargs], :int, **opts
       attach_function :zsock_brecv, [:pointer, :string, :varargs], :int, **opts
-      attach_function :zsock_routing_id, [:pointer], :pointer, **opts
-      attach_function :zsock_set_routing_id, [:pointer, :pointer], :void, **opts
+      attach_function :zsock_routing_id, [:pointer], :uint32, **opts
+      attach_function :zsock_set_routing_id, [:pointer, :uint32], :void, **opts
       attach_function :zsock_set_unbounded, [:pointer], :void, **opts
       attach_function :zsock_signal, [:pointer, :char], :int, **opts
       attach_function :zsock_wait, [:pointer], :int, **opts

@@ -189,6 +189,7 @@ module CZMQ
       def set_routing_id(routing_id)
         raise DestroyedError unless @ptr
         self_p = @ptr
+        routing_id = Integer(routing_id)
         result = ::CZMQ::FFI.zframe_set_routing_id(self_p, routing_id)
         result
       end
