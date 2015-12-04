@@ -40,7 +40,7 @@ public class Zloop implements AutoCloseable{
     each instance will invoke its corresponding handler.                   
     */
     native static int __reader (long self, long sock, long handler, long arg);
-    public int reader (long self, long sock, long handler, long arg) {
+    public int reader (long sock, long handler, long arg) {
         return __reader (self, sock, handler, arg);
     }
     /*
@@ -48,7 +48,7 @@ public class Zloop implements AutoCloseable{
     same socket, cancels ALL of them.                                     
     */
     native static void __readerEnd (long self, long sock);
-    public void readerEnd (long self, long sock) {
+    public void readerEnd (long sock) {
         __readerEnd (self, sock);
     }
     /*
@@ -56,7 +56,7 @@ public class Zloop implements AutoCloseable{
     then readers that have errors are removed from the reactor silently.   
     */
     native static void __readerSetTolerant (long self, long sock);
-    public void readerSetTolerant (long self, long sock) {
+    public void readerSetTolerant (long sock) {
         __readerSetTolerant (self, sock);
     }
     /*
@@ -66,7 +66,7 @@ public class Zloop implements AutoCloseable{
     timer in the future. Returns -1 if there was an error.                   
     */
     native static int __timer (long self, long delay, long times, long handler, long arg);
-    public int timer (long self, long delay, long times, long handler, long arg) {
+    public int timer (long delay, long times, long handler, long arg) {
         return __timer (self, delay, times, handler, arg);
     }
     /*
@@ -74,7 +74,7 @@ public class Zloop implements AutoCloseable{
     zloop_timer).                                                            
     */
     native static int __timerEnd (long self, int timerId);
-    public int timerEnd (long self, int timerId) {
+    public int timerEnd (int timerId) {
         return __timerEnd (self, timerId);
     }
     /*
@@ -89,7 +89,7 @@ public class Zloop implements AutoCloseable{
     zloop_ticket_reset and zloop_ticket_delete.                              
     */
     native static long __ticket (long self, long handler, long arg);
-    public long ticket (long self, long handler, long arg) {
+    public long ticket (long handler, long arg) {
         return __ticket (self, handler, arg);
     }
     /*
@@ -97,7 +97,7 @@ public class Zloop implements AutoCloseable{
     resets its execution time. This is a very fast operation.             
     */
     native static void __ticketReset (long self, long handle);
-    public void ticketReset (long self, long handle) {
+    public void ticketReset (long handle) {
         __ticketReset (self, handle);
     }
     /*
@@ -106,7 +106,7 @@ public class Zloop implements AutoCloseable{
     later and safely.                                                       
     */
     native static void __ticketDelete (long self, long handle);
-    public void ticketDelete (long self, long handle) {
+    public void ticketDelete (long handle) {
         __ticketDelete (self, handle);
     }
     /*
@@ -114,7 +114,7 @@ public class Zloop implements AutoCloseable{
     delay and there are already tickets created, the results are undefined.
     */
     native static void __setTicketDelay (long self, long ticketDelay);
-    public void setTicketDelay (long self, long ticketDelay) {
+    public void setTicketDelay (long ticketDelay) {
         __setTicketDelay (self, ticketDelay);
     }
     /*
@@ -125,14 +125,14 @@ public class Zloop implements AutoCloseable{
     error.                                                                 
     */
     native static void __setMaxTimers (long self, long maxTimers);
-    public void setMaxTimers (long self, long maxTimers) {
+    public void setMaxTimers (long maxTimers) {
         __setMaxTimers (self, maxTimers);
     }
     /*
     Set verbose tracing of reactor on/off
     */
     native static void __setVerbose (long self, boolean verbose);
-    public void setVerbose (long self, boolean verbose) {
+    public void setVerbose (boolean verbose) {
         __setVerbose (self, verbose);
     }
     /*
@@ -142,7 +142,7 @@ public class Zloop implements AutoCloseable{
     cancel sockets. Returns 0 if interrupted, -1 if cancelled by a handler.  
     */
     native static int __start (long self);
-    public int start (long self) {
+    public int start () {
         return __start (self);
     }
     /*
@@ -151,7 +151,7 @@ public class Zloop implements AutoCloseable{
     zero. Calling zloop_ignore_interrupts will supress this behavior.         
     */
     native static void __ignoreInterrupts (long self);
-    public void ignoreInterrupts (long self) {
+    public void ignoreInterrupts () {
         __ignoreInterrupts (self);
     }
     /*

@@ -39,7 +39,7 @@ public class Zhash implements AutoCloseable{
     Returns 0 on success.                                                  
     */
     native static int __insert (long self, String key, long item);
-    public int insert (long self, String key, long item) {
+    public int insert (String key, long item) {
         return __insert (self, key, item);
     }
     /*
@@ -48,7 +48,7 @@ public class Zhash implements AutoCloseable{
     Use free_fn method to ensure deallocator is properly called on item.
     */
     native static void __update (long self, String key, long item);
-    public void update (long self, String key, long item) {
+    public void update (String key, long item) {
         __update (self, key, item);
     }
     /*
@@ -56,14 +56,14 @@ public class Zhash implements AutoCloseable{
     item, this function does nothing.                                        
     */
     native static void __delete (long self, String key);
-    public void delete (long self, String key) {
+    public void delete (String key) {
         __delete (self, key);
     }
     /*
     Return the item at the specified key, or null
     */
     native static long __lookup (long self, String key);
-    public long lookup (long self, String key) {
+    public long lookup (String key) {
         return __lookup (self, key);
     }
     /*
@@ -71,7 +71,7 @@ public class Zhash implements AutoCloseable{
     item, does nothing. Returns 0 if successful, else -1.               
     */
     native static int __rename (long self, String oldKey, String newKey);
-    public int rename (long self, String oldKey, String newKey) {
+    public int rename (String oldKey, String newKey) {
         return __rename (self, oldKey, newKey);
     }
     /*
@@ -82,14 +82,14 @@ public class Zhash implements AutoCloseable{
     Returns the item, or NULL if there is no such item.                    
     */
     native static long __freefn (long self, String key, long freeFn);
-    public long freefn (long self, String key, long freeFn) {
+    public long freefn (String key, long freeFn) {
         return __freefn (self, key, freeFn);
     }
     /*
     Return the number of keys/items in the hash table
     */
     native static long __size (long self);
-    public long size (long self) {
+    public long size () {
         return __size (self);
     }
     /*
@@ -99,14 +99,14 @@ public class Zhash implements AutoCloseable{
     since there's no other way to know how to duplicate the item value.  
     */
     native static long __dup (long self);
-    public long dup (long self) {
+    public long dup () {
         return __dup (self);
     }
     /*
     Return keys for items in table
     */
     native static long __keys (long self);
-    public long keys (long self) {
+    public long keys () {
         return __keys (self);
     }
     /*
@@ -116,7 +116,7 @@ public class Zhash implements AutoCloseable{
     use zhash_cursor(). NOTE: do NOT modify the table while iterating.    
     */
     native static long __first (long self);
-    public long first (long self) {
+    public long first () {
         return __first (self);
     }
     /*
@@ -128,7 +128,7 @@ public class Zhash implements AutoCloseable{
     the table while iterating.                                           
     */
     native static long __next (long self);
-    public long next (long self) {
+    public long next () {
         return __next (self);
     }
     /*
@@ -138,7 +138,7 @@ public class Zhash implements AutoCloseable{
     unsuccessful first/next, returns NULL.                                 
     */
     native static String __cursor (long self);
-    public String cursor (long self) {
+    public String cursor () {
         return __cursor (self);
     }
     /*
@@ -147,7 +147,7 @@ public class Zhash implements AutoCloseable{
     the file. If you use a null format, all comments are deleted.            
     */
     native static void __comment (long self, String format);
-    public void comment (long self, String format) {
+    public void comment (String format) {
         __comment (self, format);
     }
     /*
@@ -173,7 +173,7 @@ public class Zhash implements AutoCloseable{
     strings.                                                             
     */
     native static long __pack (long self);
-    public long pack (long self) {
+    public long pack () {
         return __pack (self);
     }
     /*
@@ -191,7 +191,7 @@ public class Zhash implements AutoCloseable{
     else -1 if a file error occurred.                                       
     */
     native static int __save (long self, String filename);
-    public int save (long self, String filename) {
+    public int save (String filename) {
         return __save (self, filename);
     }
     /*
@@ -200,7 +200,7 @@ public class Zhash implements AutoCloseable{
     '=' character. Returns 0 if OK, else -1 if a file was not readable.    
     */
     native static int __load (long self, String filename);
-    public int load (long self, String filename) {
+    public int load (String filename) {
         return __load (self, filename);
     }
     /*
@@ -210,14 +210,14 @@ public class Zhash implements AutoCloseable{
     file.                                                                   
     */
     native static int __refresh (long self);
-    public int refresh (long self) {
+    public int refresh () {
         return __refresh (self);
     }
     /*
     Set hash for automatic value destruction
     */
     native static void __autofree (long self);
-    public void autofree (long self) {
+    public void autofree () {
         __autofree (self);
     }
     /*
@@ -228,7 +228,7 @@ public class Zhash implements AutoCloseable{
     Callback function for zhash_foreach method                             
     */
     native static int __foreach (long self, long callback, long argument);
-    public int foreach (long self, long callback, long argument) {
+    public int foreach (long callback, long argument) {
         return __foreach (self, callback, argument);
     }
     /*

@@ -39,7 +39,7 @@ public class Zhashx implements AutoCloseable{
     Returns 0 on success.                                                  
     */
     native static int __insert (long self, long key, long item);
-    public int insert (long self, long key, long item) {
+    public int insert (long key, long item) {
         return __insert (self, key, item);
     }
     /*
@@ -50,7 +50,7 @@ public class Zhashx implements AutoCloseable{
     new item.                                                                
     */
     native static void __update (long self, long key, long item);
-    public void update (long self, long key, long item) {
+    public void update (long key, long item) {
         __update (self, key, item);
     }
     /*
@@ -58,7 +58,7 @@ public class Zhashx implements AutoCloseable{
     item, this function does nothing.                                        
     */
     native static void __delete (long self, long key);
-    public void delete (long self, long key) {
+    public void delete (long key) {
         __delete (self, key);
     }
     /*
@@ -67,14 +67,14 @@ public class Zhashx implements AutoCloseable{
     it on every item.                                               
     */
     native static void __purge (long self);
-    public void purge (long self) {
+    public void purge () {
         __purge (self);
     }
     /*
     Return the item at the specified key, or null
     */
     native static long __lookup (long self, long key);
-    public long lookup (long self, long key) {
+    public long lookup (long key) {
         return __lookup (self, key);
     }
     /*
@@ -82,7 +82,7 @@ public class Zhashx implements AutoCloseable{
     item, does nothing. Returns 0 if successful, else -1.               
     */
     native static int __rename (long self, long oldKey, long newKey);
-    public int rename (long self, long oldKey, long newKey) {
+    public int rename (long oldKey, long newKey) {
         return __rename (self, oldKey, newKey);
     }
     /*
@@ -93,14 +93,14 @@ public class Zhashx implements AutoCloseable{
     Returns the item, or NULL if there is no such item.                    
     */
     native static long __freefn (long self, long key, long freeFn);
-    public long freefn (long self, long key, long freeFn) {
+    public long freefn (long key, long freeFn) {
         return __freefn (self, key, freeFn);
     }
     /*
     Return the number of keys/items in the hash table
     */
     native static long __size (long self);
-    public long size (long self) {
+    public long size () {
         return __size (self);
     }
     /*
@@ -109,7 +109,7 @@ public class Zhashx implements AutoCloseable{
     key_destructor as destructor for the list.                       
     */
     native static long __keys (long self);
-    public long keys (long self) {
+    public long keys () {
         return __keys (self);
     }
     /*
@@ -118,7 +118,7 @@ public class Zhashx implements AutoCloseable{
     destructor as destructor for the list.                        
     */
     native static long __values (long self);
-    public long values (long self) {
+    public long values () {
         return __values (self);
     }
     /*
@@ -128,7 +128,7 @@ public class Zhashx implements AutoCloseable{
     use zhashx_cursor(). NOTE: do NOT modify the table while iterating.   
     */
     native static long __first (long self);
-    public long first (long self) {
+    public long first () {
         return __first (self);
     }
     /*
@@ -140,7 +140,7 @@ public class Zhashx implements AutoCloseable{
     the table while iterating.                                           
     */
     native static long __next (long self);
-    public long next (long self) {
+    public long next () {
         return __next (self);
     }
     /*
@@ -150,7 +150,7 @@ public class Zhashx implements AutoCloseable{
     unsuccessful first/next, returns NULL.                                 
     */
     native static long __cursor (long self);
-    public long cursor (long self) {
+    public long cursor () {
         return __cursor (self);
     }
     /*
@@ -159,7 +159,7 @@ public class Zhashx implements AutoCloseable{
     the file. If you use a null format, all comments are deleted.            
     */
     native static void __comment (long self, String format);
-    public void comment (long self, String format) {
+    public void comment (String format) {
         __comment (self, format);
     }
     /*
@@ -168,7 +168,7 @@ public class Zhashx implements AutoCloseable{
     else -1 if a file error occurred.                                       
     */
     native static int __save (long self, String filename);
-    public int save (long self, String filename) {
+    public int save (String filename) {
         return __save (self, filename);
     }
     /*
@@ -177,7 +177,7 @@ public class Zhashx implements AutoCloseable{
     '=' character. Returns 0 if OK, else -1 if a file was not readable.    
     */
     native static int __load (long self, String filename);
-    public int load (long self, String filename) {
+    public int load (String filename) {
         return __load (self, filename);
     }
     /*
@@ -187,7 +187,7 @@ public class Zhashx implements AutoCloseable{
     file.                                                                    
     */
     native static int __refresh (long self);
-    public int refresh (long self) {
+    public int refresh () {
         return __refresh (self);
     }
     /*
@@ -213,7 +213,7 @@ public class Zhashx implements AutoCloseable{
     strings.                                                             
     */
     native static long __pack (long self);
-    public long pack (long self) {
+    public long pack () {
         return __pack (self);
     }
     /*
@@ -233,7 +233,7 @@ public class Zhashx implements AutoCloseable{
     duplicate any hash table safely. The old behavior is in zhashx_dup_v2.
     */
     native static long __dup (long self);
-    public long dup (long self) {
+    public long dup () {
         return __dup (self);
     }
     /*
@@ -241,7 +241,7 @@ public class Zhashx implements AutoCloseable{
     freed when the hash is destroyed.                                      
     */
     native static void __setDestructor (long self, long destructor);
-    public void setDestructor (long self, long destructor) {
+    public void setDestructor (long destructor) {
         __setDestructor (self, destructor);
     }
     /*
@@ -249,7 +249,7 @@ public class Zhashx implements AutoCloseable{
     copied when the hash is duplicated.                                   
     */
     native static void __setDuplicator (long self, long duplicator);
-    public void setDuplicator (long self, long duplicator) {
+    public void setDuplicator (long duplicator) {
         __setDuplicator (self, duplicator);
     }
     /*
@@ -257,7 +257,7 @@ public class Zhashx implements AutoCloseable{
     when the hash is destroyed using free().                          
     */
     native static void __setKeyDestructor (long self, long destructor);
-    public void setKeyDestructor (long self, long destructor) {
+    public void setKeyDestructor (long destructor) {
         __setKeyDestructor (self, destructor);
     }
     /*
@@ -265,7 +265,7 @@ public class Zhashx implements AutoCloseable{
     using strdup.                                                         
     */
     native static void __setKeyDuplicator (long self, long duplicator);
-    public void setKeyDuplicator (long self, long duplicator) {
+    public void setKeyDuplicator (long duplicator) {
         __setKeyDuplicator (self, duplicator);
     }
     /*
@@ -273,7 +273,7 @@ public class Zhashx implements AutoCloseable{
     compared using strcmp.                                     
     */
     native static void __setKeyComparator (long self, long comparator);
-    public void setKeyComparator (long self, long comparator) {
+    public void setKeyComparator (long comparator) {
         __setKeyComparator (self, comparator);
     }
     /*
@@ -281,7 +281,7 @@ public class Zhashx implements AutoCloseable{
     compared using strcmp.                                     
     */
     native static void __setKeyHasher (long self, long hasher);
-    public void setKeyHasher (long self, long hasher) {
+    public void setKeyHasher (long hasher) {
         __setKeyHasher (self, hasher);
     }
     /*
@@ -291,7 +291,7 @@ public class Zhashx implements AutoCloseable{
     since there's no other way to know how to duplicate the item value.  
     */
     native static long __dupV2 (long self);
-    public long dupV2 (long self) {
+    public long dupV2 () {
         return __dupV2 (self);
     }
     /*
@@ -299,7 +299,7 @@ public class Zhashx implements AutoCloseable{
     Set hash for automatic value destruction          
     */
     native static void __autofree (long self);
-    public void autofree (long self) {
+    public void autofree () {
         __autofree (self);
     }
     /*
@@ -310,7 +310,7 @@ public class Zhashx implements AutoCloseable{
     Callback function for zhashx_foreach method                            
     */
     native static int __foreach (long self, long callback, long argument);
-    public int foreach (long self, long callback, long argument) {
+    public int foreach (long callback, long argument) {
         return __foreach (self, callback, argument);
     }
     /*

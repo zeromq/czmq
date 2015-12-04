@@ -37,84 +37,84 @@ public class Zarmour implements AutoCloseable{
     Get printable string for mode.
     */
     native static String __modeStr (long self);
-    public String modeStr (long self) {
+    public String modeStr () {
         return __modeStr (self);
     }
     /*
     Get the mode property.
     */
     native static int __mode (long self);
-    public int mode (long self) {
+    public int mode () {
         return __mode (self);
     }
     /*
     Set the mode property.
     */
     native static void __setMode (long self, int mode);
-    public void setMode (long self, int mode) {
+    public void setMode (int mode) {
         __setMode (self, mode);
     }
     /*
     Return true if padding is turned on.
     */
     native static boolean __pad (long self);
-    public boolean pad (long self) {
+    public boolean pad () {
         return __pad (self);
     }
     /*
     Turn padding on or off. Default is on.
     */
     native static void __setPad (long self, boolean pad);
-    public void setPad (long self, boolean pad) {
+    public void setPad (boolean pad) {
         __setPad (self, pad);
     }
     /*
     Get the padding character.
     */
     native static char __padChar (long self);
-    public char padChar (long self) {
+    public char padChar () {
         return __padChar (self);
     }
     /*
     Set the padding character.
     */
     native static void __setPadChar (long self, char padChar);
-    public void setPadChar (long self, char padChar) {
+    public void setPadChar (char padChar) {
         __setPadChar (self, padChar);
     }
     /*
     Return if splitting output into lines is turned on. Default is off.
     */
     native static boolean __lineBreaks (long self);
-    public boolean lineBreaks (long self) {
+    public boolean lineBreaks () {
         return __lineBreaks (self);
     }
     /*
     Turn splitting output into lines on or off.
     */
     native static void __setLineBreaks (long self, boolean lineBreaks);
-    public void setLineBreaks (long self, boolean lineBreaks) {
+    public void setLineBreaks (boolean lineBreaks) {
         __setLineBreaks (self, lineBreaks);
     }
     /*
     Get the line length used for splitting lines.
     */
     native static long __lineLength (long self);
-    public long lineLength (long self) {
+    public long lineLength () {
         return __lineLength (self);
     }
     /*
     Set the line length used for splitting lines.
     */
     native static void __setLineLength (long self, long lineLength);
-    public void setLineLength (long self, long lineLength) {
+    public void setLineLength (long lineLength) {
         __setLineLength (self, lineLength);
     }
     /*
     Print properties of object
     */
     native static void __print (long self);
-    public void print (long self) {
+    public void print () {
         __print (self);
     }
     /*

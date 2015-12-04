@@ -45,14 +45,14 @@ public class Zfile implements AutoCloseable{
     is null, or memory was exhausted, returns null.                     
     */
     native static long __dup (long self);
-    public long dup (long self) {
+    public long dup () {
         return __dup (self);
     }
     /*
     Return file name, remove path if provided
     */
     native static String __filename (long self, String path);
-    public String filename (long self, String path) {
+    public String filename (String path) {
         return __filename (self, path);
     }
     /*
@@ -61,7 +61,7 @@ public class Zfile implements AutoCloseable{
     snapshots.                                                          
     */
     native static void __restat (long self);
-    public void restat (long self) {
+    public void restat () {
         __restat (self);
     }
     /*
@@ -69,7 +69,7 @@ public class Zfile implements AutoCloseable{
     current situation, call zfile_restat before checking this property.    
     */
     native static long __modified (long self);
-    public long modified (long self) {
+    public long modified () {
         return __modified (self);
     }
     /*
@@ -77,7 +77,7 @@ public class Zfile implements AutoCloseable{
     current situation, call zfile_restat before checking this property.    
     */
     native static long __cursize (long self);
-    public long cursize (long self) {
+    public long cursize () {
         return __cursize (self);
     }
     /*
@@ -85,7 +85,7 @@ public class Zfile implements AutoCloseable{
     any external changes, call zfile_restat before checking this property.
     */
     native static boolean __isDirectory (long self);
-    public boolean isDirectory (long self) {
+    public boolean isDirectory () {
         return __isDirectory (self);
     }
     /*
@@ -93,7 +93,7 @@ public class Zfile implements AutoCloseable{
     any external changes, call zfile_restat before checking this property.
     */
     native static boolean __isRegular (long self);
-    public boolean isRegular (long self) {
+    public boolean isRegular () {
         return __isRegular (self);
     }
     /*
@@ -102,7 +102,7 @@ public class Zfile implements AutoCloseable{
     property.                                                               
     */
     native static boolean __isReadable (long self);
-    public boolean isReadable (long self) {
+    public boolean isReadable () {
         return __isReadable (self);
     }
     /*
@@ -111,7 +111,7 @@ public class Zfile implements AutoCloseable{
     property.                                                              
     */
     native static boolean __isWriteable (long self);
-    public boolean isWriteable (long self) {
+    public boolean isWriteable () {
         return __isWriteable (self);
     }
     /*
@@ -119,7 +119,7 @@ public class Zfile implements AutoCloseable{
     Updates the file statistics from disk at every call.           
     */
     native static boolean __isStable (long self);
-    public boolean isStable (long self) {
+    public boolean isStable () {
         return __isStable (self);
     }
     /*
@@ -127,14 +127,14 @@ public class Zfile implements AutoCloseable{
     was created, or the last zfile_restat() call made on it.            
     */
     native static boolean __hasChanged (long self);
-    public boolean hasChanged (long self) {
+    public boolean hasChanged () {
         return __hasChanged (self);
     }
     /*
     Remove the file from disk
     */
     native static void __remove (long self);
-    public void remove (long self) {
+    public void remove () {
         __remove (self);
     }
     /*
@@ -142,7 +142,7 @@ public class Zfile implements AutoCloseable{
     Returns 0 if OK, -1 if not found or not accessible
     */
     native static int __input (long self);
-    public int input (long self) {
+    public int input () {
         return __input (self);
     }
     /*
@@ -151,7 +151,7 @@ public class Zfile implements AutoCloseable{
     location. Returns 0 if OK, -1 if error.                           
     */
     native static int __output (long self);
-    public int output (long self) {
+    public int output () {
         return __output (self);
     }
     /*
@@ -159,14 +159,14 @@ public class Zfile implements AutoCloseable{
     sets the eof property. Returns a null chunk in case of error.          
     */
     native static long __read (long self, long bytes, long offset);
-    public long read (long self, long bytes, long offset) {
+    public long read (long bytes, long offset) {
         return __read (self, bytes, offset);
     }
     /*
     Returns true if zfile_read() just read the last chunk in the file.
     */
     native static boolean __eof (long self);
-    public boolean eof (long self) {
+    public boolean eof () {
         return __eof (self);
     }
     /*
@@ -174,7 +174,7 @@ public class Zfile implements AutoCloseable{
     Return 0 if OK, else -1                  
     */
     native static int __write (long self, long chunk, long offset);
-    public int write (long self, long chunk, long offset) {
+    public int write (long chunk, long offset) {
         return __write (self, chunk, offset);
     }
     /*
@@ -182,21 +182,21 @@ public class Zfile implements AutoCloseable{
     or NULL if there was nothing more to read from the file.             
     */
     native static String __readln (long self);
-    public String readln (long self) {
+    public String readln () {
         return __readln (self);
     }
     /*
     Close file, if open
     */
     native static void __close (long self);
-    public void close (long self) {
+    public void Close () {
         __close (self);
     }
     /*
     Calculate SHA1 digest for file, using zdigest class.
     */
     native static String __digest (long self);
-    public String digest (long self) {
+    public String digest () {
         return __digest (self);
     }
     /*

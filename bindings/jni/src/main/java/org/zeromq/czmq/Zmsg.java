@@ -69,14 +69,14 @@ public class Zmsg implements AutoCloseable{
     Return size of message, i.e. number of frames (0 or more).
     */
     native static long __size (long self);
-    public long size (long self) {
+    public long size () {
         return __size (self);
     }
     /*
     Return total size of all frames in message.
     */
     native static long __contentSize (long self);
-    public long contentSize (long self) {
+    public long contentSize () {
         return __contentSize (self);
     }
     /*
@@ -84,7 +84,7 @@ public class Zmsg implements AutoCloseable{
     Else returns zero.                                                      
     */
     native static int __routingId (long self);
-    public int routingId (long self) {
+    public int routingId () {
         return __routingId (self);
     }
     /*
@@ -92,7 +92,7 @@ public class Zmsg implements AutoCloseable{
     ZMQ_SERVER socket.                                                      
     */
     native static void __setRoutingId (long self, int routingId);
-    public void setRoutingId (long self, int routingId) {
+    public void setRoutingId (int routingId) {
         __setRoutingId (self, routingId);
     }
     /*
@@ -102,7 +102,7 @@ public class Zmsg implements AutoCloseable{
     nullify the caller's frame reference.                                  
     */
     native static int __prepend (long self, long frameP);
-    public int prepend (long self, long frameP) {
+    public int prepend (long frameP) {
         return __prepend (self, frameP);
     }
     /*
@@ -112,14 +112,14 @@ public class Zmsg implements AutoCloseable{
     caller's frame reference.                                              
     */
     native static int __append (long self, long frameP);
-    public int append (long self, long frameP) {
+    public int append (long frameP) {
         return __append (self, frameP);
     }
     /*
     Remove first frame from message, if any. Returns frame, or NULL.
     */
     native static long __pop (long self);
-    public long pop (long self) {
+    public long pop () {
         return __pop (self);
     }
     /*
@@ -127,7 +127,7 @@ public class Zmsg implements AutoCloseable{
     Returns 0 on success, -1 on error.                       
     */
     native static int __pushmem (long self, long src, long size);
-    public int pushmem (long self, long src, long size) {
+    public int pushmem (long src, long size) {
         return __pushmem (self, src, size);
     }
     /*
@@ -135,7 +135,7 @@ public class Zmsg implements AutoCloseable{
     Returns 0 on success, -1 on error.                            
     */
     native static int __addmem (long self, long src, long size);
-    public int addmem (long self, long src, long size) {
+    public int addmem (long src, long size) {
         return __addmem (self, src, size);
     }
     /*
@@ -143,7 +143,7 @@ public class Zmsg implements AutoCloseable{
     Returns 0 on success, -1 on error.           
     */
     native static int __pushstr (long self, String string);
-    public int pushstr (long self, String string) {
+    public int pushstr (String string) {
         return __pushstr (self, string);
     }
     /*
@@ -151,7 +151,7 @@ public class Zmsg implements AutoCloseable{
     Returns 0 on success, -1 on error.         
     */
     native static int __addstr (long self, String string);
-    public int addstr (long self, String string) {
+    public int addstr (String string) {
         return __addstr (self, string);
     }
     /*
@@ -159,7 +159,7 @@ public class Zmsg implements AutoCloseable{
     Returns 0 on success, -1 on error.                     
     */
     native static int __pushstrf (long self, String format);
-    public int pushstrf (long self, String format) {
+    public int pushstrf (String format) {
         return __pushstrf (self, format);
     }
     /*
@@ -167,7 +167,7 @@ public class Zmsg implements AutoCloseable{
     Returns 0 on success, -1 on error.                   
     */
     native static int __addstrf (long self, String format);
-    public int addstrf (long self, String format) {
+    public int addstrf (String format) {
         return __addstrf (self, format);
     }
     /*
@@ -175,7 +175,7 @@ public class Zmsg implements AutoCloseable{
     no more frames in the message, returns NULL.                         
     */
     native static String __popstr (long self);
-    public String popstr (long self) {
+    public String popstr () {
         return __popstr (self);
     }
     /*
@@ -184,7 +184,7 @@ public class Zmsg implements AutoCloseable{
     success, -1 on error.                                              
     */
     native static int __addmsg (long self, long msgP);
-    public int addmsg (long self, long msgP) {
+    public int addmsg (long msgP) {
         return __addmsg (self, msgP);
     }
     /*
@@ -192,14 +192,14 @@ public class Zmsg implements AutoCloseable{
     decoding was not succesfull.                                            
     */
     native static long __popmsg (long self);
-    public long popmsg (long self) {
+    public long popmsg () {
         return __popmsg (self);
     }
     /*
     Remove specified frame from list, if present. Does not destroy frame.
     */
     native static void __remove (long self, long frame);
-    public void remove (long self, long frame) {
+    public void remove (long frame) {
         __remove (self, frame);
     }
     /*
@@ -207,7 +207,7 @@ public class Zmsg implements AutoCloseable{
     message is empty. Use this to navigate the frames as a list.        
     */
     native static long __first (long self);
-    public long first (long self) {
+    public long first () {
         return __first (self);
     }
     /*
@@ -215,14 +215,14 @@ public class Zmsg implements AutoCloseable{
     to the first frame call zmsg_first(). Advances the cursor.               
     */
     native static long __next (long self);
-    public long next (long self) {
+    public long next () {
         return __next (self);
     }
     /*
     Return the last frame. If there are no frames, returns NULL.
     */
     native static long __last (long self);
-    public long last (long self) {
+    public long last () {
         return __last (self);
     }
     /*
@@ -230,7 +230,7 @@ public class Zmsg implements AutoCloseable{
     object. If message is null, or memory was exhausted, returns null.   
     */
     native static long __dup (long self);
-    public long dup (long self) {
+    public long dup () {
         return __dup (self);
     }
     /*
@@ -238,7 +238,7 @@ public class Zmsg implements AutoCloseable{
     configured by zsys_set_logstream).                                 
     */
     native static void __print (long self);
-    public void print (long self) {
+    public void print () {
         __print (self);
     }
     /*
@@ -247,7 +247,7 @@ public class Zmsg implements AutoCloseable{
     other message. As with zframe_eq, return false if either message is NULL.
     */
     native static boolean __eq (long self, long other);
-    public boolean eq (long self, long other) {
+    public boolean eq (long other) {
         return __eq (self, other);
     }
     /*
@@ -263,7 +263,7 @@ public class Zmsg implements AutoCloseable{
     Return signal value, 0 or greater, if message is a signal, -1 if not.
     */
     native static int __signal (long self);
-    public int signal (long self) {
+    public int signal () {
         return __signal (self);
     }
     /*

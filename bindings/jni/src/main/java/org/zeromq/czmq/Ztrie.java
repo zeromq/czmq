@@ -42,7 +42,7 @@ public class Ztrie implements AutoCloseable{
     the provided data if a destroy_data_fn is provided.                     
     */
     native static int __insertRoute (long self, String path, long data, long destroyDataFn);
-    public int insertRoute (long self, String path, long data, long destroyDataFn) {
+    public int insertRoute (String path, long data, long destroyDataFn) {
         return __insertRoute (self, path, data, destroyDataFn);
     }
     /*
@@ -51,14 +51,14 @@ public class Ztrie implements AutoCloseable{
     the start of the list call zlist_first (). Advances the cursor.       
     */
     native static int __removeRoute (long self, String path);
-    public int removeRoute (long self, String path) {
+    public int removeRoute (String path) {
         return __removeRoute (self, path);
     }
     /*
     Returns true if the path matches a route in the tree, otherwise false.
     */
     native static boolean __matches (long self, String path);
-    public boolean matches (long self, String path) {
+    public boolean matches (String path) {
         return __matches (self, path);
     }
     /*
@@ -67,14 +67,14 @@ public class Ztrie implements AutoCloseable{
     ztrie.                                                                  
     */
     native static long __hitData (long self);
-    public long hitData (long self) {
+    public long hitData () {
         return __hitData (self);
     }
     /*
     Returns the count of parameters that a matched route has.
     */
     native static long __hitParameterCount (long self);
-    public long hitParameterCount (long self) {
+    public long hitParameterCount () {
         return __hitParameterCount (self);
     }
     /*
@@ -83,7 +83,7 @@ public class Ztrie implements AutoCloseable{
     named regexes, returns NULL.                                             
     */
     native static long __hitParameters (long self);
-    public long hitParameters (long self) {
+    public long hitParameters () {
         return __hitParameters (self);
     }
     /*
@@ -91,14 +91,14 @@ public class Ztrie implements AutoCloseable{
     or no asterisk match, returns NULL.                                     
     */
     native static String __hitAsteriskMatch (long self);
-    public String hitAsteriskMatch (long self) {
+    public String hitAsteriskMatch () {
         return __hitAsteriskMatch (self);
     }
     /*
     Print the trie
     */
     native static void __print (long self);
-    public void print (long self) {
+    public void print () {
         __print (self);
     }
     /*

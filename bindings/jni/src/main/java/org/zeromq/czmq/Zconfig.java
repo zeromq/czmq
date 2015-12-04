@@ -40,21 +40,21 @@ public class Zconfig implements AutoCloseable{
     Return name of config item
     */
     native static String __name (long self);
-    public String name (long self) {
+    public String name () {
         return __name (self);
     }
     /*
     Return value of config item
     */
     native static String __value (long self);
-    public String value (long self) {
+    public String value () {
         return __value (self);
     }
     /*
     Insert or update configuration key with value
     */
     native static void __put (long self, String path, String value);
-    public void put (long self, String path, String value) {
+    public void put (String path, String value) {
         __put (self, path, value);
     }
     /*
@@ -62,7 +62,7 @@ public class Zconfig implements AutoCloseable{
     argument list, instead of a single string value.                    
     */
     native static void __putf (long self, String path, String format);
-    public void putf (long self, String path, String format) {
+    public void putf (String path, String format) {
         __putf (self, path, format);
     }
     /*
@@ -70,14 +70,14 @@ public class Zconfig implements AutoCloseable{
     and ignored.                                                            
     */
     native static String __get (long self, String path, String defaultValue);
-    public String get (long self, String path, String defaultValue) {
+    public String get (String path, String defaultValue) {
         return __get (self, path, defaultValue);
     }
     /*
     Set config item name, name may be NULL
     */
     native static void __setName (long self, String name);
-    public void setName (long self, String name) {
+    public void setName (String name) {
         __setName (self, name);
     }
     /*
@@ -87,35 +87,35 @@ public class Zconfig implements AutoCloseable{
     by the string.                                                          
     */
     native static void __setValue (long self, String format);
-    public void setValue (long self, String format) {
+    public void setValue (String format) {
         __setValue (self, format);
     }
     /*
     Find our first child, if any
     */
     native static long __child (long self);
-    public long child (long self) {
+    public long child () {
         return __child (self);
     }
     /*
     Find our first sibling, if any
     */
     native static long __next (long self);
-    public long next (long self) {
+    public long next () {
         return __next (self);
     }
     /*
     Find a config item along a path; leading slash is optional and ignored.
     */
     native static long __locate (long self, String path);
-    public long locate (long self, String path) {
+    public long locate (String path) {
         return __locate (self, path);
     }
     /*
     Locate the last config item at a specified depth
     */
     native static long __atDepth (long self, int level);
-    public long atDepth (long self, int level) {
+    public long atDepth (int level) {
         return __atDepth (self, level);
     }
     /*
@@ -123,7 +123,7 @@ public class Zconfig implements AutoCloseable{
     successful, else -1.                                                
     */
     native static int __execute (long self, long handler, long arg);
-    public int execute (long self, long handler, long arg) {
+    public int execute (long handler, long arg) {
         return __execute (self, handler, arg);
     }
     /*
@@ -132,14 +132,14 @@ public class Zconfig implements AutoCloseable{
     deleted.                                                             
     */
     native static void __setComment (long self, String format);
-    public void setComment (long self, String format) {
+    public void setComment (String format) {
         __setComment (self, format);
     }
     /*
     Return comments of config item, as zlist.
     */
     native static long __comments (long self);
-    public long comments (long self) {
+    public long comments () {
         return __comments (self);
     }
     /*
@@ -156,7 +156,7 @@ public class Zconfig implements AutoCloseable{
     "-" means dump to standard output.                               
     */
     native static int __save (long self, String filename);
-    public int save (long self, String filename) {
+    public int save (String filename) {
         return __save (self, filename);
     }
     /*
@@ -172,14 +172,14 @@ public class Zconfig implements AutoCloseable{
     filename.                                                            
     */
     native static int __savef (long self, String format);
-    public int savef (long self, String format) {
+    public int savef (String format) {
         return __savef (self, format);
     }
     /*
     Report filename used during zconfig_load, or NULL if none
     */
     native static String __filename (long self);
-    public String filename (long self) {
+    public String filename () {
         return __filename (self);
     }
     /*
@@ -202,7 +202,7 @@ public class Zconfig implements AutoCloseable{
     Save a config tree to a new memory chunk
     */
     native static long __chunkSave (long self);
-    public long chunkSave (long self) {
+    public long chunkSave () {
         return __chunkSave (self);
     }
     /*
@@ -216,7 +216,7 @@ public class Zconfig implements AutoCloseable{
     Save a config tree to a new null terminated string
     */
     native static String __strSave (long self);
-    public String strSave (long self) {
+    public String strSave () {
         return __strSave (self);
     }
     /*
@@ -224,14 +224,14 @@ public class Zconfig implements AutoCloseable{
     file has changed in since the tree was loaded.                     
     */
     native static boolean __hasChanged (long self);
-    public boolean hasChanged (long self) {
+    public boolean hasChanged () {
         return __hasChanged (self);
     }
     /*
     Print properties of object
     */
     native static void __print (long self);
-    public void print (long self) {
+    public void print () {
         __print (self);
     }
     /*

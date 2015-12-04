@@ -41,7 +41,7 @@ public class Zactor implements AutoCloseable{
     and destroy when it has been sent.                             
     */
     native static int __send (long self, long msgP);
-    public int send (long self, long msgP) {
+    public int send (long msgP) {
         return __send (self, msgP);
     }
     /*
@@ -50,7 +50,7 @@ public class Zactor implements AutoCloseable{
     was a timeout on the actor.                                      
     */
     native static long __recv (long self);
-    public long recv (long self) {
+    public long recv () {
         return __recv (self);
     }
     /*
@@ -74,7 +74,7 @@ public class Zactor implements AutoCloseable{
     to work with the zsock instance rather than the actor.            
     */
     native static long __sock (long self);
-    public long sock (long self) {
+    public long sock () {
         return __sock (self);
     }
     /*
