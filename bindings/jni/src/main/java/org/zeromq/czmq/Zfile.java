@@ -23,10 +23,10 @@ public class Zfile implements AutoCloseable{
     data from the symbolic link actually reads from the target file. Path
     may be NULL, in which case it is not used.                           
     */
-    native static long __init (String path, String name);
+    native static long __new (String path, String name);
     public Zfile (String path, String name) {
-        /*  TODO: if __init fails, self is null...  */
-        self = __init (path, name);
+        /*  TODO: if __new fails, self is null...  */
+        self = __new (path, name);
     }
     public Zfile () {
         self = 0;

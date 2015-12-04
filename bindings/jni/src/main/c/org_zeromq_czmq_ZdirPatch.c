@@ -11,7 +11,7 @@
 #include "../../native/include/org_zeromq_czmq_ZdirPatch.h"
 
 JNIEXPORT jlong JNICALL
-Java_zdir_patch__1_1new (JNIEnv *env, jclass c, jstring path, jlong file, jint op, jstring alias)
+Java_org_zeromq_czmq_ZdirPatch__1_1new (JNIEnv *env, jclass c, jstring path, jlong file, jint op, jstring alias)
 {
     char *path_ = (char *) (*env)->GetStringUTFChars (env, path, NULL);
     char *alias_ = (char *) (*env)->GetStringUTFChars (env, alias, NULL);
@@ -22,20 +22,20 @@ Java_zdir_patch__1_1new (JNIEnv *env, jclass c, jstring path, jlong file, jint o
 }
 
 JNIEXPORT void JNICALL
-Java_zdir_patch__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
+Java_org_zeromq_czmq_ZdirPatch__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
 {
     zdir_patch_destroy ((zdir_patch_t **) &self_p);
 }
 
 JNIEXPORT jlong JNICALL
-Java_zdir_patch__1_1dup (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_ZdirPatch__1_1dup (JNIEnv *env, jclass c, jlong self)
 {
     jlong dup_ = (jlong) zdir_patch_dup ((zdir_patch_t *) self);
     return dup_;
 }
 
 JNIEXPORT jstring JNICALL
-Java_zdir_patch__1_1path (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_ZdirPatch__1_1path (JNIEnv *env, jclass c, jlong self)
 {
     char *path_ = (char *) zdir_patch_path ((zdir_patch_t *) self);
     jstring string = (*env)->NewStringUTF (env, path_);
@@ -43,21 +43,21 @@ Java_zdir_patch__1_1path (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jlong JNICALL
-Java_zdir_patch__1_1file (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_ZdirPatch__1_1file (JNIEnv *env, jclass c, jlong self)
 {
     jlong file_ = (jlong) zdir_patch_file ((zdir_patch_t *) self);
     return file_;
 }
 
 JNIEXPORT jint JNICALL
-Java_zdir_patch__1_1op (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_ZdirPatch__1_1op (JNIEnv *env, jclass c, jlong self)
 {
     jint op_ = (jint) zdir_patch_op ((zdir_patch_t *) self);
     return op_;
 }
 
 JNIEXPORT jstring JNICALL
-Java_zdir_patch__1_1vpath (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_ZdirPatch__1_1vpath (JNIEnv *env, jclass c, jlong self)
 {
     char *vpath_ = (char *) zdir_patch_vpath ((zdir_patch_t *) self);
     jstring string = (*env)->NewStringUTF (env, vpath_);
@@ -65,13 +65,13 @@ Java_zdir_patch__1_1vpath (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT void JNICALL
-Java_zdir_patch__1_1digest_set (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_ZdirPatch__1_1digest_set (JNIEnv *env, jclass c, jlong self)
 {
     zdir_patch_digest_set ((zdir_patch_t *) self);
 }
 
 JNIEXPORT jstring JNICALL
-Java_zdir_patch__1_1digest (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_ZdirPatch__1_1digest (JNIEnv *env, jclass c, jlong self)
 {
     char *digest_ = (char *) zdir_patch_digest ((zdir_patch_t *) self);
     jstring string = (*env)->NewStringUTF (env, digest_);
@@ -79,7 +79,7 @@ Java_zdir_patch__1_1digest (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT void JNICALL
-Java_zdir_patch__1_1test (JNIEnv *env, jclass c, jboolean verbose)
+Java_org_zeromq_czmq_ZdirPatch__1_1test (JNIEnv *env, jclass c, jboolean verbose)
 {
     zdir_patch_test ((bool) verbose);
 }

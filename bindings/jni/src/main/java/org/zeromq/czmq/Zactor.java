@@ -19,10 +19,10 @@ public class Zactor implements AutoCloseable{
     /*
     Create a new actor passing arbitrary arguments reference.
     */
-    native static long __init (long task, long args);
+    native static long __new (long task, long args);
     public Zactor (long task, long args) {
-        /*  TODO: if __init fails, self is null...  */
-        self = __init (task, args);
+        /*  TODO: if __new fails, self is null...  */
+        self = __new (task, args);
     }
     public Zactor () {
         self = 0;

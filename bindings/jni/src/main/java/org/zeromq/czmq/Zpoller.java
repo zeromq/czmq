@@ -20,10 +20,10 @@ public class Zpoller implements AutoCloseable{
     Create new poller; the reader can be a libzmq socket (void *), a zsock_t
     instance, or a zactor_t instance.                                       
     */
-    native static long __init (long reader);
+    native static long __new (long reader);
     public Zpoller (long reader) {
-        /*  TODO: if __init fails, self is null...  */
-        self = __init (reader);
+        /*  TODO: if __new fails, self is null...  */
+        self = __new (reader);
     }
     public Zpoller () {
         self = 0;

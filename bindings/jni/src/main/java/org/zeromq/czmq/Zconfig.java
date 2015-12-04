@@ -19,10 +19,10 @@ public class Zconfig implements AutoCloseable{
     /*
     Create new config item
     */
-    native static long __init (String name, long parent);
+    native static long __new (String name, long parent);
     public Zconfig (String name, long parent) {
-        /*  TODO: if __init fails, self is null...  */
-        self = __init (name, parent);
+        /*  TODO: if __new fails, self is null...  */
+        self = __new (name, parent);
     }
     public Zconfig () {
         self = 0;

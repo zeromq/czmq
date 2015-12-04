@@ -11,7 +11,7 @@
 #include "../../native/include/org_zeromq_czmq_Zstr.h"
 
 JNIEXPORT jstring JNICALL
-Java_zstr__1_1recv (JNIEnv *env, jclass c, jlong source)
+Java_org_zeromq_czmq_Zstr__1_1recv (JNIEnv *env, jclass c, jlong source)
 {
     char *recv_ = (char *) zstr_recv ((void *) source);
     jstring string = (*env)->NewStringUTF (env, recv_);
@@ -20,7 +20,7 @@ Java_zstr__1_1recv (JNIEnv *env, jclass c, jlong source)
 }
 
 JNIEXPORT jint JNICALL
-Java_zstr__1_1send (JNIEnv *env, jclass c, jlong dest, jstring string)
+Java_org_zeromq_czmq_Zstr__1_1send (JNIEnv *env, jclass c, jlong dest, jstring string)
 {
     char *string_ = (char *) (*env)->GetStringUTFChars (env, string, NULL);
     jint send_ = (jint) zstr_send ((void *) dest, string_);
@@ -29,7 +29,7 @@ Java_zstr__1_1send (JNIEnv *env, jclass c, jlong dest, jstring string)
 }
 
 JNIEXPORT jint JNICALL
-Java_zstr__1_1sendm (JNIEnv *env, jclass c, jlong dest, jstring string)
+Java_org_zeromq_czmq_Zstr__1_1sendm (JNIEnv *env, jclass c, jlong dest, jstring string)
 {
     char *string_ = (char *) (*env)->GetStringUTFChars (env, string, NULL);
     jint sendm_ = (jint) zstr_sendm ((void *) dest, string_);
@@ -38,7 +38,7 @@ Java_zstr__1_1sendm (JNIEnv *env, jclass c, jlong dest, jstring string)
 }
 
 JNIEXPORT jint JNICALL
-Java_zstr__1_1sendf (JNIEnv *env, jclass c, jlong dest, jstring format)
+Java_org_zeromq_czmq_Zstr__1_1sendf (JNIEnv *env, jclass c, jlong dest, jstring format)
 {
     char *format_ = (char *) (*env)->GetStringUTFChars (env, format, NULL);
     jint sendf_ = (jint) zstr_sendf ((void *) dest, "%s", format_);
@@ -47,7 +47,7 @@ Java_zstr__1_1sendf (JNIEnv *env, jclass c, jlong dest, jstring format)
 }
 
 JNIEXPORT jint JNICALL
-Java_zstr__1_1sendfm (JNIEnv *env, jclass c, jlong dest, jstring format)
+Java_org_zeromq_czmq_Zstr__1_1sendfm (JNIEnv *env, jclass c, jlong dest, jstring format)
 {
     char *format_ = (char *) (*env)->GetStringUTFChars (env, format, NULL);
     jint sendfm_ = (jint) zstr_sendfm ((void *) dest, "%s", format_);
@@ -56,7 +56,7 @@ Java_zstr__1_1sendfm (JNIEnv *env, jclass c, jlong dest, jstring format)
 }
 
 JNIEXPORT jint JNICALL
-Java_zstr__1_1sendx (JNIEnv *env, jclass c, jlong dest, jstring string)
+Java_org_zeromq_czmq_Zstr__1_1sendx (JNIEnv *env, jclass c, jlong dest, jstring string)
 {
     char *string_ = (char *) (*env)->GetStringUTFChars (env, string, NULL);
     jint sendx_ = (jint) zstr_sendx ((void *) dest, string_);
@@ -65,7 +65,7 @@ Java_zstr__1_1sendx (JNIEnv *env, jclass c, jlong dest, jstring string)
 }
 
 JNIEXPORT void JNICALL
-Java_zstr__1_1test (JNIEnv *env, jclass c, jboolean verbose)
+Java_org_zeromq_czmq_Zstr__1_1test (JNIEnv *env, jclass c, jboolean verbose)
 {
     zstr_test ((bool) verbose);
 }

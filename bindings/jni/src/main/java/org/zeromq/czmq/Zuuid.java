@@ -19,10 +19,10 @@ public class Zuuid implements AutoCloseable{
     /*
     Create a new UUID object.
     */
-    native static long __init ();
+    native static long __new ();
     public Zuuid () {
-        /*  TODO: if __init fails, self is null...  */
-        self = __init ();
+        /*  TODO: if __new fails, self is null...  */
+        self = __new ();
     }
     /*
     Destroy a specified UUID object.
@@ -34,33 +34,12 @@ public class Zuuid implements AutoCloseable{
         self = 0;
     }
     /*
-    Create UUID object from supplied ZUUID_LEN-octet value.
-    */
-    native static long __new_from (byte [] source);
-    public long newFrom (byte [] source) {
-        return __new_from (source);
-    }
-    /*
-    Set UUID to new supplied ZUUID_LEN-octet value.
-    */
-    native static void __set (long self, byte [] source);
-    public void set (long self, byte [] source) {
-        __set (self, source);
-    }
-    /*
     Set UUID to new supplied string value skipping '-' and '{' '}'
     optional delimiters. Return 0 if OK, else returns -1.         
     */
     native static int __set_str (long self, String source);
     public int setStr (long self, String source) {
         return __set_str (self, source);
-    }
-    /*
-    Return UUID binary data.
-    */
-    native static byte [] __data (long self);
-    public byte [] data (long self) {
-        return __data (self);
     }
     /*
     Return UUID binary size
@@ -84,27 +63,6 @@ public class Zuuid implements AutoCloseable{
     native static String __str_canonical (long self);
     public String strCanonical (long self) {
         return __str_canonical (self);
-    }
-    /*
-    Store UUID blob in target array
-    */
-    native static void __export (long self, byte [] target);
-    public void export (long self, byte [] target) {
-        __export (self, target);
-    }
-    /*
-    Check if UUID is same as supplied value
-    */
-    native static boolean __eq (long self, byte [] compare);
-    public boolean eq (long self, byte [] compare) {
-        return __eq (self, compare);
-    }
-    /*
-    Check if UUID is different from supplied value
-    */
-    native static boolean __neq (long self, byte [] compare);
-    public boolean neq (long self, byte [] compare) {
-        return __neq (self, compare);
     }
     /*
     Make copy of UUID object; if uuid is null, or memory was exhausted,

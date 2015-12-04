@@ -19,10 +19,10 @@ public class Zloop implements AutoCloseable{
     /*
     Create a new zloop reactor
     */
-    native static long __init ();
+    native static long __new ();
     public Zloop () {
-        /*  TODO: if __init fails, self is null...  */
-        self = __init ();
+        /*  TODO: if __new fails, self is null...  */
+        self = __new ();
     }
     /*
     Destroy a reactor

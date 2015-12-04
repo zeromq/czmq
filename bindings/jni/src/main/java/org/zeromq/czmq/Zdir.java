@@ -21,10 +21,10 @@ public class Zdir implements AutoCloseable{
     path, optionally located under some parent path. If parent is "-", then 
     loads only the top-level directory, and does not use parent as a path.  
     */
-    native static long __init (String path, String parent);
+    native static long __new (String path, String parent);
     public Zdir (String path, String parent) {
-        /*  TODO: if __init fails, self is null...  */
-        self = __init (path, parent);
+        /*  TODO: if __new fails, self is null...  */
+        self = __new (path, parent);
     }
     public Zdir () {
         self = 0;

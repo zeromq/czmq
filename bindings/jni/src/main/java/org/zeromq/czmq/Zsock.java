@@ -24,10 +24,10 @@ public class Zsock implements AutoCloseable{
     performance implications if you use a LOT of sockets. To turn off this
     redirection behaviour, define ZSOCK_NOCHECK.                          
     */
-    native static long __init (int type);
+    native static long __new (int type);
     public Zsock (int type) {
-        /*  TODO: if __init fails, self is null...  */
-        self = __init (type);
+        /*  TODO: if __new fails, self is null...  */
+        self = __new (type);
     }
     public Zsock () {
         self = 0;
@@ -545,13 +545,6 @@ public class Zsock implements AutoCloseable{
         __set_curve_publickey (self, curvePublickey);
     }
     /*
-    Set socket option `curve_publickey` from 32-octet binary
-    */
-    native static void __set_curve_publickey_bin (long self, byte [] curvePublickey);
-    public void setCurvePublickeyBin (long self, byte [] curvePublickey) {
-        __set_curve_publickey_bin (self, curvePublickey);
-    }
-    /*
     Get socket option `curve_secretkey`.
     */
     native static String __curve_secretkey (long self);
@@ -566,13 +559,6 @@ public class Zsock implements AutoCloseable{
         __set_curve_secretkey (self, curveSecretkey);
     }
     /*
-    Set socket option `curve_secretkey` from 32-octet binary
-    */
-    native static void __set_curve_secretkey_bin (long self, byte [] curveSecretkey);
-    public void setCurveSecretkeyBin (long self, byte [] curveSecretkey) {
-        __set_curve_secretkey_bin (self, curveSecretkey);
-    }
-    /*
     Get socket option `curve_serverkey`.
     */
     native static String __curve_serverkey (long self);
@@ -585,13 +571,6 @@ public class Zsock implements AutoCloseable{
     native static void __set_curve_serverkey (long self, String curveServerkey);
     public void setCurveServerkey (long self, String curveServerkey) {
         __set_curve_serverkey (self, curveServerkey);
-    }
-    /*
-    Set socket option `curve_serverkey` from 32-octet binary
-    */
-    native static void __set_curve_serverkey_bin (long self, byte [] curveServerkey);
-    public void setCurveServerkeyBin (long self, byte [] curveServerkey) {
-        __set_curve_serverkey_bin (self, curveServerkey);
     }
     /*
     Get socket option `gssapi_server`.

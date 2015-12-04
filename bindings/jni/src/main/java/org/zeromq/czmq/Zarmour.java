@@ -19,10 +19,10 @@ public class Zarmour implements AutoCloseable{
     /*
     Create a new zarmour.
     */
-    native static long __init ();
+    native static long __new ();
     public Zarmour () {
-        /*  TODO: if __init fails, self is null...  */
-        self = __init ();
+        /*  TODO: if __new fails, self is null...  */
+        self = __new ();
     }
     /*
     Destroy the zarmour.
@@ -39,22 +39,6 @@ public class Zarmour implements AutoCloseable{
     native static String __mode_str (long self);
     public String modeStr (long self) {
         return __mode_str (self);
-    }
-    /*
-    Encode a stream of bytes into an armoured string.
-    */
-    native static String __encode (long self, byte [] data, long dataSize);
-    public String encode (long self, byte [] data, long dataSize) {
-        return __encode (self, data, dataSize);
-    }
-    /*
-    Decode an armoured string into a string of bytes.          
-    The decoded output is null-terminated, so it may be treated
-    as a string, if that's what it was prior to encoding.      
-    */
-    native static byte [] __decode (long self, String data, long decodeSize);
-    public byte [] decode (long self, String data, long decodeSize) {
-        return __decode (self, data, decodeSize);
     }
     /*
     Get the mode property.

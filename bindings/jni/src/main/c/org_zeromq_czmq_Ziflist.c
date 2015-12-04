@@ -11,33 +11,33 @@
 #include "../../native/include/org_zeromq_czmq_Ziflist.h"
 
 JNIEXPORT jlong JNICALL
-Java_ziflist__1_1new (JNIEnv *env, jclass c)
+Java_org_zeromq_czmq_Ziflist__1_1new (JNIEnv *env, jclass c)
 {
     jlong new_ = (jlong) ziflist_new ();
     return new_;
 }
 
 JNIEXPORT void JNICALL
-Java_ziflist__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
+Java_org_zeromq_czmq_Ziflist__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
 {
     ziflist_destroy ((ziflist_t **) &self_p);
 }
 
 JNIEXPORT void JNICALL
-Java_ziflist__1_1reload (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Ziflist__1_1reload (JNIEnv *env, jclass c, jlong self)
 {
     ziflist_reload ((ziflist_t *) self);
 }
 
 JNIEXPORT jlong JNICALL
-Java_ziflist__1_1size (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Ziflist__1_1size (JNIEnv *env, jclass c, jlong self)
 {
     jlong size_ = (jlong) ziflist_size ((ziflist_t *) self);
     return size_;
 }
 
 JNIEXPORT jstring JNICALL
-Java_ziflist__1_1first (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Ziflist__1_1first (JNIEnv *env, jclass c, jlong self)
 {
     char *first_ = (char *) ziflist_first ((ziflist_t *) self);
     jstring string = (*env)->NewStringUTF (env, first_);
@@ -45,7 +45,7 @@ Java_ziflist__1_1first (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jstring JNICALL
-Java_ziflist__1_1next (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Ziflist__1_1next (JNIEnv *env, jclass c, jlong self)
 {
     char *next_ = (char *) ziflist_next ((ziflist_t *) self);
     jstring string = (*env)->NewStringUTF (env, next_);
@@ -53,7 +53,7 @@ Java_ziflist__1_1next (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jstring JNICALL
-Java_ziflist__1_1address (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Ziflist__1_1address (JNIEnv *env, jclass c, jlong self)
 {
     char *address_ = (char *) ziflist_address ((ziflist_t *) self);
     jstring string = (*env)->NewStringUTF (env, address_);
@@ -61,7 +61,7 @@ Java_ziflist__1_1address (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jstring JNICALL
-Java_ziflist__1_1broadcast (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Ziflist__1_1broadcast (JNIEnv *env, jclass c, jlong self)
 {
     char *broadcast_ = (char *) ziflist_broadcast ((ziflist_t *) self);
     jstring string = (*env)->NewStringUTF (env, broadcast_);
@@ -69,7 +69,7 @@ Java_ziflist__1_1broadcast (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jstring JNICALL
-Java_ziflist__1_1netmask (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Ziflist__1_1netmask (JNIEnv *env, jclass c, jlong self)
 {
     char *netmask_ = (char *) ziflist_netmask ((ziflist_t *) self);
     jstring string = (*env)->NewStringUTF (env, netmask_);
@@ -77,13 +77,13 @@ Java_ziflist__1_1netmask (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT void JNICALL
-Java_ziflist__1_1print (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Ziflist__1_1print (JNIEnv *env, jclass c, jlong self)
 {
     ziflist_print ((ziflist_t *) self);
 }
 
 JNIEXPORT void JNICALL
-Java_ziflist__1_1test (JNIEnv *env, jclass c, jboolean verbose)
+Java_org_zeromq_czmq_Ziflist__1_1test (JNIEnv *env, jclass c, jboolean verbose)
 {
     ziflist_test ((bool) verbose);
 }

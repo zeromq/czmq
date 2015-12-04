@@ -19,10 +19,10 @@ public class Ztrie implements AutoCloseable{
     /*
     Creates a new ztrie.
     */
-    native static long __init (char delimiter);
+    native static long __new (char delimiter);
     public Ztrie (char delimiter) {
-        /*  TODO: if __init fails, self is null...  */
-        self = __init (delimiter);
+        /*  TODO: if __new fails, self is null...  */
+        self = __new (delimiter);
     }
     public Ztrie () {
         self = 0;

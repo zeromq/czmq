@@ -11,7 +11,7 @@
 #include "../../native/include/org_zeromq_czmq_Zfile.h"
 
 JNIEXPORT jlong JNICALL
-Java_zfile__1_1new (JNIEnv *env, jclass c, jstring path, jstring name)
+Java_org_zeromq_czmq_Zfile__1_1new (JNIEnv *env, jclass c, jstring path, jstring name)
 {
     char *path_ = (char *) (*env)->GetStringUTFChars (env, path, NULL);
     char *name_ = (char *) (*env)->GetStringUTFChars (env, name, NULL);
@@ -22,20 +22,20 @@ Java_zfile__1_1new (JNIEnv *env, jclass c, jstring path, jstring name)
 }
 
 JNIEXPORT void JNICALL
-Java_zfile__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
+Java_org_zeromq_czmq_Zfile__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
 {
     zfile_destroy ((zfile_t **) &self_p);
 }
 
 JNIEXPORT jlong JNICALL
-Java_zfile__1_1dup (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zfile__1_1dup (JNIEnv *env, jclass c, jlong self)
 {
     jlong dup_ = (jlong) zfile_dup ((zfile_t *) self);
     return dup_;
 }
 
 JNIEXPORT jstring JNICALL
-Java_zfile__1_1filename (JNIEnv *env, jclass c, jlong self, jstring path)
+Java_org_zeromq_czmq_Zfile__1_1filename (JNIEnv *env, jclass c, jlong self, jstring path)
 {
     char *path_ = (char *) (*env)->GetStringUTFChars (env, path, NULL);
     char *filename_ = (char *) zfile_filename ((zfile_t *) self, path_);
@@ -45,110 +45,110 @@ Java_zfile__1_1filename (JNIEnv *env, jclass c, jlong self, jstring path)
 }
 
 JNIEXPORT void JNICALL
-Java_zfile__1_1restat (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zfile__1_1restat (JNIEnv *env, jclass c, jlong self)
 {
     zfile_restat ((zfile_t *) self);
 }
 
 JNIEXPORT jlong JNICALL
-Java_zfile__1_1modified (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zfile__1_1modified (JNIEnv *env, jclass c, jlong self)
 {
     jlong modified_ = (jlong) zfile_modified ((zfile_t *) self);
     return modified_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_zfile__1_1cursize (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zfile__1_1cursize (JNIEnv *env, jclass c, jlong self)
 {
     jlong cursize_ = (jlong) zfile_cursize ((zfile_t *) self);
     return cursize_;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_zfile__1_1is_directory (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zfile__1_1is_directory (JNIEnv *env, jclass c, jlong self)
 {
     jboolean is_directory_ = (jboolean) zfile_is_directory ((zfile_t *) self);
     return is_directory_;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_zfile__1_1is_regular (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zfile__1_1is_regular (JNIEnv *env, jclass c, jlong self)
 {
     jboolean is_regular_ = (jboolean) zfile_is_regular ((zfile_t *) self);
     return is_regular_;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_zfile__1_1is_readable (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zfile__1_1is_readable (JNIEnv *env, jclass c, jlong self)
 {
     jboolean is_readable_ = (jboolean) zfile_is_readable ((zfile_t *) self);
     return is_readable_;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_zfile__1_1is_writeable (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zfile__1_1is_writeable (JNIEnv *env, jclass c, jlong self)
 {
     jboolean is_writeable_ = (jboolean) zfile_is_writeable ((zfile_t *) self);
     return is_writeable_;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_zfile__1_1is_stable (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zfile__1_1is_stable (JNIEnv *env, jclass c, jlong self)
 {
     jboolean is_stable_ = (jboolean) zfile_is_stable ((zfile_t *) self);
     return is_stable_;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_zfile__1_1has_changed (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zfile__1_1has_changed (JNIEnv *env, jclass c, jlong self)
 {
     jboolean has_changed_ = (jboolean) zfile_has_changed ((zfile_t *) self);
     return has_changed_;
 }
 
 JNIEXPORT void JNICALL
-Java_zfile__1_1remove (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zfile__1_1remove (JNIEnv *env, jclass c, jlong self)
 {
     zfile_remove ((zfile_t *) self);
 }
 
 JNIEXPORT jint JNICALL
-Java_zfile__1_1input (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zfile__1_1input (JNIEnv *env, jclass c, jlong self)
 {
     jint input_ = (jint) zfile_input ((zfile_t *) self);
     return input_;
 }
 
 JNIEXPORT jint JNICALL
-Java_zfile__1_1output (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zfile__1_1output (JNIEnv *env, jclass c, jlong self)
 {
     jint output_ = (jint) zfile_output ((zfile_t *) self);
     return output_;
 }
 
 JNIEXPORT jlong JNICALL
-Java_zfile__1_1read (JNIEnv *env, jclass c, jlong self, jlong bytes, jlong offset)
+Java_org_zeromq_czmq_Zfile__1_1read (JNIEnv *env, jclass c, jlong self, jlong bytes, jlong offset)
 {
     jlong read_ = (jlong) zfile_read ((zfile_t *) self, (size_t) bytes, (off_t) offset);
     return read_;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_zfile__1_1eof (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zfile__1_1eof (JNIEnv *env, jclass c, jlong self)
 {
     jboolean eof_ = (jboolean) zfile_eof ((zfile_t *) self);
     return eof_;
 }
 
 JNIEXPORT jint JNICALL
-Java_zfile__1_1write (JNIEnv *env, jclass c, jlong self, jlong chunk, jlong offset)
+Java_org_zeromq_czmq_Zfile__1_1write (JNIEnv *env, jclass c, jlong self, jlong chunk, jlong offset)
 {
     jint write_ = (jint) zfile_write ((zfile_t *) self, (zchunk_t *) chunk, (off_t) offset);
     return write_;
 }
 
 JNIEXPORT jstring JNICALL
-Java_zfile__1_1readln (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zfile__1_1readln (JNIEnv *env, jclass c, jlong self)
 {
     char *readln_ = (char *) zfile_readln ((zfile_t *) self);
     jstring string = (*env)->NewStringUTF (env, readln_);
@@ -156,13 +156,13 @@ Java_zfile__1_1readln (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT void JNICALL
-Java_zfile__1_1close (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zfile__1_1close (JNIEnv *env, jclass c, jlong self)
 {
     zfile_close ((zfile_t *) self);
 }
 
 JNIEXPORT jstring JNICALL
-Java_zfile__1_1digest (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zfile__1_1digest (JNIEnv *env, jclass c, jlong self)
 {
     char *digest_ = (char *) zfile_digest ((zfile_t *) self);
     jstring string = (*env)->NewStringUTF (env, digest_);
@@ -170,7 +170,7 @@ Java_zfile__1_1digest (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT void JNICALL
-Java_zfile__1_1test (JNIEnv *env, jclass c, jboolean verbose)
+Java_org_zeromq_czmq_Zfile__1_1test (JNIEnv *env, jclass c, jboolean verbose)
 {
     zfile_test ((bool) verbose);
 }

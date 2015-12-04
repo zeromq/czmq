@@ -19,10 +19,10 @@ public class Zmsg implements AutoCloseable{
     /*
     Create a new empty message object
     */
-    native static long __init ();
+    native static long __new ();
     public Zmsg () {
-        /*  TODO: if __init fails, self is null...  */
-        self = __init ();
+        /*  TODO: if __new fails, self is null...  */
+        self = __new ();
     }
     /*
     Destroy a message object and all frames it contains
@@ -224,25 +224,6 @@ public class Zmsg implements AutoCloseable{
     native static long __last (long self);
     public long last (long self) {
         return __last (self);
-    }
-    /*
-    Serialize multipart message to a single buffer. Use this method to send  
-    structured messages across transports that do not support multipart data.
-    Allocates and returns a new buffer containing the serialized message.    
-    To decode a serialized message buffer, use zmsg_decode ().               
-    */
-    native static long __encode (long self, byte [] buffer);
-    public long encode (long self, byte [] buffer) {
-        return __encode (self, buffer);
-    }
-    /*
-    Decodes a serialized message buffer created by zmsg_encode () and returns
-    a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
-    there was insufficient memory to work.                                   
-    */
-    native static long __decode (byte [] buffer, long bufferSize);
-    public long decode (byte [] buffer, long bufferSize) {
-        return __decode (buffer, bufferSize);
     }
     /*
     Create copy of message, as new message object. Returns a fresh zmsg_t
