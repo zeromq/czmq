@@ -8,37 +8,40 @@ static inaddr_t broadcast;         //  Our broadcast address
 void
 s_socket_error (const char *reason)
 {
-    if (errno == EAGAIN
-    ||  errno == ENETDOWN
-    ||  errno == EHOSTUNREACH
-    ||  errno == ENETUNREACH
-    ||  errno == EINTR
-    ||  errno == EPIPE
-    ||  errno == ECONNRESET
+  bool check_errno;
+
+  check_errno = (errno == EAGAIN
+                ||  errno == ENETDOWN
+                ||  errno == EHOSTUNREACH
+                ||  errno == ENETUNREACH
+                ||  errno == EINTR
+                ||  errno == EPIPE
+                ||  errno == ECONNRESET);
 #if defined (ENOPROTOOPT)
-    ||  errno == ENOPROTOOPT
+  check_errno = (check_errno ||  errno == ENOPROTOOPT);
 #endif
 #if defined (EHOSTDOWN)
-    ||  errno == EHOSTDOWN
+  check_errno = (check_errno ||  errno == EHOSTDOWN);
 #endif
 #if defined (EOPNOTSUPP)
-    ||  errno == EOPNOTSUPP
+  check_errno = (check_errno ||  errno == EOPNOTSUPP);
 #endif
 #if defined (EWOULDBLOCK)
-    ||  errno == EWOULDBLOCK
+  check_errno = (check_errno ||  errno == EWOULDBLOCK);
 #endif
 #if defined (EPROTO)
-    ||  errno == EPROTO
+  check_errno = (check_errno ||  errno == EPROTO);
 #endif
 #if defined (ENONET)
-    ||  errno == ENONET
+  check_errno = (check_errno ||  errno == ENONET);
 #endif
-    )
+
+  if (check_errno)
         return;             //  Ignore error and try again
-    else {
+  else {
         zclock_log ("E: (UDP) error '%s' on %s", strerror (errno), reason);
         assert (false);
-    }
+  }
 }
 
 SOCKET
