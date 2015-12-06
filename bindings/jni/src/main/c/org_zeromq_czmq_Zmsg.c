@@ -18,9 +18,9 @@ Java_org_zeromq_czmq_Zmsg__1_1new (JNIEnv *env, jclass c)
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
+Java_org_zeromq_czmq_Zmsg__1_1destroy (JNIEnv *env, jclass c, jlong self)
 {
-    zmsg_destroy ((zmsg_t **) &self_p);
+    zmsg_destroy ((zmsg_t **) &self);
 }
 
 JNIEXPORT jlong JNICALL
@@ -31,17 +31,17 @@ Java_org_zeromq_czmq_Zmsg__1_1recv (JNIEnv *env, jclass c, jlong source)
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1send (JNIEnv *env, jclass c, jlong self_p, jlong dest)
+Java_org_zeromq_czmq_Zmsg__1_1send (JNIEnv *env, jclass c, jlong self, jlong dest)
 {
-    jint send_ = (jint) zmsg_send ((zmsg_t **) &self_p, (void *) dest);
-    return send_;
+    jint send_ = (jint) zmsg_send ((zmsg_t **) &self, (void *) dest);
+    return self;
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1sendm (JNIEnv *env, jclass c, jlong self_p, jlong dest)
+Java_org_zeromq_czmq_Zmsg__1_1sendm (JNIEnv *env, jclass c, jlong self, jlong dest)
 {
-    jint sendm_ = (jint) zmsg_sendm ((zmsg_t **) &self_p, (void *) dest);
-    return sendm_;
+    jint sendm_ = (jint) zmsg_sendm ((zmsg_t **) &self, (void *) dest);
+    return self;
 }
 
 JNIEXPORT jlong JNICALL
@@ -190,6 +190,24 @@ Java_org_zeromq_czmq_Zmsg__1_1last (JNIEnv *env, jclass c, jlong self)
 {
     jlong last_ = (jlong) zmsg_last ((zmsg_t *) self);
     return last_;
+}
+
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zmsg__1_1encode (JNIEnv *env, jclass c, jlong self, jbyteArray buffer)
+{
+    jbyte *buffer_ = (byte *) (*env)->GetByteArrayElements (env, buffer, 0);
+    jlong encode_ = (jlong) zmsg_encode ((zmsg_t *) self, (byte **) &buffer);
+    (*env)->ReleaseByteArrayElements (env, buffer, (jbyte *) buffer_, 0);
+    return encode_;
+}
+
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zmsg__1_1decode (JNIEnv *env, jclass c, jbyteArray buffer, jlong buffer_size)
+{
+    jbyte *buffer_ = (byte *) (*env)->GetByteArrayElements (env, buffer, 0);
+    jlong decode_ = (jlong) zmsg_decode ((const byte *) buffer, (size_t) buffer_size);
+    (*env)->ReleaseByteArrayElements (env, buffer, (jbyte *) buffer_, 0);
+    return decode_;
 }
 
 JNIEXPORT jlong JNICALL

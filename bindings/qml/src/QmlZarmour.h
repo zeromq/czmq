@@ -32,7 +32,7 @@ public slots:
     const QString modeStr ();
 
     //  Encode a stream of bytes into an armoured string.
-    QString encode (const byte *data, size_t dataSize);
+    QString encode (const byte *data, size_t size);
 
     //  Decode an armoured string into a string of bytes.          
     //  The decoded output is null-terminated, so it may be treated

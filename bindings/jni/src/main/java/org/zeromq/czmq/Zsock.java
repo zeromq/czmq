@@ -29,6 +29,9 @@ public class Zsock implements AutoCloseable{
         /*  TODO: if __new fails, self is null...  */
         self = __new (type);
     }
+    public Zsock (long pointer) {
+        self = pointer;
+    }
     public Zsock () {
         self = 0;
     }
@@ -46,100 +49,100 @@ public class Zsock implements AutoCloseable{
     Create a PUB socket. Default action is bind.
     */
     native static long __newPub (String endpoint);
-    public long newPub (String endpoint) {
-        return __newPub (endpoint);
+    public Zsock newPub (String endpoint) {
+        return new Zsock (__newPub (endpoint));
     }
     /*
     Create a SUB socket, and optionally subscribe to some prefix string. Default
     action is connect.                                                          
     */
     native static long __newSub (String endpoint, String subscribe);
-    public long newSub (String endpoint, String subscribe) {
-        return __newSub (endpoint, subscribe);
+    public Zsock newSub (String endpoint, String subscribe) {
+        return new Zsock (__newSub (endpoint, subscribe));
     }
     /*
     Create a REQ socket. Default action is connect.
     */
     native static long __newReq (String endpoint);
-    public long newReq (String endpoint) {
-        return __newReq (endpoint);
+    public Zsock newReq (String endpoint) {
+        return new Zsock (__newReq (endpoint));
     }
     /*
     Create a REP socket. Default action is bind.
     */
     native static long __newRep (String endpoint);
-    public long newRep (String endpoint) {
-        return __newRep (endpoint);
+    public Zsock newRep (String endpoint) {
+        return new Zsock (__newRep (endpoint));
     }
     /*
     Create a DEALER socket. Default action is connect.
     */
     native static long __newDealer (String endpoint);
-    public long newDealer (String endpoint) {
-        return __newDealer (endpoint);
+    public Zsock newDealer (String endpoint) {
+        return new Zsock (__newDealer (endpoint));
     }
     /*
     Create a ROUTER socket. Default action is bind.
     */
     native static long __newRouter (String endpoint);
-    public long newRouter (String endpoint) {
-        return __newRouter (endpoint);
+    public Zsock newRouter (String endpoint) {
+        return new Zsock (__newRouter (endpoint));
     }
     /*
     Create a PUSH socket. Default action is connect.
     */
     native static long __newPush (String endpoint);
-    public long newPush (String endpoint) {
-        return __newPush (endpoint);
+    public Zsock newPush (String endpoint) {
+        return new Zsock (__newPush (endpoint));
     }
     /*
     Create a PULL socket. Default action is bind.
     */
     native static long __newPull (String endpoint);
-    public long newPull (String endpoint) {
-        return __newPull (endpoint);
+    public Zsock newPull (String endpoint) {
+        return new Zsock (__newPull (endpoint));
     }
     /*
     Create an XPUB socket. Default action is bind.
     */
     native static long __newXpub (String endpoint);
-    public long newXpub (String endpoint) {
-        return __newXpub (endpoint);
+    public Zsock newXpub (String endpoint) {
+        return new Zsock (__newXpub (endpoint));
     }
     /*
     Create an XSUB socket. Default action is connect.
     */
     native static long __newXsub (String endpoint);
-    public long newXsub (String endpoint) {
-        return __newXsub (endpoint);
+    public Zsock newXsub (String endpoint) {
+        return new Zsock (__newXsub (endpoint));
     }
     /*
     Create a PAIR socket. Default action is connect.
     */
     native static long __newPair (String endpoint);
-    public long newPair (String endpoint) {
-        return __newPair (endpoint);
+    public Zsock newPair (String endpoint) {
+        return new Zsock (__newPair (endpoint));
     }
     /*
     Create a STREAM socket. Default action is connect.
     */
     native static long __newStream (String endpoint);
-    public long newStream (String endpoint) {
-        return __newStream (endpoint);
+    public Zsock newStream (String endpoint) {
+        return new Zsock (__newStream (endpoint));
     }
     /*
     Create a SERVER socket. Default action is bind.
     */
     native static long __newServer (String endpoint);
-    public long newServer (String endpoint) {
-        return __newServer (endpoint);
+    public Zsock newServer (String endpoint) {
+        return new Zsock (__newServer (endpoint));
     }
     /*
     Create a CLIENT socket. Default action is connect.
     */
     native static long __newClient (String endpoint);
-    public long newClient (String endpoint) {
-        return __newClient (endpoint);
+    public Zsock newClient (String endpoint) {
+        return new Zsock (__newClient (endpoint));
     }
     /*
     Bind a socket to a formatted endpoint. For tcp:// endpoints, supports   
@@ -248,8 +251,8 @@ public class Zsock implements AutoCloseable{
     reason.                                                               
     */
     native static int __send (long self, String picture);
-    public int send (String picture) {
-        return __send (self, picture);
+    public int send (String picture []) {
+        return __send (self, picture [0]);
     }
     /*
     Receive a 'picture' message to the socket (or actor). See zsock_send for
@@ -280,8 +283,8 @@ public class Zsock implements AutoCloseable{
     the method will return -1.                                              
     */
     native static int __recv (long self, String picture);
-    public int recv (String picture) {
-        return __recv (self, picture);
+    public int recv (String picture []) {
+        return __recv (self, picture [0]);
     }
     /*
     Send a binary encoded 'picture' message to the socket (or actor). This 
@@ -307,8 +310,8 @@ public class Zsock implements AutoCloseable{
     successful, -1 if sending failed for any reason.                       
     */
     native static int __bsend (long self, String picture);
-    public int bsend (String picture) {
-        return __bsend (self, picture);
+    public int bsend (String picture []) {
+        return __bsend (self, picture [0]);
     }
     /*
     Receive a binary encoded 'picture' message from the socket (or actor).  
@@ -321,8 +324,8 @@ public class Zsock implements AutoCloseable{
     values. Returns 0 if successful, or -1 if it failed to read a message.  
     */
     native static int __brecv (long self, String picture);
-    public int brecv (String picture) {
-        return __brecv (self, picture);
+    public int brecv (String picture []) {
+        return __brecv (self, picture [0]);
     }
     /*
     Return socket routing ID if any. This returns 0 if the socket is not
@@ -545,6 +548,13 @@ public class Zsock implements AutoCloseable{
         __setCurvePublickey (self, curvePublickey);
     }
     /*
+    Set socket option `curve_publickey` from 32-octet binary
+    */
+    native static void __setCurvePublickeyBin (long self, byte [] curvePublickey);
+    public void setCurvePublickeyBin (byte [] curvePublickey) {
+        __setCurvePublickeyBin (self, curvePublickey);
+    }
+    /*
     Get socket option `curve_secretkey`.
     */
     native static String __curveSecretkey (long self);
@@ -559,6 +569,13 @@ public class Zsock implements AutoCloseable{
         __setCurveSecretkey (self, curveSecretkey);
     }
     /*
+    Set socket option `curve_secretkey` from 32-octet binary
+    */
+    native static void __setCurveSecretkeyBin (long self, byte [] curveSecretkey);
+    public void setCurveSecretkeyBin (byte [] curveSecretkey) {
+        __setCurveSecretkeyBin (self, curveSecretkey);
+    }
+    /*
     Get socket option `curve_serverkey`.
     */
     native static String __curveServerkey (long self);
@@ -571,6 +588,13 @@ public class Zsock implements AutoCloseable{
     native static void __setCurveServerkey (long self, String curveServerkey);
     public void setCurveServerkey (String curveServerkey) {
         __setCurveServerkey (self, curveServerkey);
+    }
+    /*
+    Set socket option `curve_serverkey` from 32-octet binary
+    */
+    native static void __setCurveServerkeyBin (long self, byte [] curveServerkey);
+    public void setCurveServerkeyBin (byte [] curveServerkey) {
+        __setCurveServerkeyBin (self, curveServerkey);
     }
     /*
     Get socket option `gssapi_server`.

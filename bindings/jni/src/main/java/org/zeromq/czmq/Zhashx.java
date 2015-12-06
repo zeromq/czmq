@@ -24,6 +24,9 @@ public class Zhashx implements AutoCloseable{
         /*  TODO: if __new fails, self is null...  */
         self = __new ();
     }
+    public Zhashx (long pointer) {
+        self = pointer;
+    }
     /*
     Destroy a hash container and all items in it
     */
@@ -86,40 +89,11 @@ public class Zhashx implements AutoCloseable{
         return __rename (self, oldKey, newKey);
     }
     /*
-    Set a free function for the specified hash table item. When the item is
-    destroyed, the free function, if any, is called on that item.          
-    Use this when hash items are dynamically allocated, to ensure that     
-    you don't have memory leaks. You can pass 'free' or NULL as a free_fn. 
-    Returns the item, or NULL if there is no such item.                    
-    */
-    native static long __freefn (long self, long key, long freeFn);
-    public long freefn (long key, long freeFn) {
-        return __freefn (self, key, freeFn);
-    }
-    /*
     Return the number of keys/items in the hash table
     */
     native static long __size (long self);
     public long size () {
         return __size (self);
-    }
-    /*
-    Return a zlistx_t containing the keys for the items in the       
-    table. Uses the key_duplicator to duplicate all keys and sets the
-    key_destructor as destructor for the list.                       
-    */
-    native static long __keys (long self);
-    public long keys () {
-        return __keys (self);
-    }
-    /*
-    Return a zlistx_t containing the values for the items in the  
-    table. Uses the duplicator to duplicate all items and sets the
-    destructor as destructor for the list.                        
-    */
-    native static long __values (long self);
-    public long values () {
-        return __values (self);
     }
     /*
     Simple iterator; returns first item in hash table, in no given order, 
@@ -213,8 +187,8 @@ public class Zhashx implements AutoCloseable{
     strings.                                                             
     */
     native static long __pack (long self);
-    public long pack () {
-        return __pack (self);
+    public Zframe pack () {
+        return new Zframe (__pack (self));
     }
     /*
     Unpack binary frame into a new hash table. Packed data must follow format
@@ -222,8 +196,8 @@ public class Zhashx implements AutoCloseable{
     unpacks to an empty hash table.                                          
     */
     native static long __unpack (long frame);
-    public long unpack (long frame) {
-        return __unpack (frame);
+    public Zhashx unpack (Zframe frame) {
+        return new Zhashx (__unpack (frame.self));
     }
     /*
     Make a copy of the list; items are duplicated if you set a duplicator 
@@ -233,56 +207,8 @@ public class Zhashx implements AutoCloseable{
     duplicate any hash table safely. The old behavior is in zhashx_dup_v2.
     */
     native static long __dup (long self);
-    public long dup () {
-        return __dup (self);
-    }
-    /*
-    Set a user-defined deallocator for hash items; by default items are not
-    freed when the hash is destroyed.                                      
-    */
-    native static void __setDestructor (long self, long destructor);
-    public void setDestructor (long destructor) {
-        __setDestructor (self, destructor);
-    }
-    /*
-    Set a user-defined duplicator for hash items; by default items are not
-    copied when the hash is duplicated.                                   
-    */
-    native static void __setDuplicator (long self, long duplicator);
-    public void setDuplicator (long duplicator) {
-        __setDuplicator (self, duplicator);
-    }
-    /*
-    Set a user-defined deallocator for keys; by default keys are freed
-    when the hash is destroyed using free().                          
-    */
-    native static void __setKeyDestructor (long self, long destructor);
-    public void setKeyDestructor (long destructor) {
-        __setKeyDestructor (self, destructor);
-    }
-    /*
-    Set a user-defined duplicator for keys; by default keys are duplicated
-    using strdup.                                                         
-    */
-    native static void __setKeyDuplicator (long self, long duplicator);
-    public void setKeyDuplicator (long duplicator) {
-        __setKeyDuplicator (self, duplicator);
-    }
-    /*
-    Set a user-defined comparator for keys; by default keys are
-    compared using strcmp.                                     
-    */
-    native static void __setKeyComparator (long self, long comparator);
-    public void setKeyComparator (long comparator) {
-        __setKeyComparator (self, comparator);
-    }
-    /*
-    Set a user-defined comparator for keys; by default keys are
-    compared using strcmp.                                     
-    */
-    native static void __setKeyHasher (long self, long hasher);
-    public void setKeyHasher (long hasher) {
-        __setKeyHasher (self, hasher);
+    public Zhashx dup () {
+        return new Zhashx (__dup (self));
     }
     /*
     Make copy of hash table; if supplied table is null, returns null.    
@@ -291,8 +217,8 @@ public class Zhashx implements AutoCloseable{
     since there's no other way to know how to duplicate the item value.  
     */
     native static long __dupV2 (long self);
-    public long dupV2 () {
-        return __dupV2 (self);
+    public Zhashx dupV2 () {
+        return new Zhashx (__dupV2 (self));
     }
     /*
     DEPRECATED as clumsy -- use set_destructor instead
@@ -301,17 +227,6 @@ public class Zhashx implements AutoCloseable{
     native static void __autofree (long self);
     public void autofree () {
         __autofree (self);
-    }
-    /*
-    DEPRECATED as clumsy -- use zhashx_first/_next instead                 
-    Apply function to each item in the hash table. Items are iterated in no
-    defined order. Stops if callback function returns non-zero and returns 
-    final return code from callback function (zero = success).             
-    Callback function for zhashx_foreach method                            
-    */
-    native static int __foreach (long self, long callback, long argument);
-    public int foreach (long callback, long argument) {
-        return __foreach (self, callback, argument);
     }
     /*
     Self test of this class.

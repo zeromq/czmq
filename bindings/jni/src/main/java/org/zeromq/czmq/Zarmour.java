@@ -24,6 +24,9 @@ public class Zarmour implements AutoCloseable{
         /*  TODO: if __new fails, self is null...  */
         self = __new ();
     }
+    public Zarmour (long pointer) {
+        self = pointer;
+    }
     /*
     Destroy the zarmour.
     */
@@ -39,6 +42,13 @@ public class Zarmour implements AutoCloseable{
     native static String __modeStr (long self);
     public String modeStr () {
         return __modeStr (self);
+    }
+    /*
+    Encode a stream of bytes into an armoured string.
+    */
+    native static String __encode (long self, byte [] data, long size);
+    public String encode (byte [] data, long size) {
+        return __encode (self, data, size);
     }
     /*
     Get the mode property.

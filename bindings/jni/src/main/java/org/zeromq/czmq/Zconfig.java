@@ -20,9 +20,12 @@ public class Zconfig implements AutoCloseable{
     Create new config item
     */
     native static long __new (String name, long parent);
-    public Zconfig (String name, long parent) {
+    public Zconfig (String name, Zconfig parent) {
         /*  TODO: if __new fails, self is null...  */
-        self = __new (name, parent);
+        self = __new (name, parent.self);
+    }
+    public Zconfig (long pointer) {
+        self = pointer;
     }
     public Zconfig () {
         self = 0;
@@ -94,37 +97,29 @@ public class Zconfig implements AutoCloseable{
     Find our first child, if any
     */
     native static long __child (long self);
-    public long child () {
-        return __child (self);
+    public Zconfig child () {
+        return new Zconfig (__child (self));
     }
     /*
     Find our first sibling, if any
     */
     native static long __next (long self);
-    public long next () {
-        return __next (self);
+    public Zconfig next () {
+        return new Zconfig (__next (self));
     }
     /*
     Find a config item along a path; leading slash is optional and ignored.
     */
     native static long __locate (long self, String path);
-    public long locate (String path) {
-        return __locate (self, path);
+    public Zconfig locate (String path) {
+        return new Zconfig (__locate (self, path));
     }
     /*
     Locate the last config item at a specified depth
     */
     native static long __atDepth (long self, int level);
-    public long atDepth (int level) {
-        return __atDepth (self, level);
-    }
-    /*
-    Execute a callback for each config item in the tree; returns zero if
-    successful, else -1.                                                
-    */
-    native static int __execute (long self, long handler, long arg);
-    public int execute (long handler, long arg) {
-        return __execute (self, handler, arg);
+    public Zconfig atDepth (int level) {
+        return new Zconfig (__atDepth (self, level));
     }
     /*
     Add comment to config item before saving to disk. You can add as many
@@ -139,8 +134,8 @@ public class Zconfig implements AutoCloseable{
     Return comments of config item, as zlist.
     */
     native static long __comments (long self);
-    public long comments () {
-        return __comments (self);
+    public Zlist comments () {
+        return new Zlist (__comments (self));
     }
     /*
     Load a config tree from a specified ZPL text file; returns a zconfig_t  
@@ -148,8 +143,8 @@ public class Zconfig implements AutoCloseable{
     if the file does not exist.                                             
     */
     native static long __load (String filename);
-    public long load (String filename) {
-        return __load (filename);
+    public Zconfig load (String filename) {
+        return new Zconfig (__load (filename));
     }
     /*
     Save a config tree to a specified ZPL text file, where a filename
@@ -164,8 +159,8 @@ public class Zconfig implements AutoCloseable{
     filename.                                                            
     */
     native static long __loadf (String format);
-    public long loadf (String format) {
-        return __loadf (format);
+    public Zconfig loadf (String format) {
+        return new Zconfig (__loadf (format));
     }
     /*
     Equivalent to zconfig_save, taking a format string instead of a fixed
@@ -187,30 +182,17 @@ public class Zconfig implements AutoCloseable{
     Returns 0 if OK, -1 if there was an error (and then does not change  
     existing data).                                                      
     */
-    native static int __reload (long selfP);
-    public int reload (long selfP) {
-        return __reload (selfP);
-    }
-    /*
-    Load a config tree from a memory chunk
-    */
-    native static long __chunkLoad (long chunk);
-    public long chunkLoad (long chunk) {
-        return __chunkLoad (chunk);
-    }
-    /*
-    Save a config tree to a new memory chunk
-    */
-    native static long __chunkSave (long self);
-    public long chunkSave () {
-        return __chunkSave (self);
+    native static int __reload (long self);
+    public int reload () {
+        self = __reload (self);
+        return 0;
     }
     /*
     Load a config tree from a null-terminated string
     */
     native static long __strLoad (String string);
-    public long strLoad (String string) {
-        return __strLoad (string);
+    public Zconfig strLoad (String string) {
+        return new Zconfig (__strLoad (string));
     }
     /*
     Save a config tree to a new null terminated string

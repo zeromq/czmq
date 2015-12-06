@@ -9,7 +9,7 @@ package org.zeromq.czmq;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class ZactorTest {
+public class ZframeTest {
     static {
         try {
             System.loadLibrary ("czmqjni");
@@ -20,7 +20,7 @@ public class ZactorTest {
     }
     @Test
     public void test () {
-        Zactor zactor = new Zactor ();
-        zactor.test (false);
+        Zframe zframe = new Zframe ();
+        zframe.test (false);
     }
 }

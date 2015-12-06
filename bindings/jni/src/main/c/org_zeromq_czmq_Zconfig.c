@@ -20,9 +20,9 @@ Java_org_zeromq_czmq_Zconfig__1_1new (JNIEnv *env, jclass c, jstring name, jlong
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zconfig__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
+Java_org_zeromq_czmq_Zconfig__1_1destroy (JNIEnv *env, jclass c, jlong self)
 {
-    zconfig_destroy ((zconfig_t **) &self_p);
+    zconfig_destroy ((zconfig_t **) &self);
 }
 
 JNIEXPORT jstring JNICALL
@@ -119,13 +119,6 @@ Java_org_zeromq_czmq_Zconfig__1_1atDepth (JNIEnv *env, jclass c, jlong self, jin
     return at_depth_;
 }
 
-JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zconfig__1_1execute (JNIEnv *env, jclass c, jlong self, jlong handler, jlong arg)
-{
-    jint execute_ = (jint) zconfig_execute ((zconfig_t *) self, (zconfig_fct *) handler, (void *) arg);
-    return execute_;
-}
-
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zconfig__1_1setComment (JNIEnv *env, jclass c, jlong self, jstring format)
 {
@@ -186,24 +179,10 @@ Java_org_zeromq_czmq_Zconfig__1_1filename (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zconfig__1_1reload (JNIEnv *env, jclass c, jlong self_p)
+Java_org_zeromq_czmq_Zconfig__1_1reload (JNIEnv *env, jclass c, jlong self)
 {
-    jint reload_ = (jint) zconfig_reload ((zconfig_t **) &self_p);
-    return reload_;
-}
-
-JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zconfig__1_1chunkLoad (JNIEnv *env, jclass c, jlong chunk)
-{
-    jlong chunk_load_ = (jlong) zconfig_chunk_load ((zchunk_t *) chunk);
-    return chunk_load_;
-}
-
-JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zconfig__1_1chunkSave (JNIEnv *env, jclass c, jlong self)
-{
-    jlong chunk_save_ = (jlong) zconfig_chunk_save ((zconfig_t *) self);
-    return chunk_save_;
+    jint reload_ = (jint) zconfig_reload ((zconfig_t **) &self);
+    return self;
 }
 
 JNIEXPORT jlong JNICALL

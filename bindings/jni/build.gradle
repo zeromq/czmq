@@ -26,12 +26,12 @@ task generateJniHeaders(type: Exec, dependsOn: 'classes') {
     def classpath = sourceSets.main.output.classesDir
     def nativeIncludes = "src/native/include"
     def jniClasses = [
-            'org.zeromq.czmq.Zactor',
             'org.zeromq.czmq.Zarmour',
             'org.zeromq.czmq.Zconfig',
             'org.zeromq.czmq.Zdir',
             'org.zeromq.czmq.ZdirPatch',
             'org.zeromq.czmq.Zfile',
+            'org.zeromq.czmq.Zframe',
             'org.zeromq.czmq.Zhash',
             'org.zeromq.czmq.Zhashx',
             'org.zeromq.czmq.Ziflist',

@@ -8,7 +8,6 @@
         <return type = "integer" />
     </callback_type>
 
-    -    zconfig_new (const char *name, zconfig_t *parent);
     <constructor>
         Create new config item
         <argument name = "name" type = "string" />

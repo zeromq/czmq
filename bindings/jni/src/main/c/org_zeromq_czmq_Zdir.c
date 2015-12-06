@@ -22,9 +22,9 @@ Java_org_zeromq_czmq_Zdir__1_1new (JNIEnv *env, jclass c, jstring path, jstring 
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zdir__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
+Java_org_zeromq_czmq_Zdir__1_1destroy (JNIEnv *env, jclass c, jlong self)
 {
-    zdir_destroy ((zdir_t **) &self_p);
+    zdir_destroy ((zdir_t **) &self);
 }
 
 JNIEXPORT jstring JNICALL

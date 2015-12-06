@@ -24,6 +24,9 @@ public class Zloop implements AutoCloseable{
         /*  TODO: if __new fails, self is null...  */
         self = __new ();
     }
+    public Zloop (long pointer) {
+        self = pointer;
+    }
     /*
     Destroy a reactor
     */
@@ -34,40 +37,20 @@ public class Zloop implements AutoCloseable{
         self = 0;
     }
     /*
-    Register socket reader with the reactor. When the reader has messages, 
-    the reactor will call the handler, passing the arg. Returns 0 if OK, -1
-    if there was an error. If you register the same socket more than once, 
-    each instance will invoke its corresponding handler.                   
-    */
-    native static int __reader (long self, long sock, long handler, long arg);
-    public int reader (long sock, long handler, long arg) {
-        return __reader (self, sock, handler, arg);
-    }
-    /*
     Cancel a socket reader from the reactor. If multiple readers exist for
     same socket, cancels ALL of them.                                     
     */
     native static void __readerEnd (long self, long sock);
-    public void readerEnd (long sock) {
-        __readerEnd (self, sock);
+    public void readerEnd (Zsock sock) {
+        __readerEnd (self, sock.self);
     }
     /*
     Configure a registered reader to ignore errors. If you do not set this,
     then readers that have errors are removed from the reactor silently.   
     */
     native static void __readerSetTolerant (long self, long sock);
-    public void readerSetTolerant (long sock) {
-        __readerSetTolerant (self, sock);
-    }
-    /*
-    Register a timer that expires after some delay and repeats some number of
-    times. At each expiry, will call the handler, passing the arg. To run a  
-    timer forever, use 0 times. Returns a timer_id that is used to cancel the
-    timer in the future. Returns -1 if there was an error.                   
-    */
-    native static int __timer (long self, long delay, long times, long handler, long arg);
-    public int timer (long delay, long times, long handler, long arg) {
-        return __timer (self, delay, times, handler, arg);
+    public void readerSetTolerant (Zsock sock) {
+        __readerSetTolerant (self, sock.self);
     }
     /*
     Cancel a specific timer identified by a specific timer_id (as returned by
@@ -76,21 +59,6 @@ public class Zloop implements AutoCloseable{
     native static int __timerEnd (long self, int timerId);
     public int timerEnd (int timerId) {
         return __timerEnd (self, timerId);
-    }
-    /*
-    Register a ticket timer. Ticket timers are very fast in the case where   
-    you use a lot of timers (thousands), and frequently remove and add them. 
-    The main use case is expiry timers for servers that handle many clients, 
-    and which reset the expiry timer for each message received from a client.
-    Whereas normal timers perform poorly as the number of clients grows, the 
-    cost of ticket timers is constant, no matter the number of clients. You  
-    must set the ticket delay using zloop_set_ticket_delay before creating a 
-    ticket. Returns a handle to the timer that you should use in             
-    zloop_ticket_reset and zloop_ticket_delete.                              
-    */
-    native static long __ticket (long self, long handler, long arg);
-    public long ticket (long handler, long arg) {
-        return __ticket (self, handler, arg);
     }
     /*
     Reset a ticket timer, which moves it to the end of the ticket list and

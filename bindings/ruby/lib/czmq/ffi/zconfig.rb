@@ -7,10 +7,6 @@ module CZMQ
   module FFI
 
     # zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.
-    #                                                                       
-    #                                                                       
-    #                                                                       
-    # -    zconfig_new (const char *name, zconfig_t *parent);               
     class Zconfig
       class DestroyedError < RuntimeError; end
 

@@ -26,6 +26,9 @@ public class Zdir implements AutoCloseable{
         /*  TODO: if __new fails, self is null...  */
         self = __new (path, parent);
     }
+    public Zdir (long pointer) {
+        self = pointer;
+    }
     public Zdir () {
         self = 0;
     }
@@ -73,8 +76,8 @@ public class Zdir implements AutoCloseable{
     original zdir tree until you are done with this list.                      
     */
     native static long __list (long self);
-    public long list () {
-        return __list (self);
+    public Zlist list () {
+        return new Zlist (__list (self));
     }
     /*
     Remove directory, optionally including all files that it contains, at  
@@ -92,23 +95,23 @@ public class Zdir implements AutoCloseable{
     generates virtual filename (minus path, plus alias).               
     */
     native static long __diff (long older, long newer, String alias);
-    public long diff (long older, long newer, String alias) {
-        return __diff (older, newer, alias);
+    public Zlist diff (Zdir older, Zdir newer, String alias) {
+        return new Zlist (__diff (older.self, newer.self, alias));
     }
     /*
     Return full contents of directory as a zdir_patch list.
     */
     native static long __resync (long self, String alias);
-    public long resync (String alias) {
-        return __resync (self, alias);
+    public Zlist resync (String alias) {
+        return new Zlist (__resync (self, alias));
     }
     /*
     Load directory cache; returns a hash table containing the SHA-1 digests
     of every file in the tree. The cache is saved between runs in .cache.  
     */
     native static long __cache (long self);
-    public long cache () {
-        return __cache (self);
+    public Zhash cache () {
+        return new Zhash (__cache (self));
     }
     /*
     Print contents of directory to stdout
@@ -146,8 +149,8 @@ public class Zdir implements AutoCloseable{
         zlist_destroy (&patches);                                 
     */
     native static void __watch (long pipe, long unused);
-    public void watch (long pipe, long unused) {
-        __watch (pipe, unused);
+    public void watch (Zsock pipe, long unused) {
+        __watch (pipe.self, unused);
     }
     /*
     Self test of this class.

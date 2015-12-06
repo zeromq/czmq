@@ -18,9 +18,9 @@ Java_org_zeromq_czmq_Ziflist__1_1new (JNIEnv *env, jclass c)
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Ziflist__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
+Java_org_zeromq_czmq_Ziflist__1_1destroy (JNIEnv *env, jclass c, jlong self)
 {
-    ziflist_destroy ((ziflist_t **) &self_p);
+    ziflist_destroy ((ziflist_t **) &self);
 }
 
 JNIEXPORT void JNICALL

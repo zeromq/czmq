@@ -22,9 +22,9 @@ Java_org_zeromq_czmq_Zfile__1_1new (JNIEnv *env, jclass c, jstring path, jstring
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zfile__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
+Java_org_zeromq_czmq_Zfile__1_1destroy (JNIEnv *env, jclass c, jlong self)
 {
-    zfile_destroy ((zfile_t **) &self_p);
+    zfile_destroy ((zfile_t **) &self);
 }
 
 JNIEXPORT jlong JNICALL
@@ -126,25 +126,11 @@ Java_org_zeromq_czmq_Zfile__1_1output (JNIEnv *env, jclass c, jlong self)
     return output_;
 }
 
-JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zfile__1_1read (JNIEnv *env, jclass c, jlong self, jlong bytes, jlong offset)
-{
-    jlong read_ = (jlong) zfile_read ((zfile_t *) self, (size_t) bytes, (off_t) offset);
-    return read_;
-}
-
 JNIEXPORT jboolean JNICALL
 Java_org_zeromq_czmq_Zfile__1_1eof (JNIEnv *env, jclass c, jlong self)
 {
     jboolean eof_ = (jboolean) zfile_eof ((zfile_t *) self);
     return eof_;
-}
-
-JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zfile__1_1write (JNIEnv *env, jclass c, jlong self, jlong chunk, jlong offset)
-{
-    jint write_ = (jint) zfile_write ((zfile_t *) self, (zchunk_t *) chunk, (off_t) offset);
-    return write_;
 }
 
 JNIEXPORT jstring JNICALL

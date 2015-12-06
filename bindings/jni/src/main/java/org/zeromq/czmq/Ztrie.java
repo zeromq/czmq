@@ -24,6 +24,9 @@ public class Ztrie implements AutoCloseable{
         /*  TODO: if __new fails, self is null...  */
         self = __new (delimiter);
     }
+    public Ztrie (long pointer) {
+        self = pointer;
+    }
     public Ztrie () {
         self = 0;
     }
@@ -35,15 +38,6 @@ public class Ztrie implements AutoCloseable{
     public void close () {
         __destroy (self);
         self = 0;
-    }
-    /*
-    Inserts a new route into the tree and attaches the data. Returns -1     
-    if the route already exists, otherwise 0. This method takes ownership of
-    the provided data if a destroy_data_fn is provided.                     
-    */
-    native static int __insertRoute (long self, String path, long data, long destroyDataFn);
-    public int insertRoute (String path, long data, long destroyDataFn) {
-        return __insertRoute (self, path, data, destroyDataFn);
     }
     /*
     Removes a route from the trie and destroys its data. Returns -1 if the
@@ -83,8 +77,8 @@ public class Ztrie implements AutoCloseable{
     named regexes, returns NULL.                                             
     */
     native static long __hitParameters (long self);
-    public long hitParameters () {
-        return __hitParameters (self);
+    public Zhashx hitParameters () {
+        return new Zhashx (__hitParameters (self));
     }
     /*
     Returns the asterisk matched part of a route, if there has been no match

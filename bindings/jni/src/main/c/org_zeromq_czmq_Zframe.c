@@ -11,20 +11,22 @@
 #include "../../native/include/org_zeromq_czmq_Zframe.h"
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zframe__1_1new (JNIEnv *env, jclass c, jlong data, jlong size)
+Java_org_zeromq_czmq_Zframe__1_1new (JNIEnv *env, jclass c, jbyteArray data, jlong size)
 {
+    jbyte *data_ = (byte *) (*env)->GetByteArrayElements (env, data, 0);
     jlong new_ = (jlong) zframe_new ((const void *) data, (size_t) size);
+    (*env)->ReleaseByteArrayElements (env, data, (jbyte *) data_, 0);
     return new_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zframe__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
+Java_org_zeromq_czmq_Zframe__1_1destroy (JNIEnv *env, jclass c, jlong self)
 {
-    zframe_destroy ((zframe_t **) &self_p);
+    zframe_destroy ((zframe_t **) &self);
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zframe__1_1new_empty (JNIEnv *env, jclass c)
+Java_org_zeromq_czmq_Zframe__1_1newEmpty (JNIEnv *env, jclass c)
 {
     jlong new_empty_ = (jlong) zframe_new_empty ();
     return new_empty_;
@@ -47,10 +49,10 @@ Java_org_zeromq_czmq_Zframe__1_1recv (JNIEnv *env, jclass c, jlong source)
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zframe__1_1send (JNIEnv *env, jclass c, jlong self_p, jlong dest, jint flags)
+Java_org_zeromq_czmq_Zframe__1_1send (JNIEnv *env, jclass c, jlong self, jlong dest, jint flags)
 {
-    jint send_ = (jint) zframe_send ((zframe_t **) &self_p, (void *) dest, (int) flags);
-    return send_;
+    jint send_ = (jint) zframe_send ((zframe_t **) &self, (void *) dest, (int) flags);
+    return self;
 }
 
 JNIEXPORT jlong JNICALL
@@ -58,13 +60,6 @@ Java_org_zeromq_czmq_Zframe__1_1size (JNIEnv *env, jclass c, jlong self)
 {
     jlong size_ = (jlong) zframe_size ((zframe_t *) self);
     return size_;
-}
-
-JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zframe__1_1data (JNIEnv *env, jclass c, jlong self)
-{
-    byte *data_ = (byte *) zframe_data ((zframe_t *) self);
-    return (jlong) data_;
 }
 
 JNIEXPORT jlong JNICALL
@@ -109,20 +104,20 @@ Java_org_zeromq_czmq_Zframe__1_1more (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zframe__1_1set_more (JNIEnv *env, jclass c, jlong self, jint more)
+Java_org_zeromq_czmq_Zframe__1_1setMore (JNIEnv *env, jclass c, jlong self, jint more)
 {
     zframe_set_more ((zframe_t *) self, (int) more);
 }
 
 JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zframe__1_1routing_id (JNIEnv *env, jclass c, jlong self)
+Java_org_zeromq_czmq_Zframe__1_1routingId (JNIEnv *env, jclass c, jlong self)
 {
     jint routing_id_ = (jint) zframe_routing_id ((zframe_t *) self);
     return routing_id_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zframe__1_1set_routing_id (JNIEnv *env, jclass c, jlong self, jint routing_id)
+Java_org_zeromq_czmq_Zframe__1_1setRoutingId (JNIEnv *env, jclass c, jlong self, jint routing_id)
 {
     zframe_set_routing_id ((zframe_t *) self, (uint32_t) routing_id);
 }
@@ -135,9 +130,11 @@ Java_org_zeromq_czmq_Zframe__1_1eq (JNIEnv *env, jclass c, jlong self, jlong oth
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zframe__1_1reset (JNIEnv *env, jclass c, jlong self, jlong data, jlong size)
+Java_org_zeromq_czmq_Zframe__1_1reset (JNIEnv *env, jclass c, jlong self, jbyteArray data, jlong size)
 {
+    jbyte *data_ = (byte *) (*env)->GetByteArrayElements (env, data, 0);
     zframe_reset ((zframe_t *) self, (const void *) data, (size_t) size);
+    (*env)->ReleaseByteArrayElements (env, data, (jbyte *) data_, 0);
 }
 
 JNIEXPORT void JNICALL
