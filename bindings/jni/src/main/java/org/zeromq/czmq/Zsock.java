@@ -15,7 +15,7 @@ public class Zsock implements AutoCloseable{
             System.exit (-1);
         }
     }
-    long self;
+    public long self;
     /*
     Create a new socket. Returns the new socket, or NULL if the new socket
     could not be created. Note that the symbol zsock_new (and other       

@@ -15,7 +15,7 @@ public class Zframe implements AutoCloseable{
             System.exit (-1);
         }
     }
-    long self;
+    public long self;
     /*
     Create a new frame. If size is not null, allocates the frame data
     to the specified size. If additionally, data is not null, copies 

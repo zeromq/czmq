@@ -15,7 +15,7 @@ public class Zloop implements AutoCloseable{
             System.exit (-1);
         }
     }
-    long self;
+    public long self;
     /*
     Create a new zloop reactor
     */

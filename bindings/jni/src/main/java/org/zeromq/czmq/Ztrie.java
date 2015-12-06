@@ -15,7 +15,7 @@ public class Ztrie implements AutoCloseable{
             System.exit (-1);
         }
     }
-    long self;
+    public long self;
     /*
     Creates a new ztrie.
     */
