@@ -7,14 +7,17 @@ module CZMQ
   module FFI
 
     # sending and receiving strings
+    # @note This class is 100% generated using zproject.
     class Zstr
-      class DestroyedError < RuntimeError; end
-
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
       end
-      def initialize ptr, finalize=true
+      # Attaches the pointer _ptr_ to this instance and defines a finalizer for
+      # it if necessary.
+      # @param ptr [::FFI::Pointer]
+      # @param finalize [Boolean]
+      def initialize(ptr, finalize = true)
         @ptr = ptr
         if @ptr.null?
           @ptr = nil # Remove null pointers so we don't have to test for them.
@@ -23,24 +26,31 @@ module CZMQ
           ObjectSpace.define_finalizer self, @finalizer
         end
       end
-      def self.create_finalizer_for ptr
+      # @return [Proc]
+      def self.create_finalizer_for(ptr)
         Proc.new do
           "WARNING: "\
           "Objects of type #{self} cannot be destroyed implicitly. "\
           "Please call the correct destroy method with the relevant arguments."
         end
       end
+      # @return [Boolean]
       def null?
         !@ptr or @ptr.null?
       end
       # Return internal pointer
+      # @return [::FFI::Pointer]
       def __ptr
         raise DestroyedError unless @ptr
         @ptr
       end
       # So external Libraries can just pass the Object to a FFI function which expects a :pointer
       alias_method :to_ptr, :__ptr
-      # Nullify internal pointer and return pointer pointer
+      # Nullify internal pointer and return pointer pointer.
+      # @note This detaches the current instance from the native object
+      #   and thus makes it unusable.
+      # @return [::FFI::MemoryPointer] the pointer pointing to a pointer
+      #   pointing to the native object
       def __ptr_give_ref
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
@@ -54,6 +64,9 @@ module CZMQ
       # Receive C string from socket. Caller must free returned string using
       # zstr_free(). Returns NULL if the context is being terminated or the 
       # process was interrupted.                                            
+      #
+      # @param source [::FFI::Pointer, #to_ptr]
+      # @return [::FFI::AutoPointer]
       def self.recv(source)
         result = ::CZMQ::FFI.zstr_recv(source)
         result = ::FFI::AutoPointer.new(result, LibC.method(:free))
@@ -67,6 +80,11 @@ module CZMQ
       # number of strings filled, zero or more. Free each returned string
       # using zstr_free(). If not enough strings are provided, remaining 
       # multipart frames in the message are dropped.                     
+      #
+      # @param source [::FFI::Pointer, #to_ptr]
+      # @param string_p [::FFI::Pointer, #to_ptr]
+      # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
+      # @return [Integer]
       def self.recvx(source, string_p, *args)
         result = ::CZMQ::FFI.zstr_recvx(source, string_p, *args)
         result
@@ -76,6 +94,10 @@ module CZMQ
       # trailing null byte; to read this you can use zstr_recv, or a similar
       # method that adds a null terminator on the received string. String   
       # may be NULL, which is sent as "".                                   
+      #
+      # @param dest [::FFI::Pointer, #to_ptr]
+      # @param string [String, #to_str, #to_s]
+      # @return [Integer]
       def self.send(dest, string)
         string = String(string)
         result = ::CZMQ::FFI.zstr_send(dest, string)
@@ -84,6 +106,10 @@ module CZMQ
 
       # Send a C string to a socket, as zstr_send(), with a MORE flag, so that
       # you can send further strings in the same multi-part message.          
+      #
+      # @param dest [::FFI::Pointer, #to_ptr]
+      # @param string [String, #to_str, #to_s]
+      # @return [Integer]
       def self.sendm(dest, string)
         string = String(string)
         result = ::CZMQ::FFI.zstr_sendm(dest, string)
@@ -93,6 +119,11 @@ module CZMQ
       # Send a formatted string to a socket. Note that you should NOT use
       # user-supplied strings in the format (they may contain '%' which  
       # will create security holes).                                     
+      #
+      # @param dest [::FFI::Pointer, #to_ptr]
+      # @param format [String, #to_str, #to_s]
+      # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
+      # @return [Integer]
       def self.sendf(dest, format, *args)
         format = String(format)
         result = ::CZMQ::FFI.zstr_sendf(dest, format, *args)
@@ -102,6 +133,11 @@ module CZMQ
       # Send a formatted string to a socket, as for zstr_sendf(), with a      
       # MORE flag, so that you can send further strings in the same multi-part
       # message.                                                              
+      #
+      # @param dest [::FFI::Pointer, #to_ptr]
+      # @param format [String, #to_str, #to_s]
+      # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
+      # @return [Integer]
       def self.sendfm(dest, format, *args)
         format = String(format)
         result = ::CZMQ::FFI.zstr_sendfm(dest, format, *args)
@@ -110,6 +146,11 @@ module CZMQ
 
       # Send a series of strings (until NULL) as multipart data   
       # Returns 0 if the strings could be sent OK, or -1 on error.
+      #
+      # @param dest [::FFI::Pointer, #to_ptr]
+      # @param string [String, #to_str, #to_s]
+      # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
+      # @return [Integer]
       def self.sendx(dest, string, *args)
         string = String(string)
         result = ::CZMQ::FFI.zstr_sendx(dest, string, *args)
@@ -118,12 +159,18 @@ module CZMQ
 
       # Free a provided string, and nullify the parent pointer. Safe to call on
       # a null pointer.                                                        
+      #
+      # @param string_p [::FFI::Pointer, #to_ptr]
+      # @return [void]
       def self.free(string_p)
         result = ::CZMQ::FFI.zstr_free(string_p)
         result
       end
 
       # Self test of this class.
+      #
+      # @param verbose [Boolean]
+      # @return [void]
       def self.test(verbose)
         verbose = !(0==verbose||!verbose) # boolean
         result = ::CZMQ::FFI.zstr_test(verbose)

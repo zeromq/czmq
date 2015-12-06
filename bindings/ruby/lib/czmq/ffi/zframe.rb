@@ -7,14 +7,17 @@ module CZMQ
   module FFI
 
     # working with single message frames
+    # @note This class is 100% generated using zproject.
     class Zframe
-      class DestroyedError < RuntimeError; end
-
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
       end
-      def initialize ptr, finalize=true
+      # Attaches the pointer _ptr_ to this instance and defines a finalizer for
+      # it if necessary.
+      # @param ptr [::FFI::Pointer]
+      # @param finalize [Boolean]
+      def initialize(ptr, finalize = true)
         @ptr = ptr
         if @ptr.null?
           @ptr = nil # Remove null pointers so we don't have to test for them.
@@ -23,24 +26,32 @@ module CZMQ
           ObjectSpace.define_finalizer self, @finalizer
         end
       end
-      def self.create_finalizer_for ptr
+      # @param ptr [::FFI::Pointer]
+      # @return [Proc]
+      def self.create_finalizer_for(ptr)
         Proc.new do
           ptr_ptr = ::FFI::MemoryPointer.new :pointer
           ptr_ptr.write_pointer ptr
           ::CZMQ::FFI.zframe_destroy ptr_ptr
         end
       end
+      # @return [Boolean]
       def null?
         !@ptr or @ptr.null?
       end
       # Return internal pointer
+      # @return [::FFI::Pointer]
       def __ptr
         raise DestroyedError unless @ptr
         @ptr
       end
       # So external Libraries can just pass the Object to a FFI function which expects a :pointer
       alias_method :to_ptr, :__ptr
-      # Nullify internal pointer and return pointer pointer
+      # Nullify internal pointer and return pointer pointer.
+      # @note This detaches the current instance from the native object
+      #   and thus makes it unusable.
+      # @return [::FFI::MemoryPointer] the pointer pointing to a pointer
+      #   pointing to the native object
       def __ptr_give_ref
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
@@ -54,6 +65,9 @@ module CZMQ
       # Create a new frame. If size is not null, allocates the frame data
       # to the specified size. If additionally, data is not null, copies 
       # size octets from the specified data into the frame body.         
+      # @param data [::FFI::Pointer, #to_ptr]
+      # @param size [Integer, #to_int, #to_i]
+      # @return [CZMQ::Zframe]
       def self.new(data, size)
         size = Integer(size)
         ptr = ::CZMQ::FFI.zframe_new(data, size)
@@ -61,6 +75,8 @@ module CZMQ
       end
 
       # Destroy a frame
+      #
+      # @return [void]
       def destroy()
         return unless @ptr
         self_p = __ptr_give_ref
@@ -69,6 +85,8 @@ module CZMQ
       end
 
       # Create an empty (zero-sized) frame
+      #
+      # @return [Zframe]
       def self.new_empty()
         result = ::CZMQ::FFI.zframe_new_empty()
         result = Zframe.__new result, true
@@ -76,6 +94,9 @@ module CZMQ
       end
 
       # Create a frame with a specified string content.
+      #
+      # @param string [String, #to_str, #to_s]
+      # @return [Zframe]
       def self.from(string)
         string = String(string)
         result = ::CZMQ::FFI.zframe_from(string)
@@ -86,6 +107,9 @@ module CZMQ
       # Receive frame from socket, returns zframe_t object or NULL if the recv  
       # was interrupted. Does a blocking recv, if you want to not block then use
       # zpoller or zloop.                                                       
+      #
+      # @param source [::FFI::Pointer, #to_ptr]
+      # @return [Zframe]
       def self.recv(source)
         result = ::CZMQ::FFI.zframe_recv(source)
         result = Zframe.__new result, true
@@ -94,6 +118,11 @@ module CZMQ
 
       # Send a frame to a socket, destroy frame after sending.
       # Return -1 on error, 0 on success.                     
+      #
+      # @param self_p [#__ptr_give_ref]
+      # @param dest [::FFI::Pointer, #to_ptr]
+      # @param flags [Integer, #to_int, #to_i]
+      # @return [Integer]
       def self.send(self_p, dest, flags)
         self_p = self_p.__ptr_give_ref
         flags = Integer(flags)
@@ -102,6 +131,8 @@ module CZMQ
       end
 
       # Return number of bytes in frame data
+      #
+      # @return [Integer]
       def size()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -110,6 +141,8 @@ module CZMQ
       end
 
       # Return address of frame data
+      #
+      # @return [::FFI::Pointer]
       def data()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -119,6 +152,8 @@ module CZMQ
 
       # Create a new frame that duplicates an existing frame. If frame is null,
       # or memory was exhausted, returns null.                                 
+      #
+      # @return [Zframe]
       def dup()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -129,6 +164,8 @@ module CZMQ
 
       # Return frame data encoded as printable hex string, useful for 0MQ UUIDs.
       # Caller must free string when finished with it.                          
+      #
+      # @return [::FFI::AutoPointer]
       def strhex()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -139,6 +176,8 @@ module CZMQ
 
       # Return frame data copied into freshly allocated string
       # Caller must free string when finished with it.        
+      #
+      # @return [::FFI::AutoPointer]
       def strdup()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -148,6 +187,9 @@ module CZMQ
       end
 
       # Return TRUE if frame body is equal to string, excluding terminator
+      #
+      # @param string [String, #to_str, #to_s]
+      # @return [Boolean]
       def streq(string)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -158,6 +200,8 @@ module CZMQ
 
       # Return frame MORE indicator (1 or 0), set when reading frame from socket
       # or by the zframe_set_more() method                                      
+      #
+      # @return [Integer]
       def more()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -167,6 +211,9 @@ module CZMQ
 
       # Set frame MORE indicator (1 or 0). Note this is NOT used when sending
       # frame to socket, you have to specify flag explicitly.                
+      #
+      # @param more [Integer, #to_int, #to_i]
+      # @return [void]
       def set_more(more)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -177,6 +224,8 @@ module CZMQ
 
       # Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
       # Else returns zero.                                                  
+      #
+      # @return [Integer]
       def routing_id()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -186,6 +235,9 @@ module CZMQ
 
       # Set routing ID on frame. This is used if/when the frame is sent to a
       # ZMQ_SERVER socket.                                                  
+      #
+      # @param routing_id [Integer, #to_int, #to_i]
+      # @return [void]
       def set_routing_id(routing_id)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -196,6 +248,9 @@ module CZMQ
 
       # Return TRUE if two frames have identical size and data
       # If either frame is NULL, equality is always false.    
+      #
+      # @param other [Zframe, #__ptr]
+      # @return [Boolean]
       def eq(other)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -205,6 +260,10 @@ module CZMQ
       end
 
       # Set new contents for frame
+      #
+      # @param data [::FFI::Pointer, #to_ptr]
+      # @param size [Integer, #to_int, #to_i]
+      # @return [void]
       def reset(data, size)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -215,6 +274,9 @@ module CZMQ
 
       # Send message to zsys log sink (may be stdout, or system facility as       
       # configured by zsys_set_logstream). Prefix shows before frame, if not null.
+      #
+      # @param prefix [String, #to_str, #to_s]
+      # @return [void]
       def print(prefix)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -224,12 +286,18 @@ module CZMQ
       end
 
       # Probe the supplied object, and report if it looks like a zframe_t.
+      #
+      # @param self_ [::FFI::Pointer, #to_ptr]
+      # @return [Boolean]
       def self.is(self_)
         result = ::CZMQ::FFI.zframe_is(self_)
         result
       end
 
       # Self test of this class.
+      #
+      # @param verbose [Boolean]
+      # @return [void]
       def self.test(verbose)
         verbose = !(0==verbose||!verbose) # boolean
         result = ::CZMQ::FFI.zframe_test(verbose)

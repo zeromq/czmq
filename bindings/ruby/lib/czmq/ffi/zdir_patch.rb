@@ -7,14 +7,17 @@ module CZMQ
   module FFI
 
     # work with directory patches
+    # @note This class is 100% generated using zproject.
     class ZdirPatch
-      class DestroyedError < RuntimeError; end
-
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
       end
-      def initialize ptr, finalize=true
+      # Attaches the pointer _ptr_ to this instance and defines a finalizer for
+      # it if necessary.
+      # @param ptr [::FFI::Pointer]
+      # @param finalize [Boolean]
+      def initialize(ptr, finalize = true)
         @ptr = ptr
         if @ptr.null?
           @ptr = nil # Remove null pointers so we don't have to test for them.
@@ -23,24 +26,32 @@ module CZMQ
           ObjectSpace.define_finalizer self, @finalizer
         end
       end
-      def self.create_finalizer_for ptr
+      # @param ptr [::FFI::Pointer]
+      # @return [Proc]
+      def self.create_finalizer_for(ptr)
         Proc.new do
           ptr_ptr = ::FFI::MemoryPointer.new :pointer
           ptr_ptr.write_pointer ptr
           ::CZMQ::FFI.zdir_patch_destroy ptr_ptr
         end
       end
+      # @return [Boolean]
       def null?
         !@ptr or @ptr.null?
       end
       # Return internal pointer
+      # @return [::FFI::Pointer]
       def __ptr
         raise DestroyedError unless @ptr
         @ptr
       end
       # So external Libraries can just pass the Object to a FFI function which expects a :pointer
       alias_method :to_ptr, :__ptr
-      # Nullify internal pointer and return pointer pointer
+      # Nullify internal pointer and return pointer pointer.
+      # @note This detaches the current instance from the native object
+      #   and thus makes it unusable.
+      # @return [::FFI::MemoryPointer] the pointer pointing to a pointer
+      #   pointing to the native object
       def __ptr_give_ref
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
@@ -52,6 +63,11 @@ module CZMQ
       end
 
       # Create new patch
+      # @param path [String, #to_str, #to_s]
+      # @param file [Zfile, #__ptr]
+      # @param op [Symbol]
+      # @param alias_ [String, #to_str, #to_s]
+      # @return [CZMQ::ZdirPatch]
       def self.new(path, file, op, alias_)
         path = String(path)
         file = file.__ptr if file
@@ -61,6 +77,8 @@ module CZMQ
       end
 
       # Destroy a patch
+      #
+      # @return [void]
       def destroy()
         return unless @ptr
         self_p = __ptr_give_ref
@@ -70,6 +88,8 @@ module CZMQ
 
       # Create copy of a patch. If the patch is null, or memory was exhausted,
       # returns null.                                                         
+      #
+      # @return [ZdirPatch]
       def dup()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -79,6 +99,8 @@ module CZMQ
       end
 
       # Return patch file directory path
+      #
+      # @return [String]
       def path()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -87,6 +109,8 @@ module CZMQ
       end
 
       # Return patch file item
+      #
+      # @return [Zfile]
       def file()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -96,6 +120,8 @@ module CZMQ
       end
 
       # Return operation
+      #
+      # @return [Symbol]
       def op()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -104,6 +130,8 @@ module CZMQ
       end
 
       # Return patch virtual file path
+      #
+      # @return [String]
       def vpath()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -112,6 +140,8 @@ module CZMQ
       end
 
       # Calculate hash digest for file (create only)
+      #
+      # @return [void]
       def digest_set()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -120,6 +150,8 @@ module CZMQ
       end
 
       # Return hash digest for patch file
+      #
+      # @return [String]
       def digest()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -128,6 +160,9 @@ module CZMQ
       end
 
       # Self test of this class.
+      #
+      # @param verbose [Boolean]
+      # @return [void]
       def self.test(verbose)
         verbose = !(0==verbose||!verbose) # boolean
         result = ::CZMQ::FFI.zdir_patch_test(verbose)

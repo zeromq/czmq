@@ -7,14 +7,17 @@ module CZMQ
   module FFI
 
     # helper functions for working with files.
+    # @note This class is 100% generated using zproject.
     class Zfile
-      class DestroyedError < RuntimeError; end
-
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
       end
-      def initialize ptr, finalize=true
+      # Attaches the pointer _ptr_ to this instance and defines a finalizer for
+      # it if necessary.
+      # @param ptr [::FFI::Pointer]
+      # @param finalize [Boolean]
+      def initialize(ptr, finalize = true)
         @ptr = ptr
         if @ptr.null?
           @ptr = nil # Remove null pointers so we don't have to test for them.
@@ -23,24 +26,32 @@ module CZMQ
           ObjectSpace.define_finalizer self, @finalizer
         end
       end
-      def self.create_finalizer_for ptr
+      # @param ptr [::FFI::Pointer]
+      # @return [Proc]
+      def self.create_finalizer_for(ptr)
         Proc.new do
           ptr_ptr = ::FFI::MemoryPointer.new :pointer
           ptr_ptr.write_pointer ptr
           ::CZMQ::FFI.zfile_destroy ptr_ptr
         end
       end
+      # @return [Boolean]
       def null?
         !@ptr or @ptr.null?
       end
       # Return internal pointer
+      # @return [::FFI::Pointer]
       def __ptr
         raise DestroyedError unless @ptr
         @ptr
       end
       # So external Libraries can just pass the Object to a FFI function which expects a :pointer
       alias_method :to_ptr, :__ptr
-      # Nullify internal pointer and return pointer pointer
+      # Nullify internal pointer and return pointer pointer.
+      # @note This detaches the current instance from the native object
+      #   and thus makes it unusable.
+      # @return [::FFI::MemoryPointer] the pointer pointing to a pointer
+      #   pointing to the native object
       def __ptr_give_ref
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
@@ -56,6 +67,9 @@ module CZMQ
       # text file containing one line, the filename of a target file. Reading
       # data from the symbolic link actually reads from the target file. Path
       # may be NULL, in which case it is not used.                           
+      # @param path [String, #to_str, #to_s]
+      # @param name [String, #to_str, #to_s]
+      # @return [CZMQ::Zfile]
       def self.new(path, name)
         path = String(path)
         name = String(name)
@@ -64,6 +78,8 @@ module CZMQ
       end
 
       # Destroy a file item
+      #
+      # @return [void]
       def destroy()
         return unless @ptr
         self_p = __ptr_give_ref
@@ -73,6 +89,8 @@ module CZMQ
 
       # Duplicate a file item, returns a newly constructed item. If the file
       # is null, or memory was exhausted, returns null.                     
+      #
+      # @return [Zfile]
       def dup()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -82,6 +100,9 @@ module CZMQ
       end
 
       # Return file name, remove path if provided
+      #
+      # @param path [String, #to_str, #to_s]
+      # @return [String]
       def filename(path)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -93,6 +114,8 @@ module CZMQ
       # Refresh file properties from disk; this is not done automatically   
       # on access methods, otherwise it is not possible to compare directory
       # snapshots.                                                          
+      #
+      # @return [void]
       def restat()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -102,6 +125,8 @@ module CZMQ
 
       # Return when the file was last modified. If you want this to reflect the
       # current situation, call zfile_restat before checking this property.    
+      #
+      # @return [::FFI::Pointer]
       def modified()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -111,6 +136,8 @@ module CZMQ
 
       # Return the last-known size of the file. If you want this to reflect the
       # current situation, call zfile_restat before checking this property.    
+      #
+      # @return [::FFI::Pointer]
       def cursize()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -120,6 +147,8 @@ module CZMQ
 
       # Return true if the file is a directory. If you want this to reflect   
       # any external changes, call zfile_restat before checking this property.
+      #
+      # @return [Boolean]
       def is_directory()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -129,6 +158,8 @@ module CZMQ
 
       # Return true if the file is a regular file. If you want this to reflect
       # any external changes, call zfile_restat before checking this property.
+      #
+      # @return [Boolean]
       def is_regular()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -139,6 +170,8 @@ module CZMQ
       # Return true if the file is readable by this process. If you want this to
       # reflect any external changes, call zfile_restat before checking this    
       # property.                                                               
+      #
+      # @return [Boolean]
       def is_readable()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -149,6 +182,8 @@ module CZMQ
       # Return true if the file is writeable by this process. If you want this 
       # to reflect any external changes, call zfile_restat before checking this
       # property.                                                              
+      #
+      # @return [Boolean]
       def is_writeable()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -158,6 +193,8 @@ module CZMQ
 
       # Check if file has stopped changing and can be safely processed.
       # Updates the file statistics from disk at every call.           
+      #
+      # @return [Boolean]
       def is_stable()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -167,6 +204,8 @@ module CZMQ
 
       # Return true if the file was changed on disk since the zfile_t object
       # was created, or the last zfile_restat() call made on it.            
+      #
+      # @return [Boolean]
       def has_changed()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -175,6 +214,8 @@ module CZMQ
       end
 
       # Remove the file from disk
+      #
+      # @return [void]
       def remove()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -184,6 +225,8 @@ module CZMQ
 
       # Open file for reading                             
       # Returns 0 if OK, -1 if not found or not accessible
+      #
+      # @return [Integer]
       def input()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -194,6 +237,8 @@ module CZMQ
       # Open file for writing, creating directory if needed               
       # File is created if necessary; chunks can be written to file at any
       # location. Returns 0 if OK, -1 if error.                           
+      #
+      # @return [Integer]
       def output()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -203,6 +248,10 @@ module CZMQ
 
       # Read chunk from file at specified position. If this was the last chunk,
       # sets the eof property. Returns a null chunk in case of error.          
+      #
+      # @param bytes [Integer, #to_int, #to_i]
+      # @param offset [::FFI::Pointer, #to_ptr]
+      # @return [::FFI::Pointer]
       def read(bytes, offset)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -212,6 +261,8 @@ module CZMQ
       end
 
       # Returns true if zfile_read() just read the last chunk in the file.
+      #
+      # @return [Boolean]
       def eof()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -221,6 +272,10 @@ module CZMQ
 
       # Write chunk to file at specified position
       # Return 0 if OK, else -1                  
+      #
+      # @param chunk [::FFI::Pointer, #to_ptr]
+      # @param offset [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
       def write(chunk, offset)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -230,6 +285,8 @@ module CZMQ
 
       # Read next line of text from file. Returns a pointer to the text line,
       # or NULL if there was nothing more to read from the file.             
+      #
+      # @return [String]
       def readln()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -238,6 +295,8 @@ module CZMQ
       end
 
       # Close file, if open
+      #
+      # @return [void]
       def close()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -246,6 +305,8 @@ module CZMQ
       end
 
       # Return file handle, if opened
+      #
+      # @return [::FFI::Pointer]
       def handle()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -254,6 +315,8 @@ module CZMQ
       end
 
       # Calculate SHA1 digest for file, using zdigest class.
+      #
+      # @return [String]
       def digest()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -262,6 +325,9 @@ module CZMQ
       end
 
       # Self test of this class.
+      #
+      # @param verbose [Boolean]
+      # @return [void]
       def self.test(verbose)
         verbose = !(0==verbose||!verbose) # boolean
         result = ::CZMQ::FFI.zfile_test(verbose)

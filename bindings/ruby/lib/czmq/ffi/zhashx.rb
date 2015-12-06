@@ -7,14 +7,17 @@ module CZMQ
   module FFI
 
     # extended generic type-free hash container
+    # @note This class is 100% generated using zproject.
     class Zhashx
-      class DestroyedError < RuntimeError; end
-
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
       end
-      def initialize ptr, finalize=true
+      # Attaches the pointer _ptr_ to this instance and defines a finalizer for
+      # it if necessary.
+      # @param ptr [::FFI::Pointer]
+      # @param finalize [Boolean]
+      def initialize(ptr, finalize = true)
         @ptr = ptr
         if @ptr.null?
           @ptr = nil # Remove null pointers so we don't have to test for them.
@@ -23,24 +26,32 @@ module CZMQ
           ObjectSpace.define_finalizer self, @finalizer
         end
       end
-      def self.create_finalizer_for ptr
+      # @param ptr [::FFI::Pointer]
+      # @return [Proc]
+      def self.create_finalizer_for(ptr)
         Proc.new do
           ptr_ptr = ::FFI::MemoryPointer.new :pointer
           ptr_ptr.write_pointer ptr
           ::CZMQ::FFI.zhashx_destroy ptr_ptr
         end
       end
+      # @return [Boolean]
       def null?
         !@ptr or @ptr.null?
       end
       # Return internal pointer
+      # @return [::FFI::Pointer]
       def __ptr
         raise DestroyedError unless @ptr
         @ptr
       end
       # So external Libraries can just pass the Object to a FFI function which expects a :pointer
       alias_method :to_ptr, :__ptr
-      # Nullify internal pointer and return pointer pointer
+      # Nullify internal pointer and return pointer pointer.
+      # @note This detaches the current instance from the native object
+      #   and thus makes it unusable.
+      # @return [::FFI::MemoryPointer] the pointer pointing to a pointer
+      #   pointing to the native object
       def __ptr_give_ref
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
@@ -56,7 +67,7 @@ module CZMQ
       #     typedef void (zhashx_destructor_fn) (
       #         void **item);                    
       #
-      # WARNING: If your Ruby code doesn't retain a reference to the
+      # @note WARNING: If your Ruby code doesn't retain a reference to the
       #   FFI::Function object after passing it to a C function call,
       #   it may be garbage collected while C still holds the pointer,
       #   potentially resulting in a segmentation fault.
@@ -72,7 +83,7 @@ module CZMQ
       #     typedef void * (zhashx_duplicator_fn) (
       #         const void *item);                 
       #
-      # WARNING: If your Ruby code doesn't retain a reference to the
+      # @note WARNING: If your Ruby code doesn't retain a reference to the
       #   FFI::Function object after passing it to a C function call,
       #   it may be garbage collected while C still holds the pointer,
       #   potentially resulting in a segmentation fault.
@@ -88,7 +99,7 @@ module CZMQ
       #     typedef int (zhashx_comparator_fn) (      
       #         const void *item1, const void *item2);
       #
-      # WARNING: If your Ruby code doesn't retain a reference to the
+      # @note WARNING: If your Ruby code doesn't retain a reference to the
       #   FFI::Function object after passing it to a C function call,
       #   it may be garbage collected while C still holds the pointer,
       #   potentially resulting in a segmentation fault.
@@ -105,7 +116,7 @@ module CZMQ
       #     typedef void (zhashx_free_fn) (
       #         void *data);               
       #
-      # WARNING: If your Ruby code doesn't retain a reference to the
+      # @note WARNING: If your Ruby code doesn't retain a reference to the
       #   FFI::Function object after passing it to a C function call,
       #   it may be garbage collected while C still holds the pointer,
       #   potentially resulting in a segmentation fault.
@@ -121,7 +132,7 @@ module CZMQ
       #     typedef size_t (zhashx_hash_fn) (
       #         const void *key);            
       #
-      # WARNING: If your Ruby code doesn't retain a reference to the
+      # @note WARNING: If your Ruby code doesn't retain a reference to the
       #   FFI::Function object after passing it to a C function call,
       #   it may be garbage collected while C still holds the pointer,
       #   potentially resulting in a segmentation fault.
@@ -138,7 +149,7 @@ module CZMQ
       #     typedef int (zhashx_foreach_fn) (                
       #         const char *key, void *item, void *argument);
       #
-      # WARNING: If your Ruby code doesn't retain a reference to the
+      # @note WARNING: If your Ruby code doesn't retain a reference to the
       #   FFI::Function object after passing it to a C function call,
       #   it may be garbage collected while C still holds the pointer,
       #   potentially resulting in a segmentation fault.
@@ -151,12 +162,15 @@ module CZMQ
       end
 
       # Create a new, empty hash container
+      # @return [CZMQ::Zhashx]
       def self.new()
         ptr = ::CZMQ::FFI.zhashx_new()
         __new ptr
       end
 
       # Destroy a hash container and all items in it
+      #
+      # @return [void]
       def destroy()
         return unless @ptr
         self_p = __ptr_give_ref
@@ -167,6 +181,10 @@ module CZMQ
       # Insert item into hash table with specified key and item.               
       # If key is already present returns -1 and leaves existing item unchanged
       # Returns 0 on success.                                                  
+      #
+      # @param key [::FFI::Pointer, #to_ptr]
+      # @param item [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
       def insert(key, item)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -179,6 +197,10 @@ module CZMQ
       # a container item destructor, this is called on the old value. If the key 
       # was not already present, inserts a new item. Sets the hash cursor to the 
       # new item.                                                                
+      #
+      # @param key [::FFI::Pointer, #to_ptr]
+      # @param item [::FFI::Pointer, #to_ptr]
+      # @return [void]
       def update(key, item)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -188,6 +210,9 @@ module CZMQ
 
       # Remove an item specified by key from the hash table. If there was no such
       # item, this function does nothing.                                        
+      #
+      # @param key [::FFI::Pointer, #to_ptr]
+      # @return [void]
       def delete(key)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -198,6 +223,8 @@ module CZMQ
       # Delete all items from the hash table. If the key destructor is  
       # set, calls it on every key. If the item destructor is set, calls
       # it on every item.                                               
+      #
+      # @return [void]
       def purge()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -206,6 +233,9 @@ module CZMQ
       end
 
       # Return the item at the specified key, or null
+      #
+      # @param key [::FFI::Pointer, #to_ptr]
+      # @return [::FFI::Pointer]
       def lookup(key)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -215,6 +245,10 @@ module CZMQ
 
       # Reindexes an item from an old key to a new key. If there was no such
       # item, does nothing. Returns 0 if successful, else -1.               
+      #
+      # @param old_key [::FFI::Pointer, #to_ptr]
+      # @param new_key [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
       def rename(old_key, new_key)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -227,6 +261,10 @@ module CZMQ
       # Use this when hash items are dynamically allocated, to ensure that     
       # you don't have memory leaks. You can pass 'free' or NULL as a free_fn. 
       # Returns the item, or NULL if there is no such item.                    
+      #
+      # @param key [::FFI::Pointer, #to_ptr]
+      # @param free_fn [::FFI::Pointer, #to_ptr]
+      # @return [::FFI::Pointer]
       def freefn(key, free_fn)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -235,6 +273,8 @@ module CZMQ
       end
 
       # Return the number of keys/items in the hash table
+      #
+      # @return [Integer]
       def size()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -245,6 +285,8 @@ module CZMQ
       # Return a zlistx_t containing the keys for the items in the       
       # table. Uses the key_duplicator to duplicate all keys and sets the
       # key_destructor as destructor for the list.                       
+      #
+      # @return [::FFI::Pointer]
       def keys()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -255,6 +297,8 @@ module CZMQ
       # Return a zlistx_t containing the values for the items in the  
       # table. Uses the duplicator to duplicate all items and sets the
       # destructor as destructor for the list.                        
+      #
+      # @return [::FFI::Pointer]
       def values()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -266,6 +310,8 @@ module CZMQ
       # or NULL if the table is empty. This method is simpler to use than the 
       # foreach() method, which is deprecated. To access the key for this item
       # use zhashx_cursor(). NOTE: do NOT modify the table while iterating.   
+      #
+      # @return [::FFI::Pointer]
       def first()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -279,6 +325,8 @@ module CZMQ
       # items in sorted order, use zhashx_keys() and then zlistx_sort(). To  
       # access the key for this item use zhashx_cursor(). NOTE: do NOT modify
       # the table while iterating.                                           
+      #
+      # @return [::FFI::Pointer]
       def next()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -290,6 +338,8 @@ module CZMQ
       # was returned. This is a constant string that you may not modify or     
       # deallocate, and which lasts as long as the item in the hash. After an  
       # unsuccessful first/next, returns NULL.                                 
+      #
+      # @return [::FFI::Pointer]
       def cursor()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -300,6 +350,10 @@ module CZMQ
       # Add a comment to hash table before saving to disk. You can add as many   
       # comment lines as you like. These comment lines are discarded when loading
       # the file. If you use a null format, all comments are deleted.            
+      #
+      # @param format [String, #to_str, #to_s]
+      # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
+      # @return [void]
       def comment(format, *args)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -311,6 +365,9 @@ module CZMQ
       # Save hash table to a text file in name=value format. Hash values must be
       # printable strings; keys may not contain '=' character. Returns 0 if OK, 
       # else -1 if a file error occurred.                                       
+      #
+      # @param filename [String, #to_str, #to_s]
+      # @return [Integer]
       def save(filename)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -322,6 +379,9 @@ module CZMQ
       # Load hash table from a text file in name=value format; hash table must 
       # already exist. Hash values must printable strings; keys may not contain
       # '=' character. Returns 0 if OK, else -1 if a file was not readable.    
+      #
+      # @param filename [String, #to_str, #to_s]
+      # @return [Integer]
       def load(filename)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -334,6 +394,8 @@ module CZMQ
       # reload the file if it has been modified since, and is "stable", i.e. not 
       # still changing. Returns 0 if OK, -1 if there was an error reloading the  
       # file.                                                                    
+      #
+      # @return [Integer]
       def refresh()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -361,6 +423,8 @@ module CZMQ
       #                                                                      
       # Comments are not included in the packed data. Item values MUST be    
       # strings.                                                             
+      #
+      # @return [Zframe]
       def pack()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -372,6 +436,9 @@ module CZMQ
       # Unpack binary frame into a new hash table. Packed data must follow format
       # defined by zhashx_pack. Hash table is set to autofree. An empty frame    
       # unpacks to an empty hash table.                                          
+      #
+      # @param frame [Zframe, #__ptr]
+      # @return [Zhashx]
       def self.unpack(frame)
         frame = frame.__ptr if frame
         result = ::CZMQ::FFI.zhashx_unpack(frame)
@@ -384,6 +451,8 @@ module CZMQ
       # reference. Note that this method's behavior changed slightly for CZMQ 
       # v3.x, as it does not set nor respect autofree. It does however let you
       # duplicate any hash table safely. The old behavior is in zhashx_dup_v2.
+      #
+      # @return [Zhashx]
       def dup()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -394,6 +463,9 @@ module CZMQ
 
       # Set a user-defined deallocator for hash items; by default items are not
       # freed when the hash is destroyed.                                      
+      #
+      # @param destructor [::FFI::Pointer, #to_ptr]
+      # @return [void]
       def set_destructor(destructor)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -403,6 +475,9 @@ module CZMQ
 
       # Set a user-defined duplicator for hash items; by default items are not
       # copied when the hash is duplicated.                                   
+      #
+      # @param duplicator [::FFI::Pointer, #to_ptr]
+      # @return [void]
       def set_duplicator(duplicator)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -412,6 +487,9 @@ module CZMQ
 
       # Set a user-defined deallocator for keys; by default keys are freed
       # when the hash is destroyed using free().                          
+      #
+      # @param destructor [::FFI::Pointer, #to_ptr]
+      # @return [void]
       def set_key_destructor(destructor)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -421,6 +499,9 @@ module CZMQ
 
       # Set a user-defined duplicator for keys; by default keys are duplicated
       # using strdup.                                                         
+      #
+      # @param duplicator [::FFI::Pointer, #to_ptr]
+      # @return [void]
       def set_key_duplicator(duplicator)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -430,6 +511,9 @@ module CZMQ
 
       # Set a user-defined comparator for keys; by default keys are
       # compared using strcmp.                                     
+      #
+      # @param comparator [::FFI::Pointer, #to_ptr]
+      # @return [void]
       def set_key_comparator(comparator)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -439,6 +523,9 @@ module CZMQ
 
       # Set a user-defined comparator for keys; by default keys are
       # compared using strcmp.                                     
+      #
+      # @param hasher [::FFI::Pointer, #to_ptr]
+      # @return [void]
       def set_key_hasher(hasher)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -450,6 +537,8 @@ module CZMQ
       # Does not copy items themselves. Rebuilds new table so may be slow on 
       # very large tables. NOTE: only works with item values that are strings
       # since there's no other way to know how to duplicate the item value.  
+      #
+      # @return [Zhashx]
       def dup_v2()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -460,6 +549,8 @@ module CZMQ
 
       # DEPRECATED as clumsy -- use set_destructor instead
       # Set hash for automatic value destruction          
+      #
+      # @return [void]
       def autofree()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -472,6 +563,10 @@ module CZMQ
       # defined order. Stops if callback function returns non-zero and returns 
       # final return code from callback function (zero = success).             
       # Callback function for zhashx_foreach method                            
+      #
+      # @param callback [::FFI::Pointer, #to_ptr]
+      # @param argument [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
       def foreach(callback, argument)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -480,6 +575,9 @@ module CZMQ
       end
 
       # Self test of this class.
+      #
+      # @param verbose [Boolean]
+      # @return [void]
       def self.test(verbose)
         verbose = !(0==verbose||!verbose) # boolean
         result = ::CZMQ::FFI.zhashx_test(verbose)

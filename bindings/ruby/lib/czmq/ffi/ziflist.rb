@@ -7,14 +7,17 @@ module CZMQ
   module FFI
 
     # List of network interfaces available on system
+    # @note This class is 100% generated using zproject.
     class Ziflist
-      class DestroyedError < RuntimeError; end
-
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
       end
-      def initialize ptr, finalize=true
+      # Attaches the pointer _ptr_ to this instance and defines a finalizer for
+      # it if necessary.
+      # @param ptr [::FFI::Pointer]
+      # @param finalize [Boolean]
+      def initialize(ptr, finalize = true)
         @ptr = ptr
         if @ptr.null?
           @ptr = nil # Remove null pointers so we don't have to test for them.
@@ -23,24 +26,32 @@ module CZMQ
           ObjectSpace.define_finalizer self, @finalizer
         end
       end
-      def self.create_finalizer_for ptr
+      # @param ptr [::FFI::Pointer]
+      # @return [Proc]
+      def self.create_finalizer_for(ptr)
         Proc.new do
           ptr_ptr = ::FFI::MemoryPointer.new :pointer
           ptr_ptr.write_pointer ptr
           ::CZMQ::FFI.ziflist_destroy ptr_ptr
         end
       end
+      # @return [Boolean]
       def null?
         !@ptr or @ptr.null?
       end
       # Return internal pointer
+      # @return [::FFI::Pointer]
       def __ptr
         raise DestroyedError unless @ptr
         @ptr
       end
       # So external Libraries can just pass the Object to a FFI function which expects a :pointer
       alias_method :to_ptr, :__ptr
-      # Nullify internal pointer and return pointer pointer
+      # Nullify internal pointer and return pointer pointer.
+      # @note This detaches the current instance from the native object
+      #   and thus makes it unusable.
+      # @return [::FFI::MemoryPointer] the pointer pointing to a pointer
+      #   pointing to the native object
       def __ptr_give_ref
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
@@ -52,12 +63,15 @@ module CZMQ
       end
 
       # Get a list of network interfaces currently defined on the system
+      # @return [CZMQ::Ziflist]
       def self.new()
         ptr = ::CZMQ::FFI.ziflist_new()
         __new ptr
       end
 
       # Destroy a ziflist instance
+      #
+      # @return [void]
       def destroy()
         return unless @ptr
         self_p = __ptr_give_ref
@@ -66,6 +80,8 @@ module CZMQ
       end
 
       # Reload network interfaces from system
+      #
+      # @return [void]
       def reload()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -74,6 +90,8 @@ module CZMQ
       end
 
       # Return the number of network interfaces on system
+      #
+      # @return [Integer]
       def size()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -82,6 +100,8 @@ module CZMQ
       end
 
       # Get first network interface, return NULL if there are none
+      #
+      # @return [String]
       def first()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -90,6 +110,8 @@ module CZMQ
       end
 
       # Get next network interface, return NULL if we hit the last one
+      #
+      # @return [String]
       def next()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -98,6 +120,8 @@ module CZMQ
       end
 
       # Return the current interface IP address as a printable string
+      #
+      # @return [String]
       def address()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -106,6 +130,8 @@ module CZMQ
       end
 
       # Return the current interface broadcast address as a printable string
+      #
+      # @return [String]
       def broadcast()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -114,6 +140,8 @@ module CZMQ
       end
 
       # Return the current interface network mask as a printable string
+      #
+      # @return [String]
       def netmask()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -122,6 +150,8 @@ module CZMQ
       end
 
       # Return the list of interfaces.
+      #
+      # @return [void]
       def print()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -130,6 +160,9 @@ module CZMQ
       end
 
       # Self test of this class.
+      #
+      # @param verbose [Boolean]
+      # @return [void]
       def self.test(verbose)
         verbose = !(0==verbose||!verbose) # boolean
         result = ::CZMQ::FFI.ziflist_test(verbose)

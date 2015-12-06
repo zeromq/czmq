@@ -7,14 +7,17 @@ module CZMQ
   module FFI
 
     # simple trie for tokenizable strings
+    # @note This class is 100% generated using zproject.
     class Ztrie
-      class DestroyedError < RuntimeError; end
-
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
       end
-      def initialize ptr, finalize=true
+      # Attaches the pointer _ptr_ to this instance and defines a finalizer for
+      # it if necessary.
+      # @param ptr [::FFI::Pointer]
+      # @param finalize [Boolean]
+      def initialize(ptr, finalize = true)
         @ptr = ptr
         if @ptr.null?
           @ptr = nil # Remove null pointers so we don't have to test for them.
@@ -23,24 +26,32 @@ module CZMQ
           ObjectSpace.define_finalizer self, @finalizer
         end
       end
-      def self.create_finalizer_for ptr
+      # @param ptr [::FFI::Pointer]
+      # @return [Proc]
+      def self.create_finalizer_for(ptr)
         Proc.new do
           ptr_ptr = ::FFI::MemoryPointer.new :pointer
           ptr_ptr.write_pointer ptr
           ::CZMQ::FFI.ztrie_destroy ptr_ptr
         end
       end
+      # @return [Boolean]
       def null?
         !@ptr or @ptr.null?
       end
       # Return internal pointer
+      # @return [::FFI::Pointer]
       def __ptr
         raise DestroyedError unless @ptr
         @ptr
       end
       # So external Libraries can just pass the Object to a FFI function which expects a :pointer
       alias_method :to_ptr, :__ptr
-      # Nullify internal pointer and return pointer pointer
+      # Nullify internal pointer and return pointer pointer.
+      # @note This detaches the current instance from the native object
+      #   and thus makes it unusable.
+      # @return [::FFI::MemoryPointer] the pointer pointing to a pointer
+      #   pointing to the native object
       def __ptr_give_ref
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
@@ -56,7 +67,7 @@ module CZMQ
       #     typedef void (ztrie_destroy_data_fn) (
       #         void **data);                     
       #
-      # WARNING: If your Ruby code doesn't retain a reference to the
+      # @note WARNING: If your Ruby code doesn't retain a reference to the
       #   FFI::Function object after passing it to a C function call,
       #   it may be garbage collected while C still holds the pointer,
       #   potentially resulting in a segmentation fault.
@@ -68,12 +79,16 @@ module CZMQ
       end
 
       # Creates a new ztrie.
+      # @param delimiter [::FFI::Pointer, #to_ptr]
+      # @return [CZMQ::Ztrie]
       def self.new(delimiter)
         ptr = ::CZMQ::FFI.ztrie_new(delimiter)
         __new ptr
       end
 
       # Destroy the ztrie.
+      #
+      # @return [void]
       def destroy()
         return unless @ptr
         self_p = __ptr_give_ref
@@ -84,6 +99,11 @@ module CZMQ
       # Inserts a new route into the tree and attaches the data. Returns -1     
       # if the route already exists, otherwise 0. This method takes ownership of
       # the provided data if a destroy_data_fn is provided.                     
+      #
+      # @param path [String, #to_str, #to_s]
+      # @param data [::FFI::Pointer, #to_ptr]
+      # @param destroy_data_fn [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
       def insert_route(path, data, destroy_data_fn)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -95,6 +115,9 @@ module CZMQ
       # Removes a route from the trie and destroys its data. Returns -1 if the
       # route does not exists, otherwise 0.                                   
       # the start of the list call zlist_first (). Advances the cursor.       
+      #
+      # @param path [String, #to_str, #to_s]
+      # @return [Integer]
       def remove_route(path)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -104,6 +127,9 @@ module CZMQ
       end
 
       # Returns true if the path matches a route in the tree, otherwise false.
+      #
+      # @param path [String, #to_str, #to_s]
+      # @return [Boolean]
       def matches(path)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -115,6 +141,8 @@ module CZMQ
       # Returns the data of a matched route from last ztrie_matches. If the path
       # did not match, returns NULL. Do not delete the data as it's owned by    
       # ztrie.                                                                  
+      #
+      # @return [::FFI::Pointer]
       def hit_data()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -123,6 +151,8 @@ module CZMQ
       end
 
       # Returns the count of parameters that a matched route has.
+      #
+      # @return [Integer]
       def hit_parameter_count()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -133,6 +163,8 @@ module CZMQ
       # Returns the parameters of a matched route with named regexes from last   
       # ztrie_matches. If the path did not match or the route did not contain any
       # named regexes, returns NULL.                                             
+      #
+      # @return [Zhashx]
       def hit_parameters()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -143,6 +175,8 @@ module CZMQ
 
       # Returns the asterisk matched part of a route, if there has been no match
       # or no asterisk match, returns NULL.                                     
+      #
+      # @return [String]
       def hit_asterisk_match()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -151,6 +185,8 @@ module CZMQ
       end
 
       # Print the trie
+      #
+      # @return [void]
       def print()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -159,6 +195,9 @@ module CZMQ
       end
 
       # Self test of this class.
+      #
+      # @param verbose [Boolean]
+      # @return [void]
       def self.test(verbose)
         verbose = !(0==verbose||!verbose) # boolean
         result = ::CZMQ::FFI.ztrie_test(verbose)
