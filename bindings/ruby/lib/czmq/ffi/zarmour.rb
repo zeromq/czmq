@@ -74,11 +74,11 @@ module CZMQ
       end
 
       # Encode a stream of bytes into an armoured string.
-      def encode(data, data_size)
+      def encode(data, size)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        data_size = Integer(data_size)
-        result = ::CZMQ::FFI.zarmour_encode(self_p, data, data_size)
+        size = Integer(size)
+        result = ::CZMQ::FFI.zarmour_encode(self_p, data, size)
         result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end

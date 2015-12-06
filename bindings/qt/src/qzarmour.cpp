@@ -39,9 +39,9 @@ const QString QZarmour::modeStr ()
 
 ///
 //  Encode a stream of bytes into an armoured string.
-QString QZarmour::encode (const byte *data, size_t dataSize)
+QString QZarmour::encode (const byte *data, size_t size)
 {
-    char *retStr_ = zarmour_encode (self, data, dataSize);
+    char *retStr_ = zarmour_encode (self, data, size);
     QString rv = QString (retStr_);
     free (retStr_);;
     return rv;

@@ -21,10 +21,13 @@ public class Zframe implements AutoCloseable{
     to the specified size. If additionally, data is not null, copies 
     size octets from the specified data into the frame body.         
     */
-    native static long __init (byte [] data, long size);
+    native static long __new (byte [] data, long size);
     public Zframe (byte [] data, long size) {
-        /*  TODO: if __init fails, self is null...  */
-        self = __init (data, size);
+        /*  TODO: if __new fails, self is null...  */
+        self = __new (data, size);
+    }
+    public Zframe (long pointer) {
+        self = pointer;
     }
     public Zframe () {
         self = 0;
@@ -41,16 +44,16 @@ public class Zframe implements AutoCloseable{
     /*
     Create an empty (zero-sized) frame
     */
-    native static long __new_empty ();
-    public long newEmpty () {
-        return __new_empty ();
+    native static long __newEmpty ();
+    public Zframe newEmpty () {
+        return new Zframe (__newEmpty ());
     }
     /*
     Create a frame with a specified string content.
     */
     native static long __from (String string);
-    public long from (String string) {
-        return __from (string);
+    public Zframe from (String string) {
+        return new Zframe (__from (string));
     }
     /*
     Receive frame from socket, returns zframe_t object or NULL if the recv  
@@ -58,45 +61,39 @@ public class Zframe implements AutoCloseable{
     zpoller or zloop.                                                       
     */
     native static long __recv (long source);
-    public long recv (long source) {
-        return __recv (source);
+    public Zframe recv (long source) {
+        return new Zframe (__recv (source));
     }
     /*
     Send a frame to a socket, destroy frame after sending.
     Return -1 on error, 0 on success.                     
     */
-    native static int __send (long selfP, long dest, int flags);
-    public int send (long selfP, long dest, int flags) {
-        return __send (selfP, dest, flags);
+    native static int __send (long self, long dest, int flags);
+    public int send (long dest, int flags) {
+        self = __send (self, dest, flags);
+        return 0;
     }
     /*
     Return number of bytes in frame data
     */
     native static long __size (long self);
-    public long size (long self) {
+    public long size () {
         return __size (self);
-    }
-    /*
-    Return address of frame data
-    */
-    native static byte [] __data (long self);
-    public byte [] data (long self) {
-        return __data (self);
     }
     /*
     Create a new frame that duplicates an existing frame. If frame is null,
     or memory was exhausted, returns null.                                 
     */
     native static long __dup (long self);
-    public long dup (long self) {
-        return __dup (self);
+    public Zframe dup () {
+        return new Zframe (__dup (self));
     }
     /*
     Return frame data encoded as printable hex string, useful for 0MQ UUIDs.
     Caller must free string when finished with it.                          
     */
     native static String __strhex (long self);
-    public String strhex (long self) {
+    public String strhex () {
         return __strhex (self);
     }
     /*
@@ -104,14 +101,14 @@ public class Zframe implements AutoCloseable{
     Caller must free string when finished with it.        
     */
     native static String __strdup (long self);
-    public String strdup (long self) {
+    public String strdup () {
         return __strdup (self);
     }
     /*
     Return TRUE if frame body is equal to string, excluding terminator
     */
     native static boolean __streq (long self, String string);
-    public boolean streq (long self, String string) {
+    public boolean streq (String string) {
         return __streq (self, string);
     }
     /*
@@ -119,46 +116,46 @@ public class Zframe implements AutoCloseable{
     or by the zframe_set_more() method                                      
     */
     native static int __more (long self);
-    public int more (long self) {
+    public int more () {
         return __more (self);
     }
     /*
     Set frame MORE indicator (1 or 0). Note this is NOT used when sending
     frame to socket, you have to specify flag explicitly.                
     */
-    native static void __set_more (long self, int more);
-    public void setMore (long self, int more) {
-        __set_more (self, more);
+    native static void __setMore (long self, int more);
+    public void setMore (int more) {
+        __setMore (self, more);
     }
     /*
     Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
     Else returns zero.                                                  
     */
-    native static int __routing_id (long self);
-    public int routingId (long self) {
-        return __routing_id (self);
+    native static int __routingId (long self);
+    public int routingId () {
+        return __routingId (self);
     }
     /*
     Set routing ID on frame. This is used if/when the frame is sent to a
     ZMQ_SERVER socket.                                                  
     */
-    native static void __set_routing_id (long self, int routingId);
-    public void setRoutingId (long self, int routingId) {
-        __set_routing_id (self, routingId);
+    native static void __setRoutingId (long self, int routingId);
+    public void setRoutingId (int routingId) {
+        __setRoutingId (self, routingId);
     }
     /*
     Return TRUE if two frames have identical size and data
     If either frame is NULL, equality is always false.    
     */
     native static boolean __eq (long self, long other);
-    public boolean eq (long self, long other) {
-        return __eq (self, other);
+    public boolean eq (Zframe other) {
+        return __eq (self, other.self);
     }
     /*
     Set new contents for frame
     */
     native static void __reset (long self, byte [] data, long size);
-    public void reset (long self, byte [] data, long size) {
+    public void reset (byte [] data, long size) {
         __reset (self, data, size);
     }
     /*
@@ -166,7 +163,7 @@ public class Zframe implements AutoCloseable{
     configured by zsys_set_logstream). Prefix shows before frame, if not null.
     */
     native static void __print (long self, String prefix);
-    public void print (long self, String prefix) {
+    public void print (String prefix) {
         __print (self, prefix);
     }
     /*

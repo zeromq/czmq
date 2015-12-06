@@ -21,9 +21,12 @@ public class Zpoller implements AutoCloseable{
     instance, or a zactor_t instance.                                       
     */
     native static long __new (long reader);
-    public Zpoller (long reader) {
+    public Zpoller (long reader []) {
         /*  TODO: if __new fails, self is null...  */
-        self = __new (reader);
+        self = __new (reader [0]);
+    }
+    public Zpoller (long pointer) {
+        self = pointer;
     }
     public Zpoller () {
         self = 0;

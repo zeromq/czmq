@@ -69,8 +69,8 @@ public class Zstr {
     Returns 0 if the strings could be sent OK, or -1 on error.
     */
     native static int __sendx (long dest, String string);
-    public int sendx (long dest, String string) {
-        return __sendx (dest, string);
+    public int sendx (long dest, String string []) {
+        return __sendx (dest, string [0]);
     }
     /*
     Self test of this class.

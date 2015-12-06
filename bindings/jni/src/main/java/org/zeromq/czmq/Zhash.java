@@ -24,6 +24,9 @@ public class Zhash implements AutoCloseable{
         /*  TODO: if __new fails, self is null...  */
         self = __new ();
     }
+    public Zhash (long pointer) {
+        self = pointer;
+    }
     /*
     Destroy a hash container and all items in it
     */
@@ -75,17 +78,6 @@ public class Zhash implements AutoCloseable{
         return __rename (self, oldKey, newKey);
     }
     /*
-    Set a free function for the specified hash table item. When the item is
-    destroyed, the free function, if any, is called on that item.          
-    Use this when hash items are dynamically allocated, to ensure that     
-    you don't have memory leaks. You can pass 'free' or NULL as a free_fn. 
-    Returns the item, or NULL if there is no such item.                    
-    */
-    native static long __freefn (long self, String key, long freeFn);
-    public long freefn (String key, long freeFn) {
-        return __freefn (self, key, freeFn);
-    }
-    /*
     Return the number of keys/items in the hash table
     */
     native static long __size (long self);
@@ -99,15 +91,15 @@ public class Zhash implements AutoCloseable{
     since there's no other way to know how to duplicate the item value.  
     */
     native static long __dup (long self);
-    public long dup () {
-        return __dup (self);
+    public Zhash dup () {
+        return new Zhash (__dup (self));
     }
     /*
     Return keys for items in table
     */
     native static long __keys (long self);
-    public long keys () {
-        return __keys (self);
+    public Zlist keys () {
+        return new Zlist (__keys (self));
     }
     /*
     Simple iterator; returns first item in hash table, in no given order, 
@@ -173,8 +165,8 @@ public class Zhash implements AutoCloseable{
     strings.                                                             
     */
     native static long __pack (long self);
-    public long pack () {
-        return __pack (self);
+    public Zframe pack () {
+        return new Zframe (__pack (self));
     }
     /*
     Unpack binary frame into a new hash table. Packed data must follow format
@@ -182,8 +174,8 @@ public class Zhash implements AutoCloseable{
     unpacks to an empty hash table.                                          
     */
     native static long __unpack (long frame);
-    public long unpack (long frame) {
-        return __unpack (frame);
+    public Zhash unpack (Zframe frame) {
+        return new Zhash (__unpack (frame.self));
     }
     /*
     Save hash table to a text file in name=value format. Hash values must be
@@ -219,17 +211,6 @@ public class Zhash implements AutoCloseable{
     native static void __autofree (long self);
     public void autofree () {
         __autofree (self);
-    }
-    /*
-    DEPRECATED as clumsy -- use zhash_first/_next instead                  
-    Apply function to each item in the hash table. Items are iterated in no
-    defined order. Stops if callback function returns non-zero and returns 
-    final return code from callback function (zero = success).             
-    Callback function for zhash_foreach method                             
-    */
-    native static int __foreach (long self, long callback, long argument);
-    public int foreach (long callback, long argument) {
-        return __foreach (self, callback, argument);
     }
     /*
     Self test of this class.

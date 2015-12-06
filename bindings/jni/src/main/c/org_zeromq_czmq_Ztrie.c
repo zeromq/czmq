@@ -18,18 +18,9 @@ Java_org_zeromq_czmq_Ztrie__1_1new (JNIEnv *env, jclass c, jchar delimiter)
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Ztrie__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
+Java_org_zeromq_czmq_Ztrie__1_1destroy (JNIEnv *env, jclass c, jlong self)
 {
-    ztrie_destroy ((ztrie_t **) &self_p);
-}
-
-JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Ztrie__1_1insertRoute (JNIEnv *env, jclass c, jlong self, jstring path, jlong data, jlong destroy_data_fn)
-{
-    char *path_ = (char *) (*env)->GetStringUTFChars (env, path, NULL);
-    jint insert_route_ = (jint) ztrie_insert_route ((ztrie_t *) self, path_, (void *) data, (ztrie_destroy_data_fn *) destroy_data_fn);
-    (*env)->ReleaseStringUTFChars (env, path, path_);
-    return insert_route_;
+    ztrie_destroy ((ztrie_t **) &self);
 }
 
 JNIEXPORT jint JNICALL

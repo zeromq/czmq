@@ -24,6 +24,9 @@ public class Zlist implements AutoCloseable{
         /*  TODO: if __new fails, self is null...  */
         self = __new ();
     }
+    public Zlist (long pointer) {
+        self = pointer;
+    }
     /*
     Destroy a list container
     */
@@ -127,8 +130,8 @@ public class Zlist implements AutoCloseable{
     NULL.                                                                    
     */
     native static long __dup (long self);
-    public long dup () {
-        return __dup (self);
+    public Zlist dup () {
+        return new Zlist (__dup (self));
     }
     /*
     Purge all items from list
@@ -145,14 +148,6 @@ public class Zlist implements AutoCloseable{
         return __size (self);
     }
     /*
-    Sort the list by ascending key value using a straight ASCII comparison.
-    The sort is not stable, so may reorder items with the same keys.       
-    */
-    native static void __sort (long self, long compare);
-    public void sort (long compare) {
-        __sort (self, compare);
-    }
-    /*
     Set list for automatic item destruction; item values MUST be strings. 
     By default a list item refers to a value held elsewhere. When you set 
     this, each time you append or push a list item, zlist will take a copy
@@ -165,28 +160,6 @@ public class Zlist implements AutoCloseable{
     native static void __autofree (long self);
     public void autofree () {
         __autofree (self);
-    }
-    /*
-    Sets a compare function for this list. The function compares two items.
-    It returns an integer less than, equal to, or greater than zero if the 
-    first item is found, respectively, to be less than, to match, or be    
-    greater than the second item.                                          
-    This function is used for sorting, removal and exists checking.        
-    */
-    native static void __comparefn (long self, long fn);
-    public void comparefn (long fn) {
-        __comparefn (self, fn);
-    }
-    /*
-    Set a free function for the specified list item. When the item is     
-    destroyed, the free function, if any, is called on that item.         
-    Use this when list items are dynamically allocated, to ensure that    
-    you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
-    Returns the item, or NULL if there is no such item.                   
-    */
-    native static long __freefn (long self, long item, long fn, boolean atTail);
-    public long freefn (long item, long fn, boolean atTail) {
-        return __freefn (self, item, fn, atTail);
     }
     /*
     Self test of this class.

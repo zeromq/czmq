@@ -28,6 +28,9 @@ public class Zfile implements AutoCloseable{
         /*  TODO: if __new fails, self is null...  */
         self = __new (path, name);
     }
+    public Zfile (long pointer) {
+        self = pointer;
+    }
     public Zfile () {
         self = 0;
     }
@@ -45,8 +48,8 @@ public class Zfile implements AutoCloseable{
     is null, or memory was exhausted, returns null.                     
     */
     native static long __dup (long self);
-    public long dup () {
-        return __dup (self);
+    public Zfile dup () {
+        return new Zfile (__dup (self));
     }
     /*
     Return file name, remove path if provided
@@ -155,27 +158,11 @@ public class Zfile implements AutoCloseable{
         return __output (self);
     }
     /*
-    Read chunk from file at specified position. If this was the last chunk,
-    sets the eof property. Returns a null chunk in case of error.          
-    */
-    native static long __read (long self, long bytes, long offset);
-    public long read (long bytes, long offset) {
-        return __read (self, bytes, offset);
-    }
-    /*
     Returns true if zfile_read() just read the last chunk in the file.
     */
     native static boolean __eof (long self);
     public boolean eof () {
         return __eof (self);
-    }
-    /*
-    Write chunk to file at specified position
-    Return 0 if OK, else -1                  
-    */
-    native static int __write (long self, long chunk, long offset);
-    public int write (long chunk, long offset) {
-        return __write (self, chunk, offset);
     }
     /*
     Read next line of text from file. Returns a pointer to the text line,

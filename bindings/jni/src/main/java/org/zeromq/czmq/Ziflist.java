@@ -24,6 +24,9 @@ public class Ziflist implements AutoCloseable{
         /*  TODO: if __new fails, self is null...  */
         self = __new ();
     }
+    public Ziflist (long pointer) {
+        self = pointer;
+    }
     /*
     Destroy a ziflist instance
     */

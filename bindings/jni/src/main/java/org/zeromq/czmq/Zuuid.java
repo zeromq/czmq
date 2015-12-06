@@ -24,6 +24,9 @@ public class Zuuid implements AutoCloseable{
         /*  TODO: if __new fails, self is null...  */
         self = __new ();
     }
+    public Zuuid (long pointer) {
+        self = pointer;
+    }
     /*
     Destroy a specified UUID object.
     */
@@ -32,6 +35,20 @@ public class Zuuid implements AutoCloseable{
     public void close () {
         __destroy (self);
         self = 0;
+    }
+    /*
+    Create UUID object from supplied ZUUID_LEN-octet value.
+    */
+    native static long __newFrom (byte [] source);
+    public Zuuid newFrom (byte [] source) {
+        return new Zuuid (__newFrom (source));
+    }
+    /*
+    Set UUID to new supplied ZUUID_LEN-octet value.
+    */
+    native static void __set (long self, byte [] source);
+    public void set (byte [] source) {
+        __set (self, source);
     }
     /*
     Set UUID to new supplied string value skipping '-' and '{' '}'
@@ -65,12 +82,33 @@ public class Zuuid implements AutoCloseable{
         return __strCanonical (self);
     }
     /*
+    Store UUID blob in target array
+    */
+    native static void __export (long self, byte [] target);
+    public void export (byte [] target) {
+        __export (self, target);
+    }
+    /*
+    Check if UUID is same as supplied value
+    */
+    native static boolean __eq (long self, byte [] compare);
+    public boolean eq (byte [] compare) {
+        return __eq (self, compare);
+    }
+    /*
+    Check if UUID is different from supplied value
+    */
+    native static boolean __neq (long self, byte [] compare);
+    public boolean neq (byte [] compare) {
+        return __neq (self, compare);
+    }
+    /*
     Make copy of UUID object; if uuid is null, or memory was exhausted,
     returns null.                                                      
     */
     native static long __dup (long self);
-    public long dup () {
-        return __dup (self);
+    public Zuuid dup () {
+        return new Zuuid (__dup (self));
     }
     /*
     Self test of this class.

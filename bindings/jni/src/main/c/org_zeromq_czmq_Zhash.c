@@ -18,9 +18,9 @@ Java_org_zeromq_czmq_Zhash__1_1new (JNIEnv *env, jclass c)
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zhash__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
+Java_org_zeromq_czmq_Zhash__1_1destroy (JNIEnv *env, jclass c, jlong self)
 {
-    zhash_destroy ((zhash_t **) &self_p);
+    zhash_destroy ((zhash_t **) &self);
 }
 
 JNIEXPORT jint JNICALL
@@ -66,15 +66,6 @@ Java_org_zeromq_czmq_Zhash__1_1rename (JNIEnv *env, jclass c, jlong self, jstrin
     (*env)->ReleaseStringUTFChars (env, old_key, old_key_);
     (*env)->ReleaseStringUTFChars (env, new_key, new_key_);
     return rename_;
-}
-
-JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zhash__1_1freefn (JNIEnv *env, jclass c, jlong self, jstring key, jlong free_fn)
-{
-    char *key_ = (char *) (*env)->GetStringUTFChars (env, key, NULL);
-    jlong freefn_ = (jlong) zhash_freefn ((zhash_t *) self, key_, (zhash_free_fn *) free_fn);
-    (*env)->ReleaseStringUTFChars (env, key, key_);
-    return freefn_;
 }
 
 JNIEXPORT jlong JNICALL
@@ -171,13 +162,6 @@ JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zhash__1_1autofree (JNIEnv *env, jclass c, jlong self)
 {
     zhash_autofree ((zhash_t *) self);
-}
-
-JNIEXPORT jint JNICALL
-Java_org_zeromq_czmq_Zhash__1_1foreach (JNIEnv *env, jclass c, jlong self, jlong callback, jlong argument)
-{
-    jint foreach_ = (jint) zhash_foreach ((zhash_t *) self, (zhash_foreach_fn *) callback, (void *) argument);
-    return foreach_;
 }
 
 JNIEXPORT void JNICALL

@@ -18,9 +18,9 @@ Java_org_zeromq_czmq_Zsock__1_1new (JNIEnv *env, jclass c, jint type)
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zsock__1_1destroy (JNIEnv *env, jclass c, jlong self_p)
+Java_org_zeromq_czmq_Zsock__1_1destroy (JNIEnv *env, jclass c, jlong self)
 {
-    zsock_destroy ((zsock_t **) &self_p);
+    zsock_destroy ((zsock_t **) &self);
 }
 
 JNIEXPORT jlong JNICALL
@@ -451,6 +451,14 @@ Java_org_zeromq_czmq_Zsock__1_1setCurvePublickey (JNIEnv *env, jclass c, jlong s
     (*env)->ReleaseStringUTFChars (env, curve_publickey, curve_publickey_);
 }
 
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setCurvePublickeyBin (JNIEnv *env, jclass c, jlong self, jbyteArray curve_publickey)
+{
+    jbyte *curve_publickey_ = (byte *) (*env)->GetByteArrayElements (env, curve_publickey, 0);
+    zsock_set_curve_publickey_bin ((zsock_t *) self, (const byte *) curve_publickey);
+    (*env)->ReleaseByteArrayElements (env, curve_publickey, (jbyte *) curve_publickey_, 0);
+}
+
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zsock__1_1curveSecretkey (JNIEnv *env, jclass c, jlong self)
 {
@@ -468,6 +476,14 @@ Java_org_zeromq_czmq_Zsock__1_1setCurveSecretkey (JNIEnv *env, jclass c, jlong s
     (*env)->ReleaseStringUTFChars (env, curve_secretkey, curve_secretkey_);
 }
 
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setCurveSecretkeyBin (JNIEnv *env, jclass c, jlong self, jbyteArray curve_secretkey)
+{
+    jbyte *curve_secretkey_ = (byte *) (*env)->GetByteArrayElements (env, curve_secretkey, 0);
+    zsock_set_curve_secretkey_bin ((zsock_t *) self, (const byte *) curve_secretkey);
+    (*env)->ReleaseByteArrayElements (env, curve_secretkey, (jbyte *) curve_secretkey_, 0);
+}
+
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zsock__1_1curveServerkey (JNIEnv *env, jclass c, jlong self)
 {
@@ -483,6 +499,14 @@ Java_org_zeromq_czmq_Zsock__1_1setCurveServerkey (JNIEnv *env, jclass c, jlong s
     char *curve_serverkey_ = (char *) (*env)->GetStringUTFChars (env, curve_serverkey, NULL);
     zsock_set_curve_serverkey ((zsock_t *) self, curve_serverkey_);
     (*env)->ReleaseStringUTFChars (env, curve_serverkey, curve_serverkey_);
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setCurveServerkeyBin (JNIEnv *env, jclass c, jlong self, jbyteArray curve_serverkey)
+{
+    jbyte *curve_serverkey_ = (byte *) (*env)->GetByteArrayElements (env, curve_serverkey, 0);
+    zsock_set_curve_serverkey_bin ((zsock_t *) self, (const byte *) curve_serverkey);
+    (*env)->ReleaseByteArrayElements (env, curve_serverkey, (jbyte *) curve_serverkey_, 0);
 }
 
 JNIEXPORT jint JNICALL

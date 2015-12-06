@@ -20,9 +20,12 @@ public class ZdirPatch implements AutoCloseable{
     Create new patch
     */
     native static long __new (String path, long file, int op, String alias);
-    public ZdirPatch (String path, long file, int op, String alias) {
+    public ZdirPatch (String path, Zfile file, int op, String alias) {
         /*  TODO: if __new fails, self is null...  */
-        self = __new (path, file, op, alias);
+        self = __new (path, file.self, op, alias);
+    }
+    public ZdirPatch (long pointer) {
+        self = pointer;
     }
     public ZdirPatch () {
         self = 0;
@@ -41,8 +44,8 @@ public class ZdirPatch implements AutoCloseable{
     returns null.                                                         
     */
     native static long __dup (long self);
-    public long dup () {
-        return __dup (self);
+    public ZdirPatch dup () {
+        return new ZdirPatch (__dup (self));
     }
     /*
     Return patch file directory path
@@ -55,8 +58,8 @@ public class ZdirPatch implements AutoCloseable{
     Return patch file item
     */
     native static long __file (long self);
-    public long file () {
-        return __file (self);
+    public Zfile file () {
+        return new Zfile (__file (self));
     }
     /*
     Return operation

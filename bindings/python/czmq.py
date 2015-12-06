@@ -363,9 +363,9 @@ class Zarmour(object):
         """Get printable string for mode."""
         return lib.zarmour_mode_str(self._as_parameter_)
 
-    def encode(self, data, data_size):
+    def encode(self, data, size):
         """Encode a stream of bytes into an armoured string."""
-        return return_fresh_string(lib.zarmour_encode(self._as_parameter_, data, data_size))
+        return return_fresh_string(lib.zarmour_encode(self._as_parameter_, data, size))
 
     def decode(self, data, decode_size):
         """Decode an armoured string into a string of bytes.
@@ -487,11 +487,7 @@ lib.zconfig_test.restype = None
 lib.zconfig_test.argtypes = [c_bool]
 
 class Zconfig(object):
-    """zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.
-
-
-
--    zconfig_new (const char *name, zconfig_t *parent);"""
+    """zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL."""
 
     def __init__(self, *args):
         """Create new config item"""

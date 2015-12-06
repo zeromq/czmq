@@ -16,8 +16,8 @@ const QString QmlZarmour::modeStr () {
 
 ///
 //  Encode a stream of bytes into an armoured string.
-QString QmlZarmour::encode (const byte *data, size_t dataSize) {
-    char *retStr_ = zarmour_encode (self, data, dataSize);
+QString QmlZarmour::encode (const byte *data, size_t size) {
+    char *retStr_ = zarmour_encode (self, data, size);
     QString retQStr_ = QString (retStr_);
     free (retStr_);
     return retQStr_;
