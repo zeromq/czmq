@@ -15,7 +15,7 @@ public class Zhash implements AutoCloseable{
             System.exit (-1);
         }
     }
-    long self;
+    public long self;
     /*
     Create a new, empty hash container
     */

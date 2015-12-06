@@ -15,7 +15,7 @@ public class Ziflist implements AutoCloseable{
             System.exit (-1);
         }
     }
-    long self;
+    public long self;
     /*
     Get a list of network interfaces currently defined on the system
     */

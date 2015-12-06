@@ -15,7 +15,7 @@ public class Zstr {
             System.exit (-1);
         }
     }
-    long self;
+    public long self;
     public Zstr () {
         self = 0;
     }

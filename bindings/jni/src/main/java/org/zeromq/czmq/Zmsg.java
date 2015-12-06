@@ -15,7 +15,7 @@ public class Zmsg implements AutoCloseable{
             System.exit (-1);
         }
     }
-    long self;
+    public long self;
     /*
     Create a new empty message object
     */

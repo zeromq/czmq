@@ -15,7 +15,7 @@ public class Zdir implements AutoCloseable{
             System.exit (-1);
         }
     }
-    long self;
+    public long self;
     /*
     Create a new directory item that loads in the full tree of the specified
     path, optionally located under some parent path. If parent is "-", then 

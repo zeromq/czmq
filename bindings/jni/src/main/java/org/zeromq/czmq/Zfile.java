@@ -15,7 +15,7 @@ public class Zfile implements AutoCloseable{
             System.exit (-1);
         }
     }
-    long self;
+    public long self;
     /*
     If file exists, populates properties. CZMQ supports portable symbolic
     links, which are files with the extension ".ln". A symbolic link is a

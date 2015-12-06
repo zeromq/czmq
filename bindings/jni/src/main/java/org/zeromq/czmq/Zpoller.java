@@ -15,7 +15,7 @@ public class Zpoller implements AutoCloseable{
             System.exit (-1);
         }
     }
-    long self;
+    public long self;
     /*
     Create new poller; the reader can be a libzmq socket (void *), a zsock_t
     instance, or a zactor_t instance.                                       
