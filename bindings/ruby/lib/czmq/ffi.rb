@@ -16,6 +16,11 @@ module CZMQ
 
     extend ::FFI::Library
 
+    # Raised when one tries to use an instance of one of the classes in the
+    # {CZMQ::FFI} namespace after the internal pointer to the
+    # native object has been nullified.
+    class DestroyedError < RuntimeError; end
+
     def self.available?
       @available
     end

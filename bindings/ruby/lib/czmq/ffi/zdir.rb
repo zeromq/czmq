@@ -7,14 +7,17 @@ module CZMQ
   module FFI
 
     # work with file-system directories
+    # @note This class is 100% generated using zproject.
     class Zdir
-      class DestroyedError < RuntimeError; end
-
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
       end
-      def initialize ptr, finalize=true
+      # Attaches the pointer _ptr_ to this instance and defines a finalizer for
+      # it if necessary.
+      # @param ptr [::FFI::Pointer]
+      # @param finalize [Boolean]
+      def initialize(ptr, finalize = true)
         @ptr = ptr
         if @ptr.null?
           @ptr = nil # Remove null pointers so we don't have to test for them.
@@ -23,24 +26,32 @@ module CZMQ
           ObjectSpace.define_finalizer self, @finalizer
         end
       end
-      def self.create_finalizer_for ptr
+      # @param ptr [::FFI::Pointer]
+      # @return [Proc]
+      def self.create_finalizer_for(ptr)
         Proc.new do
           ptr_ptr = ::FFI::MemoryPointer.new :pointer
           ptr_ptr.write_pointer ptr
           ::CZMQ::FFI.zdir_destroy ptr_ptr
         end
       end
+      # @return [Boolean]
       def null?
         !@ptr or @ptr.null?
       end
       # Return internal pointer
+      # @return [::FFI::Pointer]
       def __ptr
         raise DestroyedError unless @ptr
         @ptr
       end
       # So external Libraries can just pass the Object to a FFI function which expects a :pointer
       alias_method :to_ptr, :__ptr
-      # Nullify internal pointer and return pointer pointer
+      # Nullify internal pointer and return pointer pointer.
+      # @note This detaches the current instance from the native object
+      #   and thus makes it unusable.
+      # @return [::FFI::MemoryPointer] the pointer pointing to a pointer
+      #   pointing to the native object
       def __ptr_give_ref
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
@@ -54,6 +65,9 @@ module CZMQ
       # Create a new directory item that loads in the full tree of the specified
       # path, optionally located under some parent path. If parent is "-", then 
       # loads only the top-level directory, and does not use parent as a path.  
+      # @param path [String, #to_str, #to_s]
+      # @param parent [String, #to_str, #to_s]
+      # @return [CZMQ::Zdir]
       def self.new(path, parent)
         path = String(path)
         parent = String(parent)
@@ -62,6 +76,8 @@ module CZMQ
       end
 
       # Destroy a directory tree and all children it contains.
+      #
+      # @return [void]
       def destroy()
         return unless @ptr
         self_p = __ptr_give_ref
@@ -70,6 +86,8 @@ module CZMQ
       end
 
       # Return directory path
+      #
+      # @return [String]
       def path()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -78,6 +96,8 @@ module CZMQ
       end
 
       # Return last modification time for directory.
+      #
+      # @return [::FFI::Pointer]
       def modified()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -87,6 +107,8 @@ module CZMQ
 
       # Return total hierarchy size, in bytes of data contained in all files
       # in the directory tree.                                              
+      #
+      # @return [::FFI::Pointer]
       def cursize()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -95,6 +117,8 @@ module CZMQ
       end
 
       # Return directory count
+      #
+      # @return [Integer]
       def count()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -105,6 +129,8 @@ module CZMQ
       # Returns a sorted list of zfile objects; Each entry in the list is a pointer
       # to a zfile_t item already allocated in the zdir tree. Do not destroy the   
       # original zdir tree until you are done with this list.                      
+      #
+      # @return [Zlist]
       def list()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -116,6 +142,9 @@ module CZMQ
       # Remove directory, optionally including all files that it contains, at  
       # all levels. If force is false, will only remove the directory if empty.
       # If force is true, will remove all files and all subdirectories.        
+      #
+      # @param force [Boolean]
+      # @return [void]
       def remove(force)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -128,6 +157,11 @@ module CZMQ
       # Returns a list of zdir_patch_t patches. Either older or newer may  
       # be null, indicating the directory is empty/absent. If alias is set,
       # generates virtual filename (minus path, plus alias).               
+      #
+      # @param older [Zdir, #__ptr]
+      # @param newer [Zdir, #__ptr]
+      # @param alias_ [String, #to_str, #to_s]
+      # @return [Zlist]
       def self.diff(older, newer, alias_)
         older = older.__ptr if older
         newer = newer.__ptr if newer
@@ -138,6 +172,9 @@ module CZMQ
       end
 
       # Return full contents of directory as a zdir_patch list.
+      #
+      # @param alias_ [String, #to_str, #to_s]
+      # @return [Zlist]
       def resync(alias_)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -149,6 +186,8 @@ module CZMQ
 
       # Load directory cache; returns a hash table containing the SHA-1 digests
       # of every file in the tree. The cache is saved between runs in .cache.  
+      #
+      # @return [Zhash]
       def cache()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -158,6 +197,10 @@ module CZMQ
       end
 
       # Print contents of directory to open stream
+      #
+      # @param file [::FFI::Pointer, #to_ptr]
+      # @param indent [Integer, #to_int, #to_i]
+      # @return [void]
       def fprint(file, indent)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -167,6 +210,9 @@ module CZMQ
       end
 
       # Print contents of directory to stdout
+      #
+      # @param indent [Integer, #to_int, #to_i]
+      # @return [void]
       def print(indent)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -201,6 +247,10 @@ module CZMQ
       #     // Delete the received data.                              
       #     free (path);                                              
       #     zlist_destroy (&patches);                                 
+      #
+      # @param pipe [Zsock, #__ptr]
+      # @param unused [::FFI::Pointer, #to_ptr]
+      # @return [void]
       def self.watch(pipe, unused)
         pipe = pipe.__ptr if pipe
         result = ::CZMQ::FFI.zdir_watch(pipe, unused)
@@ -208,6 +258,9 @@ module CZMQ
       end
 
       # Self test of this class.
+      #
+      # @param verbose [Boolean]
+      # @return [void]
       def self.test(verbose)
         verbose = !(0==verbose||!verbose) # boolean
         result = ::CZMQ::FFI.zdir_test(verbose)

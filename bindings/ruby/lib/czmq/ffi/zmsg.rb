@@ -7,14 +7,17 @@ module CZMQ
   module FFI
 
     # working with multipart messages
+    # @note This class is 100% generated using zproject.
     class Zmsg
-      class DestroyedError < RuntimeError; end
-
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
       end
-      def initialize ptr, finalize=true
+      # Attaches the pointer _ptr_ to this instance and defines a finalizer for
+      # it if necessary.
+      # @param ptr [::FFI::Pointer]
+      # @param finalize [Boolean]
+      def initialize(ptr, finalize = true)
         @ptr = ptr
         if @ptr.null?
           @ptr = nil # Remove null pointers so we don't have to test for them.
@@ -23,24 +26,32 @@ module CZMQ
           ObjectSpace.define_finalizer self, @finalizer
         end
       end
-      def self.create_finalizer_for ptr
+      # @param ptr [::FFI::Pointer]
+      # @return [Proc]
+      def self.create_finalizer_for(ptr)
         Proc.new do
           ptr_ptr = ::FFI::MemoryPointer.new :pointer
           ptr_ptr.write_pointer ptr
           ::CZMQ::FFI.zmsg_destroy ptr_ptr
         end
       end
+      # @return [Boolean]
       def null?
         !@ptr or @ptr.null?
       end
       # Return internal pointer
+      # @return [::FFI::Pointer]
       def __ptr
         raise DestroyedError unless @ptr
         @ptr
       end
       # So external Libraries can just pass the Object to a FFI function which expects a :pointer
       alias_method :to_ptr, :__ptr
-      # Nullify internal pointer and return pointer pointer
+      # Nullify internal pointer and return pointer pointer.
+      # @note This detaches the current instance from the native object
+      #   and thus makes it unusable.
+      # @return [::FFI::MemoryPointer] the pointer pointing to a pointer
+      #   pointing to the native object
       def __ptr_give_ref
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
@@ -52,12 +63,15 @@ module CZMQ
       end
 
       # Create a new empty message object
+      # @return [CZMQ::Zmsg]
       def self.new()
         ptr = ::CZMQ::FFI.zmsg_new()
         __new ptr
       end
 
       # Destroy a message object and all frames it contains
+      #
+      # @return [void]
       def destroy()
         return unless @ptr
         self_p = __ptr_give_ref
@@ -69,6 +83,9 @@ module CZMQ
       # was interrupted. Does a blocking recv. If you want to not block then use 
       # the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
       # before receiving.                                                        
+      #
+      # @param source [::FFI::Pointer, #to_ptr]
+      # @return [Zmsg]
       def self.recv(source)
         result = ::CZMQ::FFI.zmsg_recv(source)
         result = Zmsg.__new result, true
@@ -79,6 +96,10 @@ module CZMQ
       # it successfully. If the message has no frames, sends nothing but destroys
       # the message anyhow. Nullifies the caller's reference to the message (as  
       # it is a destructor).                                                     
+      #
+      # @param self_p [#__ptr_give_ref]
+      # @param dest [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
       def self.send(self_p, dest)
         self_p = self_p.__ptr_give_ref
         result = ::CZMQ::FFI.zmsg_send(self_p, dest)
@@ -91,6 +112,10 @@ module CZMQ
       # message part. If the message has no frames, sends nothing but destroys  
       # the message anyhow. Nullifies the caller's reference to the message (as 
       # it is a destructor).                                                    
+      #
+      # @param self_p [#__ptr_give_ref]
+      # @param dest [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
       def self.sendm(self_p, dest)
         self_p = self_p.__ptr_give_ref
         result = ::CZMQ::FFI.zmsg_sendm(self_p, dest)
@@ -98,6 +123,8 @@ module CZMQ
       end
 
       # Return size of message, i.e. number of frames (0 or more).
+      #
+      # @return [Integer]
       def size()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -106,6 +133,8 @@ module CZMQ
       end
 
       # Return total size of all frames in message.
+      #
+      # @return [Integer]
       def content_size()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -115,6 +144,8 @@ module CZMQ
 
       # Return message routing ID, if the message came from a ZMQ_SERVER socket.
       # Else returns zero.                                                      
+      #
+      # @return [Integer]
       def routing_id()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -124,6 +155,9 @@ module CZMQ
 
       # Set routing ID on message. This is used if/when the message is sent to a
       # ZMQ_SERVER socket.                                                      
+      #
+      # @param routing_id [Integer, #to_int, #to_i]
+      # @return [void]
       def set_routing_id(routing_id)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -136,6 +170,9 @@ module CZMQ
       # Message takes ownership of frame, will destroy it when message is sent.
       # Returns 0 on success, -1 on error. Deprecates zmsg_push, which did not 
       # nullify the caller's frame reference.                                  
+      #
+      # @param frame_p [#__ptr_give_ref]
+      # @return [Integer]
       def prepend(frame_p)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -148,6 +185,9 @@ module CZMQ
       # Message takes ownership of frame, will destroy it when message is sent.
       # Returns 0 on success. Deprecates zmsg_add, which did not nullify the   
       # caller's frame reference.                                              
+      #
+      # @param frame_p [#__ptr_give_ref]
+      # @return [Integer]
       def append(frame_p)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -157,6 +197,8 @@ module CZMQ
       end
 
       # Remove first frame from message, if any. Returns frame, or NULL.
+      #
+      # @return [Zframe]
       def pop()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -167,6 +209,10 @@ module CZMQ
 
       # Push block of memory to front of message, as a new frame.
       # Returns 0 on success, -1 on error.                       
+      #
+      # @param src [::FFI::Pointer, #to_ptr]
+      # @param size [Integer, #to_int, #to_i]
+      # @return [Integer]
       def pushmem(src, size)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -177,6 +223,10 @@ module CZMQ
 
       # Add block of memory to the end of the message, as a new frame.
       # Returns 0 on success, -1 on error.                            
+      #
+      # @param src [::FFI::Pointer, #to_ptr]
+      # @param size [Integer, #to_int, #to_i]
+      # @return [Integer]
       def addmem(src, size)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -187,6 +237,9 @@ module CZMQ
 
       # Push string as new frame to front of message.
       # Returns 0 on success, -1 on error.           
+      #
+      # @param string [String, #to_str, #to_s]
+      # @return [Integer]
       def pushstr(string)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -197,6 +250,9 @@ module CZMQ
 
       # Push string as new frame to end of message.
       # Returns 0 on success, -1 on error.         
+      #
+      # @param string [String, #to_str, #to_s]
+      # @return [Integer]
       def addstr(string)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -207,6 +263,10 @@ module CZMQ
 
       # Push formatted string as new frame to front of message.
       # Returns 0 on success, -1 on error.                     
+      #
+      # @param format [String, #to_str, #to_s]
+      # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
+      # @return [Integer]
       def pushstrf(format, *args)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -217,6 +277,10 @@ module CZMQ
 
       # Push formatted string as new frame to end of message.
       # Returns 0 on success, -1 on error.                   
+      #
+      # @param format [String, #to_str, #to_s]
+      # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
+      # @return [Integer]
       def addstrf(format, *args)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -227,6 +291,8 @@ module CZMQ
 
       # Pop frame off front of message, return as fresh string. If there were
       # no more frames in the message, returns NULL.                         
+      #
+      # @return [::FFI::AutoPointer]
       def popstr()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -238,6 +304,9 @@ module CZMQ
       # Push encoded message as a new frame. Message takes ownership of    
       # submessage, so the original is destroyed in this call. Returns 0 on
       # success, -1 on error.                                              
+      #
+      # @param msg_p [#__ptr_give_ref]
+      # @return [Integer]
       def addmsg(msg_p)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -248,6 +317,8 @@ module CZMQ
 
       # Remove first submessage from message, if any. Returns zmsg_t, or NULL if
       # decoding was not succesfull.                                            
+      #
+      # @return [Zmsg]
       def popmsg()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -257,6 +328,9 @@ module CZMQ
       end
 
       # Remove specified frame from list, if present. Does not destroy frame.
+      #
+      # @param frame [Zframe, #__ptr]
+      # @return [void]
       def remove(frame)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -267,6 +341,8 @@ module CZMQ
 
       # Set cursor to first frame in message. Returns frame, or NULL, if the
       # message is empty. Use this to navigate the frames as a list.        
+      #
+      # @return [Zframe]
       def first()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -277,6 +353,8 @@ module CZMQ
 
       # Return the next frame. If there are no more frames, returns NULL. To move
       # to the first frame call zmsg_first(). Advances the cursor.               
+      #
+      # @return [Zframe]
       def next()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -286,6 +364,8 @@ module CZMQ
       end
 
       # Return the last frame. If there are no frames, returns NULL.
+      #
+      # @return [Zframe]
       def last()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -299,6 +379,9 @@ module CZMQ
       # file is NOT guaranteed to be portable between operating systems, not   
       # versions of CZMQ. The file format is at present undocumented and liable
       # to arbitrary change.                                                   
+      #
+      # @param file [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
       def save(file)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -309,6 +392,10 @@ module CZMQ
       # Load/append an open file into message, create new message if
       # null message provided. Returns NULL if the message could not
       # be loaded.                                                  
+      #
+      # @param self_ [Zmsg, #__ptr]
+      # @param file [::FFI::Pointer, #to_ptr]
+      # @return [Zmsg]
       def self.load(self_, file)
         self_ = self_.__ptr if self_
         result = ::CZMQ::FFI.zmsg_load(self_, file)
@@ -320,6 +407,9 @@ module CZMQ
       # structured messages across transports that do not support multipart data.
       # Allocates and returns a new buffer containing the serialized message.    
       # To decode a serialized message buffer, use zmsg_decode ().               
+      #
+      # @param buffer [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
       def encode(buffer)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -330,6 +420,10 @@ module CZMQ
       # Decodes a serialized message buffer created by zmsg_encode () and returns
       # a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
       # there was insufficient memory to work.                                   
+      #
+      # @param buffer [::FFI::Pointer, #to_ptr]
+      # @param buffer_size [Integer, #to_int, #to_i]
+      # @return [Zmsg]
       def self.decode(buffer, buffer_size)
         buffer_size = Integer(buffer_size)
         result = ::CZMQ::FFI.zmsg_decode(buffer, buffer_size)
@@ -339,6 +433,8 @@ module CZMQ
 
       # Create copy of message, as new message object. Returns a fresh zmsg_t
       # object. If message is null, or memory was exhausted, returns null.   
+      #
+      # @return [Zmsg]
       def dup()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -349,6 +445,8 @@ module CZMQ
 
       # Send message to zsys log sink (may be stdout, or system facility as
       # configured by zsys_set_logstream).                                 
+      #
+      # @return [void]
       def print()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -359,6 +457,9 @@ module CZMQ
       # Return true if the two messages have the same number of frames and each  
       # frame in the first message is identical to the corresponding frame in the
       # other message. As with zframe_eq, return false if either message is NULL.
+      #
+      # @param other [Zmsg, #__ptr]
+      # @return [Boolean]
       def eq(other)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -370,6 +471,9 @@ module CZMQ
       # Generate a signal message encoding the given status. A signal is a short
       # message carrying a 1-byte success/failure code (by convention, 0 means  
       # OK). Signals are encoded to be distinguishable from "normal" messages.  
+      #
+      # @param status [Integer, #to_int, #to_i]
+      # @return [Zmsg]
       def self.new_signal(status)
         status = Integer(status)
         result = ::CZMQ::FFI.zmsg_new_signal(status)
@@ -378,6 +482,8 @@ module CZMQ
       end
 
       # Return signal value, 0 or greater, if message is a signal, -1 if not.
+      #
+      # @return [Integer]
       def signal()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -386,12 +492,18 @@ module CZMQ
       end
 
       # Probe the supplied object, and report if it looks like a zmsg_t.
+      #
+      # @param self_ [::FFI::Pointer, #to_ptr]
+      # @return [Boolean]
       def self.is(self_)
         result = ::CZMQ::FFI.zmsg_is(self_)
         result
       end
 
       # Self test of this class.
+      #
+      # @param verbose [Boolean]
+      # @return [void]
       def self.test(verbose)
         verbose = !(0==verbose||!verbose) # boolean
         result = ::CZMQ::FFI.zmsg_test(verbose)

@@ -7,14 +7,17 @@ module CZMQ
   module FFI
 
     # event-driven reactor
+    # @note This class is 100% generated using zproject.
     class Zpoller
-      class DestroyedError < RuntimeError; end
-
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
       end
-      def initialize ptr, finalize=true
+      # Attaches the pointer _ptr_ to this instance and defines a finalizer for
+      # it if necessary.
+      # @param ptr [::FFI::Pointer]
+      # @param finalize [Boolean]
+      def initialize(ptr, finalize = true)
         @ptr = ptr
         if @ptr.null?
           @ptr = nil # Remove null pointers so we don't have to test for them.
@@ -23,24 +26,32 @@ module CZMQ
           ObjectSpace.define_finalizer self, @finalizer
         end
       end
-      def self.create_finalizer_for ptr
+      # @param ptr [::FFI::Pointer]
+      # @return [Proc]
+      def self.create_finalizer_for(ptr)
         Proc.new do
           ptr_ptr = ::FFI::MemoryPointer.new :pointer
           ptr_ptr.write_pointer ptr
           ::CZMQ::FFI.zpoller_destroy ptr_ptr
         end
       end
+      # @return [Boolean]
       def null?
         !@ptr or @ptr.null?
       end
       # Return internal pointer
+      # @return [::FFI::Pointer]
       def __ptr
         raise DestroyedError unless @ptr
         @ptr
       end
       # So external Libraries can just pass the Object to a FFI function which expects a :pointer
       alias_method :to_ptr, :__ptr
-      # Nullify internal pointer and return pointer pointer
+      # Nullify internal pointer and return pointer pointer.
+      # @note This detaches the current instance from the native object
+      #   and thus makes it unusable.
+      # @return [::FFI::MemoryPointer] the pointer pointing to a pointer
+      #   pointing to the native object
       def __ptr_give_ref
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
@@ -53,12 +64,17 @@ module CZMQ
 
       # Create new poller; the reader can be a libzmq socket (void *), a zsock_t
       # instance, or a zactor_t instance.                                       
+      # @param reader [::FFI::Pointer, #to_ptr]
+      # @param args [Array<Object>]
+      # @return [CZMQ::Zpoller]
       def self.new(reader, *args)
         ptr = ::CZMQ::FFI.zpoller_new(reader, *args)
         __new ptr
       end
 
       # Destroy a poller
+      #
+      # @return [void]
       def destroy()
         return unless @ptr
         self_p = __ptr_give_ref
@@ -68,6 +84,9 @@ module CZMQ
 
       # Add a reader to be polled. Returns 0 if OK, -1 on failure. The reader may
       # be a libzmq void * socket, a zsock_t instance, or a zactor_t instance.   
+      #
+      # @param reader [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
       def add(reader)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -78,6 +97,9 @@ module CZMQ
       # Remove a reader from the poller; returns 0 if OK, -1 on failure. The   
       # reader may be a libzmq void * socket, a zsock_t instance, or a zactor_t
       # instance.                                                              
+      #
+      # @param reader [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
       def remove(reader)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -94,6 +116,9 @@ module CZMQ
       # or the ZMQ context was destroyed, or the timeout expired, returns NULL.   
       # You can test the actual exit condition by calling zpoller_expired () and  
       # zpoller_terminated (). The timeout is in msec.                            
+      #
+      # @param timeout [Integer, #to_int, #to_i]
+      # @return [::FFI::Pointer]
       def wait(timeout)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -104,6 +129,8 @@ module CZMQ
 
       # Return true if the last zpoller_wait () call ended because the timeout
       # expired, without any error.                                           
+      #
+      # @return [Boolean]
       def expired()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -113,6 +140,8 @@ module CZMQ
 
       # Return true if the last zpoller_wait () call ended because the process
       # was interrupted, or the parent context was destroyed.                 
+      #
+      # @return [Boolean]
       def terminated()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -123,6 +152,8 @@ module CZMQ
       # Ignore zsys_interrupted flag in this poller. By default, a zpoller_wait will 
       # return immediately if detects zsys_interrupted is set to something other than
       # zero. Calling zpoller_ignore_interrupts will supress this behavior.          
+      #
+      # @return [void]
       def ignore_interrupts()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -131,6 +162,9 @@ module CZMQ
       end
 
       # Self test of this class.
+      #
+      # @param verbose [Boolean]
+      # @return [void]
       def self.test(verbose)
         verbose = !(0==verbose||!verbose) # boolean
         result = ::CZMQ::FFI.zpoller_test(verbose)

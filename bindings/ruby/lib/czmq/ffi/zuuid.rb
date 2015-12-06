@@ -7,14 +7,17 @@ module CZMQ
   module FFI
 
     # UUID support class
+    # @note This class is 100% generated using zproject.
     class Zuuid
-      class DestroyedError < RuntimeError; end
-
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
       end
-      def initialize ptr, finalize=true
+      # Attaches the pointer _ptr_ to this instance and defines a finalizer for
+      # it if necessary.
+      # @param ptr [::FFI::Pointer]
+      # @param finalize [Boolean]
+      def initialize(ptr, finalize = true)
         @ptr = ptr
         if @ptr.null?
           @ptr = nil # Remove null pointers so we don't have to test for them.
@@ -23,24 +26,32 @@ module CZMQ
           ObjectSpace.define_finalizer self, @finalizer
         end
       end
-      def self.create_finalizer_for ptr
+      # @param ptr [::FFI::Pointer]
+      # @return [Proc]
+      def self.create_finalizer_for(ptr)
         Proc.new do
           ptr_ptr = ::FFI::MemoryPointer.new :pointer
           ptr_ptr.write_pointer ptr
           ::CZMQ::FFI.zuuid_destroy ptr_ptr
         end
       end
+      # @return [Boolean]
       def null?
         !@ptr or @ptr.null?
       end
       # Return internal pointer
+      # @return [::FFI::Pointer]
       def __ptr
         raise DestroyedError unless @ptr
         @ptr
       end
       # So external Libraries can just pass the Object to a FFI function which expects a :pointer
       alias_method :to_ptr, :__ptr
-      # Nullify internal pointer and return pointer pointer
+      # Nullify internal pointer and return pointer pointer.
+      # @note This detaches the current instance from the native object
+      #   and thus makes it unusable.
+      # @return [::FFI::MemoryPointer] the pointer pointing to a pointer
+      #   pointing to the native object
       def __ptr_give_ref
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
@@ -52,12 +63,15 @@ module CZMQ
       end
 
       # Create a new UUID object.
+      # @return [CZMQ::Zuuid]
       def self.new()
         ptr = ::CZMQ::FFI.zuuid_new()
         __new ptr
       end
 
       # Destroy a specified UUID object.
+      #
+      # @return [void]
       def destroy()
         return unless @ptr
         self_p = __ptr_give_ref
@@ -66,6 +80,9 @@ module CZMQ
       end
 
       # Create UUID object from supplied ZUUID_LEN-octet value.
+      #
+      # @param source [::FFI::Pointer, #to_ptr]
+      # @return [Zuuid]
       def self.new_from(source)
         result = ::CZMQ::FFI.zuuid_new_from(source)
         result = Zuuid.__new result, true
@@ -73,6 +90,9 @@ module CZMQ
       end
 
       # Set UUID to new supplied ZUUID_LEN-octet value.
+      #
+      # @param source [::FFI::Pointer, #to_ptr]
+      # @return [void]
       def set(source)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -82,6 +102,9 @@ module CZMQ
 
       # Set UUID to new supplied string value skipping '-' and '{' '}'
       # optional delimiters. Return 0 if OK, else returns -1.         
+      #
+      # @param source [String, #to_str, #to_s]
+      # @return [Integer]
       def set_str(source)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -91,6 +114,8 @@ module CZMQ
       end
 
       # Return UUID binary data.
+      #
+      # @return [::FFI::Pointer]
       def data()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -99,6 +124,8 @@ module CZMQ
       end
 
       # Return UUID binary size
+      #
+      # @return [Integer]
       def size()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -107,6 +134,8 @@ module CZMQ
       end
 
       # Returns UUID as string
+      #
+      # @return [String]
       def str()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -117,6 +146,8 @@ module CZMQ
       # Return UUID in the canonical string format: 8-4-4-4-12, in lower
       # case. Caller does not modify or free returned value. See        
       # http://en.wikipedia.org/wiki/Universally_unique_identifier      
+      #
+      # @return [String]
       def str_canonical()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -125,6 +156,9 @@ module CZMQ
       end
 
       # Store UUID blob in target array
+      #
+      # @param target [::FFI::Pointer, #to_ptr]
+      # @return [void]
       def export(target)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -133,6 +167,9 @@ module CZMQ
       end
 
       # Check if UUID is same as supplied value
+      #
+      # @param compare [::FFI::Pointer, #to_ptr]
+      # @return [Boolean]
       def eq(compare)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -141,6 +178,9 @@ module CZMQ
       end
 
       # Check if UUID is different from supplied value
+      #
+      # @param compare [::FFI::Pointer, #to_ptr]
+      # @return [Boolean]
       def neq(compare)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -150,6 +190,8 @@ module CZMQ
 
       # Make copy of UUID object; if uuid is null, or memory was exhausted,
       # returns null.                                                      
+      #
+      # @return [Zuuid]
       def dup()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -159,6 +201,9 @@ module CZMQ
       end
 
       # Self test of this class.
+      #
+      # @param verbose [Boolean]
+      # @return [void]
       def self.test(verbose)
         verbose = !(0==verbose||!verbose) # boolean
         result = ::CZMQ::FFI.zuuid_test(verbose)

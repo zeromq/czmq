@@ -7,14 +7,17 @@ module CZMQ
   module FFI
 
     # simple generic list container
+    # @note This class is 100% generated using zproject.
     class Zlist
-      class DestroyedError < RuntimeError; end
-
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
       end
-      def initialize ptr, finalize=true
+      # Attaches the pointer _ptr_ to this instance and defines a finalizer for
+      # it if necessary.
+      # @param ptr [::FFI::Pointer]
+      # @param finalize [Boolean]
+      def initialize(ptr, finalize = true)
         @ptr = ptr
         if @ptr.null?
           @ptr = nil # Remove null pointers so we don't have to test for them.
@@ -23,24 +26,32 @@ module CZMQ
           ObjectSpace.define_finalizer self, @finalizer
         end
       end
-      def self.create_finalizer_for ptr
+      # @param ptr [::FFI::Pointer]
+      # @return [Proc]
+      def self.create_finalizer_for(ptr)
         Proc.new do
           ptr_ptr = ::FFI::MemoryPointer.new :pointer
           ptr_ptr.write_pointer ptr
           ::CZMQ::FFI.zlist_destroy ptr_ptr
         end
       end
+      # @return [Boolean]
       def null?
         !@ptr or @ptr.null?
       end
       # Return internal pointer
+      # @return [::FFI::Pointer]
       def __ptr
         raise DestroyedError unless @ptr
         @ptr
       end
       # So external Libraries can just pass the Object to a FFI function which expects a :pointer
       alias_method :to_ptr, :__ptr
-      # Nullify internal pointer and return pointer pointer
+      # Nullify internal pointer and return pointer pointer.
+      # @note This detaches the current instance from the native object
+      #   and thus makes it unusable.
+      # @return [::FFI::MemoryPointer] the pointer pointing to a pointer
+      #   pointing to the native object
       def __ptr_give_ref
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
@@ -56,7 +67,7 @@ module CZMQ
       #     typedef int (zlist_compare_fn) (
       #         void *item1, void *item2);  
       #
-      # WARNING: If your Ruby code doesn't retain a reference to the
+      # @note WARNING: If your Ruby code doesn't retain a reference to the
       #   FFI::Function object after passing it to a C function call,
       #   it may be garbage collected while C still holds the pointer,
       #   potentially resulting in a segmentation fault.
@@ -73,7 +84,7 @@ module CZMQ
       #     typedef void (zlist_free_fn) (
       #         void *data);              
       #
-      # WARNING: If your Ruby code doesn't retain a reference to the
+      # @note WARNING: If your Ruby code doesn't retain a reference to the
       #   FFI::Function object after passing it to a C function call,
       #   it may be garbage collected while C still holds the pointer,
       #   potentially resulting in a segmentation fault.
@@ -85,12 +96,15 @@ module CZMQ
       end
 
       # Create a new list container
+      # @return [CZMQ::Zlist]
       def self.new()
         ptr = ::CZMQ::FFI.zlist_new()
         __new ptr
       end
 
       # Destroy a list container
+      #
+      # @return [void]
       def destroy()
         return unless @ptr
         self_p = __ptr_give_ref
@@ -100,6 +114,8 @@ module CZMQ
 
       # Return the item at the head of list. If the list is empty, returns NULL.
       # Leaves cursor pointing at the head item, or NULL if the list is empty.  
+      #
+      # @return [::FFI::Pointer]
       def first()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -109,6 +125,8 @@ module CZMQ
 
       # Return the next item. If the list is empty, returns NULL. To move to
       # the start of the list call zlist_first (). Advances the cursor.     
+      #
+      # @return [::FFI::Pointer]
       def next()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -118,6 +136,8 @@ module CZMQ
 
       # Return the item at the tail of list. If the list is empty, returns NULL.
       # Leaves cursor pointing at the tail item, or NULL if the list is empty.  
+      #
+      # @return [::FFI::Pointer]
       def last()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -126,6 +146,8 @@ module CZMQ
       end
 
       # Return first item in the list, or null, leaves the cursor
+      #
+      # @return [::FFI::Pointer]
       def head()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -134,6 +156,8 @@ module CZMQ
       end
 
       # Return last item in the list, or null, leaves the cursor
+      #
+      # @return [::FFI::Pointer]
       def tail()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -143,6 +167,8 @@ module CZMQ
 
       # Return the current item of list. If the list is empty, returns NULL.     
       # Leaves cursor pointing at the current item, or NULL if the list is empty.
+      #
+      # @return [::FFI::Pointer]
       def item()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -153,6 +179,9 @@ module CZMQ
       # Append an item to the end of the list, return 0 if OK or -1 if this  
       # failed for some reason (out of memory). Note that if a duplicator has
       # been set, this method will also duplicate the item.                  
+      #
+      # @param item [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
       def append(item)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -163,6 +192,9 @@ module CZMQ
       # Push an item to the start of the list, return 0 if OK or -1 if this  
       # failed for some reason (out of memory). Note that if a duplicator has
       # been set, this method will also duplicate the item.                  
+      #
+      # @param item [::FFI::Pointer, #to_ptr]
+      # @return [Integer]
       def push(item)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -171,6 +203,8 @@ module CZMQ
       end
 
       # Pop the item off the start of the list, if any
+      #
+      # @return [::FFI::Pointer]
       def pop()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -181,6 +215,9 @@ module CZMQ
       # Checks if an item already is present. Uses compare method to determine if 
       # items are equal. If the compare method is NULL the check will only compare
       # pointers. Returns true if item is present else false.                     
+      #
+      # @param item [::FFI::Pointer, #to_ptr]
+      # @return [Boolean]
       def exists(item)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -189,6 +226,9 @@ module CZMQ
       end
 
       # Remove the specified item from the list if present
+      #
+      # @param item [::FFI::Pointer, #to_ptr]
+      # @return [void]
       def remove(item)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -200,6 +240,8 @@ module CZMQ
       # duplicate all items, which must be strings. Otherwise, the list will hold
       # pointers back to the items in the original list. If list is null, returns
       # NULL.                                                                    
+      #
+      # @return [Zlist]
       def dup()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -209,6 +251,8 @@ module CZMQ
       end
 
       # Purge all items from list
+      #
+      # @return [void]
       def purge()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -217,6 +261,8 @@ module CZMQ
       end
 
       # Return number of items in the list
+      #
+      # @return [Integer]
       def size()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -226,6 +272,9 @@ module CZMQ
 
       # Sort the list by ascending key value using a straight ASCII comparison.
       # The sort is not stable, so may reorder items with the same keys.       
+      #
+      # @param compare [::FFI::Pointer, #to_ptr]
+      # @return [void]
       def sort(compare)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -241,6 +290,8 @@ module CZMQ
       # list values, you must free them explicitly before destroying the list.
       # The usual technique is to pop list items and destroy them, until the  
       # list is empty.                                                        
+      #
+      # @return [void]
       def autofree()
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -253,6 +304,9 @@ module CZMQ
       # first item is found, respectively, to be less than, to match, or be    
       # greater than the second item.                                          
       # This function is used for sorting, removal and exists checking.        
+      #
+      # @param fn [::FFI::Pointer, #to_ptr]
+      # @return [void]
       def comparefn(fn)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -265,6 +319,11 @@ module CZMQ
       # Use this when list items are dynamically allocated, to ensure that    
       # you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
       # Returns the item, or NULL if there is no such item.                   
+      #
+      # @param item [::FFI::Pointer, #to_ptr]
+      # @param fn [::FFI::Pointer, #to_ptr]
+      # @param at_tail [Boolean]
+      # @return [::FFI::Pointer]
       def freefn(item, fn, at_tail)
         raise DestroyedError unless @ptr
         self_p = @ptr
@@ -274,6 +333,9 @@ module CZMQ
       end
 
       # Self test of this class.
+      #
+      # @param verbose [Boolean]
+      # @return [void]
       def self.test(verbose)
         verbose = !(0==verbose||!verbose) # boolean
         result = ::CZMQ::FFI.zlist_test(verbose)
