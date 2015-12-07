@@ -14,7 +14,7 @@ JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zframe__1_1new (JNIEnv *env, jclass c, jbyteArray data, jlong size)
 {
     jbyte *data_ = (byte *) (*env)->GetByteArrayElements (env, data, 0);
-    jlong new_ = (jlong) zframe_new ((const void *) data, (size_t) size);
+    jlong new_ = (jlong) zframe_new (data_, (size_t) size);
     (*env)->ReleaseByteArrayElements (env, data, (jbyte *) data_, 0);
     return new_;
 }
@@ -63,6 +63,13 @@ Java_org_zeromq_czmq_Zframe__1_1size (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zframe__1_1data (JNIEnv *env, jclass c, jlong self)
+{
+    long data_ = (long) zframe_data ((zframe_t *) self);
+    return data_;
+}
+
+JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zframe__1_1dup (JNIEnv *env, jclass c, jlong self)
 {
     jlong dup_ = (jlong) zframe_dup ((zframe_t *) self);
@@ -73,18 +80,18 @@ JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zframe__1_1strhex (JNIEnv *env, jclass c, jlong self)
 {
     char *strhex_ = (char *) zframe_strhex ((zframe_t *) self);
-    jstring string = (*env)->NewStringUTF (env, strhex_);
+    jstring return_string_ = (*env)->NewStringUTF (env, strhex_);
     zstr_free (&strhex_);
-    return string;
+    return return_string_;
 }
 
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zframe__1_1strdup (JNIEnv *env, jclass c, jlong self)
 {
     char *strdup_ = (char *) zframe_strdup ((zframe_t *) self);
-    jstring string = (*env)->NewStringUTF (env, strdup_);
+    jstring return_string_ = (*env)->NewStringUTF (env, strdup_);
     zstr_free (&strdup_);
-    return string;
+    return return_string_;
 }
 
 JNIEXPORT jboolean JNICALL
@@ -133,7 +140,7 @@ JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zframe__1_1reset (JNIEnv *env, jclass c, jlong self, jbyteArray data, jlong size)
 {
     jbyte *data_ = (byte *) (*env)->GetByteArrayElements (env, data, 0);
-    zframe_reset ((zframe_t *) self, (const void *) data, (size_t) size);
+    zframe_reset ((zframe_t *) self, data_, (size_t) size);
     (*env)->ReleaseByteArrayElements (env, data, (jbyte *) data_, 0);
 }
 

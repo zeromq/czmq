@@ -66,8 +66,8 @@ JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Ztrie__1_1hitAsteriskMatch (JNIEnv *env, jclass c, jlong self)
 {
     char *hit_asterisk_match_ = (char *) ztrie_hit_asterisk_match ((ztrie_t *) self);
-    jstring string = (*env)->NewStringUTF (env, hit_asterisk_match_);
-    return string;
+    jstring return_string_ = (*env)->NewStringUTF (env, hit_asterisk_match_);
+    return return_string_;
 }
 
 JNIEXPORT void JNICALL

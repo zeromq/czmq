@@ -81,6 +81,13 @@ public class Zframe implements AutoCloseable{
         return __size (self);
     }
     /*
+    Return address of frame data
+    */
+    native static long __data (long self);
+    public long data () {
+        return __data (self);
+    }
+    /*
     Create a new frame that duplicates an existing frame. If frame is null,
     or memory was exhausted, returns null.                                 
     */

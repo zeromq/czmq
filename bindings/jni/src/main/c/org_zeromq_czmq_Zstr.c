@@ -14,9 +14,9 @@ JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zstr__1_1recv (JNIEnv *env, jclass c, jlong source)
 {
     char *recv_ = (char *) zstr_recv ((void *) source);
-    jstring string = (*env)->NewStringUTF (env, recv_);
+    jstring return_string_ = (*env)->NewStringUTF (env, recv_);
     zstr_free (&recv_);
-    return string;
+    return return_string_;
 }
 
 JNIEXPORT jint JNICALL

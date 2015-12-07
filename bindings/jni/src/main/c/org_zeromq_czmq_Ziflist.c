@@ -40,40 +40,40 @@ JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Ziflist__1_1first (JNIEnv *env, jclass c, jlong self)
 {
     char *first_ = (char *) ziflist_first ((ziflist_t *) self);
-    jstring string = (*env)->NewStringUTF (env, first_);
-    return string;
+    jstring return_string_ = (*env)->NewStringUTF (env, first_);
+    return return_string_;
 }
 
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Ziflist__1_1next (JNIEnv *env, jclass c, jlong self)
 {
     char *next_ = (char *) ziflist_next ((ziflist_t *) self);
-    jstring string = (*env)->NewStringUTF (env, next_);
-    return string;
+    jstring return_string_ = (*env)->NewStringUTF (env, next_);
+    return return_string_;
 }
 
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Ziflist__1_1address (JNIEnv *env, jclass c, jlong self)
 {
     char *address_ = (char *) ziflist_address ((ziflist_t *) self);
-    jstring string = (*env)->NewStringUTF (env, address_);
-    return string;
+    jstring return_string_ = (*env)->NewStringUTF (env, address_);
+    return return_string_;
 }
 
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Ziflist__1_1broadcast (JNIEnv *env, jclass c, jlong self)
 {
     char *broadcast_ = (char *) ziflist_broadcast ((ziflist_t *) self);
-    jstring string = (*env)->NewStringUTF (env, broadcast_);
-    return string;
+    jstring return_string_ = (*env)->NewStringUTF (env, broadcast_);
+    return return_string_;
 }
 
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Ziflist__1_1netmask (JNIEnv *env, jclass c, jlong self)
 {
     char *netmask_ = (char *) ziflist_netmask ((ziflist_t *) self);
-    jstring string = (*env)->NewStringUTF (env, netmask_);
-    return string;
+    jstring return_string_ = (*env)->NewStringUTF (env, netmask_);
+    return return_string_;
 }
 
 JNIEXPORT void JNICALL

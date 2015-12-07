@@ -29,16 +29,16 @@ JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zconfig__1_1name (JNIEnv *env, jclass c, jlong self)
 {
     char *name_ = (char *) zconfig_name ((zconfig_t *) self);
-    jstring string = (*env)->NewStringUTF (env, name_);
-    return string;
+    jstring return_string_ = (*env)->NewStringUTF (env, name_);
+    return return_string_;
 }
 
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zconfig__1_1value (JNIEnv *env, jclass c, jlong self)
 {
     char *value_ = (char *) zconfig_value ((zconfig_t *) self);
-    jstring string = (*env)->NewStringUTF (env, value_);
-    return string;
+    jstring return_string_ = (*env)->NewStringUTF (env, value_);
+    return return_string_;
 }
 
 JNIEXPORT void JNICALL
@@ -67,10 +67,10 @@ Java_org_zeromq_czmq_Zconfig__1_1get (JNIEnv *env, jclass c, jlong self, jstring
     char *path_ = (char *) (*env)->GetStringUTFChars (env, path, NULL);
     char *default_value_ = (char *) (*env)->GetStringUTFChars (env, default_value, NULL);
     char *get_ = (char *) zconfig_get ((zconfig_t *) self, path_, default_value_);
-    jstring string = (*env)->NewStringUTF (env, get_);
+    jstring return_string_ = (*env)->NewStringUTF (env, get_);
     (*env)->ReleaseStringUTFChars (env, path, path_);
     (*env)->ReleaseStringUTFChars (env, default_value, default_value_);
-    return string;
+    return return_string_;
 }
 
 JNIEXPORT void JNICALL
@@ -174,8 +174,8 @@ JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zconfig__1_1filename (JNIEnv *env, jclass c, jlong self)
 {
     char *filename_ = (char *) zconfig_filename ((zconfig_t *) self);
-    jstring string = (*env)->NewStringUTF (env, filename_);
-    return string;
+    jstring return_string_ = (*env)->NewStringUTF (env, filename_);
+    return return_string_;
 }
 
 JNIEXPORT jint JNICALL
@@ -198,9 +198,9 @@ JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zconfig__1_1strSave (JNIEnv *env, jclass c, jlong self)
 {
     char *str_save_ = (char *) zconfig_str_save ((zconfig_t *) self);
-    jstring string = (*env)->NewStringUTF (env, str_save_);
+    jstring return_string_ = (*env)->NewStringUTF (env, str_save_);
     zstr_free (&str_save_);
-    return string;
+    return return_string_;
 }
 
 JNIEXPORT jboolean JNICALL

@@ -38,8 +38,8 @@ JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_ZdirPatch__1_1path (JNIEnv *env, jclass c, jlong self)
 {
     char *path_ = (char *) zdir_patch_path ((zdir_patch_t *) self);
-    jstring string = (*env)->NewStringUTF (env, path_);
-    return string;
+    jstring return_string_ = (*env)->NewStringUTF (env, path_);
+    return return_string_;
 }
 
 JNIEXPORT jlong JNICALL
@@ -60,8 +60,8 @@ JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_ZdirPatch__1_1vpath (JNIEnv *env, jclass c, jlong self)
 {
     char *vpath_ = (char *) zdir_patch_vpath ((zdir_patch_t *) self);
-    jstring string = (*env)->NewStringUTF (env, vpath_);
-    return string;
+    jstring return_string_ = (*env)->NewStringUTF (env, vpath_);
+    return return_string_;
 }
 
 JNIEXPORT void JNICALL
@@ -74,8 +74,8 @@ JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_ZdirPatch__1_1digest (JNIEnv *env, jclass c, jlong self)
 {
     char *digest_ = (char *) zdir_patch_digest ((zdir_patch_t *) self);
-    jstring string = (*env)->NewStringUTF (env, digest_);
-    return string;
+    jstring return_string_ = (*env)->NewStringUTF (env, digest_);
+    return return_string_;
 }
 
 JNIEXPORT void JNICALL
