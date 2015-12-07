@@ -200,7 +200,7 @@ const QString QZconfig::filename ()
 //  existing data).                                                      
 int QZconfig::reload ()
 {
-    int rv = zconfig_reload (&self, );
+    int rv = zconfig_reload (&self);
     return rv;
 }
 
