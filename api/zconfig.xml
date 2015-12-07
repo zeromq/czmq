@@ -103,13 +103,12 @@
         <return type = "zlist" />
     </method>
 
-    <method name = "load" singleton = "1" >
+    <constructor name = "load">
         Load a config tree from a specified ZPL text file; returns a zconfig_t
         reference for the root, if the file exists and is readable. Returns NULL
         if the file does not exist.
         <argument name = "filename" type = "string" />
-        <return type = "zconfig" fresh = "1" />
-    </method>
+    </constructor>
 
     <method name = "save">
         Save a config tree to a specified ZPL text file, where a filename
@@ -118,12 +117,11 @@
         <return type = "integer" />
     </method>
 
-    <method name = "loadf" singleton = "1" >
+    <constructor name = "loadf">
         Equivalent to zconfig_load, taking a format string instead of a fixed
         filename.
         <argument name = "format" type = "format" />
-        <return type = "zconfig" fresh = "1" />
-    </method>
+    </constructor>
 
     <method name = "savef">
         Equivalent to zconfig_save, taking a format string instead of a fixed

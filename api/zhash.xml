@@ -146,13 +146,12 @@
         <return type = "zframe" fresh = "1" />
     </method>
 
-    <method name = "unpack" singleton = "1">
+    <constructor name = "unpack">
         Unpack binary frame into a new hash table. Packed data must follow format
         defined by zhash_pack. Hash table is set to autofree. An empty frame
         unpacks to an empty hash table.
         <argument name = "frame" type = "zframe" />
-        <return type = "zhash" fresh = "1" />
-    </method>
+    </constructor>
 
     <method name = "save">
         Save hash table to a text file in name=value format. Hash values must be
