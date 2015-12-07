@@ -190,11 +190,10 @@
         <return type = "integer" />
     </method>
 
-    <method name = "load" singleton = "1">
+    <method name = "load">
         Load/append an open file into message, create new message if
         null message provided. Returns NULL if the message could not
         be loaded.
-        <argument name = "self" type = "zmsg" />
         <argument name = "file" type = "FILE" />
         <return type = "zmsg" fresh = "1" />
     </method>
