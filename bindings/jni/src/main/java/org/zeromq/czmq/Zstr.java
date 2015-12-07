@@ -73,6 +73,14 @@ public class Zstr {
         return __sendx (dest, string [0]);
     }
     /*
+    Accepts a void pointer and returns a fresh character string. If source
+    is null, returns an empty string.                                     
+    */
+    native static String __str (long source);
+    public String str (long source) {
+        return __str (source);
+    }
+    /*
     Self test of this class.
     */
     native static void __test (boolean verbose);

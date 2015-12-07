@@ -62,11 +62,14 @@ Java_org_zeromq_czmq_Zframe__1_1size (JNIEnv *env, jclass c, jlong self)
     return size_;
 }
 
-JNIEXPORT jlong JNICALL
+JNIEXPORT jbyteArray JNICALL
 Java_org_zeromq_czmq_Zframe__1_1data (JNIEnv *env, jclass c, jlong self)
 {
-    long data_ = (long) zframe_data ((zframe_t *) self);
-    return data_;
+    jbyte *data_ = (jbyte *) zframe_data ((zframe_t *) self);
+    jint return_size_ = (jint) zframe_size ((zframe_t *) self);
+    jbyteArray return_data_ = (*env)->NewByteArray (env, return_size_);
+    (*env)->SetByteArrayRegion (env, return_data_, 0, return_size_, (jbyte *) data_);
+    return return_data_;
 }
 
 JNIEXPORT jlong JNICALL

@@ -49,11 +49,14 @@ Java_org_zeromq_czmq_Zuuid__1_1setStr (JNIEnv *env, jclass c, jlong self, jstrin
     return set_str_;
 }
 
-JNIEXPORT jlong JNICALL
+JNIEXPORT jbyteArray JNICALL
 Java_org_zeromq_czmq_Zuuid__1_1data (JNIEnv *env, jclass c, jlong self)
 {
-    long data_ = (long) zuuid_data ((zuuid_t *) self);
-    return data_;
+    jbyte *data_ = (jbyte *) zuuid_data ((zuuid_t *) self);
+    jint return_size_ = (jint) zuuid_size ((zuuid_t *) self);
+    jbyteArray return_data_ = (*env)->NewByteArray (env, return_size_);
+    (*env)->SetByteArrayRegion (env, return_data_, 0, return_size_, (jbyte *) data_);
+    return return_data_;
 }
 
 JNIEXPORT jlong JNICALL

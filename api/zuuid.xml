@@ -38,7 +38,7 @@
 
     <method name = "data">
         Return UUID binary data.
-        <return type = "buffer" />
+        <return type = "buffer" size = ".size" />
     </method>
 
     <method  name = "size">

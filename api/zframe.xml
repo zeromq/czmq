@@ -61,7 +61,7 @@
 
     <method name = "data">
         Return address of frame data
-        <return type = "buffer" mutable = "1" />
+        <return type = "buffer" mutable = "1" size = ".size" />
     </method>
 
     <method name = "dup">

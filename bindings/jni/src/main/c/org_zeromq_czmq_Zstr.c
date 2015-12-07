@@ -64,6 +64,15 @@ Java_org_zeromq_czmq_Zstr__1_1sendx (JNIEnv *env, jclass c, jlong dest, jstring 
     return sendx_;
 }
 
+JNIEXPORT jstring JNICALL
+Java_org_zeromq_czmq_Zstr__1_1str (JNIEnv *env, jclass c, jlong source)
+{
+    char *str_ = (char *) zstr_str ((void *) source);
+    jstring return_string_ = (*env)->NewStringUTF (env, str_);
+    zstr_free (&str_);
+    return return_string_;
+}
+
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zstr__1_1test (JNIEnv *env, jclass c, jboolean verbose)
 {

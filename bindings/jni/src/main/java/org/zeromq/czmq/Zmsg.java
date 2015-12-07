@@ -194,7 +194,7 @@ public class Zmsg implements AutoCloseable{
     }
     /*
     Remove first submessage from message, if any. Returns zmsg_t, or NULL if
-    decoding was not succesfull.                                            
+    decoding was not succesful.                                             
     */
     native static long __popmsg (long self);
     public Zmsg popmsg () {
