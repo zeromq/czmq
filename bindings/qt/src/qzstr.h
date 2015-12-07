@@ -42,6 +42,10 @@ public:
     //  message.                                                              
     static int sendfm (void *dest, const QString &param);
 
+    //  Accepts a void pointer and returns a fresh character string. If source
+    //  is null, returns an empty string.                                     
+    static QString str (void *source);
+
     //  Self test of this class.
     static void test (bool verbose);
 

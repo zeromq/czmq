@@ -9,6 +9,10 @@ module CZMQ
     # sending and receiving strings
     # @note This class is 100% generated using zproject.
     class Zstr
+      # Raised when one tries to use an instance of {Zstr} after
+      # the internal pointer to the native object has been nullified.
+      class DestroyedError < RuntimeError; end
+
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new
@@ -154,6 +158,17 @@ module CZMQ
       def self.sendx(dest, string, *args)
         string = String(string)
         result = ::CZMQ::FFI.zstr_sendx(dest, string, *args)
+        result
+      end
+
+      # Accepts a void pointer and returns a fresh character string. If source
+      # is null, returns an empty string.                                     
+      #
+      # @param source [::FFI::Pointer, #to_ptr]
+      # @return [::FFI::AutoPointer]
+      def self.str(source)
+        result = ::CZMQ::FFI.zstr_str(source)
+        result = ::FFI::AutoPointer.new(result, LibC.method(:free))
         result
       end
 

@@ -16,11 +16,6 @@ module CZMQ
 
     extend ::FFI::Library
 
-    # Raised when one tries to use an instance of one of the classes in the
-    # {CZMQ::FFI} namespace after the internal pointer to the
-    # native object has been nullified.
-    class DestroyedError < RuntimeError; end
-
     def self.available?
       @available
     end
@@ -517,6 +512,7 @@ module CZMQ
       attach_function :zstr_sendf, [:pointer, :string, :varargs], :int, **opts
       attach_function :zstr_sendfm, [:pointer, :string, :varargs], :int, **opts
       attach_function :zstr_sendx, [:pointer, :string, :varargs], :int, **opts
+      attach_function :zstr_str, [:pointer], :pointer, **opts
       attach_function :zstr_free, [:pointer], :void, **opts
       attach_function :zstr_test, [:bool], :void, **opts
 

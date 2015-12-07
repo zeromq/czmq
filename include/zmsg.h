@@ -133,7 +133,7 @@ CZMQ_EXPORT int
     zmsg_addmsg (zmsg_t *self, zmsg_t **msg_p);
 
 //  Remove first submessage from message, if any. Returns zmsg_t, or NULL if
-//  decoding was not succesfull.                                            
+//  decoding was not succesful.                                             
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zmsg_t *
     zmsg_popmsg (zmsg_t *self);

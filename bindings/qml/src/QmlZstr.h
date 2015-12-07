@@ -78,6 +78,10 @@ public slots:
     //  Returns 0 if the strings could be sent OK, or -1 on error.
     int sendx (void *dest, const QString &string);
 
+    //  Accepts a void pointer and returns a fresh character string. If source
+    //  is null, returns an empty string.                                     
+    QString str (void *source);
+
     //  Free a provided string, and nullify the parent pointer. Safe to call on
     //  a null pointer.                                                        
     void free (QString stringP);

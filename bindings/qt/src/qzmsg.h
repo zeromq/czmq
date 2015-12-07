@@ -106,7 +106,7 @@ public:
     int addmsg (QZmsg *msgP);
 
     //  Remove first submessage from message, if any. Returns zmsg_t, or NULL if
-    //  decoding was not succesfull.                                            
+    //  decoding was not succesful.                                             
     QZmsg * popmsg ();
 
     //  Remove specified frame from list, if present. Does not destroy frame.

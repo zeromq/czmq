@@ -2449,7 +2449,7 @@ success, -1 on error."""
 
     def popmsg(self):
         """Remove first submessage from message, if any. Returns zmsg_t, or NULL if
-decoding was not succesfull."""
+decoding was not succesful."""
         return Zmsg(lib.zmsg_popmsg(self._as_parameter_), True)
 
     def remove(self, frame):
@@ -3614,6 +3614,8 @@ lib.zstr_sendfm.restype = c_int
 lib.zstr_sendfm.argtypes = [c_void_p, c_char_p]
 lib.zstr_sendx.restype = c_int
 lib.zstr_sendx.argtypes = [c_void_p, c_char_p]
+lib.zstr_str.restype = POINTER(c_char)
+lib.zstr_str.argtypes = [c_void_p]
 lib.zstr_free.restype = None
 lib.zstr_free.argtypes = [POINTER(c_char_p)]
 lib.zstr_test.restype = None
@@ -3681,6 +3683,12 @@ message."""
         """Send a series of strings (until NULL) as multipart data
 Returns 0 if the strings could be sent OK, or -1 on error."""
         return lib.zstr_sendx(dest, string, *args)
+
+    @staticmethod
+    def str(source):
+        """Accepts a void pointer and returns a fresh character string. If source
+is null, returns an empty string."""
+        return return_fresh_string(lib.zstr_str(source))
 
     @staticmethod
     def free(string_p):

@@ -205,7 +205,7 @@ int QZmsg::addmsg (QZmsg *msgP)
 
 ///
 //  Remove first submessage from message, if any. Returns zmsg_t, or NULL if
-//  decoding was not succesfull.                                            
+//  decoding was not succesful.                                             
 QZmsg * QZmsg::popmsg ()
 {
     QZmsg *rv = new QZmsg (zmsg_popmsg (self));

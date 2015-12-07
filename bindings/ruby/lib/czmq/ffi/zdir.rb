@@ -9,6 +9,10 @@ module CZMQ
     # work with file-system directories
     # @note This class is 100% generated using zproject.
     class Zdir
+      # Raised when one tries to use an instance of {Zdir} after
+      # the internal pointer to the native object has been nullified.
+      class DestroyedError < RuntimeError; end
+
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new

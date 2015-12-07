@@ -68,6 +68,17 @@ int QZstr::sendfm (void *dest, const QString &param)
 }
 
 ///
+//  Accepts a void pointer and returns a fresh character string. If source
+//  is null, returns an empty string.                                     
+QString QZstr::str (void *source)
+{
+    char *retStr_ = zstr_str (source);
+    QString rv = QString (retStr_);
+    free (retStr_);;
+    return rv;
+}
+
+///
 //  Self test of this class.
 void QZstr::test (bool verbose)
 {

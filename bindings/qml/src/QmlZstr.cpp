@@ -77,6 +77,16 @@ int QmlZstrAttached::sendx (void *dest, const QString &string) {
 };
 
 ///
+//  Accepts a void pointer and returns a fresh character string. If source
+//  is null, returns an empty string.                                     
+QString QmlZstrAttached::str (void *source) {
+    char *retStr_ = zstr_str (source);
+    QString retQStr_ = QString (retStr_);
+    free (retStr_);
+    return retQStr_;
+};
+
+///
 //  Free a provided string, and nullify the parent pointer. Safe to call on
 //  a null pointer.                                                        
 void QmlZstrAttached::free (QString stringP) {

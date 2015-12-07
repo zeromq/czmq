@@ -122,7 +122,7 @@ int QmlZmsg::addmsg (QmlZmsg *msgP) {
 
 ///
 //  Remove first submessage from message, if any. Returns zmsg_t, or NULL if
-//  decoding was not succesfull.                                            
+//  decoding was not succesful.                                             
 QmlZmsg *QmlZmsg::popmsg () {
     QmlZmsg *retQ_ = new QmlZmsg ();
     retQ_->self = zmsg_popmsg (self);
