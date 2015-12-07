@@ -61,8 +61,8 @@ public class Zuuid implements AutoCloseable{
     /*
     Return UUID binary data.
     */
-    native static long __data (long self);
-    public long data () {
+    native static byte [] __data (long self);
+    public byte [] data () {
         return __data (self);
     }
     /*

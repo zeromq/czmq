@@ -83,8 +83,8 @@ public class Zframe implements AutoCloseable{
     /*
     Return address of frame data
     */
-    native static long __data (long self);
-    public long data () {
+    native static byte [] __data (long self);
+    public byte [] data () {
         return __data (self);
     }
     /*

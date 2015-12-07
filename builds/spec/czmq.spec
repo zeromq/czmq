@@ -60,7 +60,7 @@ This package contains development files.
 %defattr(-,root,root)
 %{_includedir}/*
 %{_libdir}/libczmq.so
-%{_libdir}/pkgconfig/czmq.pc
+%{_libdir}/pkgconfig/libczmq.pc
 
 %prep
 %setup -q
@@ -81,8 +81,6 @@ find %{buildroot} -name '*.la' | xargs rm -f
 %defattr(-,root,root)
 %doc README.md
 %doc README.txt
-%doc COPYING
 %{_bindir}/zmakecert
-%{_bindir}/test_zgossip
 
 %changelog

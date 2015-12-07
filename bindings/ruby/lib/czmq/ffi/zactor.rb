@@ -9,6 +9,10 @@ module CZMQ
     # The zactor class provides a simple actor framework.
     # @note This class is 100% generated using zproject.
     class Zactor
+      # Raised when one tries to use an instance of {Zactor} after
+      # the internal pointer to the native object has been nullified.
+      class DestroyedError < RuntimeError; end
+
       # Boilerplate for self pointer, initializer, and finalizer
       class << self
         alias :__new :new

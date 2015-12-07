@@ -154,7 +154,7 @@
 
     <method name = "popmsg">
         Remove first submessage from message, if any. Returns zmsg_t, or NULL if
-        decoding was not succesfull.
+        decoding was not succesful.
         <return type = "zmsg" fresh = "1" />
     </method>
 

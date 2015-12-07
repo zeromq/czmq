@@ -221,6 +221,20 @@ zstr_sendx (void *dest, const char *string, ...)
 
 
 //  --------------------------------------------------------------------------
+//  Accepts a void pointer and returns a fresh character string. If source is
+//  null, returns an empty string.
+
+char *
+zstr_str (void *source)
+{
+    if (source)
+        return strdup ((char *) source);
+    else
+        return strdup ("");
+}
+
+
+//  --------------------------------------------------------------------------
 //  Free a provided string, and nullify the parent pointer. Safe to call on
 //  a null pointer.
 

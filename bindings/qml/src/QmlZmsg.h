@@ -91,7 +91,7 @@ public slots:
     int addmsg (QmlZmsg *msgP);
 
     //  Remove first submessage from message, if any. Returns zmsg_t, or NULL if
-    //  decoding was not succesfull.                                            
+    //  decoding was not succesful.                                             
     QmlZmsg *popmsg ();
 
     //  Remove specified frame from list, if present. Does not destroy frame.
