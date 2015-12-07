@@ -75,6 +75,13 @@
         <return type = "integer" />
     </method>
 
+    <method name = "str" singleton = "1">
+        Accepts a void pointer and returns a fresh character string. If source
+        is null, returns an empty string.
+        <argument name = "source" type = "anything" />
+        <return type = "string" fresh = "1" />
+    </method>
+
     <method name = "free" singleton = "1">
         Free a provided string, and nullify the parent pointer. Safe to call on
         a null pointer.

@@ -67,6 +67,12 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zstr_sendx (void *dest, const char *string, ...);
 
+//  Accepts a void pointer and returns a fresh character string. If source
+//  is null, returns an empty string.                                     
+//  The caller is responsible for destroying the return value when finished with it.
+CZMQ_EXPORT char *
+    zstr_str (void *source);
+
 //  Free a provided string, and nullify the parent pointer. Safe to call on
 //  a null pointer.                                                        
 CZMQ_EXPORT void
