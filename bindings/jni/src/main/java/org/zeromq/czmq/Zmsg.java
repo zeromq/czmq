@@ -231,16 +231,6 @@ public class Zmsg implements AutoCloseable{
         return new Zframe (__last (self));
     }
     /*
-    Serialize multipart message to a single buffer. Use this method to send  
-    structured messages across transports that do not support multipart data.
-    Allocates and returns a new buffer containing the serialized message.    
-    To decode a serialized message buffer, use zmsg_decode ().               
-    */
-    native static long __encode (long self, byte [] buffer);
-    public long encode (byte [] buffer) {
-        return __encode (self, buffer);
-    }
-    /*
     Decodes a serialized message buffer created by zmsg_encode () and returns
     a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
     there was insufficient memory to work.                                   

@@ -27,7 +27,7 @@ JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zuuid__1_1newFrom (JNIEnv *env, jclass c, jbyteArray source)
 {
     jbyte *source_ = (byte *) (*env)->GetByteArrayElements (env, source, 0);
-    jlong new_from_ = (jlong) zuuid_new_from ((const byte *) source);
+    jlong new_from_ = (jlong) zuuid_new_from (source_);
     (*env)->ReleaseByteArrayElements (env, source, (jbyte *) source_, 0);
     return new_from_;
 }
@@ -36,7 +36,7 @@ JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zuuid__1_1set (JNIEnv *env, jclass c, jlong self, jbyteArray source)
 {
     jbyte *source_ = (byte *) (*env)->GetByteArrayElements (env, source, 0);
-    zuuid_set ((zuuid_t *) self, (const byte *) source);
+    zuuid_set ((zuuid_t *) self, source_);
     (*env)->ReleaseByteArrayElements (env, source, (jbyte *) source_, 0);
 }
 
@@ -50,6 +50,13 @@ Java_org_zeromq_czmq_Zuuid__1_1setStr (JNIEnv *env, jclass c, jlong self, jstrin
 }
 
 JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zuuid__1_1data (JNIEnv *env, jclass c, jlong self)
+{
+    long data_ = (long) zuuid_data ((zuuid_t *) self);
+    return data_;
+}
+
+JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zuuid__1_1size (JNIEnv *env, jclass c, jlong self)
 {
     jlong size_ = (jlong) zuuid_size ((zuuid_t *) self);
@@ -60,23 +67,23 @@ JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zuuid__1_1str (JNIEnv *env, jclass c, jlong self)
 {
     char *str_ = (char *) zuuid_str ((zuuid_t *) self);
-    jstring string = (*env)->NewStringUTF (env, str_);
-    return string;
+    jstring return_string_ = (*env)->NewStringUTF (env, str_);
+    return return_string_;
 }
 
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zuuid__1_1strCanonical (JNIEnv *env, jclass c, jlong self)
 {
     char *str_canonical_ = (char *) zuuid_str_canonical ((zuuid_t *) self);
-    jstring string = (*env)->NewStringUTF (env, str_canonical_);
-    return string;
+    jstring return_string_ = (*env)->NewStringUTF (env, str_canonical_);
+    return return_string_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zuuid__1_1export (JNIEnv *env, jclass c, jlong self, jbyteArray target)
 {
     jbyte *target_ = (byte *) (*env)->GetByteArrayElements (env, target, 0);
-    zuuid_export ((zuuid_t *) self, (byte *) target);
+    zuuid_export ((zuuid_t *) self, target_);
     (*env)->ReleaseByteArrayElements (env, target, (jbyte *) target_, 0);
 }
 
@@ -84,7 +91,7 @@ JNIEXPORT jboolean JNICALL
 Java_org_zeromq_czmq_Zuuid__1_1eq (JNIEnv *env, jclass c, jlong self, jbyteArray compare)
 {
     jbyte *compare_ = (byte *) (*env)->GetByteArrayElements (env, compare, 0);
-    jboolean eq_ = (jboolean) zuuid_eq ((zuuid_t *) self, (const byte *) compare);
+    jboolean eq_ = (jboolean) zuuid_eq ((zuuid_t *) self, compare_);
     (*env)->ReleaseByteArrayElements (env, compare, (jbyte *) compare_, 0);
     return eq_;
 }
@@ -93,7 +100,7 @@ JNIEXPORT jboolean JNICALL
 Java_org_zeromq_czmq_Zuuid__1_1neq (JNIEnv *env, jclass c, jlong self, jbyteArray compare)
 {
     jbyte *compare_ = (byte *) (*env)->GetByteArrayElements (env, compare, 0);
-    jboolean neq_ = (jboolean) zuuid_neq ((zuuid_t *) self, (const byte *) compare);
+    jboolean neq_ = (jboolean) zuuid_neq ((zuuid_t *) self, compare_);
     (*env)->ReleaseByteArrayElements (env, compare, (jbyte *) compare_, 0);
     return neq_;
 }

@@ -27,19 +27,19 @@ JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zarmour__1_1modeStr (JNIEnv *env, jclass c, jlong self)
 {
     char *mode_str_ = (char *) zarmour_mode_str ((zarmour_t *) self);
-    jstring string = (*env)->NewStringUTF (env, mode_str_);
-    return string;
+    jstring return_string_ = (*env)->NewStringUTF (env, mode_str_);
+    return return_string_;
 }
 
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zarmour__1_1encode (JNIEnv *env, jclass c, jlong self, jbyteArray data, jlong size)
 {
     jbyte *data_ = (byte *) (*env)->GetByteArrayElements (env, data, 0);
-    char *encode_ = (char *) zarmour_encode ((zarmour_t *) self, (const byte *) data, (size_t) size);
-    jstring string = (*env)->NewStringUTF (env, encode_);
+    char *encode_ = (char *) zarmour_encode ((zarmour_t *) self, data_, (size_t) size);
+    jstring return_string_ = (*env)->NewStringUTF (env, encode_);
     zstr_free (&encode_);
     (*env)->ReleaseByteArrayElements (env, data, (jbyte *) data_, 0);
-    return string;
+    return return_string_;
 }
 
 JNIEXPORT jint JNICALL

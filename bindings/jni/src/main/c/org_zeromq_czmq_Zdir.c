@@ -31,8 +31,8 @@ JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zdir__1_1path (JNIEnv *env, jclass c, jlong self)
 {
     char *path_ = (char *) zdir_path ((zdir_t *) self);
-    jstring string = (*env)->NewStringUTF (env, path_);
-    return string;
+    jstring return_string_ = (*env)->NewStringUTF (env, path_);
+    return return_string_;
 }
 
 JNIEXPORT jlong JNICALL

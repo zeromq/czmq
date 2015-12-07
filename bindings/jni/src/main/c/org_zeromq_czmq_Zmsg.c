@@ -146,9 +146,9 @@ JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zmsg__1_1popstr (JNIEnv *env, jclass c, jlong self)
 {
     char *popstr_ = (char *) zmsg_popstr ((zmsg_t *) self);
-    jstring string = (*env)->NewStringUTF (env, popstr_);
+    jstring return_string_ = (*env)->NewStringUTF (env, popstr_);
     zstr_free (&popstr_);
-    return string;
+    return return_string_;
 }
 
 JNIEXPORT jint JNICALL
@@ -193,19 +193,10 @@ Java_org_zeromq_czmq_Zmsg__1_1last (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1encode (JNIEnv *env, jclass c, jlong self, jbyteArray buffer)
-{
-    jbyte *buffer_ = (byte *) (*env)->GetByteArrayElements (env, buffer, 0);
-    jlong encode_ = (jlong) zmsg_encode ((zmsg_t *) self, (byte **) &buffer);
-    (*env)->ReleaseByteArrayElements (env, buffer, (jbyte *) buffer_, 0);
-    return encode_;
-}
-
-JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zmsg__1_1decode (JNIEnv *env, jclass c, jbyteArray buffer, jlong buffer_size)
 {
     jbyte *buffer_ = (byte *) (*env)->GetByteArrayElements (env, buffer, 0);
-    jlong decode_ = (jlong) zmsg_decode ((const byte *) buffer, (size_t) buffer_size);
+    jlong decode_ = (jlong) zmsg_decode (buffer_, (size_t) buffer_size);
     (*env)->ReleaseByteArrayElements (env, buffer, (jbyte *) buffer_, 0);
     return decode_;
 }

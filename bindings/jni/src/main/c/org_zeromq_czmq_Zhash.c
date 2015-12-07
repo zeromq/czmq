@@ -107,8 +107,8 @@ JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zhash__1_1cursor (JNIEnv *env, jclass c, jlong self)
 {
     char *cursor_ = (char *) zhash_cursor ((zhash_t *) self);
-    jstring string = (*env)->NewStringUTF (env, cursor_);
-    return string;
+    jstring return_string_ = (*env)->NewStringUTF (env, cursor_);
+    return return_string_;
 }
 
 JNIEXPORT void JNICALL

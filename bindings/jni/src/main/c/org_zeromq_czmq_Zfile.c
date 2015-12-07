@@ -39,9 +39,9 @@ Java_org_zeromq_czmq_Zfile__1_1filename (JNIEnv *env, jclass c, jlong self, jstr
 {
     char *path_ = (char *) (*env)->GetStringUTFChars (env, path, NULL);
     char *filename_ = (char *) zfile_filename ((zfile_t *) self, path_);
-    jstring string = (*env)->NewStringUTF (env, filename_);
+    jstring return_string_ = (*env)->NewStringUTF (env, filename_);
     (*env)->ReleaseStringUTFChars (env, path, path_);
-    return string;
+    return return_string_;
 }
 
 JNIEXPORT void JNICALL
@@ -137,8 +137,8 @@ JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zfile__1_1readln (JNIEnv *env, jclass c, jlong self)
 {
     char *readln_ = (char *) zfile_readln ((zfile_t *) self);
-    jstring string = (*env)->NewStringUTF (env, readln_);
-    return string;
+    jstring return_string_ = (*env)->NewStringUTF (env, readln_);
+    return return_string_;
 }
 
 JNIEXPORT void JNICALL
@@ -151,8 +151,8 @@ JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zfile__1_1digest (JNIEnv *env, jclass c, jlong self)
 {
     char *digest_ = (char *) zfile_digest ((zfile_t *) self);
-    jstring string = (*env)->NewStringUTF (env, digest_);
-    return string;
+    jstring return_string_ = (*env)->NewStringUTF (env, digest_);
+    return return_string_;
 }
 
 JNIEXPORT void JNICALL
