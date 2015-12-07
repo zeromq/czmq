@@ -26,24 +26,21 @@
         Destroy a frame
     </destructor>
 
-    <method name = "new empty" singleton = "1">
+    <constructor name = "new empty">
         Create an empty (zero-sized) frame
-        <return type = "zframe" fresh = "1" />
-    </method>
+    </constructor>
 
-    <method name = "from" singleton = "1">
+    <constructor name = "from">
         Create a frame with a specified string content.
         <argument name = "string" type = "string" />
-        <return type = "zframe" fresh = "1" />
-    </method>
+    </constructor>
 
-    <method name = "recv" singleton = "1">
+    <constructor name = "recv">
         Receive frame from socket, returns zframe_t object or NULL if the recv
         was interrupted. Does a blocking recv, if you want to not block then use
         zpoller or zloop.
         <argument name = "source" type = "anything" />
-        <return type = "zframe" fresh = "1" />
-    </method>
+    </constructor>
 
     <method name = "send" singleton = "1">
         Send a frame to a socket, destroy frame after sending.

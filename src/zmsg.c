@@ -605,45 +605,32 @@ zmsg_save (zmsg_t *self, FILE *file)
 
 
 //  --------------------------------------------------------------------------
-//  Load/append an open file into message, create new message if
-//  null message provided. Returns NULL if the message could not be
-//  loaded.
+//  Load/append an open file into new message, return the message.
+//  Returns NULL if the message could not be loaded.
+
 
 zmsg_t *
-zmsg_load (zmsg_t *self, FILE *file)
+zmsg_load (FILE *file)
 {
+    zmsg_t *self = zmsg_new ();
+    assert (self);
     assert (file);
-    if (!self)
-        self = zmsg_new ();
-    if (!self)
-        return NULL;
 
     while (true) {
         size_t frame_size;
-        size_t rc = fread (&frame_size, sizeof (frame_size), 1, file);
-        if (rc == 1) {
+        if (fread (&frame_size, sizeof (frame_size), 1, file) == 1) {
             zframe_t *frame = zframe_new (NULL, frame_size);
-            if (!frame) {
-                zmsg_destroy (&self);
-                return NULL;    //  Unable to allocate frame, fail
-            }
-            rc = fread (zframe_data (frame), frame_size, 1, file);
-            if (frame_size > 0 && rc != 1) {
+            if (fread (zframe_data (frame), frame_size, 1, file) == 1
+            &&  frame_size > 0)
+                zmsg_append (self, &frame);
+            else {
                 zframe_destroy (&frame);
                 zmsg_destroy (&self);
-                return NULL;    //  Corrupt file, fail
-            }
-            if (zmsg_append (self, &frame) == -1) {
-                zmsg_destroy (&self);
-                return NULL;    //  Unable to add frame, fail
+                break;
             }
         }
         else
             break;              //  Unable to read properly, quit
-    }
-    if (!zmsg_size (self)) {
-        zmsg_destroy (&self);
-        self = NULL;
     }
     return self;
 }
@@ -1070,19 +1057,8 @@ zmsg_test (bool verbose)
     assert (zmsg_size (msg) == 10);
     assert (zmsg_content_size (msg) == 60);
 
-    // create empty file for null test
-    FILE *file = fopen ("zmsg.test", "w");
-    assert (file);
-    fclose (file);
-
-    file = fopen ("zmsg.test", "r");
-    zmsg_t *null_msg = zmsg_load (NULL, file);
-    assert (null_msg == NULL);
-    fclose (file);
-    remove ("zmsg.test");
-
     //  Save to a file, read back
-    file = fopen ("zmsg.test", "w");
+    FILE *file = fopen ("zmsg.test", "w");
     assert (file);
     rc = zmsg_save (msg, file);
     assert (rc == 0);
@@ -1095,7 +1071,7 @@ zmsg_test (bool verbose)
     zmsg_destroy (&msg);
 
     file = fopen ("zmsg.test", "r");
-    msg = zmsg_load (NULL, file);
+    msg = zmsg_load (file);
     assert (msg);
     fclose (file);
     remove ("zmsg.test");

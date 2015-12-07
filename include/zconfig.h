@@ -29,6 +29,17 @@ typedef int (zconfig_fct) (
 CZMQ_EXPORT zconfig_t *
     zconfig_new (const char *name, zconfig_t *parent);
 
+//  Load a config tree from a specified ZPL text file; returns a zconfig_t  
+//  reference for the root, if the file exists and is readable. Returns NULL
+//  if the file does not exist.                                             
+CZMQ_EXPORT zconfig_t *
+    zconfig_load (const char *filename);
+
+//  Equivalent to zconfig_load, taking a format string instead of a fixed
+//  filename.                                                            
+CZMQ_EXPORT zconfig_t *
+    zconfig_loadf (const char *format, ...) CHECK_PRINTF (1);
+
 //  Destroy a config item and all its children
 CZMQ_EXPORT void
     zconfig_destroy (zconfig_t **self_p);
@@ -97,23 +108,10 @@ CZMQ_EXPORT void
 CZMQ_EXPORT zlist_t *
     zconfig_comments (zconfig_t *self);
 
-//  Load a config tree from a specified ZPL text file; returns a zconfig_t  
-//  reference for the root, if the file exists and is readable. Returns NULL
-//  if the file does not exist.                                             
-//  The caller is responsible for destroying the return value when finished with it.
-CZMQ_EXPORT zconfig_t *
-    zconfig_load (const char *filename);
-
 //  Save a config tree to a specified ZPL text file, where a filename
 //  "-" means dump to standard output.                               
 CZMQ_EXPORT int
     zconfig_save (zconfig_t *self, const char *filename);
-
-//  Equivalent to zconfig_load, taking a format string instead of a fixed
-//  filename.                                                            
-//  The caller is responsible for destroying the return value when finished with it.
-CZMQ_EXPORT zconfig_t *
-    zconfig_loadf (const char *format, ...) CHECK_PRINTF (1);
 
 //  Equivalent to zconfig_save, taking a format string instead of a fixed
 //  filename.                                                            

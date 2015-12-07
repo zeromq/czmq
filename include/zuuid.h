@@ -28,14 +28,13 @@ extern "C" {
 CZMQ_EXPORT zuuid_t *
     zuuid_new ();
 
+//  Create UUID object from supplied ZUUID_LEN-octet value.
+CZMQ_EXPORT zuuid_t *
+    zuuid_new_from (const byte *source);
+
 //  Destroy a specified UUID object.
 CZMQ_EXPORT void
     zuuid_destroy (zuuid_t **self_p);
-
-//  Create UUID object from supplied ZUUID_LEN-octet value.
-//  The caller is responsible for destroying the return value when finished with it.
-CZMQ_EXPORT zuuid_t *
-    zuuid_new_from (const byte *source);
 
 //  Set UUID to new supplied ZUUID_LEN-octet value.
 CZMQ_EXPORT void

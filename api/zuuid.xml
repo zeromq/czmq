@@ -18,11 +18,10 @@
         Destroy a specified UUID object.
     </destructor>
 
-    <method name = "new from" singleton = "1">
+    <constructor name = "new from">
         Create UUID object from supplied ZUUID_LEN-octet value.
         <argument name = "source" type = "buffer" />
-        <return type = "zuuid" fresh = "1" />
-    </method>
+    </constructor>
 
     <method name = "set">
         Set UUID to new supplied ZUUID_LEN-octet value.

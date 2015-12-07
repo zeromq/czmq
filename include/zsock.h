@@ -36,81 +36,67 @@ extern "C" {
 CZMQ_EXPORT zsock_t *
     zsock_new (int type);
 
-//  Destroy the socket. You must use this for any socket created via the
-//  zsock_new method.                                                   
-CZMQ_EXPORT void
-    zsock_destroy (zsock_t **self_p);
-
 //  Create a PUB socket. Default action is bind.
-//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_pub (const char *endpoint);
 
 //  Create a SUB socket, and optionally subscribe to some prefix string. Default
 //  action is connect.                                                          
-//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_sub (const char *endpoint, const char *subscribe);
 
 //  Create a REQ socket. Default action is connect.
-//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_req (const char *endpoint);
 
 //  Create a REP socket. Default action is bind.
-//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_rep (const char *endpoint);
 
 //  Create a DEALER socket. Default action is connect.
-//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_dealer (const char *endpoint);
 
 //  Create a ROUTER socket. Default action is bind.
-//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_router (const char *endpoint);
 
 //  Create a PUSH socket. Default action is connect.
-//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_push (const char *endpoint);
 
 //  Create a PULL socket. Default action is bind.
-//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_pull (const char *endpoint);
 
 //  Create an XPUB socket. Default action is bind.
-//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_xpub (const char *endpoint);
 
 //  Create an XSUB socket. Default action is connect.
-//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_xsub (const char *endpoint);
 
 //  Create a PAIR socket. Default action is connect.
-//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_pair (const char *endpoint);
 
 //  Create a STREAM socket. Default action is connect.
-//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_stream (const char *endpoint);
 
 //  Create a SERVER socket. Default action is bind.
-//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_server (const char *endpoint);
 
 //  Create a CLIENT socket. Default action is connect.
-//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zsock_t *
     zsock_new_client (const char *endpoint);
+
+//  Destroy the socket. You must use this for any socket created via the
+//  zsock_new method.                                                   
+CZMQ_EXPORT void
+    zsock_destroy (zsock_t **self_p);
 
 //  Bind a socket to a formatted endpoint. For tcp:// endpoints, supports   
 //  ephemeral ports, if you specify the port number as "*". By default      

@@ -33,6 +33,12 @@ typedef int (zhash_foreach_fn) (
 CZMQ_EXPORT zhash_t *
     zhash_new ();
 
+//  Unpack binary frame into a new hash table. Packed data must follow format
+//  defined by zhash_pack. Hash table is set to autofree. An empty frame     
+//  unpacks to an empty hash table.                                          
+CZMQ_EXPORT zhash_t *
+    zhash_unpack (zframe_t *frame);
+
 //  Destroy a hash container and all items in it
 CZMQ_EXPORT void
     zhash_destroy (zhash_t **self_p);
@@ -140,13 +146,6 @@ CZMQ_EXPORT void
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zframe_t *
     zhash_pack (zhash_t *self);
-
-//  Unpack binary frame into a new hash table. Packed data must follow format
-//  defined by zhash_pack. Hash table is set to autofree. An empty frame     
-//  unpacks to an empty hash table.                                          
-//  The caller is responsible for destroying the return value when finished with it.
-CZMQ_EXPORT zhash_t *
-    zhash_unpack (zframe_t *frame);
 
 //  Save hash table to a text file in name=value format. Hash values must be
 //  printable strings; keys may not contain '=' character. Returns 0 if OK, 

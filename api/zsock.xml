@@ -25,91 +25,77 @@
         zsock_new method.
     </destructor>
 
-    <method name = "new pub" singleton = "1">
+    <constructor name = "new pub">
         Create a PUB socket. Default action is bind.
         <argument name = "endpoint" type = "string" />
-        <return type = "zsock" fresh = "1" />
-    </method>
+    </constructor>
 
-    <method name = "new sub" singleton = "1">
+    <constructor name = "new sub">
         Create a SUB socket, and optionally subscribe to some prefix string. Default
         action is connect.
         <argument name = "endpoint" type = "string" />
         <argument name = "subscribe" type = "string" />
-        <return type = "zsock" fresh = "1" />
-    </method>
+    </constructor>
 
-    <method name = "new req" singleton = "1">
+    <constructor name = "new req">
         Create a REQ socket. Default action is connect.
         <argument name = "endpoint" type = "string" />
-        <return type = "zsock" fresh = "1" />
-    </method>
+    </constructor>
 
-    <method name = "new rep" singleton = "1">
+    <constructor name = "new rep">
         Create a REP socket. Default action is bind.
         <argument name = "endpoint" type = "string" />
-        <return type = "zsock" fresh = "1" />
-    </method>
+    </constructor>
 
-    <method name = "new dealer" singleton = "1">
+    <constructor name = "new dealer">
         Create a DEALER socket. Default action is connect.
         <argument name = "endpoint" type = "string" />
-        <return type = "zsock" fresh = "1" />
-    </method>
+    </constructor>
 
-    <method name = "new router" singleton = "1">
+    <constructor name = "new router">
         Create a ROUTER socket. Default action is bind.
         <argument name = "endpoint" type = "string" />
-        <return type = "zsock" fresh = "1" />
-    </method>
+    </constructor>
 
-    <method name = "new push" singleton = "1">
+    <constructor name = "new push">
         Create a PUSH socket. Default action is connect.
         <argument name = "endpoint" type = "string" />
-        <return type = "zsock" fresh = "1" />
-    </method>
+    </constructor>
 
-    <method name = "new pull" singleton = "1">
+    <constructor name = "new pull">
         Create a PULL socket. Default action is bind.
         <argument name = "endpoint" type = "string" />
-        <return type = "zsock" fresh = "1" />
-    </method>
+    </constructor>
 
-    <method name = "new xpub" singleton = "1">
+    <constructor name = "new xpub">
         Create an XPUB socket. Default action is bind.
         <argument name = "endpoint" type = "string" />
-        <return type = "zsock" fresh = "1" />
-    </method>
+    </constructor>
 
-    <method name = "new xsub" singleton = "1">
+    <constructor name = "new xsub">
         Create an XSUB socket. Default action is connect.
         <argument name = "endpoint" type = "string" />
-        <return type = "zsock" fresh = "1" />
-    </method>
+    </constructor>
 
-    <method name = "new pair" singleton = "1">
+    <constructor name = "new pair">
         Create a PAIR socket. Default action is connect.
         <argument name = "endpoint" type = "string" />
-        <return type = "zsock" fresh = "1" />
-    </method>
+    </constructor>
 
-    <method name = "new stream" singleton = "1">
+    <constructor name = "new stream">
         Create a STREAM socket. Default action is connect.
         <argument name = "endpoint" type = "string" />
-        <return type = "zsock" fresh = "1" />
-    </method>
+    </constructor>
 
-    <method name = "new server" singleton = "1">
+    <constructor name = "new server">
         Create a SERVER socket. Default action is bind.
         <argument name = "endpoint" type = "string" />
-        <return type = "zsock" fresh = "1" />
-    </method>
+    </constructor>
 
-    <method name = "new client" singleton = "1">
+    <constructor name = "new client">
         Create a CLIENT socket. Default action is connect.
         <argument name = "endpoint" type = "string" />
-        <return type = "zsock" fresh = "1" />
-    </method>
+    </constructor>
 
     <method name = "bind">
         Bind a socket to a formatted endpoint. For tcp:// endpoints, supports

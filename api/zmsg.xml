@@ -18,14 +18,13 @@
         Destroy a message object and all frames it contains
     </destructor>
 
-    <method name = "recv" singleton = "1">
+    <constructor name = "recv">
         Receive message from socket, returns zmsg_t object or NULL if the recv
         was interrupted. Does a blocking recv. If you want to not block then use
         the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
         before receiving.
         <argument name = "source" type = "anything" />
-        <return type = "zmsg" fresh = "1" />
-    </method>
+    </constructor>
 
     <method name = "send" singleton = "1">
         Send message to destination socket, and destroy the message after sending
@@ -190,13 +189,11 @@
         <return type = "integer" />
     </method>
 
-    <method name = "load">
-        Load/append an open file into message, create new message if
-        null message provided. Returns NULL if the message could not
-        be loaded.
+    <constructor name = "load">
+        Load/append an open file into new message, return the message.
+        Returns NULL if the message could not be loaded.
         <argument name = "file" type = "FILE" />
-        <return type = "zmsg" fresh = "1" />
-    </method>
+    </constructor>
 
     <method name = "encode">
         Serialize multipart message to a single buffer. Use this method to send
@@ -207,14 +204,13 @@
         <return type = "size" />
     </method>
 
-    <method name = "decode" singleton = "1">
+    <constructor name = "decode">
         Decodes a serialized message buffer created by zmsg_encode () and returns
         a new zmsg_t object. Returns NULL if the buffer was badly formatted or
         there was insufficient memory to work.
         <argument name = "buffer" type = "buffer" />
         <argument name = "buffer size" type = "size" />
-        <return type = "zmsg" fresh = "1" />
-    </method>
+    </constructor>
 
     <method name = "dup">
         Create copy of message, as new message object. Returns a fresh zmsg_t
@@ -235,13 +231,12 @@
         <return type = "boolean" />
     </method>
 
-    <method name = "new signal" singleton = "1">
+    <constructor name = "new signal">
         Generate a signal message encoding the given status. A signal is a short
         message carrying a 1-byte success/failure code (by convention, 0 means
         OK). Signals are encoded to be distinguishable from "normal" messages.
         <argument name = "status" type = "byte" />
-        <return type = "zmsg" fresh = "1" />
-    </method>
+    </constructor>
 
     <method name = "signal">
         Return signal value, 0 or greater, if message is a signal, -1 if not.
