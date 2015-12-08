@@ -1319,8 +1319,11 @@ zsock_bsend (void *self, const char *picture, ...)
 //  reduce memory allocations. The pattern argument is a string that defines
 //  the type of each argument. See zsock_bsend for the supported argument
 //  types. All arguments must be pointers; this call sets them to point to
-//  values held on a per-socket basis. Do not modify or destroy the returned
-//  values. Returns 0 if successful, or -1 if it failed to read a message.
+//  values held on a per-socket basis.
+//  Note that zsock_brecv creates the returned objects, and the caller must
+//  destroy them when finished with them. The supplied pointers do not need
+//  to be initialized. Returns 0 if successful, or -1 if it failed to read
+//  a message.
 
 //  This is the largest size we allow for an incoming longstr or chunk (1M)
 #define MAX_ALLOC_SIZE      1024 * 1024
