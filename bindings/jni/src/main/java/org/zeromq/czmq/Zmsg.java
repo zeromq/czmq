@@ -6,7 +6,7 @@
 */
 package org.zeromq.czmq;
 
-public class Zmsg implements AutoCloseable {
+public class Zmsg implements AutoCloseable{
     static {
         try {
             System.loadLibrary ("czmqjni");
@@ -21,29 +21,21 @@ public class Zmsg implements AutoCloseable {
     */
     native static long __new ();
     public Zmsg () {
-        /*  TODO: if __new fails, self is null...  */
+        /*  TODO: if __new fails, self is null...            */
         self = __new ();
     }
     public Zmsg (long pointer) {
         self = pointer;
     }
     /*
-    Destroy a message object and all frames it contains
+    Receive message from socket, returns zmsg_t object or NULL if the recv   
+    was interrupted. Does a blocking recv. If you want to not block then use 
+    the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
+    before receiving.                                                        
     */
-    native static void __destroy (long self);
-    @Override
-    public void close () {
-        __destroy (self);
-        self = 0;
-    }
-    /*
-    Generate a signal message encoding the given status. A signal is a short
-    message carrying a 1-byte success/failure code (by convention, 0 means  
-    OK). Signals are encoded to be distinguishable from "normal" messages.  
-    */
-    native static long __newSignal (byte status);
-    public Zmsg newSignal (byte status) {
-        return new Zmsg (__newSignal (status));
+    native static long __recv (long source);
+    public Zmsg recv (long source) {
+        return new Zmsg (__recv (source));
     }
     /*
     Decodes a serialized message buffer created by zmsg_encode () and returns
@@ -55,14 +47,22 @@ public class Zmsg implements AutoCloseable {
         return new Zmsg (__decode (buffer, bufferSize));
     }
     /*
-    Receive message from socket, returns zmsg_t object or NULL if the recv   
-    was interrupted. Does a blocking recv. If you want to not block then use 
-    the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
-    before receiving.                                                        
+    Generate a signal message encoding the given status. A signal is a short
+    message carrying a 1-byte success/failure code (by convention, 0 means  
+    OK). Signals are encoded to be distinguishable from "normal" messages.  
     */
-    native static long __recv (long source);
-    public Zmsg recv (long source) {
-        return new Zmsg (__recv (source));
+    native static long __newSignal (byte status);
+    public Zmsg newSignal (byte status) {
+        return new Zmsg (__newSignal (status));
+    }
+    /*
+    Destroy a message object and all frames it contains
+    */
+    native static void __destroy (long self);
+    @Override
+    public void close () {
+        __destroy (self);
+        self = 0;
     }
     /*
     Send message to destination socket, and destroy the message after sending

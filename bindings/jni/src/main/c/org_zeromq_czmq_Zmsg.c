@@ -17,17 +17,11 @@ Java_org_zeromq_czmq_Zmsg__1_1new (JNIEnv *env, jclass c)
     return new_;
 }
 
-JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1destroy (JNIEnv *env, jclass c, jlong self)
-{
-    zmsg_destroy ((zmsg_t **) &self);
-}
-
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1newSignal (JNIEnv *env, jclass c, jbyte status)
+Java_org_zeromq_czmq_Zmsg__1_1recv (JNIEnv *env, jclass c, jlong source)
 {
-    jlong new_signal_ = (jlong) zmsg_new_signal ((byte) status);
-    return new_signal_;
+    jlong recv_ = (jlong) zmsg_recv ((void *) source);
+    return recv_;
 }
 
 JNIEXPORT jlong JNICALL
@@ -40,10 +34,16 @@ Java_org_zeromq_czmq_Zmsg__1_1decode (JNIEnv *env, jclass c, jbyteArray buffer, 
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1recv (JNIEnv *env, jclass c, jlong source)
+Java_org_zeromq_czmq_Zmsg__1_1newSignal (JNIEnv *env, jclass c, jbyte status)
 {
-    jlong recv_ = (jlong) zmsg_recv ((void *) source);
-    return recv_;
+    jlong new_signal_ = (jlong) zmsg_new_signal ((byte) status);
+    return new_signal_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zmsg__1_1destroy (JNIEnv *env, jclass c, jlong self)
+{
+    zmsg_destroy ((zmsg_t **) &self);
 }
 
 JNIEXPORT jint JNICALL
