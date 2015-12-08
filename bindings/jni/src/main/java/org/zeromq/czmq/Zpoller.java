@@ -22,7 +22,7 @@ public class Zpoller implements AutoCloseable{
     */
     native static long __new (long reader);
     public Zpoller (long reader []) {
-        /*  TODO: if __new fails, self is null...  */
+        /*  TODO: if __new fails, self is null...            */
         self = __new (reader [0]);
     }
     public Zpoller (long pointer) {

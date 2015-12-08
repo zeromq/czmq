@@ -17,12 +17,6 @@ Java_org_zeromq_czmq_Zsock__1_1new (JNIEnv *env, jclass c, jint type)
     return new_;
 }
 
-JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zsock__1_1destroy (JNIEnv *env, jclass c, jlong self)
-{
-    zsock_destroy ((zsock_t **) &self);
-}
-
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zsock__1_1newPub (JNIEnv *env, jclass c, jstring endpoint)
 {
@@ -149,6 +143,12 @@ Java_org_zeromq_czmq_Zsock__1_1newClient (JNIEnv *env, jclass c, jstring endpoin
     jlong new_client_ = (jlong) zsock_new_client (endpoint_);
     (*env)->ReleaseStringUTFChars (env, endpoint, endpoint_);
     return new_client_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1destroy (JNIEnv *env, jclass c, jlong self)
+{
+    zsock_destroy ((zsock_t **) &self);
 }
 
 JNIEXPORT jint JNICALL

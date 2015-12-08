@@ -21,7 +21,7 @@ public class ZdirPatch implements AutoCloseable{
     */
     native static long __new (String path, long file, int op, String alias);
     public ZdirPatch (String path, Zfile file, int op, String alias) {
-        /*  TODO: if __new fails, self is null...  */
+        /*  TODO: if __new fails, self is null...            */
         self = __new (path, file.self, op, alias);
     }
     public ZdirPatch (long pointer) {

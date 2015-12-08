@@ -19,12 +19,6 @@ Java_org_zeromq_czmq_Zframe__1_1new (JNIEnv *env, jclass c, jbyteArray data, jlo
     return new_;
 }
 
-JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zframe__1_1destroy (JNIEnv *env, jclass c, jlong self)
-{
-    zframe_destroy ((zframe_t **) &self);
-}
-
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zframe__1_1newEmpty (JNIEnv *env, jclass c)
 {
@@ -46,6 +40,12 @@ Java_org_zeromq_czmq_Zframe__1_1recv (JNIEnv *env, jclass c, jlong source)
 {
     jlong recv_ = (jlong) zframe_recv ((void *) source);
     return recv_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zframe__1_1destroy (JNIEnv *env, jclass c, jlong self)
+{
+    zframe_destroy ((zframe_t **) &self);
 }
 
 JNIEXPORT jint JNICALL

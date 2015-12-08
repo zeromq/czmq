@@ -21,11 +21,18 @@ public class Zuuid implements AutoCloseable{
     */
     native static long __new ();
     public Zuuid () {
-        /*  TODO: if __new fails, self is null...  */
+        /*  TODO: if __new fails, self is null...            */
         self = __new ();
     }
     public Zuuid (long pointer) {
         self = pointer;
+    }
+    /*
+    Create UUID object from supplied ZUUID_LEN-octet value.
+    */
+    native static long __newFrom (byte [] source);
+    public Zuuid newFrom (byte [] source) {
+        return new Zuuid (__newFrom (source));
     }
     /*
     Destroy a specified UUID object.
@@ -35,13 +42,6 @@ public class Zuuid implements AutoCloseable{
     public void close () {
         __destroy (self);
         self = 0;
-    }
-    /*
-    Create UUID object from supplied ZUUID_LEN-octet value.
-    */
-    native static long __newFrom (byte [] source);
-    public Zuuid newFrom (byte [] source) {
-        return new Zuuid (__newFrom (source));
     }
     /*
     Set UUID to new supplied ZUUID_LEN-octet value.

@@ -17,6 +17,13 @@ Java_org_zeromq_czmq_Zhashx__1_1new (JNIEnv *env, jclass c)
     return new_;
 }
 
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zhashx__1_1unpack (JNIEnv *env, jclass c, jlong frame)
+{
+    jlong unpack_ = (jlong) zhashx_unpack ((zframe_t *) frame);
+    return unpack_;
+}
+
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zhashx__1_1destroy (JNIEnv *env, jclass c, jlong self)
 {
@@ -128,13 +135,6 @@ Java_org_zeromq_czmq_Zhashx__1_1pack (JNIEnv *env, jclass c, jlong self)
 {
     jlong pack_ = (jlong) zhashx_pack ((zhashx_t *) self);
     return pack_;
-}
-
-JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zhashx__1_1unpack (JNIEnv *env, jclass c, jlong frame)
-{
-    jlong unpack_ = (jlong) zhashx_unpack ((zframe_t *) frame);
-    return unpack_;
 }
 
 JNIEXPORT jlong JNICALL

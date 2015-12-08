@@ -21,20 +21,11 @@ public class Zmsg implements AutoCloseable{
     */
     native static long __new ();
     public Zmsg () {
-        /*  TODO: if __new fails, self is null...  */
+        /*  TODO: if __new fails, self is null...            */
         self = __new ();
     }
     public Zmsg (long pointer) {
         self = pointer;
-    }
-    /*
-    Destroy a message object and all frames it contains
-    */
-    native static void __destroy (long self);
-    @Override
-    public void close () {
-        __destroy (self);
-        self = 0;
     }
     /*
     Receive message from socket, returns zmsg_t object or NULL if the recv   
@@ -45,6 +36,33 @@ public class Zmsg implements AutoCloseable{
     native static long __recv (long source);
     public Zmsg recv (long source) {
         return new Zmsg (__recv (source));
+    }
+    /*
+    Decodes a serialized message buffer created by zmsg_encode () and returns
+    a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
+    there was insufficient memory to work.                                   
+    */
+    native static long __decode (byte [] buffer, long bufferSize);
+    public Zmsg decode (byte [] buffer, long bufferSize) {
+        return new Zmsg (__decode (buffer, bufferSize));
+    }
+    /*
+    Generate a signal message encoding the given status. A signal is a short
+    message carrying a 1-byte success/failure code (by convention, 0 means  
+    OK). Signals are encoded to be distinguishable from "normal" messages.  
+    */
+    native static long __newSignal (byte status);
+    public Zmsg newSignal (byte status) {
+        return new Zmsg (__newSignal (status));
+    }
+    /*
+    Destroy a message object and all frames it contains
+    */
+    native static void __destroy (long self);
+    @Override
+    public void close () {
+        __destroy (self);
+        self = 0;
     }
     /*
     Send message to destination socket, and destroy the message after sending
@@ -231,15 +249,6 @@ public class Zmsg implements AutoCloseable{
         return new Zframe (__last (self));
     }
     /*
-    Decodes a serialized message buffer created by zmsg_encode () and returns
-    a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
-    there was insufficient memory to work.                                   
-    */
-    native static long __decode (byte [] buffer, long bufferSize);
-    public Zmsg decode (byte [] buffer, long bufferSize) {
-        return new Zmsg (__decode (buffer, bufferSize));
-    }
-    /*
     Create copy of message, as new message object. Returns a fresh zmsg_t
     object. If message is null, or memory was exhausted, returns null.   
     */
@@ -263,15 +272,6 @@ public class Zmsg implements AutoCloseable{
     native static boolean __eq (long self, long other);
     public boolean eq (Zmsg other) {
         return __eq (self, other.self);
-    }
-    /*
-    Generate a signal message encoding the given status. A signal is a short
-    message carrying a 1-byte success/failure code (by convention, 0 means  
-    OK). Signals are encoded to be distinguishable from "normal" messages.  
-    */
-    native static long __newSignal (byte status);
-    public Zmsg newSignal (byte status) {
-        return new Zmsg (__newSignal (status));
     }
     /*
     Return signal value, 0 or greater, if message is a signal, -1 if not.

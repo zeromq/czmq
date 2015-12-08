@@ -23,22 +23,13 @@ public class Zframe implements AutoCloseable{
     */
     native static long __new (byte [] data, long size);
     public Zframe (byte [] data, long size) {
-        /*  TODO: if __new fails, self is null...  */
+        /*  TODO: if __new fails, self is null...            */
         self = __new (data, size);
     }
     public Zframe (long pointer) {
         self = pointer;
     }
     public Zframe () {
-        self = 0;
-    }
-    /*
-    Destroy a frame
-    */
-    native static void __destroy (long self);
-    @Override
-    public void close () {
-        __destroy (self);
         self = 0;
     }
     /*
@@ -63,6 +54,15 @@ public class Zframe implements AutoCloseable{
     native static long __recv (long source);
     public Zframe recv (long source) {
         return new Zframe (__recv (source));
+    }
+    /*
+    Destroy a frame
+    */
+    native static void __destroy (long self);
+    @Override
+    public void close () {
+        __destroy (self);
+        self = 0;
     }
     /*
     Send a frame to a socket, destroy frame after sending.

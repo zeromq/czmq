@@ -21,7 +21,7 @@ public class Zarmour implements AutoCloseable{
     */
     native static long __new ();
     public Zarmour () {
-        /*  TODO: if __new fails, self is null...  */
+        /*  TODO: if __new fails, self is null...            */
         self = __new ();
     }
     public Zarmour (long pointer) {

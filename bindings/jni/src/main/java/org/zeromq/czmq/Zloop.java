@@ -21,7 +21,7 @@ public class Zloop implements AutoCloseable{
     */
     native static long __new ();
     public Zloop () {
-        /*  TODO: if __new fails, self is null...  */
+        /*  TODO: if __new fails, self is null...            */
         self = __new ();
     }
     public Zloop (long pointer) {

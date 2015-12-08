@@ -17,12 +17,6 @@ Java_org_zeromq_czmq_Zuuid__1_1new (JNIEnv *env, jclass c)
     return new_;
 }
 
-JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zuuid__1_1destroy (JNIEnv *env, jclass c, jlong self)
-{
-    zuuid_destroy ((zuuid_t **) &self);
-}
-
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zuuid__1_1newFrom (JNIEnv *env, jclass c, jbyteArray source)
 {
@@ -30,6 +24,12 @@ Java_org_zeromq_czmq_Zuuid__1_1newFrom (JNIEnv *env, jclass c, jbyteArray source
     jlong new_from_ = (jlong) zuuid_new_from (source_);
     (*env)->ReleaseByteArrayElements (env, source, (jbyte *) source_, 0);
     return new_from_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zuuid__1_1destroy (JNIEnv *env, jclass c, jlong self)
+{
+    zuuid_destroy ((zuuid_t **) &self);
 }
 
 JNIEXPORT void JNICALL

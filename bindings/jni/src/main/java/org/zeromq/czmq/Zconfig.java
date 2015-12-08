@@ -21,7 +21,7 @@ public class Zconfig implements AutoCloseable{
     */
     native static long __new (String name, long parent);
     public Zconfig (String name, Zconfig parent) {
-        /*  TODO: if __new fails, self is null...  */
+        /*  TODO: if __new fails, self is null...            */
         self = __new (name, parent.self);
     }
     public Zconfig (long pointer) {
@@ -29,6 +29,23 @@ public class Zconfig implements AutoCloseable{
     }
     public Zconfig () {
         self = 0;
+    }
+    /*
+    Load a config tree from a specified ZPL text file; returns a zconfig_t  
+    reference for the root, if the file exists and is readable. Returns NULL
+    if the file does not exist.                                             
+    */
+    native static long __load (String filename);
+    public Zconfig load (String filename) {
+        return new Zconfig (__load (filename));
+    }
+    /*
+    Equivalent to zconfig_load, taking a format string instead of a fixed
+    filename.                                                            
+    */
+    native static long __loadf (String format);
+    public Zconfig loadf (String format) {
+        return new Zconfig (__loadf (format));
     }
     /*
     Destroy a config item and all its children
@@ -138,29 +155,12 @@ public class Zconfig implements AutoCloseable{
         return new Zlist (__comments (self));
     }
     /*
-    Load a config tree from a specified ZPL text file; returns a zconfig_t  
-    reference for the root, if the file exists and is readable. Returns NULL
-    if the file does not exist.                                             
-    */
-    native static long __load (String filename);
-    public Zconfig load (String filename) {
-        return new Zconfig (__load (filename));
-    }
-    /*
     Save a config tree to a specified ZPL text file, where a filename
     "-" means dump to standard output.                               
     */
     native static int __save (long self, String filename);
     public int save (String filename) {
         return __save (self, filename);
-    }
-    /*
-    Equivalent to zconfig_load, taking a format string instead of a fixed
-    filename.                                                            
-    */
-    native static long __loadf (String format);
-    public Zconfig loadf (String format) {
-        return new Zconfig (__loadf (format));
     }
     /*
     Equivalent to zconfig_save, taking a format string instead of a fixed
