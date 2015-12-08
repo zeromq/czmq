@@ -19,6 +19,24 @@ Java_org_zeromq_czmq_Zconfig__1_1new (JNIEnv *env, jclass c, jstring name, jlong
     return new_;
 }
 
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zconfig__1_1load (JNIEnv *env, jclass c, jstring filename)
+{
+    char *filename_ = (char *) (*env)->GetStringUTFChars (env, filename, NULL);
+    jlong load_ = (jlong) zconfig_load (filename_);
+    (*env)->ReleaseStringUTFChars (env, filename, filename_);
+    return load_;
+}
+
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zconfig__1_1loadf (JNIEnv *env, jclass c, jstring format)
+{
+    char *format_ = (char *) (*env)->GetStringUTFChars (env, format, NULL);
+    jlong loadf_ = (jlong) zconfig_loadf ("%s", format_);
+    (*env)->ReleaseStringUTFChars (env, format, format_);
+    return loadf_;
+}
+
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zconfig__1_1destroy (JNIEnv *env, jclass c, jlong self)
 {
@@ -134,15 +152,6 @@ Java_org_zeromq_czmq_Zconfig__1_1comments (JNIEnv *env, jclass c, jlong self)
     return comments_;
 }
 
-JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zconfig__1_1load (JNIEnv *env, jclass c, jstring filename)
-{
-    char *filename_ = (char *) (*env)->GetStringUTFChars (env, filename, NULL);
-    jlong load_ = (jlong) zconfig_load (filename_);
-    (*env)->ReleaseStringUTFChars (env, filename, filename_);
-    return load_;
-}
-
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zconfig__1_1save (JNIEnv *env, jclass c, jlong self, jstring filename)
 {
@@ -150,15 +159,6 @@ Java_org_zeromq_czmq_Zconfig__1_1save (JNIEnv *env, jclass c, jlong self, jstrin
     jint save_ = (jint) zconfig_save ((zconfig_t *) self, filename_);
     (*env)->ReleaseStringUTFChars (env, filename, filename_);
     return save_;
-}
-
-JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zconfig__1_1loadf (JNIEnv *env, jclass c, jstring format)
-{
-    char *format_ = (char *) (*env)->GetStringUTFChars (env, format, NULL);
-    jlong loadf_ = (jlong) zconfig_loadf ("%s", format_);
-    (*env)->ReleaseStringUTFChars (env, format, format_);
-    return loadf_;
 }
 
 JNIEXPORT jint JNICALL

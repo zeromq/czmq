@@ -21,11 +21,20 @@ public class Zhash implements AutoCloseable{
     */
     native static long __new ();
     public Zhash () {
-        /*  TODO: if __new fails, self is null...  */
+        /*  TODO: if __new fails, self is null...            */
         self = __new ();
     }
     public Zhash (long pointer) {
         self = pointer;
+    }
+    /*
+    Unpack binary frame into a new hash table. Packed data must follow format
+    defined by zhash_pack. Hash table is set to autofree. An empty frame     
+    unpacks to an empty hash table.                                          
+    */
+    native static long __unpack (long frame);
+    public Zhash unpack (Zframe frame) {
+        return new Zhash (__unpack (frame.self));
     }
     /*
     Destroy a hash container and all items in it
@@ -167,15 +176,6 @@ public class Zhash implements AutoCloseable{
     native static long __pack (long self);
     public Zframe pack () {
         return new Zframe (__pack (self));
-    }
-    /*
-    Unpack binary frame into a new hash table. Packed data must follow format
-    defined by zhash_pack. Hash table is set to autofree. An empty frame     
-    unpacks to an empty hash table.                                          
-    */
-    native static long __unpack (long frame);
-    public Zhash unpack (Zframe frame) {
-        return new Zhash (__unpack (frame.self));
     }
     /*
     Save hash table to a text file in name=value format. Hash values must be

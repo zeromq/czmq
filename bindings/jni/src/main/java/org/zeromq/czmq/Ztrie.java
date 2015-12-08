@@ -21,7 +21,7 @@ public class Ztrie implements AutoCloseable{
     */
     native static long __new (char delimiter);
     public Ztrie (char delimiter) {
-        /*  TODO: if __new fails, self is null...  */
+        /*  TODO: if __new fails, self is null...            */
         self = __new (delimiter);
     }
     public Ztrie (long pointer) {

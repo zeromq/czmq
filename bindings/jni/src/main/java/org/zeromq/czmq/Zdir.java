@@ -23,7 +23,7 @@ public class Zdir implements AutoCloseable{
     */
     native static long __new (String path, String parent);
     public Zdir (String path, String parent) {
-        /*  TODO: if __new fails, self is null...  */
+        /*  TODO: if __new fails, self is null...            */
         self = __new (path, parent);
     }
     public Zdir (long pointer) {

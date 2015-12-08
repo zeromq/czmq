@@ -24,6 +24,22 @@ Java_org_zeromq_czmq_Zmsg__1_1destroy (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zmsg__1_1newSignal (JNIEnv *env, jclass c, jbyte status)
+{
+    jlong new_signal_ = (jlong) zmsg_new_signal ((byte) status);
+    return new_signal_;
+}
+
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zmsg__1_1decode (JNIEnv *env, jclass c, jbyteArray buffer, jlong buffer_size)
+{
+    jbyte *buffer_ = (byte *) (*env)->GetByteArrayElements (env, buffer, 0);
+    jlong decode_ = (jlong) zmsg_decode (buffer_, (size_t) buffer_size);
+    (*env)->ReleaseByteArrayElements (env, buffer, (jbyte *) buffer_, 0);
+    return decode_;
+}
+
+JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zmsg__1_1recv (JNIEnv *env, jclass c, jlong source)
 {
     jlong recv_ = (jlong) zmsg_recv ((void *) source);
@@ -193,15 +209,6 @@ Java_org_zeromq_czmq_Zmsg__1_1last (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1decode (JNIEnv *env, jclass c, jbyteArray buffer, jlong buffer_size)
-{
-    jbyte *buffer_ = (byte *) (*env)->GetByteArrayElements (env, buffer, 0);
-    jlong decode_ = (jlong) zmsg_decode (buffer_, (size_t) buffer_size);
-    (*env)->ReleaseByteArrayElements (env, buffer, (jbyte *) buffer_, 0);
-    return decode_;
-}
-
-JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zmsg__1_1dup (JNIEnv *env, jclass c, jlong self)
 {
     jlong dup_ = (jlong) zmsg_dup ((zmsg_t *) self);
@@ -219,13 +226,6 @@ Java_org_zeromq_czmq_Zmsg__1_1eq (JNIEnv *env, jclass c, jlong self, jlong other
 {
     jboolean eq_ = (jboolean) zmsg_eq ((zmsg_t *) self, (zmsg_t *) other);
     return eq_;
-}
-
-JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zmsg__1_1newSignal (JNIEnv *env, jclass c, jbyte status)
-{
-    jlong new_signal_ = (jlong) zmsg_new_signal ((byte) status);
-    return new_signal_;
 }
 
 JNIEXPORT jint JNICALL

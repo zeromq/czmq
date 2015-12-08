@@ -26,23 +26,13 @@ public class Zsock implements AutoCloseable{
     */
     native static long __new (int type);
     public Zsock (int type) {
-        /*  TODO: if __new fails, self is null...  */
+        /*  TODO: if __new fails, self is null...            */
         self = __new (type);
     }
     public Zsock (long pointer) {
         self = pointer;
     }
     public Zsock () {
-        self = 0;
-    }
-    /*
-    Destroy the socket. You must use this for any socket created via the
-    zsock_new method.                                                   
-    */
-    native static void __destroy (long self);
-    @Override
-    public void close () {
-        __destroy (self);
         self = 0;
     }
     /*
@@ -143,6 +133,16 @@ public class Zsock implements AutoCloseable{
     native static long __newClient (String endpoint);
     public Zsock newClient (String endpoint) {
         return new Zsock (__newClient (endpoint));
+    }
+    /*
+    Destroy the socket. You must use this for any socket created via the
+    zsock_new method.                                                   
+    */
+    native static void __destroy (long self);
+    @Override
+    public void close () {
+        __destroy (self);
+        self = 0;
     }
     /*
     Bind a socket to a formatted endpoint. For tcp:// endpoints, supports   
@@ -320,8 +320,11 @@ public class Zsock implements AutoCloseable{
     reduce memory allocations. The pattern argument is a string that defines
     the type of each argument. See zsock_bsend for the supported argument   
     types. All arguments must be pointers; this call sets them to point to  
-    values held on a per-socket basis. Do not modify or destroy the returned
-    values. Returns 0 if successful, or -1 if it failed to read a message.  
+    values held on a per-socket basis.                                      
+    Note that zsock_brecv creates the returned objects, and the caller must 
+    destroy them when finished with them. The supplied pointers do not need 
+    to be initialized. Returns 0 if successful, or -1 if it failed to read  
+    a message.                                                              
     */
     native static int __brecv (long self, String picture);
     public int brecv (String picture []) {

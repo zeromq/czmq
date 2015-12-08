@@ -38,7 +38,6 @@ task generateJniHeaders(type: Exec, dependsOn: 'classes') {
             'org.zeromq.czmq.Ziflist',
             'org.zeromq.czmq.Zlist',
             'org.zeromq.czmq.Zloop',
-            'org.zeromq.czmq.Zmsg',
             'org.zeromq.czmq.Zpoller',
             'org.zeromq.czmq.Zsock',
             'org.zeromq.czmq.Zstr',
