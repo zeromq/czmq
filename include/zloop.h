@@ -35,7 +35,7 @@ typedef int (zloop_timer_fn) (
 
 //  Create a new zloop reactor
 CZMQ_EXPORT zloop_t *
-    zloop_new ();
+    zloop_new (void);
 
 //  Destroy a reactor
 CZMQ_EXPORT void

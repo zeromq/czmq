@@ -48,7 +48,7 @@ typedef int (zhashx_foreach_fn) (
 
 //  Create a new, empty hash container
 CZMQ_EXPORT zhashx_t *
-    zhashx_new ();
+    zhashx_new (void);
 
 //  Unpack binary frame into a new hash table. Packed data must follow format
 //  defined by zhashx_pack. Hash table is set to autofree. An empty frame    
