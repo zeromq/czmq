@@ -73,6 +73,14 @@ module CZMQ
         __new ptr
       end
 
+      # Create UUID object from supplied ZUUID_LEN-octet value.
+      # @param source [::FFI::Pointer, #to_ptr]
+      # @return [CZMQ::Zuuid]
+      def self.new_from(source)
+        ptr = ::CZMQ::FFI.zuuid_new_from(source)
+        __new ptr
+      end
+
       # Destroy a specified UUID object.
       #
       # @return [void]
@@ -80,16 +88,6 @@ module CZMQ
         return unless @ptr
         self_p = __ptr_give_ref
         result = ::CZMQ::FFI.zuuid_destroy(self_p)
-        result
-      end
-
-      # Create UUID object from supplied ZUUID_LEN-octet value.
-      #
-      # @param source [::FFI::Pointer, #to_ptr]
-      # @return [Zuuid]
-      def self.new_from(source)
-        result = ::CZMQ::FFI.zuuid_new_from(source)
-        result = Zuuid.__new result, true
         result
       end
 

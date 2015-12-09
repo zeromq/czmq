@@ -106,6 +106,17 @@ module CZMQ
         __new ptr
       end
 
+      # Unpack binary frame into a new hash table. Packed data must follow format
+      # defined by zhash_pack. Hash table is set to autofree. An empty frame     
+      # unpacks to an empty hash table.                                          
+      # @param frame [Zframe, #__ptr]
+      # @return [CZMQ::Zhash]
+      def self.unpack(frame)
+        frame = frame.__ptr if frame
+        ptr = ::CZMQ::FFI.zhash_unpack(frame)
+        __new ptr
+      end
+
       # Destroy a hash container and all items in it
       #
       # @return [void]
@@ -321,19 +332,6 @@ module CZMQ
         self_p = @ptr
         result = ::CZMQ::FFI.zhash_pack(self_p)
         result = Zframe.__new result, true
-        result
-      end
-
-      # Unpack binary frame into a new hash table. Packed data must follow format
-      # defined by zhash_pack. Hash table is set to autofree. An empty frame     
-      # unpacks to an empty hash table.                                          
-      #
-      # @param frame [Zframe, #__ptr]
-      # @return [Zhash]
-      def self.unpack(frame)
-        frame = frame.__ptr if frame
-        result = ::CZMQ::FFI.zhash_unpack(frame)
-        result = Zhash.__new result, true
         result
       end
 

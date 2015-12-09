@@ -73,6 +73,49 @@ module CZMQ
         __new ptr
       end
 
+      # Receive message from socket, returns zmsg_t object or NULL if the recv   
+      # was interrupted. Does a blocking recv. If you want to not block then use 
+      # the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
+      # before receiving.                                                        
+      # @param source [::FFI::Pointer, #to_ptr]
+      # @return [CZMQ::Zmsg]
+      def self.recv(source)
+        ptr = ::CZMQ::FFI.zmsg_recv(source)
+        __new ptr
+      end
+
+      # Load/append an open file into new message, return the message.
+      # Returns NULL if the message could not be loaded.              
+      # @param file [::FFI::Pointer, #to_ptr]
+      # @return [CZMQ::Zmsg]
+      def self.load(file)
+        ptr = ::CZMQ::FFI.zmsg_load(file)
+        __new ptr
+      end
+
+      # Decodes a serialized message buffer created by zmsg_encode () and returns
+      # a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
+      # there was insufficient memory to work.                                   
+      # @param buffer [::FFI::Pointer, #to_ptr]
+      # @param buffer_size [Integer, #to_int, #to_i]
+      # @return [CZMQ::Zmsg]
+      def self.decode(buffer, buffer_size)
+        buffer_size = Integer(buffer_size)
+        ptr = ::CZMQ::FFI.zmsg_decode(buffer, buffer_size)
+        __new ptr
+      end
+
+      # Generate a signal message encoding the given status. A signal is a short
+      # message carrying a 1-byte success/failure code (by convention, 0 means  
+      # OK). Signals are encoded to be distinguishable from "normal" messages.  
+      # @param status [Integer, #to_int, #to_i]
+      # @return [CZMQ::Zmsg]
+      def self.new_signal(status)
+        status = Integer(status)
+        ptr = ::CZMQ::FFI.zmsg_new_signal(status)
+        __new ptr
+      end
+
       # Destroy a message object and all frames it contains
       #
       # @return [void]
@@ -80,19 +123,6 @@ module CZMQ
         return unless @ptr
         self_p = __ptr_give_ref
         result = ::CZMQ::FFI.zmsg_destroy(self_p)
-        result
-      end
-
-      # Receive message from socket, returns zmsg_t object or NULL if the recv   
-      # was interrupted. Does a blocking recv. If you want to not block then use 
-      # the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
-      # before receiving.                                                        
-      #
-      # @param source [::FFI::Pointer, #to_ptr]
-      # @return [Zmsg]
-      def self.recv(source)
-        result = ::CZMQ::FFI.zmsg_recv(source)
-        result = Zmsg.__new result, true
         result
       end
 
@@ -393,20 +423,6 @@ module CZMQ
         result
       end
 
-      # Load/append an open file into message, create new message if
-      # null message provided. Returns NULL if the message could not
-      # be loaded.                                                  
-      #
-      # @param self_ [Zmsg, #__ptr]
-      # @param file [::FFI::Pointer, #to_ptr]
-      # @return [Zmsg]
-      def self.load(self_, file)
-        self_ = self_.__ptr if self_
-        result = ::CZMQ::FFI.zmsg_load(self_, file)
-        result = Zmsg.__new result, true
-        result
-      end
-
       # Serialize multipart message to a single buffer. Use this method to send  
       # structured messages across transports that do not support multipart data.
       # Allocates and returns a new buffer containing the serialized message.    
@@ -418,20 +434,6 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zmsg_encode(self_p, buffer)
-        result
-      end
-
-      # Decodes a serialized message buffer created by zmsg_encode () and returns
-      # a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
-      # there was insufficient memory to work.                                   
-      #
-      # @param buffer [::FFI::Pointer, #to_ptr]
-      # @param buffer_size [Integer, #to_int, #to_i]
-      # @return [Zmsg]
-      def self.decode(buffer, buffer_size)
-        buffer_size = Integer(buffer_size)
-        result = ::CZMQ::FFI.zmsg_decode(buffer, buffer_size)
-        result = Zmsg.__new result, true
         result
       end
 
@@ -469,19 +471,6 @@ module CZMQ
         self_p = @ptr
         other = other.__ptr if other
         result = ::CZMQ::FFI.zmsg_eq(self_p, other)
-        result
-      end
-
-      # Generate a signal message encoding the given status. A signal is a short
-      # message carrying a 1-byte success/failure code (by convention, 0 means  
-      # OK). Signals are encoded to be distinguishable from "normal" messages.  
-      #
-      # @param status [Integer, #to_int, #to_i]
-      # @return [Zmsg]
-      def self.new_signal(status)
-        status = Integer(status)
-        result = ::CZMQ::FFI.zmsg_new_signal(status)
-        result = Zmsg.__new result, true
         result
       end
 
