@@ -78,6 +78,32 @@ module CZMQ
         __new ptr
       end
 
+      # Create an empty (zero-sized) frame
+      # @return [CZMQ::Zframe]
+      def self.new_empty()
+        ptr = ::CZMQ::FFI.zframe_new_empty()
+        __new ptr
+      end
+
+      # Create a frame with a specified string content.
+      # @param string [String, #to_str, #to_s]
+      # @return [CZMQ::Zframe]
+      def self.from(string)
+        string = String(string)
+        ptr = ::CZMQ::FFI.zframe_from(string)
+        __new ptr
+      end
+
+      # Receive frame from socket, returns zframe_t object or NULL if the recv  
+      # was interrupted. Does a blocking recv, if you want to not block then use
+      # zpoller or zloop.                                                       
+      # @param source [::FFI::Pointer, #to_ptr]
+      # @return [CZMQ::Zframe]
+      def self.recv(source)
+        ptr = ::CZMQ::FFI.zframe_recv(source)
+        __new ptr
+      end
+
       # Destroy a frame
       #
       # @return [void]
@@ -85,38 +111,6 @@ module CZMQ
         return unless @ptr
         self_p = __ptr_give_ref
         result = ::CZMQ::FFI.zframe_destroy(self_p)
-        result
-      end
-
-      # Create an empty (zero-sized) frame
-      #
-      # @return [Zframe]
-      def self.new_empty()
-        result = ::CZMQ::FFI.zframe_new_empty()
-        result = Zframe.__new result, true
-        result
-      end
-
-      # Create a frame with a specified string content.
-      #
-      # @param string [String, #to_str, #to_s]
-      # @return [Zframe]
-      def self.from(string)
-        string = String(string)
-        result = ::CZMQ::FFI.zframe_from(string)
-        result = Zframe.__new result, true
-        result
-      end
-
-      # Receive frame from socket, returns zframe_t object or NULL if the recv  
-      # was interrupted. Does a blocking recv, if you want to not block then use
-      # zpoller or zloop.                                                       
-      #
-      # @param source [::FFI::Pointer, #to_ptr]
-      # @return [Zframe]
-      def self.recv(source)
-        result = ::CZMQ::FFI.zframe_recv(source)
-        result = Zframe.__new result, true
         result
       end
 

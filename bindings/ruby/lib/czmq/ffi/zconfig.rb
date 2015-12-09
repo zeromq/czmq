@@ -95,6 +95,28 @@ module CZMQ
         __new ptr
       end
 
+      # Load a config tree from a specified ZPL text file; returns a zconfig_t  
+      # reference for the root, if the file exists and is readable. Returns NULL
+      # if the file does not exist.                                             
+      # @param filename [String, #to_str, #to_s]
+      # @return [CZMQ::Zconfig]
+      def self.load(filename)
+        filename = String(filename)
+        ptr = ::CZMQ::FFI.zconfig_load(filename)
+        __new ptr
+      end
+
+      # Equivalent to zconfig_load, taking a format string instead of a fixed
+      # filename.                                                            
+      # @param format [String, #to_str, #to_s]
+      # @param args [Array<Object>]
+      # @return [CZMQ::Zconfig]
+      def self.loadf(format, *args)
+        format = String(format)
+        ptr = ::CZMQ::FFI.zconfig_loadf(format, *args)
+        __new ptr
+      end
+
       # Destroy a config item and all its children
       #
       # @return [void]
@@ -285,19 +307,6 @@ module CZMQ
         result
       end
 
-      # Load a config tree from a specified ZPL text file; returns a zconfig_t  
-      # reference for the root, if the file exists and is readable. Returns NULL
-      # if the file does not exist.                                             
-      #
-      # @param filename [String, #to_str, #to_s]
-      # @return [Zconfig]
-      def self.load(filename)
-        filename = String(filename)
-        result = ::CZMQ::FFI.zconfig_load(filename)
-        result = Zconfig.__new result, true
-        result
-      end
-
       # Save a config tree to a specified ZPL text file, where a filename
       # "-" means dump to standard output.                               
       #
@@ -308,19 +317,6 @@ module CZMQ
         self_p = @ptr
         filename = String(filename)
         result = ::CZMQ::FFI.zconfig_save(self_p, filename)
-        result
-      end
-
-      # Equivalent to zconfig_load, taking a format string instead of a fixed
-      # filename.                                                            
-      #
-      # @param format [String, #to_str, #to_s]
-      # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
-      # @return [Zconfig]
-      def self.loadf(format, *args)
-        format = String(format)
-        result = ::CZMQ::FFI.zconfig_loadf(format, *args)
-        result = Zconfig.__new result, true
         result
       end
 

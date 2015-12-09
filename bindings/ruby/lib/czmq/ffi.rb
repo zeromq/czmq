@@ -79,6 +79,8 @@ module CZMQ
       require_relative 'ffi/zarmour'
 
       attach_function :zconfig_new, [:string, :pointer], :pointer, **opts
+      attach_function :zconfig_load, [:string], :pointer, **opts
+      attach_function :zconfig_loadf, [:string, :varargs], :pointer, **opts
       attach_function :zconfig_destroy, [:pointer], :void, **opts
       attach_function :zconfig_name, [:pointer], :pointer, **opts
       attach_function :zconfig_value, [:pointer], :pointer, **opts
@@ -94,9 +96,7 @@ module CZMQ
       attach_function :zconfig_execute, [:pointer, :pointer, :pointer], :int, **opts
       attach_function :zconfig_set_comment, [:pointer, :string, :varargs], :void, **opts
       attach_function :zconfig_comments, [:pointer], :pointer, **opts
-      attach_function :zconfig_load, [:string], :pointer, **opts
       attach_function :zconfig_save, [:pointer, :string], :int, **opts
-      attach_function :zconfig_loadf, [:string, :varargs], :pointer, **opts
       attach_function :zconfig_savef, [:pointer, :string, :varargs], :int, **opts
       attach_function :zconfig_filename, [:pointer], :string, **opts
       attach_function :zconfig_reload, [:pointer], :int, **opts
@@ -175,10 +175,10 @@ module CZMQ
       require_relative 'ffi/zfile'
 
       attach_function :zframe_new, [:pointer, :size_t], :pointer, **opts
-      attach_function :zframe_destroy, [:pointer], :void, **opts
       attach_function :zframe_new_empty, [], :pointer, **opts
       attach_function :zframe_from, [:string], :pointer, **opts
       attach_function :zframe_recv, [:pointer], :pointer, **opts
+      attach_function :zframe_destroy, [:pointer], :void, **opts
       attach_function :zframe_send, [:pointer, :pointer, :int], :int, **opts
       attach_function :zframe_size, [:pointer], :size_t, **opts
       attach_function :zframe_data, [:pointer], :pointer, **opts
@@ -199,6 +199,7 @@ module CZMQ
       require_relative 'ffi/zframe'
 
       attach_function :zhash_new, [], :pointer, **opts
+      attach_function :zhash_unpack, [:pointer], :pointer, **opts
       attach_function :zhash_destroy, [:pointer], :void, **opts
       attach_function :zhash_insert, [:pointer, :string, :pointer], :int, **opts
       attach_function :zhash_update, [:pointer, :string, :pointer], :void, **opts
@@ -214,7 +215,6 @@ module CZMQ
       attach_function :zhash_cursor, [:pointer], :string, **opts
       attach_function :zhash_comment, [:pointer, :string, :varargs], :void, **opts
       attach_function :zhash_pack, [:pointer], :pointer, **opts
-      attach_function :zhash_unpack, [:pointer], :pointer, **opts
       attach_function :zhash_save, [:pointer, :string], :int, **opts
       attach_function :zhash_load, [:pointer, :string], :int, **opts
       attach_function :zhash_refresh, [:pointer], :int, **opts
@@ -225,6 +225,7 @@ module CZMQ
       require_relative 'ffi/zhash'
 
       attach_function :zhashx_new, [], :pointer, **opts
+      attach_function :zhashx_unpack, [:pointer], :pointer, **opts
       attach_function :zhashx_destroy, [:pointer], :void, **opts
       attach_function :zhashx_insert, [:pointer, :pointer, :pointer], :int, **opts
       attach_function :zhashx_update, [:pointer, :pointer, :pointer], :void, **opts
@@ -244,7 +245,6 @@ module CZMQ
       attach_function :zhashx_load, [:pointer, :string], :int, **opts
       attach_function :zhashx_refresh, [:pointer], :int, **opts
       attach_function :zhashx_pack, [:pointer], :pointer, **opts
-      attach_function :zhashx_unpack, [:pointer], :pointer, **opts
       attach_function :zhashx_dup, [:pointer], :pointer, **opts
       attach_function :zhashx_set_destructor, [:pointer, :pointer], :void, **opts
       attach_function :zhashx_set_duplicator, [:pointer, :pointer], :void, **opts
@@ -320,8 +320,11 @@ module CZMQ
       require_relative 'ffi/zloop'
 
       attach_function :zmsg_new, [], :pointer, **opts
-      attach_function :zmsg_destroy, [:pointer], :void, **opts
       attach_function :zmsg_recv, [:pointer], :pointer, **opts
+      attach_function :zmsg_load, [:pointer], :pointer, **opts
+      attach_function :zmsg_decode, [:pointer, :size_t], :pointer, **opts
+      attach_function :zmsg_new_signal, [:char], :pointer, **opts
+      attach_function :zmsg_destroy, [:pointer], :void, **opts
       attach_function :zmsg_send, [:pointer, :pointer], :int, **opts
       attach_function :zmsg_sendm, [:pointer, :pointer], :int, **opts
       attach_function :zmsg_size, [:pointer], :size_t, **opts
@@ -345,13 +348,10 @@ module CZMQ
       attach_function :zmsg_next, [:pointer], :pointer, **opts
       attach_function :zmsg_last, [:pointer], :pointer, **opts
       attach_function :zmsg_save, [:pointer, :pointer], :int, **opts
-      attach_function :zmsg_load, [:pointer, :pointer], :pointer, **opts
       attach_function :zmsg_encode, [:pointer, :pointer], :size_t, **opts
-      attach_function :zmsg_decode, [:pointer, :size_t], :pointer, **opts
       attach_function :zmsg_dup, [:pointer], :pointer, **opts
       attach_function :zmsg_print, [:pointer], :void, **opts
       attach_function :zmsg_eq, [:pointer, :pointer], :bool, **opts
-      attach_function :zmsg_new_signal, [:char], :pointer, **opts
       attach_function :zmsg_signal, [:pointer], :int, **opts
       attach_function :zmsg_is, [:pointer], :bool, **opts
       attach_function :zmsg_test, [:bool], :void, **opts
@@ -371,7 +371,6 @@ module CZMQ
       require_relative 'ffi/zpoller'
 
       attach_function :zsock_new, [:int], :pointer, **opts
-      attach_function :zsock_destroy, [:pointer], :void, **opts
       attach_function :zsock_new_pub, [:string], :pointer, **opts
       attach_function :zsock_new_sub, [:string, :string], :pointer, **opts
       attach_function :zsock_new_req, [:string], :pointer, **opts
@@ -386,6 +385,7 @@ module CZMQ
       attach_function :zsock_new_stream, [:string], :pointer, **opts
       attach_function :zsock_new_server, [:string], :pointer, **opts
       attach_function :zsock_new_client, [:string], :pointer, **opts
+      attach_function :zsock_destroy, [:pointer], :void, **opts
       attach_function :zsock_bind, [:pointer, :string, :varargs], :int, **opts
       attach_function :zsock_endpoint, [:pointer], :string, **opts
       attach_function :zsock_unbind, [:pointer, :string, :varargs], :int, **opts
@@ -533,8 +533,8 @@ module CZMQ
       require_relative 'ffi/ztrie'
 
       attach_function :zuuid_new, [], :pointer, **opts
-      attach_function :zuuid_destroy, [:pointer], :void, **opts
       attach_function :zuuid_new_from, [:pointer], :pointer, **opts
+      attach_function :zuuid_destroy, [:pointer], :void, **opts
       attach_function :zuuid_set, [:pointer, :pointer], :void, **opts
       attach_function :zuuid_set_str, [:pointer, :string], :int, **opts
       attach_function :zuuid_data, [:pointer], :pointer, **opts

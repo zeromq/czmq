@@ -80,6 +80,135 @@ module CZMQ
         __new ptr
       end
 
+      # Create a PUB socket. Default action is bind.
+      # @param endpoint [String, #to_str, #to_s]
+      # @return [CZMQ::Zsock]
+      def self.new_pub(endpoint)
+        endpoint = String(endpoint)
+        ptr = ::CZMQ::FFI.zsock_new_pub(endpoint)
+        __new ptr
+      end
+
+      # Create a SUB socket, and optionally subscribe to some prefix string. Default
+      # action is connect.                                                          
+      # @param endpoint [String, #to_str, #to_s]
+      # @param subscribe [String, #to_str, #to_s]
+      # @return [CZMQ::Zsock]
+      def self.new_sub(endpoint, subscribe)
+        endpoint = String(endpoint)
+        subscribe = String(subscribe)
+        ptr = ::CZMQ::FFI.zsock_new_sub(endpoint, subscribe)
+        __new ptr
+      end
+
+      # Create a REQ socket. Default action is connect.
+      # @param endpoint [String, #to_str, #to_s]
+      # @return [CZMQ::Zsock]
+      def self.new_req(endpoint)
+        endpoint = String(endpoint)
+        ptr = ::CZMQ::FFI.zsock_new_req(endpoint)
+        __new ptr
+      end
+
+      # Create a REP socket. Default action is bind.
+      # @param endpoint [String, #to_str, #to_s]
+      # @return [CZMQ::Zsock]
+      def self.new_rep(endpoint)
+        endpoint = String(endpoint)
+        ptr = ::CZMQ::FFI.zsock_new_rep(endpoint)
+        __new ptr
+      end
+
+      # Create a DEALER socket. Default action is connect.
+      # @param endpoint [String, #to_str, #to_s]
+      # @return [CZMQ::Zsock]
+      def self.new_dealer(endpoint)
+        endpoint = String(endpoint)
+        ptr = ::CZMQ::FFI.zsock_new_dealer(endpoint)
+        __new ptr
+      end
+
+      # Create a ROUTER socket. Default action is bind.
+      # @param endpoint [String, #to_str, #to_s]
+      # @return [CZMQ::Zsock]
+      def self.new_router(endpoint)
+        endpoint = String(endpoint)
+        ptr = ::CZMQ::FFI.zsock_new_router(endpoint)
+        __new ptr
+      end
+
+      # Create a PUSH socket. Default action is connect.
+      # @param endpoint [String, #to_str, #to_s]
+      # @return [CZMQ::Zsock]
+      def self.new_push(endpoint)
+        endpoint = String(endpoint)
+        ptr = ::CZMQ::FFI.zsock_new_push(endpoint)
+        __new ptr
+      end
+
+      # Create a PULL socket. Default action is bind.
+      # @param endpoint [String, #to_str, #to_s]
+      # @return [CZMQ::Zsock]
+      def self.new_pull(endpoint)
+        endpoint = String(endpoint)
+        ptr = ::CZMQ::FFI.zsock_new_pull(endpoint)
+        __new ptr
+      end
+
+      # Create an XPUB socket. Default action is bind.
+      # @param endpoint [String, #to_str, #to_s]
+      # @return [CZMQ::Zsock]
+      def self.new_xpub(endpoint)
+        endpoint = String(endpoint)
+        ptr = ::CZMQ::FFI.zsock_new_xpub(endpoint)
+        __new ptr
+      end
+
+      # Create an XSUB socket. Default action is connect.
+      # @param endpoint [String, #to_str, #to_s]
+      # @return [CZMQ::Zsock]
+      def self.new_xsub(endpoint)
+        endpoint = String(endpoint)
+        ptr = ::CZMQ::FFI.zsock_new_xsub(endpoint)
+        __new ptr
+      end
+
+      # Create a PAIR socket. Default action is connect.
+      # @param endpoint [String, #to_str, #to_s]
+      # @return [CZMQ::Zsock]
+      def self.new_pair(endpoint)
+        endpoint = String(endpoint)
+        ptr = ::CZMQ::FFI.zsock_new_pair(endpoint)
+        __new ptr
+      end
+
+      # Create a STREAM socket. Default action is connect.
+      # @param endpoint [String, #to_str, #to_s]
+      # @return [CZMQ::Zsock]
+      def self.new_stream(endpoint)
+        endpoint = String(endpoint)
+        ptr = ::CZMQ::FFI.zsock_new_stream(endpoint)
+        __new ptr
+      end
+
+      # Create a SERVER socket. Default action is bind.
+      # @param endpoint [String, #to_str, #to_s]
+      # @return [CZMQ::Zsock]
+      def self.new_server(endpoint)
+        endpoint = String(endpoint)
+        ptr = ::CZMQ::FFI.zsock_new_server(endpoint)
+        __new ptr
+      end
+
+      # Create a CLIENT socket. Default action is connect.
+      # @param endpoint [String, #to_str, #to_s]
+      # @return [CZMQ::Zsock]
+      def self.new_client(endpoint)
+        endpoint = String(endpoint)
+        ptr = ::CZMQ::FFI.zsock_new_client(endpoint)
+        __new ptr
+      end
+
       # Destroy the socket. You must use this for any socket created via the
       # zsock_new method.                                                   
       #
@@ -88,163 +217,6 @@ module CZMQ
         return unless @ptr
         self_p = __ptr_give_ref
         result = ::CZMQ::FFI.zsock_destroy(self_p)
-        result
-      end
-
-      # Create a PUB socket. Default action is bind.
-      #
-      # @param endpoint [String, #to_str, #to_s]
-      # @return [Zsock]
-      def self.new_pub(endpoint)
-        endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_pub(endpoint)
-        result = Zsock.__new result, true
-        result
-      end
-
-      # Create a SUB socket, and optionally subscribe to some prefix string. Default
-      # action is connect.                                                          
-      #
-      # @param endpoint [String, #to_str, #to_s]
-      # @param subscribe [String, #to_str, #to_s]
-      # @return [Zsock]
-      def self.new_sub(endpoint, subscribe)
-        endpoint = String(endpoint)
-        subscribe = String(subscribe)
-        result = ::CZMQ::FFI.zsock_new_sub(endpoint, subscribe)
-        result = Zsock.__new result, true
-        result
-      end
-
-      # Create a REQ socket. Default action is connect.
-      #
-      # @param endpoint [String, #to_str, #to_s]
-      # @return [Zsock]
-      def self.new_req(endpoint)
-        endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_req(endpoint)
-        result = Zsock.__new result, true
-        result
-      end
-
-      # Create a REP socket. Default action is bind.
-      #
-      # @param endpoint [String, #to_str, #to_s]
-      # @return [Zsock]
-      def self.new_rep(endpoint)
-        endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_rep(endpoint)
-        result = Zsock.__new result, true
-        result
-      end
-
-      # Create a DEALER socket. Default action is connect.
-      #
-      # @param endpoint [String, #to_str, #to_s]
-      # @return [Zsock]
-      def self.new_dealer(endpoint)
-        endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_dealer(endpoint)
-        result = Zsock.__new result, true
-        result
-      end
-
-      # Create a ROUTER socket. Default action is bind.
-      #
-      # @param endpoint [String, #to_str, #to_s]
-      # @return [Zsock]
-      def self.new_router(endpoint)
-        endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_router(endpoint)
-        result = Zsock.__new result, true
-        result
-      end
-
-      # Create a PUSH socket. Default action is connect.
-      #
-      # @param endpoint [String, #to_str, #to_s]
-      # @return [Zsock]
-      def self.new_push(endpoint)
-        endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_push(endpoint)
-        result = Zsock.__new result, true
-        result
-      end
-
-      # Create a PULL socket. Default action is bind.
-      #
-      # @param endpoint [String, #to_str, #to_s]
-      # @return [Zsock]
-      def self.new_pull(endpoint)
-        endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_pull(endpoint)
-        result = Zsock.__new result, true
-        result
-      end
-
-      # Create an XPUB socket. Default action is bind.
-      #
-      # @param endpoint [String, #to_str, #to_s]
-      # @return [Zsock]
-      def self.new_xpub(endpoint)
-        endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_xpub(endpoint)
-        result = Zsock.__new result, true
-        result
-      end
-
-      # Create an XSUB socket. Default action is connect.
-      #
-      # @param endpoint [String, #to_str, #to_s]
-      # @return [Zsock]
-      def self.new_xsub(endpoint)
-        endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_xsub(endpoint)
-        result = Zsock.__new result, true
-        result
-      end
-
-      # Create a PAIR socket. Default action is connect.
-      #
-      # @param endpoint [String, #to_str, #to_s]
-      # @return [Zsock]
-      def self.new_pair(endpoint)
-        endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_pair(endpoint)
-        result = Zsock.__new result, true
-        result
-      end
-
-      # Create a STREAM socket. Default action is connect.
-      #
-      # @param endpoint [String, #to_str, #to_s]
-      # @return [Zsock]
-      def self.new_stream(endpoint)
-        endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_stream(endpoint)
-        result = Zsock.__new result, true
-        result
-      end
-
-      # Create a SERVER socket. Default action is bind.
-      #
-      # @param endpoint [String, #to_str, #to_s]
-      # @return [Zsock]
-      def self.new_server(endpoint)
-        endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_server(endpoint)
-        result = Zsock.__new result, true
-        result
-      end
-
-      # Create a CLIENT socket. Default action is connect.
-      #
-      # @param endpoint [String, #to_str, #to_s]
-      # @return [Zsock]
-      def self.new_client(endpoint)
-        endpoint = String(endpoint)
-        result = ::CZMQ::FFI.zsock_new_client(endpoint)
-        result = Zsock.__new result, true
         result
       end
 
@@ -662,8 +634,11 @@ module CZMQ
       # reduce memory allocations. The pattern argument is a string that defines
       # the type of each argument. See zsock_bsend for the supported argument   
       # types. All arguments must be pointers; this call sets them to point to  
-      # values held on a per-socket basis. Do not modify or destroy the returned
-      # values. Returns 0 if successful, or -1 if it failed to read a message.  
+      # values held on a per-socket basis.                                      
+      # Note that zsock_brecv creates the returned objects, and the caller must 
+      # destroy them when finished with them. The supplied pointers do not need 
+      # to be initialized. Returns 0 if successful, or -1 if it failed to read  
+      # a message.                                                              
       #
       # @param picture [String, #to_str, #to_s]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
@@ -682,8 +657,11 @@ module CZMQ
       # reduce memory allocations. The pattern argument is a string that defines
       # the type of each argument. See zsock_bsend for the supported argument   
       # types. All arguments must be pointers; this call sets them to point to  
-      # values held on a per-socket basis. Do not modify or destroy the returned
-      # values. Returns 0 if successful, or -1 if it failed to read a message.  
+      # values held on a per-socket basis.                                      
+      # Note that zsock_brecv creates the returned objects, and the caller must 
+      # destroy them when finished with them. The supplied pointers do not need 
+      # to be initialized. Returns 0 if successful, or -1 if it failed to read  
+      # a message.                                                              
       #
       # This is the polymorphic version of #brecv.
       #
