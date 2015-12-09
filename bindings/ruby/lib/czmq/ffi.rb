@@ -78,6 +78,39 @@ module CZMQ
 
       require_relative 'ffi/zarmour'
 
+      attach_function :zcert_new, [], :pointer, **opts
+      attach_function :zcert_new_from, [:pointer, :pointer], :pointer, **opts
+      attach_function :zcert_load, [:string], :pointer, **opts
+      attach_function :zcert_destroy, [:pointer], :void, **opts
+      attach_function :zcert_public_key, [:pointer], :pointer, **opts
+      attach_function :zcert_secret_key, [:pointer], :pointer, **opts
+      attach_function :zcert_public_txt, [:pointer], :pointer, **opts
+      attach_function :zcert_secret_txt, [:pointer], :pointer, **opts
+      attach_function :zcert_set_meta, [:pointer, :string, :string, :varargs], :void, **opts
+      attach_function :zcert_meta, [:pointer, :string], :pointer, **opts
+      attach_function :zcert_meta_keys, [:pointer], :pointer, **opts
+      attach_function :zcert_save, [:pointer, :string], :int, **opts
+      attach_function :zcert_save_public, [:pointer, :string], :int, **opts
+      attach_function :zcert_save_secret, [:pointer, :string], :int, **opts
+      attach_function :zcert_apply, [:pointer, :pointer], :void, **opts
+      attach_function :zcert_dup, [:pointer], :pointer, **opts
+      attach_function :zcert_eq, [:pointer, :pointer], :bool, **opts
+      attach_function :zcert_print, [:pointer], :void, **opts
+      attach_function :zcert_fprint, [:pointer, :pointer], :void, **opts
+      attach_function :zcert_test, [:bool], :void, **opts
+
+      require_relative 'ffi/zcert'
+
+      attach_function :zcertstore_new, [:string], :pointer, **opts
+      attach_function :zcertstore_destroy, [:pointer], :void, **opts
+      attach_function :zcertstore_lookup, [:pointer, :string], :pointer, **opts
+      attach_function :zcertstore_insert, [:pointer, :pointer], :void, **opts
+      attach_function :zcertstore_print, [:pointer], :void, **opts
+      attach_function :zcertstore_fprint, [:pointer, :pointer], :void, **opts
+      attach_function :zcertstore_test, [:bool], :void, **opts
+
+      require_relative 'ffi/zcertstore'
+
       attach_function :zconfig_new, [:string, :pointer], :pointer, **opts
       attach_function :zconfig_load, [:string], :pointer, **opts
       attach_function :zconfig_loadf, [:string, :varargs], :pointer, **opts
