@@ -23,7 +23,7 @@ extern "C" {
 //  @interface
 //  Create a new empty message object
 CZMQ_EXPORT zmsg_t *
-    zmsg_new ();
+    zmsg_new (void);
 
 //  Receive message from socket, returns zmsg_t object or NULL if the recv   
 //  was interrupted. Does a blocking recv. If you want to not block then use 
