@@ -29,9 +29,6 @@ public class Zdir implements AutoCloseable{
     public Zdir (long pointer) {
         self = pointer;
     }
-    public Zdir () {
-        self = 0;
-    }
     /*
     Destroy a directory tree and all children it contains.
     */
@@ -156,7 +153,7 @@ public class Zdir implements AutoCloseable{
     Self test of this class.
     */
     native static void __test (boolean verbose);
-    public void test (boolean verbose) {
+    public static void test (boolean verbose) {
         __test (verbose);
     }
 }

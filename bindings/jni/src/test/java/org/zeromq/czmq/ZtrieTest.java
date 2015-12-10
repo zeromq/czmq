@@ -20,7 +20,6 @@ public class ZtrieTest {
     }
     @Test
     public void test () {
-        Ztrie ztrie = new Ztrie ();
-        ztrie.test (false);
+        Ztrie.test (false);
     }
 }

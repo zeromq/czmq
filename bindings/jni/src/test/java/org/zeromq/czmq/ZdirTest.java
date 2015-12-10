@@ -20,7 +20,6 @@ public class ZdirTest {
     }
     @Test
     public void test () {
-        Zdir zdir = new Zdir ();
-        zdir.test (false);
+        Zdir.test (false);
     }
 }

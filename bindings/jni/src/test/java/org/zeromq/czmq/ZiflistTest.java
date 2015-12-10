@@ -20,7 +20,6 @@ public class ZiflistTest {
     }
     @Test
     public void test () {
-        Ziflist ziflist = new Ziflist ();
-        ziflist.test (false);
+        Ziflist.test (false);
     }
 }

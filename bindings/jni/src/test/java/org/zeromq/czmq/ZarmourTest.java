@@ -20,7 +20,6 @@ public class ZarmourTest {
     }
     @Test
     public void test () {
-        Zarmour zarmour = new Zarmour ();
-        zarmour.test (false);
+        Zarmour.test (false);
     }
 }

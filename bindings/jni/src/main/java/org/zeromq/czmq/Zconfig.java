@@ -27,9 +27,6 @@ public class Zconfig implements AutoCloseable{
     public Zconfig (long pointer) {
         self = pointer;
     }
-    public Zconfig () {
-        self = 0;
-    }
     /*
     Load a config tree from a specified ZPL text file; returns a zconfig_t  
     reference for the root, if the file exists and is readable. Returns NULL
@@ -220,7 +217,7 @@ public class Zconfig implements AutoCloseable{
     Self test of this class
     */
     native static void __test (boolean verbose);
-    public void test (boolean verbose) {
+    public static void test (boolean verbose) {
         __test (verbose);
     }
 }

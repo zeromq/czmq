@@ -20,7 +20,6 @@ public class ZpollerTest {
     }
     @Test
     public void test () {
-        Zpoller zpoller = new Zpoller ();
-        zpoller.test (false);
+        Zpoller.test (false);
     }
 }

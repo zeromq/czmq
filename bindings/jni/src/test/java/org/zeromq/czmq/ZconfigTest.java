@@ -20,7 +20,6 @@ public class ZconfigTest {
     }
     @Test
     public void test () {
-        Zconfig zconfig = new Zconfig ();
-        zconfig.test (false);
+        Zconfig.test (false);
     }
 }

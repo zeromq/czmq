@@ -20,7 +20,6 @@ public class ZdirPatchTest {
     }
     @Test
     public void test () {
-        ZdirPatch zdir_patch = new ZdirPatch ();
-        zdir_patch.test (false);
+        ZdirPatch.test (false);
     }
 }

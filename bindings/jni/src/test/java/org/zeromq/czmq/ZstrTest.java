@@ -20,7 +20,6 @@ public class ZstrTest {
     }
     @Test
     public void test () {
-        Zstr zstr = new Zstr ();
-        zstr.test (false);
+        Zstr.test (false);
     }
 }

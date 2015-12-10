@@ -20,7 +20,6 @@ public class ZhashxTest {
     }
     @Test
     public void test () {
-        Zhashx zhashx = new Zhashx ();
-        zhashx.test (false);
+        Zhashx.test (false);
     }
 }

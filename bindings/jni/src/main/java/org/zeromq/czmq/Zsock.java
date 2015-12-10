@@ -32,9 +32,6 @@ public class Zsock implements AutoCloseable{
     public Zsock (long pointer) {
         self = pointer;
     }
-    public Zsock () {
-        self = 0;
-    }
     /*
     Create a PUB socket. Default action is bind.
     */
@@ -1058,7 +1055,7 @@ public class Zsock implements AutoCloseable{
     Self test of this class.
     */
     native static void __test (boolean verbose);
-    public void test (boolean verbose) {
+    public static void test (boolean verbose) {
         __test (verbose);
     }
 }

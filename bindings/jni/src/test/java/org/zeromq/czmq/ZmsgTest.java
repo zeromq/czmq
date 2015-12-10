@@ -20,7 +20,6 @@ public class ZmsgTest {
     }
     @Test
     public void test () {
-        Zmsg zmsg = new Zmsg ();
-        zmsg.test (false);
+        Zmsg.test (false);
     }
 }

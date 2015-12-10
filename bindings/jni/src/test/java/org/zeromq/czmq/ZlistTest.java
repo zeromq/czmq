@@ -20,7 +20,6 @@ public class ZlistTest {
     }
     @Test
     public void test () {
-        Zlist zlist = new Zlist ();
-        zlist.test (false);
+        Zlist.test (false);
     }
 }
