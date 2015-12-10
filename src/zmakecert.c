@@ -30,7 +30,7 @@ s_get_meta (zcert_t *cert, char *prompt, char *name)
     if (strlen (value) && value [strlen (value) - 1] == '\n')
         value [strlen (value) - 1] = 0;
     if (*value)
-        zcert_set_meta (cert, name, value);
+        zcert_set_meta (cert, name, "%s", value);
     return 0;
 }
 
@@ -46,7 +46,7 @@ int main (void)
         
     char *timestr = zclock_timestr ();
     zcert_set_meta (cert, "created-by", "CZMQ zmakecert");
-    zcert_set_meta (cert, "date-created", timestr);
+    zcert_set_meta (cert, "date-created", "%s", timestr);
     free (timestr);
     zcert_dump (cert);
     zcert_save (cert, "mycert.txt");
