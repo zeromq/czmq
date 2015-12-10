@@ -156,7 +156,6 @@ This is the API provided by CZMQ v3.x, in alphabetical order.
 .pull doc/zproxy.doc
 .pull doc/zrex.doc
 .pull doc/zsock.doc
-.pull doc/zsock_option.doc
 .pull doc/zstr.doc
 .pull doc/zsys.doc
 .pull doc/ztrie.doc
