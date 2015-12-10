@@ -20,7 +20,6 @@ public class ZloopTest {
     }
     @Test
     public void test () {
-        Zloop zloop = new Zloop ();
-        zloop.test (false);
+        Zloop.test (false);
     }
 }

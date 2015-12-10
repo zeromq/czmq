@@ -29,9 +29,6 @@ public class Zframe implements AutoCloseable{
     public Zframe (long pointer) {
         self = pointer;
     }
-    public Zframe () {
-        self = 0;
-    }
     /*
     Create an empty (zero-sized) frame
     */
@@ -184,7 +181,7 @@ public class Zframe implements AutoCloseable{
     Self test of this class.
     */
     native static void __test (boolean verbose);
-    public void test (boolean verbose) {
+    public static void test (boolean verbose) {
         __test (verbose);
     }
 }

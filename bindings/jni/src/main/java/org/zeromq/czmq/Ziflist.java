@@ -96,7 +96,7 @@ public class Ziflist implements AutoCloseable{
     Self test of this class.
     */
     native static void __test (boolean verbose);
-    public void test (boolean verbose) {
+    public static void test (boolean verbose) {
         __test (verbose);
     }
 }

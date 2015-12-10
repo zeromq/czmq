@@ -20,7 +20,6 @@ public class ZuuidTest {
     }
     @Test
     public void test () {
-        Zuuid zuuid = new Zuuid ();
-        zuuid.test (false);
+        Zuuid.test (false);
     }
 }

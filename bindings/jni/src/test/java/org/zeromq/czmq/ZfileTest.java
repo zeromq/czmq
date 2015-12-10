@@ -20,7 +20,6 @@ public class ZfileTest {
     }
     @Test
     public void test () {
-        Zfile zfile = new Zfile ();
-        zfile.test (false);
+        Zfile.test (false);
     }
 }

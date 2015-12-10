@@ -20,7 +20,6 @@ public class ZsockTest {
     }
     @Test
     public void test () {
-        Zsock zsock = new Zsock ();
-        zsock.test (false);
+        Zsock.test (false);
     }
 }

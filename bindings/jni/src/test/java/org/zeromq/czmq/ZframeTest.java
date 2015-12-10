@@ -20,7 +20,6 @@ public class ZframeTest {
     }
     @Test
     public void test () {
-        Zframe zframe = new Zframe ();
-        zframe.test (false);
+        Zframe.test (false);
     }
 }
