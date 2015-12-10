@@ -237,7 +237,7 @@ zcert_load (const char *filename)
             zconfig_t *metadata = zconfig_locate (root, "/metadata");
             zconfig_t *item = metadata? zconfig_child (metadata): NULL;
             while (item) {
-                zcert_set_meta (self, zconfig_name (item), zconfig_value (item));
+                zcert_set_meta (self, zconfig_name (item), "%s", zconfig_value (item));
                 item = zconfig_next (item);
             }
         }
