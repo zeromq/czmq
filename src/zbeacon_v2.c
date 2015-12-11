@@ -224,8 +224,8 @@ typedef struct {
     int64_t ping_at;            //  Next broadcast time
     zframe_t *transmit;         //  Beacon transmit data
     zframe_t *filter;           //  Beacon filter data
-    inaddr_t address;           //  Our own address
-    inaddr_t broadcast;         //  Our broadcast address
+    inaddr_storage_t address;   //  Our own address
+    inaddr_storage_t broadcast; //  Our broadcast address
 } agent_t;
 
 //  Prototypes for local functions we use in the agent
@@ -241,6 +241,14 @@ s_api_command (agent_t *self);
 static void
 s_beacon_recv (agent_t *self);
 
+// Function prototype of if_nametoindexi() from <net/if.h>. This header can not be included
+// as it conflicts with <linux/wireless.h>. So, just including defining the prototype. CZMQ
+// depends on libzmq library anyway so the compiler will find the appropriate function from
+// libzmq library.
+#ifndef _NET_IF_H
+unsigned int
+if_nametoindex (const char *ifname);
+#endif
 
 //  This is the background task
 
@@ -280,7 +288,7 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
         if (self->transmit
         &&  zclock_mono () >= self->ping_at) {
             //  Send beacon to any listening peers
-            zsys_udp_send (self->udpsock, self->transmit, &self->broadcast);
+            zsys_udp_send (self->udpsock, self->transmit, &self->broadcast.inaddr, self->broadcast.inaddrlen);
             self->ping_at = zclock_mono () + self->interval;
         }
     }
@@ -314,14 +322,15 @@ s_agent_new (void *pipe, int port_nbr)
 
     //  Bind to the port on all interfaces
 #if (defined (__WINDOWS__))
-    inaddr_t sockaddr = self->address;
+    inaddr_storage_t sockaddr = self->address;
 #elif (defined (__APPLE__))
-    inaddr_t sockaddr = self->broadcast;
-    sockaddr.sin_addr.s_addr = htons (INADDR_ANY);
+    inaddr_storage_t sockaddr = self->broadcast;
+    sockaddr.inaddr.sin_addr.s_addr = htons (INADDR_ANY);
 #else
-    inaddr_t sockaddr = self->broadcast;
+    inaddr_storage_t sockaddr = self->broadcast;
 #endif
-    int rc = bind (self->udpsock, (struct sockaddr *) &sockaddr, sizeof (inaddr_t));
+
+    int rc = bind (self->udpsock, (struct sockaddr *) &sockaddr.inaddr, sockaddr.inaddrlen);
     if (rc == SOCKET_ERROR)
         zsys_socket_error ("bind");
 
@@ -329,8 +338,8 @@ s_agent_new (void *pipe, int port_nbr)
     //  PROBLEM: this hostname will not be accurate when the node
     //  has more than one active interface.
     char hostname [NI_MAXHOST];
-    rc = getnameinfo ((struct sockaddr *) &self->address,
-                      sizeof (inaddr_t), hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+    rc = getnameinfo ((struct sockaddr *) &self->address.inaddr,
+                      self->address.inaddrlen, hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
     if (rc == 0) {
         //  It all looks OK
         zstr_send (pipe, hostname);
@@ -354,11 +363,12 @@ s_get_interface (agent_t *self)
     const char *iface = zsys_interface ();
     if (streq (iface, "*")) {
         //  Force binding to INADDR_ANY and sending to INADDR_BROADCAST
-        self->broadcast.sin_family = AF_INET;
-        self->broadcast.sin_addr.s_addr = INADDR_BROADCAST;
-        self->broadcast.sin_port = htons (self->port_nbr);
+        self->broadcast.inaddr.sin_family = AF_INET;
+        self->broadcast.inaddr.sin_addr.s_addr = INADDR_BROADCAST;
+        self->broadcast.inaddr.sin_port = htons (self->port_nbr);
+        self->broadcast.inaddrlen = sizeof (inaddr_t);
         self->address = self->broadcast;
-        self->address.sin_addr.s_addr = INADDR_ANY;
+        self->address.inaddr.sin_addr.s_addr = INADDR_ANY;
     }
     else {
         ziflist_t *iflist = ziflist_new ();
@@ -372,13 +382,36 @@ s_get_interface (agent_t *self)
             }
         }
         if (name) {
-            //  Using inet_addr instead of inet_aton or inet_atop because these
-            //  are not supported in Win XP
-            self->broadcast.sin_family = AF_INET;
-            self->broadcast.sin_addr.s_addr = inet_addr (ziflist_broadcast (iflist));
-            self->broadcast.sin_port = htons (self->port_nbr);
-            self->address = self->broadcast;
-            self->address.sin_addr.s_addr = inet_addr (ziflist_address (iflist));
+            if (zsys_ipv6 ()) {
+                const char *ipv6_addr = zsys_ipv6_address ();
+                const char *ipv6_mcast_addr = zsys_ipv6_mcast_address ();
+
+                if (!(*ipv6_addr))
+                    zsys_error ("No IPv6 address provided, ZSYS_IPV6_ADDRESS=%s isn't helping", ipv6_addr);
+                if (!(*ipv6_mcast_addr))
+                    zsys_error ("No IPv6 multicast address provided, ZSYS_IPV6_MCAST_ADDRESS=%s isn't helping", ipv6_mcast_addr);
+
+                //  Using inet_addr instead of inet_aton or inet_atop because these
+                //  are not supported in Win XP
+                self->broadcast.in6addr.sin6_family = AF_INET6;
+                inet_pton (AF_INET6, ipv6_mcast_addr, (void *)&self->broadcast.in6addr.sin6_addr);
+                self->broadcast.in6addr.sin6_port = htons (self->port_nbr);
+                self->broadcast.in6addr.sin6_scope_id = if_nametoindex (iface);
+                self->broadcast.inaddrlen = sizeof (in6addr_t);
+                self->address = self->broadcast;
+                inet_pton (AF_INET6, ipv6_addr, (void *)&self->address.in6addr.sin6_addr);
+                self->address.in6addr.sin6_scope_id = 0;
+            }
+            else {
+                //  Using inet_addr instead of inet_aton or inet_atop because these
+                //  are not supported in Win XP
+                self->broadcast.inaddr.sin_family = AF_INET;
+                self->broadcast.inaddr.sin_addr.s_addr = inet_addr (ziflist_broadcast (iflist));
+                self->broadcast.inaddr.sin_port = htons (self->port_nbr);
+                self->broadcast.inaddrlen = sizeof (inaddr_t);
+                self->address = self->broadcast;
+                self->address.inaddr.sin_addr.s_addr = inet_addr (ziflist_address (iflist));
+            }
         }
         else
             zsys_error ("No adapter found, ZSYS_INTERFACE=%s isn't helping", iface);
@@ -439,8 +472,8 @@ s_beacon_recv (agent_t *self)
 {
     assert (self);
 
-    char peername [INET_ADDRSTRLEN];
-    zframe_t *frame = zsys_udp_recv (self->udpsock, peername);
+    char peername [INET6_ADDRSTRLEN];
+    zframe_t *frame = zsys_udp_recv (self->udpsock, peername, INET6_ADDRSTRLEN);
 
     //  If filter is set, check that beacon matches it
     bool is_valid = false;

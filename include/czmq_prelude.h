@@ -391,7 +391,19 @@
 typedef unsigned char   byte;           //  Single unsigned byte = 8 bits
 typedef unsigned short  dbyte;          //  Double byte = 16 bits
 typedef unsigned int    qbyte;          //  Quad byte = 32 bits
-typedef struct sockaddr_in inaddr_t;    //  Internet socket address structure
+typedef struct sockaddr_in  inaddr_t;   //  Internet socket address structure
+typedef struct sockaddr_in6 in6addr_t;  //  Internet 6 socket address structure
+
+// Common structure to hold inaddr_t and in6addr_t with length
+typedef struct {
+    union {
+        inaddr_t __addr;          //  IPv4 address
+        in6addr_t __addr6;        //  IPv6 address
+    } __inaddr_u;
+#define inaddr   __inaddr_u.__addr
+#define in6addr   __inaddr_u.__addr6
+    int inaddrlen;
+} inaddr_storage_t;
 
 //- Inevitable macros -------------------------------------------------------
 

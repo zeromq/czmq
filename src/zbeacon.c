@@ -231,7 +231,7 @@ s_self_handle_udp (self_t *self)
     assert (self);
 
     char peername [INET_ADDRSTRLEN];
-    zframe_t *frame = zsys_udp_recv (self->udpsock, peername);
+    zframe_t *frame = zsys_udp_recv (self->udpsock, peername, INET_ADDRSTRLEN);
 
     //  If filter is set, check that beacon matches it
     bool is_valid = false;
@@ -298,7 +298,7 @@ zbeacon (zsock_t *pipe, void *args)
         if (self->transmit
         &&  zclock_mono () >= self->ping_at) {
             //  Send beacon to any listening peers
-            if (zsys_udp_send (self->udpsock, self->transmit, &self->broadcast))
+            if (zsys_udp_send (self->udpsock, self->transmit, &self->broadcast, sizeof (inaddr_t)))
                 //  Try to recreate UDP socket on interface
                 s_self_prepare_udp (self);
             self->ping_at = zclock_mono () + self->interval;

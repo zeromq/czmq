@@ -72,6 +72,8 @@ static size_t s_rcvhwm = 1000;      //  ZSYS_RCVHWM=1000
 static size_t s_pipehwm = 1000;     //  ZSYS_PIPEHWM=1000
 static int s_ipv6 = 0;              //  ZSYS_IPV6=0
 static char *s_interface = NULL;    //  ZSYS_INTERFACE=
+static char *s_ipv6_address = NULL; //  ZSYS_IPV6_ADDRESS=
+static char *s_ipv6_mcast_address = NULL; //  ZSYS_IPV6_MCAST_ADDRESS=
 static char *s_logident = NULL;     //  ZSYS_LOGIDENT=
 static FILE *s_logstream = NULL;    //  ZSYS_LOGSTREAM=stdout/stderr
 static bool s_logsystem = false;    //  ZSYS_LOGSYSTEM=true/false
@@ -187,6 +189,12 @@ zsys_init (void)
     if (getenv ("ZSYS_INTERFACE"))
         zsys_set_interface (getenv ("ZSYS_INTERFACE"));
 
+    if (getenv ("ZSYS_IPV6_ADDRESS"))
+        zsys_set_ipv6_address (getenv ("ZSYS_IPV6_ADDRESS"));
+
+    if (getenv ("ZSYS_IPV6_MCAST_ADDRESS"))
+        zsys_set_ipv6_mcast_address (getenv ("ZSYS_IPV6_MCAST_ADDRESS"));
+
     if (getenv ("ZSYS_LOGIDENT"))
         zsys_set_logident (getenv ("ZSYS_LOGIDENT"));
 
@@ -248,6 +256,8 @@ zsys_shutdown (void)
 
     //  Free dynamically allocated properties
     free (s_interface);
+    free (s_ipv6_address);
+    free (s_ipv6_mcast_address);
     free (s_logident);
 
 #if defined (__UNIX__)
@@ -819,7 +829,11 @@ zsys_udp_new (bool routable)
 {
     //  We haven't implemented multicast yet
     assert (!routable);
-    SOCKET udpsock = socket (AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    SOCKET udpsock;
+    if (zsys_ipv6 ())
+        udpsock = socket (AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
+    else
+        udpsock = socket (AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (udpsock == INVALID_SOCKET) {
         zsys_socket_error ("socket");
         return INVALID_SOCKET;
@@ -865,7 +879,7 @@ zsys_udp_close (SOCKET handle)
 //  interface having disappeared (happens easily with WiFi)
 
 int
-zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address)
+zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address, int addrlen)
 {
     assert (frame);
     assert (address);
@@ -873,7 +887,7 @@ zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address)
     if (sendto (udpsock,
         (char *) zframe_data (frame), (int) zframe_size (frame),
         0, //  Flags
-        (struct sockaddr *) address, (int) sizeof (inaddr_t)) == -1) {
+        (struct sockaddr *) address, addrlen) == -1) {
         zsys_debug ("zsys_udp_send: failed, reason=%s", strerror (errno));
         return -1;              //  UDP broadcast not possible
     }
@@ -887,26 +901,30 @@ zsys_udp_send (SOCKET udpsock, zframe_t *frame, inaddr_t *address)
 //  The peername must be a char [INET_ADDRSTRLEN] array.
 
 zframe_t *
-zsys_udp_recv (SOCKET udpsock, char *peername)
+zsys_udp_recv (SOCKET udpsock, char *peername, int peerlen)
 {
     char buffer [UDP_FRAME_MAX];
-    inaddr_t address;
-    socklen_t address_len = sizeof (inaddr_t);
+    in6addr_t address6;
+    inaddr_t *address = (inaddr_t *) &address6;
+    socklen_t address_len = sizeof (in6addr_t);
     ssize_t size = recvfrom (
         udpsock,
         buffer, UDP_FRAME_MAX,
         0,      //  Flags
-        (struct sockaddr *) &address, &address_len);
+        (struct sockaddr *) &address6, &address_len);
 
     if (size == SOCKET_ERROR)
         zsys_socket_error ("recvfrom");
 
     //  Get sender address as printable string
 #if (defined (__WINDOWS__))
-    getnameinfo ((struct sockaddr *) &address, address_len,
-                 peername, INET_ADDRSTRLEN, NULL, 0, NI_NUMERICHOST);
+    getnameinfo ((struct sockaddr *) &address6, address_len,
+                 peername, peerlen, NULL, 0, NI_NUMERICHOST);
 #else
-    inet_ntop (AF_INET, &address.sin_addr, peername, address_len);
+    if (address6.sin6_family == AF_INET6)
+        inet_ntop (AF_INET6, &address6.sin6_addr, peername, address_len);
+    else
+        inet_ntop (AF_INET, &address->sin_addr, peername, address_len);
 #endif
     return zframe_new (buffer, size);
 }
@@ -1327,6 +1345,16 @@ zsys_set_ipv6 (int ipv6)
 
 
 //  --------------------------------------------------------------------------
+//  Return use of IPv6 for zsock instances.
+
+int
+zsys_ipv6 (void)
+{
+    return s_ipv6;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Set network interface name to use for broadcasts, particularly zbeacon.
 //  This lets the interface be configured for test environments where required.
 //  For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is
@@ -1351,6 +1379,59 @@ const char *
 zsys_interface (void)
 {
     return s_interface? s_interface: "";
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set IPv6 address to use zbeacon socket, particularly for receiving zbeacon.
+//  This needs to be set IPv6 is enabled as IPv6 can have multiple addresses
+//  on a given interface. If the environment variable ZSYS_IPV6_ADDRESS is set,
+//  use that as the default IPv6 address.
+
+void
+zsys_set_ipv6_address (const char *value)
+{
+    zsys_init ();
+    free (s_ipv6_address);
+    s_ipv6_address = strdup (value);
+    assert (s_ipv6_address);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return IPv6 address to use for zbeacon reception, or "" if none was set.
+
+const char *
+zsys_ipv6_address (void)
+{
+    return s_ipv6_address? s_ipv6_address: "";
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set IPv6 milticast address to use for sending zbeacon messages. This needs
+//  to be set if IPv6 is enabled. If the environment variable
+//  ZSYS_IPV6_MCAST_ADDRESS is set, use that as the default IPv6 multicast
+//  address.
+
+void
+zsys_set_ipv6_mcast_address (const char *value)
+{
+    zsys_init ();
+    free (s_ipv6_mcast_address);
+    s_ipv6_mcast_address = strdup (value);
+    assert (s_ipv6_mcast_address);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return IPv6 multicast address to use for sending zbeacon, or "" if none was
+//  set.
+
+const char *
+zsys_ipv6_mcast_address (void)
+{
+    return s_ipv6_mcast_address? s_ipv6_mcast_address: "";
 }
 
 
