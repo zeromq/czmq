@@ -498,7 +498,8 @@ zsys_catch_interrupts (void)
 {
     //  Catch SIGINT and SIGTERM unless ZSYS_SIGHANDLER=false
     if ((getenv ("ZSYS_SIGHANDLER") == NULL
-        ||  strneq (getenv ("ZSYS_SIGHANDLER"), "false")) && handle_signals)
+    ||   strneq (getenv ("ZSYS_SIGHANDLER"), "false"))
+    &&   handle_signals)
         zsys_handler_set (s_signal_handler);
 }
 
