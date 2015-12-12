@@ -59,10 +59,17 @@ module CZMQ
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
         ptr_ptr.write_pointer @ptr
-        ObjectSpace.undefine_finalizer self if @finalizer
-        @finalizer = nil
+        __undef_finalizer if @finalizer
         @ptr = nil
         ptr_ptr
+      end
+      # Undefines the finalizer for this object.
+      # @note Only use this if you need to and can guarantee that the native
+      #   object will be freed by other means.
+      # @return [void]
+      def __undef_finalizer
+        ObjectSpace.undefine_finalizer self
+        @finalizer = nil
       end
 
       # Receive C string from socket. Caller must free returned string using
@@ -100,10 +107,9 @@ module CZMQ
       # may be NULL, which is sent as "".                                   
       #
       # @param dest [::FFI::Pointer, #to_ptr]
-      # @param string [String, #to_str, #to_s]
+      # @param string [String, #to_s, nil]
       # @return [Integer]
       def self.send(dest, string)
-        string = String(string)
         result = ::CZMQ::FFI.zstr_send(dest, string)
         result
       end
@@ -112,10 +118,9 @@ module CZMQ
       # you can send further strings in the same multi-part message.          
       #
       # @param dest [::FFI::Pointer, #to_ptr]
-      # @param string [String, #to_str, #to_s]
+      # @param string [String, #to_s, nil]
       # @return [Integer]
       def self.sendm(dest, string)
-        string = String(string)
         result = ::CZMQ::FFI.zstr_sendm(dest, string)
         result
       end
@@ -125,11 +130,10 @@ module CZMQ
       # will create security holes).                                     
       #
       # @param dest [::FFI::Pointer, #to_ptr]
-      # @param format [String, #to_str, #to_s]
+      # @param format [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [Integer]
       def self.sendf(dest, format, *args)
-        format = String(format)
         result = ::CZMQ::FFI.zstr_sendf(dest, format, *args)
         result
       end
@@ -139,11 +143,10 @@ module CZMQ
       # message.                                                              
       #
       # @param dest [::FFI::Pointer, #to_ptr]
-      # @param format [String, #to_str, #to_s]
+      # @param format [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [Integer]
       def self.sendfm(dest, format, *args)
-        format = String(format)
         result = ::CZMQ::FFI.zstr_sendfm(dest, format, *args)
         result
       end
@@ -152,11 +155,10 @@ module CZMQ
       # Returns 0 if the strings could be sent OK, or -1 on error.
       #
       # @param dest [::FFI::Pointer, #to_ptr]
-      # @param string [String, #to_str, #to_s]
+      # @param string [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [Integer]
       def self.sendx(dest, string, *args)
-        string = String(string)
         result = ::CZMQ::FFI.zstr_sendx(dest, string, *args)
         result
       end

@@ -60,10 +60,17 @@ module CZMQ
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
         ptr_ptr.write_pointer @ptr
-        ObjectSpace.undefine_finalizer self if @finalizer
-        @finalizer = nil
+        __undef_finalizer if @finalizer
         @ptr = nil
         ptr_ptr
+      end
+      # Undefines the finalizer for this object.
+      # @note Only use this if you need to and can guarantee that the native
+      #   object will be freed by other means.
+      # @return [void]
+      def __undef_finalizer
+        ObjectSpace.undefine_finalizer self
+        @finalizer = nil
       end
 
       # Create a new callback of the following type:
@@ -366,13 +373,12 @@ module CZMQ
       # comment lines as you like. These comment lines are discarded when loading
       # the file. If you use a null format, all comments are deleted.            
       #
-      # @param format [String, #to_str, #to_s]
+      # @param format [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [void]
       def comment(format, *args)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        format = String(format)
         result = ::CZMQ::FFI.zhashx_comment(self_p, format, *args)
         result
       end
@@ -381,12 +387,11 @@ module CZMQ
       # printable strings; keys may not contain '=' character. Returns 0 if OK, 
       # else -1 if a file error occurred.                                       
       #
-      # @param filename [String, #to_str, #to_s]
+      # @param filename [String, #to_s, nil]
       # @return [Integer]
       def save(filename)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        filename = String(filename)
         result = ::CZMQ::FFI.zhashx_save(self_p, filename)
         result
       end
@@ -395,12 +400,11 @@ module CZMQ
       # already exist. Hash values must printable strings; keys may not contain
       # '=' character. Returns 0 if OK, else -1 if a file was not readable.    
       #
-      # @param filename [String, #to_str, #to_s]
+      # @param filename [String, #to_s, nil]
       # @return [Integer]
       def load(filename)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        filename = String(filename)
         result = ::CZMQ::FFI.zhashx_load(self_p, filename)
         result
       end

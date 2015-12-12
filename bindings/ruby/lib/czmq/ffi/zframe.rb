@@ -60,10 +60,17 @@ module CZMQ
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
         ptr_ptr.write_pointer @ptr
-        ObjectSpace.undefine_finalizer self if @finalizer
-        @finalizer = nil
+        __undef_finalizer if @finalizer
         @ptr = nil
         ptr_ptr
+      end
+      # Undefines the finalizer for this object.
+      # @note Only use this if you need to and can guarantee that the native
+      #   object will be freed by other means.
+      # @return [void]
+      def __undef_finalizer
+        ObjectSpace.undefine_finalizer self
+        @finalizer = nil
       end
 
       # Create a new frame. If size is not null, allocates the frame data
@@ -86,10 +93,9 @@ module CZMQ
       end
 
       # Create a frame with a specified string content.
-      # @param string [String, #to_str, #to_s]
+      # @param string [String, #to_s, nil]
       # @return [CZMQ::Zframe]
       def self.from(string)
-        string = String(string)
         ptr = ::CZMQ::FFI.zframe_from(string)
         __new ptr
       end
@@ -186,12 +192,11 @@ module CZMQ
 
       # Return TRUE if frame body is equal to string, excluding terminator
       #
-      # @param string [String, #to_str, #to_s]
+      # @param string [String, #to_s, nil]
       # @return [Boolean]
       def streq(string)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        string = String(string)
         result = ::CZMQ::FFI.zframe_streq(self_p, string)
         result
       end
@@ -273,12 +278,11 @@ module CZMQ
       # Send message to zsys log sink (may be stdout, or system facility as       
       # configured by zsys_set_logstream). Prefix shows before frame, if not null.
       #
-      # @param prefix [String, #to_str, #to_s]
+      # @param prefix [String, #to_s, nil]
       # @return [void]
       def print(prefix)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        prefix = String(prefix)
         result = ::CZMQ::FFI.zframe_print(self_p, prefix)
         result
       end

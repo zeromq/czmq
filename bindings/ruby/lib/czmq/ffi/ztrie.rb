@@ -60,10 +60,17 @@ module CZMQ
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
         ptr_ptr.write_pointer @ptr
-        ObjectSpace.undefine_finalizer self if @finalizer
-        @finalizer = nil
+        __undef_finalizer if @finalizer
         @ptr = nil
         ptr_ptr
+      end
+      # Undefines the finalizer for this object.
+      # @note Only use this if you need to and can guarantee that the native
+      #   object will be freed by other means.
+      # @return [void]
+      def __undef_finalizer
+        ObjectSpace.undefine_finalizer self
+        @finalizer = nil
       end
 
       # Create a new callback of the following type:
@@ -104,14 +111,13 @@ module CZMQ
       # if the route already exists, otherwise 0. This method takes ownership of
       # the provided data if a destroy_data_fn is provided.                     
       #
-      # @param path [String, #to_str, #to_s]
+      # @param path [String, #to_s, nil]
       # @param data [::FFI::Pointer, #to_ptr]
       # @param destroy_data_fn [::FFI::Pointer, #to_ptr]
       # @return [Integer]
       def insert_route(path, data, destroy_data_fn)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        path = String(path)
         result = ::CZMQ::FFI.ztrie_insert_route(self_p, path, data, destroy_data_fn)
         result
       end
@@ -120,24 +126,22 @@ module CZMQ
       # route does not exists, otherwise 0.                                   
       # the start of the list call zlist_first (). Advances the cursor.       
       #
-      # @param path [String, #to_str, #to_s]
+      # @param path [String, #to_s, nil]
       # @return [Integer]
       def remove_route(path)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        path = String(path)
         result = ::CZMQ::FFI.ztrie_remove_route(self_p, path)
         result
       end
 
       # Returns true if the path matches a route in the tree, otherwise false.
       #
-      # @param path [String, #to_str, #to_s]
+      # @param path [String, #to_s, nil]
       # @return [Boolean]
       def matches(path)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        path = String(path)
         result = ::CZMQ::FFI.ztrie_matches(self_p, path)
         result
       end

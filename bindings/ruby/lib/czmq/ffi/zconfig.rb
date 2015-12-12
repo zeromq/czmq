@@ -60,10 +60,17 @@ module CZMQ
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
         ptr_ptr.write_pointer @ptr
-        ObjectSpace.undefine_finalizer self if @finalizer
-        @finalizer = nil
+        __undef_finalizer if @finalizer
         @ptr = nil
         ptr_ptr
+      end
+      # Undefines the finalizer for this object.
+      # @note Only use this if you need to and can guarantee that the native
+      #   object will be freed by other means.
+      # @return [void]
+      def __undef_finalizer
+        ObjectSpace.undefine_finalizer self
+        @finalizer = nil
       end
 
       # Create a new callback of the following type:
@@ -85,11 +92,10 @@ module CZMQ
       end
 
       # Create new config item
-      # @param name [String, #to_str, #to_s]
+      # @param name [String, #to_s, nil]
       # @param parent [Zconfig, #__ptr]
       # @return [CZMQ::Zconfig]
       def self.new(name, parent)
-        name = String(name)
         parent = parent.__ptr if parent
         ptr = ::CZMQ::FFI.zconfig_new(name, parent)
         __new ptr
@@ -98,21 +104,19 @@ module CZMQ
       # Load a config tree from a specified ZPL text file; returns a zconfig_t  
       # reference for the root, if the file exists and is readable. Returns NULL
       # if the file does not exist.                                             
-      # @param filename [String, #to_str, #to_s]
+      # @param filename [String, #to_s, nil]
       # @return [CZMQ::Zconfig]
       def self.load(filename)
-        filename = String(filename)
         ptr = ::CZMQ::FFI.zconfig_load(filename)
         __new ptr
       end
 
       # Equivalent to zconfig_load, taking a format string instead of a fixed
       # filename.                                                            
-      # @param format [String, #to_str, #to_s]
+      # @param format [String, #to_s, nil]
       # @param args [Array<Object>]
       # @return [CZMQ::Zconfig]
       def self.loadf(format, *args)
-        format = String(format)
         ptr = ::CZMQ::FFI.zconfig_loadf(format, *args)
         __new ptr
       end
@@ -149,14 +153,12 @@ module CZMQ
 
       # Insert or update configuration key with value
       #
-      # @param path [String, #to_str, #to_s]
-      # @param value [String, #to_str, #to_s]
+      # @param path [String, #to_s, nil]
+      # @param value [String, #to_s, nil]
       # @return [void]
       def put(path, value)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        path = String(path)
-        value = String(value)
         result = ::CZMQ::FFI.zconfig_put(self_p, path, value)
         result
       end
@@ -164,15 +166,13 @@ module CZMQ
       # Equivalent to zconfig_put, accepting a format specifier and variable
       # argument list, instead of a single string value.                    
       #
-      # @param path [String, #to_str, #to_s]
-      # @param format [String, #to_str, #to_s]
+      # @param path [String, #to_s, nil]
+      # @param format [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [void]
       def putf(path, format, *args)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        path = String(path)
-        format = String(format)
         result = ::CZMQ::FFI.zconfig_putf(self_p, path, format, *args)
         result
       end
@@ -180,26 +180,23 @@ module CZMQ
       # Get value for config item into a string value; leading slash is optional
       # and ignored.                                                            
       #
-      # @param path [String, #to_str, #to_s]
-      # @param default_value [String, #to_str, #to_s]
+      # @param path [String, #to_s, nil]
+      # @param default_value [String, #to_s, nil]
       # @return [::FFI::Pointer]
       def get(path, default_value)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        path = String(path)
-        default_value = String(default_value)
         result = ::CZMQ::FFI.zconfig_get(self_p, path, default_value)
         result
       end
 
       # Set config item name, name may be NULL
       #
-      # @param name [String, #to_str, #to_s]
+      # @param name [String, #to_s, nil]
       # @return [void]
       def set_name(name)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        name = String(name)
         result = ::CZMQ::FFI.zconfig_set_name(self_p, name)
         result
       end
@@ -209,13 +206,12 @@ module CZMQ
       # comes from an insecure source, you must use '%s' as the format, followed
       # by the string.                                                          
       #
-      # @param format [String, #to_str, #to_s]
+      # @param format [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [void]
       def set_value(format, *args)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        format = String(format)
         result = ::CZMQ::FFI.zconfig_set_value(self_p, format, *args)
         result
       end
@@ -244,12 +240,11 @@ module CZMQ
 
       # Find a config item along a path; leading slash is optional and ignored.
       #
-      # @param path [String, #to_str, #to_s]
+      # @param path [String, #to_s, nil]
       # @return [Zconfig]
       def locate(path)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        path = String(path)
         result = ::CZMQ::FFI.zconfig_locate(self_p, path)
         result = Zconfig.__new result, false
         result
@@ -285,13 +280,12 @@ module CZMQ
       # comment lines as you like. If you use a null format, all comments are
       # deleted.                                                             
       #
-      # @param format [String, #to_str, #to_s]
+      # @param format [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [void]
       def set_comment(format, *args)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        format = String(format)
         result = ::CZMQ::FFI.zconfig_set_comment(self_p, format, *args)
         result
       end
@@ -310,12 +304,11 @@ module CZMQ
       # Save a config tree to a specified ZPL text file, where a filename
       # "-" means dump to standard output.                               
       #
-      # @param filename [String, #to_str, #to_s]
+      # @param filename [String, #to_s, nil]
       # @return [Integer]
       def save(filename)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        filename = String(filename)
         result = ::CZMQ::FFI.zconfig_save(self_p, filename)
         result
       end
@@ -323,13 +316,12 @@ module CZMQ
       # Equivalent to zconfig_save, taking a format string instead of a fixed
       # filename.                                                            
       #
-      # @param format [String, #to_str, #to_s]
+      # @param format [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [Integer]
       def savef(format, *args)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        format = String(format)
         result = ::CZMQ::FFI.zconfig_savef(self_p, format, *args)
         result
       end
@@ -378,10 +370,9 @@ module CZMQ
 
       # Load a config tree from a null-terminated string
       #
-      # @param string [String, #to_str, #to_s]
+      # @param string [String, #to_s, nil]
       # @return [Zconfig]
       def self.str_load(string)
-        string = String(string)
         result = ::CZMQ::FFI.zconfig_str_load(string)
         result = Zconfig.__new result, true
         result

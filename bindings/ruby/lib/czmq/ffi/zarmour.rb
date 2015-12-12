@@ -60,10 +60,17 @@ module CZMQ
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
         ptr_ptr.write_pointer @ptr
-        ObjectSpace.undefine_finalizer self if @finalizer
-        @finalizer = nil
+        __undef_finalizer if @finalizer
         @ptr = nil
         ptr_ptr
+      end
+      # Undefines the finalizer for this object.
+      # @note Only use this if you need to and can guarantee that the native
+      #   object will be freed by other means.
+      # @return [void]
+      def __undef_finalizer
+        ObjectSpace.undefine_finalizer self
+        @finalizer = nil
       end
 
       # Create a new zarmour.
@@ -111,13 +118,12 @@ module CZMQ
       # The decoded output is null-terminated, so it may be treated
       # as a string, if that's what it was prior to encoding.      
       #
-      # @param data [String, #to_str, #to_s]
+      # @param data [String, #to_s, nil]
       # @param decode_size [::FFI::Pointer, #to_ptr]
       # @return [::FFI::Pointer]
       def decode(data, decode_size)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        data = String(data)
         result = ::CZMQ::FFI.zarmour_decode(self_p, data, decode_size)
         result
       end

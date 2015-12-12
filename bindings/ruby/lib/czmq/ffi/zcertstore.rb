@@ -60,10 +60,17 @@ module CZMQ
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
         ptr_ptr.write_pointer @ptr
-        ObjectSpace.undefine_finalizer self if @finalizer
-        @finalizer = nil
+        __undef_finalizer if @finalizer
         @ptr = nil
         ptr_ptr
+      end
+      # Undefines the finalizer for this object.
+      # @note Only use this if you need to and can guarantee that the native
+      #   object will be freed by other means.
+      # @return [void]
+      def __undef_finalizer
+        ObjectSpace.undefine_finalizer self
+        @finalizer = nil
       end
 
       # Create a new certificate store from a disk directory, loading and        
@@ -72,10 +79,9 @@ module CZMQ
       # is automatically refreshed on any zcertstore_lookup() call. If the       
       # location is specified as NULL, creates a pure-memory store, which you    
       # can work with by inserting certificates at runtime.                      
-      # @param location [String, #to_str, #to_s]
+      # @param location [String, #to_s, nil]
       # @return [CZMQ::Zcertstore]
       def self.new(location)
-        location = String(location)
         ptr = ::CZMQ::FFI.zcertstore_new(location)
         __new ptr
       end
@@ -94,12 +100,11 @@ module CZMQ
       # Look up certificate by public key, returns zcert_t object if found,
       # else returns NULL. The public key is provided in Z85 text format.  
       #
-      # @param public_key [String, #to_str, #to_s]
+      # @param public_key [String, #to_s, nil]
       # @return [Zcert]
       def lookup(public_key)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        public_key = String(public_key)
         result = ::CZMQ::FFI.zcertstore_lookup(self_p, public_key)
         result = Zcert.__new result, false
         result

@@ -60,10 +60,17 @@ module CZMQ
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
         ptr_ptr.write_pointer @ptr
-        ObjectSpace.undefine_finalizer self if @finalizer
-        @finalizer = nil
+        __undef_finalizer if @finalizer
         @ptr = nil
         ptr_ptr
+      end
+      # Undefines the finalizer for this object.
+      # @note Only use this if you need to and can guarantee that the native
+      #   object will be freed by other means.
+      # @return [void]
+      def __undef_finalizer
+        ObjectSpace.undefine_finalizer self
+        @finalizer = nil
       end
 
       # Create a new UUID object.
@@ -105,12 +112,11 @@ module CZMQ
       # Set UUID to new supplied string value skipping '-' and '{' '}'
       # optional delimiters. Return 0 if OK, else returns -1.         
       #
-      # @param source [String, #to_str, #to_s]
+      # @param source [String, #to_s, nil]
       # @return [Integer]
       def set_str(source)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        source = String(source)
         result = ::CZMQ::FFI.zuuid_set_str(self_p, source)
         result
       end
