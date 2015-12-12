@@ -288,7 +288,7 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
         if (self->transmit
         &&  zclock_mono () >= self->ping_at) {
             //  Send beacon to any listening peers
-            zsys_udp_send (self->udpsock, self->transmit, &self->broadcast.inaddr, self->broadcast.inaddrlen);
+            zsys_udp_send (self->udpsock, self->transmit, &self->broadcast.in4addr, self->broadcast.inaddrlen);
             self->ping_at = zclock_mono () + self->interval;
         }
     }
@@ -325,12 +325,12 @@ s_agent_new (void *pipe, int port_nbr)
     inaddr_storage_t sockaddr = self->address;
 #elif (defined (__APPLE__))
     inaddr_storage_t sockaddr = self->broadcast;
-    sockaddr.inaddr.sin_addr.s_addr = htons (INADDR_ANY);
+    sockaddr.in4addr.sin_addr.s_addr = htons (INADDR_ANY);
 #else
     inaddr_storage_t sockaddr = self->broadcast;
 #endif
 
-    int rc = bind (self->udpsock, (struct sockaddr *) &sockaddr.inaddr, sockaddr.inaddrlen);
+    int rc = bind (self->udpsock, (struct sockaddr *) &sockaddr.in4addr, sockaddr.inaddrlen);
     if (rc == SOCKET_ERROR)
         zsys_socket_error ("bind");
 
@@ -338,7 +338,7 @@ s_agent_new (void *pipe, int port_nbr)
     //  PROBLEM: this hostname will not be accurate when the node
     //  has more than one active interface.
     char hostname [NI_MAXHOST];
-    rc = getnameinfo ((struct sockaddr *) &self->address.inaddr,
+    rc = getnameinfo ((struct sockaddr *) &self->address.in4addr,
                       self->address.inaddrlen, hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
     if (rc == 0) {
         //  It all looks OK
@@ -363,12 +363,12 @@ s_get_interface (agent_t *self)
     const char *iface = zsys_interface ();
     if (streq (iface, "*")) {
         //  Force binding to INADDR_ANY and sending to INADDR_BROADCAST
-        self->broadcast.inaddr.sin_family = AF_INET;
-        self->broadcast.inaddr.sin_addr.s_addr = INADDR_BROADCAST;
-        self->broadcast.inaddr.sin_port = htons (self->port_nbr);
+        self->broadcast.in4addr.sin_family = AF_INET;
+        self->broadcast.in4addr.sin_addr.s_addr = INADDR_BROADCAST;
+        self->broadcast.in4addr.sin_port = htons (self->port_nbr);
         self->broadcast.inaddrlen = sizeof (inaddr_t);
         self->address = self->broadcast;
-        self->address.inaddr.sin_addr.s_addr = INADDR_ANY;
+        self->address.in4addr.sin_addr.s_addr = INADDR_ANY;
     }
     else {
         ziflist_t *iflist = ziflist_new ();
@@ -405,12 +405,12 @@ s_get_interface (agent_t *self)
             else {
                 //  Using inet_addr instead of inet_aton or inet_atop because these
                 //  are not supported in Win XP
-                self->broadcast.inaddr.sin_family = AF_INET;
-                self->broadcast.inaddr.sin_addr.s_addr = inet_addr (ziflist_broadcast (iflist));
-                self->broadcast.inaddr.sin_port = htons (self->port_nbr);
+                self->broadcast.in4addr.sin_family = AF_INET;
+                self->broadcast.in4addr.sin_addr.s_addr = inet_addr (ziflist_broadcast (iflist));
+                self->broadcast.in4addr.sin_port = htons (self->port_nbr);
                 self->broadcast.inaddrlen = sizeof (inaddr_t);
                 self->address = self->broadcast;
-                self->address.inaddr.sin_addr.s_addr = inet_addr (ziflist_address (iflist));
+                self->address.in4addr.sin_addr.s_addr = inet_addr (ziflist_address (iflist));
             }
         }
         else
