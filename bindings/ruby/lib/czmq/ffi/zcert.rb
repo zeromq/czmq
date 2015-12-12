@@ -60,10 +60,17 @@ module CZMQ
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
         ptr_ptr.write_pointer @ptr
-        ObjectSpace.undefine_finalizer self if @finalizer
-        @finalizer = nil
+        __undef_finalizer if @finalizer
         @ptr = nil
         ptr_ptr
+      end
+      # Undefines the finalizer for this object.
+      # @note Only use this if you need to and can guarantee that the native
+      #   object will be freed by other means.
+      # @return [void]
+      def __undef_finalizer
+        ObjectSpace.undefine_finalizer self
+        @finalizer = nil
       end
 
       # Create and initialize a new certificate in memory
@@ -83,10 +90,9 @@ module CZMQ
       end
 
       # Load certificate from file
-      # @param filename [String, #to_str, #to_s]
+      # @param filename [String, #to_s, nil]
       # @return [CZMQ::Zcert]
       def self.load(filename)
-        filename = String(filename)
         ptr = ::CZMQ::FFI.zcert_load(filename)
         __new ptr
       end
@@ -143,15 +149,13 @@ module CZMQ
 
       # Set certificate metadata from formatted string.
       #
-      # @param name [String, #to_str, #to_s]
-      # @param format [String, #to_str, #to_s]
+      # @param name [String, #to_s, nil]
+      # @param format [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [void]
       def set_meta(name, format, *args)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        name = String(name)
-        format = String(format)
         result = ::CZMQ::FFI.zcert_set_meta(self_p, name, format, *args)
         result
       end
@@ -159,12 +163,11 @@ module CZMQ
       # Get metadata value from certificate; if the metadata value doesn't
       # exist, returns NULL.                                              
       #
-      # @param name [String, #to_str, #to_s]
+      # @param name [String, #to_s, nil]
       # @return [::FFI::Pointer]
       def meta(name)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        name = String(name)
         result = ::CZMQ::FFI.zcert_meta(self_p, name)
         result
       end
@@ -184,36 +187,33 @@ module CZMQ
       # Save full certificate (public + secret) to file for persistent storage  
       # This creates one public file and one secret file (filename + "_secret").
       #
-      # @param filename [String, #to_str, #to_s]
+      # @param filename [String, #to_s, nil]
       # @return [Integer]
       def save(filename)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        filename = String(filename)
         result = ::CZMQ::FFI.zcert_save(self_p, filename)
         result
       end
 
       # Save public certificate only to file for persistent storage
       #
-      # @param filename [String, #to_str, #to_s]
+      # @param filename [String, #to_s, nil]
       # @return [Integer]
       def save_public(filename)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        filename = String(filename)
         result = ::CZMQ::FFI.zcert_save_public(self_p, filename)
         result
       end
 
       # Save secret certificate only to file for persistent storage
       #
-      # @param filename [String, #to_str, #to_s]
+      # @param filename [String, #to_s, nil]
       # @return [Integer]
       def save_secret(filename)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        filename = String(filename)
         result = ::CZMQ::FFI.zcert_save_secret(self_p, filename)
         result
       end

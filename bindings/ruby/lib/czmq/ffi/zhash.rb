@@ -60,10 +60,17 @@ module CZMQ
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
         ptr_ptr.write_pointer @ptr
-        ObjectSpace.undefine_finalizer self if @finalizer
-        @finalizer = nil
+        __undef_finalizer if @finalizer
         @ptr = nil
         ptr_ptr
+      end
+      # Undefines the finalizer for this object.
+      # @note Only use this if you need to and can guarantee that the native
+      #   object will be freed by other means.
+      # @return [void]
+      def __undef_finalizer
+        ObjectSpace.undefine_finalizer self
+        @finalizer = nil
       end
 
       # Create a new callback of the following type:
@@ -131,13 +138,12 @@ module CZMQ
       # If key is already present returns -1 and leaves existing item unchanged
       # Returns 0 on success.                                                  
       #
-      # @param key [String, #to_str, #to_s]
+      # @param key [String, #to_s, nil]
       # @param item [::FFI::Pointer, #to_ptr]
       # @return [Integer]
       def insert(key, item)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        key = String(key)
         result = ::CZMQ::FFI.zhash_insert(self_p, key, item)
         result
       end
@@ -146,13 +152,12 @@ module CZMQ
       # If key is already present, destroys old item and inserts new one.   
       # Use free_fn method to ensure deallocator is properly called on item.
       #
-      # @param key [String, #to_str, #to_s]
+      # @param key [String, #to_s, nil]
       # @param item [::FFI::Pointer, #to_ptr]
       # @return [void]
       def update(key, item)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        key = String(key)
         result = ::CZMQ::FFI.zhash_update(self_p, key, item)
         result
       end
@@ -160,24 +165,22 @@ module CZMQ
       # Remove an item specified by key from the hash table. If there was no such
       # item, this function does nothing.                                        
       #
-      # @param key [String, #to_str, #to_s]
+      # @param key [String, #to_s, nil]
       # @return [void]
       def delete(key)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        key = String(key)
         result = ::CZMQ::FFI.zhash_delete(self_p, key)
         result
       end
 
       # Return the item at the specified key, or null
       #
-      # @param key [String, #to_str, #to_s]
+      # @param key [String, #to_s, nil]
       # @return [::FFI::Pointer]
       def lookup(key)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        key = String(key)
         result = ::CZMQ::FFI.zhash_lookup(self_p, key)
         result
       end
@@ -185,14 +188,12 @@ module CZMQ
       # Reindexes an item from an old key to a new key. If there was no such
       # item, does nothing. Returns 0 if successful, else -1.               
       #
-      # @param old_key [String, #to_str, #to_s]
-      # @param new_key [String, #to_str, #to_s]
+      # @param old_key [String, #to_s, nil]
+      # @param new_key [String, #to_s, nil]
       # @return [Integer]
       def rename(old_key, new_key)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        old_key = String(old_key)
-        new_key = String(new_key)
         result = ::CZMQ::FFI.zhash_rename(self_p, old_key, new_key)
         result
       end
@@ -203,13 +204,12 @@ module CZMQ
       # you don't have memory leaks. You can pass 'free' or NULL as a free_fn. 
       # Returns the item, or NULL if there is no such item.                    
       #
-      # @param key [String, #to_str, #to_s]
+      # @param key [String, #to_s, nil]
       # @param free_fn [::FFI::Pointer, #to_ptr]
       # @return [::FFI::Pointer]
       def freefn(key, free_fn)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        key = String(key)
         result = ::CZMQ::FFI.zhash_freefn(self_p, key, free_fn)
         result
       end
@@ -294,13 +294,12 @@ module CZMQ
       # comment lines as you like. These comment lines are discarded when loading
       # the file. If you use a null format, all comments are deleted.            
       #
-      # @param format [String, #to_str, #to_s]
+      # @param format [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [void]
       def comment(format, *args)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        format = String(format)
         result = ::CZMQ::FFI.zhash_comment(self_p, format, *args)
         result
       end
@@ -339,12 +338,11 @@ module CZMQ
       # printable strings; keys may not contain '=' character. Returns 0 if OK, 
       # else -1 if a file error occurred.                                       
       #
-      # @param filename [String, #to_str, #to_s]
+      # @param filename [String, #to_s, nil]
       # @return [Integer]
       def save(filename)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        filename = String(filename)
         result = ::CZMQ::FFI.zhash_save(self_p, filename)
         result
       end
@@ -353,12 +351,11 @@ module CZMQ
       # already exist. Hash values must printable strings; keys may not contain
       # '=' character. Returns 0 if OK, else -1 if a file was not readable.    
       #
-      # @param filename [String, #to_str, #to_s]
+      # @param filename [String, #to_s, nil]
       # @return [Integer]
       def load(filename)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        filename = String(filename)
         result = ::CZMQ::FFI.zhash_load(self_p, filename)
         result
       end

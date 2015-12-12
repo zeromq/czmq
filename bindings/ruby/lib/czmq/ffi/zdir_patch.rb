@@ -60,22 +60,27 @@ module CZMQ
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
         ptr_ptr.write_pointer @ptr
-        ObjectSpace.undefine_finalizer self if @finalizer
-        @finalizer = nil
+        __undef_finalizer if @finalizer
         @ptr = nil
         ptr_ptr
       end
+      # Undefines the finalizer for this object.
+      # @note Only use this if you need to and can guarantee that the native
+      #   object will be freed by other means.
+      # @return [void]
+      def __undef_finalizer
+        ObjectSpace.undefine_finalizer self
+        @finalizer = nil
+      end
 
       # Create new patch
-      # @param path [String, #to_str, #to_s]
+      # @param path [String, #to_s, nil]
       # @param file [Zfile, #__ptr]
       # @param op [Symbol]
-      # @param alias_ [String, #to_str, #to_s]
+      # @param alias_ [String, #to_s, nil]
       # @return [CZMQ::ZdirPatch]
       def self.new(path, file, op, alias_)
-        path = String(path)
         file = file.__ptr if file
-        alias_ = String(alias_)
         ptr = ::CZMQ::FFI.zdir_patch_new(path, file, op, alias_)
         __new ptr
       end

@@ -60,10 +60,17 @@ module CZMQ
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
         ptr_ptr.write_pointer @ptr
-        ObjectSpace.undefine_finalizer self if @finalizer
-        @finalizer = nil
+        __undef_finalizer if @finalizer
         @ptr = nil
         ptr_ptr
+      end
+      # Undefines the finalizer for this object.
+      # @note Only use this if you need to and can guarantee that the native
+      #   object will be freed by other means.
+      # @return [void]
+      def __undef_finalizer
+        ObjectSpace.undefine_finalizer self
+        @finalizer = nil
       end
 
       # If file exists, populates properties. CZMQ supports portable symbolic
@@ -71,12 +78,10 @@ module CZMQ
       # text file containing one line, the filename of a target file. Reading
       # data from the symbolic link actually reads from the target file. Path
       # may be NULL, in which case it is not used.                           
-      # @param path [String, #to_str, #to_s]
-      # @param name [String, #to_str, #to_s]
+      # @param path [String, #to_s, nil]
+      # @param name [String, #to_s, nil]
       # @return [CZMQ::Zfile]
       def self.new(path, name)
-        path = String(path)
-        name = String(name)
         ptr = ::CZMQ::FFI.zfile_new(path, name)
         __new ptr
       end
@@ -105,12 +110,11 @@ module CZMQ
 
       # Return file name, remove path if provided
       #
-      # @param path [String, #to_str, #to_s]
+      # @param path [String, #to_s, nil]
       # @return [String]
       def filename(path)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        path = String(path)
         result = ::CZMQ::FFI.zfile_filename(self_p, path)
         result
       end

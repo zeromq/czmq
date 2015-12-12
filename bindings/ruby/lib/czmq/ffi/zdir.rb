@@ -60,21 +60,26 @@ module CZMQ
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
         ptr_ptr.write_pointer @ptr
-        ObjectSpace.undefine_finalizer self if @finalizer
-        @finalizer = nil
+        __undef_finalizer if @finalizer
         @ptr = nil
         ptr_ptr
+      end
+      # Undefines the finalizer for this object.
+      # @note Only use this if you need to and can guarantee that the native
+      #   object will be freed by other means.
+      # @return [void]
+      def __undef_finalizer
+        ObjectSpace.undefine_finalizer self
+        @finalizer = nil
       end
 
       # Create a new directory item that loads in the full tree of the specified
       # path, optionally located under some parent path. If parent is "-", then 
       # loads only the top-level directory, and does not use parent as a path.  
-      # @param path [String, #to_str, #to_s]
-      # @param parent [String, #to_str, #to_s]
+      # @param path [String, #to_s, nil]
+      # @param parent [String, #to_s, nil]
       # @return [CZMQ::Zdir]
       def self.new(path, parent)
-        path = String(path)
-        parent = String(parent)
         ptr = ::CZMQ::FFI.zdir_new(path, parent)
         __new ptr
       end
@@ -164,12 +169,11 @@ module CZMQ
       #
       # @param older [Zdir, #__ptr]
       # @param newer [Zdir, #__ptr]
-      # @param alias_ [String, #to_str, #to_s]
+      # @param alias_ [String, #to_s, nil]
       # @return [Zlist]
       def self.diff(older, newer, alias_)
         older = older.__ptr if older
         newer = newer.__ptr if newer
-        alias_ = String(alias_)
         result = ::CZMQ::FFI.zdir_diff(older, newer, alias_)
         result = Zlist.__new result, true
         result
@@ -177,12 +181,11 @@ module CZMQ
 
       # Return full contents of directory as a zdir_patch list.
       #
-      # @param alias_ [String, #to_str, #to_s]
+      # @param alias_ [String, #to_s, nil]
       # @return [Zlist]
       def resync(alias_)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        alias_ = String(alias_)
         result = ::CZMQ::FFI.zdir_resync(self_p, alias_)
         result = Zlist.__new result, true
         result

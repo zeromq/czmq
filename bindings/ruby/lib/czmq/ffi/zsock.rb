@@ -60,10 +60,17 @@ module CZMQ
         raise DestroyedError unless @ptr
         ptr_ptr = ::FFI::MemoryPointer.new :pointer
         ptr_ptr.write_pointer @ptr
-        ObjectSpace.undefine_finalizer self if @finalizer
-        @finalizer = nil
+        __undef_finalizer if @finalizer
         @ptr = nil
         ptr_ptr
+      end
+      # Undefines the finalizer for this object.
+      # @note Only use this if you need to and can guarantee that the native
+      #   object will be freed by other means.
+      # @return [void]
+      def __undef_finalizer
+        ObjectSpace.undefine_finalizer self
+        @finalizer = nil
       end
 
       # Create a new socket. Returns the new socket, or NULL if the new socket
@@ -81,130 +88,115 @@ module CZMQ
       end
 
       # Create a PUB socket. Default action is bind.
-      # @param endpoint [String, #to_str, #to_s]
+      # @param endpoint [String, #to_s, nil]
       # @return [CZMQ::Zsock]
       def self.new_pub(endpoint)
-        endpoint = String(endpoint)
         ptr = ::CZMQ::FFI.zsock_new_pub(endpoint)
         __new ptr
       end
 
       # Create a SUB socket, and optionally subscribe to some prefix string. Default
       # action is connect.                                                          
-      # @param endpoint [String, #to_str, #to_s]
-      # @param subscribe [String, #to_str, #to_s]
+      # @param endpoint [String, #to_s, nil]
+      # @param subscribe [String, #to_s, nil]
       # @return [CZMQ::Zsock]
       def self.new_sub(endpoint, subscribe)
-        endpoint = String(endpoint)
-        subscribe = String(subscribe)
         ptr = ::CZMQ::FFI.zsock_new_sub(endpoint, subscribe)
         __new ptr
       end
 
       # Create a REQ socket. Default action is connect.
-      # @param endpoint [String, #to_str, #to_s]
+      # @param endpoint [String, #to_s, nil]
       # @return [CZMQ::Zsock]
       def self.new_req(endpoint)
-        endpoint = String(endpoint)
         ptr = ::CZMQ::FFI.zsock_new_req(endpoint)
         __new ptr
       end
 
       # Create a REP socket. Default action is bind.
-      # @param endpoint [String, #to_str, #to_s]
+      # @param endpoint [String, #to_s, nil]
       # @return [CZMQ::Zsock]
       def self.new_rep(endpoint)
-        endpoint = String(endpoint)
         ptr = ::CZMQ::FFI.zsock_new_rep(endpoint)
         __new ptr
       end
 
       # Create a DEALER socket. Default action is connect.
-      # @param endpoint [String, #to_str, #to_s]
+      # @param endpoint [String, #to_s, nil]
       # @return [CZMQ::Zsock]
       def self.new_dealer(endpoint)
-        endpoint = String(endpoint)
         ptr = ::CZMQ::FFI.zsock_new_dealer(endpoint)
         __new ptr
       end
 
       # Create a ROUTER socket. Default action is bind.
-      # @param endpoint [String, #to_str, #to_s]
+      # @param endpoint [String, #to_s, nil]
       # @return [CZMQ::Zsock]
       def self.new_router(endpoint)
-        endpoint = String(endpoint)
         ptr = ::CZMQ::FFI.zsock_new_router(endpoint)
         __new ptr
       end
 
       # Create a PUSH socket. Default action is connect.
-      # @param endpoint [String, #to_str, #to_s]
+      # @param endpoint [String, #to_s, nil]
       # @return [CZMQ::Zsock]
       def self.new_push(endpoint)
-        endpoint = String(endpoint)
         ptr = ::CZMQ::FFI.zsock_new_push(endpoint)
         __new ptr
       end
 
       # Create a PULL socket. Default action is bind.
-      # @param endpoint [String, #to_str, #to_s]
+      # @param endpoint [String, #to_s, nil]
       # @return [CZMQ::Zsock]
       def self.new_pull(endpoint)
-        endpoint = String(endpoint)
         ptr = ::CZMQ::FFI.zsock_new_pull(endpoint)
         __new ptr
       end
 
       # Create an XPUB socket. Default action is bind.
-      # @param endpoint [String, #to_str, #to_s]
+      # @param endpoint [String, #to_s, nil]
       # @return [CZMQ::Zsock]
       def self.new_xpub(endpoint)
-        endpoint = String(endpoint)
         ptr = ::CZMQ::FFI.zsock_new_xpub(endpoint)
         __new ptr
       end
 
       # Create an XSUB socket. Default action is connect.
-      # @param endpoint [String, #to_str, #to_s]
+      # @param endpoint [String, #to_s, nil]
       # @return [CZMQ::Zsock]
       def self.new_xsub(endpoint)
-        endpoint = String(endpoint)
         ptr = ::CZMQ::FFI.zsock_new_xsub(endpoint)
         __new ptr
       end
 
       # Create a PAIR socket. Default action is connect.
-      # @param endpoint [String, #to_str, #to_s]
+      # @param endpoint [String, #to_s, nil]
       # @return [CZMQ::Zsock]
       def self.new_pair(endpoint)
-        endpoint = String(endpoint)
         ptr = ::CZMQ::FFI.zsock_new_pair(endpoint)
         __new ptr
       end
 
       # Create a STREAM socket. Default action is connect.
-      # @param endpoint [String, #to_str, #to_s]
+      # @param endpoint [String, #to_s, nil]
       # @return [CZMQ::Zsock]
       def self.new_stream(endpoint)
-        endpoint = String(endpoint)
         ptr = ::CZMQ::FFI.zsock_new_stream(endpoint)
         __new ptr
       end
 
       # Create a SERVER socket. Default action is bind.
-      # @param endpoint [String, #to_str, #to_s]
+      # @param endpoint [String, #to_s, nil]
       # @return [CZMQ::Zsock]
       def self.new_server(endpoint)
-        endpoint = String(endpoint)
         ptr = ::CZMQ::FFI.zsock_new_server(endpoint)
         __new ptr
       end
 
       # Create a CLIENT socket. Default action is connect.
-      # @param endpoint [String, #to_str, #to_s]
+      # @param endpoint [String, #to_s, nil]
       # @return [CZMQ::Zsock]
       def self.new_client(endpoint)
-        endpoint = String(endpoint)
         ptr = ::CZMQ::FFI.zsock_new_client(endpoint)
         __new ptr
       end
@@ -241,13 +233,12 @@ module CZMQ
       # clients being aware. Protocols that run on ephemeral ports should take  
       # this into account.                                                      
       #
-      # @param format [String, #to_str, #to_s]
+      # @param format [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [Integer]
       def bind(format, *args)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        format = String(format)
         result = ::CZMQ::FFI.zsock_bind(self_p, format, *args)
         result
       end
@@ -266,13 +257,12 @@ module CZMQ
       # Returns 0 if OK, -1 if the endpoint was invalid or the function
       # isn't supported.                                               
       #
-      # @param format [String, #to_str, #to_s]
+      # @param format [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [Integer]
       def unbind(format, *args)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        format = String(format)
         result = ::CZMQ::FFI.zsock_unbind(self_p, format, *args)
         result
       end
@@ -280,13 +270,12 @@ module CZMQ
       # Connect a socket to a formatted endpoint        
       # Returns 0 if OK, -1 if the endpoint was invalid.
       #
-      # @param format [String, #to_str, #to_s]
+      # @param format [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [Integer]
       def connect(format, *args)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        format = String(format)
         result = ::CZMQ::FFI.zsock_connect(self_p, format, *args)
         result
       end
@@ -295,13 +284,12 @@ module CZMQ
       # Returns 0 if OK, -1 if the endpoint was invalid or the function
       # isn't supported.                                               
       #
-      # @param format [String, #to_str, #to_s]
+      # @param format [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [Integer]
       def disconnect(format, *args)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        format = String(format)
         result = ::CZMQ::FFI.zsock_disconnect(self_p, format, *args)
         result
       end
@@ -313,13 +301,12 @@ module CZMQ
       # does not start with '@' or '>', the serverish argument defines whether   
       # it is used to bind (serverish = true) or connect (serverish = false).    
       #
-      # @param endpoints [String, #to_str, #to_s]
+      # @param endpoints [String, #to_s, nil]
       # @param serverish [Boolean]
       # @return [Integer]
       def attach(endpoints, serverish)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        endpoints = String(endpoints)
         serverish = !(0==serverish||!serverish) # boolean
         result = ::CZMQ::FFI.zsock_attach(self_p, endpoints, serverish)
         result
@@ -362,13 +349,12 @@ module CZMQ
       # any arguments. Returns 0 if successful, -1 if sending failed for any  
       # reason.                                                               
       #
-      # @param picture [String, #to_str, #to_s]
+      # @param picture [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [Integer]
       def send(picture, *args)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        picture = String(picture)
         result = ::CZMQ::FFI.zsock_send(self_p, picture, *args)
         result
       end
@@ -404,12 +390,11 @@ module CZMQ
       #
       # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
       #   object reference to use this method on
-      # @param picture [String, #to_str, #to_s]
+      # @param picture [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [Integer]
       def self.send(self_p, picture, *args)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
-        picture = String(picture)
         result = ::CZMQ::FFI.zsock_send(self_p, picture, *args)
         result
       end
@@ -418,13 +403,12 @@ module CZMQ
       # version of zsock_send (), so please consult its documentation for the
       # details.                                                             
       #
-      # @param picture [String, #to_str, #to_s]
+      # @param picture [String, #to_s, nil]
       # @param argptr [::FFI::Pointer, #to_ptr]
       # @return [Integer]
       def vsend(picture, argptr)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        picture = String(picture)
         result = ::CZMQ::FFI.zsock_vsend(self_p, picture, argptr)
         result
       end
@@ -437,12 +421,11 @@ module CZMQ
       #
       # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
       #   object reference to use this method on
-      # @param picture [String, #to_str, #to_s]
+      # @param picture [String, #to_s, nil]
       # @param argptr [::FFI::Pointer, #to_ptr]
       # @return [Integer]
       def self.vsend(self_p, picture, argptr)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
-        picture = String(picture)
         result = ::CZMQ::FFI.zsock_vsend(self_p, picture, argptr)
         result
       end
@@ -474,13 +457,12 @@ module CZMQ
       # An 'n' picture matches an empty frame; if the message does not match,   
       # the method will return -1.                                              
       #
-      # @param picture [String, #to_str, #to_s]
+      # @param picture [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [Integer]
       def recv(picture, *args)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        picture = String(picture)
         result = ::CZMQ::FFI.zsock_recv(self_p, picture, *args)
         result
       end
@@ -516,12 +498,11 @@ module CZMQ
       #
       # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
       #   object reference to use this method on
-      # @param picture [String, #to_str, #to_s]
+      # @param picture [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [Integer]
       def self.recv(self_p, picture, *args)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
-        picture = String(picture)
         result = ::CZMQ::FFI.zsock_recv(self_p, picture, *args)
         result
       end
@@ -530,13 +511,12 @@ module CZMQ
       # va_list version of zsock_recv (), so please consult its documentation
       # for the details.                                                     
       #
-      # @param picture [String, #to_str, #to_s]
+      # @param picture [String, #to_s, nil]
       # @param argptr [::FFI::Pointer, #to_ptr]
       # @return [Integer]
       def vrecv(picture, argptr)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        picture = String(picture)
         result = ::CZMQ::FFI.zsock_vrecv(self_p, picture, argptr)
         result
       end
@@ -549,12 +529,11 @@ module CZMQ
       #
       # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
       #   object reference to use this method on
-      # @param picture [String, #to_str, #to_s]
+      # @param picture [String, #to_s, nil]
       # @param argptr [::FFI::Pointer, #to_ptr]
       # @return [Integer]
       def self.vrecv(self_p, picture, argptr)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
-        picture = String(picture)
         result = ::CZMQ::FFI.zsock_vrecv(self_p, picture, argptr)
         result
       end
@@ -581,13 +560,12 @@ module CZMQ
       # Does not change or take ownership of any arguments. Returns 0 if       
       # successful, -1 if sending failed for any reason.                       
       #
-      # @param picture [String, #to_str, #to_s]
+      # @param picture [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [Integer]
       def bsend(picture, *args)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        picture = String(picture)
         result = ::CZMQ::FFI.zsock_bsend(self_p, picture, *args)
         result
       end
@@ -618,12 +596,11 @@ module CZMQ
       #
       # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
       #   object reference to use this method on
-      # @param picture [String, #to_str, #to_s]
+      # @param picture [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [Integer]
       def self.bsend(self_p, picture, *args)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
-        picture = String(picture)
         result = ::CZMQ::FFI.zsock_bsend(self_p, picture, *args)
         result
       end
@@ -640,13 +617,12 @@ module CZMQ
       # to be initialized. Returns 0 if successful, or -1 if it failed to read  
       # a message.                                                              
       #
-      # @param picture [String, #to_str, #to_s]
+      # @param picture [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [Integer]
       def brecv(picture, *args)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        picture = String(picture)
         result = ::CZMQ::FFI.zsock_brecv(self_p, picture, *args)
         result
       end
@@ -667,12 +643,11 @@ module CZMQ
       #
       # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
       #   object reference to use this method on
-      # @param picture [String, #to_str, #to_s]
+      # @param picture [String, #to_s, nil]
       # @param args [Array<Object>] see https://github.com/ffi/ffi/wiki/examples#using-varargs
       # @return [Integer]
       def self.brecv(self_p, picture, *args)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
-        picture = String(picture)
         result = ::CZMQ::FFI.zsock_brecv(self_p, picture, *args)
         result
       end
@@ -1080,12 +1055,11 @@ module CZMQ
 
       # Set socket option `zap_domain`.
       #
-      # @param zap_domain [String, #to_str, #to_s]
+      # @param zap_domain [String, #to_s, nil]
       # @return [void]
       def set_zap_domain(zap_domain)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        zap_domain = String(zap_domain)
         result = ::CZMQ::FFI.zsock_set_zap_domain(self_p, zap_domain)
         result
       end
@@ -1096,11 +1070,10 @@ module CZMQ
       #
       # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
       #   object reference to use this method on
-      # @param zap_domain [String, #to_str, #to_s]
+      # @param zap_domain [String, #to_s, nil]
       # @return [void]
       def self.set_zap_domain(self_p, zap_domain)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
-        zap_domain = String(zap_domain)
         result = ::CZMQ::FFI.zsock_set_zap_domain(self_p, zap_domain)
         result
       end
@@ -1205,12 +1178,11 @@ module CZMQ
 
       # Set socket option `plain_username`.
       #
-      # @param plain_username [String, #to_str, #to_s]
+      # @param plain_username [String, #to_s, nil]
       # @return [void]
       def set_plain_username(plain_username)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        plain_username = String(plain_username)
         result = ::CZMQ::FFI.zsock_set_plain_username(self_p, plain_username)
         result
       end
@@ -1221,11 +1193,10 @@ module CZMQ
       #
       # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
       #   object reference to use this method on
-      # @param plain_username [String, #to_str, #to_s]
+      # @param plain_username [String, #to_s, nil]
       # @return [void]
       def self.set_plain_username(self_p, plain_username)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
-        plain_username = String(plain_username)
         result = ::CZMQ::FFI.zsock_set_plain_username(self_p, plain_username)
         result
       end
@@ -1257,12 +1228,11 @@ module CZMQ
 
       # Set socket option `plain_password`.
       #
-      # @param plain_password [String, #to_str, #to_s]
+      # @param plain_password [String, #to_s, nil]
       # @return [void]
       def set_plain_password(plain_password)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        plain_password = String(plain_password)
         result = ::CZMQ::FFI.zsock_set_plain_password(self_p, plain_password)
         result
       end
@@ -1273,11 +1243,10 @@ module CZMQ
       #
       # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
       #   object reference to use this method on
-      # @param plain_password [String, #to_str, #to_s]
+      # @param plain_password [String, #to_s, nil]
       # @return [void]
       def self.set_plain_password(self_p, plain_password)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
-        plain_password = String(plain_password)
         result = ::CZMQ::FFI.zsock_set_plain_password(self_p, plain_password)
         result
       end
@@ -1359,12 +1328,11 @@ module CZMQ
 
       # Set socket option `curve_publickey`.
       #
-      # @param curve_publickey [String, #to_str, #to_s]
+      # @param curve_publickey [String, #to_s, nil]
       # @return [void]
       def set_curve_publickey(curve_publickey)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        curve_publickey = String(curve_publickey)
         result = ::CZMQ::FFI.zsock_set_curve_publickey(self_p, curve_publickey)
         result
       end
@@ -1375,11 +1343,10 @@ module CZMQ
       #
       # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
       #   object reference to use this method on
-      # @param curve_publickey [String, #to_str, #to_s]
+      # @param curve_publickey [String, #to_s, nil]
       # @return [void]
       def self.set_curve_publickey(self_p, curve_publickey)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
-        curve_publickey = String(curve_publickey)
         result = ::CZMQ::FFI.zsock_set_curve_publickey(self_p, curve_publickey)
         result
       end
@@ -1436,12 +1403,11 @@ module CZMQ
 
       # Set socket option `curve_secretkey`.
       #
-      # @param curve_secretkey [String, #to_str, #to_s]
+      # @param curve_secretkey [String, #to_s, nil]
       # @return [void]
       def set_curve_secretkey(curve_secretkey)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        curve_secretkey = String(curve_secretkey)
         result = ::CZMQ::FFI.zsock_set_curve_secretkey(self_p, curve_secretkey)
         result
       end
@@ -1452,11 +1418,10 @@ module CZMQ
       #
       # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
       #   object reference to use this method on
-      # @param curve_secretkey [String, #to_str, #to_s]
+      # @param curve_secretkey [String, #to_s, nil]
       # @return [void]
       def self.set_curve_secretkey(self_p, curve_secretkey)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
-        curve_secretkey = String(curve_secretkey)
         result = ::CZMQ::FFI.zsock_set_curve_secretkey(self_p, curve_secretkey)
         result
       end
@@ -1513,12 +1478,11 @@ module CZMQ
 
       # Set socket option `curve_serverkey`.
       #
-      # @param curve_serverkey [String, #to_str, #to_s]
+      # @param curve_serverkey [String, #to_s, nil]
       # @return [void]
       def set_curve_serverkey(curve_serverkey)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        curve_serverkey = String(curve_serverkey)
         result = ::CZMQ::FFI.zsock_set_curve_serverkey(self_p, curve_serverkey)
         result
       end
@@ -1529,11 +1493,10 @@ module CZMQ
       #
       # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
       #   object reference to use this method on
-      # @param curve_serverkey [String, #to_str, #to_s]
+      # @param curve_serverkey [String, #to_s, nil]
       # @return [void]
       def self.set_curve_serverkey(self_p, curve_serverkey)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
-        curve_serverkey = String(curve_serverkey)
         result = ::CZMQ::FFI.zsock_set_curve_serverkey(self_p, curve_serverkey)
         result
       end
@@ -1690,12 +1653,11 @@ module CZMQ
 
       # Set socket option `gssapi_principal`.
       #
-      # @param gssapi_principal [String, #to_str, #to_s]
+      # @param gssapi_principal [String, #to_s, nil]
       # @return [void]
       def set_gssapi_principal(gssapi_principal)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        gssapi_principal = String(gssapi_principal)
         result = ::CZMQ::FFI.zsock_set_gssapi_principal(self_p, gssapi_principal)
         result
       end
@@ -1706,11 +1668,10 @@ module CZMQ
       #
       # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
       #   object reference to use this method on
-      # @param gssapi_principal [String, #to_str, #to_s]
+      # @param gssapi_principal [String, #to_s, nil]
       # @return [void]
       def self.set_gssapi_principal(self_p, gssapi_principal)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
-        gssapi_principal = String(gssapi_principal)
         result = ::CZMQ::FFI.zsock_set_gssapi_principal(self_p, gssapi_principal)
         result
       end
@@ -1742,12 +1703,11 @@ module CZMQ
 
       # Set socket option `gssapi_service_principal`.
       #
-      # @param gssapi_service_principal [String, #to_str, #to_s]
+      # @param gssapi_service_principal [String, #to_s, nil]
       # @return [void]
       def set_gssapi_service_principal(gssapi_service_principal)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        gssapi_service_principal = String(gssapi_service_principal)
         result = ::CZMQ::FFI.zsock_set_gssapi_service_principal(self_p, gssapi_service_principal)
         result
       end
@@ -1758,11 +1718,10 @@ module CZMQ
       #
       # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
       #   object reference to use this method on
-      # @param gssapi_service_principal [String, #to_str, #to_s]
+      # @param gssapi_service_principal [String, #to_s, nil]
       # @return [void]
       def self.set_gssapi_service_principal(self_p, gssapi_service_principal)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
-        gssapi_service_principal = String(gssapi_service_principal)
         result = ::CZMQ::FFI.zsock_set_gssapi_service_principal(self_p, gssapi_service_principal)
         result
       end
@@ -2146,12 +2105,11 @@ module CZMQ
 
       # Set socket option `subscribe`.
       #
-      # @param subscribe [String, #to_str, #to_s]
+      # @param subscribe [String, #to_s, nil]
       # @return [void]
       def set_subscribe(subscribe)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        subscribe = String(subscribe)
         result = ::CZMQ::FFI.zsock_set_subscribe(self_p, subscribe)
         result
       end
@@ -2162,23 +2120,21 @@ module CZMQ
       #
       # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
       #   object reference to use this method on
-      # @param subscribe [String, #to_str, #to_s]
+      # @param subscribe [String, #to_s, nil]
       # @return [void]
       def self.set_subscribe(self_p, subscribe)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
-        subscribe = String(subscribe)
         result = ::CZMQ::FFI.zsock_set_subscribe(self_p, subscribe)
         result
       end
 
       # Set socket option `unsubscribe`.
       #
-      # @param unsubscribe [String, #to_str, #to_s]
+      # @param unsubscribe [String, #to_s, nil]
       # @return [void]
       def set_unsubscribe(unsubscribe)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        unsubscribe = String(unsubscribe)
         result = ::CZMQ::FFI.zsock_set_unsubscribe(self_p, unsubscribe)
         result
       end
@@ -2189,11 +2145,10 @@ module CZMQ
       #
       # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
       #   object reference to use this method on
-      # @param unsubscribe [String, #to_str, #to_s]
+      # @param unsubscribe [String, #to_s, nil]
       # @return [void]
       def self.set_unsubscribe(self_p, unsubscribe)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
-        unsubscribe = String(unsubscribe)
         result = ::CZMQ::FFI.zsock_set_unsubscribe(self_p, unsubscribe)
         result
       end
@@ -2225,12 +2180,11 @@ module CZMQ
 
       # Set socket option `identity`.
       #
-      # @param identity [String, #to_str, #to_s]
+      # @param identity [String, #to_s, nil]
       # @return [void]
       def set_identity(identity)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        identity = String(identity)
         result = ::CZMQ::FFI.zsock_set_identity(self_p, identity)
         result
       end
@@ -2241,11 +2195,10 @@ module CZMQ
       #
       # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
       #   object reference to use this method on
-      # @param identity [String, #to_str, #to_s]
+      # @param identity [String, #to_s, nil]
       # @return [void]
       def self.set_identity(self_p, identity)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
-        identity = String(identity)
         result = ::CZMQ::FFI.zsock_set_identity(self_p, identity)
         result
       end
@@ -3104,12 +3057,11 @@ module CZMQ
 
       # Set socket option `tcp_accept_filter`.
       #
-      # @param tcp_accept_filter [String, #to_str, #to_s]
+      # @param tcp_accept_filter [String, #to_s, nil]
       # @return [void]
       def set_tcp_accept_filter(tcp_accept_filter)
         raise DestroyedError unless @ptr
         self_p = @ptr
-        tcp_accept_filter = String(tcp_accept_filter)
         result = ::CZMQ::FFI.zsock_set_tcp_accept_filter(self_p, tcp_accept_filter)
         result
       end
@@ -3120,11 +3072,10 @@ module CZMQ
       #
       # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
       #   object reference to use this method on
-      # @param tcp_accept_filter [String, #to_str, #to_s]
+      # @param tcp_accept_filter [String, #to_s, nil]
       # @return [void]
       def self.set_tcp_accept_filter(self_p, tcp_accept_filter)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
-        tcp_accept_filter = String(tcp_accept_filter)
         result = ::CZMQ::FFI.zsock_set_tcp_accept_filter(self_p, tcp_accept_filter)
         result
       end
