@@ -288,7 +288,7 @@ s_agent_task (void *args, zctx_t *ctx, void *pipe)
         if (self->transmit
         &&  zclock_mono () >= self->ping_at) {
             //  Send beacon to any listening peers
-            zsys_udp_send (self->udpsock, self->transmit, &self->broadcast.in4addr, self->broadcast.inaddrlen);
+            zsys_udp_send (self->udpsock, self->transmit, &self->broadcast.ipv4addr, self->broadcast.inaddrlen);
             self->ping_at = zclock_mono () + self->interval;
         }
     }
@@ -325,12 +325,12 @@ s_agent_new (void *pipe, int port_nbr)
     inaddr_storage_t sockaddr = self->address;
 #elif (defined (__APPLE__))
     inaddr_storage_t sockaddr = self->broadcast;
-    sockaddr.in4addr.sin_addr.s_addr = htons (INADDR_ANY);
+    sockaddr.ipv4addr.sin_addr.s_addr = htons (INADDR_ANY);
 #else
     inaddr_storage_t sockaddr = self->broadcast;
 #endif
 
-    int rc = bind (self->udpsock, (struct sockaddr *) &sockaddr.in4addr, sockaddr.inaddrlen);
+    int rc = bind (self->udpsock, (struct sockaddr *) &sockaddr.ipv4addr, sockaddr.inaddrlen);
     if (rc == SOCKET_ERROR)
         zsys_socket_error ("bind");
 
@@ -338,7 +338,7 @@ s_agent_new (void *pipe, int port_nbr)
     //  PROBLEM: this hostname will not be accurate when the node
     //  has more than one active interface.
     char hostname [NI_MAXHOST];
-    rc = getnameinfo ((struct sockaddr *) &self->address.in4addr,
+    rc = getnameinfo ((struct sockaddr *) &self->address.ipv4addr,
                       self->address.inaddrlen, hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
     if (rc == 0) {
         //  It all looks OK
@@ -363,12 +363,12 @@ s_get_interface (agent_t *self)
     const char *iface = zsys_interface ();
     if (streq (iface, "*")) {
         //  Force binding to INADDR_ANY and sending to INADDR_BROADCAST
-        self->broadcast.in4addr.sin_family = AF_INET;
-        self->broadcast.in4addr.sin_addr.s_addr = INADDR_BROADCAST;
-        self->broadcast.in4addr.sin_port = htons (self->port_nbr);
+        self->broadcast.ipv4addr.sin_family = AF_INET;
+        self->broadcast.ipv4addr.sin_addr.s_addr = INADDR_BROADCAST;
+        self->broadcast.ipv4addr.sin_port = htons (self->port_nbr);
         self->broadcast.inaddrlen = sizeof (inaddr_t);
         self->address = self->broadcast;
-        self->address.in4addr.sin_addr.s_addr = INADDR_ANY;
+        self->address.ipv4addr.sin_addr.s_addr = INADDR_ANY;
     }
     else {
         ziflist_t *iflist = ziflist_new ();
@@ -393,24 +393,24 @@ s_get_interface (agent_t *self)
 
                 //  Using inet_addr instead of inet_aton or inet_atop because these
                 //  are not supported in Win XP
-                self->broadcast.in6addr.sin6_family = AF_INET6;
-                inet_pton (AF_INET6, ipv6_mcast_addr, (void *)&self->broadcast.in6addr.sin6_addr);
-                self->broadcast.in6addr.sin6_port = htons (self->port_nbr);
-                self->broadcast.in6addr.sin6_scope_id = if_nametoindex (iface);
+                self->broadcast.ipv6addr.sin6_family = AF_INET6;
+                inet_pton (AF_INET6, ipv6_mcast_addr, (void *)&self->broadcast.ipv6addr.sin6_addr);
+                self->broadcast.ipv6addr.sin6_port = htons (self->port_nbr);
+                self->broadcast.ipv6addr.sin6_scope_id = if_nametoindex (iface);
                 self->broadcast.inaddrlen = sizeof (in6addr_t);
                 self->address = self->broadcast;
-                inet_pton (AF_INET6, ipv6_addr, (void *)&self->address.in6addr.sin6_addr);
-                self->address.in6addr.sin6_scope_id = 0;
+                inet_pton (AF_INET6, ipv6_addr, (void *)&self->address.ipv6addr.sin6_addr);
+                self->address.ipv6addr.sin6_scope_id = 0;
             }
             else {
                 //  Using inet_addr instead of inet_aton or inet_atop because these
                 //  are not supported in Win XP
-                self->broadcast.in4addr.sin_family = AF_INET;
-                self->broadcast.in4addr.sin_addr.s_addr = inet_addr (ziflist_broadcast (iflist));
-                self->broadcast.in4addr.sin_port = htons (self->port_nbr);
+                self->broadcast.ipv4addr.sin_family = AF_INET;
+                self->broadcast.ipv4addr.sin_addr.s_addr = inet_addr (ziflist_broadcast (iflist));
+                self->broadcast.ipv4addr.sin_port = htons (self->port_nbr);
                 self->broadcast.inaddrlen = sizeof (inaddr_t);
                 self->address = self->broadcast;
-                self->address.in4addr.sin_addr.s_addr = inet_addr (ziflist_address (iflist));
+                self->address.ipv4addr.sin_addr.s_addr = inet_addr (ziflist_address (iflist));
             }
         }
         else
