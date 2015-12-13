@@ -400,8 +400,8 @@ typedef struct {
         inaddr_t __addr;          //  IPv4 address
         in6addr_t __addr6;        //  IPv6 address
     } __inaddr_u;
-#define in4addr   __inaddr_u.__addr
-#define in6addr   __inaddr_u.__addr6
+#define ipv4addr   __inaddr_u.__addr
+#define ipv6addr   __inaddr_u.__addr6
     int inaddrlen;
 } inaddr_storage_t;
 
