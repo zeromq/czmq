@@ -55,6 +55,11 @@
         <argument name = "format" type = "format" />
     </method>
 
+    <method name = "unset meta">
+        Unset certificate metadata.
+        <argument name = "name" type = "string" />
+    </method>
+
     <method name = "meta">
         Get metadata value from certificate; if the metadata value doesn't
         exist, returns NULL.

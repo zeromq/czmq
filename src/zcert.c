@@ -180,6 +180,16 @@ zcert_set_meta (zcert_t *self, const char *name, const char *format, ...)
     zstr_free (&value);
 }
 
+//  --------------------------------------------------------------------------
+//  Unset certificate metadata.
+
+void
+zcert_unset_meta (zcert_t *self, const char *name)
+{
+    assert(self);
+    assert (name);
+    zhash_delete (self->metadata, name);
+}
 
 //  --------------------------------------------------------------------------
 //  Get metadata value from certificate; if the metadata value doesn't
@@ -455,6 +465,8 @@ zcert_test (bool verbose)
     zcert_set_meta (cert, "name", "Pieter Hintjens");
     zcert_set_meta (cert, "organization", "iMatix Corporation");
     zcert_set_meta (cert, "version", "%d", 1);
+    zcert_set_meta (cert, "delete_me", "now");
+    zcert_unset_meta (cert, "delete_me");
     assert (streq (zcert_meta (cert, "email"), "ph@imatix.com"));
     zlist_t *keys = zcert_meta_keys (cert);
     assert (zlist_size (keys) == 4);
