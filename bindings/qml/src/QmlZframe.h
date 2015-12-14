@@ -88,17 +88,6 @@ public:
     };
     
 public slots:
-    //  Create an empty (zero-sized) frame
-    QmlZframe *newEmpty ();
-
-    //  Create a frame with a specified string content.
-    QmlZframe *from (const QString &string);
-
-    //  Receive frame from socket, returns zframe_t object or NULL if the recv  
-    //  was interrupted. Does a blocking recv, if you want to not block then use
-    //  zpoller or zloop.                                                       
-    QmlZframe *recv (void *source);
-
     //  Send a frame to a socket, destroy frame after sending.
     //  Return -1 on error, 0 on success.                     
     int send (QmlZframe *selfP, void *dest, int flags);
@@ -113,6 +102,17 @@ public slots:
     //  to the specified size. If additionally, data is not null, copies 
     //  size octets from the specified data into the frame body.         
     QmlZframe *construct (const void *data, size_t size);
+
+    //  Create an empty (zero-sized) frame
+    QmlZframe *constructEmpty ();
+
+    //  Create a frame with a specified string content.
+    QmlZframe *from (const QString &string);
+
+    //  Receive frame from socket, returns zframe_t object or NULL if the recv  
+    //  was interrupted. Does a blocking recv, if you want to not block then use
+    //  zpoller or zloop.                                                       
+    QmlZframe *recv (void *source);
 
     //  Destroy a frame
     void destruct (QmlZframe *qmlSelf);

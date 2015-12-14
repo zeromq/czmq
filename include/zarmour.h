@@ -33,7 +33,7 @@ typedef enum {
 
 //  Create a new zarmour.
 CZMQ_EXPORT zarmour_t *
-    zarmour_new ();
+    zarmour_new (void);
 
 //  Destroy the zarmour.
 CZMQ_EXPORT void

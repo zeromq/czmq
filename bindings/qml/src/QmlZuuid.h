@@ -74,14 +74,14 @@ public:
     };
     
 public slots:
-    //  Create UUID object from supplied ZUUID_LEN-octet value.
-    QmlZuuid *newFrom (const byte *source);
-
     //  Self test of this class.
     void test (bool verbose);
 
     //  Create a new UUID object.
     QmlZuuid *construct ();
+
+    //  Create UUID object from supplied ZUUID_LEN-octet value.
+    QmlZuuid *constructFrom (const byte *source);
 
     //  Destroy a specified UUID object.
     void destruct (QmlZuuid *qmlSelf);

@@ -153,16 +153,16 @@ public:
     };
     
 public slots:
-    //  Unpack binary frame into a new hash table. Packed data must follow format
-    //  defined by zhash_pack. Hash table is set to autofree. An empty frame     
-    //  unpacks to an empty hash table.                                          
-    QmlZhash *unpack (QmlZframe *frame);
-
     //  Self test of this class.
     void test (bool verbose);
 
     //  Create a new, empty hash container
     QmlZhash *construct ();
+
+    //  Unpack binary frame into a new hash table. Packed data must follow format
+    //  defined by zhash_pack. Hash table is set to autofree. An empty frame     
+    //  unpacks to an empty hash table.                                          
+    QmlZhash *unpack (QmlZframe *frame);
 
     //  Destroy a hash container and all items in it
     void destruct (QmlZhash *qmlSelf);

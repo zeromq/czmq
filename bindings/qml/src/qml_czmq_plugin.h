@@ -15,6 +15,10 @@ class QmlZactor;
 class QmlZactorAttached;
 class QmlZarmour;
 class QmlZarmourAttached;
+class QmlZcert;
+class QmlZcertAttached;
+class QmlZcertstore;
+class QmlZcertstoreAttached;
 class QmlZconfig;
 class QmlZconfigAttached;
 class QmlZdir;
@@ -50,6 +54,8 @@ class QmlZuuidAttached;
 
 #include "QmlZactor.h"
 #include "QmlZarmour.h"
+#include "QmlZcert.h"
+#include "QmlZcertstore.h"
 #include "QmlZconfig.h"
 #include "QmlZdir.h"
 #include "QmlZdirPatch.h"
@@ -79,6 +85,10 @@ public:
         qmlRegisterType<QmlZactorAttached>();
         qmlRegisterType<QmlZarmour> (uri, 1, 0, "QmlZarmour");
         qmlRegisterType<QmlZarmourAttached>();
+        qmlRegisterType<QmlZcert> (uri, 1, 0, "QmlZcert");
+        qmlRegisterType<QmlZcertAttached>();
+        qmlRegisterType<QmlZcertstore> (uri, 1, 0, "QmlZcertstore");
+        qmlRegisterType<QmlZcertstoreAttached>();
         qmlRegisterType<QmlZconfig> (uri, 1, 0, "QmlZconfig");
         qmlRegisterType<QmlZconfigAttached>();
         qmlRegisterType<QmlZdir> (uri, 1, 0, "QmlZdir");

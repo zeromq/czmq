@@ -23,6 +23,15 @@ QZhash::QZhash (QObject *qObjParent) : QObject (qObjParent)
 }
 
 ///
+//  Unpack binary frame into a new hash table. Packed data must follow format
+//  defined by zhash_pack. Hash table is set to autofree. An empty frame     
+//  unpacks to an empty hash table.                                          
+QZhash::QZhash (QZframe *frame, QObject *qObjParent) : QObject (qObjParent)
+{
+    this->self = zhash_unpack (frame->self);
+}
+
+///
 //  Destroy a hash container and all items in it
 QZhash::~QZhash ()
 {
@@ -183,16 +192,6 @@ void QZhash::comment (const QString &param)
 QZframe * QZhash::pack ()
 {
     QZframe *rv = new QZframe (zhash_pack (self));
-    return rv;
-}
-
-///
-//  Unpack binary frame into a new hash table. Packed data must follow format
-//  defined by zhash_pack. Hash table is set to autofree. An empty frame     
-//  unpacks to an empty hash table.                                          
-QZhash * QZhash::unpack (QZframe *frame)
-{
-    QZhash *rv = new QZhash (zhash_unpack (frame->self));
     return rv;
 }
 

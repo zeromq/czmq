@@ -20,6 +20,15 @@ public:
     //  Create new config item
     explicit QZconfig (const QString &name, QZconfig *parent, QObject *qObjParent = 0);
 
+    //  Load a config tree from a specified ZPL text file; returns a zconfig_t  
+    //  reference for the root, if the file exists and is readable. Returns NULL
+    //  if the file does not exist.                                             
+    explicit QZconfig (const QString &filename, QObject *qObjParent = 0);
+
+    //  Equivalent to zconfig_load, taking a format string instead of a fixed
+    //  filename.                                                            
+    explicit QZconfig (const QString &param, QObject *qObjParent = 0);
+
     //  Destroy a config item and all its children
     ~QZconfig ();
 
@@ -73,18 +82,9 @@ public:
     //  Return comments of config item, as zlist.
     QZlist * comments ();
 
-    //  Load a config tree from a specified ZPL text file; returns a zconfig_t  
-    //  reference for the root, if the file exists and is readable. Returns NULL
-    //  if the file does not exist.                                             
-    static QZconfig * load (const QString &filename);
-
     //  Save a config tree to a specified ZPL text file, where a filename
     //  "-" means dump to standard output.                               
     int save (const QString &filename);
-
-    //  Equivalent to zconfig_load, taking a format string instead of a fixed
-    //  filename.                                                            
-    static QZconfig * loadf (const QString &param);
 
     //  Equivalent to zconfig_save, taking a format string instead of a fixed
     //  filename.                                                            

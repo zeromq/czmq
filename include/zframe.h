@@ -33,7 +33,7 @@ CZMQ_EXPORT zframe_t *
 
 //  Create an empty (zero-sized) frame
 CZMQ_EXPORT zframe_t *
-    zframe_new_empty ();
+    zframe_new_empty (void);
 
 //  Create a frame with a specified string content.
 CZMQ_EXPORT zframe_t *

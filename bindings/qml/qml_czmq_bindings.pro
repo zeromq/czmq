@@ -24,11 +24,11 @@ android {
     error(The CZMQ_ROOT directory does not exist: $$CZMQ_ROOT)
   }
   # Build the czmq library for android unless it is already built
-  !system(bash $$CZMQ_ROOT/builds/qt-android/build.sh) {
-    error(Failed to build the czmq C library with $$CZMQ_ROOT/builds/qt-android/build.sh)
+  !system(bash $$CZMQ_ROOT/builds/android/build.sh) {
+    error(Failed to build the czmq C library with $$CZMQ_ROOT/builds/android/build.sh)
   }
   
-  VENDOR_PREFIX = $$CZMQ_ROOT/builds/qt-android/prefix/$(TOOLCHAIN_NAME)
+  VENDOR_PREFIX = $$CZMQ_ROOT/builds/android/prefix/$(TOOLCHAIN_NAME)
   BUILDDIR  = $$PWD/build/$(TOOLCHAIN_NAME)
   QMAKE_LIBDIR += $$VENDOR_PREFIX/lib
   QMAKE_INCDIR += $$VENDOR_PREFIX/include
@@ -40,6 +40,8 @@ HEADERS += \
   $$SRCDIR/qml_czmq_plugin.h \
   $$SRCDIR/QmlZactor.h \
   $$SRCDIR/QmlZarmour.h \
+  $$SRCDIR/QmlZcert.h \
+  $$SRCDIR/QmlZcertstore.h \
   $$SRCDIR/QmlZconfig.h \
   $$SRCDIR/QmlZdir.h \
   $$SRCDIR/QmlZdirPatch.h \
@@ -60,6 +62,8 @@ HEADERS += \
 SOURCES += \
   $$SRCDIR/QmlZactor.cpp \
   $$SRCDIR/QmlZarmour.cpp \
+  $$SRCDIR/QmlZcert.cpp \
+  $$SRCDIR/QmlZcertstore.cpp \
   $$SRCDIR/QmlZconfig.cpp \
   $$SRCDIR/QmlZdir.cpp \
   $$SRCDIR/QmlZdirPatch.cpp \

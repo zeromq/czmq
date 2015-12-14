@@ -22,19 +22,19 @@ public:
     //  size octets from the specified data into the frame body.         
     explicit QZframe (const void *data, size_t size, QObject *qObjParent = 0);
 
-    //  Destroy a frame
-    ~QZframe ();
-
     //  Create an empty (zero-sized) frame
-    static QZframe * newEmpty ();
+    explicit QZframe (QObject *qObjParent = 0);
 
     //  Create a frame with a specified string content.
-    static QZframe * from (const QString &string);
+    explicit QZframe (const QString &string, QObject *qObjParent = 0);
 
     //  Receive frame from socket, returns zframe_t object or NULL if the recv  
     //  was interrupted. Does a blocking recv, if you want to not block then use
     //  zpoller or zloop.                                                       
-    static QZframe * recv (void *source);
+    explicit QZframe (void *source, QObject *qObjParent = 0);
+
+    //  Destroy a frame
+    ~QZframe ();
 
     //  Send a frame to a socket, destroy frame after sending.
     //  Return -1 on error, 0 on success.                     

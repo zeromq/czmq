@@ -58,21 +58,29 @@ class char_t(Structure):
     pass # Empty - only for type checking
 char_p = POINTER(char_t)
 
-class zconfig_t(Structure):
+class zcert_t(Structure):
     pass # Empty - only for type checking
-zconfig_p = POINTER(zconfig_t)
+zcert_p = POINTER(zcert_t)
 
 class zlist_t(Structure):
     pass # Empty - only for type checking
 zlist_p = POINTER(zlist_t)
 
-class zchunk_t(Structure):
-    pass # Empty - only for type checking
-zchunk_p = POINTER(zchunk_t)
-
 class FILE(Structure):
     pass # Empty - only for type checking
 FILE_p = POINTER(FILE)
+
+class zcertstore_t(Structure):
+    pass # Empty - only for type checking
+zcertstore_p = POINTER(zcertstore_t)
+
+class zconfig_t(Structure):
+    pass # Empty - only for type checking
+zconfig_p = POINTER(zconfig_t)
+
+class zchunk_t(Structure):
+    pass # Empty - only for type checking
+zchunk_p = POINTER(zchunk_t)
 
 class zdir_t(Structure):
     pass # Empty - only for type checking
@@ -423,10 +431,261 @@ as a string, if that's what it was prior to encoding."""
         return lib.zarmour_test(verbose)
 
 
+# zcert
+lib.zcert_new.restype = zcert_p
+lib.zcert_new.argtypes = []
+lib.zcert_new_from.restype = zcert_p
+lib.zcert_new_from.argtypes = [POINTER(c_byte), POINTER(c_byte)]
+lib.zcert_load.restype = zcert_p
+lib.zcert_load.argtypes = [c_char_p]
+lib.zcert_destroy.restype = None
+lib.zcert_destroy.argtypes = [POINTER(zcert_p)]
+lib.zcert_public_key.restype = POINTER(c_byte)
+lib.zcert_public_key.argtypes = [zcert_p]
+lib.zcert_secret_key.restype = POINTER(c_byte)
+lib.zcert_secret_key.argtypes = [zcert_p]
+lib.zcert_public_txt.restype = c_char_p
+lib.zcert_public_txt.argtypes = [zcert_p]
+lib.zcert_secret_txt.restype = c_char_p
+lib.zcert_secret_txt.argtypes = [zcert_p]
+lib.zcert_set_meta.restype = None
+lib.zcert_set_meta.argtypes = [zcert_p, c_char_p, c_char_p]
+lib.zcert_meta.restype = c_char_p
+lib.zcert_meta.argtypes = [zcert_p, c_char_p]
+lib.zcert_meta_keys.restype = zlist_p
+lib.zcert_meta_keys.argtypes = [zcert_p]
+lib.zcert_save.restype = c_int
+lib.zcert_save.argtypes = [zcert_p, c_char_p]
+lib.zcert_save_public.restype = c_int
+lib.zcert_save_public.argtypes = [zcert_p, c_char_p]
+lib.zcert_save_secret.restype = c_int
+lib.zcert_save_secret.argtypes = [zcert_p, c_char_p]
+lib.zcert_apply.restype = None
+lib.zcert_apply.argtypes = [zcert_p, c_void_p]
+lib.zcert_dup.restype = zcert_p
+lib.zcert_dup.argtypes = [zcert_p]
+lib.zcert_eq.restype = c_bool
+lib.zcert_eq.argtypes = [zcert_p, zcert_p]
+lib.zcert_print.restype = None
+lib.zcert_print.argtypes = [zcert_p]
+lib.zcert_fprint.restype = None
+lib.zcert_fprint.argtypes = [zcert_p, FILE_p]
+lib.zcert_test.restype = None
+lib.zcert_test.argtypes = [c_bool]
+
+class Zcert(object):
+    """zcert - work with CURVE security certificates"""
+
+    def __init__(self, *args):
+        """Create and initialize a new certificate in memory"""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zcert_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zcert_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 0)
+            self._as_parameter_ = lib.zcert_new() # Creation of new raw type
+            self.allow_destruct = True
+
+    def __init__(self, *args):
+        """Accepts public/secret key pair from caller"""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zcert_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zcert_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 2)
+            self._as_parameter_ = lib.zcert_new from(args[0], args[1]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __init__(self, *args):
+        """Load certificate from file"""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zcert_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zcert_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zcert_load(args[0]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destroy a certificate in memory"""
+        if self.allow_destruct:
+            lib.zcert_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def public_key(self):
+        """Return public part of key pair as 32-byte binary string"""
+        return lib.zcert_public_key(self._as_parameter_)
+
+    def secret_key(self):
+        """Return secret part of key pair as 32-byte binary string"""
+        return lib.zcert_secret_key(self._as_parameter_)
+
+    def public_txt(self):
+        """Return public part of key pair as Z85 armored string"""
+        return lib.zcert_public_txt(self._as_parameter_)
+
+    def secret_txt(self):
+        """Return secret part of key pair as Z85 armored string"""
+        return lib.zcert_secret_txt(self._as_parameter_)
+
+    def set_meta(self, name, format, *args):
+        """Set certificate metadata from formatted string."""
+        return lib.zcert_set_meta(self._as_parameter_, name, format, *args)
+
+    def meta(self, name):
+        """Get metadata value from certificate; if the metadata value doesn't
+exist, returns NULL."""
+        return lib.zcert_meta(self._as_parameter_, name)
+
+    def meta_keys(self):
+        """Get list of metadata fields from certificate. Caller is responsible for
+destroying list. Caller should not modify the values of list items."""
+        return Zlist(lib.zcert_meta_keys(self._as_parameter_), False)
+
+    def save(self, filename):
+        """Save full certificate (public + secret) to file for persistent storage
+This creates one public file and one secret file (filename + "_secret")."""
+        return lib.zcert_save(self._as_parameter_, filename)
+
+    def save_public(self, filename):
+        """Save public certificate only to file for persistent storage"""
+        return lib.zcert_save_public(self._as_parameter_, filename)
+
+    def save_secret(self, filename):
+        """Save secret certificate only to file for persistent storage"""
+        return lib.zcert_save_secret(self._as_parameter_, filename)
+
+    def apply(self, zocket):
+        """Apply certificate to socket, i.e. use for CURVE security on socket.
+If certificate was loaded from public file, the secret key will be
+undefined, and this certificate will not work successfully."""
+        return lib.zcert_apply(self._as_parameter_, zocket)
+
+    def dup(self):
+        """Return copy of certificate; if certificate is NULL or we exhausted
+heap memory, returns NULL."""
+        return Zcert(lib.zcert_dup(self._as_parameter_), True)
+
+    def eq(self, compare):
+        """Return true if two certificates have the same keys"""
+        return lib.zcert_eq(self._as_parameter_, compare)
+
+    def print(self):
+        """Print certificate contents to stdout"""
+        return lib.zcert_print(self._as_parameter_)
+
+    def fprint(self, file):
+        """DEPRECATED as incompatible with centralized logging
+Print certificate contents to open stream"""
+        return lib.zcert_fprint(self._as_parameter_, coerce_py_file(file))
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class"""
+        return lib.zcert_test(verbose)
+
+
+# zcertstore
+lib.zcertstore_new.restype = zcertstore_p
+lib.zcertstore_new.argtypes = [c_char_p]
+lib.zcertstore_destroy.restype = None
+lib.zcertstore_destroy.argtypes = [POINTER(zcertstore_p)]
+lib.zcertstore_lookup.restype = zcert_p
+lib.zcertstore_lookup.argtypes = [zcertstore_p, c_char_p]
+lib.zcertstore_insert.restype = None
+lib.zcertstore_insert.argtypes = [zcertstore_p, POINTER(zcert_p)]
+lib.zcertstore_print.restype = None
+lib.zcertstore_print.argtypes = [zcertstore_p]
+lib.zcertstore_fprint.restype = None
+lib.zcertstore_fprint.argtypes = [zcertstore_p, FILE_p]
+lib.zcertstore_test.restype = None
+lib.zcertstore_test.argtypes = [c_bool]
+
+class Zcertstore(object):
+    """zcertstore - work with CURVE security certificate stores"""
+
+    def __init__(self, *args):
+        """Create a new certificate store from a disk directory, loading and
+indexing all certificates in that location. The directory itself may be
+absent, and created later, or modified at any time. The certificate store
+is automatically refreshed on any zcertstore_lookup() call. If the
+location is specified as NULL, creates a pure-memory store, which you
+can work with by inserting certificates at runtime."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zcertstore_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zcertstore_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zcertstore_new(args[0]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destroy a certificate store object in memory. Does not affect anything
+stored on disk."""
+        if self.allow_destruct:
+            lib.zcertstore_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def lookup(self, public_key):
+        """Look up certificate by public key, returns zcert_t object if found,
+else returns NULL. The public key is provided in Z85 text format."""
+        return Zcert(lib.zcertstore_lookup(self._as_parameter_, public_key), False)
+
+    def insert(self, cert_p):
+        """Insert certificate into certificate store in memory. Note that this
+does not save the certificate to disk. To do that, use zcert_save()
+directly on the certificate. Takes ownership of zcert_t object."""
+        return lib.zcertstore_insert(self._as_parameter_, byref(zcert_p.from_param(cert_p)))
+
+    def print(self):
+        """Print list of certificates in store to logging facility"""
+        return lib.zcertstore_print(self._as_parameter_)
+
+    def fprint(self, file):
+        """DEPRECATED as incompatible with centralized logging
+Print list of certificates in store to open stream"""
+        return lib.zcertstore_fprint(self._as_parameter_, coerce_py_file(file))
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class"""
+        return lib.zcertstore_test(verbose)
+
+
 # zconfig
 zconfig_fct = CFUNCTYPE(c_int, zconfig_p, c_void_p, c_int)
 lib.zconfig_new.restype = zconfig_p
 lib.zconfig_new.argtypes = [c_char_p, zconfig_p]
+lib.zconfig_load.restype = zconfig_p
+lib.zconfig_load.argtypes = [c_char_p]
+lib.zconfig_loadf.restype = zconfig_p
+lib.zconfig_loadf.argtypes = [c_char_p]
 lib.zconfig_destroy.restype = None
 lib.zconfig_destroy.argtypes = [POINTER(zconfig_p)]
 lib.zconfig_name.restype = c_char_p
@@ -457,12 +716,8 @@ lib.zconfig_set_comment.restype = None
 lib.zconfig_set_comment.argtypes = [zconfig_p, c_char_p]
 lib.zconfig_comments.restype = zlist_p
 lib.zconfig_comments.argtypes = [zconfig_p]
-lib.zconfig_load.restype = zconfig_p
-lib.zconfig_load.argtypes = [c_char_p]
 lib.zconfig_save.restype = c_int
 lib.zconfig_save.argtypes = [zconfig_p, c_char_p]
-lib.zconfig_loadf.restype = zconfig_p
-lib.zconfig_loadf.argtypes = [c_char_p]
 lib.zconfig_savef.restype = c_int
 lib.zconfig_savef.argtypes = [zconfig_p, c_char_p]
 lib.zconfig_filename.restype = c_char_p
@@ -500,6 +755,35 @@ class Zconfig(object):
         else:
             assert(len(args) == 2)
             self._as_parameter_ = lib.zconfig_new(args[0], args[1]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __init__(self, *args):
+        """Load a config tree from a specified ZPL text file; returns a zconfig_t
+reference for the root, if the file exists and is readable. Returns NULL
+if the file does not exist."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zconfig_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zconfig_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zconfig_load(args[0]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __init__(self, *args):
+        """Equivalent to zconfig_load, taking a format string instead of a fixed
+filename."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zconfig_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zconfig_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) >= 1)
+            self._as_parameter_ = lib.zconfig_loadf(args[0], *args[1:]) # Creation of new raw type
             self.allow_destruct = True
 
     def __del__(self):
@@ -579,23 +863,10 @@ deleted."""
         """Return comments of config item, as zlist."""
         return Zlist(lib.zconfig_comments(self._as_parameter_), False)
 
-    @staticmethod
-    def load(filename):
-        """Load a config tree from a specified ZPL text file; returns a zconfig_t
-reference for the root, if the file exists and is readable. Returns NULL
-if the file does not exist."""
-        return Zconfig(lib.zconfig_load(filename), True)
-
     def save(self, filename):
         """Save a config tree to a specified ZPL text file, where a filename
 "-" means dump to standard output."""
         return lib.zconfig_save(self._as_parameter_, filename)
-
-    @staticmethod
-    def loadf(format, *args):
-        """Equivalent to zconfig_load, taking a format string instead of a fixed
-filename."""
-        return Zconfig(lib.zconfig_loadf(format, *args), True)
 
     def savef(self, format, *args):
         """Equivalent to zconfig_save, taking a format string instead of a fixed
@@ -1094,14 +1365,14 @@ or NULL if there was nothing more to read from the file."""
 # zframe
 lib.zframe_new.restype = zframe_p
 lib.zframe_new.argtypes = [POINTER(c_byte), c_size_t]
-lib.zframe_destroy.restype = None
-lib.zframe_destroy.argtypes = [POINTER(zframe_p)]
 lib.zframe_new_empty.restype = zframe_p
 lib.zframe_new_empty.argtypes = []
 lib.zframe_from.restype = zframe_p
 lib.zframe_from.argtypes = [c_char_p]
 lib.zframe_recv.restype = zframe_p
 lib.zframe_recv.argtypes = [c_void_p]
+lib.zframe_destroy.restype = None
+lib.zframe_destroy.argtypes = [POINTER(zframe_p)]
 lib.zframe_send.restype = c_int
 lib.zframe_send.argtypes = [POINTER(zframe_p), c_void_p, c_int]
 lib.zframe_size.restype = c_size_t
@@ -1156,6 +1427,47 @@ size octets from the specified data into the frame body."""
             self._as_parameter_ = lib.zframe_new(args[0], args[1]) # Creation of new raw type
             self.allow_destruct = True
 
+    def __init__(self, *args):
+        """Create an empty (zero-sized) frame"""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zframe_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zframe_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 0)
+            self._as_parameter_ = lib.zframe_new empty() # Creation of new raw type
+            self.allow_destruct = True
+
+    def __init__(self, *args):
+        """Create a frame with a specified string content."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zframe_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zframe_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zframe_from(args[0]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __init__(self, *args):
+        """Receive frame from socket, returns zframe_t object or NULL if the recv
+was interrupted. Does a blocking recv, if you want to not block then use
+zpoller or zloop."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zframe_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zframe_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zframe_recv(args[0]) # Creation of new raw type
+            self.allow_destruct = True
+
     def __del__(self):
         """Destroy a frame"""
         if self.allow_destruct:
@@ -1168,23 +1480,6 @@ size octets from the specified data into the frame body."""
     def __nonzero__(self):
         "Determine whether the object is valid by converting to boolean" # Python 2
         return self._as_parameter_.__nonzero__()
-
-    @staticmethod
-    def new_empty():
-        """Create an empty (zero-sized) frame"""
-        return Zframe(lib.zframe_new_empty(), True)
-
-    @staticmethod
-    def from_(string):
-        """Create a frame with a specified string content."""
-        return Zframe(lib.zframe_from(string), True)
-
-    @staticmethod
-    def recv(source):
-        """Receive frame from socket, returns zframe_t object or NULL if the recv
-was interrupted. Does a blocking recv, if you want to not block then use
-zpoller or zloop."""
-        return Zframe(lib.zframe_recv(source), True)
 
     @staticmethod
     def send(self_p, dest, flags):
@@ -1269,6 +1564,8 @@ zhash_free_fn = CFUNCTYPE(None, c_void_p)
 zhash_foreach_fn = CFUNCTYPE(c_int, c_char_p, c_void_p, c_void_p)
 lib.zhash_new.restype = zhash_p
 lib.zhash_new.argtypes = []
+lib.zhash_unpack.restype = zhash_p
+lib.zhash_unpack.argtypes = [zframe_p]
 lib.zhash_destroy.restype = None
 lib.zhash_destroy.argtypes = [POINTER(zhash_p)]
 lib.zhash_insert.restype = c_int
@@ -1299,8 +1596,6 @@ lib.zhash_comment.restype = None
 lib.zhash_comment.argtypes = [zhash_p, c_char_p]
 lib.zhash_pack.restype = zframe_p
 lib.zhash_pack.argtypes = [zhash_p]
-lib.zhash_unpack.restype = zhash_p
-lib.zhash_unpack.argtypes = [zframe_p]
 lib.zhash_save.restype = c_int
 lib.zhash_save.argtypes = [zhash_p, c_char_p]
 lib.zhash_load.restype = c_int
@@ -1328,6 +1623,21 @@ class Zhash(object):
         else:
             assert(len(args) == 0)
             self._as_parameter_ = lib.zhash_new() # Creation of new raw type
+            self.allow_destruct = True
+
+    def __init__(self, *args):
+        """Unpack binary frame into a new hash table. Packed data must follow format
+defined by zhash_pack. Hash table is set to autofree. An empty frame
+unpacks to an empty hash table."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zhash_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zhash_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zhash_unpack(args[0]) # Creation of new raw type
             self.allow_destruct = True
 
     def __del__(self):
@@ -1444,13 +1754,6 @@ Comments are not included in the packed data. Item values MUST be
 strings."""
         return Zframe(lib.zhash_pack(self._as_parameter_), True)
 
-    @staticmethod
-    def unpack(frame):
-        """Unpack binary frame into a new hash table. Packed data must follow format
-defined by zhash_pack. Hash table is set to autofree. An empty frame
-unpacks to an empty hash table."""
-        return Zhash(lib.zhash_unpack(frame), True)
-
     def save(self, filename):
         """Save hash table to a text file in name=value format. Hash values must be
 printable strings; keys may not contain '=' character. Returns 0 if OK,
@@ -1497,6 +1800,8 @@ zhashx_hash_fn = CFUNCTYPE(c_size_t, c_void_p)
 zhashx_foreach_fn = CFUNCTYPE(c_int, c_char_p, c_void_p, c_void_p)
 lib.zhashx_new.restype = zhashx_p
 lib.zhashx_new.argtypes = []
+lib.zhashx_unpack.restype = zhashx_p
+lib.zhashx_unpack.argtypes = [zframe_p]
 lib.zhashx_destroy.restype = None
 lib.zhashx_destroy.argtypes = [POINTER(zhashx_p)]
 lib.zhashx_insert.restype = c_int
@@ -1535,8 +1840,6 @@ lib.zhashx_refresh.restype = c_int
 lib.zhashx_refresh.argtypes = [zhashx_p]
 lib.zhashx_pack.restype = zframe_p
 lib.zhashx_pack.argtypes = [zhashx_p]
-lib.zhashx_unpack.restype = zhashx_p
-lib.zhashx_unpack.argtypes = [zframe_p]
 lib.zhashx_dup.restype = zhashx_p
 lib.zhashx_dup.argtypes = [zhashx_p]
 lib.zhashx_set_destructor.restype = None
@@ -1574,6 +1877,21 @@ class Zhashx(object):
         else:
             assert(len(args) == 0)
             self._as_parameter_ = lib.zhashx_new() # Creation of new raw type
+            self.allow_destruct = True
+
+    def __init__(self, *args):
+        """Unpack binary frame into a new hash table. Packed data must follow format
+defined by zhashx_pack. Hash table is set to autofree. An empty frame
+unpacks to an empty hash table."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zhashx_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zhashx_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zhashx_unpack(args[0]) # Creation of new raw type
             self.allow_destruct = True
 
     def __del__(self):
@@ -1717,13 +2035,6 @@ http://rfc.zeromq.org/spec:35/FILEMQ, and implemented by zproto:
 Comments are not included in the packed data. Item values MUST be
 strings."""
         return Zframe(lib.zhashx_pack(self._as_parameter_), True)
-
-    @staticmethod
-    def unpack(frame):
-        """Unpack binary frame into a new hash table. Packed data must follow format
-defined by zhashx_pack. Hash table is set to autofree. An empty frame
-unpacks to an empty hash table."""
-        return Zhashx(lib.zhashx_unpack(frame), True)
 
     def dup(self):
         """Make a copy of the list; items are duplicated if you set a duplicator
@@ -2244,10 +2555,16 @@ zero. Calling zloop_ignore_interrupts will supress this behavior."""
 # zmsg
 lib.zmsg_new.restype = zmsg_p
 lib.zmsg_new.argtypes = []
-lib.zmsg_destroy.restype = None
-lib.zmsg_destroy.argtypes = [POINTER(zmsg_p)]
 lib.zmsg_recv.restype = zmsg_p
 lib.zmsg_recv.argtypes = [c_void_p]
+lib.zmsg_load.restype = zmsg_p
+lib.zmsg_load.argtypes = [FILE_p]
+lib.zmsg_decode.restype = zmsg_p
+lib.zmsg_decode.argtypes = [POINTER(c_byte), c_size_t]
+lib.zmsg_new_signal.restype = zmsg_p
+lib.zmsg_new_signal.argtypes = [c_ubyte]
+lib.zmsg_destroy.restype = None
+lib.zmsg_destroy.argtypes = [POINTER(zmsg_p)]
 lib.zmsg_send.restype = c_int
 lib.zmsg_send.argtypes = [POINTER(zmsg_p), c_void_p]
 lib.zmsg_sendm.restype = c_int
@@ -2294,20 +2611,14 @@ lib.zmsg_last.restype = zframe_p
 lib.zmsg_last.argtypes = [zmsg_p]
 lib.zmsg_save.restype = c_int
 lib.zmsg_save.argtypes = [zmsg_p, FILE_p]
-lib.zmsg_load.restype = zmsg_p
-lib.zmsg_load.argtypes = [zmsg_p, FILE_p]
 lib.zmsg_encode.restype = c_size_t
 lib.zmsg_encode.argtypes = [zmsg_p, POINTER(POINTER(c_byte))]
-lib.zmsg_decode.restype = zmsg_p
-lib.zmsg_decode.argtypes = [POINTER(c_byte), c_size_t]
 lib.zmsg_dup.restype = zmsg_p
 lib.zmsg_dup.argtypes = [zmsg_p]
 lib.zmsg_print.restype = None
 lib.zmsg_print.argtypes = [zmsg_p]
 lib.zmsg_eq.restype = c_bool
 lib.zmsg_eq.argtypes = [zmsg_p, zmsg_p]
-lib.zmsg_new_signal.restype = zmsg_p
-lib.zmsg_new_signal.argtypes = [c_ubyte]
 lib.zmsg_signal.restype = c_int
 lib.zmsg_signal.argtypes = [zmsg_p]
 lib.zmsg_is.restype = c_bool
@@ -2331,6 +2642,66 @@ class Zmsg(object):
             self._as_parameter_ = lib.zmsg_new() # Creation of new raw type
             self.allow_destruct = True
 
+    def __init__(self, *args):
+        """Receive message from socket, returns zmsg_t object or NULL if the recv
+was interrupted. Does a blocking recv. If you want to not block then use
+the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
+before receiving."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zmsg_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zmsg_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zmsg_recv(args[0]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __init__(self, *args):
+        """Load/append an open file into new message, return the message.
+Returns NULL if the message could not be loaded."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zmsg_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zmsg_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zmsg_load(coerce_py_file(args[0])) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __init__(self, *args):
+        """Decodes a serialized message buffer created by zmsg_encode () and returns
+a new zmsg_t object. Returns NULL if the buffer was badly formatted or
+there was insufficient memory to work."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zmsg_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zmsg_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 2)
+            self._as_parameter_ = lib.zmsg_decode(args[0], args[1]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __init__(self, *args):
+        """Generate a signal message encoding the given status. A signal is a short
+message carrying a 1-byte success/failure code (by convention, 0 means
+OK). Signals are encoded to be distinguishable from "normal" messages."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zmsg_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zmsg_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zmsg_new signal(args[0]) # Creation of new raw type
+            self.allow_destruct = True
+
     def __del__(self):
         """Destroy a message object and all frames it contains"""
         if self.allow_destruct:
@@ -2343,14 +2714,6 @@ class Zmsg(object):
     def __nonzero__(self):
         "Determine whether the object is valid by converting to boolean" # Python 2
         return self._as_parameter_.__nonzero__()
-
-    @staticmethod
-    def recv(source):
-        """Receive message from socket, returns zmsg_t object or NULL if the recv
-was interrupted. Does a blocking recv. If you want to not block then use
-the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
-before receiving."""
-        return Zmsg(lib.zmsg_recv(source), True)
 
     @staticmethod
     def send(self_p, dest):
@@ -2478,26 +2841,12 @@ versions of CZMQ. The file format is at present undocumented and liable
 to arbitrary change."""
         return lib.zmsg_save(self._as_parameter_, coerce_py_file(file))
 
-    @staticmethod
-    def load(self, file):
-        """Load/append an open file into message, create new message if
-null message provided. Returns NULL if the message could not
-be loaded."""
-        return Zmsg(lib.zmsg_load(self, coerce_py_file(file)), True)
-
     def encode(self, buffer):
         """Serialize multipart message to a single buffer. Use this method to send
 structured messages across transports that do not support multipart data.
 Allocates and returns a new buffer containing the serialized message.
 To decode a serialized message buffer, use zmsg_decode ()."""
         return lib.zmsg_encode(self._as_parameter_, byref(POINTER(c_byte).from_param(buffer)))
-
-    @staticmethod
-    def decode(buffer, buffer_size):
-        """Decodes a serialized message buffer created by zmsg_encode () and returns
-a new zmsg_t object. Returns NULL if the buffer was badly formatted or
-there was insufficient memory to work."""
-        return Zmsg(lib.zmsg_decode(buffer, buffer_size), True)
 
     def dup(self):
         """Create copy of message, as new message object. Returns a fresh zmsg_t
@@ -2514,13 +2863,6 @@ configured by zsys_set_logstream)."""
 frame in the first message is identical to the corresponding frame in the
 other message. As with zframe_eq, return false if either message is NULL."""
         return lib.zmsg_eq(self._as_parameter_, other)
-
-    @staticmethod
-    def new_signal(status):
-        """Generate a signal message encoding the given status. A signal is a short
-message carrying a 1-byte success/failure code (by convention, 0 means
-OK). Signals are encoded to be distinguishable from "normal" messages."""
-        return Zmsg(lib.zmsg_new_signal(status), True)
 
     def signal(self):
         """Return signal value, 0 or greater, if message is a signal, -1 if not."""
@@ -2635,8 +2977,6 @@ zero. Calling zpoller_ignore_interrupts will supress this behavior."""
 # zsock
 lib.zsock_new.restype = zsock_p
 lib.zsock_new.argtypes = [c_int]
-lib.zsock_destroy.restype = None
-lib.zsock_destroy.argtypes = [POINTER(zsock_p)]
 lib.zsock_new_pub.restype = zsock_p
 lib.zsock_new_pub.argtypes = [c_char_p]
 lib.zsock_new_sub.restype = zsock_p
@@ -2665,6 +3005,8 @@ lib.zsock_new_server.restype = zsock_p
 lib.zsock_new_server.argtypes = [c_char_p]
 lib.zsock_new_client.restype = zsock_p
 lib.zsock_new_client.argtypes = [c_char_p]
+lib.zsock_destroy.restype = None
+lib.zsock_destroy.argtypes = [POINTER(zsock_p)]
 lib.zsock_bind.restype = c_int
 lib.zsock_bind.argtypes = [zsock_p, c_char_p]
 lib.zsock_endpoint.restype = c_char_p
@@ -2919,6 +3261,189 @@ redirection behaviour, define ZSOCK_NOCHECK."""
             self._as_parameter_ = lib.zsock_new(args[0]) # Creation of new raw type
             self.allow_destruct = True
 
+    def __init__(self, *args):
+        """Create a PUB socket. Default action is bind."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zsock_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zsock_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zsock_new pub(args[0]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __init__(self, *args):
+        """Create a SUB socket, and optionally subscribe to some prefix string. Default
+action is connect."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zsock_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zsock_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 2)
+            self._as_parameter_ = lib.zsock_new sub(args[0], args[1]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __init__(self, *args):
+        """Create a REQ socket. Default action is connect."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zsock_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zsock_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zsock_new req(args[0]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __init__(self, *args):
+        """Create a REP socket. Default action is bind."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zsock_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zsock_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zsock_new rep(args[0]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __init__(self, *args):
+        """Create a DEALER socket. Default action is connect."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zsock_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zsock_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zsock_new dealer(args[0]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __init__(self, *args):
+        """Create a ROUTER socket. Default action is bind."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zsock_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zsock_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zsock_new router(args[0]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __init__(self, *args):
+        """Create a PUSH socket. Default action is connect."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zsock_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zsock_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zsock_new push(args[0]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __init__(self, *args):
+        """Create a PULL socket. Default action is bind."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zsock_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zsock_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zsock_new pull(args[0]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __init__(self, *args):
+        """Create an XPUB socket. Default action is bind."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zsock_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zsock_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zsock_new xpub(args[0]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __init__(self, *args):
+        """Create an XSUB socket. Default action is connect."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zsock_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zsock_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zsock_new xsub(args[0]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __init__(self, *args):
+        """Create a PAIR socket. Default action is connect."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zsock_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zsock_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zsock_new pair(args[0]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __init__(self, *args):
+        """Create a STREAM socket. Default action is connect."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zsock_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zsock_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zsock_new stream(args[0]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __init__(self, *args):
+        """Create a SERVER socket. Default action is bind."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zsock_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zsock_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zsock_new server(args[0]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __init__(self, *args):
+        """Create a CLIENT socket. Default action is connect."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zsock_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zsock_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zsock_new client(args[0]) # Creation of new raw type
+            self.allow_destruct = True
+
     def __del__(self):
         """Destroy the socket. You must use this for any socket created via the
 zsock_new method."""
@@ -2932,77 +3457,6 @@ zsock_new method."""
     def __nonzero__(self):
         "Determine whether the object is valid by converting to boolean" # Python 2
         return self._as_parameter_.__nonzero__()
-
-    @staticmethod
-    def new_pub(endpoint):
-        """Create a PUB socket. Default action is bind."""
-        return Zsock(lib.zsock_new_pub(endpoint), True)
-
-    @staticmethod
-    def new_sub(endpoint, subscribe):
-        """Create a SUB socket, and optionally subscribe to some prefix string. Default
-action is connect."""
-        return Zsock(lib.zsock_new_sub(endpoint, subscribe), True)
-
-    @staticmethod
-    def new_req(endpoint):
-        """Create a REQ socket. Default action is connect."""
-        return Zsock(lib.zsock_new_req(endpoint), True)
-
-    @staticmethod
-    def new_rep(endpoint):
-        """Create a REP socket. Default action is bind."""
-        return Zsock(lib.zsock_new_rep(endpoint), True)
-
-    @staticmethod
-    def new_dealer(endpoint):
-        """Create a DEALER socket. Default action is connect."""
-        return Zsock(lib.zsock_new_dealer(endpoint), True)
-
-    @staticmethod
-    def new_router(endpoint):
-        """Create a ROUTER socket. Default action is bind."""
-        return Zsock(lib.zsock_new_router(endpoint), True)
-
-    @staticmethod
-    def new_push(endpoint):
-        """Create a PUSH socket. Default action is connect."""
-        return Zsock(lib.zsock_new_push(endpoint), True)
-
-    @staticmethod
-    def new_pull(endpoint):
-        """Create a PULL socket. Default action is bind."""
-        return Zsock(lib.zsock_new_pull(endpoint), True)
-
-    @staticmethod
-    def new_xpub(endpoint):
-        """Create an XPUB socket. Default action is bind."""
-        return Zsock(lib.zsock_new_xpub(endpoint), True)
-
-    @staticmethod
-    def new_xsub(endpoint):
-        """Create an XSUB socket. Default action is connect."""
-        return Zsock(lib.zsock_new_xsub(endpoint), True)
-
-    @staticmethod
-    def new_pair(endpoint):
-        """Create a PAIR socket. Default action is connect."""
-        return Zsock(lib.zsock_new_pair(endpoint), True)
-
-    @staticmethod
-    def new_stream(endpoint):
-        """Create a STREAM socket. Default action is connect."""
-        return Zsock(lib.zsock_new_stream(endpoint), True)
-
-    @staticmethod
-    def new_server(endpoint):
-        """Create a SERVER socket. Default action is bind."""
-        return Zsock(lib.zsock_new_server(endpoint), True)
-
-    @staticmethod
-    def new_client(endpoint):
-        """Create a CLIENT socket. Default action is connect."""
-        return Zsock(lib.zsock_new_client(endpoint), True)
 
     def bind(self, format, *args):
         """Bind a socket to a formatted endpoint. For tcp:// endpoints, supports
@@ -3162,8 +3616,11 @@ in a binary format that is compatible with zproto, and is designed to
 reduce memory allocations. The pattern argument is a string that defines
 the type of each argument. See zsock_bsend for the supported argument
 types. All arguments must be pointers; this call sets them to point to
-values held on a per-socket basis. Do not modify or destroy the returned
-values. Returns 0 if successful, or -1 if it failed to read a message."""
+values held on a per-socket basis.
+Note that zsock_brecv creates the returned objects, and the caller must
+destroy them when finished with them. The supplied pointers do not need
+to be initialized. Returns 0 if successful, or -1 if it failed to read
+a message."""
         return lib.zsock_brecv(self._as_parameter_, picture, *args)
 
     def routing_id(self):
@@ -3806,10 +4263,10 @@ or no asterisk match, returns NULL."""
 # zuuid
 lib.zuuid_new.restype = zuuid_p
 lib.zuuid_new.argtypes = []
-lib.zuuid_destroy.restype = None
-lib.zuuid_destroy.argtypes = [POINTER(zuuid_p)]
 lib.zuuid_new_from.restype = zuuid_p
 lib.zuuid_new_from.argtypes = [POINTER(c_byte)]
+lib.zuuid_destroy.restype = None
+lib.zuuid_destroy.argtypes = [POINTER(zuuid_p)]
 lib.zuuid_set.restype = None
 lib.zuuid_set.argtypes = [zuuid_p, POINTER(c_byte)]
 lib.zuuid_set_str.restype = c_int
@@ -3849,6 +4306,19 @@ class Zuuid(object):
             self._as_parameter_ = lib.zuuid_new() # Creation of new raw type
             self.allow_destruct = True
 
+    def __init__(self, *args):
+        """Create UUID object from supplied ZUUID_LEN-octet value."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zuuid_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zuuid_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 1)
+            self._as_parameter_ = lib.zuuid_new from(args[0]) # Creation of new raw type
+            self.allow_destruct = True
+
     def __del__(self):
         """Destroy a specified UUID object."""
         if self.allow_destruct:
@@ -3861,11 +4331,6 @@ class Zuuid(object):
     def __nonzero__(self):
         "Determine whether the object is valid by converting to boolean" # Python 2
         return self._as_parameter_.__nonzero__()
-
-    @staticmethod
-    def new_from(source):
-        """Create UUID object from supplied ZUUID_LEN-octet value."""
-        return Zuuid(lib.zuuid_new_from(source), True)
 
     def set(self, source):
         """Set UUID to new supplied ZUUID_LEN-octet value."""

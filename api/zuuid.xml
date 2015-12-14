@@ -40,7 +40,7 @@
         <return type = "buffer" size = ".size" />
     </method>
 
-    <method  name = "size">
+    <method name = "size">
         Return UUID binary size
         <return type = "size" />
     </method>

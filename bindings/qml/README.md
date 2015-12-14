@@ -126,7 +126,7 @@ The build will repeat for each android kit you have configured in the Qt
 Creator IDE so that the installed library is available for all kits.
 
 In order to build for android, the qml_czmq needs access to 
-a qt-android build of the CZMQ library and all its dependencies. 
+an Android build of the CZMQ library and all its dependencies. 
 This can be done one of two ways:
 
 1. Clone the CZMQ library and all its dependencies from source 
@@ -141,11 +141,11 @@ variables are resolved, they will build in a chain.
 
 For all of the zeromq libraries in the dependencies, the source code will 
 be copied to a temporary directory for building, but installed to the 
-`$(XXX_ROOT)/builds/qt-android/prefix/$(TOOLCHAIN_NAME)` directory within 
+`$(XXX_ROOT)/builds/android/prefix/$(TOOLCHAIN_NAME)` directory within 
 the original source tree. If you need to run builds for individual projects, 
-use the `$(XXX_ROOT)/builds/qt-android/prefix/build.sh` command. The build 
+use the `$(XXX_ROOT)/builds/android/prefix/build.sh` command. The build 
 script will skip itself if it was already installed to 
-`$(XXX_ROOT)/builds/qt-android/prefix/$(TOOLCHAIN_NAME)`, so at times you 
+`$(XXX_ROOT)/builds/android/prefix/$(TOOLCHAIN_NAME)`, so at times you 
 may need to delete that directory to trigger a clean build.
 
 ```

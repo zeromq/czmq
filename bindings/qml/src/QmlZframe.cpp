@@ -110,32 +110,6 @@ QObject* QmlZframe::qmlAttachedProperties(QObject* object) {
 
 
 ///
-//  Create an empty (zero-sized) frame
-QmlZframe *QmlZframeAttached::newEmpty () {
-    QmlZframe *retQ_ = new QmlZframe ();
-    retQ_->self = zframe_new_empty ();
-    return retQ_;
-};
-
-///
-//  Create a frame with a specified string content.
-QmlZframe *QmlZframeAttached::from (const QString &string) {
-    QmlZframe *retQ_ = new QmlZframe ();
-    retQ_->self = zframe_from (string.toUtf8().data());
-    return retQ_;
-};
-
-///
-//  Receive frame from socket, returns zframe_t object or NULL if the recv  
-//  was interrupted. Does a blocking recv, if you want to not block then use
-//  zpoller or zloop.                                                       
-QmlZframe *QmlZframeAttached::recv (void *source) {
-    QmlZframe *retQ_ = new QmlZframe ();
-    retQ_->self = zframe_recv (source);
-    return retQ_;
-};
-
-///
 //  Send a frame to a socket, destroy frame after sending.
 //  Return -1 on error, 0 on success.                     
 int QmlZframeAttached::send (QmlZframe *selfP, void *dest, int flags) {
@@ -161,6 +135,32 @@ void QmlZframeAttached::test (bool verbose) {
 QmlZframe *QmlZframeAttached::construct (const void *data, size_t size) {
     QmlZframe *qmlSelf = new QmlZframe ();
     qmlSelf->self = zframe_new (data, size);
+    return qmlSelf;
+};
+
+///
+//  Create an empty (zero-sized) frame
+QmlZframe *QmlZframeAttached::constructEmpty () {
+    QmlZframe *qmlSelf = new QmlZframe ();
+    qmlSelf->self = zframe_new_empty ();
+    return qmlSelf;
+};
+
+///
+//  Create a frame with a specified string content.
+QmlZframe *QmlZframeAttached::from (const QString &string) {
+    QmlZframe *qmlSelf = new QmlZframe ();
+    qmlSelf->self = zframe_from (string.toUtf8().data());
+    return qmlSelf;
+};
+
+///
+//  Receive frame from socket, returns zframe_t object or NULL if the recv  
+//  was interrupted. Does a blocking recv, if you want to not block then use
+//  zpoller or zloop.                                                       
+QmlZframe *QmlZframeAttached::recv (void *source) {
+    QmlZframe *qmlSelf = new QmlZframe ();
+    qmlSelf->self = zframe_recv (source);
     return qmlSelf;
 };
 
