@@ -16,6 +16,7 @@ set(CMAKE_FIND_ROOT_PATH "${ANDROID_TOOLCHAIN_ROOT}/bin" "${ANDROID_TOOLCHAIN_RO
 # Prefix detection only works with compiler id "GNU"
 # CMake will look for prefixed g++, cpp, ld, etc. automatically
 CMAKE_FORCE_C_COMPILER(${ANDROID_TOOLCHAIN_ROOT}/bin/arm-linux-androideabi-gcc GNU)
+cmake_policy (SET CMP0015 NEW)
 set(ANDROID True)
 set(BUILD_ANDROID True)
 include_directories (
@@ -24,6 +25,12 @@ include_directories (
     ../../../builds/qt-android/prefix/arm-linux-androideabi-4.9/include
     ${ANDROID_NDK_ROOT}/platforms/android-8/arch-arm/usr/include
 )
+link_directories (
+    ../../../builds/qt-android/prefix/arm-linux-androideabi-4.9/lib
+    ${ANDROID_NDK_ROOT}/platforms/android-8/arch-arm/usr/lib
+)
+#target_link_libraries (libczmq libzmq)
+
 # only search for libraries and includes in the ndk toolchain
 #set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY)
 #set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
