@@ -171,6 +171,8 @@ void
 zcert_set_meta (zcert_t *self, const char *name, const char *format, ...)
 {
     assert(self);
+    assert(name);
+    assert(format);
     va_list argptr;
     va_start (argptr, format);
     char *value = zsys_vprintf (format, argptr);
