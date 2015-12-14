@@ -1,6 +1,6 @@
 #!/bin/bash
-# copy me in czmq/bindings/jni/buidlme.sh and make me executable with chmod +x
-source android_build_helper.sh
+
+source ../../../builds/android/android_build_helper.sh
 android_build_env
 
 ( cd ../../../builds/android && ./build.sh )
