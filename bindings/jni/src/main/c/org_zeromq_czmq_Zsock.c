@@ -13,6 +13,8 @@
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zsock__1_1new (JNIEnv *env, jclass c, jint type)
 {
+    //  Disable CZMQ signal handling; allow Java to deal with it
+    zsys_handler_set (NULL);
     jlong new_ = (jlong) zsock_new ((int) type);
     return new_;
 }

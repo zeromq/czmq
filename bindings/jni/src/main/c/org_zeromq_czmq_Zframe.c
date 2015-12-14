@@ -14,6 +14,8 @@ JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zframe__1_1new (JNIEnv *env, jclass c, jbyteArray data, jlong size)
 {
     jbyte *data_ = (byte *) (*env)->GetByteArrayElements (env, data, 0);
+    //  Disable CZMQ signal handling; allow Java to deal with it
+    zsys_handler_set (NULL);
     jlong new_ = (jlong) zframe_new (data_, (size_t) size);
     (*env)->ReleaseByteArrayElements (env, data, (jbyte *) data_, 0);
     return new_;

@@ -140,8 +140,8 @@ test_available (const char *testname)
 static inline void
 test_runall (bool verbose)
 {
-    test_item_t *item;
     printf ("Running czmq selftests...\n");
+    test_item_t *item;
     for (item = all_tests; item->test; item++)
         item->test (verbose);
 

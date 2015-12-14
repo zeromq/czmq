@@ -15,6 +15,8 @@ Java_org_zeromq_czmq_Zfile__1_1new (JNIEnv *env, jclass c, jstring path, jstring
 {
     char *path_ = (char *) (*env)->GetStringUTFChars (env, path, NULL);
     char *name_ = (char *) (*env)->GetStringUTFChars (env, name, NULL);
+    //  Disable CZMQ signal handling; allow Java to deal with it
+    zsys_handler_set (NULL);
     jlong new_ = (jlong) zfile_new (path_, name_);
     (*env)->ReleaseStringUTFChars (env, path, path_);
     (*env)->ReleaseStringUTFChars (env, name, name_);

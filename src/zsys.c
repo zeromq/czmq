@@ -1490,7 +1490,7 @@ zsys_set_logsender (const char *endpoint)
             assert (s_logsender);
         }
         //  Bind/connect to specified endpoint(s) using zsock_attach() syntax
-	int rc = zsock_attach (s_logsender, endpoint, true);
+        int rc = zsock_attach (s_logsender, endpoint, true);
         assert (rc == 0);
     }
     else

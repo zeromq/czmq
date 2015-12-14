@@ -23,7 +23,7 @@ extern "C" {
 //  @interface
 //  Create and initialize a new certificate in memory
 CZMQ_EXPORT zcert_t *
-    zcert_new (void);
+    zcert_new ();
 
 //  Accepts public/secret key pair from caller
 CZMQ_EXPORT zcert_t *

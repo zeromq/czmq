@@ -13,6 +13,8 @@
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Ziflist__1_1new (JNIEnv *env, jclass c)
 {
+    //  Disable CZMQ signal handling; allow Java to deal with it
+    zsys_handler_set (NULL);
     jlong new_ = (jlong) ziflist_new ();
     return new_;
 }

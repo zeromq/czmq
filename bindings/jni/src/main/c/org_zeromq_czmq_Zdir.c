@@ -15,6 +15,8 @@ Java_org_zeromq_czmq_Zdir__1_1new (JNIEnv *env, jclass c, jstring path, jstring 
 {
     char *path_ = (char *) (*env)->GetStringUTFChars (env, path, NULL);
     char *parent_ = (char *) (*env)->GetStringUTFChars (env, parent, NULL);
+    //  Disable CZMQ signal handling; allow Java to deal with it
+    zsys_handler_set (NULL);
     jlong new_ = (jlong) zdir_new (path_, parent_);
     (*env)->ReleaseStringUTFChars (env, path, path_);
     (*env)->ReleaseStringUTFChars (env, parent, parent_);

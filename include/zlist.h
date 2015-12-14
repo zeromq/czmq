@@ -31,7 +31,7 @@ typedef void (zlist_free_fn) (
 
 //  Create a new list container
 CZMQ_EXPORT zlist_t *
-    zlist_new (void);
+    zlist_new ();
 
 //  Destroy a list container
 CZMQ_EXPORT void

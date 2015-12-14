@@ -26,7 +26,7 @@ extern "C" {
 //  @interface
 //  Create a new UUID object.
 CZMQ_EXPORT zuuid_t *
-    zuuid_new (void);
+    zuuid_new ();
 
 //  Create UUID object from supplied ZUUID_LEN-octet value.
 CZMQ_EXPORT zuuid_t *

@@ -14,6 +14,8 @@ JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zconfig__1_1new (JNIEnv *env, jclass c, jstring name, jlong parent)
 {
     char *name_ = (char *) (*env)->GetStringUTFChars (env, name, NULL);
+    //  Disable CZMQ signal handling; allow Java to deal with it
+    zsys_handler_set (NULL);
     jlong new_ = (jlong) zconfig_new (name_, (zconfig_t *) parent);
     (*env)->ReleaseStringUTFChars (env, name, name_);
     return new_;

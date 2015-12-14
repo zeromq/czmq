@@ -153,6 +153,8 @@ apidir = @datadir@/zproject/czmq
 dist_api_DATA = \
     api/zactor.xml \
     api/zarmour.xml \
+    api/zcert.xml \
+    api/zcertstore.xml \
     api/zconfig.xml \
     api/zdir.xml \
     api/zdir_patch.xml \

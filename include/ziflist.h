@@ -23,7 +23,7 @@ extern "C" {
 //  @interface
 //  Get a list of network interfaces currently defined on the system
 CZMQ_EXPORT ziflist_t *
-    ziflist_new (void);
+    ziflist_new ();
 
 //  Destroy a ziflist instance
 CZMQ_EXPORT void

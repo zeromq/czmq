@@ -13,6 +13,8 @@
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Ztrie__1_1new (JNIEnv *env, jclass c, jchar delimiter)
 {
+    //  Disable CZMQ signal handling; allow Java to deal with it
+    zsys_handler_set (NULL);
     jlong new_ = (jlong) ztrie_new ((char) delimiter);
     return new_;
 }
