@@ -57,6 +57,10 @@ CZMQ_EXPORT char *
 CZMQ_EXPORT void
     zcert_set_meta (zcert_t *self, const char *name, const char *format, ...) CHECK_PRINTF (3);
 
+//  Unset certificate metadata.
+CZMQ_EXPORT void
+    zcert_unset_meta (zcert_t *self, const char *name);
+
 //  Get metadata value from certificate; if the metadata value doesn't
 //  exist, returns NULL.                                              
 CZMQ_EXPORT char *
