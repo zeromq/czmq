@@ -535,7 +535,8 @@ zhashx_keys (zhashx_t *self)
 //  is a destructor then it set as the destructor for the list.
 
 zlistx_t *zhashx_values(zhashx_t *self) {
-    assert(self);
+    assert (self);
+
     zlistx_t *values = zlistx_new ();
     if (!values)
         return NULL;

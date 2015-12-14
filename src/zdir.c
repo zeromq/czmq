@@ -997,7 +997,7 @@ zdir_test (bool verbose)
     zpoller_t *watch_poll = zpoller_new (watch, NULL);
 
     // poll for a certain timeout before giving up and failing the test.
-    assert(zpoller_wait (watch_poll, 1001) == watch);
+    assert (zpoller_wait (watch_poll, 1001) == watch);
 
     // wait for notification of the file being added
     char *path;
@@ -1023,7 +1023,7 @@ zdir_test (bool verbose)
     zfile_destroy (&newfile);
 
     // poll for a certain timeout before giving up and failing the test.
-    assert(zpoller_wait (watch_poll, 1001) == watch);
+    assert (zpoller_wait (watch_poll, 1001) == watch);
 
     // wait for notification of the file being removed
     rc = zsock_recv (watch, "sp", &path, &patches);

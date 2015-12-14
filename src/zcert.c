@@ -170,9 +170,10 @@ zcert_secret_txt (zcert_t *self)
 void
 zcert_set_meta (zcert_t *self, const char *name, const char *format, ...)
 {
-    assert(self);
-    assert(name);
-    assert(format);
+    assert (self);
+    assert (name);
+    assert (format);
+
     va_list argptr;
     va_start (argptr, format);
     char *value = zsys_vprintf (format, argptr);
@@ -188,8 +189,9 @@ zcert_set_meta (zcert_t *self, const char *name, const char *format, ...)
 void
 zcert_unset_meta (zcert_t *self, const char *name)
 {
-    assert(self);
+    assert (self);
     assert (name);
+
     zhash_delete (self->metadata, name);
 }
 

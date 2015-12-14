@@ -119,9 +119,9 @@ s_self_create_socket (self_t *self, char *type_name, char *endpoints, proxy_sock
         if (self->auth_type [selected_socket] == AUTH_CURVE) {
             // Apply certificate keys
             char *public_key = self->public_key [selected_socket];
-            assert(public_key);
+            assert (public_key);
             char *secret_key = self->secret_key [selected_socket];
-            assert(secret_key);
+            assert (secret_key);
             zsock_set_curve_publickey (sock, public_key);
             zsock_set_curve_secretkey (sock, secret_key);
 
