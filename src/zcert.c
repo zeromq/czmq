@@ -170,6 +170,7 @@ zcert_secret_txt (zcert_t *self)
 void
 zcert_set_meta (zcert_t *self, const char *name, const char *format, ...)
 {
+    assert(self);
     va_list argptr;
     va_start (argptr, format);
     char *value = zsys_vprintf (format, argptr);
