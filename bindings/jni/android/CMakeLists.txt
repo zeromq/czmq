@@ -9,6 +9,15 @@ find_library (CZMQ_LIBRARY NAMES czmq REQUIRED)
 
 include_directories (${JAVA_INCLUDE_PATH} ${JAVA_INCLUDE_PATH2} ../src/native/include)
 
+message (STATUS "JNI_INCLUDE_DIRS=${JNI_INCLUDE_DIRS}")
+message (STATUS "JNI_LIBRARIES=${JNI_LIBRARIES}")
+message (STATUS "JNI_FOUND=${JNI_FOUND}")
+message (STATUS "JAVA_AWT_LIBRARY=${JAVA_AWT_LIBRARY}")
+message (STATUS "JAVA_JVM_LIBRARY=${JAVA_JVM_LIBRARY}")
+message (STATUS "JAVA_INCLUDE_PATH=${JAVA_INCLUDE_PATH}")
+message (STATUS "JAVA_INCLUDE_PATH2=${JAVA_INCLUDE_PATH2}")
+message (STATUS "JAVA_AWT_INCLUDE_PATH=${JAVA_AWT_INCLUDE_PATH}")
+
 set (czmqjni_sources
     ../src/main/c/org_zeromq_czmq_Zarmour.c
     ../src/main/c/org_zeromq_czmq_Zcert.c
