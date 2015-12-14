@@ -280,12 +280,13 @@ zcert_save (zcert_t *self, const char *filename)
     assert (filename);
 
     //  Save public certificate using specified filename
-    zcert_save_public (self, filename);
+    int rc = zcert_save_public (self, filename);
+    if (rc == -1) return rc;
 
     //  Now save secret certificate using filename with "_secret" suffix
     char filename_secret [256];
     snprintf (filename_secret, 256, "%s_secret", filename);
-    int rc = zcert_save_secret (self, filename_secret);
+    rc = zcert_save_secret (self, filename_secret);
     return rc;
 }
 
