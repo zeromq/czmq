@@ -3,6 +3,8 @@
 source android_build_helper.sh
 android_build_env
 
+( cd ../../../builds/qt-android && ./build.sh )
+
 rm -Rf build
 mkdir build
 cd build
