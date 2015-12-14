@@ -140,13 +140,19 @@ bin_PROGRAMS += src/zmakecert
 src_zmakecert_CPPFLAGS = ${AM_CPPFLAGS}
 src_zmakecert_LDADD = ${program_libs}
 src_zmakecert_SOURCES = src/zmakecert.c
-endif
+if WITH_SYSTEMD
+endif #WITH_SYSTEMD
+
+endif #WITH_ZMAKECERT
 if WITH_TEST_ZGOSSIP
 noinst_PROGRAMS += src/test_zgossip
 src_test_zgossip_CPPFLAGS = ${AM_CPPFLAGS}
 src_test_zgossip_LDADD = ${program_libs}
 src_test_zgossip_SOURCES = src/test_zgossip.c
-endif
+if WITH_SYSTEMD
+endif #WITH_SYSTEMD
+
+endif #WITH_TEST_ZGOSSIP
 
 # Install api files into /usr/local/share/zproject
 apidir = @datadir@/zproject/czmq

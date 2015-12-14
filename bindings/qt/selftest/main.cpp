@@ -19,6 +19,8 @@ int main(int argc, char **argv)
 
     QZactor::test (verbose);
     QZarmour::test (verbose);
+    QZcert::test (verbose);
+    QZcertstore::test (verbose);
     QZconfig::test (verbose);
     QZdir::test (verbose);
     QZdirPatch::test (verbose);

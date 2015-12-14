@@ -13,6 +13,8 @@ qczmq-uselib:!qczmq-buildlib {
                      $$PWD/qczmq.h \
                      $$PWD/qzactor.h \
                      $$PWD/qzarmour.h \
+                     $$PWD/qzcert.h \
+                     $$PWD/qzcertstore.h \
                      $$PWD/qzconfig.h \
                      $$PWD/qzdir.h \
                      $$PWD/qzdirpatch.h \
@@ -33,6 +35,8 @@ qczmq-uselib:!qczmq-buildlib {
     SOURCES       += \
                      $$PWD/qzactor.cpp \
                      $$PWD/qzarmour.cpp \
+                     $$PWD/qzcert.cpp \
+                     $$PWD/qzcertstore.cpp \
                      $$PWD/qzconfig.cpp \
                      $$PWD/qzdir.cpp \
                      $$PWD/qzdirpatch.cpp \

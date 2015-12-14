@@ -20,14 +20,28 @@ public:
     //  Create a new empty message object
     explicit QZmsg (QObject *qObjParent = 0);
 
-    //  Destroy a message object and all frames it contains
-    ~QZmsg ();
-
     //  Receive message from socket, returns zmsg_t object or NULL if the recv   
     //  was interrupted. Does a blocking recv. If you want to not block then use 
     //  the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
     //  before receiving.                                                        
-    static QZmsg * recv (void *source);
+    explicit QZmsg (void *source, QObject *qObjParent = 0);
+
+    //  Load/append an open file into new message, return the message.
+    //  Returns NULL if the message could not be loaded.              
+    explicit QZmsg (FILE *file, QObject *qObjParent = 0);
+
+    //  Decodes a serialized message buffer created by zmsg_encode () and returns
+    //  a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
+    //  there was insufficient memory to work.                                   
+    explicit QZmsg (const byte *buffer, size_t bufferSize, QObject *qObjParent = 0);
+
+    //  Generate a signal message encoding the given status. A signal is a short
+    //  message carrying a 1-byte success/failure code (by convention, 0 means  
+    //  OK). Signals are encoded to be distinguishable from "normal" messages.  
+    explicit QZmsg (byte status, QObject *qObjParent = 0);
+
+    //  Destroy a message object and all frames it contains
+    ~QZmsg ();
 
     //  Send message to destination socket, and destroy the message after sending
     //  it successfully. If the message has no frames, sends nothing but destroys
@@ -130,21 +144,11 @@ public:
     //  to arbitrary change.                                                   
     int save (FILE *file);
 
-    //  Load/append an open file into message, create new message if
-    //  null message provided. Returns NULL if the message could not
-    //  be loaded.                                                  
-    static QZmsg * load (QZmsg *self, FILE *file);
-
     //  Serialize multipart message to a single buffer. Use this method to send  
     //  structured messages across transports that do not support multipart data.
     //  Allocates and returns a new buffer containing the serialized message.    
     //  To decode a serialized message buffer, use zmsg_decode ().               
     size_t encode (byte **buffer);
-
-    //  Decodes a serialized message buffer created by zmsg_encode () and returns
-    //  a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
-    //  there was insufficient memory to work.                                   
-    static QZmsg * decode (const byte *buffer, size_t bufferSize);
 
     //  Create copy of message, as new message object. Returns a fresh zmsg_t
     //  object. If message is null, or memory was exhausted, returns null.   
@@ -158,11 +162,6 @@ public:
     //  frame in the first message is identical to the corresponding frame in the
     //  other message. As with zframe_eq, return false if either message is NULL.
     bool eq (QZmsg *other);
-
-    //  Generate a signal message encoding the given status. A signal is a short
-    //  message carrying a 1-byte success/failure code (by convention, 0 means  
-    //  OK). Signals are encoded to be distinguishable from "normal" messages.  
-    static QZmsg * newSignal (byte status);
 
     //  Return signal value, 0 or greater, if message is a signal, -1 if not.
     int signal ();

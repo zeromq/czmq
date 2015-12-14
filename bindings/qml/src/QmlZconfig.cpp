@@ -171,25 +171,6 @@ QObject* QmlZconfig::qmlAttachedProperties(QObject* object) {
 
 
 ///
-//  Load a config tree from a specified ZPL text file; returns a zconfig_t  
-//  reference for the root, if the file exists and is readable. Returns NULL
-//  if the file does not exist.                                             
-QmlZconfig *QmlZconfigAttached::load (const QString &filename) {
-    QmlZconfig *retQ_ = new QmlZconfig ();
-    retQ_->self = zconfig_load (filename.toUtf8().data());
-    return retQ_;
-};
-
-///
-//  Equivalent to zconfig_load, taking a format string instead of a fixed
-//  filename.                                                            
-QmlZconfig *QmlZconfigAttached::loadf (const QString &format) {
-    QmlZconfig *retQ_ = new QmlZconfig ();
-    retQ_->self = zconfig_loadf ("%s", format.toUtf8().data());
-    return retQ_;
-};
-
-///
 //  Reload config tree from same file that it was previously loaded from.
 //  Returns 0 if OK, -1 if there was an error (and then does not change  
 //  existing data).                                                      
@@ -224,6 +205,25 @@ void QmlZconfigAttached::test (bool verbose) {
 QmlZconfig *QmlZconfigAttached::construct (const QString &name, QmlZconfig *parent) {
     QmlZconfig *qmlSelf = new QmlZconfig ();
     qmlSelf->self = zconfig_new (name.toUtf8().data(), parent->self);
+    return qmlSelf;
+};
+
+///
+//  Load a config tree from a specified ZPL text file; returns a zconfig_t  
+//  reference for the root, if the file exists and is readable. Returns NULL
+//  if the file does not exist.                                             
+QmlZconfig *QmlZconfigAttached::load (const QString &filename) {
+    QmlZconfig *qmlSelf = new QmlZconfig ();
+    qmlSelf->self = zconfig_load (filename.toUtf8().data());
+    return qmlSelf;
+};
+
+///
+//  Equivalent to zconfig_load, taking a format string instead of a fixed
+//  filename.                                                            
+QmlZconfig *QmlZconfigAttached::loadf (const QString &format) {
+    QmlZconfig *qmlSelf = new QmlZconfig ();
+    qmlSelf->self = zconfig_loadf ("%s", format.toUtf8().data());
     return qmlSelf;
 };
 

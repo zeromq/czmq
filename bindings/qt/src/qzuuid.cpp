@@ -23,18 +23,17 @@ QZuuid::QZuuid (QObject *qObjParent) : QObject (qObjParent)
 }
 
 ///
+//  Create UUID object from supplied ZUUID_LEN-octet value.
+QZuuid::QZuuid (const byte *source, QObject *qObjParent) : QObject (qObjParent)
+{
+    this->self = zuuid_new_from (source);
+}
+
+///
 //  Destroy a specified UUID object.
 QZuuid::~QZuuid ()
 {
     zuuid_destroy (&self);
-}
-
-///
-//  Create UUID object from supplied ZUUID_LEN-octet value.
-QZuuid * QZuuid::newFrom (const byte *source)
-{
-    QZuuid *rv = new QZuuid (zuuid_new_from (source));
-    return rv;
 }
 
 ///

@@ -23,21 +23,46 @@ QZmsg::QZmsg (QObject *qObjParent) : QObject (qObjParent)
 }
 
 ///
-//  Destroy a message object and all frames it contains
-QZmsg::~QZmsg ()
-{
-    zmsg_destroy (&self);
-}
-
-///
 //  Receive message from socket, returns zmsg_t object or NULL if the recv   
 //  was interrupted. Does a blocking recv. If you want to not block then use 
 //  the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
 //  before receiving.                                                        
-QZmsg * QZmsg::recv (void *source)
+QZmsg::QZmsg (void *source, QObject *qObjParent) : QObject (qObjParent)
 {
-    QZmsg *rv = new QZmsg (zmsg_recv (source));
-    return rv;
+    this->self = zmsg_recv (source);
+}
+
+///
+//  Load/append an open file into new message, return the message.
+//  Returns NULL if the message could not be loaded.              
+QZmsg::QZmsg (FILE *file, QObject *qObjParent) : QObject (qObjParent)
+{
+    this->self = zmsg_load (file);
+}
+
+///
+//  Decodes a serialized message buffer created by zmsg_encode () and returns
+//  a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
+//  there was insufficient memory to work.                                   
+QZmsg::QZmsg (const byte *buffer, size_t bufferSize, QObject *qObjParent) : QObject (qObjParent)
+{
+    this->self = zmsg_decode (buffer, bufferSize);
+}
+
+///
+//  Generate a signal message encoding the given status. A signal is a short
+//  message carrying a 1-byte success/failure code (by convention, 0 means  
+//  OK). Signals are encoded to be distinguishable from "normal" messages.  
+QZmsg::QZmsg (byte status, QObject *qObjParent) : QObject (qObjParent)
+{
+    this->self = zmsg_new_signal (status);
+}
+
+///
+//  Destroy a message object and all frames it contains
+QZmsg::~QZmsg ()
+{
+    zmsg_destroy (&self);
 }
 
 ///
@@ -259,16 +284,6 @@ int QZmsg::save (FILE *file)
 }
 
 ///
-//  Load/append an open file into message, create new message if
-//  null message provided. Returns NULL if the message could not
-//  be loaded.                                                  
-QZmsg * QZmsg::load (QZmsg *self, FILE *file)
-{
-    QZmsg *rv = new QZmsg (zmsg_load (self->self, file));
-    return rv;
-}
-
-///
 //  Serialize multipart message to a single buffer. Use this method to send  
 //  structured messages across transports that do not support multipart data.
 //  Allocates and returns a new buffer containing the serialized message.    
@@ -276,16 +291,6 @@ QZmsg * QZmsg::load (QZmsg *self, FILE *file)
 size_t QZmsg::encode (byte **buffer)
 {
     size_t rv = zmsg_encode (self, buffer);
-    return rv;
-}
-
-///
-//  Decodes a serialized message buffer created by zmsg_encode () and returns
-//  a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
-//  there was insufficient memory to work.                                   
-QZmsg * QZmsg::decode (const byte *buffer, size_t bufferSize)
-{
-    QZmsg *rv = new QZmsg (zmsg_decode (buffer, bufferSize));
     return rv;
 }
 
@@ -314,16 +319,6 @@ void QZmsg::print ()
 bool QZmsg::eq (QZmsg *other)
 {
     bool rv = zmsg_eq (self, other->self);
-    return rv;
-}
-
-///
-//  Generate a signal message encoding the given status. A signal is a short
-//  message carrying a 1-byte success/failure code (by convention, 0 means  
-//  OK). Signals are encoded to be distinguishable from "normal" messages.  
-QZmsg * QZmsg::newSignal (byte status)
-{
-    QZmsg *rv = new QZmsg (zmsg_new_signal (status));
     return rv;
 }
 

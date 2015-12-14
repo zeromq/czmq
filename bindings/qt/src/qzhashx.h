@@ -20,6 +20,11 @@ public:
     //  Create a new, empty hash container
     explicit QZhashx (QObject *qObjParent = 0);
 
+    //  Unpack binary frame into a new hash table. Packed data must follow format
+    //  defined by zhashx_pack. Hash table is set to autofree. An empty frame    
+    //  unpacks to an empty hash table.                                          
+    explicit QZhashx (QZframe *frame, QObject *qObjParent = 0);
+
     //  Destroy a hash container and all items in it
     ~QZhashx ();
 
@@ -133,11 +138,6 @@ public:
     //  Comments are not included in the packed data. Item values MUST be    
     //  strings.                                                             
     QZframe * pack ();
-
-    //  Unpack binary frame into a new hash table. Packed data must follow format
-    //  defined by zhashx_pack. Hash table is set to autofree. An empty frame    
-    //  unpacks to an empty hash table.                                          
-    static QZhashx * unpack (QZframe *frame);
 
     //  Make a copy of the list; items are duplicated if you set a duplicator 
     //  for the list, otherwise not. Copying a null reference returns a null  

@@ -173,8 +173,11 @@ public slots:
     //  reduce memory allocations. The pattern argument is a string that defines
     //  the type of each argument. See zsock_bsend for the supported argument   
     //  types. All arguments must be pointers; this call sets them to point to  
-    //  values held on a per-socket basis. Do not modify or destroy the returned
-    //  values. Returns 0 if successful, or -1 if it failed to read a message.  
+    //  values held on a per-socket basis.                                      
+    //  Note that zsock_brecv creates the returned objects, and the caller must 
+    //  destroy them when finished with them. The supplied pointers do not need 
+    //  to be initialized. Returns 0 if successful, or -1 if it failed to read  
+    //  a message.                                                              
     int brecv (const QString &picture);
 
     //  Return socket routing ID if any. This returns 0 if the socket is not
@@ -502,49 +505,6 @@ public:
     };
     
 public slots:
-    //  Create a PUB socket. Default action is bind.
-    QmlZsock *newPub (const QString &endpoint);
-
-    //  Create a SUB socket, and optionally subscribe to some prefix string. Default
-    //  action is connect.                                                          
-    QmlZsock *newSub (const QString &endpoint, const QString &subscribe);
-
-    //  Create a REQ socket. Default action is connect.
-    QmlZsock *newReq (const QString &endpoint);
-
-    //  Create a REP socket. Default action is bind.
-    QmlZsock *newRep (const QString &endpoint);
-
-    //  Create a DEALER socket. Default action is connect.
-    QmlZsock *newDealer (const QString &endpoint);
-
-    //  Create a ROUTER socket. Default action is bind.
-    QmlZsock *newRouter (const QString &endpoint);
-
-    //  Create a PUSH socket. Default action is connect.
-    QmlZsock *newPush (const QString &endpoint);
-
-    //  Create a PULL socket. Default action is bind.
-    QmlZsock *newPull (const QString &endpoint);
-
-    //  Create an XPUB socket. Default action is bind.
-    QmlZsock *newXpub (const QString &endpoint);
-
-    //  Create an XSUB socket. Default action is connect.
-    QmlZsock *newXsub (const QString &endpoint);
-
-    //  Create a PAIR socket. Default action is connect.
-    QmlZsock *newPair (const QString &endpoint);
-
-    //  Create a STREAM socket. Default action is connect.
-    QmlZsock *newStream (const QString &endpoint);
-
-    //  Create a SERVER socket. Default action is bind.
-    QmlZsock *newServer (const QString &endpoint);
-
-    //  Create a CLIENT socket. Default action is connect.
-    QmlZsock *newClient (const QString &endpoint);
-
     //  Probe the supplied object, and report if it looks like a zsock_t.
     //  Takes a polymorphic socket reference.                            
     bool is (void *self);
@@ -565,6 +525,49 @@ public slots:
     //  performance implications if you use a LOT of sockets. To turn off this
     //  redirection behaviour, define ZSOCK_NOCHECK.                          
     QmlZsock *construct (int type);
+
+    //  Create a PUB socket. Default action is bind.
+    QmlZsock *constructPub (const QString &endpoint);
+
+    //  Create a SUB socket, and optionally subscribe to some prefix string. Default
+    //  action is connect.                                                          
+    QmlZsock *constructSub (const QString &endpoint, const QString &subscribe);
+
+    //  Create a REQ socket. Default action is connect.
+    QmlZsock *constructReq (const QString &endpoint);
+
+    //  Create a REP socket. Default action is bind.
+    QmlZsock *constructRep (const QString &endpoint);
+
+    //  Create a DEALER socket. Default action is connect.
+    QmlZsock *constructDealer (const QString &endpoint);
+
+    //  Create a ROUTER socket. Default action is bind.
+    QmlZsock *constructRouter (const QString &endpoint);
+
+    //  Create a PUSH socket. Default action is connect.
+    QmlZsock *constructPush (const QString &endpoint);
+
+    //  Create a PULL socket. Default action is bind.
+    QmlZsock *constructPull (const QString &endpoint);
+
+    //  Create an XPUB socket. Default action is bind.
+    QmlZsock *constructXpub (const QString &endpoint);
+
+    //  Create an XSUB socket. Default action is connect.
+    QmlZsock *constructXsub (const QString &endpoint);
+
+    //  Create a PAIR socket. Default action is connect.
+    QmlZsock *constructPair (const QString &endpoint);
+
+    //  Create a STREAM socket. Default action is connect.
+    QmlZsock *constructStream (const QString &endpoint);
+
+    //  Create a SERVER socket. Default action is bind.
+    QmlZsock *constructServer (const QString &endpoint);
+
+    //  Create a CLIENT socket. Default action is connect.
+    QmlZsock *constructClient (const QString &endpoint);
 
     //  Destroy the socket. You must use this for any socket created via the
     //  zsock_new method.                                                   

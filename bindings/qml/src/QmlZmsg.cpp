@@ -217,17 +217,6 @@ QObject* QmlZmsg::qmlAttachedProperties(QObject* object) {
 
 
 ///
-//  Receive message from socket, returns zmsg_t object or NULL if the recv   
-//  was interrupted. Does a blocking recv. If you want to not block then use 
-//  the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
-//  before receiving.                                                        
-QmlZmsg *QmlZmsgAttached::recv (void *source) {
-    QmlZmsg *retQ_ = new QmlZmsg ();
-    retQ_->self = zmsg_recv (source);
-    return retQ_;
-};
-
-///
 //  Send message to destination socket, and destroy the message after sending
 //  it successfully. If the message has no frames, sends nothing but destroys
 //  the message anyhow. Nullifies the caller's reference to the message (as  
@@ -248,36 +237,6 @@ int QmlZmsgAttached::sendm (QmlZmsg *selfP, void *dest) {
 };
 
 ///
-//  Load/append an open file into message, create new message if
-//  null message provided. Returns NULL if the message could not
-//  be loaded.                                                  
-QmlZmsg *QmlZmsgAttached::load (QmlZmsg *self, FILE *file) {
-    QmlZmsg *retQ_ = new QmlZmsg ();
-    retQ_->self = zmsg_load (self->self, file);
-    return retQ_;
-};
-
-///
-//  Decodes a serialized message buffer created by zmsg_encode () and returns
-//  a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
-//  there was insufficient memory to work.                                   
-QmlZmsg *QmlZmsgAttached::decode (const byte *buffer, size_t bufferSize) {
-    QmlZmsg *retQ_ = new QmlZmsg ();
-    retQ_->self = zmsg_decode (buffer, bufferSize);
-    return retQ_;
-};
-
-///
-//  Generate a signal message encoding the given status. A signal is a short
-//  message carrying a 1-byte success/failure code (by convention, 0 means  
-//  OK). Signals are encoded to be distinguishable from "normal" messages.  
-QmlZmsg *QmlZmsgAttached::newSignal (byte status) {
-    QmlZmsg *retQ_ = new QmlZmsg ();
-    retQ_->self = zmsg_new_signal (status);
-    return retQ_;
-};
-
-///
 //  Probe the supplied object, and report if it looks like a zmsg_t.
 bool QmlZmsgAttached::is (void *self) {
     return zmsg_is (self);
@@ -294,6 +253,46 @@ void QmlZmsgAttached::test (bool verbose) {
 QmlZmsg *QmlZmsgAttached::construct () {
     QmlZmsg *qmlSelf = new QmlZmsg ();
     qmlSelf->self = zmsg_new ();
+    return qmlSelf;
+};
+
+///
+//  Receive message from socket, returns zmsg_t object or NULL if the recv   
+//  was interrupted. Does a blocking recv. If you want to not block then use 
+//  the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
+//  before receiving.                                                        
+QmlZmsg *QmlZmsgAttached::recv (void *source) {
+    QmlZmsg *qmlSelf = new QmlZmsg ();
+    qmlSelf->self = zmsg_recv (source);
+    return qmlSelf;
+};
+
+///
+//  Load/append an open file into new message, return the message.
+//  Returns NULL if the message could not be loaded.              
+QmlZmsg *QmlZmsgAttached::load (FILE *file) {
+    QmlZmsg *qmlSelf = new QmlZmsg ();
+    qmlSelf->self = zmsg_load (file);
+    return qmlSelf;
+};
+
+///
+//  Decodes a serialized message buffer created by zmsg_encode () and returns
+//  a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
+//  there was insufficient memory to work.                                   
+QmlZmsg *QmlZmsgAttached::decode (const byte *buffer, size_t bufferSize) {
+    QmlZmsg *qmlSelf = new QmlZmsg ();
+    qmlSelf->self = zmsg_decode (buffer, bufferSize);
+    return qmlSelf;
+};
+
+///
+//  Generate a signal message encoding the given status. A signal is a short
+//  message carrying a 1-byte success/failure code (by convention, 0 means  
+//  OK). Signals are encoded to be distinguishable from "normal" messages.  
+QmlZmsg *QmlZmsgAttached::constructSignal (byte status) {
+    QmlZmsg *qmlSelf = new QmlZmsg ();
+    qmlSelf->self = zmsg_new_signal (status);
     return qmlSelf;
 };
 

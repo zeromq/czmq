@@ -20,11 +20,11 @@ public:
     //  Create a new UUID object.
     explicit QZuuid (QObject *qObjParent = 0);
 
+    //  Create UUID object from supplied ZUUID_LEN-octet value.
+    explicit QZuuid (const byte *source, QObject *qObjParent = 0);
+
     //  Destroy a specified UUID object.
     ~QZuuid ();
-
-    //  Create UUID object from supplied ZUUID_LEN-octet value.
-    static QZuuid * newFrom (const byte *source);
 
     //  Set UUID to new supplied ZUUID_LEN-octet value.
     void set (const byte *source);

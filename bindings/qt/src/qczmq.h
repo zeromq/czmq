@@ -30,6 +30,8 @@
 //  Opaque class structures to allow forward references
 class QZactor;
 class QZarmour;
+class QZcert;
+class QZcertstore;
 class QZconfig;
 class QZdir;
 class QZdirPatch;
@@ -50,6 +52,8 @@ class QZuuid;
 //  Public API classes
 #include "qzactor.h"
 #include "qzarmour.h"
+#include "qzcert.h"
+#include "qzcertstore.h"
 #include "qzconfig.h"
 #include "qzdir.h"
 #include "qzdirpatch.h"

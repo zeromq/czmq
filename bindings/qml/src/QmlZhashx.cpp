@@ -264,16 +264,6 @@ QObject* QmlZhashx::qmlAttachedProperties(QObject* object) {
 
 
 ///
-//  Unpack binary frame into a new hash table. Packed data must follow format
-//  defined by zhashx_pack. Hash table is set to autofree. An empty frame    
-//  unpacks to an empty hash table.                                          
-QmlZhashx *QmlZhashxAttached::unpack (QmlZframe *frame) {
-    QmlZhashx *retQ_ = new QmlZhashx ();
-    retQ_->self = zhashx_unpack (frame->self);
-    return retQ_;
-};
-
-///
 //  Self test of this class.
 void QmlZhashxAttached::test (bool verbose) {
     zhashx_test (verbose);
@@ -284,6 +274,16 @@ void QmlZhashxAttached::test (bool verbose) {
 QmlZhashx *QmlZhashxAttached::construct () {
     QmlZhashx *qmlSelf = new QmlZhashx ();
     qmlSelf->self = zhashx_new ();
+    return qmlSelf;
+};
+
+///
+//  Unpack binary frame into a new hash table. Packed data must follow format
+//  defined by zhashx_pack. Hash table is set to autofree. An empty frame    
+//  unpacks to an empty hash table.                                          
+QmlZhashx *QmlZhashxAttached::unpack (QmlZframe *frame) {
+    QmlZhashx *qmlSelf = new QmlZhashx ();
+    qmlSelf->self = zhashx_unpack (frame->self);
     return qmlSelf;
 };
 

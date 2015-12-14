@@ -149,12 +149,6 @@ public:
     };
     
 public slots:
-    //  Receive message from socket, returns zmsg_t object or NULL if the recv   
-    //  was interrupted. Does a blocking recv. If you want to not block then use 
-    //  the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
-    //  before receiving.                                                        
-    QmlZmsg *recv (void *source);
-
     //  Send message to destination socket, and destroy the message after sending
     //  it successfully. If the message has no frames, sends nothing but destroys
     //  the message anyhow. Nullifies the caller's reference to the message (as  
@@ -169,10 +163,24 @@ public slots:
     //  it is a destructor).                                                    
     int sendm (QmlZmsg *selfP, void *dest);
 
-    //  Load/append an open file into message, create new message if
-    //  null message provided. Returns NULL if the message could not
-    //  be loaded.                                                  
-    QmlZmsg *load (QmlZmsg *self, FILE *file);
+    //  Probe the supplied object, and report if it looks like a zmsg_t.
+    bool is (void *self);
+
+    //  Self test of this class.
+    void test (bool verbose);
+
+    //  Create a new empty message object
+    QmlZmsg *construct ();
+
+    //  Receive message from socket, returns zmsg_t object or NULL if the recv   
+    //  was interrupted. Does a blocking recv. If you want to not block then use 
+    //  the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
+    //  before receiving.                                                        
+    QmlZmsg *recv (void *source);
+
+    //  Load/append an open file into new message, return the message.
+    //  Returns NULL if the message could not be loaded.              
+    QmlZmsg *load (FILE *file);
 
     //  Decodes a serialized message buffer created by zmsg_encode () and returns
     //  a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
@@ -182,16 +190,7 @@ public slots:
     //  Generate a signal message encoding the given status. A signal is a short
     //  message carrying a 1-byte success/failure code (by convention, 0 means  
     //  OK). Signals are encoded to be distinguishable from "normal" messages.  
-    QmlZmsg *newSignal (byte status);
-
-    //  Probe the supplied object, and report if it looks like a zmsg_t.
-    bool is (void *self);
-
-    //  Self test of this class.
-    void test (bool verbose);
-
-    //  Create a new empty message object
-    QmlZmsg *construct ();
+    QmlZmsg *constructSignal (byte status);
 
     //  Destroy a message object and all frames it contains
     void destruct (QmlZmsg *qmlSelf);

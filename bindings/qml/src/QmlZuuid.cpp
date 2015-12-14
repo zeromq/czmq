@@ -81,14 +81,6 @@ QObject* QmlZuuid::qmlAttachedProperties(QObject* object) {
 
 
 ///
-//  Create UUID object from supplied ZUUID_LEN-octet value.
-QmlZuuid *QmlZuuidAttached::newFrom (const byte *source) {
-    QmlZuuid *retQ_ = new QmlZuuid ();
-    retQ_->self = zuuid_new_from (source);
-    return retQ_;
-};
-
-///
 //  Self test of this class.
 void QmlZuuidAttached::test (bool verbose) {
     zuuid_test (verbose);
@@ -99,6 +91,14 @@ void QmlZuuidAttached::test (bool verbose) {
 QmlZuuid *QmlZuuidAttached::construct () {
     QmlZuuid *qmlSelf = new QmlZuuid ();
     qmlSelf->self = zuuid_new ();
+    return qmlSelf;
+};
+
+///
+//  Create UUID object from supplied ZUUID_LEN-octet value.
+QmlZuuid *QmlZuuidAttached::constructFrom (const byte *source) {
+    QmlZuuid *qmlSelf = new QmlZuuid ();
+    qmlSelf->self = zuuid_new_from (source);
     return qmlSelf;
 };
 

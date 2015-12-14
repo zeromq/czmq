@@ -23,6 +23,23 @@ QZconfig::QZconfig (const QString &name, QZconfig *parent, QObject *qObjParent) 
 }
 
 ///
+//  Load a config tree from a specified ZPL text file; returns a zconfig_t  
+//  reference for the root, if the file exists and is readable. Returns NULL
+//  if the file does not exist.                                             
+QZconfig::QZconfig (const QString &filename, QObject *qObjParent) : QObject (qObjParent)
+{
+    this->self = zconfig_load (filename.toUtf8().data());
+}
+
+///
+//  Equivalent to zconfig_load, taking a format string instead of a fixed
+//  filename.                                                            
+QZconfig::QZconfig (const QString &param, QObject *qObjParent) : QObject (qObjParent)
+{
+    this->self = zconfig_loadf ("%s", param.toUtf8().data());
+}
+
+///
 //  Destroy a config item and all its children
 QZconfig::~QZconfig ()
 {
@@ -150,30 +167,11 @@ QZlist * QZconfig::comments ()
 }
 
 ///
-//  Load a config tree from a specified ZPL text file; returns a zconfig_t  
-//  reference for the root, if the file exists and is readable. Returns NULL
-//  if the file does not exist.                                             
-QZconfig * QZconfig::load (const QString &filename)
-{
-    QZconfig *rv = new QZconfig (zconfig_load (filename.toUtf8().data()));
-    return rv;
-}
-
-///
 //  Save a config tree to a specified ZPL text file, where a filename
 //  "-" means dump to standard output.                               
 int QZconfig::save (const QString &filename)
 {
     int rv = zconfig_save (self, filename.toUtf8().data());
-    return rv;
-}
-
-///
-//  Equivalent to zconfig_load, taking a format string instead of a fixed
-//  filename.                                                            
-QZconfig * QZconfig::loadf (const QString &param)
-{
-    QZconfig *rv = new QZconfig (zconfig_loadf ("%s", param.toUtf8().data()));
     return rv;
 }
 

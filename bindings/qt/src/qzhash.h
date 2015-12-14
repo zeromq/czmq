@@ -20,6 +20,11 @@ public:
     //  Create a new, empty hash container
     explicit QZhash (QObject *qObjParent = 0);
 
+    //  Unpack binary frame into a new hash table. Packed data must follow format
+    //  defined by zhash_pack. Hash table is set to autofree. An empty frame     
+    //  unpacks to an empty hash table.                                          
+    explicit QZhash (QZframe *frame, QObject *qObjParent = 0);
+
     //  Destroy a hash container and all items in it
     ~QZhash ();
 
@@ -109,11 +114,6 @@ public:
     //  Comments are not included in the packed data. Item values MUST be    
     //  strings.                                                             
     QZframe * pack ();
-
-    //  Unpack binary frame into a new hash table. Packed data must follow format
-    //  defined by zhash_pack. Hash table is set to autofree. An empty frame     
-    //  unpacks to an empty hash table.                                          
-    static QZhash * unpack (QZframe *frame);
 
     //  Save hash table to a text file in name=value format. Hash values must be
     //  printable strings; keys may not contain '=' character. Returns 0 if OK, 

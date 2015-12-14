@@ -117,15 +117,6 @@ public:
     };
     
 public slots:
-    //  Load a config tree from a specified ZPL text file; returns a zconfig_t  
-    //  reference for the root, if the file exists and is readable. Returns NULL
-    //  if the file does not exist.                                             
-    QmlZconfig *load (const QString &filename);
-
-    //  Equivalent to zconfig_load, taking a format string instead of a fixed
-    //  filename.                                                            
-    QmlZconfig *loadf (const QString &format);
-
     //  Reload config tree from same file that it was previously loaded from.
     //  Returns 0 if OK, -1 if there was an error (and then does not change  
     //  existing data).                                                      
@@ -142,6 +133,15 @@ public slots:
 
     //  Create new config item
     QmlZconfig *construct (const QString &name, QmlZconfig *parent);
+
+    //  Load a config tree from a specified ZPL text file; returns a zconfig_t  
+    //  reference for the root, if the file exists and is readable. Returns NULL
+    //  if the file does not exist.                                             
+    QmlZconfig *load (const QString &filename);
+
+    //  Equivalent to zconfig_load, taking a format string instead of a fixed
+    //  filename.                                                            
+    QmlZconfig *loadf (const QString &format);
 
     //  Destroy a config item and all its children
     void destruct (QmlZconfig *qmlSelf);

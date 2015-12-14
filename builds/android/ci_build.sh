@@ -7,11 +7,9 @@
 NDK_VER=android-ndk-r10e
 NDK_ABI_VER=4.9
 
-if [ $TRAVIS_OS_NAME == "linux" ]
-then
+if [ $TRAVIS_OS_NAME == "linux" ]; then
     NDK_PLATFORM=linux-x86_64
-elif [ $TRAVIS_OS_NAME == "osx" ]
-then
+elif [ $TRAVIS_OS_NAME == "osx" ]; then
     NDK_PLATFORM=darwin-x86_64
 else
     echo "Unsupported platform $TRAVIS_OS_NAME"

@@ -23,6 +23,15 @@ QZhashx::QZhashx (QObject *qObjParent) : QObject (qObjParent)
 }
 
 ///
+//  Unpack binary frame into a new hash table. Packed data must follow format
+//  defined by zhashx_pack. Hash table is set to autofree. An empty frame    
+//  unpacks to an empty hash table.                                          
+QZhashx::QZhashx (QZframe *frame, QObject *qObjParent) : QObject (qObjParent)
+{
+    this->self = zhashx_unpack (frame->self);
+}
+
+///
 //  Destroy a hash container and all items in it
 QZhashx::~QZhashx ()
 {
@@ -227,16 +236,6 @@ int QZhashx::refresh ()
 QZframe * QZhashx::pack ()
 {
     QZframe *rv = new QZframe (zhashx_pack (self));
-    return rv;
-}
-
-///
-//  Unpack binary frame into a new hash table. Packed data must follow format
-//  defined by zhashx_pack. Hash table is set to autofree. An empty frame    
-//  unpacks to an empty hash table.                                          
-QZhashx * QZhashx::unpack (QZframe *frame)
-{
-    QZhashx *rv = new QZhashx (zhashx_unpack (frame->self));
     return rv;
 }
 

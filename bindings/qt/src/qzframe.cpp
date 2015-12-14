@@ -25,36 +25,33 @@ QZframe::QZframe (const void *data, size_t size, QObject *qObjParent) : QObject 
 }
 
 ///
-//  Destroy a frame
-QZframe::~QZframe ()
-{
-    zframe_destroy (&self);
-}
-
-///
 //  Create an empty (zero-sized) frame
-QZframe * QZframe::newEmpty ()
+QZframe::QZframe (QObject *qObjParent) : QObject (qObjParent)
 {
-    QZframe *rv = new QZframe (zframe_new_empty ());
-    return rv;
+    this->self = zframe_new_empty ();
 }
 
 ///
 //  Create a frame with a specified string content.
-QZframe * QZframe::from (const QString &string)
+QZframe::QZframe (const QString &string, QObject *qObjParent) : QObject (qObjParent)
 {
-    QZframe *rv = new QZframe (zframe_from (string.toUtf8().data()));
-    return rv;
+    this->self = zframe_from (string.toUtf8().data());
 }
 
 ///
 //  Receive frame from socket, returns zframe_t object or NULL if the recv  
 //  was interrupted. Does a blocking recv, if you want to not block then use
 //  zpoller or zloop.                                                       
-QZframe * QZframe::recv (void *source)
+QZframe::QZframe (void *source, QObject *qObjParent) : QObject (qObjParent)
 {
-    QZframe *rv = new QZframe (zframe_recv (source));
-    return rv;
+    this->self = zframe_recv (source);
+}
+
+///
+//  Destroy a frame
+QZframe::~QZframe ()
+{
+    zframe_destroy (&self);
 }
 
 ///
