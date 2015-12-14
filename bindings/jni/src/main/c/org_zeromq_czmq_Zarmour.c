@@ -13,7 +13,9 @@
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zarmour__1_1new (JNIEnv *env, jclass c)
 {
-    jlong new_ = (jlong) zarmour_new ();
+    //  Disable CZMQ signal handling; allow Java to deal with it
+    zsys_handler_set (NULL);
+    jlong new_ = (jlong) (intptr_t) zarmour_new ();
     return new_;
 }
 
@@ -26,7 +28,7 @@ Java_org_zeromq_czmq_Zarmour__1_1destroy (JNIEnv *env, jclass c, jlong self)
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zarmour__1_1modeStr (JNIEnv *env, jclass c, jlong self)
 {
-    char *mode_str_ = (char *) zarmour_mode_str ((zarmour_t *) self);
+    char *mode_str_ = (char *) zarmour_mode_str ((zarmour_t *) (intptr_t) self);
     jstring return_string_ = (*env)->NewStringUTF (env, mode_str_);
     return return_string_;
 }
@@ -35,7 +37,7 @@ JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zarmour__1_1encode (JNIEnv *env, jclass c, jlong self, jbyteArray data, jlong size)
 {
     jbyte *data_ = (byte *) (*env)->GetByteArrayElements (env, data, 0);
-    char *encode_ = (char *) zarmour_encode ((zarmour_t *) self, data_, (size_t) size);
+    char *encode_ = (char *) zarmour_encode ((zarmour_t *) (intptr_t) self, data_, (size_t) size);
     jstring return_string_ = (*env)->NewStringUTF (env, encode_);
     zstr_free (&encode_);
     (*env)->ReleaseByteArrayElements (env, data, (jbyte *) data_, 0);
@@ -45,72 +47,72 @@ Java_org_zeromq_czmq_Zarmour__1_1encode (JNIEnv *env, jclass c, jlong self, jbyt
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zarmour__1_1mode (JNIEnv *env, jclass c, jlong self)
 {
-    jint mode_ = (jint) zarmour_mode ((zarmour_t *) self);
+    jint mode_ = (jint) zarmour_mode ((zarmour_t *) (intptr_t) self);
     return mode_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zarmour__1_1setMode (JNIEnv *env, jclass c, jlong self, jint mode)
 {
-    zarmour_set_mode ((zarmour_t *) self, (zarmour_mode_t) mode);
+    zarmour_set_mode ((zarmour_t *) (intptr_t) self, (zarmour_mode_t) mode);
 }
 
 JNIEXPORT jboolean JNICALL
 Java_org_zeromq_czmq_Zarmour__1_1pad (JNIEnv *env, jclass c, jlong self)
 {
-    jboolean pad_ = (jboolean) zarmour_pad ((zarmour_t *) self);
+    jboolean pad_ = (jboolean) zarmour_pad ((zarmour_t *) (intptr_t) self);
     return pad_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zarmour__1_1setPad (JNIEnv *env, jclass c, jlong self, jboolean pad)
 {
-    zarmour_set_pad ((zarmour_t *) self, (bool) pad);
+    zarmour_set_pad ((zarmour_t *) (intptr_t) self, (bool) pad);
 }
 
 JNIEXPORT jchar JNICALL
 Java_org_zeromq_czmq_Zarmour__1_1padChar (JNIEnv *env, jclass c, jlong self)
 {
-    jchar pad_char_ = (jchar) zarmour_pad_char ((zarmour_t *) self);
+    jchar pad_char_ = (jchar) zarmour_pad_char ((zarmour_t *) (intptr_t) self);
     return pad_char_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zarmour__1_1setPadChar (JNIEnv *env, jclass c, jlong self, jchar pad_char)
 {
-    zarmour_set_pad_char ((zarmour_t *) self, (char) pad_char);
+    zarmour_set_pad_char ((zarmour_t *) (intptr_t) self, (char) pad_char);
 }
 
 JNIEXPORT jboolean JNICALL
 Java_org_zeromq_czmq_Zarmour__1_1lineBreaks (JNIEnv *env, jclass c, jlong self)
 {
-    jboolean line_breaks_ = (jboolean) zarmour_line_breaks ((zarmour_t *) self);
+    jboolean line_breaks_ = (jboolean) zarmour_line_breaks ((zarmour_t *) (intptr_t) self);
     return line_breaks_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zarmour__1_1setLineBreaks (JNIEnv *env, jclass c, jlong self, jboolean line_breaks)
 {
-    zarmour_set_line_breaks ((zarmour_t *) self, (bool) line_breaks);
+    zarmour_set_line_breaks ((zarmour_t *) (intptr_t) self, (bool) line_breaks);
 }
 
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zarmour__1_1lineLength (JNIEnv *env, jclass c, jlong self)
 {
-    jlong line_length_ = (jlong) zarmour_line_length ((zarmour_t *) self);
+    jlong line_length_ = (jlong) zarmour_line_length ((zarmour_t *) (intptr_t) self);
     return line_length_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zarmour__1_1setLineLength (JNIEnv *env, jclass c, jlong self, jlong line_length)
 {
-    zarmour_set_line_length ((zarmour_t *) self, (size_t) line_length);
+    zarmour_set_line_length ((zarmour_t *) (intptr_t) self, (size_t) line_length);
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zarmour__1_1print (JNIEnv *env, jclass c, jlong self)
 {
-    zarmour_print ((zarmour_t *) self);
+    zarmour_print ((zarmour_t *) (intptr_t) self);
 }
 
 JNIEXPORT void JNICALL

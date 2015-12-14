@@ -15,7 +15,9 @@ Java_org_zeromq_czmq_Zdir__1_1new (JNIEnv *env, jclass c, jstring path, jstring 
 {
     char *path_ = (char *) (*env)->GetStringUTFChars (env, path, NULL);
     char *parent_ = (char *) (*env)->GetStringUTFChars (env, parent, NULL);
-    jlong new_ = (jlong) zdir_new (path_, parent_);
+    //  Disable CZMQ signal handling; allow Java to deal with it
+    zsys_handler_set (NULL);
+    jlong new_ = (jlong) (intptr_t) zdir_new (path_, parent_);
     (*env)->ReleaseStringUTFChars (env, path, path_);
     (*env)->ReleaseStringUTFChars (env, parent, parent_);
     return new_;
@@ -30,7 +32,7 @@ Java_org_zeromq_czmq_Zdir__1_1destroy (JNIEnv *env, jclass c, jlong self)
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zdir__1_1path (JNIEnv *env, jclass c, jlong self)
 {
-    char *path_ = (char *) zdir_path ((zdir_t *) self);
+    char *path_ = (char *) zdir_path ((zdir_t *) (intptr_t) self);
     jstring return_string_ = (*env)->NewStringUTF (env, path_);
     return return_string_;
 }
@@ -38,42 +40,42 @@ Java_org_zeromq_czmq_Zdir__1_1path (JNIEnv *env, jclass c, jlong self)
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zdir__1_1modified (JNIEnv *env, jclass c, jlong self)
 {
-    jlong modified_ = (jlong) zdir_modified ((zdir_t *) self);
+    jlong modified_ = (jlong) zdir_modified ((zdir_t *) (intptr_t) self);
     return modified_;
 }
 
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zdir__1_1cursize (JNIEnv *env, jclass c, jlong self)
 {
-    jlong cursize_ = (jlong) zdir_cursize ((zdir_t *) self);
+    jlong cursize_ = (jlong) zdir_cursize ((zdir_t *) (intptr_t) self);
     return cursize_;
 }
 
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zdir__1_1count (JNIEnv *env, jclass c, jlong self)
 {
-    jlong count_ = (jlong) zdir_count ((zdir_t *) self);
+    jlong count_ = (jlong) zdir_count ((zdir_t *) (intptr_t) self);
     return count_;
 }
 
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zdir__1_1list (JNIEnv *env, jclass c, jlong self)
 {
-    jlong list_ = (jlong) zdir_list ((zdir_t *) self);
+    jlong list_ = (jlong) (intptr_t) zdir_list ((zdir_t *) (intptr_t) self);
     return list_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zdir__1_1remove (JNIEnv *env, jclass c, jlong self, jboolean force)
 {
-    zdir_remove ((zdir_t *) self, (bool) force);
+    zdir_remove ((zdir_t *) (intptr_t) self, (bool) force);
 }
 
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zdir__1_1diff (JNIEnv *env, jclass c, jlong older, jlong newer, jstring alias)
 {
     char *alias_ = (char *) (*env)->GetStringUTFChars (env, alias, NULL);
-    jlong diff_ = (jlong) zdir_diff ((zdir_t *) older, (zdir_t *) newer, alias_);
+    jlong diff_ = (jlong) (intptr_t) zdir_diff ((zdir_t *) (intptr_t) older, (zdir_t *) (intptr_t) newer, alias_);
     (*env)->ReleaseStringUTFChars (env, alias, alias_);
     return diff_;
 }
@@ -82,7 +84,7 @@ JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zdir__1_1resync (JNIEnv *env, jclass c, jlong self, jstring alias)
 {
     char *alias_ = (char *) (*env)->GetStringUTFChars (env, alias, NULL);
-    jlong resync_ = (jlong) zdir_resync ((zdir_t *) self, alias_);
+    jlong resync_ = (jlong) (intptr_t) zdir_resync ((zdir_t *) (intptr_t) self, alias_);
     (*env)->ReleaseStringUTFChars (env, alias, alias_);
     return resync_;
 }
@@ -90,20 +92,20 @@ Java_org_zeromq_czmq_Zdir__1_1resync (JNIEnv *env, jclass c, jlong self, jstring
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zdir__1_1cache (JNIEnv *env, jclass c, jlong self)
 {
-    jlong cache_ = (jlong) zdir_cache ((zdir_t *) self);
+    jlong cache_ = (jlong) (intptr_t) zdir_cache ((zdir_t *) (intptr_t) self);
     return cache_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zdir__1_1print (JNIEnv *env, jclass c, jlong self, jint indent)
 {
-    zdir_print ((zdir_t *) self, (int) indent);
+    zdir_print ((zdir_t *) (intptr_t) self, (int) indent);
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zdir__1_1watch (JNIEnv *env, jclass c, jlong pipe, jlong unused)
 {
-    zdir_watch ((zsock_t *) pipe, (void *) unused);
+    zdir_watch ((zsock_t *) (intptr_t) pipe, (void *) (intptr_t) unused);
 }
 
 JNIEXPORT void JNICALL

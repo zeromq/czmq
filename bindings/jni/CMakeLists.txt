@@ -11,6 +11,8 @@ include_directories (${JAVA_INCLUDE_PATH} ${JAVA_INCLUDE_PATH2} src/native/inclu
 
 set (czmqjni_sources
     src/main/c/org_zeromq_czmq_Zarmour.c
+    src/main/c/org_zeromq_czmq_Zcert.c
+    src/main/c/org_zeromq_czmq_Zcertstore.c
     src/main/c/org_zeromq_czmq_Zconfig.c
     src/main/c/org_zeromq_czmq_Zdir.c
     src/main/c/org_zeromq_czmq_ZdirPatch.c

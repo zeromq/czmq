@@ -498,7 +498,8 @@ zsys_catch_interrupts (void)
 {
     //  Catch SIGINT and SIGTERM unless ZSYS_SIGHANDLER=false
     if ((getenv ("ZSYS_SIGHANDLER") == NULL
-        ||  strneq (getenv ("ZSYS_SIGHANDLER"), "false")) && handle_signals)
+    ||   strneq (getenv ("ZSYS_SIGHANDLER"), "false"))
+    &&   handle_signals)
         zsys_handler_set (s_signal_handler);
 }
 
@@ -1489,7 +1490,7 @@ zsys_set_logsender (const char *endpoint)
             assert (s_logsender);
         }
         //  Bind/connect to specified endpoint(s) using zsock_attach() syntax
-	int rc = zsock_attach (s_logsender, endpoint, true);
+        int rc = zsock_attach (s_logsender, endpoint, true);
         assert (rc == 0);
     }
     else
