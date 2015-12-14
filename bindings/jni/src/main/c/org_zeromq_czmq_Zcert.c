@@ -15,7 +15,7 @@ Java_org_zeromq_czmq_Zcert__1_1new (JNIEnv *env, jclass c)
 {
     //  Disable CZMQ signal handling; allow Java to deal with it
     zsys_handler_set (NULL);
-    jlong new_ = (jlong) zcert_new ();
+    jlong new_ = (jlong) (intptr_t) zcert_new ();
     return new_;
 }
 
@@ -24,7 +24,7 @@ Java_org_zeromq_czmq_Zcert__1_1newFrom (JNIEnv *env, jclass c, jbyteArray public
 {
     jbyte *public_key_ = (byte *) (*env)->GetByteArrayElements (env, public_key, 0);
     jbyte *secret_key_ = (byte *) (*env)->GetByteArrayElements (env, secret_key, 0);
-    jlong new_from_ = (jlong) zcert_new_from (public_key_, secret_key_);
+    jlong new_from_ = (jlong) (intptr_t) zcert_new_from (public_key_, secret_key_);
     (*env)->ReleaseByteArrayElements (env, public_key, (jbyte *) public_key_, 0);
     (*env)->ReleaseByteArrayElements (env, secret_key, (jbyte *) secret_key_, 0);
     return new_from_;
@@ -34,7 +34,7 @@ JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zcert__1_1load (JNIEnv *env, jclass c, jstring filename)
 {
     char *filename_ = (char *) (*env)->GetStringUTFChars (env, filename, NULL);
-    jlong load_ = (jlong) zcert_load (filename_);
+    jlong load_ = (jlong) (intptr_t) zcert_load (filename_);
     (*env)->ReleaseStringUTFChars (env, filename, filename_);
     return load_;
 }
@@ -48,7 +48,7 @@ Java_org_zeromq_czmq_Zcert__1_1destroy (JNIEnv *env, jclass c, jlong self)
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zcert__1_1publicTxt (JNIEnv *env, jclass c, jlong self)
 {
-    char *public_txt_ = (char *) zcert_public_txt ((zcert_t *) self);
+    char *public_txt_ = (char *) zcert_public_txt ((zcert_t *) (intptr_t) self);
     jstring return_string_ = (*env)->NewStringUTF (env, public_txt_);
     return return_string_;
 }
@@ -56,7 +56,7 @@ Java_org_zeromq_czmq_Zcert__1_1publicTxt (JNIEnv *env, jclass c, jlong self)
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zcert__1_1secretTxt (JNIEnv *env, jclass c, jlong self)
 {
-    char *secret_txt_ = (char *) zcert_secret_txt ((zcert_t *) self);
+    char *secret_txt_ = (char *) zcert_secret_txt ((zcert_t *) (intptr_t) self);
     jstring return_string_ = (*env)->NewStringUTF (env, secret_txt_);
     return return_string_;
 }
@@ -66,7 +66,7 @@ Java_org_zeromq_czmq_Zcert__1_1setMeta (JNIEnv *env, jclass c, jlong self, jstri
 {
     char *name_ = (char *) (*env)->GetStringUTFChars (env, name, NULL);
     char *format_ = (char *) (*env)->GetStringUTFChars (env, format, NULL);
-    zcert_set_meta ((zcert_t *) self, name_, "%s", format_);
+    zcert_set_meta ((zcert_t *) (intptr_t) self, name_, "%s", format_);
     (*env)->ReleaseStringUTFChars (env, name, name_);
     (*env)->ReleaseStringUTFChars (env, format, format_);
 }
@@ -75,7 +75,7 @@ JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zcert__1_1meta (JNIEnv *env, jclass c, jlong self, jstring name)
 {
     char *name_ = (char *) (*env)->GetStringUTFChars (env, name, NULL);
-    char *meta_ = (char *) zcert_meta ((zcert_t *) self, name_);
+    char *meta_ = (char *) zcert_meta ((zcert_t *) (intptr_t) self, name_);
     jstring return_string_ = (*env)->NewStringUTF (env, meta_);
     (*env)->ReleaseStringUTFChars (env, name, name_);
     return return_string_;
@@ -84,7 +84,7 @@ Java_org_zeromq_czmq_Zcert__1_1meta (JNIEnv *env, jclass c, jlong self, jstring 
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zcert__1_1metaKeys (JNIEnv *env, jclass c, jlong self)
 {
-    jlong meta_keys_ = (jlong) zcert_meta_keys ((zcert_t *) self);
+    jlong meta_keys_ = (jlong) (intptr_t) zcert_meta_keys ((zcert_t *) (intptr_t) self);
     return meta_keys_;
 }
 
@@ -92,7 +92,7 @@ JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zcert__1_1save (JNIEnv *env, jclass c, jlong self, jstring filename)
 {
     char *filename_ = (char *) (*env)->GetStringUTFChars (env, filename, NULL);
-    jint save_ = (jint) zcert_save ((zcert_t *) self, filename_);
+    jint save_ = (jint) zcert_save ((zcert_t *) (intptr_t) self, filename_);
     (*env)->ReleaseStringUTFChars (env, filename, filename_);
     return save_;
 }
@@ -101,7 +101,7 @@ JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zcert__1_1savePublic (JNIEnv *env, jclass c, jlong self, jstring filename)
 {
     char *filename_ = (char *) (*env)->GetStringUTFChars (env, filename, NULL);
-    jint save_public_ = (jint) zcert_save_public ((zcert_t *) self, filename_);
+    jint save_public_ = (jint) zcert_save_public ((zcert_t *) (intptr_t) self, filename_);
     (*env)->ReleaseStringUTFChars (env, filename, filename_);
     return save_public_;
 }
@@ -110,7 +110,7 @@ JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zcert__1_1saveSecret (JNIEnv *env, jclass c, jlong self, jstring filename)
 {
     char *filename_ = (char *) (*env)->GetStringUTFChars (env, filename, NULL);
-    jint save_secret_ = (jint) zcert_save_secret ((zcert_t *) self, filename_);
+    jint save_secret_ = (jint) zcert_save_secret ((zcert_t *) (intptr_t) self, filename_);
     (*env)->ReleaseStringUTFChars (env, filename, filename_);
     return save_secret_;
 }
@@ -118,27 +118,27 @@ Java_org_zeromq_czmq_Zcert__1_1saveSecret (JNIEnv *env, jclass c, jlong self, js
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zcert__1_1apply (JNIEnv *env, jclass c, jlong self, jlong zocket)
 {
-    zcert_apply ((zcert_t *) self, (void *) zocket);
+    zcert_apply ((zcert_t *) (intptr_t) self, (void *) (intptr_t) zocket);
 }
 
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zcert__1_1dup (JNIEnv *env, jclass c, jlong self)
 {
-    jlong dup_ = (jlong) zcert_dup ((zcert_t *) self);
+    jlong dup_ = (jlong) (intptr_t) zcert_dup ((zcert_t *) (intptr_t) self);
     return dup_;
 }
 
 JNIEXPORT jboolean JNICALL
 Java_org_zeromq_czmq_Zcert__1_1eq (JNIEnv *env, jclass c, jlong self, jlong compare)
 {
-    jboolean eq_ = (jboolean) zcert_eq ((zcert_t *) self, (zcert_t *) compare);
+    jboolean eq_ = (jboolean) zcert_eq ((zcert_t *) (intptr_t) self, (zcert_t *) (intptr_t) compare);
     return eq_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zcert__1_1print (JNIEnv *env, jclass c, jlong self)
 {
-    zcert_print ((zcert_t *) self);
+    zcert_print ((zcert_t *) (intptr_t) self);
 }
 
 JNIEXPORT void JNICALL

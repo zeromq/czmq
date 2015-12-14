@@ -15,7 +15,7 @@ Java_org_zeromq_czmq_Zloop__1_1new (JNIEnv *env, jclass c)
 {
     //  Disable CZMQ signal handling; allow Java to deal with it
     zsys_handler_set (NULL);
-    jlong new_ = (jlong) zloop_new ();
+    jlong new_ = (jlong) (intptr_t) zloop_new ();
     return new_;
 }
 
@@ -28,63 +28,63 @@ Java_org_zeromq_czmq_Zloop__1_1destroy (JNIEnv *env, jclass c, jlong self)
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zloop__1_1readerEnd (JNIEnv *env, jclass c, jlong self, jlong sock)
 {
-    zloop_reader_end ((zloop_t *) self, (zsock_t *) sock);
+    zloop_reader_end ((zloop_t *) (intptr_t) self, (zsock_t *) (intptr_t) sock);
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zloop__1_1readerSetTolerant (JNIEnv *env, jclass c, jlong self, jlong sock)
 {
-    zloop_reader_set_tolerant ((zloop_t *) self, (zsock_t *) sock);
+    zloop_reader_set_tolerant ((zloop_t *) (intptr_t) self, (zsock_t *) (intptr_t) sock);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zloop__1_1timerEnd (JNIEnv *env, jclass c, jlong self, jint timer_id)
 {
-    jint timer_end_ = (jint) zloop_timer_end ((zloop_t *) self, (int) timer_id);
+    jint timer_end_ = (jint) zloop_timer_end ((zloop_t *) (intptr_t) self, (int) timer_id);
     return timer_end_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zloop__1_1ticketReset (JNIEnv *env, jclass c, jlong self, jlong handle)
 {
-    zloop_ticket_reset ((zloop_t *) self, (void *) handle);
+    zloop_ticket_reset ((zloop_t *) (intptr_t) self, (void *) (intptr_t) handle);
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zloop__1_1ticketDelete (JNIEnv *env, jclass c, jlong self, jlong handle)
 {
-    zloop_ticket_delete ((zloop_t *) self, (void *) handle);
+    zloop_ticket_delete ((zloop_t *) (intptr_t) self, (void *) (intptr_t) handle);
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zloop__1_1setTicketDelay (JNIEnv *env, jclass c, jlong self, jlong ticket_delay)
 {
-    zloop_set_ticket_delay ((zloop_t *) self, (size_t) ticket_delay);
+    zloop_set_ticket_delay ((zloop_t *) (intptr_t) self, (size_t) ticket_delay);
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zloop__1_1setMaxTimers (JNIEnv *env, jclass c, jlong self, jlong max_timers)
 {
-    zloop_set_max_timers ((zloop_t *) self, (size_t) max_timers);
+    zloop_set_max_timers ((zloop_t *) (intptr_t) self, (size_t) max_timers);
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zloop__1_1setVerbose (JNIEnv *env, jclass c, jlong self, jboolean verbose)
 {
-    zloop_set_verbose ((zloop_t *) self, (bool) verbose);
+    zloop_set_verbose ((zloop_t *) (intptr_t) self, (bool) verbose);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zloop__1_1start (JNIEnv *env, jclass c, jlong self)
 {
-    jint start_ = (jint) zloop_start ((zloop_t *) self);
+    jint start_ = (jint) zloop_start ((zloop_t *) (intptr_t) self);
     return start_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zloop__1_1ignoreInterrupts (JNIEnv *env, jclass c, jlong self)
 {
-    zloop_ignore_interrupts ((zloop_t *) self);
+    zloop_ignore_interrupts ((zloop_t *) (intptr_t) self);
 }
 
 JNIEXPORT void JNICALL

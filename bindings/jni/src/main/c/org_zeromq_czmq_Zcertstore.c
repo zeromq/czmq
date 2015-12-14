@@ -16,7 +16,7 @@ Java_org_zeromq_czmq_Zcertstore__1_1new (JNIEnv *env, jclass c, jstring location
     char *location_ = (char *) (*env)->GetStringUTFChars (env, location, NULL);
     //  Disable CZMQ signal handling; allow Java to deal with it
     zsys_handler_set (NULL);
-    jlong new_ = (jlong) zcertstore_new (location_);
+    jlong new_ = (jlong) (intptr_t) zcertstore_new (location_);
     (*env)->ReleaseStringUTFChars (env, location, location_);
     return new_;
 }
@@ -31,7 +31,7 @@ JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zcertstore__1_1lookup (JNIEnv *env, jclass c, jlong self, jstring public_key)
 {
     char *public_key_ = (char *) (*env)->GetStringUTFChars (env, public_key, NULL);
-    jlong lookup_ = (jlong) zcertstore_lookup ((zcertstore_t *) self, public_key_);
+    jlong lookup_ = (jlong) (intptr_t) zcertstore_lookup ((zcertstore_t *) (intptr_t) self, public_key_);
     (*env)->ReleaseStringUTFChars (env, public_key, public_key_);
     return lookup_;
 }
@@ -39,13 +39,13 @@ Java_org_zeromq_czmq_Zcertstore__1_1lookup (JNIEnv *env, jclass c, jlong self, j
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zcertstore__1_1insert (JNIEnv *env, jclass c, jlong self, jlong cert_p)
 {
-    zcertstore_insert ((zcertstore_t *) self, (zcert_t **) &cert_p);
+    zcertstore_insert ((zcertstore_t *) (intptr_t) self, (zcert_t **) (intptr_t) &cert_p);
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zcertstore__1_1print (JNIEnv *env, jclass c, jlong self)
 {
-    zcertstore_print ((zcertstore_t *) self);
+    zcertstore_print ((zcertstore_t *) (intptr_t) self);
 }
 
 JNIEXPORT void JNICALL

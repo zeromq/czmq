@@ -15,7 +15,7 @@ Java_org_zeromq_czmq_Zsock__1_1new (JNIEnv *env, jclass c, jint type)
 {
     //  Disable CZMQ signal handling; allow Java to deal with it
     zsys_handler_set (NULL);
-    jlong new_ = (jlong) zsock_new ((int) type);
+    jlong new_ = (jlong) (intptr_t) zsock_new ((int) type);
     return new_;
 }
 
@@ -23,7 +23,7 @@ JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zsock__1_1newPub (JNIEnv *env, jclass c, jstring endpoint)
 {
     char *endpoint_ = (char *) (*env)->GetStringUTFChars (env, endpoint, NULL);
-    jlong new_pub_ = (jlong) zsock_new_pub (endpoint_);
+    jlong new_pub_ = (jlong) (intptr_t) zsock_new_pub (endpoint_);
     (*env)->ReleaseStringUTFChars (env, endpoint, endpoint_);
     return new_pub_;
 }
@@ -33,7 +33,7 @@ Java_org_zeromq_czmq_Zsock__1_1newSub (JNIEnv *env, jclass c, jstring endpoint, 
 {
     char *endpoint_ = (char *) (*env)->GetStringUTFChars (env, endpoint, NULL);
     char *subscribe_ = (char *) (*env)->GetStringUTFChars (env, subscribe, NULL);
-    jlong new_sub_ = (jlong) zsock_new_sub (endpoint_, subscribe_);
+    jlong new_sub_ = (jlong) (intptr_t) zsock_new_sub (endpoint_, subscribe_);
     (*env)->ReleaseStringUTFChars (env, endpoint, endpoint_);
     (*env)->ReleaseStringUTFChars (env, subscribe, subscribe_);
     return new_sub_;
@@ -43,7 +43,7 @@ JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zsock__1_1newReq (JNIEnv *env, jclass c, jstring endpoint)
 {
     char *endpoint_ = (char *) (*env)->GetStringUTFChars (env, endpoint, NULL);
-    jlong new_req_ = (jlong) zsock_new_req (endpoint_);
+    jlong new_req_ = (jlong) (intptr_t) zsock_new_req (endpoint_);
     (*env)->ReleaseStringUTFChars (env, endpoint, endpoint_);
     return new_req_;
 }
@@ -52,7 +52,7 @@ JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zsock__1_1newRep (JNIEnv *env, jclass c, jstring endpoint)
 {
     char *endpoint_ = (char *) (*env)->GetStringUTFChars (env, endpoint, NULL);
-    jlong new_rep_ = (jlong) zsock_new_rep (endpoint_);
+    jlong new_rep_ = (jlong) (intptr_t) zsock_new_rep (endpoint_);
     (*env)->ReleaseStringUTFChars (env, endpoint, endpoint_);
     return new_rep_;
 }
@@ -61,7 +61,7 @@ JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zsock__1_1newDealer (JNIEnv *env, jclass c, jstring endpoint)
 {
     char *endpoint_ = (char *) (*env)->GetStringUTFChars (env, endpoint, NULL);
-    jlong new_dealer_ = (jlong) zsock_new_dealer (endpoint_);
+    jlong new_dealer_ = (jlong) (intptr_t) zsock_new_dealer (endpoint_);
     (*env)->ReleaseStringUTFChars (env, endpoint, endpoint_);
     return new_dealer_;
 }
@@ -70,7 +70,7 @@ JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zsock__1_1newRouter (JNIEnv *env, jclass c, jstring endpoint)
 {
     char *endpoint_ = (char *) (*env)->GetStringUTFChars (env, endpoint, NULL);
-    jlong new_router_ = (jlong) zsock_new_router (endpoint_);
+    jlong new_router_ = (jlong) (intptr_t) zsock_new_router (endpoint_);
     (*env)->ReleaseStringUTFChars (env, endpoint, endpoint_);
     return new_router_;
 }
@@ -79,7 +79,7 @@ JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zsock__1_1newPush (JNIEnv *env, jclass c, jstring endpoint)
 {
     char *endpoint_ = (char *) (*env)->GetStringUTFChars (env, endpoint, NULL);
-    jlong new_push_ = (jlong) zsock_new_push (endpoint_);
+    jlong new_push_ = (jlong) (intptr_t) zsock_new_push (endpoint_);
     (*env)->ReleaseStringUTFChars (env, endpoint, endpoint_);
     return new_push_;
 }
@@ -88,7 +88,7 @@ JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zsock__1_1newPull (JNIEnv *env, jclass c, jstring endpoint)
 {
     char *endpoint_ = (char *) (*env)->GetStringUTFChars (env, endpoint, NULL);
-    jlong new_pull_ = (jlong) zsock_new_pull (endpoint_);
+    jlong new_pull_ = (jlong) (intptr_t) zsock_new_pull (endpoint_);
     (*env)->ReleaseStringUTFChars (env, endpoint, endpoint_);
     return new_pull_;
 }
@@ -97,7 +97,7 @@ JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zsock__1_1newXpub (JNIEnv *env, jclass c, jstring endpoint)
 {
     char *endpoint_ = (char *) (*env)->GetStringUTFChars (env, endpoint, NULL);
-    jlong new_xpub_ = (jlong) zsock_new_xpub (endpoint_);
+    jlong new_xpub_ = (jlong) (intptr_t) zsock_new_xpub (endpoint_);
     (*env)->ReleaseStringUTFChars (env, endpoint, endpoint_);
     return new_xpub_;
 }
@@ -106,7 +106,7 @@ JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zsock__1_1newXsub (JNIEnv *env, jclass c, jstring endpoint)
 {
     char *endpoint_ = (char *) (*env)->GetStringUTFChars (env, endpoint, NULL);
-    jlong new_xsub_ = (jlong) zsock_new_xsub (endpoint_);
+    jlong new_xsub_ = (jlong) (intptr_t) zsock_new_xsub (endpoint_);
     (*env)->ReleaseStringUTFChars (env, endpoint, endpoint_);
     return new_xsub_;
 }
@@ -115,7 +115,7 @@ JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zsock__1_1newPair (JNIEnv *env, jclass c, jstring endpoint)
 {
     char *endpoint_ = (char *) (*env)->GetStringUTFChars (env, endpoint, NULL);
-    jlong new_pair_ = (jlong) zsock_new_pair (endpoint_);
+    jlong new_pair_ = (jlong) (intptr_t) zsock_new_pair (endpoint_);
     (*env)->ReleaseStringUTFChars (env, endpoint, endpoint_);
     return new_pair_;
 }
@@ -124,7 +124,7 @@ JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zsock__1_1newStream (JNIEnv *env, jclass c, jstring endpoint)
 {
     char *endpoint_ = (char *) (*env)->GetStringUTFChars (env, endpoint, NULL);
-    jlong new_stream_ = (jlong) zsock_new_stream (endpoint_);
+    jlong new_stream_ = (jlong) (intptr_t) zsock_new_stream (endpoint_);
     (*env)->ReleaseStringUTFChars (env, endpoint, endpoint_);
     return new_stream_;
 }
@@ -133,7 +133,7 @@ JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zsock__1_1newServer (JNIEnv *env, jclass c, jstring endpoint)
 {
     char *endpoint_ = (char *) (*env)->GetStringUTFChars (env, endpoint, NULL);
-    jlong new_server_ = (jlong) zsock_new_server (endpoint_);
+    jlong new_server_ = (jlong) (intptr_t) zsock_new_server (endpoint_);
     (*env)->ReleaseStringUTFChars (env, endpoint, endpoint_);
     return new_server_;
 }
@@ -142,7 +142,7 @@ JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zsock__1_1newClient (JNIEnv *env, jclass c, jstring endpoint)
 {
     char *endpoint_ = (char *) (*env)->GetStringUTFChars (env, endpoint, NULL);
-    jlong new_client_ = (jlong) zsock_new_client (endpoint_);
+    jlong new_client_ = (jlong) (intptr_t) zsock_new_client (endpoint_);
     (*env)->ReleaseStringUTFChars (env, endpoint, endpoint_);
     return new_client_;
 }
@@ -157,7 +157,7 @@ JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1bind (JNIEnv *env, jclass c, jlong self, jstring format)
 {
     char *format_ = (char *) (*env)->GetStringUTFChars (env, format, NULL);
-    jint bind_ = (jint) zsock_bind ((zsock_t *) self, "%s", format_);
+    jint bind_ = (jint) zsock_bind ((zsock_t *) (intptr_t) self, "%s", format_);
     (*env)->ReleaseStringUTFChars (env, format, format_);
     return bind_;
 }
@@ -165,7 +165,7 @@ Java_org_zeromq_czmq_Zsock__1_1bind (JNIEnv *env, jclass c, jlong self, jstring 
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zsock__1_1endpoint (JNIEnv *env, jclass c, jlong self)
 {
-    char *endpoint_ = (char *) zsock_endpoint ((zsock_t *) self);
+    char *endpoint_ = (char *) zsock_endpoint ((zsock_t *) (intptr_t) self);
     jstring return_string_ = (*env)->NewStringUTF (env, endpoint_);
     return return_string_;
 }
@@ -174,7 +174,7 @@ JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1unbind (JNIEnv *env, jclass c, jlong self, jstring format)
 {
     char *format_ = (char *) (*env)->GetStringUTFChars (env, format, NULL);
-    jint unbind_ = (jint) zsock_unbind ((zsock_t *) self, "%s", format_);
+    jint unbind_ = (jint) zsock_unbind ((zsock_t *) (intptr_t) self, "%s", format_);
     (*env)->ReleaseStringUTFChars (env, format, format_);
     return unbind_;
 }
@@ -183,7 +183,7 @@ JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1connect (JNIEnv *env, jclass c, jlong self, jstring format)
 {
     char *format_ = (char *) (*env)->GetStringUTFChars (env, format, NULL);
-    jint connect_ = (jint) zsock_connect ((zsock_t *) self, "%s", format_);
+    jint connect_ = (jint) zsock_connect ((zsock_t *) (intptr_t) self, "%s", format_);
     (*env)->ReleaseStringUTFChars (env, format, format_);
     return connect_;
 }
@@ -192,7 +192,7 @@ JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1disconnect (JNIEnv *env, jclass c, jlong self, jstring format)
 {
     char *format_ = (char *) (*env)->GetStringUTFChars (env, format, NULL);
-    jint disconnect_ = (jint) zsock_disconnect ((zsock_t *) self, "%s", format_);
+    jint disconnect_ = (jint) zsock_disconnect ((zsock_t *) (intptr_t) self, "%s", format_);
     (*env)->ReleaseStringUTFChars (env, format, format_);
     return disconnect_;
 }
@@ -201,7 +201,7 @@ JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1attach (JNIEnv *env, jclass c, jlong self, jstring endpoints, jboolean serverish)
 {
     char *endpoints_ = (char *) (*env)->GetStringUTFChars (env, endpoints, NULL);
-    jint attach_ = (jint) zsock_attach ((zsock_t *) self, endpoints_, (bool) serverish);
+    jint attach_ = (jint) zsock_attach ((zsock_t *) (intptr_t) self, endpoints_, (bool) serverish);
     (*env)->ReleaseStringUTFChars (env, endpoints, endpoints_);
     return attach_;
 }
@@ -209,7 +209,7 @@ Java_org_zeromq_czmq_Zsock__1_1attach (JNIEnv *env, jclass c, jlong self, jstrin
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zsock__1_1typeStr (JNIEnv *env, jclass c, jlong self)
 {
-    char *type_str_ = (char *) zsock_type_str ((zsock_t *) self);
+    char *type_str_ = (char *) zsock_type_str ((zsock_t *) (intptr_t) self);
     jstring return_string_ = (*env)->NewStringUTF (env, type_str_);
     return return_string_;
 }
@@ -218,7 +218,7 @@ JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1send (JNIEnv *env, jclass c, jlong self, jstring picture)
 {
     char *picture_ = (char *) (*env)->GetStringUTFChars (env, picture, NULL);
-    jint send_ = (jint) zsock_send ((zsock_t *) self, picture_);
+    jint send_ = (jint) zsock_send ((zsock_t *) (intptr_t) self, picture_);
     (*env)->ReleaseStringUTFChars (env, picture, picture_);
     return send_;
 }
@@ -227,7 +227,7 @@ JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1recv (JNIEnv *env, jclass c, jlong self, jstring picture)
 {
     char *picture_ = (char *) (*env)->GetStringUTFChars (env, picture, NULL);
-    jint recv_ = (jint) zsock_recv ((zsock_t *) self, picture_);
+    jint recv_ = (jint) zsock_recv ((zsock_t *) (intptr_t) self, picture_);
     (*env)->ReleaseStringUTFChars (env, picture, picture_);
     return recv_;
 }
@@ -236,7 +236,7 @@ JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1bsend (JNIEnv *env, jclass c, jlong self, jstring picture)
 {
     char *picture_ = (char *) (*env)->GetStringUTFChars (env, picture, NULL);
-    jint bsend_ = (jint) zsock_bsend ((zsock_t *) self, picture_);
+    jint bsend_ = (jint) zsock_bsend ((zsock_t *) (intptr_t) self, picture_);
     (*env)->ReleaseStringUTFChars (env, picture, picture_);
     return bsend_;
 }
@@ -245,7 +245,7 @@ JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1brecv (JNIEnv *env, jclass c, jlong self, jstring picture)
 {
     char *picture_ = (char *) (*env)->GetStringUTFChars (env, picture, NULL);
-    jint brecv_ = (jint) zsock_brecv ((zsock_t *) self, picture_);
+    jint brecv_ = (jint) zsock_brecv ((zsock_t *) (intptr_t) self, picture_);
     (*env)->ReleaseStringUTFChars (env, picture, picture_);
     return brecv_;
 }
@@ -253,109 +253,109 @@ Java_org_zeromq_czmq_Zsock__1_1brecv (JNIEnv *env, jclass c, jlong self, jstring
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1routingId (JNIEnv *env, jclass c, jlong self)
 {
-    jint routing_id_ = (jint) zsock_routing_id ((zsock_t *) self);
+    jint routing_id_ = (jint) zsock_routing_id ((zsock_t *) (intptr_t) self);
     return routing_id_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setRoutingId (JNIEnv *env, jclass c, jlong self, jint routing_id)
 {
-    zsock_set_routing_id ((zsock_t *) self, (uint32_t) routing_id);
+    zsock_set_routing_id ((zsock_t *) (intptr_t) self, (uint32_t) routing_id);
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setUnbounded (JNIEnv *env, jclass c, jlong self)
 {
-    zsock_set_unbounded ((zsock_t *) self);
+    zsock_set_unbounded ((zsock_t *) (intptr_t) self);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1signal (JNIEnv *env, jclass c, jlong self, jbyte status)
 {
-    jint signal_ = (jint) zsock_signal ((zsock_t *) self, (byte) status);
+    jint signal_ = (jint) zsock_signal ((zsock_t *) (intptr_t) self, (byte) status);
     return signal_;
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1wait (JNIEnv *env, jclass c, jlong self)
 {
-    jint wait_ = (jint) zsock_wait ((zsock_t *) self);
+    jint wait_ = (jint) zsock_wait ((zsock_t *) (intptr_t) self);
     return wait_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1flush (JNIEnv *env, jclass c, jlong self)
 {
-    zsock_flush ((zsock_t *) self);
+    zsock_flush ((zsock_t *) (intptr_t) self);
 }
 
 JNIEXPORT jboolean JNICALL
 Java_org_zeromq_czmq_Zsock__1_1is (JNIEnv *env, jclass c, jlong self)
 {
-    jboolean is_ = (jboolean) zsock_is ((void *) self);
+    jboolean is_ = (jboolean) zsock_is ((void *) (intptr_t) self);
     return is_;
 }
 
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zsock__1_1resolve (JNIEnv *env, jclass c, jlong self)
 {
-    jlong resolve_ = (jlong) zsock_resolve ((void *) self);
+    jlong resolve_ = (jlong) (intptr_t) zsock_resolve ((void *) (intptr_t) self);
     return resolve_;
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1tos (JNIEnv *env, jclass c, jlong self)
 {
-    jint tos_ = (jint) zsock_tos ((zsock_t *) self);
+    jint tos_ = (jint) zsock_tos ((zsock_t *) (intptr_t) self);
     return tos_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setTos (JNIEnv *env, jclass c, jlong self, jint tos)
 {
-    zsock_set_tos ((zsock_t *) self, (int) tos);
+    zsock_set_tos ((zsock_t *) (intptr_t) self, (int) tos);
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setRouterHandover (JNIEnv *env, jclass c, jlong self, jint router_handover)
 {
-    zsock_set_router_handover ((zsock_t *) self, (int) router_handover);
+    zsock_set_router_handover ((zsock_t *) (intptr_t) self, (int) router_handover);
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setRouterMandatory (JNIEnv *env, jclass c, jlong self, jint router_mandatory)
 {
-    zsock_set_router_mandatory ((zsock_t *) self, (int) router_mandatory);
+    zsock_set_router_mandatory ((zsock_t *) (intptr_t) self, (int) router_mandatory);
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setProbeRouter (JNIEnv *env, jclass c, jlong self, jint probe_router)
 {
-    zsock_set_probe_router ((zsock_t *) self, (int) probe_router);
+    zsock_set_probe_router ((zsock_t *) (intptr_t) self, (int) probe_router);
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setReqRelaxed (JNIEnv *env, jclass c, jlong self, jint req_relaxed)
 {
-    zsock_set_req_relaxed ((zsock_t *) self, (int) req_relaxed);
+    zsock_set_req_relaxed ((zsock_t *) (intptr_t) self, (int) req_relaxed);
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setReqCorrelate (JNIEnv *env, jclass c, jlong self, jint req_correlate)
 {
-    zsock_set_req_correlate ((zsock_t *) self, (int) req_correlate);
+    zsock_set_req_correlate ((zsock_t *) (intptr_t) self, (int) req_correlate);
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setConflate (JNIEnv *env, jclass c, jlong self, jint conflate)
 {
-    zsock_set_conflate ((zsock_t *) self, (int) conflate);
+    zsock_set_conflate ((zsock_t *) (intptr_t) self, (int) conflate);
 }
 
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zsock__1_1zapDomain (JNIEnv *env, jclass c, jlong self)
 {
-    char *zap_domain_ = (char *) zsock_zap_domain ((zsock_t *) self);
+    char *zap_domain_ = (char *) zsock_zap_domain ((zsock_t *) (intptr_t) self);
     jstring return_string_ = (*env)->NewStringUTF (env, zap_domain_);
     zstr_free (&zap_domain_);
     return return_string_;
@@ -365,34 +365,34 @@ JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setZapDomain (JNIEnv *env, jclass c, jlong self, jstring zap_domain)
 {
     char *zap_domain_ = (char *) (*env)->GetStringUTFChars (env, zap_domain, NULL);
-    zsock_set_zap_domain ((zsock_t *) self, zap_domain_);
+    zsock_set_zap_domain ((zsock_t *) (intptr_t) self, zap_domain_);
     (*env)->ReleaseStringUTFChars (env, zap_domain, zap_domain_);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1mechanism (JNIEnv *env, jclass c, jlong self)
 {
-    jint mechanism_ = (jint) zsock_mechanism ((zsock_t *) self);
+    jint mechanism_ = (jint) zsock_mechanism ((zsock_t *) (intptr_t) self);
     return mechanism_;
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1plainServer (JNIEnv *env, jclass c, jlong self)
 {
-    jint plain_server_ = (jint) zsock_plain_server ((zsock_t *) self);
+    jint plain_server_ = (jint) zsock_plain_server ((zsock_t *) (intptr_t) self);
     return plain_server_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setPlainServer (JNIEnv *env, jclass c, jlong self, jint plain_server)
 {
-    zsock_set_plain_server ((zsock_t *) self, (int) plain_server);
+    zsock_set_plain_server ((zsock_t *) (intptr_t) self, (int) plain_server);
 }
 
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zsock__1_1plainUsername (JNIEnv *env, jclass c, jlong self)
 {
-    char *plain_username_ = (char *) zsock_plain_username ((zsock_t *) self);
+    char *plain_username_ = (char *) zsock_plain_username ((zsock_t *) (intptr_t) self);
     jstring return_string_ = (*env)->NewStringUTF (env, plain_username_);
     zstr_free (&plain_username_);
     return return_string_;
@@ -402,14 +402,14 @@ JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setPlainUsername (JNIEnv *env, jclass c, jlong self, jstring plain_username)
 {
     char *plain_username_ = (char *) (*env)->GetStringUTFChars (env, plain_username, NULL);
-    zsock_set_plain_username ((zsock_t *) self, plain_username_);
+    zsock_set_plain_username ((zsock_t *) (intptr_t) self, plain_username_);
     (*env)->ReleaseStringUTFChars (env, plain_username, plain_username_);
 }
 
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zsock__1_1plainPassword (JNIEnv *env, jclass c, jlong self)
 {
-    char *plain_password_ = (char *) zsock_plain_password ((zsock_t *) self);
+    char *plain_password_ = (char *) zsock_plain_password ((zsock_t *) (intptr_t) self);
     jstring return_string_ = (*env)->NewStringUTF (env, plain_password_);
     zstr_free (&plain_password_);
     return return_string_;
@@ -419,27 +419,27 @@ JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setPlainPassword (JNIEnv *env, jclass c, jlong self, jstring plain_password)
 {
     char *plain_password_ = (char *) (*env)->GetStringUTFChars (env, plain_password, NULL);
-    zsock_set_plain_password ((zsock_t *) self, plain_password_);
+    zsock_set_plain_password ((zsock_t *) (intptr_t) self, plain_password_);
     (*env)->ReleaseStringUTFChars (env, plain_password, plain_password_);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1curveServer (JNIEnv *env, jclass c, jlong self)
 {
-    jint curve_server_ = (jint) zsock_curve_server ((zsock_t *) self);
+    jint curve_server_ = (jint) zsock_curve_server ((zsock_t *) (intptr_t) self);
     return curve_server_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setCurveServer (JNIEnv *env, jclass c, jlong self, jint curve_server)
 {
-    zsock_set_curve_server ((zsock_t *) self, (int) curve_server);
+    zsock_set_curve_server ((zsock_t *) (intptr_t) self, (int) curve_server);
 }
 
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zsock__1_1curvePublickey (JNIEnv *env, jclass c, jlong self)
 {
-    char *curve_publickey_ = (char *) zsock_curve_publickey ((zsock_t *) self);
+    char *curve_publickey_ = (char *) zsock_curve_publickey ((zsock_t *) (intptr_t) self);
     jstring return_string_ = (*env)->NewStringUTF (env, curve_publickey_);
     zstr_free (&curve_publickey_);
     return return_string_;
@@ -449,7 +449,7 @@ JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setCurvePublickey (JNIEnv *env, jclass c, jlong self, jstring curve_publickey)
 {
     char *curve_publickey_ = (char *) (*env)->GetStringUTFChars (env, curve_publickey, NULL);
-    zsock_set_curve_publickey ((zsock_t *) self, curve_publickey_);
+    zsock_set_curve_publickey ((zsock_t *) (intptr_t) self, curve_publickey_);
     (*env)->ReleaseStringUTFChars (env, curve_publickey, curve_publickey_);
 }
 
@@ -457,14 +457,14 @@ JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setCurvePublickeyBin (JNIEnv *env, jclass c, jlong self, jbyteArray curve_publickey)
 {
     jbyte *curve_publickey_ = (byte *) (*env)->GetByteArrayElements (env, curve_publickey, 0);
-    zsock_set_curve_publickey_bin ((zsock_t *) self, curve_publickey_);
+    zsock_set_curve_publickey_bin ((zsock_t *) (intptr_t) self, curve_publickey_);
     (*env)->ReleaseByteArrayElements (env, curve_publickey, (jbyte *) curve_publickey_, 0);
 }
 
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zsock__1_1curveSecretkey (JNIEnv *env, jclass c, jlong self)
 {
-    char *curve_secretkey_ = (char *) zsock_curve_secretkey ((zsock_t *) self);
+    char *curve_secretkey_ = (char *) zsock_curve_secretkey ((zsock_t *) (intptr_t) self);
     jstring return_string_ = (*env)->NewStringUTF (env, curve_secretkey_);
     zstr_free (&curve_secretkey_);
     return return_string_;
@@ -474,7 +474,7 @@ JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setCurveSecretkey (JNIEnv *env, jclass c, jlong self, jstring curve_secretkey)
 {
     char *curve_secretkey_ = (char *) (*env)->GetStringUTFChars (env, curve_secretkey, NULL);
-    zsock_set_curve_secretkey ((zsock_t *) self, curve_secretkey_);
+    zsock_set_curve_secretkey ((zsock_t *) (intptr_t) self, curve_secretkey_);
     (*env)->ReleaseStringUTFChars (env, curve_secretkey, curve_secretkey_);
 }
 
@@ -482,14 +482,14 @@ JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setCurveSecretkeyBin (JNIEnv *env, jclass c, jlong self, jbyteArray curve_secretkey)
 {
     jbyte *curve_secretkey_ = (byte *) (*env)->GetByteArrayElements (env, curve_secretkey, 0);
-    zsock_set_curve_secretkey_bin ((zsock_t *) self, curve_secretkey_);
+    zsock_set_curve_secretkey_bin ((zsock_t *) (intptr_t) self, curve_secretkey_);
     (*env)->ReleaseByteArrayElements (env, curve_secretkey, (jbyte *) curve_secretkey_, 0);
 }
 
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zsock__1_1curveServerkey (JNIEnv *env, jclass c, jlong self)
 {
-    char *curve_serverkey_ = (char *) zsock_curve_serverkey ((zsock_t *) self);
+    char *curve_serverkey_ = (char *) zsock_curve_serverkey ((zsock_t *) (intptr_t) self);
     jstring return_string_ = (*env)->NewStringUTF (env, curve_serverkey_);
     zstr_free (&curve_serverkey_);
     return return_string_;
@@ -499,7 +499,7 @@ JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setCurveServerkey (JNIEnv *env, jclass c, jlong self, jstring curve_serverkey)
 {
     char *curve_serverkey_ = (char *) (*env)->GetStringUTFChars (env, curve_serverkey, NULL);
-    zsock_set_curve_serverkey ((zsock_t *) self, curve_serverkey_);
+    zsock_set_curve_serverkey ((zsock_t *) (intptr_t) self, curve_serverkey_);
     (*env)->ReleaseStringUTFChars (env, curve_serverkey, curve_serverkey_);
 }
 
@@ -507,40 +507,40 @@ JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setCurveServerkeyBin (JNIEnv *env, jclass c, jlong self, jbyteArray curve_serverkey)
 {
     jbyte *curve_serverkey_ = (byte *) (*env)->GetByteArrayElements (env, curve_serverkey, 0);
-    zsock_set_curve_serverkey_bin ((zsock_t *) self, curve_serverkey_);
+    zsock_set_curve_serverkey_bin ((zsock_t *) (intptr_t) self, curve_serverkey_);
     (*env)->ReleaseByteArrayElements (env, curve_serverkey, (jbyte *) curve_serverkey_, 0);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1gssapiServer (JNIEnv *env, jclass c, jlong self)
 {
-    jint gssapi_server_ = (jint) zsock_gssapi_server ((zsock_t *) self);
+    jint gssapi_server_ = (jint) zsock_gssapi_server ((zsock_t *) (intptr_t) self);
     return gssapi_server_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setGssapiServer (JNIEnv *env, jclass c, jlong self, jint gssapi_server)
 {
-    zsock_set_gssapi_server ((zsock_t *) self, (int) gssapi_server);
+    zsock_set_gssapi_server ((zsock_t *) (intptr_t) self, (int) gssapi_server);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1gssapiPlaintext (JNIEnv *env, jclass c, jlong self)
 {
-    jint gssapi_plaintext_ = (jint) zsock_gssapi_plaintext ((zsock_t *) self);
+    jint gssapi_plaintext_ = (jint) zsock_gssapi_plaintext ((zsock_t *) (intptr_t) self);
     return gssapi_plaintext_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setGssapiPlaintext (JNIEnv *env, jclass c, jlong self, jint gssapi_plaintext)
 {
-    zsock_set_gssapi_plaintext ((zsock_t *) self, (int) gssapi_plaintext);
+    zsock_set_gssapi_plaintext ((zsock_t *) (intptr_t) self, (int) gssapi_plaintext);
 }
 
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zsock__1_1gssapiPrincipal (JNIEnv *env, jclass c, jlong self)
 {
-    char *gssapi_principal_ = (char *) zsock_gssapi_principal ((zsock_t *) self);
+    char *gssapi_principal_ = (char *) zsock_gssapi_principal ((zsock_t *) (intptr_t) self);
     jstring return_string_ = (*env)->NewStringUTF (env, gssapi_principal_);
     zstr_free (&gssapi_principal_);
     return return_string_;
@@ -550,14 +550,14 @@ JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setGssapiPrincipal (JNIEnv *env, jclass c, jlong self, jstring gssapi_principal)
 {
     char *gssapi_principal_ = (char *) (*env)->GetStringUTFChars (env, gssapi_principal, NULL);
-    zsock_set_gssapi_principal ((zsock_t *) self, gssapi_principal_);
+    zsock_set_gssapi_principal ((zsock_t *) (intptr_t) self, gssapi_principal_);
     (*env)->ReleaseStringUTFChars (env, gssapi_principal, gssapi_principal_);
 }
 
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zsock__1_1gssapiServicePrincipal (JNIEnv *env, jclass c, jlong self)
 {
-    char *gssapi_service_principal_ = (char *) zsock_gssapi_service_principal ((zsock_t *) self);
+    char *gssapi_service_principal_ = (char *) zsock_gssapi_service_principal ((zsock_t *) (intptr_t) self);
     jstring return_string_ = (*env)->NewStringUTF (env, gssapi_service_principal_);
     zstr_free (&gssapi_service_principal_);
     return return_string_;
@@ -567,112 +567,112 @@ JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setGssapiServicePrincipal (JNIEnv *env, jclass c, jlong self, jstring gssapi_service_principal)
 {
     char *gssapi_service_principal_ = (char *) (*env)->GetStringUTFChars (env, gssapi_service_principal, NULL);
-    zsock_set_gssapi_service_principal ((zsock_t *) self, gssapi_service_principal_);
+    zsock_set_gssapi_service_principal ((zsock_t *) (intptr_t) self, gssapi_service_principal_);
     (*env)->ReleaseStringUTFChars (env, gssapi_service_principal, gssapi_service_principal_);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1ipv6 (JNIEnv *env, jclass c, jlong self)
 {
-    jint ipv6_ = (jint) zsock_ipv6 ((zsock_t *) self);
+    jint ipv6_ = (jint) zsock_ipv6 ((zsock_t *) (intptr_t) self);
     return ipv6_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setIpv6 (JNIEnv *env, jclass c, jlong self, jint ipv6)
 {
-    zsock_set_ipv6 ((zsock_t *) self, (int) ipv6);
+    zsock_set_ipv6 ((zsock_t *) (intptr_t) self, (int) ipv6);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1immediate (JNIEnv *env, jclass c, jlong self)
 {
-    jint immediate_ = (jint) zsock_immediate ((zsock_t *) self);
+    jint immediate_ = (jint) zsock_immediate ((zsock_t *) (intptr_t) self);
     return immediate_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setImmediate (JNIEnv *env, jclass c, jlong self, jint immediate)
 {
-    zsock_set_immediate ((zsock_t *) self, (int) immediate);
+    zsock_set_immediate ((zsock_t *) (intptr_t) self, (int) immediate);
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setRouterRaw (JNIEnv *env, jclass c, jlong self, jint router_raw)
 {
-    zsock_set_router_raw ((zsock_t *) self, (int) router_raw);
+    zsock_set_router_raw ((zsock_t *) (intptr_t) self, (int) router_raw);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1ipv4only (JNIEnv *env, jclass c, jlong self)
 {
-    jint ipv4only_ = (jint) zsock_ipv4only ((zsock_t *) self);
+    jint ipv4only_ = (jint) zsock_ipv4only ((zsock_t *) (intptr_t) self);
     return ipv4only_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setIpv4only (JNIEnv *env, jclass c, jlong self, jint ipv4only)
 {
-    zsock_set_ipv4only ((zsock_t *) self, (int) ipv4only);
+    zsock_set_ipv4only ((zsock_t *) (intptr_t) self, (int) ipv4only);
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setDelayAttachOnConnect (JNIEnv *env, jclass c, jlong self, jint delay_attach_on_connect)
 {
-    zsock_set_delay_attach_on_connect ((zsock_t *) self, (int) delay_attach_on_connect);
+    zsock_set_delay_attach_on_connect ((zsock_t *) (intptr_t) self, (int) delay_attach_on_connect);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1type (JNIEnv *env, jclass c, jlong self)
 {
-    jint type_ = (jint) zsock_type ((zsock_t *) self);
+    jint type_ = (jint) zsock_type ((zsock_t *) (intptr_t) self);
     return type_;
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1sndhwm (JNIEnv *env, jclass c, jlong self)
 {
-    jint sndhwm_ = (jint) zsock_sndhwm ((zsock_t *) self);
+    jint sndhwm_ = (jint) zsock_sndhwm ((zsock_t *) (intptr_t) self);
     return sndhwm_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setSndhwm (JNIEnv *env, jclass c, jlong self, jint sndhwm)
 {
-    zsock_set_sndhwm ((zsock_t *) self, (int) sndhwm);
+    zsock_set_sndhwm ((zsock_t *) (intptr_t) self, (int) sndhwm);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1rcvhwm (JNIEnv *env, jclass c, jlong self)
 {
-    jint rcvhwm_ = (jint) zsock_rcvhwm ((zsock_t *) self);
+    jint rcvhwm_ = (jint) zsock_rcvhwm ((zsock_t *) (intptr_t) self);
     return rcvhwm_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setRcvhwm (JNIEnv *env, jclass c, jlong self, jint rcvhwm)
 {
-    zsock_set_rcvhwm ((zsock_t *) self, (int) rcvhwm);
+    zsock_set_rcvhwm ((zsock_t *) (intptr_t) self, (int) rcvhwm);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1affinity (JNIEnv *env, jclass c, jlong self)
 {
-    jint affinity_ = (jint) zsock_affinity ((zsock_t *) self);
+    jint affinity_ = (jint) zsock_affinity ((zsock_t *) (intptr_t) self);
     return affinity_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setAffinity (JNIEnv *env, jclass c, jlong self, jint affinity)
 {
-    zsock_set_affinity ((zsock_t *) self, (int) affinity);
+    zsock_set_affinity ((zsock_t *) (intptr_t) self, (int) affinity);
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setSubscribe (JNIEnv *env, jclass c, jlong self, jstring subscribe)
 {
     char *subscribe_ = (char *) (*env)->GetStringUTFChars (env, subscribe, NULL);
-    zsock_set_subscribe ((zsock_t *) self, subscribe_);
+    zsock_set_subscribe ((zsock_t *) (intptr_t) self, subscribe_);
     (*env)->ReleaseStringUTFChars (env, subscribe, subscribe_);
 }
 
@@ -680,14 +680,14 @@ JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setUnsubscribe (JNIEnv *env, jclass c, jlong self, jstring unsubscribe)
 {
     char *unsubscribe_ = (char *) (*env)->GetStringUTFChars (env, unsubscribe, NULL);
-    zsock_set_unsubscribe ((zsock_t *) self, unsubscribe_);
+    zsock_set_unsubscribe ((zsock_t *) (intptr_t) self, unsubscribe_);
     (*env)->ReleaseStringUTFChars (env, unsubscribe, unsubscribe_);
 }
 
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zsock__1_1identity (JNIEnv *env, jclass c, jlong self)
 {
-    char *identity_ = (char *) zsock_identity ((zsock_t *) self);
+    char *identity_ = (char *) zsock_identity ((zsock_t *) (intptr_t) self);
     jstring return_string_ = (*env)->NewStringUTF (env, identity_);
     zstr_free (&identity_);
     return return_string_;
@@ -697,228 +697,228 @@ JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setIdentity (JNIEnv *env, jclass c, jlong self, jstring identity)
 {
     char *identity_ = (char *) (*env)->GetStringUTFChars (env, identity, NULL);
-    zsock_set_identity ((zsock_t *) self, identity_);
+    zsock_set_identity ((zsock_t *) (intptr_t) self, identity_);
     (*env)->ReleaseStringUTFChars (env, identity, identity_);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1rate (JNIEnv *env, jclass c, jlong self)
 {
-    jint rate_ = (jint) zsock_rate ((zsock_t *) self);
+    jint rate_ = (jint) zsock_rate ((zsock_t *) (intptr_t) self);
     return rate_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setRate (JNIEnv *env, jclass c, jlong self, jint rate)
 {
-    zsock_set_rate ((zsock_t *) self, (int) rate);
+    zsock_set_rate ((zsock_t *) (intptr_t) self, (int) rate);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1recoveryIvl (JNIEnv *env, jclass c, jlong self)
 {
-    jint recovery_ivl_ = (jint) zsock_recovery_ivl ((zsock_t *) self);
+    jint recovery_ivl_ = (jint) zsock_recovery_ivl ((zsock_t *) (intptr_t) self);
     return recovery_ivl_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setRecoveryIvl (JNIEnv *env, jclass c, jlong self, jint recovery_ivl)
 {
-    zsock_set_recovery_ivl ((zsock_t *) self, (int) recovery_ivl);
+    zsock_set_recovery_ivl ((zsock_t *) (intptr_t) self, (int) recovery_ivl);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1sndbuf (JNIEnv *env, jclass c, jlong self)
 {
-    jint sndbuf_ = (jint) zsock_sndbuf ((zsock_t *) self);
+    jint sndbuf_ = (jint) zsock_sndbuf ((zsock_t *) (intptr_t) self);
     return sndbuf_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setSndbuf (JNIEnv *env, jclass c, jlong self, jint sndbuf)
 {
-    zsock_set_sndbuf ((zsock_t *) self, (int) sndbuf);
+    zsock_set_sndbuf ((zsock_t *) (intptr_t) self, (int) sndbuf);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1rcvbuf (JNIEnv *env, jclass c, jlong self)
 {
-    jint rcvbuf_ = (jint) zsock_rcvbuf ((zsock_t *) self);
+    jint rcvbuf_ = (jint) zsock_rcvbuf ((zsock_t *) (intptr_t) self);
     return rcvbuf_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setRcvbuf (JNIEnv *env, jclass c, jlong self, jint rcvbuf)
 {
-    zsock_set_rcvbuf ((zsock_t *) self, (int) rcvbuf);
+    zsock_set_rcvbuf ((zsock_t *) (intptr_t) self, (int) rcvbuf);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1linger (JNIEnv *env, jclass c, jlong self)
 {
-    jint linger_ = (jint) zsock_linger ((zsock_t *) self);
+    jint linger_ = (jint) zsock_linger ((zsock_t *) (intptr_t) self);
     return linger_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setLinger (JNIEnv *env, jclass c, jlong self, jint linger)
 {
-    zsock_set_linger ((zsock_t *) self, (int) linger);
+    zsock_set_linger ((zsock_t *) (intptr_t) self, (int) linger);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1reconnectIvl (JNIEnv *env, jclass c, jlong self)
 {
-    jint reconnect_ivl_ = (jint) zsock_reconnect_ivl ((zsock_t *) self);
+    jint reconnect_ivl_ = (jint) zsock_reconnect_ivl ((zsock_t *) (intptr_t) self);
     return reconnect_ivl_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setReconnectIvl (JNIEnv *env, jclass c, jlong self, jint reconnect_ivl)
 {
-    zsock_set_reconnect_ivl ((zsock_t *) self, (int) reconnect_ivl);
+    zsock_set_reconnect_ivl ((zsock_t *) (intptr_t) self, (int) reconnect_ivl);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1reconnectIvlMax (JNIEnv *env, jclass c, jlong self)
 {
-    jint reconnect_ivl_max_ = (jint) zsock_reconnect_ivl_max ((zsock_t *) self);
+    jint reconnect_ivl_max_ = (jint) zsock_reconnect_ivl_max ((zsock_t *) (intptr_t) self);
     return reconnect_ivl_max_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setReconnectIvlMax (JNIEnv *env, jclass c, jlong self, jint reconnect_ivl_max)
 {
-    zsock_set_reconnect_ivl_max ((zsock_t *) self, (int) reconnect_ivl_max);
+    zsock_set_reconnect_ivl_max ((zsock_t *) (intptr_t) self, (int) reconnect_ivl_max);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1backlog (JNIEnv *env, jclass c, jlong self)
 {
-    jint backlog_ = (jint) zsock_backlog ((zsock_t *) self);
+    jint backlog_ = (jint) zsock_backlog ((zsock_t *) (intptr_t) self);
     return backlog_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setBacklog (JNIEnv *env, jclass c, jlong self, jint backlog)
 {
-    zsock_set_backlog ((zsock_t *) self, (int) backlog);
+    zsock_set_backlog ((zsock_t *) (intptr_t) self, (int) backlog);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1maxmsgsize (JNIEnv *env, jclass c, jlong self)
 {
-    jint maxmsgsize_ = (jint) zsock_maxmsgsize ((zsock_t *) self);
+    jint maxmsgsize_ = (jint) zsock_maxmsgsize ((zsock_t *) (intptr_t) self);
     return maxmsgsize_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setMaxmsgsize (JNIEnv *env, jclass c, jlong self, jint maxmsgsize)
 {
-    zsock_set_maxmsgsize ((zsock_t *) self, (int) maxmsgsize);
+    zsock_set_maxmsgsize ((zsock_t *) (intptr_t) self, (int) maxmsgsize);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1multicastHops (JNIEnv *env, jclass c, jlong self)
 {
-    jint multicast_hops_ = (jint) zsock_multicast_hops ((zsock_t *) self);
+    jint multicast_hops_ = (jint) zsock_multicast_hops ((zsock_t *) (intptr_t) self);
     return multicast_hops_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setMulticastHops (JNIEnv *env, jclass c, jlong self, jint multicast_hops)
 {
-    zsock_set_multicast_hops ((zsock_t *) self, (int) multicast_hops);
+    zsock_set_multicast_hops ((zsock_t *) (intptr_t) self, (int) multicast_hops);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1rcvtimeo (JNIEnv *env, jclass c, jlong self)
 {
-    jint rcvtimeo_ = (jint) zsock_rcvtimeo ((zsock_t *) self);
+    jint rcvtimeo_ = (jint) zsock_rcvtimeo ((zsock_t *) (intptr_t) self);
     return rcvtimeo_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setRcvtimeo (JNIEnv *env, jclass c, jlong self, jint rcvtimeo)
 {
-    zsock_set_rcvtimeo ((zsock_t *) self, (int) rcvtimeo);
+    zsock_set_rcvtimeo ((zsock_t *) (intptr_t) self, (int) rcvtimeo);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1sndtimeo (JNIEnv *env, jclass c, jlong self)
 {
-    jint sndtimeo_ = (jint) zsock_sndtimeo ((zsock_t *) self);
+    jint sndtimeo_ = (jint) zsock_sndtimeo ((zsock_t *) (intptr_t) self);
     return sndtimeo_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setSndtimeo (JNIEnv *env, jclass c, jlong self, jint sndtimeo)
 {
-    zsock_set_sndtimeo ((zsock_t *) self, (int) sndtimeo);
+    zsock_set_sndtimeo ((zsock_t *) (intptr_t) self, (int) sndtimeo);
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setXpubVerbose (JNIEnv *env, jclass c, jlong self, jint xpub_verbose)
 {
-    zsock_set_xpub_verbose ((zsock_t *) self, (int) xpub_verbose);
+    zsock_set_xpub_verbose ((zsock_t *) (intptr_t) self, (int) xpub_verbose);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1tcpKeepalive (JNIEnv *env, jclass c, jlong self)
 {
-    jint tcp_keepalive_ = (jint) zsock_tcp_keepalive ((zsock_t *) self);
+    jint tcp_keepalive_ = (jint) zsock_tcp_keepalive ((zsock_t *) (intptr_t) self);
     return tcp_keepalive_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setTcpKeepalive (JNIEnv *env, jclass c, jlong self, jint tcp_keepalive)
 {
-    zsock_set_tcp_keepalive ((zsock_t *) self, (int) tcp_keepalive);
+    zsock_set_tcp_keepalive ((zsock_t *) (intptr_t) self, (int) tcp_keepalive);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1tcpKeepaliveIdle (JNIEnv *env, jclass c, jlong self)
 {
-    jint tcp_keepalive_idle_ = (jint) zsock_tcp_keepalive_idle ((zsock_t *) self);
+    jint tcp_keepalive_idle_ = (jint) zsock_tcp_keepalive_idle ((zsock_t *) (intptr_t) self);
     return tcp_keepalive_idle_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setTcpKeepaliveIdle (JNIEnv *env, jclass c, jlong self, jint tcp_keepalive_idle)
 {
-    zsock_set_tcp_keepalive_idle ((zsock_t *) self, (int) tcp_keepalive_idle);
+    zsock_set_tcp_keepalive_idle ((zsock_t *) (intptr_t) self, (int) tcp_keepalive_idle);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1tcpKeepaliveCnt (JNIEnv *env, jclass c, jlong self)
 {
-    jint tcp_keepalive_cnt_ = (jint) zsock_tcp_keepalive_cnt ((zsock_t *) self);
+    jint tcp_keepalive_cnt_ = (jint) zsock_tcp_keepalive_cnt ((zsock_t *) (intptr_t) self);
     return tcp_keepalive_cnt_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setTcpKeepaliveCnt (JNIEnv *env, jclass c, jlong self, jint tcp_keepalive_cnt)
 {
-    zsock_set_tcp_keepalive_cnt ((zsock_t *) self, (int) tcp_keepalive_cnt);
+    zsock_set_tcp_keepalive_cnt ((zsock_t *) (intptr_t) self, (int) tcp_keepalive_cnt);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1tcpKeepaliveIntvl (JNIEnv *env, jclass c, jlong self)
 {
-    jint tcp_keepalive_intvl_ = (jint) zsock_tcp_keepalive_intvl ((zsock_t *) self);
+    jint tcp_keepalive_intvl_ = (jint) zsock_tcp_keepalive_intvl ((zsock_t *) (intptr_t) self);
     return tcp_keepalive_intvl_;
 }
 
 JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setTcpKeepaliveIntvl (JNIEnv *env, jclass c, jlong self, jint tcp_keepalive_intvl)
 {
-    zsock_set_tcp_keepalive_intvl ((zsock_t *) self, (int) tcp_keepalive_intvl);
+    zsock_set_tcp_keepalive_intvl ((zsock_t *) (intptr_t) self, (int) tcp_keepalive_intvl);
 }
 
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zsock__1_1tcpAcceptFilter (JNIEnv *env, jclass c, jlong self)
 {
-    char *tcp_accept_filter_ = (char *) zsock_tcp_accept_filter ((zsock_t *) self);
+    char *tcp_accept_filter_ = (char *) zsock_tcp_accept_filter ((zsock_t *) (intptr_t) self);
     jstring return_string_ = (*env)->NewStringUTF (env, tcp_accept_filter_);
     zstr_free (&tcp_accept_filter_);
     return return_string_;
@@ -928,28 +928,28 @@ JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zsock__1_1setTcpAcceptFilter (JNIEnv *env, jclass c, jlong self, jstring tcp_accept_filter)
 {
     char *tcp_accept_filter_ = (char *) (*env)->GetStringUTFChars (env, tcp_accept_filter, NULL);
-    zsock_set_tcp_accept_filter ((zsock_t *) self, tcp_accept_filter_);
+    zsock_set_tcp_accept_filter ((zsock_t *) (intptr_t) self, tcp_accept_filter_);
     (*env)->ReleaseStringUTFChars (env, tcp_accept_filter, tcp_accept_filter_);
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1rcvmore (JNIEnv *env, jclass c, jlong self)
 {
-    jint rcvmore_ = (jint) zsock_rcvmore ((zsock_t *) self);
+    jint rcvmore_ = (jint) zsock_rcvmore ((zsock_t *) (intptr_t) self);
     return rcvmore_;
 }
 
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1events (JNIEnv *env, jclass c, jlong self)
 {
-    jint events_ = (jint) zsock_events ((zsock_t *) self);
+    jint events_ = (jint) zsock_events ((zsock_t *) (intptr_t) self);
     return events_;
 }
 
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zsock__1_1lastEndpoint (JNIEnv *env, jclass c, jlong self)
 {
-    char *last_endpoint_ = (char *) zsock_last_endpoint ((zsock_t *) self);
+    char *last_endpoint_ = (char *) zsock_last_endpoint ((zsock_t *) (intptr_t) self);
     jstring return_string_ = (*env)->NewStringUTF (env, last_endpoint_);
     zstr_free (&last_endpoint_);
     return return_string_;
