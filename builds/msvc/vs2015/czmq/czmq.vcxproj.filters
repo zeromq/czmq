@@ -79,6 +79,9 @@
     <ClCompile Include="..\..\..\..\src\zpoller.c">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\zproc.c">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zproxy.c">
       <Filter>src</Filter>
     </ClCompile>

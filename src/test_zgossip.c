@@ -1,4 +1,4 @@
-#include "../include/czmq.h"
+#include "czmq_classes.h"
 
 void
 assert_status (zactor_t *actor, int count)

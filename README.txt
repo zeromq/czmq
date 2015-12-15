@@ -153,6 +153,7 @@ This is the API provided by CZMQ v3.x, in alphabetical order.
 .pull doc/zmonitor.doc
 .pull doc/zmsg.doc
 .pull doc/zpoller.doc
+.pull doc/zproc.doc
 .pull doc/zproxy.doc
 .pull doc/zrex.doc
 .pull doc/zsock.doc

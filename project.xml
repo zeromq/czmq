@@ -33,6 +33,7 @@
     <class name = "zmonitor" />
     <class name = "zmsg" />
     <class name = "zpoller" />
+    <class name = "zproc" />
     <class name = "zproxy" />
     <class name = "zrex" />
     <class name = "zsock" />

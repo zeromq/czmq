@@ -54,6 +54,7 @@ HEADERS += \
   $$SRCDIR/QmlZloop.h \
   $$SRCDIR/QmlZmsg.h \
   $$SRCDIR/QmlZpoller.h \
+  $$SRCDIR/QmlZproc.h \
   $$SRCDIR/QmlZsock.h \
   $$SRCDIR/QmlZstr.h \
   $$SRCDIR/QmlZtrie.h \
@@ -76,6 +77,7 @@ SOURCES += \
   $$SRCDIR/QmlZloop.cpp \
   $$SRCDIR/QmlZmsg.cpp \
   $$SRCDIR/QmlZpoller.cpp \
+  $$SRCDIR/QmlZproc.cpp \
   $$SRCDIR/QmlZsock.cpp \
   $$SRCDIR/QmlZstr.cpp \
   $$SRCDIR/QmlZtrie.cpp \

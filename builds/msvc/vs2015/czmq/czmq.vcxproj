@@ -163,6 +163,9 @@
     <ClCompile Include="..\..\..\..\src\zpoller.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\zproc.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\src\zproxy.c">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>

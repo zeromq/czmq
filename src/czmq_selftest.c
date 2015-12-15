@@ -68,6 +68,7 @@ test_item_t all_tests [] = {
     DECLARE_TEST(zmonitor_test),
     DECLARE_TEST(zmsg_test),
     DECLARE_TEST(zpoller_test),
+    DECLARE_TEST(zproc_test),
     DECLARE_TEST(zproxy_test),
     DECLARE_TEST(zrex_test),
     DECLARE_TEST(zsock_test),

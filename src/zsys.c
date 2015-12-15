@@ -21,7 +21,7 @@
 */
 
 #include "platform.h"
-#include "czmq_classes.h"
+#include "../include/czmq.h"
 
 //  --------------------------------------------------------------------------
 //  Signal handling

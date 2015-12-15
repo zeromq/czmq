@@ -97,6 +97,8 @@ typedef struct _zmsg_t zmsg_t;
 #define ZMSG_T_DEFINED
 typedef struct _zpoller_t zpoller_t;
 #define ZPOLLER_T_DEFINED
+typedef struct _zproc_t zproc_t;
+#define ZPROC_T_DEFINED
 typedef struct _zproxy_t zproxy_t;
 #define ZPROXY_T_DEFINED
 typedef struct _zrex_t zrex_t;
@@ -156,6 +158,7 @@ typedef struct _zthread_t zthread_t;
 #include "zmonitor.h"
 #include "zmsg.h"
 #include "zpoller.h"
+#include "zproc.h"
 #include "zproxy.h"
 #include "zrex.h"
 #include "zsock.h"

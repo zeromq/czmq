@@ -128,6 +128,7 @@ set (czmq_headers
     include/zmonitor.h
     include/zmsg.h
     include/zpoller.h
+    include/zproc.h
     include/zproxy.h
     include/zrex.h
     include/zsock.h
@@ -187,6 +188,7 @@ set (czmq_sources
     src/zmonitor.c
     src/zmsg.c
     src/zpoller.c
+    src/zproc.c
     src/zproxy.c
     src/zrex.c
     src/zsock.c
@@ -273,6 +275,7 @@ set(TEST_CLASSES
   zmonitor_test
   zmsg_test
   zpoller_test
+  zproc_test
   zproxy_test
   zrex_test
   zsock_test
