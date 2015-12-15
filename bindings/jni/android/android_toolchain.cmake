@@ -1,24 +1,32 @@
+#   CMake toolchain script
+#
+#   Targets Android 8, ARM
+#   Called from build.sh via cmake
+
 set (CMAKE_SYSTEM_NAME Linux)  # Tell CMake we're cross-compiling
-set (ANDROID_NDK_ROOT $ENV{ANDROID_NDK_ROOT})
+set (ANDROID True)
+set (BUILD_ANDROID True)
+
 include (CMakeForceCompiler)
 
 # where is the target environment
-set (ANDROID_TOOLCHAIN_ROOT ${ANDROID_NDK_ROOT}/toolchains/$ENV{TOOLCHAIN_NAME}/prebuilt/linux-x86_64)
-set (ANDROID_TOOLCHAIN_MACHINE_NAME $ENV{TOOLCHAIN_HOST})
+set (ANDROID_NDK_ROOT $ENV{ANDROID_NDK_ROOT})
+set (ANDROID_SYS_ROOT $ENV{ANDROID_SYS_ROOT})
+set (ANDROID_API_LEVEL $ENV{ANDROID_API_LEVEL})
+set (TOOLCHAIN_PATH $ENV{TOOLCHAIN_PATH})
+set (TOOLCHAIN_HOST $ENV{TOOLCHAIN_HOST})
+set (TOOLCHAIN_ARCH $ENV{TOOLCHAIN_ARCH})
 
 # api level see doc https://github.com/taka-no-me/android-cmake
-set (ANDROID_NATIVE_API_LEVEL android-8)
-set (ANDROID_ARCH_NAME arm)
-set (ANDROID_SYSROOT "${ANDROID_NDK_ROOT}/platforms/android-${ANDROID_NATIVE_API_LEVEL}/arch-${ANDROID_ARCH_NAME}" )
 set (CMAKE_INSTALL_PREFIX /tmp)
-set (CMAKE_FIND_ROOT_PATH "${ANDROID_TOOLCHAIN_ROOT}/bin" "${ANDROID_TOOLCHAIN_ROOT}/${ANDROID_TOOLCHAIN_MACHINE_NAME}" "${ANDROID_SYSROOT}" "${CMAKE_INSTALL_PREFIX}" "${CMAKE_INSTALL_PREFIX}/share")
+set (CMAKE_FIND_ROOT_PATH
+    "${TOOLCHAIN_PATH}"
+    "${CMAKE_INSTALL_PREFIX}"
+    "${CMAKE_INSTALL_PREFIX}/share")
 
 # Prefix detection only works with compiler id "GNU"
 # CMake will look for prefixed g++, cpp, ld, etc. automatically
-CMAKE_FORCE_C_COMPILER (${ANDROID_TOOLCHAIN_ROOT}/bin/arm-linux-androideabi-gcc GNU)
-cmake_policy (SET CMP0015 NEW)
-set (ANDROID True)
-set (BUILD_ANDROID True)
+CMAKE_FORCE_C_COMPILER (${TOOLCHAIN_PATH}/arm-linux-androideabi-gcc GNU)
 
 #   Find location of ZeroMQ header file
 include (FindPkgConfig)
@@ -32,14 +40,16 @@ if (PC_ZEROMQ_FOUND)
 endif (PC_ZEROMQ_FOUND)
 find_path (ZEROMQ_INCLUDE_DIR NAMES zmq.h HINTS ${PC_ZEROMQ_INCLUDE_HINTS})
 
+cmake_policy (SET CMP0015 NEW)   #  Use relative paths in link_directories
+
 include_directories (
     ${ZEROMQ_INCLUDE_DIR}
     ../../../include
     ../../../bindings/jni/src/native/include
     ../../../builds/android/prefix/arm-linux-androideabi-4.9/include
-    ${ANDROID_NDK_ROOT}/platforms/android-8/arch-arm/usr/include
+    ${ANDROID_SYS_ROOT}/usr/include
 )
 link_directories (
     ../../../builds/android/prefix/arm-linux-androideabi-4.9/lib
-    ${ANDROID_NDK_ROOT}/platforms/android-8/arch-arm/usr/lib
+    ${ANDROID_SYS_ROOT}/usr/lib
 )

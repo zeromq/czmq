@@ -1,4 +1,20 @@
 #!/bin/bash
+#   Build JNI interface for Android
+#   Targets Android API level 8, ARM architecture (see below)
+#
+#   Requires these environment variables be set, e.g.:
+#
+#     ANDROID_NDK_ROOT=$HOME/android-ndk-r10e
+#     TOOLCHAIN_NAME=arm-linux-androideabi-4.9
+#     TOOLCHAIN_HOST=arm-linux-androideabi
+#     TOOLCHAIN_ARCH=arm
+#     TOOLCHAIN_PATH=$ANDROID_NDK_ROOT/toolchains/$TOOLCHAIN_NAME/prebuilt/linux-x86_64/bin
+#
+export ANDROID_API_LEVEL=android-8
+export ANDROID_SYSROOT=$ANDROID_NDK_ROOT/platforms/$ANDROID_API_LEVEL/arch-$TOOLCHAIN_ARCH
+if [ "$1" = "-d" ]; then
+    MAKE_OPTIONS=VERBOSE=1
+fi
 
 source ../../../builds/android/android_build_helper.sh
 android_build_env
@@ -8,8 +24,8 @@ echo "********  Building Android native libraries"
 ( cd ../../../builds/android && ./build.sh )
 
 #   Ensure we've built JNI interface
-echo "********  Building JNI interface & classes"
-( cd .. && gradle build jar )
+# echo "********  Building JNI interface & classes"
+# ( cd .. && gradle build jar )
 
 rm -Rf build
 mkdir build
@@ -18,11 +34,11 @@ cmake -v -DCMAKE_TOOLCHAIN_FILE=../android_toolchain.cmake ..
 
 #   CMake wrongly searches current directory and then toolchain path instead
 #   of lib path for these files, so make them available temporarily
-ln -s $ANDROID_NDK_ROOT/platforms/android-8/arch-arm/usr/lib/crtend_so.o
-ln -s $ANDROID_NDK_ROOT/platforms/android-8/arch-arm/usr/lib/crtbegin_so.o
+ln -s $ANDROID_SYSROOT/usr/lib/crtend_so.o
+ln -s $ANDROID_SYSROOT/usr/lib/crtbegin_so.o
 
 echo "********  Building JNI for Android"
-make #VERBOSE=1
+make $MAKE_OPTIONS
 rm crtend_so.o crtbegin_so.o
 cd ..
 
