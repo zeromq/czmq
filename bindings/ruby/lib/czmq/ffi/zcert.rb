@@ -160,6 +160,17 @@ module CZMQ
         result
       end
 
+      # Unset certificate metadata.
+      #
+      # @param name [String, #to_s, nil]
+      # @return [void]
+      def unset_meta(name)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zcert_unset_meta(self_p, name)
+        result
+      end
+
       # Get metadata value from certificate; if the metadata value doesn't
       # exist, returns NULL.                                              
       #
