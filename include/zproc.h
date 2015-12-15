@@ -72,47 +72,6 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zproc_set_max_sockets (size_t max_sockets);
 
-//  Return maximum number of ZeroMQ sockets that the system will support.
-CZMQ_EXPORT size_t
-    zproc_max_sockets (void);
-
-//  Configure the default linger timeout in msecs for new zsock instances. 
-//  You can also set this separately on each zsock_t instance. The default 
-//  linger time is zero, i.e. any pending messages will be dropped. If the 
-//  environment variable ZSYS_LINGER is defined, that provides the default.
-//  Note that process exit will typically be delayed by the linger time.   
-CZMQ_EXPORT void
-    zproc_set_linger (size_t linger);
-
-//  Configure the default outgoing pipe limit (HWM) for new zsock instances.
-//  You can also set this separately on each zsock_t instance. The default  
-//  HWM is 1,000, on all versions of ZeroMQ. If the environment variable    
-//  ZSYS_SNDHWM is defined, that provides the default. Note that a value of 
-//  zero means no limit, i.e. infinite memory consumption.                  
-CZMQ_EXPORT void
-    zproc_set_sndhwm (size_t sndhwm);
-
-//  Configure the default incoming pipe limit (HWM) for new zsock instances.
-//  You can also set this separately on each zsock_t instance. The default  
-//  HWM is 1,000, on all versions of ZeroMQ. If the environment variable    
-//  ZSYS_RCVHWM is defined, that provides the default. Note that a value of 
-//  zero means no limit, i.e. infinite memory consumption.                  
-CZMQ_EXPORT void
-    zproc_set_rcvhwm (size_t rcvhwm);
-
-//  Configure use of IPv6 for new zsock instances. By default sockets accept   
-//  and make only IPv4 connections. When you enable IPv6, sockets will accept  
-//  and connect to both IPv4 and IPv6 peers. You can override the setting on   
-//  each zsock_t instance. The default is IPv4 only (ipv6 set to false). If the
-//  environment variable ZSYS_IPV6 is defined (as 1 or 0), this provides the   
-//  default. Note: has no effect on ZMQ v2.                                    
-CZMQ_EXPORT void
-    zproc_set_ipv6 (bool ipv6);
-
-//  Return use of IPv6 for zsock instances.
-CZMQ_EXPORT bool
-    zproc_ipv6 (void);
-
 //  Set network interface name to use for broadcasts, particularly zbeacon.    
 //  This lets the interface be configured for test environments where required.
 //  For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is  
@@ -120,17 +79,17 @@ CZMQ_EXPORT bool
 //  variable ZSYS_INTERFACE is set, use that as the default interface name.    
 //  Setting the interface to "*" means "use all available interfaces".         
 CZMQ_EXPORT void
-    zproc_set_interface (const char *value);
+    zproc_set_biface (const char *value);
 
 //  Return network interface to use for broadcasts, or "" if none was set.
 CZMQ_EXPORT const char *
-    zproc_interface (void);
+    zproc_biface (void);
 
 //  Set log identity, which is a string that prefixes all log messages sent
 //  by this process. The log identity defaults to the environment variable 
 //  ZSYS_LOGIDENT, if that is set.                                         
 CZMQ_EXPORT void
-    zproc_log_set_ident (const char *value);
+    zproc_set_log_ident (const char *value);
 
 //  Sends log output to a PUB socket bound to the specified endpoint. To   
 //  collect such log output, create a SUB socket, subscribe to the traffic 
@@ -140,12 +99,12 @@ CZMQ_EXPORT void
 //  bind the same sender to multiple endpoints. To disable the sender, call
 //  this method with a null argument.                                      
 CZMQ_EXPORT void
-    zproc_log_set_sender (const char *endpoint);
+    zproc_set_log_sender (const char *endpoint);
 
 //  Enable or disable logging to the system facility (syslog on POSIX boxes,
 //  event log on Windows). By default this is disabled.                     
 CZMQ_EXPORT void
-    zproc_log_set_system (bool logsystem);
+    zproc_set_log_system (bool logsystem);
 
 //  Log error condition - highest priority
 CZMQ_EXPORT void

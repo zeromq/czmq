@@ -84,6 +84,14 @@ void QZcert::setMeta (const QString &name, const QString &param)
 }
 
 ///
+//  Unset certificate metadata.
+void QZcert::unsetMeta (const QString &name)
+{
+    zcert_unset_meta (self, name.toUtf8().data());
+    
+}
+
+///
 //  Get metadata value from certificate; if the metadata value doesn't
 //  exist, returns NULL.                                              
 const QString QZcert::meta (const QString &name)

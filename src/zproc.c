@@ -121,7 +121,7 @@ zproc_set_max_sockets (size_t max_sockets)
 //  Setting the interface to "*" means "use all available interfaces".         
 
 void
-zproc_set_interface (const char *value)
+zproc_set_biface (const char *value)
 {
     zsys_set_interface (value);
 }
@@ -131,7 +131,7 @@ zproc_set_interface (const char *value)
 //  Return network interface to use for broadcasts, or "" if none was set.
 
 const char *
-zproc_interface (void)
+zproc_biface (void)
 {
     return zsys_interface ();
 }

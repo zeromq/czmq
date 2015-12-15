@@ -68,7 +68,7 @@
         <argument name = "max_sockets" type = "size" />
     </method>
 
-    <method name = "set interface" singleton = "1">
+    <method name = "set biface" singleton = "1">
         Set network interface name to use for broadcasts, particularly zbeacon.
         This lets the interface be configured for test environments where required.
         For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is
@@ -78,7 +78,7 @@
         <argument name = "value" type = "string" />
     </method>
 
-    <method name = "interface" singleton = "1">
+    <method name = "biface" singleton = "1">
         Return network interface to use for broadcasts, or "" if none was set.
         <return type = "string" />
     </method>

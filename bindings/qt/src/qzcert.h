@@ -44,6 +44,9 @@ public:
     //  Set certificate metadata from formatted string.
     void setMeta (const QString &name, const QString &param);
 
+    //  Unset certificate metadata.
+    void unsetMeta (const QString &name);
+
     //  Get metadata value from certificate; if the metadata value doesn't
     //  exist, returns NULL.                                              
     const QString meta (const QString &name);

@@ -411,17 +411,11 @@ module CZMQ
       attach_function :zproc_run_as, [:string, :string, :string], :void, **opts
       attach_function :zproc_set_io_threads, [:size_t], :void, **opts
       attach_function :zproc_set_max_sockets, [:size_t], :void, **opts
-      attach_function :zproc_max_sockets, [], :size_t, **opts
-      attach_function :zproc_set_linger, [:size_t], :void, **opts
-      attach_function :zproc_set_sndhwm, [:size_t], :void, **opts
-      attach_function :zproc_set_rcvhwm, [:size_t], :void, **opts
-      attach_function :zproc_set_ipv6, [:bool], :void, **opts
-      attach_function :zproc_ipv6, [], :bool, **opts
-      attach_function :zproc_set_interface, [:string], :void, **opts
-      attach_function :zproc_interface, [], :string, **opts
-      attach_function :zproc_log_set_ident, [:string], :void, **opts
-      attach_function :zproc_log_set_sender, [:string], :void, **opts
-      attach_function :zproc_log_set_system, [:bool], :void, **opts
+      attach_function :zproc_set_biface, [:string], :void, **opts
+      attach_function :zproc_biface, [], :string, **opts
+      attach_function :zproc_set_log_ident, [:string], :void, **opts
+      attach_function :zproc_set_log_sender, [:string], :void, **opts
+      attach_function :zproc_set_log_system, [:bool], :void, **opts
       attach_function :zproc_log_error, [:string, :varargs], :void, **opts
       attach_function :zproc_log_warning, [:string, :varargs], :void, **opts
       attach_function :zproc_log_notice, [:string, :varargs], :void, **opts

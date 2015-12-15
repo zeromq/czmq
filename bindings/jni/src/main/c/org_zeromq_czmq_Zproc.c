@@ -65,80 +65,42 @@ Java_org_zeromq_czmq_Zproc__1_1setMaxSockets (JNIEnv *env, jclass c, jlong max_s
     zproc_set_max_sockets ((size_t) max_sockets);
 }
 
-JNIEXPORT jlong JNICALL
-Java_org_zeromq_czmq_Zproc__1_1maxSockets (JNIEnv *env, jclass c)
-{
-    jlong max_sockets_ = (jlong) zproc_max_sockets ();
-    return max_sockets_;
-}
-
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zproc__1_1setLinger (JNIEnv *env, jclass c, jlong linger)
-{
-    zproc_set_linger ((size_t) linger);
-}
-
-JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zproc__1_1setSndhwm (JNIEnv *env, jclass c, jlong sndhwm)
-{
-    zproc_set_sndhwm ((size_t) sndhwm);
-}
-
-JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zproc__1_1setRcvhwm (JNIEnv *env, jclass c, jlong rcvhwm)
-{
-    zproc_set_rcvhwm ((size_t) rcvhwm);
-}
-
-JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zproc__1_1setIpv6 (JNIEnv *env, jclass c, jboolean ipv6)
-{
-    zproc_set_ipv6 ((bool) ipv6);
-}
-
-JNIEXPORT jboolean JNICALL
-Java_org_zeromq_czmq_Zproc__1_1ipv6 (JNIEnv *env, jclass c)
-{
-    jboolean ipv6_ = (jboolean) zproc_ipv6 ();
-    return ipv6_;
-}
-
-JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zproc__1_1setInterface (JNIEnv *env, jclass c, jstring value)
+Java_org_zeromq_czmq_Zproc__1_1setBiface (JNIEnv *env, jclass c, jstring value)
 {
     char *value_ = (char *) (*env)->GetStringUTFChars (env, value, NULL);
-    zproc_set_interface (value_);
+    zproc_set_biface (value_);
     (*env)->ReleaseStringUTFChars (env, value, value_);
 }
 
 JNIEXPORT jstring JNICALL
-Java_org_zeromq_czmq_Zproc__1_1interface (JNIEnv *env, jclass c)
+Java_org_zeromq_czmq_Zproc__1_1biface (JNIEnv *env, jclass c)
 {
-    char *interface_ = (char *) zproc_interface ();
-    jstring return_string_ = (*env)->NewStringUTF (env, interface_);
+    char *biface_ = (char *) zproc_biface ();
+    jstring return_string_ = (*env)->NewStringUTF (env, biface_);
     return return_string_;
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zproc__1_1logSetIdent (JNIEnv *env, jclass c, jstring value)
+Java_org_zeromq_czmq_Zproc__1_1setLogIdent (JNIEnv *env, jclass c, jstring value)
 {
     char *value_ = (char *) (*env)->GetStringUTFChars (env, value, NULL);
-    zproc_log_set_ident (value_);
+    zproc_set_log_ident (value_);
     (*env)->ReleaseStringUTFChars (env, value, value_);
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zproc__1_1logSetSender (JNIEnv *env, jclass c, jstring endpoint)
+Java_org_zeromq_czmq_Zproc__1_1setLogSender (JNIEnv *env, jclass c, jstring endpoint)
 {
     char *endpoint_ = (char *) (*env)->GetStringUTFChars (env, endpoint, NULL);
-    zproc_log_set_sender (endpoint_);
+    zproc_set_log_sender (endpoint_);
     (*env)->ReleaseStringUTFChars (env, endpoint, endpoint_);
 }
 
 JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zproc__1_1logSetSystem (JNIEnv *env, jclass c, jboolean logsystem)
+Java_org_zeromq_czmq_Zproc__1_1setLogSystem (JNIEnv *env, jclass c, jboolean logsystem)
 {
-    zproc_log_set_system ((bool) logsystem);
+    zproc_set_log_system ((bool) logsystem);
 }
 
 JNIEXPORT void JNICALL

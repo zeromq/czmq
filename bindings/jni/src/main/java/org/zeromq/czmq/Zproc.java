@@ -87,65 +87,6 @@ public class Zproc {
         __setMaxSockets (maxSockets);
     }
     /*
-    Return maximum number of ZeroMQ sockets that the system will support.
-    */
-    native static long __maxSockets ();
-    public long maxSockets () {
-        return __maxSockets ();
-    }
-    /*
-    Configure the default linger timeout in msecs for new zsock instances. 
-    You can also set this separately on each zsock_t instance. The default 
-    linger time is zero, i.e. any pending messages will be dropped. If the 
-    environment variable ZSYS_LINGER is defined, that provides the default.
-    Note that process exit will typically be delayed by the linger time.   
-    */
-    native static void __setLinger (long linger);
-    public void setLinger (long linger) {
-        __setLinger (linger);
-    }
-    /*
-    Configure the default outgoing pipe limit (HWM) for new zsock instances.
-    You can also set this separately on each zsock_t instance. The default  
-    HWM is 1,000, on all versions of ZeroMQ. If the environment variable    
-    ZSYS_SNDHWM is defined, that provides the default. Note that a value of 
-    zero means no limit, i.e. infinite memory consumption.                  
-    */
-    native static void __setSndhwm (long sndhwm);
-    public void setSndhwm (long sndhwm) {
-        __setSndhwm (sndhwm);
-    }
-    /*
-    Configure the default incoming pipe limit (HWM) for new zsock instances.
-    You can also set this separately on each zsock_t instance. The default  
-    HWM is 1,000, on all versions of ZeroMQ. If the environment variable    
-    ZSYS_RCVHWM is defined, that provides the default. Note that a value of 
-    zero means no limit, i.e. infinite memory consumption.                  
-    */
-    native static void __setRcvhwm (long rcvhwm);
-    public void setRcvhwm (long rcvhwm) {
-        __setRcvhwm (rcvhwm);
-    }
-    /*
-    Configure use of IPv6 for new zsock instances. By default sockets accept   
-    and make only IPv4 connections. When you enable IPv6, sockets will accept  
-    and connect to both IPv4 and IPv6 peers. You can override the setting on   
-    each zsock_t instance. The default is IPv4 only (ipv6 set to false). If the
-    environment variable ZSYS_IPV6 is defined (as 1 or 0), this provides the   
-    default. Note: has no effect on ZMQ v2.                                    
-    */
-    native static void __setIpv6 (boolean ipv6);
-    public void setIpv6 (boolean ipv6) {
-        __setIpv6 (ipv6);
-    }
-    /*
-    Return use of IPv6 for zsock instances.
-    */
-    native static boolean __ipv6 ();
-    public boolean ipv6 () {
-        return __ipv6 ();
-    }
-    /*
     Set network interface name to use for broadcasts, particularly zbeacon.    
     This lets the interface be configured for test environments where required.
     For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is  
@@ -153,25 +94,25 @@ public class Zproc {
     variable ZSYS_INTERFACE is set, use that as the default interface name.    
     Setting the interface to "*" means "use all available interfaces".         
     */
-    native static void __setInterface (String value);
-    public void setInterface (String value) {
-        __setInterface (value);
+    native static void __setBiface (String value);
+    public void setBiface (String value) {
+        __setBiface (value);
     }
     /*
     Return network interface to use for broadcasts, or "" if none was set.
     */
-    native static String __interface ();
-    public String interface () {
-        return __interface ();
+    native static String __biface ();
+    public String biface () {
+        return __biface ();
     }
     /*
     Set log identity, which is a string that prefixes all log messages sent
     by this process. The log identity defaults to the environment variable 
     ZSYS_LOGIDENT, if that is set.                                         
     */
-    native static void __logSetIdent (String value);
-    public void logSetIdent (String value) {
-        __logSetIdent (value);
+    native static void __setLogIdent (String value);
+    public void setLogIdent (String value) {
+        __setLogIdent (value);
     }
     /*
     Sends log output to a PUB socket bound to the specified endpoint. To   
@@ -182,17 +123,17 @@ public class Zproc {
     bind the same sender to multiple endpoints. To disable the sender, call
     this method with a null argument.                                      
     */
-    native static void __logSetSender (String endpoint);
-    public void logSetSender (String endpoint) {
-        __logSetSender (endpoint);
+    native static void __setLogSender (String endpoint);
+    public void setLogSender (String endpoint) {
+        __setLogSender (endpoint);
     }
     /*
     Enable or disable logging to the system facility (syslog on POSIX boxes,
     event log on Windows). By default this is disabled.                     
     */
-    native static void __logSetSystem (boolean logsystem);
-    public void logSetSystem (boolean logsystem) {
-        __logSetSystem (logsystem);
+    native static void __setLogSystem (boolean logsystem);
+    public void setLogSystem (boolean logsystem) {
+        __setLogSystem (logsystem);
     }
     /*
     Log error condition - highest priority
