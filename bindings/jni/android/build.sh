@@ -11,7 +11,7 @@
 #     TOOLCHAIN_PATH=$ANDROID_NDK_ROOT/toolchains/$TOOLCHAIN_NAME/prebuilt/linux-x86_64/bin
 #
 export ANDROID_API_LEVEL=android-8
-export ANDROID_SYSROOT=$ANDROID_NDK_ROOT/platforms/$ANDROID_API_LEVEL/arch-$TOOLCHAIN_ARCH
+export ANDROID_SYS_ROOT=$ANDROID_NDK_ROOT/platforms/$ANDROID_API_LEVEL/arch-$TOOLCHAIN_ARCH
 if [ "$1" = "-d" ]; then
     MAKE_OPTIONS=VERBOSE=1
 fi
@@ -34,8 +34,8 @@ cmake -v -DCMAKE_TOOLCHAIN_FILE=../android_toolchain.cmake ..
 
 #   CMake wrongly searches current directory and then toolchain path instead
 #   of lib path for these files, so make them available temporarily
-ln -s $ANDROID_SYSROOT/usr/lib/crtend_so.o
-ln -s $ANDROID_SYSROOT/usr/lib/crtbegin_so.o
+ln -s $ANDROID_SYS_ROOT/usr/lib/crtend_so.o
+ln -s $ANDROID_SYS_ROOT/usr/lib/crtbegin_so.o
 
 echo "********  Building JNI for Android"
 make $MAKE_OPTIONS
