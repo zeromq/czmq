@@ -87,6 +87,7 @@ module CZMQ
       attach_function :zcert_public_txt, [:pointer], :pointer, **opts
       attach_function :zcert_secret_txt, [:pointer], :pointer, **opts
       attach_function :zcert_set_meta, [:pointer, :string, :string, :varargs], :void, **opts
+      attach_function :zcert_unset_meta, [:pointer, :string], :void, **opts
       attach_function :zcert_meta, [:pointer, :string], :pointer, **opts
       attach_function :zcert_meta_keys, [:pointer], :pointer, **opts
       attach_function :zcert_save, [:pointer, :string], :int, **opts
