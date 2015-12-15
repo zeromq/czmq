@@ -23,7 +23,7 @@
 
 #define ZSOCK_NOCHECK // we are defining the methods here, so don't redirect symbols.
 
-#include "../include/czmq.h"
+#include "czmq_classes.h"
 #include "zsock_option.inc"
 
 //  zsock_t instances always have this tag as the first 4 octets of

@@ -24,7 +24,7 @@
 */
 
 #include "platform.h"
-#include "../include/czmq.h"
+#include "czmq_classes.h"
 #include "foreign/sha1/sha1.inc_c"
 
 

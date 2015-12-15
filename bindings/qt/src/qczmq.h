@@ -44,6 +44,7 @@ class QZlist;
 class QZloop;
 class QZmsg;
 class QZpoller;
+class QZproc;
 class QZsock;
 class QZstr;
 class QZtrie;
@@ -66,6 +67,7 @@ class QZuuid;
 #include "qzloop.h"
 #include "qzmsg.h"
 #include "qzpoller.h"
+#include "qzproc.h"
 #include "qzsock.h"
 #include "qzstr.h"
 #include "qztrie.h"

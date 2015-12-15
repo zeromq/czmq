@@ -39,6 +39,7 @@ include_HEADERS = \
     include/zmonitor.h \
     include/zmsg.h \
     include/zpoller.h \
+    include/zproc.h \
     include/zproxy.h \
     include/zrex.h \
     include/zsock.h \
@@ -82,6 +83,7 @@ src_libczmq_la_SOURCES = \
     src/zmonitor.c \
     src/zmsg.c \
     src/zpoller.c \
+    src/zproc.c \
     src/zproxy.c \
     src/zrex.c \
     src/zsock.c \
@@ -173,6 +175,7 @@ dist_api_DATA = \
     api/zloop.xml \
     api/zmsg.xml \
     api/zpoller.xml \
+    api/zproc.xml \
     api/zsock_option.xml \
     api/zsock.xml \
     api/zstr.xml \

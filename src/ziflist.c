@@ -23,7 +23,7 @@
 */
 
 #include "platform.h"
-#include "../include/czmq.h"
+#include "czmq_classes.h"
 
 //  Structure of an interface
 typedef struct {

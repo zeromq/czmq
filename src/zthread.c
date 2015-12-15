@@ -54,7 +54,7 @@
 @end
 */
 
-#include "../include/czmq.h"
+#include "czmq_classes.h"
 
 //  --------------------------------------------------------------------------
 //  Thread creation code, wrapping POSIX and Win32 thread APIs

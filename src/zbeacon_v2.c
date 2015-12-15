@@ -31,7 +31,7 @@
 */
 
 #include "platform.h"
-#include "../include/czmq.h"
+#include "czmq_classes.h"
 
 //  Constants
 #define INTERVAL_DFLT  1000         //  Default interval = 1 second

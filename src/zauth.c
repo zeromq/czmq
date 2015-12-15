@@ -22,7 +22,7 @@
 @end
 */
 
-#include "../include/czmq.h"
+#include "czmq_classes.h"
 #define ZAP_ENDPOINT  "inproc://zeromq.zap.01"
 
 //  --------------------------------------------------------------------------

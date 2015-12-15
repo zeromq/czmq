@@ -21,7 +21,7 @@
 @end
 */
 
-#include "../include/czmq.h"
+#include "czmq_classes.h"
 
 typedef struct _s_reader_t s_reader_t;
 typedef struct _s_poller_t s_poller_t;

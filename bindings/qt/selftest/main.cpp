@@ -33,6 +33,7 @@ int main(int argc, char **argv)
     QZloop::test (verbose);
     QZmsg::test (verbose);
     QZpoller::test (verbose);
+    QZproc::test (verbose);
     QZsock::test (verbose);
     QZstr::test (verbose);
     QZtrie::test (verbose);

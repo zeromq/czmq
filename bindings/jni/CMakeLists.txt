@@ -25,6 +25,7 @@ set (czmqjni_sources
     src/main/c/org_zeromq_czmq_Zloop.c
     src/main/c/org_zeromq_czmq_Zmsg.c
     src/main/c/org_zeromq_czmq_Zpoller.c
+    src/main/c/org_zeromq_czmq_Zproc.c
     src/main/c/org_zeromq_czmq_Zsock.c
     src/main/c/org_zeromq_czmq_Zstr.c
     src/main/c/org_zeromq_czmq_Ztrie.c

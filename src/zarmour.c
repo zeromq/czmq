@@ -36,7 +36,7 @@
 @end
 */
 
-#include "../include/czmq.h"
+#include "czmq_classes.h"
 
 #if (ZMQ_VERSION >= ZMQ_MAKE_VERSION (3, 3, 0))
 #   define _INCLUDE_Z85

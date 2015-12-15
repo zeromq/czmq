@@ -27,6 +27,7 @@ qczmq-uselib:!qczmq-buildlib {
                      $$PWD/qzloop.h \
                      $$PWD/qzmsg.h \
                      $$PWD/qzpoller.h \
+                     $$PWD/qzproc.h \
                      $$PWD/qzsock.h \
                      $$PWD/qzstr.h \
                      $$PWD/qztrie.h \
@@ -49,6 +50,7 @@ qczmq-uselib:!qczmq-buildlib {
                      $$PWD/qzloop.cpp \
                      $$PWD/qzmsg.cpp \
                      $$PWD/qzpoller.cpp \
+                     $$PWD/qzproc.cpp \
                      $$PWD/qzsock.cpp \
                      $$PWD/qzstr.cpp \
                      $$PWD/qztrie.cpp \

@@ -404,6 +404,33 @@ module CZMQ
 
       require_relative 'ffi/zpoller'
 
+      attach_function :zproc_czmq_version, [], :int, **opts
+      attach_function :zproc_interrupted, [], :bool, **opts
+      attach_function :zproc_hostname, [], :pointer, **opts
+      attach_function :zproc_daemonize, [:string], :void, **opts
+      attach_function :zproc_run_as, [:string, :string, :string], :void, **opts
+      attach_function :zproc_set_io_threads, [:size_t], :void, **opts
+      attach_function :zproc_set_max_sockets, [:size_t], :void, **opts
+      attach_function :zproc_max_sockets, [], :size_t, **opts
+      attach_function :zproc_set_linger, [:size_t], :void, **opts
+      attach_function :zproc_set_sndhwm, [:size_t], :void, **opts
+      attach_function :zproc_set_rcvhwm, [:size_t], :void, **opts
+      attach_function :zproc_set_ipv6, [:bool], :void, **opts
+      attach_function :zproc_ipv6, [], :bool, **opts
+      attach_function :zproc_set_interface, [:string], :void, **opts
+      attach_function :zproc_interface, [], :string, **opts
+      attach_function :zproc_log_set_ident, [:string], :void, **opts
+      attach_function :zproc_log_set_sender, [:string], :void, **opts
+      attach_function :zproc_log_set_system, [:bool], :void, **opts
+      attach_function :zproc_log_error, [:string, :varargs], :void, **opts
+      attach_function :zproc_log_warning, [:string, :varargs], :void, **opts
+      attach_function :zproc_log_notice, [:string, :varargs], :void, **opts
+      attach_function :zproc_log_info, [:string, :varargs], :void, **opts
+      attach_function :zproc_log_debug, [:string, :varargs], :void, **opts
+      attach_function :zproc_test, [:bool], :void, **opts
+
+      require_relative 'ffi/zproc'
+
       attach_function :zsock_new, [:int], :pointer, **opts
       attach_function :zsock_new_pub, [:string], :pointer, **opts
       attach_function :zsock_new_sub, [:string, :string], :pointer, **opts
