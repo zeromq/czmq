@@ -20,7 +20,7 @@
 @end
 */
 
-#include "../include/czmq.h"
+#include "czmq_classes.h"
 
 #ifdef ZMQ_HAVE_POLLER
 

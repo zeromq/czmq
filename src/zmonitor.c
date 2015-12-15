@@ -24,7 +24,7 @@
 @end
 */
 
-#include "../include/czmq.h"
+#include "czmq_classes.h"
 
 //  --------------------------------------------------------------------------
 //  The self_t structure holds the state for one actor instance

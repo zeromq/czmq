@@ -89,8 +89,7 @@
 @end
 */
 
-#include "../include/czmq.h"
-#include "zgossip_msg.h"
+#include "czmq_classes.h"
 
 
 //  ---------------------------------------------------------------------

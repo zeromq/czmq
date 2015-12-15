@@ -22,7 +22,7 @@
 @end
 */
 
-#include "../include/czmq.h"
+#include "czmq_classes.h"
 
 #if defined (__WINDOWS__)
 //  --------------------------------------------------------------------------

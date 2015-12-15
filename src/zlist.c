@@ -23,7 +23,7 @@
 @end
 */
 
-#include "../include/czmq.h"
+#include "czmq_classes.h"
 
 //  List node, used internally only
 

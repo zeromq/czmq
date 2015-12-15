@@ -20,7 +20,7 @@
 @end
 */
 
-#include "../include/czmq.h"
+#include "czmq_classes.h"
 
 //  --------------------------------------------------------------------------
 //  Create a new socket within our CZMQ context, replaces zmq_socket.

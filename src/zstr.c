@@ -30,7 +30,7 @@
 @end
 */
 
-#include "../include/czmq.h"
+#include "czmq_classes.h"
 
 static int
 s_send_string (void *dest, bool more, char *string)

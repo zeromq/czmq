@@ -43,7 +43,7 @@
 @end
 */
 
-#include "../include/czmq.h"
+#include "czmq_classes.h"
 #include "foreign/slre/slre.inc_c"
 
 #define MAX_HITS 100            //  Should be enough for anyone :)

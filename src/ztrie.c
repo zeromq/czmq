@@ -24,7 +24,7 @@
 @end
 */
 
-#include "../include/czmq.h"
+#include "czmq_classes.h"
 #include "czmq_classes.h"
 
 #define MODE_INSERT 0

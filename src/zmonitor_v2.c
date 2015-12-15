@@ -26,7 +26,7 @@
 @end
 */
 
-#include "../include/czmq.h"
+#include "czmq_classes.h"
 
 //  This code needs backporting to work with ZMQ v3.2
 #if (ZMQ_VERSION_MAJOR == 4)

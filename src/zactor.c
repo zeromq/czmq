@@ -31,7 +31,8 @@
 @end
 */
 
-#include "../include/czmq.h"
+#include "czmq_classes.h"
+#include "czmq_classes.h"
 
 //  zactor_t instances always have this tag as the first 4 octets of
 //  their data, which lets us do runtime object typing & validation.
