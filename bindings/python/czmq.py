@@ -450,6 +450,8 @@ lib.zcert_secret_txt.restype = c_char_p
 lib.zcert_secret_txt.argtypes = [zcert_p]
 lib.zcert_set_meta.restype = None
 lib.zcert_set_meta.argtypes = [zcert_p, c_char_p, c_char_p]
+lib.zcert_unset_meta.restype = None
+lib.zcert_unset_meta.argtypes = [zcert_p, c_char_p]
 lib.zcert_meta.restype = c_char_p
 lib.zcert_meta.argtypes = [zcert_p, c_char_p]
 lib.zcert_meta_keys.restype = zlist_p
@@ -547,6 +549,10 @@ class Zcert(object):
     def set_meta(self, name, format, *args):
         """Set certificate metadata from formatted string."""
         return lib.zcert_set_meta(self._as_parameter_, name, format, *args)
+
+    def unset_meta(self, name):
+        """Unset certificate metadata."""
+        return lib.zcert_unset_meta(self._as_parameter_, name)
 
     def meta(self, name):
         """Get metadata value from certificate; if the metadata value doesn't
@@ -2989,28 +2995,16 @@ lib.zproc_set_io_threads.restype = None
 lib.zproc_set_io_threads.argtypes = [c_size_t]
 lib.zproc_set_max_sockets.restype = None
 lib.zproc_set_max_sockets.argtypes = [c_size_t]
-lib.zproc_max_sockets.restype = c_size_t
-lib.zproc_max_sockets.argtypes = []
-lib.zproc_set_linger.restype = None
-lib.zproc_set_linger.argtypes = [c_size_t]
-lib.zproc_set_sndhwm.restype = None
-lib.zproc_set_sndhwm.argtypes = [c_size_t]
-lib.zproc_set_rcvhwm.restype = None
-lib.zproc_set_rcvhwm.argtypes = [c_size_t]
-lib.zproc_set_ipv6.restype = None
-lib.zproc_set_ipv6.argtypes = [c_bool]
-lib.zproc_ipv6.restype = c_bool
-lib.zproc_ipv6.argtypes = []
-lib.zproc_set_interface.restype = None
-lib.zproc_set_interface.argtypes = [c_char_p]
-lib.zproc_interface.restype = c_char_p
-lib.zproc_interface.argtypes = []
-lib.zproc_log_set_ident.restype = None
-lib.zproc_log_set_ident.argtypes = [c_char_p]
-lib.zproc_log_set_sender.restype = None
-lib.zproc_log_set_sender.argtypes = [c_char_p]
-lib.zproc_log_set_system.restype = None
-lib.zproc_log_set_system.argtypes = [c_bool]
+lib.zproc_set_biface.restype = None
+lib.zproc_set_biface.argtypes = [c_char_p]
+lib.zproc_biface.restype = c_char_p
+lib.zproc_biface.argtypes = []
+lib.zproc_set_log_ident.restype = None
+lib.zproc_set_log_ident.argtypes = [c_char_p]
+lib.zproc_set_log_sender.restype = None
+lib.zproc_set_log_sender.argtypes = [c_char_p]
+lib.zproc_set_log_system.restype = None
+lib.zproc_set_log_system.argtypes = [c_bool]
 lib.zproc_log_error.restype = None
 lib.zproc_log_error.argtypes = [c_char_p]
 lib.zproc_log_warning.restype = None
@@ -3092,76 +3086,29 @@ Note that this method is valid only before any socket is created."""
         return lib.zproc_set_max_sockets(max_sockets)
 
     @staticmethod
-    def max_sockets():
-        """Return maximum number of ZeroMQ sockets that the system will support."""
-        return lib.zproc_max_sockets()
-
-    @staticmethod
-    def set_linger(linger):
-        """Configure the default linger timeout in msecs for new zsock instances.
-You can also set this separately on each zsock_t instance. The default
-linger time is zero, i.e. any pending messages will be dropped. If the
-environment variable ZSYS_LINGER is defined, that provides the default.
-Note that process exit will typically be delayed by the linger time."""
-        return lib.zproc_set_linger(linger)
-
-    @staticmethod
-    def set_sndhwm(sndhwm):
-        """Configure the default outgoing pipe limit (HWM) for new zsock instances.
-You can also set this separately on each zsock_t instance. The default
-HWM is 1,000, on all versions of ZeroMQ. If the environment variable
-ZSYS_SNDHWM is defined, that provides the default. Note that a value of
-zero means no limit, i.e. infinite memory consumption."""
-        return lib.zproc_set_sndhwm(sndhwm)
-
-    @staticmethod
-    def set_rcvhwm(rcvhwm):
-        """Configure the default incoming pipe limit (HWM) for new zsock instances.
-You can also set this separately on each zsock_t instance. The default
-HWM is 1,000, on all versions of ZeroMQ. If the environment variable
-ZSYS_RCVHWM is defined, that provides the default. Note that a value of
-zero means no limit, i.e. infinite memory consumption."""
-        return lib.zproc_set_rcvhwm(rcvhwm)
-
-    @staticmethod
-    def set_ipv6(ipv6):
-        """Configure use of IPv6 for new zsock instances. By default sockets accept
-and make only IPv4 connections. When you enable IPv6, sockets will accept
-and connect to both IPv4 and IPv6 peers. You can override the setting on
-each zsock_t instance. The default is IPv4 only (ipv6 set to false). If the
-environment variable ZSYS_IPV6 is defined (as 1 or 0), this provides the
-default. Note: has no effect on ZMQ v2."""
-        return lib.zproc_set_ipv6(ipv6)
-
-    @staticmethod
-    def ipv6():
-        """Return use of IPv6 for zsock instances."""
-        return lib.zproc_ipv6()
-
-    @staticmethod
-    def set_interface(value):
+    def set_biface(value):
         """Set network interface name to use for broadcasts, particularly zbeacon.
 This lets the interface be configured for test environments where required.
 For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is
 the default when there is no specified interface. If the environment
 variable ZSYS_INTERFACE is set, use that as the default interface name.
 Setting the interface to "*" means "use all available interfaces"."""
-        return lib.zproc_set_interface(value)
+        return lib.zproc_set_biface(value)
 
     @staticmethod
-    def interface():
+    def biface():
         """Return network interface to use for broadcasts, or "" if none was set."""
-        return lib.zproc_interface()
+        return lib.zproc_biface()
 
     @staticmethod
-    def log_set_ident(value):
+    def set_log_ident(value):
         """Set log identity, which is a string that prefixes all log messages sent
 by this process. The log identity defaults to the environment variable
 ZSYS_LOGIDENT, if that is set."""
-        return lib.zproc_log_set_ident(value)
+        return lib.zproc_set_log_ident(value)
 
     @staticmethod
-    def log_set_sender(endpoint):
+    def set_log_sender(endpoint):
         """Sends log output to a PUB socket bound to the specified endpoint. To
 collect such log output, create a SUB socket, subscribe to the traffic
 you care about, and connect to the endpoint. Log traffic is sent as a
@@ -3169,13 +3116,13 @@ single string frame, in the same format as when sent to stdout. The
 log system supports a single sender; multiple calls to this method will
 bind the same sender to multiple endpoints. To disable the sender, call
 this method with a null argument."""
-        return lib.zproc_log_set_sender(endpoint)
+        return lib.zproc_set_log_sender(endpoint)
 
     @staticmethod
-    def log_set_system(logsystem):
+    def set_log_system(logsystem):
         """Enable or disable logging to the system facility (syslog on POSIX boxes,
 event log on Windows). By default this is disabled."""
-        return lib.zproc_log_set_system(logsystem)
+        return lib.zproc_set_log_system(logsystem)
 
     @staticmethod
     def log_error(format, *args):

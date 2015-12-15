@@ -158,79 +158,6 @@ module CZMQ
         result
       end
 
-      # Return maximum number of ZeroMQ sockets that the system will support.
-      #
-      # @return [Integer]
-      def self.max_sockets()
-        result = ::CZMQ::FFI.zproc_max_sockets()
-        result
-      end
-
-      # Configure the default linger timeout in msecs for new zsock instances. 
-      # You can also set this separately on each zsock_t instance. The default 
-      # linger time is zero, i.e. any pending messages will be dropped. If the 
-      # environment variable ZSYS_LINGER is defined, that provides the default.
-      # Note that process exit will typically be delayed by the linger time.   
-      #
-      # @param linger [Integer, #to_int, #to_i]
-      # @return [void]
-      def self.set_linger(linger)
-        linger = Integer(linger)
-        result = ::CZMQ::FFI.zproc_set_linger(linger)
-        result
-      end
-
-      # Configure the default outgoing pipe limit (HWM) for new zsock instances.
-      # You can also set this separately on each zsock_t instance. The default  
-      # HWM is 1,000, on all versions of ZeroMQ. If the environment variable    
-      # ZSYS_SNDHWM is defined, that provides the default. Note that a value of 
-      # zero means no limit, i.e. infinite memory consumption.                  
-      #
-      # @param sndhwm [Integer, #to_int, #to_i]
-      # @return [void]
-      def self.set_sndhwm(sndhwm)
-        sndhwm = Integer(sndhwm)
-        result = ::CZMQ::FFI.zproc_set_sndhwm(sndhwm)
-        result
-      end
-
-      # Configure the default incoming pipe limit (HWM) for new zsock instances.
-      # You can also set this separately on each zsock_t instance. The default  
-      # HWM is 1,000, on all versions of ZeroMQ. If the environment variable    
-      # ZSYS_RCVHWM is defined, that provides the default. Note that a value of 
-      # zero means no limit, i.e. infinite memory consumption.                  
-      #
-      # @param rcvhwm [Integer, #to_int, #to_i]
-      # @return [void]
-      def self.set_rcvhwm(rcvhwm)
-        rcvhwm = Integer(rcvhwm)
-        result = ::CZMQ::FFI.zproc_set_rcvhwm(rcvhwm)
-        result
-      end
-
-      # Configure use of IPv6 for new zsock instances. By default sockets accept   
-      # and make only IPv4 connections. When you enable IPv6, sockets will accept  
-      # and connect to both IPv4 and IPv6 peers. You can override the setting on   
-      # each zsock_t instance. The default is IPv4 only (ipv6 set to false). If the
-      # environment variable ZSYS_IPV6 is defined (as 1 or 0), this provides the   
-      # default. Note: has no effect on ZMQ v2.                                    
-      #
-      # @param ipv6 [Boolean]
-      # @return [void]
-      def self.set_ipv6(ipv6)
-        ipv6 = !(0==ipv6||!ipv6) # boolean
-        result = ::CZMQ::FFI.zproc_set_ipv6(ipv6)
-        result
-      end
-
-      # Return use of IPv6 for zsock instances.
-      #
-      # @return [Boolean]
-      def self.ipv6()
-        result = ::CZMQ::FFI.zproc_ipv6()
-        result
-      end
-
       # Set network interface name to use for broadcasts, particularly zbeacon.    
       # This lets the interface be configured for test environments where required.
       # For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is  
@@ -240,16 +167,16 @@ module CZMQ
       #
       # @param value [String, #to_s, nil]
       # @return [void]
-      def self.set_interface(value)
-        result = ::CZMQ::FFI.zproc_set_interface(value)
+      def self.set_biface(value)
+        result = ::CZMQ::FFI.zproc_set_biface(value)
         result
       end
 
       # Return network interface to use for broadcasts, or "" if none was set.
       #
       # @return [String]
-      def self.interface()
-        result = ::CZMQ::FFI.zproc_interface()
+      def self.biface()
+        result = ::CZMQ::FFI.zproc_biface()
         result
       end
 
@@ -259,8 +186,8 @@ module CZMQ
       #
       # @param value [String, #to_s, nil]
       # @return [void]
-      def self.log_set_ident(value)
-        result = ::CZMQ::FFI.zproc_log_set_ident(value)
+      def self.set_log_ident(value)
+        result = ::CZMQ::FFI.zproc_set_log_ident(value)
         result
       end
 
@@ -274,8 +201,8 @@ module CZMQ
       #
       # @param endpoint [String, #to_s, nil]
       # @return [void]
-      def self.log_set_sender(endpoint)
-        result = ::CZMQ::FFI.zproc_log_set_sender(endpoint)
+      def self.set_log_sender(endpoint)
+        result = ::CZMQ::FFI.zproc_set_log_sender(endpoint)
         result
       end
 
@@ -284,9 +211,9 @@ module CZMQ
       #
       # @param logsystem [Boolean]
       # @return [void]
-      def self.log_set_system(logsystem)
+      def self.set_log_system(logsystem)
         logsystem = !(0==logsystem||!logsystem) # boolean
-        result = ::CZMQ::FFI.zproc_log_set_system(logsystem)
+        result = ::CZMQ::FFI.zproc_set_log_system(logsystem)
         result
       end
 

@@ -95,88 +95,23 @@ void QZproc::setMaxSockets (size_t maxSockets)
 }
 
 ///
-//  Return maximum number of ZeroMQ sockets that the system will support.
-size_t QZproc::maxSockets ()
-{
-    size_t rv = zproc_max_sockets ();
-    return rv;
-}
-
-///
-//  Configure the default linger timeout in msecs for new zsock instances. 
-//  You can also set this separately on each zsock_t instance. The default 
-//  linger time is zero, i.e. any pending messages will be dropped. If the 
-//  environment variable ZSYS_LINGER is defined, that provides the default.
-//  Note that process exit will typically be delayed by the linger time.   
-void QZproc::setLinger (size_t linger)
-{
-    zproc_set_linger (linger);
-    
-}
-
-///
-//  Configure the default outgoing pipe limit (HWM) for new zsock instances.
-//  You can also set this separately on each zsock_t instance. The default  
-//  HWM is 1,000, on all versions of ZeroMQ. If the environment variable    
-//  ZSYS_SNDHWM is defined, that provides the default. Note that a value of 
-//  zero means no limit, i.e. infinite memory consumption.                  
-void QZproc::setSndhwm (size_t sndhwm)
-{
-    zproc_set_sndhwm (sndhwm);
-    
-}
-
-///
-//  Configure the default incoming pipe limit (HWM) for new zsock instances.
-//  You can also set this separately on each zsock_t instance. The default  
-//  HWM is 1,000, on all versions of ZeroMQ. If the environment variable    
-//  ZSYS_RCVHWM is defined, that provides the default. Note that a value of 
-//  zero means no limit, i.e. infinite memory consumption.                  
-void QZproc::setRcvhwm (size_t rcvhwm)
-{
-    zproc_set_rcvhwm (rcvhwm);
-    
-}
-
-///
-//  Configure use of IPv6 for new zsock instances. By default sockets accept   
-//  and make only IPv4 connections. When you enable IPv6, sockets will accept  
-//  and connect to both IPv4 and IPv6 peers. You can override the setting on   
-//  each zsock_t instance. The default is IPv4 only (ipv6 set to false). If the
-//  environment variable ZSYS_IPV6 is defined (as 1 or 0), this provides the   
-//  default. Note: has no effect on ZMQ v2.                                    
-void QZproc::setIpv6 (bool ipv6)
-{
-    zproc_set_ipv6 (ipv6);
-    
-}
-
-///
-//  Return use of IPv6 for zsock instances.
-bool QZproc::ipv6 ()
-{
-    bool rv = zproc_ipv6 ();
-    return rv;
-}
-
-///
 //  Set network interface name to use for broadcasts, particularly zbeacon.    
 //  This lets the interface be configured for test environments where required.
 //  For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is  
 //  the default when there is no specified interface. If the environment       
 //  variable ZSYS_INTERFACE is set, use that as the default interface name.    
 //  Setting the interface to "*" means "use all available interfaces".         
-void QZproc::setInterface (const QString &value)
+void QZproc::setBiface (const QString &value)
 {
-    zproc_set_interface (value.toUtf8().data());
+    zproc_set_biface (value.toUtf8().data());
     
 }
 
 ///
 //  Return network interface to use for broadcasts, or "" if none was set.
-const QString QZproc::interface ()
+const QString QZproc::biface ()
 {
-    const QString rv = QString (zproc_interface ());
+    const QString rv = QString (zproc_biface ());
     return rv;
 }
 
@@ -184,9 +119,9 @@ const QString QZproc::interface ()
 //  Set log identity, which is a string that prefixes all log messages sent
 //  by this process. The log identity defaults to the environment variable 
 //  ZSYS_LOGIDENT, if that is set.                                         
-void QZproc::logSetIdent (const QString &value)
+void QZproc::setLogIdent (const QString &value)
 {
-    zproc_log_set_ident (value.toUtf8().data());
+    zproc_set_log_ident (value.toUtf8().data());
     
 }
 
@@ -198,18 +133,18 @@ void QZproc::logSetIdent (const QString &value)
 //  log system supports a single sender; multiple calls to this method will
 //  bind the same sender to multiple endpoints. To disable the sender, call
 //  this method with a null argument.                                      
-void QZproc::logSetSender (const QString &endpoint)
+void QZproc::setLogSender (const QString &endpoint)
 {
-    zproc_log_set_sender (endpoint.toUtf8().data());
+    zproc_set_log_sender (endpoint.toUtf8().data());
     
 }
 
 ///
 //  Enable or disable logging to the system facility (syslog on POSIX boxes,
 //  event log on Windows). By default this is disabled.                     
-void QZproc::logSetSystem (bool logsystem)
+void QZproc::setLogSystem (bool logsystem)
 {
-    zproc_log_set_system (logsystem);
+    zproc_set_log_system (logsystem);
     
 }
 

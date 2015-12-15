@@ -72,6 +72,13 @@ public class Zcert implements AutoCloseable{
         __setMeta (self, name, format);
     }
     /*
+    Unset certificate metadata.
+    */
+    native static void __unsetMeta (long self, String name);
+    public void unsetMeta (String name) {
+        __unsetMeta (self, name);
+    }
+    /*
     Get metadata value from certificate; if the metadata value doesn't
     exist, returns NULL.                                              
     */

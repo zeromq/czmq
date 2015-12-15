@@ -71,6 +71,14 @@ Java_org_zeromq_czmq_Zcert__1_1setMeta (JNIEnv *env, jclass c, jlong self, jstri
     (*env)->ReleaseStringUTFChars (env, format, format_);
 }
 
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zcert__1_1unsetMeta (JNIEnv *env, jclass c, jlong self, jstring name)
+{
+    char *name_ = (char *) (*env)->GetStringUTFChars (env, name, NULL);
+    zcert_unset_meta ((zcert_t *) (intptr_t) self, name_);
+    (*env)->ReleaseStringUTFChars (env, name, name_);
+}
+
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zcert__1_1meta (JNIEnv *env, jclass c, jlong self, jstring name)
 {
