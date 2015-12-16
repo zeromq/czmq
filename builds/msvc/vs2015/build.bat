@@ -1,15 +1,13 @@
 @ECHO OFF
-REM Usage: [buildbase.bat ..\vs2013\mysolution.sln 12]
-
-SET solution=%1
-SET version=%2
-SET log=build_%version%.log
-SET tools=Microsoft Visual Studio %version%.0\VC\vcvarsall.bat
-SET environment="%programfiles(x86)%\%tools%"
-IF NOT EXIST %environment% SET environment="%programfiles%\%tools%"
+SET solution=czmq.sln
+SET version=14
+SET log=build.log
+SET tools=Microsoft Visual Studio %version%.0VCvcvarsall.bat
+SET environment="%programfiles(x86)%%tools%"
+IF NOT EXIST %environment% SET environment="%programfiles%%tools%"
 IF NOT EXIST %environment% GOTO no_tools
 
-ECHO Building: %solution%
+ECHO Building %solution%...
 
 CALL %environment% x86 > nul
 ECHO Platform=x86
@@ -66,4 +64,3 @@ GOTO end
 ECHO *** ERROR, build tools not found: %tools%
 
 :end
-

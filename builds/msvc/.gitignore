@@ -4,3 +4,8 @@
 *.user
 *.aps
 *.log
+*.rc
+resource.h
+*.props
+*.import.xml
+properties
