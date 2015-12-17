@@ -25,7 +25,6 @@
 */
 
 #include "czmq_classes.h"
-#include "czmq_classes.h"
 
 #define MODE_INSERT 0
 #define MODE_LOOKUP 1
