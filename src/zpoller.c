@@ -217,7 +217,7 @@ struct _zpoller_t {
     zmq_pollitem_t *poll_set;   //  Current zmq_poll set
     void **poll_readers;        //  Matching table of socket readers
     size_t poll_size;           //  Size of poll set
-    bool need_rebuild;          //  Does pollset needs rebuilding?
+    bool need_rebuild;          //  Does pollset need rebuilding?
     bool expired;               //  Did poll timer expire?
     bool terminated;            //  Did poll call end with EINTR?
     bool ignore_interrupts;     //  Should this poller ignore zsys_interrupted?
