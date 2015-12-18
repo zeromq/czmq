@@ -501,7 +501,7 @@ class Zcert(object):
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
             assert(len(args) == 2)
-            self._as_parameter_ = lib.zcert_new from(args[0], args[1]) # Creation of new raw type
+            self._as_parameter_ = lib.zcert_new_from(args[0], args[1]) # Creation of new raw type
             self.allow_destruct = True
 
     def __init__(self, *args):
@@ -1443,7 +1443,7 @@ size octets from the specified data into the frame body."""
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
             assert(len(args) == 0)
-            self._as_parameter_ = lib.zframe_new empty() # Creation of new raw type
+            self._as_parameter_ = lib.zframe_new_empty() # Creation of new raw type
             self.allow_destruct = True
 
     def __init__(self, *args):
@@ -2705,7 +2705,7 @@ OK). Signals are encoded to be distinguishable from "normal" messages."""
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
             assert(len(args) == 1)
-            self._as_parameter_ = lib.zmsg_new signal(args[0]) # Creation of new raw type
+            self._as_parameter_ = lib.zmsg_new_signal(args[0]) # Creation of new raw type
             self.allow_destruct = True
 
     def __del__(self):
@@ -3452,7 +3452,7 @@ redirection behaviour, define ZSOCK_NOCHECK."""
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
             assert(len(args) == 1)
-            self._as_parameter_ = lib.zsock_new pub(args[0]) # Creation of new raw type
+            self._as_parameter_ = lib.zsock_new_pub(args[0]) # Creation of new raw type
             self.allow_destruct = True
 
     def __init__(self, *args):
@@ -3466,7 +3466,7 @@ action is connect."""
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
             assert(len(args) == 2)
-            self._as_parameter_ = lib.zsock_new sub(args[0], args[1]) # Creation of new raw type
+            self._as_parameter_ = lib.zsock_new_sub(args[0], args[1]) # Creation of new raw type
             self.allow_destruct = True
 
     def __init__(self, *args):
@@ -3479,7 +3479,7 @@ action is connect."""
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
             assert(len(args) == 1)
-            self._as_parameter_ = lib.zsock_new req(args[0]) # Creation of new raw type
+            self._as_parameter_ = lib.zsock_new_req(args[0]) # Creation of new raw type
             self.allow_destruct = True
 
     def __init__(self, *args):
@@ -3492,7 +3492,7 @@ action is connect."""
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
             assert(len(args) == 1)
-            self._as_parameter_ = lib.zsock_new rep(args[0]) # Creation of new raw type
+            self._as_parameter_ = lib.zsock_new_rep(args[0]) # Creation of new raw type
             self.allow_destruct = True
 
     def __init__(self, *args):
@@ -3505,7 +3505,7 @@ action is connect."""
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
             assert(len(args) == 1)
-            self._as_parameter_ = lib.zsock_new dealer(args[0]) # Creation of new raw type
+            self._as_parameter_ = lib.zsock_new_dealer(args[0]) # Creation of new raw type
             self.allow_destruct = True
 
     def __init__(self, *args):
@@ -3518,7 +3518,7 @@ action is connect."""
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
             assert(len(args) == 1)
-            self._as_parameter_ = lib.zsock_new router(args[0]) # Creation of new raw type
+            self._as_parameter_ = lib.zsock_new_router(args[0]) # Creation of new raw type
             self.allow_destruct = True
 
     def __init__(self, *args):
@@ -3531,7 +3531,7 @@ action is connect."""
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
             assert(len(args) == 1)
-            self._as_parameter_ = lib.zsock_new push(args[0]) # Creation of new raw type
+            self._as_parameter_ = lib.zsock_new_push(args[0]) # Creation of new raw type
             self.allow_destruct = True
 
     def __init__(self, *args):
@@ -3544,7 +3544,7 @@ action is connect."""
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
             assert(len(args) == 1)
-            self._as_parameter_ = lib.zsock_new pull(args[0]) # Creation of new raw type
+            self._as_parameter_ = lib.zsock_new_pull(args[0]) # Creation of new raw type
             self.allow_destruct = True
 
     def __init__(self, *args):
@@ -3557,7 +3557,7 @@ action is connect."""
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
             assert(len(args) == 1)
-            self._as_parameter_ = lib.zsock_new xpub(args[0]) # Creation of new raw type
+            self._as_parameter_ = lib.zsock_new_xpub(args[0]) # Creation of new raw type
             self.allow_destruct = True
 
     def __init__(self, *args):
@@ -3570,7 +3570,7 @@ action is connect."""
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
             assert(len(args) == 1)
-            self._as_parameter_ = lib.zsock_new xsub(args[0]) # Creation of new raw type
+            self._as_parameter_ = lib.zsock_new_xsub(args[0]) # Creation of new raw type
             self.allow_destruct = True
 
     def __init__(self, *args):
@@ -3583,7 +3583,7 @@ action is connect."""
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
             assert(len(args) == 1)
-            self._as_parameter_ = lib.zsock_new pair(args[0]) # Creation of new raw type
+            self._as_parameter_ = lib.zsock_new_pair(args[0]) # Creation of new raw type
             self.allow_destruct = True
 
     def __init__(self, *args):
@@ -3596,7 +3596,7 @@ action is connect."""
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
             assert(len(args) == 1)
-            self._as_parameter_ = lib.zsock_new stream(args[0]) # Creation of new raw type
+            self._as_parameter_ = lib.zsock_new_stream(args[0]) # Creation of new raw type
             self.allow_destruct = True
 
     def __init__(self, *args):
@@ -3609,7 +3609,7 @@ action is connect."""
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
             assert(len(args) == 1)
-            self._as_parameter_ = lib.zsock_new server(args[0]) # Creation of new raw type
+            self._as_parameter_ = lib.zsock_new_server(args[0]) # Creation of new raw type
             self.allow_destruct = True
 
     def __init__(self, *args):
@@ -3622,7 +3622,7 @@ action is connect."""
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
             assert(len(args) == 1)
-            self._as_parameter_ = lib.zsock_new client(args[0]) # Creation of new raw type
+            self._as_parameter_ = lib.zsock_new_client(args[0]) # Creation of new raw type
             self.allow_destruct = True
 
     def __del__(self):
@@ -4497,7 +4497,7 @@ class Zuuid(object):
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
         else:
             assert(len(args) == 1)
-            self._as_parameter_ = lib.zuuid_new from(args[0]) # Creation of new raw type
+            self._as_parameter_ = lib.zuuid_new_from(args[0]) # Creation of new raw type
             self.allow_destruct = True
 
     def __del__(self):
