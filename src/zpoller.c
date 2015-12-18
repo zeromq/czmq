@@ -243,7 +243,7 @@ zpoller_new (void *reader, ...)
             va_list args;
             va_start (args, reader);
             while (reader) {
-                if (zlist_append (self->reader_list, reader)) {
+                if (zlist_append (self->reader_list, reader) == -1) {
                     zpoller_destroy (&self);
                     break;
                 }
