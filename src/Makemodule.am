@@ -101,15 +101,15 @@ src_libczmq_la_SOURCES = \
     src/zsocket.c \
     src/zsockopt.c \
     src/zthread.c \
-    src/zsock_option_inc \
-    src/zgossip_engine_inc \
-    src/zhash_primes_inc \
-    src/zclass_example_xml \
-    src/foreign_sha1_sha1_inc_c \
-    src/foreign_sha1_sha1_h \
-    src/foreign_slre_slre_inc_c \
-    src/foreign_slre_slre_h \
-    src/foreign_slre_readme_txt \
+    src/zsock_option.inc \
+    src/zgossip_engine.inc \
+    src/zhash_primes.inc \
+    src/zclass_example.xml \
+    src/foreign/sha1/sha1.inc_c \
+    src/foreign/sha1/sha1.h \
+    src/foreign/slre/slre.inc_c \
+    src/foreign/slre/slre.h \
+    src/foreign/slre/readme.txt \
     src/platform.h
 
 src_libczmq_la_CPPFLAGS = ${AM_CPPFLAGS}
