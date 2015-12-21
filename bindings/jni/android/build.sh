@@ -28,8 +28,8 @@ echo "********  Building Android native libraries"
 ( cd ../../../builds/android && ./build.sh )
 
 #   Ensure we've built JNI interface
-# echo "********  Building JNI interface & classes"
-# ( cd .. && gradle build jar )
+echo "********  Building JNI interface & classes"
+( cd .. && gradle build jar )
 
 rm -Rf build
 mkdir build
