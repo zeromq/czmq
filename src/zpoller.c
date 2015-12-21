@@ -71,7 +71,7 @@ zpoller_destroy (zpoller_t **self_p)
     assert (self_p);
     if (*self_p) {
         zpoller_t *self = *self_p;
-        zmq_poller_close (self->zmq_poller);
+        zmq_poller_destroy (&self->zmq_poller);
         free (self);
         *self_p = NULL;
     }
