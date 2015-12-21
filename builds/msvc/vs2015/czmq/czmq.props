@@ -17,10 +17,10 @@
 
   <ItemDefinitionGroup>
     <PreBuildEvent>
-      <Command>copy $(BuildRoot)platform.h $(RepoRoot)include</Command>
+      <Command>copy $(BuildRoot)platform.h $(RepoRoot)include\</Command>
     </PreBuildEvent>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(RepoRoot)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(RepoRoot)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <EnablePREfast>false</EnablePREfast>
@@ -56,7 +56,7 @@
   <!-- Messages -->
 
   <Target Name="CustomInfo" BeforeTargets="PrepareForBuild">
-    <Message Text="Will copy $(BuildRoot)platform.h -&gt; $(RepoRoot)includeplatform.h" Importance="high"/>
+    <Message Text="Will copy $(BuildRoot)platform.h -&gt; $(RepoRoot)include\platform.h" Importance="high"/>
   </Target>
 
   <Target Name="LinkageInfo" BeforeTargets="PrepareForBuild">

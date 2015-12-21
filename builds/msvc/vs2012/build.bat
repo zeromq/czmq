@@ -2,9 +2,9 @@
 SET solution=czmq.sln
 SET version=11
 SET log=build.log
-SET tools=Microsoft Visual Studio %version%.0VCvcvarsall.bat
-SET environment="%programfiles(x86)%%tools%"
-IF NOT EXIST %environment% SET environment="%programfiles%%tools%"
+SET tools=Microsoft Visual Studio %version%.0\VC\vcvarsall.bat
+SET environment="%programfiles(x86)%\%tools%"
+IF NOT EXIST %environment% SET environment="%programfiles%\%tools%"
 IF NOT EXIST %environment% GOTO no_tools
 
 ECHO Building %solution%...
