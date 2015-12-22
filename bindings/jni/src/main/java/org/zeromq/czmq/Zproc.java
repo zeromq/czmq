@@ -34,6 +34,13 @@ public class Zproc {
         return __interrupted ();
     }
     /*
+    Returns true if the underlying libzmq supports CURVE security.
+    */
+    native static boolean __hasCurve ();
+    public boolean hasCurve () {
+        return __hasCurve ();
+    }
+    /*
     Return current host name, for use in public tcp:// endpoints.
     If the host name is not resolvable, returns NULL.            
     */
