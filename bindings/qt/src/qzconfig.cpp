@@ -232,7 +232,7 @@ QString QZconfig::strSave ()
 {
     char *retStr_ = zconfig_str_save (self);
     QString rv = QString (retStr_);
-    free (retStr_);;
+    zstr_free (&retStr_);
     return rv;
 }
 

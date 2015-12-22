@@ -57,7 +57,7 @@ ECHO Complete: %solution%
 GOTO end
 
 :error
-ECHO *** ERROR, build terminated early, see: %log%
+ECHO *** ERROR, build terminated early: see %log%
 GOTO end
 
 :no_tools

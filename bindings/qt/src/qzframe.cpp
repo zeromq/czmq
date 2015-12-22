@@ -95,7 +95,7 @@ QString QZframe::strhex ()
 {
     char *retStr_ = zframe_strhex (self);
     QString rv = QString (retStr_);
-    free (retStr_);;
+    zstr_free (&retStr_);
     return rv;
 }
 
@@ -106,7 +106,7 @@ QString QZframe::strdup ()
 {
     char *retStr_ = zframe_strdup (self);
     QString rv = QString (retStr_);
-    free (retStr_);;
+    zstr_free (&retStr_);
     return rv;
 }
 

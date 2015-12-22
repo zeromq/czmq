@@ -43,7 +43,7 @@ QString QZarmour::encode (const byte *data, size_t size)
 {
     char *retStr_ = zarmour_encode (self, data, size);
     QString rv = QString (retStr_);
-    free (retStr_);;
+    zstr_free (&retStr_);
     return rv;
 }
 

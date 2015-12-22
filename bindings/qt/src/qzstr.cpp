@@ -23,7 +23,7 @@ QString QZstr::recv (void *source)
 {
     char *retStr_ = zstr_recv (source);
     QString rv = QString (retStr_);
-    free (retStr_);;
+    zstr_free (&retStr_);
     return rv;
 }
 
@@ -74,7 +74,7 @@ QString QZstr::str (void *source)
 {
     char *retStr_ = zstr_str (source);
     QString rv = QString (retStr_);
-    free (retStr_);;
+    zstr_free (&retStr_);
     return rv;
 }
 

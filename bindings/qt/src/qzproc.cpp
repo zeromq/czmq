@@ -41,7 +41,7 @@ QString QZproc::hostname ()
 {
     char *retStr_ = zproc_hostname ();
     QString rv = QString (retStr_);
-    free (retStr_);;
+    zstr_free (&retStr_);
     return rv;
 }
 

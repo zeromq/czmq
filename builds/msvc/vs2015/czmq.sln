@@ -1,8 +1,8 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # vs2015
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "czmq", "czmq$(project.prefix).vcxproj", "{0C4A2E28-8C9E-4B27-85D9-BB679AD84AC7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "czmq", "czmq\czmq.vcxproj", "{0C4A2E28-8C9E-4B27-85D9-BB679AD84AC7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "czmq_selftest", "czmq_selftest$(project.prefix)_selftest.vcxproj", "{A5497C4B-1CD1-4779-9458-2CF7908E7E26}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "czmq_selftest", "czmq_selftest\czmq_selftest.vcxproj", "{A5497C4B-1CD1-4779-9458-2CF7908E7E26}"
 EndProject
 Global
     GlobalSection(SolutionConfigurationPlatforms) = preSolution
