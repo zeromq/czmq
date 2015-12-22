@@ -101,8 +101,6 @@ src/test_zgossip
 *~
 ChangeLog
 .libs/
-czmq_labs_selftest*
-czmq_selftest*
 makecert
 test-suite.log
 *.pyc
