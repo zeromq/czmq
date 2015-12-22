@@ -147,6 +147,8 @@ zpoller_remove (zpoller_t *self, void *reader)
 void *
 zpoller_wait (zpoller_t *self, int timeout)
 {
+    assert (self);
+
     self->expired = false;
     if (!self->ignore_interrupts && zsys_interrupted) {
         self->terminated = true;
