@@ -27,7 +27,7 @@
 @end
 */
 
-#include "czmq_classes.h"
+#include "../include/czmq.h"
 
 #if (ZMQ_VERSION_MAJOR == 4)
 //  --------------------------------------------------------------------------
