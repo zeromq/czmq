@@ -527,7 +527,7 @@ zfile_digest (zfile_t *self)
             return NULL;            //  Problem reading file
 
         //  Now calculate hash for file data, chunk by chunk
-        size_t blocksz = 65535;
+        long blocksz = 65535;
         off_t offset = 0;
 
         self->digest = zdigest_new ();
@@ -544,8 +544,8 @@ zfile_digest (zfile_t *self)
             if (blocksz > LONG_MAX - offset)
                 return NULL;
 
-            offset += (off_t) blocksz;
-            chunk = zfile_read (self, blocksz, offset);
+            offset += blocksz;
+            chunk = zfile_read (self, (size_t) blocksz, offset);
         }
         zchunk_destroy (&chunk);
         fclose (self->handle);
