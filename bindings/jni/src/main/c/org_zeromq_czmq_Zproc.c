@@ -24,6 +24,13 @@ Java_org_zeromq_czmq_Zproc__1_1interrupted (JNIEnv *env, jclass c)
     return interrupted_;
 }
 
+JNIEXPORT jboolean JNICALL
+Java_org_zeromq_czmq_Zproc__1_1hasCurve (JNIEnv *env, jclass c)
+{
+    jboolean has_curve_ = (jboolean) zproc_has_curve ();
+    return has_curve_;
+}
+
 JNIEXPORT jstring JNICALL
 Java_org_zeromq_czmq_Zproc__1_1hostname (JNIEnv *env, jclass c)
 {

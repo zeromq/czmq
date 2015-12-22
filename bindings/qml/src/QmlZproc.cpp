@@ -30,6 +30,12 @@ bool QmlZprocAttached::interrupted () {
 };
 
 ///
+//  Returns true if the underlying libzmq supports CURVE security.
+bool QmlZprocAttached::hasCurve () {
+    return zproc_has_curve ();
+};
+
+///
 //  Return current host name, for use in public tcp:// endpoints.
 //  If the host name is not resolvable, returns NULL.            
 QString QmlZprocAttached::hostname () {

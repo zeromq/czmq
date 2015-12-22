@@ -2985,6 +2985,8 @@ lib.zproc_czmq_version.restype = c_int
 lib.zproc_czmq_version.argtypes = []
 lib.zproc_interrupted.restype = c_bool
 lib.zproc_interrupted.argtypes = []
+lib.zproc_has_curve.restype = c_bool
+lib.zproc_has_curve.argtypes = []
 lib.zproc_hostname.restype = POINTER(c_char)
 lib.zproc_hostname.argtypes = []
 lib.zproc_daemonize.restype = None
@@ -3041,6 +3043,11 @@ version (x 10000), the minor version (x 100) and the patch."""
 It is good practice to use this method to exit any infinite loop
 processing messages."""
         return lib.zproc_interrupted()
+
+    @staticmethod
+    def has_curve():
+        """Returns true if the underlying libzmq supports CURVE security."""
+        return lib.zproc_has_curve()
 
     @staticmethod
     def hostname():

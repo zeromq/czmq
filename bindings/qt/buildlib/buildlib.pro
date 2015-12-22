@@ -13,9 +13,11 @@ include(../src/qczmq.pri)
 TARGET = $$QCZMQ_LIBNAME
 DESTDIR = $$QCZMQ_LIBDIR
 
+!packagesExist (libsodium): error ("cannot link with -lsodium, install libsodium.")
 !packagesExist (libzmq): error ("cannot link with -lzmq, install libzmq.")
 
 LIBS += \
+    -lsodium \
     -lzmq \
     -lczmq
 

@@ -36,21 +36,21 @@
   <!-- Dependencies -->
 
   <ImportGroup Label="PropertySheets">
-    <Import Project="$(SolutionDir)libzmq.import.props" />
     <Import Project="$(SolutionDir)libsodium.import.props" />
+    <Import Project="$(SolutionDir)libzmq.import.props" />
   </ImportGroup>
 
   <PropertyGroup Condition="'$(DefaultLinkage)' == 'dynamic'">
-    <Linkage-libzmq>dynamic</Linkage-libzmq>
     <Linkage-libsodium>dynamic</Linkage-libsodium>
+    <Linkage-libzmq>dynamic</Linkage-libzmq>
   </PropertyGroup>
   <PropertyGroup Condition="'$(DefaultLinkage)' == 'ltcg'">
-    <Linkage-libzmq>ltcg</Linkage-libzmq>
     <Linkage-libsodium>ltcg</Linkage-libsodium>
+    <Linkage-libzmq>ltcg</Linkage-libzmq>
   </PropertyGroup>
   <PropertyGroup Condition="'$(DefaultLinkage)' == 'static'">
-    <Linkage-libzmq>static</Linkage-libzmq>
     <Linkage-libsodium>static</Linkage-libsodium>
+    <Linkage-libzmq>static</Linkage-libzmq>
   </PropertyGroup>
 
   <!-- Messages -->
@@ -60,8 +60,8 @@
   </Target>
 
   <Target Name="LinkageInfo" BeforeTargets="PrepareForBuild">
-    <Message Text="Linkage-libzmq    : $(Linkage-libzmq)" Importance="high"/>
     <Message Text="Linkage-libsodium : $(Linkage-libsodium)" Importance="high"/>
+    <Message Text="Linkage-libzmq : $(Linkage-libzmq)" Importance="high"/>
   </Target>
 <!--
 ################################################################################

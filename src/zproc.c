@@ -39,7 +39,7 @@ zproc_czmq_version (void)
 bool
 zproc_interrupted (void)
 {
-    return zsys_interrupted;
+    return zsys_interrupted == 1;
 }
 
 //  --------------------------------------------------------------------------

@@ -183,7 +183,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\..\czmq.rc">
+    <ResourceCompile Include="..\..\resource.rc">
       <Filter>resource</Filter>
     </ResourceCompile>
   </ItemGroup>

@@ -241,15 +241,6 @@ s_api_command (agent_t *self);
 static void
 s_beacon_recv (agent_t *self);
 
-// Function prototype of if_nametoindexi() from <net/if.h>. This header can not be included
-// as it conflicts with <linux/wireless.h>. So, just including defining the prototype. CZMQ
-// depends on libzmq library anyway so the compiler will find the appropriate function from
-// libzmq library.
-#ifndef _NET_IF_H
-unsigned int
-if_nametoindex (const char *ifname);
-#endif
-
 //  This is the background task
 
 static void

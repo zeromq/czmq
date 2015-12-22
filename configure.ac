@@ -75,6 +75,51 @@ PREVIOUS_CFLAGS="${CFLAGS}"
 PREVIOUS_LIBS="${LIBS}"
 
 
+was_libsodium_check_lib_detected=no
+
+PKG_CHECK_MODULES([libsodium], [libsodium >= 0.0.0],
+    [
+    ],
+    [
+        AC_ARG_WITH([libsodium],
+            [
+                AS_HELP_STRING([--with-libsodium],
+                [Specify libsodium prefix])
+            ],
+            [search_libsodium="yes"],
+            [])
+
+        libsodium_synthetic_cflags=""
+        libsodium_synthetic_libs="-lsodium"
+
+        if test "x$search_libsodium" = "xyes"; then
+            if test -r "${with_libsodium}/include/sodium.h"; then
+                libsodium_synthetic_cflags="-I${with_libsodium}/include"
+                libsodium_synthetic_libs="-L${with_libsodium}/lib -lsodium"
+            else
+                AC_MSG_ERROR([${with_libsodium}/include/sodium.h not found. Please check libsodium prefix])
+            fi
+        fi
+
+        AC_CHECK_LIB([libsodium], [sodium_init],
+            [
+                CFLAGS="${libsodium_synthetic_cflags} ${CFLAGS}"
+                LDFLAGS="${libsodium_synthetic_libs} ${LDFLAGS}"
+                LIBS="${libsodium_synthetic_libs} ${LIBS}"
+
+                AC_SUBST([libsodium_CFLAGS],[${libsodium_synthetic_cflags}])
+                AC_SUBST([libsodium_LIBS],[${libsodium_synthetic_libs}])
+                was_libsodium_check_lib_detected=yes
+            ],
+            [AC_MSG_ERROR([cannot link with -lsodium, install libsodium.])])
+    ])
+
+if test "x$was_libsodium_check_lib_detected" = "xno"; then
+    CFLAGS="${libsodium_CFLAGS} ${CFLAGS}"
+    LIBS="${libsodium_LIBS} ${LIBS}"
+fi
+
+
 was_libzmq_check_lib_detected=no
 
 PKG_CHECK_MODULES([libzmq], [libzmq >= 0.0.0],

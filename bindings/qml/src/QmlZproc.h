@@ -49,6 +49,9 @@ public slots:
     //  processing messages.                                            
     bool interrupted ();
 
+    //  Returns true if the underlying libzmq supports CURVE security.
+    bool hasCurve ();
+
     //  Return current host name, for use in public tcp:// endpoints.
     //  If the host name is not resolvable, returns NULL.            
     QString hostname ();

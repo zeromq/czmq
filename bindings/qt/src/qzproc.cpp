@@ -35,13 +35,21 @@ bool QZproc::interrupted ()
 }
 
 ///
+//  Returns true if the underlying libzmq supports CURVE security.
+bool QZproc::hasCurve ()
+{
+    bool rv = zproc_has_curve ();
+    return rv;
+}
+
+///
 //  Return current host name, for use in public tcp:// endpoints.
 //  If the host name is not resolvable, returns NULL.            
 QString QZproc::hostname ()
 {
     char *retStr_ = zproc_hostname ();
     QString rv = QString (retStr_);
-    free (retStr_);;
+    zstr_free (&retStr_);
     return rv;
 }
 

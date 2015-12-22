@@ -586,6 +586,8 @@ typedef int SOCKET;
 
 #if defined (HAVE_LINUX_WIRELESS_H)
 #   include <linux/wireless.h>
+//  This would normally come from net/if.h
+unsigned int if_nametoindex (const char *ifname);
 #else
 #   if defined (HAVE_NET_IF_H)
 #       include <net/if.h>

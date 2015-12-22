@@ -22,6 +22,8 @@ BuildRequires:  automake
 BuildRequires:  autoconf
 BuildRequires:  libtool
 BuildRequires:  pkg-config
+BuildRequires:  systemd-devel
+BuildRequires:  libsodium-devel
 BuildRequires:  zeromq-devel
 BuildRequires:  uuid-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -49,6 +51,7 @@ This package contains shared library.
 Summary:        the high-level c binding for 0mq
 Group:          System/Libraries
 Requires:       libczmq3 = %{version}
+Requires:       libsodium-devel
 Requires:       zeromq-devel
 Requires:       uuid-devel
 
@@ -67,7 +70,7 @@ This package contains development files.
 
 %build
 sh autogen.sh
-%{configure}
+%{configure} --with-systemd
 make %{_smp_mflags}
 
 %install

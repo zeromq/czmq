@@ -128,7 +128,7 @@ s_ztrie_node_new (ztrie_node_t *parent, char *token, int token_len, zlistx_t *pa
         self->parameter_names = (char **) malloc (sizeof (char *) * self->parameter_count);
         self->parameter_values = (char **) malloc (sizeof (char *) * self->parameter_count);
         char *key = (char *) zlistx_first (param_keys);
-        int index;
+        size_t index;
         for (index = 0; index < zlistx_size (param_keys); index++) {
             self->parameter_names [index] = key;
             self->parameter_values [index] = NULL;
@@ -167,7 +167,7 @@ s_ztrie_node_destroy (ztrie_node_t **self_p)
         zstr_free (&self->token);
         zstr_free (&self->asterisk_match);
         if (self->parameter_count > 0) {
-            int index;
+            size_t index;
             for (index = 0; index < self->parameter_count; index++) {
                 free (self->parameter_names [index]);
                 if (self->parameter_values [index])
@@ -566,7 +566,7 @@ ztrie_hit_parameters (ztrie_t *self)
         zhashx_t *route_parameters = zhashx_new ();
         ztrie_node_t *node = self->match;
         while (node) {
-            int index;
+            size_t index;
             for (index = 0; index < node->parameter_count; index++)
                 zhashx_insert (route_parameters,
                                node->parameter_names [index],
@@ -595,27 +595,28 @@ ztrie_hit_asterisk_match (ztrie_t *self)
 //  --------------------------------------------------------------------------
 //  Print properties of the ztrie object.
 //
+
 static void
-s_ztrie_print_tree_line (ztrie_node_t *self, bool isEOL)
+s_ztrie_print_tree_line (ztrie_node_t *self, bool end_line)
 {
     if (self->parent) {
         s_ztrie_print_tree_line (self->parent, false);
         if (zlistx_tail (self->parent->children) == self) {
-            if (isEOL)
-                printf ("\u2514\u2500\u2500 ");
+            if (end_line)
+                printf ("`-- ");
             else
                 printf ("    ");
         }
         else {
-            if (isEOL)
-                printf ("\u251C\u2500\u2500 ");
+            if (end_line)
+                printf ("+-- ");
             else
-                printf ("\u2502   ");
+                printf ("|   ");
         }
-        if (isEOL) {
-            char *isEndpoint = self->endpoint? "true": "false";
+        if (end_line) {
+            char *is_endpoint = self->endpoint? "true": "false";
             printf ("%s (params: %zu, endpoint: %s, type: %d)\n",
-                self->token, self->parameter_count, isEndpoint, self->token_type);
+                self->token, self->parameter_count, is_endpoint, self->token_type);
         }
     }
 }

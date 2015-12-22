@@ -439,7 +439,7 @@ s_bind_test_sockets (zactor_t *proxy, char **frontend, char **backend)
     zstr_free (backend);
     assert (proxy);
 
-    srandom (time (NULL) ^ *(int *) proxy);
+    srandom ((uint) (time (NULL) ^ *(int *) proxy));
     *frontend = zsys_sprintf (LOCALENDPOINT, s_get_available_port ());
     *backend = zsys_sprintf (LOCALENDPOINT, s_get_available_port ());
 

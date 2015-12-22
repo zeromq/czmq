@@ -6,6 +6,10 @@ override_dh_strip:
 
 override_dh_auto_test:
 	echo "Skipped for now"
+
+override_dh_auto_configure:
+	dh_auto_configure -- --with-systemd
+
 %:
 	dh $@ --with=autoreconf
 
