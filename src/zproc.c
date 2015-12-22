@@ -42,6 +42,15 @@ zproc_interrupted (void)
     return zsys_interrupted;
 }
 
+//  --------------------------------------------------------------------------
+//  Returns true if the underlying libzmq supports CURVE security.
+
+bool
+zproc_has_curve (void)
+{
+	return zsys_has_curve ();
+}
+
 
 //  --------------------------------------------------------------------------
 //  Return current host name, for use in public tcp:// endpoints.

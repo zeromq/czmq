@@ -33,6 +33,10 @@ CZMQ_EXPORT int
 CZMQ_EXPORT bool
     zproc_interrupted (void);
 
+//  Returns true if the underlying libzmq supports CURVE security.
+CZMQ_EXPORT bool
+    zproc_has_curve (void);
+
 //  Return current host name, for use in public tcp:// endpoints.
 //  If the host name is not resolvable, returns NULL.            
 //  The caller is responsible for destroying the return value when finished with it.

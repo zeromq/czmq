@@ -91,6 +91,14 @@ module CZMQ
         result
       end
 
+      # Returns true if the underlying libzmq supports CURVE security.
+      #
+      # @return [Boolean]
+      def self.has_curve()
+        result = ::CZMQ::FFI.zproc_has_curve()
+        result
+      end
+
       # Return current host name, for use in public tcp:// endpoints.
       # If the host name is not resolvable, returns NULL.            
       #
