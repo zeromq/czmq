@@ -147,6 +147,8 @@ zpoller_remove (zpoller_t *self, void *reader)
 void *
 zpoller_wait (zpoller_t *self, int timeout)
 {
+    assert (self);
+
     self->expired = false;
     if (!self->ignore_interrupts && zsys_interrupted) {
         self->terminated = true;
@@ -217,7 +219,7 @@ struct _zpoller_t {
     zmq_pollitem_t *poll_set;   //  Current zmq_poll set
     void **poll_readers;        //  Matching table of socket readers
     size_t poll_size;           //  Size of poll set
-    bool need_rebuild;          //  Does pollset needs rebuilding?
+    bool need_rebuild;          //  Does pollset need rebuilding?
     bool expired;               //  Did poll timer expire?
     bool terminated;            //  Did poll call end with EINTR?
     bool ignore_interrupts;     //  Should this poller ignore zsys_interrupted?
@@ -243,7 +245,7 @@ zpoller_new (void *reader, ...)
             va_list args;
             va_start (args, reader);
             while (reader) {
-                if (zlist_append (self->reader_list, reader)) {
+                if (zlist_append (self->reader_list, reader) == -1) {
                     zpoller_destroy (&self);
                     break;
                 }
