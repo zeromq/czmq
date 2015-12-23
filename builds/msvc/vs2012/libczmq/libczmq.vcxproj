@@ -8,8 +8,8 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0C4A2E28-8C9E-4B27-85D9-BB679AD84AC7}</ProjectGuid>
-    <ProjectName>czmq</ProjectName>
-    <PlatformToolset>v120</PlatformToolset>
+    <ProjectName>libczmq</ProjectName>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="DebugDLL|Win32">

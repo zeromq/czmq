@@ -131,7 +131,7 @@
     <ClCompile Include="..\..\..\..\src\czmq_selftest.c" />
   </ItemGroup>
     <ItemGroup>
-    <ProjectReference Include="..\czmq\czmq.vcxproj">
+    <ProjectReference Include="..\libczmq\libczmq.vcxproj">
       <Project>{0C4A2E28-8C9E-4B27-85D9-BB679AD84AC7}</Project>
     </ProjectReference>
   </ItemGroup>

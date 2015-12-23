@@ -8,7 +8,7 @@
 <ProjectSchemaDefinitions xmlns="clr-namespace:Microsoft.Build.Framework.XamlTypes;assembly=Microsoft.Build.Framework">
   <Rule Name="czmq-linkage-uiextension" PageTemplate="tool" DisplayName="Local Dependencies" SwitchPrefix="/" Order="1">
     <Rule.Categories>
-      <Category Name="czmq" DisplayName="CZMQ" />
+      <Category Name="libczmq" DisplayName="CZMQ" />
     </Rule.Categories>
     <Rule.DataSource>
       <DataSource Persistence="ProjectFile" ItemType="" />
