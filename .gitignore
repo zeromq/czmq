@@ -109,3 +109,5 @@ test-suite.log
 *pro.user
 moc_*
 build-*
+build_cmake
+
