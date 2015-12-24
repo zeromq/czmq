@@ -73,7 +73,7 @@
     <Import Project="$(ProjectDir)$(ProjectName).props" />
   </ImportGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\builds\msvc\platform.h" />
+    <ClInclude Include="..\..\platform.h" />
     <ClInclude Include="..\..\resource.h" />
   </ItemGroup>
   <ItemGroup>
@@ -222,12 +222,10 @@
     <ResourceCompile Include="..\..\resource.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\packaging\nuget\package.bat" />
-    <None Include="..\..\..\..\packaging\nuget\package.config" />
-    <None Include="..\..\..\..\packaging\nuget\package.gsl" />
-    <None Include="..\..\..\..\packaging\nuget\package.nuspec" />
-    <None Include="..\..\..\..\packaging\nuget\package.targets" />
-    <None Include="..\..\..\..\packaging\nuget\package.xml" />
+    <None Include="..\..\nuget\package.bat" />
+    <None Include="..\..\nuget\package.nuspec" />
+    <None Include="..\..\nuget\package.targets" />
+    <None Include="..\..\nuget\package.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <!--

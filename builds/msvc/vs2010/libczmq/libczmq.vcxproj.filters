@@ -173,7 +173,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\builds\msvc\platform.h">
+    <ClInclude Include="..\..\platform.h">
       <Filter>src\include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -205,22 +205,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\packaging\nuget\package.bat">
+    <None Include="..\..\nuget\package.bat">
       <Filter>packaging</Filter>
     </None>
-    <None Include="..\..\..\..\packaging\nuget\package.config">
+    <None Include="..\..\nuget\package.nuspec">
       <Filter>packaging</Filter>
     </None>
-    <None Include="..\..\..\..\packaging\nuget\package.gsl">
+    <None Include="..\..\nuget\package.targets">
       <Filter>packaging</Filter>
     </None>
-    <None Include="..\..\..\..\packaging\nuget\package.nuspec">
-      <Filter>packaging</Filter>
-    </None>
-    <None Include="..\..\..\..\packaging\nuget\package.targets">
-      <Filter>packaging</Filter>
-    </None>
-    <None Include="..\..\..\..\packaging\nuget\package.xml">
+    <None Include="..\..\nuget\package.xml">
       <Filter>packaging</Filter>
     </None>
   </ItemGroup>

@@ -12,7 +12,6 @@ enable_language(C)
 enable_testing()
 
 set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-set(BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 
 ########################################################################
 # determine version
@@ -45,7 +44,7 @@ if (NOT HAVE_NET_IF_H)
     CHECK_INCLUDE_FILE("net/if.h" HAVE_NET_IF_H)
 endif()
 
-file(WRITE "${BINARY_DIR}/platform.h.in" "
+file(WRITE "${SOURCE_DIR}/src/platform.h.in" "
 #cmakedefine HAVE_LINUX_WIRELESS_H
 #cmakedefine HAVE_NET_IF_H
 #cmakedefine HAVE_NET_IF_MEDIA_H
@@ -53,7 +52,7 @@ file(WRITE "${BINARY_DIR}/platform.h.in" "
 #cmakedefine HAVE_FREEIFADDRS
 ")
 
-configure_file("${BINARY_DIR}/platform.h.in" "${BINARY_DIR}/platform.h")
+configure_file("${SOURCE_DIR}/src/platform.h.in" "${SOURCE_DIR}/src/platform.h")
 
 #The MSVC C compiler is too out of date,
 #so the sources have to be compiled as c++
@@ -147,7 +146,6 @@ set (czmq_headers
     include/zsys.h
     include/ztrie.h
     include/zuuid.h
-    src/zgossip_msg.h
     include/zauth_v2.h
     include/zbeacon_v2.h
     include/zctx.h
@@ -157,6 +155,7 @@ set (czmq_headers
     include/zsocket.h
     include/zsockopt.h
     include/zthread.h
+    src/zgossip_msg.h
     src/zsock_option.inc
     src/zgossip_engine.inc
     src/zhash_primes.inc
@@ -173,7 +172,7 @@ install(FILES ${czmq_headers} DESTINATION include)
 ########################################################################
 # library
 ########################################################################
-include_directories("${BINARY_DIR}" "${SOURCE_DIR}/include")
+include_directories("${SOURCE_DIR}/src" "${SOURCE_DIR}/include")
 set (czmq_sources
     src/zactor.c
     src/zauth.c
@@ -224,6 +223,7 @@ if (NOT DEFINED BUILD_SHARED_LIBS)
 endif()
 add_library(czmq ${czmq_sources})
 set_target_properties(czmq PROPERTIES DEFINE_SYMBOL "LIBCZMQ_EXPORTS")
+set_target_properties(czmq PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${SOURCE_DIR}/src")
 target_link_libraries(czmq ${ZEROMQ_LIBRARIES} ${MORE_LIBRARIES})
 
 install(TARGETS czmq
@@ -244,20 +244,27 @@ set(libdir "\${prefix}/lib${LIB_SUFFIX}")
 set(includedir "\${prefix}/include")
 configure_file(
     "${SOURCE_DIR}/src/libczmq.pc.in"
-    "${BINARY_DIR}/libczmq.pc"
+    "${SOURCE_DIR}/src/libczmq.pc"
 @ONLY)
 
 install(
-    FILES "${BINARY_DIR}/libczmq.pc"
+    FILES "${SOURCE_DIR}/src/libczmq.pc"
     DESTINATION "lib${LIB_SUFFIX}/pkgconfig"
 )
 
 ########################################################################
-# tests
+# executables
 ########################################################################
+add_executable(zmakecert "${SOURCE_DIR}/src/zmakecert.c")
+target_link_libraries(zmakecert czmq ${ZEROMQ_LIBRARIES})
+set_target_properties(zmakecert PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${SOURCE_DIR}/src")
 add_executable(czmq_selftest "${SOURCE_DIR}/src/czmq_selftest.c")
 target_link_libraries(czmq_selftest czmq ${ZEROMQ_LIBRARIES})
+set_target_properties(czmq_selftest PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${SOURCE_DIR}/src")
 
+########################################################################
+# tests
+########################################################################
 set(CLASSTEST_TIMEOUT 5 CACHE STRING "Timeout of the selftest of a class")
 set(TOTAL_TIMEOUT 20 CACHE STRING "Timout of the total testsuite")
 
@@ -313,6 +320,7 @@ endforeach(TEST_CLASS)
 
 add_test(czmq_selftest czmq_selftest)
 set_tests_properties(czmq_selftest PROPERTIES TIMEOUT ${TOTAL_TIMEOUT})
+
 ########################################################################
 # summary
 ########################################################################

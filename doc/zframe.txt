@@ -18,26 +18,23 @@ SYNOPSIS
 CZMQ_EXPORT zframe_t *
     zframe_new (const void *data, size_t size);
 
-//  Destroy a frame
-CZMQ_EXPORT void
-    zframe_destroy (zframe_t **self_p);
-
 //  Create an empty (zero-sized) frame
-//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zframe_t *
-    zframe_new_empty ();
+    zframe_new_empty (void);
 
 //  Create a frame with a specified string content.
-//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zframe_t *
     zframe_from (const char *string);
 
 //  Receive frame from socket, returns zframe_t object or NULL if the recv  
 //  was interrupted. Does a blocking recv, if you want to not block then use
 //  zpoller or zloop.                                                       
-//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zframe_t *
     zframe_recv (void *source);
+
+//  Destroy a frame
+CZMQ_EXPORT void
+    zframe_destroy (zframe_t **self_p);
 
 //  Send a frame to a socket, destroy frame after sending.
 //  Return -1 on error, 0 on success.                     

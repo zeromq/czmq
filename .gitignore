@@ -42,6 +42,7 @@ ipr
 *.gz
 *.zip
 *.la
+*.so
 win32/czmq.ncb
 win32/czmq.vcproj.WS200902.user.user
 win32/czmq_selftest.exe.embed.manifest
@@ -50,7 +51,7 @@ win32/czmq_selftest.exe.intermediate.manifest
 win32/czmq_selftest.vcproj.WS200902.user.user
 builds/mingw32/*.o
 builds/android/prefix/
-zmakecert
+src/zmakecert
 foreign/trex/test.o
 foreign/trex/test
 foreign/trex/test2.o
@@ -110,4 +111,11 @@ test-suite.log
 moc_*
 build-*
 build_cmake
+
+# CMake cache
+CMakeCache.txt
+CMakeFiles/
+CTestTestfile.cmake
+cmake_install.cmake
+install_manifest.txt
 

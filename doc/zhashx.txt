@@ -34,7 +34,13 @@ typedef int (zhashx_foreach_fn) (
 
 //  Create a new, empty hash container
 CZMQ_EXPORT zhashx_t *
-    zhashx_new ();
+    zhashx_new (void);
+
+//  Unpack binary frame into a new hash table. Packed data must follow format
+//  defined by zhashx_pack. Hash table is set to autofree. An empty frame    
+//  unpacks to an empty hash table.                                          
+CZMQ_EXPORT zhashx_t *
+    zhashx_unpack (zframe_t *frame);
 
 //  Destroy a hash container and all items in it
 CZMQ_EXPORT void
@@ -171,13 +177,6 @@ CZMQ_EXPORT int
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zframe_t *
     zhashx_pack (zhashx_t *self);
-
-//  Unpack binary frame into a new hash table. Packed data must follow format
-//  defined by zhashx_pack. Hash table is set to autofree. An empty frame    
-//  unpacks to an empty hash table.                                          
-//  The caller is responsible for destroying the return value when finished with it.
-CZMQ_EXPORT zhashx_t *
-    zhashx_unpack (zframe_t *frame);
 
 //  Make a copy of the list; items are duplicated if you set a duplicator 
 //  for the list, otherwise not. Copying a null reference returns a null  

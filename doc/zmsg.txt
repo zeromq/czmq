@@ -10,19 +10,35 @@ SYNOPSIS
 ----
 //  Create a new empty message object
 CZMQ_EXPORT zmsg_t *
-    zmsg_new ();
-
-//  Destroy a message object and all frames it contains
-CZMQ_EXPORT void
-    zmsg_destroy (zmsg_t **self_p);
+    zmsg_new (void);
 
 //  Receive message from socket, returns zmsg_t object or NULL if the recv   
 //  was interrupted. Does a blocking recv. If you want to not block then use 
 //  the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
 //  before receiving.                                                        
-//  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zmsg_t *
     zmsg_recv (void *source);
+
+//  Load/append an open file into new message, return the message.
+//  Returns NULL if the message could not be loaded.              
+CZMQ_EXPORT zmsg_t *
+    zmsg_load (FILE *file);
+
+//  Decodes a serialized message buffer created by zmsg_encode () and returns
+//  a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
+//  there was insufficient memory to work.                                   
+CZMQ_EXPORT zmsg_t *
+    zmsg_decode (const byte *buffer, size_t buffer_size);
+
+//  Generate a signal message encoding the given status. A signal is a short
+//  message carrying a 1-byte success/failure code (by convention, 0 means  
+//  OK). Signals are encoded to be distinguishable from "normal" messages.  
+CZMQ_EXPORT zmsg_t *
+    zmsg_new_signal (byte status);
+
+//  Destroy a message object and all frames it contains
+CZMQ_EXPORT void
+    zmsg_destroy (zmsg_t **self_p);
 
 //  Send message to destination socket, and destroy the message after sending
 //  it successfully. If the message has no frames, sends nothing but destroys
@@ -120,7 +136,7 @@ CZMQ_EXPORT int
     zmsg_addmsg (zmsg_t *self, zmsg_t **msg_p);
 
 //  Remove first submessage from message, if any. Returns zmsg_t, or NULL if
-//  decoding was not succesfull.                                            
+//  decoding was not succesful.                                             
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT zmsg_t *
     zmsg_popmsg (zmsg_t *self);
@@ -151,26 +167,12 @@ CZMQ_EXPORT zframe_t *
 CZMQ_EXPORT int
     zmsg_save (zmsg_t *self, FILE *file);
 
-//  Load/append an open file into message, create new message if
-//  null message provided. Returns NULL if the message could not
-//  be loaded.                                                  
-//  The caller is responsible for destroying the return value when finished with it.
-CZMQ_EXPORT zmsg_t *
-    zmsg_load (zmsg_t *self, FILE *file);
-
 //  Serialize multipart message to a single buffer. Use this method to send  
 //  structured messages across transports that do not support multipart data.
 //  Allocates and returns a new buffer containing the serialized message.    
 //  To decode a serialized message buffer, use zmsg_decode ().               
 CZMQ_EXPORT size_t
     zmsg_encode (zmsg_t *self, byte **buffer);
-
-//  Decodes a serialized message buffer created by zmsg_encode () and returns
-//  a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
-//  there was insufficient memory to work.                                   
-//  The caller is responsible for destroying the return value when finished with it.
-CZMQ_EXPORT zmsg_t *
-    zmsg_decode (const byte *buffer, size_t buffer_size);
 
 //  Create copy of message, as new message object. Returns a fresh zmsg_t
 //  object. If message is null, or memory was exhausted, returns null.   
@@ -188,13 +190,6 @@ CZMQ_EXPORT void
 //  other message. As with zframe_eq, return false if either message is NULL.
 CZMQ_EXPORT bool
     zmsg_eq (zmsg_t *self, zmsg_t *other);
-
-//  Generate a signal message encoding the given status. A signal is a short
-//  message carrying a 1-byte success/failure code (by convention, 0 means  
-//  OK). Signals are encoded to be distinguishable from "normal" messages.  
-//  The caller is responsible for destroying the return value when finished with it.
-CZMQ_EXPORT zmsg_t *
-    zmsg_new_signal (byte status);
 
 //  Return signal value, 0 or greater, if message is a signal, -1 if not.
 CZMQ_EXPORT int
@@ -288,19 +283,8 @@ assert (msg);
 assert (zmsg_size (msg) == 10);
 assert (zmsg_content_size (msg) == 60);
 
-// create empty file for null test
-FILE *file = fopen ("zmsg.test", "w");
-assert (file);
-fclose (file);
-
-file = fopen ("zmsg.test", "r");
-zmsg_t *null_msg = zmsg_load (NULL, file);
-assert (null_msg == NULL);
-fclose (file);
-remove ("zmsg.test");
-
 //  Save to a file, read back
-file = fopen ("zmsg.test", "w");
+FILE *file = fopen ("zmsg.test", "w");
 assert (file);
 rc = zmsg_save (msg, file);
 assert (rc == 0);
@@ -313,7 +297,7 @@ fclose (file);
 zmsg_destroy (&msg);
 
 file = fopen ("zmsg.test", "r");
-msg = zmsg_load (NULL, file);
+msg = zmsg_load (file);
 assert (msg);
 fclose (file);
 remove ("zmsg.test");

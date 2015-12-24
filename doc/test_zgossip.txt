@@ -1,1 +1,0 @@
-test_zgossip(3)

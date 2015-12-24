@@ -362,15 +362,15 @@ AC_ARG_WITH([zmakecert],
 AM_CONDITIONAL([WITH_ZMAKECERT], [test x$with_zmakecert != xno])
 AM_COND_IF([WITH_ZMAKECERT], [AC_MSG_NOTICE([WITH_ZMAKECERT defined])])
 
-# Check for test_zgossip intent
-AC_ARG_WITH([test_zgossip],
-    AS_HELP_STRING([--with-test_zgossip],
-        [Compile the test_zgossip program [default=yes].]),
-    [with_test_zgossip=$withval],
-    [with_test_zgossip=yes])
+# Check for czmq_selftest intent
+AC_ARG_WITH([czmq_selftest],
+    AS_HELP_STRING([--with-czmq_selftest],
+        [Compile the czmq_selftest program [default=yes].]),
+    [with_czmq_selftest=$withval],
+    [with_czmq_selftest=yes])
 
-AM_CONDITIONAL([WITH_TEST_ZGOSSIP], [test x$with_test_zgossip != xno])
-AM_COND_IF([WITH_TEST_ZGOSSIP], [AC_MSG_NOTICE([WITH_TEST_ZGOSSIP defined])])
+AM_CONDITIONAL([WITH_CZMQ_SELFTEST], [test x$with_czmq_selftest != xno])
+AM_COND_IF([WITH_CZMQ_SELFTEST], [AC_MSG_NOTICE([WITH_CZMQ_SELFTEST defined])])
 
 # Checks for library functions.
 AC_TYPE_SIGNAL
