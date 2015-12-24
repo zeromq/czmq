@@ -226,9 +226,8 @@ zsys_shutdown (void)
         zclock_sleep (200);
 
     //  Close logsender socket if opened (don't do this in critical section)
-    if (s_logsender) {
+    if (s_logsender) 
         zsock_destroy (&s_logsender);
-    }
 
     //  No matter, we are now going to shut down
     //  Print the source reference for any sockets the app did not
