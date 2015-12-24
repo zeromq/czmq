@@ -647,16 +647,6 @@ class TestCZMQ(unittest.TestCase):
         self.assertEqual(msg.size(), 10)
         self.assertEqual(msg.content_size(), 60)
 
-        # create empty file for null test
-        f = open('zmsg.test', 'w')
-        f.close()
-
-        f = open("zmsg.test", "r")
-        null_msg = Zmsg.load(None, f)
-        self.assertFalse(null_msg)
-        f.close()
-        os.remove("zmsg.test")
-
         # Save to a file, read back
         f = open("zmsg.test", "w")
         self.assertEqual(msg.save(f), 0)
@@ -668,7 +658,7 @@ class TestCZMQ(unittest.TestCase):
         del msg
 
         f = open ("zmsg.test", "r")
-        msg = Zmsg.load(None, f)
+        msg = Zmsg.load(f)
         self.assertTrue(msg)
         f.close()
         os.remove ("zmsg.test")
