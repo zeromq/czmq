@@ -72,5 +72,4 @@
 
     <!-- Command-line utilities -->
     <main name = "zmakecert" />
-    <main name = "test_zgossip" private = "1" />
 </project>
