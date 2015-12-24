@@ -1,9 +1,6 @@
 @ECHO OFF
 ECHO Started nuget packaging build.
 ECHO.
-REM http://www.nuget.org/packages/gsl
-gsl -q -script:package.gsl package.config
-ECHO.
 REM http://nuget.codeplex.com/releases
 nuget pack package.nuspec -verbosity detailed
 ECHO.
