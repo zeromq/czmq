@@ -779,9 +779,9 @@ zloop_start (zloop_t *self)
                 zsys_debug ("zloop: call ticket handler");
             if (!ticket->deleted
             && ticket->handler (self, 0, ticket->arg) == -1) {
-				rc = -1;	//  Trigger exit from zloop_start
+                rc = -1;    //  Trigger exit from zloop_start
                 break;      //  Ticket handler signaled break
-			}
+            }
             zlistx_delete (self->tickets, ticket->list_handle);
             ticket = (s_ticket_t *) zlistx_next (self->tickets);
         }
