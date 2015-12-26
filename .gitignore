@@ -50,13 +50,17 @@ win32/czmq_selftest.exe.embed.manifest.res
 win32/czmq_selftest.exe.intermediate.manifest
 win32/czmq_selftest.vcproj.WS200902.user.user
 builds/mingw32/*.o
+builds/msvc/*/czmq/
+builds/android/Android.mk
 builds/android/prefix/
+builds/qt-android/
 src/zmakecert
 foreign/trex/test.o
 foreign/trex/test
 foreign/trex/test2.o
 foreign/trex/test2
 *.kate-swp
+*.vimsession
 src/czmq_selftest.log
 src/czmq_selftest.trs
 src/test-suite.log
