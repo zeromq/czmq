@@ -180,7 +180,7 @@ Java_org_zeromq_czmq_Zconfig__1_1filename (JNIEnv *env, jclass c, jlong self)
     return return_string_;
 }
 
-JNIEXPORT jint JNICALL
+JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zconfig__1_1reload (JNIEnv *env, jclass c, jlong self)
 {
     jint reload_ = (jint) zconfig_reload ((zconfig_t **) &self);

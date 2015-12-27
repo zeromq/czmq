@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
-# vs2010
+# builds/msvc/vs2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libczmq", "libczmq\libczmq.vcxproj", "{0C4A2E28-8C9E-4B27-85D9-BB679AD84AC7}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zmakecert", "zmakecert\zmakecert.vcxproj", "{A5497C4B-1CD1-4779-9458-2CF7908E7E26}"
