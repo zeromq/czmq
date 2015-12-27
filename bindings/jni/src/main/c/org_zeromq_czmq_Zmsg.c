@@ -48,14 +48,14 @@ Java_org_zeromq_czmq_Zmsg__1_1destroy (JNIEnv *env, jclass c, jlong self)
     zmsg_destroy ((zmsg_t **) &self);
 }
 
-JNIEXPORT jint JNICALL
+JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zmsg__1_1send (JNIEnv *env, jclass c, jlong self, jlong dest)
 {
     jint send_ = (jint) zmsg_send ((zmsg_t **) &self, (void *) (intptr_t) dest);
     return self;
 }
 
-JNIEXPORT jint JNICALL
+JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zmsg__1_1sendm (JNIEnv *env, jclass c, jlong self, jlong dest)
 {
     jint sendm_ = (jint) zmsg_sendm ((zmsg_t **) &self, (void *) (intptr_t) dest);

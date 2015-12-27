@@ -179,7 +179,7 @@ public class Zconfig implements AutoCloseable{
     Returns 0 if OK, -1 if there was an error (and then does not change  
     existing data).                                                      
     */
-    native static int __reload (long self);
+    native static long __reload (long self);
     public int reload () {
         self = __reload (self);
         return 0;

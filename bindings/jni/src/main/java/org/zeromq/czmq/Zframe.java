@@ -65,7 +65,7 @@ public class Zframe implements AutoCloseable{
     Send a frame to a socket, destroy frame after sending.
     Return -1 on error, 0 on success.                     
     */
-    native static int __send (long self, long dest, int flags);
+    native static long __send (long self, long dest, int flags);
     public int send (long dest, int flags) {
         self = __send (self, dest, flags);
         return 0;

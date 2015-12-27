@@ -70,7 +70,7 @@ public class Zmsg implements AutoCloseable{
     the message anyhow. Nullifies the caller's reference to the message (as  
     it is a destructor).                                                     
     */
-    native static int __send (long self, long dest);
+    native static long __send (long self, long dest);
     public int send (long dest) {
         self = __send (self, dest);
         return 0;
@@ -83,7 +83,7 @@ public class Zmsg implements AutoCloseable{
     the message anyhow. Nullifies the caller's reference to the message (as 
     it is a destructor).                                                    
     */
-    native static int __sendm (long self, long dest);
+    native static long __sendm (long self, long dest);
     public int sendm (long dest) {
         self = __sendm (self, dest);
         return 0;

@@ -50,7 +50,7 @@ Java_org_zeromq_czmq_Zframe__1_1destroy (JNIEnv *env, jclass c, jlong self)
     zframe_destroy ((zframe_t **) &self);
 }
 
-JNIEXPORT jint JNICALL
+JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zframe__1_1send (JNIEnv *env, jclass c, jlong self, jlong dest, jint flags)
 {
     jint send_ = (jint) zframe_send ((zframe_t **) &self, (void *) (intptr_t) dest, (int) flags);
