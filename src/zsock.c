@@ -1901,9 +1901,8 @@ zsock_test (bool verbose)
 
     zsock_destroy (&reader);
     zsock_destroy (&writer);
-
-    zsock_option_test (verbose);
     
     //  @end
     printf ("OK\n");
+    zsock_option_test (verbose);
 }
