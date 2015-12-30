@@ -17,15 +17,31 @@ set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 # determine version
 ########################################################################
 foreach(which MAJOR MINOR PATCH)
-    file(STRINGS "${SOURCE_DIR}/include/czmq_library.h" CZMQ_VERSION_STRING REGEX "#define CZMQ_VERSION_${which}")
-    string(REGEX MATCH "#define CZMQ_VERSION_${which} ([0-9_]+)" CZMQ_REGEX_MATCH "${CZMQ_VERSION_STRING}")
+    file(
+        STRINGS
+        "${SOURCE_DIR}/include/czmq_library.h"
+        CZMQ_VERSION_STRING REGEX
+        "#define CZMQ_VERSION_${which}"
+    )
+    string(
+        REGEX MATCH
+        "#define CZMQ_VERSION_${which} ([0-9_]+)"
+        CZMQ_REGEX_MATCH
+        "${CZMQ_VERSION_STRING}"
+    )
     if (NOT CZMQ_REGEX_MATCH)
-        message(FATAL_ERROR "failed to parse CZMQ_VERSION_${which} from czmq.h")
+        message(
+            FATAL_ERROR
+            "failed to parse CZMQ_VERSION_${which} from czmq.h"
+        )
     endif()
     set(CZMQ_${which}_VERSION ${CMAKE_MATCH_1})
 endforeach(which)
 
-set(CZMQ_VERSION ${CZMQ_MAJOR_VERSION}.${CZMQ_MINOR_VERSION}.${CZMQ_PATCH_VERSION})
+set(
+    CZMQ_VERSION
+    ${CZMQ_MAJOR_VERSION}.${CZMQ_MINOR_VERSION}.${CZMQ_PATCH_VERSION}
+)
 
 ########################################################################
 # platform.h
@@ -59,7 +75,10 @@ configure_file("${SOURCE_DIR}/src/platform.h.in" "${SOURCE_DIR}/src/platform.h")
 if (MSVC)
     enable_language(CXX)
     file(GLOB sources "${SOURCE_DIR}/src/*.c")
-    set_source_files_properties(${sources} PROPERTIES LANGUAGE CXX)
+    set_source_files_properties(
+        ${sources}
+        PROPERTIES LANGUAGE CXX
+    )
     set(MORE_LIBRARIES ws2_32 Rpcrt4 Iphlpapi)
 endif()
 
@@ -80,10 +99,10 @@ list(APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}")
 ########################################################################
 find_package(Libsodium REQUIRED)
 IF (LIBSODIUM_FOUND)
-include_directories(${LIBSODIUM_INCLUDE_DIRS})
-list(APPEND MORE_LIBRARIES ${LIBSODIUM_LIBRARIES})
+    include_directories(${LIBSODIUM_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${LIBSODIUM_LIBRARIES})
 ELSE (LIBSODIUM_FOUND)
-message( FATAL_ERROR "Libsodium not found." )
+    message( FATAL_ERROR "Libsodium not found." )
 ENDIF (LIBSODIUM_FOUND)
 
 ########################################################################
@@ -91,10 +110,10 @@ ENDIF (LIBSODIUM_FOUND)
 ########################################################################
 find_package(ZeroMQ REQUIRED)
 IF (ZEROMQ_FOUND)
-include_directories(${ZEROMQ_INCLUDE_DIRS})
-list(APPEND MORE_LIBRARIES ${ZEROMQ_LIBRARIES})
+    include_directories(${ZEROMQ_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${ZEROMQ_LIBRARIES})
 ELSE (ZEROMQ_FOUND)
-message( FATAL_ERROR "ZeroMQ not found." )
+    message( FATAL_ERROR "ZeroMQ not found." )
 ENDIF (ZEROMQ_FOUND)
 
 ########################################################################
@@ -102,9 +121,9 @@ ENDIF (ZEROMQ_FOUND)
 ########################################################################
 find_package(Uuid)
 IF (UUID_FOUND)
-include_directories(${UUID_INCLUDE_DIRS})
-list(APPEND MORE_LIBRARIES ${UUID_LIBRARIES})
-add_definitions(-DHAVE_UUID)
+    include_directories(${UUID_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${UUID_LIBRARIES})
+    add_definitions(-DHAVE_UUID)
 ENDIF (UUID_FOUND)
 
 ########################################################################
@@ -217,14 +236,20 @@ set (czmq_sources
     src/zsockopt.c
     src/zthread.c
 )
-source_group ("Source Files" FILES ${czmq_sources})
+source_group("Source Files" FILES ${czmq_sources})
 if (NOT DEFINED BUILD_SHARED_LIBS)
     SET(BUILD_SHARED_LIBS ON)
 endif()
 add_library(czmq ${czmq_sources})
-set_target_properties(czmq PROPERTIES DEFINE_SYMBOL "LIBCZMQ_EXPORTS")
-set_target_properties(czmq PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${SOURCE_DIR}/src")
-target_link_libraries(czmq ${ZEROMQ_LIBRARIES} ${MORE_LIBRARIES})
+set_target_properties(czmq
+    PROPERTIES DEFINE_SYMBOL "LIBCZMQ_EXPORTS"
+)
+set_target_properties(czmq
+    PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${SOURCE_DIR}/src"
+)
+target_link_libraries(czmq
+    ${ZEROMQ_LIBRARIES} ${MORE_LIBRARIES}
+)
 
 install(TARGETS czmq
     LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
@@ -255,12 +280,36 @@ install(
 ########################################################################
 # executables
 ########################################################################
-add_executable(zmakecert "${SOURCE_DIR}/src/zmakecert.c")
-target_link_libraries(zmakecert czmq ${ZEROMQ_LIBRARIES})
-set_target_properties(zmakecert PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${SOURCE_DIR}/src")
-add_executable(czmq_selftest "${SOURCE_DIR}/src/czmq_selftest.c")
-target_link_libraries(czmq_selftest czmq ${ZEROMQ_LIBRARIES})
-set_target_properties(czmq_selftest PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${SOURCE_DIR}/src")
+add_executable(
+    zmakecert
+    "${SOURCE_DIR}/src/zmakecert.c"
+)
+target_link_libraries(
+    zmakecert
+    czmq
+    ${LIBSODIUM_LIBRARIES}
+    ${ZEROMQ_LIBRARIES}
+    ${UUID_LIBRARIES}
+)
+set_target_properties(
+    zmakecert
+    PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${SOURCE_DIR}/src"
+)
+add_executable(
+    czmq_selftest
+    "${SOURCE_DIR}/src/czmq_selftest.c"
+)
+target_link_libraries(
+    czmq_selftest
+    czmq
+    ${LIBSODIUM_LIBRARIES}
+    ${ZEROMQ_LIBRARIES}
+    ${UUID_LIBRARIES}
+)
+set_target_properties(
+    czmq_selftest
+    PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${SOURCE_DIR}/src"
+)
 
 ########################################################################
 # tests
@@ -269,57 +318,66 @@ set(CLASSTEST_TIMEOUT 5 CACHE STRING "Timeout of the selftest of a class")
 set(TOTAL_TIMEOUT 20 CACHE STRING "Timout of the total testsuite")
 
 set(TEST_CLASSES
-  zactor_test
-  zauth_test
-  zarmour_test
-  zbeacon_test
-  zcert_test
-  zcertstore_test
-  zchunk_test
-  zclock_test
-  zconfig_test
-  zdigest_test
-  zdir_test
-  zdir_patch_test
-  zfile_test
-  zframe_test
-  zgossip_test
-  zhash_test
-  zhashx_test
-  ziflist_test
-  zlist_test
-  zlistx_test
-  zloop_test
-  zmonitor_test
-  zmsg_test
-  zpoller_test
-  zproc_test
-  zproxy_test
-  zrex_test
-  zsock_test
-  zstr_test
-  zsys_test
-  ztrie_test
-  zuuid_test
-  zgossip_msg_test
-  zauth_v2_test
-  zbeacon_v2_test
-  zctx_test
-  zmonitor_v2_test
-  zmutex_test
-  zproxy_v2_test
-  zsocket_test
-  zsockopt_test
-  zthread_test
+    zactor_test
+    zauth_test
+    zarmour_test
+    zbeacon_test
+    zcert_test
+    zcertstore_test
+    zchunk_test
+    zclock_test
+    zconfig_test
+    zdigest_test
+    zdir_test
+    zdir_patch_test
+    zfile_test
+    zframe_test
+    zgossip_test
+    zhash_test
+    zhashx_test
+    ziflist_test
+    zlist_test
+    zlistx_test
+    zloop_test
+    zmonitor_test
+    zmsg_test
+    zpoller_test
+    zproc_test
+    zproxy_test
+    zrex_test
+    zsock_test
+    zstr_test
+    zsys_test
+    ztrie_test
+    zuuid_test
+    zgossip_msg_test
+    zauth_v2_test
+    zbeacon_v2_test
+    zctx_test
+    zmonitor_v2_test
+    zmutex_test
+    zproxy_v2_test
+    zsocket_test
+    zsockopt_test
+    zthread_test
 )
 
 foreach(TEST_CLASS ${TEST_CLASSES})
-  add_test(NAME ${TEST_CLASS} COMMAND czmq_selftest -e -v --test ${TEST_CLASS})
-  set_tests_properties(${TEST_CLASS} PROPERTIES TIMEOUT ${CLASSTEST_TIMEOUT})
+    add_test(
+        NAME ${TEST_CLASS}
+        COMMAND czmq_selftest -e -v --test ${TEST_CLASS}
+    )
+    set_tests_properties(
+        ${TEST_CLASS}
+        PROPERTIES TIMEOUT ${CLASSTEST_TIMEOUT}
+    )
 endforeach(TEST_CLASS)
 
 add_test(czmq_selftest czmq_selftest)
-set_tests_properties(czmq_selftest PROPERTIES TIMEOUT ${TOTAL_TIMEOUT})
+set_tests_properties(
+    czmq_selftest
+    PROPERTIES TIMEOUT ${TOTAL_TIMEOUT}
+)
 
 ########################################################################
 # summary
