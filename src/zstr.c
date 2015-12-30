@@ -341,6 +341,7 @@ zstr_test (bool verbose)
     assert (rc == 0);
     char *request = zstr_recv (server);
     assert (streq (request, "Hello"));
+    assert (zsock_routing_id (server));
     free (request);
 
     rc = zstr_send (server, "World");
@@ -370,7 +371,7 @@ zstr_test (bool verbose)
     assert (streq (reply, "World"));
     free (reply);
 
-   //  Client and server disallow multipart
+    //  Client and server disallow multipart
     rc = zstr_sendm (client, "Hello");
     assert (rc == -1);
     rc = zstr_sendm (server, "World");
