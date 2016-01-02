@@ -73,12 +73,10 @@ zhash_t *
 zhash_new (void)
 {
     zhash_t *self = (zhash_t *) zmalloc (sizeof (zhash_t));
-    if (self) {
-        self->limit = INITIAL_SIZE;
-        self->items = (item_t **) zmalloc (sizeof (item_t *) * self->limit);
-        if (!self->items)
-            zhash_destroy (&self);
-    }
+    assert (self);
+    self->limit = INITIAL_SIZE;
+    self->items = (item_t **) zmalloc (sizeof (item_t *) * self->limit);
+    assert (self->items);
     return self;
 }
 
@@ -186,7 +184,6 @@ zhash_insert (zhash_t *self, const char *key, void *value)
         self->items = new_items;
         self->limit = new_limit;
     }
-
     return s_item_insert (self, key, value)? 0: -1;
 }
 
@@ -220,11 +217,13 @@ s_item_insert (zhash_t *self, const char *key, void *value)
     item_t *item = s_item_lookup (self, key);
     if (item == NULL) {
         item = (item_t *) zmalloc (sizeof (item_t));
-        if (!item)
-            return NULL;
+        assert (item);
+
         //  If necessary, take duplicate of item (string) value
-        if (self->autofree)
+        if (self->autofree) {
             value = strdup ((char *) value);
+            assert (value);
+        }
         item->value = value;
         item->key = strdup (key);
         item->index = self->cached_index;
@@ -280,8 +279,10 @@ zhash_update (zhash_t *self, const char *key, void *value)
             free (item->value);
 
         //  If necessary, take duplicate of item (string) value
-        if (self->autofree)
+        if (self->autofree) {
             value = strdup ((char *) value);
+            assert (value);
+        }
         item->value = value;
     }
     else
@@ -335,6 +336,7 @@ zhash_rename (zhash_t *self, const char *old_key, const char *new_key)
         s_item_destroy (self, old_item, false);
         free (old_item->key);
         old_item->key = strdup (new_key);
+        assert (old_item->key);
         old_item->index = self->cached_index;
         old_item->next = self->items [self->cached_index];
         self->items [self->cached_index] = old_item;
@@ -575,40 +577,33 @@ zhash_load (zhash_t *self, const char *filename)
 
     //  Take copy of filename in case self->filename is same string.
     char *filename_copy = strdup (filename);
-    if (filename_copy) {
-        free (self->filename);
-        self->filename = filename_copy;
-        self->modified = zsys_file_modified (self->filename);
-        FILE *handle = fopen (self->filename, "r");
-        if (handle) {
-            char *buffer = (char *) zmalloc (1024);
-            if (buffer) {
-                while (fgets (buffer, 1024, handle)) {
-                    //  Skip lines starting with "#" or that do not look like
-                    //  name=value data.
-                    char *equals = strchr (buffer, '=');
-                    if (buffer [0] == '#' || equals == buffer || !equals)
-                        continue;
+    assert (filename_copy);
+    free (self->filename);
+    self->filename = filename_copy;
+    self->modified = zsys_file_modified (self->filename);
 
-                    //  Buffer may end in newline, which we don't want
-                    if (buffer [strlen (buffer) - 1] == '\n')
-                        buffer [strlen (buffer) - 1] = 0;
-                    *equals++ = 0;
-                    zhash_update (self, buffer, equals);
-                }
-                free (buffer);
-            }
-            else {
-                fclose (handle);
-                return -1; // Out of memory
-            }
-            fclose (handle);
+    FILE *handle = fopen (self->filename, "r");
+    if (handle) {
+        char *buffer = (char *) zmalloc (1024);
+        assert (buffer);
+        while (fgets (buffer, 1024, handle)) {
+            //  Skip lines starting with "#" or that do not look like
+            //  name=value data.
+            char *equals = strchr (buffer, '=');
+            if (buffer [0] == '#' || equals == buffer || !equals)
+                continue;
+
+            //  Buffer may end in newline, which we don't want
+            if (buffer [strlen (buffer) - 1] == '\n')
+                buffer [strlen (buffer) - 1] = 0;
+            *equals++ = 0;
+            zhash_update (self, buffer, equals);
         }
-        else
-            return -1; // Failed to open file for reading
+        free (buffer);
+        fclose (handle);
     }
     else
-        return -1; // Out of memory
+        return -1; // Failed to open file for reading
 
     return 0;
 }

@@ -53,21 +53,17 @@ zauth_t *
 zauth_new (zctx_t *ctx)
 {
     zauth_t *self = (zauth_t *) zmalloc (sizeof (zauth_t));
-    if (!self)
-        return NULL;
+    assert (self);
 
     //  Start background agent and wait for it to initialize
     assert (ctx);
     self->pipe = zthread_fork (ctx, s_agent_task, NULL);
-    if (self->pipe) {
-        char *status = zstr_recv (self->pipe);
-        if (strneq (status, "OK"))
-            zauth_destroy (&self);
-        zstr_free (&status);
-    }
-    else {
+    assert (self->pipe);
+    char *status = zstr_recv (self->pipe);
+    if (strneq (status, "OK"))
         zauth_destroy (&self);
-    }
+
+    zstr_free (&status);
     return self;
 }
 

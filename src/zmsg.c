@@ -56,12 +56,10 @@ zmsg_t *
 zmsg_new (void)
 {
     zmsg_t *self = (zmsg_t *) zmalloc (sizeof (zmsg_t));
-    if (self) {
-        self->tag = ZMSG_TAG;
-        self->frames = zlist_new ();
-        if (!self->frames)
-            zmsg_destroy (&self);
-    }
+    assert (self);
+    self->tag = ZMSG_TAG;
+    self->frames = zlist_new ();
+    assert (self->frames);
     return self;
 }
 
@@ -272,7 +270,8 @@ zmsg_prepend (zmsg_t *self, zframe_t **frame_p)
     zframe_t *frame = *frame_p;
     *frame_p = NULL;            //  We now own frame
     self->content_size += zframe_size (frame);
-    return zlist_push (self->frames, frame);
+    zlist_push (self->frames, frame);
+    return 0;
 }
 
 
@@ -291,7 +290,8 @@ zmsg_append (zmsg_t *self, zframe_t **frame_p)
     zframe_t *frame = *frame_p;
     *frame_p = NULL;            //  We now own frame
     self->content_size += zframe_size (frame);
-    return zlist_append (self->frames, frame);
+    zlist_append (self->frames, frame);
+    return 0;
 }
 
 
@@ -324,12 +324,10 @@ zmsg_pushmem (zmsg_t *self, const void *src, size_t size)
     assert (zmsg_is (self));
 
     zframe_t *frame = zframe_new (src, size);
-    if (frame) {
-        self->content_size += size;
-        return zlist_push (self->frames, frame);
-    }
-    else
-        return -1;
+    assert (frame);
+    self->content_size += size;
+    zlist_push (self->frames, frame);
+    return 0;
 }
 
 //  --------------------------------------------------------------------------
@@ -343,12 +341,10 @@ zmsg_addmem (zmsg_t *self, const void *src, size_t size)
     assert (zmsg_is (self));
 
     zframe_t *frame = zframe_new (src, size);
-    if (frame) {
-        self->content_size += size;
-        return zlist_append (self->frames, frame);
-    }
-    else
-        return -1;
+    assert (frame);
+    self->content_size += size;
+    zlist_append (self->frames, frame);
+    return 0;
 }
 
 
@@ -365,12 +361,10 @@ zmsg_pushstr (zmsg_t *self, const char *string)
 
     size_t len = strlen (string);
     zframe_t *frame = zframe_new (string, len);
-    if (frame) {
-        self->content_size += len;
-        return zlist_push (self->frames, frame);
-    }
-    else
-        return -1;
+    assert (frame);
+    self->content_size += len;
+    zlist_push (self->frames, frame);
+    return 0;
 }
 
 
@@ -387,12 +381,10 @@ zmsg_addstr (zmsg_t *self, const char *string)
 
     size_t len = strlen (string);
     zframe_t *frame = zframe_new (string, len);
-    if (frame) {
-        self->content_size += len;
-        return zlist_append (self->frames, frame);
-    }
-    else
-        return -1;
+    assert (frame);
+    self->content_size += len;
+    zlist_append (self->frames, frame);
+    return 0;
 }
 
 
@@ -416,13 +408,11 @@ zmsg_pushstrf (zmsg_t *self, const char *format, ...)
 
     size_t len = strlen (string);
     zframe_t *frame = zframe_new (string, len);
+    assert (frame);
+    self->content_size += len;
+    zlist_push (self->frames, frame);
     zstr_free (&string);
-    if (frame) {
-        self->content_size += len;
-        return zlist_push (self->frames, frame);
-    }
-    else
-        return -1;
+    return 0;
 }
 
 
@@ -446,13 +436,11 @@ zmsg_addstrf (zmsg_t *self, const char *format, ...)
 
     size_t len = strlen (string);
     zframe_t *frame = zframe_new (string, len);
+    assert (frame);
+    self->content_size += len;
+    zlist_append (self->frames, frame);
     zstr_free (&string);
-    if (frame) {
-        self->content_size += len;
-        return zlist_append (self->frames, frame);
-    }
-    else
-        return -1;
+    return 0;
 }
 
 
@@ -489,16 +477,12 @@ zmsg_addmsg (zmsg_t *self, zmsg_t **msg_p)
     assert (zmsg_is (self));
     assert (msg_p);
 
-    zmsg_t *msg = *msg_p;
     byte *data;
-    size_t len = zmsg_encode (msg, &data);
-    int r = zmsg_addmem (self, data, len);
-    if (r == 0) {
-        zmsg_destroy (&msg);
-        *msg_p = NULL;
-    }
+    size_t length = zmsg_encode (*msg_p, &data);
+    zmsg_destroy (msg_p);
+    zmsg_addmem (self, data, length);
     free (data);
-    return r;
+    return 0;
 }
 
 
@@ -664,31 +648,30 @@ zmsg_encode (zmsg_t *self, byte **buffer)
         frame = zmsg_next (self);
     }
     *buffer = (byte *) zmalloc (buffer_size);
+    assert (buffer);
 
-    if (*buffer) {
-        //  Encode message now
-        byte *dest = *buffer;
-        frame = zmsg_first (self);
-        while (frame) {
-            size_t frame_size = zframe_size (frame);
-            if (frame_size < 255) {
-                *dest++ = (byte) frame_size;
-                memcpy (dest, zframe_data (frame), frame_size);
-                dest += frame_size;
-            }
-            else {
-                *dest++ = 0xFF;
-                *dest++ = (frame_size >> 24) & 255;
-                *dest++ = (frame_size >> 16) & 255;
-                *dest++ = (frame_size >>  8) & 255;
-                *dest++ =  frame_size        & 255;
-                memcpy (dest, zframe_data (frame), frame_size);
-                dest += frame_size;
-            }
-            frame = zmsg_next (self);
+    //  Encode message now
+    byte *dest = *buffer;
+    frame = zmsg_first (self);
+    while (frame) {
+        size_t frame_size = zframe_size (frame);
+        if (frame_size < 255) {
+            *dest++ = (byte) frame_size;
+            memcpy (dest, zframe_data (frame), frame_size);
+            dest += frame_size;
         }
-        assert ((dest - *buffer) == buffer_size);
+        else {
+            *dest++ = 0xFF;
+            *dest++ = (frame_size >> 24) & 255;
+            *dest++ = (frame_size >> 16) & 255;
+            *dest++ = (frame_size >>  8) & 255;
+            *dest++ =  frame_size        & 255;
+            memcpy (dest, zframe_data (frame), frame_size);
+            dest += frame_size;
+        }
+        frame = zmsg_next (self);
     }
+    assert ((dest - *buffer) == buffer_size);
     return buffer_size;
 }
 
@@ -702,8 +685,7 @@ zmsg_t *
 zmsg_decode (const byte *buffer, size_t buffer_size)
 {
     zmsg_t *self = zmsg_new ();
-    if (!self)
-        return NULL;
+    assert (self);
 
     const byte *source = buffer;
     const byte *limit = buffer + buffer_size;
@@ -725,17 +707,9 @@ zmsg_decode (const byte *buffer, size_t buffer_size)
             break;
         }
         zframe_t *frame = zframe_new (source, frame_size);
-        if (frame) {
-            if (zmsg_append (self, &frame)) {
-                zmsg_destroy (&self);
-                break;
-            }
-            source += frame_size;
-        }
-        else {
-            zmsg_destroy (&self);
-            break;
-        }
+        assert (frame);
+        zmsg_append (self, &frame);
+        source += frame_size;
     }
     return self;
 }
@@ -751,15 +725,11 @@ zmsg_dup (zmsg_t *self)
     if (self) {
         assert (zmsg_is (self));
         zmsg_t *copy = zmsg_new ();
-        if (copy) {
-            zframe_t *frame = zmsg_first (self);
-            while (frame) {
-                if (zmsg_addmem (copy, zframe_data (frame), zframe_size (frame))) {
-                    zmsg_destroy (&copy);
-                    break;      //  Abandon attempt to copy message
-                }
-                frame = zmsg_next (self);
-            }
+        assert (copy);
+        zframe_t *frame = zmsg_first (self);
+        while (frame) {
+            zmsg_addmem (copy, zframe_data (frame), zframe_size (frame));
+            frame = zmsg_next (self);
         }
         return copy;
     }
@@ -826,8 +796,7 @@ zmsg_new_signal (byte status)
 {
     zmsg_t *self = zmsg_new ();
     int64_t signal_value = 0x7766554433221100L + status;
-    if (zmsg_addmem (self, &signal_value, 8))
-        zmsg_destroy (&self);
+    zmsg_addmem (self, &signal_value, 8);
     return self;
 }
 
@@ -936,7 +905,8 @@ zmsg_push (zmsg_t *self, zframe_t *frame)
     assert (self);
     assert (frame);
     self->content_size += zframe_size (frame);
-    return zlist_push (self->frames, frame);
+    zlist_push (self->frames, frame);
+    return 0;
 }
 
 
@@ -952,7 +922,8 @@ zmsg_add (zmsg_t *self, zframe_t *frame)
     assert (self);
     assert (frame);
     self->content_size += zframe_size (frame);
-    return zlist_append (self->frames, frame);
+    zlist_append (self->frames, frame);
+    return 0;
 }
 
 

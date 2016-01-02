@@ -60,17 +60,15 @@ static interface_t *
 s_interface_new (char *name, inaddr_t address, inaddr_t netmask, inaddr_t broadcast)
 {
     interface_t *self = (interface_t *) zmalloc (sizeof (interface_t));
-    if (!self)
-        return NULL;
+    assert (self);
     self->name = strdup (name);
-    if (self->name)
-        self->address = strdup (inet_ntoa (address.sin_addr));
-    if (self->address)
-        self->netmask = strdup (inet_ntoa (netmask.sin_addr));
-    if (self->netmask)
-        self->broadcast = strdup (inet_ntoa (broadcast.sin_addr));
-    if (!self->broadcast)
-        s_interface_destroy (&self);
+    assert (self->name);
+    self->address = strdup (inet_ntoa (address.sin_addr));
+    assert (self->address);
+    self->netmask = strdup (inet_ntoa (netmask.sin_addr));
+    assert (self->netmask);
+    self->broadcast = strdup (inet_ntoa (broadcast.sin_addr));
+    assert (self->broadcast);
     return self;
 }
 
@@ -83,12 +81,10 @@ struct _ziflist_t;
 ziflist_t *
 ziflist_new (void)
 {
-    zlistx_t *list = zlistx_new ();
-    ziflist_t *self = (ziflist_t *) list;
-    if (self) {
-        zlistx_set_destructor (list, (czmq_destructor *) s_interface_destroy);
-        ziflist_reload (self);
-    }
+    ziflist_t *self = (ziflist_t *) zlistx_new ();
+    assert (self);
+    zlistx_set_destructor ((zlistx_t *) self, (czmq_destructor *) s_interface_destroy);
+    ziflist_reload (self);
     return self;
 }
 
@@ -379,7 +375,7 @@ ziflist_test (bool verbose)
     size_t items = ziflist_size (iflist);
 
     if (verbose) {
-//        printf ("ziflist: interfaces=%zu\n", ziflist_size (iflist));
+        printf ("ziflist: interfaces=%zu\n", ziflist_size (iflist));
         const char *name = ziflist_first (iflist);
         while (name) {
             printf (" - name=%s address=%s netmask=%s broadcast=%s\n",

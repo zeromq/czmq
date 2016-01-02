@@ -47,16 +47,20 @@ zframe_t *
 zframe_new (const void *data, size_t size)
 {
     zframe_t *self = (zframe_t *) zmalloc (sizeof (zframe_t));
-    if (self) {
-        self->tag = ZFRAME_TAG;
-        if (size) {
-            zmq_msg_init_size (&self->zmsg, size);
-            if (data)
-                memcpy (zmq_msg_data (&self->zmsg), data, size);
+    assert (self);
+    self->tag = ZFRAME_TAG;
+    if (size) {
+        //  Catch heap exhaustion in this specific case
+        if (zmq_msg_init_size (&self->zmsg, size)) {
+            zframe_destroy (&self);
+            return NULL;
         }
-        else
-            zmq_msg_init (&self->zmsg);
+        if (data)
+            memcpy (zmq_msg_data (&self->zmsg), data, size);
     }
+    else
+        zmq_msg_init (&self->zmsg);
+
     return self;
 }
 
@@ -69,10 +73,9 @@ zframe_t *
 zframe_new_empty (void)
 {
     zframe_t *self = (zframe_t *) zmalloc (sizeof (zframe_t));
-    if (self) {
-        self->tag = ZFRAME_TAG;
-        zmq_msg_init (&self->zmsg);
-    }
+    assert (self);
+    self->tag = ZFRAME_TAG;
+    zmq_msg_init (&self->zmsg);
     return self;
 }
 
@@ -117,18 +120,18 @@ zframe_recv (void *source)
     assert (source);
     void *handle = zsock_resolve (source);
     zframe_t *self = zframe_new (NULL, 0);
-    if (self) {
-        if (zmq_recvmsg (handle, &self->zmsg, 0) < 0) {
-            zframe_destroy (&self);
-            return NULL;            //  Interrupted or terminated
-        }
-        self->more = zsock_rcvmore (source);
-#if defined (ZMQ_SERVER)
-        //  Grab routing ID if we're reading from a SERVER socket (ZMQ 4.2 and later)
-        if (zsock_type (source) == ZMQ_SERVER)
-            self->routing_id = zmq_msg_routing_id (&self->zmsg);
-#endif
+    assert (self);
+
+    if (zmq_recvmsg (handle, &self->zmsg, 0) < 0) {
+        zframe_destroy (&self);
+        return NULL;            //  Interrupted or terminated
     }
+    self->more = zsock_rcvmore (source);
+#if defined (ZMQ_SERVER)
+    //  Grab routing ID if we're reading from a SERVER socket (ZMQ 4.2 and later)
+    if (zsock_type (source) == ZMQ_SERVER)
+        self->routing_id = zmq_msg_routing_id (&self->zmsg);
+#endif
     return self;
 }
 
@@ -260,10 +263,9 @@ zframe_strdup (zframe_t *self)
 
     size_t size = zframe_size (self);
     char *string = (char *) malloc (size + 1);
-    if (string) {
-        memcpy (string, zframe_data (self), size);
-        string [size] = 0;
-    }
+    assert (string);
+    memcpy (string, zframe_data (self), size);
+    string [size] = 0;
     return string;
 }
 
@@ -441,13 +443,12 @@ zframe_recv_nowait (void *source)
     void *handle = zsock_resolve (source);
 
     zframe_t *self = zframe_new (NULL, 0);
-    if (self) {
-        if (zmq_recvmsg (handle, &self->zmsg, ZMQ_DONTWAIT) < 0) {
-            zframe_destroy (&self);
-            return NULL;            //  Interrupted or terminated
-        }
-        self->more = zsock_rcvmore (source);
+    assert (self);
+    if (zmq_recvmsg (handle, &self->zmsg, ZMQ_DONTWAIT) < 0) {
+        zframe_destroy (&self);
+        return NULL;            //  Interrupted or terminated
     }
+    self->more = zsock_rcvmore (source);
     return self;
 }
 

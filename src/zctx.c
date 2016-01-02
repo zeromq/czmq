@@ -67,15 +67,12 @@ zctx_t *
 zctx_new (void)
 {
     zctx_t *self = (zctx_t *) zmalloc (sizeof (zctx_t));
-    if (!self)
-        return NULL;
+    assert (self);
 
     self->sockets = zlist_new ();
+    assert (self->sockets);
     self->mutex = zmutex_new ();
-    if (!self->sockets || !self->mutex) {
-        zctx_destroy (&self);
-        return NULL;
-    }
+    assert (self->mutex);
     self->iothreads = 1;
     self->pipehwm = 1000;
     self->sndhwm = 1000;

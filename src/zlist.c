@@ -55,6 +55,7 @@ zlist_t *
 zlist_new (void)
 {
     zlist_t *self = (zlist_t *) zmalloc (sizeof (zlist_t));
+    assert (self);
     return self;
 }
 
@@ -167,7 +168,7 @@ zlist_item (zlist_t *self)
 
 //  --------------------------------------------------------------------------
 //  Append an item to the end of the list, return 0 if OK or -1 if this
-//  failed for some reason (out of memory).
+//  failed for some reason.
 
 int
 zlist_append (zlist_t *self, void *item)
@@ -175,15 +176,14 @@ zlist_append (zlist_t *self, void *item)
     if (!item)
         return -1;
 
-    node_t *node;
-    node = (node_t *) zmalloc (sizeof (node_t));
-    if (!node)
-        return -1;
+    node_t *node = (node_t *) zmalloc (sizeof (node_t));
+    assert (node);
 
     //  If necessary, take duplicate of (string) item
-    if (self->autofree)
+    if (self->autofree) {
         item = strdup ((char *) item);
-
+        assert (item);
+    }
     node->item = item;
     if (self->tail)
         self->tail->next = node;
@@ -201,20 +201,19 @@ zlist_append (zlist_t *self, void *item)
 
 //  --------------------------------------------------------------------------
 //  Push an item to the start of the list, return 0 if OK or -1 if this
-//  failed for some reason (out of memory).
+//  failed for some reason.
 
 int
 zlist_push (zlist_t *self, void *item)
 {
-    node_t *node;
-    node = (node_t *) zmalloc (sizeof (node_t));
-    if (!node)
-        return -1;
+    node_t *node = (node_t *) zmalloc (sizeof (node_t));
+    assert (node);
 
     //  If necessary, take duplicate of (string) item
-    if (self->autofree)
+    if (self->autofree) {
         item = strdup ((char *) item);
-
+        assert (item);
+    }
     node->item = item;
     node->next = self->head;
     self->head = node;
@@ -265,14 +264,12 @@ zlist_exists (zlist_t *self, void *item)
             if ((*self->compare_fn)(node->item, item) == 0)
                 return true;
         }
-        else {
-            if (node->item == item) {
-                return true;
-            }
-        }
+        else
+        if (node->item == item)
+            return true;
+
         node = node->next;
     }
-
     return false;
 }
 
@@ -292,10 +289,10 @@ zlist_remove (zlist_t *self, void *item)
             if ((*self->compare_fn)(node->item, item) == 0)
                break;
         }
-        else {
-            if (node->item == item)
-                break;
-        }
+        else
+        if (node->item == item)
+            break;
+
         prev = node;
     }
     if (node) {
@@ -331,13 +328,13 @@ zlist_dup (zlist_t *self)
         return NULL;
 
     zlist_t *copy = zlist_new ();
-    if (copy) {
-        node_t *node;
-        for (node = self->head; node; node = node->next) {
-            if (zlist_append (copy, node->item) == -1) {
-                zlist_destroy (&copy);
-                break;
-            }
+    assert (copy);
+
+    node_t *node;
+    for (node = self->head; node; node = node->next) {
+        if (zlist_append (copy, node->item) == -1) {
+            zlist_destroy (&copy);
+            break;
         }
     }
     return copy;

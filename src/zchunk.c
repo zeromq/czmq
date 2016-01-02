@@ -47,6 +47,7 @@ zchunk_new (const void *data, size_t size)
 {
     //  Use malloc, not zmalloc, to avoid nullification costs
     zchunk_t *self = (zchunk_t *) malloc (sizeof (zchunk_t) + size);
+    //  Catch memory exhaustion in this specific class
     if (self) {
         self->tag = ZCHUNK_TAG;
         self->size = 0;

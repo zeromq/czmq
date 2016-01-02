@@ -103,20 +103,17 @@ zhashx_t *
 zhashx_new (void)
 {
     zhashx_t *self = (zhashx_t *) zmalloc (sizeof (zhashx_t));
-    if (self) {
-        self->prime_index = INITIAL_PRIME;
-        self->chain_limit = INITIAL_CHAIN;
-        size_t limit = primes [self->prime_index];
-        self->items = (item_t **) zmalloc (sizeof (item_t *) * limit);
-        if (self->items) {
-            self->hasher = s_bernstein_hash;
-            self->key_destructor = (zhashx_destructor_fn *) zstr_free;
-            self->key_duplicator = (zhashx_duplicator_fn *) strdup;
-            self->key_comparator = (zhashx_comparator_fn *) strcmp;
-        }
-        else
-            zhashx_destroy (&self);
-    }
+    assert (self);
+    self->prime_index = INITIAL_PRIME;
+    self->chain_limit = INITIAL_CHAIN;
+    size_t limit = primes [self->prime_index];
+    self->items = (item_t **) zmalloc (sizeof (item_t *) * limit);
+    assert (self->items);
+    self->hasher = s_bernstein_hash;
+    self->key_destructor = (zhashx_destructor_fn *) zstr_free;
+    self->key_duplicator = (zhashx_duplicator_fn *) strdup;
+    self->key_comparator = (zhashx_comparator_fn *) strcmp;
+
     return self;
 }
 
@@ -212,8 +209,7 @@ s_zhashx_rehash (zhashx_t *self, uint new_prime_index)
     size_t limit = primes [self->prime_index];
     size_t new_limit = primes [new_prime_index];
     item_t **new_items = (item_t **) zmalloc (sizeof (item_t *) * new_limit);
-    if (!new_items)
-        return -1;
+    assert (new_items);
 
     //  Move all items to the new hash table, rehashing to
     //  take into account new hash table limit
@@ -278,8 +274,7 @@ s_item_insert (zhashx_t *self, const void *key, void *value)
     item_t *item = s_item_lookup (self, key);
     if (item == NULL) {
         item = (item_t *) zmalloc (sizeof (item_t));
-        if (!item)
-            return NULL;
+        assert (item);
 
         //  If necessary, take duplicate of item key
         if (self->key_duplicator)
@@ -400,14 +395,11 @@ zhashx_purge (zhashx_t *self)
     if (self->prime_index > INITIAL_PRIME) {
         // Try to shrink hash table
         size_t limit = primes [INITIAL_PRIME];
-        item_t **items =
-            (item_t **) zmalloc (sizeof (item_t *) * limit);
-        if (items) {
-            free (self->items);
-            self->prime_index = INITIAL_PRIME;
-            self->chain_limit = INITIAL_CHAIN;
-            self->items = items;
-        }
+        item_t **items = (item_t **) zmalloc (sizeof (item_t *) * limit);
+        assert (items);
+        self->prime_index = INITIAL_PRIME;
+        self->chain_limit = INITIAL_CHAIN;
+        self->items = items;
     }
 }
 
@@ -706,40 +698,32 @@ zhashx_load (zhashx_t *self, const char *filename)
 
     //  Take copy of filename in case self->filename is same string.
     char *filename_copy = strdup (filename);
-    if (filename_copy) {
-        free (self->filename);
-        self->filename = filename_copy;
-        self->modified = zsys_file_modified (self->filename);
-        FILE *handle = fopen (self->filename, "r");
-        if (handle) {
-            char *buffer = (char *) zmalloc (1024);
-            if (buffer) {
-                while (fgets (buffer, 1024, handle)) {
-                    //  Skip lines starting with "#" or that do not look like
-                    //  name=value data.
-                    char *equals = strchr (buffer, '=');
-                    if (buffer [0] == '#' || equals == buffer || !equals)
-                        continue;
+    assert (filename_copy);
+    free (self->filename);
+    self->filename = filename_copy;
+    self->modified = zsys_file_modified (self->filename);
+    FILE *handle = fopen (self->filename, "r");
+    if (handle) {
+        char *buffer = (char *) zmalloc (1024);
+        assert (buffer);
+        while (fgets (buffer, 1024, handle)) {
+            //  Skip lines starting with "#" or that do not look like
+            //  name=value data.
+            char *equals = strchr (buffer, '=');
+            if (buffer [0] == '#' || equals == buffer || !equals)
+                continue;
 
-                    //  Buffer may end in newline, which we don't want
-                    if (buffer [strlen (buffer) - 1] == '\n')
-                        buffer [strlen (buffer) - 1] = 0;
-                    *equals++ = 0;
-                    zhashx_update (self, buffer, equals);
-                }
-                free (buffer);
-            }
-            else {
-                fclose (handle);
-                return -1; //  Out of memory
-            }
-            fclose (handle);
+            //  Buffer may end in newline, which we don't want
+            if (buffer [strlen (buffer) - 1] == '\n')
+                buffer [strlen (buffer) - 1] = 0;
+            *equals++ = 0;
+            zhashx_update (self, buffer, equals);
         }
-        else
-            return -1; //  Failed to open file for reading
+        free (buffer);
+        fclose (handle);
     }
     else
-        return -1; //  Out of memory
+        return -1; //  Failed to open file for reading
 
     return 0;
 }
@@ -883,10 +867,7 @@ zhashx_unpack (zframe_t *frame)
                 //  Be wary of malformed frames
                 if (needle + value_size <= ceiling) {
                     char *value = (char *) zmalloc (value_size + 1);
-                    if (!value) {
-                        zhashx_destroy (&self);
-                        return NULL;
-                    }
+                    assert (value);
                     memcpy (value, needle, value_size);
                     value [value_size] = 0;
                     needle += value_size;

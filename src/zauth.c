@@ -65,23 +65,21 @@ static self_t *
 s_self_new (zsock_t *pipe)
 {
     self_t *self = (self_t *) zmalloc (sizeof (self_t));
-    int rc = -1;
-    if (self) {
-        self->pipe = pipe;
-        self->whitelist = zhashx_new ();
-        if (self->whitelist)
-            self->blacklist = zhashx_new ();
+    assert (self);
+    self->pipe = pipe;
+    self->whitelist = zhashx_new ();
+    assert (self->whitelist);
+    self->blacklist = zhashx_new ();
 
-        //  Create ZAP handler and get ready for requests
-        if (self->blacklist)
-            self->handler = zsock_new (ZMQ_REP);
-        if (self->handler)
-            rc = zsock_bind (self->handler, ZAP_ENDPOINT);
-        if (rc == 0)
-            self->poller = zpoller_new (self->pipe, self->handler, NULL);
-        if (!self->poller)
-            s_self_destroy (&self);
-    }
+    //  Create ZAP handler and get ready for requests
+    assert (self->blacklist);
+    self->handler = zsock_new (ZMQ_REP);
+    assert (self->handler);
+    int rc = zsock_bind (self->handler, ZAP_ENDPOINT);
+    assert (rc == 0);
+    self->poller = zpoller_new (self->pipe, self->handler, NULL);
+    assert (self->poller);
+
     return self;
 }
 
@@ -428,8 +426,7 @@ void
 zauth (zsock_t *pipe, void *unused)
 {
     self_t *self = s_self_new (pipe);
-    if (!self)
-        return;
+    assert (self);
 
     //  Signal successful initialization
     zsock_signal (pipe, 0);

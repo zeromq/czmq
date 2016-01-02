@@ -59,14 +59,11 @@ static self_t *
 s_self_new (zsock_t *pipe, void *sock)
 {
     self_t *self = (self_t *) zmalloc (sizeof (self_t));
-    if (!self)
-        return NULL;
-
+    assert (self);
     self->pipe = pipe;
     self->monitored = zsock_resolve (sock);
     self->poller = zpoller_new (self->pipe, NULL);
-    if (!self->poller)
-        s_self_destroy (&self);
+    assert (self->poller);
     return self;
 }
 
