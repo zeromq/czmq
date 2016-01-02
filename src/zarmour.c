@@ -69,8 +69,7 @@ zarmour_t *
 zarmour_new (void)
 {
     zarmour_t *self = (zarmour_t *) zmalloc (sizeof (zarmour_t));
-    if (!self)
-        return NULL;
+    assert (self);
 
     //  Setup default as RFC4648 paragraph 4
     self->mode = ZARMOUR_MODE_BASE64_STD;
@@ -79,10 +78,7 @@ zarmour_new (void)
     self->line_breaks = false;
     self->line_length = 72;
     self->line_end = strdup ("\n");
-    if (!self->line_end) {
-        zarmour_destroy (&self);
-        return NULL;
-    }
+    assert (self->line_end);
     return self;
 }
 
@@ -96,42 +92,10 @@ zarmour_destroy (zarmour_t **self_p)
     assert (self_p);
     if (*self_p) {
         zarmour_t *self = *self_p;
-
-        //  Free class properties
         free (self->line_end);
-
-        //  Free object itself
         free (self);
         *self_p = NULL;
     }
-}
-
-
-//  --------------------------------------------------------------------------
-//  Print properties of object
-
-void
-zarmour_print (zarmour_t *self)
-{
-    assert (self);
-
-    zsys_debug ("zarmour:");
-    zsys_debug ("    mode:        %s", zarmour_mode_str (self));
-    zsys_debug ("    pad:         %s", self->pad? "true": "false");
-    zsys_debug ("    pad_char:    '%c'", self->pad_char);
-    zsys_debug ("    line_breaks: %s", self->line_breaks? "true": "false");
-    zsys_debug ("    line_length: %d", self->line_length);
-}
-
-
-//  --------------------------------------------------------------------------
-//  Get printable string for mode
-
-const char *
-zarmour_mode_str (zarmour_t *self)
-{
-    assert (self);
-    return s_mode_names [(int) self->mode];
 }
 
 
@@ -194,10 +158,13 @@ static byte *
 s_base64_decode (const char *data, size_t *size, const char *alphabet, size_t linebreakchars)
 {
     size_t length = strlen (data);
-    while (length > 0 && !strchr (alphabet, data [length - 1])) --length;
-    const byte *needle = (const byte *) data, *ceiling = (const byte *) (data + length);
+    while (length > 0 && !strchr (alphabet, data [length - 1]))
+        --length;
+    const byte *needle = (const byte *) data;
+    const byte *ceiling = (const byte *) (data + length);
+
     length -= linebreakchars;
-    *size = 3 *(length / 4) + ((length % 4)? length % 4 - 1 : 0) + 1;
+    *size = 3 * (length / 4) + ((length % 4)? length % 4 - 1 : 0) + 1;
     byte *bytes = (byte *) zmalloc (*size);
     if (!bytes)
         return NULL;
@@ -419,7 +386,12 @@ s_z85_decode (const char *data, size_t *size)
 }
 
 
-//  Definition of encode method
+//  --------------------------------------------------------------------------
+//  Decode an armoured string into a string of bytes.
+//  The decoded output is null-terminated, so it may be treated
+//  as a string, if that's what it was prior to encoding.
+//  The caller is responsible for destroying the return value when finished with it.
+
 char *
 zarmour_encode (zarmour_t *self, const byte *data, size_t data_size)
 {
@@ -453,8 +425,7 @@ zarmour_encode (zarmour_t *self, const byte *data, size_t data_size)
     if (self->line_breaks
     &&  self->line_length > 0
     &&  strlen (encoded) > self->line_length
-    &&  self->mode != ZARMOUR_MODE_Z85
-    ) {
+    &&  self->mode != ZARMOUR_MODE_Z85) {
         char *line_end = self->line_end;
         size_t nbr_lines = strlen (encoded) / self->line_length;
         size_t new_length =
@@ -483,6 +454,12 @@ zarmour_encode (zarmour_t *self, const byte *data, size_t data_size)
     }
     return encoded;
 }
+
+
+//  --------------------------------------------------------------------------
+//  Encode a stream of bytes into an armoured string. Returns the armoured
+//  string, or NULL if there was insufficient memory available to allocate
+//  a new string.
 
 byte *
 zarmour_decode (zarmour_t *self, const char *data, size_t *decode_size)
@@ -518,7 +495,7 @@ zarmour_decode (zarmour_t *self, const char *data, size_t *decode_size)
 
 
 //  --------------------------------------------------------------------------
-//  Get/set the mode property
+//  Get the mode property.
 
 zarmour_mode_t
 zarmour_mode (zarmour_t *self)
@@ -526,6 +503,21 @@ zarmour_mode (zarmour_t *self)
     assert (self);
     return self->mode;
 }
+
+
+//  --------------------------------------------------------------------------
+//  Get printable string for mode.
+
+const char *
+zarmour_mode_str (zarmour_t *self)
+{
+    assert (self);
+    return s_mode_names [(int) self->mode];
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set the mode property.
 
 void
 zarmour_set_mode (zarmour_t *self, zarmour_mode_t mode)
@@ -536,7 +528,7 @@ zarmour_set_mode (zarmour_t *self, zarmour_mode_t mode)
 
 
 //  --------------------------------------------------------------------------
-//  Get/set the pad property
+//  Return true if padding is turned on.
 
 bool
 zarmour_pad (zarmour_t *self)
@@ -544,6 +536,9 @@ zarmour_pad (zarmour_t *self)
     assert (self);
     return self->pad;
 }
+
+//  --------------------------------------------------------------------------
+//  Turn padding on or off. Default is on.
 
 void
 zarmour_set_pad (zarmour_t *self, bool pad)
@@ -554,7 +549,7 @@ zarmour_set_pad (zarmour_t *self, bool pad)
 
 
 //  --------------------------------------------------------------------------
-//  Get/set the pad_char property
+//  Get the padding character.
 
 char
 zarmour_pad_char (zarmour_t *self)
@@ -562,6 +557,10 @@ zarmour_pad_char (zarmour_t *self)
     assert (self);
     return self->pad_char;
 }
+
+
+//  --------------------------------------------------------------------------
+//  Set the padding character.
 
 void
 zarmour_set_pad_char (zarmour_t *self, char pad_char)
@@ -572,7 +571,7 @@ zarmour_set_pad_char (zarmour_t *self, char pad_char)
 
 
 //  --------------------------------------------------------------------------
-//  Get/set the line_breaks property
+//  Return if splitting output into lines is turned on. Default is off.
 
 bool
 zarmour_line_breaks (zarmour_t *self)
@@ -581,6 +580,10 @@ zarmour_line_breaks (zarmour_t *self)
     return self->line_breaks;
 }
 
+
+//  --------------------------------------------------------------------------
+//  Turn splitting output into lines on or off.
+
 void
 zarmour_set_line_breaks (zarmour_t *self, bool line_breaks)
 {
@@ -588,8 +591,9 @@ zarmour_set_line_breaks (zarmour_t *self, bool line_breaks)
     self->line_breaks = line_breaks;
 }
 
+
 //  --------------------------------------------------------------------------
-//  Get/set the line_length property
+//  Get the line length used for splitting lines.
 
 size_t
 zarmour_line_length (zarmour_t *self)
@@ -597,6 +601,10 @@ zarmour_line_length (zarmour_t *self)
     assert (self);
     return self->line_length;
 }
+
+
+//  --------------------------------------------------------------------------
+//  Set the line length used for splitting lines.
 
 void
 zarmour_set_line_length (zarmour_t *self, size_t line_length)
@@ -606,8 +614,25 @@ zarmour_set_line_length (zarmour_t *self, size_t line_length)
 }
 
 
+//  --------------------------------------------------------------------------
+//  Print properties of object
+
+void
+zarmour_print (zarmour_t *self)
+{
+    assert (self);
+
+    zsys_debug ("zarmour:");
+    zsys_debug ("    mode:        %s", zarmour_mode_str (self));
+    zsys_debug ("    pad:         %s", self->pad? "true": "false");
+    zsys_debug ("    pad_char:    '%c'", self->pad_char);
+    zsys_debug ("    line_breaks: %s", self->line_breaks? "true": "false");
+    zsys_debug ("    line_length: %d", self->line_length);
+}
+
+
 //  ---------------------------------------------------------------------------
-//  armour test utility
+//  Self test support functions
 
 static void
 s_armour_test (zarmour_t *self, const char *test_string, const char *expected, bool verbose)
@@ -676,6 +701,7 @@ s_armour_test_long (zarmour_t *self, byte *test_data, size_t length, bool verbos
     if (verbose)
         zsys_debug ("    decoded %d bytes, all match", test_size - 1);
 }
+
 
 //  --------------------------------------------------------------------------
 //  Selftest

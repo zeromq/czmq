@@ -30,15 +30,9 @@ QZarmour::~QZarmour ()
 }
 
 ///
-//  Get printable string for mode.
-const QString QZarmour::modeStr ()
-{
-    const QString rv = QString (zarmour_mode_str (self));
-    return rv;
-}
-
-///
-//  Encode a stream of bytes into an armoured string.
+//  Encode a stream of bytes into an armoured string. Returns the armoured
+//  string, or NULL if there was insufficient memory available to allocate
+//  a new string.                                                         
 QString QZarmour::encode (const byte *data, size_t size)
 {
     char *retStr_ = zarmour_encode (self, data, size);
@@ -62,6 +56,14 @@ byte * QZarmour::decode (const QString &data, size_t *decodeSize)
 zarmour_mode_t QZarmour::mode ()
 {
     zarmour_mode_t rv = zarmour_mode (self);
+    return rv;
+}
+
+///
+//  Get printable string for mode.
+const QString QZarmour::modeStr ()
+{
+    const QString rv = QString (zarmour_mode_str (self));
     return rv;
 }
 

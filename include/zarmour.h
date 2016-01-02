@@ -39,11 +39,9 @@ CZMQ_EXPORT zarmour_t *
 CZMQ_EXPORT void
     zarmour_destroy (zarmour_t **self_p);
 
-//  Get printable string for mode.
-CZMQ_EXPORT const char *
-    zarmour_mode_str (zarmour_t *self);
-
-//  Encode a stream of bytes into an armoured string.
+//  Encode a stream of bytes into an armoured string. Returns the armoured
+//  string, or NULL if there was insufficient memory available to allocate
+//  a new string.                                                         
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT char *
     zarmour_encode (zarmour_t *self, const byte *data, size_t size);
@@ -58,6 +56,10 @@ CZMQ_EXPORT byte *
 //  Get the mode property.
 CZMQ_EXPORT zarmour_mode_t
     zarmour_mode (zarmour_t *self);
+
+//  Get printable string for mode.
+CZMQ_EXPORT const char *
+    zarmour_mode_str (zarmour_t *self);
 
 //  Set the mode property.
 CZMQ_EXPORT void

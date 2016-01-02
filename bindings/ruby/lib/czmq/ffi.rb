@@ -60,10 +60,10 @@ module CZMQ
 
       attach_function :zarmour_new, [], :pointer, **opts
       attach_function :zarmour_destroy, [:pointer], :void, **opts
-      attach_function :zarmour_mode_str, [:pointer], :string, **opts
       attach_function :zarmour_encode, [:pointer, :pointer, :size_t], :pointer, **opts
       attach_function :zarmour_decode, [:pointer, :string, :pointer], :pointer, **opts
       attach_function :zarmour_mode, [:pointer], :zarmour_mode, **opts
+      attach_function :zarmour_mode_str, [:pointer], :string, **opts
       attach_function :zarmour_set_mode, [:pointer, :zarmour_mode], :void, **opts
       attach_function :zarmour_pad, [:pointer], :bool, **opts
       attach_function :zarmour_set_pad, [:pointer, :bool], :void, **opts

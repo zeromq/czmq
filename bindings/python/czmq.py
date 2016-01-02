@@ -290,14 +290,14 @@ lib.zarmour_new.restype = zarmour_p
 lib.zarmour_new.argtypes = []
 lib.zarmour_destroy.restype = None
 lib.zarmour_destroy.argtypes = [POINTER(zarmour_p)]
-lib.zarmour_mode_str.restype = c_char_p
-lib.zarmour_mode_str.argtypes = [zarmour_p]
 lib.zarmour_encode.restype = POINTER(c_char)
 lib.zarmour_encode.argtypes = [zarmour_p, c_void_p, c_size_t]
 lib.zarmour_decode.restype = c_void_p
 lib.zarmour_decode.argtypes = [zarmour_p, c_char_p, POINTER(c_size_t)]
 lib.zarmour_mode.restype = c_int
 lib.zarmour_mode.argtypes = [zarmour_p]
+lib.zarmour_mode_str.restype = c_char_p
+lib.zarmour_mode_str.argtypes = [zarmour_p]
 lib.zarmour_set_mode.restype = None
 lib.zarmour_set_mode.argtypes = [zarmour_p, c_int]
 lib.zarmour_pad.restype = c_bool
@@ -369,12 +369,10 @@ class Zarmour(object):
         "Determine whether the object is valid by converting to boolean" # Python 2
         return self._as_parameter_.__nonzero__()
 
-    def mode_str(self):
-        """Get printable string for mode."""
-        return lib.zarmour_mode_str(self._as_parameter_)
-
     def encode(self, data, size):
-        """Encode a stream of bytes into an armoured string."""
+        """Encode a stream of bytes into an armoured string. Returns the armoured
+string, or NULL if there was insufficient memory available to allocate
+a new string."""
         return return_fresh_string(lib.zarmour_encode(self._as_parameter_, data, size))
 
     def decode(self, data, decode_size):
@@ -386,6 +384,10 @@ as a string, if that's what it was prior to encoding."""
     def mode(self):
         """Get the mode property."""
         return Zarmour.Mode_out[lib.zarmour_mode(self._as_parameter_)]
+
+    def mode_str(self):
+        """Get printable string for mode."""
+        return lib.zarmour_mode_str(self._as_parameter_)
 
     def set_mode(self, mode):
         """Set the mode property."""
