@@ -178,7 +178,6 @@ set (czmq_headers
     src/zsock_option.inc
     src/zgossip_engine.inc
     src/zhash_primes.inc
-    src/zclass_example.xml
     src/foreign/sha1/sha1.inc_c
     src/foreign/sha1/sha1.h
     src/foreign/slre/slre.inc_c
@@ -318,54 +317,54 @@ set(CLASSTEST_TIMEOUT 5 CACHE STRING "Timeout of the selftest of a class")
 set(TOTAL_TIMEOUT 20 CACHE STRING "Timout of the total testsuite")
 
 set(TEST_CLASSES
-    zactor_test
-    zauth_test
-    zarmour_test
-    zbeacon_test
-    zcert_test
-    zcertstore_test
-    zchunk_test
-    zclock_test
-    zconfig_test
-    zdigest_test
-    zdir_test
-    zdir_patch_test
-    zfile_test
-    zframe_test
-    zgossip_test
-    zhash_test
-    zhashx_test
-    ziflist_test
-    zlist_test
-    zlistx_test
-    zloop_test
-    zmonitor_test
-    zmsg_test
-    zpoller_test
-    zproc_test
-    zproxy_test
-    zrex_test
-    zsock_test
-    zstr_test
-    zsys_test
-    ztrie_test
-    zuuid_test
-    zgossip_msg_test
-    zauth_v2_test
-    zbeacon_v2_test
-    zctx_test
-    zmonitor_v2_test
-    zmutex_test
-    zproxy_v2_test
-    zsocket_test
-    zsockopt_test
-    zthread_test
+    zactor
+    zauth
+    zarmour
+    zbeacon
+    zcert
+    zcertstore
+    zchunk
+    zclock
+    zconfig
+    zdigest
+    zdir
+    zdir_patch
+    zfile
+    zframe
+    zgossip
+    zhash
+    zhashx
+    ziflist
+    zlist
+    zlistx
+    zloop
+    zmonitor
+    zmsg
+    zpoller
+    zproc
+    zproxy
+    zrex
+    zsock
+    zstr
+    zsys
+    ztrie
+    zuuid
+    zgossip_msg
+    zauth_v2
+    zbeacon_v2
+    zctx
+    zmonitor_v2
+    zmutex
+    zproxy_v2
+    zsocket
+    zsockopt
+    zthread
 )
 
 foreach(TEST_CLASS ${TEST_CLASSES})
     add_test(
         NAME ${TEST_CLASS}
-        COMMAND czmq_selftest -e -v --test ${TEST_CLASS}
+        COMMAND czmq_selftest --continue --verbose --test ${TEST_CLASS}
     )
     set_tests_properties(
         ${TEST_CLASS}
@@ -373,11 +372,6 @@ foreach(TEST_CLASS ${TEST_CLASSES})
     )
 endforeach(TEST_CLASS)
 
-add_test(czmq_selftest czmq_selftest)
-set_tests_properties(
-    czmq_selftest
-    PROPERTIES TIMEOUT ${TOTAL_TIMEOUT}
-)
 
 ########################################################################
 # summary
