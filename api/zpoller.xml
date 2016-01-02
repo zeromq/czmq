@@ -11,8 +11,9 @@
     event-driven reactor
 
     <constructor>
-        Create new poller; the reader can be a libzmq socket (void *), a zsock_t
-        instance, or a zactor_t instance.
+        Create new poller, specifying zero or more readers. The list of
+        readers ends in a NULL. Each reader can be a zsock_t instance, a
+        zactor_t instance, a libzmq socket (void *), or a file handle.
         <argument name = "reader" type = "anything" variadic = "1" />
     </constructor>
 
@@ -28,9 +29,8 @@
     </method>
 
     <method name = "remove">
-        Remove a reader from the poller; returns 0 if OK, -1 on failure. The
-        reader may be a libzmq void * socket, a zsock_t instance, or a zactor_t
-        instance.
+        Remove a reader from the poller; returns 0 if OK, -1 on failure. The reader
+        must have been passed during construction, or in an zpoller_add () call.
         <argument name = "reader" type = "anything" />
         <return type = "integer" />
     </method>
