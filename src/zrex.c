@@ -72,15 +72,14 @@ zrex_t *
 zrex_new (const char *expression)
 {
     zrex_t *self = (zrex_t *) zmalloc (sizeof (zrex_t));
-    if (self) {
-        self->strerror = "No error";
-        if (expression) {
-            //  Returns 1 on success, 0 on failure
-            self->valid = (slre_compile (&self->slre, expression) == 1);
-            if (!self->valid)
-                self->strerror = self->slre.err_str;
-            assert (self->slre.num_caps < MAX_HITS);
-        }
+    assert (self);
+    self->strerror = "No error";
+    if (expression) {
+        //  Returns 1 on success, 0 on failure
+        self->valid = (slre_compile (&self->slre, expression) == 1);
+        if (!self->valid)
+            self->strerror = self->slre.err_str;
+        assert (self->slre.num_caps < MAX_HITS);
     }
     return self;
 }

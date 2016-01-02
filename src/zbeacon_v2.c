@@ -60,8 +60,7 @@ zbeacon_t *
 zbeacon_new (zctx_t *ctx, int port_nbr)
 {
     zbeacon_t *self = (zbeacon_t *) zmalloc (sizeof (zbeacon_t));
-    if (!self)
-        return NULL;
+    assert (self);
 
     //  If user passes a ctx, use that, else take the global context from
     //  zsys and use that. This provides compatibility with old zsocket
@@ -73,17 +72,14 @@ zbeacon_new (zctx_t *ctx, int port_nbr)
 
     //  Start background agent and wait for it to initialize
     self->pipe = zthread_fork (self->ctx, s_agent_task, NULL);
-    if (self->pipe) {
-        zstr_sendf (self->pipe, "%d", port_nbr);
-        self->hostname = zstr_recv (self->pipe);
-        if (streq (self->hostname, "-")) {
-            free (self->hostname);
-            free (self);
-            self = NULL;
-        }
+    assert (self->pipe);
+    zstr_sendf (self->pipe, "%d", port_nbr);
+    self->hostname = zstr_recv (self->pipe);
+    if (streq (self->hostname, "-")) {
+        free (self->hostname);
+        free (self);
+        self = NULL;
     }
-    else
-        zbeacon_destroy (&self);
     return self;
 }
 

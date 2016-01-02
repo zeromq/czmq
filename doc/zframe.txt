@@ -200,9 +200,9 @@ zsock_destroy (&output);
 
 #if defined (ZMQ_SERVER)
 //  Create server and client sockets and connect over inproc
-zsock_t *server = zsock_new_server ("inproc://zframe-server.test");
+zsock_t *server = zsock_new_server ("inproc://zframe-test-routing");
 assert (server);
-zsock_t *client = zsock_new_client ("inproc://zframe-server.test");
+zsock_t *client = zsock_new_client ("inproc://zframe-test-routing");
 assert (client);
 
 //  Send request from client to server
@@ -229,6 +229,14 @@ reply = zframe_recv (client);
 assert (zframe_streq (reply, "World"));
 assert (zframe_routing_id (reply) == 0);
 zframe_destroy (&reply);
+
+//  Client and server disallow multipart
+frame = zframe_new ("Hello", 5);
+rc = zframe_send (&frame, client, ZFRAME_MORE);
+assert (rc == -1);
+rc = zframe_send (&frame, server, ZFRAME_MORE);
+assert (rc == -1);
+zframe_destroy (&frame);
 
 zsock_destroy (&client);
 zsock_destroy (&server);

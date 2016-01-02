@@ -24,10 +24,15 @@ public:
     //  be a libzmq void * socket, a zsock_t instance, or a zactor_t instance.   
     int add (void *reader);
 
-    //  Remove a reader from the poller; returns 0 if OK, -1 on failure. The   
-    //  reader may be a libzmq void * socket, a zsock_t instance, or a zactor_t
-    //  instance.                                                              
+    //  Remove a reader from the poller; returns 0 if OK, -1 on failure. The reader
+    //  must have been passed during construction, or in an zpoller_add () call.   
     int remove (void *reader);
+
+    //  By default the poller stops if the process receives a SIGINT or SIGTERM  
+    //  signal. This makes it impossible to shut-down message based architectures
+    //  like zactors. This method lets you switch off break handling. The default
+    //  nonstop setting is off (false).                                          
+    void setNonstop (bool nonstop);
 
     //  Poll the registered readers for I/O, return first reader that has input.  
     //  The reader will be a libzmq void * socket, or a zsock_t or zactor_t       
@@ -47,11 +52,6 @@ public:
     //  Return true if the last zpoller_wait () call ended because the process
     //  was interrupted, or the parent context was destroyed.                 
     bool terminated ();
-
-    //  Ignore zsys_interrupted flag in this poller. By default, a zpoller_wait will 
-    //  return immediately if detects zsys_interrupted is set to something other than
-    //  zero. Calling zpoller_ignore_interrupts will supress this behavior.          
-    void ignoreInterrupts ();
 
     //  Self test of this class.
     static void test (bool verbose);

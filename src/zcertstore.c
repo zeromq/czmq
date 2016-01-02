@@ -66,23 +66,17 @@ zcertstore_t *
 zcertstore_new (const char *location)
 {
     zcertstore_t *self = (zcertstore_t *) zmalloc (sizeof (zcertstore_t));
-    if (!self)
-        return NULL;
+    assert (self);
 
     self->certs = zhashx_new ();
-    if (self->certs) {
-        zhashx_set_destructor (self->certs, (czmq_destructor *) zcert_destroy);
-        if (location) {
-            self->location = strdup (location);
-            if (!self->location) {
-                zcertstore_destroy (&self);
-                return NULL;
-            }
-            s_load_certs_from_disk (self);
-        }
+    assert (self->certs);
+    zhashx_set_destructor (self->certs, (czmq_destructor *) zcert_destroy);
+
+    if (location) {
+        self->location = strdup (location);
+        assert (self->location);
+        s_load_certs_from_disk (self);
     }
-    else
-        zcertstore_destroy (&self);
     return self;
 }
 
@@ -156,8 +150,8 @@ zcertstore_lookup (zcertstore_t *self, const char *public_key)
         zdir_t *dir = zdir_new (self->location, NULL);
         if (dir
         && (self->modified != zdir_modified (dir)
-         || self->count != zdir_count (dir)
-         || self->cursize != zdir_cursize (dir)))
+        ||  self->count != zdir_count (dir)
+        ||  self->cursize != zdir_cursize (dir)))
             s_load_certs_from_disk (self);
             
         zdir_destroy (&dir);

@@ -38,6 +38,7 @@
 #define MIN_LEN(x,y) \
     y + ((x - y) & ((x - y) >>(sizeof(int) * CHAR_BIT - 1)))
 
+
 // TODO: Move to a more appropriate location:
 char *
 s_strndup (const char *s, size_t size) {

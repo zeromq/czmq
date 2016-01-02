@@ -981,6 +981,4 @@ This is the class self test code:
     zsock_destroy (&reader);
     zsock_destroy (&writer);
     
-    zsock_option_test (verbose);
-    
 

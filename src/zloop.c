@@ -45,7 +45,7 @@ struct _zloop_t {
     bool need_rebuild;          //  True if pollset needs rebuilding
     bool verbose;               //  True if verbose tracing wanted
     bool terminated;            //  True when stopped running
-    bool ignore_interrupts;     //  True when this loop should ingnore intterupts
+    bool nonstop;               //  Don't stop running on Ctrl-C
     zlistx_t *zombies;          //  List of timers to kill
 };
 
@@ -103,12 +103,11 @@ static s_reader_t *
 s_reader_new (zsock_t *sock, zloop_reader_fn handler, void *arg)
 {
     s_reader_t *self = (s_reader_t *) zmalloc (sizeof (s_reader_t));
-    if (self) {
-        self->sock = sock;
-        self->handler = handler;
-        self->arg = arg;
-        self->tolerant = false;     //  By default, errors are bad
-    }
+    assert (self);
+    self->sock = sock;
+    self->handler = handler;
+    self->arg = arg;
+    self->tolerant = false;     //  By default, errors are bad
     return self;
 }
 
@@ -127,12 +126,11 @@ static s_poller_t *
 s_poller_new (zmq_pollitem_t *item, zloop_fn handler, void *arg)
 {
     s_poller_t *self = (s_poller_t *) zmalloc (sizeof (s_poller_t));
-    if (self) {
-        self->item = *item;
-        self->handler = handler;
-        self->arg = arg;
-        self->tolerant = false;     //  By default, errors are bad
-    }
+    assert (self);
+    self->item = *item;
+    self->handler = handler;
+    self->arg = arg;
+    self->tolerant = false;     //  By default, errors are bad
     return self;
 }
 
@@ -152,14 +150,13 @@ static s_timer_t *
 s_timer_new (int timer_id, size_t delay, size_t times, zloop_timer_fn handler, void *arg)
 {
     s_timer_t *self = (s_timer_t *) zmalloc (sizeof (s_timer_t));
-    if (self) {
-        self->timer_id = timer_id;
-        self->delay = delay;
-        self->times = times;
-        self->when = zclock_mono () + delay;
-        self->handler = handler;
-        self->arg = arg;
-    }
+    assert (self);
+    self->timer_id = timer_id;
+    self->delay = delay;
+    self->times = times;
+    self->when = zclock_mono () + delay;
+    self->handler = handler;
+    self->arg = arg;
     return self;
 }
 
@@ -175,12 +172,12 @@ s_timer_destroy (s_timer_t **self_p)
 }
 
 static int
-s_timer_comparator (s_timer_t *timer1, s_timer_t *timer2)
+s_timer_comparator (s_timer_t *first, s_timer_t *second)
 {
-    if (timer1->when > timer2->when)
+    if (first->when > second->when)
         return 1;
     else
-    if (timer1->when < timer2->when)
+    if (first->when < second->when)
         return -1;
     else
         return 0;
@@ -190,13 +187,12 @@ static s_ticket_t *
 s_ticket_new (size_t delay, zloop_timer_fn handler, void *arg)
 {
     s_ticket_t *self = (s_ticket_t *) zmalloc (sizeof (s_ticket_t));
-    if (self) {
-        self->tag = TICKET_TAG;
-        self->delay = delay;
-        self->when = zclock_mono () + delay;
-        self->handler = handler;
-        self->arg = arg;
-    }
+    assert (self);
+    self->tag = TICKET_TAG;
+    self->delay = delay;
+    self->when = zclock_mono () + delay;
+    self->handler = handler;
+    self->arg = arg;
     return self;
 }
 
@@ -213,12 +209,12 @@ s_ticket_destroy (s_ticket_t **self_p)
 }
 
 static int
-s_ticket_comparator (s_ticket_t *ticket1, s_ticket_t *ticket2)
+s_ticket_comparator (s_ticket_t *first, s_ticket_t *second)
 {
-    if (ticket1->when > ticket2->when)
+    if (first->when > second->when)
         return 1;
     else
-    if (ticket1->when < ticket2->when)
+    if (first->when < second->when)
         return -1;
     else
         return 0;
@@ -247,25 +243,19 @@ s_timer_remove (zloop_t *self, int timer_id)
 static int
 s_rebuild_pollset (zloop_t *self)
 {
-    free (self->pollset);
-    free (self->readact);
-    free (self->pollact);
-    self->pollset = NULL;
-    self->readact = NULL;
-    self->pollact = NULL;
-
     self->poll_size = zlistx_size (self->readers) + zlistx_size (self->pollers);
+
+    free (self->pollset);
     self->pollset = (zmq_pollitem_t *) zmalloc (self->poll_size * sizeof (zmq_pollitem_t));
-    if (!self->pollset)
-        return -1;
+    assert (self->pollset);
 
+    free (self->readact);
     self->readact = (s_reader_t *) zmalloc (self->poll_size * sizeof (s_reader_t));
-    if (!self->readact)
-        return -1;
+    assert (self->readact);
 
+    free (self->pollact);
     self->pollact = (s_poller_t *) zmalloc (self->poll_size * sizeof (s_poller_t));
-    if (!self->pollact)
-        return -1;
+    assert (self->pollact);
 
     s_reader_t *reader = (s_reader_t *) zlistx_first (self->readers);
     uint item_nbr = 0;
@@ -323,33 +313,32 @@ s_tickless (zloop_t *self)
 zloop_t *
 zloop_new (void)
 {
-    zloop_t
-    *self;
-
-    self = (zloop_t *) zmalloc (sizeof (zloop_t));
-    if (!self)
-        return NULL;
+    zloop_t *self = (zloop_t *) zmalloc (sizeof (zloop_t));
+    assert (self);
 
     self->readers = zlistx_new ();
-    if (self->readers)
-        self->pollers = zlistx_new ();
-    if (self->pollers)
-        self->timers = zlistx_new ();
-    if (self->timers)
-        self->zombies = zlistx_new ();
-    if (self->zombies)
-        self->tickets = zlistx_new ();
-    if (self->tickets) {
-        self->last_timer_id = 0;
-        zlistx_set_destructor (self->readers, (czmq_destructor *) s_reader_destroy);
-        zlistx_set_destructor (self->pollers, (czmq_destructor *) s_poller_destroy);
-        zlistx_set_destructor (self->timers, (czmq_destructor *) s_timer_destroy);
-        zlistx_set_comparator (self->timers, (czmq_comparator *) s_timer_comparator);
-        zlistx_set_destructor (self->tickets, (czmq_destructor *) s_ticket_destroy);
-        zlistx_set_comparator (self->tickets, (czmq_comparator *) s_ticket_comparator);
-    }
-    else
-        zloop_destroy (&self);
+    assert (self->readers);
+
+    self->pollers = zlistx_new ();
+    assert (self->pollers);
+
+    self->timers = zlistx_new ();
+    assert (self->timers);
+
+    self->zombies = zlistx_new ();
+    assert (self->zombies);
+
+    self->tickets = zlistx_new ();
+    assert (self->tickets);
+    self->last_timer_id = 0;
+
+    zlistx_set_destructor (self->readers, (czmq_destructor *) s_reader_destroy);
+    zlistx_set_destructor (self->pollers, (czmq_destructor *) s_poller_destroy);
+    zlistx_set_destructor (self->timers, (czmq_destructor *) s_timer_destroy);
+    zlistx_set_comparator (self->timers, (czmq_comparator *) s_timer_comparator);
+    zlistx_set_destructor (self->tickets, (czmq_destructor *) s_ticket_destroy);
+    zlistx_set_comparator (self->tickets, (czmq_comparator *) s_ticket_comparator);
+
     return self;
 }
 
@@ -400,10 +389,7 @@ zloop_reader (zloop_t *self, zsock_t *sock, zloop_reader_fn handler, void *arg)
     s_reader_t *reader = s_reader_new (sock, handler, arg);
     if (reader) {
         reader->list_handle = zlistx_add_end (self->readers, reader);
-        if (!reader->list_handle) {
-            s_reader_destroy (&reader);
-            return -1;
-        }
+        assert (reader->list_handle);
         self->need_rebuild = true;
         if (self->verbose)
             zsys_debug ("zloop: register %s reader", zsock_type_str (sock));
@@ -473,21 +459,16 @@ zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg)
         return -1;
 
     s_poller_t *poller = s_poller_new (item, handler, arg);
-    if (poller) {
-        poller->list_handle = zlistx_add_end (self->pollers, poller);
-        if (!poller->list_handle) {
-            s_poller_destroy (&poller);
-            return -1;
-        }
-        self->need_rebuild = true;
-        if (self->verbose)
-            zsys_debug ("zloop: register %s poller (%p, %d)",
-                        item->socket? zsys_sockname (zsock_type (item->socket)): "FD",
-                        item->socket, item->fd);
-        return 0;
-    }
-    else
-        return -1;
+    assert (poller);
+
+    poller->list_handle = zlistx_add_end (self->pollers, poller);
+    assert (poller->list_handle);
+    self->need_rebuild = true;
+    if (self->verbose)
+        zsys_debug ("zloop: register %s poller (%p, %d)",
+                    item->socket? zsys_sockname (zsock_type (item->socket)): "FD",
+                    item->socket, item->fd);
+    return 0;
 }
 
 
@@ -560,10 +541,6 @@ zloop_poller_set_tolerant (zloop_t *self, zmq_pollitem_t *item)
 //  times. At each expiry, will call the handler, passing the arg. To run a
 //  timer forever, use 0 times. Returns a timer_id that is used to cancel the
 //  timer in the future. Returns -1 if there was an error.
-//
-//  TODO: if we returned a void *handle to the timer then we could work
-//  directly into the list rather than scanning... how to do this without
-//  breaking the API or making the code horribly complex?
 
 int
 zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_timer_fn handler, void *arg)
@@ -578,10 +555,7 @@ zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_timer_fn handler, 
     s_timer_t *timer = s_timer_new (timer_id, delay, times, handler, arg);
     if (timer) {
         timer->list_handle = zlistx_add_end (self->timers, timer);
-        if (!timer->list_handle) {
-            s_timer_destroy (&timer);
-            return -1;
-        }
+        assert (timer->list_handle);
         if (self->verbose)
             zsys_debug ("zloop: register timer id=%d delay=%d times=%d",
                         timer_id, (int) delay, (int) times);
@@ -604,12 +578,11 @@ zloop_timer_end (zloop_t *self, int timer_id)
     if (self->terminated)
         s_timer_remove (self, timer_id);
     else
-    //  We cannot touch self->timers because we may be executing that
-    //  from inside the poll loop. So, we hold the arg on the zombie
-    //  list, and process that list when we're done executing timers.
-    //  This hack lets us store an integer timer ID as a pointer
-    if (zlistx_add_end (self->zombies, (byte *) NULL + timer_id) == NULL)
-        return -1;
+        //  We cannot touch self->timers because we may be executing that
+        //  from inside the poll loop. So, we hold the arg on the zombie
+        //  list, and process that list when we're done executing timers.
+        //  This hack lets us store an integer timer ID as a pointer
+        zlistx_add_end (self->zombies, (byte *) NULL + timer_id);
 
     if (self->verbose)
         zsys_debug ("zloop: cancel timer id=%d", timer_id);
@@ -637,8 +610,7 @@ zloop_ticket (zloop_t *self, zloop_timer_fn handler, void *arg)
     s_ticket_t *ticket = s_ticket_new (self->ticket_delay, handler, arg);
     if (ticket) {
         ticket->list_handle = zlistx_add_end (self->tickets, ticket);
-        if (!ticket->list_handle)
-            s_ticket_destroy (&ticket);
+        assert (ticket->list_handle);
     }
     return ticket;
 }
@@ -697,15 +669,16 @@ zloop_set_verbose (zloop_t *self, bool verbose)
 }
 
 //  --------------------------------------------------------------------------
-//  Ignore zsys_interrupted flag in this loop. By default, a zloop_start will
-//  exit as soon as it detects zsys_interrupted is set to something other than
-//  zero. Calling zloop_ignore_interrupts will supress this behavior.
+//  By default the reactor stops if the process receives a SIGINT or SIGTERM
+//  signal. This makes it impossible to shut-down message based architectures
+//  like zactors. This method lets you switch off break handling. The default
+//  nonstop setting is off (false).
 
 void
-zloop_ignore_interrupts (zloop_t *self)
+zloop_set_nonstop (zloop_t *self, bool nonstop)
 {
     assert (self);
-    self->ignore_interrupts = true;
+    self->nonstop = true;
 }
 
 
@@ -738,7 +711,7 @@ zloop_start (zloop_t *self)
     int rc = 0;
 
     //  Main reactor loop
-    while (self->ignore_interrupts || !zsys_interrupted) {
+    while (!zsys_interrupted || self->nonstop) {
         if (self->need_rebuild) {
             //  If s_rebuild_pollset() fails, break out of the loop and
             //  return its error
@@ -747,7 +720,7 @@ zloop_start (zloop_t *self)
                 break;
         }
         rc = zmq_poll (self->pollset, (int) self->poll_size, s_tickless (self));
-        if (rc == -1 || (!self->ignore_interrupts && zsys_interrupted)) {
+        if (rc == -1 || (zsys_interrupted && !self->nonstop)) {
             if (self->verbose)
                 zsys_debug ("zloop: interrupted");
             rc = 0;
@@ -962,7 +935,7 @@ zloop_test (bool verbose)
     //  zloop returns immediately without giving any handler a chance to run
     assert (!timer_event_called);
 
-    zloop_ignore_interrupts (loop);
+    zloop_set_nonstop (loop, true);
     zloop_start (loop);
     //  zloop runs the handler which will terminate the loop
     assert (timer_event_called);

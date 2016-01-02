@@ -153,9 +153,6 @@
     <ClInclude Include="..\..\..\..\src\zhash_primes.inc">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\zclass_example.xml">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\foreign/sha1/sha1.inc_c">
       <Filter>src</Filter>
     </ClInclude>

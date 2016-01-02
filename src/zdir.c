@@ -113,8 +113,7 @@ zdir_t *
 zdir_new (const char *path, const char *parent)
 {
     zdir_t *self = (zdir_t *) zmalloc (sizeof (zdir_t));
-    if (!self)
-        return NULL;
+    assert (self);
 
     if (parent) {
         if (streq (parent, "-")) {

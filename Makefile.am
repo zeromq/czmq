@@ -30,7 +30,6 @@ EXTRA_DIST = \
     src/zsock_option.inc \
     src/zgossip_engine.inc \
     src/zhash_primes.inc \
-    src/zclass_example.xml \
     src/foreign/sha1/sha1.inc_c \
     src/foreign/sha1/sha1.h \
     src/foreign/slre/slre.inc_c \

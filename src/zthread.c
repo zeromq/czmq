@@ -148,13 +148,11 @@ zthread_new (zthread_detached_fn *thread_fn, void *args)
 {
     //  Prepare argument shim for child thread
     shim_t *shim = (shim_t *) zmalloc (sizeof (shim_t));
-    if (shim) {
-        shim->detached = thread_fn;
-        shim->args = args;
-        s_thread_start (shim);
-        return 0;
-    }
-    return -1;
+    assert (shim);
+    shim->detached = thread_fn;
+    shim->args = args;
+    s_thread_start (shim);
+    return 0;
 }
 
 
@@ -169,31 +167,20 @@ zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args)
     shim_t *shim = NULL;
     //  Create our end of the pipe
     void *pipe = zctx__socket_pipe (ctx);
-    if (pipe)
-        zsocket_bind (pipe, "inproc://zctx-pipe-%p", pipe);
-    else
-        return NULL;
+    assert (pipe);
+    zsocket_bind (pipe, "inproc://zctx-pipe-%p", pipe);
 
     //  Prepare argument shim for child thread
     shim = (shim_t *) zmalloc (sizeof (shim_t));
-    if (shim) {
-        shim->attached = thread_fn;
-        shim->args = args;
-        shim->ctx = zctx_shadow (ctx);
-        if (!shim->ctx) {
-            zctx__socket_destroy (ctx, pipe);
-            return NULL;
-        }
-    }
-    else
-        return NULL;
+    assert (shim);
+    shim->attached = thread_fn;
+    shim->args = args;
+    shim->ctx = zctx_shadow (ctx);
+    assert (shim->ctx);
+    shim->pipe = zctx__socket_pipe (shim->ctx);
+    assert (shim->pipe);
 
     //  Connect child pipe to our pipe
-    shim->pipe = zctx__socket_pipe (shim->ctx);
-    if (!shim->pipe) {
-        zctx__socket_destroy (ctx, pipe);
-        return NULL;
-    }
     zsocket_connect (shim->pipe, "inproc://zctx-pipe-%p", pipe);
 
     s_thread_start (shim);

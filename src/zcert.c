@@ -79,26 +79,22 @@ zcert_t *
 zcert_new_from (byte *public_key, byte *secret_key)
 {
     zcert_t *self = (zcert_t *) zmalloc (sizeof (zcert_t));
-    if (!self)
-        return NULL;
+    assert (self);
     assert (public_key);
     assert (secret_key);
 
     self->metadata = zhash_new ();
-    if (self->metadata) {
-        zhash_autofree (self->metadata);
-        memcpy (self->public_key, public_key, 32);
-        memcpy (self->secret_key, secret_key, 32);
+    assert (self->metadata);
+    zhash_autofree (self->metadata);
+    memcpy (self->public_key, public_key, 32);
+    memcpy (self->secret_key, secret_key, 32);
 #if (ZMQ_VERSION_MAJOR == 4)
-        zmq_z85_encode (self->public_txt, self->public_key, 32);
-        zmq_z85_encode (self->secret_txt, self->secret_key, 32);
+    zmq_z85_encode (self->public_txt, self->public_key, 32);
+    zmq_z85_encode (self->secret_txt, self->secret_key, 32);
 #else
-        strcpy (self->public_txt, FORTY_ZEROES);
-        strcpy (self->secret_txt, FORTY_ZEROES);
+    strcpy (self->public_txt, FORTY_ZEROES);
+    strcpy (self->secret_txt, FORTY_ZEROES);
 #endif
-    }
-    else
-        zcert_destroy (&self);
     return self;
 }
 
@@ -182,6 +178,7 @@ zcert_set_meta (zcert_t *self, const char *name, const char *format, ...)
     zhash_insert (self->metadata, name, value);
     zstr_free (&value);
 }
+
 
 //  --------------------------------------------------------------------------
 //  Unset certificate metadata.
@@ -325,9 +322,10 @@ zcert_save_public (zcert_t *self, const char *filename)
                          "   directory, in the .curve subdirectory.");
 
     zconfig_put (self->config, "/curve/public-key", self->public_txt);
-    int rc = zconfig_save (self->config, filename);
-    return rc;
+
+    return zconfig_save (self->config, filename);;
 }
+
 
 //  --------------------------------------------------------------------------
 //  Save public certificate only to file for persistent storage.
@@ -403,8 +401,8 @@ zcert_eq (zcert_t *self, zcert_t *compare)
     assert (self);
     assert (compare);
 
-    return (  streq (self->public_txt, compare->public_txt)
-           && streq (self->secret_txt, compare->secret_txt));
+    return (streq (self->public_txt, compare->public_txt)
+         && streq (self->secret_txt, compare->secret_txt));
 }
 
 

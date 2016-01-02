@@ -1593,7 +1593,6 @@
       <File RelativePath="..\..\..\..\src\zsock_option.inc" />
       <File RelativePath="..\..\..\..\src\zgossip_engine.inc" />
       <File RelativePath="..\..\..\..\src\zhash_primes.inc" />
-      <File RelativePath="..\..\..\..\src\zclass_example.xml" />
       <File RelativePath="..\..\..\..\src\foreign/sha1/sha1.inc_c" />
       <File RelativePath="..\..\..\..\src\foreign/sha1/sha1.h" />
       <File RelativePath="..\..\..\..\src\foreign/slre/slre.inc_c" />

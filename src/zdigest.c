@@ -48,8 +48,8 @@ zdigest_t *
 zdigest_new (void)
 {
     zdigest_t *self = (zdigest_t *) zmalloc (sizeof (zdigest_t));
-    if (self)
-        SHA1_Init (&self->context);
+    assert (self);
+    SHA1_Init (&self->context);
     return self;
 }
 

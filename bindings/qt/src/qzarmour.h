@@ -23,10 +23,9 @@ public:
     //  Destroy the zarmour.
     ~QZarmour ();
 
-    //  Get printable string for mode.
-    const QString modeStr ();
-
-    //  Encode a stream of bytes into an armoured string.
+    //  Encode a stream of bytes into an armoured string. Returns the armoured
+    //  string, or NULL if there was insufficient memory available to allocate
+    //  a new string.                                                         
     QString encode (const byte *data, size_t size);
 
     //  Decode an armoured string into a string of bytes.          
@@ -36,6 +35,9 @@ public:
 
     //  Get the mode property.
     zarmour_mode_t mode ();
+
+    //  Get printable string for mode.
+    const QString modeStr ();
 
     //  Set the mode property.
     void setMode (zarmour_mode_t mode);

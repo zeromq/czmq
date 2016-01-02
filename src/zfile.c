@@ -64,51 +64,42 @@ zfile_t *
 zfile_new (const char *path, const char *name)
 {
     zfile_t *self = (zfile_t *) zmalloc (sizeof (zfile_t));
+    assert (self);
 
-    if (self) {
-        //  Format full path to file
-        if (path) {
-            self->fullname = (char *) zmalloc (strlen (path) + strlen (name) + 2);
-            if (self->fullname)
-                sprintf (self->fullname, "%s/%s", path, name);
-            else {
-                zfile_destroy (&self);
-                return NULL;
-            }
-        }
-        else
-            self->fullname = strdup (name);
+    //  Format full path to file
+    if (path) {
+        self->fullname = (char *) zmalloc (strlen (path) + strlen (name) + 2);
+        assert (self->fullname);
+        sprintf (self->fullname, "%s/%s", path, name);
+    }
+    else
+        self->fullname = strdup (name);
 
-        if (self->fullname) {
-            //  Resolve symbolic link if possible
-            if (strlen (self->fullname) > 3
-            &&  streq (self->fullname + strlen (self->fullname) - 3, ".ln")) {
-                FILE *handle = fopen (self->fullname, "r");
-                if (handle) {
-                    char buffer [256];
-                    if (fgets (buffer, 256, handle)) {
-                        //  We have the contents of the symbolic link
-                        if (buffer [strlen (buffer) - 1] == '\n')
-                            buffer [strlen (buffer) - 1] = 0;
-                        self->link = strdup (buffer);
-                        
-                        //  Chop ".ln" off name for external use
-                        if (self->link)
-                            self->fullname [strlen (self->fullname) - 3] = 0;
-                        else {
-                            fclose (handle);
-                            zfile_destroy (&self);
-                            return NULL;
-                        }
-                    }
+    //  Resolve symbolic link if possible
+    if (strlen (self->fullname) > 3
+    &&  streq (self->fullname + strlen (self->fullname) - 3, ".ln")) {
+        FILE *handle = fopen (self->fullname, "r");
+        if (handle) {
+            char buffer [256];
+            if (fgets (buffer, 256, handle)) {
+                //  We have the contents of the symbolic link
+                if (buffer [strlen (buffer) - 1] == '\n')
+                    buffer [strlen (buffer) - 1] = 0;
+                self->link = strdup (buffer);
+
+                //  Chop ".ln" off name for external use
+                if (self->link)
+                    self->fullname [strlen (self->fullname) - 3] = 0;
+                else {
                     fclose (handle);
+                    zfile_destroy (&self);
+                    return NULL;
                 }
             }
-            zfile_restat (self);
+            fclose (handle);
         }
-        else
-            zfile_destroy (&self);
     }
+    zfile_restat (self);
     return self;
 }
 
@@ -143,16 +134,13 @@ zfile_dup (zfile_t *self)
 {
     if (self) {
         zfile_t *copy = (zfile_t *) zmalloc (sizeof (zfile_t));
-        if (copy)
-            copy->fullname = strdup (self->fullname);
-        if (copy->fullname) {
-            copy->modified = self->modified;
-            copy->cursize = self->cursize;
-            copy->link = self->link? strdup (self->link): NULL;
-            copy->mode = self->mode;
-        }
-        else
-            zfile_destroy (&copy);
+        assert (copy);
+        copy->fullname = strdup (self->fullname);
+        assert (copy->fullname);
+        copy->modified = self->modified;
+        copy->cursize = self->cursize;
+        copy->link = self->link? strdup (self->link): NULL;
+        copy->mode = self->mode;
         return copy;
     }
     else
@@ -464,6 +452,7 @@ zfile_readln (zfile_t *self)
     if (!self->curline) {
         self->linemax = 512; 
         self->curline = (char *) malloc (self->linemax);
+        assert (self->curline);
     }
     uint char_nbr = 0;
     while (true) {

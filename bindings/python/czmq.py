@@ -290,14 +290,14 @@ lib.zarmour_new.restype = zarmour_p
 lib.zarmour_new.argtypes = []
 lib.zarmour_destroy.restype = None
 lib.zarmour_destroy.argtypes = [POINTER(zarmour_p)]
-lib.zarmour_mode_str.restype = c_char_p
-lib.zarmour_mode_str.argtypes = [zarmour_p]
 lib.zarmour_encode.restype = POINTER(c_char)
 lib.zarmour_encode.argtypes = [zarmour_p, c_void_p, c_size_t]
 lib.zarmour_decode.restype = c_void_p
 lib.zarmour_decode.argtypes = [zarmour_p, c_char_p, POINTER(c_size_t)]
 lib.zarmour_mode.restype = c_int
 lib.zarmour_mode.argtypes = [zarmour_p]
+lib.zarmour_mode_str.restype = c_char_p
+lib.zarmour_mode_str.argtypes = [zarmour_p]
 lib.zarmour_set_mode.restype = None
 lib.zarmour_set_mode.argtypes = [zarmour_p, c_int]
 lib.zarmour_pad.restype = c_bool
@@ -369,12 +369,10 @@ class Zarmour(object):
         "Determine whether the object is valid by converting to boolean" # Python 2
         return self._as_parameter_.__nonzero__()
 
-    def mode_str(self):
-        """Get printable string for mode."""
-        return lib.zarmour_mode_str(self._as_parameter_)
-
     def encode(self, data, size):
-        """Encode a stream of bytes into an armoured string."""
+        """Encode a stream of bytes into an armoured string. Returns the armoured
+string, or NULL if there was insufficient memory available to allocate
+a new string."""
         return return_fresh_string(lib.zarmour_encode(self._as_parameter_, data, size))
 
     def decode(self, data, decode_size):
@@ -386,6 +384,10 @@ as a string, if that's what it was prior to encoding."""
     def mode(self):
         """Get the mode property."""
         return Zarmour.Mode_out[lib.zarmour_mode(self._as_parameter_)]
+
+    def mode_str(self):
+        """Get printable string for mode."""
+        return lib.zarmour_mode_str(self._as_parameter_)
 
     def set_mode(self, mode):
         """Set the mode property."""
@@ -2356,10 +2358,10 @@ lib.zloop_set_max_timers.restype = None
 lib.zloop_set_max_timers.argtypes = [zloop_p, c_size_t]
 lib.zloop_set_verbose.restype = None
 lib.zloop_set_verbose.argtypes = [zloop_p, c_bool]
+lib.zloop_set_nonstop.restype = None
+lib.zloop_set_nonstop.argtypes = [zloop_p, c_bool]
 lib.zloop_start.restype = c_int
 lib.zloop_start.argtypes = [zloop_p]
-lib.zloop_ignore_interrupts.restype = None
-lib.zloop_ignore_interrupts.argtypes = [zloop_p]
 lib.zloop_test.restype = None
 lib.zloop_test.argtypes = [c_bool]
 
@@ -2478,21 +2480,23 @@ error."""
         return lib.zloop_set_max_timers(self._as_parameter_, max_timers)
 
     def set_verbose(self, verbose):
-        """Set verbose tracing of reactor on/off"""
+        """Set verbose tracing of reactor on/off. The default verbose setting is
+off (false)."""
         return lib.zloop_set_verbose(self._as_parameter_, verbose)
+
+    def set_nonstop(self, nonstop):
+        """By default the reactor stops if the process receives a SIGINT or SIGTERM
+signal. This makes it impossible to shut-down message based architectures
+like zactors. This method lets you switch off break handling. The default
+nonstop setting is off (false)."""
+        return lib.zloop_set_nonstop(self._as_parameter_, nonstop)
 
     def start(self):
         """Start the reactor. Takes control of the thread and returns when the 0MQ
 context is terminated or the process is interrupted, or any event handler
 returns -1. Event handlers may register new sockets and timers, and
-cancel sockets. Returns 0 if interrupted, -1 if cancelled by a handler."""
+cancel sockets. Returns 0 if interrupted, -1 if canceled by a handler."""
         return lib.zloop_start(self._as_parameter_)
-
-    def ignore_interrupts(self):
-        """Ignore zsys_interrupted flag in this loop. By default, a zloop_start will
-exit as soon as it detects zsys_interrupted is set to something other than
-zero. Calling zloop_ignore_interrupts will supress this behavior."""
-        return lib.zloop_ignore_interrupts(self._as_parameter_)
 
     @staticmethod
     def test(verbose):
@@ -2805,14 +2809,14 @@ lib.zpoller_add.restype = c_int
 lib.zpoller_add.argtypes = [zpoller_p, c_void_p]
 lib.zpoller_remove.restype = c_int
 lib.zpoller_remove.argtypes = [zpoller_p, c_void_p]
+lib.zpoller_set_nonstop.restype = None
+lib.zpoller_set_nonstop.argtypes = [zpoller_p, c_bool]
 lib.zpoller_wait.restype = c_void_p
 lib.zpoller_wait.argtypes = [zpoller_p, c_int]
 lib.zpoller_expired.restype = c_bool
 lib.zpoller_expired.argtypes = [zpoller_p]
 lib.zpoller_terminated.restype = c_bool
 lib.zpoller_terminated.argtypes = [zpoller_p]
-lib.zpoller_ignore_interrupts.restype = None
-lib.zpoller_ignore_interrupts.argtypes = [zpoller_p]
 lib.zpoller_test.restype = None
 lib.zpoller_test.argtypes = [c_bool]
 
@@ -2821,8 +2825,9 @@ class Zpoller(object):
 
     allow_destruct = False
     def __init__(self, *args):
-        """Create new poller; the reader can be a libzmq socket (void *), a zsock_t
-instance, or a zactor_t instance."""
+        """Create new poller, specifying zero or more readers. The list of
+readers ends in a NULL. Each reader can be a zsock_t instance, a
+zactor_t instance, a libzmq socket (void *), or a file handle."""
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], zpoller_p) # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -2853,10 +2858,16 @@ be a libzmq void * socket, a zsock_t instance, or a zactor_t instance."""
         return lib.zpoller_add(self._as_parameter_, reader)
 
     def remove(self, reader):
-        """Remove a reader from the poller; returns 0 if OK, -1 on failure. The
-reader may be a libzmq void * socket, a zsock_t instance, or a zactor_t
-instance."""
+        """Remove a reader from the poller; returns 0 if OK, -1 on failure. The reader
+must have been passed during construction, or in an zpoller_add () call."""
         return lib.zpoller_remove(self._as_parameter_, reader)
+
+    def set_nonstop(self, nonstop):
+        """By default the poller stops if the process receives a SIGINT or SIGTERM
+signal. This makes it impossible to shut-down message based architectures
+like zactors. This method lets you switch off break handling. The default
+nonstop setting is off (false)."""
+        return lib.zpoller_set_nonstop(self._as_parameter_, nonstop)
 
     def wait(self, timeout):
         """Poll the registered readers for I/O, return first reader that has input.
@@ -2879,12 +2890,6 @@ expired, without any error."""
         """Return true if the last zpoller_wait () call ended because the process
 was interrupted, or the parent context was destroyed."""
         return lib.zpoller_terminated(self._as_parameter_)
-
-    def ignore_interrupts(self):
-        """Ignore zsys_interrupted flag in this poller. By default, a zpoller_wait will
-return immediately if detects zsys_interrupted is set to something other than
-zero. Calling zpoller_ignore_interrupts will supress this behavior."""
-        return lib.zpoller_ignore_interrupts(self._as_parameter_)
 
     @staticmethod
     def test(verbose):

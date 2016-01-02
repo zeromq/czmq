@@ -107,4 +107,54 @@ This is the class self test code:
     
     zsock_destroy (&input);
     zsock_destroy (&output);
+    
+    //  Test SERVER/CLIENT over zstr
+    zsock_t *server = zsock_new_server ("inproc://zstr-test-routing");
+    zsock_t *client = zsock_new_client ("inproc://zstr-test-routing");;
+    assert (server);
+    assert (client);
+    
+    //  Try normal ping-pong to check reply routing ID
+    int rc = zstr_send (client, "Hello");
+    assert (rc == 0);
+    char *request = zstr_recv (server);
+    assert (streq (request, "Hello"));
+    assert (zsock_routing_id (server));
+    free (request);
+    
+    rc = zstr_send (server, "World");
+    assert (rc == 0);
+    char *reply = zstr_recv (client);
+    assert (streq (reply, "World"));
+    free (reply);
+    
+    rc = zstr_sendf (server, "%s", "World");
+    assert (rc == 0);
+    reply = zstr_recv (client);
+    assert (streq (reply, "World"));
+    free (reply);
+    
+    //  Try ping-pong using sendx and recx
+    rc = zstr_sendx (client, "Hello", NULL);
+    assert (rc == 0);
+    rc = zstr_recvx (server, &request, NULL);
+    assert (rc >= 0);
+    assert (streq (request, "Hello"));
+    free (request);
+    
+    rc = zstr_sendx (server, "World", NULL);
+    assert (rc == 0);
+    rc = zstr_recvx (client, &reply, NULL);
+    assert (rc >= 0);
+    assert (streq (reply, "World"));
+    free (reply);
+    
+    //  Client and server disallow multipart
+    rc = zstr_sendm (client, "Hello");
+    assert (rc == -1);
+    rc = zstr_sendm (server, "World");
+    assert (rc == -1);
+    
+    zsock_destroy (&client);
+    zsock_destroy (&server);
 

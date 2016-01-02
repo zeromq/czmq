@@ -66,8 +66,7 @@ static self_t *
 s_self_new (zsock_t *pipe)
 {
     self_t *self = (self_t *) zmalloc (sizeof (self_t));
-    if (!self)
-        return NULL;
+    assert (self);
     self->pipe = pipe;
     return self;
 }

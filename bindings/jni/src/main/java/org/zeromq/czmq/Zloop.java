@@ -97,30 +97,32 @@ public class Zloop implements AutoCloseable{
         __setMaxTimers (self, maxTimers);
     }
     /*
-    Set verbose tracing of reactor on/off
+    Set verbose tracing of reactor on/off. The default verbose setting is
+    off (false).                                                         
     */
     native static void __setVerbose (long self, boolean verbose);
     public void setVerbose (boolean verbose) {
         __setVerbose (self, verbose);
     }
     /*
+    By default the reactor stops if the process receives a SIGINT or SIGTERM 
+    signal. This makes it impossible to shut-down message based architectures
+    like zactors. This method lets you switch off break handling. The default
+    nonstop setting is off (false).                                          
+    */
+    native static void __setNonstop (long self, boolean nonstop);
+    public void setNonstop (boolean nonstop) {
+        __setNonstop (self, nonstop);
+    }
+    /*
     Start the reactor. Takes control of the thread and returns when the 0MQ  
     context is terminated or the process is interrupted, or any event handler
     returns -1. Event handlers may register new sockets and timers, and      
-    cancel sockets. Returns 0 if interrupted, -1 if cancelled by a handler.  
+    cancel sockets. Returns 0 if interrupted, -1 if canceled by a handler.   
     */
     native static int __start (long self);
     public int start () {
         return __start (self);
-    }
-    /*
-    Ignore zsys_interrupted flag in this loop. By default, a zloop_start will 
-    exit as soon as it detects zsys_interrupted is set to something other than
-    zero. Calling zloop_ignore_interrupts will supress this behavior.         
-    */
-    native static void __ignoreInterrupts (long self);
-    public void ignoreInterrupts () {
-        __ignoreInterrupts (self);
     }
     /*
     Self test of this class.

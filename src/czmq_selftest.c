@@ -21,102 +21,57 @@
 
 #include "czmq_classes.h"
 
-//  -------------------------------------------------------------------------
-//  Prototype of test function
-//
-
-typedef void (*testfn_t) (bool);
-
-//  -------------------------------------------------------------------------
-//  Mapping of test class and test function.
-//
-
-typedef struct
-{
+typedef struct {
     const char *testname;
-    testfn_t test;
+    void (*test) (bool);
 } test_item_t;
 
-//  -------------------------------------------------------------------------
-//  Declaration of all tests
-//
-
-#define DECLARE_TEST(TEST) {#TEST, TEST}
-
-test_item_t all_tests [] = {
-    DECLARE_TEST(zactor_test),
-    DECLARE_TEST(zauth_test),
-    DECLARE_TEST(zarmour_test),
-    DECLARE_TEST(zbeacon_test),
-    DECLARE_TEST(zcert_test),
-    DECLARE_TEST(zcertstore_test),
-    DECLARE_TEST(zchunk_test),
-    DECLARE_TEST(zclock_test),
-    DECLARE_TEST(zconfig_test),
-    DECLARE_TEST(zdigest_test),
-    DECLARE_TEST(zdir_test),
-    DECLARE_TEST(zdir_patch_test),
-    DECLARE_TEST(zfile_test),
-    DECLARE_TEST(zframe_test),
-    DECLARE_TEST(zgossip_test),
-    DECLARE_TEST(zhash_test),
-    DECLARE_TEST(zhashx_test),
-    DECLARE_TEST(ziflist_test),
-    DECLARE_TEST(zlist_test),
-    DECLARE_TEST(zlistx_test),
-    DECLARE_TEST(zloop_test),
-    DECLARE_TEST(zmonitor_test),
-    DECLARE_TEST(zmsg_test),
-    DECLARE_TEST(zpoller_test),
-    DECLARE_TEST(zproc_test),
-    DECLARE_TEST(zproxy_test),
-    DECLARE_TEST(zrex_test),
-    DECLARE_TEST(zsock_test),
-    DECLARE_TEST(zstr_test),
-    DECLARE_TEST(zsys_test),
-    DECLARE_TEST(ztrie_test),
-    DECLARE_TEST(zuuid_test),
-    DECLARE_TEST(zgossip_msg_test),
-    DECLARE_TEST(zauth_v2_test),
-    DECLARE_TEST(zbeacon_v2_test),
-    DECLARE_TEST(zctx_test),
-    DECLARE_TEST(zmonitor_v2_test),
-    DECLARE_TEST(zmutex_test),
-    DECLARE_TEST(zproxy_v2_test),
-    DECLARE_TEST(zsocket_test),
-    DECLARE_TEST(zsockopt_test),
-    DECLARE_TEST(zthread_test),
-    {0, 0} // Null terminator
+static test_item_t
+all_tests [] = {
+    { "zactor", zactor_test },
+    { "zauth", zauth_test },
+    { "zarmour", zarmour_test },
+    { "zbeacon", zbeacon_test },
+    { "zcert", zcert_test },
+    { "zcertstore", zcertstore_test },
+    { "zchunk", zchunk_test },
+    { "zclock", zclock_test },
+    { "zconfig", zconfig_test },
+    { "zdigest", zdigest_test },
+    { "zdir", zdir_test },
+    { "zdir_patch", zdir_patch_test },
+    { "zfile", zfile_test },
+    { "zframe", zframe_test },
+    { "zgossip", zgossip_test },
+    { "zhash", zhash_test },
+    { "zhashx", zhashx_test },
+    { "ziflist", ziflist_test },
+    { "zlist", zlist_test },
+    { "zlistx", zlistx_test },
+    { "zloop", zloop_test },
+    { "zmonitor", zmonitor_test },
+    { "zmsg", zmsg_test },
+    { "zpoller", zpoller_test },
+    { "zproc", zproc_test },
+    { "zproxy", zproxy_test },
+    { "zrex", zrex_test },
+    { "zsock", zsock_test },
+    { "zstr", zstr_test },
+    { "zsys", zsys_test },
+    { "ztrie", ztrie_test },
+    { "zuuid", zuuid_test },
+    { "zgossip_msg", zgossip_msg_test },
+    { "zauth_v2", zauth_v2_test },
+    { "zbeacon_v2", zbeacon_v2_test },
+    { "zctx", zctx_test },
+    { "zmonitor_v2", zmonitor_v2_test },
+    { "zmutex", zmutex_test },
+    { "zproxy_v2", zproxy_v2_test },
+    { "zsocket", zsocket_test },
+    { "zsockopt", zsockopt_test },
+    { "zthread", zthread_test },
+    {0, 0}          //  Sentinel
 };
-
-//  -------------------------------------------------------------------------
-//  Return the number of available tests.
-//
-
-static inline unsigned
-test_get_number (void)
-{
-    unsigned count = 0;
-    test_item_t *item;
-    for (item = all_tests; item->test; item++)
-        count++;
-    return count;
-}
-
-//  -------------------------------------------------------------------------
-//  Print names of all available tests to stdout.
-//
-
-static inline void
-test_print_list (void)
-{
-    unsigned count = 0;
-    test_item_t *item;
-    for (item = all_tests; item->test; item++) {
-        count++;
-        printf ("%u:%s\n", count, item->testname);
-    }
-}
 
 //  -------------------------------------------------------------------------
 //  Test whether a test is available.
@@ -138,7 +93,7 @@ test_available (const char *testname)
 //  Run all tests.
 //
 
-static inline void
+static void
 test_runall (bool verbose)
 {
     test_item_t *item;
@@ -156,20 +111,76 @@ main (int argc, char **argv)
     test_item_t *test = 0;
     int argn;
     for (argn = 1; argn < argc; argn++) {
-        if (streq (argv [argn], "-v"))
+        if (streq (argv [argn], "--help")
+        ||  streq (argv [argn], "-h")) {
+            puts ("czmq_selftest.c [options] ...");
+            puts ("  --verbose / -v         verbose test output");
+            puts ("  --number / -n          report number of tests");
+            puts ("  --list / -l            list all tests");
+            puts ("  --test / -t [name]     run only test 'name'");
+            puts ("  --continue / -c        continue on exception (on Windows)");
+            return 0;
+        }
+        if (streq (argv [argn], "--verbose")
+        ||  streq (argv [argn], "-v"))
             verbose = true;
         else
-        if (streq (argv [argn], "--nb")) {
-            printf("%d\n", test_get_number ());
+        if (streq (argv [argn], "--number")
+        ||  streq (argv [argn], "-n")) {
+            puts ("42");
             return 0;
         }
         else
-        if (streq (argv [argn], "--list")) {
-            test_print_list ();
+        if (streq (argv [argn], "--list")
+        ||  streq (argv [argn], "-l")) {
+            puts ("Available tests:");
+            puts ("    zactor");
+            puts ("    zauth");
+            puts ("    zarmour");
+            puts ("    zbeacon");
+            puts ("    zcert");
+            puts ("    zcertstore");
+            puts ("    zchunk");
+            puts ("    zclock");
+            puts ("    zconfig");
+            puts ("    zdigest");
+            puts ("    zdir");
+            puts ("    zdir_patch");
+            puts ("    zfile");
+            puts ("    zframe");
+            puts ("    zgossip");
+            puts ("    zhash");
+            puts ("    zhashx");
+            puts ("    ziflist");
+            puts ("    zlist");
+            puts ("    zlistx");
+            puts ("    zloop");
+            puts ("    zmonitor");
+            puts ("    zmsg");
+            puts ("    zpoller");
+            puts ("    zproc");
+            puts ("    zproxy");
+            puts ("    zrex");
+            puts ("    zsock");
+            puts ("    zstr");
+            puts ("    zsys");
+            puts ("    ztrie");
+            puts ("    zuuid");
+            puts ("    zgossip_msg");
+            puts ("    zauth_v2");
+            puts ("    zbeacon_v2");
+            puts ("    zctx");
+            puts ("    zmonitor_v2");
+            puts ("    zmutex");
+            puts ("    zproxy_v2");
+            puts ("    zsocket");
+            puts ("    zsockopt");
+            puts ("    zthread");
             return 0;
         }
         else
-        if (streq (argv [argn], "--test")) {
+        if (streq (argv [argn], "--test")
+        ||  streq (argv [argn], "-t")) {
             argn++;
             if (argn >= argc) {
                 fprintf (stderr, "--test needs an argument\n");
@@ -177,12 +188,13 @@ main (int argc, char **argv)
             }
             test = test_available (argv [argn]);
             if (!test) {
-                fprintf (stderr, "%s is not available\n", argv [argn]);
+                fprintf (stderr, "%s not valid, use --list to show tests\n", argv [argn]);
                 return 1;
             }
         }
         else
-        if (streq (argv [argn], "-e")) {
+        if (streq (argv [argn], "--continue")
+        ||  streq (argv [argn], "-c")) {
 #ifdef _MSC_VER
             //  When receiving an abort signal, only print to stderr (no dialog)
             _set_abort_behavior (0, _WRITE_ABORT_MSG);
@@ -194,7 +206,7 @@ main (int argc, char **argv)
         }
     }
     if (test) {
-        printf ("Running czmq selftest '%s'...\n", test->testname);
+        printf ("Running czmq test '%s'...\n", test->testname);
         test->test (verbose);
     }
     else

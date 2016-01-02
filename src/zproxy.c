@@ -53,6 +53,18 @@ typedef struct {
     bool verbose;               //  Verbose logging enabled?
 } self_t;
 
+
+static self_t *
+s_self_new (zsock_t *pipe)
+{
+    self_t *self = (self_t *) zmalloc (sizeof (self_t));
+    assert (self);
+    self->pipe = pipe;
+    self->poller = zpoller_new (self->pipe, NULL);
+    assert (self->poller);
+    return self;
+}
+
 static void
 s_self_destroy (self_t **self_p)
 {
@@ -72,19 +84,6 @@ s_self_destroy (self_t **self_p)
         free (self);
         *self_p = NULL;
     }
-}
-
-static self_t *
-s_self_new (zsock_t *pipe)
-{
-    self_t *self = (self_t *) zmalloc (sizeof (self_t));
-    if (self) {
-        self->pipe = pipe;
-        self->poller = zpoller_new (self->pipe, NULL);
-        if (!self->poller)
-            s_self_destroy (&self);
-    }
-    return self;
 }
 
 static zsock_t *
@@ -180,9 +179,9 @@ s_self_selected_socket (zmsg_t *request)
         zsys_error ("zproxy: invalid proxy socket selection: %s", socket_name);
         assert (false);
     }
-
     return socket;
 }
+
 
 static void
 s_self_configure (self_t *self, zsock_t **sock_p, zmsg_t *request, proxy_socket selected_socket)
@@ -202,6 +201,7 @@ s_self_configure (self_t *self, zsock_t **sock_p, zmsg_t *request, proxy_socket 
     zstr_free (&type_name);
     zstr_free (&endpoints);
 }
+
 
 //  --------------------------------------------------------------------------
 //  Handle a command from calling application
@@ -299,6 +299,7 @@ s_self_handle_pipe (self_t *self)
     return 0;
 }
 
+
 //  --------------------------------------------------------------------------
 //  Switch messages from an input socket to an output socket until there are
 //  no messages left waiting. We use this loop rather than zmq_poll, to reduce
@@ -332,6 +333,7 @@ s_self_switch (self_t *self, zsock_t *input, zsock_t *output)
     }
 }
 
+
 //  --------------------------------------------------------------------------
 //  zproxy() implements the zproxy actor interface
 
@@ -360,6 +362,7 @@ zproxy (zsock_t *pipe, void *unused)
     s_self_destroy (&self);
 }
 
+
 //  --------------------------------------------------------------------------
 //  Selftest
 
@@ -386,7 +389,7 @@ s_create_test_sockets (zactor_t **proxy, zsock_t **faucet, zsock_t **sink, bool 
 }
 
 static int
-s_get_available_port ()
+s_get_available_port (void)
 {
     int port_nbr = -1;
     int attempts = 0;
@@ -400,12 +403,10 @@ s_get_available_port ()
         port_nbr = zsock_bind (server, LOCALENDPOINT, port_nbr);
         zsock_destroy (&server);
     }
-
     if (port_nbr < 0) {
         zsys_error ("zproxy: failed to find an available port number");
         assert (false);
     }
-
     return port_nbr;
 }
 

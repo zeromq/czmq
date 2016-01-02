@@ -40,13 +40,10 @@
         Destroy the zarmour.
     </destructor>
 
-    <method name = "mode str">
-        Get printable string for mode.
-        <return type = "string" />
-    </method>
-
     <method name = "encode">
-        Encode a stream of bytes into an armoured string.
+        Encode a stream of bytes into an armoured string. Returns the armoured
+        string, or NULL if there was insufficient memory available to allocate
+        a new string.
         <argument name = "data" type = "buffer" />
         <argument name = "size" type = "size" />
         <return type = "string" fresh = "1" />
@@ -64,6 +61,11 @@
     <method name = "mode">
         Get the mode property.
         <return type = "enum:zarmour.mode" />
+    </method>
+
+    <method name = "mode str">
+        Get printable string for mode.
+        <return type = "string" />
     </method>
 
     <method name = "set mode">

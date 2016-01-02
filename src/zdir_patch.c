@@ -43,30 +43,21 @@ zdir_patch_new (const char *path, zfile_t *file,
                 zdir_patch_op_t op, const char *alias)
 {
     zdir_patch_t *self = (zdir_patch_t *) zmalloc (sizeof (zdir_patch_t));
-    if (!self)
-        return NULL;
+    assert (self);
     self->path = strdup (path);
-    if (self->path)
-        self->file = zfile_dup (file);
-    if (!self->file) {
-        zdir_patch_destroy (&self);
-        return NULL;
-    }
-
+    assert (self->path);
+    self->file = zfile_dup (file);
+    assert (self->file);
     self->op = op;
 
     //  Calculate virtual path for patch (remove path, prefix alias)
     const char *filename = zfile_filename (file, path);
-    if (!filename) {
-        zdir_patch_destroy (&self);
-        return NULL;
-    }
+    assert (filename);
     assert (*filename != '/');
+
     self->vpath = (char *) zmalloc (strlen (alias) + strlen (filename) + 2);
-    if (!self->vpath) {
-        zdir_patch_destroy (&self);
-        return NULL;
-    }
+    assert (self->vpath);
+
     if (alias [strlen (alias) - 1] == '/')
         sprintf (self->vpath, "%s%s", alias, filename);
     else

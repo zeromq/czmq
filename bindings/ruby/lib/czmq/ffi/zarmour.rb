@@ -90,17 +90,9 @@ module CZMQ
         result
       end
 
-      # Get printable string for mode.
-      #
-      # @return [String]
-      def mode_str()
-        raise DestroyedError unless @ptr
-        self_p = @ptr
-        result = ::CZMQ::FFI.zarmour_mode_str(self_p)
-        result
-      end
-
-      # Encode a stream of bytes into an armoured string.
+      # Encode a stream of bytes into an armoured string. Returns the armoured
+      # string, or NULL if there was insufficient memory available to allocate
+      # a new string.                                                         
       #
       # @param data [::FFI::Pointer, #to_ptr]
       # @param size [Integer, #to_int, #to_i]
@@ -135,6 +127,16 @@ module CZMQ
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zarmour_mode(self_p)
+        result
+      end
+
+      # Get printable string for mode.
+      #
+      # @return [String]
+      def mode_str()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zarmour_mode_str(self_p)
         result
       end
 

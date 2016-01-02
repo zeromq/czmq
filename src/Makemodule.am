@@ -104,7 +104,6 @@ src_libczmq_la_SOURCES = \
     src/zsock_option.inc \
     src/zgossip_engine.inc \
     src/zhash_primes.inc \
-    src/zclass_example.xml \
     src/foreign/sha1/sha1.inc_c \
     src/foreign/sha1/sha1.h \
     src/foreign/slre/slre.inc_c \
@@ -143,6 +142,7 @@ endif #WITH_SYSTEMD
 endif #WITH_ZMAKECERT
 if WITH_CZMQ_SELFTEST
 check_PROGRAMS += src/czmq_selftest
+noinst_PROGRAMS += src/czmq_selftest
 src_czmq_selftest_CPPFLAGS = ${AM_CPPFLAGS}
 src_czmq_selftest_LDADD = ${program_libs}
 src_czmq_selftest_SOURCES = src/czmq_selftest.c
@@ -179,7 +179,9 @@ dist_api_DATA = \
 
 # define custom target for all products of /src
 src:
-	src/zmakecert 	src/czmq_selftest 	src/libczmq.la
+	src/zmakecert \
+	src/czmq_selftest \
+	src/libczmq.la
 
 # Produce generated code from models in the src directory
 code:

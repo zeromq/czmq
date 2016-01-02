@@ -39,6 +39,12 @@ Java_org_zeromq_czmq_Zpoller__1_1remove (JNIEnv *env, jclass c, jlong self, jlon
     return remove_;
 }
 
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zpoller__1_1setNonstop (JNIEnv *env, jclass c, jlong self, jboolean nonstop)
+{
+    zpoller_set_nonstop ((zpoller_t *) (intptr_t) self, (bool) nonstop);
+}
+
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zpoller__1_1wait (JNIEnv *env, jclass c, jlong self, jint timeout)
 {
@@ -58,12 +64,6 @@ Java_org_zeromq_czmq_Zpoller__1_1terminated (JNIEnv *env, jclass c, jlong self)
 {
     jboolean terminated_ = (jboolean) zpoller_terminated ((zpoller_t *) (intptr_t) self);
     return terminated_;
-}
-
-JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zpoller__1_1ignoreInterrupts (JNIEnv *env, jclass c, jlong self)
-{
-    zpoller_ignore_interrupts ((zpoller_t *) (intptr_t) self);
 }
 
 JNIEXPORT void JNICALL

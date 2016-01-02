@@ -37,14 +37,9 @@ public class Zarmour implements AutoCloseable{
         self = 0;
     }
     /*
-    Get printable string for mode.
-    */
-    native static String __modeStr (long self);
-    public String modeStr () {
-        return __modeStr (self);
-    }
-    /*
-    Encode a stream of bytes into an armoured string.
+    Encode a stream of bytes into an armoured string. Returns the armoured
+    string, or NULL if there was insufficient memory available to allocate
+    a new string.                                                         
     */
     native static String __encode (long self, byte [] data, long size);
     public String encode (byte [] data, long size) {
@@ -56,6 +51,13 @@ public class Zarmour implements AutoCloseable{
     native static int __mode (long self);
     public int mode () {
         return __mode (self);
+    }
+    /*
+    Get printable string for mode.
+    */
+    native static String __modeStr (long self);
+    public String modeStr () {
+        return __modeStr (self);
     }
     /*
     Set the mode property.

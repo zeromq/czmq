@@ -166,7 +166,8 @@ void QZloop::setMaxTimers (size_t maxTimers)
 }
 
 ///
-//  Set verbose tracing of reactor on/off
+//  Set verbose tracing of reactor on/off. The default verbose setting is
+//  off (false).                                                         
 void QZloop::setVerbose (bool verbose)
 {
     zloop_set_verbose (self, verbose);
@@ -174,24 +175,25 @@ void QZloop::setVerbose (bool verbose)
 }
 
 ///
+//  By default the reactor stops if the process receives a SIGINT or SIGTERM 
+//  signal. This makes it impossible to shut-down message based architectures
+//  like zactors. This method lets you switch off break handling. The default
+//  nonstop setting is off (false).                                          
+void QZloop::setNonstop (bool nonstop)
+{
+    zloop_set_nonstop (self, nonstop);
+    
+}
+
+///
 //  Start the reactor. Takes control of the thread and returns when the 0MQ  
 //  context is terminated or the process is interrupted, or any event handler
 //  returns -1. Event handlers may register new sockets and timers, and      
-//  cancel sockets. Returns 0 if interrupted, -1 if cancelled by a handler.  
+//  cancel sockets. Returns 0 if interrupted, -1 if canceled by a handler.   
 int QZloop::start ()
 {
     int rv = zloop_start (self);
     return rv;
-}
-
-///
-//  Ignore zsys_interrupted flag in this loop. By default, a zloop_start will 
-//  exit as soon as it detects zsys_interrupted is set to something other than
-//  zero. Calling zloop_ignore_interrupts will supress this behavior.         
-void QZloop::ignoreInterrupts ()
-{
-    zloop_ignore_interrupts (self);
-    
 }
 
 ///
