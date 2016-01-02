@@ -45,7 +45,7 @@ struct _zloop_t {
     bool need_rebuild;          //  True if pollset needs rebuilding
     bool verbose;               //  True if verbose tracing wanted
     bool terminated;            //  True when stopped running
-    bool ignore_interrupts;     //  Don't stop running on Ctrl-C
+    bool nonstop;               //  Don't stop running on Ctrl-C
     zlistx_t *zombies;          //  List of timers to kill
 };
 
@@ -669,15 +669,16 @@ zloop_set_verbose (zloop_t *self, bool verbose)
 }
 
 //  --------------------------------------------------------------------------
-//  Ignore zsys_interrupted flag in this loop. By default, a zloop_start will
-//  exit as soon as it detects zsys_interrupted is set to something other than
-//  zero. Calling zloop_ignore_interrupts will supress this behavior.
+//  By default the reactor stops if the process receives a SIGINT or SIGTERM
+//  signal. This makes it impossible to shut-down message based architectures
+//  like zactors. This method lets you switch off break handling. The default
+//  nonstop setting is off (false).
 
 void
-zloop_ignore_interrupts (zloop_t *self)
+zloop_set_nonstop (zloop_t *self, bool nonstop)
 {
     assert (self);
-    self->ignore_interrupts = true;
+    self->nonstop = true;
 }
 
 
@@ -710,7 +711,7 @@ zloop_start (zloop_t *self)
     int rc = 0;
 
     //  Main reactor loop
-    while (self->ignore_interrupts || !zsys_interrupted) {
+    while (!zsys_interrupted || self->nonstop) {
         if (self->need_rebuild) {
             //  If s_rebuild_pollset() fails, break out of the loop and
             //  return its error
@@ -719,7 +720,7 @@ zloop_start (zloop_t *self)
                 break;
         }
         rc = zmq_poll (self->pollset, (int) self->poll_size, s_tickless (self));
-        if (rc == -1 || (!self->ignore_interrupts && zsys_interrupted)) {
+        if (rc == -1 || (zsys_interrupted && !self->nonstop)) {
             if (self->verbose)
                 zsys_debug ("zloop: interrupted");
             rc = 0;
@@ -934,7 +935,7 @@ zloop_test (bool verbose)
     //  zloop returns immediately without giving any handler a chance to run
     assert (!timer_event_called);
 
-    zloop_ignore_interrupts (loop);
+    zloop_set_nonstop (loop, true);
     zloop_start (loop);
     //  zloop runs the handler which will terminate the loop
     assert (timer_event_called);

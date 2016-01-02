@@ -74,17 +74,17 @@ Java_org_zeromq_czmq_Zloop__1_1setVerbose (JNIEnv *env, jclass c, jlong self, jb
     zloop_set_verbose ((zloop_t *) (intptr_t) self, (bool) verbose);
 }
 
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zloop__1_1setNonstop (JNIEnv *env, jclass c, jlong self, jboolean nonstop)
+{
+    zloop_set_nonstop ((zloop_t *) (intptr_t) self, (bool) nonstop);
+}
+
 JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zloop__1_1start (JNIEnv *env, jclass c, jlong self)
 {
     jint start_ = (jint) zloop_start ((zloop_t *) (intptr_t) self);
     return start_;
-}
-
-JNIEXPORT void JNICALL
-Java_org_zeromq_czmq_Zloop__1_1ignoreInterrupts (JNIEnv *env, jclass c, jlong self)
-{
-    zloop_ignore_interrupts ((zloop_t *) (intptr_t) self);
 }
 
 JNIEXPORT void JNICALL

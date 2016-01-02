@@ -38,7 +38,7 @@ struct _zpoller_t {
 #endif
     bool expired;               //  Did poll timer expire?
     bool terminated;            //  Did poll call end with EINTR?
-    bool ignore_interrupts;     //  Should this poller ignore zsys_interrupted?
+    bool nonstop;               //  Don't stop running on Ctrl-C
 };
 
 
@@ -182,6 +182,20 @@ zpoller_remove (zpoller_t *self, void *reader)
 
 
 //  --------------------------------------------------------------------------
+//  By default the poller stops if the process receives a SIGINT or SIGTERM
+//  signal. This makes it impossible to shut-down message based architectures
+//  like zactors. This method lets you switch off break handling. The default
+//  nonstop setting is off (false).
+
+void
+zpoller_set_nonstop (zpoller_t *self, bool nonstop)
+{
+    assert (self);
+    self->nonstop = true;
+}
+
+
+//  --------------------------------------------------------------------------
 //  Poll the registered readers for I/O, return first reader that has input.
 //  The reader will be a libzmq void * socket, or a zsock_t or zactor_t
 //  instance as specified in zpoller_new/zpoller_add. The timeout should be
@@ -197,7 +211,7 @@ zpoller_wait (zpoller_t *self, int timeout)
 {
     assert (self);
     self->expired = false;
-    if (!self->ignore_interrupts && zsys_interrupted) {
+    if (zsys_interrupted && !self->nonstop) {
         self->terminated = true;
         return NULL;
     }
@@ -212,7 +226,7 @@ zpoller_wait (zpoller_t *self, int timeout)
     if (errno == ETIMEDOUT)
         self->expired = true;
     else
-    if (!self->ignore_interrupts && zsys_interrupted)
+    if (zsys_interrupted && !self->nonstop)
         self->terminated = true;
 
     return NULL;
@@ -227,7 +241,7 @@ zpoller_wait (zpoller_t *self, int timeout)
                 return self->poll_readers [reader];
     }
     else
-    if (rc == -1 || (!self->ignore_interrupts && zsys_interrupted))
+    if (rc == -1 || (zsys_interrupted && !self->nonstop))
         self->terminated = true;
     else
     if (rc == 0)
@@ -259,19 +273,6 @@ zpoller_terminated (zpoller_t *self)
 {
     assert (self);
     return self->terminated;
-}
-
-
-//  --------------------------------------------------------------------------
-//  Ignore zsys_interrupted flag in this poller. By default, a zpoller_wait will
-//  return immediately if detects zsys_interrupted is set to something other than
-//  zero. Calling zpoller_ignore_interrupts will supress this behavior.
-
-void
-zpoller_ignore_interrupts (zpoller_t *self)
-{
-    assert (self);
-    self->ignore_interrupts = true;
 }
 
 
@@ -330,12 +331,11 @@ zpoller_test (bool verbose)
     zstr_send (vent, "Hello again, world");
     assert (zpoller_wait (poller, 500) == &fd);
 
-    // Check whether poller properly ignores zsys_interrupted flag
-    // when asked to
+    // Check zpoller_set_nonstop ()
     zsys_interrupted = 1;
     zpoller_wait (poller, 0);
     assert (zpoller_terminated (poller));
-    zpoller_ignore_interrupts (poller);
+    zpoller_set_nonstop (poller, true);
     zpoller_wait (poller, 0);
     assert (!zpoller_terminated (poller));
     zsys_interrupted = 0;

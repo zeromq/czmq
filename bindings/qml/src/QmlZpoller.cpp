@@ -16,11 +16,19 @@ int QmlZpoller::add (void *reader) {
 };
 
 ///
-//  Remove a reader from the poller; returns 0 if OK, -1 on failure. The   
-//  reader may be a libzmq void * socket, a zsock_t instance, or a zactor_t
-//  instance.                                                              
+//  Remove a reader from the poller; returns 0 if OK, -1 on failure. The reader
+//  must have been passed during construction, or in an zpoller_add () call.   
 int QmlZpoller::remove (void *reader) {
     return zpoller_remove (self, reader);
+};
+
+///
+//  By default the poller stops if the process receives a SIGINT or SIGTERM  
+//  signal. This makes it impossible to shut-down message based architectures
+//  like zactors. This method lets you switch off break handling. The default
+//  nonstop setting is off (false).                                          
+void QmlZpoller::setNonstop (bool nonstop) {
+    zpoller_set_nonstop (self, nonstop);
 };
 
 ///
@@ -51,14 +59,6 @@ bool QmlZpoller::terminated () {
     return zpoller_terminated (self);
 };
 
-///
-//  Ignore zsys_interrupted flag in this poller. By default, a zpoller_wait will 
-//  return immediately if detects zsys_interrupted is set to something other than
-//  zero. Calling zpoller_ignore_interrupts will supress this behavior.          
-void QmlZpoller::ignoreInterrupts () {
-    zpoller_ignore_interrupts (self);
-};
-
 
 QObject* QmlZpoller::qmlAttachedProperties(QObject* object) {
     return new QmlZpollerAttached(object);
@@ -72,8 +72,9 @@ void QmlZpollerAttached::test (bool verbose) {
 };
 
 ///
-//  Create new poller; the reader can be a libzmq socket (void *), a zsock_t
-//  instance, or a zactor_t instance.                                       
+//  Create new poller, specifying zero or more readers. The list of 
+//  readers ends in a NULL. Each reader can be a zsock_t instance, a
+//  zactor_t instance, a libzmq socket (void *), or a file handle.  
 QmlZpoller *QmlZpollerAttached::construct (void *reader) {
     QmlZpoller *qmlSelf = new QmlZpoller ();
     qmlSelf->self = zpoller_new (reader);
