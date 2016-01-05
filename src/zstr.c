@@ -330,6 +330,7 @@ zstr_test (bool verbose)
     zsock_destroy (&input);
     zsock_destroy (&output);
 
+#if defined (ZMQ_SERVER)
     //  Test SERVER/CLIENT over zstr
     zsock_t *server = zsock_new_server ("inproc://zstr-test-routing");
     zsock_t *client = zsock_new_client ("inproc://zstr-test-routing");;
@@ -379,6 +380,7 @@ zstr_test (bool verbose)
 
     zsock_destroy (&client);
     zsock_destroy (&server);
+#endif
     //  @end
 
     printf ("OK\n");
