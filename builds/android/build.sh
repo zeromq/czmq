@@ -59,8 +59,8 @@ fi
     export LIBTOOL_EXTRA_LDFLAGS='-avoid-version'
 
     (cd "${cache}/czmq" && ./autogen.sh \
-        && ./configure "${ANDROID_BUILD_OPTS[@]}" \
-        && make \
+        && ./configure "${ANDROID_BUILD_OPTS[@]}" --without-documentation \
+        && make -j 4 \
         && make install) || exit 1
 }
 
