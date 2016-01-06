@@ -56,7 +56,8 @@ s_self_destroy (self_t **self_p)
         self_t *self = *self_p;
         zframe_destroy (&self->transmit);
         zframe_destroy (&self->filter);
-        zsys_udp_close (self->udpsock);
+        if (self->udpsock) // don't close STDIN
+            zsys_udp_close (self->udpsock);
         free (self);
         *self_p = NULL;
     }
