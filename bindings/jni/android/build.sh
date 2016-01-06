@@ -10,6 +10,7 @@
 #
 #     ANDROID_NDK_ROOT=$HOME/android-ndk-r10e
 #     TOOLCHAIN_NAME=arm-linux-androideabi-4.9
+#     TOOLCHAIN_VERSION=4.9
 #     TOOLCHAIN_HOST=arm-linux-androideabi
 #     TOOLCHAIN_ARCH=arm
 #     TOOLCHAIN_PATH=$ANDROID_NDK_ROOT/toolchains/$TOOLCHAIN_NAME/prebuilt/linux-x86_64/bin
@@ -31,7 +32,8 @@ echo "********  Building Android native libraries"
 echo "********  Building JNI interface & classes"
 ( cd .. && gradle build jar )
 
-cmake -v -DCMAKE_TOOLCHAIN_FILE=android_toolchain.cmake .
+rm -rf build && mkdir build && cd build
+cmake -v -DCMAKE_TOOLCHAIN_FILE=../android_toolchain.cmake ..
 
 #   CMake wrongly searches current directory and then toolchain path instead
 #   of lib path for these files, so make them available temporarily
@@ -40,18 +42,20 @@ ln -s $ANDROID_SYS_ROOT/usr/lib/crtbegin_so.o
 
 echo "********  Building JNI for Android"
 make $MAKE_OPTIONS
-rm crtend_so.o crtbegin_so.o
 
 echo "********  Building czmq.jar for Android"
 
 #   Copy class files into org/zeromq/etc.
-unzip -q ../build/libs/czmq*.jar
+unzip -q ../../build/libs/czmq*.jar
 
 #   Copy native libraries into lib/armeabi
 mkdir -p lib/armeabi
 mv libczmqjni.so lib/armeabi
-cp ../../../builds/android/prefix/*/lib/*.so lib/armeabi
+cp ../../../../builds/android/prefix/*/lib/*.so lib/armeabi
+cp $ANDROID_NDK_ROOT/sources/cxx-stl/gnu-libstdc++/$TOOLCHAIN_VERSION/libs/armeabi/libgnustl_shared.so lib/armeabi
 
-zip -r -m czmq-android.jar lib/ org/ META-INF/
+zip -r -m ../czmq-android.jar lib/ org/ META-INF/
+cd ..
+rm -rf build
 
 echo "********  Complete"
