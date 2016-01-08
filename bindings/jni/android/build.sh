@@ -15,6 +15,9 @@
 #     TOOLCHAIN_ARCH=arm
 #     TOOLCHAIN_PATH=$ANDROID_NDK_ROOT/toolchains/$TOOLCHAIN_NAME/prebuilt/linux-x86_64/bin
 #
+#   Exit if any step fails
+set -e
+
 export ANDROID_API_LEVEL=android-8
 export ANDROID_SYS_ROOT=$ANDROID_NDK_ROOT/platforms/$ANDROID_API_LEVEL/arch-$TOOLCHAIN_ARCH
 if [ "$1" = "-d" ]; then
@@ -24,12 +27,14 @@ fi
 source ../../../builds/android/android_build_helper.sh
 android_build_env
 
+#   Build any dependent libraries
+
 #   Ensure we've built dependencies for Android
-echo "********  Building Android native libraries"
+echo "********  Building CZMQ Android native libraries"
 ( cd ../../../builds/android && ./build.sh )
 
 #   Ensure we've built JNI interface
-echo "********  Building JNI interface & classes"
+echo "********  Building CZMQ JNI interface & classes"
 ( cd .. && gradle build jar )
 
 rm -rf build && mkdir build && cd build
@@ -40,7 +45,7 @@ cmake -v -DCMAKE_TOOLCHAIN_FILE=../android_toolchain.cmake ..
 ln -s $ANDROID_SYS_ROOT/usr/lib/crtend_so.o
 ln -s $ANDROID_SYS_ROOT/usr/lib/crtbegin_so.o
 
-echo "********  Building JNI for Android"
+echo "********  Building CZMQ JNI for Android"
 make $MAKE_OPTIONS
 
 echo "********  Building czmq.jar for Android"
@@ -52,7 +57,11 @@ unzip -q ../../build/libs/czmq*.jar
 mkdir -p lib/armeabi
 mv libczmqjni.so lib/armeabi
 cp ../../../../builds/android/prefix/*/lib/*.so lib/armeabi
-cp $ANDROID_NDK_ROOT/sources/cxx-stl/gnu-libstdc++/$TOOLCHAIN_VERSION/libs/armeabi/libgnustl_shared.so lib/armeabi
+# REMOVE IF NO COMPLAINTS
+# cp $ANDROID_NDK_ROOT/sources/cxx-stl/gnu-libstdc++/$TOOLCHAIN_VERSION/libs/armeabi/libgnustl_shared.so lib/armeabi
+
+
+
 
 zip -r -m ../czmq-android.jar lib/ org/ META-INF/
 cd ..
