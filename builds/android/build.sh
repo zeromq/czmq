@@ -53,8 +53,7 @@ fi
 (android_build_verify_so "libczmq.so" "libzmq.so" &> /dev/null) || {
     rm -rf "${cache}/czmq"
     (cp -r ../.. "${cache}/czmq" && cd "${cache}/czmq" \
-        && make clean && rm configure config.status)
-    rm
+        && make clean && rm -f configure config.status)
 
     export LIBTOOL_EXTRA_LDFLAGS='-avoid-version'
 
