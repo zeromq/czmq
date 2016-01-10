@@ -23,9 +23,10 @@ addons:
   apt:
     packages:
     - uuid-dev
+    - valgrind
 
 before_install:
-- if [ $TRAVIS_OS_NAME == "osx" ] ; then brew update; brew install ossp-uuid binutils ; fi
+- if [ $TRAVIS_OS_NAME == "osx" ] ; then brew update; brew install ossp-uuid binutils valgrind ; fi
 
 # ZMQ stress tests need more open socket (files) than the usual default
 # On OSX, it seems the way to set the max files limit is constantly changing, so
