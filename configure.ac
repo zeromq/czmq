@@ -79,6 +79,7 @@ was_libsodium_check_lib_detected=no
 
 PKG_CHECK_MODULES([libsodium], [libsodium >= 0.0.0],
     [
+        AC_DEFINE(HAVE_LIBSODIUM, 1, [The libsodium library is to be used.])
     ],
     [
         AC_ARG_WITH([libsodium],
@@ -110,8 +111,9 @@ PKG_CHECK_MODULES([libsodium], [libsodium >= 0.0.0],
                 AC_SUBST([libsodium_CFLAGS],[${libsodium_synthetic_cflags}])
                 AC_SUBST([libsodium_LIBS],[${libsodium_synthetic_libs}])
                 was_libsodium_check_lib_detected=yes
+                AC_DEFINE(HAVE_LIBSODIUM, 1, [The libsodium library is to be used.])
             ],
-            [AC_MSG_ERROR([cannot link with -lsodium, install libsodium.])])
+            [])
     ])
 
 if test "x$was_libsodium_check_lib_detected" = "xno"; then
