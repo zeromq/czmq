@@ -546,7 +546,7 @@ zdir_resync (zdir_t *self, const char *alias)
     zlist_t *patches = zlist_new ();
     if (!patches)
         return NULL;
-    
+
     zfile_t **files = zdir_flatten (self);
     uint index;
     for (index = 0;; index++) {
@@ -725,6 +725,7 @@ s_zdir_watch_destroy (zdir_watch_t **watch_p)
         zdir_watch_t *watch = *watch_p;
 
         zloop_destroy (&watch->loop);
+        zhash_destroy (&watch->subs);
 
         free (watch);
         *watch_p = NULL;
@@ -832,6 +833,8 @@ s_on_command (zloop_t *loop, zsock_t *reader, void *arg)
         zsys_info ("zdir_watch: Command received: %s", command);
 
     if (streq (command, "$TERM")) {
+        zstr_free (&command);
+        zmsg_destroy (&msg);
         return -1;
     }
     else
@@ -887,6 +890,7 @@ s_on_command (zloop_t *loop, zsock_t *reader, void *arg)
     }
 
     free (command);
+    zmsg_destroy (&msg);
     return 0;
 }
 

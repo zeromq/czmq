@@ -1794,6 +1794,7 @@ zsock_test (bool verbose)
     zframe_destroy (&frame);
     zchunk_destroy (&chunk);
     zhashx_destroy (&hash);
+    zuuid_destroy (&uuid);
 
     //  Test zsock_recv of short message; this lets us return a failure
     //  with a status code and then nothing else; the receiver will get
@@ -1885,7 +1886,7 @@ zsock_test (bool verbose)
 
     zsock_destroy (&reader);
     zsock_destroy (&writer);
-    
+
     //  @end
     printf ("OK\n");
     zsock_option_test (verbose);

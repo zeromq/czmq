@@ -595,6 +595,7 @@ zframe_test (bool verbose)
     zframe_set_routing_id (reply, zframe_routing_id (request));
     rc = zframe_send (&reply, server, 0);
     assert (rc == 0);
+    zframe_destroy (&request);
 
     //  Read reply
     reply = zframe_recv (client);

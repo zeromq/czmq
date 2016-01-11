@@ -770,10 +770,10 @@ zmsg_eq (zmsg_t *self, zmsg_t *other)
 {
     if (!self || !other)
         return false;
-    
+
     if (zlist_size (self->frames) != zlist_size (other->frames))
         return false;
-    
+
     zframe_t *self_frame = (zframe_t *) zlist_first (self->frames);
     zframe_t *other_frame = (zframe_t *) zlist_first (other->frames);
     while (self_frame && other_frame) {
@@ -1208,6 +1208,7 @@ zmsg_test (bool verbose)
     zmsg_set_routing_id (reply, zmsg_routing_id (request));
     rc = zmsg_send (&reply, server);
     assert (rc == 0);
+    zmsg_destroy (&request);
 
     //  Read reply
     reply = zmsg_recv (client);
