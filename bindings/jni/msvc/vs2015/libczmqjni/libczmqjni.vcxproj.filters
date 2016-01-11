@@ -16,6 +16,9 @@
     <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_Zcertstore.c">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_Zchunk.c">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_Zconfig.c">
       <Filter>src</Filter>
     </ClCompile>
@@ -79,6 +82,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Zcertstore.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Zchunk.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Zconfig.h">

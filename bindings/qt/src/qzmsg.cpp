@@ -27,35 +27,35 @@ QZmsg::QZmsg (QObject *qObjParent) : QObject (qObjParent)
 //  was interrupted. Does a blocking recv. If you want to not block then use 
 //  the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
 //  before receiving.                                                        
-QZmsg::QZmsg (void *source, QObject *qObjParent) : QObject (qObjParent)
+QZmsg* QZmsg::recv (void *source, QObject *qObjParent)
 {
-    this->self = zmsg_recv (source);
+    return new QZmsg (zmsg_recv (source), qObjParent);
 }
 
 ///
 //  Load/append an open file into new message, return the message.
 //  Returns NULL if the message could not be loaded.              
-QZmsg::QZmsg (FILE *file, QObject *qObjParent) : QObject (qObjParent)
+QZmsg* QZmsg::load (FILE *file, QObject *qObjParent)
 {
-    this->self = zmsg_load (file);
+    return new QZmsg (zmsg_load (file), qObjParent);
 }
 
 ///
 //  Decodes a serialized message buffer created by zmsg_encode () and returns
 //  a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
 //  there was insufficient memory to work.                                   
-QZmsg::QZmsg (const byte *buffer, size_t bufferSize, QObject *qObjParent) : QObject (qObjParent)
+QZmsg* QZmsg::decode (const byte *buffer, size_t bufferSize, QObject *qObjParent)
 {
-    this->self = zmsg_decode (buffer, bufferSize);
+    return new QZmsg (zmsg_decode (buffer, bufferSize), qObjParent);
 }
 
 ///
 //  Generate a signal message encoding the given status. A signal is a short
 //  message carrying a 1-byte success/failure code (by convention, 0 means  
 //  OK). Signals are encoded to be distinguishable from "normal" messages.  
-QZmsg::QZmsg (byte status, QObject *qObjParent) : QObject (qObjParent)
+QZmsg* QZmsg::newSignal (byte status, QObject *qObjParent)
 {
-    this->self = zmsg_new_signal (status);
+    return new QZmsg (zmsg_new_signal (status), qObjParent);
 }
 
 ///

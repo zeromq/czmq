@@ -29,101 +29,101 @@ QZsock::QZsock (int type, QObject *qObjParent) : QObject (qObjParent)
 
 ///
 //  Create a PUB socket. Default action is bind.
-QZsock::QZsock (const QString &endpoint, QObject *qObjParent) : QObject (qObjParent)
+QZsock* QZsock::newPub (const QString &endpoint, QObject *qObjParent)
 {
-    this->self = zsock_new_pub (endpoint.toUtf8().data());
+    return new QZsock (zsock_new_pub (endpoint.toUtf8().data()), qObjParent);
 }
 
 ///
 //  Create a SUB socket, and optionally subscribe to some prefix string. Default
 //  action is connect.                                                          
-QZsock::QZsock (const QString &endpoint, const QString &subscribe, QObject *qObjParent) : QObject (qObjParent)
+QZsock* QZsock::newSub (const QString &endpoint, const QString &subscribe, QObject *qObjParent)
 {
-    this->self = zsock_new_sub (endpoint.toUtf8().data(), subscribe.toUtf8().data());
+    return new QZsock (zsock_new_sub (endpoint.toUtf8().data(), subscribe.toUtf8().data()), qObjParent);
 }
 
 ///
 //  Create a REQ socket. Default action is connect.
-QZsock::QZsock (const QString &endpoint, QObject *qObjParent) : QObject (qObjParent)
+QZsock* QZsock::newReq (const QString &endpoint, QObject *qObjParent)
 {
-    this->self = zsock_new_req (endpoint.toUtf8().data());
+    return new QZsock (zsock_new_req (endpoint.toUtf8().data()), qObjParent);
 }
 
 ///
 //  Create a REP socket. Default action is bind.
-QZsock::QZsock (const QString &endpoint, QObject *qObjParent) : QObject (qObjParent)
+QZsock* QZsock::newRep (const QString &endpoint, QObject *qObjParent)
 {
-    this->self = zsock_new_rep (endpoint.toUtf8().data());
+    return new QZsock (zsock_new_rep (endpoint.toUtf8().data()), qObjParent);
 }
 
 ///
 //  Create a DEALER socket. Default action is connect.
-QZsock::QZsock (const QString &endpoint, QObject *qObjParent) : QObject (qObjParent)
+QZsock* QZsock::newDealer (const QString &endpoint, QObject *qObjParent)
 {
-    this->self = zsock_new_dealer (endpoint.toUtf8().data());
+    return new QZsock (zsock_new_dealer (endpoint.toUtf8().data()), qObjParent);
 }
 
 ///
 //  Create a ROUTER socket. Default action is bind.
-QZsock::QZsock (const QString &endpoint, QObject *qObjParent) : QObject (qObjParent)
+QZsock* QZsock::newRouter (const QString &endpoint, QObject *qObjParent)
 {
-    this->self = zsock_new_router (endpoint.toUtf8().data());
+    return new QZsock (zsock_new_router (endpoint.toUtf8().data()), qObjParent);
 }
 
 ///
 //  Create a PUSH socket. Default action is connect.
-QZsock::QZsock (const QString &endpoint, QObject *qObjParent) : QObject (qObjParent)
+QZsock* QZsock::newPush (const QString &endpoint, QObject *qObjParent)
 {
-    this->self = zsock_new_push (endpoint.toUtf8().data());
+    return new QZsock (zsock_new_push (endpoint.toUtf8().data()), qObjParent);
 }
 
 ///
 //  Create a PULL socket. Default action is bind.
-QZsock::QZsock (const QString &endpoint, QObject *qObjParent) : QObject (qObjParent)
+QZsock* QZsock::newPull (const QString &endpoint, QObject *qObjParent)
 {
-    this->self = zsock_new_pull (endpoint.toUtf8().data());
+    return new QZsock (zsock_new_pull (endpoint.toUtf8().data()), qObjParent);
 }
 
 ///
 //  Create an XPUB socket. Default action is bind.
-QZsock::QZsock (const QString &endpoint, QObject *qObjParent) : QObject (qObjParent)
+QZsock* QZsock::newXpub (const QString &endpoint, QObject *qObjParent)
 {
-    this->self = zsock_new_xpub (endpoint.toUtf8().data());
+    return new QZsock (zsock_new_xpub (endpoint.toUtf8().data()), qObjParent);
 }
 
 ///
 //  Create an XSUB socket. Default action is connect.
-QZsock::QZsock (const QString &endpoint, QObject *qObjParent) : QObject (qObjParent)
+QZsock* QZsock::newXsub (const QString &endpoint, QObject *qObjParent)
 {
-    this->self = zsock_new_xsub (endpoint.toUtf8().data());
+    return new QZsock (zsock_new_xsub (endpoint.toUtf8().data()), qObjParent);
 }
 
 ///
 //  Create a PAIR socket. Default action is connect.
-QZsock::QZsock (const QString &endpoint, QObject *qObjParent) : QObject (qObjParent)
+QZsock* QZsock::newPair (const QString &endpoint, QObject *qObjParent)
 {
-    this->self = zsock_new_pair (endpoint.toUtf8().data());
+    return new QZsock (zsock_new_pair (endpoint.toUtf8().data()), qObjParent);
 }
 
 ///
 //  Create a STREAM socket. Default action is connect.
-QZsock::QZsock (const QString &endpoint, QObject *qObjParent) : QObject (qObjParent)
+QZsock* QZsock::newStream (const QString &endpoint, QObject *qObjParent)
 {
-    this->self = zsock_new_stream (endpoint.toUtf8().data());
+    return new QZsock (zsock_new_stream (endpoint.toUtf8().data()), qObjParent);
 }
 
 ///
 //  Create a SERVER socket. Default action is bind.
-QZsock::QZsock (const QString &endpoint, QObject *qObjParent) : QObject (qObjParent)
+QZsock* QZsock::newServer (const QString &endpoint, QObject *qObjParent)
 {
-    this->self = zsock_new_server (endpoint.toUtf8().data());
+    return new QZsock (zsock_new_server (endpoint.toUtf8().data()), qObjParent);
 }
 
 ///
 //  Create a CLIENT socket. Default action is connect.
-QZsock::QZsock (const QString &endpoint, QObject *qObjParent) : QObject (qObjParent)
+QZsock* QZsock::newClient (const QString &endpoint, QObject *qObjParent)
 {
-    this->self = zsock_new_client (endpoint.toUtf8().data());
+    return new QZsock (zsock_new_client (endpoint.toUtf8().data()), qObjParent);
 }
 
 ///

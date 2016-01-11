@@ -23,11 +23,11 @@ public:
     //  Load a config tree from a specified ZPL text file; returns a zconfig_t  
     //  reference for the root, if the file exists and is readable. Returns NULL
     //  if the file does not exist.                                             
-    explicit QZconfig (const QString &filename, QObject *qObjParent = 0);
+    static QZconfig* load (const QString &filename, QObject *qObjParent = 0);
 
     //  Equivalent to zconfig_load, taking a format string instead of a fixed
     //  filename.                                                            
-    explicit QZconfig (const QString &param, QObject *qObjParent = 0);
+    static QZconfig* loadf (const QString &param, QObject *qObjParent = 0);
 
     //  Destroy a config item and all its children
     ~QZconfig ();
@@ -99,10 +99,10 @@ public:
     int reload ();
 
     //  Load a config tree from a memory chunk
-    static QZconfig * chunkLoad (zchunk_t *chunk);
+    static QZconfig * chunkLoad (QZchunk *chunk);
 
     //  Save a config tree to a new memory chunk
-    zchunk_t * chunkSave ();
+    QZchunk * chunkSave ();
 
     //  Load a config tree from a null-terminated string
     static QZconfig * strLoad (const QString &string);

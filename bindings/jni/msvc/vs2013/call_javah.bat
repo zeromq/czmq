@@ -9,6 +9,9 @@ IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Zcert.h GOTO HAVE_Zcert
 IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Zcertstore.h GOTO HAVE_Zcertstore
 "%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.Zcertstore
 :HAVE_Zcertstore
+IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Zchunk.h GOTO HAVE_Zchunk
+"%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.Zchunk
+:HAVE_Zchunk
 IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Zconfig.h GOTO HAVE_Zconfig
 "%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.Zconfig
 :HAVE_Zconfig

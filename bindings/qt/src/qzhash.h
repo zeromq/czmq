@@ -23,7 +23,7 @@ public:
     //  Unpack binary frame into a new hash table. Packed data must follow format
     //  defined by zhash_pack. Hash table is set to autofree. An empty frame     
     //  unpacks to an empty hash table.                                          
-    explicit QZhash (QZframe *frame, QObject *qObjParent = 0);
+    static QZhash* unpack (QZframe *frame, QObject *qObjParent = 0);
 
     //  Destroy a hash container and all items in it
     ~QZhash ();

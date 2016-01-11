@@ -350,9 +350,10 @@ module CZMQ
 
       # Load a config tree from a memory chunk
       #
-      # @param chunk [::FFI::Pointer, #to_ptr]
+      # @param chunk [Zchunk, #__ptr]
       # @return [Zconfig]
       def self.chunk_load(chunk)
+        chunk = chunk.__ptr if chunk
         result = ::CZMQ::FFI.zconfig_chunk_load(chunk)
         result = Zconfig.__new result, false
         result
@@ -360,11 +361,12 @@ module CZMQ
 
       # Save a config tree to a new memory chunk
       #
-      # @return [::FFI::Pointer]
+      # @return [Zchunk]
       def chunk_save()
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zconfig_chunk_save(self_p)
+        result = Zchunk.__new result, false
         result
       end
 

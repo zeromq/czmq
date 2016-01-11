@@ -90,7 +90,7 @@ public slots:
     const QString filename ();
 
     //  Save a config tree to a new memory chunk
-    zchunk_t *chunkSave ();
+    QmlZchunk *chunkSave ();
 
     //  Save a config tree to a new null terminated string
     QString strSave ();
@@ -123,7 +123,7 @@ public slots:
     int reload (QmlZconfig *selfP);
 
     //  Load a config tree from a memory chunk
-    QmlZconfig *chunkLoad (zchunk_t *chunk);
+    QmlZconfig *chunkLoad (QmlZchunk *chunk);
 
     //  Load a config tree from a null-terminated string
     QmlZconfig *strLoad (const QString &string);

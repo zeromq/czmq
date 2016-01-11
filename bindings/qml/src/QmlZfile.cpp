@@ -113,8 +113,10 @@ int QmlZfile::output () {
 ///
 //  Read chunk from file at specified position. If this was the last chunk,
 //  sets the eof property. Returns a null chunk in case of error.          
-zchunk_t *QmlZfile::read (size_t bytes, off_t offset) {
-    return zfile_read (self, bytes, offset);
+QmlZchunk *QmlZfile::read (size_t bytes, off_t offset) {
+    QmlZchunk *retQ_ = new QmlZchunk ();
+    retQ_->self = zfile_read (self, bytes, offset);
+    return retQ_;
 };
 
 ///
@@ -126,8 +128,8 @@ bool QmlZfile::eof () {
 ///
 //  Write chunk to file at specified position
 //  Return 0 if OK, else -1                  
-int QmlZfile::write (zchunk_t *chunk, off_t offset) {
-    return zfile_write (self, chunk, offset);
+int QmlZfile::write (QmlZchunk *chunk, off_t offset) {
+    return zfile_write (self, chunk->self, offset);
 };
 
 ///

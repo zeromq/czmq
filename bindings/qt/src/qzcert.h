@@ -21,10 +21,10 @@ public:
     explicit QZcert (QObject *qObjParent = 0);
 
     //  Accepts public/secret key pair from caller
-    explicit QZcert (byte *publicKey, byte *secretKey, QObject *qObjParent = 0);
+    static QZcert* newFrom (byte *publicKey, byte *secretKey, QObject *qObjParent = 0);
 
     //  Load certificate from file
-    explicit QZcert (const QString &filename, QObject *qObjParent = 0);
+    static QZcert* load (const QString &filename, QObject *qObjParent = 0);
 
     //  Destroy a certificate in memory
     ~QZcert ();

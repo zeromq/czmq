@@ -74,13 +74,17 @@ class zcertstore_t(Structure):
     pass # Empty - only for type checking
 zcertstore_p = POINTER(zcertstore_t)
 
-class zconfig_t(Structure):
-    pass # Empty - only for type checking
-zconfig_p = POINTER(zconfig_t)
-
 class zchunk_t(Structure):
     pass # Empty - only for type checking
 zchunk_p = POINTER(zchunk_t)
+
+class zframe_t(Structure):
+    pass # Empty - only for type checking
+zframe_p = POINTER(zframe_t)
+
+class zconfig_t(Structure):
+    pass # Empty - only for type checking
+zconfig_p = POINTER(zconfig_t)
 
 class zdir_t(Structure):
     pass # Empty - only for type checking
@@ -97,10 +101,6 @@ zfile_p = POINTER(zfile_t)
 class zdir_patch_t(Structure):
     pass # Empty - only for type checking
 zdir_patch_p = POINTER(zdir_patch_t)
-
-class zframe_t(Structure):
-    pass # Empty - only for type checking
-zframe_p = POINTER(zframe_t)
 
 class number_t(Structure):
     pass # Empty - only for type checking
@@ -674,6 +674,210 @@ Print list of certificates in store to open stream"""
         return lib.zcertstore_test(verbose)
 
 
+# zchunk
+lib.zchunk_new.restype = zchunk_p
+lib.zchunk_new.argtypes = [c_void_p, c_size_t]
+lib.zchunk_destroy.restype = None
+lib.zchunk_destroy.argtypes = [POINTER(zchunk_p)]
+lib.zchunk_resize.restype = None
+lib.zchunk_resize.argtypes = [zchunk_p, c_size_t]
+lib.zchunk_size.restype = c_size_t
+lib.zchunk_size.argtypes = [zchunk_p]
+lib.zchunk_max_size.restype = c_size_t
+lib.zchunk_max_size.argtypes = [zchunk_p]
+lib.zchunk_data.restype = c_void_p
+lib.zchunk_data.argtypes = [zchunk_p]
+lib.zchunk_set.restype = c_size_t
+lib.zchunk_set.argtypes = [zchunk_p, c_void_p, c_size_t]
+lib.zchunk_fill.restype = c_size_t
+lib.zchunk_fill.argtypes = [zchunk_p, c_ubyte, c_size_t]
+lib.zchunk_append.restype = c_size_t
+lib.zchunk_append.argtypes = [zchunk_p, c_void_p, c_size_t]
+lib.zchunk_extend.restype = c_size_t
+lib.zchunk_extend.argtypes = [zchunk_p, c_void_p, c_size_t]
+lib.zchunk_consume.restype = c_size_t
+lib.zchunk_consume.argtypes = [zchunk_p, zchunk_p]
+lib.zchunk_exhausted.restype = c_bool
+lib.zchunk_exhausted.argtypes = [zchunk_p]
+lib.zchunk_read.restype = zchunk_p
+lib.zchunk_read.argtypes = [FILE_p, c_size_t]
+lib.zchunk_write.restype = c_int
+lib.zchunk_write.argtypes = [zchunk_p, FILE_p]
+lib.zchunk_slurp.restype = zchunk_p
+lib.zchunk_slurp.argtypes = [c_char_p, c_size_t]
+lib.zchunk_dup.restype = zchunk_p
+lib.zchunk_dup.argtypes = [zchunk_p]
+lib.zchunk_strhex.restype = POINTER(c_char)
+lib.zchunk_strhex.argtypes = [zchunk_p]
+lib.zchunk_strdup.restype = POINTER(c_char)
+lib.zchunk_strdup.argtypes = [zchunk_p]
+lib.zchunk_streq.restype = c_bool
+lib.zchunk_streq.argtypes = [zchunk_p, c_char_p]
+lib.zchunk_pack.restype = zframe_p
+lib.zchunk_pack.argtypes = [zchunk_p]
+lib.zchunk_unpack.restype = zchunk_p
+lib.zchunk_unpack.argtypes = [zframe_p]
+lib.zchunk_digest.restype = c_char_p
+lib.zchunk_digest.argtypes = [zchunk_p]
+lib.zchunk_fprint.restype = None
+lib.zchunk_fprint.argtypes = [zchunk_p, FILE_p]
+lib.zchunk_print.restype = None
+lib.zchunk_print.argtypes = [zchunk_p]
+lib.zchunk_is.restype = c_bool
+lib.zchunk_is.argtypes = [c_void_p]
+lib.zchunk_test.restype = None
+lib.zchunk_test.argtypes = [c_bool]
+
+class Zchunk(object):
+    """"""
+
+    allow_destruct = False
+    def __init__(self, *args):
+        """Create a new chunk of the specified size. If you specify the data, it
+is copied into the chunk. If you do not specify the data, the chunk is
+allocated and left empty, and you can then add data using zchunk_append."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zchunk_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zchunk_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 2)
+            self._as_parameter_ = lib.zchunk_new(args[0], args[1]) # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destroy a chunk"""
+        if self.allow_destruct:
+            lib.zchunk_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def resize(self, size):
+        """Resizes chunk max_size as requested; chunk_cur size is set to zero"""
+        return lib.zchunk_resize(self._as_parameter_, size)
+
+    def size(self):
+        """Return chunk cur size"""
+        return lib.zchunk_size(self._as_parameter_)
+
+    def max_size(self):
+        """Return chunk max size"""
+        return lib.zchunk_max_size(self._as_parameter_)
+
+    def data(self):
+        """Return chunk data"""
+        return lib.zchunk_data(self._as_parameter_)
+
+    def set(self, data, size):
+        """Set chunk data from user-supplied data; truncate if too large. Data may
+be null. Returns actual size of chunk"""
+        return lib.zchunk_set(self._as_parameter_, data, size)
+
+    def fill(self, filler, size):
+        """Fill chunk data from user-supplied octet"""
+        return lib.zchunk_fill(self._as_parameter_, filler, size)
+
+    def append(self, data, size):
+        """Append user-supplied data to chunk, return resulting chunk size. If the
+data would exceeded the available space, it is truncated. If you want to
+grow the chunk to accommodate new data, use the zchunk_extend method."""
+        return lib.zchunk_append(self._as_parameter_, data, size)
+
+    def extend(self, data, size):
+        """Append user-supplied data to chunk, return resulting chunk size. If the
+data would exceeded the available space, the chunk grows in size."""
+        return lib.zchunk_extend(self._as_parameter_, data, size)
+
+    def consume(self, source):
+        """Copy as much data from 'source' into the chunk as possible; returns the
+new size of chunk. If all data from 'source' is used, returns exhausted
+on the source chunk. Source can be consumed as many times as needed until
+it is exhausted. If source was already exhausted, does not change chunk."""
+        return lib.zchunk_consume(self._as_parameter_, source)
+
+    def exhausted(self):
+        """Returns true if the chunk was exhausted by consume methods, or if the
+chunk has a size of zero."""
+        return lib.zchunk_exhausted(self._as_parameter_)
+
+    @staticmethod
+    def read(handle, bytes):
+        """Read chunk from an open file descriptor"""
+        return Zchunk(lib.zchunk_read(coerce_py_file(handle), bytes), True)
+
+    def write(self, handle):
+        """Write chunk to an open file descriptor"""
+        return lib.zchunk_write(self._as_parameter_, coerce_py_file(handle))
+
+    @staticmethod
+    def slurp(filename, maxsize):
+        """Try to slurp an entire file into a chunk. Will read up to maxsize of
+the file. If maxsize is 0, will attempt to read the entire file and
+fail with an assertion if that cannot fit into memory. Returns a new
+chunk containing the file data, or NULL if the file could not be read."""
+        return Zchunk(lib.zchunk_slurp(filename, maxsize), True)
+
+    def dup(self):
+        """Create copy of chunk, as new chunk object. Returns a fresh zchunk_t
+object, or null if there was not enough heap memory. If chunk is null,
+returns null."""
+        return Zchunk(lib.zchunk_dup(self._as_parameter_), True)
+
+    def strhex(self):
+        """Return chunk data encoded as printable hex string. Caller must free
+string when finished with it."""
+        return return_fresh_string(lib.zchunk_strhex(self._as_parameter_))
+
+    def strdup(self):
+        """Return chunk data copied into freshly allocated string
+Caller must free string when finished with it."""
+        return return_fresh_string(lib.zchunk_strdup(self._as_parameter_))
+
+    def streq(self, string):
+        """Return TRUE if chunk body is equal to string, excluding terminator"""
+        return lib.zchunk_streq(self._as_parameter_, string)
+
+    def pack(self):
+        """Transform zchunk into a zframe that can be sent in a message."""
+        return Zframe(lib.zchunk_pack(self._as_parameter_), True)
+
+    @staticmethod
+    def unpack(frame):
+        """Transform a zframe into a zchunk."""
+        return Zchunk(lib.zchunk_unpack(frame), True)
+
+    def digest(self):
+        """Calculate SHA1 digest for chunk, using zdigest class."""
+        return lib.zchunk_digest(self._as_parameter_)
+
+    def fprint(self, file):
+        """Dump chunk to FILE stream, for debugging and tracing."""
+        return lib.zchunk_fprint(self._as_parameter_, coerce_py_file(file))
+
+    def print(self):
+        """Dump message to stderr, for debugging and tracing.
+See zchunk_fprint for details"""
+        return lib.zchunk_print(self._as_parameter_)
+
+    @staticmethod
+    def is_(self):
+        """Probe the supplied object, and report if it looks like a zchunk_t."""
+        return lib.zchunk_is(self)
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class."""
+        return lib.zchunk_test(verbose)
+
+
 # zconfig
 zconfig_fct = CFUNCTYPE(c_int, zconfig_p, c_void_p, c_int)
 lib.zconfig_new.restype = zconfig_p
@@ -872,7 +1076,7 @@ existing data)."""
 
     def chunk_save(self):
         """Save a config tree to a new memory chunk"""
-        return lib.zconfig_chunk_save(self._as_parameter_)
+        return Zchunk(lib.zconfig_chunk_save(self._as_parameter_), False)
 
     @staticmethod
     def str_load(string):
@@ -1312,7 +1516,7 @@ location. Returns 0 if OK, -1 if error."""
     def read(self, bytes, offset):
         """Read chunk from file at specified position. If this was the last chunk,
 sets the eof property. Returns a null chunk in case of error."""
-        return lib.zfile_read(self._as_parameter_, bytes, offset)
+        return Zchunk(lib.zfile_read(self._as_parameter_, bytes, offset), True)
 
     def eof(self):
         """Returns true if zfile_read() just read the last chunk in the file."""

@@ -42,6 +42,7 @@ HEADERS += \
   $$SRCDIR/QmlZarmour.h \
   $$SRCDIR/QmlZcert.h \
   $$SRCDIR/QmlZcertstore.h \
+  $$SRCDIR/QmlZchunk.h \
   $$SRCDIR/QmlZconfig.h \
   $$SRCDIR/QmlZdir.h \
   $$SRCDIR/QmlZdirPatch.h \
@@ -65,6 +66,7 @@ SOURCES += \
   $$SRCDIR/QmlZarmour.cpp \
   $$SRCDIR/QmlZcert.cpp \
   $$SRCDIR/QmlZcertstore.cpp \
+  $$SRCDIR/QmlZchunk.cpp \
   $$SRCDIR/QmlZconfig.cpp \
   $$SRCDIR/QmlZdir.cpp \
   $$SRCDIR/QmlZdirPatch.cpp \

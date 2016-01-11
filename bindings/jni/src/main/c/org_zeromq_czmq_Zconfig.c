@@ -188,6 +188,20 @@ Java_org_zeromq_czmq_Zconfig__1_1reload (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zconfig__1_1chunkLoad (JNIEnv *env, jclass c, jlong chunk)
+{
+    jlong chunk_load_ = (jlong) (intptr_t) zconfig_chunk_load ((zchunk_t *) (intptr_t) chunk);
+    return chunk_load_;
+}
+
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zconfig__1_1chunkSave (JNIEnv *env, jclass c, jlong self)
+{
+    jlong chunk_save_ = (jlong) (intptr_t) zconfig_chunk_save ((zconfig_t *) (intptr_t) self);
+    return chunk_save_;
+}
+
+JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zconfig__1_1strLoad (JNIEnv *env, jclass c, jstring string)
 {
     char *string_ = (char *) (*env)->GetStringUTFChars (env, string, NULL);

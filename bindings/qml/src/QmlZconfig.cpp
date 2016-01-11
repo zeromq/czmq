@@ -132,8 +132,10 @@ const QString QmlZconfig::filename () {
 
 ///
 //  Save a config tree to a new memory chunk
-zchunk_t *QmlZconfig::chunkSave () {
-    return zconfig_chunk_save (self);
+QmlZchunk *QmlZconfig::chunkSave () {
+    QmlZchunk *retQ_ = new QmlZchunk ();
+    retQ_->self = zconfig_chunk_save (self);
+    return retQ_;
 };
 
 ///
@@ -180,9 +182,9 @@ int QmlZconfigAttached::reload (QmlZconfig *selfP) {
 
 ///
 //  Load a config tree from a memory chunk
-QmlZconfig *QmlZconfigAttached::chunkLoad (zchunk_t *chunk) {
+QmlZconfig *QmlZconfigAttached::chunkLoad (QmlZchunk *chunk) {
     QmlZconfig *retQ_ = new QmlZconfig ();
-    retQ_->self = zconfig_chunk_load (chunk);
+    retQ_->self = zconfig_chunk_load (chunk->self);
     return retQ_;
 };
 

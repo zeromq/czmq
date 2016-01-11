@@ -21,6 +21,7 @@ int main(int argc, char **argv)
     QZarmour::test (verbose);
     QZcert::test (verbose);
     QZcertstore::test (verbose);
+    QZchunk::test (verbose);
     QZconfig::test (verbose);
     QZdir::test (verbose);
     QZdirPatch::test (verbose);

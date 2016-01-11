@@ -16,13 +16,13 @@ if [ $BUILD_TYPE == "default" ]; then
 
     # Clone and build dependencies
     git clone --depth 1 https://github.com/jedisct1/libsodium libsodium
-    ( cd libsodium && ./autogen.sh && ./configure "${CONFIG_OPTS[@]}" && make check && make install ) || exit 1
+    ( cd libsodium && ./autogen.sh && ./configure "${CONFIG_OPTS[@]}" && make -j4 && make check && make install ) || exit 1
 
     git clone --depth 1 https://github.com/zeromq/libzmq libzmq
-    ( cd libzmq && ./autogen.sh && ./configure "${CONFIG_OPTS[@]}" && make check && make install ) || exit 1
+    ( cd libzmq && ./autogen.sh && ./configure "${CONFIG_OPTS[@]}" && make -j4 && make check && make install ) || exit 1
 
     # Build and check this project
-    ( ./autogen.sh && ./configure "${CONFIG_OPTS[@]}" && make && make check && make memcheck && make install ) || exit 1
+    ( ./autogen.sh && ./configure "${CONFIG_OPTS[@]}" && make -j4 && make check && make memcheck && make install ) || exit 1
 else
     cd ./builds/${BUILD_TYPE} && ./ci_build.sh
 fi

@@ -32,6 +32,7 @@ class QZactor;
 class QZarmour;
 class QZcert;
 class QZcertstore;
+class QZchunk;
 class QZconfig;
 class QZdir;
 class QZdirPatch;
@@ -55,6 +56,7 @@ class QZuuid;
 #include "qzarmour.h"
 #include "qzcert.h"
 #include "qzcertstore.h"
+#include "qzchunk.h"
 #include "qzconfig.h"
 #include "qzdir.h"
 #include "qzdirpatch.h"
