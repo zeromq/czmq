@@ -87,14 +87,14 @@ public:
 
     //  Read chunk from file at specified position. If this was the last chunk,
     //  sets the eof property. Returns a null chunk in case of error.          
-    zchunk_t * read (size_t bytes, off_t offset);
+    QZchunk * read (size_t bytes, off_t offset);
 
     //  Returns true if zfile_read() just read the last chunk in the file.
     bool eof ();
 
     //  Write chunk to file at specified position
     //  Return 0 if OK, else -1                  
-    int write (zchunk_t *chunk, off_t offset);
+    int write (QZchunk *chunk, off_t offset);
 
     //  Read next line of text from file. Returns a pointer to the text line,
     //  or NULL if there was nothing more to read from the file.             

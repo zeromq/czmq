@@ -120,6 +120,7 @@ assert (string_nbr == 15);
 zsock_destroy (&input);
 zsock_destroy (&output);
 
+#if defined (ZMQ_SERVER)
 //  Test SERVER/CLIENT over zstr
 zsock_t *server = zsock_new_server ("inproc://zstr-test-routing");
 zsock_t *client = zsock_new_client ("inproc://zstr-test-routing");;
@@ -169,4 +170,5 @@ assert (rc == -1);
 
 zsock_destroy (&client);
 zsock_destroy (&server);
+#endif
 ----

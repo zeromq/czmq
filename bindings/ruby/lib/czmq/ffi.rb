@@ -112,6 +112,35 @@ module CZMQ
 
       require_relative 'ffi/zcertstore'
 
+      attach_function :zchunk_new, [:pointer, :size_t], :pointer, **opts
+      attach_function :zchunk_destroy, [:pointer], :void, **opts
+      attach_function :zchunk_resize, [:pointer, :size_t], :void, **opts
+      attach_function :zchunk_size, [:pointer], :size_t, **opts
+      attach_function :zchunk_max_size, [:pointer], :size_t, **opts
+      attach_function :zchunk_data, [:pointer], :pointer, **opts
+      attach_function :zchunk_set, [:pointer, :pointer, :size_t], :size_t, **opts
+      attach_function :zchunk_fill, [:pointer, :char, :size_t], :size_t, **opts
+      attach_function :zchunk_append, [:pointer, :pointer, :size_t], :size_t, **opts
+      attach_function :zchunk_extend, [:pointer, :pointer, :size_t], :size_t, **opts
+      attach_function :zchunk_consume, [:pointer, :pointer], :size_t, **opts
+      attach_function :zchunk_exhausted, [:pointer], :bool, **opts
+      attach_function :zchunk_read, [:pointer, :size_t], :pointer, **opts
+      attach_function :zchunk_write, [:pointer, :pointer], :int, **opts
+      attach_function :zchunk_slurp, [:string, :size_t], :pointer, **opts
+      attach_function :zchunk_dup, [:pointer], :pointer, **opts
+      attach_function :zchunk_strhex, [:pointer], :pointer, **opts
+      attach_function :zchunk_strdup, [:pointer], :pointer, **opts
+      attach_function :zchunk_streq, [:pointer, :string], :bool, **opts
+      attach_function :zchunk_pack, [:pointer], :pointer, **opts
+      attach_function :zchunk_unpack, [:pointer], :pointer, **opts
+      attach_function :zchunk_digest, [:pointer], :string, **opts
+      attach_function :zchunk_fprint, [:pointer, :pointer], :void, **opts
+      attach_function :zchunk_print, [:pointer], :void, **opts
+      attach_function :zchunk_is, [:pointer], :bool, **opts
+      attach_function :zchunk_test, [:bool], :void, **opts
+
+      require_relative 'ffi/zchunk'
+
       attach_function :zconfig_new, [:string, :pointer], :pointer, **opts
       attach_function :zconfig_load, [:string], :pointer, **opts
       attach_function :zconfig_loadf, [:string, :varargs], :pointer, **opts

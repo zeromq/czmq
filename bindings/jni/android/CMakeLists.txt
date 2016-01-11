@@ -25,6 +25,7 @@ set (czmqjni_sources
     ../src/main/c/org_zeromq_czmq_Zarmour.c
     ../src/main/c/org_zeromq_czmq_Zcert.c
     ../src/main/c/org_zeromq_czmq_Zcertstore.c
+    ../src/main/c/org_zeromq_czmq_Zchunk.c
     ../src/main/c/org_zeromq_czmq_Zconfig.c
     ../src/main/c/org_zeromq_czmq_Zdir.c
     ../src/main/c/org_zeromq_czmq_ZdirPatch.c
@@ -47,7 +48,6 @@ set (czmqjni_sources
 add_library (czmqjni SHARED ${czmqjni_sources})
 target_link_libraries (czmqjni
     czmq
-    sodium
     zmq
 )
 

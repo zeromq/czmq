@@ -158,6 +158,8 @@ dist_api_DATA = \
     api/zarmour.xml \
     api/zcert.xml \
     api/zcertstore.xml \
+    api/../license.xml \
+    api/zchunk.xml \
     api/zconfig.xml \
     api/zdir.xml \
     api/zdir_patch.xml \

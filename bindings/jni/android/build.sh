@@ -49,7 +49,6 @@ echo "********  Building CZMQ JNI for Android"
 make $MAKE_OPTIONS
 
 echo "********  Building czmq.jar for Android"
-
 #   Copy class files into org/zeromq/etc.
 unzip -q ../../build/libs/czmq*.jar
 
@@ -57,11 +56,8 @@ unzip -q ../../build/libs/czmq*.jar
 mkdir -p lib/armeabi
 mv libczmqjni.so lib/armeabi
 cp ../../../../builds/android/prefix/*/lib/*.so lib/armeabi
-# REMOVE IF NO COMPLAINTS
-# cp $ANDROID_NDK_ROOT/sources/cxx-stl/gnu-libstdc++/$TOOLCHAIN_VERSION/libs/armeabi/libgnustl_shared.so lib/armeabi
 
-
-
+cp $ANDROID_NDK_ROOT/sources/cxx-stl/gnu-libstdc++/$TOOLCHAIN_VERSION/libs/armeabi/libgnustl_shared.so lib/armeabi
 
 zip -r -m ../czmq-android.jar lib/ org/ META-INF/
 cd ..

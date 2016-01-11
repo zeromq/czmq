@@ -24,9 +24,9 @@ QZuuid::QZuuid (QObject *qObjParent) : QObject (qObjParent)
 
 ///
 //  Create UUID object from supplied ZUUID_LEN-octet value.
-QZuuid::QZuuid (const byte *source, QObject *qObjParent) : QObject (qObjParent)
+QZuuid* QZuuid::newFrom (const byte *source, QObject *qObjParent)
 {
-    this->self = zuuid_new_from (source);
+    return new QZuuid (zuuid_new_from (source), qObjParent);
 }
 
 ///

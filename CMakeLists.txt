@@ -97,12 +97,11 @@ list(APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}")
 ########################################################################
 # LIBSODIUM dependency
 ########################################################################
-find_package(Libsodium REQUIRED)
+find_package(Libsodium)
 IF (LIBSODIUM_FOUND)
     include_directories(${LIBSODIUM_INCLUDE_DIRS})
     list(APPEND MORE_LIBRARIES ${LIBSODIUM_LIBRARIES})
-ELSE (LIBSODIUM_FOUND)
-    message( FATAL_ERROR "Libsodium not found." )
+    add_definitions(-DHAVE_LIBSODIUM)
 ENDIF (LIBSODIUM_FOUND)
 
 ########################################################################

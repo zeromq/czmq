@@ -185,6 +185,20 @@ public class Zconfig implements AutoCloseable{
         return 0;
     }
     /*
+    Load a config tree from a memory chunk
+    */
+    native static long __chunkLoad (long chunk);
+    public Zconfig chunkLoad (Zchunk chunk) {
+        return new Zconfig (__chunkLoad (chunk.self));
+    }
+    /*
+    Save a config tree to a new memory chunk
+    */
+    native static long __chunkSave (long self);
+    public Zchunk chunkSave () {
+        return new Zchunk (__chunkSave (self));
+    }
+    /*
     Load a config tree from a null-terminated string
     */
     native static long __strLoad (String string);

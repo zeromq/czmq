@@ -15,6 +15,7 @@ qczmq-uselib:!qczmq-buildlib {
                      $$PWD/qzarmour.h \
                      $$PWD/qzcert.h \
                      $$PWD/qzcertstore.h \
+                     $$PWD/qzchunk.h \
                      $$PWD/qzconfig.h \
                      $$PWD/qzdir.h \
                      $$PWD/qzdirpatch.h \
@@ -38,6 +39,7 @@ qczmq-uselib:!qczmq-buildlib {
                      $$PWD/qzarmour.cpp \
                      $$PWD/qzcert.cpp \
                      $$PWD/qzcertstore.cpp \
+                     $$PWD/qzchunk.cpp \
                      $$PWD/qzconfig.cpp \
                      $$PWD/qzdir.cpp \
                      $$PWD/qzdirpatch.cpp \

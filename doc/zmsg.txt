@@ -463,6 +463,7 @@ zmsg_addstr (reply, "World");
 zmsg_set_routing_id (reply, zmsg_routing_id (request));
 rc = zmsg_send (&reply, server);
 assert (rc == 0);
+zmsg_destroy (&request);
 
 //  Read reply
 reply = zmsg_recv (client);

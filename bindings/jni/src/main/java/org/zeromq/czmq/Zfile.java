@@ -155,11 +155,27 @@ public class Zfile implements AutoCloseable{
         return __output (self);
     }
     /*
+    Read chunk from file at specified position. If this was the last chunk,
+    sets the eof property. Returns a null chunk in case of error.          
+    */
+    native static long __read (long self, long bytes, long offset);
+    public Zchunk read (long bytes, long offset) {
+        return new Zchunk (__read (self, bytes, offset));
+    }
+    /*
     Returns true if zfile_read() just read the last chunk in the file.
     */
     native static boolean __eof (long self);
     public boolean eof () {
         return __eof (self);
+    }
+    /*
+    Write chunk to file at specified position
+    Return 0 if OK, else -1                  
+    */
+    native static int __write (long self, long chunk, long offset);
+    public int write (Zchunk chunk, long offset) {
+        return __write (self, chunk.self, offset);
     }
     /*
     Read next line of text from file. Returns a pointer to the text line,

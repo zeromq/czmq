@@ -26,17 +26,17 @@ QZconfig::QZconfig (const QString &name, QZconfig *parent, QObject *qObjParent) 
 //  Load a config tree from a specified ZPL text file; returns a zconfig_t  
 //  reference for the root, if the file exists and is readable. Returns NULL
 //  if the file does not exist.                                             
-QZconfig::QZconfig (const QString &filename, QObject *qObjParent) : QObject (qObjParent)
+QZconfig* QZconfig::load (const QString &filename, QObject *qObjParent)
 {
-    this->self = zconfig_load (filename.toUtf8().data());
+    return new QZconfig (zconfig_load (filename.toUtf8().data()), qObjParent);
 }
 
 ///
 //  Equivalent to zconfig_load, taking a format string instead of a fixed
 //  filename.                                                            
-QZconfig::QZconfig (const QString &param, QObject *qObjParent) : QObject (qObjParent)
+QZconfig* QZconfig::loadf (const QString &param, QObject *qObjParent)
 {
-    this->self = zconfig_loadf ("%s", param.toUtf8().data());
+    return new QZconfig (zconfig_loadf ("%s", param.toUtf8().data()), qObjParent);
 }
 
 ///
@@ -204,17 +204,17 @@ int QZconfig::reload ()
 
 ///
 //  Load a config tree from a memory chunk
-QZconfig * QZconfig::chunkLoad (zchunk_t *chunk)
+QZconfig * QZconfig::chunkLoad (QZchunk *chunk)
 {
-    QZconfig *rv = new QZconfig (zconfig_chunk_load (chunk));
+    QZconfig *rv = new QZconfig (zconfig_chunk_load (chunk->self));
     return rv;
 }
 
 ///
 //  Save a config tree to a new memory chunk
-zchunk_t * QZconfig::chunkSave ()
+QZchunk * QZconfig::chunkSave ()
 {
-    zchunk_t * rv = zconfig_chunk_save (self);
+    QZchunk *rv = new QZchunk (zconfig_chunk_save (self));
     return rv;
 }
 

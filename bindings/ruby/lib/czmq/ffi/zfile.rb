@@ -259,12 +259,13 @@ module CZMQ
       #
       # @param bytes [Integer, #to_int, #to_i]
       # @param offset [::FFI::Pointer, #to_ptr]
-      # @return [::FFI::Pointer]
+      # @return [Zchunk]
       def read(bytes, offset)
         raise DestroyedError unless @ptr
         self_p = @ptr
         bytes = Integer(bytes)
         result = ::CZMQ::FFI.zfile_read(self_p, bytes, offset)
+        result = Zchunk.__new result, true
         result
       end
 
@@ -281,12 +282,13 @@ module CZMQ
       # Write chunk to file at specified position
       # Return 0 if OK, else -1                  
       #
-      # @param chunk [::FFI::Pointer, #to_ptr]
+      # @param chunk [Zchunk, #__ptr]
       # @param offset [::FFI::Pointer, #to_ptr]
       # @return [Integer]
       def write(chunk, offset)
         raise DestroyedError unless @ptr
         self_p = @ptr
+        chunk = chunk.__ptr if chunk
         result = ::CZMQ::FFI.zfile_write(self_p, chunk, offset)
         result
       end

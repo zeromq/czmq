@@ -30,6 +30,7 @@ task generateJniHeaders(type: Exec, dependsOn: 'classes') {
             'org.zeromq.czmq.Zarmour',
             'org.zeromq.czmq.Zcert',
             'org.zeromq.czmq.Zcertstore',
+            'org.zeromq.czmq.Zchunk',
             'org.zeromq.czmq.Zconfig',
             'org.zeromq.czmq.Zdir',
             'org.zeromq.czmq.ZdirPatch',

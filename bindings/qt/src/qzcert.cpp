@@ -24,16 +24,16 @@ QZcert::QZcert (QObject *qObjParent) : QObject (qObjParent)
 
 ///
 //  Accepts public/secret key pair from caller
-QZcert::QZcert (byte *publicKey, byte *secretKey, QObject *qObjParent) : QObject (qObjParent)
+QZcert* QZcert::newFrom (byte *publicKey, byte *secretKey, QObject *qObjParent)
 {
-    this->self = zcert_new_from (publicKey, secretKey);
+    return new QZcert (zcert_new_from (publicKey, secretKey), qObjParent);
 }
 
 ///
 //  Load certificate from file
-QZcert::QZcert (const QString &filename, QObject *qObjParent) : QObject (qObjParent)
+QZcert* QZcert::load (const QString &filename, QObject *qObjParent)
 {
-    this->self = zcert_load (filename.toUtf8().data());
+    return new QZcert (zcert_load (filename.toUtf8().data()), qObjParent);
 }
 
 ///

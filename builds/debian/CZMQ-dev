@@ -1,0 +1,3 @@
+debian/tmp/usr/include/*
+debian/tmp/usr/lib/libczmq.so
+debian/tmp/usr/lib/pkgconfig/libczmq.pc

@@ -23,15 +23,15 @@ public:
     explicit QZframe (const void *data, size_t size, QObject *qObjParent = 0);
 
     //  Create an empty (zero-sized) frame
-    explicit QZframe (QObject *qObjParent = 0);
+    static QZframe* newEmpty (QObject *qObjParent = 0);
 
     //  Create a frame with a specified string content.
-    explicit QZframe (const QString &string, QObject *qObjParent = 0);
+    static QZframe* from (const QString &string, QObject *qObjParent = 0);
 
     //  Receive frame from socket, returns zframe_t object or NULL if the recv  
     //  was interrupted. Does a blocking recv, if you want to not block then use
     //  zpoller or zloop.                                                       
-    explicit QZframe (void *source, QObject *qObjParent = 0);
+    static QZframe* recv (void *source, QObject *qObjParent = 0);
 
     //  Destroy a frame
     ~QZframe ();

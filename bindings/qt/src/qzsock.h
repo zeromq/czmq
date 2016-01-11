@@ -26,47 +26,47 @@ public:
     explicit QZsock (int type, QObject *qObjParent = 0);
 
     //  Create a PUB socket. Default action is bind.
-    explicit QZsock (const QString &endpoint, QObject *qObjParent = 0);
+    static QZsock* newPub (const QString &endpoint, QObject *qObjParent = 0);
 
     //  Create a SUB socket, and optionally subscribe to some prefix string. Default
     //  action is connect.                                                          
-    explicit QZsock (const QString &endpoint, const QString &subscribe, QObject *qObjParent = 0);
+    static QZsock* newSub (const QString &endpoint, const QString &subscribe, QObject *qObjParent = 0);
 
     //  Create a REQ socket. Default action is connect.
-    explicit QZsock (const QString &endpoint, QObject *qObjParent = 0);
+    static QZsock* newReq (const QString &endpoint, QObject *qObjParent = 0);
 
     //  Create a REP socket. Default action is bind.
-    explicit QZsock (const QString &endpoint, QObject *qObjParent = 0);
+    static QZsock* newRep (const QString &endpoint, QObject *qObjParent = 0);
 
     //  Create a DEALER socket. Default action is connect.
-    explicit QZsock (const QString &endpoint, QObject *qObjParent = 0);
+    static QZsock* newDealer (const QString &endpoint, QObject *qObjParent = 0);
 
     //  Create a ROUTER socket. Default action is bind.
-    explicit QZsock (const QString &endpoint, QObject *qObjParent = 0);
+    static QZsock* newRouter (const QString &endpoint, QObject *qObjParent = 0);
 
     //  Create a PUSH socket. Default action is connect.
-    explicit QZsock (const QString &endpoint, QObject *qObjParent = 0);
+    static QZsock* newPush (const QString &endpoint, QObject *qObjParent = 0);
 
     //  Create a PULL socket. Default action is bind.
-    explicit QZsock (const QString &endpoint, QObject *qObjParent = 0);
+    static QZsock* newPull (const QString &endpoint, QObject *qObjParent = 0);
 
     //  Create an XPUB socket. Default action is bind.
-    explicit QZsock (const QString &endpoint, QObject *qObjParent = 0);
+    static QZsock* newXpub (const QString &endpoint, QObject *qObjParent = 0);
 
     //  Create an XSUB socket. Default action is connect.
-    explicit QZsock (const QString &endpoint, QObject *qObjParent = 0);
+    static QZsock* newXsub (const QString &endpoint, QObject *qObjParent = 0);
 
     //  Create a PAIR socket. Default action is connect.
-    explicit QZsock (const QString &endpoint, QObject *qObjParent = 0);
+    static QZsock* newPair (const QString &endpoint, QObject *qObjParent = 0);
 
     //  Create a STREAM socket. Default action is connect.
-    explicit QZsock (const QString &endpoint, QObject *qObjParent = 0);
+    static QZsock* newStream (const QString &endpoint, QObject *qObjParent = 0);
 
     //  Create a SERVER socket. Default action is bind.
-    explicit QZsock (const QString &endpoint, QObject *qObjParent = 0);
+    static QZsock* newServer (const QString &endpoint, QObject *qObjParent = 0);
 
     //  Create a CLIENT socket. Default action is connect.
-    explicit QZsock (const QString &endpoint, QObject *qObjParent = 0);
+    static QZsock* newClient (const QString &endpoint, QObject *qObjParent = 0);
 
     //  Destroy the socket. You must use this for any socket created via the
     //  zsock_new method.                                                   
