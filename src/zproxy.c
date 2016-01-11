@@ -179,6 +179,7 @@ s_self_selected_socket (zmsg_t *request)
         zsys_error ("zproxy: invalid proxy socket selection: %s", socket_name);
         assert (false);
     }
+    zstr_free (&socket_name);
     return socket;
 }
 

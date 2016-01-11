@@ -371,6 +371,7 @@ zpoller_test (bool verbose)
     assert (streq (message, "Hello, World"));
     zstr_free (&message);
 
+    zpoller_destroy (&poller);
     zsock_destroy (&client);
     zsock_destroy (&server);
 #endif

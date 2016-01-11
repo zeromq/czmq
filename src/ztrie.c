@@ -196,6 +196,7 @@ static void
 s_ztrie_node_update_param (ztrie_node_t *self, int pos, const char *value)
 {
     assert (self);
+    zstr_free (&self->parameter_values [pos - 1]);
     self->parameter_values [pos - 1] = strdup (value);
 }
 
