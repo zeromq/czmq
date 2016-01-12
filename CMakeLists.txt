@@ -93,6 +93,7 @@ if (CYGWIN)
 endif()
 
 list(APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}")
+set(OPTIONAL_LIBRARIES)
 
 ########################################################################
 # LIBSODIUM dependency
@@ -102,6 +103,7 @@ IF (LIBSODIUM_FOUND)
     include_directories(${LIBSODIUM_INCLUDE_DIRS})
     list(APPEND MORE_LIBRARIES ${LIBSODIUM_LIBRARIES})
     add_definitions(-DHAVE_LIBSODIUM)
+    list(APPEND OPTIONAL_LIBRARIES ${LIBSODIUM_LIBRARIES})
 ENDIF (LIBSODIUM_FOUND)
 
 ########################################################################
@@ -123,6 +125,7 @@ IF (UUID_FOUND)
     include_directories(${UUID_INCLUDE_DIRS})
     list(APPEND MORE_LIBRARIES ${UUID_LIBRARIES})
     add_definitions(-DHAVE_UUID)
+    list(APPEND OPTIONAL_LIBRARIES ${UUID_LIBRARIES})
 ENDIF (UUID_FOUND)
 
 ########################################################################
@@ -285,9 +288,8 @@ add_executable(
 target_link_libraries(
     zmakecert
     czmq
-    ${LIBSODIUM_LIBRARIES}
     ${ZEROMQ_LIBRARIES}
-    ${UUID_LIBRARIES}
+    ${OPTIONAL_LIBRARIES}
 )
 set_target_properties(
     zmakecert
@@ -300,9 +302,8 @@ add_executable(
 target_link_libraries(
     czmq_selftest
     czmq
-    ${LIBSODIUM_LIBRARIES}
     ${ZEROMQ_LIBRARIES}
-    ${UUID_LIBRARIES}
+    ${OPTIONAL_LIBRARIES}
 )
 set_target_properties(
     czmq_selftest
