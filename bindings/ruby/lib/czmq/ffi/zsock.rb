@@ -816,6 +816,156 @@ module CZMQ
         result
       end
 
+      # Get socket option `heartbeat_ivl`.
+      #
+      # @return [Integer]
+      def heartbeat_ivl()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_heartbeat_ivl(self_p)
+        result
+      end
+
+      # Get socket option `heartbeat_ivl`.
+      #
+      # This is the polymorphic version of #heartbeat_ivl.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.heartbeat_ivl(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_heartbeat_ivl(self_p)
+        result
+      end
+
+      # Set socket option `heartbeat_ivl`.
+      #
+      # @param heartbeat_ivl [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_heartbeat_ivl(heartbeat_ivl)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        heartbeat_ivl = Integer(heartbeat_ivl)
+        result = ::CZMQ::FFI.zsock_set_heartbeat_ivl(self_p, heartbeat_ivl)
+        result
+      end
+
+      # Set socket option `heartbeat_ivl`.
+      #
+      # This is the polymorphic version of #set_heartbeat_ivl.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param heartbeat_ivl [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_heartbeat_ivl(self_p, heartbeat_ivl)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        heartbeat_ivl = Integer(heartbeat_ivl)
+        result = ::CZMQ::FFI.zsock_set_heartbeat_ivl(self_p, heartbeat_ivl)
+        result
+      end
+
+      # Get socket option `heartbeat_ttl`.
+      #
+      # @return [Integer]
+      def heartbeat_ttl()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_heartbeat_ttl(self_p)
+        result
+      end
+
+      # Get socket option `heartbeat_ttl`.
+      #
+      # This is the polymorphic version of #heartbeat_ttl.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.heartbeat_ttl(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_heartbeat_ttl(self_p)
+        result
+      end
+
+      # Set socket option `heartbeat_ttl`.
+      #
+      # @param heartbeat_ttl [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_heartbeat_ttl(heartbeat_ttl)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        heartbeat_ttl = Integer(heartbeat_ttl)
+        result = ::CZMQ::FFI.zsock_set_heartbeat_ttl(self_p, heartbeat_ttl)
+        result
+      end
+
+      # Set socket option `heartbeat_ttl`.
+      #
+      # This is the polymorphic version of #set_heartbeat_ttl.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param heartbeat_ttl [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_heartbeat_ttl(self_p, heartbeat_ttl)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        heartbeat_ttl = Integer(heartbeat_ttl)
+        result = ::CZMQ::FFI.zsock_set_heartbeat_ttl(self_p, heartbeat_ttl)
+        result
+      end
+
+      # Get socket option `heartbeat_timeout`.
+      #
+      # @return [Integer]
+      def heartbeat_timeout()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_heartbeat_timeout(self_p)
+        result
+      end
+
+      # Get socket option `heartbeat_timeout`.
+      #
+      # This is the polymorphic version of #heartbeat_timeout.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @return [Integer]
+      def self.heartbeat_timeout(self_p)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_heartbeat_timeout(self_p)
+        result
+      end
+
+      # Set socket option `heartbeat_timeout`.
+      #
+      # @param heartbeat_timeout [Integer, #to_int, #to_i]
+      # @return [void]
+      def set_heartbeat_timeout(heartbeat_timeout)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        heartbeat_timeout = Integer(heartbeat_timeout)
+        result = ::CZMQ::FFI.zsock_set_heartbeat_timeout(self_p, heartbeat_timeout)
+        result
+      end
+
+      # Set socket option `heartbeat_timeout`.
+      #
+      # This is the polymorphic version of #set_heartbeat_timeout.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param heartbeat_timeout [Integer, #to_int, #to_i]
+      # @return [void]
+      def self.set_heartbeat_timeout(self_p, heartbeat_timeout)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        heartbeat_timeout = Integer(heartbeat_timeout)
+        result = ::CZMQ::FFI.zsock_set_heartbeat_timeout(self_p, heartbeat_timeout)
+        result
+      end
+
       # Get socket option `tos`.
       #
       # @return [Integer]

@@ -231,9 +231,9 @@ zsock_option_test (bool verbose)
     assert (self);
 .       if mode = "rw" | mode = "w"
 .           if ctype = "int"
-    zsock_set_$(name) (self, 1);
+    zsock_set_$(name) (self, $(test_value? 1 :));
 .               if mode = "rw"
-    assert (zsock_$(name) (self) == 1);
+    assert (zsock_$(name) (self) == $(test_value? 1 :));
 .               endif
 .           else
     zsock_set_$(name) (self, "$(test_value?'test':)");

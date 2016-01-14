@@ -27,6 +27,9 @@ extern "C" {
 //  @interface
 #if (ZMQ_VERSION_MAJOR == 4)
 //  Get socket options
+CZMQ_EXPORT int zsocket_heartbeat_ivl (void *zocket);
+CZMQ_EXPORT int zsocket_heartbeat_ttl (void *zocket);
+CZMQ_EXPORT int zsocket_heartbeat_timeout (void *zocket);
 CZMQ_EXPORT int zsocket_tos (void *zocket);
 CZMQ_EXPORT char * zsocket_zap_domain (void *zocket);
 CZMQ_EXPORT int zsocket_mechanism (void *zocket);
@@ -72,6 +75,9 @@ CZMQ_EXPORT int zsocket_events (void *zocket);
 CZMQ_EXPORT char * zsocket_last_endpoint (void *zocket);
 
 //  Set socket options
+CZMQ_EXPORT void zsocket_set_heartbeat_ivl (void *zocket, int heartbeat_ivl);
+CZMQ_EXPORT void zsocket_set_heartbeat_ttl (void *zocket, int heartbeat_ttl);
+CZMQ_EXPORT void zsocket_set_heartbeat_timeout (void *zocket, int heartbeat_timeout);
 CZMQ_EXPORT void zsocket_set_tos (void *zocket, int tos);
 CZMQ_EXPORT void zsocket_set_router_handover (void *zocket, int router_handover);
 CZMQ_EXPORT void zsocket_set_router_mandatory (void *zocket, int router_mandatory);

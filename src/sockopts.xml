@@ -9,6 +9,14 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
     -->
     <version major = "4" style = "macro">
+        <!-- Options that are new in 4.2 -->
+        <option name = "heartbeat_ivl"     type = "int"    mode = "rw" test = "DEALER"
+            test_value = "2000" />
+        <option name = "heartbeat_ttl"     type = "int"    mode = "rw"  test = "DEALER"
+            test_value = "4000" />
+        <option name = "heartbeat_timeout" type = "int"    mode = "rw"  test = "DEALER"
+            test_value = "6000" />
+
         <!-- Options that are new in 4.1 -->
         <option name = "tos"               type = "int"    mode = "rw" test = "DEALER" />
         <option name = "router_handover"   type = "int"    mode = "w"  test = "ROUTER">

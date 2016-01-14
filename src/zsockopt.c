@@ -31,6 +31,114 @@
 
 #if (ZMQ_VERSION_MAJOR == 4)
 //  --------------------------------------------------------------------------
+//  Set socket ZMQ_HEARTBEAT_IVL value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsocket_set_heartbeat_ivl (void *zocket, int heartbeat_ivl)
+{
+    if (zsock_is (zocket)) {
+        printf ("Please use zsock_set_heartbeat_ivl () on zsock_t instances\n");
+        assert (false);
+    }
+#   if defined (ZMQ_HEARTBEAT_IVL)
+    int rc = zmq_setsockopt (zocket, ZMQ_HEARTBEAT_IVL, &heartbeat_ivl, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_HEARTBEAT_IVL value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsocket_heartbeat_ivl (void *zocket)
+{
+#   if defined (ZMQ_HEARTBEAT_IVL)
+    int heartbeat_ivl;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zocket, ZMQ_HEARTBEAT_IVL, &heartbeat_ivl, &option_len);
+    return heartbeat_ivl;
+#   else
+    return 0;
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_HEARTBEAT_TTL value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsocket_set_heartbeat_ttl (void *zocket, int heartbeat_ttl)
+{
+    if (zsock_is (zocket)) {
+        printf ("Please use zsock_set_heartbeat_ttl () on zsock_t instances\n");
+        assert (false);
+    }
+#   if defined (ZMQ_HEARTBEAT_TTL)
+    int rc = zmq_setsockopt (zocket, ZMQ_HEARTBEAT_TTL, &heartbeat_ttl, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_HEARTBEAT_TTL value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsocket_heartbeat_ttl (void *zocket)
+{
+#   if defined (ZMQ_HEARTBEAT_TTL)
+    int heartbeat_ttl;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zocket, ZMQ_HEARTBEAT_TTL, &heartbeat_ttl, &option_len);
+    return heartbeat_ttl;
+#   else
+    return 0;
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Set socket ZMQ_HEARTBEAT_TIMEOUT value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+void
+zsocket_set_heartbeat_timeout (void *zocket, int heartbeat_timeout)
+{
+    if (zsock_is (zocket)) {
+        printf ("Please use zsock_set_heartbeat_timeout () on zsock_t instances\n");
+        assert (false);
+    }
+#   if defined (ZMQ_HEARTBEAT_TIMEOUT)
+    int rc = zmq_setsockopt (zocket, ZMQ_HEARTBEAT_TIMEOUT, &heartbeat_timeout, sizeof (int));
+    assert (rc == 0 || zmq_errno () == ETERM);
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
+//  Return socket ZMQ_HEARTBEAT_TIMEOUT value
+//  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
+
+int
+zsocket_heartbeat_timeout (void *zocket)
+{
+#   if defined (ZMQ_HEARTBEAT_TIMEOUT)
+    int heartbeat_timeout;
+    size_t option_len = sizeof (int);
+    zmq_getsockopt (zocket, ZMQ_HEARTBEAT_TIMEOUT, &heartbeat_timeout, &option_len);
+    return heartbeat_timeout;
+#   else
+    return 0;
+#   endif
+}
+
+
+//  --------------------------------------------------------------------------
 //  Set socket ZMQ_TOS value
 //  *** GENERATED SOURCE CODE, DO NOT EDIT, SEE INSTRUCTIONS AT START ***
 
@@ -3489,6 +3597,30 @@ zsockopt_test (bool verbose)
     assert (ctx);
     void *zocket;
 #if (ZMQ_VERSION_MAJOR == 4)
+#     if defined (ZMQ_HEARTBEAT_IVL)
+    zocket = zsocket_new (ctx, ZMQ_DEALER);
+    assert (zocket);
+    zsocket_set_heartbeat_ivl (zocket, 2000);
+    assert (zsocket_heartbeat_ivl (zocket) == 2000);
+    zsocket_heartbeat_ivl (zocket);
+    zsocket_destroy (ctx, zocket);
+#     endif
+#     if defined (ZMQ_HEARTBEAT_TTL)
+    zocket = zsocket_new (ctx, ZMQ_DEALER);
+    assert (zocket);
+    zsocket_set_heartbeat_ttl (zocket, 4000);
+    assert (zsocket_heartbeat_ttl (zocket) == 4000);
+    zsocket_heartbeat_ttl (zocket);
+    zsocket_destroy (ctx, zocket);
+#     endif
+#     if defined (ZMQ_HEARTBEAT_TIMEOUT)
+    zocket = zsocket_new (ctx, ZMQ_DEALER);
+    assert (zocket);
+    zsocket_set_heartbeat_timeout (zocket, 6000);
+    assert (zsocket_heartbeat_timeout (zocket) == 6000);
+    zsocket_heartbeat_timeout (zocket);
+    zsocket_destroy (ctx, zocket);
+#     endif
 #     if defined (ZMQ_TOS)
     zocket = zsocket_new (ctx, ZMQ_DEALER);
     assert (zocket);

@@ -285,9 +285,9 @@ zsockopt_test (bool verbose)
     assert (zocket);
 .       if mode = "rw" | mode = "w"
 .           if ctype = "int"
-    zsocket_set_$(name) (zocket, 1);
+    zsocket_set_$(name) (zocket, $(test_value? 1 :));
 .               if mode = "rw"
-    assert (zsocket_$(name) (zocket) == 1);
+    assert (zsocket_$(name) (zocket) == $(test_value? 1 :));
 .               endif
 .           else
     zsocket_set_$(name) (zocket, "$(test_value?'test':)");
