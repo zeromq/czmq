@@ -8,7 +8,7 @@
 *   GENERATED SOURCE CODE, DO NOT EDIT!!                         *
 *   TO CHANGE THIS FILE:                                         *
 *    - EDIT src/zsock_option.gsl and/or                          *
-*    - EDIT src/zsock_option.xml and then                        *
+*    - EDIT src/sockopts.xml     and then                        *
 *    - RUN 'make code'                                           *
 ******************************************************************
 -->
