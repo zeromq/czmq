@@ -3,10 +3,40 @@
 *   GENERATED SOURCE CODE, DO NOT EDIT!!                         *
 *   TO CHANGE THIS FILE:                                         *
 *    - EDIT src/zsock_option.gsl and/or                          *
-*    - EDIT src/zsock_option.xml and then                        *
+*    - EDIT src/sockopts.xml     and then                        *
 *    - RUN 'make code'                                           *
 ******************************************************************
 -->
+
+<method name = "heartbeat ivl" polymorphic = "1">
+    Get socket option `heartbeat_ivl`.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set heartbeat ivl" polymorphic = "1">
+    Set socket option `heartbeat_ivl`.
+    <argument name = "heartbeat ivl" type = "integer" />
+</method>
+
+<method name = "heartbeat ttl" polymorphic = "1">
+    Get socket option `heartbeat_ttl`.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set heartbeat ttl" polymorphic = "1">
+    Set socket option `heartbeat_ttl`.
+    <argument name = "heartbeat ttl" type = "integer" />
+</method>
+
+<method name = "heartbeat timeout" polymorphic = "1">
+    Get socket option `heartbeat_timeout`.
+    <return type = "integer" fresh = "1" />
+</method>
+
+<method name = "set heartbeat timeout" polymorphic = "1">
+    Set socket option `heartbeat_timeout`.
+    <argument name = "heartbeat timeout" type = "integer" />
+</method>
 
 <method name = "tos" polymorphic = "1">
     Get socket option `tos`.

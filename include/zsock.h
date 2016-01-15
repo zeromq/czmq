@@ -312,6 +312,33 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT void *
     zsock_resolve (void *self);
 
+//  Get socket option `heartbeat_ivl`.
+//  The caller is responsible for destroying the return value when finished with it.
+CZMQ_EXPORT int
+    zsock_heartbeat_ivl (void *self);
+
+//  Set socket option `heartbeat_ivl`.
+CZMQ_EXPORT void
+    zsock_set_heartbeat_ivl (void *self, int heartbeat_ivl);
+
+//  Get socket option `heartbeat_ttl`.
+//  The caller is responsible for destroying the return value when finished with it.
+CZMQ_EXPORT int
+    zsock_heartbeat_ttl (void *self);
+
+//  Set socket option `heartbeat_ttl`.
+CZMQ_EXPORT void
+    zsock_set_heartbeat_ttl (void *self, int heartbeat_ttl);
+
+//  Get socket option `heartbeat_timeout`.
+//  The caller is responsible for destroying the return value when finished with it.
+CZMQ_EXPORT int
+    zsock_heartbeat_timeout (void *self);
+
+//  Set socket option `heartbeat_timeout`.
+CZMQ_EXPORT void
+    zsock_set_heartbeat_timeout (void *self, int heartbeat_timeout);
+
 //  Get socket option `tos`.
 //  The caller is responsible for destroying the return value when finished with it.
 CZMQ_EXPORT int

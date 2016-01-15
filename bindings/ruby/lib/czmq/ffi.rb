@@ -492,6 +492,12 @@ module CZMQ
       attach_function :zsock_flush, [:pointer], :void, **opts
       attach_function :zsock_is, [:pointer], :bool, **opts
       attach_function :zsock_resolve, [:pointer], :pointer, **opts
+      attach_function :zsock_heartbeat_ivl, [:pointer], :int, **opts
+      attach_function :zsock_set_heartbeat_ivl, [:pointer, :int], :void, **opts
+      attach_function :zsock_heartbeat_ttl, [:pointer], :int, **opts
+      attach_function :zsock_set_heartbeat_ttl, [:pointer, :int], :void, **opts
+      attach_function :zsock_heartbeat_timeout, [:pointer], :int, **opts
+      attach_function :zsock_set_heartbeat_timeout, [:pointer, :int], :void, **opts
       attach_function :zsock_tos, [:pointer], :int, **opts
       attach_function :zsock_set_tos, [:pointer, :int], :void, **opts
       attach_function :zsock_set_router_handover, [:pointer, :int], :void, **opts
