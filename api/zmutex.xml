@@ -1,0 +1,26 @@
+<class name = "zmutex" >
+
+    <include filename = "../license.xml" />
+
+    <constructor>
+        Create a new mutex container
+    </constructor>
+
+    <destructor>
+        Destroy a mutex container
+    </destructor>
+
+    <method name = "lock">
+        Lock mutex
+    </method>
+
+    <method name = "unlock">
+        Unlock mutex
+    </method>
+
+    <method name = "try_lock">
+        Try to lock mutex
+        <return type = "integer" />
+    </method>
+
+</class>
