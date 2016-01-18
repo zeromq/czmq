@@ -72,6 +72,3 @@ IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Ztrie.h GOTO HAVE_Ztrie
 IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Zuuid.h GOTO HAVE_Zuuid
 "%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.Zuuid
 :HAVE_Zuuid
-IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Zmutex.h GOTO HAVE_Zmutex
-"%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.Zmutex
-:HAVE_Zmutex

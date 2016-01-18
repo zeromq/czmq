@@ -35,8 +35,7 @@ qczmq-uselib:!qczmq-buildlib {
                      $$PWD/qzsock.h \
                      $$PWD/qzstr.h \
                      $$PWD/qztrie.h \
-                     $$PWD/qzuuid.h \
-                     $$PWD/qzmutex.h
+                     $$PWD/qzuuid.h
 
     SOURCES       += \
                      $$PWD/qzactor.cpp \
@@ -63,8 +62,7 @@ qczmq-uselib:!qczmq-buildlib {
                      $$PWD/qzsock.cpp \
                      $$PWD/qzstr.cpp \
                      $$PWD/qztrie.cpp \
-                     $$PWD/qzuuid.cpp \
-                     $$PWD/qzmutex.cpp
+                     $$PWD/qzuuid.cpp
 }
 
 win32 {

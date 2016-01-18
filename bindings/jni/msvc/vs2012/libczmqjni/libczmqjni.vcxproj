@@ -69,7 +69,6 @@
     <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Zstr.h" />
     <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Ztrie.h" />
     <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Zuuid.h" />
-    <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Zmutex.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_Zarmour.c">
@@ -142,9 +141,6 @@
       <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_Zuuid.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_Zmutex.c">
       <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
   </ItemGroup>

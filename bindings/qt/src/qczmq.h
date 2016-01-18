@@ -53,7 +53,6 @@ class QZsock;
 class QZstr;
 class QZtrie;
 class QZuuid;
-class QZmutex;
 
 //  Public API classes
 #include "qzactor.h"
@@ -81,7 +80,6 @@ class QZmutex;
 #include "qzstr.h"
 #include "qztrie.h"
 #include "qzuuid.h"
-#include "qzmutex.h"
 
 #endif //  Q_CZMQ_H
 /*
