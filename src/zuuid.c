@@ -13,15 +13,11 @@
 
 /*
 @header
-    The zuuid class generates universally-unique IDs (UUIDs) and provides
-    methods for working with them. A UUID is a 16-byte blob, which we print
-    as 32 hex chars.
-@discuss
-    If you build CZMQ with libuuid, on Unix/Linux, it will use that
+    The zuuid class generates UUIDs and provides methods for working with
+    them. If you build CZMQ with libuuid, on Unix/Linux, it will use that
     library. On Windows it will use UuidCreate(). Otherwise it will use a
-    random number generator to produce convincing imitations of UUIDs.
-    Android has no uuid library so we always use random numbers on that
-    platform.
+    random number generator to produce convincing imitations of uuids.
+@discuss
 @end
 */
 
