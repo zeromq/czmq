@@ -393,6 +393,54 @@ void * QZsock::resolve (void *self)
 }
 
 ///
+//  Get socket option `heartbeat_ivl`.
+int QZsock::heartbeatIvl ()
+{
+    int rv = zsock_heartbeat_ivl (self);
+    return rv;
+}
+
+///
+//  Set socket option `heartbeat_ivl`.
+void QZsock::setHeartbeatIvl (int heartbeatIvl)
+{
+    zsock_set_heartbeat_ivl (self, heartbeatIvl);
+    
+}
+
+///
+//  Get socket option `heartbeat_ttl`.
+int QZsock::heartbeatTtl ()
+{
+    int rv = zsock_heartbeat_ttl (self);
+    return rv;
+}
+
+///
+//  Set socket option `heartbeat_ttl`.
+void QZsock::setHeartbeatTtl (int heartbeatTtl)
+{
+    zsock_set_heartbeat_ttl (self, heartbeatTtl);
+    
+}
+
+///
+//  Get socket option `heartbeat_timeout`.
+int QZsock::heartbeatTimeout ()
+{
+    int rv = zsock_heartbeat_timeout (self);
+    return rv;
+}
+
+///
+//  Set socket option `heartbeat_timeout`.
+void QZsock::setHeartbeatTimeout (int heartbeatTimeout)
+{
+    zsock_set_heartbeat_timeout (self, heartbeatTimeout);
+    
+}
+
+///
 //  Get socket option `tos`.
 int QZsock::tos ()
 {

@@ -105,6 +105,24 @@ public class Zhashx implements AutoCloseable{
         return __size (self);
     }
     /*
+    Return a zlistx_t containing the keys for the items in the       
+    table. Uses the key_duplicator to duplicate all keys and sets the
+    key_destructor as destructor for the list.                       
+    */
+    native static long __keys (long self);
+    public Zlistx keys () {
+        return new Zlistx (__keys (self));
+    }
+    /*
+    Return a zlistx_t containing the values for the items in the  
+    table. Uses the duplicator to duplicate all items and sets the
+    destructor as destructor for the list.                        
+    */
+    native static long __values (long self);
+    public Zlistx values () {
+        return new Zlistx (__values (self));
+    }
+    /*
     Simple iterator; returns first item in hash table, in no given order, 
     or NULL if the table is empty. This method is simpler to use than the 
     foreach() method, which is deprecated. To access the key for this item

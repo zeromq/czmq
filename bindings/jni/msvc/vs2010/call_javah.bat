@@ -12,9 +12,15 @@ IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Zcertstore.h GOTO HAVE_Zcer
 IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Zchunk.h GOTO HAVE_Zchunk
 "%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.Zchunk
 :HAVE_Zchunk
+IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Zclock.h GOTO HAVE_Zclock
+"%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.Zclock
+:HAVE_Zclock
 IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Zconfig.h GOTO HAVE_Zconfig
 "%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.Zconfig
 :HAVE_Zconfig
+IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Zdigest.h GOTO HAVE_Zdigest
+"%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.Zdigest
+:HAVE_Zdigest
 IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Zdir.h GOTO HAVE_Zdir
 "%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.Zdir
 :HAVE_Zdir
@@ -39,6 +45,9 @@ IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Ziflist.h GOTO HAVE_Ziflist
 IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Zlist.h GOTO HAVE_Zlist
 "%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.Zlist
 :HAVE_Zlist
+IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Zlistx.h GOTO HAVE_Zlistx
+"%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.Zlistx
+:HAVE_Zlistx
 IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Zloop.h GOTO HAVE_Zloop
 "%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.Zloop
 :HAVE_Zloop
@@ -63,3 +72,6 @@ IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Ztrie.h GOTO HAVE_Ztrie
 IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Zuuid.h GOTO HAVE_Zuuid
 "%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.Zuuid
 :HAVE_Zuuid
+IF EXIST ..\..\..\src\native\include\org_zeromq_czmq_Zmutex.h GOTO HAVE_Zmutex
+"%JAVA_HOME%\bin\javah.exe" -d ..\..\..\src\native\include -classpath ..\..\..\src\main\java org.zeromq.czmq.Zmutex
+:HAVE_Zmutex

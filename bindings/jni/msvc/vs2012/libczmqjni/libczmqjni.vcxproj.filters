@@ -19,7 +19,13 @@
     <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_Zchunk.c">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_Zclock.c">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_Zconfig.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_Zdigest.c">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_Zdir.c">
@@ -46,6 +52,9 @@
     <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_Zlist.c">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_Zlistx.c">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_Zloop.c">
       <Filter>src</Filter>
     </ClCompile>
@@ -70,6 +79,9 @@
     <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_Zuuid.c">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\main\c\org_zeromq_czmq_Zmutex.c">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\include\czmq.h">
@@ -87,7 +99,13 @@
     <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Zchunk.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Zclock.h">
+      <Filter>include</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Zconfig.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Zdigest.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Zdir.h">
@@ -114,6 +132,9 @@
     <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Zlist.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Zlistx.h">
+      <Filter>include</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Zloop.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -136,6 +157,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Zuuid.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\native\include\org_zeromq_czmq_Zmutex.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

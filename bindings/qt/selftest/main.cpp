@@ -22,7 +22,9 @@ int main(int argc, char **argv)
     QZcert::test (verbose);
     QZcertstore::test (verbose);
     QZchunk::test (verbose);
+    QZclock::test (verbose);
     QZconfig::test (verbose);
+    QZdigest::test (verbose);
     QZdir::test (verbose);
     QZdirPatch::test (verbose);
     QZfile::test (verbose);
@@ -31,6 +33,7 @@ int main(int argc, char **argv)
     QZhashx::test (verbose);
     QZiflist::test (verbose);
     QZlist::test (verbose);
+    QZlistx::test (verbose);
     QZloop::test (verbose);
     QZmsg::test (verbose);
     QZpoller::test (verbose);
@@ -39,6 +42,7 @@ int main(int argc, char **argv)
     QZstr::test (verbose);
     QZtrie::test (verbose);
     QZuuid::test (verbose);
+    QZmutex::test (verbose);
 
     qDebug() << "Tests passed OK\n";
     return 0;

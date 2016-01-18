@@ -74,16 +74,20 @@ size_t QmlZhashx::size () {
 //  Return a zlistx_t containing the keys for the items in the       
 //  table. Uses the key_duplicator to duplicate all keys and sets the
 //  key_destructor as destructor for the list.                       
-zlistx_t *QmlZhashx::keys () {
-    return zhashx_keys (self);
+QmlZlistx *QmlZhashx::keys () {
+    QmlZlistx *retQ_ = new QmlZlistx ();
+    retQ_->self = zhashx_keys (self);
+    return retQ_;
 };
 
 ///
 //  Return a zlistx_t containing the values for the items in the  
 //  table. Uses the duplicator to duplicate all items and sets the
 //  destructor as destructor for the list.                        
-zlistx_t *QmlZhashx::values () {
-    return zhashx_values (self);
+QmlZlistx *QmlZhashx::values () {
+    QmlZlistx *retQ_ = new QmlZlistx ();
+    retQ_->self = zhashx_values (self);
+    return retQ_;
 };
 
 ///

@@ -134,11 +134,9 @@ public:
     //  Set hash for automatic value destruction
     void autofree ();
 
-    //  DEPRECATED as clumsy -- use zhash_first/_next instead                  
     //  Apply function to each item in the hash table. Items are iterated in no
     //  defined order. Stops if callback function returns non-zero and returns 
-    //  final return code from callback function (zero = success).             
-    //  Callback function for zhash_foreach method                             
+    //  final return code from callback function (zero = success). Deprecated. 
     int foreachNoConflict (zhash_foreach_fn callback, void *argument);
 
     //  Self test of this class.

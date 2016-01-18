@@ -29,9 +29,7 @@ typedef struct {
 static test_item_t
 all_tests [] = {
     { "zactor", zactor_test },
-    { "zauth", zauth_test },
     { "zarmour", zarmour_test },
-    { "zbeacon", zbeacon_test },
     { "zcert", zcert_test },
     { "zcertstore", zcertstore_test },
     { "zchunk", zchunk_test },
@@ -42,24 +40,24 @@ all_tests [] = {
     { "zdir_patch", zdir_patch_test },
     { "zfile", zfile_test },
     { "zframe", zframe_test },
-    { "zgossip", zgossip_test },
     { "zhash", zhash_test },
     { "zhashx", zhashx_test },
     { "ziflist", ziflist_test },
     { "zlist", zlist_test },
     { "zlistx", zlistx_test },
     { "zloop", zloop_test },
-    { "zmonitor", zmonitor_test },
     { "zmsg", zmsg_test },
     { "zpoller", zpoller_test },
-    { "zproc", zproc_test },
-    { "zproxy", zproxy_test },
-    { "zrex", zrex_test },
     { "zsock", zsock_test },
     { "zstr", zstr_test },
-    { "zsys", zsys_test },
-    { "ztrie", ztrie_test },
     { "zuuid", zuuid_test },
+    { "zauth", zauth_test },
+    { "zbeacon", zbeacon_test },
+    { "zgossip", zgossip_test },
+    { "zmonitor", zmonitor_test },
+    { "zproxy", zproxy_test },
+    { "zrex", zrex_test },
+    { "zsys", zsys_test },
     { "zgossip_msg", zgossip_msg_test },
     { "zauth_v2", zauth_v2_test },
     { "zbeacon_v2", zbeacon_v2_test },
@@ -70,6 +68,10 @@ all_tests [] = {
     { "zsocket", zsocket_test },
     { "zsockopt", zsockopt_test },
     { "zthread", zthread_test },
+#ifdef WITH_DRAFTS
+    { "zproc", zproc_test },
+    { "ztrie", ztrie_test },
+#endif // WITH_DRAFTS
     {0, 0}          //  Sentinel
 };
 
@@ -135,9 +137,7 @@ main (int argc, char **argv)
         ||  streq (argv [argn], "-l")) {
             puts ("Available tests:");
             puts ("    zactor");
-            puts ("    zauth");
             puts ("    zarmour");
-            puts ("    zbeacon");
             puts ("    zcert");
             puts ("    zcertstore");
             puts ("    zchunk");
@@ -148,24 +148,26 @@ main (int argc, char **argv)
             puts ("    zdir_patch");
             puts ("    zfile");
             puts ("    zframe");
-            puts ("    zgossip");
             puts ("    zhash");
             puts ("    zhashx");
             puts ("    ziflist");
             puts ("    zlist");
             puts ("    zlistx");
             puts ("    zloop");
-            puts ("    zmonitor");
             puts ("    zmsg");
             puts ("    zpoller");
             puts ("    zproc");
-            puts ("    zproxy");
-            puts ("    zrex");
             puts ("    zsock");
             puts ("    zstr");
-            puts ("    zsys");
             puts ("    ztrie");
             puts ("    zuuid");
+            puts ("    zauth");
+            puts ("    zbeacon");
+            puts ("    zgossip");
+            puts ("    zmonitor");
+            puts ("    zproxy");
+            puts ("    zrex");
+            puts ("    zsys");
             puts ("    zgossip_msg");
             puts ("    zauth_v2");
             puts ("    zbeacon_v2");

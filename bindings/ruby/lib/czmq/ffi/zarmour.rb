@@ -6,7 +6,7 @@
 module CZMQ
   module FFI
 
-    # zarmour - armoured text encoding and decoding
+    # armoured text encoding and decoding
     # @note This class is 100% generated using zproject.
     class Zarmour
       # Raised when one tries to use an instance of {Zarmour} after

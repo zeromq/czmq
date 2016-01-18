@@ -5,40 +5,40 @@
 
 if (NOT MSVC)
     include(FindPkgConfig)
-    pkg_check_modules(PC_UUID "uuid")
-    if (NOT PC_UUID_FOUND)
-        pkg_check_modules(PC_UUID "uuid")
-    endif (NOT PC_UUID_FOUND)
-    if (PC_UUID_FOUND)
+    pkg_check_modules(PC_LIBSODIUM "sodium")
+    if (NOT PC_LIBSODIUM_FOUND)
+        pkg_check_modules(PC_LIBSODIUM "sodium")
+    endif (NOT PC_LIBSODIUM_FOUND)
+    if (PC_LIBSODIUM_FOUND)
         # some libraries install the headers is a subdirectory of the include dir
         # returned by pkg-config, so use a wildcard match to improve chances of finding
         # headers and SOs.
-        set(PC_UUID_INCLUDE_HINTS ${PC_UUID_INCLUDE_DIRS} ${PC_UUID_INCLUDE_DIRS}/*)
-        set(PC_UUID_LIBRARY_HINTS ${PC_UUID_LIBRARY_DIRS} ${PC_UUID_LIBRARY_DIRS}/*)
-    endif(PC_UUID_FOUND)
+        set(PC_LIBSODIUM_INCLUDE_HINTS ${PC_LIBSODIUM_INCLUDE_DIRS} ${PC_LIBSODIUM_INCLUDE_DIRS}/*)
+        set(PC_LIBSODIUM_LIBRARY_HINTS ${PC_LIBSODIUM_LIBRARY_DIRS} ${PC_LIBSODIUM_LIBRARY_DIRS}/*)
+    endif(PC_LIBSODIUM_FOUND)
 endif (NOT MSVC)
 
-find_path(
-    UUID_INCLUDE_DIRS
-    NAMES uuid.h
-    HINTS ${PC_UUID_INCLUDE_HINTS}
+find_path (
+    LIBSODIUM_INCLUDE_DIRS
+    NAMES sodium.h
+    HINTS ${PC_LIBSODIUM_INCLUDE_HINTS}
 )
 
-find_library(
-    UUID_LIBRARIES
-    NAMES uuid
-    HINTS ${PC_UUID_LIBRARY_HINTS}
+find_library (
+    LIBSODIUM_LIBRARIES
+    NAMES sodium
+    HINTS ${PC_LIBSODIUM_LIBRARY_HINTS}
 )
 
 include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(
-    UUID
-    REQUIRED_VARS UUID_LIBRARIES UUID_INCLUDE_DIRS
+    LIBSODIUM
+    REQUIRED_VARS LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS
 )
 mark_as_advanced(
-    UUID_FOUND
-    UUID_LIBRARIES UUID_INCLUDE_DIRS
+    LIBSODIUM_FOUND
+    LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS
 )
 
 ################################################################################

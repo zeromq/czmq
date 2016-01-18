@@ -31,7 +31,9 @@ task generateJniHeaders(type: Exec, dependsOn: 'classes') {
             'org.zeromq.czmq.Zcert',
             'org.zeromq.czmq.Zcertstore',
             'org.zeromq.czmq.Zchunk',
+            'org.zeromq.czmq.Zclock',
             'org.zeromq.czmq.Zconfig',
+            'org.zeromq.czmq.Zdigest',
             'org.zeromq.czmq.Zdir',
             'org.zeromq.czmq.ZdirPatch',
             'org.zeromq.czmq.Zfile',
@@ -40,6 +42,7 @@ task generateJniHeaders(type: Exec, dependsOn: 'classes') {
             'org.zeromq.czmq.Zhashx',
             'org.zeromq.czmq.Ziflist',
             'org.zeromq.czmq.Zlist',
+            'org.zeromq.czmq.Zlistx',
             'org.zeromq.czmq.Zloop',
             'org.zeromq.czmq.Zmsg',
             'org.zeromq.czmq.Zpoller',
@@ -47,7 +50,8 @@ task generateJniHeaders(type: Exec, dependsOn: 'classes') {
             'org.zeromq.czmq.Zsock',
             'org.zeromq.czmq.Zstr',
             'org.zeromq.czmq.Ztrie',
-            'org.zeromq.czmq.Zuuid'
+            'org.zeromq.czmq.Zuuid',
+            'org.zeromq.czmq.Zmutex'
     ]
     commandLine("javah", "-d", "$nativeIncludes", "-classpath", "$classpath:$appclasspath", *jniClasses)
 }

@@ -1,4 +1,4 @@
-<class name = "zhash">
+<class name = "zhash" state = "stable">
     <!--
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -181,21 +181,18 @@
         Set hash for automatic value destruction
     </method>
 
-    <callback_type name = "foreach_fn">
-        DEPRECATED as clumsy -- use zhash_first/_next instead
+    <callback_type name = "foreach_fn" state = "legacy">
+        Callback function for zhash_foreach method. Deprecated.
         <argument name = "key" type = "string" />
         <argument name = "item" type = "anything" />
         <argument name = "argument" type = "anything" />
         <return type = "integer" />
     </callback_type>
 
-    <method name = "foreach">
-        DEPRECATED as clumsy -- use zhash_first/_next instead
+    <method name = "foreach" state = "legacy">
         Apply function to each item in the hash table. Items are iterated in no
         defined order. Stops if callback function returns non-zero and returns
-        final return code from callback function (zero = success).
-        Callback function for zhash_foreach method
-
+        final return code from callback function (zero = success). Deprecated.
         <argument name = "callback" type = "zhash_foreach_fn" callback = "1" />
         <argument name = "argument" type = "anything" />
         <return type = "integer" />

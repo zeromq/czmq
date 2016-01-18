@@ -401,6 +401,48 @@ public class Zsock implements AutoCloseable{
         return __resolve (self);
     }
     /*
+    Get socket option `heartbeat_ivl`.
+    */
+    native static int __heartbeatIvl (long self);
+    public int heartbeatIvl () {
+        return __heartbeatIvl (self);
+    }
+    /*
+    Set socket option `heartbeat_ivl`.
+    */
+    native static void __setHeartbeatIvl (long self, int heartbeatIvl);
+    public void setHeartbeatIvl (int heartbeatIvl) {
+        __setHeartbeatIvl (self, heartbeatIvl);
+    }
+    /*
+    Get socket option `heartbeat_ttl`.
+    */
+    native static int __heartbeatTtl (long self);
+    public int heartbeatTtl () {
+        return __heartbeatTtl (self);
+    }
+    /*
+    Set socket option `heartbeat_ttl`.
+    */
+    native static void __setHeartbeatTtl (long self, int heartbeatTtl);
+    public void setHeartbeatTtl (int heartbeatTtl) {
+        __setHeartbeatTtl (self, heartbeatTtl);
+    }
+    /*
+    Get socket option `heartbeat_timeout`.
+    */
+    native static int __heartbeatTimeout (long self);
+    public int heartbeatTimeout () {
+        return __heartbeatTimeout (self);
+    }
+    /*
+    Set socket option `heartbeat_timeout`.
+    */
+    native static void __setHeartbeatTimeout (long self, int heartbeatTimeout);
+    public void setHeartbeatTimeout (int heartbeatTimeout) {
+        __setHeartbeatTimeout (self, heartbeatTimeout);
+    }
+    /*
     Get socket option `tos`.
     */
     native static int __tos (long self);

@@ -249,6 +249,42 @@ void QmlZsock::flush () {
 };
 
 ///
+//  Get socket option `heartbeat_ivl`.
+int QmlZsock::heartbeatIvl () {
+    return zsock_heartbeat_ivl (self);
+};
+
+///
+//  Set socket option `heartbeat_ivl`.
+void QmlZsock::setHeartbeatIvl (int heartbeatIvl) {
+    zsock_set_heartbeat_ivl (self, heartbeatIvl);
+};
+
+///
+//  Get socket option `heartbeat_ttl`.
+int QmlZsock::heartbeatTtl () {
+    return zsock_heartbeat_ttl (self);
+};
+
+///
+//  Set socket option `heartbeat_ttl`.
+void QmlZsock::setHeartbeatTtl (int heartbeatTtl) {
+    zsock_set_heartbeat_ttl (self, heartbeatTtl);
+};
+
+///
+//  Get socket option `heartbeat_timeout`.
+int QmlZsock::heartbeatTimeout () {
+    return zsock_heartbeat_timeout (self);
+};
+
+///
+//  Set socket option `heartbeat_timeout`.
+void QmlZsock::setHeartbeatTimeout (int heartbeatTimeout) {
+    zsock_set_heartbeat_timeout (self, heartbeatTimeout);
+};
+
+///
 //  Get socket option `tos`.
 int QmlZsock::tos () {
     return zsock_tos (self);

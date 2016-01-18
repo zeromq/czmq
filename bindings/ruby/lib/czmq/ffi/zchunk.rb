@@ -6,7 +6,7 @@
 module CZMQ
   module FFI
 
-    # 
+    # work with memory chunks
     # @note This class is 100% generated using zproject.
     class Zchunk
       # Raised when one tries to use an instance of {Zchunk} after

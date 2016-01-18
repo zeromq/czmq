@@ -69,12 +69,12 @@ public:
     //  Return a zlistx_t containing the keys for the items in the       
     //  table. Uses the key_duplicator to duplicate all keys and sets the
     //  key_destructor as destructor for the list.                       
-    zlistx_t * keys ();
+    QZlistx * keys ();
 
     //  Return a zlistx_t containing the values for the items in the  
     //  table. Uses the duplicator to duplicate all items and sets the
     //  destructor as destructor for the list.                        
-    zlistx_t * values ();
+    QZlistx * values ();
 
     //  Simple iterator; returns first item in hash table, in no given order, 
     //  or NULL if the table is empty. This method is simpler to use than the 

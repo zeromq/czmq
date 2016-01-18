@@ -51,12 +51,8 @@
 //  Opaque class structures to allow forward references
 typedef struct _zactor_t zactor_t;
 #define ZACTOR_T_DEFINED
-typedef struct _zauth_t zauth_t;
-#define ZAUTH_T_DEFINED
 typedef struct _zarmour_t zarmour_t;
 #define ZARMOUR_T_DEFINED
-typedef struct _zbeacon_t zbeacon_t;
-#define ZBEACON_T_DEFINED
 typedef struct _zcert_t zcert_t;
 #define ZCERT_T_DEFINED
 typedef struct _zcertstore_t zcertstore_t;
@@ -77,8 +73,6 @@ typedef struct _zfile_t zfile_t;
 #define ZFILE_T_DEFINED
 typedef struct _zframe_t zframe_t;
 #define ZFRAME_T_DEFINED
-typedef struct _zgossip_t zgossip_t;
-#define ZGOSSIP_T_DEFINED
 typedef struct _zhash_t zhash_t;
 #define ZHASH_T_DEFINED
 typedef struct _zhashx_t zhashx_t;
@@ -91,28 +85,30 @@ typedef struct _zlistx_t zlistx_t;
 #define ZLISTX_T_DEFINED
 typedef struct _zloop_t zloop_t;
 #define ZLOOP_T_DEFINED
-typedef struct _zmonitor_t zmonitor_t;
-#define ZMONITOR_T_DEFINED
 typedef struct _zmsg_t zmsg_t;
 #define ZMSG_T_DEFINED
 typedef struct _zpoller_t zpoller_t;
 #define ZPOLLER_T_DEFINED
-typedef struct _zproc_t zproc_t;
-#define ZPROC_T_DEFINED
-typedef struct _zproxy_t zproxy_t;
-#define ZPROXY_T_DEFINED
-typedef struct _zrex_t zrex_t;
-#define ZREX_T_DEFINED
 typedef struct _zsock_t zsock_t;
 #define ZSOCK_T_DEFINED
 typedef struct _zstr_t zstr_t;
 #define ZSTR_T_DEFINED
-typedef struct _zsys_t zsys_t;
-#define ZSYS_T_DEFINED
-typedef struct _ztrie_t ztrie_t;
-#define ZTRIE_T_DEFINED
 typedef struct _zuuid_t zuuid_t;
 #define ZUUID_T_DEFINED
+typedef struct _zauth_t zauth_t;
+#define ZAUTH_T_DEFINED
+typedef struct _zbeacon_t zbeacon_t;
+#define ZBEACON_T_DEFINED
+typedef struct _zgossip_t zgossip_t;
+#define ZGOSSIP_T_DEFINED
+typedef struct _zmonitor_t zmonitor_t;
+#define ZMONITOR_T_DEFINED
+typedef struct _zproxy_t zproxy_t;
+#define ZPROXY_T_DEFINED
+typedef struct _zrex_t zrex_t;
+#define ZREX_T_DEFINED
+typedef struct _zsys_t zsys_t;
+#define ZSYS_T_DEFINED
 typedef struct _zauth_v2_t zauth_v2_t;
 #define ZAUTH_V2_T_DEFINED
 typedef struct _zbeacon_v2_t zbeacon_v2_t;
@@ -132,12 +128,17 @@ typedef struct _zsockopt_t zsockopt_t;
 typedef struct _zthread_t zthread_t;
 #define ZTHREAD_T_DEFINED
 
+//  Draft APIs, excluded by default in stable releases
+#ifdef WITH_DRAFTS
+typedef struct _zproc_t zproc_t;
+#define ZPROC_T_DEFINED
+typedef struct _ztrie_t ztrie_t;
+#define ZTRIE_T_DEFINED
+#endif // WITH_DRAFTS
 
 //  Public API classes
 #include "zactor.h"
-#include "zauth.h"
 #include "zarmour.h"
-#include "zbeacon.h"
 #include "zcert.h"
 #include "zcertstore.h"
 #include "zchunk.h"
@@ -148,24 +149,24 @@ typedef struct _zthread_t zthread_t;
 #include "zdir_patch.h"
 #include "zfile.h"
 #include "zframe.h"
-#include "zgossip.h"
 #include "zhash.h"
 #include "zhashx.h"
 #include "ziflist.h"
 #include "zlist.h"
 #include "zlistx.h"
 #include "zloop.h"
-#include "zmonitor.h"
 #include "zmsg.h"
 #include "zpoller.h"
-#include "zproc.h"
-#include "zproxy.h"
-#include "zrex.h"
 #include "zsock.h"
 #include "zstr.h"
-#include "zsys.h"
-#include "ztrie.h"
 #include "zuuid.h"
+#include "zauth.h"
+#include "zbeacon.h"
+#include "zgossip.h"
+#include "zmonitor.h"
+#include "zproxy.h"
+#include "zrex.h"
+#include "zsys.h"
 #include "zauth_v2.h"
 #include "zbeacon_v2.h"
 #include "zctx.h"
@@ -175,6 +176,12 @@ typedef struct _zthread_t zthread_t;
 #include "zsocket.h"
 #include "zsockopt.h"
 #include "zthread.h"
+
+//  Draft APIs, excluded by default in stable releases
+#ifdef WITH_DRAFTS
+#include "zproc.h"
+#include "ztrie.h"
+#endif // WITH_DRAFTS
 
 #endif
 /*

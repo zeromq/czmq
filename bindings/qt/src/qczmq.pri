@@ -16,7 +16,9 @@ qczmq-uselib:!qczmq-buildlib {
                      $$PWD/qzcert.h \
                      $$PWD/qzcertstore.h \
                      $$PWD/qzchunk.h \
+                     $$PWD/qzclock.h \
                      $$PWD/qzconfig.h \
+                     $$PWD/qzdigest.h \
                      $$PWD/qzdir.h \
                      $$PWD/qzdirpatch.h \
                      $$PWD/qzfile.h \
@@ -25,6 +27,7 @@ qczmq-uselib:!qczmq-buildlib {
                      $$PWD/qzhashx.h \
                      $$PWD/qziflist.h \
                      $$PWD/qzlist.h \
+                     $$PWD/qzlistx.h \
                      $$PWD/qzloop.h \
                      $$PWD/qzmsg.h \
                      $$PWD/qzpoller.h \
@@ -32,7 +35,8 @@ qczmq-uselib:!qczmq-buildlib {
                      $$PWD/qzsock.h \
                      $$PWD/qzstr.h \
                      $$PWD/qztrie.h \
-                     $$PWD/qzuuid.h
+                     $$PWD/qzuuid.h \
+                     $$PWD/qzmutex.h
 
     SOURCES       += \
                      $$PWD/qzactor.cpp \
@@ -40,7 +44,9 @@ qczmq-uselib:!qczmq-buildlib {
                      $$PWD/qzcert.cpp \
                      $$PWD/qzcertstore.cpp \
                      $$PWD/qzchunk.cpp \
+                     $$PWD/qzclock.cpp \
                      $$PWD/qzconfig.cpp \
+                     $$PWD/qzdigest.cpp \
                      $$PWD/qzdir.cpp \
                      $$PWD/qzdirpatch.cpp \
                      $$PWD/qzfile.cpp \
@@ -49,6 +55,7 @@ qczmq-uselib:!qczmq-buildlib {
                      $$PWD/qzhashx.cpp \
                      $$PWD/qziflist.cpp \
                      $$PWD/qzlist.cpp \
+                     $$PWD/qzlistx.cpp \
                      $$PWD/qzloop.cpp \
                      $$PWD/qzmsg.cpp \
                      $$PWD/qzpoller.cpp \
@@ -56,7 +63,8 @@ qczmq-uselib:!qczmq-buildlib {
                      $$PWD/qzsock.cpp \
                      $$PWD/qzstr.cpp \
                      $$PWD/qztrie.cpp \
-                     $$PWD/qzuuid.cpp
+                     $$PWD/qzuuid.cpp \
+                     $$PWD/qzmutex.cpp
 }
 
 win32 {

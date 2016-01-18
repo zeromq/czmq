@@ -1,4 +1,4 @@
-<class name = "zchunk" >
+<class name = "zchunk" state = "stable">
     <!--
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -8,6 +8,8 @@
     License, v. 2.0. If a copy of the MPL was not distributed with this
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
     -->
+    work with memory chunks
+    
     <constructor>
         Create a new chunk of the specified size. If you specify the data, it
         is copied into the chunk. If you do not specify the data, the chunk is

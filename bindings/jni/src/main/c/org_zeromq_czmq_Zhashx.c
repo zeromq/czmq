@@ -79,6 +79,20 @@ Java_org_zeromq_czmq_Zhashx__1_1size (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zhashx__1_1keys (JNIEnv *env, jclass c, jlong self)
+{
+    jlong keys_ = (jlong) (intptr_t) zhashx_keys ((zhashx_t *) (intptr_t) self);
+    return keys_;
+}
+
+JNIEXPORT jlong JNICALL
+Java_org_zeromq_czmq_Zhashx__1_1values (JNIEnv *env, jclass c, jlong self)
+{
+    jlong values_ = (jlong) (intptr_t) zhashx_values ((zhashx_t *) (intptr_t) self);
+    return values_;
+}
+
+JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zhashx__1_1first (JNIEnv *env, jclass c, jlong self)
 {
     jlong first_ = (jlong) (intptr_t) zhashx_first ((zhashx_t *) (intptr_t) self);

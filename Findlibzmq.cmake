@@ -5,40 +5,40 @@
 
 if (NOT MSVC)
     include(FindPkgConfig)
-    pkg_check_modules(PC_LIBSODIUM "libsodium")
-    if (NOT PC_LIBSODIUM_FOUND)
-        pkg_check_modules(PC_LIBSODIUM "sodium")
-    endif (NOT PC_LIBSODIUM_FOUND)
-    if (PC_LIBSODIUM_FOUND)
+    pkg_check_modules(PC_LIBZMQ "zmq")
+    if (NOT PC_LIBZMQ_FOUND)
+        pkg_check_modules(PC_LIBZMQ "zmq")
+    endif (NOT PC_LIBZMQ_FOUND)
+    if (PC_LIBZMQ_FOUND)
         # some libraries install the headers is a subdirectory of the include dir
         # returned by pkg-config, so use a wildcard match to improve chances of finding
         # headers and SOs.
-        set(PC_LIBSODIUM_INCLUDE_HINTS ${PC_LIBSODIUM_INCLUDE_DIRS} ${PC_LIBSODIUM_INCLUDE_DIRS}/*)
-        set(PC_LIBSODIUM_LIBRARY_HINTS ${PC_LIBSODIUM_LIBRARY_DIRS} ${PC_LIBSODIUM_LIBRARY_DIRS}/*)
-    endif(PC_LIBSODIUM_FOUND)
+        set(PC_LIBZMQ_INCLUDE_HINTS ${PC_LIBZMQ_INCLUDE_DIRS} ${PC_LIBZMQ_INCLUDE_DIRS}/*)
+        set(PC_LIBZMQ_LIBRARY_HINTS ${PC_LIBZMQ_LIBRARY_DIRS} ${PC_LIBZMQ_LIBRARY_DIRS}/*)
+    endif(PC_LIBZMQ_FOUND)
 endif (NOT MSVC)
 
-find_path(
-    LIBSODIUM_INCLUDE_DIRS
-    NAMES sodium.h
-    HINTS ${PC_LIBSODIUM_INCLUDE_HINTS}
+find_path (
+    LIBZMQ_INCLUDE_DIRS
+    NAMES zmq.h
+    HINTS ${PC_LIBZMQ_INCLUDE_HINTS}
 )
 
-find_library(
-    LIBSODIUM_LIBRARIES
-    NAMES sodium
-    HINTS ${PC_LIBSODIUM_LIBRARY_HINTS}
+find_library (
+    LIBZMQ_LIBRARIES
+    NAMES zmq
+    HINTS ${PC_LIBZMQ_LIBRARY_HINTS}
 )
 
 include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(
-    LIBSODIUM
-    REQUIRED_VARS LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS
+    LIBZMQ
+    REQUIRED_VARS LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS
 )
 mark_as_advanced(
-    LIBSODIUM_FOUND
-    LIBSODIUM_LIBRARIES LIBSODIUM_INCLUDE_DIRS
+    LIBZMQ_FOUND
+    LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS
 )
 
 ################################################################################
