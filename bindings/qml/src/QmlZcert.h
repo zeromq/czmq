@@ -102,7 +102,7 @@ public slots:
     QmlZcert *construct ();
 
     //  Accepts public/secret key pair from caller
-    QmlZcert *constructFrom (byte *publicKey, byte *secretKey);
+    QmlZcert *constructFrom (const byte *publicKey, const byte *secretKey);
 
     //  Load certificate from file
     QmlZcert *load (const QString &filename);

@@ -30,7 +30,7 @@ CZMQ_EXPORT zcert_t *
 
 //  Accepts public/secret key pair from caller
 CZMQ_EXPORT zcert_t *
-    zcert_new_from (byte *public_key, byte *secret_key);
+    zcert_new_from (const byte *public_key, const byte *secret_key);
 
 //  Load certificate from file
 CZMQ_EXPORT zcert_t *

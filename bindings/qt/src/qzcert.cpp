@@ -24,7 +24,7 @@ QZcert::QZcert (QObject *qObjParent) : QObject (qObjParent)
 
 ///
 //  Accepts public/secret key pair from caller
-QZcert* QZcert::newFrom (byte *publicKey, byte *secretKey, QObject *qObjParent)
+QZcert* QZcert::newFrom (const byte *publicKey, const byte *secretKey, QObject *qObjParent)
 {
     return new QZcert (zcert_new_from (publicKey, secretKey), qObjParent);
 }

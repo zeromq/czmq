@@ -137,7 +137,7 @@ QmlZcert *QmlZcertAttached::construct () {
 
 ///
 //  Accepts public/secret key pair from caller
-QmlZcert *QmlZcertAttached::constructFrom (byte *publicKey, byte *secretKey) {
+QmlZcert *QmlZcertAttached::constructFrom (const byte *publicKey, const byte *secretKey) {
     QmlZcert *qmlSelf = new QmlZcert ();
     qmlSelf->self = zcert_new_from (publicKey, secretKey);
     return qmlSelf;

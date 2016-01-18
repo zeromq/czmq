@@ -76,7 +76,7 @@ zcert_new (void)
 //  Constructor, accepts public/secret key pair from caller
 
 zcert_t *
-zcert_new_from (byte *public_key, byte *secret_key)
+zcert_new_from (const byte *public_key, const byte *secret_key)
 {
     zcert_t *self = (zcert_t *) zmalloc (sizeof (zcert_t));
     assert (self);
