@@ -862,7 +862,7 @@ s_server_handle_protocol (zloop_t *loop, zsock_t *reader, void *argument)
     //  of polling and the reactor:
     while (zsock_events (self->router) & ZMQ_POLLIN) {
         if (zgossip_msg_recv (self->message, self->router))
-            return -1;              //  Interrupted; exit zloop
+            return -1;      //  Interrupted; exit zloop
 
         //  TODO: use binary hashing on routing_id
         char *hashkey = zframe_strhex (zgossip_msg_routing_id (self->message));

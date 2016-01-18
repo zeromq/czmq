@@ -106,7 +106,7 @@ CZMQ_EXPORT void zsockopt_test (bool verbose);
 @end
 */
 
-#include "../include/czmq.h"
+#include "czmq_classes.h"
 
 .for version
 #if (ZMQ_VERSION_MAJOR == $(major))

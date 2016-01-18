@@ -20,8 +20,7 @@
 @end
 */
 
-#include "platform.h"
-#include "../include/czmq.h"
+#include "czmq_classes.h"
 
 //  --------------------------------------------------------------------------
 //  Signal handling

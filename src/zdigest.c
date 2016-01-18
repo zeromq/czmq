@@ -23,7 +23,6 @@
 @end
 */
 
-#include "platform.h"
 #include "czmq_classes.h"
 #include "foreign/sha1/sha1.inc_c"
 
