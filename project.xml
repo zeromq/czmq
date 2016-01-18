@@ -9,44 +9,44 @@
     <use project = "libzmq" />
     <use project = "uuid" optional = "1" implied = "1" />
 
-    <class name = "zactor" />
-    <class name = "zauth" />
-    <class name = "zarmour" />
-    <class name = "zbeacon" />
-    <class name = "zcert" />
-    <class name = "zcertstore" />
-    <class name = "zchunk" />
-    <class name = "zclock" />
-    <class name = "zconfig" />
-    <class name = "zdigest" />
-    <class name = "zdir" />
-    <class name = "zdir_patch" />
-    <class name = "zfile" />
-    <class name = "zframe" />
-    <class name = "zgossip" />
-    <class name = "zhash" />
-    <class name = "zhashx" />
-    <class name = "ziflist" />
-    <class name = "zlist" />
-    <class name = "zlistx" />
-    <class name = "zloop" />
-    <class name = "zmonitor" />
-    <class name = "zmsg" />
-    <class name = "zpoller" />
-    <class name = "zproc" />
-    <class name = "zproxy" />
-    <class name = "zrex" />
-    <class name = "zsock" />
-    <class name = "zstr" />
-    <class name = "zsys" />
-    <class name = "ztrie" />
-    <class name = "zuuid" />
+    <class name = "zactor" status = "stable" />
+    <class name = "zauth" status = "stable" />
+    <class name = "zarmour" status = "stable" />
+    <class name = "zbeacon" status = "stable" />
+    <class name = "zcert" status = "stable" />
+    <class name = "zcertstore" status = "stable" />
+    <class name = "zchunk" status = "stable" />
+    <class name = "zclock" status = "stable" />
+    <class name = "zconfig" status = "stable" />
+    <class name = "zdigest" status = "stable" />
+    <class name = "zdir" status = "stable" />
+    <class name = "zdir_patch" status = "stable" />
+    <class name = "zfile" status = "stable" />
+    <class name = "zframe" status = "stable" />
+    <class name = "zgossip" status = "stable" />
+    <class name = "zhash" status = "stable" />
+    <class name = "zhashx" status = "stable" />
+    <class name = "ziflist" status = "stable" />
+    <class name = "zlist" status = "stable" />
+    <class name = "zlistx" status = "stable" />
+    <class name = "zloop" status = "stable" />
+    <class name = "zmonitor" status = "stable" />
+    <class name = "zmsg" status = "stable" />
+    <class name = "zpoller" status = "stable" />
+    <class name = "zproc" status = "stable" />
+    <class name = "zproxy" status = "stable" />
+    <class name = "zrex" status = "stable" />
+    <class name = "zsock" status = "stable" />
+    <class name = "zstr" status = "stable" />
+    <class name = "zsys" status = "stable" />
+    <class name = "ztrie" status = "stable" />
+    <class name = "zuuid" status = "stable" />
 
     <!-- Models that we build using GSL -->
     <model name = "sockopts" />
     <model name = "zgossip" />
     <model name = "zgossip_msg" />
-    <class name = "zgossip_msg" private = "1" />
+    <class name = "zgossip_msg" private = "1" status = "stable" />
 
     <!-- Other source files in src that we need to package -->
     <extra name = "zsock_option.inc" />
