@@ -18,6 +18,9 @@
 #ifndef CZMQ_CLASSES_H_INCLUDED
 #define CZMQ_CLASSES_H_INCLUDED
 
+//  Platform definitions, must come first
+#include "platform.h"
+
 //  External API
 #include "../include/czmq.h"
 

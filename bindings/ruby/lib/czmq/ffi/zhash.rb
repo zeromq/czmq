@@ -90,7 +90,7 @@ module CZMQ
       end
 
       # Create a new callback of the following type:
-      # DEPRECATED as clumsy -- use zhash_first/_next instead
+      # Callback function for zhash_foreach method. Deprecated.
       #     typedef int (zhash_foreach_fn) (                 
       #         const char *key, void *item, void *argument);
       #
@@ -383,11 +383,9 @@ module CZMQ
         result
       end
 
-      # DEPRECATED as clumsy -- use zhash_first/_next instead                  
       # Apply function to each item in the hash table. Items are iterated in no
       # defined order. Stops if callback function returns non-zero and returns 
-      # final return code from callback function (zero = success).             
-      # Callback function for zhash_foreach method                             
+      # final return code from callback function (zero = success). Deprecated. 
       #
       # @param callback [::FFI::Pointer, #to_ptr]
       # @param argument [::FFI::Pointer, #to_ptr]

@@ -21,8 +21,12 @@ class QmlZcertstore;
 class QmlZcertstoreAttached;
 class QmlZchunk;
 class QmlZchunkAttached;
+class QmlZclock;
+class QmlZclockAttached;
 class QmlZconfig;
 class QmlZconfigAttached;
+class QmlZdigest;
+class QmlZdigestAttached;
 class QmlZdir;
 class QmlZdirAttached;
 class QmlZdirPatch;
@@ -39,6 +43,8 @@ class QmlZiflist;
 class QmlZiflistAttached;
 class QmlZlist;
 class QmlZlistAttached;
+class QmlZlistx;
+class QmlZlistxAttached;
 class QmlZloop;
 class QmlZloopAttached;
 class QmlZmsg;
@@ -55,13 +61,17 @@ class QmlZtrie;
 class QmlZtrieAttached;
 class QmlZuuid;
 class QmlZuuidAttached;
+class QmlZmutex;
+class QmlZmutexAttached;
 
 #include "QmlZactor.h"
 #include "QmlZarmour.h"
 #include "QmlZcert.h"
 #include "QmlZcertstore.h"
 #include "QmlZchunk.h"
+#include "QmlZclock.h"
 #include "QmlZconfig.h"
+#include "QmlZdigest.h"
 #include "QmlZdir.h"
 #include "QmlZdirPatch.h"
 #include "QmlZfile.h"
@@ -70,6 +80,7 @@ class QmlZuuidAttached;
 #include "QmlZhashx.h"
 #include "QmlZiflist.h"
 #include "QmlZlist.h"
+#include "QmlZlistx.h"
 #include "QmlZloop.h"
 #include "QmlZmsg.h"
 #include "QmlZpoller.h"
@@ -78,6 +89,7 @@ class QmlZuuidAttached;
 #include "QmlZstr.h"
 #include "QmlZtrie.h"
 #include "QmlZuuid.h"
+#include "QmlZmutex.h"
 
 class QmlCZMQPlugin : public QQmlExtensionPlugin
 {
@@ -97,8 +109,12 @@ public:
         qmlRegisterType<QmlZcertstoreAttached>();
         qmlRegisterType<QmlZchunk> (uri, 1, 0, "QmlZchunk");
         qmlRegisterType<QmlZchunkAttached>();
+        qmlRegisterType<QmlZclock> (uri, 1, 0, "QmlZclock");
+        qmlRegisterType<QmlZclockAttached>();
         qmlRegisterType<QmlZconfig> (uri, 1, 0, "QmlZconfig");
         qmlRegisterType<QmlZconfigAttached>();
+        qmlRegisterType<QmlZdigest> (uri, 1, 0, "QmlZdigest");
+        qmlRegisterType<QmlZdigestAttached>();
         qmlRegisterType<QmlZdir> (uri, 1, 0, "QmlZdir");
         qmlRegisterType<QmlZdirAttached>();
         qmlRegisterType<QmlZdirPatch> (uri, 1, 0, "QmlZdirPatch");
@@ -115,6 +131,8 @@ public:
         qmlRegisterType<QmlZiflistAttached>();
         qmlRegisterType<QmlZlist> (uri, 1, 0, "QmlZlist");
         qmlRegisterType<QmlZlistAttached>();
+        qmlRegisterType<QmlZlistx> (uri, 1, 0, "QmlZlistx");
+        qmlRegisterType<QmlZlistxAttached>();
         qmlRegisterType<QmlZloop> (uri, 1, 0, "QmlZloop");
         qmlRegisterType<QmlZloopAttached>();
         qmlRegisterType<QmlZmsg> (uri, 1, 0, "QmlZmsg");
@@ -131,6 +149,8 @@ public:
         qmlRegisterType<QmlZtrieAttached>();
         qmlRegisterType<QmlZuuid> (uri, 1, 0, "QmlZuuid");
         qmlRegisterType<QmlZuuidAttached>();
+        qmlRegisterType<QmlZmutex> (uri, 1, 0, "QmlZmutex");
+        qmlRegisterType<QmlZmutexAttached>();
     };
 };
 

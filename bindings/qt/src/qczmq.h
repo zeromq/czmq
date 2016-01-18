@@ -33,7 +33,9 @@ class QZarmour;
 class QZcert;
 class QZcertstore;
 class QZchunk;
+class QZclock;
 class QZconfig;
+class QZdigest;
 class QZdir;
 class QZdirPatch;
 class QZfile;
@@ -42,6 +44,7 @@ class QZhash;
 class QZhashx;
 class QZiflist;
 class QZlist;
+class QZlistx;
 class QZloop;
 class QZmsg;
 class QZpoller;
@@ -50,6 +53,7 @@ class QZsock;
 class QZstr;
 class QZtrie;
 class QZuuid;
+class QZmutex;
 
 //  Public API classes
 #include "qzactor.h"
@@ -57,7 +61,9 @@ class QZuuid;
 #include "qzcert.h"
 #include "qzcertstore.h"
 #include "qzchunk.h"
+#include "qzclock.h"
 #include "qzconfig.h"
+#include "qzdigest.h"
 #include "qzdir.h"
 #include "qzdirpatch.h"
 #include "qzfile.h"
@@ -66,6 +72,7 @@ class QZuuid;
 #include "qzhashx.h"
 #include "qziflist.h"
 #include "qzlist.h"
+#include "qzlistx.h"
 #include "qzloop.h"
 #include "qzmsg.h"
 #include "qzpoller.h"
@@ -74,6 +81,7 @@ class QZuuid;
 #include "qzstr.h"
 #include "qztrie.h"
 #include "qzuuid.h"
+#include "qzmutex.h"
 
 #endif //  Q_CZMQ_H
 /*

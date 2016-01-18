@@ -304,6 +304,45 @@ Java_org_zeromq_czmq_Zsock__1_1resolve (JNIEnv *env, jclass c, jlong self)
 }
 
 JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zsock__1_1heartbeatIvl (JNIEnv *env, jclass c, jlong self)
+{
+    jint heartbeat_ivl_ = (jint) zsock_heartbeat_ivl ((zsock_t *) (intptr_t) self);
+    return heartbeat_ivl_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setHeartbeatIvl (JNIEnv *env, jclass c, jlong self, jint heartbeat_ivl)
+{
+    zsock_set_heartbeat_ivl ((zsock_t *) (intptr_t) self, (int) heartbeat_ivl);
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zsock__1_1heartbeatTtl (JNIEnv *env, jclass c, jlong self)
+{
+    jint heartbeat_ttl_ = (jint) zsock_heartbeat_ttl ((zsock_t *) (intptr_t) self);
+    return heartbeat_ttl_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setHeartbeatTtl (JNIEnv *env, jclass c, jlong self, jint heartbeat_ttl)
+{
+    zsock_set_heartbeat_ttl ((zsock_t *) (intptr_t) self, (int) heartbeat_ttl);
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zsock__1_1heartbeatTimeout (JNIEnv *env, jclass c, jlong self)
+{
+    jint heartbeat_timeout_ = (jint) zsock_heartbeat_timeout ((zsock_t *) (intptr_t) self);
+    return heartbeat_timeout_;
+}
+
+JNIEXPORT void JNICALL
+Java_org_zeromq_czmq_Zsock__1_1setHeartbeatTimeout (JNIEnv *env, jclass c, jlong self, jint heartbeat_timeout)
+{
+    zsock_set_heartbeat_timeout ((zsock_t *) (intptr_t) self, (int) heartbeat_timeout);
+}
+
+JNIEXPORT jint JNICALL
 Java_org_zeromq_czmq_Zsock__1_1tos (JNIEnv *env, jclass c, jlong self)
 {
     jint tos_ = (jint) zsock_tos ((zsock_t *) (intptr_t) self);

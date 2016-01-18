@@ -6,7 +6,7 @@
 module CZMQ
   module FFI
 
-    # zcertstore - work with CURVE security certificate stores
+    # work with CURVE security certificate stores
     # @note This class is 100% generated using zproject.
     class Zcertstore
       # Raised when one tries to use an instance of {Zcertstore} after

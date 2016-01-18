@@ -69,6 +69,9 @@ if test "x${CZMQ_GCOV}" == "xyes"; then
     if test "x${CZMQ_ORIG_CFLAGS}" != "xnone"; then
         CFLAGS="${CFLAGS} ${CZMQ_ORIG_CFLAGS}"
     fi
+    AM_CONDITIONAL(WITH_GCOV, true)
+else
+    AM_CONDITIONAL(WITH_GCOV, false)
 fi
 
 PREVIOUS_CFLAGS="${CFLAGS}"
@@ -394,7 +397,6 @@ AC_ARG_WITH([pkgconfigdir], AS_HELP_STRING([--with-pkgconfigdir=PATH],
 AC_SUBST([pkgconfigdir])
 
 
-
 # enable specific system integration features
 AC_ARG_WITH([systemd],
     AS_HELP_STRING([--with-systemd],
@@ -408,6 +410,25 @@ AM_COND_IF([WITH_SYSTEMD],
     [PKG_CHECK_MODULES([SYSTEMD], [systemd >= 200], [],
         [AC_MSG_ERROR([Cannot find required package for systemd. Note, pkg-config is required due to specified version >= 200])])],
     [])
+
+# enable draft API by default if we're in a git repository
+# else disable it by default; then allow --with-draft=yes/no override
+AC_CHECK_FILE(.git, [gitmaster=yes], [gitmaster=no])
+
+AC_ARG_WITH([drafts],
+    AS_HELP_STRING([--with-drafts],
+        [Build and install draft classes and methods [default=yes.]]),
+    [with_drafts=$withval],
+    [with_drafts=$gitmaster])
+
+AM_CONDITIONAL([WITH_DRAFTS], [test x$with_drafts != xno])
+
+if test "x$with_drafts" = "xyes"; then
+    AC_MSG_NOTICE([building draft, stable, and legacy API])
+    AC_DEFINE(WITH_DRAFTS, 1, [Build and install draft classes and methods.])
+else
+    AC_MSG_NOTICE([building stable and legacy API (no drafts)])
+fi
 
 # Specify output files
 AC_CONFIG_FILES([Makefile

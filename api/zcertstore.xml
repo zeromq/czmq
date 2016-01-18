@@ -1,4 +1,4 @@
-<class name = "zcertstore">
+<class name = "zcertstore" state = "stable">
     <!--
     Copyright (c) the Contributors as noted in the AUTHORS file.
     This file is part of CZMQ, the high-level C binding for 0MQ:
@@ -8,7 +8,7 @@
     License, v. 2.0. If a copy of the MPL was not distributed with this
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
     -->
-    zcertstore - work with CURVE security certificate stores
+    work with CURVE security certificate stores
 
     <constructor>
         Create a new certificate store from a disk directory, loading and

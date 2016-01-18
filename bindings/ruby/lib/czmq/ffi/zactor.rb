@@ -6,7 +6,7 @@
 module CZMQ
   module FFI
 
-    # The zactor class provides a simple actor framework.
+    # provides a simple actor framework
     # @note This class is 100% generated using zproject.
     class Zactor
       # Raised when one tries to use an instance of {Zactor} after

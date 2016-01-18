@@ -141,6 +141,15 @@ module CZMQ
 
       require_relative 'ffi/zchunk'
 
+      attach_function :zclock_sleep, [:int], :void, **opts
+      attach_function :zclock_time, [], :pointer, **opts
+      attach_function :zclock_mono, [], :pointer, **opts
+      attach_function :zclock_usecs, [], :pointer, **opts
+      attach_function :zclock_timestr, [], :pointer, **opts
+      attach_function :zclock_test, [:bool], :void, **opts
+
+      require_relative 'ffi/zclock'
+
       attach_function :zconfig_new, [:string, :pointer], :pointer, **opts
       attach_function :zconfig_load, [:string], :pointer, **opts
       attach_function :zconfig_loadf, [:string, :varargs], :pointer, **opts
@@ -173,6 +182,16 @@ module CZMQ
       attach_function :zconfig_test, [:bool], :void, **opts
 
       require_relative 'ffi/zconfig'
+
+      attach_function :zdigest_new, [], :pointer, **opts
+      attach_function :zdigest_destroy, [:pointer], :void, **opts
+      attach_function :zdigest_update, [:pointer, :pointer, :size_t], :void, **opts
+      attach_function :zdigest_data, [:pointer], :pointer, **opts
+      attach_function :zdigest_size, [:pointer], :size_t, **opts
+      attach_function :zdigest_string, [:pointer], :pointer, **opts
+      attach_function :zdigest_test, [:bool], :void, **opts
+
+      require_relative 'ffi/zdigest'
 
       attach_function :zdir_new, [:string, :string], :pointer, **opts
       attach_function :zdir_destroy, [:pointer], :void, **opts
@@ -359,6 +378,38 @@ module CZMQ
       attach_function :zlist_test, [:bool], :void, **opts
 
       require_relative 'ffi/zlist'
+
+      attach_function :zlistx_new, [], :pointer, **opts
+      attach_function :zlistx_destroy, [:pointer], :void, **opts
+      attach_function :zlistx_add_start, [:pointer, :pointer], :pointer, **opts
+      attach_function :zlistx_add_end, [:pointer, :pointer], :pointer, **opts
+      attach_function :zlistx_size, [:pointer], :size_t, **opts
+      attach_function :zlistx_head, [:pointer], :pointer, **opts
+      attach_function :zlistx_tail, [:pointer], :pointer, **opts
+      attach_function :zlistx_first, [:pointer], :pointer, **opts
+      attach_function :zlistx_next, [:pointer], :pointer, **opts
+      attach_function :zlistx_prev, [:pointer], :pointer, **opts
+      attach_function :zlistx_last, [:pointer], :pointer, **opts
+      attach_function :zlistx_item, [:pointer], :pointer, **opts
+      attach_function :zlistx_cursor, [:pointer], :pointer, **opts
+      attach_function :zlistx_handle_item, [:pointer], :pointer, **opts
+      attach_function :zlistx_find, [:pointer, :pointer], :pointer, **opts
+      attach_function :zlistx_detach, [:pointer, :pointer], :pointer, **opts
+      attach_function :zlistx_detach_cur, [:pointer], :pointer, **opts
+      attach_function :zlistx_delete, [:pointer, :pointer], :int, **opts
+      attach_function :zlistx_move_start, [:pointer, :pointer], :void, **opts
+      attach_function :zlistx_move_end, [:pointer, :pointer], :void, **opts
+      attach_function :zlistx_purge, [:pointer], :void, **opts
+      attach_function :zlistx_sort, [:pointer], :void, **opts
+      attach_function :zlistx_insert, [:pointer, :pointer, :bool], :pointer, **opts
+      attach_function :zlistx_reorder, [:pointer, :pointer, :bool], :void, **opts
+      attach_function :zlistx_dup, [:pointer], :pointer, **opts
+      attach_function :zlistx_set_destructor, [:pointer, :pointer], :void, **opts
+      attach_function :zlistx_set_duplicator, [:pointer, :pointer], :void, **opts
+      attach_function :zlistx_set_comparator, [:pointer, :pointer], :void, **opts
+      attach_function :zlistx_test, [:bool], :void, **opts
+
+      require_relative 'ffi/zlistx'
 
       attach_function :zloop_new, [], :pointer, **opts
       attach_function :zloop_destroy, [:pointer], :void, **opts
@@ -639,6 +690,15 @@ module CZMQ
       attach_function :zuuid_test, [:bool], :void, **opts
 
       require_relative 'ffi/zuuid'
+
+      attach_function :zmutex_new, [], :pointer, **opts
+      attach_function :zmutex_destroy, [:pointer], :void, **opts
+      attach_function :zmutex_lock, [:pointer], :void, **opts
+      attach_function :zmutex_unlock, [:pointer], :void, **opts
+      attach_function :zmutex_try_lock, [:pointer], :int, **opts
+      attach_function :zmutex_test, [:bool], :void, **opts
+
+      require_relative 'ffi/zmutex'
     end
   end
 end

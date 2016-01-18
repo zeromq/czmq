@@ -229,6 +229,24 @@ public:
     //  return the supplied value. Takes a polymorphic socket reference.         
     static void * resolve (void *self);
 
+    //  Get socket option `heartbeat_ivl`.
+    int heartbeatIvl ();
+
+    //  Set socket option `heartbeat_ivl`.
+    void setHeartbeatIvl (int heartbeatIvl);
+
+    //  Get socket option `heartbeat_ttl`.
+    int heartbeatTtl ();
+
+    //  Set socket option `heartbeat_ttl`.
+    void setHeartbeatTtl (int heartbeatTtl);
+
+    //  Get socket option `heartbeat_timeout`.
+    int heartbeatTimeout ();
+
+    //  Set socket option `heartbeat_timeout`.
+    void setHeartbeatTimeout (int heartbeatTimeout);
+
     //  Get socket option `tos`.
     int tos ();
 

@@ -25,7 +25,7 @@ android {
   }
   # Build the czmq library for android unless it is already built
   !system(bash $$CZMQ_ROOT/builds/android/build.sh) {
-    error(Failed to build the czmq C library with $$CZMQ_ROOT/builds/android/build.sh)
+    error(Failed to build the czmq library with $$CZMQ_ROOT/builds/android/build.sh)
   }
   
   VENDOR_PREFIX = $$CZMQ_ROOT/builds/android/prefix/$(TOOLCHAIN_NAME)
@@ -43,7 +43,9 @@ HEADERS += \
   $$SRCDIR/QmlZcert.h \
   $$SRCDIR/QmlZcertstore.h \
   $$SRCDIR/QmlZchunk.h \
+  $$SRCDIR/QmlZclock.h \
   $$SRCDIR/QmlZconfig.h \
+  $$SRCDIR/QmlZdigest.h \
   $$SRCDIR/QmlZdir.h \
   $$SRCDIR/QmlZdirPatch.h \
   $$SRCDIR/QmlZfile.h \
@@ -52,6 +54,7 @@ HEADERS += \
   $$SRCDIR/QmlZhashx.h \
   $$SRCDIR/QmlZiflist.h \
   $$SRCDIR/QmlZlist.h \
+  $$SRCDIR/QmlZlistx.h \
   $$SRCDIR/QmlZloop.h \
   $$SRCDIR/QmlZmsg.h \
   $$SRCDIR/QmlZpoller.h \
@@ -59,7 +62,8 @@ HEADERS += \
   $$SRCDIR/QmlZsock.h \
   $$SRCDIR/QmlZstr.h \
   $$SRCDIR/QmlZtrie.h \
-  $$SRCDIR/QmlZuuid.h 
+  $$SRCDIR/QmlZuuid.h \
+  $$SRCDIR/QmlZmutex.h 
 
 SOURCES += \
   $$SRCDIR/QmlZactor.cpp \
@@ -67,7 +71,9 @@ SOURCES += \
   $$SRCDIR/QmlZcert.cpp \
   $$SRCDIR/QmlZcertstore.cpp \
   $$SRCDIR/QmlZchunk.cpp \
+  $$SRCDIR/QmlZclock.cpp \
   $$SRCDIR/QmlZconfig.cpp \
+  $$SRCDIR/QmlZdigest.cpp \
   $$SRCDIR/QmlZdir.cpp \
   $$SRCDIR/QmlZdirPatch.cpp \
   $$SRCDIR/QmlZfile.cpp \
@@ -76,6 +82,7 @@ SOURCES += \
   $$SRCDIR/QmlZhashx.cpp \
   $$SRCDIR/QmlZiflist.cpp \
   $$SRCDIR/QmlZlist.cpp \
+  $$SRCDIR/QmlZlistx.cpp \
   $$SRCDIR/QmlZloop.cpp \
   $$SRCDIR/QmlZmsg.cpp \
   $$SRCDIR/QmlZpoller.cpp \
@@ -83,7 +90,8 @@ SOURCES += \
   $$SRCDIR/QmlZsock.cpp \
   $$SRCDIR/QmlZstr.cpp \
   $$SRCDIR/QmlZtrie.cpp \
-  $$SRCDIR/QmlZuuid.cpp 
+  $$SRCDIR/QmlZuuid.cpp \
+  $$SRCDIR/QmlZmutex.cpp 
 
 OBJECTS_DIR = $$BUILDDIR/.obj
 MOC_DIR     = $$BUILDDIR/.moc

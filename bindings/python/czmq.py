@@ -82,9 +82,17 @@ class zframe_t(Structure):
     pass # Empty - only for type checking
 zframe_p = POINTER(zframe_t)
 
+class msecs_t(Structure):
+    pass # Empty - only for type checking
+msecs_p = POINTER(msecs_t)
+
 class zconfig_t(Structure):
     pass # Empty - only for type checking
 zconfig_p = POINTER(zconfig_t)
+
+class zdigest_t(Structure):
+    pass # Empty - only for type checking
+zdigest_p = POINTER(zdigest_t)
 
 class zdir_t(Structure):
     pass # Empty - only for type checking
@@ -145,6 +153,10 @@ ztrie_p = POINTER(ztrie_t)
 class zuuid_t(Structure):
     pass # Empty - only for type checking
 zuuid_p = POINTER(zuuid_t)
+
+class zmutex_t(Structure):
+    pass # Empty - only for type checking
+zmutex_p = POINTER(zmutex_t)
 
 def return_py_file(c_file):
     if not sys.version_info > (3,):
@@ -222,7 +234,7 @@ lib.zactor_test.restype = None
 lib.zactor_test.argtypes = [c_bool]
 
 class Zactor(object):
-    """The zactor class provides a simple actor framework."""
+    """provides a simple actor framework"""
 
     allow_destruct = False
     def __init__(self, *args):
@@ -322,7 +334,7 @@ lib.zarmour_test.restype = None
 lib.zarmour_test.argtypes = [c_bool]
 
 class Zarmour(object):
-    """zarmour - armoured text encoding and decoding"""
+    """armoured text encoding and decoding"""
 
     Mode = {
         'mode base64 std': 0,
@@ -480,7 +492,7 @@ lib.zcert_test.restype = None
 lib.zcert_test.argtypes = [c_bool]
 
 class Zcert(object):
-    """zcert - work with CURVE security certificates"""
+    """work with CURVE security certificates"""
 
     allow_destruct = False
     def __init__(self, *args):
@@ -613,7 +625,7 @@ lib.zcertstore_test.restype = None
 lib.zcertstore_test.argtypes = [c_bool]
 
 class Zcertstore(object):
-    """zcertstore - work with CURVE security certificate stores"""
+    """work with CURVE security certificate stores"""
 
     allow_destruct = False
     def __init__(self, *args):
@@ -729,7 +741,7 @@ lib.zchunk_test.restype = None
 lib.zchunk_test.argtypes = [c_bool]
 
 class Zchunk(object):
-    """"""
+    """work with memory chunks"""
 
     allow_destruct = False
     def __init__(self, *args):
@@ -876,6 +888,69 @@ See zchunk_fprint for details"""
     def test(verbose):
         """Self test of this class."""
         return lib.zchunk_test(verbose)
+
+
+# zclock
+lib.zclock_sleep.restype = None
+lib.zclock_sleep.argtypes = [c_int]
+lib.zclock_time.restype = msecs_p
+lib.zclock_time.argtypes = []
+lib.zclock_mono.restype = msecs_p
+lib.zclock_mono.argtypes = []
+lib.zclock_usecs.restype = msecs_p
+lib.zclock_usecs.argtypes = []
+lib.zclock_timestr.restype = POINTER(c_char)
+lib.zclock_timestr.argtypes = []
+lib.zclock_test.restype = None
+lib.zclock_test.argtypes = [c_bool]
+
+class Zclock(object):
+    """millisecond clocks and delays"""
+
+    allow_destruct = False
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    @staticmethod
+    def sleep(msecs):
+        """Sleep for a number of milliseconds"""
+        return lib.zclock_sleep(msecs)
+
+    @staticmethod
+    def time():
+        """Return current system clock as milliseconds. Note that this clock can
+jump backwards (if the system clock is changed) so is unsafe to use for
+timers and time offsets. Use zclock_mono for that instead."""
+        return lib.zclock_time()
+
+    @staticmethod
+    def mono():
+        """Return current monotonic clock in milliseconds. Use this when you compute
+time offsets. The monotonic clock is not affected by system changes and
+so will never be reset backwards, unlike a system clock."""
+        return lib.zclock_mono()
+
+    @staticmethod
+    def usecs():
+        """Return current monotonic clock in microseconds. Use this when you compute
+time offsets. The monotonic clock is not affected by system changes and
+so will never be reset backwards, unlike a system clock."""
+        return lib.zclock_usecs()
+
+    @staticmethod
+    def timestr():
+        """Return formatted date/time as fresh string. Free using zstr_free()."""
+        return return_fresh_string(lib.zclock_timestr())
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class."""
+        return lib.zclock_test(verbose)
 
 
 # zconfig
@@ -1104,6 +1179,78 @@ file has changed in since the tree was loaded."""
     def test(verbose):
         """Self test of this class"""
         return lib.zconfig_test(verbose)
+
+
+# zdigest
+lib.zdigest_new.restype = zdigest_p
+lib.zdigest_new.argtypes = []
+lib.zdigest_destroy.restype = None
+lib.zdigest_destroy.argtypes = [POINTER(zdigest_p)]
+lib.zdigest_update.restype = None
+lib.zdigest_update.argtypes = [zdigest_p, c_void_p, c_size_t]
+lib.zdigest_data.restype = c_void_p
+lib.zdigest_data.argtypes = [zdigest_p]
+lib.zdigest_size.restype = c_size_t
+lib.zdigest_size.argtypes = [zdigest_p]
+lib.zdigest_string.restype = c_char_p
+lib.zdigest_string.argtypes = [zdigest_p]
+lib.zdigest_test.restype = None
+lib.zdigest_test.argtypes = [c_bool]
+
+class Zdigest(object):
+    """zdigest - provides hashing functions (SHA-1 at present)"""
+
+    allow_destruct = False
+    def __init__(self, *args):
+        """Constructor - creates new digest object, which you use to build up a
+digest by repeatedly calling zdigest_update() on chunks of data."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zdigest_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zdigest_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 0)
+            self._as_parameter_ = lib.zdigest_new() # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destroy a digest object"""
+        if self.allow_destruct:
+            lib.zdigest_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def update(self, buffer, length):
+        """Add buffer into digest calculation"""
+        return lib.zdigest_update(self._as_parameter_, buffer, length)
+
+    def data(self):
+        """Return final digest hash data. If built without crypto support, returns
+NULL."""
+        return lib.zdigest_data(self._as_parameter_)
+
+    def size(self):
+        """Return final digest hash size"""
+        return lib.zdigest_size(self._as_parameter_)
+
+    def string(self):
+        """Return digest as printable hex string; caller should not modify nor
+free this string. After calling this, you may not use zdigest_update()
+on the same digest. If built without crypto support, returns NULL."""
+        return lib.zdigest_string(self._as_parameter_)
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class."""
+        return lib.zdigest_test(verbose)
 
 
 # zdir
@@ -1936,11 +2083,9 @@ file."""
         return lib.zhash_autofree(self._as_parameter_)
 
     def foreach(self, callback, argument):
-        """DEPRECATED as clumsy -- use zhash_first/_next instead
-Apply function to each item in the hash table. Items are iterated in no
+        """Apply function to each item in the hash table. Items are iterated in no
 defined order. Stops if callback function returns non-zero and returns
-final return code from callback function (zero = success).
-Callback function for zhash_foreach method"""
+final return code from callback function (zero = success). Deprecated."""
         return lib.zhash_foreach(self._as_parameter_, callback, argument)
 
     @staticmethod
@@ -2108,13 +2253,13 @@ Returns the item, or NULL if there is no such item."""
         """Return a zlistx_t containing the keys for the items in the
 table. Uses the key_duplicator to duplicate all keys and sets the
 key_destructor as destructor for the list."""
-        return lib.zhashx_keys(self._as_parameter_)
+        return Zlistx(lib.zhashx_keys(self._as_parameter_), True)
 
     def values(self):
         """Return a zlistx_t containing the values for the items in the
 table. Uses the duplicator to duplicate all items and sets the
 destructor as destructor for the list."""
-        return lib.zhashx_values(self._as_parameter_)
+        return Zlistx(lib.zhashx_values(self._as_parameter_), True)
 
     def first(self):
         """Simple iterator; returns first item in hash table, in no given order,
@@ -2524,6 +2669,251 @@ Returns the item, or NULL if there is no such item."""
     def test(verbose):
         """Self test of this class."""
         return lib.zlist_test(verbose)
+
+
+# zlistx
+lib.zlistx_new.restype = zlistx_p
+lib.zlistx_new.argtypes = []
+lib.zlistx_destroy.restype = None
+lib.zlistx_destroy.argtypes = [POINTER(zlistx_p)]
+lib.zlistx_add_start.restype = c_void_p
+lib.zlistx_add_start.argtypes = [zlistx_p, c_void_p]
+lib.zlistx_add_end.restype = c_void_p
+lib.zlistx_add_end.argtypes = [zlistx_p, c_void_p]
+lib.zlistx_size.restype = c_size_t
+lib.zlistx_size.argtypes = [zlistx_p]
+lib.zlistx_head.restype = c_void_p
+lib.zlistx_head.argtypes = [zlistx_p]
+lib.zlistx_tail.restype = c_void_p
+lib.zlistx_tail.argtypes = [zlistx_p]
+lib.zlistx_first.restype = c_void_p
+lib.zlistx_first.argtypes = [zlistx_p]
+lib.zlistx_next.restype = c_void_p
+lib.zlistx_next.argtypes = [zlistx_p]
+lib.zlistx_prev.restype = c_void_p
+lib.zlistx_prev.argtypes = [zlistx_p]
+lib.zlistx_last.restype = c_void_p
+lib.zlistx_last.argtypes = [zlistx_p]
+lib.zlistx_item.restype = c_void_p
+lib.zlistx_item.argtypes = [zlistx_p]
+lib.zlistx_cursor.restype = c_void_p
+lib.zlistx_cursor.argtypes = [zlistx_p]
+lib.zlistx_handle_item.restype = c_void_p
+lib.zlistx_handle_item.argtypes = [c_void_p]
+lib.zlistx_find.restype = c_void_p
+lib.zlistx_find.argtypes = [zlistx_p, c_void_p]
+lib.zlistx_detach.restype = c_void_p
+lib.zlistx_detach.argtypes = [zlistx_p, c_void_p]
+lib.zlistx_detach_cur.restype = c_void_p
+lib.zlistx_detach_cur.argtypes = [zlistx_p]
+lib.zlistx_delete.restype = c_int
+lib.zlistx_delete.argtypes = [zlistx_p, c_void_p]
+lib.zlistx_move_start.restype = None
+lib.zlistx_move_start.argtypes = [zlistx_p, c_void_p]
+lib.zlistx_move_end.restype = None
+lib.zlistx_move_end.argtypes = [zlistx_p, c_void_p]
+lib.zlistx_purge.restype = None
+lib.zlistx_purge.argtypes = [zlistx_p]
+lib.zlistx_sort.restype = None
+lib.zlistx_sort.argtypes = [zlistx_p]
+lib.zlistx_insert.restype = c_void_p
+lib.zlistx_insert.argtypes = [zlistx_p, c_void_p, c_bool]
+lib.zlistx_reorder.restype = None
+lib.zlistx_reorder.argtypes = [zlistx_p, c_void_p, c_bool]
+lib.zlistx_dup.restype = zlistx_p
+lib.zlistx_dup.argtypes = [zlistx_p]
+lib.zlistx_set_destructor.restype = None
+lib.zlistx_set_destructor.argtypes = [zlistx_p, czmq_destructor]
+lib.zlistx_set_duplicator.restype = None
+lib.zlistx_set_duplicator.argtypes = [zlistx_p, czmq_duplicator]
+lib.zlistx_set_comparator.restype = None
+lib.zlistx_set_comparator.argtypes = [zlistx_p, czmq_comparator]
+lib.zlistx_test.restype = None
+lib.zlistx_test.argtypes = [c_bool]
+
+class Zlistx(object):
+    """extended generic list container"""
+
+    allow_destruct = False
+    def __init__(self, *args):
+        """Create a new, empty list."""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zlistx_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zlistx_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 0)
+            self._as_parameter_ = lib.zlistx_new() # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destroy a list. If an item destructor was specified, all items in the
+list are automatically destroyed as well."""
+        if self.allow_destruct:
+            lib.zlistx_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def add_start(self, item):
+        """Add an item to the head of the list. Calls the item duplicator, if any,
+on the item. Resets cursor to list head. Returns an item handle on
+success, NULL if memory was exhausted."""
+        return c_void_p(lib.zlistx_add_start(self._as_parameter_, item))
+
+    def add_end(self, item):
+        """Add an item to the tail of the list. Calls the item duplicator, if any,
+on the item. Resets cursor to list head. Returns an item handle on
+success, NULL if memory was exhausted."""
+        return c_void_p(lib.zlistx_add_end(self._as_parameter_, item))
+
+    def size(self):
+        """Return the number of items in the list"""
+        return lib.zlistx_size(self._as_parameter_)
+
+    def head(self):
+        """Return first item in the list, or null, leaves the cursor"""
+        return c_void_p(lib.zlistx_head(self._as_parameter_))
+
+    def tail(self):
+        """Return last item in the list, or null, leaves the cursor"""
+        return c_void_p(lib.zlistx_tail(self._as_parameter_))
+
+    def first(self):
+        """Return the item at the head of list. If the list is empty, returns NULL.
+Leaves cursor pointing at the head item, or NULL if the list is empty."""
+        return c_void_p(lib.zlistx_first(self._as_parameter_))
+
+    def next(self):
+        """Return the next item. At the end of the list (or in an empty list),
+returns NULL. Use repeated zlistx_next () calls to work through the list
+from zlistx_first (). First time, acts as zlistx_first()."""
+        return c_void_p(lib.zlistx_next(self._as_parameter_))
+
+    def prev(self):
+        """Return the previous item. At the start of the list (or in an empty list),
+returns NULL. Use repeated zlistx_prev () calls to work through the list
+backwards from zlistx_last (). First time, acts as zlistx_last()."""
+        return c_void_p(lib.zlistx_prev(self._as_parameter_))
+
+    def last(self):
+        """Return the item at the tail of list. If the list is empty, returns NULL.
+Leaves cursor pointing at the tail item, or NULL if the list is empty."""
+        return c_void_p(lib.zlistx_last(self._as_parameter_))
+
+    def item(self):
+        """Returns the value of the item at the cursor, or NULL if the cursor is
+not pointing to an item."""
+        return c_void_p(lib.zlistx_item(self._as_parameter_))
+
+    def cursor(self):
+        """Returns the handle of the item at the cursor, or NULL if the cursor is
+not pointing to an item."""
+        return c_void_p(lib.zlistx_cursor(self._as_parameter_))
+
+    @staticmethod
+    def handle_item(handle):
+        """Returns the item associated with the given list handle, or NULL if passed
+in handle is NULL. Asserts that the passed in handle points to a list element."""
+        return c_void_p(lib.zlistx_handle_item(handle))
+
+    def find(self, item):
+        """Find an item in the list, searching from the start. Uses the item
+comparator, if any, else compares item values directly. Returns the
+item handle found, or NULL. Sets the cursor to the found item, if any."""
+        return c_void_p(lib.zlistx_find(self._as_parameter_, item))
+
+    def detach(self, handle):
+        """Detach an item from the list, using its handle. The item is not modified,
+and the caller is responsible for destroying it if necessary. If handle is
+null, detaches the first item on the list. Returns item that was detached,
+or null if none was. If cursor was at item, moves cursor to previous item,
+so you can detach items while iterating forwards through a list."""
+        return c_void_p(lib.zlistx_detach(self._as_parameter_, handle))
+
+    def detach_cur(self):
+        """Detach item at the cursor, if any, from the list. The item is not modified,
+and the caller is responsible for destroying it as necessary. Returns item
+that was detached, or null if none was. Moves cursor to previous item, so
+you can detach items while iterating forwards through a list."""
+        return c_void_p(lib.zlistx_detach_cur(self._as_parameter_))
+
+    def delete(self, handle):
+        """Delete an item, using its handle. Calls the item destructor is any is
+set. If handle is null, deletes the first item on the list. Returns 0
+if an item was deleted, -1 if not. If cursor was at item, moves cursor
+to previous item, so you can delete items while iterating forwards
+through a list."""
+        return lib.zlistx_delete(self._as_parameter_, handle)
+
+    def move_start(self, handle):
+        """Move an item to the start of the list, via its handle."""
+        return lib.zlistx_move_start(self._as_parameter_, handle)
+
+    def move_end(self, handle):
+        """Move an item to the end of the list, via its handle."""
+        return lib.zlistx_move_end(self._as_parameter_, handle)
+
+    def purge(self):
+        """Remove all items from the list, and destroy them if the item destructor
+is set."""
+        return lib.zlistx_purge(self._as_parameter_)
+
+    def sort(self):
+        """Sort the list. If an item comparator was set, calls that to compare
+items, otherwise compares on item value. The sort is not stable, so may
+reorder equal items."""
+        return lib.zlistx_sort(self._as_parameter_)
+
+    def insert(self, item, low_value):
+        """Create a new node and insert it into a sorted list. Calls the item
+duplicator, if any, on the item. If low_value is true, starts searching
+from the start of the list, otherwise searches from the end. Use the item
+comparator, if any, to find where to place the new node. Returns a handle
+to the new node, or NULL if memory was exhausted. Resets the cursor to the
+list head."""
+        return c_void_p(lib.zlistx_insert(self._as_parameter_, item, low_value))
+
+    def reorder(self, handle, low_value):
+        """Move an item, specified by handle, into position in a sorted list. Uses
+the item comparator, if any, to determine the new location. If low_value
+is true, starts searching from the start of the list, otherwise searches
+from the end."""
+        return lib.zlistx_reorder(self._as_parameter_, handle, low_value)
+
+    def dup(self):
+        """Make a copy of the list; items are duplicated if you set a duplicator
+for the list, otherwise not. Copying a null reference returns a null
+reference."""
+        return Zlistx(lib.zlistx_dup(self._as_parameter_), False)
+
+    def set_destructor(self, destructor):
+        """Set a user-defined deallocator for list items; by default items are not
+freed when the list is destroyed."""
+        return lib.zlistx_set_destructor(self._as_parameter_, destructor)
+
+    def set_duplicator(self, duplicator):
+        """Set a user-defined duplicator for list items; by default items are not
+copied when the list is duplicated."""
+        return lib.zlistx_set_duplicator(self._as_parameter_, duplicator)
+
+    def set_comparator(self, comparator):
+        """Set a user-defined comparator for zlistx_find and zlistx_sort; the method
+must return -1, 0, or 1 depending on whether item1 is less than, equal to,
+or greater than, item2."""
+        return lib.zlistx_set_comparator(self._as_parameter_, comparator)
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class."""
+        return lib.zlistx_test(verbose)
 
 
 # zloop
@@ -3359,6 +3749,18 @@ lib.zsock_is.restype = c_bool
 lib.zsock_is.argtypes = [c_void_p]
 lib.zsock_resolve.restype = c_void_p
 lib.zsock_resolve.argtypes = [c_void_p]
+lib.zsock_heartbeat_ivl.restype = c_int
+lib.zsock_heartbeat_ivl.argtypes = [zsock_p]
+lib.zsock_set_heartbeat_ivl.restype = None
+lib.zsock_set_heartbeat_ivl.argtypes = [zsock_p, c_int]
+lib.zsock_heartbeat_ttl.restype = c_int
+lib.zsock_heartbeat_ttl.argtypes = [zsock_p]
+lib.zsock_set_heartbeat_ttl.restype = None
+lib.zsock_set_heartbeat_ttl.argtypes = [zsock_p, c_int]
+lib.zsock_heartbeat_timeout.restype = c_int
+lib.zsock_heartbeat_timeout.argtypes = [zsock_p]
+lib.zsock_set_heartbeat_timeout.restype = None
+lib.zsock_set_heartbeat_timeout.argtypes = [zsock_p, c_int]
 lib.zsock_tos.restype = c_int
 lib.zsock_tos.argtypes = [zsock_p]
 lib.zsock_set_tos.restype = None
@@ -3872,6 +4274,30 @@ the underlying libzmq socket handle; else if it looks like a file
 descriptor, return NULL; else if it looks like a libzmq socket handle,
 return the supplied value. Takes a polymorphic socket reference."""
         return c_void_p(lib.zsock_resolve(self))
+
+    def heartbeat_ivl(self):
+        """Get socket option `heartbeat_ivl`."""
+        return lib.zsock_heartbeat_ivl(self._as_parameter_)
+
+    def set_heartbeat_ivl(self, heartbeat_ivl):
+        """Set socket option `heartbeat_ivl`."""
+        return lib.zsock_set_heartbeat_ivl(self._as_parameter_, heartbeat_ivl)
+
+    def heartbeat_ttl(self):
+        """Get socket option `heartbeat_ttl`."""
+        return lib.zsock_heartbeat_ttl(self._as_parameter_)
+
+    def set_heartbeat_ttl(self, heartbeat_ttl):
+        """Set socket option `heartbeat_ttl`."""
+        return lib.zsock_set_heartbeat_ttl(self._as_parameter_, heartbeat_ttl)
+
+    def heartbeat_timeout(self):
+        """Get socket option `heartbeat_timeout`."""
+        return lib.zsock_heartbeat_timeout(self._as_parameter_)
+
+    def set_heartbeat_timeout(self, heartbeat_timeout):
+        """Set socket option `heartbeat_timeout`."""
+        return lib.zsock_set_heartbeat_timeout(self._as_parameter_, heartbeat_timeout)
 
     def tos(self):
         """Get socket option `tos`."""
@@ -4574,6 +5000,68 @@ returns null."""
     def test(verbose):
         """Self test of this class."""
         return lib.zuuid_test(verbose)
+
+
+# zmutex
+lib.zmutex_new.restype = zmutex_p
+lib.zmutex_new.argtypes = []
+lib.zmutex_destroy.restype = None
+lib.zmutex_destroy.argtypes = [POINTER(zmutex_p)]
+lib.zmutex_lock.restype = None
+lib.zmutex_lock.argtypes = [zmutex_p]
+lib.zmutex_unlock.restype = None
+lib.zmutex_unlock.argtypes = [zmutex_p]
+lib.zmutex_try_lock.restype = c_int
+lib.zmutex_try_lock.argtypes = [zmutex_p]
+lib.zmutex_test.restype = None
+lib.zmutex_test.argtypes = [c_bool]
+
+class Zmutex(object):
+    """work with mutexes (deprecated)"""
+
+    allow_destruct = False
+    def __init__(self, *args):
+        """Create a new mutex container"""
+        if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
+            self._as_parameter_ = cast(args[0], zmutex_p) # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        elif len(args) == 2 and type(args[0]) is zmutex_p and isinstance(args[1], bool):
+            self._as_parameter_ = args[0] # Conversion from raw type to binding
+            self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
+        else:
+            assert(len(args) == 0)
+            self._as_parameter_ = lib.zmutex_new() # Creation of new raw type
+            self.allow_destruct = True
+
+    def __del__(self):
+        """Destroy a mutex container"""
+        if self.allow_destruct:
+            lib.zmutex_destroy(byref(self._as_parameter_))
+
+    def __bool__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 3
+        return self._as_parameter_.__bool__()
+
+    def __nonzero__(self):
+        "Determine whether the object is valid by converting to boolean" # Python 2
+        return self._as_parameter_.__nonzero__()
+
+    def lock(self):
+        """Lock mutex"""
+        return lib.zmutex_lock(self._as_parameter_)
+
+    def unlock(self):
+        """Unlock mutex"""
+        return lib.zmutex_unlock(self._as_parameter_)
+
+    def try_lock(self):
+        """Try to lock mutex"""
+        return lib.zmutex_try_lock(self._as_parameter_)
+
+    @staticmethod
+    def test(verbose):
+        """Self test of this class."""
+        return lib.zmutex_test(verbose)
 
 ################################################################################
 #  THIS FILE IS 100% GENERATED BY ZPROJECT; DO NOT EDIT EXCEPT EXPERIMENTALLY  #

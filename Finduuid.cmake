@@ -5,40 +5,40 @@
 
 if (NOT MSVC)
     include(FindPkgConfig)
-    pkg_check_modules(PC_ZEROMQ "libzmq")
-    if (NOT PC_ZEROMQ_FOUND)
-        pkg_check_modules(PC_ZEROMQ "zmq")
-    endif (NOT PC_ZEROMQ_FOUND)
-    if (PC_ZEROMQ_FOUND)
+    pkg_check_modules(PC_UUID "uuid")
+    if (NOT PC_UUID_FOUND)
+        pkg_check_modules(PC_UUID "uuid")
+    endif (NOT PC_UUID_FOUND)
+    if (PC_UUID_FOUND)
         # some libraries install the headers is a subdirectory of the include dir
         # returned by pkg-config, so use a wildcard match to improve chances of finding
         # headers and SOs.
-        set(PC_ZEROMQ_INCLUDE_HINTS ${PC_ZEROMQ_INCLUDE_DIRS} ${PC_ZEROMQ_INCLUDE_DIRS}/*)
-        set(PC_ZEROMQ_LIBRARY_HINTS ${PC_ZEROMQ_LIBRARY_DIRS} ${PC_ZEROMQ_LIBRARY_DIRS}/*)
-    endif(PC_ZEROMQ_FOUND)
+        set(PC_UUID_INCLUDE_HINTS ${PC_UUID_INCLUDE_DIRS} ${PC_UUID_INCLUDE_DIRS}/*)
+        set(PC_UUID_LIBRARY_HINTS ${PC_UUID_LIBRARY_DIRS} ${PC_UUID_LIBRARY_DIRS}/*)
+    endif(PC_UUID_FOUND)
 endif (NOT MSVC)
 
-find_path(
-    ZEROMQ_INCLUDE_DIRS
-    NAMES zmq.h
-    HINTS ${PC_ZEROMQ_INCLUDE_HINTS}
+find_path (
+    UUID_INCLUDE_DIRS
+    NAMES uuid/uuid.h
+    HINTS ${PC_UUID_INCLUDE_HINTS}
 )
 
-find_library(
-    ZEROMQ_LIBRARIES
-    NAMES zmq
-    HINTS ${PC_ZEROMQ_LIBRARY_HINTS}
+find_library (
+    UUID_LIBRARIES
+    NAMES uuid
+    HINTS ${PC_UUID_LIBRARY_HINTS}
 )
 
 include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(
-    ZEROMQ
-    REQUIRED_VARS ZEROMQ_LIBRARIES ZEROMQ_INCLUDE_DIRS
+    UUID
+    REQUIRED_VARS UUID_LIBRARIES UUID_INCLUDE_DIRS
 )
 mark_as_advanced(
-    ZEROMQ_FOUND
-    ZEROMQ_LIBRARIES ZEROMQ_INCLUDE_DIRS
+    UUID_FOUND
+    UUID_LIBRARIES UUID_INCLUDE_DIRS
 )
 
 ################################################################################

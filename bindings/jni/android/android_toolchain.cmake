@@ -33,21 +33,26 @@ set (CMAKE_FIND_ROOT_PATH
 # CMake will look for prefixed g++, cpp, ld, etc. automatically
 CMAKE_FORCE_C_COMPILER (${TOOLCHAIN_PATH}/arm-linux-androideabi-gcc GNU)
 
-#   Find location of ZeroMQ header file
-pkg_check_modules (PC_ZEROMQ "libzmq")
-if (NOT PC_ZEROMQ_FOUND)
-    pkg_check_modules(PC_ZEROMQ "zmq")
-endif (NOT PC_ZEROMQ_FOUND)
+#   Find location of zmq.h file
+pkg_check_modules (PC_LIBZMQ "libzmq")
+if (NOT PC_LIBZMQ_FOUND)
+    pkg_check_modules(PC_LIBZMQ "zmq")
+endif (NOT PC_LIBZMQ_FOUND)
 
-if (PC_ZEROMQ_FOUND)
-    set (PC_ZEROMQ_INCLUDE_HINTS ${PC_ZEROMQ_INCLUDE_DIRS} ${PC_ZEROMQ_INCLUDE_DIRS}/*)
-endif (PC_ZEROMQ_FOUND)
-find_path (ZEROMQ_INCLUDE_DIR NAMES zmq.h HINTS ${PC_ZEROMQ_INCLUDE_HINTS})
+if (PC_LIBZMQ_FOUND)
+    set (PC_LIBZMQ_INCLUDE_HINTS ${PC_LIBZMQ_INCLUDE_DIRS} ${PC_LIBZMQ_INCLUDE_DIRS}/*)
+endif (PC_LIBZMQ_FOUND)
+
+find_path (
+    LIBZMQ_INCLUDE_DIR
+    NAMES zmq.h
+    HINTS ${PC_LIBZMQ_INCLUDE_HINTS}
+)
 
 cmake_policy (SET CMP0015 NEW)   #  Use relative paths in link_directories
 
 include_directories (
-    ${ZEROMQ_INCLUDE_DIR}
+    ${LIBZMQ_INCLUDE_DIR}
     ../../../include
     ../../../bindings/jni/src/native/include
     ../../../builds/android/prefix/arm-linux-androideabi-4.9/include

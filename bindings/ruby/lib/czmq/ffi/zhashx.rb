@@ -308,11 +308,12 @@ module CZMQ
       # table. Uses the key_duplicator to duplicate all keys and sets the
       # key_destructor as destructor for the list.                       
       #
-      # @return [::FFI::Pointer]
+      # @return [Zlistx]
       def keys()
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zhashx_keys(self_p)
+        result = Zlistx.__new result, true
         result
       end
 
@@ -320,11 +321,12 @@ module CZMQ
       # table. Uses the duplicator to duplicate all items and sets the
       # destructor as destructor for the list.                        
       #
-      # @return [::FFI::Pointer]
+      # @return [Zlistx]
       def values()
         raise DestroyedError unless @ptr
         self_p = @ptr
         result = ::CZMQ::FFI.zhashx_values(self_p)
+        result = Zlistx.__new result, true
         result
       end
 

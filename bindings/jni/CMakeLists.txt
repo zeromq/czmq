@@ -14,7 +14,9 @@ set (czmqjni_sources
     src/main/c/org_zeromq_czmq_Zcert.c
     src/main/c/org_zeromq_czmq_Zcertstore.c
     src/main/c/org_zeromq_czmq_Zchunk.c
+    src/main/c/org_zeromq_czmq_Zclock.c
     src/main/c/org_zeromq_czmq_Zconfig.c
+    src/main/c/org_zeromq_czmq_Zdigest.c
     src/main/c/org_zeromq_czmq_Zdir.c
     src/main/c/org_zeromq_czmq_ZdirPatch.c
     src/main/c/org_zeromq_czmq_Zfile.c
@@ -23,6 +25,7 @@ set (czmqjni_sources
     src/main/c/org_zeromq_czmq_Zhashx.c
     src/main/c/org_zeromq_czmq_Ziflist.c
     src/main/c/org_zeromq_czmq_Zlist.c
+    src/main/c/org_zeromq_czmq_Zlistx.c
     src/main/c/org_zeromq_czmq_Zloop.c
     src/main/c/org_zeromq_czmq_Zmsg.c
     src/main/c/org_zeromq_czmq_Zpoller.c
@@ -31,6 +34,7 @@ set (czmqjni_sources
     src/main/c/org_zeromq_czmq_Zstr.c
     src/main/c/org_zeromq_czmq_Ztrie.c
     src/main/c/org_zeromq_czmq_Zuuid.c
+    src/main/c/org_zeromq_czmq_Zmutex.c
 )
 
 add_library (czmqjni SHARED ${czmqjni_sources})

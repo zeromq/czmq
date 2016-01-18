@@ -6,7 +6,7 @@
 module CZMQ
   module FFI
 
-    # zcert - work with CURVE security certificates
+    # work with CURVE security certificates
     # @note This class is 100% generated using zproject.
     class Zcert
       # Raised when one tries to use an instance of {Zcert} after

@@ -44,6 +44,19 @@ set(
 )
 
 ########################################################################
+# options
+########################################################################
+if (EXISTS ".git")
+    OPTION (WITH_DRAFTS "Build and install draft classes and methods" ON)
+else ()
+    OPTION (WITH_DRAFTS "Build and install draft classes and methods" OFF)
+endif ()
+
+IF (WITH_DRAFTS)
+    ADD_DEFINITIONS (-DWITH_DRAFTS)
+ENDIF (WITH_DRAFTS)
+
+########################################################################
 # platform.h
 ########################################################################
 include(CheckIncludeFile)
@@ -98,7 +111,7 @@ set(OPTIONAL_LIBRARIES)
 ########################################################################
 # LIBSODIUM dependency
 ########################################################################
-find_package(Libsodium)
+find_package(libsodium)
 IF (LIBSODIUM_FOUND)
     include_directories(${LIBSODIUM_INCLUDE_DIRS})
     list(APPEND MORE_LIBRARIES ${LIBSODIUM_LIBRARIES})
@@ -109,18 +122,18 @@ ENDIF (LIBSODIUM_FOUND)
 ########################################################################
 # LIBZMQ dependency
 ########################################################################
-find_package(ZeroMQ REQUIRED)
-IF (ZEROMQ_FOUND)
-    include_directories(${ZEROMQ_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${ZEROMQ_LIBRARIES})
-ELSE (ZEROMQ_FOUND)
-    message( FATAL_ERROR "ZeroMQ not found." )
-ENDIF (ZEROMQ_FOUND)
+find_package(libzmq REQUIRED)
+IF (LIBZMQ_FOUND)
+    include_directories(${LIBZMQ_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${LIBZMQ_LIBRARIES})
+ELSE (LIBZMQ_FOUND)
+    message( FATAL_ERROR "libzmq not found." )
+ENDIF (LIBZMQ_FOUND)
 
 ########################################################################
 # UUID dependency
 ########################################################################
-find_package(Uuid)
+find_package(uuid)
 IF (UUID_FOUND)
     include_directories(${UUID_INCLUDE_DIRS})
     list(APPEND MORE_LIBRARIES ${UUID_LIBRARIES})
@@ -136,9 +149,7 @@ set (czmq_headers
     include/czmq_prelude.h
     include/czmq.h
     include/zactor.h
-    include/zauth.h
     include/zarmour.h
-    include/zbeacon.h
     include/zcert.h
     include/zcertstore.h
     include/zchunk.h
@@ -149,24 +160,24 @@ set (czmq_headers
     include/zdir_patch.h
     include/zfile.h
     include/zframe.h
-    include/zgossip.h
     include/zhash.h
     include/zhashx.h
     include/ziflist.h
     include/zlist.h
     include/zlistx.h
     include/zloop.h
-    include/zmonitor.h
     include/zmsg.h
     include/zpoller.h
-    include/zproc.h
-    include/zproxy.h
-    include/zrex.h
     include/zsock.h
     include/zstr.h
-    include/zsys.h
-    include/ztrie.h
     include/zuuid.h
+    include/zauth.h
+    include/zbeacon.h
+    include/zgossip.h
+    include/zmonitor.h
+    include/zproxy.h
+    include/zrex.h
+    include/zsys.h
     include/zauth_v2.h
     include/zbeacon_v2.h
     include/zctx.h
@@ -186,6 +197,14 @@ set (czmq_headers
     src/foreign/slre/slre.h
     src/foreign/slre/readme.txt
 )
+
+IF (WITH_DRAFTS)
+list(APPEND czmq_headers
+    include/zproc.h
+    include/ztrie.h
+)
+ENDIF (WITH_DRAFTS)
+
 source_group ("Header Files" FILES ${czmq_headers})
 install(FILES ${czmq_headers} DESTINATION include)
 
@@ -195,9 +214,7 @@ install(FILES ${czmq_headers} DESTINATION include)
 include_directories("${SOURCE_DIR}/src" "${SOURCE_DIR}/include")
 set (czmq_sources
     src/zactor.c
-    src/zauth.c
     src/zarmour.c
-    src/zbeacon.c
     src/zcert.c
     src/zcertstore.c
     src/zchunk.c
@@ -208,24 +225,24 @@ set (czmq_sources
     src/zdir_patch.c
     src/zfile.c
     src/zframe.c
-    src/zgossip.c
     src/zhash.c
     src/zhashx.c
     src/ziflist.c
     src/zlist.c
     src/zlistx.c
     src/zloop.c
-    src/zmonitor.c
     src/zmsg.c
     src/zpoller.c
-    src/zproc.c
-    src/zproxy.c
-    src/zrex.c
     src/zsock.c
     src/zstr.c
-    src/zsys.c
-    src/ztrie.c
     src/zuuid.c
+    src/zauth.c
+    src/zbeacon.c
+    src/zgossip.c
+    src/zmonitor.c
+    src/zproxy.c
+    src/zrex.c
+    src/zsys.c
     src/zgossip_msg.c
     src/zauth_v2.c
     src/zbeacon_v2.c
@@ -237,6 +254,14 @@ set (czmq_sources
     src/zsockopt.c
     src/zthread.c
 )
+
+IF (WITH_DRAFTS)
+list(APPEND czmq_sources
+    src/zproc.c
+    src/ztrie.c
+)
+ENDIF (WITH_DRAFTS)
+
 source_group("Source Files" FILES ${czmq_sources})
 if (NOT DEFINED BUILD_SHARED_LIBS)
     SET(BUILD_SHARED_LIBS ON)
@@ -288,7 +313,7 @@ add_executable(
 target_link_libraries(
     zmakecert
     czmq
-    ${ZEROMQ_LIBRARIES}
+    ${LIBZMQ_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
 )
 set_target_properties(
@@ -302,7 +327,7 @@ add_executable(
 target_link_libraries(
     czmq_selftest
     czmq
-    ${ZEROMQ_LIBRARIES}
+    ${LIBZMQ_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
 )
 set_target_properties(
@@ -318,9 +343,7 @@ set(TOTAL_TIMEOUT 20 CACHE STRING "Timout of the total testsuite")
 
 set(TEST_CLASSES
     zactor
-    zauth
     zarmour
-    zbeacon
     zcert
     zcertstore
     zchunk
@@ -331,24 +354,24 @@ set(TEST_CLASSES
     zdir_patch
     zfile
     zframe
-    zgossip
     zhash
     zhashx
     ziflist
     zlist
     zlistx
     zloop
-    zmonitor
     zmsg
     zpoller
-    zproc
-    zproxy
-    zrex
     zsock
     zstr
-    zsys
-    ztrie
     zuuid
+    zauth
+    zbeacon
+    zgossip
+    zmonitor
+    zproxy
+    zrex
+    zsys
     zgossip_msg
     zauth_v2
     zbeacon_v2
@@ -360,6 +383,13 @@ set(TEST_CLASSES
     zsockopt
     zthread
 )
+
+IF (WITH_DRAFTS)
+list(APPEND TEST_CLASSES
+    zproc
+    ztrie
+)
+ENDIF (WITH_DRAFTS)
 
 foreach(TEST_CLASS ${TEST_CLASSES})
     add_test(
