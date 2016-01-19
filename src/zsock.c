@@ -62,6 +62,7 @@ zsock_new_checked (int type, const char *filename, size_t line_nbr)
 {
     zsock_t *self = (zsock_t *) zmalloc (sizeof (zsock_t));
     assert (self);
+    self->routing_id = 0;
     self->tag = ZSOCK_TAG;
     self->type = type;
     self->handle = zsys_socket (type, filename, line_nbr);
@@ -1209,6 +1210,10 @@ zsock_bsend (void *self, const char *picture, ...)
     zmq_msg_init_size (&msg, frame_size);
     byte *needle = (byte *) zmq_msg_data (&msg);
 
+    //  Set routing id if self is zsock
+    if (zsock_is (self) && zsock_routing_id ((zsock_t *)self) != 0)
+        zmq_msg_set_routing_id (&msg, zsock_routing_id ((zsock_t *)self));
+
     va_start (argptr, picture);
     picptr = picture;
     while (*picptr) {
@@ -1338,6 +1343,10 @@ zsock_brecv (void *selfish, const char *picture, ...)
     uint cache_used = 0;
     byte *needle = (byte *) zmq_msg_data (&msg);
     byte *ceiling = needle + zmq_msg_size (&msg);
+
+    //  If selfish is zsock get routing id from msg
+    if (zsock_is (selfish) && zsock_type (self) == ZMQ_SERVER)
+        zsock_set_routing_id (self, zmq_msg_routing_id (&msg));
 
     va_list argptr;
     va_start (argptr, picture);
@@ -1876,6 +1885,73 @@ zsock_test (bool verbose)
     zchunk_destroy (&chunk);
     zframe_destroy (&frame);
     zmsg_destroy (&msg);
+
+#ifdef ZMQ_SERVER
+
+    //  Test zsock_bsend/brecv pictures with binary encoding on SERVER and CLIENT sockets
+    server = zsock_new_server ("tcp://127.0.0.1:5561");
+    assert (server);
+    zsock_t* client = zsock_new_client ("tcp://127.0.0.1:5561");
+    assert (client);
+
+    //  From client to server
+    chunk = zchunk_new ("World", 5);
+    zsock_bsend (client, "1248sSpc",
+                 number1, number2, number4, number8,
+                 "Hello, World",
+                 "Goodbye cruel World!",
+                 original,
+                 chunk);
+    zchunk_destroy (&chunk);
+
+    number8 = number4 = number2 = number1 = 0;
+    zsock_brecv (server, "1248sSpc",
+                 &number1, &number2, &number4, &number8,
+                 &string, &longstr,
+                 &pointer,
+                 &chunk);
+    assert (number1 == 123);
+    assert (number2 == 123 * 123);
+    assert (number4 == 123 * 123 * 123);
+    assert (number8 == 123 * 123 * 123 * 123);
+    assert (streq (string, "Hello, World"));
+    assert (streq (longstr, "Goodbye cruel World!"));
+    assert (pointer == original);
+    assert (zsock_routing_id (server));
+    zstr_free (&longstr);
+    zchunk_destroy (&chunk);
+
+    //  From server to client
+    chunk = zchunk_new ("World", 5);
+    zsock_bsend (server, "1248sSpc",
+                 number1, number2, number4, number8,
+                 "Hello, World",
+                 "Goodbye cruel World!",
+                 original,
+                 chunk);
+    zchunk_destroy (&chunk);
+
+    number8 = number4 = number2 = number1 = 0;
+    zsock_brecv (client, "1248sSpc",
+                 &number1, &number2, &number4, &number8,
+                 &string, &longstr,
+                 &pointer,
+                 &chunk);
+    assert (number1 == 123);
+    assert (number2 == 123 * 123);
+    assert (number4 == 123 * 123 * 123);
+    assert (number8 == 123 * 123 * 123 * 123);
+    assert (streq (string, "Hello, World"));
+    assert (streq (longstr, "Goodbye cruel World!"));
+    assert (pointer == original);
+    assert (zsock_routing_id (client) == 0);
+    zstr_free (&longstr);
+    zchunk_destroy (&chunk);
+
+    zsock_destroy (&client);
+    zsock_destroy (&server);
+
+#endif
 
     //  Check that we can send a zproto format message
     zsock_bsend (writer, "1111sS4", 0xAA, 0xA0, 0x02, 0x01, "key", "value", 1234);
