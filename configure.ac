@@ -228,11 +228,14 @@ czmq_on_android="no"
 # Host specific checks
 AC_CANONICAL_HOST
 
-# Allow user to disable doc build
-AC_ARG_WITH([documentation], [AS_HELP_STRING([--without-documentation],
-    [disable documentation build even if asciidoc and xmlto are present [default=no]])])
+# Man pages are built/installed if asciidoc and xmlto are present
+#   --with-docs=no overrides this
+AC_ARG_WITH([docs],
+    AS_HELP_STRING([--with-docs],
+        [Build and install man pages [default=yes]]),
+    [with_docs=$withval])
 
-if test "x$with_documentation" = "xno"; then
+if test "x$with_docs" = "xno"; then
     czmq_build_doc="no"
     czmq_install_man="no"
 else
@@ -426,8 +429,10 @@ AM_CONDITIONAL([WITH_DRAFTS], [test x$with_drafts != xno])
 if test "x$with_drafts" = "xyes"; then
     AC_MSG_NOTICE([building draft, stable, and legacy API])
     AC_DEFINE(WITH_DRAFTS, 1, [Build and install draft classes and methods.])
+    AC_SUBST(pkg_config_defines, "-DWITH_DRAFTS=1")
 else
     AC_MSG_NOTICE([building stable and legacy API (no drafts)])
+    AC_SUBST(pkg_config_defines, "")
 fi
 
 # Specify output files

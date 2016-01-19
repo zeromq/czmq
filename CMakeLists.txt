@@ -293,6 +293,11 @@ set(prefix "${CMAKE_INSTALL_PREFIX}")
 set(exec_prefix "\${prefix}")
 set(libdir "\${prefix}/lib${LIB_SUFFIX}")
 set(includedir "\${prefix}/include")
+IF (WITH_DRAFTS)
+set(pkg_config_defines "-DWITH_DRAFTS=1")
+ELSE (WITH_DRAFTS)
+set(pkg_config_defines "")
+ENDIF (WITH_DRAFTS)
 configure_file(
     "${SOURCE_DIR}/src/libczmq.pc.in"
     "${SOURCE_DIR}/src/libczmq.pc"
