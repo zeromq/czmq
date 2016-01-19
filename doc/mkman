@@ -1,10 +1,10 @@
 #! /usr/bin/perl
-#   
-#   zproject_mkman - Generates man pages from C source and header files.
 #
-#   Syntax: 'mkman classname', in doc subdirectory.
+#   mkman - Generates man pages from C source and header files.
 #
-#   Copyright (c) 1996-2014 iMatix Corporation
+#   Syntax: './mkman classname', in doc subdirectory.
+#
+#   Copyright (c) 1996-2016 iMatix Corporation
 #
 #   This is free software; you can redistribute it and/or modify it under the
 #   terms of the GNU General Public License as published by the Free Software
@@ -56,7 +56,7 @@ sub generate_manpage {
     $name = $1 if $name =~ /(\w+)\.\w+/;
 
     #   Check if we're making the man page for a main program, or a class
-    
+
     $cat = 0;           #   Unknown category
     exit unless open (MAKEFILE, "Makefile");
     while (<MAKEFILE>) {
@@ -129,7 +129,7 @@ END
             print OUTPUT $_;
         }
     }
-    
+
     #   Generate a simple text documentation for README.txt
     close OUTPUT;
     printf "Generating $name.doc...\n";
@@ -149,6 +149,6 @@ END
 
 $name = shift (@ARGV);
 while ($name) {
-    generate_manpage ($name); 
+    generate_manpage ($name);
     $name = shift (@ARGV);
 }

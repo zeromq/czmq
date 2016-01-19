@@ -6,7 +6,7 @@
 ACLOCAL_AMFLAGS = -I config
 
 AM_CFLAGS = \
-	-Werror=format-security
+    -Werror=format-security
 
 
 AM_CPPFLAGS = \
