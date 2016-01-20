@@ -90,12 +90,12 @@ CZMQ_EXPORT size_t
 //  Does not copy items themselves. Rebuilds new table so may be slow on 
 //  very large tables. NOTE: only works with item values that are strings
 //  since there's no other way to know how to duplicate the item value.  
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT zhash_t *
     zhash_dup (zhash_t *self);
 
 //  Return keys for items in table
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT zlist_t *
     zhash_keys (zhash_t *self);
 
@@ -148,7 +148,7 @@ CZMQ_EXPORT void
 //                                                                       
 //  Comments are not included in the packed data. Item values MUST be    
 //  strings.                                                             
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT zframe_t *
     zhash_pack (zhash_t *self);
 

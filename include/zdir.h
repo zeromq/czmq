@@ -54,7 +54,7 @@ CZMQ_EXPORT size_t
 //  Returns a sorted list of zfile objects; Each entry in the list is a pointer
 //  to a zfile_t item already allocated in the zdir tree. Do not destroy the   
 //  original zdir tree until you are done with this list.                      
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT zlist_t *
     zdir_list (zdir_t *self);
 
@@ -68,18 +68,18 @@ CZMQ_EXPORT void
 //  Returns a list of zdir_patch_t patches. Either older or newer may  
 //  be null, indicating the directory is empty/absent. If alias is set,
 //  generates virtual filename (minus path, plus alias).               
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT zlist_t *
     zdir_diff (zdir_t *older, zdir_t *newer, const char *alias);
 
 //  Return full contents of directory as a zdir_patch list.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT zlist_t *
     zdir_resync (zdir_t *self, const char *alias);
 
 //  Load directory cache; returns a hash table containing the SHA-1 digests
 //  of every file in the tree. The cache is saved between runs in .cache.  
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT zhash_t *
     zdir_cache (zdir_t *self);
 

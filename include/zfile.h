@@ -38,7 +38,7 @@ CZMQ_EXPORT void
 
 //  Duplicate a file item, returns a newly constructed item. If the file
 //  is null, or memory was exhausted, returns null.                     
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT zfile_t *
     zfile_dup (zfile_t *self);
 
@@ -111,7 +111,7 @@ CZMQ_EXPORT int
 
 //  Read chunk from file at specified position. If this was the last chunk,
 //  sets the eof property. Returns a null chunk in case of error.          
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT zchunk_t *
     zfile_read (zfile_t *self, size_t bytes, off_t offset);
 

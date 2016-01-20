@@ -98,7 +98,7 @@ CZMQ_EXPORT void
 //  duplicate all items, which must be strings. Otherwise, the list will hold
 //  pointers back to the items in the original list. If list is null, returns
 //  NULL.                                                                    
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT zlist_t *
     zlist_dup (zlist_t *self);
 

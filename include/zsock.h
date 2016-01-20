@@ -316,7 +316,7 @@ CZMQ_EXPORT void *
     zsock_resolve (void *self);
 
 //  Get socket option `heartbeat_ivl`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_heartbeat_ivl (void *self);
 
@@ -325,7 +325,7 @@ CZMQ_EXPORT void
     zsock_set_heartbeat_ivl (void *self, int heartbeat_ivl);
 
 //  Get socket option `heartbeat_ttl`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_heartbeat_ttl (void *self);
 
@@ -334,7 +334,7 @@ CZMQ_EXPORT void
     zsock_set_heartbeat_ttl (void *self, int heartbeat_ttl);
 
 //  Get socket option `heartbeat_timeout`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_heartbeat_timeout (void *self);
 
@@ -343,7 +343,7 @@ CZMQ_EXPORT void
     zsock_set_heartbeat_timeout (void *self, int heartbeat_timeout);
 
 //  Get socket option `tos`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_tos (void *self);
 
@@ -376,7 +376,7 @@ CZMQ_EXPORT void
     zsock_set_conflate (void *self, int conflate);
 
 //  Get socket option `zap_domain`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT char *
     zsock_zap_domain (void *self);
 
@@ -385,12 +385,12 @@ CZMQ_EXPORT void
     zsock_set_zap_domain (void *self, const char *zap_domain);
 
 //  Get socket option `mechanism`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_mechanism (void *self);
 
 //  Get socket option `plain_server`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_plain_server (void *self);
 
@@ -399,7 +399,7 @@ CZMQ_EXPORT void
     zsock_set_plain_server (void *self, int plain_server);
 
 //  Get socket option `plain_username`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT char *
     zsock_plain_username (void *self);
 
@@ -408,7 +408,7 @@ CZMQ_EXPORT void
     zsock_set_plain_username (void *self, const char *plain_username);
 
 //  Get socket option `plain_password`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT char *
     zsock_plain_password (void *self);
 
@@ -417,7 +417,7 @@ CZMQ_EXPORT void
     zsock_set_plain_password (void *self, const char *plain_password);
 
 //  Get socket option `curve_server`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_curve_server (void *self);
 
@@ -426,7 +426,7 @@ CZMQ_EXPORT void
     zsock_set_curve_server (void *self, int curve_server);
 
 //  Get socket option `curve_publickey`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT char *
     zsock_curve_publickey (void *self);
 
@@ -439,7 +439,7 @@ CZMQ_EXPORT void
     zsock_set_curve_publickey_bin (void *self, const byte *curve_publickey);
 
 //  Get socket option `curve_secretkey`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT char *
     zsock_curve_secretkey (void *self);
 
@@ -452,7 +452,7 @@ CZMQ_EXPORT void
     zsock_set_curve_secretkey_bin (void *self, const byte *curve_secretkey);
 
 //  Get socket option `curve_serverkey`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT char *
     zsock_curve_serverkey (void *self);
 
@@ -465,7 +465,7 @@ CZMQ_EXPORT void
     zsock_set_curve_serverkey_bin (void *self, const byte *curve_serverkey);
 
 //  Get socket option `gssapi_server`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_gssapi_server (void *self);
 
@@ -474,7 +474,7 @@ CZMQ_EXPORT void
     zsock_set_gssapi_server (void *self, int gssapi_server);
 
 //  Get socket option `gssapi_plaintext`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_gssapi_plaintext (void *self);
 
@@ -483,7 +483,7 @@ CZMQ_EXPORT void
     zsock_set_gssapi_plaintext (void *self, int gssapi_plaintext);
 
 //  Get socket option `gssapi_principal`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT char *
     zsock_gssapi_principal (void *self);
 
@@ -492,7 +492,7 @@ CZMQ_EXPORT void
     zsock_set_gssapi_principal (void *self, const char *gssapi_principal);
 
 //  Get socket option `gssapi_service_principal`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT char *
     zsock_gssapi_service_principal (void *self);
 
@@ -501,7 +501,7 @@ CZMQ_EXPORT void
     zsock_set_gssapi_service_principal (void *self, const char *gssapi_service_principal);
 
 //  Get socket option `ipv6`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_ipv6 (void *self);
 
@@ -510,7 +510,7 @@ CZMQ_EXPORT void
     zsock_set_ipv6 (void *self, int ipv6);
 
 //  Get socket option `immediate`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_immediate (void *self);
 
@@ -523,7 +523,7 @@ CZMQ_EXPORT void
     zsock_set_router_raw (void *self, int router_raw);
 
 //  Get socket option `ipv4only`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_ipv4only (void *self);
 
@@ -536,12 +536,12 @@ CZMQ_EXPORT void
     zsock_set_delay_attach_on_connect (void *self, int delay_attach_on_connect);
 
 //  Get socket option `type`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_type (void *self);
 
 //  Get socket option `sndhwm`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_sndhwm (void *self);
 
@@ -550,7 +550,7 @@ CZMQ_EXPORT void
     zsock_set_sndhwm (void *self, int sndhwm);
 
 //  Get socket option `rcvhwm`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_rcvhwm (void *self);
 
@@ -559,7 +559,7 @@ CZMQ_EXPORT void
     zsock_set_rcvhwm (void *self, int rcvhwm);
 
 //  Get socket option `affinity`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_affinity (void *self);
 
@@ -576,7 +576,7 @@ CZMQ_EXPORT void
     zsock_set_unsubscribe (void *self, const char *unsubscribe);
 
 //  Get socket option `identity`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT char *
     zsock_identity (void *self);
 
@@ -585,7 +585,7 @@ CZMQ_EXPORT void
     zsock_set_identity (void *self, const char *identity);
 
 //  Get socket option `rate`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_rate (void *self);
 
@@ -594,7 +594,7 @@ CZMQ_EXPORT void
     zsock_set_rate (void *self, int rate);
 
 //  Get socket option `recovery_ivl`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_recovery_ivl (void *self);
 
@@ -603,7 +603,7 @@ CZMQ_EXPORT void
     zsock_set_recovery_ivl (void *self, int recovery_ivl);
 
 //  Get socket option `sndbuf`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_sndbuf (void *self);
 
@@ -612,7 +612,7 @@ CZMQ_EXPORT void
     zsock_set_sndbuf (void *self, int sndbuf);
 
 //  Get socket option `rcvbuf`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_rcvbuf (void *self);
 
@@ -621,7 +621,7 @@ CZMQ_EXPORT void
     zsock_set_rcvbuf (void *self, int rcvbuf);
 
 //  Get socket option `linger`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_linger (void *self);
 
@@ -630,7 +630,7 @@ CZMQ_EXPORT void
     zsock_set_linger (void *self, int linger);
 
 //  Get socket option `reconnect_ivl`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_reconnect_ivl (void *self);
 
@@ -639,7 +639,7 @@ CZMQ_EXPORT void
     zsock_set_reconnect_ivl (void *self, int reconnect_ivl);
 
 //  Get socket option `reconnect_ivl_max`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_reconnect_ivl_max (void *self);
 
@@ -648,7 +648,7 @@ CZMQ_EXPORT void
     zsock_set_reconnect_ivl_max (void *self, int reconnect_ivl_max);
 
 //  Get socket option `backlog`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_backlog (void *self);
 
@@ -657,7 +657,7 @@ CZMQ_EXPORT void
     zsock_set_backlog (void *self, int backlog);
 
 //  Get socket option `maxmsgsize`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_maxmsgsize (void *self);
 
@@ -666,7 +666,7 @@ CZMQ_EXPORT void
     zsock_set_maxmsgsize (void *self, int maxmsgsize);
 
 //  Get socket option `multicast_hops`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_multicast_hops (void *self);
 
@@ -675,7 +675,7 @@ CZMQ_EXPORT void
     zsock_set_multicast_hops (void *self, int multicast_hops);
 
 //  Get socket option `rcvtimeo`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_rcvtimeo (void *self);
 
@@ -684,7 +684,7 @@ CZMQ_EXPORT void
     zsock_set_rcvtimeo (void *self, int rcvtimeo);
 
 //  Get socket option `sndtimeo`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_sndtimeo (void *self);
 
@@ -697,7 +697,7 @@ CZMQ_EXPORT void
     zsock_set_xpub_verbose (void *self, int xpub_verbose);
 
 //  Get socket option `tcp_keepalive`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_tcp_keepalive (void *self);
 
@@ -706,7 +706,7 @@ CZMQ_EXPORT void
     zsock_set_tcp_keepalive (void *self, int tcp_keepalive);
 
 //  Get socket option `tcp_keepalive_idle`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_tcp_keepalive_idle (void *self);
 
@@ -715,7 +715,7 @@ CZMQ_EXPORT void
     zsock_set_tcp_keepalive_idle (void *self, int tcp_keepalive_idle);
 
 //  Get socket option `tcp_keepalive_cnt`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_tcp_keepalive_cnt (void *self);
 
@@ -724,7 +724,7 @@ CZMQ_EXPORT void
     zsock_set_tcp_keepalive_cnt (void *self, int tcp_keepalive_cnt);
 
 //  Get socket option `tcp_keepalive_intvl`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_tcp_keepalive_intvl (void *self);
 
@@ -733,7 +733,7 @@ CZMQ_EXPORT void
     zsock_set_tcp_keepalive_intvl (void *self, int tcp_keepalive_intvl);
 
 //  Get socket option `tcp_accept_filter`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT char *
     zsock_tcp_accept_filter (void *self);
 
@@ -742,22 +742,22 @@ CZMQ_EXPORT void
     zsock_set_tcp_accept_filter (void *self, const char *tcp_accept_filter);
 
 //  Get socket option `rcvmore`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_rcvmore (void *self);
 
 //  Get socket option `fd`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT SOCKET
     zsock_fd (void *self);
 
 //  Get socket option `events`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_events (void *self);
 
 //  Get socket option `last_endpoint`.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT char *
     zsock_last_endpoint (void *self);
 

@@ -45,14 +45,14 @@ CZMQ_EXPORT void
 //  Encode a stream of bytes into an armoured string. Returns the armoured
 //  string, or NULL if there was insufficient memory available to allocate
 //  a new string.                                                         
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT char *
     zarmour_encode (zarmour_t *self, const byte *data, size_t size);
 
 //  Decode an armoured string into a string of bytes.          
 //  The decoded output is null-terminated, so it may be treated
 //  as a string, if that's what it was prior to encoding.      
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT byte *
     zarmour_decode (zarmour_t *self, const char *data, size_t *decode_size);
 
