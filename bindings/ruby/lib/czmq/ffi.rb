@@ -690,15 +690,6 @@ module CZMQ
       attach_function :zuuid_test, [:bool], :void, **opts
 
       require_relative 'ffi/zuuid'
-
-      attach_function :zmutex_new, [], :pointer, **opts
-      attach_function :zmutex_destroy, [:pointer], :void, **opts
-      attach_function :zmutex_lock, [:pointer], :void, **opts
-      attach_function :zmutex_unlock, [:pointer], :void, **opts
-      attach_function :zmutex_try_lock, [:pointer], :int, **opts
-      attach_function :zmutex_test, [:bool], :void, **opts
-
-      require_relative 'ffi/zmutex'
     end
   end
 end

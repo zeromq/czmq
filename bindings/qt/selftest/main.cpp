@@ -42,7 +42,6 @@ int main(int argc, char **argv)
     QZstr::test (verbose);
     QZtrie::test (verbose);
     QZuuid::test (verbose);
-    QZmutex::test (verbose);
 
     qDebug() << "Tests passed OK\n";
     return 0;

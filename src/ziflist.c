@@ -22,7 +22,6 @@
 @end
 */
 
-#include "platform.h"
 #include "czmq_classes.h"
 
 //  Structure of an interface

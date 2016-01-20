@@ -62,8 +62,7 @@ HEADERS += \
   $$SRCDIR/QmlZsock.h \
   $$SRCDIR/QmlZstr.h \
   $$SRCDIR/QmlZtrie.h \
-  $$SRCDIR/QmlZuuid.h \
-  $$SRCDIR/QmlZmutex.h 
+  $$SRCDIR/QmlZuuid.h 
 
 SOURCES += \
   $$SRCDIR/QmlZactor.cpp \
@@ -90,8 +89,7 @@ SOURCES += \
   $$SRCDIR/QmlZsock.cpp \
   $$SRCDIR/QmlZstr.cpp \
   $$SRCDIR/QmlZtrie.cpp \
-  $$SRCDIR/QmlZuuid.cpp \
-  $$SRCDIR/QmlZmutex.cpp 
+  $$SRCDIR/QmlZuuid.cpp 
 
 OBJECTS_DIR = $$BUILDDIR/.obj
 MOC_DIR     = $$BUILDDIR/.moc

@@ -8,6 +8,7 @@
     <version major = "3" minor = "0" patch = "3" />
     <use project = "libzmq" />
     <use project = "uuid" optional = "1" implied = "1" />
+    <target name = "*" />
 
     <!-- These classes have an API model -->
     <class name = "zactor" />
@@ -49,7 +50,7 @@
     <model name = "sockopts" />
     <model name = "zgossip" />
     <model name = "zgossip_msg" />
-    <class name = "zgossip_msg" private = "1" state = "stable" />
+    <class name = "zgossip_msg" private = "1" />
 
     <!-- Other source files in src that we need to package -->
     <extra name = "zsock_option.inc" />

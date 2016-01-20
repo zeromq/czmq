@@ -16,8 +16,8 @@
 
     <constructor name = "new from">
         Accepts public/secret key pair from caller
-        <argument name = "public key" type = "buffer" mutable = "1" /><!-- FIXME: Why mutable? -->
-        <argument name = "secret key" type = "buffer" mutable = "1" /><!-- FIXME: Why mutable? -->
+        <argument name = "public key" type = "buffer" />
+        <argument name = "secret key" type = "buffer" />
     </constructor>
 
     <constructor name = "load">

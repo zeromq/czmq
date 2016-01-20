@@ -85,6 +85,7 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zgossip_msg_send (zgossip_msg_t *self, zsock_t *output);
 
+
 //  Print contents of message to stdout
 CZMQ_EXPORT void
     zgossip_msg_print (zgossip_msg_t *self);

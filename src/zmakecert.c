@@ -17,7 +17,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <czmq.h>
+#include "czmq_classes.h"
 
 //  Get and store one header in certificate
 

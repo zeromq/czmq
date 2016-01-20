@@ -61,8 +61,6 @@ class QmlZtrie;
 class QmlZtrieAttached;
 class QmlZuuid;
 class QmlZuuidAttached;
-class QmlZmutex;
-class QmlZmutexAttached;
 
 #include "QmlZactor.h"
 #include "QmlZarmour.h"
@@ -89,7 +87,6 @@ class QmlZmutexAttached;
 #include "QmlZstr.h"
 #include "QmlZtrie.h"
 #include "QmlZuuid.h"
-#include "QmlZmutex.h"
 
 class QmlCZMQPlugin : public QQmlExtensionPlugin
 {
@@ -149,8 +146,6 @@ public:
         qmlRegisterType<QmlZtrieAttached>();
         qmlRegisterType<QmlZuuid> (uri, 1, 0, "QmlZuuid");
         qmlRegisterType<QmlZuuidAttached>();
-        qmlRegisterType<QmlZmutex> (uri, 1, 0, "QmlZmutex");
-        qmlRegisterType<QmlZmutexAttached>();
     };
 };
 

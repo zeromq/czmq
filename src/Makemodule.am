@@ -187,8 +187,7 @@ dist_api_DATA = \
     api/zsock.xml \
     api/zstr.xml \
     api/ztrie.xml \
-    api/zuuid.xml \
-    api/zmutex.xml
+    api/zuuid.xml
 
 # define custom target for all products of /src
 src:
