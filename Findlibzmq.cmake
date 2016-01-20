@@ -5,9 +5,9 @@
 
 if (NOT MSVC)
     include(FindPkgConfig)
-    pkg_check_modules(PC_LIBZMQ "zmq")
+    pkg_check_modules(PC_LIBZMQ "libzmq")
     if (NOT PC_LIBZMQ_FOUND)
-        pkg_check_modules(PC_LIBZMQ "zmq")
+        pkg_check_modules(PC_LIBZMQ "libzmq")
     endif (NOT PC_LIBZMQ_FOUND)
     if (PC_LIBZMQ_FOUND)
         # some libraries install the headers is a subdirectory of the include dir

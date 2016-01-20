@@ -44,7 +44,7 @@ CZMQ_EXPORT int
 //  Receive a zmsg message from the actor. Returns NULL if the actor 
 //  was interrupted before the message could be received, or if there
 //  was a timeout on the actor.                                      
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT zmsg_t *
     zactor_recv (zactor_t *self);
 

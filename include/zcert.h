@@ -95,7 +95,7 @@ CZMQ_EXPORT void
 
 //  Return copy of certificate; if certificate is NULL or we exhausted
 //  heap memory, returns NULL.                                        
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT zcert_t *
     zcert_dup (zcert_t *self);
 

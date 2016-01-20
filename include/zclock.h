@@ -47,7 +47,7 @@ CZMQ_EXPORT int64_t
     zclock_usecs (void);
 
 //  Return formatted date/time as fresh string. Free using zstr_free().
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT char *
     zclock_timestr (void);
 

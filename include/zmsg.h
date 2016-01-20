@@ -105,7 +105,7 @@ CZMQ_EXPORT int
     zmsg_append (zmsg_t *self, zframe_t **frame_p);
 
 //  Remove first frame from message, if any. Returns frame, or NULL.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT zframe_t *
     zmsg_pop (zmsg_t *self);
 
@@ -141,7 +141,7 @@ CZMQ_EXPORT int
 
 //  Pop frame off front of message, return as fresh string. If there were
 //  no more frames in the message, returns NULL.                         
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT char *
     zmsg_popstr (zmsg_t *self);
 
@@ -153,7 +153,7 @@ CZMQ_EXPORT int
 
 //  Remove first submessage from message, if any. Returns zmsg_t, or NULL if
 //  decoding was not succesful.                                             
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT zmsg_t *
     zmsg_popmsg (zmsg_t *self);
 
@@ -192,7 +192,7 @@ CZMQ_EXPORT size_t
 
 //  Create copy of message, as new message object. Returns a fresh zmsg_t
 //  object. If message is null, or memory was exhausted, returns null.   
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT zmsg_t *
     zmsg_dup (zmsg_t *self);
 

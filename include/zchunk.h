@@ -83,7 +83,7 @@ CZMQ_EXPORT bool
     zchunk_exhausted (zchunk_t *self);
 
 //  Read chunk from an open file descriptor
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT zchunk_t *
     zchunk_read (FILE *handle, size_t bytes);
 
@@ -95,26 +95,26 @@ CZMQ_EXPORT int
 //  the file. If maxsize is 0, will attempt to read the entire file and   
 //  fail with an assertion if that cannot fit into memory. Returns a new  
 //  chunk containing the file data, or NULL if the file could not be read.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT zchunk_t *
     zchunk_slurp (const char *filename, size_t maxsize);
 
 //  Create copy of chunk, as new chunk object. Returns a fresh zchunk_t   
 //  object, or null if there was not enough heap memory. If chunk is null,
 //  returns null.                                                         
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT zchunk_t *
     zchunk_dup (zchunk_t *self);
 
 //  Return chunk data encoded as printable hex string. Caller must free
 //  string when finished with it.                                      
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT char *
     zchunk_strhex (zchunk_t *self);
 
 //  Return chunk data copied into freshly allocated string
 //  Caller must free string when finished with it.        
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT char *
     zchunk_strdup (zchunk_t *self);
 
@@ -123,12 +123,12 @@ CZMQ_EXPORT bool
     zchunk_streq (zchunk_t *self, const char *string);
 
 //  Transform zchunk into a zframe that can be sent in a message.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT zframe_t *
     zchunk_pack (zchunk_t *self);
 
 //  Transform a zframe into a zchunk.
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT zchunk_t *
     zchunk_unpack (zframe_t *frame);
 

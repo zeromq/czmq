@@ -50,7 +50,7 @@ CZMQ_EXPORT bool
 #ifdef WITH_DRAFTS
 //  Return current host name, for use in public tcp:// endpoints.
 //  If the host name is not resolvable, returns NULL.            
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT char *
     zproc_hostname (void);
 #endif // WITH_DRAFTS

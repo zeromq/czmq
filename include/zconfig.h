@@ -140,12 +140,12 @@ CZMQ_EXPORT zchunk_t *
     zconfig_chunk_save (zconfig_t *self);
 
 //  Load a config tree from a null-terminated string
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT zconfig_t *
     zconfig_str_load (const char *string);
 
 //  Save a config tree to a new null terminated string
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT char *
     zconfig_str_save (zconfig_t *self);
 

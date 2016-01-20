@@ -67,19 +67,19 @@ CZMQ_EXPORT byte *
 
 //  Create a new frame that duplicates an existing frame. If frame is null,
 //  or memory was exhausted, returns null.                                 
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT zframe_t *
     zframe_dup (zframe_t *self);
 
 //  Return frame data encoded as printable hex string, useful for 0MQ UUIDs.
 //  Caller must free string when finished with it.                          
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT char *
     zframe_strhex (zframe_t *self);
 
 //  Return frame data copied into freshly allocated string
 //  Caller must free string when finished with it.        
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT char *
     zframe_strdup (zframe_t *self);
 

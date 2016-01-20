@@ -27,7 +27,7 @@ extern "C" {
 //  Receive C string from socket. Caller must free returned string using
 //  zstr_free(). Returns NULL if the context is being terminated or the 
 //  process was interrupted.                                            
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT char *
     zstr_recv (void *source);
 
@@ -72,7 +72,7 @@ CZMQ_EXPORT int
 
 //  Accepts a void pointer and returns a fresh character string. If source
 //  is null, returns an empty string.                                     
-//  The caller is responsible for destroying the return value when finished with it.
+//  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT char *
     zstr_str (void *source);
 
