@@ -5,9 +5,9 @@
 
 if (NOT MSVC)
     include(FindPkgConfig)
-    pkg_check_modules(PC_LIBSODIUM "sodium")
+    pkg_check_modules(PC_LIBSODIUM "libsodium")
     if (NOT PC_LIBSODIUM_FOUND)
-        pkg_check_modules(PC_LIBSODIUM "sodium")
+        pkg_check_modules(PC_LIBSODIUM "libsodium")
     endif (NOT PC_LIBSODIUM_FOUND)
     if (PC_LIBSODIUM_FOUND)
         # some libraries install the headers is a subdirectory of the include dir
