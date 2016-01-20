@@ -75,7 +75,7 @@ zuuid_new (void)
     byte buffer [ZUUID_LEN];
     uuid_enc_be (&buffer, &uuid);
     zuuid_set (self, buffer);
-#elif defined (__UTYPE_LINUX) || defined (__UTYPE_OSX)
+#elif defined (__UTYPE_LINUX) || defined (__UTYPE_OSX) || defined (__UTYPE_GNU)
     uuid_t uuid;
     assert (sizeof (uuid) == ZUUID_LEN);
     uuid_generate (uuid);

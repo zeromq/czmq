@@ -39,6 +39,7 @@
  *  __UTYPE_HPUX        HP/UX
  *  __UTYPE_ANDROID     Android
  *  __UTYPE_LINUX       Linux
+ *  __UTYPE_GNU         GNU/Hurd
  *  __UTYPE_MIPS        MIPS (BSD 4.3/System V mixture)
  *  __UTYPE_NETBSD      NetBSD
  *  __UTYPE_NEXT        NeXT
@@ -156,6 +157,9 @@
 #   ifndef _DEFAULT_SOURCE
 #   define _DEFAULT_SOURCE                  //  Include stuff from 4.3 BSD Unix
 #   endif
+#elif (defined (__GNU__))
+#   define __UTYPE_GNU
+#   define __UNIX__
 #elif (defined (Mips))
 #   define __UTYPE_MIPS
 #   define __UNIX__

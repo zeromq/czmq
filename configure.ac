@@ -224,6 +224,8 @@ LIBS="${PREVIOUS_LIBS}"
 czmq_on_mingw32="no"
 czmq_on_cygwin="no"
 czmq_on_android="no"
+czmq_on_linux="no"
+czmq_on_gnu="no"
 
 # Host specific checks
 AC_CANONICAL_HOST
@@ -270,6 +272,7 @@ case "${host_os}" in
         # Define on Linux to enable all library features
         CPPFLAGS="-D_GNU_SOURCE -DLINUX $CPPFLAGS"
         AC_DEFINE(CZMQ_HAVE_LINUX, 1, [Have Linux OS])
+        czmq_on_linux="yes"
 
         case "${host_os}" in
             *android*)
@@ -328,6 +331,14 @@ case "${host_os}" in
         AC_DEFINE(CZMQ_HAVE_CYGWIN, 1, [Have Cygwin])
         czmq_on_cygwin="yes"
         ;;
+    gnu*)
+        # Define on GNU/Hurd to enable all library features
+        if test "x$GXX" = "xyes"; then
+            CPPFLAGS="-D_GNU_SOURCE $CPPFLAGS"
+        fi
+        AC_DEFINE(CZMQ_HAVE_GNU, 1, [Have GNU/Hurd OS])
+        czmq_on_gnu="yes"
+        ;;
     *)
         AC_MSG_ERROR([unsupported system: ${host_os}.])
         ;;
@@ -366,6 +377,8 @@ AM_CONDITIONAL(ENABLE_SHARED, test "x$enable_shared" = "xyes")
 AM_CONDITIONAL(ON_MINGW, test "x$czmq_on_mingw32" = "xyes")
 AM_CONDITIONAL(ON_CYGWIN, test "x$czmq_on_cygwin" = "xyes")
 AM_CONDITIONAL(ON_ANDROID, test "x$czmq_on_android" = "xyes")
+AM_CONDITIONAL(ON_LINUX, test "x$czmq_on_linux" = "xyes")
+AM_CONDITIONAL(ON_GNU, test "x$czmq_on_gnu" = "xyes")
 AM_CONDITIONAL(INSTALL_MAN, test "x$czmq_install_man" = "xyes")
 AM_CONDITIONAL(BUILD_DOC, test "x$czmq_build_doc" = "xyes")
 
