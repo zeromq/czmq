@@ -8,32 +8,32 @@
 ******************************************************************
 -->
 
-<method name = "heartbeat ivl" polymorphic = "1">
+<method name = "heartbeat ivl" polymorphic = "1" state = "draft">
     Get socket option `heartbeat_ivl`.
     <return type = "integer" fresh = "1" />
 </method>
 
-<method name = "set heartbeat ivl" polymorphic = "1">
+<method name = "set heartbeat ivl" polymorphic = "1" state = "draft">
     Set socket option `heartbeat_ivl`.
     <argument name = "heartbeat ivl" type = "integer" />
 </method>
 
-<method name = "heartbeat ttl" polymorphic = "1">
+<method name = "heartbeat ttl" polymorphic = "1" state = "draft">
     Get socket option `heartbeat_ttl`.
     <return type = "integer" fresh = "1" />
 </method>
 
-<method name = "set heartbeat ttl" polymorphic = "1">
+<method name = "set heartbeat ttl" polymorphic = "1" state = "draft">
     Set socket option `heartbeat_ttl`.
     <argument name = "heartbeat ttl" type = "integer" />
 </method>
 
-<method name = "heartbeat timeout" polymorphic = "1">
+<method name = "heartbeat timeout" polymorphic = "1" state = "draft">
     Get socket option `heartbeat_timeout`.
     <return type = "integer" fresh = "1" />
 </method>
 
-<method name = "set heartbeat timeout" polymorphic = "1">
+<method name = "set heartbeat timeout" polymorphic = "1" state = "draft">
     Set socket option `heartbeat_timeout`.
     <argument name = "heartbeat timeout" type = "integer" />
 </method>

@@ -29,6 +29,8 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
+//  This class has draft methods, which may change over time. They are not
+//  in stable releases, by default. Use --enable-draft-api to enable.
 
 //  Create a new socket. Returns the new socket, or NULL if the new socket
 //  could not be created. Note that the symbol zsock_new (and other       
@@ -266,15 +268,19 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zsock_brecv (void *self, const char *picture, ...);
 
+#ifdef WITH_DRAFTS
 //  Return socket routing ID if any. This returns 0 if the socket is not
 //  of type ZMQ_SERVER or if no request was already received on it.     
 CZMQ_EXPORT uint32_t
     zsock_routing_id (zsock_t *self);
+#endif // WITH_DRAFTS
 
+#ifdef WITH_DRAFTS
 //  Set routing ID on socket. The socket MUST be of type ZMQ_SERVER.        
 //  This will be used when sending messages on the socket via the zsock API.
 CZMQ_EXPORT void
     zsock_set_routing_id (zsock_t *self, uint32_t routing_id);
+#endif // WITH_DRAFTS
 
 //  Set socket to use unbounded pipes (HWM=0); use this in cases when you are
 //  totally certain the message volume can fit in memory. This method works  
@@ -315,32 +321,44 @@ CZMQ_EXPORT bool
 CZMQ_EXPORT void *
     zsock_resolve (void *self);
 
+#ifdef WITH_DRAFTS
 //  Get socket option `heartbeat_ivl`.
 //  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_heartbeat_ivl (void *self);
+#endif // WITH_DRAFTS
 
+#ifdef WITH_DRAFTS
 //  Set socket option `heartbeat_ivl`.
 CZMQ_EXPORT void
     zsock_set_heartbeat_ivl (void *self, int heartbeat_ivl);
+#endif // WITH_DRAFTS
 
+#ifdef WITH_DRAFTS
 //  Get socket option `heartbeat_ttl`.
 //  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_heartbeat_ttl (void *self);
+#endif // WITH_DRAFTS
 
+#ifdef WITH_DRAFTS
 //  Set socket option `heartbeat_ttl`.
 CZMQ_EXPORT void
     zsock_set_heartbeat_ttl (void *self, int heartbeat_ttl);
+#endif // WITH_DRAFTS
 
+#ifdef WITH_DRAFTS
 //  Get socket option `heartbeat_timeout`.
 //  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT int
     zsock_heartbeat_timeout (void *self);
+#endif // WITH_DRAFTS
 
+#ifdef WITH_DRAFTS
 //  Set socket option `heartbeat_timeout`.
 CZMQ_EXPORT void
     zsock_set_heartbeat_timeout (void *self, int heartbeat_timeout);
+#endif // WITH_DRAFTS
 
 //  Get socket option `tos`.
 //  The caller owns the return value and must destroy it when done with it.

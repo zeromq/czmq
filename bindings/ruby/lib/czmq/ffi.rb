@@ -87,7 +87,14 @@ module CZMQ
       attach_function :zcert_public_txt, [:pointer], :pointer, **opts
       attach_function :zcert_secret_txt, [:pointer], :pointer, **opts
       attach_function :zcert_set_meta, [:pointer, :string, :string, :varargs], :void, **opts
-      attach_function :zcert_unset_meta, [:pointer, :string], :void, **opts
+      begin # DRAFT method
+        attach_function :zcert_unset_meta, [:pointer, :string], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function unset_meta() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
       attach_function :zcert_meta, [:pointer, :string], :pointer, **opts
       attach_function :zcert_meta_keys, [:pointer], :pointer, **opts
       attach_function :zcert_save, [:pointer, :string], :int, **opts
@@ -270,8 +277,22 @@ module CZMQ
       attach_function :zframe_streq, [:pointer, :string], :bool, **opts
       attach_function :zframe_more, [:pointer], :int, **opts
       attach_function :zframe_set_more, [:pointer, :int], :void, **opts
-      attach_function :zframe_routing_id, [:pointer], :uint32, **opts
-      attach_function :zframe_set_routing_id, [:pointer, :uint32], :void, **opts
+      begin # DRAFT method
+        attach_function :zframe_routing_id, [:pointer], :uint32, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function routing_id() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zframe_set_routing_id, [:pointer, :uint32], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function set_routing_id() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
       attach_function :zframe_eq, [:pointer, :pointer], :bool, **opts
       attach_function :zframe_reset, [:pointer, :pointer, :size_t], :void, **opts
       attach_function :zframe_print, [:pointer, :string], :void, **opts
@@ -384,8 +405,22 @@ module CZMQ
       attach_function :zlistx_add_start, [:pointer, :pointer], :pointer, **opts
       attach_function :zlistx_add_end, [:pointer, :pointer], :pointer, **opts
       attach_function :zlistx_size, [:pointer], :size_t, **opts
-      attach_function :zlistx_head, [:pointer], :pointer, **opts
-      attach_function :zlistx_tail, [:pointer], :pointer, **opts
+      begin # DRAFT method
+        attach_function :zlistx_head, [:pointer], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function head() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zlistx_tail, [:pointer], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function tail() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
       attach_function :zlistx_first, [:pointer], :pointer, **opts
       attach_function :zlistx_next, [:pointer], :pointer, **opts
       attach_function :zlistx_prev, [:pointer], :pointer, **opts
@@ -427,7 +462,14 @@ module CZMQ
       attach_function :zloop_set_ticket_delay, [:pointer, :size_t], :void, **opts
       attach_function :zloop_set_max_timers, [:pointer, :size_t], :void, **opts
       attach_function :zloop_set_verbose, [:pointer, :bool], :void, **opts
-      attach_function :zloop_set_nonstop, [:pointer, :bool], :void, **opts
+      begin # DRAFT method
+        attach_function :zloop_set_nonstop, [:pointer, :bool], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function set_nonstop() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
       attach_function :zloop_start, [:pointer], :int, **opts
       attach_function :zloop_test, [:bool], :void, **opts
 
@@ -443,8 +485,22 @@ module CZMQ
       attach_function :zmsg_sendm, [:pointer, :pointer], :int, **opts
       attach_function :zmsg_size, [:pointer], :size_t, **opts
       attach_function :zmsg_content_size, [:pointer], :size_t, **opts
-      attach_function :zmsg_routing_id, [:pointer], :uint32, **opts
-      attach_function :zmsg_set_routing_id, [:pointer, :uint32], :void, **opts
+      begin # DRAFT method
+        attach_function :zmsg_routing_id, [:pointer], :uint32, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function routing_id() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zmsg_set_routing_id, [:pointer, :uint32], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function set_routing_id() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
       attach_function :zmsg_prepend, [:pointer, :pointer], :int, **opts
       attach_function :zmsg_append, [:pointer, :pointer], :int, **opts
       attach_function :zmsg_pop, [:pointer], :pointer, **opts
@@ -476,7 +532,14 @@ module CZMQ
       attach_function :zpoller_destroy, [:pointer], :void, **opts
       attach_function :zpoller_add, [:pointer, :pointer], :int, **opts
       attach_function :zpoller_remove, [:pointer, :pointer], :int, **opts
-      attach_function :zpoller_set_nonstop, [:pointer, :bool], :void, **opts
+      begin # DRAFT method
+        attach_function :zpoller_set_nonstop, [:pointer, :bool], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function set_nonstop() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
       attach_function :zpoller_wait, [:pointer, :int], :pointer, **opts
       attach_function :zpoller_expired, [:pointer], :bool, **opts
       attach_function :zpoller_terminated, [:pointer], :bool, **opts
@@ -484,25 +547,158 @@ module CZMQ
 
       require_relative 'ffi/zpoller'
 
-      attach_function :zproc_czmq_version, [], :int, **opts
-      attach_function :zproc_interrupted, [], :bool, **opts
-      attach_function :zproc_has_curve, [], :bool, **opts
-      attach_function :zproc_hostname, [], :pointer, **opts
-      attach_function :zproc_daemonize, [:string], :void, **opts
-      attach_function :zproc_run_as, [:string, :string, :string], :void, **opts
-      attach_function :zproc_set_io_threads, [:size_t], :void, **opts
-      attach_function :zproc_set_max_sockets, [:size_t], :void, **opts
-      attach_function :zproc_set_biface, [:string], :void, **opts
-      attach_function :zproc_biface, [], :string, **opts
-      attach_function :zproc_set_log_ident, [:string], :void, **opts
-      attach_function :zproc_set_log_sender, [:string], :void, **opts
-      attach_function :zproc_set_log_system, [:bool], :void, **opts
-      attach_function :zproc_log_error, [:string, :varargs], :void, **opts
-      attach_function :zproc_log_warning, [:string, :varargs], :void, **opts
-      attach_function :zproc_log_notice, [:string, :varargs], :void, **opts
-      attach_function :zproc_log_info, [:string, :varargs], :void, **opts
-      attach_function :zproc_log_debug, [:string, :varargs], :void, **opts
-      attach_function :zproc_test, [:bool], :void, **opts
+      begin # DRAFT method
+        attach_function :zproc_czmq_version, [], :int, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function czmq_version() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_interrupted, [], :bool, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function interrupted() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_has_curve, [], :bool, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function has_curve() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_hostname, [], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function hostname() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_daemonize, [:string], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function daemonize() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_run_as, [:string, :string, :string], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function run_as() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_set_io_threads, [:size_t], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function set_io_threads() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_set_max_sockets, [:size_t], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function set_max_sockets() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_set_biface, [:string], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function set_biface() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_biface, [], :string, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function biface() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_set_log_ident, [:string], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function set_log_ident() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_set_log_sender, [:string], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function set_log_sender() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_set_log_system, [:bool], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function set_log_system() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_log_error, [:string, :varargs], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function log_error() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_log_warning, [:string, :varargs], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function log_warning() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_log_notice, [:string, :varargs], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function log_notice() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_log_info, [:string, :varargs], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function log_info() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_log_debug, [:string, :varargs], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function log_debug() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zproc_test, [:bool], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function test() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
 
       require_relative 'ffi/zproc'
 
@@ -519,8 +715,22 @@ module CZMQ
       attach_function :zsock_new_xsub, [:string], :pointer, **opts
       attach_function :zsock_new_pair, [:string], :pointer, **opts
       attach_function :zsock_new_stream, [:string], :pointer, **opts
-      attach_function :zsock_new_server, [:string], :pointer, **opts
-      attach_function :zsock_new_client, [:string], :pointer, **opts
+      begin # DRAFT method
+        attach_function :zsock_new_server, [:string], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function new_server() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zsock_new_client, [:string], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function new_client() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
       attach_function :zsock_destroy, [:pointer], :void, **opts
       attach_function :zsock_bind, [:pointer, :string, :varargs], :int, **opts
       attach_function :zsock_endpoint, [:pointer], :string, **opts
@@ -535,20 +745,76 @@ module CZMQ
       attach_function :zsock_vrecv, [:pointer, :string, :pointer], :int, **opts
       attach_function :zsock_bsend, [:pointer, :string, :varargs], :int, **opts
       attach_function :zsock_brecv, [:pointer, :string, :varargs], :int, **opts
-      attach_function :zsock_routing_id, [:pointer], :uint32, **opts
-      attach_function :zsock_set_routing_id, [:pointer, :uint32], :void, **opts
+      begin # DRAFT method
+        attach_function :zsock_routing_id, [:pointer], :uint32, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function routing_id() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zsock_set_routing_id, [:pointer, :uint32], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function set_routing_id() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
       attach_function :zsock_set_unbounded, [:pointer], :void, **opts
       attach_function :zsock_signal, [:pointer, :char], :int, **opts
       attach_function :zsock_wait, [:pointer], :int, **opts
       attach_function :zsock_flush, [:pointer], :void, **opts
       attach_function :zsock_is, [:pointer], :bool, **opts
       attach_function :zsock_resolve, [:pointer], :pointer, **opts
-      attach_function :zsock_heartbeat_ivl, [:pointer], :int, **opts
-      attach_function :zsock_set_heartbeat_ivl, [:pointer, :int], :void, **opts
-      attach_function :zsock_heartbeat_ttl, [:pointer], :int, **opts
-      attach_function :zsock_set_heartbeat_ttl, [:pointer, :int], :void, **opts
-      attach_function :zsock_heartbeat_timeout, [:pointer], :int, **opts
-      attach_function :zsock_set_heartbeat_timeout, [:pointer, :int], :void, **opts
+      begin # DRAFT method
+        attach_function :zsock_heartbeat_ivl, [:pointer], :int, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function heartbeat_ivl() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zsock_set_heartbeat_ivl, [:pointer, :int], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function set_heartbeat_ivl() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zsock_heartbeat_ttl, [:pointer], :int, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function heartbeat_ttl() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zsock_set_heartbeat_ttl, [:pointer, :int], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function set_heartbeat_ttl() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zsock_heartbeat_timeout, [:pointer], :int, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function heartbeat_timeout() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :zsock_set_heartbeat_timeout, [:pointer, :int], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function set_heartbeat_timeout() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
       attach_function :zsock_tos, [:pointer], :int, **opts
       attach_function :zsock_set_tos, [:pointer, :int], :void, **opts
       attach_function :zsock_set_router_handover, [:pointer, :int], :void, **opts
@@ -654,23 +920,107 @@ module CZMQ
       attach_function :zstr_sendf, [:pointer, :string, :varargs], :int, **opts
       attach_function :zstr_sendfm, [:pointer, :string, :varargs], :int, **opts
       attach_function :zstr_sendx, [:pointer, :string, :varargs], :int, **opts
-      attach_function :zstr_str, [:pointer], :pointer, **opts
+      begin # DRAFT method
+        attach_function :zstr_str, [:pointer], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function str() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
       attach_function :zstr_free, [:pointer], :void, **opts
       attach_function :zstr_test, [:bool], :void, **opts
 
       require_relative 'ffi/zstr'
 
-      attach_function :ztrie_new, [:pointer], :pointer, **opts
-      attach_function :ztrie_destroy, [:pointer], :void, **opts
-      attach_function :ztrie_insert_route, [:pointer, :string, :pointer, :pointer], :int, **opts
-      attach_function :ztrie_remove_route, [:pointer, :string], :int, **opts
-      attach_function :ztrie_matches, [:pointer, :string], :bool, **opts
-      attach_function :ztrie_hit_data, [:pointer], :pointer, **opts
-      attach_function :ztrie_hit_parameter_count, [:pointer], :size_t, **opts
-      attach_function :ztrie_hit_parameters, [:pointer], :pointer, **opts
-      attach_function :ztrie_hit_asterisk_match, [:pointer], :string, **opts
-      attach_function :ztrie_print, [:pointer], :void, **opts
-      attach_function :ztrie_test, [:bool], :void, **opts
+      begin # DRAFT method
+        attach_function :ztrie_new, [:pointer], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function new() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :ztrie_destroy, [:pointer], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function destroy() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :ztrie_insert_route, [:pointer, :string, :pointer, :pointer], :int, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function insert_route() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :ztrie_remove_route, [:pointer, :string], :int, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function remove_route() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :ztrie_matches, [:pointer, :string], :bool, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function matches() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :ztrie_hit_data, [:pointer], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function hit_data() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :ztrie_hit_parameter_count, [:pointer], :size_t, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function hit_parameter_count() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :ztrie_hit_parameters, [:pointer], :pointer, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function hit_parameters() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :ztrie_hit_asterisk_match, [:pointer], :string, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function hit_asterisk_match() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :ztrie_print, [:pointer], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function print() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
+      begin # DRAFT method
+        attach_function :ztrie_test, [:bool], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function test() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
 
       require_relative 'ffi/ztrie'
 

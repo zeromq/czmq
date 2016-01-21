@@ -23,6 +23,8 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
+//  This class has draft methods, which may change over time. They are not
+//  in stable releases, by default. Use --enable-draft-api to enable.
 
 //  Create new poller, specifying zero or more readers. The list of 
 //  readers ends in a NULL. Each reader can be a zsock_t instance, a
@@ -44,12 +46,14 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zpoller_remove (zpoller_t *self, void *reader);
 
+#ifdef WITH_DRAFTS
 //  By default the poller stops if the process receives a SIGINT or SIGTERM  
 //  signal. This makes it impossible to shut-down message based architectures
 //  like zactors. This method lets you switch off break handling. The default
 //  nonstop setting is off (false).                                          
 CZMQ_EXPORT void
     zpoller_set_nonstop (zpoller_t *self, bool nonstop);
+#endif // WITH_DRAFTS
 
 //  Poll the registered readers for I/O, return first reader that has input.  
 //  The reader will be a libzmq void * socket, or a zsock_t or zactor_t       

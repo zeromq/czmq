@@ -55,7 +55,7 @@
         <argument name = "format" type = "format" />
     </method>
 
-    <method name = "unset meta">
+    <method name = "unset meta" state = "draft" >
         Unset certificate metadata.
         <argument name = "name" type = "string" />
     </method>

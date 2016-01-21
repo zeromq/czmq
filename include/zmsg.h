@@ -23,6 +23,8 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
+//  This class has draft methods, which may change over time. They are not
+//  in stable releases, by default. Use --enable-draft-api to enable.
 
 //  Create a new empty message object
 CZMQ_EXPORT zmsg_t *
@@ -80,15 +82,19 @@ CZMQ_EXPORT size_t
 CZMQ_EXPORT size_t
     zmsg_content_size (zmsg_t *self);
 
+#ifdef WITH_DRAFTS
 //  Return message routing ID, if the message came from a ZMQ_SERVER socket.
 //  Else returns zero.                                                      
 CZMQ_EXPORT uint32_t
     zmsg_routing_id (zmsg_t *self);
+#endif // WITH_DRAFTS
 
+#ifdef WITH_DRAFTS
 //  Set routing ID on message. This is used if/when the message is sent to a
 //  ZMQ_SERVER socket.                                                      
 CZMQ_EXPORT void
     zmsg_set_routing_id (zmsg_t *self, uint32_t routing_id);
+#endif // WITH_DRAFTS
 
 //  Push frame to the front of the message, i.e. before all other frames.  
 //  Message takes ownership of frame, will destroy it when message is sent.

@@ -12,18 +12,24 @@
 *    - RUN 'make code'                                           *
 ******************************************************************
 -->
+.function state(option)
+.  if defined(my.option.state) & my.option.state = 'draft'
+.    return ' state = "draft"'
+.  endif
+.  return ''
+.endfunction
 .for version where major = "4"
 .   for option
 .       if mode = "rw" | mode = "r"
 
-<method name = "$(option.api_name:)" polymorphic = "1">
+<method name = "$(option.api_name:)" polymorphic = "1"$(state(option))>
     Get socket option `$(option.name:)`.
     <return type = "$(option.api_type:)" fresh = "1" />
 </method>
 .       endif
 .       if mode = "rw" | mode = "w"
 
-<method name = "set $(option.api_name:)" polymorphic = "1">
+<method name = "set $(option.api_name:)" polymorphic = "1"$(state(option))>
     Set socket option `$(option.name:)`.
     <argument name = "$(option.api_name:)" type = "$(option.api_type:)" />
 </method>
