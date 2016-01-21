@@ -23,6 +23,8 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
+//  This class has draft methods, which may change over time. They are not
+//  in stable releases, by default. Use --enable-draft-api to enable.
 
 //  Create a new, empty list.
 CZMQ_EXPORT zlistx_t *
@@ -49,13 +51,17 @@ CZMQ_EXPORT void *
 CZMQ_EXPORT size_t
     zlistx_size (zlistx_t *self);
 
+#ifdef WITH_DRAFTS
 //  Return first item in the list, or null, leaves the cursor
 CZMQ_EXPORT void *
     zlistx_head (zlistx_t *self);
+#endif // WITH_DRAFTS
 
+#ifdef WITH_DRAFTS
 //  Return last item in the list, or null, leaves the cursor
 CZMQ_EXPORT void *
     zlistx_tail (zlistx_t *self);
+#endif // WITH_DRAFTS
 
 //  Return the item at the head of list. If the list is empty, returns NULL.
 //  Leaves cursor pointing at the head item, or NULL if the list is empty.  

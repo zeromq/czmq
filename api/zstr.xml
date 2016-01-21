@@ -75,7 +75,7 @@
         <return type = "integer" />
     </method>
 
-    <method name = "str" singleton = "1">
+    <method name = "str" singleton = "1" state = "draft" >
         Accepts a void pointer and returns a fresh character string. If source
         is null, returns an empty string.
         <argument name = "source" type = "anything" />

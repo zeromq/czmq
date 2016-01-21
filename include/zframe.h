@@ -23,6 +23,8 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
+//  This class has draft methods, which may change over time. They are not
+//  in stable releases, by default. Use --enable-draft-api to enable.
 
 #define ZFRAME_MORE 1                       // 
 #define ZFRAME_REUSE 2                      // 
@@ -97,15 +99,19 @@ CZMQ_EXPORT int
 CZMQ_EXPORT void
     zframe_set_more (zframe_t *self, int more);
 
+#ifdef WITH_DRAFTS
 //  Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
 //  Else returns zero.                                                  
 CZMQ_EXPORT uint32_t
     zframe_routing_id (zframe_t *self);
+#endif // WITH_DRAFTS
 
+#ifdef WITH_DRAFTS
 //  Set routing ID on frame. This is used if/when the frame is sent to a
 //  ZMQ_SERVER socket.                                                  
 CZMQ_EXPORT void
     zframe_set_routing_id (zframe_t *self, uint32_t routing_id);
+#endif // WITH_DRAFTS
 
 //  Return TRUE if two frames have identical size and data
 //  If either frame is NULL, equality is always false.    

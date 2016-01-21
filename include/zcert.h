@@ -23,6 +23,8 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
+//  This class has draft methods, which may change over time. They are not
+//  in stable releases, by default. Use --enable-draft-api to enable.
 
 //  Create and initialize a new certificate in memory
 CZMQ_EXPORT zcert_t *
@@ -60,9 +62,11 @@ CZMQ_EXPORT char *
 CZMQ_EXPORT void
     zcert_set_meta (zcert_t *self, const char *name, const char *format, ...) CHECK_PRINTF (3);
 
+#ifdef WITH_DRAFTS
 //  Unset certificate metadata.
 CZMQ_EXPORT void
     zcert_unset_meta (zcert_t *self, const char *name);
+#endif // WITH_DRAFTS
 
 //  Get metadata value from certificate; if the metadata value doesn't
 //  exist, returns NULL.                                              

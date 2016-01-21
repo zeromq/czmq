@@ -158,7 +158,7 @@
         <argument name = "verbose" type = "boolean" />
     </method>
 
-    <method name = "set nonstop">
+    <method name = "set nonstop" state = "draft" >
         By default the reactor stops if the process receives a SIGINT or SIGTERM
         signal. This makes it impossible to shut-down message based architectures
         like zactors. This method lets you switch off break handling. The default

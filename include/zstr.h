@@ -23,6 +23,8 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
+//  This class has draft methods, which may change over time. They are not
+//  in stable releases, by default. Use --enable-draft-api to enable.
 
 //  Receive C string from socket. Caller must free returned string using
 //  zstr_free(). Returns NULL if the context is being terminated or the 
@@ -70,11 +72,13 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zstr_sendx (void *dest, const char *string, ...);
 
+#ifdef WITH_DRAFTS
 //  Accepts a void pointer and returns a fresh character string. If source
 //  is null, returns an empty string.                                     
 //  The caller owns the return value and must destroy it when done with it.
 CZMQ_EXPORT char *
     zstr_str (void *source);
+#endif // WITH_DRAFTS
 
 //  Free a provided string, and nullify the parent pointer. Safe to call on
 //  a null pointer.                                                        
