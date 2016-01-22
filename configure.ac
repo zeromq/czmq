@@ -427,9 +427,14 @@ AM_COND_IF([WITH_SYSTEMD],
         [AC_MSG_ERROR([Cannot find required package for systemd. Note, pkg-config is required due to specified version >= 200])])],
     [])
 
-# enable draft API by default if we're in a git repository
-# else disable it by default; then allow --with-draft=yes/no override
-AC_CHECK_FILE(.git, [gitmaster=yes], [gitmaster=no])
+if test "x$cross_compiling" = "xyes"; then
+    #   Enable draft by default when cross-compiling
+    gitmaster=yes
+else
+    # enable draft API by default if we're in a git repository
+    # else disable it by default; then allow --with-draft=yes/no override
+    AC_CHECK_FILE(.git, [gitmaster=yes], [gitmaster=no])
+fi
 
 AC_ARG_WITH([drafts],
     AS_HELP_STRING([--with-drafts],
