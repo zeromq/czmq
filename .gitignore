@@ -1,3 +1,4 @@
+save.xml
 INSTALL
 Makefile
 Makefile.in
@@ -115,6 +116,11 @@ test-suite.log
 moc_*
 build-*
 build_cmake
+
+# GYP files
+project.Makefile
+*.target.mk
+out/
 
 # CMake cache
 CMakeCache.txt
