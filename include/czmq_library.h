@@ -49,6 +49,7 @@
 #endif
 
 //  Opaque class structures to allow forward references
+//  These classes are stable or legacy and built in all releases
 typedef struct _zactor_t zactor_t;
 #define ZACTOR_T_DEFINED
 typedef struct _zarmour_t zarmour_t;
@@ -127,16 +128,16 @@ typedef struct _zsockopt_t zsockopt_t;
 #define ZSOCKOPT_T_DEFINED
 typedef struct _zthread_t zthread_t;
 #define ZTHREAD_T_DEFINED
-
-//  Draft APIs, excluded by default in stable releases
-#ifdef WITH_DRAFTS
+//  Draft classes are by default not built stable releases
+#ifdef CZMQ_BUILD_DRAFT_API
 typedef struct _zproc_t zproc_t;
 #define ZPROC_T_DEFINED
 typedef struct _ztrie_t ztrie_t;
 #define ZTRIE_T_DEFINED
-#endif // WITH_DRAFTS
+#endif // CZMQ_BUILD_DRAFT_API
 
-//  Public API classes
+
+//  Public classes, each with its own header file
 #include "zactor.h"
 #include "zarmour.h"
 #include "zcert.h"
@@ -176,12 +177,10 @@ typedef struct _ztrie_t ztrie_t;
 #include "zsocket.h"
 #include "zsockopt.h"
 #include "zthread.h"
-
-//  Draft APIs, excluded by default in stable releases
-#ifdef WITH_DRAFTS
+#ifdef CZMQ_BUILD_DRAFT_API
 #include "zproc.h"
 #include "ztrie.h"
-#endif // WITH_DRAFTS
+#endif // CZMQ_BUILD_DRAFT_API
 
 #endif
 /*

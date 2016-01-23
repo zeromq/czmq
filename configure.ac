@@ -383,24 +383,14 @@ AM_CONDITIONAL(INSTALL_MAN, test "x$czmq_install_man" = "xyes")
 AM_CONDITIONAL(BUILD_DOC, test "x$czmq_build_doc" = "xyes")
 
 # Check for zmakecert intent
-AC_ARG_WITH([zmakecert],
-    AS_HELP_STRING([--with-zmakecert],
-        [Compile and install the zmakecert program [default=yes].]),
-    [with_zmakecert=$withval],
-    [with_zmakecert=yes])
+AC_ARG_ENABLE([zmakecert],
+    AS_HELP_STRING([--enable-zmakecert],
+        [Compile and install 'zmakecert' [default=yes].]),
+    [enable_zmakecert=$enableval],
+    [enable_zmakecert=yes])
 
-AM_CONDITIONAL([WITH_ZMAKECERT], [test x$with_zmakecert != xno])
-AM_COND_IF([WITH_ZMAKECERT], [AC_MSG_NOTICE([WITH_ZMAKECERT defined])])
-
-# Check for czmq_selftest intent
-AC_ARG_WITH([czmq_selftest],
-    AS_HELP_STRING([--with-czmq_selftest],
-        [Compile the czmq_selftest program [default=yes].]),
-    [with_czmq_selftest=$withval],
-    [with_czmq_selftest=yes])
-
-AM_CONDITIONAL([WITH_CZMQ_SELFTEST], [test x$with_czmq_selftest != xno])
-AM_COND_IF([WITH_CZMQ_SELFTEST], [AC_MSG_NOTICE([WITH_CZMQ_SELFTEST defined])])
+AM_CONDITIONAL([ENABLE_ZMAKECERT], [test x$enable_zmakecert != xno])
+AM_COND_IF([ENABLE_ZMAKECERT], [AC_MSG_NOTICE([ENABLE_ZMAKECERT defined])])
 
 # Checks for library functions.
 AC_TYPE_SIGNAL
@@ -432,24 +422,24 @@ if test "x$cross_compiling" = "xyes"; then
     gitmaster=yes
 else
     # enable draft API by default if we're in a git repository
-    # else disable it by default; then allow --with-draft=yes/no override
+    # else disable it by default; then allow --enable-drafts=yes/no override
     AC_CHECK_FILE(.git, [gitmaster=yes], [gitmaster=no])
 fi
 
-AC_ARG_WITH([drafts],
-    AS_HELP_STRING([--with-drafts],
+AC_ARG_ENABLE([drafts],
+    AS_HELP_STRING([--enable-drafts],
         [Build and install draft classes and methods [default=yes.]]),
-    [with_drafts=$withval],
-    [with_drafts=$gitmaster])
+    [enable_drafts=$withval],
+    [enable_drafts=$gitmaster])
 
-AM_CONDITIONAL([WITH_DRAFTS], [test x$with_drafts != xno])
+AM_CONDITIONAL([ENABLE_DRAFTS], [test x$enable_drafts != xno])
 
-if test "x$with_drafts" = "xyes"; then
-    AC_MSG_NOTICE([building draft, stable, and legacy API])
-    AC_DEFINE(WITH_DRAFTS, 1, [Build and install draft classes and methods.])
-    AC_SUBST(pkg_config_defines, "-DWITH_DRAFTS=1")
+if test "x$enable_drafts" = "xyes"; then
+    AC_MSG_NOTICE([Building stable and legacy API + draft API])
+    AC_DEFINE(CZMQ_BUILD_DRAFT_API, 1, [Provide draft classes and methods.])
+    AC_SUBST(pkg_config_defines, "-DCZMQ_BUILD_DRAFT_API=1")
 else
-    AC_MSG_NOTICE([building stable and legacy API (no drafts)])
+    AC_MSG_NOTICE([Building stable and legacy API (no draft API)])
     AC_SUBST(pkg_config_defines, "")
 fi
 

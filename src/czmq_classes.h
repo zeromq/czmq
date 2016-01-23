@@ -27,4 +27,111 @@
 //  Internal API
 #include "zgossip_msg.h"
 
+//  *** Draft method, defined for internal use only ***
+//  Unset certificate metadata.
+CZMQ_EXPORT void
+    zcert_unset_meta (zcert_t *self, const char *name);
+
+//  *** Draft method, defined for internal use only ***
+//  Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
+//  Else returns zero.                                                  
+CZMQ_EXPORT uint32_t
+    zframe_routing_id (zframe_t *self);
+
+//  *** Draft method, defined for internal use only ***
+//  Set routing ID on frame. This is used if/when the frame is sent to a
+//  ZMQ_SERVER socket.                                                  
+CZMQ_EXPORT void
+    zframe_set_routing_id (zframe_t *self, uint32_t routing_id);
+
+//  *** Draft method, defined for internal use only ***
+//  By default the reactor stops if the process receives a SIGINT or SIGTERM 
+//  signal. This makes it impossible to shut-down message based architectures
+//  like zactors. This method lets you switch off break handling. The default
+//  nonstop setting is off (false).                                          
+CZMQ_EXPORT void
+    zloop_set_nonstop (zloop_t *self, bool nonstop);
+
+//  *** Draft method, defined for internal use only ***
+//  Return message routing ID, if the message came from a ZMQ_SERVER socket.
+//  Else returns zero.                                                      
+CZMQ_EXPORT uint32_t
+    zmsg_routing_id (zmsg_t *self);
+
+//  *** Draft method, defined for internal use only ***
+//  Set routing ID on message. This is used if/when the message is sent to a
+//  ZMQ_SERVER socket.                                                      
+CZMQ_EXPORT void
+    zmsg_set_routing_id (zmsg_t *self, uint32_t routing_id);
+
+//  *** Draft method, defined for internal use only ***
+//  By default the poller stops if the process receives a SIGINT or SIGTERM  
+//  signal. This makes it impossible to shut-down message based architectures
+//  like zactors. This method lets you switch off break handling. The default
+//  nonstop setting is off (false).                                          
+CZMQ_EXPORT void
+    zpoller_set_nonstop (zpoller_t *self, bool nonstop);
+
+//  *** Draft method, defined for internal use only ***
+//  Create a SERVER socket. Default action is bind.
+CZMQ_EXPORT zsock_t *
+    zsock_new_server (const char *endpoint);
+
+//  *** Draft method, defined for internal use only ***
+//  Create a CLIENT socket. Default action is connect.
+CZMQ_EXPORT zsock_t *
+    zsock_new_client (const char *endpoint);
+
+//  *** Draft method, defined for internal use only ***
+//  Return socket routing ID if any. This returns 0 if the socket is not
+//  of type ZMQ_SERVER or if no request was already received on it.     
+CZMQ_EXPORT uint32_t
+    zsock_routing_id (zsock_t *self);
+
+//  *** Draft method, defined for internal use only ***
+//  Set routing ID on socket. The socket MUST be of type ZMQ_SERVER.        
+//  This will be used when sending messages on the socket via the zsock API.
+CZMQ_EXPORT void
+    zsock_set_routing_id (zsock_t *self, uint32_t routing_id);
+
+//  *** Draft method, defined for internal use only ***
+//  Get socket option `heartbeat_ivl`.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_heartbeat_ivl (void *self);
+
+//  *** Draft method, defined for internal use only ***
+//  Set socket option `heartbeat_ivl`.
+CZMQ_EXPORT void
+    zsock_set_heartbeat_ivl (void *self, int heartbeat_ivl);
+
+//  *** Draft method, defined for internal use only ***
+//  Get socket option `heartbeat_ttl`.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_heartbeat_ttl (void *self);
+
+//  *** Draft method, defined for internal use only ***
+//  Set socket option `heartbeat_ttl`.
+CZMQ_EXPORT void
+    zsock_set_heartbeat_ttl (void *self, int heartbeat_ttl);
+
+//  *** Draft method, defined for internal use only ***
+//  Get socket option `heartbeat_timeout`.
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT int
+    zsock_heartbeat_timeout (void *self);
+
+//  *** Draft method, defined for internal use only ***
+//  Set socket option `heartbeat_timeout`.
+CZMQ_EXPORT void
+    zsock_set_heartbeat_timeout (void *self, int heartbeat_timeout);
+
+//  *** Draft method, defined for internal use only ***
+//  Accepts a void pointer and returns a fresh character string. If source
+//  is null, returns an empty string.                                     
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT char *
+    zstr_str (void *source);
+
 #endif

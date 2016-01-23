@@ -24,8 +24,7 @@ extern "C" {
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
 //  This class has draft methods, which may change over time. They are not
-//  in stable releases, by default. Use --enable-draft-api to enable.
-
+//  in stable releases, by default. Use --enable-drafts to enable.
 //  Create and initialize a new certificate in memory
 CZMQ_EXPORT zcert_t *
     zcert_new (void);
@@ -62,12 +61,6 @@ CZMQ_EXPORT char *
 CZMQ_EXPORT void
     zcert_set_meta (zcert_t *self, const char *name, const char *format, ...) CHECK_PRINTF (3);
 
-#ifdef WITH_DRAFTS
-//  Unset certificate metadata.
-CZMQ_EXPORT void
-    zcert_unset_meta (zcert_t *self, const char *name);
-#endif // WITH_DRAFTS
-
 //  Get metadata value from certificate; if the metadata value doesn't
 //  exist, returns NULL.                                              
 CZMQ_EXPORT char *
@@ -99,7 +92,7 @@ CZMQ_EXPORT void
 
 //  Return copy of certificate; if certificate is NULL or we exhausted
 //  heap memory, returns NULL.                                        
-//  The caller owns the return value and must destroy it when done with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zcert_t *
     zcert_dup (zcert_t *self);
 
@@ -119,6 +112,14 @@ CZMQ_EXPORT void
 //  Self test of this class
 CZMQ_EXPORT void
     zcert_test (bool verbose);
+
+#ifdef CZMQ_BUILD_DRAFT_API
+//  *** Draft method, for development use, may change without warning ***
+//  Unset certificate metadata.
+CZMQ_EXPORT void
+    zcert_unset_meta (zcert_t *self, const char *name);
+
+#endif // CZMQ_BUILD_DRAFT_API
 //  @end
 
 #ifdef __cplusplus

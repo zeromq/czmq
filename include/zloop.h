@@ -24,8 +24,7 @@ extern "C" {
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
 //  This class has draft methods, which may change over time. They are not
-//  in stable releases, by default. Use --enable-draft-api to enable.
-
+//  in stable releases, by default. Use --enable-drafts to enable.
 // Callback function for reactor socket activity
 typedef int (zloop_reader_fn) (
     zloop_t *loop, zsock_t *reader, void *arg);
@@ -135,15 +134,6 @@ CZMQ_EXPORT void
 CZMQ_EXPORT void
     zloop_set_verbose (zloop_t *self, bool verbose);
 
-#ifdef WITH_DRAFTS
-//  By default the reactor stops if the process receives a SIGINT or SIGTERM 
-//  signal. This makes it impossible to shut-down message based architectures
-//  like zactors. This method lets you switch off break handling. The default
-//  nonstop setting is off (false).                                          
-CZMQ_EXPORT void
-    zloop_set_nonstop (zloop_t *self, bool nonstop);
-#endif // WITH_DRAFTS
-
 //  Start the reactor. Takes control of the thread and returns when the 0MQ  
 //  context is terminated or the process is interrupted, or any event handler
 //  returns -1. Event handlers may register new sockets and timers, and      
@@ -154,6 +144,17 @@ CZMQ_EXPORT int
 //  Self test of this class.
 CZMQ_EXPORT void
     zloop_test (bool verbose);
+
+#ifdef CZMQ_BUILD_DRAFT_API
+//  *** Draft method, for development use, may change without warning ***
+//  By default the reactor stops if the process receives a SIGINT or SIGTERM 
+//  signal. This makes it impossible to shut-down message based architectures
+//  like zactors. This method lets you switch off break handling. The default
+//  nonstop setting is off (false).                                          
+CZMQ_EXPORT void
+    zloop_set_nonstop (zloop_t *self, bool nonstop);
+
+#endif // CZMQ_BUILD_DRAFT_API
 //  @end
 
 //  Deprecated method aliases

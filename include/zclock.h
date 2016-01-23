@@ -23,7 +23,6 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
-
 //  Sleep for a number of milliseconds
 CZMQ_EXPORT void
     zclock_sleep (int msecs);
@@ -47,13 +46,14 @@ CZMQ_EXPORT int64_t
     zclock_usecs (void);
 
 //  Return formatted date/time as fresh string. Free using zstr_free().
-//  The caller owns the return value and must destroy it when done with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT char *
     zclock_timestr (void);
 
 //  Self test of this class.
 CZMQ_EXPORT void
     zclock_test (bool verbose);
+
 //  @end
 
 //  DEPRECATED in favor of zsys logging, see issue #519

@@ -24,8 +24,7 @@ extern "C" {
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
 //  This class has draft methods, which may change over time. They are not
-//  in stable releases, by default. Use --enable-draft-api to enable.
-
+//  in stable releases, by default. Use --enable-drafts to enable.
 #define ZFRAME_MORE 1                       // 
 #define ZFRAME_REUSE 2                      // 
 #define ZFRAME_DONTWAIT 4                   // 
@@ -69,19 +68,19 @@ CZMQ_EXPORT byte *
 
 //  Create a new frame that duplicates an existing frame. If frame is null,
 //  or memory was exhausted, returns null.                                 
-//  The caller owns the return value and must destroy it when done with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zframe_t *
     zframe_dup (zframe_t *self);
 
 //  Return frame data encoded as printable hex string, useful for 0MQ UUIDs.
 //  Caller must free string when finished with it.                          
-//  The caller owns the return value and must destroy it when done with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT char *
     zframe_strhex (zframe_t *self);
 
 //  Return frame data copied into freshly allocated string
 //  Caller must free string when finished with it.        
-//  The caller owns the return value and must destroy it when done with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT char *
     zframe_strdup (zframe_t *self);
 
@@ -98,20 +97,6 @@ CZMQ_EXPORT int
 //  frame to socket, you have to specify flag explicitly.                
 CZMQ_EXPORT void
     zframe_set_more (zframe_t *self, int more);
-
-#ifdef WITH_DRAFTS
-//  Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
-//  Else returns zero.                                                  
-CZMQ_EXPORT uint32_t
-    zframe_routing_id (zframe_t *self);
-#endif // WITH_DRAFTS
-
-#ifdef WITH_DRAFTS
-//  Set routing ID on frame. This is used if/when the frame is sent to a
-//  ZMQ_SERVER socket.                                                  
-CZMQ_EXPORT void
-    zframe_set_routing_id (zframe_t *self, uint32_t routing_id);
-#endif // WITH_DRAFTS
 
 //  Return TRUE if two frames have identical size and data
 //  If either frame is NULL, equality is always false.    
@@ -134,6 +119,21 @@ CZMQ_EXPORT bool
 //  Self test of this class.
 CZMQ_EXPORT void
     zframe_test (bool verbose);
+
+#ifdef CZMQ_BUILD_DRAFT_API
+//  *** Draft method, for development use, may change without warning ***
+//  Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
+//  Else returns zero.                                                  
+CZMQ_EXPORT uint32_t
+    zframe_routing_id (zframe_t *self);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Set routing ID on frame. This is used if/when the frame is sent to a
+//  ZMQ_SERVER socket.                                                  
+CZMQ_EXPORT void
+    zframe_set_routing_id (zframe_t *self, uint32_t routing_id);
+
+#endif // CZMQ_BUILD_DRAFT_API
 //  @end
 
 //  DEPRECATED as poor style -- callers should use zloop or zpoller

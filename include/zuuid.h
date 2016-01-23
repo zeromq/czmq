@@ -26,7 +26,6 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
-
 //  Create a new UUID object.
 CZMQ_EXPORT zuuid_t *
     zuuid_new (void);
@@ -86,6 +85,7 @@ CZMQ_EXPORT zuuid_t *
 //  Self test of this class.
 CZMQ_EXPORT void
     zuuid_test (bool verbose);
+
 //  @end
 
 #ifdef __cplusplus

@@ -23,7 +23,6 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
-
 //  Create a new certificate store from a disk directory, loading and        
 //  indexing all certificates in that location. The directory itself may be  
 //  absent, and created later, or modified at any time. The certificate store
@@ -61,6 +60,7 @@ CZMQ_EXPORT void
 //  Self test of this class
 CZMQ_EXPORT void
     zcertstore_test (bool verbose);
+
 //  @end
 
 #ifdef __cplusplus

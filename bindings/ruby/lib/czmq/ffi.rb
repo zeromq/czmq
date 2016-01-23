@@ -405,22 +405,8 @@ module CZMQ
       attach_function :zlistx_add_start, [:pointer, :pointer], :pointer, **opts
       attach_function :zlistx_add_end, [:pointer, :pointer], :pointer, **opts
       attach_function :zlistx_size, [:pointer], :size_t, **opts
-      begin # DRAFT method
-        attach_function :zlistx_head, [:pointer], :pointer, **opts
-      rescue ::FFI::NotFoundError
-        if $VERBOSE || $DEBUG
-          warn "The function head() can't be used through " +
-               "this Ruby binding because it's not available."
-        end
-      end
-      begin # DRAFT method
-        attach_function :zlistx_tail, [:pointer], :pointer, **opts
-      rescue ::FFI::NotFoundError
-        if $VERBOSE || $DEBUG
-          warn "The function tail() can't be used through " +
-               "this Ruby binding because it's not available."
-        end
-      end
+      attach_function :zlistx_head, [:pointer], :pointer, **opts
+      attach_function :zlistx_tail, [:pointer], :pointer, **opts
       attach_function :zlistx_first, [:pointer], :pointer, **opts
       attach_function :zlistx_next, [:pointer], :pointer, **opts
       attach_function :zlistx_prev, [:pointer], :pointer, **opts
@@ -691,14 +677,7 @@ module CZMQ
                "this Ruby binding because it's not available."
         end
       end
-      begin # DRAFT method
-        attach_function :zproc_test, [:bool], :void, **opts
-      rescue ::FFI::NotFoundError
-        if $VERBOSE || $DEBUG
-          warn "The function test() can't be used through " +
-               "this Ruby binding because it's not available."
-        end
-      end
+      attach_function :zproc_test, [:bool], :void, **opts
 
       require_relative 'ffi/zproc'
 
@@ -1013,14 +992,7 @@ module CZMQ
                "this Ruby binding because it's not available."
         end
       end
-      begin # DRAFT method
-        attach_function :ztrie_test, [:bool], :void, **opts
-      rescue ::FFI::NotFoundError
-        if $VERBOSE || $DEBUG
-          warn "The function test() can't be used through " +
-               "this Ruby binding because it's not available."
-        end
-      end
+      attach_function :ztrie_test, [:bool], :void, **opts
 
       require_relative 'ffi/ztrie'
 

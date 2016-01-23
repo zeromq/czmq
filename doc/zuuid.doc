@@ -9,6 +9,8 @@ Please add @discuss section in ../src/zuuid.c.
 
 This is the class interface:
 
+    //  This is a stable class, and may not change except for emergencies. It
+    //  is provided in stable builds.
     //  Create a new UUID object.
     CZMQ_EXPORT zuuid_t *
         zuuid_new (void);
@@ -68,6 +70,7 @@ This is the class interface:
     //  Self test of this class.
     CZMQ_EXPORT void
         zuuid_test (bool verbose);
+    
 
 This is the class self test code:
 

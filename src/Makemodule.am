@@ -56,7 +56,7 @@ include_HEADERS = \
     include/zthread.h \
     include/czmq_library.h
 
-if WITH_DRAFTS
+if ENABLE_DRAFTS
 include_HEADERS += \
     include/zproc.h \
     include/ztrie.h
@@ -113,7 +113,7 @@ src_libczmq_la_SOURCES = \
     src/foreign/slre/readme.txt \
     src/platform.h
 
-if WITH_DRAFTS
+if ENABLE_DRAFTS
 src_libczmq_la_SOURCES += \
     src/zproc.c \
     src/ztrie.c
@@ -139,7 +139,7 @@ endif
 
 src_libczmq_la_LIBADD = ${project_libs}
 
-if WITH_ZMAKECERT
+if ENABLE_ZMAKECERT
 bin_PROGRAMS += src/zmakecert
 src_zmakecert_CPPFLAGS = ${AM_CPPFLAGS}
 src_zmakecert_LDADD = ${program_libs}
@@ -147,8 +147,7 @@ src_zmakecert_SOURCES = src/zmakecert.c
 if WITH_SYSTEMD
 endif #WITH_SYSTEMD
 
-endif #WITH_ZMAKECERT
-if WITH_CZMQ_SELFTEST
+endif #ENABLE_ZMAKECERT
 check_PROGRAMS += src/czmq_selftest
 noinst_PROGRAMS += src/czmq_selftest
 src_czmq_selftest_CPPFLAGS = ${AM_CPPFLAGS}
@@ -157,7 +156,6 @@ src_czmq_selftest_SOURCES = src/czmq_selftest.c
 if WITH_SYSTEMD
 endif #WITH_SYSTEMD
 
-endif #WITH_CZMQ_SELFTEST
 
 # Install api files into /usr/local/share/zproject
 apidir = @datadir@/zproject/czmq

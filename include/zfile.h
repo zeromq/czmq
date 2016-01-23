@@ -23,7 +23,6 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
-
 //  If file exists, populates properties. CZMQ supports portable symbolic
 //  links, which are files with the extension ".ln". A symbolic link is a
 //  text file containing one line, the filename of a target file. Reading
@@ -38,7 +37,7 @@ CZMQ_EXPORT void
 
 //  Duplicate a file item, returns a newly constructed item. If the file
 //  is null, or memory was exhausted, returns null.                     
-//  The caller owns the return value and must destroy it when done with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zfile_t *
     zfile_dup (zfile_t *self);
 
@@ -111,7 +110,7 @@ CZMQ_EXPORT int
 
 //  Read chunk from file at specified position. If this was the last chunk,
 //  sets the eof property. Returns a null chunk in case of error.          
-//  The caller owns the return value and must destroy it when done with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zchunk_t *
     zfile_read (zfile_t *self, size_t bytes, off_t offset);
 
@@ -144,6 +143,7 @@ CZMQ_EXPORT const char *
 //  Self test of this class.
 CZMQ_EXPORT void
     zfile_test (bool verbose);
+
 //  @end
 
 //  @interface

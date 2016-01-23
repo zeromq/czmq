@@ -17,10 +17,14 @@ Recv   | 6 | S t r i n g |  ---->   | S t r i n g | 0 |
 
 This is the class interface:
 
+    //  This is a stable class, and may not change except for emergencies. It
+    //  is provided in stable builds.
+    //  This class has draft methods, which may change over time. They are not
+    //  in stable releases, by default. Use --enable-drafts to enable.
     //  Receive C string from socket. Caller must free returned string using
     //  zstr_free(). Returns NULL if the context is being terminated or the 
     //  process was interrupted.                                            
-    //  The caller is responsible for destroying the return value when finished with it.
+    //  Caller owns return value and must destroy it when done.
     CZMQ_EXPORT char *
         zstr_recv (void *source);
     
@@ -63,12 +67,6 @@ This is the class interface:
     CZMQ_EXPORT int
         zstr_sendx (void *dest, const char *string, ...);
     
-    //  Accepts a void pointer and returns a fresh character string. If source
-    //  is null, returns an empty string.                                     
-    //  The caller is responsible for destroying the return value when finished with it.
-    CZMQ_EXPORT char *
-        zstr_str (void *source);
-    
     //  Free a provided string, and nullify the parent pointer. Safe to call on
     //  a null pointer.                                                        
     CZMQ_EXPORT void
@@ -77,6 +75,16 @@ This is the class interface:
     //  Self test of this class.
     CZMQ_EXPORT void
         zstr_test (bool verbose);
+    
+    #ifdef CZMQ_BUILD_DRAFT_API
+    //  *** Draft method, for development use, may change without warning ***
+    //  Accepts a void pointer and returns a fresh character string. If source
+    //  is null, returns an empty string.                                     
+    //  Caller owns return value and must destroy it when done.
+    CZMQ_EXPORT char *
+        zstr_str (void *source);
+    
+    #endif // CZMQ_BUILD_DRAFT_API
 
 This is the class self test code:
 

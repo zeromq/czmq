@@ -24,8 +24,7 @@ extern "C" {
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
 //  This class has draft methods, which may change over time. They are not
-//  in stable releases, by default. Use --enable-draft-api to enable.
-
+//  in stable releases, by default. Use --enable-drafts to enable.
 //  Create a new empty message object
 CZMQ_EXPORT zmsg_t *
     zmsg_new (void);
@@ -82,20 +81,6 @@ CZMQ_EXPORT size_t
 CZMQ_EXPORT size_t
     zmsg_content_size (zmsg_t *self);
 
-#ifdef WITH_DRAFTS
-//  Return message routing ID, if the message came from a ZMQ_SERVER socket.
-//  Else returns zero.                                                      
-CZMQ_EXPORT uint32_t
-    zmsg_routing_id (zmsg_t *self);
-#endif // WITH_DRAFTS
-
-#ifdef WITH_DRAFTS
-//  Set routing ID on message. This is used if/when the message is sent to a
-//  ZMQ_SERVER socket.                                                      
-CZMQ_EXPORT void
-    zmsg_set_routing_id (zmsg_t *self, uint32_t routing_id);
-#endif // WITH_DRAFTS
-
 //  Push frame to the front of the message, i.e. before all other frames.  
 //  Message takes ownership of frame, will destroy it when message is sent.
 //  Returns 0 on success, -1 on error. Deprecates zmsg_push, which did not 
@@ -111,7 +96,7 @@ CZMQ_EXPORT int
     zmsg_append (zmsg_t *self, zframe_t **frame_p);
 
 //  Remove first frame from message, if any. Returns frame, or NULL.
-//  The caller owns the return value and must destroy it when done with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zframe_t *
     zmsg_pop (zmsg_t *self);
 
@@ -147,7 +132,7 @@ CZMQ_EXPORT int
 
 //  Pop frame off front of message, return as fresh string. If there were
 //  no more frames in the message, returns NULL.                         
-//  The caller owns the return value and must destroy it when done with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT char *
     zmsg_popstr (zmsg_t *self);
 
@@ -159,7 +144,7 @@ CZMQ_EXPORT int
 
 //  Remove first submessage from message, if any. Returns zmsg_t, or NULL if
 //  decoding was not succesful.                                             
-//  The caller owns the return value and must destroy it when done with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zmsg_t *
     zmsg_popmsg (zmsg_t *self);
 
@@ -198,7 +183,7 @@ CZMQ_EXPORT size_t
 
 //  Create copy of message, as new message object. Returns a fresh zmsg_t
 //  object. If message is null, or memory was exhausted, returns null.   
-//  The caller owns the return value and must destroy it when done with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zmsg_t *
     zmsg_dup (zmsg_t *self);
 
@@ -224,6 +209,21 @@ CZMQ_EXPORT bool
 //  Self test of this class.
 CZMQ_EXPORT void
     zmsg_test (bool verbose);
+
+#ifdef CZMQ_BUILD_DRAFT_API
+//  *** Draft method, for development use, may change without warning ***
+//  Return message routing ID, if the message came from a ZMQ_SERVER socket.
+//  Else returns zero.                                                      
+CZMQ_EXPORT uint32_t
+    zmsg_routing_id (zmsg_t *self);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Set routing ID on message. This is used if/when the message is sent to a
+//  ZMQ_SERVER socket.                                                      
+CZMQ_EXPORT void
+    zmsg_set_routing_id (zmsg_t *self, uint32_t routing_id);
+
+#endif // CZMQ_BUILD_DRAFT_API
 //  @end
 
 //  DEPRECATED as over-engineered, poor style

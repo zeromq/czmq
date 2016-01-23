@@ -68,10 +68,10 @@ all_tests [] = {
     { "zsocket", zsocket_test },
     { "zsockopt", zsockopt_test },
     { "zthread", zthread_test },
-#ifdef WITH_DRAFTS
+#ifdef CZMQ_BUILD_DRAFT_API
     { "zproc", zproc_test },
     { "ztrie", ztrie_test },
-#endif // WITH_DRAFTS
+#endif // CZMQ_BUILD_DRAFT_API
     {0, 0}          //  Sentinel
 };
 
