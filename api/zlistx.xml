@@ -40,12 +40,12 @@
         <return type = "size" />
     </method>
 
-    <method name = "head" state = "draft" >
+    <method name = "head">
         Return first item in the list, or null, leaves the cursor
         <return type = "anything" mutable = "1" />
     </method>
 
-    <method name = "tail" state = "draft" >
+    <method name = "tail">
         Return last item in the list, or null, leaves the cursor
         <return type = "anything" mutable = "1" />
     </method>
