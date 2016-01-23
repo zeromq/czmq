@@ -24,7 +24,6 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
-
 // Destroy an item
 typedef void (zhashx_destructor_fn) (
     void **item);
@@ -112,14 +111,14 @@ CZMQ_EXPORT size_t
 //  Return a zlistx_t containing the keys for the items in the       
 //  table. Uses the key_duplicator to duplicate all keys and sets the
 //  key_destructor as destructor for the list.                       
-//  The caller owns the return value and must destroy it when done with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zlistx_t *
     zhashx_keys (zhashx_t *self);
 
 //  Return a zlistx_t containing the values for the items in the  
 //  table. Uses the duplicator to duplicate all items and sets the
 //  destructor as destructor for the list.                        
-//  The caller owns the return value and must destroy it when done with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zlistx_t *
     zhashx_values (zhashx_t *self);
 
@@ -191,7 +190,7 @@ CZMQ_EXPORT int
 //                                                                       
 //  Comments are not included in the packed data. Item values MUST be    
 //  strings.                                                             
-//  The caller owns the return value and must destroy it when done with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zframe_t *
     zhashx_pack (zhashx_t *self);
 
@@ -200,7 +199,7 @@ CZMQ_EXPORT zframe_t *
 //  reference. Note that this method's behavior changed slightly for CZMQ 
 //  v3.x, as it does not set nor respect autofree. It does however let you
 //  duplicate any hash table safely. The old behavior is in zhashx_dup_v2.
-//  The caller owns the return value and must destroy it when done with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zhashx_t *
     zhashx_dup (zhashx_t *self);
 
@@ -257,6 +256,7 @@ CZMQ_EXPORT int
 //  Self test of this class.
 CZMQ_EXPORT void
     zhashx_test (bool verbose);
+
 //  @end
 
 #ifdef __cplusplus

@@ -25,7 +25,6 @@ extern "C" {
 //  is provided in stable builds.
 //  This class has legacy methods, which will be removed over time. You
 //  should not use them, and migrate any code that is still using them.
-
 // Callback function for zhash_freefn method
 typedef void (zhash_free_fn) (
     void *data);
@@ -90,12 +89,12 @@ CZMQ_EXPORT size_t
 //  Does not copy items themselves. Rebuilds new table so may be slow on 
 //  very large tables. NOTE: only works with item values that are strings
 //  since there's no other way to know how to duplicate the item value.  
-//  The caller owns the return value and must destroy it when done with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zhash_t *
     zhash_dup (zhash_t *self);
 
 //  Return keys for items in table
-//  The caller owns the return value and must destroy it when done with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zlist_t *
     zhash_keys (zhash_t *self);
 
@@ -148,7 +147,7 @@ CZMQ_EXPORT void
 //                                                                       
 //  Comments are not included in the packed data. Item values MUST be    
 //  strings.                                                             
-//  The caller owns the return value and must destroy it when done with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zframe_t *
     zhash_pack (zhash_t *self);
 
@@ -175,6 +174,7 @@ CZMQ_EXPORT int
 CZMQ_EXPORT void
     zhash_autofree (zhash_t *self);
 
+//  *** Deprecated method, slated for removal: avoid using it ***
 //  Apply function to each item in the hash table. Items are iterated in no
 //  defined order. Stops if callback function returns non-zero and returns 
 //  final return code from callback function (zero = success). Deprecated. 
@@ -184,6 +184,7 @@ CZMQ_EXPORT int
 //  Self test of this class.
 CZMQ_EXPORT void
     zhash_test (bool verbose);
+
 //  @end
 
 #ifdef __cplusplus

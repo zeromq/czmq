@@ -47,14 +47,14 @@ set(
 # options
 ########################################################################
 if (EXISTS ".git")
-    OPTION (WITH_DRAFTS "Build and install draft classes and methods" ON)
+    OPTION (ENABLE_DRAFTS "Build and install draft classes and methods" ON)
 else ()
-    OPTION (WITH_DRAFTS "Build and install draft classes and methods" OFF)
+    OPTION (ENABLE_DRAFTS "Build and install draft classes and methods" OFF)
 endif ()
 
-IF (WITH_DRAFTS)
-    ADD_DEFINITIONS (-DWITH_DRAFTS)
-ENDIF (WITH_DRAFTS)
+IF (ENABLE_DRAFTS)
+    ADD_DEFINITIONS (-DCZMQ_BUILD_DRAFT_API)
+ENDIF (ENABLE_DRAFTS)
 
 ########################################################################
 # platform.h
@@ -198,12 +198,12 @@ set (czmq_headers
     src/foreign/slre/readme.txt
 )
 
-IF (WITH_DRAFTS)
-list(APPEND czmq_headers
-    include/zproc.h
-    include/ztrie.h
-)
-ENDIF (WITH_DRAFTS)
+IF (ENABLE_DRAFTS)
+    list(APPEND czmq_headers
+        include/zproc.h
+        include/ztrie.h
+    )
+ENDIF (ENABLE_DRAFTS)
 
 source_group ("Header Files" FILES ${czmq_headers})
 install(FILES ${czmq_headers} DESTINATION include)
@@ -255,12 +255,12 @@ set (czmq_sources
     src/zthread.c
 )
 
-IF (WITH_DRAFTS)
-list(APPEND czmq_sources
-    src/zproc.c
-    src/ztrie.c
-)
-ENDIF (WITH_DRAFTS)
+IF (ENABLE_DRAFTS)
+    list (APPEND czmq_sources
+        src/zproc.c
+        src/ztrie.c
+    )
+ENDIF (ENABLE_DRAFTS)
 
 source_group("Source Files" FILES ${czmq_sources})
 if (NOT DEFINED BUILD_SHARED_LIBS)
@@ -288,16 +288,16 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/src/CMakeLists-local.txt) # Optional project
 ########################################################################
 # pkgconfig
 ########################################################################
-set(VERSION "${CZMQ_VERSION}")
-set(prefix "${CMAKE_INSTALL_PREFIX}")
-set(exec_prefix "\${prefix}")
-set(libdir "\${prefix}/lib${LIB_SUFFIX}")
-set(includedir "\${prefix}/include")
-IF (WITH_DRAFTS)
-set(pkg_config_defines "-DWITH_DRAFTS=1")
-ELSE (WITH_DRAFTS)
-set(pkg_config_defines "")
-ENDIF (WITH_DRAFTS)
+set (VERSION "${CZMQ_VERSION}")
+set (prefix "${CMAKE_INSTALL_PREFIX}")
+set (exec_prefix "\${prefix}")
+set (libdir "\${prefix}/lib${LIB_SUFFIX}")
+set (includedir "\${prefix}/include")
+IF (ENABLE_DRAFTS)
+    set (pkg_config_defines "-DCZMQ_BUILD_DRAFT_API=1")
+ELSE (ENABLE_DRAFTS)
+    set (pkg_config_defines "")
+ENDIF (ENABLE_DRAFTS)
 configure_file(
     "${SOURCE_DIR}/src/libczmq.pc.in"
     "${SOURCE_DIR}/src/libczmq.pc"
@@ -389,12 +389,12 @@ set(TEST_CLASSES
     zthread
 )
 
-IF (WITH_DRAFTS)
-list(APPEND TEST_CLASSES
+IF (ENABLE_DRAFTS)
+    list (APPEND TEST_CLASSES
     zproc
     ztrie
-)
-ENDIF (WITH_DRAFTS)
+    )
+ENDIF (ENABLE_DRAFTS)
 
 foreach(TEST_CLASS ${TEST_CLASSES})
     add_test(

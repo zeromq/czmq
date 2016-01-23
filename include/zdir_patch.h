@@ -27,7 +27,6 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
-
 // 
 typedef enum {
     ZDIR_PATCH_CREATE = 1,                                  //  
@@ -44,7 +43,7 @@ CZMQ_EXPORT void
 
 //  Create copy of a patch. If the patch is null, or memory was exhausted,
 //  returns null.                                                         
-//  The caller owns the return value and must destroy it when done with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zdir_patch_t *
     zdir_patch_dup (zdir_patch_t *self);
 
@@ -75,6 +74,7 @@ CZMQ_EXPORT const char *
 //  Self test of this class.
 CZMQ_EXPORT void
     zdir_patch_test (bool verbose);
+
 //  @end
 
 #ifdef __cplusplus

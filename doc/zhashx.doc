@@ -11,6 +11,8 @@ and 63 items depending on table size) is detected.
 
 This is the class interface:
 
+    //  This is a stable class, and may not change except for emergencies. It
+    //  is provided in stable builds.
     // Destroy an item
     typedef void (zhashx_destructor_fn) (
         void **item);
@@ -98,14 +100,14 @@ This is the class interface:
     //  Return a zlistx_t containing the keys for the items in the       
     //  table. Uses the key_duplicator to duplicate all keys and sets the
     //  key_destructor as destructor for the list.                       
-    //  The caller is responsible for destroying the return value when finished with it.
+    //  Caller owns return value and must destroy it when done.
     CZMQ_EXPORT zlistx_t *
         zhashx_keys (zhashx_t *self);
     
     //  Return a zlistx_t containing the values for the items in the  
     //  table. Uses the duplicator to duplicate all items and sets the
     //  destructor as destructor for the list.                        
-    //  The caller is responsible for destroying the return value when finished with it.
+    //  Caller owns return value and must destroy it when done.
     CZMQ_EXPORT zlistx_t *
         zhashx_values (zhashx_t *self);
     
@@ -177,7 +179,7 @@ This is the class interface:
     //                                                                       
     //  Comments are not included in the packed data. Item values MUST be    
     //  strings.                                                             
-    //  The caller is responsible for destroying the return value when finished with it.
+    //  Caller owns return value and must destroy it when done.
     CZMQ_EXPORT zframe_t *
         zhashx_pack (zhashx_t *self);
     
@@ -186,7 +188,7 @@ This is the class interface:
     //  reference. Note that this method's behavior changed slightly for CZMQ 
     //  v3.x, as it does not set nor respect autofree. It does however let you
     //  duplicate any hash table safely. The old behavior is in zhashx_dup_v2.
-    //  The caller is responsible for destroying the return value when finished with it.
+    //  Caller owns return value and must destroy it when done.
     CZMQ_EXPORT zhashx_t *
         zhashx_dup (zhashx_t *self);
     
@@ -243,6 +245,7 @@ This is the class interface:
     //  Self test of this class.
     CZMQ_EXPORT void
         zhashx_test (bool verbose);
+    
 
 This is the class self test code:
 

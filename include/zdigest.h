@@ -23,7 +23,6 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
-
 //  Constructor - creates new digest object, which you use to build up a
 //  digest by repeatedly calling zdigest_update() on chunks of data.    
 CZMQ_EXPORT zdigest_t *
@@ -55,6 +54,7 @@ CZMQ_EXPORT char *
 //  Self test of this class.
 CZMQ_EXPORT void
     zdigest_test (bool verbose);
+
 //  @end
 
 #ifdef __cplusplus

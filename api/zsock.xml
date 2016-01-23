@@ -87,12 +87,12 @@
         <argument name = "endpoint" type = "string" />
     </constructor>
 
-    <constructor name = "new server" state = "draft" >
+    <constructor name = "new server" state = "draft">
         Create a SERVER socket. Default action is bind.
         <argument name = "endpoint" type = "string" />
     </constructor>
 
-    <constructor name = "new client" state = "draft" >
+    <constructor name = "new client" state = "draft">
         Create a CLIENT socket. Default action is connect.
         <argument name = "endpoint" type = "string" />
     </constructor>
@@ -289,13 +289,13 @@
         <return type = "integer" />
     </method>
 
-    <method name = "routing id" state = "draft" >
+    <method name = "routing id" state = "draft">
         Return socket routing ID if any. This returns 0 if the socket is not
         of type ZMQ_SERVER or if no request was already received on it.
         <return type = "number" size = "4" />
     </method>
 
-    <method name = "set routing id" state = "draft" >
+    <method name = "set routing id" state = "draft">
         Set routing ID on socket. The socket MUST be of type ZMQ_SERVER.
         This will be used when sending messages on the socket via the zsock API.
         <argument name = "routing id" type = "number" size = "4" />

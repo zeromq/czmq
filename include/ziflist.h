@@ -23,7 +23,6 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
-
 //  Get a list of network interfaces currently defined on the system
 CZMQ_EXPORT ziflist_t *
     ziflist_new (void);
@@ -67,6 +66,7 @@ CZMQ_EXPORT void
 //  Self test of this class.
 CZMQ_EXPORT void
     ziflist_test (bool verbose);
+
 //  @end
 
 #ifdef __cplusplus

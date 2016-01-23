@@ -7,6 +7,8 @@ Please add @discuss section in ../src/zdir_patch.c.
 
 This is the class interface:
 
+    //  This is a stable class, and may not change except for emergencies. It
+    //  is provided in stable builds.
     // 
     typedef enum {
         ZDIR_PATCH_CREATE = 1,                                  //  
@@ -23,7 +25,7 @@ This is the class interface:
     
     //  Create copy of a patch. If the patch is null, or memory was exhausted,
     //  returns null.                                                         
-    //  The caller is responsible for destroying the return value when finished with it.
+    //  Caller owns return value and must destroy it when done.
     CZMQ_EXPORT zdir_patch_t *
         zdir_patch_dup (zdir_patch_t *self);
     
@@ -54,6 +56,7 @@ This is the class interface:
     //  Self test of this class.
     CZMQ_EXPORT void
         zdir_patch_test (bool verbose);
+    
 
 This is the class self test code:
 

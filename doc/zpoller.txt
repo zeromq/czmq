@@ -8,6 +8,10 @@ zpoller - trivial socket poller class
 SYNOPSIS
 --------
 ----
+//  This is a stable class, and may not change except for emergencies. It
+//  is provided in stable builds.
+//  This class has draft methods, which may change over time. They are not
+//  in stable releases, by default. Use --enable-drafts to enable.
 //  Create new poller, specifying zero or more readers. The list of 
 //  readers ends in a NULL. Each reader can be a zsock_t instance, a
 //  zactor_t instance, a libzmq socket (void *), or a file handle.  
@@ -27,13 +31,6 @@ CZMQ_EXPORT int
 //  must have been passed during construction, or in an zpoller_add () call.   
 CZMQ_EXPORT int
     zpoller_remove (zpoller_t *self, void *reader);
-
-//  By default the poller stops if the process receives a SIGINT or SIGTERM  
-//  signal. This makes it impossible to shut-down message based architectures
-//  like zactors. This method lets you switch off break handling. The default
-//  nonstop setting is off (false).                                          
-CZMQ_EXPORT void
-    zpoller_set_nonstop (zpoller_t *self, bool nonstop);
 
 //  Poll the registered readers for I/O, return first reader that has input.  
 //  The reader will be a libzmq void * socket, or a zsock_t or zactor_t       
@@ -60,6 +57,17 @@ CZMQ_EXPORT bool
 //  Self test of this class.
 CZMQ_EXPORT void
     zpoller_test (bool verbose);
+
+#ifdef CZMQ_BUILD_DRAFT_API
+//  *** Draft method, for development use, may change without warning ***
+//  By default the poller stops if the process receives a SIGINT or SIGTERM  
+//  signal. This makes it impossible to shut-down message based architectures
+//  like zactors. This method lets you switch off break handling. The default
+//  nonstop setting is off (false).                                          
+CZMQ_EXPORT void
+    zpoller_set_nonstop (zpoller_t *self, bool nonstop);
+
+#endif // CZMQ_BUILD_DRAFT_API
 ----
 
 DESCRIPTION

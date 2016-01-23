@@ -23,7 +23,6 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
-
 //  Create a new, empty list.
 CZMQ_EXPORT zlistx_t *
     zlistx_new (void);
@@ -183,6 +182,7 @@ CZMQ_EXPORT void
 //  Self test of this class.
 CZMQ_EXPORT void
     zlistx_test (bool verbose);
+
 //  @end
 
 #ifdef __cplusplus

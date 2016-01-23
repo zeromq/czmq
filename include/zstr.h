@@ -24,12 +24,11 @@ extern "C" {
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
 //  This class has draft methods, which may change over time. They are not
-//  in stable releases, by default. Use --enable-draft-api to enable.
-
+//  in stable releases, by default. Use --enable-drafts to enable.
 //  Receive C string from socket. Caller must free returned string using
 //  zstr_free(). Returns NULL if the context is being terminated or the 
 //  process was interrupted.                                            
-//  The caller owns the return value and must destroy it when done with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT char *
     zstr_recv (void *source);
 
@@ -72,14 +71,6 @@ CZMQ_EXPORT int
 CZMQ_EXPORT int
     zstr_sendx (void *dest, const char *string, ...);
 
-#ifdef WITH_DRAFTS
-//  Accepts a void pointer and returns a fresh character string. If source
-//  is null, returns an empty string.                                     
-//  The caller owns the return value and must destroy it when done with it.
-CZMQ_EXPORT char *
-    zstr_str (void *source);
-#endif // WITH_DRAFTS
-
 //  Free a provided string, and nullify the parent pointer. Safe to call on
 //  a null pointer.                                                        
 CZMQ_EXPORT void
@@ -88,6 +79,16 @@ CZMQ_EXPORT void
 //  Self test of this class.
 CZMQ_EXPORT void
     zstr_test (bool verbose);
+
+#ifdef CZMQ_BUILD_DRAFT_API
+//  *** Draft method, for development use, may change without warning ***
+//  Accepts a void pointer and returns a fresh character string. If source
+//  is null, returns an empty string.                                     
+//  Caller owns return value and must destroy it when done.
+CZMQ_EXPORT char *
+    zstr_str (void *source);
+
+#endif // CZMQ_BUILD_DRAFT_API
 //  @end
 
 //  DEPRECATED as poor style -- callers should use zloop or zpoller

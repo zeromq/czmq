@@ -23,7 +23,6 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
-
 // Comparison function e.g. for sorting and removing.
 typedef int (zlist_compare_fn) (
     void *item1, void *item2);
@@ -98,7 +97,7 @@ CZMQ_EXPORT void
 //  duplicate all items, which must be strings. Otherwise, the list will hold
 //  pointers back to the items in the original list. If list is null, returns
 //  NULL.                                                                    
-//  The caller owns the return value and must destroy it when done with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zlist_t *
     zlist_dup (zlist_t *self);
 
@@ -145,6 +144,7 @@ CZMQ_EXPORT void *
 //  Self test of this class.
 CZMQ_EXPORT void
     zlist_test (bool verbose);
+
 //  @end
 
 #ifdef __cplusplus

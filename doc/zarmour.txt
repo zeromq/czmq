@@ -8,6 +8,8 @@ zarmour - armoured text encoding and decoding
 SYNOPSIS
 --------
 ----
+//  This is a stable class, and may not change except for emergencies. It
+//  is provided in stable builds.
 // Enumeration defining different encoding modes
 typedef enum {
     ZARMOUR_MODE_BASE64_STD = 0,                            //  Standard base 64
@@ -29,14 +31,14 @@ CZMQ_EXPORT void
 //  Encode a stream of bytes into an armoured string. Returns the armoured
 //  string, or NULL if there was insufficient memory available to allocate
 //  a new string.                                                         
-//  The caller is responsible for destroying the return value when finished with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT char *
     zarmour_encode (zarmour_t *self, const byte *data, size_t size);
 
 //  Decode an armoured string into a string of bytes.          
 //  The decoded output is null-terminated, so it may be treated
 //  as a string, if that's what it was prior to encoding.      
-//  The caller is responsible for destroying the return value when finished with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT byte *
     zarmour_decode (zarmour_t *self, const char *data, size_t *decode_size);
 
@@ -91,6 +93,7 @@ CZMQ_EXPORT void
 //  Self test of this class.
 CZMQ_EXPORT void
     zarmour_test (bool verbose);
+
 ----
 
 DESCRIPTION

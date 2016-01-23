@@ -23,7 +23,6 @@ extern "C" {
 //  @interface
 //  This is a stable class, and may not change except for emergencies. It
 //  is provided in stable builds.
-
 // 
 typedef int (zconfig_fct) (
     zconfig_t *self, void *arg, int level);
@@ -140,12 +139,12 @@ CZMQ_EXPORT zchunk_t *
     zconfig_chunk_save (zconfig_t *self);
 
 //  Load a config tree from a null-terminated string
-//  The caller owns the return value and must destroy it when done with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT zconfig_t *
     zconfig_str_load (const char *string);
 
 //  Save a config tree to a new null terminated string
-//  The caller owns the return value and must destroy it when done with it.
+//  Caller owns return value and must destroy it when done.
 CZMQ_EXPORT char *
     zconfig_str_save (zconfig_t *self);
 
@@ -165,6 +164,7 @@ CZMQ_EXPORT void
 //  Self test of this class
 CZMQ_EXPORT void
     zconfig_test (bool verbose);
+
 //  @end
 //  Self test of this class
 CZMQ_EXPORT void

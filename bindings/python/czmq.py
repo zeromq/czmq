@@ -230,11 +230,15 @@ lib.zactor_test.restype = None
 lib.zactor_test.argtypes = [c_bool]
 
 class Zactor(object):
-    """provides a simple actor framework"""
+    """
+    provides a simple actor framework
+    """
 
     allow_destruct = False
     def __init__(self, *args):
-        """Create a new actor passing arbitrary arguments reference."""
+        """
+        Create a new actor passing arbitrary arguments reference.
+        """
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], zactor_p) # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -247,7 +251,9 @@ class Zactor(object):
             self.allow_destruct = True
 
     def __del__(self):
-        """Destroy an actor."""
+        """
+        Destroy an actor.
+        """
         if self.allow_destruct:
             lib.zactor_destroy(byref(self._as_parameter_))
 
@@ -260,36 +266,48 @@ class Zactor(object):
         return self._as_parameter_.__nonzero__()
 
     def send(self, msg_p):
-        """Send a zmsg message to the actor, take ownership of the message
-and destroy when it has been sent."""
+        """
+        Send a zmsg message to the actor, take ownership of the message
+and destroy when it has been sent.
+        """
         return lib.zactor_send(self._as_parameter_, byref(zmsg_p.from_param(msg_p)))
 
     def recv(self):
-        """Receive a zmsg message from the actor. Returns NULL if the actor
+        """
+        Receive a zmsg message from the actor. Returns NULL if the actor
 was interrupted before the message could be received, or if there
-was a timeout on the actor."""
+was a timeout on the actor.
+        """
         return Zmsg(lib.zactor_recv(self._as_parameter_), True)
 
     @staticmethod
     def is_(self):
-        """Probe the supplied object, and report if it looks like a zactor_t."""
+        """
+        Probe the supplied object, and report if it looks like a zactor_t.
+        """
         return lib.zactor_is(self)
 
     @staticmethod
     def resolve(self):
-        """Probe the supplied reference. If it looks like a zactor_t instance,
+        """
+        Probe the supplied reference. If it looks like a zactor_t instance,
 return the underlying libzmq actor handle; else if it looks like
-a libzmq actor handle, return the supplied value."""
+a libzmq actor handle, return the supplied value.
+        """
         return c_void_p(lib.zactor_resolve(self))
 
     def sock(self):
-        """Return the actor's zsock handle. Use this when you absolutely need
-to work with the zsock instance rather than the actor."""
+        """
+        Return the actor's zsock handle. Use this when you absolutely need
+to work with the zsock instance rather than the actor.
+        """
         return Zsock(lib.zactor_sock(self._as_parameter_), False)
 
     @staticmethod
     def test(verbose):
-        """Self test of this class."""
+        """
+        Self test of this class.
+        """
         return lib.zactor_test(verbose)
 
 
@@ -330,7 +348,9 @@ lib.zarmour_test.restype = None
 lib.zarmour_test.argtypes = [c_bool]
 
 class Zarmour(object):
-    """armoured text encoding and decoding"""
+    """
+    armoured text encoding and decoding
+    """
 
     Mode = {
         'mode base64 std': 0,
@@ -352,7 +372,9 @@ class Zarmour(object):
 
     allow_destruct = False
     def __init__(self, *args):
-        """Create a new zarmour."""
+        """
+        Create a new zarmour.
+        """
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], zarmour_p) # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -365,7 +387,9 @@ class Zarmour(object):
             self.allow_destruct = True
 
     def __del__(self):
-        """Destroy the zarmour."""
+        """
+        Destroy the zarmour.
+        """
         if self.allow_destruct:
             lib.zarmour_destroy(byref(self._as_parameter_))
 
@@ -378,68 +402,98 @@ class Zarmour(object):
         return self._as_parameter_.__nonzero__()
 
     def encode(self, data, size):
-        """Encode a stream of bytes into an armoured string. Returns the armoured
+        """
+        Encode a stream of bytes into an armoured string. Returns the armoured
 string, or NULL if there was insufficient memory available to allocate
-a new string."""
+a new string.
+        """
         return return_fresh_string(lib.zarmour_encode(self._as_parameter_, data, size))
 
     def decode(self, data, decode_size):
-        """Decode an armoured string into a string of bytes.
+        """
+        Decode an armoured string into a string of bytes.
 The decoded output is null-terminated, so it may be treated
-as a string, if that's what it was prior to encoding."""
+as a string, if that's what it was prior to encoding.
+        """
         return lib.zarmour_decode(self._as_parameter_, data, byref(c_size_t.from_param(decode_size)))
 
     def mode(self):
-        """Get the mode property."""
+        """
+        Get the mode property.
+        """
         return Zarmour.Mode_out[lib.zarmour_mode(self._as_parameter_)]
 
     def mode_str(self):
-        """Get printable string for mode."""
+        """
+        Get printable string for mode.
+        """
         return lib.zarmour_mode_str(self._as_parameter_)
 
     def set_mode(self, mode):
-        """Set the mode property."""
+        """
+        Set the mode property.
+        """
         return lib.zarmour_set_mode(self._as_parameter_, Zarmour.Mode[mode])
 
     def pad(self):
-        """Return true if padding is turned on."""
+        """
+        Return true if padding is turned on.
+        """
         return lib.zarmour_pad(self._as_parameter_)
 
     def set_pad(self, pad):
-        """Turn padding on or off. Default is on."""
+        """
+        Turn padding on or off. Default is on.
+        """
         return lib.zarmour_set_pad(self._as_parameter_, pad)
 
     def pad_char(self):
-        """Get the padding character."""
+        """
+        Get the padding character.
+        """
         return lib.zarmour_pad_char(self._as_parameter_)
 
     def set_pad_char(self, pad_char):
-        """Set the padding character."""
+        """
+        Set the padding character.
+        """
         return lib.zarmour_set_pad_char(self._as_parameter_, pad_char)
 
     def line_breaks(self):
-        """Return if splitting output into lines is turned on. Default is off."""
+        """
+        Return if splitting output into lines is turned on. Default is off.
+        """
         return lib.zarmour_line_breaks(self._as_parameter_)
 
     def set_line_breaks(self, line_breaks):
-        """Turn splitting output into lines on or off."""
+        """
+        Turn splitting output into lines on or off.
+        """
         return lib.zarmour_set_line_breaks(self._as_parameter_, line_breaks)
 
     def line_length(self):
-        """Get the line length used for splitting lines."""
+        """
+        Get the line length used for splitting lines.
+        """
         return lib.zarmour_line_length(self._as_parameter_)
 
     def set_line_length(self, line_length):
-        """Set the line length used for splitting lines."""
+        """
+        Set the line length used for splitting lines.
+        """
         return lib.zarmour_set_line_length(self._as_parameter_, line_length)
 
     def print(self):
-        """Print properties of object"""
+        """
+        Print properties of object
+        """
         return lib.zarmour_print(self._as_parameter_)
 
     @staticmethod
     def test(verbose):
-        """Self test of this class."""
+        """
+        Self test of this class.
+        """
         return lib.zarmour_test(verbose)
 
 
@@ -488,11 +542,15 @@ lib.zcert_test.restype = None
 lib.zcert_test.argtypes = [c_bool]
 
 class Zcert(object):
-    """work with CURVE security certificates"""
+    """
+    work with CURVE security certificates
+    """
 
     allow_destruct = False
     def __init__(self, *args):
-        """Create and initialize a new certificate in memory"""
+        """
+        Create and initialize a new certificate in memory
+        """
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], zcert_p) # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -505,7 +563,9 @@ class Zcert(object):
             self.allow_destruct = True
 
     def __del__(self):
-        """Destroy a certificate in memory"""
+        """
+        Destroy a certificate in memory
+        """
         if self.allow_destruct:
             lib.zcert_destroy(byref(self._as_parameter_))
 
@@ -519,88 +579,126 @@ class Zcert(object):
 
     @staticmethod
     def new_from(public_key, secret_key):
-        """Accepts public/secret key pair from caller"""
+        """
+        Accepts public/secret key pair from caller
+        """
         return Zcert(lib.zcert_new_from(public_key, secret_key), False)
 
     @staticmethod
     def load(filename):
-        """Load certificate from file"""
+        """
+        Load certificate from file
+        """
         return Zcert(lib.zcert_load(filename), False)
 
     def public_key(self):
-        """Return public part of key pair as 32-byte binary string"""
+        """
+        Return public part of key pair as 32-byte binary string
+        """
         return lib.zcert_public_key(self._as_parameter_)
 
     def secret_key(self):
-        """Return secret part of key pair as 32-byte binary string"""
+        """
+        Return secret part of key pair as 32-byte binary string
+        """
         return lib.zcert_secret_key(self._as_parameter_)
 
     def public_txt(self):
-        """Return public part of key pair as Z85 armored string"""
+        """
+        Return public part of key pair as Z85 armored string
+        """
         return lib.zcert_public_txt(self._as_parameter_)
 
     def secret_txt(self):
-        """Return secret part of key pair as Z85 armored string"""
+        """
+        Return secret part of key pair as Z85 armored string
+        """
         return lib.zcert_secret_txt(self._as_parameter_)
 
     def set_meta(self, name, format, *args):
-        """Set certificate metadata from formatted string."""
+        """
+        Set certificate metadata from formatted string.
+        """
         return lib.zcert_set_meta(self._as_parameter_, name, format, *args)
 
     def unset_meta(self, name):
-        """Unset certificate metadata."""
+        """
+        Unset certificate metadata.
+        """
         return lib.zcert_unset_meta(self._as_parameter_, name)
 
     def meta(self, name):
-        """Get metadata value from certificate; if the metadata value doesn't
-exist, returns NULL."""
+        """
+        Get metadata value from certificate; if the metadata value doesn't
+exist, returns NULL.
+        """
         return lib.zcert_meta(self._as_parameter_, name)
 
     def meta_keys(self):
-        """Get list of metadata fields from certificate. Caller is responsible for
-destroying list. Caller should not modify the values of list items."""
+        """
+        Get list of metadata fields from certificate. Caller is responsible for
+destroying list. Caller should not modify the values of list items.
+        """
         return Zlist(lib.zcert_meta_keys(self._as_parameter_), False)
 
     def save(self, filename):
-        """Save full certificate (public + secret) to file for persistent storage
-This creates one public file and one secret file (filename + "_secret")."""
+        """
+        Save full certificate (public + secret) to file for persistent storage
+This creates one public file and one secret file (filename + "_secret").
+        """
         return lib.zcert_save(self._as_parameter_, filename)
 
     def save_public(self, filename):
-        """Save public certificate only to file for persistent storage"""
+        """
+        Save public certificate only to file for persistent storage
+        """
         return lib.zcert_save_public(self._as_parameter_, filename)
 
     def save_secret(self, filename):
-        """Save secret certificate only to file for persistent storage"""
+        """
+        Save secret certificate only to file for persistent storage
+        """
         return lib.zcert_save_secret(self._as_parameter_, filename)
 
     def apply(self, zocket):
-        """Apply certificate to socket, i.e. use for CURVE security on socket.
+        """
+        Apply certificate to socket, i.e. use for CURVE security on socket.
 If certificate was loaded from public file, the secret key will be
-undefined, and this certificate will not work successfully."""
+undefined, and this certificate will not work successfully.
+        """
         return lib.zcert_apply(self._as_parameter_, zocket)
 
     def dup(self):
-        """Return copy of certificate; if certificate is NULL or we exhausted
-heap memory, returns NULL."""
+        """
+        Return copy of certificate; if certificate is NULL or we exhausted
+heap memory, returns NULL.
+        """
         return Zcert(lib.zcert_dup(self._as_parameter_), True)
 
     def eq(self, compare):
-        """Return true if two certificates have the same keys"""
+        """
+        Return true if two certificates have the same keys
+        """
         return lib.zcert_eq(self._as_parameter_, compare)
 
     def print(self):
-        """Print certificate contents to stdout"""
+        """
+        Print certificate contents to stdout
+        """
         return lib.zcert_print(self._as_parameter_)
 
     def fprint(self, file):
-        """DEPRECATED as incompatible with centralized logging
-Print certificate contents to open stream"""
+        """
+        DEPRECATED as incompatible with centralized logging
+Print certificate contents to open stream
+        """
         return lib.zcert_fprint(self._as_parameter_, coerce_py_file(file))
 
     @staticmethod
     def test(verbose):
-        """Self test of this class"""
+        """
+        Self test of this class
+        """
         return lib.zcert_test(verbose)
 
 
@@ -621,16 +719,20 @@ lib.zcertstore_test.restype = None
 lib.zcertstore_test.argtypes = [c_bool]
 
 class Zcertstore(object):
-    """work with CURVE security certificate stores"""
+    """
+    work with CURVE security certificate stores
+    """
 
     allow_destruct = False
     def __init__(self, *args):
-        """Create a new certificate store from a disk directory, loading and
+        """
+        Create a new certificate store from a disk directory, loading and
 indexing all certificates in that location. The directory itself may be
 absent, and created later, or modified at any time. The certificate store
 is automatically refreshed on any zcertstore_lookup() call. If the
 location is specified as NULL, creates a pure-memory store, which you
-can work with by inserting certificates at runtime."""
+can work with by inserting certificates at runtime.
+        """
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], zcertstore_p) # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -643,8 +745,10 @@ can work with by inserting certificates at runtime."""
             self.allow_destruct = True
 
     def __del__(self):
-        """Destroy a certificate store object in memory. Does not affect anything
-stored on disk."""
+        """
+        Destroy a certificate store object in memory. Does not affect anything
+stored on disk.
+        """
         if self.allow_destruct:
             lib.zcertstore_destroy(byref(self._as_parameter_))
 
@@ -657,28 +761,38 @@ stored on disk."""
         return self._as_parameter_.__nonzero__()
 
     def lookup(self, public_key):
-        """Look up certificate by public key, returns zcert_t object if found,
-else returns NULL. The public key is provided in Z85 text format."""
+        """
+        Look up certificate by public key, returns zcert_t object if found,
+else returns NULL. The public key is provided in Z85 text format.
+        """
         return Zcert(lib.zcertstore_lookup(self._as_parameter_, public_key), False)
 
     def insert(self, cert_p):
-        """Insert certificate into certificate store in memory. Note that this
+        """
+        Insert certificate into certificate store in memory. Note that this
 does not save the certificate to disk. To do that, use zcert_save()
-directly on the certificate. Takes ownership of zcert_t object."""
+directly on the certificate. Takes ownership of zcert_t object.
+        """
         return lib.zcertstore_insert(self._as_parameter_, byref(zcert_p.from_param(cert_p)))
 
     def print(self):
-        """Print list of certificates in store to logging facility"""
+        """
+        Print list of certificates in store to logging facility
+        """
         return lib.zcertstore_print(self._as_parameter_)
 
     def fprint(self, file):
-        """DEPRECATED as incompatible with centralized logging
-Print list of certificates in store to open stream"""
+        """
+        DEPRECATED as incompatible with centralized logging
+Print list of certificates in store to open stream
+        """
         return lib.zcertstore_fprint(self._as_parameter_, coerce_py_file(file))
 
     @staticmethod
     def test(verbose):
-        """Self test of this class"""
+        """
+        Self test of this class
+        """
         return lib.zcertstore_test(verbose)
 
 
@@ -737,13 +851,17 @@ lib.zchunk_test.restype = None
 lib.zchunk_test.argtypes = [c_bool]
 
 class Zchunk(object):
-    """work with memory chunks"""
+    """
+    work with memory chunks
+    """
 
     allow_destruct = False
     def __init__(self, *args):
-        """Create a new chunk of the specified size. If you specify the data, it
+        """
+        Create a new chunk of the specified size. If you specify the data, it
 is copied into the chunk. If you do not specify the data, the chunk is
-allocated and left empty, and you can then add data using zchunk_append."""
+allocated and left empty, and you can then add data using zchunk_append.
+        """
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], zchunk_p) # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -756,7 +874,9 @@ allocated and left empty, and you can then add data using zchunk_append."""
             self.allow_destruct = True
 
     def __del__(self):
-        """Destroy a chunk"""
+        """
+        Destroy a chunk
+        """
         if self.allow_destruct:
             lib.zchunk_destroy(byref(self._as_parameter_))
 
@@ -769,120 +889,168 @@ allocated and left empty, and you can then add data using zchunk_append."""
         return self._as_parameter_.__nonzero__()
 
     def resize(self, size):
-        """Resizes chunk max_size as requested; chunk_cur size is set to zero"""
+        """
+        Resizes chunk max_size as requested; chunk_cur size is set to zero
+        """
         return lib.zchunk_resize(self._as_parameter_, size)
 
     def size(self):
-        """Return chunk cur size"""
+        """
+        Return chunk cur size
+        """
         return lib.zchunk_size(self._as_parameter_)
 
     def max_size(self):
-        """Return chunk max size"""
+        """
+        Return chunk max size
+        """
         return lib.zchunk_max_size(self._as_parameter_)
 
     def data(self):
-        """Return chunk data"""
+        """
+        Return chunk data
+        """
         return lib.zchunk_data(self._as_parameter_)
 
     def set(self, data, size):
-        """Set chunk data from user-supplied data; truncate if too large. Data may
-be null. Returns actual size of chunk"""
+        """
+        Set chunk data from user-supplied data; truncate if too large. Data may
+be null. Returns actual size of chunk
+        """
         return lib.zchunk_set(self._as_parameter_, data, size)
 
     def fill(self, filler, size):
-        """Fill chunk data from user-supplied octet"""
+        """
+        Fill chunk data from user-supplied octet
+        """
         return lib.zchunk_fill(self._as_parameter_, filler, size)
 
     def append(self, data, size):
-        """Append user-supplied data to chunk, return resulting chunk size. If the
+        """
+        Append user-supplied data to chunk, return resulting chunk size. If the
 data would exceeded the available space, it is truncated. If you want to
-grow the chunk to accommodate new data, use the zchunk_extend method."""
+grow the chunk to accommodate new data, use the zchunk_extend method.
+        """
         return lib.zchunk_append(self._as_parameter_, data, size)
 
     def extend(self, data, size):
-        """Append user-supplied data to chunk, return resulting chunk size. If the
-data would exceeded the available space, the chunk grows in size."""
+        """
+        Append user-supplied data to chunk, return resulting chunk size. If the
+data would exceeded the available space, the chunk grows in size.
+        """
         return lib.zchunk_extend(self._as_parameter_, data, size)
 
     def consume(self, source):
-        """Copy as much data from 'source' into the chunk as possible; returns the
+        """
+        Copy as much data from 'source' into the chunk as possible; returns the
 new size of chunk. If all data from 'source' is used, returns exhausted
 on the source chunk. Source can be consumed as many times as needed until
-it is exhausted. If source was already exhausted, does not change chunk."""
+it is exhausted. If source was already exhausted, does not change chunk.
+        """
         return lib.zchunk_consume(self._as_parameter_, source)
 
     def exhausted(self):
-        """Returns true if the chunk was exhausted by consume methods, or if the
-chunk has a size of zero."""
+        """
+        Returns true if the chunk was exhausted by consume methods, or if the
+chunk has a size of zero.
+        """
         return lib.zchunk_exhausted(self._as_parameter_)
 
     @staticmethod
     def read(handle, bytes):
-        """Read chunk from an open file descriptor"""
+        """
+        Read chunk from an open file descriptor
+        """
         return Zchunk(lib.zchunk_read(coerce_py_file(handle), bytes), True)
 
     def write(self, handle):
-        """Write chunk to an open file descriptor"""
+        """
+        Write chunk to an open file descriptor
+        """
         return lib.zchunk_write(self._as_parameter_, coerce_py_file(handle))
 
     @staticmethod
     def slurp(filename, maxsize):
-        """Try to slurp an entire file into a chunk. Will read up to maxsize of
+        """
+        Try to slurp an entire file into a chunk. Will read up to maxsize of
 the file. If maxsize is 0, will attempt to read the entire file and
 fail with an assertion if that cannot fit into memory. Returns a new
-chunk containing the file data, or NULL if the file could not be read."""
+chunk containing the file data, or NULL if the file could not be read.
+        """
         return Zchunk(lib.zchunk_slurp(filename, maxsize), True)
 
     def dup(self):
-        """Create copy of chunk, as new chunk object. Returns a fresh zchunk_t
+        """
+        Create copy of chunk, as new chunk object. Returns a fresh zchunk_t
 object, or null if there was not enough heap memory. If chunk is null,
-returns null."""
+returns null.
+        """
         return Zchunk(lib.zchunk_dup(self._as_parameter_), True)
 
     def strhex(self):
-        """Return chunk data encoded as printable hex string. Caller must free
-string when finished with it."""
+        """
+        Return chunk data encoded as printable hex string. Caller must free
+string when finished with it.
+        """
         return return_fresh_string(lib.zchunk_strhex(self._as_parameter_))
 
     def strdup(self):
-        """Return chunk data copied into freshly allocated string
-Caller must free string when finished with it."""
+        """
+        Return chunk data copied into freshly allocated string
+Caller must free string when finished with it.
+        """
         return return_fresh_string(lib.zchunk_strdup(self._as_parameter_))
 
     def streq(self, string):
-        """Return TRUE if chunk body is equal to string, excluding terminator"""
+        """
+        Return TRUE if chunk body is equal to string, excluding terminator
+        """
         return lib.zchunk_streq(self._as_parameter_, string)
 
     def pack(self):
-        """Transform zchunk into a zframe that can be sent in a message."""
+        """
+        Transform zchunk into a zframe that can be sent in a message.
+        """
         return Zframe(lib.zchunk_pack(self._as_parameter_), True)
 
     @staticmethod
     def unpack(frame):
-        """Transform a zframe into a zchunk."""
+        """
+        Transform a zframe into a zchunk.
+        """
         return Zchunk(lib.zchunk_unpack(frame), True)
 
     def digest(self):
-        """Calculate SHA1 digest for chunk, using zdigest class."""
+        """
+        Calculate SHA1 digest for chunk, using zdigest class.
+        """
         return lib.zchunk_digest(self._as_parameter_)
 
     def fprint(self, file):
-        """Dump chunk to FILE stream, for debugging and tracing."""
+        """
+        Dump chunk to FILE stream, for debugging and tracing.
+        """
         return lib.zchunk_fprint(self._as_parameter_, coerce_py_file(file))
 
     def print(self):
-        """Dump message to stderr, for debugging and tracing.
-See zchunk_fprint for details"""
+        """
+        Dump message to stderr, for debugging and tracing.
+See zchunk_fprint for details
+        """
         return lib.zchunk_print(self._as_parameter_)
 
     @staticmethod
     def is_(self):
-        """Probe the supplied object, and report if it looks like a zchunk_t."""
+        """
+        Probe the supplied object, and report if it looks like a zchunk_t.
+        """
         return lib.zchunk_is(self)
 
     @staticmethod
     def test(verbose):
-        """Self test of this class."""
+        """
+        Self test of this class.
+        """
         return lib.zchunk_test(verbose)
 
 
@@ -901,7 +1069,9 @@ lib.zclock_test.restype = None
 lib.zclock_test.argtypes = [c_bool]
 
 class Zclock(object):
-    """millisecond clocks and delays"""
+    """
+    millisecond clocks and delays
+    """
 
     allow_destruct = False
     def __bool__(self):
@@ -914,38 +1084,50 @@ class Zclock(object):
 
     @staticmethod
     def sleep(msecs):
-        """Sleep for a number of milliseconds"""
+        """
+        Sleep for a number of milliseconds
+        """
         return lib.zclock_sleep(msecs)
 
     @staticmethod
     def time():
-        """Return current system clock as milliseconds. Note that this clock can
+        """
+        Return current system clock as milliseconds. Note that this clock can
 jump backwards (if the system clock is changed) so is unsafe to use for
-timers and time offsets. Use zclock_mono for that instead."""
+timers and time offsets. Use zclock_mono for that instead.
+        """
         return lib.zclock_time()
 
     @staticmethod
     def mono():
-        """Return current monotonic clock in milliseconds. Use this when you compute
+        """
+        Return current monotonic clock in milliseconds. Use this when you compute
 time offsets. The monotonic clock is not affected by system changes and
-so will never be reset backwards, unlike a system clock."""
+so will never be reset backwards, unlike a system clock.
+        """
         return lib.zclock_mono()
 
     @staticmethod
     def usecs():
-        """Return current monotonic clock in microseconds. Use this when you compute
+        """
+        Return current monotonic clock in microseconds. Use this when you compute
 time offsets. The monotonic clock is not affected by system changes and
-so will never be reset backwards, unlike a system clock."""
+so will never be reset backwards, unlike a system clock.
+        """
         return lib.zclock_usecs()
 
     @staticmethod
     def timestr():
-        """Return formatted date/time as fresh string. Free using zstr_free()."""
+        """
+        Return formatted date/time as fresh string. Free using zstr_free().
+        """
         return return_fresh_string(lib.zclock_timestr())
 
     @staticmethod
     def test(verbose):
-        """Self test of this class."""
+        """
+        Self test of this class.
+        """
         return lib.zclock_test(verbose)
 
 
@@ -1013,11 +1195,15 @@ lib.zconfig_test.restype = None
 lib.zconfig_test.argtypes = [c_bool]
 
 class Zconfig(object):
-    """zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL."""
+    """
+    zconfig - work with config files written in rfc.zeromq.org/spec:4/ZPL.
+    """
 
     allow_destruct = False
     def __init__(self, *args):
-        """Create new config item"""
+        """
+        Create new config item
+        """
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], zconfig_p) # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -1030,7 +1216,9 @@ class Zconfig(object):
             self.allow_destruct = True
 
     def __del__(self):
-        """Destroy a config item and all its children"""
+        """
+        Destroy a config item and all its children
+        """
         if self.allow_destruct:
             lib.zconfig_destroy(byref(self._as_parameter_))
 
@@ -1044,136 +1232,192 @@ class Zconfig(object):
 
     @staticmethod
     def load(filename):
-        """Load a config tree from a specified ZPL text file; returns a zconfig_t
+        """
+        Load a config tree from a specified ZPL text file; returns a zconfig_t
 reference for the root, if the file exists and is readable. Returns NULL
-if the file does not exist."""
+if the file does not exist.
+        """
         return Zconfig(lib.zconfig_load(filename), False)
 
     @staticmethod
     def loadf(format, *args):
-        """Equivalent to zconfig_load, taking a format string instead of a fixed
-filename."""
+        """
+        Equivalent to zconfig_load, taking a format string instead of a fixed
+filename.
+        """
         return Zconfig(lib.zconfig_loadf(format, *args), False)
 
     def name(self):
-        """Return name of config item"""
+        """
+        Return name of config item
+        """
         return lib.zconfig_name(self._as_parameter_)
 
     def value(self):
-        """Return value of config item"""
+        """
+        Return value of config item
+        """
         return lib.zconfig_value(self._as_parameter_)
 
     def put(self, path, value):
-        """Insert or update configuration key with value"""
+        """
+        Insert or update configuration key with value
+        """
         return lib.zconfig_put(self._as_parameter_, path, value)
 
     def putf(self, path, format, *args):
-        """Equivalent to zconfig_put, accepting a format specifier and variable
-argument list, instead of a single string value."""
+        """
+        Equivalent to zconfig_put, accepting a format specifier and variable
+argument list, instead of a single string value.
+        """
         return lib.zconfig_putf(self._as_parameter_, path, format, *args)
 
     def get(self, path, default_value):
-        """Get value for config item into a string value; leading slash is optional
-and ignored."""
+        """
+        Get value for config item into a string value; leading slash is optional
+and ignored.
+        """
         return lib.zconfig_get(self._as_parameter_, path, default_value)
 
     def set_name(self, name):
-        """Set config item name, name may be NULL"""
+        """
+        Set config item name, name may be NULL
+        """
         return lib.zconfig_set_name(self._as_parameter_, name)
 
     def set_value(self, format, *args):
-        """Set new value for config item. The new value may be a string, a printf
+        """
+        Set new value for config item. The new value may be a string, a printf
 format, or NULL. Note that if string may possibly contain '%', or if it
 comes from an insecure source, you must use '%s' as the format, followed
-by the string."""
+by the string.
+        """
         return lib.zconfig_set_value(self._as_parameter_, format, *args)
 
     def child(self):
-        """Find our first child, if any"""
+        """
+        Find our first child, if any
+        """
         return Zconfig(lib.zconfig_child(self._as_parameter_), False)
 
     def next(self):
-        """Find our first sibling, if any"""
+        """
+        Find our first sibling, if any
+        """
         return Zconfig(lib.zconfig_next(self._as_parameter_), False)
 
     def locate(self, path):
-        """Find a config item along a path; leading slash is optional and ignored."""
+        """
+        Find a config item along a path; leading slash is optional and ignored.
+        """
         return Zconfig(lib.zconfig_locate(self._as_parameter_, path), False)
 
     def at_depth(self, level):
-        """Locate the last config item at a specified depth"""
+        """
+        Locate the last config item at a specified depth
+        """
         return Zconfig(lib.zconfig_at_depth(self._as_parameter_, level), False)
 
     def execute(self, handler, arg):
-        """Execute a callback for each config item in the tree; returns zero if
-successful, else -1."""
+        """
+        Execute a callback for each config item in the tree; returns zero if
+successful, else -1.
+        """
         return lib.zconfig_execute(self._as_parameter_, handler, arg)
 
     def set_comment(self, format, *args):
-        """Add comment to config item before saving to disk. You can add as many
+        """
+        Add comment to config item before saving to disk. You can add as many
 comment lines as you like. If you use a null format, all comments are
-deleted."""
+deleted.
+        """
         return lib.zconfig_set_comment(self._as_parameter_, format, *args)
 
     def comments(self):
-        """Return comments of config item, as zlist."""
+        """
+        Return comments of config item, as zlist.
+        """
         return Zlist(lib.zconfig_comments(self._as_parameter_), False)
 
     def save(self, filename):
-        """Save a config tree to a specified ZPL text file, where a filename
-"-" means dump to standard output."""
+        """
+        Save a config tree to a specified ZPL text file, where a filename
+"-" means dump to standard output.
+        """
         return lib.zconfig_save(self._as_parameter_, filename)
 
     def savef(self, format, *args):
-        """Equivalent to zconfig_save, taking a format string instead of a fixed
-filename."""
+        """
+        Equivalent to zconfig_save, taking a format string instead of a fixed
+filename.
+        """
         return lib.zconfig_savef(self._as_parameter_, format, *args)
 
     def filename(self):
-        """Report filename used during zconfig_load, or NULL if none"""
+        """
+        Report filename used during zconfig_load, or NULL if none
+        """
         return lib.zconfig_filename(self._as_parameter_)
 
     @staticmethod
     def reload(self_p):
-        """Reload config tree from same file that it was previously loaded from.
+        """
+        Reload config tree from same file that it was previously loaded from.
 Returns 0 if OK, -1 if there was an error (and then does not change
-existing data)."""
+existing data).
+        """
         return lib.zconfig_reload(byref(zconfig_p.from_param(self_p)))
 
     @staticmethod
     def chunk_load(chunk):
-        """Load a config tree from a memory chunk"""
+        """
+        Load a config tree from a memory chunk
+        """
         return Zconfig(lib.zconfig_chunk_load(chunk), False)
 
     def chunk_save(self):
-        """Save a config tree to a new memory chunk"""
+        """
+        Save a config tree to a new memory chunk
+        """
         return Zchunk(lib.zconfig_chunk_save(self._as_parameter_), False)
 
     @staticmethod
     def str_load(string):
-        """Load a config tree from a null-terminated string"""
+        """
+        Load a config tree from a null-terminated string
+        """
         return Zconfig(lib.zconfig_str_load(string), True)
 
     def str_save(self):
-        """Save a config tree to a new null terminated string"""
+        """
+        Save a config tree to a new null terminated string
+        """
         return return_fresh_string(lib.zconfig_str_save(self._as_parameter_))
 
     def has_changed(self):
-        """Return true if a configuration tree was loaded from a file and that
-file has changed in since the tree was loaded."""
+        """
+        Return true if a configuration tree was loaded from a file and that
+file has changed in since the tree was loaded.
+        """
         return lib.zconfig_has_changed(self._as_parameter_)
 
     def fprint(self, file):
-        """Print the config file to open stream"""
+        """
+        Print the config file to open stream
+        """
         return lib.zconfig_fprint(self._as_parameter_, coerce_py_file(file))
 
     def print(self):
-        """Print properties of object"""
+        """
+        Print properties of object
+        """
         return lib.zconfig_print(self._as_parameter_)
 
     @staticmethod
     def test(verbose):
-        """Self test of this class"""
+        """
+        Self test of this class
+        """
         return lib.zconfig_test(verbose)
 
 
@@ -1194,12 +1438,16 @@ lib.zdigest_test.restype = None
 lib.zdigest_test.argtypes = [c_bool]
 
 class Zdigest(object):
-    """zdigest - provides hashing functions (SHA-1 at present)"""
+    """
+    zdigest - provides hashing functions (SHA-1 at present)
+    """
 
     allow_destruct = False
     def __init__(self, *args):
-        """Constructor - creates new digest object, which you use to build up a
-digest by repeatedly calling zdigest_update() on chunks of data."""
+        """
+        Constructor - creates new digest object, which you use to build up a
+digest by repeatedly calling zdigest_update() on chunks of data.
+        """
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], zdigest_p) # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -1212,7 +1460,9 @@ digest by repeatedly calling zdigest_update() on chunks of data."""
             self.allow_destruct = True
 
     def __del__(self):
-        """Destroy a digest object"""
+        """
+        Destroy a digest object
+        """
         if self.allow_destruct:
             lib.zdigest_destroy(byref(self._as_parameter_))
 
@@ -1225,27 +1475,37 @@ digest by repeatedly calling zdigest_update() on chunks of data."""
         return self._as_parameter_.__nonzero__()
 
     def update(self, buffer, length):
-        """Add buffer into digest calculation"""
+        """
+        Add buffer into digest calculation
+        """
         return lib.zdigest_update(self._as_parameter_, buffer, length)
 
     def data(self):
-        """Return final digest hash data. If built without crypto support, returns
-NULL."""
+        """
+        Return final digest hash data. If built without crypto support, returns
+NULL.
+        """
         return lib.zdigest_data(self._as_parameter_)
 
     def size(self):
-        """Return final digest hash size"""
+        """
+        Return final digest hash size
+        """
         return lib.zdigest_size(self._as_parameter_)
 
     def string(self):
-        """Return digest as printable hex string; caller should not modify nor
+        """
+        Return digest as printable hex string; caller should not modify nor
 free this string. After calling this, you may not use zdigest_update()
-on the same digest. If built without crypto support, returns NULL."""
+on the same digest. If built without crypto support, returns NULL.
+        """
         return lib.zdigest_string(self._as_parameter_)
 
     @staticmethod
     def test(verbose):
-        """Self test of this class."""
+        """
+        Self test of this class.
+        """
         return lib.zdigest_test(verbose)
 
 
@@ -1282,13 +1542,17 @@ lib.zdir_test.restype = None
 lib.zdir_test.argtypes = [c_bool]
 
 class Zdir(object):
-    """work with file-system directories"""
+    """
+    work with file-system directories
+    """
 
     allow_destruct = False
     def __init__(self, *args):
-        """Create a new directory item that loads in the full tree of the specified
+        """
+        Create a new directory item that loads in the full tree of the specified
 path, optionally located under some parent path. If parent is "-", then
-loads only the top-level directory, and does not use parent as a path."""
+loads only the top-level directory, and does not use parent as a path.
+        """
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], zdir_p) # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -1301,7 +1565,9 @@ loads only the top-level directory, and does not use parent as a path."""
             self.allow_destruct = True
 
     def __del__(self):
-        """Destroy a directory tree and all children it contains."""
+        """
+        Destroy a directory tree and all children it contains.
+        """
         if self.allow_destruct:
             lib.zdir_destroy(byref(self._as_parameter_))
 
@@ -1314,62 +1580,85 @@ loads only the top-level directory, and does not use parent as a path."""
         return self._as_parameter_.__nonzero__()
 
     def path(self):
-        """Return directory path"""
+        """
+        Return directory path
+        """
         return lib.zdir_path(self._as_parameter_)
 
     def modified(self):
-        """Return last modification time for directory."""
+        """
+        Return last modification time for directory.
+        """
         return lib.zdir_modified(self._as_parameter_)
 
     def cursize(self):
-        """Return total hierarchy size, in bytes of data contained in all files
-in the directory tree."""
+        """
+        Return total hierarchy size, in bytes of data contained in all files
+in the directory tree.
+        """
         return lib.zdir_cursize(self._as_parameter_)
 
     def count(self):
-        """Return directory count"""
+        """
+        Return directory count
+        """
         return lib.zdir_count(self._as_parameter_)
 
     def list(self):
-        """Returns a sorted list of zfile objects; Each entry in the list is a pointer
+        """
+        Returns a sorted list of zfile objects; Each entry in the list is a pointer
 to a zfile_t item already allocated in the zdir tree. Do not destroy the
-original zdir tree until you are done with this list."""
+original zdir tree until you are done with this list.
+        """
         return Zlist(lib.zdir_list(self._as_parameter_), True)
 
     def remove(self, force):
-        """Remove directory, optionally including all files that it contains, at
+        """
+        Remove directory, optionally including all files that it contains, at
 all levels. If force is false, will only remove the directory if empty.
-If force is true, will remove all files and all subdirectories."""
+If force is true, will remove all files and all subdirectories.
+        """
         return lib.zdir_remove(self._as_parameter_, force)
 
     @staticmethod
     def diff(older, newer, alias):
-        """Calculate differences between two versions of a directory tree.
+        """
+        Calculate differences between two versions of a directory tree.
 Returns a list of zdir_patch_t patches. Either older or newer may
 be null, indicating the directory is empty/absent. If alias is set,
-generates virtual filename (minus path, plus alias)."""
+generates virtual filename (minus path, plus alias).
+        """
         return Zlist(lib.zdir_diff(older, newer, alias), True)
 
     def resync(self, alias):
-        """Return full contents of directory as a zdir_patch list."""
+        """
+        Return full contents of directory as a zdir_patch list.
+        """
         return Zlist(lib.zdir_resync(self._as_parameter_, alias), True)
 
     def cache(self):
-        """Load directory cache; returns a hash table containing the SHA-1 digests
-of every file in the tree. The cache is saved between runs in .cache."""
+        """
+        Load directory cache; returns a hash table containing the SHA-1 digests
+of every file in the tree. The cache is saved between runs in .cache.
+        """
         return Zhash(lib.zdir_cache(self._as_parameter_), True)
 
     def fprint(self, file, indent):
-        """Print contents of directory to open stream"""
+        """
+        Print contents of directory to open stream
+        """
         return lib.zdir_fprint(self._as_parameter_, coerce_py_file(file), indent)
 
     def print(self, indent):
-        """Print contents of directory to stdout"""
+        """
+        Print contents of directory to stdout
+        """
         return lib.zdir_print(self._as_parameter_, indent)
 
     @staticmethod
     def watch(pipe, unused):
-        """Create a new zdir_watch actor instance:
+        """
+        Create a new zdir_watch actor instance:
 
     zactor_t *watch = zactor_new (zdir_watch, NULL);
 
@@ -1394,12 +1683,15 @@ Receive directory changes:
 
     // Delete the received data.
     free (path);
-    zlist_destroy (&patches);"""
+    zlist_destroy (&patches);
+        """
         return lib.zdir_watch(pipe, unused)
 
     @staticmethod
     def test(verbose):
-        """Self test of this class."""
+        """
+        Self test of this class.
+        """
         return lib.zdir_test(verbose)
 
 
@@ -1426,7 +1718,9 @@ lib.zdir_patch_test.restype = None
 lib.zdir_patch_test.argtypes = [c_bool]
 
 class ZdirPatch(object):
-    """work with directory patches"""
+    """
+    work with directory patches
+    """
 
     Op = {
         'create': 1,
@@ -1440,7 +1734,9 @@ class ZdirPatch(object):
 
     allow_destruct = False
     def __init__(self, *args):
-        """Create new patch"""
+        """
+        Create new patch
+        """
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], zdir_patch_p) # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -1453,7 +1749,9 @@ class ZdirPatch(object):
             self.allow_destruct = True
 
     def __del__(self):
-        """Destroy a patch"""
+        """
+        Destroy a patch
+        """
         if self.allow_destruct:
             lib.zdir_patch_destroy(byref(self._as_parameter_))
 
@@ -1466,37 +1764,53 @@ class ZdirPatch(object):
         return self._as_parameter_.__nonzero__()
 
     def dup(self):
-        """Create copy of a patch. If the patch is null, or memory was exhausted,
-returns null."""
+        """
+        Create copy of a patch. If the patch is null, or memory was exhausted,
+returns null.
+        """
         return ZdirPatch(lib.zdir_patch_dup(self._as_parameter_), True)
 
     def path(self):
-        """Return patch file directory path"""
+        """
+        Return patch file directory path
+        """
         return lib.zdir_patch_path(self._as_parameter_)
 
     def file(self):
-        """Return patch file item"""
+        """
+        Return patch file item
+        """
         return Zfile(lib.zdir_patch_file(self._as_parameter_), False)
 
     def op(self):
-        """Return operation"""
+        """
+        Return operation
+        """
         return ZdirPatch.Op_out[lib.zdir_patch_op(self._as_parameter_)]
 
     def vpath(self):
-        """Return patch virtual file path"""
+        """
+        Return patch virtual file path
+        """
         return lib.zdir_patch_vpath(self._as_parameter_)
 
     def digest_set(self):
-        """Calculate hash digest for file (create only)"""
+        """
+        Calculate hash digest for file (create only)
+        """
         return lib.zdir_patch_digest_set(self._as_parameter_)
 
     def digest(self):
-        """Return hash digest for patch file"""
+        """
+        Return hash digest for patch file
+        """
         return lib.zdir_patch_digest(self._as_parameter_)
 
     @staticmethod
     def test(verbose):
-        """Self test of this class."""
+        """
+        Self test of this class.
+        """
         return lib.zdir_patch_test(verbose)
 
 
@@ -1551,15 +1865,19 @@ lib.zfile_test.restype = None
 lib.zfile_test.argtypes = [c_bool]
 
 class Zfile(object):
-    """helper functions for working with files."""
+    """
+    helper functions for working with files.
+    """
 
     allow_destruct = False
     def __init__(self, *args):
-        """If file exists, populates properties. CZMQ supports portable symbolic
+        """
+        If file exists, populates properties. CZMQ supports portable symbolic
 links, which are files with the extension ".ln". A symbolic link is a
 text file containing one line, the filename of a target file. Reading
 data from the symbolic link actually reads from the target file. Path
-may be NULL, in which case it is not used."""
+may be NULL, in which case it is not used.
+        """
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], zfile_p) # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -1572,7 +1890,9 @@ may be NULL, in which case it is not used."""
             self.allow_destruct = True
 
     def __del__(self):
-        """Destroy a file item"""
+        """
+        Destroy a file item
+        """
         if self.allow_destruct:
             lib.zfile_destroy(byref(self._as_parameter_))
 
@@ -1585,111 +1905,155 @@ may be NULL, in which case it is not used."""
         return self._as_parameter_.__nonzero__()
 
     def dup(self):
-        """Duplicate a file item, returns a newly constructed item. If the file
-is null, or memory was exhausted, returns null."""
+        """
+        Duplicate a file item, returns a newly constructed item. If the file
+is null, or memory was exhausted, returns null.
+        """
         return Zfile(lib.zfile_dup(self._as_parameter_), True)
 
     def filename(self, path):
-        """Return file name, remove path if provided"""
+        """
+        Return file name, remove path if provided
+        """
         return lib.zfile_filename(self._as_parameter_, path)
 
     def restat(self):
-        """Refresh file properties from disk; this is not done automatically
+        """
+        Refresh file properties from disk; this is not done automatically
 on access methods, otherwise it is not possible to compare directory
-snapshots."""
+snapshots.
+        """
         return lib.zfile_restat(self._as_parameter_)
 
     def modified(self):
-        """Return when the file was last modified. If you want this to reflect the
-current situation, call zfile_restat before checking this property."""
+        """
+        Return when the file was last modified. If you want this to reflect the
+current situation, call zfile_restat before checking this property.
+        """
         return lib.zfile_modified(self._as_parameter_)
 
     def cursize(self):
-        """Return the last-known size of the file. If you want this to reflect the
-current situation, call zfile_restat before checking this property."""
+        """
+        Return the last-known size of the file. If you want this to reflect the
+current situation, call zfile_restat before checking this property.
+        """
         return lib.zfile_cursize(self._as_parameter_)
 
     def is_directory(self):
-        """Return true if the file is a directory. If you want this to reflect
-any external changes, call zfile_restat before checking this property."""
+        """
+        Return true if the file is a directory. If you want this to reflect
+any external changes, call zfile_restat before checking this property.
+        """
         return lib.zfile_is_directory(self._as_parameter_)
 
     def is_regular(self):
-        """Return true if the file is a regular file. If you want this to reflect
-any external changes, call zfile_restat before checking this property."""
+        """
+        Return true if the file is a regular file. If you want this to reflect
+any external changes, call zfile_restat before checking this property.
+        """
         return lib.zfile_is_regular(self._as_parameter_)
 
     def is_readable(self):
-        """Return true if the file is readable by this process. If you want this to
+        """
+        Return true if the file is readable by this process. If you want this to
 reflect any external changes, call zfile_restat before checking this
-property."""
+property.
+        """
         return lib.zfile_is_readable(self._as_parameter_)
 
     def is_writeable(self):
-        """Return true if the file is writeable by this process. If you want this
+        """
+        Return true if the file is writeable by this process. If you want this
 to reflect any external changes, call zfile_restat before checking this
-property."""
+property.
+        """
         return lib.zfile_is_writeable(self._as_parameter_)
 
     def is_stable(self):
-        """Check if file has stopped changing and can be safely processed.
-Updates the file statistics from disk at every call."""
+        """
+        Check if file has stopped changing and can be safely processed.
+Updates the file statistics from disk at every call.
+        """
         return lib.zfile_is_stable(self._as_parameter_)
 
     def has_changed(self):
-        """Return true if the file was changed on disk since the zfile_t object
-was created, or the last zfile_restat() call made on it."""
+        """
+        Return true if the file was changed on disk since the zfile_t object
+was created, or the last zfile_restat() call made on it.
+        """
         return lib.zfile_has_changed(self._as_parameter_)
 
     def remove(self):
-        """Remove the file from disk"""
+        """
+        Remove the file from disk
+        """
         return lib.zfile_remove(self._as_parameter_)
 
     def input(self):
-        """Open file for reading
-Returns 0 if OK, -1 if not found or not accessible"""
+        """
+        Open file for reading
+Returns 0 if OK, -1 if not found or not accessible
+        """
         return lib.zfile_input(self._as_parameter_)
 
     def output(self):
-        """Open file for writing, creating directory if needed
+        """
+        Open file for writing, creating directory if needed
 File is created if necessary; chunks can be written to file at any
-location. Returns 0 if OK, -1 if error."""
+location. Returns 0 if OK, -1 if error.
+        """
         return lib.zfile_output(self._as_parameter_)
 
     def read(self, bytes, offset):
-        """Read chunk from file at specified position. If this was the last chunk,
-sets the eof property. Returns a null chunk in case of error."""
+        """
+        Read chunk from file at specified position. If this was the last chunk,
+sets the eof property. Returns a null chunk in case of error.
+        """
         return Zchunk(lib.zfile_read(self._as_parameter_, bytes, offset), True)
 
     def eof(self):
-        """Returns true if zfile_read() just read the last chunk in the file."""
+        """
+        Returns true if zfile_read() just read the last chunk in the file.
+        """
         return lib.zfile_eof(self._as_parameter_)
 
     def write(self, chunk, offset):
-        """Write chunk to file at specified position
-Return 0 if OK, else -1"""
+        """
+        Write chunk to file at specified position
+Return 0 if OK, else -1
+        """
         return lib.zfile_write(self._as_parameter_, chunk, offset)
 
     def readln(self):
-        """Read next line of text from file. Returns a pointer to the text line,
-or NULL if there was nothing more to read from the file."""
+        """
+        Read next line of text from file. Returns a pointer to the text line,
+or NULL if there was nothing more to read from the file.
+        """
         return lib.zfile_readln(self._as_parameter_)
 
     def close(self):
-        """Close file, if open"""
+        """
+        Close file, if open
+        """
         return lib.zfile_close(self._as_parameter_)
 
     def handle(self):
-        """Return file handle, if opened"""
+        """
+        Return file handle, if opened
+        """
         return return_py_file(lib.zfile_handle(self._as_parameter_))
 
     def digest(self):
-        """Calculate SHA1 digest for file, using zdigest class."""
+        """
+        Calculate SHA1 digest for file, using zdigest class.
+        """
         return lib.zfile_digest(self._as_parameter_)
 
     @staticmethod
     def test(verbose):
-        """Self test of this class."""
+        """
+        Self test of this class.
+        """
         return lib.zfile_test(verbose)
 
 
@@ -1738,16 +2102,20 @@ lib.zframe_test.restype = None
 lib.zframe_test.argtypes = [c_bool]
 
 class Zframe(object):
-    """working with single message frames"""
+    """
+    working with single message frames
+    """
 
     MORE = 1 # 
     REUSE = 2 # 
     DONTWAIT = 4 # 
     allow_destruct = False
     def __init__(self, *args):
-        """Create a new frame. If size is not null, allocates the frame data
+        """
+        Create a new frame. If size is not null, allocates the frame data
 to the specified size. If additionally, data is not null, copies
-size octets from the specified data into the frame body."""
+size octets from the specified data into the frame body.
+        """
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], zframe_p) # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -1760,7 +2128,9 @@ size octets from the specified data into the frame body."""
             self.allow_destruct = True
 
     def __del__(self):
-        """Destroy a frame"""
+        """
+        Destroy a frame
+        """
         if self.allow_destruct:
             lib.zframe_destroy(byref(self._as_parameter_))
 
@@ -1774,96 +2144,134 @@ size octets from the specified data into the frame body."""
 
     @staticmethod
     def new_empty():
-        """Create an empty (zero-sized) frame"""
+        """
+        Create an empty (zero-sized) frame
+        """
         return Zframe(lib.zframe_new_empty(), False)
 
     @staticmethod
     def from_(string):
-        """Create a frame with a specified string content."""
+        """
+        Create a frame with a specified string content.
+        """
         return Zframe(lib.zframe_from(string), False)
 
     @staticmethod
     def recv(source):
-        """Receive frame from socket, returns zframe_t object or NULL if the recv
+        """
+        Receive frame from socket, returns zframe_t object or NULL if the recv
 was interrupted. Does a blocking recv, if you want to not block then use
-zpoller or zloop."""
+zpoller or zloop.
+        """
         return Zframe(lib.zframe_recv(source), False)
 
     @staticmethod
     def send(self_p, dest, flags):
-        """Send a frame to a socket, destroy frame after sending.
-Return -1 on error, 0 on success."""
+        """
+        Send a frame to a socket, destroy frame after sending.
+Return -1 on error, 0 on success.
+        """
         return lib.zframe_send(byref(zframe_p.from_param(self_p)), dest, flags)
 
     def size(self):
-        """Return number of bytes in frame data"""
+        """
+        Return number of bytes in frame data
+        """
         return lib.zframe_size(self._as_parameter_)
 
     def data(self):
-        """Return address of frame data"""
+        """
+        Return address of frame data
+        """
         return lib.zframe_data(self._as_parameter_)
 
     def dup(self):
-        """Create a new frame that duplicates an existing frame. If frame is null,
-or memory was exhausted, returns null."""
+        """
+        Create a new frame that duplicates an existing frame. If frame is null,
+or memory was exhausted, returns null.
+        """
         return Zframe(lib.zframe_dup(self._as_parameter_), True)
 
     def strhex(self):
-        """Return frame data encoded as printable hex string, useful for 0MQ UUIDs.
-Caller must free string when finished with it."""
+        """
+        Return frame data encoded as printable hex string, useful for 0MQ UUIDs.
+Caller must free string when finished with it.
+        """
         return return_fresh_string(lib.zframe_strhex(self._as_parameter_))
 
     def strdup(self):
-        """Return frame data copied into freshly allocated string
-Caller must free string when finished with it."""
+        """
+        Return frame data copied into freshly allocated string
+Caller must free string when finished with it.
+        """
         return return_fresh_string(lib.zframe_strdup(self._as_parameter_))
 
     def streq(self, string):
-        """Return TRUE if frame body is equal to string, excluding terminator"""
+        """
+        Return TRUE if frame body is equal to string, excluding terminator
+        """
         return lib.zframe_streq(self._as_parameter_, string)
 
     def more(self):
-        """Return frame MORE indicator (1 or 0), set when reading frame from socket
-or by the zframe_set_more() method"""
+        """
+        Return frame MORE indicator (1 or 0), set when reading frame from socket
+or by the zframe_set_more() method
+        """
         return lib.zframe_more(self._as_parameter_)
 
     def set_more(self, more):
-        """Set frame MORE indicator (1 or 0). Note this is NOT used when sending
-frame to socket, you have to specify flag explicitly."""
+        """
+        Set frame MORE indicator (1 or 0). Note this is NOT used when sending
+frame to socket, you have to specify flag explicitly.
+        """
         return lib.zframe_set_more(self._as_parameter_, more)
 
     def routing_id(self):
-        """Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
-Else returns zero."""
+        """
+        Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
+Else returns zero.
+        """
         return lib.zframe_routing_id(self._as_parameter_)
 
     def set_routing_id(self, routing_id):
-        """Set routing ID on frame. This is used if/when the frame is sent to a
-ZMQ_SERVER socket."""
+        """
+        Set routing ID on frame. This is used if/when the frame is sent to a
+ZMQ_SERVER socket.
+        """
         return lib.zframe_set_routing_id(self._as_parameter_, routing_id)
 
     def eq(self, other):
-        """Return TRUE if two frames have identical size and data
-If either frame is NULL, equality is always false."""
+        """
+        Return TRUE if two frames have identical size and data
+If either frame is NULL, equality is always false.
+        """
         return lib.zframe_eq(self._as_parameter_, other)
 
     def reset(self, data, size):
-        """Set new contents for frame"""
+        """
+        Set new contents for frame
+        """
         return lib.zframe_reset(self._as_parameter_, data, size)
 
     def print(self, prefix):
-        """Send message to zsys log sink (may be stdout, or system facility as
-configured by zsys_set_logstream). Prefix shows before frame, if not null."""
+        """
+        Send message to zsys log sink (may be stdout, or system facility as
+configured by zsys_set_logstream). Prefix shows before frame, if not null.
+        """
         return lib.zframe_print(self._as_parameter_, prefix)
 
     @staticmethod
     def is_(self):
-        """Probe the supplied object, and report if it looks like a zframe_t."""
+        """
+        Probe the supplied object, and report if it looks like a zframe_t.
+        """
         return lib.zframe_is(self)
 
     @staticmethod
     def test(verbose):
-        """Self test of this class."""
+        """
+        Self test of this class.
+        """
         return lib.zframe_test(verbose)
 
 
@@ -1918,11 +2326,15 @@ lib.zhash_test.restype = None
 lib.zhash_test.argtypes = [c_bool]
 
 class Zhash(object):
-    """generic type-free hash container (simple)"""
+    """
+    generic type-free hash container (simple)
+    """
 
     allow_destruct = False
     def __init__(self, *args):
-        """Create a new, empty hash container"""
+        """
+        Create a new, empty hash container
+        """
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], zhash_p) # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -1935,7 +2347,9 @@ class Zhash(object):
             self.allow_destruct = True
 
     def __del__(self):
-        """Destroy a hash container and all items in it"""
+        """
+        Destroy a hash container and all items in it
+        """
         if self.allow_destruct:
             lib.zhash_destroy(byref(self._as_parameter_))
 
@@ -1949,91 +2363,120 @@ class Zhash(object):
 
     @staticmethod
     def unpack(frame):
-        """Unpack binary frame into a new hash table. Packed data must follow format
+        """
+        Unpack binary frame into a new hash table. Packed data must follow format
 defined by zhash_pack. Hash table is set to autofree. An empty frame
-unpacks to an empty hash table."""
+unpacks to an empty hash table.
+        """
         return Zhash(lib.zhash_unpack(frame), False)
 
     def insert(self, key, item):
-        """Insert item into hash table with specified key and item.
+        """
+        Insert item into hash table with specified key and item.
 If key is already present returns -1 and leaves existing item unchanged
-Returns 0 on success."""
+Returns 0 on success.
+        """
         return lib.zhash_insert(self._as_parameter_, key, item)
 
     def update(self, key, item):
-        """Update item into hash table with specified key and item.
+        """
+        Update item into hash table with specified key and item.
 If key is already present, destroys old item and inserts new one.
-Use free_fn method to ensure deallocator is properly called on item."""
+Use free_fn method to ensure deallocator is properly called on item.
+        """
         return lib.zhash_update(self._as_parameter_, key, item)
 
     def delete(self, key):
-        """Remove an item specified by key from the hash table. If there was no such
-item, this function does nothing."""
+        """
+        Remove an item specified by key from the hash table. If there was no such
+item, this function does nothing.
+        """
         return lib.zhash_delete(self._as_parameter_, key)
 
     def lookup(self, key):
-        """Return the item at the specified key, or null"""
+        """
+        Return the item at the specified key, or null
+        """
         return c_void_p(lib.zhash_lookup(self._as_parameter_, key))
 
     def rename(self, old_key, new_key):
-        """Reindexes an item from an old key to a new key. If there was no such
-item, does nothing. Returns 0 if successful, else -1."""
+        """
+        Reindexes an item from an old key to a new key. If there was no such
+item, does nothing. Returns 0 if successful, else -1.
+        """
         return lib.zhash_rename(self._as_parameter_, old_key, new_key)
 
     def freefn(self, key, free_fn):
-        """Set a free function for the specified hash table item. When the item is
+        """
+        Set a free function for the specified hash table item. When the item is
 destroyed, the free function, if any, is called on that item.
 Use this when hash items are dynamically allocated, to ensure that
 you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
-Returns the item, or NULL if there is no such item."""
+Returns the item, or NULL if there is no such item.
+        """
         return c_void_p(lib.zhash_freefn(self._as_parameter_, key, free_fn))
 
     def size(self):
-        """Return the number of keys/items in the hash table"""
+        """
+        Return the number of keys/items in the hash table
+        """
         return lib.zhash_size(self._as_parameter_)
 
     def dup(self):
-        """Make copy of hash table; if supplied table is null, returns null.
+        """
+        Make copy of hash table; if supplied table is null, returns null.
 Does not copy items themselves. Rebuilds new table so may be slow on
 very large tables. NOTE: only works with item values that are strings
-since there's no other way to know how to duplicate the item value."""
+since there's no other way to know how to duplicate the item value.
+        """
         return Zhash(lib.zhash_dup(self._as_parameter_), True)
 
     def keys(self):
-        """Return keys for items in table"""
+        """
+        Return keys for items in table
+        """
         return Zlist(lib.zhash_keys(self._as_parameter_), True)
 
     def first(self):
-        """Simple iterator; returns first item in hash table, in no given order,
+        """
+        Simple iterator; returns first item in hash table, in no given order,
 or NULL if the table is empty. This method is simpler to use than the
 foreach() method, which is deprecated. To access the key for this item
-use zhash_cursor(). NOTE: do NOT modify the table while iterating."""
+use zhash_cursor(). NOTE: do NOT modify the table while iterating.
+        """
         return c_void_p(lib.zhash_first(self._as_parameter_))
 
     def next(self):
-        """Simple iterator; returns next item in hash table, in no given order,
+        """
+        Simple iterator; returns next item in hash table, in no given order,
 or NULL if the last item was already returned. Use this together with
 zhash_first() to process all items in a hash table. If you need the
 items in sorted order, use zhash_keys() and then zlist_sort(). To
 access the key for this item use zhash_cursor(). NOTE: do NOT modify
-the table while iterating."""
+the table while iterating.
+        """
         return c_void_p(lib.zhash_next(self._as_parameter_))
 
     def cursor(self):
-        """After a successful first/next method, returns the key for the item that
+        """
+        After a successful first/next method, returns the key for the item that
 was returned. This is a constant string that you may not modify or
 deallocate, and which lasts as long as the item in the hash. After an
-unsuccessful first/next, returns NULL."""
+unsuccessful first/next, returns NULL.
+        """
         return lib.zhash_cursor(self._as_parameter_)
 
     def comment(self, format, *args):
-        """Add a comment to hash table before saving to disk. You can add as many
+        """
+        Add a comment to hash table before saving to disk. You can add as many
 comment lines as you like. These comment lines are discarded when loading
-the file. If you use a null format, all comments are deleted."""
+the file. If you use a null format, all comments are deleted.
+        """
         return lib.zhash_comment(self._as_parameter_, format, *args)
 
     def pack(self):
-        """Serialize hash table to a binary frame that can be sent in a message.
+        """
+        Serialize hash table to a binary frame that can be sent in a message.
 The packed format is compatible with the 'dictionary' type defined in
 http://rfc.zeromq.org/spec:35/FILEMQ, and implemented by zproto:
 
@@ -2052,41 +2495,54 @@ http://rfc.zeromq.org/spec:35/FILEMQ, and implemented by zproto:
    number-4        = 4OCTET
 
 Comments are not included in the packed data. Item values MUST be
-strings."""
+strings.
+        """
         return Zframe(lib.zhash_pack(self._as_parameter_), True)
 
     def save(self, filename):
-        """Save hash table to a text file in name=value format. Hash values must be
+        """
+        Save hash table to a text file in name=value format. Hash values must be
 printable strings; keys may not contain '=' character. Returns 0 if OK,
-else -1 if a file error occurred."""
+else -1 if a file error occurred.
+        """
         return lib.zhash_save(self._as_parameter_, filename)
 
     def load(self, filename):
-        """Load hash table from a text file in name=value format; hash table must
+        """
+        Load hash table from a text file in name=value format; hash table must
 already exist. Hash values must printable strings; keys may not contain
-'=' character. Returns 0 if OK, else -1 if a file was not readable."""
+'=' character. Returns 0 if OK, else -1 if a file was not readable.
+        """
         return lib.zhash_load(self._as_parameter_, filename)
 
     def refresh(self):
-        """When a hash table was loaded from a file by zhash_load, this method will
+        """
+        When a hash table was loaded from a file by zhash_load, this method will
 reload the file if it has been modified since, and is "stable", i.e. not
 still changing. Returns 0 if OK, -1 if there was an error reloading the 
-file."""
+file.
+        """
         return lib.zhash_refresh(self._as_parameter_)
 
     def autofree(self):
-        """Set hash for automatic value destruction"""
+        """
+        Set hash for automatic value destruction
+        """
         return lib.zhash_autofree(self._as_parameter_)
 
     def foreach(self, callback, argument):
-        """Apply function to each item in the hash table. Items are iterated in no
+        """
+        Apply function to each item in the hash table. Items are iterated in no
 defined order. Stops if callback function returns non-zero and returns
-final return code from callback function (zero = success). Deprecated."""
+final return code from callback function (zero = success). Deprecated.
+        """
         return lib.zhash_foreach(self._as_parameter_, callback, argument)
 
     @staticmethod
     def test(verbose):
-        """Self test of this class."""
+        """
+        Self test of this class.
+        """
         return lib.zhash_test(verbose)
 
 
@@ -2163,11 +2619,15 @@ lib.zhashx_test.restype = None
 lib.zhashx_test.argtypes = [c_bool]
 
 class Zhashx(object):
-    """extended generic type-free hash container"""
+    """
+    extended generic type-free hash container
+    """
 
     allow_destruct = False
     def __init__(self, *args):
-        """Create a new, empty hash container"""
+        """
+        Create a new, empty hash container
+        """
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], zhashx_p) # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -2180,7 +2640,9 @@ class Zhashx(object):
             self.allow_destruct = True
 
     def __del__(self):
-        """Destroy a hash container and all items in it"""
+        """
+        Destroy a hash container and all items in it
+        """
         if self.allow_destruct:
             lib.zhashx_destroy(byref(self._as_parameter_))
 
@@ -2194,119 +2656,156 @@ class Zhashx(object):
 
     @staticmethod
     def unpack(frame):
-        """Unpack binary frame into a new hash table. Packed data must follow format
+        """
+        Unpack binary frame into a new hash table. Packed data must follow format
 defined by zhashx_pack. Hash table is set to autofree. An empty frame
-unpacks to an empty hash table."""
+unpacks to an empty hash table.
+        """
         return Zhashx(lib.zhashx_unpack(frame), False)
 
     def insert(self, key, item):
-        """Insert item into hash table with specified key and item.
+        """
+        Insert item into hash table with specified key and item.
 If key is already present returns -1 and leaves existing item unchanged
-Returns 0 on success."""
+Returns 0 on success.
+        """
         return lib.zhashx_insert(self._as_parameter_, key, item)
 
     def update(self, key, item):
-        """Update or insert item into hash table with specified key and item. If the
+        """
+        Update or insert item into hash table with specified key and item. If the
 key is already present, destroys old item and inserts new one. If you set
 a container item destructor, this is called on the old value. If the key
 was not already present, inserts a new item. Sets the hash cursor to the
-new item."""
+new item.
+        """
         return lib.zhashx_update(self._as_parameter_, key, item)
 
     def delete(self, key):
-        """Remove an item specified by key from the hash table. If there was no such
-item, this function does nothing."""
+        """
+        Remove an item specified by key from the hash table. If there was no such
+item, this function does nothing.
+        """
         return lib.zhashx_delete(self._as_parameter_, key)
 
     def purge(self):
-        """Delete all items from the hash table. If the key destructor is
+        """
+        Delete all items from the hash table. If the key destructor is
 set, calls it on every key. If the item destructor is set, calls
-it on every item."""
+it on every item.
+        """
         return lib.zhashx_purge(self._as_parameter_)
 
     def lookup(self, key):
-        """Return the item at the specified key, or null"""
+        """
+        Return the item at the specified key, or null
+        """
         return c_void_p(lib.zhashx_lookup(self._as_parameter_, key))
 
     def rename(self, old_key, new_key):
-        """Reindexes an item from an old key to a new key. If there was no such
-item, does nothing. Returns 0 if successful, else -1."""
+        """
+        Reindexes an item from an old key to a new key. If there was no such
+item, does nothing. Returns 0 if successful, else -1.
+        """
         return lib.zhashx_rename(self._as_parameter_, old_key, new_key)
 
     def freefn(self, key, free_fn):
-        """Set a free function for the specified hash table item. When the item is
+        """
+        Set a free function for the specified hash table item. When the item is
 destroyed, the free function, if any, is called on that item.
 Use this when hash items are dynamically allocated, to ensure that
 you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
-Returns the item, or NULL if there is no such item."""
+Returns the item, or NULL if there is no such item.
+        """
         return c_void_p(lib.zhashx_freefn(self._as_parameter_, key, free_fn))
 
     def size(self):
-        """Return the number of keys/items in the hash table"""
+        """
+        Return the number of keys/items in the hash table
+        """
         return lib.zhashx_size(self._as_parameter_)
 
     def keys(self):
-        """Return a zlistx_t containing the keys for the items in the
+        """
+        Return a zlistx_t containing the keys for the items in the
 table. Uses the key_duplicator to duplicate all keys and sets the
-key_destructor as destructor for the list."""
+key_destructor as destructor for the list.
+        """
         return Zlistx(lib.zhashx_keys(self._as_parameter_), True)
 
     def values(self):
-        """Return a zlistx_t containing the values for the items in the
+        """
+        Return a zlistx_t containing the values for the items in the
 table. Uses the duplicator to duplicate all items and sets the
-destructor as destructor for the list."""
+destructor as destructor for the list.
+        """
         return Zlistx(lib.zhashx_values(self._as_parameter_), True)
 
     def first(self):
-        """Simple iterator; returns first item in hash table, in no given order,
+        """
+        Simple iterator; returns first item in hash table, in no given order,
 or NULL if the table is empty. This method is simpler to use than the
 foreach() method, which is deprecated. To access the key for this item
-use zhashx_cursor(). NOTE: do NOT modify the table while iterating."""
+use zhashx_cursor(). NOTE: do NOT modify the table while iterating.
+        """
         return c_void_p(lib.zhashx_first(self._as_parameter_))
 
     def next(self):
-        """Simple iterator; returns next item in hash table, in no given order,
+        """
+        Simple iterator; returns next item in hash table, in no given order,
 or NULL if the last item was already returned. Use this together with
 zhashx_first() to process all items in a hash table. If you need the
 items in sorted order, use zhashx_keys() and then zlistx_sort(). To
 access the key for this item use zhashx_cursor(). NOTE: do NOT modify
-the table while iterating."""
+the table while iterating.
+        """
         return c_void_p(lib.zhashx_next(self._as_parameter_))
 
     def cursor(self):
-        """After a successful first/next method, returns the key for the item that
+        """
+        After a successful first/next method, returns the key for the item that
 was returned. This is a constant string that you may not modify or
 deallocate, and which lasts as long as the item in the hash. After an
-unsuccessful first/next, returns NULL."""
+unsuccessful first/next, returns NULL.
+        """
         return c_void_p(lib.zhashx_cursor(self._as_parameter_))
 
     def comment(self, format, *args):
-        """Add a comment to hash table before saving to disk. You can add as many
+        """
+        Add a comment to hash table before saving to disk. You can add as many
 comment lines as you like. These comment lines are discarded when loading
-the file. If you use a null format, all comments are deleted."""
+the file. If you use a null format, all comments are deleted.
+        """
         return lib.zhashx_comment(self._as_parameter_, format, *args)
 
     def save(self, filename):
-        """Save hash table to a text file in name=value format. Hash values must be
+        """
+        Save hash table to a text file in name=value format. Hash values must be
 printable strings; keys may not contain '=' character. Returns 0 if OK,
-else -1 if a file error occurred."""
+else -1 if a file error occurred.
+        """
         return lib.zhashx_save(self._as_parameter_, filename)
 
     def load(self, filename):
-        """Load hash table from a text file in name=value format; hash table must
+        """
+        Load hash table from a text file in name=value format; hash table must
 already exist. Hash values must printable strings; keys may not contain
-'=' character. Returns 0 if OK, else -1 if a file was not readable."""
+'=' character. Returns 0 if OK, else -1 if a file was not readable.
+        """
         return lib.zhashx_load(self._as_parameter_, filename)
 
     def refresh(self):
-        """When a hash table was loaded from a file by zhashx_load, this method will
+        """
+        When a hash table was loaded from a file by zhashx_load, this method will
 reload the file if it has been modified since, and is "stable", i.e. not
 still changing. Returns 0 if OK, -1 if there was an error reloading the 
-file."""
+file.
+        """
         return lib.zhashx_refresh(self._as_parameter_)
 
     def pack(self):
-        """Serialize hash table to a binary frame that can be sent in a message.
+        """
+        Serialize hash table to a binary frame that can be sent in a message.
 The packed format is compatible with the 'dictionary' type defined in
 http://rfc.zeromq.org/spec:35/FILEMQ, and implemented by zproto:
 
@@ -2325,70 +2824,93 @@ http://rfc.zeromq.org/spec:35/FILEMQ, and implemented by zproto:
    number-4        = 4OCTET
 
 Comments are not included in the packed data. Item values MUST be
-strings."""
+strings.
+        """
         return Zframe(lib.zhashx_pack(self._as_parameter_), True)
 
     def dup(self):
-        """Make a copy of the list; items are duplicated if you set a duplicator
+        """
+        Make a copy of the list; items are duplicated if you set a duplicator
 for the list, otherwise not. Copying a null reference returns a null
 reference. Note that this method's behavior changed slightly for CZMQ
 v3.x, as it does not set nor respect autofree. It does however let you
-duplicate any hash table safely. The old behavior is in zhashx_dup_v2."""
+duplicate any hash table safely. The old behavior is in zhashx_dup_v2.
+        """
         return Zhashx(lib.zhashx_dup(self._as_parameter_), True)
 
     def set_destructor(self, destructor):
-        """Set a user-defined deallocator for hash items; by default items are not
-freed when the hash is destroyed."""
+        """
+        Set a user-defined deallocator for hash items; by default items are not
+freed when the hash is destroyed.
+        """
         return lib.zhashx_set_destructor(self._as_parameter_, destructor)
 
     def set_duplicator(self, duplicator):
-        """Set a user-defined duplicator for hash items; by default items are not
-copied when the hash is duplicated."""
+        """
+        Set a user-defined duplicator for hash items; by default items are not
+copied when the hash is duplicated.
+        """
         return lib.zhashx_set_duplicator(self._as_parameter_, duplicator)
 
     def set_key_destructor(self, destructor):
-        """Set a user-defined deallocator for keys; by default keys are freed
-when the hash is destroyed using free()."""
+        """
+        Set a user-defined deallocator for keys; by default keys are freed
+when the hash is destroyed using free().
+        """
         return lib.zhashx_set_key_destructor(self._as_parameter_, destructor)
 
     def set_key_duplicator(self, duplicator):
-        """Set a user-defined duplicator for keys; by default keys are duplicated
-using strdup."""
+        """
+        Set a user-defined duplicator for keys; by default keys are duplicated
+using strdup.
+        """
         return lib.zhashx_set_key_duplicator(self._as_parameter_, duplicator)
 
     def set_key_comparator(self, comparator):
-        """Set a user-defined comparator for keys; by default keys are
-compared using strcmp."""
+        """
+        Set a user-defined comparator for keys; by default keys are
+compared using strcmp.
+        """
         return lib.zhashx_set_key_comparator(self._as_parameter_, comparator)
 
     def set_key_hasher(self, hasher):
-        """Set a user-defined comparator for keys; by default keys are
-compared using strcmp."""
+        """
+        Set a user-defined comparator for keys; by default keys are
+compared using strcmp.
+        """
         return lib.zhashx_set_key_hasher(self._as_parameter_, hasher)
 
     def dup_v2(self):
-        """Make copy of hash table; if supplied table is null, returns null.
+        """
+        Make copy of hash table; if supplied table is null, returns null.
 Does not copy items themselves. Rebuilds new table so may be slow on
 very large tables. NOTE: only works with item values that are strings
-since there's no other way to know how to duplicate the item value."""
+since there's no other way to know how to duplicate the item value.
+        """
         return Zhashx(lib.zhashx_dup_v2(self._as_parameter_), False)
 
     def autofree(self):
-        """DEPRECATED as clumsy -- use set_destructor instead
-Set hash for automatic value destruction"""
+        """
+        DEPRECATED as clumsy -- use set_destructor instead
+Set hash for automatic value destruction
+        """
         return lib.zhashx_autofree(self._as_parameter_)
 
     def foreach(self, callback, argument):
-        """DEPRECATED as clumsy -- use zhashx_first/_next instead
+        """
+        DEPRECATED as clumsy -- use zhashx_first/_next instead
 Apply function to each item in the hash table. Items are iterated in no
 defined order. Stops if callback function returns non-zero and returns
 final return code from callback function (zero = success).
-Callback function for zhashx_foreach method"""
+Callback function for zhashx_foreach method
+        """
         return lib.zhashx_foreach(self._as_parameter_, callback, argument)
 
     @staticmethod
     def test(verbose):
-        """Self test of this class."""
+        """
+        Self test of this class.
+        """
         return lib.zhashx_test(verbose)
 
 
@@ -2417,11 +2939,15 @@ lib.ziflist_test.restype = None
 lib.ziflist_test.argtypes = [c_bool]
 
 class Ziflist(object):
-    """List of network interfaces available on system"""
+    """
+    List of network interfaces available on system
+    """
 
     allow_destruct = False
     def __init__(self, *args):
-        """Get a list of network interfaces currently defined on the system"""
+        """
+        Get a list of network interfaces currently defined on the system
+        """
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], ziflist_p) # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -2434,7 +2960,9 @@ class Ziflist(object):
             self.allow_destruct = True
 
     def __del__(self):
-        """Destroy a ziflist instance"""
+        """
+        Destroy a ziflist instance
+        """
         if self.allow_destruct:
             lib.ziflist_destroy(byref(self._as_parameter_))
 
@@ -2447,40 +2975,58 @@ class Ziflist(object):
         return self._as_parameter_.__nonzero__()
 
     def reload(self):
-        """Reload network interfaces from system"""
+        """
+        Reload network interfaces from system
+        """
         return lib.ziflist_reload(self._as_parameter_)
 
     def size(self):
-        """Return the number of network interfaces on system"""
+        """
+        Return the number of network interfaces on system
+        """
         return lib.ziflist_size(self._as_parameter_)
 
     def first(self):
-        """Get first network interface, return NULL if there are none"""
+        """
+        Get first network interface, return NULL if there are none
+        """
         return lib.ziflist_first(self._as_parameter_)
 
     def next(self):
-        """Get next network interface, return NULL if we hit the last one"""
+        """
+        Get next network interface, return NULL if we hit the last one
+        """
         return lib.ziflist_next(self._as_parameter_)
 
     def address(self):
-        """Return the current interface IP address as a printable string"""
+        """
+        Return the current interface IP address as a printable string
+        """
         return lib.ziflist_address(self._as_parameter_)
 
     def broadcast(self):
-        """Return the current interface broadcast address as a printable string"""
+        """
+        Return the current interface broadcast address as a printable string
+        """
         return lib.ziflist_broadcast(self._as_parameter_)
 
     def netmask(self):
-        """Return the current interface network mask as a printable string"""
+        """
+        Return the current interface network mask as a printable string
+        """
         return lib.ziflist_netmask(self._as_parameter_)
 
     def print(self):
-        """Return the list of interfaces."""
+        """
+        Return the list of interfaces.
+        """
         return lib.ziflist_print(self._as_parameter_)
 
     @staticmethod
     def test(verbose):
-        """Self test of this class."""
+        """
+        Self test of this class.
+        """
         return lib.ziflist_test(verbose)
 
 
@@ -2531,11 +3077,15 @@ lib.zlist_test.restype = None
 lib.zlist_test.argtypes = [c_bool]
 
 class Zlist(object):
-    """simple generic list container"""
+    """
+    simple generic list container
+    """
 
     allow_destruct = False
     def __init__(self, *args):
-        """Create a new list container"""
+        """
+        Create a new list container
+        """
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], zlist_p) # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -2548,7 +3098,9 @@ class Zlist(object):
             self.allow_destruct = True
 
     def __del__(self):
-        """Destroy a list container"""
+        """
+        Destroy a list container
+        """
         if self.allow_destruct:
             lib.zlist_destroy(byref(self._as_parameter_))
 
@@ -2561,109 +3113,147 @@ class Zlist(object):
         return self._as_parameter_.__nonzero__()
 
     def first(self):
-        """Return the item at the head of list. If the list is empty, returns NULL.
-Leaves cursor pointing at the head item, or NULL if the list is empty."""
+        """
+        Return the item at the head of list. If the list is empty, returns NULL.
+Leaves cursor pointing at the head item, or NULL if the list is empty.
+        """
         return c_void_p(lib.zlist_first(self._as_parameter_))
 
     def next(self):
-        """Return the next item. If the list is empty, returns NULL. To move to
-the start of the list call zlist_first (). Advances the cursor."""
+        """
+        Return the next item. If the list is empty, returns NULL. To move to
+the start of the list call zlist_first (). Advances the cursor.
+        """
         return c_void_p(lib.zlist_next(self._as_parameter_))
 
     def last(self):
-        """Return the item at the tail of list. If the list is empty, returns NULL.
-Leaves cursor pointing at the tail item, or NULL if the list is empty."""
+        """
+        Return the item at the tail of list. If the list is empty, returns NULL.
+Leaves cursor pointing at the tail item, or NULL if the list is empty.
+        """
         return c_void_p(lib.zlist_last(self._as_parameter_))
 
     def head(self):
-        """Return first item in the list, or null, leaves the cursor"""
+        """
+        Return first item in the list, or null, leaves the cursor
+        """
         return c_void_p(lib.zlist_head(self._as_parameter_))
 
     def tail(self):
-        """Return last item in the list, or null, leaves the cursor"""
+        """
+        Return last item in the list, or null, leaves the cursor
+        """
         return c_void_p(lib.zlist_tail(self._as_parameter_))
 
     def item(self):
-        """Return the current item of list. If the list is empty, returns NULL.
-Leaves cursor pointing at the current item, or NULL if the list is empty."""
+        """
+        Return the current item of list. If the list is empty, returns NULL.
+Leaves cursor pointing at the current item, or NULL if the list is empty.
+        """
         return c_void_p(lib.zlist_item(self._as_parameter_))
 
     def append(self, item):
-        """Append an item to the end of the list, return 0 if OK or -1 if this
+        """
+        Append an item to the end of the list, return 0 if OK or -1 if this
 failed for some reason (out of memory). Note that if a duplicator has
-been set, this method will also duplicate the item."""
+been set, this method will also duplicate the item.
+        """
         return lib.zlist_append(self._as_parameter_, item)
 
     def push(self, item):
-        """Push an item to the start of the list, return 0 if OK or -1 if this
+        """
+        Push an item to the start of the list, return 0 if OK or -1 if this
 failed for some reason (out of memory). Note that if a duplicator has
-been set, this method will also duplicate the item."""
+been set, this method will also duplicate the item.
+        """
         return lib.zlist_push(self._as_parameter_, item)
 
     def pop(self):
-        """Pop the item off the start of the list, if any"""
+        """
+        Pop the item off the start of the list, if any
+        """
         return c_void_p(lib.zlist_pop(self._as_parameter_))
 
     def exists(self, item):
-        """Checks if an item already is present. Uses compare method to determine if
+        """
+        Checks if an item already is present. Uses compare method to determine if
 items are equal. If the compare method is NULL the check will only compare
-pointers. Returns true if item is present else false."""
+pointers. Returns true if item is present else false.
+        """
         return lib.zlist_exists(self._as_parameter_, item)
 
     def remove(self, item):
-        """Remove the specified item from the list if present"""
+        """
+        Remove the specified item from the list if present
+        """
         return lib.zlist_remove(self._as_parameter_, item)
 
     def dup(self):
-        """Make a copy of list. If the list has autofree set, the copied list will
+        """
+        Make a copy of list. If the list has autofree set, the copied list will
 duplicate all items, which must be strings. Otherwise, the list will hold
 pointers back to the items in the original list. If list is null, returns
-NULL."""
+NULL.
+        """
         return Zlist(lib.zlist_dup(self._as_parameter_), True)
 
     def purge(self):
-        """Purge all items from list"""
+        """
+        Purge all items from list
+        """
         return lib.zlist_purge(self._as_parameter_)
 
     def size(self):
-        """Return number of items in the list"""
+        """
+        Return number of items in the list
+        """
         return lib.zlist_size(self._as_parameter_)
 
     def sort(self, compare):
-        """Sort the list by ascending key value using a straight ASCII comparison.
-The sort is not stable, so may reorder items with the same keys."""
+        """
+        Sort the list by ascending key value using a straight ASCII comparison.
+The sort is not stable, so may reorder items with the same keys.
+        """
         return lib.zlist_sort(self._as_parameter_, compare)
 
     def autofree(self):
-        """Set list for automatic item destruction; item values MUST be strings.
+        """
+        Set list for automatic item destruction; item values MUST be strings.
 By default a list item refers to a value held elsewhere. When you set
 this, each time you append or push a list item, zlist will take a copy
 of the string value. Then, when you destroy the list, it will free all
 item values automatically. If you use any other technique to allocate
 list values, you must free them explicitly before destroying the list.
 The usual technique is to pop list items and destroy them, until the
-list is empty."""
+list is empty.
+        """
         return lib.zlist_autofree(self._as_parameter_)
 
     def comparefn(self, fn):
-        """Sets a compare function for this list. The function compares two items.
+        """
+        Sets a compare function for this list. The function compares two items.
 It returns an integer less than, equal to, or greater than zero if the
 first item is found, respectively, to be less than, to match, or be
 greater than the second item.
-This function is used for sorting, removal and exists checking."""
+This function is used for sorting, removal and exists checking.
+        """
         return lib.zlist_comparefn(self._as_parameter_, fn)
 
     def freefn(self, item, fn, at_tail):
-        """Set a free function for the specified list item. When the item is
+        """
+        Set a free function for the specified list item. When the item is
 destroyed, the free function, if any, is called on that item.
 Use this when list items are dynamically allocated, to ensure that
 you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
-Returns the item, or NULL if there is no such item."""
+Returns the item, or NULL if there is no such item.
+        """
         return c_void_p(lib.zlist_freefn(self._as_parameter_, item, fn, at_tail))
 
     @staticmethod
     def test(verbose):
-        """Self test of this class."""
+        """
+        Self test of this class.
+        """
         return lib.zlist_test(verbose)
 
 
@@ -2728,11 +3318,15 @@ lib.zlistx_test.restype = None
 lib.zlistx_test.argtypes = [c_bool]
 
 class Zlistx(object):
-    """extended generic list container"""
+    """
+    extended generic list container
+    """
 
     allow_destruct = False
     def __init__(self, *args):
-        """Create a new, empty list."""
+        """
+        Create a new, empty list.
+        """
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], zlistx_p) # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -2745,8 +3339,10 @@ class Zlistx(object):
             self.allow_destruct = True
 
     def __del__(self):
-        """Destroy a list. If an item destructor was specified, all items in the
-list are automatically destroyed as well."""
+        """
+        Destroy a list. If an item destructor was specified, all items in the
+list are automatically destroyed as well.
+        """
         if self.allow_destruct:
             lib.zlistx_destroy(byref(self._as_parameter_))
 
@@ -2759,156 +3355,210 @@ list are automatically destroyed as well."""
         return self._as_parameter_.__nonzero__()
 
     def add_start(self, item):
-        """Add an item to the head of the list. Calls the item duplicator, if any,
+        """
+        Add an item to the head of the list. Calls the item duplicator, if any,
 on the item. Resets cursor to list head. Returns an item handle on
-success, NULL if memory was exhausted."""
+success, NULL if memory was exhausted.
+        """
         return c_void_p(lib.zlistx_add_start(self._as_parameter_, item))
 
     def add_end(self, item):
-        """Add an item to the tail of the list. Calls the item duplicator, if any,
+        """
+        Add an item to the tail of the list. Calls the item duplicator, if any,
 on the item. Resets cursor to list head. Returns an item handle on
-success, NULL if memory was exhausted."""
+success, NULL if memory was exhausted.
+        """
         return c_void_p(lib.zlistx_add_end(self._as_parameter_, item))
 
     def size(self):
-        """Return the number of items in the list"""
+        """
+        Return the number of items in the list
+        """
         return lib.zlistx_size(self._as_parameter_)
 
     def head(self):
-        """Return first item in the list, or null, leaves the cursor"""
+        """
+        Return first item in the list, or null, leaves the cursor
+        """
         return c_void_p(lib.zlistx_head(self._as_parameter_))
 
     def tail(self):
-        """Return last item in the list, or null, leaves the cursor"""
+        """
+        Return last item in the list, or null, leaves the cursor
+        """
         return c_void_p(lib.zlistx_tail(self._as_parameter_))
 
     def first(self):
-        """Return the item at the head of list. If the list is empty, returns NULL.
-Leaves cursor pointing at the head item, or NULL if the list is empty."""
+        """
+        Return the item at the head of list. If the list is empty, returns NULL.
+Leaves cursor pointing at the head item, or NULL if the list is empty.
+        """
         return c_void_p(lib.zlistx_first(self._as_parameter_))
 
     def next(self):
-        """Return the next item. At the end of the list (or in an empty list),
+        """
+        Return the next item. At the end of the list (or in an empty list),
 returns NULL. Use repeated zlistx_next () calls to work through the list
-from zlistx_first (). First time, acts as zlistx_first()."""
+from zlistx_first (). First time, acts as zlistx_first().
+        """
         return c_void_p(lib.zlistx_next(self._as_parameter_))
 
     def prev(self):
-        """Return the previous item. At the start of the list (or in an empty list),
+        """
+        Return the previous item. At the start of the list (or in an empty list),
 returns NULL. Use repeated zlistx_prev () calls to work through the list
-backwards from zlistx_last (). First time, acts as zlistx_last()."""
+backwards from zlistx_last (). First time, acts as zlistx_last().
+        """
         return c_void_p(lib.zlistx_prev(self._as_parameter_))
 
     def last(self):
-        """Return the item at the tail of list. If the list is empty, returns NULL.
-Leaves cursor pointing at the tail item, or NULL if the list is empty."""
+        """
+        Return the item at the tail of list. If the list is empty, returns NULL.
+Leaves cursor pointing at the tail item, or NULL if the list is empty.
+        """
         return c_void_p(lib.zlistx_last(self._as_parameter_))
 
     def item(self):
-        """Returns the value of the item at the cursor, or NULL if the cursor is
-not pointing to an item."""
+        """
+        Returns the value of the item at the cursor, or NULL if the cursor is
+not pointing to an item.
+        """
         return c_void_p(lib.zlistx_item(self._as_parameter_))
 
     def cursor(self):
-        """Returns the handle of the item at the cursor, or NULL if the cursor is
-not pointing to an item."""
+        """
+        Returns the handle of the item at the cursor, or NULL if the cursor is
+not pointing to an item.
+        """
         return c_void_p(lib.zlistx_cursor(self._as_parameter_))
 
     @staticmethod
     def handle_item(handle):
-        """Returns the item associated with the given list handle, or NULL if passed
-in handle is NULL. Asserts that the passed in handle points to a list element."""
+        """
+        Returns the item associated with the given list handle, or NULL if passed
+in handle is NULL. Asserts that the passed in handle points to a list element.
+        """
         return c_void_p(lib.zlistx_handle_item(handle))
 
     def find(self, item):
-        """Find an item in the list, searching from the start. Uses the item
+        """
+        Find an item in the list, searching from the start. Uses the item
 comparator, if any, else compares item values directly. Returns the
-item handle found, or NULL. Sets the cursor to the found item, if any."""
+item handle found, or NULL. Sets the cursor to the found item, if any.
+        """
         return c_void_p(lib.zlistx_find(self._as_parameter_, item))
 
     def detach(self, handle):
-        """Detach an item from the list, using its handle. The item is not modified,
+        """
+        Detach an item from the list, using its handle. The item is not modified,
 and the caller is responsible for destroying it if necessary. If handle is
 null, detaches the first item on the list. Returns item that was detached,
 or null if none was. If cursor was at item, moves cursor to previous item,
-so you can detach items while iterating forwards through a list."""
+so you can detach items while iterating forwards through a list.
+        """
         return c_void_p(lib.zlistx_detach(self._as_parameter_, handle))
 
     def detach_cur(self):
-        """Detach item at the cursor, if any, from the list. The item is not modified,
+        """
+        Detach item at the cursor, if any, from the list. The item is not modified,
 and the caller is responsible for destroying it as necessary. Returns item
 that was detached, or null if none was. Moves cursor to previous item, so
-you can detach items while iterating forwards through a list."""
+you can detach items while iterating forwards through a list.
+        """
         return c_void_p(lib.zlistx_detach_cur(self._as_parameter_))
 
     def delete(self, handle):
-        """Delete an item, using its handle. Calls the item destructor is any is
+        """
+        Delete an item, using its handle. Calls the item destructor is any is
 set. If handle is null, deletes the first item on the list. Returns 0
 if an item was deleted, -1 if not. If cursor was at item, moves cursor
 to previous item, so you can delete items while iterating forwards
-through a list."""
+through a list.
+        """
         return lib.zlistx_delete(self._as_parameter_, handle)
 
     def move_start(self, handle):
-        """Move an item to the start of the list, via its handle."""
+        """
+        Move an item to the start of the list, via its handle.
+        """
         return lib.zlistx_move_start(self._as_parameter_, handle)
 
     def move_end(self, handle):
-        """Move an item to the end of the list, via its handle."""
+        """
+        Move an item to the end of the list, via its handle.
+        """
         return lib.zlistx_move_end(self._as_parameter_, handle)
 
     def purge(self):
-        """Remove all items from the list, and destroy them if the item destructor
-is set."""
+        """
+        Remove all items from the list, and destroy them if the item destructor
+is set.
+        """
         return lib.zlistx_purge(self._as_parameter_)
 
     def sort(self):
-        """Sort the list. If an item comparator was set, calls that to compare
+        """
+        Sort the list. If an item comparator was set, calls that to compare
 items, otherwise compares on item value. The sort is not stable, so may
-reorder equal items."""
+reorder equal items.
+        """
         return lib.zlistx_sort(self._as_parameter_)
 
     def insert(self, item, low_value):
-        """Create a new node and insert it into a sorted list. Calls the item
+        """
+        Create a new node and insert it into a sorted list. Calls the item
 duplicator, if any, on the item. If low_value is true, starts searching
 from the start of the list, otherwise searches from the end. Use the item
 comparator, if any, to find where to place the new node. Returns a handle
 to the new node, or NULL if memory was exhausted. Resets the cursor to the
-list head."""
+list head.
+        """
         return c_void_p(lib.zlistx_insert(self._as_parameter_, item, low_value))
 
     def reorder(self, handle, low_value):
-        """Move an item, specified by handle, into position in a sorted list. Uses
+        """
+        Move an item, specified by handle, into position in a sorted list. Uses
 the item comparator, if any, to determine the new location. If low_value
 is true, starts searching from the start of the list, otherwise searches
-from the end."""
+from the end.
+        """
         return lib.zlistx_reorder(self._as_parameter_, handle, low_value)
 
     def dup(self):
-        """Make a copy of the list; items are duplicated if you set a duplicator
+        """
+        Make a copy of the list; items are duplicated if you set a duplicator
 for the list, otherwise not. Copying a null reference returns a null
-reference."""
+reference.
+        """
         return Zlistx(lib.zlistx_dup(self._as_parameter_), False)
 
     def set_destructor(self, destructor):
-        """Set a user-defined deallocator for list items; by default items are not
-freed when the list is destroyed."""
+        """
+        Set a user-defined deallocator for list items; by default items are not
+freed when the list is destroyed.
+        """
         return lib.zlistx_set_destructor(self._as_parameter_, destructor)
 
     def set_duplicator(self, duplicator):
-        """Set a user-defined duplicator for list items; by default items are not
-copied when the list is duplicated."""
+        """
+        Set a user-defined duplicator for list items; by default items are not
+copied when the list is duplicated.
+        """
         return lib.zlistx_set_duplicator(self._as_parameter_, duplicator)
 
     def set_comparator(self, comparator):
-        """Set a user-defined comparator for zlistx_find and zlistx_sort; the method
+        """
+        Set a user-defined comparator for zlistx_find and zlistx_sort; the method
 must return -1, 0, or 1 depending on whether item1 is less than, equal to,
-or greater than, item2."""
+or greater than, item2.
+        """
         return lib.zlistx_set_comparator(self._as_parameter_, comparator)
 
     @staticmethod
     def test(verbose):
-        """Self test of this class."""
+        """
+        Self test of this class.
+        """
         return lib.zlistx_test(verbose)
 
 
@@ -2956,11 +3606,15 @@ lib.zloop_test.restype = None
 lib.zloop_test.argtypes = [c_bool]
 
 class Zloop(object):
-    """event-driven reactor"""
+    """
+    event-driven reactor
+    """
 
     allow_destruct = False
     def __init__(self, *args):
-        """Create a new zloop reactor"""
+        """
+        Create a new zloop reactor
+        """
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], zloop_p) # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -2973,7 +3627,9 @@ class Zloop(object):
             self.allow_destruct = True
 
     def __del__(self):
-        """Destroy a reactor"""
+        """
+        Destroy a reactor
+        """
         if self.allow_destruct:
             lib.zloop_destroy(byref(self._as_parameter_))
 
@@ -2986,55 +3642,72 @@ class Zloop(object):
         return self._as_parameter_.__nonzero__()
 
     def reader(self, sock, handler, arg):
-        """Register socket reader with the reactor. When the reader has messages,
+        """
+        Register socket reader with the reactor. When the reader has messages,
 the reactor will call the handler, passing the arg. Returns 0 if OK, -1
 if there was an error. If you register the same socket more than once,
-each instance will invoke its corresponding handler."""
+each instance will invoke its corresponding handler.
+        """
         return lib.zloop_reader(self._as_parameter_, sock, handler, arg)
 
     def reader_end(self, sock):
-        """Cancel a socket reader from the reactor. If multiple readers exist for
-same socket, cancels ALL of them."""
+        """
+        Cancel a socket reader from the reactor. If multiple readers exist for
+same socket, cancels ALL of them.
+        """
         return lib.zloop_reader_end(self._as_parameter_, sock)
 
     def reader_set_tolerant(self, sock):
-        """Configure a registered reader to ignore errors. If you do not set this,
-then readers that have errors are removed from the reactor silently."""
+        """
+        Configure a registered reader to ignore errors. If you do not set this,
+then readers that have errors are removed from the reactor silently.
+        """
         return lib.zloop_reader_set_tolerant(self._as_parameter_, sock)
 
     def poller(self, item, handler, arg):
-        """Register low-level libzmq pollitem with the reactor. When the pollitem
+        """
+        Register low-level libzmq pollitem with the reactor. When the pollitem
 is ready, will call the handler, passing the arg. Returns 0 if OK, -1
 if there was an error. If you register the pollitem more than once, each
 instance will invoke its corresponding handler. A pollitem with
-socket=NULL and fd=0 means 'poll on FD zero'."""
+socket=NULL and fd=0 means 'poll on FD zero'.
+        """
         return lib.zloop_poller(self._as_parameter_, item, handler, arg)
 
     def poller_end(self, item):
-        """Cancel a pollitem from the reactor, specified by socket or FD. If both
+        """
+        Cancel a pollitem from the reactor, specified by socket or FD. If both
 are specified, uses only socket. If multiple poll items exist for same
-socket/FD, cancels ALL of them."""
+socket/FD, cancels ALL of them.
+        """
         return lib.zloop_poller_end(self._as_parameter_, item)
 
     def poller_set_tolerant(self, item):
-        """Configure a registered poller to ignore errors. If you do not set this,
-then poller that have errors are removed from the reactor silently."""
+        """
+        Configure a registered poller to ignore errors. If you do not set this,
+then poller that have errors are removed from the reactor silently.
+        """
         return lib.zloop_poller_set_tolerant(self._as_parameter_, item)
 
     def timer(self, delay, times, handler, arg):
-        """Register a timer that expires after some delay and repeats some number of
+        """
+        Register a timer that expires after some delay and repeats some number of
 times. At each expiry, will call the handler, passing the arg. To run a
 timer forever, use 0 times. Returns a timer_id that is used to cancel the
-timer in the future. Returns -1 if there was an error."""
+timer in the future. Returns -1 if there was an error.
+        """
         return lib.zloop_timer(self._as_parameter_, delay, times, handler, arg)
 
     def timer_end(self, timer_id):
-        """Cancel a specific timer identified by a specific timer_id (as returned by
-zloop_timer)."""
+        """
+        Cancel a specific timer identified by a specific timer_id (as returned by
+zloop_timer).
+        """
         return lib.zloop_timer_end(self._as_parameter_, timer_id)
 
     def ticket(self, handler, arg):
-        """Register a ticket timer. Ticket timers are very fast in the case where
+        """
+        Register a ticket timer. Ticket timers are very fast in the case where
 you use a lot of timers (thousands), and frequently remove and add them.
 The main use case is expiry timers for servers that handle many clients,
 and which reset the expiry timer for each message received from a client.
@@ -3042,55 +3715,72 @@ Whereas normal timers perform poorly as the number of clients grows, the
 cost of ticket timers is constant, no matter the number of clients. You
 must set the ticket delay using zloop_set_ticket_delay before creating a
 ticket. Returns a handle to the timer that you should use in
-zloop_ticket_reset and zloop_ticket_delete."""
+zloop_ticket_reset and zloop_ticket_delete.
+        """
         return c_void_p(lib.zloop_ticket(self._as_parameter_, handler, arg))
 
     def ticket_reset(self, handle):
-        """Reset a ticket timer, which moves it to the end of the ticket list and
-resets its execution time. This is a very fast operation."""
+        """
+        Reset a ticket timer, which moves it to the end of the ticket list and
+resets its execution time. This is a very fast operation.
+        """
         return lib.zloop_ticket_reset(self._as_parameter_, handle)
 
     def ticket_delete(self, handle):
-        """Delete a ticket timer. We do not actually delete the ticket here, as
+        """
+        Delete a ticket timer. We do not actually delete the ticket here, as
 other code may still refer to the ticket. We mark as deleted, and remove
-later and safely."""
+later and safely.
+        """
         return lib.zloop_ticket_delete(self._as_parameter_, handle)
 
     def set_ticket_delay(self, ticket_delay):
-        """Set the ticket delay, which applies to all tickets. If you lower the
-delay and there are already tickets created, the results are undefined."""
+        """
+        Set the ticket delay, which applies to all tickets. If you lower the
+delay and there are already tickets created, the results are undefined.
+        """
         return lib.zloop_set_ticket_delay(self._as_parameter_, ticket_delay)
 
     def set_max_timers(self, max_timers):
-        """Set hard limit on number of timers allowed. Setting more than a small
+        """
+        Set hard limit on number of timers allowed. Setting more than a small
 number of timers (10-100) can have a dramatic impact on the performance
 of the reactor. For high-volume cases, use ticket timers. If the hard
 limit is reached, the reactor stops creating new timers and logs an
-error."""
+error.
+        """
         return lib.zloop_set_max_timers(self._as_parameter_, max_timers)
 
     def set_verbose(self, verbose):
-        """Set verbose tracing of reactor on/off. The default verbose setting is
-off (false)."""
+        """
+        Set verbose tracing of reactor on/off. The default verbose setting is
+off (false).
+        """
         return lib.zloop_set_verbose(self._as_parameter_, verbose)
 
     def set_nonstop(self, nonstop):
-        """By default the reactor stops if the process receives a SIGINT or SIGTERM
+        """
+        By default the reactor stops if the process receives a SIGINT or SIGTERM
 signal. This makes it impossible to shut-down message based architectures
 like zactors. This method lets you switch off break handling. The default
-nonstop setting is off (false)."""
+nonstop setting is off (false).
+        """
         return lib.zloop_set_nonstop(self._as_parameter_, nonstop)
 
     def start(self):
-        """Start the reactor. Takes control of the thread and returns when the 0MQ
+        """
+        Start the reactor. Takes control of the thread and returns when the 0MQ
 context is terminated or the process is interrupted, or any event handler
 returns -1. Event handlers may register new sockets and timers, and
-cancel sockets. Returns 0 if interrupted, -1 if canceled by a handler."""
+cancel sockets. Returns 0 if interrupted, -1 if canceled by a handler.
+        """
         return lib.zloop_start(self._as_parameter_)
 
     @staticmethod
     def test(verbose):
-        """Self test of this class."""
+        """
+        Self test of this class.
+        """
         return lib.zloop_test(verbose)
 
 
@@ -3169,11 +3859,15 @@ lib.zmsg_test.restype = None
 lib.zmsg_test.argtypes = [c_bool]
 
 class Zmsg(object):
-    """working with multipart messages"""
+    """
+    working with multipart messages
+    """
 
     allow_destruct = False
     def __init__(self, *args):
-        """Create a new empty message object"""
+        """
+        Create a new empty message object
+        """
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], zmsg_p) # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -3186,7 +3880,9 @@ class Zmsg(object):
             self.allow_destruct = True
 
     def __del__(self):
-        """Destroy a message object and all frames it contains"""
+        """
+        Destroy a message object and all frames it contains
+        """
         if self.allow_destruct:
             lib.zmsg_destroy(byref(self._as_parameter_))
 
@@ -3200,193 +3896,261 @@ class Zmsg(object):
 
     @staticmethod
     def recv(source):
-        """Receive message from socket, returns zmsg_t object or NULL if the recv
+        """
+        Receive message from socket, returns zmsg_t object or NULL if the recv
 was interrupted. Does a blocking recv. If you want to not block then use
 the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
-before receiving."""
+before receiving.
+        """
         return Zmsg(lib.zmsg_recv(source), False)
 
     @staticmethod
     def load(file):
-        """Load/append an open file into new message, return the message.
-Returns NULL if the message could not be loaded."""
+        """
+        Load/append an open file into new message, return the message.
+Returns NULL if the message could not be loaded.
+        """
         return Zmsg(lib.zmsg_load(coerce_py_file(file)), False)
 
     @staticmethod
     def decode(buffer, buffer_size):
-        """Decodes a serialized message buffer created by zmsg_encode () and returns
+        """
+        Decodes a serialized message buffer created by zmsg_encode () and returns
 a new zmsg_t object. Returns NULL if the buffer was badly formatted or
-there was insufficient memory to work."""
+there was insufficient memory to work.
+        """
         return Zmsg(lib.zmsg_decode(buffer, buffer_size), False)
 
     @staticmethod
     def new_signal(status):
-        """Generate a signal message encoding the given status. A signal is a short
+        """
+        Generate a signal message encoding the given status. A signal is a short
 message carrying a 1-byte success/failure code (by convention, 0 means
-OK). Signals are encoded to be distinguishable from "normal" messages."""
+OK). Signals are encoded to be distinguishable from "normal" messages.
+        """
         return Zmsg(lib.zmsg_new_signal(status), False)
 
     @staticmethod
     def send(self_p, dest):
-        """Send message to destination socket, and destroy the message after sending
+        """
+        Send message to destination socket, and destroy the message after sending
 it successfully. If the message has no frames, sends nothing but destroys
 the message anyhow. Nullifies the caller's reference to the message (as
-it is a destructor)."""
+it is a destructor).
+        """
         return lib.zmsg_send(byref(zmsg_p.from_param(self_p)), dest)
 
     @staticmethod
     def sendm(self_p, dest):
-        """Send message to destination socket as part of a multipart sequence, and
+        """
+        Send message to destination socket as part of a multipart sequence, and
 destroy the message after sending it successfully. Note that after a
 zmsg_sendm, you must call zmsg_send or another method that sends a final
 message part. If the message has no frames, sends nothing but destroys
 the message anyhow. Nullifies the caller's reference to the message (as
-it is a destructor)."""
+it is a destructor).
+        """
         return lib.zmsg_sendm(byref(zmsg_p.from_param(self_p)), dest)
 
     def size(self):
-        """Return size of message, i.e. number of frames (0 or more)."""
+        """
+        Return size of message, i.e. number of frames (0 or more).
+        """
         return lib.zmsg_size(self._as_parameter_)
 
     def content_size(self):
-        """Return total size of all frames in message."""
+        """
+        Return total size of all frames in message.
+        """
         return lib.zmsg_content_size(self._as_parameter_)
 
     def routing_id(self):
-        """Return message routing ID, if the message came from a ZMQ_SERVER socket.
-Else returns zero."""
+        """
+        Return message routing ID, if the message came from a ZMQ_SERVER socket.
+Else returns zero.
+        """
         return lib.zmsg_routing_id(self._as_parameter_)
 
     def set_routing_id(self, routing_id):
-        """Set routing ID on message. This is used if/when the message is sent to a
-ZMQ_SERVER socket."""
+        """
+        Set routing ID on message. This is used if/when the message is sent to a
+ZMQ_SERVER socket.
+        """
         return lib.zmsg_set_routing_id(self._as_parameter_, routing_id)
 
     def prepend(self, frame_p):
-        """Push frame to the front of the message, i.e. before all other frames.
+        """
+        Push frame to the front of the message, i.e. before all other frames.
 Message takes ownership of frame, will destroy it when message is sent.
 Returns 0 on success, -1 on error. Deprecates zmsg_push, which did not
-nullify the caller's frame reference."""
+nullify the caller's frame reference.
+        """
         return lib.zmsg_prepend(self._as_parameter_, byref(zframe_p.from_param(frame_p)))
 
     def append(self, frame_p):
-        """Add frame to the end of the message, i.e. after all other frames.
+        """
+        Add frame to the end of the message, i.e. after all other frames.
 Message takes ownership of frame, will destroy it when message is sent.
 Returns 0 on success. Deprecates zmsg_add, which did not nullify the
-caller's frame reference."""
+caller's frame reference.
+        """
         return lib.zmsg_append(self._as_parameter_, byref(zframe_p.from_param(frame_p)))
 
     def pop(self):
-        """Remove first frame from message, if any. Returns frame, or NULL."""
+        """
+        Remove first frame from message, if any. Returns frame, or NULL.
+        """
         return Zframe(lib.zmsg_pop(self._as_parameter_), True)
 
     def pushmem(self, src, size):
-        """Push block of memory to front of message, as a new frame.
-Returns 0 on success, -1 on error."""
+        """
+        Push block of memory to front of message, as a new frame.
+Returns 0 on success, -1 on error.
+        """
         return lib.zmsg_pushmem(self._as_parameter_, src, size)
 
     def addmem(self, src, size):
-        """Add block of memory to the end of the message, as a new frame.
-Returns 0 on success, -1 on error."""
+        """
+        Add block of memory to the end of the message, as a new frame.
+Returns 0 on success, -1 on error.
+        """
         return lib.zmsg_addmem(self._as_parameter_, src, size)
 
     def pushstr(self, string):
-        """Push string as new frame to front of message.
-Returns 0 on success, -1 on error."""
+        """
+        Push string as new frame to front of message.
+Returns 0 on success, -1 on error.
+        """
         return lib.zmsg_pushstr(self._as_parameter_, string)
 
     def addstr(self, string):
-        """Push string as new frame to end of message.
-Returns 0 on success, -1 on error."""
+        """
+        Push string as new frame to end of message.
+Returns 0 on success, -1 on error.
+        """
         return lib.zmsg_addstr(self._as_parameter_, string)
 
     def pushstrf(self, format, *args):
-        """Push formatted string as new frame to front of message.
-Returns 0 on success, -1 on error."""
+        """
+        Push formatted string as new frame to front of message.
+Returns 0 on success, -1 on error.
+        """
         return lib.zmsg_pushstrf(self._as_parameter_, format, *args)
 
     def addstrf(self, format, *args):
-        """Push formatted string as new frame to end of message.
-Returns 0 on success, -1 on error."""
+        """
+        Push formatted string as new frame to end of message.
+Returns 0 on success, -1 on error.
+        """
         return lib.zmsg_addstrf(self._as_parameter_, format, *args)
 
     def popstr(self):
-        """Pop frame off front of message, return as fresh string. If there were
-no more frames in the message, returns NULL."""
+        """
+        Pop frame off front of message, return as fresh string. If there were
+no more frames in the message, returns NULL.
+        """
         return return_fresh_string(lib.zmsg_popstr(self._as_parameter_))
 
     def addmsg(self, msg_p):
-        """Push encoded message as a new frame. Message takes ownership of
+        """
+        Push encoded message as a new frame. Message takes ownership of
 submessage, so the original is destroyed in this call. Returns 0 on
-success, -1 on error."""
+success, -1 on error.
+        """
         return lib.zmsg_addmsg(self._as_parameter_, byref(zmsg_p.from_param(msg_p)))
 
     def popmsg(self):
-        """Remove first submessage from message, if any. Returns zmsg_t, or NULL if
-decoding was not succesful."""
+        """
+        Remove first submessage from message, if any. Returns zmsg_t, or NULL if
+decoding was not succesful.
+        """
         return Zmsg(lib.zmsg_popmsg(self._as_parameter_), True)
 
     def remove(self, frame):
-        """Remove specified frame from list, if present. Does not destroy frame."""
+        """
+        Remove specified frame from list, if present. Does not destroy frame.
+        """
         return lib.zmsg_remove(self._as_parameter_, frame)
 
     def first(self):
-        """Set cursor to first frame in message. Returns frame, or NULL, if the
-message is empty. Use this to navigate the frames as a list."""
+        """
+        Set cursor to first frame in message. Returns frame, or NULL, if the
+message is empty. Use this to navigate the frames as a list.
+        """
         return Zframe(lib.zmsg_first(self._as_parameter_), False)
 
     def next(self):
-        """Return the next frame. If there are no more frames, returns NULL. To move
-to the first frame call zmsg_first(). Advances the cursor."""
+        """
+        Return the next frame. If there are no more frames, returns NULL. To move
+to the first frame call zmsg_first(). Advances the cursor.
+        """
         return Zframe(lib.zmsg_next(self._as_parameter_), False)
 
     def last(self):
-        """Return the last frame. If there are no frames, returns NULL."""
+        """
+        Return the last frame. If there are no frames, returns NULL.
+        """
         return Zframe(lib.zmsg_last(self._as_parameter_), False)
 
     def save(self, file):
-        """Save message to an open file, return 0 if OK, else -1. The message is
+        """
+        Save message to an open file, return 0 if OK, else -1. The message is
 saved as a series of frames, each with length and data. Note that the
 file is NOT guaranteed to be portable between operating systems, not
 versions of CZMQ. The file format is at present undocumented and liable
-to arbitrary change."""
+to arbitrary change.
+        """
         return lib.zmsg_save(self._as_parameter_, coerce_py_file(file))
 
     def encode(self, buffer):
-        """Serialize multipart message to a single buffer. Use this method to send
+        """
+        Serialize multipart message to a single buffer. Use this method to send
 structured messages across transports that do not support multipart data.
 Allocates and returns a new buffer containing the serialized message.
-To decode a serialized message buffer, use zmsg_decode ()."""
+To decode a serialized message buffer, use zmsg_decode ().
+        """
         return lib.zmsg_encode(self._as_parameter_, byref(c_void_p.from_param(buffer)))
 
     def dup(self):
-        """Create copy of message, as new message object. Returns a fresh zmsg_t
-object. If message is null, or memory was exhausted, returns null."""
+        """
+        Create copy of message, as new message object. Returns a fresh zmsg_t
+object. If message is null, or memory was exhausted, returns null.
+        """
         return Zmsg(lib.zmsg_dup(self._as_parameter_), True)
 
     def print(self):
-        """Send message to zsys log sink (may be stdout, or system facility as
-configured by zsys_set_logstream)."""
+        """
+        Send message to zsys log sink (may be stdout, or system facility as
+configured by zsys_set_logstream).
+        """
         return lib.zmsg_print(self._as_parameter_)
 
     def eq(self, other):
-        """Return true if the two messages have the same number of frames and each
+        """
+        Return true if the two messages have the same number of frames and each
 frame in the first message is identical to the corresponding frame in the
-other message. As with zframe_eq, return false if either message is NULL."""
+other message. As with zframe_eq, return false if either message is NULL.
+        """
         return lib.zmsg_eq(self._as_parameter_, other)
 
     def signal(self):
-        """Return signal value, 0 or greater, if message is a signal, -1 if not."""
+        """
+        Return signal value, 0 or greater, if message is a signal, -1 if not.
+        """
         return lib.zmsg_signal(self._as_parameter_)
 
     @staticmethod
     def is_(self):
-        """Probe the supplied object, and report if it looks like a zmsg_t."""
+        """
+        Probe the supplied object, and report if it looks like a zmsg_t.
+        """
         return lib.zmsg_is(self)
 
     @staticmethod
     def test(verbose):
-        """Self test of this class."""
+        """
+        Self test of this class.
+        """
         return lib.zmsg_test(verbose)
 
 
@@ -3411,13 +4175,17 @@ lib.zpoller_test.restype = None
 lib.zpoller_test.argtypes = [c_bool]
 
 class Zpoller(object):
-    """event-driven reactor"""
+    """
+    event-driven reactor
+    """
 
     allow_destruct = False
     def __init__(self, *args):
-        """Create new poller, specifying zero or more readers. The list of
+        """
+        Create new poller, specifying zero or more readers. The list of
 readers ends in a NULL. Each reader can be a zsock_t instance, a
-zactor_t instance, a libzmq socket (void *), or a file handle."""
+zactor_t instance, a libzmq socket (void *), or a file handle.
+        """
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], zpoller_p) # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -3430,7 +4198,9 @@ zactor_t instance, a libzmq socket (void *), or a file handle."""
             self.allow_destruct = True
 
     def __del__(self):
-        """Destroy a poller"""
+        """
+        Destroy a poller
+        """
         if self.allow_destruct:
             lib.zpoller_destroy(byref(self._as_parameter_))
 
@@ -3443,24 +4213,31 @@ zactor_t instance, a libzmq socket (void *), or a file handle."""
         return self._as_parameter_.__nonzero__()
 
     def add(self, reader):
-        """Add a reader to be polled. Returns 0 if OK, -1 on failure. The reader may
-be a libzmq void * socket, a zsock_t instance, or a zactor_t instance."""
+        """
+        Add a reader to be polled. Returns 0 if OK, -1 on failure. The reader may
+be a libzmq void * socket, a zsock_t instance, or a zactor_t instance.
+        """
         return lib.zpoller_add(self._as_parameter_, reader)
 
     def remove(self, reader):
-        """Remove a reader from the poller; returns 0 if OK, -1 on failure. The reader
-must have been passed during construction, or in an zpoller_add () call."""
+        """
+        Remove a reader from the poller; returns 0 if OK, -1 on failure. The reader
+must have been passed during construction, or in an zpoller_add () call.
+        """
         return lib.zpoller_remove(self._as_parameter_, reader)
 
     def set_nonstop(self, nonstop):
-        """By default the poller stops if the process receives a SIGINT or SIGTERM
+        """
+        By default the poller stops if the process receives a SIGINT or SIGTERM
 signal. This makes it impossible to shut-down message based architectures
 like zactors. This method lets you switch off break handling. The default
-nonstop setting is off (false)."""
+nonstop setting is off (false).
+        """
         return lib.zpoller_set_nonstop(self._as_parameter_, nonstop)
 
     def wait(self, timeout):
-        """Poll the registered readers for I/O, return first reader that has input.
+        """
+        Poll the registered readers for I/O, return first reader that has input.
 The reader will be a libzmq void * socket, or a zsock_t or zactor_t
 instance as specified in zpoller_new/zpoller_add. The timeout should be
 zero or greater, or -1 to wait indefinitely. Socket priority is defined
@@ -3468,22 +4245,29 @@ by their order in the poll list. If you need a balanced poll, use the low
 level zmq_poll method directly. If the poll call was interrupted (SIGINT),
 or the ZMQ context was destroyed, or the timeout expired, returns NULL.
 You can test the actual exit condition by calling zpoller_expired () and
-zpoller_terminated (). The timeout is in msec."""
+zpoller_terminated (). The timeout is in msec.
+        """
         return c_void_p(lib.zpoller_wait(self._as_parameter_, timeout))
 
     def expired(self):
-        """Return true if the last zpoller_wait () call ended because the timeout
-expired, without any error."""
+        """
+        Return true if the last zpoller_wait () call ended because the timeout
+expired, without any error.
+        """
         return lib.zpoller_expired(self._as_parameter_)
 
     def terminated(self):
-        """Return true if the last zpoller_wait () call ended because the process
-was interrupted, or the parent context was destroyed."""
+        """
+        Return true if the last zpoller_wait () call ended because the process
+was interrupted, or the parent context was destroyed.
+        """
         return lib.zpoller_terminated(self._as_parameter_)
 
     @staticmethod
     def test(verbose):
-        """Self test of this class."""
+        """
+        Self test of this class.
+        """
         return lib.zpoller_test(verbose)
 
 
@@ -3528,7 +4312,9 @@ lib.zproc_test.restype = None
 lib.zproc_test.argtypes = [c_bool]
 
 class Zproc(object):
-    """process configuration and status"""
+    """
+    process configuration and status
+    """
 
     allow_destruct = False
     def __bool__(self):
@@ -3541,132 +4327,170 @@ class Zproc(object):
 
     @staticmethod
     def czmq_version():
-        """Returns CZMQ version as a single 6-digit integer encoding the major
-version (x 10000), the minor version (x 100) and the patch."""
+        """
+        Returns CZMQ version as a single 6-digit integer encoding the major
+version (x 10000), the minor version (x 100) and the patch.
+        """
         return lib.zproc_czmq_version()
 
     @staticmethod
     def interrupted():
-        """Returns true if the process received a SIGINT or SIGTERM signal.
+        """
+        Returns true if the process received a SIGINT or SIGTERM signal.
 It is good practice to use this method to exit any infinite loop
-processing messages."""
+processing messages.
+        """
         return lib.zproc_interrupted()
 
     @staticmethod
     def has_curve():
-        """Returns true if the underlying libzmq supports CURVE security."""
+        """
+        Returns true if the underlying libzmq supports CURVE security.
+        """
         return lib.zproc_has_curve()
 
     @staticmethod
     def hostname():
-        """Return current host name, for use in public tcp:// endpoints.
-If the host name is not resolvable, returns NULL."""
+        """
+        Return current host name, for use in public tcp:// endpoints.
+If the host name is not resolvable, returns NULL.
+        """
         return return_fresh_string(lib.zproc_hostname())
 
     @staticmethod
     def daemonize(workdir):
-        """Move the current process into the background. The precise effect
+        """
+        Move the current process into the background. The precise effect
 depends on the operating system. On POSIX boxes, moves to a specified
 working directory (if specified), closes all file handles, reopens
 stdin, stdout, and stderr to the null device, and sets the process to
 ignore SIGHUP. On Windows, does nothing. Returns 0 if OK, -1 if there
-was an error."""
+was an error.
+        """
         return lib.zproc_daemonize(workdir)
 
     @staticmethod
     def run_as(lockfile, group, user):
-        """Drop the process ID into the lockfile, with exclusive lock, and
+        """
+        Drop the process ID into the lockfile, with exclusive lock, and
 switch the process to the specified group and/or user. Any of the
 arguments may be null, indicating a no-op. Returns 0 on success,
 -1 on failure. Note if you combine this with zsys_daemonize, run
 after, not before that method, or the lockfile will hold the wrong
-process ID."""
+process ID.
+        """
         return lib.zproc_run_as(lockfile, group, user)
 
     @staticmethod
     def set_io_threads(io_threads):
-        """Configure the number of I/O threads that ZeroMQ will use. A good
+        """
+        Configure the number of I/O threads that ZeroMQ will use. A good
 rule of thumb is one thread per gigabit of traffic in or out. The
 default is 1, sufficient for most applications. If the environment
 variable ZSYS_IO_THREADS is defined, that provides the default.
-Note that this method is valid only before any socket is created."""
+Note that this method is valid only before any socket is created.
+        """
         return lib.zproc_set_io_threads(io_threads)
 
     @staticmethod
     def set_max_sockets(max_sockets):
-        """Configure the number of sockets that ZeroMQ will allow. The default
+        """
+        Configure the number of sockets that ZeroMQ will allow. The default
 is 1024. The actual limit depends on the system, and you can query it
 by using zsys_socket_limit (). A value of zero means "maximum".
-Note that this method is valid only before any socket is created."""
+Note that this method is valid only before any socket is created.
+        """
         return lib.zproc_set_max_sockets(max_sockets)
 
     @staticmethod
     def set_biface(value):
-        """Set network interface name to use for broadcasts, particularly zbeacon.
+        """
+        Set network interface name to use for broadcasts, particularly zbeacon.
 This lets the interface be configured for test environments where required.
 For example, on Mac OS X, zbeacon cannot bind to 255.255.255.255 which is
 the default when there is no specified interface. If the environment
 variable ZSYS_INTERFACE is set, use that as the default interface name.
-Setting the interface to "*" means "use all available interfaces"."""
+Setting the interface to "*" means "use all available interfaces".
+        """
         return lib.zproc_set_biface(value)
 
     @staticmethod
     def biface():
-        """Return network interface to use for broadcasts, or "" if none was set."""
+        """
+        Return network interface to use for broadcasts, or "" if none was set.
+        """
         return lib.zproc_biface()
 
     @staticmethod
     def set_log_ident(value):
-        """Set log identity, which is a string that prefixes all log messages sent
+        """
+        Set log identity, which is a string that prefixes all log messages sent
 by this process. The log identity defaults to the environment variable
-ZSYS_LOGIDENT, if that is set."""
+ZSYS_LOGIDENT, if that is set.
+        """
         return lib.zproc_set_log_ident(value)
 
     @staticmethod
     def set_log_sender(endpoint):
-        """Sends log output to a PUB socket bound to the specified endpoint. To
+        """
+        Sends log output to a PUB socket bound to the specified endpoint. To
 collect such log output, create a SUB socket, subscribe to the traffic
 you care about, and connect to the endpoint. Log traffic is sent as a
 single string frame, in the same format as when sent to stdout. The
 log system supports a single sender; multiple calls to this method will
 bind the same sender to multiple endpoints. To disable the sender, call
-this method with a null argument."""
+this method with a null argument.
+        """
         return lib.zproc_set_log_sender(endpoint)
 
     @staticmethod
     def set_log_system(logsystem):
-        """Enable or disable logging to the system facility (syslog on POSIX boxes,
-event log on Windows). By default this is disabled."""
+        """
+        Enable or disable logging to the system facility (syslog on POSIX boxes,
+event log on Windows). By default this is disabled.
+        """
         return lib.zproc_set_log_system(logsystem)
 
     @staticmethod
     def log_error(format, *args):
-        """Log error condition - highest priority"""
+        """
+        Log error condition - highest priority
+        """
         return lib.zproc_log_error(format, *args)
 
     @staticmethod
     def log_warning(format, *args):
-        """Log warning condition - high priority"""
+        """
+        Log warning condition - high priority
+        """
         return lib.zproc_log_warning(format, *args)
 
     @staticmethod
     def log_notice(format, *args):
-        """Log normal, but significant, condition - normal priority"""
+        """
+        Log normal, but significant, condition - normal priority
+        """
         return lib.zproc_log_notice(format, *args)
 
     @staticmethod
     def log_info(format, *args):
-        """Log informational message - low priority"""
+        """
+        Log informational message - low priority
+        """
         return lib.zproc_log_info(format, *args)
 
     @staticmethod
     def log_debug(format, *args):
-        """Log debug-level message - lowest priority"""
+        """
+        Log debug-level message - lowest priority
+        """
         return lib.zproc_log_debug(format, *args)
 
     @staticmethod
     def test(verbose):
-        """Self test of this class."""
+        """
+        Self test of this class.
+        """
         return lib.zproc_test(verbose)
 
 
@@ -3949,16 +4773,20 @@ lib.zsock_test.restype = None
 lib.zsock_test.argtypes = [c_bool]
 
 class Zsock(object):
-    """high-level socket API that hides libzmq contexts and sockets"""
+    """
+    high-level socket API that hides libzmq contexts and sockets
+    """
 
     allow_destruct = False
     def __init__(self, *args):
-        """Create a new socket. Returns the new socket, or NULL if the new socket
+        """
+        Create a new socket. Returns the new socket, or NULL if the new socket
 could not be created. Note that the symbol zsock_new (and other
 constructors/destructors for zsock) are redirected to the *_checked
 variant, enabling intelligent socket leak detection. This can have
 performance implications if you use a LOT of sockets. To turn off this
-redirection behaviour, define ZSOCK_NOCHECK."""
+redirection behaviour, define ZSOCK_NOCHECK.
+        """
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], zsock_p) # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -3971,8 +4799,10 @@ redirection behaviour, define ZSOCK_NOCHECK."""
             self.allow_destruct = True
 
     def __del__(self):
-        """Destroy the socket. You must use this for any socket created via the
-zsock_new method."""
+        """
+        Destroy the socket. You must use this for any socket created via the
+zsock_new method.
+        """
         if self.allow_destruct:
             lib.zsock_destroy(byref(self._as_parameter_))
 
@@ -3986,77 +4816,106 @@ zsock_new method."""
 
     @staticmethod
     def new_pub(endpoint):
-        """Create a PUB socket. Default action is bind."""
+        """
+        Create a PUB socket. Default action is bind.
+        """
         return Zsock(lib.zsock_new_pub(endpoint), False)
 
     @staticmethod
     def new_sub(endpoint, subscribe):
-        """Create a SUB socket, and optionally subscribe to some prefix string. Default
-action is connect."""
+        """
+        Create a SUB socket, and optionally subscribe to some prefix string. Default
+action is connect.
+        """
         return Zsock(lib.zsock_new_sub(endpoint, subscribe), False)
 
     @staticmethod
     def new_req(endpoint):
-        """Create a REQ socket. Default action is connect."""
+        """
+        Create a REQ socket. Default action is connect.
+        """
         return Zsock(lib.zsock_new_req(endpoint), False)
 
     @staticmethod
     def new_rep(endpoint):
-        """Create a REP socket. Default action is bind."""
+        """
+        Create a REP socket. Default action is bind.
+        """
         return Zsock(lib.zsock_new_rep(endpoint), False)
 
     @staticmethod
     def new_dealer(endpoint):
-        """Create a DEALER socket. Default action is connect."""
+        """
+        Create a DEALER socket. Default action is connect.
+        """
         return Zsock(lib.zsock_new_dealer(endpoint), False)
 
     @staticmethod
     def new_router(endpoint):
-        """Create a ROUTER socket. Default action is bind."""
+        """
+        Create a ROUTER socket. Default action is bind.
+        """
         return Zsock(lib.zsock_new_router(endpoint), False)
 
     @staticmethod
     def new_push(endpoint):
-        """Create a PUSH socket. Default action is connect."""
+        """
+        Create a PUSH socket. Default action is connect.
+        """
         return Zsock(lib.zsock_new_push(endpoint), False)
 
     @staticmethod
     def new_pull(endpoint):
-        """Create a PULL socket. Default action is bind."""
+        """
+        Create a PULL socket. Default action is bind.
+        """
         return Zsock(lib.zsock_new_pull(endpoint), False)
 
     @staticmethod
     def new_xpub(endpoint):
-        """Create an XPUB socket. Default action is bind."""
+        """
+        Create an XPUB socket. Default action is bind.
+        """
         return Zsock(lib.zsock_new_xpub(endpoint), False)
 
     @staticmethod
     def new_xsub(endpoint):
-        """Create an XSUB socket. Default action is connect."""
+        """
+        Create an XSUB socket. Default action is connect.
+        """
         return Zsock(lib.zsock_new_xsub(endpoint), False)
 
     @staticmethod
     def new_pair(endpoint):
-        """Create a PAIR socket. Default action is connect."""
+        """
+        Create a PAIR socket. Default action is connect.
+        """
         return Zsock(lib.zsock_new_pair(endpoint), False)
 
     @staticmethod
     def new_stream(endpoint):
-        """Create a STREAM socket. Default action is connect."""
+        """
+        Create a STREAM socket. Default action is connect.
+        """
         return Zsock(lib.zsock_new_stream(endpoint), False)
 
     @staticmethod
     def new_server(endpoint):
-        """Create a SERVER socket. Default action is bind."""
+        """
+        Create a SERVER socket. Default action is bind.
+        """
         return Zsock(lib.zsock_new_server(endpoint), False)
 
     @staticmethod
     def new_client(endpoint):
-        """Create a CLIENT socket. Default action is connect."""
+        """
+        Create a CLIENT socket. Default action is connect.
+        """
         return Zsock(lib.zsock_new_client(endpoint), False)
 
     def bind(self, format, *args):
-        """Bind a socket to a formatted endpoint. For tcp:// endpoints, supports
+        """
+        Bind a socket to a formatted endpoint. For tcp:// endpoints, supports
 ephemeral ports, if you specify the port number as "*". By default
 zsock uses the IANA designated range from C000 (49152) to FFFF (65535).
 To override this range, follow the "*" with "[first-last]". Either or
@@ -4075,45 +4934,59 @@ On success, returns the actual port number used, for tcp:// endpoints,
 and 0 for other transports. On failure, returns -1. Note that when using
 ephemeral ports, a port may be reused by different services without
 clients being aware. Protocols that run on ephemeral ports should take
-this into account."""
+this into account.
+        """
         return lib.zsock_bind(self._as_parameter_, format, *args)
 
     def endpoint(self):
-        """Returns last bound endpoint, if any."""
+        """
+        Returns last bound endpoint, if any.
+        """
         return lib.zsock_endpoint(self._as_parameter_)
 
     def unbind(self, format, *args):
-        """Unbind a socket from a formatted endpoint.
+        """
+        Unbind a socket from a formatted endpoint.
 Returns 0 if OK, -1 if the endpoint was invalid or the function
-isn't supported."""
+isn't supported.
+        """
         return lib.zsock_unbind(self._as_parameter_, format, *args)
 
     def connect(self, format, *args):
-        """Connect a socket to a formatted endpoint
-Returns 0 if OK, -1 if the endpoint was invalid."""
+        """
+        Connect a socket to a formatted endpoint
+Returns 0 if OK, -1 if the endpoint was invalid.
+        """
         return lib.zsock_connect(self._as_parameter_, format, *args)
 
     def disconnect(self, format, *args):
-        """Disconnect a socket from a formatted endpoint
+        """
+        Disconnect a socket from a formatted endpoint
 Returns 0 if OK, -1 if the endpoint was invalid or the function
-isn't supported."""
+isn't supported.
+        """
         return lib.zsock_disconnect(self._as_parameter_, format, *args)
 
     def attach(self, endpoints, serverish):
-        """Attach a socket to zero or more endpoints. If endpoints is not null,
+        """
+        Attach a socket to zero or more endpoints. If endpoints is not null,
 parses as list of ZeroMQ endpoints, separated by commas, and prefixed by
 '@' (to bind the socket) or '>' (to connect the socket). Returns 0 if all
 endpoints were valid, or -1 if there was a syntax error. If the endpoint
 does not start with '@' or '>', the serverish argument defines whether
-it is used to bind (serverish = true) or connect (serverish = false)."""
+it is used to bind (serverish = true) or connect (serverish = false).
+        """
         return lib.zsock_attach(self._as_parameter_, endpoints, serverish)
 
     def type_str(self):
-        """Returns socket type as printable constant string."""
+        """
+        Returns socket type as printable constant string.
+        """
         return lib.zsock_type_str(self._as_parameter_)
 
     def send(self, picture, *args):
-        """Send a 'picture' message to the socket (or actor). The picture is a
+        """
+        Send a 'picture' message to the socket (or actor). The picture is a
 string that defines the type of each frame. This makes it easy to send
 a complex multiframe message in one call. The picture can contain any
 of these characters, each corresponding to one or two arguments:
@@ -4138,17 +5011,21 @@ Note that s, b, c, and f are encoded the same way and the choice is
 offered as a convenience to the sender, which may or may not already
 have data in a zchunk or zframe. Does not change or take ownership of
 any arguments. Returns 0 if successful, -1 if sending failed for any
-reason."""
+reason.
+        """
         return lib.zsock_send(self._as_parameter_, picture, *args)
 
     def vsend(self, picture, argptr):
-        """Send a 'picture' message to the socket (or actor). This is a va_list
+        """
+        Send a 'picture' message to the socket (or actor). This is a va_list
 version of zsock_send (), so please consult its documentation for the
-details."""
+details.
+        """
         return lib.zsock_vsend(self._as_parameter_, picture, argptr)
 
     def recv(self, picture, *args):
-        """Receive a 'picture' message to the socket (or actor). See zsock_send for
+        """
+        Receive a 'picture' message to the socket (or actor). See zsock_send for
 the format and meaning of the picture. Returns the picture elements into
 a series of pointers as provided by the caller:
 
@@ -4173,17 +5050,21 @@ a message, in which case the pointers are not modified. When message
 frames are truncated (a short message), sets return values to zero/null.
 If an argument pointer is NULL, does not store any value (skips it).
 An 'n' picture matches an empty frame; if the message does not match,
-the method will return -1."""
+the method will return -1.
+        """
         return lib.zsock_recv(self._as_parameter_, picture, *args)
 
     def vrecv(self, picture, argptr):
-        """Receive a 'picture' message from the socket (or actor). This is a
+        """
+        Receive a 'picture' message from the socket (or actor). This is a
 va_list version of zsock_recv (), so please consult its documentation
-for the details."""
+for the details.
+        """
         return lib.zsock_vrecv(self._as_parameter_, picture, argptr)
 
     def bsend(self, picture, *args):
-        """Send a binary encoded 'picture' message to the socket (or actor). This
+        """
+        Send a binary encoded 'picture' message to the socket (or actor). This
 method is similar to zsock_send, except the arguments are encoded in a
 binary format that is compatible with zproto, and is designed to reduce
 memory allocations. The pattern argument is a string that defines the
@@ -4203,11 +5084,13 @@ type of each argument. Supports these argument types:
     p       void *, sends pointer value, only over inproc
 
 Does not change or take ownership of any arguments. Returns 0 if
-successful, -1 if sending failed for any reason."""
+successful, -1 if sending failed for any reason.
+        """
         return lib.zsock_bsend(self._as_parameter_, picture, *args)
 
     def brecv(self, picture, *args):
-        """Receive a binary encoded 'picture' message from the socket (or actor).
+        """
+        Receive a binary encoded 'picture' message from the socket (or actor).
 This method is similar to zsock_recv, except the arguments are encoded
 in a binary format that is compatible with zproto, and is designed to
 reduce memory allocations. The pattern argument is a string that defines
@@ -4217,463 +5100,682 @@ values held on a per-socket basis.
 Note that zsock_brecv creates the returned objects, and the caller must
 destroy them when finished with them. The supplied pointers do not need
 to be initialized. Returns 0 if successful, or -1 if it failed to read
-a message."""
+a message.
+        """
         return lib.zsock_brecv(self._as_parameter_, picture, *args)
 
     def routing_id(self):
-        """Return socket routing ID if any. This returns 0 if the socket is not
-of type ZMQ_SERVER or if no request was already received on it."""
+        """
+        Return socket routing ID if any. This returns 0 if the socket is not
+of type ZMQ_SERVER or if no request was already received on it.
+        """
         return lib.zsock_routing_id(self._as_parameter_)
 
     def set_routing_id(self, routing_id):
-        """Set routing ID on socket. The socket MUST be of type ZMQ_SERVER.
-This will be used when sending messages on the socket via the zsock API."""
+        """
+        Set routing ID on socket. The socket MUST be of type ZMQ_SERVER.
+This will be used when sending messages on the socket via the zsock API.
+        """
         return lib.zsock_set_routing_id(self._as_parameter_, routing_id)
 
     def set_unbounded(self):
-        """Set socket to use unbounded pipes (HWM=0); use this in cases when you are
+        """
+        Set socket to use unbounded pipes (HWM=0); use this in cases when you are
 totally certain the message volume can fit in memory. This method works
-across all versions of ZeroMQ. Takes a polymorphic socket reference."""
+across all versions of ZeroMQ. Takes a polymorphic socket reference.
+        """
         return lib.zsock_set_unbounded(self._as_parameter_)
 
     def signal(self, status):
-        """Send a signal over a socket. A signal is a short message carrying a
+        """
+        Send a signal over a socket. A signal is a short message carrying a
 success/failure code (by convention, 0 means OK). Signals are encoded
 to be distinguishable from "normal" messages. Accepts a zsock_t or a
 zactor_t argument, and returns 0 if successful, -1 if the signal could
-not be sent. Takes a polymorphic socket reference."""
+not be sent. Takes a polymorphic socket reference.
+        """
         return lib.zsock_signal(self._as_parameter_, status)
 
     def wait(self):
-        """Wait on a signal. Use this to coordinate between threads, over pipe
+        """
+        Wait on a signal. Use this to coordinate between threads, over pipe
 pairs. Blocks until the signal is received. Returns -1 on error, 0 or
 greater on success. Accepts a zsock_t or a zactor_t as argument.
-Takes a polymorphic socket reference."""
+Takes a polymorphic socket reference.
+        """
         return lib.zsock_wait(self._as_parameter_)
 
     def flush(self):
-        """If there is a partial message still waiting on the socket, remove and
+        """
+        If there is a partial message still waiting on the socket, remove and
 discard it. This is useful when reading partial messages, to get specific
-message types."""
+message types.
+        """
         return lib.zsock_flush(self._as_parameter_)
 
     @staticmethod
     def is_(self):
-        """Probe the supplied object, and report if it looks like a zsock_t.
-Takes a polymorphic socket reference."""
+        """
+        Probe the supplied object, and report if it looks like a zsock_t.
+Takes a polymorphic socket reference.
+        """
         return lib.zsock_is(self)
 
     @staticmethod
     def resolve(self):
-        """Probe the supplied reference. If it looks like a zsock_t instance, return
+        """
+        Probe the supplied reference. If it looks like a zsock_t instance, return
 the underlying libzmq socket handle; else if it looks like a file
 descriptor, return NULL; else if it looks like a libzmq socket handle,
-return the supplied value. Takes a polymorphic socket reference."""
+return the supplied value. Takes a polymorphic socket reference.
+        """
         return c_void_p(lib.zsock_resolve(self))
 
     def heartbeat_ivl(self):
-        """Get socket option `heartbeat_ivl`."""
+        """
+        Get socket option `heartbeat_ivl`.
+        """
         return lib.zsock_heartbeat_ivl(self._as_parameter_)
 
     def set_heartbeat_ivl(self, heartbeat_ivl):
-        """Set socket option `heartbeat_ivl`."""
+        """
+        Set socket option `heartbeat_ivl`.
+        """
         return lib.zsock_set_heartbeat_ivl(self._as_parameter_, heartbeat_ivl)
 
     def heartbeat_ttl(self):
-        """Get socket option `heartbeat_ttl`."""
+        """
+        Get socket option `heartbeat_ttl`.
+        """
         return lib.zsock_heartbeat_ttl(self._as_parameter_)
 
     def set_heartbeat_ttl(self, heartbeat_ttl):
-        """Set socket option `heartbeat_ttl`."""
+        """
+        Set socket option `heartbeat_ttl`.
+        """
         return lib.zsock_set_heartbeat_ttl(self._as_parameter_, heartbeat_ttl)
 
     def heartbeat_timeout(self):
-        """Get socket option `heartbeat_timeout`."""
+        """
+        Get socket option `heartbeat_timeout`.
+        """
         return lib.zsock_heartbeat_timeout(self._as_parameter_)
 
     def set_heartbeat_timeout(self, heartbeat_timeout):
-        """Set socket option `heartbeat_timeout`."""
+        """
+        Set socket option `heartbeat_timeout`.
+        """
         return lib.zsock_set_heartbeat_timeout(self._as_parameter_, heartbeat_timeout)
 
     def tos(self):
-        """Get socket option `tos`."""
+        """
+        Get socket option `tos`.
+        """
         return lib.zsock_tos(self._as_parameter_)
 
     def set_tos(self, tos):
-        """Set socket option `tos`."""
+        """
+        Set socket option `tos`.
+        """
         return lib.zsock_set_tos(self._as_parameter_, tos)
 
     def set_router_handover(self, router_handover):
-        """Set socket option `router_handover`."""
+        """
+        Set socket option `router_handover`.
+        """
         return lib.zsock_set_router_handover(self._as_parameter_, router_handover)
 
     def set_router_mandatory(self, router_mandatory):
-        """Set socket option `router_mandatory`."""
+        """
+        Set socket option `router_mandatory`.
+        """
         return lib.zsock_set_router_mandatory(self._as_parameter_, router_mandatory)
 
     def set_probe_router(self, probe_router):
-        """Set socket option `probe_router`."""
+        """
+        Set socket option `probe_router`.
+        """
         return lib.zsock_set_probe_router(self._as_parameter_, probe_router)
 
     def set_req_relaxed(self, req_relaxed):
-        """Set socket option `req_relaxed`."""
+        """
+        Set socket option `req_relaxed`.
+        """
         return lib.zsock_set_req_relaxed(self._as_parameter_, req_relaxed)
 
     def set_req_correlate(self, req_correlate):
-        """Set socket option `req_correlate`."""
+        """
+        Set socket option `req_correlate`.
+        """
         return lib.zsock_set_req_correlate(self._as_parameter_, req_correlate)
 
     def set_conflate(self, conflate):
-        """Set socket option `conflate`."""
+        """
+        Set socket option `conflate`.
+        """
         return lib.zsock_set_conflate(self._as_parameter_, conflate)
 
     def zap_domain(self):
-        """Get socket option `zap_domain`."""
+        """
+        Get socket option `zap_domain`.
+        """
         return return_fresh_string(lib.zsock_zap_domain(self._as_parameter_))
 
     def set_zap_domain(self, zap_domain):
-        """Set socket option `zap_domain`."""
+        """
+        Set socket option `zap_domain`.
+        """
         return lib.zsock_set_zap_domain(self._as_parameter_, zap_domain)
 
     def mechanism(self):
-        """Get socket option `mechanism`."""
+        """
+        Get socket option `mechanism`.
+        """
         return lib.zsock_mechanism(self._as_parameter_)
 
     def plain_server(self):
-        """Get socket option `plain_server`."""
+        """
+        Get socket option `plain_server`.
+        """
         return lib.zsock_plain_server(self._as_parameter_)
 
     def set_plain_server(self, plain_server):
-        """Set socket option `plain_server`."""
+        """
+        Set socket option `plain_server`.
+        """
         return lib.zsock_set_plain_server(self._as_parameter_, plain_server)
 
     def plain_username(self):
-        """Get socket option `plain_username`."""
+        """
+        Get socket option `plain_username`.
+        """
         return return_fresh_string(lib.zsock_plain_username(self._as_parameter_))
 
     def set_plain_username(self, plain_username):
-        """Set socket option `plain_username`."""
+        """
+        Set socket option `plain_username`.
+        """
         return lib.zsock_set_plain_username(self._as_parameter_, plain_username)
 
     def plain_password(self):
-        """Get socket option `plain_password`."""
+        """
+        Get socket option `plain_password`.
+        """
         return return_fresh_string(lib.zsock_plain_password(self._as_parameter_))
 
     def set_plain_password(self, plain_password):
-        """Set socket option `plain_password`."""
+        """
+        Set socket option `plain_password`.
+        """
         return lib.zsock_set_plain_password(self._as_parameter_, plain_password)
 
     def curve_server(self):
-        """Get socket option `curve_server`."""
+        """
+        Get socket option `curve_server`.
+        """
         return lib.zsock_curve_server(self._as_parameter_)
 
     def set_curve_server(self, curve_server):
-        """Set socket option `curve_server`."""
+        """
+        Set socket option `curve_server`.
+        """
         return lib.zsock_set_curve_server(self._as_parameter_, curve_server)
 
     def curve_publickey(self):
-        """Get socket option `curve_publickey`."""
+        """
+        Get socket option `curve_publickey`.
+        """
         return return_fresh_string(lib.zsock_curve_publickey(self._as_parameter_))
 
     def set_curve_publickey(self, curve_publickey):
-        """Set socket option `curve_publickey`."""
+        """
+        Set socket option `curve_publickey`.
+        """
         return lib.zsock_set_curve_publickey(self._as_parameter_, curve_publickey)
 
     def set_curve_publickey_bin(self, curve_publickey):
-        """Set socket option `curve_publickey` from 32-octet binary"""
+        """
+        Set socket option `curve_publickey` from 32-octet binary
+        """
         return lib.zsock_set_curve_publickey_bin(self._as_parameter_, curve_publickey)
 
     def curve_secretkey(self):
-        """Get socket option `curve_secretkey`."""
+        """
+        Get socket option `curve_secretkey`.
+        """
         return return_fresh_string(lib.zsock_curve_secretkey(self._as_parameter_))
 
     def set_curve_secretkey(self, curve_secretkey):
-        """Set socket option `curve_secretkey`."""
+        """
+        Set socket option `curve_secretkey`.
+        """
         return lib.zsock_set_curve_secretkey(self._as_parameter_, curve_secretkey)
 
     def set_curve_secretkey_bin(self, curve_secretkey):
-        """Set socket option `curve_secretkey` from 32-octet binary"""
+        """
+        Set socket option `curve_secretkey` from 32-octet binary
+        """
         return lib.zsock_set_curve_secretkey_bin(self._as_parameter_, curve_secretkey)
 
     def curve_serverkey(self):
-        """Get socket option `curve_serverkey`."""
+        """
+        Get socket option `curve_serverkey`.
+        """
         return return_fresh_string(lib.zsock_curve_serverkey(self._as_parameter_))
 
     def set_curve_serverkey(self, curve_serverkey):
-        """Set socket option `curve_serverkey`."""
+        """
+        Set socket option `curve_serverkey`.
+        """
         return lib.zsock_set_curve_serverkey(self._as_parameter_, curve_serverkey)
 
     def set_curve_serverkey_bin(self, curve_serverkey):
-        """Set socket option `curve_serverkey` from 32-octet binary"""
+        """
+        Set socket option `curve_serverkey` from 32-octet binary
+        """
         return lib.zsock_set_curve_serverkey_bin(self._as_parameter_, curve_serverkey)
 
     def gssapi_server(self):
-        """Get socket option `gssapi_server`."""
+        """
+        Get socket option `gssapi_server`.
+        """
         return lib.zsock_gssapi_server(self._as_parameter_)
 
     def set_gssapi_server(self, gssapi_server):
-        """Set socket option `gssapi_server`."""
+        """
+        Set socket option `gssapi_server`.
+        """
         return lib.zsock_set_gssapi_server(self._as_parameter_, gssapi_server)
 
     def gssapi_plaintext(self):
-        """Get socket option `gssapi_plaintext`."""
+        """
+        Get socket option `gssapi_plaintext`.
+        """
         return lib.zsock_gssapi_plaintext(self._as_parameter_)
 
     def set_gssapi_plaintext(self, gssapi_plaintext):
-        """Set socket option `gssapi_plaintext`."""
+        """
+        Set socket option `gssapi_plaintext`.
+        """
         return lib.zsock_set_gssapi_plaintext(self._as_parameter_, gssapi_plaintext)
 
     def gssapi_principal(self):
-        """Get socket option `gssapi_principal`."""
+        """
+        Get socket option `gssapi_principal`.
+        """
         return return_fresh_string(lib.zsock_gssapi_principal(self._as_parameter_))
 
     def set_gssapi_principal(self, gssapi_principal):
-        """Set socket option `gssapi_principal`."""
+        """
+        Set socket option `gssapi_principal`.
+        """
         return lib.zsock_set_gssapi_principal(self._as_parameter_, gssapi_principal)
 
     def gssapi_service_principal(self):
-        """Get socket option `gssapi_service_principal`."""
+        """
+        Get socket option `gssapi_service_principal`.
+        """
         return return_fresh_string(lib.zsock_gssapi_service_principal(self._as_parameter_))
 
     def set_gssapi_service_principal(self, gssapi_service_principal):
-        """Set socket option `gssapi_service_principal`."""
+        """
+        Set socket option `gssapi_service_principal`.
+        """
         return lib.zsock_set_gssapi_service_principal(self._as_parameter_, gssapi_service_principal)
 
     def ipv6(self):
-        """Get socket option `ipv6`."""
+        """
+        Get socket option `ipv6`.
+        """
         return lib.zsock_ipv6(self._as_parameter_)
 
     def set_ipv6(self, ipv6):
-        """Set socket option `ipv6`."""
+        """
+        Set socket option `ipv6`.
+        """
         return lib.zsock_set_ipv6(self._as_parameter_, ipv6)
 
     def immediate(self):
-        """Get socket option `immediate`."""
+        """
+        Get socket option `immediate`.
+        """
         return lib.zsock_immediate(self._as_parameter_)
 
     def set_immediate(self, immediate):
-        """Set socket option `immediate`."""
+        """
+        Set socket option `immediate`.
+        """
         return lib.zsock_set_immediate(self._as_parameter_, immediate)
 
     def set_router_raw(self, router_raw):
-        """Set socket option `router_raw`."""
+        """
+        Set socket option `router_raw`.
+        """
         return lib.zsock_set_router_raw(self._as_parameter_, router_raw)
 
     def ipv4only(self):
-        """Get socket option `ipv4only`."""
+        """
+        Get socket option `ipv4only`.
+        """
         return lib.zsock_ipv4only(self._as_parameter_)
 
     def set_ipv4only(self, ipv4only):
-        """Set socket option `ipv4only`."""
+        """
+        Set socket option `ipv4only`.
+        """
         return lib.zsock_set_ipv4only(self._as_parameter_, ipv4only)
 
     def set_delay_attach_on_connect(self, delay_attach_on_connect):
-        """Set socket option `delay_attach_on_connect`."""
+        """
+        Set socket option `delay_attach_on_connect`.
+        """
         return lib.zsock_set_delay_attach_on_connect(self._as_parameter_, delay_attach_on_connect)
 
     def type(self):
-        """Get socket option `type`."""
+        """
+        Get socket option `type`.
+        """
         return lib.zsock_type(self._as_parameter_)
 
     def sndhwm(self):
-        """Get socket option `sndhwm`."""
+        """
+        Get socket option `sndhwm`.
+        """
         return lib.zsock_sndhwm(self._as_parameter_)
 
     def set_sndhwm(self, sndhwm):
-        """Set socket option `sndhwm`."""
+        """
+        Set socket option `sndhwm`.
+        """
         return lib.zsock_set_sndhwm(self._as_parameter_, sndhwm)
 
     def rcvhwm(self):
-        """Get socket option `rcvhwm`."""
+        """
+        Get socket option `rcvhwm`.
+        """
         return lib.zsock_rcvhwm(self._as_parameter_)
 
     def set_rcvhwm(self, rcvhwm):
-        """Set socket option `rcvhwm`."""
+        """
+        Set socket option `rcvhwm`.
+        """
         return lib.zsock_set_rcvhwm(self._as_parameter_, rcvhwm)
 
     def affinity(self):
-        """Get socket option `affinity`."""
+        """
+        Get socket option `affinity`.
+        """
         return lib.zsock_affinity(self._as_parameter_)
 
     def set_affinity(self, affinity):
-        """Set socket option `affinity`."""
+        """
+        Set socket option `affinity`.
+        """
         return lib.zsock_set_affinity(self._as_parameter_, affinity)
 
     def set_subscribe(self, subscribe):
-        """Set socket option `subscribe`."""
+        """
+        Set socket option `subscribe`.
+        """
         return lib.zsock_set_subscribe(self._as_parameter_, subscribe)
 
     def set_unsubscribe(self, unsubscribe):
-        """Set socket option `unsubscribe`."""
+        """
+        Set socket option `unsubscribe`.
+        """
         return lib.zsock_set_unsubscribe(self._as_parameter_, unsubscribe)
 
     def identity(self):
-        """Get socket option `identity`."""
+        """
+        Get socket option `identity`.
+        """
         return return_fresh_string(lib.zsock_identity(self._as_parameter_))
 
     def set_identity(self, identity):
-        """Set socket option `identity`."""
+        """
+        Set socket option `identity`.
+        """
         return lib.zsock_set_identity(self._as_parameter_, identity)
 
     def rate(self):
-        """Get socket option `rate`."""
+        """
+        Get socket option `rate`.
+        """
         return lib.zsock_rate(self._as_parameter_)
 
     def set_rate(self, rate):
-        """Set socket option `rate`."""
+        """
+        Set socket option `rate`.
+        """
         return lib.zsock_set_rate(self._as_parameter_, rate)
 
     def recovery_ivl(self):
-        """Get socket option `recovery_ivl`."""
+        """
+        Get socket option `recovery_ivl`.
+        """
         return lib.zsock_recovery_ivl(self._as_parameter_)
 
     def set_recovery_ivl(self, recovery_ivl):
-        """Set socket option `recovery_ivl`."""
+        """
+        Set socket option `recovery_ivl`.
+        """
         return lib.zsock_set_recovery_ivl(self._as_parameter_, recovery_ivl)
 
     def sndbuf(self):
-        """Get socket option `sndbuf`."""
+        """
+        Get socket option `sndbuf`.
+        """
         return lib.zsock_sndbuf(self._as_parameter_)
 
     def set_sndbuf(self, sndbuf):
-        """Set socket option `sndbuf`."""
+        """
+        Set socket option `sndbuf`.
+        """
         return lib.zsock_set_sndbuf(self._as_parameter_, sndbuf)
 
     def rcvbuf(self):
-        """Get socket option `rcvbuf`."""
+        """
+        Get socket option `rcvbuf`.
+        """
         return lib.zsock_rcvbuf(self._as_parameter_)
 
     def set_rcvbuf(self, rcvbuf):
-        """Set socket option `rcvbuf`."""
+        """
+        Set socket option `rcvbuf`.
+        """
         return lib.zsock_set_rcvbuf(self._as_parameter_, rcvbuf)
 
     def linger(self):
-        """Get socket option `linger`."""
+        """
+        Get socket option `linger`.
+        """
         return lib.zsock_linger(self._as_parameter_)
 
     def set_linger(self, linger):
-        """Set socket option `linger`."""
+        """
+        Set socket option `linger`.
+        """
         return lib.zsock_set_linger(self._as_parameter_, linger)
 
     def reconnect_ivl(self):
-        """Get socket option `reconnect_ivl`."""
+        """
+        Get socket option `reconnect_ivl`.
+        """
         return lib.zsock_reconnect_ivl(self._as_parameter_)
 
     def set_reconnect_ivl(self, reconnect_ivl):
-        """Set socket option `reconnect_ivl`."""
+        """
+        Set socket option `reconnect_ivl`.
+        """
         return lib.zsock_set_reconnect_ivl(self._as_parameter_, reconnect_ivl)
 
     def reconnect_ivl_max(self):
-        """Get socket option `reconnect_ivl_max`."""
+        """
+        Get socket option `reconnect_ivl_max`.
+        """
         return lib.zsock_reconnect_ivl_max(self._as_parameter_)
 
     def set_reconnect_ivl_max(self, reconnect_ivl_max):
-        """Set socket option `reconnect_ivl_max`."""
+        """
+        Set socket option `reconnect_ivl_max`.
+        """
         return lib.zsock_set_reconnect_ivl_max(self._as_parameter_, reconnect_ivl_max)
 
     def backlog(self):
-        """Get socket option `backlog`."""
+        """
+        Get socket option `backlog`.
+        """
         return lib.zsock_backlog(self._as_parameter_)
 
     def set_backlog(self, backlog):
-        """Set socket option `backlog`."""
+        """
+        Set socket option `backlog`.
+        """
         return lib.zsock_set_backlog(self._as_parameter_, backlog)
 
     def maxmsgsize(self):
-        """Get socket option `maxmsgsize`."""
+        """
+        Get socket option `maxmsgsize`.
+        """
         return lib.zsock_maxmsgsize(self._as_parameter_)
 
     def set_maxmsgsize(self, maxmsgsize):
-        """Set socket option `maxmsgsize`."""
+        """
+        Set socket option `maxmsgsize`.
+        """
         return lib.zsock_set_maxmsgsize(self._as_parameter_, maxmsgsize)
 
     def multicast_hops(self):
-        """Get socket option `multicast_hops`."""
+        """
+        Get socket option `multicast_hops`.
+        """
         return lib.zsock_multicast_hops(self._as_parameter_)
 
     def set_multicast_hops(self, multicast_hops):
-        """Set socket option `multicast_hops`."""
+        """
+        Set socket option `multicast_hops`.
+        """
         return lib.zsock_set_multicast_hops(self._as_parameter_, multicast_hops)
 
     def rcvtimeo(self):
-        """Get socket option `rcvtimeo`."""
+        """
+        Get socket option `rcvtimeo`.
+        """
         return lib.zsock_rcvtimeo(self._as_parameter_)
 
     def set_rcvtimeo(self, rcvtimeo):
-        """Set socket option `rcvtimeo`."""
+        """
+        Set socket option `rcvtimeo`.
+        """
         return lib.zsock_set_rcvtimeo(self._as_parameter_, rcvtimeo)
 
     def sndtimeo(self):
-        """Get socket option `sndtimeo`."""
+        """
+        Get socket option `sndtimeo`.
+        """
         return lib.zsock_sndtimeo(self._as_parameter_)
 
     def set_sndtimeo(self, sndtimeo):
-        """Set socket option `sndtimeo`."""
+        """
+        Set socket option `sndtimeo`.
+        """
         return lib.zsock_set_sndtimeo(self._as_parameter_, sndtimeo)
 
     def set_xpub_verbose(self, xpub_verbose):
-        """Set socket option `xpub_verbose`."""
+        """
+        Set socket option `xpub_verbose`.
+        """
         return lib.zsock_set_xpub_verbose(self._as_parameter_, xpub_verbose)
 
     def tcp_keepalive(self):
-        """Get socket option `tcp_keepalive`."""
+        """
+        Get socket option `tcp_keepalive`.
+        """
         return lib.zsock_tcp_keepalive(self._as_parameter_)
 
     def set_tcp_keepalive(self, tcp_keepalive):
-        """Set socket option `tcp_keepalive`."""
+        """
+        Set socket option `tcp_keepalive`.
+        """
         return lib.zsock_set_tcp_keepalive(self._as_parameter_, tcp_keepalive)
 
     def tcp_keepalive_idle(self):
-        """Get socket option `tcp_keepalive_idle`."""
+        """
+        Get socket option `tcp_keepalive_idle`.
+        """
         return lib.zsock_tcp_keepalive_idle(self._as_parameter_)
 
     def set_tcp_keepalive_idle(self, tcp_keepalive_idle):
-        """Set socket option `tcp_keepalive_idle`."""
+        """
+        Set socket option `tcp_keepalive_idle`.
+        """
         return lib.zsock_set_tcp_keepalive_idle(self._as_parameter_, tcp_keepalive_idle)
 
     def tcp_keepalive_cnt(self):
-        """Get socket option `tcp_keepalive_cnt`."""
+        """
+        Get socket option `tcp_keepalive_cnt`.
+        """
         return lib.zsock_tcp_keepalive_cnt(self._as_parameter_)
 
     def set_tcp_keepalive_cnt(self, tcp_keepalive_cnt):
-        """Set socket option `tcp_keepalive_cnt`."""
+        """
+        Set socket option `tcp_keepalive_cnt`.
+        """
         return lib.zsock_set_tcp_keepalive_cnt(self._as_parameter_, tcp_keepalive_cnt)
 
     def tcp_keepalive_intvl(self):
-        """Get socket option `tcp_keepalive_intvl`."""
+        """
+        Get socket option `tcp_keepalive_intvl`.
+        """
         return lib.zsock_tcp_keepalive_intvl(self._as_parameter_)
 
     def set_tcp_keepalive_intvl(self, tcp_keepalive_intvl):
-        """Set socket option `tcp_keepalive_intvl`."""
+        """
+        Set socket option `tcp_keepalive_intvl`.
+        """
         return lib.zsock_set_tcp_keepalive_intvl(self._as_parameter_, tcp_keepalive_intvl)
 
     def tcp_accept_filter(self):
-        """Get socket option `tcp_accept_filter`."""
+        """
+        Get socket option `tcp_accept_filter`.
+        """
         return return_fresh_string(lib.zsock_tcp_accept_filter(self._as_parameter_))
 
     def set_tcp_accept_filter(self, tcp_accept_filter):
-        """Set socket option `tcp_accept_filter`."""
+        """
+        Set socket option `tcp_accept_filter`.
+        """
         return lib.zsock_set_tcp_accept_filter(self._as_parameter_, tcp_accept_filter)
 
     def rcvmore(self):
-        """Get socket option `rcvmore`."""
+        """
+        Get socket option `rcvmore`.
+        """
         return lib.zsock_rcvmore(self._as_parameter_)
 
     def fd(self):
-        """Get socket option `fd`."""
+        """
+        Get socket option `fd`.
+        """
         return lib.zsock_fd(self._as_parameter_)
 
     def events(self):
-        """Get socket option `events`."""
+        """
+        Get socket option `events`.
+        """
         return lib.zsock_events(self._as_parameter_)
 
     def last_endpoint(self):
-        """Get socket option `last_endpoint`."""
+        """
+        Get socket option `last_endpoint`.
+        """
         return return_fresh_string(lib.zsock_last_endpoint(self._as_parameter_))
 
     @staticmethod
     def test(verbose):
-        """Self test of this class."""
+        """
+        Self test of this class.
+        """
         return lib.zsock_test(verbose)
 
 
@@ -4700,7 +5802,9 @@ lib.zstr_test.restype = None
 lib.zstr_test.argtypes = [c_bool]
 
 class Zstr(object):
-    """sending and receiving strings"""
+    """
+    sending and receiving strings
+    """
 
     allow_destruct = False
     def __bool__(self):
@@ -4713,71 +5817,91 @@ class Zstr(object):
 
     @staticmethod
     def recv(source):
-        """Receive C string from socket. Caller must free returned string using
+        """
+        Receive C string from socket. Caller must free returned string using
 zstr_free(). Returns NULL if the context is being terminated or the
-process was interrupted."""
+process was interrupted.
+        """
         return return_fresh_string(lib.zstr_recv(source))
 
     @staticmethod
     def recvx(source, string_p, *args):
-        """Receive a series of strings (until NULL) from multipart data.
+        """
+        Receive a series of strings (until NULL) from multipart data.
 Each string is allocated and filled with string data; if there
 are not enough frames, unallocated strings are set to NULL.
 Returns -1 if the message could not be read, else returns the
 number of strings filled, zero or more. Free each returned string
 using zstr_free(). If not enough strings are provided, remaining
-multipart frames in the message are dropped."""
+multipart frames in the message are dropped.
+        """
         return lib.zstr_recvx(source, byref(c_char_p.from_param(string_p)), *args)
 
     @staticmethod
     def send(dest, string):
-        """Send a C string to a socket, as a frame. The string is sent without
+        """
+        Send a C string to a socket, as a frame. The string is sent without
 trailing null byte; to read this you can use zstr_recv, or a similar
 method that adds a null terminator on the received string. String
-may be NULL, which is sent as ""."""
+may be NULL, which is sent as "".
+        """
         return lib.zstr_send(dest, string)
 
     @staticmethod
     def sendm(dest, string):
-        """Send a C string to a socket, as zstr_send(), with a MORE flag, so that
-you can send further strings in the same multi-part message."""
+        """
+        Send a C string to a socket, as zstr_send(), with a MORE flag, so that
+you can send further strings in the same multi-part message.
+        """
         return lib.zstr_sendm(dest, string)
 
     @staticmethod
     def sendf(dest, format, *args):
-        """Send a formatted string to a socket. Note that you should NOT use
+        """
+        Send a formatted string to a socket. Note that you should NOT use
 user-supplied strings in the format (they may contain '%' which
-will create security holes)."""
+will create security holes).
+        """
         return lib.zstr_sendf(dest, format, *args)
 
     @staticmethod
     def sendfm(dest, format, *args):
-        """Send a formatted string to a socket, as for zstr_sendf(), with a
+        """
+        Send a formatted string to a socket, as for zstr_sendf(), with a
 MORE flag, so that you can send further strings in the same multi-part
-message."""
+message.
+        """
         return lib.zstr_sendfm(dest, format, *args)
 
     @staticmethod
     def sendx(dest, string, *args):
-        """Send a series of strings (until NULL) as multipart data
-Returns 0 if the strings could be sent OK, or -1 on error."""
+        """
+        Send a series of strings (until NULL) as multipart data
+Returns 0 if the strings could be sent OK, or -1 on error.
+        """
         return lib.zstr_sendx(dest, string, *args)
 
     @staticmethod
     def str(source):
-        """Accepts a void pointer and returns a fresh character string. If source
-is null, returns an empty string."""
+        """
+        Accepts a void pointer and returns a fresh character string. If source
+is null, returns an empty string.
+        """
         return return_fresh_string(lib.zstr_str(source))
 
     @staticmethod
     def free(string_p):
-        """Free a provided string, and nullify the parent pointer. Safe to call on
-a null pointer."""
+        """
+        Free a provided string, and nullify the parent pointer. Safe to call on
+a null pointer.
+        """
         return lib.zstr_free(byref(c_char_p.from_param(string_p)))
 
     @staticmethod
     def test(verbose):
-        """Self test of this class."""
+        """
+        Self test of this class.
+        """
         return lib.zstr_test(verbose)
 
 
@@ -4807,11 +5931,15 @@ lib.ztrie_test.restype = None
 lib.ztrie_test.argtypes = [c_bool]
 
 class Ztrie(object):
-    """simple trie for tokenizable strings"""
+    """
+    simple trie for tokenizable strings
+    """
 
     allow_destruct = False
     def __init__(self, *args):
-        """Creates a new ztrie."""
+        """
+        Creates a new ztrie.
+        """
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], ztrie_p) # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -4824,7 +5952,9 @@ class Ztrie(object):
             self.allow_destruct = True
 
     def __del__(self):
-        """Destroy the ztrie."""
+        """
+        Destroy the ztrie.
+        """
         if self.allow_destruct:
             lib.ztrie_destroy(byref(self._as_parameter_))
 
@@ -4837,49 +5967,67 @@ class Ztrie(object):
         return self._as_parameter_.__nonzero__()
 
     def insert_route(self, path, data, destroy_data_fn):
-        """Inserts a new route into the tree and attaches the data. Returns -1
+        """
+        Inserts a new route into the tree and attaches the data. Returns -1
 if the route already exists, otherwise 0. This method takes ownership of
-the provided data if a destroy_data_fn is provided."""
+the provided data if a destroy_data_fn is provided.
+        """
         return lib.ztrie_insert_route(self._as_parameter_, path, data, destroy_data_fn)
 
     def remove_route(self, path):
-        """Removes a route from the trie and destroys its data. Returns -1 if the
+        """
+        Removes a route from the trie and destroys its data. Returns -1 if the
 route does not exists, otherwise 0.
-the start of the list call zlist_first (). Advances the cursor."""
+the start of the list call zlist_first (). Advances the cursor.
+        """
         return lib.ztrie_remove_route(self._as_parameter_, path)
 
     def matches(self, path):
-        """Returns true if the path matches a route in the tree, otherwise false."""
+        """
+        Returns true if the path matches a route in the tree, otherwise false.
+        """
         return lib.ztrie_matches(self._as_parameter_, path)
 
     def hit_data(self):
-        """Returns the data of a matched route from last ztrie_matches. If the path
+        """
+        Returns the data of a matched route from last ztrie_matches. If the path
 did not match, returns NULL. Do not delete the data as it's owned by
-ztrie."""
+ztrie.
+        """
         return c_void_p(lib.ztrie_hit_data(self._as_parameter_))
 
     def hit_parameter_count(self):
-        """Returns the count of parameters that a matched route has."""
+        """
+        Returns the count of parameters that a matched route has.
+        """
         return lib.ztrie_hit_parameter_count(self._as_parameter_)
 
     def hit_parameters(self):
-        """Returns the parameters of a matched route with named regexes from last
+        """
+        Returns the parameters of a matched route with named regexes from last
 ztrie_matches. If the path did not match or the route did not contain any
-named regexes, returns NULL."""
+named regexes, returns NULL.
+        """
         return Zhashx(lib.ztrie_hit_parameters(self._as_parameter_), False)
 
     def hit_asterisk_match(self):
-        """Returns the asterisk matched part of a route, if there has been no match
-or no asterisk match, returns NULL."""
+        """
+        Returns the asterisk matched part of a route, if there has been no match
+or no asterisk match, returns NULL.
+        """
         return lib.ztrie_hit_asterisk_match(self._as_parameter_)
 
     def print(self):
-        """Print the trie"""
+        """
+        Print the trie
+        """
         return lib.ztrie_print(self._as_parameter_)
 
     @staticmethod
     def test(verbose):
-        """Self test of this class."""
+        """
+        Self test of this class.
+        """
         return lib.ztrie_test(verbose)
 
 
@@ -4914,11 +6062,15 @@ lib.zuuid_test.restype = None
 lib.zuuid_test.argtypes = [c_bool]
 
 class Zuuid(object):
-    """UUID support class"""
+    """
+    UUID support class
+    """
 
     allow_destruct = False
     def __init__(self, *args):
-        """Create a new UUID object."""
+        """
+        Create a new UUID object.
+        """
         if len(args) == 2 and type(args[0]) is c_void_p and isinstance(args[1], bool):
             self._as_parameter_ = cast(args[0], zuuid_p) # Conversion from raw type to binding
             self.allow_destruct = args[1] # This is a 'fresh' value, owned by us
@@ -4931,7 +6083,9 @@ class Zuuid(object):
             self.allow_destruct = True
 
     def __del__(self):
-        """Destroy a specified UUID object."""
+        """
+        Destroy a specified UUID object.
+        """
         if self.allow_destruct:
             lib.zuuid_destroy(byref(self._as_parameter_))
 
@@ -4945,56 +6099,80 @@ class Zuuid(object):
 
     @staticmethod
     def new_from(source):
-        """Create UUID object from supplied ZUUID_LEN-octet value."""
+        """
+        Create UUID object from supplied ZUUID_LEN-octet value.
+        """
         return Zuuid(lib.zuuid_new_from(source), False)
 
     def set(self, source):
-        """Set UUID to new supplied ZUUID_LEN-octet value."""
+        """
+        Set UUID to new supplied ZUUID_LEN-octet value.
+        """
         return lib.zuuid_set(self._as_parameter_, source)
 
     def set_str(self, source):
-        """Set UUID to new supplied string value skipping '-' and '{' '}'
-optional delimiters. Return 0 if OK, else returns -1."""
+        """
+        Set UUID to new supplied string value skipping '-' and '{' '}'
+optional delimiters. Return 0 if OK, else returns -1.
+        """
         return lib.zuuid_set_str(self._as_parameter_, source)
 
     def data(self):
-        """Return UUID binary data."""
+        """
+        Return UUID binary data.
+        """
         return lib.zuuid_data(self._as_parameter_)
 
     def size(self):
-        """Return UUID binary size"""
+        """
+        Return UUID binary size
+        """
         return lib.zuuid_size(self._as_parameter_)
 
     def str(self):
-        """Returns UUID as string"""
+        """
+        Returns UUID as string
+        """
         return lib.zuuid_str(self._as_parameter_)
 
     def str_canonical(self):
-        """Return UUID in the canonical string format: 8-4-4-4-12, in lower
+        """
+        Return UUID in the canonical string format: 8-4-4-4-12, in lower
 case. Caller does not modify or free returned value. See
-http://en.wikipedia.org/wiki/Universally_unique_identifier"""
+http://en.wikipedia.org/wiki/Universally_unique_identifier
+        """
         return lib.zuuid_str_canonical(self._as_parameter_)
 
     def export(self, target):
-        """Store UUID blob in target array"""
+        """
+        Store UUID blob in target array
+        """
         return lib.zuuid_export(self._as_parameter_, target)
 
     def eq(self, compare):
-        """Check if UUID is same as supplied value"""
+        """
+        Check if UUID is same as supplied value
+        """
         return lib.zuuid_eq(self._as_parameter_, compare)
 
     def neq(self, compare):
-        """Check if UUID is different from supplied value"""
+        """
+        Check if UUID is different from supplied value
+        """
         return lib.zuuid_neq(self._as_parameter_, compare)
 
     def dup(self):
-        """Make copy of UUID object; if uuid is null, or memory was exhausted,
-returns null."""
+        """
+        Make copy of UUID object; if uuid is null, or memory was exhausted,
+returns null.
+        """
         return Zuuid(lib.zuuid_dup(self._as_parameter_), False)
 
     @staticmethod
     def test(verbose):
-        """Self test of this class."""
+        """
+        Self test of this class.
+        """
         return lib.zuuid_test(verbose)
 
 ################################################################################
