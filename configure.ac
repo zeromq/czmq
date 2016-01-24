@@ -392,6 +392,16 @@ AC_ARG_ENABLE([zmakecert],
 AM_CONDITIONAL([ENABLE_ZMAKECERT], [test x$enable_zmakecert != xno])
 AM_COND_IF([ENABLE_ZMAKECERT], [AC_MSG_NOTICE([ENABLE_ZMAKECERT defined])])
 
+# Check for czmq_selftest intent
+AC_ARG_ENABLE([czmq_selftest],
+    AS_HELP_STRING([--enable-czmq_selftest],
+        [Compile 'czmq_selftest' in src [default=yes].]),
+    [enable_czmq_selftest=$enableval],
+    [enable_czmq_selftest=yes])
+
+AM_CONDITIONAL([ENABLE_CZMQ_SELFTEST], [test x$enable_czmq_selftest != xno])
+AM_COND_IF([ENABLE_CZMQ_SELFTEST], [AC_MSG_NOTICE([ENABLE_CZMQ_SELFTEST defined])])
+
 # Checks for library functions.
 AC_TYPE_SIGNAL
 AC_CHECK_FUNCS(perror gettimeofday memset getifaddrs)
