@@ -10,6 +10,8 @@ CONFIG(debug, debug|release) {
     else:win32:QCZMQ_LIBNAME = $$member(QCZMQ_LIBNAME, 0)d
 }
 TEMPLATE -= fakelib
+CONFIG += link_pkgconfig
+PKGCONFIG += libczmq
 QCZMQ_LIBDIR = $$PWD/lib
 unix:qczmq-uselib:!qczmq-buildlib:QMAKE_RPATHDIR += $$QCZMQ_LIBDIR
 ################################################################################
