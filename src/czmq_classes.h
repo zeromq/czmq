@@ -134,4 +134,9 @@ CZMQ_EXPORT void
 CZMQ_EXPORT char *
     zstr_str (void *source);
 
+//  *** Draft method, defined for internal use only ***
+//  Self test of this class.
+CZMQ_EXPORT void
+    zgossip_msg_test (bool verbose);
+
 #endif

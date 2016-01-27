@@ -26,10 +26,6 @@ extern "C" {
 //  This is a draft class, and may change without notice. It is disabled in
 //  stable builds by default. If you use this in applications, please ask
 //  for it to be pushed to stable state. Use --enable-drafts to enable.
-//  Self test of this class.
-CZMQ_EXPORT void
-    ztrie_test (bool verbose);
-
 #ifdef CZMQ_BUILD_DRAFT_API
 // Callback function for ztrie_node to destroy node data.
 typedef void (ztrie_destroy_data_fn) (
@@ -93,6 +89,11 @@ CZMQ_EXPORT const char *
 //  Print the trie
 CZMQ_EXPORT void
     ztrie_print (ztrie_t *self);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Self test of this class.
+CZMQ_EXPORT void
+    ztrie_test (bool verbose);
 
 #endif // CZMQ_BUILD_DRAFT_API
 //  @end
