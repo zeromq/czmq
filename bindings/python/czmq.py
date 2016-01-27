@@ -110,10 +110,6 @@ class zdir_patch_t(Structure):
     pass # Empty - only for type checking
 zdir_patch_p = POINTER(zdir_patch_t)
 
-class number_t(Structure):
-    pass # Empty - only for type checking
-number_p = POINTER(number_t)
-
 class zhashx_t(Structure):
     pass # Empty - only for type checking
 zhashx_p = POINTER(zhashx_t)
@@ -2086,10 +2082,10 @@ lib.zframe_more.restype = c_int
 lib.zframe_more.argtypes = [zframe_p]
 lib.zframe_set_more.restype = None
 lib.zframe_set_more.argtypes = [zframe_p, c_int]
-lib.zframe_routing_id.restype = number_p
+lib.zframe_routing_id.restype = c_int
 lib.zframe_routing_id.argtypes = [zframe_p]
 lib.zframe_set_routing_id.restype = None
-lib.zframe_set_routing_id.argtypes = [zframe_p, number_p]
+lib.zframe_set_routing_id.argtypes = [zframe_p, c_int]
 lib.zframe_eq.restype = c_bool
 lib.zframe_eq.argtypes = [zframe_p, zframe_p]
 lib.zframe_reset.restype = None
@@ -3805,10 +3801,10 @@ lib.zmsg_size.restype = c_size_t
 lib.zmsg_size.argtypes = [zmsg_p]
 lib.zmsg_content_size.restype = c_size_t
 lib.zmsg_content_size.argtypes = [zmsg_p]
-lib.zmsg_routing_id.restype = number_p
+lib.zmsg_routing_id.restype = c_int
 lib.zmsg_routing_id.argtypes = [zmsg_p]
 lib.zmsg_set_routing_id.restype = None
-lib.zmsg_set_routing_id.argtypes = [zmsg_p, number_p]
+lib.zmsg_set_routing_id.argtypes = [zmsg_p, c_int]
 lib.zmsg_prepend.restype = c_int
 lib.zmsg_prepend.argtypes = [zmsg_p, POINTER(zframe_p)]
 lib.zmsg_append.restype = c_int
@@ -4553,10 +4549,10 @@ lib.zsock_bsend.restype = c_int
 lib.zsock_bsend.argtypes = [zsock_p, c_char_p]
 lib.zsock_brecv.restype = c_int
 lib.zsock_brecv.argtypes = [zsock_p, c_char_p]
-lib.zsock_routing_id.restype = number_p
+lib.zsock_routing_id.restype = c_int
 lib.zsock_routing_id.argtypes = [zsock_p]
 lib.zsock_set_routing_id.restype = None
-lib.zsock_set_routing_id.argtypes = [zsock_p, number_p]
+lib.zsock_set_routing_id.argtypes = [zsock_p, c_int]
 lib.zsock_set_unbounded.restype = None
 lib.zsock_set_unbounded.argtypes = [zsock_p]
 lib.zsock_signal.restype = c_int

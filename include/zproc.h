@@ -25,10 +25,6 @@ extern "C" {
 //  This is a draft class, and may change without notice. It is disabled in
 //  stable builds by default. If you use this in applications, please ask
 //  for it to be pushed to stable state. Use --enable-drafts to enable.
-//  Self test of this class.
-CZMQ_EXPORT void
-    zproc_test (bool verbose);
-
 #ifdef CZMQ_BUILD_DRAFT_API
 //  *** Draft method, for development use, may change without warning ***
 //  Returns CZMQ version as a single 6-digit integer encoding the major
@@ -155,6 +151,11 @@ CZMQ_EXPORT void
 //  Log debug-level message - lowest priority
 CZMQ_EXPORT void
     zproc_log_debug (const char *format, ...) CHECK_PRINTF (1);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Self test of this class.
+CZMQ_EXPORT void
+    zproc_test (bool verbose);
 
 #endif // CZMQ_BUILD_DRAFT_API
 //  @end

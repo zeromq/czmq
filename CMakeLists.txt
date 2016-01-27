@@ -46,7 +46,7 @@ set(
 ########################################################################
 # options
 ########################################################################
-if (EXISTS ".git")
+if (EXISTS "${SOURCE_DIR}/.git")
     OPTION (ENABLE_DRAFTS "Build and install draft classes and methods" ON)
 else ()
     OPTION (ENABLE_DRAFTS "Build and install draft classes and methods" OFF)
