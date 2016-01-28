@@ -526,7 +526,9 @@ zhashx_keys (zhashx_t *self)
 //  a duplicator, then it is used to duplicate all items, and if there
 //  is a destructor then it set as the destructor for the list.
 
-zlistx_t *zhashx_values(zhashx_t *self) {
+zlistx_t *
+zhashx_values (zhashx_t *self) 
+{
     assert (self);
 
     zlistx_t *values = zlistx_new ();
@@ -548,7 +550,6 @@ zlistx_t *zhashx_values(zhashx_t *self) {
             item = item->next;
         }
      }
-
     return values;
 }
 

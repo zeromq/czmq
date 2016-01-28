@@ -3312,7 +3312,7 @@ lib.zlistx_set_destructor.argtypes = [zlistx_p, zlistx_destructor_fn]
 lib.zlistx_set_duplicator.restype = None
 lib.zlistx_set_duplicator.argtypes = [zlistx_p, zlistx_duplicator_fn]
 lib.zlistx_set_comparator.restype = None
-lib.zlistx_set_comparator.argtypes = [zlistx_p, zlistx_destructor_fn]
+lib.zlistx_set_comparator.argtypes = [zlistx_p, zlistx_comparator_fn]
 lib.zlistx_test.restype = None
 lib.zlistx_test.argtypes = [c_bool]
 
@@ -3545,13 +3545,13 @@ copied when the list is duplicated.
         """
         return lib.zlistx_set_duplicator(self._as_parameter_, duplicator)
 
-    def set_comparator(self, destructor):
+    def set_comparator(self, comparator):
         """
         Set a user-defined comparator for zlistx_find and zlistx_sort; the method
 must return -1, 0, or 1 depending on whether item1 is less than, equal to,
 or greater than, item2.
         """
-        return lib.zlistx_set_comparator(self._as_parameter_, destructor)
+        return lib.zlistx_set_comparator(self._as_parameter_, comparator)
 
     @staticmethod
     def test(verbose):

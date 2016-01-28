@@ -73,6 +73,55 @@ module CZMQ
         @finalizer = nil
       end
 
+      # Create a new callback of the following type:
+      # Destroy an item
+      #     typedef void (zlistx_destructor_fn) (
+      #         void **item);                    
+      #
+      # @note WARNING: If your Ruby code doesn't retain a reference to the
+      #   FFI::Function object after passing it to a C function call,
+      #   it may be garbage collected while C still holds the pointer,
+      #   potentially resulting in a segmentation fault.
+      def self.destructor_fn
+        ::FFI::Function.new :void, [:pointer], blocking: true do |item|
+          result = yield item
+          result
+        end
+      end
+
+      # Create a new callback of the following type:
+      # Duplicate an item
+      #     typedef void * (zlistx_duplicator_fn) (
+      #         const void *item);                 
+      #
+      # @note WARNING: If your Ruby code doesn't retain a reference to the
+      #   FFI::Function object after passing it to a C function call,
+      #   it may be garbage collected while C still holds the pointer,
+      #   potentially resulting in a segmentation fault.
+      def self.duplicator_fn
+        ::FFI::Function.new :pointer, [:pointer], blocking: true do |item|
+          result = yield item
+          result
+        end
+      end
+
+      # Create a new callback of the following type:
+      # Compare two items, for sorting
+      #     typedef int (zlistx_comparator_fn) (      
+      #         const void *item1, const void *item2);
+      #
+      # @note WARNING: If your Ruby code doesn't retain a reference to the
+      #   FFI::Function object after passing it to a C function call,
+      #   it may be garbage collected while C still holds the pointer,
+      #   potentially resulting in a segmentation fault.
+      def self.comparator_fn
+        ::FFI::Function.new :int, [:pointer, :pointer], blocking: true do |item1, item2|
+          result = yield item1, item2
+          result = Integer(result)
+          result
+        end
+      end
+
       # Create a new, empty list.
       # @return [CZMQ::Zlistx]
       def self.new()
