@@ -10,6 +10,24 @@
     -->
     extended generic list container
 
+    <callback_type name = "destructor_fn">
+        Destroy an item
+        <argument name = "item" type = "anything" by_reference = "1" />
+    </callback_type>
+
+    <callback_type name = "duplicator_fn">
+        Duplicate an item
+        <argument name = "item" type = "anything" mutable = "0" />
+        <return type = "anything" />
+    </callback_type>
+
+    <callback_type name = "comparator_fn">
+        Compare two items, for sorting
+        <argument name = "item1" type = "anything" mutable = "0" />
+        <argument name = "item2" type = "anything" mutable = "0" />
+        <return type = "integer" />
+    </callback_type>
+
     <constructor>
         Create a new, empty list.
     </constructor>
@@ -180,23 +198,23 @@
         <return type = "zlistx" fresh = "0" />
     </method>
 
-    <method name = "set_destructor">
+    <method name = "set destructor">
         Set a user-defined deallocator for list items; by default items are not
         freed when the list is destroyed.
-        <argument name = "destructor" type = "czmq_destructor" callback = "1" />
+        <argument name = "destructor" type = "zlistx_destructor_fn" callback = "1" />
     </method>
 
-    <method name = "set_duplicator">
+    <method name = "set duplicator">
         Set a user-defined duplicator for list items; by default items are not
         copied when the list is duplicated.
-        <argument name = "duplicator" type = "czmq_duplicator" callback = "1" />
+        <argument name = "duplicator" type = "zlistx_duplicator_fn" callback = "1" />
     </method>
 
-    <method name = "set_comparator">
+    <method name = "set comparator">
         Set a user-defined comparator for zlistx_find and zlistx_sort; the method
         must return -1, 0, or 1 depending on whether item1 is less than, equal to,
         or greater than, item2.
-        <argument name = "comparator" type = "czmq_comparator" callback = "1" />
+        <argument name = "comparator" type = "zlistx_comparator_fn" callback = "1" />
     </method>
 
 </class>

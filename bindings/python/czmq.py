@@ -3254,6 +3254,9 @@ Returns the item, or NULL if there is no such item.
 
 
 # zlistx
+zlistx_destructor_fn = CFUNCTYPE(None, POINTER(c_void_p))
+zlistx_duplicator_fn = CFUNCTYPE(c_void_p, c_void_p)
+zlistx_comparator_fn = CFUNCTYPE(c_int, c_void_p, c_void_p)
 lib.zlistx_new.restype = zlistx_p
 lib.zlistx_new.argtypes = []
 lib.zlistx_destroy.restype = None
@@ -3305,11 +3308,11 @@ lib.zlistx_reorder.argtypes = [zlistx_p, c_void_p, c_bool]
 lib.zlistx_dup.restype = zlistx_p
 lib.zlistx_dup.argtypes = [zlistx_p]
 lib.zlistx_set_destructor.restype = None
-lib.zlistx_set_destructor.argtypes = [zlistx_p, czmq_destructor]
+lib.zlistx_set_destructor.argtypes = [zlistx_p, zlistx_destructor_fn]
 lib.zlistx_set_duplicator.restype = None
-lib.zlistx_set_duplicator.argtypes = [zlistx_p, czmq_duplicator]
+lib.zlistx_set_duplicator.argtypes = [zlistx_p, zlistx_duplicator_fn]
 lib.zlistx_set_comparator.restype = None
-lib.zlistx_set_comparator.argtypes = [zlistx_p, czmq_comparator]
+lib.zlistx_set_comparator.argtypes = [zlistx_p, zlistx_destructor_fn]
 lib.zlistx_test.restype = None
 lib.zlistx_test.argtypes = [c_bool]
 
@@ -3542,13 +3545,13 @@ copied when the list is duplicated.
         """
         return lib.zlistx_set_duplicator(self._as_parameter_, duplicator)
 
-    def set_comparator(self, comparator):
+    def set_comparator(self, destructor):
         """
         Set a user-defined comparator for zlistx_find and zlistx_sort; the method
 must return -1, 0, or 1 depending on whether item1 is less than, equal to,
 or greater than, item2.
         """
-        return lib.zlistx_set_comparator(self._as_parameter_, comparator)
+        return lib.zlistx_set_comparator(self._as_parameter_, destructor)
 
     @staticmethod
     def test(verbose):
