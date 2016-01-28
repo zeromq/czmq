@@ -62,7 +62,6 @@ zsock_new_checked (int type, const char *filename, size_t line_nbr)
 {
     zsock_t *self = (zsock_t *) zmalloc (sizeof (zsock_t));
     assert (self);
-    self->routing_id = 0;
     self->tag = ZSOCK_TAG;
     self->type = type;
     self->handle = zsys_socket (type, filename, line_nbr);
