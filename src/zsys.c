@@ -387,11 +387,9 @@ zsys_create_pipe (zsock_t **backend_p)
 {
     zsock_t *frontend = zsock_new (ZMQ_PAIR);
     zsock_t *backend = zsock_new (ZMQ_PAIR);
-    if (!frontend || !backend) {
-        zsock_destroy (&frontend);
-        zsock_destroy (&backend);
-        return frontend;
-    }
+    assert (frontend);
+    assert (backend);
+
 #if (ZMQ_VERSION_MAJOR == 2)
     //  Use the deprecated zsockopt API as the current zsock_option
     //  API does not support ZeroMQ/2.x
