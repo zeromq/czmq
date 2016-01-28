@@ -189,7 +189,7 @@ CZMQ_EXPORT void
 //  must return -1, 0, or 1 depending on whether item1 is less than, equal to,
 //  or greater than, item2.                                                   
 CZMQ_EXPORT void
-    zlistx_set_comparator (zlistx_t *self, zlistx_destructor_fn destructor);
+    zlistx_set_comparator (zlistx_t *self, zlistx_comparator_fn comparator);
 
 //  Self test of this class.
 CZMQ_EXPORT void

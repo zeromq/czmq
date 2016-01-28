@@ -45,9 +45,10 @@ struct _zlistx_t {
     node_t *head;                   //  First item in list, if any
     node_t *cursor;                 //  Current cursors for iteration
     size_t size;                    //  Number of items in list
-    czmq_duplicator *duplicator;    //  Item duplicator, if any
-    czmq_comparator *comparator;    //  Item comparator, if any
-    czmq_destructor *destructor;    //  Item destructor, if any
+    //  Function callbacks for duplicating and destroying items, if any
+    zlistx_duplicator_fn *duplicator;
+    zlistx_destructor_fn *destructor;
+    zlistx_comparator_fn *comparator;
 };
 
 
@@ -600,7 +601,7 @@ zlistx_dup (zlistx_t *self)
 //  freed when the list is destroyed.
 
 void
-zlistx_set_destructor (zlistx_t *self, czmq_destructor destructor)
+zlistx_set_destructor (zlistx_t *self, zlistx_destructor_fn destructor)
 {
     assert (self);
     self->destructor = destructor;
@@ -612,7 +613,7 @@ zlistx_set_destructor (zlistx_t *self, czmq_destructor destructor)
 //  copied when the list is duplicated.
 
 void
-zlistx_set_duplicator (zlistx_t *self, czmq_duplicator duplicator)
+zlistx_set_duplicator (zlistx_t *self, zlistx_duplicator_fn duplicator)
 {
     assert (self);
     self->duplicator = duplicator;
@@ -625,7 +626,7 @@ zlistx_set_duplicator (zlistx_t *self, czmq_duplicator duplicator)
 //  or greater than, item2.
 
 void
-zlistx_set_comparator (zlistx_t *self, czmq_comparator comparator)
+zlistx_set_comparator (zlistx_t *self, zlistx_comparator_fn comparator)
 {
     assert (self);
     self->comparator = comparator;
@@ -659,9 +660,9 @@ zlistx_test (bool verbose)
     zlistx_sort (list);
 
     //  Use item handlers
-    zlistx_set_destructor (list, (czmq_destructor *) zstr_free);
-    zlistx_set_duplicator (list, (czmq_duplicator *) strdup);
-    zlistx_set_comparator (list, (czmq_comparator *) strcmp);
+    zlistx_set_destructor (list, (zlistx_destructor_fn *) zstr_free);
+    zlistx_set_duplicator (list, (zlistx_duplicator_fn *) strdup);
+    zlistx_set_comparator (list, (zlistx_comparator_fn *) strcmp);
 
     //  Try simple insert/sort/delete/next
     assert (zlistx_next (list) == NULL);

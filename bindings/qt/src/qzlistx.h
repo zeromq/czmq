@@ -134,16 +134,16 @@ public:
 
     //  Set a user-defined deallocator for list items; by default items are not
     //  freed when the list is destroyed.                                      
-    void setDestructor (czmq_destructor destructor);
+    void setDestructor (zlistx_destructor_fn destructor);
 
     //  Set a user-defined duplicator for list items; by default items are not
     //  copied when the list is duplicated.                                   
-    void setDuplicator (czmq_duplicator duplicator);
+    void setDuplicator (zlistx_duplicator_fn duplicator);
 
     //  Set a user-defined comparator for zlistx_find and zlistx_sort; the method 
     //  must return -1, 0, or 1 depending on whether item1 is less than, equal to,
     //  or greater than, item2.                                                   
-    void setComparator (czmq_comparator comparator);
+    void setComparator (zlistx_comparator_fn comparator);
 
     //  Self test of this class.
     static void test (bool verbose);

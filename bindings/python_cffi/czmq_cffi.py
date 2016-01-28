@@ -137,6 +137,18 @@ typedef int (zlist_compare_fn) (
 typedef void (zlist_free_fn) (
     void *data);
 
+// Destroy an item
+typedef void (zlistx_destructor_fn) (
+    void **item);
+
+// Duplicate an item
+typedef void * (zlistx_duplicator_fn) (
+    const void *item);
+
+// Compare two items, for sorting
+typedef int (zlistx_comparator_fn) (
+    const void *item1, const void *item2);
+
 // Callback function for reactor socket activity
 typedef int (zloop_reader_fn) (
     zloop_t *loop, zsock_t *reader, void *arg);
@@ -1736,18 +1748,18 @@ CZMQ_EXPORT zlistx_t *
 // Set a user-defined deallocator for list items; by default items are not
 // freed when the list is destroyed.                                      
 CZMQ_EXPORT void
-    zlistx_set_destructor (zlistx_t *self, czmq_destructor destructor);
+    zlistx_set_destructor (zlistx_t *self, zlistx_destructor_fn destructor);
 
 // Set a user-defined duplicator for list items; by default items are not
 // copied when the list is duplicated.                                   
 CZMQ_EXPORT void
-    zlistx_set_duplicator (zlistx_t *self, czmq_duplicator duplicator);
+    zlistx_set_duplicator (zlistx_t *self, zlistx_duplicator_fn duplicator);
 
 // Set a user-defined comparator for zlistx_find and zlistx_sort; the method 
 // must return -1, 0, or 1 depending on whether item1 is less than, equal to,
 // or greater than, item2.                                                   
 CZMQ_EXPORT void
-    zlistx_set_comparator (zlistx_t *self, czmq_comparator comparator);
+    zlistx_set_comparator (zlistx_t *self, zlistx_comparator_fn comparator);
 
 // Self test of this class.
 CZMQ_EXPORT void
