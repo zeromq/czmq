@@ -40,8 +40,7 @@ EXTRA_DIST = \
     LICENSE \
     README.txt \
     README.md \
-    CONTRIBUTING.md \
-    version.sh
+    CONTRIBUTING.md
 
 include $(srcdir)/src/Makemodule.am
 include $(srcdir)/src/Makemodule-local.am # Optional project-local hook

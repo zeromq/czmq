@@ -677,7 +677,14 @@ module CZMQ
                "this Ruby binding because it's not available."
         end
       end
-      attach_function :zproc_test, [:bool], :void, **opts
+      begin # DRAFT method
+        attach_function :zproc_test, [:bool], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function test() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
 
       require_relative 'ffi/zproc'
 
@@ -992,7 +999,14 @@ module CZMQ
                "this Ruby binding because it's not available."
         end
       end
-      attach_function :ztrie_test, [:bool], :void, **opts
+      begin # DRAFT method
+        attach_function :ztrie_test, [:bool], :void, **opts
+      rescue ::FFI::NotFoundError
+        if $VERBOSE || $DEBUG
+          warn "The function test() can't be used through " +
+               "this Ruby binding because it's not available."
+        end
+      end
 
       require_relative 'ffi/ztrie'
 

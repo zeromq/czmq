@@ -60,8 +60,8 @@ if ENABLE_DRAFTS
 include_HEADERS += \
     include/zproc.h \
     include/ztrie.h
-endif
 
+endif
 src_libczmq_la_SOURCES = \
     src/zactor.c \
     src/zarmour.c \
@@ -117,6 +117,7 @@ if ENABLE_DRAFTS
 src_libczmq_la_SOURCES += \
     src/zproc.c \
     src/ztrie.c
+
 endif
 
 src_libczmq_la_CPPFLAGS = ${AM_CPPFLAGS}
@@ -144,18 +145,15 @@ bin_PROGRAMS += src/zmakecert
 src_zmakecert_CPPFLAGS = ${AM_CPPFLAGS}
 src_zmakecert_LDADD = ${program_libs}
 src_zmakecert_SOURCES = src/zmakecert.c
-if WITH_SYSTEMD
-endif #WITH_SYSTEMD
-
 endif #ENABLE_ZMAKECERT
+
+if ENABLE_CZMQ_SELFTEST
 check_PROGRAMS += src/czmq_selftest
 noinst_PROGRAMS += src/czmq_selftest
 src_czmq_selftest_CPPFLAGS = ${AM_CPPFLAGS}
 src_czmq_selftest_LDADD = ${program_libs}
 src_czmq_selftest_SOURCES = src/czmq_selftest.c
-if WITH_SYSTEMD
-endif #WITH_SYSTEMD
-
+endif #ENABLE_CZMQ_SELFTEST
 
 # Install api files into /usr/local/share/zproject
 apidir = @datadir@/zproject/czmq
@@ -195,9 +193,9 @@ src:
 
 # Produce generated code from models in the src directory
 code:
-	cd $(srcdir)/src; gsl -q sockopts.xml
-	cd $(srcdir)/src; gsl -q zgossip.xml
-	cd $(srcdir)/src; gsl -q zgossip_msg.xml
+	cd $(srcdir)/src; gsl -topdir:.. -zproject:1 -q sockopts.xml
+	cd $(srcdir)/src; gsl -topdir:.. -zproject:1 -q zgossip.xml
+	cd $(srcdir)/src; gsl -topdir:.. -zproject:1 -q zgossip_msg.xml
 
 check-local: src/czmq_selftest
 	$(LIBTOOL) --mode=execute $(srcdir)/src/czmq_selftest
