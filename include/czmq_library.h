@@ -37,7 +37,6 @@
     CZMQ_MAKE_VERSION(CZMQ_VERSION_MAJOR, CZMQ_VERSION_MINOR, CZMQ_VERSION_PATCH)
 
 #if defined (__WINDOWS__)
-	#define CZMQ_BUILD_DRAFT_API
 #   if defined LIBCZMQ_STATIC
 #       define CZMQ_EXPORT
 #   elif defined LIBCZMQ_EXPORTS
@@ -178,7 +177,6 @@ typedef struct _ztrie_t ztrie_t;
 #include "zsocket.h"
 #include "zsockopt.h"
 #include "zthread.h"
-
 #ifdef CZMQ_BUILD_DRAFT_API
 #include "zproc.h"
 #include "ztrie.h"
