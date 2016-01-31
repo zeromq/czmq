@@ -196,6 +196,7 @@ code:
 	cd $(srcdir)/src; gsl -topdir:.. -zproject:1 -q sockopts.xml
 	cd $(srcdir)/src; gsl -topdir:.. -zproject:1 -q zgossip.xml
 	cd $(srcdir)/src; gsl -topdir:.. -zproject:1 -q zgossip_msg.xml
+	gsl -target:- project.xml
 
 check-local: src/czmq_selftest
 	$(LIBTOOL) --mode=execute $(srcdir)/src/czmq_selftest
