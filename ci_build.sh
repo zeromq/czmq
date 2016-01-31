@@ -7,7 +7,7 @@
 
 set -x
 
-if [ $BUILD_TYPE == "default" ]; then
+if [ "$BUILD_TYPE" == "default" ]; then
     mkdir tmp
     BUILD_PREFIX=$PWD/tmp
 
@@ -21,13 +21,15 @@ if [ $BUILD_TYPE == "default" ]; then
 
     # Clone and build dependencies
     git clone --depth 1 https://github.com/jedisct1/libsodium libsodium
+    git --no-pager log -oneline -n1
     ( cd libsodium && ./autogen.sh && ./configure "${CONFIG_OPTS[@]}" && make -j4 && make install ) || exit 1
 
     git clone --depth 1 https://github.com/zeromq/libzmq libzmq
+    git --no-pager log -oneline -n1
     ( cd libzmq && ./autogen.sh && ./configure "${CONFIG_OPTS[@]}" && make -j4 && make install ) || exit 1
 
     # Build and check this project
     ( ./autogen.sh && ./configure "${CONFIG_OPTS[@]}" && make -j4 && make check && make memcheck && make install ) || exit 1
 else
-    cd ./builds/${BUILD_TYPE} && ./ci_build.sh
+    pushd "./builds/${BUILD_TYPE}" && REPO_DIR="$(dirs -l +1)" ./ci_build.sh
 fi

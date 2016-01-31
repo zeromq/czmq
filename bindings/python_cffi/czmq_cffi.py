@@ -167,206 +167,206 @@ typedef void (ztrie_destroy_data_fn) (
 
 // CLASS: zactor
 // Create a new actor passing arbitrary arguments reference.
-CZMQ_EXPORT zactor_t *
+zactor_t *
     zactor_new (zactor_fn task, void *args);
 
 // Destroy an actor.
-CZMQ_EXPORT void
+void
     zactor_destroy (zactor_t **self_p);
 
 // Send a zmsg message to the actor, take ownership of the message
 // and destroy when it has been sent.                             
-CZMQ_EXPORT int
+int
     zactor_send (zactor_t *self, zmsg_t **msg_p);
 
 // Receive a zmsg message from the actor. Returns NULL if the actor 
 // was interrupted before the message could be received, or if there
 // was a timeout on the actor.                                      
-CZMQ_EXPORT zmsg_t *
+zmsg_t *
     zactor_recv (zactor_t *self);
 
 // Probe the supplied object, and report if it looks like a zactor_t.
-CZMQ_EXPORT bool
+bool
     zactor_is (void *self);
 
 // Probe the supplied reference. If it looks like a zactor_t instance,
 // return the underlying libzmq actor handle; else if it looks like   
 // a libzmq actor handle, return the supplied value.                  
-CZMQ_EXPORT void *
+void *
     zactor_resolve (void *self);
 
 // Return the actor's zsock handle. Use this when you absolutely need
 // to work with the zsock instance rather than the actor.            
-CZMQ_EXPORT zsock_t *
+zsock_t *
     zactor_sock (zactor_t *self);
 
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zactor_test (bool verbose);
 
 // CLASS: zarmour
 // Create a new zarmour.
-CZMQ_EXPORT zarmour_t *
+zarmour_t *
     zarmour_new (void);
 
 // Destroy the zarmour.
-CZMQ_EXPORT void
+void
     zarmour_destroy (zarmour_t **self_p);
 
 // Encode a stream of bytes into an armoured string. Returns the armoured
 // string, or NULL if there was insufficient memory available to allocate
 // a new string.                                                         
-CZMQ_EXPORT char *
+char *
     zarmour_encode (zarmour_t *self, const byte *data, size_t size);
 
 // Decode an armoured string into a string of bytes.          
 // The decoded output is null-terminated, so it may be treated
 // as a string, if that's what it was prior to encoding.      
-CZMQ_EXPORT byte *
+byte *
     zarmour_decode (zarmour_t *self, const char *data, size_t *decode_size);
 
 // Get the mode property.
-CZMQ_EXPORT zarmour_mode_t
+zarmour_mode_t
     zarmour_mode (zarmour_t *self);
 
 // Get printable string for mode.
-CZMQ_EXPORT const char *
+const char *
     zarmour_mode_str (zarmour_t *self);
 
 // Set the mode property.
-CZMQ_EXPORT void
+void
     zarmour_set_mode (zarmour_t *self, zarmour_mode_t mode);
 
 // Return true if padding is turned on.
-CZMQ_EXPORT bool
+bool
     zarmour_pad (zarmour_t *self);
 
 // Turn padding on or off. Default is on.
-CZMQ_EXPORT void
+void
     zarmour_set_pad (zarmour_t *self, bool pad);
 
 // Get the padding character.
-CZMQ_EXPORT char
+char
     zarmour_pad_char (zarmour_t *self);
 
 // Set the padding character.
-CZMQ_EXPORT void
+void
     zarmour_set_pad_char (zarmour_t *self, char pad_char);
 
 // Return if splitting output into lines is turned on. Default is off.
-CZMQ_EXPORT bool
+bool
     zarmour_line_breaks (zarmour_t *self);
 
 // Turn splitting output into lines on or off.
-CZMQ_EXPORT void
+void
     zarmour_set_line_breaks (zarmour_t *self, bool line_breaks);
 
 // Get the line length used for splitting lines.
-CZMQ_EXPORT size_t
+size_t
     zarmour_line_length (zarmour_t *self);
 
 // Set the line length used for splitting lines.
-CZMQ_EXPORT void
+void
     zarmour_set_line_length (zarmour_t *self, size_t line_length);
 
 // Print properties of object
-CZMQ_EXPORT void
+void
     zarmour_print (zarmour_t *self);
 
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zarmour_test (bool verbose);
 
 // CLASS: zcert
 // Create and initialize a new certificate in memory
-CZMQ_EXPORT zcert_t *
+zcert_t *
     zcert_new (void);
 
 // Accepts public/secret key pair from caller
-CZMQ_EXPORT zcert_t *
+zcert_t *
     zcert_new_from (const byte *public_key, const byte *secret_key);
 
 // Load certificate from file
-CZMQ_EXPORT zcert_t *
+zcert_t *
     zcert_load (const char *filename);
 
 // Destroy a certificate in memory
-CZMQ_EXPORT void
+void
     zcert_destroy (zcert_t **self_p);
 
 // Return public part of key pair as 32-byte binary string
-CZMQ_EXPORT byte *
+byte *
     zcert_public_key (zcert_t *self);
 
 // Return secret part of key pair as 32-byte binary string
-CZMQ_EXPORT byte *
+byte *
     zcert_secret_key (zcert_t *self);
 
 // Return public part of key pair as Z85 armored string
-CZMQ_EXPORT char *
+char *
     zcert_public_txt (zcert_t *self);
 
 // Return secret part of key pair as Z85 armored string
-CZMQ_EXPORT char *
+char *
     zcert_secret_txt (zcert_t *self);
 
 // Set certificate metadata from formatted string.
-CZMQ_EXPORT void
-    zcert_set_meta (zcert_t *self, const char *name, const char *format, ...) CHECK_PRINTF (3);
+void
+    zcert_set_meta (zcert_t *self, const char *name, const char *format, ...);
 
 // Unset certificate metadata.
-CZMQ_EXPORT void
+void
     zcert_unset_meta (zcert_t *self, const char *name);
 
 // Get metadata value from certificate; if the metadata value doesn't
 // exist, returns NULL.                                              
-CZMQ_EXPORT char *
+char *
     zcert_meta (zcert_t *self, const char *name);
 
 // Get list of metadata fields from certificate. Caller is responsible for
 // destroying list. Caller should not modify the values of list items.    
-CZMQ_EXPORT zlist_t *
+zlist_t *
     zcert_meta_keys (zcert_t *self);
 
 // Save full certificate (public + secret) to file for persistent storage  
 // This creates one public file and one secret file (filename + "_secret").
-CZMQ_EXPORT int
+int
     zcert_save (zcert_t *self, const char *filename);
 
 // Save public certificate only to file for persistent storage
-CZMQ_EXPORT int
+int
     zcert_save_public (zcert_t *self, const char *filename);
 
 // Save secret certificate only to file for persistent storage
-CZMQ_EXPORT int
+int
     zcert_save_secret (zcert_t *self, const char *filename);
 
 // Apply certificate to socket, i.e. use for CURVE security on socket.
 // If certificate was loaded from public file, the secret key will be 
 // undefined, and this certificate will not work successfully.        
-CZMQ_EXPORT void
+void
     zcert_apply (zcert_t *self, void *zocket);
 
 // Return copy of certificate; if certificate is NULL or we exhausted
 // heap memory, returns NULL.                                        
-CZMQ_EXPORT zcert_t *
+zcert_t *
     zcert_dup (zcert_t *self);
 
 // Return true if two certificates have the same keys
-CZMQ_EXPORT bool
+bool
     zcert_eq (zcert_t *self, zcert_t *compare);
 
 // Print certificate contents to stdout
-CZMQ_EXPORT void
+void
     zcert_print (zcert_t *self);
 
 // DEPRECATED as incompatible with centralized logging
 // Print certificate contents to open stream          
-CZMQ_EXPORT void
+void
     zcert_fprint (zcert_t *self, FILE *file);
 
 // Self test of this class
-CZMQ_EXPORT void
+void
     zcert_test (bool verbose);
 
 // CLASS: zcertstore
@@ -376,424 +376,424 @@ CZMQ_EXPORT void
 // is automatically refreshed on any zcertstore_lookup() call. If the       
 // location is specified as NULL, creates a pure-memory store, which you    
 // can work with by inserting certificates at runtime.                      
-CZMQ_EXPORT zcertstore_t *
+zcertstore_t *
     zcertstore_new (const char *location);
 
 // Destroy a certificate store object in memory. Does not affect anything
 // stored on disk.                                                       
-CZMQ_EXPORT void
+void
     zcertstore_destroy (zcertstore_t **self_p);
 
 // Look up certificate by public key, returns zcert_t object if found,
 // else returns NULL. The public key is provided in Z85 text format.  
-CZMQ_EXPORT zcert_t *
+zcert_t *
     zcertstore_lookup (zcertstore_t *self, const char *public_key);
 
 // Insert certificate into certificate store in memory. Note that this
 // does not save the certificate to disk. To do that, use zcert_save()
 // directly on the certificate. Takes ownership of zcert_t object.    
-CZMQ_EXPORT void
+void
     zcertstore_insert (zcertstore_t *self, zcert_t **cert_p);
 
 // Print list of certificates in store to logging facility
-CZMQ_EXPORT void
+void
     zcertstore_print (zcertstore_t *self);
 
 // DEPRECATED as incompatible with centralized logging
 // Print list of certificates in store to open stream 
-CZMQ_EXPORT void
+void
     zcertstore_fprint (zcertstore_t *self, FILE *file);
 
 // Self test of this class
-CZMQ_EXPORT void
+void
     zcertstore_test (bool verbose);
 
 // CLASS: zchunk
 // Create a new chunk of the specified size. If you specify the data, it   
 // is copied into the chunk. If you do not specify the data, the chunk is  
 // allocated and left empty, and you can then add data using zchunk_append.
-CZMQ_EXPORT zchunk_t *
+zchunk_t *
     zchunk_new (const void *data, size_t size);
 
 // Destroy a chunk
-CZMQ_EXPORT void
+void
     zchunk_destroy (zchunk_t **self_p);
 
 // Resizes chunk max_size as requested; chunk_cur size is set to zero
-CZMQ_EXPORT void
+void
     zchunk_resize (zchunk_t *self, size_t size);
 
 // Return chunk cur size
-CZMQ_EXPORT size_t
+size_t
     zchunk_size (zchunk_t *self);
 
 // Return chunk max size
-CZMQ_EXPORT size_t
+size_t
     zchunk_max_size (zchunk_t *self);
 
 // Return chunk data
-CZMQ_EXPORT byte *
+byte *
     zchunk_data (zchunk_t *self);
 
 // Set chunk data from user-supplied data; truncate if too large. Data may
 // be null. Returns actual size of chunk                                  
-CZMQ_EXPORT size_t
+size_t
     zchunk_set (zchunk_t *self, const void *data, size_t size);
 
 // Fill chunk data from user-supplied octet
-CZMQ_EXPORT size_t
+size_t
     zchunk_fill (zchunk_t *self, byte filler, size_t size);
 
 // Append user-supplied data to chunk, return resulting chunk size. If the 
 // data would exceeded the available space, it is truncated. If you want to
 // grow the chunk to accommodate new data, use the zchunk_extend method.   
-CZMQ_EXPORT size_t
+size_t
     zchunk_append (zchunk_t *self, const void *data, size_t size);
 
 // Append user-supplied data to chunk, return resulting chunk size. If the
 // data would exceeded the available space, the chunk grows in size.      
-CZMQ_EXPORT size_t
+size_t
     zchunk_extend (zchunk_t *self, const void *data, size_t size);
 
 // Copy as much data from 'source' into the chunk as possible; returns the  
 // new size of chunk. If all data from 'source' is used, returns exhausted  
 // on the source chunk. Source can be consumed as many times as needed until
 // it is exhausted. If source was already exhausted, does not change chunk. 
-CZMQ_EXPORT size_t
+size_t
     zchunk_consume (zchunk_t *self, zchunk_t *source);
 
 // Returns true if the chunk was exhausted by consume methods, or if the
 // chunk has a size of zero.                                            
-CZMQ_EXPORT bool
+bool
     zchunk_exhausted (zchunk_t *self);
 
 // Read chunk from an open file descriptor
-CZMQ_EXPORT zchunk_t *
+zchunk_t *
     zchunk_read (FILE *handle, size_t bytes);
 
 // Write chunk to an open file descriptor
-CZMQ_EXPORT int
+int
     zchunk_write (zchunk_t *self, FILE *handle);
 
 // Try to slurp an entire file into a chunk. Will read up to maxsize of  
 // the file. If maxsize is 0, will attempt to read the entire file and   
 // fail with an assertion if that cannot fit into memory. Returns a new  
 // chunk containing the file data, or NULL if the file could not be read.
-CZMQ_EXPORT zchunk_t *
+zchunk_t *
     zchunk_slurp (const char *filename, size_t maxsize);
 
 // Create copy of chunk, as new chunk object. Returns a fresh zchunk_t   
 // object, or null if there was not enough heap memory. If chunk is null,
 // returns null.                                                         
-CZMQ_EXPORT zchunk_t *
+zchunk_t *
     zchunk_dup (zchunk_t *self);
 
 // Return chunk data encoded as printable hex string. Caller must free
 // string when finished with it.                                      
-CZMQ_EXPORT char *
+char *
     zchunk_strhex (zchunk_t *self);
 
 // Return chunk data copied into freshly allocated string
 // Caller must free string when finished with it.        
-CZMQ_EXPORT char *
+char *
     zchunk_strdup (zchunk_t *self);
 
 // Return TRUE if chunk body is equal to string, excluding terminator
-CZMQ_EXPORT bool
+bool
     zchunk_streq (zchunk_t *self, const char *string);
 
 // Transform zchunk into a zframe that can be sent in a message.
-CZMQ_EXPORT zframe_t *
+zframe_t *
     zchunk_pack (zchunk_t *self);
 
 // Transform a zframe into a zchunk.
-CZMQ_EXPORT zchunk_t *
+zchunk_t *
     zchunk_unpack (zframe_t *frame);
 
 // Calculate SHA1 digest for chunk, using zdigest class.
-CZMQ_EXPORT const char *
+const char *
     zchunk_digest (zchunk_t *self);
 
 // Dump chunk to FILE stream, for debugging and tracing.
-CZMQ_EXPORT void
+void
     zchunk_fprint (zchunk_t *self, FILE *file);
 
 // Dump message to stderr, for debugging and tracing.
 // See zchunk_fprint for details                     
-CZMQ_EXPORT void
+void
     zchunk_print (zchunk_t *self);
 
 // Probe the supplied object, and report if it looks like a zchunk_t.
-CZMQ_EXPORT bool
+bool
     zchunk_is (void *self);
 
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zchunk_test (bool verbose);
 
 // CLASS: zclock
 // Sleep for a number of milliseconds
-CZMQ_EXPORT void
+void
     zclock_sleep (int msecs);
 
 // Return current system clock as milliseconds. Note that this clock can  
 // jump backwards (if the system clock is changed) so is unsafe to use for
 // timers and time offsets. Use zclock_mono for that instead.             
-CZMQ_EXPORT int64_t
+int64_t
     zclock_time (void);
 
 // Return current monotonic clock in milliseconds. Use this when you compute
 // time offsets. The monotonic clock is not affected by system changes and  
 // so will never be reset backwards, unlike a system clock.                 
-CZMQ_EXPORT int64_t
+int64_t
     zclock_mono (void);
 
 // Return current monotonic clock in microseconds. Use this when you compute
 // time offsets. The monotonic clock is not affected by system changes and  
 // so will never be reset backwards, unlike a system clock.                 
-CZMQ_EXPORT int64_t
+int64_t
     zclock_usecs (void);
 
 // Return formatted date/time as fresh string. Free using zstr_free().
-CZMQ_EXPORT char *
+char *
     zclock_timestr (void);
 
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zclock_test (bool verbose);
 
 // CLASS: zconfig
 // Create new config item
-CZMQ_EXPORT zconfig_t *
+zconfig_t *
     zconfig_new (const char *name, zconfig_t *parent);
 
 // Destroy a config item and all its children
-CZMQ_EXPORT void
+void
     zconfig_destroy (zconfig_t **self_p);
 
 // Load a config tree from a specified ZPL text file; returns a zconfig_t  
 // reference for the root, if the file exists and is readable. Returns NULL
 // if the file does not exist.                                             
-CZMQ_EXPORT zconfig_t *
+zconfig_t *
     zconfig_load (const char *filename);
 
 // Equivalent to zconfig_load, taking a format string instead of a fixed
 // filename.                                                            
-CZMQ_EXPORT zconfig_t *
-    zconfig_loadf (const char *format, ...) CHECK_PRINTF (1);
+zconfig_t *
+    zconfig_loadf (const char *format, ...);
 
 // Return name of config item
-CZMQ_EXPORT char *
+char *
     zconfig_name (zconfig_t *self);
 
 // Return value of config item
-CZMQ_EXPORT char *
+char *
     zconfig_value (zconfig_t *self);
 
 // Insert or update configuration key with value
-CZMQ_EXPORT void
+void
     zconfig_put (zconfig_t *self, const char *path, const char *value);
 
 // Equivalent to zconfig_put, accepting a format specifier and variable
 // argument list, instead of a single string value.                    
-CZMQ_EXPORT void
-    zconfig_putf (zconfig_t *self, const char *path, const char *format, ...) CHECK_PRINTF (3);
+void
+    zconfig_putf (zconfig_t *self, const char *path, const char *format, ...);
 
 // Get value for config item into a string value; leading slash is optional
 // and ignored.                                                            
-CZMQ_EXPORT char *
+char *
     zconfig_get (zconfig_t *self, const char *path, const char *default_value);
 
 // Set config item name, name may be NULL
-CZMQ_EXPORT void
+void
     zconfig_set_name (zconfig_t *self, const char *name);
 
 // Set new value for config item. The new value may be a string, a printf  
 // format, or NULL. Note that if string may possibly contain '%', or if it 
 // comes from an insecure source, you must use '%s' as the format, followed
 // by the string.                                                          
-CZMQ_EXPORT void
-    zconfig_set_value (zconfig_t *self, const char *format, ...) CHECK_PRINTF (2);
+void
+    zconfig_set_value (zconfig_t *self, const char *format, ...);
 
 // Find our first child, if any
-CZMQ_EXPORT zconfig_t *
+zconfig_t *
     zconfig_child (zconfig_t *self);
 
 // Find our first sibling, if any
-CZMQ_EXPORT zconfig_t *
+zconfig_t *
     zconfig_next (zconfig_t *self);
 
 // Find a config item along a path; leading slash is optional and ignored.
-CZMQ_EXPORT zconfig_t *
+zconfig_t *
     zconfig_locate (zconfig_t *self, const char *path);
 
 // Locate the last config item at a specified depth
-CZMQ_EXPORT zconfig_t *
+zconfig_t *
     zconfig_at_depth (zconfig_t *self, int level);
 
 // Execute a callback for each config item in the tree; returns zero if
 // successful, else -1.                                                
-CZMQ_EXPORT int
+int
     zconfig_execute (zconfig_t *self, zconfig_fct handler, void *arg);
 
 // Add comment to config item before saving to disk. You can add as many
 // comment lines as you like. If you use a null format, all comments are
 // deleted.                                                             
-CZMQ_EXPORT void
-    zconfig_set_comment (zconfig_t *self, const char *format, ...) CHECK_PRINTF (2);
+void
+    zconfig_set_comment (zconfig_t *self, const char *format, ...);
 
 // Return comments of config item, as zlist.
-CZMQ_EXPORT zlist_t *
+zlist_t *
     zconfig_comments (zconfig_t *self);
 
 // Save a config tree to a specified ZPL text file, where a filename
 // "-" means dump to standard output.                               
-CZMQ_EXPORT int
+int
     zconfig_save (zconfig_t *self, const char *filename);
 
 // Equivalent to zconfig_save, taking a format string instead of a fixed
 // filename.                                                            
-CZMQ_EXPORT int
-    zconfig_savef (zconfig_t *self, const char *format, ...) CHECK_PRINTF (2);
+int
+    zconfig_savef (zconfig_t *self, const char *format, ...);
 
 // Report filename used during zconfig_load, or NULL if none
-CZMQ_EXPORT const char *
+const char *
     zconfig_filename (zconfig_t *self);
 
 // Reload config tree from same file that it was previously loaded from.
 // Returns 0 if OK, -1 if there was an error (and then does not change  
 // existing data).                                                      
-CZMQ_EXPORT int
+int
     zconfig_reload (zconfig_t **self_p);
 
 // Load a config tree from a memory chunk
-CZMQ_EXPORT zconfig_t *
+zconfig_t *
     zconfig_chunk_load (zchunk_t *chunk);
 
 // Save a config tree to a new memory chunk
-CZMQ_EXPORT zchunk_t *
+zchunk_t *
     zconfig_chunk_save (zconfig_t *self);
 
 // Load a config tree from a null-terminated string
-CZMQ_EXPORT zconfig_t *
+zconfig_t *
     zconfig_str_load (const char *string);
 
 // Save a config tree to a new null terminated string
-CZMQ_EXPORT char *
+char *
     zconfig_str_save (zconfig_t *self);
 
 // Return true if a configuration tree was loaded from a file and that
 // file has changed in since the tree was loaded.                     
-CZMQ_EXPORT bool
+bool
     zconfig_has_changed (zconfig_t *self);
 
 // Print the config file to open stream
-CZMQ_EXPORT void
+void
     zconfig_fprint (zconfig_t *self, FILE *file);
 
 // Print properties of object
-CZMQ_EXPORT void
+void
     zconfig_print (zconfig_t *self);
 
 // Self test of this class
-CZMQ_EXPORT void
+void
     zconfig_test (bool verbose);
 
 // CLASS: zdigest
 // Constructor - creates new digest object, which you use to build up a
 // digest by repeatedly calling zdigest_update() on chunks of data.    
-CZMQ_EXPORT zdigest_t *
+zdigest_t *
     zdigest_new (void);
 
 // Destroy a digest object
-CZMQ_EXPORT void
+void
     zdigest_destroy (zdigest_t **self_p);
 
 // Add buffer into digest calculation
-CZMQ_EXPORT void
+void
     zdigest_update (zdigest_t *self, byte *buffer, size_t length);
 
 // Return final digest hash data. If built without crypto support, returns
 // NULL.                                                                  
-CZMQ_EXPORT byte *
+byte *
     zdigest_data (zdigest_t *self);
 
 // Return final digest hash size
-CZMQ_EXPORT size_t
+size_t
     zdigest_size (zdigest_t *self);
 
 // Return digest as printable hex string; caller should not modify nor   
 // free this string. After calling this, you may not use zdigest_update()
 // on the same digest. If built without crypto support, returns NULL.    
-CZMQ_EXPORT char *
+char *
     zdigest_string (zdigest_t *self);
 
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zdigest_test (bool verbose);
 
 // CLASS: zdir
 // Create a new directory item that loads in the full tree of the specified
 // path, optionally located under some parent path. If parent is "-", then 
 // loads only the top-level directory, and does not use parent as a path.  
-CZMQ_EXPORT zdir_t *
+zdir_t *
     zdir_new (const char *path, const char *parent);
 
 // Destroy a directory tree and all children it contains.
-CZMQ_EXPORT void
+void
     zdir_destroy (zdir_t **self_p);
 
 // Return directory path
-CZMQ_EXPORT const char *
+const char *
     zdir_path (zdir_t *self);
 
 // Return last modification time for directory.
-CZMQ_EXPORT time_t
+time_t
     zdir_modified (zdir_t *self);
 
 // Return total hierarchy size, in bytes of data contained in all files
 // in the directory tree.                                              
-CZMQ_EXPORT off_t
+off_t
     zdir_cursize (zdir_t *self);
 
 // Return directory count
-CZMQ_EXPORT size_t
+size_t
     zdir_count (zdir_t *self);
 
 // Returns a sorted list of zfile objects; Each entry in the list is a pointer
 // to a zfile_t item already allocated in the zdir tree. Do not destroy the   
 // original zdir tree until you are done with this list.                      
-CZMQ_EXPORT zlist_t *
+zlist_t *
     zdir_list (zdir_t *self);
 
 // Remove directory, optionally including all files that it contains, at  
 // all levels. If force is false, will only remove the directory if empty.
 // If force is true, will remove all files and all subdirectories.        
-CZMQ_EXPORT void
+void
     zdir_remove (zdir_t *self, bool force);
 
 // Calculate differences between two versions of a directory tree.    
 // Returns a list of zdir_patch_t patches. Either older or newer may  
 // be null, indicating the directory is empty/absent. If alias is set,
 // generates virtual filename (minus path, plus alias).               
-CZMQ_EXPORT zlist_t *
+zlist_t *
     zdir_diff (zdir_t *older, zdir_t *newer, const char *alias);
 
 // Return full contents of directory as a zdir_patch list.
-CZMQ_EXPORT zlist_t *
+zlist_t *
     zdir_resync (zdir_t *self, const char *alias);
 
 // Load directory cache; returns a hash table containing the SHA-1 digests
 // of every file in the tree. The cache is saved between runs in .cache.  
-CZMQ_EXPORT zhash_t *
+zhash_t *
     zdir_cache (zdir_t *self);
 
 // Print contents of directory to open stream
-CZMQ_EXPORT void
+void
     zdir_fprint (zdir_t *self, FILE *file, int indent);
 
 // Print contents of directory to stdout
-CZMQ_EXPORT void
+void
     zdir_print (zdir_t *self, int indent);
 
 // Create a new zdir_watch actor instance:                       
@@ -822,53 +822,53 @@ CZMQ_EXPORT void
 //     // Delete the received data.                              
 //     free (path);                                              
 //     zlist_destroy (&patches);                                 
-CZMQ_EXPORT void
+void
     zdir_watch (zsock_t *pipe, void *unused);
 
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zdir_test (bool verbose);
 
 // CLASS: zdir_patch
 // Create new patch
-CZMQ_EXPORT zdir_patch_t *
+zdir_patch_t *
     zdir_patch_new (const char *path, zfile_t *file, zdir_patch_op_t op, const char *alias);
 
 // Destroy a patch
-CZMQ_EXPORT void
+void
     zdir_patch_destroy (zdir_patch_t **self_p);
 
 // Create copy of a patch. If the patch is null, or memory was exhausted,
 // returns null.                                                         
-CZMQ_EXPORT zdir_patch_t *
+zdir_patch_t *
     zdir_patch_dup (zdir_patch_t *self);
 
 // Return patch file directory path
-CZMQ_EXPORT const char *
+const char *
     zdir_patch_path (zdir_patch_t *self);
 
 // Return patch file item
-CZMQ_EXPORT zfile_t *
+zfile_t *
     zdir_patch_file (zdir_patch_t *self);
 
 // Return operation
-CZMQ_EXPORT zdir_patch_op_t
+zdir_patch_op_t
     zdir_patch_op (zdir_patch_t *self);
 
 // Return patch virtual file path
-CZMQ_EXPORT const char *
+const char *
     zdir_patch_vpath (zdir_patch_t *self);
 
 // Calculate hash digest for file (create only)
-CZMQ_EXPORT void
+void
     zdir_patch_digest_set (zdir_patch_t *self);
 
 // Return hash digest for patch file
-CZMQ_EXPORT const char *
+const char *
     zdir_patch_digest (zdir_patch_t *self);
 
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zdir_patch_test (bool verbose);
 
 // CLASS: zfile
@@ -877,258 +877,258 @@ CZMQ_EXPORT void
 // text file containing one line, the filename of a target file. Reading
 // data from the symbolic link actually reads from the target file. Path
 // may be NULL, in which case it is not used.                           
-CZMQ_EXPORT zfile_t *
+zfile_t *
     zfile_new (const char *path, const char *name);
 
 // Destroy a file item
-CZMQ_EXPORT void
+void
     zfile_destroy (zfile_t **self_p);
 
 // Duplicate a file item, returns a newly constructed item. If the file
 // is null, or memory was exhausted, returns null.                     
-CZMQ_EXPORT zfile_t *
+zfile_t *
     zfile_dup (zfile_t *self);
 
 // Return file name, remove path if provided
-CZMQ_EXPORT const char *
+const char *
     zfile_filename (zfile_t *self, const char *path);
 
 // Refresh file properties from disk; this is not done automatically   
 // on access methods, otherwise it is not possible to compare directory
 // snapshots.                                                          
-CZMQ_EXPORT void
+void
     zfile_restat (zfile_t *self);
 
 // Return when the file was last modified. If you want this to reflect the
 // current situation, call zfile_restat before checking this property.    
-CZMQ_EXPORT time_t
+time_t
     zfile_modified (zfile_t *self);
 
 // Return the last-known size of the file. If you want this to reflect the
 // current situation, call zfile_restat before checking this property.    
-CZMQ_EXPORT off_t
+off_t
     zfile_cursize (zfile_t *self);
 
 // Return true if the file is a directory. If you want this to reflect   
 // any external changes, call zfile_restat before checking this property.
-CZMQ_EXPORT bool
+bool
     zfile_is_directory (zfile_t *self);
 
 // Return true if the file is a regular file. If you want this to reflect
 // any external changes, call zfile_restat before checking this property.
-CZMQ_EXPORT bool
+bool
     zfile_is_regular (zfile_t *self);
 
 // Return true if the file is readable by this process. If you want this to
 // reflect any external changes, call zfile_restat before checking this    
 // property.                                                               
-CZMQ_EXPORT bool
+bool
     zfile_is_readable (zfile_t *self);
 
 // Return true if the file is writeable by this process. If you want this 
 // to reflect any external changes, call zfile_restat before checking this
 // property.                                                              
-CZMQ_EXPORT bool
+bool
     zfile_is_writeable (zfile_t *self);
 
 // Check if file has stopped changing and can be safely processed.
 // Updates the file statistics from disk at every call.           
-CZMQ_EXPORT bool
+bool
     zfile_is_stable (zfile_t *self);
 
 // Return true if the file was changed on disk since the zfile_t object
 // was created, or the last zfile_restat() call made on it.            
-CZMQ_EXPORT bool
+bool
     zfile_has_changed (zfile_t *self);
 
 // Remove the file from disk
-CZMQ_EXPORT void
+void
     zfile_remove (zfile_t *self);
 
 // Open file for reading                             
 // Returns 0 if OK, -1 if not found or not accessible
-CZMQ_EXPORT int
+int
     zfile_input (zfile_t *self);
 
 // Open file for writing, creating directory if needed               
 // File is created if necessary; chunks can be written to file at any
 // location. Returns 0 if OK, -1 if error.                           
-CZMQ_EXPORT int
+int
     zfile_output (zfile_t *self);
 
 // Read chunk from file at specified position. If this was the last chunk,
 // sets the eof property. Returns a null chunk in case of error.          
-CZMQ_EXPORT zchunk_t *
+zchunk_t *
     zfile_read (zfile_t *self, size_t bytes, off_t offset);
 
 // Returns true if zfile_read() just read the last chunk in the file.
-CZMQ_EXPORT bool
+bool
     zfile_eof (zfile_t *self);
 
 // Write chunk to file at specified position
 // Return 0 if OK, else -1                  
-CZMQ_EXPORT int
+int
     zfile_write (zfile_t *self, zchunk_t *chunk, off_t offset);
 
 // Read next line of text from file. Returns a pointer to the text line,
 // or NULL if there was nothing more to read from the file.             
-CZMQ_EXPORT const char *
+const char *
     zfile_readln (zfile_t *self);
 
 // Close file, if open
-CZMQ_EXPORT void
+void
     zfile_close (zfile_t *self);
 
 // Return file handle, if opened
-CZMQ_EXPORT FILE *
+FILE *
     zfile_handle (zfile_t *self);
 
 // Calculate SHA1 digest for file, using zdigest class.
-CZMQ_EXPORT const char *
+const char *
     zfile_digest (zfile_t *self);
 
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zfile_test (bool verbose);
 
 // CLASS: zframe
 // Create a new frame. If size is not null, allocates the frame data
 // to the specified size. If additionally, data is not null, copies 
 // size octets from the specified data into the frame body.         
-CZMQ_EXPORT zframe_t *
+zframe_t *
     zframe_new (const void *data, size_t size);
 
 // Destroy a frame
-CZMQ_EXPORT void
+void
     zframe_destroy (zframe_t **self_p);
 
 // Create an empty (zero-sized) frame
-CZMQ_EXPORT zframe_t *
+zframe_t *
     zframe_new_empty (void);
 
 // Create a frame with a specified string content.
-CZMQ_EXPORT zframe_t *
+zframe_t *
     zframe_from (const char *string);
 
 // Receive frame from socket, returns zframe_t object or NULL if the recv  
 // was interrupted. Does a blocking recv, if you want to not block then use
 // zpoller or zloop.                                                       
-CZMQ_EXPORT zframe_t *
+zframe_t *
     zframe_recv (void *source);
 
 // Send a frame to a socket, destroy frame after sending.
 // Return -1 on error, 0 on success.                     
-CZMQ_EXPORT int
+int
     zframe_send (zframe_t **self_p, void *dest, int flags);
 
 // Return number of bytes in frame data
-CZMQ_EXPORT size_t
+size_t
     zframe_size (zframe_t *self);
 
 // Return address of frame data
-CZMQ_EXPORT byte *
+byte *
     zframe_data (zframe_t *self);
 
 // Create a new frame that duplicates an existing frame. If frame is null,
 // or memory was exhausted, returns null.                                 
-CZMQ_EXPORT zframe_t *
+zframe_t *
     zframe_dup (zframe_t *self);
 
 // Return frame data encoded as printable hex string, useful for 0MQ UUIDs.
 // Caller must free string when finished with it.                          
-CZMQ_EXPORT char *
+char *
     zframe_strhex (zframe_t *self);
 
 // Return frame data copied into freshly allocated string
 // Caller must free string when finished with it.        
-CZMQ_EXPORT char *
+char *
     zframe_strdup (zframe_t *self);
 
 // Return TRUE if frame body is equal to string, excluding terminator
-CZMQ_EXPORT bool
+bool
     zframe_streq (zframe_t *self, const char *string);
 
 // Return frame MORE indicator (1 or 0), set when reading frame from socket
 // or by the zframe_set_more() method                                      
-CZMQ_EXPORT int
+int
     zframe_more (zframe_t *self);
 
 // Set frame MORE indicator (1 or 0). Note this is NOT used when sending
 // frame to socket, you have to specify flag explicitly.                
-CZMQ_EXPORT void
+void
     zframe_set_more (zframe_t *self, int more);
 
 // Return frame routing ID, if the frame came from a ZMQ_SERVER socket.
 // Else returns zero.                                                  
-CZMQ_EXPORT uint32_t
+uint32_t
     zframe_routing_id (zframe_t *self);
 
 // Set routing ID on frame. This is used if/when the frame is sent to a
 // ZMQ_SERVER socket.                                                  
-CZMQ_EXPORT void
+void
     zframe_set_routing_id (zframe_t *self, uint32_t routing_id);
 
 // Return TRUE if two frames have identical size and data
 // If either frame is NULL, equality is always false.    
-CZMQ_EXPORT bool
+bool
     zframe_eq (zframe_t *self, zframe_t *other);
 
 // Set new contents for frame
-CZMQ_EXPORT void
+void
     zframe_reset (zframe_t *self, const void *data, size_t size);
 
 // Send message to zsys log sink (may be stdout, or system facility as       
 // configured by zsys_set_logstream). Prefix shows before frame, if not null.
-CZMQ_EXPORT void
+void
     zframe_print (zframe_t *self, const char *prefix);
 
 // Probe the supplied object, and report if it looks like a zframe_t.
-CZMQ_EXPORT bool
+bool
     zframe_is (void *self);
 
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zframe_test (bool verbose);
 
 // CLASS: zhash
 // Create a new, empty hash container
-CZMQ_EXPORT zhash_t *
+zhash_t *
     zhash_new (void);
 
 // Destroy a hash container and all items in it
-CZMQ_EXPORT void
+void
     zhash_destroy (zhash_t **self_p);
 
 // Unpack binary frame into a new hash table. Packed data must follow format
 // defined by zhash_pack. Hash table is set to autofree. An empty frame     
 // unpacks to an empty hash table.                                          
-CZMQ_EXPORT zhash_t *
+zhash_t *
     zhash_unpack (zframe_t *frame);
 
 // Insert item into hash table with specified key and item.               
 // If key is already present returns -1 and leaves existing item unchanged
 // Returns 0 on success.                                                  
-CZMQ_EXPORT int
+int
     zhash_insert (zhash_t *self, const char *key, void *item);
 
 // Update item into hash table with specified key and item.            
 // If key is already present, destroys old item and inserts new one.   
 // Use free_fn method to ensure deallocator is properly called on item.
-CZMQ_EXPORT void
+void
     zhash_update (zhash_t *self, const char *key, void *item);
 
 // Remove an item specified by key from the hash table. If there was no such
 // item, this function does nothing.                                        
-CZMQ_EXPORT void
+void
     zhash_delete (zhash_t *self, const char *key);
 
 // Return the item at the specified key, or null
-CZMQ_EXPORT void *
+void *
     zhash_lookup (zhash_t *self, const char *key);
 
 // Reindexes an item from an old key to a new key. If there was no such
 // item, does nothing. Returns 0 if successful, else -1.               
-CZMQ_EXPORT int
+int
     zhash_rename (zhash_t *self, const char *old_key, const char *new_key);
 
 // Set a free function for the specified hash table item. When the item is
@@ -1136,29 +1136,29 @@ CZMQ_EXPORT int
 // Use this when hash items are dynamically allocated, to ensure that     
 // you don't have memory leaks. You can pass 'free' or NULL as a free_fn. 
 // Returns the item, or NULL if there is no such item.                    
-CZMQ_EXPORT void *
+void *
     zhash_freefn (zhash_t *self, const char *key, zhash_free_fn free_fn);
 
 // Return the number of keys/items in the hash table
-CZMQ_EXPORT size_t
+size_t
     zhash_size (zhash_t *self);
 
 // Make copy of hash table; if supplied table is null, returns null.    
 // Does not copy items themselves. Rebuilds new table so may be slow on 
 // very large tables. NOTE: only works with item values that are strings
 // since there's no other way to know how to duplicate the item value.  
-CZMQ_EXPORT zhash_t *
+zhash_t *
     zhash_dup (zhash_t *self);
 
 // Return keys for items in table
-CZMQ_EXPORT zlist_t *
+zlist_t *
     zhash_keys (zhash_t *self);
 
 // Simple iterator; returns first item in hash table, in no given order, 
 // or NULL if the table is empty. This method is simpler to use than the 
 // foreach() method, which is deprecated. To access the key for this item
 // use zhash_cursor(). NOTE: do NOT modify the table while iterating.    
-CZMQ_EXPORT void *
+void *
     zhash_first (zhash_t *self);
 
 // Simple iterator; returns next item in hash table, in no given order, 
@@ -1167,21 +1167,21 @@ CZMQ_EXPORT void *
 // items in sorted order, use zhash_keys() and then zlist_sort(). To    
 // access the key for this item use zhash_cursor(). NOTE: do NOT modify 
 // the table while iterating.                                           
-CZMQ_EXPORT void *
+void *
     zhash_next (zhash_t *self);
 
 // After a successful first/next method, returns the key for the item that
 // was returned. This is a constant string that you may not modify or     
 // deallocate, and which lasts as long as the item in the hash. After an  
 // unsuccessful first/next, returns NULL.                                 
-CZMQ_EXPORT const char *
+const char *
     zhash_cursor (zhash_t *self);
 
 // Add a comment to hash table before saving to disk. You can add as many   
 // comment lines as you like. These comment lines are discarded when loading
 // the file. If you use a null format, all comments are deleted.            
-CZMQ_EXPORT void
-    zhash_comment (zhash_t *self, const char *format, ...) CHECK_PRINTF (2);
+void
+    zhash_comment (zhash_t *self, const char *format, ...);
 
 // Serialize hash table to a binary frame that can be sent in a message.
 // The packed format is compatible with the 'dictionary' type defined in
@@ -1203,61 +1203,61 @@ CZMQ_EXPORT void
 //                                                                      
 // Comments are not included in the packed data. Item values MUST be    
 // strings.                                                             
-CZMQ_EXPORT zframe_t *
+zframe_t *
     zhash_pack (zhash_t *self);
 
 // Save hash table to a text file in name=value format. Hash values must be
 // printable strings; keys may not contain '=' character. Returns 0 if OK, 
 // else -1 if a file error occurred.                                       
-CZMQ_EXPORT int
+int
     zhash_save (zhash_t *self, const char *filename);
 
 // Load hash table from a text file in name=value format; hash table must 
 // already exist. Hash values must printable strings; keys may not contain
 // '=' character. Returns 0 if OK, else -1 if a file was not readable.    
-CZMQ_EXPORT int
+int
     zhash_load (zhash_t *self, const char *filename);
 
 // When a hash table was loaded from a file by zhash_load, this method will
 // reload the file if it has been modified since, and is "stable", i.e. not
 // still changing. Returns 0 if OK, -1 if there was an error reloading the 
 // file.                                                                   
-CZMQ_EXPORT int
+int
     zhash_refresh (zhash_t *self);
 
 // Set hash for automatic value destruction
-CZMQ_EXPORT void
+void
     zhash_autofree (zhash_t *self);
 
 // Apply function to each item in the hash table. Items are iterated in no
 // defined order. Stops if callback function returns non-zero and returns 
 // final return code from callback function (zero = success). Deprecated. 
-CZMQ_EXPORT int
+int
     zhash_foreach (zhash_t *self, zhash_foreach_fn callback, void *argument);
 
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zhash_test (bool verbose);
 
 // CLASS: zhashx
 // Create a new, empty hash container
-CZMQ_EXPORT zhashx_t *
+zhashx_t *
     zhashx_new (void);
 
 // Destroy a hash container and all items in it
-CZMQ_EXPORT void
+void
     zhashx_destroy (zhashx_t **self_p);
 
 // Unpack binary frame into a new hash table. Packed data must follow format
 // defined by zhashx_pack. Hash table is set to autofree. An empty frame    
 // unpacks to an empty hash table.                                          
-CZMQ_EXPORT zhashx_t *
+zhashx_t *
     zhashx_unpack (zframe_t *frame);
 
 // Insert item into hash table with specified key and item.               
 // If key is already present returns -1 and leaves existing item unchanged
 // Returns 0 on success.                                                  
-CZMQ_EXPORT int
+int
     zhashx_insert (zhashx_t *self, const void *key, void *item);
 
 // Update or insert item into hash table with specified key and item. If the
@@ -1265,27 +1265,27 @@ CZMQ_EXPORT int
 // a container item destructor, this is called on the old value. If the key 
 // was not already present, inserts a new item. Sets the hash cursor to the 
 // new item.                                                                
-CZMQ_EXPORT void
+void
     zhashx_update (zhashx_t *self, const void *key, void *item);
 
 // Remove an item specified by key from the hash table. If there was no such
 // item, this function does nothing.                                        
-CZMQ_EXPORT void
+void
     zhashx_delete (zhashx_t *self, const void *key);
 
 // Delete all items from the hash table. If the key destructor is  
 // set, calls it on every key. If the item destructor is set, calls
 // it on every item.                                               
-CZMQ_EXPORT void
+void
     zhashx_purge (zhashx_t *self);
 
 // Return the item at the specified key, or null
-CZMQ_EXPORT void *
+void *
     zhashx_lookup (zhashx_t *self, const void *key);
 
 // Reindexes an item from an old key to a new key. If there was no such
 // item, does nothing. Returns 0 if successful, else -1.               
-CZMQ_EXPORT int
+int
     zhashx_rename (zhashx_t *self, const void *old_key, const void *new_key);
 
 // Set a free function for the specified hash table item. When the item is
@@ -1293,30 +1293,30 @@ CZMQ_EXPORT int
 // Use this when hash items are dynamically allocated, to ensure that     
 // you don't have memory leaks. You can pass 'free' or NULL as a free_fn. 
 // Returns the item, or NULL if there is no such item.                    
-CZMQ_EXPORT void *
+void *
     zhashx_freefn (zhashx_t *self, const void *key, zhashx_free_fn free_fn);
 
 // Return the number of keys/items in the hash table
-CZMQ_EXPORT size_t
+size_t
     zhashx_size (zhashx_t *self);
 
 // Return a zlistx_t containing the keys for the items in the       
 // table. Uses the key_duplicator to duplicate all keys and sets the
 // key_destructor as destructor for the list.                       
-CZMQ_EXPORT zlistx_t *
+zlistx_t *
     zhashx_keys (zhashx_t *self);
 
 // Return a zlistx_t containing the values for the items in the  
 // table. Uses the duplicator to duplicate all items and sets the
 // destructor as destructor for the list.                        
-CZMQ_EXPORT zlistx_t *
+zlistx_t *
     zhashx_values (zhashx_t *self);
 
 // Simple iterator; returns first item in hash table, in no given order, 
 // or NULL if the table is empty. This method is simpler to use than the 
 // foreach() method, which is deprecated. To access the key for this item
 // use zhashx_cursor(). NOTE: do NOT modify the table while iterating.   
-CZMQ_EXPORT void *
+void *
     zhashx_first (zhashx_t *self);
 
 // Simple iterator; returns next item in hash table, in no given order, 
@@ -1325,39 +1325,39 @@ CZMQ_EXPORT void *
 // items in sorted order, use zhashx_keys() and then zlistx_sort(). To  
 // access the key for this item use zhashx_cursor(). NOTE: do NOT modify
 // the table while iterating.                                           
-CZMQ_EXPORT void *
+void *
     zhashx_next (zhashx_t *self);
 
 // After a successful first/next method, returns the key for the item that
 // was returned. This is a constant string that you may not modify or     
 // deallocate, and which lasts as long as the item in the hash. After an  
 // unsuccessful first/next, returns NULL.                                 
-CZMQ_EXPORT const void *
+const void *
     zhashx_cursor (zhashx_t *self);
 
 // Add a comment to hash table before saving to disk. You can add as many   
 // comment lines as you like. These comment lines are discarded when loading
 // the file. If you use a null format, all comments are deleted.            
-CZMQ_EXPORT void
-    zhashx_comment (zhashx_t *self, const char *format, ...) CHECK_PRINTF (2);
+void
+    zhashx_comment (zhashx_t *self, const char *format, ...);
 
 // Save hash table to a text file in name=value format. Hash values must be
 // printable strings; keys may not contain '=' character. Returns 0 if OK, 
 // else -1 if a file error occurred.                                       
-CZMQ_EXPORT int
+int
     zhashx_save (zhashx_t *self, const char *filename);
 
 // Load hash table from a text file in name=value format; hash table must 
 // already exist. Hash values must printable strings; keys may not contain
 // '=' character. Returns 0 if OK, else -1 if a file was not readable.    
-CZMQ_EXPORT int
+int
     zhashx_load (zhashx_t *self, const char *filename);
 
 // When a hash table was loaded from a file by zhashx_load, this method will
 // reload the file if it has been modified since, and is "stable", i.e. not 
 // still changing. Returns 0 if OK, -1 if there was an error reloading the  
 // file.                                                                    
-CZMQ_EXPORT int
+int
     zhashx_refresh (zhashx_t *self);
 
 // Serialize hash table to a binary frame that can be sent in a message.
@@ -1380,7 +1380,7 @@ CZMQ_EXPORT int
 //                                                                      
 // Comments are not included in the packed data. Item values MUST be    
 // strings.                                                             
-CZMQ_EXPORT zframe_t *
+zframe_t *
     zhashx_pack (zhashx_t *self);
 
 // Make a copy of the list; items are duplicated if you set a duplicator 
@@ -1388,49 +1388,49 @@ CZMQ_EXPORT zframe_t *
 // reference. Note that this method's behavior changed slightly for CZMQ 
 // v3.x, as it does not set nor respect autofree. It does however let you
 // duplicate any hash table safely. The old behavior is in zhashx_dup_v2.
-CZMQ_EXPORT zhashx_t *
+zhashx_t *
     zhashx_dup (zhashx_t *self);
 
 // Set a user-defined deallocator for hash items; by default items are not
 // freed when the hash is destroyed.                                      
-CZMQ_EXPORT void
+void
     zhashx_set_destructor (zhashx_t *self, zhashx_destructor_fn destructor);
 
 // Set a user-defined duplicator for hash items; by default items are not
 // copied when the hash is duplicated.                                   
-CZMQ_EXPORT void
+void
     zhashx_set_duplicator (zhashx_t *self, zhashx_duplicator_fn duplicator);
 
 // Set a user-defined deallocator for keys; by default keys are freed
 // when the hash is destroyed using free().                          
-CZMQ_EXPORT void
+void
     zhashx_set_key_destructor (zhashx_t *self, zhashx_destructor_fn destructor);
 
 // Set a user-defined duplicator for keys; by default keys are duplicated
 // using strdup.                                                         
-CZMQ_EXPORT void
+void
     zhashx_set_key_duplicator (zhashx_t *self, zhashx_duplicator_fn duplicator);
 
 // Set a user-defined comparator for keys; by default keys are
 // compared using strcmp.                                     
-CZMQ_EXPORT void
+void
     zhashx_set_key_comparator (zhashx_t *self, zhashx_comparator_fn comparator);
 
 // Set a user-defined comparator for keys; by default keys are
 // compared using strcmp.                                     
-CZMQ_EXPORT void
+void
     zhashx_set_key_hasher (zhashx_t *self, zhashx_hash_fn hasher);
 
 // Make copy of hash table; if supplied table is null, returns null.    
 // Does not copy items themselves. Rebuilds new table so may be slow on 
 // very large tables. NOTE: only works with item values that are strings
 // since there's no other way to know how to duplicate the item value.  
-CZMQ_EXPORT zhashx_t *
+zhashx_t *
     zhashx_dup_v2 (zhashx_t *self);
 
 // DEPRECATED as clumsy -- use set_destructor instead
 // Set hash for automatic value destruction          
-CZMQ_EXPORT void
+void
     zhashx_autofree (zhashx_t *self);
 
 // DEPRECATED as clumsy -- use zhashx_first/_next instead                 
@@ -1438,139 +1438,139 @@ CZMQ_EXPORT void
 // defined order. Stops if callback function returns non-zero and returns 
 // final return code from callback function (zero = success).             
 // Callback function for zhashx_foreach method                            
-CZMQ_EXPORT int
+int
     zhashx_foreach (zhashx_t *self, zhashx_foreach_fn callback, void *argument);
 
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zhashx_test (bool verbose);
 
 // CLASS: ziflist
 // Get a list of network interfaces currently defined on the system
-CZMQ_EXPORT ziflist_t *
+ziflist_t *
     ziflist_new (void);
 
 // Destroy a ziflist instance
-CZMQ_EXPORT void
+void
     ziflist_destroy (ziflist_t **self_p);
 
 // Reload network interfaces from system
-CZMQ_EXPORT void
+void
     ziflist_reload (ziflist_t *self);
 
 // Return the number of network interfaces on system
-CZMQ_EXPORT size_t
+size_t
     ziflist_size (ziflist_t *self);
 
 // Get first network interface, return NULL if there are none
-CZMQ_EXPORT const char *
+const char *
     ziflist_first (ziflist_t *self);
 
 // Get next network interface, return NULL if we hit the last one
-CZMQ_EXPORT const char *
+const char *
     ziflist_next (ziflist_t *self);
 
 // Return the current interface IP address as a printable string
-CZMQ_EXPORT const char *
+const char *
     ziflist_address (ziflist_t *self);
 
 // Return the current interface broadcast address as a printable string
-CZMQ_EXPORT const char *
+const char *
     ziflist_broadcast (ziflist_t *self);
 
 // Return the current interface network mask as a printable string
-CZMQ_EXPORT const char *
+const char *
     ziflist_netmask (ziflist_t *self);
 
 // Return the list of interfaces.
-CZMQ_EXPORT void
+void
     ziflist_print (ziflist_t *self);
 
 // Self test of this class.
-CZMQ_EXPORT void
+void
     ziflist_test (bool verbose);
 
 // CLASS: zlist
 // Create a new list container
-CZMQ_EXPORT zlist_t *
+zlist_t *
     zlist_new (void);
 
 // Destroy a list container
-CZMQ_EXPORT void
+void
     zlist_destroy (zlist_t **self_p);
 
 // Return the item at the head of list. If the list is empty, returns NULL.
 // Leaves cursor pointing at the head item, or NULL if the list is empty.  
-CZMQ_EXPORT void *
+void *
     zlist_first (zlist_t *self);
 
 // Return the next item. If the list is empty, returns NULL. To move to
 // the start of the list call zlist_first (). Advances the cursor.     
-CZMQ_EXPORT void *
+void *
     zlist_next (zlist_t *self);
 
 // Return the item at the tail of list. If the list is empty, returns NULL.
 // Leaves cursor pointing at the tail item, or NULL if the list is empty.  
-CZMQ_EXPORT void *
+void *
     zlist_last (zlist_t *self);
 
 // Return first item in the list, or null, leaves the cursor
-CZMQ_EXPORT void *
+void *
     zlist_head (zlist_t *self);
 
 // Return last item in the list, or null, leaves the cursor
-CZMQ_EXPORT void *
+void *
     zlist_tail (zlist_t *self);
 
 // Return the current item of list. If the list is empty, returns NULL.     
 // Leaves cursor pointing at the current item, or NULL if the list is empty.
-CZMQ_EXPORT void *
+void *
     zlist_item (zlist_t *self);
 
 // Append an item to the end of the list, return 0 if OK or -1 if this  
 // failed for some reason (out of memory). Note that if a duplicator has
 // been set, this method will also duplicate the item.                  
-CZMQ_EXPORT int
+int
     zlist_append (zlist_t *self, void *item);
 
 // Push an item to the start of the list, return 0 if OK or -1 if this  
 // failed for some reason (out of memory). Note that if a duplicator has
 // been set, this method will also duplicate the item.                  
-CZMQ_EXPORT int
+int
     zlist_push (zlist_t *self, void *item);
 
 // Pop the item off the start of the list, if any
-CZMQ_EXPORT void *
+void *
     zlist_pop (zlist_t *self);
 
 // Checks if an item already is present. Uses compare method to determine if 
 // items are equal. If the compare method is NULL the check will only compare
 // pointers. Returns true if item is present else false.                     
-CZMQ_EXPORT bool
+bool
     zlist_exists (zlist_t *self, void *item);
 
 // Remove the specified item from the list if present
-CZMQ_EXPORT void
+void
     zlist_remove (zlist_t *self, void *item);
 
 // Make a copy of list. If the list has autofree set, the copied list will  
 // duplicate all items, which must be strings. Otherwise, the list will hold
 // pointers back to the items in the original list. If list is null, returns
 // NULL.                                                                    
-CZMQ_EXPORT zlist_t *
+zlist_t *
     zlist_dup (zlist_t *self);
 
 // Purge all items from list
-CZMQ_EXPORT void
+void
     zlist_purge (zlist_t *self);
 
 // Return number of items in the list
-CZMQ_EXPORT size_t
+size_t
     zlist_size (zlist_t *self);
 
 // Sort the list by ascending key value using a straight ASCII comparison.
 // The sort is not stable, so may reorder items with the same keys.       
-CZMQ_EXPORT void
+void
     zlist_sort (zlist_t *self, zlist_compare_fn compare);
 
 // Set list for automatic item destruction; item values MUST be strings. 
@@ -1581,7 +1581,7 @@ CZMQ_EXPORT void
 // list values, you must free them explicitly before destroying the list.
 // The usual technique is to pop list items and destroy them, until the  
 // list is empty.                                                        
-CZMQ_EXPORT void
+void
     zlist_autofree (zlist_t *self);
 
 // Sets a compare function for this list. The function compares two items.
@@ -1589,7 +1589,7 @@ CZMQ_EXPORT void
 // first item is found, respectively, to be less than, to match, or be    
 // greater than the second item.                                          
 // This function is used for sorting, removal and exists checking.        
-CZMQ_EXPORT void
+void
     zlist_comparefn (zlist_t *self, zlist_compare_fn fn);
 
 // Set a free function for the specified list item. When the item is     
@@ -1597,88 +1597,88 @@ CZMQ_EXPORT void
 // Use this when list items are dynamically allocated, to ensure that    
 // you don't have memory leaks. You can pass 'free' or NULL as a free_fn.
 // Returns the item, or NULL if there is no such item.                   
-CZMQ_EXPORT void *
+void *
     zlist_freefn (zlist_t *self, void *item, zlist_free_fn fn, bool at_tail);
 
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zlist_test (bool verbose);
 
 // CLASS: zlistx
 // Create a new, empty list.
-CZMQ_EXPORT zlistx_t *
+zlistx_t *
     zlistx_new (void);
 
 // Destroy a list. If an item destructor was specified, all items in the
 // list are automatically destroyed as well.                            
-CZMQ_EXPORT void
+void
     zlistx_destroy (zlistx_t **self_p);
 
 // Add an item to the head of the list. Calls the item duplicator, if any,
 // on the item. Resets cursor to list head. Returns an item handle on     
 // success, NULL if memory was exhausted.                                 
-CZMQ_EXPORT void *
+void *
     zlistx_add_start (zlistx_t *self, void *item);
 
 // Add an item to the tail of the list. Calls the item duplicator, if any,
 // on the item. Resets cursor to list head. Returns an item handle on     
 // success, NULL if memory was exhausted.                                 
-CZMQ_EXPORT void *
+void *
     zlistx_add_end (zlistx_t *self, void *item);
 
 // Return the number of items in the list
-CZMQ_EXPORT size_t
+size_t
     zlistx_size (zlistx_t *self);
 
 // Return first item in the list, or null, leaves the cursor
-CZMQ_EXPORT void *
+void *
     zlistx_head (zlistx_t *self);
 
 // Return last item in the list, or null, leaves the cursor
-CZMQ_EXPORT void *
+void *
     zlistx_tail (zlistx_t *self);
 
 // Return the item at the head of list. If the list is empty, returns NULL.
 // Leaves cursor pointing at the head item, or NULL if the list is empty.  
-CZMQ_EXPORT void *
+void *
     zlistx_first (zlistx_t *self);
 
 // Return the next item. At the end of the list (or in an empty list),     
 // returns NULL. Use repeated zlistx_next () calls to work through the list
 // from zlistx_first (). First time, acts as zlistx_first().               
-CZMQ_EXPORT void *
+void *
     zlistx_next (zlistx_t *self);
 
 // Return the previous item. At the start of the list (or in an empty list),
 // returns NULL. Use repeated zlistx_prev () calls to work through the list 
 // backwards from zlistx_last (). First time, acts as zlistx_last().        
-CZMQ_EXPORT void *
+void *
     zlistx_prev (zlistx_t *self);
 
 // Return the item at the tail of list. If the list is empty, returns NULL.
 // Leaves cursor pointing at the tail item, or NULL if the list is empty.  
-CZMQ_EXPORT void *
+void *
     zlistx_last (zlistx_t *self);
 
 // Returns the value of the item at the cursor, or NULL if the cursor is
 // not pointing to an item.                                             
-CZMQ_EXPORT void *
+void *
     zlistx_item (zlistx_t *self);
 
 // Returns the handle of the item at the cursor, or NULL if the cursor is
 // not pointing to an item.                                              
-CZMQ_EXPORT void *
+void *
     zlistx_cursor (zlistx_t *self);
 
 // Returns the item associated with the given list handle, or NULL if passed     
 // in handle is NULL. Asserts that the passed in handle points to a list element.
-CZMQ_EXPORT void *
+void *
     zlistx_handle_item (void *handle);
 
 // Find an item in the list, searching from the start. Uses the item     
 // comparator, if any, else compares item values directly. Returns the   
 // item handle found, or NULL. Sets the cursor to the found item, if any.
-CZMQ_EXPORT void *
+void *
     zlistx_find (zlistx_t *self, void *item);
 
 // Detach an item from the list, using its handle. The item is not modified, 
@@ -1686,14 +1686,14 @@ CZMQ_EXPORT void *
 // null, detaches the first item on the list. Returns item that was detached,
 // or null if none was. If cursor was at item, moves cursor to previous item,
 // so you can detach items while iterating forwards through a list.          
-CZMQ_EXPORT void *
+void *
     zlistx_detach (zlistx_t *self, void *handle);
 
 // Detach item at the cursor, if any, from the list. The item is not modified,
 // and the caller is responsible for destroying it as necessary. Returns item 
 // that was detached, or null if none was. Moves cursor to previous item, so  
 // you can detach items while iterating forwards through a list.              
-CZMQ_EXPORT void *
+void *
     zlistx_detach_cur (zlistx_t *self);
 
 // Delete an item, using its handle. Calls the item destructor is any is 
@@ -1701,26 +1701,26 @@ CZMQ_EXPORT void *
 // if an item was deleted, -1 if not. If cursor was at item, moves cursor
 // to previous item, so you can delete items while iterating forwards    
 // through a list.                                                       
-CZMQ_EXPORT int
+int
     zlistx_delete (zlistx_t *self, void *handle);
 
 // Move an item to the start of the list, via its handle.
-CZMQ_EXPORT void
+void
     zlistx_move_start (zlistx_t *self, void *handle);
 
 // Move an item to the end of the list, via its handle.
-CZMQ_EXPORT void
+void
     zlistx_move_end (zlistx_t *self, void *handle);
 
 // Remove all items from the list, and destroy them if the item destructor
 // is set.                                                                
-CZMQ_EXPORT void
+void
     zlistx_purge (zlistx_t *self);
 
 // Sort the list. If an item comparator was set, calls that to compare    
 // items, otherwise compares on item value. The sort is not stable, so may
 // reorder equal items.                                                   
-CZMQ_EXPORT void
+void
     zlistx_sort (zlistx_t *self);
 
 // Create a new node and insert it into a sorted list. Calls the item        
@@ -1729,66 +1729,66 @@ CZMQ_EXPORT void
 // comparator, if any, to find where to place the new node. Returns a handle 
 // to the new node, or NULL if memory was exhausted. Resets the cursor to the
 // list head.                                                                
-CZMQ_EXPORT void *
+void *
     zlistx_insert (zlistx_t *self, void *item, bool low_value);
 
 // Move an item, specified by handle, into position in a sorted list. Uses 
 // the item comparator, if any, to determine the new location. If low_value
 // is true, starts searching from the start of the list, otherwise searches
 // from the end.                                                           
-CZMQ_EXPORT void
+void
     zlistx_reorder (zlistx_t *self, void *handle, bool low_value);
 
 // Make a copy of the list; items are duplicated if you set a duplicator
 // for the list, otherwise not. Copying a null reference returns a null 
 // reference.                                                           
-CZMQ_EXPORT zlistx_t *
+zlistx_t *
     zlistx_dup (zlistx_t *self);
 
 // Set a user-defined deallocator for list items; by default items are not
 // freed when the list is destroyed.                                      
-CZMQ_EXPORT void
+void
     zlistx_set_destructor (zlistx_t *self, zlistx_destructor_fn destructor);
 
 // Set a user-defined duplicator for list items; by default items are not
 // copied when the list is duplicated.                                   
-CZMQ_EXPORT void
+void
     zlistx_set_duplicator (zlistx_t *self, zlistx_duplicator_fn duplicator);
 
 // Set a user-defined comparator for zlistx_find and zlistx_sort; the method 
 // must return -1, 0, or 1 depending on whether item1 is less than, equal to,
 // or greater than, item2.                                                   
-CZMQ_EXPORT void
+void
     zlistx_set_comparator (zlistx_t *self, zlistx_comparator_fn comparator);
 
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zlistx_test (bool verbose);
 
 // CLASS: zloop
 // Create a new zloop reactor
-CZMQ_EXPORT zloop_t *
+zloop_t *
     zloop_new (void);
 
 // Destroy a reactor
-CZMQ_EXPORT void
+void
     zloop_destroy (zloop_t **self_p);
 
 // Register socket reader with the reactor. When the reader has messages, 
 // the reactor will call the handler, passing the arg. Returns 0 if OK, -1
 // if there was an error. If you register the same socket more than once, 
 // each instance will invoke its corresponding handler.                   
-CZMQ_EXPORT int
+int
     zloop_reader (zloop_t *self, zsock_t *sock, zloop_reader_fn handler, void *arg);
 
 // Cancel a socket reader from the reactor. If multiple readers exist for
 // same socket, cancels ALL of them.                                     
-CZMQ_EXPORT void
+void
     zloop_reader_end (zloop_t *self, zsock_t *sock);
 
 // Configure a registered reader to ignore errors. If you do not set this,
 // then readers that have errors are removed from the reactor silently.   
-CZMQ_EXPORT void
+void
     zloop_reader_set_tolerant (zloop_t *self, zsock_t *sock);
 
 // Register low-level libzmq pollitem with the reactor. When the pollitem  
@@ -1796,30 +1796,30 @@ CZMQ_EXPORT void
 // if there was an error. If you register the pollitem more than once, each
 // instance will invoke its corresponding handler. A pollitem with         
 // socket=NULL and fd=0 means 'poll on FD zero'.                           
-CZMQ_EXPORT int
+int
     zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg);
 
 // Cancel a pollitem from the reactor, specified by socket or FD. If both
 // are specified, uses only socket. If multiple poll items exist for same
 // socket/FD, cancels ALL of them.                                       
-CZMQ_EXPORT void
+void
     zloop_poller_end (zloop_t *self, zmq_pollitem_t *item);
 
 // Configure a registered poller to ignore errors. If you do not set this,
 // then poller that have errors are removed from the reactor silently.    
-CZMQ_EXPORT void
+void
     zloop_poller_set_tolerant (zloop_t *self, zmq_pollitem_t *item);
 
 // Register a timer that expires after some delay and repeats some number of
 // times. At each expiry, will call the handler, passing the arg. To run a  
 // timer forever, use 0 times. Returns a timer_id that is used to cancel the
 // timer in the future. Returns -1 if there was an error.                   
-CZMQ_EXPORT int
+int
     zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_timer_fn handler, void *arg);
 
 // Cancel a specific timer identified by a specific timer_id (as returned by
 // zloop_timer).                                                            
-CZMQ_EXPORT int
+int
     zloop_timer_end (zloop_t *self, int timer_id);
 
 // Register a ticket timer. Ticket timers are very fast in the case where   
@@ -1831,23 +1831,23 @@ CZMQ_EXPORT int
 // must set the ticket delay using zloop_set_ticket_delay before creating a 
 // ticket. Returns a handle to the timer that you should use in             
 // zloop_ticket_reset and zloop_ticket_delete.                              
-CZMQ_EXPORT void *
+void *
     zloop_ticket (zloop_t *self, zloop_timer_fn handler, void *arg);
 
 // Reset a ticket timer, which moves it to the end of the ticket list and
 // resets its execution time. This is a very fast operation.             
-CZMQ_EXPORT void
+void
     zloop_ticket_reset (zloop_t *self, void *handle);
 
 // Delete a ticket timer. We do not actually delete the ticket here, as    
 // other code may still refer to the ticket. We mark as deleted, and remove
 // later and safely.                                                       
-CZMQ_EXPORT void
+void
     zloop_ticket_delete (zloop_t *self, void *handle);
 
 // Set the ticket delay, which applies to all tickets. If you lower the   
 // delay and there are already tickets created, the results are undefined.
-CZMQ_EXPORT void
+void
     zloop_set_ticket_delay (zloop_t *self, size_t ticket_delay);
 
 // Set hard limit on number of timers allowed. Setting more than a small  
@@ -1855,70 +1855,70 @@ CZMQ_EXPORT void
 // of the reactor. For high-volume cases, use ticket timers. If the hard  
 // limit is reached, the reactor stops creating new timers and logs an    
 // error.                                                                 
-CZMQ_EXPORT void
+void
     zloop_set_max_timers (zloop_t *self, size_t max_timers);
 
 // Set verbose tracing of reactor on/off. The default verbose setting is
 // off (false).                                                         
-CZMQ_EXPORT void
+void
     zloop_set_verbose (zloop_t *self, bool verbose);
 
 // By default the reactor stops if the process receives a SIGINT or SIGTERM 
 // signal. This makes it impossible to shut-down message based architectures
 // like zactors. This method lets you switch off break handling. The default
 // nonstop setting is off (false).                                          
-CZMQ_EXPORT void
+void
     zloop_set_nonstop (zloop_t *self, bool nonstop);
 
 // Start the reactor. Takes control of the thread and returns when the 0MQ  
 // context is terminated or the process is interrupted, or any event handler
 // returns -1. Event handlers may register new sockets and timers, and      
 // cancel sockets. Returns 0 if interrupted, -1 if canceled by a handler.   
-CZMQ_EXPORT int
+int
     zloop_start (zloop_t *self);
 
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zloop_test (bool verbose);
 
 // CLASS: zmsg
 // Create a new empty message object
-CZMQ_EXPORT zmsg_t *
+zmsg_t *
     zmsg_new (void);
 
 // Destroy a message object and all frames it contains
-CZMQ_EXPORT void
+void
     zmsg_destroy (zmsg_t **self_p);
 
 // Receive message from socket, returns zmsg_t object or NULL if the recv   
 // was interrupted. Does a blocking recv. If you want to not block then use 
 // the zloop class or zmsg_recv_nowait or zmq_poll to check for socket input
 // before receiving.                                                        
-CZMQ_EXPORT zmsg_t *
+zmsg_t *
     zmsg_recv (void *source);
 
 // Load/append an open file into new message, return the message.
 // Returns NULL if the message could not be loaded.              
-CZMQ_EXPORT zmsg_t *
+zmsg_t *
     zmsg_load (FILE *file);
 
 // Decodes a serialized message buffer created by zmsg_encode () and returns
 // a new zmsg_t object. Returns NULL if the buffer was badly formatted or   
 // there was insufficient memory to work.                                   
-CZMQ_EXPORT zmsg_t *
+zmsg_t *
     zmsg_decode (const byte *buffer, size_t buffer_size);
 
 // Generate a signal message encoding the given status. A signal is a short
 // message carrying a 1-byte success/failure code (by convention, 0 means  
 // OK). Signals are encoded to be distinguishable from "normal" messages.  
-CZMQ_EXPORT zmsg_t *
+zmsg_t *
     zmsg_new_signal (byte status);
 
 // Send message to destination socket, and destroy the message after sending
 // it successfully. If the message has no frames, sends nothing but destroys
 // the message anyhow. Nullifies the caller's reference to the message (as  
 // it is a destructor).                                                     
-CZMQ_EXPORT int
+int
     zmsg_send (zmsg_t **self_p, void *dest);
 
 // Send message to destination socket as part of a multipart sequence, and 
@@ -1927,107 +1927,107 @@ CZMQ_EXPORT int
 // message part. If the message has no frames, sends nothing but destroys  
 // the message anyhow. Nullifies the caller's reference to the message (as 
 // it is a destructor).                                                    
-CZMQ_EXPORT int
+int
     zmsg_sendm (zmsg_t **self_p, void *dest);
 
 // Return size of message, i.e. number of frames (0 or more).
-CZMQ_EXPORT size_t
+size_t
     zmsg_size (zmsg_t *self);
 
 // Return total size of all frames in message.
-CZMQ_EXPORT size_t
+size_t
     zmsg_content_size (zmsg_t *self);
 
 // Return message routing ID, if the message came from a ZMQ_SERVER socket.
 // Else returns zero.                                                      
-CZMQ_EXPORT uint32_t
+uint32_t
     zmsg_routing_id (zmsg_t *self);
 
 // Set routing ID on message. This is used if/when the message is sent to a
 // ZMQ_SERVER socket.                                                      
-CZMQ_EXPORT void
+void
     zmsg_set_routing_id (zmsg_t *self, uint32_t routing_id);
 
 // Push frame to the front of the message, i.e. before all other frames.  
 // Message takes ownership of frame, will destroy it when message is sent.
 // Returns 0 on success, -1 on error. Deprecates zmsg_push, which did not 
 // nullify the caller's frame reference.                                  
-CZMQ_EXPORT int
+int
     zmsg_prepend (zmsg_t *self, zframe_t **frame_p);
 
 // Add frame to the end of the message, i.e. after all other frames.      
 // Message takes ownership of frame, will destroy it when message is sent.
 // Returns 0 on success. Deprecates zmsg_add, which did not nullify the   
 // caller's frame reference.                                              
-CZMQ_EXPORT int
+int
     zmsg_append (zmsg_t *self, zframe_t **frame_p);
 
 // Remove first frame from message, if any. Returns frame, or NULL.
-CZMQ_EXPORT zframe_t *
+zframe_t *
     zmsg_pop (zmsg_t *self);
 
 // Push block of memory to front of message, as a new frame.
 // Returns 0 on success, -1 on error.                       
-CZMQ_EXPORT int
+int
     zmsg_pushmem (zmsg_t *self, const void *src, size_t size);
 
 // Add block of memory to the end of the message, as a new frame.
 // Returns 0 on success, -1 on error.                            
-CZMQ_EXPORT int
+int
     zmsg_addmem (zmsg_t *self, const void *src, size_t size);
 
 // Push string as new frame to front of message.
 // Returns 0 on success, -1 on error.           
-CZMQ_EXPORT int
+int
     zmsg_pushstr (zmsg_t *self, const char *string);
 
 // Push string as new frame to end of message.
 // Returns 0 on success, -1 on error.         
-CZMQ_EXPORT int
+int
     zmsg_addstr (zmsg_t *self, const char *string);
 
 // Push formatted string as new frame to front of message.
 // Returns 0 on success, -1 on error.                     
-CZMQ_EXPORT int
-    zmsg_pushstrf (zmsg_t *self, const char *format, ...) CHECK_PRINTF (2);
+int
+    zmsg_pushstrf (zmsg_t *self, const char *format, ...);
 
 // Push formatted string as new frame to end of message.
 // Returns 0 on success, -1 on error.                   
-CZMQ_EXPORT int
-    zmsg_addstrf (zmsg_t *self, const char *format, ...) CHECK_PRINTF (2);
+int
+    zmsg_addstrf (zmsg_t *self, const char *format, ...);
 
 // Pop frame off front of message, return as fresh string. If there were
 // no more frames in the message, returns NULL.                         
-CZMQ_EXPORT char *
+char *
     zmsg_popstr (zmsg_t *self);
 
 // Push encoded message as a new frame. Message takes ownership of    
 // submessage, so the original is destroyed in this call. Returns 0 on
 // success, -1 on error.                                              
-CZMQ_EXPORT int
+int
     zmsg_addmsg (zmsg_t *self, zmsg_t **msg_p);
 
 // Remove first submessage from message, if any. Returns zmsg_t, or NULL if
 // decoding was not succesful.                                             
-CZMQ_EXPORT zmsg_t *
+zmsg_t *
     zmsg_popmsg (zmsg_t *self);
 
 // Remove specified frame from list, if present. Does not destroy frame.
-CZMQ_EXPORT void
+void
     zmsg_remove (zmsg_t *self, zframe_t *frame);
 
 // Set cursor to first frame in message. Returns frame, or NULL, if the
 // message is empty. Use this to navigate the frames as a list.        
-CZMQ_EXPORT zframe_t *
+zframe_t *
     zmsg_first (zmsg_t *self);
 
 // Return the next frame. If there are no more frames, returns NULL. To move
 // to the first frame call zmsg_first(). Advances the cursor.               
-CZMQ_EXPORT zframe_t *
+zframe_t *
     zmsg_next (zmsg_t *self);
 
 // Return the last frame. If there are no frames, returns NULL.
-CZMQ_EXPORT zframe_t *
+zframe_t *
     zmsg_last (zmsg_t *self);
 
 // Save message to an open file, return 0 if OK, else -1. The message is  
@@ -2035,70 +2035,70 @@ CZMQ_EXPORT zframe_t *
 // file is NOT guaranteed to be portable between operating systems, not   
 // versions of CZMQ. The file format is at present undocumented and liable
 // to arbitrary change.                                                   
-CZMQ_EXPORT int
+int
     zmsg_save (zmsg_t *self, FILE *file);
 
 // Serialize multipart message to a single buffer. Use this method to send  
 // structured messages across transports that do not support multipart data.
 // Allocates and returns a new buffer containing the serialized message.    
 // To decode a serialized message buffer, use zmsg_decode ().               
-CZMQ_EXPORT size_t
+size_t
     zmsg_encode (zmsg_t *self, byte **buffer);
 
 // Create copy of message, as new message object. Returns a fresh zmsg_t
 // object. If message is null, or memory was exhausted, returns null.   
-CZMQ_EXPORT zmsg_t *
+zmsg_t *
     zmsg_dup (zmsg_t *self);
 
 // Send message to zsys log sink (may be stdout, or system facility as
 // configured by zsys_set_logstream).                                 
-CZMQ_EXPORT void
+void
     zmsg_print (zmsg_t *self);
 
 // Return true if the two messages have the same number of frames and each  
 // frame in the first message is identical to the corresponding frame in the
 // other message. As with zframe_eq, return false if either message is NULL.
-CZMQ_EXPORT bool
+bool
     zmsg_eq (zmsg_t *self, zmsg_t *other);
 
 // Return signal value, 0 or greater, if message is a signal, -1 if not.
-CZMQ_EXPORT int
+int
     zmsg_signal (zmsg_t *self);
 
 // Probe the supplied object, and report if it looks like a zmsg_t.
-CZMQ_EXPORT bool
+bool
     zmsg_is (void *self);
 
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zmsg_test (bool verbose);
 
 // CLASS: zpoller
 // Create new poller, specifying zero or more readers. The list of 
 // readers ends in a NULL. Each reader can be a zsock_t instance, a
 // zactor_t instance, a libzmq socket (void *), or a file handle.  
-CZMQ_EXPORT zpoller_t *
+zpoller_t *
     zpoller_new (void *reader, ...);
 
 // Destroy a poller
-CZMQ_EXPORT void
+void
     zpoller_destroy (zpoller_t **self_p);
 
 // Add a reader to be polled. Returns 0 if OK, -1 on failure. The reader may
 // be a libzmq void * socket, a zsock_t instance, or a zactor_t instance.   
-CZMQ_EXPORT int
+int
     zpoller_add (zpoller_t *self, void *reader);
 
 // Remove a reader from the poller; returns 0 if OK, -1 on failure. The reader
 // must have been passed during construction, or in an zpoller_add () call.   
-CZMQ_EXPORT int
+int
     zpoller_remove (zpoller_t *self, void *reader);
 
 // By default the poller stops if the process receives a SIGINT or SIGTERM  
 // signal. This makes it impossible to shut-down message based architectures
 // like zactors. This method lets you switch off break handling. The default
 // nonstop setting is off (false).                                          
-CZMQ_EXPORT void
+void
     zpoller_set_nonstop (zpoller_t *self, bool nonstop);
 
 // Poll the registered readers for I/O, return first reader that has input.  
@@ -2110,42 +2110,42 @@ CZMQ_EXPORT void
 // or the ZMQ context was destroyed, or the timeout expired, returns NULL.   
 // You can test the actual exit condition by calling zpoller_expired () and  
 // zpoller_terminated (). The timeout is in msec.                            
-CZMQ_EXPORT void *
+void *
     zpoller_wait (zpoller_t *self, int timeout);
 
 // Return true if the last zpoller_wait () call ended because the timeout
 // expired, without any error.                                           
-CZMQ_EXPORT bool
+bool
     zpoller_expired (zpoller_t *self);
 
 // Return true if the last zpoller_wait () call ended because the process
 // was interrupted, or the parent context was destroyed.                 
-CZMQ_EXPORT bool
+bool
     zpoller_terminated (zpoller_t *self);
 
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zpoller_test (bool verbose);
 
 // CLASS: zproc
 // Returns CZMQ version as a single 6-digit integer encoding the major
 // version (x 10000), the minor version (x 100) and the patch.        
-CZMQ_EXPORT int
+int
     zproc_czmq_version (void);
 
 // Returns true if the process received a SIGINT or SIGTERM signal.
 // It is good practice to use this method to exit any infinite loop
 // processing messages.                                            
-CZMQ_EXPORT bool
+bool
     zproc_interrupted (void);
 
 // Returns true if the underlying libzmq supports CURVE security.
-CZMQ_EXPORT bool
+bool
     zproc_has_curve (void);
 
 // Return current host name, for use in public tcp:// endpoints.
 // If the host name is not resolvable, returns NULL.            
-CZMQ_EXPORT char *
+char *
     zproc_hostname (void);
 
 // Move the current process into the background. The precise effect     
@@ -2154,7 +2154,7 @@ CZMQ_EXPORT char *
 // stdin, stdout, and stderr to the null device, and sets the process to
 // ignore SIGHUP. On Windows, does nothing. Returns 0 if OK, -1 if there
 // was an error.                                                        
-CZMQ_EXPORT void
+void
     zproc_daemonize (const char *workdir);
 
 // Drop the process ID into the lockfile, with exclusive lock, and   
@@ -2163,7 +2163,7 @@ CZMQ_EXPORT void
 // -1 on failure. Note if you combine this with zsys_daemonize, run  
 // after, not before that method, or the lockfile will hold the wrong
 // process ID.                                                       
-CZMQ_EXPORT void
+void
     zproc_run_as (const char *lockfile, const char *group, const char *user);
 
 // Configure the number of I/O threads that ZeroMQ will use. A good  
@@ -2171,14 +2171,14 @@ CZMQ_EXPORT void
 // default is 1, sufficient for most applications. If the environment
 // variable ZSYS_IO_THREADS is defined, that provides the default.   
 // Note that this method is valid only before any socket is created. 
-CZMQ_EXPORT void
+void
     zproc_set_io_threads (size_t io_threads);
 
 // Configure the number of sockets that ZeroMQ will allow. The default  
 // is 1024. The actual limit depends on the system, and you can query it
 // by using zsys_socket_limit (). A value of zero means "maximum".      
 // Note that this method is valid only before any socket is created.    
-CZMQ_EXPORT void
+void
     zproc_set_max_sockets (size_t max_sockets);
 
 // Set network interface name to use for broadcasts, particularly zbeacon.    
@@ -2187,17 +2187,17 @@ CZMQ_EXPORT void
 // the default when there is no specified interface. If the environment       
 // variable ZSYS_INTERFACE is set, use that as the default interface name.    
 // Setting the interface to "*" means "use all available interfaces".         
-CZMQ_EXPORT void
+void
     zproc_set_biface (const char *value);
 
 // Return network interface to use for broadcasts, or "" if none was set.
-CZMQ_EXPORT const char *
+const char *
     zproc_biface (void);
 
 // Set log identity, which is a string that prefixes all log messages sent
 // by this process. The log identity defaults to the environment variable 
 // ZSYS_LOGIDENT, if that is set.                                         
-CZMQ_EXPORT void
+void
     zproc_set_log_ident (const char *value);
 
 // Sends log output to a PUB socket bound to the specified endpoint. To   
@@ -2207,36 +2207,36 @@ CZMQ_EXPORT void
 // log system supports a single sender; multiple calls to this method will
 // bind the same sender to multiple endpoints. To disable the sender, call
 // this method with a null argument.                                      
-CZMQ_EXPORT void
+void
     zproc_set_log_sender (const char *endpoint);
 
 // Enable or disable logging to the system facility (syslog on POSIX boxes,
 // event log on Windows). By default this is disabled.                     
-CZMQ_EXPORT void
+void
     zproc_set_log_system (bool logsystem);
 
 // Log error condition - highest priority
-CZMQ_EXPORT void
-    zproc_log_error (const char *format, ...) CHECK_PRINTF (1);
+void
+    zproc_log_error (const char *format, ...);
 
 // Log warning condition - high priority
-CZMQ_EXPORT void
-    zproc_log_warning (const char *format, ...) CHECK_PRINTF (1);
+void
+    zproc_log_warning (const char *format, ...);
 
 // Log normal, but significant, condition - normal priority
-CZMQ_EXPORT void
-    zproc_log_notice (const char *format, ...) CHECK_PRINTF (1);
+void
+    zproc_log_notice (const char *format, ...);
 
 // Log informational message - low priority
-CZMQ_EXPORT void
-    zproc_log_info (const char *format, ...) CHECK_PRINTF (1);
+void
+    zproc_log_info (const char *format, ...);
 
 // Log debug-level message - lowest priority
-CZMQ_EXPORT void
-    zproc_log_debug (const char *format, ...) CHECK_PRINTF (1);
+void
+    zproc_log_debug (const char *format, ...);
 
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zproc_test (bool verbose);
 
 // CLASS: zsock
@@ -2246,69 +2246,69 @@ CZMQ_EXPORT void
 // variant, enabling intelligent socket leak detection. This can have    
 // performance implications if you use a LOT of sockets. To turn off this
 // redirection behaviour, define ZSOCK_NOCHECK.                          
-CZMQ_EXPORT zsock_t *
+zsock_t *
     zsock_new (int type);
 
 // Destroy the socket. You must use this for any socket created via the
 // zsock_new method.                                                   
-CZMQ_EXPORT void
+void
     zsock_destroy (zsock_t **self_p);
 
 // Create a PUB socket. Default action is bind.
-CZMQ_EXPORT zsock_t *
+zsock_t *
     zsock_new_pub (const char *endpoint);
 
 // Create a SUB socket, and optionally subscribe to some prefix string. Default
 // action is connect.                                                          
-CZMQ_EXPORT zsock_t *
+zsock_t *
     zsock_new_sub (const char *endpoint, const char *subscribe);
 
 // Create a REQ socket. Default action is connect.
-CZMQ_EXPORT zsock_t *
+zsock_t *
     zsock_new_req (const char *endpoint);
 
 // Create a REP socket. Default action is bind.
-CZMQ_EXPORT zsock_t *
+zsock_t *
     zsock_new_rep (const char *endpoint);
 
 // Create a DEALER socket. Default action is connect.
-CZMQ_EXPORT zsock_t *
+zsock_t *
     zsock_new_dealer (const char *endpoint);
 
 // Create a ROUTER socket. Default action is bind.
-CZMQ_EXPORT zsock_t *
+zsock_t *
     zsock_new_router (const char *endpoint);
 
 // Create a PUSH socket. Default action is connect.
-CZMQ_EXPORT zsock_t *
+zsock_t *
     zsock_new_push (const char *endpoint);
 
 // Create a PULL socket. Default action is bind.
-CZMQ_EXPORT zsock_t *
+zsock_t *
     zsock_new_pull (const char *endpoint);
 
 // Create an XPUB socket. Default action is bind.
-CZMQ_EXPORT zsock_t *
+zsock_t *
     zsock_new_xpub (const char *endpoint);
 
 // Create an XSUB socket. Default action is connect.
-CZMQ_EXPORT zsock_t *
+zsock_t *
     zsock_new_xsub (const char *endpoint);
 
 // Create a PAIR socket. Default action is connect.
-CZMQ_EXPORT zsock_t *
+zsock_t *
     zsock_new_pair (const char *endpoint);
 
 // Create a STREAM socket. Default action is connect.
-CZMQ_EXPORT zsock_t *
+zsock_t *
     zsock_new_stream (const char *endpoint);
 
 // Create a SERVER socket. Default action is bind.
-CZMQ_EXPORT zsock_t *
+zsock_t *
     zsock_new_server (const char *endpoint);
 
 // Create a CLIENT socket. Default action is connect.
-CZMQ_EXPORT zsock_t *
+zsock_t *
     zsock_new_client (const char *endpoint);
 
 // Bind a socket to a formatted endpoint. For tcp:// endpoints, supports   
@@ -2331,29 +2331,29 @@ CZMQ_EXPORT zsock_t *
 // ephemeral ports, a port may be reused by different services without     
 // clients being aware. Protocols that run on ephemeral ports should take  
 // this into account.                                                      
-CZMQ_EXPORT int
-    zsock_bind (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
+int
+    zsock_bind (zsock_t *self, const char *format, ...);
 
 // Returns last bound endpoint, if any.
-CZMQ_EXPORT const char *
+const char *
     zsock_endpoint (zsock_t *self);
 
 // Unbind a socket from a formatted endpoint.                     
 // Returns 0 if OK, -1 if the endpoint was invalid or the function
 // isn't supported.                                               
-CZMQ_EXPORT int
-    zsock_unbind (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
+int
+    zsock_unbind (zsock_t *self, const char *format, ...);
 
 // Connect a socket to a formatted endpoint        
 // Returns 0 if OK, -1 if the endpoint was invalid.
-CZMQ_EXPORT int
-    zsock_connect (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
+int
+    zsock_connect (zsock_t *self, const char *format, ...);
 
 // Disconnect a socket from a formatted endpoint                  
 // Returns 0 if OK, -1 if the endpoint was invalid or the function
 // isn't supported.                                               
-CZMQ_EXPORT int
-    zsock_disconnect (zsock_t *self, const char *format, ...) CHECK_PRINTF (2);
+int
+    zsock_disconnect (zsock_t *self, const char *format, ...);
 
 // Attach a socket to zero or more endpoints. If endpoints is not null,     
 // parses as list of ZeroMQ endpoints, separated by commas, and prefixed by 
@@ -2361,11 +2361,11 @@ CZMQ_EXPORT int
 // endpoints were valid, or -1 if there was a syntax error. If the endpoint 
 // does not start with '@' or '>', the serverish argument defines whether   
 // it is used to bind (serverish = true) or connect (serverish = false).    
-CZMQ_EXPORT int
+int
     zsock_attach (zsock_t *self, const char *endpoints, bool serverish);
 
 // Returns socket type as printable constant string.
-CZMQ_EXPORT const char *
+const char *
     zsock_type_str (zsock_t *self);
 
 // Send a 'picture' message to the socket (or actor). The picture is a   
@@ -2394,13 +2394,13 @@ CZMQ_EXPORT const char *
 // have data in a zchunk or zframe. Does not change or take ownership of 
 // any arguments. Returns 0 if successful, -1 if sending failed for any  
 // reason.                                                               
-CZMQ_EXPORT int
+int
     zsock_send (void *self, const char *picture, ...);
 
 // Send a 'picture' message to the socket (or actor). This is a va_list 
 // version of zsock_send (), so please consult its documentation for the
 // details.                                                             
-CZMQ_EXPORT int
+int
     zsock_vsend (void *self, const char *picture, va_list argptr);
 
 // Receive a 'picture' message to the socket (or actor). See zsock_send for
@@ -2429,13 +2429,13 @@ CZMQ_EXPORT int
 // If an argument pointer is NULL, does not store any value (skips it).    
 // An 'n' picture matches an empty frame; if the message does not match,   
 // the method will return -1.                                              
-CZMQ_EXPORT int
+int
     zsock_recv (void *self, const char *picture, ...);
 
 // Receive a 'picture' message from the socket (or actor). This is a    
 // va_list version of zsock_recv (), so please consult its documentation
 // for the details.                                                     
-CZMQ_EXPORT int
+int
     zsock_vrecv (void *self, const char *picture, va_list argptr);
 
 // Send a binary encoded 'picture' message to the socket (or actor). This 
@@ -2459,7 +2459,7 @@ CZMQ_EXPORT int
 //                                                                        
 // Does not change or take ownership of any arguments. Returns 0 if       
 // successful, -1 if sending failed for any reason.                       
-CZMQ_EXPORT int
+int
     zsock_bsend (void *self, const char *picture, ...);
 
 // Receive a binary encoded 'picture' message from the socket (or actor).  
@@ -2473,23 +2473,23 @@ CZMQ_EXPORT int
 // destroy them when finished with them. The supplied pointers do not need 
 // to be initialized. Returns 0 if successful, or -1 if it failed to read  
 // a message.                                                              
-CZMQ_EXPORT int
+int
     zsock_brecv (void *self, const char *picture, ...);
 
 // Return socket routing ID if any. This returns 0 if the socket is not
 // of type ZMQ_SERVER or if no request was already received on it.     
-CZMQ_EXPORT uint32_t
+uint32_t
     zsock_routing_id (zsock_t *self);
 
 // Set routing ID on socket. The socket MUST be of type ZMQ_SERVER.        
 // This will be used when sending messages on the socket via the zsock API.
-CZMQ_EXPORT void
+void
     zsock_set_routing_id (zsock_t *self, uint32_t routing_id);
 
 // Set socket to use unbounded pipes (HWM=0); use this in cases when you are
 // totally certain the message volume can fit in memory. This method works  
 // across all versions of ZeroMQ. Takes a polymorphic socket reference.     
-CZMQ_EXPORT void
+void
     zsock_set_unbounded (void *self);
 
 // Send a signal over a socket. A signal is a short message carrying a   
@@ -2497,443 +2497,443 @@ CZMQ_EXPORT void
 // to be distinguishable from "normal" messages. Accepts a zsock_t or a  
 // zactor_t argument, and returns 0 if successful, -1 if the signal could
 // not be sent. Takes a polymorphic socket reference.                    
-CZMQ_EXPORT int
+int
     zsock_signal (void *self, byte status);
 
 // Wait on a signal. Use this to coordinate between threads, over pipe  
 // pairs. Blocks until the signal is received. Returns -1 on error, 0 or
 // greater on success. Accepts a zsock_t or a zactor_t as argument.     
 // Takes a polymorphic socket reference.                                
-CZMQ_EXPORT int
+int
     zsock_wait (void *self);
 
 // If there is a partial message still waiting on the socket, remove and    
 // discard it. This is useful when reading partial messages, to get specific
 // message types.                                                           
-CZMQ_EXPORT void
+void
     zsock_flush (void *self);
 
 // Probe the supplied object, and report if it looks like a zsock_t.
 // Takes a polymorphic socket reference.                            
-CZMQ_EXPORT bool
+bool
     zsock_is (void *self);
 
 // Probe the supplied reference. If it looks like a zsock_t instance, return
 // the underlying libzmq socket handle; else if it looks like a file        
 // descriptor, return NULL; else if it looks like a libzmq socket handle,   
 // return the supplied value. Takes a polymorphic socket reference.         
-CZMQ_EXPORT void *
+void *
     zsock_resolve (void *self);
 
 // Get socket option `heartbeat_ivl`.
-CZMQ_EXPORT int
+int
     zsock_heartbeat_ivl (void *self);
 
 // Set socket option `heartbeat_ivl`.
-CZMQ_EXPORT void
+void
     zsock_set_heartbeat_ivl (void *self, int heartbeat_ivl);
 
 // Get socket option `heartbeat_ttl`.
-CZMQ_EXPORT int
+int
     zsock_heartbeat_ttl (void *self);
 
 // Set socket option `heartbeat_ttl`.
-CZMQ_EXPORT void
+void
     zsock_set_heartbeat_ttl (void *self, int heartbeat_ttl);
 
 // Get socket option `heartbeat_timeout`.
-CZMQ_EXPORT int
+int
     zsock_heartbeat_timeout (void *self);
 
 // Set socket option `heartbeat_timeout`.
-CZMQ_EXPORT void
+void
     zsock_set_heartbeat_timeout (void *self, int heartbeat_timeout);
 
 // Get socket option `tos`.
-CZMQ_EXPORT int
+int
     zsock_tos (void *self);
 
 // Set socket option `tos`.
-CZMQ_EXPORT void
+void
     zsock_set_tos (void *self, int tos);
 
 // Set socket option `router_handover`.
-CZMQ_EXPORT void
+void
     zsock_set_router_handover (void *self, int router_handover);
 
 // Set socket option `router_mandatory`.
-CZMQ_EXPORT void
+void
     zsock_set_router_mandatory (void *self, int router_mandatory);
 
 // Set socket option `probe_router`.
-CZMQ_EXPORT void
+void
     zsock_set_probe_router (void *self, int probe_router);
 
 // Set socket option `req_relaxed`.
-CZMQ_EXPORT void
+void
     zsock_set_req_relaxed (void *self, int req_relaxed);
 
 // Set socket option `req_correlate`.
-CZMQ_EXPORT void
+void
     zsock_set_req_correlate (void *self, int req_correlate);
 
 // Set socket option `conflate`.
-CZMQ_EXPORT void
+void
     zsock_set_conflate (void *self, int conflate);
 
 // Get socket option `zap_domain`.
-CZMQ_EXPORT char *
+char *
     zsock_zap_domain (void *self);
 
 // Set socket option `zap_domain`.
-CZMQ_EXPORT void
+void
     zsock_set_zap_domain (void *self, const char *zap_domain);
 
 // Get socket option `mechanism`.
-CZMQ_EXPORT int
+int
     zsock_mechanism (void *self);
 
 // Get socket option `plain_server`.
-CZMQ_EXPORT int
+int
     zsock_plain_server (void *self);
 
 // Set socket option `plain_server`.
-CZMQ_EXPORT void
+void
     zsock_set_plain_server (void *self, int plain_server);
 
 // Get socket option `plain_username`.
-CZMQ_EXPORT char *
+char *
     zsock_plain_username (void *self);
 
 // Set socket option `plain_username`.
-CZMQ_EXPORT void
+void
     zsock_set_plain_username (void *self, const char *plain_username);
 
 // Get socket option `plain_password`.
-CZMQ_EXPORT char *
+char *
     zsock_plain_password (void *self);
 
 // Set socket option `plain_password`.
-CZMQ_EXPORT void
+void
     zsock_set_plain_password (void *self, const char *plain_password);
 
 // Get socket option `curve_server`.
-CZMQ_EXPORT int
+int
     zsock_curve_server (void *self);
 
 // Set socket option `curve_server`.
-CZMQ_EXPORT void
+void
     zsock_set_curve_server (void *self, int curve_server);
 
 // Get socket option `curve_publickey`.
-CZMQ_EXPORT char *
+char *
     zsock_curve_publickey (void *self);
 
 // Set socket option `curve_publickey`.
-CZMQ_EXPORT void
+void
     zsock_set_curve_publickey (void *self, const char *curve_publickey);
 
 // Set socket option `curve_publickey` from 32-octet binary
-CZMQ_EXPORT void
+void
     zsock_set_curve_publickey_bin (void *self, const byte *curve_publickey);
 
 // Get socket option `curve_secretkey`.
-CZMQ_EXPORT char *
+char *
     zsock_curve_secretkey (void *self);
 
 // Set socket option `curve_secretkey`.
-CZMQ_EXPORT void
+void
     zsock_set_curve_secretkey (void *self, const char *curve_secretkey);
 
 // Set socket option `curve_secretkey` from 32-octet binary
-CZMQ_EXPORT void
+void
     zsock_set_curve_secretkey_bin (void *self, const byte *curve_secretkey);
 
 // Get socket option `curve_serverkey`.
-CZMQ_EXPORT char *
+char *
     zsock_curve_serverkey (void *self);
 
 // Set socket option `curve_serverkey`.
-CZMQ_EXPORT void
+void
     zsock_set_curve_serverkey (void *self, const char *curve_serverkey);
 
 // Set socket option `curve_serverkey` from 32-octet binary
-CZMQ_EXPORT void
+void
     zsock_set_curve_serverkey_bin (void *self, const byte *curve_serverkey);
 
 // Get socket option `gssapi_server`.
-CZMQ_EXPORT int
+int
     zsock_gssapi_server (void *self);
 
 // Set socket option `gssapi_server`.
-CZMQ_EXPORT void
+void
     zsock_set_gssapi_server (void *self, int gssapi_server);
 
 // Get socket option `gssapi_plaintext`.
-CZMQ_EXPORT int
+int
     zsock_gssapi_plaintext (void *self);
 
 // Set socket option `gssapi_plaintext`.
-CZMQ_EXPORT void
+void
     zsock_set_gssapi_plaintext (void *self, int gssapi_plaintext);
 
 // Get socket option `gssapi_principal`.
-CZMQ_EXPORT char *
+char *
     zsock_gssapi_principal (void *self);
 
 // Set socket option `gssapi_principal`.
-CZMQ_EXPORT void
+void
     zsock_set_gssapi_principal (void *self, const char *gssapi_principal);
 
 // Get socket option `gssapi_service_principal`.
-CZMQ_EXPORT char *
+char *
     zsock_gssapi_service_principal (void *self);
 
 // Set socket option `gssapi_service_principal`.
-CZMQ_EXPORT void
+void
     zsock_set_gssapi_service_principal (void *self, const char *gssapi_service_principal);
 
 // Get socket option `ipv6`.
-CZMQ_EXPORT int
+int
     zsock_ipv6 (void *self);
 
 // Set socket option `ipv6`.
-CZMQ_EXPORT void
+void
     zsock_set_ipv6 (void *self, int ipv6);
 
 // Get socket option `immediate`.
-CZMQ_EXPORT int
+int
     zsock_immediate (void *self);
 
 // Set socket option `immediate`.
-CZMQ_EXPORT void
+void
     zsock_set_immediate (void *self, int immediate);
 
 // Set socket option `router_raw`.
-CZMQ_EXPORT void
+void
     zsock_set_router_raw (void *self, int router_raw);
 
 // Get socket option `ipv4only`.
-CZMQ_EXPORT int
+int
     zsock_ipv4only (void *self);
 
 // Set socket option `ipv4only`.
-CZMQ_EXPORT void
+void
     zsock_set_ipv4only (void *self, int ipv4only);
 
 // Set socket option `delay_attach_on_connect`.
-CZMQ_EXPORT void
+void
     zsock_set_delay_attach_on_connect (void *self, int delay_attach_on_connect);
 
 // Get socket option `type`.
-CZMQ_EXPORT int
+int
     zsock_type (void *self);
 
 // Get socket option `sndhwm`.
-CZMQ_EXPORT int
+int
     zsock_sndhwm (void *self);
 
 // Set socket option `sndhwm`.
-CZMQ_EXPORT void
+void
     zsock_set_sndhwm (void *self, int sndhwm);
 
 // Get socket option `rcvhwm`.
-CZMQ_EXPORT int
+int
     zsock_rcvhwm (void *self);
 
 // Set socket option `rcvhwm`.
-CZMQ_EXPORT void
+void
     zsock_set_rcvhwm (void *self, int rcvhwm);
 
 // Get socket option `affinity`.
-CZMQ_EXPORT int
+int
     zsock_affinity (void *self);
 
 // Set socket option `affinity`.
-CZMQ_EXPORT void
+void
     zsock_set_affinity (void *self, int affinity);
 
 // Set socket option `subscribe`.
-CZMQ_EXPORT void
+void
     zsock_set_subscribe (void *self, const char *subscribe);
 
 // Set socket option `unsubscribe`.
-CZMQ_EXPORT void
+void
     zsock_set_unsubscribe (void *self, const char *unsubscribe);
 
 // Get socket option `identity`.
-CZMQ_EXPORT char *
+char *
     zsock_identity (void *self);
 
 // Set socket option `identity`.
-CZMQ_EXPORT void
+void
     zsock_set_identity (void *self, const char *identity);
 
 // Get socket option `rate`.
-CZMQ_EXPORT int
+int
     zsock_rate (void *self);
 
 // Set socket option `rate`.
-CZMQ_EXPORT void
+void
     zsock_set_rate (void *self, int rate);
 
 // Get socket option `recovery_ivl`.
-CZMQ_EXPORT int
+int
     zsock_recovery_ivl (void *self);
 
 // Set socket option `recovery_ivl`.
-CZMQ_EXPORT void
+void
     zsock_set_recovery_ivl (void *self, int recovery_ivl);
 
 // Get socket option `sndbuf`.
-CZMQ_EXPORT int
+int
     zsock_sndbuf (void *self);
 
 // Set socket option `sndbuf`.
-CZMQ_EXPORT void
+void
     zsock_set_sndbuf (void *self, int sndbuf);
 
 // Get socket option `rcvbuf`.
-CZMQ_EXPORT int
+int
     zsock_rcvbuf (void *self);
 
 // Set socket option `rcvbuf`.
-CZMQ_EXPORT void
+void
     zsock_set_rcvbuf (void *self, int rcvbuf);
 
 // Get socket option `linger`.
-CZMQ_EXPORT int
+int
     zsock_linger (void *self);
 
 // Set socket option `linger`.
-CZMQ_EXPORT void
+void
     zsock_set_linger (void *self, int linger);
 
 // Get socket option `reconnect_ivl`.
-CZMQ_EXPORT int
+int
     zsock_reconnect_ivl (void *self);
 
 // Set socket option `reconnect_ivl`.
-CZMQ_EXPORT void
+void
     zsock_set_reconnect_ivl (void *self, int reconnect_ivl);
 
 // Get socket option `reconnect_ivl_max`.
-CZMQ_EXPORT int
+int
     zsock_reconnect_ivl_max (void *self);
 
 // Set socket option `reconnect_ivl_max`.
-CZMQ_EXPORT void
+void
     zsock_set_reconnect_ivl_max (void *self, int reconnect_ivl_max);
 
 // Get socket option `backlog`.
-CZMQ_EXPORT int
+int
     zsock_backlog (void *self);
 
 // Set socket option `backlog`.
-CZMQ_EXPORT void
+void
     zsock_set_backlog (void *self, int backlog);
 
 // Get socket option `maxmsgsize`.
-CZMQ_EXPORT int
+int
     zsock_maxmsgsize (void *self);
 
 // Set socket option `maxmsgsize`.
-CZMQ_EXPORT void
+void
     zsock_set_maxmsgsize (void *self, int maxmsgsize);
 
 // Get socket option `multicast_hops`.
-CZMQ_EXPORT int
+int
     zsock_multicast_hops (void *self);
 
 // Set socket option `multicast_hops`.
-CZMQ_EXPORT void
+void
     zsock_set_multicast_hops (void *self, int multicast_hops);
 
 // Get socket option `rcvtimeo`.
-CZMQ_EXPORT int
+int
     zsock_rcvtimeo (void *self);
 
 // Set socket option `rcvtimeo`.
-CZMQ_EXPORT void
+void
     zsock_set_rcvtimeo (void *self, int rcvtimeo);
 
 // Get socket option `sndtimeo`.
-CZMQ_EXPORT int
+int
     zsock_sndtimeo (void *self);
 
 // Set socket option `sndtimeo`.
-CZMQ_EXPORT void
+void
     zsock_set_sndtimeo (void *self, int sndtimeo);
 
 // Set socket option `xpub_verbose`.
-CZMQ_EXPORT void
+void
     zsock_set_xpub_verbose (void *self, int xpub_verbose);
 
 // Get socket option `tcp_keepalive`.
-CZMQ_EXPORT int
+int
     zsock_tcp_keepalive (void *self);
 
 // Set socket option `tcp_keepalive`.
-CZMQ_EXPORT void
+void
     zsock_set_tcp_keepalive (void *self, int tcp_keepalive);
 
 // Get socket option `tcp_keepalive_idle`.
-CZMQ_EXPORT int
+int
     zsock_tcp_keepalive_idle (void *self);
 
 // Set socket option `tcp_keepalive_idle`.
-CZMQ_EXPORT void
+void
     zsock_set_tcp_keepalive_idle (void *self, int tcp_keepalive_idle);
 
 // Get socket option `tcp_keepalive_cnt`.
-CZMQ_EXPORT int
+int
     zsock_tcp_keepalive_cnt (void *self);
 
 // Set socket option `tcp_keepalive_cnt`.
-CZMQ_EXPORT void
+void
     zsock_set_tcp_keepalive_cnt (void *self, int tcp_keepalive_cnt);
 
 // Get socket option `tcp_keepalive_intvl`.
-CZMQ_EXPORT int
+int
     zsock_tcp_keepalive_intvl (void *self);
 
 // Set socket option `tcp_keepalive_intvl`.
-CZMQ_EXPORT void
+void
     zsock_set_tcp_keepalive_intvl (void *self, int tcp_keepalive_intvl);
 
 // Get socket option `tcp_accept_filter`.
-CZMQ_EXPORT char *
+char *
     zsock_tcp_accept_filter (void *self);
 
 // Set socket option `tcp_accept_filter`.
-CZMQ_EXPORT void
+void
     zsock_set_tcp_accept_filter (void *self, const char *tcp_accept_filter);
 
 // Get socket option `rcvmore`.
-CZMQ_EXPORT int
+int
     zsock_rcvmore (void *self);
 
 // Get socket option `fd`.
-CZMQ_EXPORT SOCKET
+SOCKET
     zsock_fd (void *self);
 
 // Get socket option `events`.
-CZMQ_EXPORT int
+int
     zsock_events (void *self);
 
 // Get socket option `last_endpoint`.
-CZMQ_EXPORT char *
+char *
     zsock_last_endpoint (void *self);
 
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zsock_test (bool verbose);
 
 // CLASS: zstr
 // Receive C string from socket. Caller must free returned string using
 // zstr_free(). Returns NULL if the context is being terminated or the 
 // process was interrupted.                                            
-CZMQ_EXPORT char *
+char *
     zstr_recv (void *source);
 
 // Receive a series of strings (until NULL) from multipart data.    
@@ -2943,255 +2943,253 @@ CZMQ_EXPORT char *
 // number of strings filled, zero or more. Free each returned string
 // using zstr_free(). If not enough strings are provided, remaining 
 // multipart frames in the message are dropped.                     
-CZMQ_EXPORT int
+int
     zstr_recvx (void *source, char **string_p, ...);
 
 // Send a C string to a socket, as a frame. The string is sent without 
 // trailing null byte; to read this you can use zstr_recv, or a similar
 // method that adds a null terminator on the received string. String   
 // may be NULL, which is sent as "".                                   
-CZMQ_EXPORT int
+int
     zstr_send (void *dest, const char *string);
 
 // Send a C string to a socket, as zstr_send(), with a MORE flag, so that
 // you can send further strings in the same multi-part message.          
-CZMQ_EXPORT int
+int
     zstr_sendm (void *dest, const char *string);
 
 // Send a formatted string to a socket. Note that you should NOT use
 // user-supplied strings in the format (they may contain '%' which  
 // will create security holes).                                     
-CZMQ_EXPORT int
-    zstr_sendf (void *dest, const char *format, ...) CHECK_PRINTF (2);
+int
+    zstr_sendf (void *dest, const char *format, ...);
 
 // Send a formatted string to a socket, as for zstr_sendf(), with a      
 // MORE flag, so that you can send further strings in the same multi-part
 // message.                                                              
-CZMQ_EXPORT int
-    zstr_sendfm (void *dest, const char *format, ...) CHECK_PRINTF (2);
+int
+    zstr_sendfm (void *dest, const char *format, ...);
 
 // Send a series of strings (until NULL) as multipart data   
 // Returns 0 if the strings could be sent OK, or -1 on error.
-CZMQ_EXPORT int
+int
     zstr_sendx (void *dest, const char *string, ...);
 
 // Accepts a void pointer and returns a fresh character string. If source
 // is null, returns an empty string.                                     
-CZMQ_EXPORT char *
+char *
     zstr_str (void *source);
 
 // Free a provided string, and nullify the parent pointer. Safe to call on
 // a null pointer.                                                        
-CZMQ_EXPORT void
+void
     zstr_free (char **string_p);
 
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zstr_test (bool verbose);
 
 // CLASS: ztrie
 // Creates a new ztrie.
-CZMQ_EXPORT ztrie_t *
+ztrie_t *
     ztrie_new (char delimiter);
 
 // Destroy the ztrie.
-CZMQ_EXPORT void
+void
     ztrie_destroy (ztrie_t **self_p);
 
 // Inserts a new route into the tree and attaches the data. Returns -1     
 // if the route already exists, otherwise 0. This method takes ownership of
 // the provided data if a destroy_data_fn is provided.                     
-CZMQ_EXPORT int
+int
     ztrie_insert_route (ztrie_t *self, const char *path, void *data, ztrie_destroy_data_fn destroy_data_fn);
 
 // Removes a route from the trie and destroys its data. Returns -1 if the
 // route does not exists, otherwise 0.                                   
 // the start of the list call zlist_first (). Advances the cursor.       
-CZMQ_EXPORT int
+int
     ztrie_remove_route (ztrie_t *self, const char *path);
 
 // Returns true if the path matches a route in the tree, otherwise false.
-CZMQ_EXPORT bool
+bool
     ztrie_matches (ztrie_t *self, const char *path);
 
 // Returns the data of a matched route from last ztrie_matches. If the path
 // did not match, returns NULL. Do not delete the data as it's owned by    
 // ztrie.                                                                  
-CZMQ_EXPORT void *
+void *
     ztrie_hit_data (ztrie_t *self);
 
 // Returns the count of parameters that a matched route has.
-CZMQ_EXPORT size_t
+size_t
     ztrie_hit_parameter_count (ztrie_t *self);
 
 // Returns the parameters of a matched route with named regexes from last   
 // ztrie_matches. If the path did not match or the route did not contain any
 // named regexes, returns NULL.                                             
-CZMQ_EXPORT zhashx_t *
+zhashx_t *
     ztrie_hit_parameters (ztrie_t *self);
 
 // Returns the asterisk matched part of a route, if there has been no match
 // or no asterisk match, returns NULL.                                     
-CZMQ_EXPORT const char *
+const char *
     ztrie_hit_asterisk_match (ztrie_t *self);
 
 // Print the trie
-CZMQ_EXPORT void
+void
     ztrie_print (ztrie_t *self);
 
 // Self test of this class.
-CZMQ_EXPORT void
+void
     ztrie_test (bool verbose);
 
 // CLASS: zuuid
 // Create a new UUID object.
-CZMQ_EXPORT zuuid_t *
+zuuid_t *
     zuuid_new (void);
 
 // Destroy a specified UUID object.
-CZMQ_EXPORT void
+void
     zuuid_destroy (zuuid_t **self_p);
 
 // Create UUID object from supplied ZUUID_LEN-octet value.
-CZMQ_EXPORT zuuid_t *
+zuuid_t *
     zuuid_new_from (const byte *source);
 
 // Set UUID to new supplied ZUUID_LEN-octet value.
-CZMQ_EXPORT void
+void
     zuuid_set (zuuid_t *self, const byte *source);
 
 // Set UUID to new supplied string value skipping '-' and '{' '}'
 // optional delimiters. Return 0 if OK, else returns -1.         
-CZMQ_EXPORT int
+int
     zuuid_set_str (zuuid_t *self, const char *source);
 
 // Return UUID binary data.
-CZMQ_EXPORT const byte *
+const byte *
     zuuid_data (zuuid_t *self);
 
 // Return UUID binary size
-CZMQ_EXPORT size_t
+size_t
     zuuid_size (zuuid_t *self);
 
 // Returns UUID as string
-CZMQ_EXPORT const char *
+const char *
     zuuid_str (zuuid_t *self);
 
 // Return UUID in the canonical string format: 8-4-4-4-12, in lower
 // case. Caller does not modify or free returned value. See        
 // http://en.wikipedia.org/wiki/Universally_unique_identifier      
-CZMQ_EXPORT const char *
+const char *
     zuuid_str_canonical (zuuid_t *self);
 
 // Store UUID blob in target array
-CZMQ_EXPORT void
+void
     zuuid_export (zuuid_t *self, byte *target);
 
 // Check if UUID is same as supplied value
-CZMQ_EXPORT bool
+bool
     zuuid_eq (zuuid_t *self, const byte *compare);
 
 // Check if UUID is different from supplied value
-CZMQ_EXPORT bool
+bool
     zuuid_neq (zuuid_t *self, const byte *compare);
 
 // Make copy of UUID object; if uuid is null, or memory was exhausted,
 // returns null.                                                      
-CZMQ_EXPORT zuuid_t *
+zuuid_t *
     zuuid_dup (zuuid_t *self);
 
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zuuid_test (bool verbose);
 
 // CLASS: zauth
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zauth_test (bool verbose);
 
 // CLASS: zbeacon
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zbeacon_test (bool verbose);
 
 // CLASS: zgossip
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zgossip_test (bool verbose);
 
 // CLASS: zmonitor
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zmonitor_test (bool verbose);
 
 // CLASS: zproxy
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zproxy_test (bool verbose);
 
 // CLASS: zrex
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zrex_test (bool verbose);
 
 // CLASS: zsys
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zsys_test (bool verbose);
 
 // CLASS: zgossip_msg
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zgossip_msg_test (bool verbose);
 
 // CLASS: zauth_v2
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zauth_v2_test (bool verbose);
 
 // CLASS: zbeacon_v2
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zbeacon_v2_test (bool verbose);
 
 // CLASS: zctx
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zctx_test (bool verbose);
 
 // CLASS: zmonitor_v2
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zmonitor_v2_test (bool verbose);
 
 // CLASS: zmutex
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zmutex_test (bool verbose);
 
 // CLASS: zproxy_v2
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zproxy_v2_test (bool verbose);
 
 // CLASS: zsocket
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zsocket_test (bool verbose);
 
 // CLASS: zsockopt
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zsockopt_test (bool verbose);
 
 // CLASS: zthread
 // Self test of this class.
-CZMQ_EXPORT void
+void
     zthread_test (bool verbose);
 
 '''
-cdefs = cdefs.replace('CZMQ_EXPORT', '')
-cdefs = re.sub(r'CHECK_PRINTF\s*\([^)]\)\s*', '', cdefs)
 cdefs = re.sub(r';[^;]*\bva_list\b[^;]*;', ';', cdefs, flags=re.S) # we don't support anything with a va_list arg
 
 ffi.cdef(cdefs)

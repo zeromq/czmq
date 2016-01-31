@@ -36,11 +36,11 @@ EXTRA_DIST = \
     src/foreign/slre/slre.h \
     src/foreign/slre/readme.txt \
     src/zgossip_msg.h \
-    src/czmq_classes.h \
     LICENSE \
     README.txt \
     README.md \
-    CONTRIBUTING.md
+    CONTRIBUTING.md \
+    src/czmq_classes.h
 
 include $(srcdir)/src/Makemodule.am
 include $(srcdir)/src/Makemodule-local.am # Optional project-local hook
