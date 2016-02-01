@@ -4,12 +4,12 @@ JNI Binding for CZMQ
 
 ## Building the JNI Layer for Linux
 
-Ensure you have gradle and cmake installed, then run:
+Ensure you have cmake installed, then run:
 
-    gradle build jar
-    gradle test
+    ./gradle build jar
+    ./gradle test
 
-This calls javah to build the headers in src/native/include, and then compiles the C and Java pieces to create a jar file a sharable library (.so).
+This calls javah to build the headers in src/native/c, and then compiles the C and Java pieces to create a jar file a sharable library (.so).
 
 ## Building the JNI Layer for Android
 

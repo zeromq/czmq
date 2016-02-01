@@ -183,7 +183,8 @@ dist_api_DATA = \
     api/zsock.xml \
     api/zstr.xml \
     api/ztrie.xml \
-    api/zuuid.xml
+    api/zuuid.xml \
+    api/zgossip_msg.api
 
 # define custom target for all products of /src
 src:

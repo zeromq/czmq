@@ -135,6 +135,87 @@ CZMQ_EXPORT char *
     zstr_str (void *source);
 
 //  *** Draft method, defined for internal use only ***
+//  Create a new empty zgossip_msg
+CZMQ_EXPORT zgossip_msg_t *
+    zgossip_msg_new (void);
+
+//  *** Draft method, defined for internal use only ***
+//  Destroy a zgossip_msg instance
+CZMQ_EXPORT void
+    zgossip_msg_destroy (zgossip_msg_t **self_p);
+
+//  *** Draft method, defined for internal use only ***
+//  Receive a zgossip_msg from the socket. Returns 0 if OK, -1 if
+//  there was an error. Blocks if there is no message waiting.   
+CZMQ_EXPORT int
+    zgossip_msg_recv (zgossip_msg_t *self, zsock_t *input);
+
+//  *** Draft method, defined for internal use only ***
+//  Send the zgossip_msg to the output socket, does not destroy it
+CZMQ_EXPORT int
+    zgossip_msg_send (zgossip_msg_t *self, zsock_t *output);
+
+//  *** Draft method, defined for internal use only ***
+//  Print contents of message to stdout
+CZMQ_EXPORT void
+    zgossip_msg_print (zgossip_msg_t *self);
+
+//  *** Draft method, defined for internal use only ***
+//  Get the message routing id, as a frame
+CZMQ_EXPORT zframe_t *
+    zgossip_msg_routing_id (zgossip_msg_t *self);
+
+//  *** Draft method, defined for internal use only ***
+//  Set the message routing id from a frame
+CZMQ_EXPORT void
+    zgossip_msg_set_routing_id (zgossip_msg_t *self, zframe_t *routing_id);
+
+//  *** Draft method, defined for internal use only ***
+//  Get the zgossip_msg message id
+CZMQ_EXPORT int
+    zgossip_msg_id (zgossip_msg_t *self);
+
+//  *** Draft method, defined for internal use only ***
+//  Set the zgossip_msg message id
+CZMQ_EXPORT void
+    zgossip_msg_set_id (zgossip_msg_t *self, int id);
+
+//  *** Draft method, defined for internal use only ***
+//  Get the zgossip_msg message id as printable text
+CZMQ_EXPORT const char *
+    zgossip_msg_command (zgossip_msg_t *self);
+
+//  *** Draft method, defined for internal use only ***
+//  Get the key field
+CZMQ_EXPORT const char *
+    zgossip_msg_key (zgossip_msg_t *self);
+
+//  *** Draft method, defined for internal use only ***
+//  Set the key field
+CZMQ_EXPORT void
+    zgossip_msg_set_key (zgossip_msg_t *self, const char *key);
+
+//  *** Draft method, defined for internal use only ***
+//  Get the value field
+CZMQ_EXPORT const char *
+    zgossip_msg_value (zgossip_msg_t *self);
+
+//  *** Draft method, defined for internal use only ***
+//  Set the value field
+CZMQ_EXPORT void
+    zgossip_msg_set_value (zgossip_msg_t *self, const char *value);
+
+//  *** Draft method, defined for internal use only ***
+//  Get the ttl field
+CZMQ_EXPORT uint32_t
+    zgossip_msg_ttl (zgossip_msg_t *self);
+
+//  *** Draft method, defined for internal use only ***
+//  Set the ttl field
+CZMQ_EXPORT void
+    zgossip_msg_set_ttl (zgossip_msg_t *self, uint32_t ttl);
+
+//  *** Draft method, defined for internal use only ***
 //  Self test of this class.
 CZMQ_EXPORT void
     zgossip_msg_test (bool verbose);

@@ -3,7 +3,7 @@
     title = "ZeroMQ Gossip Protocol"
     script = "zproto_codec_c"
     package_dir = "."
-    project_header = "../include/czmq.h"
+    project_header = "czmq_classes.h"
     export_macro = "CZMQ_EXPORT"
     >
     This is a server implementation of the ZeroMQ Gossip Protocol (ZGP)
@@ -22,7 +22,7 @@
     <message name = "hello">
         Client says hello to server
     </message>
-    
+
     <message name = "publish">
         Client or server announces a new tuple
         <field name = "key" type = "string">Tuple key, globally unique</field>
