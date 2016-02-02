@@ -127,6 +127,20 @@ QZsock* QZsock::newClient (const QString &endpoint, QObject *qObjParent)
 }
 
 ///
+//  Create a RADIO socket. Default action is bind.
+QZsock* QZsock::newRadio (const QString &endpoint, QObject *qObjParent)
+{
+    return new QZsock (zsock_new_radio (endpoint.toUtf8().data()), qObjParent);
+}
+
+///
+//  Create a DISH socket. Default action is connect.
+QZsock* QZsock::newDish (const QString &endpoint, QObject *qObjParent)
+{
+    return new QZsock (zsock_new_dish (endpoint.toUtf8().data()), qObjParent);
+}
+
+///
 //  Destroy the socket. You must use this for any socket created via the
 //  zsock_new method.                                                   
 QZsock::~QZsock ()
@@ -370,6 +384,24 @@ void QZsock::flush ()
 {
     zsock_flush (self);
     
+}
+
+///
+//  Join a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+//  Returns 0 if OK, -1 if failed.                                 
+int QZsock::join (const QString &group)
+{
+    int rv = zsock_join (self, group.toUtf8().data());
+    return rv;
+}
+
+///
+//  Leave a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+//  Returns 0 if OK, -1 if failed.                                  
+int QZsock::leave (const QString &group)
+{
+    int rv = zsock_leave (self, group.toUtf8().data());
+    return rv;
 }
 
 ///

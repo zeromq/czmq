@@ -132,6 +132,20 @@ public class Zsock implements AutoCloseable{
         return new Zsock (__newClient (endpoint));
     }
     /*
+    Create a RADIO socket. Default action is bind.
+    */
+    native static long __newRadio (String endpoint);
+    public Zsock newRadio (String endpoint) {
+        return new Zsock (__newRadio (endpoint));
+    }
+    /*
+    Create a DISH socket. Default action is connect.
+    */
+    native static long __newDish (String endpoint);
+    public Zsock newDish (String endpoint) {
+        return new Zsock (__newDish (endpoint));
+    }
+    /*
     Destroy the socket. You must use this for any socket created via the
     zsock_new method.                                                   
     */
@@ -381,6 +395,22 @@ public class Zsock implements AutoCloseable{
     native static void __flush (long self);
     public void flush () {
         __flush (self);
+    }
+    /*
+    Join a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+    Returns 0 if OK, -1 if failed.                                 
+    */
+    native static int __join (long self, String group);
+    public int join (String group) {
+        return __join (self, group);
+    }
+    /*
+    Leave a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+    Returns 0 if OK, -1 if failed.                                  
+    */
+    native static int __leave (long self, String group);
+    public int leave (String group) {
+        return __leave (self, group);
     }
     /*
     Probe the supplied object, and report if it looks like a zsock_t.

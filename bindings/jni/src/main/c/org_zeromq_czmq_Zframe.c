@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <jni.h>
 #include "czmq.h"
-#include "../../native/include/org_zeromq_czmq_Zframe.h"
+#include "org_zeromq_czmq_Zframe.h"
 
 JNIEXPORT jlong JNICALL
 Java_org_zeromq_czmq_Zframe__1_1new (JNIEnv *env, jclass c, jbyteArray data, jlong size)
@@ -132,6 +132,23 @@ JNIEXPORT void JNICALL
 Java_org_zeromq_czmq_Zframe__1_1setRoutingId (JNIEnv *env, jclass c, jlong self, jint routing_id)
 {
     zframe_set_routing_id ((zframe_t *) (intptr_t) self, (uint32_t) routing_id);
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_zeromq_czmq_Zframe__1_1group (JNIEnv *env, jclass c, jlong self)
+{
+    char *group_ = (char *) zframe_group ((zframe_t *) (intptr_t) self);
+    jstring return_string_ = (*env)->NewStringUTF (env, group_);
+    return return_string_;
+}
+
+JNIEXPORT jint JNICALL
+Java_org_zeromq_czmq_Zframe__1_1setGroup (JNIEnv *env, jclass c, jlong self, jstring group)
+{
+    char *group_ = (char *) (*env)->GetStringUTFChars (env, group, NULL);
+    jint set_group_ = (jint) zframe_set_group ((zframe_t *) (intptr_t) self, group_);
+    (*env)->ReleaseStringUTFChars (env, group, group_);
+    return set_group_;
 }
 
 JNIEXPORT jboolean JNICALL

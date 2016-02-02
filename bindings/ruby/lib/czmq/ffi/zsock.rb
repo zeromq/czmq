@@ -201,6 +201,22 @@ module CZMQ
         __new ptr
       end
 
+      # Create a RADIO socket. Default action is bind.
+      # @param endpoint [String, #to_s, nil]
+      # @return [CZMQ::Zsock]
+      def self.new_radio(endpoint)
+        ptr = ::CZMQ::FFI.zsock_new_radio(endpoint)
+        __new ptr
+      end
+
+      # Create a DISH socket. Default action is connect.
+      # @param endpoint [String, #to_s, nil]
+      # @return [CZMQ::Zsock]
+      def self.new_dish(endpoint)
+        ptr = ::CZMQ::FFI.zsock_new_dish(endpoint)
+        __new ptr
+      end
+
       # Destroy the socket. You must use this for any socket created via the
       # zsock_new method.                                                   
       #
@@ -791,6 +807,60 @@ module CZMQ
       def self.flush(self_p)
         self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
         result = ::CZMQ::FFI.zsock_flush(self_p)
+        result
+      end
+
+      # Join a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+      # Returns 0 if OK, -1 if failed.                                 
+      #
+      # @param group [String, #to_s, nil]
+      # @return [Integer]
+      def join(group)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_join(self_p, group)
+        result
+      end
+
+      # Join a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+      # Returns 0 if OK, -1 if failed.                                 
+      #
+      # This is the polymorphic version of #join.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param group [String, #to_s, nil]
+      # @return [Integer]
+      def self.join(self_p, group)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_join(self_p, group)
+        result
+      end
+
+      # Leave a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+      # Returns 0 if OK, -1 if failed.                                  
+      #
+      # @param group [String, #to_s, nil]
+      # @return [Integer]
+      def leave(group)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zsock_leave(self_p, group)
+        result
+      end
+
+      # Leave a group for the RADIO-DISH pattern. Call only on ZMQ_DISH.
+      # Returns 0 if OK, -1 if failed.                                  
+      #
+      # This is the polymorphic version of #leave.
+      #
+      # @param self_p [CZMQ::Zsock, #__ptr, ::FFI::Pointer, nil]
+      #   object reference to use this method on
+      # @param group [String, #to_s, nil]
+      # @return [Integer]
+      def self.leave(self_p, group)
+        self_p = self_p.__ptr if self_p.respond_to?(:__ptr)
+        result = ::CZMQ::FFI.zsock_leave(self_p, group)
         result
       end
 

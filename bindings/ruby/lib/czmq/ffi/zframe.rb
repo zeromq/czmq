@@ -249,6 +249,29 @@ module CZMQ
         result
       end
 
+      # Return frame group of radio-dish pattern.
+      #
+      # @return [String]
+      def group()
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zframe_group(self_p)
+        result
+      end
+
+      # Set group on frame. This is used if/when the frame is sent to a
+      # ZMQ_RADIO socket.                                              
+      # Return -1 on error, 0 on success.                              
+      #
+      # @param group [String, #to_s, nil]
+      # @return [Integer]
+      def set_group(group)
+        raise DestroyedError unless @ptr
+        self_p = @ptr
+        result = ::CZMQ::FFI.zframe_set_group(self_p, group)
+        result
+      end
+
       # Return TRUE if two frames have identical size and data
       # If either frame is NULL, equality is always false.    
       #
